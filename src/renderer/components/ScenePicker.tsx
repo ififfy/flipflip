@@ -2,19 +2,16 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 import {remote} from 'electron';
-
-type Scene = {
-  id: Number,
-  name: string,
-  directories: Array<String>,
-};
+import Scene from '../Scene';
 
 class ScenePickerItem extends React.Component {
   readonly props: { scene: Scene, onSelect(scene: Scene): void }
 
   render() {
     return (
-      <div className="ScenePickerItem u-clickable" onClick={this.onClick.bind(this)}>
+      <div
+          className="ScenePickerItem u-clickable"
+          onClick={this.onClick.bind(this)}>
         {this.props.scene.name}
       </div>
     );
@@ -35,19 +32,19 @@ export default class ScenePicker extends React.Component {
   render() {
     return (
       <div className="ScenePicker">
-        {this.props.scenes.map((scene) => <ScenePickerItem scene={scene} onSelect={this.props.onSelect} />)}
-        <div className="ScenePickerItem u-clickable" onClick={this.onAdd.bind(this)}>New scene</div>
+        {this.props.scenes.map((scene) =>
+          <ScenePickerItem key={`${scene.id}`} scene={scene} onSelect={this.props.onSelect
+         } />)}
+        <div key="add" className="ScenePickerItem u-clickable" onClick={this.onAdd.bind(this)}>+ Add scene</div>
       </div>
     );
   }
 
   onAdd() {
-    const id = (this.props.scenes.length > 0
-      ? this.props.scenes[this.props.scenes.length - 1].id
-      : 1);
-    this.props.onAdd({
+    const id = this.props.scenes.length + 1;
+    this.props.onAdd(new Scene({
       id: id,
       name: "New scene",
-      directories: []});
+      directories: []}));
   }
 };

@@ -1,4 +1,25 @@
+*, *::after, *::before {
+  box-sizing: border-box;
+}
+
+.u-button {
+  padding: 0.2em;
+  border: 0.5px solid blue;
+  border-radius: 0.2em;
+  display: inline-block;
+
+  &:hover {
+    background-color: #eee;
+  }
+}
+
+/* attributes */
+
 .u-clickable {
   cursor: pointer;
   color: blue;
+}
+
+.u-destructive {
+  color: red !important;
 }

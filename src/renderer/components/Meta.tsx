@@ -5,21 +5,20 @@ import * as ReactDOM from 'react-dom';
 import {writeFileSync, mkdirSync} from 'fs';
 import path from 'path';
 
+import Scene from '../Scene';
 import ScenePicker from './ScenePicker';
 import SceneDetail from './SceneDetail';
 
 import {remote} from 'electron';
 
 const saveDir = path.join(remote.app.getPath('appData'), 'flipflip');
-mkdirSync(saveDir);
+try {
+  mkdirSync(saveDir);
+} catch (e) {
+  // who cares
+}
 const savePath = path.join(saveDir, 'data.json');
 console.log("Saving to", savePath);
-
-type Scene = {
-  id: Number,
-  name: string,
-  directories: Array<String>,
-};
 
 class Route {
   kind: String
@@ -34,6 +33,7 @@ class Route {
 const initialState = {
   scenes: Array<Scene>(),
   route: Array<Route>(),
+  autoEdit: Boolean,
 };
 
 export default class Meta extends React.Component {
@@ -68,7 +68,9 @@ export default class Meta extends React.Component {
         {this.isRoute('scene') && (
           <SceneDetail
             scene={this.scene()}
+            autoEdit={this.state.autoEdit}
             goBack={this.goBack.bind(this)}
+            onDelete={this.onDeleteScene.bind(this)}
             onChangeName={this.onChangeName.bind(this)}
             onChangeDirectories={this.onChangeDirectories.bind(this)} />)}
       </div>
@@ -80,13 +82,23 @@ export default class Meta extends React.Component {
   }
 
   goBack() {
-    this.setState({route: this.state.route.splice(-1,1)})
+    const newRoute = this.state.route;
+    this.state.route.pop();
+    this.setState({route: newRoute, autoEdit: false});
   }
 
   onAddScene(scene: Scene) {
     this.setState({
       scenes: this.state.scenes.concat([scene]),
       route: [new Route('scene', scene.id)],
+      autoEdit: true,
+    });
+  }
+
+  onDeleteScene(scene: Scene) {
+    this.setState({
+      scenes: this.state.scenes.filter((s) => s.id != scene.id),
+      route: [],
     });
   }
 

@@ -3,40 +3,45 @@ import * as ReactDOM from 'react-dom';
 
 import {remote} from 'electron';
 
-type Scene = {
-  id: Number,
-  name: string,
-  directories: Array<String>,
-};
+import Scene from '../Scene';
 
 type Props = {
   scene?: Scene,
+  autoEdit: boolean,
   goBack(): void,
   onChangeName(scene: Scene, name: String): void,
   onChangeDirectories(scene: Scene, directories: Array<String>): void,
+  onDelete(scene: Scene): void,
 };
 
 export default class SceneDetail extends React.Component {
   readonly props: Props
+  readonly nameInputRef: React.RefObject<HTMLInputElement> = React.createRef()
 
   readonly state: {
-    isEditingName: Boolean
+    isEditingName: boolean,
   }
 
   constructor(props: Props) {
     super(props);
     this.props = props;
-    this.state = {isEditingName: false};
+    this.state = {isEditingName: props.autoEdit};
   }
 
   render() {
     return (
       <div className='SceneDetail'>
-        <div className="BackButton u-clickable" onClick={this.props.goBack}>Back</div>
+        <div className="BackButton u-button u-clickable" onClick={this.props.goBack}>Back</div>
+        <div
+          className="DeleteButton u-destructive u-button u-clickable"
+          onClick={this.props.onDelete.bind(this, this.props.scene)}>
+          Delete
+        </div>
         {this.state.isEditingName && (
           <form className="SceneNameForm" onSubmit={this.endEditingName.bind(this)}>
             <input
               type="text"
+              ref={this.nameInputRef}
               value={this.props.scene.name}
               onChange={this.onChangeName.bind(this)} />
           </form>
@@ -48,6 +53,13 @@ export default class SceneDetail extends React.Component {
         )}
       </div>
     )
+  }
+
+  componentDidMount() {
+    if (this.nameInputRef.current) {
+      this.nameInputRef.current.select();
+      this.nameInputRef.current.focus();
+    }
   }
 
   beginEditingName() {
