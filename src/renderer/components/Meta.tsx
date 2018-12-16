@@ -86,6 +86,8 @@ export default class Meta extends React.Component {
             onDelete={this.onDeleteScene.bind(this)}
             onPlay={this.onPlayScene.bind(this)}
             onChangeName={this.onChangeName.bind(this)}
+            onChangeImageTypeFilter={this.onChangeImageTypeFilter.bind(this)}
+            onChangeTimingFunction={this.onChangeTimingFunction.bind(this)}
             onChangeDirectories={this.onChangeDirectories.bind(this)} />)}
 
         {this.isRoute('play') && (
@@ -132,23 +134,37 @@ export default class Meta extends React.Component {
     this.setState({route: newRoute});
   }
 
-  onChangeDirectories(scene: Scene, directories: Array<string>) {
+  editScene(scene: Scene, fn: (scene: Scene) => void) {
     const scenes = this.state.scenes;
     for (let s of scenes) {
       if (s.id == scene.id) {
-        s.directories = directories;
+        fn(s);
       }
     }
     this.setState({scenes: scenes});
   }
 
+  onChangeDirectories(scene: Scene, directories: Array<string>) {
+    this.editScene(scene, (s) => {
+      s.directories = directories;
+    });
+  }
+
   onChangeName(scene: Scene, name: string) {
-    const scenes = this.state.scenes;
-    for (let s of scenes) {
-      if (s.id == scene.id) {
-        s.name = name;
-      }
-    }
-    this.setState({scenes: scenes});
+    this.editScene(scene, (s) => {
+      s.name = name;
+    });
+  }
+
+  onChangeImageTypeFilter(scene: Scene, filter: string) {
+    this.editScene(scene, (s) => {
+      s.imageTypeFilter = filter; 
+    });
+  }
+
+  onChangeTimingFunction(scene: Scene, fnId: string) {
+    this.editScene(scene, (s) => {
+      s.timingFunction = fnId;
+    });
   }
 };

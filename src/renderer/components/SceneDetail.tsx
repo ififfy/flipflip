@@ -5,7 +5,8 @@ import {remote} from 'electron';
 
 import Scene from '../Scene';
 import DirectoryPicker from './DirectoryPicker';
-import ScenePicker from './ScenePicker';
+import SimpleOptionPicker from './SimpleOptionPicker';
+import TIMING_FUNCTIONS from '../TIMING_FUNCTIONS';
 
 type Props = {
   scene?: Scene,
@@ -13,6 +14,8 @@ type Props = {
   goBack(): void,
   onPlay(scene: Scene): void,
   onChangeName(scene: Scene, name: string): void,
+  onChangeImageTypeFilter(scene: Scene, filter: string): void,
+  onChangeTimingFunction(scene: Scene, fnId: string): void,
   onChangeDirectories(scene: Scene, directories: Array<string>): void,
   onDelete(scene: Scene): void,
 };
@@ -59,6 +62,19 @@ export default class SceneDetail extends React.Component {
                 className="SceneName u-clickable"
                 onClick={this.beginEditingName.bind(this)}>{this.props.scene.name}</h1>
             )}
+
+            <form className="SceneOptionsForm">
+              <SimpleOptionPicker
+                onChange={this.props.onChangeTimingFunction.bind(this, this.props.scene)}
+                label="Timing"
+                value={this.props.scene.timingFunction}
+                keys={Array.from(TIMING_FUNCTIONS.keys()).map((s) => s.toString())} />
+              <SimpleOptionPicker
+                onChange={this.props.onChangeImageTypeFilter.bind(this, this.props.scene)}
+                label="Image filter"
+                value={this.props.scene.imageTypeFilter}
+                keys={['any', 'gifs', 'stills']} />
+            </form>
 
             <div onClick={this.play.bind(this)} className="SceneDetail__PlayButton u-clickable u-button">
               Play

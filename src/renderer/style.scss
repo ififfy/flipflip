@@ -125,6 +125,14 @@ body {
   border-radius: 0.5rem;
 }
 
+.SimpleOptionPicker {
+  height: 2.5rem;
+
+  label {
+    margin-right: 0.5rem;
+  }
+}
+
 .DirectoryPicker__Directory {
   padding: $smallPadding;
   padding-left: 0;
