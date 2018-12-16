@@ -34,33 +34,44 @@ export default class SceneDetail extends React.Component {
   render() {
     return (
       <div className='SceneDetail'>
-        <div className="BackButton u-button u-clickable" onClick={this.props.goBack}>Back</div>
-        <div
-          className="DeleteButton u-destructive u-button u-clickable"
-          onClick={this.props.onDelete.bind(this, this.props.scene)}>
-          Delete
+        <div className="u-button-row">
+          <div className="BackButton u-button u-clickable" onClick={this.props.goBack}>Back</div>
+          <div
+            className="DeleteButton u-destructive u-button u-clickable"
+            onClick={this.props.onDelete.bind(this, this.props.scene)}>
+            Delete
+          </div>
         </div>
-        {this.state.isEditingName && (
-          <form className="SceneNameForm" onSubmit={this.endEditingName.bind(this)}>
-            <input
-              type="text"
-              ref={this.nameInputRef}
-              value={this.props.scene.name}
-              onChange={this.onChangeName.bind(this)} />
-          </form>
-        )}
-        {!this.state.isEditingName && (
-          <h1
-            className="SceneName u-clickable"
-            onClick={this.beginEditingName.bind(this)}>{this.props.scene.name}</h1>
-        )}
 
-        <div onClick={this.play.bind(this)} className="u-clickable u-button">Play</div>
+        <div className="SceneDetail__Content">
+          <div className="SceneDetail__Options">
+            {this.state.isEditingName && (
+              <form className="SceneNameForm" onSubmit={this.endEditingName.bind(this)}>
+                <input
+                  type="text"
+                  ref={this.nameInputRef}
+                  value={this.props.scene.name}
+                  onChange={this.onChangeName.bind(this)} />
+              </form>
+            )}
+            {!this.state.isEditingName && (
+              <h1
+                className="SceneName u-clickable"
+                onClick={this.beginEditingName.bind(this)}>{this.props.scene.name}</h1>
+            )}
 
-        <h2>Sources:</h2>
-        <DirectoryPicker
-          directories={this.props.scene.directories}
-          onChange={this.onChangeDirectories.bind(this)} />
+            <div onClick={this.play.bind(this)} className="SceneDetail__PlayButton u-clickable u-button">
+              Play
+            </div>
+          </div>
+
+          <div className='SceneDetail__Sources'>
+            <h2>Sources:</h2>
+            <DirectoryPicker
+              directories={this.props.scene.directories}
+              onChange={this.onChangeDirectories.bind(this)} />
+          </div>
+        </div>
       </div>
     )
   }

@@ -24,7 +24,7 @@ export default class DirectoryPicker extends React.Component {
               {pathname(directory, this.props.directories)}
               <div
                 onClick={this.onRemove.bind(this, directory)}
-                className="u-button u-destructive u-clickable">✖️</div>
+                className="u-button u-destructive u-clickable">×️</div>
             </div>
           );
         })}

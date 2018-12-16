@@ -72,8 +72,6 @@ export default class ImagePlayer extends React.Component {
       return;
     }
 
-    console.log("running", i, this.state);
-
     this.setState({numBeingLoaded: this.state.numBeingLoaded + 1});
 
     // We either get one giant list of paths, or one list per directory,
@@ -84,6 +82,8 @@ export default class ImagePlayer extends React.Component {
     const img = new Image();
 
     img.onload = () => {
+      // images may load immediately, but that messes up the setState()
+      // lifecycle, so always load on the next event loop iteration
       setTimeout(() => {
         if (!this._isMounted) return;
         this.setState({
