@@ -4,6 +4,8 @@ import * as ReactDOM from 'react-dom';
 import {remote} from 'electron';
 
 import Scene from '../Scene';
+import DirectoryPicker from './DirectoryPicker';
+import ScenePicker from './ScenePicker';
 
 type Props = {
   scene?: Scene,
@@ -51,6 +53,10 @@ export default class SceneDetail extends React.Component {
             className="SceneName u-clickable"
             onClick={this.beginEditingName.bind(this)}>{this.props.scene.name}</h1>
         )}
+
+        <DirectoryPicker
+          directories={this.props.scene.directories}
+          onChange={this.onChangeDirectories.bind(this)} />
       </div>
     )
   }
@@ -75,5 +81,9 @@ export default class SceneDetail extends React.Component {
     const scene = this.props.scene;
     if (!scene) return;
     this.props.onChangeName(scene, e.currentTarget.value);
+  }
+
+  onChangeDirectories(directories: Array<String>) {
+    this.props.onChangeDirectories(this.props.scene, directories);
   }
 };
