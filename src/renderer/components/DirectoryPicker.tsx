@@ -6,8 +6,8 @@ import {remote} from 'electron';
 import {pathname} from '../util';
 
 type Props = {
-  directories: Array<String>,
-  onChange(directories: Array<String>): void,
+  directories: Array<string>,
+  onChange(directories: Array<string>): void,
 };
 
 export default class DirectoryPicker extends React.Component {
@@ -38,7 +38,7 @@ export default class DirectoryPicker extends React.Component {
       remote.dialog.showOpenDialog({properties: ['openDirectory', 'multiSelections']})));
   }
 
-  onRemove(val: String) {
+  onRemove(val: string) {
 
     this.props.onChange(this.props.directories.filter((d) => d != val));
   }

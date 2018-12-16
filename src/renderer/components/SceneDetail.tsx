@@ -11,8 +11,9 @@ type Props = {
   scene?: Scene,
   autoEdit: boolean,
   goBack(): void,
-  onChangeName(scene: Scene, name: String): void,
-  onChangeDirectories(scene: Scene, directories: Array<String>): void,
+  onPlay(scene: Scene): void,
+  onChangeName(scene: Scene, name: string): void,
+  onChangeDirectories(scene: Scene, directories: Array<string>): void,
   onDelete(scene: Scene): void,
 };
 
@@ -54,6 +55,9 @@ export default class SceneDetail extends React.Component {
             onClick={this.beginEditingName.bind(this)}>{this.props.scene.name}</h1>
         )}
 
+        <div onClick={this.play.bind(this)} className="u-clickable u-button">Play</div>
+
+        <h2>Sources:</h2>
         <DirectoryPicker
           directories={this.props.scene.directories}
           onChange={this.onChangeDirectories.bind(this)} />
@@ -66,6 +70,10 @@ export default class SceneDetail extends React.Component {
       this.nameInputRef.current.select();
       this.nameInputRef.current.focus();
     }
+  }
+
+  play() {
+    this.props.onPlay(this.props.scene);
   }
 
   beginEditingName() {
@@ -83,7 +91,7 @@ export default class SceneDetail extends React.Component {
     this.props.onChangeName(scene, e.currentTarget.value);
   }
 
-  onChangeDirectories(directories: Array<String>) {
+  onChangeDirectories(directories: Array<string>) {
     this.props.onChangeDirectories(this.props.scene, directories);
   }
 };

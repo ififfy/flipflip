@@ -1,6 +1,6 @@
 import {sep, join} from 'path';
 
-export function pathname(p: String, all: Array<String>): String {
+export function pathname(p: string, all: Array<string>): string {
   const parts = p.split(sep).reverse();
   const allParts = all
     .filter((p2) => p2 != p)

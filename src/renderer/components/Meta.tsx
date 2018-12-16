@@ -8,11 +8,12 @@ import path from 'path';
 import Scene from '../Scene';
 import ScenePicker from './ScenePicker';
 import SceneDetail from './SceneDetail';
+import Player from './Player';
 
 import {remote} from 'electron';
 
 class Route {
-  kind: String
+  kind: string
   value: any
 
   constructor(init?:Partial<Route>) {
@@ -50,9 +51,9 @@ try {
 export default class Meta extends React.Component {
   readonly state = initialState
 
-  isRoute(kind: String): Boolean {
+  isRoute(kind: string): Boolean {
     if (this.state.route.length < 1) return false;
-    return this.state.route[0].kind === kind;
+    return this.state.route[this.state.route.length - 1].kind === kind;
   }
 
   scene?(): Scene {
@@ -76,14 +77,22 @@ export default class Meta extends React.Component {
             scenes={this.state.scenes}
             onAdd={this.onAddScene.bind(this)}
             onSelect={this.onOpenScene.bind(this)} />)}
+
         {this.isRoute('scene') && (
           <SceneDetail
             scene={this.scene()}
             autoEdit={this.state.autoEdit}
             goBack={this.goBack.bind(this)}
             onDelete={this.onDeleteScene.bind(this)}
+            onPlay={this.onPlayScene.bind(this)}
             onChangeName={this.onChangeName.bind(this)}
             onChangeDirectories={this.onChangeDirectories.bind(this)} />)}
+
+        {this.isRoute('play') && (
+          <Player
+            scene={this.scene()}
+            goBack={this.goBack.bind(this)} />
+        )}
       </div>
     )
   }
@@ -117,7 +126,13 @@ export default class Meta extends React.Component {
     this.setState({route: [new Route({kind: 'scene', value: scene.id})]});
   }
 
-  onChangeDirectories(scene: Scene, directories: Array<String>) {
+  onPlayScene(scene: Scene) {
+    const newRoute = this.state.route.concat(new Route({kind: 'play', value: scene.id}));
+    console.log(newRoute);
+    this.setState({route: newRoute});
+  }
+
+  onChangeDirectories(scene: Scene, directories: Array<string>) {
     const scenes = this.state.scenes;
     for (let s of scenes) {
       if (s.id == scene.id) {

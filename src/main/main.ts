@@ -1,10 +1,19 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, session } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 
 let mainWindow: Electron.BrowserWindow;
 
 function createWindow() {
+    session.defaultSession.webRequest.onHeadersReceived((details: any, callback: any) => {
+        callback({
+            responseHeaders: {
+            ...details.responseHeaders,
+            'Content-Security-Policy': ['default-src \'none\'']
+            }
+        })
+    });
+
     // Create the browser window.
     mainWindow = new BrowserWindow({
         height: 600,
