@@ -2,7 +2,7 @@ import _ from 'lodash';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import {writeFileSync, mkdirSync} from 'fs';
+import {writeFileSync, mkdirSync, readFileSync, readFile} from 'fs';
 import path from 'path';
 
 import Scene from '../Scene';
@@ -10,6 +10,21 @@ import ScenePicker from './ScenePicker';
 import SceneDetail from './SceneDetail';
 
 import {remote} from 'electron';
+
+class Route {
+  kind: String
+  value: any
+
+  constructor(init?:Partial<Route>) {
+    Object.assign(this, init);
+  }
+}
+
+let initialState = {
+  scenes: Array<Scene>(),
+  route: Array<Route>(),
+  autoEdit: false,
+}
 
 const saveDir = path.join(remote.app.getPath('appData'), 'flipflip');
 try {
@@ -20,21 +35,17 @@ try {
 const savePath = path.join(saveDir, 'data.json');
 console.log("Saving to", savePath);
 
-class Route {
-  kind: String
-  value: any
-
-  constructor(kind: String, value: any) {
-    this.kind = kind;
-    this.value = value;
+try {
+  const data = JSON.parse(readFileSync(savePath, 'utf-8'));
+  initialState = {
+    autoEdit: data.autoEdit,
+    scenes: data.scenes.map((s: any) => new Scene(s)),
+    route: data.route.map((s: any) => new Route(s)),
   }
+  console.log(initialState);
+} catch (e) {
+  // who cares
 }
-
-const initialState = {
-  scenes: Array<Scene>(),
-  route: Array<Route>(),
-  autoEdit: Boolean,
-};
 
 export default class Meta extends React.Component {
   readonly state = initialState
@@ -90,7 +101,7 @@ export default class Meta extends React.Component {
   onAddScene(scene: Scene) {
     this.setState({
       scenes: this.state.scenes.concat([scene]),
-      route: [new Route('scene', scene.id)],
+      route: [new Route({kind: 'scene', value: scene.id})],
       autoEdit: true,
     });
   }
@@ -103,7 +114,7 @@ export default class Meta extends React.Component {
   }
 
   onOpenScene(scene: Scene) {
-    this.setState({route: [new Route('scene', scene.id)]});
+    this.setState({route: [new Route({kind: 'scene', value: scene.id})]});
   }
 
   onChangeDirectories(scene: Scene, directories: Array<String>) {
