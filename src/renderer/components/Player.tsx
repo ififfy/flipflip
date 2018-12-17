@@ -46,8 +46,6 @@ export default class Player extends React.Component {
     console.log(this.state);
     return (
       <div className="Player">
-        <div className="BackButton u-button u-clickable" onClick={this.props.goBack}>Back</div>
-
         {this.state.isLoaded && (
           <ImagePlayer
             maxInMemory={120}
@@ -58,6 +56,10 @@ export default class Player extends React.Component {
             allPaths={this.state.allPaths} />)}
 
         {!this.state.isLoaded && <div>Loading...</div>}
+
+        <div className="u-button-row u-show-on-hover-only">
+          <div className="BackButton u-button u-clickable" onClick={this.props.goBack}>Back</div>
+        </div>
       </div>
     );
   }

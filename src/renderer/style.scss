@@ -2,6 +2,7 @@ $blue: blue;
 $red: red;
 $mouseover: #eee;
 $black: black;
+$buttonBarColor: white;
 
 $smallPadding: 0.5rem;
 $buttonBarHeight: 2rem + $smallPadding;
@@ -34,6 +35,7 @@ body {
 }
 
 .u-button-row {
+  z-index: 1;
   border-bottom: 1px solid $black;
   padding: $smallPadding $smallPadding 0 $smallPadding;
   height: $buttonBarHeight;
@@ -65,6 +67,23 @@ body {
 
 .u-destructive {
   color: $red !important;
+}
+
+.u-show-on-hover-only {
+  border-bottom: none;
+
+  & > * {
+    visibility: hidden;
+  }
+
+  &:hover {
+    background-color: $buttonBarColor;
+    border-bottom: 1px solid $black;
+  }
+
+  &:hover > * {
+    visibility: visible !important;
+  }
 }
 
 /* components */
@@ -144,8 +163,14 @@ body {
   }
 }
 
+.Player {
+  .u-button-row {
+    position: absolute;
+    top: 0; right: 0; left: 0;
+  }
+}
+
 .ImagePlayer {
   position: absolute;
-  top: 30px;
-  right: 0; bottom: 0; left: 0;
+  top: 0; right: 0; bottom: 0; left: 0;
 }
