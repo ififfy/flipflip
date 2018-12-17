@@ -19,6 +19,7 @@ export default class ImagePlayer extends React.Component {
     allPaths: Array<Array<string>>,
     isPlaying: boolean,
     timingFunction: string,
+    historyOffset: number,
   }
 
   readonly state = {
@@ -31,11 +32,21 @@ export default class ImagePlayer extends React.Component {
   _isMounted = false;
 
   render() {
+    if (this.state.pastAndLatest.length < 1) return <div className="ImagePlayer m-empty" />;
+
+    let img = this.state.pastAndLatest[this.state.pastAndLatest.length - 1];
+    if (this.state.historyPaths.length > 0 && !this.props.isPlaying && this.props.historyOffset < 0) {
+      let offset = this.props.historyOffset;
+      // if user went too far off the end, just loop to the front again
+      while (offset < -this.state.historyPaths.length) {
+        offset += this.state.historyPaths.length;
+      }
+      img = new Image();
+      img.src = this.state.historyPaths[this.state.historyPaths.length + offset];
+    }
     return (
       <div className="ImagePlayer">
-        {this.state.pastAndLatest.length > 0 && (
-          <ImageView img={this.state.pastAndLatest[this.state.pastAndLatest.length - 1]} />
-        )}
+        <ImageView img={img} />
       </div>
     );
   }
@@ -112,17 +123,27 @@ export default class ImagePlayer extends React.Component {
 
   advance(isStarting = false, schedule = true) {
     let nextPastAndLatest = this.state.pastAndLatest;
+    let nextHistoryPaths = this.state.historyPaths;
     if (this.state.readyToDisplay.length) {
-      nextPastAndLatest = nextPastAndLatest.concat([this.state.readyToDisplay.shift()]);
+      const nextImg = this.state.readyToDisplay.shift();
+      nextPastAndLatest = nextPastAndLatest.concat([nextImg]);
+      nextHistoryPaths = nextHistoryPaths.concat([nextImg.src]);
     } else if (this.state.pastAndLatest.length) {
-      nextPastAndLatest = nextPastAndLatest.concat([choice(this.state.pastAndLatest)]);
+      // no new image ready; just pick a random one from the past 120
+      const nextImg = choice(this.state.pastAndLatest);
+      nextPastAndLatest = nextPastAndLatest.concat([nextImg]);
+      nextHistoryPaths = nextHistoryPaths.concat([nextImg.src]);
     }
     while (nextPastAndLatest.length > this.props.maxInMemory) {
       nextPastAndLatest.shift();
+      nextHistoryPaths.shift();
     }
 
-    if (this.props.isPlaying && (this._isMounted || isStarting)) {
-      this.setState({pastAndLatest: nextPastAndLatest});
+    if (isStarting || (this.props.isPlaying && this._isMounted)) {
+      this.setState({
+        pastAndLatest: nextPastAndLatest,
+        historyPaths: nextHistoryPaths,
+      });
 
       if (schedule) {
         setTimeout(

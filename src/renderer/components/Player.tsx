@@ -39,6 +39,7 @@ export default class Player extends React.Component {
   readonly state = {
     isLoaded: false,
     isPlaying: false,
+    historyOffset: -1,
     allPaths: Array<Array<string>>(),
   }
 
@@ -48,6 +49,7 @@ export default class Player extends React.Component {
       <div className="Player">
         {this.state.isLoaded && (
           <ImagePlayer
+            historyOffset={this.state.historyOffset}
             maxInMemory={120}
             maxLoadingAtOnce={5}
             maxToRememberInHistory={500}
@@ -59,11 +61,23 @@ export default class Player extends React.Component {
 
         <div className="u-button-row u-show-on-hover-only">
           <div className="BackButton u-button u-clickable" onClick={this.props.goBack}>Back</div>
+          <div className="HistoryBackButton u-button u-clickable" onClick={this.historyBack.bind(this)}>
+            &lt;
+          </div>
+          <div className="HistoryForwardButton u-button u-clickable" onClick={this.historyForward.bind(this)}>
+            &gt;
+          </div>
+          {this.state.isPlaying && (
+            <div className="PauseButton u-button u-clickable" onClick={this.pause.bind(this)}>Pause</div>
+          )}
+          {!this.state.isPlaying && (
+            <div className="PlayButton u-button u-clickable" onClick={this.play.bind(this)}>Play</div>
+          )}
         </div>
       </div>
     );
   }
-  
+
   componentDidMount() {
     const loadAll = () => {
       let n = this.props.scene.directories.length;
@@ -95,5 +109,21 @@ export default class Player extends React.Component {
       });
     };
     loadAll();
+  }
+
+  play() {
+    this.setState({isPlaying: true, historyOffset: -1});
+  }
+
+  pause() {
+    this.setState({isPlaying: false});
+  }
+
+  historyBack() {
+    this.setState({isPlaying: false, historyOffset: this.state.historyOffset - 1});
+  }
+
+  historyForward() {
+    this.setState({isPlaying: false, historyOffset: Math.min(-1, this.state.historyOffset + 1)});
   }
 };
