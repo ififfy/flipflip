@@ -14,5 +14,6 @@ export default class Scene {
 
   constructor(init?:Partial<Scene>) {
     Object.assign(this, init);
+    this.directories = this.directories.filter((d) => !!d);
   }
 }

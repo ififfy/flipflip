@@ -1,8 +1,15 @@
 $blue: blue;
-$red: red;
+$red: #d00;
 $mouseover: #eee;
-$black: black;
-$buttonBarColor: white;
+$black: #010101;
+$white: white;
+$yellow: #ffeeb1;
+$buttonBarColorTop: #ffeeb1;
+$buttonBarColorBottom: #ffcd09;
+$bodyColor: white;
+$buttonTop: #eaeaea;
+$buttonBottom: #dcdcdc;
+$buttonBorder: #727272;
 
 $smallPadding: 0.5rem;
 $buttonBarHeight: 2rem + $smallPadding;
@@ -26,6 +33,14 @@ html, body {
 body {
   font-family: "system";
   font-size: 14px;
+  color: $bodyColor;
+}
+
+.app {
+  position: fixed;
+  top: 0; right: 0; bottom: 0; left: 0;
+  background-color: rgb(52,104,152);
+  background: linear-gradient(180deg, rgba(52,104,152,1) 0%, rgba(24,50,76,1) 100%);
 }
 
 @mixin noselect {
@@ -40,18 +55,23 @@ body {
 
 @mixin mouseover {
   &:hover {
-    background-color: #eee;
+    background-color: rgba(240, 240, 240, 0.3);
   }
+}
+
+@mixin buttonBarBackground {
+  background-color: $buttonBarColorTop;
+  background: linear-gradient(180deg, $buttonBarColorTop 0%, $buttonBarColorBottom 100%);
+  border-bottom: 1px solid $black;
 }
 
 .u-button-row {
   @include noselect;
 
   z-index: 1;
-  border-bottom: 1px solid $black;
   padding: $smallPadding $smallPadding 0 $smallPadding;
   height: $buttonBarHeight;
-  background-color: $buttonBarColor;
+  @include buttonBarBackground;
 
   .u-button-row-right {
     float: right;
@@ -64,10 +84,16 @@ body {
 
 .u-button {
   padding: 0.2em;
-  border: 0.5px solid $blue;
-  border-radius: 0.2em;
+  border: 1px solid $buttonBorder;
   display: inline-block;
-  @include mouseover;
+  color: $black !important;
+
+  background-color: $buttonTop;
+  background: linear-gradient(180deg, $buttonTop 0%, $buttonBottom 100%);
+
+  &:hover {
+    border: 1px solid $white;
+  }
 }
 
 .u-fill-container {
@@ -90,7 +116,7 @@ body {
 
 .u-clickable {
   cursor: pointer;
-  color: $blue;
+  color: $yellow;
 }
 
 .u-disabled {
@@ -104,15 +130,14 @@ body {
 
 .u-show-on-hover-only {
   border-bottom: none;
-  background-color: rgba(0,0,0,0);
+  background: rgba(0,0,0,0);
 
   & > * {
     visibility: hidden;
   }
 
   &:hover {
-    background-color: $buttonBarColor;
-    border-bottom: 1px solid $black;
+    @include buttonBarBackground;
   }
 
   &:hover > * {
@@ -127,19 +152,45 @@ body {
   top: 0;
   bottom: 0;
   left: 0;
-  width: 50%;
-  overflow: auto;
-  border-right: 1px solid $black;
+  right: 0;
+
+  .About {
+    overflow: auto;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    padding: $smallPadding;
+
+    h1:first-child {
+      margin-top: 0;
+    }
+  }
+
+  .ScenePicker__Scenes {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 50%;
+    overflow: auto;
+    border-right: 1px solid $black;
+    padding: $smallPadding;
+  }
 
   .ScenePickerItem {
-    padding: 1rem;
-    margin: $smallPadding;
-    border-radius: $smallPadding;
+    // margin: $smallPadding;
+    // border-radius: $smallPadding;
     display: block;
     text-align: center;
-    border: 1px solid $blue;
+    // border: 1px solid $blue;
+    background-color: $white;
+    color: $black !important;
+    padding: $smallPadding;
 
-    @include mouseover;
+    &:hover {
+      background-color: $buttonBottom;
+    }
   }
 }
 
@@ -153,6 +204,15 @@ body {
 
   h1:first-child {
     margin-top: 0;
+    color: $bodyColor;
+  }
+
+  input {
+    font-size: 28px;
+    font-weight: 700;
+    display: block;
+    width: 100%;
+    margin-bottom: 13px;
   }
 }
 
@@ -178,7 +238,6 @@ $sceneDetailOptionsWidth: 220px;
   width: 100%;
   text-align: center;
   padding: $smallPadding;
-  border-radius: 0.5rem;
 }
 
 .SimpleOptionPicker {
@@ -189,16 +248,42 @@ $sceneDetailOptionsWidth: 220px;
   }
 }
 
+.DirectoryPicker {
+  & > .u-button {
+    float: right;
+    margin-top: $smallPadding;
+    margin-right: $smallPadding;
+    padding: $smallPadding;
+  }
+}
+
 .DirectoryPicker__Directory {
   padding: $smallPadding;
   padding-left: 0;
+  line-height: 1.5rem;
+  height: 2.5rem;
 
   @include mouseover;
 
-  .u-button {
+  .u-button { /* delete */
     float: right;
     text-align: center;
     width: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+    line-height: 1.5rem;
+    font-weight: bold;
+  }
+}
+
+.LoadingIndicator {
+  position: fixed;
+  top: 0; right: 0; bottom: 0; left: 0;
+
+  .loader {
+    position: absolute;
+    top: calc(50% - 10em);
+    left: calc(50% - 5em);
   }
 }
 
@@ -212,4 +297,48 @@ $sceneDetailOptionsWidth: 220px;
 .ImagePlayer {
   position: fixed;
   top: 0; right: 0; bottom: 0; left: 0;
+}
+
+/* loader */
+
+.loader,
+.loader:after {
+  border-radius: 50%;
+  width: 10em;
+  height: 10em;
+}
+.loader {
+  margin: 60px auto;
+  font-size: 10px;
+  position: relative;
+  text-indent: -9999em;
+  border-top: 1.1em solid rgba(255, 255, 255, 0.2);
+  border-right: 1.1em solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1.1em solid rgba(255, 255, 255, 0.2);
+  border-left: 1.1em solid #ffffff;
+  -webkit-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-animation: load8 1.1s infinite linear;
+  animation: load8 1.1s infinite linear;
+}
+@-webkit-keyframes load8 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@keyframes load8 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
 }

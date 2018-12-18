@@ -34,8 +34,10 @@ export default class DirectoryPicker extends React.Component {
   }
 
   onAdd() {
-    this.props.onChange(this.props.directories.concat(
-      remote.dialog.showOpenDialog({properties: ['openDirectory', 'multiSelections']})));
+    const result = remote.dialog.showOpenDialog({properties: ['openDirectory', 'multiSelections']});
+    if (result) {
+      this.props.onChange(this.props.directories.concat(result));
+    }
   }
 
   onRemove(val: string) {

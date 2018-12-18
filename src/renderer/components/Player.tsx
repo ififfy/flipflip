@@ -55,7 +55,6 @@ export default class Player extends React.Component {
   render() {
     const canGoBack = this.state.historyOffset > -this.state.historyLength;
     const canGoForward = this.state.historyOffset < -1;
-    console.log(this.state);
     return (
       <HotKeys keyMap={keyMap} handlers={this.handlers()}>
         <div className="Player">
@@ -70,7 +69,9 @@ export default class Player extends React.Component {
               isPlaying={this.state.isPlaying}
               allPaths={this.state.allPaths} />)}
 
-          {!this.state.isLoaded && <div>Loading...</div>}
+          {!this.state.isLoaded && (
+            <div className="LoadingIndicator"><div className="loader" /></div>
+          )}
 
           <div className={`u-button-row ${this.state.isPlaying ? 'u-show-on-hover-only' : ''}`}>
             <div className="u-button-row-right">
