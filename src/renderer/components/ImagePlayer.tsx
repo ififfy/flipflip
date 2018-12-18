@@ -20,6 +20,7 @@ export default class ImagePlayer extends React.Component {
     isPlaying: boolean,
     timingFunction: string,
     historyOffset: number,
+    setHistoryLength: (historyLength: number) => void,
   }
 
   readonly state = {
@@ -35,6 +36,8 @@ export default class ImagePlayer extends React.Component {
     if (this.state.pastAndLatest.length < 1) return <div className="ImagePlayer m-empty" />;
 
     let img = this.state.pastAndLatest[this.state.pastAndLatest.length - 1];
+
+    // if user is browsing history, use that image instead
     if (this.state.historyPaths.length > 0 && !this.props.isPlaying && this.props.historyOffset < 0) {
       let offset = this.props.historyOffset;
       // if user went too far off the end, just loop to the front again
@@ -44,8 +47,13 @@ export default class ImagePlayer extends React.Component {
       img = new Image();
       img.src = this.state.historyPaths[this.state.historyPaths.length + offset];
     }
+
     return (
       <div className="ImagePlayer">
+        <div className="u-fill-container u-fill-image-blur" style={{
+          backgroundImage: `url("${img.src}")`,
+        }}>
+        </div>
         <ImageView img={img} />
       </div>
     );
@@ -144,6 +152,7 @@ export default class ImagePlayer extends React.Component {
         pastAndLatest: nextPastAndLatest,
         historyPaths: nextHistoryPaths,
       });
+      this.props.setHistoryLength(nextHistoryPaths.length);
 
       if (schedule) {
         setTimeout(

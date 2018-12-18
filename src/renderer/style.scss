@@ -28,6 +28,16 @@ body {
   font-size: 14px;
 }
 
+@mixin noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+      -khtml-user-select: none; /* Konqueror HTML */
+        -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+
 @mixin mouseover {
   &:hover {
     background-color: #eee;
@@ -35,10 +45,17 @@ body {
 }
 
 .u-button-row {
+  @include noselect;
+
   z-index: 1;
   border-bottom: 1px solid $black;
   padding: $smallPadding $smallPadding 0 $smallPadding;
   height: $buttonBarHeight;
+  background-color: $buttonBarColor;
+
+  .u-button-row-right {
+    float: right;
+  }
 
   .u-button {
     margin-right: $smallPadding;
@@ -56,6 +73,17 @@ body {
 .u-fill-container {
   position: absolute;
   top: 0; right: 0; bottom: 0; left: 0;  
+  overflow: hidden;
+}
+
+.u-fill-image-blur {
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;  
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  -webkit-filter: blur(8px);
+  transform: scale(2, 2);
 }
 
 /* attributes */
@@ -65,12 +93,18 @@ body {
   color: $blue;
 }
 
+.u-disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .u-destructive {
   color: $red !important;
 }
 
 .u-show-on-hover-only {
   border-bottom: none;
+  background-color: rgba(0,0,0,0);
 
   & > * {
     visibility: hidden;
@@ -122,9 +156,11 @@ body {
   }
 }
 
+$sceneDetailOptionsWidth: 220px;
+
 .SceneDetail__Options {
   position: absolute;
-  right: 50%;
+  width: $sceneDetailOptionsWidth;
   padding: $smallPadding;
   top: 0; left: $smallPadding; bottom: 0;
   overflow: auto;
@@ -132,9 +168,10 @@ body {
 
 .SceneDetail__Sources {
   position: absolute;
-  left: 50%;
+  left: $sceneDetailOptionsWidth;
   top: 0; right: 0; bottom: 0;
   overflow: auto;
+  padding-left: $smallPadding;
 }
 
 .SceneDetail__PlayButton {
@@ -156,6 +193,8 @@ body {
   padding: $smallPadding;
   padding-left: 0;
 
+  @include mouseover;
+
   .u-button {
     float: right;
     text-align: center;
@@ -171,6 +210,6 @@ body {
 }
 
 .ImagePlayer {
-  position: absolute;
+  position: fixed;
   top: 0; right: 0; bottom: 0; left: 0;
 }

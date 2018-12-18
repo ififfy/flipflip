@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import {HotKeys} from 'react-hotkeys';
 
 import {join} from 'path';
 import {readdir} from 'fs';
@@ -30,6 +31,13 @@ function filterPathsToJustImages(imageTypeFilter: string, paths: Array<string>):
   return paths;
 }
 
+const keyMap = {
+  'playPause': 'space',
+  'historyBack': 'left',
+  'historyForward': 'right',
+  'navigateBack': 'backspace',
+}
+
 export default class Player extends React.Component {
   readonly props: {
     goBack(): void,
@@ -41,40 +49,60 @@ export default class Player extends React.Component {
     isPlaying: false,
     historyOffset: -1,
     allPaths: Array<Array<string>>(),
+    historyLength: 0,
   }
 
   render() {
+    const canGoBack = this.state.historyOffset > -this.state.historyLength;
+    const canGoForward = this.state.historyOffset < -1;
     console.log(this.state);
     return (
-      <div className="Player">
-        {this.state.isLoaded && (
-          <ImagePlayer
-            historyOffset={this.state.historyOffset}
-            maxInMemory={120}
-            maxLoadingAtOnce={5}
-            maxToRememberInHistory={500}
-            timingFunction={this.props.scene.timingFunction}
-            isPlaying={this.state.isPlaying}
-            allPaths={this.state.allPaths} />)}
+      <HotKeys keyMap={keyMap} handlers={this.handlers()}>
+        <div className="Player">
+          {this.state.isLoaded && (
+            <ImagePlayer
+              historyOffset={this.state.historyOffset}
+              setHistoryLength={this.setHistoryLength.bind(this)}
+              maxInMemory={120}
+              maxLoadingAtOnce={5}
+              maxToRememberInHistory={500}
+              timingFunction={this.props.scene.timingFunction}
+              isPlaying={this.state.isPlaying}
+              allPaths={this.state.allPaths} />)}
 
-        {!this.state.isLoaded && <div>Loading...</div>}
+          {!this.state.isLoaded && <div>Loading...</div>}
 
-        <div className="u-button-row u-show-on-hover-only">
-          <div className="BackButton u-button u-clickable" onClick={this.props.goBack}>Back</div>
-          <div className="HistoryBackButton u-button u-clickable" onClick={this.historyBack.bind(this)}>
-            &lt;
+          <div className={`u-button-row ${this.state.isPlaying ? 'u-show-on-hover-only' : ''}`}>
+            <div className="u-button-row-right">
+              <div
+                className={`HistoryBackButton u-button u-clickable ${canGoBack ? '' : 'u-disabled'}`}
+                onClick={canGoBack ? this.historyBack.bind(this) : this.nop}>
+                &larr; back
+              </div>
+              {this.state.isPlaying && (
+                <div
+                  className="PauseButton u-button u-clickable"
+                  onClick={this.pause.bind(this)}>
+                  Pause
+                </div>
+              )}
+              {!this.state.isPlaying && (
+                <div
+                  className="PlayButton u-button u-clickable"
+                  onClick={this.play.bind(this)}>
+                  Play
+                </div>
+              )}
+              <div
+                className={`HistoryForwardButton u-button u-clickable ${canGoForward ? '' : 'u-disabled'}`}
+                onClick={canGoForward ? this.historyForward.bind(this) : this.nop}>
+                forward &rarr;
+              </div>
+            </div>
+            <div className="BackButton u-button u-clickable" onClick={this.props.goBack}>Back</div>
           </div>
-          <div className="HistoryForwardButton u-button u-clickable" onClick={this.historyForward.bind(this)}>
-            &gt;
-          </div>
-          {this.state.isPlaying && (
-            <div className="PauseButton u-button u-clickable" onClick={this.pause.bind(this)}>Pause</div>
-          )}
-          {!this.state.isPlaying && (
-            <div className="PlayButton u-button u-clickable" onClick={this.play.bind(this)}>Play</div>
-          )}
         </div>
-      </div>
+      </HotKeys>
     );
   }
 
@@ -111,6 +139,23 @@ export default class Player extends React.Component {
     loadAll();
   }
 
+  handlers(): any {
+    return {
+      'playPause': this.playPause.bind(this),
+      'historyBack': this.historyBack.bind(this),
+      'historyForward': this.historyForward.bind(this),
+      'navigateBack': this.props.goBack,
+    }
+  }
+
+  nop() {
+
+  }
+
+  playPause() {
+    if (this.state.isPlaying) { this.pause() } else { this.play() }
+  }
+
   play() {
     this.setState({isPlaying: true, historyOffset: -1});
   }
@@ -125,5 +170,9 @@ export default class Player extends React.Component {
 
   historyForward() {
     this.setState({isPlaying: false, historyOffset: Math.min(-1, this.state.historyOffset + 1)});
+  }
+
+  setHistoryLength(n: number) {
+    this.setState({historyLength: n});
   }
 };
