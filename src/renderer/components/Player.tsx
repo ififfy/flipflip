@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom';
 import {HotKeys} from 'react-hotkeys';
 
 import {join} from 'path';
-import {readdir} from 'fs';
+import recursiveReaddir from 'recursive-readdir';
 
 import Scene from '../Scene';
 import ImagePlayer from './ImagePlayer';
@@ -111,11 +111,12 @@ export default class Player extends React.Component {
       let n = this.props.scene.directories.length;
       this.setState({allPaths: []});
       this.props.scene.directories.forEach((d) => {
-        readdir(d, (err, rawFiles) => {
+        const blacklist = ['*.css', '*.html', 'avatar.png'];
+        recursiveReaddir(d, blacklist, (err: any, rawFiles: Array<string>) => {
           if (err) console.warn(err);
 
-          const files = filterPathsToJustImages(this.props.scene.imageTypeFilter, rawFiles)
-            .map((p) => join(d, p));
+          const files = filterPathsToJustImages(this.props.scene.imageTypeFilter, rawFiles);
+            // .map((p) => join(d, p));
 
           let newAllPaths = this.state.allPaths;
           if (this.props.scene.weightDirectoriesEqually) {
