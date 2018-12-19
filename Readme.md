@@ -4,6 +4,9 @@ A random slideshow of images from your computer. Runs on Mac and Windows.
 
 ## [Downloads](https://github.com/ififfy/flipflip/releases)
 
+![Screenshot 1](/screenshot.png)
+![Screenshot 2](/screenshot2.png)
+
 ## Developers
 
 FlipFlip is an Electron app written in TypeScript and React.
