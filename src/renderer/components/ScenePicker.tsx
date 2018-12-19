@@ -60,28 +60,10 @@ export default class ScenePicker extends React.Component {
           </p>
 
           <p>
-            FlipFlip is <strong>giftware:</strong> if you like it, send something nice
+            FlipFlip is <em>giftware:</em> if you like it, send something nice
             to <a href="mailto:ififfy@mm.st">ififfy@mm.st</a>. Perhaps a BTSync/Dropbox
             folder of your favorite FlipFlip images, or links to good image blogs. (The
             software itself is G-rated, but don't let that limit you…)
-          </p>
-
-          <h2>To do</h2>
-          
-          <p>
-            Will probably get to these:
-            <ul>
-              <li>Let you choose images randomly from all images, instead of by directory first</li>
-              <li>Zooming effect</li>
-            </ul>
-          </p>
-          
-          <p>
-            May or may not get to these:
-            <ul>
-              <li>Text scripts</li>
-              <li>Loading images from the internet</li>
-            </ul>
           </p>
 
           <p>
