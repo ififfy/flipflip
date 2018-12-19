@@ -44,17 +44,26 @@ export default class ScenePicker extends React.Component {
 
           <p>
             This program displays random images from your hard drive on a timer. Click
-            'Add Scene' to the left, add some directories, and press Play!
+            'Add Scene' to the left, add some directories, and press Play! You might
+            need to click the window first to make it work.
           </p>
 
           <p>
             While the slideshow is playing, you can press Space to pause, and use the
-            arrow keys to move through the history. Press Cmd+Ctrl+F to fullscreen.
+            arrow keys to move through the history. Press Cmd+Ctrl+F to fullscreen on Mac
+            (not sure what it is on Windows).
           </p>
 
           <p>
             Each time the image changes, one of the directories is chosen randomly, then
             one image inside that directory is chosen randomly.
+          </p>
+
+          <p>
+            FlipFlip is <strong>giftware:</strong> if you like it, send something nice
+            to <a href="mailto:ififfy@mm.st">ififfy@mm.st</a>. Perhaps a BTSync/Dropbox
+            folder of your favorite FlipFlip images, or links to good image blogs. (The
+            software itself is G-rated, but don't let that limit you…)
           </p>
 
           <h2>To do</h2>
@@ -73,6 +82,10 @@ export default class ScenePicker extends React.Component {
               <li>Text scripts</li>
               <li>Loading images from the internet</li>
             </ul>
+          </p>
+
+          <p>
+            Offer bug reports and feature suggestions at <a href="https://github.com/ififfy/flipflip/issues">https://github.com/ififfy/flipflip/issues</a>.
           </p>
 
         </div>

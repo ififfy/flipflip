@@ -1,4 +1,4 @@
-$blue: blue;
+$blue: #ccccff;
 $red: #d00;
 $mouseover: #eee;
 $black: #010101;
@@ -34,6 +34,10 @@ body {
   font-family: "system";
   font-size: 14px;
   color: $bodyColor;
+}
+
+a {
+  color: $blue;
 }
 
 .app {
