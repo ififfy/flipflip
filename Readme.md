@@ -4,6 +4,10 @@ A random slideshow of images from your computer. Runs on Mac and Windows.
 
 ## [Downloads](https://github.com/ififfy/flipflip/releases)
 
+If you are on a Mac, you might need to open this by right-clicking the
+application, selecting "Open," and accepting all the stupid prompts
+that pop up.
+
 ![Screenshot 1](/screenshot.png)
 ![Screenshot 2](/screenshot2.png)
 
