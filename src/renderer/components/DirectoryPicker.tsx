@@ -35,6 +35,7 @@ export default class DirectoryPicker extends React.Component {
         })}
         <div className='u-button u-clickable' onClick={this.onAdd.bind(this)}>+ Add</div>
         <div className='u-button u-clickable' onClick={this.toggleModal}>+ Import From URL</div>
+        <div className='u-button u-clickable' onClick={this.removeAll.bind(this)} style={{float: 'left'}}>- Remove All</div>
         <Modal show={this.state.isOpen} onImport={this.doImport} onClose={this.toggleModal}>
           <div>Enter a gooninator URL for import:</div>
           <input type="text" name="url" onChange={this.importURLChange}/>
@@ -104,5 +105,9 @@ export default class DirectoryPicker extends React.Component {
 
   onRemove(val: string) {
     this.props.onChange(this.props.directories.filter((d) => d != val));
+  }
+
+  removeAll() {
+    this.props.onChange([]);
   }
 };
