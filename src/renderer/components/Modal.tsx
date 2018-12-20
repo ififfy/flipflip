@@ -3,7 +3,6 @@ import React from 'react';
 export default class Modal extends React.Component {
   readonly props: {
     onClose(): void,
-    onImport(): void,
     show: boolean,
     children: JSX.Element[]
   };
@@ -31,14 +30,9 @@ export default class Modal extends React.Component {
           color: 'black'}}>
           {this.props.children}
 
-          <div className="footer">
-            <button onClick={this.props.onImport}>
-              Import
-            </button>
-            <button onClick={this.props.onClose} style={{float: 'right'}}>
-              Cancel
-            </button>
-          </div>
+          <button onClick={this.props.onClose} style={{float: 'right'}}>
+            Cancel
+          </button>
         </div>
       </div>
     );
