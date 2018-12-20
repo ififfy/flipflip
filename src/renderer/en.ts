@@ -13,4 +13,7 @@ export default new Map<String, String>([
   ['if.any', 'All images'],
   ['if.gifs', 'Only gifs'],
   ['if.stills', 'Only stills'],
+  ['zf.none','No zoom'],
+  ['zf.1s','1s zoom'],
+  ['zf.5s','5s zoom'],
 ]);

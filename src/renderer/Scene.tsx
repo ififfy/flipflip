@@ -4,7 +4,8 @@ export default class Scene {
   directories: Array<string> = []
   timingFunction = 'tf.1s'
   imageTypeFilter = 'if.any'  // 'if.gifs', 'if.stills'
-  effects = Array<string>() // ['zoom']
+  zoomType = 'zf.none'// 'zf.1s', 'zf.5s'
+  //effects = Array<string>() // ['zoom']
 
   // if true, the display chooses a directory first, then picks an image out
   // of it.

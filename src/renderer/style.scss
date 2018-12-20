@@ -355,3 +355,37 @@ $sceneDetailOptionsWidth: 220px;
     transform: rotate(360deg);
   }
 }
+
+.zoom-1 img {
+  -webkit-animation: keyframes-zoom 1s;
+  animation: keyframes-zoom 1s;
+  -webkit-transform: scale(1,1);
+  transform: scale(1,1);
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+  animation-timing-function: linear;
+  -webkit-animation-timing-function: linear;
+}
+
+@-webkit-keyframes keyframes-zoom {
+  100% {
+    -webkit-transform: scale(2,2);
+  }
+}
+
+.zoom-5 img {
+  -webkit-animation: keyframes-zoom 5s;
+  animation: keyframes-zoom 5s;
+  -webkit-transform: scale(1,1);
+  transform: scale(1,1);
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+  animation-timing-function: linear;
+  -webkit-animation-timing-function: linear;
+}
+
+@-webkit-keyframes keyframes-zoom {
+  100% {
+    -webkit-transform: scale(2,2);
+  }
+}
