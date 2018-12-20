@@ -112,6 +112,7 @@ a {
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
+  filter: blur(8px);
   -webkit-filter: blur(8px);
   transform: scale(2, 2);
 }
@@ -211,12 +212,16 @@ a {
     color: $bodyColor;
   }
 
-  input {
+  input[type=text] {
     font-size: 28px;
     font-weight: 700;
     display: block;
     width: 100%;
     margin-bottom: 13px;
+  }
+
+  form {
+    margin-bottom: $smallPadding;
   }
 }
 
@@ -352,3 +357,15 @@ $sceneDetailOptionsWidth: 220px;
     transform: rotate(360deg);
   }
 }
+
+/* animations */
+
+@keyframes fadeIn {
+  0% {opacity: 0;}
+  100% {opacity: 1;} 
+} 
+
+@keyframes fadeOut {
+  0% {opacity: 1;}
+  100% {opacity: 0;} 
+} 

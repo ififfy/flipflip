@@ -69,6 +69,7 @@ export default class Player extends React.Component {
               maxToRememberInHistory={500}
               timingFunction={this.props.scene.timingFunction}
               isPlaying={this.state.isPlaying}
+              fadeEnabled={this.props.scene.crossFade}
               allPaths={this.state.allPaths} />)}
 
           {!this.state.isLoaded && (

@@ -2,9 +2,14 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 
+const maxFadeSeconds = 5;
+
+
 export default class ImageDisplay extends React.Component {
   readonly props: {
     img: HTMLImageElement,
+    fadeState: string,
+    fadeDuration: number,
   }
 
   readonly contentRef: React.RefObject<HTMLImageElement> = React.createRef()
@@ -55,6 +60,24 @@ export default class ImageDisplay extends React.Component {
   }
 
   render() {
-    return <div className="ImageView u-fill-container" ref={this.contentRef} />;
+    let style = {};
+    if (this.props.fadeState === 'in') {
+      style = {
+        animationName: 'fadeIn',
+        opacity: 1,
+        animationDuration: '1s',
+      };
+    } else if (this.props.fadeState === 'out') {
+      style = {
+        animationName: 'fadeOut',
+        opacity: 0,
+        animationDuration: Math.min(maxFadeSeconds, (this.props.fadeDuration / 1000)) + 's',
+      };
+    }
+    return (
+      <div
+        className="ImageView u-fill-container"
+        style={style}
+        ref={this.contentRef} />);
   }
 }

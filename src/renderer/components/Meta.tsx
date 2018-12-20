@@ -88,6 +88,7 @@ export default class Meta extends React.Component {
             onChangeName={this.onChangeName.bind(this)}
             onChangeImageTypeFilter={this.onChangeImageTypeFilter.bind(this)}
             onChangeTimingFunction={this.onChangeTimingFunction.bind(this)}
+            onChangeCrossFade={this.onChangeCrossFade.bind(this)}
             onChangeDirectories={this.onChangeDirectories.bind(this)} />)}
 
         {this.isRoute('play') && (
@@ -165,6 +166,12 @@ export default class Meta extends React.Component {
   onChangeTimingFunction(scene: Scene, fnId: string) {
     this.editScene(scene, (s) => {
       s.timingFunction = fnId;
+    });
+  }
+
+  onChangeCrossFade(scene: Scene, value: boolean) {
+    this.editScene(scene, (s) => {
+      s.crossFade = value;
     });
   }
 };

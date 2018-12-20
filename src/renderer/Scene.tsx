@@ -4,6 +4,7 @@ export default class Scene {
   directories: Array<string> = []
   timingFunction = '1s'
   imageTypeFilter = 'any'  // 'gifs', 'stills'
+  crossFade = false
   effects = Array<string>() // ['zoom']
 
   // if true, the display chooses a directory first, then picks an image out

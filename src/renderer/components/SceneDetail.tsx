@@ -17,8 +17,33 @@ type Props = {
   onChangeImageTypeFilter(scene: Scene, filter: string): void,
   onChangeTimingFunction(scene: Scene, fnId: string): void,
   onChangeDirectories(scene: Scene, directories: Array<string>): void,
+  onChangeCrossFade(scene: Scene, value: boolean): void,
   onDelete(scene: Scene): void,
 };
+
+class Checkbox extends React.Component {
+  readonly props: {
+    text: string,
+    isOn: boolean,
+    onChange: (isOn: boolean) => void,
+  }
+
+  render() {
+    return (
+      <label className="Checkbox">
+        <input type="checkbox"
+          value={this.props.text}
+          checked={this.props.isOn} 
+          onChange={this.onToggle.bind(this)}
+          /> {this.props.text}
+      </label>
+    )
+  }
+
+  onToggle() {
+    this.props.onChange(!this.props.isOn);
+  }
+}
 
 export default class SceneDetail extends React.Component {
   readonly props: Props
@@ -74,6 +99,10 @@ export default class SceneDetail extends React.Component {
                 label="Image filter"
                 value={this.props.scene.imageTypeFilter}
                 keys={['any', 'gifs', 'stills']} />
+              <Checkbox
+                text="Cross-fade images"
+                isOn={this.props.scene.crossFade}
+                onChange={this.onChangeCrossFade.bind(this)} />
             </form>
 
             <div onClick={this.play.bind(this)} className="SceneDetail__PlayButton u-clickable u-button">
@@ -120,5 +149,9 @@ export default class SceneDetail extends React.Component {
 
   onChangeDirectories(directories: Array<string>) {
     this.props.onChangeDirectories(this.props.scene, directories);
+  }
+
+  onChangeCrossFade(value: boolean) {
+    this.props.onChangeCrossFade(this.props.scene, value);
   }
 };
