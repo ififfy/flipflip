@@ -7,6 +7,8 @@ import recursiveReaddir from 'recursive-readdir';
 
 import Scene from '../Scene';
 import ImagePlayer from './ImagePlayer';
+import { remote } from 'electron';
+import { removeListener } from 'cluster';
 
 function filterPathsToJustImages(imageTypeFilter: string, paths: Array<string>): Array<string> {
   if (imageTypeFilter === 'any') return paths;
@@ -55,7 +57,6 @@ export default class Player extends React.Component {
   render() {
     const canGoBack = this.state.historyOffset > -this.state.historyLength;
     const canGoForward = this.state.historyOffset < -1;
-    console.log(this.state);
     return (
       <HotKeys keyMap={keyMap} handlers={this.handlers()}>
         <div className="Player">
@@ -79,6 +80,11 @@ export default class Player extends React.Component {
 
           <div className={`u-button-row ${this.state.isPlaying ? 'u-show-on-hover-only' : ''}`}>
             <div className="u-button-row-right">
+              <div
+                className={`FullscreenButton u-button u-clickable`}
+                onClick={this.toggleFullscreen.bind(this)}>
+                Fullscreen on/off
+              </div>
               <div
                 className={`HistoryBackButton u-button u-clickable ${canGoBack ? '' : 'u-disabled'}`}
                 onClick={canGoBack ? this.historyBack.bind(this) : this.nop}>
@@ -188,5 +194,10 @@ export default class Player extends React.Component {
 
   setHistoryLength(n: number) {
     this.setState({historyLength: n});
+  }
+
+  toggleFullscreen() {
+    const window = remote.getCurrentWindow();
+    window.setFullScreen(!window.isFullScreen());
   }
 };
