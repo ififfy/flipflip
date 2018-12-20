@@ -9,15 +9,15 @@ import Scene from '../Scene';
 import ImagePlayer from './ImagePlayer';
 
 function filterPathsToJustImages(imageTypeFilter: string, paths: Array<string>): Array<string> {
-  if (imageTypeFilter === 'any') return paths;
+  if (imageTypeFilter === 'if.any') return paths;
 
-  if (imageTypeFilter === 'gifs') {
+  if (imageTypeFilter === 'if.gifs') {
     return paths.filter((f) => f.toLowerCase().endsWith('.gif'));
   }
 
-  if (imageTypeFilter === 'stills') {
+  if (imageTypeFilter === 'if.stills') {
     return paths.filter((f) => {
-      if (f.toLowerCase().endsWith('.gif')) return true;
+      //if (f.toLowerCase().endsWith('.gif')) return true;
       if (f.toLowerCase().endsWith('.png')) return true;
       if (f.toLowerCase().endsWith('.jpeg')) return true;
       if (f.toLowerCase().endsWith('.jpg')) return true;
