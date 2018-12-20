@@ -67,6 +67,7 @@ export default class Player extends React.Component {
               maxLoadingAtOnce={5}
               maxToRememberInHistory={500}
               timingFunction={this.props.scene.timingFunction}
+              zoomType={this.props.scene.zoomType}
               isPlaying={this.state.isPlaying}
               allPaths={this.state.allPaths} />)}
 
