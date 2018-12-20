@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-
+import Modal from './Modal';
 import {remote} from 'electron';
 
 import {pathname} from '../util';
@@ -11,7 +11,12 @@ type Props = {
 };
 
 export default class DirectoryPicker extends React.Component {
-  readonly props: Props
+  readonly props: Props;
+  readonly state = {
+    isOpen: false,
+    importURL: "",
+    rootDir: "",
+  };
 
   render() {
     return (
@@ -29,9 +34,66 @@ export default class DirectoryPicker extends React.Component {
           );
         })}
         <div className='u-button u-clickable' onClick={this.onAdd.bind(this)}>+ Add</div>
+        <div className='u-button u-clickable' onClick={this.toggleModal}>+ Import From URL</div>
+        <Modal show={this.state.isOpen} onImport={this.doImport} onClose={this.toggleModal}>
+          <div>Enter a gooninator URL for import:</div>
+          <input type="text" name="url" onChange={this.importURLChange}/>
+          <div>Enter the parent directory to look in:</div>
+          <input type="text" name="root" value={this.state.rootDir} onChange={this.rootDirChange}/>
+        </Modal>
       </div>
     )
   }
+
+  // @ts-ignore
+  importURLChange = (e) => {
+    this.setState({importURL: e.target.value});
+  };
+
+  // @ts-ignore
+  rootDirChange = (e) => {
+    this.setState({rootDir: e.target.value});
+  };
+
+  toggleModal = () => {
+    this.setState({
+      isOpen: !this.state.isOpen,
+      importURL: ""
+    });
+  };
+
+  doImport = () => {
+    let importURL = this.state.importURL;
+    this.setState({
+      isOpen: !this.state.isOpen,
+      importURL: ""
+    });
+    if (!importURL) {
+      return;
+    }
+    let rootDir = this.state.rootDir;
+    if (!rootDir.endsWith("\\")) {
+      rootDir += "\\";
+    }
+    // Remove everything before "sources="
+    importURL = importURL.substring(importURL.indexOf("sources=") + 8);
+    // Remove everything after the sources parameter
+    importURL = importURL.substring(0, importURL.indexOf("&"));
+    // Split into blog names
+    let importURLs = importURL.split("%20");
+    // Append root onto each blog
+    for (let u = 0; u<importURLs.length; u++) {
+      importURLs[u] = rootDir + importURLs[u];
+    }
+
+    // Don't add empty blog
+    if (importURLs.length == 1 && importURLs[0] === "\\") {
+      return;
+    } else {
+      // Add list
+      this.props.onChange(this.props.directories.concat(importURLs));
+    }
+  };
 
   onAdd() {
     const result = remote.dialog.showOpenDialog({properties: ['openDirectory', 'multiSelections']});
@@ -41,7 +103,6 @@ export default class DirectoryPicker extends React.Component {
   }
 
   onRemove(val: string) {
-
     this.props.onChange(this.props.directories.filter((d) => d != val));
   }
 };
