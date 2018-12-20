@@ -227,7 +227,10 @@ $sceneDetailOptionsWidth: 220px;
   width: $sceneDetailOptionsWidth;
   padding: $smallPadding;
   top: 0; left: $smallPadding; bottom: 0;
-  overflow: auto;
+  overflow: hidden;
+  .SimpleOptionPicker select {
+    max-width: 210px;
+  }
 }
 
 .SceneDetail__Sources {
@@ -235,7 +238,7 @@ $sceneDetailOptionsWidth: 220px;
   left: $sceneDetailOptionsWidth;
   top: 0; right: 0; bottom: 0;
   overflow: auto;
-  padding-left: $smallPadding;
+  padding-left: $smallPadding * 2;
 }
 
 .SceneDetail__PlayButton {
@@ -245,7 +248,7 @@ $sceneDetailOptionsWidth: 220px;
 }
 
 .SimpleOptionPicker {
-  height: 2.5rem;
+  padding-bottom: 9px;
 
   label {
     margin-right: 0.5rem;
