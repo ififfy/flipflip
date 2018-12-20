@@ -85,20 +85,21 @@ export default class ImagePlayer extends React.Component {
   runFetchLoop(i: Number, isStarting = false) {
     if (!this._isMounted && !isStarting) return;
 
-    if (this.state.readyToDisplay.length >= this.props.maxLoadingAtOnce) {
+    // We either get one giant list of paths, or one list per directory,
+    // depending on scene.weightDirectoriesEqually
+    const collection = choice(this.props.allPaths);
+
+    if (this.state.readyToDisplay.length >= this.props.maxLoadingAtOnce ||
+      !(collection && collection.length)) {
       // Wait for the display loop to use an image (it might be fast, or paused)
       setTimeout(() => this.runFetchLoop(i), 100);
       return;
     }
-
-    this.setState({numBeingLoaded: this.state.numBeingLoaded + 1});
-
-    // We either get one giant list of paths, or one list per directory,
-    // depending on scene.weightDirectoriesEqually
-    const collection = choice(this.props.allPaths);
     const path = choice(collection);
     const url: string = fileURL(path);
     const img = new Image();
+
+    this.setState({numBeingLoaded: this.state.numBeingLoaded + 1});
 
     img.onload = () => {
       // images may load immediately, but that messes up the setState()

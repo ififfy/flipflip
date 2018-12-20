@@ -291,6 +291,12 @@ $sceneDetailOptionsWidth: 220px;
   }
 }
 
+.EmptyIndicator {
+  position: fixed;
+  top: 50%; right: 0; left: 0;
+  text-align: center;
+}
+
 .Player {
   .u-button-row {
     position: absolute;

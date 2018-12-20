@@ -55,6 +55,7 @@ export default class Player extends React.Component {
   render() {
     const canGoBack = this.state.historyOffset > -this.state.historyLength;
     const canGoForward = this.state.historyOffset < -1;
+    console.log(this.state);
     return (
       <HotKeys keyMap={keyMap} handlers={this.handlers()}>
         <div className="Player">
@@ -71,6 +72,9 @@ export default class Player extends React.Component {
 
           {!this.state.isLoaded && (
             <div className="LoadingIndicator"><div className="loader" /></div>
+          )}
+          {this.state.isLoaded && this.state.allPaths.length == 0 && (
+            <div className="EmptyIndicator">No images found</div>
           )}
 
           <div className={`u-button-row ${this.state.isPlaying ? 'u-show-on-hover-only' : ''}`}>
@@ -117,23 +121,31 @@ export default class Player extends React.Component {
           if (err) console.warn(err);
 
           const files = filterPathsToJustImages(this.props.scene.imageTypeFilter, rawFiles);
-            // .map((p) => join(d, p));
 
           let newAllPaths = this.state.allPaths;
+
+          n -= 1;
+          if (n == 0) {
+            this.setState({isLoaded: true, isPlaying: true});
+          }
+
+          if (files.length === 0) {
+            return;
+          }
+
+          // The scene can configure which of these branches to take
           if (this.props.scene.weightDirectoriesEqually) {
+            // Just add the new paths to the end of the list
             newAllPaths = this.state.allPaths.concat([files]);
             this.setState({allPaths: newAllPaths});
           } else {
+            // If we found some files, put them in their own list.
+            // If list is empty, ignore.
             if (newAllPaths.length == 0) {
               newAllPaths = [files];
             } else {
               newAllPaths[0] = newAllPaths[0].concat(files);
             }
-          }
-
-          n -= 1;
-          if (n == 0) {
-            this.setState({isLoaded: true, isPlaying: true});
           }
         });
       });
