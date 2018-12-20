@@ -84,7 +84,14 @@ export default class DirectoryPicker extends React.Component {
     let importURLs = importURL.split("%20");
     // Append root onto each blog
     for (let u = 0; u<importURLs.length; u++) {
-      importURLs[u] = rootDir + importURLs[u];
+      let fullPath = rootDir + importURLs[u];
+      if (this.props.directories.includes(fullPath)) {
+        // Remove index and push u back
+        importURLs.splice(u,1);
+        u-=1
+      } else {
+        importURLs[u] = fullPath;
+      }
     }
 
     // Don't add empty blog
@@ -99,6 +106,13 @@ export default class DirectoryPicker extends React.Component {
   onAdd() {
     const result = remote.dialog.showOpenDialog({properties: ['openDirectory', 'multiSelections']});
     if (result) {
+      for (let u=0; u < result.length; u++) {
+        if (this.props.directories.includes(result[u])) {
+          // Remove index and push u back
+          result.splice(u,1);
+          u-=1
+        }
+      }
       this.props.onChange(this.props.directories.concat(result));
     }
   }
