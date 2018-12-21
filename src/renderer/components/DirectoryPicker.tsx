@@ -43,7 +43,7 @@ export default class DirectoryPicker extends React.Component {
             <div>Enter a gooninator URL for import:</div>
             <input type="text" name="url" onChange={this.importURLChange.bind(this)}/>
             <div>Enter the parent directory to look in:</div>
-            <input type="text" name="root" value={this.state.rootDir} onChange={this.rootDirChange}/>
+            <input type="text" name="root" value={this.state.rootDir} onChange={this.rootDirChange.bind(this)}/>
             <button onClick={this.doImport.bind(this)}>
               Import
             </button>
