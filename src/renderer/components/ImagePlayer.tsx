@@ -6,6 +6,7 @@ import fileURL from 'file-url';
 import ImageView from './ImageView';
 import TIMING_FUNCTIONS from '../TIMING_FUNCTIONS';
 import { number } from 'prop-types';
+import {ZF} from '../const';
 
 function choice<T>(items: Array<T>): T {
   const i = Math.floor(Math.random() * items.length);
@@ -54,7 +55,6 @@ export default class ImagePlayer extends React.Component {
     } else {
       const max = this.props.fadeEnabled ? 3 : 2;
       for (let i=1; i<max; i++) {
-        console.log(i);
         const img = this.state.pastAndLatest[this.state.pastAndLatest.length - i];
         if (img) {
           imgs.push(img);
@@ -63,11 +63,9 @@ export default class ImagePlayer extends React.Component {
     }
 
     let className = "ImagePlayer ";
-    if (this.props.zoomType === "zf.1s") {
-      className += "zoom-1";
-    }
-    if (this.props.zoomType === "zf.5s") {
-      className += "zoom-5";
+    console.log(this.props);
+    if (this.props.zoomType != ZF.none) {
+      className += `zoom-${this.props.zoomType.slice(3)}`;
     }
 
     return (
