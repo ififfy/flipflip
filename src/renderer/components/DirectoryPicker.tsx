@@ -57,7 +57,6 @@ export default class DirectoryPicker extends React.Component {
     this.setState({importURL: e.currentTarget.value});
   };
 
-  // @ts-ignore
   rootDirChange(e: React.FormEvent<HTMLInputElement>) {
     this.setState({rootDir: e.currentTarget.value});
   };
