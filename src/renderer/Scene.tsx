@@ -6,6 +6,7 @@ export default class Scene {
   timingFunction = TF.seconds1
   imageTypeFilter = IF.any
   zoomType = ZF.none
+  zoomLevel: number = 5
   crossFade = false
   hastebinID: string = "";
 
