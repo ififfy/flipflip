@@ -232,7 +232,10 @@ $sceneDetailOptionsWidth: 220px;
   width: $sceneDetailOptionsWidth;
   padding: $smallPadding;
   top: 0; left: $smallPadding; bottom: 0;
-  overflow: auto;
+  overflow: hidden;
+  .SimpleOptionPicker select {
+    max-width: 210px;
+  }
 }
 
 .SceneDetail__Sources {
@@ -240,7 +243,7 @@ $sceneDetailOptionsWidth: 220px;
   left: $sceneDetailOptionsWidth;
   top: 0; right: 0; bottom: 0;
   overflow: auto;
-  padding-left: $smallPadding;
+  padding-left: $smallPadding * 2;
 }
 
 .SceneDetail__PlayButton {
@@ -250,7 +253,7 @@ $sceneDetailOptionsWidth: 220px;
 }
 
 .SimpleOptionPicker {
-  height: 2.5rem;
+  padding-bottom: 9px;
 
   label {
     margin-right: 0.5rem;
@@ -369,3 +372,36 @@ $sceneDetailOptionsWidth: 220px;
   0% {opacity: 1;}
   100% {opacity: 0;} 
 } 
+.zoom-1 img {
+  -webkit-animation: keyframes-zoom 1s;
+  animation: keyframes-zoom 1s;
+  -webkit-transform: scale(1,1);
+  transform: scale(1,1);
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+  animation-timing-function: linear;
+  -webkit-animation-timing-function: linear;
+}
+
+@-webkit-keyframes keyframes-zoom {
+  100% {
+    -webkit-transform: scale(2,2);
+  }
+}
+
+.zoom-5 img {
+  -webkit-animation: keyframes-zoom 5s;
+  animation: keyframes-zoom 5s;
+  -webkit-transform: scale(1,1);
+  transform: scale(1,1);
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+  animation-timing-function: linear;
+  -webkit-animation-timing-function: linear;
+}
+
+@-webkit-keyframes keyframes-zoom {
+  100% {
+    -webkit-transform: scale(2,2);
+  }
+}

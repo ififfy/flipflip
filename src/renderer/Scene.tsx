@@ -2,10 +2,10 @@ export default class Scene {
   id: Number = 0
   name: string = "Unnamed scene"
   directories: Array<string> = []
-  timingFunction = '1s'
-  imageTypeFilter = 'any'  // 'gifs', 'stills'
+  timingFunction = 'tf.1s'
+  imageTypeFilter = 'if.any'  // 'if.gifs', 'if.stills'
+  zoomType = 'zf.none'// 'zf.1s', 'zf.5s'
   crossFade = false
-  effects = Array<string>() // ['zoom']
 
   // if true, the display chooses a directory first, then picks an image out
   // of it.
