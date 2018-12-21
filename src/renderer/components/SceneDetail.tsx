@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 import {remote} from 'electron';
+import {ZF} from '../const';
 
 import Scene from '../Scene';
 import DirectoryPicker from './DirectoryPicker';
@@ -104,7 +105,7 @@ export default class SceneDetail extends React.Component {
                 onChange={this.props.onChangeZoomType.bind(this, this.props.scene)}
                 label="Zoom level"
                 value={this.props.scene.zoomType}
-                keys={['zf.none', 'zf.1s', 'zf.5s']} />
+                keys={Object.values(ZF)} />
               <Checkbox
                 text="Cross-fade images"
                 isOn={this.props.scene.crossFade}
