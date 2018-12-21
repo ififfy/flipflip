@@ -87,6 +87,7 @@ export default class Meta extends React.Component {
             onPlay={this.onPlayScene.bind(this)}
             onChangeName={this.onChangeName.bind(this)}
             onChangeImageTypeFilter={this.onChangeImageTypeFilter.bind(this)}
+            onChangeZoomType={this.onChangeZoomType.bind(this)}
             onChangeTimingFunction={this.onChangeTimingFunction.bind(this)}
             onChangeDirectories={this.onChangeDirectories.bind(this)} />)}
 
@@ -159,6 +160,12 @@ export default class Meta extends React.Component {
   onChangeImageTypeFilter(scene: Scene, filter: string) {
     this.editScene(scene, (s) => {
       s.imageTypeFilter = filter; 
+    });
+  }
+
+  onChangeZoomType(scene: Scene, type: string) {
+    this.editScene(scene, (s) => {
+      s.zoomType = type;
     });
   }
 
