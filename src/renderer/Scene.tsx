@@ -1,11 +1,12 @@
+import {ZF, TF, IF} from './const';
 export default class Scene {
   id: Number = 0
   name: string = "Unnamed scene"
   directories: Array<string> = []
-  timingFunction = 'tf.1s'
-  imageTypeFilter = 'if.any'  // 'if.gifs', 'if.stills'
-  zoomType = 'zf.none'// 'zf.1s', 'zf.5s'
-  //effects = Array<string>() // ['zoom']
+  timingFunction = TF.seconds1
+  imageTypeFilter = IF.any
+  zoomType = ZF.none
+  crossFade = false
 
   // if true, the display chooses a directory first, then picks an image out
   // of it.
@@ -16,5 +17,21 @@ export default class Scene {
   constructor(init?:Partial<Scene>) {
     Object.assign(this, init);
     this.directories = this.directories.filter((d) => !!d);
+
+    // backward compatible with 1.0.1
+    if (!(TF as any)[this.timingFunction]) {
+      this.timingFunction = 'tf.' + this.timingFunction;
+    }
+    if (!(TF as any)[this.timingFunction]) {
+      this.timingFunction = TF.seconds1;
+    }
+
+    // backward compatible with 1.0.1
+    if (!(IF as any)[this.imageTypeFilter]) {
+      this.imageTypeFilter = 'if.' + this.imageTypeFilter;
+    }
+    if (!(IF as any)[this.imageTypeFilter]) {
+      this.imageTypeFilter = IF.any;
+    }
   }
 }

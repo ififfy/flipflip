@@ -112,6 +112,7 @@ a {
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
+  filter: blur(8px);
   -webkit-filter: blur(8px);
   transform: scale(2, 2);
 }
@@ -211,12 +212,16 @@ a {
     color: $bodyColor;
   }
 
-  input {
+  input[type=text] {
     font-size: 28px;
     font-weight: 700;
     display: block;
     width: 100%;
     margin-bottom: 13px;
+  }
+
+  form {
+    margin-bottom: $smallPadding;
   }
 }
 
@@ -312,6 +317,30 @@ $sceneDetailOptionsWidth: 220px;
   top: 0; right: 0; bottom: 0; left: 0;
 }
 
+.Modal {
+  position: 'fixed';
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0,0,0,0.3);
+  padding: 50;
+
+  button {
+    float: right;
+  }
+}
+
+.Modal__Inner {
+  background-color: #fff;
+  border-radius: 5;
+  max-width: 500;
+  min-height: 300;
+  margin: 0 auto;
+  padding: 30;
+  color: black;
+}
+
 /* loader */
 
 .loader,
@@ -356,7 +385,25 @@ $sceneDetailOptionsWidth: 220px;
   }
 }
 
-.zoom-1 img {
+/* animations */
+
+@keyframes fadeIn {
+  0% {opacity: 0;}
+  100% {opacity: 1;} 
+} 
+
+@keyframes fadeOut {
+  0% {opacity: 1;}
+  100% {opacity: 0;} 
+} 
+
+@keyframes keyframes-zoom {
+  100% {
+    transform: scale(2,2);
+  }
+}
+
+.zoom-1s img {
   -webkit-animation: keyframes-zoom 1s;
   animation: keyframes-zoom 1s;
   -webkit-transform: scale(1,1);
@@ -367,13 +414,7 @@ $sceneDetailOptionsWidth: 220px;
   -webkit-animation-timing-function: linear;
 }
 
-@-webkit-keyframes keyframes-zoom {
-  100% {
-    -webkit-transform: scale(2,2);
-  }
-}
-
-.zoom-5 img {
+.zoom-5s img {
   -webkit-animation: keyframes-zoom 5s;
   animation: keyframes-zoom 5s;
   -webkit-transform: scale(1,1);
@@ -382,10 +423,4 @@ $sceneDetailOptionsWidth: 220px;
   animation-fill-mode: forwards;
   animation-timing-function: linear;
   -webkit-animation-timing-function: linear;
-}
-
-@-webkit-keyframes keyframes-zoom {
-  100% {
-    -webkit-transform: scale(2,2);
-  }
 }
