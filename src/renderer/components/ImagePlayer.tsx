@@ -63,7 +63,6 @@ export default class ImagePlayer extends React.Component {
     }
 
     let className = "ImagePlayer ";
-    console.log(this.props);
     if (this.props.zoomType != ZF.none) {
       className += `zoom-${this.props.zoomType.slice(3)}`;
     }
