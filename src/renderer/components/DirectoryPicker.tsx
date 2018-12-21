@@ -43,7 +43,7 @@ export default class DirectoryPicker extends React.Component {
             <div>Enter a gooninator URL for import:</div>
             <input type="text" name="url" onChange={this.importURLChange.bind(this)}/>
             <div>Enter the parent directory to look in:</div>
-            <input type="text" name="root" value={this.state.rootDir} onChange={this.rootDirChange}/>
+            <input type="text" name="root" value={this.state.rootDir} readOnly onClick={this.addRootDir.bind(this)}/>
             <button onClick={this.doImport.bind(this)}>
               Import
             </button>
@@ -55,10 +55,6 @@ export default class DirectoryPicker extends React.Component {
 
   importURLChange(e: React.FormEvent<HTMLInputElement>) {
     this.setState({importURL: e.currentTarget.value});
-  };
-
-  rootDirChange(e: React.FormEvent<HTMLInputElement>) {
-    this.setState({rootDir: e.currentTarget.value});
   };
 
   toggleModal() {
@@ -77,7 +73,7 @@ export default class DirectoryPicker extends React.Component {
     if (!importURL) {
       return;
     }
-    let rootDir = this.state.rootDir;
+    let rootDir = this.state.rootDir.toString();
     if (!rootDir.endsWith(sep)) {
       rootDir += sep;
     }
@@ -90,7 +86,7 @@ export default class DirectoryPicker extends React.Component {
     // Append root onto each blog
     for (let u = 0; u<importURLs.length; u++) {
       let fullPath = rootDir + importURLs[u];
-      if (this.props.directories.includes(fullPath)) {
+      if (this.props.directories.includes(fullPath) || importURLs[u] === sep || importURLs[u] === "") {
         // Remove index and push u back
         importURLs.splice(u,1);
         u-=1
@@ -99,14 +95,15 @@ export default class DirectoryPicker extends React.Component {
       }
     }
 
-    // Don't add empty blog
-    if (importURLs.length == 1 && importURLs[0] === sep) {
-      return;
-    } else {
-      // Add list
-      this.props.onChange(this.props.directories.concat(importURLs));
-    }
+    // Add list
+    this.props.onChange(this.props.directories.concat(importURLs));
   };
+
+  addRootDir() {
+    let result = remote.dialog.showOpenDialog({properties: ['openDirectory']});
+    if (!result) return;
+    this.setState({rootDir: result});
+  }
 
   onAdd() {
     let result = remote.dialog.showOpenDialog({properties: ['openDirectory', 'multiSelections']});
