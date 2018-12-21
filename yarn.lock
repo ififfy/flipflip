@@ -227,6 +227,13 @@ amdefine@>=0.0.4:
   resolved "https://registry.yarnpkg.com/amdefine/-/amdefine-1.0.1.tgz#4a5282ac164729e93619bcfd3ad151f817ce91f5"
   integrity sha1-SlKCrBZHKek2Gbz9OtFR+BfOkfU=
 
+animated-gif-detector@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/animated-gif-detector/-/animated-gif-detector-1.2.0.tgz#cb2f9911ca8024f2b34c693b7fd64542ee416189"
+  integrity sha1-yy+ZEcqAJPKzTGk7f9ZFQu5BYYk=
+  dependencies:
+    inherits "^2.0.1"
+
 ansi-regex@^2.0.0:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-2.1.1.tgz#c3b33ab5ee360d86e0e628f0468ae7ef27d654df"
