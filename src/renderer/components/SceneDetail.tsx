@@ -7,6 +7,7 @@ import {ZF} from '../const';
 import Scene from '../Scene';
 import DirectoryPicker from './DirectoryPicker';
 import SimpleOptionPicker from './SimpleOptionPicker';
+import SimpleTextInput from './SimpleTextInput';
 import TIMING_FUNCTIONS from '../TIMING_FUNCTIONS';
 
 type Props = {
@@ -17,6 +18,7 @@ type Props = {
   onChangeName(scene: Scene, name: string): void,
   onChangeImageTypeFilter(scene: Scene, filter: string): void,
   onChangeZoomType(scene: Scene, type: string): void,
+  onChangeHastebinID(scene: Scene, hbId: string): void,
   onChangeTimingFunction(scene: Scene, fnId: string): void,
   onChangeDirectories(scene: Scene, directories: Array<string>): void,
   onChangeCrossFade(scene: Scene, value: boolean): void,
@@ -110,6 +112,10 @@ export default class SceneDetail extends React.Component {
                 text="Cross-fade images"
                 isOn={this.props.scene.crossFade}
                 onChange={this.onChangeCrossFade.bind(this)} />
+              <SimpleTextInput
+                onChange={this.props.onChangeHastebinID.bind(this, this.props.scene)}
+                label="Hastebin ID"
+                value={this.props.scene.hastebinID} />
             </form>
 
             <div onClick={this.play.bind(this)} className="SceneDetail__PlayButton u-clickable u-button">
