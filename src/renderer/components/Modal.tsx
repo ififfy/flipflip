@@ -11,7 +11,7 @@ export default class Modal extends React.Component {
       <div className="Modal">
         <div className="Modal__Inner">
           {this.props.children}
-          <button onClick={this.props.onClose}>Cancel</button>
+          <button className="Modal__Close" onClick={this.props.onClose}>Cancel</button>
         </div>
       </div>
     );
