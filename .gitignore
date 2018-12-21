@@ -5,3 +5,10 @@ app/
 FlipFlip-win32-x64/
 release/
 FlipFlip-win32-ia32/
+
+## Ignore project files created by IntelliJ IDEA
+*.iml
+*.ipr
+*.iws
+.idea/
+overlays/

@@ -20,6 +20,7 @@ export default class ImagePlayer extends React.Component {
     allPaths: Array<Array<string>>,
     isPlaying: boolean,
     timingFunction: string,
+    zoomType: string,
     historyOffset: number,
     fadeEnabled: boolean,
     setHistoryLength: (historyLength: number) => void,
@@ -61,8 +62,16 @@ export default class ImagePlayer extends React.Component {
       }
     }
 
+    let className = "ImagePlayer ";
+    if (this.props.zoomType === "zf.1s") {
+      className += "zoom-1";
+    }
+    if (this.props.zoomType === "zf.5s") {
+      className += "zoom-5";
+    }
+
     return (
-      <div className="ImagePlayer">
+      <div className={className}>
         <div className="u-fill-container u-fill-image-blur" style={{
           backgroundImage: `url("${imgs[0].src}")`,
         }}>
