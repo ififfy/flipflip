@@ -252,11 +252,21 @@ $sceneDetailOptionsWidth: 220px;
   padding: $smallPadding;
 }
 
-.SimpleOptionPicker {
-  padding-bottom: 9px;
-
-  label {
-    margin-right: 0.5rem;
+.SceneOptionsForm {
+  div {
+    padding-bottom: 9px;
+    label {
+      margin-right: 0.5rem;
+    }
+  }
+  .SimpleTextInput {
+    input[type=text] {
+      font-size: 16px;
+      font-weight: 400;
+      display: block;
+      width: 100%;
+      margin-bottom: 0;
+    }
   }
 }
 
@@ -335,15 +345,31 @@ $sceneDetailOptionsWidth: 220px;
   background-color: #fff;
   border-radius: 5px;
   max-width: 500px;
-  min-height: 300px;
+  min-height: 100px;
   margin: 0 auto;
-  padding: 30px;
+  padding: 30px 30px 45px 30px;
   color: black;
   .Modal__Close {
     float: right;
   }
   button:not(.Modal__Close) {
     float: left;
+  }
+}
+
+label.Checkbox {
+  display: block;
+  padding-left: 15px;
+  text-indent: -15px;
+  input {
+    width: 13px;
+    height: 13px;
+    padding: 0;
+    margin:0;
+    vertical-align: bottom;
+    position: relative;
+    top: -1px;
+    *overflow: hidden;
   }
 }
 
