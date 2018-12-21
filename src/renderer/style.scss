@@ -441,48 +441,30 @@ label.Checkbox {
   }
 }
 
-.zoom-1s img {
-  -webkit-animation: keyframes-zoom 1s;
-  animation: keyframes-zoom 1s;
-  -webkit-transform: scale(1,1);
-  transform: scale(1,1);
-  -webkit-animation-fill-mode: forwards;
-  animation-fill-mode: forwards;
-  animation-timing-function: linear;
-  -webkit-animation-timing-function: linear;
+@for $i from 1 through 20 {
+  .zoom-#{$i}s img {
+    -webkit-animation: keyframes-zoom #{$i}s;
+    animation: keyframes-zoom #{$i}s;
+    -webkit-transform: scale(1,1);
+    transform: scale(1,1);
+    -webkit-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
+    animation-timing-function: linear;
+    -webkit-animation-timing-function: linear;
+  }
 }
 
-.zoom-5s img {
-  -webkit-animation: keyframes-zoom 5s;
-  animation: keyframes-zoom 5s;
-  -webkit-transform: scale(1,1);
-  transform: scale(1,1);
-  -webkit-animation-fill-mode: forwards;
-  animation-fill-mode: forwards;
-  animation-timing-function: linear;
-  -webkit-animation-timing-function: linear;
-}
-
-.zoom-r1s img {
-  -webkit-animation: keyframes-zoom-out 1s;
-  animation: keyframes-zoom-out 1s;
-  -webkit-transform: scale(1.5,1.5);
-  transform: scale(1.5,1.5);
-  -webkit-animation-fill-mode: forwards;
-  animation-fill-mode: forwards;
-  animation-timing-function: linear;
-  -webkit-animation-timing-function: linear;
-}
-
-.zoom-r5s img {
-  -webkit-animation: keyframes-zoom-out 5s;
-  animation: keyframes-zoom-out 5s;
-  -webkit-transform: scale(1.5,1.5);
-  transform: scale(1.5,1.5);
-  -webkit-animation-fill-mode: forwards;
-  animation-fill-mode: forwards;
-  animation-timing-function: linear;
-  -webkit-animation-timing-function: linear;
+@for $i from 1 through 20 {
+  .zoom-r#{$i}s img {
+    -webkit-animation: keyframes-zoom-out #{$i}s;
+    animation: keyframes-zoom-out #{$i}s;
+    -webkit-transform: scale(1.5,1.5);
+    transform: scale(1.5,1.5);
+    -webkit-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
+    animation-timing-function: linear;
+    -webkit-animation-timing-function: linear;
+  }
 }
 
 .text-blink {
