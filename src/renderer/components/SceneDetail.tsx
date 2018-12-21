@@ -15,6 +15,7 @@ type Props = {
   onPlay(scene: Scene): void,
   onChangeName(scene: Scene, name: string): void,
   onChangeImageTypeFilter(scene: Scene, filter: string): void,
+  onChangeZoomType(scene: Scene, type: string): void,
   onChangeTimingFunction(scene: Scene, fnId: string): void,
   onChangeDirectories(scene: Scene, directories: Array<string>): void,
   onDelete(scene: Scene): void,
@@ -73,7 +74,12 @@ export default class SceneDetail extends React.Component {
                 onChange={this.props.onChangeImageTypeFilter.bind(this, this.props.scene)}
                 label="Image filter"
                 value={this.props.scene.imageTypeFilter}
-                keys={['any', 'gifs', 'stills']} />
+                keys={['if.any', 'if.gifs', 'if.stills']} />
+              <SimpleOptionPicker
+                onChange={this.props.onChangeZoomType.bind(this, this.props.scene)}
+                label="Zoom level"
+                value={this.props.scene.zoomType}
+                keys={['zf.none', 'zf.1s', 'zf.5s']} />
             </form>
 
             <div onClick={this.play.bind(this)} className="SceneDetail__PlayButton u-clickable u-button">

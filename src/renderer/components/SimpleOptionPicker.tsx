@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import en from '../en';
 
 
 export default class SimpleOptionPicker extends React.Component {
@@ -17,7 +18,7 @@ export default class SimpleOptionPicker extends React.Component {
         <select
           value={this.props.value}
           onChange={this.onChange.bind(this)}>
-          {this.props.keys.map((k) => <option value={k} key={k}>{k}</option>)}
+          {this.props.keys.map((k) => <option value={k} key={k}>{en.get(k) != null ? en.get(k) : k}</option>)}
         </select>
       </div>
     );
