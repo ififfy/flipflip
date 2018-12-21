@@ -191,6 +191,9 @@ const run = function(getHasStopped : Function) {
 const startText = function(el : HTMLElement, programText : string) {
   let i = -1;
   let hasError = false;
+  let hasStopped = false;
+  const getHasStopped = () => { return hasStopped; };
+
   programText.split('\n').forEach(function(line) {
     line = line.trim();
     i += 1;
@@ -205,7 +208,11 @@ const startText = function(el : HTMLElement, programText : string) {
       if (COMMANDS[command]) {
         const fn = COMMANDS[command](el, value);
         if (fn) {
-          PROGRAM.push(fn);
+          if (command.toLowerCase().startsWith("set")) {
+            fn(getHasStopped);
+          } else {
+            PROGRAM.push(fn);
+          }
         } else {
           hasError = true;
           console.error("Error on line", i, "- invalid arguments");
@@ -217,8 +224,6 @@ const startText = function(el : HTMLElement, programText : string) {
     }
   });
 
-  let hasStopped = false;
-  const getHasStopped = () => { return hasStopped; };
   if (!hasError) {
     run(getHasStopped);
   }
@@ -300,16 +305,16 @@ export default class CaptionProgram extends React.Component {
   }
 
   componentWillUnmount() {
+    PROGRAM = [];
+    programCounter = 0;
     this.state.stopFunc();
   }
 
   _update(props: {hastebinID : string}) {
     if (!this.el.current) return;
     if (props.hastebinID == this.state.lastHastebinID) return;
-    console.log("Updating '" + this.state.lastHastebinID + "' to '" + props.hastebinID + "'");
     this.setState({lastHastebinID: props.hastebinID});
     this._stop();
-
     this.setState({stopFunc: startShowingText(this.el.current, props.hastebinID)});
   }
 
