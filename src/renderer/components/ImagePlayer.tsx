@@ -5,6 +5,8 @@ import fileURL from 'file-url';
 
 import ImageView from './ImageView';
 import TIMING_FUNCTIONS from '../TIMING_FUNCTIONS';
+import { number } from 'prop-types';
+import {ZF} from '../const';
 
 function choice<T>(items: Array<T>): T {
   const i = Math.floor(Math.random() * items.length);
@@ -21,6 +23,7 @@ export default class ImagePlayer extends React.Component {
     timingFunction: string,
     zoomType: string,
     historyOffset: number,
+    fadeEnabled: boolean,
     setHistoryLength: (historyLength: number) => void,
   }
 
@@ -29,6 +32,7 @@ export default class ImagePlayer extends React.Component {
     pastAndLatest: Array<HTMLImageElement>(),
     readyToDisplay: Array<HTMLImageElement>(),
     historyPaths: Array<string>(),
+    timeToNextFrame: 0,
   }
 
   _isMounted = false;
@@ -36,7 +40,7 @@ export default class ImagePlayer extends React.Component {
   render() {
     if (this.state.pastAndLatest.length < 1) return <div className="ImagePlayer m-empty" />;
 
-    let img = this.state.pastAndLatest[this.state.pastAndLatest.length - 1];
+    const imgs = Array<HTMLImageElement>();
 
     // if user is browsing history, use that image instead
     if (this.state.historyPaths.length > 0 && !this.props.isPlaying && this.props.historyOffset < 0) {
@@ -45,25 +49,37 @@ export default class ImagePlayer extends React.Component {
       while (offset < -this.state.historyPaths.length) {
         offset += this.state.historyPaths.length;
       }
-      img = new Image();
+      const img = new Image();
       img.src = this.state.historyPaths[this.state.historyPaths.length + offset];
+      imgs.push(img);
+    } else {
+      const max = this.props.fadeEnabled ? 3 : 2;
+      for (let i=1; i<max; i++) {
+        const img = this.state.pastAndLatest[this.state.pastAndLatest.length - i];
+        if (img) {
+          imgs.push(img);
+        }
+      }
     }
 
     let className = "ImagePlayer ";
-    if (this.props.zoomType === "zf.1s") {
-      className += "zoom-1";
-    }
-    if (this.props.zoomType === "zf.5s") {
-      className += "zoom-5";
+    if (this.props.zoomType != ZF.none) {
+      className += `zoom-${this.props.zoomType.slice(3)}`;
     }
 
     return (
       <div className={className}>
         <div className="u-fill-container u-fill-image-blur" style={{
-          backgroundImage: `url("${img.src}")`,
+          backgroundImage: `url("${imgs[0].src}")`,
         }}>
         </div>
-        <ImageView img={img} />
+        {imgs.map((img) => {
+          return <ImageView
+            img={img}
+            key={img.src}
+            fadeState={this.props.fadeEnabled ? (img.src === imgs[0].src ? 'in' : 'out') : 'none'}
+            fadeDuration={this.state.timeToNextFrame / 2} />;
+        })}
       </div>
     );
   }
@@ -165,9 +181,9 @@ export default class ImagePlayer extends React.Component {
       this.props.setHistoryLength(nextHistoryPaths.length);
 
       if (schedule) {
-        setTimeout(
-          this.advance.bind(this, false, true),
-          TIMING_FUNCTIONS.get(this.props.timingFunction)());
+        const timeToNextFrame = TIMING_FUNCTIONS.get(this.props.timingFunction)()
+        this.setState({timeToNextFrame});
+        setTimeout(this.advance.bind(this, false, true), timeToNextFrame);
       }
     }
   }
