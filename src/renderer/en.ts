@@ -16,4 +16,6 @@ export default new Map<String, String>([
   ['zf.none','No zoom'],
   ['zf.1s','1s zoom'],
   ['zf.5s','5s zoom'],
+  ['zf.r1s','1s zoom-out'],
+  ['zf.r5s','5s zoom-out'],
 ]);
