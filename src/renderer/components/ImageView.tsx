@@ -61,17 +61,18 @@ export default class ImageView extends React.Component {
 
   render() {
     let style = {};
+    const fadeDuration = Math.min(maxFadeSeconds, (this.props.fadeDuration / 1000)) + 's';
     if (this.props.fadeState === 'in') {
       style = {
         animationName: 'fadeIn',
         opacity: 1,
-        animationDuration: '1s',
+        animationDuration: fadeDuration,
       };
     } else if (this.props.fadeState === 'out') {
       style = {
         animationName: 'fadeOut',
         opacity: 0,
-        animationDuration: Math.min(maxFadeSeconds, (this.props.fadeDuration / 1000)) + 's',
+        animationDuration: fadeDuration,
       };
     }
     return (
