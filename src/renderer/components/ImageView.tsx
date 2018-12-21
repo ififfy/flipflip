@@ -5,7 +5,7 @@ import * as ReactDOM from 'react-dom';
 const maxFadeSeconds = 5;
 
 
-export default class ImageDisplay extends React.Component {
+export default class ImageView extends React.Component {
   readonly props: {
     img: HTMLImageElement,
     fadeState: string,
