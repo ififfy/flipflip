@@ -88,6 +88,7 @@ export default class Meta extends React.Component {
             onChangeName={this.onChangeName.bind(this)}
             onChangeImageTypeFilter={this.onChangeImageTypeFilter.bind(this)}
             onChangeZoomType={this.onChangeZoomType.bind(this)}
+            onChangeZoomLevel={this.onChangeZoomLevel.bind(this)}
             onChangeHastebinID={this.onChangeHastebinID.bind(this)}
             onChangeTimingFunction={this.onChangeTimingFunction.bind(this)}
             onChangeCrossFade={this.onChangeCrossFade.bind(this)}
@@ -168,6 +169,12 @@ export default class Meta extends React.Component {
   onChangeZoomType(scene: Scene, type: string) {
     this.editScene(scene, (s) => {
       s.zoomType = type;
+    });
+  }
+
+  onChangeZoomLevel(scene: Scene, level: number) {
+    this.editScene(scene, (s) => {
+      s.zoomLevel = level;
     });
   }
 

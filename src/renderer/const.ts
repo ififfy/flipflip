@@ -20,10 +20,8 @@ const IF = { // image filters
 
 const ZF = { // zoom functions
   none: 'zf.none',
-  seconds1: 'zf.1s',
-  seconds5: 'zf.5s',
-  revseconds1: 'zf.r1s',
-  revseconds5: 'zf.r5s'
+  in: 'zf.in',
+  out: 'zf.out',
 };
 
 export {

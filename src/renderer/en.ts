@@ -14,8 +14,6 @@ export default new Map<String, String>([
   ['if.gifs', 'Only gifs'],
   ['if.stills', 'Only stills'],
   ['zf.none','No zoom'],
-  ['zf.1s','1s zoom'],
-  ['zf.5s','5s zoom'],
-  ['zf.r1s','1s zoom-out'],
-  ['zf.r5s','5s zoom-out'],
+  ['zf.in','Zoom In'],
+  ['zf.out','Zoom Out'],
 ]);

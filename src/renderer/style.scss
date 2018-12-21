@@ -268,6 +268,35 @@ $sceneDetailOptionsWidth: 220px;
       margin-bottom: 0;
     }
   }
+  .SimpleSliderInput {
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 10px;
+      border-radius: 5px;
+      outline: none;
+      -webkit-transition: opacity .2s ease-in-out;
+      transition: opacity .2s ease-in-out;
+
+      &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 17px;
+        height: 17px;
+        border-radius: 50%;
+        background: #3f96d0;
+        cursor: pointer;
+      }
+
+      &::-moz-range-thumb {
+        width: 17px;
+        height: 17px;
+        border-radius: 50%;
+        background: #3f96d0;
+        cursor: pointer;
+      }
+    }
+  }
 }
 
 .DirectoryPicker {

@@ -22,6 +22,7 @@ export default class ImagePlayer extends React.Component {
     isPlaying: boolean,
     timingFunction: string,
     zoomType: string,
+    zoomLevel: number,
     historyOffset: number,
     fadeEnabled: boolean,
     setHistoryLength: (historyLength: number) => void,
@@ -64,7 +65,11 @@ export default class ImagePlayer extends React.Component {
 
     let className = "ImagePlayer ";
     if (this.props.zoomType != ZF.none) {
-      className += `zoom-${this.props.zoomType.slice(3)}`;
+      let cssPrefix = 'zoom-';
+      if (this.props.zoomType === ZF.out) {
+        cssPrefix += 'r'
+      }
+      className += cssPrefix + `${this.props.zoomLevel}s`;
     }
 
     return (

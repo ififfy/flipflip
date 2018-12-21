@@ -8,6 +8,7 @@ import Scene from '../Scene';
 import DirectoryPicker from './DirectoryPicker';
 import SimpleOptionPicker from './SimpleOptionPicker';
 import SimpleTextInput from './SimpleTextInput';
+import SimpleSliderInput from "./SimpleSliderInput";
 import TIMING_FUNCTIONS from '../TIMING_FUNCTIONS';
 
 type Props = {
@@ -18,6 +19,7 @@ type Props = {
   onChangeName(scene: Scene, name: string): void,
   onChangeImageTypeFilter(scene: Scene, filter: string): void,
   onChangeZoomType(scene: Scene, type: string): void,
+  onChangeZoomLevel(scene: Scene, level: number): void,
   onChangeHastebinID(scene: Scene, hbId: string): void,
   onChangeTimingFunction(scene: Scene, fnId: string): void,
   onChangeDirectories(scene: Scene, directories: Array<string>): void,
@@ -100,14 +102,22 @@ export default class SceneDetail extends React.Component {
                 keys={Array.from(TIMING_FUNCTIONS.keys()).map((s) => s.toString())} />
               <SimpleOptionPicker
                 onChange={this.props.onChangeImageTypeFilter.bind(this, this.props.scene)}
-                label="Image filter"
+                label="Image Filter"
                 value={this.props.scene.imageTypeFilter}
                 keys={['if.any', 'if.gifs', 'if.stills']} />
               <SimpleOptionPicker
                 onChange={this.props.onChangeZoomType.bind(this, this.props.scene)}
-                label="Zoom level"
+                label="Zoom Type"
                 value={this.props.scene.zoomType}
                 keys={Object.values(ZF)} />
+              {this.props.scene.zoomType != 'zf.none' && (
+                  <SimpleSliderInput
+                      onChange={this.props.onChangeZoomLevel.bind(this, this.props.scene)}
+                      label={"Zoom Length: " + this.props.scene.zoomLevel + "s"}
+                      min={1}
+                      max={20}
+                      value={this.props.scene.zoomLevel.toString()} />
+              )}
               <SimpleTextInput
                   onChange={this.props.onChangeHastebinID.bind(this, this.props.scene)}
                   label="Hastebin ID"
