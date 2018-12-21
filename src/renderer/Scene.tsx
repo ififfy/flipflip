@@ -7,6 +7,7 @@ export default class Scene {
   imageTypeFilter = IF.any
   zoomType = ZF.none
   crossFade = false
+  hastebinID: string = "";
 
   // if true, the display chooses a directory first, then picks an image out
   // of it.

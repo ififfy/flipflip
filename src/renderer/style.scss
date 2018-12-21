@@ -424,3 +424,29 @@ $sceneDetailOptionsWidth: 220px;
   animation-timing-function: linear;
   -webkit-animation-timing-function: linear;
 }
+
+.text-blink {
+  text-align: center; color: white; font-size: 20vmin;
+  vertical-align: middle; transition: opacity 0.1s ease-out;
+  font-family: Arial Black,Arial Bold,Gadget,sans-serif;
+  -webkit-text-stroke-width: 1px; -webkit-text-stroke-color: black;
+}
+
+.text-caption {
+  text-align: center; color: white; font-size: 8vmin;
+  vertical-align: bottom; padding-bottom: 20vmin;
+  transition: opacity 0.5s ease-in-out;
+  font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
+  -webkit-text-stroke-width: 1px; -webkit-text-stroke-color: black;
+}
+
+.text-caption-big {
+  text-align: center; color: white; font-size: 12vmin;
+  vertical-align: middle; transition: opacity 0.1s ease-out;
+  font-family: Arial Black,Arial Bold,Gadget,sans-serif;
+  -webkit-text-stroke-width: 1px; -webkit-text-stroke-color: black;
+}
+
+.text-display {
+  z-index: 1;
+}

@@ -9,6 +9,7 @@ import animated from 'animated-gif-detector';
 import Scene from '../Scene';
 import ImagePlayer from './ImagePlayer';
 import { remote } from 'electron';
+import CaptionProgram from './CaptionProgram';
 
 function filterPathsToJustImages(imageTypeFilter: string, paths: Array<string>): Array<string> {
   if (imageTypeFilter === 'if.any') return paths;
@@ -72,6 +73,9 @@ export default class Player extends React.Component {
               isPlaying={this.state.isPlaying}
               fadeEnabled={this.props.scene.crossFade}
               allPaths={this.state.allPaths} />)}
+          {this.state.isLoaded && this.props.scene.hastebinID && this.state.isPlaying && (
+            <CaptionProgram hastebinID={this.props.scene.hastebinID} />
+          )}
 
           {!this.state.isLoaded && (
             <div className="LoadingIndicator"><div className="loader" /></div>
