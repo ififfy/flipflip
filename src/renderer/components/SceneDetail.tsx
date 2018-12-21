@@ -127,7 +127,8 @@ export default class SceneDetail extends React.Component {
             <h2>Sources:</h2>
             <DirectoryPicker
               directories={this.props.scene.directories}
-              onChange={this.onChangeDirectories.bind(this)} />
+              onChange={this.onChangeDirectories.bind(this)}
+              onChangeHastebinID={this.onChangeHastebinID.bind(this)}/>
           </div>
         </div>
       </div>
@@ -162,6 +163,10 @@ export default class SceneDetail extends React.Component {
 
   onChangeDirectories(directories: Array<string>) {
     this.props.onChangeDirectories(this.props.scene, directories);
+  }
+
+  onChangeHastebinID(hbID: string) {
+    this.props.onChangeHastebinID(this.props.scene, hbID);
   }
 
   onChangeCrossFade(value: boolean) {

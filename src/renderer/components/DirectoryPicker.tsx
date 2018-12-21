@@ -9,6 +9,7 @@ import {pathname} from '../util';
 type Props = {
   directories: Array<string>,
   onChange(directories: Array<string>): void,
+  onChangeHastebinID(hbID: string): void,
 };
 
 export default class DirectoryPicker extends React.Component {
@@ -82,6 +83,7 @@ export default class DirectoryPicker extends React.Component {
 
   doImport() {
     let importURL = this.state.importURL;
+    let hastebinURL = this.state.importURL;
     this.toggleImportModal();
     if (!importURL) {
       return;
@@ -90,26 +92,45 @@ export default class DirectoryPicker extends React.Component {
     if (!rootDir.endsWith(sep)) {
       rootDir += sep;
     }
-    // Remove everything before "sources="
-    importURL = importURL.substring(importURL.indexOf("sources=") + 8);
-    // Remove everything after the sources parameter
-    importURL = importURL.substring(0, importURL.indexOf("&"));
-    // Split into blog names
-    let importURLs = importURL.split("%20");
-    // Append root onto each blog
-    for (let u = 0; u<importURLs.length; u++) {
-      let fullPath = rootDir + importURLs[u];
-      if (this.props.directories.includes(fullPath) || importURLs[u] === sep || importURLs[u] === "") {
-        // Remove index and push u back
-        importURLs.splice(u,1);
-        u-=1
-      } else {
-        importURLs[u] = fullPath;
+    if (importURL.includes("sources=")) {
+      // Remove everything before "sources="
+      importURL = importURL.substring(importURL.indexOf("sources=") + 8);
+
+      if (importURL.includes("&")) {
+        // Remove everything after the sources parameter
+        importURL = importURL.substring(0, importURL.indexOf("&"));
       }
+
+      // Split into blog names
+      let importURLs = importURL.split("%20");
+      // Append root onto each blog
+      for (let u = 0; u < importURLs.length; u++) {
+        let fullPath = rootDir + importURLs[u];
+        if (this.props.directories.includes(fullPath) || importURLs[u] === sep || importURLs[u] === "") {
+          // Remove index and push u back
+          importURLs.splice(u, 1);
+          u -= 1
+        } else {
+          importURLs[u] = fullPath;
+        }
+      }
+
+      // Add list
+      this.props.onChange(this.props.directories.concat(importURLs));
     }
 
-    // Add list
-    this.props.onChange(this.props.directories.concat(importURLs));
+    if (hastebinURL.includes("pastebinId=")) {
+      // Remove everything before "sources="
+      hastebinURL = hastebinURL.substring(hastebinURL.indexOf("pastebinId=") + 11);
+
+      if (hastebinURL.includes("&")) {
+        // Remove everything after the sources parameter
+        hastebinURL = hastebinURL.substring(0, hastebinURL.indexOf("&"));
+      }
+
+      // Update hastebin URL (if present)
+      this.props.onChangeHastebinID(hastebinURL);
+    }
   };
 
   addRootDir() {
