@@ -4,6 +4,8 @@ import {HotKeys} from 'react-hotkeys';
 
 import recursiveReaddir from 'recursive-readdir';
 
+import fs from 'fs'
+import animated from 'animated-gif-detector';
 import Scene from '../Scene';
 import ImagePlayer from './ImagePlayer';
 import { remote } from 'electron';
@@ -12,12 +14,12 @@ function filterPathsToJustImages(imageTypeFilter: string, paths: Array<string>):
   if (imageTypeFilter === 'if.any') return paths;
 
   if (imageTypeFilter === 'if.gifs') {
-    return paths.filter((f) => f.toLowerCase().endsWith('.gif'));
+    return paths.filter((f) => f.toLowerCase().endsWith('.gif') && animated(fs.readFileSync(f)));
   }
 
   if (imageTypeFilter === 'if.stills') {
     return paths.filter((f) => {
-      //if (f.toLowerCase().endsWith('.gif')) return true;
+      if (f.toLowerCase().endsWith('.gif') && !animated(fs.readFileSync(f))) return true;
       if (f.toLowerCase().endsWith('.png')) return true;
       if (f.toLowerCase().endsWith('.jpeg')) return true;
       if (f.toLowerCase().endsWith('.jpg')) return true;
