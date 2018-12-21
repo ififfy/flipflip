@@ -2,13 +2,11 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {HotKeys} from 'react-hotkeys';
 
-import {join} from 'path';
 import recursiveReaddir from 'recursive-readdir';
 
 import Scene from '../Scene';
 import ImagePlayer from './ImagePlayer';
 import { remote } from 'electron';
-import { removeListener } from 'cluster';
 
 function filterPathsToJustImages(imageTypeFilter: string, paths: Array<string>): Array<string> {
   if (imageTypeFilter === 'if.any') return paths;
