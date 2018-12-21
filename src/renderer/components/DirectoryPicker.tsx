@@ -14,7 +14,8 @@ type Props = {
 export default class DirectoryPicker extends React.Component {
   readonly props: Props;
   readonly state = {
-    isOpen: false,
+    importIsOpen: false,
+    removeAllIsOpen: false,
     importURL: "",
     rootDir: "",
   };
@@ -35,17 +36,26 @@ export default class DirectoryPicker extends React.Component {
           );
         })}
         <div className='u-button u-clickable' onClick={this.onAdd.bind(this)}>+ Add</div>
-        <div className='u-button u-clickable' onClick={this.toggleModal.bind(this)}>+ Import From URL</div>
-        <div className='u-button u-clickable' onClick={this.removeAll.bind(this)} style={{float: 'left'}}>- Remove All</div>
+        <div className='u-button u-clickable' onClick={this.toggleImportModal.bind(this)}>+ Import From URL</div>
+        <div className='u-button u-clickable' onClick={this.toggleRemoveAllModal.bind(this)} style={{float: 'left'}}>- Remove All</div>
 
-        {this.state.isOpen && (
-          <Modal onClose={this.toggleModal.bind(this)}>
+        {this.state.importIsOpen && (
+          <Modal onClose={this.toggleImportModal.bind(this)}>
             <div>Enter a gooninator URL for import:</div>
             <input type="text" name="url" onChange={this.importURLChange.bind(this)}/>
             <div>Enter the parent directory to look in:</div>
             <input type="text" name="root" value={this.state.rootDir} readOnly onClick={this.addRootDir.bind(this)}/>
             <button onClick={this.doImport.bind(this)}>
               Import
+            </button>
+          </Modal>
+        )}
+
+        {this.state.removeAllIsOpen && (
+          <Modal onClose={this.toggleRemoveAllModal.bind(this)}>
+            <div>Are you sure you want to remove all?</div>
+            <button onClick={this.removeAll.bind(this)}>
+              OK
             </button>
           </Modal>
         )}
@@ -57,19 +67,22 @@ export default class DirectoryPicker extends React.Component {
     this.setState({importURL: e.currentTarget.value});
   };
 
-  toggleModal() {
+  toggleRemoveAllModal() {
     this.setState({
-      isOpen: !this.state.isOpen,
+      removeAllIsOpen: !this.state.removeAllIsOpen
+    });
+  };
+
+  toggleImportModal() {
+    this.setState({
+      importIsOpen: !this.state.importIsOpen,
       importURL: ""
     });
   };
 
   doImport() {
     let importURL = this.state.importURL;
-    this.setState({
-      isOpen: !this.state.isOpen,
-      importURL: ""
-    });
+    this.toggleImportModal();
     if (!importURL) {
       return;
     }
@@ -118,6 +131,7 @@ export default class DirectoryPicker extends React.Component {
   }
 
   removeAll() {
+    this.toggleRemoveAllModal();
     this.props.onChange([]);
   }
 };
