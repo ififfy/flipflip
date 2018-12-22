@@ -252,11 +252,50 @@ $sceneDetailOptionsWidth: 220px;
   padding: $smallPadding;
 }
 
-.SimpleOptionPicker {
-  padding-bottom: 9px;
+.SceneOptionsForm {
+  div {
+    padding-bottom: 9px;
+    label {
+      margin-right: 0.5rem;
+    }
+  }
+  .SimpleTextInput {
+    input[type=text] {
+      font-size: 16px;
+      font-weight: 400;
+      display: block;
+      width: 100%;
+      margin-bottom: 0;
+    }
+  }
+  .SimpleSliderInput {
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 10px;
+      border-radius: 5px;
+      outline: none;
+      -webkit-transition: opacity .2s ease-in-out;
+      transition: opacity .2s ease-in-out;
 
-  label {
-    margin-right: 0.5rem;
+      &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 17px;
+        height: 17px;
+        border-radius: 50%;
+        background: #3f96d0;
+        cursor: pointer;
+      }
+
+      &::-moz-range-thumb {
+        width: 17px;
+        height: 17px;
+        border-radius: 50%;
+        background: #3f96d0;
+        cursor: pointer;
+      }
+    }
   }
 }
 
@@ -333,12 +372,34 @@ $sceneDetailOptionsWidth: 220px;
 
 .Modal__Inner {
   background-color: #fff;
-  border-radius: 5;
-  max-width: 500;
-  min-height: 300;
+  border-radius: 5px;
+  max-width: 500px;
+  min-height: 100px;
   margin: 0 auto;
-  padding: 30px;
+  padding: 30px 30px 45px 30px;
   color: black;
+  .Modal__Close {
+    float: right;
+  }
+  button:not(.Modal__Close) {
+    float: left;
+  }
+}
+
+label.Checkbox {
+  display: block;
+  padding-left: 15px;
+  text-indent: -15px;
+  input {
+    width: 13px;
+    height: 13px;
+    padding: 0;
+    margin:0;
+    vertical-align: bottom;
+    position: relative;
+    top: -1px;
+    *overflow: hidden;
+  }
 }
 
 /* loader */
@@ -403,24 +464,60 @@ $sceneDetailOptionsWidth: 220px;
   }
 }
 
-.zoom-1s img {
-  -webkit-animation: keyframes-zoom 1s;
-  animation: keyframes-zoom 1s;
-  -webkit-transform: scale(1,1);
-  transform: scale(1,1);
-  -webkit-animation-fill-mode: forwards;
-  animation-fill-mode: forwards;
-  animation-timing-function: linear;
-  -webkit-animation-timing-function: linear;
+@keyframes keyframes-zoom-out {
+  100% {
+    transform: scale(1,1);
+  }
 }
 
-.zoom-5s img {
-  -webkit-animation: keyframes-zoom 5s;
-  animation: keyframes-zoom 5s;
-  -webkit-transform: scale(1,1);
-  transform: scale(1,1);
-  -webkit-animation-fill-mode: forwards;
-  animation-fill-mode: forwards;
-  animation-timing-function: linear;
-  -webkit-animation-timing-function: linear;
+@for $i from 1 through 20 {
+  .zoom-#{$i}s img {
+    -webkit-animation: keyframes-zoom #{$i}s;
+    animation: keyframes-zoom #{$i}s;
+    -webkit-transform: scale(1,1);
+    transform: scale(1,1);
+    -webkit-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
+    animation-timing-function: linear;
+    -webkit-animation-timing-function: linear;
+  }
+}
+
+@for $i from 1 through 20 {
+  .zoom-r#{$i}s img {
+    -webkit-animation: keyframes-zoom-out #{$i}s;
+    animation: keyframes-zoom-out #{$i}s;
+    -webkit-transform: scale(1.5,1.5);
+    transform: scale(1.5,1.5);
+    -webkit-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
+    animation-timing-function: linear;
+    -webkit-animation-timing-function: linear;
+  }
+}
+
+.text-blink {
+  text-align: center; color: white; font-size: 20vmin;
+  vertical-align: middle; transition: opacity 0.1s ease-out;
+  font-family: Arial Black,Arial Bold,Gadget,sans-serif;
+  -webkit-text-stroke-width: 1px; -webkit-text-stroke-color: black;
+}
+
+.text-caption {
+  text-align: center; color: white; font-size: 8vmin;
+  vertical-align: bottom; padding-bottom: 20vmin;
+  transition: opacity 0.5s ease-in-out;
+  font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
+  -webkit-text-stroke-width: 1px; -webkit-text-stroke-color: black;
+}
+
+.text-caption-big {
+  text-align: center; color: white; font-size: 12vmin;
+  vertical-align: middle; transition: opacity 0.1s ease-out;
+  font-family: Arial Black,Arial Bold,Gadget,sans-serif;
+  -webkit-text-stroke-width: 1px; -webkit-text-stroke-color: black;
+}
+
+.text-display {
+  z-index: 1;
 }

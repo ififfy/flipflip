@@ -11,6 +11,7 @@
     "production": "rimraf dist && webpack --config ./webpack.prod.js --progress --colors"
   },
   "devDependencies": {
+    "@types/jquery": "^3.3.28",
     "@types/lodash": "^4.14.119",
     "@types/react": "^16.7.13",
     "@types/react-dom": "^16.0.11",
@@ -29,11 +30,13 @@
     "webpack-cli": "^3.1.2"
   },
   "dependencies": {
+    "animated-gif-detector": "^1.2.0",
     "file-url": "^2.0.2",
     "lodash": "^4.17.11",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
     "react-hotkeys": "^1.1.4",
-    "recursive-readdir": "^2.2.2"
+    "recursive-readdir": "^2.2.2",
+    "wretch": "^1.4.2"
   }
 }

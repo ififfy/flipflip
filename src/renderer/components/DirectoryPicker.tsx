@@ -9,12 +9,14 @@ import {pathname} from '../util';
 type Props = {
   directories: Array<string>,
   onChange(directories: Array<string>): void,
+  onChangeHastebinID(hbID: string): void,
 };
 
 export default class DirectoryPicker extends React.Component {
   readonly props: Props;
   readonly state = {
-    isOpen: false,
+    importIsOpen: false,
+    removeAllIsOpen: false,
     importURL: "",
     rootDir: "",
   };
@@ -35,17 +37,26 @@ export default class DirectoryPicker extends React.Component {
           );
         })}
         <div className='u-button u-clickable' onClick={this.onAdd.bind(this)}>+ Add</div>
-        <div className='u-button u-clickable' onClick={this.toggleModal.bind(this)}>+ Import From URL</div>
-        <div className='u-button u-clickable' onClick={this.removeAll.bind(this)} style={{float: 'left'}}>- Remove All</div>
+        <div className='u-button u-clickable' onClick={this.toggleImportModal.bind(this)}>+ Import From URL</div>
+        <div className='u-button u-clickable' onClick={this.toggleRemoveAllModal.bind(this)} style={{float: 'left'}}>- Remove All</div>
 
-        {this.state.isOpen && (
-          <Modal onClose={this.toggleModal.bind(this)}>
+        {this.state.importIsOpen && (
+          <Modal onClose={this.toggleImportModal.bind(this)}>
             <div>Enter a gooninator URL for import:</div>
             <input type="text" name="url" onChange={this.importURLChange.bind(this)}/>
             <div>Enter the parent directory to look in:</div>
-            <input type="text" name="root" value={this.state.rootDir} onChange={this.rootDirChange.bind(this)}/>
+            <input type="text" name="root" value={this.state.rootDir} readOnly onClick={this.addRootDir.bind(this)}/>
             <button onClick={this.doImport.bind(this)}>
               Import
+            </button>
+          </Modal>
+        )}
+
+        {this.state.removeAllIsOpen && (
+          <Modal onClose={this.toggleRemoveAllModal.bind(this)}>
+            <div>Are you sure you want to remove all?</div>
+            <button onClick={this.removeAll.bind(this)}>
+              OK
             </button>
           </Modal>
         )}
@@ -57,56 +68,76 @@ export default class DirectoryPicker extends React.Component {
     this.setState({importURL: e.currentTarget.value});
   };
 
-  rootDirChange(e: React.FormEvent<HTMLInputElement>) {
-    this.setState({rootDir: e.currentTarget.value});
+  toggleRemoveAllModal() {
+    this.setState({
+      removeAllIsOpen: !this.state.removeAllIsOpen
+    });
   };
 
-  toggleModal() {
+  toggleImportModal() {
     this.setState({
-      isOpen: !this.state.isOpen,
+      importIsOpen: !this.state.importIsOpen,
       importURL: ""
     });
   };
 
   doImport() {
     let importURL = this.state.importURL;
-    this.setState({
-      isOpen: !this.state.isOpen,
-      importURL: ""
-    });
+    let hastebinURL = this.state.importURL;
+    this.toggleImportModal();
     if (!importURL) {
       return;
     }
-    let rootDir = this.state.rootDir;
+    let rootDir = this.state.rootDir.toString();
     if (!rootDir.endsWith(sep)) {
       rootDir += sep;
     }
-    // Remove everything before "sources="
-    importURL = importURL.substring(importURL.indexOf("sources=") + 8);
-    // Remove everything after the sources parameter
-    importURL = importURL.substring(0, importURL.indexOf("&"));
-    // Split into blog names
-    let importURLs = importURL.split("%20");
-    // Append root onto each blog
-    for (let u = 0; u<importURLs.length; u++) {
-      let fullPath = rootDir + importURLs[u];
-      if (this.props.directories.includes(fullPath)) {
-        // Remove index and push u back
-        importURLs.splice(u,1);
-        u-=1
-      } else {
-        importURLs[u] = fullPath;
-      }
-    }
+    if (importURL.includes("sources=")) {
+      // Remove everything before "sources="
+      importURL = importURL.substring(importURL.indexOf("sources=") + 8);
 
-    // Don't add empty blog
-    if (importURLs.length == 1 && importURLs[0] === sep) {
-      return;
-    } else {
+      if (importURL.includes("&")) {
+        // Remove everything after the sources parameter
+        importURL = importURL.substring(0, importURL.indexOf("&"));
+      }
+
+      // Split into blog names
+      let importURLs = importURL.split("%20");
+      // Append root onto each blog
+      for (let u = 0; u < importURLs.length; u++) {
+        let fullPath = rootDir + importURLs[u];
+        if (this.props.directories.includes(fullPath) || importURLs[u] === sep || importURLs[u] === "") {
+          // Remove index and push u back
+          importURLs.splice(u, 1);
+          u -= 1
+        } else {
+          importURLs[u] = fullPath;
+        }
+      }
+
       // Add list
       this.props.onChange(this.props.directories.concat(importURLs));
     }
+
+    if (hastebinURL.includes("pastebinId=")) {
+      // Remove everything before "sources="
+      hastebinURL = hastebinURL.substring(hastebinURL.indexOf("pastebinId=") + 11);
+
+      if (hastebinURL.includes("&")) {
+        // Remove everything after the sources parameter
+        hastebinURL = hastebinURL.substring(0, hastebinURL.indexOf("&"));
+      }
+
+      // Update hastebin URL (if present)
+      this.props.onChangeHastebinID(hastebinURL);
+    }
   };
+
+  addRootDir() {
+    let result = remote.dialog.showOpenDialog({properties: ['openDirectory']});
+    if (!result) return;
+    this.setState({rootDir: result});
+  }
 
   onAdd() {
     let result = remote.dialog.showOpenDialog({properties: ['openDirectory', 'multiSelections']});
@@ -121,6 +152,7 @@ export default class DirectoryPicker extends React.Component {
   }
 
   removeAll() {
+    this.toggleRemoveAllModal();
     this.props.onChange([]);
   }
 };
