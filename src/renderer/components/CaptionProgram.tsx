@@ -1,4 +1,4 @@
-import $ from 'jquery';
+import wretch from 'wretch';
 import * as React from 'react';
 
 let STYLES : {[style : string] : string} = {};
@@ -247,11 +247,6 @@ const startShowingText = function(el : HTMLElement, hastebinId : string) {
     return startText(el, testProgram);
   }
 
-  // const url = `text/${pastebinId}.txt`;
-  // const url = 'https://crossorigin.me/http://pastebin.com/raw/' + pastebinId;
-  // const url = 'http://cors-proxy.htmldriven.com/?url=http://pastebin.com/raw/' + hastebinId;
-  // const url = 'http://cors-proxy.htmldriven.com/?url=https://hastebin.com/raw/' + hastebinId;
-  // const url = 'https://cors-anywhere.herokuapp.com/https://hastebin.com/raw/' + hastebinId;
   const url = 'https://hastebin.com/raw/' + hastebinId;
 
   let _hasStoppedEarly = false;
@@ -259,28 +254,13 @@ const startShowingText = function(el : HTMLElement, hastebinId : string) {
     _hasStoppedEarly = true;
   };
   const stop = () => { _stop(); };
-  $.ajax({
-    url: url,
-    method: 'get',
-    success: function(data) {
+  wretch(url)
+    .get()
+    .text(data => {
       if (_hasStoppedEarly) return;
-      try {
-        JSON.parse(data.body);
-        return;
-      } catch (e) {
-        // ok; old format
-      }
-      if (data.body) {
-        data = data.body;
-      }
       console.log(data);
       _stop = startText(el, data);
-    },
-    error: function(err) {
-      console.error("Could not load hastebin ID", hastebinId);
-      alert("Could not load your hastebin. This may or may not be temporary.");
-    },
-  });
+    });
   return stop;
 };
 
