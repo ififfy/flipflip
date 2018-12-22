@@ -1,23 +1,25 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {HotKeys} from 'react-hotkeys';
-
 import recursiveReaddir from 'recursive-readdir';
+import fs from 'fs'
+const animated : Function = require('animated-gif-detector');
+import { remote } from 'electron';
 
 import Scene from '../Scene';
 import ImagePlayer from './ImagePlayer';
-import { remote } from 'electron';
+import CaptionProgram from './CaptionProgram';
 
 function filterPathsToJustImages(imageTypeFilter: string, paths: Array<string>): Array<string> {
   if (imageTypeFilter === 'if.any') return paths;
 
   if (imageTypeFilter === 'if.gifs') {
-    return paths.filter((f) => f.toLowerCase().endsWith('.gif'));
+    return paths.filter((f) => f.toLowerCase().endsWith('.gif') && animated(fs.readFileSync(f)));
   }
 
   if (imageTypeFilter === 'if.stills') {
     return paths.filter((f) => {
-      //if (f.toLowerCase().endsWith('.gif')) return true;
+      if (f.toLowerCase().endsWith('.gif') && !animated(fs.readFileSync(f))) return true;
       if (f.toLowerCase().endsWith('.png')) return true;
       if (f.toLowerCase().endsWith('.jpeg')) return true;
       if (f.toLowerCase().endsWith('.jpg')) return true;
@@ -66,10 +68,15 @@ export default class Player extends React.Component {
               maxLoadingAtOnce={5}
               maxToRememberInHistory={500}
               timingFunction={this.props.scene.timingFunction}
+              timingConstant={this.props.scene.timingConstant}
               zoomType={this.props.scene.zoomType}
+              zoomLevel={this.props.scene.zoomLevel}
               isPlaying={this.state.isPlaying}
               fadeEnabled={this.props.scene.crossFade}
               allPaths={this.state.allPaths} />)}
+          {this.state.isLoaded && this.props.scene.hastebinID && this.state.isPlaying && (
+            <CaptionProgram hastebinID={this.props.scene.hastebinID} />
+          )}
 
           {!this.state.isLoaded && (
             <div className="LoadingIndicator"><div className="loader" /></div>

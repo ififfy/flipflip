@@ -2,11 +2,13 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 import {remote} from 'electron';
-import {ZF} from '../const';
+import {IF, TF, ZF} from '../const';
 
 import Scene from '../Scene';
 import DirectoryPicker from './DirectoryPicker';
 import SimpleOptionPicker from './SimpleOptionPicker';
+import SimpleTextInput from './SimpleTextInput';
+import SimpleSliderInput from "./SimpleSliderInput";
 import TIMING_FUNCTIONS from '../TIMING_FUNCTIONS';
 
 type Props = {
@@ -17,7 +19,10 @@ type Props = {
   onChangeName(scene: Scene, name: string): void,
   onChangeImageTypeFilter(scene: Scene, filter: string): void,
   onChangeZoomType(scene: Scene, type: string): void,
+  onChangeZoomLevel(scene: Scene, level: number): void,
+  onChangeHastebinID(scene: Scene, hbId: string): void,
   onChangeTimingFunction(scene: Scene, fnId: string): void,
+  onChangeTimingConstant(scene: Scene, constant: string): void,
   onChangeDirectories(scene: Scene, directories: Array<string>): void,
   onChangeCrossFade(scene: Scene, value: boolean): void,
   onDelete(scene: Scene): void,
@@ -95,17 +100,35 @@ export default class SceneDetail extends React.Component {
                 onChange={this.props.onChangeTimingFunction.bind(this, this.props.scene)}
                 label="Timing"
                 value={this.props.scene.timingFunction}
-                keys={Array.from(TIMING_FUNCTIONS.keys()).map((s) => s.toString())} />
+                keys={Object.values(TF)} />
+              {this.props.scene.timingFunction === TF.constant && (
+                <SimpleTextInput
+                  onChange={this.props.onChangeTimingConstant.bind(this, this.props.scene)}
+                  label="Time between images (ms)"
+                  value={this.props.scene.timingConstant.toString()} />
+              )}
               <SimpleOptionPicker
                 onChange={this.props.onChangeImageTypeFilter.bind(this, this.props.scene)}
-                label="Image filter"
+                label="Image Filter"
                 value={this.props.scene.imageTypeFilter}
-                keys={['if.any', 'if.gifs', 'if.stills']} />
+                keys={Object.values(IF)} />
               <SimpleOptionPicker
                 onChange={this.props.onChangeZoomType.bind(this, this.props.scene)}
-                label="Zoom level"
+                label="Zoom Type"
                 value={this.props.scene.zoomType}
                 keys={Object.values(ZF)} />
+              {this.props.scene.zoomType != ZF.none && (
+                <SimpleSliderInput
+                  onChange={this.props.onChangeZoomLevel.bind(this, this.props.scene)}
+                  label={"Zoom Length: " + this.props.scene.zoomLevel + "s"}
+                  min={1}
+                  max={20}
+                  value={this.props.scene.zoomLevel.toString()} />
+              )}
+              <SimpleTextInput
+                  onChange={this.props.onChangeHastebinID.bind(this, this.props.scene)}
+                  label="Hastebin ID"
+                  value={this.props.scene.hastebinID} />
               <Checkbox
                 text="Cross-fade images"
                 isOn={this.props.scene.crossFade}
@@ -121,7 +144,8 @@ export default class SceneDetail extends React.Component {
             <h2>Sources:</h2>
             <DirectoryPicker
               directories={this.props.scene.directories}
-              onChange={this.onChangeDirectories.bind(this)} />
+              onChange={this.onChangeDirectories.bind(this)}
+              onChangeHastebinID={this.onChangeHastebinID.bind(this)}/>
           </div>
         </div>
       </div>
@@ -156,6 +180,10 @@ export default class SceneDetail extends React.Component {
 
   onChangeDirectories(directories: Array<string>) {
     this.props.onChangeDirectories(this.props.scene, directories);
+  }
+
+  onChangeHastebinID(hbID: string) {
+    this.props.onChangeHastebinID(this.props.scene, hbID);
   }
 
   onChangeCrossFade(value: boolean) {

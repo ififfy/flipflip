@@ -88,7 +88,10 @@ export default class Meta extends React.Component {
             onChangeName={this.onChangeName.bind(this)}
             onChangeImageTypeFilter={this.onChangeImageTypeFilter.bind(this)}
             onChangeZoomType={this.onChangeZoomType.bind(this)}
+            onChangeZoomLevel={this.onChangeZoomLevel.bind(this)}
+            onChangeHastebinID={this.onChangeHastebinID.bind(this)}
             onChangeTimingFunction={this.onChangeTimingFunction.bind(this)}
+            onChangeTimingConstant={this.onChangeTimingConstant.bind(this)}
             onChangeCrossFade={this.onChangeCrossFade.bind(this)}
             onChangeDirectories={this.onChangeDirectories.bind(this)} />)}
 
@@ -170,9 +173,27 @@ export default class Meta extends React.Component {
     });
   }
 
+  onChangeZoomLevel(scene: Scene, level: number) {
+    this.editScene(scene, (s) => {
+      s.zoomLevel = level;
+    });
+  }
+
+  onChangeHastebinID(scene: Scene, hbId: string) {
+    this.editScene(scene, (s) => {
+      s.hastebinID = hbId;
+    });
+  }
+
   onChangeTimingFunction(scene: Scene, fnId: string) {
     this.editScene(scene, (s) => {
       s.timingFunction = fnId;
+    });
+  }
+
+  onChangeTimingConstant(scene: Scene, constant: string) {
+    this.editScene(scene, (s) => {
+      s.timingConstant = constant;
     });
   }
 
