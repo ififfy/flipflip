@@ -91,6 +91,7 @@ export default class Meta extends React.Component {
             onChangeZoomLevel={this.onChangeZoomLevel.bind(this)}
             onChangeHastebinID={this.onChangeHastebinID.bind(this)}
             onChangeTimingFunction={this.onChangeTimingFunction.bind(this)}
+            onChangeTimingConstant={this.onChangeTimingConstant.bind(this)}
             onChangeCrossFade={this.onChangeCrossFade.bind(this)}
             onChangeDirectories={this.onChangeDirectories.bind(this)} />)}
 
@@ -187,6 +188,12 @@ export default class Meta extends React.Component {
   onChangeTimingFunction(scene: Scene, fnId: string) {
     this.editScene(scene, (s) => {
       s.timingFunction = fnId;
+    });
+  }
+
+  onChangeTimingConstant(scene: Scene, constant: string) {
+    this.editScene(scene, (s) => {
+      s.timingConstant = constant;
     });
   }
 

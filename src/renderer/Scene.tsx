@@ -3,7 +3,8 @@ export default class Scene {
   id: Number = 0
   name: string = "Unnamed scene"
   directories: Array<string> = []
-  timingFunction = TF.seconds1
+  timingFunction = TF.constant
+  timingConstant = "1000";
   imageTypeFilter = IF.any
   zoomType = ZF.none
   zoomLevel: number = 5
@@ -25,7 +26,8 @@ export default class Scene {
       this.timingFunction = 'tf.' + this.timingFunction;
     }
     if (!(TF as any)[this.timingFunction]) {
-      this.timingFunction = TF.seconds1;
+      this.timingFunction = TF.constant;
+      this.timingConstant = "1000";
     }
 
     // backward compatible with 1.0.1

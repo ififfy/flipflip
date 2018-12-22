@@ -1,12 +1,9 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-
 import fileURL from 'file-url';
 
 import ImageView from './ImageView';
 import TIMING_FUNCTIONS from '../TIMING_FUNCTIONS';
-import { number } from 'prop-types';
-import {ZF} from '../const';
+import {TF, ZF} from '../const';
 
 function choice<T>(items: Array<T>): T {
   const i = Math.floor(Math.random() * items.length);
@@ -21,6 +18,7 @@ export default class ImagePlayer extends React.Component {
     allPaths: Array<Array<string>>,
     isPlaying: boolean,
     timingFunction: string,
+    timingConstant: string,
     zoomType: string,
     zoomLevel: number,
     historyOffset: number,
@@ -186,7 +184,16 @@ export default class ImagePlayer extends React.Component {
       this.props.setHistoryLength(nextHistoryPaths.length);
 
       if (schedule) {
-        const timeToNextFrame = TIMING_FUNCTIONS.get(this.props.timingFunction)()
+        let timeToNextFrame;
+        if (this.props.timingFunction === TF.constant) {
+          timeToNextFrame = Number(this.props.timingConstant);
+          // If we cannot parse this, default to 1s
+          if (!timeToNextFrame && timeToNextFrame != 0) {
+            timeToNextFrame = 1000;
+          }
+        } else {
+          timeToNextFrame = TIMING_FUNCTIONS.get(this.props.timingFunction)();
+        }
         this.setState({timeToNextFrame});
         setTimeout(this.advance.bind(this, false, true), timeToNextFrame);
       }
