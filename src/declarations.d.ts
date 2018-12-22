@@ -22,3 +22,4 @@ declare module '*.icns' {
 declare module 'file-url';
 declare module 'react-hotkeys';
 declare module 'recursive-readdir';
+declare module 'animated-gif-detector';
