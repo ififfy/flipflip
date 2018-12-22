@@ -142,7 +142,7 @@ export default class Player extends React.Component {
             this.setState({isLoaded: true, isPlaying: true});
           }
 
-          if (files.length === 0) {
+          if (!files || files.length === 0) {
             return;
           }
 
