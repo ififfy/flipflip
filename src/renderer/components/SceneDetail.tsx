@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 import {remote} from 'electron';
-import {ZF} from '../const';
+import {IF, TF, ZF} from '../const';
 
 import Scene from '../Scene';
 import DirectoryPicker from './DirectoryPicker';
@@ -22,6 +22,7 @@ type Props = {
   onChangeZoomLevel(scene: Scene, level: number): void,
   onChangeHastebinID(scene: Scene, hbId: string): void,
   onChangeTimingFunction(scene: Scene, fnId: string): void,
+  onChangeTimingConstant(scene: Scene, constant: string): void,
   onChangeDirectories(scene: Scene, directories: Array<string>): void,
   onChangeCrossFade(scene: Scene, value: boolean): void,
   onDelete(scene: Scene): void,
@@ -99,24 +100,30 @@ export default class SceneDetail extends React.Component {
                 onChange={this.props.onChangeTimingFunction.bind(this, this.props.scene)}
                 label="Timing"
                 value={this.props.scene.timingFunction}
-                keys={Array.from(TIMING_FUNCTIONS.keys()).map((s) => s.toString())} />
+                keys={Object.values(TF)} />
+              {this.props.scene.timingFunction === TF.constant && (
+                <SimpleTextInput
+                  onChange={this.props.onChangeTimingConstant.bind(this, this.props.scene)}
+                  label="Time between images (ms)"
+                  value={this.props.scene.timingConstant.toString()} />
+              )}
               <SimpleOptionPicker
                 onChange={this.props.onChangeImageTypeFilter.bind(this, this.props.scene)}
                 label="Image Filter"
                 value={this.props.scene.imageTypeFilter}
-                keys={['if.any', 'if.gifs', 'if.stills']} />
+                keys={Object.values(IF)} />
               <SimpleOptionPicker
                 onChange={this.props.onChangeZoomType.bind(this, this.props.scene)}
                 label="Zoom Type"
                 value={this.props.scene.zoomType}
                 keys={Object.values(ZF)} />
-              {this.props.scene.zoomType != 'zf.none' && (
-                  <SimpleSliderInput
-                      onChange={this.props.onChangeZoomLevel.bind(this, this.props.scene)}
-                      label={"Zoom Length: " + this.props.scene.zoomLevel + "s"}
-                      min={1}
-                      max={20}
-                      value={this.props.scene.zoomLevel.toString()} />
+              {this.props.scene.zoomType != ZF.none && (
+                <SimpleSliderInput
+                  onChange={this.props.onChangeZoomLevel.bind(this, this.props.scene)}
+                  label={"Zoom Length: " + this.props.scene.zoomLevel + "s"}
+                  min={1}
+                  max={20}
+                  value={this.props.scene.zoomLevel.toString()} />
               )}
               <SimpleTextInput
                   onChange={this.props.onChangeHastebinID.bind(this, this.props.scene)}
