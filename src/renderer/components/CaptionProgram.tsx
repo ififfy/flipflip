@@ -80,7 +80,6 @@ const COMMANDS : { [command : string] : (el: HTMLElement, value : string) => any
     return function(runNextCommand : Function) {
       el.style.opacity = '1.0';
       el.innerHTML = textString;
-      console.log("Timeout is " + ms);
       setTimeout(function() {
         el.style.opacity = '0.0';
         runNextCommand();
@@ -258,7 +257,7 @@ const startShowingText = function(el : HTMLElement, hastebinId : string) {
     .get()
     .text(data => {
       if (_hasStoppedEarly) return;
-      console.log(data);
+      //console.log(data);
       _stop = startText(el, data);
     });
   return stop;
