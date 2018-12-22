@@ -47,6 +47,8 @@ on the project to make changes as you wish. :-)
 ### JS style guide
 
 * Use proper TypeScript. Some hacks are OK, but be reasonable.
+* `import`, not `require`. (To make non-TypeScript modules work, add an entry
+  to `src/declaration.d.ts`.)
 * 2-space tabs.
 
 ### CSS style guide
