@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom';
 import {HotKeys} from 'react-hotkeys';
 import recursiveReaddir from 'recursive-readdir';
 import fs from 'fs'
-const animated : Function = require('animated-gif-detector');
+import animated from 'animated-gif-detector';
 import { remote } from 'electron';
 
 import Scene from '../Scene';
@@ -142,7 +142,7 @@ export default class Player extends React.Component {
             this.setState({isLoaded: true, isPlaying: true});
           }
 
-          if (files.length === 0) {
+          if (!files || files.length === 0) {
             return;
           }
 
