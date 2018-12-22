@@ -292,7 +292,7 @@ export default class CaptionProgram extends React.Component {
   };
 
   readonly state = {
-    stopFunc: null,
+    stopFunc: Function(),
     lastHastebinID: ""
   };
 
