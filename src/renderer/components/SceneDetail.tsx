@@ -1,7 +1,5 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 
-import {remote} from 'electron';
 import {IF, TF, ZF} from '../const';
 
 import Scene from '../Scene';
@@ -9,7 +7,7 @@ import DirectoryPicker from './DirectoryPicker';
 import SimpleOptionPicker from './SimpleOptionPicker';
 import SimpleTextInput from './SimpleTextInput';
 import SimpleSliderInput from "./SimpleSliderInput";
-import TIMING_FUNCTIONS from '../TIMING_FUNCTIONS';
+import URLImporter from "./URLImporter";
 
 type Props = {
   scene?: Scene,
@@ -53,12 +51,12 @@ class Checkbox extends React.Component {
 }
 
 export default class SceneDetail extends React.Component {
-  readonly props: Props
-  readonly nameInputRef: React.RefObject<HTMLInputElement> = React.createRef()
+  readonly props: Props;
+  readonly nameInputRef: React.RefObject<HTMLInputElement> = React.createRef();
 
   readonly state: {
     isEditingName: boolean,
-  }
+  };
 
   constructor(props: Props) {
     super(props);
@@ -144,7 +142,10 @@ export default class SceneDetail extends React.Component {
             <h2>Sources:</h2>
             <DirectoryPicker
               directories={this.props.scene.directories}
-              onChange={this.onChangeDirectories.bind(this)}
+              onChange={this.onChangeDirectories.bind(this)}/>
+            <URLImporter
+              directories={this.props.scene.directories}
+              onChangeDirectories={this.onChangeDirectories.bind(this)}
               onChangeHastebinID={this.onChangeHastebinID.bind(this)}/>
           </div>
         </div>
