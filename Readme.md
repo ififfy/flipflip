@@ -44,6 +44,19 @@ policy of the FlipFlip project is, "patches are generally accepted."
 If your contributions make sense, you will be added as a collaborator
 on the project to make changes as you wish. :-)
 
+### JS style guide
+
+* Use proper TypeScript. Some hacks are OK, but be reasonable.
+* 2-space tabs.
+
+### CSS style guide
+
+* The top level of every React component simply has the component's full name as its CSS class
+  (`<div className="Modal">`)
+* Markup inside the component is `ClassName__Whatever` (`Modal__CloseButton`)
+* For different states of the same component, make `m-blah` classes. (`Checkbox m-disabled`)
+* For classes used on different kinds of elements, use `u-blah`, like `u-fill-screen`
+
 ### Contribution guidelines
 
 * Try to keep the code repository and the application itself G-rated.
