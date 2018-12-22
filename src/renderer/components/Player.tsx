@@ -1,14 +1,13 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {HotKeys} from 'react-hotkeys';
-
 import recursiveReaddir from 'recursive-readdir';
-
 import fs from 'fs'
-import animated from 'animated-gif-detector';
+const animated : Function = require('animated-gif-detector');
+import { remote } from 'electron';
+
 import Scene from '../Scene';
 import ImagePlayer from './ImagePlayer';
-import { remote } from 'electron';
 import CaptionProgram from './CaptionProgram';
 
 function filterPathsToJustImages(imageTypeFilter: string, paths: Array<string>): Array<string> {
