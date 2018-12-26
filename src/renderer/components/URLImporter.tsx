@@ -31,6 +31,7 @@ export default class URLImporter extends React.Component {
               </button>
             </Modal>
         )}
+        <div style={{clear: 'both'}}></div>
       </div>
     )
   }
