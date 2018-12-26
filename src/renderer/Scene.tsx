@@ -23,10 +23,10 @@ export default class Scene {
     this.directories = this.directories.filter((d) => !!d);
 
     // backward compatible with 1.0.1
-    if (!(TF as any)[this.timingFunction]) {
+    if (!this.timingFunction.startsWith('tf.')) {
       this.timingFunction = 'tf.' + this.timingFunction;
     }
-    if (!(TF as any)[this.timingFunction]) {
+    if (Object.values(TF).indexOf(this.timingFunction) < 0) {
       this.timingFunction = TF.constant;
       this.timingConstant = "1000";
     }
