@@ -72,6 +72,7 @@ export default class Player extends React.Component {
             zoomLevel={this.props.scene.zoomLevel}
             isPlaying={this.state.isPlaying}
             fadeEnabled={this.props.scene.crossFade}
+            imageSizeMin={this.props.scene.imageSizeMin}
             allPaths={this.state.allPaths} />)}
         {this.state.isLoaded && this.props.scene.hastebinID && this.state.isPlaying && (
           <CaptionProgram hastebinID={this.props.scene.hastebinID} />
