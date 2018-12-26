@@ -11,6 +11,8 @@ export default class Scene {
   crossFade = false
   hastebinID: string = "";
   imageSizeMin: 200;
+  overlaySceneID: number = 0;
+  overlaySceneOpacity: number = 0.5;
 
   // if true, the display chooses a directory first, then picks an image out
   // of it.
@@ -21,6 +23,11 @@ export default class Scene {
   constructor(init?:Partial<Scene>) {
     Object.assign(this, init);
     this.directories = this.directories.filter((d) => !!d);
+
+    this.overlaySceneID = parseInt(this.overlaySceneID as any, 10);
+    if (!this.overlaySceneOpacity) {
+      this.overlaySceneOpacity = 0.5;
+    }
 
     if (!this.imageSizeMin) {
       this.imageSizeMin = 200;
