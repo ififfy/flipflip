@@ -85,15 +85,7 @@ export default class Meta extends React.Component {
             goBack={this.goBack.bind(this)}
             onDelete={this.onDeleteScene.bind(this)}
             onPlay={this.onPlayScene.bind(this)}
-            onChangeName={this.onChangeName.bind(this)}
-            onChangeImageTypeFilter={this.onChangeImageTypeFilter.bind(this)}
-            onChangeZoomType={this.onChangeZoomType.bind(this)}
-            onChangeZoomLevel={this.onChangeZoomLevel.bind(this)}
-            onChangeHastebinID={this.onChangeHastebinID.bind(this)}
-            onChangeTimingFunction={this.onChangeTimingFunction.bind(this)}
-            onChangeTimingConstant={this.onChangeTimingConstant.bind(this)}
-            onChangeCrossFade={this.onChangeCrossFade.bind(this)}
-            onChangeDirectories={this.onChangeDirectories.bind(this)} />)}
+            onUpdateScene={this.onUpdateScene.bind(this)} />)}
 
         {this.isRoute('play') && (
           <Player
@@ -139,7 +131,7 @@ export default class Meta extends React.Component {
     this.setState({route: newRoute});
   }
 
-  editScene(scene: Scene, fn: (scene: Scene) => void) {
+  onUpdateScene(scene: Scene, fn: (scene: Scene) => void) {
     const scenes = this.state.scenes;
     for (let s of scenes) {
       if (s.id == scene.id) {
@@ -147,59 +139,5 @@ export default class Meta extends React.Component {
       }
     }
     this.setState({scenes: scenes});
-  }
-
-  onChangeDirectories(scene: Scene, directories: Array<string>) {
-    this.editScene(scene, (s) => {
-      s.directories = directories;
-    });
-  }
-
-  onChangeName(scene: Scene, name: string) {
-    this.editScene(scene, (s) => {
-      s.name = name;
-    });
-  }
-
-  onChangeImageTypeFilter(scene: Scene, filter: string) {
-    this.editScene(scene, (s) => {
-      s.imageTypeFilter = filter; 
-    });
-  }
-
-  onChangeZoomType(scene: Scene, type: string) {
-    this.editScene(scene, (s) => {
-      s.zoomType = type;
-    });
-  }
-
-  onChangeZoomLevel(scene: Scene, level: number) {
-    this.editScene(scene, (s) => {
-      s.zoomLevel = level;
-    });
-  }
-
-  onChangeHastebinID(scene: Scene, hbId: string) {
-    this.editScene(scene, (s) => {
-      s.hastebinID = hbId;
-    });
-  }
-
-  onChangeTimingFunction(scene: Scene, fnId: string) {
-    this.editScene(scene, (s) => {
-      s.timingFunction = fnId;
-    });
-  }
-
-  onChangeTimingConstant(scene: Scene, constant: string) {
-    this.editScene(scene, (s) => {
-      s.timingConstant = constant;
-    });
-  }
-
-  onChangeCrossFade(scene: Scene, value: boolean) {
-    this.editScene(scene, (s) => {
-      s.crossFade = value;
-    });
   }
 };
