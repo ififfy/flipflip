@@ -12,9 +12,9 @@ function choice<T>(items: Array<T>): T {
 
 export default class ImagePlayer extends React.Component {
   readonly props: {
-    maxInMemory: Number,
-    maxLoadingAtOnce: Number,
-    maxToRememberInHistory: Number,
+    maxInMemory: number,
+    maxLoadingAtOnce: number,
+    maxToRememberInHistory: number,
     allPaths: Array<Array<string>>,
     isPlaying: boolean,
     timingFunction: string,
@@ -115,7 +115,7 @@ export default class ImagePlayer extends React.Component {
     this.advance(true, true);
   }
 
-  runFetchLoop(i: Number, isStarting = false) {
+  runFetchLoop(i: number, isStarting = false) {
     if (!this._isMounted && !isStarting) return;
 
     // We either get one giant list of paths, or one list per directory,
@@ -202,9 +202,9 @@ export default class ImagePlayer extends React.Component {
 
     if (!schedule) return;
 
-    let timeToNextFrame;
+    let timeToNextFrame: number = 0;
     if (this.props.timingFunction === TF.constant) {
-      timeToNextFrame = Number(this.props.timingConstant);
+      timeToNextFrame = parseInt(this.props.timingConstant, 10);
       // If we cannot parse this, default to 1s
       if (!timeToNextFrame && timeToNextFrame != 0) {
         timeToNextFrame = 1000;
