@@ -38,31 +38,42 @@ export default class SceneDetail extends React.Component {
     return (
       <div className='SceneDetail'>
         <div className="u-button-row">
+
+          <div className="u-abs-center">
+            {this.state.isEditingName && (
+              <form className="SceneNameForm" onSubmit={this.endEditingName.bind(this)}>
+                <input
+                  autoFocus
+                  type="text"
+                  ref={this.nameInputRef}
+                  value={this.props.scene.name}
+                  onBlur={this.endEditingName.bind(this)}
+                  onChange={this.onChangeName.bind(this)} />
+              </form>
+            )}
+            {!this.state.isEditingName && (
+              <h2
+                className="SceneName u-clickable"
+                onClick={this.beginEditingName.bind(this)}>{this.props.scene.name}</h2>
+            )}
+          </div>
+
           <div className="BackButton u-button u-clickable" onClick={this.props.goBack}>Back</div>
           <div
             className="DeleteButton u-destructive u-button u-clickable"
             onClick={this.props.onDelete.bind(this, this.props.scene)}>
             Delete
           </div>
+
+          <div className="u-button-row-right">
+            <div onClick={this.play.bind(this)} className="u-clickable u-button">
+              Play
+            </div>
+          </div>
         </div>
 
         <div className="SceneDetail__Content">
           <div className="SceneDetail__Options">
-            {this.state.isEditingName && (
-              <form className="SceneNameForm" onSubmit={this.endEditingName.bind(this)}>
-                <input
-                  type="text"
-                  ref={this.nameInputRef}
-                  value={this.props.scene.name}
-                  onChange={this.onChangeName.bind(this)} />
-              </form>
-            )}
-            {!this.state.isEditingName && (
-              <h1
-                className="SceneName u-clickable"
-                onClick={this.beginEditingName.bind(this)}>{this.props.scene.name}</h1>
-            )}
-
             <form className="SceneOptionsForm">
               <SimpleOptionPicker
                 onChange={this.onChangeTimingFunction.bind(this)}
@@ -116,10 +127,6 @@ export default class SceneDetail extends React.Component {
                   label="Hastebin ID"
                   value={this.props.scene.hastebinID} />
             </form>
-
-            <div onClick={this.play.bind(this)} className="SceneDetail__PlayButton u-clickable u-button">
-              Play
-            </div>
           </div>
 
           <div className='SceneDetail__Sources'>
