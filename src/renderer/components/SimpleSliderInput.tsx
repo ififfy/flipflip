@@ -7,6 +7,7 @@ export default class SimpleSliderInput extends React.Component {
     min: number,
     max: number,
     value: string,
+    isEnabled: boolean,
     onChange: (value: string) => void
   };
 
@@ -15,6 +16,7 @@ export default class SimpleSliderInput extends React.Component {
       <div className="SimpleSliderInput">
         <label>{this.props.label}</label>
         <input
+          disabled={!this.props.isEnabled}
           type="range"
           min={this.props.min}
           max={this.props.max}
