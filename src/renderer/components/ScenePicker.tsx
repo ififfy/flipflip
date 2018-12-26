@@ -50,8 +50,7 @@ export default class ScenePicker extends React.Component {
 
           <p>
             While the slideshow is playing, you can press Space to pause, and use the
-            arrow keys to move through the history. Press Cmd+Ctrl+F to fullscreen on Mac
-            (not sure what it is on Windows).
+            arrow keys to move through the history. Press Cmd/Ctrl+F to fullscreen.
           </p>
 
           <p>
