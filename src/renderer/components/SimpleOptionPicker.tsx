@@ -7,8 +7,9 @@ export default class SimpleOptionPicker extends React.Component {
   readonly props: {
     label: string,
     value: string,
-    keys: Array<string>
-    onChange: (value: string) => void
+    keys: Array<string>,
+    getLabel?: (id: string) => string,
+    onChange: (value: string) => void,
   }
 
   render() {
@@ -18,7 +19,14 @@ export default class SimpleOptionPicker extends React.Component {
         <select
           value={this.props.value}
           onChange={this.onChange.bind(this)}>
-          {this.props.keys.map((k) => <option value={k} key={k}>{en.get(k) != null ? en.get(k) : k}</option>)}
+          {this.props.keys.map((k) => {
+            const label  = this.props.getLabel
+              ? this.props.getLabel(k)
+              : (
+                en.get(k) != null ? en.get(k) : k
+              );
+            return <option value={k} key={k}>{label}</option>;
+          })}
         </select>
       </div>
     );

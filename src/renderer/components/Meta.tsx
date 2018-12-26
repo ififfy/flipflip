@@ -65,6 +65,14 @@ export default class Meta extends React.Component {
     return null;
   }
 
+  overlayScene?(): Scene {
+    if (!this.scene()) return null;
+    if (!this.scene().overlaySceneID) return null;
+    return this.state.scenes.filter((s) => {
+      return s.id === this.scene().overlaySceneID;
+    })[0];
+  }
+
   componentDidMount() {
     setInterval(this.save.bind(this), 500);
   }
@@ -81,6 +89,7 @@ export default class Meta extends React.Component {
         {this.isRoute('scene') && (
           <SceneDetail
             scene={this.scene()}
+            allScenes={this.state.scenes}
             autoEdit={this.state.autoEdit}
             goBack={this.goBack.bind(this)}
             onDelete={this.onDeleteScene.bind(this)}
@@ -90,6 +99,7 @@ export default class Meta extends React.Component {
         {this.isRoute('play') && (
           <Player
             scene={this.scene()}
+            overlayScene={this.overlayScene()}
             goBack={this.goBack.bind(this)} />
         )}
       </div>
