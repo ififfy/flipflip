@@ -4,6 +4,7 @@ import {IF, TF, ZF} from '../const';
 
 import Scene from '../Scene';
 import DirectoryPicker from './DirectoryPicker';
+import SimpleCheckbox from './SimpleCheckbox';
 import SimpleOptionPicker from './SimpleOptionPicker';
 import SimpleTextInput from './SimpleTextInput';
 import SimpleSliderInput from "./SimpleSliderInput";
@@ -11,36 +12,13 @@ import URLImporter from "./URLImporter";
 
 type Props = {
   scene?: Scene,
+  allScenes: Array<Scene>,
   autoEdit: boolean,
   goBack(): void,
   onPlay(scene: Scene): void,
   onDelete(scene: Scene): void,
   onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
 };
-
-class Checkbox extends React.Component {
-  readonly props: {
-    text: string,
-    isOn: boolean,
-    onChange: (isOn: boolean) => void,
-  }
-
-  render() {
-    return (
-      <label className="Checkbox">
-        <input type="checkbox"
-          value={this.props.text}
-          checked={this.props.isOn} 
-          onChange={this.onToggle.bind(this)}
-          /> {this.props.text}
-      </label>
-    )
-  }
-
-  onToggle() {
-    this.props.onChange(!this.props.isOn);
-  }
-}
 
 export default class SceneDetail extends React.Component {
   readonly props: Props;
@@ -115,14 +93,28 @@ export default class SceneDetail extends React.Component {
                   max={20}
                   value={this.props.scene.zoomLevel.toString()} />
               )}
+              <SimpleCheckbox
+                text="Cross-fade images"
+                isOn={this.props.scene.crossFade}
+                onChange={this.onChangeCrossFade.bind(this)} />
+              <SimpleOptionPicker
+                onChange={this.onChangeOverlaySceneID.bind(this)}
+                label="Overlay scene"
+                value={this.props.scene.overlaySceneID.toString()}
+                getLabel={this.getSceneName.bind(this)}
+                keys={["0"].concat(this.props.allScenes.map((s) => s.id.toString()))} />
+              {this.props.scene.overlaySceneID != 0 && (
+                <SimpleSliderInput
+                  onChange={this.onChangeOverlaySceneOpacity.bind(this)}
+                  label={"Overlay opacity: " + (this.props.scene.overlaySceneOpacity * 100).toFixed(0) + '%'}
+                  min={1}
+                  max={100}
+                  value={(this.props.scene.overlaySceneOpacity * 100).toString()} />
+              )}
               <SimpleTextInput
                   onChange={this.onChangeHastebinID.bind(this)}
                   label="Hastebin ID"
                   value={this.props.scene.hastebinID} />
-              <Checkbox
-                text="Cross-fade images"
-                isOn={this.props.scene.crossFade}
-                onChange={this.onChangeCrossFade.bind(this)} />
             </form>
 
             <div onClick={this.play.bind(this)} className="SceneDetail__PlayButton u-clickable u-button">
@@ -152,6 +144,11 @@ export default class SceneDetail extends React.Component {
     }
   }
 
+  getSceneName(id: string): string {
+    if (id === "0") return "none";
+    return this.props.allScenes.filter((s) => s.id.toString() === id)[0].name;
+  }
+
   play() {
     this.props.onPlay(this.props.scene);
   }
@@ -175,11 +172,17 @@ export default class SceneDetail extends React.Component {
 
   onChangeDirectories(directories: Array<string>) { this.update((s) => { s.directories = directories; }); }
 
+  onChangeOverlaySceneOpacity(value: string) {
+    this.update((s) => { s.overlaySceneOpacity = parseInt(value, 10) / 100; });
+  }
+
   onChangeImageTypeFilter(filter: string) { this.update((s) => { s.imageTypeFilter = filter; }); }
 
   onChangeZoomType(type: string) { this.update((s) => { s.zoomType = type; }); }
 
   onChangeZoomLevel(level: number) { this.update((s) => { s.zoomLevel = level; }); }
+
+  onChangeOverlaySceneID(id: string) { this.update((s) => { s.overlaySceneID = parseInt(id, 10); }); }
 
   onChangeHastebinID(hbId: string) { this.update((s) => { s.hastebinID = hbId; }); }
 
