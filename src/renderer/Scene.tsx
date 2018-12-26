@@ -1,6 +1,6 @@
 import {ZF, TF, IF} from './const';
 export default class Scene {
-  id: Number = 0
+  id: number = 0
   name: string = "Unnamed scene"
   directories: Array<string> = []
   timingFunction = TF.constant
