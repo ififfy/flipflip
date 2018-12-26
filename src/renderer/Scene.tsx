@@ -10,6 +10,7 @@ export default class Scene {
   zoomLevel: number = 5
   crossFade = false
   hastebinID: string = "";
+  imageSizeMin: 200;
 
   // if true, the display chooses a directory first, then picks an image out
   // of it.

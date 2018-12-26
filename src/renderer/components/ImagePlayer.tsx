@@ -23,6 +23,7 @@ export default class ImagePlayer extends React.Component {
     zoomLevel: number,
     historyOffset: number,
     fadeEnabled: boolean,
+    imageSizeMin: number,
     setHistoryLength: (historyLength: number) => void,
   }
 
@@ -32,6 +33,7 @@ export default class ImagePlayer extends React.Component {
     readyToDisplay: Array<HTMLImageElement>(),
     historyPaths: Array<string>(),
     timeToNextFrame: 0,
+    timeoutID: 0,
   }
 
   _isMounted = false;
@@ -99,6 +101,9 @@ export default class ImagePlayer extends React.Component {
   componentWillReceiveProps(props: any) {
     if (!this.props.isPlaying && props.isPlaying) {
       this.start();
+    } else if (!this.props.isPlaying && this.state.timeoutID != 0) {
+      clearTimeout(this.state.timeoutID);
+      this.setState({timeoutID: 0});
     }
   }
 
@@ -129,30 +134,40 @@ export default class ImagePlayer extends React.Component {
 
     this.setState({numBeingLoaded: this.state.numBeingLoaded + 1});
 
+    const successCallback = () => {
+      if (!this._isMounted) return;
+      this.setState({
+        readyToDisplay: this.state.readyToDisplay.concat([img]),
+        numBeingLoaded: Math.max(0, this.state.numBeingLoaded - 1),
+      });
+      if (this.state.pastAndLatest.length === 0) {
+        this.advance(false, false);
+      }
+      this.runFetchLoop(i);
+    };
+
+    const errorCallback = () => {
+      if (!this._isMounted) return;
+      this.setState({
+        numBeingLoaded: Math.max(0, this.state.numBeingLoaded - 1),
+      });
+      setTimeout(this.runFetchLoop.bind(this, i), 0);
+    };
+
     img.onload = () => {
       // images may load immediately, but that messes up the setState()
-      // lifecycle, so always load on the next event loop iteration
-      setTimeout(() => {
-        if (!this._isMounted) return;
-        this.setState({
-          readyToDisplay: this.state.readyToDisplay.concat([img]),
-          numBeingLoaded: Math.max(0, this.state.numBeingLoaded - 1),
-        });
-        if (this.state.pastAndLatest.length === 0) {
-          this.advance(false, false);
-        }
-        this.runFetchLoop(i);
-      }, 0);
+      // lifecycle, so always load on the next event loop iteration.
+      // Also, now  we know the image size, so we can finally filter it.
+      if (img.width < this.props.imageSizeMin || img.height < this.props.imageSizeMin) {
+        console.log("Skipping tiny image at", img.src);
+        setTimeout(errorCallback, 0);
+      } else {
+        setTimeout(successCallback, 0);
+      }
     };
 
     img.onerror = () => {
-      setTimeout(() => {
-        if (!this._isMounted) return;
-        this.setState({
-          numBeingLoaded: Math.max(0, this.state.numBeingLoaded - 1),
-        });
-        setTimeout(this.runFetchLoop.bind(this, i), 0);
-      }, 0);
+      setTimeout(errorCallback, 0);
     };
 
     img.src = url;
@@ -176,27 +191,30 @@ export default class ImagePlayer extends React.Component {
       nextHistoryPaths.shift();
     }
 
-    if (isStarting || (this.props.isPlaying && this._isMounted)) {
-      this.setState({
-        pastAndLatest: nextPastAndLatest,
-        historyPaths: nextHistoryPaths,
-      });
-      this.props.setHistoryLength(nextHistoryPaths.length);
+    // bail if dead
+    if (!(isStarting || (this.props.isPlaying && this._isMounted))) return;
 
-      if (schedule) {
-        let timeToNextFrame;
-        if (this.props.timingFunction === TF.constant) {
-          timeToNextFrame = Number(this.props.timingConstant);
-          // If we cannot parse this, default to 1s
-          if (!timeToNextFrame && timeToNextFrame != 0) {
-            timeToNextFrame = 1000;
-          }
-        } else {
-          timeToNextFrame = TIMING_FUNCTIONS.get(this.props.timingFunction)();
-        }
-        this.setState({timeToNextFrame});
-        setTimeout(this.advance.bind(this, false, true), timeToNextFrame);
+    this.setState({
+      pastAndLatest: nextPastAndLatest,
+      historyPaths: nextHistoryPaths,
+    });
+    this.props.setHistoryLength(nextHistoryPaths.length);
+
+    if (!schedule) return;
+
+    let timeToNextFrame;
+    if (this.props.timingFunction === TF.constant) {
+      timeToNextFrame = Number(this.props.timingConstant);
+      // If we cannot parse this, default to 1s
+      if (!timeToNextFrame && timeToNextFrame != 0) {
+        timeToNextFrame = 1000;
       }
+    } else {
+      timeToNextFrame = TIMING_FUNCTIONS.get(this.props.timingFunction)();
     }
+    this.setState({
+      timeToNextFrame,
+      timeoutID: setTimeout(this.advance.bind(this, false, true), timeToNextFrame),
+    });
   }
 };
