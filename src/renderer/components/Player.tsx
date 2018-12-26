@@ -37,7 +37,7 @@ export default class Player extends React.Component {
     return (
       <div className="Player">
         <HeadlessScenePlayer
-          isOverlay={false}
+          opacity={1}
           scene={this.props.scene}
           historyOffset={this.state.historyOffset}
           isPlaying={this.state.isPlaying}
@@ -49,7 +49,7 @@ export default class Player extends React.Component {
 
         {this.props.overlayScene && (
           <HeadlessScenePlayer
-            isOverlay={true}
+            opacity={this.props.scene.overlaySceneOpacity}
             scene={this.props.overlayScene}
             historyOffset={-1}
             isPlaying={this.state.isPlaying}

@@ -102,7 +102,15 @@ export default class SceneDetail extends React.Component {
                 label="Overlay scene"
                 value={this.props.scene.overlaySceneID.toString()}
                 getLabel={this.getSceneName.bind(this)}
-                keys={this.props.allScenes.map((s) => s.id.toString())} />
+                keys={["0"].concat(this.props.allScenes.map((s) => s.id.toString()))} />
+              {this.props.scene.overlaySceneID != 0 && (
+                <SimpleSliderInput
+                  onChange={this.onChangeOverlaySceneOpacity.bind(this)}
+                  label={"Overlay opacity: " + (this.props.scene.overlaySceneOpacity * 100).toFixed(0) + '%'}
+                  min={1}
+                  max={100}
+                  value={(this.props.scene.overlaySceneOpacity * 100).toString()} />
+              )}
               <SimpleTextInput
                   onChange={this.onChangeHastebinID.bind(this)}
                   label="Hastebin ID"
@@ -137,6 +145,7 @@ export default class SceneDetail extends React.Component {
   }
 
   getSceneName(id: string): string {
+    if (id === "0") return "none";
     return this.props.allScenes.filter((s) => s.id.toString() === id)[0].name;
   }
 
@@ -162,6 +171,10 @@ export default class SceneDetail extends React.Component {
   }
 
   onChangeDirectories(directories: Array<string>) { this.update((s) => { s.directories = directories; }); }
+
+  onChangeOverlaySceneOpacity(value: string) {
+    this.update((s) => { s.overlaySceneOpacity = parseInt(value, 10) / 100; });
+  }
 
   onChangeImageTypeFilter(filter: string) { this.update((s) => { s.imageTypeFilter = filter; }); }
 
