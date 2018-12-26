@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import {HotKeys} from 'react-hotkeys';
 import recursiveReaddir from 'recursive-readdir';
 import fs from 'fs'
 import animated from 'animated-gif-detector';
@@ -33,12 +32,13 @@ function filterPathsToJustImages(imageTypeFilter: string, paths: Array<string>):
   return paths;
 }
 
-const keyMap = {
-  'playPause': 'space',
-  'historyBack': 'left',
-  'historyForward': 'right',
-  'navigateBack': 'backspace',
-}
+const keyMap2 = {
+  playPause: 'space',
+  historyBack: 'left',
+  historyForward: 'right',
+  navigateBack: 'backspace',
+  toggleFullscreen: 'CommandOrControl+F',
+};
 
 export default class Player extends React.Component {
   readonly props: {
@@ -58,73 +58,75 @@ export default class Player extends React.Component {
     const canGoBack = this.state.historyOffset > -this.state.historyLength;
     const canGoForward = this.state.historyOffset < -1;
     return (
-      <HotKeys keyMap={keyMap} handlers={this.handlers()}>
-        <div className="Player">
-          {this.state.isLoaded && (
-            <ImagePlayer
-              historyOffset={this.state.historyOffset}
-              setHistoryLength={this.setHistoryLength.bind(this)}
-              maxInMemory={120}
-              maxLoadingAtOnce={5}
-              maxToRememberInHistory={500}
-              timingFunction={this.props.scene.timingFunction}
-              timingConstant={this.props.scene.timingConstant}
-              zoomType={this.props.scene.zoomType}
-              zoomLevel={this.props.scene.zoomLevel}
-              isPlaying={this.state.isPlaying}
-              fadeEnabled={this.props.scene.crossFade}
-              allPaths={this.state.allPaths} />)}
-          {this.state.isLoaded && this.props.scene.hastebinID && this.state.isPlaying && (
-            <CaptionProgram hastebinID={this.props.scene.hastebinID} />
-          )}
+      <div className="Player">
+        {this.state.isLoaded && (
+          <ImagePlayer
+            historyOffset={this.state.historyOffset}
+            setHistoryLength={this.setHistoryLength.bind(this)}
+            maxInMemory={120}
+            maxLoadingAtOnce={5}
+            maxToRememberInHistory={500}
+            timingFunction={this.props.scene.timingFunction}
+            timingConstant={this.props.scene.timingConstant}
+            zoomType={this.props.scene.zoomType}
+            zoomLevel={this.props.scene.zoomLevel}
+            isPlaying={this.state.isPlaying}
+            fadeEnabled={this.props.scene.crossFade}
+            allPaths={this.state.allPaths} />)}
+        {this.state.isLoaded && this.props.scene.hastebinID && this.state.isPlaying && (
+          <CaptionProgram hastebinID={this.props.scene.hastebinID} />
+        )}
 
-          {!this.state.isLoaded && (
-            <div className="LoadingIndicator"><div className="loader" /></div>
-          )}
-          {this.state.isLoaded && this.state.allPaths.length == 0 && (
-            <div className="EmptyIndicator">No images found</div>
-          )}
+        {!this.state.isLoaded && (
+          <div className="LoadingIndicator"><div className="loader" /></div>
+        )}
+        {this.state.isLoaded && this.state.allPaths.length == 0 && (
+          <div className="EmptyIndicator">No images found</div>
+        )}
 
-          <div className={`u-button-row ${this.state.isPlaying ? 'u-show-on-hover-only' : ''}`}>
-            <div className="u-button-row-right">
-              <div
-                className={`FullscreenButton u-button u-clickable`}
-                onClick={this.toggleFullscreen.bind(this)}>
-                Fullscreen on/off
-              </div>
-              <div
-                className={`HistoryBackButton u-button u-clickable ${canGoBack ? '' : 'u-disabled'}`}
-                onClick={canGoBack ? this.historyBack.bind(this) : this.nop}>
-                &larr; back
-              </div>
-              {this.state.isPlaying && (
-                <div
-                  className="PauseButton u-button u-clickable"
-                  onClick={this.pause.bind(this)}>
-                  Pause
-                </div>
-              )}
-              {!this.state.isPlaying && (
-                <div
-                  className="PlayButton u-button u-clickable"
-                  onClick={this.play.bind(this)}>
-                  Play
-                </div>
-              )}
-              <div
-                className={`HistoryForwardButton u-button u-clickable ${canGoForward ? '' : 'u-disabled'}`}
-                onClick={canGoForward ? this.historyForward.bind(this) : this.nop}>
-                forward &rarr;
-              </div>
+        <div className={`u-button-row ${this.state.isPlaying ? 'u-show-on-hover-only' : ''}`}>
+          <div className="u-button-row-right">
+            <div
+              className={`FullscreenButton u-button u-clickable`}
+              onClick={this.toggleFullscreen.bind(this)}>
+              Fullscreen on/off
             </div>
-            <div className="BackButton u-button u-clickable" onClick={this.props.goBack}>Back</div>
+            <div
+              className={`HistoryBackButton u-button u-clickable ${canGoBack ? '' : 'u-disabled'}`}
+              onClick={canGoBack ? this.historyBack.bind(this) : this.nop}>
+              &larr; back
+            </div>
+            {this.state.isPlaying && (
+              <div
+                className="PauseButton u-button u-clickable"
+                onClick={this.pause.bind(this)}>
+                Pause
+              </div>
+            )}
+            {!this.state.isPlaying && (
+              <div
+                className="PlayButton u-button u-clickable"
+                onClick={this.play.bind(this)}>
+                Play
+              </div>
+            )}
+            <div
+              className={`HistoryForwardButton u-button u-clickable ${canGoForward ? '' : 'u-disabled'}`}
+              onClick={canGoForward ? this.historyForward.bind(this) : this.nop}>
+              forward &rarr;
+            </div>
           </div>
+          <div className="BackButton u-button u-clickable" onClick={this.props.goBack}>Back</div>
         </div>
-      </HotKeys>
+      </div>
     );
   }
 
   componentDidMount() {
+    Object.entries(keyMap2).forEach(([k, v]) => {
+      remote.globalShortcut.register(v, (this as any)[k].bind(this));
+    })
+
     const loadAll = () => {
       let n = this.props.scene.directories.length;
       this.setState({allPaths: []});
@@ -166,13 +168,10 @@ export default class Player extends React.Component {
     loadAll();
   }
 
-  handlers(): any {
-    return {
-      'playPause': this.playPause.bind(this),
-      'historyBack': this.historyBack.bind(this),
-      'historyForward': this.historyForward.bind(this),
-      'navigateBack': this.props.goBack,
-    }
+  componentWillUnmount() {
+    Object.values(keyMap2).forEach((k) => {
+      remote.globalShortcut.unregister(k);
+    })
   }
 
   nop() {
@@ -197,6 +196,10 @@ export default class Player extends React.Component {
 
   historyForward() {
     this.setState({isPlaying: false, historyOffset: Math.min(-1, this.state.historyOffset + 1)});
+  }
+
+  navigateBack() {
+    this.props.goBack();
   }
 
   setHistoryLength(n: number) {
