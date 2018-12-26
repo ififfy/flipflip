@@ -30,7 +30,7 @@ export default class DirectoryPicker extends React.Component {
             </div>
           );
         })}
-        <div className='u-button u-clickable' onClick={this.onAdd.bind(this)}>+ Add</div>
+        <div className='u-button u-clickable' onClick={this.onAdd.bind(this)}>+ Add local files</div>
         <div className='u-button u-clickable' onClick={this.toggleRemoveAllModal.bind(this)} style={{float: 'left'}}>- Remove All</div>
 
         {this.state.removeAllIsOpen && (
