@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-export default class Checkbox extends React.Component {
+export default class SimpleCheckbox extends React.Component {
   readonly props: {
     text: string,
     isOn: boolean,
@@ -9,7 +9,7 @@ export default class Checkbox extends React.Component {
 
   render() {
     return (
-      <label className="Checkbox">
+      <label className="SimpleCheckbox">
         <input type="checkbox"
           value={this.props.text}
           checked={this.props.isOn} 
