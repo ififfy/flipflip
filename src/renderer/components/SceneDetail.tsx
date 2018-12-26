@@ -20,6 +20,30 @@ type Props = {
   onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
 };
 
+class ControlGroup extends React.Component {
+  readonly props: {
+    title: string,
+    isNarrow: boolean,
+    children: React.ReactNode,
+  };
+
+  render() {
+    return (
+      <form
+          className={`ControlGroup ${this.props.isNarrow ? 'm-narrow' : 'm-wide'}`}
+          onSubmit={this.preventDefault.bind(this)}>
+        <div className="ControlGroup__Title">{this.props.title}</div>
+        {this.props.children}
+      </form>
+    );
+  }
+
+  preventDefault(e: Event) {
+    e.preventDefault();
+    return;
+  }
+}
+
 export default class SceneDetail extends React.Component {
   readonly props: Props;
   readonly nameInputRef: React.RefObject<HTMLInputElement> = React.createRef();
@@ -38,92 +62,42 @@ export default class SceneDetail extends React.Component {
     return (
       <div className='SceneDetail'>
         <div className="u-button-row">
+
+          <div className="u-abs-center">
+            {this.state.isEditingName && (
+              <form className="SceneNameForm" onSubmit={this.endEditingName.bind(this)}>
+                <input
+                  autoFocus
+                  type="text"
+                  ref={this.nameInputRef}
+                  value={this.props.scene.name}
+                  onBlur={this.endEditingName.bind(this)}
+                  onChange={this.onChangeName.bind(this)} />
+              </form>
+            )}
+            {!this.state.isEditingName && (
+              <h2
+                className="SceneName u-clickable"
+                onClick={this.beginEditingName.bind(this)}>{this.props.scene.name}</h2>
+            )}
+          </div>
+
           <div className="BackButton u-button u-clickable" onClick={this.props.goBack}>Back</div>
           <div
             className="DeleteButton u-destructive u-button u-clickable"
             onClick={this.props.onDelete.bind(this, this.props.scene)}>
             Delete
           </div>
-        </div>
 
-        <div className="SceneDetail__Content">
-          <div className="SceneDetail__Options">
-            {this.state.isEditingName && (
-              <form className="SceneNameForm" onSubmit={this.endEditingName.bind(this)}>
-                <input
-                  type="text"
-                  ref={this.nameInputRef}
-                  value={this.props.scene.name}
-                  onChange={this.onChangeName.bind(this)} />
-              </form>
-            )}
-            {!this.state.isEditingName && (
-              <h1
-                className="SceneName u-clickable"
-                onClick={this.beginEditingName.bind(this)}>{this.props.scene.name}</h1>
-            )}
-
-            <form className="SceneOptionsForm">
-              <SimpleOptionPicker
-                onChange={this.onChangeTimingFunction.bind(this)}
-                label="Timing"
-                value={this.props.scene.timingFunction}
-                keys={Object.values(TF)} />
-              {this.props.scene.timingFunction === TF.constant && (
-                <SimpleTextInput
-                  onChange={this.onChangeTimingConstant.bind(this)}
-                  label="Time between images (ms)"
-                  value={this.props.scene.timingConstant.toString()} />
-              )}
-              <SimpleOptionPicker
-                onChange={this.onChangeImageTypeFilter.bind(this)}
-                label="Image Filter"
-                value={this.props.scene.imageTypeFilter}
-                keys={Object.values(IF)} />
-              <SimpleOptionPicker
-                onChange={this.onChangeZoomType.bind(this)}
-                label="Zoom Type"
-                value={this.props.scene.zoomType}
-                keys={Object.values(ZF)} />
-              {this.props.scene.zoomType != ZF.none && (
-                <SimpleSliderInput
-                  onChange={this.onChangeZoomLevel.bind(this)}
-                  label={"Zoom Length: " + this.props.scene.zoomLevel + "s"}
-                  min={1}
-                  max={20}
-                  value={this.props.scene.zoomLevel.toString()} />
-              )}
-              <SimpleCheckbox
-                text="Cross-fade images"
-                isOn={this.props.scene.crossFade}
-                onChange={this.onChangeCrossFade.bind(this)} />
-              <SimpleOptionPicker
-                onChange={this.onChangeOverlaySceneID.bind(this)}
-                label="Overlay scene"
-                value={this.props.scene.overlaySceneID.toString()}
-                getLabel={this.getSceneName.bind(this)}
-                keys={["0"].concat(this.props.allScenes.map((s) => s.id.toString()))} />
-              {this.props.scene.overlaySceneID != 0 && (
-                <SimpleSliderInput
-                  onChange={this.onChangeOverlaySceneOpacity.bind(this)}
-                  label={"Overlay opacity: " + (this.props.scene.overlaySceneOpacity * 100).toFixed(0) + '%'}
-                  min={1}
-                  max={100}
-                  value={(this.props.scene.overlaySceneOpacity * 100).toString()} />
-              )}
-              <SimpleTextInput
-                  onChange={this.onChangeHastebinID.bind(this)}
-                  label="Hastebin ID"
-                  value={this.props.scene.hastebinID} />
-            </form>
-
-            <div onClick={this.play.bind(this)} className="SceneDetail__PlayButton u-clickable u-button">
+          <div className="u-button-row-right">
+            <div onClick={this.play.bind(this)} className="u-clickable u-button">
               Play
             </div>
           </div>
+        </div>
 
-          <div className='SceneDetail__Sources'>
-            <h2>Sources:</h2>
+        <div className="SceneDetail__Content ControlGroupGroup">
+          <ControlGroup title="Sources" isNarrow={false}>
             <DirectoryPicker
               directories={this.props.scene.directories}
               onChange={this.onChangeDirectories.bind(this)}/>
@@ -131,7 +105,76 @@ export default class SceneDetail extends React.Component {
               directories={this.props.scene.directories}
               onChangeDirectories={this.onChangeDirectories.bind(this)}
               onChangeHastebinID={this.onChangeHastebinID.bind(this)}/>
-          </div>
+          </ControlGroup>
+        
+          <ControlGroup title="Timing" isNarrow={true}>
+            <SimpleOptionPicker
+              onChange={this.onChangeTimingFunction.bind(this)}
+              label="Timing"
+              value={this.props.scene.timingFunction}
+              keys={Object.values(TF)} />
+              <SimpleTextInput
+                isEnabled={this.props.scene.timingFunction === TF.constant}
+                onChange={this.onChangeTimingConstant.bind(this)}
+                label="Time between images (ms)"
+                value={this.props.scene.timingConstant.toString()} />
+          </ControlGroup>
+
+          <ControlGroup title="Effects" isNarrow={true}>
+
+            <SimpleCheckbox
+              text="Cross-fade images"
+              isOn={this.props.scene.crossFade}
+              onChange={this.onChangeCrossFade.bind(this)} />
+
+            <div className="ControlSubgroup">
+              <SimpleOptionPicker
+                onChange={this.onChangeZoomType.bind(this)}
+                label="Zoom Type"
+                value={this.props.scene.zoomType}
+                keys={Object.values(ZF)} />
+              <SimpleSliderInput
+                isEnabled={this.props.scene.zoomType != ZF.none}
+                onChange={this.onChangeZoomLevel.bind(this)}
+                label={"Zoom Length: " + this.props.scene.zoomLevel + "s"}
+                min={1}
+                max={20}
+                value={this.props.scene.zoomLevel.toString()} />
+            </div>
+
+            <div className="ControlSubgroup">
+              <SimpleOptionPicker
+                onChange={this.onChangeOverlaySceneID.bind(this)}
+                label="Overlay scene"
+                value={this.props.scene.overlaySceneID.toString()}
+                getLabel={this.getSceneName.bind(this)}
+                keys={["0"].concat(this.props.allScenes.map((s) => s.id.toString()))} />
+              <SimpleSliderInput
+                isEnabled={this.props.scene.overlaySceneID != 0}
+                onChange={this.onChangeOverlaySceneOpacity.bind(this)}
+                label={"Overlay opacity: " + (this.props.scene.overlaySceneOpacity * 100).toFixed(0) + '%'}
+                min={1}
+                max={100}
+                value={(this.props.scene.overlaySceneOpacity * 100).toString()} />
+            </div>
+          </ControlGroup>
+
+          <ControlGroup title="Images" isNarrow={true}>
+            <SimpleOptionPicker
+              onChange={this.onChangeImageTypeFilter.bind(this)}
+              label="Image Filter"
+              value={this.props.scene.imageTypeFilter}
+              keys={Object.values(IF)} />
+          </ControlGroup>
+
+          <ControlGroup title="Text" isNarrow={true}>
+            <SimpleTextInput
+              isEnabled={true}
+              onChange={this.onChangeHastebinID.bind(this)}
+              label="Hastebin ID"
+              value={this.props.scene.hastebinID} />
+          </ControlGroup>
+
         </div>
       </div>
     )
