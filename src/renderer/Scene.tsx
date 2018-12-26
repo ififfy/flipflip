@@ -10,6 +10,7 @@ export default class Scene {
   zoomLevel: number = 5
   crossFade = false
   hastebinID: string = "";
+  imageSizeMin: 200;
 
   // if true, the display chooses a directory first, then picks an image out
   // of it.
@@ -21,20 +22,24 @@ export default class Scene {
     Object.assign(this, init);
     this.directories = this.directories.filter((d) => !!d);
 
+    if (!this.imageSizeMin) {
+      this.imageSizeMin = 200;
+    }
+
     // backward compatible with 1.0.1
-    if (!(TF as any)[this.timingFunction]) {
+    if (!this.timingFunction.startsWith('tf.')) {
       this.timingFunction = 'tf.' + this.timingFunction;
     }
-    if (!(TF as any)[this.timingFunction]) {
+    if (Object.values(TF).indexOf(this.timingFunction) < 0) {
       this.timingFunction = TF.constant;
       this.timingConstant = "1000";
     }
 
     // backward compatible with 1.0.1
-    if (!(IF as any)[this.imageTypeFilter]) {
+    if (!this.imageTypeFilter.startsWith('.if.')) {
       this.imageTypeFilter = 'if.' + this.imageTypeFilter;
     }
-    if (!(IF as any)[this.imageTypeFilter]) {
+    if (Object.values(IF).indexOf(this.imageTypeFilter) < 0) {
       this.imageTypeFilter = IF.any;
     }
   }
