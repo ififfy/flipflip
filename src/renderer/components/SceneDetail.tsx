@@ -14,16 +14,8 @@ type Props = {
   autoEdit: boolean,
   goBack(): void,
   onPlay(scene: Scene): void,
-  onChangeName(scene: Scene, name: string): void,
-  onChangeImageTypeFilter(scene: Scene, filter: string): void,
-  onChangeZoomType(scene: Scene, type: string): void,
-  onChangeZoomLevel(scene: Scene, level: number): void,
-  onChangeHastebinID(scene: Scene, hbId: string): void,
-  onChangeTimingFunction(scene: Scene, fnId: string): void,
-  onChangeTimingConstant(scene: Scene, constant: string): void,
-  onChangeDirectories(scene: Scene, directories: Array<string>): void,
-  onChangeCrossFade(scene: Scene, value: boolean): void,
   onDelete(scene: Scene): void,
+  onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
 };
 
 class Checkbox extends React.Component {
@@ -95,36 +87,36 @@ export default class SceneDetail extends React.Component {
 
             <form className="SceneOptionsForm">
               <SimpleOptionPicker
-                onChange={this.props.onChangeTimingFunction.bind(this, this.props.scene)}
+                onChange={this.onChangeTimingFunction.bind(this)}
                 label="Timing"
                 value={this.props.scene.timingFunction}
                 keys={Object.values(TF)} />
               {this.props.scene.timingFunction === TF.constant && (
                 <SimpleTextInput
-                  onChange={this.props.onChangeTimingConstant.bind(this, this.props.scene)}
+                  onChange={this.onChangeTimingConstant.bind(this)}
                   label="Time between images (ms)"
                   value={this.props.scene.timingConstant.toString()} />
               )}
               <SimpleOptionPicker
-                onChange={this.props.onChangeImageTypeFilter.bind(this, this.props.scene)}
+                onChange={this.onChangeImageTypeFilter.bind(this)}
                 label="Image Filter"
                 value={this.props.scene.imageTypeFilter}
                 keys={Object.values(IF)} />
               <SimpleOptionPicker
-                onChange={this.props.onChangeZoomType.bind(this, this.props.scene)}
+                onChange={this.onChangeZoomType.bind(this)}
                 label="Zoom Type"
                 value={this.props.scene.zoomType}
                 keys={Object.values(ZF)} />
               {this.props.scene.zoomType != ZF.none && (
                 <SimpleSliderInput
-                  onChange={this.props.onChangeZoomLevel.bind(this, this.props.scene)}
+                  onChange={this.onChangeZoomLevel.bind(this)}
                   label={"Zoom Length: " + this.props.scene.zoomLevel + "s"}
                   min={1}
                   max={20}
                   value={this.props.scene.zoomLevel.toString()} />
               )}
               <SimpleTextInput
-                  onChange={this.props.onChangeHastebinID.bind(this, this.props.scene)}
+                  onChange={this.onChangeHastebinID.bind(this)}
                   label="Hastebin ID"
                   value={this.props.scene.hastebinID} />
               <Checkbox
@@ -173,21 +165,27 @@ export default class SceneDetail extends React.Component {
     this.setState({isEditingName: false});
   }
 
+  update(fn: (scene: Scene) => void) {
+    this.props.onUpdateScene(this.props.scene, fn);
+  }
+
   onChangeName(e: React.FormEvent<HTMLInputElement>) {
-    const scene = this.props.scene;
-    if (!scene) return;
-    this.props.onChangeName(scene, e.currentTarget.value);
+    this.update((s) => { s.name = e.currentTarget.value; });
   }
 
-  onChangeDirectories(directories: Array<string>) {
-    this.props.onChangeDirectories(this.props.scene, directories);
-  }
+  onChangeDirectories(directories: Array<string>) { this.update((s) => { s.directories = directories; }); }
 
-  onChangeHastebinID(hbID: string) {
-    this.props.onChangeHastebinID(this.props.scene, hbID);
-  }
+  onChangeImageTypeFilter(filter: string) { this.update((s) => { s.imageTypeFilter = filter; }); }
 
-  onChangeCrossFade(value: boolean) {
-    this.props.onChangeCrossFade(this.props.scene, value);
-  }
+  onChangeZoomType(type: string) { this.update((s) => { s.zoomType = type; }); }
+
+  onChangeZoomLevel(level: number) { this.update((s) => { s.zoomLevel = level; }); }
+
+  onChangeHastebinID(hbId: string) { this.update((s) => { s.hastebinID = hbId; }); }
+
+  onChangeTimingFunction(fnId: string) { this.update((s) => { s.timingFunction = fnId; }); }
+
+  onChangeTimingConstant(constant: string) { this.update((s) => { s.timingConstant = constant; }); }
+
+  onChangeCrossFade(value: boolean) { this.update((s) => { s.crossFade = value; }); }
 };
