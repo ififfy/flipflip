@@ -22,6 +22,10 @@ export default class Scene {
     Object.assign(this, init);
     this.directories = this.directories.filter((d) => !!d);
 
+    if (!this.imageSizeMin) {
+      this.imageSizeMin = 200;
+    }
+
     // backward compatible with 1.0.1
     if (!this.timingFunction.startsWith('tf.')) {
       this.timingFunction = 'tf.' + this.timingFunction;
@@ -32,10 +36,10 @@ export default class Scene {
     }
 
     // backward compatible with 1.0.1
-    if (!(IF as any)[this.imageTypeFilter]) {
+    if (!this.imageTypeFilter.startsWith('.if.')) {
       this.imageTypeFilter = 'if.' + this.imageTypeFilter;
     }
-    if (!(IF as any)[this.imageTypeFilter]) {
+    if (Object.values(IF).indexOf(this.imageTypeFilter) < 0) {
       this.imageTypeFilter = IF.any;
     }
   }
