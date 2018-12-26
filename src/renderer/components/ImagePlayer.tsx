@@ -101,7 +101,7 @@ export default class ImagePlayer extends React.Component {
   componentWillReceiveProps(props: any) {
     if (!this.props.isPlaying && props.isPlaying) {
       this.start();
-    } else if (!this.props.isPlaying && this.state.timeoutID != 0) {
+    } else if (!props.isPlaying && this.state.timeoutID != 0) {
       clearTimeout(this.state.timeoutID);
       this.setState({timeoutID: 0});
     }
