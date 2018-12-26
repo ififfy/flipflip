@@ -4,6 +4,7 @@ import recursiveReaddir from 'recursive-readdir';
 import fs from 'fs'
 import animated from 'animated-gif-detector';
 import { remote } from 'electron';
+const { Menu, MenuItem, app } = remote;
 
 import Scene from '../Scene';
 import ImagePlayer from './ImagePlayer';
@@ -32,13 +33,15 @@ function filterPathsToJustImages(imageTypeFilter: string, paths: Array<string>):
   return paths;
 }
 
-const keyMap2 = {
-  playPause: 'space',
-  historyBack: 'left',
-  historyForward: 'right',
-  navigateBack: 'backspace',
-  toggleFullscreen: 'CommandOrControl+F',
+const keyMap = {
+  playPause: ['Play/Pause', 'space'],
+  historyBack: ['Back in time', 'left'],
+  historyForward: ['Forward in time', 'right'],
+  navigateBack: ['Go back to scene details', 'backspace'],
+  toggleFullscreen: ['Toggle fullscreen', 'CommandOrControl+F'],
 };
+
+let originalMenu = Menu.getApplicationMenu();
 
 export default class Player extends React.Component {
   readonly props: {
@@ -124,9 +127,25 @@ export default class Player extends React.Component {
   }
 
   componentDidMount() {
-    Object.entries(keyMap2).forEach(([k, v]) => {
-      remote.globalShortcut.register(v, (this as any)[k].bind(this));
-    })
+    Menu.setApplicationMenu(Menu.buildFromTemplate([
+      {
+        label: app.getName(),
+        submenu: [
+          { role: 'quit' },
+        ],
+      },
+      {
+        label: 'Player controls',
+        submenu: Object.entries(keyMap).map(([k, v]) => {
+          const [label, accelerator] = v;
+          return {
+            label,
+            accelerator,
+            click: (this as any)[k].bind(this),
+          };
+        })
+      }
+    ]))
 
     const loadAll = () => {
       let n = this.props.scene.directories.length;
@@ -170,9 +189,7 @@ export default class Player extends React.Component {
   }
 
   componentWillUnmount() {
-    Object.values(keyMap2).forEach((k) => {
-      remote.globalShortcut.unregister(k);
-    })
+    Menu.setApplicationMenu(originalMenu);
   }
 
   nop() {
