@@ -1,37 +1,10 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import recursiveReaddir from 'recursive-readdir';
-import fs from 'fs'
-import animated from 'animated-gif-detector';
 import { remote } from 'electron';
-const { Menu, MenuItem, app } = remote;
+const { Menu, app } = remote;
 
 import Scene from '../Scene';
-import ImagePlayer from './ImagePlayer';
-import CaptionProgram from './CaptionProgram';
-
-function filterPathsToJustImages(imageTypeFilter: string, paths: Array<string>): Array<string> {
-  if (imageTypeFilter === 'if.any') return paths;
-
-  if (imageTypeFilter === 'if.gifs') {
-    return paths.filter((f) => f.toLowerCase().endsWith('.gif') && animated(fs.readFileSync(f)));
-  }
-
-  if (imageTypeFilter === 'if.stills') {
-    return paths.filter((f) => {
-      if (f.toLowerCase().endsWith('.gif') && !animated(fs.readFileSync(f))) return true;
-      if (f.toLowerCase().endsWith('.png')) return true;
-      if (f.toLowerCase().endsWith('.jpeg')) return true;
-      if (f.toLowerCase().endsWith('.jpg')) return true;
-      if (f.toLowerCase().endsWith('.webp')) return true;
-      if (f.toLowerCase().endsWith('.tiff')) return true;
-      return false;
-    });
-  }
-
-  console.warn('unknown image type filter', imageTypeFilter);
-  return paths;
-}
+import HeadlessScenePlayer from './HeadlessScenePlayer';
 
 const keyMap = {
   playPause: ['Play/Pause', 'space'],
@@ -47,6 +20,7 @@ export default class Player extends React.Component {
   readonly props: {
     goBack(): void,
     scene: Scene,
+    overlayScene?: Scene,
   }
 
   readonly state = {
@@ -62,30 +36,28 @@ export default class Player extends React.Component {
     const canGoForward = this.state.historyOffset < -1;
     return (
       <div className="Player">
-        {this.state.isLoaded && (
-          <ImagePlayer
-            historyOffset={this.state.historyOffset}
-            setHistoryLength={this.setHistoryLength.bind(this)}
-            maxInMemory={120}
-            maxLoadingAtOnce={5}
-            maxToRememberInHistory={500}
-            timingFunction={this.props.scene.timingFunction}
-            timingConstant={this.props.scene.timingConstant}
-            zoomType={this.props.scene.zoomType}
-            zoomLevel={this.props.scene.zoomLevel}
-            isPlaying={this.state.isPlaying}
-            fadeEnabled={this.props.scene.crossFade}
-            imageSizeMin={this.props.scene.imageSizeMin}
-            allPaths={this.state.allPaths} />)}
-        {this.state.isLoaded && this.props.scene.hastebinID && this.state.isPlaying && (
-          <CaptionProgram hastebinID={this.props.scene.hastebinID} />
-        )}
+        <HeadlessScenePlayer
+          isOverlay={false}
+          scene={this.props.scene}
+          historyOffset={this.state.historyOffset}
+          isPlaying={this.state.isPlaying}
+          showLoadingState={true}
+          showEmptyState={true}
+          showText={true}
+          didFinishLoading={this.play.bind(this)}
+          setHistoryLength={this.setHistoryLength.bind(this)} />
 
-        {!this.state.isLoaded && (
-          <div className="LoadingIndicator"><div className="loader" /></div>
-        )}
-        {this.state.isLoaded && this.state.allPaths.length == 0 && (
-          <div className="EmptyIndicator">No images found</div>
+        {this.props.overlayScene && (
+          <HeadlessScenePlayer
+            isOverlay={true}
+            scene={this.props.overlayScene}
+            historyOffset={-1}
+            isPlaying={this.state.isPlaying}
+            showLoadingState={false}
+            showEmptyState={false}
+            showText={false}
+            didFinishLoading={this.nop.bind(this)}  
+            setHistoryLength={this.nop.bind(this)} />
         )}
 
         <div className={`u-button-row ${this.state.isPlaying ? 'u-show-on-hover-only' : ''}`}>
@@ -145,47 +117,7 @@ export default class Player extends React.Component {
           };
         })
       }
-    ]))
-
-    const loadAll = () => {
-      let n = this.props.scene.directories.length;
-      this.setState({allPaths: []});
-      this.props.scene.directories.forEach((d) => {
-        const blacklist = ['*.css', '*.html', 'avatar.png'];
-        recursiveReaddir(d, blacklist, (err: any, rawFiles: Array<string>) => {
-          if (err) console.warn(err);
-
-          const files = filterPathsToJustImages(this.props.scene.imageTypeFilter, rawFiles);
-
-          let newAllPaths = this.state.allPaths;
-
-          n -= 1;
-          if (n == 0) {
-            this.setState({isLoaded: true, isPlaying: true});
-          }
-
-          if (!files || files.length === 0) {
-            return;
-          }
-
-          // The scene can configure which of these branches to take
-          if (this.props.scene.weightDirectoriesEqually) {
-            // Just add the new paths to the end of the list
-            newAllPaths = this.state.allPaths.concat([files]);
-            this.setState({allPaths: newAllPaths});
-          } else {
-            // If we found some files, put them in their own list.
-            // If list is empty, ignore.
-            if (newAllPaths.length == 0) {
-              newAllPaths = [files];
-            } else {
-              newAllPaths[0] = newAllPaths[0].concat(files);
-            }
-          }
-        });
-      });
-    };
-    loadAll();
+    ]));
   }
 
   componentWillUnmount() {

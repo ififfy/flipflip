@@ -75,7 +75,10 @@ export default class ScenePicker extends React.Component {
   }
 
   onAdd() {
-    const id = this.props.scenes.length + 1;
+    let id = this.props.scenes.length + 1;
+    this.props.scenes.forEach((s) => {
+      id = Math.max(s.id.valueOf() + 1, id);
+    })
     this.props.onAdd(new Scene({
       id: id,
       name: "New scene",
