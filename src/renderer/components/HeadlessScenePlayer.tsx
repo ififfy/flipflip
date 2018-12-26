@@ -34,7 +34,7 @@ function filterPathsToJustImages(imageTypeFilter: string, paths: Array<string>):
 export default class HeadlessScenePlayer extends React.Component {
   readonly props: {
     scene: Scene,
-    isOverlay: boolean,
+    opacity: number,
     showText: boolean,
     showLoadingState: boolean,
     showEmptyState: boolean,
@@ -51,7 +51,9 @@ export default class HeadlessScenePlayer extends React.Component {
 
   render() {
     return (
-      <div className={`HeadlessScenePlayer ${this.props.isOverlay ? 'm-overlay' : ''}`}>
+      <div
+        className="HeadlessScenePlayer"
+        style={{opacity: this.props.opacity}}>
         {this.state.isLoaded && (
           <ImagePlayer
             historyOffset={this.props.historyOffset}
