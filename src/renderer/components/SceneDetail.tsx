@@ -3,8 +3,8 @@ import * as React from 'react';
 import {IF, TF, ZF} from '../const';
 
 import Scene from '../Scene';
-import Checkbox from './Checkbox';
 import DirectoryPicker from './DirectoryPicker';
+import SimpleCheckbox from './SimpleCheckbox';
 import SimpleOptionPicker from './SimpleOptionPicker';
 import SimpleTextInput from './SimpleTextInput';
 import SimpleSliderInput from "./SimpleSliderInput";
@@ -93,7 +93,7 @@ export default class SceneDetail extends React.Component {
                   max={20}
                   value={this.props.scene.zoomLevel.toString()} />
               )}
-              <Checkbox
+              <SimpleCheckbox
                 text="Cross-fade images"
                 isOn={this.props.scene.crossFade}
                 onChange={this.onChangeCrossFade.bind(this)} />
