@@ -6,6 +6,7 @@ $white: white;
 $yellow: #ffeeb1;
 $buttonBarColorTop: #ffeeb1;
 $buttonBarColorBottom: #ffcd09;
+$uiGray: #d8d8d8;
 $bodyColor: white;
 $buttonTop: #eaeaea;
 $buttonBottom: #dcdcdc;
@@ -215,6 +216,82 @@ a {
   }
 }
 
+.ControlGroupGroup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  align-content: flex-start;
+}
+
+.ControlGroup {
+  flex-grow: 1;
+
+  margin-top: 1em;
+  margin-bottom: $smallPadding * 3;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+
+  border: 1px solid $black;
+  padding: ($smallPadding * 3) $smallPadding $smallPadding $smallPadding;
+  position: relative;
+
+  color: $black;
+  background-color: $uiGray;
+
+  &.m-narrow {
+    width: 300px;
+  }
+
+  &.m-wide {
+    width: 100%;
+  }
+
+  .ControlGroup__Title {
+    position: absolute;
+    top: -0.7em;
+    height: 0.7em;
+    overflow: visible;
+    padding: 0 0.2rem;
+    font-weight: bold;
+    font-size: 1rem;
+    background-color: $uiGray;
+    border-top: 1px solid $black;
+    border-right: 1px solid $black;
+    border-left: 1px solid $black;
+  }
+}
+
+.ControlSubgroup {
+  flex-grow: 1;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  align-content: flex-start;
+
+  & > * {
+    margin-right: $smallPadding * 2;
+  }
+}
+
+@mixin control {
+  margin-bottom: $smallPadding * 2;
+  label {
+    display: block;
+    margin-bottom: $smallPadding;
+  }
+}
+
+.SimpleOptionPicker, .SimpleTextInput, .SimpleSliderInput, .SimpleCheckbox {
+  @include control;
+}
+
+.SimpleOptionPicker {
+  select {
+    max-width: 210px;
+  }
+}
+
 .SceneDetail {
   .SceneName {
     display: inline-block;
@@ -245,14 +322,6 @@ a {
   left: 0;
   padding: $smallPadding;
   overflow: auto;
-
-  form {
-    margin-bottom: $smallPadding;
-  }
-}
-
-.SimpleOptionPicker select {
-  max-width: 210px;
 }
 
 .SceneDetail__PlayButton {

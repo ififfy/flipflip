@@ -5,6 +5,7 @@ export default class SimpleTextInput extends React.Component {
   readonly props: {
     label: string,
     value: string,
+    isEnabled: boolean,
     onChange: (value: string) => void
   };
 
@@ -14,6 +15,7 @@ export default class SimpleTextInput extends React.Component {
         <label>{this.props.label}</label>
         <input
           type="text"
+          disabled={!this.props.isEnabled}
           value={this.props.value}
           onChange={this.onChange.bind(this)}>
         </input>
