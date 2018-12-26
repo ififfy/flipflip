@@ -72,6 +72,7 @@ a {
 .u-button-row {
   @include noselect;
 
+  position: relative;
   z-index: 1;
   padding: $smallPadding $smallPadding 0 $smallPadding;
   height: $buttonBarHeight;
@@ -79,6 +80,11 @@ a {
 
   .u-button-row-right {
     float: right;
+
+    .u-button {
+      margin-right: 0;
+      margin-left: $smallPadding;
+    }
   }
 
   .u-button {
@@ -115,6 +121,16 @@ a {
   filter: blur(8px);
   -webkit-filter: blur(8px);
   transform: scale(2, 2);
+}
+
+.u-abs-center {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  z-index: -1;
 }
 
 /* attributes */
@@ -199,6 +215,28 @@ a {
   }
 }
 
+.SceneDetail {
+  .SceneName {
+    display: inline-block;
+    margin-top: 0;
+    color: $black !important;
+    line-height: $buttonBarHeight;
+  }
+
+  .SceneNameForm {
+    display: inline-block;
+    width: 200px;
+
+    input[type=text] {
+      font-size: 21px;
+      font-weight: 700;
+      display: block;
+      width: 100%;
+      margin-top: 4px;
+    }
+  }
+}
+
 .SceneDetail__Content {
   position: fixed;
   top: $buttonBarHeight;
@@ -206,44 +244,15 @@ a {
   bottom: 0;
   left: 0;
   padding: $smallPadding;
-
-  h1:first-child {
-    margin-top: 0;
-    color: $bodyColor;
-  }
-
-  input[type=text] {
-    font-size: 28px;
-    font-weight: 700;
-    display: block;
-    width: 100%;
-    margin-bottom: 13px;
-  }
+  overflow: auto;
 
   form {
     margin-bottom: $smallPadding;
   }
 }
 
-$sceneDetailOptionsWidth: 220px;
-
-.SceneDetail__Options {
-  position: absolute;
-  width: $sceneDetailOptionsWidth;
-  padding: $smallPadding;
-  top: 0; left: $smallPadding; bottom: 0;
-  overflow: hidden;
-  .SimpleOptionPicker select {
-    max-width: 210px;
-  }
-}
-
-.SceneDetail__Sources {
-  position: absolute;
-  left: $sceneDetailOptionsWidth;
-  top: 0; right: 0; bottom: 0;
-  overflow: auto;
-  padding-left: $smallPadding * 2;
+.SimpleOptionPicker select {
+  max-width: 210px;
 }
 
 .SceneDetail__PlayButton {
