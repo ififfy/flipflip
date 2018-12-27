@@ -2,34 +2,48 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import recursiveReaddir from 'recursive-readdir';
 import fs from 'fs'
+import fileURL from 'file-url';
 import animated from 'animated-gif-detector';
 
 import Scene from '../../Scene';
 import ImagePlayer from './ImagePlayer';
 import CaptionProgram from './CaptionProgram';
-import { TK } from '../../const';
+import { TK, IF } from '../../const';
+
+function isImage(path: string): boolean {
+  const p = path.toLowerCase()
+  if (p.endsWith('.gif')) return true;
+  if (p.endsWith('.png')) return true;
+  if (p.endsWith('.jpeg')) return true;
+  if (p.endsWith('.jpg')) return true;
+  if (p.endsWith('.webp')) return true;
+  if (p.endsWith('.tiff')) return true;
+  if (p.endsWith('.svg')) return true;
+  return false;
+}
 
 function filterPathsToJustImages(imageTypeFilter: string, paths: Array<string>): Array<string> {
-  if (imageTypeFilter === 'if.any') return paths;
-
-  if (imageTypeFilter === 'if.gifs') {
-    return paths.filter((f) => f.toLowerCase().endsWith('.gif') && animated(fs.readFileSync(f)));
+  switch (imageTypeFilter) {
+    case IF.any:
+      return paths.filter((p) => isImage(p));
+    case IF.gifs:
+      return paths.filter((f) => f.toLowerCase().endsWith('.gif') && animated(fs.readFileSync(f)));
+    case IF.stills:
+      return paths.filter((f) => {
+        const p = f.toLowerCase()
+        if (p.endsWith('.gif') && !animated(fs.readFileSync(f))) return true;
+        if (p.endsWith('.png')) return true;
+        if (p.endsWith('.jpeg')) return true;
+        if (p.endsWith('.jpg')) return true;
+        if (p.endsWith('.webp')) return true;
+        if (p.endsWith('.tiff')) return true;
+        if (p.endsWith('.svg')) return true;
+        return false;
+      });
+    default:
+      console.warn('unknown image type filter', imageTypeFilter);
+      return paths.filter((p) => isImage(p));
   }
-
-  if (imageTypeFilter === 'if.stills') {
-    return paths.filter((f) => {
-      if (f.toLowerCase().endsWith('.gif') && !animated(fs.readFileSync(f))) return true;
-      if (f.toLowerCase().endsWith('.png')) return true;
-      if (f.toLowerCase().endsWith('.jpeg')) return true;
-      if (f.toLowerCase().endsWith('.jpg')) return true;
-      if (f.toLowerCase().endsWith('.webp')) return true;
-      if (f.toLowerCase().endsWith('.tiff')) return true;
-      return false;
-    });
-  }
-
-  console.warn('unknown image type filter', imageTypeFilter);
-  return paths;
 }
 
 function textURL(kind: string, src: string): string {
@@ -38,6 +52,27 @@ function textURL(kind: string, src: string): string {
     case TK.hastebin: return `https://hastebin.com/raw/${src}`;
     default: return src;
   }
+}
+
+function isURL(maybeURL: string): boolean {
+  return maybeURL.startsWith('http');  // lol
+}
+
+function loadLocalDirectory(path: string, filter: string): Promise<Array<string>> {
+  const blacklist = ['*.css', '*.html', 'avatar.png'];
+
+  return new Promise<Array<string>>((resolve, reject) => {
+    recursiveReaddir(path, blacklist, (err: any, rawFiles: Array<string>) => {
+      if (err) console.warn(err);
+      resolve(filterPathsToJustImages(filter, rawFiles).map((p) => fileURL(p)));
+    });
+  });
+}
+
+function loadRemoteImageURLList(url: string, filter: string): Promise<Array<string>> {
+  return new Promise<Array<string>>((resolve, reject) => {
+    resolve([]);
+  });
 }
 
 export default class HeadlessScenePlayer extends React.Component {
@@ -55,7 +90,7 @@ export default class HeadlessScenePlayer extends React.Component {
 
   readonly state = {
     isLoaded: false,
-    allPaths: Array<Array<string>>(),
+    allURLs: Array<Array<string>>(),
   }
 
   render() {
@@ -64,7 +99,7 @@ export default class HeadlessScenePlayer extends React.Component {
     const showEmptyIndicator = (
       this.props.showEmptyState &&
       this.state.isLoaded &&
-      this.state.allPaths.length == 0);
+      this.state.allURLs.length == 0);
     const showCaptionProgram = (
       this.props.showText &&
       this.state.isLoaded &&
@@ -91,14 +126,17 @@ export default class HeadlessScenePlayer extends React.Component {
             isPlaying={this.props.isPlaying}
             fadeEnabled={this.props.scene.crossFade}
             imageSizeMin={this.props.scene.imageSizeMin}
-            allPaths={this.state.allPaths} />)}
+            allURLs={this.state.allURLs} />)}
 
         {showCaptionProgram && (
           <CaptionProgram url={textURL(this.props.scene.textKind, this.props.scene.textSource)} />
         )}
 
         {showLoadingIndicator && (
-          <div className="LoadingIndicator"><div className="loader" /></div>
+          <div className="LoadingIndicator">
+            <div className="loader" />
+            <div className="LoadingIndicator__Text">Building image list</div>
+          </div>
         )}
 
         {showEmptyIndicator && (
@@ -110,41 +148,33 @@ export default class HeadlessScenePlayer extends React.Component {
 
   componentDidMount() {
     let n = this.props.scene.directories.length;
-    this.setState({allPaths: []});
+    this.setState({allURLs: []});
+
+    let newAllURLs = Array<Array<string>>();
+
     this.props.scene.directories.forEach((d) => {
-      const blacklist = ['*.css', '*.html', 'avatar.png'];
-      recursiveReaddir(d, blacklist, (err: any, rawFiles: Array<string>) => {
-        if (err) console.warn(err);
+      const loadPromise = (isURL(d)
+        ? loadRemoteImageURLList(d, this.props.scene.imageTypeFilter)
+        : loadLocalDirectory(d, this.props.scene.imageTypeFilter))
+      
+        loadPromise.then((urls) => {
+          n -= 1;
 
-        const files = filterPathsToJustImages(this.props.scene.imageTypeFilter, rawFiles);
-
-        let newAllPaths = this.state.allPaths;
-
-        n -= 1;
-        if (n == 0) {
-          this.setState({isLoaded: true});
-          setTimeout(this.props.didFinishLoading, 0);
-        }
-
-        if (!files || files.length === 0) {
-          return;
-        }
-
-        // The scene can configure which of these branches to take
-        if (this.props.scene.weightDirectoriesEqually) {
-          // Just add the new paths to the end of the list
-          newAllPaths = this.state.allPaths.concat([files]);
-          this.setState({allPaths: newAllPaths});
-        } else {
-          // If we found some files, put them in their own list.
-          // If list is empty, ignore.
-          if (newAllPaths.length == 0) {
-            newAllPaths = [files];
+          // The scene can configure which of these branches to take
+          if (this.props.scene.weightDirectoriesEqually) {
+            // Just add the new urls to the end of the list
+            newAllURLs = this.state.allURLs.concat([urls]);
           } else {
-            newAllPaths[0] = newAllPaths[0].concat(files);
+            if (newAllURLs.length == 0) newAllURLs = [[]];
+            // Append to a single list of urls
+            newAllURLs[0] = newAllURLs[0].concat(urls);
           }
-        }
-      });
+
+          if (n == 0) {
+            this.setState({allURLs: newAllURLs, isLoaded: true});
+            setTimeout(this.props.didFinishLoading, 0);
+          }
+        })
     });
   }
 }

@@ -1,5 +1,4 @@
 import * as React from 'react';
-import fileURL from 'file-url';
 
 import ImageView from './ImageView';
 import TIMING_FUNCTIONS from '../../TIMING_FUNCTIONS';
@@ -15,7 +14,7 @@ export default class ImagePlayer extends React.Component {
     maxInMemory: number,
     maxLoadingAtOnce: number,
     maxToRememberInHistory: number,
-    allPaths: Array<Array<string>>,
+    allURLs: Array<Array<string>>,
     isPlaying: boolean,
     timingFunction: string,
     timingConstant: string,
@@ -120,7 +119,7 @@ export default class ImagePlayer extends React.Component {
 
     // We either get one giant list of paths, or one list per directory,
     // depending on scene.weightDirectoriesEqually
-    const collection = choice(this.props.allPaths);
+    const collection = choice(this.props.allURLs);
 
     if (this.state.readyToDisplay.length >= this.props.maxLoadingAtOnce ||
       !(collection && collection.length)) {
@@ -128,8 +127,7 @@ export default class ImagePlayer extends React.Component {
       setTimeout(() => this.runFetchLoop(i), 100);
       return;
     }
-    const path = choice(collection);
-    const url: string = fileURL(path);
+    const url = choice(collection);
     const img = new Image();
 
     this.setState({numBeingLoaded: this.state.numBeingLoaded + 1});
