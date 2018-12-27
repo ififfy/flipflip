@@ -2,8 +2,8 @@ import * as React from 'react';
 import fileURL from 'file-url';
 
 import ImageView from './ImageView';
-import TIMING_FUNCTIONS from '../TIMING_FUNCTIONS';
-import {TF, ZF} from '../const';
+import TIMING_FUNCTIONS from '../../TIMING_FUNCTIONS';
+import {TF, ZF} from '../../const';
 
 function choice<T>(items: Array<T>): T {
   const i = Math.floor(Math.random() * items.length);

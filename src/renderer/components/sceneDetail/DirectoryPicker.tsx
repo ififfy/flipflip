@@ -1,8 +1,8 @@
 import * as React from 'react';
-import Modal from './Modal';
+import Modal from '../ui/Modal';
 import {remote} from 'electron';
 
-import {pathname} from '../util';
+import {pathname} from '../../util';
 
 type Props = {
   directories: Array<string>,

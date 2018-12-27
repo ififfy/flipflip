@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import en from '../en';
+import en from '../../en';
 
 
 export default class SimpleOptionPicker extends React.Component {

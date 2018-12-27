@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom';
 import { remote } from 'electron';
 const { Menu, app } = remote;
 
-import Scene from '../Scene';
+import Scene from '../../Scene';
 import HeadlessScenePlayer from './HeadlessScenePlayer';
 
 const keyMap = {
