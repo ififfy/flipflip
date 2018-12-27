@@ -1,14 +1,14 @@
 import * as React from 'react';
 
-import {IF, TF, ZF, TK} from '../const';
+import {IF, TF, ZF, TK} from '../../const';
 
-import Scene from '../Scene';
+import Scene from '../../Scene';
 import DirectoryPicker from './DirectoryPicker';
-import SimpleCheckbox from './SimpleCheckbox';
-import SimpleOptionPicker from './SimpleOptionPicker';
-import SimpleTextInput from './SimpleTextInput';
-import SimpleSliderInput from "./SimpleSliderInput";
-import SimpleURLInput from "./SimpleURLInput";
+import SimpleCheckbox from '../ui/SimpleCheckbox';
+import SimpleOptionPicker from '../ui/SimpleOptionPicker';
+import SimpleTextInput from '../ui/SimpleTextInput';
+import SimpleSliderInput from "../ui/SimpleSliderInput";
+import SimpleURLInput from "../ui/SimpleURLInput";
 import URLImporter from "./URLImporter";
 
 type Props = {

@@ -1,8 +1,8 @@
 import * as React from 'react'
-import Modal from "./Modal";
+import Modal from "../ui/Modal";
 import {sep} from "path";
 import {remote} from "electron";
-import {TK} from '../const';
+import {TK} from '../../const';
 
 export default class URLImporter extends React.Component {
   readonly props: {

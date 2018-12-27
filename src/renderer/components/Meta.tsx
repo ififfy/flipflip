@@ -7,8 +7,8 @@ import path from 'path';
 
 import Scene from '../Scene';
 import ScenePicker from './ScenePicker';
-import SceneDetail from './SceneDetail';
-import Player from './Player';
+import SceneDetail from './sceneDetail/SceneDetail';
+import Player from './player/Player';
 
 import {remote} from 'electron';
 

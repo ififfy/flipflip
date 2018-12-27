@@ -4,10 +4,10 @@ import recursiveReaddir from 'recursive-readdir';
 import fs from 'fs'
 import animated from 'animated-gif-detector';
 
-import Scene from '../Scene';
+import Scene from '../../Scene';
 import ImagePlayer from './ImagePlayer';
 import CaptionProgram from './CaptionProgram';
-import { TK } from '../const';
+import { TK } from '../../const';
 
 function filterPathsToJustImages(imageTypeFilter: string, paths: Array<string>): Array<string> {
   if (imageTypeFilter === 'if.any') return paths;
