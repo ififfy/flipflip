@@ -306,10 +306,7 @@ export default class CaptionProgram extends React.Component {
 
   render() {
     return (
-      <div style={{pointerEvents: 'none', display: 'table', width: '100%', height: '100%'}}
-          className="u-fill-container text-display">
-        <div style={{display: 'table-cell'}} ref={this.el} />
-      </div>
+      <div className="CaptionProgram u-fill-container"><div ref={this.el} /></div>
     );
   }
 }

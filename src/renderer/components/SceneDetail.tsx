@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import {IF, TF, ZF} from '../const';
+import {IF, TF, ZF, TK} from '../const';
 
 import Scene from '../Scene';
 import DirectoryPicker from './DirectoryPicker';
@@ -8,6 +8,7 @@ import SimpleCheckbox from './SimpleCheckbox';
 import SimpleOptionPicker from './SimpleOptionPicker';
 import SimpleTextInput from './SimpleTextInput';
 import SimpleSliderInput from "./SimpleSliderInput";
+import SimpleURLInput from "./SimpleURLInput";
 import URLImporter from "./URLImporter";
 
 type Props = {
@@ -104,7 +105,8 @@ export default class SceneDetail extends React.Component {
             <URLImporter
               directories={this.props.scene.directories}
               onChangeDirectories={this.onChangeDirectories.bind(this)}
-              onChangeHastebinID={this.onChangeHastebinID.bind(this)}/>
+              onChangeTextKind={this.onChangeTextKind.bind(this)}
+              onChangeTextSource={this.onChangeTextSource.bind(this)}/>
           </ControlGroup>
         
           <ControlGroup title="Timing" isNarrow={true}>
@@ -113,11 +115,11 @@ export default class SceneDetail extends React.Component {
               label="Timing"
               value={this.props.scene.timingFunction}
               keys={Object.values(TF)} />
-              <SimpleTextInput
-                isEnabled={this.props.scene.timingFunction === TF.constant}
-                onChange={this.onChangeTimingConstant.bind(this)}
-                label="Time between images (ms)"
-                value={this.props.scene.timingConstant.toString()} />
+            <SimpleTextInput
+              isEnabled={this.props.scene.timingFunction === TF.constant}
+              onChange={this.onChangeTimingConstant.bind(this)}
+              label="Time between images (ms)"
+              value={this.props.scene.timingConstant.toString()} />
           </ControlGroup>
 
           <ControlGroup title="Effects" isNarrow={true}>
@@ -168,11 +170,21 @@ export default class SceneDetail extends React.Component {
           </ControlGroup>
 
           <ControlGroup title="Text" isNarrow={true}>
-            <SimpleTextInput
+            <SimpleOptionPicker
+              onChange={this.onChangeTextKind.bind(this)}
+              label="Source"
+              value={this.props.scene.textKind}
+              keys={Object.values(TK)} />
+            <SimpleURLInput
               isEnabled={true}
-              onChange={this.onChangeHastebinID.bind(this)}
-              label="Hastebin ID"
-              value={this.props.scene.hastebinID} />
+              onChange={this.onChangeTextSource.bind(this)}
+              label={(() => {
+                switch (this.props.scene.textKind) {
+                  case TK.hastebin: return "Hastebin ID";
+                  case TK.url: return "URL";
+                }
+              })()}
+              value={this.props.scene.textSource} />
           </ControlGroup>
 
         </div>
@@ -227,7 +239,9 @@ export default class SceneDetail extends React.Component {
 
   onChangeOverlaySceneID(id: string) { this.update((s) => { s.overlaySceneID = parseInt(id, 10); }); }
 
-  onChangeHastebinID(hbId: string) { this.update((s) => { s.hastebinID = hbId; }); }
+  onChangeTextKind(kind: string) { this.update((s) => { s.textKind = kind; }); }
+
+  onChangeTextSource(textSource: string) { this.update((s) => { s.textSource = textSource; }); }
 
   onChangeTimingFunction(fnId: string) { this.update((s) => { s.timingFunction = fnId; }); }
 

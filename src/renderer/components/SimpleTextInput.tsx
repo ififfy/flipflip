@@ -6,6 +6,7 @@ export default class SimpleTextInput extends React.Component {
     label: string,
     value: string,
     isEnabled: boolean,
+    children?: React.ReactNode,
     onChange: (value: string) => void
   };
 
@@ -19,6 +20,7 @@ export default class SimpleTextInput extends React.Component {
           value={this.props.value}
           onChange={this.onChange.bind(this)}>
         </input>
+        {this.props.children}
       </div>
     );
   }
