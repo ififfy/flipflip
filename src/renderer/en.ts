@@ -4,10 +4,15 @@ export default new Map<String, String>([
   ['tf.variableMedium', 'Variable - Fast (0.2s-1.2s)'],
   ['tf.variableSlow', 'Variable - Slow (3.0s-5.0s)'],
   ['tf.variableSlowest', 'Variable - Slowest (3.5s-6.5s)'],
+
   ['if.any', 'All images'],
   ['if.gifs', 'Only gifs'],
   ['if.stills', 'Only stills'],
+
   ['zf.none','No zoom'],
   ['zf.in','Zoom In'],
   ['zf.out','Zoom Out'],
+
+  ['tk.url', 'URL'],
+  ['tk.hastebin', 'Hastebin'],
 ]);

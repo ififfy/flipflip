@@ -1,4 +1,5 @@
-import {ZF, TF, IF} from './const';
+import {ZF, TF, IF, TK} from './const';
+
 export default class Scene {
   id: number = 0
   name: string = "Unnamed scene"
@@ -9,10 +10,14 @@ export default class Scene {
   zoomType = ZF.none
   zoomLevel: number = 5
   crossFade = false
-  hastebinID: string = "";
+  textKind: string = "";
+  textSource: string = "";
   imageSizeMin: 200;
   overlaySceneID: number = 0;
   overlaySceneOpacity: number = 0.5;
+
+  // unused; migration only
+  hastebinID: string = "";
 
   // if true, the display chooses a directory first, then picks an image out
   // of it.
@@ -31,6 +36,16 @@ export default class Scene {
 
     if (!this.imageSizeMin) {
       this.imageSizeMin = 200;
+    }
+
+    if (this.hastebinID.length && !(this.textSource && this.textSource.length)) {
+      this.textKind = TK.hastebin;
+      this.textSource = this.hastebinID;
+      this.hastebinID = "";
+    }
+
+    if (!(this.textKind && this.textKind.length)) {
+      this.textKind = TK.url;
     }
 
     // backward compatible with 1.0.1
