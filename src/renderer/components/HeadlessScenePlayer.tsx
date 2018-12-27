@@ -7,6 +7,7 @@ import animated from 'animated-gif-detector';
 import Scene from '../Scene';
 import ImagePlayer from './ImagePlayer';
 import CaptionProgram from './CaptionProgram';
+import { TK } from '../const';
 
 function filterPathsToJustImages(imageTypeFilter: string, paths: Array<string>): Array<string> {
   if (imageTypeFilter === 'if.any') return paths;
@@ -31,6 +32,14 @@ function filterPathsToJustImages(imageTypeFilter: string, paths: Array<string>):
   return paths;
 }
 
+function textURL(kind: string, src: string): string {
+  switch (kind) {
+    case TK.url: return src;
+    case TK.hastebin: return `https://hastebin.com/raw/${src}`;
+    default: return src;
+  }
+}
+
 export default class HeadlessScenePlayer extends React.Component {
   readonly props: {
     scene: Scene,
@@ -50,11 +59,25 @@ export default class HeadlessScenePlayer extends React.Component {
   }
 
   render() {
+    const showImagePlayer = this.state.isLoaded;
+    const showLoadingIndicator = this.props.showLoadingState && !this.state.isLoaded;
+    const showEmptyIndicator = (
+      this.props.showEmptyState &&
+      this.state.isLoaded &&
+      this.state.allPaths.length == 0);
+    const showCaptionProgram = (
+      this.props.showText &&
+      this.state.isLoaded &&
+      this.props.scene.textSource &&
+      this.props.scene.textSource.length &&
+      this.props.isPlaying);
+
     return (
       <div
         className="HeadlessScenePlayer"
         style={{opacity: this.props.opacity}}>
-        {this.state.isLoaded && (
+
+        {showImagePlayer && (
           <ImagePlayer
             historyOffset={this.props.historyOffset}
             setHistoryLength={this.props.setHistoryLength}
@@ -69,14 +92,16 @@ export default class HeadlessScenePlayer extends React.Component {
             fadeEnabled={this.props.scene.crossFade}
             imageSizeMin={this.props.scene.imageSizeMin}
             allPaths={this.state.allPaths} />)}
-        {this.props.showText && this.state.isLoaded && this.props.scene.hastebinID && this.props.isPlaying && (
-          <CaptionProgram hastebinID={this.props.scene.hastebinID} />
+
+        {showCaptionProgram && (
+          <CaptionProgram url={textURL(this.props.scene.textKind, this.props.scene.textSource)} />
         )}
 
-        {this.props.showLoadingState && !this.state.isLoaded && (
+        {showLoadingIndicator && (
           <div className="LoadingIndicator"><div className="loader" /></div>
         )}
-        {this.props.showEmptyState && this.state.isLoaded && this.state.allPaths.length == 0 && (
+
+        {showEmptyIndicator && (
           <div className="EmptyIndicator">No images found</div>
         )}
       </div>
