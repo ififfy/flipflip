@@ -2,12 +2,14 @@ import * as React from 'react'
 import Modal from "./Modal";
 import {sep} from "path";
 import {remote} from "electron";
+import {TK} from '../const';
 
 export default class URLImporter extends React.Component {
   readonly props: {
     directories: Array<string>,
     onChangeDirectories(directories: Array<string>): void,
-    onChangeHastebinID(hbID: string) : void,
+    onChangeTextKind(kind: string) : void,
+    onChangeTextSource(hbID: string) : void,
   };
 
   readonly state = {
@@ -84,7 +86,8 @@ export default class URLImporter extends React.Component {
       }
 
       // Update hastebin URL (if present)
-      this.props.onChangeHastebinID(hastebinURL);
+      this.props.onChangeTextKind(TK.hastebin);
+      this.props.onChangeTextSource(hastebinURL);
     }
   };
 

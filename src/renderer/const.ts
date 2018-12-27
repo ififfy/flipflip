@@ -18,6 +18,11 @@ const ZF = { // zoom functions
   out: 'zf.out',
 };
 
+const TK = { // text kind
+  url: 'tk.url',
+  hastebin: 'tk.hastebin',
+};
+
 export {
-  TF, IF, ZF
+  TF, IF, ZF, TK
 };
