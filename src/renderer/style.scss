@@ -423,6 +423,14 @@ a {
     top: calc(50% - 10em);
     left: calc(50% - 5em);
   }
+
+  .LoadingIndicator__Text {
+    position: absolute;
+    text-align: center;
+    top: calc(50% + 10em);
+    width: 100%;
+    height: 100%;
+  }
 }
 
 .EmptyIndicator {

@@ -27,7 +27,6 @@ export default class Player extends React.Component {
     isLoaded: false,
     isPlaying: false,
     historyOffset: -1,
-    allPaths: Array<Array<string>>(),
     historyLength: 0,
   }
 
