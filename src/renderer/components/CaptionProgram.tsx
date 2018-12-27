@@ -1,5 +1,6 @@
 import wretch from 'wretch';
 import * as React from 'react';
+import {TK} from '../const';
 
 let STYLES : {[style : string] : string} = {};
 
@@ -230,8 +231,8 @@ const startText = function(el : HTMLElement, programText : string) {
 };
 
 
-const startShowingText = function(el : HTMLElement, hastebinId : string) {
-  if (hastebinId === 'test') {
+const startShowingText = function(el : HTMLElement, url : string) {
+  if (url === 'test') {
     let testProgram = `
     setBlinkDuration 300
     setBlinkDelay 100
@@ -246,8 +247,6 @@ const startShowingText = function(el : HTMLElement, hastebinId : string) {
     return startText(el, testProgram);
   }
 
-  const url = 'https://hastebin.com/raw/' + hastebinId;
-
   let _hasStoppedEarly = false;
   let _stop = () => {
     _hasStoppedEarly = true;
@@ -257,7 +256,9 @@ const startShowingText = function(el : HTMLElement, hastebinId : string) {
     .get()
     .text(data => {
       if (_hasStoppedEarly) return;
-      //console.log(data);
+      if (localStorage.debugText) {
+        console.log(data);
+      }
       _stop = startText(el, data);
     });
   return stop;
@@ -267,19 +268,19 @@ export default class CaptionProgram extends React.Component {
   readonly el = React.createRef<HTMLDivElement>();
 
   readonly props: {
-    hastebinID: string,
+    url: string,
   };
 
   readonly state = {
     stopFunc: Function(),
-    lastHastebinID: ""
+    lastURL: ""
   };
 
-  shouldComponentUpdate(nextProps : {hastebinID : string}, nextState: any) {
-    return nextProps.hastebinID !== this.props.hastebinID;
+  shouldComponentUpdate(nextProps : {url : string}, nextState: any) {
+    return nextProps.url !== this.props.url;
   }
 
-  componentWillReceiveProps(nextProps : {hastebinID : string}) {
+  componentWillReceiveProps(nextProps : {url : string}) {
     this._update(nextProps);
   }
 
@@ -289,12 +290,12 @@ export default class CaptionProgram extends React.Component {
     this.state.stopFunc();
   }
 
-  _update(props: {hastebinID : string}) {
+  _update(props: {url : string}) {
     if (!this.el.current) return;
-    if (props.hastebinID == this.state.lastHastebinID) return;
-    this.setState({lastHastebinID: props.hastebinID});
+    if (props.url == this.state.lastURL) return;
+    this.setState({lastURL: props.url});
     this._stop();
-    this.setState({stopFunc: startShowingText(this.el.current, props.hastebinID)});
+    this.setState({stopFunc: startShowingText(this.el.current, props.url)});
   }
 
   _stop() {
