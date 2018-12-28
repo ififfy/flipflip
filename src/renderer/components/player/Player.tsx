@@ -113,7 +113,6 @@ export default class Player extends React.Component {
       {
         label: app.getName(),
         submenu: [
-          { role: 'reload' },
           { role: 'quit' },
         ],
       },
