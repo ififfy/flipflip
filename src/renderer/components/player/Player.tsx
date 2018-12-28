@@ -106,6 +106,20 @@ export default class Player extends React.Component {
         ],
       },
       {
+        label: 'Edit',
+        submenu: [
+          { role: 'undo' },
+          { role: 'redo' },
+          { type: 'separator' },
+          { role: 'cut' },
+          { role: 'copy' },
+          { role: 'paste' },
+          { role: 'pasteandmatchstyle' },
+          { role: 'delete' },
+          { role: 'selectall' }
+        ]
+      },
+      {
         label: 'Player controls',
         submenu: Object.entries(keyMap).map(([k, v]) => {
           const [label, accelerator] = v;

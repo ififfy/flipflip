@@ -41,13 +41,6 @@ a {
   color: $blue;
 }
 
-.app {
-  position: fixed;
-  top: 0; right: 0; bottom: 0; left: 0;
-  background-color: rgb(52,104,152);
-  background: linear-gradient(180deg, rgba(52,104,152,1) 0%, rgba(24,50,76,1) 100%);
-}
-
 @mixin noselect {
   -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
@@ -64,10 +57,21 @@ a {
   }
 }
 
-@mixin buttonBarBackground {
+@mixin yellowGradient {
   background-color: $buttonBarColorTop;
   background: linear-gradient(180deg, $buttonBarColorTop 0%, $buttonBarColorBottom 100%);
+}
+
+@mixin buttonBarBackground {
+  @include yellowGradient();
   border-bottom: 1px solid $black;
+}
+
+.app {
+  position: fixed;
+  top: 0; right: 0; bottom: 0; left: 0;
+  background-color: rgb(52,104,152);
+  background: linear-gradient(180deg, rgba(52,104,152,1) 0%, rgba(24,50,76,1) 100%);
 }
 
 .u-button-row {
@@ -90,14 +94,16 @@ a {
 
   .u-button {
     margin-right: $smallPadding;
+    padding: 0.2rem;
   }
 }
 
 .u-button {
-  padding: 0.2em;
+  padding: $smallPadding;
   border: 1px solid $buttonBorder;
   display: inline-block;
   color: $black !important;
+  cursor: pointer;
 
   background-color: $buttonTop;
   background: linear-gradient(180deg, $buttonTop 0%, $buttonBottom 100%);
@@ -382,7 +388,6 @@ a {
     float: right;
     margin-top: $smallPadding;
     margin-right: $smallPadding;
-    padding: $smallPadding;
   }
 }
 
@@ -410,7 +415,6 @@ a {
     float: right;
     margin-top: $smallPadding;
     margin-right: $smallPadding;
-    padding: $smallPadding;
   }
 }
 
@@ -457,8 +461,12 @@ a {
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: rgba(0,0,0,0.3);
-  padding: 50px;
+  background-color: rgba(24, 24, 24, 0.3);
+  z-index: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   button {
     float: right;
@@ -466,18 +474,51 @@ a {
 }
 
 .Modal__Inner {
-  background-color: #fff;
-  border-radius: 5px;
-  max-width: 500px;
-  min-height: 100px;
-  margin: 0 auto;
-  padding: 30px 30px 45px 30px;
-  color: black;
-  .Modal__Close {
-    float: right;
+  background-color: $uiGray;
+  border: 1px solid $black;
+  position: relative;
+  padding: $smallPadding;
+
+  $barHeight: 1.9rem;
+  $buttonHeight: 1.2rem;
+  $barPadding: ($barHeight - $buttonHeight) / 2;
+
+  .Modal__Bar__Container {
+    z-index: 2;
+    position: absolute;
+    left: -1px;
+    top: -$barHeight;
+    height: $barHeight;
   }
-  button:not(.Modal__Close) {
+
+  .Modal__Bar {
+    @include yellowGradient();
+    height: $barHeight;
+    font-weight: 700;
+    font-size: 1.1rem;
+    line-height: $barHeight;
+    background-color: $uiGray;
+    border-top: 1px solid $black;
+    border-left: 1px solid $black;
+    border-right: 1px solid $black;
+    border-bottom: 1px solid $black;
+    padding-right: $barPadding;
+  }
+
+  .Modal__Bar__Title {
     float: left;
+  }
+
+  .Modal__Bar__Close {
+    float: left;
+    cursor: pointer;
+    width: $buttonHeight;
+    height: $buttonHeight;
+    margin: $barPadding;
+    border: 1px solid $black;
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
   }
 }
 
