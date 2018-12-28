@@ -15,6 +15,7 @@ export default class Scene {
   imageSizeMin: 200;
   overlaySceneID: number = 0;
   overlaySceneOpacity: number = 0.5;
+  audioURL?: string = "";
 
   // unused; migration only
   hastebinID: string = "";

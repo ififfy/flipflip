@@ -192,6 +192,14 @@ export default class SceneDetail extends React.Component {
               value={this.props.scene.textSource} />
           </ControlGroup>
 
+          <ControlGroup title="Audio" isNarrow={true}>
+            <SimpleURLInput
+              isEnabled={true}
+              onChange={this.onChangeAudioURL.bind(this)}
+              label="URL"
+              value={this.props.scene.audioURL} />
+          </ControlGroup>
+
         </div>
       </div>
     )
@@ -261,4 +269,6 @@ export default class SceneDetail extends React.Component {
   onChangeTimingConstant(constant: string) { this.update((s) => { s.timingConstant = constant; }); }
 
   onChangeCrossFade(value: boolean) { this.update((s) => { s.crossFade = value; }); }
+
+  onChangeAudioURL(value: string) { this.update((s) => { s.audioURL = value; }); }
 };

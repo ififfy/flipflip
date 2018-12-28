@@ -262,10 +262,10 @@ a {
 
   .ControlGroup__Title {
     position: absolute;
-    top: -0.7em;
-    height: 0.7em;
+    top: -1em;
+    height: 1em;
     overflow: visible;
-    padding: 0 0.2rem;
+    padding: 0.15rem 0.6rem;
     font-weight: bold;
     font-size: 1rem;
     background-color: $uiGray;
@@ -580,6 +580,7 @@ label.SimpleCheckbox {
 
   .Modal__Bar__Title {
     float: left;
+    margin: 0 0.6rem;
   }
 
   .Modal__Bar__Close {
