@@ -1,15 +1,15 @@
 import * as React from 'react';
 
-import {IF, TF, ZF, TK} from '../const';
+import {IF, TF, ZF, TK} from '../../const';
 
-import Scene from '../Scene';
+import Scene from '../../Scene';
 import DirectoryPicker from './DirectoryPicker';
-import SimpleCheckbox from './SimpleCheckbox';
-import SimpleOptionPicker from './SimpleOptionPicker';
-import SimpleTextInput from './SimpleTextInput';
-import SimpleSliderInput from "./SimpleSliderInput";
-import SimpleURLInput from "./SimpleURLInput";
-import URLImporter from "./URLImporter";
+import SimpleCheckbox from '../ui/SimpleCheckbox';
+import SimpleOptionPicker from '../ui/SimpleOptionPicker';
+import SimpleTextInput from '../ui/SimpleTextInput';
+import SimpleSliderInput from "../ui/SimpleSliderInput";
+import SimpleURLInput from "../ui/SimpleURLInput";
+import URLModal from './URLModal';
 
 type Props = {
   scene?: Scene,
@@ -51,19 +51,28 @@ export default class SceneDetail extends React.Component {
 
   readonly state: {
     isEditingName: boolean,
+    isShowingURLModal: boolean,
   };
 
   constructor(props: Props) {
     super(props);
     this.props = props;
-    this.state = {isEditingName: props.autoEdit};
+    this.state = {isEditingName: props.autoEdit, isShowingURLModal: false};
   }
 
   render() {
     return (
       <div className='SceneDetail'>
-        <div className="u-button-row">
+        {this.state.isShowingURLModal && (
+            <URLModal
+              onClose={this.closeModals.bind(this)}
+              directories={this.props.scene.directories}
+              onChangeDirectories={this.onChangeDirectories.bind(this)}
+              onChangeTextKind={this.onChangeTextKind.bind(this)}
+              onChangeTextSource={this.onChangeTextSource.bind(this)} />
+        )}
 
+        <div className="u-button-row">
           <div className="u-abs-center">
             {this.state.isEditingName && (
               <form className="SceneNameForm" onSubmit={this.endEditingName.bind(this)}>
@@ -101,12 +110,8 @@ export default class SceneDetail extends React.Component {
           <ControlGroup title="Sources" isNarrow={false}>
             <DirectoryPicker
               directories={this.props.scene.directories}
+              onImportURL={this.onImportURL.bind(this)}
               onChange={this.onChangeDirectories.bind(this)}/>
-            <URLImporter
-              directories={this.props.scene.directories}
-              onChangeDirectories={this.onChangeDirectories.bind(this)}
-              onChangeTextKind={this.onChangeTextKind.bind(this)}
-              onChangeTextSource={this.onChangeTextSource.bind(this)}/>
           </ControlGroup>
         
           <ControlGroup title="Timing" isNarrow={true}>
@@ -199,6 +204,10 @@ export default class SceneDetail extends React.Component {
     }
   }
 
+  closeModals() {
+    this.setState({isShowingURLModal: false});
+  }
+
   getSceneName(id: string): string {
     if (id === "0") return "none";
     return this.props.allScenes.filter((s) => s.id.toString() === id)[0].name;
@@ -206,6 +215,10 @@ export default class SceneDetail extends React.Component {
 
   play() {
     this.props.onPlay(this.props.scene);
+  }
+
+  onImportURL() {
+    this.setState({isShowingURLModal: true});
   }
 
   beginEditingName() {

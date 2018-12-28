@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom';
 import { remote } from 'electron';
 const { Menu, app } = remote;
 
-import Scene from '../Scene';
+import Scene from '../../Scene';
 import HeadlessScenePlayer from './HeadlessScenePlayer';
 
 const keyMap = {
@@ -27,7 +27,6 @@ export default class Player extends React.Component {
     isLoaded: false,
     isPlaying: false,
     historyOffset: -1,
-    allPaths: Array<Array<string>>(),
     historyLength: 0,
   }
 
@@ -105,6 +104,20 @@ export default class Player extends React.Component {
         submenu: [
           { role: 'quit' },
         ],
+      },
+      {
+        label: 'Edit',
+        submenu: [
+          { role: 'undo' },
+          { role: 'redo' },
+          { type: 'separator' },
+          { role: 'cut' },
+          { role: 'copy' },
+          { role: 'paste' },
+          { role: 'pasteandmatchstyle' },
+          { role: 'delete' },
+          { role: 'selectall' }
+        ]
       },
       {
         label: 'Player controls',
