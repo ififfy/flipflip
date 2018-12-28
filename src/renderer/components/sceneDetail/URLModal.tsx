@@ -14,7 +14,7 @@ class ImageURLListImporter extends React.Component {
   };
 
   state = {
-    url: "";
+    url: "",
   }
 
   render() {
