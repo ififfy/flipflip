@@ -38,7 +38,7 @@ export default class DirectoryPicker extends React.Component {
         {this.state.removeAllIsOpen && (
           <Modal onClose={this.toggleRemoveAllModal.bind(this)} title="Remove all?">
             <p>Are you sure you want to remove everything from this scene?</p>
-            <div className="u-button" onClick={this.removeAll.bind(this)}>
+            <div className="u-button u-float-right" onClick={this.removeAll.bind(this)}>
               OK
             </div>
           </Modal>
