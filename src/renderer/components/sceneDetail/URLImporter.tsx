@@ -23,14 +23,14 @@ export default class URLImporter extends React.Component {
       <div className="URLImporter">
         <div className='u-button u-clickable' onClick={this.toggleImportModal.bind(this)}>+ Import From URL</div>
         {this.state.importIsOpen && (
-            <Modal onClose={this.toggleImportModal.bind(this)}>
+            <Modal onClose={this.toggleImportModal.bind(this)} title="Import URL">
               <div>Enter a gooninator URL for import:</div>
               <input type="text" name="url" onChange={this.importURLChange.bind(this)}/>
               <div>Enter the parent directory to look in:</div>
               <input type="text" name="root" value={this.state.rootDir} readOnly onClick={this.addRootDir.bind(this)}/>
-              <button onClick={this.doImport.bind(this)}>
+              <div className="u-button" onClick={this.doImport.bind(this)}>
                 Import
-              </button>
+              </div>
             </Modal>
         )}
         <div style={{clear: 'both'}}></div>
