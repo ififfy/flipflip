@@ -376,7 +376,6 @@ label.SimpleCheckbox {
   padding: $smallPadding;
   border-top: 1px solid $black;
   border-right: 1px solid $black;
-  z-index: 1;
   margin-bottom: -1px;
   font-weight: 700;
 
@@ -386,10 +385,12 @@ label.SimpleCheckbox {
 
   &.m-active {
     background-color: $uiGray;
+    border-bottom: 1px solid $uiGray;
   }
 
   &.m-inactive {
     background-color: lighten($uiGray, 20%);
+    border-bottom: 1px solid $black;
     color: lighten($black, 20%);
     cursor: pointer;
 
