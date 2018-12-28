@@ -4,7 +4,7 @@ A random slideshow of images from your computer. Runs on Mac and Windows.
 
 ## Instructions
 
-**[Downloads (Mac/Windows/Linux)](https://github.com/ififfy/flipflip/releases)**
+**[Downloads (Mac/Windows/Linux)](https://github.com/ififfy/flipflip/releases/latest)**
 
 **[User manual](https://github.com/ififfy/flipflip/wiki/FlipFlip-User-Manual)**
 
