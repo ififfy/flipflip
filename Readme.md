@@ -2,11 +2,11 @@
 
 A random slideshow of images from your computer. Runs on Mac and Windows.
 
-## [Instructions](https://github.com/ififfy/flipflip/releases)
+## Instructions
 
-[Mac download](https://github.com/ififfy/flipflip/releases/download/v1.0.0/FlipFlip-Mac.zip)
+**[Downloads (Mac/Windows/Linux)](https://github.com/ififfy/flipflip/releases)**
 
-[Windows download](https://github.com/ififfy/flipflip/releases/download/v1.0.0/FlipFlip-Windows.zip)
+**[User manual](https://github.com/ififfy/flipflip/wiki/FlipFlip-User-Manual)**
 
 If you are on a Mac, you might need to open this by right-clicking the
 application, selecting "Open," and accepting all the stupid prompts
