@@ -12,13 +12,36 @@ class ScenePickerItem extends React.Component {
       <div
           className="ScenePickerItem u-clickable"
           onClick={this.onClick.bind(this)}>
-        {this.props.scene.name}
+        <div className="ScenePickerItem__Title">
+          {this.props.scene.name}
+        </div>
       </div>
     );
   }
 
   onClick() {
     this.props.onSelect(this.props.scene);
+  }
+}
+
+class Link extends React.Component {
+  readonly props: {
+    url: string,
+    onClick?(): void,
+    children?: React.ReactNode,
+  }
+
+  render() {
+    return <a href={this.props.url} onClick={this.onClick.bind(this)}>{this.props.children}</a>
+  }
+
+  onClick(e: Event) {
+    e.preventDefault();
+    if (this.props.onClick) {
+      this.props.onClick();
+    } else {
+      remote.shell.openExternal(this.props.url);
+    }
   }
 }
 
@@ -32,43 +55,31 @@ export default class ScenePicker extends React.Component {
   render() {
     return (
       <div className="ScenePicker">
+        <div className="About">
+          <h1>FlipFlip</h1>
+
+          <p><Link url="https://github.com/ififfy/flipflip/wiki/FlipFlip-User-Manual">User manual</Link></p>
+
+          <p>
+            <Link url="https://github.com/ififfy/flipflip/issues">Report a problem or suggest an improvement</Link>
+          </p>
+
+          <p>
+            If you like FlipFlip, drop me a line at <a href="mailto:ififfy@mm.st">ififfy@mm.st</a> and tell me
+            about how you're using it. :-)
+          </p>
+
+        </div>
+
         <div className="ScenePicker__Scenes">
           {this.props.scenes.map((scene) =>
             <ScenePickerItem key={`${scene.id}`} scene={scene} onSelect={this.props.onSelect
           } />)}
-          <div key="add" className="ScenePickerItem u-clickable" onClick={this.onAdd.bind(this)}>+ Add scene</div>
-        </div>
-
-        <div className="About">
-          <h1>FlipFlip</h1>
-
-          <p>
-            This program displays random images from your hard drive on a timer. Click
-            'Add Scene' to the left, add some directories, and press Play! You might
-            need to click the window first to make it work.
-          </p>
-
-          <p>
-            While the slideshow is playing, you can press Space to pause, and use the
-            arrow keys to move through the history. Press Cmd/Ctrl+F to fullscreen.
-          </p>
-
-          <p>
-            Each time the image changes, one of the directories is chosen randomly, then
-            one image inside that directory is chosen randomly.
-          </p>
-
-          <p>
-            FlipFlip is <em>giftware:</em> if you like it, send something nice
-            to <a href="mailto:ififfy@mm.st">ififfy@mm.st</a>. Perhaps a BTSync/Dropbox
-            folder of your favorite FlipFlip images, or links to good image blogs. (The
-            software itself is G-rated, but don't let that limit you…)
-          </p>
-
-          <p>
-            Offer bug reports and feature suggestions at <a href="https://github.com/ififfy/flipflip/issues">https://github.com/ififfy/flipflip/issues</a>.
-          </p>
-
+          <div key="add" className="ScenePickerItem u-clickable" onClick={this.onAdd.bind(this)}>
+            <div className="ScenePickerItem__Title">
+              + Add scene
+            </div>
+          </div>
         </div>
       </div>
     );
