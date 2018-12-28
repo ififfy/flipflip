@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { remote } from 'electron';
 const { Menu, app } = remote;
+import Sound from 'react-sound';
 
 import Scene from '../../Scene';
 import HeadlessScenePlayer from './HeadlessScenePlayer';
@@ -33,6 +34,9 @@ export default class Player extends React.Component {
   render() {
     const canGoBack = this.state.historyOffset > -this.state.historyLength;
     const canGoForward = this.state.historyOffset < -1;
+    const audioPlayStatus = this.state.isPlaying
+      ? (Sound as any).status.PLAYING
+      : (Sound as any).status.PAUSED;
     return (
       <div className="Player">
         <HeadlessScenePlayer
@@ -61,6 +65,13 @@ export default class Player extends React.Component {
 
         <div className={`u-button-row ${this.state.isPlaying ? 'u-show-on-hover-only' : ''}`}>
           <div className="u-button-row-right">
+            {this.props.scene.audioURL && (
+              <Sound
+                url={this.props.scene.audioURL}
+                playStatus={audioPlayStatus}
+                loop={true}
+                />
+            )}
             <div
               className={`FullscreenButton u-button u-clickable`}
               onClick={this.toggleFullscreen.bind(this)}>
@@ -117,6 +128,14 @@ export default class Player extends React.Component {
           { role: 'pasteandmatchstyle' },
           { role: 'delete' },
           { role: 'selectall' }
+        ]
+      },
+      {
+        label: 'View',
+        submenu: [
+          { role: 'reload' },
+          { role: 'forcereload' },
+          { role: 'toggledevtools' },
         ]
       },
       {
