@@ -1,6 +1,5 @@
 import wretch from 'wretch';
 import * as React from 'react';
-import {TK} from '../../const';
 
 let STYLES : {[style : string] : string} = {};
 
