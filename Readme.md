@@ -14,12 +14,11 @@ If you are on a Mac, you might need to open this by right-clicking the
 application, selecting "Open," and accepting all the stupid prompts
 that pop up.
 
-![Screenshot 1](/screenshot.png)
-![Screenshot 2](/screenshot2.png)
+![Screenshot](/screenshot2.png)
 
 ## History
 
-### 1.1 (in progress)
+### 1.1
 
 - Fresh UI for editing scenes
 - Overlay a scene on top of another with transparency
