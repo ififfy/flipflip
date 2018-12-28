@@ -94,7 +94,7 @@ export default class GooninatorImporter extends React.Component {
   };
 
   importURLChange(value: string) {
-    this.setState({importURL: value);
+    this.setState({importURL: value});
   };
 
   addRootDir() {

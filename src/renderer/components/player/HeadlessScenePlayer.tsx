@@ -4,6 +4,7 @@ import recursiveReaddir from 'recursive-readdir';
 import fs from 'fs'
 import fileURL from 'file-url';
 import animated from 'animated-gif-detector';
+import wretch from 'wretch';
 
 import Scene from '../../Scene';
 import ImagePlayer from './ImagePlayer';
@@ -71,7 +72,20 @@ function loadLocalDirectory(path: string, filter: string): Promise<Array<string>
 
 function loadRemoteImageURLList(url: string, filter: string): Promise<Array<string>> {
   return new Promise<Array<string>>((resolve, reject) => {
-    resolve([]);
+    wretch(url)
+      .get()
+      .text(data => {
+        const lines = data.match(/[^\r\n]+/g).filter((line) => line.startsWith("http"));
+        if (!lines.length) {
+          console.warn("No lines in", url, "start with 'http://'")
+        }
+        resolve(lines);
+      })
+      .catch((e) => {
+        console.warn("Fetch error on", url);
+        console.warn(e);
+        resolve([]);
+      });
   });
 }
 
