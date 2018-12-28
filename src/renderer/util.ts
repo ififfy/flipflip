@@ -1,6 +1,7 @@
 import {sep, join} from 'path';
 
 export function pathname(p: string, all: Array<string>): string {
+  return p;
   const parts = p.split(sep).reverse();
   const allParts = all
     .filter((p2) => p2 != p)
