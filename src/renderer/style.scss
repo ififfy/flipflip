@@ -678,6 +678,7 @@ label.SimpleCheckbox {
 
 @for $i from 1 through 20 {
   .zoom-#{$i}s img {
+    animation-timing-function: ease-out;
     -webkit-animation: keyframes-zoom #{$i}s;
     animation: keyframes-zoom #{$i}s;
     -webkit-transform: scale(1,1);
@@ -691,6 +692,7 @@ label.SimpleCheckbox {
 
 @for $i from 1 through 20 {
   .zoom-r#{$i}s img {
+    animation-timing-function: ease-out;
     -webkit-animation: keyframes-zoom-out #{$i}s;
     animation: keyframes-zoom-out #{$i}s;
     -webkit-transform: scale(1.5,1.5);
