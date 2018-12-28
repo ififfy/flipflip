@@ -6,6 +6,7 @@ import {pathname} from '../../util';
 
 type Props = {
   directories: Array<string>,
+  onImportURL(): void,
   onChange(directories: Array<string>): void,
 };
 
@@ -22,7 +23,7 @@ export default class DirectoryPicker extends React.Component {
           return (
             <div
               className="DirectoryPicker__Directory"
-              key={(directory as unknown) as number}>
+              key={(directory as any) as number}>
               {pathname(directory, this.props.directories)}
               <div
                 onClick={this.onRemove.bind(this, directory)}
@@ -31,14 +32,15 @@ export default class DirectoryPicker extends React.Component {
           );
         })}
         <div className='u-button u-clickable' onClick={this.onAdd.bind(this)}>+ Add local files</div>
-        <div className='u-button u-clickable' onClick={this.toggleRemoveAllModal.bind(this)} style={{float: 'left'}}>- Remove All</div>
+        <div className='u-button u-clickable' onClick={this.props.onImportURL.bind(this)}>+ Import URL</div>
+        <div className='u-button u-clickable u-float-left' onClick={this.toggleRemoveAllModal.bind(this)}>- Remove All</div>
 
         {this.state.removeAllIsOpen && (
-          <Modal onClose={this.toggleRemoveAllModal.bind(this)}>
-            <div>Are you sure you want to remove all?</div>
-            <button onClick={this.removeAll.bind(this)}>
+          <Modal onClose={this.toggleRemoveAllModal.bind(this)} title="Remove all?">
+            <p>Are you sure you want to remove everything from this scene?</p>
+            <div className="u-button" onClick={this.removeAll.bind(this)}>
               OK
-            </button>
+            </div>
           </Modal>
         )}
       </div>

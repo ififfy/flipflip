@@ -4,7 +4,7 @@ export default class Modal extends React.Component {
   readonly props: {
     title: string,
     onClose(): void,
-    children: JSX.Element[]
+    children?: React.ReactNode,
   };
 
   render() {

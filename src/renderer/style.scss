@@ -140,6 +140,14 @@ a {
   z-index: -1;
 }
 
+.u-float-left {
+  float: left !important;
+}
+
+.u-float-right {
+  float: right !important;
+}
+
 /* attributes */
 
 .u-clickable {
@@ -298,6 +306,107 @@ a {
   }
 }
 
+.SimpleTextInput {
+  input[type=text] {
+    font-size: 16px;
+    font-weight: 400;
+    display: block;
+    width: 100%;
+    margin-bottom: 0;
+  }
+}
+.SimpleSliderInput {
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 10px;
+    border-radius: 5px;
+    outline: none;
+    -webkit-transition: opacity .2s ease-in-out;
+    transition: opacity .2s ease-in-out;
+
+    &:disabled {
+      opacity: 0.5;
+    }
+
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      background: #3f96d0;
+      cursor: pointer;
+    }
+
+    &::-moz-range-thumb {
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      background: #3f96d0;
+      cursor: pointer;
+    }
+  }
+}
+
+label.SimpleCheckbox {
+  display: block;
+  padding-left: 15px;
+  text-indent: -15px;
+  input {
+    width: 13px;
+    height: 13px;
+    padding: 0;
+    margin:0;
+    vertical-align: bottom;
+    position: relative;
+    top: -1px;
+    *overflow: hidden;
+  }
+}
+
+.TabbedSections {
+  .TabbedSections__Content {
+    border: 1px solid $black;
+  }
+}
+
+.Tab {
+  display: inline-block;
+  padding: $smallPadding;
+  border-top: 1px solid $black;
+  border-right: 1px solid $black;
+  z-index: 1;
+  margin-bottom: -1px;
+  font-weight: 700;
+
+  &:first-child {
+    border-left: 1px solid $black;
+  }
+
+  &.m-active {
+    background-color: $uiGray;
+  }
+
+  &.m-inactive {
+    background-color: lighten($uiGray, 20%);
+    color: lighten($black, 20%);
+    cursor: pointer;
+
+    &:hover {
+      background-color: darken($uiGray, 20%);
+    }
+  }
+}
+
+.TabContent {
+  padding: $smallPadding;
+
+  &.m-hidden {
+    display: none;
+  }
+}
+
 .SceneDetail {
   .SceneName {
     display: inline-block;
@@ -341,44 +450,6 @@ a {
     padding-bottom: 9px;
     label {
       margin-right: 0.5rem;
-    }
-  }
-  .SimpleTextInput {
-    input[type=text] {
-      font-size: 16px;
-      font-weight: 400;
-      display: block;
-      width: 100%;
-      margin-bottom: 0;
-    }
-  }
-  .SimpleSliderInput {
-    input[type=range] {
-      -webkit-appearance: none;
-      width: 100%;
-      height: 10px;
-      border-radius: 5px;
-      outline: none;
-      -webkit-transition: opacity .2s ease-in-out;
-      transition: opacity .2s ease-in-out;
-
-      &::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: 17px;
-        height: 17px;
-        border-radius: 50%;
-        background: #3f96d0;
-        cursor: pointer;
-      }
-
-      &::-moz-range-thumb {
-        width: 17px;
-        height: 17px;
-        border-radius: 50%;
-        background: #3f96d0;
-        cursor: pointer;
-      }
     }
   }
 }
@@ -456,6 +527,7 @@ a {
 }
 
 .Modal {
+  color: $black;
   position: fixed;
   top: 0;
   bottom: 0;
@@ -519,22 +591,6 @@ a {
     &:hover {
       background-color: rgba(0, 0, 0, 0.1);
     }
-  }
-}
-
-label.SimpleCheckbox {
-  display: block;
-  padding-left: 15px;
-  text-indent: -15px;
-  input {
-    width: 13px;
-    height: 13px;
-    padding: 0;
-    margin:0;
-    vertical-align: bottom;
-    position: relative;
-    top: -1px;
-    *overflow: hidden;
   }
 }
 
