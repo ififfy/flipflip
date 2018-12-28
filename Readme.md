@@ -8,6 +8,8 @@ A random slideshow of images from your computer. Runs on Mac and Windows.
 
 **[User manual](https://github.com/ififfy/flipflip/wiki/FlipFlip-User-Manual)**
 
+**[Subreddit](https://www.reddit.com/r/flipflip/)**
+
 If you are on a Mac, you might need to open this by right-clicking the
 application, selecting "Open," and accepting all the stupid prompts
 that pop up.
