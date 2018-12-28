@@ -1,47 +1,47 @@
 import * as React from 'react'
-import Modal from "../ui/Modal";
 import {sep} from "path";
 import {remote} from "electron";
 import {TK} from '../../const';
+import SimpleTextInput from '../ui/SimpleTextInput';
 
-export default class URLImporter extends React.Component {
+export default class GooninatorImporter extends React.Component {
   readonly props: {
     directories: Array<string>,
     onChangeDirectories(directories: Array<string>): void,
     onChangeTextKind(kind: string) : void,
     onChangeTextSource(hbID: string) : void,
+    onDidImport(): void,
   };
 
   readonly state = {
-    importIsOpen: false,
     importURL: "",
     rootDir: "",
   };
 
   render() {
     return (
-      <div className="URLImporter">
-        <div className='u-button u-clickable' onClick={this.toggleImportModal.bind(this)}>+ Import From URL</div>
-        {this.state.importIsOpen && (
-            <Modal onClose={this.toggleImportModal.bind(this)} title="Import URL">
-              <div>Enter a gooninator URL for import:</div>
-              <input type="text" name="url" onChange={this.importURLChange.bind(this)}/>
-              <div>Enter the parent directory to look in:</div>
-              <input type="text" name="root" value={this.state.rootDir} readOnly onClick={this.addRootDir.bind(this)}/>
-              <div className="u-button" onClick={this.doImport.bind(this)}>
-                Import
-              </div>
-            </Modal>
-        )}
-        <div style={{clear: 'both'}}></div>
+      <div className="GooninatorImporter">
+        <SimpleTextInput
+          label="Paste a gooninator URL for import:"
+          value={this.state.importURL}
+          onChange={this.importURLChange.bind(this)}
+          isEnabled={true} />
+
+        <p>Enter the parent directory to look in:</p>
+        <p>
+          <input type="text" name="root" value={this.state.rootDir} readOnly onClick={this.addRootDir.bind(this)}/>
+        </p>
+        <div className="u-button u-float-right" onClick={this.doImport.bind(this)}>
+          Import
+        </div>
+        <div style={{clear: 'both'}} />
       </div>
-    )
+    );
   }
 
   doImport() {
     let importURL = this.state.importURL;
     let hastebinURL = this.state.importURL;
-    this.toggleImportModal();
     if (!importURL) {
       return;
     }
@@ -89,17 +89,12 @@ export default class URLImporter extends React.Component {
       this.props.onChangeTextKind(TK.hastebin);
       this.props.onChangeTextSource(hastebinURL);
     }
+
+    this.props.onDidImport();
   };
 
-  toggleImportModal() {
-    this.setState({
-      importIsOpen: !this.state.importIsOpen,
-      importURL: ""
-    });
-  };
-
-  importURLChange(e: React.FormEvent<HTMLInputElement>) {
-    this.setState({importURL: e.currentTarget.value});
+  importURLChange(value: string) {
+    this.setState({importURL: value);
   };
 
   addRootDir() {
