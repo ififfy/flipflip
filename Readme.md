@@ -15,6 +15,43 @@ that pop up.
 ![Screenshot 1](/screenshot.png)
 ![Screenshot 2](/screenshot2.png)
 
+## History
+
+### 1.1 (in progress)
+
+- Fresh UI for editing scenes
+- Overlay a scene on top of another with transparency
+- Load text scripts from any URL, not just Hastebin
+- Audio loops
+- Images can be loaded from the web. Create a text file containing one image URL per line, and use
+  the "Import URL" option.
+
+### 1.0.4
+
+- Hotkeys work more often
+- Don't show images <200px in either dimension
+- Bug fixes
+
+### 1.0.3
+
+- Linux support
+- Better zoom
+- Text script support with Hastebin
+- Configurable timing down to the millisecond
+- Gifs no longer count as animated if they only have one frame
+
+### 1.0.2
+
+- Zoom
+- More timing options
+- Gooninator URL import
+
+### 1.0.1
+
+- Fullscreen toggle
+- Cross-fade images as they change
+- Bug fixes
+
 ## Developers
 
 FlipFlip is an Electron app written in TypeScript and React.
