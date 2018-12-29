@@ -177,7 +177,7 @@ export default class HeadlessScenePlayer extends React.Component {
           // The scene can configure which of these branches to take
           if (this.props.scene.weightDirectoriesEqually) {
             // Just add the new urls to the end of the list
-            newAllURLs = this.state.allURLs.concat([urls]);
+            newAllURLs = newAllURLs.concat([urls]);
           } else {
             if (newAllURLs.length == 0) newAllURLs = [[]];
             // Append to a single list of urls
