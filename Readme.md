@@ -18,6 +18,11 @@ that pop up.
 
 ## History
 
+### 1.1.1
+
+- Fix bug where only one source would be displayed
+- Remove code that figures out if gifs are animated or not. It was just too slow to run.
+
 ### 1.1
 
 - Fresh UI for editing scenes
