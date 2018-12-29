@@ -190,13 +190,10 @@ a {
   left: 0;
   right: 0;
 
+  padding: $smallPadding;
+  overflow: auto;
+
   .About {
-    overflow: auto;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 50%;
-    padding: $smallPadding;
 
     h1:first-child {
       margin-top: 0;
@@ -204,25 +201,28 @@ a {
   }
 
   .ScenePicker__Scenes {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 50%;
-    overflow: auto;
-    border-right: 1px solid $black;
-    padding: $smallPadding;
+    display: flex;
+
+    & > * {
+      margin-right: $smallPadding;
+      height: 4rem;
+      min-width: 6rem;
+      max-width: 8rem;
+    }
   }
 
   .ScenePickerItem {
-    // margin: $smallPadding;
-    // border-radius: $smallPadding;
-    display: block;
-    text-align: center;
-    // border: 1px solid $blue;
     background-color: $white;
     color: $black !important;
     padding: $smallPadding;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .ScenePickerItem__Title {
+      text-align: center;
+    }
 
     &:hover {
       background-color: $buttonBottom;
