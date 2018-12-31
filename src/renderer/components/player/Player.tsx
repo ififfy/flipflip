@@ -27,13 +27,13 @@ export default class Player extends React.Component {
   readonly state = {
     isLoaded: false,
     isPlaying: false,
-    historyOffset: -1,
+    historyOffset: 0,
     historyLength: 0,
   }
 
   render() {
     const canGoBack = this.state.historyOffset > -this.state.historyLength;
-    const canGoForward = this.state.historyOffset < -1;
+    const canGoForward = this.state.historyOffset < 0;
     const audioPlayStatus = this.state.isPlaying
       ? (Sound as any).status.PLAYING
       : (Sound as any).status.PAUSED;
@@ -165,7 +165,7 @@ export default class Player extends React.Component {
   }
 
   play() {
-    this.setState({isPlaying: true, historyOffset: -1});
+    this.setState({isPlaying: true, historyOffset: 0});
   }
 
   pause() {
@@ -173,7 +173,10 @@ export default class Player extends React.Component {
   }
 
   historyBack() {
-    this.setState({isPlaying: false, historyOffset: this.state.historyOffset - 1});
+    this.setState({
+      isPlaying: false,
+      historyOffset: this.state.historyOffset == 0 ? -2 : this.state.historyOffset - 1,
+    });
   }
 
   historyForward() {
