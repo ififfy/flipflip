@@ -18,6 +18,10 @@ that pop up.
 
 ## History
 
+### 1.1.2
+
+- Fix two images loading at once
+
 ### 1.1.1
 
 - Fix bug where only one source would be displayed
