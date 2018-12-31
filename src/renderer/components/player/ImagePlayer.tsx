@@ -90,7 +90,6 @@ export default class ImagePlayer extends React.Component {
 
   componentDidMount() {
     this._isMounted = true;
-    this.start();
   }
 
   componentWillUnmount() {
