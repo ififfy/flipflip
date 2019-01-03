@@ -63,7 +63,7 @@ export default class GooninatorImporter extends React.Component {
       // Append root onto each blog
       for (let u = 0; u < importURLs.length; u++) {
         let fullPath = rootDir + importURLs[u];
-        if (this.props.directories.includes(fullPath) || importURLs[u] === sep || importURLs[u] === "") {
+        if (this.props.directories.includes(fullPath) || importURLs.includes(fullPath) || importURLs[u] === sep || importURLs[u] === "") {
           // Remove index and push u back
           importURLs.splice(u, 1);
           u -= 1
