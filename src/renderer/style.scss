@@ -202,6 +202,8 @@ a {
 
   .ScenePicker__Scenes {
     display: flex;
+    flex-wrap: wrap;
+    overflow: auto;
 
     & > * {
       margin-right: $smallPadding;
@@ -215,6 +217,7 @@ a {
     background-color: $white;
     color: $black !important;
     padding: $smallPadding;
+    margin-bottom: $smallPadding;
 
     display: flex;
     justify-content: center;
