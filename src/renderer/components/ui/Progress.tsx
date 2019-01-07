@@ -1,0 +1,45 @@
+import React from 'react';
+import ProgressBar from 'progressbar.js'
+
+export default class Modal extends React.Component {
+  readonly props: {
+    total: number,
+    current: number,
+    message: string,
+  };
+
+  readonly state: {
+    progress: any
+  };
+
+  render() {
+    return (
+      <div className="ProgressIndicator">
+        <div className="ProgressContainer">
+          <div className="progress" id="progress"/>
+        </div>
+      </div>
+    );
+  }
+
+  componentDidMount() {
+    this.setState({progress: new ProgressBar.Circle('#progress', {
+      color: '#FFFFFF',
+      strokeWidth: 2,
+      text: {
+        value: this.props.message + "<br/>" + this.props.current + " / " + this.props.total,
+      },
+    })});
+  }
+
+  shouldComponentUpdate(nextProps: any, nextState: any) {
+    return nextProps.current !== this.props.current;
+  }
+
+  componentWillReceiveProps(props : any) {
+    if (this.state && this.state.progress && props.current != this.props.current) {
+      this.state.progress.animate(props.current / this.props.total);
+      this.state.progress.setText("<p>" + this.props.message + "</p><p>" + props.current + " / " + this.props.total + "</p>");
+    }
+  }
+};
