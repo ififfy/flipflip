@@ -33,6 +33,7 @@
     "animated-gif-detector": "^1.2.0",
     "file-url": "^2.0.2",
     "lodash": "^4.17.11",
+    "progressbar.js": "^1.0.1",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
     "react-sound": "^1.2.0",

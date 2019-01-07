@@ -22,3 +22,4 @@ declare module '*.icns' {
 declare module 'file-url';
 declare module 'recursive-readdir';
 declare module 'animated-gif-detector';
+declare module 'progressbar.js';
