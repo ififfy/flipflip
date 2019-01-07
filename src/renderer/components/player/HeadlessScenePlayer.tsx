@@ -7,6 +7,7 @@ import fileURL from 'file-url';
 import wretch from 'wretch';
 
 import Scene from '../../Scene';
+import Progress from '../ui/Progress';
 import ImagePlayer from './ImagePlayer';
 import CaptionProgram from './CaptionProgram';
 import { TK, IF } from '../../const';
@@ -61,10 +62,10 @@ function isURL(maybeURL: string): boolean {
   return maybeURL.startsWith('http');  // lol
 }
 
-function loadLocalDirectory(path: string, filter: string): Promise<Array<string>> {
+function loadLocalDirectory(path: string, filter: string): CancelablePromise {
   const blacklist = ['*.css', '*.html', 'avatar.png'];
 
-  return new Promise<Array<string>>((resolve, reject) => {
+  return new CancelablePromise((resolve, reject) => {
     recursiveReaddir(path, blacklist, (err: any, rawFiles: Array<string>) => {
       if (err) console.warn(err);
       resolve(filterPathsToJustImages(filter, rawFiles).map((p) => fileURL(p)));
@@ -72,8 +73,8 @@ function loadLocalDirectory(path: string, filter: string): Promise<Array<string>
   });
 }
 
-function loadRemoteImageURLList(url: string, filter: string): Promise<Array<string>> {
-  return new Promise<Array<string>>((resolve, reject) => {
+function loadRemoteImageURLList(url: string, filter: string): CancelablePromise {
+  return new CancelablePromise((resolve, reject) => {
     wretch(url)
       .get()
       .text(data => {
@@ -91,6 +92,31 @@ function loadRemoteImageURLList(url: string, filter: string): Promise<Array<stri
   });
 }
 
+// Inspired by https://reactjs.org/blog/2015/12/16/ismounted-antipattern.html
+class CancelablePromise extends Promise<Array<string>> {
+  hasCanceled_ : boolean;
+
+
+  constructor(executor: (resolve: (value?: (PromiseLike<Array<string>> | Array<string>)) => void, reject: (reason?: any) => void) => void) {
+    super(executor);
+    this.hasCanceled_ = false;
+  }
+
+  getPromise() : Promise<Array<string>> {
+    return new Promise((resolve, reject) => {
+      this.then(
+          val => this.hasCanceled_ ? null : resolve(val),
+          error => this.hasCanceled_ ? null : reject(error)
+      );
+    });
+  }
+
+  cancel() {
+    this.hasCanceled_ = true;
+  }
+
+}
+
 export default class HeadlessScenePlayer extends React.Component {
   readonly props: {
     scene: Scene,
@@ -102,12 +128,15 @@ export default class HeadlessScenePlayer extends React.Component {
     historyOffset: number,
     setHistoryLength: (historyLength: number) => void,
     didFinishLoading: () => void,
-  }
+  };
 
   readonly state = {
     isLoaded: false,
+    promise: new CancelablePromise((resolve, reject) => {}),
+    directoriesProcessed: 0,
+    progressMessage: "",
     allURLs: Array<Array<string>>(),
-  }
+  };
 
   render() {
     const showImagePlayer = this.state.isLoaded;
@@ -149,10 +178,10 @@ export default class HeadlessScenePlayer extends React.Component {
         )}
 
         {showLoadingIndicator && (
-          <div className="LoadingIndicator">
-            <div className="loader" />
-            <div className="LoadingIndicator__Text">Building image list</div>
-          </div>
+          <Progress
+            total={this.props.scene.directories.length}
+            current={this.state.directoriesProcessed}
+            message={this.state.progressMessage}/>
         )}
 
         {showEmptyIndicator && (
@@ -163,21 +192,25 @@ export default class HeadlessScenePlayer extends React.Component {
   }
 
   componentDidMount() {
-    let n = this.props.scene.directories.length;
+    let n = 0;
     this.setState({allURLs: []});
-
     let newAllURLs = Array<Array<string>>();
 
-    this.props.scene.directories.forEach((d) => {
-      const loadPromise = (isURL(d)
-        ? loadRemoteImageURLList(d, this.props.scene.imageTypeFilter)
-        : loadLocalDirectory(d, this.props.scene.imageTypeFilter))
-      
-        loadPromise.then((urls) => {
-          n -= 1;
+    function directoryLoop(e : HeadlessScenePlayer) {
+      let d = e.props.scene.directories[n];
+      let loadPromise = (isURL(d)
+          ? loadRemoteImageURLList(d, e.props.scene.imageTypeFilter)
+          : loadLocalDirectory(d, e.props.scene.imageTypeFilter));
+
+      e.setState({promise: loadPromise, progressMessage: d});
+
+      loadPromise
+        .getPromise()
+        .then((urls) => {
+          n += 1;
 
           // The scene can configure which of these branches to take
-          if (this.props.scene.weightDirectoriesEqually) {
+          if (e.props.scene.weightDirectoriesEqually) {
             // Just add the new urls to the end of the list
             newAllURLs = newAllURLs.concat([urls]);
           } else {
@@ -186,11 +219,20 @@ export default class HeadlessScenePlayer extends React.Component {
             newAllURLs[0] = newAllURLs[0].concat(urls);
           }
 
-          if (n == 0) {
-            this.setState({allURLs: newAllURLs, isLoaded: true});
-            setTimeout(this.props.didFinishLoading, 0);
+          if (n < e.props.scene.directories.length) {
+            e.setState({directoriesProcessed: (n + 1)});
+            directoryLoop(e);
+          } else {
+            e.setState({allURLs: newAllURLs, isLoaded: true});
+            setTimeout(e.props.didFinishLoading, 0);
           }
         })
-    });
+    }
+
+    directoryLoop(this);
+  }
+
+  componentWillUnmount() {
+    this.state.promise.cancel(); // Cancel the promise
   }
 }
