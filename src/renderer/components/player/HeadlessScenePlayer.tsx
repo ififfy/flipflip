@@ -13,7 +13,7 @@ import CaptionProgram from './CaptionProgram';
 import { TK, IF } from '../../const';
 
 function isImage(path: string): boolean {
-  const p = path.toLowerCase()
+  const p = path.toLowerCase();
   if (p.endsWith('.gif')) return true;
   if (p.endsWith('.png')) return true;
   if (p.endsWith('.jpeg')) return true;
@@ -33,7 +33,7 @@ function filterPathsToJustImages(imageTypeFilter: string, paths: Array<string>):
       return paths.filter((f) => f.toLowerCase().endsWith('.gif'));
     case IF.stills:
       return paths.filter((f) => {
-        const p = f.toLowerCase()
+        const p = f.toLowerCase();
         // if (p.endsWith('.gif') && !animated(fs.readFileSync(f))) return true;
         if (p.endsWith('.gif')) return false;
         if (p.endsWith('.png')) return true;
@@ -114,7 +114,6 @@ class CancelablePromise extends Promise<Array<string>> {
   cancel() {
     this.hasCanceled_ = true;
   }
-
 }
 
 export default class HeadlessScenePlayer extends React.Component {
@@ -196,18 +195,18 @@ export default class HeadlessScenePlayer extends React.Component {
     this.setState({allURLs: []});
     let newAllURLs = Array<Array<string>>();
 
-    function directoryLoop(e : HeadlessScenePlayer) {
-      let d = e.props.scene.directories[n];
+    let directoryLoop = () => {
+      let d = this.props.scene.directories[n];
       let loadPromise = (isURL(d)
-          ? loadRemoteImageURLList(d, e.props.scene.imageTypeFilter)
-          : loadLocalDirectory(d, e.props.scene.imageTypeFilter));
+          ? loadRemoteImageURLList(d, this.props.scene.imageTypeFilter)
+          : loadLocalDirectory(d, this.props.scene.imageTypeFilter));
 
       let message = d;
-      if (e.props.historyOffset == -1) {
+      if (this.props.historyOffset == -1) {
         message = "<p>Loading Overlay...</p>" + d;
       }
 
-      e.setState({promise: loadPromise, progressMessage: message});
+      this.setState({promise: loadPromise, progressMessage: message});
 
       loadPromise
         .getPromise()
@@ -216,7 +215,7 @@ export default class HeadlessScenePlayer extends React.Component {
 
           // The scene can configure which of these branches to take
           if (urls.length > 0) {
-            if (e.props.scene.weightDirectoriesEqually) {
+            if (this.props.scene.weightDirectoriesEqually) {
               // Just add the new urls to the end of the list
               newAllURLs = newAllURLs.concat([urls]);
             } else {
@@ -226,17 +225,19 @@ export default class HeadlessScenePlayer extends React.Component {
             }
           }
 
-          if (n < e.props.scene.directories.length) {
-            e.setState({directoriesProcessed: (n + 1)});
-            directoryLoop(e);
+          if (n < this.props.scene.directories.length) {
+            this.setState({directoriesProcessed: (n + 1)});
+            directoryLoop();
           } else {
-            e.setState({allURLs: newAllURLs, isLoaded: true});
-            setTimeout(e.props.didFinishLoading, 0);
+            this.setState({allURLs: newAllURLs, isLoaded: true});
+            setTimeout(this.props.didFinishLoading, 0);
           }
-        })
-    }
+        }
+      )
+    };
 
-    directoryLoop(this);
+    directoryLoop();
+
   }
 
   componentWillUnmount() {
