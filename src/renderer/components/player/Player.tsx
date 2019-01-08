@@ -25,7 +25,8 @@ export default class Player extends React.Component {
   }
 
   readonly state = {
-    isLoaded: false,
+    isMainLoaded: false,
+    isOverlayLoaded: false,
     isPlaying: false,
     historyOffset: 0,
     historyLength: 0,
@@ -37,6 +38,8 @@ export default class Player extends React.Component {
     const audioPlayStatus = this.state.isPlaying
       ? (Sound as any).status.PLAYING
       : (Sound as any).status.PAUSED;
+    const showOverlayIndicator = this.state.isMainLoaded && !this.state.isOverlayLoaded;
+
     return (
       <div className="Player">
         <HeadlessScenePlayer
@@ -47,7 +50,7 @@ export default class Player extends React.Component {
           showLoadingState={true}
           showEmptyState={true}
           showText={true}
-          didFinishLoading={this.play.bind(this)}
+          didFinishLoading={this.playMain.bind(this)}
           setHistoryLength={this.setHistoryLength.bind(this)} />
 
         {this.props.overlayScene && (
@@ -56,10 +59,10 @@ export default class Player extends React.Component {
             scene={this.props.overlayScene}
             historyOffset={-1}
             isPlaying={this.state.isPlaying}
-            showLoadingState={false}
+            showLoadingState={showOverlayIndicator}
             showEmptyState={false}
             showText={false}
-            didFinishLoading={this.nop.bind(this)}  
+            didFinishLoading={this.playOverlay.bind(this)}
             setHistoryLength={this.nop.bind(this)} />
         )}
 
@@ -166,6 +169,20 @@ export default class Player extends React.Component {
 
   play() {
     this.setState({isPlaying: true, historyOffset: 0});
+  }
+
+  playMain() {
+    this.setState({isMainLoaded: true});
+    if (!this.props.overlayScene || this.state.isOverlayLoaded) {
+      this.play();
+    }
+  }
+
+  playOverlay() {
+    this.setState({isOverlayLoaded: true});
+    if (this.state.isMainLoaded) {
+      this.play();
+    }
   }
 
   pause() {
