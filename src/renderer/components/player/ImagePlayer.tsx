@@ -2,7 +2,9 @@ import * as React from 'react';
 
 import ImageView from './ImageView';
 import TIMING_FUNCTIONS from '../../TIMING_FUNCTIONS';
-import {TF, ZF} from '../../const';
+import {IF, TF, ZF} from '../../const';
+import fs from "fs";
+import animated from 'animated-gif-detector';
 
 function choice<T>(items: Array<T>): T {
   const i = Math.floor(Math.random() * items.length);
@@ -20,11 +22,12 @@ export default class ImagePlayer extends React.Component {
     timingConstant: string,
     zoomType: string,
     zoomLevel: number,
+    imageTypeFilter: string,
     historyOffset: number,
     fadeEnabled: boolean,
     imageSizeMin: number,
     setHistoryLength: (historyLength: number) => void,
-  }
+  };
 
   readonly state = {
     numBeingLoaded: 0,
@@ -33,7 +36,7 @@ export default class ImagePlayer extends React.Component {
     historyPaths: Array<string>(),
     timeToNextFrame: 0,
     timeoutID: 0,
-  }
+  };
 
   _isMounted = false;
 
@@ -166,6 +169,17 @@ export default class ImagePlayer extends React.Component {
     img.onerror = () => {
       setTimeout(errorCallback, 0);
     };
+
+    // Filter gifs by animation
+    if (url.toLocaleLowerCase().endsWith('.gif')) {
+      // Exclude non-animated gifs from gifs
+      if (this.props.imageTypeFilter == IF.gifs && !animated(fs.readFileSync(url.replace("file:///", "")))) {
+        return;
+      // Exclude animated gifs from stills
+      } else if (this.props.imageTypeFilter == IF.stills && animated(fs.readFileSync(url.replace("file:///", "")))) {
+        return;
+      }
+    }
 
     img.src = url;
   }
