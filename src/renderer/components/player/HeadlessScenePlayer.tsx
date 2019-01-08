@@ -202,7 +202,12 @@ export default class HeadlessScenePlayer extends React.Component {
           ? loadRemoteImageURLList(d, e.props.scene.imageTypeFilter)
           : loadLocalDirectory(d, e.props.scene.imageTypeFilter));
 
-      e.setState({promise: loadPromise, progressMessage: d});
+      let message = d;
+      if (e.props.historyOffset == -1) {
+        message = "<p>Loading Overlay...</p>" + d;
+      }
+
+      e.setState({promise: loadPromise, progressMessage: message});
 
       loadPromise
         .getPromise()
