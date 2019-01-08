@@ -30,8 +30,8 @@
     "webpack-cli": "^3.1.2"
   },
   "dependencies": {
-    "animated-gif-detector": "^1.2.0",
     "file-url": "^2.0.2",
+    "gif-info": "^1.0.1",
     "lodash": "^4.17.11",
     "progressbar.js": "^1.0.1",
     "react": "^16.6.3",
