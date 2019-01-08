@@ -4,7 +4,7 @@ import ImageView from './ImageView';
 import TIMING_FUNCTIONS from '../../TIMING_FUNCTIONS';
 import {IF, TF, ZF} from '../../const';
 import fs from "fs";
-import animated from 'animated-gif-detector';
+import gifInfo from 'gif-info';
 
 function choice<T>(items: Array<T>): T {
   const i = Math.floor(Math.random() * items.length);
@@ -131,6 +131,7 @@ export default class ImagePlayer extends React.Component {
     }
     const url = choice(collection);
     const img = new Image();
+    let duration : number;
 
     this.setState({numBeingLoaded: this.state.numBeingLoaded + 1});
 
@@ -154,6 +155,15 @@ export default class ImagePlayer extends React.Component {
       setTimeout(this.runFetchLoop.bind(this, i), 0);
     };
 
+    function toArrayBuffer(buf : Buffer) {
+      let ab = new ArrayBuffer(buf.length);
+      let view = new Uint8Array(ab);
+      for (let i = 0; i < buf.length; ++i) {
+        view[i] = buf[i];
+      }
+      return ab;
+    }
+
     img.onload = () => {
       // images may load immediately, but that messes up the setState()
       // lifecycle, so always load on the next event loop iteration.
@@ -172,11 +182,19 @@ export default class ImagePlayer extends React.Component {
 
     // Filter gifs by animation
     if (url.toLocaleLowerCase().endsWith('.gif')) {
+      // Get gif info. See https://github.com/Prinzhorn/gif-info
+      let info = gifInfo(toArrayBuffer(fs.readFileSync(url.replace("file:///", ""))));
+
+      // If gif is animated, store its duration
+      if (info.animated) {
+        duration = info.duration;
+      }
+
       // Exclude non-animated gifs from gifs
-      if (this.props.imageTypeFilter == IF.gifs && !animated(fs.readFileSync(url.replace("file:///", "")))) {
+      if (this.props.imageTypeFilter == IF.gifs && !info.animated) {
         return;
       // Exclude animated gifs from stills
-      } else if (this.props.imageTypeFilter == IF.stills && animated(fs.readFileSync(url.replace("file:///", "")))) {
+      } else if (this.props.imageTypeFilter == IF.stills && info.animated) {
         return;
       }
     }
