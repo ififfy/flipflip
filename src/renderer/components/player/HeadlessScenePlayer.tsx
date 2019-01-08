@@ -3,7 +3,6 @@ import * as ReactDOM from 'react-dom';
 import recursiveReaddir from 'recursive-readdir';
 import fs from 'fs'
 import fileURL from 'file-url';
-// import animated from 'animated-gif-detector';
 import wretch from 'wretch';
 
 import Scene from '../../Scene';
@@ -27,23 +26,10 @@ function isImage(path: string): boolean {
 function filterPathsToJustImages(imageTypeFilter: string, paths: Array<string>): Array<string> {
   switch (imageTypeFilter) {
     case IF.any:
+    case IF.stills:
       return paths.filter((p) => isImage(p));
     case IF.gifs:
-      // return paths.filter((f) => f.toLowerCase().endsWith('.gif') && animated(fs.readFileSync(f)));
       return paths.filter((f) => f.toLowerCase().endsWith('.gif'));
-    case IF.stills:
-      return paths.filter((f) => {
-        const p = f.toLowerCase();
-        // if (p.endsWith('.gif') && !animated(fs.readFileSync(f))) return true;
-        if (p.endsWith('.gif')) return false;
-        if (p.endsWith('.png')) return true;
-        if (p.endsWith('.jpeg')) return true;
-        if (p.endsWith('.jpg')) return true;
-        if (p.endsWith('.webp')) return true;
-        if (p.endsWith('.tiff')) return true;
-        if (p.endsWith('.svg')) return true;
-        return false;
-      });
     default:
       console.warn('unknown image type filter', imageTypeFilter);
       return paths.filter((p) => isImage(p));
@@ -167,6 +153,7 @@ export default class HeadlessScenePlayer extends React.Component {
             timingConstant={this.props.scene.timingConstant}
             zoomType={this.props.scene.zoomType}
             zoomLevel={this.props.scene.zoomLevel}
+            imageTypeFilter={this.props.scene.imageTypeFilter}
             isPlaying={this.props.isPlaying}
             fadeEnabled={this.props.scene.crossFade}
             imageSizeMin={this.props.scene.imageSizeMin}
