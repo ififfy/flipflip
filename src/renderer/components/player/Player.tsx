@@ -5,6 +5,12 @@ import Sound from 'react-sound';
 
 import Scene from '../../Scene';
 import HeadlessScenePlayer from './HeadlessScenePlayer';
+import SimpleOptionPicker from "../ui/SimpleOptionPicker";
+import {HTF, TF, VTF, ZF} from "../../const";
+import SimpleTextInput from "../ui/SimpleTextInput";
+import SimpleCheckbox from "../ui/SimpleCheckbox";
+import SimpleSliderInput from "../ui/SimpleSliderInput";
+import ControlGroup from "../sceneDetail/ControlGroup";
 
 const keyMap = {
   playPause: ['Play/Pause', 'space'],
@@ -20,6 +26,7 @@ export default class Player extends React.Component {
   readonly props: {
     goBack(): void,
     scene: Scene,
+    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
     overlayScene?: Scene,
   };
 
@@ -105,6 +112,54 @@ export default class Player extends React.Component {
             </div>
           </div>
           <div className="BackButton u-button u-clickable" onClick={this.props.goBack}>Back</div>
+        </div>
+
+        <div className={`u-button-sidebar ${this.state.isPlaying ? 'u-show-on-hover-only' : 'u-hidden'}`}>
+          <h2 className="SceneOptions">Scene Options</h2>
+          <ControlGroup title="Timing" isNarrow={true}>
+            <SimpleOptionPicker
+                onChange={this.onChangeTimingFunction.bind(this)}
+                label="Timing"
+                value={this.props.scene.timingFunction}
+                keys={Object.values(TF)} />
+            <SimpleTextInput
+                isEnabled={this.props.scene.timingFunction === TF.constant}
+                onChange={this.onChangeTimingConstant.bind(this)}
+                label="Time between images (ms)"
+                value={this.props.scene.timingConstant.toString()} />
+          </ControlGroup>
+
+          <ControlGroup title="Effects" isNarrow={true}>
+            <SimpleCheckbox
+                text="Cross-fade images"
+                isOn={this.props.scene.crossFade}
+                onChange={this.onChangeCrossFade.bind(this)} />
+
+            <div className="ControlSubgroup">
+              <SimpleOptionPicker
+                  onChange={this.onChangeZoomType.bind(this)}
+                  label="Zoom Type"
+                  value={this.props.scene.zoomType}
+                  keys={Object.values(ZF)} />
+              <SimpleSliderInput
+                  isEnabled={true}
+                  onChange={this.onChangeEffectLevel.bind(this)}
+                  label={"Effect Length: " + this.props.scene.effectLevel + "s"}
+                  min={1}
+                  max={20}
+                  value={this.props.scene.effectLevel.toString()} />
+              <SimpleOptionPicker
+                  onChange={this.onChangeHorizTransType.bind(this)}
+                  label="Translate Horizontally"
+                  value={this.props.scene.horizTransType}
+                  keys={Object.values(HTF)} />
+              <SimpleOptionPicker
+                  onChange={this.onChangeVertTransType.bind(this)}
+                  label="Translate Vertically"
+                  value={this.props.scene.vertTransType}
+                  keys={Object.values(VTF)} />
+            </div>
+          </ControlGroup>
         </div>
       </div>
     );
@@ -222,4 +277,22 @@ export default class Player extends React.Component {
       Menu.setApplicationMenu(null);
     }
   }
+
+  update(fn: (scene: Scene) => void) {
+    this.props.onUpdateScene(this.props.scene, fn);
+  }
+
+  onChangeTimingFunction(fnId: string) { this.update((s) => { s.timingFunction = fnId; }); }
+
+  onChangeTimingConstant(constant: string) { this.update((s) => { s.timingConstant = constant; }); }
+
+  onChangeCrossFade(value: boolean) { this.update((s) => { s.crossFade = value; }); }
+
+  onChangeZoomType(type: string) { this.update((s) => { s.zoomType = type; }); }
+
+  onChangeEffectLevel(level: number) { this.update((s) => { s.effectLevel = level; }); }
+
+  onChangeHorizTransType(type: string) { this.update((s) => { s.horizTransType = type; }); }
+
+  onChangeVertTransType(type: string) { this.update((s) => { s.vertTransType = type; }); }
 };

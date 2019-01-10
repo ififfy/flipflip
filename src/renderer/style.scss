@@ -14,6 +14,7 @@ $buttonBorder: #727272;
 
 $smallPadding: 0.5rem;
 $buttonBarHeight: 2rem + $smallPadding;
+$buttonSidebarWidth: 20rem + $smallPadding;
 
 @font-face {
   font-family: system;
@@ -74,11 +75,15 @@ a {
   background: linear-gradient(180deg, rgba(52,104,152,1) 0%, rgba(24,50,76,1) 100%);
 }
 
+.u-hidden {
+  display: none;
+}
+
 .u-button-row {
   @include noselect;
 
   position: relative;
-  z-index: 1;
+  z-index: 2;
   padding: $smallPadding $smallPadding 0 $smallPadding;
   height: $buttonBarHeight;
   @include buttonBarBackground;
@@ -95,6 +100,27 @@ a {
   .u-button {
     margin-right: $smallPadding;
     padding: 0.2rem;
+  }
+}
+
+.u-button-sidebar {
+  @include noselect;
+
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  padding: $smallPadding $smallPadding 0 $smallPadding;
+  width: $buttonSidebarWidth;
+  @include buttonBarBackground;
+
+  .SceneOptions {
+    display: inline-block;
+    margin-top: 0;
+    color: $black !important;
+    line-height: $buttonBarHeight;
   }
 }
 
