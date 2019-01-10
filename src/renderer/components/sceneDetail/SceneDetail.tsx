@@ -171,7 +171,7 @@ export default class SceneDetail extends React.Component {
                 onChange={this.onChangeOverlaySceneOpacity.bind(this)}
                 label={"Overlay opacity: " + (this.props.scene.overlaySceneOpacity * 100).toFixed(0) + '%'}
                 min={1}
-                max={100}
+                max={99}
                 value={(this.props.scene.overlaySceneOpacity * 100).toString()} />
             </div>
           </ControlGroup>
