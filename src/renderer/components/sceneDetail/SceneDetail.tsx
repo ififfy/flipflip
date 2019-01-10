@@ -3,6 +3,7 @@ import * as React from 'react';
 import {IF, TF, ZF, TK, HTF, VTF} from '../../const';
 
 import Scene from '../../Scene';
+import ControlGroup from './ControlGroup';
 import DirectoryPicker from './DirectoryPicker';
 import SimpleCheckbox from '../ui/SimpleCheckbox';
 import SimpleOptionPicker from '../ui/SimpleOptionPicker';
@@ -20,30 +21,6 @@ type Props = {
   onDelete(scene: Scene): void,
   onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
 };
-
-class ControlGroup extends React.Component {
-  readonly props: {
-    title: string,
-    isNarrow: boolean,
-    children: React.ReactNode,
-  };
-
-  render() {
-    return (
-      <form
-          className={`ControlGroup ${this.props.isNarrow ? 'm-narrow' : 'm-wide'}`}
-          onSubmit={this.preventDefault.bind(this)}>
-        <div className="ControlGroup__Title">{this.props.title}</div>
-        {this.props.children}
-      </form>
-    );
-  }
-
-  preventDefault(e: Event) {
-    e.preventDefault();
-    return;
-  }
-}
 
 export default class SceneDetail extends React.Component {
   readonly props: Props;
@@ -128,7 +105,6 @@ export default class SceneDetail extends React.Component {
           </ControlGroup>
 
           <ControlGroup title="Effects" isNarrow={true}>
-
             <SimpleCheckbox
               text="Cross-fade images"
               isOn={this.props.scene.crossFade}

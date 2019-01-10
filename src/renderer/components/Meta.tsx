@@ -1,6 +1,4 @@
-import _ from 'lodash';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 
 import {writeFileSync, mkdirSync, readFileSync, readFile} from 'fs';
 import path from 'path';
@@ -13,8 +11,8 @@ import Player from './player/Player';
 import {remote} from 'electron';
 
 class Route {
-  kind: string
-  value: any
+  kind: string;
+  value: any;
 
   constructor(init?:Partial<Route>) {
     Object.assign(this, init);
@@ -25,7 +23,7 @@ let initialState = {
   scenes: Array<Scene>(),
   route: Array<Route>(),
   autoEdit: false,
-}
+};
 
 const saveDir = path.join(remote.app.getPath('appData'), 'flipflip');
 try {
@@ -42,14 +40,14 @@ try {
     autoEdit: data.autoEdit,
     scenes: data.scenes.map((s: any) => new Scene(s)),
     route: data.route.map((s: any) => new Route(s)),
-  }
+  };
   console.log(initialState);
 } catch (e) {
   // who cares
 }
 
 export default class Meta extends React.Component {
-  readonly state = initialState
+  readonly state = initialState;
 
   isRoute(kind: string): Boolean {
     if (this.state.route.length < 1) return false;
@@ -99,6 +97,7 @@ export default class Meta extends React.Component {
         {this.isRoute('play') && (
           <Player
             scene={this.scene()}
+            onUpdateScene={this.onUpdateScene.bind(this)}
             overlayScene={this.overlayScene()}
             goBack={this.goBack.bind(this)} />
         )}
