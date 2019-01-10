@@ -156,6 +156,7 @@ export default class Player extends React.Component {
 
   componentWillUnmount() {
     Menu.setApplicationMenu(originalMenu);
+    remote.getCurrentWindow().setFullScreen(false);
   }
 
   nop() {
@@ -213,5 +214,12 @@ export default class Player extends React.Component {
   toggleFullscreen() {
     const window = remote.getCurrentWindow();
     window.setFullScreen(!window.isFullScreen());
+    if (Menu.getApplicationMenu() == null) {
+      // Reattach menu
+      this.componentDidMount();
+    } else {
+      // Remove menu
+      Menu.setApplicationMenu(null);
+    }
   }
 };
