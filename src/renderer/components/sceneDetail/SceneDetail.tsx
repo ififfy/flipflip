@@ -177,11 +177,17 @@ export default class SceneDetail extends React.Component {
           </ControlGroup>
 
           <ControlGroup title="Images" isNarrow={true}>
-            <SimpleOptionPicker
-              onChange={this.onChangeImageTypeFilter.bind(this)}
-              label="Image Filter"
-              value={this.props.scene.imageTypeFilter}
-              keys={Object.values(IF)} />
+            <div className="ControlSubgroup">
+              <SimpleOptionPicker
+                onChange={this.onChangeImageTypeFilter.bind(this)}
+                label="Image Filter"
+                value={this.props.scene.imageTypeFilter}
+                keys={Object.values(IF)} />
+              <SimpleCheckbox
+                  text="Play Full GIF animations"
+                  isOn={this.props.scene.playFullGif}
+                  onChange={this.onChangePlayFullGif.bind(this)} />
+            </div>
           </ControlGroup>
 
           <ControlGroup title="Text" isNarrow={true}>
@@ -283,6 +289,8 @@ export default class SceneDetail extends React.Component {
   onChangeTimingConstant(constant: string) { this.update((s) => { s.timingConstant = constant; }); }
 
   onChangeCrossFade(value: boolean) { this.update((s) => { s.crossFade = value; }); }
+
+  onChangePlayFullGif(value: boolean) { this.update((s) => { s.playFullGif = value; }); }
 
   onChangeAudioURL(value: string) { this.update((s) => { s.audioURL = value; }); }
 };
