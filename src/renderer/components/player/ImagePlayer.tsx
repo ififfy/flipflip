@@ -48,14 +48,14 @@ export default class ImagePlayer extends React.Component {
     const imgs = Array<HTMLImageElement>();
 
     // if user is browsing history, use that image instead
-    if (this.state.historyPaths.length > 0 && !this.props.isPlaying && this.props.historyOffset < 0) {
+    if (this.state.historyPaths.length > 0 && !this.props.isPlaying) {
       let offset = this.props.historyOffset;
       // if user went too far off the end, just loop to the front again
       while (offset < -this.state.historyPaths.length) {
         offset += this.state.historyPaths.length;
       }
       const img = new Image();
-      img.src = this.state.historyPaths[this.state.historyPaths.length + offset];
+      img.src = this.state.historyPaths[(this.state.historyPaths.length - 1) + offset];
       imgs.push(img);
     } else {
       const max = this.props.fadeEnabled ? 3 : 2;
@@ -113,7 +113,8 @@ export default class ImagePlayer extends React.Component {
             img={img}
             key={img.src}
             fadeState={this.props.fadeEnabled ? (img.src === imgs[0].src ? 'in' : 'out') : 'none'}
-            fadeDuration={this.state.timeToNextFrame / 2} />;
+            fadeDuration={this.state.timeToNextFrame / 2}
+            fileURL={this.state.historyPaths[(this.state.historyPaths.length - 1) + this.props.historyOffset]}/>;
         })}
       </div>
     );
