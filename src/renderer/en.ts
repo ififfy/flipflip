@@ -13,6 +13,14 @@ export default new Map<String, String>([
   ['zf.in','Zoom In'],
   ['zf.out','Zoom Out'],
 
+  ['htf.none','None'],
+  ['htf.left','Left'],
+  ['htf.right','Right'],
+
+  ['vtf.none','None'],
+  ['vtf.up','Up'],
+  ['vtf.down','Down'],
+
   ['tk.url', 'URL'],
   ['tk.hastebin', 'Hastebin'],
 ]);

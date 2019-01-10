@@ -527,6 +527,12 @@ label.SimpleCheckbox {
 .ImagePlayer {
   position: fixed;
   top: 0; right: 0; bottom: 0; left: 0;
+  .ImageView img{
+    -webkit-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
+    -webkit-animation-timing-function: ease-out;
+    animation-timing-function: ease-out;
+  }
 }
 
 .Modal {
@@ -610,58 +616,6 @@ label.SimpleCheckbox {
   }
 }
 
-/* animations */
-
-@keyframes fadeIn {
-  0% {opacity: 0;}
-  100% {opacity: 1;} 
-} 
-
-@keyframes fadeOut {
-  0% {opacity: 1;}
-  100% {opacity: 0;} 
-} 
-
-@keyframes keyframes-zoom {
-  100% {
-    transform: scale(2,2);
-  }
-}
-
-@keyframes keyframes-zoom-out {
-  100% {
-    transform: scale(1,1);
-  }
-}
-
-@for $i from 1 through 20 {
-  .zoom-#{$i}s img {
-    animation-timing-function: ease-out;
-    -webkit-animation: keyframes-zoom #{$i}s;
-    animation: keyframes-zoom #{$i}s;
-    -webkit-transform: scale(1,1);
-    transform: scale(1,1);
-    -webkit-animation-fill-mode: forwards;
-    animation-fill-mode: forwards;
-    animation-timing-function: linear;
-    -webkit-animation-timing-function: linear;
-  }
-}
-
-@for $i from 1 through 20 {
-  .zoom-r#{$i}s img {
-    animation-timing-function: ease-out;
-    -webkit-animation: keyframes-zoom-out #{$i}s;
-    animation: keyframes-zoom-out #{$i}s;
-    -webkit-transform: scale(1.5,1.5);
-    transform: scale(1.5,1.5);
-    -webkit-animation-fill-mode: forwards;
-    animation-fill-mode: forwards;
-    animation-timing-function: linear;
-    -webkit-animation-timing-function: linear;
-  }
-}
-
 .text-blink {
   text-align: center; color: white; font-size: 20vmin;
   vertical-align: middle; transition: opacity 0.1s ease-out;
@@ -682,4 +636,65 @@ label.SimpleCheckbox {
   vertical-align: middle; transition: opacity 0.1s ease-out;
   font-family: Arial Black,Arial Bold,Gadget,sans-serif;
   -webkit-text-stroke-width: 1px; -webkit-text-stroke-color: black;
+}
+
+@for $x from -10 through 10 {
+  @for $y from -10 through 10 {
+    @for $z from 1 through 20 {
+      .translate-#{$x}-#{$y}-#{$z}s img {
+        -webkit-animation: kb-#{$x}-#{$y} #{$z}s;
+        animation: kb-#{$x}-#{$y} #{$z}s;
+      }
+
+      .translate-#{$x}-#{$y}-zoom-#{$z}s img {
+        -webkit-animation: kb-#{$x}-#{$y}-zoom #{$z}s;
+        animation: kb-#{$x}-#{$y} #{$z}-zoom #{$z}s;
+        -webkit-transform: scale(1,1);
+        transform: scale(1,1);
+      }
+
+      .translate-#{$x}-#{$y}-zoom-out-#{$z}s img {
+        -webkit-animation: kb-#{$x}-#{$y}-zoom-out #{$z}s;
+        animation: kb-#{$x}-#{$y} #{$z}-zoom-out #{$z}s;
+        -webkit-transform: scale(1.5,1.5);
+        transform: scale(1.5,1.5);
+      }
+    }
+  }
+}
+
+/* Animations */
+
+@keyframes fadeIn {
+  0% {opacity: 0;}
+  100% {opacity: 1;}
+}
+
+@keyframes fadeOut {
+  0% {opacity: 1;}
+  100% {opacity: 0;}
+}
+
+/* Ken Burns effects */
+
+@for $x from -10 through 10 {
+  @for $y from -10 through 10 {
+    @keyframes kb-#{$x}-#{$y} {
+      100% {
+        transform: translate(percentage($x/100), percentage($y/100));
+      }
+    }
+
+    @keyframes kb-#{$x}-#{$y}-zoom {
+      100% {
+        transform: translate(percentage($x*2/100), percentage($y*2/100)) scale(2,2);
+      }
+    }
+
+    @keyframes kb-#{$x}-#{$y}-zoom-out {
+      100% {
+        transform: translate(percentage($x/100), percentage($y/100)) scale(1,1);
+      }
+    }
+  }
 }
