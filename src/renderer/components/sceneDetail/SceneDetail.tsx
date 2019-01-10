@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import {IF, TF, ZF, TK} from '../../const';
+import {IF, TF, ZF, TK, HTF, VTF} from '../../const';
 
 import Scene from '../../Scene';
 import DirectoryPicker from './DirectoryPicker';
@@ -141,12 +141,22 @@ export default class SceneDetail extends React.Component {
                 value={this.props.scene.zoomType}
                 keys={Object.values(ZF)} />
               <SimpleSliderInput
-                isEnabled={this.props.scene.zoomType != ZF.none}
-                onChange={this.onChangeZoomLevel.bind(this)}
-                label={"Zoom Length: " + this.props.scene.zoomLevel + "s"}
-                min={1}
-                max={20}
-                value={this.props.scene.zoomLevel.toString()} />
+                  isEnabled={true}
+                  onChange={this.onChangeEffectLevel.bind(this)}
+                  label={"Effect Length: " + this.props.scene.effectLevel + "s"}
+                  min={1}
+                  max={20}
+                  value={this.props.scene.effectLevel.toString()} />
+              <SimpleOptionPicker
+                  onChange={this.onChangeHorizTransType.bind(this)}
+                  label="Translate Horizontally"
+                  value={this.props.scene.horizTransType}
+                  keys={Object.values(HTF)} />
+              <SimpleOptionPicker
+                  onChange={this.onChangeVertTransType.bind(this)}
+                  label="Translate Vertically"
+                  value={this.props.scene.vertTransType}
+                  keys={Object.values(VTF)} />
             </div>
 
             <div className="ControlSubgroup">
@@ -256,7 +266,11 @@ export default class SceneDetail extends React.Component {
 
   onChangeZoomType(type: string) { this.update((s) => { s.zoomType = type; }); }
 
-  onChangeZoomLevel(level: number) { this.update((s) => { s.zoomLevel = level; }); }
+  onChangeEffectLevel(level: number) { this.update((s) => { s.effectLevel = level; }); }
+
+  onChangeHorizTransType(type: string) { this.update((s) => { s.horizTransType = type; }); }
+
+  onChangeVertTransType(type: string) { this.update((s) => { s.vertTransType = type; }); }
 
   onChangeOverlaySceneID(id: string) { this.update((s) => { s.overlaySceneID = parseInt(id, 10); }); }
 
