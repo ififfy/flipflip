@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import ImageView from './ImageView';
 import TIMING_FUNCTIONS from '../../TIMING_FUNCTIONS';
-import {IF, TF, ZF} from '../../const';
+import {IF, TF, ZF, HTF, VTF} from '../../const';
 import fs from "fs";
 import gifInfo from 'gif-info';
 
@@ -21,7 +21,9 @@ export default class ImagePlayer extends React.Component {
     timingFunction: string,
     timingConstant: string,
     zoomType: string,
-    zoomLevel: number,
+    effectLevel: number,
+    horizTransType: string,
+    vertTransType: string,
     imageTypeFilter: string,
     historyOffset: number,
     fadeEnabled: boolean,
@@ -65,13 +67,39 @@ export default class ImagePlayer extends React.Component {
       }
     }
 
-    let className = "ImagePlayer ";
-    if (this.props.zoomType != ZF.none) {
-      let cssPrefix = 'zoom-';
-      if (this.props.zoomType === ZF.out) {
-        cssPrefix += 'r'
-      }
-      className += cssPrefix + `${this.props.zoomLevel}s`;
+    let className = "ImagePlayer translate-";
+
+    switch (this.props.horizTransType) {
+      case HTF.none:
+        className += '0-';
+        break;
+      case HTF.right:
+        className += '10-';
+        break;
+      case HTF.left:
+        className += '-10-';
+        break;
+    }
+    switch (this.props.vertTransType) {
+      case VTF.none:
+        className += '0-';
+        break;
+      case VTF.down:
+        className += '10-';
+        break;
+      case VTF.up:
+        className += '-10-';
+        break;
+    }
+    switch (this.props.zoomType) {
+      case ZF.none:
+        className += `${this.props.effectLevel}s`;
+        break;
+      case ZF.in:
+        className += `zoom-${this.props.effectLevel}s`;
+        break;
+      case ZF.out:
+        className += `zoom-out-${this.props.effectLevel}s`;
     }
 
     return (
