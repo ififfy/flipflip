@@ -18,11 +18,23 @@ const ZF = { // zoom functions
   out: 'zf.out',
 };
 
+const HTF = { // horizontal translate functions
+  none: 'htf.none',
+  left: 'htf.left',
+  right: 'htf.right',
+};
+
+const VTF = { // vertical translate functions
+  none: 'vtf.none',
+  up: 'vtf.up',
+  down: 'vtf.down',
+};
+
 const TK = { // text kind
   url: 'tk.url',
   hastebin: 'tk.hastebin',
 };
 
 export {
-  TF, IF, ZF, TK
+  TF, IF, ZF, HTF, VTF, TK
 };

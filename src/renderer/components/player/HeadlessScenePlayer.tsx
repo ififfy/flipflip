@@ -152,7 +152,9 @@ export default class HeadlessScenePlayer extends React.Component {
             timingFunction={this.props.scene.timingFunction}
             timingConstant={this.props.scene.timingConstant}
             zoomType={this.props.scene.zoomType}
-            zoomLevel={this.props.scene.zoomLevel}
+            effectLevel={this.props.scene.effectLevel}
+            horizTransType={this.props.scene.horizTransType}
+            vertTransType={this.props.scene.vertTransType}
             imageTypeFilter={this.props.scene.imageTypeFilter}
             isPlaying={this.props.isPlaying}
             fadeEnabled={this.props.scene.crossFade}
