@@ -156,6 +156,7 @@ export default class HeadlessScenePlayer extends React.Component {
             imageTypeFilter={this.props.scene.imageTypeFilter}
             isPlaying={this.props.isPlaying}
             fadeEnabled={this.props.scene.crossFade}
+            playFullGif={this.props.scene.playFullGif}
             imageSizeMin={this.props.scene.imageSizeMin}
             allURLs={this.state.allURLs} />)}
 

@@ -1,17 +1,18 @@
 import {ZF, HTF, VTF, TF, IF, TK} from './const';
 
 export default class Scene {
-  id: number = 0
-  name: string = "Unnamed scene"
-  directories: Array<string> = []
-  timingFunction = TF.constant
+  id: number = 0;
+  name: string = "Unnamed scene";
+  directories: Array<string> = [];
+  timingFunction = TF.constant;
   timingConstant = "1000";
-  imageTypeFilter = IF.any
-  zoomType = ZF.none
-  effectLevel: number = 5
-  horizTransType = HTF.none
-  vertTransType = VTF.none
-  crossFade = false
+  imageTypeFilter = IF.any;
+  zoomType = ZF.none;
+  effectLevel: number = 5;
+  horizTransType = HTF.none;
+  vertTransType = VTF.none;
+  crossFade = false;
+  playFullGif = false;
   textKind: string = "";
   textSource: string = "";
   imageSizeMin: 200;
@@ -26,7 +27,7 @@ export default class Scene {
   // of it.
   // if false, the display chooses an image out of all possible images, without
   // looking at which directory it was in.
-  weightDirectoriesEqually = true
+  weightDirectoriesEqually = true;
 
   constructor(init?:Partial<Scene>) {
     Object.assign(this, init);
