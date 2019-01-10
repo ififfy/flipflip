@@ -27,6 +27,7 @@ export default class ImagePlayer extends React.Component {
     imageTypeFilter: string,
     historyOffset: number,
     fadeEnabled: boolean,
+    playFullGif: boolean;
     imageSizeMin: number,
     setHistoryLength: (historyLength: number) => void,
   };
@@ -160,7 +161,6 @@ export default class ImagePlayer extends React.Component {
     }
     const url = choice(collection);
     const img = new Image();
-    let duration : number;
 
     this.setState({numBeingLoaded: this.state.numBeingLoaded + 1});
 
@@ -214,9 +214,9 @@ export default class ImagePlayer extends React.Component {
       // Get gif info. See https://github.com/Prinzhorn/gif-info
       let info = gifInfo(toArrayBuffer(fs.readFileSync(url.replace("file:///", ""))));
 
-      // If gif is animated, store its duration
-      if (info.animated) {
-        duration = info.duration;
+      // If gif is animated and we want to play entire length, store its duration
+      if (info.animated && this.props.playFullGif) {
+        img.alt=info.duration;
       }
 
       // Exclude non-animated gifs from gifs
@@ -234,13 +234,14 @@ export default class ImagePlayer extends React.Component {
   advance(isStarting = false, schedule = true) {
     let nextPastAndLatest = this.state.pastAndLatest;
     let nextHistoryPaths = this.state.historyPaths;
+    let nextImg : HTMLImageElement;
     if (this.state.readyToDisplay.length) {
-      const nextImg = this.state.readyToDisplay.shift();
+      nextImg = this.state.readyToDisplay.shift();
       nextPastAndLatest = nextPastAndLatest.concat([nextImg]);
       nextHistoryPaths = nextHistoryPaths.concat([nextImg.src]);
     } else if (this.state.pastAndLatest.length) {
       // no new image ready; just pick a random one from the past 120
-      const nextImg = choice(this.state.pastAndLatest);
+      nextImg = choice(this.state.pastAndLatest);
       nextPastAndLatest = nextPastAndLatest.concat([nextImg]);
       nextHistoryPaths = nextHistoryPaths.concat([nextImg.src]);
     }
@@ -269,6 +270,9 @@ export default class ImagePlayer extends React.Component {
       }
     } else {
       timeToNextFrame = TIMING_FUNCTIONS.get(this.props.timingFunction)();
+    }
+    if (nextImg && nextImg.alt && timeToNextFrame < parseInt(nextImg.alt)) {
+      timeToNextFrame = parseInt(nextImg.alt);
     }
     this.setState({
       timeToNextFrame,
