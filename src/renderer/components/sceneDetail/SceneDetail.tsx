@@ -1,16 +1,16 @@
 import * as React from 'react';
 
-import {IF, TF, ZF, TK, HTF, VTF} from '../../const';
+import {IF, TK} from '../../const';
 
 import Scene from '../../Scene';
 import ControlGroup from './ControlGroup';
 import DirectoryPicker from './DirectoryPicker';
 import SimpleCheckbox from '../ui/SimpleCheckbox';
 import SimpleOptionPicker from '../ui/SimpleOptionPicker';
-import SimpleTextInput from '../ui/SimpleTextInput';
-import SimpleSliderInput from "../ui/SimpleSliderInput";
 import SimpleURLInput from "../ui/SimpleURLInput";
 import URLModal from './URLModal';
+import TimingGroup from "./TimingGroup";
+import EffectGroup from "./EffectGroup";
 
 type Props = {
   scene?: Scene,
@@ -90,67 +90,15 @@ export default class SceneDetail extends React.Component {
               onImportURL={this.onImportURL.bind(this)}
               onChange={this.onChangeDirectories.bind(this)}/>
           </ControlGroup>
-        
-          <ControlGroup title="Timing" isNarrow={true}>
-            <SimpleOptionPicker
-              onChange={this.onChangeTimingFunction.bind(this)}
-              label="Timing"
-              value={this.props.scene.timingFunction}
-              keys={Object.values(TF)} />
-            <SimpleTextInput
-              isEnabled={this.props.scene.timingFunction === TF.constant}
-              onChange={this.onChangeTimingConstant.bind(this)}
-              label="Time between images (ms)"
-              value={this.props.scene.timingConstant.toString()} />
-          </ControlGroup>
 
-          <ControlGroup title="Effects" isNarrow={true}>
-            <SimpleCheckbox
-              text="Cross-fade images"
-              isOn={this.props.scene.crossFade}
-              onChange={this.onChangeCrossFade.bind(this)} />
+          <TimingGroup
+            scene={this.props.scene}
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
-            <div className="ControlSubgroup">
-              <SimpleOptionPicker
-                onChange={this.onChangeZoomType.bind(this)}
-                label="Zoom Type"
-                value={this.props.scene.zoomType}
-                keys={Object.values(ZF)} />
-              <SimpleSliderInput
-                  isEnabled={true}
-                  onChange={this.onChangeEffectLevel.bind(this)}
-                  label={"Effect Length: " + this.props.scene.effectLevel + "s"}
-                  min={1}
-                  max={20}
-                  value={this.props.scene.effectLevel.toString()} />
-              <SimpleOptionPicker
-                  onChange={this.onChangeHorizTransType.bind(this)}
-                  label="Translate Horizontally"
-                  value={this.props.scene.horizTransType}
-                  keys={Object.values(HTF)} />
-              <SimpleOptionPicker
-                  onChange={this.onChangeVertTransType.bind(this)}
-                  label="Translate Vertically"
-                  value={this.props.scene.vertTransType}
-                  keys={Object.values(VTF)} />
-            </div>
-
-            <div className="ControlSubgroup">
-              <SimpleOptionPicker
-                onChange={this.onChangeOverlaySceneID.bind(this)}
-                label="Overlay scene"
-                value={this.props.scene.overlaySceneID.toString()}
-                getLabel={this.getSceneName.bind(this)}
-                keys={["0"].concat(this.props.allScenes.map((s) => s.id.toString()))} />
-              <SimpleSliderInput
-                isEnabled={this.props.scene.overlaySceneID != 0}
-                onChange={this.onChangeOverlaySceneOpacity.bind(this)}
-                label={"Overlay opacity: " + (this.props.scene.overlaySceneOpacity * 100).toFixed(0) + '%'}
-                min={1}
-                max={99}
-                value={(this.props.scene.overlaySceneOpacity * 100).toString()} />
-            </div>
-          </ControlGroup>
+          <EffectGroup
+            scene={this.props.scene}
+            allScenes={this.props.allScenes}
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
           <ControlGroup title="Images" isNarrow={true}>
             <div className="ControlSubgroup">
@@ -208,11 +156,6 @@ export default class SceneDetail extends React.Component {
     this.setState({isShowingURLModal: false});
   }
 
-  getSceneName(id: string): string {
-    if (id === "0") return "none";
-    return this.props.allScenes.filter((s) => s.id.toString() === id)[0].name;
-  }
-
   play() {
     this.props.onPlay(this.props.scene);
   }
@@ -240,31 +183,11 @@ export default class SceneDetail extends React.Component {
 
   onChangeDirectories(directories: Array<string>) { this.update((s) => { s.directories = directories; }); }
 
-  onChangeOverlaySceneOpacity(value: string) {
-    this.update((s) => { s.overlaySceneOpacity = parseInt(value, 10) / 100; });
-  }
-
   onChangeImageTypeFilter(filter: string) { this.update((s) => { s.imageTypeFilter = filter; }); }
-
-  onChangeZoomType(type: string) { this.update((s) => { s.zoomType = type; }); }
-
-  onChangeEffectLevel(level: number) { this.update((s) => { s.effectLevel = level; }); }
-
-  onChangeHorizTransType(type: string) { this.update((s) => { s.horizTransType = type; }); }
-
-  onChangeVertTransType(type: string) { this.update((s) => { s.vertTransType = type; }); }
-
-  onChangeOverlaySceneID(id: string) { this.update((s) => { s.overlaySceneID = parseInt(id, 10); }); }
 
   onChangeTextKind(kind: string) { this.update((s) => { s.textKind = kind; }); }
 
   onChangeTextSource(textSource: string) { this.update((s) => { s.textSource = textSource; }); }
-
-  onChangeTimingFunction(fnId: string) { this.update((s) => { s.timingFunction = fnId; }); }
-
-  onChangeTimingConstant(constant: string) { this.update((s) => { s.timingConstant = constant; }); }
-
-  onChangeCrossFade(value: boolean) { this.update((s) => { s.crossFade = value; }); }
 
   onChangePlayFullGif(value: boolean) { this.update((s) => { s.playFullGif = value; }); }
 
