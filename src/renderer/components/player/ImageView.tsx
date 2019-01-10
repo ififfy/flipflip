@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+import ImageContextMenu from "./ImageContextMenu";
 
 
 const maxFadeSeconds = 5;
@@ -8,11 +8,12 @@ const maxFadeSeconds = 5;
 export default class ImageView extends React.Component {
   readonly props: {
     img: HTMLImageElement,
+    fileURL: string,
     fadeState: string,
     fadeDuration: number,
-  }
+  };
 
-  readonly contentRef: React.RefObject<HTMLImageElement> = React.createRef()
+  readonly contentRef: React.RefObject<HTMLImageElement> = React.createRef();
 
   componentDidMount() {
     this._applyImage();
@@ -79,6 +80,9 @@ export default class ImageView extends React.Component {
       <div
         className="ImageView u-fill-container"
         style={style}
-        ref={this.contentRef} />);
+        ref={this.contentRef}>
+        <ImageContextMenu
+          fileURL={this.props.fileURL}/>
+      </div>);
   }
 }
