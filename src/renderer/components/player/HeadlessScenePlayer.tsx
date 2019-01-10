@@ -1,7 +1,5 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import recursiveReaddir from 'recursive-readdir';
-import fs from 'fs'
 import fileURL from 'file-url';
 import wretch from 'wretch';
 
@@ -191,7 +189,7 @@ export default class HeadlessScenePlayer extends React.Component {
           : loadLocalDirectory(d, this.props.scene.imageTypeFilter));
 
       let message = d;
-      if (this.props.historyOffset == -1) {
+      if (this.props.opacity != 1) {
         message = "<p>Loading Overlay...</p>" + d;
       }
 

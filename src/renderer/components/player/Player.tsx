@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import { remote } from 'electron';
 const { Menu, app } = remote;
 import Sound from 'react-sound';
@@ -22,7 +21,7 @@ export default class Player extends React.Component {
     goBack(): void,
     scene: Scene,
     overlayScene?: Scene,
-  }
+  };
 
   readonly state = {
     isMainLoaded: false,
@@ -30,10 +29,10 @@ export default class Player extends React.Component {
     isPlaying: false,
     historyOffset: 0,
     historyLength: 0,
-  }
+  };
 
   render() {
-    const canGoBack = this.state.historyOffset > -this.state.historyLength;
+    const canGoBack = this.state.historyOffset > -(this.state.historyLength-1);
     const canGoForward = this.state.historyOffset < 0;
     const audioPlayStatus = this.state.isPlaying
       ? (Sound as any).status.PLAYING
@@ -57,7 +56,7 @@ export default class Player extends React.Component {
           <HeadlessScenePlayer
             opacity={this.props.scene.overlaySceneOpacity}
             scene={this.props.overlayScene}
-            historyOffset={-1}
+            historyOffset={0}
             isPlaying={this.state.isPlaying}
             showLoadingState={showOverlayIndicator}
             showEmptyState={false}
@@ -192,12 +191,15 @@ export default class Player extends React.Component {
   historyBack() {
     this.setState({
       isPlaying: false,
-      historyOffset: this.state.historyOffset == 0 ? -2 : this.state.historyOffset - 1,
+      historyOffset: this.state.historyOffset - 1,
     });
   }
 
   historyForward() {
-    this.setState({isPlaying: false, historyOffset: Math.min(-1, this.state.historyOffset + 1)});
+    this.setState({
+      isPlaying: false,
+      historyOffset: this.state.historyOffset + 1,
+    });
   }
 
   navigateBack() {
