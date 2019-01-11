@@ -223,7 +223,7 @@ export default class ImagePlayer extends React.Component {
     if (url.toLocaleLowerCase().endsWith('.gif')) {
       // Get gif info. See https://github.com/Prinzhorn/gif-info
       const path = urlToPath(url);
-      let info = gifInfo(toArrayBuffer(fs.readFileSync(path)));
+      let info = gifInfo(toArrayBuffer(fs.readFileSync(decodeURIComponent(path))));
 
       // If gif is animated and we want to play entire length, store its duration
       if (info.animated && this.props.playFullGif) {
