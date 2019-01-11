@@ -14,9 +14,23 @@ If you are on a Mac, you might need to open this by right-clicking the
 application, selecting "Open," and accepting all the stupid prompts
 that pop up.
 
-![Screenshot](/screenshot2.png)
+![Screenshot](/screenshot3.png)
 
 ## History
+
+### 1.2.0
+
+- Fix importing duplicate directories
+- Add progress circle for loading scenes
+- Fix bug with No images warning
+- Fix bug with overlay when scene loads first
+- Improve animated gif detection (much better performance)
+- Add horizontal and vertical transition options
+- Add context menu with image information and actions
+- Hide menu-bar when in fullscreen (and automatically exit fullscreen when scene ends)
+- Add sidebar to player for modifying effects and timing
+- Right arrow now resumes slideshow if at the most recent image
+- Fixed a bug with image filter resetting
 
 ### 1.1.2
 
