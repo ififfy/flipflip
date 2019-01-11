@@ -23,13 +23,16 @@ export default class Modal extends React.Component {
   }
 
   componentDidMount() {
-    this.setState({progress: new ProgressBar.Circle('#progress', {
+    const progress = new ProgressBar.Circle('#progress', {
       color: '#FFFFFF',
       strokeWidth: 2,
       text: {
         value: this.props.message + "<br/>" + this.props.current + " / " + this.props.total,
       },
-    })});
+    });
+    this.setState({progress});
+    progress.animate((this.props.current + 0.1) / (this.props.total + 0.1));
+    progress.setText("<p>" + this.props.message + "</p><p>" + this.props.current + " / " + this.props.total + "</p>");
   }
 
   shouldComponentUpdate(nextProps: any, nextState: any) {
@@ -38,7 +41,7 @@ export default class Modal extends React.Component {
 
   componentWillReceiveProps(props : any) {
     if (this.state && this.state.progress && props.current != this.props.current) {
-      this.state.progress.animate(props.current / this.props.total);
+      this.state.progress.animate((props.current + 0.1) / (this.props.total + 0.1));
       this.state.progress.setText("<p>" + this.props.message + "</p><p>" + props.current + " / " + this.props.total + "</p>");
     }
   }
