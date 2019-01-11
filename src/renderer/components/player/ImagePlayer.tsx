@@ -4,6 +4,7 @@ import ImageView from './ImageView';
 import TIMING_FUNCTIONS from '../../TIMING_FUNCTIONS';
 import {IF, TF, ZF, HTF, VTF} from '../../const';
 import fs from "fs";
+import { URL } from "url";
 import gifInfo from 'gif-info';
 
 function choice<T>(items: Array<T>): T {
@@ -211,7 +212,7 @@ export default class ImagePlayer extends React.Component {
     // Filter gifs by animation
     if (url.toLocaleLowerCase().endsWith('.gif')) {
       // Get gif info. See https://github.com/Prinzhorn/gif-info
-      let info = gifInfo(toArrayBuffer(fs.readFileSync(url.replace("file:///", ""))));
+      let info = gifInfo(toArrayBuffer(fs.readFileSync(new URL(url).pathname)));
 
       // If gif is animated and we want to play entire length, store its duration
       if (info.animated && this.props.playFullGif) {
