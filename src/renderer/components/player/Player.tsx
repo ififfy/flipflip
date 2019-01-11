@@ -2,7 +2,6 @@ import * as React from 'react';
 import { remote } from 'electron';
 const { getCurrentWindow, Menu, MenuItem, app } = remote;
 import Sound from 'react-sound';
-import { URL } from 'url';
 import fs from "fs";
 
 import Scene from '../../Scene';
@@ -10,6 +9,7 @@ import HeadlessScenePlayer from './HeadlessScenePlayer';
 import TimingGroup from "../sceneDetail/TimingGroup";
 import EffectGroup from "../sceneDetail/EffectGroup";
 import ChildCallbackHack from './ChildCallbackHack';
+import urlToPath from '../../urlToPath';
 
 const keyMap = {
   playPause: ['Play/Pause', 'space'],
@@ -178,7 +178,7 @@ export default class Player extends React.Component {
 
   componentWillUnmount() {
     Menu.setApplicationMenu(originalMenu);
-    remote.getCurrentWindow().setFullScreen(false);
+    getCurrentWindow().setFullScreen(false);
     window.removeEventListener('contextmenu', this.showContextMenu);
   }
 
@@ -190,7 +190,7 @@ export default class Player extends React.Component {
     const contextMenu = new Menu();
     const url = this.state.historyPaths[(this.state.historyPaths.length - 1) + this.state.historyOffset];
     const isFile = url.startsWith('file://');
-    const path = new URL(url).pathname;
+    const path = urlToPath(url);
     const labelItem = new MenuItem({
       label: isFile ? path : url,
       click: () => { }});
@@ -206,10 +206,20 @@ export default class Player extends React.Component {
     if (isFile) {
       contextMenu.append(new MenuItem({
         label: 'Reveal',
-        click: () => { remote.shell.showItemInFolder(url); }}));
+        click: () => {
+          // for some reason windows uses URLs and everyone else uses paths
+          if (process.platform === "win32") {
+            remote.shell.showItemInFolder(url);
+          } else {
+            remote.shell.showItemInFolder(path);
+          }
+        }}));
       contextMenu.append(new MenuItem({
         label: 'Delete',
         click: () => {
+          // If you find that this doesn't work on Windows, please add an if/then
+          // (see 'reveal' above) rather than changing all cases, since this all
+          // works fine on macOS.
           if (!confirm("Are you sure you want to delete " + path + "?")) return;
           if (fs.existsSync(path)) {
             fs.unlink(path, (err) => {
@@ -279,7 +289,7 @@ export default class Player extends React.Component {
   }
 
   toggleFullscreen() {
-    const window = remote.getCurrentWindow();
+    const window = getCurrentWindow();
     window.setFullScreen(!window.isFullScreen());
     if (Menu.getApplicationMenu() == null) {
       // Reattach menu
