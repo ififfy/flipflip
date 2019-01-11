@@ -29,7 +29,7 @@ that pop up.
 - Add context menu with image information and actions
 - Hide menu-bar when in fullscreen (and automatically exit fullscreen when scene ends)
 - Add sidebar to player for modifying effects and timing
-- Right arrow now resumes slideshow if at the most recent image
+- Right arrow now advances slideshow if at the most recent image
 - Fixed a bug with image filter resetting
 
 ### 1.1.2
