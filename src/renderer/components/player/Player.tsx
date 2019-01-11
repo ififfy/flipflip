@@ -1,13 +1,14 @@
 import * as React from 'react';
 import { remote } from 'electron';
-const { Menu, app } = remote;
+const { getCurrentWindow, Menu, MenuItem, app } = remote;
 import Sound from 'react-sound';
+import { URL } from 'url';
+import fs from "fs";
 
 import Scene from '../../Scene';
 import HeadlessScenePlayer from './HeadlessScenePlayer';
 import TimingGroup from "../sceneDetail/TimingGroup";
 import EffectGroup from "../sceneDetail/EffectGroup";
-import ImageContextMenu from "./ImageContextMenu";
 
 const keyMap = {
   playPause: ['Play/Pause', 'space'],
@@ -121,14 +122,13 @@ export default class Player extends React.Component {
             scene={this.props.scene}
             onUpdateScene={this.props.onUpdateScene.bind(this)}/>
         </div>
-
-        <ImageContextMenu
-            fileURL={this.state.historyPaths[(this.state.historyPaths.length - 1) + this.state.historyOffset]}/>
       </div>
     );
   }
 
   componentDidMount() {
+    window.addEventListener('contextmenu', this.showContextMenu, false);
+
     Menu.setApplicationMenu(Menu.buildFromTemplate([
       {
         label: app.getName(),
@@ -175,10 +175,51 @@ export default class Player extends React.Component {
   componentWillUnmount() {
     Menu.setApplicationMenu(originalMenu);
     remote.getCurrentWindow().setFullScreen(false);
+    window.removeEventListener('contextmenu', this.showContextMenu);
   }
 
   nop() {
 
+  }
+
+  showContextMenu = () => {
+    const contextMenu = new Menu();
+    const url = this.state.historyPaths[(this.state.historyPaths.length - 1) + this.state.historyOffset];
+    const isFile = url.startsWith('file://');
+    const path = new URL(url).pathname;
+    const labelItem = new MenuItem({
+      label: isFile ? path : url,
+      click: () => { }});
+    labelItem.enabled = false;
+    contextMenu.append(labelItem);
+    contextMenu.append(new MenuItem({
+      label: 'Copy',
+      click: () => {
+        navigator.clipboard.writeText(new URL(url).pathname); }}));
+    contextMenu.append(new MenuItem({
+      label: 'Open',
+      click: () => { remote.shell.openExternal(url); }}));
+    if (isFile) {
+      contextMenu.append(new MenuItem({
+        label: 'Reveal',
+        click: () => { remote.shell.showItemInFolder(path); }}));
+      contextMenu.append(new MenuItem({
+        label: 'Delete',
+        click: () => {
+          if (!confirm("Are you sure you want to delete " + path + "?")) return;
+          if (fs.existsSync(path)) {
+            fs.unlink(path, (err) => {
+              if (err) {
+                alert("An error ocurred while deleting the file: " + err.message);
+                console.log(err);
+              }
+            });
+          } else {
+            alert("This file doesn't exist, cannot delete");
+          }
+        }}));
+      }
+    contextMenu.popup({});
   }
 
   playPause() {
