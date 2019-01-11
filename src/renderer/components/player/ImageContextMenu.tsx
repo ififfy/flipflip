@@ -61,7 +61,7 @@ export default class ImageContextMenu extends React.Component {
 
   _handleClick = (event : MouseEvent) => {
     const { visible } = this.state;
-    const wasOutside = !(event.target.contains === this.root);
+    const wasOutside = !((event.target as any).contains === this.root);
 
     if (wasOutside && visible) this.setState({ visible: false, });
   };
@@ -73,7 +73,7 @@ export default class ImageContextMenu extends React.Component {
   };
 
   copy = () => {
-    navigator.clipboard.writeText(this.props.fileURL.replace("file:///", ""));
+    navigator.clipboard.writeText(new URL(this.props.fileURL).pathname);
   };
 
   showInFolder = () => {
@@ -85,10 +85,10 @@ export default class ImageContextMenu extends React.Component {
   };
 
   delete = () => {
-    let fileURL = this.props.fileURL.replace("file:///", "");
-    if (confirm("Are you sure you want to delete " + fileURL + "?")) {
-      if (fs.existsSync(fileURL)) {
-        fs.unlink(fileURL, (err) => {
+    let filePath = new URL(this.props.fileURL).pathname;
+    if (confirm("Are you sure you want to delete " + filePath + "?")) {
+      if (fs.existsSync(filePath)) {
+        fs.unlink(filePath, (err) => {
           if (err) {
             alert("An error ocurred while deleting the file: " + err.message);
             console.log(err);
@@ -109,7 +109,7 @@ export default class ImageContextMenu extends React.Component {
     const isFile = this.props.fileURL.includes('file:///');
     let display = this.props.fileURL;
     if (isFile) {
-      display = display.replace("file:///", "");
+      display = new URL(display).pathname;
     }
 
     return(this.state.visible || null) &&
