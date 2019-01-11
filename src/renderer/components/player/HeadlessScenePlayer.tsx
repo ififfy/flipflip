@@ -8,6 +8,7 @@ import Progress from '../ui/Progress';
 import ImagePlayer from './ImagePlayer';
 import CaptionProgram from './CaptionProgram';
 import { TK, IF } from '../../const';
+import ChildCallbackHack from './ChildCallbackHack';
 
 function isImage(path: string): boolean {
   const p = path.toLowerCase();
@@ -109,6 +110,7 @@ export default class HeadlessScenePlayer extends React.Component {
     showEmptyState: boolean,
     isPlaying: boolean,
     historyOffset: number,
+    advanceHack?: ChildCallbackHack,
     setHistoryPaths: (historyPaths: string[]) => void,
     didFinishLoading: () => void,
   };
@@ -142,6 +144,7 @@ export default class HeadlessScenePlayer extends React.Component {
 
         {showImagePlayer && (
           <ImagePlayer
+            advanceHack={this.props.advanceHack}
             historyOffset={this.props.historyOffset}
             setHistoryPaths={this.props.setHistoryPaths}
             maxInMemory={120}

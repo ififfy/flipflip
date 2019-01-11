@@ -9,6 +9,7 @@ import Scene from '../../Scene';
 import HeadlessScenePlayer from './HeadlessScenePlayer';
 import TimingGroup from "../sceneDetail/TimingGroup";
 import EffectGroup from "../sceneDetail/EffectGroup";
+import ChildCallbackHack from './ChildCallbackHack';
 
 const keyMap = {
   playPause: ['Play/Pause', 'space'],
@@ -34,6 +35,7 @@ export default class Player extends React.Component {
     isPlaying: false,
     historyOffset: 0,
     historyPaths: Array<string>(),
+    imagePlayerAdvanceHack: new ChildCallbackHack(),
   };
 
   render() {
@@ -54,11 +56,13 @@ export default class Player extends React.Component {
           showLoadingState={true}
           showEmptyState={true}
           showText={true}
+          advanceHack={this.state.imagePlayerAdvanceHack}
           didFinishLoading={this.playMain.bind(this)}
           setHistoryPaths={this.setHistoryPaths.bind(this)} />
 
         {this.props.overlayScene && (
           <HeadlessScenePlayer
+            advanceHack={null}
             opacity={this.props.scene.overlaySceneOpacity}
             scene={this.props.overlayScene}
             historyOffset={0}
@@ -256,10 +260,14 @@ export default class Player extends React.Component {
   }
 
   historyForward() {
-    this.setState({
-      isPlaying: false,
-      historyOffset: this.state.historyOffset + 1,
-    });
+    if (this.state.historyOffset >= 0) {
+      this.state.imagePlayerAdvanceHack.fire();
+    } else {
+      this.setState({
+        isPlaying: false,
+        historyOffset: this.state.historyOffset + 1,
+      });
+    }
   }
 
   navigateBack() {
