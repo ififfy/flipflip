@@ -199,14 +199,14 @@ export default class Player extends React.Component {
     contextMenu.append(new MenuItem({
       label: 'Copy',
       click: () => {
-        navigator.clipboard.writeText(new URL(url).pathname); }}));
+        navigator.clipboard.writeText(path); }}));
     contextMenu.append(new MenuItem({
       label: 'Open',
       click: () => { remote.shell.openExternal(url); }}));
     if (isFile) {
       contextMenu.append(new MenuItem({
         label: 'Reveal',
-        click: () => { remote.shell.showItemInFolder(path); }}));
+        click: () => { remote.shell.showItemInFolder(url); }}));
       contextMenu.append(new MenuItem({
         label: 'Delete',
         click: () => {
