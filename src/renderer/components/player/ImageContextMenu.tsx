@@ -24,6 +24,8 @@ export default class ImageContextMenu extends React.Component {
   }
 
   _handleContextMenu = (event : MouseEvent) => {
+    if (!this.props.fileURL || this.props.fileURL == null || this.props.fileURL.length == 0) return;
+
     event.preventDefault();
 
     this.setState({ visible: true });
@@ -102,6 +104,8 @@ export default class ImageContextMenu extends React.Component {
   };
 
   render() {
+    if (!this.props.fileURL || this.props.fileURL == null || this.props.fileURL.length == 0) return null;
+
     const isFile = this.props.fileURL.includes('file:///');
     let display = this.props.fileURL;
     if (isFile) {

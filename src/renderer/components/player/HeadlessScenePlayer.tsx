@@ -109,7 +109,7 @@ export default class HeadlessScenePlayer extends React.Component {
     showEmptyState: boolean,
     isPlaying: boolean,
     historyOffset: number,
-    setHistoryLength: (historyLength: number) => void,
+    setHistoryPaths: (historyPaths: string[]) => void,
     didFinishLoading: () => void,
   };
 
@@ -143,7 +143,7 @@ export default class HeadlessScenePlayer extends React.Component {
         {showImagePlayer && (
           <ImagePlayer
             historyOffset={this.props.historyOffset}
-            setHistoryLength={this.props.setHistoryLength}
+            setHistoryPaths={this.props.setHistoryPaths}
             maxInMemory={120}
             maxLoadingAtOnce={5}
             maxToRememberInHistory={500}
