@@ -23,13 +23,16 @@ export default class Modal extends React.Component {
   }
 
   componentDidMount() {
-    this.setState({progress: new ProgressBar.Circle('#progress', {
+    const progress = new ProgressBar.Circle('#progress', {
       color: '#FFFFFF',
       strokeWidth: 2,
       text: {
         value: this.props.message + "<br/>" + this.props.current + " / " + this.props.total,
       },
-    })});
+    });
+    this.setState({progress});
+    progress.animate(this.props.current / this.props.total);
+    progress.setText("<p>" + this.props.message + "</p><p>" + this.props.current + " / " + this.props.total + "</p>");
   }
 
   shouldComponentUpdate(nextProps: any, nextState: any) {
