@@ -526,10 +526,13 @@ label.SimpleCheckbox {
   bottom: 0;
   left: 0;
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   .ProgressContainer {
-    position: absolute;
-    top: calc(50% - 10em);
-    left: calc(50% - 5em);
+    width: 20rem;
+    height: 20rem;
   }
 
   p {
