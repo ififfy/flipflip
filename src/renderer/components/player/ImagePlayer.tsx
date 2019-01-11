@@ -6,6 +6,7 @@ import {IF, TF, ZF, HTF, VTF} from '../../const';
 import fs from "fs";
 import { URL } from "url";
 import gifInfo from 'gif-info';
+import ChildCallbackHack from './ChildCallbackHack';
 
 function choice<T>(items: Array<T>): T {
   const i = Math.floor(Math.random() * items.length);
@@ -14,6 +15,7 @@ function choice<T>(items: Array<T>): T {
 
 export default class ImagePlayer extends React.Component {
   readonly props: {
+    advanceHack?: ChildCallbackHack,
     maxInMemory: number,
     maxLoadingAtOnce: number,
     maxToRememberInHistory: number,
@@ -52,9 +54,8 @@ export default class ImagePlayer extends React.Component {
     // if user is browsing history, use that image instead
     if (this.state.historyPaths.length > 0 && !this.props.isPlaying) {
       let offset = this.props.historyOffset;
-      // if user went too far off the end, just loop to the front again
-      while (offset < -this.state.historyPaths.length) {
-        offset += this.state.historyPaths.length;
+      if (offset <= -this.state.historyPaths.length) {
+        offset = -this.state.historyPaths.length + 1;
       }
       const img = new Image();
       img.src = this.state.historyPaths[(this.state.historyPaths.length - 1) + offset];
@@ -123,10 +124,19 @@ export default class ImagePlayer extends React.Component {
 
   componentDidMount() {
     this._isMounted = true;
+    if (this.props.advanceHack) {
+      this.props.advanceHack.listener = () => {
+        // advance, ignoring isPlaying status and not scheduling another
+        this.advance(false, false, true);
+      }
+    }
   }
 
   componentWillUnmount() {
     this._isMounted = false;
+    if (this.props.advanceHack) {
+      this.props.advanceHack.listener = null;
+    }
   }
 
   componentWillReceiveProps(props: any) {
@@ -231,7 +241,7 @@ export default class ImagePlayer extends React.Component {
     img.src = url;
   }
 
-  advance(isStarting = false, schedule = true) {
+  advance(isStarting = false, schedule = true, ignoreIsPlayingStatus = false) {
     let nextPastAndLatest = this.state.pastAndLatest;
     let nextHistoryPaths = this.state.historyPaths;
     let nextImg : HTMLImageElement;
@@ -251,7 +261,7 @@ export default class ImagePlayer extends React.Component {
     }
 
     // bail if dead
-    if (!(isStarting || (this.props.isPlaying && this._isMounted))) return;
+    if (!(isStarting || ignoreIsPlayingStatus || (this.props.isPlaying && this._isMounted))) return;
 
     this.setState({
       pastAndLatest: nextPastAndLatest,
