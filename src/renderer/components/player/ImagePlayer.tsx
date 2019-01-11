@@ -29,7 +29,7 @@ export default class ImagePlayer extends React.Component {
     fadeEnabled: boolean,
     playFullGif: boolean;
     imageSizeMin: number,
-    setHistoryLength: (historyLength: number) => void,
+    setHistoryPaths: (historyPaths: string[]) => void,
   };
 
   readonly state = {
@@ -114,8 +114,7 @@ export default class ImagePlayer extends React.Component {
             img={img}
             key={img.src}
             fadeState={this.props.fadeEnabled ? (img.src === imgs[0].src ? 'in' : 'out') : 'none'}
-            fadeDuration={this.state.timeToNextFrame / 2}
-            fileURL={this.state.historyPaths[(this.state.historyPaths.length - 1) + this.props.historyOffset]}/>;
+            fadeDuration={this.state.timeToNextFrame / 2} />;
         })}
       </div>
     );
@@ -257,7 +256,7 @@ export default class ImagePlayer extends React.Component {
       pastAndLatest: nextPastAndLatest,
       historyPaths: nextHistoryPaths,
     });
-    this.props.setHistoryLength(nextHistoryPaths.length);
+    this.props.setHistoryPaths(nextHistoryPaths);
 
     if (!schedule) return;
 
