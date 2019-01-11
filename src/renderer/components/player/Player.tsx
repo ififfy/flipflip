@@ -7,6 +7,7 @@ import Scene from '../../Scene';
 import HeadlessScenePlayer from './HeadlessScenePlayer';
 import TimingGroup from "../sceneDetail/TimingGroup";
 import EffectGroup from "../sceneDetail/EffectGroup";
+import ImageContextMenu from "./ImageContextMenu";
 
 const keyMap = {
   playPause: ['Play/Pause', 'space'],
@@ -31,11 +32,11 @@ export default class Player extends React.Component {
     isOverlayLoaded: false,
     isPlaying: false,
     historyOffset: 0,
-    historyLength: 0,
+    historyPaths: Array<string>(),
   };
 
   render() {
-    const canGoBack = this.state.historyOffset > -(this.state.historyLength-1);
+    const canGoBack = this.state.historyOffset > -(this.state.historyPaths.length-1);
     const canGoForward = this.state.historyOffset < 0;
     const audioPlayStatus = this.state.isPlaying
       ? (Sound as any).status.PLAYING
@@ -53,7 +54,7 @@ export default class Player extends React.Component {
           showEmptyState={true}
           showText={true}
           didFinishLoading={this.playMain.bind(this)}
-          setHistoryLength={this.setHistoryLength.bind(this)} />
+          setHistoryPaths={this.setHistoryPaths.bind(this)} />
 
         {this.props.overlayScene && (
           <HeadlessScenePlayer
@@ -65,7 +66,7 @@ export default class Player extends React.Component {
             showEmptyState={false}
             showText={false}
             didFinishLoading={this.playOverlay.bind(this)}
-            setHistoryLength={this.nop.bind(this)} />
+            setHistoryPaths={this.nop.bind(this)} />
         )}
 
         <div className={`u-button-row ${this.state.isPlaying ? 'u-show-on-hover-only' : ''}`}>
@@ -120,6 +121,9 @@ export default class Player extends React.Component {
             scene={this.props.scene}
             onUpdateScene={this.props.onUpdateScene.bind(this)}/>
         </div>
+
+        <ImageContextMenu
+            fileURL={this.state.historyPaths[(this.state.historyPaths.length - 1) + this.state.historyOffset]}/>
       </div>
     );
   }
@@ -221,8 +225,8 @@ export default class Player extends React.Component {
     this.props.goBack();
   }
 
-  setHistoryLength(n: number) {
-    this.setState({historyLength: n});
+  setHistoryPaths(paths: string[]) {
+    this.setState({historyPaths: paths});
   }
 
   toggleFullscreen() {
