@@ -62,7 +62,7 @@ export default class Scene {
     }
 
     // backward compatible with 1.0.1
-    if (!this.imageTypeFilter.startsWith('.if.')) {
+    if (!this.imageTypeFilter.startsWith('if.')) {
       this.imageTypeFilter = 'if.' + this.imageTypeFilter;
     }
     if (Object.values(IF).indexOf(this.imageTypeFilter) < 0) {
