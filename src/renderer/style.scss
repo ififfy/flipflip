@@ -623,12 +623,17 @@ label.SimpleCheckbox {
   .Modal__Bar__Close {
     float: left;
     cursor: pointer;
-    width: $buttonHeight;
+    width: $buttonHeight + 0.1rem;
     height: $buttonHeight;
     margin: $barPadding;
     border: 1px solid $black;
     &:hover {
       background-color: rgba(0, 0, 0, 0.1);
+    }
+    &:before {
+      content: '╳';
+      position: relative;
+      bottom: 8px;
     }
   }
 }
