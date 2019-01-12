@@ -84,13 +84,6 @@ export default class SceneDetail extends React.Component {
         </div>
 
         <div className="SceneDetail__Content ControlGroupGroup">
-          <ControlGroup title="Sources" isNarrow={false}>
-            <DirectoryPicker
-              directories={this.props.scene.directories}
-              onImportURL={this.onImportURL.bind(this)}
-              onChange={this.onChangeDirectories.bind(this)}/>
-          </ControlGroup>
-
           <TimingGroup
             scene={this.props.scene}
             onUpdateScene={this.props.onUpdateScene.bind(this)}/>
@@ -138,6 +131,13 @@ export default class SceneDetail extends React.Component {
               onChange={this.onChangeAudioURL.bind(this)}
               label="URL"
               value={this.props.scene.audioURL} />
+          </ControlGroup>
+
+          <ControlGroup title="Sources" isNarrow={false}>
+            <DirectoryPicker
+                directories={this.props.scene.directories}
+                onImportURL={this.onImportURL.bind(this)}
+                onChange={this.onChangeDirectories.bind(this)}/>
           </ControlGroup>
 
         </div>

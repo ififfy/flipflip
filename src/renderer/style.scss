@@ -485,30 +485,34 @@ label.SimpleCheckbox {
 }
 
 .DirectoryPicker {
-  & > .u-button {
-    float: right;
-    margin-top: $smallPadding;
-    margin-right: $smallPadding;
+  .DirectoryPicker__Buttons {
+    height: 2.5rem;
+
+    & > .u-button {
+      float: right;
+      margin-right: $smallPadding;
+    }
   }
-}
 
-.DirectoryPicker__Directory {
-  padding: $smallPadding;
-  padding-left: 0;
-  line-height: 1.5rem;
-  height: 2.5rem;
-
-  @include mouseover;
-
-  .u-button { /* delete */
-    float: right;
-    text-align: center;
-    width: 1.5rem;
-    height: 1.5rem;
-    padding: 0;
+  .DirectoryPicker__Directory {
+    padding: $smallPadding;
+    padding-left: 0;
     line-height: 1.5rem;
-    font-weight: bold;
+    height: 2.5rem;
+
+    @include mouseover;
+
+    .u-button { /* delete */
+      float: right;
+      text-align: center;
+      width: 1.5rem;
+      height: 1.5rem;
+      padding: 0;
+      line-height: 1.5rem;
+      font-weight: bold;
+    }
   }
+
 }
 
 .URLImporter {
