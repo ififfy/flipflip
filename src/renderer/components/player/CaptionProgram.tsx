@@ -253,6 +253,9 @@ const startShowingText = function(el : HTMLElement, url : string) {
   const stop = () => { _stop(); };
   wretch(url)
     .get()
+    .error(503, error => {
+      console.log("Unable to access " + url + " - Service is unavailable");
+    })
     .text(data => {
       if (_hasStoppedEarly) return;
       if (localStorage.debugText) {
