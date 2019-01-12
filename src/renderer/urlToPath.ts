@@ -5,6 +5,6 @@ export default function urlToPath(url: string): string {
     if (process.platform === "win32") {
       return decodeURIComponent(path.substring(1, path.length));
     } else {
-      return path;
+      return decodeURIComponent(path);
     }
 }
