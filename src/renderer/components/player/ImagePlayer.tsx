@@ -236,9 +236,11 @@ export default class ImagePlayer extends React.Component {
 
         // Exclude non-animated gifs from gifs
         if (this.props.imageTypeFilter == IF.gifs && !info.animated) {
+          this.runFetchLoop(i);
           return;
         // Exclude animated gifs from stills
         } else if (this.props.imageTypeFilter == IF.stills && info.animated) {
+          this.runFetchLoop(i);
           return;
         }
       } catch (e) {
