@@ -33,6 +33,7 @@ export default class ImagePlayer extends React.Component {
     playFullGif: boolean;
     imageSizeMin: number,
     setHistoryPaths: (historyPaths: string[]) => void,
+    onLoaded: () => void,
   };
 
   readonly state = {
@@ -176,6 +177,9 @@ export default class ImagePlayer extends React.Component {
 
     const successCallback = () => {
       if (!this._isMounted) return;
+      if (this.props.onLoaded && this.state.historyPaths.length == 1) {
+        this.props.onLoaded();
+      }
       this.setState({
         readyToDisplay: this.state.readyToDisplay.concat([img]),
         numBeingLoaded: Math.max(0, this.state.numBeingLoaded - 1),
@@ -232,9 +236,11 @@ export default class ImagePlayer extends React.Component {
 
         // Exclude non-animated gifs from gifs
         if (this.props.imageTypeFilter == IF.gifs && !info.animated) {
+          this.runFetchLoop(i);
           return;
         // Exclude animated gifs from stills
         } else if (this.props.imageTypeFilter == IF.stills && info.animated) {
+          this.runFetchLoop(i);
           return;
         }
       } catch (e) {

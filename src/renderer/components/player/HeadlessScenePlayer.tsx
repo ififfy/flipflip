@@ -117,6 +117,7 @@ export default class HeadlessScenePlayer extends React.Component {
 
   readonly state = {
     isLoaded: false,
+    onLoaded: Function(),
     promise: new CancelablePromise((resolve, reject) => {}),
     directoriesProcessed: 0,
     progressMessage: "",
@@ -124,7 +125,7 @@ export default class HeadlessScenePlayer extends React.Component {
   };
 
   render() {
-    const showImagePlayer = this.state.isLoaded;
+    const showImagePlayer = this.state.onLoaded != null;
     const showLoadingIndicator = this.props.showLoadingState && !this.state.isLoaded;
     const showEmptyIndicator = (
       this.props.showEmptyState &&
@@ -161,7 +162,8 @@ export default class HeadlessScenePlayer extends React.Component {
             fadeEnabled={this.props.scene.crossFade}
             playFullGif={this.props.scene.playFullGif}
             imageSizeMin={this.props.scene.imageSizeMin}
-            allURLs={this.state.allURLs} />)}
+            allURLs={this.state.allURLs}
+            onLoaded={this.state.onLoaded.bind(this)}/>)}
 
         {showCaptionProgram && (
           <CaptionProgram url={textURL(this.props.scene.textKind, this.props.scene.textSource)} />
@@ -220,7 +222,7 @@ export default class HeadlessScenePlayer extends React.Component {
             this.setState({directoriesProcessed: (n + 1)});
             directoryLoop();
           } else {
-            this.setState({allURLs: newAllURLs, isLoaded: true});
+            this.setState({allURLs: newAllURLs, onLoaded: this.onLoaded});
             setTimeout(this.props.didFinishLoading, 0);
           }
         }
@@ -233,5 +235,9 @@ export default class HeadlessScenePlayer extends React.Component {
 
   componentWillUnmount() {
     this.state.promise.cancel(); // Cancel the promise
+  }
+
+  onLoaded() {
+    this.setState({isLoaded: true});
   }
 }
