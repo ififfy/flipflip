@@ -77,20 +77,13 @@ export default class SceneDetail extends React.Component {
           </div>
 
           <div className="u-button-row-right">
-            <div onClick={this.play.bind(this)} className="u-clickable u-button">
+            <div onClick={this.props.scene.directories.length > 0 ? this.play.bind(this) : this.nop.bind(this)} className={`u-clickable u-button ${this.props.scene.directories.length > 0 ? '' : 'u-disabled'}`}>
               Play
             </div>
           </div>
         </div>
 
         <div className="SceneDetail__Content ControlGroupGroup">
-          <ControlGroup title="Sources" isNarrow={false}>
-            <DirectoryPicker
-              directories={this.props.scene.directories}
-              onImportURL={this.onImportURL.bind(this)}
-              onChange={this.onChangeDirectories.bind(this)}/>
-          </ControlGroup>
-
           <TimingGroup
             scene={this.props.scene}
             onUpdateScene={this.props.onUpdateScene.bind(this)}/>
@@ -140,6 +133,13 @@ export default class SceneDetail extends React.Component {
               value={this.props.scene.audioURL} />
           </ControlGroup>
 
+          <ControlGroup title="Sources" isNarrow={false}>
+            <DirectoryPicker
+                directories={this.props.scene.directories}
+                onImportURL={this.onImportURL.bind(this)}
+                onChange={this.onChangeDirectories.bind(this)}/>
+          </ControlGroup>
+
         </div>
       </div>
     )
@@ -158,6 +158,10 @@ export default class SceneDetail extends React.Component {
 
   play() {
     this.props.onPlay(this.props.scene);
+  }
+
+  nop() {
+
   }
 
   onImportURL() {
