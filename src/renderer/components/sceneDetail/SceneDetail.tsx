@@ -77,7 +77,7 @@ export default class SceneDetail extends React.Component {
           </div>
 
           <div className="u-button-row-right">
-            <div onClick={this.play.bind(this)} className="u-clickable u-button">
+            <div onClick={this.props.scene.directories.length > 0 ? this.play.bind(this) : this.nop.bind(this)} className={`u-clickable u-button ${this.props.scene.directories.length > 0 ? '' : 'u-disabled'}`}>
               Play
             </div>
           </div>
@@ -158,6 +158,10 @@ export default class SceneDetail extends React.Component {
 
   play() {
     this.props.onPlay(this.props.scene);
+  }
+
+  nop() {
+
   }
 
   onImportURL() {
