@@ -14,7 +14,7 @@ If you are on a Mac, you might need to open this by right-clicking the
 application, selecting "Open," and accepting all the stupid prompts
 that pop up.
 
-![Screenshot](/screenshot3.png)
+![Screenshot](/doc_images/scene_details.png)
 
 ## History
 
