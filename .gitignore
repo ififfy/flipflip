@@ -7,6 +7,7 @@ FlipFlip-darwin-x64/
 FlipFlip-win32-x64/
 FlipFlip-win32-ia32/
 FlipFlip-linux-x64/
+FlipFlip-linux-ia32/
 
 ## Ignore project files created by IntelliJ IDEA
 *.iml
