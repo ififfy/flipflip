@@ -22,6 +22,7 @@ declare module '*.icns' {
 declare module 'file-url';
 declare module 'recursive-readdir';
 declare module 'gif-info';
+declare module 'request';
 declare module 'progressbar.js';
 
 // Type declarations for Clipboard API

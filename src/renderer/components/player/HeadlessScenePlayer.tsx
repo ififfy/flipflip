@@ -43,6 +43,25 @@ function textURL(kind: string, src: string): string {
   }
 }
 
+// Determine what kind of source we have based on the URL and return associated Promise
+function getPromise(url: string, filter: string, page: number, index: number): CancelablePromise {
+  if (isURL(url)) {
+    let promise;
+    // What kind of service?
+    if (url.includes('tumblr.com')) {
+      promise = loadTumblr(url, filter, page);
+      promise.setSource(url);
+      promise.setIndex(index);
+      promise.setPage(page);
+    } else {
+      promise = loadRemoteImageURLList(url, filter);
+    }
+    return promise;
+  } else {
+    return loadLocalDirectory(url, filter);
+  }
+}
+
 function isURL(maybeURL: string): boolean {
   return maybeURL.startsWith('http');  // lol
 }
@@ -77,27 +96,99 @@ function loadRemoteImageURLList(url: string, filter: string): CancelablePromise 
   });
 }
 
+function loadTumblr(url: string, filter: string, page: number): CancelablePromise {
+  // Using GoddessServant0's API key for now
+  // TODO Allow user to specify API key or something?
+  let API_KEY="BaQquvlxQeRhKRyViknF98vseIdcBEyDrzJBpHxvAiMPHCKR2l";
+  // TumblrID takes the form of <blog_name>.tumblr.com
+  let tumblrID = url.replace(/https?:\/\//, "");
+  tumblrID = tumblrID.replace("/", "");
+  let tumblrURL = "https://api.tumblr.com/v2/blog/" + tumblrID + "/posts/photo?api_key=" + API_KEY + "&offset=" + (page*20);
+  return new CancelablePromise((resolve, reject) => {
+    wretch(tumblrURL)
+      .get()
+      .error(429, error => {
+        // If we're hitting Tumblr's server too often, just show a warning and stop.
+        // Timeout may need to be adjusted, 0 was too low
+        console.warn("Tumblr responded with 429 - Too Many Requests");
+        resolve(null);
+      })
+      .json(json => {
+        // End loop if we're at end of posts
+        if (json.response.posts.length == 0) {
+          resolve(null);
+          return;
+        }
+
+        let images = [];
+        for (let post of json.response.posts) {
+          // Sometimes photos are listed separately
+          if (post.photos) {
+            for (let photo of post.photos) {
+              let imgURL = photo.original_size.url;
+              if (filter != IF.gifs || (filter == IF.gifs && imgURL.toLowerCase().endsWith('.gif'))) {
+                images.push(photo.original_size.url);
+              }
+            }
+          } else { // Sometimes photos are elements of the body
+            const regex = /<img[^(?:src|\/>)]*src="([^"]*)[^(?:\/>)]*\/>/g;
+            let imageSource;
+            while ((imageSource = regex.exec(post.body)) !== null) {
+              images.push(imageSource[1]);
+            }
+          }
+          // There may be other cases I didn't account for here
+        }
+        resolve(images);
+      })
+      .catch((e) => {
+        console.warn("Fetch error on", tumblrURL);
+        console.error(e);
+        resolve(null)
+      });
+  });
+}
+
 // Inspired by https://reactjs.org/blog/2015/12/16/ismounted-antipattern.html
 class CancelablePromise extends Promise<Array<string>> {
-  hasCanceled_ : boolean;
+  hasCanceled: boolean;
+  // Only looping sources use these properties
+  source: string;
+  index: number;
+  page: number;
 
 
   constructor(executor: (resolve: (value?: (PromiseLike<Array<string>> | Array<string>)) => void, reject: (reason?: any) => void) => void) {
     super(executor);
-    this.hasCanceled_ = false;
+    this.hasCanceled = false;
+    this.source = "";
+    this.index = 0;
+    this.page = 0;
   }
 
-  getPromise() : Promise<Array<string>> {
+  getPromise(): Promise<Array<string>> {
     return new Promise((resolve, reject) => {
       this.then(
-          val => this.hasCanceled_ ? null : resolve(val),
-          error => this.hasCanceled_ ? null : reject(error)
+          val => this.hasCanceled ? null : resolve(val),
+          error => this.hasCanceled ? null : reject(error)
       );
     });
   }
 
   cancel() {
-    this.hasCanceled_ = true;
+    this.hasCanceled = true;
+  }
+
+  setSource(source: string) {
+    this.source = source;
+  }
+
+  setIndex(index: number) {
+    this.index = index;
+  }
+
+  setPage(page: number) {
+    this.page = page;
   }
 }
 
@@ -118,19 +209,22 @@ export default class HeadlessScenePlayer extends React.Component {
   readonly state = {
     isLoaded: false,
     onLoaded: Function(),
+    promiseQueue: Array<CancelablePromise>(),
     promise: new CancelablePromise((resolve, reject) => {}),
     directoriesProcessed: 0,
-    progressMessage: "",
+    progressMessage: this.props.scene.directories.length > 0 ? this.props.scene.directories[0] : "",
     allURLs: Array<Array<string>>(),
   };
 
   render() {
+    // Returns true if array is empty, or only contains empty arrays
+    const isEmpty = function(allURLs: any[], index: number, array: any[]): boolean {
+      return Array.isArray(allURLs) && allURLs.every(isEmpty);
+    };
+
     const showImagePlayer = this.state.onLoaded != null;
     const showLoadingIndicator = this.props.showLoadingState && !this.state.isLoaded;
-    const showEmptyIndicator = (
-      this.props.showEmptyState &&
-      this.state.isLoaded &&
-      this.state.allURLs.length == 0);
+    const showEmptyIndicator = this.props.showEmptyState && this.state.isLoaded && isEmpty(this.state.allURLs, -1, null);
     const showCaptionProgram = (
       this.props.showText &&
       this.state.isLoaded &&
@@ -164,7 +258,7 @@ export default class HeadlessScenePlayer extends React.Component {
             fadeEnabled={this.props.scene.crossFade}
             playFullGif={this.props.scene.playFullGif}
             imageSizeMin={this.props.scene.imageSizeMin}
-            allURLs={this.state.allURLs}
+            allURLs={isEmpty(this.state.allURLs, -1, null) ? null : this.state.allURLs}
             onLoaded={this.state.onLoaded.bind(this)}/>)}
 
         {showCaptionProgram && (
@@ -192,13 +286,17 @@ export default class HeadlessScenePlayer extends React.Component {
 
     let directoryLoop = () => {
       let d = this.props.scene.directories[n];
-      let loadPromise = (isURL(d)
-          ? loadRemoteImageURLList(d, this.props.scene.imageTypeFilter)
-          : loadLocalDirectory(d, this.props.scene.imageTypeFilter));
+      let loadPromise = getPromise(d, this.props.scene.imageTypeFilter, 0, n);
 
-      let message = d;
+      // Because of rendering lag, always display the NEXT source, unless this is the last one
+      let message;
+      if ((n+1) == this.props.scene.directories.length) {
+        message = d;
+      } else {
+        message = this.props.scene.directories[n+1];
+      }
       if (this.props.opacity != 1) {
-        message = "<p>Loading Overlay...</p>" + d;
+        message = "<p>Loading Overlay...</p>" + message;
       }
 
       this.setState({promise: loadPromise, progressMessage: message});
@@ -206,29 +304,64 @@ export default class HeadlessScenePlayer extends React.Component {
       loadPromise
         .getPromise()
         .then((urls) => {
+          let newPromiseQueue = this.state.promiseQueue;
           n += 1;
 
           // The scene can configure which of these branches to take
-          if (urls.length > 0) {
-            if (this.props.scene.weightDirectoriesEqually) {
-              // Just add the new urls to the end of the list
-              newAllURLs = newAllURLs.concat([urls]);
-            } else {
-              if (newAllURLs.length == 0) newAllURLs = [[]];
-              // Append to a single list of urls
-              newAllURLs[0] = newAllURLs[0].concat(urls);
-            }
+          if (this.props.scene.weightDirectoriesEqually) {
+            // Just add the new urls to the end of the list
+            newAllURLs = newAllURLs.concat([urls]);
+          } else {
+            if (newAllURLs.length == 0) newAllURLs = [[]];
+            // Append to a single list of urls
+            newAllURLs[0] = newAllURLs[0].concat(urls);
+          }
+
+          // If this is a remote URL, queue up the next promise
+          if (loadPromise.source.length > 0) {
+            newPromiseQueue.push(
+                getPromise(d, this.props.scene.imageTypeFilter, loadPromise.page + 1, loadPromise.index));
           }
 
           if (n < this.props.scene.directories.length) {
-            this.setState({directoriesProcessed: (n + 1)});
+            this.setState({directoriesProcessed: (n + 1), promiseQueue: newPromiseQueue});
             directoryLoop();
           } else {
-            this.setState({allURLs: newAllURLs, onLoaded: this.onLoaded});
+            this.setState({allURLs: newAllURLs, onLoaded: this.onLoaded, promiseQueue: newPromiseQueue});
             setTimeout(this.props.didFinishLoading, 0);
+            // All sources have been initialized, start our remote promise loop
+            promiseLoop();
           }
-        }
-      )
+        });
+    };
+
+    let promiseLoop = () => {
+      // Process until queue is empty or player has been stopped
+      if (this.state.promiseQueue.length > 0 && !this.state.promise.hasCanceled) {
+        let promise = this.state.promiseQueue.shift();
+        this.setState({promise: promise});
+        promise
+          .getPromise()
+          .then((urls) => {
+            // If we are not at the end of a source
+            if (urls == null) {
+              // Update the correct index with our new images
+              let newAllURLs = this.state.allURLs;
+              let sourceURLs = newAllURLs[promise.index];
+              newAllURLs[promise.index] = sourceURLs.concat(urls);
+
+              // Add the next promise to the queue
+              let newPromiseQueue = this.state.promiseQueue;
+              newPromiseQueue.push(
+                  getPromise(promise.source, this.props.scene.imageTypeFilter, promise.page + 1, promise.index));
+
+              this.setState({allURLs: newAllURLs, promiseQueue: newPromiseQueue});
+            }
+
+            // This delay might have to be modified, 0 was too low, resulted in 429 response
+            setTimeout(promiseLoop, 200);
+          });
+      }
     };
 
     directoryLoop();

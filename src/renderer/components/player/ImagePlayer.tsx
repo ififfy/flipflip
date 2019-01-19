@@ -1,4 +1,5 @@
 import * as React from 'react';
+import request from 'request';
 
 import ImageView from './ImageView';
 import TIMING_FUNCTIONS from '../../TIMING_FUNCTIONS';
@@ -7,10 +8,16 @@ import fs from "fs";
 import gifInfo from 'gif-info';
 import ChildCallbackHack from './ChildCallbackHack';
 import urlToPath from '../../urlToPath';
+import IncomingMessage = Electron.IncomingMessage;
 
 function choice<T>(items: Array<T>): T {
   const i = Math.floor(Math.random() * items.length);
   return items[i];
+}
+
+class GifInfo {
+  animated: boolean;
+  duration: string;
 }
 
 export default class ImagePlayer extends React.Component {
@@ -46,6 +53,7 @@ export default class ImagePlayer extends React.Component {
     timeToNextFrame: 0,
     timeoutID: 0,
     nextImageID: 0,
+    restart: false,
   };
 
   _isMounted = false;
@@ -145,15 +153,25 @@ export default class ImagePlayer extends React.Component {
   }
 
   componentWillReceiveProps(props: any) {
-    if (!this.props.isPlaying && props.isPlaying) {
+    if ((!this.props.isPlaying && props.isPlaying) || this.state.restart) {
+      this.setState({restart: false});
       this.start();
     } else if (!props.isPlaying && this.state.timeoutID != 0) {
       clearTimeout(this.state.timeoutID);
       this.setState({timeoutID: 0});
+    } else if (this.props.allURLs == null && props.allURLs != null && props.allURLs.length > 0) {
+      // Can't just call start again, because props won't have been updated yet,
+      // but flag to restart next time props are updated
+      this.setState({restart: true});
     }
   }
 
   start() {
+    if (this.props.allURLs == null) {
+      this.props.onLoaded();
+      return;
+    }
+
     for (let i=0; i<this.props.maxLoadingAtOnce; i++) {
       this.runFetchLoop(i, true);
     }
@@ -218,7 +236,6 @@ export default class ImagePlayer extends React.Component {
       // lifecycle, so always load on the next event loop iteration.
       // Also, now  we know the image size, so we can finally filter it.
       if (img.width < this.props.imageSizeMin || img.height < this.props.imageSizeMin) {
-        console.log("Skipping tiny image at", img.src);
         setTimeout(errorCallback, 0);
       } else {
         setTimeout(successCallback, 0);
@@ -229,32 +246,46 @@ export default class ImagePlayer extends React.Component {
       setTimeout(errorCallback, 0);
     };
 
+    const processInfo = (info: GifInfo) => {
+      // If gif is animated and we want to play entire length, store its duration
+      if (this.props.playFullGif && info && info.animated) {
+        img.alt=info.duration;
+      }
+
+      // Exclude non-animated gifs from gifs
+      if (this.props.imageTypeFilter == IF.gifs && info && !info.animated) {
+        this.runFetchLoop(i);
+        return;
+        // Exclude animated gifs from stills
+      } else if (this.props.imageTypeFilter == IF.stills && info && info.animated) {
+        this.runFetchLoop(i);
+        return;
+      }
+
+      img.src = url;
+    };
+
     // Filter gifs by animation
     if (url.toLocaleLowerCase().endsWith('.gif')) {
       // Get gif info. See https://github.com/Prinzhorn/gif-info
       try {
-        let info = gifInfo(toArrayBuffer(fs.readFileSync(urlToPath(url))));
-
-        // If gif is animated and we want to play entire length, store its duration
-        if (info.animated && this.props.playFullGif) {
-          img.alt=info.duration;
-        }
-
-        // Exclude non-animated gifs from gifs
-        if (this.props.imageTypeFilter == IF.gifs && !info.animated) {
-          this.runFetchLoop(i);
-          return;
-        // Exclude animated gifs from stills
-        } else if (this.props.imageTypeFilter == IF.stills && info.animated) {
-          this.runFetchLoop(i);
-          return;
+        if (url.includes("file:///")) {
+          processInfo(gifInfo(toArrayBuffer(fs.readFileSync(urlToPath(url)))));
+        } else {
+          request.get({url, encoding: null}, function(err: Error, res: IncomingMessage, body: Buffer) {
+            if (err) {
+              console.error(err);
+              return;
+            }
+            processInfo(gifInfo(toArrayBuffer(body)));
+          });
         }
       } catch (e) {
         console.error(e);
       }
+    } else {
+      img.src = url;
     }
-
-    img.src = url;
   }
 
   advance(isStarting = false, schedule = true, ignoreIsPlayingStatus = false) {

@@ -38,6 +38,7 @@
     "react-dom": "^16.6.3",
     "react-sound": "^1.2.0",
     "recursive-readdir": "^2.2.2",
+    "request": "^2.88.0",
     "wretch": "^1.4.2"
   }
 }

@@ -46,7 +46,6 @@ export default class Player extends React.Component {
     const audioPlayStatus = this.state.isPlaying
       ? (Sound as any).status.PLAYING
       : (Sound as any).status.PAUSED;
-    const showOverlayIndicator = this.state.isMainLoaded && !this.state.isOverlayLoaded;
 
     return (
       <div className="Player">
@@ -55,7 +54,7 @@ export default class Player extends React.Component {
           scene={this.props.scene}
           historyOffset={this.state.historyOffset}
           isPlaying={this.state.isPlaying}
-          showLoadingState={true}
+          showLoadingState={!this.state.isMainLoaded}
           showEmptyState={true}
           showText={true}
           advanceHack={this.state.imagePlayerAdvanceHack}
@@ -69,7 +68,7 @@ export default class Player extends React.Component {
             scene={this.props.overlayScene}
             historyOffset={0}
             isPlaying={this.state.isPlaying}
-            showLoadingState={showOverlayIndicator}
+            showLoadingState={this.state.isMainLoaded && !this.state.isOverlayLoaded}
             showEmptyState={false}
             showText={false}
             didFinishLoading={this.playOverlay.bind(this)}
@@ -242,7 +241,7 @@ export default class Player extends React.Component {
       }));
     }
     contextMenu.popup({});
-  }
+  };
 
   playPause() {
     if (this.state.isPlaying) { this.pause() } else { this.play() }
