@@ -330,7 +330,7 @@ export default class HeadlessScenePlayer extends React.Component {
           .getPromise()
           .then((urls) => {
             // If we are not at the end of a source
-            if (urls == null) {
+            if (urls != null) {
               // Update the correct index with our new images
               let newAllURLs = this.state.allURLs;
               let sourceURLs = newAllURLs[promise.index];
