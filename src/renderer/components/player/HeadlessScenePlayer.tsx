@@ -45,25 +45,18 @@ function textURL(kind: string, src: string): string {
 
 // Determine what kind of source we have based on the URL and return associated Promise
 function getPromise(url: string, filter: string, page: number, index: number): CancelablePromise {
-  if (isURL(url)) {
-    let promise;
-    // What kind of service?
-    if (url.includes('tumblr.com')) {
-      promise = loadTumblr(url, filter, page);
-      promise.setSource(url);
-      promise.setIndex(index);
-      promise.setPage(page);
-    } else {
-      promise = loadRemoteImageURLList(url, filter);
-    }
-    return promise;
-  } else {
-    return loadLocalDirectory(url, filter);
+  let promise;
+  if (/^https?:\/\/[^\.]*\.tumblr\.com/.exec(url) != null) { // Tumblr
+    promise = loadTumblr(url, filter, page);
+    promise.setSource(url);
+    promise.setIndex(index);
+    promise.setPage(page);
+  } else if (/^https?:\/\//.exec(url) != null) { // Arbitrary URL, assume image list
+    promise = loadRemoteImageURLList(url, filter);
+  } else { // Directory
+    promise = loadLocalDirectory(url, filter);
   }
-}
-
-function isURL(maybeURL: string): boolean {
-  return maybeURL.startsWith('http');  // lol
+  return promise;
 }
 
 function loadLocalDirectory(path: string, filter: string): CancelablePromise {
