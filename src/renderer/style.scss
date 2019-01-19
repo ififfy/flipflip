@@ -125,7 +125,7 @@ a {
   }
 
   opacity: 0;
-  left: $smallPadding - $buttonSidebarWidth;
+  left: ($smallPadding*4) - $buttonSidebarWidth;
   transition: opacity 500ms ease-in-out,
   left 500ms ease-in-out;
 }
