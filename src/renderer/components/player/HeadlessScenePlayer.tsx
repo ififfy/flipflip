@@ -300,15 +300,8 @@ export default class HeadlessScenePlayer extends React.Component {
           let newPromiseQueue = this.state.promiseQueue;
           n += 1;
 
-          // The scene can configure which of these branches to take
-          if (this.props.scene.weightDirectoriesEqually) {
-            // Just add the new urls to the end of the list
-            newAllURLs = newAllURLs.concat([urls]);
-          } else {
-            if (newAllURLs.length == 0) newAllURLs = [[]];
-            // Append to a single list of urls
-            newAllURLs[0] = newAllURLs[0].concat(urls);
-          }
+          // Just add the new urls to the end of the list
+          newAllURLs = newAllURLs.concat([urls]);
 
           // If this is a remote URL, queue up the next promise
           if (loadPromise.source.length > 0) {
