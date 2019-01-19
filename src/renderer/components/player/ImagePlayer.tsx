@@ -114,10 +114,9 @@ export default class ImagePlayer extends React.Component {
         }}>
         </div>
         {imgs.map((img) => {
-          this.state.nextImageID ++;
           return <ImageView
             img={img}
-            key={this.state.nextImageID.toString()}
+            key={(img as any).key}
             fadeState={this.props.fadeEnabled ? (img.src === imgs[0].src ? 'in' : 'out') : 'none'}
             fadeDuration={this.state.timeToNextFrame / 2} />;
         })}
@@ -182,9 +181,11 @@ export default class ImagePlayer extends React.Component {
       if (this.props.onLoaded && this.state.historyPaths.length == 1) {
         this.props.onLoaded();
       }
+      (img as any).key = this.state.nextImageID;
       this.setState({
         readyToDisplay: this.state.readyToDisplay.concat([img]),
         numBeingLoaded: Math.max(0, this.state.numBeingLoaded - 1),
+        nextImageID: this.state.nextImageID + 1,
       });
       if (this.state.pastAndLatest.length === 0) {
         this.advance(false, false);
