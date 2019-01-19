@@ -31,7 +31,7 @@ export default class ImageURLListImporter extends React.Component {
   }
 
   import() {
-    if (this.state.url) {
+    if (this.state.url && ! this.props.directories.includes(this.state.url)) {
       this.props.onChangeDirectories(this.props.directories.concat([this.state.url]))
     }
     this.props.onDidImport();
