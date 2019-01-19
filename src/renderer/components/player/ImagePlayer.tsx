@@ -43,6 +43,7 @@ export default class ImagePlayer extends React.Component {
     historyPaths: Array<string>(),
     timeToNextFrame: 0,
     timeoutID: 0,
+    nextImageID: 0,
   };
 
   _isMounted = false;
@@ -113,9 +114,10 @@ export default class ImagePlayer extends React.Component {
         }}>
         </div>
         {imgs.map((img) => {
+          this.state.nextImageID ++;
           return <ImageView
             img={img}
-            key={img.src}
+            key={this.state.nextImageID.toString()}
             fadeState={this.props.fadeEnabled ? (img.src === imgs[0].src ? 'in' : 'out') : 'none'}
             fadeDuration={this.state.timeToNextFrame / 2} />;
         })}
