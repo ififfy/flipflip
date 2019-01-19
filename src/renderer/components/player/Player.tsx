@@ -116,7 +116,7 @@ export default class Player extends React.Component {
           <div className="BackButton u-button u-clickable" onClick={this.props.goBack}>Back</div>
         </div>
 
-        <div className={`u-button-sidebar ${this.state.isPlaying ? 'u-show-on-hover-only' : 'u-hidden'}`}>
+        <div className={`u-button-sidebar ${this.state.isPlaying ? '' : 'u-hidden'}`}>
           <h2 className="SceneOptions">Scene Options</h2>
           <TimingGroup
             scene={this.props.scene}
