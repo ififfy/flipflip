@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 
-export default class SimpleSimpleColorPicker extends React.Component {
+export default class SimpleColorPicker extends React.Component {
   readonly props: {
     label: string,
     value: string,
