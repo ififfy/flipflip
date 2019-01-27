@@ -18,6 +18,11 @@ const ZF = { // zoom functions
   out: 'zf.out',
 };
 
+const BT = { //background type}
+  image: 'bt.blurredScaledImage',
+  color: 'bt.color',
+};
+
 const HTF = { // horizontal translate functions
   none: 'htf.none',
   left: 'htf.left',
@@ -36,5 +41,5 @@ const TK = { // text kind
 };
 
 export {
-  TF, IF, ZF, HTF, VTF, TK
+  TF, IF, ZF, HTF, VTF, TK, BT
 };
