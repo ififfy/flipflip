@@ -5,7 +5,6 @@ import ControlGroup from "./ControlGroup";
 import Scene from "../../Scene";
 import SimpleSliderInput from "../ui/SimpleSliderInput";
 import SimpleCheckbox from "../ui/SimpleCheckbox";
-import SimpleTextInput from "../ui/SimpleTextInput";
 import SimpleColorPicker from "../ui/SimpleColorPicker";
 
 export default class EffectGroup extends React.Component {
@@ -22,7 +21,6 @@ export default class EffectGroup extends React.Component {
           text="Cross-fade images"
           isOn={this.props.scene.crossFade}
           onChange={this.onChangeCrossFade.bind(this)} />
-
         
           <SimpleOptionPicker
             onChange={this.onChangeBackgroundType.bind(this)}
