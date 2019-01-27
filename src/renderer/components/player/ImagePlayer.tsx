@@ -7,6 +7,7 @@ import fs from "fs";
 import gifInfo from 'gif-info';
 import ChildCallbackHack from './ChildCallbackHack';
 import urlToPath from '../../urlToPath';
+import { isNull, isNullOrUndefined } from 'util';
 
 function choice<T>(items: Array<T>): T {
   const i = Math.floor(Math.random() * items.length);
@@ -24,6 +25,7 @@ export default class ImagePlayer extends React.Component {
     timingFunction: string,
     timingConstant: string,
     zoomType: string,
+    backgroundColor : string;  // color name or number - if empty string use blurred image
     effectLevel: number,
     horizTransType: string,
     vertTransType: string,
@@ -107,12 +109,19 @@ export default class ImagePlayer extends React.Component {
         className += `zoom-out-${this.props.effectLevel}s`;
     }
 
+
+    let backgroundDiv;
+    switch (this.props.backgroundColor) {
+      case '':
+        backgroundDiv = <div className="u-fill-container u-fill-image-blur" style={{ backgroundImage: `url("${imgs[0].src}")`, }}></div>;
+        break;
+      default:
+        backgroundDiv = <div className="u-fill-container" style={{ background: this.props.backgroundColor, }}></div>;
+    }
+
     return (
       <div className={className}>
-        <div className="u-fill-container u-fill-image-blur" style={{
-          backgroundImage: `url("${imgs[0].src}")`,
-        }}>
-        </div>
+        {backgroundDiv}
         {imgs.map((img) => {
           return <ImageView
             img={img}
