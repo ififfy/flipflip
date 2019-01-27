@@ -30,13 +30,13 @@ export default class EffectGroup extends React.Component {
             value={this.props.scene.backgroundType}
             keys={Object.values(BT)} />
 
+          {this.props.scene.backgroundType==BT.color &&
           <SimpleColorPicker 
-            isVisible={this.props.scene.backgroundType== BT.color}
             isEnabled={this.props.scene.backgroundType== BT.color}
             onChange={this.onChangeBackgroundColor.bind(this)}
             label=""
             value={this.props.scene.backgroundColor.toString()} />
-        
+          }
         <div className="ControlSubgroup">
           <SimpleOptionPicker
             onChange={this.onChangeZoomType.bind(this)}

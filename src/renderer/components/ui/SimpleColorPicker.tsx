@@ -5,14 +5,12 @@ export default class SimpleColorPicker extends React.Component {
   readonly props: {
     label: string,
     value: string,
-    isVisible: boolean,
     isEnabled: boolean,
     children?: React.ReactNode,
     onChange: (value: string) => void
   };
 
     render() {
-        if (this.props.isVisible) {
             return (
                 <div className="SimpleColorPicker">
                     <label>{this.props.label}</label>
@@ -25,9 +23,6 @@ export default class SimpleColorPicker extends React.Component {
                     {this.props.children}
                 </div>
             );
-        }
-        else
-        return (<div/>);
     }
 
   onChange(e: React.FormEvent<HTMLSelectElement>) {
