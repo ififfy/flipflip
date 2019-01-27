@@ -7,7 +7,6 @@ import fs from "fs";
 import gifInfo from 'gif-info';
 import ChildCallbackHack from './ChildCallbackHack';
 import urlToPath from '../../urlToPath';
-import { isNull, isNullOrUndefined } from 'util';
 
 function choice<T>(items: Array<T>): T {
   const i = Math.floor(Math.random() * items.length);
