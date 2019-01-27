@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import ImageView from './ImageView';
 import TIMING_FUNCTIONS from '../../TIMING_FUNCTIONS';
-import {IF, TF, ZF, HTF, VTF} from '../../const';
+import {IF, TF, ZF, HTF, VTF, BT} from '../../const';
 import fs from "fs";
 import gifInfo from 'gif-info';
 import ChildCallbackHack from './ChildCallbackHack';
@@ -25,7 +25,8 @@ export default class ImagePlayer extends React.Component {
     timingFunction: string,
     timingConstant: string,
     zoomType: string,
-    backgroundColor : string;  // color name or number - if empty string use blurred image
+    backgroundType : string;   // Background blurred image or color
+    backgroundColor : string;  // color name or number 
     effectLevel: number,
     horizTransType: string,
     vertTransType: string,
@@ -110,13 +111,14 @@ export default class ImagePlayer extends React.Component {
     }
 
 
+    // prepare the background
     let backgroundDiv;
-    switch (this.props.backgroundColor) {
-      case '':
-        backgroundDiv = <div className="u-fill-container u-fill-image-blur" style={{ backgroundImage: `url("${imgs[0].src}")`, }}></div>;
+    switch (this.props.backgroundType) {
+      case BT.color:
+        backgroundDiv = <div className="u-fill-container" style={{ background: this.props.backgroundColor, }}></div>;
         break;
       default:
-        backgroundDiv = <div className="u-fill-container" style={{ background: this.props.backgroundColor, }}></div>;
+        backgroundDiv = <div className="u-fill-container u-fill-image-blur" style={{ backgroundImage: `url("${imgs[0].src}")`, }}></div>;
     }
 
     return (

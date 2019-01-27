@@ -1,11 +1,12 @@
 import * as React from 'react';
-import {HTF, VTF, ZF} from "../../const";
+import {HTF, VTF, ZF, BT} from "../../const";
 import SimpleOptionPicker from "../ui/SimpleOptionPicker";
 import ControlGroup from "./ControlGroup";
 import Scene from "../../Scene";
 import SimpleSliderInput from "../ui/SimpleSliderInput";
 import SimpleCheckbox from "../ui/SimpleCheckbox";
 import SimpleTextInput from "../ui/SimpleTextInput";
+import SimpleColorPicker from "../ui/SimpleColorPicker";
 
 export default class EffectGroup extends React.Component {
   readonly props: {
@@ -22,12 +23,20 @@ export default class EffectGroup extends React.Component {
           isOn={this.props.scene.crossFade}
           onChange={this.onChangeCrossFade.bind(this)} />
 
-        <SimpleTextInput
-          isEnabled= {true}
-          onChange={this.onChangeBackgroundColor.bind(this)}
-          label="Background color"
-          value={this.props.scene.backgroundColor.toString()} />
+        
+          <SimpleOptionPicker
+            onChange={this.onChangeBackgroundType.bind(this)}
+            label="Background"
+            value={this.props.scene.backgroundType}
+            keys={Object.values(BT)} />
 
+          <SimpleColorPicker 
+            isVisible={this.props.scene.backgroundType== BT.color}
+            isEnabled={this.props.scene.backgroundType== BT.color}
+            onChange={this.onChangeBackgroundColor.bind(this)}
+            label=""
+            value={this.props.scene.backgroundColor.toString()} />
+        
         <div className="ControlSubgroup">
           <SimpleOptionPicker
             onChange={this.onChangeZoomType.bind(this)}
@@ -98,4 +107,6 @@ export default class EffectGroup extends React.Component {
   onChangeOverlaySceneID(id: string) { this.update((s) => { s.overlaySceneID = parseInt(id, 10); }); }
 
   onChangeBackgroundColor(type: string) { this.update((s) => { s.backgroundColor = type; }); }
+
+  onChangeBackgroundType(type: string) { this.update((s) => { s.backgroundType = type; }); }
 }
