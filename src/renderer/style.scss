@@ -339,7 +339,7 @@ a {
   }
 }
 
-.SimpleOptionPicker, .SimpleTextInput, .SimpleSliderInput, .SimpleCheckbox {
+.SimpleOptionPicker, .SimpleTextInput, .SimpleSliderInput, .SimpleCheckbox, .SimpleColorPicker {
   @include control;
 }
 

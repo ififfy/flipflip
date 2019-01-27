@@ -1,4 +1,4 @@
-import {ZF, HTF, VTF, TF, IF, TK} from './const';
+import {ZF, HTF, VTF, TF, IF, TK, BT} from './const';
 
 export default class Scene {
   id: number = 0;
@@ -12,6 +12,8 @@ export default class Scene {
   horizTransType = HTF.none;
   vertTransType = VTF.none;
   crossFade = false;
+  backgroundType = BT.image; 
+  backgroundColor = "";  //Color name of number Empty - use blurred image 
   playFullGif = false;
   textKind: string = "";
   textSource: string = "";
