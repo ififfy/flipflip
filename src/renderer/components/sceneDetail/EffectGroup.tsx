@@ -5,6 +5,7 @@ import ControlGroup from "./ControlGroup";
 import Scene from "../../Scene";
 import SimpleSliderInput from "../ui/SimpleSliderInput";
 import SimpleCheckbox from "../ui/SimpleCheckbox";
+import SimpleTextInput from "../ui/SimpleTextInput";
 
 export default class EffectGroup extends React.Component {
   readonly props: {
@@ -15,46 +16,52 @@ export default class EffectGroup extends React.Component {
 
   render() {
     return (
-        <ControlGroup title="Effects" isNarrow={true}>
-          <SimpleCheckbox
-            text="Cross-fade images"
-            isOn={this.props.scene.crossFade}
-            onChange={this.onChangeCrossFade.bind(this)} />
+      <ControlGroup title="Effects" isNarrow={true}>
+        <SimpleCheckbox
+          text="Cross-fade images"
+          isOn={this.props.scene.crossFade}
+          onChange={this.onChangeCrossFade.bind(this)} />
 
-          <div className="ControlSubgroup">
-            <SimpleOptionPicker
-              onChange={this.onChangeZoomType.bind(this)}
-              label="Zoom Type"
-              value={this.props.scene.zoomType}
-              keys={Object.values(ZF)} />
-            <SimpleSliderInput
-              isEnabled={true}
-              onChange={this.onChangeEffectLevel.bind(this)}
-              label={"Effect Length: " + this.props.scene.effectLevel + "s"}
-              min={1}
-              max={20}
-              value={this.props.scene.effectLevel.toString()} />
-            <SimpleOptionPicker
-              onChange={this.onChangeHorizTransType.bind(this)}
-              label="Translate Horizontally"
-              value={this.props.scene.horizTransType}
-              keys={Object.values(HTF)} />
-            <SimpleOptionPicker
-              onChange={this.onChangeVertTransType.bind(this)}
-              label="Translate Vertically"
-              value={this.props.scene.vertTransType}
-              keys={Object.values(VTF)} />
-          </div>
+        <SimpleTextInput
+          isEnabled= {true}
+          onChange={this.onChangeBackgroundColor.bind(this)}
+          label="Background color"
+          value={this.props.scene.backgroundColor.toString()} />
 
-          <div className="ControlSubgroup">
-            {this.props.allScenes != null && (
+        <div className="ControlSubgroup">
+          <SimpleOptionPicker
+            onChange={this.onChangeZoomType.bind(this)}
+            label="Zoom Type"
+            value={this.props.scene.zoomType}
+            keys={Object.values(ZF)} />
+          <SimpleSliderInput
+            isEnabled={true}
+            onChange={this.onChangeEffectLevel.bind(this)}
+            label={"Effect Length: " + this.props.scene.effectLevel + "s"}
+            min={1}
+            max={20}
+            value={this.props.scene.effectLevel.toString()} />
+          <SimpleOptionPicker
+            onChange={this.onChangeHorizTransType.bind(this)}
+            label="Translate Horizontally"
+            value={this.props.scene.horizTransType}
+            keys={Object.values(HTF)} />
+          <SimpleOptionPicker
+            onChange={this.onChangeVertTransType.bind(this)}
+            label="Translate Vertically"
+            value={this.props.scene.vertTransType}
+            keys={Object.values(VTF)} />
+        </div>
+
+        <div className="ControlSubgroup">
+          {this.props.allScenes != null && (
             <SimpleOptionPicker
               onChange={this.onChangeOverlaySceneID.bind(this)}
               label="Overlay scene"
               value={this.props.scene.overlaySceneID.toString()}
               getLabel={this.getSceneName.bind(this)}
               keys={["0"].concat(this.props.allScenes.map((s) => s.id.toString()))} />)}
-            {(this.props.allScenes != null || this.props.scene.overlaySceneID != 0) && (
+          {(this.props.allScenes != null || this.props.scene.overlaySceneID != 0) && (
             <SimpleSliderInput
               isEnabled={this.props.scene.overlaySceneID != 0}
               onChange={this.onChangeOverlaySceneOpacity.bind(this)}
@@ -62,8 +69,8 @@ export default class EffectGroup extends React.Component {
               min={1}
               max={99}
               value={(this.props.scene.overlaySceneOpacity * 100).toString()} />)}
-          </div>
-        </ControlGroup>
+        </div>
+      </ControlGroup>
     );
   }
 
@@ -89,4 +96,6 @@ export default class EffectGroup extends React.Component {
   onChangeOverlaySceneOpacity(value: string) { this.update((s) => { s.overlaySceneOpacity = parseInt(value, 10) / 100; }); }
 
   onChangeOverlaySceneID(id: string) { this.update((s) => { s.overlaySceneID = parseInt(id, 10); }); }
+
+  onChangeBackgroundColor(type: string) { this.update((s) => { s.backgroundColor = type; }); }
 }

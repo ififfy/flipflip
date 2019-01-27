@@ -12,6 +12,7 @@ export default class Scene {
   horizTransType = HTF.none;
   vertTransType = VTF.none;
   crossFade = false;
+  backgroundColor = "";  //Color name of number Empty - use blurred image 
   playFullGif = false;
   textKind: string = "";
   textSource: string = "";
