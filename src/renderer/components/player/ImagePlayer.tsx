@@ -114,7 +114,7 @@ export default class ImagePlayer extends React.Component {
     let backgroundDiv;
     switch (this.props.backgroundType) {
       case BT.color:
-        backgroundDiv = <div className="u-fill-container" style={{ background: this.props.backgroundColor, }}></div>;
+        backgroundDiv = <div className="u-fill-container" style={{ background: this.props.backgroundColor===''?"black":this.props.backgroundColor, }}></div>;
         break;
       default:
         backgroundDiv = <div className="u-fill-container u-fill-image-blur" style={{ backgroundImage: `url("${imgs[0].src}")`, }}></div>;
