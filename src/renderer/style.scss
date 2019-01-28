@@ -271,6 +271,29 @@ a {
       background-color: $buttonBottom;
     }
   }
+
+  .ScenePicker__Library {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: $smallPadding;
+    margin-left: -$smallPadding;
+
+    .ScenePicker__LibraryButton {
+      display: flex;
+      background-color: $white;
+      color: $black !important;
+      height: 4em;
+
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+
+      &:hover {
+        background-color: $buttonBottom;
+      }
+    }
+  }
 }
 
 .ControlGroupGroup {
@@ -448,6 +471,15 @@ label.SimpleCheckbox {
 
   &.m-hidden {
     display: none;
+  }
+}
+
+.Library {
+  .LibraryHeader {
+    display: inline-block;
+    margin-top: 0;
+    color: $black !important;
+    line-height: $buttonBarHeight;
   }
 }
 

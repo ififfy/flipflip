@@ -3,6 +3,7 @@ import * as React from 'react';
 import {writeFileSync, mkdirSync, readFileSync, readFile} from 'fs';
 import path from 'path';
 
+import Library from './library/Library';
 import Scene from '../Scene';
 import ScenePicker from './ScenePicker';
 import SceneDetail from './sceneDetail/SceneDetail';
@@ -82,7 +83,14 @@ export default class Meta extends React.Component {
           <ScenePicker
             scenes={this.state.scenes}
             onAdd={this.onAddScene.bind(this)}
-            onSelect={this.onOpenScene.bind(this)} />)}
+            onSelect={this.onOpenScene.bind(this)}
+            onOpenLibrary={this.onOpenLibrary.bind(this)}/>)}
+
+        {this.isRoute('library') && (
+          <Library
+            goBack={this.goBack.bind(this)}
+          />
+        )}
 
         {this.isRoute('scene') && (
           <SceneDetail
@@ -132,6 +140,10 @@ export default class Meta extends React.Component {
 
   onOpenScene(scene: Scene) {
     this.setState({route: [new Route({kind: 'scene', value: scene.id})]});
+  }
+
+  onOpenLibrary() {
+    this.setState({route: [new Route({kind: 'library'})]});
   }
 
   onPlayScene(scene: Scene) {

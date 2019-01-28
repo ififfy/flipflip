@@ -1,11 +1,10 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 
 import {remote} from 'electron';
 import Scene from '../Scene';
 
 class ScenePickerItem extends React.Component {
-  readonly props: { scene: Scene, onSelect(scene: Scene): void }
+  readonly props: { scene: Scene, onSelect(scene: Scene): void };
 
   render() {
     return (
@@ -29,7 +28,7 @@ class Link extends React.Component {
     url: string,
     onClick?(): void,
     children?: React.ReactNode,
-  }
+  };
 
   render() {
     return <a href={this.props.url} onClick={this.onClick.bind(this)}>{this.props.children}</a>
@@ -50,7 +49,8 @@ export default class ScenePicker extends React.Component {
     scenes: Array<Scene>,
     onAdd(scene: Scene): void,
     onSelect(scene: Scene): void,
-  }
+    onOpenLibrary(): void,
+  };
 
   render() {
     return (
@@ -81,6 +81,12 @@ export default class ScenePicker extends React.Component {
             </div>
           </div>
         </div>
+
+        <div className="ScenePicker__Library">
+          <div className="ScenePicker__LibraryButton" onClick={this.props.onOpenLibrary}>
+            Library
+          </div>
+        </div>
       </div>
     );
   }
@@ -89,7 +95,7 @@ export default class ScenePicker extends React.Component {
     let id = this.props.scenes.length + 1;
     this.props.scenes.forEach((s) => {
       id = Math.max(s.id + 1, id);
-    })
+    });
     this.props.onAdd(new Scene({
       id: id,
       name: "New scene",
