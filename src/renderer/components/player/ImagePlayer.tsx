@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import ImageView from './ImageView';
 import TIMING_FUNCTIONS from '../../TIMING_FUNCTIONS';
-import {IF, TF, ZF, HTF, VTF} from '../../const';
+import {IF, TF, ZF, HTF, VTF, BT} from '../../const';
 import fs from "fs";
 import gifInfo from 'gif-info';
 import ChildCallbackHack from './ChildCallbackHack';
@@ -24,6 +24,8 @@ export default class ImagePlayer extends React.Component {
     timingFunction: string,
     timingConstant: string,
     zoomType: string,
+    backgroundType : string;
+    backgroundColor : string;
     effectLevel: number,
     horizTransType: string,
     vertTransType: string,
@@ -109,10 +111,11 @@ export default class ImagePlayer extends React.Component {
 
     return (
       <div className={className}>
-        <div className="u-fill-container u-fill-image-blur" style={{
-          backgroundImage: `url("${imgs[0].src}")`,
-        }}>
-        </div>
+        <div className={`u-fill-container ${this.props.backgroundType == BT.color ?  '' : 'u-fill-image-blur'}`} style={{
+          background: this.props.backgroundType == BT.color ? this.props.backgroundColor : null,
+          backgroundImage: this.props.backgroundType == BT.color ? null : `url("${imgs[0].src}")`,
+        }}
+        />
         {imgs.map((img) => {
           return <ImageView
             img={img}
