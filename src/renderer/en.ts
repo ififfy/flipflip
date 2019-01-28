@@ -13,6 +13,9 @@ export default new Map<String, String>([
   ['zf.in','Zoom In'],
   ['zf.out','Zoom Out'],
 
+  ['bt.blur', 'Blurred'],
+  ['bt.color', 'Solid Color'],
+
   ['htf.none','None'],
   ['htf.left','Left'],
   ['htf.right','Right'],
