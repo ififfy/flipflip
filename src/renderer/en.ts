@@ -13,8 +13,8 @@ export default new Map<String, String>([
   ['zf.in','Zoom In'],
   ['zf.out','Zoom Out'],
 
-  ['bt.blurredScaledImage', 'Blurred Image'],
-  ['bt.color', 'Fixed Color'],
+  ['bt.blur', 'Blurred'],
+  ['bt.color', 'Solid Color'],
 
   ['htf.none','None'],
   ['htf.left','Left'],

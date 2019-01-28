@@ -18,8 +18,8 @@ const ZF = { // zoom functions
   out: 'zf.out',
 };
 
-const BT = { //background type}
-  image: 'bt.blurredScaledImage',
+const BT = { // background type
+  blur: 'bt.blur',
   color: 'bt.color',
 };
 
