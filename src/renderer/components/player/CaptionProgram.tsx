@@ -254,7 +254,7 @@ const startShowingText = function(el : HTMLElement, url : string) {
   wretch(url)
     .get()
     .error(503, error => {
-      console.log("Unable to access " + url + " - Service is unavailable");
+      console.warn("Unable to access " + url + " - Service is unavailable");
     })
     .text(data => {
       if (_hasStoppedEarly) return;
