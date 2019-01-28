@@ -28,12 +28,12 @@ export default class EffectGroup extends React.Component {
             label="Background"
             value={this.props.scene.backgroundType}
             keys={Object.values(BT)} />
-          {this.props.scene.backgroundType == BT.color  &&
+          {this.props.scene.backgroundType == BT.color && (
             <SimpleColorPicker
               onChange={this.onChangeBackgroundColor.bind(this)}
               label="Color"
               value={this.props.scene.backgroundColor} />
-          }
+          )}
         </div>
 
         <div className="ControlSubgroup">
