@@ -21,19 +21,21 @@ export default class EffectGroup extends React.Component {
           text="Cross-fade images"
           isOn={this.props.scene.crossFade}
           onChange={this.onChangeCrossFade.bind(this)} />
+
         <div className="ControlSubgroup">
           <SimpleOptionPicker
             onChange={this.onChangeBackgroundType.bind(this)}
             label="Background"
             value={this.props.scene.backgroundType}
             keys={Object.values(BT)} />
-          {this.props.scene.backgroundType == BT.color &&
+          {this.props.scene.backgroundType == BT.color  &&
             <SimpleColorPicker
-              isEnabled={this.props.scene.backgroundType == BT.color}
               onChange={this.onChangeBackgroundColor.bind(this)}
               label="Color"
-              value={this.props.scene.backgroundColor.toString()} />
-          }</div>
+              value={this.props.scene.backgroundColor} />
+          }
+        </div>
+
         <div className="ControlSubgroup">
           <SimpleOptionPicker
             onChange={this.onChangeZoomType.bind(this)}
