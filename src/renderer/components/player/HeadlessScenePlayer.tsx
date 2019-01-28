@@ -51,6 +51,7 @@ function getPromise(url: string, filter: string, page: number, index: number): C
     promise.setSource(url);
     promise.setIndex(index);
     promise.setPage(page);
+    promise.setTimeout(8000); // This delay might have to be modified, 5000 was too low, resulted in 429 response
   } else if (/^https?:\/\//.exec(url) != null) { // Arbitrary URL, assume image list
     promise = loadRemoteImageURLList(url, filter);
   } else { // Directory
@@ -90,6 +91,11 @@ function loadRemoteImageURLList(url: string, filter: string): CancelablePromise 
 }
 
 function loadTumblr(url: string, filter: string, page: number): CancelablePromise {
+  // Implementing hard page cap for now
+  // TODO Implement caching and remove this
+  if (page > 20) {
+    return new CancelablePromise((resolve, reject) => {resolve(null)});
+  }
   // Using GoddessServant0's API key for now
   // TODO Allow user to specify API key or something?
   let API_KEY="BaQquvlxQeRhKRyViknF98vseIdcBEyDrzJBpHxvAiMPHCKR2l";
@@ -100,9 +106,11 @@ function loadTumblr(url: string, filter: string, page: number): CancelablePromis
   return new CancelablePromise((resolve, reject) => {
     wretch(tumblrURL)
       .get()
+      .notFound(error => {
+        console.warn(tumblrID + " is not available");
+        resolve(null);
+      })
       .error(429, error => {
-        // If we're hitting Tumblr's server too often, just show a warning and stop.
-        // Timeout may need to be adjusted, 0 was too low
         console.warn("Tumblr responded with 429 - Too Many Requests");
         resolve(null);
       })
@@ -130,7 +138,6 @@ function loadTumblr(url: string, filter: string, page: number): CancelablePromis
               images.push(imageSource[1]);
             }
           }
-          // There may be other cases I didn't account for here
         }
         resolve(images);
       })
@@ -149,6 +156,7 @@ class CancelablePromise extends Promise<Array<string>> {
   source: string;
   index: number;
   page: number;
+  timeout: number;
 
 
   constructor(executor: (resolve: (value?: (PromiseLike<Array<string>> | Array<string>)) => void, reject: (reason?: any) => void) => void) {
@@ -157,6 +165,7 @@ class CancelablePromise extends Promise<Array<string>> {
     this.source = "";
     this.index = 0;
     this.page = 0;
+    this.timeout = 0;
   }
 
   getPromise(): Promise<Array<string>> {
@@ -182,6 +191,10 @@ class CancelablePromise extends Promise<Array<string>> {
 
   setPage(page: number) {
     this.page = page;
+  }
+
+  setTimeout(timeout: number) {
+    this.timeout = timeout;
   }
 }
 
@@ -344,8 +357,8 @@ export default class HeadlessScenePlayer extends React.Component {
               this.setState({allURLs: newAllURLs, promiseQueue: newPromiseQueue});
             }
 
-            // This delay might have to be modified, 0 was too low, resulted in 429 response
-            setTimeout(promiseLoop, 200);
+            // If there is an overlay, double the timeout
+            setTimeout(promiseLoop, this.props.scene.overlaySceneID != -1 ? promise.timeout * 2 : promise.timeout);
           });
       }
     };
