@@ -73,8 +73,8 @@ export default class ScenePicker extends React.Component {
 
         <div className="ScenePicker__Scenes">
           {this.props.scenes.map((scene) =>
-            <ScenePickerItem key={`${scene.id}`} scene={scene} onSelect={this.props.onSelect
-          } />)}
+            <ScenePickerItem key={`${scene.id}`} scene={scene} onSelect={this.props.onSelect} />
+          )}
           <div key="add" className="ScenePickerItem u-clickable" onClick={this.onAdd.bind(this)}>
             <div className="ScenePickerItem__Title">
               + Add scene
@@ -83,7 +83,7 @@ export default class ScenePicker extends React.Component {
         </div>
 
         <div className="ScenePicker__Library">
-          <div className="ScenePicker__LibraryButton" onClick={this.props.onOpenLibrary}>
+          <div className="ScenePicker__LibraryButton u-clickable" onClick={this.props.onOpenLibrary}>
             Library
           </div>
         </div>

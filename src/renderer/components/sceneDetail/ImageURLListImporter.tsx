@@ -3,16 +3,13 @@ import SimpleURLInput from '../ui/SimpleURLInput';
 
 export default class ImageURLListImporter extends React.Component {
   readonly props: {
-    directories: Array<string>,
     onDidImport(): void,
-    onChangeDirectories(directories: Array<string>): void,
-    onChangeTextKind(kind: string) : void,
-    onChangeTextSource(hbID: string) : void,
+    addDirectories(directories: Array<string>): void,
   };
 
   state = {
     url: "",
-  }
+  };
 
   render() {
     return (
@@ -31,8 +28,8 @@ export default class ImageURLListImporter extends React.Component {
   }
 
   import() {
-    if (this.state.url && ! this.props.directories.includes(this.state.url)) {
-      this.props.onChangeDirectories(this.props.directories.concat([this.state.url]))
+    if (this.state.url) {
+      this.props.addDirectories([this.state.url])
     }
     this.props.onDidImport();
   }

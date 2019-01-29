@@ -6,8 +6,7 @@ import SimpleTextInput from '../ui/SimpleTextInput';
 
 export default class GooninatorImporter extends React.Component {
   readonly props: {
-    directories: Array<string>,
-    onChangeDirectories(directories: Array<string>): void,
+    addDirectories(directories: Array<string>): void,
     onChangeTextKind(kind: string) : void,
     onChangeTextSource(hbID: string) : void,
     onDidImport(): void,
@@ -63,7 +62,7 @@ export default class GooninatorImporter extends React.Component {
       // Append root onto each blog
       for (let u = 0; u < importURLs.length; u++) {
         let fullPath = rootDir + importURLs[u];
-        if (this.props.directories.includes(fullPath) || importURLs.includes(fullPath) || importURLs[u] === sep || importURLs[u] === "") {
+        if (importURLs.includes(fullPath) || importURLs[u] === sep || importURLs[u] === "") {
           // Remove index and push u back
           importURLs.splice(u, 1);
           u -= 1
@@ -73,7 +72,7 @@ export default class GooninatorImporter extends React.Component {
       }
 
       // Add list
-      this.props.onChangeDirectories(this.props.directories.concat(importURLs));
+      this.props.addDirectories(importURLs);
     }
 
     if (hastebinURL.includes("pastebinId=")) {
