@@ -6,8 +6,4 @@ export default class LibrarySource {
   constructor(init?:Partial<LibrarySource>) {
     Object.assign(this, init);
   }
-
-  setURL(url: string) {
-    this.url = url;
-  }
 }

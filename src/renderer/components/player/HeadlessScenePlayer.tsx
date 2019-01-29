@@ -48,10 +48,10 @@ function getPromise(url: string, filter: string, page: number, index: number): C
   let promise;
   if (/^https?:\/\/[^\.]*\.tumblr\.com/.exec(url) != null) { // Tumblr
     promise = loadTumblr(url, filter, page);
-    promise.setSource(url);
-    promise.setIndex(index);
-    promise.setPage(page);
-    promise.setTimeout(8000); // This delay might have to be modified, 5000 was too low, resulted in 429 response
+    promise.source = url;
+    promise.index = index;
+    promise.page = page;
+    promise.timeout = 8000; // This delay might have to be modified, 5000 was too low, resulted in 429 response
   } else if (/^https?:\/\//.exec(url) != null) { // Arbitrary URL, assume image list
     promise = loadRemoteImageURLList(url, filter);
   } else { // Directory
@@ -179,22 +179,6 @@ class CancelablePromise extends Promise<Array<string>> {
 
   cancel() {
     this.hasCanceled = true;
-  }
-
-  setSource(source: string) {
-    this.source = source;
-  }
-
-  setIndex(index: number) {
-    this.index = index;
-  }
-
-  setPage(page: number) {
-    this.page = page;
-  }
-
-  setTimeout(timeout: number) {
-    this.timeout = timeout;
   }
 }
 

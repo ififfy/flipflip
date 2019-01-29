@@ -8,6 +8,7 @@ export default class Library extends React.Component {
   readonly props: {
     library: Array<LibrarySource>,
     onUpdateLibrary(sources: Array<LibrarySource>): void,
+    onPlay(source: string): void,
     goBack(): void,
   };
 
@@ -42,8 +43,10 @@ export default class Library extends React.Component {
           )}
           {this.props.library.map((source) =>
             <div className="Library__Source"
-                 key={(source.id as any) as number}>
-              {source.url}
+                 key={(source.url as any) as number}>
+              <div className="Library__SourceTitle" onClick={this.props.onPlay.bind(this, source.url)}>
+                {source.url}
+              </div>
               <div className="u-button u-destructive u-clickable"
                    onClick={this.onRemove.bind(this, source.url)}>×️</div>
             </div>
@@ -109,7 +112,7 @@ export default class Library extends React.Component {
     let newLibrary = this.props.library;
     for (let url of directories) {
       let source = new LibrarySource();
-      source.setURL(url);
+      source.url = url;
       newLibrary.push(source);
     }
     this.props.onUpdateLibrary(newLibrary);

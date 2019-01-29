@@ -93,6 +93,7 @@ export default class Meta extends React.Component {
           <Library
             library={this.state.library}
             goBack={this.goBack.bind(this)}
+            onPlay={this.onPlaySceneFromLibrary.bind(this)}
             onUpdateLibrary={this.onUpdateLibrary.bind(this)}
           />
         )}
@@ -114,6 +115,13 @@ export default class Meta extends React.Component {
             overlayScene={this.overlayScene()}
             goBack={this.goBack.bind(this)} />
         )}
+        {this.isRoute('libraryplay') && (
+          <Player
+            scene={this.scene()}
+            onUpdateScene={this.onUpdateScene.bind(this)}
+            overlayScene={null}
+            goBack={this.goBackToLibrary.bind(this)} />
+        )}
       </div>
     )
   }
@@ -126,6 +134,12 @@ export default class Meta extends React.Component {
     const newRoute = this.state.route;
     this.state.route.pop();
     this.setState({route: newRoute, autoEdit: false});
+  }
+
+  goBackToLibrary() {
+    const newScenes = this.state.scenes;
+    newScenes.pop();
+    this.setState({route: [new Route({kind: 'library'})], scenes: newScenes});
   }
 
   onAddScene(scene: Scene) {
@@ -155,6 +169,18 @@ export default class Meta extends React.Component {
     const newRoute = this.state.route.concat(new Route({kind: 'play', value: scene.id}));
     console.log(newRoute);
     this.setState({route: newRoute});
+  }
+
+  onPlaySceneFromLibrary(source: string) {
+    let tempScene = new Scene();
+    tempScene.name = "library_scene_temp";
+    tempScene.directories = [source];
+    tempScene.id = this.state.scenes.length + 1;
+    const newRoute = [new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'libraryplay', value: tempScene.id})];
+    this.setState({
+      scenes: this.state.scenes.concat([tempScene]),
+      route: newRoute,
+    });
   }
 
   onUpdateScene(scene: Scene, fn: (scene: Scene) => void) {
