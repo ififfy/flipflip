@@ -2,8 +2,6 @@ import * as React from 'react';
 import Modal from '../ui/Modal';
 import {remote} from 'electron';
 
-import {pathname} from '../../util';
-
 type Props = {
   directories: Array<string>,
   onImportURL(): void,
@@ -30,7 +28,7 @@ export default class DirectoryPicker extends React.Component {
             <div
               className="DirectoryPicker__Directory"
               key={(directory as any) as number}>
-              {pathname(directory, this.props.directories)}
+              {directory}
               <div
                 onClick={this.onRemove.bind(this, directory)}
                 className="u-button u-destructive u-clickable">×️</div>

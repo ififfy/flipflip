@@ -508,6 +508,11 @@ label.SimpleCheckbox {
 
       @include mouseover;
 
+      .Library__SourceTitle {
+        cursor: pointer;
+        display: inline-block;
+      }
+
       .u-button { /* delete */
         float: right;
         text-align: center;
