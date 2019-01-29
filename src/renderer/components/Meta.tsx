@@ -1,9 +1,10 @@
 import * as React from 'react';
 
-import {writeFileSync, mkdirSync, readFileSync, readFile} from 'fs';
+import {writeFileSync, mkdirSync, readFileSync} from 'fs';
 import path from 'path';
 
 import Library from './library/Library';
+import LibrarySource from './library/LibrarySource';
 import Scene from '../Scene';
 import ScenePicker from './ScenePicker';
 import SceneDetail from './sceneDetail/SceneDetail';
@@ -22,6 +23,7 @@ class Route {
 
 let initialState = {
   scenes: Array<Scene>(),
+  library: Array<LibrarySource>(),
   route: Array<Route>(),
   autoEdit: false,
 };
@@ -40,6 +42,7 @@ try {
   initialState = {
     autoEdit: data.autoEdit,
     scenes: data.scenes.map((s: any) => new Scene(s)),
+    library: data.library.map((s: any) => new LibrarySource(s)),
     route: data.route.map((s: any) => new Route(s)),
   };
   console.log(initialState);
@@ -88,7 +91,9 @@ export default class Meta extends React.Component {
 
         {this.isRoute('library') && (
           <Library
+            library={this.state.library}
             goBack={this.goBack.bind(this)}
+            onUpdateLibrary={this.onUpdateLibrary.bind(this)}
           />
         )}
 
@@ -160,5 +165,11 @@ export default class Meta extends React.Component {
       }
     }
     this.setState({scenes: scenes});
+  }
+
+  onUpdateLibrary(library: Array<LibrarySource>) {
+    this.setState({
+      library: library,
+    });
   }
 };

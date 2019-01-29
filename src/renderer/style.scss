@@ -148,7 +148,7 @@ a {
   background-color: $buttonTop;
   background: linear-gradient(180deg, $buttonTop 0%, $buttonBottom 100%);
 
-  &:hover {
+  &:not(.u-disabled):hover {
     border: 1px solid $white;
   }
 }
@@ -475,11 +475,54 @@ label.SimpleCheckbox {
 }
 
 .Library {
-  .LibraryHeader {
+  .Library__LibraryHeader {
     display: inline-block;
     margin-top: 0;
     color: $black !important;
     line-height: $buttonBarHeight;
+  }
+
+  .Library__Buttons {
+    padding: $smallPadding;
+    height: 3.2rem;
+
+    & > .u-button {
+      float: right;
+      margin-right: $smallPadding;
+    }
+  }
+
+  .Library__Sources {
+    position: fixed;
+    top: 5.5rem;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: $smallPadding;
+    overflow: auto;
+
+    .Library__Source {
+      padding: $smallPadding;
+      line-height: 1.5rem;
+      height: 2.5rem;
+
+      @include mouseover;
+
+      .u-button { /* delete */
+        float: right;
+        text-align: center;
+        width: 1.5rem;
+        height: 1.5rem;
+        padding: 0;
+        line-height: 1.5rem;
+        font-weight: bold;
+      }
+    }
+
+    .Library__Empty {
+      text-align: center;
+      padding: 1em;
+    }
   }
 }
 

@@ -25,12 +25,6 @@ export default class Scene {
   // unused; migration only
   hastebinID: string = "";
 
-  // if true, the display chooses a directory first, then picks an image out
-  // of it.
-  // if false, the display chooses an image out of all possible images, without
-  // looking at which directory it was in.
-  weightDirectoriesEqually = true;
-
   constructor(init?:Partial<Scene>) {
     Object.assign(this, init);
     this.directories = this.directories.filter((d) => !!d);

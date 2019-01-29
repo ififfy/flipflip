@@ -6,9 +6,8 @@ import { TabbedSections } from '../ui/TabbedSections';
 
 export default class URLModal extends React.Component {
   readonly props: {
-    directories: Array<string>,
     onClose(): void,
-    onChangeDirectories(directories: Array<string>): void,
+    addDirectories(directories: Array<string>): void,
     onChangeTextKind(kind: string) : void,
     onChangeTextSource(hbID: string) : void,
   };
@@ -21,16 +20,12 @@ export default class URLModal extends React.Component {
           titles={['Image URL list', 'Gooninator']}
           renderChildren={() => [
               <ImageURLListImporter
-                directories={this.props.directories}
                 onDidImport={this.props.onClose}
-                onChangeDirectories={this.props.onChangeDirectories}
-                onChangeTextKind={this.props.onChangeTextKind}
-                onChangeTextSource={this.props.onChangeTextSource} />,
+                addDirectories={this.props.addDirectories} />,
 
               <GooninatorImporter
-                directories={this.props.directories}
                 onDidImport={this.props.onClose}
-                onChangeDirectories={this.props.onChangeDirectories}
+                addDirectories={this.props.addDirectories}
                 onChangeTextKind={this.props.onChangeTextKind}
                 onChangeTextSource={this.props.onChangeTextSource} />,
             ]}

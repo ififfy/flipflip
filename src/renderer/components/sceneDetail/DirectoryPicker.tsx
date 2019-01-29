@@ -22,7 +22,8 @@ export default class DirectoryPicker extends React.Component {
         <div className='DirectoryPicker__Buttons'>
           <div className='u-button u-clickable' onClick={this.onAdd.bind(this)}>+ Add local files</div>
           <div className='u-button u-clickable' onClick={this.props.onImportURL.bind(this)}>+ Import URL</div>
-          <div className='u-button u-clickable u-float-left' onClick={this.toggleRemoveAllModal.bind(this)}>- Remove All</div>
+          <div className={`u-button u-float-left ${this.props.directories.length == 0 ? 'u-disabled' : 'u-clickable'} `}
+               onClick={this.props.directories.length == 0 ? this.nop : this.toggleRemoveAllModal.bind(this)}>- Remove All</div>
         </div>
         {this.props.directories.map((directory) => {
           return (
@@ -48,6 +49,8 @@ export default class DirectoryPicker extends React.Component {
       </div>
     )
   }
+
+  nop() {}
 
   toggleRemoveAllModal() {
     this.setState({

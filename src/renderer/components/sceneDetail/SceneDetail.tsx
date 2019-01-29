@@ -43,8 +43,7 @@ export default class SceneDetail extends React.Component {
         {this.state.isShowingURLModal && (
             <URLModal
               onClose={this.closeModals.bind(this)}
-              directories={this.props.scene.directories}
-              onChangeDirectories={this.onChangeDirectories.bind(this)}
+              addDirectories={this.addDirectories.bind(this)}
               onChangeTextKind={this.onChangeTextKind.bind(this)}
               onChangeTextSource={this.onChangeTextSource.bind(this)} />
         )}
@@ -183,6 +182,12 @@ export default class SceneDetail extends React.Component {
 
   onChangeName(e: React.FormEvent<HTMLInputElement>) {
     this.update((s) => { s.name = e.currentTarget.value; });
+  }
+
+  addDirectories(directories: Array<string>) {
+    // dedup
+    directories = directories.filter((d) => !this.props.scene.directories.includes(d));
+    this.onChangeDirectories(this.props.scene.directories.concat(directories));
   }
 
   onChangeDirectories(directories: Array<string>) { this.update((s) => { s.directories = directories; }); }
