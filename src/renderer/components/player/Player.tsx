@@ -39,7 +39,7 @@ export default class Player extends React.Component {
   };
 
   render() {
-    const canGoBack = this.state.historyOffset > -(this.state.historyPaths.length-1);
+    const canGoBack = this.state.historyOffset > -(this.state.historyPaths.length - 1);
     const canGoForward = this.state.historyOffset < 0;
     const audioPlayStatus = this.state.isPlaying
       ? (Sound as any).status.PLAYING
@@ -81,7 +81,7 @@ export default class Player extends React.Component {
                 url={this.props.scene.audioURL}
                 playStatus={audioPlayStatus}
                 loop={true}
-                />
+              />
             )}
             <div
               className={`FullscreenButton u-button u-clickable`}
@@ -120,11 +120,11 @@ export default class Player extends React.Component {
           <h2 className="SceneOptions">Scene Options</h2>
           <TimingGroup
             scene={this.props.scene}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+            onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
           <EffectGroup
             scene={this.props.scene}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+            onUpdateScene={this.props.onUpdateScene.bind(this)} />
         </div>
       </div>
     );
@@ -193,16 +193,20 @@ export default class Player extends React.Component {
     const path = urlToPath(url);
     const labelItem = new MenuItem({
       label: isFile ? path : url,
-      click: () => { }});
+      click: () => { }
+    });
     labelItem.enabled = false;
     contextMenu.append(labelItem);
     contextMenu.append(new MenuItem({
       label: 'Copy',
       click: () => {
-        navigator.clipboard.writeText(path); }}));
+        navigator.clipboard.writeText(path);
+      }
+    }));
     contextMenu.append(new MenuItem({
       label: 'Open',
-      click: () => { remote.shell.openExternal(url); }}));
+      click: () => { remote.shell.openExternal(url); }
+    }));
     if (isFile) {
       contextMenu.append(new MenuItem({
         label: 'Reveal',
@@ -213,7 +217,8 @@ export default class Player extends React.Component {
           } else {
             remote.shell.showItemInFolder(path);
           }
-        }}));
+        }
+      }));
       contextMenu.append(new MenuItem({
         label: 'Delete',
         click: () => {
@@ -231,8 +236,9 @@ export default class Player extends React.Component {
           } else {
             alert("This file doesn't exist, cannot delete");
           }
-        }}));
-      }
+        }
+      }));
+    }
     contextMenu.popup({});
   }
 
@@ -241,25 +247,25 @@ export default class Player extends React.Component {
   }
 
   play() {
-    this.setState({isPlaying: true, historyOffset: 0});
+    this.setState({ isPlaying: true, historyOffset: 0 });
   }
 
   playMain() {
-    this.setState({isMainLoaded: true});
+    this.setState({ isMainLoaded: true });
     if (!this.props.overlayScene || this.state.isOverlayLoaded) {
       this.play();
     }
   }
 
   playOverlay() {
-    this.setState({isOverlayLoaded: true});
+    this.setState({ isOverlayLoaded: true });
     if (this.state.isMainLoaded) {
       this.play();
     }
   }
 
   pause() {
-    this.setState({isPlaying: false});
+    this.setState({ isPlaying: false });
   }
 
   historyBack() {
@@ -285,18 +291,16 @@ export default class Player extends React.Component {
   }
 
   setHistoryPaths(paths: string[]) {
-    this.setState({historyPaths: paths});
+    this.setState({ historyPaths: paths });
   }
 
+
+  /** 
+  * Toggles fullscreen mode and MenuBar visibility
+  */
   toggleFullscreen() {
     const window = getCurrentWindow();
     window.setFullScreen(!window.isFullScreen());
-    if (Menu.getApplicationMenu() == null) {
-      // Reattach menu
-      this.componentDidMount();
-    } else {
-      // Remove menu
-      Menu.setApplicationMenu(null);
-    }
+    window.setMenuBarVisibility(!window.isFullScreen());
   }
 };
