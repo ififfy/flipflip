@@ -71,9 +71,9 @@ export default class Library extends React.Component {
 
         {this.state.removeAllIsOpen && (
           <Modal onClose={this.toggleRemoveAllModal.bind(this)} title="Remove all?">
-            <p>Are you sure you want to remove everything from this scene?</p>
+            <p>Are you sure you really wanna delete your library...? ಠ_ಠ</p>
             <div className="u-button u-float-right" onClick={this.removeAll.bind(this)}>
-              OK
+              Yea... I'm sure
             </div>
           </Modal>
         )}
