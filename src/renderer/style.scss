@@ -204,6 +204,14 @@ a {
   color: $red !important;
 }
 
+.u-edit {
+  color: #444 !important;
+  transform: scale(-1,1);
+  &:before {
+    content: '✎';
+  }
+}
+
 .u-show-on-hover-only {
   border-bottom: none;
   background: rgba(0,0,0,0);
@@ -475,6 +483,8 @@ label.SimpleCheckbox {
 }
 
 .Library {
+  outline: none;
+
   .Library__LibraryHeader {
     display: inline-block;
     margin-top: 0;
@@ -509,16 +519,17 @@ label.SimpleCheckbox {
       @include mouseover;
 
       .Library__SourceTitle {
-        cursor: pointer;
+        color: white !important;
         display: inline-block;
       }
 
-      .u-button { /* delete */
+      .u-button {
         float: right;
         text-align: center;
         width: 1.5rem;
         height: 1.5rem;
         padding: 0;
+        margin-left: 0.5rem;
         line-height: 1.5rem;
         font-weight: bold;
       }
