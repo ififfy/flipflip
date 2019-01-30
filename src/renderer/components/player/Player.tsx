@@ -17,6 +17,8 @@ const keyMap = {
   historyForward: ['Forward in time', 'right'],
   navigateBack: ['Go back to scene details', 'backspace'],
   toggleFullscreen: ['Toggle fullscreen', 'CommandOrControl+F'],
+  alwaysOnTop: ['Toggle On Top', 'CommandOrControl+T'],
+  toggleMenuBarDisplay: ['Show/Hide Menu', 'CommandOrControl+M'],
 };
 
 let originalMenu = Menu.getApplicationMenu();
@@ -293,7 +295,21 @@ export default class Player extends React.Component {
   setHistoryPaths(paths: string[]) {
     this.setState({ historyPaths: paths });
   }
+  /**
+   * Toggles if Player Window stays on top
+   */
+  alwaysOnTop() {
+    const window = getCurrentWindow();
+    window.setAlwaysOnTop(!window.isAlwaysOnTop());
+  }
 
+  /**
+   * Shows/Hides the MenuBar
+   */
+  toggleMenuBarDisplay() {
+    const window = getCurrentWindow();
+    window.setMenuBarVisibility(!window.isMenuBarVisible());
+  }
 
   /** 
   * Toggles fullscreen mode and MenuBar visibility
