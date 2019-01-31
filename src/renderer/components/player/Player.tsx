@@ -10,7 +10,7 @@ import TimingGroup from "../sceneDetail/TimingGroup";
 import EffectGroup from "../sceneDetail/EffectGroup";
 import Tag from "../library/Tag";
 import ChildCallbackHack from './ChildCallbackHack';
-import urlToPath from '../../urlToPath';
+import {urlToPath} from '../../utils';
 import SimpleCheckbox from "../ui/SimpleCheckbox";
 
 const keyMap = {

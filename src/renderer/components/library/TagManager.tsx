@@ -2,16 +2,7 @@ import * as React from "react";
 import Sortable from "sortablejs"
 
 import Tag from "./Tag";
-
-function array_move(arr: Array<any>, old_index: number, new_index: number) {
-  if (new_index >= arr.length) {
-    let k = new_index - arr.length + 1;
-    while (k--) {
-      arr.push(undefined);
-    }
-  }
-  arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
-}
+import {array_move, removeDuplicatesBy} from "../../utils";
 
 export default class TagManager extends React.Component {
   readonly props: {
@@ -88,9 +79,9 @@ export default class TagManager extends React.Component {
     )
   }
 
-  onEnd(evt: any) {
+  onEnd(evt: Sortable.SortableEvent) {
     let newTags = this.props.tags;
-    array_move(newTags, evt.oldIndex, evt.newIndex)
+    array_move(newTags, evt.oldIndex, evt.newIndex);
     this.props.onUpdateTags(newTags);
   }
 
@@ -115,51 +106,39 @@ export default class TagManager extends React.Component {
   }
 
   onAdd() {
-    this.setState({isEditing: this.props.tags.length});
+    let id= this.props.tags.length + 1;
+    this.props.tags.forEach((s) => {
+      id = Math.max(s.id + 1, id);
+    });
+
+    this.setState({isEditing: id});
     let newTags = this.props.tags;
-    let highestID = -1;
-    for (let tag of newTags) {
-      if (tag.id > highestID) {
-        highestID = tag.id
-      }
-    }
-    let tag = new Tag();
-    tag.name = "";
-    tag.id = highestID+1;
-    newTags.push(tag);
+    newTags.push(new Tag({
+      name: "",
+      id: id,
+    }));
     this.props.onUpdateTags(newTags);
   }
 
   onEdit(tagID: number, e: Event) {
     e.preventDefault();
+    this.setState({isEditing: tagID});
     // If user left input blank, remove it from list of sources
     // Also prevent user from inputing duplicate source
-    let newTags = [];
-    let newNames = Array<string>();
-    let needsUpdate = false;
-    for (let tag of this.props.tags) {
-      if (tag.name == "" || newNames.includes(tag.name)) {
-        needsUpdate = true;
-      } else {
-        newTags.push(tag);
-        newNames.push(tag.name);
-      }
-    }
-    this.setState({isEditing: tagID});
-    if (needsUpdate) { // Only update tags if we need to
-      this.props.onUpdateTags(newTags);
-    }
+    this.props.onUpdateTags(
+        removeDuplicatesBy((t: Tag) => t.name,
+            this.props.tags.filter((t) => t.name != "")));
   }
 
   onEditTag(tagID: number, e: React.FormEvent<HTMLInputElement>) {
-    let newTags = this.props.tags;
-    for (let tag of newTags) {
-      if (tag.id == tagID) {
-        tag.name = e.currentTarget.value;
-        break;
-      }
-    }
-    this.props.onUpdateTags(newTags);
+    this.props.onUpdateTags(this.props.tags.map(
+        function map(tag: Tag) {
+          if (tag.id == tagID) {
+            tag.name = e.currentTarget.value;
+          }
+          return tag;
+        })
+    );
   }
 
 }
