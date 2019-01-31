@@ -4025,6 +4025,11 @@ snapdragon@^0.8.1:
     source-map-resolve "^0.5.0"
     use "^3.1.0"
 
+sortablejs@^1.8.1:
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/sortablejs/-/sortablejs-1.8.1.tgz#d19b66cf10aab9521a565b79766f2f3291c18278"
+  integrity sha512-r0bKxZYGUFgv/6DQSWW8TVJBBtupUn6TPnDABd4rlqNq+u94ct5+barZmYauPAQNCKwy56C1kg9Y9msAN7UPag==
+
 soundmanager2@^2.97.20170602:
   version "2.97.20170602"
   resolved "https://registry.yarnpkg.com/soundmanager2/-/soundmanager2-2.97.20170602.tgz#fe3bc731bfc4d54c1364e71980263e6816981879"
