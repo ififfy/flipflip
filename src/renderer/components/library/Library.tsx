@@ -5,6 +5,7 @@ import LibrarySource from "./LibrarySource";
 import Tag from "./Tag";
 import Modal from "../ui/Modal";
 import URLModal from "../sceneDetail/URLModal";
+import {removeDuplicatesBy} from "../../utils";
 
 export default class Library extends React.Component {
   readonly props: {
@@ -105,11 +106,7 @@ export default class Library extends React.Component {
   nop() {}
 
   getSourceURLs() {
-    let sourceURLs = [];
-    for (let source of this.props.library) {
-      sourceURLs.push(source.url);
-    }
-    return sourceURLs;
+    return this.props.library.map((s) => s.url);
   }
 
   toggleRemoveAllModal() {
@@ -129,34 +126,23 @@ export default class Library extends React.Component {
 
   onEdit(sourceID: number, e: Event) {
     e.preventDefault();
+    this.setState({isEditing: sourceID});
     // If user left input blank, remove it from list of sources
     // Also prevent user from inputing duplicate source
-    let newLibrary = [];
-    let newSources = Array<string>();
-    let needsUpdate = false;
-    for (let source of this.props.library) {
-      if (source.url == "" || newSources.includes(source.url)) {
-        needsUpdate = true;
-      } else {
-        newLibrary.push(source);
-        newSources.push(source.url);
-      }
-    }
-    this.setState({isEditing: sourceID});
-    if (needsUpdate) { // Only update sources if we need to
-      this.props.onUpdateLibrary(newLibrary);
-    }
+    this.props.onUpdateLibrary(
+        removeDuplicatesBy((s: LibrarySource) => s.url,
+            this.props.library.filter((s) => s.url != "")));
   }
 
   onEditSource(sourceID: number, e: React.FormEvent<HTMLInputElement>) {
-    let newLibrary = this.props.library;
-    for (let source of newLibrary) {
-      if (source.id == sourceID) {
-        source.url = e.currentTarget.value;
-        break;
-      }
-    }
-    this.props.onUpdateLibrary(newLibrary);
+    this.props.onUpdateLibrary(this.props.library.map(
+      function map(source: LibrarySource) {
+        if (source.id == sourceID) {
+          source.url = e.currentTarget.value;
+        }
+        return source;
+      })
+    );
   }
 
   removeAll() {
@@ -165,11 +151,7 @@ export default class Library extends React.Component {
   }
 
   onRemove(sourceID: number) {
-    let newLibrary = this.props.library.filter((s) => s.id != sourceID);
-    for (let s=0; s < newLibrary.length; s++) {
-      newLibrary[s].id = s;
-    }
-    this.props.onUpdateLibrary(newLibrary);
+    this.props.onUpdateLibrary(this.props.library.filter((s) => s.id != sourceID));
   }
 
   onAdd() {
@@ -187,13 +169,20 @@ export default class Library extends React.Component {
     // dedup
     let sourceURLs = this.getSourceURLs();
     directories = directories.filter((d) => !sourceURLs.includes(d));
+
+    let id= this.props.library.length + 1;
+    this.props.library.forEach((s) => {
+      id = Math.max(s.id + 1, id);
+    });
+
     let newLibrary = this.props.library;
     for (let url of directories) {
-      let source = new LibrarySource();
-      source.url = url;
-      source.id = newLibrary.length;
-      source.tags = new Array<Tag>();
-      newLibrary.push(source);
+      newLibrary.push(new LibrarySource({
+        url: url,
+        id: id,
+        tags: new Array<Tag>(),
+      }));
+      id+=1;
     }
     this.props.onUpdateLibrary(newLibrary);
   }

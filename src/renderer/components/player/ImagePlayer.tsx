@@ -7,7 +7,7 @@ import {IF, TF, ZF, HTF, VTF, BT} from '../../const';
 import fs from "fs";
 import gifInfo from 'gif-info';
 import ChildCallbackHack from './ChildCallbackHack';
-import urlToPath from '../../urlToPath';
+import {urlToPath} from '../../utils';
 import IncomingMessage = Electron.IncomingMessage;
 
 function choice<T>(items: Array<T>): T {
