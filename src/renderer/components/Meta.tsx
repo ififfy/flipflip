@@ -5,6 +5,8 @@ import path from 'path';
 
 import Library from './library/Library';
 import LibrarySource from './library/LibrarySource';
+import TagManager from "./library/TagManager";
+import Tag from "./library/Tag";
 import Scene from '../Scene';
 import ScenePicker from './ScenePicker';
 import SceneDetail from './sceneDetail/SceneDetail';
@@ -24,6 +26,7 @@ class Route {
 let initialState = {
   scenes: Array<Scene>(),
   library: Array<LibrarySource>(),
+  tags: Array<Tag>(),
   route: Array<Route>(),
   autoEdit: false,
 };
@@ -43,6 +46,7 @@ try {
     autoEdit: data.autoEdit,
     scenes: data.scenes.map((s: any) => new Scene(s)),
     library: data.library.map((s: any) => new LibrarySource(s)),
+    tags: data.tags.map((t: any) => new Tag(t)),
     route: data.route.map((s: any) => new Route(s)),
   };
   console.log(initialState);
@@ -92,12 +96,20 @@ export default class Meta extends React.Component {
         {this.isRoute('library') && (
           <Library
             library={this.state.library}
-            goBack={this.goBack.bind(this)}
+            tags={this.state.tags}
             onPlay={this.onPlaySceneFromLibrary.bind(this)}
             onUpdateLibrary={this.onUpdateLibrary.bind(this)}
+            goBack={this.goBack.bind(this)}
+            manageTags={this.manageTags.bind(this)}
           />
         )}
-
+        {this.isRoute('tags') && (
+          <TagManager
+            tags={this.state.tags}
+            onUpdateTags={this.onUpdateTags.bind(this)}
+            goBack={this.goBackToLibrary.bind(this)}
+          />
+        )}
         {this.isRoute('scene') && (
           <SceneDetail
             scene={this.scene()}
@@ -162,12 +174,11 @@ export default class Meta extends React.Component {
   }
 
   onOpenLibrary() {
-    this.setState({route: [new Route({kind: 'library'})]});
+    this.setState({route: [new Route({kind: 'library', value: null})]});
   }
 
   onPlayScene(scene: Scene) {
     const newRoute = this.state.route.concat(new Route({kind: 'play', value: scene.id}));
-    console.log(newRoute);
     this.setState({route: newRoute});
   }
 
@@ -183,6 +194,11 @@ export default class Meta extends React.Component {
     });
   }
 
+  manageTags() {
+    const newRoute = this.state.route.concat(new Route({kind: 'tags', value: null}));
+    this.setState({route: newRoute});
+  }
+
   onUpdateScene(scene: Scene, fn: (scene: Scene) => void) {
     const scenes = this.state.scenes;
     for (let s of scenes) {
@@ -194,8 +210,10 @@ export default class Meta extends React.Component {
   }
 
   onUpdateLibrary(library: Array<LibrarySource>) {
-    this.setState({
-      library: library,
-    });
+    this.setState({library: library});
+  }
+
+  onUpdateTags(tags: Array<Tag>) {
+    this.setState({tags: tags});
   }
 };

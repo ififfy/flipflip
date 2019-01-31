@@ -204,6 +204,11 @@ a {
   color: $red !important;
 }
 
+.u-destructive-bg {
+  background-color: $red !important;
+  color: white !important;
+}
+
 .u-edit {
   color: #444 !important;
   transform: scale(-1,1);
@@ -538,6 +543,72 @@ label.SimpleCheckbox {
     .Library__Empty {
       text-align: center;
       padding: 1em;
+    }
+  }
+}
+
+.TagManager {
+  .TagManager__TagManagerHeader {
+    display: inline-block;
+    margin-top: 0;
+    color: $black !important;
+    line-height: $buttonBarHeight;
+  }
+
+  .TagManager__Buttons {
+    padding: $smallPadding;
+    height: 3.2rem;
+
+    & > .u-button {
+      float: right;
+      margin-right: $smallPadding;
+    }
+  }
+
+  .TagManager__Remove, .TagManager__Empty {
+    text-align: center;
+    padding: 1em;
+  }
+
+  .TagManager__Tags {
+    display: flex;
+    flex-wrap: wrap;
+    overflow: auto;
+    padding: $smallPadding;
+
+    & > * {
+      margin-right: $smallPadding;
+      height: 4rem;
+      min-width: 6rem;
+      max-width: 8rem;
+    }
+
+    .TagManager__Tag {
+      background-color: $white;
+      padding: $smallPadding;
+      margin-bottom: $smallPadding;
+
+      &.u-destructive-bg {
+        color: $white !important;
+      }
+      &:not(.u-destructive-bg) {
+        color: $black !important;
+      }
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .TagManager_TagTitle {
+        text-align: center;
+        input {
+          max-width: 7rem;
+        }
+      }
+
+      &:hover {
+        background-color: $buttonBottom;
+      }
     }
   }
 }
