@@ -18,7 +18,7 @@ const keyMap = {
   navigateBack: ['Go back to scene details', 'backspace'],
   toggleFullscreen: ['Toggle fullscreen', 'CommandOrControl+F'],
   alwaysOnTop: ['Toggle On Top', 'CommandOrControl+T'],
-  toggleMenuBarDisplay: ['Show/Hide Menu', 'CommandOrControl+M'],
+  toggleMenuBarDisplay: ['Show/Hide Menu', 'CommandOrControl+^'],
 };
 
 let originalMenu = Menu.getApplicationMenu();
