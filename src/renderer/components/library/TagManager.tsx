@@ -3,6 +3,16 @@ import Sortable from "sortablejs"
 
 import Tag from "./Tag";
 
+function array_move(arr: Array<any>, old_index: number, new_index: number) {
+  if (new_index >= arr.length) {
+    let k = new_index - arr.length + 1;
+    while (k--) {
+      arr.push(undefined);
+    }
+  }
+  arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
+}
+
 export default class TagManager extends React.Component {
   readonly props: {
     tags: Array<Tag>,
@@ -13,6 +23,7 @@ export default class TagManager extends React.Component {
   readonly state = {
     removeTags: false,
     isEditing: -1,
+    sortable: Sortable,
   };
 
   render() {
@@ -63,7 +74,6 @@ export default class TagManager extends React.Component {
           )}
         </div>
 
-
         {this.props.tags.length == 0 && (
           <div className="TagManager__Empty">
             You haven't added any tags yet.
@@ -78,33 +88,44 @@ export default class TagManager extends React.Component {
     )
   }
 
+  onEnd(evt: any) {
+    let newTags = this.props.tags;
+    array_move(newTags, evt.oldIndex, evt.newIndex)
+    this.props.onUpdateTags(newTags);
+  }
+
   componentDidMount() {
-    Sortable.create(document.getElementById('tags'), {
+    let sortable = Sortable.create(document.getElementById('tags'), {
       animation: 150,
       easing: "cubic-bezier(1, 0, 0, 1)",
+      onEnd: this.onEnd.bind(this),
     });
+    this.setState({sortable: sortable});
   }
 
   nop() {}
 
   toggleRemoveMode() {
+    this.state.sortable.option("disabled", !this.state.removeTags);
     this.setState({removeTags: !this.state.removeTags});
   };
 
   onRemove(tagID: number) {
-    let newTags = this.props.tags.filter((t) => t.id != tagID);
-    for (let t=0; t < newTags.length; t++) {
-      newTags[t].id = t;
-    }
-    this.props.onUpdateTags(newTags);
+    this.props.onUpdateTags(this.props.tags.filter((t) => t.id != tagID));
   }
 
   onAdd() {
     this.setState({isEditing: this.props.tags.length});
     let newTags = this.props.tags;
+    let highestID = -1;
+    for (let tag of newTags) {
+      if (tag.id > highestID) {
+        highestID = tag.id
+      }
+    }
     let tag = new Tag();
     tag.name = "";
-    tag.id = newTags.length;
+    tag.id = highestID+1;
     newTags.push(tag);
     this.props.onUpdateTags(newTags);
   }

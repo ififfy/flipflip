@@ -115,9 +115,7 @@ a {
   width: $buttonSidebarWidth;
   @include buttonBarBackground;
 
-
-
-  .SceneOptions {
+  .SceneOptionsHeader {
     display: inline-block;
     margin-top: 0;
     color: $black !important;
@@ -528,6 +526,12 @@ label.SimpleCheckbox {
         display: inline-block;
       }
 
+      .Library__SourceTag {
+        color: $uiGray;
+        padding-left: 1rem;
+        font-size: 12px;
+      }
+
       .u-button {
         float: right;
         text-align: center;
@@ -741,6 +745,36 @@ label.SimpleCheckbox {
     animation-fill-mode: forwards;
     -webkit-animation-timing-function: ease-out;
     animation-timing-function: ease-out;
+  }
+}
+
+.SourceTags {
+  @include noselect;
+  position: absolute;
+  display: flex;
+  height: 8rem;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 0;
+  padding: $smallPadding $smallPadding 0 $smallPadding;
+  @include buttonBarBackground;
+
+  opacity: 0;
+  bottom: -6rem;
+  transition: opacity 500ms ease-in-out,
+  bottom 500ms ease-in-out;
+
+  &:hover {
+    bottom: 0;
+    opacity: 1;
+    transition: opacity 500ms ease-in-out, bottom 500ms ease-in-out;
+  }
+
+  .SourceTag {
+    color: $black;
+    margin-left: $smallPadding;
   }
 }
 

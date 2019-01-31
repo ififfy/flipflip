@@ -11,7 +11,7 @@ export default class Library extends React.Component {
     library: Array<LibrarySource>,
     tags: Array<Tag>,
     onUpdateLibrary(sources: Array<LibrarySource>): void,
-    onPlay(source: string): void,
+    onPlay(source: LibrarySource): void,
     goBack(): void,
     manageTags(): void,
   };
@@ -57,7 +57,7 @@ export default class Library extends React.Component {
             <div className="Library__Source"
                  key={source.id}>
               {this.state.isEditing != source.id && (
-                <div className="Library__SourceTitle u-clickable" onClick={this.props.onPlay.bind(this, source.url)}>
+                <div className="Library__SourceTitle u-clickable" onClick={this.props.onPlay.bind(this, source)}>
                   {source.url}
                 </div>
               )}
@@ -70,6 +70,9 @@ export default class Library extends React.Component {
                       onBlur={this.onEdit.bind(this, -1)}
                       onChange={this.onEditSource.bind(this, source.id)} />
                 </form>
+              )}
+              {source.tags && source.tags.map((tag) =>
+                <span className="Library__SourceTag" key={tag.id}>{tag.name}</span>
               )}
 
               <div className="u-button u-destructive u-clickable"
@@ -189,6 +192,7 @@ export default class Library extends React.Component {
       let source = new LibrarySource();
       source.url = url;
       source.id = newLibrary.length;
+      source.tags = new Array<Tag>();
       newLibrary.push(source);
     }
     this.props.onUpdateLibrary(newLibrary);

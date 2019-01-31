@@ -131,8 +131,10 @@ export default class Meta extends React.Component {
           <Player
             scene={this.scene()}
             onUpdateScene={this.onUpdateScene.bind(this)}
-            overlayScene={null}
-            goBack={this.goBackToLibrary.bind(this)} />
+            goBack={this.goBackToLibrary.bind(this)}
+            tags={this.state.library[this.scene().libraryID].tags}
+            allTags={this.state.tags}
+            toggleTag={this.onToggleTag.bind(this)}/>
         )}
       </div>
     )
@@ -182,10 +184,11 @@ export default class Meta extends React.Component {
     this.setState({route: newRoute});
   }
 
-  onPlaySceneFromLibrary(source: string) {
+  onPlaySceneFromLibrary(source: LibrarySource) {
     let tempScene = new Scene();
     tempScene.name = "library_scene_temp";
-    tempScene.directories = [source];
+    tempScene.directories = [source.url];
+    tempScene.libraryID = source.id;
     tempScene.id = this.state.scenes.length + 1;
     const newRoute = [new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'libraryplay', value: tempScene.id})];
     this.setState({
@@ -215,5 +218,21 @@ export default class Meta extends React.Component {
 
   onUpdateTags(tags: Array<Tag>) {
     this.setState({tags: tags});
+  }
+
+  onToggleTag(sourceID: number, tag: Tag) {
+    let newLibrary = this.state.library;
+    for (let source of newLibrary) {
+      if (source.id==sourceID) {
+        if (source.tags.map((t) => t.id).includes(tag.id)) {
+          source.tags = source.tags.filter((t) => t.id != tag.id);
+        } else {
+          let newTags = source.tags;
+          newTags.push(tag);
+          source.tags = newTags;
+        }
+      }
+    }
+    this.onUpdateLibrary(newLibrary);
   }
 };
