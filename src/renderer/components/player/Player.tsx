@@ -8,8 +8,10 @@ import Scene from '../../Scene';
 import HeadlessScenePlayer from './HeadlessScenePlayer';
 import TimingGroup from "../sceneDetail/TimingGroup";
 import EffectGroup from "../sceneDetail/EffectGroup";
+import Tag from "../library/Tag";
 import ChildCallbackHack from './ChildCallbackHack';
 import urlToPath from '../../urlToPath';
+import SimpleCheckbox from "../ui/SimpleCheckbox";
 
 const keyMap = {
   playPause: ['Play/Pause', 'space'],
@@ -29,6 +31,9 @@ export default class Player extends React.Component {
     scene: Scene,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
     overlayScene?: Scene,
+    tags?: Array<Tag>,
+    allTags?: Array<Tag>,
+    toggleTag?(sourceID: number, tag: Tag): void,
   };
 
   readonly state = {
@@ -46,6 +51,7 @@ export default class Player extends React.Component {
     const audioPlayStatus = this.state.isPlaying
       ? (Sound as any).status.PLAYING
       : (Sound as any).status.PAUSED;
+    const tagIDs = this.props.tags.map((t) => t.id);
 
     return (
       <div className="Player">
@@ -117,16 +123,31 @@ export default class Player extends React.Component {
           <div className="BackButton u-button u-clickable" onClick={this.props.goBack}>Back</div>
         </div>
 
-        <div className={`u-button-sidebar ${this.state.isPlaying ? '' : 'u-hidden'}`}>
-          <h2 className="SceneOptions">Scene Options</h2>
-          <TimingGroup
-            scene={this.props.scene}
-            onUpdateScene={this.props.onUpdateScene.bind(this)} />
+        {this.state.isPlaying && (
+          <div className="SceneOptions u-button-sidebar">
+            <h2 className="SceneOptionsHeader">Scene Options</h2>
+            <TimingGroup
+              scene={this.props.scene}
+              onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
-          <EffectGroup
-            scene={this.props.scene}
-            onUpdateScene={this.props.onUpdateScene.bind(this)} />
-        </div>
+            <EffectGroup
+              scene={this.props.scene}
+              onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+          </div>
+        )}
+
+        {this.props.allTags && (
+          <div className="SourceTags">
+            {this.props.allTags.map((tag) =>
+              <div className="SourceTag" key={tag.id}>
+                <SimpleCheckbox
+                    text={tag.name}
+                    onChange={this.props.toggleTag.bind(this, this.props.scene.libraryID, tag)}
+                    isOn={tagIDs && tagIDs.includes(tag.id)} />
+              </div>
+            )}
+          </div>
+        )}
       </div>
     );
   }
