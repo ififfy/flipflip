@@ -1,4 +1,5 @@
 import * as React from "react";
+import Sortable from "sortablejs"
 
 import Tag from "./Tag";
 
@@ -26,7 +27,8 @@ export default class TagManager extends React.Component {
         </div>
 
         <div className="TagManager__Buttons">
-          <div className='u-button u-clickable' onClick={this.onAdd.bind(this)}>+ Add</div>
+          <div className={`u-button ${this.state.removeTags ? 'u-disabled' : 'u-clickable'}`}
+               onClick={this.state.removeTags ? this.nop : this.onAdd.bind(this)}>+ Add</div>
           {this.state.removeTags && (
             <div className="u-button u-float-left u-clickable"
                  onClick={this.toggleRemoveMode.bind(this)}>Done</div>
@@ -37,7 +39,7 @@ export default class TagManager extends React.Component {
           )}
         </div>
 
-        <div className="TagManager__Tags">
+        <div id="tags" className="TagManager__Tags">
           {this.props.tags.map((tag) =>
             <div className={`TagManager__Tag u-clickable ${this.state.removeTags ? 'u-destructive-bg' : ''}`}
                  onClick={this.state.removeTags ? this.onRemove.bind(this, tag.id) : this.onEdit.bind(this, tag.id)}
@@ -76,6 +78,13 @@ export default class TagManager extends React.Component {
     )
   }
 
+  componentDidMount() {
+    Sortable.create(document.getElementById('tags'), {
+      animation: 150,
+      easing: "cubic-bezier(1, 0, 0, 1)",
+    });
+  }
+
   nop() {}
 
   toggleRemoveMode() {
@@ -83,7 +92,11 @@ export default class TagManager extends React.Component {
   };
 
   onRemove(tagID: number) {
-    this.props.onUpdateTags(this.props.tags.filter((t) => t.id != tagID));
+    let newTags = this.props.tags.filter((t) => t.id != tagID);
+    for (let t=0; t < newTags.length; t++) {
+      newTags[t].id = t;
+    }
+    this.props.onUpdateTags(newTags);
   }
 
   onAdd() {

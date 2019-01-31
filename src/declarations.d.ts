@@ -24,6 +24,7 @@ declare module 'recursive-readdir';
 declare module 'gif-info';
 declare module 'request';
 declare module 'progressbar.js';
+declare module 'sortablejs';
 
 // Type declarations for Clipboard API
 // https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API

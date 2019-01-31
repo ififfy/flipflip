@@ -162,7 +162,11 @@ export default class Library extends React.Component {
   }
 
   onRemove(sourceID: number) {
-    this.props.onUpdateLibrary(this.props.library.filter((s) => s.id != sourceID));
+    let newLibrary = this.props.library.filter((s) => s.id != sourceID);
+    for (let s=0; s < newLibrary.length; s++) {
+      newLibrary[s].id = s;
+    }
+    this.props.onUpdateLibrary(newLibrary);
   }
 
   onAdd() {
