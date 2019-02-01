@@ -526,10 +526,15 @@ label.SimpleCheckbox {
         display: inline-block;
       }
 
-      .Library__SourceTag {
-        color: $uiGray;
-        padding-left: 1rem;
-        font-size: 12px;
+      .Library__SourceTags {
+        display: inline-block;
+
+        .Library__SourceTag {
+          color: $uiGray;
+          padding-left: 1rem;
+          font-size: 12px;
+          cursor: move;
+        }
       }
 
       .u-button {
@@ -589,7 +594,7 @@ label.SimpleCheckbox {
 
     .TagManager__Tag {
       background-color: $white;
-      padding: $smallPadding;
+      padding: $smallPadding*3;
       margin-bottom: $smallPadding;
 
       &.u-destructive-bg {

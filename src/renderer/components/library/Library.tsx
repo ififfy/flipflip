@@ -5,7 +5,8 @@ import LibrarySource from "./LibrarySource";
 import Tag from "./Tag";
 import Modal from "../ui/Modal";
 import URLModal from "../sceneDetail/URLModal";
-import {removeDuplicatesBy} from "../../utils";
+import {array_move, removeDuplicatesBy} from "../../utils";
+import Sortable from "sortablejs";
 
 export default class Library extends React.Component {
   readonly props: {
@@ -48,7 +49,7 @@ export default class Library extends React.Component {
                onClick={this.props.library.length == 0 ? this.nop : this.toggleRemoveAllModal.bind(this)}>- Remove All</div>
         </div>
 
-        <div className="Library__Sources">
+        <div id="sources" className="Library__Sources">
           {this.props.library.length == 0 && (
             <div className="Library__Empty">
               You haven't added anything to the Library yet.
@@ -72,8 +73,12 @@ export default class Library extends React.Component {
                       onChange={this.onEditSource.bind(this, source.id)} />
                 </form>
               )}
-              {source.tags && source.tags.map((tag) =>
-                <span className="Library__SourceTag" key={tag.id}>{tag.name}</span>
+              {source.tags && (
+                <div id={`tags-${source.id}`} className="Library__SourceTags">
+                  {source.tags.map((tag) =>
+                    <span className="Library__SourceTag" key={tag.id}>{tag.name}</span>
+                  )}
+                </div>
               )}
 
               <div className="u-button u-destructive u-clickable"
@@ -101,6 +106,38 @@ export default class Library extends React.Component {
         )}
       </div>
     )
+  }
+
+  onEnd(evt: any) {
+    let newLibrary = this.props.library;
+    array_move(newLibrary, evt.oldIndex, evt.newIndex);
+    this.props.onUpdateLibrary(newLibrary);
+  }
+
+  onEndTag(libraryID: number, evt: any) {
+    let newLibrary = this.props.library;
+    for (let source of newLibrary) {
+      if (source.id==libraryID) {
+        array_move(source.tags, evt.oldIndex, evt.newIndex);
+      }
+    }
+    this.props.onUpdateLibrary(newLibrary);
+  }
+
+  componentDidMount() {
+    if (this.props.library.length == 0) return;
+    Sortable.create(document.getElementById('sources'), {
+      animation: 150,
+      easing: "cubic-bezier(1, 0, 0, 1)",
+      onEnd: this.onEnd.bind(this),
+    });
+    for (let s=0; s<this.props.library.length; s++) {
+      Sortable.create(document.getElementById('tags-' + this.props.library[s].id), {
+        animation: 150,
+        easing: "cubic-bezier(1, 0, 0, 1)",
+        onEnd: this.onEndTag.bind(this, this.props.library[s].id),
+      });
+    }
   }
 
   nop() {}
