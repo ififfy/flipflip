@@ -6,7 +6,7 @@ import SimpleTextInput from '../ui/SimpleTextInput';
 
 export default class GooninatorImporter extends React.Component {
   readonly props: {
-    addDirectories(directories: Array<string>): void,
+    addSources(sources: Array<string>): void,
     onChangeTextKind(kind: string) : void,
     onChangeTextSource(hbID: string) : void,
     onDidImport(): void,
@@ -72,7 +72,7 @@ export default class GooninatorImporter extends React.Component {
       }
 
       // Add list
-      this.props.addDirectories(importURLs);
+      this.props.addSources(importURLs);
     }
 
     if (hastebinURL.includes("pastebinId=")) {

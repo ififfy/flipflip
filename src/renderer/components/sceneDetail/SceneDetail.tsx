@@ -41,11 +41,11 @@ export default class SceneDetail extends React.Component {
     return (
       <div className='SceneDetail'>
         {this.state.isShowingURLModal && (
-            <URLModal
-              onClose={this.closeModals.bind(this)}
-              addDirectories={this.addDirectories.bind(this)}
-              onChangeTextKind={this.onChangeTextKind.bind(this)}
-              onChangeTextSource={this.onChangeTextSource.bind(this)} />
+          <URLModal
+            onClose={this.closeModals.bind(this)}
+            addSources={this.addSources.bind(this)}
+            onChangeTextKind={this.onChangeTextKind.bind(this)}
+            onChangeTextSource={this.onChangeTextSource.bind(this)} />
         )}
 
         <div className="u-button-row">
@@ -100,9 +100,9 @@ export default class SceneDetail extends React.Component {
                 value={this.props.scene.imageTypeFilter}
                 keys={Object.values(IF)} />
               <SimpleCheckbox
-                  text="Play Full GIF animations"
-                  isOn={this.props.scene.playFullGif}
-                  onChange={this.onChangePlayFullGif.bind(this)} />
+                text="Play Full GIF animations"
+                isOn={this.props.scene.playFullGif}
+                onChange={this.onChangePlayFullGif.bind(this)} />
             </div>
           </ControlGroup>
 
@@ -134,9 +134,9 @@ export default class SceneDetail extends React.Component {
 
           <ControlGroup title="Sources" isNarrow={false}>
             <DirectoryPicker
-                directories={this.props.scene.directories}
-                onImportURL={this.onImportURL.bind(this)}
-                onChange={this.onChangeDirectories.bind(this)}/>
+              sources={this.props.scene.directories}
+              onImportURL={this.onImportURL.bind(this)}
+              onChange={this.onChangeSources.bind(this)}/>
           </ControlGroup>
 
         </div>
@@ -184,13 +184,13 @@ export default class SceneDetail extends React.Component {
     this.update((s) => { s.name = e.currentTarget.value; });
   }
 
-  addDirectories(directories: Array<string>) {
+  addSources(sources: Array<string>) {
     // dedup
-    directories = directories.filter((d) => !this.props.scene.directories.includes(d));
-    this.onChangeDirectories(this.props.scene.directories.concat(directories));
+    sources = sources.filter((s) => !this.props.scene.directories.includes(s));
+    this.onChangeSources(this.props.scene.directories.concat(sources));
   }
 
-  onChangeDirectories(directories: Array<string>) { this.update((s) => { s.directories = directories; }); }
+  onChangeSources(sources: Array<string>) { this.update((s) => { s.directories = sources; }); }
 
   onChangeImageTypeFilter(filter: string) { this.update((s) => { s.imageTypeFilter = filter; }); }
 

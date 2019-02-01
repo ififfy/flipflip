@@ -47,9 +47,11 @@ class Link extends React.Component {
 export default class ScenePicker extends React.Component {
   readonly props: {
     scenes: Array<Scene>,
-    onAdd(scene: Scene): void,
+    onAdd(sources: []): void,
     onSelect(scene: Scene): void,
     onOpenLibrary(): void,
+    canGenerate: boolean,
+    onGenerate(): void,
   };
 
   render() {
@@ -80,6 +82,13 @@ export default class ScenePicker extends React.Component {
               + Add scene
             </div>
           </div>
+          <div key="generate"
+               className={`ScenePickerItem ${this.props.canGenerate ? 'u-clickable' : 'u-disabled'}`}
+               onClick={this.props.canGenerate ? this.props.onGenerate.bind(this) : this.nop}>
+            <div className="ScenePickerItem__Title">
+              + Generate scene
+            </div>
+          </div>
         </div>
 
         <div className="ScenePicker__Library">
@@ -91,14 +100,9 @@ export default class ScenePicker extends React.Component {
     );
   }
 
+  nop () {}
+
   onAdd() {
-    let id = this.props.scenes.length + 1;
-    this.props.scenes.forEach((s) => {
-      id = Math.max(s.id + 1, id);
-    });
-    this.props.onAdd(new Scene({
-      id: id,
-      name: "New scene",
-      directories: []}));
+    this.props.onAdd([]);
   }
 };

@@ -95,7 +95,7 @@ export default class Library extends React.Component {
         {this.state.urlImportIsOpen && (
           <URLModal
             onClose={this.toggleURLImportModal.bind(this)}
-            addDirectories={this.addDirectories.bind(this)}
+            addSources={this.addSources.bind(this)}
             onChangeTextKind={this.nop}
             onChangeTextSource={this.nop} />
         )}
@@ -157,18 +157,18 @@ export default class Library extends React.Component {
   onAdd() {
     let result = remote.dialog.showOpenDialog({properties: ['openDirectory', 'multiSelections']});
     if (!result) return;
-    this.addDirectories(result);
+    this.addSources(result);
   }
 
   onAddURL() {
     this.setState({isEditing: this.props.library.length});
-    this.addDirectories([""]);
+    this.addSources([""]);
   }
 
-  addDirectories(directories: Array<string>) {
+  addSources(sources: Array<string>) {
     // dedup
     let sourceURLs = this.getSourceURLs();
-    directories = directories.filter((d) => !sourceURLs.includes(d));
+    sources = sources.filter((s) => !sourceURLs.includes(s));
 
     let id= this.props.library.length + 1;
     this.props.library.forEach((s) => {
@@ -176,7 +176,7 @@ export default class Library extends React.Component {
     });
 
     let newLibrary = this.props.library;
-    for (let url of directories) {
+    for (let url of sources) {
       newLibrary.push(new LibrarySource({
         url: url,
         id: id,

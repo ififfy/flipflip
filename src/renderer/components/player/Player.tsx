@@ -51,7 +51,7 @@ export default class Player extends React.Component {
     const audioPlayStatus = this.state.isPlaying
       ? (Sound as any).status.PLAYING
       : (Sound as any).status.PAUSED;
-    const tagIDs = this.props.tags.map((t) => t.id);
+    const tagNames = this.props.tags ? this.props.tags.map((t) => t.name) : [];
 
     return (
       <div className="Player">
@@ -136,14 +136,14 @@ export default class Player extends React.Component {
           </div>
         )}
 
-        {this.props.allTags && (
+        {this.state.isPlaying && this.props.allTags && (
           <div className="SourceTags">
             {this.props.allTags.map((tag) =>
               <div className="SourceTag" key={tag.id}>
                 <SimpleCheckbox
                     text={tag.name}
                     onChange={this.props.toggleTag.bind(this, this.props.scene.libraryID, tag)}
-                    isOn={tagIDs && tagIDs.includes(tag.id)} />
+                    isOn={tagNames && tagNames.includes(tag.name)} />
               </div>
             )}
           </div>
@@ -252,7 +252,7 @@ export default class Player extends React.Component {
             fs.unlink(path, (err) => {
               if (err) {
                 alert("An error ocurred while deleting the file: " + err.message);
-                console.log(err);
+                console.error(err);
               }
             });
           } else {

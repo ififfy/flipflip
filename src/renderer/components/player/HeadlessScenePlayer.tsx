@@ -201,7 +201,7 @@ export default class HeadlessScenePlayer extends React.Component {
     onLoaded: Function(),
     promiseQueue: Array<CancelablePromise>(),
     promise: new CancelablePromise((resolve, reject) => {}),
-    directoriesProcessed: 0,
+    sourcesProcessed: 0,
     progressMessage: this.props.scene.directories.length > 0 ? this.props.scene.directories[0] : "",
     allURLs: Array<Array<string>>(),
   };
@@ -258,7 +258,7 @@ export default class HeadlessScenePlayer extends React.Component {
         {showLoadingIndicator && (
           <Progress
             total={this.props.scene.directories.length}
-            current={this.state.directoriesProcessed}
+            current={this.state.sourcesProcessed}
             message={this.state.progressMessage}/>
         )}
 
@@ -274,7 +274,7 @@ export default class HeadlessScenePlayer extends React.Component {
     this.setState({allURLs: []});
     let newAllURLs = Array<Array<string>>();
 
-    let directoryLoop = () => {
+    let sourceLoop = () => {
       let d = this.props.scene.directories[n];
       let loadPromise = getPromise(d, this.props.scene.imageTypeFilter, 0, n);
 
@@ -307,8 +307,8 @@ export default class HeadlessScenePlayer extends React.Component {
           }
 
           if (n < this.props.scene.directories.length) {
-            this.setState({directoriesProcessed: (n + 1), promiseQueue: newPromiseQueue});
-            directoryLoop();
+            this.setState({sourcesProcessed: (n + 1), promiseQueue: newPromiseQueue});
+            sourceLoop();
           } else {
             this.setState({allURLs: newAllURLs, onLoaded: this.onLoaded, promiseQueue: newPromiseQueue});
             setTimeout(this.props.didFinishLoading, 0);
@@ -347,7 +347,7 @@ export default class HeadlessScenePlayer extends React.Component {
       }
     };
 
-    directoryLoop();
+    sourceLoop();
 
   }
 

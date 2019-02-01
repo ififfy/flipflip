@@ -6,7 +6,7 @@ export default class SimpleSliderInput extends React.Component {
     label: string,
     min: number,
     max: number,
-    value: string,
+    value: number,
     isEnabled: boolean,
     onChange: (value: string) => void
   };
