@@ -15,6 +15,7 @@ export default class DirectoryPicker extends React.Component {
   };
 
   render() {
+    // TODO Port improvements from Library
     return (
       <div className='DirectoryPicker'>
         <div className='DirectoryPicker__Buttons'>

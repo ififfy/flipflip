@@ -40,6 +40,11 @@ const TK = { // text kind
   hastebin: 'tk.hastebin',
 };
 
+const GT = { // gooninator import type
+  tumblr: 'gt.tumblr',
+  local: 'gt.local',
+};
+
 export {
-  TF, IF, ZF, HTF, VTF, TK, BT
+  TF, IF, ZF, HTF, VTF, TK, BT, GT,
 };

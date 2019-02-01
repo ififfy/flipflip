@@ -5,7 +5,7 @@ import Tag from "./Tag";
 import ControlGroup from "../sceneDetail/ControlGroup";
 import SimpleSliderInput from "../ui/SimpleSliderInput";
 import {getRandomListItem, removeDuplicatesBy} from "../../utils";
-
+// TODO Persist Generators
 export default class SceneGenerator extends React.Component {
   readonly props: {
     library: Array<LibrarySource>,
@@ -61,6 +61,7 @@ export default class SceneGenerator extends React.Component {
     this.setState({tagWeights: this.state.tagWeights.set(tag, weight)})
   }
 
+  // TODO Add All and None functionality
   generateScene(tagWeights: Map<Tag, number>) {
     const sum = Array.from(tagWeights.values()).reduce((total, weight) => total + weight);
     const max = 300; // TODO Make this configurable

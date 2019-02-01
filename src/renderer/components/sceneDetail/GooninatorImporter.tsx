@@ -1,8 +1,9 @@
 import * as React from 'react'
 import {sep} from "path";
 import {remote} from "electron";
-import {TK} from '../../const';
+import {TK, GT} from '../../const';
 import SimpleTextInput from '../ui/SimpleTextInput';
+import SimpleOptionPicker from "../ui/SimpleOptionPicker";
 
 export default class GooninatorImporter extends React.Component {
   readonly props: {
@@ -14,6 +15,7 @@ export default class GooninatorImporter extends React.Component {
 
   readonly state = {
     importURL: "",
+    importType: GT.tumblr,
     rootDir: "",
   };
 
@@ -26,10 +28,21 @@ export default class GooninatorImporter extends React.Component {
           onChange={this.importURLChange.bind(this)}
           isEnabled={true} />
 
-        <p>Enter the parent directory to look in:</p>
-        <p>
-          <input type="text" name="root" value={this.state.rootDir} readOnly onClick={this.addRootDir.bind(this)}/>
-        </p>
+        <SimpleOptionPicker
+          label="Import Type"
+          value={this.state.importType}
+          keys={Object.values(GT)}
+          onChange={this.changeImportType.bind(this)}
+        />
+
+        {this.state.importType == GT.local && (
+          <div>
+            <p>Enter the parent directory to look in:</p>
+            <p>
+              <input type="text" name="root" value={this.state.rootDir} readOnly onClick={this.addRootDir.bind(this)}/>
+            </p>
+          </div>
+        )}
         <div className="u-button u-float-right" onClick={this.doImport.bind(this)}>
           Import
         </div>
@@ -38,16 +51,24 @@ export default class GooninatorImporter extends React.Component {
     );
   }
 
+  changeImportType(type: string) {
+    this.setState({importType: type});
+  }
+
   doImport() {
     let importURL = this.state.importURL;
     let hastebinURL = this.state.importURL;
     if (!importURL) {
       return;
     }
-    let rootDir = this.state.rootDir.toString();
-    if (!rootDir.endsWith(sep)) {
-      rootDir += sep;
+    let rootDir;
+    if (this.state.importType == GT.local) {
+      rootDir = this.state.rootDir.toString();
+      if (!rootDir.endsWith(sep)) {
+        rootDir += sep;
+      }
     }
+
     if (importURL.includes("sources=")) {
       // Remove everything before "sources="
       importURL = importURL.substring(importURL.indexOf("sources=") + 8);
@@ -61,7 +82,12 @@ export default class GooninatorImporter extends React.Component {
       let importURLs = importURL.split("%20");
       // Append root onto each blog
       for (let u = 0; u < importURLs.length; u++) {
-        let fullPath = rootDir + importURLs[u];
+        let fullPath;
+        if (this.state.importType == GT.local) {
+          fullPath = rootDir + importURLs[u];
+        } else {
+          fullPath = "http://" + importURLs[u] + ".tumblr.com";
+        }
         if (importURLs.includes(fullPath) || importURLs[u] === sep || importURLs[u] === "") {
           // Remove index and push u back
           importURLs.splice(u, 1);

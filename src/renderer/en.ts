@@ -26,4 +26,7 @@ export default new Map<String, String>([
 
   ['tk.url', 'URL'],
   ['tk.hastebin', 'Hastebin'],
+
+  ['gt.tumblr', 'Tumblr'],
+  ['gt.local', 'Local'],
 ]);
