@@ -198,8 +198,19 @@ export default class Library extends React.Component {
   }
 
   onAddURL() {
-    this.setState({isEditing: this.props.library.length});
-    this.addSources([""]);
+    let id= this.props.library.length + 1;
+    this.props.library.forEach((s) => {
+      id = Math.max(s.id + 1, id);
+    });
+    this.setState({isEditing: id});
+
+    let newLibrary = this.props.library;
+    newLibrary.push(new LibrarySource({
+      url: "",
+      id: id,
+      tags: new Array<Tag>(),
+    }));
+    this.props.onUpdateLibrary(newLibrary);
   }
 
   addSources(sources: Array<string>) {
