@@ -782,8 +782,26 @@ label.SimpleCheckbox {
   }
 
   .SourceTag {
-    color: $black;
-    margin-left: $smallPadding;
+    background-color: $white;
+    padding: $smallPadding;
+    margin-right: $smallPadding;
+    color: $black !important;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .SourceTagTitle {
+      text-align: center;
+    }
+
+    &.u-selected {
+      background-color: $buttonBottom;
+    }
+
+    &:hover {
+      background-color: $buttonBottom;
+    }
   }
 }
 

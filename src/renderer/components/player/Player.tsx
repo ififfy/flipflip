@@ -139,11 +139,12 @@ export default class Player extends React.Component {
         {this.state.isPlaying && this.props.allTags && (
           <div className="SourceTags">
             {this.props.allTags.map((tag) =>
-              <div className="SourceTag" key={tag.id}>
-                <SimpleCheckbox
-                    text={tag.name}
-                    onChange={this.props.toggleTag.bind(this, this.props.scene.libraryID, tag)}
-                    isOn={tagNames && tagNames.includes(tag.name)} />
+              <div className={`SourceTag u-clickable ${tagNames && tagNames.includes(tag.name) ? 'u-selected' : ''}`}
+                   onClick={this.props.toggleTag.bind(this, this.props.scene.libraryID, tag)}
+                   key={tag.id}>
+                <div className="SourceTagTitle">
+                  {tag.name}
+                </div>
               </div>
             )}
           </div>
