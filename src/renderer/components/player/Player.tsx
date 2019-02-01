@@ -133,6 +133,8 @@ export default class Player extends React.Component {
             <EffectGroup
               scene={this.props.scene}
               onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+
+            {/*TODO Add text and audio options here*/}
           </div>
         )}
 
