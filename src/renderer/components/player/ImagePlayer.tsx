@@ -7,13 +7,8 @@ import {IF, TF, ZF, HTF, VTF, BT} from '../../const';
 import fs from "fs";
 import gifInfo from 'gif-info';
 import ChildCallbackHack from './ChildCallbackHack';
-import {urlToPath} from '../../utils';
+import {urlToPath, getRandomListItem} from '../../utils';
 import IncomingMessage = Electron.IncomingMessage;
-
-function choice<T>(items: Array<T>): T {
-  const i = Math.floor(Math.random() * items.length);
-  return items[i];
-}
 
 class GifInfo {
   animated: boolean;
@@ -182,9 +177,7 @@ export default class ImagePlayer extends React.Component {
   runFetchLoop(i: number, isStarting = false) {
     if (!this._isMounted && !isStarting) return;
 
-    // We either get one giant list of paths, or one list per directory,
-    // depending on scene.weightDirectoriesEqually
-    const collection = choice(this.props.allURLs);
+    const collection = getRandomListItem(this.props.allURLs);
 
     if (this.state.readyToDisplay.length >= this.props.maxLoadingAtOnce ||
       !(collection && collection.length)) {
@@ -192,7 +185,7 @@ export default class ImagePlayer extends React.Component {
       setTimeout(() => this.runFetchLoop(i), 100);
       return;
     }
-    const url = choice(collection);
+    const url = getRandomListItem(collection);
     const img = new Image();
 
     this.setState({numBeingLoaded: this.state.numBeingLoaded + 1});
@@ -298,7 +291,7 @@ export default class ImagePlayer extends React.Component {
       nextHistoryPaths = nextHistoryPaths.concat([nextImg.src]);
     } else if (this.state.pastAndLatest.length) {
       // no new image ready; just pick a random one from the past 120
-      nextImg = choice(this.state.pastAndLatest);
+      nextImg = getRandomListItem(this.state.pastAndLatest);
       nextPastAndLatest = nextPastAndLatest.concat([nextImg]);
       nextHistoryPaths = nextHistoryPaths.concat([nextImg.src]);
     }

@@ -5,7 +5,7 @@ import GooninatorImporter from './GooninatorImporter';
 export default class URLModal extends React.Component {
   readonly props: {
     onClose(): void,
-    addDirectories(directories: Array<string>): void,
+    addSources(sources: Array<string>): void,
     onChangeTextKind(kind: string) : void,
     onChangeTextSource(hbID: string) : void,
   };
@@ -15,7 +15,7 @@ export default class URLModal extends React.Component {
       <Modal onClose={this.props.onClose} title="Import URL">
         <GooninatorImporter
             onDidImport={this.props.onClose}
-            addDirectories={this.props.addDirectories}
+            addSources={this.props.addSources}
             onChangeTextKind={this.props.onChangeTextKind}
             onChangeTextSource={this.props.onChangeTextSource} />
       </Modal>

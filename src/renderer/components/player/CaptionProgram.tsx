@@ -1,6 +1,8 @@
 import wretch from 'wretch';
 import * as React from 'react';
 
+import {getRandomListItem} from '../../utils'
+
 let STYLES : {[style : string] : string} = {};
 
 let programCounter = 0;
@@ -38,15 +40,6 @@ const fnIntArg = function(innerFn : Function) {
     return innerFn(ms);
   };
 };
-
-const getRandomIndex = (list : any[]) => {
-  return Math.floor(Math.random()*list.length)
-};
-
-const getRandomListItem = (list : any[]) => {
-  return list[getRandomIndex(list)];
-};
-
 
 const COMMANDS : { [command : string] : (el: HTMLElement, value : string) => any;} = {
   saveStyleRules: function(el : HTMLElement, value : string) {

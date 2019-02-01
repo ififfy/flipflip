@@ -7,6 +7,7 @@ import Library from './library/Library';
 import LibrarySource from './library/LibrarySource';
 import TagManager from "./library/TagManager";
 import Tag from "./library/Tag";
+import SceneGenerator from "./library/SceneGenerator";
 import Scene from '../Scene';
 import ScenePicker from './ScenePicker';
 import SceneDetail from './sceneDetail/SceneDetail';
@@ -49,7 +50,6 @@ try {
     tags: data.tags.map((t: any) => new Tag(t)),
     route: data.route.map((s: any) => new Route(s)),
   };
-  console.log(initialState);
 } catch (e) {
   // who cares
 }
@@ -66,6 +66,16 @@ export default class Meta extends React.Component {
     for (let r of this.state.route.slice().reverse()) {
       if (r.kind == 'scene') {
         return this.state.scenes.find((s) => s.id === r.value);
+      }
+    }
+    return null;
+  }
+
+  librarySource?(): LibrarySource {
+    const libraryID = this.scene().libraryID;
+    for (let s of this.state.library) {
+      if (s.id == libraryID) {
+        return s;
       }
     }
     return null;
@@ -91,7 +101,9 @@ export default class Meta extends React.Component {
             scenes={this.state.scenes}
             onAdd={this.onAddScene.bind(this)}
             onSelect={this.onOpenScene.bind(this)}
-            onOpenLibrary={this.onOpenLibrary.bind(this)}/>)}
+            onOpenLibrary={this.onOpenLibrary.bind(this)}
+            onGenerate={this.onGenerate.bind(this)}
+            canGenerate={this.state.library.length > 0 && this.state.tags.length > 0}/>)}
 
         {this.isRoute('library') && (
           <Library
@@ -103,6 +115,7 @@ export default class Meta extends React.Component {
             manageTags={this.manageTags.bind(this)}
           />
         )}
+
         {this.isRoute('tags') && (
           <TagManager
             tags={this.state.tags}
@@ -110,6 +123,16 @@ export default class Meta extends React.Component {
             goBack={this.goBackToLibrary.bind(this)}
           />
         )}
+
+        {this.isRoute('generate') && (
+          <SceneGenerator
+            library={this.state.library}
+            tags={this.state.tags}
+            goBack={this.goBack.bind(this)}
+            onGenerate={this.onAddScene.bind(this)}
+          />
+        )}
+
         {this.isRoute('scene') && (
           <SceneDetail
             scene={this.scene()}
@@ -127,12 +150,13 @@ export default class Meta extends React.Component {
             overlayScene={this.overlayScene()}
             goBack={this.goBack.bind(this)} />
         )}
+
         {this.isRoute('libraryplay') && (
           <Player
             scene={this.scene()}
             onUpdateScene={this.onUpdateScene.bind(this)}
             goBack={this.goBackToLibrary.bind(this)}
-            tags={this.state.library[this.scene().libraryID].tags}
+            tags={this.librarySource().tags}
             allTags={this.state.tags}
             toggleTag={this.onToggleTag.bind(this)}/>
         )}
@@ -156,7 +180,16 @@ export default class Meta extends React.Component {
     this.setState({route: [new Route({kind: 'library'})], scenes: newScenes});
   }
 
-  onAddScene(scene: Scene) {
+  onAddScene(sources: Array<string>) {
+    let id = this.state.scenes.length + 1;
+    this.state.scenes.forEach((s) => {
+      id = Math.max(s.id + 1, id);
+    });
+    let scene = new Scene({
+      id: id,
+      name: "New scene",
+      directories: sources
+    });
     this.setState({
       scenes: this.state.scenes.concat([scene]),
       route: [new Route({kind: 'scene', value: scene.id})],
@@ -185,11 +218,16 @@ export default class Meta extends React.Component {
   }
 
   onPlaySceneFromLibrary(source: LibrarySource) {
-    let tempScene = new Scene();
-    tempScene.name = "library_scene_temp";
-    tempScene.directories = [source.url];
-    tempScene.libraryID = source.id;
-    tempScene.id = this.state.scenes.length + 1;
+    let id = this.state.scenes.length + 1;
+    this.state.scenes.forEach((s) => {
+      id = Math.max(s.id + 1, id);
+    });
+    let tempScene = new Scene({
+      name: "library_scene_temp",
+      directories: [source.url],
+      libraryID: source.id,
+      id: id,
+    });
     const newRoute = [new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'libraryplay', value: tempScene.id})];
     this.setState({
       scenes: this.state.scenes.concat([tempScene]),
@@ -200,6 +238,10 @@ export default class Meta extends React.Component {
   manageTags() {
     const newRoute = this.state.route.concat(new Route({kind: 'tags', value: null}));
     this.setState({route: newRoute});
+  }
+
+  onGenerate() {
+    this.setState({route: [new Route({kind: 'generate', value: null})]});
   }
 
   onUpdateScene(scene: Scene, fn: (scene: Scene) => void) {
@@ -224,12 +266,10 @@ export default class Meta extends React.Component {
     let newLibrary = this.state.library;
     for (let source of newLibrary) {
       if (source.id==sourceID) {
-        if (source.tags.map((t) => t.id).includes(tag.id)) {
-          source.tags = source.tags.filter((t) => t.id != tag.id);
+        if (source.tags.map((t) => t.name).includes(tag.name)) {
+          source.tags = source.tags.filter((t) => t.name != tag.name);
         } else {
-          let newTags = source.tags;
-          newTags.push(tag);
-          source.tags = newTags;
+          source.tags.push(tag);
         }
       }
     }

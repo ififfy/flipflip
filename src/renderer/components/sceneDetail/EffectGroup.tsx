@@ -48,7 +48,7 @@ export default class EffectGroup extends React.Component {
             label={"Effect Length: " + this.props.scene.effectLevel + "s"}
             min={1}
             max={20}
-            value={this.props.scene.effectLevel.toString()} />
+            value={this.props.scene.effectLevel} />
           <SimpleOptionPicker
             onChange={this.onChangeHorizTransType.bind(this)}
             label="Translate Horizontally"
@@ -76,7 +76,7 @@ export default class EffectGroup extends React.Component {
               label={"Overlay opacity: " + (this.props.scene.overlaySceneOpacity * 100).toFixed(0) + '%'}
               min={1}
               max={99}
-              value={(this.props.scene.overlaySceneOpacity * 100).toString()} />)}
+              value={(this.props.scene.overlaySceneOpacity * 100)} />)}
         </div>
       </ControlGroup>
     );

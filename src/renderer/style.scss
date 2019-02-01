@@ -278,7 +278,7 @@ a {
       text-align: center;
     }
 
-    &:hover {
+    &:not(.u-disabled):hover {
       background-color: $buttonBottom;
     }
   }
@@ -617,6 +617,25 @@ label.SimpleCheckbox {
   }
 }
 
+.SceneGenerator {
+  .SceneGenerator__SceneGeneratorHeader {
+    display: inline-block;
+    margin-top: 0;
+    color: $black !important;
+    line-height: $buttonBarHeight;
+  }
+
+  .SceneGenerator__Content {
+    position: fixed;
+    top: $buttonBarHeight;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: $smallPadding;
+    overflow: auto;
+  }
+}
+
 .SceneDetail {
   .SceneName {
     display: inline-block;
@@ -637,30 +656,15 @@ label.SimpleCheckbox {
       margin-top: 4px;
     }
   }
-}
 
-.SceneDetail__Content {
-  position: fixed;
-  top: $buttonBarHeight;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  padding: $smallPadding;
-  overflow: auto;
-}
-
-.SceneDetail__PlayButton {
-  width: 100%;
-  text-align: center;
-  padding: $smallPadding;
-}
-
-.SceneOptionsForm {
-  div {
-    padding-bottom: 9px;
-    label {
-      margin-right: 0.5rem;
-    }
+  .SceneDetail__Content {
+    position: fixed;
+    top: $buttonBarHeight;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: $smallPadding;
+    overflow: auto;
   }
 }
 

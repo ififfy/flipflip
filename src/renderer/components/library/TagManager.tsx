@@ -79,7 +79,7 @@ export default class TagManager extends React.Component {
     )
   }
 
-  onEnd(evt: Sortable.SortableEvent) {
+  onEnd(evt: any) {
     let newTags = this.props.tags;
     array_move(newTags, evt.oldIndex, evt.newIndex);
     this.props.onUpdateTags(newTags);

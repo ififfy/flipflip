@@ -3,9 +3,9 @@ import Modal from '../ui/Modal';
 import {remote} from 'electron';
 
 type Props = {
-  directories: Array<string>,
+  sources: Array<string>,
   onImportURL(): void,
-  onChange(directories: Array<string>): void,
+  onChange(sources: Array<string>): void,
 };
 
 export default class DirectoryPicker extends React.Component {
@@ -20,17 +20,17 @@ export default class DirectoryPicker extends React.Component {
         <div className='DirectoryPicker__Buttons'>
           <div className='u-button u-clickable' onClick={this.onAdd.bind(this)}>+ Add local files</div>
           <div className='u-button u-clickable' onClick={this.props.onImportURL.bind(this)}>+ Import URL</div>
-          <div className={`u-button u-float-left ${this.props.directories.length == 0 ? 'u-disabled' : 'u-clickable'} `}
-               onClick={this.props.directories.length == 0 ? this.nop : this.toggleRemoveAllModal.bind(this)}>- Remove All</div>
+          <div className={`u-button u-float-left ${this.props.sources.length == 0 ? 'u-disabled' : 'u-clickable'} `}
+               onClick={this.props.sources.length == 0 ? this.nop : this.toggleRemoveAllModal.bind(this)}>- Remove All</div>
         </div>
-        {this.props.directories.map((directory) => {
+        {this.props.sources.map((source) => {
           return (
             <div
               className="DirectoryPicker__Directory"
-              key={(directory as any) as number}>
-              {directory}
+              key={(source as any) as number}>
+              {source}
               <div
-                onClick={this.onRemove.bind(this, directory)}
+                onClick={this.onRemove.bind(this, source)}
                 className="u-button u-destructive u-clickable">×️</div>
             </div>
           );
@@ -60,12 +60,12 @@ export default class DirectoryPicker extends React.Component {
     let result = remote.dialog.showOpenDialog({properties: ['openDirectory', 'multiSelections']});
     if (!result) return;
     // dedup
-    result = result.filter((d) => !this.props.directories.includes(d));
-    this.props.onChange(this.props.directories.concat(result));
+    result = result.filter((s) => !this.props.sources.includes(s));
+    this.props.onChange(this.props.sources.concat(result));
   }
 
   onRemove(val: string) {
-    this.props.onChange(this.props.directories.filter((d) => d != val));
+    this.props.onChange(this.props.sources.filter((s) => s != val));
   }
 
   removeAll() {
