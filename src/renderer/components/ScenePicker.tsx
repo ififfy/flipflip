@@ -86,7 +86,7 @@ export default class ScenePicker extends React.Component {
 
         <div className="ScenePicker__Library">
           <div className={`ScenePicker__GenerateSceneButton ${this.props.canGenerate ? 'u-clickable' : 'u-disabled'}`} onClick={this.props.canGenerate ? this.props.onGenerate.bind(this) : this.nop}>
-            + Generate scene
+            + New Scene Generator
           </div>
           <div className="ScenePicker__LibraryButton u-clickable" onClick={this.props.onOpenLibrary}>
             Library

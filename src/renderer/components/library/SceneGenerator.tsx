@@ -2,6 +2,7 @@ import * as React from "react";
 
 import LibrarySource from "./LibrarySource";
 import Tag from "./Tag";
+import Scene from "../../Scene";
 import ControlGroup from "../sceneDetail/ControlGroup";
 import SimpleSliderInput from "../ui/SimpleSliderInput";
 import SimpleTextInput from "../ui/SimpleTextInput";
@@ -20,23 +21,26 @@ class TagWeight {
   }
 }
 
-// TODO Persist Generators
 export default class SceneGenerator extends React.Component {
   readonly props: {
     library: Array<LibrarySource>,
     tags: Array<Tag>,
+    scene: Scene,
     goBack(): void,
-    onGenerate(sources: Array<string>): void,
+    onGenerate(): void,
+    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
+    onDelete(scene: Scene): void,
   };
 
   readonly state = {
-    tagWeights: new Map<Tag, TagWeight>(),
     max: "300",
     errorMessage: "",
+    isEditingName: false,
   };
 
   render() {
-    const weights = Array.from(this.state.tagWeights.values());
+    const tagWeights = new Map<Tag, TagWeight>(JSON.parse(this.props.scene.tagWeights));
+    const weights = Array.from(tagWeights.values());
     const sum = weights.length > 0 ? weights.map((w) => w.value).reduce((total, value) => Number(total) + Number(value)) : 0;
     const hasAll = weights.filter((w) => w.type == TT.all).length > 0;
 
@@ -50,7 +54,21 @@ export default class SceneGenerator extends React.Component {
       <div className="SceneGenerator">
         <div className="u-button-row">
           <div className="u-abs-center">
-            <h2 className="SceneGenerator__SceneGeneratorHeader">Scene Generator</h2>
+            {this.state.isEditingName && (
+              <form className="SceneNameForm" onSubmit={this.endEditingName.bind(this)}>
+                <input
+                  autoFocus
+                  type="text"
+                  value={this.props.scene.name}
+                  onBlur={this.endEditingName.bind(this)}
+                  onChange={this.updateSceneName.bind(this)} />
+              </form>
+            )}
+            {!this.state.isEditingName && (
+              <h2
+                className="SceneGenerator__SceneGeneratorHeader u-clickable"
+                onClick={this.beginEditingName.bind(this)}>{this.props.scene.name}</h2>
+            )}
           </div>
 
           <div className="u-button-row-right">
@@ -59,31 +77,42 @@ export default class SceneGenerator extends React.Component {
               value={this.state.max}
               isEnabled={true}
               onChange={this.onUpdateMax.bind(this)} />
+            <div className={`SceneGenerator__Generate u-button ${this.props.scene.directories.length > 0 ? 'u-clickable' : 'u-disabled'}`}
+                 onClick={this.props.scene.directories.length > 0 ? this.previousScene.bind(this) : this.nop}>
+              Previous Scene
+            </div>
             <div className={`SceneGenerator__Generate u-button ${(sum > 0 || hasAll) && max > 0 ? 'u-clickable' : 'u-disabled'}`}
-                 onClick={(sum > 0 || hasAll) && max > 0 ? this.generateScene.bind(this, this.state.tagWeights) : this.nop}>
+                 onClick={(sum > 0 || hasAll) && max > 0 ? this.generateScene.bind(this, tagWeights) : this.nop}>
               Generate Scene
             </div>
           </div>
           <div className="BackButton u-button u-clickable" onClick={this.props.goBack}>Back</div>
+          <div
+              className="DeleteButton u-destructive u-button u-clickable"
+              onClick={this.props.onDelete.bind(this, this.props.scene)}>
+            Delete
+          </div>
         </div>
 
         <div className="SceneGenerator__Content ControlGroupGroup">
           {this.props.tags.map((tag) =>
             <ControlGroup key={tag.id} title={tag.name} isNarrow={true}>
-              <span>{"Weight " + (this.state.tagWeights.has(tag) ? this.state.tagWeights.get(tag).value : 0).toString()}</span>
-              <span>{"Percentage: " + (sum > 0 ? (this.state.tagWeights.has(tag) ?
-                  (this.state.tagWeights.get(tag).value > 0 ? Math.round((this.state.tagWeights.get(tag).value / sum)*100) + "%" : "--") : "--") : "--")}</span>
+              <span>{"Weight " + (Array.from(tagWeights.keys()).filter((t) => t.id == tag.id).length > 0 ?
+                  tagWeights.get(Array.from(tagWeights.keys()).filter((t) => t.id == tag.id)[0]).value : 0).toString()}</span>
+              <span>{"Percentage: " + (sum > 0 ? (Array.from(tagWeights.keys()).filter((t) => t.id == tag.id).length > 0 ?
+                  (tagWeights.get(Array.from(tagWeights.keys()).filter((t) => t.id == tag.id)[0]).value > 0 ?
+                  Math.round((tagWeights.get(Array.from(tagWeights.keys()).filter((t) => t.id == tag.id)[0]).value / sum)*100) + "%" : "--") : "--") : "--")}</span>
               <SimpleSliderInput
-                isEnabled={this.state.tagWeights.has(tag) ? this.state.tagWeights.get(tag).type == TT.weight : true}
+                isEnabled={Array.from(tagWeights.keys()).filter((t) => t.id == tag.id).length > 0 ? tagWeights.get(Array.from(tagWeights.keys()).filter((t) => t.id == tag.id)[0]).type == TT.weight : true}
                 onChange={this.onChangeTagWeight.bind(this, tag)}
                 label=""
                 min={0}
                 max={100}
-                value={this.state.tagWeights.has(tag) ? this.state.tagWeights.get(tag).value : 0} />
+                value={Array.from(tagWeights.keys()).filter((t) => t.id == tag.id).length > 0 ? tagWeights.get(Array.from(tagWeights.keys()).filter((t) => t.id == tag.id)[0]).value : 0} />
               <SimpleRadioInput
                 label=""
                 groupName={tag.name}
-                value={this.state.tagWeights.has(tag) ? this.state.tagWeights.get(tag).type : TT.weight}
+                value={Array.from(tagWeights.keys()).filter((t) => t.id == tag.id).length > 0 ? tagWeights.get(Array.from(tagWeights.keys()).filter((t) => t.id == tag.id)[0]).type : TT.weight}
                 keys={Object.values(TT)}
                 onChange={this.onChangeTagType.bind(this, tag)}
                 />
@@ -113,24 +142,75 @@ export default class SceneGenerator extends React.Component {
     this.setState({max: max});
   }
 
+  beginEditingName() {
+    this.setState({isEditingName: true});
+  }
+
+  endEditingName(e: Event) {
+    e.preventDefault();
+    this.setState({isEditingName: false});
+  }
+
+  update(fn: (scene: Scene) => void) {
+    this.props.onUpdateScene(this.props.scene, fn);
+  }
+
+  updateTagWeights(tagWeights: string) {
+    this.update((s) => { s.tagWeights = tagWeights; });
+  }
+
+  updateSceneSources(sources: Array<string>) {
+    this.update((s) => { s.directories = sources; });
+  }
+
+  updateSceneName(e: React.FormEvent<HTMLInputElement>) {
+    this.update((s) => { s.name = e.currentTarget.value; });
+  }
+
   onChangeTagWeight(tag: Tag, weight: number) {
-    let tagWeight = this.state.tagWeights.get(tag);
-    if (tagWeight == undefined) {
-      tagWeight = new TagWeight(TT.weight, weight);
-    } else {
-      tagWeight.value = weight;
+    const tagWeights = new Map<Tag, TagWeight>(JSON.parse(this.props.scene.tagWeights));
+
+    let found = false;
+    for (let key of tagWeights.keys()) {
+      if (tag.id == key.id) {
+        let tagWeight = tagWeights.get(key);
+        tagWeight.value = weight;
+        tagWeights.set(key, tagWeight);
+        found = true;
+        break;
+      }
     }
-    this.setState({tagWeights: this.state.tagWeights.set(tag, tagWeight)});
+
+    if (!found) {
+      tagWeights.set(tag, new TagWeight(TT.weight, weight));
+    }
+
+    this.updateTagWeights(JSON.stringify(Array.from(tagWeights)));
   }
 
   onChangeTagType(tag: Tag, type: string) {
-    let tagWeight = this.state.tagWeights.get(tag);
-    if (tagWeight == undefined) {
-      tagWeight = new TagWeight(type, 0);
-    } else {
-      tagWeight.type = type;
+    const tagWeights = new Map<Tag, TagWeight>(JSON.parse(this.props.scene.tagWeights));
+
+    let found = false;
+    for (let key of tagWeights.keys()) {
+      if (tag.id == key.id) {
+        let tagWeight = tagWeights.get(key);
+        tagWeight.type = type;
+        tagWeights.set(key, tagWeight);
+        found = true;
+        break;
+      }
     }
-    this.setState({tagWeights: this.state.tagWeights.set(tag, tagWeight)});
+
+    if (!found) {
+      tagWeights.set(tag, new TagWeight(type, 0));
+    }
+
+    this.updateTagWeights(JSON.stringify(Array.from(tagWeights)));
+  }
+
+  previousScene() {
+    this.props.onGenerate();
   }
 
   generateScene(tagWeightMap: Map<Tag, TagWeight>) {
@@ -231,7 +311,8 @@ export default class SceneGenerator extends React.Component {
       return;
     }
 
-    // Make a new scene
-    this.props.onGenerate(removeDuplicatesBy((s: string) => s, sceneSources));
+    // Set directories for scene
+    this.updateSceneSources(removeDuplicatesBy((s: string) => s, sceneSources));
+    this.props.onGenerate();
   }
 }

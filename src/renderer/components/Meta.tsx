@@ -64,7 +64,7 @@ export default class Meta extends React.Component {
 
   scene?(): Scene {
     for (let r of this.state.route.slice().reverse()) {
-      if (r.kind == 'scene') {
+      if (r.kind == 'scene' || r.kind == 'generate') {
         return this.state.scenes.find((s) => s.id === r.value);
       }
     }
@@ -102,7 +102,7 @@ export default class Meta extends React.Component {
             onAdd={this.onAddScene.bind(this)}
             onSelect={this.onOpenScene.bind(this)}
             onOpenLibrary={this.onOpenLibrary.bind(this)}
-            onGenerate={this.onGenerate.bind(this)}
+            onGenerate={this.onAddGenerator.bind(this)}
             canGenerate={this.state.library.length > 0 && this.state.tags.length > 0}/>)}
 
         {this.isRoute('library') && (
@@ -128,8 +128,11 @@ export default class Meta extends React.Component {
           <SceneGenerator
             library={this.state.library}
             tags={this.state.tags}
+            scene={this.scene()}
             goBack={this.goBack.bind(this)}
-            onGenerate={this.onAddScene.bind(this)}
+            onGenerate={this.onGenerateScene.bind(this)}
+            onUpdateScene={this.onUpdateScene.bind(this)}
+            onDelete={this.onDeleteScene.bind(this)}
           />
         )}
 
@@ -205,7 +208,11 @@ export default class Meta extends React.Component {
   }
 
   onOpenScene(scene: Scene) {
-    this.setState({route: [new Route({kind: 'scene', value: scene.id})]});
+    if (scene.tagWeights) {
+      this.setState({route: [new Route({kind: 'generate', value: scene.id})]});
+    } else {
+      this.setState({route: [new Route({kind: 'scene', value: scene.id})]});
+    }
   }
 
   onOpenLibrary() {
@@ -240,8 +247,26 @@ export default class Meta extends React.Component {
     this.setState({route: newRoute});
   }
 
-  onGenerate() {
-    this.setState({route: [new Route({kind: 'generate', value: null})]});
+  onAddGenerator() {
+    let id = this.state.scenes.length + 1;
+    this.state.scenes.forEach((s) => {
+      id = Math.max(s.id + 1, id);
+    });
+    let scene = new Scene({
+      id: id,
+      name: "New generator",
+      directories: [],
+      tagWeights: "[]",
+    });
+    this.setState({
+      scenes: this.state.scenes.concat([scene]),
+      route: [new Route({kind: 'generate', value: scene.id})]}
+    );
+  }
+
+  onGenerateScene() {
+    const newRoute = this.state.route.concat(new Route({kind: 'scene', value: this.scene().id}));
+    this.setState({route: newRoute});
   }
 
   onUpdateScene(scene: Scene, fn: (scene: Scene) => void) {
