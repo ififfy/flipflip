@@ -3,7 +3,6 @@ import {remote} from 'electron';
 import fileURL from 'file-url';
 import SimpleTextInput from './SimpleTextInput';
 
-
 export default class SimpleURLInput extends React.Component {
   readonly props: {
     label: string,

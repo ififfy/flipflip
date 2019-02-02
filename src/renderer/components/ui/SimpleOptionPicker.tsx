@@ -1,7 +1,5 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import en from '../../en';
-
 
 export default class SimpleOptionPicker extends React.Component {
   readonly props: {
@@ -10,7 +8,7 @@ export default class SimpleOptionPicker extends React.Component {
     keys: Array<string>,
     getLabel?: (id: string) => string,
     onChange: (value: string) => void,
-  }
+  };
 
   render() {
     return ( 

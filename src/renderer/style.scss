@@ -630,6 +630,22 @@ label.SimpleCheckbox {
     line-height: $buttonBarHeight;
   }
 
+  .u-button-row-right {
+    display: flex;
+    .SimpleTextInput {
+      display: flex;
+      width: 75px;
+      margin-bottom: 0;
+      align-items: center;
+
+      label {
+        color: black !important;
+        margin-right: $smallPadding;
+        margin-bottom: 0;
+      }
+    }
+  }
+
   .SceneGenerator__Content {
     position: fixed;
     top: $buttonBarHeight;
@@ -638,6 +654,21 @@ label.SimpleCheckbox {
     left: 0;
     padding: $smallPadding;
     overflow: auto;
+
+    .ControlGroup {
+      > span {
+        margin-right: 2rem;
+      }
+
+      .SimpleRadioInput {
+        text-align: center;
+
+        .SimpleRadioInput__Choice {
+          margin-right: 2rem;
+          cursor: pointer;
+        }
+      }
+    }
   }
 }
 
