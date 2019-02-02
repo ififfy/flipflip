@@ -1,6 +1,5 @@
 import * as React from 'react';
 
-
 export default class SimpleSliderInput extends React.Component {
   readonly props: {
     label: string,

@@ -45,6 +45,12 @@ const GT = { // gooninator import type
   local: 'gt.local',
 };
 
+const TT = { // tag type
+  weight: 'tt.weight',
+  all: 'tt.all',
+  none: 'tt.none',
+};
+
 export {
-  TF, IF, ZF, HTF, VTF, TK, BT, GT,
+  TF, IF, ZF, HTF, VTF, TK, BT, GT, TT,
 };
