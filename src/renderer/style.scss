@@ -290,15 +290,26 @@ a {
     padding: $smallPadding;
     margin-left: -$smallPadding;
 
-    .ScenePicker__LibraryButton {
+    div {
       display: flex;
       background-color: $white;
       color: $black !important;
-      height: 4em;
 
       justify-content: center;
       align-items: center;
       text-align: center;
+
+      &.ScenePicker__LibraryButton {
+        height: 4em;
+        width: 100%;
+      }
+
+      &.ScenePicker__GenerateSceneButton {
+        height: 5em;
+        width: 10rem;
+        float: right;
+        margin-bottom: $smallPadding;
+      }
 
       &:hover {
         background-color: $buttonBottom;
