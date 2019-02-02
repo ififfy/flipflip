@@ -192,7 +192,7 @@ export default class Library extends React.Component {
   }
 
   onAdd() {
-    let result = remote.dialog.showOpenDialog({properties: ['openDirectory', 'multiSelections']});
+    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(),{properties: ['openDirectory', 'multiSelections']});
     if (!result) return;
     this.addSources(result);
   }
