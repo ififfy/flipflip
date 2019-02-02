@@ -22,6 +22,7 @@ export default class Scene {
   overlaySceneOpacity: number = 0.5;
   libraryID: number = -1;
   audioURL?: string = "";
+  tagWeights?: string;
 
   // unused; migration only
   hastebinID: string = "";

@@ -641,6 +641,19 @@ label.SimpleCheckbox {
     line-height: $buttonBarHeight;
   }
 
+  .SceneNameForm {
+    display: inline-block;
+    width: 200px;
+
+    input[type=text] {
+      font-size: 21px;
+      font-weight: 700;
+      display: block;
+      width: 100%;
+      margin-top: 4px;
+    }
+  }
+
   .u-button-row-right {
     display: flex;
     .SimpleTextInput {
