@@ -58,7 +58,7 @@ export default class DirectoryPicker extends React.Component {
   };
 
   onAdd() {
-    let result = remote.dialog.showOpenDialog({properties: ['openDirectory', 'multiSelections']});
+    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(),{properties: ['openDirectory', 'multiSelections']});
     if (!result) return;
     // dedup
     result = result.filter((s) => !this.props.sources.includes(s));

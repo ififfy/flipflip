@@ -123,7 +123,7 @@ export default class GooninatorImporter extends React.Component {
   };
 
   addRootDir() {
-    let result = remote.dialog.showOpenDialog({properties: ['openDirectory']});
+    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(),{properties: ['openDirectory']});
     if (!result) return;
     this.setState({rootDir: result});
   }
