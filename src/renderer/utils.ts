@@ -12,7 +12,8 @@ export function urlToPath(url: string): string {
 export function removeDuplicatesBy(keyFn: Function, array: any[]): any[] {
   let mySet = new Set();
   return array.filter(function(x: any) {
-    let key = keyFn(x), isNew = !mySet.has(key);
+    let key = keyFn(x);
+    let isNew = !mySet.has(key);
     if (isNew) mySet.add(key);
     return isNew;
   });

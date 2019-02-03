@@ -2,6 +2,8 @@ import * as React from 'react';
 
 import {remote} from 'electron';
 import Scene from '../Scene';
+import Sortable from "sortablejs";
+import {array_move} from "../utils";
 
 class ScenePickerItem extends React.Component {
   readonly props: { scene: Scene, onSelect(scene: Scene): void };
@@ -9,7 +11,7 @@ class ScenePickerItem extends React.Component {
   render() {
     return (
       <div
-          className="ScenePickerItem u-clickable"
+          className={`ScenePickerItem u-clickable u-draggable ${this.props.scene.tagWeights ? 'm-generator' : ''}`}
           onClick={this.onClick.bind(this)}>
         <div className="ScenePickerItem__Title">
           {this.props.scene.name}
@@ -47,11 +49,12 @@ class Link extends React.Component {
 export default class ScenePicker extends React.Component {
   readonly props: {
     scenes: Array<Scene>,
-    onAdd(sources: []): void,
+    canGenerate: boolean,
+    onAdd(): void,
     onSelect(scene: Scene): void,
     onOpenLibrary(): void,
-    canGenerate: boolean,
     onGenerate(): void,
+    onUpdateScenes(scenes: Array<Scene>): void,
   };
 
   render() {
@@ -70,27 +73,26 @@ export default class ScenePicker extends React.Component {
             If you like FlipFlip, drop me a line at <a href="mailto:ififfy@mm.st">ififfy@mm.st</a> and tell me
             about how you're using it. :-)
           </p>
-
         </div>
 
-        <div className="ScenePicker__Scenes">
-          {this.props.scenes.map((scene) =>
-            <ScenePickerItem key={`${scene.id}`} scene={scene} onSelect={this.props.onSelect} />
-          )}
-          <div key="add" className="ScenePickerItem u-clickable" onClick={this.onAdd.bind(this)}>
-            <div className="ScenePickerItem__Title">
-              + Add scene
-            </div>
-          </div>
-        </div>
-
-        <div className="ScenePicker__Library">
-          <div className={`ScenePicker__GenerateSceneButton ${this.props.canGenerate ? 'u-clickable' : 'u-disabled'}`} onClick={this.props.canGenerate ? this.props.onGenerate.bind(this) : this.nop}>
-            + New Scene Generator
-          </div>
+        <div className="ScenePicker__Buttons">
           <div className="ScenePicker__LibraryButton u-clickable" onClick={this.props.onOpenLibrary}>
             Library
           </div>
+          <div className={`ScenePicker__GenerateSceneButton ${this.props.canGenerate ? 'u-clickable' : 'u-disabled'}`} onClick={this.props.canGenerate ? this.props.onGenerate.bind(this) : this.nop}>
+            + Add Scene Generator
+          </div>
+          <div className={`ScenePicker__AddSceneButton ${this.props.canGenerate ? 'u-clickable' : 'u-disabled'}`} onClick={this.props.canGenerate ? this.props.onAdd.bind(this) : this.nop}>
+            + Add Scene
+          </div>
+        </div>
+
+        <hr/>
+
+        <div className="ScenePicker__Scenes" id="scenes" >
+          {this.props.scenes.map((scene) =>
+            <ScenePickerItem key={`${scene.id}`} scene={scene} onSelect={this.props.onSelect} />
+          )}
         </div>
       </div>
     );
@@ -98,7 +100,19 @@ export default class ScenePicker extends React.Component {
 
   nop () {}
 
-  onAdd() {
-    this.props.onAdd([]);
+  onEnd(evt: any) {
+    let newScenes = this.props.scenes;
+    array_move(newScenes, evt.oldIndex, evt.newIndex);
+    this.props.onUpdateScenes(newScenes);
+  }
+
+  componentDidMount() {
+    if (this.props.scenes.length == 0) return;
+    Sortable.create(document.getElementById('scenes'), {
+      animation: 150,
+      easing: "cubic-bezier(1, 0, 0, 1)",
+      draggable: ".u-draggable",
+      onEnd: this.onEnd.bind(this),
+    });
   }
 };

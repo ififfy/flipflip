@@ -1,9 +1,10 @@
 import {ZF, HTF, VTF, TF, IF, TK, BT} from './const';
+import LibrarySource from "./components/library/LibrarySource";
 
 export default class Scene {
   id: number = 0;
   name: string = "Unnamed scene";
-  directories: Array<string> = [];
+  sources: Array<LibrarySource> = [];
   timingFunction = TF.constant;
   timingConstant = "1000";
   imageTypeFilter = IF.any;
@@ -29,7 +30,7 @@ export default class Scene {
 
   constructor(init?:Partial<Scene>) {
     Object.assign(this, init);
-    this.directories = this.directories.filter((d) => !!d);
+    this.sources = this.sources.filter((d) => !!d);
 
     this.overlaySceneID = parseInt(this.overlaySceneID as any, 10);
     if (!this.overlaySceneOpacity) {

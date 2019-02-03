@@ -99,6 +99,7 @@ export default class Meta extends React.Component {
         {this.state.route.length === 0 && (
           <ScenePicker
             scenes={this.state.scenes}
+            onUpdateScenes={this.onUpdateScenes.bind(this)}
             onAdd={this.onAddScene.bind(this)}
             onSelect={this.onOpenScene.bind(this)}
             onOpenLibrary={this.onOpenLibrary.bind(this)}
@@ -183,7 +184,7 @@ export default class Meta extends React.Component {
     this.setState({route: [new Route({kind: 'library'})], scenes: newScenes});
   }
 
-  onAddScene(sources: Array<string>) {
+  onAddScene() {
     let id = this.state.scenes.length + 1;
     this.state.scenes.forEach((s) => {
       id = Math.max(s.id + 1, id);
@@ -191,7 +192,7 @@ export default class Meta extends React.Component {
     let scene = new Scene({
       id: id,
       name: "New scene",
-      directories: sources
+      sources: new Array<LibrarySource>()
     });
     this.setState({
       scenes: this.state.scenes.concat([scene]),
@@ -231,7 +232,7 @@ export default class Meta extends React.Component {
     });
     let tempScene = new Scene({
       name: "library_scene_temp",
-      directories: [source.url],
+      sources: [source],
       libraryID: source.id,
       id: id,
     });
@@ -255,7 +256,7 @@ export default class Meta extends React.Component {
     let scene = new Scene({
       id: id,
       name: "New generator",
-      directories: [],
+      sources: new Array<LibrarySource>(),
       tagWeights: "[]",
     });
     this.setState({
@@ -276,6 +277,10 @@ export default class Meta extends React.Component {
         fn(s);
       }
     }
+    this.setState({scenes: scenes});
+  }
+
+  onUpdateScenes(scenes: Array<Scene>) {
     this.setState({scenes: scenes});
   }
 

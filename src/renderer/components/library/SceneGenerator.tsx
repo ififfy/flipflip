@@ -77,8 +77,8 @@ export default class SceneGenerator extends React.Component {
               value={this.state.max}
               isEnabled={true}
               onChange={this.onUpdateMax.bind(this)} />
-            <div className={`SceneGenerator__Generate u-button ${this.props.scene.directories.length > 0 ? 'u-clickable' : 'u-disabled'}`}
-                 onClick={this.props.scene.directories.length > 0 ? this.previousScene.bind(this) : this.nop}>
+            <div className={`SceneGenerator__Generate u-button ${this.props.scene.sources.length > 0 ? 'u-clickable' : 'u-disabled'}`}
+                 onClick={this.props.scene.sources.length > 0 ? this.previousScene.bind(this) : this.nop}>
               Previous Scene
             </div>
             <div className={`SceneGenerator__Generate u-button ${(sum > 0 || hasAll) && max > 0 ? 'u-clickable' : 'u-disabled'}`}
@@ -159,8 +159,8 @@ export default class SceneGenerator extends React.Component {
     this.update((s) => { s.tagWeights = tagWeights; });
   }
 
-  updateSceneSources(sources: Array<string>) {
-    this.update((s) => { s.directories = sources; });
+  updateSceneSources(sources: Array<LibrarySource>) {
+    this.update((s) => { s.sources = sources; });
   }
 
   updateSceneName(e: React.FormEvent<HTMLInputElement>) {
@@ -283,36 +283,44 @@ export default class SceneGenerator extends React.Component {
       }
     }
 
-    let sceneSources = Array<string>();
+    let randomSources = Array<string>();
     if (tagWeightMap.size > 0) { // If we have weights
       let index = 0;
       for (let tag of tagWeightMap.keys()) {
         if (taggedSources[index] != undefined) { // If we actually found sources for this tag
           let sources = taggedSources[index];
-          sources = sources.filter((s) => !sceneSources.includes(s));
+          sources = sources.filter((s) => !randomSources.includes(s));
           // Add sources equal to this tags percent of the max
-          sceneSources = sceneSources.concat(getRandomListItem(sources, Math.round((tagWeightMap.get(tag).value / sum) * max)));
+          randomSources = randomSources.concat(getRandomListItem(sources, Math.round((tagWeightMap.get(tag).value / sum) * max)));
         }
         index += 1;
       }
     } else { // IF we only have Alls
       if (taggedSources[0] != undefined) { // If we actually found sources for this tag
         // Add sources equal to max
-        sceneSources = sceneSources.concat(getRandomListItem(taggedSources[0], max));
+        randomSources = randomSources.concat(getRandomListItem(taggedSources[0], max));
       }
     }
     // Randomize our whole list
-    if (sceneSources.length > 1) {
-      sceneSources = getRandomListItem(sceneSources, sceneSources.length);
+    if (randomSources.length > 1) {
+      randomSources = getRandomListItem(randomSources, randomSources.length);
     }
 
-    if (sceneSources.length == 0) {
+    if (randomSources.length == 0) {
       this.setState({errorMessage: "Sorry, no sources were found for this configuration ¯\\_(ツ)_/¯"});
       return;
     }
 
-    // Set directories for scene
-    this.updateSceneSources(removeDuplicatesBy((s: string) => s, sceneSources));
+    // Set sources for scene
+    let sceneSources = Array<LibrarySource>();
+    for (let source of removeDuplicatesBy((s: string) => s, randomSources)) {
+      sceneSources.push(new LibrarySource({
+        url: source,
+        id: sceneSources.length + 1,
+        tags: new Array<Tag>(),
+      }));
+    }
+    this.updateSceneSources(sceneSources);
     this.props.onGenerate();
   }
 }

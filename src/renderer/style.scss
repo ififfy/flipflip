@@ -267,12 +267,16 @@ a {
   .ScenePickerItem {
     background-color: $white;
     color: $black !important;
-    padding: $smallPadding;
+    padding: $smallPadding * 2;
     margin-bottom: $smallPadding;
 
     display: flex;
     justify-content: center;
     align-items: center;
+
+    &.m-generator {
+      border: 2px solid black;
+    }
 
     .ScenePickerItem__Title {
       text-align: center;
@@ -283,35 +287,36 @@ a {
     }
   }
 
-  .ScenePicker__Library {
-    position: absolute;
-    bottom: 0;
+  .ScenePicker__Buttons {
+    display: inline-flex;
     width: 100%;
-    padding: $smallPadding;
-    margin-left: -$smallPadding;
 
     div {
       display: flex;
       background-color: $white;
       color: $black !important;
+      height: 4rem;
+      margin-right: $smallPadding;
 
       justify-content: center;
       align-items: center;
       text-align: center;
 
       &.ScenePicker__LibraryButton {
-        height: 4em;
-        width: 100%;
+        font-weight: bold;
+        width: 70%;
       }
 
       &.ScenePicker__GenerateSceneButton {
-        height: 5em;
-        width: 10rem;
-        float: right;
-        margin-bottom: $smallPadding;
+        width: 18%;
+        border: 2px solid black;
       }
 
-      &:hover {
+      &.ScenePicker__AddSceneButton {
+        width: 12%;
+      }
+
+      &:not(.u-disabled):hover {
         background-color: $buttonBottom;
       }
     }
@@ -334,7 +339,7 @@ a {
   margin-right: 0.5em;
 
   border: 1px solid $black;
-  padding: ($smallPadding * 3) $smallPadding $smallPadding $smallPadding;
+  padding: ($smallPadding * 2) $smallPadding $smallPadding $smallPadding;
   position: relative;
 
   color: $black;
@@ -496,51 +501,36 @@ label.SimpleCheckbox {
   }
 }
 
-.Library {
+.SourcePicker {
   outline: none;
-
-  .Library__LibraryHeader {
-    display: inline-block;
-    margin-top: 0;
-    color: $black !important;
-    line-height: $buttonBarHeight;
-  }
-
-  .Library__Buttons {
-    padding: $smallPadding;
+  .SourcePicker__Buttons {
     height: 3.2rem;
 
-    & > .u-button {
+    & > .u-button:not(.u-float-left) {
       float: right;
-      margin-right: $smallPadding;
+      margin-left: $smallPadding;
     }
   }
 
-  .Library__Sources {
-    position: fixed;
-    top: 5.5rem;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    padding: $smallPadding;
+  .SourcePicker__Sources {
     overflow: auto;
 
-    .Library__Source {
+    .SourcePicker__Source {
       padding: $smallPadding;
       line-height: 1.5rem;
       height: 2.5rem;
 
       @include mouseover;
 
-      .Library__SourceTitle {
-        color: white !important;
+      .SourcePicker__SourceTitle {
+        color: black !important;
         display: inline-block;
       }
 
-      .Library__SourceTags {
+      .SourcePicker__SourceTags {
         display: inline-block;
 
-        .Library__SourceTag {
+        .SourcePicker__SourceTag {
           color: $uiGray;
           padding-left: 1rem;
           font-size: 12px;
@@ -560,9 +550,37 @@ label.SimpleCheckbox {
       }
     }
 
-    .Library__Empty {
+    .SourcePicker__Empty {
       text-align: center;
       padding: 1em;
+    }
+  }
+}
+
+.Library {
+  .Library__LibraryHeader {
+    display: inline-block;
+    margin-top: 0;
+    color: $black !important;
+    line-height: $buttonBarHeight;
+  }
+
+  .SourcePicker {
+    .SourcePicker__Buttons {
+      padding: $smallPadding;
+    }
+
+    .SourcePicker__Sources {
+      position: fixed;
+      top: 5.5rem;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      padding: $smallPadding;
+
+      .SourcePicker__SourceTitle {
+        color: white !important;
+      }
     }
   }
 }
@@ -726,37 +744,6 @@ label.SimpleCheckbox {
     padding: $smallPadding;
     overflow: auto;
   }
-}
-
-.DirectoryPicker {
-  .DirectoryPicker__Buttons {
-    height: 2.5rem;
-
-    & > .u-button {
-      float: right;
-      margin-right: $smallPadding;
-    }
-  }
-
-  .DirectoryPicker__Directory {
-    padding: $smallPadding;
-    padding-left: 0;
-    line-height: 1.5rem;
-    height: 2.5rem;
-
-    @include mouseover;
-
-    .u-button { /* delete */
-      float: right;
-      text-align: center;
-      width: 1.5rem;
-      height: 1.5rem;
-      padding: 0;
-      line-height: 1.5rem;
-      font-weight: bold;
-    }
-  }
-
 }
 
 .URLImporter {

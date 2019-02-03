@@ -202,7 +202,7 @@ export default class HeadlessScenePlayer extends React.Component {
     promiseQueue: Array<CancelablePromise>(),
     promise: new CancelablePromise((resolve, reject) => {}),
     sourcesProcessed: 0,
-    progressMessage: this.props.scene.directories.length > 0 ? this.props.scene.directories[0] : "",
+    progressMessage: this.props.scene.sources.length > 0 ? this.props.scene.sources[0].url : "",
     allURLs: Array<Array<string>>(),
   };
 
@@ -257,7 +257,7 @@ export default class HeadlessScenePlayer extends React.Component {
 
         {showLoadingIndicator && (
           <Progress
-            total={this.props.scene.directories.length}
+            total={this.props.scene.sources.length}
             current={this.state.sourcesProcessed}
             message={this.state.progressMessage}/>
         )}
@@ -275,15 +275,15 @@ export default class HeadlessScenePlayer extends React.Component {
     let newAllURLs = Array<Array<string>>();
 
     let sourceLoop = () => {
-      let d = this.props.scene.directories[n];
+      let d = this.props.scene.sources[n].url;
       let loadPromise = getPromise(d, this.props.scene.imageTypeFilter, 0, n);
 
       // Because of rendering lag, always display the NEXT source, unless this is the last one
       let message;
-      if ((n+1) == this.props.scene.directories.length) {
+      if ((n+1) == this.props.scene.sources.length) {
         message = d;
       } else {
-        message = this.props.scene.directories[n+1];
+        message = this.props.scene.sources[n+1].url;
       }
       if (this.props.opacity != 1) {
         message = "<p>Loading Overlay...</p>" + message;
@@ -306,7 +306,7 @@ export default class HeadlessScenePlayer extends React.Component {
                 getPromise(d, this.props.scene.imageTypeFilter, loadPromise.page + 1, loadPromise.index));
           }
 
-          if (n < this.props.scene.directories.length) {
+          if (n < this.props.scene.sources.length) {
             this.setState({sourcesProcessed: (n + 1), promiseQueue: newPromiseQueue});
             sourceLoop();
           } else {

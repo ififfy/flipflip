@@ -4,13 +4,13 @@ import {IF, TK} from '../../const';
 
 import Scene from '../../Scene';
 import ControlGroup from './ControlGroup';
-import DirectoryPicker from './DirectoryPicker';
+import SourcePicker from './SourcePicker';
 import SimpleCheckbox from '../ui/SimpleCheckbox';
 import SimpleOptionPicker from '../ui/SimpleOptionPicker';
 import SimpleURLInput from "../ui/SimpleURLInput";
-import URLModal from './URLModal';
 import TimingGroup from "./TimingGroup";
 import EffectGroup from "./EffectGroup";
+import LibrarySource from "../library/LibrarySource";
 
 type Props = {
   scene?: Scene,
@@ -39,14 +39,7 @@ export default class SceneDetail extends React.Component {
 
   render() {
     return (
-      <div className='SceneDetail'>
-        {this.state.isShowingURLModal && (
-          <URLModal
-            onClose={this.closeModals.bind(this)}
-            addSources={this.addSources.bind(this)}
-            onChangeTextKind={this.onChangeTextKind.bind(this)}
-            onChangeTextSource={this.onChangeTextSource.bind(this)} />
-        )}
+      <div className="SceneDetail"  onKeyDown={this.secretHotkey.bind(this)} tabIndex={0}>
 
         <div className="u-button-row">
           <div className="u-abs-center">
@@ -76,7 +69,7 @@ export default class SceneDetail extends React.Component {
           </div>
 
           <div className="u-button-row-right">
-            <div onClick={this.props.scene.directories.length > 0 ? this.play.bind(this) : this.nop.bind(this)} className={`u-clickable u-button ${this.props.scene.directories.length > 0 ? '' : 'u-disabled'}`}>
+            <div onClick={this.props.scene.sources.length > 0 ? this.play.bind(this) : this.nop.bind(this)} className={`u-clickable u-button ${this.props.scene.sources.length > 0 ? '' : 'u-disabled'}`}>
               Play
             </div>
           </div>
@@ -132,13 +125,16 @@ export default class SceneDetail extends React.Component {
               value={this.props.scene.audioURL} />
           </ControlGroup>
 
-          <ControlGroup title="Sources" isNarrow={false}>
-            <DirectoryPicker
-              sources={this.props.scene.directories}
-              onImportURL={this.onImportURL.bind(this)}
-              onChange={this.onChangeSources.bind(this)}/>
-          </ControlGroup>
-
+          <div className="ControlGroup m-wide">
+            <div className="ControlGroup__Title">Sources</div>
+            <SourcePicker
+              sources={this.props.scene.sources}
+              emptyMessage="You haven't added any sources to this Scene yet."
+              removeAllMessage="Are you sure you want to remove all sources from this scene?"
+              removeAllConfirm="Ok"
+              onUpdateSources={this.onChangeSources.bind(this)}
+            />
+          </div>
         </div>
       </div>
     )
@@ -151,10 +147,6 @@ export default class SceneDetail extends React.Component {
     }
   }
 
-  closeModals() {
-    this.setState({isShowingURLModal: false});
-  }
-
   play() {
     this.props.onPlay(this.props.scene);
   }
@@ -163,8 +155,15 @@ export default class SceneDetail extends React.Component {
 
   }
 
-  onImportURL() {
-    this.setState({isShowingURLModal: true});
+  toggleURLImportModal() {
+    this.setState({isShowingURLModal: !this.state.isShowingURLModal});
+  }
+
+  // Use alt+P to access import modal
+  secretHotkey(e: KeyboardEvent) {
+    if (e.altKey && e.key=='p') {
+      this.toggleURLImportModal();
+    }
   }
 
   beginEditingName() {
@@ -184,13 +183,7 @@ export default class SceneDetail extends React.Component {
     this.update((s) => { s.name = e.currentTarget.value; });
   }
 
-  addSources(sources: Array<string>) {
-    // dedup
-    sources = sources.filter((s) => !this.props.scene.directories.includes(s));
-    this.onChangeSources(this.props.scene.directories.concat(sources));
-  }
-
-  onChangeSources(sources: Array<string>) { this.update((s) => { s.directories = sources; }); }
+  onChangeSources(sources: Array<LibrarySource>) { this.update((s) => { s.sources = sources; }); }
 
   onChangeImageTypeFilter(filter: string) { this.update((s) => { s.imageTypeFilter = filter; }); }
 
