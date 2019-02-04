@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import {IF, TK} from '../../const';
+import {IF} from '../../const';
 
 import Scene from '../../Scene';
 import ControlGroup from './ControlGroup';
@@ -8,9 +8,10 @@ import SourcePicker from './SourcePicker';
 import SimpleCheckbox from '../ui/SimpleCheckbox';
 import SimpleOptionPicker from '../ui/SimpleOptionPicker';
 import SimpleURLInput from "../ui/SimpleURLInput";
+import LibrarySource from "../library/LibrarySource";
 import TimingGroup from "./TimingGroup";
 import EffectGroup from "./EffectGroup";
-import LibrarySource from "../library/LibrarySource";
+import TextGroup from "./TextGroup";
 
 type Props = {
   scene?: Scene,
@@ -99,23 +100,9 @@ export default class SceneDetail extends React.Component {
             </div>
           </ControlGroup>
 
-          <ControlGroup title="Text" isNarrow={true}>
-            <SimpleOptionPicker
-              onChange={this.onChangeTextKind.bind(this)}
-              label="Source"
-              value={this.props.scene.textKind}
-              keys={Object.values(TK)} />
-            <SimpleURLInput
-              isEnabled={true}
-              onChange={this.onChangeTextSource.bind(this)}
-              label={(() => {
-                switch (this.props.scene.textKind) {
-                  case TK.hastebin: return "Hastebin ID";
-                  case TK.url: return "URL";
-                }
-              })()}
-              value={this.props.scene.textSource} />
-          </ControlGroup>
+          <TextGroup
+            scene={this.props.scene}
+            onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
           <ControlGroup title="Audio" isNarrow={true}>
             <SimpleURLInput
@@ -186,10 +173,6 @@ export default class SceneDetail extends React.Component {
   onChangeSources(sources: Array<LibrarySource>) { this.update((s) => { s.sources = sources; }); }
 
   onChangeImageTypeFilter(filter: string) { this.update((s) => { s.imageTypeFilter = filter; }); }
-
-  onChangeTextKind(kind: string) { this.update((s) => { s.textKind = kind; }); }
-
-  onChangeTextSource(textSource: string) { this.update((s) => { s.textSource = textSource; }); }
 
   onChangePlayFullGif(value: boolean) { this.update((s) => { s.playFullGif = value; }); }
 

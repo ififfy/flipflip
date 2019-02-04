@@ -22,10 +22,12 @@ class TagWeight {
 }
 
 export default class SceneGenerator extends React.Component {
+  readonly nameInputRef: React.RefObject<HTMLInputElement> = React.createRef();
   readonly props: {
     library: Array<LibrarySource>,
     tags: Array<Tag>,
     scene: Scene,
+    autoEdit: boolean,
     goBack(): void,
     onGenerate(): void,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
@@ -35,7 +37,7 @@ export default class SceneGenerator extends React.Component {
   readonly state = {
     max: "300",
     errorMessage: "",
-    isEditingName: false,
+    isEditingName: this.props.autoEdit,
   };
 
   render() {
@@ -59,6 +61,7 @@ export default class SceneGenerator extends React.Component {
                 <input
                   autoFocus
                   type="text"
+                  ref={this.nameInputRef}
                   value={this.props.scene.name}
                   onBlur={this.endEditingName.bind(this)}
                   onChange={this.updateSceneName.bind(this)} />
@@ -130,6 +133,13 @@ export default class SceneGenerator extends React.Component {
         )}
       </div>
     );
+  }
+
+  componentDidMount() {
+    if (this.nameInputRef.current) {
+      this.nameInputRef.current.select();
+      this.nameInputRef.current.focus();
+    }
   }
 
   nop() {}
