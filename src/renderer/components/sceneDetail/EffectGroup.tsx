@@ -67,7 +67,7 @@ export default class EffectGroup extends React.Component {
               onChange={this.onChangeOverlaySceneID.bind(this)}
               label="Overlay scene"
               value={this.props.scene.overlaySceneID.toString()}
-              getLabel={this.getSceneName.bind(this)}
+              parseKeyFunction={this.getSceneName.bind(this)}
               keys={["0"].concat(this.props.allScenes.map((s) => s.id.toString()))} />)}
           {(this.props.allScenes != null || this.props.scene.overlaySceneID != 0) && (
             <SimpleSliderInput

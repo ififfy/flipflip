@@ -215,6 +215,13 @@ a {
   }
 }
 
+.u-random {
+  cursor: pointer;
+  &:before {
+    content: '🎲';
+  }
+}
+
 .u-show-on-hover-only {
   border-bottom: none;
   background: rgba(0,0,0,0);
@@ -245,9 +252,22 @@ a {
   overflow: auto;
 
   .About {
-
-    h1:first-child {
-      margin-top: 0;
+    display: inline-block;
+    width: 100%;
+    div {
+      margin-bottom: $smallPadding*2;
+    }
+    .Header {
+      h1 {
+        margin: 0;
+      }
+      div {
+        margin-left: $smallPadding;
+        display: inline-block;
+      }
+      select {
+        height: 1.5em;
+      }
     }
   }
 

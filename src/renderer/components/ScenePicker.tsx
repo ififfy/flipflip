@@ -1,9 +1,11 @@
 import * as React from 'react';
-
-import {remote} from 'electron';
-import Scene from '../Scene';
 import Sortable from "sortablejs";
-import {array_move} from "../utils";
+import {remote} from 'electron';
+
+import Scene from '../Scene';
+import SimpleOptionPicker from "./ui/SimpleOptionPicker";
+import {array_move, getRandomListItem} from "../utils";
+import {ST} from "../const";
 
 class ScenePickerItem extends React.Component {
   readonly props: { scene: Scene, onSelect(scene: Scene): void };
@@ -61,18 +63,30 @@ export default class ScenePicker extends React.Component {
     return (
       <div className="ScenePicker">
         <div className="About">
-          <h1>FlipFlip</h1>
+          <div className="Header">
+            <div className="u-float-right">
+              <SimpleOptionPicker
+                  label=""
+                  value="Sort"
+                  disableFirst={true}
+                  keys={["Sort"].concat(Object.values(ST))}
+                  onChange={this.onSort.bind(this)}
+              />
+              <div className="u-random" onClick={this.onRandom.bind(this)}/>
+            </div>
+            <h1>FlipFlip</h1>
+          </div>
 
-          <p><Link url="https://github.com/ififfy/flipflip/wiki/FlipFlip-User-Manual">User manual</Link></p>
+          <div><Link url="https://github.com/ififfy/flipflip/wiki/FlipFlip-User-Manual">User manual</Link></div>
 
-          <p>
+          <div>
             <Link url="https://github.com/ififfy/flipflip/issues">Report a problem or suggest an improvement</Link>
-          </p>
+          </div>
 
-          <p>
+          <div>
             If you like FlipFlip, drop me a line at <a href="mailto:ififfy@mm.st">ififfy@mm.st</a> and tell me
             about how you're using it. :-)
-          </p>
+          </div>
         </div>
 
         <div className="ScenePicker__Buttons">
@@ -114,5 +128,75 @@ export default class ScenePicker extends React.Component {
       draggable: ".u-draggable",
       onEnd: this.onEnd.bind(this),
     });
+  }
+
+  onRandom() {
+    this.props.onSelect(getRandomListItem(this.props.scenes));
+  }
+
+  onSort(algorithm: string) {
+    switch (algorithm) {
+      case ST.alphaA:
+        this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
+          if (a.name < b.name) {
+            return -1;
+          } else if (a.name > b.name) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }));
+        break;
+      case ST.alphaD:
+        this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
+          if (a.name > b.name) {
+            return -1;
+          } else if (a.name < b.name) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }));
+        break;
+      case ST.dateA:
+        this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
+          if (a.id < b.id) {
+            return -1;
+          } else if (a.id > b.id) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }));
+        break;
+      case ST.dateD:
+        this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
+          if (a.id > b.id) {
+            return -1;
+          } else if (a.id < b.id) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }));
+        break;
+      case ST.type:
+        this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
+          if (!a.tagWeights && b.tagWeights) {
+            return -1;
+          } else if (a.tagWeights && !b.tagWeights) {
+            return 1;
+          } else {
+            if (a.name < b.name) {
+              return -1;
+            } else if (a.name > b.name) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }
+        }));
+        break;
+    }
   }
 };
