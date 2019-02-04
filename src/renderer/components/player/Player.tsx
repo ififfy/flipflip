@@ -8,10 +8,10 @@ import Scene from '../../Scene';
 import HeadlessScenePlayer from './HeadlessScenePlayer';
 import TimingGroup from "../sceneDetail/TimingGroup";
 import EffectGroup from "../sceneDetail/EffectGroup";
+import TextGroup from "../sceneDetail/TextGroup";
 import Tag from "../library/Tag";
 import ChildCallbackHack from './ChildCallbackHack';
 import {urlToPath} from '../../utils';
-import SimpleCheckbox from "../ui/SimpleCheckbox";
 
 const keyMap = {
   playPause: ['Play/Pause', 'space'],
@@ -134,7 +134,11 @@ export default class Player extends React.Component {
               scene={this.props.scene}
               onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
-            {/*TODO Add text and audio options here*/}
+            <TextGroup
+              scene={this.props.scene}
+              onUpdateScene={this.props.onUpdateScene.bind(this)} />
+
+            {/*TODO Add audio options here*/}
           </div>
         )}
 

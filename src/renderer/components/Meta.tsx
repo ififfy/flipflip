@@ -129,6 +129,7 @@ export default class Meta extends React.Component {
           <SceneGenerator
             library={this.state.library}
             tags={this.state.tags}
+            autoEdit={this.state.autoEdit}
             scene={this.scene()}
             goBack={this.goBack.bind(this)}
             onGenerate={this.onGenerateScene.bind(this)}
@@ -261,8 +262,9 @@ export default class Meta extends React.Component {
     });
     this.setState({
       scenes: this.state.scenes.concat([scene]),
-      route: [new Route({kind: 'generate', value: scene.id})]}
-    );
+      route: [new Route({kind: 'generate', value: scene.id})],
+      autoEdit: true
+    });
   }
 
   onGenerateScene() {

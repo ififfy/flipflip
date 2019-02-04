@@ -9,6 +9,7 @@ import ImagePlayer from './ImagePlayer';
 import CaptionProgram from './CaptionProgram';
 import { TK, IF } from '../../const';
 import ChildCallbackHack from './ChildCallbackHack';
+import {CancelablePromise} from "../../utils";
 
 function isImage(path: string): boolean {
   const p = path.toLowerCase();
@@ -147,39 +148,6 @@ function loadTumblr(url: string, filter: string, page: number): CancelablePromis
         resolve(null)
       });
   });
-}
-
-// Inspired by https://reactjs.org/blog/2015/12/16/ismounted-antipattern.html
-class CancelablePromise extends Promise<Array<string>> {
-  hasCanceled: boolean;
-  // Only looping sources use these properties
-  source: string;
-  index: number;
-  page: number;
-  timeout: number;
-
-
-  constructor(executor: (resolve: (value?: (PromiseLike<Array<string>> | Array<string>)) => void, reject: (reason?: any) => void) => void) {
-    super(executor);
-    this.hasCanceled = false;
-    this.source = "";
-    this.index = 0;
-    this.page = 0;
-    this.timeout = 0;
-  }
-
-  getPromise(): Promise<Array<string>> {
-    return new Promise((resolve, reject) => {
-      this.then(
-          val => this.hasCanceled ? null : resolve(val),
-          error => this.hasCanceled ? null : reject(error)
-      );
-    });
-  }
-
-  cancel() {
-    this.hasCanceled = true;
-  }
 }
 
 export default class HeadlessScenePlayer extends React.Component {

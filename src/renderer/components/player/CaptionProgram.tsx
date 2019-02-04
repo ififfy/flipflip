@@ -1,7 +1,7 @@
 import wretch from 'wretch';
 import * as React from 'react';
 
-import {getRandomListItem} from '../../utils'
+import {CancelablePromise, getRandomListItem} from '../../utils'
 
 let STYLES : {[style : string] : string} = {};
 
@@ -13,6 +13,11 @@ let BLINK_GROUP_DELAY = 1200;
 let CAPTION_DURATION = 2000;
 let CAPTION_DELAY = 1200;
 let PHRASES : string[] = [];
+
+function reset() {
+  PROGRAM = [];
+  programCounter = 0;
+}
 
 const splitFirstWord = function(s : string) {
   const firstSpaceIndex = s.indexOf(" ");
@@ -166,100 +171,7 @@ const COMMANDS : { [command : string] : (el: HTMLElement, value : string) => any
   }
 };
 
-const run = function(getHasStopped : Function) {
-  if (getHasStopped()) {
-    return;
-  }
-  PROGRAM[programCounter](function() {
-    programCounter += 1;
-    if (programCounter >= PROGRAM.length) {
-      programCounter = 0;
-    }
-    run(getHasStopped);
-  })
-};
-
-
-const startText = function(el : HTMLElement, programText : string) {
-  let i = -1;
-  let hasError = false;
-  let hasStopped = false;
-  const getHasStopped = () => { return hasStopped; };
-
-  programText.split('\n').forEach(function(line) {
-    line = line.trim();
-    i += 1;
-    if (line.length < 1) return;
-
-    if (line[0] === '#') {
-      return;
-    }
-    const command = getFirstWord(line);
-    if (command) {
-      const value = getRest(line);
-      if (COMMANDS[command]) {
-        const fn = COMMANDS[command](el, value);
-        if (fn) {
-          if (command.toLowerCase().startsWith("set")) {
-            fn(getHasStopped);
-          } else {
-            PROGRAM.push(fn);
-          }
-        } else {
-          hasError = true;
-          console.error("Error on line", i, "- invalid arguments");
-        }
-      } else {
-        hasError = true;
-        console.error("Error on line", i, "- unknown command");
-      }
-    }
-  });
-
-  if (!hasError) {
-    run(getHasStopped);
-  }
-  return () => { hasStopped = true; };
-};
-
-
-const startShowingText = function(el : HTMLElement, url : string) {
-  if (url === 'test') {
-    let testProgram = `
-    setBlinkDuration 300
-    setBlinkDelay 100
-    setBlinkGroupDelay 1200
-    setCaptionDuration 2000
-    setCaptionDelay 1200
-
-    bigcap YOU LOVE FLUFFY KITTENS
-    blink KITTENS / ARE / YOUR / LIFE
-    cap Cuddle all the kittens forever because you love them.
-    `;
-    return startText(el, testProgram);
-  }
-
-  let _hasStoppedEarly = false;
-  let _stop = () => {
-    _hasStoppedEarly = true;
-  };
-  const stop = () => { _stop(); };
-  wretch(url)
-    .get()
-    .error(503, error => {
-      console.warn("Unable to access " + url + " - Service is unavailable");
-    })
-    .text(data => {
-      if (_hasStoppedEarly) return;
-      if (localStorage.debugText) {
-        console.log(data);
-      }
-      _stop = startText(el, data);
-    });
-  return stop;
-};
-
-export default class CaptionProgram extends React.Component {
+export default class LegacyCaptionProgram extends React.Component {
   readonly el = React.createRef<HTMLDivElement>();
 
   readonly props: {
@@ -267,42 +179,105 @@ export default class CaptionProgram extends React.Component {
   };
 
   readonly state = {
-    stopFunc: Function(),
-    lastURL: ""
+    runningPromise: new CancelablePromise((resolve, reject) => {})
   };
+
+  render() {
+    return (
+      <div className="CaptionProgram u-fill-container"><div ref={this.el} /></div>
+    );
+  }
+
+  componentDidMount() {
+    this.start();
+  }
+
+  componentWillUnmount() {
+    reset();
+    this.stop(false);
+  }
 
   shouldComponentUpdate(nextProps : {url : string}, nextState: any) {
     return nextProps.url !== this.props.url;
   }
 
   componentWillReceiveProps(nextProps : {url : string}) {
-    this._update(nextProps);
+    if (!this.el.current || nextProps.url == this.props.url) return;
+    this.stop(true);
+    reset();
+    this.start(nextProps.url);
   }
 
-  componentWillUnmount() {
-    PROGRAM = [];
-    programCounter = 0;
-    this.state.stopFunc();
-  }
-
-  _update(props: {url : string}) {
-    if (!this.el.current) return;
-    if (props.url == this.state.lastURL) return;
-    this.setState({lastURL: props.url});
-    this._stop();
-    this.setState({stopFunc: startShowingText(this.el.current, props.url)});
-  }
-
-  _stop() {
-    if (this.state.stopFunc) {
-      this.state.stopFunc();
-      this.setState({stopFunc: null});
+  start(url?: string) {
+    if (url == undefined) {
+      url = this.props.url;
     }
+    const newPromise = new CancelablePromise((resolve, reject) => {
+      wretch(url)
+          .get()
+          .error(503, error => {
+            console.warn("Unable to access " + url + " - Service is unavailable");
+          })
+          .text(data => {
+            resolve([data]);
+          });
+    });
+    this.setState({runningPromise: newPromise});
+    newPromise
+      .then((data) => {
+        let hasError = false;
+        for (let line of data[0].split('\n')) {
+          line = line.trim();
+
+          if (line.length == 0 || line[0] === '#') continue;
+
+          const command = getFirstWord(line);
+          if (command) {
+            const value = getRest(line);
+            if (COMMANDS[command]) {
+              const fn = COMMANDS[command](this.el.current, value);
+              if (fn) {
+                if (command.toLowerCase().startsWith("set")) {
+                  fn(() => {return newPromise.hasCanceled;});
+                } else {
+                  PROGRAM.push(fn);
+                }
+              } else {
+                hasError = true;
+                console.error("Error: '" + line +"' - invalid arguments");
+                break;
+              }
+            } else {
+              hasError = true;
+              console.error("Error: '" + line +"' - unknown command");
+              break;
+            }
+          }
+        }
+
+        function captionLoop(hasCanceled: boolean) {
+          if (hasCanceled) {
+            return;
+          }
+          PROGRAM[programCounter](() => {
+            programCounter += 1;
+            if (programCounter >= PROGRAM.length) {
+              programCounter = 0;
+            }
+            captionLoop(newPromise.hasCanceled);
+          });
+        }
+
+        if (!hasError) {
+          captionLoop(newPromise.hasCanceled);
+        }
+      });
   }
 
-  render() {
-    return (
-      <div className="CaptionProgram u-fill-container"><div ref={this.el} /></div>
-    );
+  stop(setState: boolean) {
+    if (this.state.runningPromise) {
+      this.state.runningPromise.cancel();
+      if (setState) this.setState({runningPromise: null});
+    }
   }
 }
