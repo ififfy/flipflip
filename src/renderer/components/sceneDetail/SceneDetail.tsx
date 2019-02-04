@@ -7,11 +7,11 @@ import ControlGroup from './ControlGroup';
 import SourcePicker from './SourcePicker';
 import SimpleCheckbox from '../ui/SimpleCheckbox';
 import SimpleOptionPicker from '../ui/SimpleOptionPicker';
-import SimpleURLInput from "../ui/SimpleURLInput";
 import LibrarySource from "../library/LibrarySource";
 import TimingGroup from "./TimingGroup";
 import EffectGroup from "./EffectGroup";
 import TextGroup from "./TextGroup";
+import AudioGroup from "./AudioGroup";
 
 type Props = {
   scene?: Scene,
@@ -104,13 +104,9 @@ export default class SceneDetail extends React.Component {
             scene={this.props.scene}
             onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
-          <ControlGroup title="Audio" isNarrow={true}>
-            <SimpleURLInput
-              isEnabled={true}
-              onChange={this.onChangeAudioURL.bind(this)}
-              label="URL"
-              value={this.props.scene.audioURL} />
-          </ControlGroup>
+          <AudioGroup
+            scene={this.props.scene}
+            onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
           <div className="ControlGroup m-wide">
             <div className="ControlGroup__Title">Sources</div>
@@ -175,6 +171,4 @@ export default class SceneDetail extends React.Component {
   onChangeImageTypeFilter(filter: string) { this.update((s) => { s.imageTypeFilter = filter; }); }
 
   onChangePlayFullGif(value: boolean) { this.update((s) => { s.playFullGif = value; }); }
-
-  onChangeAudioURL(value: string) { this.update((s) => { s.audioURL = value; }); }
 };
