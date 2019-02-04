@@ -51,6 +51,14 @@ const TT = { // tag type
   none: 'tt.none',
 };
 
+const ST = { // sort type
+  alphaA: 'st.alphaA',
+  alphaD: 'st.alphaD',
+  dateA: 'st.dateA',
+  dateD: 'st.dateD',
+  type: 'st.type',
+};
+
 export {
-  TF, IF, ZF, HTF, VTF, TK, BT, GT, TT,
+  TF, IF, ZF, HTF, VTF, TK, BT, GT, TT, ST,
 };

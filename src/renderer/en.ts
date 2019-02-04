@@ -33,4 +33,10 @@ export default new Map<String, String>([
   ['tt.weight', 'Weight'],
   ['tt.all', 'Require'],
   ['tt.none', 'Exclude'],
+
+  ['st.alphaA', 'By Title Asc'],
+  ['st.alphaD', 'By Title Desc'],
+  ['st.dateA', 'By Date Asc'],
+  ['st.dateD', 'By Date Desc'],
+  ['st.type', 'By Type'],
 ]);
