@@ -31,7 +31,7 @@ export default class SimpleURLInput extends React.Component {
   }
   
   pickFile() {
-    let result = remote.dialog.showOpenDialog({properties: ['openFile']});
+    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openFile']});
     if (!result || !result.length) return;
     this.props.onChange(fileURL(result[0]));
   }

@@ -9,6 +9,7 @@ import HeadlessScenePlayer from './HeadlessScenePlayer';
 import TimingGroup from "../sceneDetail/TimingGroup";
 import EffectGroup from "../sceneDetail/EffectGroup";
 import TextGroup from "../sceneDetail/TextGroup";
+import AudioGroup from "../sceneDetail/AudioGroup";
 import Tag from "../library/Tag";
 import ChildCallbackHack from './ChildCallbackHack';
 import {urlToPath} from '../../utils';
@@ -138,7 +139,9 @@ export default class Player extends React.Component {
               scene={this.props.scene}
               onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
-            {/*TODO Add audio options here*/}
+            <AudioGroup
+                scene={this.props.scene}
+                onUpdateScene={this.props.onUpdateScene.bind(this)} />
           </div>
         )}
 

@@ -66,6 +66,7 @@ export default class ImagePlayer extends React.Component {
       }
       const img = new Image();
       img.src = this.state.historyPaths[(this.state.historyPaths.length - 1) + offset];
+      (img as any).key = 0;
       imgs.push(img);
     } else {
       const max = this.props.fadeEnabled ? 3 : 2;
