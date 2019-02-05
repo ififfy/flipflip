@@ -30,6 +30,7 @@ let initialState = {
   tags: Array<Tag>(),
   route: Array<Route>(),
   autoEdit: false,
+  isSelect: false,
 };
 
 const saveDir = path.join(remote.app.getPath('appData'), 'flipflip');
@@ -45,6 +46,7 @@ try {
   const data = JSON.parse(readFileSync(savePath, 'utf-8'));
   initialState = {
     autoEdit: data.autoEdit,
+    isSelect: data.isSelect,
     scenes: data.scenes.map((s: any) => new Scene(s)),
     library: data.library.map((s: any) => new LibrarySource(s)),
     tags: data.tags.map((t: any) => new Tag(t)),
@@ -110,10 +112,12 @@ export default class Meta extends React.Component {
           <Library
             library={this.state.library}
             tags={this.state.tags}
+            isSelect={this.state.isSelect}
             onPlay={this.onPlaySceneFromLibrary.bind(this)}
             onUpdateLibrary={this.onUpdateLibrary.bind(this)}
             goBack={this.goBack.bind(this)}
             manageTags={this.manageTags.bind(this)}
+            importSources={this.onImportFromLibrary.bind(this)}
           />
         )}
 
@@ -146,7 +150,9 @@ export default class Meta extends React.Component {
             goBack={this.goBack.bind(this)}
             onDelete={this.onDeleteScene.bind(this)}
             onPlay={this.onPlayScene.bind(this)}
-            onUpdateScene={this.onUpdateScene.bind(this)} />)}
+            onUpdateScene={this.onUpdateScene.bind(this)}
+            onOpenLibraryImport={this.onOpenLibraryImport.bind(this)}
+          />)}
 
         {this.isRoute('play') && (
           <Player
@@ -176,7 +182,7 @@ export default class Meta extends React.Component {
   goBack() {
     const newRoute = this.state.route;
     this.state.route.pop();
-    this.setState({route: newRoute, autoEdit: false});
+    this.setState({route: newRoute, autoEdit: false, isSelect: false});
   }
 
   goBackToLibrary() {
@@ -221,9 +227,34 @@ export default class Meta extends React.Component {
     this.setState({route: [new Route({kind: 'library', value: null})]});
   }
 
+  onOpenLibraryImport() {
+    this.setState({route: this.state.route.concat(new Route({kind: 'library', value: null})), isSelect: true});
+  }
+
+  onImportFromLibrary(sources: Array<string>) {
+    const sceneSources = this.scene().sources;
+    const sceneSourceURLs = sceneSources.map((s) => s.url);
+    let id = sceneSources.length + 1;
+    this.scene().sources.forEach((s) => {
+      id = Math.max(s.id + 1, id);
+    });
+    for (let source of sources) {
+      if (!sceneSourceURLs.includes(source)) {
+        const newSource = new LibrarySource({
+          url: source,
+          id: id,
+          tags: new Array<Tag>(),
+        });
+        sceneSources.push(newSource);
+        id += 1;
+      }
+    }
+    this.onUpdateScene(this.scene(), (s) => {s.sources = sceneSources;});
+    this.goBack();
+  }
+
   onPlayScene(scene: Scene) {
-    const newRoute = this.state.route.concat(new Route({kind: 'play', value: scene.id}));
-    this.setState({route: newRoute});
+    this.setState({route: this.state.route.concat(new Route({kind: 'play', value: scene.id}))});
   }
 
   onPlaySceneFromLibrary(source: LibrarySource) {

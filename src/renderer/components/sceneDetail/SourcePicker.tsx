@@ -13,11 +13,15 @@ import {SF} from "../../const";
 
 type Props = {
   sources: Array<LibrarySource>,
+  isSelect: boolean,
   emptyMessage: string,
   removeAllMessage: string,
   removeAllConfirm: string,
+  allowLibraryImport: boolean,
   onUpdateSources(sources: Array<LibrarySource>): void,
   onClick?(source: LibrarySource): void,
+  onOpenLibraryImport?(): void,
+  importSourcesFromLibrary?(sources: Array<string>): void,
 };
 
 export default class SourcePicker extends React.Component {
@@ -28,6 +32,7 @@ export default class SourcePicker extends React.Component {
     isEditing: -1,
     sortable: Sortable,
     filters: Array<string>(),
+    selected: Array<string>(),
   };
 
   render() {
@@ -73,29 +78,57 @@ export default class SourcePicker extends React.Component {
 
     return (
       <div className="SourcePicker"  onKeyDown={this.secretHotkey.bind(this)} tabIndex={0}>
-        <div className="SourcePicker__Buttons">
-          <div className="u-button u-clickable" onClick={this.onAdd.bind(this)}>+ Add local files</div>
-          <div className="u-button u-clickable" onClick={this.onAddURL.bind(this)}>+ Add URL</div>
-          <SimpleOptionPicker
-              label=""
-              value="Sort Sources"
-              disableFirst={true}
-              keys={["Sort Sources"].concat(Object.values(SF))}
-              onChange={this.onSort.bind(this)}
-          />
-          {tags.length > 0 && (
-            <div className="ReactMultiSelectCheckboxes">
-              <ReactMultiSelectCheckboxes
-                options={options}
-                placeholderButtonLabel="Filter Tags"
-                onChange={this.onFilter.bind(this)}
-                rightAligned={true}
+        {this.props.isSelect && (
+            <div className="SourcePicker__Buttons">
+              <SimpleOptionPicker
+                  label=""
+                  value="Sort Sources"
+                  disableFirst={true}
+                  keys={["Sort Sources"].concat(Object.values(SF))}
+                  onChange={this.onSort.bind(this)}
               />
+              {tags.length > 0 && (
+                  <div className="ReactMultiSelectCheckboxes">
+                    <ReactMultiSelectCheckboxes
+                        options={options}
+                        placeholderButtonLabel="Filter Tags"
+                        onChange={this.onFilter.bind(this)}
+                        rightAligned={true}
+                    />
+                  </div>
+              )}
+
+              <div className={`u-button u-float-left ${this.state.selected.length > 0 ? 'u-clickable' : 'u-disabled'}`} onClick={this.state.selected.length > 0 ? this.props.importSourcesFromLibrary.bind(this, this.state.selected) : this.nop}>Import Selected</div>
             </div>
-          )}
-          <div className={`u-button u-float-left ${this.props.sources.length == 0 ? 'u-disabled' : 'u-clickable'} `}
-               onClick={this.props.sources.length == 0 ? this.nop : this.toggleRemoveAllModal.bind(this)}>- Remove All</div>
-        </div>
+        )}
+        {!this.props.isSelect && (
+          <div className="SourcePicker__Buttons">
+            <div className="u-button u-clickable" onClick={this.onAdd.bind(this)}>+ Add local files</div>
+            <div className="u-button u-clickable" onClick={this.onAddURL.bind(this)}>+ Add URL</div>
+            {this.props.allowLibraryImport && (
+                <div className="u-button u-clickable" onClick={this.props.onOpenLibraryImport.bind(this)}>+ Add From Library</div>
+            )}
+            <SimpleOptionPicker
+                label=""
+                value="Sort Sources"
+                disableFirst={true}
+                keys={["Sort Sources"].concat(Object.values(SF))}
+                onChange={this.onSort.bind(this)}
+            />
+            {tags.length > 0 && (
+              <div className="ReactMultiSelectCheckboxes">
+                <ReactMultiSelectCheckboxes
+                  options={options}
+                  placeholderButtonLabel="Filter Tags"
+                  onChange={this.onFilter.bind(this)}
+                  rightAligned={true}
+                />
+              </div>
+            )}
+            <div className={`u-button u-float-left ${this.props.sources.length == 0 ? 'u-disabled' : 'u-clickable'} `}
+                 onClick={this.props.sources.length == 0 ? this.nop : this.toggleRemoveAllModal.bind(this)}>- Remove All</div>
+          </div>
+        )}
 
         <div id="sources" className="SourcePicker__Sources">
           {displaySources.length == 0 && (
@@ -106,6 +139,9 @@ export default class SourcePicker extends React.Component {
           {displaySources.map((source) =>
             <div className="SourcePicker__Source"
                  key={source.id}>
+              {this.props.isSelect && (
+                <input type="checkbox" value={source.url} onChange={this.onSelect.bind(this)} checked={this.state.selected.includes(source.url)}/>
+              )}
               {this.state.isEditing != source.id && (
                 <div className="SourcePicker__SourceTitle u-clickable" onClick={this.props.onClick ? this.props.onClick.bind(this, source) : this.onEdit.bind(this, source.id)}>
                   {source.url}
@@ -294,6 +330,17 @@ export default class SourcePicker extends React.Component {
       id+=1;
     }
     this.props.onUpdateSources(newLibrary);
+  }
+
+  onSelect(event: any) {
+    const source = event.currentTarget.value;
+    const newSelected = this.state.selected;
+    if (newSelected.includes(source)) {
+      newSelected.splice(newSelected.indexOf(source), 1)
+    } else {
+      newSelected.push(source);
+    }
+    this.setState({selected: newSelected});
   }
 
   onFilter(tags: Array<{label: string, value: string}>) {

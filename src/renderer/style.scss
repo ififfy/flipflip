@@ -583,6 +583,11 @@ label.SimpleCheckbox {
 
       @include mouseover;
 
+      > input {
+        vertical-align: -2px;
+        margin-right: 10px;
+      }
+
       .SourcePicker__SourceTitle {
         color: black !important;
         display: inline-block;
