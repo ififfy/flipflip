@@ -21,6 +21,7 @@ type Props = {
   onPlay(scene: Scene): void,
   onDelete(scene: Scene): void,
   onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
+  onOpenLibraryImport(scene: Scene): void,
 };
 
 export default class SceneDetail extends React.Component {
@@ -115,7 +116,10 @@ export default class SceneDetail extends React.Component {
               emptyMessage="You haven't added any sources to this Scene yet."
               removeAllMessage="Are you sure you want to remove all sources from this scene?"
               removeAllConfirm="Ok"
+              allowLibraryImport={true}
+              isSelect={false}
               onUpdateSources={this.onChangeSources.bind(this)}
+              onOpenLibraryImport={this.props.onOpenLibraryImport.bind(this, this.props.scene)}
             />
           </div>
         </div>

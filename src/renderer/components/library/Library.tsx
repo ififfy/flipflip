@@ -8,10 +8,12 @@ export default class Library extends React.Component {
   readonly props: {
     library: Array<LibrarySource>,
     tags: Array<Tag>,
+    isSelect: boolean,
     onUpdateLibrary(sources: Array<LibrarySource>): void,
     onPlay(source: LibrarySource): void,
     goBack(): void,
     manageTags(): void,
+    importSources(sources: Array<string>): void,
   };
 
   render() {
@@ -21,14 +23,15 @@ export default class Library extends React.Component {
           <div className="u-abs-center">
               <h2 className="Library__LibraryHeader">Library</h2>
           </div>
-
-          <div className="u-button-row-right">
-            <div
-                className="Library__ManageTags u-button u-clickable"
-                onClick={this.props.manageTags.bind(this)}>
-              Manage Tags
+          {!this.props.isSelect && (
+            <div className="u-button-row-right">
+                <div
+                    className="Library__ManageTags u-button u-clickable"
+                    onClick={this.props.manageTags.bind(this)}>
+                  Manage Tags
+                </div>
             </div>
-          </div>
+          )}
           <div className="BackButton u-button u-clickable" onClick={this.props.goBack}>Back</div>
         </div>
 
@@ -37,11 +40,16 @@ export default class Library extends React.Component {
           emptyMessage="You haven't added anything to the Library yet."
           removeAllMessage="Are you sure you really wanna delete your library...? ಠ_ಠ"
           removeAllConfirm="Yea... I'm sure"
+          allowLibraryImport={false}
+          isSelect={this.props.isSelect}
           onUpdateSources={this.props.onUpdateLibrary}
           onClick={this.props.onPlay}
+          importSourcesFromLibrary={this.props.importSources}
         />
       </div>
     )
   }
+
+  nop() {}
 
 }
