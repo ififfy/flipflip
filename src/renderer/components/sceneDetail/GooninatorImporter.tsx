@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {sep} from "path";
 import {remote} from "electron";
-import {TK, GT} from '../../const';
+import {TOT, GT} from '../../const';
 import SimpleTextInput from '../ui/SimpleTextInput';
 import SimpleOptionPicker from "../ui/SimpleOptionPicker";
 
@@ -111,7 +111,7 @@ export default class GooninatorImporter extends React.Component {
       }
 
       // Update hastebin URL (if present)
-      this.props.onChangeTextKind(TK.hastebin);
+      this.props.onChangeTextKind(TOT.hastebin);
       this.props.onChangeTextSource(hastebinURL);
     }
 

@@ -1,4 +1,4 @@
-import {ZF, HTF, VTF, TF, IF, TK, BT} from './const';
+import {ZF, HTF, VTF, TF, IF, TOT, BT} from './const';
 import LibrarySource from "./components/library/LibrarySource";
 
 export default class Scene {
@@ -42,13 +42,13 @@ export default class Scene {
     }
 
     if (this.hastebinID.length && !(this.textSource && this.textSource.length)) {
-      this.textKind = TK.hastebin;
+      this.textKind = TOT.hastebin;
       this.textSource = this.hastebinID;
       this.hastebinID = "";
     }
 
     if (!(this.textKind && this.textKind.length)) {
-      this.textKind = TK.url;
+      this.textKind = TOT.url;
     }
 
     // backward compatible with 1.0.1

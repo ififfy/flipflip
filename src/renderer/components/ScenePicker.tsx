@@ -5,7 +5,7 @@ import {remote} from 'electron';
 import Scene from '../Scene';
 import SimpleOptionPicker from "./ui/SimpleOptionPicker";
 import {array_move, getRandomListItem} from "../utils";
-import {ST} from "../const";
+import {SF} from "../const";
 
 class ScenePickerItem extends React.Component {
   readonly props: { scene: Scene, onSelect(scene: Scene): void };
@@ -69,7 +69,7 @@ export default class ScenePicker extends React.Component {
                   label=""
                   value="Sort"
                   disableFirst={true}
-                  keys={["Sort"].concat(Object.values(ST))}
+                  keys={["Sort"].concat(Object.values(SF))}
                   onChange={this.onSort.bind(this)}
               />
               <div className="u-random" onClick={this.onRandom.bind(this)}/>
@@ -136,7 +136,7 @@ export default class ScenePicker extends React.Component {
 
   onSort(algorithm: string) {
     switch (algorithm) {
-      case ST.alphaA:
+      case SF.alphaA:
         this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
           if (a.name < b.name) {
             return -1;
@@ -147,7 +147,7 @@ export default class ScenePicker extends React.Component {
           }
         }));
         break;
-      case ST.alphaD:
+      case SF.alphaD:
         this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
           if (a.name > b.name) {
             return -1;
@@ -158,7 +158,7 @@ export default class ScenePicker extends React.Component {
           }
         }));
         break;
-      case ST.dateA:
+      case SF.dateA:
         this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
           if (a.id < b.id) {
             return -1;
@@ -169,7 +169,7 @@ export default class ScenePicker extends React.Component {
           }
         }));
         break;
-      case ST.dateD:
+      case SF.dateD:
         this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
           if (a.id > b.id) {
             return -1;
@@ -180,7 +180,7 @@ export default class ScenePicker extends React.Component {
           }
         }));
         break;
-      case ST.type:
+      case SF.type:
         this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
           if (!a.tagWeights && b.tagWeights) {
             return -1;
