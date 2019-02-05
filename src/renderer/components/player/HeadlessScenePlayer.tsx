@@ -7,9 +7,9 @@ import Scene from '../../Scene';
 import Progress from '../ui/Progress';
 import ImagePlayer from './ImagePlayer';
 import CaptionProgram from './CaptionProgram';
-import { TK, IF } from '../../const';
+import {TOT, IF, ST} from '../../const';
 import ChildCallbackHack from './ChildCallbackHack';
-import {CancelablePromise} from "../../utils";
+import {CancelablePromise, getSourceType} from "../../utils";
 
 function isImage(path: string): boolean {
   const p = path.toLowerCase();
@@ -38,8 +38,8 @@ function filterPathsToJustImages(imageTypeFilter: string, paths: Array<string>):
 
 function textURL(kind: string, src: string): string {
   switch (kind) {
-    case TK.url: return src;
-    case TK.hastebin: return `https://hastebin.com/raw/${src}`;
+    case TOT.url: return src;
+    case TOT.hastebin: return `https://hastebin.com/raw/${src}`;
     default: return src;
   }
 }
@@ -47,16 +47,20 @@ function textURL(kind: string, src: string): string {
 // Determine what kind of source we have based on the URL and return associated Promise
 function getPromise(url: string, filter: string, page: number, index: number): CancelablePromise {
   let promise;
-  if (/^https?:\/\/[^\.]*\.tumblr\.com/.exec(url) != null) { // Tumblr
-    promise = loadTumblr(url, filter, page);
-    promise.source = url;
-    promise.index = index;
-    promise.page = page;
-    promise.timeout = 8000; // This delay might have to be modified, 5000 was too low, resulted in 429 response
-  } else if (/^https?:\/\//.exec(url) != null) { // Arbitrary URL, assume image list
-    promise = loadRemoteImageURLList(url, filter);
-  } else { // Directory
-    promise = loadLocalDirectory(url, filter);
+  switch (getSourceType(url)) {
+    case ST.tumblr:
+      promise = loadTumblr(url, filter, page);
+      promise.source = url;
+      promise.index = index;
+      promise.page = page;
+      promise.timeout = 8000; // This delay might have to be modified, 5000 was too low, resulted in 429 response
+      break;
+    case ST.list:
+      promise = loadRemoteImageURLList(url, filter);
+      break;
+    case ST.local:
+      promise = loadLocalDirectory(url, filter);
+      break;
   }
   return promise;
 }

@@ -254,7 +254,7 @@ a {
   .About {
     display: inline-block;
     width: 100%;
-    div {
+    > div {
       margin-bottom: $smallPadding*2;
     }
     .Header {
@@ -526,7 +526,50 @@ label.SimpleCheckbox {
   .SourcePicker__Buttons {
     height: 3.2rem;
 
-    & > .u-button:not(.u-float-left) {
+    .ReactMultiSelectCheckboxes > div {
+      > button {
+        margin-top: 4px;
+        height: 2em;
+        padding: 0 0 0 5px;
+        border-radius: 0;
+        border-width: 1px;
+        box-shadow: none;
+        font-size: 13.3px;
+        color: black;
+
+        &:after {
+          content: '▼';
+          font-size: 9px;
+          padding-top: 3px;
+          padding-right: 5px;
+        }
+
+        > span > svg {
+          display: none;
+        }
+      }
+      > div {
+        margin-top: 0 !important;
+        color: black;
+        > div > div > div > div > input {
+          vertical-align: -2px;
+        }
+      }
+    }
+
+    > .SimpleOptionPicker {
+      select {
+        margin-top: 4px;
+        height: 2em;
+        cursor: pointer;
+        &::-ms-expand {
+          display: none;
+        }
+      }
+    }
+
+
+    & > :not(.u-float-left) {
       float: right;
       margin-left: $smallPadding;
     }

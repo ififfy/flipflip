@@ -1,4 +1,15 @@
 import { URL } from "url";
+import {ST} from "./const";
+
+export function getSourceType(url: string): string {
+  if (/^https?:\/\/[^\.]*\.tumblr\.com/.exec(url) != null) { // Tumblr
+    return ST.tumblr;
+  } else if (/^https?:\/\//.exec(url) != null) { // Arbitrary URL, assume image list
+    return ST.list;
+  } else { // Directory
+    return ST.local;
+  }
+}
 
 export function urlToPath(url: string): string {
   const path = new URL(url).pathname;

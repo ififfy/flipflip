@@ -1,12 +1,15 @@
 import * as React from 'react';
 import Sortable from "sortablejs";
+import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 import {remote} from 'electron';
 
 import Modal from '../ui/Modal';
 import Tag from "../library/Tag";
 import LibrarySource from "../library/LibrarySource";
 import URLModal from "../sceneDetail/URLModal";
-import {array_move, removeDuplicatesBy} from "../../utils";
+import SimpleOptionPicker from "../ui/SimpleOptionPicker";
+import {array_move, getSourceType, removeDuplicatesBy} from "../../utils";
+import {SF} from "../../const";
 
 type Props = {
   sources: Array<LibrarySource>,
@@ -23,25 +26,84 @@ export default class SourcePicker extends React.Component {
     removeAllIsOpen: false,
     urlImportIsOpen: false,
     isEditing: -1,
+    sortable: Sortable,
+    filters: Array<string>(),
   };
 
   render() {
+    let tags = Array<Tag>();
+    let options = Array<{label: string, value: string}>();
+    for (let source of this.props.sources) {
+      for (let tag of source.tags) {
+        tags.push(tag);
+      }
+    }
+    tags = removeDuplicatesBy((t: Tag) => t.name, tags);
+    tags.sort((a, b) => {
+      if (a.name < b.name) {
+        return -1;
+      } else if (a.name > b.name) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+    for (let tag of tags) {
+      options.push({label: tag.name, value: tag.name})
+    }
+
+    let displaySources = [];
+    const filtering = this.state.filters.length > 0;
+    if (filtering) {
+      for (let source of this.props.sources) {
+        let matchesFilter = true;
+        for (let filter of this.state.filters) {
+          if (!source.tags.map((s) => s.name).includes(filter)) {
+            matchesFilter = false;
+            break;
+          }
+        }
+        if (matchesFilter) {
+          displaySources.push(source);
+        }
+      }
+    } else {
+      displaySources = this.props.sources;
+    }
+
     return (
       <div className="SourcePicker"  onKeyDown={this.secretHotkey.bind(this)} tabIndex={0}>
         <div className="SourcePicker__Buttons">
           <div className="u-button u-clickable" onClick={this.onAdd.bind(this)}>+ Add local files</div>
           <div className="u-button u-clickable" onClick={this.onAddURL.bind(this)}>+ Add URL</div>
+          <SimpleOptionPicker
+              label=""
+              value="Sort Sources"
+              disableFirst={true}
+              keys={["Sort Sources"].concat(Object.values(SF))}
+              onChange={this.onSort.bind(this)}
+          />
+          {tags.length > 0 && (
+            <div className="ReactMultiSelectCheckboxes">
+              <ReactMultiSelectCheckboxes
+                options={options}
+                placeholderButtonLabel="Filter Tags"
+                onChange={this.onFilter.bind(this)}
+                rightAligned={true}
+              />
+            </div>
+          )}
           <div className={`u-button u-float-left ${this.props.sources.length == 0 ? 'u-disabled' : 'u-clickable'} `}
                onClick={this.props.sources.length == 0 ? this.nop : this.toggleRemoveAllModal.bind(this)}>- Remove All</div>
         </div>
 
         <div id="sources" className="SourcePicker__Sources">
-          {this.props.sources.length == 0 && (
+          {displaySources.length == 0 && (
             <div className="SourcePicker__Empty">
-              {this.props.emptyMessage}
+              {filtering ? "No results" : this.props.emptyMessage}
             </div>
           )}
-          {this.props.sources.map((source) =>
+          {displaySources.map((source) =>
             <div className="SourcePicker__Source"
                  key={source.id}>
               {this.state.isEditing != source.id && (
@@ -111,18 +173,29 @@ export default class SourcePicker extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.sources.length == 0) return;
-    Sortable.create(document.getElementById('sources'), {
-      animation: 150,
-      easing: "cubic-bezier(1, 0, 0, 1)",
-      onEnd: this.onEnd.bind(this),
-    });
-    for (let s=0; s<this.props.sources.length; s++) {
-      Sortable.create(document.getElementById('tags-' + this.props.sources[s].id), {
+    this.setState({sortable: null});
+    this.initSortable();
+  }
+
+  componentDidUpdate() {
+    this.initSortable();
+  }
+
+  initSortable() {
+    if (!this.state.sortable && this.props.sources.length > 0) {
+      let sortable = Sortable.create(document.getElementById('sources'), {
         animation: 150,
         easing: "cubic-bezier(1, 0, 0, 1)",
-        onEnd: this.onEndTag.bind(this, this.props.sources[s].id),
+        onEnd: this.onEnd.bind(this),
       });
+      for (let s = 0; s < this.props.sources.length; s++) {
+        Sortable.create(document.getElementById('tags-' + this.props.sources[s].id), {
+          animation: 150,
+          easing: "cubic-bezier(1, 0, 0, 1)",
+          onEnd: this.onEndTag.bind(this, this.props.sources[s].id),
+        });
+      }
+      this.setState({sortable: sortable});
     }
   }
 
@@ -221,5 +294,72 @@ export default class SourcePicker extends React.Component {
       id+=1;
     }
     this.props.onUpdateSources(newLibrary);
+  }
+
+  onFilter(tags: Array<{label: string, value: string}>) {
+    this.state.sortable.option("disabled", tags.length > 0);
+    this.setState({filters: tags.map((t) => t.value)});
+  }
+
+  onSort(algorithm: string) {
+    switch (algorithm) {
+      case SF.alphaA:
+        this.props.onUpdateSources(this.props.sources.sort((a, b) => {
+          if (a.url < b.url) {
+            return -1;
+          } else if (a.url > b.url) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }));
+        break;
+      case SF.alphaD:
+        this.props.onUpdateSources(this.props.sources.sort((a, b) => {
+          if (a.url > b.url) {
+            return -1;
+          } else if (a.url < b.url) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }));
+        break;
+      case SF.dateA:
+        this.props.onUpdateSources(this.props.sources.sort((a, b) => {
+          if (a.id < b.id) {
+            return -1;
+          } else if (a.id > b.id) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }));
+        break;
+      case SF.dateD:
+        this.props.onUpdateSources(this.props.sources.sort((a, b) => {
+          if (a.id > b.id) {
+            return -1;
+          } else if (a.id < b.id) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }));
+        break;
+      case SF.type:
+        this.props.onUpdateSources(this.props.sources.sort((a, b) => {
+          const aType = getSourceType(a.url);
+          const bType = getSourceType(b.url);
+          if (aType > bType) {
+            return -1;
+          } else if (aType < bType) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }));
+        break;
+    }
   }
 };

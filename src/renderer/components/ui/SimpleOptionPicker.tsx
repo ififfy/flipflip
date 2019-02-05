@@ -14,7 +14,9 @@ export default class SimpleOptionPicker extends React.Component {
   render() {
     return ( 
       <div className="SimpleOptionPicker">
-        <label>{this.props.label}</label>
+        {this.props.label && (
+          <label>{this.props.label}</label>
+        )}
         <select
           value={this.props.value}
           onChange={this.onChange.bind(this)}>

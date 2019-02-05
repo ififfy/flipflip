@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {TK} from "../../const";
+import {TOT} from "../../const";
 import SimpleOptionPicker from "../ui/SimpleOptionPicker";
 import SimpleURLInput from "../ui/SimpleURLInput";
 import ControlGroup from "./ControlGroup";
@@ -18,14 +18,14 @@ export default class TextGroup extends React.Component {
           onChange={this.onChangeTextKind.bind(this)}
           label="Source"
           value={this.props.scene.textKind}
-          keys={Object.values(TK)} />
+          keys={Object.values(TOT)} />
         <SimpleURLInput
           isEnabled={true}
           onChange={this.onChangeTextSource.bind(this)}
           label={(() => {
             switch (this.props.scene.textKind) {
-              case TK.hastebin: return "Hastebin ID";
-              case TK.url: return "URL";
+              case TOT.hastebin: return "Hastebin ID";
+              case TOT.url: return "URL";
             }
           })()}
           value={this.props.scene.textSource} />

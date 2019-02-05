@@ -24,8 +24,8 @@ export default new Map<String, String>([
   ['vtf.up','Up'],
   ['vtf.down','Down'],
 
-  ['tk.url', 'URL'],
-  ['tk.hastebin', 'Hastebin'],
+  ['tot.url', 'URL'],
+  ['tot.hastebin', 'Hastebin'],
 
   ['gt.tumblr', 'Tumblr'],
   ['gt.local', 'Local'],
@@ -34,9 +34,9 @@ export default new Map<String, String>([
   ['tt.all', 'Require'],
   ['tt.none', 'Exclude'],
 
-  ['st.alphaA', 'By Title Asc'],
-  ['st.alphaD', 'By Title Desc'],
-  ['st.dateA', 'By Date Asc'],
-  ['st.dateD', 'By Date Desc'],
-  ['st.type', 'By Type'],
+  ['sf.alphaA', 'By Title Asc'],
+  ['sf.alphaD', 'By Title Desc'],
+  ['sf.dateA', 'By Date Asc'],
+  ['sf.dateD', 'By Date Desc'],
+  ['sf.type', 'By Type'],
 ]);
