@@ -521,50 +521,48 @@ label.SimpleCheckbox {
   }
 }
 
+.ReactMultiSelectCheckboxes > div {
+  > button {
+    margin-top: 4px;
+    height: 2em;
+    padding: 0 0 0 5px;
+    border-radius: 0;
+    border-width: 1px;
+    box-shadow: none;
+    font-size: 13.3px;
+    color: black;
+
+    &:after {
+      content: '▼';
+      font-size: 9px;
+      padding-top: 3px;
+      padding-right: 5px;
+    }
+
+    > span > svg {
+      display: none;
+    }
+  }
+  > div {
+    margin-top: 0 !important;
+    color: black;
+    > div > div > div > div > input {
+      vertical-align: -2px;
+    }
+  }
+}
+
 .SourcePicker {
   outline: none;
   .SourcePicker__Buttons {
     height: 3.2rem;
 
-    .ReactMultiSelectCheckboxes > div {
-      > button {
-        margin-top: 4px;
-        height: 2em;
-        padding: 0 0 0 5px;
-        border-radius: 0;
-        border-width: 1px;
-        box-shadow: none;
-        font-size: 13.3px;
-        color: black;
-
-        &:after {
-          content: '▼';
-          font-size: 9px;
-          padding-top: 3px;
-          padding-right: 5px;
-        }
-
-        > span > svg {
-          display: none;
-        }
-      }
-      > div {
-        margin-top: 0 !important;
-        color: black;
-        > div > div > div > div > input {
-          vertical-align: -2px;
-        }
-      }
-    }
-
     > .SimpleOptionPicker {
       select {
+        outline: none;
         margin-top: 4px;
         height: 2em;
         cursor: pointer;
-        &::-ms-expand {
-          display: none;
-        }
       }
     }
 
