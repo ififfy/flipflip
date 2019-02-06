@@ -1,5 +1,5 @@
 import * as React from 'react';
-
+import {remote} from 'electron';
 import {writeFileSync, mkdirSync, readFileSync} from 'fs';
 import path from 'path';
 
@@ -9,11 +9,11 @@ import TagManager from "./library/TagManager";
 import Tag from "./library/Tag";
 import SceneGenerator from "./library/SceneGenerator";
 import Scene from '../Scene';
+import Config from "../Config";
+import ConfigForm from './config/ConfigForm';
 import ScenePicker from './ScenePicker';
 import SceneDetail from './sceneDetail/SceneDetail';
 import Player from './player/Player';
-
-import {remote} from 'electron';
 
 class Route {
   kind: string;
@@ -25,6 +25,7 @@ class Route {
 }
 
 let initialState = {
+  config: new Config(),
   scenes: Array<Scene>(),
   library: Array<LibrarySource>(),
   tags: Array<Tag>(),
@@ -47,6 +48,7 @@ try {
   initialState = {
     autoEdit: data.autoEdit,
     isSelect: data.isSelect,
+    config: data.config,
     scenes: data.scenes.map((s: any) => new Scene(s)),
     library: data.library.map((s: any) => new LibrarySource(s)),
     tags: data.tags.map((t: any) => new Tag(t)),
@@ -106,6 +108,7 @@ export default class Meta extends React.Component {
             onSelect={this.onOpenScene.bind(this)}
             onOpenLibrary={this.onOpenLibrary.bind(this)}
             onGenerate={this.onAddGenerator.bind(this)}
+            onConfig={this.onConfig.bind(this)}
             canGenerate={this.state.library.length > 0 && this.state.tags.length > 0}/>)}
 
         {this.isRoute('library') && (
@@ -171,6 +174,15 @@ export default class Meta extends React.Component {
             allTags={this.state.tags}
             toggleTag={this.onToggleTag.bind(this)}/>
         )}
+
+        {this.isRoute('config') && (
+          <ConfigForm
+            config={this.state.config}
+            scenes={this.state.scenes}
+            goBack={this.goBack.bind(this)}
+            updateConfig={this.updateConfig.bind(this)}
+            onDefault={this.onDefaultConfig.bind(this)} />
+        )}
       </div>
     )
   }
@@ -207,6 +219,18 @@ export default class Meta extends React.Component {
       scenes: this.state.scenes.filter((s) => s.id != scene.id),
       route: [],
     });
+  }
+
+  updateConfig(newConfig: Config) {
+    this.setState({config: newConfig});
+  }
+
+  onConfig() {
+    this.setState({route: [new Route({kind: 'config', value: null})]});
+  }
+
+  onDefaultConfig() {
+    this.setState({config: new Config(), route: []});
   }
 
   onOpenScene(scene: Scene) {

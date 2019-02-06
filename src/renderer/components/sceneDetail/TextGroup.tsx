@@ -1,14 +1,16 @@
 import * as React from 'react';
 import {TOT} from "../../const";
+
 import SimpleOptionPicker from "../ui/SimpleOptionPicker";
 import SimpleURLInput from "../ui/SimpleURLInput";
 import ControlGroup from "./ControlGroup";
 import Scene from "../../Scene";
+import {SceneSettings} from "../../Config";
 
 export default class TextGroup extends React.Component {
   readonly props: {
-    scene?: Scene,
-    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
+    scene?: Scene | SceneSettings,
+    onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 
   render() {
@@ -33,7 +35,7 @@ export default class TextGroup extends React.Component {
     );
   }
 
-  update(fn: (scene: Scene) => void) {
+  update(fn: (scene: Scene | SceneSettings) => void) {
     this.props.onUpdateScene(this.props.scene, fn);
   }
 
