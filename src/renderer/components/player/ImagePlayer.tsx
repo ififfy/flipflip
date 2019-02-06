@@ -11,7 +11,7 @@ import ImageView from './ImageView';
 import TIMING_FUNCTIONS from '../../TIMING_FUNCTIONS';
 import {IF, TF, ZF, HTF, VTF, BT, ST} from '../../const';
 import ChildCallbackHack from './ChildCallbackHack';
-import {urlToPath, getRandomListItem, getSourceType, getPath, getFileName, getFileGroup} from '../../utils';
+import {urlToPath, getRandomListItem, getSourceType, getFileName, getCachePath} from '../../utils';
 
 class GifInfo {
   animated: boolean;
@@ -238,9 +238,9 @@ export default class ImagePlayer extends React.Component {
       } else {
         const fileType = getSourceType(img.src);
         if (fileType != ST.local) {
-          const fileGroup = getFileGroup(img.getAttribute("source"), fileType);
-          const fileName = getFileName(img.src, fileType);
-          const filePath = getPath() + "\\ImageCache\\" + en.get(fileType) + "\\" + fileGroup + "\\" + fileName;
+          const cachePath = getCachePath(img.getAttribute("source"));
+          const fileName = getFileName(img.src);
+          const filePath = cachePath + fileName;
           if (!fs.existsSync(filePath)) {
             wretch(img.src)
               .get()

@@ -3,13 +3,14 @@ import { URL } from "url";
 import path from 'path';
 
 import {ST} from "./const";
+import en from "./en";
 
 export function getPath() {
   return path.join(remote.app.getPath('appData'), 'flipflip');
 }
 
-export function getFileName(url: string, type: string) {
-  switch (type) {
+export function getFileName(url: string) {
+  switch (getSourceType(url)) {
     case ST.local:
     case ST.list:
     case ST.tumblr:
@@ -17,17 +18,21 @@ export function getFileName(url: string, type: string) {
   }
 }
 
-export function getFileGroup(source: string, type: string) {
-  switch (type) {
+export function getFileGroup(url: string) {
+  switch (getSourceType(url)) {
     case ST.tumblr:
-      let tumblrID = source.replace(/https?:\/\//, "");
+      let tumblrID = url.replace(/https?:\/\//, "");
       tumblrID = tumblrID.replace(/\.tumblr\.com\/?/, "");
       return tumblrID;
     case ST.local:
-      return source.substring(source.lastIndexOf("\\"));
+      return url.substring(url.lastIndexOf("\\"));
     case ST.list:
       break;
   }
+}
+
+export function getCachePath(source: string) {
+  return getPath() + "\\ImageCache\\" + en.get(getSourceType(source)) + "\\" + getFileGroup(source) + "\\"
 }
 
 export function getSourceType(url: string): string {

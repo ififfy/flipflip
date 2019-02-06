@@ -9,7 +9,8 @@ import ImagePlayer from './ImagePlayer';
 import CaptionProgram from './CaptionProgram';
 import {TOT, IF, ST} from '../../const';
 import ChildCallbackHack from './ChildCallbackHack';
-import {CancelablePromise, getSourceType} from "../../utils";
+import {CancelablePromise, getCachePath, getFileName, getSourceType} from "../../utils";
+import * as fs from "fs";
 
 function isImage(path: string): boolean {
   const p = path.toLowerCase();
@@ -47,10 +48,24 @@ function textURL(kind: string, src: string): string {
 // Determine what kind of source we have based on the URL and return associated Promise
 function getPromise(url: string, filter: string, page: number): CancelablePromise {
   let promise;
-  switch (getSourceType(url)) {
+  const sourceType = getSourceType(url);
+  switch (sourceType) {
     case ST.tumblr:
-      promise = loadTumblr(url, filter, page);
-      promise.page = page;
+      if (page == -1) {
+        const cachePath = getCachePath(url);
+        if (fs.existsSync(cachePath)) {
+          // If the cache directory exists, use it
+          promise = loadLocalDirectory(getCachePath(url), filter);
+          promise.page = -1;
+        } else {
+          // Otherwise loadTumblr;
+          promise = loadTumblr(url, filter, page);
+          promise.page = 0;
+        }
+      } else {
+        promise = loadTumblr(url, filter, page);
+        promise.page = page;
+      }
       promise.timeout = 8000; // This delay might have to be modified, 5000 was too low, resulted in 429 response
       break;
     case ST.list:
@@ -69,8 +84,12 @@ function loadLocalDirectory(path: string, filter: string): CancelablePromise {
 
   return new CancelablePromise((resolve, reject) => {
     recursiveReaddir(path, blacklist, (err: any, rawFiles: Array<string>) => {
-      if (err) console.warn(err);
-      resolve(filterPathsToJustImages(filter, rawFiles).map((p) => fileURL(p)));
+      if (err) {
+        console.warn(err);
+        resolve([]);
+      } else {
+        resolve(filterPathsToJustImages(filter, rawFiles).map((p) => fileURL(p)));
+      }
     });
   });
 }
@@ -95,11 +114,6 @@ function loadRemoteImageURLList(url: string, filter: string): CancelablePromise 
 }
 
 function loadTumblr(url: string, filter: string, page: number): CancelablePromise {
-  // Implementing hard page cap for now
-  // TODO Implement caching and remove this
-  if (page > 20) {
-    return new CancelablePromise((resolve, reject) => {resolve(null)});
-  }
   // Using GoddessServant0's API key for now
   // TODO Allow user to specify API key or something?
   let API_KEY="BaQquvlxQeRhKRyViknF98vseIdcBEyDrzJBpHxvAiMPHCKR2l";
@@ -246,7 +260,7 @@ export default class HeadlessScenePlayer extends React.Component {
 
     let sourceLoop = () => {
       let d = this.props.scene.sources[n].url;
-      let loadPromise = getPromise(d, this.props.scene.imageTypeFilter, 0);
+      let loadPromise = getPromise(d, this.props.scene.imageTypeFilter, -1);
 
       // Because of rendering lag, always display the NEXT source, unless this is the last one
       let message;
@@ -271,7 +285,7 @@ export default class HeadlessScenePlayer extends React.Component {
           newAllURLs = newAllURLs.set(loadPromise.source, urls);
 
           // If this is a remote URL, queue up the next promise
-          if (loadPromise.source.length > 0) {
+          if (loadPromise.page) {
             newPromiseQueue.push(
                 getPromise(d, this.props.scene.imageTypeFilter, loadPromise.page + 1));
           }
@@ -301,7 +315,10 @@ export default class HeadlessScenePlayer extends React.Component {
               // Update the correct index with our new images
               let newAllURLs = this.state.allURLs;
               let sourceURLs = newAllURLs.get(promise.source);
-              newAllURLs.set(promise.source, sourceURLs.concat(urls));
+              newAllURLs.set(promise.source, sourceURLs.concat(urls.filter((u) => {
+                const fileName = getFileName(u);
+                return !sourceURLs.map((u) => getFileName(u)).includes(fileName);
+              })));
 
               // Add the next promise to the queue
               let newPromiseQueue = this.state.promiseQueue;
