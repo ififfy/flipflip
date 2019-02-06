@@ -1,17 +1,19 @@
 import * as React from 'react';
 import { HTF, VTF, ZF, BT } from "../../const";
+
 import SimpleOptionPicker from "../ui/SimpleOptionPicker";
 import ControlGroup from "./ControlGroup";
 import Scene from "../../Scene";
 import SimpleSliderInput from "../ui/SimpleSliderInput";
 import SimpleCheckbox from "../ui/SimpleCheckbox";
 import SimpleColorPicker from "../ui/SimpleColorPicker";
+import {SceneSettings} from "../../Config";
 
 export default class EffectGroup extends React.Component {
   readonly props: {
-    scene: Scene,
+    scene: Scene | SceneSettings,
     allScenes?: Array<Scene>,
-    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
+    onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 
   render() {
@@ -87,7 +89,7 @@ export default class EffectGroup extends React.Component {
     return this.props.allScenes.filter((s) => s.id.toString() === id)[0].name;
   }
 
-  update(fn: (scene: Scene) => void) {
+  update(fn: (scene: Scene | SceneSettings) => void) {
     this.props.onUpdateScene(this.props.scene, fn);
   }
 

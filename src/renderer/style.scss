@@ -217,8 +217,17 @@ a {
 
 .u-random {
   cursor: pointer;
+  font-size: 20px;
   &:before {
     content: '🎲';
+  }
+}
+
+.u-config {
+  cursor: pointer;
+  font-size: 20px;
+  &:before {
+    content: '⚙';
   }
 }
 
@@ -264,6 +273,9 @@ a {
       div {
         margin-left: $smallPadding;
         display: inline-block;
+        &.SimpleOptionPicker {
+          vertical-align: 3px;
+        }
       }
       select {
         height: 1.5em;
@@ -620,6 +632,25 @@ label.SimpleCheckbox {
       text-align: center;
       padding: 1em;
     }
+  }
+}
+
+.Config {
+  .Config__ConfigHeader {
+    display: inline-block;
+    margin-top: 0;
+    color: $black !important;
+    line-height: $buttonBarHeight;
+  }
+
+  .Config__Content {
+    position: fixed;
+    top: $buttonBarHeight;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: $smallPadding;
+    overflow: auto;
   }
 }
 
@@ -1035,25 +1066,36 @@ label.SimpleCheckbox {
 }
 
 .text-blink {
-  text-align: center; color: white; font-size: 20vmin;
-  vertical-align: middle; transition: opacity 0.1s ease-out;
+  text-align: center;
+  color: white;
+  font-size: 20vmin;
+  vertical-align: middle;
+  transition: opacity 0.1s ease-out;
   font-family: Arial Black,Arial Bold,Gadget,sans-serif;
-  -webkit-text-stroke-width: 1px; -webkit-text-stroke-color: black;
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black;
 }
 
 .text-caption {
-  text-align: center; color: white; font-size: 8vmin;
-  vertical-align: bottom; padding-bottom: 20vmin;
+  text-align: center;
+  color: white;
+  font-size: 8vmin;
+  vertical-align: bottom;
+  padding-bottom: 20vmin;
   transition: opacity 0.5s ease-in-out;
   font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
   -webkit-text-stroke-width: 1px; -webkit-text-stroke-color: black;
 }
 
 .text-caption-big {
-  text-align: center; color: white; font-size: 12vmin;
-  vertical-align: middle; transition: opacity 0.1s ease-out;
+  text-align: center;
+  color: white;
+  font-size: 12vmin;
+  vertical-align: middle;
+  transition: opacity 0.1s ease-out;
   font-family: Arial Black,Arial Bold,Gadget,sans-serif;
-  -webkit-text-stroke-width: 1px; -webkit-text-stroke-color: black;
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black;
 }
 
 @for $x from -10 through 10 {

@@ -56,6 +56,7 @@ export default class ScenePicker extends React.Component {
     onSelect(scene: Scene): void,
     onOpenLibrary(): void,
     onGenerate(): void,
+    onConfig(): void,
     onUpdateScenes(scenes: Array<Scene>): void,
   };
 
@@ -66,13 +67,16 @@ export default class ScenePicker extends React.Component {
           <div className="Header">
             <div className="u-float-right">
               <SimpleOptionPicker
-                  label=""
-                  value="Sort"
-                  disableFirst={true}
-                  keys={["Sort"].concat(Object.values(SF))}
-                  onChange={this.onSort.bind(this)}
+                label=""
+                value="Sort"
+                disableFirst={true}
+                keys={["Sort"].concat(Object.values(SF))}
+                onChange={this.onSort.bind(this)}
               />
-              <div className="u-random" onClick={this.onRandom.bind(this)}/>
+              {this.props.scenes.length > 1 && (
+                <div className="u-random" onClick={this.onRandom.bind(this)}/>
+              )}
+              <div className="u-config" onClick={this.props.onConfig.bind(this)}/>
             </div>
             <h1>FlipFlip</h1>
           </div>
@@ -96,7 +100,7 @@ export default class ScenePicker extends React.Component {
           <div className={`ScenePicker__GenerateSceneButton ${this.props.canGenerate ? 'u-clickable' : 'u-disabled'}`} onClick={this.props.canGenerate ? this.props.onGenerate.bind(this) : this.nop}>
             + Add Scene Generator
           </div>
-          <div className={`ScenePicker__AddSceneButton ${this.props.canGenerate ? 'u-clickable' : 'u-disabled'}`} onClick={this.props.canGenerate ? this.props.onAdd.bind(this) : this.nop}>
+          <div className="ScenePicker__AddSceneButton u-clickable" onClick={this.props.onAdd.bind(this)}>
             + Add Scene
           </div>
         </div>

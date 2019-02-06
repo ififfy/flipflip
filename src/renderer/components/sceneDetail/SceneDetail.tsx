@@ -1,17 +1,13 @@
 import * as React from 'react';
 
-import {IF} from '../../const';
-
 import Scene from '../../Scene';
-import ControlGroup from './ControlGroup';
 import SourcePicker from './SourcePicker';
-import SimpleCheckbox from '../ui/SimpleCheckbox';
-import SimpleOptionPicker from '../ui/SimpleOptionPicker';
 import LibrarySource from "../library/LibrarySource";
 import TimingGroup from "./TimingGroup";
 import EffectGroup from "./EffectGroup";
 import TextGroup from "./TextGroup";
 import AudioGroup from "./AudioGroup";
+import ImageGroup from "./ImageGroup";
 
 type Props = {
   scene?: Scene,
@@ -80,26 +76,16 @@ export default class SceneDetail extends React.Component {
         <div className="SceneDetail__Content ControlGroupGroup">
           <TimingGroup
             scene={this.props.scene}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+            onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
           <EffectGroup
             scene={this.props.scene}
             allScenes={this.props.allScenes}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+            onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
-          <ControlGroup title="Images" isNarrow={true}>
-            <div className="ControlSubgroup">
-              <SimpleOptionPicker
-                onChange={this.onChangeImageTypeFilter.bind(this)}
-                label="Image Filter"
-                value={this.props.scene.imageTypeFilter}
-                keys={Object.values(IF)} />
-              <SimpleCheckbox
-                text="Play Full GIF animations"
-                isOn={this.props.scene.playFullGif}
-                onChange={this.onChangePlayFullGif.bind(this)} />
-            </div>
-          </ControlGroup>
+          <ImageGroup
+            scene={this.props.scene}
+            onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
           <TextGroup
             scene={this.props.scene}
@@ -171,8 +157,4 @@ export default class SceneDetail extends React.Component {
   }
 
   onChangeSources(sources: Array<LibrarySource>) { this.update((s) => { s.sources = sources; }); }
-
-  onChangeImageTypeFilter(filter: string) { this.update((s) => { s.imageTypeFilter = filter; }); }
-
-  onChangePlayFullGif(value: boolean) { this.update((s) => { s.playFullGif = value; }); }
 };
