@@ -125,7 +125,7 @@ export default class Meta extends React.Component {
           <TagManager
             tags={this.state.tags}
             onUpdateTags={this.onUpdateTags.bind(this)}
-            goBack={this.goBackToLibrary.bind(this)}
+            goBack={this.goBack.bind(this)}
           />
         )}
 
@@ -166,7 +166,7 @@ export default class Meta extends React.Component {
           <Player
             scene={this.scene()}
             onUpdateScene={this.onUpdateScene.bind(this)}
-            goBack={this.goBackToLibrary.bind(this)}
+            goBack={this.endPlaySceneFromLibrary.bind(this)}
             tags={this.librarySource().tags}
             allTags={this.state.tags}
             toggleTag={this.onToggleTag.bind(this)}/>
@@ -183,12 +183,6 @@ export default class Meta extends React.Component {
     const newRoute = this.state.route;
     this.state.route.pop();
     this.setState({route: newRoute, autoEdit: false, isSelect: false});
-  }
-
-  goBackToLibrary() {
-    const newScenes = this.state.scenes;
-    newScenes.pop();
-    this.setState({route: [new Route({kind: 'library'})], scenes: newScenes});
   }
 
   onAddScene() {
@@ -273,6 +267,12 @@ export default class Meta extends React.Component {
       scenes: this.state.scenes.concat([tempScene]),
       route: newRoute,
     });
+  }
+
+  endPlaySceneFromLibrary() {
+    const newScenes = this.state.scenes;
+    newScenes.pop();
+    this.setState({route: [new Route({kind: 'library'})], scenes: newScenes});
   }
 
   manageTags() {
