@@ -1,14 +1,17 @@
 import * as React from 'react';
 import request from 'request';
+import fs from "fs";
+import {outputFile} from "fs-extra";
+import wretch from "wretch";
+import gifInfo from 'gif-info';
+import IncomingMessage = Electron.IncomingMessage;
 
+import en from "../../en";
 import ImageView from './ImageView';
 import TIMING_FUNCTIONS from '../../TIMING_FUNCTIONS';
-import {IF, TF, ZF, HTF, VTF, BT} from '../../const';
-import fs from "fs";
-import gifInfo from 'gif-info';
+import {IF, TF, ZF, HTF, VTF, BT, ST} from '../../const';
 import ChildCallbackHack from './ChildCallbackHack';
-import {urlToPath, getRandomListItem} from '../../utils';
-import IncomingMessage = Electron.IncomingMessage;
+import {urlToPath, getRandomListItem, getSourceType, getPath, getFileName, getFileGroup} from '../../utils';
 
 class GifInfo {
   animated: boolean;
@@ -21,7 +24,7 @@ export default class ImagePlayer extends React.Component {
     maxInMemory: number,
     maxLoadingAtOnce: number,
     maxToRememberInHistory: number,
-    allURLs: Array<Array<string>>,
+    allURLs: Map<String, Array<string>>,
     isPlaying: boolean,
     timingFunction: string,
     timingConstant: string,
@@ -36,7 +39,7 @@ export default class ImagePlayer extends React.Component {
     fadeEnabled: boolean,
     playFullGif: boolean;
     imageSizeMin: number,
-    setHistoryPaths: (historyPaths: string[]) => void,
+    setHistoryPaths: (historyPaths: Array<HTMLImageElement>) => void,
     onLoaded: () => void,
   };
 
@@ -44,7 +47,7 @@ export default class ImagePlayer extends React.Component {
     numBeingLoaded: 0,
     pastAndLatest: Array<HTMLImageElement>(),
     readyToDisplay: Array<HTMLImageElement>(),
-    historyPaths: Array<string>(),
+    historyPaths: Array<HTMLImageElement>(),
     timeToNextFrame: 0,
     timeoutID: 0,
     nextImageID: 0,
@@ -64,8 +67,7 @@ export default class ImagePlayer extends React.Component {
       if (offset <= -this.state.historyPaths.length) {
         offset = -this.state.historyPaths.length + 1;
       }
-      const img = new Image();
-      img.src = this.state.historyPaths[(this.state.historyPaths.length - 1) + offset];
+      const img = this.state.historyPaths[(this.state.historyPaths.length - 1) + offset];
       (img as any).key = 0;
       imgs.push(img);
     } else {
@@ -155,7 +157,7 @@ export default class ImagePlayer extends React.Component {
     } else if (!props.isPlaying && this.state.timeoutID != 0) {
       clearTimeout(this.state.timeoutID);
       this.setState({timeoutID: 0});
-    } else if (this.props.allURLs == null && props.allURLs != null && props.allURLs.length > 0) {
+    } else if (this.props.allURLs == null && props.allURLs != null && props.allURLs.size > 0) {
       // Can't just call start again, because props won't have been updated yet,
       // but flag to restart next time props are updated
       this.setState({restart: true});
@@ -178,7 +180,8 @@ export default class ImagePlayer extends React.Component {
   runFetchLoop(i: number, isStarting = false) {
     if (!this._isMounted && !isStarting) return;
 
-    const collection = getRandomListItem(this.props.allURLs);
+    const source = getRandomListItem(Array.from(this.props.allURLs.keys()));
+    const collection = this.props.allURLs.get(source);
 
     if (this.state.readyToDisplay.length >= this.props.maxLoadingAtOnce ||
       !(collection && collection.length)) {
@@ -188,6 +191,7 @@ export default class ImagePlayer extends React.Component {
     }
     const url = getRandomListItem(collection);
     const img = new Image();
+    img.setAttribute("source", source);
 
     this.setState({numBeingLoaded: this.state.numBeingLoaded + 1});
 
@@ -232,6 +236,31 @@ export default class ImagePlayer extends React.Component {
       if (img.width < this.props.imageSizeMin || img.height < this.props.imageSizeMin) {
         setTimeout(errorCallback, 0);
       } else {
+        const fileType = getSourceType(img.src);
+        if (fileType != ST.local) {
+          const fileGroup = getFileGroup(img.getAttribute("source"), fileType);
+          const fileName = getFileName(img.src, fileType);
+          const filePath = getPath() + "\\ImageCache\\" + en.get(fileType) + "\\" + fileGroup + "\\" + fileName;
+          if (!fs.existsSync(filePath)) {
+            wretch(img.src)
+              .get()
+              .blob(blob => {
+                const reader = new FileReader();
+                reader.onload = function () {
+                  if (reader.readyState == 2) {
+                    const arrayBuffer = reader.result as ArrayBuffer;
+                    const buffer = Buffer.alloc(arrayBuffer.byteLength);
+                    const view = new Uint8Array(arrayBuffer);
+                    for (let i = 0; i < arrayBuffer.byteLength; ++i) {
+                      buffer[i] = view[i];
+                    }
+                    outputFile(filePath, buffer);
+                  }
+                };
+                reader.readAsArrayBuffer(blob)
+              });
+          }
+        }
         setTimeout(successCallback, 0);
       }
     };
@@ -243,7 +272,7 @@ export default class ImagePlayer extends React.Component {
     const processInfo = (info: GifInfo) => {
       // If gif is animated and we want to play entire length, store its duration
       if (this.props.playFullGif && info && info.animated) {
-        img.alt=info.duration;
+        img.setAttribute("duration", info.duration);
       }
 
       // Exclude non-animated gifs from gifs
@@ -289,12 +318,12 @@ export default class ImagePlayer extends React.Component {
     if (this.state.readyToDisplay.length) {
       nextImg = this.state.readyToDisplay.shift();
       nextPastAndLatest = nextPastAndLatest.concat([nextImg]);
-      nextHistoryPaths = nextHistoryPaths.concat([nextImg.src]);
+      nextHistoryPaths = nextHistoryPaths.concat([nextImg]);
     } else if (this.state.pastAndLatest.length) {
       // no new image ready; just pick a random one from the past 120
       nextImg = getRandomListItem(this.state.pastAndLatest);
       nextPastAndLatest = nextPastAndLatest.concat([nextImg]);
-      nextHistoryPaths = nextHistoryPaths.concat([nextImg.src]);
+      nextHistoryPaths = nextHistoryPaths.concat([nextImg]);
     }
     while (nextPastAndLatest.length > this.props.maxInMemory) {
       nextPastAndLatest.shift();
@@ -322,8 +351,8 @@ export default class ImagePlayer extends React.Component {
     } else {
       timeToNextFrame = TIMING_FUNCTIONS.get(this.props.timingFunction)();
     }
-    if (nextImg && nextImg.alt && timeToNextFrame < parseInt(nextImg.alt)) {
-      timeToNextFrame = parseInt(nextImg.alt);
+    if (nextImg && nextImg.getAttribute("duration") && timeToNextFrame < parseInt(nextImg.getAttribute("duration"))) {
+      timeToNextFrame = parseInt(nextImg.getAttribute("duration"));
     }
     this.setState({
       timeToNextFrame,

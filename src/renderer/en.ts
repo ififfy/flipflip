@@ -39,4 +39,7 @@ export default new Map<String, String>([
   ['sf.dateA', 'By Date Asc'],
   ['sf.dateD', 'By Date Desc'],
   ['sf.type', 'By Type'],
+
+  ['st.tumblr', 'tumblr'],
+  ['st.list', 'list'],
 ]);

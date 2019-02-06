@@ -19,6 +19,7 @@ declare module '*.icns' {
   export = value;
 }
 
+declare module 'fs-extra';
 declare module 'file-url';
 declare module 'recursive-readdir';
 declare module 'gif-info';

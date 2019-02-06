@@ -45,13 +45,11 @@ function textURL(kind: string, src: string): string {
 }
 
 // Determine what kind of source we have based on the URL and return associated Promise
-function getPromise(url: string, filter: string, page: number, index: number): CancelablePromise {
+function getPromise(url: string, filter: string, page: number): CancelablePromise {
   let promise;
   switch (getSourceType(url)) {
     case ST.tumblr:
       promise = loadTumblr(url, filter, page);
-      promise.source = url;
-      promise.index = index;
       promise.page = page;
       promise.timeout = 8000; // This delay might have to be modified, 5000 was too low, resulted in 429 response
       break;
@@ -62,6 +60,7 @@ function getPromise(url: string, filter: string, page: number, index: number): C
       promise = loadLocalDirectory(url, filter);
       break;
   }
+  promise.source = url;
   return promise;
 }
 
@@ -164,7 +163,7 @@ export default class HeadlessScenePlayer extends React.Component {
     isPlaying: boolean,
     historyOffset: number,
     advanceHack?: ChildCallbackHack,
-    setHistoryPaths: (historyPaths: string[]) => void,
+    setHistoryPaths: (historyPaths: Array<HTMLImageElement>) => void,
     didFinishLoading: () => void,
   };
 
@@ -175,18 +174,18 @@ export default class HeadlessScenePlayer extends React.Component {
     promise: new CancelablePromise((resolve, reject) => {}),
     sourcesProcessed: 0,
     progressMessage: this.props.scene.sources.length > 0 ? this.props.scene.sources[0].url : "",
-    allURLs: Array<Array<string>>(),
+    allURLs: new Map<string, Array<string>>(),
   };
 
   render() {
     // Returns true if array is empty, or only contains empty arrays
-    const isEmpty = function(allURLs: any[], index: number, array: any[]): boolean {
+    const isEmpty = function(allURLs: any[]): boolean {
       return Array.isArray(allURLs) && allURLs.every(isEmpty);
     };
 
     const showImagePlayer = this.state.onLoaded != null;
     const showLoadingIndicator = this.props.showLoadingState && !this.state.isLoaded;
-    const showEmptyIndicator = this.props.showEmptyState && this.state.isLoaded && isEmpty(this.state.allURLs, -1, null);
+    const showEmptyIndicator = this.props.showEmptyState && this.state.isLoaded && isEmpty(Array.from(this.state.allURLs.values()));
     const showCaptionProgram = (
       this.props.showText &&
       this.state.isLoaded &&
@@ -220,7 +219,7 @@ export default class HeadlessScenePlayer extends React.Component {
             fadeEnabled={this.props.scene.crossFade}
             playFullGif={this.props.scene.playFullGif}
             imageSizeMin={this.props.scene.imageSizeMin}
-            allURLs={isEmpty(this.state.allURLs, -1, null) ? null : this.state.allURLs}
+            allURLs={isEmpty(Array.from(this.state.allURLs.values())) ? null : this.state.allURLs}
             onLoaded={this.state.onLoaded.bind(this)}/>)}
 
         {showCaptionProgram && (
@@ -243,12 +242,11 @@ export default class HeadlessScenePlayer extends React.Component {
 
   componentDidMount() {
     let n = 0;
-    this.setState({allURLs: []});
-    let newAllURLs = Array<Array<string>>();
+    let newAllURLs = new Map<string, Array<string>>();
 
     let sourceLoop = () => {
       let d = this.props.scene.sources[n].url;
-      let loadPromise = getPromise(d, this.props.scene.imageTypeFilter, 0, n);
+      let loadPromise = getPromise(d, this.props.scene.imageTypeFilter, 0);
 
       // Because of rendering lag, always display the NEXT source, unless this is the last one
       let message;
@@ -270,12 +268,12 @@ export default class HeadlessScenePlayer extends React.Component {
           n += 1;
 
           // Just add the new urls to the end of the list
-          newAllURLs = newAllURLs.concat([urls]);
+          newAllURLs = newAllURLs.set(loadPromise.source, urls);
 
           // If this is a remote URL, queue up the next promise
           if (loadPromise.source.length > 0) {
             newPromiseQueue.push(
-                getPromise(d, this.props.scene.imageTypeFilter, loadPromise.page + 1, loadPromise.index));
+                getPromise(d, this.props.scene.imageTypeFilter, loadPromise.page + 1));
           }
 
           if (n < this.props.scene.sources.length) {
@@ -302,13 +300,13 @@ export default class HeadlessScenePlayer extends React.Component {
             if (urls != null) {
               // Update the correct index with our new images
               let newAllURLs = this.state.allURLs;
-              let sourceURLs = newAllURLs[promise.index];
-              newAllURLs[promise.index] = sourceURLs.concat(urls);
+              let sourceURLs = newAllURLs.get(promise.source);
+              newAllURLs.set(promise.source, sourceURLs.concat(urls));
 
               // Add the next promise to the queue
               let newPromiseQueue = this.state.promiseQueue;
               newPromiseQueue.push(
-                  getPromise(promise.source, this.props.scene.imageTypeFilter, promise.page + 1, promise.index));
+                  getPromise(promise.source, this.props.scene.imageTypeFilter, promise.page + 1));
 
               this.setState({allURLs: newAllURLs, promiseQueue: newPromiseQueue});
             }

@@ -12,7 +12,8 @@ import TextGroup from "../sceneDetail/TextGroup";
 import AudioGroup from "../sceneDetail/AudioGroup";
 import Tag from "../library/Tag";
 import ChildCallbackHack from './ChildCallbackHack';
-import {urlToPath} from '../../utils';
+import {getSourceType, urlToPath} from '../../utils';
+import {ST} from "../../const";
 
 const keyMap = {
   playPause: ['Play/Pause', 'space'],
@@ -42,7 +43,7 @@ export default class Player extends React.Component {
     isOverlayLoaded: false,
     isPlaying: false,
     historyOffset: 0,
-    historyPaths: Array<string>(),
+    historyPaths: Array<HTMLImageElement>(),
     imagePlayerAdvanceHack: new ChildCallbackHack(),
   };
 
@@ -220,23 +221,25 @@ export default class Player extends React.Component {
 
   showContextMenu = () => {
     const contextMenu = new Menu();
-    const url = this.state.historyPaths[(this.state.historyPaths.length - 1) + this.state.historyOffset];
+    const img = this.state.historyPaths[(this.state.historyPaths.length - 1) + this.state.historyOffset];
+    const url = img.src;
+    const source = getSourceType(url) == ST.local ? urlToPath("file://" + img.getAttribute("source")) : img.getAttribute("source");
     const isFile = url.startsWith('file://');
     const path = urlToPath(url);
-    const labelItem = new MenuItem({
-      label: isFile ? path : url,
-      click: () => { }
-    });
-    labelItem.enabled = false;
-    contextMenu.append(labelItem);
     contextMenu.append(new MenuItem({
-      label: 'Copy',
-      click: () => {
-        navigator.clipboard.writeText(path);
-      }
+      label: source,
+      click: () => { navigator.clipboard.writeText(source); }
     }));
     contextMenu.append(new MenuItem({
-      label: 'Open',
+      label: isFile ? path : url,
+      click: () => { navigator.clipboard.writeText(path); }
+    }));
+    contextMenu.append(new MenuItem({
+      label: 'Open Source',
+      click: () => { remote.shell.openExternal(source); }
+    }));
+    contextMenu.append(new MenuItem({
+      label: 'Open File',
       click: () => { remote.shell.openExternal(url); }
     }));
     if (isFile) {
@@ -322,7 +325,7 @@ export default class Player extends React.Component {
     this.props.goBack();
   }
 
-  setHistoryPaths(paths: string[]) {
+  setHistoryPaths(paths: Array<HTMLImageElement>) {
     this.setState({ historyPaths: paths });
   }
   /**

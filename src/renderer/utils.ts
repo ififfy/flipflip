@@ -1,8 +1,37 @@
+import {remote} from "electron";
 import { URL } from "url";
+import path from 'path';
+
 import {ST} from "./const";
 
+export function getPath() {
+  return path.join(remote.app.getPath('appData'), 'flipflip');
+}
+
+export function getFileName(url: string, type: string) {
+  switch (type) {
+    case ST.local:
+    case ST.list:
+    case ST.tumblr:
+      return url.substring(url.lastIndexOf("/"));
+  }
+}
+
+export function getFileGroup(source: string, type: string) {
+  switch (type) {
+    case ST.tumblr:
+      let tumblrID = source.replace(/https?:\/\//, "");
+      tumblrID = tumblrID.replace(/\.tumblr\.com\/?/, "");
+      return tumblrID;
+    case ST.local:
+      return source.substring(source.lastIndexOf("\\"));
+    case ST.list:
+      break;
+  }
+}
+
 export function getSourceType(url: string): string {
-  if (/^https?:\/\/[^\.]*\.tumblr\.com/.exec(url) != null) { // Tumblr
+  if (/^https?:\/\/[[^\.]*|(66\.media)]\.tumblr\.com/.exec(url) != null) { // Tumblr
     return ST.tumblr;
   } else if (/^https?:\/\//.exec(url) != null) { // Arbitrary URL, assume image list
     return ST.list;
@@ -63,7 +92,6 @@ export class CancelablePromise extends Promise<Array<string>> {
   hasCanceled: boolean;
   // Only looping sources use these properties
   source: string;
-  index: number;
   page: number;
   timeout: number;
 
@@ -72,7 +100,6 @@ export class CancelablePromise extends Promise<Array<string>> {
     super(executor);
     this.hasCanceled = false;
     this.source = "";
-    this.index = 0;
     this.page = 0;
     this.timeout = 0;
   }
