@@ -421,7 +421,7 @@ a {
   }
 }
 
-.SimpleOptionPicker, .SimpleTextInput, .SimpleSliderInput, .SimpleCheckbox, .SimpleColorPicker {
+.SimpleOptionPicker, .SimpleTextInput, .SimpleSliderInput, .SimpleCheckbox, .SimpleColorPicker, .SimpleNumberInput {
   @include control;
 }
 
@@ -430,7 +430,15 @@ a {
     max-width: 210px;
   }
 }
-
+.SimpleNumberInput {
+  input[type=number] {
+    font-size: 16px;
+    font-weight: 400;
+    display: block;
+    width: 100%;
+    margin-bottom: 0;
+  }
+}
 .SimpleTextInput {
   input[type=text] {
     font-size: 16px;
@@ -1067,39 +1075,30 @@ label.SimpleCheckbox {
 
 .text-blink {
   text-align: center;
-  color: white;
-  font-size: 20vmin;
   vertical-align: middle;
   transition: opacity 0.1s ease-out;
-  font-family: Arial Black,Arial Bold,Gadget,sans-serif;
   -webkit-text-stroke-width: 1px;
   -webkit-text-stroke-color: black;
 }
 
 .text-caption {
   text-align: center;
-  color: white;
-  font-size: 8vmin;
   vertical-align: bottom;
   padding-bottom: 20vmin;
   transition: opacity 0.5s ease-in-out;
-  font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
   -webkit-text-stroke-width: 1px; -webkit-text-stroke-color: black;
 }
 
 .text-caption-big {
   text-align: center;
-  color: white;
-  font-size: 12vmin;
   vertical-align: middle;
   transition: opacity 0.1s ease-out;
-  font-family: Arial Black,Arial Bold,Gadget,sans-serif;
   -webkit-text-stroke-width: 1px;
   -webkit-text-stroke-color: black;
 }
 
-@for $x from -10 through 10 {
-  @for $y from -10 through 10 {
+@each $x in -10 0 10 {
+  @each $y in -10 0 10 {
     @for $z from 1 through 20 {
       .translate-#{$x}-#{$y}-#{$z}s img {
         -webkit-animation: kb-#{$x}-#{$y} #{$z}s;
@@ -1137,8 +1136,8 @@ label.SimpleCheckbox {
 
 /* Ken Burns effects */
 
-@for $x from -10 through 10 {
-  @for $y from -10 through 10 {
+@each $x in -10 0 10 {
+  @each $y in -10 0 10 {
     @keyframes kb-#{$x}-#{$y} {
       100% {
         transform: translate(percentage($x/100), percentage($y/100));

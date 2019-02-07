@@ -267,7 +267,9 @@ export default class HeadlessScenePlayer extends React.Component {
             onLoaded={this.state.onLoaded.bind(this)}/>)}
 
         {showCaptionProgram && (
-          <CaptionProgram url={textURL(this.props.scene.textKind, this.props.scene.textSource)} />
+          <CaptionProgram
+            config={this.props.config}
+            url={textURL(this.props.scene.textKind, this.props.scene.textSource)} />
         )}
 
         {showLoadingIndicator && (
@@ -359,7 +361,7 @@ export default class HeadlessScenePlayer extends React.Component {
             }
 
             // If there is an overlay, double the timeout
-            setTimeout(promiseLoop, this.props.scene.overlaySceneID != -1 ? promise.timeout * 2 : promise.timeout);
+            setTimeout(promiseLoop, promise.timeout);
           });
       }
     };

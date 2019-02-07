@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import Scene from "../../Scene";
-import Config, {APIKeys, CacheSettings, SceneSettings} from "../../Config";
+import Config, {APIKeys, CacheSettings, CaptionSettings, SceneSettings} from "../../Config";
 import TimingGroup from "../sceneDetail/TimingGroup";
 import EffectGroup from "../sceneDetail/EffectGroup";
 import TextGroup from "../sceneDetail/TextGroup";
@@ -9,6 +9,8 @@ import ImageGroup from "../sceneDetail/ImageGroup";
 import Modal from "../ui/Modal";
 import CacheGroup from "./CacheGroup";
 import APIGroup from "./APIGroup";
+import * as fs from "fs";
+import CaptionFontGroup from "./CaptionFontGroup";
 
 export default class Library extends React.Component {
   readonly props: {
@@ -71,8 +73,12 @@ export default class Library extends React.Component {
             onUpdateSettings={this.onUpdateCachingSettings.bind(this)} />
 
           <APIGroup
-              keys={this.state.config.apiKeys}
-              onUpdateKeys={this.onUpdateAPIKeys.bind(this)} />
+            keys={this.state.config.apiKeys}
+            onUpdateKeys={this.onUpdateAPIKeys.bind(this)} />
+
+          <CaptionFontGroup
+            settings={this.state.config.captions}
+            onUpdateSettings={this.onUpdateCaptionSettings.bind(this)} />
         </div>
 
         {this.state.errorMessage != "" && (
@@ -99,6 +105,13 @@ export default class Library extends React.Component {
     }
     if (this.state.config.apiKeys.overlayTumblr.length != 50) {
       errorMessage += "Invalid Overlay Tumblr API Key<br/>"
+    }
+    if (isNaN(parseInt(this.state.config.caching.maxSize))) {
+      errorMessage += "Invalid Cache Size<br/>"
+    }
+    if (this.state.config.caching.directory != "" &&
+        !fs.existsSync(this.state.config.caching.directory)) {
+      errorMessage += "Invalid Cache Directory<br/>"
     }
     return errorMessage;
   }
@@ -133,6 +146,12 @@ export default class Library extends React.Component {
   onUpdateAPIKeys(keys: APIKeys, fn: (keys: APIKeys) => void) {
     const newConfig = this.state.config;
     fn(newConfig.apiKeys);
+    this.setState({config: newConfig});
+  }
+
+  onUpdateCaptionSettings(settings: CaptionSettings, fn: (settings: CaptionSettings) => void) {
+    const newConfig = this.state.config;
+    fn(newConfig.captions);
     this.setState({config: newConfig});
   }
 
