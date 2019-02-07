@@ -250,7 +250,6 @@ export default class ImagePlayer extends React.Component {
               });
             }
             let mbSize = (size / 1024 / 1024);
-            console.log("Cache size " + mbSize.toString());
             const maxSize = this.props.config.caching.maxSize;
             if (mbSize < maxSize) {
               if (!fs.existsSync(filePath)) {

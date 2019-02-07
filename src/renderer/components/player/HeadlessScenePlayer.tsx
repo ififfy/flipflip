@@ -46,8 +46,33 @@ function textURL(kind: string, src: string): string {
   }
 }
 
+function getTumblrAPIKey(config: Config, overlay: boolean, attempt: number): string {
+  if (attempt == 0) { // This is our first attempt, use defaults
+    if (!overlay) {
+      return config.apiKeys.defaultTumblr;
+    } else {
+      return config.apiKeys.overlayTumblr;
+    }
+  } else {
+    let nextAPIKey = null;
+    for (let key of config.apiKeys.otherTumblrs) {
+      if (key != config.apiKeys.defaultTumblr &&
+          key != config.apiKeys.overlayTumblr) {
+        if (attempt == 0) {
+          nextAPIKey = key;
+        } else {
+          attempt -= 1;
+        }
+      }
+    }
+    // If they have all been used, just use default
+    if (nextAPIKey == null) nextAPIKey = config.apiKeys.defaultTumblr;
+    return nextAPIKey;
+  }
+}
+
 // Determine what kind of source we have based on the URL and return associated Promise
-function getPromise(config: Config, url: string, filter: string, page: number): CancelablePromise {
+function getPromise(config: Config, url: string, filter: string, page: number, overlay: boolean): CancelablePromise {
   let promise;
   const sourceType = getSourceType(url);
   switch (sourceType) {
@@ -60,17 +85,17 @@ function getPromise(config: Config, url: string, filter: string, page: number): 
           promise.page = -1;
         } else {
           // Otherwise loadTumblr;
-          promise = loadTumblr(url, filter, page);
+          promise = loadTumblr(config, url, filter, page, overlay, 0);
           promise.page = 0;
         }
       } else {
-        promise = loadTumblr(url, filter, page);
+        promise = loadTumblr(config, url, filter, page, overlay, 0);
         promise.page = page;
       }
       promise.timeout = 8000; // This delay might have to be modified, 5000 was too low, resulted in 429 response
       break;
     case ST.list:
-      promise = loadRemoteImageURLList(url, filter);
+      promise = loadRemoteImageURLList(url);
       break;
     case ST.local:
       promise = loadLocalDirectory(url, filter);
@@ -95,7 +120,7 @@ function loadLocalDirectory(path: string, filter: string): CancelablePromise {
   });
 }
 
-function loadRemoteImageURLList(url: string, filter: string): CancelablePromise {
+function loadRemoteImageURLList(url: string): CancelablePromise {
   return new CancelablePromise((resolve, reject) => {
     wretch(url)
       .get()
@@ -114,10 +139,8 @@ function loadRemoteImageURLList(url: string, filter: string): CancelablePromise 
   });
 }
 
-function loadTumblr(url: string, filter: string, page: number): CancelablePromise {
-  // Using GoddessServant0's API key for now
-  // TODO Allow user to specify API key or something?
-  let API_KEY="BaQquvlxQeRhKRyViknF98vseIdcBEyDrzJBpHxvAiMPHCKR2l";
+function loadTumblr(config: Config, url: string, filter: string, page: number, overlay: boolean, attempt: number): CancelablePromise {
+  const API_KEY = getTumblrAPIKey(config, overlay, attempt);
   // TumblrID takes the form of <blog_name>.tumblr.com
   let tumblrID = url.replace(/https?:\/\//, "");
   tumblrID = tumblrID.replace("/", "");
@@ -131,7 +154,11 @@ function loadTumblr(url: string, filter: string, page: number): CancelablePromis
       })
       .error(429, error => {
         console.warn("Tumblr responded with 429 - Too Many Requests");
-        resolve(null);
+        if (attempt < 4) {
+          loadTumblr(config, url, filter, page, overlay, attempt + 1);
+        } else {
+          resolve(null);
+        }
       })
       .json(json => {
         // End loop if we're at end of posts
@@ -263,7 +290,7 @@ export default class HeadlessScenePlayer extends React.Component {
 
     let sourceLoop = () => {
       let d = this.props.scene.sources[n].url;
-      let loadPromise = getPromise(this.props.config, d, this.props.scene.imageTypeFilter, -1);
+      let loadPromise = getPromise(this.props.config, d, this.props.scene.imageTypeFilter, -1, this.props.opacity != 1);
 
       // Because of rendering lag, always display the NEXT source, unless this is the last one
       let message;
@@ -290,7 +317,7 @@ export default class HeadlessScenePlayer extends React.Component {
           // If this is a remote URL, queue up the next promise
           if (loadPromise.page) {
             newPromiseQueue.push(
-                getPromise(this.props.config, d, this.props.scene.imageTypeFilter, loadPromise.page + 1));
+                getPromise(this.props.config, d, this.props.scene.imageTypeFilter, loadPromise.page + 1, this.props.opacity != 1));
           }
 
           if (n < this.props.scene.sources.length) {
@@ -326,7 +353,7 @@ export default class HeadlessScenePlayer extends React.Component {
               // Add the next promise to the queue
               let newPromiseQueue = this.state.promiseQueue;
               newPromiseQueue.push(
-                  getPromise(this.props.config, promise.source, this.props.scene.imageTypeFilter, promise.page + 1));
+                  getPromise(this.props.config, promise.source, this.props.scene.imageTypeFilter, promise.page + 1, this.props.opacity != 1));
 
               this.setState({allURLs: newAllURLs, promiseQueue: newPromiseQueue});
             }
