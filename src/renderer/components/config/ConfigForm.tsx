@@ -1,15 +1,12 @@
 import * as React from "react";
 
 import Scene from "../../Scene";
-import Config, {SceneSettings} from "../../Config";
+import Config, {CacheSettings, SceneSettings} from "../../Config";
 import TimingGroup from "../sceneDetail/TimingGroup";
 import EffectGroup from "../sceneDetail/EffectGroup";
 import TextGroup from "../sceneDetail/TextGroup";
 import ImageGroup from "../sceneDetail/ImageGroup";
-import ControlGroup from "../sceneDetail/ControlGroup";
-import SimpleTextInput from "../ui/SimpleTextInput";
-import {remote} from "electron";
-import fileURL from "file-url";
+import CacheGroup from "./CacheGroup";
 
 export default class Library extends React.Component {
   readonly props: {
@@ -66,17 +63,9 @@ export default class Library extends React.Component {
             scene={this.state.config.defaultScene}
             onUpdateScene={this.onUpdateDefaultScene.bind(this)} />
 
-          {/* TODO Implement caching and uncomment this
-          <ControlGroup title="Caching" isNarrow={true}>
-            <SimpleTextInput
-                isEnabled={true}
-                label={"Caching Directory"}
-                value={this.state.config.cachingDir}
-                onChange={this.onUpdateCachingDir.bind(this)}>
-              {" "}
-              <button onClick={this.pickDirectory.bind(this)}>Browse</button>
-            </SimpleTextInput>
-          </ControlGroup>*/}
+          <CacheGroup
+            settings={this.state.config.caching}
+            onUpdateSettings={this.onUpdateCachingSettings.bind(this)} />
         </div>
       </div>
     )
@@ -91,21 +80,15 @@ export default class Library extends React.Component {
     this.props.updateConfig(this.state.config);
   }
 
-  pickDirectory() {
-    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']});
-    if (!result || !result.length) return;
-    this.onUpdateCachingDir(fileURL(result[0]));
-  }
-
   onUpdateDefaultScene(settings: SceneSettings, fn: (settings: SceneSettings) => void) {
     const newConfig = this.state.config;
     fn(newConfig.defaultScene);
     this.setState({config: newConfig});
   }
 
-  onUpdateCachingDir(cachingDir: string) {
+  onUpdateCachingSettings(settings: CacheSettings, fn: (settings: CacheSettings) => void) {
     const newConfig = this.state.config;
-    newConfig.cachingDir = cachingDir;
+    fn(newConfig.caching);
     this.setState({config: newConfig});
   }
 

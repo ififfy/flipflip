@@ -25,11 +25,16 @@ class APIKeys {
     "JFNLu3CbINQjRdUvZibXW9VpSEVYYtiPJ86o8YmvgLZIoKyuNX"];
 }
 
+export class CacheSettings {
+  enabled = true;
+  directory = "";
+  maxSize = 5120; // Size in MB (default 5GB)
+}
+
 export default class Config {
   defaultScene = new SceneSettings();
   apiKeys = new APIKeys();
-  cachingDir = "";
-  cachingDirMax = 5120; // Size in MB (default 5GB)
+  caching = new CacheSettings();
 
   constructor(init?:Partial<SceneSettings>) {
     Object.assign(this, init);

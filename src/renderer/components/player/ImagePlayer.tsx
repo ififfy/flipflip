@@ -6,12 +6,12 @@ import wretch from "wretch";
 import gifInfo from 'gif-info';
 import IncomingMessage = Electron.IncomingMessage;
 
-import en from "../../en";
 import ImageView from './ImageView';
 import TIMING_FUNCTIONS from '../../TIMING_FUNCTIONS';
 import {IF, TF, ZF, HTF, VTF, BT, ST} from '../../const';
 import ChildCallbackHack from './ChildCallbackHack';
 import {urlToPath, getRandomListItem, getSourceType, getFileName, getCachePath} from '../../utils';
+import Config from "../../Config";
 
 class GifInfo {
   animated: boolean;
@@ -20,6 +20,7 @@ class GifInfo {
 
 export default class ImagePlayer extends React.Component {
   readonly props: {
+    config: Config,
     advanceHack?: ChildCallbackHack,
     maxInMemory: number,
     maxLoadingAtOnce: number,
@@ -236,29 +237,42 @@ export default class ImagePlayer extends React.Component {
       if (img.width < this.props.imageSizeMin || img.height < this.props.imageSizeMin) {
         setTimeout(errorCallback, 0);
       } else {
-        const fileType = getSourceType(img.src);
-        if (fileType != ST.local) {
-          const cachePath = getCachePath(img.getAttribute("source"));
-          const fileName = getFileName(img.src);
-          const filePath = cachePath + fileName;
-          if (!fs.existsSync(filePath)) {
-            wretch(img.src)
-              .get()
-              .blob(blob => {
-                const reader = new FileReader();
-                reader.onload = function () {
-                  if (reader.readyState == 2) {
-                    const arrayBuffer = reader.result as ArrayBuffer;
-                    const buffer = Buffer.alloc(arrayBuffer.byteLength);
-                    const view = new Uint8Array(arrayBuffer);
-                    for (let i = 0; i < arrayBuffer.byteLength; ++i) {
-                      buffer[i] = view[i];
-                    }
-                    outputFile(filePath, buffer);
-                  }
-                };
-                reader.readAsArrayBuffer(blob)
+        if (this.props.config.caching.enabled) {
+          const fileType = getSourceType(img.src);
+          if (fileType != ST.local) {
+            const cachePath = getCachePath(img.getAttribute("source"), this.props.config);
+            const fileName = getFileName(img.src);
+            const filePath = cachePath + fileName;
+            let size = 0;
+            if (fs.existsSync(cachePath)) {
+              fs.readdirSync(cachePath).forEach((f) => {
+                size += fs.statSync(cachePath + f).size;
               });
+            }
+            let mbSize = (size / 1024 / 1024);
+            console.log("Cache size " + mbSize.toString());
+            const maxSize = this.props.config.caching.maxSize;
+            if (mbSize < maxSize) {
+              if (!fs.existsSync(filePath)) {
+                wretch(img.src)
+                  .get()
+                  .blob(blob => {
+                    const reader = new FileReader();
+                    reader.onload = function () {
+                      if (reader.readyState == 2) {
+                        const arrayBuffer = reader.result as ArrayBuffer;
+                        const buffer = Buffer.alloc(arrayBuffer.byteLength);
+                        const view = new Uint8Array(arrayBuffer);
+                        for (let i = 0; i < arrayBuffer.byteLength; ++i) {
+                          buffer[i] = view[i];
+                        }
+                        outputFile(filePath, buffer);
+                      }
+                    };
+                    reader.readAsArrayBuffer(blob);
+                  });
+              }
+            }
           }
         }
         setTimeout(successCallback, 0);

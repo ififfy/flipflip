@@ -10,7 +10,7 @@ import AudioGroup from "./AudioGroup";
 import ImageGroup from "./ImageGroup";
 
 type Props = {
-  scene?: Scene,
+  scene: Scene,
   allScenes: Array<Scene>,
   autoEdit: boolean,
   goBack(): void,

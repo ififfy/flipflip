@@ -8,8 +8,8 @@ import {SceneSettings} from "../../Config";
 
 export default class TimingGroup extends React.Component {
   readonly props: {
-    scene?: Scene | SceneSettings,
-    onUpdateScene?(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
+    scene: Scene | SceneSettings,
+    onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 
   render() {

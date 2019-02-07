@@ -4,6 +4,8 @@ import path from 'path';
 
 import {ST} from "./const";
 import en from "./en";
+import Config from "./Config";
+
 
 export function getPath() {
   return path.join(remote.app.getPath('appData'), 'flipflip');
@@ -31,8 +33,16 @@ export function getFileGroup(url: string) {
   }
 }
 
-export function getCachePath(source: string) {
-  return getPath() + "\\ImageCache\\" + en.get(getSourceType(source)) + "\\" + getFileGroup(source) + "\\"
+export function getCachePath(source: string, config: Config) {
+  if (config.caching.directory != "") {
+    let baseDir = config.caching.directory;
+    if (!baseDir.endsWith("/")) {
+      baseDir += "/";
+    }
+    return baseDir + en.get(getSourceType(source)) + "/" + getFileGroup(source) + "/"
+  } else {
+    return getPath() + "/ImageCache/" + en.get(getSourceType(source)) + "/" + getFileGroup(source) + "/"
+  }
 }
 
 export function getSourceType(url: string): string {

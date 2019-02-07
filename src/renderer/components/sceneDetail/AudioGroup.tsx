@@ -6,7 +6,7 @@ import ControlGroup from "./ControlGroup";
 
 export default class AudioGroup extends React.Component {
   readonly props: {
-    scene?: Scene,
+    scene: Scene,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
   };
 

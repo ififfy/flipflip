@@ -12,8 +12,9 @@ import TextGroup from "../sceneDetail/TextGroup";
 import AudioGroup from "../sceneDetail/AudioGroup";
 import Tag from "../library/Tag";
 import ChildCallbackHack from './ChildCallbackHack';
-import {getSourceType, urlToPath} from '../../utils';
-import {ST} from "../../const";
+import {urlToPath} from '../../utils';
+import Config from "../../Config";
+import fileURL from "file-url";
 
 const keyMap = {
   playPause: ['Play/Pause', 'space'],
@@ -29,6 +30,7 @@ let originalMenu = Menu.getApplicationMenu();
 
 export default class Player extends React.Component {
   readonly props: {
+    config: Config,
     goBack(): void,
     scene: Scene,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
@@ -58,6 +60,7 @@ export default class Player extends React.Component {
     return (
       <div className="Player">
         <HeadlessScenePlayer
+          config={this.props.config}
           opacity={1}
           scene={this.props.scene}
           historyOffset={this.state.historyOffset}
@@ -71,6 +74,7 @@ export default class Player extends React.Component {
 
         {this.props.overlayScene && (
           <HeadlessScenePlayer
+            config={this.props.config}
             advanceHack={null}
             opacity={this.props.scene.overlaySceneOpacity}
             scene={this.props.overlayScene}
@@ -223,7 +227,10 @@ export default class Player extends React.Component {
     const contextMenu = new Menu();
     const img = this.state.historyPaths[(this.state.historyPaths.length - 1) + this.state.historyOffset];
     const url = img.src;
-    const source = getSourceType(url) == ST.local ? urlToPath("file://" + img.getAttribute("source")) : img.getAttribute("source");
+    let source = img.getAttribute("source");
+    if (!source.startsWith("http://") && !source.startsWith("https://")) {
+      source = urlToPath(fileURL(source));
+    }
     const isFile = url.startsWith('file://');
     const path = urlToPath(url);
     contextMenu.append(new MenuItem({

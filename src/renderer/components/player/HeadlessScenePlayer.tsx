@@ -11,6 +11,7 @@ import {TOT, IF, ST} from '../../const';
 import ChildCallbackHack from './ChildCallbackHack';
 import {CancelablePromise, getCachePath, getFileName, getSourceType} from "../../utils";
 import * as fs from "fs";
+import Config from "../../Config";
 
 function isImage(path: string): boolean {
   const p = path.toLowerCase();
@@ -46,16 +47,16 @@ function textURL(kind: string, src: string): string {
 }
 
 // Determine what kind of source we have based on the URL and return associated Promise
-function getPromise(url: string, filter: string, page: number): CancelablePromise {
+function getPromise(config: Config, url: string, filter: string, page: number): CancelablePromise {
   let promise;
   const sourceType = getSourceType(url);
   switch (sourceType) {
     case ST.tumblr:
       if (page == -1) {
-        const cachePath = getCachePath(url);
-        if (fs.existsSync(cachePath)) {
+        const cachePath = getCachePath(url, config);
+        if (fs.existsSync(cachePath) && config.caching.enabled) {
           // If the cache directory exists, use it
-          promise = loadLocalDirectory(getCachePath(url), filter);
+          promise = loadLocalDirectory(getCachePath(url, config), filter);
           promise.page = -1;
         } else {
           // Otherwise loadTumblr;
@@ -169,6 +170,7 @@ function loadTumblr(url: string, filter: string, page: number): CancelablePromis
 
 export default class HeadlessScenePlayer extends React.Component {
   readonly props: {
+    config: Config,
     scene: Scene,
     opacity: number,
     showText: boolean,
@@ -214,6 +216,7 @@ export default class HeadlessScenePlayer extends React.Component {
 
         {showImagePlayer && (
           <ImagePlayer
+            config={this.props.config}
             advanceHack={this.props.advanceHack}
             historyOffset={this.props.historyOffset}
             setHistoryPaths={this.props.setHistoryPaths}
@@ -260,7 +263,7 @@ export default class HeadlessScenePlayer extends React.Component {
 
     let sourceLoop = () => {
       let d = this.props.scene.sources[n].url;
-      let loadPromise = getPromise(d, this.props.scene.imageTypeFilter, -1);
+      let loadPromise = getPromise(this.props.config, d, this.props.scene.imageTypeFilter, -1);
 
       // Because of rendering lag, always display the NEXT source, unless this is the last one
       let message;
@@ -287,7 +290,7 @@ export default class HeadlessScenePlayer extends React.Component {
           // If this is a remote URL, queue up the next promise
           if (loadPromise.page) {
             newPromiseQueue.push(
-                getPromise(d, this.props.scene.imageTypeFilter, loadPromise.page + 1));
+                getPromise(this.props.config, d, this.props.scene.imageTypeFilter, loadPromise.page + 1));
           }
 
           if (n < this.props.scene.sources.length) {
@@ -323,7 +326,7 @@ export default class HeadlessScenePlayer extends React.Component {
               // Add the next promise to the queue
               let newPromiseQueue = this.state.promiseQueue;
               newPromiseQueue.push(
-                  getPromise(promise.source, this.props.scene.imageTypeFilter, promise.page + 1));
+                  getPromise(this.props.config, promise.source, this.props.scene.imageTypeFilter, promise.page + 1));
 
               this.setState({allURLs: newAllURLs, promiseQueue: newPromiseQueue});
             }
