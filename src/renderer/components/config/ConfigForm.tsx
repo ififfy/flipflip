@@ -1,12 +1,14 @@
 import * as React from "react";
 
 import Scene from "../../Scene";
-import Config, {CacheSettings, SceneSettings} from "../../Config";
+import Config, {APIKeys, CacheSettings, SceneSettings} from "../../Config";
 import TimingGroup from "../sceneDetail/TimingGroup";
 import EffectGroup from "../sceneDetail/EffectGroup";
 import TextGroup from "../sceneDetail/TextGroup";
 import ImageGroup from "../sceneDetail/ImageGroup";
+import Modal from "../ui/Modal";
 import CacheGroup from "./CacheGroup";
+import APIGroup from "./APIGroup";
 
 export default class Library extends React.Component {
   readonly props: {
@@ -18,6 +20,7 @@ export default class Library extends React.Component {
   };
 
   readonly state = {
+    errorMessage: "",
     config: JSON.parse(JSON.stringify(this.props.config)), // Make a copy
   };
 
@@ -66,18 +69,53 @@ export default class Library extends React.Component {
           <CacheGroup
             settings={this.state.config.caching}
             onUpdateSettings={this.onUpdateCachingSettings.bind(this)} />
+
+          <APIGroup
+              keys={this.state.config.apiKeys}
+              onUpdateKeys={this.onUpdateAPIKeys.bind(this)} />
         </div>
+
+        {this.state.errorMessage != "" && (
+          <Modal onClose={this.onErrorClose.bind(this)} title="Error">
+            <p dangerouslySetInnerHTML={{__html: this.state.errorMessage}}/>
+            <div className="u-button u-float-right" onClick={this.onErrorClose.bind(this)}>
+              Ok
+            </div>
+          </Modal>
+        )}
       </div>
     )
   }
 
-  onOK() {
-    this.applyConfig();
-    this.props.goBack();
+  onErrorClose() {
+    this.setState({errorMessage: ""});
   }
 
-  applyConfig() {
-    this.props.updateConfig(this.state.config);
+  validate(): string {
+    let errorMessage = "";
+    // Validate any data:
+    if (this.state.config.apiKeys.defaultTumblr.length != 50) {
+      errorMessage += "Invalid Default Tumblr API Key<br/>"
+    }
+    if (this.state.config.apiKeys.overlayTumblr.length != 50) {
+      errorMessage += "Invalid Overlay Tumblr API Key<br/>"
+    }
+    return errorMessage;
+  }
+
+  onOK() {
+    if (this.applyConfig()) this.props.goBack();
+  }
+
+  applyConfig(): boolean {
+    const errorMessage = this.validate();
+    if (errorMessage.length == 0) {
+      this.props.updateConfig(this.state.config);
+      return true;
+    } else {
+      this.setState({errorMessage: errorMessage});
+      return false;
+    }
   }
 
   onUpdateDefaultScene(settings: SceneSettings, fn: (settings: SceneSettings) => void) {
@@ -89,6 +127,12 @@ export default class Library extends React.Component {
   onUpdateCachingSettings(settings: CacheSettings, fn: (settings: CacheSettings) => void) {
     const newConfig = this.state.config;
     fn(newConfig.caching);
+    this.setState({config: newConfig});
+  }
+
+  onUpdateAPIKeys(keys: APIKeys, fn: (keys: APIKeys) => void) {
+    const newConfig = this.state.config;
+    fn(newConfig.apiKeys);
     this.setState({config: newConfig});
   }
 
