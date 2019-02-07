@@ -9,7 +9,7 @@ import {SceneSettings} from "../../Config";
 
 export default class ImageGroup extends React.Component {
   readonly props: {
-    scene?: Scene | SceneSettings,
+    scene: Scene | SceneSettings,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 

@@ -159,6 +159,7 @@ export default class Meta extends React.Component {
 
         {this.isRoute('play') && (
           <Player
+            config={this.state.config}
             scene={this.scene()}
             onUpdateScene={this.onUpdateScene.bind(this)}
             overlayScene={this.overlayScene()}
@@ -167,6 +168,7 @@ export default class Meta extends React.Component {
 
         {this.isRoute('libraryplay') && (
           <Player
+            config={this.state.config}
             scene={this.scene()}
             onUpdateScene={this.onUpdateScene.bind(this)}
             goBack={this.endPlaySceneFromLibrary.bind(this)}
