@@ -12,7 +12,7 @@ export default class APIGroup extends React.Component {
 
   render() {
     return (
-      <ControlGroup title="APIKeys" isNarrow={true}>
+      <ControlGroup title="API Keys" isNarrow={true}>
         <SimpleTextInput
           isEnabled={true}
           label="Default Tumblr API Key"

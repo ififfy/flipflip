@@ -66,5 +66,5 @@ export default class CacheGroup extends React.Component {
 
   onChangeDirectory(directory: string) { this.update((s) => { s.directory = directory; }); }
 
-  onChangeMaxSize(maxSize: number) { this.update((s) => { if (maxSize >= 0) s.maxSize = maxSize; }); }
+  onChangeMaxSize(maxSize: number) { this.update((s) => { s.maxSize = maxSize; }); }
 }

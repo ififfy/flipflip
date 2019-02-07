@@ -2,6 +2,7 @@ import wretch from 'wretch';
 import * as React from 'react';
 
 import {CancelablePromise, getRandomListItem} from '../../utils'
+import Config from "../../Config";
 
 let STYLES : {[style : string] : string} = {};
 
@@ -46,7 +47,7 @@ const fnIntArg = function(innerFn : Function) {
   };
 };
 
-const COMMANDS : { [command : string] : (el: HTMLElement, value : string) => any;} = {
+const COMMANDS : { [command : string] : (el: HTMLElement, value : string, config: Config) => any;} = {
   saveStyleRules: function(el : HTMLElement, value : string) {
     const firstWord = getFirstWord(value);
     const style = getRest(value);
@@ -129,22 +130,25 @@ const COMMANDS : { [command : string] : (el: HTMLElement, value : string) => any
     return function(f : Function) { f() };
   },
 
-  blink: function(el : HTMLElement, value : string) {
+  blink: function(el : HTMLElement, value : string, config: Config) {
     return function(runNextCommand : Function) {
       let fns : Function[] = [];
       let i = 0;
+      el.style.color = config.captions.blinkColor;
+      el.style.fontSize = config.captions.blinkFontSize + "vmin";
+      el.style.fontFamily = config.captions.blinkFontFamily;
       el.className = "text-blink";
       value.split('/').forEach(function(word) {
         word = word.trim();
         let j = i;
         i += 1;
         fns.push(function() {
-          const showText = COMMANDS.showText(el, BLINK_DURATION + ' ' + word);
-          const wait = COMMANDS.wait(el, '' + BLINK_DELAY);
+          const showText = COMMANDS.showText(el, BLINK_DURATION + ' ' + word, config);
+          const wait = COMMANDS.wait(el, '' + BLINK_DELAY, config);
           showText(function() { wait(fns[j + 1]); });
         })
       });
-      const lastWait = COMMANDS.wait(el, '' + BLINK_GROUP_DELAY);
+      const lastWait = COMMANDS.wait(el, '' + BLINK_GROUP_DELAY, config);
       fns.push(function() {
         lastWait(runNextCommand);
       });
@@ -152,29 +156,36 @@ const COMMANDS : { [command : string] : (el: HTMLElement, value : string) => any
     }
   },
 
-  cap: function(el : HTMLElement, value : string) {
-    const showText = COMMANDS.showText(el, CAPTION_DURATION + ' ' + value);
-    const wait = COMMANDS.wait(el, '' + CAPTION_DELAY);
+  cap: function(el : HTMLElement, value : string, config: Config) {
+    const showText = COMMANDS.showText(el, CAPTION_DURATION + ' ' + value, config);
+    const wait = COMMANDS.wait(el, '' + CAPTION_DELAY, config);
     return function(runNextCommand : Function) {
+      el.style.color = config.captions.captionColor;
+      el.style.fontSize = config.captions.captionFontSize + "vmin";
+      el.style.fontFamily = config.captions.captionFontFamily;
       el.className = "text-caption";
       showText(function() { wait(runNextCommand); });
     }
   },
 
-  bigcap: function(el : HTMLElement, value : string) {
-    const showText = COMMANDS.showText(el, CAPTION_DURATION + ' ' + value);
-    const wait = COMMANDS.wait(el, '' + CAPTION_DELAY);
+  bigcap: function(el : HTMLElement, value : string, config: Config) {
+    const showText = COMMANDS.showText(el, CAPTION_DURATION + ' ' + value, config);
+    const wait = COMMANDS.wait(el, '' + CAPTION_DELAY, config);
     return function(runNextCommand : Function) {
+      el.style.color = config.captions.captionBigColor;
+      el.style.fontSize = config.captions.captionBigFontSize + "vmin";
+      el.style.fontFamily = config.captions.captionBigFontFamily;
       el.className = "text-caption-big";
       showText(function() { wait(runNextCommand); });
     }
   }
 };
 
-export default class LegacyCaptionProgram extends React.Component {
+export default class CaptionProgram extends React.Component {
   readonly el = React.createRef<HTMLDivElement>();
 
   readonly props: {
+    config: Config,
     url: string,
   };
 
@@ -235,7 +246,7 @@ export default class LegacyCaptionProgram extends React.Component {
           if (command) {
             const value = getRest(line);
             if (COMMANDS[command]) {
-              const fn = COMMANDS[command](this.el.current, value);
+              const fn = COMMANDS[command](this.el.current, value, this.props.config);
               if (fn) {
                 if (command.toLowerCase().startsWith("set")) {
                   fn(() => {return newPromise.hasCanceled;});
