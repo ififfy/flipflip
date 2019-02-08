@@ -1,4 +1,4 @@
-import {ZF, HTF, VTF, TF, IF, TOT, BT} from './const';
+import {BT, HTF, IF, TF, TOT, VTF, ZF} from './const';
 import LibrarySource from "./components/library/LibrarySource";
 
 export default class Scene {
@@ -37,7 +37,7 @@ export default class Scene {
   // unused; migration only
   hastebinID: string = "";
 
-  constructor(init?:Partial<Scene>) {
+  constructor(init?: Partial<Scene>) {
     Object.assign(this, init);
     this.sources = this.sources.filter((d) => !!d);
 

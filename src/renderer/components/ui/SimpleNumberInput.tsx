@@ -12,17 +12,17 @@ export default class SimpleNumberInput extends React.Component {
 
   render() {
     return (
-        <div className="SimpleNumberInput">
-          <label>{this.props.label}</label>
-          <input
-              disabled={!this.props.isEnabled}
-              type="number"
-              min={this.props.min}
-              max={this.props.max}
-              value={this.props.value}
-              onChange={this.onChange.bind(this)}>
-          </input>
-        </div>
+      <div className="SimpleNumberInput">
+        <label>{this.props.label}</label>
+        <input
+          disabled={!this.props.isEnabled}
+          type="number"
+          min={this.props.min}
+          max={this.props.max}
+          value={this.props.value}
+          onChange={this.onChange.bind(this)}>
+        </input>
+      </div>
     );
   }
 

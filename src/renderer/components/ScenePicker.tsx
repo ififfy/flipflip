@@ -1,11 +1,11 @@
+import {remote} from 'electron';
 import * as React from 'react';
 import Sortable from "sortablejs";
-import {remote} from 'electron';
 
+import {SF} from "../const";
+import {array_move, getRandomListItem} from "../utils";
 import Scene from '../Scene';
 import SimpleOptionPicker from "./ui/SimpleOptionPicker";
-import {array_move, getRandomListItem} from "../utils";
-import {SF} from "../const";
 
 class ScenePickerItem extends React.Component {
   readonly props: { scene: Scene, onSelect(scene: Scene): void };
@@ -13,8 +13,8 @@ class ScenePickerItem extends React.Component {
   render() {
     return (
       <div
-          className={`ScenePickerItem u-clickable u-draggable ${this.props.scene.tagWeights ? 'm-generator' : ''}`}
-          onClick={this.onClick.bind(this)}>
+        className={`ScenePickerItem u-clickable u-draggable ${this.props.scene.tagWeights ? 'm-generator' : ''}`}
+        onClick={this.onClick.bind(this)}>
         <div className="ScenePickerItem__Title">
           {this.props.scene.name}
         </div>
@@ -97,7 +97,8 @@ export default class ScenePicker extends React.Component {
           <div className="ScenePicker__LibraryButton u-clickable" onClick={this.props.onOpenLibrary}>
             Library
           </div>
-          <div className={`ScenePicker__GenerateSceneButton ${this.props.canGenerate ? 'u-clickable' : 'u-disabled'}`} onClick={this.props.canGenerate ? this.props.onGenerate.bind(this) : this.nop}>
+          <div className={`ScenePicker__GenerateSceneButton ${this.props.canGenerate ? 'u-clickable' : 'u-disabled'}`}
+               onClick={this.props.canGenerate ? this.props.onGenerate.bind(this) : this.nop}>
             + Add Scene Generator
           </div>
           <div className="ScenePicker__AddSceneButton u-clickable" onClick={this.props.onAdd.bind(this)}>
@@ -107,16 +108,16 @@ export default class ScenePicker extends React.Component {
 
         <hr/>
 
-        <div className="ScenePicker__Scenes" id="scenes" >
+        <div className="ScenePicker__Scenes" id="scenes">
           {this.props.scenes.map((scene) =>
-            <ScenePickerItem key={`${scene.id}`} scene={scene} onSelect={this.props.onSelect} />
+            <ScenePickerItem key={`${scene.id}`} scene={scene} onSelect={this.props.onSelect}/>
           )}
         </div>
       </div>
     );
   }
 
-  nop () {}
+  nop() {}
 
   onEnd(evt: any) {
     let newScenes = this.props.scenes;

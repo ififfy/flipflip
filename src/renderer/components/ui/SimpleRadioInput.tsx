@@ -1,4 +1,5 @@
 import * as React from 'react';
+
 import en from "../../en";
 
 export default class SimpleRadioInput extends React.Component {
@@ -20,10 +21,10 @@ export default class SimpleRadioInput extends React.Component {
               type="radio"
               name={this.props.groupName}
               value={k}
-              checked={this.props.value==k}
+              checked={this.props.value == k}
               onChange={this.onChange.bind(this)}>
             </input>
-            <span onClick={this.props.onChange.bind(this,k)}>
+            <span onClick={this.props.onChange.bind(this, k)}>
               {en.get(k) != null ? en.get(k) : k}
             </span>
           </span>

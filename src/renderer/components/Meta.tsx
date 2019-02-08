@@ -1,25 +1,25 @@
-import * as React from 'react';
 import {remote} from 'electron';
-import {writeFileSync, mkdirSync, readFileSync} from 'fs';
+import {mkdirSync, readFileSync, writeFileSync} from 'fs';
+import * as React from 'react';
 import path from 'path';
 
+import Config from "../Config";
+import Scene from '../Scene';
+import ScenePicker from './ScenePicker';
+import ConfigForm from './config/ConfigForm';
 import Library from './library/Library';
 import LibrarySource from './library/LibrarySource';
-import TagManager from "./library/TagManager";
 import Tag from "./library/Tag";
+import TagManager from "./library/TagManager";
 import SceneGenerator from "./library/SceneGenerator";
-import Scene from '../Scene';
-import Config from "../Config";
-import ConfigForm from './config/ConfigForm';
-import ScenePicker from './ScenePicker';
-import SceneDetail from './sceneDetail/SceneDetail';
 import Player from './player/Player';
+import SceneDetail from './sceneDetail/SceneDetail';
 
 class Route {
   kind: string;
   value: any;
 
-  constructor(init?:Partial<Route>) {
+  constructor(init?: Partial<Route>) {
     Object.assign(this, init);
   }
 }
@@ -163,7 +163,7 @@ export default class Meta extends React.Component {
             scene={this.scene()}
             onUpdateScene={this.onUpdateScene.bind(this)}
             overlayScene={this.overlayScene()}
-            goBack={this.goBack.bind(this)} />
+            goBack={this.goBack.bind(this)}/>
         )}
 
         {this.isRoute('libraryplay') && (
@@ -183,7 +183,7 @@ export default class Meta extends React.Component {
             scenes={this.state.scenes}
             goBack={this.goBack.bind(this)}
             updateConfig={this.updateConfig.bind(this)}
-            onDefault={this.onDefaultConfig.bind(this)} />
+            onDefault={this.onDefaultConfig.bind(this)}/>
         )}
       </div>
     )
@@ -384,7 +384,7 @@ export default class Meta extends React.Component {
   onToggleTag(sourceID: number, tag: Tag) {
     let newLibrary = this.state.library;
     for (let source of newLibrary) {
-      if (source.id==sourceID) {
+      if (source.id == sourceID) {
         if (source.tags.map((t) => t.name).includes(tag.name)) {
           source.tags = source.tags.filter((t) => t.name != tag.name);
         } else {

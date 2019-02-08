@@ -1,6 +1,7 @@
-import * as React from 'react';
 import {remote} from 'electron';
+import * as React from 'react';
 import fileURL from 'file-url';
+
 import SimpleTextInput from './SimpleTextInput';
 
 export default class SimpleURLInput extends React.Component {
@@ -29,7 +30,7 @@ export default class SimpleURLInput extends React.Component {
   onChange(e: React.FormEvent<HTMLSelectElement>) {
     this.props.onChange(e.currentTarget.value);
   }
-  
+
   pickFile() {
     let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openFile']});
     if (!result || !result.length) return;

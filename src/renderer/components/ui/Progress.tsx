@@ -39,7 +39,7 @@ export default class Modal extends React.Component {
     return nextProps.current !== this.props.current;
   }
 
-  componentWillReceiveProps(props : any) {
+  componentWillReceiveProps(props: any) {
     if (this.state && this.state.progress && props.current != this.props.current) {
       this.state.progress.animate((props.current + 0.1) / (this.props.total + 0.1));
       this.state.progress.setText("<p>" + this.props.message + "</p><p>" + props.current + " / " + this.props.total + "</p>");

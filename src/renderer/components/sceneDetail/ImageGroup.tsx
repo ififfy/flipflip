@@ -1,11 +1,11 @@
 import * as React from 'react';
-import {IF} from "../../const";
 
+import {IF} from "../../const";
+import {SceneSettings} from "../../Config";
+import Scene from "../../Scene";
+import ControlGroup from "./ControlGroup";
 import SimpleCheckbox from "../ui/SimpleCheckbox";
 import SimpleOptionPicker from "../ui/SimpleOptionPicker";
-import ControlGroup from "./ControlGroup";
-import Scene from "../../Scene";
-import {SceneSettings} from "../../Config";
 
 export default class ImageGroup extends React.Component {
   readonly props: {
@@ -21,11 +21,11 @@ export default class ImageGroup extends React.Component {
             onChange={this.onChangeImageTypeFilter.bind(this)}
             label="Image Filter"
             value={this.props.scene.imageTypeFilter}
-            keys={Object.values(IF)} />
+            keys={Object.values(IF)}/>
           <SimpleCheckbox
             text="Play Full GIF animations"
             isOn={this.props.scene.playFullGif}
-            onChange={this.onChangePlayFullGif.bind(this)} />
+            onChange={this.onChangePlayFullGif.bind(this)}/>
         </div>
       </ControlGroup>
     );

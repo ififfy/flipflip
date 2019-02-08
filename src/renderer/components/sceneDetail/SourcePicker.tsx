@@ -1,15 +1,15 @@
+import {remote} from 'electron';
 import * as React from 'react';
 import Sortable from "sortablejs";
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
-import {remote} from 'electron';
 
-import Modal from '../ui/Modal';
-import Tag from "../library/Tag";
-import LibrarySource from "../library/LibrarySource";
-import URLModal from "../sceneDetail/URLModal";
-import SimpleOptionPicker from "../ui/SimpleOptionPicker";
-import {array_move, getSourceType, removeDuplicatesBy} from "../../utils";
 import {SF} from "../../const";
+import {array_move, getSourceType, removeDuplicatesBy} from "../../utils";
+import LibrarySource from "../library/LibrarySource";
+import Tag from "../library/Tag";
+import URLModal from "../sceneDetail/URLModal";
+import Modal from '../ui/Modal';
+import SimpleOptionPicker from "../ui/SimpleOptionPicker";
 
 type Props = {
   sources: Array<LibrarySource>,
@@ -37,7 +37,7 @@ export default class SourcePicker extends React.Component {
 
   render() {
     let tags = Array<Tag>();
-    let options = Array<{label: string, value: string}>();
+    let options = Array<{ label: string, value: string }>();
     for (let source of this.props.sources) {
       for (let tag of source.tags) {
         tags.push(tag);
@@ -77,43 +77,47 @@ export default class SourcePicker extends React.Component {
     }
 
     return (
-      <div className="SourcePicker"  onKeyDown={this.secretHotkey.bind(this)} tabIndex={0}>
+      <div className="SourcePicker" onKeyDown={this.secretHotkey.bind(this)} tabIndex={0}>
         {this.props.isSelect && (
-            <div className="SourcePicker__Buttons">
-              <SimpleOptionPicker
-                  label=""
-                  value="Sort Sources"
-                  disableFirst={true}
-                  keys={["Sort Sources"].concat(Object.values(SF))}
-                  onChange={this.onSort.bind(this)}
-              />
-              {tags.length > 0 && (
-                  <div className="ReactMultiSelectCheckboxes">
-                    <ReactMultiSelectCheckboxes
-                        options={options}
-                        placeholderButtonLabel="Filter Tags"
-                        onChange={this.onFilter.bind(this)}
-                        rightAligned={true}
-                    />
-                  </div>
-              )}
+          <div className="SourcePicker__Buttons">
+            <SimpleOptionPicker
+              label=""
+              value="Sort Sources"
+              disableFirst={true}
+              keys={["Sort Sources"].concat(Object.values(SF))}
+              onChange={this.onSort.bind(this)}
+            />
+            {tags.length > 0 && (
+              <div className="ReactMultiSelectCheckboxes">
+                <ReactMultiSelectCheckboxes
+                  options={options}
+                  placeholderButtonLabel="Filter Tags"
+                  onChange={this.onFilter.bind(this)}
+                  rightAligned={true}
+                />
+              </div>
+            )}
 
-              <div className={`u-button u-float-left ${this.state.selected.length > 0 ? 'u-clickable' : 'u-disabled'}`} onClick={this.state.selected.length > 0 ? this.props.importSourcesFromLibrary.bind(this, this.state.selected) : this.nop}>Import Selected</div>
+            <div className={`u-button u-float-left ${this.state.selected.length > 0 ? 'u-clickable' : 'u-disabled'}`}
+                 onClick={this.state.selected.length > 0 ? this.props.importSourcesFromLibrary.bind(this, this.state.selected) : this.nop}>Import
+              Selected
             </div>
+          </div>
         )}
         {!this.props.isSelect && (
           <div className="SourcePicker__Buttons">
             <div className="u-button u-clickable" onClick={this.onAdd.bind(this)}>+ Add local files</div>
             <div className="u-button u-clickable" onClick={this.onAddURL.bind(this)}>+ Add URL</div>
             {this.props.allowLibraryImport && (
-                <div className="u-button u-clickable" onClick={this.props.onOpenLibraryImport.bind(this)}>+ Add From Library</div>
+              <div className="u-button u-clickable" onClick={this.props.onOpenLibraryImport.bind(this)}>+ Add From
+                Library</div>
             )}
             <SimpleOptionPicker
-                label=""
-                value="Sort Sources"
-                disableFirst={true}
-                keys={["Sort Sources"].concat(Object.values(SF))}
-                onChange={this.onSort.bind(this)}
+              label=""
+              value="Sort Sources"
+              disableFirst={true}
+              keys={["Sort Sources"].concat(Object.values(SF))}
+              onChange={this.onSort.bind(this)}
             />
             {tags.length > 0 && (
               <div className="ReactMultiSelectCheckboxes">
@@ -126,7 +130,8 @@ export default class SourcePicker extends React.Component {
               </div>
             )}
             <div className={`u-button u-float-left ${this.props.sources.length == 0 ? 'u-disabled' : 'u-clickable'} `}
-                 onClick={this.props.sources.length == 0 ? this.nop : this.toggleRemoveAllModal.bind(this)}>- Remove All</div>
+                 onClick={this.props.sources.length == 0 ? this.nop : this.toggleRemoveAllModal.bind(this)}>- Remove All
+            </div>
           </div>
         )}
 
@@ -140,10 +145,12 @@ export default class SourcePicker extends React.Component {
             <div className="SourcePicker__Source"
                  key={source.id}>
               {this.props.isSelect && (
-                <input type="checkbox" value={source.url} onChange={this.onSelect.bind(this)} checked={this.state.selected.includes(source.url)}/>
+                <input type="checkbox" value={source.url} onChange={this.onSelect.bind(this)}
+                       checked={this.state.selected.includes(source.url)}/>
               )}
               {this.state.isEditing != source.id && (
-                <div className="SourcePicker__SourceTitle u-clickable" onClick={this.props.onClick ? this.props.onClick.bind(this, source) : this.onEdit.bind(this, source.id)}>
+                <div className="SourcePicker__SourceTitle u-clickable"
+                     onClick={this.props.onClick ? this.props.onClick.bind(this, source) : this.onEdit.bind(this, source.id)}>
                   {source.url}
                 </div>
               )}
@@ -154,7 +161,7 @@ export default class SourcePicker extends React.Component {
                     type="text"
                     value={source.url}
                     onBlur={this.onEdit.bind(this, -1)}
-                    onChange={this.onEditSource.bind(this, source.id)} />
+                    onChange={this.onEditSource.bind(this, source.id)}/>
                 </form>
               )}
               {source.tags && (
@@ -166,7 +173,8 @@ export default class SourcePicker extends React.Component {
               )}
 
               <div className="u-button u-destructive u-clickable"
-                   onClick={this.onRemove.bind(this, source.id)}>×️</div>
+                   onClick={this.onRemove.bind(this, source.id)}>×️
+              </div>
               <div className="u-button u-edit u-clickable"
                    onClick={this.onEdit.bind(this, source.id)}/>
             </div>
@@ -186,7 +194,7 @@ export default class SourcePicker extends React.Component {
             onClose={this.toggleURLImportModal.bind(this)}
             addSources={this.addSources.bind(this)}
             onChangeTextKind={this.nop}
-            onChangeTextSource={this.nop} />
+            onChangeTextSource={this.nop}/>
         )}
       </div>
     )
@@ -201,7 +209,7 @@ export default class SourcePicker extends React.Component {
   onEndTag(sourceID: number, evt: any) {
     let newSources = this.props.sources;
     for (let source of newSources) {
-      if (source.id==sourceID) {
+      if (source.id == sourceID) {
         array_move(source.tags, evt.oldIndex, evt.newIndex);
       }
     }
@@ -237,7 +245,7 @@ export default class SourcePicker extends React.Component {
 
   // Use alt+P to access import modal
   secretHotkey(e: KeyboardEvent) {
-    if (e.altKey && e.key=='p') {
+    if (e.altKey && e.key == 'p') {
       this.toggleURLImportModal();
     }
   }
@@ -305,13 +313,13 @@ export default class SourcePicker extends React.Component {
   }
 
   onAdd() {
-    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(),{properties: ['openDirectory', 'multiSelections']});
+    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory', 'multiSelections']});
     if (!result) return;
     this.addSources(result);
   }
 
   onAddURL() {
-    let id= this.props.sources.length + 1;
+    let id = this.props.sources.length + 1;
     this.props.sources.forEach((s) => {
       id = Math.max(s.id + 1, id);
     });
@@ -331,7 +339,7 @@ export default class SourcePicker extends React.Component {
     let sourceURLs = this.getSourceURLs();
     sources = sources.filter((s) => !sourceURLs.includes(s));
 
-    let id= this.props.sources.length + 1;
+    let id = this.props.sources.length + 1;
     this.props.sources.forEach((s) => {
       id = Math.max(s.id + 1, id);
     });
@@ -343,7 +351,7 @@ export default class SourcePicker extends React.Component {
         id: id,
         tags: new Array<Tag>(),
       }));
-      id+=1;
+      id += 1;
     }
     this.props.onUpdateSources(newLibrary);
   }
@@ -359,7 +367,7 @@ export default class SourcePicker extends React.Component {
     this.setState({selected: newSelected});
   }
 
-  onFilter(tags: Array<{label: string, value: string}>) {
+  onFilter(tags: Array<{ label: string, value: string }>) {
     this.state.sortable.option("disabled", tags.length > 0);
     this.setState({filters: tags.map((t) => t.value)});
   }

@@ -1,15 +1,15 @@
 import * as React from "react";
-
-import Scene from "../../Scene";
-import Config, {RemoteSettings, CacheSettings, SceneSettings} from "../../Config";
-import TimingGroup from "../sceneDetail/TimingGroup";
-import EffectGroup from "../sceneDetail/EffectGroup";
-import TextGroup from "../sceneDetail/TextGroup";
-import ImageGroup from "../sceneDetail/ImageGroup";
-import Modal from "../ui/Modal";
-import CacheGroup from "./CacheGroup";
-import APIGroup from "./APIGroup";
 import * as fs from "fs";
+
+import Config, {CacheSettings, RemoteSettings, SceneSettings} from "../../Config";
+import Scene from "../../Scene";
+import APIGroup from "./APIGroup";
+import CacheGroup from "./CacheGroup";
+import EffectGroup from "../sceneDetail/EffectGroup";
+import ImageGroup from "../sceneDetail/ImageGroup";
+import TextGroup from "../sceneDetail/TextGroup";
+import TimingGroup from "../sceneDetail/TimingGroup";
+import Modal from "../ui/Modal";
 
 export default class Library extends React.Component {
   readonly props: {
@@ -34,17 +34,17 @@ export default class Library extends React.Component {
           </div>
           <div className="u-button-row-right">
             <div className="Config__Apply u-button u-clickable"
-                onClick={this.applyConfig.bind(this)}>
+                 onClick={this.applyConfig.bind(this)}>
               Apply
             </div>
             <div className="Config__OK u-button u-clickable"
-                onClick={this.onOK.bind(this)}>
+                 onClick={this.onOK.bind(this)}>
               OK
             </div>
           </div>
           <div className="BackButton u-button u-clickable" onClick={this.props.goBack}>Back</div>
           <div className="DefaultButton u-destructive u-button u-clickable"
-              onClick={this.props.onDefault.bind(this)}>
+               onClick={this.props.onDefault.bind(this)}>
             Reset to Defaults
           </div>
         </div>
@@ -52,29 +52,29 @@ export default class Library extends React.Component {
         <div className="Config__Content ControlGroupGroup">
           <TimingGroup
             scene={this.state.config.defaultScene}
-            onUpdateScene={this.onUpdateDefaultScene.bind(this)} />
+            onUpdateScene={this.onUpdateDefaultScene.bind(this)}/>
 
           <EffectGroup
             scene={this.state.config.defaultScene}
             onUpdateScene={this.onUpdateDefaultScene.bind(this)}
-            allScenes={this.props.scenes} />
+            allScenes={this.props.scenes}/>
 
           <ImageGroup
             scene={this.state.config.defaultScene}
-            onUpdateScene={this.onUpdateDefaultScene.bind(this)} />
+            onUpdateScene={this.onUpdateDefaultScene.bind(this)}/>
 
           <TextGroup
             scene={this.state.config.defaultScene}
             isPlayer={false}
-            onUpdateScene={this.onUpdateDefaultScene.bind(this)} />
+            onUpdateScene={this.onUpdateDefaultScene.bind(this)}/>
 
           <CacheGroup
             settings={this.state.config.caching}
-            onUpdateSettings={this.onUpdateCachingSettings.bind(this)} />
+            onUpdateSettings={this.onUpdateCachingSettings.bind(this)}/>
 
           <APIGroup
             settings={this.state.config.remoteSettings}
-            onUpdateSettings={this.onUpdateRemoteSettings.bind(this)} />
+            onUpdateSettings={this.onUpdateRemoteSettings.bind(this)}/>
         </div>
 
         {this.state.errorMessage != "" && (
@@ -106,7 +106,7 @@ export default class Library extends React.Component {
       errorMessage += "Invalid Cache Size<br/>"
     }
     if (this.state.config.caching.directory != "" &&
-        !fs.existsSync(this.state.config.caching.directory)) {
+      !fs.existsSync(this.state.config.caching.directory)) {
       errorMessage += "Invalid Cache Directory<br/>"
     }
     return errorMessage;

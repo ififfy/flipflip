@@ -1,5 +1,5 @@
 import {remote} from "electron";
-import { URL } from "url";
+import {URL} from "url";
 import path from 'path';
 
 import {ST} from "./const";
@@ -12,7 +12,7 @@ export function getPath() {
 }
 
 export function getFileName(url: string) {
-    return url.substring(url.lastIndexOf("/"));
+  return url.substring(url.lastIndexOf("/"));
 }
 
 export function getFileGroup(url: string) {
@@ -23,7 +23,7 @@ export function getFileGroup(url: string) {
       return tumblrID;
     case ST.reddit:
       let redditID = url;
-      if (url.endsWith("/")) redditID = redditID.slice(0,url.lastIndexOf("/"));
+      if (url.endsWith("/")) redditID = redditID.slice(0, url.lastIndexOf("/"));
       redditID = redditID.substring(redditID.lastIndexOf("/") + 1);
       return redditID;
     case ST.local:
@@ -69,7 +69,7 @@ export function urlToPath(url: string): string {
 
 export function removeDuplicatesBy(keyFn: Function, array: any[]): any[] {
   let mySet = new Set();
-  return array.filter(function(x: any) {
+  return array.filter(function (x: any) {
     let key = keyFn(x);
     let isNew = !mySet.has(key);
     if (isNew) mySet.add(key);
@@ -88,7 +88,7 @@ export function array_move(arr: any[], old_index: number, new_index: number) {
 }
 
 function getRandomIndex(list: any[]) {
-  return Math.floor(Math.random()*list.length)
+  return Math.floor(Math.random() * list.length)
 }
 
 export function getRandomListItem(list: any[], count: number = 1) {
@@ -99,7 +99,7 @@ export function getRandomListItem(list: any[], count: number = 1) {
   } else {
     let newList = [];
     for (let c = 0; c < count && list.length > 0; c++) {
-      newList.push(list.splice(getRandomIndex(list),1)[0])
+      newList.push(list.splice(getRandomIndex(list), 1)[0])
     }
     return newList;
   }
@@ -125,8 +125,8 @@ export class CancelablePromise extends Promise<Array<string>> {
   getPromise(): Promise<Array<string>> {
     return new Promise((resolve, reject) => {
       this.then(
-          val => this.hasCanceled ? null : resolve(val),
-          error => this.hasCanceled ? null : reject(error)
+        val => this.hasCanceled ? null : resolve(val),
+        error => this.hasCanceled ? null : reject(error)
       );
     });
   }

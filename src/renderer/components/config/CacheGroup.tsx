@@ -1,11 +1,11 @@
-import * as React from 'react';
 import {remote} from "electron";
+import * as React from 'react';
 
 import {CacheSettings} from "../../Config";
 import ControlGroup from "../sceneDetail/ControlGroup";
-import SimpleTextInput from "../ui/SimpleTextInput";
 import SimpleCheckbox from "../ui/SimpleCheckbox";
 import SimpleNumberInput from "../ui/SimpleNumberInput";
+import SimpleTextInput from "../ui/SimpleTextInput";
 
 export default class CacheGroup extends React.Component {
   readonly props: {
@@ -24,11 +24,15 @@ export default class CacheGroup extends React.Component {
           isEnabled={this.props.settings.enabled}
           label="Caching Directory"
           value={this.props.settings.directory}
-          onChange={this.onChangeDirectory.bind(this)} >
+          onChange={this.onChangeDirectory.bind(this)}>
           {" "}
-          <button className={this.props.settings.enabled ? '' : 'u-disabled'} onClick={this.props.settings.enabled ? this.pickDirectory.bind(this) : this.nop}>Browse</button>
+          <button className={this.props.settings.enabled ? '' : 'u-disabled'}
+                  onClick={this.props.settings.enabled ? this.pickDirectory.bind(this) : this.nop}>Browse
+          </button>
           {" "}
-          <button className={this.props.settings.enabled ? '' : 'u-disabled'} onClick={this.props.settings.enabled ? this.paste.bind(this) : this.nop}>Paste</button>
+          <button className={this.props.settings.enabled ? '' : 'u-disabled'}
+                  onClick={this.props.settings.enabled ? this.paste.bind(this) : this.nop}>Paste
+          </button>
           {" "}
           {this.props.settings.directory == "" && (
             <span>You are using the default directory</span>
@@ -47,7 +51,7 @@ export default class CacheGroup extends React.Component {
   nop() {}
 
   pickDirectory() {
-    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(),{properties: ['openDirectory']});
+    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']});
     if (!result) return;
     this.onChangeDirectory(result[0]);
   }

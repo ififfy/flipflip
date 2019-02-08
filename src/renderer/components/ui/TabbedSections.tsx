@@ -46,7 +46,7 @@ class TabBar extends React.Component {
             key={i}
             isActive={i === this.props.activeIndex}
             title={t}
-            onClick={() => this.props.onChangeActiveIndex(i)} />;
+            onClick={() => this.props.onChangeActiveIndex(i)}/>;
         })}
       </div>
     );
@@ -70,11 +70,11 @@ export class TabbedSections extends React.Component {
         <TabBar
           titles={this.props.titles}
           activeIndex={this.state.activeIndex}
-          onChangeActiveIndex={this.changeActiveIndex.bind(this)} />
+          onChangeActiveIndex={this.changeActiveIndex.bind(this)}/>
         <div className="TabbedSections__Content">
           {this.props.renderChildren().map((child, i) => {
             return (
-              <TabContent key={i} isActive={i === this.state.activeIndex} children={child} />
+              <TabContent key={i} isActive={i === this.state.activeIndex} children={child}/>
             );
           })}
         </div>

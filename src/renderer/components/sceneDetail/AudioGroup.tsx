@@ -1,8 +1,8 @@
 import * as React from 'react';
 
 import Scene from "../../Scene";
-import SimpleURLInput from "../ui/SimpleURLInput";
 import ControlGroup from "./ControlGroup";
+import SimpleURLInput from "../ui/SimpleURLInput";
 
 export default class AudioGroup extends React.Component {
   readonly props: {
@@ -17,7 +17,7 @@ export default class AudioGroup extends React.Component {
           isEnabled={true}
           onChange={this.onChangeAudioURL.bind(this)}
           label="URL"
-          value={this.props.scene.audioURL} />
+          value={this.props.scene.audioURL}/>
       </ControlGroup>
     );
   }
