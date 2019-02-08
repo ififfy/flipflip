@@ -10,12 +10,12 @@ export default class SimpleColorPicker extends React.Component {
   render() {
     return (
       <div className="SimpleColorPicker">
-          <label>{this.props.label}</label>
-          <input
-              type="color"
-              value={this.props.value}
-              onChange={this.onChange.bind(this)}>
-          </input>
+        <label>{this.props.label}</label>
+        <input
+          type="color"
+          value={this.props.value}
+          onChange={this.onChange.bind(this)}>
+        </input>
       </div>
     );
   }

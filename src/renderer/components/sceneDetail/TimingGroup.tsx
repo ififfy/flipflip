@@ -1,10 +1,11 @@
 import * as React from 'react';
+
 import {TF} from "../../const";
-import SimpleTextInput from "../ui/SimpleTextInput";
-import SimpleOptionPicker from "../ui/SimpleOptionPicker";
-import ControlGroup from "./ControlGroup";
-import Scene from "../../Scene";
 import {SceneSettings} from "../../Config";
+import Scene from "../../Scene";
+import ControlGroup from "./ControlGroup";
+import SimpleOptionPicker from "../ui/SimpleOptionPicker";
+import SimpleTextInput from "../ui/SimpleTextInput";
 
 export default class TimingGroup extends React.Component {
   readonly props: {
@@ -14,18 +15,18 @@ export default class TimingGroup extends React.Component {
 
   render() {
     return (
-        <ControlGroup title="Timing" isNarrow={true}>
-          <SimpleOptionPicker
-            onChange={this.onChangeTimingFunction.bind(this)}
-            label="Timing"
-            value={this.props.scene.timingFunction}
-            keys={Object.values(TF)} />
-          <SimpleTextInput
-            isEnabled={this.props.scene.timingFunction === TF.constant}
-            onChange={this.onChangeTimingConstant.bind(this)}
-            label="Time between images (ms)"
-            value={this.props.scene.timingConstant.toString()} />
-        </ControlGroup>
+      <ControlGroup title="Timing" isNarrow={true}>
+        <SimpleOptionPicker
+          onChange={this.onChangeTimingFunction.bind(this)}
+          label="Timing"
+          value={this.props.scene.timingFunction}
+          keys={Object.values(TF)}/>
+        <SimpleTextInput
+          isEnabled={this.props.scene.timingFunction === TF.constant}
+          onChange={this.onChangeTimingConstant.bind(this)}
+          label="Time between images (ms)"
+          value={this.props.scene.timingConstant.toString()}/>
+      </ControlGroup>
     );
   }
 

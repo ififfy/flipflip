@@ -1,20 +1,21 @@
+import {remote} from 'electron';
 import * as React from 'react';
-import { remote } from 'electron';
-const { getCurrentWindow, Menu, MenuItem, app } = remote;
 import Sound from 'react-sound';
 import fs from "fs";
+import fileURL from "file-url";
 
-import Scene from '../../Scene';
-import HeadlessScenePlayer from './HeadlessScenePlayer';
-import TimingGroup from "../sceneDetail/TimingGroup";
-import EffectGroup from "../sceneDetail/EffectGroup";
-import TextGroup from "../sceneDetail/TextGroup";
-import AudioGroup from "../sceneDetail/AudioGroup";
-import Tag from "../library/Tag";
-import ChildCallbackHack from './ChildCallbackHack';
 import {urlToPath} from '../../utils';
 import Config from "../../Config";
-import fileURL from "file-url";
+import Scene from '../../Scene';
+import ChildCallbackHack from './ChildCallbackHack';
+import HeadlessScenePlayer from './HeadlessScenePlayer';
+import Tag from "../library/Tag";
+import AudioGroup from "../sceneDetail/AudioGroup";
+import EffectGroup from "../sceneDetail/EffectGroup";
+import TextGroup from "../sceneDetail/TextGroup";
+import TimingGroup from "../sceneDetail/TimingGroup";
+
+const {getCurrentWindow, Menu, MenuItem, app} = remote;
 
 const keyMap = {
   playPause: ['Play/Pause', 'space'],
@@ -70,7 +71,7 @@ export default class Player extends React.Component {
           showText={true}
           advanceHack={this.state.imagePlayerAdvanceHack}
           didFinishLoading={this.playMain.bind(this)}
-          setHistoryPaths={this.setHistoryPaths.bind(this)} />
+          setHistoryPaths={this.setHistoryPaths.bind(this)}/>
 
         {this.props.overlayScene && (
           <HeadlessScenePlayer
@@ -84,7 +85,7 @@ export default class Player extends React.Component {
             showEmptyState={false}
             showText={false}
             didFinishLoading={this.playOverlay.bind(this)}
-            setHistoryPaths={this.nop.bind(this)} />
+            setHistoryPaths={this.nop.bind(this)}/>
         )}
 
         <div className={`u-button-row ${this.state.isPlaying ? 'u-show-on-hover-only' : ''}`}>
@@ -141,13 +142,13 @@ export default class Player extends React.Component {
               onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
             <AudioGroup
-                scene={this.props.scene}
-                onUpdateScene={this.props.onUpdateScene.bind(this)} />
+              scene={this.props.scene}
+              onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
             <TextGroup
               scene={this.props.scene}
               isPlayer={true}
-              onUpdateScene={this.props.onUpdateScene.bind(this)} />
+              onUpdateScene={this.props.onUpdateScene.bind(this)}/>
           </div>
         )}
 
@@ -175,29 +176,29 @@ export default class Player extends React.Component {
       {
         label: app.getName(),
         submenu: [
-          { role: 'quit' },
+          {role: 'quit'},
         ],
       },
       {
         label: 'Edit',
         submenu: [
-          { role: 'undo' },
-          { role: 'redo' },
-          { type: 'separator' },
-          { role: 'cut' },
-          { role: 'copy' },
-          { role: 'paste' },
-          { role: 'pasteandmatchstyle' },
-          { role: 'delete' },
-          { role: 'selectall' }
+          {role: 'undo'},
+          {role: 'redo'},
+          {type: 'separator'},
+          {role: 'cut'},
+          {role: 'copy'},
+          {role: 'paste'},
+          {role: 'pasteandmatchstyle'},
+          {role: 'delete'},
+          {role: 'selectall'}
         ]
       },
       {
         label: 'View',
         submenu: [
-          { role: 'reload' },
-          { role: 'forcereload' },
-          { role: 'toggledevtools' },
+          {role: 'reload'},
+          {role: 'forcereload'},
+          {role: 'toggledevtools'},
         ]
       },
       {
@@ -285,30 +286,26 @@ export default class Player extends React.Component {
     contextMenu.popup({});
   };
 
-  playPause() {
-    if (this.state.isPlaying) { this.pause() } else { this.play() }
-  }
-
   play() {
-    this.setState({ isPlaying: true, historyOffset: 0 });
+    this.setState({isPlaying: true, historyOffset: 0});
   }
 
   playMain() {
-    this.setState({ isMainLoaded: true });
+    this.setState({isMainLoaded: true});
     if (!this.props.overlayScene || this.state.isOverlayLoaded) {
       this.play();
     }
   }
 
   playOverlay() {
-    this.setState({ isOverlayLoaded: true });
+    this.setState({isOverlayLoaded: true});
     if (this.state.isMainLoaded) {
       this.play();
     }
   }
 
   pause() {
-    this.setState({ isPlaying: false });
+    this.setState({isPlaying: false});
   }
 
   historyBack() {
@@ -337,27 +334,29 @@ export default class Player extends React.Component {
   }
 
   setHistoryPaths(paths: Array<HTMLImageElement>) {
-    this.setState({ historyPaths: paths });
+    this.setState({historyPaths: paths});
   }
-  /**
-   * Toggles if Player Window stays on top
-   */
+
+  /* Menu (hotkey) options DON'T DELETE */
+
+  playPause() {
+    if (this.state.isPlaying) {
+      this.pause()
+    } else {
+      this.play()
+    }
+  }
+
   alwaysOnTop() {
     const window = getCurrentWindow();
     window.setAlwaysOnTop(!window.isAlwaysOnTop());
   }
 
-  /**
-   * Shows/Hides the MenuBar
-   */
   toggleMenuBarDisplay() {
     const window = getCurrentWindow();
     window.setMenuBarVisibility(!window.isMenuBarVisible());
   }
 
-  /** 
-  * Toggles fullscreen mode and MenuBar visibility
-  */
   toggleFullscreen() {
     const window = getCurrentWindow();
     window.setFullScreen(!window.isFullScreen());

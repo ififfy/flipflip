@@ -1,17 +1,17 @@
+import IncomingMessage = Electron.IncomingMessage;
 import * as React from 'react';
 import request from 'request';
 import fs from "fs";
 import {outputFile} from "fs-extra";
 import wretch from "wretch";
 import gifInfo from 'gif-info';
-import IncomingMessage = Electron.IncomingMessage;
 
-import ImageView from './ImageView';
-import TIMING_FUNCTIONS from '../../TIMING_FUNCTIONS';
-import {IF, TF, ZF, HTF, VTF, BT, ST} from '../../const';
-import ChildCallbackHack from './ChildCallbackHack';
-import {urlToPath, getRandomListItem, getSourceType, getFileName, getCachePath} from '../../utils';
+import {BT, HTF, IF, ST, TF, VTF, ZF} from '../../const';
+import {getCachePath, getFileName, getRandomListItem, getSourceType, urlToPath} from '../../utils';
 import Config from "../../Config";
+import TIMING_FUNCTIONS from '../../TIMING_FUNCTIONS';
+import ChildCallbackHack from './ChildCallbackHack';
+import ImageView from './ImageView';
 
 class GifInfo {
   animated: boolean;
@@ -30,8 +30,8 @@ export default class ImagePlayer extends React.Component {
     timingFunction: string,
     timingConstant: string,
     zoomType: string,
-    backgroundType : string;
-    backgroundColor : string;
+    backgroundType: string;
+    backgroundColor: string;
     effectLevel: number,
     horizTransType: string,
     vertTransType: string,
@@ -58,7 +58,7 @@ export default class ImagePlayer extends React.Component {
   _isMounted = false;
 
   render() {
-    if (this.state.pastAndLatest.length < 1) return <div className="ImagePlayer m-empty" />;
+    if (this.state.pastAndLatest.length < 1) return <div className="ImagePlayer m-empty"/>;
 
     const imgs = Array<HTMLImageElement>();
 
@@ -73,7 +73,7 @@ export default class ImagePlayer extends React.Component {
       imgs.push(img);
     } else {
       const max = this.props.fadeEnabled ? 3 : 2;
-      for (let i=1; i<max; i++) {
+      for (let i = 1; i < max; i++) {
         const img = this.state.pastAndLatest[this.state.pastAndLatest.length - i];
         if (img) {
           imgs.push(img);
@@ -118,7 +118,7 @@ export default class ImagePlayer extends React.Component {
 
     return (
       <div className={className}>
-        <div className={`u-fill-container ${this.props.backgroundType == BT.color ?  '' : 'u-fill-image-blur'}`} style={{
+        <div className={`u-fill-container ${this.props.backgroundType == BT.color ? '' : 'u-fill-image-blur'}`} style={{
           background: this.props.backgroundType == BT.color ? this.props.backgroundColor : null,
           backgroundImage: this.props.backgroundType == BT.color ? null : `url("${imgs[0].src}")`,
         }}
@@ -128,7 +128,7 @@ export default class ImagePlayer extends React.Component {
             img={img}
             key={(img as any).key}
             fadeState={this.props.fadeEnabled ? (img.src === imgs[0].src ? 'in' : 'out') : 'none'}
-            fadeDuration={this.state.timeToNextFrame / 2} />;
+            fadeDuration={this.state.timeToNextFrame / 2}/>;
         })}
       </div>
     );
@@ -171,7 +171,7 @@ export default class ImagePlayer extends React.Component {
       return;
     }
 
-    for (let i=0; i<this.props.maxLoadingAtOnce; i++) {
+    for (let i = 0; i < this.props.maxLoadingAtOnce; i++) {
       this.runFetchLoop(i, true);
     }
 
@@ -221,7 +221,7 @@ export default class ImagePlayer extends React.Component {
       setTimeout(this.runFetchLoop.bind(this, i), 0);
     };
 
-    function toArrayBuffer(buf : Buffer) {
+    function toArrayBuffer(buf: Buffer) {
       let ab = new ArrayBuffer(buf.length);
       let view = new Uint8Array(ab);
       for (let i = 0; i < buf.length; ++i) {
@@ -308,7 +308,7 @@ export default class ImagePlayer extends React.Component {
         if (url.includes("file:///")) {
           processInfo(gifInfo(toArrayBuffer(fs.readFileSync(urlToPath(url)))));
         } else {
-          request.get({url, encoding: null}, function(err: Error, res: IncomingMessage, body: Buffer) {
+          request.get({url, encoding: null}, function (err: Error, res: IncomingMessage, body: Buffer) {
             if (err) {
               console.error(err);
               return;
@@ -327,7 +327,7 @@ export default class ImagePlayer extends React.Component {
   advance(isStarting = false, schedule = true, ignoreIsPlayingStatus = false) {
     let nextPastAndLatest = this.state.pastAndLatest;
     let nextHistoryPaths = this.state.historyPaths;
-    let nextImg : HTMLImageElement;
+    let nextImg: HTMLImageElement;
     if (this.state.readyToDisplay.length) {
       nextImg = this.state.readyToDisplay.shift();
       nextPastAndLatest = nextPastAndLatest.concat([nextImg]);

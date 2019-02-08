@@ -3,7 +3,7 @@ import {BT, HTF, IF, TF, VTF, ZF} from "./const";
 export class SceneSettings {
   timingFunction = TF.constant;
   timingConstant = "1000";
-  imageTypeFilter= IF.any;
+  imageTypeFilter = IF.any;
   zoomType = ZF.none;
   effectLevel = 5;
   horizTransType = HTF.none;
@@ -55,7 +55,7 @@ export default class Config {
   remoteSettings = new RemoteSettings();
   caching = new CacheSettings();
 
-  constructor(init?:Partial<SceneSettings>) {
+  constructor(init?: Partial<SceneSettings>) {
     Object.assign(this, init);
   }
 }

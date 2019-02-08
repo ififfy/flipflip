@@ -9,20 +9,20 @@ export default new Map<String, String>([
   ['if.gifs', 'Only gifs'],
   ['if.stills', 'Only stills'],
 
-  ['zf.none','No zoom'],
-  ['zf.in','Zoom In'],
-  ['zf.out','Zoom Out'],
+  ['zf.none', 'No zoom'],
+  ['zf.in', 'Zoom In'],
+  ['zf.out', 'Zoom Out'],
 
   ['bt.blur', 'Blurred'],
   ['bt.color', 'Solid Color'],
 
-  ['htf.none','None'],
-  ['htf.left','Left'],
-  ['htf.right','Right'],
+  ['htf.none', 'None'],
+  ['htf.left', 'Left'],
+  ['htf.right', 'Right'],
 
-  ['vtf.none','None'],
-  ['vtf.up','Up'],
-  ['vtf.down','Down'],
+  ['vtf.none', 'None'],
+  ['vtf.up', 'Up'],
+  ['vtf.down', 'Down'],
 
   ['tot.url', 'URL'],
   ['tot.hastebin', 'Hastebin'],

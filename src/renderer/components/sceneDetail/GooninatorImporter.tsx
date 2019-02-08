@@ -1,15 +1,16 @@
+import {remote} from "electron";
 import * as React from 'react'
 import {sep} from "path";
-import {remote} from "electron";
-import {TOT, GT} from '../../const';
-import SimpleTextInput from '../ui/SimpleTextInput';
+
+import {GT, TOT} from '../../const';
 import SimpleOptionPicker from "../ui/SimpleOptionPicker";
+import SimpleTextInput from '../ui/SimpleTextInput';
 
 export default class GooninatorImporter extends React.Component {
   readonly props: {
     addSources(sources: Array<string>): void,
-    onChangeTextKind(kind: string) : void,
-    onChangeTextSource(hbID: string) : void,
+    onChangeTextKind(kind: string): void,
+    onChangeTextSource(hbID: string): void,
     onDidImport(): void,
   };
 
@@ -26,7 +27,7 @@ export default class GooninatorImporter extends React.Component {
           label="Paste a gooninator URL for import:"
           value={this.state.importURL}
           onChange={this.importURLChange.bind(this)}
-          isEnabled={true} />
+          isEnabled={true}/>
 
         <SimpleOptionPicker
           label="Import Type"
@@ -46,7 +47,7 @@ export default class GooninatorImporter extends React.Component {
         <div className="u-button u-float-right" onClick={this.doImport.bind(this)}>
           Import
         </div>
-        <div style={{clear: 'both'}} />
+        <div style={{clear: 'both'}}/>
       </div>
     );
   }
@@ -123,7 +124,7 @@ export default class GooninatorImporter extends React.Component {
   };
 
   addRootDir() {
-    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(),{properties: ['openDirectory']});
+    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']});
     if (!result) return;
     this.setState({rootDir: result});
   }

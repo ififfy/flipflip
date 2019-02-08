@@ -1,8 +1,8 @@
 import * as React from "react";
 import Sortable from "sortablejs"
 
-import Tag from "./Tag";
 import {array_move, removeDuplicatesBy} from "../../utils";
+import Tag from "./Tag";
 
 export default class TagManager extends React.Component {
   readonly props: {
@@ -30,7 +30,8 @@ export default class TagManager extends React.Component {
 
         <div className="TagManager__Buttons">
           <div className={`u-button ${this.state.removeTags ? 'u-disabled' : 'u-clickable'}`}
-               onClick={this.state.removeTags ? this.nop : this.onAdd.bind(this)}>+ Add</div>
+               onClick={this.state.removeTags ? this.nop : this.onAdd.bind(this)}>+ Add
+          </div>
           {this.state.removeTags && (
             <div className="u-button u-float-left u-clickable"
                  onClick={this.toggleRemoveMode.bind(this)}>Done</div>
@@ -58,7 +59,7 @@ export default class TagManager extends React.Component {
                     type="text"
                     value={tag.name}
                     onBlur={this.onEdit.bind(this, -1)}
-                    onChange={this.onEditTag.bind(this, tag.id)} />
+                    onChange={this.onEditTag.bind(this, tag.id)}/>
                 </form>
               )}
             </div>
@@ -106,7 +107,7 @@ export default class TagManager extends React.Component {
   }
 
   onAdd() {
-    let id= this.props.tags.length + 1;
+    let id = this.props.tags.length + 1;
     this.props.tags.forEach((s) => {
       id = Math.max(s.id + 1, id);
     });
@@ -126,18 +127,18 @@ export default class TagManager extends React.Component {
     // If user left input blank, remove it from list of sources
     // Also prevent user from inputing duplicate source
     this.props.onUpdateTags(
-        removeDuplicatesBy((t: Tag) => t.name,
-            this.props.tags.filter((t) => t.name != "")));
+      removeDuplicatesBy((t: Tag) => t.name,
+        this.props.tags.filter((t) => t.name != "")));
   }
 
   onEditTag(tagID: number, e: React.FormEvent<HTMLInputElement>) {
     this.props.onUpdateTags(this.props.tags.map(
-        function map(tag: Tag) {
-          if (tag.id == tagID) {
-            tag.name = e.currentTarget.value;
-          }
-          return tag;
-        })
+      function map(tag: Tag) {
+        if (tag.id == tagID) {
+          tag.name = e.currentTarget.value;
+        }
+        return tag;
+      })
     );
   }
 

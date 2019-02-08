@@ -1,14 +1,14 @@
 import * as React from 'react';
-import {TOT} from "../../const";
 
-import SimpleOptionPicker from "../ui/SimpleOptionPicker";
-import SimpleURLInput from "../ui/SimpleURLInput";
-import SimpleNumberInput from "../ui/SimpleNumberInput";
-import ControlGroup from "./ControlGroup";
-import Scene from "../../Scene";
+import {TOT} from "../../const";
 import {SceneSettings} from "../../Config";
-import SimpleTextInput from "../ui/SimpleTextInput";
+import Scene from "../../Scene";
+import ControlGroup from "./ControlGroup";
 import SimpleColorPicker from "../ui/SimpleColorPicker";
+import SimpleNumberInput from "../ui/SimpleNumberInput";
+import SimpleOptionPicker from "../ui/SimpleOptionPicker";
+import SimpleTextInput from "../ui/SimpleTextInput";
+import SimpleURLInput from "../ui/SimpleURLInput";
 
 export default class TextGroup extends React.Component {
   readonly props: {
@@ -29,22 +29,24 @@ export default class TextGroup extends React.Component {
             onChange={this.onChangeTextKind.bind(this)}
             label="Source"
             value={this.props.scene.textKind}
-            keys={Object.values(TOT)} />
+            keys={Object.values(TOT)}/>
           <SimpleURLInput
             isEnabled={true}
             onChange={this.onChangeTextSource.bind(this)}
             label={(() => {
               switch (this.props.scene.textKind) {
-                case TOT.hastebin: return "Hastebin ID";
-                case TOT.url: return "URL";
+                case TOT.hastebin:
+                  return "Hastebin ID";
+                case TOT.url:
+                  return "URL";
               }
             })()}
-            value={this.props.scene.textSource} />
+            value={this.props.scene.textSource}/>
           <br/>
         </div>
         {!this.props.isPlayer && (
           <div className="ControlSubgroup">
-            <button className="AdvancedButton" onClick={this.toggleFontOptions.bind(this)} >Font Options</button>
+            <button className="AdvancedButton" onClick={this.toggleFontOptions.bind(this)}>Font Options</button>
           </div>
         )}
         {this.state.showFontSettings && (
@@ -65,7 +67,7 @@ export default class TextGroup extends React.Component {
               <SimpleColorPicker
                 label="Blink Color"
                 value={this.props.scene.blinkColor}
-                onChange={this.onChangeBlinkColor.bind(this)} />
+                onChange={this.onChangeBlinkColor.bind(this)}/>
             </div>
             <hr/>
             <div className="ControlSubgroup">
@@ -83,7 +85,7 @@ export default class TextGroup extends React.Component {
               <SimpleColorPicker
                 label="Caption Color"
                 value={this.props.scene.captionColor}
-                onChange={this.onChangeCaptionColor.bind(this)} />
+                onChange={this.onChangeCaptionColor.bind(this)}/>
             </div>
             <hr/>
             <div className="ControlSubgroup">
@@ -101,7 +103,7 @@ export default class TextGroup extends React.Component {
               <SimpleColorPicker
                 label="Big Caption Color"
                 value={this.props.scene.captionBigColor}
-                onChange={this.onChangeCaptionBigColor.bind(this)} />
+                onChange={this.onChangeCaptionBigColor.bind(this)}/>
             </div>
           </div>
         )}

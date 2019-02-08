@@ -2,12 +2,12 @@ import * as React from 'react';
 
 import Scene from '../../Scene';
 import SourcePicker from './SourcePicker';
-import LibrarySource from "../library/LibrarySource";
-import TimingGroup from "./TimingGroup";
-import EffectGroup from "./EffectGroup";
-import TextGroup from "./TextGroup";
 import AudioGroup from "./AudioGroup";
+import EffectGroup from "./EffectGroup";
 import ImageGroup from "./ImageGroup";
+import TextGroup from "./TextGroup";
+import TimingGroup from "./TimingGroup";
+import LibrarySource from "../library/LibrarySource";
 
 type Props = {
   scene: Scene,
@@ -37,7 +37,7 @@ export default class SceneDetail extends React.Component {
 
   render() {
     return (
-      <div className="SceneDetail"  onKeyDown={this.secretHotkey.bind(this)} tabIndex={0}>
+      <div className="SceneDetail" onKeyDown={this.secretHotkey.bind(this)} tabIndex={0}>
 
         <div className="u-button-row">
           <div className="u-abs-center">
@@ -49,7 +49,7 @@ export default class SceneDetail extends React.Component {
                   ref={this.nameInputRef}
                   value={this.props.scene.name}
                   onBlur={this.endEditingName.bind(this)}
-                  onChange={this.onChangeName.bind(this)} />
+                  onChange={this.onChangeName.bind(this)}/>
               </form>
             )}
             {!this.state.isEditingName && (
@@ -67,7 +67,8 @@ export default class SceneDetail extends React.Component {
           </div>
 
           <div className="u-button-row-right">
-            <div onClick={this.props.scene.sources.length > 0 ? this.play.bind(this) : this.nop.bind(this)} className={`u-clickable u-button ${this.props.scene.sources.length > 0 ? '' : 'u-disabled'}`}>
+            <div onClick={this.props.scene.sources.length > 0 ? this.play.bind(this) : this.nop.bind(this)}
+                 className={`u-clickable u-button ${this.props.scene.sources.length > 0 ? '' : 'u-disabled'}`}>
               Play
             </div>
           </div>
@@ -76,25 +77,25 @@ export default class SceneDetail extends React.Component {
         <div className="SceneDetail__Content ControlGroupGroup">
           <TimingGroup
             scene={this.props.scene}
-            onUpdateScene={this.props.onUpdateScene.bind(this)} />
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
           <EffectGroup
             scene={this.props.scene}
             allScenes={this.props.allScenes}
-            onUpdateScene={this.props.onUpdateScene.bind(this)} />
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
           <ImageGroup
             scene={this.props.scene}
-            onUpdateScene={this.props.onUpdateScene.bind(this)} />
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
           <AudioGroup
             scene={this.props.scene}
-            onUpdateScene={this.props.onUpdateScene.bind(this)} />
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
           <TextGroup
             scene={this.props.scene}
             isPlayer={false}
-            onUpdateScene={this.props.onUpdateScene.bind(this)} />
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
           <div className="ControlGroup m-wide">
             <div className="ControlGroup__Title">Sources</div>
@@ -135,7 +136,7 @@ export default class SceneDetail extends React.Component {
 
   // Use alt+P to access import modal
   secretHotkey(e: KeyboardEvent) {
-    if (e.altKey && e.key=='p') {
+    if (e.altKey && e.key == 'p') {
       this.toggleURLImportModal();
     }
   }
@@ -153,9 +154,7 @@ export default class SceneDetail extends React.Component {
     this.props.onUpdateScene(this.props.scene, fn);
   }
 
-  onChangeName(e: React.FormEvent<HTMLInputElement>) {
-    this.update((s) => { s.name = e.currentTarget.value; });
-  }
+  onChangeName(e: React.FormEvent<HTMLInputElement>) { this.update((s) => { s.name = e.currentTarget.value; }); }
 
   onChangeSources(sources: Array<LibrarySource>) { this.update((s) => { s.sources = sources; }); }
 };

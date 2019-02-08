@@ -21,15 +21,15 @@ export default class Library extends React.Component {
       <div className="Library">
         <div className="u-button-row">
           <div className="u-abs-center">
-              <h2 className="Library__LibraryHeader">Library</h2>
+            <h2 className="Library__LibraryHeader">Library</h2>
           </div>
           {!this.props.isSelect && (
             <div className="u-button-row-right">
-                <div
-                    className="Library__ManageTags u-button u-clickable"
-                    onClick={this.props.manageTags.bind(this)}>
-                  Manage Tags
-                </div>
+              <div
+                className="Library__ManageTags u-button u-clickable"
+                onClick={this.props.manageTags.bind(this)}>
+                Manage Tags
+              </div>
             </div>
           )}
           <div className="BackButton u-button u-clickable" onClick={this.props.goBack}>Back</div>

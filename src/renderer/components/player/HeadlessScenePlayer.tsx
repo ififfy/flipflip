@@ -1,18 +1,17 @@
 import * as React from 'react';
 import * as fs from "fs";
-import Snoowrap from 'snoowrap';
 import recursiveReaddir from 'recursive-readdir';
 import fileURL from 'file-url';
 import wretch from 'wretch';
 
-import {CancelablePromise, getCachePath, getFileGroup, getFileName, getSourceType} from "../../utils";
-import Scene from '../../Scene';
-import Progress from '../ui/Progress';
-import ImagePlayer from './ImagePlayer';
-import CaptionProgram from './CaptionProgram';
-import {TOT, IF, ST} from '../../const';
-import ChildCallbackHack from './ChildCallbackHack';
+import {IF, ST, TOT} from '../../const';
+import {CancelablePromise, getCachePath, getFileName, getSourceType} from "../../utils";
 import Config from "../../Config";
+import Scene from '../../Scene';
+import CaptionProgram from './CaptionProgram';
+import ChildCallbackHack from './ChildCallbackHack';
+import ImagePlayer from './ImagePlayer';
+import Progress from '../ui/Progress';
 
 function isImage(path: string): boolean {
   const p = path.toLowerCase();
@@ -41,9 +40,12 @@ function filterPathsToJustImages(imageTypeFilter: string, paths: Array<string>):
 
 function textURL(kind: string, src: string): string {
   switch (kind) {
-    case TOT.url: return src;
-    case TOT.hastebin: return `https://hastebin.com/raw/${src}`;
-    default: return src;
+    case TOT.url:
+      return src;
+    case TOT.hastebin:
+      return `https://hastebin.com/raw/${src}`;
+    default:
+      return src;
   }
 }
 
@@ -58,7 +60,7 @@ function getTumblrAPIKey(config: Config, overlay: boolean, attempt: number): str
     let nextAPIKey = null;
     for (let key of config.remoteSettings.tumblrOther) {
       if (key != config.remoteSettings.tumblrDefault &&
-          key != config.remoteSettings.tumblrOverlay) {
+        key != config.remoteSettings.tumblrOverlay) {
         if (attempt == 0) {
           nextAPIKey = key;
         } else {
@@ -163,7 +165,7 @@ function loadTumblr(config: Config, url: string, filter: string, page: number, o
   // TumblrID takes the form of <blog_name>.tumblr.com
   let tumblrID = url.replace(/https?:\/\//, "");
   tumblrID = tumblrID.replace("/", "");
-  let tumblrURL = "https://api.tumblr.com/v2/blog/" + tumblrID + "/posts/photo?api_key=" + API_KEY + "&offset=" + (page*20);
+  let tumblrURL = "https://api.tumblr.com/v2/blog/" + tumblrID + "/posts/photo?api_key=" + API_KEY + "&offset=" + (page * 20);
   return new CancelablePromise((resolve, reject) => {
     wretch(tumblrURL)
       .get()
@@ -284,7 +286,7 @@ export default class HeadlessScenePlayer extends React.Component {
 
   render() {
     // Returns true if array is empty, or only contains empty arrays
-    const isEmpty = function(allURLs: any[]): boolean {
+    const isEmpty = function (allURLs: any[]): boolean {
       return Array.isArray(allURLs) && allURLs.every(isEmpty);
     };
 
@@ -315,8 +317,8 @@ export default class HeadlessScenePlayer extends React.Component {
             timingFunction={this.props.scene.timingFunction}
             timingConstant={this.props.scene.timingConstant}
             zoomType={this.props.scene.zoomType}
-            backgroundType = {this.props.scene.backgroundType}
-            backgroundColor = {this.props.scene.backgroundColor}
+            backgroundType={this.props.scene.backgroundType}
+            backgroundColor={this.props.scene.backgroundColor}
             effectLevel={this.props.scene.effectLevel}
             horizTransType={this.props.scene.horizTransType}
             vertTransType={this.props.scene.vertTransType}
@@ -331,7 +333,7 @@ export default class HeadlessScenePlayer extends React.Component {
         {showCaptionProgram && (
           <CaptionProgram
             config={this.props.config}
-            url={textURL(this.props.scene.textKind, this.props.scene.textSource)} />
+            url={textURL(this.props.scene.textKind, this.props.scene.textSource)}/>
         )}
 
         {showLoadingIndicator && (
@@ -358,10 +360,10 @@ export default class HeadlessScenePlayer extends React.Component {
 
       // Because of rendering lag, always display the NEXT source, unless this is the last one
       let message;
-      if ((n+1) == this.props.scene.sources.length) {
+      if ((n + 1) == this.props.scene.sources.length) {
         message = d;
       } else {
-        message = this.props.scene.sources[n+1].url;
+        message = this.props.scene.sources[n + 1].url;
       }
       if (this.props.opacity != 1) {
         message = "<p>Loading Overlay...</p>" + message;
@@ -381,7 +383,7 @@ export default class HeadlessScenePlayer extends React.Component {
           // If this is a remote URL, queue up the next promise
           if (loadPromise.page) {
             newPromiseQueue.push(
-                getPromise(this.props.config, d, this.props.scene.imageTypeFilter, loadPromise.page + 1, this.props.opacity != 1));
+              getPromise(this.props.config, d, this.props.scene.imageTypeFilter, loadPromise.page + 1, this.props.opacity != 1));
           }
 
           if (n < this.props.scene.sources.length) {
@@ -417,7 +419,7 @@ export default class HeadlessScenePlayer extends React.Component {
               // Add the next promise to the queue
               let newPromiseQueue = this.state.promiseQueue;
               newPromiseQueue.push(
-                  getPromise(this.props.config, promise.source, this.props.scene.imageTypeFilter, promise.page + 1, this.props.opacity != 1));
+                getPromise(this.props.config, promise.source, this.props.scene.imageTypeFilter, promise.page + 1, this.props.opacity != 1));
 
               this.setState({allURLs: newAllURLs, promiseQueue: newPromiseQueue});
             }
@@ -429,7 +431,6 @@ export default class HeadlessScenePlayer extends React.Component {
     };
 
     sourceLoop();
-
   }
 
   componentWillUnmount() {

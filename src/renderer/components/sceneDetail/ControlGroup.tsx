@@ -9,12 +9,12 @@ export default class ControlGroup extends React.Component {
 
   render() {
     return (
-        <form
-            className={`ControlGroup ${this.props.isNarrow ? 'm-narrow' : 'm-wide'}`}
-            onSubmit={this.preventDefault.bind(this)}>
-          <div className="ControlGroup__Title">{this.props.title}</div>
-          {this.props.children}
-        </form>
+      <form
+        className={`ControlGroup ${this.props.isNarrow ? 'm-narrow' : 'm-wide'}`}
+        onSubmit={this.preventDefault.bind(this)}>
+        <div className="ControlGroup__Title">{this.props.title}</div>
+        {this.props.children}
+      </form>
     );
   }
 

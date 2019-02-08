@@ -1,4 +1,5 @@
 import * as React from 'react';
+
 import en from '../../en';
 
 export default class SimpleOptionPicker extends React.Component {
@@ -12,7 +13,7 @@ export default class SimpleOptionPicker extends React.Component {
   };
 
   render() {
-    return ( 
+    return (
       <div className="SimpleOptionPicker">
         {this.props.label && (
           <label>{this.props.label}</label>
@@ -21,12 +22,12 @@ export default class SimpleOptionPicker extends React.Component {
           value={this.props.value}
           onChange={this.onChange.bind(this)}>
           {this.props.keys.map((k, index) => {
-            const text  = this.props.parseKeyFunction
+            const text = this.props.parseKeyFunction
               ? this.props.parseKeyFunction(k)
               : (
                 en.get(k) != null ? en.get(k) : k
               );
-            return <option value={k} key={k} disabled={this.props.disableFirst && index==0}>{text}</option>;
+            return <option value={k} key={k} disabled={this.props.disableFirst && index == 0}>{text}</option>;
           })}
         </select>
       </div>

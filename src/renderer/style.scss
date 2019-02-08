@@ -33,7 +33,7 @@ html, body {
 }
 
 body {
-  font-family: "system";
+  font-family: system, serif;
   font-size: 14px;
   color: $bodyColor;
 }
@@ -44,12 +44,10 @@ a {
 
 @mixin noselect {
   -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-      -khtml-user-select: none; /* Konqueror HTML */
-        -moz-user-select: none; /* Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome and Opera */
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
 }
 
 @mixin mouseover {
@@ -59,8 +57,7 @@ a {
 }
 
 @mixin yellowGradient {
-  background-color: $buttonBarColorTop;
-  background: linear-gradient(180deg, $buttonBarColorTop 0%, $buttonBarColorBottom 100%);
+  background: $buttonBarColorTop linear-gradient(180deg, $buttonBarColorTop 0%, $buttonBarColorBottom 100%);
 }
 
 @mixin buttonBarBackground {
@@ -70,9 +67,11 @@ a {
 
 .app {
   position: fixed;
-  top: 0; right: 0; bottom: 0; left: 0;
-  background-color: rgb(52,104,152);
-  background: linear-gradient(180deg, rgba(52,104,152,1) 0%, rgba(24,50,76,1) 100%);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgb(52, 104, 152) linear-gradient(180deg, rgba(52, 104, 152, 1) 0%, rgba(24, 50, 76, 1) 100%);
 }
 
 .u-hidden {
@@ -143,8 +142,7 @@ a {
   color: $black !important;
   cursor: pointer;
 
-  background-color: $buttonTop;
-  background: linear-gradient(180deg, $buttonTop 0%, $buttonBottom 100%);
+  background: $buttonTop linear-gradient(180deg, $buttonTop 0%, $buttonBottom 100%);
 
   &:not(.u-disabled):hover {
     border: 1px solid $white;
@@ -153,13 +151,19 @@ a {
 
 .u-fill-container {
   position: absolute;
-  top: 0; right: 0; bottom: 0; left: 0;  
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   overflow: hidden;
 }
 
 .u-fill-image-blur {
   position: absolute;
-  top: 0; right: 0; bottom: 0; left: 0;  
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -209,7 +213,8 @@ a {
 
 .u-edit {
   color: #444 !important;
-  transform: scale(-1,1);
+  transform: scale(-1, 1);
+
   &:before {
     content: '✎';
   }
@@ -218,6 +223,7 @@ a {
 .u-random {
   cursor: pointer;
   font-size: 20px;
+
   &:before {
     content: '🎲';
   }
@@ -226,6 +232,7 @@ a {
 .u-config {
   cursor: pointer;
   font-size: 20px;
+
   &:before {
     content: '⚙';
   }
@@ -233,7 +240,7 @@ a {
 
 .u-show-on-hover-only {
   border-bottom: none;
-  background: rgba(0,0,0,0);
+  background: rgba(0, 0, 0, 0);
 
   & > * {
     visibility: hidden;
@@ -263,20 +270,25 @@ a {
   .About {
     display: inline-block;
     width: 100%;
+
     > div {
       margin-bottom: $smallPadding*2;
     }
+
     .Header {
       h1 {
         margin: 0;
       }
+
       div {
         margin-left: $smallPadding;
         display: inline-block;
+
         &.SimpleOptionPicker {
           vertical-align: 3px;
         }
       }
+
       select {
         height: 1.5em;
       }
@@ -365,10 +377,7 @@ a {
 .ControlGroup {
   flex-grow: 1;
 
-  margin-top: 1em;
-  margin-bottom: $smallPadding * 3;
-  margin-left: 0.5em;
-  margin-right: 0.5em;
+  margin: 1em 0.5em $smallPadding * 3;
 
   border: 1px solid $black;
   padding: ($smallPadding * 2) $smallPadding $smallPadding $smallPadding;
@@ -430,6 +439,7 @@ a {
     max-width: 210px;
   }
 }
+
 .SimpleNumberInput {
   input[type=number] {
     font-size: 16px;
@@ -439,6 +449,7 @@ a {
     margin-bottom: 0;
   }
 }
+
 .SimpleTextInput {
   input[type=text] {
     font-size: 16px;
@@ -448,6 +459,7 @@ a {
     margin-bottom: 0;
   }
 }
+
 .SimpleSliderInput {
   input[type=range] {
     -webkit-appearance: none;
@@ -464,7 +476,6 @@ a {
 
     &::-webkit-slider-thumb {
       -webkit-appearance: none;
-      appearance: none;
       width: 17px;
       height: 17px;
       border-radius: 50%;
@@ -486,11 +497,12 @@ label.SimpleCheckbox {
   display: block;
   padding-left: 15px;
   text-indent: -15px;
+
   input {
     width: 13px;
     height: 13px;
     padding: 0;
-    margin:0;
+    margin: 0;
     vertical-align: bottom;
     position: relative;
     top: -1px;
@@ -563,9 +575,11 @@ label.SimpleCheckbox {
       display: none;
     }
   }
+
   > div {
     margin-top: 0 !important;
     color: black;
+
     > div > div > div > div > input {
       vertical-align: -2px;
     }
@@ -574,6 +588,7 @@ label.SimpleCheckbox {
 
 .SourcePicker {
   outline: none;
+
   .SourcePicker__Buttons {
     height: 3.2rem;
 
@@ -734,6 +749,7 @@ label.SimpleCheckbox {
       &.u-destructive-bg {
         color: $white !important;
       }
+
       &:not(.u-destructive-bg) {
         color: $black !important;
       }
@@ -744,6 +760,7 @@ label.SimpleCheckbox {
 
       .TagManager_TagTitle {
         text-align: center;
+
         input {
           max-width: 7rem;
         }
@@ -779,6 +796,7 @@ label.SimpleCheckbox {
 
   .u-button-row-right {
     display: flex;
+
     .SimpleTextInput {
       display: flex;
       width: 75px;
@@ -882,21 +900,29 @@ label.SimpleCheckbox {
 
 .EmptyIndicator {
   position: fixed;
-  top: 50%; right: 0; left: 0;
+  top: 50%;
+  right: 0;
+  left: 0;
   text-align: center;
 }
 
 .Player {
   .u-button-row {
     position: absolute;
-    top: 0; right: 0; left: 0;
+    top: 0;
+    right: 0;
+    left: 0;
   }
 }
 
 .ImagePlayer {
   position: fixed;
-  top: 0; right: 0; bottom: 0; left: 0;
-  .ImageView img{
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  .ImageView img {
     -webkit-animation-fill-mode: forwards;
     animation-fill-mode: forwards;
     -webkit-animation-timing-function: ease-out;
@@ -1015,9 +1041,11 @@ label.SimpleCheckbox {
     height: $buttonHeight;
     margin: $barPadding;
     border: 1px solid $black;
+
     &:hover {
       background-color: rgba(0, 0, 0, 0.1);
     }
+
     &:before {
       content: '╳';
       position: relative;
@@ -1029,7 +1057,7 @@ label.SimpleCheckbox {
 .ContextMenu {
   position: fixed;
   background: white;
-  box-shadow: 0px 2px 10px #999999;
+  box-shadow: 0 2px 10px #999999;
 
   &--option {
     color: $black;
@@ -1037,6 +1065,7 @@ label.SimpleCheckbox {
     min-width: 160px;
     cursor: default;
     font-size: 12px;
+
     &:hover {
       background: linear-gradient(to top, #555, #333);
       color: white;
@@ -1086,7 +1115,8 @@ label.SimpleCheckbox {
   vertical-align: bottom;
   padding-bottom: 20vmin;
   transition: opacity 0.5s ease-in-out;
-  -webkit-text-stroke-width: 1px; -webkit-text-stroke-color: black;
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black;
 }
 
 .text-caption-big {
@@ -1108,15 +1138,15 @@ label.SimpleCheckbox {
       .translate-#{$x}-#{$y}-zoom-#{$z}s img {
         -webkit-animation: kb-#{$x}-#{$y}-zoom #{$z}s;
         animation: kb-#{$x}-#{$y} #{$z}-zoom #{$z}s;
-        -webkit-transform: scale(1,1);
-        transform: scale(1,1);
+        -webkit-transform: scale(1, 1);
+        transform: scale(1, 1);
       }
 
       .translate-#{$x}-#{$y}-zoom-out-#{$z}s img {
         -webkit-animation: kb-#{$x}-#{$y}-zoom-out #{$z}s;
         animation: kb-#{$x}-#{$y} #{$z}-zoom-out #{$z}s;
-        -webkit-transform: scale(1.5,1.5);
-        transform: scale(1.5,1.5);
+        -webkit-transform: scale(1.5, 1.5);
+        transform: scale(1.5, 1.5);
       }
     }
   }
@@ -1125,13 +1155,21 @@ label.SimpleCheckbox {
 /* Animations */
 
 @keyframes fadeIn {
-  0% {opacity: 0;}
-  100% {opacity: 1;}
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 @keyframes fadeOut {
-  0% {opacity: 1;}
-  100% {opacity: 0;}
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 /* Ken Burns effects */
@@ -1146,13 +1184,13 @@ label.SimpleCheckbox {
 
     @keyframes kb-#{$x}-#{$y}-zoom {
       100% {
-        transform: translate(percentage($x*2/100), percentage($y*2/100)) scale(2,2);
+        transform: translate(percentage($x*2/100), percentage($y*2/100)) scale(2, 2);
       }
     }
 
     @keyframes kb-#{$x}-#{$y}-zoom-out {
       100% {
-        transform: translate(percentage($x/100), percentage($y/100)) scale(1,1);
+        transform: translate(percentage($x/100), percentage($y/100)) scale(1, 1);
       }
     }
   }

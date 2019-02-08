@@ -5,7 +5,7 @@ export default class LibrarySource {
   url: string;
   tags: Array<Tag>;
 
-  constructor(init?:Partial<LibrarySource>) {
+  constructor(init?: Partial<LibrarySource>) {
     Object.assign(this, init);
   }
 }

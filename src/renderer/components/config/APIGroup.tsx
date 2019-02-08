@@ -1,8 +1,8 @@
 import * as React from 'react';
 
+import {RemoteSettings} from "../../Config";
 import ControlGroup from "../sceneDetail/ControlGroup";
 import SimpleTextInput from "../ui/SimpleTextInput";
-import {RemoteSettings} from "../../Config";
 
 export default class APIGroup extends React.Component {
   readonly props: {
@@ -34,34 +34,34 @@ export default class APIGroup extends React.Component {
         <hr/>
         <div className="ControlSubgroup">
           <SimpleTextInput
-              isEnabled={true}
-              label="Reddit Client ID"
-              value={this.props.settings.redditClientID}
-              onChange={this.onChangeRedditClientID.bind(this)}>
+            isEnabled={true}
+            label="Reddit Client ID"
+            value={this.props.settings.redditClientID}
+            onChange={this.onChangeRedditClientID.bind(this)}>
             {" "}
             <button onClick={this.paste.bind(this, this.onChangeRedditClientID.bind(this))}>Paste</button>
           </SimpleTextInput>
           <SimpleTextInput
-              isEnabled={true}
-              label="Reddit Client Secret"
-              value={this.props.settings.redditClientSecret}
-              onChange={this.onChangeRedditClientSecret.bind(this)}>
+            isEnabled={true}
+            label="Reddit Client Secret"
+            value={this.props.settings.redditClientSecret}
+            onChange={this.onChangeRedditClientSecret.bind(this)}>
             {" "}
             <button onClick={this.paste.bind(this, this.onChangeRedditClientSecret.bind(this))}>Paste</button>
           </SimpleTextInput>
           <SimpleTextInput
-              isEnabled={true}
-              label="Reddit Username"
-              value={this.props.settings.redditUsername}
-              onChange={this.onChangeRedditUsername.bind(this)}>
+            isEnabled={true}
+            label="Reddit Username"
+            value={this.props.settings.redditUsername}
+            onChange={this.onChangeRedditUsername.bind(this)}>
             {" "}
             <button onClick={this.paste.bind(this, this.onChangeRedditUsername.bind(this))}>Paste</button>
           </SimpleTextInput>
           <SimpleTextInput
-              isEnabled={true}
-              label="Reddit Password"
-              value={this.props.settings.redditPassword}
-              onChange={this.onChangeRedditPassword.bind(this)}>
+            isEnabled={true}
+            label="Reddit Password"
+            value={this.props.settings.redditPassword}
+            onChange={this.onChangeRedditPassword.bind(this)}>
             {" "}
             <button onClick={this.paste.bind(this, this.onChangeRedditPassword.bind(this))}>Paste</button>
           </SimpleTextInput>
