@@ -87,12 +87,13 @@ export default class SceneDetail extends React.Component {
             scene={this.props.scene}
             onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
-          <TextGroup
+          <AudioGroup
             scene={this.props.scene}
             onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
-          <AudioGroup
+          <TextGroup
             scene={this.props.scene}
+            isPlayer={false}
             onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
           <div className="ControlGroup m-wide">

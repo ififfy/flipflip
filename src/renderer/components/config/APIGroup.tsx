@@ -22,10 +22,10 @@ export default class APIGroup extends React.Component {
           <button onClick={this.paste.bind(this, this.onChangeDefaultTumblr.bind(this))}>Paste</button>
         </SimpleTextInput>
         <SimpleTextInput
-            isEnabled={true}
-            label="Overlay Tumblr API Key"
-            value={this.props.keys.overlayTumblr}
-            onChange={this.onChangeOverlayTumblr.bind(this)}>
+          isEnabled={true}
+          label="Overlay Tumblr API Key"
+          value={this.props.keys.overlayTumblr}
+          onChange={this.onChangeOverlayTumblr.bind(this)}>
           {" "}
           <button onClick={this.paste.bind(this, this.onChangeOverlayTumblr.bind(this))}>Paste</button>
         </SimpleTextInput>

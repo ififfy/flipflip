@@ -12,10 +12,19 @@ export class SceneSettings {
   backgroundType = BT.blur;
   backgroundColor = "#000000";
   playFullGif = false;
-  textKind = "";
-  textSource = "";
   overlaySceneID = 0;
   overlaySceneOpacity = 0.5;
+  textKind = "";
+  textSource = "";
+  blinkColor = "#FFFFFF";
+  blinkFontSize = 20;
+  blinkFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
+  captionColor = "#FFFFFF";
+  captionFontSize = 8;
+  captionFontFamily = "Helvetica Neue,Helvetica,Arial,sans-serif";
+  captionBigColor = "#FFFFFF";
+  captionBigFontSize = 12;
+  captionBigFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
 }
 
 export class APIKeys {
@@ -33,25 +42,10 @@ export class CacheSettings {
   maxSize = 5120; // Size in MB (default 5GB)
 }
 
-export class CaptionSettings {
-  blinkColor = "#FFFFFF";
-  blinkFontSize = 20;
-  blinkFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
-
-  captionColor = "#FFFFFF";
-  captionFontSize = 8;
-  captionFontFamily = "Helvetica Neue,Helvetica,Arial,sans-serif";
-
-  captionBigColor = "#FFFFFF";
-  captionBigFontSize = 12;
-  captionBigFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
-}
-
 export default class Config {
   defaultScene = new SceneSettings();
   apiKeys = new APIKeys();
   caching = new CacheSettings();
-  captions = new CaptionSettings();
 
   constructor(init?:Partial<SceneSettings>) {
     Object.assign(this, init);
