@@ -18,6 +18,15 @@ export default class Scene {
   playFullGif = false;
   textKind: string = "";
   textSource: string = "";
+  blinkColor = "#FFFFFF";
+  blinkFontSize = 20;
+  blinkFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
+  captionColor = "#FFFFFF";
+  captionFontSize = 8;
+  captionFontFamily = "Helvetica Neue,Helvetica,Arial,sans-serif";
+  captionBigColor = "#FFFFFF";
+  captionBigFontSize = 12;
+  captionBigFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
   imageSizeMin: 200;
   overlaySceneID: number = 0;
   overlaySceneOpacity: number = 0.5;

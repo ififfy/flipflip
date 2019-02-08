@@ -140,13 +140,14 @@ export default class Player extends React.Component {
               scene={this.props.scene}
               onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
-            <TextGroup
-              scene={this.props.scene}
-              onUpdateScene={this.props.onUpdateScene.bind(this)} />
-
             <AudioGroup
                 scene={this.props.scene}
                 onUpdateScene={this.props.onUpdateScene.bind(this)} />
+
+            <TextGroup
+              scene={this.props.scene}
+              isPlayer={true}
+              onUpdateScene={this.props.onUpdateScene.bind(this)} />
           </div>
         )}
 
