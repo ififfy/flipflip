@@ -62,7 +62,8 @@ const SF = { // sort function
 const ST = { // source types
   local: 'st.local',
   list: 'st.list',
-  tumblr: 'st.tumblr'
+  tumblr: 'st.tumblr',
+  reddit: 'st.reddit',
 };
 
 export {

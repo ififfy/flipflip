@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import Scene from "../../Scene";
-import Config, {APIKeys, CacheSettings, SceneSettings} from "../../Config";
+import Config, {RemoteSettings, CacheSettings, SceneSettings} from "../../Config";
 import TimingGroup from "../sceneDetail/TimingGroup";
 import EffectGroup from "../sceneDetail/EffectGroup";
 import TextGroup from "../sceneDetail/TextGroup";
@@ -73,8 +73,8 @@ export default class Library extends React.Component {
             onUpdateSettings={this.onUpdateCachingSettings.bind(this)} />
 
           <APIGroup
-            keys={this.state.config.apiKeys}
-            onUpdateKeys={this.onUpdateAPIKeys.bind(this)} />
+            settings={this.state.config.remoteSettings}
+            onUpdateSettings={this.onUpdateRemoteSettings.bind(this)} />
         </div>
 
         {this.state.errorMessage != "" && (
@@ -96,10 +96,10 @@ export default class Library extends React.Component {
   validate(): string {
     let errorMessage = "";
     // Validate any data:
-    if (this.state.config.apiKeys.defaultTumblr.length != 50) {
+    if (this.state.config.remoteSettings.tumblrDefault.length != 50) {
       errorMessage += "Invalid Default Tumblr API Key<br/>"
     }
-    if (this.state.config.apiKeys.overlayTumblr.length != 50) {
+    if (this.state.config.remoteSettings.tumblrOverlay.length != 50) {
       errorMessage += "Invalid Overlay Tumblr API Key<br/>"
     }
     if (isNaN(parseInt(this.state.config.caching.maxSize))) {
@@ -139,9 +139,9 @@ export default class Library extends React.Component {
     this.setState({config: newConfig});
   }
 
-  onUpdateAPIKeys(keys: APIKeys, fn: (keys: APIKeys) => void) {
+  onUpdateRemoteSettings(keys: RemoteSettings, fn: (keys: RemoteSettings) => void) {
     const newConfig = this.state.config;
-    fn(newConfig.apiKeys);
+    fn(newConfig.remoteSettings);
     this.setState({config: newConfig});
   }
 

@@ -16,24 +16,32 @@ export class SceneSettings {
   overlaySceneOpacity = 0.5;
   textKind = "";
   textSource = "";
+
   blinkColor = "#FFFFFF";
   blinkFontSize = 20;
   blinkFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
+
   captionColor = "#FFFFFF";
   captionFontSize = 8;
   captionFontFamily = "Helvetica Neue,Helvetica,Arial,sans-serif";
+
   captionBigColor = "#FFFFFF";
   captionBigFontSize = 12;
   captionBigFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
 }
 
-export class APIKeys {
-  defaultTumblr = "BaQquvlxQeRhKRyViknF98vseIdcBEyDrzJBpHxvAiMPHCKR2l";
-  overlayTumblr = "G4iZd6FBiyDxHVUpNqtOTDu4woWzfp8WuH3tTrT3MC16GTmNzq";
-  otherTumblrs = ["BaQquvlxQeRhKRyViknF98vseIdcBEyDrzJBpHxvAiMPHCKR2l",
+export class RemoteSettings {
+  tumblrDefault = "BaQquvlxQeRhKRyViknF98vseIdcBEyDrzJBpHxvAiMPHCKR2l";
+  tumblrOverlay = "G4iZd6FBiyDxHVUpNqtOTDu4woWzfp8WuH3tTrT3MC16GTmNzq";
+  tumblrOther = ["BaQquvlxQeRhKRyViknF98vseIdcBEyDrzJBpHxvAiMPHCKR2l",
     "G4iZd6FBiyDxHVUpNqtOTDu4woWzfp8WuH3tTrT3MC16GTmNzq",
     "UHpRFx16HFIRgQjtjJKgfVIcwIeb71BYwOQXTMtiCvdSEPjV7N",
     "JFNLu3CbINQjRdUvZibXW9VpSEVYYtiPJ86o8YmvgLZIoKyuNX"];
+
+  redditClientID = "";
+  redditClientSecret = "";
+  redditUsername = "";
+  redditPassword = "";
 }
 
 export class CacheSettings {
@@ -44,7 +52,7 @@ export class CacheSettings {
 
 export default class Config {
   defaultScene = new SceneSettings();
-  apiKeys = new APIKeys();
+  remoteSettings = new RemoteSettings();
   caching = new CacheSettings();
 
   constructor(init?:Partial<SceneSettings>) {

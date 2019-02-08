@@ -41,5 +41,6 @@ export default new Map<String, String>([
   ['sf.type', 'By Type'],
 
   ['st.tumblr', 'tumblr'],
+  ['st.reddit', 'reddit'],
   ['st.list', 'list'],
 ]);
