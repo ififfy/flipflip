@@ -126,7 +126,7 @@ export default class Player extends React.Component {
               forward &rarr;
             </div>
           </div>
-          <div className="BackButton u-button u-clickable" onClick={this.props.goBack}>Back</div>
+          <div className="BackButton u-button u-clickable" onClick={this.navigateBack.bind(this)}>Back</div>
         </div>
 
         {this.state.isPlaying && (
@@ -329,6 +329,9 @@ export default class Player extends React.Component {
   }
 
   navigateBack() {
+    const window = getCurrentWindow();
+    window.setFullScreen(false);
+    window.setMenuBarVisibility(true);
     this.props.goBack();
   }
 
