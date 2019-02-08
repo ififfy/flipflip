@@ -134,9 +134,9 @@ const COMMANDS : { [command : string] : (el: HTMLElement, value : string, config
     return function(runNextCommand : Function) {
       let fns : Function[] = [];
       let i = 0;
-      el.style.color = config.captions.blinkColor;
-      el.style.fontSize = config.captions.blinkFontSize + "vmin";
-      el.style.fontFamily = config.captions.blinkFontFamily;
+      el.style.color = config.defaultScene.blinkColor;
+      el.style.fontSize = config.defaultScene.blinkFontSize + "vmin";
+      el.style.fontFamily = config.defaultScene.blinkFontFamily;
       el.className = "text-blink";
       value.split('/').forEach(function(word) {
         word = word.trim();
@@ -160,9 +160,9 @@ const COMMANDS : { [command : string] : (el: HTMLElement, value : string, config
     const showText = COMMANDS.showText(el, CAPTION_DURATION + ' ' + value, config);
     const wait = COMMANDS.wait(el, '' + CAPTION_DELAY, config);
     return function(runNextCommand : Function) {
-      el.style.color = config.captions.captionColor;
-      el.style.fontSize = config.captions.captionFontSize + "vmin";
-      el.style.fontFamily = config.captions.captionFontFamily;
+      el.style.color = config.defaultScene.captionColor;
+      el.style.fontSize = config.defaultScene.captionFontSize + "vmin";
+      el.style.fontFamily = config.defaultScene.captionFontFamily;
       el.className = "text-caption";
       showText(function() { wait(runNextCommand); });
     }
@@ -172,9 +172,9 @@ const COMMANDS : { [command : string] : (el: HTMLElement, value : string, config
     const showText = COMMANDS.showText(el, CAPTION_DURATION + ' ' + value, config);
     const wait = COMMANDS.wait(el, '' + CAPTION_DELAY, config);
     return function(runNextCommand : Function) {
-      el.style.color = config.captions.captionBigColor;
-      el.style.fontSize = config.captions.captionBigFontSize + "vmin";
-      el.style.fontFamily = config.captions.captionBigFontFamily;
+      el.style.color = config.defaultScene.captionBigColor;
+      el.style.fontSize = config.defaultScene.captionBigFontSize + "vmin";
+      el.style.fontFamily = config.defaultScene.captionBigFontFamily;
       el.className = "text-caption-big";
       showText(function() { wait(runNextCommand); });
     }

@@ -12,12 +12,7 @@ export function getPath() {
 }
 
 export function getFileName(url: string) {
-  switch (getSourceType(url)) {
-    case ST.local:
-    case ST.list:
-    case ST.tumblr:
-      return url.substring(url.lastIndexOf("/"));
-  }
+    return url.substring(url.lastIndexOf("/"));
 }
 
 export function getFileGroup(url: string) {
@@ -26,6 +21,11 @@ export function getFileGroup(url: string) {
       let tumblrID = url.replace(/https?:\/\//, "");
       tumblrID = tumblrID.replace(/\.tumblr\.com\/?/, "");
       return tumblrID;
+    case ST.reddit:
+      let redditID = url;
+      if (url.endsWith("/")) redditID = redditID.slice(0,url.lastIndexOf("/"));
+      redditID = redditID.substring(redditID.lastIndexOf("/") + 1);
+      return redditID;
     case ST.local:
       return url.substring(url.lastIndexOf("\\"));
     case ST.list:
@@ -46,8 +46,11 @@ export function getCachePath(source: string, config: Config) {
 }
 
 export function getSourceType(url: string): string {
-  if (/^https?:\/\/[[^\.]*|(66\.media)]\.tumblr\.com/.exec(url) != null) { // Tumblr
+  if (/^https?:\/\/([^.]*|(66\.media))\.tumblr\.com/.exec(url) != null) { // Tumblr
+    console.log("tumblr");
     return ST.tumblr;
+  } else if (/^https?:\/\/www.reddit.com\//.exec(url) != null) {
+    return ST.reddit;
   } else if (/^https?:\/\//.exec(url) != null) { // Arbitrary URL, assume image list
     return ST.list;
   } else { // Directory

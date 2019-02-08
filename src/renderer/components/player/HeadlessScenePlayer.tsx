@@ -1,16 +1,17 @@
 import * as React from 'react';
+import * as fs from "fs";
+import Snoowrap from 'snoowrap';
 import recursiveReaddir from 'recursive-readdir';
 import fileURL from 'file-url';
 import wretch from 'wretch';
 
+import {CancelablePromise, getCachePath, getFileGroup, getFileName, getSourceType} from "../../utils";
 import Scene from '../../Scene';
 import Progress from '../ui/Progress';
 import ImagePlayer from './ImagePlayer';
 import CaptionProgram from './CaptionProgram';
 import {TOT, IF, ST} from '../../const';
 import ChildCallbackHack from './ChildCallbackHack';
-import {CancelablePromise, getCachePath, getFileName, getSourceType} from "../../utils";
-import * as fs from "fs";
 import Config from "../../Config";
 
 function isImage(path: string): boolean {
@@ -49,15 +50,15 @@ function textURL(kind: string, src: string): string {
 function getTumblrAPIKey(config: Config, overlay: boolean, attempt: number): string {
   if (attempt == 0) { // This is our first attempt, use defaults
     if (!overlay) {
-      return config.apiKeys.defaultTumblr;
+      return config.remoteSettings.tumblrDefault;
     } else {
-      return config.apiKeys.overlayTumblr;
+      return config.remoteSettings.tumblrOverlay;
     }
   } else {
     let nextAPIKey = null;
-    for (let key of config.apiKeys.otherTumblrs) {
-      if (key != config.apiKeys.defaultTumblr &&
-          key != config.apiKeys.overlayTumblr) {
+    for (let key of config.remoteSettings.tumblrOther) {
+      if (key != config.remoteSettings.tumblrDefault &&
+          key != config.remoteSettings.tumblrOverlay) {
         if (attempt == 0) {
           nextAPIKey = key;
         } else {
@@ -66,7 +67,7 @@ function getTumblrAPIKey(config: Config, overlay: boolean, attempt: number): str
       }
     }
     // If they have all been used, just use default
-    if (nextAPIKey == null) nextAPIKey = config.apiKeys.defaultTumblr;
+    if (nextAPIKey == null) nextAPIKey = config.remoteSettings.tumblrDefault;
     return nextAPIKey;
   }
 }
@@ -92,7 +93,25 @@ function getPromise(config: Config, url: string, filter: string, page: number, o
         promise = loadTumblr(config, url, filter, page, overlay, 0);
         promise.page = page;
       }
-      promise.timeout = 8000; // This delay might have to be modified, 5000 was too low, resulted in 429 response
+      promise.timeout = 8000;
+      break;
+    case ST.reddit:
+      if (page == -1) {
+        const cachePath = getCachePath(url, config);
+        if (fs.existsSync(cachePath) && config.caching.enabled) {
+          // If the cache directory exists, use it
+          promise = loadLocalDirectory(getCachePath(url, config), filter);
+          promise.page = -1;
+        } else {
+          // Otherwise loadTumblr;
+          promise = loadReddit(config, url, filter, page, overlay, 0);
+          promise.page = 0;
+        }
+      } else {
+        promise = loadReddit(config, url, filter, page, overlay, 0);
+        promise.page = page;
+      }
+      promise.timeout = 1000;
       break;
     case ST.list:
       promise = loadRemoteImageURLList(url);
@@ -193,6 +212,49 @@ function loadTumblr(config: Config, url: string, filter: string, page: number, o
         resolve(null)
       });
   });
+}
+
+function loadReddit(config: Config, url: string, filter: string, page: number, overlay: boolean, attempt: number): CancelablePromise {
+  let configured = true;
+  if (config.remoteSettings.redditClientID == "") {
+    configured = false;
+    console.warn("Reddit Client ID is not configured");
+  }
+  if (config.remoteSettings.redditClientSecret == "") {
+    configured = false;
+    console.warn("Reddit Client Secret is not configured");
+  }
+  if (config.remoteSettings.redditUsername == "") {
+    configured = false;
+    console.warn("Reddit Username is not configured");
+  }
+  if (config.remoteSettings.redditUsername == "") {
+    configured = false;
+    console.warn("Reddit Username is not configured");
+  }
+  if (config.remoteSettings.redditPassword == "") {
+    configured = false;
+    console.warn("Reddit Password is not configured");
+  }
+
+  //TODO Finish implementing reddit
+  if (configured) {
+    return new CancelablePromise((resolve, reject) => {
+      /*const reddit = new Snoowrap({
+        clientId: config.remoteSettings.redditClientID,
+        clientSecret: config.remoteSettings.redditClientSecret,
+        username: config.remoteSettings.redditUsername,
+        password: config.remoteSettings.redditPassword,
+      });
+      console.log(getFileGroup(url));
+      reddit.getSubreddit(getFileGroup(url)).getHot();*/
+      resolve(null);
+    });
+  } else {
+    return new CancelablePromise((resolve, reject) => {
+      resolve(null);
+    });
+  }
 }
 
 export default class HeadlessScenePlayer extends React.Component {
