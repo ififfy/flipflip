@@ -2,7 +2,22 @@ import * as React from 'react';
 import wretch from 'wretch';
 
 import {CancelablePromise, getRandomListItem} from '../../utils'
-import Config from "../../Config";
+
+class CaptionSettings {
+  blinkColor: string;
+  blinkFontSize: number;
+  blinkFontFamily: string;
+  captionColor: string;
+  captionFontSize: number;
+  captionFontFamily: string;
+  captionBigColor: string;
+  captionBigFontSize: number;
+  captionBigFontFamily: string;
+
+  constructor(init?: Partial<CaptionSettings>) {
+    Object.assign(this, init);
+  }
+}
 
 let STYLES: { [style: string]: string } = {};
 
@@ -47,7 +62,7 @@ const fnIntArg = function (innerFn: Function) {
   };
 };
 
-const COMMANDS: { [command: string]: (el: HTMLElement, value: string, config: Config) => any; } = {
+const COMMANDS: { [command: string]: (el: HTMLElement, value: string, config: CaptionSettings) => any; } = {
   saveStyleRules: function (el: HTMLElement, value: string) {
     const firstWord = getFirstWord(value);
     const style = getRest(value);
@@ -130,13 +145,13 @@ const COMMANDS: { [command: string]: (el: HTMLElement, value: string, config: Co
     return function(f : Function) { f() };
   },
 
-  blink: function (el: HTMLElement, value: string, config: Config) {
+  blink: function (el: HTMLElement, value: string, config: CaptionSettings) {
     return function (runNextCommand: Function) {
       let fns: Function[] = [];
       let i = 0;
-      el.style.color = config.defaultScene.blinkColor;
-      el.style.fontSize = config.defaultScene.blinkFontSize + "vmin";
-      el.style.fontFamily = config.defaultScene.blinkFontFamily;
+      el.style.color = config.blinkColor;
+      el.style.fontSize = config.blinkFontSize + "vmin";
+      el.style.fontFamily = config.blinkFontFamily;
       el.className = "text-blink";
       value.split('/').forEach(function (word) {
         word = word.trim();
@@ -156,25 +171,25 @@ const COMMANDS: { [command: string]: (el: HTMLElement, value: string, config: Co
     }
   },
 
-  cap: function (el: HTMLElement, value: string, config: Config) {
+  cap: function (el: HTMLElement, value: string, config: CaptionSettings) {
     const showText = COMMANDS.showText(el, CAPTION_DURATION + ' ' + value, config);
     const wait = COMMANDS.wait(el, '' + CAPTION_DELAY, config);
     return function (runNextCommand: Function) {
-      el.style.color = config.defaultScene.captionColor;
-      el.style.fontSize = config.defaultScene.captionFontSize + "vmin";
-      el.style.fontFamily = config.defaultScene.captionFontFamily;
+      el.style.color = config.captionColor;
+      el.style.fontSize = config.captionFontSize + "vmin";
+      el.style.fontFamily = config.captionFontFamily;
       el.className = "text-caption";
       showText(function() { wait(runNextCommand); });
     }
   },
 
-  bigcap: function (el: HTMLElement, value: string, config: Config) {
+  bigcap: function (el: HTMLElement, value: string, config: CaptionSettings) {
     const showText = COMMANDS.showText(el, CAPTION_DURATION + ' ' + value, config);
     const wait = COMMANDS.wait(el, '' + CAPTION_DELAY, config);
     return function (runNextCommand: Function) {
-      el.style.color = config.defaultScene.captionBigColor;
-      el.style.fontSize = config.defaultScene.captionBigFontSize + "vmin";
-      el.style.fontFamily = config.defaultScene.captionBigFontFamily;
+      el.style.color = config.captionBigColor;
+      el.style.fontSize = config.captionBigFontSize + "vmin";
+      el.style.fontFamily = config.captionBigFontFamily;
       el.className = "text-caption-big";
       showText(function() { wait(runNextCommand); });
     }
@@ -185,7 +200,15 @@ export default class CaptionProgram extends React.Component {
   readonly el = React.createRef<HTMLDivElement>();
 
   readonly props: {
-    config: Config,
+    blinkColor: string,
+    blinkFontSize: number,
+    blinkFontFamily: string,
+    captionColor: string,
+    captionFontSize: number,
+    captionFontFamily: string,
+    captionBigColor: string,
+    captionBigFontSize: number,
+    captionBigFontFamily: string,
     url: string,
   };
 
@@ -239,6 +262,17 @@ export default class CaptionProgram extends React.Component {
     newPromise
       .then((data) => {
         let hasError = false;
+        const captionSettings = new CaptionSettings({
+          blinkColor: this.props.blinkColor,
+          blinkFontSize: this.props.blinkFontSize,
+          blinkFontFamily: this.props.blinkFontFamily,
+          captionColor: this.props.captionColor,
+          captionFontSize: this.props.captionFontSize,
+          captionFontFamily: this.props.captionFontFamily,
+          captionBigColor: this.props.captionBigColor,
+          captionBigFontSize: this.props.captionBigFontSize,
+          captionBigFontFamily: this.props.captionBigFontFamily,
+        });
         for (let line of data[0].split('\n')) {
           line = line.trim();
 
@@ -248,7 +282,7 @@ export default class CaptionProgram extends React.Component {
           if (command) {
             const value = getRest(line);
             if (COMMANDS[command]) {
-              const fn = COMMANDS[command](this.el.current, value, this.props.config);
+              const fn = COMMANDS[command](this.el.current, value, captionSettings);
               if (fn) {
                 if (command.toLowerCase().startsWith("set")) {
                   fn(() => {return newPromise.hasCanceled;});

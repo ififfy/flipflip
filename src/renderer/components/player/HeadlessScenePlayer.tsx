@@ -336,7 +336,15 @@ export default class HeadlessScenePlayer extends React.Component {
 
         {showCaptionProgram && (
           <CaptionProgram
-            config={this.props.config}
+            blinkColor={this.props.scene.blinkColor}
+            blinkFontSize={this.props.scene.blinkFontSize}
+            blinkFontFamily={this.props.scene.blinkFontFamily}
+            captionColor={this.props.scene.captionColor}
+            captionFontSize={this.props.scene.captionFontSize}
+            captionFontFamily={this.props.scene.captionFontFamily}
+            captionBigColor={this.props.scene.captionBigColor}
+            captionBigFontSize={this.props.scene.captionBigFontSize}
+            captionBigFontFamily={this.props.scene.captionBigFontFamily}
             url={textURL(this.props.scene.textKind, this.props.scene.textSource)}/>
         )}
 
