@@ -300,10 +300,12 @@ export default class Player extends React.Component {
   }
 
   historyBack() {
-    this.setState({
-      isPlaying: false,
-      historyOffset: this.state.historyOffset - 1,
-    });
+    if (this.state.historyOffset > -(this.state.historyPaths.length - 1)) {
+      this.setState({
+        isPlaying: false,
+        historyOffset: this.state.historyOffset - 1,
+      });
+    }
   }
 
   historyForward() {
