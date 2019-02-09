@@ -934,17 +934,19 @@ label.SimpleCheckbox {
   @include noselect;
   position: absolute;
   display: flex;
-  height: 8rem;
+  flex-wrap: wrap;
+  height: auto;
+  line-height: 1.5rem;
   width: 100%;
   align-items: center;
   justify-content: center;
 
   z-index: 0;
-  padding: $smallPadding $smallPadding 0 $smallPadding;
+  padding: $smallPadding;
   @include buttonBarBackground;
 
   opacity: 0;
-  bottom: -6rem;
+  bottom: -4rem;
   transition: opacity 500ms ease-in-out,
   bottom 500ms ease-in-out;
 
@@ -957,7 +959,7 @@ label.SimpleCheckbox {
   .SourceTag {
     background-color: $white;
     padding: $smallPadding;
-    margin-right: $smallPadding;
+    margin: $smallPadding $smallPadding 0 $smallPadding;
     color: $black !important;
 
     display: flex;
