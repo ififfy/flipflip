@@ -47,7 +47,7 @@ export class RemoteSettings {
 export class CacheSettings {
   enabled = true;
   directory = "";
-  maxSize = 5120; // Size in MB (default 5GB)
+  maxSize = 500; // Size in MB
 }
 
 export default class Config {
