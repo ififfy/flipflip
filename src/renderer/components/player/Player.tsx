@@ -19,12 +19,13 @@ const {getCurrentWindow, Menu, MenuItem, app} = remote;
 
 const keyMap = {
   playPause: ['Play/Pause', 'space'],
-  historyBack: ['Back in time', 'left'],
-  historyForward: ['Forward in time', 'right'],
-  navigateBack: ['Go back to scene details', 'backspace'],
-  toggleFullscreen: ['Toggle fullscreen', 'CommandOrControl+F'],
+  historyBack: ['Back in Time', 'left'],
+  historyForward: ['Forward in Time', 'right'],
+  navigateBack: ['Go Back to Scene Details', 'backspace'],
+  toggleFullscreen: ['Toggle Fullscreen', 'CommandOrControl+F'],
   alwaysOnTop: ['Toggle On Top', 'CommandOrControl+T'],
   toggleMenuBarDisplay: ['Show/Hide Menu', 'CommandOrControl+^'],
+  onDelete: ['Delete Image', 'Delete'],
 };
 
 let originalMenu = Menu.getApplicationMenu();
@@ -266,20 +267,7 @@ export default class Player extends React.Component {
       contextMenu.append(new MenuItem({
         label: 'Delete',
         click: () => {
-          // If you find that this doesn't work on Windows, please add an if/then
-          // (see 'reveal' above) rather than changing all cases, since this all
-          // works fine on macOS.
-          if (!confirm("Are you sure you want to delete " + path + "?")) return;
-          if (fs.existsSync(path)) {
-            fs.unlink(path, (err) => {
-              if (err) {
-                alert("An error ocurred while deleting the file: " + err.message);
-                console.error(err);
-              }
-            });
-          } else {
-            alert("This file doesn't exist, cannot delete");
-          }
+          this.onDeletePath(path);
         }
       }));
     }
@@ -326,6 +314,20 @@ export default class Player extends React.Component {
     }
   }
 
+  onDeletePath(path: string) {
+    if (!confirm("Are you sure you want to delete " + path + "?")) return;
+    if (fs.existsSync(path)) {
+      fs.unlink(path, (err) => {
+        if (err) {
+          alert("An error ocurred while deleting the file: " + err.message);
+          console.error(err);
+        }
+      });
+    } else {
+      alert("This file doesn't exist, cannot delete");
+    }
+  }
+
   navigateBack() {
     const window = getCurrentWindow();
     window.setFullScreen(false);
@@ -337,7 +339,17 @@ export default class Player extends React.Component {
     this.setState({historyPaths: paths});
   }
 
-  /* Menu (hotkey) options DON'T DELETE */
+  /* Menu and hotkey options DON'T DELETE */
+
+  onDelete() {
+    const img = this.state.historyPaths[(this.state.historyPaths.length - 1) + this.state.historyOffset];
+    const url = img.src;
+    const isFile = url.startsWith('file://');
+    const path = urlToPath(url);
+    if (isFile) {
+      this.onDeletePath(path);
+    }
+  }
 
   playPause() {
     if (this.state.isPlaying) {
