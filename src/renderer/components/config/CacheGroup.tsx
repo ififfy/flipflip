@@ -19,12 +19,12 @@ export default class CacheGroup extends React.Component {
         <SimpleCheckbox
           text="Enable Caching"
           isOn={this.props.settings.enabled}
-          onChange={this.onChangeEnabled.bind(this)}/>
+          onChange={this.changeKey.bind(this, 'enabled').bind(this)}/>
         <SimpleTextInput
           isEnabled={this.props.settings.enabled}
           label="Caching Directory"
           value={this.props.settings.directory}
-          onChange={this.onChangeDirectory.bind(this)}>
+          onChange={this.changeKey.bind(this, 'directory').bind(this)}>
           {" "}
           <button className={this.props.settings.enabled ? '' : 'u-disabled'}
                   onClick={this.props.settings.enabled ? this.pickDirectory.bind(this) : this.nop}>Browse
@@ -43,7 +43,7 @@ export default class CacheGroup extends React.Component {
           min={0}
           value={this.props.settings.maxSize}
           isEnabled={this.props.settings.enabled}
-          onChange={this.onChangeMaxSize.bind(this)}/>
+          onChange={this.changeKey.bind(this, 'maxSize').bind(this)}/>
       </ControlGroup>
     );
   }
@@ -53,22 +53,20 @@ export default class CacheGroup extends React.Component {
   pickDirectory() {
     let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']});
     if (!result) return;
-    this.onChangeDirectory(result[0]);
+    this.changeKey('directory', result[0]);
   }
 
   paste() {
     (navigator as any).clipboard.readText().then((pastedText: string) => {
-      this.onChangeDirectory(pastedText);
+      this.changeKey('directory', pastedText);
     });
   }
 
-  update(fn: (settings: CacheSettings) => void) {
+  update(fn: (settings: any) => void) {
     this.props.onUpdateSettings(this.props.settings, fn);
   }
 
-  onChangeEnabled(enabled: boolean) { this.update((s) => { s.enabled = enabled; }); }
-
-  onChangeDirectory(directory: string) { this.update((s) => { s.directory = directory; }); }
-
-  onChangeMaxSize(maxSize: number) { this.update((s) => { s.maxSize = maxSize; }); }
+  changeKey(key: string, value: any) {
+    this.update((s) => s[key] = value);
+  }
 }

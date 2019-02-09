@@ -18,24 +18,24 @@ export default class ImageGroup extends React.Component {
       <ControlGroup title="Images" isNarrow={true}>
         <div className="ControlSubgroup">
           <SimpleOptionPicker
-            onChange={this.onChangeImageTypeFilter.bind(this)}
+            onChange={this.changeKey.bind(this, 'imageTypeFilter').bind(this)}
             label="Image Filter"
             value={this.props.scene.imageTypeFilter}
             keys={Object.values(IF)}/>
           <SimpleCheckbox
             text="Play Full GIF animations"
             isOn={this.props.scene.playFullGif}
-            onChange={this.onChangePlayFullGif.bind(this)}/>
+            onChange={this.changeKey.bind(this, 'playFullGif').bind(this)}/>
         </div>
       </ControlGroup>
     );
   }
 
-  update(fn: (scene: Scene | SceneSettings) => void) {
+  update(fn: (scene: any) => void) {
     this.props.onUpdateScene(this.props.scene, fn);
   }
 
-  onChangeImageTypeFilter(filter: string) { this.update((s) => { s.imageTypeFilter = filter; }); }
-
-  onChangePlayFullGif(value: boolean) { this.update((s) => { s.playFullGif = value; }); }
+  changeKey(key: string, value: any) {
+    this.update((s) => s[key] = value);
+  }
 }

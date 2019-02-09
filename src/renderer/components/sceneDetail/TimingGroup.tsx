@@ -17,24 +17,24 @@ export default class TimingGroup extends React.Component {
     return (
       <ControlGroup title="Timing" isNarrow={true}>
         <SimpleOptionPicker
-          onChange={this.onChangeTimingFunction.bind(this)}
+          onChange={this.changeKey.bind(this, 'timingFunction').bind(this)}
           label="Timing"
           value={this.props.scene.timingFunction}
           keys={Object.values(TF)}/>
         <SimpleTextInput
           isEnabled={this.props.scene.timingFunction === TF.constant}
-          onChange={this.onChangeTimingConstant.bind(this)}
+          onChange={this.changeKey.bind(this, 'timingConstant').bind(this)}
           label="Time between images (ms)"
           value={this.props.scene.timingConstant.toString()}/>
       </ControlGroup>
     );
   }
 
-  update(fn: (scene: Scene | SceneSettings) => void) {
+  update(fn: (scene: any) => void) {
     this.props.onUpdateScene(this.props.scene, fn);
   }
 
-  onChangeTimingFunction(fnId: string) { this.update((s) => { s.timingFunction = fnId; }); }
-
-  onChangeTimingConstant(constant: string) { this.update((s) => { s.timingConstant = constant; }); }
+  changeKey(key: string, value: any) {
+    this.update((s) => s[key] = value);
+  }
 }

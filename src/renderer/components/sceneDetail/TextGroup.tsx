@@ -26,13 +26,13 @@ export default class TextGroup extends React.Component {
       <ControlGroup title="Text" isNarrow={true}>
         <div className="ControlSubgroup">
           <SimpleOptionPicker
-            onChange={this.onChangeTextKind.bind(this)}
+            onChange={this.changeKey.bind(this, 'textKind').bind(this)}
             label="Source"
             value={this.props.scene.textKind}
             keys={Object.values(TOT)}/>
           <SimpleURLInput
             isEnabled={true}
-            onChange={this.onChangeTextSource.bind(this)}
+            onChange={this.changeKey.bind(this, 'textSource').bind(this)}
             label={(() => {
               switch (this.props.scene.textKind) {
                 case TOT.hastebin:
@@ -58,16 +58,16 @@ export default class TextGroup extends React.Component {
                 value={this.props.scene.blinkFontSize}
                 min={0}
                 isEnabled={true}
-                onChange={this.onChangeBlinkFontSize.bind(this)}/>
+                onChange={this.changeKey.bind(this, 'blinkFontSize').bind(this)}/>
               <SimpleTextInput
                 label="Blink Font Family"
                 value={this.props.scene.blinkFontFamily}
                 isEnabled={true}
-                onChange={this.onChangeBlinkFontFamily.bind(this)}/>
+                onChange={this.changeKey.bind(this, 'blinkFontFamily').bind(this)}/>
               <SimpleColorPicker
                 label="Blink Color"
                 value={this.props.scene.blinkColor}
-                onChange={this.onChangeBlinkColor.bind(this)}/>
+                onChange={this.changeKey.bind(this, 'blinkColor').bind(this)}/>
             </div>
             <hr/>
             <div className="ControlSubgroup">
@@ -76,16 +76,16 @@ export default class TextGroup extends React.Component {
                 value={this.props.scene.captionFontSize}
                 min={0}
                 isEnabled={true}
-                onChange={this.onChangeCaptionFontSize.bind(this)}/>
+                onChange={this.changeKey.bind(this, 'captionFontSize').bind(this)}/>
               <SimpleTextInput
                 label="Caption Font Family"
                 value={this.props.scene.captionFontFamily}
                 isEnabled={true}
-                onChange={this.onChangeCaptionFontFamily.bind(this)}/>
+                onChange={this.changeKey.bind(this, 'captionFontFamily').bind(this)}/>
               <SimpleColorPicker
                 label="Caption Color"
                 value={this.props.scene.captionColor}
-                onChange={this.onChangeCaptionColor.bind(this)}/>
+                onChange={this.changeKey.bind(this, 'captionColor').bind(this)}/>
             </div>
             <hr/>
             <div className="ControlSubgroup">
@@ -94,16 +94,16 @@ export default class TextGroup extends React.Component {
                 value={this.props.scene.captionBigFontSize}
                 min={0}
                 isEnabled={true}
-                onChange={this.onChangeCaptionBigFontSize.bind(this)}/>
+                onChange={this.changeKey.bind(this, 'captionBigFontSize').bind(this)}/>
               <SimpleTextInput
                 label="Big Caption Font Family"
                 value={this.props.scene.captionBigFontFamily}
                 isEnabled={true}
-                onChange={this.onChangeCaptionBigFontFamily.bind(this)}/>
+                onChange={this.changeKey.bind(this, 'captionBigFontFamily').bind(this)}/>
               <SimpleColorPicker
                 label="Big Caption Color"
                 value={this.props.scene.captionBigColor}
-                onChange={this.onChangeCaptionBigColor.bind(this)}/>
+                onChange={this.changeKey.bind(this, 'captionBigColor').bind(this)}/>
             </div>
           </div>
         )}
@@ -115,23 +115,11 @@ export default class TextGroup extends React.Component {
     this.setState({showFontSettings: !this.state.showFontSettings});
   }
 
-  update(fn: (scene: Scene | SceneSettings) => void) {
+  update(fn: (scene: any) => void) {
     this.props.onUpdateScene(this.props.scene, fn);
   }
 
-  onChangeTextKind(kind: string) { this.update((s) => { s.textKind = kind; }); }
-  onChangeTextSource(textSource: string) { this.update((s) => { s.textSource = textSource; }); }
-
-  onChangeBlinkColor(blinkColor: string) { this.update((s) => { s.blinkColor = blinkColor; }); }
-  onChangeBlinkFontSize(blinkFontSize: number) { this.update((s) => { s.blinkFontSize = blinkFontSize; }); }
-  onChangeBlinkFontFamily(blinkFontFamily: string) { this.update((s) => { s.blinkFontFamily = blinkFontFamily; }); }
-
-  onChangeCaptionColor(captionColor: string) { this.update((s) => { s.captionColor = captionColor; }); }
-  onChangeCaptionFontSize(captionFontSize: number) { this.update((s) => { s.captionFontSize = captionFontSize; }); }
-  onChangeCaptionFontFamily(captionFontFamily: string) { this.update((s) => { s.captionFontFamily = captionFontFamily; }); }
-
-  onChangeCaptionBigColor(captionBigColor: string) { this.update((s) => { s.captionBigColor = captionBigColor; }); }
-  onChangeCaptionBigFontSize(captionBigFontSize: number) { this.update((s) => { s.captionBigFontSize = captionBigFontSize; }); }
-  onChangeCaptionBigFontFamily(captionBigFontFamily: string) { this.update((s) => { s.captionBigFontFamily = captionBigFontFamily; }); }
-
+  changeKey(key: string, value: any) {
+    this.update((s) => s[key] = value);
+  }
 }
