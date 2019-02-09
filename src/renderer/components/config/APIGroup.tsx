@@ -18,17 +18,17 @@ export default class APIGroup extends React.Component {
             isEnabled={true}
             label="Default Tumblr API Key"
             value={this.props.settings.tumblrDefault}
-            onChange={this.onChangeDefaultTumblr.bind(this)}>
+            onChange={this.changeKey.bind(this, 'tumblrDefault').bind(this)}>
             {" "}
-            <button onClick={this.paste.bind(this, this.onChangeDefaultTumblr.bind(this))}>Paste</button>
+            <button onClick={this.paste.bind(this, this.changeKey.bind(this, 'tumblrDefault').bind(this))}>Paste</button>
           </SimpleTextInput>
           <SimpleTextInput
             isEnabled={true}
             label="Overlay Tumblr API Key"
             value={this.props.settings.tumblrOverlay}
-            onChange={this.onChangeOverlayTumblr.bind(this)}>
+            onChange={this.changeKey.bind(this, 'tumblrOverlay').bind(this)}>
             {" "}
-            <button onClick={this.paste.bind(this, this.onChangeOverlayTumblr.bind(this))}>Paste</button>
+            <button onClick={this.paste.bind(this, this.changeKey.bind(this, 'tumblrOverlay').bind(this))}>Paste</button>
           </SimpleTextInput>
         </div>
         <hr/>
@@ -37,33 +37,33 @@ export default class APIGroup extends React.Component {
             isEnabled={true}
             label="Reddit Client ID"
             value={this.props.settings.redditClientID}
-            onChange={this.onChangeRedditClientID.bind(this)}>
+            onChange={this.changeKey.bind(this, 'redditClientID').bind(this)}>
             {" "}
-            <button onClick={this.paste.bind(this, this.onChangeRedditClientID.bind(this))}>Paste</button>
+            <button onClick={this.paste.bind(this, this.changeKey.bind(this, 'redditClientID').bind(this))}>Paste</button>
           </SimpleTextInput>
           <SimpleTextInput
             isEnabled={true}
             label="Reddit Client Secret"
             value={this.props.settings.redditClientSecret}
-            onChange={this.onChangeRedditClientSecret.bind(this)}>
+            onChange={this.changeKey.bind(this, 'redditClientSecret').bind(this)}>
             {" "}
-            <button onClick={this.paste.bind(this, this.onChangeRedditClientSecret.bind(this))}>Paste</button>
+            <button onClick={this.paste.bind(this, this.changeKey.bind(this, 'redditClientSecret').bind(this))}>Paste</button>
           </SimpleTextInput>
           <SimpleTextInput
             isEnabled={true}
             label="Reddit Username"
             value={this.props.settings.redditUsername}
-            onChange={this.onChangeRedditUsername.bind(this)}>
+            onChange={this.changeKey.bind(this, 'redditUsername').bind(this)}>
             {" "}
-            <button onClick={this.paste.bind(this, this.onChangeRedditUsername.bind(this))}>Paste</button>
+            <button onClick={this.paste.bind(this, this.changeKey.bind(this, 'redditUsername').bind(this))}>Paste</button>
           </SimpleTextInput>
           <SimpleTextInput
             isEnabled={true}
             label="Reddit Password"
             value={this.props.settings.redditPassword}
-            onChange={this.onChangeRedditPassword.bind(this)}>
+            onChange={this.changeKey.bind(this, 'redditPassword').bind(this)}>
             {" "}
-            <button onClick={this.paste.bind(this, this.onChangeRedditPassword.bind(this))}>Paste</button>
+            <button onClick={this.paste.bind(this, this.changeKey.bind(this, 'redditPassword').bind(this))}>Paste</button>
           </SimpleTextInput>
         </div>
       </ControlGroup>
@@ -76,15 +76,11 @@ export default class APIGroup extends React.Component {
     });
   }
 
-  update(fn: (keys: RemoteSettings) => void) {
+  update(fn: (keys: any) => void) {
     this.props.onUpdateSettings(this.props.settings, fn);
   }
 
-  onChangeDefaultTumblr(tumblr: string) { this.update((s) => { s.tumblrDefault = tumblr; }); }
-  onChangeOverlayTumblr(tumblr: string) { this.update((s) => { s.tumblrOverlay = tumblr; }); }
-
-  onChangeRedditClientID(clientID: string) { this.update((s) => { s.redditClientID = clientID; }); }
-  onChangeRedditClientSecret(clientSecret: string) { this.update((s) => { s.redditClientSecret = clientSecret; }); }
-  onChangeRedditUsername(username: string) { this.update((s) => { s.redditUsername = username; }); }
-  onChangeRedditPassword(password: string) { this.update((s) => { s.redditPassword = password; }); }
+  changeKey(key: string, value: any) {
+    this.update((s) => s[key] = value);
+  }
 }
