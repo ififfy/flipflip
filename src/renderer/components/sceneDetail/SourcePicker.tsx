@@ -4,7 +4,7 @@ import Sortable from "sortablejs";
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 
 import {SF} from "../../const";
-import {array_move, getSourceType, removeDuplicatesBy} from "../../utils";
+import {arrayMove, getSourceType, removeDuplicatesBy} from "../../utils";
 import LibrarySource from "../library/LibrarySource";
 import Tag from "../library/Tag";
 import URLModal from "../sceneDetail/URLModal";
@@ -202,7 +202,7 @@ export default class SourcePicker extends React.Component {
 
   onEnd(evt: any) {
     let newSources = this.props.sources;
-    array_move(newSources, evt.oldIndex, evt.newIndex);
+    arrayMove(newSources, evt.oldIndex, evt.newIndex);
     this.props.onUpdateSources(newSources);
   }
 
@@ -210,7 +210,7 @@ export default class SourcePicker extends React.Component {
     let newSources = this.props.sources;
     for (let source of newSources) {
       if (source.id == sourceID) {
-        array_move(source.tags, evt.oldIndex, evt.newIndex);
+        arrayMove(source.tags, evt.oldIndex, evt.newIndex);
       }
     }
     this.props.onUpdateSources(newSources);

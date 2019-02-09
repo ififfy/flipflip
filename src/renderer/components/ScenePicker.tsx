@@ -3,7 +3,7 @@ import * as React from 'react';
 import Sortable from "sortablejs";
 
 import {SF} from "../const";
-import {array_move, getRandomListItem} from "../utils";
+import {arrayMove, getRandomListItem} from "../utils";
 import Scene from '../Scene';
 import SimpleOptionPicker from "./ui/SimpleOptionPicker";
 
@@ -121,7 +121,7 @@ export default class ScenePicker extends React.Component {
 
   onEnd(evt: any) {
     let newScenes = this.props.scenes;
-    array_move(newScenes, evt.oldIndex, evt.newIndex);
+    arrayMove(newScenes, evt.oldIndex, evt.newIndex);
     this.props.onUpdateScenes(newScenes);
   }
 
