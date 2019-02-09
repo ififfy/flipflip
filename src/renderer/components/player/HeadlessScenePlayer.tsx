@@ -270,6 +270,8 @@ export default class HeadlessScenePlayer extends React.Component {
     isPlaying: boolean,
     historyOffset: number,
     advanceHack?: ChildCallbackHack,
+    deleteHack?: ChildCallbackHack,
+    setHistoryOffset: (historyOffset: number) => void,
     setHistoryPaths: (historyPaths: Array<HTMLImageElement>) => void,
     didFinishLoading: () => void,
   };
@@ -309,7 +311,9 @@ export default class HeadlessScenePlayer extends React.Component {
           <ImagePlayer
             config={this.props.config}
             advanceHack={this.props.advanceHack}
+            deleteHack={this.props.deleteHack}
             historyOffset={this.props.historyOffset}
+            setHistoryOffset={this.props.setHistoryOffset}
             setHistoryPaths={this.props.setHistoryPaths}
             maxInMemory={120}
             maxLoadingAtOnce={5}
