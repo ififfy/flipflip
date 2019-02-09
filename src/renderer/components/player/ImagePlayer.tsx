@@ -22,6 +22,7 @@ export default class ImagePlayer extends React.Component {
   readonly props: {
     config: Config,
     advanceHack?: ChildCallbackHack,
+    deleteHack?: ChildCallbackHack,
     maxInMemory: number,
     maxLoadingAtOnce: number,
     maxToRememberInHistory: number,
@@ -41,12 +42,12 @@ export default class ImagePlayer extends React.Component {
     playFullGif: boolean;
     imageSizeMin: number,
     setHistoryPaths: (historyPaths: Array<HTMLImageElement>) => void,
+    setHistoryOffset: (historyOffset: number) => void,
     onLoaded: () => void,
   };
 
   readonly state = {
     numBeingLoaded: 0,
-    pastAndLatest: Array<HTMLImageElement>(),
     readyToDisplay: Array<HTMLImageElement>(),
     historyPaths: Array<HTMLImageElement>(),
     timeToNextFrame: 0,
@@ -58,7 +59,7 @@ export default class ImagePlayer extends React.Component {
   _isMounted = false;
 
   render() {
-    if (this.state.pastAndLatest.length < 1) return <div className="ImagePlayer m-empty"/>;
+    if (this.state.historyPaths.length < 1) return <div className="ImagePlayer m-empty"/>;
 
     const imgs = Array<HTMLImageElement>();
 
@@ -74,7 +75,7 @@ export default class ImagePlayer extends React.Component {
     } else {
       const max = this.props.fadeEnabled ? 3 : 2;
       for (let i = 1; i < max; i++) {
-        const img = this.state.pastAndLatest[this.state.pastAndLatest.length - i];
+        const img = this.state.historyPaths[this.state.historyPaths.length - i];
         if (img) {
           imgs.push(img);
         }
@@ -142,6 +143,12 @@ export default class ImagePlayer extends React.Component {
         this.advance(false, false, true);
       }
     }
+    if (this.props.deleteHack) {
+      this.props.deleteHack.listener = () => {
+        // delete current image from historyPaths and readyToDisplay
+        this.delete();
+      }
+    }
   }
 
   componentWillUnmount() {
@@ -163,6 +170,30 @@ export default class ImagePlayer extends React.Component {
       // but flag to restart next time props are updated
       this.setState({restart: true});
     }
+  }
+
+  delete() {
+    const img = this.state.historyPaths[(this.state.historyPaths.length - 1) + this.props.historyOffset];
+    const url = img.src;
+    let newHistoryPaths = [];
+    let newHistoryOffset = this.props.historyOffset;
+    for (let image of this.state.historyPaths) {
+      if (image.src != url) {
+        newHistoryPaths.push(image);
+      } else {
+        newHistoryOffset += 1;
+      }
+    }
+    if (newHistoryOffset > 0) {
+      newHistoryOffset = 0;
+    }
+    this.props.setHistoryPaths(newHistoryPaths);
+    this.props.setHistoryOffset(newHistoryOffset);
+    this.setState({
+      historyPaths: newHistoryPaths,
+      historyOffset: newHistoryOffset,
+      readyToDisplay: this.state.readyToDisplay.filter((i) => i.src != url),
+    });
   }
 
   start() {
@@ -207,7 +238,7 @@ export default class ImagePlayer extends React.Component {
         numBeingLoaded: Math.max(0, this.state.numBeingLoaded - 1),
         nextImageID: this.state.nextImageID + 1,
       });
-      if (this.state.pastAndLatest.length === 0) {
+      if (this.state.historyPaths.length === 0) {
         this.advance(false, false);
       }
       this.runFetchLoop(i);
@@ -325,21 +356,17 @@ export default class ImagePlayer extends React.Component {
   }
 
   advance(isStarting = false, schedule = true, ignoreIsPlayingStatus = false) {
-    let nextPastAndLatest = this.state.pastAndLatest;
     let nextHistoryPaths = this.state.historyPaths;
     let nextImg: HTMLImageElement;
     if (this.state.readyToDisplay.length) {
       nextImg = this.state.readyToDisplay.shift();
-      nextPastAndLatest = nextPastAndLatest.concat([nextImg]);
       nextHistoryPaths = nextHistoryPaths.concat([nextImg]);
-    } else if (this.state.pastAndLatest.length) {
+    } else if (this.state.historyPaths.length) {
       // no new image ready; just pick a random one from the past 120
-      nextImg = getRandomListItem(this.state.pastAndLatest);
-      nextPastAndLatest = nextPastAndLatest.concat([nextImg]);
+      nextImg = getRandomListItem(this.state.historyPaths);
       nextHistoryPaths = nextHistoryPaths.concat([nextImg]);
     }
-    while (nextPastAndLatest.length > this.props.maxInMemory) {
-      nextPastAndLatest.shift();
+    while (nextHistoryPaths.length > this.props.maxInMemory) {
       nextHistoryPaths.shift();
     }
 
@@ -347,7 +374,6 @@ export default class ImagePlayer extends React.Component {
     if (!(isStarting || ignoreIsPlayingStatus || (this.props.isPlaying && this._isMounted))) return;
 
     this.setState({
-      pastAndLatest: nextPastAndLatest,
       historyPaths: nextHistoryPaths,
     });
     this.props.setHistoryPaths(nextHistoryPaths);

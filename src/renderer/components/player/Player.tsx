@@ -49,6 +49,7 @@ export default class Player extends React.Component {
     historyOffset: 0,
     historyPaths: Array<HTMLImageElement>(),
     imagePlayerAdvanceHack: new ChildCallbackHack(),
+    imagePlayerDeleteHack: new ChildCallbackHack(),
   };
 
   render() {
@@ -71,13 +72,14 @@ export default class Player extends React.Component {
           showEmptyState={true}
           showText={true}
           advanceHack={this.state.imagePlayerAdvanceHack}
+          deleteHack={this.state.imagePlayerDeleteHack}
           didFinishLoading={this.playMain.bind(this)}
+          setHistoryOffset={this.setHistoryOffset.bind(this)}
           setHistoryPaths={this.setHistoryPaths.bind(this)}/>
 
         {this.props.overlayScene && (
           <HeadlessScenePlayer
             config={this.props.config}
-            advanceHack={null}
             opacity={this.props.scene.overlaySceneOpacity}
             scene={this.props.overlayScene}
             historyOffset={0}
@@ -86,6 +88,7 @@ export default class Player extends React.Component {
             showEmptyState={false}
             showText={false}
             didFinishLoading={this.playOverlay.bind(this)}
+            setHistoryOffset={this.nop.bind(this)}
             setHistoryPaths={this.nop.bind(this)}/>
         )}
 
@@ -321,6 +324,8 @@ export default class Player extends React.Component {
         if (err) {
           alert("An error ocurred while deleting the file: " + err.message);
           console.error(err);
+        } else {
+          this.state.imagePlayerDeleteHack.fire();
         }
       });
     } else {
@@ -337,6 +342,10 @@ export default class Player extends React.Component {
 
   setHistoryPaths(paths: Array<HTMLImageElement>) {
     this.setState({historyPaths: paths});
+  }
+
+  setHistoryOffset(offset: number) {
+    this.setState({historyOffset: offset});
   }
 
   /* Menu and hotkey options DON'T DELETE */
