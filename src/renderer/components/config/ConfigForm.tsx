@@ -21,7 +21,7 @@ export default class Library extends React.Component {
   };
 
   readonly state = {
-    errorMessage: "",
+    errorMessages: new Array<string>(),
     config: JSON.parse(JSON.stringify(this.props.config)), // Make a copy
   };
 
@@ -77,9 +77,11 @@ export default class Library extends React.Component {
             onUpdateSettings={this.onUpdateRemoteSettings.bind(this)}/>
         </div>
 
-        {this.state.errorMessage != "" && (
+        {this.state.errorMessages.length > 0 && (
           <Modal onClose={this.onErrorClose.bind(this)} title="Error">
-            <p dangerouslySetInnerHTML={{__html: this.state.errorMessage}}/>
+            {this.state.errorMessages.map((m) =>
+              <p key={(m as any) as number}>{m}</p>
+            )}
             <div className="u-button u-float-right" onClick={this.onErrorClose.bind(this)}>
               Ok
             </div>
@@ -90,26 +92,26 @@ export default class Library extends React.Component {
   }
 
   onErrorClose() {
-    this.setState({errorMessage: ""});
+    this.setState({errorMessages: Array<string>()});
   }
 
-  validate(): string {
-    let errorMessage = "";
+  validate(): Array<string> {
+    let errorMessages = Array<string>();
     // Validate any data:
     if (this.state.config.remoteSettings.tumblrDefault.length != 50) {
-      errorMessage += "Invalid Default Tumblr API Key<br/>"
+      errorMessages.push("Invalid Default Tumblr API Key");
     }
     if (this.state.config.remoteSettings.tumblrOverlay.length != 50) {
-      errorMessage += "Invalid Overlay Tumblr API Key<br/>"
+      errorMessages.push("Invalid Overlay Tumblr API Key");
     }
     if (isNaN(parseInt(this.state.config.caching.maxSize))) {
-      errorMessage += "Invalid Cache Size<br/>"
+      errorMessages.push("Invalid Cache Size");
     }
     if (this.state.config.caching.directory != "" &&
       !fs.existsSync(this.state.config.caching.directory)) {
-      errorMessage += "Invalid Cache Directory<br/>"
+      errorMessages.push("Invalid Cache Directory");
     }
-    return errorMessage;
+    return errorMessages;
   }
 
   onOK() {
@@ -117,12 +119,12 @@ export default class Library extends React.Component {
   }
 
   applyConfig(): boolean {
-    const errorMessage = this.validate();
-    if (errorMessage.length == 0) {
+    const errorMessages = this.validate();
+    if (errorMessages.length == 0) {
       this.props.updateConfig(this.state.config);
       return true;
     } else {
-      this.setState({errorMessage: errorMessage});
+      this.setState({errorMessages: errorMessages});
       return false;
     }
   }
