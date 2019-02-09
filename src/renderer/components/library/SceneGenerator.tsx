@@ -100,28 +100,35 @@ export default class SceneGenerator extends React.Component {
         </div>
 
         <div className="SceneGenerator__Content ControlGroupGroup">
-          {this.props.tags.map((tag) =>
-            <ControlGroup key={tag.id} title={tag.name} isNarrow={true}>
-              <span>{"Weight " + (Array.from(tagWeights.keys()).filter((t) => t.id == tag.id).length > 0 ?
-                tagWeights.get(Array.from(tagWeights.keys()).filter((t) => t.id == tag.id)[0]).value : 0).toString()}</span>
-              <span>{"Percentage: " + (sum > 0 ? (Array.from(tagWeights.keys()).filter((t) => t.id == tag.id).length > 0 ?
-                (tagWeights.get(Array.from(tagWeights.keys()).filter((t) => t.id == tag.id)[0]).value > 0 ?
-                  Math.round((tagWeights.get(Array.from(tagWeights.keys()).filter((t) => t.id == tag.id)[0]).value / sum) * 100) + "%" : "--") : "--") : "--")}</span>
-              <SimpleSliderInput
-                isEnabled={Array.from(tagWeights.keys()).filter((t) => t.id == tag.id).length > 0 ? tagWeights.get(Array.from(tagWeights.keys()).filter((t) => t.id == tag.id)[0]).type == TT.weight : true}
-                onChange={this.onChangeTagWeight.bind(this, tag)}
-                label=""
-                min={0}
-                max={100}
-                value={Array.from(tagWeights.keys()).filter((t) => t.id == tag.id).length > 0 ? tagWeights.get(Array.from(tagWeights.keys()).filter((t) => t.id == tag.id)[0]).value : 0}/>
-              <SimpleRadioInput
-                label=""
-                groupName={tag.name}
-                value={Array.from(tagWeights.keys()).filter((t) => t.id == tag.id).length > 0 ? tagWeights.get(Array.from(tagWeights.keys()).filter((t) => t.id == tag.id)[0]).type : TT.weight}
-                keys={Object.values(TT)}
-                onChange={this.onChangeTagType.bind(this, tag)}
-              />
-            </ControlGroup>
+          {this.props.tags.map((tag) => {
+            // If this weight hasn't been set before, it won't be in the map
+            const mapTagArray =  Array.from(tagWeights.keys()).filter((t) => t.id == tag.id);
+            const found = mapTagArray.length > 0;
+            let percentage = "--";
+            if (sum > 0 && found && tagWeights.get(mapTagArray[0]).value > 0) {
+              percentage = Math.round((tagWeights.get(mapTagArray[0]).value / sum) * 100) + "%";
+            }
+            return (
+              <ControlGroup key={tag.id} title={tag.name} isNarrow={true}>
+              <span>{"Weight " + (found ?
+                tagWeights.get(mapTagArray[0]).value : 0).toString()}</span>
+                <span>{"Percentage: " + percentage}</span>
+                <SimpleSliderInput
+                  isEnabled={found ? tagWeights.get(mapTagArray[0]).type == TT.weight : true}
+                  onChange={this.onChangeTagWeight.bind(this, tag)}
+                  label=""
+                  min={0}
+                  max={100}
+                  value={found ? tagWeights.get(mapTagArray[0]).value : 0}/>
+                <SimpleRadioInput
+                  label=""
+                  groupName={tag.name}
+                  value={found ? tagWeights.get(mapTagArray[0]).type : TT.weight}
+                  keys={Object.values(TT)}
+                  onChange={this.onChangeTagType.bind(this, tag)}
+                />
+              </ControlGroup>
+            )}
           )}
         </div>
 
@@ -193,6 +200,8 @@ export default class SceneGenerator extends React.Component {
       }
     }
 
+    // If this weight hasn't been set before, it won't be in the map
+    // Make a new TagWeight object
     if (!found) {
       tagWeights.set(tag, new TagWeight(TT.weight, weight));
     }
@@ -214,6 +223,8 @@ export default class SceneGenerator extends React.Component {
       }
     }
 
+    // If this weight hasn't been set before, it won't be in the map
+    // Make a new TagWeight object
     if (!found) {
       tagWeights.set(tag, new TagWeight(type, 0));
     }
