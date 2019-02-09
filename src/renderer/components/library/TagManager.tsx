@@ -1,7 +1,7 @@
 import * as React from "react";
 import Sortable from "sortablejs"
 
-import {array_move, removeDuplicatesBy} from "../../utils";
+import {arrayMove, removeDuplicatesBy} from "../../utils";
 import Tag from "./Tag";
 
 export default class TagManager extends React.Component {
@@ -82,7 +82,7 @@ export default class TagManager extends React.Component {
 
   onEnd(evt: any) {
     let newTags = this.props.tags;
-    array_move(newTags, evt.oldIndex, evt.newIndex);
+    arrayMove(newTags, evt.oldIndex, evt.newIndex);
     this.props.onUpdateTags(newTags);
   }
 

@@ -76,7 +76,7 @@ export function removeDuplicatesBy(keyFn: Function, array: any[]): any[] {
   });
 }
 
-export function array_move(arr: any[], old_index: number, new_index: number) {
+export function arrayMove(arr: any[], old_index: number, new_index: number) {
   if (new_index >= arr.length) {
     let k = new_index - arr.length + 1;
     while (k--) {
