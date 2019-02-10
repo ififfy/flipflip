@@ -18,6 +18,7 @@ type Props = {
   onDelete(scene: Scene): void,
   onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
   onOpenLibraryImport(scene: Scene): void,
+  saveScene(): void,
 };
 
 export default class SceneDetail extends React.Component {
@@ -67,6 +68,11 @@ export default class SceneDetail extends React.Component {
           </div>
 
           <div className="u-button-row-right">
+            {this.props.scene.tagWeights && (
+              <div onClick={this.props.saveScene.bind(this)} className="u-clickable u-button">
+                Save as New Scene
+              </div>
+            )}
             <div onClick={this.props.scene.sources.length > 0 ? this.play.bind(this) : this.nop.bind(this)}
                  className={`u-clickable u-button ${this.props.scene.sources.length > 0 ? '' : 'u-disabled'}`}>
               Play

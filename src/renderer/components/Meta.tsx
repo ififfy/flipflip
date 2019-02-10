@@ -155,6 +155,7 @@ export default class Meta extends React.Component {
             onPlay={this.onPlayScene.bind(this)}
             onUpdateScene={this.onUpdateScene.bind(this)}
             onOpenLibraryImport={this.onOpenLibraryImport.bind(this)}
+            saveScene={this.saveScene.bind(this)}
           />)}
 
         {this.isRoute('play') && (
@@ -197,6 +198,21 @@ export default class Meta extends React.Component {
     const newRoute = this.state.route;
     this.state.route.pop();
     this.setState({route: newRoute, autoEdit: false, isSelect: false});
+  }
+
+  saveScene() {
+    let id = this.state.scenes.length + 1;
+    this.state.scenes.forEach((s) => {
+      id = Math.max(s.id + 1, id);
+    });
+    const sceneCopy = JSON.parse(JSON.stringify(this.scene())); // Make a copy
+    sceneCopy.tagWeights = null;
+    sceneCopy.id = id;
+    this.setState({
+      scenes: this.state.scenes.concat([sceneCopy]),
+      route: [new Route({kind: 'scene', value: sceneCopy.id})],
+      autoEdit: true,
+    });
   }
 
   onAddScene() {
