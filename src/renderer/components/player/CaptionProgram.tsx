@@ -1,18 +1,41 @@
-import wretch from 'wretch';
 import * as React from 'react';
+import wretch from 'wretch';
 
-let STYLES : {[style : string] : string} = {};
+import {CancelablePromise, getRandomListItem} from '../../utils'
+
+class CaptionSettings {
+  blinkColor: string;
+  blinkFontSize: number;
+  blinkFontFamily: string;
+  captionColor: string;
+  captionFontSize: number;
+  captionFontFamily: string;
+  captionBigColor: string;
+  captionBigFontSize: number;
+  captionBigFontFamily: string;
+
+  constructor(init?: Partial<CaptionSettings>) {
+    Object.assign(this, init);
+  }
+}
+
+let STYLES: { [style: string]: string } = {};
 
 let programCounter = 0;
-let PROGRAM : Function[] = [];
+let PROGRAM: Function[] = [];
 let BLINK_DURATION = 200;
 let BLINK_DELAY = 80;
 let BLINK_GROUP_DELAY = 1200;
 let CAPTION_DURATION = 2000;
 let CAPTION_DELAY = 1200;
-let PHRASES : string[] = [];
+let PHRASES: string[] = [];
 
-const splitFirstWord = function(s : string) {
+function reset() {
+  PROGRAM = [];
+  programCounter = 0;
+}
+
+const splitFirstWord = function (s: string) {
   const firstSpaceIndex = s.indexOf(" ");
   if (firstSpaceIndex > 0 && firstSpaceIndex < s.length - 1) {
     const first = s.substring(0, firstSpaceIndex);
@@ -23,33 +46,24 @@ const splitFirstWord = function(s : string) {
   }
 };
 
-const getFirstWord = function(s : string) {
+const getFirstWord = function (s: string) {
   return splitFirstWord(s)[0];
 };
 
-const getRest = function(s : string) {
+const getRest = function (s: string) {
   return splitFirstWord(s)[1];
 };
 
-const fnIntArg = function(innerFn : Function) {
-  return function(el : HTMLElement, value : string) {
+const fnIntArg = function (innerFn: Function) {
+  return function (el: HTMLElement, value: string) {
     const ms = parseInt(value, 10);
     if (isNaN(ms)) { return null; }
     return innerFn(ms);
   };
 };
 
-const getRandomIndex = (list : any[]) => {
-  return Math.floor(Math.random()*list.length)
-};
-
-const getRandomListItem = (list : any[]) => {
-  return list[getRandomIndex(list)];
-};
-
-
-const COMMANDS : { [command : string] : (el: HTMLElement, value : string) => any;} = {
-  saveStyleRules: function(el : HTMLElement, value : string) {
+const COMMANDS: { [command: string]: (el: HTMLElement, value: string, config: CaptionSettings) => any; } = {
+  saveStyleRules: function (el: HTMLElement, value: string) {
     const firstWord = getFirstWord(value);
     const style = getRest(value);
     if (!firstWord || !style) { return null; }
@@ -60,14 +74,14 @@ const COMMANDS : { [command : string] : (el: HTMLElement, value : string) => any
     return function(f : Function) { f() };
   },
 
-  applySavedStyle: function(el : HTMLElement, value : string) {
-    return function(runNextCommand : Function) {
+  applySavedStyle: function (el: HTMLElement, value: string) {
+    return function (runNextCommand: Function) {
       el.style.cssText = STYLES[value];
       runNextCommand();
     }
   },
 
-  showText: function(el : HTMLElement, value : string) {
+  showText: function (el: HTMLElement, value: string) {
     let textString = getRest(value);
     const msString = getFirstWord(value);
     const ms = parseInt(msString, 10);
@@ -77,10 +91,10 @@ const COMMANDS : { [command : string] : (el: HTMLElement, value : string) => any
       textString = getRandomListItem(PHRASES);
     }
 
-    return function(runNextCommand : Function) {
+    return function (runNextCommand: Function) {
       el.style.opacity = '1.0';
       el.innerHTML = textString;
-      setTimeout(function() {
+      setTimeout(function () {
         el.style.opacity = '0.0';
         runNextCommand();
       }, ms);
@@ -91,225 +105,226 @@ const COMMANDS : { [command : string] : (el: HTMLElement, value : string) => any
     return function(runNextCommand : Function) { setTimeout(runNextCommand, ms); }
   }),
 
-  setBlinkDuration: fnIntArg(function(ms : number) {
-    return function(runNextCommand : Function) {
+  setBlinkDuration: fnIntArg(function (ms: number) {
+    return function (runNextCommand: Function) {
       BLINK_DURATION = ms;
       runNextCommand();
     }
   }),
 
-  setBlinkDelay: fnIntArg(function(ms : number) {
-    return function(runNextCommand : Function) {
+  setBlinkDelay: fnIntArg(function (ms: number) {
+    return function (runNextCommand: Function) {
       BLINK_DELAY = ms;
       runNextCommand();
     }
   }),
 
-  setBlinkGroupDelay: fnIntArg(function(ms : number) {
-    return function(runNextCommand : Function) {
+  setBlinkGroupDelay: fnIntArg(function (ms: number) {
+    return function (runNextCommand: Function) {
       BLINK_GROUP_DELAY = ms;
       runNextCommand();
     }
   }),
 
-  setCaptionDuration: fnIntArg(function(ms : number) {
-    return function(runNextCommand : Function) {
+  setCaptionDuration: fnIntArg(function (ms: number) {
+    return function (runNextCommand: Function) {
       CAPTION_DURATION = ms;
       runNextCommand();
     }
   }),
 
-  setCaptionDelay: fnIntArg(function(ms : number) {
-    return function(runNextCommand : Function) {
+  setCaptionDelay: fnIntArg(function (ms: number) {
+    return function (runNextCommand: Function) {
       CAPTION_DELAY = ms;
       runNextCommand();
     }
   }),
 
-  storePhrase: function(el : HTMLElement, value : string) {
+  storePhrase: function (el: HTMLElement, value: string) {
     PHRASES.push(value);
     return function(f : Function) { f() };
   },
 
-  blink: function(el : HTMLElement, value : string) {
-    return function(runNextCommand : Function) {
-      let fns : Function[] = [];
+  blink: function (el: HTMLElement, value: string, config: CaptionSettings) {
+    return function (runNextCommand: Function) {
+      let fns: Function[] = [];
       let i = 0;
+      el.style.color = config.blinkColor;
+      el.style.fontSize = config.blinkFontSize + "vmin";
+      el.style.fontFamily = config.blinkFontFamily;
       el.className = "text-blink";
-      value.split('/').forEach(function(word) {
+      value.split('/').forEach(function (word) {
         word = word.trim();
         let j = i;
         i += 1;
-        fns.push(function() {
-          const showText = COMMANDS.showText(el, BLINK_DURATION + ' ' + word);
-          const wait = COMMANDS.wait(el, '' + BLINK_DELAY);
+        fns.push(function () {
+          const showText = COMMANDS.showText(el, BLINK_DURATION + ' ' + word, config);
+          const wait = COMMANDS.wait(el, '' + BLINK_DELAY, config);
           showText(function() { wait(fns[j + 1]); });
         })
       });
-      const lastWait = COMMANDS.wait(el, '' + BLINK_GROUP_DELAY);
-      fns.push(function() {
+      const lastWait = COMMANDS.wait(el, '' + BLINK_GROUP_DELAY, config);
+      fns.push(function () {
         lastWait(runNextCommand);
       });
       fns[0]();
     }
   },
 
-  cap: function(el : HTMLElement, value : string) {
-    const showText = COMMANDS.showText(el, CAPTION_DURATION + ' ' + value);
-    const wait = COMMANDS.wait(el, '' + CAPTION_DELAY);
-    return function(runNextCommand : Function) {
+  cap: function (el: HTMLElement, value: string, config: CaptionSettings) {
+    const showText = COMMANDS.showText(el, CAPTION_DURATION + ' ' + value, config);
+    const wait = COMMANDS.wait(el, '' + CAPTION_DELAY, config);
+    return function (runNextCommand: Function) {
+      el.style.color = config.captionColor;
+      el.style.fontSize = config.captionFontSize + "vmin";
+      el.style.fontFamily = config.captionFontFamily;
       el.className = "text-caption";
       showText(function() { wait(runNextCommand); });
     }
   },
 
-  bigcap: function(el : HTMLElement, value : string) {
-    const showText = COMMANDS.showText(el, CAPTION_DURATION + ' ' + value);
-    const wait = COMMANDS.wait(el, '' + CAPTION_DELAY);
-    return function(runNextCommand : Function) {
+  bigcap: function (el: HTMLElement, value: string, config: CaptionSettings) {
+    const showText = COMMANDS.showText(el, CAPTION_DURATION + ' ' + value, config);
+    const wait = COMMANDS.wait(el, '' + CAPTION_DELAY, config);
+    return function (runNextCommand: Function) {
+      el.style.color = config.captionBigColor;
+      el.style.fontSize = config.captionBigFontSize + "vmin";
+      el.style.fontFamily = config.captionBigFontFamily;
       el.className = "text-caption-big";
       showText(function() { wait(runNextCommand); });
     }
   }
 };
 
-const run = function(getHasStopped : Function) {
-  if (getHasStopped()) {
-    return;
-  }
-  PROGRAM[programCounter](function() {
-    programCounter += 1;
-    if (programCounter >= PROGRAM.length) {
-      programCounter = 0;
-    }
-    run(getHasStopped);
-  })
-};
-
-
-const startText = function(el : HTMLElement, programText : string) {
-  let i = -1;
-  let hasError = false;
-  let hasStopped = false;
-  const getHasStopped = () => { return hasStopped; };
-
-  programText.split('\n').forEach(function(line) {
-    line = line.trim();
-    i += 1;
-    if (line.length < 1) return;
-
-    if (line[0] === '#') {
-      return;
-    }
-    const command = getFirstWord(line);
-    if (command) {
-      const value = getRest(line);
-      if (COMMANDS[command]) {
-        const fn = COMMANDS[command](el, value);
-        if (fn) {
-          if (command.toLowerCase().startsWith("set")) {
-            fn(getHasStopped);
-          } else {
-            PROGRAM.push(fn);
-          }
-        } else {
-          hasError = true;
-          console.error("Error on line", i, "- invalid arguments");
-        }
-      } else {
-        hasError = true;
-        console.error("Error on line", i, "- unknown command");
-      }
-    }
-  });
-
-  if (!hasError) {
-    run(getHasStopped);
-  }
-  return () => { hasStopped = true; };
-};
-
-
-const startShowingText = function(el : HTMLElement, url : string) {
-  if (url === 'test') {
-    let testProgram = `
-    setBlinkDuration 300
-    setBlinkDelay 100
-    setBlinkGroupDelay 1200
-    setCaptionDuration 2000
-    setCaptionDelay 1200
-
-    bigcap YOU LOVE FLUFFY KITTENS
-    blink KITTENS / ARE / YOUR / LIFE
-    cap Cuddle all the kittens forever because you love them.
-    `;
-    return startText(el, testProgram);
-  }
-
-  let _hasStoppedEarly = false;
-  let _stop = () => {
-    _hasStoppedEarly = true;
-  };
-  const stop = () => { _stop(); };
-  wretch(url)
-    .get()
-    .error(503, error => {
-      console.log("Unable to access " + url + " - Service is unavailable");
-    })
-    .text(data => {
-      if (_hasStoppedEarly) return;
-      if (localStorage.debugText) {
-        console.log(data);
-      }
-      _stop = startText(el, data);
-    });
-  return stop;
-};
-
 export default class CaptionProgram extends React.Component {
   readonly el = React.createRef<HTMLDivElement>();
 
   readonly props: {
+    blinkColor: string,
+    blinkFontSize: number,
+    blinkFontFamily: string,
+    captionColor: string,
+    captionFontSize: number,
+    captionFontFamily: string,
+    captionBigColor: string,
+    captionBigFontSize: number,
+    captionBigFontFamily: string,
     url: string,
   };
 
   readonly state = {
-    stopFunc: Function(),
-    lastURL: ""
+    runningPromise: new CancelablePromise((resolve, reject) => {})
   };
-
-  shouldComponentUpdate(nextProps : {url : string}, nextState: any) {
-    return nextProps.url !== this.props.url;
-  }
-
-  componentWillReceiveProps(nextProps : {url : string}) {
-    this._update(nextProps);
-  }
-
-  componentWillUnmount() {
-    PROGRAM = [];
-    programCounter = 0;
-    this.state.stopFunc();
-  }
-
-  _update(props: {url : string}) {
-    if (!this.el.current) return;
-    if (props.url == this.state.lastURL) return;
-    this.setState({lastURL: props.url});
-    this._stop();
-    this.setState({stopFunc: startShowingText(this.el.current, props.url)});
-  }
-
-  _stop() {
-    if (this.state.stopFunc) {
-      this.state.stopFunc();
-      this.setState({stopFunc: null});
-    }
-  }
 
   render() {
     return (
-      <div className="CaptionProgram u-fill-container"><div ref={this.el} /></div>
+      <div className="CaptionProgram u-fill-container">
+        <div ref={this.el}/>
+      </div>
     );
+  }
+
+  componentDidMount() {
+    this.start();
+  }
+
+  componentWillUnmount() {
+    reset();
+    this.stop(false);
+  }
+
+  shouldComponentUpdate(nextProps: { url: string }, nextState: any) {
+    return nextProps.url !== this.props.url;
+  }
+
+  componentWillReceiveProps(nextProps: { url: string }) {
+    if (!this.el.current || nextProps.url == this.props.url) return;
+    this.stop(true);
+    reset();
+    this.start(nextProps.url);
+  }
+
+  start(url?: string) {
+    if (url == undefined) {
+      url = this.props.url;
+    }
+    const newPromise = new CancelablePromise((resolve, reject) => {
+      wretch(url)
+        .get()
+        .error(503, error => {
+          console.warn("Unable to access " + url + " - Service is unavailable");
+        })
+        .text(data => {
+          resolve([data]);
+        });
+    });
+    this.setState({runningPromise: newPromise});
+    newPromise
+      .then((data) => {
+        let hasError = false;
+        const captionSettings = new CaptionSettings({
+          blinkColor: this.props.blinkColor,
+          blinkFontSize: this.props.blinkFontSize,
+          blinkFontFamily: this.props.blinkFontFamily,
+          captionColor: this.props.captionColor,
+          captionFontSize: this.props.captionFontSize,
+          captionFontFamily: this.props.captionFontFamily,
+          captionBigColor: this.props.captionBigColor,
+          captionBigFontSize: this.props.captionBigFontSize,
+          captionBigFontFamily: this.props.captionBigFontFamily,
+        });
+        for (let line of data[0].split('\n')) {
+          line = line.trim();
+
+          if (line.length == 0 || line[0] === '#') continue;
+
+          const command = getFirstWord(line);
+          if (command) {
+            const value = getRest(line);
+            if (COMMANDS[command]) {
+              const fn = COMMANDS[command](this.el.current, value, captionSettings);
+              if (fn) {
+                if (command.toLowerCase().startsWith("set")) {
+                  fn(() => {return newPromise.hasCanceled;});
+                } else {
+                  PROGRAM.push(fn);
+                }
+              } else {
+                hasError = true;
+                console.error("Error: '" + line + "' - invalid arguments");
+                break;
+              }
+            } else {
+              hasError = true;
+              console.error("Error: '" + line + "' - unknown command");
+              break;
+            }
+          }
+        }
+
+        function captionLoop(hasCanceled: boolean) {
+          if (hasCanceled) {
+            return;
+          }
+          PROGRAM[programCounter](() => {
+            programCounter += 1;
+            if (programCounter >= PROGRAM.length) {
+              programCounter = 0;
+            }
+            captionLoop(newPromise.hasCanceled);
+          });
+        }
+
+        if (!hasError) {
+          captionLoop(newPromise.hasCanceled);
+        }
+      });
+  }
+
+  stop(setState: boolean) {
+    if (this.state.runningPromise) {
+      this.state.runningPromise.cancel();
+      if (setState) this.setState({runningPromise: null});
+    }
   }
 }

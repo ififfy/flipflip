@@ -35,11 +35,37 @@ const VTF = { // vertical translate functions
   down: 'vtf.down',
 };
 
-const TK = { // text kind
-  url: 'tk.url',
-  hastebin: 'tk.hastebin',
+const TOT = { // text overlay type
+  url: 'tot.url',
+  hastebin: 'tot.hastebin',
+};
+
+const GT = { // gooninator import type
+  tumblr: 'gt.tumblr',
+  local: 'gt.local',
+};
+
+const TT = { // tag type
+  weight: 'tt.weight',
+  all: 'tt.all',
+  none: 'tt.none',
+};
+
+const SF = { // sort function
+  alphaA: 'sf.alphaA',
+  alphaD: 'sf.alphaD',
+  dateA: 'sf.dateA',
+  dateD: 'sf.dateD',
+  type: 'sf.type',
+};
+
+const ST = { // source types
+  local: 'st.local',
+  list: 'st.list',
+  tumblr: 'st.tumblr',
+  reddit: 'st.reddit',
 };
 
 export {
-  TF, IF, ZF, HTF, VTF, TK, BT
+  TF, IF, ZF, HTF, VTF, TOT, BT, GT, TT, SF, ST,
 };

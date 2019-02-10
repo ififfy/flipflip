@@ -16,7 +16,7 @@ export default class ImageView extends React.Component {
   }
 
   componentDidUpdate() {
-    this._applyImage();    
+    this._applyImage();
   }
 
   _applyImage() {

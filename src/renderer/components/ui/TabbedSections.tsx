@@ -1,11 +1,10 @@
 import * as React from 'react';
-import { triggerAsyncId } from 'async_hooks';
 
 class TabContent extends React.Component {
   readonly props: {
     isActive: boolean,
     children?: React.ReactNode,
-  }
+  };
 
   render() {
     return (
@@ -21,7 +20,7 @@ class Tab extends React.Component {
     isActive: boolean,
     title: string,
     onClick(): void,
-  }
+  };
 
   render() {
     return (
@@ -37,7 +36,7 @@ class TabBar extends React.Component {
     titles: string[],
     activeIndex: number,
     onChangeActiveIndex(i: number): void,
-  }
+  };
 
   render() {
     return (
@@ -47,7 +46,7 @@ class TabBar extends React.Component {
             key={i}
             isActive={i === this.props.activeIndex}
             title={t}
-            onClick={() => this.props.onChangeActiveIndex(i)} />;
+            onClick={() => this.props.onChangeActiveIndex(i)}/>;
         })}
       </div>
     );
@@ -59,11 +58,11 @@ export class TabbedSections extends React.Component {
     style: any,
     titles: Array<string>,
     renderChildren: () => React.ReactNode[],
-  }
+  };
 
   readonly state = {
     activeIndex: 0,
-  }
+  };
 
   render() {
     return (
@@ -71,11 +70,11 @@ export class TabbedSections extends React.Component {
         <TabBar
           titles={this.props.titles}
           activeIndex={this.state.activeIndex}
-          onChangeActiveIndex={this.changeActiveIndex.bind(this)} />
+          onChangeActiveIndex={this.changeActiveIndex.bind(this)}/>
         <div className="TabbedSections__Content">
           {this.props.renderChildren().map((child, i) => {
             return (
-              <TabContent key={i} isActive={i === this.state.activeIndex} children={child} />
+              <TabContent key={i} isActive={i === this.state.activeIndex} children={child}/>
             );
           })}
         </div>

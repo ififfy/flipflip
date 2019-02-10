@@ -1,20 +1,22 @@
+import {remote} from "electron";
 import * as React from 'react'
 import {sep} from "path";
-import {remote} from "electron";
-import {TK} from '../../const';
+
+import {GT, TOT} from '../../const';
+import SimpleOptionPicker from "../ui/SimpleOptionPicker";
 import SimpleTextInput from '../ui/SimpleTextInput';
 
 export default class GooninatorImporter extends React.Component {
   readonly props: {
-    directories: Array<string>,
-    onChangeDirectories(directories: Array<string>): void,
-    onChangeTextKind(kind: string) : void,
-    onChangeTextSource(hbID: string) : void,
+    addSources(sources: Array<string>): void,
+    onChangeTextKind(kind: string): void,
+    onChangeTextSource(hbID: string): void,
     onDidImport(): void,
   };
 
   readonly state = {
     importURL: "",
+    importType: GT.tumblr,
     rootDir: "",
   };
 
@@ -25,18 +27,33 @@ export default class GooninatorImporter extends React.Component {
           label="Paste a gooninator URL for import:"
           value={this.state.importURL}
           onChange={this.importURLChange.bind(this)}
-          isEnabled={true} />
+          isEnabled={true}/>
 
-        <p>Enter the parent directory to look in:</p>
-        <p>
-          <input type="text" name="root" value={this.state.rootDir} readOnly onClick={this.addRootDir.bind(this)}/>
-        </p>
+        <SimpleOptionPicker
+          label="Import Type"
+          value={this.state.importType}
+          keys={Object.values(GT)}
+          onChange={this.changeImportType.bind(this)}
+        />
+
+        {this.state.importType == GT.local && (
+          <div>
+            <p>Enter the parent directory to look in:</p>
+            <p>
+              <input type="text" name="root" value={this.state.rootDir} readOnly onClick={this.addRootDir.bind(this)}/>
+            </p>
+          </div>
+        )}
         <div className="u-button u-float-right" onClick={this.doImport.bind(this)}>
           Import
         </div>
-        <div style={{clear: 'both'}} />
+        <div style={{clear: 'both'}}/>
       </div>
     );
+  }
+
+  changeImportType(type: string) {
+    this.setState({importType: type});
   }
 
   doImport() {
@@ -45,10 +62,14 @@ export default class GooninatorImporter extends React.Component {
     if (!importURL) {
       return;
     }
-    let rootDir = this.state.rootDir.toString();
-    if (!rootDir.endsWith(sep)) {
-      rootDir += sep;
+    let rootDir;
+    if (this.state.importType == GT.local) {
+      rootDir = this.state.rootDir.toString();
+      if (!rootDir.endsWith(sep)) {
+        rootDir += sep;
+      }
     }
+
     if (importURL.includes("sources=")) {
       // Remove everything before "sources="
       importURL = importURL.substring(importURL.indexOf("sources=") + 8);
@@ -62,8 +83,13 @@ export default class GooninatorImporter extends React.Component {
       let importURLs = importURL.split("%20");
       // Append root onto each blog
       for (let u = 0; u < importURLs.length; u++) {
-        let fullPath = rootDir + importURLs[u];
-        if (this.props.directories.includes(fullPath) || importURLs.includes(fullPath) || importURLs[u] === sep || importURLs[u] === "") {
+        let fullPath;
+        if (this.state.importType == GT.local) {
+          fullPath = rootDir + importURLs[u];
+        } else {
+          fullPath = "http://" + importURLs[u] + ".tumblr.com";
+        }
+        if (importURLs.includes(fullPath) || importURLs[u] === sep || importURLs[u] === "") {
           // Remove index and push u back
           importURLs.splice(u, 1);
           u -= 1
@@ -73,7 +99,7 @@ export default class GooninatorImporter extends React.Component {
       }
 
       // Add list
-      this.props.onChangeDirectories(this.props.directories.concat(importURLs));
+      this.props.addSources(importURLs);
     }
 
     if (hastebinURL.includes("pastebinId=")) {
@@ -86,7 +112,7 @@ export default class GooninatorImporter extends React.Component {
       }
 
       // Update hastebin URL (if present)
-      this.props.onChangeTextKind(TK.hastebin);
+      this.props.onChangeTextKind(TOT.hastebin);
       this.props.onChangeTextSource(hastebinURL);
     }
 
@@ -98,7 +124,7 @@ export default class GooninatorImporter extends React.Component {
   };
 
   addRootDir() {
-    let result = remote.dialog.showOpenDialog({properties: ['openDirectory']});
+    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']});
     if (!result) return;
     this.setState({rootDir: result});
   }

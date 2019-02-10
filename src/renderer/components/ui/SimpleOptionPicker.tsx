@@ -1,31 +1,33 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import en from '../../en';
 
+import en from '../../en';
 
 export default class SimpleOptionPicker extends React.Component {
   readonly props: {
     label: string,
     value: string,
     keys: Array<string>,
-    getLabel?: (id: string) => string,
+    disableFirst?: boolean,
+    parseKeyFunction?: (id: string) => string,
     onChange: (value: string) => void,
-  }
+  };
 
   render() {
-    return ( 
+    return (
       <div className="SimpleOptionPicker">
-        <label>{this.props.label}</label>
+        {this.props.label && (
+          <label>{this.props.label}</label>
+        )}
         <select
           value={this.props.value}
           onChange={this.onChange.bind(this)}>
-          {this.props.keys.map((k) => {
-            const label  = this.props.getLabel
-              ? this.props.getLabel(k)
+          {this.props.keys.map((k, index) => {
+            const text = this.props.parseKeyFunction
+              ? this.props.parseKeyFunction(k)
               : (
                 en.get(k) != null ? en.get(k) : k
               );
-            return <option value={k} key={k}>{label}</option>;
+            return <option value={k} key={k} disabled={this.props.disableFirst && index == 0}>{text}</option>;
           })}
         </select>
       </div>

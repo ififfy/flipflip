@@ -1,25 +1,23 @@
 import * as React from 'react';
 
-import {IF, TK} from '../../const';
-
 import Scene from '../../Scene';
-import ControlGroup from './ControlGroup';
-import DirectoryPicker from './DirectoryPicker';
-import SimpleCheckbox from '../ui/SimpleCheckbox';
-import SimpleOptionPicker from '../ui/SimpleOptionPicker';
-import SimpleURLInput from "../ui/SimpleURLInput";
-import URLModal from './URLModal';
-import TimingGroup from "./TimingGroup";
+import SourcePicker from './SourcePicker';
+import AudioGroup from "./AudioGroup";
 import EffectGroup from "./EffectGroup";
+import ImageGroup from "./ImageGroup";
+import TextGroup from "./TextGroup";
+import TimingGroup from "./TimingGroup";
+import LibrarySource from "../library/LibrarySource";
 
 type Props = {
-  scene?: Scene,
+  scene: Scene,
   allScenes: Array<Scene>,
   autoEdit: boolean,
   goBack(): void,
   onPlay(scene: Scene): void,
   onDelete(scene: Scene): void,
   onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
+  onOpenLibraryImport(scene: Scene): void,
 };
 
 export default class SceneDetail extends React.Component {
@@ -39,15 +37,7 @@ export default class SceneDetail extends React.Component {
 
   render() {
     return (
-      <div className='SceneDetail'>
-        {this.state.isShowingURLModal && (
-            <URLModal
-              onClose={this.closeModals.bind(this)}
-              directories={this.props.scene.directories}
-              onChangeDirectories={this.onChangeDirectories.bind(this)}
-              onChangeTextKind={this.onChangeTextKind.bind(this)}
-              onChangeTextSource={this.onChangeTextSource.bind(this)} />
-        )}
+      <div className="SceneDetail" onKeyDown={this.secretHotkey.bind(this)} tabIndex={0}>
 
         <div className="u-button-row">
           <div className="u-abs-center">
@@ -59,7 +49,7 @@ export default class SceneDetail extends React.Component {
                   ref={this.nameInputRef}
                   value={this.props.scene.name}
                   onBlur={this.endEditingName.bind(this)}
-                  onChange={this.onChangeName.bind(this)} />
+                  onChange={this.onChangeName.bind(this)}/>
               </form>
             )}
             {!this.state.isEditingName && (
@@ -77,7 +67,8 @@ export default class SceneDetail extends React.Component {
           </div>
 
           <div className="u-button-row-right">
-            <div onClick={this.props.scene.directories.length > 0 ? this.play.bind(this) : this.nop.bind(this)} className={`u-clickable u-button ${this.props.scene.directories.length > 0 ? '' : 'u-disabled'}`}>
+            <div onClick={this.props.scene.sources.length > 0 ? this.play.bind(this) : this.nop.bind(this)}
+                 className={`u-clickable u-button ${this.props.scene.sources.length > 0 ? '' : 'u-disabled'}`}>
               Play
             </div>
           </div>
@@ -93,53 +84,32 @@ export default class SceneDetail extends React.Component {
             allScenes={this.props.allScenes}
             onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
-          <ControlGroup title="Images" isNarrow={true}>
-            <div className="ControlSubgroup">
-              <SimpleOptionPicker
-                onChange={this.onChangeImageTypeFilter.bind(this)}
-                label="Image Filter"
-                value={this.props.scene.imageTypeFilter}
-                keys={Object.values(IF)} />
-              <SimpleCheckbox
-                  text="Play Full GIF animations"
-                  isOn={this.props.scene.playFullGif}
-                  onChange={this.onChangePlayFullGif.bind(this)} />
-            </div>
-          </ControlGroup>
+          <ImageGroup
+            scene={this.props.scene}
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
-          <ControlGroup title="Text" isNarrow={true}>
-            <SimpleOptionPicker
-              onChange={this.onChangeTextKind.bind(this)}
-              label="Source"
-              value={this.props.scene.textKind}
-              keys={Object.values(TK)} />
-            <SimpleURLInput
-              isEnabled={true}
-              onChange={this.onChangeTextSource.bind(this)}
-              label={(() => {
-                switch (this.props.scene.textKind) {
-                  case TK.hastebin: return "Hastebin ID";
-                  case TK.url: return "URL";
-                }
-              })()}
-              value={this.props.scene.textSource} />
-          </ControlGroup>
+          <AudioGroup
+            scene={this.props.scene}
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
-          <ControlGroup title="Audio" isNarrow={true}>
-            <SimpleURLInput
-              isEnabled={true}
-              onChange={this.onChangeAudioURL.bind(this)}
-              label="URL"
-              value={this.props.scene.audioURL} />
-          </ControlGroup>
+          <TextGroup
+            scene={this.props.scene}
+            isPlayer={false}
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
-          <ControlGroup title="Sources" isNarrow={false}>
-            <DirectoryPicker
-                directories={this.props.scene.directories}
-                onImportURL={this.onImportURL.bind(this)}
-                onChange={this.onChangeDirectories.bind(this)}/>
-          </ControlGroup>
-
+          <div className="ControlGroup m-wide">
+            <div className="ControlGroup__Title">Sources</div>
+            <SourcePicker
+              sources={this.props.scene.sources}
+              emptyMessage="You haven't added any sources to this Scene yet."
+              removeAllMessage="Are you sure you want to remove all sources from this scene?"
+              removeAllConfirm="Ok"
+              allowLibraryImport={true}
+              isSelect={false}
+              onUpdateSources={this.onChangeSources.bind(this)}
+              onOpenLibraryImport={this.props.onOpenLibraryImport.bind(this, this.props.scene)}
+            />
+          </div>
         </div>
       </div>
     )
@@ -152,10 +122,6 @@ export default class SceneDetail extends React.Component {
     }
   }
 
-  closeModals() {
-    this.setState({isShowingURLModal: false});
-  }
-
   play() {
     this.props.onPlay(this.props.scene);
   }
@@ -164,8 +130,15 @@ export default class SceneDetail extends React.Component {
 
   }
 
-  onImportURL() {
-    this.setState({isShowingURLModal: true});
+  toggleURLImportModal() {
+    this.setState({isShowingURLModal: !this.state.isShowingURLModal});
+  }
+
+  // Use alt+P to access import modal
+  secretHotkey(e: KeyboardEvent) {
+    if (e.altKey && e.key == 'p') {
+      this.toggleURLImportModal();
+    }
   }
 
   beginEditingName() {
@@ -181,19 +154,7 @@ export default class SceneDetail extends React.Component {
     this.props.onUpdateScene(this.props.scene, fn);
   }
 
-  onChangeName(e: React.FormEvent<HTMLInputElement>) {
-    this.update((s) => { s.name = e.currentTarget.value; });
-  }
+  onChangeName(e: React.FormEvent<HTMLInputElement>) { this.update((s) => { s.name = e.currentTarget.value; }); }
 
-  onChangeDirectories(directories: Array<string>) { this.update((s) => { s.directories = directories; }); }
-
-  onChangeImageTypeFilter(filter: string) { this.update((s) => { s.imageTypeFilter = filter; }); }
-
-  onChangeTextKind(kind: string) { this.update((s) => { s.textKind = kind; }); }
-
-  onChangeTextSource(textSource: string) { this.update((s) => { s.textSource = textSource; }); }
-
-  onChangePlayFullGif(value: boolean) { this.update((s) => { s.playFullGif = value; }); }
-
-  onChangeAudioURL(value: string) { this.update((s) => { s.audioURL = value; }); }
+  onChangeSources(sources: Array<LibrarySource>) { this.update((s) => { s.sources = sources; }); }
 };
