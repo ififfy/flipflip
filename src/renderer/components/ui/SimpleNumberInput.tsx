@@ -1,10 +1,10 @@
 import * as React from 'react';
 
-export default class SimpleSliderInput extends React.Component {
+export default class SimpleNumberInput extends React.Component {
   readonly props: {
     label: string,
-    min: number,
-    max: number,
+    min?: number,
+    max?: number,
     value: number,
     isEnabled: boolean,
     onChange: (value: string) => void
@@ -12,11 +12,11 @@ export default class SimpleSliderInput extends React.Component {
 
   render() {
     return (
-      <div className="SimpleSliderInput">
+      <div className="SimpleNumberInput">
         <label>{this.props.label}</label>
         <input
           disabled={!this.props.isEnabled}
-          type="range"
+          type="number"
           min={this.props.min}
           max={this.props.max}
           value={this.props.value}
@@ -27,6 +27,13 @@ export default class SimpleSliderInput extends React.Component {
   }
 
   onChange(e: React.FormEvent<HTMLSelectElement>) {
-    this.props.onChange(e.currentTarget.value);
+    if (e.currentTarget.value == "") {
+      this.props.onChange(e.currentTarget.value);
+    } else {
+      const value = parseInt(e.currentTarget.value);
+      if ((this.props.min == null || value >= this.props.min) && (this.props.max == null || value <= this.props.max)) {
+        this.props.onChange(e.currentTarget.value);
+      }
+    }
   }
 }

@@ -9,21 +9,38 @@ export default new Map<String, String>([
   ['if.gifs', 'Only gifs'],
   ['if.stills', 'Only stills'],
 
-  ['zf.none','No zoom'],
-  ['zf.in','Zoom In'],
-  ['zf.out','Zoom Out'],
+  ['zf.none', 'No zoom'],
+  ['zf.in', 'Zoom In'],
+  ['zf.out', 'Zoom Out'],
 
   ['bt.blur', 'Blurred'],
   ['bt.color', 'Solid Color'],
 
-  ['htf.none','None'],
-  ['htf.left','Left'],
-  ['htf.right','Right'],
+  ['htf.none', 'None'],
+  ['htf.left', 'Left'],
+  ['htf.right', 'Right'],
 
-  ['vtf.none','None'],
-  ['vtf.up','Up'],
-  ['vtf.down','Down'],
+  ['vtf.none', 'None'],
+  ['vtf.up', 'Up'],
+  ['vtf.down', 'Down'],
 
-  ['tk.url', 'URL'],
-  ['tk.hastebin', 'Hastebin'],
+  ['tot.url', 'URL'],
+  ['tot.hastebin', 'Hastebin'],
+
+  ['gt.tumblr', 'Tumblr'],
+  ['gt.local', 'Local'],
+
+  ['tt.weight', 'Weight'],
+  ['tt.all', 'Require'],
+  ['tt.none', 'Exclude'],
+
+  ['sf.alphaA', 'By Title Asc'],
+  ['sf.alphaD', 'By Title Desc'],
+  ['sf.dateA', 'By Date Asc'],
+  ['sf.dateD', 'By Date Desc'],
+  ['sf.type', 'By Type'],
+
+  ['st.tumblr', 'tumblr'],
+  ['st.reddit', 'reddit'],
+  ['st.list', 'list'],
 ]);

@@ -1,4 +1,4 @@
-import { TF } from './const';
+import {TF} from './const';
 
 export default new Map<String, () => number>([
   [TF.variableFast, () => (Math.sin(Date.now() / 1000) + 1) / 2 * 600],

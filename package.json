@@ -30,14 +30,20 @@
     "webpack-cli": "^3.1.2"
   },
   "dependencies": {
+    "electron-window-state": "^5.0.3",
     "file-url": "^2.0.2",
+    "fs-extra": "^7.0.1",
     "gif-info": "^1.0.1",
     "lodash": "^4.17.11",
     "progressbar.js": "^1.0.1",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
+    "react-multiselect-checkboxes": "^0.1.1",
     "react-sound": "^1.2.0",
     "recursive-readdir": "^2.2.2",
+    "request": "^2.88.0",
+    "snoowrap": "^1.15.2",
+    "sortablejs": "^1.8.1",
     "wretch": "^1.4.2"
   }
 }

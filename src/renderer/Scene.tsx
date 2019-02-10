@@ -1,9 +1,10 @@
-import {ZF, HTF, VTF, TF, IF, TK, BT} from './const';
+import {BT, HTF, IF, TF, TOT, VTF, ZF} from './const';
+import LibrarySource from "./components/library/LibrarySource";
 
 export default class Scene {
   id: number = 0;
   name: string = "Unnamed scene";
-  directories: Array<string> = [];
+  sources: Array<LibrarySource> = [];
   timingFunction = TF.constant;
   timingConstant = "1000";
   imageTypeFilter = IF.any;
@@ -17,23 +18,28 @@ export default class Scene {
   playFullGif = false;
   textKind: string = "";
   textSource: string = "";
+  blinkColor = "#FFFFFF";
+  blinkFontSize = 20;
+  blinkFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
+  captionColor = "#FFFFFF";
+  captionFontSize = 8;
+  captionFontFamily = "Helvetica Neue,Helvetica,Arial,sans-serif";
+  captionBigColor = "#FFFFFF";
+  captionBigFontSize = 12;
+  captionBigFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
   imageSizeMin: 200;
   overlaySceneID: number = 0;
   overlaySceneOpacity: number = 0.5;
+  libraryID: number = -1;
   audioURL?: string = "";
+  tagWeights?: string;
 
   // unused; migration only
   hastebinID: string = "";
 
-  // if true, the display chooses a directory first, then picks an image out
-  // of it.
-  // if false, the display chooses an image out of all possible images, without
-  // looking at which directory it was in.
-  weightDirectoriesEqually = true;
-
-  constructor(init?:Partial<Scene>) {
+  constructor(init?: Partial<Scene>) {
     Object.assign(this, init);
-    this.directories = this.directories.filter((d) => !!d);
+    this.sources = this.sources.filter((d) => !!d);
 
     this.overlaySceneID = parseInt(this.overlaySceneID as any, 10);
     if (!this.overlaySceneOpacity) {
@@ -45,13 +51,13 @@ export default class Scene {
     }
 
     if (this.hastebinID.length && !(this.textSource && this.textSource.length)) {
-      this.textKind = TK.hastebin;
+      this.textKind = TOT.hastebin;
       this.textSource = this.hastebinID;
       this.hastebinID = "";
     }
 
     if (!(this.textKind && this.textKind.length)) {
-      this.textKind = TK.url;
+      this.textKind = TOT.url;
     }
 
     // backward compatible with 1.0.1

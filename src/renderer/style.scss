@@ -33,7 +33,7 @@ html, body {
 }
 
 body {
-  font-family: "system";
+  font-family: system, serif;
   font-size: 14px;
   color: $bodyColor;
 }
@@ -44,12 +44,10 @@ a {
 
 @mixin noselect {
   -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-      -khtml-user-select: none; /* Konqueror HTML */
-        -moz-user-select: none; /* Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome and Opera */
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
 }
 
 @mixin mouseover {
@@ -59,8 +57,7 @@ a {
 }
 
 @mixin yellowGradient {
-  background-color: $buttonBarColorTop;
-  background: linear-gradient(180deg, $buttonBarColorTop 0%, $buttonBarColorBottom 100%);
+  background: $buttonBarColorTop linear-gradient(180deg, $buttonBarColorTop 0%, $buttonBarColorBottom 100%);
 }
 
 @mixin buttonBarBackground {
@@ -70,9 +67,11 @@ a {
 
 .app {
   position: fixed;
-  top: 0; right: 0; bottom: 0; left: 0;
-  background-color: rgb(52,104,152);
-  background: linear-gradient(180deg, rgba(52,104,152,1) 0%, rgba(24,50,76,1) 100%);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgb(52, 104, 152) linear-gradient(180deg, rgba(52, 104, 152, 1) 0%, rgba(24, 50, 76, 1) 100%);
 }
 
 .u-hidden {
@@ -115,9 +114,7 @@ a {
   width: $buttonSidebarWidth;
   @include buttonBarBackground;
 
-
-
-  .SceneOptions {
+  .SceneOptionsHeader {
     display: inline-block;
     margin-top: 0;
     color: $black !important;
@@ -145,23 +142,28 @@ a {
   color: $black !important;
   cursor: pointer;
 
-  background-color: $buttonTop;
-  background: linear-gradient(180deg, $buttonTop 0%, $buttonBottom 100%);
+  background: $buttonTop linear-gradient(180deg, $buttonTop 0%, $buttonBottom 100%);
 
-  &:hover {
+  &:not(.u-disabled):hover {
     border: 1px solid $white;
   }
 }
 
 .u-fill-container {
   position: absolute;
-  top: 0; right: 0; bottom: 0; left: 0;  
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   overflow: hidden;
 }
 
 .u-fill-image-blur {
   position: absolute;
-  top: 0; right: 0; bottom: 0; left: 0;  
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -204,9 +206,41 @@ a {
   color: $red !important;
 }
 
+.u-destructive-bg {
+  background-color: $red !important;
+  color: white !important;
+}
+
+.u-edit {
+  color: #444 !important;
+  transform: scale(-1, 1);
+
+  &:before {
+    content: '✎';
+  }
+}
+
+.u-random {
+  cursor: pointer;
+  font-size: 20px;
+
+  &:before {
+    content: '🎲';
+  }
+}
+
+.u-config {
+  cursor: pointer;
+  font-size: 20px;
+
+  &:before {
+    content: '⚙';
+  }
+}
+
 .u-show-on-hover-only {
   border-bottom: none;
-  background: rgba(0,0,0,0);
+  background: rgba(0, 0, 0, 0);
 
   & > * {
     visibility: hidden;
@@ -234,9 +268,30 @@ a {
   overflow: auto;
 
   .About {
+    display: inline-block;
+    width: 100%;
 
-    h1:first-child {
-      margin-top: 0;
+    > div {
+      margin-bottom: $smallPadding*2;
+    }
+
+    .Header {
+      h1 {
+        margin: 0;
+      }
+
+      div {
+        margin-left: $smallPadding;
+        display: inline-block;
+
+        &.SimpleOptionPicker {
+          vertical-align: 3px;
+        }
+      }
+
+      select {
+        height: 1.5em;
+      }
     }
   }
 
@@ -256,19 +311,58 @@ a {
   .ScenePickerItem {
     background-color: $white;
     color: $black !important;
-    padding: $smallPadding;
+    padding: $smallPadding * 2;
     margin-bottom: $smallPadding;
 
     display: flex;
     justify-content: center;
     align-items: center;
 
+    &.m-generator {
+      border: 2px solid black;
+    }
+
     .ScenePickerItem__Title {
       text-align: center;
     }
 
-    &:hover {
+    &:not(.u-disabled):hover {
       background-color: $buttonBottom;
+    }
+  }
+
+  .ScenePicker__Buttons {
+    display: inline-flex;
+    width: 100%;
+
+    div {
+      display: flex;
+      background-color: $white;
+      color: $black !important;
+      height: 4rem;
+      margin-right: $smallPadding;
+
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+
+      &.ScenePicker__LibraryButton {
+        font-weight: bold;
+        width: 70%;
+      }
+
+      &.ScenePicker__GenerateSceneButton {
+        width: 18%;
+        border: 2px solid black;
+      }
+
+      &.ScenePicker__AddSceneButton {
+        width: 12%;
+      }
+
+      &:not(.u-disabled):hover {
+        background-color: $buttonBottom;
+      }
     }
   }
 }
@@ -283,13 +377,10 @@ a {
 .ControlGroup {
   flex-grow: 1;
 
-  margin-top: 1em;
-  margin-bottom: $smallPadding * 3;
-  margin-left: 0.5em;
-  margin-right: 0.5em;
+  margin: 1em 0.5em $smallPadding * 3;
 
   border: 1px solid $black;
-  padding: ($smallPadding * 3) $smallPadding $smallPadding $smallPadding;
+  padding: ($smallPadding * 2) $smallPadding $smallPadding $smallPadding;
   position: relative;
 
   color: $black;
@@ -339,13 +430,23 @@ a {
   }
 }
 
-.SimpleOptionPicker, .SimpleTextInput, .SimpleSliderInput, .SimpleCheckbox, .SimpleColorPicker {
+.SimpleOptionPicker, .SimpleTextInput, .SimpleSliderInput, .SimpleCheckbox, .SimpleColorPicker, .SimpleNumberInput {
   @include control;
 }
 
 .SimpleOptionPicker {
   select {
     max-width: 210px;
+  }
+}
+
+.SimpleNumberInput {
+  input[type=number] {
+    font-size: 16px;
+    font-weight: 400;
+    display: block;
+    width: 100%;
+    margin-bottom: 0;
   }
 }
 
@@ -358,6 +459,7 @@ a {
     margin-bottom: 0;
   }
 }
+
 .SimpleSliderInput {
   input[type=range] {
     -webkit-appearance: none;
@@ -374,7 +476,6 @@ a {
 
     &::-webkit-slider-thumb {
       -webkit-appearance: none;
-      appearance: none;
       width: 17px;
       height: 17px;
       border-radius: 50%;
@@ -396,11 +497,12 @@ label.SimpleCheckbox {
   display: block;
   padding-left: 15px;
   text-indent: -15px;
+
   input {
     width: 13px;
     height: 13px;
     padding: 0;
-    margin:0;
+    margin: 0;
     vertical-align: bottom;
     position: relative;
     top: -1px;
@@ -451,6 +553,290 @@ label.SimpleCheckbox {
   }
 }
 
+.ReactMultiSelectCheckboxes > div {
+  > button {
+    margin-top: 4px;
+    height: 2em;
+    padding: 0 0 0 5px;
+    border-radius: 0;
+    border-width: 1px;
+    box-shadow: none;
+    font-size: 13.3px;
+    color: black;
+
+    &:after {
+      content: '▼';
+      font-size: 9px;
+      padding-top: 3px;
+      padding-right: 5px;
+    }
+
+    > span > svg {
+      display: none;
+    }
+  }
+
+  > div {
+    margin-top: 0 !important;
+    color: black;
+
+    > div > div > div > div > input {
+      vertical-align: -2px;
+    }
+  }
+}
+
+.SourcePicker {
+  outline: none;
+
+  .SourcePicker__Buttons {
+    height: 3.2rem;
+
+    > .SimpleOptionPicker {
+      select {
+        outline: none;
+        margin-top: 4px;
+        height: 2em;
+        cursor: pointer;
+      }
+    }
+
+
+    & > :not(.u-float-left) {
+      float: right;
+      margin-left: $smallPadding;
+    }
+  }
+
+  .SourcePicker__Sources {
+    overflow: auto;
+
+    .SourcePicker__Source {
+      padding: $smallPadding;
+      line-height: 1.5rem;
+      height: 2.5rem;
+
+      @include mouseover;
+
+      > input {
+        vertical-align: -2px;
+        margin-right: 10px;
+      }
+
+      .SourcePicker__SourceTitle {
+        color: black !important;
+        display: inline-block;
+      }
+
+      .SourcePicker__SourceTags {
+        display: inline-block;
+
+        .SourcePicker__SourceTag {
+          color: $uiGray;
+          padding-left: 1rem;
+          font-size: 12px;
+          cursor: move;
+        }
+      }
+
+      .u-button {
+        float: right;
+        text-align: center;
+        width: 1.5rem;
+        height: 1.5rem;
+        padding: 0;
+        margin-left: 0.5rem;
+        line-height: 1.5rem;
+        font-weight: bold;
+      }
+    }
+
+    .SourcePicker__Empty {
+      text-align: center;
+      padding: 1em;
+    }
+  }
+}
+
+.Config {
+  .Config__ConfigHeader {
+    display: inline-block;
+    margin-top: 0;
+    color: $black !important;
+    line-height: $buttonBarHeight;
+  }
+
+  .Config__Content {
+    position: fixed;
+    top: $buttonBarHeight;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: $smallPadding;
+    overflow: auto;
+  }
+}
+
+.Library {
+  .Library__LibraryHeader {
+    display: inline-block;
+    margin-top: 0;
+    color: $black !important;
+    line-height: $buttonBarHeight;
+  }
+
+  .SourcePicker {
+    .SourcePicker__Buttons {
+      padding: $smallPadding;
+    }
+
+    .SourcePicker__Sources {
+      position: fixed;
+      top: 5.5rem;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      padding: $smallPadding;
+
+      .SourcePicker__SourceTitle {
+        color: white !important;
+      }
+    }
+  }
+}
+
+.TagManager {
+  .TagManager__TagManagerHeader {
+    display: inline-block;
+    margin-top: 0;
+    color: $black !important;
+    line-height: $buttonBarHeight;
+  }
+
+  .TagManager__Buttons {
+    padding: $smallPadding;
+    height: 3.2rem;
+
+    & > .u-button {
+      float: right;
+      margin-right: $smallPadding;
+    }
+  }
+
+  .TagManager__Remove, .TagManager__Empty {
+    text-align: center;
+    padding: 1em;
+  }
+
+  .TagManager__Tags {
+    display: flex;
+    flex-wrap: wrap;
+    overflow: auto;
+    padding: $smallPadding;
+
+    & > * {
+      margin-right: $smallPadding;
+      height: 4rem;
+      min-width: 6rem;
+      max-width: 8rem;
+    }
+
+    .TagManager__Tag {
+      background-color: $white;
+      padding: $smallPadding*3;
+      margin-bottom: $smallPadding;
+
+      &.u-destructive-bg {
+        color: $white !important;
+      }
+
+      &:not(.u-destructive-bg) {
+        color: $black !important;
+      }
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      .TagManager_TagTitle {
+        text-align: center;
+
+        input {
+          max-width: 7rem;
+        }
+      }
+
+      &:hover {
+        background-color: $buttonBottom;
+      }
+    }
+  }
+}
+
+.SceneGenerator {
+  .SceneGenerator__SceneGeneratorHeader {
+    display: inline-block;
+    margin-top: 0;
+    color: $black !important;
+    line-height: $buttonBarHeight;
+  }
+
+  .SceneNameForm {
+    display: inline-block;
+    width: 200px;
+
+    input[type=text] {
+      font-size: 21px;
+      font-weight: 700;
+      display: block;
+      width: 100%;
+      margin-top: 4px;
+    }
+  }
+
+  .u-button-row-right {
+    display: flex;
+
+    .SimpleTextInput {
+      display: flex;
+      width: 75px;
+      margin-bottom: 0;
+      align-items: center;
+
+      label {
+        color: black !important;
+        margin-right: $smallPadding;
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .SceneGenerator__Content {
+    position: fixed;
+    top: $buttonBarHeight;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: $smallPadding;
+    overflow: auto;
+
+    .ControlGroup {
+      > span {
+        margin-right: 2rem;
+      }
+
+      .SimpleRadioInput {
+        text-align: center;
+
+        .SimpleRadioInput__Choice {
+          margin-right: 2rem;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+}
+
 .SceneDetail {
   .SceneName {
     display: inline-block;
@@ -471,62 +857,16 @@ label.SimpleCheckbox {
       margin-top: 4px;
     }
   }
-}
 
-.SceneDetail__Content {
-  position: fixed;
-  top: $buttonBarHeight;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  padding: $smallPadding;
-  overflow: auto;
-}
-
-.SceneDetail__PlayButton {
-  width: 100%;
-  text-align: center;
-  padding: $smallPadding;
-}
-
-.SceneOptionsForm {
-  div {
-    padding-bottom: 9px;
-    label {
-      margin-right: 0.5rem;
-    }
-  }
-}
-
-.DirectoryPicker {
-  .DirectoryPicker__Buttons {
-    height: 2.5rem;
-
-    & > .u-button {
-      float: right;
-      margin-right: $smallPadding;
-    }
-  }
-
-  .DirectoryPicker__Directory {
+  .SceneDetail__Content {
+    position: fixed;
+    top: $buttonBarHeight;
+    right: 0;
+    bottom: 0;
+    left: 0;
     padding: $smallPadding;
-    padding-left: 0;
-    line-height: 1.5rem;
-    height: 2.5rem;
-
-    @include mouseover;
-
-    .u-button { /* delete */
-      float: right;
-      text-align: center;
-      width: 1.5rem;
-      height: 1.5rem;
-      padding: 0;
-      line-height: 1.5rem;
-      font-weight: bold;
-    }
+    overflow: auto;
   }
-
 }
 
 .URLImporter {
@@ -560,25 +900,83 @@ label.SimpleCheckbox {
 
 .EmptyIndicator {
   position: fixed;
-  top: 50%; right: 0; left: 0;
+  top: 50%;
+  right: 0;
+  left: 0;
   text-align: center;
 }
 
 .Player {
   .u-button-row {
     position: absolute;
-    top: 0; right: 0; left: 0;
+    top: 0;
+    right: 0;
+    left: 0;
   }
 }
 
 .ImagePlayer {
   position: fixed;
-  top: 0; right: 0; bottom: 0; left: 0;
-  .ImageView img{
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  .ImageView img {
     -webkit-animation-fill-mode: forwards;
     animation-fill-mode: forwards;
     -webkit-animation-timing-function: ease-out;
     animation-timing-function: ease-out;
+  }
+}
+
+.SourceTags {
+  @include noselect;
+  position: absolute;
+  display: flex;
+  flex-wrap: wrap;
+  height: auto;
+  line-height: 1.5rem;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 0;
+  padding: $smallPadding;
+  @include buttonBarBackground;
+
+  opacity: 0;
+  bottom: -4rem;
+  transition: opacity 500ms ease-in-out,
+  bottom 500ms ease-in-out;
+
+  &:hover {
+    bottom: 0;
+    opacity: 1;
+    transition: opacity 500ms ease-in-out, bottom 500ms ease-in-out;
+  }
+
+  .SourceTag {
+    background-color: $white;
+    padding: $smallPadding;
+    margin: $smallPadding $smallPadding 0 $smallPadding;
+    color: $black !important;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .SourceTagTitle {
+      text-align: center;
+    }
+
+    &.u-selected {
+      background-color: $buttonBottom;
+    }
+
+    &:hover {
+      background-color: $buttonBottom;
+    }
   }
 }
 
@@ -645,9 +1043,11 @@ label.SimpleCheckbox {
     height: $buttonHeight;
     margin: $barPadding;
     border: 1px solid $black;
+
     &:hover {
       background-color: rgba(0, 0, 0, 0.1);
     }
+
     &:before {
       content: '╳';
       position: relative;
@@ -659,7 +1059,7 @@ label.SimpleCheckbox {
 .ContextMenu {
   position: fixed;
   background: white;
-  box-shadow: 0px 2px 10px #999999;
+  box-shadow: 0 2px 10px #999999;
 
   &--option {
     color: $black;
@@ -667,6 +1067,7 @@ label.SimpleCheckbox {
     min-width: 160px;
     cursor: default;
     font-size: 12px;
+
     &:hover {
       background: linear-gradient(to top, #555, #333);
       color: white;
@@ -704,29 +1105,32 @@ label.SimpleCheckbox {
 }
 
 .text-blink {
-  text-align: center; color: white; font-size: 20vmin;
-  vertical-align: middle; transition: opacity 0.1s ease-out;
-  font-family: Arial Black,Arial Bold,Gadget,sans-serif;
-  -webkit-text-stroke-width: 1px; -webkit-text-stroke-color: black;
+  text-align: center;
+  vertical-align: middle;
+  transition: opacity 0.1s ease-out;
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black;
 }
 
 .text-caption {
-  text-align: center; color: white; font-size: 8vmin;
-  vertical-align: bottom; padding-bottom: 20vmin;
+  text-align: center;
+  vertical-align: bottom;
+  padding-bottom: 20vmin;
   transition: opacity 0.5s ease-in-out;
-  font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
-  -webkit-text-stroke-width: 1px; -webkit-text-stroke-color: black;
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black;
 }
 
 .text-caption-big {
-  text-align: center; color: white; font-size: 12vmin;
-  vertical-align: middle; transition: opacity 0.1s ease-out;
-  font-family: Arial Black,Arial Bold,Gadget,sans-serif;
-  -webkit-text-stroke-width: 1px; -webkit-text-stroke-color: black;
+  text-align: center;
+  vertical-align: middle;
+  transition: opacity 0.1s ease-out;
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black;
 }
 
-@for $x from -10 through 10 {
-  @for $y from -10 through 10 {
+@each $x in -10 0 10 {
+  @each $y in -10 0 10 {
     @for $z from 1 through 20 {
       .translate-#{$x}-#{$y}-#{$z}s img {
         -webkit-animation: kb-#{$x}-#{$y} #{$z}s;
@@ -736,15 +1140,15 @@ label.SimpleCheckbox {
       .translate-#{$x}-#{$y}-zoom-#{$z}s img {
         -webkit-animation: kb-#{$x}-#{$y}-zoom #{$z}s;
         animation: kb-#{$x}-#{$y} #{$z}-zoom #{$z}s;
-        -webkit-transform: scale(1,1);
-        transform: scale(1,1);
+        -webkit-transform: scale(1, 1);
+        transform: scale(1, 1);
       }
 
       .translate-#{$x}-#{$y}-zoom-out-#{$z}s img {
         -webkit-animation: kb-#{$x}-#{$y}-zoom-out #{$z}s;
         animation: kb-#{$x}-#{$y} #{$z}-zoom-out #{$z}s;
-        -webkit-transform: scale(1.5,1.5);
-        transform: scale(1.5,1.5);
+        -webkit-transform: scale(1.5, 1.5);
+        transform: scale(1.5, 1.5);
       }
     }
   }
@@ -753,19 +1157,27 @@ label.SimpleCheckbox {
 /* Animations */
 
 @keyframes fadeIn {
-  0% {opacity: 0;}
-  100% {opacity: 1;}
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 @keyframes fadeOut {
-  0% {opacity: 1;}
-  100% {opacity: 0;}
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 /* Ken Burns effects */
 
-@for $x from -10 through 10 {
-  @for $y from -10 through 10 {
+@each $x in -10 0 10 {
+  @each $y in -10 0 10 {
     @keyframes kb-#{$x}-#{$y} {
       100% {
         transform: translate(percentage($x/100), percentage($y/100));
@@ -774,13 +1186,13 @@ label.SimpleCheckbox {
 
     @keyframes kb-#{$x}-#{$y}-zoom {
       100% {
-        transform: translate(percentage($x*2/100), percentage($y*2/100)) scale(2,2);
+        transform: translate(percentage($x*2/100), percentage($y*2/100)) scale(2, 2);
       }
     }
 
     @keyframes kb-#{$x}-#{$y}-zoom-out {
       100% {
-        transform: translate(percentage($x/100), percentage($y/100)) scale(1,1);
+        transform: translate(percentage($x/100), percentage($y/100)) scale(1, 1);
       }
     }
   }

@@ -1,14 +1,17 @@
 import * as React from 'react';
+import * as fs from "fs";
 import recursiveReaddir from 'recursive-readdir';
 import fileURL from 'file-url';
 import wretch from 'wretch';
 
+import {IF, ST, TOT} from '../../const';
+import {CancelablePromise, getCachePath, getFileName, getSourceType} from "../../utils";
+import Config from "../../Config";
 import Scene from '../../Scene';
-import Progress from '../ui/Progress';
-import ImagePlayer from './ImagePlayer';
 import CaptionProgram from './CaptionProgram';
-import { TK, IF } from '../../const';
 import ChildCallbackHack from './ChildCallbackHack';
+import ImagePlayer from './ImagePlayer';
+import Progress from '../ui/Progress';
 
 function isImage(path: string): boolean {
   const p = path.toLowerCase();
@@ -37,14 +40,73 @@ function filterPathsToJustImages(imageTypeFilter: string, paths: Array<string>):
 
 function textURL(kind: string, src: string): string {
   switch (kind) {
-    case TK.url: return src;
-    case TK.hastebin: return `https://hastebin.com/raw/${src}`;
-    default: return src;
+    case TOT.url:
+      return src;
+    case TOT.hastebin:
+      return `https://hastebin.com/raw/${src}`;
+    default:
+      return src;
   }
 }
 
-function isURL(maybeURL: string): boolean {
-  return maybeURL.startsWith('http');  // lol
+function getTumblrAPIKey(config: Config, overlay: boolean): string {
+  if (!overlay) {
+    return config.remoteSettings.tumblrDefault;
+  } else {
+    return config.remoteSettings.tumblrOverlay;
+  }
+}
+
+// Determine what kind of source we have based on the URL and return associated Promise
+function getPromise(config: Config, url: string, filter: string, page: number, overlay: boolean): CancelablePromise {
+  let promise;
+  const sourceType = getSourceType(url);
+  switch (sourceType) {
+    case ST.tumblr:
+      if (page == -1) {
+        const cachePath = getCachePath(url, config);
+        if (fs.existsSync(cachePath) && config.caching.enabled) {
+          // If the cache directory exists, use it
+          promise = loadLocalDirectory(getCachePath(url, config), filter);
+          promise.page = -1;
+        } else {
+          // Otherwise loadTumblr;
+          promise = loadTumblr(config, url, filter, page, overlay, 0);
+          promise.page = 0;
+        }
+      } else {
+        promise = loadTumblr(config, url, filter, page, overlay, 0);
+        promise.page = page;
+      }
+      promise.timeout = 8000;
+      break;
+    case ST.reddit:
+      if (page == -1) {
+        const cachePath = getCachePath(url, config);
+        if (fs.existsSync(cachePath) && config.caching.enabled) {
+          // If the cache directory exists, use it
+          promise = loadLocalDirectory(getCachePath(url, config), filter);
+          promise.page = -1;
+        } else {
+          // Otherwise loadTumblr;
+          promise = loadReddit(config, url, filter, page, overlay, 0);
+          promise.page = 0;
+        }
+      } else {
+        promise = loadReddit(config, url, filter, page, overlay, 0);
+        promise.page = page;
+      }
+      promise.timeout = 1000;
+      break;
+    case ST.list:
+      promise = loadRemoteImageURLList(url);
+      break;
+    case ST.local:
+      promise = loadLocalDirectory(url, filter);
+      break;
+  }
+  promise.source = url;
+  return promise;
 }
 
 function loadLocalDirectory(path: string, filter: string): CancelablePromise {
@@ -52,13 +114,17 @@ function loadLocalDirectory(path: string, filter: string): CancelablePromise {
 
   return new CancelablePromise((resolve, reject) => {
     recursiveReaddir(path, blacklist, (err: any, rawFiles: Array<string>) => {
-      if (err) console.warn(err);
-      resolve(filterPathsToJustImages(filter, rawFiles).map((p) => fileURL(p)));
+      if (err) {
+        console.warn(err);
+        resolve([]);
+      } else {
+        resolve(filterPathsToJustImages(filter, rawFiles).map((p) => fileURL(p)));
+      }
     });
   });
 }
 
-function loadRemoteImageURLList(url: string, filter: string): CancelablePromise {
+function loadRemoteImageURLList(url: string): CancelablePromise {
   return new CancelablePromise((resolve, reject) => {
     wretch(url)
       .get()
@@ -77,32 +143,108 @@ function loadRemoteImageURLList(url: string, filter: string): CancelablePromise 
   });
 }
 
-// Inspired by https://reactjs.org/blog/2015/12/16/ismounted-antipattern.html
-class CancelablePromise extends Promise<Array<string>> {
-  hasCanceled_ : boolean;
+function loadTumblr(config: Config, url: string, filter: string, page: number, overlay: boolean, attempt: number): CancelablePromise {
+  const API_KEY = getTumblrAPIKey(config, overlay);
+  // TumblrID takes the form of <blog_name>.tumblr.com
+  let tumblrID = url.replace(/https?:\/\//, "");
+  tumblrID = tumblrID.replace("/", "");
+  let tumblrURL = "https://api.tumblr.com/v2/blog/" + tumblrID + "/posts/photo?api_key=" + API_KEY + "&offset=" + (page * 20);
+  return new CancelablePromise((resolve, reject) => {
+    wretch(tumblrURL)
+      .get()
+      .notFound(error => {
+        console.warn(tumblrID + " is not available");
+        resolve(null);
+      })
+      .error(429, error => {
+        console.warn("Tumblr responded with 429 - Too Many Requests");
+        if (attempt < 4) {
+          loadTumblr(config, url, filter, page, overlay, attempt + 1);
+        } else {
+          resolve(null);
+        }
+      })
+      .json(json => {
+        // End loop if we're at end of posts
+        if (json.response.posts.length == 0) {
+          resolve(null);
+          return;
+        }
 
+        let images = [];
+        for (let post of json.response.posts) {
+          // Sometimes photos are listed separately
+          if (post.photos) {
+            for (let photo of post.photos) {
+              let imgURL = photo.original_size.url;
+              if (filter != IF.gifs || (filter == IF.gifs && imgURL.toLowerCase().endsWith('.gif'))) {
+                images.push(photo.original_size.url);
+              }
+            }
+          } else { // Sometimes photos are elements of the body
+            const regex = /<img[^(?:src|\/>)]*src="([^"]*)[^(?:\/>)]*\/>/g;
+            let imageSource;
+            while ((imageSource = regex.exec(post.body)) !== null) {
+              images.push(imageSource[1]);
+            }
+          }
+        }
+        resolve(images);
+      })
+      .catch((e) => {
+        console.warn("Fetch error on", tumblrURL);
+        console.error(e);
+        resolve(null)
+      });
+  });
+}
 
-  constructor(executor: (resolve: (value?: (PromiseLike<Array<string>> | Array<string>)) => void, reject: (reason?: any) => void) => void) {
-    super(executor);
-    this.hasCanceled_ = false;
+function loadReddit(config: Config, url: string, filter: string, page: number, overlay: boolean, attempt: number): CancelablePromise {
+  let configured = true;
+  if (config.remoteSettings.redditClientID == "") {
+    configured = false;
+    console.warn("Reddit Client ID is not configured");
+  }
+  if (config.remoteSettings.redditClientSecret == "") {
+    configured = false;
+    console.warn("Reddit Client Secret is not configured");
+  }
+  if (config.remoteSettings.redditUsername == "") {
+    configured = false;
+    console.warn("Reddit Username is not configured");
+  }
+  if (config.remoteSettings.redditUsername == "") {
+    configured = false;
+    console.warn("Reddit Username is not configured");
+  }
+  if (config.remoteSettings.redditPassword == "") {
+    configured = false;
+    console.warn("Reddit Password is not configured");
   }
 
-  getPromise() : Promise<Array<string>> {
-    return new Promise((resolve, reject) => {
-      this.then(
-          val => this.hasCanceled_ ? null : resolve(val),
-          error => this.hasCanceled_ ? null : reject(error)
-      );
+  //TODO Finish implementing reddit
+  if (configured) {
+    return new CancelablePromise((resolve, reject) => {
+      /*const reddit = new Snoowrap({
+        clientId: config.remoteSettings.redditClientID,
+        clientSecret: config.remoteSettings.redditClientSecret,
+        username: config.remoteSettings.redditUsername,
+        password: config.remoteSettings.redditPassword,
+      });
+      console.log(getFileGroup(url));
+      reddit.getSubreddit(getFileGroup(url)).getHot();*/
+      resolve(null);
     });
-  }
-
-  cancel() {
-    this.hasCanceled_ = true;
+  } else {
+    return new CancelablePromise((resolve, reject) => {
+      resolve(null);
+    });
   }
 }
 
 export default class HeadlessScenePlayer extends React.Component {
   readonly props: {
+    config: Config,
     scene: Scene,
     opacity: number,
     showText: boolean,
@@ -111,26 +253,31 @@ export default class HeadlessScenePlayer extends React.Component {
     isPlaying: boolean,
     historyOffset: number,
     advanceHack?: ChildCallbackHack,
-    setHistoryPaths: (historyPaths: string[]) => void,
+    deleteHack?: ChildCallbackHack,
+    setHistoryOffset: (historyOffset: number) => void,
+    setHistoryPaths: (historyPaths: Array<HTMLImageElement>) => void,
     didFinishLoading: () => void,
   };
 
   readonly state = {
     isLoaded: false,
     onLoaded: Function(),
+    promiseQueue: Array<CancelablePromise>(),
     promise: new CancelablePromise((resolve, reject) => {}),
-    directoriesProcessed: 0,
-    progressMessage: "",
-    allURLs: Array<Array<string>>(),
+    sourcesProcessed: 0,
+    progressMessage: this.props.scene.sources.length > 0 ? this.props.scene.sources[0].url : "",
+    allURLs: new Map<string, Array<string>>(),
   };
 
   render() {
+    // Returns true if array is empty, or only contains empty arrays
+    const isEmpty = function (allURLs: any[]): boolean {
+      return Array.isArray(allURLs) && allURLs.every(isEmpty);
+    };
+
     const showImagePlayer = this.state.onLoaded != null;
     const showLoadingIndicator = this.props.showLoadingState && !this.state.isLoaded;
-    const showEmptyIndicator = (
-      this.props.showEmptyState &&
-      this.state.isLoaded &&
-      this.state.allURLs.length == 0);
+    const showEmptyIndicator = this.props.showEmptyState && this.state.isLoaded && isEmpty(Array.from(this.state.allURLs.values()));
     const showCaptionProgram = (
       this.props.showText &&
       this.state.isLoaded &&
@@ -145,8 +292,11 @@ export default class HeadlessScenePlayer extends React.Component {
 
         {showImagePlayer && (
           <ImagePlayer
+            config={this.props.config}
             advanceHack={this.props.advanceHack}
+            deleteHack={this.props.deleteHack}
             historyOffset={this.props.historyOffset}
+            setHistoryOffset={this.props.setHistoryOffset}
             setHistoryPaths={this.props.setHistoryPaths}
             maxInMemory={120}
             maxLoadingAtOnce={5}
@@ -154,8 +304,8 @@ export default class HeadlessScenePlayer extends React.Component {
             timingFunction={this.props.scene.timingFunction}
             timingConstant={this.props.scene.timingConstant}
             zoomType={this.props.scene.zoomType}
-            backgroundType = {this.props.scene.backgroundType}
-            backgroundColor = {this.props.scene.backgroundColor}
+            backgroundType={this.props.scene.backgroundType}
+            backgroundColor={this.props.scene.backgroundColor}
             effectLevel={this.props.scene.effectLevel}
             horizTransType={this.props.scene.horizTransType}
             vertTransType={this.props.scene.vertTransType}
@@ -164,17 +314,27 @@ export default class HeadlessScenePlayer extends React.Component {
             fadeEnabled={this.props.scene.crossFade}
             playFullGif={this.props.scene.playFullGif}
             imageSizeMin={this.props.scene.imageSizeMin}
-            allURLs={this.state.allURLs}
+            allURLs={isEmpty(Array.from(this.state.allURLs.values())) ? null : this.state.allURLs}
             onLoaded={this.state.onLoaded.bind(this)}/>)}
 
         {showCaptionProgram && (
-          <CaptionProgram url={textURL(this.props.scene.textKind, this.props.scene.textSource)} />
+          <CaptionProgram
+            blinkColor={this.props.scene.blinkColor}
+            blinkFontSize={this.props.scene.blinkFontSize}
+            blinkFontFamily={this.props.scene.blinkFontFamily}
+            captionColor={this.props.scene.captionColor}
+            captionFontSize={this.props.scene.captionFontSize}
+            captionFontFamily={this.props.scene.captionFontFamily}
+            captionBigColor={this.props.scene.captionBigColor}
+            captionBigFontSize={this.props.scene.captionBigFontSize}
+            captionBigFontFamily={this.props.scene.captionBigFontFamily}
+            url={textURL(this.props.scene.textKind, this.props.scene.textSource)}/>
         )}
 
         {showLoadingIndicator && (
           <Progress
-            total={this.props.scene.directories.length}
-            current={this.state.directoriesProcessed}
+            total={this.props.scene.sources.length}
+            current={this.state.sourcesProcessed}
             message={this.state.progressMessage}/>
         )}
 
@@ -187,18 +347,21 @@ export default class HeadlessScenePlayer extends React.Component {
 
   componentDidMount() {
     let n = 0;
-    this.setState({allURLs: []});
-    let newAllURLs = Array<Array<string>>();
+    let newAllURLs = new Map<string, Array<string>>();
 
-    let directoryLoop = () => {
-      let d = this.props.scene.directories[n];
-      let loadPromise = (isURL(d)
-          ? loadRemoteImageURLList(d, this.props.scene.imageTypeFilter)
-          : loadLocalDirectory(d, this.props.scene.imageTypeFilter));
+    let sourceLoop = () => {
+      let d = this.props.scene.sources[n].url;
+      let loadPromise = getPromise(this.props.config, d, this.props.scene.imageTypeFilter, -1, this.props.opacity != 1);
 
-      let message = d;
+      // Because of rendering lag, always display the NEXT source, unless this is the last one
+      let message;
+      if ((n + 1) == this.props.scene.sources.length) {
+        message = d;
+      } else {
+        message = this.props.scene.sources[n + 1].url;
+      }
       if (this.props.opacity != 1) {
-        message = "<p>Loading Overlay...</p>" + d;
+        message = "<p>Loading Overlay...</p>" + message;
       }
 
       this.setState({promise: loadPromise, progressMessage: message});
@@ -206,33 +369,63 @@ export default class HeadlessScenePlayer extends React.Component {
       loadPromise
         .getPromise()
         .then((urls) => {
+          let newPromiseQueue = this.state.promiseQueue;
           n += 1;
 
-          // The scene can configure which of these branches to take
-          if (urls.length > 0) {
-            if (this.props.scene.weightDirectoriesEqually) {
-              // Just add the new urls to the end of the list
-              newAllURLs = newAllURLs.concat([urls]);
-            } else {
-              if (newAllURLs.length == 0) newAllURLs = [[]];
-              // Append to a single list of urls
-              newAllURLs[0] = newAllURLs[0].concat(urls);
-            }
+          // Just add the new urls to the end of the list
+          newAllURLs = newAllURLs.set(loadPromise.source, urls);
+
+          // If this is a remote URL, queue up the next promise
+          if (loadPromise.page) {
+            newPromiseQueue.push(
+              getPromise(this.props.config, d, this.props.scene.imageTypeFilter, loadPromise.page + 1, this.props.opacity != 1));
           }
 
-          if (n < this.props.scene.directories.length) {
-            this.setState({directoriesProcessed: (n + 1)});
-            directoryLoop();
+          if (n < this.props.scene.sources.length) {
+            this.setState({sourcesProcessed: (n + 1), promiseQueue: newPromiseQueue});
+            sourceLoop();
           } else {
-            this.setState({allURLs: newAllURLs, onLoaded: this.onLoaded});
+            this.setState({allURLs: newAllURLs, onLoaded: this.onLoaded, promiseQueue: newPromiseQueue});
             setTimeout(this.props.didFinishLoading, 0);
+            // All sources have been initialized, start our remote promise loop
+            promiseLoop();
           }
-        }
-      )
+        });
     };
 
-    directoryLoop();
+    let promiseLoop = () => {
+      // Process until queue is empty or player has been stopped
+      if (this.state.promiseQueue.length > 0 && !this.state.promise.hasCanceled) {
+        let promise = this.state.promiseQueue.shift();
+        this.setState({promise: promise});
+        promise
+          .getPromise()
+          .then((urls) => {
+            // If we are not at the end of a source
+            if (urls != null) {
+              // Update the correct index with our new images
+              let newAllURLs = this.state.allURLs;
+              let sourceURLs = newAllURLs.get(promise.source);
+              newAllURLs.set(promise.source, sourceURLs.concat(urls.filter((u) => {
+                const fileName = getFileName(u);
+                return !sourceURLs.map((u) => getFileName(u)).includes(fileName);
+              })));
 
+              // Add the next promise to the queue
+              let newPromiseQueue = this.state.promiseQueue;
+              newPromiseQueue.push(
+                getPromise(this.props.config, promise.source, this.props.scene.imageTypeFilter, promise.page + 1, this.props.opacity != 1));
+
+              this.setState({allURLs: newAllURLs, promiseQueue: newPromiseQueue});
+            }
+
+            // If there is an overlay, double the timeout
+            setTimeout(promiseLoop, promise.timeout);
+          });
+      }
+    };
+
+    sourceLoop();
   }
 
   componentWillUnmount() {
