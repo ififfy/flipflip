@@ -69,7 +69,7 @@ export default class Library extends React.Component {
             onUpdateScene={this.onUpdateDefaultScene.bind(this)}/>
 
           <CacheGroup
-            settings={this.state.config.caching}
+            config={this.state.config}
             onUpdateSettings={this.onUpdateCachingSettings.bind(this)}/>
 
           <APIGroup

@@ -28,6 +28,8 @@ declare module 'progressbar.js';
 declare module 'sortablejs';
 declare module 'react-multiselect-checkboxes';
 declare module 'snoowrap';
+declare module 'rimraf';
+declare module 'get-folder-size';
 
 // Type declarations for Clipboard API
 // https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API

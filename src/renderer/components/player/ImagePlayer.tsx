@@ -5,6 +5,8 @@ import fs from "fs";
 import {outputFile} from "fs-extra";
 import wretch from "wretch";
 import gifInfo from 'gif-info';
+import getFolderSize from "get-folder-size";
+
 
 import {BT, HTF, IF, ST, TF, VTF, ZF} from '../../const';
 import {getCachePath, getFileName, getRandomListItem, getSourceType, urlToPath} from '../../utils';
@@ -271,38 +273,38 @@ export default class ImagePlayer extends React.Component {
         if (this.props.config.caching.enabled) {
           const fileType = getSourceType(img.src);
           if (fileType != ST.local) {
-            const cachePath = getCachePath(img.getAttribute("source"), this.props.config);
-            const fileName = getFileName(img.src);
-            const filePath = cachePath + fileName;
-            let size = 0;
-            if (fs.existsSync(cachePath)) {
-              fs.readdirSync(cachePath).forEach((f) => {
-                size += fs.statSync(cachePath + f).size;
-              });
+            const cachePath = getCachePath(null, this.props.config);
+            if (!fs.existsSync(cachePath)) {
+              fs.mkdirSync(cachePath)
             }
-            let mbSize = (size / 1024 / 1024);
-            const maxSize = this.props.config.caching.maxSize;
-            if (mbSize < maxSize) {
-              if (!fs.existsSync(filePath)) {
-                wretch(img.src)
-                  .get()
-                  .blob(blob => {
-                    const reader = new FileReader();
-                    reader.onload = function () {
-                      if (reader.readyState == 2) {
-                        const arrayBuffer = reader.result as ArrayBuffer;
-                        const buffer = Buffer.alloc(arrayBuffer.byteLength);
-                        const view = new Uint8Array(arrayBuffer);
-                        for (let i = 0; i < arrayBuffer.byteLength; ++i) {
-                          buffer[i] = view[i];
+            getFolderSize(cachePath, (err: string, size: number) => {
+              if (err) { throw err; }
+              const sourceCachePath = getCachePath(img.getAttribute("source"), this.props.config);
+              const filePath = sourceCachePath + getFileName(img.src);
+              const mbSize = (size / 1024 / 1024);
+              const maxSize = this.props.config.caching.maxSize;
+              if (mbSize < maxSize) {
+                if (!fs.existsSync(filePath)) {
+                  wretch(img.src)
+                    .get()
+                    .blob(blob => {
+                      const reader = new FileReader();
+                      reader.onload = function () {
+                        if (reader.readyState == 2) {
+                          const arrayBuffer = reader.result as ArrayBuffer;
+                          const buffer = Buffer.alloc(arrayBuffer.byteLength);
+                          const view = new Uint8Array(arrayBuffer);
+                          for (let i = 0; i < arrayBuffer.byteLength; ++i) {
+                            buffer[i] = view[i];
+                          }
+                          outputFile(filePath, buffer);
                         }
-                        outputFile(filePath, buffer);
-                      }
-                    };
-                    reader.readAsArrayBuffer(blob);
-                  });
+                      };
+                      reader.readAsArrayBuffer(blob);
+                    });
+                }
               }
-            }
+            });
           }
         }
         setTimeout(successCallback, 0);
