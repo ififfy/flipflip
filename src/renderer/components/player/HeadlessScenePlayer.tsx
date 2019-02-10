@@ -49,28 +49,11 @@ function textURL(kind: string, src: string): string {
   }
 }
 
-function getTumblrAPIKey(config: Config, overlay: boolean, attempt: number): string {
-  if (attempt == 0) { // This is our first attempt, use defaults
-    if (!overlay) {
-      return config.remoteSettings.tumblrDefault;
-    } else {
-      return config.remoteSettings.tumblrOverlay;
-    }
+function getTumblrAPIKey(config: Config, overlay: boolean): string {
+  if (!overlay) {
+    return config.remoteSettings.tumblrDefault;
   } else {
-    let nextAPIKey = null;
-    for (let key of config.remoteSettings.tumblrOther) {
-      if (key != config.remoteSettings.tumblrDefault &&
-        key != config.remoteSettings.tumblrOverlay) {
-        if (attempt == 0) {
-          nextAPIKey = key;
-        } else {
-          attempt -= 1;
-        }
-      }
-    }
-    // If they have all been used, just use default
-    if (nextAPIKey == null) nextAPIKey = config.remoteSettings.tumblrDefault;
-    return nextAPIKey;
+    return config.remoteSettings.tumblrOverlay;
   }
 }
 
@@ -161,7 +144,7 @@ function loadRemoteImageURLList(url: string): CancelablePromise {
 }
 
 function loadTumblr(config: Config, url: string, filter: string, page: number, overlay: boolean, attempt: number): CancelablePromise {
-  const API_KEY = getTumblrAPIKey(config, overlay, attempt);
+  const API_KEY = getTumblrAPIKey(config, overlay);
   // TumblrID takes the form of <blog_name>.tumblr.com
   let tumblrID = url.replace(/https?:\/\//, "");
   tumblrID = tumblrID.replace("/", "");
