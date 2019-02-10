@@ -4,6 +4,7 @@ export default class SimpleCheckbox extends React.Component {
   readonly props: {
     text: string,
     isOn: boolean,
+    children?: React.ReactNode,
     onChange: (isOn: boolean) => void,
   };
 
@@ -16,6 +17,7 @@ export default class SimpleCheckbox extends React.Component {
           value={this.props.text}
           checked={this.props.isOn}
           onChange={this.onToggle.bind(this)}/>
+        {this.props.children}
       </label>
     )
   }

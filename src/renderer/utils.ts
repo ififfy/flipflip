@@ -36,12 +36,20 @@ export function getFileGroup(url: string) {
 export function getCachePath(source: string, config: Config) {
   if (config.caching.directory != "") {
     let baseDir = config.caching.directory;
-    if (!baseDir.endsWith("/")) {
-      baseDir += "/";
+    if (!baseDir.endsWith(path.sep)) {
+      baseDir += path.sep;
     }
-    return baseDir + en.get(getSourceType(source)) + "/" + getFileGroup(source) + "/"
+    if (source) {
+      return baseDir + en.get(getSourceType(source)) + path.sep + getFileGroup(source) + path.sep;
+    } else {
+      return baseDir;
+    }
   } else {
-    return getPath() + "/ImageCache/" + en.get(getSourceType(source)) + "/" + getFileGroup(source) + "/"
+    if (source) {
+      return getPath() + path.sep + "ImageCache" + path.sep + en.get(getSourceType(source)) + path.sep + getFileGroup(source) + path.sep;
+    } else {
+      return getPath() + path.sep + "ImageCache" + path.sep;
+    }
   }
 }
 
