@@ -24,7 +24,12 @@ class Route {
   }
 }
 
+
+// initialState declaration (overwritten by data read from data.json)
+// 'process.env.npm_package_version' is taken from 'version'
+// in package.json
 let initialState = {
+  version: process.env.npm_package_version,
   config: new Config(),
   scenes: Array<Scene>(),
   library: Array<LibrarySource>(),
@@ -46,6 +51,7 @@ console.log("Saving to", savePath);
 try {
   const data = JSON.parse(readFileSync(savePath, 'utf-8'));
   initialState = {
+    version: data.version,
     autoEdit: data.autoEdit,
     isSelect: data.isSelect,
     config: data.config,
@@ -54,6 +60,14 @@ try {
     tags: data.tags.map((t: any) => new Tag(t)),
     route: data.route.map((s: any) => new Route(s)),
   };
+
+  // validate initialState is rehydrated from a 'compatible' version
+  if (initialState.version != process.env.npm_package_version)
+  {
+    // ToDo (in future) deal with upgrading incompatible versions 
+    //  For now the version is flattened to the current version.
+    initialState.version = process.env.npm_package_version;
+  }
 } catch (e) {
   // who cares
 }
