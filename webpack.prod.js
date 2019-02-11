@@ -1,5 +1,6 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
+const webpack = require('webpack');
 
 let mainConfig = {
     mode: 'production',
@@ -97,6 +98,9 @@ let rendererConfig = {
         new HtmlWebpackPlugin({
             template: path.resolve(__dirname, './src/renderer/index.html'),
         }),
+        new webpack.DefinePlugin({
+            VERSION: JSON.stringify(require("./package.json").version)
+          }),
     ],
 };
 
