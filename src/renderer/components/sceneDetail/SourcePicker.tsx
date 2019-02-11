@@ -37,7 +37,7 @@ export default class SourcePicker extends React.Component {
 
   render() {
     let tags = Array<Tag>();
-    let options = Array<{ label: string, value: string }>();
+    let options = Array<{ label: string, value: string, isDisabled: boolean }>();
     for (let source of this.props.sources) {
       for (let tag of source.tags) {
         tags.push(tag);
@@ -53,8 +53,10 @@ export default class SourcePicker extends React.Component {
         return 0;
       }
     });
+    const untagged = this.state.filters.length == 1 && this.state.filters[0] == null;
+    options.push({label: "<Untagged>", value: null, isDisabled: this.state.filters.length > 0 && !untagged});
     for (let tag of tags) {
-      options.push({label: tag.name, value: tag.name})
+      options.push({label: tag.name, value: tag.name, isDisabled: this.state.filters.length > 0 && untagged});
     }
 
     let displaySources = [];
@@ -62,10 +64,16 @@ export default class SourcePicker extends React.Component {
     if (filtering) {
       for (let source of this.props.sources) {
         let matchesFilter = true;
-        for (let filter of this.state.filters) {
-          if (!source.tags.map((s) => s.name).includes(filter)) {
+        if (untagged) {
+          if (source.tags.length > 0) {
             matchesFilter = false;
-            break;
+          }
+        } else {
+          for (let filter of this.state.filters) {
+            if (!source.tags.map((s) => s.name).includes(filter)) {
+              matchesFilter = false;
+              break;
+            }
           }
         }
         if (matchesFilter) {
