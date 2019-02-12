@@ -1,14 +1,15 @@
 import {remote} from "electron";
 import * as React from 'react';
+import {existsSync} from "fs";
+import rimraf from "rimraf";
 import getFolderSize from 'get-folder-size';
 
+import {getCachePath} from "../../utils";
 import Config, {CacheSettings} from "../../Config";
 import ControlGroup from "../sceneDetail/ControlGroup";
 import SimpleCheckbox from "../ui/SimpleCheckbox";
 import SimpleNumberInput from "../ui/SimpleNumberInput";
 import SimpleTextInput from "../ui/SimpleTextInput";
-import {getCachePath} from "../../utils";
-import rimraf from "rimraf";
 
 export default class CacheGroup extends React.Component {
   readonly props: {
@@ -67,11 +68,14 @@ export default class CacheGroup extends React.Component {
   }
 
   calculateCacheSize() {
-    getFolderSize(getCachePath(null, this.props.config), (err: string, size: number) => {
-      if (err) { throw err; }
-      const mbSize = (size / 1024 / 1024);
-      this.setState({cacheSize:  mbSize.toFixed(2) + "MB"});
-    });
+    const cachePath = getCachePath(null, this.props.config);
+    if (existsSync(cachePath)) {
+      getFolderSize(getCachePath(null, this.props.config), (err: string, size: number) => {
+        if (err) { throw err; }
+        const mbSize = (size / 1024 / 1024);
+        this.setState({cacheSize:  mbSize.toFixed(2) + "MB"});
+      });
+    }
   }
 
   pickDirectory() {
