@@ -1,5 +1,5 @@
 import {remote} from 'electron';
-import {mkdirSync, readFileSync, writeFileSync} from 'fs';
+import {existsSync, mkdirSync, readFileSync, renameSync, writeFileSync} from 'fs';
 import * as React from 'react';
 import path from 'path';
 
@@ -20,7 +20,7 @@ import SceneDetail from './sceneDetail/SceneDetail';
  *  [plugins] section to pick up the version string from 
  *   package.json
  */
-declare var VERSION: string;
+declare var __VERSION__: string;
 
 class Route {
   kind: string;
@@ -31,12 +31,9 @@ class Route {
   }
 }
 
-
 // initialState declaration (overwritten by data read from data.json)
-// 'process.env.npm_package_version' is taken from 'version'
-// in package.json
 let initialState = {
-  version: process.env.npm_package_version,
+  version: __VERSION__,
   config: new Config(),
   scenes: Array<Scene>(),
   library: Array<LibrarySource>(),
@@ -57,26 +54,75 @@ console.log("Saving to", savePath);
 
 try {
   const data = JSON.parse(readFileSync(savePath, 'utf-8'));
-  initialState = {
-    version: data.version,
-    autoEdit: data.autoEdit,
-    isSelect: data.isSelect,
-    config: data.config,
-    scenes: data.scenes.map((s: any) => new Scene(s)),
-    library: data.library.map((s: any) => new LibrarySource(s)),
-    tags: data.tags.map((t: any) => new Tag(t)),
-    route: data.route.map((s: any) => new Route(s)),
-  };
 
-  // validate initialState is rehydrated from a 'compatible' version
-  if (initialState.version != VERSION)
-  {
-    // ToDo (in future) deal with upgrading incompatible versions 
-    //  For now the version is flattened to the current version.
-    initialState.version = VERSION;
+  switch (data.version) {
+
+    // When no version number found in data.json - assume v1.2.0 format
+    // This should fail safe and self heal.
+    case undefined:
+
+      // Preserve the existing file - so as not to destroy user's data
+      archiveFile(savePath);
+
+      // Version:
+      // Explicitly 'upgrading' so set the new version number
+      initialState.version = __VERSION__;
+
+      // Library:
+      // Create Library from aggregate of previous scenes' directories
+      // technique is by text manipulation hack 
+      let libraryString: string = "";
+      let sourceId: number = 0;
+      let directories: string[];
+
+      // Get a unique array of directories from old scenes
+      data.scenes.forEach((oldScene: any) => {
+        directories = [].concat(directories, oldScene.directories).filter((val, ind, arr) => arr.indexOf(val) === ind);
+      });
+
+          // hack the stringified LibrarySource
+      directories.slice(1).forEach((directory: string) => {
+        libraryString += (sourceId ? "," : "") + "{\"id\"\:" + sourceId++ + ",\"url\"\:\"" + directory + "\",\"tags\"\:\[\]}";
+      });
+
+      // Hydrate the library ! Yay!!! :)
+      initialState.library = JSON.parse("[" + libraryString + "]");
+
+      break;
+
+    default:
+      // Standard rehydration of initialState 
+      // We do not overwrite version with __VERSION__
+      // so that we know when looking at a data.json file
+      // which version it was created with.
+      initialState = {
+        version: data.version,
+        autoEdit: data.autoEdit,
+        isSelect: data.isSelect,
+        config: data.config,
+        scenes: data.scenes.map((s: any) => new Scene(s)),
+        library: data.library.map((s: any) => new LibrarySource(s)),
+        tags: data.tags.map((t: any) => new Tag(t)),
+        route: data.route.map((s: any) => new Route(s)),
+      };
   }
 } catch (e) {
-  // who cares
+  // When an error occurs archive potentially incompatible data.json file 
+  // This essentially renames the data.json file and thus the app is self-healing
+  // in that it will recreate an initial (blank) data.json file on restarting
+  // - The archived file being available for investigation.
+  archiveFile(savePath);
+}
+
+/**
+ * Archives a file (if it exists) to same path appending '.{epoch now}' 
+ * to the file name 
+ * @param {string} filePath 
+ */
+function archiveFile(filePath: string): void {
+  if (existsSync(filePath)) {
+    renameSync(filePath, (filePath + '.' + Date.now()));
+  }
 }
 
 export default class Meta extends React.Component {
@@ -131,7 +177,9 @@ export default class Meta extends React.Component {
             onOpenLibrary={this.onOpenLibrary.bind(this)}
             onGenerate={this.onAddGenerator.bind(this)}
             onConfig={this.onConfig.bind(this)}
-            canGenerate={this.state.library.length > 0 && this.state.tags.length > 0}/>)}
+            canGenerate={this.state.library.length > 0 && this.state.tags.length > 0}
+          />
+        )}
 
         {this.isRoute('library') && (
           <Library
@@ -178,7 +226,8 @@ export default class Meta extends React.Component {
             onUpdateScene={this.onUpdateScene.bind(this)}
             onOpenLibraryImport={this.onOpenLibraryImport.bind(this)}
             saveScene={this.saveScene.bind(this)}
-          />)}
+          />
+        )}
 
         {this.isRoute('play') && (
           <Player
@@ -186,7 +235,8 @@ export default class Meta extends React.Component {
             scene={this.scene()}
             onUpdateScene={this.onUpdateScene.bind(this)}
             overlayScene={this.overlayScene()}
-            goBack={this.goBack.bind(this)}/>
+            goBack={this.goBack.bind(this)}
+          />
         )}
 
         {this.isRoute('libraryplay') && (
@@ -197,7 +247,8 @@ export default class Meta extends React.Component {
             goBack={this.endPlaySceneFromLibrary.bind(this)}
             tags={this.librarySource().tags}
             allTags={this.state.tags}
-            toggleTag={this.onToggleTag.bind(this)}/>
+            toggleTag={this.onToggleTag.bind(this)}
+          />
         )}
 
         {this.isRoute('config') && (
@@ -206,7 +257,8 @@ export default class Meta extends React.Component {
             scenes={this.state.scenes}
             goBack={this.goBack.bind(this)}
             updateConfig={this.updateConfig.bind(this)}
-            onDefault={this.onDefaultConfig.bind(this)}/>
+            onDefault={this.onDefaultConfig.bind(this)}
+          />
         )}
       </div>
     )

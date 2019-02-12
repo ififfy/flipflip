@@ -100,7 +100,7 @@ let rendererConfig = {
         }),
         // Create a global variable at compile time
         new webpack.DefinePlugin({
-            VERSION: JSON.stringify(require("./package.json").version),
+            __VERSION__: JSON.stringify(require("./package.json").version),
           })
     ],
 };
