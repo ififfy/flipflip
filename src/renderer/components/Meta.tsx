@@ -3,6 +3,7 @@ import {existsSync, mkdirSync, readFileSync, renameSync, writeFileSync} from 'fs
 import * as React from 'react';
 import path from 'path';
 
+import {removeDuplicatesBy} from "../utils";
 import Config from "../Config";
 import Scene from '../Scene';
 import ScenePicker from './ScenePicker';
@@ -54,47 +55,67 @@ console.log("Saving to", savePath);
 
 try {
   const data = JSON.parse(readFileSync(savePath, 'utf-8'));
-
   switch (data.version) {
-
-    // When no version number found in data.json - assume v1.2.0 format
+    // When no version number found in data.json -- assume pre-v2.0.0 format
     // This should fail safe and self heal.
     case undefined:
-
       // Preserve the existing file - so as not to destroy user's data
       archiveFile(savePath);
 
-      // Version:
-      // Explicitly 'upgrading' so set the new version number
-      initialState.version = __VERSION__;
-
-      // Library:
       // Create Library from aggregate of previous scenes' directories
-      // technique is by text manipulation hack 
-      let libraryString: string = "";
-      let sourceId: number = 0;
-      let directories: string[];
+      let sources = Array<string>();
+      for (let scene of data.scenes) {
+        sources = sources.concat(scene.directories);
+      }
+      sources = removeDuplicatesBy((s: string) => s, sources);
 
-      // Get a unique array of directories from old scenes
-      data.scenes.forEach((oldScene: any) => {
-        directories = [].concat(directories, oldScene.directories).filter((val, ind, arr) => arr.indexOf(val) === ind);
-      });
+      // Create our initialState object
+      initialState = {
+        version: __VERSION__,
+        autoEdit: data.autoEdit,
+        isSelect: data.isSelect ? data.isSelect : false,
+        config: data.config ? data.config : new Config(),
+        scenes: Array<Scene>(),
+        library: Array<LibrarySource>(),
+        tags: Array<Tag>(),
+        route: data.route.map((s: any) => new Route(s)),
+      };
 
-          // hack the stringified LibrarySource
-      directories.slice(1).forEach((directory: string) => {
-        libraryString += (sourceId ? "," : "") + "{\"id\"\:" + sourceId++ + ",\"url\"\:\"" + directory + "\",\"tags\"\:\[\]}";
-      });
 
-      // Hydrate the library ! Yay!!! :)
-      initialState.library = JSON.parse("[" + libraryString + "]");
+      // Hydrate and add the library ! Yay!!! :)
+      let libraryID = 0;
+      const newLibrarySources = Array<LibrarySource>();
+      for (let url of sources) {
+        newLibrarySources.push(new LibrarySource({
+          url: url,
+          id: libraryID,
+          tags: Array<Tag>(),
+        }));
+        libraryID += 1;
+      }
+      initialState.library = newLibrarySources;
 
+      // Convert and add old scenes
+      const newScenes = Array<Scene>();
+      for (let oldScene of data.scenes) {
+        const newScene = new Scene(oldScene);
+
+        let sourceID = 0;
+        const sources = Array<LibrarySource>();
+        for (let oldDirectory of oldScene.directories) {
+          sources.push(new LibrarySource({
+            url: oldDirectory,
+            id: sourceID,
+            tags: Array<Tag>(),
+          }));
+          sourceID += 1;
+        }
+        newScene.sources = sources;
+        newScenes.push(newScene);
+      }
+      initialState.scenes = newScenes;
       break;
-
     default:
-      // Standard rehydration of initialState 
-      // We do not overwrite version with __VERSION__
-      // so that we know when looking at a data.json file
-      // which version it was created with.
       initialState = {
         version: data.version,
         autoEdit: data.autoEdit,
@@ -111,6 +132,7 @@ try {
   // This essentially renames the data.json file and thus the app is self-healing
   // in that it will recreate an initial (blank) data.json file on restarting
   // - The archived file being available for investigation.
+  console.error(e);
   archiveFile(savePath);
 }
 
