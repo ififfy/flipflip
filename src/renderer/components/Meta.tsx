@@ -1,8 +1,9 @@
 import {remote} from 'electron';
-import {mkdirSync, readFileSync, writeFileSync} from 'fs';
+import {existsSync, mkdirSync, readFileSync, renameSync, writeFileSync} from 'fs';
 import * as React from 'react';
 import path from 'path';
 
+import {removeDuplicatesBy} from "../utils";
 import Config from "../Config";
 import Scene from '../Scene';
 import ScenePicker from './ScenePicker';
@@ -20,7 +21,7 @@ import SceneDetail from './sceneDetail/SceneDetail';
  *  [plugins] section to pick up the version string from 
  *   package.json
  */
-declare var VERSION: string;
+declare var __VERSION__: string;
 
 class Route {
   kind: string;
@@ -31,12 +32,9 @@ class Route {
   }
 }
 
-
 // initialState declaration (overwritten by data read from data.json)
-// 'process.env.npm_package_version' is taken from 'version'
-// in package.json
 let initialState = {
-  version: process.env.npm_package_version,
+  version: __VERSION__,
   config: new Config(),
   scenes: Array<Scene>(),
   library: Array<LibrarySource>(),
@@ -57,26 +55,96 @@ console.log("Saving to", savePath);
 
 try {
   const data = JSON.parse(readFileSync(savePath, 'utf-8'));
-  initialState = {
-    version: data.version,
-    autoEdit: data.autoEdit,
-    isSelect: data.isSelect,
-    config: data.config,
-    scenes: data.scenes.map((s: any) => new Scene(s)),
-    library: data.library.map((s: any) => new LibrarySource(s)),
-    tags: data.tags.map((t: any) => new Tag(t)),
-    route: data.route.map((s: any) => new Route(s)),
-  };
+  switch (data.version) {
+    // When no version number found in data.json -- assume pre-v2.0.0 format
+    // This should fail safe and self heal.
+    case undefined:
+      // Preserve the existing file - so as not to destroy user's data
+      archiveFile(savePath);
 
-  // validate initialState is rehydrated from a 'compatible' version
-  if (initialState.version != VERSION)
-  {
-    // ToDo (in future) deal with upgrading incompatible versions 
-    //  For now the version is flattened to the current version.
-    initialState.version = VERSION;
+      // Create Library from aggregate of previous scenes' directories
+      let sources = Array<string>();
+      for (let scene of data.scenes) {
+        sources = sources.concat(scene.directories);
+      }
+      sources = removeDuplicatesBy((s: string) => s, sources);
+
+      // Create our initialState object
+      initialState = {
+        version: __VERSION__,
+        autoEdit: data.autoEdit,
+        isSelect: data.isSelect ? data.isSelect : false,
+        config: data.config ? data.config : new Config(),
+        scenes: Array<Scene>(),
+        library: Array<LibrarySource>(),
+        tags: Array<Tag>(),
+        route: data.route.map((s: any) => new Route(s)),
+      };
+
+
+      // Hydrate and add the library ! Yay!!! :)
+      let libraryID = 0;
+      const newLibrarySources = Array<LibrarySource>();
+      for (let url of sources) {
+        newLibrarySources.push(new LibrarySource({
+          url: url,
+          id: libraryID,
+          tags: Array<Tag>(),
+        }));
+        libraryID += 1;
+      }
+      initialState.library = newLibrarySources;
+
+      // Convert and add old scenes
+      const newScenes = Array<Scene>();
+      for (let oldScene of data.scenes) {
+        const newScene = new Scene(oldScene);
+
+        let sourceID = 0;
+        const sources = Array<LibrarySource>();
+        for (let oldDirectory of oldScene.directories) {
+          sources.push(new LibrarySource({
+            url: oldDirectory,
+            id: sourceID,
+            tags: Array<Tag>(),
+          }));
+          sourceID += 1;
+        }
+        newScene.sources = sources;
+        newScenes.push(newScene);
+      }
+      initialState.scenes = newScenes;
+      break;
+    default:
+      initialState = {
+        version: data.version,
+        autoEdit: data.autoEdit,
+        isSelect: data.isSelect,
+        config: data.config,
+        scenes: data.scenes.map((s: any) => new Scene(s)),
+        library: data.library.map((s: any) => new LibrarySource(s)),
+        tags: data.tags.map((t: any) => new Tag(t)),
+        route: data.route.map((s: any) => new Route(s)),
+      };
   }
 } catch (e) {
-  // who cares
+  // When an error occurs archive potentially incompatible data.json file 
+  // This essentially renames the data.json file and thus the app is self-healing
+  // in that it will recreate an initial (blank) data.json file on restarting
+  // - The archived file being available for investigation.
+  console.error(e);
+  archiveFile(savePath);
+}
+
+/**
+ * Archives a file (if it exists) to same path appending '.{epoch now}' 
+ * to the file name 
+ * @param {string} filePath 
+ */
+function archiveFile(filePath: string): void {
+  if (existsSync(filePath)) {
+    renameSync(filePath, (filePath + '.' + Date.now()));
+  }
 }
 
 export default class Meta extends React.Component {
@@ -131,7 +199,9 @@ export default class Meta extends React.Component {
             onOpenLibrary={this.onOpenLibrary.bind(this)}
             onGenerate={this.onAddGenerator.bind(this)}
             onConfig={this.onConfig.bind(this)}
-            canGenerate={this.state.library.length > 0 && this.state.tags.length > 0}/>)}
+            canGenerate={this.state.library.length > 0 && this.state.tags.length > 0}
+          />
+        )}
 
         {this.isRoute('library') && (
           <Library
@@ -178,7 +248,8 @@ export default class Meta extends React.Component {
             onUpdateScene={this.onUpdateScene.bind(this)}
             onOpenLibraryImport={this.onOpenLibraryImport.bind(this)}
             saveScene={this.saveScene.bind(this)}
-          />)}
+          />
+        )}
 
         {this.isRoute('play') && (
           <Player
@@ -186,7 +257,8 @@ export default class Meta extends React.Component {
             scene={this.scene()}
             onUpdateScene={this.onUpdateScene.bind(this)}
             overlayScene={this.overlayScene()}
-            goBack={this.goBack.bind(this)}/>
+            goBack={this.goBack.bind(this)}
+          />
         )}
 
         {this.isRoute('libraryplay') && (
@@ -197,7 +269,8 @@ export default class Meta extends React.Component {
             goBack={this.endPlaySceneFromLibrary.bind(this)}
             tags={this.librarySource().tags}
             allTags={this.state.tags}
-            toggleTag={this.onToggleTag.bind(this)}/>
+            toggleTag={this.onToggleTag.bind(this)}
+          />
         )}
 
         {this.isRoute('config') && (
@@ -206,7 +279,8 @@ export default class Meta extends React.Component {
             scenes={this.state.scenes}
             goBack={this.goBack.bind(this)}
             updateConfig={this.updateConfig.bind(this)}
-            onDefault={this.onDefaultConfig.bind(this)}/>
+            onDefault={this.onDefaultConfig.bind(this)}
+          />
         )}
       </div>
     )

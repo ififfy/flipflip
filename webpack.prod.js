@@ -99,7 +99,7 @@ let rendererConfig = {
             template: path.resolve(__dirname, './src/renderer/index.html'),
         }),
         new webpack.DefinePlugin({
-            VERSION: JSON.stringify(require("./package.json").version)
+            __VERSION__: JSON.stringify(require("./package.json").version)
           }),
     ],
 };
