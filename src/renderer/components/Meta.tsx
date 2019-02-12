@@ -124,6 +124,7 @@ export default class Meta extends React.Component {
         {this.state.route.length === 0 && (
           <ScenePicker
             scenes={this.state.scenes}
+            version={this.state.version}
             onUpdateScenes={this.onUpdateScenes.bind(this)}
             onAdd={this.onAddScene.bind(this)}
             onSelect={this.onOpenScene.bind(this)}
