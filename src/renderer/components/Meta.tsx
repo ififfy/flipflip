@@ -15,6 +15,13 @@ import SceneGenerator from "./library/SceneGenerator";
 import Player from './player/Player';
 import SceneDetail from './sceneDetail/SceneDetail';
 
+/**
+ * A compile-time global variable defined in webpack.config'
+ *  [plugins] section to pick up the version string from 
+ *   package.json
+ */
+declare var VERSION: string;
+
 class Route {
   kind: string;
   value: any;
@@ -62,11 +69,11 @@ try {
   };
 
   // validate initialState is rehydrated from a 'compatible' version
-  if (initialState.version != process.env.npm_package_version)
+  if (initialState.version != VERSION)
   {
     // ToDo (in future) deal with upgrading incompatible versions 
     //  For now the version is flattened to the current version.
-    initialState.version = process.env.npm_package_version;
+    initialState.version = VERSION;
   }
 } catch (e) {
   // who cares
@@ -117,6 +124,7 @@ export default class Meta extends React.Component {
         {this.state.route.length === 0 && (
           <ScenePicker
             scenes={this.state.scenes}
+            version={this.state.version}
             onUpdateScenes={this.onUpdateScenes.bind(this)}
             onAdd={this.onAddScene.bind(this)}
             onSelect={this.onOpenScene.bind(this)}
