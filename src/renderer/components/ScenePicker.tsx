@@ -51,6 +51,7 @@ class Link extends React.Component {
 export default class ScenePicker extends React.Component {
   readonly props: {
     scenes: Array<Scene>,
+    version: string,
     canGenerate: boolean,
     onAdd(): void,
     onSelect(scene: Scene): void,
@@ -79,6 +80,7 @@ export default class ScenePicker extends React.Component {
               <div className="u-config" onClick={this.props.onConfig.bind(this)}/>
             </div>
             <h1>FlipFlip</h1>
+            <small>v{this.props.version}</small>
           </div>
 
           <div><Link url="https://github.com/ififfy/flipflip/wiki/FlipFlip-User-Manual">User manual</Link></div>
