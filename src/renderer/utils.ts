@@ -113,23 +113,23 @@ export function getRandomListItem(list: any[], count: number = 1) {
 }
 
 // Inspired by https://reactjs.org/blog/2015/12/16/ismounted-antipattern.html
-export class CancelablePromise extends Promise<Array<string>> {
+// In order to assist with processing the next promise, this promise returns
+// a list of strings as well as a value used to build the next promise. This vlaue is
+// null if there is no follow-up promise.
+export class CancelablePromise extends Promise<{data: Array<string>, next: any}> {
   hasCanceled: boolean;
-  // Only looping sources use these properties
   source: string;
-  page: number;
   timeout: number;
 
 
-  constructor(executor: (resolve: (value?: (PromiseLike<Array<string>> | Array<string>)) => void, reject: (reason?: any) => void) => void) {
+  constructor(executor: (resolve: (value?: (PromiseLike<{data: Array<string>, next: any}> | {data: Array<string>, next: any})) => void, reject: (reason?: any) => void) => void) {
     super(executor);
     this.hasCanceled = false;
     this.source = "";
-    this.page = 0;
     this.timeout = 0;
   }
 
-  getPromise(): Promise<Array<string>> {
+  getPromise(): Promise<{data: Array<string>, next: any}> {
     return new Promise((resolve, reject) => {
       this.then(
         val => this.hasCanceled ? null : resolve(val),

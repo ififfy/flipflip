@@ -255,7 +255,7 @@ export default class CaptionProgram extends React.Component {
           console.warn("Unable to access " + url + " - Service is unavailable");
         })
         .text(data => {
-          resolve([data]);
+          resolve({data: [data], next: null});
         });
     });
     this.setState({runningPromise: newPromise});
@@ -273,7 +273,7 @@ export default class CaptionProgram extends React.Component {
           captionBigFontSize: this.props.captionBigFontSize,
           captionBigFontFamily: this.props.captionBigFontFamily,
         });
-        for (let line of data[0].split('\n')) {
+        for (let line of data.data[0].split('\n')) {
           line = line.trim();
 
           if (line.length == 0 || line[0] === '#') continue;
