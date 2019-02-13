@@ -34,10 +34,11 @@ export class RemoteSettings {
   tumblrDefault = "BaQquvlxQeRhKRyViknF98vseIdcBEyDrzJBpHxvAiMPHCKR2l";
   tumblrOverlay = "G4iZd6FBiyDxHVUpNqtOTDu4woWzfp8WuH3tTrT3MC16GTmNzq";
 
-  redditClientID = "";
-  redditClientSecret = "";
-  redditUsername = "";
-  redditPassword = "";
+  redditUserAgent= "desktop:flipflip:v2.0.0 (by /u/ififfy)";
+  redditClientID = "2Iqe-1CsO4VQlA";
+  redditRedirectURI = "http://localhost:65010";
+  redditDeviceID = "";
+  redditRefreshToken = "";
 }
 
 export class CacheSettings {

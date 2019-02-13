@@ -3,9 +3,11 @@ import * as fs from "fs";
 import recursiveReaddir from 'recursive-readdir';
 import fileURL from 'file-url';
 import wretch from 'wretch';
+import http from 'http';
+import Snoowrap from 'snoowrap';
 
 import {IF, ST, TOT} from '../../const';
-import {CancelablePromise, getCachePath, getFileName, getSourceType} from "../../utils";
+import {CancelablePromise, getCachePath, getFileGroup, getFileName, getSourceType} from "../../utils";
 import Config from "../../Config";
 import Scene from '../../Scene';
 import CaptionProgram from './CaptionProgram';
@@ -200,39 +202,18 @@ function loadTumblr(config: Config, url: string, filter: string, page: number, o
 }
 
 function loadReddit(config: Config, url: string, filter: string, page: number, overlay: boolean, attempt: number): CancelablePromise {
-  let configured = true;
-  if (config.remoteSettings.redditClientID == "") {
-    configured = false;
-    console.warn("Reddit Client ID is not configured");
-  }
-  if (config.remoteSettings.redditClientSecret == "") {
-    configured = false;
-    console.warn("Reddit Client Secret is not configured");
-  }
-  if (config.remoteSettings.redditUsername == "") {
-    configured = false;
-    console.warn("Reddit Username is not configured");
-  }
-  if (config.remoteSettings.redditUsername == "") {
-    configured = false;
-    console.warn("Reddit Username is not configured");
-  }
-  if (config.remoteSettings.redditPassword == "") {
-    configured = false;
-    console.warn("Reddit Password is not configured");
-  }
+  let configured = config.remoteSettings.redditRefreshToken != "";
 
   //TODO Finish implementing reddit
   if (configured) {
     return new CancelablePromise((resolve, reject) => {
-      /*const reddit = new Snoowrap({
+      const reddit = new Snoowrap({
+        userAgent: config.remoteSettings.redditUserAgent,
         clientId: config.remoteSettings.redditClientID,
-        clientSecret: config.remoteSettings.redditClientSecret,
-        username: config.remoteSettings.redditUsername,
-        password: config.remoteSettings.redditPassword,
+        clientSecret: "",
+        refreshToken: config.remoteSettings.redditRefreshToken,
       });
-      console.log(getFileGroup(url));
-      reddit.getSubreddit(getFileGroup(url)).getHot();*/
+      reddit.getSubreddit(getFileGroup(url)).getHot().then(console.log);
       resolve(null);
     });
   } else {

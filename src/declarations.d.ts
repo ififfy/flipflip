@@ -30,6 +30,7 @@ declare module 'react-multiselect-checkboxes';
 declare module 'snoowrap';
 declare module 'rimraf';
 declare module 'get-folder-size';
+declare module 'uuid/v4';
 
 // Type declarations for Clipboard API
 // https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API
