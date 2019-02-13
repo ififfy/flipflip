@@ -841,6 +841,9 @@ label.SimpleCheckbox {
 
 .SceneDetail {
   .SceneName {
+    min-width: 10rem;
+    min-height: 2rem;
+    margin: 0;
     display: inline-block;
     margin-top: 0;
     color: $black !important;
