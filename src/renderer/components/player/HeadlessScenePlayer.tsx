@@ -60,67 +60,51 @@ function getTumblrAPIKey(config: Config, overlay: boolean): string {
 }
 
 // Determine what kind of source we have based on the URL and return associated Promise
-function getPromise(config: Config, url: string, filter: string, page: number, overlay: boolean): CancelablePromise {
+function getPromise(config: Config, url: string, filter: string, next: any, overlay: boolean): CancelablePromise {
   let promise;
   const sourceType = getSourceType(url);
-  switch (sourceType) {
-    case ST.tumblr:
-      if (page == -1) {
-        const cachePath = getCachePath(url, config);
-        if (fs.existsSync(cachePath) && config.caching.enabled) {
-          // If the cache directory exists, use it
-          promise = loadLocalDirectory(getCachePath(url, config), filter);
-          promise.page = -1;
-        } else {
-          // Otherwise loadTumblr;
-          promise = loadTumblr(config, url, filter, page, overlay, 0);
-          promise.page = 0;
-        }
+
+  if (sourceType == ST.local) { // Local files
+    promise = loadLocalDirectory(url, filter, null);
+  } else if (sourceType == ST.list) { // Image List
+    promise = loadRemoteImageURLList(url);
+  } else { // Paging sources
+    let promiseFunction;
+    let timeout;
+    if (sourceType == ST.tumblr) {
+      promiseFunction = loadTumblr;
+      timeout = 8000;
+    } else if (sourceType == ST.reddit) {
+      promiseFunction = loadReddit;
+      timeout = 5000;
+    }
+    if (next == -1) {
+      const cachePath = getCachePath(url, config);
+      if (fs.existsSync(cachePath) && config.caching.enabled) {
+        // If the cache directory exists, use it
+        promise = loadLocalDirectory(getCachePath(url, config), filter, 0);
       } else {
-        promise = loadTumblr(config, url, filter, page, overlay, 0);
-        promise.page = page;
+        promise = promiseFunction(config, url, filter, 0, overlay);
       }
-      promise.timeout = 8000;
-      break;
-    case ST.reddit:
-      if (page == -1) {
-        const cachePath = getCachePath(url, config);
-        if (fs.existsSync(cachePath) && config.caching.enabled) {
-          // If the cache directory exists, use it
-          promise = loadLocalDirectory(getCachePath(url, config), filter);
-          promise.page = -1;
-        } else {
-          // Otherwise loadTumblr;
-          promise = loadReddit(config, url, filter, page, overlay, 0);
-          promise.page = 0;
-        }
-      } else {
-        promise = loadReddit(config, url, filter, page, overlay, 0);
-        promise.page = page;
-      }
-      promise.timeout = 1000;
-      break;
-    case ST.list:
-      promise = loadRemoteImageURLList(url);
-      break;
-    case ST.local:
-      promise = loadLocalDirectory(url, filter);
-      break;
+    } else {
+      promise = promiseFunction(config, url, filter, next, overlay);
+    }
+    promise.timeout = timeout;
   }
   promise.source = url;
   return promise;
 }
 
-function loadLocalDirectory(path: string, filter: string): CancelablePromise {
+function loadLocalDirectory(path: string, filter: string, next: any): CancelablePromise {
   const blacklist = ['*.css', '*.html', 'avatar.png'];
 
   return new CancelablePromise((resolve, reject) => {
     recursiveReaddir(path, blacklist, (err: any, rawFiles: Array<string>) => {
       if (err) {
         console.warn(err);
-        resolve([]);
+        resolve(null);
       } else {
-        resolve(filterPathsToJustImages(filter, rawFiles).map((p) => fileURL(p)));
+        resolve({data: filterPathsToJustImages(filter, rawFiles).map((p) => fileURL(p)), next: next});
       }
     });
   });
@@ -135,22 +119,22 @@ function loadRemoteImageURLList(url: string): CancelablePromise {
         if (!lines.length) {
           console.warn("No lines in", url, "start with 'http://'")
         }
-        resolve(lines);
+        resolve({data: lines, next: null});
       })
       .catch((e) => {
         console.warn("Fetch error on", url);
         console.warn(e);
-        resolve([]);
+        resolve(null);
       });
   });
 }
 
-function loadTumblr(config: Config, url: string, filter: string, page: number, overlay: boolean, attempt: number): CancelablePromise {
+function loadTumblr(config: Config, url: string, filter: string, next: any, overlay: boolean): CancelablePromise {
   const API_KEY = getTumblrAPIKey(config, overlay);
   // TumblrID takes the form of <blog_name>.tumblr.com
   let tumblrID = url.replace(/https?:\/\//, "");
   tumblrID = tumblrID.replace("/", "");
-  let tumblrURL = "https://api.tumblr.com/v2/blog/" + tumblrID + "/posts/photo?api_key=" + API_KEY + "&offset=" + (page * 20);
+  let tumblrURL = "https://api.tumblr.com/v2/blog/" + tumblrID + "/posts/photo?api_key=" + API_KEY + "&offset=" + (next * 20);
   return new CancelablePromise((resolve, reject) => {
     wretch(tumblrURL)
       .get()
@@ -160,11 +144,7 @@ function loadTumblr(config: Config, url: string, filter: string, page: number, o
       })
       .error(429, error => {
         console.warn("Tumblr responded with 429 - Too Many Requests");
-        if (attempt < 4) {
-          loadTumblr(config, url, filter, page, overlay, attempt + 1);
-        } else {
-          resolve(null);
-        }
+        resolve(null);
       })
       .json(json => {
         // End loop if we're at end of posts
@@ -191,7 +171,7 @@ function loadTumblr(config: Config, url: string, filter: string, page: number, o
             }
           }
         }
-        resolve(images);
+        resolve({data: images, next: (next as number) + 1});
       })
       .catch((e) => {
         console.warn("Fetch error on", tumblrURL);
@@ -201,22 +181,43 @@ function loadTumblr(config: Config, url: string, filter: string, page: number, o
   });
 }
 
-function loadReddit(config: Config, url: string, filter: string, page: number, overlay: boolean, attempt: number): CancelablePromise {
+function loadReddit(config: Config, url: string, filter: string, next: any, overlay: boolean): CancelablePromise {
   let configured = config.remoteSettings.redditRefreshToken != "";
-
-  //TODO Finish implementing reddit
   if (configured) {
-    return new CancelablePromise((resolve, reject) => {
-      const reddit = new Snoowrap({
-        userAgent: config.remoteSettings.redditUserAgent,
-        clientId: config.remoteSettings.redditClientID,
-        clientSecret: "",
-        refreshToken: config.remoteSettings.redditRefreshToken,
+      return new CancelablePromise((resolve, reject) => {
+        const reddit = new Snoowrap({
+          userAgent: config.remoteSettings.redditUserAgent,
+          clientId: config.remoteSettings.redditClientID,
+          clientSecret: "",
+          refreshToken: config.remoteSettings.redditRefreshToken,
+        });
+        if (next == 0) {
+          reddit.getSubreddit(getFileGroup(url)).getHot().then((submissionListing: any) => {
+            if (submissionListing.length > 0) {
+              resolve({
+                data: submissionListing.map((s: any) => s.url),
+                next: submissionListing[submissionListing.length - 1].name
+              });
+            } else {
+              resolve(null);
+            }
+          });
+        } else {
+          console.log("Now on page " + next);
+          reddit.getSubreddit(getFileGroup(url)).getHot({after: next}).then((submissionListing: any) => {
+            if (submissionListing.length > 0) {
+              resolve({
+                data: submissionListing.map((s: any) => s.url),
+                next: submissionListing[submissionListing.length - 1].name
+              });
+            } else {
+              resolve(null);
+            }
+          });
+        }
       });
-      reddit.getSubreddit(getFileGroup(url)).getHot().then(console.log);
-      resolve(null);
-    });
   } else {
+    console.warn("Reddit is not authorized. Visit Config to authorize Reddit with FlipFlip");
     return new CancelablePromise((resolve, reject) => {
       resolve(null);
     });
@@ -349,17 +350,19 @@ export default class HeadlessScenePlayer extends React.Component {
 
       loadPromise
         .getPromise()
-        .then((urls) => {
+        .then((object) => {
           let newPromiseQueue = this.state.promiseQueue;
           n += 1;
 
           // Just add the new urls to the end of the list
-          newAllURLs = newAllURLs.set(loadPromise.source, urls);
+          if (object != null) {
+            newAllURLs = newAllURLs.set(loadPromise.source, object.data);
 
-          // If this is a remote URL, queue up the next promise
-          if (loadPromise.page) {
-            newPromiseQueue.push(
-              getPromise(this.props.config, d, this.props.scene.imageTypeFilter, loadPromise.page + 1, this.props.opacity != 1));
+            // If this is a remote URL, queue up the next promise
+            if (object.next != null) {
+              newPromiseQueue.push(
+                getPromise(this.props.config, d, this.props.scene.imageTypeFilter, object.next, this.props.opacity != 1));
+            }
           }
 
           if (n < this.props.scene.sources.length) {
@@ -381,13 +384,13 @@ export default class HeadlessScenePlayer extends React.Component {
         this.setState({promise: promise});
         promise
           .getPromise()
-          .then((urls) => {
+          .then((object) => {
             // If we are not at the end of a source
-            if (urls != null) {
+            if (object != null) {
               // Update the correct index with our new images
               let newAllURLs = this.state.allURLs;
               let sourceURLs = newAllURLs.get(promise.source);
-              newAllURLs.set(promise.source, sourceURLs.concat(urls.filter((u) => {
+              newAllURLs.set(promise.source, sourceURLs.concat(object.data.filter((u) => {
                 const fileName = getFileName(u);
                 return !sourceURLs.map((u) => getFileName(u)).includes(fileName);
               })));
@@ -395,7 +398,7 @@ export default class HeadlessScenePlayer extends React.Component {
               // Add the next promise to the queue
               let newPromiseQueue = this.state.promiseQueue;
               newPromiseQueue.push(
-                getPromise(this.props.config, promise.source, this.props.scene.imageTypeFilter, promise.page + 1, this.props.opacity != 1));
+                getPromise(this.props.config, promise.source, this.props.scene.imageTypeFilter, object.next, this.props.opacity != 1));
 
               this.setState({allURLs: newAllURLs, promiseQueue: newPromiseQueue});
             }
