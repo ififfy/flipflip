@@ -1009,6 +1009,7 @@ label.SimpleCheckbox {
   border: 1px solid $black;
   position: relative;
   padding: $smallPadding;
+  max-width: 28rem;
 
   $barHeight: 1.9rem;
   $buttonHeight: 1.2rem;

@@ -1,5 +1,9 @@
 import * as React from "react";
 import * as fs from "fs";
+import uuidv4 from "uuid/v4";
+import wretch from "wretch";
+import {remote} from "electron";
+import http from "http";
 
 import Config, {CacheSettings, RemoteSettings, SceneSettings} from "../../Config";
 import Scene from "../../Scene";
@@ -21,7 +25,9 @@ export default class Library extends React.Component {
   };
 
   readonly state = {
-    errorMessages: new Array<string>(),
+    modalTitle: "",
+    modalMessages: new Array<string>(),
+    modalFunction: Function(),
     config: JSON.parse(JSON.stringify(this.props.config)), // Make a copy
   };
 
@@ -74,15 +80,16 @@ export default class Library extends React.Component {
 
           <APIGroup
             settings={this.state.config.remoteSettings}
+            activateReddit={this.showActivateRedditNotice.bind(this)}
             onUpdateSettings={this.onUpdateRemoteSettings.bind(this)}/>
         </div>
 
-        {this.state.errorMessages.length > 0 && (
-          <Modal onClose={this.onErrorClose.bind(this)} title="Error">
-            {this.state.errorMessages.map((m) =>
+        {this.state.modalMessages.length > 0 && (
+          <Modal onClose={this.closeModal.bind(this)} title={this.state.modalTitle}>
+            {this.state.modalMessages.map((m) =>
               <p key={(m as any) as number}>{m}</p>
             )}
-            <div className="u-button u-float-right" onClick={this.onErrorClose.bind(this)}>
+            <div className="u-button u-float-right" onClick={this.state.modalFunction.bind(this)}>
               Ok
             </div>
           </Modal>
@@ -91,10 +98,18 @@ export default class Library extends React.Component {
     )
   }
 
-  onErrorClose() {
-    this.setState({errorMessages: Array<string>()});
+  showActivateRedditNotice() {
+    const messages = Array<string>();
+    messages.push("You are about to be directed to Reddit.com to authorize FlipFlip. You should only have to do this once");
+    messages.push("Currently, this is only used for finding images. FlipFlip does not request or store any user information.");
+    this.setState({modalTitle: "Authorize FlipFlip on Reddit", modalMessages: messages, modalFunction: this.activateReddit });
   }
 
+  closeModal() {
+    this.setState({modalTitle: "", modalMessages: Array<string>(), modalFunction: null});
+  }
+
+  // This should only validate data REQUIRED for FlipFlip to work
   validate(): Array<string> {
     let errorMessages = Array<string>();
     // Validate any data:
@@ -124,7 +139,7 @@ export default class Library extends React.Component {
       this.props.updateConfig(this.state.config);
       return true;
     } else {
-      this.setState({errorMessages: errorMessages});
+      this.setState({modalTitle: "Error", modalMessages: errorMessages, modalFunction: this.closeModal});
       return false;
     }
   }
@@ -145,6 +160,82 @@ export default class Library extends React.Component {
     const newConfig = this.state.config;
     fn(newConfig.remoteSettings);
     this.setState({config: newConfig});
+  }
+
+  activateReddit() {
+    this.closeModal();
+    const clientID = this.props.config.remoteSettings.redditClientID;
+    const redirectURI = this.props.config.remoteSettings.redditRedirectURI;
+    const userAgent = this.props.config.remoteSettings.redditUserAgent;
+
+    let deviceID = this.props.config.remoteSettings.redditDeviceID;
+    if (deviceID == "") {
+      deviceID = uuidv4();
+    }
+
+    // Make initial request and open authorization form in browser
+    wretch("https://www.reddit.com/api/v1/authorize?client_id=" + clientID + "&response_type=code&state=" + deviceID +
+      "&redirect_uri=" + redirectURI + "&duration=permanent&scope=read")
+      .post()
+      .res(res => {
+        remote.shell.openExternal(res.url);
+      });
+
+    // Start a server to listen for Reddit OAuth response
+    http.createServer((req, res) => {
+      // Can't seem to get electron to properly return focus to FlipFlip, just alert the user in the response
+      const html = "<html><body><h1>Please return to FlipFlip</h1></body></html>";
+      res.writeHead(200, {"Content-Type": "text/html"});
+      res.write(html);
+
+      if (req.url.includes("state") && req.url.includes("code")) {
+        const args = req.url.replace("\/?", "").split("&");
+        // This should be the same as the deviceID
+        const state = args[0].substring(6);
+        if (state == deviceID) {
+          // This is what we use to get our token
+          const code = args[1].substring(5);
+          wretch("https://www.reddit.com/api/v1/access_token")
+            .headers({"User-Agent": userAgent, "Authorization": "Basic " + btoa(clientID + ":")})
+            .formData({grant_type: "authorization_code", code: code, redirect_uri: redirectURI})
+            .post()
+            .json(json => {
+              // Use prop here and not state, we strictly want to update refreshToken and deviceID
+              const config = this.props.config;
+              config.remoteSettings.redditDeviceID = deviceID;
+              config.remoteSettings.redditRefreshToken = json.refresh_token;
+              this.props.updateConfig(config);
+
+              // Also update state (so our config doesn't get overridden if other changes are saved)
+              const newConfig = this.state.config;
+              newConfig.remoteSettings.redditDeviceID = deviceID;
+              newConfig.remoteSettings.redditRefreshToken = json.refresh_token;
+              const newMessages = Array<string>();
+              newMessages.push("Reddit is now activated.");
+              this.setState({
+                config: newConfig,
+                modalTitle: "Success!",
+                modalMessages: newMessages,
+                modalFunction: this.closeModal
+              });
+
+              // This closes the server
+              req.connection.destroy();
+            })
+        }
+      } else if (req.url.includes("state") && req.url.includes("error")) {
+        const args = req.url.replace("\/?", "").split("&");
+        // This should be the same as the deviceID
+        const state = args[0].substring(6);
+        if (state == deviceID) {
+          const error = args[1].substring(6);
+          const newMessages = Array<string>();
+          newMessages.push("Error: " + error);
+          this.setState({modalTitle: "Failed", modalMessages: newMessages, modalFunction: this.closeModal});
+        }
+      }
+      res.end();
+    }).listen(65010);
   }
 
 }
