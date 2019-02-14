@@ -29,6 +29,7 @@ that pop up.
 - Scene Export/Import
 - Configure FlipFlip options
 - Caching
+- Open random scene
 - Add config option for image background (color vs blur)
 - Add config option for caption font styles
 - Allow Text and Audio options to be changed while playing
