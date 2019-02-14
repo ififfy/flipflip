@@ -14,7 +14,7 @@ $buttonBorder: #727272;
 
 $smallPadding: 0.5rem;
 $buttonBarHeight: 2rem + $smallPadding;
-$buttonSidebarWidth: 20rem + $smallPadding;
+$buttonSidebarWidth: 21rem + $smallPadding;
 
 @font-face {
   font-family: system;
@@ -108,6 +108,7 @@ a {
   top: 0;
   right: 0;
   bottom: 0;
+  overflow: auto;
 
   z-index: 1;
   padding: $smallPadding $smallPadding 0 $smallPadding;
@@ -960,7 +961,7 @@ label.SimpleCheckbox {
   @include buttonBarBackground;
 
   opacity: 0;
-  bottom: -4rem;
+  bottom: -3rem;
   transition: opacity 500ms ease-in-out,
   bottom 500ms ease-in-out;
 

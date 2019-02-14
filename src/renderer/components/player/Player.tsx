@@ -134,7 +134,7 @@ export default class Player extends React.Component {
           <div className="BackButton u-button u-clickable" onClick={this.navigateBack.bind(this)}>Back</div>
         </div>
 
-        {this.state.isPlaying && (
+        {this.state.isMainLoaded && (!this.props.overlayScene || this.state.isOverlayLoaded) && (
           <div className="SceneOptions u-button-sidebar">
             <h2 className="SceneOptionsHeader">Scene Options</h2>
             <TimingGroup
