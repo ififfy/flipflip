@@ -14,9 +14,27 @@ If you are on a Mac, you might need to open this by right-clicking the
 application, selecting "Open," and accepting all the stupid prompts
 that pop up.
 
-![Screenshot](/doc_images/scene_details.png)
+![Screenshot](/doc_images/flipflip_home.PNG)
 
 ## History
+
+### 2.0.0
+
+- Many bugfixes
+- Remote sources -- Tumblr and Reddit so far
+- Library
+- Source tagging
+- Source sorting & filtering
+- Scene Generation
+- Scene Export/Import
+- Configure FlipFlip options
+- Caching
+- Add config option for image background (color vs blur)
+- Add config option for caption font styles
+- Allow Text and Audio options to be changed while playing
+- "Always On Top" and "Show/Hide Menu" options in player
+- Improve source interface
+- Drag'n'drop elements
 
 ### 1.2.0
 
