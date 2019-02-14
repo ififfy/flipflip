@@ -14,7 +14,7 @@ If you are on a Mac, you might need to open this by right-clicking the
 application, selecting "Open," and accepting all the stupid prompts
 that pop up.
 
-![Screenshot](/doc_images/flipflip_home.PNG)
+![Screenshot](/doc_images/flipflip_home.png)
 
 ## History
 
