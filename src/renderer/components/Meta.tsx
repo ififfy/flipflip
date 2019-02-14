@@ -483,8 +483,10 @@ export default class Meta extends React.Component {
   }
 
   onExport(scene: Scene) {
-    const sceneExport = JSON.stringify(scene);
-    const fileName = scene.name + "_export.json";
+    const sceneCopy = JSON.parse(JSON.stringify(scene)); // Make a copy
+    sceneCopy.tagWeights = null;
+    const sceneExport = JSON.stringify(sceneCopy);
+    const fileName = sceneCopy.name + "_export.json";
     remote.dialog.showSaveDialog(remote.getCurrentWindow(),
       {filters: [{name: 'JSON Document', extensions: ['json']}], defaultPath: fileName}, (filePath) => {
         if (filePath != null) {
