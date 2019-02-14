@@ -1,5 +1,6 @@
 import {remote} from 'electron';
 import {existsSync, mkdirSync, readFileSync, renameSync, writeFileSync} from 'fs';
+import * as fs from "fs";
 import * as React from 'react';
 import path from 'path';
 
@@ -195,6 +196,7 @@ export default class Meta extends React.Component {
             version={this.state.version}
             onUpdateScenes={this.onUpdateScenes.bind(this)}
             onAdd={this.onAddScene.bind(this)}
+            onImport={this.onImport.bind(this)}
             onSelect={this.onOpenScene.bind(this)}
             onOpenLibrary={this.onOpenLibrary.bind(this)}
             onGenerate={this.onAddGenerator.bind(this)}
@@ -243,6 +245,7 @@ export default class Meta extends React.Component {
             allScenes={this.state.scenes}
             autoEdit={this.state.autoEdit}
             goBack={this.goBack.bind(this)}
+            onExport={this.onExport.bind(this)}
             onDelete={this.onDeleteScene.bind(this)}
             onPlay={this.onPlayScene.bind(this)}
             onUpdateScene={this.onUpdateScene.bind(this)}
@@ -477,5 +480,29 @@ export default class Meta extends React.Component {
       }
     }
     this.onUpdateLibrary(newLibrary);
+  }
+
+  onExport(scene: Scene) {
+    const sceneExport = JSON.stringify(scene);
+    const fileName = scene.name + "_export.json";
+    remote.dialog.showSaveDialog(remote.getCurrentWindow(),
+      {filters: [{name: 'JSON Document', extensions: ['json']}], defaultPath: fileName}, (filePath) => {
+        if (filePath != null) {
+          fs.writeFileSync(filePath, sceneExport);
+        }
+    });
+  }
+
+  onImport() {
+    const filePath = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+      {filters: [{name: 'JSON Document', extensions: ['json']}], properties: ['openFile']});
+    if (!filePath || !filePath.length) return;
+    const scene = new Scene(JSON.parse(readFileSync(filePath[0], 'utf-8')));
+    let id = this.state.scenes.length + 1;
+    this.state.scenes.forEach((s) => {
+      id = Math.max(s.id + 1, id);
+    });
+    scene.id = id;
+    this.setState({scenes: this.state.scenes.concat([scene]), route: [new Route({kind: 'scene', value: scene.id})]});
   }
 };

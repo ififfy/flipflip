@@ -229,6 +229,15 @@ a {
   }
 }
 
+.u-import {
+  cursor: pointer;
+  font-size: 20px;
+
+  &:before {
+    content: '🠋';
+  }
+}
+
 .u-config {
   cursor: pointer;
   font-size: 20px;
