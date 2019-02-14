@@ -495,7 +495,7 @@ export default class Meta extends React.Component {
 
   onImport() {
     const filePath = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
-      {filters: [{name: 'JSON Document', extensions: ['json']}], properties: ['openFile']});
+      {filters: [{name:'All Files (*.*)', extensions: ['*']},{name: 'JSON Document', extensions: ['json']}], properties: ['openFile']});
     if (!filePath || !filePath.length) return;
     const scene = new Scene(JSON.parse(readFileSync(filePath[0], 'utf-8')));
     let id = this.state.scenes.length + 1;
