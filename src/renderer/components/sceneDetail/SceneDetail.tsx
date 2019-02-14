@@ -14,6 +14,7 @@ type Props = {
   allScenes: Array<Scene>,
   autoEdit: boolean,
   goBack(): void,
+  onExport(scene: Scene): void,
   onPlay(scene: Scene): void,
   onDelete(scene: Scene): void,
   onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
@@ -65,6 +66,11 @@ export default class SceneDetail extends React.Component {
             className="DeleteButton u-destructive u-button u-clickable"
             onClick={this.props.onDelete.bind(this, this.props.scene)}>
             Delete
+          </div>
+          <div
+            className="ExportButton u-button u-clickable"
+            onClick={this.props.onExport.bind(this, this.props.scene)}>
+            Export Scene
           </div>
 
           <div className="u-button-row-right">
@@ -163,4 +169,5 @@ export default class SceneDetail extends React.Component {
   onChangeName(e: React.FormEvent<HTMLInputElement>) { this.update((s) => { s.name = e.currentTarget.value; }); }
 
   onChangeSources(sources: Array<LibrarySource>) { this.update((s) => { s.sources = sources; }); }
+
 };

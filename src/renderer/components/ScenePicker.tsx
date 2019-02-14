@@ -54,6 +54,7 @@ export default class ScenePicker extends React.Component {
     version: string,
     canGenerate: boolean,
     onAdd(): void,
+    onImport(): void,
     onSelect(scene: Scene): void,
     onOpenLibrary(): void,
     onGenerate(): void,
@@ -77,6 +78,7 @@ export default class ScenePicker extends React.Component {
               {this.props.scenes.length > 1 && (
                 <div className="u-random" onClick={this.onRandom.bind(this)}/>
               )}
+              <div className="u-import" onClick={this.props.onImport.bind(this)}/>
               <div className="u-config" onClick={this.props.onConfig.bind(this)}/>
             </div>
             <h1>FlipFlip</h1>
