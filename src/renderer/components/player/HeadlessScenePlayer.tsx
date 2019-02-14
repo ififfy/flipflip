@@ -332,7 +332,7 @@ export default class HeadlessScenePlayer extends React.Component {
     let newAllURLs = new Map<string, Array<string>>();
 
     let sourceLoop = () => {
-      let d = this.props.scene.sources[n].url;
+      let d = this.props.scene.sources[n] != null ? this.props.scene.sources[n].url : "";
       let loadPromise = getPromise(this.props.config, d, this.props.scene.imageTypeFilter, -1, this.props.opacity != 1);
 
       // Because of rendering lag, always display the NEXT source, unless this is the last one
@@ -340,7 +340,7 @@ export default class HeadlessScenePlayer extends React.Component {
       if ((n + 1) == this.props.scene.sources.length) {
         message = d;
       } else {
-        message = this.props.scene.sources[n + 1].url;
+        message = this.props.scene.sources[n + 1] != null ? this.props.scene.sources[n + 1].url : "";
       }
       if (this.props.opacity != 1) {
         message = "<p>Loading Overlay...</p>" + message;
