@@ -66,7 +66,7 @@ export default class EffectGroup extends React.Component {
         <div className="ControlSubgroup">
           {this.props.allScenes != null && (
             <SimpleOptionPicker
-              onChange={this.changeKey.bind(this, 'overlaySceneID').bind(this)}
+              onChange={this.onChangeOverlaySceneID.bind(this)}
               label="Overlay scene"
               value={this.props.scene.overlaySceneID.toString()}
               parseKeyFunction={this.getSceneName.bind(this)}
@@ -98,4 +98,6 @@ export default class EffectGroup extends React.Component {
   }
 
   onChangeOverlaySceneOpacity(value: string) { this.update((s) => { s.overlaySceneOpacity = parseInt(value, 10) / 100; }); }
+
+  onChangeOverlaySceneID(id: string) { this.update((s) => { s.overlaySceneID = parseInt(id, 10); }); }
 }
