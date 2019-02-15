@@ -74,7 +74,7 @@ export default class EffectGroup extends React.Component {
           {(this.props.allScenes != null || this.props.scene.overlaySceneID != 0) && (
             <SimpleSliderInput
               isEnabled={this.props.scene.overlaySceneID != 0}
-              onChange={this.changeKey.bind(this, 'overlaySceneOpacity').bind(this)}
+              onChange={this.onChangeOverlaySceneOpacity.bind(this)}
               label={"Overlay opacity: " + (this.props.scene.overlaySceneOpacity * 100).toFixed(0) + '%'}
               min={1}
               max={99}
@@ -96,4 +96,6 @@ export default class EffectGroup extends React.Component {
   changeKey(key: string, value: any) {
     this.update((s) => s[key] = value);
   }
+
+  onChangeOverlaySceneOpacity(value: string) { this.update((s) => { s.overlaySceneOpacity = parseInt(value, 10) / 100; }); }
 }
