@@ -17,10 +17,10 @@ $buttonBarHeight: 2rem + $smallPadding;
 $buttonSidebarWidth: 21rem + $smallPadding;
 
 @font-face {
-  font-family: system;
+  font-family: 'Roboto';
   font-style: normal;
   font-weight: 300;
-  src: local(".SFNSText-Light"), local(".HelveticaNeueDeskInterface-Light"), local(".LucidaGrandeUI"), local("Ubuntu Light"), local("Segoe UI Light"), local("Roboto-Light"), local("DroidSans"), local("Tahoma"), local("Liberation Sans"), local("FreeSans");
+  src: local('Roboto Light'), local('Roboto Light'), url('./fonts/Roboto-Light.woff2') format('woff2');
 }
 
 *, *::after, *::before {
@@ -33,7 +33,7 @@ html, body {
 }
 
 body {
-  font-family: system, serif;
+  font-family: 'Roboto';
   font-size: 14px;
   color: $bodyColor;
 }
