@@ -419,8 +419,26 @@ export default class Meta extends React.Component {
 
   endPlaySceneFromLibrary() {
     const newScenes = this.state.scenes;
-    newScenes.pop();
-    this.setState({route: [new Route({kind: 'library'})], scenes: newScenes});
+    const libraryID = newScenes.pop().libraryID;
+    const tagNames = this.state.tags.map((t) => t.name);
+    // Re-order the tags of the source we were playing
+    const newLibrary = this.state.library.map((s) => {
+      if (s.id == libraryID) {
+         s.tags = s.tags.sort((a, b) => {
+          const aIndex = tagNames.indexOf(a.name);
+          const bIndex = tagNames.indexOf(b.name);
+          if (aIndex < bIndex) {
+            return -1;
+          } else if (aIndex > bIndex) {
+            return 1;
+          } else {
+            return 0;
+          }
+        });
+      }
+      return s;
+    });
+    this.setState({route: [new Route({kind: 'library'})], scenes: newScenes, library: newLibrary});
   }
 
   manageTags() {
@@ -471,7 +489,25 @@ export default class Meta extends React.Component {
   }
 
   onUpdateTags(tags: Array<Tag>) {
-    this.setState({tags: tags});
+    // Go through each scene in the library
+    let newLibrary = this.state.library;
+    const tagNames = tags.map((t) => t.name);
+    for (let source of newLibrary) {
+      // Order the same as tags and remove deleted tags
+      source.tags = source.tags.filter((t) => tagNames.includes(t.name));
+      source.tags = source.tags.sort((a, b) => {
+        const aIndex = tagNames.indexOf(a.name);
+        const bIndex = tagNames.indexOf(b.name);
+        if (aIndex < bIndex) {
+          return -1;
+        } else if (aIndex > bIndex) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+    }
+    this.setState({tags: tags, library: newLibrary});
   }
 
   onToggleTag(sourceID: number, tag: Tag) {

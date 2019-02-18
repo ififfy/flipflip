@@ -120,9 +120,8 @@ export default class TagManager extends React.Component {
     this.props.goBack();
   }
 
-  applyConfig(): boolean {
+  applyConfig() {
     this.props.onUpdateTags(this.state.tags);
-    return true;
   }
 
   toggleRemoveMode() {
@@ -151,10 +150,9 @@ export default class TagManager extends React.Component {
 
   onEdit(tagID: number, e: Event) {
     e.preventDefault();
-    this.setState({isEditing: tagID});
     // If user left input blank, remove it from list of sources
     // Also prevent user from inputing duplicate source
-    this.setState({tags:
+    this.setState({isEditing: tagID, tags:
       removeDuplicatesBy((t: Tag) => t.name,
         this.state.tags.filter((t) => t.name != ""))});
   }
