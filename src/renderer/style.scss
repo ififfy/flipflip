@@ -16,11 +16,17 @@ $smallPadding: 0.5rem;
 $buttonBarHeight: 2rem + $smallPadding;
 $buttonSidebarWidth: 21rem + $smallPadding;
 
+// Unicode Emoji characters
+$emojiDice: '\1F3B2';
+$emojiGear: '\2699';
+$emojiPencil: '\270E';
+$emojiDownArrow: '\1F80B';
+
 @font-face {
   font-family: system;
   font-style: normal;
   font-weight: 300;
-  src: local(".SFNSText-Light"), local(".HelveticaNeueDeskInterface-Light"), local(".LucidaGrandeUI"), local("Ubuntu Light"), local("Segoe UI Light"), local("Roboto-Light"), local("DroidSans"), local("Tahoma"), local("Liberation Sans"), local("FreeSans");
+  src: local(".SFNSText-Light"), local(".HelveticaNeueDeskInterface-Light"), local(".LucidaGrandeUI"), local("Ubuntu Light"), local("Segoe UI Light"), local("Roboto-Light"), url('./fonts/Roboto-Light.woff2') format('woff2'), local("DroidSans"), local("Tahoma"), local("Liberation Sans"), local("FreeSans");
 }
 
 *, *::after, *::before {
@@ -213,29 +219,30 @@ a {
 }
 
 .u-edit {
-  color: #444 !important;
+ color: #444 !important;
   transform: scale(-1, 1);
-
+  cursor: pointer;
+ 
   &:before {
-    content: '✎';
+    content: $emojiPencil;
   }
 }
 
 .u-random {
   cursor: pointer;
   font-size: 20px;
-
+  
   &:before {
-    content: '🎲';
+    content: $emojiDice;
   }
 }
 
 .u-import {
   cursor: pointer;
   font-size: 20px;
-
+  
   &:before {
-    content: '🠋';
+    content: $emojiDownArrow;
   }
 }
 
@@ -244,7 +251,7 @@ a {
   font-size: 20px;
 
   &:before {
-    content: '⚙';
+    content: $emojiGear;
   }
 }
 
