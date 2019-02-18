@@ -219,16 +219,6 @@ export default class SourcePicker extends React.Component {
     this.props.onUpdateSources(newSources);
   }
 
-  onEndTag(sourceID: number, evt: any) {
-    let newSources = this.props.sources;
-    for (let source of newSources) {
-      if (source.id == sourceID) {
-        arrayMove(source.tags, evt.oldIndex, evt.newIndex);
-      }
-    }
-    this.props.onUpdateSources(newSources);
-  }
-
   componentDidMount() {
     this.setState({sortable: null});
     this.initSortable();
@@ -241,19 +231,13 @@ export default class SourcePicker extends React.Component {
 
   initSortable() {
     if (!this.state.sortable && this.props.sources.length > 0) {
-      let sortable = Sortable.create(document.getElementById('sources'), {
-        animation: 150,
-        easing: "cubic-bezier(1, 0, 0, 1)",
-        onEnd: this.onEnd.bind(this),
-      });
-      for (let s = 0; s < this.props.sources.length; s++) {
-        Sortable.create(document.getElementById('tags-' + this.props.sources[s].id), {
+      this.setState({sortable:
+        Sortable.create(document.getElementById('sources'), {
           animation: 150,
           easing: "cubic-bezier(1, 0, 0, 1)",
-          onEnd: this.onEndTag.bind(this, this.props.sources[s].id),
-        });
-      }
-      this.setState({sortable: sortable});
+          onEnd: this.onEnd.bind(this),
+        })
+      });
     }
   }
 
