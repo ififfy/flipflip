@@ -113,6 +113,7 @@ export default class SceneDetail extends React.Component {
             <div className="ControlGroup__Title">Sources</div>
             <SourcePicker
               sources={this.props.scene.sources}
+              yOffset={0}
               emptyMessage="You haven't added any sources to this Scene yet."
               removeAllMessage="Are you sure you want to remove all sources from this scene?"
               removeAllConfirm="Ok"
