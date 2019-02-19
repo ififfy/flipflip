@@ -491,13 +491,21 @@ export default class Meta extends React.Component {
   onUpdateTags(tags: Array<Tag>) {
     // Go through each scene in the library
     let newLibrary = this.state.library;
-    const tagNames = tags.map((t) => t.name);
+    const tagIDs = tags.map((t) => t.id);
     for (let source of newLibrary) {
-      // Order the same as tags and remove deleted tags
-      source.tags = source.tags.filter((t) => tagNames.includes(t.name));
+      // Remove deleted tags, update any edited tags, and order the same as tags
+      source.tags = source.tags.filter((t) => tagIDs.includes(t.id));
+      source.tags = source.tags.map((t) => {
+        for (let tag of tags) {
+          if (t.id == tag.id) {
+            t.name = tag.name;
+            return t;
+          }
+        }
+      });
       source.tags = source.tags.sort((a, b) => {
-        const aIndex = tagNames.indexOf(a.name);
-        const bIndex = tagNames.indexOf(b.name);
+        const aIndex = tagIDs.indexOf(a.id);
+        const bIndex = tagIDs.indexOf(b.id);
         if (aIndex < bIndex) {
           return -1;
         } else if (aIndex > bIndex) {
