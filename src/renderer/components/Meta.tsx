@@ -43,6 +43,7 @@ let initialState = {
   route: Array<Route>(),
   autoEdit: false,
   isSelect: false,
+  libraryYOffset: 0,
 };
 
 const saveDir = path.join(remote.app.getPath('appData'), 'flipflip');
@@ -80,6 +81,7 @@ try {
         library: Array<LibrarySource>(),
         tags: Array<Tag>(),
         route: data.route.map((s: any) => new Route(s)),
+        libraryYOffset: 0,
       };
 
 
@@ -126,6 +128,7 @@ try {
         library: data.library.map((s: any) => new LibrarySource(s)),
         tags: data.tags.map((t: any) => new Tag(t)),
         route: data.route.map((s: any) => new Route(s)),
+        libraryYOffset: 0,
       };
   }
 } catch (e) {
@@ -210,6 +213,7 @@ export default class Meta extends React.Component {
             library={this.state.library}
             tags={this.state.tags}
             isSelect={this.state.isSelect}
+            yOffset={this.state.libraryYOffset}
             onPlay={this.onPlaySceneFromLibrary.bind(this)}
             onUpdateLibrary={this.onUpdateLibrary.bind(this)}
             goBack={this.goBack.bind(this)}
@@ -360,7 +364,7 @@ export default class Meta extends React.Component {
   }
 
   onOpenLibrary() {
-    this.setState({route: [new Route({kind: 'library', value: null})]});
+    this.setState({route: [new Route({kind: 'library', value: null})], libraryYOffset: 0});
   }
 
   onOpenLibraryImport() {
@@ -393,7 +397,8 @@ export default class Meta extends React.Component {
     this.setState({route: this.state.route.concat(new Route({kind: 'play', value: scene.id}))});
   }
 
-  onPlaySceneFromLibrary(source: LibrarySource) {
+  onPlaySceneFromLibrary(source: LibrarySource, yOffset: number) {
+    console.log(yOffset);
     let id = this.state.scenes.length + 1;
     this.state.scenes.forEach((s) => {
       id = Math.max(s.id + 1, id);
@@ -408,6 +413,7 @@ export default class Meta extends React.Component {
     this.setState({
       scenes: this.state.scenes.concat([tempScene]),
       route: newRoute,
+      libraryYOffset: yOffset,
     });
   }
 

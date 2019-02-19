@@ -18,8 +18,9 @@ type Props = {
   removeAllMessage: string,
   removeAllConfirm: string,
   allowLibraryImport: boolean,
+  yOffset: number,
   onUpdateSources(sources: Array<LibrarySource>): void,
-  onClick?(source: LibrarySource): void,
+  onClick?(source: LibrarySource, yOffset: number): void,
   onOpenLibraryImport?(): void,
   importSourcesFromLibrary?(sources: Array<string>): void,
 };
@@ -158,7 +159,7 @@ export default class SourcePicker extends React.Component {
               )}
               {this.state.isEditing != source.id && (
                 <div className="SourcePicker__SourceTitle u-clickable"
-                     onClick={this.props.onClick ? this.props.onClick.bind(this, source) : this.onEdit.bind(this, source.id)}>
+                     onClick={this.props.onClick ? this.onClick.bind(this, source) : this.onEdit.bind(this, source.id)}>
                   {source.url}
                 </div>
               )}
@@ -208,6 +209,10 @@ export default class SourcePicker extends React.Component {
     )
   }
 
+  onClick(source: LibrarySource) {
+    this.props.onClick(source, document.getElementById("sources").scrollTop);
+  }
+
   onEnd(evt: any) {
     let newSources = this.props.sources;
     arrayMove(newSources, evt.oldIndex, evt.newIndex);
@@ -227,6 +232,7 @@ export default class SourcePicker extends React.Component {
   componentDidMount() {
     this.setState({sortable: null});
     this.initSortable();
+    document.getElementById("sources").scrollTo(0, this.props.yOffset);
   }
 
   componentDidUpdate() {
