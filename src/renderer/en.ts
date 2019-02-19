@@ -1,9 +1,11 @@
 export default new Map<String, String>([
   ['tf.c', 'Constant'],
-  ['tf.variableFast', 'Variable - Really Fast (0.0s-0.6s)'],
-  ['tf.variableMedium', 'Variable - Fast (0.2s-1.2s)'],
-  ['tf.variableSlow', 'Variable - Slow (3.0s-5.0s)'],
-  ['tf.variableSlowest', 'Variable - Slowest (3.5s-6.5s)'],
+  ['tf.variableFaster', 'Variable - Really Fast (0.0s-0.6s)'],
+  ['tf.variableFast', 'Variable - Fast (0.2s-1.2s)'],
+  ['tf.variableMedium', 'Variable - Natural (3.0s-5.0s)'],
+  ['tf.variableSlow', 'Variable - Slow (3.5s-6.5s)'],
+  ['tf.variableSlower', 'Variable - Slower (10s-20s)'],
+  ['tf.variableSlowest', 'Variable - Slowest (30s-60s)'],
 
   ['if.any', 'All images'],
   ['if.gifs', 'Only gifs'],

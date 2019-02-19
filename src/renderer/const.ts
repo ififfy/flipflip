@@ -1,8 +1,10 @@
 const TF = {  // timing functions
   constant: 'tf.c',
+  variableFaster: 'tf.variableFaster',
   variableFast: 'tf.variableFast',
   variableMedium: 'tf.variableMedium',
   variableSlow: 'tf.variableSlow',
+  variableSlower: 'tf.variableSlower',
   variableSlowest: 'tf.variableSlowest',
 };
 
