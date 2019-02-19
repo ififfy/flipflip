@@ -15,6 +15,8 @@ import ChildCallbackHack from './ChildCallbackHack';
 import ImagePlayer from './ImagePlayer';
 import Progress from '../ui/Progress';
 
+let redditAlerted = false;
+
 function isImage(path: string): boolean {
   const p = path.toLowerCase();
   if (p.endsWith('.gif')) return true;
@@ -217,7 +219,10 @@ function loadReddit(config: Config, url: string, filter: string, next: any, over
         }
       });
   } else {
-    console.warn("Reddit is not authorized. Visit Config to authorize Reddit with FlipFlip");
+    if (!redditAlerted) {
+      alert("You haven't authorized FlipFlip to work with Reddit yet.\nVisit Config and click 'Authorzie FlipFlip on Reddit'.");
+      redditAlerted = true;
+    }
     return new CancelablePromise((resolve, reject) => {
       resolve(null);
     });
@@ -328,6 +333,7 @@ export default class HeadlessScenePlayer extends React.Component {
   }
 
   componentDidMount() {
+    redditAlerted = false;
     let n = 0;
     let newAllURLs = new Map<string, Array<string>>();
 
