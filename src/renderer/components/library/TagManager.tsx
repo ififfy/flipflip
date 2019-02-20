@@ -134,7 +134,10 @@ export default class TagManager extends React.Component {
   }
 
   onAdd() {
-    let id = this.props.tags.length + 1;
+    let id = this.state.tags.length + 1;
+    this.state.tags.forEach((s) => {
+      id = Math.max(s.id + 1, id);
+    });
     this.props.tags.forEach((s) => {
       id = Math.max(s.id + 1, id);
     });
