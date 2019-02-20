@@ -12,6 +12,7 @@ export default class TagManager extends React.Component {
   };
 
   readonly state = {
+    tags: Array<Tag>(),
     removeTags: false,
     isEditing: -1,
     sortable: Sortable,
@@ -23,6 +24,16 @@ export default class TagManager extends React.Component {
         <div className="u-button-row">
           <div className="u-abs-center">
             <h2 className="TagManager__TagManagerHeader">Tag Manager</h2>
+          </div>
+          <div className="u-button-row-right">
+            <div className="Config__Apply u-button u-clickable"
+                 onClick={this.applyConfig.bind(this)}>
+              Apply
+            </div>
+            <div className="Config__OK u-button u-clickable"
+                 onClick={this.onOK.bind(this)}>
+              OK
+            </div>
           </div>
 
           <div className="BackButton u-button u-clickable" onClick={this.props.goBack}>Back</div>
@@ -37,13 +48,13 @@ export default class TagManager extends React.Component {
                  onClick={this.toggleRemoveMode.bind(this)}>Done</div>
           )}
           {!this.state.removeTags && (
-            <div className={`u-button u-float-left ${this.props.tags.length == 0 ? 'u-disabled' : 'u-clickable'} `}
-                 onClick={this.props.tags.length == 0 ? this.nop : this.toggleRemoveMode.bind(this)}>- Remove Tags</div>
+            <div className={`u-button u-float-left ${this.state.tags.length == 0 ? 'u-disabled' : 'u-clickable'} `}
+                 onClick={this.state.tags.length == 0 ? this.nop : this.toggleRemoveMode.bind(this)}>- Remove Tags</div>
           )}
         </div>
 
         <div id="tags" className="TagManager__Tags">
-          {this.props.tags.map((tag) =>
+          {this.state.tags.map((tag) =>
             <div className={`TagManager__Tag u-clickable ${this.state.removeTags ? 'u-destructive-bg' : ''}`}
                  onClick={this.state.removeTags ? this.onRemove.bind(this, tag.id) : this.onEdit.bind(this, tag.id)}
                  key={tag.id}>
@@ -66,7 +77,7 @@ export default class TagManager extends React.Component {
           )}
         </div>
 
-        {this.props.tags.length == 0 && (
+        {this.state.tags.length == 0 && (
           <div className="TagManager__Empty">
             You haven't added any tags yet.
           </div>
@@ -81,9 +92,9 @@ export default class TagManager extends React.Component {
   }
 
   onEnd(evt: any) {
-    let newTags = this.props.tags;
+    let newTags = this.state.tags;
     arrayMove(newTags, evt.oldIndex, evt.newIndex);
-    this.props.onUpdateTags(newTags);
+    this.setState({tags: newTags});
   }
 
   componentDidMount() {
@@ -92,10 +103,26 @@ export default class TagManager extends React.Component {
       easing: "cubic-bezier(1, 0, 0, 1)",
       onEnd: this.onEnd.bind(this),
     });
-    this.setState({sortable: sortable});
+
+    // Make a deep copy of Tags
+    // For some reason, shallow copy was still modifying props' Tags
+    let newTags = Array<Tag>();
+    for (let tag of this.props.tags) {
+      newTags.push(JSON.parse(JSON.stringify(tag)));
+    }
+    this.setState({sortable: sortable, tags: newTags});
   }
 
   nop() {}
+
+  onOK() {
+    this.applyConfig();
+    this.props.goBack();
+  }
+
+  applyConfig() {
+    this.props.onUpdateTags(this.state.tags);
+  }
 
   toggleRemoveMode() {
     this.state.sortable.option("disabled", !this.state.removeTags);
@@ -103,43 +130,46 @@ export default class TagManager extends React.Component {
   };
 
   onRemove(tagID: number) {
-    this.props.onUpdateTags(this.props.tags.filter((t) => t.id != tagID));
+    this.setState({tags: this.state.tags.filter((t) => t.id != tagID)});
   }
 
   onAdd() {
-    let id = this.props.tags.length + 1;
+    let id = this.state.tags.length + 1;
+    this.state.tags.forEach((s) => {
+      id = Math.max(s.id + 1, id);
+    });
     this.props.tags.forEach((s) => {
       id = Math.max(s.id + 1, id);
     });
 
     this.setState({isEditing: id});
-    let newTags = this.props.tags;
+    let newTags = this.state.tags;
     newTags.push(new Tag({
       name: "",
       id: id,
     }));
-    this.props.onUpdateTags(newTags);
+    this.setState({tags: newTags});
   }
 
   onEdit(tagID: number, e: Event) {
     e.preventDefault();
-    this.setState({isEditing: tagID});
     // If user left input blank, remove it from list of sources
     // Also prevent user from inputing duplicate source
-    this.props.onUpdateTags(
+    this.setState({isEditing: tagID, tags:
       removeDuplicatesBy((t: Tag) => t.name,
-        this.props.tags.filter((t) => t.name != "")));
+        this.state.tags.filter((t) => t.name != ""))});
   }
 
   onEditTag(tagID: number, e: React.FormEvent<HTMLInputElement>) {
-    this.props.onUpdateTags(this.props.tags.map(
-      function map(tag: Tag) {
-        if (tag.id == tagID) {
-          tag.name = e.currentTarget.value;
-        }
-        return tag;
-      })
-    );
+    this.setState({
+      tags: this.state.tags.map(
+        function map(tag: Tag) {
+          if (tag.id == tagID) {
+            tag.name = e.currentTarget.value;
+          }
+          return tag;
+        })
+    });
   }
 
 }

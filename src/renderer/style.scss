@@ -17,10 +17,7 @@ $buttonBarHeight: 2rem + $smallPadding;
 $buttonSidebarWidth: 21rem + $smallPadding;
 
 // Unicode Emoji characters
-$emojiDice: '\1F3B2';
-$emojiGear: '\2699';
-$emojiPencil: '\270E';
-$emojiDownArrow: '\1F80B';
+$emojiPencil: '\270E'; // ✎
 
 @font-face {
   font-family: system;
@@ -652,7 +649,6 @@ label.SimpleCheckbox {
           color: $uiGray;
           padding-left: 1rem;
           font-size: 12px;
-          cursor: move;
         }
       }
 
