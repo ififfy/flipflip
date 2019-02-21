@@ -19,8 +19,9 @@ type Props = {
   removeAllConfirm: string,
   allowLibraryImport: boolean,
   yOffset: number,
+  filters: Array<string>,
   onUpdateSources(sources: Array<LibrarySource>): void,
-  onClick?(source: LibrarySource, yOffset: number): void,
+  onClick?(source: LibrarySource, yOffset: number, filters: Array<string>): void,
   onOpenLibraryImport?(): void,
   importSourcesFromLibrary?(sources: Array<string>): void,
 };
@@ -32,13 +33,14 @@ export default class SourcePicker extends React.Component {
     urlImportIsOpen: false,
     isEditing: -1,
     sortable: Sortable,
-    filters: Array<string>(),
+    filters: this.props.filters,
     selected: Array<string>(),
   };
 
   render() {
     let tags = Array<Tag>();
     let options = Array<{ label: string, value: string, isDisabled: boolean }>();
+    let defaultValues = Array<{ label: string, value: string }>();
     for (let source of this.props.sources) {
       for (let tag of source.tags) {
         tags.push(tag);
@@ -58,6 +60,9 @@ export default class SourcePicker extends React.Component {
     options.push({label: "<Untagged>", value: null, isDisabled: this.state.filters.length > 0 && !untagged});
     for (let tag of tags) {
       options.push({label: tag.name, value: tag.name, isDisabled: this.state.filters.length > 0 && untagged});
+    }
+    for (let filter of this.state.filters) {
+      defaultValues.push({label: filter, value: filter});
     }
 
     let displaySources = [];
@@ -131,6 +136,7 @@ export default class SourcePicker extends React.Component {
             {tags.length > 0 && (
               <div className="ReactMultiSelectCheckboxes">
                 <ReactMultiSelectCheckboxes
+                  defaultValue={defaultValues}
                   options={options}
                   placeholderButtonLabel="Filter Tags"
                   onChange={this.onFilter.bind(this)}
@@ -210,7 +216,7 @@ export default class SourcePicker extends React.Component {
   }
 
   onClick(source: LibrarySource) {
-    this.props.onClick(source, document.getElementById("sources").scrollTop);
+    this.props.onClick(source, document.getElementById("sources").scrollTop, this.state.filters);
   }
 
   onEnd(evt: any) {

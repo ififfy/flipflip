@@ -44,6 +44,7 @@ let initialState = {
   autoEdit: false,
   isSelect: false,
   libraryYOffset: 0,
+  libraryFilters: Array<string>(),
 };
 
 const saveDir = path.join(remote.app.getPath('appData'), 'flipflip');
@@ -82,6 +83,7 @@ try {
         tags: Array<Tag>(),
         route: data.route.map((s: any) => new Route(s)),
         libraryYOffset: 0,
+        libraryFilters: Array<string>(),
       };
 
 
@@ -129,6 +131,7 @@ try {
         tags: data.tags.map((t: any) => new Tag(t)),
         route: data.route.map((s: any) => new Route(s)),
         libraryYOffset: 0,
+        libraryFilters: Array<string>(),
       };
   }
 } catch (e) {
@@ -214,6 +217,7 @@ export default class Meta extends React.Component {
             tags={this.state.tags}
             isSelect={this.state.isSelect}
             yOffset={this.state.libraryYOffset}
+            filters={this.state.libraryFilters}
             onPlay={this.onPlaySceneFromLibrary.bind(this)}
             onUpdateLibrary={this.onUpdateLibrary.bind(this)}
             goBack={this.goBack.bind(this)}
@@ -364,7 +368,7 @@ export default class Meta extends React.Component {
   }
 
   onOpenLibrary() {
-    this.setState({route: [new Route({kind: 'library', value: null})], libraryYOffset: 0});
+    this.setState({route: [new Route({kind: 'library', value: null})], libraryYOffset: 0, libraryFilters: Array<string>()});
   }
 
   onOpenLibraryImport() {
@@ -397,8 +401,7 @@ export default class Meta extends React.Component {
     this.setState({route: this.state.route.concat(new Route({kind: 'play', value: scene.id}))});
   }
 
-  onPlaySceneFromLibrary(source: LibrarySource, yOffset: number) {
-    console.log(yOffset);
+  onPlaySceneFromLibrary(source: LibrarySource, yOffset: number, filters: Array<string>) {
     let id = this.state.scenes.length + 1;
     this.state.scenes.forEach((s) => {
       id = Math.max(s.id + 1, id);
@@ -414,6 +417,7 @@ export default class Meta extends React.Component {
       scenes: this.state.scenes.concat([tempScene]),
       route: newRoute,
       libraryYOffset: yOffset,
+      libraryFilters: filters,
     });
   }
 

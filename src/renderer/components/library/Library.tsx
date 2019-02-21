@@ -10,8 +10,9 @@ export default class Library extends React.Component {
     tags: Array<Tag>,
     isSelect: boolean,
     yOffset: number,
+    filters: Array<string>,
     onUpdateLibrary(sources: Array<LibrarySource>): void,
-    onPlay(source: LibrarySource, yOffset: number): void,
+    onPlay(source: LibrarySource, yOffset: number, filters: Array<string>): void,
     goBack(): void,
     manageTags(): void,
     importSources(sources: Array<string>): void,
@@ -39,6 +40,7 @@ export default class Library extends React.Component {
         <SourcePicker
           sources={this.props.library}
           yOffset={this.props.yOffset}
+          filters={this.props.filters}
           emptyMessage="You haven't added anything to the Library yet."
           removeAllMessage="Are you sure you really wanna delete your library...? ಠ_ಠ"
           removeAllConfirm="Yea... I'm sure"
