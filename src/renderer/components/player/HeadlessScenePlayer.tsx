@@ -205,7 +205,6 @@ function loadReddit(config: Config, url: string, filter: string, next: any, over
             }
           });
         } else {
-          console.log("Now on page " + next);
           reddit.getSubreddit(getFileGroup(url)).getHot({after: next}).then((submissionListing: any) => {
             if (submissionListing.length > 0) {
               resolve({

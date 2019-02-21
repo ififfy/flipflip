@@ -114,6 +114,7 @@ export default class SceneDetail extends React.Component {
             <SourcePicker
               sources={this.props.scene.sources}
               yOffset={0}
+              filters={[]}
               emptyMessage="You haven't added any sources to this Scene yet."
               removeAllMessage="Are you sure you want to remove all sources from this scene?"
               removeAllConfirm="Ok"
@@ -128,6 +129,8 @@ export default class SceneDetail extends React.Component {
     )
   }
 
+  nop() {}
+
   componentDidMount() {
     if (this.nameInputRef.current) {
       this.nameInputRef.current.select();
@@ -137,10 +140,6 @@ export default class SceneDetail extends React.Component {
 
   play() {
     this.props.onPlay(this.props.scene);
-  }
-
-  nop() {
-
   }
 
   toggleURLImportModal() {
