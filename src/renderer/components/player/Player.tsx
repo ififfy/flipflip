@@ -156,7 +156,7 @@ export default class Player extends React.Component {
           </div>
         )}
 
-        {this.props.allTags && (
+        {this.state.isMainLoaded && this.props.allTags && (
           <div className="SourceTags">
             {this.props.allTags.map((tag) =>
               <div className={`SourceTag u-clickable ${tagNames && tagNames.includes(tag.name) ? 'u-selected' : ''}`}
