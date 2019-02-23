@@ -54,6 +54,7 @@ try {
   // who cares
 }
 const savePath = path.join(saveDir, 'data.json');
+const backupPath = path.join(saveDir, 'data - Backup.json');
 console.log("Saving to", savePath);
 
 try {
@@ -291,6 +292,8 @@ export default class Meta extends React.Component {
             goBack={this.goBack.bind(this)}
             updateConfig={this.updateConfig.bind(this)}
             onDefault={this.onDefaultConfig.bind(this)}
+            onBackup={this.backup.bind(this)}
+            onRestore={this.restore.bind(this)}
           />
         )}
       </div>
@@ -299,6 +302,27 @@ export default class Meta extends React.Component {
 
   save() {
     writeFileSync(savePath, JSON.stringify(this.state), 'utf-8');
+  }
+
+  backup() {
+    archiveFile(savePath);
+    fs.copyFileSync(savePath, backupPath);
+  }
+
+  restore() {
+    const data = JSON.parse(readFileSync(backupPath, 'utf-8'));
+    this.setState({
+      version: data.version,
+      autoEdit: data.autoEdit,
+      isSelect: data.isSelect,
+      config: data.config,
+      scenes: data.scenes.map((s: any) => new Scene(s)),
+      library: data.library.map((s: any) => new LibrarySource(s)),
+      tags: data.tags.map((t: any) => new Tag(t)),
+      route: data.route.map((s: any) => new Route(s)),
+      libraryYOffset: 0,
+      libraryFilters: Array<string>(),
+    });
   }
 
   goBack() {
