@@ -49,8 +49,12 @@ export default class Library extends React.Component {
           onUpdateSources={this.props.onUpdateLibrary}
           onClick={this.props.onPlay}
           importSourcesFromLibrary={this.props.importSources}
+          onChangeTextKind={this.nop}
+          onChangeTextSource={this.nop}
         />
       </div>
     )
   }
+
+  nop() {}
 }

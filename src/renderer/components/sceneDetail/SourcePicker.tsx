@@ -24,6 +24,8 @@ type Props = {
   onClick?(source: LibrarySource, yOffset: number, filters: Array<string>): void,
   onOpenLibraryImport?(): void,
   importSourcesFromLibrary?(sources: Array<string>): void,
+  onChangeTextKind(kind: string): void,
+  onChangeTextSource(hbID: string): void,
 };
 
 export default class SourcePicker extends React.Component {
@@ -208,8 +210,8 @@ export default class SourcePicker extends React.Component {
           <URLModal
             onClose={this.toggleURLImportModal.bind(this)}
             addSources={this.addSources.bind(this)}
-            onChangeTextKind={this.nop}
-            onChangeTextSource={this.nop}/>
+            onChangeTextKind={this.props.onChangeTextKind.bind(this)}
+            onChangeTextSource={this.props.onChangeTextSource.bind(this)}/>
         )}
       </div>
     )
@@ -268,7 +270,7 @@ export default class SourcePicker extends React.Component {
     this.setState({
       removeAllIsOpen: !this.state.removeAllIsOpen
     });
-  };
+  }
 
   onEdit(sourceID: number, e: Event) {
     e.preventDefault();
