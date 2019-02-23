@@ -15,7 +15,7 @@ import TextGroup from "../sceneDetail/TextGroup";
 import TimingGroup from "../sceneDetail/TimingGroup";
 import Modal from "../ui/Modal";
 
-export default class Library extends React.Component {
+export default class ConfigForm extends React.Component {
   readonly props: {
     config: Config,
     scenes: Array<Scene>,

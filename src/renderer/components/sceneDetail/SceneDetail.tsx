@@ -122,6 +122,8 @@ export default class SceneDetail extends React.Component {
               isSelect={false}
               onUpdateSources={this.onChangeSources.bind(this)}
               onOpenLibraryImport={this.props.onOpenLibraryImport.bind(this, this.props.scene)}
+              onChangeTextKind={this.changeKey.bind(this, 'textKind').bind(this)}
+              onChangeTextSource={this.changeKey.bind(this, 'textSource').bind(this)}/>
             />
           </div>
         </div>
@@ -162,8 +164,12 @@ export default class SceneDetail extends React.Component {
     this.setState({isEditingName: false});
   }
 
-  update(fn: (scene: Scene) => void) {
+  update(fn: (scene: any) => void) {
     this.props.onUpdateScene(this.props.scene, fn);
+  }
+
+  changeKey(key: string, value: any) {
+    this.update((s) => s[key] = value);
   }
 
   onChangeName(e: React.FormEvent<HTMLInputElement>) { this.update((s) => { s.name = e.currentTarget.value; }); }
