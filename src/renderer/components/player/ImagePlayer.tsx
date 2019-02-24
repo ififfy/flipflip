@@ -35,6 +35,9 @@ export default class ImagePlayer extends React.Component {
     zoomType: string,
     backgroundType: string;
     backgroundColor: string;
+    strobe: boolean;
+    strobeTime: number;
+    strobeColor: string;
     effectLevel: number,
     horizTransType: string,
     vertTransType: string,
@@ -120,19 +123,23 @@ export default class ImagePlayer extends React.Component {
     }
 
     return (
-      <div className={className}>
-        <div className={`u-fill-container ${this.props.backgroundType == BT.color ? '' : 'u-fill-image-blur'}`} style={{
-          background: this.props.backgroundType == BT.color ? this.props.backgroundColor : null,
-          backgroundImage: this.props.backgroundType == BT.color ? null : `url("${imgs[0].src}")`,
-        }}
-        />
-        {imgs.map((img) => {
-          return <ImageView
-            img={img}
-            key={(img as any).key}
-            fadeState={this.props.fadeEnabled ? (img.src === imgs[0].src ? 'in' : 'out') : 'none'}
-            fadeDuration={this.state.timeToNextFrame / 2}/>;
-        })}
+      <div className={className} style={{
+        background: this.props.strobe ? this.props.strobeColor : "none",
+      }}>
+        <div style={{ animation: this.props.strobe ? "strobe " + this.props.strobeTime + "ms steps(1, end) infinite" : "none" }}>
+          <div className={`u-fill-container ${this.props.backgroundType == BT.color ? '' : 'u-fill-image-blur'}`} style={{
+            background: this.props.backgroundType == BT.color ? this.props.backgroundColor : null,
+            backgroundImage: this.props.backgroundType == BT.color ? null : `url("${imgs[0].src}")`,
+          }}
+          />
+          {imgs.map((img) => {
+            return <ImageView
+              img={img}
+              key={(img as any).key}
+              fadeState={this.props.fadeEnabled ? (img.src === imgs[0].src ? 'in' : 'out') : 'none'}
+              fadeDuration={this.state.timeToNextFrame / 2}/>;
+          })}
+        </div>
       </div>
     );
   }

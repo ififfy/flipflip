@@ -15,6 +15,9 @@ export default class Scene {
   crossFade = false;
   backgroundType = BT.blur;
   backgroundColor = "#000000";
+  strobe = false;
+  strobeTime = 200;
+  strobeColor = "#FFFFFF";
   playFullGif = false;
   textKind: string = "";
   textSource: string = "";

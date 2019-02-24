@@ -1173,6 +1173,12 @@ label.SimpleCheckbox {
 
 /* Animations */
 
+@keyframes strobe {
+  50% {
+    opacity: 0;
+  }
+}
+
 @keyframes fadeIn {
   0% {
     opacity: 0;

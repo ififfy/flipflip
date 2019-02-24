@@ -17,6 +17,10 @@ export class SceneSettings {
   textKind = "";
   textSource = "";
 
+  strobe = false;
+  strobeTime = 200;
+  strobeColor = "#FFFFFF";
+
   blinkColor = "#FFFFFF";
   blinkFontSize = 20;
   blinkFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
