@@ -123,8 +123,7 @@ export default class SceneDetail extends React.Component {
               onUpdateSources={this.onChangeSources.bind(this)}
               onOpenLibraryImport={this.props.onOpenLibraryImport.bind(this, this.props.scene)}
               onChangeTextKind={this.changeKey.bind(this, 'textKind').bind(this)}
-              onChangeTextSource={this.changeKey.bind(this, 'textSource').bind(this)}/>
-            />
+              onChangeTextSource={this.changeKey.bind(this, 'textSource').bind(this)} />
           </div>
         </div>
       </div>
