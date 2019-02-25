@@ -4,7 +4,7 @@ import Sortable from "sortablejs";
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 
 import {SF} from "../../const";
-import {arrayMove, getSourceType, removeDuplicatesBy} from "../../utils";
+import {arrayMove, getFileGroup, getSourceType, removeDuplicatesBy} from "../../utils";
 import LibrarySource from "../library/LibrarySource";
 import Tag from "../library/Tag";
 import URLModal from "../sceneDetail/URLModal";
@@ -382,6 +382,34 @@ export default class SourcePicker extends React.Component {
     switch (algorithm) {
       case SF.alphaA:
         this.props.onUpdateSources(this.props.sources.sort((a, b) => {
+          const aType = getFileGroup(a.url);
+          const bType = getFileGroup(b.url);
+          console.log(aType);
+          console.log(bType);
+          if (aType < bType) {
+            return -1;
+          } else if (aType > bType) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }));
+        break;
+      case SF.alphaD:
+        this.props.onUpdateSources(this.props.sources.sort((a, b) => {
+          const aType = getFileGroup(a.url);
+          const bType = getFileGroup(b.url);
+          if (aType > bType) {
+            return -1;
+          } else if (aType < bType) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }));
+        break;
+      case SF.alphaFullA:
+        this.props.onUpdateSources(this.props.sources.sort((a, b) => {
           if (a.url < b.url) {
             return -1;
           } else if (a.url > b.url) {
@@ -391,7 +419,7 @@ export default class SourcePicker extends React.Component {
           }
         }));
         break;
-      case SF.alphaD:
+      case SF.alphaFullD:
         this.props.onUpdateSources(this.props.sources.sort((a, b) => {
           if (a.url > b.url) {
             return -1;

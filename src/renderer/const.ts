@@ -56,6 +56,8 @@ const TT = { // tag type
 const SF = { // sort function
   alphaA: 'sf.alphaA',
   alphaD: 'sf.alphaD',
+  alphaFullA: 'sf.alphaFullA',
+  alphaFullD: 'sf.alphaFullD',
   dateA: 'sf.dateA',
   dateD: 'sf.dateD',
   type: 'sf.type',
