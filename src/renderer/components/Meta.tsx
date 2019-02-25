@@ -200,6 +200,7 @@ export default class Meta extends React.Component {
           <ScenePicker
             scenes={this.state.scenes}
             version={this.state.version}
+            libraryCount={this.state.library.length}
             onUpdateScenes={this.onUpdateScenes.bind(this)}
             onAdd={this.onAddScene.bind(this)}
             onImport={this.onImport.bind(this)}
