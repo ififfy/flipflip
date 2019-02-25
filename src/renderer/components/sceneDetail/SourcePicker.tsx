@@ -40,28 +40,38 @@ export default class SourcePicker extends React.Component {
   };
 
   render() {
-    let tags = Array<Tag>();
-    let options = Array<{ label: string, value: string, isDisabled: boolean }>();
-    let defaultValues = Array<{ label: string, value: string }>();
+    const tags = new Map<string, number>();
+    let untaggedCount = 0;
+    const options = Array<{ label: string, value: string, isDisabled: boolean }>();
+    const defaultValues = Array<{ label: string, value: string }>();
     for (let source of this.props.sources) {
-      for (let tag of source.tags) {
-        tags.push(tag);
+      if (source.tags.length > 0) {
+        for (let tag of source.tags) {
+          if (tags.has(tag.name)) {
+            tags.set(tag.name, tags.get(tag.name) + 1);
+          } else {
+            tags.set(tag.name, 1);
+          }
+        }
+      } else {
+        untaggedCount += 1;
       }
     }
-    tags = removeDuplicatesBy((t: Tag) => t.name, tags);
-    tags.sort((a, b) => {
-      if (a.name < b.name) {
+    const tagKeys = Array.from(tags.keys()).sort((a, b) => {
+      const aCount = tags.get(a);
+      const bCount = tags.get(b);
+      if (aCount > bCount) {
         return -1;
-      } else if (a.name > b.name) {
+      } else if (aCount < bCount) {
         return 1;
       } else {
         return 0;
       }
     });
     const untagged = this.state.filters.length == 1 && this.state.filters[0] == null;
-    options.push({label: "<Untagged>", value: null, isDisabled: this.state.filters.length > 0 && !untagged});
-    for (let tag of tags) {
-      options.push({label: tag.name, value: tag.name, isDisabled: this.state.filters.length > 0 && untagged});
+    options.push({label: "<Untagged> (" + untaggedCount + ")", value: null, isDisabled: this.state.filters.length > 0 && !untagged});
+    for (let tag of tagKeys) {
+      options.push({label: tag + " (" + tags.get(tag) + ")", value: tag, isDisabled: this.state.filters.length > 0 && untagged});
     }
     for (let filter of this.state.filters) {
       defaultValues.push({label: filter, value: filter});
@@ -103,7 +113,7 @@ export default class SourcePicker extends React.Component {
               keys={["Sort Sources"].concat(Object.values(SF))}
               onChange={this.onSort.bind(this)}
             />
-            {tags.length > 0 && (
+            {tags.size > 0 && (
               <div className="ReactMultiSelectCheckboxes">
                 <ReactMultiSelectCheckboxes
                   options={options}
@@ -135,7 +145,7 @@ export default class SourcePicker extends React.Component {
               keys={["Sort Sources"].concat(Object.values(SF))}
               onChange={this.onSort.bind(this)}
             />
-            {tags.length > 0 && (
+            {tags.size > 0 && (
               <div className="ReactMultiSelectCheckboxes">
                 <ReactMultiSelectCheckboxes
                   defaultValue={defaultValues}
