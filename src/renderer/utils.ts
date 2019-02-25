@@ -27,7 +27,7 @@ export function getFileGroup(url: string) {
       redditID = redditID.substring(redditID.lastIndexOf("/") + 1);
       return redditID;
     case ST.local:
-      return url.substring(url.lastIndexOf(path.sep));
+      return url.substring(url.lastIndexOf(path.sep)+1);
     case ST.list:
       break;
   }

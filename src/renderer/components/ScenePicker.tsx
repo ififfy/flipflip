@@ -72,7 +72,7 @@ export default class ScenePicker extends React.Component {
                 label=""
                 value="Sort"
                 disableFirst={true}
-                keys={["Sort"].concat(Object.values(SF))}
+                keys={["Sort"].concat([SF.alphaA, SF.alphaD, SF.dateA, SF.dateD, SF.type])}
                 onChange={this.onSort.bind(this)}
               />
               {this.props.scenes.length > 1 && (

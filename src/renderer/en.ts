@@ -38,6 +38,8 @@ export default new Map<String, String>([
 
   ['sf.alphaA', 'By Title Asc'],
   ['sf.alphaD', 'By Title Desc'],
+  ['sf.alphaFullA', 'By Full Title Asc'],
+  ['sf.alphaFullD', 'By Full Title Desc'],
   ['sf.dateA', 'By Date Asc'],
   ['sf.dateD', 'By Date Desc'],
   ['sf.type', 'By Type'],
