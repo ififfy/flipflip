@@ -52,6 +52,7 @@ export default class ScenePicker extends React.Component {
   readonly props: {
     scenes: Array<Scene>,
     version: string,
+    libraryCount: number,
     canGenerate: boolean,
     onAdd(): void,
     onImport(): void,
@@ -99,7 +100,7 @@ export default class ScenePicker extends React.Component {
 
         <div className="ScenePicker__Buttons">
           <div className="ScenePicker__LibraryButton u-clickable" onClick={this.props.onOpenLibrary}>
-            Library
+            Library {this.props.libraryCount > 0 ? '(' + this.props.libraryCount + ' Sources)' : ''}
           </div>
           <div className={`ScenePicker__GenerateSceneButton ${this.props.canGenerate ? 'u-clickable' : 'u-disabled'}`}
                onClick={this.props.canGenerate ? this.props.onGenerate.bind(this) : this.nop}>
