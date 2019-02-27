@@ -606,7 +606,16 @@ label.SimpleCheckbox {
   .SourcePicker__Buttons {
     height: 3.2rem;
 
+    > .SourcePicker__AddButtons {
+      float: right;
+      div {
+        margin-left: $smallPadding;
+      }
+    }
+
     > .SimpleOptionPicker {
+      float: right;
+      margin-left: $smallPadding;
       select {
         outline: none;
         margin-top: 4px;
@@ -615,8 +624,7 @@ label.SimpleCheckbox {
       }
     }
 
-
-    & > :not(.u-float-left) {
+    > .ReactMultiSelectCheckboxes {
       float: right;
       margin-left: $smallPadding;
     }

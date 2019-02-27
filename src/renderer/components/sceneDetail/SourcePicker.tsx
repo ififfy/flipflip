@@ -17,15 +17,14 @@ type Props = {
   emptyMessage: string,
   removeAllMessage: string,
   removeAllConfirm: string,
-  allowLibraryImport: boolean,
   yOffset: number,
   filters: Array<string>,
   onUpdateSources(sources: Array<LibrarySource>): void,
   onClick?(source: LibrarySource, yOffset: number, filters: Array<string>): void,
   onOpenLibraryImport?(): void,
   importSourcesFromLibrary?(sources: Array<string>): void,
-  onChangeTextKind(kind: string): void,
-  onChangeTextSource(hbID: string): void,
+  onChangeTextKind?(kind: string): void,
+  onChangeTextSource?(hbID: string): void,
 };
 
 export default class SourcePicker extends React.Component {
@@ -40,44 +39,8 @@ export default class SourcePicker extends React.Component {
   };
 
   render() {
-    const tags = new Map<string, number>();
-    let untaggedCount = 0;
-    const options = Array<{ label: string, value: string, isDisabled: boolean }>();
-    const defaultValues = Array<{ label: string, value: string }>();
-    for (let source of this.props.sources) {
-      if (source.tags.length > 0) {
-        for (let tag of source.tags) {
-          if (tags.has(tag.name)) {
-            tags.set(tag.name, tags.get(tag.name) + 1);
-          } else {
-            tags.set(tag.name, 1);
-          }
-        }
-      } else {
-        untaggedCount += 1;
-      }
-    }
-    const tagKeys = Array.from(tags.keys()).sort((a, b) => {
-      const aCount = tags.get(a);
-      const bCount = tags.get(b);
-      if (aCount > bCount) {
-        return -1;
-      } else if (aCount < bCount) {
-        return 1;
-      } else {
-        return 0;
-      }
-    });
-    const untagged = this.state.filters.length == 1 && this.state.filters[0] == null;
-    options.push({label: "<Untagged> (" + untaggedCount + ")", value: null, isDisabled: this.state.filters.length > 0 && !untagged});
-    for (let tag of tagKeys) {
-      options.push({label: tag + " (" + tags.get(tag) + ")", value: tag, isDisabled: this.state.filters.length > 0 && untagged});
-    }
-    for (let filter of this.state.filters) {
-      defaultValues.push({label: filter, value: filter});
-    }
-
     let displaySources = [];
+    const untagged = this.state.filters.length == 1 && this.state.filters[0] == null;
     const filtering = this.state.filters.length > 0;
     if (filtering) {
       for (let source of this.props.sources) {
@@ -102,65 +65,96 @@ export default class SourcePicker extends React.Component {
       displaySources = this.props.sources;
     }
 
+    const tags = new Map<string, number>();
+    let untaggedCount = 0;
+    const options = Array<{ label: string, value: string }>();
+    const defaultValues = Array<{ label: string, value: string }>();
+    for (let source of displaySources) {
+      if (source.tags.length > 0) {
+        for (let tag of source.tags) {
+          if (tags.has(tag.name)) {
+            tags.set(tag.name, tags.get(tag.name) + 1);
+          } else {
+            tags.set(tag.name, 1);
+          }
+        }
+      } else {
+        untaggedCount += 1;
+      }
+    }
+    const tagKeys = Array.from(tags.keys()).sort((a, b) => {
+      const aCount = tags.get(a);
+      const bCount = tags.get(b);
+      if (aCount > bCount) {
+        return -1;
+      } else if (aCount < bCount) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+    for (let filter of this.state.filters) {
+      if (filter == null) {
+        options.push({label: "<Untagged> (" + untaggedCount + ")", value: null});
+        defaultValues.push({label: "<Untagged> (" + untaggedCount + ")", value: null});
+      } else {
+        options.push({label: filter + " (" + tags.get(filter) + ")", value: filter});
+        defaultValues.push({label: filter + " (" + tags.get(filter) + ")", value: filter});
+      }
+    }
+
+    if (untaggedCount > 0 && !this.state.filters.includes(null)) {
+      options.push({label: "<Untagged> (" + untaggedCount + ")", value: null});
+    }
+    for (let tag of tagKeys) {
+      if (!this.state.filters.includes(tag)) {
+        options.push({label: tag + " (" + tags.get(tag) + ")", value: tag});
+      }
+    }
+
     return (
       <div className="SourcePicker" onKeyDown={this.secretHotkey.bind(this)} tabIndex={0}>
-        {this.props.isSelect && (
-          <div className="SourcePicker__Buttons">
-            <SimpleOptionPicker
-              label=""
-              value="Sort Sources"
-              disableFirst={true}
-              keys={["Sort Sources"].concat(Object.values(SF))}
-              onChange={this.onSort.bind(this)}
-            />
-            {tags.size > 0 && (
-              <div className="ReactMultiSelectCheckboxes">
-                <ReactMultiSelectCheckboxes
-                  options={options}
-                  placeholderButtonLabel="Filter Tags"
-                  onChange={this.onFilter.bind(this)}
-                  rightAligned={true}
-                />
-              </div>
-            )}
-
+        <div className="SourcePicker__Buttons">
+          {!this.props.isSelect && (
+            <div className="SourcePicker__AddButtons">
+              <div className={`u-button ${this.state.filters.length > 0 ? 'u-disabled' : 'u-clickable'}`} onClick={this.state.filters.length > 0 ? this.nop : this.onAdd.bind(this)}>+ Add local files</div>
+              <div className={`u-button ${this.state.filters.length > 0 ? 'u-disabled' : 'u-clickable'}`} onClick={this.state.filters.length > 0 ? this.nop : this.onAddURL.bind(this)}>+ Add URL</div>
+              {this.props.onOpenLibraryImport && (
+                <div className="u-button u-clickable" onClick={this.props.onOpenLibraryImport.bind(this)}>+ Add From
+                  Library</div>
+              )}
+            </div>
+          )}
+          <SimpleOptionPicker
+            label=""
+            value="Sort Sources"
+            disableFirst={true}
+            keys={["Sort Sources"].concat(Object.values(SF))}
+            onChange={this.onSort.bind(this)}
+          />
+          {options.length > 0 && !this.props.onOpenLibraryImport && (
+            <div className="ReactMultiSelectCheckboxes">
+              <ReactMultiSelectCheckboxes
+                value={defaultValues}
+                options={options}
+                placeholderButtonLabel="Filter Tags"
+                onChange={this.onFilter.bind(this)}
+                rightAligned={true}
+              />
+            </div>
+          )}
+          {this.props.isSelect && (
             <div className={`u-button u-float-left ${this.state.selected.length > 0 ? 'u-clickable' : 'u-disabled'}`}
                  onClick={this.state.selected.length > 0 ? this.props.importSourcesFromLibrary.bind(this, this.state.selected) : this.nop}>Import
               Selected
             </div>
-          </div>
-        )}
-        {!this.props.isSelect && (
-          <div className="SourcePicker__Buttons">
-            <div className="u-button u-clickable" onClick={this.onAdd.bind(this)}>+ Add local files</div>
-            <div className="u-button u-clickable" onClick={this.onAddURL.bind(this)}>+ Add URL</div>
-            {this.props.allowLibraryImport && (
-              <div className="u-button u-clickable" onClick={this.props.onOpenLibraryImport.bind(this)}>+ Add From
-                Library</div>
-            )}
-            <SimpleOptionPicker
-              label=""
-              value="Sort Sources"
-              disableFirst={true}
-              keys={["Sort Sources"].concat(Object.values(SF))}
-              onChange={this.onSort.bind(this)}
-            />
-            {tags.size > 0 && (
-              <div className="ReactMultiSelectCheckboxes">
-                <ReactMultiSelectCheckboxes
-                  defaultValue={defaultValues}
-                  options={options}
-                  placeholderButtonLabel="Filter Tags"
-                  onChange={this.onFilter.bind(this)}
-                  rightAligned={true}
-                />
-              </div>
-            )}
+          )}
+          {!this.props.isSelect && (
             <div className={`u-button u-float-left ${this.props.sources.length == 0 ? 'u-disabled' : 'u-clickable'} `}
                  onClick={this.props.sources.length == 0 ? this.nop : this.toggleRemoveAllModal.bind(this)}>- Remove All
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         <div id="sources" className="SourcePicker__Sources">
           {displaySources.length == 0 && (
@@ -220,8 +214,8 @@ export default class SourcePicker extends React.Component {
           <URLModal
             onClose={this.toggleURLImportModal.bind(this)}
             addSources={this.addSources.bind(this)}
-            onChangeTextKind={this.props.onChangeTextKind.bind(this)}
-            onChangeTextSource={this.props.onChangeTextSource.bind(this)}/>
+            onChangeTextKind={this.props.onChangeTextKind ? this.props.onChangeTextKind.bind(this) : this.nop}
+            onChangeTextSource={this.props.onChangeTextSource ? this.props.onChangeTextSource.bind(this) : this.nop}/>
         )}
       </div>
     )
@@ -394,8 +388,6 @@ export default class SourcePicker extends React.Component {
         this.props.onUpdateSources(this.props.sources.sort((a, b) => {
           const aType = getFileGroup(a.url);
           const bType = getFileGroup(b.url);
-          console.log(aType);
-          console.log(bType);
           if (aType < bType) {
             return -1;
           } else if (aType > bType) {

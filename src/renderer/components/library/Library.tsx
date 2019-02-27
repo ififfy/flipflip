@@ -44,13 +44,10 @@ export default class Library extends React.Component {
           emptyMessage="You haven't added anything to the Library yet."
           removeAllMessage="Are you sure you really wanna delete your library...? ಠ_ಠ"
           removeAllConfirm="Yea... I'm sure"
-          allowLibraryImport={false}
           isSelect={this.props.isSelect}
           onUpdateSources={this.props.onUpdateLibrary}
-          onClick={this.props.onPlay}
+          onClick={this.props.isSelect ? this.nop : this.props.onPlay}
           importSourcesFromLibrary={this.props.importSources}
-          onChangeTextKind={this.nop}
-          onChangeTextSource={this.nop}
         />
       </div>
     )
