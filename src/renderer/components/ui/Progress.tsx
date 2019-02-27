@@ -1,7 +1,7 @@
 import React from 'react';
 import ProgressBar from 'progressbar.js'
 
-export default class Modal extends React.Component {
+export default class Progress extends React.Component {
   readonly props: {
     total: number,
     current: number,

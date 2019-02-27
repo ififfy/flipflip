@@ -24,7 +24,7 @@ export default class ConfigForm extends React.Component {
     updateConfig(config: Config): void,
     onDefault(): void,
     onBackup(): void,
-    onRestore(): void,
+    onRestore(backupFile: string): void,
   };
 
   readonly state = {
