@@ -54,7 +54,6 @@ try {
   // who cares
 }
 const savePath = path.join(saveDir, 'data.json');
-const backupPath = path.join(saveDir, 'data - Backup.json');
 console.log("Saving to", savePath);
 
 try {
@@ -305,24 +304,35 @@ export default class Meta extends React.Component {
   }
 
   backup() {
-    archiveFile(savePath);
-    fs.copyFileSync(savePath, backupPath);
+    try {
+      archiveFile(savePath);
+    } catch (e) {
+      alert("Backup error:\n" + e);
+      return;
+    }
+    alert("Backup success!");
   }
 
-  restore() {
-    const data = JSON.parse(readFileSync(backupPath, 'utf-8'));
-    this.setState({
-      version: data.version,
-      autoEdit: data.autoEdit,
-      isSelect: data.isSelect,
-      config: data.config,
-      scenes: data.scenes.map((s: any) => new Scene(s)),
-      library: data.library.map((s: any) => new LibrarySource(s)),
-      tags: data.tags.map((t: any) => new Tag(t)),
-      route: data.route.map((s: any) => new Route(s)),
-      libraryYOffset: 0,
-      libraryFilters: Array<string>(),
-    });
+  restore(backupFile: string) {
+    try {
+      const data = JSON.parse(readFileSync(backupFile, 'utf-8'));
+      this.setState({
+        version: data.version,
+        autoEdit: data.autoEdit,
+        isSelect: data.isSelect,
+        config: data.config,
+        scenes: data.scenes.map((s: any) => new Scene(s)),
+        library: data.library.map((s: any) => new LibrarySource(s)),
+        tags: data.tags.map((t: any) => new Tag(t)),
+        route: data.route.map((s: any) => new Route(s)),
+        libraryYOffset: 0,
+        libraryFilters: Array<string>(),
+      });
+    } catch (e) {
+      alert("Restore error:\n" + e);
+      return;
+    }
+    alert("Restore success!");
   }
 
   goBack() {
