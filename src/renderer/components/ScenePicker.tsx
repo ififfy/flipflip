@@ -1,5 +1,6 @@
 import {remote} from 'electron';
 import * as React from 'react';
+import wretch from 'wretch';
 import Sortable from "sortablejs";
 
 import {SF} from "../const";
@@ -63,6 +64,11 @@ export default class ScenePicker extends React.Component {
     onUpdateScenes(scenes: Array<Scene>): void,
   };
 
+  readonly state = {
+    newVersion: "",
+    newVersionLink: "",
+  };
+
   render() {
     return (
       <div className="ScenePicker">
@@ -83,7 +89,17 @@ export default class ScenePicker extends React.Component {
               <div className="u-config" onClick={this.props.onConfig.bind(this)}/>
             </div>
             <h1>FlipFlip</h1>
-            <small>v{this.props.version}</small>
+            <small>
+              v{this.props.version}
+              {this.state.newVersion != "" && (
+                <span>
+                  &nbsp;&nbsp;(New Version!&nbsp;
+                  <a onClick={this.openGitRelease.bind(this)} href="#">
+                    {this.state.newVersion}
+                  </a>)
+                </span>
+              )}
+            </small>
           </div>
 
           <div><Link url="https://github.com/ififfy/flipflip/wiki/FlipFlip-User-Manual">User manual</Link></div>
@@ -138,6 +154,22 @@ export default class ScenePicker extends React.Component {
       draggable: ".u-draggable",
       onEnd: this.onEnd.bind(this),
     });
+
+    wretch("https://api.github.com/repos/ififfy/flipflip/releases")
+      .get()
+      .json(json => {
+        const newestRelease = json[0];
+        if (newestRelease.tag_name != "v" + this.props.version) {
+          this.setState({
+            newVersion: newestRelease.tag_name,
+            newVersionLink: newestRelease.html_url,
+          });
+        }
+      });
+  }
+
+  openGitRelease() {
+    remote.shell.openExternal(this.state.newVersionLink);
   }
 
   onRandom() {

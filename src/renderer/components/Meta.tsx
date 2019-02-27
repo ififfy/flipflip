@@ -86,7 +86,6 @@ try {
         libraryFilters: Array<string>(),
       };
 
-
       // Hydrate and add the library ! Yay!!! :)
       let libraryID = 0;
       const newLibrarySources = Array<LibrarySource>();
@@ -122,7 +121,7 @@ try {
       break;
     default:
       initialState = {
-        version: data.version,
+        version: __VERSION__,
         autoEdit: data.autoEdit,
         isSelect: data.isSelect,
         config: data.config,
