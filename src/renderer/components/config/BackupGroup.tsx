@@ -1,19 +1,18 @@
 import * as React from "react";
-import * as fs from "fs";
 import path from "path";
-import {remote} from "electron";
 
+import {getBackups, saveDir} from "../../utils";
 import ControlGroup from "../sceneDetail/ControlGroup";
 import Modal from "../ui/Modal";
 import SimpleOptionPicker from "../ui/SimpleOptionPicker";
 
-const saveDir = path.join(remote.app.getPath('appData'), 'flipflip');
 
 export default class BackupGroup extends React.Component {
 
   readonly props: {
     backup(): void,
     restore(backupFile: string): void,
+    clean(): void,
   };
 
   readonly state = {
@@ -21,6 +20,7 @@ export default class BackupGroup extends React.Component {
     backup: "",
     confirmMessage: "",
     confirmTitle: "",
+    confirmShowSelect: true,
     confirmFunction: this.nop,
   };
 
@@ -35,19 +35,29 @@ export default class BackupGroup extends React.Component {
           <button onClick={hasBackup ? this.onRestore.bind(this) : this.nop} className={`u-button ${hasBackup ? 'u-clickable' : 'u-disabled'}`} >
             Restore Backup
           </button>
+          <button onClick={this.state.backups.length > 1 ? this.onClean.bind(this) : this.nop}
+                  className={`u-button ${this.state.backups.length > 1 ? 'u-clickable' : 'u-disabled'}`} >
+            Clean Backups
+          </button>
         </div>
         <br/>
         <span>
-          Last Backup: {hasBackup ? this.convertFromEpoch(this.state.backups[0]) : '--'}
+          Number of Backups: {hasBackup ? this.state.backups.length : "--"}
+        </span>
+        <br/>
+        <span>
+          Last Backup: {hasBackup ? this.convertFromEpoch(this.state.backups[0]) : "--"}
         </span>
         {this.state.confirmMessage != "" && (
           <Modal onClose={this.closeConfirm.bind(this)} title={this.state.confirmTitle}>
             <p>{this.state.confirmMessage}</p>
-            <SimpleOptionPicker
-              label=""
-              value={this.state.backup}
-              keys={this.state.backups.map((b) => this.convertFromEpoch(b))}
-              onChange={this.onChangeBackup.bind(this)}/>
+            {this.state.confirmShowSelect && (
+              <SimpleOptionPicker
+                label=""
+                value={this.state.backup}
+                keys={this.state.backups.map((b) => this.convertFromEpoch(b))}
+                onChange={this.onChangeBackup.bind(this)} />
+            )}
             <div className="u-button u-float-right" onClick={this.state.confirmFunction.bind(this)}>
               Confirm
             </div>
@@ -64,23 +74,7 @@ export default class BackupGroup extends React.Component {
   }
 
   refreshBackups() {
-    const files = fs.readdirSync(saveDir);
-    const backups = [];
-    for (let file of files) {
-      if (file.startsWith("data.json.")) {
-        backups.push(file);
-      }
-    }
-    backups.sort((a, b) => {
-      if (a > b) {
-        return -1;
-      } else if (a < b) {
-        return 1;
-      } else {
-        return 0;
-      }
-    });
-    this.setState({backups: backups});
+    this.setState({backups: getBackups()});
   }
 
   convertFromEpoch(backupFile: string) {
@@ -99,12 +93,29 @@ export default class BackupGroup extends React.Component {
     this.setState({backup: backupFile});
   }
 
+  onClean() {
+    this.setState({
+      backup: this.state.backups[0],
+      confirmTitle: "Clean",
+      confirmMessage: "You are about to clean your backups. This will leave only the latest backup. Continue?",
+      confirmShowSelect: false,
+      confirmFunction: this.clean,
+    });
+  }
+
+  clean() {
+    this.props.clean();
+    this.closeConfirm();
+    this.refreshBackups();
+  }
+
   onRestore() {
     this.setState({
       backup: this.state.backups[0],
       confirmTitle: "Restore",
       confirmMessage: "You are about to override your data with the most recent backup. Continue?",
-      confirmFunction: this.restore
+      confirmShowSelect: true,
+      confirmFunction: this.restore,
     });
   }
 

@@ -25,6 +25,7 @@ export default class ConfigForm extends React.Component {
     onDefault(): void,
     onBackup(): void,
     onRestore(backupFile: string): void,
+    onClean(): void,
   };
 
   readonly state = {
@@ -87,8 +88,9 @@ export default class ConfigForm extends React.Component {
             onUpdateSettings={this.onUpdateRemoteSettings.bind(this)}/>
 
           <BackupGroup
+            backup={this.props.onBackup.bind(this)}
             restore={this.props.onRestore.bind(this)}
-            backup={this.props.onBackup.bind(this)}/>
+            clean={this.props.onClean.bind(this)}/>
         </div>
 
         {this.state.modalMessages.length > 0 && (

@@ -4,7 +4,7 @@ import * as fs from "fs";
 import * as React from 'react';
 import path from 'path';
 
-import {removeDuplicatesBy} from "../utils";
+import {getBackups, removeDuplicatesBy, saveDir} from "../utils";
 import Config from "../Config";
 import Scene from '../Scene';
 import ScenePicker from './ScenePicker';
@@ -47,7 +47,6 @@ let initialState = {
   libraryFilters: Array<string>(),
 };
 
-const saveDir = path.join(remote.app.getPath('appData'), 'flipflip');
 try {
   mkdirSync(saveDir);
 } catch (e) {
@@ -293,6 +292,7 @@ export default class Meta extends React.Component {
             onDefault={this.onDefaultConfig.bind(this)}
             onBackup={this.backup.bind(this)}
             onRestore={this.restore.bind(this)}
+            onClean={this.cleanBackups.bind(this)}
           />
         )}
       </div>
@@ -333,6 +333,24 @@ export default class Meta extends React.Component {
       return;
     }
     alert("Restore success!");
+  }
+
+  cleanBackups() {
+    const backups = getBackups();
+    backups.shift(); // Keep the newest backup
+    let error;
+    for (let backup of backups) {
+      fs.unlink(saveDir + path.sep + backup, (err) => {
+        if (err) {
+          error = err;
+        }
+      });
+    }
+    if (error) {
+      alert("Cleanup error:\n" + error);
+    } else {
+      alert("Cleanup success!");
+    }
   }
 
   goBack() {
