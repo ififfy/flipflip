@@ -113,7 +113,7 @@ export default class BackupGroup extends React.Component {
     this.setState({
       backup: this.state.backups[0],
       confirmTitle: "Restore",
-      confirmMessage: "You are about to override your data with the most recent backup. Continue?",
+      confirmMessage: "Choose a backup to restore from:",
       confirmShowSelect: true,
       confirmFunction: this.restore,
     });
