@@ -1,4 +1,5 @@
 import * as React from 'react';
+import SystemFonts from 'system-font-families';
 
 import {TOT} from "../../const";
 import {SceneSettings} from "../../Config";
@@ -18,7 +19,8 @@ export default class TextGroup extends React.Component {
   };
 
   readonly state = {
-    showFontSettings: false
+    showFontSettings: false,
+    systemFonts: Array<string>(),
   };
 
   render() {
@@ -59,15 +61,30 @@ export default class TextGroup extends React.Component {
                 min={0}
                 isEnabled={true}
                 onChange={this.changeKey.bind(this, 'blinkFontSize').bind(this)}/>
-              <SimpleTextInput
-                label="Blink Font Family"
-                value={this.props.scene.blinkFontFamily}
-                isEnabled={true}
-                onChange={this.changeKey.bind(this, 'blinkFontFamily').bind(this)}/>
               <SimpleColorPicker
                 label="Blink Color"
                 value={this.props.scene.blinkColor}
                 onChange={this.changeKey.bind(this, 'blinkColor').bind(this)}/>
+              {this.state.systemFonts.length > 0 && (
+                <div className="SimpleOptionPicker">
+                  <label>Blink Font Family</label>
+                  <select
+                    value={this.props.scene.blinkFontFamily}
+                    onChange={this.changeKeyOnEvent.bind(this, 'blinkFontFamily').bind(this)}
+                    style={{fontFamily: this.props.scene.blinkFontFamily, height: '1.5rem'}}>
+                    {this.state.systemFonts.map((b) =>
+                      <option value={b} key={b} style={{fontFamily: b}}>{b}</option>
+                    )}
+                  </select>
+                </div>
+              )}
+              {this.state.systemFonts.length == 0 && (
+                <SimpleTextInput
+                  label="Blink Font Family"
+                  value={this.props.scene.blinkFontFamily}
+                  isEnabled={true}
+                  onChange={this.changeKey.bind(this, 'blinkFontFamily').bind(this)}/>
+              )}
             </div>
             <hr/>
             <div className="ControlSubgroup">
@@ -77,15 +94,30 @@ export default class TextGroup extends React.Component {
                 min={0}
                 isEnabled={true}
                 onChange={this.changeKey.bind(this, 'captionFontSize').bind(this)}/>
-              <SimpleTextInput
-                label="Caption Font Family"
-                value={this.props.scene.captionFontFamily}
-                isEnabled={true}
-                onChange={this.changeKey.bind(this, 'captionFontFamily').bind(this)}/>
               <SimpleColorPicker
                 label="Caption Color"
                 value={this.props.scene.captionColor}
                 onChange={this.changeKey.bind(this, 'captionColor').bind(this)}/>
+              {this.state.systemFonts.length > 0 && (
+                <div className="SimpleOptionPicker">
+                  <label>Caption Font Family</label>
+                  <select
+                    value={this.props.scene.captionFontFamily}
+                    onChange={this.changeKeyOnEvent.bind(this, 'captionFontFamily').bind(this)}
+                    style={{fontFamily: this.props.scene.captionFontFamily, height: '1.5rem'}}>
+                    {this.state.systemFonts.map((b) =>
+                      <option value={b} key={b} style={{fontFamily: b}}>{b}</option>
+                    )}
+                  </select>
+                </div>
+              )}
+              {this.state.systemFonts.length == 0 && (
+                <SimpleTextInput
+                  label="Caption Font Family"
+                  value={this.props.scene.captionFontFamily}
+                  isEnabled={true}
+                  onChange={this.changeKey.bind(this, 'captionFontFamily').bind(this)}/>
+              )}
             </div>
             <hr/>
             <div className="ControlSubgroup">
@@ -95,19 +127,46 @@ export default class TextGroup extends React.Component {
                 min={0}
                 isEnabled={true}
                 onChange={this.changeKey.bind(this, 'captionBigFontSize').bind(this)}/>
-              <SimpleTextInput
-                label="Big Caption Font Family"
-                value={this.props.scene.captionBigFontFamily}
-                isEnabled={true}
-                onChange={this.changeKey.bind(this, 'captionBigFontFamily').bind(this)}/>
               <SimpleColorPicker
                 label="Big Caption Color"
                 value={this.props.scene.captionBigColor}
                 onChange={this.changeKey.bind(this, 'captionBigColor').bind(this)}/>
+              {this.state.systemFonts.length > 0 && (
+                <div className="SimpleOptionPicker">
+                  <label>Big Caption Font Family</label>
+                  <select
+                    value={this.props.scene.captionBigFontFamily}
+                    onChange={this.changeKeyOnEvent.bind(this, 'captionBigFontFamily').bind(this)}
+                    style={{fontFamily: this.props.scene.captionBigFontFamily, height: '1.5rem'}}>
+                    {this.state.systemFonts.map((b) =>
+                      <option value={b} key={b} style={{fontFamily: b}}>{b}</option>
+                    )}
+                  </select>
+                </div>
+              )}
+              {this.state.systemFonts.length == 0 && (
+                <SimpleTextInput
+                  label="Big Caption Font Family"
+                  value={this.props.scene.captionBigFontFamily}
+                  isEnabled={true}
+                  onChange={this.changeKey.bind(this, 'captionBigFontFamily').bind(this)}/>
+              )}
             </div>
           </div>
         )}
       </ControlGroup>
+    );
+  }
+
+  componentDidMount() {
+    // Define system fonts
+    new SystemFonts().getFonts().then(
+      (res: Array<string>) => {
+        this.setState({systemFonts: res});
+      },
+      (err: string) => {
+        console.error(err);
+      }
     );
   }
 
@@ -121,5 +180,9 @@ export default class TextGroup extends React.Component {
 
   changeKey(key: string, value: any) {
     this.update((s) => s[key] = value);
+  }
+
+  changeKeyOnEvent(key: string, value: any) {
+    this.update((s) => s[key] = value.currentTarget.value);
   }
 }
