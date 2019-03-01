@@ -292,7 +292,7 @@ export default class HeadlessScenePlayer extends React.Component {
             zoomType={this.props.scene.zoomType}
             backgroundType={this.props.scene.backgroundType}
             backgroundColor={this.props.scene.backgroundColor}
-            strobe={this.props.scene.strobe}
+            strobe={this.props.opacity == 1 ? this.props.scene.strobe : false}
             strobeTime={this.props.scene.strobeTime}
             strobeColor={this.props.scene.strobeColor}
             effectLevel={this.props.scene.effectLevel}
