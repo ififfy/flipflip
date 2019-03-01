@@ -4,7 +4,6 @@ import path from "path";
 import {getBackups, saveDir} from "../../utils";
 import ControlGroup from "../sceneDetail/ControlGroup";
 import Modal from "../ui/Modal";
-import SimpleOptionPicker from "../ui/SimpleOptionPicker";
 
 
 export default class BackupGroup extends React.Component {
@@ -52,11 +51,15 @@ export default class BackupGroup extends React.Component {
           <Modal onClose={this.closeConfirm.bind(this)} title={this.state.confirmTitle}>
             <p>{this.state.confirmMessage}</p>
             {this.state.confirmShowSelect && (
-              <SimpleOptionPicker
-                label=""
+              <div className="SimpleOptionPicker">
+                <select
                 value={this.state.backup}
-                keys={this.state.backups.map((b) => this.convertFromEpoch(b))}
-                onChange={this.onChangeBackup.bind(this)} />
+                onChange={this.onChangeBackup.bind(this)}>
+                {this.state.backups.map((b) =>
+                  <option value={b} key={b}>{this.convertFromEpoch(b)}</option>
+                )}
+                </select>
+              </div>
             )}
             <div className="u-button u-float-right" onClick={this.state.confirmFunction.bind(this)}>
               Confirm
@@ -83,14 +86,8 @@ export default class BackupGroup extends React.Component {
     return date.toLocaleString();
   }
 
-  convertToEpoch(localeString: string) {
-    const date = new Date(localeString);
-    return date.getTime();
-  }
-
-  onChangeBackup(backup: string) {
-    const backupFile = 'data.json.' + this.convertToEpoch(backup);
-    this.setState({backup: backupFile});
+  onChangeBackup(e: React.FormEvent<HTMLSelectElement>) {
+    this.setState({backup: e.currentTarget.value});
   }
 
   onClean() {
