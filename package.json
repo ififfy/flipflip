@@ -45,6 +45,7 @@
     "request": "^2.88.0",
     "snoowrap": "^1.15.2",
     "sortablejs": "^1.8.1",
+    "system-font-families": "^0.4.1",
     "wretch": "^1.4.2"
   }
 }
