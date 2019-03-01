@@ -5,7 +5,29 @@ import path from 'path';
 import {ST} from "./const";
 import en from "./en";
 import Config from "./Config";
+import * as fs from "fs";
 
+export const saveDir = path.join(remote.app.getPath('appData'), 'flipflip');
+
+export function getBackups() {
+  const files = fs.readdirSync(saveDir);
+  const backups = [];
+  for (let file of files) {
+    if (file.startsWith("data.json.")) {
+      backups.push(file);
+    }
+  }
+  backups.sort((a, b) => {
+    if (a > b) {
+      return -1;
+    } else if (a < b) {
+      return 1;
+    } else {
+      return 0;
+    }
+  });
+  return backups;
+}
 
 export function getPath() {
   return path.join(remote.app.getPath('appData'), 'flipflip');

@@ -14,6 +14,7 @@ import ImageGroup from "../sceneDetail/ImageGroup";
 import TextGroup from "../sceneDetail/TextGroup";
 import TimingGroup from "../sceneDetail/TimingGroup";
 import Modal from "../ui/Modal";
+import BackupGroup from "./BackupGroup";
 
 export default class ConfigForm extends React.Component {
   readonly props: {
@@ -22,6 +23,9 @@ export default class ConfigForm extends React.Component {
     goBack(): void,
     updateConfig(config: Config): void,
     onDefault(): void,
+    onBackup(): void,
+    onRestore(backupFile: string): void,
+    onClean(): void,
   };
 
   readonly state = {
@@ -82,6 +86,11 @@ export default class ConfigForm extends React.Component {
             settings={this.state.config.remoteSettings}
             activateReddit={this.showActivateRedditNotice.bind(this)}
             onUpdateSettings={this.onUpdateRemoteSettings.bind(this)}/>
+
+          <BackupGroup
+            backup={this.props.onBackup.bind(this)}
+            restore={this.props.onRestore.bind(this)}
+            clean={this.props.onClean.bind(this)} />
         </div>
 
         {this.state.modalMessages.length > 0 && (
@@ -96,6 +105,12 @@ export default class ConfigForm extends React.Component {
         )}
       </div>
     )
+  }
+
+  componentWillReceiveProps(props: any) {
+    if (props.config != this.props.config) {
+      this.setState({config: props.config});
+    }
   }
 
   showActivateRedditNotice() {

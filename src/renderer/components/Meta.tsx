@@ -4,7 +4,7 @@ import * as fs from "fs";
 import * as React from 'react';
 import path from 'path';
 
-import {removeDuplicatesBy} from "../utils";
+import {getBackups, removeDuplicatesBy, saveDir} from "../utils";
 import Config from "../Config";
 import Scene from '../Scene';
 import ScenePicker from './ScenePicker';
@@ -47,7 +47,6 @@ let initialState = {
   libraryFilters: Array<string>(),
 };
 
-const saveDir = path.join(remote.app.getPath('appData'), 'flipflip');
 try {
   mkdirSync(saveDir);
 } catch (e) {
@@ -291,6 +290,9 @@ export default class Meta extends React.Component {
             goBack={this.goBack.bind(this)}
             updateConfig={this.updateConfig.bind(this)}
             onDefault={this.onDefaultConfig.bind(this)}
+            onBackup={this.backup.bind(this)}
+            onRestore={this.restore.bind(this)}
+            onClean={this.cleanBackups.bind(this)}
           />
         )}
       </div>
@@ -299,6 +301,56 @@ export default class Meta extends React.Component {
 
   save() {
     writeFileSync(savePath, JSON.stringify(this.state), 'utf-8');
+  }
+
+  backup() {
+    try {
+      archiveFile(savePath);
+    } catch (e) {
+      alert("Backup error:\n" + e);
+      return;
+    }
+    alert("Backup success!");
+  }
+
+  restore(backupFile: string) {
+    try {
+      const data = JSON.parse(readFileSync(backupFile, 'utf-8'));
+      this.setState({
+        version: data.version,
+        autoEdit: data.autoEdit,
+        isSelect: data.isSelect,
+        config: data.config,
+        scenes: data.scenes.map((s: any) => new Scene(s)),
+        library: data.library.map((s: any) => new LibrarySource(s)),
+        tags: data.tags.map((t: any) => new Tag(t)),
+        route: data.route.map((s: any) => new Route(s)),
+        libraryYOffset: 0,
+        libraryFilters: Array<string>(),
+      });
+    } catch (e) {
+      alert("Restore error:\n" + e);
+      return;
+    }
+    alert("Restore success!");
+  }
+
+  cleanBackups() {
+    const backups = getBackups();
+    backups.shift(); // Keep the newest backup
+    let error;
+    for (let backup of backups) {
+      fs.unlink(saveDir + path.sep + backup, (err) => {
+        if (err) {
+          error = err;
+        }
+      });
+    }
+    if (error) {
+      alert("Cleanup error:\n" + error);
+    } else {
+      alert("Cleanup success!");
+    }
   }
 
   goBack() {
