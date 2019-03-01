@@ -320,7 +320,7 @@ export default class Meta extends React.Component {
         version: data.version,
         autoEdit: data.autoEdit,
         isSelect: data.isSelect,
-        config: data.config,
+        config: new Config(data.config),
         scenes: data.scenes.map((s: any) => new Scene(s)),
         library: data.library.map((s: any) => new LibrarySource(s)),
         tags: data.tags.map((t: any) => new Tag(t)),
