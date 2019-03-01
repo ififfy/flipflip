@@ -90,7 +90,7 @@ export default class ConfigForm extends React.Component {
           <BackupGroup
             backup={this.props.onBackup.bind(this)}
             restore={this.props.onRestore.bind(this)}
-            clean={this.props.onClean.bind(this)}/>
+            clean={this.props.onClean.bind(this)} />
         </div>
 
         {this.state.modalMessages.length > 0 && (
@@ -105,6 +105,12 @@ export default class ConfigForm extends React.Component {
         )}
       </div>
     )
+  }
+
+  componentWillReceiveProps(props: any) {
+    if (props.config != this.props.config) {
+      this.setState({config: props.config});
+    }
   }
 
   showActivateRedditNotice() {
