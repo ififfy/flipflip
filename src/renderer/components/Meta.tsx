@@ -214,6 +214,7 @@ export default class Meta extends React.Component {
           <Library
             library={this.state.library}
             tags={this.state.tags}
+            config={this.state.config}
             isSelect={this.state.isSelect}
             yOffset={this.state.libraryYOffset}
             filters={this.state.libraryFilters}

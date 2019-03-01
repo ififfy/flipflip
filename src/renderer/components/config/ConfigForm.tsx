@@ -2,6 +2,7 @@ import * as React from "react";
 import * as fs from "fs";
 import uuidv4 from "uuid/v4";
 import wretch from "wretch";
+import {OAuth} from 'oauth';
 import {remote} from "electron";
 import http from "http";
 
@@ -85,6 +86,7 @@ export default class ConfigForm extends React.Component {
           <APIGroup
             settings={this.state.config.remoteSettings}
             activateReddit={this.showActivateRedditNotice.bind(this)}
+            activateTumblr={this.showActivateTumblrNotice.bind(this)}
             onUpdateSettings={this.onUpdateRemoteSettings.bind(this)}/>
 
           <BackupGroup
@@ -115,9 +117,17 @@ export default class ConfigForm extends React.Component {
 
   showActivateRedditNotice() {
     const messages = Array<string>();
-    messages.push("You are about to be directed to Reddit.com to authorize FlipFlip. You should only have to do this once");
+    messages.push("You are about to be directed to Reddit.com to authorize FlipFlip. You should only have to do this once.");
     messages.push("Currently, this is only used for finding images. FlipFlip does not request or store any user information.");
     this.setState({modalTitle: "Authorize FlipFlip on Reddit", modalMessages: messages, modalFunction: this.activateReddit });
+  }
+
+  showActivateTumblrNotice() {
+    const messages = Array<string>();
+    messages.push("You are about to be directed to Tumblr.com to authorize FlipFlip. You should only have to do this once. You do not need to do this to use Tumblr sources.");
+    messages.push("Tumblr has no Read-Only mode, so read AND write access are requested.");
+    messages.push("FlipFlip will only access the blogs you are following (for import) and will not read from, write to, or edit your account in any other form.");
+    this.setState({modalTitle: "Authorize FlipFlip on Tumblr", modalMessages: messages, modalFunction: this.activateTumblr });
   }
 
   closeModal() {
@@ -180,7 +190,6 @@ export default class ConfigForm extends React.Component {
   activateReddit() {
     this.closeModal();
     const clientID = this.props.config.remoteSettings.redditClientID;
-    const redirectURI = this.props.config.remoteSettings.redditRedirectURI;
     const userAgent = this.props.config.remoteSettings.redditUserAgent;
 
     let deviceID = this.props.config.remoteSettings.redditDeviceID;
@@ -190,7 +199,7 @@ export default class ConfigForm extends React.Component {
 
     // Make initial request and open authorization form in browser
     wretch("https://www.reddit.com/api/v1/authorize?client_id=" + clientID + "&response_type=code&state=" + deviceID +
-      "&redirect_uri=" + redirectURI + "&duration=permanent&scope=read")
+      "&redirect_uri=http://localhost:65010&duration=permanent&scope=read")
       .post()
       .res(res => {
         remote.shell.openExternal(res.url);
@@ -203,30 +212,129 @@ export default class ConfigForm extends React.Component {
       res.writeHead(200, {"Content-Type": "text/html"});
       res.write(html);
 
-      if (req.url.includes("state") && req.url.includes("code")) {
-        const args = req.url.replace("\/?", "").split("&");
-        // This should be the same as the deviceID
-        const state = args[0].substring(6);
-        if (state == deviceID) {
-          // This is what we use to get our token
-          const code = args[1].substring(5);
-          wretch("https://www.reddit.com/api/v1/access_token")
-            .headers({"User-Agent": userAgent, "Authorization": "Basic " + btoa(clientID + ":")})
-            .formData({grant_type: "authorization_code", code: code, redirect_uri: redirectURI})
-            .post()
-            .json(json => {
-              // Use prop here and not state, we strictly want to update refreshToken and deviceID
+      if (!req.url.endsWith("favicon.ico")) {
+        if (req.url.includes("state") && req.url.includes("code")) {
+          const args = req.url.replace("\/?", "").split("&");
+          // This should be the same as the deviceID
+          const state = args[0].substring(6);
+          if (state == deviceID) {
+            // This is what we use to get our token
+            const code = args[1].substring(5);
+            wretch("https://www.reddit.com/api/v1/access_token")
+              .headers({"User-Agent": userAgent, "Authorization": "Basic " + btoa(clientID + ":")})
+              .formData({grant_type: "authorization_code", code: code, redirect_uri: "http://localhost:65010"})
+              .post()
+              .json(json => {
+                // Use prop here and not state, we strictly want to update refreshToken and deviceID
+                const config = this.props.config;
+                config.remoteSettings.redditDeviceID = deviceID;
+                config.remoteSettings.redditRefreshToken = json.refresh_token;
+                this.props.updateConfig(config);
+
+                // Also update state (so our config doesn't get overridden if other changes are saved)
+                const newConfig = this.state.config;
+                newConfig.remoteSettings.redditDeviceID = deviceID;
+                newConfig.remoteSettings.redditRefreshToken = json.refresh_token;
+                const newMessages = Array<string>();
+                newMessages.push("Reddit is now activated.");
+                this.setState({
+                  config: newConfig,
+                  modalTitle: "Success!",
+                  modalMessages: newMessages,
+                  modalFunction: this.closeModal,
+                });
+
+                // This closes the server
+                req.connection.destroy();
+              });
+          }
+        } else if (req.url.includes("state") && req.url.includes("error")) {
+          const args = req.url.replace("\/?", "").split("&");
+          // This should be the same as the deviceID
+          const state = args[0].substring(6);
+          if (state == deviceID) {
+            const error = args[1].substring(6);
+            const newMessages = Array<string>();
+            newMessages.push("Error: " + error);
+            this.setState({modalTitle: "Failed", modalMessages: newMessages, modalFunction: this.closeModal});
+          }
+        }
+      }
+      res.end();
+    }).listen(65010);
+  }
+
+  activateTumblr() {
+    this.closeModal();
+
+    // Tumblr endpoints
+    const authorizeUrl = 'https://www.tumblr.com/oauth/authorize';
+    const requestTokenUrl = 'https://www.tumblr.com/oauth/request_token';
+    const accessTokenUrl = 'https://www.tumblr.com/oauth/access_token';
+
+    const oauth = new OAuth(
+      requestTokenUrl,
+      accessTokenUrl,
+      this.props.config.remoteSettings.tumblrKey,
+      this.props.config.remoteSettings.tumblrSecret,
+      '1.0A',
+      'http://localhost:65010',
+      'HMAC-SHA1'
+    );
+
+    let sharedSecret = "";
+
+    oauth.getOAuthRequestToken((err: string, token: string, secret: string) => {
+      if (err) {
+        console.error("Failed with error" + err);
+        const newMessages = Array<string>();
+        newMessages.push("Error: " + err);
+        this.setState({modalTitle: "Failed", modalMessages: newMessages, modalFunction: this.closeModal});
+        return;
+      }
+
+      sharedSecret = secret;
+      remote.shell.openExternal(authorizeUrl + '?oauth_token=' + token);
+    });
+
+    // Start a server to listen for Tumblr OAuth response
+    http.createServer((req, res) => {
+      // Can't seem to get electron to properly return focus to FlipFlip, just alert the user in the response
+      const html = "<html><body><h1>Please return to FlipFlip</h1></body></html>";
+      res.writeHead(200, {"Content-Type": "text/html"});
+      res.write(html);
+
+      if (!req.url.endsWith("favicon.ico")) {
+        if (req.url.includes("oauth_token") && req.url.includes("oauth_verifier")) {
+          const args = req.url.replace("\/?", "").split("&");
+          const oauthToken = args[0].substring(12);
+          const oauthVerifier = args[1].substring(15);
+
+          oauth.getOAuthAccessToken(
+            oauthToken,
+            sharedSecret,
+            oauthVerifier,
+            (err: string, token: string, secret: string) => {
+              if (err) {
+                console.error("Validation failed with error", err);
+                const newMessages = Array<string>();
+                newMessages.push("Error: " + err);
+                this.setState({modalTitle: "Failed", modalMessages: newMessages, modalFunction: this.closeModal});
+                return;
+              }
+
+              // Use prop here and not state, we strictly want to update oauthToken and oauthVerifier
               const config = this.props.config;
-              config.remoteSettings.redditDeviceID = deviceID;
-              config.remoteSettings.redditRefreshToken = json.refresh_token;
+              config.remoteSettings.tumblrOAuthToken = token;
+              config.remoteSettings.tumblrOAuthTokenSecret = secret;
               this.props.updateConfig(config);
 
               // Also update state (so our config doesn't get overridden if other changes are saved)
               const newConfig = this.state.config;
-              newConfig.remoteSettings.redditDeviceID = deviceID;
-              newConfig.remoteSettings.redditRefreshToken = json.refresh_token;
+              newConfig.remoteSettings.tumblrOAuthToken = token;
+              newConfig.remoteSettings.tumblrOAuthTokenSecret = secret;
               const newMessages = Array<string>();
-              newMessages.push("Reddit is now activated.");
+              newMessages.push("Tumblr is now activated.");
               this.setState({
                 config: newConfig,
                 modalTitle: "Success!",
@@ -236,21 +344,15 @@ export default class ConfigForm extends React.Component {
 
               // This closes the server
               req.connection.destroy();
-            })
-        }
-      } else if (req.url.includes("state") && req.url.includes("error")) {
-        const args = req.url.replace("\/?", "").split("&");
-        // This should be the same as the deviceID
-        const state = args[0].substring(6);
-        if (state == deviceID) {
-          const error = args[1].substring(6);
+            }
+          );
+        } else {
           const newMessages = Array<string>();
-          newMessages.push("Error: " + error);
+          newMessages.push("Error: Access Denied");
           this.setState({modalTitle: "Failed", modalMessages: newMessages, modalFunction: this.closeModal});
         }
       }
       res.end();
     }).listen(65010);
   }
-
 }
