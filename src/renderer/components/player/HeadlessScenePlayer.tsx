@@ -42,17 +42,6 @@ function filterPathsToJustImages(imageTypeFilter: string, paths: Array<string>):
   }
 }
 
-function textURL(kind: string, src: string): string {
-  switch (kind) {
-    case TOT.url:
-      return src;
-    case TOT.hastebin:
-      return `https://hastebin.com/raw/${src}`;
-    default:
-      return src;
-  }
-}
-
 function getTumblrAPIKey(config: Config, overlay: boolean): string {
   if (!overlay) {
     return config.remoteSettings.tumblrDefault;
@@ -233,7 +222,6 @@ export default class HeadlessScenePlayer extends React.Component {
     config: Config,
     scene: Scene,
     opacity: number,
-    showText: boolean,
     showLoadingState: boolean,
     showEmptyState: boolean,
     isPlaying: boolean,
@@ -264,12 +252,6 @@ export default class HeadlessScenePlayer extends React.Component {
     const showImagePlayer = this.state.onLoaded != null;
     const showLoadingIndicator = this.props.showLoadingState && !this.state.isLoaded;
     const showEmptyIndicator = this.props.showEmptyState && this.state.isLoaded && isEmpty(Array.from(this.state.allURLs.values()));
-    const showCaptionProgram = (
-      this.props.showText &&
-      this.state.isLoaded &&
-      this.props.scene.textSource &&
-      this.props.scene.textSource.length &&
-      this.props.isPlaying);
 
     return (
       <div
@@ -292,7 +274,7 @@ export default class HeadlessScenePlayer extends React.Component {
             zoomType={this.props.scene.zoomType}
             backgroundType={this.props.scene.backgroundType}
             backgroundColor={this.props.scene.backgroundColor}
-            strobe={this.props.opacity == 1 ? this.props.scene.strobe : false}
+            strobe={this.props.opacity == 1 && !this.props.scene.strobeOverlay ? this.props.scene.strobe : false}
             strobeTime={this.props.scene.strobeTime}
             strobeColor={this.props.scene.strobeColor}
             effectLevel={this.props.scene.effectLevel}
@@ -305,20 +287,6 @@ export default class HeadlessScenePlayer extends React.Component {
             imageSizeMin={this.props.scene.imageSizeMin}
             allURLs={isEmpty(Array.from(this.state.allURLs.values())) ? null : this.state.allURLs}
             onLoaded={this.state.onLoaded.bind(this)}/>)}
-
-        {showCaptionProgram && (
-          <CaptionProgram
-            blinkColor={this.props.scene.blinkColor}
-            blinkFontSize={this.props.scene.blinkFontSize}
-            blinkFontFamily={this.props.scene.blinkFontFamily}
-            captionColor={this.props.scene.captionColor}
-            captionFontSize={this.props.scene.captionFontSize}
-            captionFontFamily={this.props.scene.captionFontFamily}
-            captionBigColor={this.props.scene.captionBigColor}
-            captionBigFontSize={this.props.scene.captionBigFontSize}
-            captionBigFontFamily={this.props.scene.captionBigFontFamily}
-            url={textURL(this.props.scene.textKind, this.props.scene.textSource)}/>
-        )}
 
         {showLoadingIndicator && (
           <Progress

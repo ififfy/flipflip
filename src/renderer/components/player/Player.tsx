@@ -4,6 +4,7 @@ import Sound from 'react-sound';
 import fs from "fs";
 import fileURL from "file-url";
 
+import {TOT} from "../../const";
 import {urlToPath} from '../../utils';
 import Config from "../../Config";
 import Scene from '../../Scene';
@@ -14,6 +15,7 @@ import AudioGroup from "../sceneDetail/AudioGroup";
 import EffectGroup from "../sceneDetail/EffectGroup";
 import TextGroup from "../sceneDetail/TextGroup";
 import TimingGroup from "../sceneDetail/TimingGroup";
+import CaptionProgram from "./CaptionProgram";
 
 const {getCurrentWindow, Menu, MenuItem, app} = remote;
 
@@ -29,6 +31,17 @@ const keyMap = {
 };
 
 let originalMenu = Menu.getApplicationMenu();
+
+function textURL(kind: string, src: string): string {
+  switch (kind) {
+    case TOT.url:
+      return src;
+    case TOT.hastebin:
+      return `https://hastebin.com/raw/${src}`;
+    default:
+      return src;
+  }
+}
 
 export default class Player extends React.Component {
   readonly props: {
@@ -59,37 +72,60 @@ export default class Player extends React.Component {
       ? (Sound as any).status.PLAYING
       : (Sound as any).status.PAUSED;
     const tagNames = this.props.tags ? this.props.tags.map((t) => t.name) : [];
+    const isLoaded = this.state.isMainLoaded && (!this.props.overlayScene || this.state.isOverlayLoaded);
+    const overlayStrobe = this.props.scene.strobe && this.props.scene.strobeOverlay;
+    const showCaptionProgram = (
+      isLoaded &&
+      this.props.scene.textSource &&
+      this.props.scene.textSource.length &&
+      this.state.isPlaying);
 
     return (
-      <div className="Player">
-        <HeadlessScenePlayer
-          config={this.props.config}
-          opacity={1}
-          scene={this.props.scene}
-          historyOffset={this.state.historyOffset}
-          isPlaying={this.state.isPlaying}
-          showLoadingState={!this.state.isMainLoaded}
-          showEmptyState={true}
-          showText={true}
-          advanceHack={this.state.imagePlayerAdvanceHack}
-          deleteHack={this.state.imagePlayerDeleteHack}
-          didFinishLoading={this.playMain.bind(this)}
-          setHistoryOffset={this.setHistoryOffset.bind(this)}
-          setHistoryPaths={this.setHistoryPaths.bind(this)}/>
-
-        {this.props.overlayScene && (
+      <div className="Player" style={{
+        background: overlayStrobe && isLoaded ? this.props.scene.strobeColor : "none",
+      }}>
+        <div style={{ animation: overlayStrobe && isLoaded ? "strobe " + this.props.scene.strobeTime + "ms steps(1, end) infinite" : "none" }}>
           <HeadlessScenePlayer
             config={this.props.config}
-            opacity={this.props.scene.overlaySceneOpacity}
-            scene={this.props.overlayScene}
-            historyOffset={0}
+            opacity={1}
+            scene={this.props.scene}
+            historyOffset={this.state.historyOffset}
             isPlaying={this.state.isPlaying}
-            showLoadingState={this.state.isMainLoaded && !this.state.isOverlayLoaded}
-            showEmptyState={false}
-            showText={false}
-            didFinishLoading={this.playOverlay.bind(this)}
-            setHistoryOffset={this.nop.bind(this)}
-            setHistoryPaths={this.nop.bind(this)}/>
+            showLoadingState={!this.state.isMainLoaded}
+            showEmptyState={true}
+            advanceHack={this.state.imagePlayerAdvanceHack}
+            deleteHack={this.state.imagePlayerDeleteHack}
+            didFinishLoading={this.playMain.bind(this)}
+            setHistoryOffset={this.setHistoryOffset.bind(this)}
+            setHistoryPaths={this.setHistoryPaths.bind(this)}/>
+
+          {this.props.overlayScene && (
+            <HeadlessScenePlayer
+              config={this.props.config}
+              opacity={this.props.scene.overlaySceneOpacity}
+              scene={this.props.overlayScene}
+              historyOffset={0}
+              isPlaying={this.state.isPlaying}
+              showLoadingState={this.state.isMainLoaded && !this.state.isOverlayLoaded}
+              showEmptyState={false}
+              didFinishLoading={this.playOverlay.bind(this)}
+              setHistoryOffset={this.nop.bind(this)}
+              setHistoryPaths={this.nop.bind(this)}/>
+          )}
+        </div>
+
+        {showCaptionProgram && (
+          <CaptionProgram
+            blinkColor={this.props.scene.blinkColor}
+            blinkFontSize={this.props.scene.blinkFontSize}
+            blinkFontFamily={this.props.scene.blinkFontFamily}
+            captionColor={this.props.scene.captionColor}
+            captionFontSize={this.props.scene.captionFontSize}
+            captionFontFamily={this.props.scene.captionFontFamily}
+            captionBigColor={this.props.scene.captionBigColor}
+            captionBigFontSize={this.props.scene.captionBigFontSize}
+            captionBigFontFamily={this.props.scene.captionBigFontFamily}
+            url={textURL(this.props.scene.textKind, this.props.scene.textSource)}/>
         )}
 
         <div className={`u-button-row ${this.state.isPlaying ? 'u-show-on-hover-only' : ''}`}>
@@ -134,7 +170,7 @@ export default class Player extends React.Component {
           <div className="BackButton u-button u-clickable" onClick={this.navigateBack.bind(this)}>Back</div>
         </div>
 
-        {this.state.isMainLoaded && (!this.props.overlayScene || this.state.isOverlayLoaded) && (
+        {isLoaded && (
           <div className="SceneOptions u-button-sidebar">
             <h2 className="SceneOptionsHeader">Scene Options</h2>
             <TimingGroup
@@ -156,7 +192,7 @@ export default class Player extends React.Component {
           </div>
         )}
 
-        {this.state.isMainLoaded && this.props.allTags && (
+        {isLoaded && this.props.allTags && (
           <div className="SourceTags">
             {this.props.allTags.map((tag) =>
               <div className={`SourceTag u-clickable ${tagNames && tagNames.includes(tag.name) ? 'u-selected' : ''}`}

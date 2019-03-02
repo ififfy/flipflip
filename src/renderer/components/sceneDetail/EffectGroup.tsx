@@ -54,6 +54,10 @@ export default class EffectGroup extends React.Component {
               value={this.props.scene.strobeTime}
               isEnabled={true}
               onChange={this.changeKey.bind(this, 'strobeTime').bind(this)} />
+            <SimpleCheckbox
+              text="Overlay Strobe"
+              isOn={this.props.scene.strobeOverlay}
+              onChange={this.changeKey.bind(this, 'strobeOverlay').bind(this)} />
           </div>
         )}
 
