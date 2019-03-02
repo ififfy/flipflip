@@ -284,34 +284,44 @@ export default class ImagePlayer extends React.Component {
             if (!fs.existsSync(cachePath)) {
               fs.mkdirSync(cachePath)
             }
-            getFolderSize(cachePath, (err: string, size: number) => {
-              if (err) { throw err; }
-              const sourceCachePath = getCachePath(img.getAttribute("source"), this.props.config);
-              const filePath = sourceCachePath + getFileName(img.src);
-              const mbSize = (size / 1024 / 1024);
-              const maxSize = this.props.config.caching.maxSize;
-              if (mbSize < maxSize) {
-                if (!fs.existsSync(filePath)) {
-                  wretch(img.src)
-                    .get()
-                    .blob(blob => {
-                      const reader = new FileReader();
-                      reader.onload = function () {
-                        if (reader.readyState == 2) {
-                          const arrayBuffer = reader.result as ArrayBuffer;
-                          const buffer = Buffer.alloc(arrayBuffer.byteLength);
-                          const view = new Uint8Array(arrayBuffer);
-                          for (let i = 0; i < arrayBuffer.byteLength; ++i) {
-                            buffer[i] = view[i];
-                          }
-                          outputFile(filePath, buffer);
+            const maxSize = this.props.config.caching.maxSize;
+            const sourceCachePath = getCachePath(img.getAttribute("source"), this.props.config);
+            const filePath = sourceCachePath + getFileName(img.src);
+            const downloadImage = () => {
+              if (!fs.existsSync(filePath)) {
+                wretch(img.src)
+                  .get()
+                  .blob(blob => {
+                    const reader = new FileReader();
+                    reader.onload = function () {
+                      if (reader.readyState == 2) {
+                        const arrayBuffer = reader.result as ArrayBuffer;
+                        const buffer = Buffer.alloc(arrayBuffer.byteLength);
+                        const view = new Uint8Array(arrayBuffer);
+                        for (let i = 0; i < arrayBuffer.byteLength; ++i) {
+                          buffer[i] = view[i];
                         }
-                      };
-                      reader.readAsArrayBuffer(blob);
-                    });
-                }
+                        outputFile(filePath, buffer);
+                      }
+                    };
+                    reader.readAsArrayBuffer(blob);
+                  });
               }
-            });
+            };
+            if (maxSize == 0) {
+              downloadImage();
+            } else {
+              getFolderSize(cachePath, (err: string, size: number) => {
+                if (err) {
+                  throw err;
+                }
+
+                const mbSize = (size / 1024 / 1024);
+                if (mbSize < maxSize) {
+                  downloadImage();
+                }
+              });
+            }
           }
         }
         setTimeout(successCallback, 0);
