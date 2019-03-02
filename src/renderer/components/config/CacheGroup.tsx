@@ -52,11 +52,12 @@ export default class CacheGroup extends React.Component {
         </SimpleTextInput>
         <span>Cache Dir size: {this.state.cacheSize}</span>
         <SimpleNumberInput
-          label="Caching Directory Max Size (MB)"
+          label="Caching Directory Max Size (MB):"
           min={0}
           value={this.props.config.caching.maxSize}
           isEnabled={this.props.config.caching.enabled}
           onChange={this.changeKey.bind(this, 'maxSize').bind(this)}/>
+        <span>Set to 0 for Unlimited</span>
       </ControlGroup>
     );
   }
