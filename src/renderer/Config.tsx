@@ -77,6 +77,7 @@ export class SceneSettings implements SceneSettingsI {
   textSource = "";
 
   strobe = false;
+  strobeOverlay = false;
   strobeTime = 200;
   strobeColor = "#FFFFFF";
 

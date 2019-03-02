@@ -16,6 +16,7 @@ export default class Scene {
   backgroundType = BT.blur;
   backgroundColor = "#000000";
   strobe = false;
+  strobeOverlay = false;
   strobeTime = 200;
   strobeColor = "#FFFFFF";
   playFullGif = false;
