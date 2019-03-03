@@ -2,6 +2,7 @@ import * as React from 'react';
 import tumblr from 'tumblr.js';
 import Snoowrap from "snoowrap";
 
+import {ST} from "../../const";
 import LibrarySource from "./LibrarySource";
 import Tag from "./Tag";
 import Config from "../../Config";
@@ -27,31 +28,33 @@ export default class Library extends React.Component {
   readonly state = {
     redditInProgress: false,
     tumblrInProgress: false,
+    showProgress: false,
     totalProgress: 0,
     currentProgress: 0,
     next: "",
   };
 
   render() {
-    const showProgress = this.state.tumblrInProgress;
     return (
       <div className="Library">
         <div className="u-button-row">
           <div className="u-abs-center">
-            <h2 className="Library__LibraryHeader">Library</h2>
+            {!this.state.showProgress && (
+              <h2 className="Library__LibraryHeader">Library</h2>
+            )}
+            {this.state.showProgress && (
+              <h2 className="Library__LibraryHeader">Import</h2>
+            )}
           </div>
-          {!this.props.isSelect && (
+          {!this.props.isSelect && !this.state.showProgress && (
             <div className="u-button-row-right">
-              <div
-                className={`Library__ImportRemote u-button ${this.state.redditInProgress ? 'u-disabled' : 'u-clickable'}`}
-                onClick={this.state.redditInProgress ? this.nop : this.importReddit.bind(this)}>
-                Import Reddit Subscriptions
-              </div>
-              <div
-                className="Library__ImportRemote u-button u-clickable"
-                onClick={this.state.tumblrInProgress ? this.nop : this.importTumblr.bind(this)}>
-                Import Tumblr Following
-              </div>
+              <select
+                value={""}
+                onChange={this.onChangeImport.bind(this)}>
+                <option value={""} key={""} disabled={true}>Remote Import</option>
+                <option value={ST.tumblr} key={ST.tumblr}>Tumblr Following</option>
+                <option value={ST.reddit} key={ST.reddit} disabled={this.state.redditInProgress}>Reddit Subscriptions</option>
+              </select>
               <div
                 className="Library__ManageTags u-button u-clickable"
                 onClick={this.props.manageTags.bind(this)}>
@@ -59,10 +62,10 @@ export default class Library extends React.Component {
               </div>
             </div>
           )}
-          <div className="BackButton u-button u-clickable" onClick={showProgress ? this.hideProgress.bind(this) : this.props.goBack}>Back</div>
+          <div className="BackButton u-button u-clickable" onClick={this.state.showProgress ? this.hideProgress.bind(this) : this.props.goBack}>Back</div>
         </div>
 
-        {!showProgress && (
+        {!this.state.showProgress && (
           <SourcePicker
             sources={this.props.library}
             yOffset={this.props.yOffset}
@@ -76,7 +79,7 @@ export default class Library extends React.Component {
             importSourcesFromLibrary={this.props.importSources}
           />
         )}
-        {showProgress && (
+        {this.state.showProgress && (
           <Progress
             total={this.state.totalProgress}
             current={this.state.currentProgress}
@@ -87,6 +90,15 @@ export default class Library extends React.Component {
   }
 
   nop() {}
+
+  onChangeImport(e: React.FormEvent<HTMLSelectElement>) {
+    const importType = e.currentTarget.value;
+    if (importType == ST.tumblr) {
+      this.importTumblr();
+    } else if (importType == ST.reddit) {
+      this.importReddit();
+    }
+  }
 
   hideProgress() {
     this.setState({showProgress: false});
@@ -145,12 +157,11 @@ export default class Library extends React.Component {
         if (err.statusCode == 403) {
           alert("You have not authorized FlipFlip to work with Reddit subscriptions. Visit config and authorize FlipFlip to work with Reddit.");
           this.props.onClearReddit();
-          this.setState({currentProgress: 0, totalProgress: 0, redditInProgress: false});
         } else {
           alert("Error retrieving subscriptions: " + err);
-          this.setState({currentProgress: 0, totalProgress: 0, redditInProgress: false});
           console.error(err);
         }
+        this.setState({currentProgress: 0, totalProgress: 0, redditInProgress: false});
       });
     };
 
@@ -162,7 +173,7 @@ export default class Library extends React.Component {
 
   importTumblr() {
     // If we don't have an import running
-    if (this.state.totalProgress == 0) {
+    if (!this.state.tumblrInProgress) {
       // Build our Tumblr client
       const client = tumblr.createClient({
         consumer_key: this.props.config.remoteSettings.tumblrKey,
@@ -173,12 +184,12 @@ export default class Library extends React.Component {
 
       // Define our loop
       const tumblrImportLoop = () => {
-        const page = this.state.currentProgress;
+        const offset = this.state.currentProgress;
         // Get the next page of blogs
-        client.userFollowing({offset: page * 20}, (err, data) => {
+        client.userFollowing({offset: offset}, (err, data) => {
           if (err) {
             alert("Error retrieving following: " + err);
-            this.setState({currentProgress: 0, totalProgress: 0, showProgress: false});
+            this.setState({currentProgress: 0, totalProgress: 0, tumblrInProgress: false, showProgress: false});
             console.error(err);
             return;
           }
@@ -211,14 +222,19 @@ export default class Library extends React.Component {
           }
           this.props.onUpdateLibrary(newLibrary);
 
+          let nextOffset = offset + 20;
+          if (offset > this.state.totalProgress) {
+            nextOffset = this.state.totalProgress;
+          }
+
           // Update progress
-          this.setState({currentProgress: page + 1});
+          this.setState({currentProgress: nextOffset});
 
           // Loop until we run out of blogs
-          if ((page + 1) < this.state.totalProgress) {
+          if ((nextOffset) < this.state.totalProgress) {
             setTimeout(tumblrImportLoop, 1500);
           } else {
-            this.setState({currentProgress: 0, totalProgress: 0, showProgress: false});
+            this.setState({currentProgress: 0, totalProgress: 0, tumblrInProgress: false, showProgress: false});
             alert("Tumblr Following Import has completed");
           }
         });
@@ -233,7 +249,7 @@ export default class Library extends React.Component {
         }
 
         // Show progress bar and kick off loop
-        this.setState({currentProgress: 0, totalProgress: Math.ceil(data.total_blogs / 20), showProgress: true});
+        this.setState({currentProgress: 0, totalProgress: data.total_blogs, tumblrInProgress: true, showProgress: true});
         tumblrImportLoop();
       });
     } else {
