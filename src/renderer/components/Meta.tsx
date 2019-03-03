@@ -223,6 +223,7 @@ export default class Meta extends React.Component {
             goBack={this.goBack.bind(this)}
             manageTags={this.manageTags.bind(this)}
             importSources={this.onImportFromLibrary.bind(this)}
+            onClearReddit={this.clearReddit.bind(this)}
           />
         )}
 
@@ -294,6 +295,7 @@ export default class Meta extends React.Component {
             onBackup={this.backup.bind(this)}
             onRestore={this.restore.bind(this)}
             onClean={this.cleanBackups.bind(this)}
+            onClearReddit={this.clearReddit.bind(this)}
           />
         )}
       </div>
@@ -613,5 +615,11 @@ export default class Meta extends React.Component {
     });
     scene.id = id;
     this.setState({scenes: this.state.scenes.concat([scene]), route: [new Route({kind: 'scene', value: scene.id})]});
+  }
+
+  clearReddit() {
+    const newConfig = this.state.config;
+    newConfig.remoteSettings.redditRefreshToken = "";
+    this.setState({config: newConfig});
   }
 };

@@ -17,7 +17,7 @@ export default class Library extends React.Component {
     yOffset: number,
     filters: Array<string>,
     onUpdateLibrary(sources: Array<LibrarySource>): void,
-    onUpdateConfig(config: Config): void,
+    onClearReddit(): void,
     onPlay(source: LibrarySource, yOffset: number, filters: Array<string>): void,
     goBack(): void,
     manageTags(): void,
@@ -144,9 +144,7 @@ export default class Library extends React.Component {
         // If user is not authenticated for subscriptions, prompt to re-authenticate
         if (err.statusCode == 403) {
           alert("You have not authorized FlipFlip to work with Reddit subscriptions. Visit config and authorize FlipFlip to work with Reddit.");
-          const newConfig = this.props.config;
-          newConfig.remoteSettings.redditRefreshToken = "";
-          this.props.onUpdateConfig(newConfig);
+          this.props.onClearReddit();
           this.setState({currentProgress: 0, totalProgress: 0, redditInProgress: false});
         } else {
           alert("Error retrieving subscriptions: " + err);

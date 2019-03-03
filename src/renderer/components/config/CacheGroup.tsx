@@ -69,13 +69,15 @@ export default class CacheGroup extends React.Component {
   }
 
   calculateCacheSize() {
-    const cachePath = getCachePath(null, this.props.config);
-    if (existsSync(cachePath)) {
-      getFolderSize(getCachePath(null, this.props.config), (err: string, size: number) => {
-        if (err) { throw err; }
-        const mbSize = (size / 1024 / 1024);
-        this.setState({cacheSize:  mbSize.toFixed(2) + "MB"});
-      });
+    if (this.props.config.caching.maxSize != 0) {
+      const cachePath = getCachePath(null, this.props.config);
+      if (existsSync(cachePath)) {
+        getFolderSize(getCachePath(null, this.props.config), (err: string, size: number) => {
+          if (err) { throw err; }
+          const mbSize = (size / 1024 / 1024);
+          this.setState({cacheSize: mbSize.toFixed(2) + "MB"});
+        });
+      }
     }
   }
 

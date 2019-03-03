@@ -6,11 +6,10 @@ import wretch from 'wretch';
 import http from 'http';
 import Snoowrap from 'snoowrap';
 
-import {IF, ST, TOT} from '../../const';
+import {IF, ST} from '../../const';
 import {CancelablePromise, getCachePath, getFileGroup, getFileName, getSourceType} from "../../utils";
 import Config from "../../Config";
 import Scene from '../../Scene';
-import CaptionProgram from './CaptionProgram';
 import ChildCallbackHack from './ChildCallbackHack';
 import ImagePlayer from './ImagePlayer';
 import Progress from '../ui/Progress';
@@ -182,8 +181,8 @@ function loadReddit(config: Config, url: string, filter: string, next: any, over
           clientSecret: "",
           refreshToken: config.remoteSettings.redditRefreshToken,
         });
-        if (next == 0) {
-          reddit.getSubreddit(getFileGroup(url)).getHot().then((submissionListing: any) => {
+        if (url.includes("/r/")) {
+          reddit.getSubreddit(getFileGroup(url)).getHot({after: next}).then((submissionListing: any) => {
             if (submissionListing.length > 0) {
               resolve({
                 data: submissionListing.map((s: any) => s.url),
@@ -193,14 +192,20 @@ function loadReddit(config: Config, url: string, filter: string, next: any, over
               resolve(null);
             }
           });
-        } else {
-          reddit.getSubreddit(getFileGroup(url)).getHot({after: next}).then((submissionListing: any) => {
+        } else if (url.includes("/user/") || url.includes("/u/")) {
+          reddit.getUser(getFileGroup(url)).getSubmissions({after: next}).then((submissionListing: any) => {
             if (submissionListing.length > 0) {
               resolve({
                 data: submissionListing.map((s: any) => s.url),
                 next: submissionListing[submissionListing.length - 1].name
               });
             } else {
+              resolve(null);
+            }
+          }).catch((err: any) => {
+            // If user is not authenticated for users, prompt to re-authenticate
+            if (err.statusCode == 403) {
+              alert("You have not authorized FlipFlip to work with Reddit users submissions. Visit config and authorize FlipFlip to work with Reddit. Try clearing and re-authorizing FlipFlip with Reddit.");
               resolve(null);
             }
           });
