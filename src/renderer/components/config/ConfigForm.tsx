@@ -199,7 +199,7 @@ export default class ConfigForm extends React.Component {
 
     // Make initial request and open authorization form in browser
     wretch("https://www.reddit.com/api/v1/authorize?client_id=" + clientID + "&response_type=code&state=" + deviceID +
-      "&redirect_uri=http://localhost:65010&duration=permanent&scope=read")
+      "&redirect_uri=http://localhost:65010&duration=permanent&scope=read,mysubreddits")
       .post()
       .res(res => {
         remote.shell.openExternal(res.url);
