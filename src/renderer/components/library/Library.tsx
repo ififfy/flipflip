@@ -1,5 +1,6 @@
 import * as React from 'react';
 import tumblr from 'tumblr.js';
+import Snoowrap from "snoowrap";
 
 import LibrarySource from "./LibrarySource";
 import Tag from "./Tag";
@@ -16,6 +17,7 @@ export default class Library extends React.Component {
     yOffset: number,
     filters: Array<string>,
     onUpdateLibrary(sources: Array<LibrarySource>): void,
+    onUpdateConfig(config: Config): void,
     onPlay(source: LibrarySource, yOffset: number, filters: Array<string>): void,
     goBack(): void,
     manageTags(): void,
@@ -23,12 +25,15 @@ export default class Library extends React.Component {
   };
 
   readonly state = {
-    showProgress: false,
-    total: 0,
-    current: 0,
+    redditInProgress: false,
+    tumblrInProgress: false,
+    totalProgress: 0,
+    currentProgress: 0,
+    next: "",
   };
 
   render() {
+    const showProgress = this.state.tumblrInProgress;
     return (
       <div className="Library">
         <div className="u-button-row">
@@ -38,8 +43,13 @@ export default class Library extends React.Component {
           {!this.props.isSelect && (
             <div className="u-button-row-right">
               <div
-                className={`Library__ImportRemote u-button ${this.state.showProgress ? 'u-disabled' : 'u-clickable'}`}
-                onClick={this.state.showProgress ? this.nop : this.importRemote.bind(this)}>
+                className={`Library__ImportRemote u-button ${this.state.redditInProgress ? 'u-disabled' : 'u-clickable'}`}
+                onClick={this.state.redditInProgress ? this.nop : this.importReddit.bind(this)}>
+                Import Reddit Subscriptions
+              </div>
+              <div
+                className="Library__ImportRemote u-button u-clickable"
+                onClick={this.state.tumblrInProgress ? this.nop : this.importTumblr.bind(this)}>
                 Import Tumblr Following
               </div>
               <div
@@ -49,10 +59,10 @@ export default class Library extends React.Component {
               </div>
             </div>
           )}
-          <div className="BackButton u-button u-clickable" onClick={this.state.showProgress ? this.hideProgress.bind(this) : this.props.goBack}>Back</div>
+          <div className="BackButton u-button u-clickable" onClick={showProgress ? this.hideProgress.bind(this) : this.props.goBack}>Back</div>
         </div>
 
-        {!this.state.showProgress && (
+        {!showProgress && (
           <SourcePicker
             sources={this.props.library}
             yOffset={this.props.yOffset}
@@ -66,10 +76,10 @@ export default class Library extends React.Component {
             importSourcesFromLibrary={this.props.importSources}
           />
         )}
-        {this.state.showProgress && (
+        {showProgress && (
           <Progress
-            total={this.state.total}
-            current={this.state.current}
+            total={this.state.totalProgress}
+            current={this.state.currentProgress}
             message={"<p>Importing Tumblr Following...</p>You can return the Library"} />
         )}
       </div>
@@ -82,9 +92,79 @@ export default class Library extends React.Component {
     this.setState({showProgress: false});
   }
 
-  importRemote() {
+  importReddit() {
+    const reddit = new Snoowrap({
+      userAgent: this.props.config.remoteSettings.redditUserAgent,
+      clientId: this.props.config.remoteSettings.redditClientID,
+      clientSecret: "",
+      refreshToken: this.props.config.remoteSettings.redditRefreshToken,
+    });
+
+    // Define our loop
+    const redditImportLoop = () => {
+      //if (this.state.next == "") {
+      reddit.getSubscriptions({limit: 20, after: this.state.next}).then((subscriptionListing: any) => {
+        if (subscriptionListing.length > 0) {
+          // Get the next 20 blogs
+          let subscriptions = [];
+          for (let sub of subscriptionListing) {
+            const subURL = "http://www.reddit.com" + sub.url;
+            subscriptions.push(subURL);
+          }
+
+          // dedup
+          let sourceURLs = this.props.library.map((s) => s.url);
+          subscriptions = subscriptions.filter((s) => !sourceURLs.includes(s));
+
+          let id = this.props.library.length + 1;
+          this.props.library.forEach((s) => {
+            id = Math.max(s.id + 1, id);
+          });
+
+          // Add to Library
+          let newLibrary = this.props.library;
+          for (let url of subscriptions) {
+            newLibrary.push(new LibrarySource({
+              url: url,
+              id: id,
+              tags: new Array<Tag>(),
+            }));
+            id += 1;
+          }
+          this.props.onUpdateLibrary(newLibrary);
+
+          // Loop until we run out of blogs
+          setTimeout(redditImportLoop, 1500);
+          this.setState({next: subscriptionListing[subscriptionListing.length - 1].name, currentProgress: this.state.currentProgress + 1});
+        } else {
+          this.setState({next: "", currentProgress: 0, totalProgress: 0, redditInProgress: false});
+          alert("Reddit Subscription Import has completed");
+        }
+      }).catch((err: any) => {
+        // If user is not authenticated for subscriptions, prompt to re-authenticate
+        if (err.statusCode == 403) {
+          alert("You have not authorized FlipFlip to work with Reddit subscriptions. Visit config and authorize FlipFlip to work with Reddit.");
+          const newConfig = this.props.config;
+          newConfig.remoteSettings.redditRefreshToken = "";
+          this.props.onUpdateConfig(newConfig);
+          this.setState({currentProgress: 0, totalProgress: 0, redditInProgress: false});
+        } else {
+          alert("Error retrieving subscriptions: " + err);
+          this.setState({currentProgress: 0, totalProgress: 0, redditInProgress: false});
+          console.error(err);
+        }
+      });
+    };
+
+    // Show progress bar and kick off loop
+    alert("Your Reddit subscriptions are being imported... You will recieve an alert when the import is finished.");
+    this.setState({totalProgress: 1, redditInProgress: true});
+    redditImportLoop();
+  }
+
+  importTumblr() {
     // If we don't have an import running
-    if (this.state.total == 0) {
+    if (this.state.totalProgress == 0) {
       // Build our Tumblr client
       const client = tumblr.createClient({
         consumer_key: this.props.config.remoteSettings.tumblrKey,
@@ -95,12 +175,12 @@ export default class Library extends React.Component {
 
       // Define our loop
       const tumblrImportLoop = () => {
-        const page = this.state.current;
+        const page = this.state.currentProgress;
         // Get the next page of blogs
         client.userFollowing({offset: page * 20}, (err, data) => {
           if (err) {
             alert("Error retrieving following: " + err);
-            this.setState({current: 0, total: 0, showProgress: false});
+            this.setState({currentProgress: 0, totalProgress: 0, showProgress: false});
             console.error(err);
             return;
           }
@@ -134,13 +214,13 @@ export default class Library extends React.Component {
           this.props.onUpdateLibrary(newLibrary);
 
           // Update progress
-          this.setState({current: page + 1});
+          this.setState({currentProgress: page + 1});
 
           // Loop until we run out of blogs
-          if ((page + 1) < this.state.total) {
+          if ((page + 1) < this.state.totalProgress) {
             setTimeout(tumblrImportLoop, 1500);
           } else {
-            this.setState({current: 0, total: 0, showProgress: false});
+            this.setState({currentProgress: 0, totalProgress: 0, showProgress: false});
             alert("Tumblr Following Import has completed");
           }
         });
@@ -155,7 +235,7 @@ export default class Library extends React.Component {
         }
 
         // Show progress bar and kick off loop
-        this.setState({current: 0, total: Math.ceil(data.total_blogs / 20), showProgress: true});
+        this.setState({currentProgress: 0, totalProgress: Math.ceil(data.total_blogs / 20), showProgress: true});
         tumblrImportLoop();
       });
     } else {
