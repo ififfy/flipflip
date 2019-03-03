@@ -27,6 +27,7 @@ export default class ConfigForm extends React.Component {
     onBackup(): void,
     onRestore(backupFile: string): void,
     onClean(): void,
+    onClearReddit(): void,
   };
 
   readonly state = {
@@ -86,6 +87,7 @@ export default class ConfigForm extends React.Component {
           <APIGroup
             settings={this.state.config.remoteSettings}
             activateReddit={this.showActivateRedditNotice.bind(this)}
+            clearReddit={this.props.onClearReddit.bind(this)}
             activateTumblr={this.showActivateTumblrNotice.bind(this)}
             onUpdateSettings={this.onUpdateRemoteSettings.bind(this)}/>
 
@@ -110,7 +112,7 @@ export default class ConfigForm extends React.Component {
   }
 
   componentWillReceiveProps(props: any) {
-    if (props.config != this.props.config) {
+    if (props.config != this.state.config) {
       this.setState({config: props.config});
     }
   }
@@ -118,7 +120,8 @@ export default class ConfigForm extends React.Component {
   showActivateRedditNotice() {
     const messages = Array<string>();
     messages.push("You are about to be directed to Reddit.com to authorize FlipFlip. You should only have to do this once.");
-    messages.push("Currently, this is only used for finding images. FlipFlip does not request or store any user information.");
+    messages.push("This is used for finding images on subreddits and user accounts as well as importing your subscriptions.");
+    messages.push("FlipFlip does not store any user information or make any changes to your account.");
     this.setState({modalTitle: "Authorize FlipFlip on Reddit", modalMessages: messages, modalFunction: this.activateReddit });
   }
 
@@ -126,7 +129,7 @@ export default class ConfigForm extends React.Component {
     const messages = Array<string>();
     messages.push("You are about to be directed to Tumblr.com to authorize FlipFlip. You should only have to do this once. You do not need to do this to use Tumblr sources.");
     messages.push("Tumblr has no Read-Only mode, so read AND write access are requested.");
-    messages.push("FlipFlip will only access the blogs you are following (for import) and will not read from, write to, or edit your account in any other form.");
+    messages.push("FlipFlip does not store any user information or make any changes to your account.");
     this.setState({modalTitle: "Authorize FlipFlip on Tumblr", modalMessages: messages, modalFunction: this.activateTumblr });
   }
 
@@ -199,7 +202,7 @@ export default class ConfigForm extends React.Component {
 
     // Make initial request and open authorization form in browser
     wretch("https://www.reddit.com/api/v1/authorize?client_id=" + clientID + "&response_type=code&state=" + deviceID +
-      "&redirect_uri=http://localhost:65010&duration=permanent&scope=read,mysubreddits")
+      "&redirect_uri=http://localhost:65010&duration=permanent&scope=read,mysubreddits,history")
       .post()
       .res(res => {
         remote.shell.openExternal(res.url);

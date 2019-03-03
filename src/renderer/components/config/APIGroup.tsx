@@ -8,6 +8,7 @@ export default class APIGroup extends React.Component {
   readonly props: {
     settings: RemoteSettings
     activateReddit(): void,
+    clearReddit(): void,
     activateTumblr(): void,
     onUpdateSettings(keys: RemoteSettings, fn: (keys: RemoteSettings) => void): void,
   };
@@ -42,6 +43,8 @@ export default class APIGroup extends React.Component {
         <div className="ControlSubgroup">
           <button onClick={!redditAuthorized ? this.props.activateReddit.bind(this) : this.nop}
                   className={`u-button ${!redditAuthorized ? 'u-clickable' : 'u-disabled'}`}>Authorize FlipFlip on Reddit</button>
+          <button onClick={redditAuthorized ? this.props.clearReddit.bind(this) : this.nop}
+                  className={`u-button ${redditAuthorized ? 'u-clickable' : 'u-disabled'}`}>Clear Reddit Token</button>
         </div>
       </ControlGroup>
     )
