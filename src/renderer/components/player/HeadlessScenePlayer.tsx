@@ -67,7 +67,7 @@ function getPromise(config: Config, url: string, filter: string, next: any, over
       timeout = 8000;
     } else if (sourceType == ST.reddit) {
       promiseFunction = loadReddit;
-      timeout = 5000;
+      timeout = 3000;
     }
     if (next == -1) {
       const cachePath = getCachePath(url, config);
