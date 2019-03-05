@@ -185,7 +185,7 @@ function loadReddit(config: Config, url: string, filter: string, next: any, over
           reddit.getSubreddit(getFileGroup(url)).getHot({after: next}).then((submissionListing: any) => {
             if (submissionListing.length > 0) {
               resolve({
-                data: submissionListing.map((s: any) => s.url),
+                data: submissionListing.map((s: any) => s.url).filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
                 next: submissionListing[submissionListing.length - 1].name
               });
             } else {
@@ -196,7 +196,7 @@ function loadReddit(config: Config, url: string, filter: string, next: any, over
           reddit.getUser(getFileGroup(url)).getSubmissions({after: next}).then((submissionListing: any) => {
             if (submissionListing.length > 0) {
               resolve({
-                data: submissionListing.map((s: any) => s.url),
+                data: submissionListing.map((s: any) => s.url).filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
                 next: submissionListing[submissionListing.length - 1].name
               });
             } else {

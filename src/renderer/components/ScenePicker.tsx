@@ -181,7 +181,7 @@ export default class ScenePicker extends React.Component {
       case SF.alphaA:
         this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
           const aName = a.name.toLowerCase();
-          const bName = b.name.toLocaleLowerCase();
+          const bName = b.name.toLowerCase();
           if (aName < bName) {
             return -1;
           } else if (aName > bName) {
@@ -194,7 +194,7 @@ export default class ScenePicker extends React.Component {
       case SF.alphaD:
         this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
           const aName = a.name.toLowerCase();
-          const bName = b.name.toLocaleLowerCase();
+          const bName = b.name.toLowerCase();
           if (aName > bName) {
             return -1;
           } else if (aName < bName) {
@@ -234,7 +234,7 @@ export default class ScenePicker extends React.Component {
             return 1;
           } else {
             const aName = a.name.toLowerCase();
-            const bName = a.name.toLocaleLowerCase();
+            const bName = a.name.toLowerCase();
             if (aName < bName) {
               return -1;
             } else if (a.name > b.name) {
