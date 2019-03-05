@@ -386,27 +386,43 @@ export default class SourcePicker extends React.Component {
     switch (algorithm) {
       case SF.alphaA:
         this.props.onUpdateSources(this.props.sources.sort((a, b) => {
-          const aType = getFileGroup(a.url);
-          const bType = getFileGroup(b.url);
-          if (aType < bType) {
+          const aName = getFileGroup(a.url).toLowerCase();
+          const bName = getFileGroup(b.url).toLowerCase();
+          if (aName < bName) {
             return -1;
-          } else if (aType > bType) {
+          } else if (aName > bName) {
             return 1;
           } else {
-            return 0;
+            const aType = getSourceType(a.url);
+            const bType = getSourceType(b.url);
+            if (aType > bType) {
+              return -1;
+            } else if (aType < bType) {
+              return 1;
+            } else {
+              return 0;
+            }
           }
         }));
         break;
       case SF.alphaD:
         this.props.onUpdateSources(this.props.sources.sort((a, b) => {
-          const aType = getFileGroup(a.url);
-          const bType = getFileGroup(b.url);
-          if (aType > bType) {
+          const aName = getFileGroup(a.url).toLowerCase();
+          const bName = getFileGroup(b.url).toLowerCase();
+          if (aName > bName) {
             return -1;
-          } else if (aType < bType) {
+          } else if (aName < bName) {
             return 1;
           } else {
-            return 0;
+            const aType = getSourceType(a.url);
+            const bType = getSourceType(b.url);
+            if (aType > bType) {
+              return -1;
+            } else if (aType < bType) {
+              return 1;
+            } else {
+              return 0;
+            }
           }
         }));
         break;
