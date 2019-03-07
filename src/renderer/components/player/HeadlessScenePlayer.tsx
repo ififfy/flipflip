@@ -16,6 +16,11 @@ import Progress from '../ui/Progress';
 
 let redditAlerted = false;
 
+// Returns true if array is empty, or only contains empty arrays
+const isEmpty = function (allURLs: any[]): boolean {
+  return Array.isArray(allURLs) && allURLs.every(isEmpty);
+};
+
 function isImage(path: string): boolean {
   const p = path.toLowerCase();
   if (p.endsWith('.gif')) return true;
@@ -235,7 +240,7 @@ export default class HeadlessScenePlayer extends React.Component {
     deleteHack?: ChildCallbackHack,
     setHistoryOffset: (historyOffset: number) => void,
     setHistoryPaths: (historyPaths: Array<HTMLImageElement>) => void,
-    didFinishLoading: () => void,
+    didFinishLoading: (empty?: boolean) => void,
   };
 
   readonly state = {
@@ -249,11 +254,6 @@ export default class HeadlessScenePlayer extends React.Component {
   };
 
   render() {
-    // Returns true if array is empty, or only contains empty arrays
-    const isEmpty = function (allURLs: any[]): boolean {
-      return Array.isArray(allURLs) && allURLs.every(isEmpty);
-    };
-
     const showImagePlayer = this.state.onLoaded != null;
     const showLoadingIndicator = this.props.showLoadingState && !this.state.isLoaded;
     const showEmptyIndicator = this.props.showEmptyState && this.state.isLoaded && isEmpty(Array.from(this.state.allURLs.values()));
@@ -351,7 +351,7 @@ export default class HeadlessScenePlayer extends React.Component {
             sourceLoop();
           } else {
             this.setState({allURLs: newAllURLs, onLoaded: this.onLoaded, promiseQueue: newPromiseQueue});
-            setTimeout(this.props.didFinishLoading, 0);
+            setTimeout(this.props.didFinishLoading.bind(this, isEmpty(Array.from(newAllURLs.values()))), 0);
             // All sources have been initialized, start our remote promise loop
             promiseLoop();
           }

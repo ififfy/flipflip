@@ -58,6 +58,7 @@ export default class Player extends React.Component {
   readonly state = {
     isMainLoaded: false,
     isOverlayLoaded: false,
+    isEmpty: false,
     isPlaying: false,
     historyOffset: 0,
     historyPaths: Array<HTMLImageElement>(),
@@ -72,7 +73,7 @@ export default class Player extends React.Component {
       ? (Sound as any).status.PLAYING
       : (Sound as any).status.PAUSED;
     const tagNames = this.props.tags ? this.props.tags.map((t) => t.name) : [];
-    const isLoaded = this.state.isMainLoaded && (!this.props.overlayScene || this.state.isOverlayLoaded);
+    const isLoaded = this.state.isMainLoaded && (!this.props.overlayScene || this.state.isOverlayLoaded) && !this.state.isEmpty;
     const overlayStrobe = this.props.scene.strobe && this.props.scene.strobeOverlay;
     const showCaptionProgram = (
       isLoaded &&
@@ -105,7 +106,7 @@ export default class Player extends React.Component {
               opacity={this.props.scene.overlaySceneOpacity}
               scene={this.props.overlayScene}
               historyOffset={0}
-              isPlaying={this.state.isPlaying}
+              isPlaying={this.state.isPlaying && !this.state.isEmpty}
               showLoadingState={this.state.isMainLoaded && !this.state.isOverlayLoaded}
               showEmptyState={false}
               didFinishLoading={this.playOverlay.bind(this)}
@@ -130,7 +131,7 @@ export default class Player extends React.Component {
 
         <div className={`u-button-row ${this.state.isPlaying ? 'u-show-on-hover-only' : ''}`}>
           <div className="u-button-row-right">
-            {this.props.scene.audioURL && (
+            {this.props.scene.audioURL && isLoaded && (
               <Sound
                 url={this.props.scene.audioURL}
                 playStatus={audioPlayStatus}
@@ -317,8 +318,8 @@ export default class Player extends React.Component {
     this.setState({isPlaying: true, historyOffset: 0});
   }
 
-  playMain() {
-    this.setState({isMainLoaded: true});
+  playMain(empty: boolean) {
+    this.setState({isMainLoaded: true, isEmpty: empty});
     if (!this.props.overlayScene || this.state.isOverlayLoaded) {
       this.play();
     }
