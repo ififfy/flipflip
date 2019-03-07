@@ -4,7 +4,7 @@ import Sortable from "sortablejs";
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 
 import {SF} from "../../const";
-import {arrayMove, getFileGroup, getSourceType, removeDuplicatesBy} from "../../utils";
+import {arrayMove, getFileGroup, getSourceType} from "../../utils";
 import LibrarySource from "../library/LibrarySource";
 import Tag from "../library/Tag";
 import URLModal from "../sceneDetail/URLModal";
@@ -428,9 +428,11 @@ export default class SourcePicker extends React.Component {
         break;
       case SF.alphaFullA:
         this.props.onUpdateSources(this.props.sources.sort((a, b) => {
-          if (a.url < b.url) {
+          const aUrl = a.url.toLowerCase();
+          const bUrl = b.url.toLocaleLowerCase();
+          if (aUrl < bUrl) {
             return -1;
-          } else if (a.url > b.url) {
+          } else if (aUrl > bUrl) {
             return 1;
           } else {
             return 0;
@@ -439,9 +441,11 @@ export default class SourcePicker extends React.Component {
         break;
       case SF.alphaFullD:
         this.props.onUpdateSources(this.props.sources.sort((a, b) => {
-          if (a.url > b.url) {
+          const aUrl = a.url.toLowerCase();
+          const bUrl = b.url.toLocaleLowerCase();
+          if (aUrl > bUrl) {
             return -1;
-          } else if (a.url < b.url) {
+          } else if (aUrl < bUrl) {
             return 1;
           } else {
             return 0;

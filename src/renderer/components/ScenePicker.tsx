@@ -180,9 +180,11 @@ export default class ScenePicker extends React.Component {
     switch (algorithm) {
       case SF.alphaA:
         this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
-          if (a.name < b.name) {
+          const aName = a.name.toLowerCase();
+          const bName = b.name.toLowerCase();
+          if (aName < bName) {
             return -1;
-          } else if (a.name > b.name) {
+          } else if (aName > bName) {
             return 1;
           } else {
             return 0;
@@ -191,9 +193,11 @@ export default class ScenePicker extends React.Component {
         break;
       case SF.alphaD:
         this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
-          if (a.name > b.name) {
+          const aName = a.name.toLowerCase();
+          const bName = b.name.toLowerCase();
+          if (aName > bName) {
             return -1;
-          } else if (a.name < b.name) {
+          } else if (aName < bName) {
             return 1;
           } else {
             return 0;
@@ -229,7 +233,9 @@ export default class ScenePicker extends React.Component {
           } else if (a.tagWeights && !b.tagWeights) {
             return 1;
           } else {
-            if (a.name < b.name) {
+            const aName = a.name.toLowerCase();
+            const bName = a.name.toLowerCase();
+            if (aName < bName) {
               return -1;
             } else if (a.name > b.name) {
               return 1;
