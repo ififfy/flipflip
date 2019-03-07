@@ -8,13 +8,18 @@ export default class APIGroup extends React.Component {
   readonly props: {
     settings: RemoteSettings
     activateReddit(): void,
+    clearReddit(): void,
+    activateTumblr(): void,
     onUpdateSettings(keys: RemoteSettings, fn: (keys: RemoteSettings) => void): void,
   };
 
   render() {
+    const tumblrAuthorized = (this.props.settings.tumblrOAuthToken && this.props.settings.tumblrOAuthToken != "") &&
+                             (this.props.settings.tumblrOAuthTokenSecret && this.props.settings.tumblrOAuthTokenSecret != "");
+    const redditAuthorized = this.props.settings.redditRefreshToken && this.props.settings.redditRefreshToken != "";
     return (
       <ControlGroup title="API Keys" isNarrow={true}>
-        <div className="ControlSubgroup">
+        <div className="ControlSubgroup" style={{display: 'block'}}>
           <SimpleTextInput
             isEnabled={true}
             label="Default Tumblr API Key"
@@ -31,11 +36,15 @@ export default class APIGroup extends React.Component {
             {" "}
             <button onClick={this.paste.bind(this, this.changeKey.bind(this, 'tumblrOverlay').bind(this))}>Paste</button>
           </SimpleTextInput>
+          <button onClick={!tumblrAuthorized ? this.props.activateTumblr.bind(this) : this.nop}
+                  className={`u-button ${!tumblrAuthorized ? 'u-clickable' : 'u-disabled'}`}>Authorize FlipFlip on Tumblr</button>
         </div>
         <hr/>
         <div className="ControlSubgroup">
-          <button onClick={this.props.settings.redditRefreshToken == "" ? this.props.activateReddit.bind(this) : this.nop}
-                  className={`u-button ${this.props.settings.redditRefreshToken == "" ? 'u-clickable' : 'u-disabled'}`}>Authorize FlipFlip on Reddit</button>
+          <button onClick={!redditAuthorized ? this.props.activateReddit.bind(this) : this.nop}
+                  className={`u-button ${!redditAuthorized ? 'u-clickable' : 'u-disabled'}`}>Authorize FlipFlip on Reddit</button>
+          <button onClick={redditAuthorized ? this.props.clearReddit.bind(this) : this.nop}
+                  className={`u-button ${redditAuthorized ? 'u-clickable' : 'u-disabled'}`}>Clear Reddit Token</button>
         </div>
       </ControlGroup>
     )

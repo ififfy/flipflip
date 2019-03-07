@@ -36,6 +36,7 @@
     "get-folder-size": "^2.0.1",
     "gif-info": "^1.0.1",
     "lodash": "^4.17.11",
+    "oauth": "^0.9.15",
     "progressbar.js": "^1.0.1",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
@@ -46,6 +47,7 @@
     "snoowrap": "^1.15.2",
     "sortablejs": "^1.8.1",
     "system-font-families": "^0.4.1",
+    "tumblr.js": "^2.0.0",
     "wretch": "^1.4.2"
   }
 }
