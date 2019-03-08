@@ -77,7 +77,6 @@ export default class ConfigForm extends React.Component {
 
           <TextGroup
             scene={this.state.config.defaultScene}
-            isPlayer={false}
             onUpdateScene={this.onUpdateDefaultScene.bind(this)}/>
 
           <CacheGroup

@@ -3,22 +3,6 @@ import wretch from 'wretch';
 
 import {CancelablePromise, getRandomListItem} from '../../utils'
 
-class CaptionSettings {
-  blinkColor: string;
-  blinkFontSize: number;
-  blinkFontFamily: string;
-  captionColor: string;
-  captionFontSize: number;
-  captionFontFamily: string;
-  captionBigColor: string;
-  captionBigFontSize: number;
-  captionBigFontFamily: string;
-
-  constructor(init?: Partial<CaptionSettings>) {
-    Object.assign(this, init);
-  }
-}
-
 let STYLES: { [style: string]: string } = {};
 
 let programCounter = 0;
@@ -60,140 +44,6 @@ const fnIntArg = function (innerFn: Function) {
     if (isNaN(ms)) { return null; }
     return innerFn(ms);
   };
-};
-
-const COMMANDS: { [command: string]: (el: HTMLElement, value: string, config: CaptionSettings) => any; } = {
-  saveStyleRules: function (el: HTMLElement, value: string) {
-    const firstWord = getFirstWord(value);
-    const style = getRest(value);
-    if (!firstWord || !style) { return null; }
-
-    STYLES[firstWord] = STYLES[firstWord] || '';
-    STYLES[firstWord] += style;
-
-    return function(f : Function) { f() };
-  },
-
-  applySavedStyle: function (el: HTMLElement, value: string) {
-    return function (runNextCommand: Function) {
-      el.style.cssText = STYLES[value];
-      runNextCommand();
-    }
-  },
-
-  showText: function (el: HTMLElement, value: string) {
-    let textString = getRest(value);
-    const msString = getFirstWord(value);
-    const ms = parseInt(msString, 10);
-    if (!textString || isNaN(ms)) { return null; }
-
-    if (textString === '$RANDOM_PHRASE') {
-      textString = getRandomListItem(PHRASES);
-    }
-
-    return function (runNextCommand: Function) {
-      el.style.opacity = '1.0';
-      el.innerHTML = textString;
-      setTimeout(function () {
-        el.style.opacity = '0.0';
-        runNextCommand();
-      }, ms);
-    }
-  },
-
-  wait: fnIntArg(function(ms : number) {
-    return function(runNextCommand : Function) { setTimeout(runNextCommand, ms); }
-  }),
-
-  setBlinkDuration: fnIntArg(function (ms: number) {
-    return function (runNextCommand: Function) {
-      BLINK_DURATION = ms;
-      runNextCommand();
-    }
-  }),
-
-  setBlinkDelay: fnIntArg(function (ms: number) {
-    return function (runNextCommand: Function) {
-      BLINK_DELAY = ms;
-      runNextCommand();
-    }
-  }),
-
-  setBlinkGroupDelay: fnIntArg(function (ms: number) {
-    return function (runNextCommand: Function) {
-      BLINK_GROUP_DELAY = ms;
-      runNextCommand();
-    }
-  }),
-
-  setCaptionDuration: fnIntArg(function (ms: number) {
-    return function (runNextCommand: Function) {
-      CAPTION_DURATION = ms;
-      runNextCommand();
-    }
-  }),
-
-  setCaptionDelay: fnIntArg(function (ms: number) {
-    return function (runNextCommand: Function) {
-      CAPTION_DELAY = ms;
-      runNextCommand();
-    }
-  }),
-
-  storePhrase: function (el: HTMLElement, value: string) {
-    PHRASES.push(value);
-    return function(f : Function) { f() };
-  },
-
-  blink: function (el: HTMLElement, value: string, config: CaptionSettings) {
-    return function (runNextCommand: Function) {
-      let fns: Function[] = [];
-      let i = 0;
-      el.style.color = config.blinkColor;
-      el.style.fontSize = config.blinkFontSize + "vmin";
-      el.style.fontFamily = config.blinkFontFamily;
-      el.className = "text-blink";
-      value.split('/').forEach(function (word) {
-        word = word.trim();
-        let j = i;
-        i += 1;
-        fns.push(function () {
-          const showText = COMMANDS.showText(el, BLINK_DURATION + ' ' + word, config);
-          const wait = COMMANDS.wait(el, '' + BLINK_DELAY, config);
-          showText(function() { wait(fns[j + 1]); });
-        })
-      });
-      const lastWait = COMMANDS.wait(el, '' + BLINK_GROUP_DELAY, config);
-      fns.push(function () {
-        lastWait(runNextCommand);
-      });
-      fns[0]();
-    }
-  },
-
-  cap: function (el: HTMLElement, value: string, config: CaptionSettings) {
-    const showText = COMMANDS.showText(el, CAPTION_DURATION + ' ' + value, config);
-    const wait = COMMANDS.wait(el, '' + CAPTION_DELAY, config);
-    return function (runNextCommand: Function) {
-      el.style.color = config.captionColor;
-      el.style.fontSize = config.captionFontSize + "vmin";
-      el.style.fontFamily = config.captionFontFamily;
-      el.className = "text-caption";
-      showText(function() { wait(runNextCommand); });
-    }
-  },
-
-  bigcap: function (el: HTMLElement, value: string, config: CaptionSettings) {
-    const showText = COMMANDS.showText(el, CAPTION_DURATION + ' ' + value, config);
-    const wait = COMMANDS.wait(el, '' + CAPTION_DELAY, config);
-    return function (runNextCommand: Function) {
-      el.style.color = config.captionBigColor;
-      el.style.fontSize = config.captionBigFontSize + "vmin";
-      el.style.fontFamily = config.captionBigFontFamily;
-      el.className = "text-caption-big";
-      showText(function() { wait(runNextCommand); });
-    }
-  }
 };
 
 export default class CaptionProgram extends React.Component {
@@ -262,17 +112,6 @@ export default class CaptionProgram extends React.Component {
     newPromise
       .then((data) => {
         let hasError = false;
-        const captionSettings = new CaptionSettings({
-          blinkColor: this.props.blinkColor,
-          blinkFontSize: this.props.blinkFontSize,
-          blinkFontFamily: this.props.blinkFontFamily,
-          captionColor: this.props.captionColor,
-          captionFontSize: this.props.captionFontSize,
-          captionFontFamily: this.props.captionFontFamily,
-          captionBigColor: this.props.captionBigColor,
-          captionBigFontSize: this.props.captionBigFontSize,
-          captionBigFontFamily: this.props.captionBigFontFamily,
-        });
         for (let line of data.data[0].split('\n')) {
           line = line.trim();
 
@@ -281,8 +120,8 @@ export default class CaptionProgram extends React.Component {
           const command = getFirstWord(line);
           if (command) {
             const value = getRest(line);
-            if (COMMANDS[command]) {
-              const fn = COMMANDS[command](this.el.current, value, captionSettings);
+            if (this.COMMANDS[command]) {
+              const fn = this.COMMANDS[command](this.el.current, value);
               if (fn) {
                 if (command.toLowerCase().startsWith("set")) {
                   fn(() => {return newPromise.hasCanceled;});
@@ -327,4 +166,138 @@ export default class CaptionProgram extends React.Component {
       if (setState) this.setState({runningPromise: null});
     }
   }
+
+  COMMANDS: { [command: string]: (el: HTMLElement, value: string) => any; } = {
+    saveStyleRules: function (el: HTMLElement, value: string) {
+      const firstWord = getFirstWord(value);
+      const style = getRest(value);
+      if (!firstWord || !style) { return null; }
+
+      STYLES[firstWord] = STYLES[firstWord] || '';
+      STYLES[firstWord] += style;
+
+      return function(f : Function) { f() };
+    },
+
+    applySavedStyle: function (el: HTMLElement, value: string) {
+      return function (runNextCommand: Function) {
+        el.style.cssText = STYLES[value];
+        runNextCommand();
+      }
+    },
+
+    showText: function (el: HTMLElement, value: string) {
+      let textString = getRest(value);
+      const msString = getFirstWord(value);
+      const ms = parseInt(msString, 10);
+      if (!textString || isNaN(ms)) { return null; }
+
+      if (textString === '$RANDOM_PHRASE') {
+        textString = getRandomListItem(PHRASES);
+      }
+
+      return function (runNextCommand: Function) {
+        el.style.opacity = '1.0';
+        el.innerHTML = textString;
+        setTimeout(function () {
+          el.style.opacity = '0.0';
+          runNextCommand();
+        }, ms);
+      }
+    },
+
+    wait: fnIntArg(function(ms : number) {
+      return function(runNextCommand : Function) { setTimeout(runNextCommand, ms); }
+    }),
+
+    setBlinkDuration: fnIntArg(function (ms: number) {
+      return function (runNextCommand: Function) {
+        BLINK_DURATION = ms;
+        runNextCommand();
+      }
+    }),
+
+    setBlinkDelay: fnIntArg(function (ms: number) {
+      return function (runNextCommand: Function) {
+        BLINK_DELAY = ms;
+        runNextCommand();
+      }
+    }),
+
+    setBlinkGroupDelay: fnIntArg(function (ms: number) {
+      return function (runNextCommand: Function) {
+        BLINK_GROUP_DELAY = ms;
+        runNextCommand();
+      }
+    }),
+
+    setCaptionDuration: fnIntArg(function (ms: number) {
+      return function (runNextCommand: Function) {
+        CAPTION_DURATION = ms;
+        runNextCommand();
+      }
+    }),
+
+    setCaptionDelay: fnIntArg(function (ms: number) {
+      return function (runNextCommand: Function) {
+        CAPTION_DELAY = ms;
+        runNextCommand();
+      }
+    }),
+
+    storePhrase: function (el: HTMLElement, value: string) {
+      PHRASES.push(value);
+      return function(f : Function) { f() };
+    },
+
+    blink: function(this: CaptionProgram, el: HTMLElement, value: string) {
+      return function (this: CaptionProgram, runNextCommand: Function) {
+        let fns: Function[] = [];
+        let i = 0;
+        el.style.color = this.props.blinkColor;
+        el.style.fontSize = this.props.blinkFontSize + "vmin";
+        el.style.fontFamily = this.props.blinkFontFamily;
+        el.className = "text-blink";
+        value.split('/').forEach(function (this: CaptionProgram, word: string) {
+          word = word.trim();
+          let j = i;
+          i += 1;
+          fns.push(function (this: CaptionProgram) {
+            const showText = this.COMMANDS.showText(el, BLINK_DURATION + ' ' + word);
+            const wait = this.COMMANDS.wait(el, '' + BLINK_DELAY);
+            showText(function() { wait(fns[j + 1]); });
+          }.bind(this))
+        }.bind(this));
+        const lastWait = this.COMMANDS.wait(el, '' + BLINK_GROUP_DELAY);
+        fns.push(function () {
+          lastWait(runNextCommand);
+        });
+        fns[0]();
+      }.bind(this);
+    }.bind(this),
+
+    cap: function (this: CaptionProgram, el: HTMLElement, value: string) {
+      const showText = this.COMMANDS.showText(el, CAPTION_DURATION + ' ' + value);
+      const wait = this.COMMANDS.wait(el, '' + CAPTION_DELAY);
+      return function (this: CaptionProgram, runNextCommand: Function) {
+        el.style.color = this.props.captionColor;
+        el.style.fontSize = this.props.captionFontSize + "vmin";
+        el.style.fontFamily = this.props.captionFontFamily;
+        el.className = "text-caption";
+        showText(function() { wait(runNextCommand); });
+      }.bind(this)
+    }.bind(this),
+
+    bigcap: function (this: CaptionProgram, el: HTMLElement, value: string) {
+      const showText = this.COMMANDS.showText(el, CAPTION_DURATION + ' ' + value);
+      const wait = this.COMMANDS.wait(el, '' + CAPTION_DELAY);
+      return function (this: CaptionProgram, runNextCommand: Function) {
+        el.style.color = this.props.captionBigColor;
+        el.style.fontSize = this.props.captionBigFontSize + "vmin";
+        el.style.fontFamily = this.props.captionBigFontFamily;
+        el.className = "text-caption-big";
+        showText(function() { wait(runNextCommand); });
+      }.bind(this)
+    }.bind(this)
+  };
 }

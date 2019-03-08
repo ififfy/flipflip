@@ -188,7 +188,6 @@ export default class Player extends React.Component {
 
             <TextGroup
               scene={this.props.scene}
-              isPlayer={true}
               onUpdateScene={this.props.onUpdateScene.bind(this)}/>
           </div>
         )}
