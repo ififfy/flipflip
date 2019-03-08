@@ -39,32 +39,8 @@ export default class SourcePicker extends React.Component {
   };
 
   render() {
-    let displaySources = [];
-    const untagged = this.state.filters.length == 1 && this.state.filters[0] == null;
     const filtering = this.state.filters.length > 0;
-    if (filtering) {
-      for (let source of this.props.sources) {
-        let matchesFilter = true;
-        if (untagged) {
-          if (source.tags.length > 0) {
-            matchesFilter = false;
-          }
-        } else {
-          for (let filter of this.state.filters) {
-            if (!source.tags.map((s) => s.name).includes(filter)) {
-              matchesFilter = false;
-              break;
-            }
-          }
-        }
-        if (matchesFilter) {
-          displaySources.push(source);
-        }
-      }
-    } else {
-      displaySources = this.props.sources;
-    }
-
+    const displaySources = this.getDisplaySources();
     const tags = new Map<string, number>();
     let untaggedCount = 0;
     const options = Array<{ label: string, value: string }>();
@@ -144,19 +120,30 @@ export default class SourcePicker extends React.Component {
             </div>
           )}
           {this.props.isSelect && (
-            <div className={`u-button u-float-left ${this.state.selected.length > 0 ? 'u-clickable' : 'u-disabled'}`}
-                 onClick={this.state.selected.length > 0 ? this.props.importSourcesFromLibrary.bind(this, this.state.selected) : this.nop}>Import
-              Selected
+            <div className="SourcePicker_SelectButtons">
+              <div className={`u-button u-float-left ${this.state.selected.length > 0 ? 'u-clickable' : 'u-disabled'}`}
+                   onClick={this.state.selected.length > 0 ? this.props.importSourcesFromLibrary.bind(this, this.state.selected) : this.nop}>
+                Import Selected {this.state.selected.length > 0 ? "(" + this.state.selected.length + ")" : ""}
+              </div>
+              <div className="SourcePicker_SelectAllNone">
+                <a href="#" onClick={this.onSelectAll.bind(this)}>
+                  Select All
+                </a>
+                <a href="#" onClick={this.onSelectNone.bind(this)}>
+                  Select None
+                </a>
+              </div>
             </div>
           )}
           {!this.props.isSelect && (
             <div className={`u-button u-float-left ${this.props.sources.length == 0 ? 'u-disabled' : 'u-clickable'} `}
-                 onClick={this.props.sources.length == 0 ? this.nop : this.toggleRemoveAllModal.bind(this)}>- Remove All
+                 onClick={this.props.sources.length == 0 ? this.nop : this.toggleRemoveAllModal.bind(this)}>
+              - Remove All
             </div>
           )}
         </div>
 
-        <div id="sources" className="SourcePicker__Sources">
+        <div id="sources" className={`SourcePicker__Sources ${this.props.isSelect ? 'm-select' : ''}`}>
           {displaySources.length == 0 && (
             <div className="SourcePicker__Empty">
               {filtering ? "No results" : this.props.emptyMessage}
@@ -377,6 +364,28 @@ export default class SourcePicker extends React.Component {
     this.setState({selected: newSelected});
   }
 
+  onSelectAll() {
+    const displaySources = this.getDisplaySources();
+    const newSelected = this.state.selected;
+    for (let source of displaySources.map((s) => s.url)) {
+      if (!newSelected.includes(source)) {
+        newSelected.push(source);
+      }
+    }
+    this.setState({selected: newSelected});
+  }
+
+  onSelectNone() {
+    const displaySources = this.getDisplaySources();
+    const newSelected = this.state.selected;
+    for (let source of displaySources.map((s) => s.url)) {
+      if (newSelected.includes(source)) {
+        newSelected.splice(newSelected.indexOf(source), 1)
+      }
+    }
+    this.setState({selected: newSelected});
+  }
+
   onFilter(tags: Array<{ label: string, value: string }>) {
     this.state.sortable.option("disabled", tags.length > 0);
     this.setState({filters: tags.map((t) => t.value)});
@@ -488,5 +497,34 @@ export default class SourcePicker extends React.Component {
         }));
         break;
     }
+  }
+
+  getDisplaySources() {
+    let displaySources = [];
+    const untagged = this.state.filters.length == 1 && this.state.filters[0] == null;
+    const filtering = this.state.filters.length > 0;
+    if (filtering) {
+      for (let source of this.props.sources) {
+        let matchesFilter = true;
+        if (untagged) {
+          if (source.tags.length > 0) {
+            matchesFilter = false;
+          }
+        } else {
+          for (let filter of this.state.filters) {
+            if (!source.tags.map((s) => s.name).includes(filter)) {
+              matchesFilter = false;
+              break;
+            }
+          }
+        }
+        if (matchesFilter) {
+          displaySources.push(source);
+        }
+      }
+    } else {
+      displaySources = this.props.sources;
+    }
+    return displaySources;
   }
 };
