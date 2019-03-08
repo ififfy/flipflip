@@ -104,27 +104,32 @@ export default class SceneGenerator extends React.Component {
             // If this weight hasn't been set before, it won't be in the map
             const mapTagArray =  Array.from(tagWeights.keys()).filter((t) => t.id == tag.id);
             const found = mapTagArray.length > 0;
+            const weight = found ? tagWeights.get(mapTagArray[0]).value : 0;
+            const type = found ? tagWeights.get(mapTagArray[0]).type : TT.weight;
             let percentage = "--";
-            if (sum > 0 && found && tagWeights.get(mapTagArray[0]).value > 0) {
-              percentage = Math.round((tagWeights.get(mapTagArray[0]).value / sum) * 100) + "%";
+            if (sum > 0 && weight > 0) {
+              percentage = Math.round((weight / sum) * 100) + "%";
             }
             return (
-              <ControlGroup key={tag.id} title={tag.name} isNarrow={true}>
-              <span>{"Weight " + (found ?
-                tagWeights.get(mapTagArray[0]).value : 0).toString()}</span>
-                <span>{"Percentage: " + percentage}</span>
+              <ControlGroup key={tag.id} title={tag.name} isNarrow={true}
+                            canCollapse={type == TT.weight && weight == 0}
+                            startCollapsed={type == TT.weight && weight == 0}
+                            bold={type != TT.weight || weight > 0}>
+                <span style={{fontWeight: type == TT.weight && weight > 0 ? "bolder" : "initial", opacity: type == TT.weight ? 1 : 0.3}}>{"Weight: " + weight}</span>
+                <span style={{fontWeight: type == TT.weight && percentage != "--" ? "bolder" : "initial", opacity: type == TT.weight ? 1 : 0.3}}>{"Percentage: " + percentage}</span>
                 <SimpleSliderInput
-                  isEnabled={found ? tagWeights.get(mapTagArray[0]).type == TT.weight : true}
+                  isEnabled={type == TT.weight}
                   onChange={this.onChangeTagWeight.bind(this, tag)}
                   label=""
                   min={0}
                   max={100}
-                  value={found ? tagWeights.get(mapTagArray[0]).value : 0}/>
+                  value={weight}/>
                 <SimpleRadioInput
                   label=""
                   groupName={tag.name}
-                  value={found ? tagWeights.get(mapTagArray[0]).type : TT.weight}
+                  value={type}
                   keys={Object.values(TT)}
+                  bold={true}
                   onChange={this.onChangeTagType.bind(this, tag)}
                 />
               </ControlGroup>
