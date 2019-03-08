@@ -106,7 +106,6 @@ export default class SceneDetail extends React.Component {
 
           <TextGroup
             scene={this.props.scene}
-            isPlayer={false}
             onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
           <div className="ControlGroup m-wide">

@@ -14,7 +14,6 @@ import SimpleURLInput from "../ui/SimpleURLInput";
 export default class TextGroup extends React.Component {
   readonly props: {
     scene: Scene | SceneSettings,
-    isPlayer: boolean,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 
@@ -46,11 +45,9 @@ export default class TextGroup extends React.Component {
             value={this.props.scene.textSource}/>
           <br/>
         </div>
-        {!this.props.isPlayer && (
-          <div className="ControlSubgroup">
-            <button className="AdvancedButton" onClick={this.toggleFontOptions.bind(this)}>Font Options</button>
-          </div>
-        )}
+        <div className="ControlSubgroup">
+          <button className="AdvancedButton" onClick={this.toggleFontOptions.bind(this)}>Font Options</button>
+        </div>
         {this.state.showFontSettings && (
           <div>
             <hr/>
