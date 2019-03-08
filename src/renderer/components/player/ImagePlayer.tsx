@@ -6,7 +6,7 @@ import {outputFile} from "fs-extra";
 import wretch from "wretch";
 import gifInfo from 'gif-info';
 import getFolderSize from "get-folder-size";
-
+import IdleTimer from 'react-idle-timer';
 
 import {BT, HTF, IF, ST, TF, VTF, ZF} from '../../const';
 import {getCachePath, getFileName, getRandomListItem, getSourceType, urlToPath} from '../../utils';
@@ -59,6 +59,7 @@ export default class ImagePlayer extends React.Component {
     timeoutID: 0,
     nextImageID: 0,
     restart: false,
+    hideCursor: false,
   };
 
   _isMounted = false;
@@ -123,9 +124,13 @@ export default class ImagePlayer extends React.Component {
     }
 
     return (
-      <div className={className} style={{
-        background: this.props.strobe ? this.props.strobeColor : "none",
-      }}>
+      <div className={className}
+           style={{background: this.props.strobe ? this.props.strobeColor : "none", cursor: this.state.hideCursor ? "none" : "initial"}}>
+        <IdleTimer
+          ref={null}
+          onActive={this.onActive.bind(this)}
+          onIdle={this.onIdle.bind(this)}
+          timeout={3000} />
         <div style={{ animation: this.props.strobe ? "strobe " + this.props.strobeTime + "ms steps(1, end) infinite" : "none" }}>
           <div className={`u-fill-container ${this.props.backgroundType == BT.color ? '' : 'u-fill-image-blur'}`} style={{
             background: this.props.backgroundType == BT.color ? this.props.backgroundColor : null,
@@ -179,6 +184,14 @@ export default class ImagePlayer extends React.Component {
       // but flag to restart next time props are updated
       this.setState({restart: true});
     }
+  }
+
+  onActive() {
+    this.setState({hideCursor: false})
+  }
+
+  onIdle() {
+    this.setState({hideCursor: true})
   }
 
   delete() {

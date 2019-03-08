@@ -40,6 +40,7 @@
     "progressbar.js": "^1.0.1",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
+    "react-idle-timer": "^4.2.3",
     "react-multiselect-checkboxes": "^0.1.1",
     "react-sound": "^1.2.0",
     "recursive-readdir": "^2.2.2",
