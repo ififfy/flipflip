@@ -96,6 +96,15 @@ You can change the port used by replacing 9222 in the two places it is found in 
     "--remote-debugging-port=9222"
 ```
 
+### webpack.dev.js
+
+The `webpack.dev.js` needs to include `devtool: 'source-map'` to provide accurate source mappings e.g.
+
+```typescript
+let rendererConfig = {
+    devtool: 'source-map',
+```
+
 Happy remote debugging! (Perhaps it can be less painful than self-performed root canal surgery after all)
 
 ![# F3](https://avatars3.githubusercontent.com/u/46749380?s=460&v=4)
