@@ -49,6 +49,7 @@ let rendererConfig = {
     mode: 'development',
     entry: './src/renderer/renderer.tsx',
     target: 'electron-renderer',
+    devtool: 'source-map',
     output: {
         filename: 'renderer.bundle.js',
         path: __dirname + '/dist',
