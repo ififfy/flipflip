@@ -3868,6 +3868,11 @@ react-dom@^16.6.3:
     prop-types "^15.6.2"
     scheduler "^0.11.2"
 
+react-idle-timer@^4.2.3:
+  version "4.2.3"
+  resolved "https://registry.yarnpkg.com/react-idle-timer/-/react-idle-timer-4.2.3.tgz#d4c7e646de0d7d67b26d47a49ac231a15c7350c7"
+  integrity sha512-p+Pf0u3/juGlK7tkSdE4HNBSEIbReqVR41dsGy+/Fyb9YLRXml3QC7Iyu14k+rjuC8plFu76WrAr/j6wgIWshQ==
+
 react-input-autosize@^2.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/react-input-autosize/-/react-input-autosize-2.2.1.tgz#ec428fa15b1592994fb5f9aa15bb1eb6baf420f8"
@@ -4922,9 +4927,9 @@ tslib@^1.9.0:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.9.3.tgz#d7e4dd79245d85428c4d7e4822a79917954ca286"
   integrity sha512-4krF8scpejhaOgqzBEcGM7yDIEfi0/8+8zDRZhNZZ2kjmHJ4hv3zCbQWxoJGz1iw5U0Jl0nma13xzHXcncMavQ==
 
-"ttfinfo@git+https://github.com/rBurgett/ttfinfo.git":
+"ttfinfo@https://github.com/rBurgett/ttfinfo.git":
   version "0.2.0"
-  resolved "git+https://github.com/rBurgett/ttfinfo.git#f00e43e2a6d4c8a12a677df20b7804492d50863c"
+  resolved "https://github.com/rBurgett/ttfinfo.git#f00e43e2a6d4c8a12a677df20b7804492d50863c"
 
 tty-browserify@0.0.0:
   version "0.0.0"
