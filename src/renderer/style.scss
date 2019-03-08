@@ -721,6 +721,21 @@ label.SimpleCheckbox {
   .SourcePicker {
     .SourcePicker__Buttons {
       padding: $smallPadding;
+
+      > .SourcePicker_SelectButtons {
+        display: inline-block;
+
+        div:first-child {
+          margin-bottom: 0.5rem;
+        }
+
+        .SourcePicker_SelectAllNone {
+          a:first-child {
+            margin-left: 0.75em;
+            margin-right: 1em;
+          }
+        }
+      }
     }
 
     .SourcePicker__Sources {
@@ -729,7 +744,11 @@ label.SimpleCheckbox {
       right: 0;
       bottom: 0;
       left: 0;
-      padding: $smallPadding;
+      padding: 0 $smallPadding $smallPadding;
+
+      &.m-select {
+        top: 7rem;
+      }
 
       .SourcePicker__SourceTitle {
         color: white !important;
