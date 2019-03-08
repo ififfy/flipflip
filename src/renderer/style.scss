@@ -406,6 +406,10 @@ a {
     width: 100%;
   }
 
+  &.m-bold {
+    border-width: 3px;
+  }
+
   .ControlGroup__Title {
     position: absolute;
     top: -1em;
@@ -418,6 +422,14 @@ a {
     border-top: 1px solid $black;
     border-right: 1px solid $black;
     border-left: 1px solid $black;
+
+    &.m-can-collapse {
+      cursor: pointer;
+    }
+
+    &.m-bold {
+      border-width: 3px;
+    }
   }
 }
 
@@ -483,7 +495,7 @@ a {
     transition: opacity .2s ease-in-out;
 
     &:disabled {
-      opacity: 0.5;
+      opacity: 0.3;
     }
 
     &::-webkit-slider-thumb {
