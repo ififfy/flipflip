@@ -20,7 +20,7 @@ import TimingGroup from "../sceneDetail/TimingGroup";
 const {getCurrentWindow, Menu, MenuItem, app} = remote;
 
 const keyMap = {
-  playPause: ['Play/Pause', 'space'],
+  playPause: ['Play/Pause (Playing)', 'space'],
   historyBack: ['Back in Time', 'left'],
   historyForward: ['Forward in Time', 'right'],
   navigateBack: ['Go Back to Scene Details', 'backspace'],
@@ -152,14 +152,14 @@ export default class Player extends React.Component {
             {this.state.isPlaying && (
               <div
                 className="PauseButton u-button u-clickable"
-                onClick={this.pause.bind(this)}>
+                onClick={this.setPlayPause.bind(this, false)}>
                 Pause
               </div>
             )}
             {!this.state.isPlaying && (
               <div
                 className="PlayButton u-button u-clickable"
-                onClick={this.play.bind(this)}>
+                onClick={this.setPlayPause.bind(this, true)}>
                 Play
               </div>
             )}
@@ -217,33 +217,37 @@ export default class Player extends React.Component {
 
     window.addEventListener('contextmenu', this.showContextMenu, false);
 
+    this.buildMenu();
+  }
+
+  buildMenu() {
     Menu.setApplicationMenu(Menu.buildFromTemplate([
       {
         label: app.getName(),
         submenu: [
-          {role: 'quit'},
+          { role: 'quit' },
         ],
       },
       {
         label: 'Edit',
         submenu: [
-          {role: 'undo'},
-          {role: 'redo'},
-          {type: 'separator'},
-          {role: 'cut'},
-          {role: 'copy'},
-          {role: 'paste'},
-          {role: 'pasteandmatchstyle'},
-          {role: 'delete'},
-          {role: 'selectall'}
+          { role: 'undo' },
+          { role: 'redo' },
+          { type: 'separator' },
+          { role: 'cut' },
+          { role: 'copy' },
+          { role: 'paste' },
+          { role: 'pasteandmatchstyle' },
+          { role: 'delete' },
+          { role: 'selectall' }
         ]
       },
       {
         label: 'View',
         submenu: [
-          {role: 'reload'},
-          {role: 'forcereload'},
-          {role: 'toggledevtools'},
+          { role: 'reload' },
+          { role: 'forcereload' },
+          { role: 'toggledevtools' },
         ]
       },
       {
@@ -267,9 +271,7 @@ export default class Player extends React.Component {
     window.removeEventListener('contextmenu', this.showContextMenu);
   }
 
-  nop() {
-
-  }
+  nop() {}
 
   showContextMenu = () => {
     const contextMenu = new Menu();
@@ -319,10 +321,6 @@ export default class Player extends React.Component {
     contextMenu.popup({});
   };
 
-  play() {
-    this.setState({isPlaying: true, historyOffset: 0});
-  }
-
   playMain(empty: boolean) {
     this.setState({isMainLoaded: true, isEmpty: empty});
     if (!this.props.overlayScene || this.state.isOverlayLoaded) {
@@ -337,8 +335,22 @@ export default class Player extends React.Component {
     }
   }
 
+  play() {
+    this.setState({isPlaying: true, historyOffset: 0});
+  }
+
   pause() {
     this.setState({isPlaying: false});
+  }
+
+  setPlayPause(play: boolean) {
+    if (play) {
+      this.play()
+    } else {
+      this.pause()
+    }
+    keyMap.playPause = ["Play/Pause " + (play ? "(Playing)" : "(Paused)"), 'space'];
+    this.buildMenu();
   }
 
   historyBack() {
@@ -394,16 +406,22 @@ export default class Player extends React.Component {
 
   setAlwaysOnTop(alwaysOnTop: boolean){
     this.props.config.displaySettings.alwaysOnTop = alwaysOnTop;
+    keyMap.toggleAlwaysOnTop = ['Toggle Always On Top ' + (alwaysOnTop ? "(On)" : "(Off)"), 'CommandOrControl+T'];
+    this.buildMenu();
     getCurrentWindow().setAlwaysOnTop(alwaysOnTop);
   }
 
   setMenuBarVisibility(showMenu: boolean) {
     this.props.config.displaySettings.showMenu = showMenu;
+    keyMap.toggleMenuBarDisplay = ['Toggle Menu Bar ' + (showMenu ? "(On)" : "(Off)"), 'CommandOrControl+^'];
+    this.buildMenu();
     getCurrentWindow().setMenuBarVisibility(showMenu);
   }
 
   setFullscreen(fullScreen: boolean) {
     this.props.config.displaySettings.fullScreen = fullScreen;
+    keyMap.toggleFullscreen = ['Toggle Fullscreen ' + (fullScreen ? "(On)" : "(Off)"), 'CommandOrControl+F'];
+    this.buildMenu();
     getCurrentWindow().setFullScreen(fullScreen);
   }
 
@@ -425,11 +443,7 @@ export default class Player extends React.Component {
   }
 
   playPause() {
-    if (this.state.isPlaying) {
-      this.pause()
-    } else {
-      this.play()
-    }
+    this.setPlayPause(!this.state.isPlaying)
   }
 
   toggleAlwaysOnTop() {
