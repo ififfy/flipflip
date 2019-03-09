@@ -57,6 +57,12 @@ interface CacheSettingsI {
   maxSize: number;
 }
 
+interface DisplaySettingsI {
+  alwaysOnTop: boolean;
+  showMenu: boolean;
+}
+
+
 export class SceneSettings implements SceneSettingsI {
   [key: string]: string | number | boolean;
 
@@ -118,11 +124,18 @@ export class CacheSettings implements CacheSettingsI {
   maxSize = 500; // Size in MB
 }
 
+export class DisplaySettings  implements DisplaySettingsI {
+  [key: string]:boolean;
+  alwaysOnTop = false;
+  showMenu = true;
+}
+
 export default class Config {
   defaultScene = new SceneSettings();
   remoteSettings = new RemoteSettings();
   caching = new CacheSettings();
-
+  displaySettings = new DisplaySettings();
+  
   constructor(init?: Partial<Config>) {
     Object.assign(this, init);
 

@@ -129,7 +129,10 @@ export default class Player extends React.Component {
             url={textURL(this.props.scene.textKind, this.props.scene.textSource)}/>
         )}
 
-        <div className={`u-button-row ${this.state.isPlaying ? 'u-show-on-hover-only' : ''}`}>
+        <div className={`u-button-row ${this.state.isPlaying ? 'u-show-on-hover-only' : ''}`} 
+             onMouseEnter={this.setMenuBarVisibleOnHover.bind(this)}
+             onMouseLeave={this.setMenuBarVisibleOnHover.bind(this)}
+             >
           <div className="u-button-row-right">
             {this.props.scene.audioURL && isLoaded && (
               <Sound
@@ -210,6 +213,10 @@ export default class Player extends React.Component {
   }
 
   componentDidMount() {
+    
+    this.setAlwaysOnTop(this.props.config.displaySettings.alwaysOnTop);
+    this.setMenuBarVisibility(this.props.config.displaySettings.showMenu);
+  
     window.addEventListener('contextmenu', this.showContextMenu, false);
 
     Menu.setApplicationMenu(Menu.buildFromTemplate([
@@ -408,12 +415,43 @@ export default class Player extends React.Component {
 
   alwaysOnTop() {
     const window = getCurrentWindow();
-    window.setAlwaysOnTop(!window.isAlwaysOnTop());
+    this.setAlwaysOnTop(!window.isAlwaysOnTop());
+  }
+
+  /** Sets window.setAlwaysOnTop and strores the state */
+  setAlwaysOnTop(value:boolean){
+    const window = getCurrentWindow();
+    this.props.config.displaySettings.alwaysOnTop = value;
+    window.setAlwaysOnTop(value);
   }
 
   toggleMenuBarDisplay() {
     const window = getCurrentWindow();
-    window.setMenuBarVisibility(!window.isMenuBarVisible());
+    this.setMenuBarVisibility(!this.props.config.displaySettings.showMenu);
+  }
+
+  /** Sets window.setMenuBarVisibility and stores the state */
+  setMenuBarVisibility(value: boolean) {
+    const window = getCurrentWindow();
+    this.props.config.displaySettings.showMenu = value;
+    window.setMenuBarVisibility(value);
+  }
+
+  setMenuBarVisibleOnHover(mouseEvent: MouseEvent) {
+    const window = getCurrentWindow();
+  
+    // Mouse entering button row and menu not visible - make menu visible
+    if (!window.isMenuBarVisible() && mouseEvent.type == "mouseenter" && mouseEvent.clientY > 0) {
+      window.setMenuBarVisibility(true);
+    }
+    // Mouse leaving button row going to menu keep menu visible
+    else if (mouseEvent.type == "mouseleave" && mouseEvent.clientY <= 0) {
+      window.setMenuBarVisibility(true);
+    }
+    // Mouse leaving button row not going to menu set menu per props
+    else if (mouseEvent.type == "mouseleave" && mouseEvent.clientY >= 0) {
+      window.setMenuBarVisibility(this.props.config.displaySettings.showMenu);
+    }
   }
 
   toggleFullscreen() {
