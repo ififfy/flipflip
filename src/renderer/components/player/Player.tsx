@@ -8,6 +8,7 @@ import {TOT} from "../../const";
 import {urlToPath} from '../../utils';
 import Config from "../../Config";
 import Scene from '../../Scene';
+import CaptionProgram from "./CaptionProgram";
 import ChildCallbackHack from './ChildCallbackHack';
 import HeadlessScenePlayer from './HeadlessScenePlayer';
 import Tag from "../library/Tag";
@@ -15,7 +16,6 @@ import AudioGroup from "../sceneDetail/AudioGroup";
 import EffectGroup from "../sceneDetail/EffectGroup";
 import TextGroup from "../sceneDetail/TextGroup";
 import TimingGroup from "../sceneDetail/TimingGroup";
-import CaptionProgram from "./CaptionProgram";
 
 const {getCurrentWindow, Menu, MenuItem, app} = remote;
 
@@ -25,8 +25,8 @@ const keyMap = {
   historyForward: ['Forward in Time', 'right'],
   navigateBack: ['Go Back to Scene Details', 'backspace'],
   toggleFullscreen: ['Toggle Fullscreen', 'CommandOrControl+F'],
-  alwaysOnTop: ['Toggle On Top', 'CommandOrControl+T'],
-  toggleMenuBarDisplay: ['Show/Hide Menu', 'CommandOrControl+^'],
+  toggleAlwaysOnTop: ['Toggle Always On Top', 'CommandOrControl+T'],
+  toggleMenuBarDisplay: ['Toggle Menu Bar', 'CommandOrControl+^'],
   onDelete: ['Delete Image', 'Delete'],
 };
 
@@ -129,10 +129,7 @@ export default class Player extends React.Component {
             url={textURL(this.props.scene.textKind, this.props.scene.textSource)}/>
         )}
 
-        <div className={`u-button-row ${this.state.isPlaying ? 'u-show-on-hover-only' : ''}`} 
-             onMouseEnter={this.setMenuBarVisibleOnHover.bind(this)}
-             onMouseLeave={this.setMenuBarVisibleOnHover.bind(this)}
-             >
+        <div className={`u-button-row ${this.state.isPlaying ? 'u-show-on-hover-only' : ''}`}>
           <div className="u-button-row-right">
             {this.props.scene.audioURL && isLoaded && (
               <Sound
@@ -143,8 +140,9 @@ export default class Player extends React.Component {
             )}
             <div
               className={`FullscreenButton u-button u-clickable`}
-              onClick={this.toggleFullscreen.bind(this)}>
-              Fullscreen on/off
+              onClick={this.toggleFull.bind(this)}
+              style={{verticalAlign: 'bottom'}}>
+              <div className="u-fullscreen"/>
             </div>
             <div
               className={`HistoryBackButton u-button u-clickable ${canGoBack ? '' : 'u-disabled'}`}
@@ -213,10 +211,10 @@ export default class Player extends React.Component {
   }
 
   componentDidMount() {
-    
     this.setAlwaysOnTop(this.props.config.displaySettings.alwaysOnTop);
     this.setMenuBarVisibility(this.props.config.displaySettings.showMenu);
-  
+    this.setFullscreen(this.props.config.displaySettings.fullScreen);
+
     window.addEventListener('contextmenu', this.showContextMenu, false);
 
     Menu.setApplicationMenu(Menu.buildFromTemplate([
@@ -263,6 +261,7 @@ export default class Player extends React.Component {
   }
 
   componentWillUnmount() {
+    getCurrentWindow().setAlwaysOnTop(false);
     Menu.setApplicationMenu(originalMenu);
     getCurrentWindow().setFullScreen(false);
     window.removeEventListener('contextmenu', this.showContextMenu);
@@ -393,6 +392,26 @@ export default class Player extends React.Component {
     this.setState({historyOffset: offset});
   }
 
+  setAlwaysOnTop(alwaysOnTop: boolean){
+    this.props.config.displaySettings.alwaysOnTop = alwaysOnTop;
+    getCurrentWindow().setAlwaysOnTop(alwaysOnTop);
+  }
+
+  setMenuBarVisibility(showMenu: boolean) {
+    this.props.config.displaySettings.showMenu = showMenu;
+    getCurrentWindow().setMenuBarVisibility(showMenu);
+  }
+
+  setFullscreen(fullScreen: boolean) {
+    this.props.config.displaySettings.fullScreen = fullScreen;
+    getCurrentWindow().setFullScreen(fullScreen);
+  }
+
+  toggleFull() {
+    this.setFullscreen(!getCurrentWindow().isFullScreen());
+    this.setMenuBarVisibility(!getCurrentWindow().isFullScreen());
+  }
+
   /* Menu and hotkey options DON'T DELETE */
 
   onDelete() {
@@ -413,50 +432,15 @@ export default class Player extends React.Component {
     }
   }
 
-  alwaysOnTop() {
-    const window = getCurrentWindow();
-    this.setAlwaysOnTop(!window.isAlwaysOnTop());
-  }
-
-  /** Sets window.setAlwaysOnTop and strores the state */
-  setAlwaysOnTop(value:boolean){
-    const window = getCurrentWindow();
-    this.props.config.displaySettings.alwaysOnTop = value;
-    window.setAlwaysOnTop(value);
+  toggleAlwaysOnTop() {
+    this.setAlwaysOnTop(!this.props.config.displaySettings.alwaysOnTop);
   }
 
   toggleMenuBarDisplay() {
-    const window = getCurrentWindow();
     this.setMenuBarVisibility(!this.props.config.displaySettings.showMenu);
   }
 
-  /** Sets window.setMenuBarVisibility and stores the state */
-  setMenuBarVisibility(value: boolean) {
-    const window = getCurrentWindow();
-    this.props.config.displaySettings.showMenu = value;
-    window.setMenuBarVisibility(value);
-  }
-
-  setMenuBarVisibleOnHover(mouseEvent: MouseEvent) {
-    const window = getCurrentWindow();
-  
-    // Mouse entering button row and menu not visible - make menu visible
-    if (!window.isMenuBarVisible() && mouseEvent.type == "mouseenter" && mouseEvent.clientY > 0) {
-      window.setMenuBarVisibility(true);
-    }
-    // Mouse leaving button row going to menu keep menu visible
-    else if (mouseEvent.type == "mouseleave" && mouseEvent.clientY <= 0) {
-      window.setMenuBarVisibility(true);
-    }
-    // Mouse leaving button row not going to menu set menu per props
-    else if (mouseEvent.type == "mouseleave" && mouseEvent.clientY >= 0) {
-      window.setMenuBarVisibility(this.props.config.displaySettings.showMenu);
-    }
-  }
-
   toggleFullscreen() {
-    const window = getCurrentWindow();
-    window.setFullScreen(!window.isFullScreen());
-    window.setMenuBarVisibility(!window.isFullScreen());
+    this.setFullscreen(!this.props.config.displaySettings.fullScreen);
   }
 };
