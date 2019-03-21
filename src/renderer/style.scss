@@ -250,6 +250,14 @@ a {
   background-size: 1rem 1rem;
 }
 
+.u-fullscreen {
+  cursor: pointer;
+  width: 1rem;
+  height: 1rem;
+  background: url("./icons/fullscreen.svg") no-repeat;
+  background-size: 1rem 1rem;
+}
+
 .u-show-on-hover-only {
   border-bottom: none;
   background: rgba(0, 0, 0, 0);
