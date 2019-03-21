@@ -58,10 +58,11 @@ interface CacheSettingsI {
 }
 
 interface DisplaySettingsI {
+  [key: string]: boolean;
   alwaysOnTop: boolean;
   showMenu: boolean;
+  fullScreen: boolean;
 }
-
 
 export class SceneSettings implements SceneSettingsI {
   [key: string]: string | number | boolean;
@@ -125,9 +126,11 @@ export class CacheSettings implements CacheSettingsI {
 }
 
 export class DisplaySettings  implements DisplaySettingsI {
-  [key: string]:boolean;
+  [key: string]: boolean;
+
   alwaysOnTop = false;
   showMenu = true;
+  fullScreen = false;
 }
 
 export default class Config {
@@ -153,6 +156,11 @@ export default class Config {
     for (let key of Object.keys(new CacheSettings())) {
       if (this.caching[key] == null) {
         this.caching[key] = new CacheSettings()[key];
+      }
+    }
+    for (let key of Object.keys(new DisplaySettings())) {
+      if (this.displaySettings[key] == null) {
+        this.displaySettings[key] = new DisplaySettings()[key];
       }
     }
   }
