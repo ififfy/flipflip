@@ -392,7 +392,7 @@ export default class Player extends React.Component {
   navigateBack() {
     const window = getCurrentWindow();
     window.setFullScreen(false);
-    window.setMenuBarVisibility(true);
+    this.setMenuBarVisibility(true);
     this.props.goBack();
   }
 
