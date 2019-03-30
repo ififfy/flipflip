@@ -193,7 +193,14 @@ export default class CaptionProgram extends React.Component {
       if (!textString || isNaN(ms)) { return null; }
 
       if (textString === '$RANDOM_PHRASE') {
-        textString = getRandomListItem(PHRASES);
+        return function (runNextCommand: Function) {
+          el.style.opacity = '1.0';
+          el.innerHTML = getRandomListItem(PHRASES);
+          setTimeout(function () {
+            el.style.opacity = '0.0';
+            runNextCommand();
+          }, ms);
+        }
       }
 
       return function (runNextCommand: Function) {
