@@ -21,6 +21,21 @@ const isEmpty = function (allURLs: any[]): boolean {
   return Array.isArray(allURLs) && allURLs.every(isEmpty);
 };
 
+function urlConversion(url: string): string {
+  let imgurMatch = url.match("^https?://(?:m\.)?imgur\.com/([\\w\\d]{7})$");
+  if (imgurMatch != null) {
+    return "https://i.imgur.com/" + imgurMatch[1] + ".jpg";
+  }
+  /*let gfycatMatch = url.match("^https?://gfycat\.com/(\\w*)$");
+  if (gfycatMatch != null) {
+    // TODO Somehow convert richpepperyferret to RichPepperyFerret
+    // Origiinal link: https://gfycat.com/richpepperyferret
+    // Target link: https://giant.gfycat.com/RichPepperyFerret.gif
+    return "https://giant.gfycat.com/" + gfycatMatch[1] + ".gif";
+  }*/
+  return url;
+}
+
 function isImage(path: string): boolean {
   const p = path.toLowerCase();
   if (p.endsWith('.gif')) return true;
@@ -190,7 +205,7 @@ function loadReddit(config: Config, url: string, filter: string, next: any, over
           reddit.getSubreddit(getFileGroup(url)).getHot({after: next}).then((submissionListing: any) => {
             if (submissionListing.length > 0) {
               resolve({
-                data: submissionListing.map((s: any) => s.url).filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
+                data: submissionListing.map((s: any) => urlConversion(s.url)).filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
                 next: submissionListing[submissionListing.length - 1].name
               });
             } else {
@@ -201,7 +216,7 @@ function loadReddit(config: Config, url: string, filter: string, next: any, over
           reddit.getUser(getFileGroup(url)).getSubmissions({after: next}).then((submissionListing: any) => {
             if (submissionListing.length > 0) {
               resolve({
-                data: submissionListing.map((s: any) => s.url).filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
+                data: submissionListing.map((s: any) => urlConversion(s.url)).filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
                 next: submissionListing[submissionListing.length - 1].name
               });
             } else {
