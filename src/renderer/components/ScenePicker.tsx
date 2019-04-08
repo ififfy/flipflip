@@ -109,7 +109,7 @@ export default class ScenePicker extends React.Component {
           </div>
 
           <div>
-            If you like FlipFlip, drop me a line at <a href="mailto:ififfy@mm.st">ififfy@mm.st</a> and tell me
+            If you like FlipFlip, drop us a line on <a href="https://www.reddit.com/r/flipflip">Reddit</a> and tell us
             about how you're using it. :-)
           </div>
         </div>

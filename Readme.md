@@ -22,16 +22,21 @@ that pop up.
 
 - Many bugfixes
 - Remote sources -- Tumblr and Reddit so far
+- Remote source import -- Tumblr and Reddit so far
 - Library
 - Source tagging
 - Source sorting & filtering
 - Scene Generation
 - Scene Export/Import
 - Configure FlipFlip options
+- Backup/Restore
 - Caching
 - Open random scene
 - Add config option for image background (color vs blur)
+- Add config option for strobe effect
 - Add config option for caption font styles
+- Detect and list system fonts
+- Add slower timing functions
 - Allow Text and Audio options to be changed while playing
 - "Always On Top" and "Show/Hide Menu" options in player
 - Improve source interface
