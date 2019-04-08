@@ -147,13 +147,14 @@ export default class ScenePicker extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.scenes.length == 0) return;
-    Sortable.create(document.getElementById('scenes'), {
-      animation: 150,
-      easing: "cubic-bezier(1, 0, 0, 1)",
-      draggable: ".u-draggable",
-      onEnd: this.onEnd.bind(this),
-    });
+    if (this.props.scenes.length > 0) {
+      Sortable.create(document.getElementById('scenes'), {
+        animation: 150,
+        easing: "cubic-bezier(1, 0, 0, 1)",
+        draggable: ".u-draggable",
+        onEnd: this.onEnd.bind(this),
+      });
+    }
 
     wretch("https://api.github.com/repos/ififfy/flipflip/releases")
       .get()
