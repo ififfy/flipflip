@@ -5,9 +5,17 @@ import fileURL from 'file-url';
 import wretch from 'wretch';
 import http from 'http';
 import Snoowrap from 'snoowrap';
+import tumblr from "tumblr.js";
 
 import {IF, ST} from '../../const';
-import {CancelablePromise, getCachePath, getFileGroup, getFileName, getSourceType} from "../../utils";
+import {
+  CancelablePromise,
+  convertURL,
+  getCachePath,
+  getFileGroup,
+  getFileName,
+  getSourceType,
+} from "../../utils";
 import Config from "../../Config";
 import Scene from '../../Scene';
 import ChildCallbackHack from './ChildCallbackHack';
@@ -15,26 +23,12 @@ import ImagePlayer from './ImagePlayer';
 import Progress from '../ui/Progress';
 
 let redditAlerted = false;
+let tumblrAlerted = false;
 
 // Returns true if array is empty, or only contains empty arrays
 const isEmpty = function (allURLs: any[]): boolean {
   return Array.isArray(allURLs) && allURLs.every(isEmpty);
 };
-
-function urlConversion(url: string): string {
-  let imgurMatch = url.match("^https?://(?:m\.)?imgur\.com/([\\w\\d]{7})$");
-  if (imgurMatch != null) {
-    return "https://i.imgur.com/" + imgurMatch[1] + ".jpg";
-  }
-  /*let gfycatMatch = url.match("^https?://gfycat\.com/(\\w*)$");
-  if (gfycatMatch != null) {
-    // TODO Somehow convert richpepperyferret to RichPepperyFerret
-    // Origiinal link: https://gfycat.com/richpepperyferret
-    // Target link: https://giant.gfycat.com/RichPepperyFerret.gif
-    return "https://giant.gfycat.com/" + gfycatMatch[1] + ".gif";
-  }*/
-  return url;
-}
 
 function isImage(path: string): boolean {
   const p = path.toLowerCase();
@@ -61,23 +55,15 @@ function filterPathsToJustImages(imageTypeFilter: string, paths: Array<string>):
   }
 }
 
-function getTumblrAPIKey(config: Config, overlay: boolean): string {
-  if (!overlay) {
-    return config.remoteSettings.tumblrDefault;
-  } else {
-    return config.remoteSettings.tumblrOverlay;
-  }
-}
-
 // Determine what kind of source we have based on the URL and return associated Promise
 function getPromise(config: Config, url: string, filter: string, next: any, overlay: boolean): CancelablePromise {
   let promise;
   const sourceType = getSourceType(url);
 
   if (sourceType == ST.local) { // Local files
-    promise = loadLocalDirectory(url, filter, null);
+    promise = loadLocalDirectory(config, url, filter, null);
   } else if (sourceType == ST.list) { // Image List
-    promise = loadRemoteImageURLList(url);
+    promise = loadRemoteImageURLList(config, url, filter, null);
   } else { // Paging sources
     let promiseFunction;
     let timeout;
@@ -92,12 +78,12 @@ function getPromise(config: Config, url: string, filter: string, next: any, over
       const cachePath = getCachePath(url, config);
       if (fs.existsSync(cachePath) && config.caching.enabled) {
         // If the cache directory exists, use it
-        promise = loadLocalDirectory(getCachePath(url, config), filter, 0);
+        promise = loadLocalDirectory(config, getCachePath(url, config), filter, 0);
       } else {
-        promise = promiseFunction(config, url, filter, 0, overlay);
+        promise = promiseFunction(config, url, filter, 0);
       }
     } else {
-      promise = promiseFunction(config, url, filter, next, overlay);
+      promise = promiseFunction(config, url, filter, next);
     }
     promise.timeout = timeout;
   }
@@ -105,11 +91,11 @@ function getPromise(config: Config, url: string, filter: string, next: any, over
   return promise;
 }
 
-function loadLocalDirectory(path: string, filter: string, next: any): CancelablePromise {
+function loadLocalDirectory(config: Config, url: string, filter: string, next: any): CancelablePromise {
   const blacklist = ['*.css', '*.html', 'avatar.png'];
 
   return new CancelablePromise((resolve, reject) => {
-    recursiveReaddir(path, blacklist, (err: any, rawFiles: Array<string>) => {
+    recursiveReaddir(url, blacklist, (err: any, rawFiles: Array<string>) => {
       if (err) {
         console.warn(err);
         resolve(null);
@@ -120,16 +106,31 @@ function loadLocalDirectory(path: string, filter: string, next: any): Cancelable
   });
 }
 
-function loadRemoteImageURLList(url: string): CancelablePromise {
+function loadRemoteImageURLList(config: Config, url: string, filter: string, next: any): CancelablePromise {
   return new CancelablePromise((resolve, reject) => {
     wretch(url)
       .get()
       .text(data => {
         const lines = data.match(/[^\r\n]+/g).filter((line) => line.startsWith("http"));
-        if (!lines.length) {
+        if (lines.length > 0) {
+          let convertedSource = Array<string>();
+          let convertedCount = 0;
+          for (let url of lines) {
+            convertURL(url).then((urls: Array<string>) => {
+              convertedSource = convertedSource.concat(urls);
+              convertedCount++;
+              if (convertedCount == lines.length) {
+                resolve({
+                  data: convertedSource.filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
+                  next: null
+                });
+              }
+            });
+          }
+        } else {
           console.warn("No lines in", url, "start with 'http://'")
+          resolve(null)
         }
-        resolve({data: lines, next: null});
       })
       .catch((e) => {
         console.warn("Fetch error on", url);
@@ -139,59 +140,89 @@ function loadRemoteImageURLList(url: string): CancelablePromise {
   });
 }
 
-function loadTumblr(config: Config, url: string, filter: string, next: any, overlay: boolean): CancelablePromise {
-  const API_KEY = getTumblrAPIKey(config, overlay);
-  // TumblrID takes the form of <blog_name>.tumblr.com
-  let tumblrID = url.replace(/https?:\/\//, "");
-  tumblrID = tumblrID.replace("/", "");
-  let tumblrURL = "https://api.tumblr.com/v2/blog/" + tumblrID + "/posts/photo?api_key=" + API_KEY + "&offset=" + (next * 20);
-  return new CancelablePromise((resolve, reject) => {
-    wretch(tumblrURL)
-      .get()
-      .notFound(error => {
-        console.warn(tumblrID + " is not available");
-        resolve(null);
-      })
-      .error(429, error => {
-        console.warn("Tumblr responded with 429 - Too Many Requests");
-        resolve(null);
-      })
-      .json(json => {
+function loadTumblr(config: Config, url: string, filter: string, next: any): CancelablePromise {
+  let configured = config.remoteSettings.tumblrOAuthToken != "" && config.remoteSettings.tumblrOAuthTokenSecret != "";
+  if (configured) {
+    return new CancelablePromise((resolve, reject) => {
+      const client = tumblr.createClient({
+        consumer_key: config.remoteSettings.tumblrKey,
+        consumer_secret: config.remoteSettings.tumblrSecret,
+        token: config.remoteSettings.tumblrOAuthToken,
+        token_secret: config.remoteSettings.tumblrOAuthTokenSecret,
+      });
+      // TumblrID takes the form of <blog_name>.tumblr.com
+      let tumblrID = url.replace(/https?:\/\//, "");
+      tumblrID = tumblrID.replace("/", "");
+      client.blogPosts(tumblrID, {offset: next*20}, (err, data) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+
         // End loop if we're at end of posts
-        if (json.response.posts.length == 0) {
+        if (data.posts.length == 0) {
           resolve(null);
           return;
         }
 
         let images = [];
-        for (let post of json.response.posts) {
+        for (let post of data.posts) {
           // Sometimes photos are listed separately
           if (post.photos) {
             for (let photo of post.photos) {
-              let imgURL = photo.original_size.url;
-              if (filter != IF.gifs || (filter == IF.gifs && imgURL.toLowerCase().endsWith('.gif'))) {
-                images.push(photo.original_size.url);
+              images.push(photo.original_size.url);
+            }
+          }
+          if (post.player) {
+            for (let embed of post.player) {
+              const regex = /<iframe[^(?:src|\/>)]*src=["']([^"']*)[^(?:\/>)]*\/?>/g;
+              let imageSource;
+              while ((imageSource = regex.exec(embed.embed_code)) !== null) {
+                images.push(imageSource[1]);
               }
             }
-          } else { // Sometimes photos are elements of the body
-            const regex = /<img[^(?:src|\/>)]*src="([^"]*)[^(?:\/>)]*\/>/g;
+          }
+          if (post.body) {
+            const regex = /<img[^(?:src|\/>)]*src=["']([^"']*)[^(?:\/>)]*\/?>/g;
             let imageSource;
             while ((imageSource = regex.exec(post.body)) !== null) {
               images.push(imageSource[1]);
             }
           }
         }
-        resolve({data: images, next: (next as number) + 1});
-      })
-      .catch((e) => {
-        console.warn("Fetch error on", tumblrURL);
-        console.error(e);
-        resolve(null)
+
+        if (images.length > 0) {
+          let convertedSource = Array<string>();
+          let convertedCount = 0;
+          for (let url of images) {
+            convertURL(url).then((urls: Array<string>) => {
+              convertedSource = convertedSource.concat(urls);
+              convertedCount++;
+              if (convertedCount == images.length) {
+                resolve({
+                  data: convertedSource.filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
+                  next: (next as number) + 1
+                });
+              }
+            });
+          }
+        } else {
+          resolve(null);
+        }
       });
-  });
+    });
+  } else {
+    if (!tumblrAlerted) {
+      alert("You haven't authorized FlipFlip to work with Reddit yet.\nVisit Config and click 'Authorzie FlipFlip on Reddit'.");
+      tumblrAlerted = true;
+    }
+    return new CancelablePromise((resolve, reject) => {
+      resolve(null);
+    });
+  }
 }
 
-function loadReddit(config: Config, url: string, filter: string, next: any, overlay: boolean): CancelablePromise {
+function loadReddit(config: Config, url: string, filter: string, next: any): CancelablePromise {
   let configured = config.remoteSettings.redditRefreshToken != "";
   if (configured) {
       return new CancelablePromise((resolve, reject) => {
@@ -204,10 +235,20 @@ function loadReddit(config: Config, url: string, filter: string, next: any, over
         if (url.includes("/r/")) {
           reddit.getSubreddit(getFileGroup(url)).getHot({after: next}).then((submissionListing: any) => {
             if (submissionListing.length > 0) {
-              resolve({
-                data: submissionListing.map((s: any) => urlConversion(s.url)).filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
-                next: submissionListing[submissionListing.length - 1].name
-              });
+              let convertedListing = Array<string>();
+              let convertedCount = 0;
+              for (let s of submissionListing) {
+                convertURL(s.url).then((urls: Array<string>) => {
+                  convertedListing = convertedListing.concat(urls);
+                  convertedCount++;
+                  if (convertedCount == submissionListing.length) {
+                    resolve({
+                      data: convertedListing.filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
+                      next: submissionListing[submissionListing.length - 1].name
+                    });
+                  }
+                });
+              }
             } else {
               resolve(null);
             }
@@ -215,10 +256,20 @@ function loadReddit(config: Config, url: string, filter: string, next: any, over
         } else if (url.includes("/user/") || url.includes("/u/")) {
           reddit.getUser(getFileGroup(url)).getSubmissions({after: next}).then((submissionListing: any) => {
             if (submissionListing.length > 0) {
-              resolve({
-                data: submissionListing.map((s: any) => urlConversion(s.url)).filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
-                next: submissionListing[submissionListing.length - 1].name
-              });
+              let convertedListing = Array<string>();
+              let convertedCount = 0;
+              for (let s of submissionListing) {
+                convertURL(s.url).then((urls: Array<string>) => {
+                  convertedListing = convertedListing.concat(urls);
+                  convertedCount++;
+                  if (convertedCount == submissionListing.length) {
+                    resolve({
+                      data: convertedListing.filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
+                      next: submissionListing[submissionListing.length - 1].name
+                    });
+                  }
+                });
+              }
             } else {
               resolve(null);
             }
@@ -324,6 +375,7 @@ export default class HeadlessScenePlayer extends React.Component {
 
   componentDidMount() {
     redditAlerted = false;
+    tumblrAlerted = false;
     let n = 0;
     let newAllURLs = new Map<string, Array<string>>();
 

@@ -37,8 +37,6 @@ interface SceneSettingsI {
 
 interface RemoteSettingsI {
   [key: string]: string;
-  tumblrDefault: string;
-  tumblrOverlay: string;
   tumblrKey: string;
   tumblrSecret: string;
   tumblrOAuthToken: string;
@@ -104,8 +102,6 @@ export class SceneSettings implements SceneSettingsI {
 export class RemoteSettings implements RemoteSettingsI {
   [key: string]: string;
 
-  tumblrDefault = "BaQquvlxQeRhKRyViknF98vseIdcBEyDrzJBpHxvAiMPHCKR2l";
-  tumblrOverlay = "G4iZd6FBiyDxHVUpNqtOTDu4woWzfp8WuH3tTrT3MC16GTmNzq";
   tumblrKey = "y5uUQJYTCp15Nj3P80cLmNFqwSr1mxIhm3C4PCsGAfReydkF9m";
   tumblrSecret = "xiEV5sJISJAwegJHTTLWtxnmFUkowxgMk2gOq4mc20VNLM2TpJ";
   tumblrOAuthToken = "";

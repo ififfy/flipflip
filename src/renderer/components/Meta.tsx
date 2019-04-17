@@ -296,6 +296,7 @@ export default class Meta extends React.Component {
             onRestore={this.restore.bind(this)}
             onClean={this.cleanBackups.bind(this)}
             onClearReddit={this.clearReddit.bind(this)}
+            onClearTumblr={this.clearTumblr.bind(this)}
           />
         )}
       </div>
@@ -620,6 +621,13 @@ export default class Meta extends React.Component {
   clearReddit() {
     const newConfig = this.state.config;
     newConfig.remoteSettings.redditRefreshToken = "";
+    this.setState({config: newConfig});
+  }
+
+  clearTumblr() {
+    const newConfig = this.state.config;
+    newConfig.remoteSettings.tumblrOAuthToken = "";
+    newConfig.remoteSettings.tumblrOAuthTokenSecret = "";
     this.setState({config: newConfig});
   }
 };

@@ -1,11 +1,12 @@
 import {remote} from "electron";
 import {URL} from "url";
 import path from 'path';
+import * as fs from "fs";
+import wretch from "wretch";
 
 import {ST} from "./const";
 import en from "./en";
 import Config from "./Config";
-import * as fs from "fs";
 
 export const saveDir = path.join(remote.app.getPath('appData'), 'flipflip');
 
@@ -84,6 +85,53 @@ export function getSourceType(url: string): string {
     return ST.list;
   } else { // Directory
     return ST.local;
+  }
+}
+
+export async function convertURL(url: string): Promise<Array<string>> {
+  // If this is a imgur image page, return image file
+  let imgurMatch = url.match("^https?://(?:m\.)?imgur\.com/([\\w\\d]{7})$");
+  if (imgurMatch != null) {
+    return ["https://i.imgur.com/" + imgurMatch[1] + ".jpg"];
+  }
+
+  // If this is imgur album, return album images
+  let imgurAlbumMatch = url.match("^https?://imgur\.com/a/([\\w\\d]{7})$");
+  if (imgurAlbumMatch != null) {
+    let html = await wretch(url).get().text();
+    let imageEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll(".post-images > div.post-image-container");
+    if (imageEls.length > 0) {
+      let images = Array<string>();
+      for (let image of imageEls) {
+        images.push("https://i.imgur.com/" + image.id + ".jpg");
+      }
+      return images;
+    } else {
+      imgurAlbumMatch = null;
+    }
+  }
+
+  // If this is gfycat page, return gfycat image
+  let gfycatMatch = url.match("^https?://gfycat\.com/(?:ifr/)(\\w*)$");
+  if (gfycatMatch != null) {
+    // Only lookup CamelCase url if not already CamelCase
+    if (/[A-Z]/.test(gfycatMatch[1])) {
+      return ["https://giant.gfycat.com/" + gfycatMatch[1] + ".gif"];
+    }
+
+    let html = await wretch(url).get().text();
+    let gfycat = new DOMParser().parseFromString(html, "text/html").querySelectorAll(".upnext-item.active > a");
+    if (gfycat.length > 0) {
+      let gfycatID = (gfycat[0] as any).href;
+      gfycatID = gfycatID.substring(gfycatID.lastIndexOf("/") + 1);
+      return ["https://giant.gfycat.com/" + gfycatID + ".gif"];
+    } else {
+      gfycatMatch = null;
+    }
+  }
+
+  if (!imgurMatch && !imgurAlbumMatch && !gfycatMatch) {
+    return [url];
   }
 }
 

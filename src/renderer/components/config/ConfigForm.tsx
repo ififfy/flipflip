@@ -28,6 +28,7 @@ export default class ConfigForm extends React.Component {
     onRestore(backupFile: string): void,
     onClean(): void,
     onClearReddit(): void,
+    onClearTumblr(): void,
   };
 
   readonly state = {
@@ -88,6 +89,7 @@ export default class ConfigForm extends React.Component {
             activateReddit={this.showActivateRedditNotice.bind(this)}
             clearReddit={this.props.onClearReddit.bind(this)}
             activateTumblr={this.showActivateTumblrNotice.bind(this)}
+            clearTumblr={this.props.onClearTumblr.bind(this)}
             onUpdateSettings={this.onUpdateRemoteSettings.bind(this)}/>
 
           <BackupGroup
@@ -140,12 +142,6 @@ export default class ConfigForm extends React.Component {
   validate(): Array<string> {
     let errorMessages = Array<string>();
     // Validate any data:
-    if (this.state.config.remoteSettings.tumblrDefault.length != 50) {
-      errorMessages.push("Invalid Default Tumblr API Key");
-    }
-    if (this.state.config.remoteSettings.tumblrOverlay.length != 50) {
-      errorMessages.push("Invalid Overlay Tumblr API Key");
-    }
     if (isNaN(parseInt(this.state.config.caching.maxSize))) {
       errorMessages.push("Invalid Cache Size");
     }
