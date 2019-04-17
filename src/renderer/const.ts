@@ -68,6 +68,7 @@ const ST = { // source types
   list: 'st.list',
   tumblr: 'st.tumblr',
   reddit: 'st.reddit',
+  imagefap: 'st.imagefap',
 };
 
 export {

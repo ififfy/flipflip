@@ -73,6 +73,9 @@ function getPromise(config: Config, url: string, filter: string, next: any, over
     } else if (sourceType == ST.reddit) {
       promiseFunction = loadReddit;
       timeout = 3000;
+    } else if (sourceType == ST.imagefap) {
+      promiseFunction = loadImageFap;
+      timeout = 3000;
     }
     if (next == -1) {
       const cachePath = getCachePath(url, config);
@@ -291,6 +294,145 @@ function loadReddit(config: Config, url: string, filter: string, next: any): Can
       resolve(null);
     });
   }
+}
+
+function loadImageFap(config: Config, url: string, filter: string, next: any): CancelablePromise {
+  return new CancelablePromise((resolve, reject) => {
+    if (url.includes("/pictures/")) {
+      wretch("http://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2")
+        .get()
+        .text((html) => {
+          let imageEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll(".expp-container > form > table > tbody > tr > td");
+          if (imageEls.length > 0) {
+            let imageCount = 0;
+            let images = Array<string>();
+            for (let image of imageEls) {
+              wretch("http://www.imagefap.com/photo/" + image.id + "/")
+                .get()
+                .text((html) => {
+                  imageCount++;
+                  let contentURL = html.match("\"contentUrl\": \"(.*?)\",");
+                  if (contentURL != null) {
+                    images.push(contentURL[1]);
+                  }
+                  if (imageCount == imageEls.length) {
+                    resolve({
+                      data: images.filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
+                      next: null
+                    });
+                  }
+                })
+            }
+          } else {
+            resolve(null);
+          }
+        });
+    } else if (url.includes("/organizer/")) {
+      wretch(url)
+        .get()
+        .text((html) => {
+          let albumEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll("td.blk_galleries > font > a.blk_galleries");
+          if (albumEls.length > next) {
+            let albumEl = albumEls[next];
+            let albumID = (albumEl as any).href.substring((albumEl as any).href.lastIndexOf("/") + 1);
+            wretch("http://www.imagefap.com/gallery/" + albumID + "?view=2")
+              .get()
+              .text((html) => {
+                let imageEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll(".expp-container > form > table > tbody > tr > td");
+                if (imageEls.length > 0) {
+                  let images = Array<string>();
+                  let imageCount = 0;
+                  for (let image of imageEls) {
+                    wretch("http://www.imagefap.com/photo/" + image.id + "/")
+                      .get()
+                      .text((html) => {
+                        imageCount++;
+                        let contentURL = html.match("\"contentUrl\": \"(.*?)\",");
+                        if (contentURL != null) {
+                          images.push(contentURL[1]);
+                        }
+                        if (imageCount == imageEls.length) {
+                          resolve({
+                            data: images.filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
+                            next: next + 1
+                          })
+                        }
+                      });
+                  }
+                } else {
+                  resolve({
+                    data: [],
+                    next: next+ 1
+                  })
+                }
+              });
+          } else {
+            resolve(null);
+          }
+        });
+    } else if (url.includes("/profile/")) {
+      wretch("http://www.imagefap.com/profile/" + getFileGroup(url) + "/galleries")
+        .get()
+        .text((html) => {
+          let galleryEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll("table.blk_galleries > tbody > tr > td.blk_galleries:not(.no-popunder) > table.blk_galleries > tbody > tr > td.blk_galleries > table.blk_galleries > tbody > tr:first-child > td.blk_galleries > a.blk_galleries");
+          if (galleryEls.length > next) {
+            let galleryEl = galleryEls[next];
+            wretch((galleryEl as any).href)
+              .get()
+              .text((html) => {
+                let albumEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll("td.blk_galleries > font > a.blk_galleries");
+                if (albumEls.length > 0) {
+                  let albumCount = 0;
+                  let images = Array<string>();
+                  for (let albumEl of albumEls) {
+                    let albumID = (albumEl as any).href.substring((albumEl as any).href.lastIndexOf("/") + 1);
+                    wretch("http://www.imagefap.com/gallery/" + albumID + "?view=2")
+                      .get()
+                      .text((html) => {
+                        let imageCount = 0;
+                        let imageEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll(".expp-container > form > table > tbody > tr > td");
+                        if (imageEls.length > 0) {
+                          for (let image of imageEls) {
+                            wretch("http://www.imagefap.com/photo/" + image.id + "/")
+                              .get()
+                              .text((html) => {
+                                imageCount++;
+                                let contentURL = html.match("\"contentUrl\": \"(.*?)\",");
+                                if (contentURL != null) {
+                                  images.push(contentURL[1]);
+                                }
+                                if (imageCount == imageEls.length) {
+                                  albumCount++;
+                                }
+                                if (albumCount == albumEls.length) {
+                                  resolve({
+                                    data: images.filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
+                                    next: next + 1
+                                  })
+                                }
+                              });
+                          }
+                        } else {
+                          albumCount++;
+                          if (albumCount == albumEls.length) {
+                            resolve({
+                              data: images.filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
+                              next: next+ 1
+                            })
+                          }
+                        }
+                      });
+                  }
+                } else {
+                  resolve({data: [], next: next + 1});
+                }
+              });
+          } else {
+            resolve(null);
+          }
+        });
+    }
+  });
 }
 
 export default class HeadlessScenePlayer extends React.Component {

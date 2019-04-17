@@ -49,6 +49,13 @@ export function getFileGroup(url: string) {
       if (url.endsWith("/")) redditID = redditID.slice(0, url.lastIndexOf("/"));
       redditID = redditID.substring(redditID.lastIndexOf("/") + 1);
       return redditID;
+    case ST.imagefap:
+      let imagefapID = url.replace(/https?:\/\/www.imagefap.com\//, "");
+      imagefapID = imagefapID.replace(/pictures\//, "");
+      imagefapID = imagefapID.replace(/profile\//, "");
+      imagefapID = imagefapID.replace(/organizer\//, "");
+      imagefapID = imagefapID.split("/")[0];
+      return imagefapID;
     case ST.local:
       return url.substring(url.lastIndexOf(path.sep)+1);
     case ST.list:
@@ -81,6 +88,8 @@ export function getSourceType(url: string): string {
     return ST.tumblr;
   } else if (/^https?:\/\/www.reddit.com\//.exec(url) != null) {
     return ST.reddit;
+  } else if (/^https?:\/\/www.imagefap.com\//.exec(url) != null) {
+    return ST.imagefap;
   } else if (/^https?:\/\//.exec(url) != null) { // Arbitrary URL, assume image list
     return ST.list;
   } else { // Directory
