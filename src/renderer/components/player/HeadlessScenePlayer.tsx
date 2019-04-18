@@ -75,7 +75,7 @@ function getPromise(config: Config, url: string, filter: string, next: any, over
       timeout = 3000;
     } else if (sourceType == ST.imagefap) {
       promiseFunction = loadImageFap;
-      timeout = 3000;
+      timeout = 8000;
     }
     if (next == -1) {
       const cachePath = getCachePath(url, config);
@@ -159,6 +159,7 @@ function loadTumblr(config: Config, url: string, filter: string, next: any): Can
       client.blogPosts(tumblrID, {offset: next*20}, (err, data) => {
         if (err) {
           console.error(err);
+          resolve(null);
           return;
         }
 
@@ -236,28 +237,33 @@ function loadReddit(config: Config, url: string, filter: string, next: any): Can
           refreshToken: config.remoteSettings.redditRefreshToken,
         });
         if (url.includes("/r/")) {
-          reddit.getSubreddit(getFileGroup(url)).getHot({after: next}).then((submissionListing: any) => {
-            if (submissionListing.length > 0) {
-              let convertedListing = Array<string>();
-              let convertedCount = 0;
-              for (let s of submissionListing) {
-                convertURL(s.url).then((urls: Array<string>) => {
-                  convertedListing = convertedListing.concat(urls);
-                  convertedCount++;
-                  if (convertedCount == submissionListing.length) {
-                    resolve({
-                      data: convertedListing.filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
-                      next: submissionListing[submissionListing.length - 1].name
-                    });
-                  }
-                });
+          reddit.getSubreddit(getFileGroup(url)).getHot({after: next})
+            .then((submissionListing: any) => {
+              if (submissionListing.length > 0) {
+                let convertedListing = Array<string>();
+                let convertedCount = 0;
+                for (let s of submissionListing) {
+                  convertURL(s.url).then((urls: Array<string>) => {
+                    convertedListing = convertedListing.concat(urls);
+                    convertedCount++;
+                    if (convertedCount == submissionListing.length) {
+                      resolve({
+                        data: convertedListing.filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
+                        next: submissionListing[submissionListing.length - 1].name
+                      });
+                    }
+                  });
+                }
+              } else {
+                resolve(null);
               }
-            } else {
+            })
+            .catch((error: any) => {
               resolve(null);
-            }
-          });
+            });
         } else if (url.includes("/user/") || url.includes("/u/")) {
-          reddit.getUser(getFileGroup(url)).getSubmissions({after: next}).then((submissionListing: any) => {
+          reddit.getUser(getFileGroup(url)).getSubmissions({after: next})
+            .then((submissionListing: any) => {
             if (submissionListing.length > 0) {
               let convertedListing = Array<string>();
               let convertedCount = 0;
@@ -280,8 +286,8 @@ function loadReddit(config: Config, url: string, filter: string, next: any): Can
             // If user is not authenticated for users, prompt to re-authenticate
             if (err.statusCode == 403) {
               alert("You have not authorized FlipFlip to work with Reddit users submissions. Visit config and authorize FlipFlip to work with Reddit. Try clearing and re-authorizing FlipFlip with Reddit.");
-              resolve(null);
             }
+            resolve(null);
           });
         }
       });
@@ -301,6 +307,8 @@ function loadImageFap(config: Config, url: string, filter: string, next: any): C
     if (url.includes("/pictures/")) {
       wretch("http://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2")
         .get()
+        .setTimeout(5000)
+        .onAbort((e) => resolve(null))
         .text((html) => {
           let imageEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll(".expp-container > form > table > tbody > tr > td");
           if (imageEls.length > 0) {
@@ -330,6 +338,8 @@ function loadImageFap(config: Config, url: string, filter: string, next: any): C
     } else if (url.includes("/organizer/")) {
       wretch(url)
         .get()
+        .setTimeout(5000)
+        .onAbort((e) => resolve(null))
         .text((html) => {
           let albumEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll("td.blk_galleries > font > a.blk_galleries");
           if (albumEls.length > next) {
@@ -373,6 +383,8 @@ function loadImageFap(config: Config, url: string, filter: string, next: any): C
     } else if (url.includes("/profile/")) {
       wretch("http://www.imagefap.com/profile/" + getFileGroup(url) + "/galleries")
         .get()
+        .setTimeout(5000)
+        .onAbort((e) => resolve(null))
         .text((html) => {
           let galleryEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll("table.blk_galleries > tbody > tr > td.blk_galleries:not(.no-popunder) > table.blk_galleries > tbody > tr > td.blk_galleries > table.blk_galleries > tbody > tr:first-child > td.blk_galleries > a.blk_galleries");
           if (galleryEls.length > next) {
