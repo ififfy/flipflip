@@ -76,6 +76,9 @@ function getPromise(config: Config, url: string, filter: string, next: any, over
     } else if (sourceType == ST.imagefap) {
       promiseFunction = loadImageFap;
       timeout = 8000;
+    } else if (sourceType == ST.sex) {
+      promiseFunction = loadSexCom;
+      timeout = 8000;
     }
     if (next == -1) {
       const cachePath = getCachePath(url, config);
@@ -444,6 +447,37 @@ function loadImageFap(config: Config, url: string, filter: string, next: any): C
           }
         });
     }
+  });
+}
+
+function loadSexCom(config: Config, url: string, filter: string, next: any): CancelablePromise {
+  return new CancelablePromise((resolve, reject) => {
+    let requestURL;
+    if (url.includes("/user/")) {
+      requestURL = "http://www.sex.com/user/" + getFileGroup(url) + "?page=" + (next + 1);
+    } else if (url.includes("/gifs/") || url.includes("/pics/")) {
+      requestURL = "http://www.sex.com/" + getFileGroup(url) + "?page=" + (next + 1);
+    }
+    wretch(requestURL)
+      .get()
+      .setTimeout(5000)
+      .onAbort((e) => resolve(null))
+      .notFound((e) => resolve(null))
+      .text((html) => {
+        let imageEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll(".small_pin_box > .image_wrapper > img");
+        if (imageEls.length > 0) {
+          let images = Array<string>();
+          for (let image of imageEls) {
+            images.push(image.getAttribute("data-src"));
+          }
+          resolve({
+            data: images.filter((s) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
+            next: next + 1
+          })
+        } else {
+          resolve(null);
+        }
+      });
   });
 }
 
