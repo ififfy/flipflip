@@ -69,7 +69,7 @@ const ST = { // source types
   tumblr: 'st.tumblr',
   reddit: 'st.reddit',
   imagefap: 'st.imagefap',
-  sex: 'st.sex',
+  sexcom: 'st.sexcom',
 };
 
 export {

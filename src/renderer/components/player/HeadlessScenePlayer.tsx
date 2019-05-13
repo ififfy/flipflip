@@ -69,14 +69,14 @@ function getPromise(config: Config, url: string, filter: string, next: any, over
     let timeout;
     if (sourceType == ST.tumblr) {
       promiseFunction = loadTumblr;
-      timeout = 8000;
+      timeout = 3000;
     } else if (sourceType == ST.reddit) {
       promiseFunction = loadReddit;
       timeout = 3000;
     } else if (sourceType == ST.imagefap) {
       promiseFunction = loadImageFap;
       timeout = 8000;
-    } else if (sourceType == ST.sex) {
+    } else if (sourceType == ST.sexcom) {
       promiseFunction = loadSexCom;
       timeout = 8000;
     }
@@ -106,7 +106,7 @@ function loadLocalDirectory(config: Config, url: string, filter: string, next: a
         console.warn(err);
         resolve(null);
       } else {
-        resolve({data: filterPathsToJustImages(filter, rawFiles).map((p) => fileURL(p)), next: next});
+        resolve({data: filterPathsToJustImages(filter, rawFiles).map((p) => fileURL(p)), next: null});
       }
     });
   });
@@ -306,6 +306,9 @@ function loadReddit(config: Config, url: string, filter: string, next: any): Can
 }
 
 function loadImageFap(config: Config, url: string, filter: string, next: any): CancelablePromise {
+  if (next == 0) {
+    next = [0, 0];
+  }
   return new CancelablePromise((resolve, reject) => {
     if (url.includes("/pictures/")) {
       wretch("http://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2")
@@ -339,15 +342,17 @@ function loadImageFap(config: Config, url: string, filter: string, next: any): C
           }
         });
     } else if (url.includes("/organizer/")) {
-      wretch(url)
+      wretch(url + "?page=" + next[0])
         .get()
         .setTimeout(5000)
         .onAbort((e) => resolve(null))
         .text((html) => {
           let albumEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll("td.blk_galleries > font > a.blk_galleries");
-          if (albumEls.length > next) {
-            let albumEl = albumEls[next];
-            let albumID = (albumEl as any).href.substring((albumEl as any).href.lastIndexOf("/") + 1);
+          if (albumEls.length == 0) {
+            resolve(null);
+          } else if (albumEls.length > next[1]) {
+            let albumEl = albumEls[next[1]];
+            let albumID = albumEl.getAttribute("href").substring(albumEl.getAttribute("href").lastIndexOf("/") + 1);
             wretch("http://www.imagefap.com/gallery/" + albumID + "?view=2")
               .get()
               .text((html) => {
@@ -365,85 +370,29 @@ function loadImageFap(config: Config, url: string, filter: string, next: any): C
                           images.push(contentURL[1]);
                         }
                         if (imageCount == imageEls.length) {
+                          next[1] += 1;
                           resolve({
                             data: images.filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
-                            next: next + 1
+                            next: next
                           })
                         }
                       });
                   }
                 } else {
+                  next[1] += 1;
                   resolve({
                     data: [],
-                    next: next+ 1
+                    next: next
                   })
                 }
               });
           } else {
-            resolve(null);
-          }
-        });
-    } else if (url.includes("/profile/")) {
-      wretch("http://www.imagefap.com/profile/" + getFileGroup(url) + "/galleries")
-        .get()
-        .setTimeout(5000)
-        .onAbort((e) => resolve(null))
-        .text((html) => {
-          let galleryEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll("table.blk_galleries > tbody > tr > td.blk_galleries:not(.no-popunder) > table.blk_galleries > tbody > tr > td.blk_galleries > table.blk_galleries > tbody > tr:first-child > td.blk_galleries > a.blk_galleries");
-          if (galleryEls.length > next) {
-            let galleryEl = galleryEls[next];
-            wretch((galleryEl as any).href)
-              .get()
-              .text((html) => {
-                let albumEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll("td.blk_galleries > font > a.blk_galleries");
-                if (albumEls.length > 0) {
-                  let albumCount = 0;
-                  let images = Array<string>();
-                  for (let albumEl of albumEls) {
-                    let albumID = (albumEl as any).href.substring((albumEl as any).href.lastIndexOf("/") + 1);
-                    wretch("http://www.imagefap.com/gallery/" + albumID + "?view=2")
-                      .get()
-                      .text((html) => {
-                        let imageCount = 0;
-                        let imageEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll(".expp-container > form > table > tbody > tr > td");
-                        if (imageEls.length > 0) {
-                          for (let image of imageEls) {
-                            wretch("http://www.imagefap.com/photo/" + image.id + "/")
-                              .get()
-                              .text((html) => {
-                                imageCount++;
-                                let contentURL = html.match("\"contentUrl\": \"(.*?)\",");
-                                if (contentURL != null) {
-                                  images.push(contentURL[1]);
-                                }
-                                if (imageCount == imageEls.length) {
-                                  albumCount++;
-                                }
-                                if (albumCount == albumEls.length) {
-                                  resolve({
-                                    data: images.filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
-                                    next: next + 1
-                                  })
-                                }
-                              });
-                          }
-                        } else {
-                          albumCount++;
-                          if (albumCount == albumEls.length) {
-                            resolve({
-                              data: images.filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
-                              next: next+ 1
-                            })
-                          }
-                        }
-                      });
-                  }
-                } else {
-                  resolve({data: [], next: next + 1});
-                }
-              });
-          } else {
-            resolve(null);
+            next[0] += 1;
+            next[1] = 0;
+            resolve({
+              data: [],
+              next: next
+            })
           }
         });
     }

@@ -52,11 +52,10 @@ export function getFileGroup(url: string) {
     case ST.imagefap:
       let imagefapID = url.replace(/https?:\/\/www.imagefap.com\//, "");
       imagefapID = imagefapID.replace(/pictures\//, "");
-      imagefapID = imagefapID.replace(/profile\//, "");
       imagefapID = imagefapID.replace(/organizer\//, "");
       imagefapID = imagefapID.split("/")[0];
       return imagefapID;
-    case ST.sex:
+    case ST.sexcom:
       let sexcomID = url.replace(/https?:\/\/www.sex.com\//, "");
       sexcomID = sexcomID.replace(/user\//, "");
       sexcomID = sexcomID.split("?")[0];
@@ -89,14 +88,14 @@ export function getCachePath(source: string, config: Config) {
 }
 
 export function getSourceType(url: string): string {
-  if (/^https?:\/\/([^.]*|(66\.media))\.tumblr\.com/.exec(url) != null) { // Tumblr
+  if (/^https?:\/\/([^.]*|(66\.media))\.tumblr\.com/.exec(url) != null) {
     return ST.tumblr;
   } else if (/^https?:\/\/www.reddit.com\//.exec(url) != null) {
     return ST.reddit;
   } else if (/^https?:\/\/www.imagefap.com\//.exec(url) != null) {
     return ST.imagefap;
   } else if (/^https?:\/\/www.sex.com\//.exec(url) != null) {
-    return ST.sex
+    return ST.sexcom
   } else if (/^https?:\/\//.exec(url) != null) { // Arbitrary URL, assume image list
     return ST.list;
   } else { // Directory
