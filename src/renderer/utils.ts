@@ -60,6 +60,10 @@ export function getFileGroup(url: string) {
       sexcomID = sexcomID.replace(/user\//, "");
       sexcomID = sexcomID.split("?")[0];
       return sexcomID;
+    case ST.imgur:
+      let imgurID = url.replace(/https?:\/\/imgur.com\//, "");
+      imgurID = imgurID.replace(/a\//, "");
+      return imgurID;
     case ST.local:
       return url.substring(url.lastIndexOf(path.sep)+1);
     case ST.list:
@@ -94,6 +98,8 @@ export function getSourceType(url: string): string {
     return ST.reddit;
   } else if (/^https?:\/\/www.imagefap.com\//.exec(url) != null) {
     return ST.imagefap;
+  } else if (/^https?:\/\/imgur.com\//.exec(url) != null) {
+    return ST.imgur
   } else if (/^https?:\/\/www.sex.com\//.exec(url) != null) {
     return ST.sexcom
   } else if (/^https?:\/\//.exec(url) != null) { // Arbitrary URL, assume image list

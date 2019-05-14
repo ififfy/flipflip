@@ -6,10 +6,10 @@ import ControlGroup from "../sceneDetail/ControlGroup";
 export default class APIGroup extends React.Component {
   readonly props: {
     settings: RemoteSettings
-    activateReddit(): void,
-    clearReddit(): void,
     activateTumblr(): void,
     clearTumblr(): void,
+    activateReddit(): void,
+    clearReddit(): void,
     onUpdateSettings(keys: RemoteSettings, fn: (keys: RemoteSettings) => void): void,
   };
 

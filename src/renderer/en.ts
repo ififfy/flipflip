@@ -48,5 +48,6 @@ export default new Map<String, String>([
   ['st.reddit', 'reddit'],
   ['st.imagefap', 'imagefap'],
   ['st.sexcom', 'sexcom'],
+  ['st.imgur', 'imgur'],
   ['st.list', 'list'],
 ]);

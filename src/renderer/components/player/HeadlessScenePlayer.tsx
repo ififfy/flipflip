@@ -6,6 +6,7 @@ import wretch from 'wretch';
 import http from 'http';
 import Snoowrap from 'snoowrap';
 import tumblr from "tumblr.js";
+import imgur from "imgur";
 
 import {IF, ST} from '../../const';
 import {
@@ -79,6 +80,9 @@ function getPromise(config: Config, url: string, filter: string, next: any, over
     } else if (sourceType == ST.sexcom) {
       promiseFunction = loadSexCom;
       timeout = 8000;
+    } else if (sourceType == ST.imgur) {
+      promiseFunction = loadImgur;
+      timeout = 3000;
     }
     if (next == -1) {
       const cachePath = getCachePath(url, config);
@@ -426,6 +430,23 @@ function loadSexCom(config: Config, url: string, filter: string, next: any): Can
         } else {
           resolve(null);
         }
+      });
+  });
+}
+
+function loadImgur(config: Config, url: string, filter: string, next: any): CancelablePromise {
+  return new CancelablePromise((resolve, reject) => {
+    imgur.getAlbumInfo(getFileGroup(url))
+      .then((json: any) => {
+        console.log(json);
+        resolve({
+          data: json.data.images.map((i: any) => i.link).filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
+          next: null
+        })
+      })
+      .catch((err: any) => {
+        console.error(err.message);
+        resolve(null);
       });
   });
 }

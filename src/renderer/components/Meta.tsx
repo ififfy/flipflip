@@ -295,8 +295,8 @@ export default class Meta extends React.Component {
             onBackup={this.backup.bind(this)}
             onRestore={this.restore.bind(this)}
             onClean={this.cleanBackups.bind(this)}
-            onClearReddit={this.clearReddit.bind(this)}
             onClearTumblr={this.clearTumblr.bind(this)}
+            onClearReddit={this.clearReddit.bind(this)}
           />
         )}
       </div>
@@ -618,16 +618,16 @@ export default class Meta extends React.Component {
     this.setState({scenes: this.state.scenes.concat([scene]), route: [new Route({kind: 'scene', value: scene.id})]});
   }
 
-  clearReddit() {
-    const newConfig = this.state.config;
-    newConfig.remoteSettings.redditRefreshToken = "";
-    this.setState({config: newConfig});
-  }
-
   clearTumblr() {
     const newConfig = this.state.config;
     newConfig.remoteSettings.tumblrOAuthToken = "";
     newConfig.remoteSettings.tumblrOAuthTokenSecret = "";
+    this.setState({config: newConfig});
+  }
+
+  clearReddit() {
+    const newConfig = this.state.config;
+    newConfig.remoteSettings.redditRefreshToken = "";
     this.setState({config: newConfig});
   }
 };

@@ -70,6 +70,7 @@ const ST = { // source types
   reddit: 'st.reddit',
   imagefap: 'st.imagefap',
   sexcom: 'st.sexcom',
+  imgur: 'st.imgur',
 };
 
 export {
