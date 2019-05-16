@@ -15,16 +15,19 @@ export default class ImageView extends React.Component {
     this._applyImage();
   }
 
+  shouldComponentUpdate(props: any, state: any): boolean {
+    return props.fadeDuration !== this.props.fadeDuration || props.fadeState !== this.props.fadeState ||
+           props.img.src !== this.props.img.src;
+  }
+
   componentDidUpdate() {
     this._applyImage();
   }
 
   _applyImage() {
     const el = this.contentRef.current;
-    if (!el) return "No element";
-
     const img = this.props.img;
-    if (!img) return "No image available";
+    if (!el || !img) return;
 
     const firstChild = el.firstChild;
     if (firstChild instanceof HTMLImageElement) {
@@ -34,24 +37,26 @@ export default class ImageView extends React.Component {
     const parentWidth = el.offsetWidth;
     const parentHeight = el.offsetHeight;
     const parentAspect = parentWidth / parentHeight;
-    const imgAspect = img.width / img.height;
+    const imgWidth = img.width;
+    const imgHeight = img.height;
+    const imgAspect = imgWidth / imgHeight;
 
     if (imgAspect < parentAspect) {
-      const scale = parentHeight / img.height;
+      const scale = parentHeight / imgHeight;
       img.style.width = 'auto';
       img.style.height = '100%';
       img.style.marginTop = '0';
-      img.style.marginLeft = (parentWidth / 2 - img.width * scale / 2) + 'px';
+      img.style.marginLeft = (parentWidth / 2 - imgWidth * scale / 2) + 'px';
     } else {
-      const scale = parentWidth / img.width;
+      const scale = parentWidth / imgWidth;
       img.style.height = 'auto';
       img.style.width = '100%';
-      img.style.marginTop = (parentHeight / 2 - img.height * scale / 2) + 'px';
+      img.style.marginTop = (parentHeight / 2 - imgHeight * scale / 2) + 'px';
       img.style.marginLeft = '0';
     }
 
-    if (el.firstChild) {
-      el.removeChild(el.firstChild);
+    if (firstChild) {
+      el.removeChild(firstChild);
     }
     el.appendChild(img);
   }
