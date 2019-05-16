@@ -8,11 +8,12 @@ import SimpleSliderInput from "../ui/SimpleSliderInput";
 import SimpleCheckbox from "../ui/SimpleCheckbox";
 import SimpleColorPicker from "../ui/SimpleColorPicker";
 import {SceneSettings} from "../../Config";
+import SimpleNumberInput from "../ui/SimpleNumberInput";
 
 export default class EffectGroup extends React.Component {
   readonly props: {
     scene: Scene | SceneSettings,
-    allScenes?: Array<Scene>,
+    allScenes: Array<Scene>,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 
@@ -87,21 +88,31 @@ export default class EffectGroup extends React.Component {
         </div>
 
         <div className="ControlSubgroup">
-          {this.props.allScenes != null && (
-            <SimpleOptionPicker
-              onChange={this.onChangeOverlaySceneID.bind(this)}
-              label="Overlay scene"
-              value={this.props.scene.overlaySceneID.toString()}
-              parseKeyFunction={this.getSceneName.bind(this)}
-              keys={["0"].concat(this.props.allScenes.map((s) => s.id.toString()))}/>)}
-          {(this.props.allScenes != null || this.props.scene.overlaySceneID != 0) && (
-            <SimpleSliderInput
-              isEnabled={this.props.scene.overlaySceneID != 0}
-              onChange={this.onChangeOverlaySceneOpacity.bind(this)}
-              label={"Overlay opacity: " + (this.props.scene.overlaySceneOpacity * 100).toFixed(0) + '%'}
-              min={1}
-              max={99}
-              value={(this.props.scene.overlaySceneOpacity * 100)}/>)}
+          <SimpleOptionPicker
+            onChange={this.onChangeOverlaySceneID.bind(this)}
+            label="Overlay scene"
+            value={this.props.scene.overlaySceneID.toString()}
+            parseKeyFunction={this.getSceneName.bind(this)}
+            keys={["0"].concat(this.props.allScenes.map((s) => s.id.toString()))}/>)}
+          <SimpleSliderInput
+            isEnabled={this.props.scene.overlaySceneID != 0}
+            onChange={this.onChangeOverlaySceneOpacity.bind(this)}
+            label={"Overlay opacity: " + (this.props.scene.overlaySceneOpacity * 100).toFixed(0) + '%'}
+            min={1}
+            max={99}
+            value={(this.props.scene.overlaySceneOpacity * 100)}/>
+          <SimpleOptionPicker
+            onChange={this.onChangeNextSceneID.bind(this)}
+            label="Next Scene"
+            value={this.props.scene.nextSceneID.toString()}
+            parseKeyFunction={this.getSceneName.bind(this)}
+            keys={["0"].concat(this.props.allScenes.filter((s) => s.id != this.props.scene.id).map((s) => s.id.toString()))}/>)}
+          <SimpleNumberInput
+            label="Time before playing next scene (sec)"
+            min={0}
+            value={this.props.scene.nextSceneTime}
+            isEnabled={this.props.scene.nextSceneID != 0}
+            onChange={this.onChangeNextSceneTime.bind(this)}/>
         </div>
       </ControlGroup>
     );
@@ -123,4 +134,8 @@ export default class EffectGroup extends React.Component {
   onChangeOverlaySceneOpacity(value: string) { this.update((s) => { s.overlaySceneOpacity = parseInt(value, 10) / 100; }); }
 
   onChangeOverlaySceneID(id: string) { this.update((s) => { s.overlaySceneID = parseInt(id, 10); }); }
+
+  onChangeNextSceneTime(value: string) { this.update((s) => { s.nextSceneTime = parseInt(value, 10); }); }
+
+  onChangeNextSceneID(id: string) { this.update((s) => { s.nextSceneID = parseInt(id, 10); }); }
 }

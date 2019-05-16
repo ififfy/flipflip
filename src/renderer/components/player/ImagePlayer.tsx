@@ -170,6 +170,9 @@ export default class ImagePlayer extends React.Component {
     if (this.props.advanceHack) {
       this.props.advanceHack.listener = null;
     }
+    if (this.props.deleteHack) {
+      this.props.deleteHack.listener = null;
+    }
   }
 
   componentWillReceiveProps(props: any) {

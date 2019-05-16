@@ -49,7 +49,7 @@ export default class Player extends React.Component {
     goBack(): void,
     scene: Scene,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
-    overlayScene?: Scene,
+    scenes?: Array<Scene>,
     tags?: Array<Tag>,
     allTags?: Array<Tag>,
     toggleTag?(sourceID: number, tag: Tag): void,
@@ -73,7 +73,8 @@ export default class Player extends React.Component {
       ? (Sound as any).status.PLAYING
       : (Sound as any).status.PAUSED;
     const tagNames = this.props.tags ? this.props.tags.map((t) => t.name) : [];
-    const isLoaded = this.state.isMainLoaded && (!this.props.overlayScene || this.state.isOverlayLoaded) && !this.state.isEmpty;
+    const hasOverlay = (this.props.scenes && this.props.scene.overlaySceneID !== 0)
+    const isLoaded = this.state.isMainLoaded && (!hasOverlay || this.state.isOverlayLoaded) && !this.state.isEmpty;
     const overlayStrobe = this.props.scene.strobe && this.props.scene.strobeOverlay;
     const showCaptionProgram = (
       isLoaded &&
@@ -90,6 +91,7 @@ export default class Player extends React.Component {
             config={this.props.config}
             opacity={1}
             scene={this.props.scene}
+            /*nextScene={this.props.scene.nextScene}*/
             historyOffset={this.state.historyOffset}
             isPlaying={this.state.isPlaying}
             showLoadingState={!this.state.isMainLoaded}
@@ -100,16 +102,17 @@ export default class Player extends React.Component {
             setHistoryOffset={this.setHistoryOffset.bind(this)}
             setHistoryPaths={this.setHistoryPaths.bind(this)}/>
 
-          {this.props.overlayScene && (
+          {hasOverlay && (
             <HeadlessScenePlayer
               config={this.props.config}
               opacity={this.props.scene.overlaySceneOpacity}
-              scene={this.props.overlayScene}
+              scene={this.getScene(this.props.scene.overlaySceneID)}
               historyOffset={0}
-              isPlaying={this.state.isPlaying && !this.state.isEmpty}
+              isPlaying={this.state.isOverlayLoaded && this.state.isPlaying && !this.state.isEmpty}
               showLoadingState={this.state.isMainLoaded && !this.state.isOverlayLoaded}
               showEmptyState={false}
               didFinishLoading={this.playOverlay.bind(this)}
+              wasReset={this.resetOverlay.bind(this)}
               setHistoryOffset={this.nop.bind(this)}
               setHistoryPaths={this.nop.bind(this)}/>
           )}
@@ -181,7 +184,8 @@ export default class Player extends React.Component {
 
             <EffectGroup
               scene={this.props.scene}
-              onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+              onUpdateScene={this.props.onUpdateScene.bind(this)}
+              allScenes={this.props.scenes}/>
 
             <AudioGroup
               scene={this.props.scene}
@@ -323,7 +327,7 @@ export default class Player extends React.Component {
 
   playMain(empty: boolean) {
     this.setState({isMainLoaded: true, isEmpty: empty});
-    if (!this.props.overlayScene || this.state.isOverlayLoaded) {
+    if (!this.props.scenes || this.props.scene.overlaySceneID === 0 || this.state.isOverlayLoaded) {
       this.play();
     }
   }
@@ -333,6 +337,10 @@ export default class Player extends React.Component {
     if (this.state.isMainLoaded) {
       this.play();
     }
+  }
+
+  resetOverlay() {
+    this.setState({isOverlayLoaded: false});
   }
 
   play() {
@@ -428,6 +436,15 @@ export default class Player extends React.Component {
   toggleFull() {
     this.setFullscreen(!getCurrentWindow().isFullScreen());
     this.setMenuBarVisibility(!getCurrentWindow().isFullScreen());
+  }
+
+  getScene(id: number): Scene {
+    for (let s of this.props.scenes) {
+      if (s.id == id) {
+        return s;
+      }
+    }
+    return null;
   }
 
   /* Menu and hotkey options DON'T DELETE */

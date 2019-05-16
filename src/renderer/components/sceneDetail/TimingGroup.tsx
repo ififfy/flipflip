@@ -5,7 +5,7 @@ import {SceneSettings} from "../../Config";
 import Scene from "../../Scene";
 import ControlGroup from "./ControlGroup";
 import SimpleOptionPicker from "../ui/SimpleOptionPicker";
-import SimpleTextInput from "../ui/SimpleTextInput";
+import SimpleNumberInput from "../ui/SimpleNumberInput";
 
 export default class TimingGroup extends React.Component {
   readonly props: {
@@ -21,11 +21,12 @@ export default class TimingGroup extends React.Component {
           label="Timing"
           value={this.props.scene.timingFunction}
           keys={Object.values(TF)}/>
-        <SimpleTextInput
+        <SimpleNumberInput
           isEnabled={this.props.scene.timingFunction === TF.constant}
           onChange={this.changeKey.bind(this, 'timingConstant').bind(this)}
           label="Time between images (ms)"
-          value={this.props.scene.timingConstant.toString()}/>
+          value={parseInt(this.props.scene.timingConstant, 10)}
+          min={0}/>
       </ControlGroup>
     );
   }

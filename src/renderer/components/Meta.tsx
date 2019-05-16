@@ -179,14 +179,6 @@ export default class Meta extends React.Component {
     return null;
   }
 
-  overlayScene?(): Scene {
-    if (!this.scene()) return null;
-    if (!this.scene().overlaySceneID) return null;
-    return this.state.scenes.filter((s) => {
-      return s.id === this.scene().overlaySceneID;
-    })[0];
-  }
-
   componentDidMount() {
     setInterval(this.save.bind(this), 500);
   }
@@ -267,8 +259,8 @@ export default class Meta extends React.Component {
           <Player
             config={this.state.config}
             scene={this.scene()}
+            scenes={this.state.scenes}
             onUpdateScene={this.onUpdateScene.bind(this)}
-            overlayScene={this.overlayScene()}
             goBack={this.goBack.bind(this)}
           />
         )}
@@ -445,7 +437,7 @@ export default class Meta extends React.Component {
           id: id,
           tags: new Array<Tag>(),
         });
-        sceneSources.push(newSource);
+        sceneSources.unshift(newSource);
         id += 1;
       }
     }

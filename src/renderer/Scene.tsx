@@ -34,6 +34,8 @@ export default class Scene {
   imageSizeMin: 200;
   overlaySceneID: number = 0;
   overlaySceneOpacity: number = 0.5;
+  nextSceneID: number = 0;
+  nextSceneTime: number = 900;
   libraryID: number = -1;
   audioURL?: string = "";
   tagWeights?: string;

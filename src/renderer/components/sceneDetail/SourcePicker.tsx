@@ -343,7 +343,7 @@ export default class SourcePicker extends React.Component {
 
     let newLibrary = this.props.sources;
     for (let url of sources) {
-      newLibrary.push(new LibrarySource({
+      newLibrary.unshift(new LibrarySource({
         url: url,
         id: id,
         tags: new Array<Tag>(),

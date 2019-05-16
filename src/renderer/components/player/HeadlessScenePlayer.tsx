@@ -57,7 +57,7 @@ function filterPathsToJustImages(imageTypeFilter: string, paths: Array<string>):
 }
 
 // Determine what kind of source we have based on the URL and return associated Promise
-function getPromise(config: Config, url: string, filter: string, next: any, overlay: boolean): CancelablePromise {
+function getPromise(config: Config, url: string, filter: string, next: any): CancelablePromise {
   let promise;
   const sourceType = getSourceType(url);
 
@@ -110,7 +110,7 @@ function loadLocalDirectory(config: Config, url: string, filter: string, next: a
         console.warn(err);
         resolve(null);
       } else {
-        resolve({data: filterPathsToJustImages(filter, rawFiles).map((p) => fileURL(p)), next: null});
+        resolve({data: filterPathsToJustImages(filter, rawFiles).map((p) => fileURL(p)), next: next});
       }
     });
   });
@@ -438,7 +438,6 @@ function loadImgur(config: Config, url: string, filter: string, next: any): Canc
   return new CancelablePromise((resolve, reject) => {
     imgur.getAlbumInfo(getFileGroup(url))
       .then((json: any) => {
-        console.log(json);
         resolve({
           data: json.data.images.map((i: any) => i.link).filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
           next: null
@@ -465,6 +464,7 @@ export default class HeadlessScenePlayer extends React.Component {
     setHistoryOffset: (historyOffset: number) => void,
     setHistoryPaths: (historyPaths: Array<HTMLImageElement>) => void,
     didFinishLoading: (empty?: boolean) => void,
+    wasReset?: () => void,
   };
 
   readonly state = {
@@ -475,6 +475,7 @@ export default class HeadlessScenePlayer extends React.Component {
     sourcesProcessed: 0,
     progressMessage: this.props.scene.sources.length > 0 ? this.props.scene.sources[0].url : "",
     allURLs: new Map<string, Array<string>>(),
+    restart: false,
   };
 
   render() {
@@ -487,7 +488,7 @@ export default class HeadlessScenePlayer extends React.Component {
         className="HeadlessScenePlayer"
         style={{opacity: this.props.opacity}}>
 
-        {showImagePlayer && (
+        {(showImagePlayer && this.state.restart == false) && (
           <ImagePlayer
             config={this.props.config}
             advanceHack={this.props.advanceHack}
@@ -539,7 +540,7 @@ export default class HeadlessScenePlayer extends React.Component {
 
     let sourceLoop = () => {
       let d = this.props.scene.sources[n] != null ? this.props.scene.sources[n].url : "";
-      let loadPromise = getPromise(this.props.config, d, this.props.scene.imageTypeFilter, -1, this.props.opacity != 1);
+      let loadPromise = getPromise(this.props.config, d, this.props.scene.imageTypeFilter, -1);
 
       // Because of rendering lag, always display the NEXT source, unless this is the last one
       let message;
@@ -567,7 +568,7 @@ export default class HeadlessScenePlayer extends React.Component {
             // If this is a remote URL, queue up the next promise
             if (object.next != null) {
               newPromiseQueue.push(
-                getPromise(this.props.config, d, this.props.scene.imageTypeFilter, object.next, this.props.opacity != 1));
+                getPromise(this.props.config, d, this.props.scene.imageTypeFilter, object.next));
             }
           }
 
@@ -579,6 +580,7 @@ export default class HeadlessScenePlayer extends React.Component {
             setTimeout(this.props.didFinishLoading.bind(this, isEmpty(Array.from(newAllURLs.values()))), 0);
             // All sources have been initialized, start our remote promise loop
             promiseLoop();
+            // TODO At this time, we can also start loading our NEXT scene
           }
         });
     };
@@ -604,7 +606,7 @@ export default class HeadlessScenePlayer extends React.Component {
               // Add the next promise to the queue
               let newPromiseQueue = this.state.promiseQueue;
               newPromiseQueue.push(
-                getPromise(this.props.config, promise.source, this.props.scene.imageTypeFilter, object.next, this.props.opacity != 1));
+                getPromise(this.props.config, promise.source, this.props.scene.imageTypeFilter, object.next));
 
               this.setState({allURLs: newAllURLs, promiseQueue: newPromiseQueue});
             }
@@ -616,6 +618,30 @@ export default class HeadlessScenePlayer extends React.Component {
     };
 
     sourceLoop();
+  }
+
+  componentWillReceiveProps(props: any) {
+    if (props.scene.id != this.props.scene.id) {
+      this.state.promise.cancel();
+      this.setState({
+        isLoaded: false,
+        onLoaded: null,
+        promiseQueue: Array<CancelablePromise>(),
+        sourcesProcessed: 0,
+        progressMessage: this.props.scene.sources.length > 0 ? this.props.scene.sources[0].url : "",
+        allURLs: new Map<string, Array<string>>(),
+        restart: true});
+    }
+  }
+
+  componentDidUpdate() {
+    if (this.state.restart == true) {
+      if (this.props.wasReset != null) {
+        this.props.wasReset();
+      }
+      this.setState({restart: false});
+      this.componentDidMount();
+    }
   }
 
   componentWillUnmount() {

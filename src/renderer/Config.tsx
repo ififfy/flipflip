@@ -78,6 +78,8 @@ export class SceneSettings implements SceneSettingsI {
   playFullGif = false;
   overlaySceneID = 0;
   overlaySceneOpacity = 0.5;
+  nextSceneID = 0;
+  nextSceneTime = 900;
   textKind = "";
   textSource = "";
 

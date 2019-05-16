@@ -760,6 +760,9 @@ label.SimpleCheckbox {
 
       .SourcePicker__SourceTitle {
         color: white !important;
+        > input {
+          width: 250px;
+        }
       }
     }
   }
