@@ -109,7 +109,7 @@ export default class SceneDetail extends React.Component {
             onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
           <div className="ControlGroup m-wide">
-            <div className="ControlGroup__Title">Sources</div>
+            <div className="ControlGroup__Title">{`Sources (${this.props.scene.sources.length})`}</div>
             <SourcePicker
               sources={this.props.scene.sources}
               yOffset={0}

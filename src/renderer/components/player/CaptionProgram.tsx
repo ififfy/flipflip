@@ -83,8 +83,8 @@ export default class CaptionProgram extends React.Component {
     this.stop(false);
   }
 
-  shouldComponentUpdate(nextProps: { url: string }, nextState: any) {
-    return nextProps.url !== this.props.url;
+  shouldComponentUpdate(props: any, state: any): boolean {
+    return props.url !== this.props.url;
   }
 
   componentWillReceiveProps(nextProps: { url: string }) {

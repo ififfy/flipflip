@@ -955,21 +955,18 @@ label.SimpleCheckbox {
   justify-content: center;
 
   .ProgressContainer {
-    width: 20rem;
-    height: 20rem;
+    width: 22rem;
+    height: 22rem;
+  }
+
+  .StartButton {
+    position: absolute;
+    margin-top: 5rem;
   }
 
   p {
     text-align: center;
   }
-}
-
-.EmptyIndicator {
-  position: fixed;
-  top: 50%;
-  right: 0;
-  left: 0;
-  text-align: center;
 }
 
 .Player {
@@ -984,6 +981,16 @@ label.SimpleCheckbox {
     top: 0;
     right: 0;
     left: 0;
+  }
+
+  .EmptyIndicator {
+    position: fixed;
+    top: 50%;
+    right: 0;
+    left: 0;
+    text-align: center;
+    font-size: 25px;
+    font-weight: bolder;
   }
 }
 

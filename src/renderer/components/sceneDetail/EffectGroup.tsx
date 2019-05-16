@@ -93,7 +93,7 @@ export default class EffectGroup extends React.Component {
             label="Overlay scene"
             value={this.props.scene.overlaySceneID.toString()}
             parseKeyFunction={this.getSceneName.bind(this)}
-            keys={["0"].concat(this.props.allScenes.map((s) => s.id.toString()))}/>)}
+            keys={["0"].concat(this.props.allScenes.map((s) => s.id.toString()))}/>
           <SimpleSliderInput
             isEnabled={this.props.scene.overlaySceneID != 0}
             onChange={this.onChangeOverlaySceneOpacity.bind(this)}
@@ -106,7 +106,7 @@ export default class EffectGroup extends React.Component {
             label="Next Scene"
             value={this.props.scene.nextSceneID.toString()}
             parseKeyFunction={this.getSceneName.bind(this)}
-            keys={["0"].concat(this.props.allScenes.filter((s) => s.id != this.props.scene.id).map((s) => s.id.toString()))}/>)}
+            keys={["0"].concat(this.props.allScenes.filter((s) => s.id != this.props.scene.id).map((s) => s.id.toString()))}/>
           <SimpleNumberInput
             label="Time before playing next scene (sec)"
             min={0}

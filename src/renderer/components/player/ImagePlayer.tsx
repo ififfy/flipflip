@@ -11,6 +11,7 @@ import IdleTimer from 'react-idle-timer';
 import {BT, HTF, IF, ST, TF, VTF, ZF} from '../../const';
 import {getCachePath, getFileName, getRandomListItem, getSourceType, urlToPath} from '../../utils';
 import Config from "../../Config";
+import Scene from "../../Scene";
 import TIMING_FUNCTIONS from '../../TIMING_FUNCTIONS';
 import ChildCallbackHack from './ChildCallbackHack';
 import ImageView from './ImageView';
@@ -23,29 +24,17 @@ class GifInfo {
 export default class ImagePlayer extends React.Component {
   readonly props: {
     config: Config,
+    scene: Scene,
     advanceHack?: ChildCallbackHack,
     deleteHack?: ChildCallbackHack,
     maxInMemory: number,
     maxLoadingAtOnce: number,
     maxToRememberInHistory: number,
     allURLs: Map<String, Array<string>>,
+    strobe: boolean,
+    strobeTime: number,
     isPlaying: boolean,
-    timingFunction: string,
-    timingConstant: string,
-    zoomType: string,
-    backgroundType: string;
-    backgroundColor: string;
-    strobe: boolean;
-    strobeTime: number;
-    strobeColor: string;
-    effectLevel: number,
-    horizTransType: string,
-    vertTransType: string,
-    imageTypeFilter: string,
     historyOffset: number,
-    fadeEnabled: boolean,
-    playFullGif: boolean;
-    imageSizeMin: number,
     setHistoryPaths: (historyPaths: Array<HTMLImageElement>) => void,
     setHistoryOffset: (historyOffset: number) => void,
     onLoaded: () => void,
@@ -58,7 +47,6 @@ export default class ImagePlayer extends React.Component {
     timeToNextFrame: 0,
     timeoutID: 0,
     nextImageID: 0,
-    restart: false,
     hideCursor: false,
   };
 
@@ -79,7 +67,7 @@ export default class ImagePlayer extends React.Component {
       (img as any).key = 0;
       imgs.push(img);
     } else {
-      const max = this.props.fadeEnabled ? 3 : 2;
+      const max = this.props.scene.crossFade ? 3 : 2;
       for (let i = 1; i < max; i++) {
         const img = this.state.historyPaths[this.state.historyPaths.length - i];
         if (img) {
@@ -90,7 +78,7 @@ export default class ImagePlayer extends React.Component {
 
     let className = "ImagePlayer translate-";
 
-    switch (this.props.horizTransType) {
+    switch (this.props.scene.horizTransType) {
       case HTF.none:
         className += '0-';
         break;
@@ -101,7 +89,7 @@ export default class ImagePlayer extends React.Component {
         className += '-10-';
         break;
     }
-    switch (this.props.vertTransType) {
+    switch (this.props.scene.vertTransType) {
       case VTF.none:
         className += '0-';
         break;
@@ -112,36 +100,36 @@ export default class ImagePlayer extends React.Component {
         className += '-10-';
         break;
     }
-    switch (this.props.zoomType) {
+    switch (this.props.scene.zoomType) {
       case ZF.none:
-        className += `${this.props.effectLevel}s`;
+        className += `${this.props.scene.effectLevel}s`;
         break;
       case ZF.in:
-        className += `zoom-${this.props.effectLevel}s`;
+        className += `zoom-${this.props.scene.effectLevel}s`;
         break;
       case ZF.out:
-        className += `zoom-out-${this.props.effectLevel}s`;
+        className += `zoom-out-${this.props.scene.effectLevel}s`;
     }
 
     return (
       <div className={className}
-           style={{background: this.props.strobe ? this.props.strobeColor : "none", cursor: this.state.hideCursor ? "none" : "initial"}}>
+           style={{background: this.props.strobe ? this.props.scene.strobeColor : "none", cursor: this.state.hideCursor ? "none" : "initial"}}>
         <IdleTimer
           ref={null}
           onActive={this.onActive.bind(this)}
           onIdle={this.onIdle.bind(this)}
-          timeout={3000} />
+          timeout={2000} />
         <div style={{ animation: this.props.strobe ? "strobe " + this.props.strobeTime + "ms steps(1, end) infinite" : "none" }}>
-          <div className={`u-fill-container ${this.props.backgroundType == BT.color ? '' : 'u-fill-image-blur'}`} style={{
-            background: this.props.backgroundType == BT.color ? this.props.backgroundColor : null,
-            backgroundImage: this.props.backgroundType == BT.color ? null : `url("${imgs[0].src}")`,
+          <div className={`u-fill-container ${this.props.scene.backgroundType == BT.color ? '' : 'u-fill-image-blur'}`} style={{
+            background: this.props.scene.backgroundType == BT.color ? this.props.scene.backgroundColor : null,
+            backgroundImage: this.props.scene.backgroundType == BT.color ? null : `url("${imgs[0].src}")`,
           }}
           />
           {imgs.map((img) => {
             return <ImageView
               img={img}
               key={(img as any).key}
-              fadeState={this.props.fadeEnabled ? (img.src === imgs[0].src ? 'in' : 'out') : 'none'}
+              fadeState={this.props.scene.crossFade ? (img.src === imgs[0].src ? 'in' : 'out') : 'none'}
               fadeDuration={this.state.timeToNextFrame / 2}/>;
           })}
         </div>
@@ -163,6 +151,7 @@ export default class ImagePlayer extends React.Component {
         this.delete();
       }
     }
+    this.start();
   }
 
   componentWillUnmount() {
@@ -175,17 +164,19 @@ export default class ImagePlayer extends React.Component {
     }
   }
 
+  shouldComponentUpdate(props: any, state: any): boolean {
+    return (state.historyPaths !== this.state.historyPaths ||
+            props.historyOffset !== this.props.historyOffset ||
+            props.strobe !== this.props.strobe ||
+            props.strobeTime !== this.props.strobeTime);
+  }
+
   componentWillReceiveProps(props: any) {
-    if ((!this.props.isPlaying && props.isPlaying) || this.state.restart) {
-      this.setState({restart: false});
+    if (!this.props.isPlaying && props.isPlaying) {
       this.start();
     } else if (!props.isPlaying && this.state.timeoutID != 0) {
       clearTimeout(this.state.timeoutID);
       this.setState({timeoutID: 0});
-    } else if (this.props.allURLs == null && props.allURLs != null && props.allURLs.size > 0) {
-      // Can't just call start again, because props won't have been updated yet,
-      // but flag to restart next time props are updated
-      this.setState({restart: true});
     }
   }
 
@@ -223,7 +214,6 @@ export default class ImagePlayer extends React.Component {
 
   start() {
     if (this.props.allURLs == null) {
-      this.props.onLoaded();
       return;
     }
 
@@ -290,7 +280,7 @@ export default class ImagePlayer extends React.Component {
       // images may load immediately, but that messes up the setState()
       // lifecycle, so always load on the next event loop iteration.
       // Also, now  we know the image size, so we can finally filter it.
-      if (img.width < this.props.imageSizeMin || img.height < this.props.imageSizeMin) {
+      if (img.width < this.props.scene.imageSizeMin || img.height < this.props.scene.imageSizeMin) {
         setTimeout(errorCallback, 0);
       } else {
         if (this.props.config.caching.enabled) {
@@ -350,16 +340,16 @@ export default class ImagePlayer extends React.Component {
 
     const processInfo = (info: GifInfo) => {
       // If gif is animated and we want to play entire length, store its duration
-      if (this.props.playFullGif && info && info.animated) {
+      if (this.props.scene.playFullGif && info && info.animated) {
         img.setAttribute("duration", info.duration);
       }
 
       // Exclude non-animated gifs from gifs
-      if (this.props.imageTypeFilter == IF.gifs && info && !info.animated) {
+      if (this.props.scene.imageTypeFilter == IF.gifs && info && !info.animated) {
         this.runFetchLoop(i);
         return;
         // Exclude animated gifs from stills
-      } else if (this.props.imageTypeFilter == IF.stills && info && info.animated) {
+      } else if (this.props.scene.imageTypeFilter == IF.stills && info && info.animated) {
         this.runFetchLoop(i);
         return;
       }
@@ -368,7 +358,7 @@ export default class ImagePlayer extends React.Component {
     };
 
     // Get gifinfo if we need for imageFilter or playFullGif
-    if ((this.props.imageTypeFilter == IF.gifs || this.props.imageTypeFilter == IF.stills || this.props.playFullGif) && url.toLocaleLowerCase().endsWith('.gif')) {
+    if ((this.props.scene.imageTypeFilter == IF.gifs || this.props.scene.imageTypeFilter == IF.stills || this.props.scene.playFullGif) && url.toLocaleLowerCase().endsWith('.gif')) {
       // Get gif info. See https://github.com/Prinzhorn/gif-info
       try {
         if (url.includes("file:///")) {
@@ -416,14 +406,14 @@ export default class ImagePlayer extends React.Component {
     if (!schedule) return;
 
     let timeToNextFrame: number = 0;
-    if (this.props.timingFunction === TF.constant) {
-      timeToNextFrame = parseInt(this.props.timingConstant, 10);
+    if (this.props.scene.timingFunction === TF.constant) {
+      timeToNextFrame = parseInt(this.props.scene.timingConstant, 10);
       // If we cannot parse this, default to 1s
       if (!timeToNextFrame && timeToNextFrame != 0) {
         timeToNextFrame = 1000;
       }
     } else {
-      timeToNextFrame = TIMING_FUNCTIONS.get(this.props.timingFunction)();
+      timeToNextFrame = TIMING_FUNCTIONS.get(this.props.scene.timingFunction)();
     }
     if (nextImg && nextImg.getAttribute("duration") && timeToNextFrame < parseInt(nextImg.getAttribute("duration"))) {
       timeToNextFrame = parseInt(nextImg.getAttribute("duration"));

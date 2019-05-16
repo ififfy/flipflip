@@ -16,6 +16,7 @@ import AudioGroup from "../sceneDetail/AudioGroup";
 import EffectGroup from "../sceneDetail/EffectGroup";
 import TextGroup from "../sceneDetail/TextGroup";
 import TimingGroup from "../sceneDetail/TimingGroup";
+import Progress from "../ui/Progress";
 
 const {getCurrentWindow, Menu, MenuItem, app} = remote;
 
@@ -56,10 +57,17 @@ export default class Player extends React.Component {
   };
 
   readonly state = {
+    isLoaded: false,
+    hasStarted: false,
+    canMainStart: false,
     isMainLoaded: false,
+    canOverlayStart: false,
     isOverlayLoaded: false,
     isEmpty: false,
-    isPlaying: false,
+    isPlaying: true,
+    total: 0,
+    progress: 0,
+    progressMessage: this.props.scene.sources.length > 0 ? this.props.scene.sources[0].url : "",
     historyOffset: 0,
     historyPaths: Array<HTMLImageElement>(),
     imagePlayerAdvanceHack: new ChildCallbackHack(),
@@ -73,52 +81,80 @@ export default class Player extends React.Component {
       ? (Sound as any).status.PLAYING
       : (Sound as any).status.PAUSED;
     const tagNames = this.props.tags ? this.props.tags.map((t) => t.name) : [];
-    const hasOverlay = (this.props.scenes && this.props.scene.overlaySceneID !== 0)
-    const isLoaded = this.state.isMainLoaded && (!hasOverlay || this.state.isOverlayLoaded) && !this.state.isEmpty;
+    const hasOverlay = (this.props.scenes && this.props.scene.overlaySceneID !== 0);
     const overlayStrobe = this.props.scene.strobe && this.props.scene.strobeOverlay;
     const showCaptionProgram = (
-      isLoaded &&
       this.props.scene.textSource &&
       this.props.scene.textSource.length &&
       this.state.isPlaying);
+    //const nextScene = this.getScene(this.props.scene.nextSceneID);
+    //const nextOverlay = nextScene ? this.getScene(nextScene.overlaySceneID) : null;
+    const nextScene: any = null; // TODO
+    const nextOverlay: any = null;
 
     return (
       <div className="Player" style={{
-        background: overlayStrobe && isLoaded ? this.props.scene.strobeColor : "none",
+        background: overlayStrobe && this.state.hasStarted ? this.props.scene.strobeColor : "none",
       }}>
-        <div style={{ animation: overlayStrobe && isLoaded ? "strobe " + this.props.scene.strobeTime + "ms steps(1, end) infinite" : "none" }}>
+        {!this.state.hasStarted && !this.state.isEmpty && (
+          <Progress
+          total={this.state.total}
+          current={this.state.progress}
+          message={this.state.progressMessage}>
+            {this.state.isLoaded && (<div
+              className="StartButton u-button u-clickable"
+              onClick={this.start.bind(this, true)}>
+              Start Now
+            </div>)}
+          </Progress>
+        )}
+        {this.state.isEmpty && (
+          <div className="EmptyIndicator"><p>I couldn't find anything</p><p>(ಥ﹏ಥ)</p></div>
+        )}
+
+        <div style={{
+          animation: overlayStrobe && this.state.hasStarted ? "strobe " + this.props.scene.strobeTime + "ms steps(1, end) infinite" : "none",
+          display: this.state.hasStarted ? "" : "none"}}>
           <HeadlessScenePlayer
             config={this.props.config}
-            opacity={1}
             scene={this.props.scene}
-            /*nextScene={this.props.scene.nextScene}*/
-            historyOffset={this.state.historyOffset}
+            nextScene={nextScene}
+            opacity={1}
             isPlaying={this.state.isPlaying}
-            showLoadingState={!this.state.isMainLoaded}
-            showEmptyState={true}
+            strobe={!this.props.scene.strobeOverlay && this.props.scene.strobe}
+            strobeTime={this.props.scene.strobeTime}
+            historyOffset={this.state.historyOffset}
             advanceHack={this.state.imagePlayerAdvanceHack}
             deleteHack={this.state.imagePlayerDeleteHack}
-            didFinishLoading={this.playMain.bind(this)}
             setHistoryOffset={this.setHistoryOffset.bind(this)}
-            setHistoryPaths={this.setHistoryPaths.bind(this)}/>
+            setHistoryPaths={this.setHistoryPaths.bind(this)}
+            finishedLoading={this.setMainLoaded.bind(this)}
+            firstImageLoaded={this.setMainCanStart.bind(this)}
+            setProgress={this.setProgress.bind(this)}
+            hasStarted={this.state.hasStarted}
+           />
 
-          {hasOverlay && (
+          {hasOverlay && !this.state.isEmpty && (
             <HeadlessScenePlayer
               config={this.props.config}
-              opacity={this.props.scene.overlaySceneOpacity}
               scene={this.getScene(this.props.scene.overlaySceneID)}
+              nextScene={nextOverlay}
+              opacity={this.props.scene.overlaySceneOpacity}
+              isPlaying={this.state.isPlaying && !this.state.isEmpty}
+              strobe={false}
+              strobeTime={0}
               historyOffset={0}
-              isPlaying={this.state.isOverlayLoaded && this.state.isPlaying && !this.state.isEmpty}
-              showLoadingState={this.state.isMainLoaded && !this.state.isOverlayLoaded}
-              showEmptyState={false}
-              didFinishLoading={this.playOverlay.bind(this)}
-              wasReset={this.resetOverlay.bind(this)}
-              setHistoryOffset={this.nop.bind(this)}
-              setHistoryPaths={this.nop.bind(this)}/>
+              setHistoryOffset={this.nop}
+              setHistoryPaths={this.nop}
+              finishedLoading={this.setOverlayLoaded.bind(this)}
+              firstImageLoaded={this.setOverlayCanStart.bind(this)}
+              setProgress={this.state.isMainLoaded ? this.setProgress.bind(this) : this.nop}
+              hasStarted={this.state.hasStarted}
+            />
           )}
         </div>
 
-        {showCaptionProgram && (
+        {this.state.hasStarted && showCaptionProgram && (
           <CaptionProgram
             blinkColor={this.props.scene.blinkColor}
             blinkFontSize={this.props.scene.blinkFontSize}
@@ -134,7 +170,7 @@ export default class Player extends React.Component {
 
         <div className={`u-button-row ${this.state.isPlaying ? 'u-show-on-hover-only' : ''}`}>
           <div className="u-button-row-right">
-            {this.props.scene.audioURL && isLoaded && (
+            {this.props.scene.audioURL && this.state.hasStarted && (
               <Sound
                 url={this.props.scene.audioURL}
                 playStatus={audioPlayStatus}
@@ -175,7 +211,7 @@ export default class Player extends React.Component {
           <div className="BackButton u-button u-clickable" onClick={this.navigateBack.bind(this)}>Back</div>
         </div>
 
-        {isLoaded && (
+        {this.state.hasStarted && (
           <div className="SceneOptions u-button-sidebar">
             <h2 className="SceneOptionsHeader">Scene Options</h2>
             <TimingGroup
@@ -197,7 +233,7 @@ export default class Player extends React.Component {
           </div>
         )}
 
-        {isLoaded && this.props.allTags && (
+        {this.state.hasStarted && this.props.allTags && (
           <div className="SourceTags">
             {this.props.allTags.map((tag) =>
               <div className={`SourceTag u-clickable ${tagNames && tagNames.includes(tag.name) ? 'u-selected' : ''}`}
@@ -212,6 +248,18 @@ export default class Player extends React.Component {
         )}
       </div>
     );
+  }
+
+  shouldComponentUpdate(props: any, state: any): boolean {
+    return (state.isLoaded !== this.state.isLoaded ||
+          state.hasStarted !== this.state.hasStarted ||
+          state.isMainLoaded !== this.state.isMainLoaded ||
+          state.isEmptuy !== this.state.isEmpty ||
+          state.isPlaying !== this.state.isPlaying ||
+          state.total !== this.state.total ||
+          state.progress !== this.state.progress ||
+          state.progressMessage !== this.state.progressMessage ||
+          state.historyOffset !== this.state.historyOffset);
   }
 
   componentDidMount() {
@@ -277,6 +325,10 @@ export default class Player extends React.Component {
 
   nop() {}
 
+  setProgress(total: number, current: number, message: string) {
+    this.setState({total: total, progress: current, progressMessage: message});
+  }
+
   showContextMenu = () => {
     const contextMenu = new Menu();
     const img = this.state.historyPaths[(this.state.historyPaths.length - 1) + this.state.historyOffset];
@@ -325,26 +377,48 @@ export default class Player extends React.Component {
     contextMenu.popup({});
   };
 
-  playMain(empty: boolean) {
-    this.setState({isMainLoaded: true, isEmpty: empty});
-    if (!this.props.scenes || this.props.scene.overlaySceneID === 0 || this.state.isOverlayLoaded) {
-      this.play();
+  setMainCanStart() {
+    if (!this.state.canMainStart) {
+      this.setState({canMainStart: true, isEmpty: false});
+      if (!this.props.scenes || this.props.scene.overlaySceneID === 0 || this.state.canOverlayStart) {
+        this.play();
+      }
     }
   }
 
-  playOverlay() {
+  setOverlayCanStart() {
+    if (!this.state.canOverlayStart) {
+      this.setState({canOverlayStart: true});
+      if (this.state.canMainStart) {
+        this.play();
+      }
+    }
+  }
+
+  setMainLoaded(empty: boolean) {
+    if (empty) {
+      this.setState({isEmpty: empty});
+    } else {
+      this.setState({isMainLoaded: true});
+      if (!this.props.scenes || this.props.scene.overlaySceneID === 0 || this.state.isOverlayLoaded) {
+        this.start();
+      }
+    }
+  }
+
+  setOverlayLoaded(empty: boolean) {
     this.setState({isOverlayLoaded: true});
     if (this.state.isMainLoaded) {
-      this.play();
+      this.start();
     }
   }
 
-  resetOverlay() {
-    this.setState({isOverlayLoaded: false});
+  start() {
+    this.setState({hasStarted: true});
   }
 
   play() {
-    this.setState({isPlaying: true, historyOffset: 0});
+    this.setState({isPlaying: true, isLoaded: true, historyOffset: 0});
   }
 
   pause() {

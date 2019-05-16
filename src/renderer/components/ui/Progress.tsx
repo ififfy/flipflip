@@ -6,6 +6,7 @@ export default class Progress extends React.Component {
     total: number,
     current: number,
     message: string,
+    children?: React.ReactNode,
   };
 
   readonly state: {
@@ -18,31 +19,34 @@ export default class Progress extends React.Component {
         <div className="ProgressContainer">
           <div className="progress" id="progress"/>
         </div>
+        {this.props.children}
       </div>
     );
   }
 
-  componentDidMount() {
-    const progress = new ProgressBar.Circle('#progress', {
-      color: '#FFFFFF',
-      strokeWidth: 2,
-      text: {
-        value: this.props.message + "<br/>" + this.props.current + " / " + this.props.total,
-      },
-    });
-    this.setState({progress});
-    progress.animate((this.props.current + 0.1) / (this.props.total + 0.1));
-    progress.setText("<p>" + this.props.message + "</p><p>" + this.props.current + " / " + this.props.total + "</p>");
-  }
-
-  shouldComponentUpdate(nextProps: any, nextState: any) {
-    return nextProps.current !== this.props.current;
+  shouldComponentUpdate(props: any, state: any): boolean {
+    return (props.total > 0 && props.current > 0 && (
+          props.total !== this.props.total ||
+          props.current !== this.props.current ||
+          props.message !== this.props.message));
   }
 
   componentWillReceiveProps(props: any) {
-    if (this.state && this.state.progress && props.current != this.props.current) {
-      this.state.progress.animate((props.current + 0.1) / (this.props.total + 0.1));
-      this.state.progress.setText("<p>" + this.props.message + "</p><p>" + props.current + " / " + this.props.total + "</p>");
+    let progress;
+    if (!this.state) {
+      progress = new ProgressBar.Circle('#progress', {
+        color: '#FFFFFF',
+        strokeWidth: 2,
+        text: {
+          value: props.message + "<br/>" + props.current + " / " + props.total,
+        },
+        duration: 100,
+      });
+      this.setState({progress: progress});
+    } else {
+      progress = this.state.progress;
     }
+    progress.animate((props.current + 0.1) / (props.total + 0.1));
+    progress.setText("<p>" + props.message + "</p><p>" + props.current + " / " + props.total + "</p>");
   }
 };
