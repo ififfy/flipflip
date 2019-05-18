@@ -50,6 +50,7 @@ export default class Player extends React.Component {
     goBack(): void,
     scene: Scene,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
+    nextScene(): void,
     scenes?: Array<Scene>,
     tags?: Array<Tag>,
     allTags?: Array<Tag>,
@@ -68,11 +69,14 @@ export default class Player extends React.Component {
     total: 0,
     progress: 0,
     progressMessage: this.props.scene.sources.length > 0 ? this.props.scene.sources[0].url : "",
+    startTime: (null as Date),
     historyOffset: 0,
     historyPaths: Array<HTMLImageElement>(),
     imagePlayerAdvanceHack: new ChildCallbackHack(),
     imagePlayerDeleteHack: new ChildCallbackHack(),
   };
+
+  interval: NodeJS.Timer = null;
 
   render() {
     const canGoBack = this.state.historyOffset > -(this.state.historyPaths.length - 1);
@@ -81,16 +85,14 @@ export default class Player extends React.Component {
       ? (Sound as any).status.PLAYING
       : (Sound as any).status.PAUSED;
     const tagNames = this.props.tags ? this.props.tags.map((t) => t.name) : [];
-    const hasOverlay = (this.props.scenes && this.props.scene.overlaySceneID !== 0);
+    const hasOverlay = (this.props.scene.overlaySceneID !== 0 && this.getScene(this.props.scene.overlaySceneID) != null && this.getScene(this.props.scene.overlaySceneID).sources.length > 0);
     const overlayStrobe = this.props.scene.strobe && this.props.scene.strobeOverlay;
     const showCaptionProgram = (
       this.props.scene.textSource &&
       this.props.scene.textSource.length &&
       this.state.isPlaying);
-    //const nextScene = this.getScene(this.props.scene.nextSceneID);
-    //const nextOverlay = nextScene ? this.getScene(nextScene.overlaySceneID) : null;
-    const nextScene: any = null; // TODO
-    const nextOverlay: any = null;
+    const nextScene = this.getScene(this.props.scene.nextSceneID);
+    const nextOverlay = nextScene ? this.getScene(nextScene.overlaySceneID) : null;
 
     return (
       <div className="Player" style={{
@@ -221,7 +223,8 @@ export default class Player extends React.Component {
             <EffectGroup
               scene={this.props.scene}
               onUpdateScene={this.props.onUpdateScene.bind(this)}
-              allScenes={this.props.scenes}/>
+              allScenes={this.props.scenes}
+              libraryPlay={this.props.tags != null}/>
 
             <AudioGroup
               scene={this.props.scene}
@@ -250,16 +253,21 @@ export default class Player extends React.Component {
     );
   }
 
-  shouldComponentUpdate(props: any, state: any): boolean {
-    return (state.isLoaded !== this.state.isLoaded ||
-          state.hasStarted !== this.state.hasStarted ||
-          state.isMainLoaded !== this.state.isMainLoaded ||
-          state.isEmptuy !== this.state.isEmpty ||
-          state.isPlaying !== this.state.isPlaying ||
-          state.total !== this.state.total ||
-          state.progress !== this.state.progress ||
-          state.progressMessage !== this.state.progressMessage ||
-          state.historyOffset !== this.state.historyOffset);
+  nextSceneLoop() {
+    if (this.props.scene.nextSceneID === 0) {
+      clearInterval(this.interval);
+    }
+    if (this.state.startTime != null &&
+      Math.round(Math.abs(new Date().getTime() - this.state.startTime.getTime()) / 1000) >= this.props.scene.nextSceneTime) {
+      this.setState({startTime: null});
+      this.props.nextScene();
+    }
+  }
+
+  componentDidUpdate(props: any, state: any) {
+    if (props.scene.id !== this.props.scene.id) {
+      this.start();
+    }
   }
 
   componentDidMount() {
@@ -270,6 +278,7 @@ export default class Player extends React.Component {
     window.addEventListener('contextmenu', this.showContextMenu, false);
 
     this.buildMenu();
+    this.interval = setInterval(() => this.nextSceneLoop(), 1000);
   }
 
   buildMenu() {
@@ -317,6 +326,7 @@ export default class Player extends React.Component {
   }
 
   componentWillUnmount() {
+    clearInterval(this.interval);
     getCurrentWindow().setAlwaysOnTop(false);
     Menu.setApplicationMenu(originalMenu);
     getCurrentWindow().setFullScreen(false);
@@ -380,7 +390,7 @@ export default class Player extends React.Component {
   setMainCanStart() {
     if (!this.state.canMainStart) {
       this.setState({canMainStart: true, isEmpty: false});
-      if (!this.props.scenes || this.props.scene.overlaySceneID === 0 || this.state.canOverlayStart) {
+      if (this.props.scene.overlaySceneID === 0 || this.getScene(this.props.scene.overlaySceneID) == null || this.state.canOverlayStart) {
         this.play();
       }
     }
@@ -400,7 +410,7 @@ export default class Player extends React.Component {
       this.setState({isEmpty: empty});
     } else {
       this.setState({isMainLoaded: true});
-      if (!this.props.scenes || this.props.scene.overlaySceneID === 0 || this.state.isOverlayLoaded) {
+      if (this.props.scene.overlaySceneID === 0 || this.getScene(this.props.scene.overlaySceneID) == null || this.state.isOverlayLoaded) {
         this.start();
       }
     }
@@ -414,7 +424,7 @@ export default class Player extends React.Component {
   }
 
   start() {
-    this.setState({hasStarted: true});
+    this.setState({hasStarted: true, startTime: new Date()});
   }
 
   play() {
@@ -513,12 +523,7 @@ export default class Player extends React.Component {
   }
 
   getScene(id: number): Scene {
-    for (let s of this.props.scenes) {
-      if (s.id == id) {
-        return s;
-      }
-    }
-    return null;
+    return this.props.scenes.find((s) => s.id === id);
   }
 
   /* Menu and hotkey options DON'T DELETE */

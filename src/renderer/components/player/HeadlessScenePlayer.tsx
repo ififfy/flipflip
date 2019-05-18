@@ -476,6 +476,7 @@ export default class HeadlessScenePlayer extends React.Component {
     nextPromise: new CancelablePromise((resolve, reject) => {}),
     allURLs: new Map<string, Array<string>>(),
     restart: false,
+    preload: false,
   };
 
   nextPromiseQueue = Array<{source: string, next: any}>();
@@ -502,6 +503,7 @@ export default class HeadlessScenePlayer extends React.Component {
             deleteHack={this.props.deleteHack}
             strobe={this.props.strobe}
             strobeTime={this.props.strobeTime}
+            hasStarted={this.props.hasStarted}
             allURLs={isEmpty(Array.from(this.state.allURLs.values())) ? null : this.state.allURLs}
             onLoaded={this.props.firstImageLoaded.bind(this)}/>)}
       </div>
@@ -550,10 +552,10 @@ export default class HeadlessScenePlayer extends React.Component {
           } else {
             this.props.finishedLoading(isEmpty(Array.from(newAllURLs.values())));
             promiseLoop();
-            /*if (this.props.nextScene) { TODO
+            if (this.props.nextScene) {
               n = 0;
               nextSourceLoop();
-            }*/
+            }
           }
         });
     };
@@ -619,28 +621,72 @@ export default class HeadlessScenePlayer extends React.Component {
       }
     };
 
-    sourceLoop();
+    if (this.state.preload) {
+      this.setState({preload: false});
+      promiseLoop();
+      if (this.props.nextScene && isEmpty(Array.from(this.nextAllURLs.values()))) {
+        n = 0;
+        nextSourceLoop();
+      }
+    } else {
+      sourceLoop();
+    }
   }
 
   shouldComponentUpdate(props: any, state: any): boolean {
-    return (props.historyOffset !== this.props.historyOffset ||
+    return (props.scene.id !== this.props.scene.id ||
+      (props.nextScene && this.props.nextScene &&
+      props.nextScene.id !== this.props.nextScene.id) ||
+      props.historyOffset !== this.props.historyOffset ||
       props.isPlaying !== this.props.isPlaying ||
       props.opacity !== this.props.opacity ||
       props.strobe !== this.props.strobe ||
       props.strobeTime !== this.props.strobeTime ||
+      props.hasStarted !== this.props.hasStarted ||
       state.restart !== this.state.restart ||
-      state.allURLs.size !== this.state.allURLs.size);
+      state.promise.source !== this.state.promise.source);
   }
 
   componentWillReceiveProps(props: any) {
-    if (props.scene.id != this.props.scene.id) {
+    if (props.scene.id !== this.props.scene.id) {
       this.componentWillUnmount();
-      this.setState({
-        promiseQueue: Array<{source: string, next: any}>(),
-        promise: new CancelablePromise((resolve, reject) => {}),
-        nextPromise: new CancelablePromise((resolve, reject) => {}),
-        allURLs: new Map<string, Array<string>>(),
-        restart: true});
+      if (props.scene.id === this.props.nextScene.id) { // If the next scene has been played
+        if (props.nextScene.id === this.props.scene.id) { // Just swap values if we're coming back to this scene again
+          const newAllURLs = this.nextAllURLs;
+          const newPromiseQueue = this.nextPromiseQueue;
+          this.nextAllURLs = this.state.allURLs;
+          this.nextPromiseQueue = this.state.promiseQueue;
+          this.setState({
+            promiseQueue: newPromiseQueue,
+            promise: new CancelablePromise((resolve, reject) => {}),
+            nextPromise: new CancelablePromise((resolve, reject) => {}),
+            allURLs: newAllURLs,
+            preload: true,
+            restart: true
+          });
+
+        } else { // Replace values
+          this.setState({
+            promiseQueue: this.nextPromiseQueue,
+            promise: new CancelablePromise((resolve, reject) => {}),
+            nextPromise: new CancelablePromise((resolve, reject) => {}),
+            allURLs: this.nextAllURLs,
+            preload: true,
+            restart: true
+          });
+          this.nextPromiseQueue = Array<{source: string, next: any}>();
+          this.nextAllURLs = new Map<string, Array<string>>();
+        }
+      } else {
+        this.setState({
+          promiseQueue: Array<{ source: string, next: any }>(),
+          promise: new CancelablePromise((resolve, reject) => {}),
+          nextPromise: new CancelablePromise((resolve, reject) => {}),
+          allURLs: new Map<string, Array<string>>(),
+          preload: false,
+          restart: true
+        });
+      }
     }
   }
 

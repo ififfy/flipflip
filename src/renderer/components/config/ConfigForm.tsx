@@ -70,7 +70,8 @@ export default class ConfigForm extends React.Component {
           <EffectGroup
             scene={this.state.config.defaultScene}
             onUpdateScene={this.onUpdateDefaultScene.bind(this)}
-            allScenes={this.props.scenes}/>
+            allScenes={this.props.scenes}
+            libraryPlay={false} />
 
           <ImageGroup
             scene={this.state.config.defaultScene}

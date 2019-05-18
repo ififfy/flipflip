@@ -94,7 +94,8 @@ export default class SceneDetail extends React.Component {
           <EffectGroup
             scene={this.props.scene}
             allScenes={this.props.allScenes}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+            onUpdateScene={this.props.onUpdateScene.bind(this)}
+            libraryPlay={false} />
 
           <ImageGroup
             scene={this.props.scene}

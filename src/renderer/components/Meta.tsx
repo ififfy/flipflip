@@ -261,6 +261,7 @@ export default class Meta extends React.Component {
             scene={this.scene()}
             scenes={this.state.scenes}
             onUpdateScene={this.onUpdateScene.bind(this)}
+            nextScene={this.nextScene.bind(this)}
             goBack={this.goBack.bind(this)}
           />
         )}
@@ -269,7 +270,9 @@ export default class Meta extends React.Component {
           <Player
             config={this.state.config}
             scene={this.scene()}
+            scenes={this.state.scenes}
             onUpdateScene={this.onUpdateScene.bind(this)}
+            nextScene={this.nextScene.bind(this)}
             goBack={this.endPlaySceneFromLibrary.bind(this)}
             tags={this.librarySource().tags}
             allTags={this.state.tags}
@@ -393,6 +396,21 @@ export default class Meta extends React.Component {
       scenes: this.state.scenes.filter((s) => s.id != scene.id),
       route: [],
     });
+  }
+
+  nextScene() {
+    const scene = this.scene();
+    if (scene && scene.nextSceneID !== 0){
+      const nextScene = this.state.scenes.find((s) => s.id === this.scene().nextSceneID);
+      if (nextScene != null) {
+        if (nextScene.tagWeights) {
+          this.setState({route: [new Route({kind: 'generate', value: scene.id}),
+              new Route({kind: 'scene', value: nextScene.id}), new Route({kind: 'play', value: nextScene.id})]});
+        } else {
+          this.setState({route: [new Route({kind: 'scene', value: nextScene.id}), new Route({kind: 'play', value: nextScene.id})]});
+        }
+      }
+    }
   }
 
   updateConfig(newConfig: Config) {

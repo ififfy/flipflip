@@ -1050,11 +1050,11 @@ label.SimpleCheckbox {
     }
 
     &.u-selected {
-      background-color: $buttonBottom;
+      background-color: #ccc;
     }
 
     &:hover {
-      background-color: $buttonBottom;
+      background-color: #ccc;
     }
   }
 }

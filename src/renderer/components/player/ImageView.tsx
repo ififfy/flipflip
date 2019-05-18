@@ -15,11 +15,6 @@ export default class ImageView extends React.Component {
     this._applyImage();
   }
 
-  shouldComponentUpdate(props: any, state: any): boolean {
-    return props.fadeDuration !== this.props.fadeDuration || props.fadeState !== this.props.fadeState ||
-           props.img.src !== this.props.img.src;
-  }
-
   componentDidUpdate() {
     this._applyImage();
   }

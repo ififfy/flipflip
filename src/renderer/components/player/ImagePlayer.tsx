@@ -38,6 +38,7 @@ export default class ImagePlayer extends React.Component {
     setHistoryPaths: (historyPaths: Array<HTMLImageElement>) => void,
     setHistoryOffset: (historyOffset: number) => void,
     onLoaded: () => void,
+    hasStarted: boolean,
   };
 
   readonly state = {
@@ -53,7 +54,7 @@ export default class ImagePlayer extends React.Component {
   _isMounted = false;
 
   render() {
-    if (this.state.historyPaths.length < 1) return <div className="ImagePlayer m-empty"/>;
+    if (this.state.historyPaths.length < 1 || !this.props.hasStarted) return <div className="ImagePlayer m-empty"/>;
 
     const imgs = Array<HTMLImageElement>();
 
@@ -165,7 +166,11 @@ export default class ImagePlayer extends React.Component {
   }
 
   shouldComponentUpdate(props: any, state: any): boolean {
-    return (state.historyPaths !== this.state.historyPaths ||
+    return (state.hideCursor !== this.state.hideCursor ||
+            state.historyPaths !== this.state.historyPaths ||
+            state.timeoutID !== this.state.timeoutID ||
+            props.hasStarted !== this.props.hasStarted ||
+            props.allURLs !== this.props.allURLs ||
             props.historyOffset !== this.props.historyOffset ||
             props.strobe !== this.props.strobe ||
             props.strobeTime !== this.props.strobeTime);
@@ -177,6 +182,12 @@ export default class ImagePlayer extends React.Component {
     } else if (!props.isPlaying && this.state.timeoutID != 0) {
       clearTimeout(this.state.timeoutID);
       this.setState({timeoutID: 0});
+    }
+  }
+
+  componentDidUpdate(props: any) {
+    if (props.allURLs == null && this.props.allURLs != null) {
+      this.start();
     }
   }
 
@@ -244,7 +255,7 @@ export default class ImagePlayer extends React.Component {
 
     const successCallback = () => {
       if (!this._isMounted) return;
-      if (this.props.onLoaded && this.state.historyPaths.length == 1) {
+      if (this.props.onLoaded && this.state.historyPaths.length == 0) {
         this.props.onLoaded();
       }
       (img as any).key = this.state.nextImageID;
