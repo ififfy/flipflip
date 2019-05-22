@@ -64,6 +64,12 @@ export function getFileGroup(url: string) {
       let imgurID = url.replace(/https?:\/\/imgur.com\//, "");
       imgurID = imgurID.replace(/a\//, "");
       return imgurID;
+    case ST.twitter:
+      let twitterID = url.replace(/https?:\/\/twitter.com\//, "");
+      if (twitterID.includes("?")) {
+        twitterID = twitterID.substring(0, twitterID.indexOf("?"));
+      }
+      return twitterID;
     case ST.local:
       return url.substring(url.lastIndexOf(path.sep)+1);
     case ST.list:
@@ -99,9 +105,11 @@ export function getSourceType(url: string): string {
   } else if (/^https?:\/\/www.imagefap.com\//.exec(url) != null) {
     return ST.imagefap;
   } else if (/^https?:\/\/imgur.com\//.exec(url) != null) {
-    return ST.imgur
+    return ST.imgur;
   } else if (/^https?:\/\/www.sex.com\//.exec(url) != null) {
-    return ST.sexcom
+    return ST.sexcom;
+  } else if (/^https?:\/\/twitter.com\//.exec(url) != null) {
+    return ST.twitter;
   } else if (/^https?:\/\//.exec(url) != null) { // Arbitrary URL, assume image list
     return ST.list;
   } else { // Directory

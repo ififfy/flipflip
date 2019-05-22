@@ -71,6 +71,7 @@ const ST = { // source types
   imagefap: 'st.imagefap',
   sexcom: 'st.sexcom',
   imgur: 'st.imgur',
+  twitter: 'st.twitter',
 };
 
 export {

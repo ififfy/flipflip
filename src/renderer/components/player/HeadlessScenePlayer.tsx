@@ -82,6 +82,9 @@ function getPromise(config: Config, url: string, filter: string, next: any): Can
     } else if (sourceType == ST.imgur) {
       promiseFunction = loadImgur;
       timeout = 3000;
+    } else if (sourceType == ST.twitter) {
+      promiseFunction = loadTwitter;
+      timeout = 3000;
     }
     if (next == -1) {
       const cachePath = getCachePath(url, config);
@@ -447,6 +450,34 @@ function loadImgur(config: Config, url: string, filter: string, next: any): Canc
         console.error(err.message);
         resolve(null);
       });
+  });
+}
+
+function loadTwitter(config: Config, url: string, filter: string, next: any): CancelablePromise {
+  return new CancelablePromise((resolve, reject) => {
+      wretch("https://twitter.com/i/profiles/show/" + getFileGroup(url) + "/media_timeline" + (next != 0 ? next : ""))
+        .get()
+        .setTimeout(5000)
+        .onAbort((e) => resolve(null))
+        .notFound((e) => resolve(null))
+        .json((json) => {
+          const itemsHTML = new DOMParser().parseFromString(json.items_html, "text/html");
+          const imageEls = itemsHTML.querySelectorAll(".AdaptiveMedia-photoContainer");
+          let images = Array<string>();
+          for (let image of imageEls) {
+            images.push(image.getAttribute("data-image-url"));
+          }
+          const tweets = itemsHTML.querySelectorAll(".tweet");
+          if (tweets.length == 0) {
+            resolve(null);
+            return;
+          }
+          const lastTweetID = tweets[tweets.length-1].getAttribute("data-tweet-id");
+          resolve({
+            data: images.filter((s) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
+            next: "?last_note_ts=" + lastTweetID + "&max_position=" + (parseInt(lastTweetID, 10) - 1)
+          })
+        });
   });
 }
 
