@@ -50,5 +50,6 @@ export default new Map<String, String>([
   ['st.sexcom', 'sexcom'],
   ['st.imgur', 'imgur'],
   ['st.twitter', 'twitter'],
+  ['st.deviantart', 'deviantart'],
   ['st.list', 'list'],
 ]);

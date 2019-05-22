@@ -85,6 +85,9 @@ function getPromise(config: Config, url: string, filter: string, next: any): Can
     } else if (sourceType == ST.twitter) {
       promiseFunction = loadTwitter;
       timeout = 3000;
+    } else if (sourceType == ST.deviantart) {
+      promiseFunction = loadDeviantArt;
+      timeout = 3000;
     }
     if (next == -1) {
       const cachePath = getCachePath(url, config);
@@ -476,8 +479,45 @@ function loadTwitter(config: Config, url: string, filter: string, next: any): Ca
           resolve({
             data: images.filter((s) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
             next: "?last_note_ts=" + lastTweetID + "&max_position=" + (parseInt(lastTweetID, 10) - 1)
-          })
+          });
         });
+  });
+}
+
+function loadDeviantArt(config: Config, url: string, filter: string, next: any): CancelablePromise {
+  return new CancelablePromise((resolve, reject) => {
+    wretch("http://backend.deviantart.com/rss.xml?type=deviation&q=by%3A" + getFileGroup(url) + "+sort%3Atime+meta%3Aall" + (next != 0 ? "&offset=" + next : ""))
+      .get()
+      .setTimeout(5000)
+      .onAbort((e) => resolve(null))
+      .notFound((e) => resolve(null))
+      .text((text) => {
+        const xml = new DOMParser().parseFromString(text, "text/xml");
+        let hasNextPage = false;
+        for (let link of xml.getElementsByTagName("atom:link")) {
+          if (link.getAttribute("rel") == "next") hasNextPage = true;
+        }
+        let images = Array<string>();
+        for (let item of xml.getElementsByTagName("item")) {
+          next+=1;
+          for (let content of item.getElementsByTagName("media:content")) {
+            if (content.getAttribute("medium") == "image") {
+              images.push(content.getAttribute("url"));
+            }
+          }
+        }
+        if (hasNextPage) {
+          resolve({
+            data: images.filter((s) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
+            next: next
+          });
+        } else {
+          resolve({
+            data: images.filter((s) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
+            next: null
+          });
+        }
+      });
   });
 }
 
