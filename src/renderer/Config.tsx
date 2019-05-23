@@ -46,6 +46,9 @@ interface RemoteSettingsI {
   redditClientID: string;
   redditDeviceID: string;
   redditRefreshToken: string;
+
+  instagramUsername: string;
+  instagramPassword: string;
 }
 
 interface CacheSettingsI {
@@ -113,6 +116,9 @@ export class RemoteSettings implements RemoteSettingsI {
   redditClientID = "2Iqe-1CsO4VQlA";
   redditDeviceID = "";
   redditRefreshToken = "";
+
+  instagramUsername = "";
+  instagramPassword = "";
 }
 
 export class CacheSettings implements CacheSettingsI {

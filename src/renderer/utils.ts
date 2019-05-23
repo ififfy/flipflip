@@ -35,7 +35,11 @@ export function getPath() {
 }
 
 export function getFileName(url: string) {
-  return url.substring(url.lastIndexOf("/"));
+  url = url.substring(url.lastIndexOf("/"));
+  if (url.includes("?")) {
+    url = url.substring(0, url.indexOf("?"));
+  }
+  return url;
 }
 
 export function getFileGroup(url: string) {
@@ -76,6 +80,12 @@ export function getFileGroup(url: string) {
         authorID = authorID.substring(0, authorID.indexOf("/"));
       }
       return authorID;
+    case ST.instagram:
+      let instagramID = url.replace(/https?:\/\/www.instagram.com\//, "");
+      if (instagramID.includes("/")) {
+        instagramID = instagramID.substring(0, instagramID.indexOf("/"));
+      }
+      return instagramID;
     case ST.local:
       return url.substring(url.lastIndexOf(path.sep)+1);
     case ST.list:
@@ -118,6 +128,8 @@ export function getSourceType(url: string): string {
     return ST.twitter;
   } else if (/^https?:\/\/www.deviantart.com\//.exec(url) != null) {
     return ST.deviantart;
+  } else if (/^https?:\/\/www.instagram.com\//.exec(url) != null) {
+    return ST.instagram;
   } else if (/^https?:\/\//.exec(url) != null) { // Arbitrary URL, assume image list
     return ST.list;
   } else { // Directory

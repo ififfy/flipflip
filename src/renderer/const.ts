@@ -73,6 +73,7 @@ const ST = { // source types
   imgur: 'st.imgur',
   twitter: 'st.twitter',
   deviantart: 'st.deviantart',
+  instagram: 'st.instagram',
 };
 
 export {

@@ -36,6 +36,7 @@
     "get-folder-size": "^2.0.1",
     "gif-info": "^1.0.1",
     "imgur": "^0.3.1",
+    "instagram-private-api": "^1.9.0",
     "lodash": "^4.17.11",
     "oauth": "^0.9.15",
     "progressbar.js": "^1.0.1",

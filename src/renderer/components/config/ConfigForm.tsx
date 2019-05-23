@@ -27,8 +27,8 @@ export default class ConfigForm extends React.Component {
     onBackup(): void,
     onRestore(backupFile: string): void,
     onClean(): void,
-    onClearReddit(): void,
     onClearTumblr(): void,
+    onClearReddit(): void,
   };
 
   readonly state = {

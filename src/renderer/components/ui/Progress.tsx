@@ -24,13 +24,6 @@ export default class Progress extends React.Component {
     );
   }
 
-  shouldComponentUpdate(props: any, state: any): boolean {
-    return (props.total > 0 && props.current > 0 && (
-          props.total !== this.props.total ||
-          props.current !== this.props.current ||
-          props.message !== this.props.message));
-  }
-
   componentWillReceiveProps(props: any) {
     let progress;
     if (!this.state) {

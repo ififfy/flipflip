@@ -7,6 +7,7 @@ import http from 'http';
 import Snoowrap from 'snoowrap';
 import tumblr from "tumblr.js";
 import imgur from "imgur";
+import { IgApiClient } from "instagram-private-api";
 
 import {IF, ST} from '../../const';
 import {
@@ -24,6 +25,7 @@ import ImagePlayer from './ImagePlayer';
 
 let redditAlerted = false;
 let tumblrAlerted = false;
+let instagramAlerted = false;
 
 // Returns true if array is empty, or only contains empty arrays
 const isEmpty = function (allURLs: any[]): boolean {
@@ -87,6 +89,9 @@ function getPromise(config: Config, url: string, filter: string, next: any): Can
       timeout = 3000;
     } else if (sourceType == ST.deviantart) {
       promiseFunction = loadDeviantArt;
+      timeout = 3000;
+    } else if (sourceType == ST.instagram) {
+      promiseFunction = loadInstagram;
       timeout = 3000;
     }
     if (next == -1) {
@@ -521,6 +526,107 @@ function loadDeviantArt(config: Config, url: string, filter: string, next: any):
   });
 }
 
+let ig: IgApiClient = null;
+let session: any = null;
+function loadInstagram(config: Config, url: string, filter: string, next: any): CancelablePromise {
+  const configured = config.remoteSettings.instagramUsername != "" && config.remoteSettings.instagramPassword != "";
+  if (configured) {
+    if (ig == null) {
+      ig = new IgApiClient();
+      ig.state.generateDevice(config.remoteSettings.instagramUsername);
+      return new CancelablePromise((resolve, reject) => {
+        ig.account.login(config.remoteSettings.instagramUsername, config.remoteSettings.instagramPassword).then((loggedInUser) => {
+          ig.state.serializeCookieJar().then((cookies) => {
+            session = JSON.stringify(cookies);
+            ig.user.getIdByUsername(getFileGroup(url)).then((id) => {
+              const userFeed = ig.feed.user(id);
+              userFeed.items().then((items) => {
+                let images = Array<string>();
+                for (let item of items) {
+                  if (item.carousel_media) {
+                    for (let media of item.carousel_media) {
+                      images.push(media.image_versions2.candidates[0].url);
+                    }
+                  }
+                  if (item.image_versions2) {
+                    images.push(item.image_versions2.candidates[0].url);
+                  }
+                }
+                resolve({
+                  data: images.filter((s) => (filter != IF.gifs || (filter == IF.gifs && s.includes('.gif')))),
+                  next: id + "~" + userFeed.serialize()
+                });
+              }).catch((e) => {console.error(e);resolve(null)});
+            }).catch((e) => {console.error(e);resolve(null)});
+          }).catch((e) => {console.error(e);resolve(null)});
+        }).catch((e) => {alert(e);console.error(e);ig = null;resolve(null)});
+      });
+    } else if (next == 0) {
+      return new CancelablePromise((resolve, reject) => {
+        ig.user.getIdByUsername(getFileGroup(url)).then((id) => {
+          const userFeed = ig.feed.user(id);
+          userFeed.items().then((items) => {
+            let images = Array<string>();
+            for (let item of items) {
+              if (item.carousel_media) {
+                for (let media of item.carousel_media) {
+                  images.push(media.image_versions2.candidates[0].url);
+                }
+              }
+              if (item.image_versions2) {
+                images.push(item.image_versions2.candidates[0].url);
+              }
+            }
+            resolve({
+              data: images.filter((s) => (filter != IF.gifs || (filter == IF.gifs && s.includes('.gif')))),
+              next: id + "~" + userFeed.serialize()
+            });
+          }).catch((e) => {console.error(e);resolve(null)});
+        }).catch((e) => {console.error(e);resolve(null)});
+      });
+    } else {
+      return new CancelablePromise((resolve, reject) => {
+        ig.state.deserializeCookieJar(JSON.parse(session)).then((data) => {
+          const id = (next as string).split("~")[0];
+          const feedSession = (next as string).split("~")[1];
+          const userFeed = ig.feed.user(id);
+          userFeed.deserialize(feedSession);
+          if (!userFeed.isMoreAvailable()) {
+            resolve(null);
+            return;
+          }
+
+          userFeed.items().then((items) => {
+            let images = Array<string>();
+            for (let item of items) {
+              if (item.carousel_media) {
+                for (let media of item.carousel_media) {
+                  images.push(media.image_versions2.candidates[0].url);
+                }
+              }
+              if (item.image_versions2) {
+                images.push(item.image_versions2.candidates[0].url);
+              }
+            }
+            resolve({
+              data: images.filter((s) => (filter != IF.gifs || (filter == IF.gifs && s.includes('.gif')))),
+              next: id + "~" + userFeed.serialize()
+            });
+          }).catch((e) => {console.error(e);resolve(null)});
+        }).catch((e) => {console.error(e);resolve(null)});
+      });
+    }
+  } else {
+    if (!instagramAlerted) {
+      alert("You haven't authorized FlipFlip to work with Instagram yet.\nVisit Config and populate your username and password.\nNote this information is only kept on your computer and never shared with anyone else.");
+      instagramAlerted = true;
+    }
+    return new CancelablePromise((resolve, reject) => {
+      resolve(null);
+    });
+  }
+}
+
 export default class HeadlessScenePlayer extends React.Component {
   readonly props: {
     config: Config,
@@ -584,6 +690,7 @@ export default class HeadlessScenePlayer extends React.Component {
   componentDidMount() {
     redditAlerted = false;
     tumblrAlerted = false;
+    instagramAlerted = false;
     let n = 0;
     let newAllURLs = new Map<string, Array<string>>();
 
@@ -681,7 +788,9 @@ export default class HeadlessScenePlayer extends React.Component {
 
               // Add the next promise to the queue
               let newPromiseQueue = this.state.promiseQueue;
-              newPromiseQueue.push({source: promise.source, next: object.next});
+              if (object.next != null) {
+                newPromiseQueue.push({source: promise.source, next: object.next});
+              }
 
               this.setState({allURLs: newAllURLs, promiseQueue: newPromiseQueue});
             }
