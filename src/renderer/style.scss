@@ -1184,7 +1184,7 @@ label.SimpleCheckbox {
   }
 }
 
-.text-blink {
+.text-blink, .text-caption-big, .text-count {
   text-align: center;
   vertical-align: middle;
   transition: opacity 0.1s ease-out;
@@ -1197,14 +1197,6 @@ label.SimpleCheckbox {
   vertical-align: bottom;
   padding-bottom: 20vmin;
   transition: opacity 0.5s ease-in-out;
-  -webkit-text-stroke-width: 1px;
-  -webkit-text-stroke-color: black;
-}
-
-.text-caption-big {
-  text-align: center;
-  vertical-align: middle;
-  transition: opacity 0.1s ease-out;
   -webkit-text-stroke-width: 1px;
   -webkit-text-stroke-color: black;
 }

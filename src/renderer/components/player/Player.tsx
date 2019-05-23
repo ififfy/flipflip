@@ -167,6 +167,9 @@ export default class Player extends React.Component {
             captionBigColor={this.props.scene.captionBigColor}
             captionBigFontSize={this.props.scene.captionBigFontSize}
             captionBigFontFamily={this.props.scene.captionBigFontFamily}
+            countColor={this.props.scene.countColor}
+            countFontSize={this.props.scene.countFontSize}
+            countFontFamily={this.props.scene.countFontFamily}
             url={textURL(this.props.scene.textKind, this.props.scene.textSource)}/>
         )}
 

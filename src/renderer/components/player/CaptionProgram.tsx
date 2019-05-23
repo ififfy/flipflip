@@ -12,6 +12,9 @@ let BLINK_DELAY = 80;
 let BLINK_GROUP_DELAY = 1200;
 let CAPTION_DURATION = 2000;
 let CAPTION_DELAY = 1200;
+let COUNT_DURATION = 500;
+let COUNT_DELAY = 1000;
+let COUNT_GROUP_DELAY = 1200;
 let PHRASES: string[] = [];
 
 function reset() {
@@ -59,6 +62,9 @@ export default class CaptionProgram extends React.Component {
     captionBigColor: string,
     captionBigFontSize: number,
     captionBigFontFamily: string,
+    countColor: string,
+    countFontSize: number,
+    countFontFamily: string,
     url: string,
   };
 
@@ -252,6 +258,27 @@ export default class CaptionProgram extends React.Component {
       }
     }),
 
+    setCountDuration: fnIntArg(function (ms: number) {
+      return function (runNextCommand: Function) {
+        COUNT_DURATION = ms;
+        runNextCommand();
+      }
+    }),
+
+    setCountDelay: fnIntArg(function (ms: number) {
+      return function (runNextCommand: Function) {
+        COUNT_DELAY = ms;
+        runNextCommand();
+      }
+    }),
+
+    setCountGroupDelay: fnIntArg(function (ms: number) {
+      return function (runNextCommand: Function) {
+        COUNT_GROUP_DELAY = ms;
+        runNextCommand();
+      }
+    }),
+
     storePhrase: function (el: HTMLElement, value: string) {
       PHRASES.push(value);
       return function(f : Function) { f() };
@@ -305,6 +332,57 @@ export default class CaptionProgram extends React.Component {
         el.className = "text-caption-big";
         showText(function() { wait(runNextCommand); });
       }.bind(this)
-    }.bind(this)
+    }.bind(this),
+
+    count: function(this: CaptionProgram, el: HTMLElement, value: string) {
+      return function (this: CaptionProgram, runNextCommand: Function) {
+        let fns: Function[] = [];
+        el.style.color = this.props.countColor;
+        el.style.fontSize = this.props.countFontSize + "vmin";
+        el.style.fontFamily = this.props.countFontFamily;
+        el.className = "text-count";
+        const split = value.split(" ");
+        if (split.length != 2) {
+          console.error("Invalid count command: "  + value);
+          runNextCommand();
+          return;
+        }
+        let number = parseInt(split[0], 10);
+        const end = parseInt(split[1], 10);
+        if (isNaN(number) || isNaN(end) || number < 0 || end < 0) {
+          console.error("Invalid count command: "  + value);
+          runNextCommand();
+          return;
+        }
+
+        let values = [];
+        do {
+          values.push(number);
+          if (number == end) {
+            break;
+          } else if (number < end) {
+            number+=1;
+          } else if (number > end) {
+            number-=1;
+          }
+        } while (true);
+
+        let i = 0;
+        values.forEach(function (this: CaptionProgram, number: number) {
+          let j = i;
+          i += 1;
+          fns.push(function (this: CaptionProgram) {
+            const showText = this.COMMANDS.showText(el, COUNT_DURATION + ' ' + number);
+            const wait = this.COMMANDS.wait(el, '' + COUNT_DELAY);
+            showText(function() { wait(fns[j + 1]); });
+          }.bind(this));
+        }.bind(this));
+        const lastWait = this.COMMANDS.wait(el, '' + COUNT_GROUP_DELAY);
+        fns.push(function () {
+          lastWait(runNextCommand);
+        });
+        fns[0]();
+      }.bind(this);
+    }.bind(this),
   };
 }

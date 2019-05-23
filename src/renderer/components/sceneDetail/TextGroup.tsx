@@ -149,6 +149,39 @@ export default class TextGroup extends React.Component {
                   onChange={this.changeKey.bind(this, 'captionBigFontFamily').bind(this)}/>
               )}
             </div>
+            <hr/>
+            <div className="ControlSubgroup">
+              <SimpleNumberInput
+                label="Count Font Size (vmin)"
+                value={this.props.scene.countFontSize}
+                min={0}
+                isEnabled={true}
+                onChange={this.changeKey.bind(this, 'countFontSize').bind(this)}/>
+              <SimpleColorPicker
+                label="Count Color"
+                value={this.props.scene.countColor}
+                onChange={this.changeKey.bind(this, 'countColor').bind(this)}/>
+              {this.state.systemFonts.length > 0 && (
+                <div className="SimpleOptionPicker">
+                  <label>Count Font Family</label>
+                  <select
+                    value={this.props.scene.countFontFamily}
+                    onChange={this.changeKeyOnEvent.bind(this, 'countFontFamily').bind(this)}
+                    style={{fontFamily: this.props.scene.countFontFamily, height: '1.5rem'}}>
+                    {this.state.systemFonts.map((b) =>
+                      <option value={b} key={b} style={{fontFamily: b}}>{b}</option>
+                    )}
+                  </select>
+                </div>
+              )}
+              {this.state.systemFonts.length == 0 && (
+                <SimpleTextInput
+                  label="Count Font Family"
+                  value={this.props.scene.countFontFamily}
+                  isEnabled={true}
+                  onChange={this.changeKey.bind(this, 'countFontFamily').bind(this)}/>
+              )}
+            </div>
           </div>
         )}
       </ControlGroup>

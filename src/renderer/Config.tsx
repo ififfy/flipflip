@@ -33,6 +33,10 @@ interface SceneSettingsI {
   captionBigColor: string;
   captionBigFontSize: number;
   captionBigFontFamily: string;
+
+  countColor: string;
+  countFontSize: number;
+  countFontFamily: string;
 }
 
 interface RemoteSettingsI {
@@ -102,6 +106,10 @@ export class SceneSettings implements SceneSettingsI {
   captionBigColor = "#FFFFFF";
   captionBigFontSize = 12;
   captionBigFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
+
+  countColor = "#FFFFFF";
+  countFontSize = 20;
+  countFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
 }
 
 export class RemoteSettings implements RemoteSettingsI {

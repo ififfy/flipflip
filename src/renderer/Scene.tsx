@@ -31,6 +31,9 @@ export default class Scene {
   captionBigColor = "#FFFFFF";
   captionBigFontSize = 12;
   captionBigFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
+  countColor = "#FFFFFF";
+  countFontSize = 20;
+  countFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
   imageSizeMin: 200;
   overlaySceneID: number = 0;
   overlaySceneOpacity: number = 0.5;
