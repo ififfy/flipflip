@@ -864,9 +864,9 @@ label.SimpleCheckbox {
   .u-button-row-right {
     display: flex;
 
-    .SimpleTextInput {
+    .SimpleNumberInput {
       display: flex;
-      width: 75px;
+      width: 90px;
       margin-bottom: 0;
       align-items: center;
 
@@ -874,6 +874,10 @@ label.SimpleCheckbox {
         color: black !important;
         margin-right: $smallPadding;
         margin-bottom: 0;
+      }
+
+      input {
+        text-align: center;
       }
     }
   }

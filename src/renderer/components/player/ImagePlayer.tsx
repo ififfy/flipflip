@@ -291,7 +291,8 @@ export default class ImagePlayer extends React.Component {
       // images may load immediately, but that messes up the setState()
       // lifecycle, so always load on the next event loop iteration.
       // Also, now  we know the image size, so we can finally filter it.
-      if (img.width < this.props.scene.imageSizeMin || img.height < this.props.scene.imageSizeMin) {
+      if (img.width < this.props.config.displaySettings.minImageSize
+        || img.height < this.props.config.displaySettings.minImageSize) {
         setTimeout(errorCallback, 0);
       } else {
         if (this.props.config.caching.enabled) {

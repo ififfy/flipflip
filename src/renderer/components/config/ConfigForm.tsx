@@ -6,7 +6,7 @@ import {OAuth} from 'oauth';
 import {remote} from "electron";
 import http from "http";
 
-import Config, {CacheSettings, RemoteSettings, SceneSettings} from "../../Config";
+import Config, {CacheSettings, DisplaySettings, RemoteSettings, SceneSettings} from "../../Config";
 import Scene from "../../Scene";
 import APIGroup from "./APIGroup";
 import CacheGroup from "./CacheGroup";
@@ -16,6 +16,7 @@ import TextGroup from "../sceneDetail/TextGroup";
 import TimingGroup from "../sceneDetail/TimingGroup";
 import Modal from "../ui/Modal";
 import BackupGroup from "./BackupGroup";
+import DisplayGroup from "./DisplayGroup";
 
 export default class ConfigForm extends React.Component {
   readonly props: {
@@ -80,6 +81,10 @@ export default class ConfigForm extends React.Component {
           <TextGroup
             scene={this.state.config.defaultScene}
             onUpdateScene={this.onUpdateDefaultScene.bind(this)}/>
+
+          <DisplayGroup
+            settings={this.state.config.displaySettings}
+            onUpdateSettings={this.onUpdateDisplaySettings.bind(this)}/>
 
           <CacheGroup
             config={this.state.config}
@@ -171,6 +176,12 @@ export default class ConfigForm extends React.Component {
   onUpdateDefaultScene(settings: SceneSettings, fn: (settings: SceneSettings) => void) {
     const newConfig = this.state.config;
     fn(newConfig.defaultScene);
+    this.setState({config: newConfig});
+  }
+
+  onUpdateDisplaySettings(keys: DisplaySettings, fn: (keys: DisplaySettings) => void) {
+    const newConfig = this.state.config;
+    fn(newConfig.displaySettings);
     this.setState({config: newConfig});
   }
 

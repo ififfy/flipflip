@@ -432,6 +432,9 @@ export default class Player extends React.Component {
 
   play() {
     this.setState({isPlaying: true, isLoaded: true, historyOffset: 0});
+    if (this.props.config.displaySettings.startImmediately) {
+      this.start();
+    }
   }
 
   pause() {

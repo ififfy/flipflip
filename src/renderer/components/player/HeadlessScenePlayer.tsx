@@ -673,9 +673,9 @@ export default class HeadlessScenePlayer extends React.Component {
             historyOffset={this.props.historyOffset}
             setHistoryOffset={this.props.setHistoryOffset}
             setHistoryPaths={this.props.setHistoryPaths}
-            maxInMemory={120}
-            maxLoadingAtOnce={5}
-            maxToRememberInHistory={500}
+            maxInMemory={this.props.config.displaySettings.maxInMemory}
+            maxLoadingAtOnce={this.props.config.displaySettings.maxLoadingAtOnce}
+            maxToRememberInHistory={this.props.config.displaySettings.maxInHistory}
             advanceHack={this.props.advanceHack}
             deleteHack={this.props.deleteHack}
             strobe={this.props.strobe}

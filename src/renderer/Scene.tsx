@@ -34,7 +34,7 @@ export default class Scene {
   countColor = "#FFFFFF";
   countFontSize = 20;
   countFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
-  imageSizeMin: 200;
+  generatorMax = 100;
   overlaySceneID: number = 0;
   overlaySceneOpacity: number = 0.5;
   nextSceneID: number = 0;
@@ -53,10 +53,6 @@ export default class Scene {
     this.overlaySceneID = parseInt(this.overlaySceneID as any, 10);
     if (!this.overlaySceneOpacity) {
       this.overlaySceneOpacity = 0.5;
-    }
-
-    if (!this.imageSizeMin) {
-      this.imageSizeMin = 200;
     }
 
     if (this.hastebinID.length && !(this.textSource && this.textSource.length)) {

@@ -9,7 +9,7 @@ import ControlGroup from "../sceneDetail/ControlGroup";
 import Modal from "../ui/Modal";
 import SimpleRadioInput from "../ui/SimpleRadioInput";
 import SimpleSliderInput from "../ui/SimpleSliderInput";
-import SimpleTextInput from "../ui/SimpleTextInput";
+import SimpleNumberInput from "../ui/SimpleNumberInput";
 
 class TagWeight {
   type: string;
@@ -35,7 +35,6 @@ export default class SceneGenerator extends React.Component {
   };
 
   readonly state = {
-    max: "300",
     errorMessage: "",
     isEditingName: this.props.autoEdit,
   };
@@ -45,12 +44,6 @@ export default class SceneGenerator extends React.Component {
     const weights = Array.from(tagWeights.values());
     const sum = weights.length > 0 ? weights.map((w) => w.value).reduce((total, value) => Number(total) + Number(value)) : 0;
     const hasAll = weights.filter((w) => w.type == TT.all).length > 0;
-
-    let max = parseInt(this.state.max, 10);
-    // If we cannot parse this, default to 300
-    if (!max && max != 0) {
-      max = 300;
-    }
 
     return (
       <div className="SceneGenerator">
@@ -75,9 +68,10 @@ export default class SceneGenerator extends React.Component {
           </div>
 
           <div className="u-button-row-right">
-            <SimpleTextInput
+            <SimpleNumberInput
               label="Max"
-              value={this.state.max}
+              value={this.props.scene.generatorMax}
+              min={0}
               isEnabled={true}
               onChange={this.onUpdateMax.bind(this)}/>
             <div
@@ -86,8 +80,8 @@ export default class SceneGenerator extends React.Component {
               Previous Scene
             </div>
             <div
-              className={`SceneGenerator__Generate u-button ${(sum > 0 || hasAll) && max > 0 ? 'u-clickable' : 'u-disabled'}`}
-              onClick={(sum > 0 || hasAll) && max > 0 ? this.generateScene.bind(this, tagWeights) : this.nop}>
+              className={`SceneGenerator__Generate u-button ${(sum > 0 || hasAll) && this.props.scene.generatorMax > 0 ? 'u-clickable' : 'u-disabled'}`}
+              onClick={(sum > 0 || hasAll) && this.props.scene.generatorMax > 0 ? this.generateScene.bind(this, tagWeights) : this.nop}>
               Generate Scene
             </div>
           </div>
@@ -162,8 +156,8 @@ export default class SceneGenerator extends React.Component {
     this.setState({errorMessage: ""});
   }
 
-  onUpdateMax(max: string) {
-    this.setState({max: max});
+  onUpdateMax(generatorMax: number) {
+    this.update((s) => { s.generatorMax = generatorMax; });
   }
 
   beginEditingName() {
@@ -245,11 +239,6 @@ export default class SceneGenerator extends React.Component {
     tagWeightMap = new Map(tagWeightMap);
     const weights = Array.from(tagWeightMap.values());
     const sum = weights.length > 0 ? weights.map((w) => w.value).reduce((total, weight) => Number(total) + Number(weight)) : 1;
-    let max = parseInt(this.state.max, 10);
-    // If we cannot parse this, default to 300
-    if (!max && max != 0) {
-      max = 300;
-    }
     let allList = Array<string>();
     let noneList = Array<string>();
     tagWeightMap.forEach(function (value, key, map) { // Get rid of any weighted tags with weight = 0
@@ -319,14 +308,14 @@ export default class SceneGenerator extends React.Component {
           let sources = taggedSources[index];
           sources = sources.filter((s) => !randomSources.includes(s));
           // Add sources equal to this tags percent of the max
-          randomSources = randomSources.concat(getRandomListItem(sources, Math.round((tagWeightMap.get(tag).value / sum) * max)));
+          randomSources = randomSources.concat(getRandomListItem(sources, Math.round((tagWeightMap.get(tag).value / sum) * this.props.scene.generatorMax)));
         }
         index += 1;
       }
     } else { // IF we only have Alls
       if (taggedSources[0] != undefined) { // If we actually found sources for this tag
         // Add sources equal to max
-        randomSources = randomSources.concat(getRandomListItem(taggedSources[0], max));
+        randomSources = randomSources.concat(getRandomListItem(taggedSources[0], this.props.scene.generatorMax));
       }
     }
     // Randomize our whole list

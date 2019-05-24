@@ -13,6 +13,7 @@ interface SceneSettingsI {
   backgroundType: string;
   backgroundColor: string;
   playFullGif: boolean;
+  generatorMax: number;
   overlaySceneID: number;
   overlaySceneOpacity: number;
   textKind: string;
@@ -56,17 +57,23 @@ interface RemoteSettingsI {
 }
 
 interface CacheSettingsI {
-  [key: string]: string|number|boolean;
+  [key: string]: string | number | boolean;
   enabled: boolean;
   directory: string;
   maxSize: number;
 }
 
 interface DisplaySettingsI {
-  [key: string]: boolean;
+  [key: string]: number | boolean;
   alwaysOnTop: boolean;
   showMenu: boolean;
   fullScreen: boolean;
+  startImmediately: boolean;
+
+  minImageSize: number;
+  maxInMemory: number;
+  maxLoadingAtOnce: number;
+  maxInHistory: number;
 }
 
 export class SceneSettings implements SceneSettingsI {
@@ -83,6 +90,7 @@ export class SceneSettings implements SceneSettingsI {
   backgroundType = BT.blur;
   backgroundColor = "#000000";
   playFullGif = false;
+  generatorMax = 100;
   overlaySceneID = 0;
   overlaySceneOpacity = 0.5;
   nextSceneID = 0;
@@ -138,11 +146,17 @@ export class CacheSettings implements CacheSettingsI {
 }
 
 export class DisplaySettings  implements DisplaySettingsI {
-  [key: string]: boolean;
+  [key: string]: number | boolean;
 
   alwaysOnTop = false;
   showMenu = true;
   fullScreen = false;
+  startImmediately = false;
+
+  minImageSize = 200;
+  maxInMemory = 120;
+  maxLoadingAtOnce = 5;
+  maxInHistory = 500;
 }
 
 export default class Config {
