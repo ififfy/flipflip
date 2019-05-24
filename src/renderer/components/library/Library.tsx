@@ -1,5 +1,6 @@
 import * as React from 'react';
 import tumblr from 'tumblr.js';
+import wretch from 'wretch';
 import Snoowrap from "snoowrap";
 
 import {ST} from "../../const";
@@ -26,11 +27,11 @@ export default class Library extends React.Component {
   };
 
   readonly state = {
-    redditInProgress: false,
-    tumblrInProgress: false,
+    inProgress: false,
     showProgress: false,
     totalProgress: 0,
     currentProgress: 0,
+    progressTitle: "",
     next: "",
   };
 
@@ -43,7 +44,7 @@ export default class Library extends React.Component {
               <h2 className="Library__LibraryHeader">Library</h2>
             )}
             {this.state.showProgress && (
-              <h2 className="Library__LibraryHeader">Import</h2>
+              <h2 className="Library__LibraryHeader">Progress</h2>
             )}
           </div>
           {!this.props.isSelect && !this.state.showProgress && (
@@ -53,8 +54,13 @@ export default class Library extends React.Component {
                 onChange={this.onChangeImport.bind(this)}>
                 <option value={""} key={""} disabled={true}>Remote Import</option>
                 <option value={ST.tumblr} key={ST.tumblr}>Tumblr Following</option>
-                <option value={ST.reddit} key={ST.reddit} disabled={this.state.redditInProgress}>Reddit Subscriptions</option>
+                <option value={ST.reddit} key={ST.reddit} disabled={this.state.inProgress}>Reddit Subscriptions</option>
               </select>
+              <div
+                className="Library__MarkOffline u-button u-clickable"
+                onClick={this.markOffline.bind(this)}>
+                Mark Offline
+              </div>
               <div
                 className="Library__ManageTags u-button u-clickable"
                 onClick={this.props.manageTags.bind(this)}>
@@ -83,7 +89,7 @@ export default class Library extends React.Component {
           <Progress
             total={this.state.totalProgress}
             current={this.state.currentProgress}
-            message={"<p>Importing Tumblr Following...</p>You can return the Library"} />
+            message={"<p>" + this.state.progressTitle + "</p><p>You can return to the Library</p>"} />
         )}
       </div>
     )
@@ -114,7 +120,6 @@ export default class Library extends React.Component {
 
     // Define our loop
     const redditImportLoop = () => {
-      //if (this.state.next == "") {
       reddit.getSubscriptions({limit: 20, after: this.state.next}).then((subscriptionListing: any) => {
         if (subscriptionListing.length > 0) {
           // Get the next 20 blogs
@@ -149,7 +154,7 @@ export default class Library extends React.Component {
           setTimeout(redditImportLoop, 1500);
           this.setState({next: subscriptionListing[subscriptionListing.length - 1].name, currentProgress: this.state.currentProgress + 1});
         } else {
-          this.setState({next: "", currentProgress: 0, totalProgress: 0, redditInProgress: false});
+          this.setState({next: "", currentProgress: 0, totalProgress: 0, inProgress: false, progressTitle: ""});
           alert("Reddit Subscription Import has completed");
         }
       }).catch((err: any) => {
@@ -161,19 +166,19 @@ export default class Library extends React.Component {
           alert("Error retrieving subscriptions: " + err);
           console.error(err);
         }
-        this.setState({currentProgress: 0, totalProgress: 0, redditInProgress: false});
+        this.setState({currentProgress: 0, totalProgress: 0, inProgress: false, progressTitle: ""});
       });
     };
 
     // Show progress bar and kick off loop
     alert("Your Reddit subscriptions are being imported... You will recieve an alert when the import is finished.");
-    this.setState({totalProgress: 1, redditInProgress: true});
+    this.setState({totalProgress: 1, inProgress: true});
     redditImportLoop();
   }
 
   importTumblr() {
     // If we don't have an import running
-    if (!this.state.tumblrInProgress) {
+    if (!this.state.inProgress) {
       // Build our Tumblr client
       const client = tumblr.createClient({
         consumer_key: this.props.config.remoteSettings.tumblrKey,
@@ -189,7 +194,7 @@ export default class Library extends React.Component {
         client.userFollowing({offset: offset}, (err, data) => {
           if (err) {
             alert("Error retrieving following: " + err);
-            this.setState({currentProgress: 0, totalProgress: 0, tumblrInProgress: false, showProgress: false});
+            this.setState({currentProgress: 0, totalProgress: 0, inProgress: false, showProgress: false, progressTitle: ""});
             console.error(err);
             return;
           }
@@ -234,7 +239,7 @@ export default class Library extends React.Component {
           if ((nextOffset) < this.state.totalProgress) {
             setTimeout(tumblrImportLoop, 1500);
           } else {
-            this.setState({currentProgress: 0, totalProgress: 0, tumblrInProgress: false, showProgress: false});
+            this.setState({currentProgress: 0, totalProgress: 0, inProgress: false, showProgress: false, progressTitle: ""});
             alert("Tumblr Following Import has completed");
           }
         });
@@ -249,9 +254,74 @@ export default class Library extends React.Component {
         }
 
         // Show progress bar and kick off loop
-        this.setState({currentProgress: 0, totalProgress: data.total_blogs, tumblrInProgress: true, showProgress: true});
+        this.setState({
+          currentProgress: 0,
+          totalProgress: data.total_blogs,
+          inProgress: true,
+          showProgress: true,
+          progressTitle: "Tumblr Following Import"});
         tumblrImportLoop();
       });
+    } else {
+      // We already have an import running, just show it
+      this.setState({showProgress: true});
+    }
+  }
+
+  markOffline() {
+    // If we don't have an import running
+    if (!this.state.inProgress) {
+      // Define our loop
+      const offlineLoop = () => {
+        const offset = this.state.currentProgress;
+        if (this.props.library.length == offset) {
+          this.setState({currentProgress: 0, totalProgress: 0, inProgress: false, showProgress: false, progressTitle: ""});
+          alert("Offline Check has completed. Remote sources not available are now marked in red.");
+        } else if (this.props.library[offset].url.startsWith("http://") ||
+                   this.props.library[offset].url.startsWith("https://")) {
+          this.setState({progressTitle: "Checking...</p><p>" + this.props.library[offset].url});
+          const lastCheck = this.props.library[offset].lastCheck;
+          if (lastCheck != null) {
+            // If this link was checked within the last week, skip
+            if (new Date().getTime() - new Date(lastCheck).getTime() < 604800000) {
+              this.setState({currentProgress: offset + 1});
+              setTimeout(offlineLoop, 100);
+              return;
+            }
+          }
+
+          this.props.library[offset].lastCheck = new Date();
+          wretch(this.props.library[offset].url)
+            .get()
+            .notFound((res) => {
+              this.props.library[offset].offline = true;
+              this.setState({currentProgress: offset + 1});
+              setTimeout(offlineLoop, 1000);
+            })
+            .res((res) => {
+              this.props.library[offset].offline = false;
+              this.setState({currentProgress: offset + 1});
+              setTimeout(offlineLoop, 1000);
+            })
+            .catch((e) => {
+              console.error(e);
+              this.props.library[offset].lastCheck = null;
+              this.setState({currentProgress: offset + 1});
+              setTimeout(offlineLoop, 100);
+            });
+        } else {
+          this.setState({currentProgress: offset + 1});
+          setTimeout(offlineLoop, 100);
+        }
+      };
+
+      // Show progress bar and kick off loop
+      this.setState({
+        currentProgress: 0,
+        totalProgress: this.props.library.length,
+        inProgress: true,
+        showProgress: true});
+      offlineLoop();
     } else {
       // We already have an import running, just show it
       this.setState({showProgress: true});

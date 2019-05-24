@@ -660,6 +660,10 @@ label.SimpleCheckbox {
 
       @include mouseover;
 
+      &.m-offline {
+        background-color: #ff0000;
+      }
+
       > input {
         vertical-align: -2px;
         margin-right: 10px;

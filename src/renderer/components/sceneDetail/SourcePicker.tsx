@@ -150,7 +150,7 @@ export default class SourcePicker extends React.Component {
             </div>
           )}
           {displaySources.map((source) =>
-            <div className="SourcePicker__Source"
+            <div className={`SourcePicker__Source ${source.offline ? 'm-offline' : ''}`}
                  key={source.id}>
               {this.props.isSelect && (
                 <input type="checkbox" value={source.url} onChange={this.onSelect.bind(this)}
@@ -293,6 +293,8 @@ export default class SourcePicker extends React.Component {
     this.props.onUpdateSources(this.props.sources.map(
       function map(source: LibrarySource) {
         if (source.id == sourceID) {
+          source.offline = false;
+          source.lastCheck = null;
           source.url = e.currentTarget.value;
         }
         return source;
