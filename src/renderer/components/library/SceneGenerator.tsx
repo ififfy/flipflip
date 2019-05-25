@@ -28,6 +28,7 @@ export default class SceneGenerator extends React.Component {
     tags: Array<Tag>,
     scene: Scene,
     autoEdit: boolean,
+    scenes: Array<Scene>,
     goBack(): void,
     onGenerate(): void,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
@@ -41,7 +42,11 @@ export default class SceneGenerator extends React.Component {
 
   render() {
     const tagWeights = new Map<Tag, TagWeight>(JSON.parse(this.props.scene.tagWeights));
-    const weights = Array.from(tagWeights.values());
+    let sceneWeights = new Map<number, TagWeight>();
+    if (this.props.scene.sceneWeights != null) {
+      sceneWeights = new Map<number, TagWeight>(JSON.parse(this.props.scene.sceneWeights));
+    }
+    const weights = Array.from(tagWeights.values()).concat(Array.from(sceneWeights.values()));
     const sum = weights.length > 0 ? weights.map((w) => w.value).reduce((total, value) => Number(total) + Number(value)) : 0;
     const hasAll = weights.filter((w) => w.type == TT.all).length > 0;
 
@@ -81,7 +86,7 @@ export default class SceneGenerator extends React.Component {
             </div>
             <div
               className={`SceneGenerator__Generate u-button ${(sum > 0 || hasAll) && this.props.scene.generatorMax > 0 ? 'u-clickable' : 'u-disabled'}`}
-              onClick={(sum > 0 || hasAll) && this.props.scene.generatorMax > 0 ? this.generateScene.bind(this, tagWeights) : this.nop}>
+              onClick={(sum > 0 || hasAll) && this.props.scene.generatorMax > 0 ? this.generateScene.bind(this, tagWeights, sceneWeights) : this.nop}>
               Generate Scene
             </div>
           </div>
@@ -93,42 +98,72 @@ export default class SceneGenerator extends React.Component {
           </div>
         </div>
 
-        <div className="SceneGenerator__Content ControlGroupGroup">
-          {this.props.tags.map((tag) => {
-            // If this weight hasn't been set before, it won't be in the map
-            const mapTagArray =  Array.from(tagWeights.keys()).filter((t) => t.id == tag.id);
-            const found = mapTagArray.length > 0;
-            const weight = found ? tagWeights.get(mapTagArray[0]).value : 0;
-            const type = found ? tagWeights.get(mapTagArray[0]).type : TT.weight;
-            let percentage = "--";
-            if (sum > 0 && weight > 0) {
-              percentage = Math.round((weight / sum) * 100) + "%";
-            }
-            return (
-              <ControlGroup key={tag.id} title={tag.name} isNarrow={true}
-                            canCollapse={type == TT.weight && weight == 0}
-                            startCollapsed={type == TT.weight && weight == 0}
-                            bold={type != TT.weight || weight > 0}>
-                <span style={{fontWeight: type == TT.weight && weight > 0 ? "bolder" : "initial", opacity: type == TT.weight ? 1 : 0.3}}>{"Weight: " + weight}</span>
-                <span style={{fontWeight: type == TT.weight && percentage != "--" ? "bolder" : "initial", opacity: type == TT.weight ? 1 : 0.3}}>{"Percentage: " + percentage}</span>
-                <SimpleSliderInput
-                  isEnabled={type == TT.weight}
-                  onChange={this.onChangeTagWeight.bind(this, tag)}
-                  label=""
-                  min={0}
-                  max={100}
-                  value={weight}/>
-                <SimpleRadioInput
-                  label=""
-                  groupName={tag.name}
-                  value={type}
-                  keys={Object.values(TT)}
-                  bold={true}
-                  onChange={this.onChangeTagType.bind(this, tag)}
-                />
-              </ControlGroup>
+        <div className="SceneGenerator__Content">
+          <div className="ControlGroupGroup">
+            {this.props.tags.map((tag) => {
+              // If this weight hasn't been set before, it won't be in the map
+              const mapTagArray =  Array.from(tagWeights.keys()).filter((t) => t.id == tag.id);
+              const found = mapTagArray.length > 0;
+              const weight = found ? tagWeights.get(mapTagArray[0]).value : 0;
+              const type = found ? tagWeights.get(mapTagArray[0]).type : TT.weight;
+              let percentage = "--";
+              if (sum > 0 && weight > 0) {
+                percentage = Math.round((weight / sum) * 100) + "%";
+              }
+              return (
+                <ControlGroup key={"t" + tag.id} title={tag.name} isNarrow={true}
+                              canCollapse={type == TT.weight && weight == 0}
+                              startCollapsed={type == TT.weight && weight == 0}
+                              bold={type != TT.weight || weight > 0}>
+                  <span style={{fontWeight: type == TT.weight && weight > 0 ? "bolder" : "initial", opacity: type == TT.weight ? 1 : 0.3}}>{"Weight: " + weight}</span>
+                  <span style={{fontWeight: type == TT.weight && percentage != "--" ? "bolder" : "initial", opacity: type == TT.weight ? 1 : 0.3}}>{"Percentage: " + percentage}</span>
+                  <SimpleSliderInput
+                    isEnabled={type == TT.weight}
+                    onChange={this.onChangeTagWeight.bind(this, tag)}
+                    label=""
+                    min={0}
+                    max={100}
+                    value={weight}/>
+                  <SimpleRadioInput
+                    label=""
+                    groupName={tag.name}
+                    value={type}
+                    keys={Object.values(TT)}
+                    bold={true}
+                    onChange={this.onChangeTagType.bind(this, tag)}
+                  />
+                </ControlGroup>
+              )}
             )}
-          )}
+          </div>
+          <hr/>
+          <div className="ControlGroupGroup">
+            {this.props.scenes.filter((s) => s.id !== this.props.scene.id).map((scene) => {
+              // If this weight hasn't been set before, it won't be in the map
+              const mapScene =  sceneWeights.get(scene.id);
+              const weight = mapScene != null ? mapScene.value : 0;
+              let percentage = "--";
+              if (sum > 0 && weight > 0) {
+                percentage = Math.round((weight / sum) * 100) + "%";
+              }
+              return (
+                <ControlGroup key={"s" + scene.id} title={scene.name} isNarrow={true}
+                              canCollapse={weight == 0}
+                              startCollapsed={weight == 0}
+                              bold={weight > 0}>
+                  <span style={{fontWeight: weight > 0 ? "bolder" : "initial", opacity: 1}}>{"Weight: " + weight}</span>
+                  <span style={{fontWeight: percentage != "--" ? "bolder" : "initial", opacity: 1}}>{"Percentage: " + percentage}</span>
+                  <SimpleSliderInput
+                    isEnabled={true}
+                    onChange={this.onChangeSceneWeight.bind(this, scene)}
+                    label=""
+                    min={0}
+                    max={100}
+                    value={weight}/>
+                </ControlGroup>
+              )}
+            )}
+          </div>
         </div>
 
         {this.state.errorMessage != "" && (
@@ -177,12 +212,31 @@ export default class SceneGenerator extends React.Component {
     this.update((s) => { s.tagWeights = tagWeights; });
   }
 
+  updateSceneWeights(sceneWeights: string) {
+    this.update((s) => { s.sceneWeights = sceneWeights; });
+  }
+
   updateSceneSources(sources: Array<LibrarySource>) {
     this.update((s) => { s.sources = sources; });
   }
 
   updateSceneName(e: React.FormEvent<HTMLInputElement>) {
     this.update((s) => { s.name = e.currentTarget.value; });
+  }
+
+  onChangeSceneWeight(scene: Scene, weight: number) {
+    let sceneWeights = new Map<number, TagWeight>();
+    if (this.props.scene.sceneWeights != null) {
+      sceneWeights = new Map<number, TagWeight>(JSON.parse(this.props.scene.sceneWeights));
+    }
+
+    let sceneWeight = sceneWeights.get(scene.id);
+    if (sceneWeight != null) {
+      sceneWeight.value = weight;
+    } else {
+      sceneWeights.set(scene.id, new TagWeight(TT.weight, weight));
+    }
+    this.updateSceneWeights(JSON.stringify(Array.from(sceneWeights)));
   }
 
   onChangeTagWeight(tag: Tag, weight: number) {
@@ -235,9 +289,14 @@ export default class SceneGenerator extends React.Component {
     this.props.onGenerate();
   }
 
-  generateScene(tagWeightMap: Map<Tag, TagWeight>) {
+  getScene(id: number): Scene {
+    return this.props.scenes.find((s) => s.id === id);
+  }
+
+  generateScene(tagWeightMap: Map<Tag, TagWeight>, sceneWeightMap: Map<number, TagWeight>) {
     tagWeightMap = new Map(tagWeightMap);
-    const weights = Array.from(tagWeightMap.values());
+    sceneWeightMap = new Map(sceneWeightMap);
+    const weights = Array.from(tagWeightMap.values()).concat(Array.from(sceneWeightMap.values()));
     const sum = weights.length > 0 ? weights.map((w) => w.value).reduce((total, weight) => Number(total) + Number(weight)) : 1;
     let allList = Array<string>();
     let noneList = Array<string>();
@@ -249,6 +308,11 @@ export default class SceneGenerator extends React.Component {
         map.delete(key);
       } else if (value.type == TT.none) {
         noneList.push(key.name);
+        map.delete(key);
+      }
+    });
+    sceneWeightMap.forEach(function (value, key, map) {
+      if (value.value == 0) {
         map.delete(key);
       }
     });
@@ -301,7 +365,7 @@ export default class SceneGenerator extends React.Component {
     }
 
     let randomSources = Array<string>();
-    if (tagWeightMap.size > 0) { // If we have weights
+    if (tagWeightMap.size > 0 || sceneWeightMap.size > 0) { // If we have weights
       let index = 0;
       for (let tag of tagWeightMap.keys()) {
         if (taggedSources[index] != undefined) { // If we actually found sources for this tag
@@ -311,6 +375,15 @@ export default class SceneGenerator extends React.Component {
           randomSources = randomSources.concat(getRandomListItem(sources, Math.round((tagWeightMap.get(tag).value / sum) * this.props.scene.generatorMax)));
         }
         index += 1;
+      }
+      for (let sceneId of sceneWeightMap.keys()) {
+        let scene = this.getScene(sceneId);
+        if (scene != undefined) {
+          let sources = scene.sources.map((s) => s.url);
+          sources = sources.filter((s) => !randomSources.includes(s));
+          // Add sources equal to this scenes percent of the max
+          randomSources = randomSources.concat(getRandomListItem(sources, Math.round((sceneWeightMap.get(sceneId).value / sum) * this.props.scene.generatorMax)));
+        }
       }
     } else { // IF we only have Alls
       if (taggedSources[0] != undefined) { // If we actually found sources for this tag

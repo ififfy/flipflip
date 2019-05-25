@@ -232,6 +232,7 @@ export default class Meta extends React.Component {
             library={this.state.library}
             tags={this.state.tags}
             autoEdit={this.state.autoEdit}
+            scenes={this.state.scenes}
             scene={this.scene()}
             goBack={this.goBack.bind(this)}
             onGenerate={this.onGenerateScene.bind(this)}
@@ -365,6 +366,7 @@ export default class Meta extends React.Component {
     });
     const sceneCopy = JSON.parse(JSON.stringify(this.scene())); // Make a copy
     sceneCopy.tagWeights = null;
+    sceneCopy.sceneWeights = null;
     sceneCopy.id = id;
     this.setState({
       scenes: this.state.scenes.concat([sceneCopy]),
@@ -403,7 +405,7 @@ export default class Meta extends React.Component {
     if (scene && scene.nextSceneID !== 0){
       const nextScene = this.state.scenes.find((s) => s.id === this.scene().nextSceneID);
       if (nextScene != null) {
-        if (nextScene.tagWeights) {
+        if (nextScene.tagWeights || nextScene.sceneWeights) {
           this.setState({route: [new Route({kind: 'generate', value: scene.id}),
               new Route({kind: 'scene', value: nextScene.id}), new Route({kind: 'play', value: nextScene.id})]});
         } else {
@@ -426,7 +428,7 @@ export default class Meta extends React.Component {
   }
 
   onOpenScene(scene: Scene) {
-    if (scene.tagWeights) {
+    if (scene.tagWeights || scene.sceneWeights) {
       this.setState({route: [new Route({kind: 'generate', value: scene.id})]});
     } else {
       this.setState({route: [new Route({kind: 'scene', value: scene.id})]});
@@ -526,6 +528,7 @@ export default class Meta extends React.Component {
       name: "New generator",
       sources: new Array<LibrarySource>(),
       tagWeights: "[]",
+      sceneWeights: "[]",
       ...this.state.config.defaultScene,
     });
     this.setState({
@@ -605,6 +608,7 @@ export default class Meta extends React.Component {
   onExport(scene: Scene) {
     const sceneCopy = JSON.parse(JSON.stringify(scene)); // Make a copy
     sceneCopy.tagWeights = null;
+    sceneCopy.sceneWeights = null;
     const sceneExport = JSON.stringify(sceneCopy);
     const fileName = sceneCopy.name + "_export.json";
     remote.dialog.showSaveDialog(remote.getCurrentWindow(),

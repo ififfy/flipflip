@@ -74,7 +74,7 @@ export default class SceneDetail extends React.Component {
           </div>
 
           <div className="u-button-row-right">
-            {this.props.scene.tagWeights && (
+            {(this.props.scene.tagWeights || this.props.scene.sceneWeights) && (
               <div onClick={this.props.saveScene.bind(this)} className="u-clickable u-button">
                 Save as New Scene
               </div>

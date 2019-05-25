@@ -78,6 +78,7 @@ on the project to make changes as you wish. :-)
 - Allow overlay to be changed while playing
 - Add "count" command to captioning
 - 404 Checker (mark offline sources)
+- Allow other Scenes to be weighted in Scene Generator
 - Use Tumblr OAuth for retrieving images (prevent 429 error)
 - Added ImageFap as source
 - Added Sex.com as source

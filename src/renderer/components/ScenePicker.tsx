@@ -14,7 +14,7 @@ class ScenePickerItem extends React.Component {
   render() {
     return (
       <div
-        className={`ScenePickerItem u-clickable u-draggable ${this.props.scene.tagWeights ? 'm-generator' : ''}`}
+        className={`ScenePickerItem u-clickable u-draggable ${this.props.scene.tagWeights || this.props.scene.sceneWeights ? 'm-generator' : ''}`}
         onClick={this.onClick.bind(this)}>
         <div className="ScenePickerItem__Title">
           {this.props.scene.name}
@@ -229,9 +229,9 @@ export default class ScenePicker extends React.Component {
         break;
       case SF.type:
         this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
-          if (!a.tagWeights && b.tagWeights) {
+          if (!(a.tagWeights || a.sceneWeights) && (b.tagWeights || b.sceneWeights)) {
             return -1;
-          } else if (a.tagWeights && !b.tagWeights) {
+          } else if ((a.tagWeights || a.sceneWeights) && !(b.tagWeights || b.sceneWeights)) {
             return 1;
           } else {
             const aName = a.name.toLowerCase();

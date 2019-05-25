@@ -42,6 +42,7 @@ export default class Scene {
   libraryID: number = -1;
   audioURL?: string = "";
   tagWeights?: string;
+  sceneWeights?: string;
 
   // unused; migration only
   hastebinID: string = "";
