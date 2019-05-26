@@ -173,7 +173,7 @@ export default class Player extends React.Component {
             url={textURL(this.props.scene.textKind, this.props.scene.textSource)}/>
         )}
 
-        <div className={`u-button-row ${this.state.isPlaying ? 'u-show-on-hover-only' : ''}`}>
+        <div className={`u-button-row ${this.state.hasStarted && this.state.isPlaying ? 'u-show-on-hover-only' : ''}`}>
           <div className="u-button-row-right">
             {this.props.scene.audioURL && this.state.hasStarted && (
               <Sound
