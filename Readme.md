@@ -71,7 +71,7 @@ on the project to make changes as you wish. :-)
   
 ## History
 
-### 2.1.0 (Upcoming)
+### 2.1.0
 - Major performance improvements
 - Allow scenes to transition into other scenes
 - Allow scenes to be started as soon as the first image loads
