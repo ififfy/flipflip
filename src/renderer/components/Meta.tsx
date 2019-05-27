@@ -198,7 +198,7 @@ export default class Meta extends React.Component {
             onOpenLibrary={this.onOpenLibrary.bind(this)}
             onGenerate={this.onAddGenerator.bind(this)}
             onConfig={this.onConfig.bind(this)}
-            canGenerate={this.state.library.length > 0 && this.state.tags.length > 0}
+            canGenerate={(this.state.library.length >= 1 && this.state.tags.length >= 1) || (this.state.scenes.length >= 1)}
           />
         )}
 
