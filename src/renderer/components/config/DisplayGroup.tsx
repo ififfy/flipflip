@@ -35,7 +35,7 @@ export default class DisplayGroup extends React.Component {
         <hr/>
         <div className="ControlSubgroup">
           <SimpleNumberInput
-            label={"Min Image Size"}
+            label={"Min Image Size (px)"}
             value={this.props.settings.minImageSize}
             isEnabled={true}
             min={0}

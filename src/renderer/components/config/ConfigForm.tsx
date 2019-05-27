@@ -151,6 +151,19 @@ export default class ConfigForm extends React.Component {
     if (isNaN(parseInt(this.state.config.caching.maxSize))) {
       errorMessages.push("Invalid Cache Size");
     }
+    if (isNaN(parseInt(this.state.config.displaySettings.minImageSize))) {
+      errorMessages.push("Invalid Min Image Size");
+    }
+    if (isNaN(parseInt(this.state.config.displaySettings.maxInMemory))) {
+      errorMessages.push("Invalid Max in Memory");
+    }
+    if (isNaN(parseInt(this.state.config.displaySettings.maxLoadingAtOnce))) {
+      errorMessages.push("Invalid Max Loading at Once");
+    }
+    if (isNaN(parseInt(this.state.config.displaySettings.maxInHistory))) {
+      errorMessages.push("Invalid Max In History");
+    }
+
     if (this.state.config.caching.directory != "" &&
       !fs.existsSync(this.state.config.caching.directory)) {
       errorMessages.push("Invalid Cache Directory");
