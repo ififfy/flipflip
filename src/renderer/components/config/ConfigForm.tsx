@@ -128,7 +128,7 @@ export default class ConfigForm extends React.Component {
 
   showActivateTumblrNotice() {
     const messages = Array<string>();
-    messages.push("You are about to be directed to Tumblr.com to authorize FlipFlip. You should only have to do this once. You do not need to do this to use Tumblr sources.");
+    messages.push("You are about to be directed to Tumblr.com to authorize FlipFlip. You should only have to do this once.");
     messages.push("Tumblr has no Read-Only mode, so read AND write access are requested.");
     messages.push("FlipFlip does not store any user information or make any changes to your account.");
     this.setState({modalTitle: "Authorize FlipFlip on Tumblr", modalMessages: messages, modalFunction: this.activateTumblr });
@@ -220,18 +220,25 @@ export default class ConfigForm extends React.Component {
     const requestTokenUrl = 'https://www.tumblr.com/oauth/request_token';
     const accessTokenUrl = 'https://www.tumblr.com/oauth/access_token';
 
-    let tumblrIndex = getRandomIndex(this.props.config.remoteSettings.tumblrKeys);
-    if (this.props.config.remoteSettings.tumblrKey != "") {
-      tumblrIndex = this.props.config.remoteSettings.tumblrKeys.indexOf(this.props.config.remoteSettings.tumblrKey);
-      tumblrIndex += 1;
-      if (tumblrIndex == this.props.config.remoteSettings.tumblrKeys.length) {
-        tumblrIndex = 0;
+    // Default to user's own key
+    let tumblrKey = this.props.config.remoteSettings.tumblrKey;
+    let tumblrSecret = this.props.config.remoteSettings.tumblrSecret;
+    const indexOfKey = this.props.config.remoteSettings.tumblrKeys.indexOf(tumblrKey);
+    const indexOfSecret = this.props.config.remoteSettings.tumblrSecrets.indexOf(tumblrSecret);
+    if (tumblrKey == "" || tumblrSecret == "") {
+      // If user has no key, pick random one
+      let randomIndex = getRandomIndex(this.props.config.remoteSettings.tumblrKeys);
+      tumblrKey = this.props.config.remoteSettings.tumblrKeys[randomIndex];
+      tumblrSecret = this.props.config.remoteSettings.tumblrSecrets[randomIndex];
+    } else if (indexOfKey == indexOfSecret && indexOfKey != -1) {
+      // Else if user has one of our keys, move to the next one
+      let newIndex = indexOfKey + 1;
+      if (newIndex == this.props.config.remoteSettings.tumblrKeys.length) {
+        newIndex = 0;
       }
-      this.props.onClearTumblr();
+      tumblrKey = this.props.config.remoteSettings.tumblrKeys[newIndex];
+      tumblrSecret = this.props.config.remoteSettings.tumblrSecrets[newIndex];
     }
-
-    const tumblrKey = this.props.config.remoteSettings.tumblrKeys[tumblrIndex];
-    const tumblrSecret = this.props.config.remoteSettings.tumblrSecrets[tumblrIndex];
 
     const oauth = new OAuth(
       requestTokenUrl,
@@ -245,11 +252,11 @@ export default class ConfigForm extends React.Component {
 
     let sharedSecret = "";
 
-    oauth.getOAuthRequestToken((err: string, token: string, secret: string) => {
+    oauth.getOAuthRequestToken((err: {statusCode: number, data: string}, token: string, secret: string) => {
       if (err) {
-        console.error("Failed with error" + err);
+        console.error(err.statusCode + " - " + err.data);
         const newMessages = Array<string>();
-        newMessages.push("Error: " + err);
+        newMessages.push("Error: " + err.statusCode + " - " + err.data);
         this.setState({modalTitle: "Failed", modalMessages: newMessages, modalFunction: this.closeModal});
         return;
       }
