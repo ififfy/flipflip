@@ -160,8 +160,8 @@ export default class ScenePicker extends React.Component {
       .get()
       .json(json => {
         const newestRelease = json[0];
-        const releaseVersion = newestRelease.tag_name.replace("v", "");
-        if (parseFloat(releaseVersion) > parseFloat(this.props.version)) {
+        const releaseVersion = newestRelease.tag_name.replace("v", "").replace(".", "").replace(".", "");
+        if (parseInt(releaseVersion, 10) > parseInt(this.props.version.replace(".", "").replace(".", ""), 10)) {
           this.setState({
             newVersion: newestRelease.tag_name,
             newVersionLink: newestRelease.html_url,
