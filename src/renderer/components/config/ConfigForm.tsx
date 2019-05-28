@@ -17,6 +17,7 @@ import TimingGroup from "../sceneDetail/TimingGroup";
 import Modal from "../ui/Modal";
 import BackupGroup from "./BackupGroup";
 import DisplayGroup from "./DisplayGroup";
+import {getRandomIndex} from "../../utils";
 
 export default class ConfigForm extends React.Component {
   readonly props: {
@@ -93,6 +94,7 @@ export default class ConfigForm extends React.Component {
           <APIGroup
             settings={this.state.config.remoteSettings}
             activateTumblr={this.showActivateTumblrNotice.bind(this)}
+            nextTumblr={this.activateTumblr.bind(this)}
             clearTumblr={this.props.onClearTumblr.bind(this)}
             activateReddit={this.showActivateRedditNotice.bind(this)}
             clearReddit={this.props.onClearReddit.bind(this)}
@@ -218,11 +220,24 @@ export default class ConfigForm extends React.Component {
     const requestTokenUrl = 'https://www.tumblr.com/oauth/request_token';
     const accessTokenUrl = 'https://www.tumblr.com/oauth/access_token';
 
+    let tumblrIndex = getRandomIndex(this.props.config.remoteSettings.tumblrKeys);
+    if (this.props.config.remoteSettings.tumblrKey != "") {
+      tumblrIndex = this.props.config.remoteSettings.tumblrKeys.indexOf(this.props.config.remoteSettings.tumblrKey);
+      tumblrIndex += 1;
+      if (tumblrIndex == this.props.config.remoteSettings.tumblrKeys.length) {
+        tumblrIndex = 0;
+      }
+      this.props.onClearTumblr();
+    }
+
+    const tumblrKey = this.props.config.remoteSettings.tumblrKeys[tumblrIndex];
+    const tumblrSecret = this.props.config.remoteSettings.tumblrSecrets[tumblrIndex];
+
     const oauth = new OAuth(
       requestTokenUrl,
       accessTokenUrl,
-      this.props.config.remoteSettings.tumblrKey,
-      this.props.config.remoteSettings.tumblrSecret,
+      tumblrKey,
+      tumblrSecret,
       '1.0A',
       'http://localhost:65010',
       'HMAC-SHA1'
@@ -244,7 +259,7 @@ export default class ConfigForm extends React.Component {
     });
 
     // Start a server to listen for Tumblr OAuth response
-    http.createServer((req, res) => {
+    const server = http.createServer((req, res) => {
       // Can't seem to get electron to properly return focus to FlipFlip, just alert the user in the response
       const html = "<html><body><h1>Please return to FlipFlip</h1></body></html>";
       res.writeHead(200, {"Content-Type": "text/html"});
@@ -271,12 +286,16 @@ export default class ConfigForm extends React.Component {
 
               // Use prop here and not state, we strictly want to update oauthToken and oauthVerifier
               const config = this.props.config;
+              config.remoteSettings.tumblrKey = tumblrKey;
+              config.remoteSettings.tumblrSecret = tumblrSecret;
               config.remoteSettings.tumblrOAuthToken = token;
               config.remoteSettings.tumblrOAuthTokenSecret = secret;
               this.props.updateConfig(config);
 
               // Also update state (so our config doesn't get overridden if other changes are saved)
               const newConfig = this.state.config;
+              newConfig.remoteSettings.tumblrKey = tumblrKey;
+              newConfig.remoteSettings.tumblrSecret = tumblrSecret;
               newConfig.remoteSettings.tumblrOAuthToken = token;
               newConfig.remoteSettings.tumblrOAuthTokenSecret = secret;
               const newMessages = Array<string>();
@@ -289,6 +308,7 @@ export default class ConfigForm extends React.Component {
               });
 
               // This closes the server
+              server.close();
               req.connection.destroy();
             }
           );
@@ -321,7 +341,7 @@ export default class ConfigForm extends React.Component {
       });
 
     // Start a server to listen for Reddit OAuth response
-    http.createServer((req, res) => {
+    const server = http.createServer((req, res) => {
       // Can't seem to get electron to properly return focus to FlipFlip, just alert the user in the response
       const html = "<html><body><h1>Please return to FlipFlip</h1></body></html>";
       res.writeHead(200, {"Content-Type": "text/html"});
@@ -360,6 +380,7 @@ export default class ConfigForm extends React.Component {
                 });
 
                 // This closes the server
+                server.close();
                 req.connection.destroy();
               });
           }

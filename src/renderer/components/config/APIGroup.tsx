@@ -8,6 +8,7 @@ export default class APIGroup extends React.Component {
   readonly props: {
     settings: RemoteSettings
     activateTumblr(): void,
+    nextTumblr(): void,
     clearTumblr(): void,
     activateReddit(): void,
     clearReddit(): void,
@@ -20,8 +21,13 @@ export default class APIGroup extends React.Component {
     return (
       <ControlGroup title="API Keys" isNarrow={true}>
         <div className="ControlSubgroup" style={{display: 'block'}}>
+          {tumblrAuthorized && (
+            <div>Using Tumblr API Key {this.props.settings.tumblrKeys.indexOf(this.props.settings.tumblrKey)}</div>
+          )}
           <button onClick={!tumblrAuthorized ? this.props.activateTumblr.bind(this) : this.nop}
                   className={`u-button ${!tumblrAuthorized ? 'u-clickable' : 'u-disabled'}`}>Authorize FlipFlip on Tumblr</button>
+          <button onClick={tumblrAuthorized ? this.props.nextTumblr.bind(this) : this.nop}
+                  className={`u-button ${tumblrAuthorized ? 'u-clickable' : 'u-disabled'}`}>Try Next Tumblr Token</button>
           <button onClick={tumblrAuthorized ? this.props.clearTumblr.bind(this) : this.nop}
                   className={`u-button ${tumblrAuthorized ? 'u-clickable' : 'u-disabled'}`}>Clear Tumblr Token</button>
         </div>

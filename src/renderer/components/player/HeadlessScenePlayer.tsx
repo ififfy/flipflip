@@ -25,6 +25,7 @@ import ImagePlayer from './ImagePlayer';
 
 let redditAlerted = false;
 let tumblrAlerted = false;
+let tumblr429Alerted = false;
 let instagramAlerted = false;
 
 // Returns true if array is empty, or only contains empty arrays
@@ -176,7 +177,12 @@ function loadTumblr(config: Config, url: string, filter: string, next: any): Can
       tumblrID = tumblrID.replace("/", "");
       client.blogPosts(tumblrID, {offset: next*20}, (err, data) => {
         if (err) {
+          console.error("Error retriving " + tumblrID + (next == 0 ? "" : "(Page " + next + " )"));
           console.error(err);
+          if (err.message.includes("429 Limit Exceeded") && !tumblr429Alerted && next == 0) {
+            alert("Tumblr has temporarily throttled your FlipFlip due to high traffic. Try again in a few minutes or visit config to try a different Tumblr API key.");
+            tumblr429Alerted = true;
+          }
           resolve(null);
           return;
         }
@@ -690,6 +696,7 @@ export default class HeadlessScenePlayer extends React.Component {
   componentDidMount() {
     redditAlerted = false;
     tumblrAlerted = false;
+    tumblr429Alerted = false;
     instagramAlerted = false;
     let n = 0;
     let newAllURLs = new Map<string, Array<string>>();

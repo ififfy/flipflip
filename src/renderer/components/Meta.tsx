@@ -634,6 +634,8 @@ export default class Meta extends React.Component {
 
   clearTumblr() {
     const newConfig = this.state.config;
+    newConfig.remoteSettings.tumblrKey = "";
+    newConfig.remoteSettings.tumblrSecret = "";
     newConfig.remoteSettings.tumblrOAuthToken = "";
     newConfig.remoteSettings.tumblrOAuthTokenSecret = "";
     this.setState({config: newConfig});
