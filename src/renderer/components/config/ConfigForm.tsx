@@ -129,6 +129,7 @@ export default class ConfigForm extends React.Component {
   showActivateTumblrNotice() {
     const messages = Array<string>();
     messages.push("You are about to be directed to Tumblr.com to authorize FlipFlip. You should only have to do this once.");
+    messages.push("FlipFlip provides a few public keys for use, but we recommend registering your own app at https://www.tumblr.com/oauth/apps and using your own keys. Refer to the FlipFlip documentation for more complete instructions.");
     messages.push("Tumblr has no Read-Only mode, so read AND write access are requested.");
     messages.push("FlipFlip does not store any user information or make any changes to your account.");
     this.setState({modalTitle: "Authorize FlipFlip on Tumblr", modalMessages: messages, modalFunction: this.activateTumblr });

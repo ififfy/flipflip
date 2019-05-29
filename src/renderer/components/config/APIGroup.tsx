@@ -35,20 +35,16 @@ export default class APIGroup extends React.Component {
               label="Tumblr OAuth Consumer Key"
               value={this.props.settings.tumblrKey}
               onChange={this.changeKey.bind(this, 'tumblrKey').bind(this)}>
-              {" "}
-              <button onClick={this.paste.bind(this, this.changeKey.bind(this, 'tumblrKey').bind(this))}>Paste</button>
             </SimpleTextInput>
             <SimpleTextInput
               isEnabled={!tumblrAuthorized}
               label="Tumblr OAuth Consumer Secret"
               value={this.props.settings.tumblrSecret}
               onChange={this.changeKey.bind(this, 'tumblrSecret').bind(this)}>
-              {" "}
-              <button onClick={this.paste.bind(this, this.changeKey.bind(this, 'tumblrSecret').bind(this))}>Paste</button>
             </SimpleTextInput>
             {tumblrAuthorized && indexOf !== -1 && (
               <div>
-                <span>Using Tumblr API Key {indexOf + 1}</span>
+                <p>Using Tumblr API Key {indexOf + 1}</p>
                 <button onClick={tumblrAuthorized ? this.props.nextTumblr.bind(this) : this.nop}
                         className={`u-button ${tumblrAuthorized ? 'u-clickable' : 'u-disabled'}`}>Try Next Tumblr Token</button>
               </div>
