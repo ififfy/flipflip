@@ -71,6 +71,11 @@ on the project to make changes as you wish. :-)
   
 ## History
 
+### 2.1.1
+- Add more public Tumblr keys
+- Allow users to specify Tumblr keys
+- Fix bug with  new version alert
+
 ### 2.1.0
 - Major performance improvements
 - Allow scenes to transition into other scenes
