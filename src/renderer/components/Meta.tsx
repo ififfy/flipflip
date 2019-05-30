@@ -49,7 +49,11 @@ export default class Meta extends React.Component {
   }
 
   componentDidMount() {
-    setInterval(appStorage.save.bind(appStorage, this.state), 500);
+    setInterval(this.save.bind(this), 500);
+  }
+
+  save() {
+    appStorage.save(this.state);
   }
 
   render() {
