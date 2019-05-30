@@ -1,11 +1,12 @@
 import { mkdirSync, existsSync, readFileSync, renameSync, writeFileSync } from 'fs';
 import path from 'path';
+
 import { removeDuplicatesBy, saveDir } from "./utils";
+import { Route } from './Route';
 import Config from "./Config";
 import Scene from './Scene';
 import LibrarySource from '../components/library/LibrarySource';
 import Tag from "../components/library/Tag";
-import { Route } from './Route';
 
 /**
  * A compile-time global variable defined in webpack.config'
@@ -40,7 +41,7 @@ function archiveFile(filePath: string): void {
 
 export default class AppStorage {
   initialState: any = defaultInitialState;
-  savePath: string
+  savePath: string;
 
   constructor() {
     try {
@@ -95,16 +96,16 @@ export default class AppStorage {
           for (let oldScene of data.scenes) {
             const newScene = new Scene(oldScene);
             let sourceID = 0;
-            const sources = Array<LibrarySource>();
+            const newSources = Array<LibrarySource>();
             for (let oldDirectory of oldScene.directories) {
-              sources.push(new LibrarySource({
+              newSources.push(new LibrarySource({
                 url: oldDirectory,
                 id: sourceID,
                 tags: Array<Tag>(),
               }));
               sourceID += 1;
             }
-            newScene.sources = sources;
+            newScene.sources = newSources;
             newScenes.push(newScene);
           }
           this.initialState.scenes = newScenes;

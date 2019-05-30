@@ -5,7 +5,6 @@ import {getBackups, saveDir} from "../../data/utils";
 import ControlGroup from "../sceneDetail/ControlGroup";
 import Modal from "../ui/Modal";
 
-
 export default class BackupGroup extends React.Component {
 
   readonly props: {

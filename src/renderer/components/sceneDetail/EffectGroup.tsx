@@ -1,13 +1,13 @@
 import * as React from 'react';
-import {BT, HTF, VTF, ZF} from "../../data/const";
 
-import SimpleOptionPicker from "../ui/SimpleOptionPicker";
+import {BT, HTF, VTF, ZF} from "../../data/const";
+import {SceneSettings} from "../../data/Config";
 import ControlGroup from "./ControlGroup";
 import Scene from "../../data/Scene";
+import SimpleOptionPicker from "../ui/SimpleOptionPicker";
 import SimpleSliderInput from "../ui/SimpleSliderInput";
 import SimpleCheckbox from "../ui/SimpleCheckbox";
 import SimpleColorPicker from "../ui/SimpleColorPicker";
-import {SceneSettings} from "../../data/Config";
 import SimpleNumberInput from "../ui/SimpleNumberInput";
 
 export default class EffectGroup extends React.Component {

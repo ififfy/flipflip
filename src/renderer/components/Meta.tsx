@@ -1,10 +1,12 @@
-import {remote, app} from 'electron';
-import {readFileSync, writeFileSync} from 'fs';
+import {remote} from 'electron';
+import {readFileSync} from 'fs';
 import * as fs from "fs";
 import * as React from 'react';
 import path from 'path';
 
 import {getBackups, saveDir} from "../data/utils";
+import { Route } from '../data/Route';
+import AppStorage from '../data/AppStorage';
 import Config from "../data/Config";
 import Scene from '../data/Scene';
 import ScenePicker from './ScenePicker';
@@ -16,8 +18,6 @@ import TagManager from "./library/TagManager";
 import SceneGenerator from "./library/SceneGenerator";
 import Player from './player/Player';
 import SceneDetail from './sceneDetail/SceneDetail';
-import { Route } from '../data/Route';
-import AppStorage from '../data/AppStorage';
 
 const appStorage = new AppStorage();
 
@@ -32,7 +32,7 @@ export default class Meta extends React.Component {
   scene?(): Scene {
     for (let r of this.state.route.slice().reverse()) {
       if (r.kind == 'scene' || r.kind == 'generate') {
-        return this.state.scenes.find((s: any) => s.id === r.value);
+        return this.state.scenes.find((s: Scene) => s.id === r.value);
       }
     }
     return null;
@@ -216,7 +216,7 @@ export default class Meta extends React.Component {
 
   saveScene() {
     let id = this.state.scenes.length + 1;
-    this.state.scenes.forEach((s: any) => {
+    this.state.scenes.forEach((s: Scene) => {
       id = Math.max(s.id + 1, id);
     });
     const sceneCopy = JSON.parse(JSON.stringify(this.scene())); // Make a copy
@@ -232,7 +232,7 @@ export default class Meta extends React.Component {
 
   onAddScene() {
     let id = this.state.scenes.length + 1;
-    this.state.scenes.forEach((s: any) => {
+    this.state.scenes.forEach((s: Scene) => {
       id = Math.max(s.id + 1, id);
     });
     let scene = new Scene({
@@ -250,7 +250,7 @@ export default class Meta extends React.Component {
 
   onDeleteScene(scene: Scene) {
     this.setState({
-      scenes: this.state.scenes.filter((s: any) => s.id != scene.id),
+      scenes: this.state.scenes.filter((s: Scene) => s.id != scene.id),
       route: [],
     });
   }
@@ -258,7 +258,7 @@ export default class Meta extends React.Component {
   nextScene() {
     const scene = this.scene();
     if (scene && scene.nextSceneID !== 0){
-      const nextScene = this.state.scenes.find((s: any) => s.id === this.scene().nextSceneID);
+      const nextScene = this.state.scenes.find((s: Scene) => s.id === this.scene().nextSceneID);
       if (nextScene != null) {
         if (nextScene.tagWeights || nextScene.sceneWeights) {
           this.setState({route: [new Route({kind: 'generate', value: scene.id}),
@@ -326,7 +326,7 @@ export default class Meta extends React.Component {
 
   onPlaySceneFromLibrary(source: LibrarySource, yOffset: number, filters: Array<string>) {
     let id = this.state.scenes.length + 1;
-    this.state.scenes.forEach((s: any) => {
+    this.state.scenes.forEach((s: Scene) => {
       id = Math.max(s.id + 1, id);
     });
     let tempScene = new Scene({
@@ -347,11 +347,11 @@ export default class Meta extends React.Component {
   endPlaySceneFromLibrary() {
     const newScenes = this.state.scenes;
     const libraryID = newScenes.pop().libraryID;
-    const tagNames = this.state.tags.map((t: any) => t.name);
+    const tagNames = this.state.tags.map((t: Tag) => t.name);
     // Re-order the tags of the source we were playing
-    const newLibrary = this.state.library.map((s: any) => {
+    const newLibrary = this.state.library.map((s: LibrarySource) => {
       if (s.id == libraryID) {
-         s.tags = s.tags.sort((a: any, b: any) => {
+         s.tags = s.tags.sort((a: Tag, b: Tag) => {
           const aIndex = tagNames.indexOf(a.name);
           const bIndex = tagNames.indexOf(b.name);
           if (aIndex < bIndex) {
@@ -375,7 +375,7 @@ export default class Meta extends React.Component {
 
   onAddGenerator() {
     let id = this.state.scenes.length + 1;
-    this.state.scenes.forEach((s: any) => {
+    this.state.scenes.forEach((s: Scene) => {
       id = Math.max(s.id + 1, id);
     });
     let scene = new Scene({
@@ -422,8 +422,8 @@ export default class Meta extends React.Component {
     const tagIDs = tags.map((t) => t.id);
     for (let source of newLibrary) {
       // Remove deleted tags, update any edited tags, and order the same as tags
-      source.tags = source.tags.filter((t: any) => tagIDs.includes(t.id));
-      source.tags = source.tags.map((t: any) => {
+      source.tags = source.tags.filter((t: Tag) => tagIDs.includes(t.id));
+      source.tags = source.tags.map((t: Tag) => {
         for (let tag of tags) {
           if (t.id == tag.id) {
             t.name = tag.name;
@@ -431,7 +431,7 @@ export default class Meta extends React.Component {
           }
         }
       });
-      source.tags = source.tags.sort((a: any, b: any) => {
+      source.tags = source.tags.sort((a: Tag, b: Tag) => {
         const aIndex = tagIDs.indexOf(a.id);
         const bIndex = tagIDs.indexOf(b.id);
         if (aIndex < bIndex) {
@@ -450,8 +450,8 @@ export default class Meta extends React.Component {
     let newLibrary = this.state.library;
     for (let source of newLibrary) {
       if (source.id == sourceID) {
-        if (source.tags.map((t: any) => t.name).includes(tag.name)) {
-          source.tags = source.tags.filter((t: any) => t.name != tag.name);
+        if (source.tags.map((t: Tag) => t.name).includes(tag.name)) {
+          source.tags = source.tags.filter((t: Tag) => t.name != tag.name);
         } else {
           source.tags.push(tag);
         }
@@ -480,7 +480,7 @@ export default class Meta extends React.Component {
     if (!filePath || !filePath.length) return;
     const scene = new Scene(JSON.parse(readFileSync(filePath[0], 'utf-8')));
     let id = this.state.scenes.length + 1;
-    this.state.scenes.forEach((s: any) => {
+    this.state.scenes.forEach((s: Scene) => {
       id = Math.max(s.id + 1, id);
     });
     scene.id = id;
