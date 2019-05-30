@@ -1,9 +1,9 @@
 import * as React from 'react';
 import SystemFonts from 'system-font-families';
 
-import {TOT} from "../../const";
-import {SceneSettings} from "../../Config";
-import Scene from "../../Scene";
+import {TOT} from "../../data/const";
+import {SceneSettings} from "../../data/Config";
+import Scene from "../../data/Scene";
 import ControlGroup from "./ControlGroup";
 import SimpleColorPicker from "../ui/SimpleColorPicker";
 import SimpleNumberInput from "../ui/SimpleNumberInput";

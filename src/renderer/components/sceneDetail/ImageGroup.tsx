@@ -1,8 +1,8 @@
 import * as React from 'react';
 
-import {IF} from "../../const";
-import {SceneSettings} from "../../Config";
-import Scene from "../../Scene";
+import {IF} from "../../data/const";
+import {SceneSettings} from "../../data/Config";
+import Scene from "../../data/Scene";
 import ControlGroup from "./ControlGroup";
 import SimpleCheckbox from "../ui/SimpleCheckbox";
 import SimpleOptionPicker from "../ui/SimpleOptionPicker";

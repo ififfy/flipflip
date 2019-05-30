@@ -1,7 +1,7 @@
 import * as React from "react";
 import Sortable from "sortablejs"
 
-import {arrayMove, removeDuplicatesBy} from "../../utils";
+import {arrayMove, removeDuplicatesBy} from "../../data/utils";
 import Tag from "./Tag";
 
 export default class TagManager extends React.Component {

@@ -2,7 +2,7 @@ import {remote} from "electron";
 import * as React from 'react'
 import {sep} from "path";
 
-import {GT, TOT} from '../../const';
+import {GT, TOT} from '../../data/const';
 import SimpleOptionPicker from "../ui/SimpleOptionPicker";
 import SimpleTextInput from '../ui/SimpleTextInput';
 

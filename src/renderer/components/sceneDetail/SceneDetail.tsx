@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import Scene from '../../Scene';
+import Scene from '../../data/Scene';
 import SourcePicker from './SourcePicker';
 import AudioGroup from "./AudioGroup";
 import EffectGroup from "./EffectGroup";

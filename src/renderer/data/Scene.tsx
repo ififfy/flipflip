@@ -1,5 +1,5 @@
 import {BT, HTF, IF, TF, TOT, VTF, ZF} from './const';
-import LibrarySource from "./components/library/LibrarySource";
+import LibrarySource from "../components/library/LibrarySource";
 
 export default class Scene {
   id: number = 0;

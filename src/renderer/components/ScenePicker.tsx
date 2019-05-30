@@ -3,9 +3,9 @@ import * as React from 'react';
 import wretch from 'wretch';
 import Sortable from "sortablejs";
 
-import {SF} from "../const";
-import {arrayMove, getRandomListItem} from "../utils";
-import Scene from '../Scene';
+import {SF} from "../data/const";
+import {arrayMove, getRandomListItem} from "../data/utils";
+import Scene from '../data/Scene';
 import SimpleOptionPicker from "./ui/SimpleOptionPicker";
 
 class ScenePickerItem extends React.Component {

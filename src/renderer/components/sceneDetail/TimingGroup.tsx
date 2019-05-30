@@ -1,8 +1,8 @@
 import * as React from 'react';
 
-import {TF} from "../../const";
-import {SceneSettings} from "../../Config";
-import Scene from "../../Scene";
+import {TF} from "../../data/const";
+import {SceneSettings} from "../../data/Config";
+import Scene from "../../data/Scene";
 import ControlGroup from "./ControlGroup";
 import SimpleOptionPicker from "../ui/SimpleOptionPicker";
 import SimpleNumberInput from "../ui/SimpleNumberInput";

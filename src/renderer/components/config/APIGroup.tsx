@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import {RemoteSettings} from "../../Config";
+import {RemoteSettings} from "../../data/Config";
 import ControlGroup from "../sceneDetail/ControlGroup";
 import SimpleTextInput from "../ui/SimpleTextInput";
 
