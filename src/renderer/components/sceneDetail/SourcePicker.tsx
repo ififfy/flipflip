@@ -3,8 +3,8 @@ import * as React from 'react';
 import Sortable from "sortablejs";
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 
-import {SF} from "../../const";
-import {arrayMove, getFileGroup, getSourceType} from "../../utils";
+import {SF} from "../../data/const";
+import {arrayMove, getFileGroup, getSourceType} from "../../data/utils";
 import LibrarySource from "../library/LibrarySource";
 import Tag from "../library/Tag";
 import URLModal from "../sceneDetail/URLModal";

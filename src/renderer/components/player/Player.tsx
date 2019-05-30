@@ -4,10 +4,10 @@ import Sound from 'react-sound';
 import fs from "fs";
 import fileURL from "file-url";
 
-import {TOT} from "../../const";
-import {urlToPath} from '../../utils';
-import Config from "../../Config";
-import Scene from '../../Scene';
+import {TOT} from "../../data/const";
+import {urlToPath} from '../../data/utils';
+import Config from "../../data/Config";
+import Scene from '../../data/Scene';
 import CaptionProgram from "./CaptionProgram";
 import ChildCallbackHack from './ChildCallbackHack';
 import HeadlessScenePlayer from './HeadlessScenePlayer';

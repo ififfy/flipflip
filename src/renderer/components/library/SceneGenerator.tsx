@@ -1,8 +1,8 @@
 import * as React from "react";
 
-import {TT} from "../../const";
-import {getRandomListItem, removeDuplicatesBy} from "../../utils";
-import Scene from "../../Scene";
+import {TT} from "../../data/const";
+import {getRandomListItem, removeDuplicatesBy} from "../../data/utils";
+import Scene from "../../data/Scene";
 import LibrarySource from "./LibrarySource";
 import Tag from "./Tag";
 import ControlGroup from "../sceneDetail/ControlGroup";

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import wretch from 'wretch';
 
-import {CancelablePromise, getRandomListItem} from '../../utils'
+import {CancelablePromise, getRandomListItem} from '../../data/utils'
 
 let STYLES: { [style: string]: string } = {};
 

@@ -4,8 +4,8 @@ import {existsSync} from "fs";
 import rimraf from "rimraf";
 import getFolderSize from 'get-folder-size';
 
-import {getCachePath} from "../../utils";
-import Config, {CacheSettings} from "../../Config";
+import {getCachePath} from "../../data/utils";
+import Config, {CacheSettings} from "../../data/Config";
 import ControlGroup from "../sceneDetail/ControlGroup";
 import SimpleCheckbox from "../ui/SimpleCheckbox";
 import SimpleNumberInput from "../ui/SimpleNumberInput";

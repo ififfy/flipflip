@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import {DisplaySettings} from "../../Config";
+import {DisplaySettings} from "../../data/Config";
 import ControlGroup from "../sceneDetail/ControlGroup";
 import SimpleCheckbox from "../ui/SimpleCheckbox";
 import SimpleNumberInput from "../ui/SimpleNumberInput";

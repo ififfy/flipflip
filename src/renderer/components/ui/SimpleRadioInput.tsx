@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import en from "../../en";
+import en from "../../data/en";
 
 export default class SimpleRadioInput extends React.Component {
   readonly props: {

@@ -1,12 +1,14 @@
 import {remote} from 'electron';
-import {existsSync, mkdirSync, readFileSync, renameSync, writeFileSync} from 'fs';
+import {readFileSync} from 'fs';
 import * as fs from "fs";
 import * as React from 'react';
 import path from 'path';
 
-import {getBackups, removeDuplicatesBy, saveDir} from "../utils";
-import Config from "../Config";
-import Scene from '../Scene';
+import {getBackups, saveDir} from "../data/utils";
+import { Route } from '../data/Route';
+import AppStorage from '../data/AppStorage';
+import Config from "../data/Config";
+import Scene from '../data/Scene';
 import ScenePicker from './ScenePicker';
 import ConfigForm from './config/ConfigForm';
 import Library from './library/Library';
@@ -17,143 +19,10 @@ import SceneGenerator from "./library/SceneGenerator";
 import Player from './player/Player';
 import SceneDetail from './sceneDetail/SceneDetail';
 
-/**
- * A compile-time global variable defined in webpack.config'
- *  [plugins] section to pick up the version string from 
- *   package.json
- */
-declare var __VERSION__: string;
-
-class Route {
-  kind: string;
-  value: any;
-
-  constructor(init?: Partial<Route>) {
-    Object.assign(this, init);
-  }
-}
-
-// initialState declaration (overwritten by data read from data.json)
-let initialState = {
-  version: __VERSION__,
-  config: new Config(),
-  scenes: Array<Scene>(),
-  library: Array<LibrarySource>(),
-  tags: Array<Tag>(),
-  route: Array<Route>(),
-  autoEdit: false,
-  isSelect: false,
-  libraryYOffset: 0,
-  libraryFilters: Array<string>(),
-};
-
-try {
-  mkdirSync(saveDir);
-} catch (e) {
-  // who cares
-}
-const savePath = path.join(saveDir, 'data.json');
-console.log("Saving to", savePath);
-
-try {
-  const data = JSON.parse(readFileSync(savePath, 'utf-8'));
-  switch (data.version) {
-    // When no version number found in data.json -- assume pre-v2.0.0 format
-    // This should fail safe and self heal.
-    case undefined:
-      // Preserve the existing file - so as not to destroy user's data
-      archiveFile(savePath);
-
-      // Create Library from aggregate of previous scenes' directories
-      let sources = Array<string>();
-      for (let scene of data.scenes) {
-        sources = sources.concat(scene.directories);
-      }
-      sources = removeDuplicatesBy((s: string) => s, sources);
-
-      // Create our initialState object
-      initialState = {
-        version: __VERSION__,
-        autoEdit: data.autoEdit,
-        isSelect: data.isSelect ? data.isSelect : false,
-        config: data.config ? new Config(data.config) : new Config(),
-        scenes: Array<Scene>(),
-        library: Array<LibrarySource>(),
-        tags: Array<Tag>(),
-        route: data.route.map((s: any) => new Route(s)),
-        libraryYOffset: 0,
-        libraryFilters: Array<string>(),
-      };
-
-      // Hydrate and add the library ! Yay!!! :)
-      let libraryID = 0;
-      const newLibrarySources = Array<LibrarySource>();
-      for (let url of sources) {
-        newLibrarySources.push(new LibrarySource({
-          url: url,
-          id: libraryID,
-          tags: Array<Tag>(),
-        }));
-        libraryID += 1;
-      }
-      initialState.library = newLibrarySources;
-
-      // Convert and add old scenes
-      const newScenes = Array<Scene>();
-      for (let oldScene of data.scenes) {
-        const newScene = new Scene(oldScene);
-
-        let sourceID = 0;
-        const sources = Array<LibrarySource>();
-        for (let oldDirectory of oldScene.directories) {
-          sources.push(new LibrarySource({
-            url: oldDirectory,
-            id: sourceID,
-            tags: Array<Tag>(),
-          }));
-          sourceID += 1;
-        }
-        newScene.sources = sources;
-        newScenes.push(newScene);
-      }
-      initialState.scenes = newScenes;
-      break;
-    default:
-      initialState = {
-        version: __VERSION__,
-        autoEdit: data.autoEdit,
-        isSelect: data.isSelect,
-        config: new Config(data.config),
-        scenes: data.scenes.map((s: any) => new Scene(s)),
-        library: data.library.map((s: any) => new LibrarySource(s)),
-        tags: data.tags.map((t: any) => new Tag(t)),
-        route: data.route.map((s: any) => new Route(s)),
-        libraryYOffset: 0,
-        libraryFilters: Array<string>(),
-      };
-  }
-} catch (e) {
-  // When an error occurs archive potentially incompatible data.json file 
-  // This essentially renames the data.json file and thus the app is self-healing
-  // in that it will recreate an initial (blank) data.json file on restarting
-  // - The archived file being available for investigation.
-  console.error(e);
-  archiveFile(savePath);
-}
-
-/**
- * Archives a file (if it exists) to same path appending '.{epoch now}' 
- * to the file name 
- * @param {string} filePath 
- */
-function archiveFile(filePath: string): void {
-  if (existsSync(filePath)) {
-    renameSync(filePath, (filePath + '.' + Date.now()));
-  }
-}
+const appStorage = new AppStorage();
 
 export default class Meta extends React.Component {
-  readonly state = initialState;
+  readonly state = appStorage.initialState;
 
   isRoute(kind: string): Boolean {
     if (this.state.route.length < 1) return false;
@@ -163,7 +32,7 @@ export default class Meta extends React.Component {
   scene?(): Scene {
     for (let r of this.state.route.slice().reverse()) {
       if (r.kind == 'scene' || r.kind == 'generate') {
-        return this.state.scenes.find((s) => s.id === r.value);
+        return this.state.scenes.find((s: Scene) => s.id === r.value);
       }
     }
     return null;
@@ -180,7 +49,7 @@ export default class Meta extends React.Component {
   }
 
   componentDidMount() {
-    setInterval(this.save.bind(this), 500);
+    setInterval(appStorage.save.bind(appStorage, this.state), 500);
   }
 
   render() {
@@ -288,7 +157,7 @@ export default class Meta extends React.Component {
             goBack={this.goBack.bind(this)}
             updateConfig={this.updateConfig.bind(this)}
             onDefault={this.onDefaultConfig.bind(this)}
-            onBackup={this.backup.bind(this)}
+            onBackup={appStorage.backup.bind(appStorage)}
             onRestore={this.restore.bind(this)}
             onClean={this.cleanBackups.bind(this)}
             onClearTumblr={this.clearTumblr.bind(this)}
@@ -297,20 +166,6 @@ export default class Meta extends React.Component {
         )}
       </div>
     )
-  }
-
-  save() {
-    writeFileSync(savePath, JSON.stringify(this.state), 'utf-8');
-  }
-
-  backup() {
-    try {
-      archiveFile(savePath);
-    } catch (e) {
-      alert("Backup error:\n" + e);
-      return;
-    }
-    alert("Backup success!");
   }
 
   restore(backupFile: string) {
@@ -361,7 +216,7 @@ export default class Meta extends React.Component {
 
   saveScene() {
     let id = this.state.scenes.length + 1;
-    this.state.scenes.forEach((s) => {
+    this.state.scenes.forEach((s: Scene) => {
       id = Math.max(s.id + 1, id);
     });
     const sceneCopy = JSON.parse(JSON.stringify(this.scene())); // Make a copy
@@ -377,7 +232,7 @@ export default class Meta extends React.Component {
 
   onAddScene() {
     let id = this.state.scenes.length + 1;
-    this.state.scenes.forEach((s) => {
+    this.state.scenes.forEach((s: Scene) => {
       id = Math.max(s.id + 1, id);
     });
     let scene = new Scene({
@@ -395,7 +250,7 @@ export default class Meta extends React.Component {
 
   onDeleteScene(scene: Scene) {
     this.setState({
-      scenes: this.state.scenes.filter((s) => s.id != scene.id),
+      scenes: this.state.scenes.filter((s: Scene) => s.id != scene.id),
       route: [],
     });
   }
@@ -403,7 +258,7 @@ export default class Meta extends React.Component {
   nextScene() {
     const scene = this.scene();
     if (scene && scene.nextSceneID !== 0){
-      const nextScene = this.state.scenes.find((s) => s.id === this.scene().nextSceneID);
+      const nextScene = this.state.scenes.find((s: Scene) => s.id === this.scene().nextSceneID);
       if (nextScene != null) {
         if (nextScene.tagWeights || nextScene.sceneWeights) {
           this.setState({route: [new Route({kind: 'generate', value: scene.id}),
@@ -471,7 +326,7 @@ export default class Meta extends React.Component {
 
   onPlaySceneFromLibrary(source: LibrarySource, yOffset: number, filters: Array<string>) {
     let id = this.state.scenes.length + 1;
-    this.state.scenes.forEach((s) => {
+    this.state.scenes.forEach((s: Scene) => {
       id = Math.max(s.id + 1, id);
     });
     let tempScene = new Scene({
@@ -492,11 +347,11 @@ export default class Meta extends React.Component {
   endPlaySceneFromLibrary() {
     const newScenes = this.state.scenes;
     const libraryID = newScenes.pop().libraryID;
-    const tagNames = this.state.tags.map((t) => t.name);
+    const tagNames = this.state.tags.map((t: Tag) => t.name);
     // Re-order the tags of the source we were playing
-    const newLibrary = this.state.library.map((s) => {
+    const newLibrary = this.state.library.map((s: LibrarySource) => {
       if (s.id == libraryID) {
-         s.tags = s.tags.sort((a, b) => {
+         s.tags = s.tags.sort((a: Tag, b: Tag) => {
           const aIndex = tagNames.indexOf(a.name);
           const bIndex = tagNames.indexOf(b.name);
           if (aIndex < bIndex) {
@@ -520,7 +375,7 @@ export default class Meta extends React.Component {
 
   onAddGenerator() {
     let id = this.state.scenes.length + 1;
-    this.state.scenes.forEach((s) => {
+    this.state.scenes.forEach((s: Scene) => {
       id = Math.max(s.id + 1, id);
     });
     let scene = new Scene({
@@ -567,8 +422,8 @@ export default class Meta extends React.Component {
     const tagIDs = tags.map((t) => t.id);
     for (let source of newLibrary) {
       // Remove deleted tags, update any edited tags, and order the same as tags
-      source.tags = source.tags.filter((t) => tagIDs.includes(t.id));
-      source.tags = source.tags.map((t) => {
+      source.tags = source.tags.filter((t: Tag) => tagIDs.includes(t.id));
+      source.tags = source.tags.map((t: Tag) => {
         for (let tag of tags) {
           if (t.id == tag.id) {
             t.name = tag.name;
@@ -576,7 +431,7 @@ export default class Meta extends React.Component {
           }
         }
       });
-      source.tags = source.tags.sort((a, b) => {
+      source.tags = source.tags.sort((a: Tag, b: Tag) => {
         const aIndex = tagIDs.indexOf(a.id);
         const bIndex = tagIDs.indexOf(b.id);
         if (aIndex < bIndex) {
@@ -595,8 +450,8 @@ export default class Meta extends React.Component {
     let newLibrary = this.state.library;
     for (let source of newLibrary) {
       if (source.id == sourceID) {
-        if (source.tags.map((t) => t.name).includes(tag.name)) {
-          source.tags = source.tags.filter((t) => t.name != tag.name);
+        if (source.tags.map((t: Tag) => t.name).includes(tag.name)) {
+          source.tags = source.tags.filter((t: Tag) => t.name != tag.name);
         } else {
           source.tags.push(tag);
         }
@@ -625,7 +480,7 @@ export default class Meta extends React.Component {
     if (!filePath || !filePath.length) return;
     const scene = new Scene(JSON.parse(readFileSync(filePath[0], 'utf-8')));
     let id = this.state.scenes.length + 1;
-    this.state.scenes.forEach((s) => {
+    this.state.scenes.forEach((s: Scene) => {
       id = Math.max(s.id + 1, id);
     });
     scene.id = id;

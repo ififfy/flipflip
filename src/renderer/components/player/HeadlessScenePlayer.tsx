@@ -9,7 +9,7 @@ import tumblr from "tumblr.js";
 import imgur from "imgur";
 import { IgApiClient } from "instagram-private-api";
 
-import {IF, ST} from '../../const';
+import {IF, ST} from '../../data/const';
 import {
   CancelablePromise,
   convertURL,
@@ -17,9 +17,9 @@ import {
   getFileGroup,
   getFileName,
   getSourceType,
-} from "../../utils";
-import Config from "../../Config";
-import Scene from '../../Scene';
+} from "../../data/utils";
+import Config from "../../data/Config";
+import Scene from '../../data/Scene';
 import ChildCallbackHack from './ChildCallbackHack';
 import ImagePlayer from './ImagePlayer';
 

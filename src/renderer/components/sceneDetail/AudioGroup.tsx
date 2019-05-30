@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import Scene from "../../Scene";
+import Scene from "../../data/Scene";
 import ControlGroup from "./ControlGroup";
 import SimpleURLInput from "../ui/SimpleURLInput";
 

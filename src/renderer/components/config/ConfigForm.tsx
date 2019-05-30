@@ -6,8 +6,8 @@ import {OAuth} from 'oauth';
 import {remote} from "electron";
 import http from "http";
 
-import Config, {CacheSettings, DisplaySettings, RemoteSettings, SceneSettings} from "../../Config";
-import Scene from "../../Scene";
+import Config, {CacheSettings, DisplaySettings, RemoteSettings, SceneSettings} from "../../data/Config";
+import Scene from "../../data/Scene";
 import APIGroup from "./APIGroup";
 import CacheGroup from "./CacheGroup";
 import EffectGroup from "../sceneDetail/EffectGroup";
@@ -17,7 +17,7 @@ import TimingGroup from "../sceneDetail/TimingGroup";
 import Modal from "../ui/Modal";
 import BackupGroup from "./BackupGroup";
 import DisplayGroup from "./DisplayGroup";
-import {getRandomIndex} from "../../utils";
+import {getRandomIndex} from "../../data/utils";
 
 export default class ConfigForm extends React.Component {
   readonly props: {

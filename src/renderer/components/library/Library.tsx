@@ -3,10 +3,10 @@ import tumblr from 'tumblr.js';
 import wretch from 'wretch';
 import Snoowrap from "snoowrap";
 
-import {ST} from "../../const";
+import {ST} from "../../data/const";
 import LibrarySource from "./LibrarySource";
 import Tag from "./Tag";
-import Config from "../../Config";
+import Config from "../../data/Config";
 import SourcePicker from "../sceneDetail/SourcePicker";
 import Progress from "../ui/Progress";
 

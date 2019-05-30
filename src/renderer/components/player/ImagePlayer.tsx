@@ -8,11 +8,11 @@ import gifInfo from 'gif-info';
 import getFolderSize from "get-folder-size";
 import IdleTimer from 'react-idle-timer';
 
-import {BT, HTF, IF, ST, TF, VTF, ZF} from '../../const';
-import {getCachePath, getFileName, getRandomListItem, getSourceType, urlToPath} from '../../utils';
-import Config from "../../Config";
-import Scene from "../../Scene";
-import TIMING_FUNCTIONS from '../../TIMING_FUNCTIONS';
+import {BT, HTF, IF, ST, TF, VTF, ZF} from '../../data/const';
+import {getCachePath, getFileName, getRandomListItem, getSourceType, urlToPath} from '../../data/utils';
+import Config from "../../data/Config";
+import Scene from "../../data/Scene";
+import TIMING_FUNCTIONS from '../../data/TIMING_FUNCTIONS';
 import ChildCallbackHack from './ChildCallbackHack';
 import ImageView from './ImageView';
 
