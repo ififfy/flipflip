@@ -27,7 +27,12 @@ export default class Meta extends React.Component {
     // Actions are functions that take (state, args+) and return {objectDiff}.
     // So we simply call the function and setState(return value).
     // This is basically the Redux pattern with fewer steps.
-    this.setState(fn(this.state, ...args));
+    const result = fn(this.state, ...args)
+    // run `window.logStateChanges = true` to see these
+    if ((window as any).logStateChanges) {
+      console.log(result);
+    }
+    this.setState(result);
   }
 
   componentDidMount() {
@@ -54,7 +59,7 @@ export default class Meta extends React.Component {
             onImport={a(actions.importScene)}
             onSelect={a(actions.goToScene)}
             onOpenLibrary={a(actions.openLibrary)}
-            onGenerate={a(actions.generateScene)}
+            onGenerate={a(actions.addGenerator)}
             onConfig={a(actions.openConfig)}
             canGenerate={(this.state.library.length >= 1 && this.state.tags.length >= 1) || (this.state.scenes.length >= 1)}
           />
@@ -94,7 +99,7 @@ export default class Meta extends React.Component {
             scene={scene}
             goBack={a(actions.goBack)}
             onGenerate={a(actions.generateScene)}
-            onUpdateScene={a(actions.generateScene)}
+            onUpdateScene={a(actions.updateScene)}
             onDelete={a(actions.deleteScene)}
           />
         )}
