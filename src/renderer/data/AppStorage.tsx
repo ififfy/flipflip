@@ -15,7 +15,7 @@ import Tag from "../components/library/Tag";
  */
 export declare var __VERSION__: string;
 
-const defaultInitialState = {
+export const defaultInitialState = {
   version: __VERSION__,
   config: new Config(),
   scenes: Array<Scene>(),
