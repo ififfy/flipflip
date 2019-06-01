@@ -17,6 +17,9 @@ import {
   getFileGroup,
   getFileName,
   getSourceType,
+  isImage,
+  isVideo,
+  isImageOrVideo,
 } from "../../data/utils";
 import Config from "../../data/Config";
 import Scene from '../../data/Scene';
@@ -33,28 +36,15 @@ const isEmpty = function (allURLs: any[]): boolean {
   return Array.isArray(allURLs) && allURLs.every(isEmpty);
 };
 
-function isImage(path: string): boolean {
-  const p = path.toLowerCase();
-  if (p.endsWith('.gif')) return true;
-  if (p.endsWith('.png')) return true;
-  if (p.endsWith('.jpeg')) return true;
-  if (p.endsWith('.jpg')) return true;
-  if (p.endsWith('.webp')) return true;
-  if (p.endsWith('.tiff')) return true;
-  if (p.endsWith('.svg')) return true;
-  return false;
-}
-
-function filterPathsToJustImages(imageTypeFilter: string, paths: Array<string>): Array<string> {
+function filterPathsToJustPlayable(imageTypeFilter: string, paths: Array<string>): Array<string> {
   switch (imageTypeFilter) {
+    default:
     case IF.any:
+      return paths.filter((p) => isImageOrVideo(p));
     case IF.stills:
       return paths.filter((p) => isImage(p));
     case IF.gifs:
-      return paths.filter((f) => f.toLowerCase().endsWith('.gif'));
-    default:
-      console.warn('unknown image type filter', imageTypeFilter);
-      return paths.filter((p) => isImage(p));
+      return paths.filter((f) => f.toLowerCase().endsWith('.gif') || isVideo(f));
   }
 }
 
@@ -116,20 +106,23 @@ function getPromise(config: Config, url: string, filter: string, next: any): Can
 function loadLocalDirectory(config: Config, url: string, filter: string, next: any): CancelablePromise {
   const blacklist = ['*.css', '*.html', 'avatar.png'];
 
-  return new CancelablePromise((resolve, reject) => {
+  return new CancelablePromise((resolve) => {
     recursiveReaddir(url, blacklist, (err: any, rawFiles: Array<string>) => {
       if (err) {
         console.warn(err);
         resolve(null);
       } else {
-        resolve({data: filterPathsToJustImages(filter, rawFiles).map((p) => fileURL(p)), next: next});
+        resolve({
+          data: filterPathsToJustPlayable(filter, rawFiles).map((p) => fileURL(p)),
+          next: next
+        });
       }
     });
   });
 }
 
 function loadRemoteImageURLList(config: Config, url: string, filter: string, next: any): CancelablePromise {
-  return new CancelablePromise((resolve, reject) => {
+  return new CancelablePromise((resolve) => {
     wretch(url)
       .get()
       .text(data => {
@@ -143,14 +136,14 @@ function loadRemoteImageURLList(config: Config, url: string, filter: string, nex
               convertedCount++;
               if (convertedCount == lines.length) {
                 resolve({
-                  data: convertedSource.filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
+                  data: filterPathsToJustPlayable(filter, convertedSource),
                   next: null
                 });
               }
             });
           }
         } else {
-          console.warn("No lines in", url, "start with 'http://'")
+          console.warn("No lines in", url, "start with 'http://'");
           resolve(null)
         }
       })
@@ -165,7 +158,7 @@ function loadRemoteImageURLList(config: Config, url: string, filter: string, nex
 function loadTumblr(config: Config, url: string, filter: string, next: any): CancelablePromise {
   let configured = config.remoteSettings.tumblrOAuthToken != "" && config.remoteSettings.tumblrOAuthTokenSecret != "";
   if (configured) {
-    return new CancelablePromise((resolve, reject) => {
+    return new CancelablePromise((resolve) => {
       const client = tumblr.createClient({
         consumer_key: config.remoteSettings.tumblrKey,
         consumer_secret: config.remoteSettings.tumblrSecret,
@@ -217,6 +210,9 @@ function loadTumblr(config: Config, url: string, filter: string, next: any): Can
               images.push(imageSource[1]);
             }
           }
+          if (post.video_url) {
+            images.push(post.video_url);
+          }
         }
 
         if (images.length > 0) {
@@ -228,7 +224,7 @@ function loadTumblr(config: Config, url: string, filter: string, next: any): Can
               convertedCount++;
               if (convertedCount == images.length) {
                 resolve({
-                  data: convertedSource.filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
+                  data: filterPathsToJustPlayable(filter, convertedSource),
                   next: (next as number) + 1
                 });
               }
@@ -244,7 +240,7 @@ function loadTumblr(config: Config, url: string, filter: string, next: any): Can
       alert("You haven't authorized FlipFlip to work with Reddit yet.\nVisit Config and click 'Authorzie FlipFlip on Reddit'.");
       tumblrAlerted = true;
     }
-    return new CancelablePromise((resolve, reject) => {
+    return new CancelablePromise((resolve) => {
       resolve(null);
     });
   }
@@ -253,7 +249,7 @@ function loadTumblr(config: Config, url: string, filter: string, next: any): Can
 function loadReddit(config: Config, url: string, filter: string, next: any): CancelablePromise {
   let configured = config.remoteSettings.redditRefreshToken != "";
   if (configured) {
-      return new CancelablePromise((resolve, reject) => {
+      return new CancelablePromise((resolve) => {
         const reddit = new Snoowrap({
           userAgent: config.remoteSettings.redditUserAgent,
           clientId: config.remoteSettings.redditClientID,
@@ -272,7 +268,7 @@ function loadReddit(config: Config, url: string, filter: string, next: any): Can
                     convertedCount++;
                     if (convertedCount == submissionListing.length) {
                       resolve({
-                        data: convertedListing.filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
+                        data: filterPathsToJustPlayable(filter, convertedListing),
                         next: submissionListing[submissionListing.length - 1].name
                       });
                     }
@@ -297,7 +293,7 @@ function loadReddit(config: Config, url: string, filter: string, next: any): Can
                   convertedCount++;
                   if (convertedCount == submissionListing.length) {
                     resolve({
-                      data: convertedListing.filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
+                      data: filterPathsToJustPlayable(filter, convertedListing),
                       next: submissionListing[submissionListing.length - 1].name
                     });
                   }
@@ -320,7 +316,7 @@ function loadReddit(config: Config, url: string, filter: string, next: any): Can
       alert("You haven't authorized FlipFlip to work with Reddit yet.\nVisit Config and click 'Authorzie FlipFlip on Reddit'.");
       redditAlerted = true;
     }
-    return new CancelablePromise((resolve, reject) => {
+    return new CancelablePromise((resolve) => {
       resolve(null);
     });
   }
@@ -330,7 +326,7 @@ function loadImageFap(config: Config, url: string, filter: string, next: any): C
   if (next == 0) {
     next = [0, 0];
   }
-  return new CancelablePromise((resolve, reject) => {
+  return new CancelablePromise((resolve) => {
     if (url.includes("/pictures/")) {
       wretch("http://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2")
         .get()
@@ -352,7 +348,7 @@ function loadImageFap(config: Config, url: string, filter: string, next: any): C
                   }
                   if (imageCount == imageEls.length) {
                     resolve({
-                      data: images.filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
+                      data: filterPathsToJustPlayable(filter, images),
                       next: null
                     });
                   }
@@ -393,7 +389,7 @@ function loadImageFap(config: Config, url: string, filter: string, next: any): C
                         if (imageCount == imageEls.length) {
                           next[1] += 1;
                           resolve({
-                            data: images.filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
+                            data: filterPathsToJustPlayable(filter, images),
                             next: next
                           })
                         }
@@ -421,7 +417,7 @@ function loadImageFap(config: Config, url: string, filter: string, next: any): C
 }
 
 function loadSexCom(config: Config, url: string, filter: string, next: any): CancelablePromise {
-  return new CancelablePromise((resolve, reject) => {
+  return new CancelablePromise((resolve) => {
     let requestURL;
     if (url.includes("/user/")) {
       requestURL = "http://www.sex.com/user/" + getFileGroup(url) + "?page=" + (next + 1);
@@ -441,7 +437,7 @@ function loadSexCom(config: Config, url: string, filter: string, next: any): Can
             images.push(image.getAttribute("data-src"));
           }
           resolve({
-            data: images.filter((s) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
+            data: filterPathsToJustPlayable(filter, images),
             next: next + 1
           })
         } else {
@@ -452,11 +448,11 @@ function loadSexCom(config: Config, url: string, filter: string, next: any): Can
 }
 
 function loadImgur(config: Config, url: string, filter: string, next: any): CancelablePromise {
-  return new CancelablePromise((resolve, reject) => {
+  return new CancelablePromise((resolve) => {
     imgur.getAlbumInfo(getFileGroup(url))
       .then((json: any) => {
         resolve({
-          data: json.data.images.map((i: any) => i.link).filter((s: string) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
+          data: filterPathsToJustPlayable(filter, json.data.images.map((i: any) => i.link)),
           next: null
         })
       })
@@ -468,7 +464,7 @@ function loadImgur(config: Config, url: string, filter: string, next: any): Canc
 }
 
 function loadTwitter(config: Config, url: string, filter: string, next: any): CancelablePromise {
-  return new CancelablePromise((resolve, reject) => {
+  return new CancelablePromise((resolve) => {
       wretch("https://twitter.com/i/profiles/show/" + getFileGroup(url) + "/media_timeline" + (next != 0 ? next : ""))
         .get()
         .setTimeout(5000)
@@ -488,7 +484,7 @@ function loadTwitter(config: Config, url: string, filter: string, next: any): Ca
           }
           const lastTweetID = tweets[tweets.length-1].getAttribute("data-tweet-id");
           resolve({
-            data: images.filter((s) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
+            data: filterPathsToJustPlayable(filter, images),
             next: "?last_note_ts=" + lastTweetID + "&max_position=" + (parseInt(lastTweetID, 10) - 1)
           });
         });
@@ -496,7 +492,7 @@ function loadTwitter(config: Config, url: string, filter: string, next: any): Ca
 }
 
 function loadDeviantArt(config: Config, url: string, filter: string, next: any): CancelablePromise {
-  return new CancelablePromise((resolve, reject) => {
+  return new CancelablePromise((resolve) => {
     wretch("http://backend.deviantart.com/rss.xml?type=deviation&q=by%3A" + getFileGroup(url) + "+sort%3Atime+meta%3Aall" + (next != 0 ? "&offset=" + next : ""))
       .get()
       .setTimeout(5000)
@@ -517,17 +513,10 @@ function loadDeviantArt(config: Config, url: string, filter: string, next: any):
             }
           }
         }
-        if (hasNextPage) {
-          resolve({
-            data: images.filter((s) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
-            next: next
-          });
-        } else {
-          resolve({
-            data: images.filter((s) => isImage(s) && (filter != IF.gifs || (filter == IF.gifs && s.endsWith('.gif')))),
-            next: null
-          });
-        }
+        resolve({
+          data: filterPathsToJustPlayable(filter, images),
+          next: hasNextPage ? next : null
+        });
       });
   });
 }
@@ -540,7 +529,7 @@ function loadInstagram(config: Config, url: string, filter: string, next: any): 
     if (ig == null) {
       ig = new IgApiClient();
       ig.state.generateDevice(config.remoteSettings.instagramUsername);
-      return new CancelablePromise((resolve, reject) => {
+      return new CancelablePromise((resolve) => {
         ig.account.login(config.remoteSettings.instagramUsername, config.remoteSettings.instagramPassword).then((loggedInUser) => {
           ig.state.serializeCookieJar().then((cookies) => {
             session = JSON.stringify(cookies);
@@ -559,7 +548,7 @@ function loadInstagram(config: Config, url: string, filter: string, next: any): 
                   }
                 }
                 resolve({
-                  data: images.filter((s) => (filter != IF.gifs || (filter == IF.gifs && s.includes('.gif')))),
+                  data: filterPathsToJustPlayable(filter, images),
                   next: id + "~" + userFeed.serialize()
                 });
               }).catch((e) => {console.error(e);resolve(null)});
@@ -568,7 +557,7 @@ function loadInstagram(config: Config, url: string, filter: string, next: any): 
         }).catch((e) => {alert(e);console.error(e);ig = null;resolve(null)});
       });
     } else if (next == 0) {
-      return new CancelablePromise((resolve, reject) => {
+      return new CancelablePromise((resolve) => {
         ig.user.getIdByUsername(getFileGroup(url)).then((id) => {
           const userFeed = ig.feed.user(id);
           userFeed.items().then((items) => {
@@ -584,14 +573,14 @@ function loadInstagram(config: Config, url: string, filter: string, next: any): 
               }
             }
             resolve({
-              data: images.filter((s) => (filter != IF.gifs || (filter == IF.gifs && s.includes('.gif')))),
+              data: filterPathsToJustPlayable(filter, images),
               next: id + "~" + userFeed.serialize()
             });
           }).catch((e) => {console.error(e);resolve(null)});
         }).catch((e) => {console.error(e);resolve(null)});
       });
     } else {
-      return new CancelablePromise((resolve, reject) => {
+      return new CancelablePromise((resolve) => {
         ig.state.deserializeCookieJar(JSON.parse(session)).then((data) => {
           const id = (next as string).split("~")[0];
           const feedSession = (next as string).split("~")[1];
@@ -615,7 +604,7 @@ function loadInstagram(config: Config, url: string, filter: string, next: any): 
               }
             }
             resolve({
-              data: images.filter((s) => (filter != IF.gifs || (filter == IF.gifs && s.includes('.gif')))),
+              data: filterPathsToJustPlayable(filter, images),
               next: id + "~" + userFeed.serialize()
             });
           }).catch((e) => {console.error(e);resolve(null)});
@@ -627,7 +616,7 @@ function loadInstagram(config: Config, url: string, filter: string, next: any): 
       alert("You haven't authorized FlipFlip to work with Instagram yet.\nVisit Config and populate your username and password.\nNote this information is only kept on your computer and never shared with anyone else.");
       instagramAlerted = true;
     }
-    return new CancelablePromise((resolve, reject) => {
+    return new CancelablePromise((resolve) => {
       resolve(null);
     });
   }
@@ -646,7 +635,7 @@ export default class HeadlessScenePlayer extends React.Component {
     advanceHack?: ChildCallbackHack,
     deleteHack?: ChildCallbackHack,
     setHistoryOffset: (historyOffset: number) => void,
-    setHistoryPaths: (historyPaths: Array<HTMLImageElement>) => void,
+    setHistoryPaths: (historyPaths: Array<any>) => void,
     firstImageLoaded: () => void,
     finishedLoading: (empty: boolean) => void,
     setProgress: (tota: number, current: number, message: string) => void,

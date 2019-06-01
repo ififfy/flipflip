@@ -71,7 +71,7 @@ export default class Player extends React.Component {
     progressMessage: this.props.scene.sources.length > 0 ? this.props.scene.sources[0].url : "",
     startTime: (null as Date),
     historyOffset: 0,
-    historyPaths: Array<HTMLImageElement>(),
+    historyPaths: Array<any>(),
     imagePlayerAdvanceHack: new ChildCallbackHack(),
     imagePlayerDeleteHack: new ChildCallbackHack(),
   };
@@ -494,7 +494,7 @@ export default class Player extends React.Component {
     this.props.goBack();
   }
 
-  setHistoryPaths(paths: Array<HTMLImageElement>) {
+  setHistoryPaths(paths: Array<any>) {
     this.setState({historyPaths: paths});
   }
 

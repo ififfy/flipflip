@@ -160,20 +160,11 @@ a {
   bottom: 0;
   left: 0;
   overflow: hidden;
-}
-
-.u-fill-image-blur {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
-  filter: blur(8px);
-  -webkit-filter: blur(8px);
-  transform: scale(2, 2);
+  &.m-blur {
+    filter: blur(8px);
+    -webkit-filter: blur(8px);
+    transform: scale(1.5, 1.5);
+  }
 }
 
 .u-abs-center {
@@ -1009,11 +1000,13 @@ label.SimpleCheckbox {
   bottom: 0;
   left: 0;
 
-  .ImageView img {
-    -webkit-animation-fill-mode: forwards;
-    animation-fill-mode: forwards;
-    -webkit-animation-timing-function: ease-out;
-    animation-timing-function: ease-out;
+  .ImageView {
+    img, video {
+      -webkit-animation-fill-mode: forwards;
+      animation-fill-mode: forwards;
+      -webkit-animation-timing-function: ease-out;
+      animation-timing-function: ease-out;
+    }
   }
 }
 
@@ -1212,23 +1205,29 @@ label.SimpleCheckbox {
 @each $x in -10 0 10 {
   @each $y in -10 0 10 {
     @for $z from 1 through 20 {
-      .translate-#{$x}-#{$y}-#{$z}s img {
-        -webkit-animation: kb-#{$x}-#{$y} #{$z}s;
-        animation: kb-#{$x}-#{$y} #{$z}s;
+      .translate-#{$x}-#{$y}-#{$z}s {
+        img, video {
+          -webkit-animation: kb-#{$x}-#{$y} #{$z}s;
+          animation: kb-#{$x}-#{$y} #{$z}s;
+        }
       }
 
-      .translate-#{$x}-#{$y}-zoom-#{$z}s img {
-        -webkit-animation: kb-#{$x}-#{$y}-zoom #{$z}s;
-        animation: kb-#{$x}-#{$y} #{$z}-zoom #{$z}s;
-        -webkit-transform: scale(1, 1);
-        transform: scale(1, 1);
+      .translate-#{$x}-#{$y}-zoom-#{$z}s {
+        img, video {
+          -webkit-animation: kb-#{$x}-#{$y}-zoom #{$z}s;
+          animation: kb-#{$x}-#{$y} #{$z}-zoom #{$z}s;
+          -webkit-transform: scale(1, 1);
+          transform: scale(1, 1);
+        }
       }
 
-      .translate-#{$x}-#{$y}-zoom-out-#{$z}s img {
-        -webkit-animation: kb-#{$x}-#{$y}-zoom-out #{$z}s;
-        animation: kb-#{$x}-#{$y} #{$z}-zoom-out #{$z}s;
-        -webkit-transform: scale(1.5, 1.5);
-        transform: scale(1.5, 1.5);
+      .translate-#{$x}-#{$y}-zoom-out-#{$z}s {
+        img, video {
+          -webkit-animation: kb-#{$x}-#{$y}-zoom-out #{$z}s;
+          animation: kb-#{$x}-#{$y} #{$z}-zoom-out #{$z}s;
+          -webkit-transform: scale(1.5, 1.5);
+          transform: scale(1.5, 1.5);
+        }
       }
     }
   }

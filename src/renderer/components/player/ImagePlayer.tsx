@@ -8,8 +8,8 @@ import gifInfo from 'gif-info';
 import getFolderSize from "get-folder-size";
 import IdleTimer from 'react-idle-timer';
 
-import {BT, HTF, IF, ST, TF, VTF, ZF} from '../../data/const';
-import {getCachePath, getFileName, getRandomListItem, getSourceType, urlToPath} from '../../data/utils';
+import {IF, ST, TF} from '../../data/const';
+import {getCachePath, getFileName, getRandomListItem, getSourceType, isVideo, urlToPath} from '../../data/utils';
 import Config from "../../data/Config";
 import Scene from "../../data/Scene";
 import TIMING_FUNCTIONS from '../../data/TIMING_FUNCTIONS';
@@ -35,7 +35,7 @@ export default class ImagePlayer extends React.Component {
     strobeTime: number,
     isPlaying: boolean,
     historyOffset: number,
-    setHistoryPaths: (historyPaths: Array<HTMLImageElement>) => void,
+    setHistoryPaths: (historyPaths: Array<any>) => void,
     setHistoryOffset: (historyOffset: number) => void,
     onLoaded: () => void,
     hasStarted: boolean,
@@ -43,8 +43,8 @@ export default class ImagePlayer extends React.Component {
 
   readonly state = {
     numBeingLoaded: 0,
-    readyToDisplay: Array<HTMLImageElement>(),
-    historyPaths: Array<HTMLImageElement>(),
+    readyToDisplay: Array<any>(),
+    historyPaths: Array<any>(),
     timeToNextFrame: 0,
     timeoutID: 0,
     nextImageID: 0,
@@ -56,7 +56,7 @@ export default class ImagePlayer extends React.Component {
   render() {
     if (this.state.historyPaths.length < 1 || !this.props.hasStarted) return <div className="ImagePlayer m-empty"/>;
 
-    const imgs = Array<HTMLImageElement>();
+    const imgs = Array<any>();
 
     // if user is browsing history, use that image instead
     if (this.state.historyPaths.length > 0 && !this.props.isPlaying) {
@@ -77,43 +77,8 @@ export default class ImagePlayer extends React.Component {
       }
     }
 
-    let className = "ImagePlayer translate-";
-
-    switch (this.props.scene.horizTransType) {
-      case HTF.none:
-        className += '0-';
-        break;
-      case HTF.right:
-        className += '10-';
-        break;
-      case HTF.left:
-        className += '-10-';
-        break;
-    }
-    switch (this.props.scene.vertTransType) {
-      case VTF.none:
-        className += '0-';
-        break;
-      case VTF.down:
-        className += '10-';
-        break;
-      case VTF.up:
-        className += '-10-';
-        break;
-    }
-    switch (this.props.scene.zoomType) {
-      case ZF.none:
-        className += `${this.props.scene.effectLevel}s`;
-        break;
-      case ZF.in:
-        className += `zoom-${this.props.scene.effectLevel}s`;
-        break;
-      case ZF.out:
-        className += `zoom-out-${this.props.scene.effectLevel}s`;
-    }
-
     return (
-      <div className={className}
+      <div className="ImagePlayer"
            style={{background: this.props.strobe ? this.props.scene.strobeColor : "none", cursor: this.state.hideCursor ? "none" : "initial"}}>
         <IdleTimer
           ref={null}
@@ -121,17 +86,19 @@ export default class ImagePlayer extends React.Component {
           onIdle={this.onIdle.bind(this)}
           timeout={2000} />
         <div style={{ animation: this.props.strobe ? "strobe " + this.props.strobeTime + "ms steps(1, end) infinite" : "none" }}>
-          <div className={`u-fill-container ${this.props.scene.backgroundType == BT.color ? '' : 'u-fill-image-blur'}`} style={{
-            background: this.props.scene.backgroundType == BT.color ? this.props.scene.backgroundColor : null,
-            backgroundImage: this.props.scene.backgroundType == BT.color ? null : `url("${imgs[0].src}")`,
-          }}
-          />
           {imgs.map((img) => {
             return <ImageView
               img={img}
               key={(img as any).key}
               fadeState={this.props.scene.crossFade ? (img.src === imgs[0].src ? 'in' : 'out') : 'none'}
-              fadeDuration={this.state.timeToNextFrame / 2}/>;
+              fadeDuration={this.state.timeToNextFrame / 2}
+              backgroundType={this.props.scene.backgroundType}
+              backgroundColor={this.props.scene.backgroundColor}
+              horizTransType={this.props.scene.horizTransType}
+              vertTransType={this.props.scene.vertTransType}
+              zoomType={this.props.scene.zoomType}
+              effectLevel={this.props.scene.effectLevel}
+            />;
           })}
         </div>
       </div>
@@ -248,153 +215,201 @@ export default class ImagePlayer extends React.Component {
       return;
     }
     const url = getRandomListItem(collection);
-    const img = new Image();
-    img.setAttribute("source", source);
+    if (isVideo(url)) {
+      const video = document.createElement('video');
+      video.setAttribute("source", source);
 
-    this.setState({numBeingLoaded: this.state.numBeingLoaded + 1});
+      this.setState({numBeingLoaded: this.state.numBeingLoaded + 1});
 
-    const successCallback = () => {
-      if (!this._isMounted) return;
-      if (this.props.onLoaded && this.state.historyPaths.length == 0) {
-        this.props.onLoaded();
-      }
-      (img as any).key = this.state.nextImageID;
-      this.setState({
-        readyToDisplay: this.state.readyToDisplay.concat([img]),
-        numBeingLoaded: Math.max(0, this.state.numBeingLoaded - 1),
-        nextImageID: this.state.nextImageID + 1,
-      });
-      if (this.state.historyPaths.length === 0) {
-        this.advance(false, false);
-      }
-      this.runFetchLoop(i);
-    };
+      const successCallback = () => {
+        if (!this._isMounted) return;
+        if (this.props.onLoaded && this.state.historyPaths.length == 0) {
+          this.props.onLoaded();
+        }
+        (video as any).key = this.state.nextImageID;
+        this.setState({
+          readyToDisplay: this.state.readyToDisplay.concat([video]),
+          numBeingLoaded: Math.max(0, this.state.numBeingLoaded - 1),
+          nextImageID: this.state.nextImageID + 1,
+        });
+        if (this.state.historyPaths.length === 0) {
+          this.advance(false, false);
+        }
+        this.runFetchLoop(i);
+      };
 
-    const errorCallback = () => {
-      if (!this._isMounted) return;
-      this.setState({
-        numBeingLoaded: Math.max(0, this.state.numBeingLoaded - 1),
-      });
-      setTimeout(this.runFetchLoop.bind(this, i), 0);
-    };
+      const errorCallback = () => {
+        if (!this._isMounted) return;
+        this.setState({
+          numBeingLoaded: Math.max(0, this.state.numBeingLoaded - 1),
+        });
+        setTimeout(this.runFetchLoop.bind(this, i), 0);
+      };
 
-    function toArrayBuffer(buf: Buffer) {
-      let ab = new ArrayBuffer(buf.length);
-      let view = new Uint8Array(ab);
-      for (let i = 0; i < buf.length; ++i) {
-        view[i] = buf[i];
-      }
-      return ab;
-    }
+      video.onloadeddata = () => {
+        setTimeout(successCallback, 0);
+      };
 
-    img.onload = () => {
-      // images may load immediately, but that messes up the setState()
-      // lifecycle, so always load on the next event loop iteration.
-      // Also, now  we know the image size, so we can finally filter it.
-      if (img.width < this.props.config.displaySettings.minImageSize
-        || img.height < this.props.config.displaySettings.minImageSize) {
+      video.onerror = () => {
         setTimeout(errorCallback, 0);
-      } else {
-        if (this.props.config.caching.enabled) {
-          const fileType = getSourceType(img.src);
-          if (fileType != ST.local) {
-            const cachePath = getCachePath(null, this.props.config);
-            if (!fs.existsSync(cachePath)) {
-              fs.mkdirSync(cachePath)
-            }
-            const maxSize = this.props.config.caching.maxSize;
-            const sourceCachePath = getCachePath(img.getAttribute("source"), this.props.config);
-            const filePath = sourceCachePath + getFileName(img.src);
-            const downloadImage = () => {
-              if (!fs.existsSync(filePath)) {
-                wretch(img.src)
-                  .get()
-                  .blob(blob => {
-                    const reader = new FileReader();
-                    reader.onload = function () {
-                      if (reader.readyState == 2) {
-                        const arrayBuffer = reader.result as ArrayBuffer;
-                        const buffer = Buffer.alloc(arrayBuffer.byteLength);
-                        const view = new Uint8Array(arrayBuffer);
-                        for (let i = 0; i < arrayBuffer.byteLength; ++i) {
-                          buffer[i] = view[i];
-                        }
-                        outputFile(filePath, buffer);
-                      }
-                    };
-                    reader.readAsArrayBuffer(blob);
-                  });
-              }
-            };
-            if (maxSize == 0) {
-              downloadImage();
-            } else {
-              getFolderSize(cachePath, (err: string, size: number) => {
-                if (err) {
-                  throw err;
-                }
+      };
 
-                const mbSize = (size / 1024 / 1024);
-                if (mbSize < maxSize) {
-                  downloadImage();
+      video.src = url;
+      video.preload = "auto";
+      video.autoplay = true;
+      video.muted = true;
+      video.volume = 0;
+      video.loop = true;
+      video.load();
+    } else {
+      const img = new Image();
+      img.setAttribute("source", source);
+
+      this.setState({numBeingLoaded: this.state.numBeingLoaded + 1});
+
+      const successCallback = () => {
+        if (!this._isMounted) return;
+        if (this.props.onLoaded && this.state.historyPaths.length == 0) {
+          this.props.onLoaded();
+        }
+        (img as any).key = this.state.nextImageID;
+        this.setState({
+          readyToDisplay: this.state.readyToDisplay.concat([img]),
+          numBeingLoaded: Math.max(0, this.state.numBeingLoaded - 1),
+          nextImageID: this.state.nextImageID + 1,
+        });
+        if (this.state.historyPaths.length === 0) {
+          this.advance(false, false);
+        }
+        this.runFetchLoop(i);
+      };
+
+      const errorCallback = () => {
+        if (!this._isMounted) return;
+        this.setState({
+          numBeingLoaded: Math.max(0, this.state.numBeingLoaded - 1),
+        });
+        setTimeout(this.runFetchLoop.bind(this, i), 0);
+      };
+
+      function toArrayBuffer(buf: Buffer) {
+        let ab = new ArrayBuffer(buf.length);
+        let view = new Uint8Array(ab);
+        for (let i = 0; i < buf.length; ++i) {
+          view[i] = buf[i];
+        }
+        return ab;
+      }
+
+      img.onload = () => {
+        // images may load immediately, but that messes up the setState()
+        // lifecycle, so always load on the next event loop iteration.
+        // Also, now  we know the image size, so we can finally filter it.
+        if (img.width < this.props.config.displaySettings.minImageSize
+          || img.height < this.props.config.displaySettings.minImageSize) {
+          setTimeout(errorCallback, 0);
+        } else {
+          if (this.props.config.caching.enabled) {
+            const fileType = getSourceType(img.src);
+            if (fileType != ST.local) {
+              const cachePath = getCachePath(null, this.props.config);
+              if (!fs.existsSync(cachePath)) {
+                fs.mkdirSync(cachePath)
+              }
+              const maxSize = this.props.config.caching.maxSize;
+              const sourceCachePath = getCachePath(img.getAttribute("source"), this.props.config);
+              const filePath = sourceCachePath + getFileName(img.src);
+              const downloadImage = () => {
+                if (!fs.existsSync(filePath)) {
+                  wretch(img.src)
+                    .get()
+                    .blob(blob => {
+                      const reader = new FileReader();
+                      reader.onload = function () {
+                        if (reader.readyState == 2) {
+                          const arrayBuffer = reader.result as ArrayBuffer;
+                          const buffer = Buffer.alloc(arrayBuffer.byteLength);
+                          const view = new Uint8Array(arrayBuffer);
+                          for (let i = 0; i < arrayBuffer.byteLength; ++i) {
+                            buffer[i] = view[i];
+                          }
+                          outputFile(filePath, buffer);
+                        }
+                      };
+                      reader.readAsArrayBuffer(blob);
+                    });
                 }
-              });
+              };
+              if (maxSize == 0) {
+                downloadImage();
+              } else {
+                getFolderSize(cachePath, (err: string, size: number) => {
+                  if (err) {
+                    throw err;
+                  }
+
+                  const mbSize = (size / 1024 / 1024);
+                  if (mbSize < maxSize) {
+                    downloadImage();
+                  }
+                });
+              }
             }
           }
+          setTimeout(successCallback, 0);
         }
-        setTimeout(successCallback, 0);
-      }
-    };
+      };
 
-    img.onerror = () => {
-      setTimeout(errorCallback, 0);
-    };
+      img.onerror = () => {
+        setTimeout(errorCallback, 0);
+      };
 
-    const processInfo = (info: GifInfo) => {
-      // If gif is animated and we want to play entire length, store its duration
-      if (this.props.scene.playFullGif && info && info.animated) {
-        img.setAttribute("duration", info.duration);
-      }
-
-      // Exclude non-animated gifs from gifs
-      if (this.props.scene.imageTypeFilter == IF.gifs && info && !info.animated) {
-        this.runFetchLoop(i);
-        return;
-        // Exclude animated gifs from stills
-      } else if (this.props.scene.imageTypeFilter == IF.stills && info && info.animated) {
-        this.runFetchLoop(i);
-        return;
-      }
-
-      img.src = url;
-    };
-
-    // Get gifinfo if we need for imageFilter or playFullGif
-    if ((this.props.scene.imageTypeFilter == IF.gifs || this.props.scene.imageTypeFilter == IF.stills || this.props.scene.playFullGif) && url.toLocaleLowerCase().endsWith('.gif')) {
-      // Get gif info. See https://github.com/Prinzhorn/gif-info
-      try {
-        if (url.includes("file:///")) {
-          processInfo(gifInfo(toArrayBuffer(fs.readFileSync(urlToPath(url)))));
-        } else {
-          request.get({url, encoding: null}, function (err: Error, res: IncomingMessage, body: Buffer) {
-            if (err) {
-              console.error(err);
-              return;
-            }
-            processInfo(gifInfo(toArrayBuffer(body)));
-          });
+      const processInfo = (info: GifInfo) => {
+        // If gif is animated and we want to play entire length, store its duration
+        if (this.props.scene.playFullGif && info && info.animated) {
+          img.setAttribute("duration", info.duration);
         }
-      } catch (e) {
-        console.error(e);
+
+        // Exclude non-animated gifs from gifs
+        if (this.props.scene.imageTypeFilter == IF.gifs && info && !info.animated) {
+          this.runFetchLoop(i);
+          return;
+          // Exclude animated gifs from stills
+        } else if (this.props.scene.imageTypeFilter == IF.stills && info && info.animated) {
+          this.runFetchLoop(i);
+          return;
+        }
+
+        img.src = url;
+      };
+
+      // Get gifinfo if we need for imageFilter or playFullGif
+      if ((this.props.scene.imageTypeFilter == IF.gifs || this.props.scene.imageTypeFilter == IF.stills || this.props.scene.playFullGif) && url.toLocaleLowerCase().endsWith('.gif')) {
+        // Get gif info. See https://github.com/Prinzhorn/gif-info
+        try {
+          if (url.includes("file:///")) {
+            processInfo(gifInfo(toArrayBuffer(fs.readFileSync(urlToPath(url)))));
+          } else {
+            request.get({url, encoding: null}, function (err: Error, res: IncomingMessage, body: Buffer) {
+              if (err) {
+                console.error(err);
+                return;
+              }
+              processInfo(gifInfo(toArrayBuffer(body)));
+            });
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        img.src = url;
       }
-    } else {
-      img.src = url;
     }
   }
 
   advance(isStarting = false, schedule = true, ignoreIsPlayingStatus = false) {
     let nextHistoryPaths = this.state.historyPaths;
-    let nextImg: HTMLImageElement;
+    let nextImg;
     if (this.state.readyToDisplay.length) {
       nextImg = this.state.readyToDisplay.shift();
       nextHistoryPaths = nextHistoryPaths.concat([nextImg]);

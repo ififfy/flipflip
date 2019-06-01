@@ -161,11 +161,11 @@ export async function convertURL(url: string): Promise<Array<string>> {
   }
 
   // If this is gfycat page, return gfycat image
-  let gfycatMatch = url.match("^https?://gfycat\.com/(?:ifr/)(\\w*)$");
+  let gfycatMatch = url.match("^https?://gfycat\.com/(?:ifr/)?(\\w*)$");
   if (gfycatMatch != null) {
     // Only lookup CamelCase url if not already CamelCase
     if (/[A-Z]/.test(gfycatMatch[1])) {
-      return ["https://giant.gfycat.com/" + gfycatMatch[1] + ".gif"];
+      return ["https://giant.gfycat.com/" + gfycatMatch[1] + ".mp4"];
     }
 
     let html = await wretch(url).get().text();
@@ -173,7 +173,7 @@ export async function convertURL(url: string): Promise<Array<string>> {
     if (gfycat.length > 0) {
       let gfycatID = (gfycat[0] as any).href;
       gfycatID = gfycatID.substring(gfycatID.lastIndexOf("/") + 1);
-      return ["https://giant.gfycat.com/" + gfycatID + ".gif"];
+      return ["https://giant.gfycat.com/" + gfycatID + ".mp4"];
     } else {
       gfycatMatch = null;
     }
@@ -229,6 +229,29 @@ export function getRandomListItem(list: any[], count: number = 1) {
     }
     return newList;
   }
+}
+
+export function isImageOrVideo(path: string): boolean {
+  return (isImage(path) || isVideo(path));
+}
+
+export function isVideo(path: string): boolean {
+  const p = path.toLowerCase();
+  if (p.endsWith('.mp4')) return true;
+  if (p.endsWith('.mkv')) return true;
+  return false;
+}
+
+export function isImage(path: string): boolean {
+  const p = path.toLowerCase();
+  if (p.endsWith('.gif')) return true;
+  if (p.endsWith('.png')) return true;
+  if (p.endsWith('.jpeg')) return true;
+  if (p.endsWith('.jpg')) return true;
+  if (p.endsWith('.webp')) return true;
+  if (p.endsWith('.tiff')) return true;
+  if (p.endsWith('.svg')) return true;
+  return false;
 }
 
 // Inspired by https://reactjs.org/blog/2015/12/16/ismounted-antipattern.html
