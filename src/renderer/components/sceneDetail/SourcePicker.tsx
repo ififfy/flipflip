@@ -43,9 +43,14 @@ export default class SourcePicker extends React.Component {
     const displaySources = this.getDisplaySources();
     const tags = new Map<string, number>();
     let untaggedCount = 0;
+    let offlineCount = 0;
     const options = Array<{ label: string, value: string }>();
     const defaultValues = Array<{ label: string, value: string }>();
     for (let source of displaySources) {
+      if (source.offline) {
+        offlineCount++;
+      }
+
       if (source.tags.length > 0) {
         for (let tag of source.tags) {
           if (tags.has(tag.name)) {
@@ -70,17 +75,23 @@ export default class SourcePicker extends React.Component {
       }
     });
     for (let filter of this.state.filters) {
-      if (filter == null) {
-        options.push({label: "<Untagged> (" + untaggedCount + ")", value: null});
-        defaultValues.push({label: "<Untagged> (" + untaggedCount + ")", value: null});
+      if (filter == "<Untagged>") {
+        options.push({label: "<Untagged> (" + untaggedCount + ")", value: "<Untagged>"});
+        defaultValues.push({label: "<Untagged> (" + untaggedCount + ")", value: "<Untagged>"});
+      } else if (filter == "<Offline>") {
+        options.push({label: "<Offline> (" + offlineCount + ")", value: "<Offline>"});
+        defaultValues.push({label: "<Offline> (" + offlineCount + ")", value: "<Offline>"});
       } else {
         options.push({label: filter + " (" + tags.get(filter) + ")", value: filter});
         defaultValues.push({label: filter + " (" + tags.get(filter) + ")", value: filter});
       }
     }
 
-    if (untaggedCount > 0 && !this.state.filters.includes(null)) {
-      options.push({label: "<Untagged> (" + untaggedCount + ")", value: null});
+    if (untaggedCount > 0 && !this.state.filters.includes("<Untagged>")) {
+      options.push({label: "<Untagged> (" + untaggedCount + ")", value: "<Untagged>"});
+    }
+    if (offlineCount > 0 && !this.state.filters.includes("<Offline>")) {
+      options.push({label: "<Offline> (" + offlineCount + ")", value: "<Offline>"});
     }
     for (let tag of tagKeys) {
       if (!this.state.filters.includes(tag)) {
@@ -503,18 +514,27 @@ export default class SourcePicker extends React.Component {
 
   getDisplaySources() {
     let displaySources = [];
-    const untagged = this.state.filters.length == 1 && this.state.filters[0] == null;
+    const untagged = this.state.filters.find((f) => f == "<Untagged>") != null;
+    const offline = this.state.filters.find((f) => f == "<Offline>") != null;
     const filtering = this.state.filters.length > 0;
     if (filtering) {
       for (let source of this.props.sources) {
         let matchesFilter = true;
         if (untagged) {
+          if (offline && !source.offline) {
+            matchesFilter = false;
+          }
           if (source.tags.length > 0) {
             matchesFilter = false;
           }
         } else {
           for (let filter of this.state.filters) {
-            if (!source.tags.map((s) => s.name).includes(filter)) {
+            if (filter == "<Offline>") {
+              if (!source.offline) {
+                matchesFilter = false;
+                break;
+              }
+            } else  if (!source.tags.map((s) => s.name).includes(filter)) {
               matchesFilter = false;
               break;
             }
