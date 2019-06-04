@@ -265,7 +265,7 @@ export default class ImagePlayer extends React.Component {
       return;
     }
     const url = getRandomListItem(collection);
-    if (isVideo(url)) {
+    if (isVideo(url, false)) {
       const video = document.createElement('video');
       video.setAttribute("source", source);
 

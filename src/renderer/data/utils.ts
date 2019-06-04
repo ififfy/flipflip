@@ -57,12 +57,16 @@ export function getFileGroup(url: string) {
       let imagefapID = url.replace(/https?:\/\/www.imagefap.com\//, "");
       imagefapID = imagefapID.replace(/pictures\//, "");
       imagefapID = imagefapID.replace(/organizer\//, "");
+      imagefapID = imagefapID.replace(/video\.php\?vid=/, "");
       imagefapID = imagefapID.split("/")[0];
       return imagefapID;
     case ST.sexcom:
       let sexcomID = url.replace(/https?:\/\/www.sex.com\//, "");
       sexcomID = sexcomID.replace(/user\//, "");
       sexcomID = sexcomID.split("?")[0];
+      if (sexcomID.endsWith("/")) {
+        sexcomID = sexcomID.substring(0, sexcomID.length - 1);
+      }
       return sexcomID;
     case ST.imgur:
       let imgurID = url.replace(/https?:\/\/imgur.com\//, "");
@@ -231,26 +235,35 @@ export function getRandomListItem(list: any[], count: number = 1) {
   }
 }
 
-export function isImageOrVideo(path: string): boolean {
-  return (isImage(path) || isVideo(path));
+export function isImageOrVideo(path: string, strict: boolean): boolean {
+  return (isImage(path, strict) || isVideo(path, strict));
 }
 
-export function isVideo(path: string): boolean {
+export function isVideo(path: string, strict: boolean): boolean {
+  if (path == null) return false;
   const p = path.toLowerCase();
-  if (p.endsWith('.mp4')) return true;
-  if (p.endsWith('.mkv')) return true;
+  const acceptableExtensions = [".mp4", ".mkv"];
+  for (let ext of acceptableExtensions) {
+    if (strict) {
+      if (p.endsWith(ext)) return true;
+    } else {
+      if (p.includes(ext)) return true;
+    }
+  }
   return false;
 }
 
-export function isImage(path: string): boolean {
+export function isImage(path: string, strict: boolean): boolean {
+  if (path == null) return false;
   const p = path.toLowerCase();
-  if (p.endsWith('.gif')) return true;
-  if (p.endsWith('.png')) return true;
-  if (p.endsWith('.jpeg')) return true;
-  if (p.endsWith('.jpg')) return true;
-  if (p.endsWith('.webp')) return true;
-  if (p.endsWith('.tiff')) return true;
-  if (p.endsWith('.svg')) return true;
+  const acceptableExtensions = [".gif", ".png", ".jpeg", ".jpg", ".webp", ".tiff", ".svg"];
+  for (let ext of acceptableExtensions) {
+    if (strict) {
+      if (p.endsWith(ext)) return true;
+    } else {
+      if (p.includes(ext)) return true;
+    }
+  }
   return false;
 }
 

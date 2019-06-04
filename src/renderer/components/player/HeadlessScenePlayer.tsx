@@ -7,7 +7,7 @@ import http from 'http';
 import Snoowrap from 'snoowrap';
 import tumblr from "tumblr.js";
 import imgur from "imgur";
-import { IgApiClient } from "instagram-private-api";
+import {IgApiClient} from "instagram-private-api";
 
 import {IF, ST} from '../../data/const';
 import {
@@ -36,15 +36,15 @@ const isEmpty = function (allURLs: any[]): boolean {
   return Array.isArray(allURLs) && allURLs.every(isEmpty);
 };
 
-function filterPathsToJustPlayable(imageTypeFilter: string, paths: Array<string>): Array<string> {
+function filterPathsToJustPlayable(imageTypeFilter: string, paths: Array<string>, strict: boolean): Array<string> {
   switch (imageTypeFilter) {
     default:
     case IF.any:
-      return paths.filter((p) => isImageOrVideo(p));
+      return paths.filter((p) => isImageOrVideo(p, strict));
     case IF.stills:
-      return paths.filter((p) => isImage(p));
+      return paths.filter((p) => isImage(p, strict));
     case IF.gifs:
-      return paths.filter((f) => f.toLowerCase().endsWith('.gif') || isVideo(f));
+      return paths.filter((f) => f.toLowerCase().endsWith('.gif') || isVideo(f, strict));
   }
 }
 
@@ -113,7 +113,7 @@ function loadLocalDirectory(config: Config, url: string, filter: string, next: a
         resolve(null);
       } else {
         resolve({
-          data: filterPathsToJustPlayable(filter, rawFiles).map((p) => fileURL(p)),
+          data: filterPathsToJustPlayable(filter, rawFiles, true).map((p) => fileURL(p)),
           next: next
         });
       }
@@ -136,7 +136,7 @@ function loadRemoteImageURLList(config: Config, url: string, filter: string, nex
               convertedCount++;
               if (convertedCount == lines.length) {
                 resolve({
-                  data: filterPathsToJustPlayable(filter, convertedSource),
+                  data: filterPathsToJustPlayable(filter, convertedSource, true),
                   next: null
                 });
               }
@@ -224,7 +224,7 @@ function loadTumblr(config: Config, url: string, filter: string, next: any): Can
               convertedCount++;
               if (convertedCount == images.length) {
                 resolve({
-                  data: filterPathsToJustPlayable(filter, convertedSource),
+                  data: filterPathsToJustPlayable(filter, convertedSource, true),
                   next: (next as number) + 1
                 });
               }
@@ -268,7 +268,7 @@ function loadReddit(config: Config, url: string, filter: string, next: any): Can
                     convertedCount++;
                     if (convertedCount == submissionListing.length) {
                       resolve({
-                        data: filterPathsToJustPlayable(filter, convertedListing),
+                        data: filterPathsToJustPlayable(filter, convertedListing, true),
                         next: submissionListing[submissionListing.length - 1].name
                       });
                     }
@@ -293,7 +293,7 @@ function loadReddit(config: Config, url: string, filter: string, next: any): Can
                   convertedCount++;
                   if (convertedCount == submissionListing.length) {
                     resolve({
-                      data: filterPathsToJustPlayable(filter, convertedListing),
+                      data: filterPathsToJustPlayable(filter, convertedListing, true),
                       next: submissionListing[submissionListing.length - 1].name
                     });
                   }
@@ -348,7 +348,7 @@ function loadImageFap(config: Config, url: string, filter: string, next: any): C
                   }
                   if (imageCount == imageEls.length) {
                     resolve({
-                      data: filterPathsToJustPlayable(filter, images),
+                      data: filterPathsToJustPlayable(filter, images, true),
                       next: null
                     });
                   }
@@ -389,7 +389,7 @@ function loadImageFap(config: Config, url: string, filter: string, next: any): C
                         if (imageCount == imageEls.length) {
                           next[1] += 1;
                           resolve({
-                            data: filterPathsToJustPlayable(filter, images),
+                            data: filterPathsToJustPlayable(filter, images, true),
                             next: next
                           })
                         }
@@ -412,6 +412,36 @@ function loadImageFap(config: Config, url: string, filter: string, next: any): C
             })
           }
         });
+    } else if (url.includes("/video.php?vid=")) {
+      wretch(url)
+        .get()
+        .setTimeout(5000)
+        .onAbort((e) => resolve(null))
+        .text((html) => {
+          let videoEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll(".video-js");
+          if (videoEls.length == 0) {
+            resolve(null);
+          } else {
+            let videoURLs = Array<string>();
+            for (let el of videoEls) {
+              let videoURL = "";
+              let videoDimension = 0;
+              for (let source of el.querySelectorAll("source")) {
+                if (parseInt(source.getAttribute("res"), 10) > videoDimension) {
+                  videoDimension = parseInt(source.getAttribute("res"), 10);
+                  videoURL = source.src;
+                }
+              }
+              if (videoURL != "") {
+                videoURLs.push(videoURL.split("?")[0]);
+              }
+            }
+            resolve({
+              data: videoURLs,
+              next: null
+            })
+          }
+        });
     }
   });
 }
@@ -421,7 +451,7 @@ function loadSexCom(config: Config, url: string, filter: string, next: any): Can
     let requestURL;
     if (url.includes("/user/")) {
       requestURL = "http://www.sex.com/user/" + getFileGroup(url) + "?page=" + (next + 1);
-    } else if (url.includes("/gifs/") || url.includes("/pics/")) {
+    } else if (url.includes("/gifs/") || url.includes("/pics/") || url.includes("/videos/")) {
       requestURL = "http://www.sex.com/" + getFileGroup(url) + "?page=" + (next + 1);
     }
     wretch(requestURL)
@@ -432,14 +462,63 @@ function loadSexCom(config: Config, url: string, filter: string, next: any): Can
       .text((html) => {
         let imageEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll(".small_pin_box > .image_wrapper > img");
         if (imageEls.length > 0) {
+          let videos = Array<string>();
           let images = Array<string>();
           for (let image of imageEls) {
-            images.push(image.getAttribute("data-src"));
+            if (image.nextElementSibling || image.previousElementSibling) {
+              videos.push(image.parentElement.getAttribute("href"));
+            } else {
+              images.push(image.getAttribute("data-src"));
+            }
           }
-          resolve({
-            data: filterPathsToJustPlayable(filter, images),
-            next: next + 1
-          })
+          if (videos.length == 0) {
+            resolve({
+              data: filterPathsToJustPlayable(filter, images, true),
+              next: next + 1
+            })
+          } else {
+            let count = 0;
+            for (let videoURL of videos) {
+              wretch("http://www.sex.com" + videoURL)
+                .get()
+                .setTimeout(5000)
+                .onAbort((e) => resolve({
+                  data: filterPathsToJustPlayable(filter, images, true),
+                  next: next + 1,
+                }))
+                .notFound((e) => resolve({
+                  data: filterPathsToJustPlayable(filter, images, true),
+                  next: next + 1,
+                }))
+                .text((html) => {
+                  count += 1;
+
+                  let vidID = null;
+                  const vidIDRegex = /\/video\/stream\/(\d+)/g;
+                  let regexResult = vidIDRegex.exec(html);
+                  if (regexResult != null) {
+                    vidID = regexResult[1];
+                  }
+
+                  let date = null;
+                  const dateRegex = /\d{4}\/\d{2}\/\d{2}/g;
+                  regexResult = dateRegex.exec(html);
+                  if (regexResult != null) {
+                    date = regexResult[0];
+                  }
+
+                  if (vidID != null && date != null) {
+                    images.push("https://videos1.sex.com/stream/" + date + "/" + vidID +".mp4");
+                  }
+                  if (count == videos.length) {
+                    resolve({
+                      data: filterPathsToJustPlayable(filter, images, true),
+                      next: next + 1
+                    })
+                  }
+                });
+            }
+          }
         } else {
           resolve(null);
         }
@@ -452,7 +531,7 @@ function loadImgur(config: Config, url: string, filter: string, next: any): Canc
     imgur.getAlbumInfo(getFileGroup(url))
       .then((json: any) => {
         resolve({
-          data: filterPathsToJustPlayable(filter, json.data.images.map((i: any) => i.link)),
+          data: filterPathsToJustPlayable(filter, json.data.images.map((i: any) => i.link), true),
           next: null
         })
       })
@@ -464,6 +543,7 @@ function loadImgur(config: Config, url: string, filter: string, next: any): Canc
 }
 
 function loadTwitter(config: Config, url: string, filter: string, next: any): CancelablePromise {
+  // TODO This endpoint doesn't provide video links (just photos) so a new endpoint or library will be necessary (like one with oauth)
   return new CancelablePromise((resolve) => {
       wretch("https://twitter.com/i/profiles/show/" + getFileGroup(url) + "/media_timeline" + (next != 0 ? next : ""))
         .get()
@@ -484,7 +564,7 @@ function loadTwitter(config: Config, url: string, filter: string, next: any): Ca
           }
           const lastTweetID = tweets[tweets.length-1].getAttribute("data-tweet-id");
           resolve({
-            data: filterPathsToJustPlayable(filter, images),
+            data: filterPathsToJustPlayable(filter, images, true),
             next: "?last_note_ts=" + lastTweetID + "&max_position=" + (parseInt(lastTweetID, 10) - 1)
           });
         });
@@ -514,7 +594,7 @@ function loadDeviantArt(config: Config, url: string, filter: string, next: any):
           }
         }
         resolve({
-          data: filterPathsToJustPlayable(filter, images),
+          data: filterPathsToJustPlayable(filter, images, true),
           next: hasNextPage ? next : null
         });
       });
@@ -526,6 +606,27 @@ let session: any = null;
 function loadInstagram(config: Config, url: string, filter: string, next: any): CancelablePromise {
   const configured = config.remoteSettings.instagramUsername != "" && config.remoteSettings.instagramPassword != "";
   if (configured) {
+    const processItems = (items: any, resolve: any, next: any) => {
+      let images = Array<string>();
+      for (let item of items) {
+        if (item.carousel_media) {
+          for (let media of item.carousel_media) {
+            images.push(media.image_versions2.candidates[0].url);
+          }
+        }
+        if (item.video_versions) {
+          images.push(item.video_versions[0].url);
+        } else if (item.image_versions2) {
+          images.push(item.image_versions2.candidates[0].url);
+        }
+      }
+      // Strict filter won't work because instagram media needs the extra parameters on the end
+      resolve({
+        data: filterPathsToJustPlayable(filter, images, false),
+        next: next
+      });
+    };
+
     if (ig == null) {
       ig = new IgApiClient();
       ig.state.generateDevice(config.remoteSettings.instagramUsername);
@@ -536,21 +637,7 @@ function loadInstagram(config: Config, url: string, filter: string, next: any): 
             ig.user.getIdByUsername(getFileGroup(url)).then((id) => {
               const userFeed = ig.feed.user(id);
               userFeed.items().then((items) => {
-                let images = Array<string>();
-                for (let item of items) {
-                  if (item.carousel_media) {
-                    for (let media of item.carousel_media) {
-                      images.push(media.image_versions2.candidates[0].url);
-                    }
-                  }
-                  if (item.image_versions2) {
-                    images.push(item.image_versions2.candidates[0].url);
-                  }
-                }
-                resolve({
-                  data: filterPathsToJustPlayable(filter, images),
-                  next: id + "~" + userFeed.serialize()
-                });
+                processItems(items, resolve, id + "~" + userFeed.serialize());
               }).catch((e) => {console.error(e);resolve(null)});
             }).catch((e) => {console.error(e);resolve(null)});
           }).catch((e) => {console.error(e);resolve(null)});
@@ -561,21 +648,7 @@ function loadInstagram(config: Config, url: string, filter: string, next: any): 
         ig.user.getIdByUsername(getFileGroup(url)).then((id) => {
           const userFeed = ig.feed.user(id);
           userFeed.items().then((items) => {
-            let images = Array<string>();
-            for (let item of items) {
-              if (item.carousel_media) {
-                for (let media of item.carousel_media) {
-                  images.push(media.image_versions2.candidates[0].url);
-                }
-              }
-              if (item.image_versions2) {
-                images.push(item.image_versions2.candidates[0].url);
-              }
-            }
-            resolve({
-              data: filterPathsToJustPlayable(filter, images),
-              next: id + "~" + userFeed.serialize()
-            });
+            processItems(items, resolve, id + "~" + userFeed.serialize());
           }).catch((e) => {console.error(e);resolve(null)});
         }).catch((e) => {console.error(e);resolve(null)});
       });
@@ -590,23 +663,8 @@ function loadInstagram(config: Config, url: string, filter: string, next: any): 
             resolve(null);
             return;
           }
-
           userFeed.items().then((items) => {
-            let images = Array<string>();
-            for (let item of items) {
-              if (item.carousel_media) {
-                for (let media of item.carousel_media) {
-                  images.push(media.image_versions2.candidates[0].url);
-                }
-              }
-              if (item.image_versions2) {
-                images.push(item.image_versions2.candidates[0].url);
-              }
-            }
-            resolve({
-              data: filterPathsToJustPlayable(filter, images),
-              next: id + "~" + userFeed.serialize()
-            });
+            processItems(items, resolve, id + "~" + userFeed.serialize());
           }).catch((e) => {console.error(e);resolve(null)});
         }).catch((e) => {console.error(e);resolve(null)});
       });
