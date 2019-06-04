@@ -157,6 +157,9 @@ export default class ConfigForm extends React.Component {
     if (isNaN(parseInt(this.state.config.displaySettings.minImageSize))) {
       errorMessages.push("Invalid Min Image Size");
     }
+    if (isNaN(parseInt(this.state.config.displaySettings.minVideoSize))) {
+      errorMessages.push("Invalid Min Video Size");
+    }
     if (isNaN(parseInt(this.state.config.displaySettings.maxInMemory))) {
       errorMessages.push("Invalid Max in Memory");
     }

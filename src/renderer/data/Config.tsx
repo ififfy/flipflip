@@ -74,6 +74,7 @@ interface DisplaySettingsI {
   startImmediately: boolean;
 
   minImageSize: number;
+  minVideoSize: number;
   maxInMemory: number;
   maxLoadingAtOnce: number;
   maxInHistory: number;
@@ -167,6 +168,7 @@ export class DisplaySettings  implements DisplaySettingsI {
   fullScreen = false;
   startImmediately = false;
 
+  minVideoSize = 200;
   minImageSize = 200;
   maxInMemory = 120;
   maxLoadingAtOnce = 5;

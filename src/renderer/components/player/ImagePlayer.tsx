@@ -202,6 +202,56 @@ export default class ImagePlayer extends React.Component {
     this.advance(true, true);
   }
 
+  cache(i: HTMLImageElement | HTMLVideoElement) {
+    if (this.props.config.caching.enabled) {
+      const fileType = getSourceType(i.src);
+      if (fileType != ST.local) {
+        const cachePath = getCachePath(null, this.props.config);
+        if (!fs.existsSync(cachePath)) {
+          fs.mkdirSync(cachePath)
+        }
+        const maxSize = this.props.config.caching.maxSize;
+        const sourceCachePath = getCachePath(i.getAttribute("source"), this.props.config);
+        const filePath = sourceCachePath + getFileName(i.src);
+        const downloadImage = () => {
+          if (!fs.existsSync(filePath)) {
+            wretch(i.src)
+              .get()
+              .blob(blob => {
+                const reader = new FileReader();
+                reader.onload = function () {
+                  if (reader.readyState == 2) {
+                    const arrayBuffer = reader.result as ArrayBuffer;
+                    const buffer = Buffer.alloc(arrayBuffer.byteLength);
+                    const view = new Uint8Array(arrayBuffer);
+                    for (let i = 0; i < arrayBuffer.byteLength; ++i) {
+                      buffer[i] = view[i];
+                    }
+                    outputFile(filePath, buffer);
+                  }
+                };
+                reader.readAsArrayBuffer(blob);
+              });
+          }
+        };
+        if (maxSize == 0) {
+          downloadImage();
+        } else {
+          getFolderSize(cachePath, (err: string, size: number) => {
+            if (err) {
+              throw err;
+            }
+
+            const mbSize = (size / 1024 / 1024);
+            if (mbSize < maxSize) {
+              downloadImage();
+            }
+          });
+        }
+      }
+    }
+  }
+
   runFetchLoop(i: number, isStarting = false) {
     if (!this._isMounted && !isStarting) return;
 
@@ -247,7 +297,16 @@ export default class ImagePlayer extends React.Component {
       };
 
       video.onloadeddata = () => {
-        setTimeout(successCallback, 0);
+        // images may load immediately, but that messes up the setState()
+        // lifecycle, so always load on the next event loop iteration.
+        // Also, now  we know the image size, so we can finally filter it.
+        if (video.videoWidth < this.props.config.displaySettings.minVideoSize
+          || video.videoHeight < this.props.config.displaySettings.minVideoSize) {
+          setTimeout(errorCallback, 0);
+        } else {
+          this.cache(video);
+          setTimeout(successCallback, 0);
+        }
       };
 
       video.onerror = () => {
@@ -309,53 +368,7 @@ export default class ImagePlayer extends React.Component {
           || img.height < this.props.config.displaySettings.minImageSize) {
           setTimeout(errorCallback, 0);
         } else {
-          if (this.props.config.caching.enabled) {
-            const fileType = getSourceType(img.src);
-            if (fileType != ST.local) {
-              const cachePath = getCachePath(null, this.props.config);
-              if (!fs.existsSync(cachePath)) {
-                fs.mkdirSync(cachePath)
-              }
-              const maxSize = this.props.config.caching.maxSize;
-              const sourceCachePath = getCachePath(img.getAttribute("source"), this.props.config);
-              const filePath = sourceCachePath + getFileName(img.src);
-              const downloadImage = () => {
-                if (!fs.existsSync(filePath)) {
-                  wretch(img.src)
-                    .get()
-                    .blob(blob => {
-                      const reader = new FileReader();
-                      reader.onload = function () {
-                        if (reader.readyState == 2) {
-                          const arrayBuffer = reader.result as ArrayBuffer;
-                          const buffer = Buffer.alloc(arrayBuffer.byteLength);
-                          const view = new Uint8Array(arrayBuffer);
-                          for (let i = 0; i < arrayBuffer.byteLength; ++i) {
-                            buffer[i] = view[i];
-                          }
-                          outputFile(filePath, buffer);
-                        }
-                      };
-                      reader.readAsArrayBuffer(blob);
-                    });
-                }
-              };
-              if (maxSize == 0) {
-                downloadImage();
-              } else {
-                getFolderSize(cachePath, (err: string, size: number) => {
-                  if (err) {
-                    throw err;
-                  }
-
-                  const mbSize = (size / 1024 / 1024);
-                  if (mbSize < maxSize) {
-                    downloadImage();
-                  }
-                });
-              }
-            }
-          }
+          this.cache(img);
           setTimeout(successCallback, 0);
         }
       };

@@ -41,6 +41,12 @@ export default class DisplayGroup extends React.Component {
             min={0}
             onChange={this.changeKey.bind(this, 'minImageSize').bind(this)}/>
           <SimpleNumberInput
+            label={"Min Video Size (px)"}
+            value={this.props.settings.minVideoSize}
+            isEnabled={true}
+            min={0}
+            onChange={this.changeKey.bind(this, 'minVideoSize').bind(this)}/>
+          <SimpleNumberInput
             label={"Max in Memory"}
             value={this.props.settings.maxInMemory}
             isEnabled={true}
