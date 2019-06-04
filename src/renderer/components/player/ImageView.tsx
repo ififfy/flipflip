@@ -33,6 +33,10 @@ export default class ImageView extends React.Component {
     const img = this.props.img;
     if (!el || !img) return;
 
+    if (img instanceof HTMLVideoElement) {
+      img.play();
+    }
+
     const firstChild = el.firstChild;
     if (firstChild instanceof HTMLImageElement || firstChild instanceof HTMLVideoElement) {
       if (firstChild.src === img.src) return;
@@ -96,17 +100,12 @@ export default class ImageView extends React.Component {
       bg.removeChild(bg.firstChild);
     }
 
-    if (img instanceof HTMLVideoElement) {
-      img.onpause = () => {
-        bgImg.pause();
-      }
-    }
-
     el.appendChild(img);
     if (blur) {
       if (bgImg instanceof HTMLVideoElement) {
         bgImg.muted = true;
         bgImg.volume = 0;
+        bgImg.autoplay = false;
       }
       bg.appendChild(bgImg);
     }
