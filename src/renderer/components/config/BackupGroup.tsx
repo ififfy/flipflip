@@ -117,6 +117,7 @@ export default class BackupGroup extends React.Component {
 
   restore() {
     this.props.restore(saveDir + path.sep + this.state.backup);
+    alert("Restore succes!");
     this.closeConfirm();
   }
 

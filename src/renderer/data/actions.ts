@@ -13,13 +13,13 @@ type State = typeof defaultInitialState;
 
 /** Getters **/
 
-/// Returns true iff the last route matches the given kind
+// Returns true if the last route matches the given kind
 export function isRoute(state: State, kind: string): Boolean {
   if (state.route.length < 1) return false;
   return state.route[state.route.length - 1].kind === kind;
 }
 
-/// Returns the active scene, or null if the current route isn't a scene
+// Returns the active scene, or null if the current route isn't a scene
 export function getActiveScene(state: State): Scene | null {
   for (let r of state.route.slice().reverse()) {
     if (r.kind == 'scene' || r.kind == 'generate') {
@@ -29,7 +29,7 @@ export function getActiveScene(state: State): Scene | null {
   return null;
 }
 
-/// Returns the actiave library source, or null if the current route isn't a library source
+// Returns the active library source, or null if the current route isn't a library source
 export function getLibrarySource(state: State): LibrarySource | null {
   const libraryID = getActiveScene(state).libraryID;
   for (let s of state.library) {
@@ -40,8 +40,7 @@ export function getLibrarySource(state: State): LibrarySource | null {
   return null;
 }
 
-
-/** Actiions **/
+/** Actions **/
 // All of these functions return object diffs that you can pass to ReactComponent.setState().
 // The first argument is always a State object, even if it isn't used.
 
@@ -197,10 +196,8 @@ export function importFromLibrary(state: State, sources: Array<string>): Object 
       id += 1;
     }
   }
-  const returnValue = new Object();
-  Object.assign(returnValue, updateScene(state, getActiveScene(state), (s: Scene) => {s.sources = sceneSources}));
-  Object.assign(returnValue, goBack(returnValue as State));
-  return returnValue;
+  updateScene(state, getActiveScene(state), (s: Scene) => {s.sources = sceneSources});
+  return goBack(state);
 }
 
 export function playScene(state: State, scene: Scene): Object {
