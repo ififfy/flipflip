@@ -151,7 +151,7 @@ export async function convertURL(url: string): Promise<Array<string>> {
   // If this is imgur album, return album images
   let imgurAlbumMatch = url.match("^https?://imgur\.com/a/([\\w\\d]{7})$");
   if (imgurAlbumMatch != null) {
-    let html = await wretch(url).get().text();
+    let html = await wretch(url).get().notFound(() => {return [url]}).text();
     let imageEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll(".post-images > div.post-image-container");
     if (imageEls.length > 0) {
       let images = Array<string>();
@@ -172,7 +172,7 @@ export async function convertURL(url: string): Promise<Array<string>> {
       return ["https://giant.gfycat.com/" + gfycatMatch[1] + ".mp4"];
     }
 
-    let html = await wretch(url).get().text();
+    let html = await wretch(url).get().notFound(() => {return [url]}).text();
     let gfycat = new DOMParser().parseFromString(html, "text/html").querySelectorAll(".upnext-item.active > a");
     if (gfycat.length > 0) {
       let gfycatID = (gfycat[0] as any).href;
