@@ -8,10 +8,12 @@ import ImageGroup from "./ImageGroup";
 import TextGroup from "./TextGroup";
 import TimingGroup from "./TimingGroup";
 import LibrarySource from "../library/LibrarySource";
+import Config from "../../data/Config";
 
 type Props = {
   scene: Scene,
   allScenes: Array<Scene>,
+  config: Config,
   autoEdit: boolean,
   goBack(): void,
   onExport(scene: Scene): void,
@@ -113,6 +115,7 @@ export default class SceneDetail extends React.Component {
             <div className="ControlGroup__Title">{`Sources (${this.props.scene.sources.length})`}</div>
             <SourcePicker
               sources={this.props.scene.sources}
+              config={this.props.config}
               yOffset={0}
               filters={[]}
               emptyMessage="You haven't added any sources to this Scene yet."

@@ -74,6 +74,7 @@ export default class Library extends React.Component {
         {!this.state.showProgress && (
           <SourcePicker
             sources={this.props.library}
+            config={this.props.config}
             yOffset={this.props.yOffset}
             filters={this.props.filters}
             emptyMessage="You haven't added anything to the Library yet."

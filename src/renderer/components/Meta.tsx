@@ -108,6 +108,7 @@ export default class Meta extends React.Component {
           <SceneDetail
             scene={scene}
             allScenes={this.state.scenes}
+            config={this.state.config}
             autoEdit={this.state.autoEdit}
             goBack={a(actions.goBack)}
             onExport={a(actions.exportScene)}

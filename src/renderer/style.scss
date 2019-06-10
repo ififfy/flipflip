@@ -17,7 +17,8 @@ $buttonBarHeight: 2rem + $smallPadding;
 $buttonSidebarWidth: 21rem + $smallPadding;
 
 // Unicode Emoji characters
-$emojiPencil: '\270E'; // ✎
+$emojiPencil: '\270E';  // ✎
+$emojiTrash:  '\1F5D1'; // 🗑
 
 @font-face {
   font-family: system;
@@ -213,6 +214,16 @@ a {
  
   &:before {
     content: $emojiPencil;
+  }
+}
+
+.u-clean {
+  color: #444 !important;
+  transform: scale(-1, 1);
+  cursor: pointer;
+
+  &:before {
+    content: $emojiTrash;
   }
 }
 

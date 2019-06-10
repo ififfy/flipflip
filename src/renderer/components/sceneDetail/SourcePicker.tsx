@@ -1,18 +1,21 @@
 import {remote} from 'electron';
 import * as React from 'react';
+import rimraf from "rimraf";
 import Sortable from "sortablejs";
 import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
 
-import {SF} from "../../data/const";
-import {arrayMove, getFileGroup, getSourceType} from "../../data/utils";
+import {SF, ST} from "../../data/const";
+import {arrayMove, getCachePath, getFileGroup, getSourceType} from "../../data/utils";
 import LibrarySource from "../library/LibrarySource";
 import Tag from "../library/Tag";
 import URLModal from "../sceneDetail/URLModal";
 import Modal from '../ui/Modal';
+import Config from "../../data/Config";
 import SimpleOptionPicker from "../ui/SimpleOptionPicker";
 
 type Props = {
   sources: Array<LibrarySource>,
+  config: Config,
   isSelect: boolean,
   emptyMessage: string,
   removeAllMessage: string,
@@ -192,10 +195,16 @@ export default class SourcePicker extends React.Component {
               )}
 
               <div className="u-button u-destructive u-clickable"
-                   onClick={this.onRemove.bind(this, source.id)}>×️
+                   onClick={this.onRemove.bind(this, source.id)}
+                   title="Remove">×️
               </div>
+              {this.props.config.caching.enabled && getSourceType(source.url) != ST.local && (
+                <div className="u-button u-clean u-clickable"
+                     onClick={this.onClean.bind(this, source.id)}
+                     title="Clear cache"/>)}
               <div className="u-button u-edit u-clickable"
-                   onClick={this.onEdit.bind(this, source.id)}/>
+                   onClick={this.onEdit.bind(this, source.id)}
+                   title="Edit"/>
             </div>
           )}
         </div>
@@ -272,6 +281,16 @@ export default class SourcePicker extends React.Component {
     this.setState({
       removeAllIsOpen: !this.state.removeAllIsOpen
     });
+  }
+
+  onClean(sourceID: number) {
+    const sourceURL = this.props.sources.find((s) => s.id == sourceID).url;
+    const fileType = getSourceType(sourceURL);
+    if (fileType != ST.local) {
+      const cachePath = getCachePath(sourceURL, this.props.config);
+      if (!confirm("Are you SURE you want to delete " + cachePath + "?")) return;
+      rimraf.sync(cachePath);
+    }
   }
 
   onEdit(sourceID: number, e: Event) {
