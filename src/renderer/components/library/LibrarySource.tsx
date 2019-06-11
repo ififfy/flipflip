@@ -4,6 +4,7 @@ export default class LibrarySource {
   id: number = 0;
   url: string;
   offline: boolean = false;
+  untagged: boolean = false;
   lastCheck: Date = null;
   tags: Array<Tag>;
 

@@ -164,7 +164,7 @@ export default class SourcePicker extends React.Component {
             </div>
           )}
           {displaySources.map((source) =>
-            <div className={`SourcePicker__Source ${source.offline ? 'm-offline' : ''}`}
+            <div className={`SourcePicker__Source ${source.offline ? 'm-offline' : ''} ${source.untagged ? 'm-untagged' : ''}`}
                  key={source.id}>
               {this.props.isSelect && (
                 <input type="checkbox" value={source.url} onChange={this.onSelect.bind(this)}
@@ -261,9 +261,33 @@ export default class SourcePicker extends React.Component {
   }
 
   // Use alt+P to access import modal
+  // Use alt+U to toggle highlighting untagged sources
   secretHotkey(e: KeyboardEvent) {
     if (e.altKey && e.key == 'p') {
       this.toggleURLImportModal();
+    } else if (e.altKey && e.key == 'u') {
+      this.toggleUntagged();
+    }
+  }
+
+  toggleUntagged() {
+    let taggingMode = true;
+    for (let source of this.props.sources) {
+      if (source.untagged) {
+        taggingMode = false;
+      }
+    }
+
+    if (taggingMode) { // We're marking untagged sources
+      for (let source of this.props.sources) {
+        if (source.tags.length === 0) {
+          source.untagged = true;
+        }
+      }
+    } else { // We're unmarking sources
+      for (let source of this.props.sources) {
+        source.untagged = false;
+      }
     }
   }
 

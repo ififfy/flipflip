@@ -666,6 +666,10 @@ label.SimpleCheckbox {
         background-color: #ff0000;
       }
 
+      &.m-untagged {
+        background-color: #117900;
+      }
+
       > input {
         vertical-align: -2px;
         margin-right: 10px;
