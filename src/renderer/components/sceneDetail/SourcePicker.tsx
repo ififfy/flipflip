@@ -22,8 +22,10 @@ type Props = {
   removeAllConfirm: string,
   yOffset: number,
   filters: Array<string>,
+  selected: Array<string>,
   onUpdateSources(sources: Array<LibrarySource>): void,
-  onClick?(source: LibrarySource, yOffset: number, filters: Array<string>): void,
+  onPlay?(source: LibrarySource): void,
+  savePosition?(yOffset: number, filters: Array<string>, selected: Array<string>): void,
   onOpenLibraryImport?(): void,
   importSourcesFromLibrary?(sources: Array<string>): void,
   onChangeTextKind?(kind: string): void,
@@ -38,7 +40,7 @@ export default class SourcePicker extends React.Component {
     isEditing: -1,
     sortable: Sortable,
     filters: this.props.filters,
-    selected: Array<string>(),
+    selected: this.props.selected,
   };
 
   render() {
@@ -172,7 +174,7 @@ export default class SourcePicker extends React.Component {
               )}
               {this.state.isEditing != source.id && (
                 <div className="SourcePicker__SourceTitle u-clickable"
-                     onClick={this.props.onClick ? this.onClick.bind(this, source) : this.onEdit.bind(this, source.id)}>
+                     onClick={this.props.onPlay ? this.onPlay.bind(this, source) : this.onEdit.bind(this, source.id)}>
                   {source.url}
                 </div>
               )}
@@ -228,8 +230,9 @@ export default class SourcePicker extends React.Component {
     )
   }
 
-  onClick(source: LibrarySource) {
-    this.props.onClick(source, document.getElementById("sources").scrollTop, this.state.filters);
+  onPlay(source: LibrarySource) {
+    this.props.savePosition(document.getElementById("sources").scrollTop, this.state.filters, this.state.selected);
+    this.props.onPlay(source);
   }
 
   onEnd(evt: any) {
@@ -242,6 +245,12 @@ export default class SourcePicker extends React.Component {
     this.setState({sortable: null});
     this.initSortable();
     document.getElementById("sources").scrollTo(0, this.props.yOffset);
+  }
+
+  componentWillUnmount() {
+    if (this.props.savePosition) {
+      this.props.savePosition(document.getElementById("sources").scrollTop, this.state.filters, this.state.selected);
+    }
   }
 
   componentDidUpdate() {
@@ -289,6 +298,7 @@ export default class SourcePicker extends React.Component {
         source.untagged = false;
       }
     }
+    this.setState({}); // Trigger update
   }
 
   nop() {}

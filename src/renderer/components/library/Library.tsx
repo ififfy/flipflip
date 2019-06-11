@@ -18,9 +18,11 @@ export default class Library extends React.Component {
     isSelect: boolean,
     yOffset: number,
     filters: Array<string>,
+    selected: Array<string>,
     onUpdateLibrary(sources: Array<LibrarySource>): void,
     onClearReddit(): void,
-    onPlay(source: LibrarySource, yOffset: number, filters: Array<string>): void,
+    onPlay(source: LibrarySource): void,
+    savePosition(yOffset: number, filters:Array<string>, selected: Array<string>): void,
     goBack(): void,
     manageTags(): void,
     importSources(sources: Array<string>): void,
@@ -77,12 +79,14 @@ export default class Library extends React.Component {
             config={this.props.config}
             yOffset={this.props.yOffset}
             filters={this.props.filters}
+            selected={this.props.selected}
             emptyMessage="You haven't added anything to the Library yet."
             removeAllMessage="Are you sure you really wanna delete your library...? ಠ_ಠ"
             removeAllConfirm="Yea... I'm sure"
             isSelect={this.props.isSelect}
             onUpdateSources={this.props.onUpdateLibrary}
-            onClick={this.props.isSelect ? this.nop : this.props.onPlay}
+            onPlay={this.props.onPlay}
+            savePosition={this.props.savePosition}
             importSourcesFromLibrary={this.props.importSources}
           />
         )}

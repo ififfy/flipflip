@@ -73,7 +73,9 @@ export default class Meta extends React.Component {
             isSelect={this.state.isSelect}
             yOffset={this.state.libraryYOffset}
             filters={this.state.libraryFilters}
+            selected={this.state.librarySelected}
             onPlay={a(actions.playSceneFromLibrary)}
+            savePosition={a(actions.saveLibraryPosition)}
             onUpdateLibrary={a(actions.replaceLibrary)}
             goBack={a(actions.goBack)}
             manageTags={a(actions.manageTags)}

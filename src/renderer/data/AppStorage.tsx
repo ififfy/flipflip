@@ -26,6 +26,7 @@ export const defaultInitialState = {
   isSelect: false,
   libraryYOffset: 0,
   libraryFilters: Array<string>(),
+  librarySelected: Array<string>(),
 };
 
 /**
@@ -78,6 +79,7 @@ export default class AppStorage {
             route: data.route.map((s: any) => new Route(s)),
             libraryYOffset: 0,
             libraryFilters: Array<string>(),
+            librarySelected: Array<string>(),
           };
           // Hydrate and add the library ! Yay!!! :)
           let libraryID = 0;
@@ -122,6 +124,7 @@ export default class AppStorage {
             route: data.route.map((s: any) => new Route(s)),
             libraryYOffset: 0,
             libraryFilters: Array<string>(),
+            librarySelected: Array<string>(),
           };
       }
     }

@@ -58,6 +58,7 @@ export function restoreFromBackup(state: State, backupFile: string): Object {
       route: data.route.map((s: any) => new Route(s)),
       libraryYOffset: 0,
       libraryFilters: Array<string>(),
+      librarySelected: Array<string>(),
     };
   } catch (e) {
     alert("Restore error:\n" + e);
@@ -171,11 +172,11 @@ export function goToScene(state: State, scene: Scene): Object {
 }
 
 export function openLibrary(state: State): Object {
-  return {route: [new Route({kind: 'library', value: null})], libraryYOffset: 0, libraryFilters: Array<string>()};
+  return {route: [new Route({kind: 'library', value: null})]};
 }
 
 export function openLibraryImport(state: State): Object {
-  return {route: state.route.concat(new Route({kind: 'library', value: null})), isSelect: true};
+  return {route: state.route.concat(new Route({kind: 'library', value: null})), isSelect: true, librarySelected: []};
 }
 
 export function importFromLibrary(state: State, sources: Array<string>): Object {
@@ -200,11 +201,19 @@ export function importFromLibrary(state: State, sources: Array<string>): Object 
   return goBack(state);
 }
 
+export function saveLibraryPosition(state: State, yOffset: number, filters: Array<string>, selected: Array<string>): Object {
+  return {
+    libraryYOffset: yOffset,
+    libraryFilters: filters,
+    librarySelected: selected,
+  };
+}
+
 export function playScene(state: State, scene: Scene): Object {
   return {route: state.route.concat(new Route({kind: 'play', value: scene.id}))};
 }
 
-export function playSceneFromLibrary(state: State, source: LibrarySource, yOffset: number, filters: Array<string>): Object {
+export function playSceneFromLibrary(state: State, source: LibrarySource): Object {
   let id = state.scenes.length + 1;
   state.scenes.forEach((s: Scene) => {
     id = Math.max(s.id + 1, id);
@@ -215,42 +224,35 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, yOffse
     libraryID: source.id,
     id: id,
   });
-  const newRoute = [new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'libraryplay', value: tempScene.id})];
   return {
     scenes: state.scenes.concat([tempScene]),
-    route: newRoute,
-    libraryYOffset: yOffset,
-    libraryFilters: filters,
+    route: state.route.concat([new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'libraryplay', value: tempScene.id})]),
   };
 }
 
 export function endPlaySceneFromLibrary(state: State): Object {
-  const newScenes = state.scenes;
-  const libraryID = newScenes.pop().libraryID;
+  const librarySource = getLibrarySource(state);
+  state.scenes.pop();
   const tagNames = state.tags.map((t: Tag) => t.name);
   // Re-order the tags of the source we were playing
-  const newLibrary = state.library.map((s: LibrarySource) => {
-    if (s.id == libraryID) {
-       s.tags = s.tags.sort((a: Tag, b: Tag) => {
-        const aIndex = tagNames.indexOf(a.name);
-        const bIndex = tagNames.indexOf(b.name);
-        if (aIndex < bIndex) {
-          return -1;
-        } else if (aIndex > bIndex) {
-          return 1;
-        } else {
-          return 0;
-        }
-      });
+  librarySource.tags = librarySource.tags.sort((a: Tag, b: Tag) => {
+    const aIndex = tagNames.indexOf(a.name);
+    const bIndex = tagNames.indexOf(b.name);
+    if (aIndex < bIndex) {
+      return -1;
+    } else if (aIndex > bIndex) {
+      return 1;
+    } else {
+      return 0;
     }
-    return s;
   });
-  return {route: [new Route({kind: 'library'})], scenes: newScenes, library: newLibrary};
+  state.route.pop();
+  state.route.pop();
+  return {route: state.route.slice(0), scenes: state.scenes.slice(0)};
 }
 
 export function manageTags(state: State): Object {
-  const newRoute = state.route.concat(new Route({kind: 'tags', value: null}));
-  return {route: newRoute};
+  return {route: state.route.concat(new Route({kind: 'tags', value: null}))};
 }
 
 export function addGenerator(state: State): Object {
@@ -274,8 +276,7 @@ export function addGenerator(state: State): Object {
 }
 
 export function generateScene(state: State): Object {
-  const newRoute = state.route.concat(new Route({kind: 'scene', value: getActiveScene(state).id}));
-  return {route: newRoute};
+  return {route: state.route.concat(new Route({kind: 'scene', value: getActiveScene(state).id}))};
 }
 
 export function updateScene(state: State, scene: Scene, fn: (scene: Scene) => void): Object {
