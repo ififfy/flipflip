@@ -358,7 +358,7 @@ export default class Player extends React.Component {
     }));
     contextMenu.append(new MenuItem({
       label: isFile ? path : url,
-      click: () => { navigator.clipboard.writeText(path); }
+      click: () => { navigator.clipboard.writeText(isFile ? path : url); }
     }));
     contextMenu.append(new MenuItem({
       label: 'Open Source',
