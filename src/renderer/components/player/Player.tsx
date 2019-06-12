@@ -4,8 +4,8 @@ import Sound from 'react-sound';
 import fs from "fs";
 import fileURL from "file-url";
 
-import {TOT} from "../../data/const";
-import {urlToPath} from '../../data/utils';
+import {ST, TOT} from "../../data/const";
+import {getCachePath, getSourceType, urlToPath} from '../../data/utils';
 import Config from "../../data/Config";
 import Scene from '../../data/Scene';
 import CaptionProgram from "./CaptionProgram";
@@ -368,6 +368,19 @@ export default class Player extends React.Component {
       label: 'Open File',
       click: () => { remote.shell.openExternal(url); }
     }));
+    if (this.props.config.caching.enabled && getSourceType(source) != ST.local) {
+      contextMenu.append(new MenuItem({
+        label: 'Open Cached Images',
+        click: () => {
+          // for some reason windows uses URLs and everyone else uses paths
+          if (process.platform === "win32") {
+            remote.shell.openExternal(getCachePath(source, this.props.config));
+          } else {
+            remote.shell.openExternal(urlToPath(getCachePath(source, this.props.config)));
+          }
+        }
+      }));
+    }
     if (isFile) {
       contextMenu.append(new MenuItem({
         label: 'Reveal',
