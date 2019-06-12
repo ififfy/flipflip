@@ -901,16 +901,18 @@ label.SimpleCheckbox {
       > span {
         margin-right: 2rem;
       }
-
-      .SimpleRadioInput {
-        text-align: center;
-
-        .SimpleRadioInput__Choice {
-          margin-right: 2rem;
-          cursor: pointer;
-        }
-      }
     }
+  }
+}
+
+.SimpleRadioInput {
+  > div {
+    text-align: center;
+  }
+
+  .SimpleRadioInput__Choice {
+    margin-right: 2rem;
+    cursor: pointer;
   }
 }
 

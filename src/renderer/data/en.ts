@@ -7,6 +7,9 @@ export default new Map<String, String>([
   ['tf.variableSlower', 'Variable - Slower (10s-20s)'],
   ['tf.variableSlowest', 'Variable - Slowest (30s-60s)'],
 
+  ['wf.s', 'By Source'],
+  ['wf.i', 'By Image'],
+
   ['if.any', 'All images'],
   ['if.gifs', 'Only gifs'],
   ['if.stills', 'Only stills'],

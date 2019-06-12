@@ -1,4 +1,4 @@
-import {BT, HTF, IF, TF, TOT, VTF, ZF} from './const';
+import {BT, HTF, IF, TF, TOT, VTF, WF, ZF} from './const';
 import LibrarySource from "../components/library/LibrarySource";
 
 export default class Scene {
@@ -7,6 +7,7 @@ export default class Scene {
   sources: Array<LibrarySource> = [];
   timingFunction = TF.constant;
   timingConstant = "1000";
+  weightFunction = WF.sources;
   imageTypeFilter = IF.any;
   zoomType = ZF.none;
   effectLevel: number = 5;

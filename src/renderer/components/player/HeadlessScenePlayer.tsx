@@ -9,7 +9,7 @@ import tumblr from "tumblr.js";
 import imgur from "imgur";
 import {IgApiClient} from "instagram-private-api";
 
-import {IF, ST} from '../../data/const';
+import {IF, ST, WF} from '../../data/const';
 import {
   CancelablePromise,
   convertURL,
@@ -770,7 +770,13 @@ export default class HeadlessScenePlayer extends React.Component {
 
           // Just add the new urls to the end of the list
           if (object != null) {
-            newAllURLs = newAllURLs.set(loadPromise.source, object.data);
+            if (this.props.scene.weightFunction == WF.sources) {
+              newAllURLs.set(loadPromise.source, object.data);
+            } else {
+              for (let d of object.data) {
+                newAllURLs.set(d, [loadPromise.source]);
+              }
+            }
 
             // If this is a remote URL, queue up the next promise
             if (object.next != null) {
@@ -806,7 +812,13 @@ export default class HeadlessScenePlayer extends React.Component {
 
           // Just add the new urls to the end of the list
           if (object != null) {
-            this.nextAllURLs = this.nextAllURLs.set(loadPromise.source, object.data);
+            if (this.props.nextScene.weightFunction == WF.sources) {
+              this.nextAllURLs.set(loadPromise.source, object.data);
+            } else {
+              for (let d of object.data) {
+                this.nextAllURLs.set(d, [loadPromise.source]);
+              }
+            }
 
             // If this is a remote URL, queue up the next promise
             if (object.next != null) {
@@ -834,11 +846,17 @@ export default class HeadlessScenePlayer extends React.Component {
             if (object != null) {
               // Update the correct index with our new images
               let newAllURLs = this.state.allURLs;
-              let sourceURLs = newAllURLs.get(promise.source);
-              newAllURLs.set(promise.source, sourceURLs.concat(object.data.filter((u) => {
-                const fileName = getFileName(u);
-                return !sourceURLs.map((u) => getFileName(u)).includes(fileName);
-              })));
+              if (this.props.scene.weightFunction == WF.sources) {
+                let sourceURLs = newAllURLs.get(promise.source);
+                newAllURLs.set(promise.source, sourceURLs.concat(object.data.filter((u) => {
+                  const fileName = getFileName(u);
+                  return !sourceURLs.map((u) => getFileName(u)).includes(fileName);
+                })));
+              } else {
+                for (let d of object.data) {
+                  newAllURLs.set(d, [promise.source]);
+                }
+              }
 
               // Add the next promise to the queue
               let newPromiseQueue = this.state.promiseQueue;

@@ -8,6 +8,11 @@ const TF = {  // timing functions
   variableSlowest: 'tf.variableSlowest',
 };
 
+const WF = { // weight functions
+  sources: 'wf.s',
+  images: 'wf.i',
+};
+
 const IF = { // image filters
   any: 'if.any',
   gifs: 'if.gifs',
@@ -77,5 +82,5 @@ const ST = { // source types
 };
 
 export {
-  TF, IF, ZF, HTF, VTF, TOT, BT, GT, TT, SF, ST,
+  TF, WF, IF, ZF, HTF, VTF, TOT, BT, GT, TT, SF, ST,
 };

@@ -6,7 +6,7 @@ import AudioGroup from "./AudioGroup";
 import EffectGroup from "./EffectGroup";
 import ImageGroup from "./ImageGroup";
 import TextGroup from "./TextGroup";
-import TimingGroup from "./TimingGroup";
+import PlaybackGroup from "./PlaybackGroup";
 import LibrarySource from "../library/LibrarySource";
 import Config from "../../data/Config";
 
@@ -89,8 +89,9 @@ export default class SceneDetail extends React.Component {
         </div>
 
         <div className="SceneDetail__Content ControlGroupGroup">
-          <TimingGroup
+          <PlaybackGroup
             scene={this.props.scene}
+            isPlayer={false}
             onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
           <EffectGroup
@@ -118,6 +119,7 @@ export default class SceneDetail extends React.Component {
               config={this.props.config}
               yOffset={0}
               filters={[]}
+              selected={[]}
               emptyMessage="You haven't added any sources to this Scene yet."
               removeAllMessage="Are you sure you want to remove all sources from this scene?"
               removeAllConfirm="Ok"

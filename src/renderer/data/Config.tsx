@@ -1,10 +1,11 @@
-import {BT, HTF, IF, TF, VTF, ZF} from "./const";
+import {BT, HTF, IF, TF, VTF, WF, ZF} from "./const";
 
 interface SceneSettingsI {
   [key: string]: string|number|boolean;
   timingFunction: string;
   timingConstant: string;
   imageTypeFilter: string;
+  weightFunction: string;
   zoomType: string;
   effectLevel: number;
   horizTransType: string;
@@ -86,6 +87,7 @@ export class SceneSettings implements SceneSettingsI {
   timingFunction = TF.constant;
   timingConstant = "1000";
   imageTypeFilter = IF.any;
+  weightFunction = WF.sources;
   zoomType = ZF.none;
   effectLevel = 5;
   horizTransType = HTF.none;

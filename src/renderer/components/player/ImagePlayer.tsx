@@ -8,7 +8,7 @@ import gifInfo from 'gif-info';
 import getFolderSize from "get-folder-size";
 import IdleTimer from 'react-idle-timer';
 
-import {IF, ST, TF} from '../../data/const';
+import {IF, ST, TF, WF} from '../../data/const';
 import {getCachePath, getFileName, getRandomListItem, getSourceType, isVideo, urlToPath} from '../../data/utils';
 import Config from "../../data/Config";
 import Scene from "../../data/Scene";
@@ -252,19 +252,40 @@ export default class ImagePlayer extends React.Component {
     }
   }
 
+  wait(i: number) {
+    // Wait for the display loop to use an image (it might be fast, or paused)
+    setTimeout(() => this.runFetchLoop(i), 100);
+  }
+
   runFetchLoop(i: number, isStarting = false) {
     if (!this._isMounted && !isStarting) return;
 
-    const source = getRandomListItem(Array.from(this.props.allURLs.keys()));
-    const collection = this.props.allURLs.get(source);
-
-    if (this.state.readyToDisplay.length >= this.props.maxLoadingAtOnce ||
-      !(collection && collection.length)) {
-      // Wait for the display loop to use an image (it might be fast, or paused)
-      setTimeout(() => this.runFetchLoop(i), 100);
+    if (this.state.readyToDisplay.length >= this.props.maxLoadingAtOnce) {
+      this.wait(i);
       return;
     }
-    const url = getRandomListItem(collection);
+
+    let source;
+    let collection;
+    let url: string;
+    if (this.props.scene.weightFunction == WF.sources) {
+      source = getRandomListItem(Array.from(this.props.allURLs.keys()));
+      collection = this.props.allURLs.get(source);
+      if (!(collection && collection.length)) {
+        this.wait(i);
+        return;
+      }
+      url = getRandomListItem(collection);
+    } else {
+      collection = [].concat.apply([], Array.from(this.props.allURLs.keys()));
+      if (!(collection && collection.length)) {
+        this.wait(i);
+        return;
+      }
+      url = getRandomListItem(collection);
+      source = this.props.allURLs.get(url)[0];
+    }
+
     if (isVideo(url, false)) {
       const video = document.createElement('video');
       video.setAttribute("source", source);
