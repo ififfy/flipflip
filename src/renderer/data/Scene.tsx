@@ -8,6 +8,7 @@ export default class Scene {
   timingFunction = TF.constant;
   timingConstant = "1000";
   weightFunction = WF.sources;
+  randomize = true;
   imageTypeFilter = IF.any;
   zoomType = ZF.none;
   effectLevel: number = 5;

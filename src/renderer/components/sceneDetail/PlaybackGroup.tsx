@@ -7,6 +7,7 @@ import ControlGroup from "./ControlGroup";
 import SimpleOptionPicker from "../ui/SimpleOptionPicker";
 import SimpleNumberInput from "../ui/SimpleNumberInput";
 import SimpleRadioInput from "../ui/SimpleRadioInput";
+import SimpleCheckbox from "../ui/SimpleCheckbox";
 
 export default class PlaybackGroup extends React.Component {
   readonly props: {
@@ -37,10 +38,10 @@ export default class PlaybackGroup extends React.Component {
             keys={Object.values(WF)}
             onChange={this.changeKey.bind(this, 'weightFunction').bind(this)} />
         )}
-        {/*<SimpleCheckbox
-          text={"Random Order"}
-          isOn={this.props.scene.randomOrder}
-          onChange={this.changeKey.bind(this, 'randomOrder').bind(this)} />*/}
+        <SimpleCheckbox
+          text={"Randomize"}
+          isOn={this.props.scene.randomize}
+          onChange={this.changeKey.bind(this, 'randomize').bind(this)} />
       </ControlGroup>
     );
   }

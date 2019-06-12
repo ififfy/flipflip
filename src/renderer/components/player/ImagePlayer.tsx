@@ -196,7 +196,7 @@ export default class ImagePlayer extends React.Component {
     }
 
     for (let i = 0; i < this.props.maxLoadingAtOnce; i++) {
-      this.runFetchLoop(i, true);
+      this.runFetchLoop(i, 0, true);
     }
 
     this.advance(true, true);
@@ -252,37 +252,46 @@ export default class ImagePlayer extends React.Component {
     }
   }
 
-  wait(i: number) {
+  wait(i: number, l: number) {
     // Wait for the display loop to use an image (it might be fast, or paused)
-    setTimeout(() => this.runFetchLoop(i), 100);
+    setTimeout(() => this.runFetchLoop(i, l), 100);
   }
 
-  runFetchLoop(i: number, isStarting = false) {
+  runFetchLoop(i: number, l: number, isStarting = false) {
     if (!this._isMounted && !isStarting) return;
 
     if (this.state.readyToDisplay.length >= this.props.maxLoadingAtOnce) {
-      this.wait(i);
+      this.wait(i, l);
       return;
     }
 
     let source;
     let collection;
     let url: string;
+    let loopID = (l * this.props.maxLoadingAtOnce) + i;
     if (this.props.scene.weightFunction == WF.sources) {
       source = getRandomListItem(Array.from(this.props.allURLs.keys()));
       collection = this.props.allURLs.get(source);
       if (!(collection && collection.length)) {
-        this.wait(i);
+        this.wait(i, l);
         return;
       }
-      url = getRandomListItem(collection);
+      if (this.props.scene.randomize) {
+        url = getRandomListItem(collection);
+      } else {
+        url = collection[loopID%collection.length];
+      }
     } else {
       collection = [].concat.apply([], Array.from(this.props.allURLs.keys()));
       if (!(collection && collection.length)) {
-        this.wait(i);
+        this.wait(i, l);
         return;
       }
-      url = getRandomListItem(collection);
+      if (this.props.scene.randomize) {
+        url = getRandomListItem(collection);
+      } else {
+        url = collection[loopID%collection.length];
+      }
       source = this.props.allURLs.get(url)[0];
     }
 
@@ -306,7 +315,7 @@ export default class ImagePlayer extends React.Component {
         if (this.state.historyPaths.length === 0) {
           this.advance(false, false);
         }
-        this.runFetchLoop(i);
+        this.runFetchLoop(i, l+1);
       };
 
       const errorCallback = () => {
@@ -361,7 +370,7 @@ export default class ImagePlayer extends React.Component {
         if (this.state.historyPaths.length === 0) {
           this.advance(false, false);
         }
-        this.runFetchLoop(i);
+        this.runFetchLoop(i, l+1);
       };
 
       const errorCallback = () => {
@@ -375,8 +384,8 @@ export default class ImagePlayer extends React.Component {
       function toArrayBuffer(buf: Buffer) {
         let ab = new ArrayBuffer(buf.length);
         let view = new Uint8Array(ab);
-        for (let i = 0; i < buf.length; ++i) {
-          view[i] = buf[i];
+        for (let j = 0; j < buf.length; ++j) {
+          view[j] = buf[j];
         }
         return ab;
       }
@@ -406,11 +415,11 @@ export default class ImagePlayer extends React.Component {
 
         // Exclude non-animated gifs from gifs
         if (this.props.scene.imageTypeFilter == IF.gifs && info && !info.animated) {
-          this.runFetchLoop(i);
+          this.runFetchLoop(i, l+1);
           return;
           // Exclude animated gifs from stills
         } else if (this.props.scene.imageTypeFilter == IF.stills && info && info.animated) {
-          this.runFetchLoop(i);
+          this.runFetchLoop(i, l+1);
           return;
         }
 

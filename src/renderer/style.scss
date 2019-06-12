@@ -464,7 +464,7 @@ a {
   }
 }
 
-.SimpleOptionPicker, .SimpleTextInput, .SimpleSliderInput, .SimpleCheckbox, .SimpleColorPicker, .SimpleNumberInput {
+.SimpleOptionPicker, .SimpleTextInput, .SimpleSliderInput, .SimpleCheckbox, .SimpleColorPicker, .SimpleNumberInput, .SimpleRadioInput {
   @include control;
 }
 
@@ -908,6 +908,10 @@ label.SimpleCheckbox {
 .SimpleRadioInput {
   > div {
     text-align: center;
+  }
+
+  &.m-no-margin-bottom {
+    margin-bottom: 0;
   }
 
   .SimpleRadioInput__Choice {

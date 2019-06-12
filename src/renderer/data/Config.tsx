@@ -6,6 +6,7 @@ interface SceneSettingsI {
   timingConstant: string;
   imageTypeFilter: string;
   weightFunction: string;
+  randomize: boolean;
   zoomType: string;
   effectLevel: number;
   horizTransType: string;
@@ -88,6 +89,7 @@ export class SceneSettings implements SceneSettingsI {
   timingConstant = "1000";
   imageTypeFilter = IF.any;
   weightFunction = WF.sources;
+  randomize = true;
   zoomType = ZF.none;
   effectLevel = 5;
   horizTransType = HTF.none;

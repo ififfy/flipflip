@@ -130,6 +130,7 @@ export default class SceneGenerator extends React.Component {
                     value={type}
                     keys={Object.values(TT)}
                     bold={true}
+                    bottom={false}
                     onChange={this.onChangeTagType.bind(this, tag)}
                   />
                 </ControlGroup>
