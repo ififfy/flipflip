@@ -27,6 +27,7 @@ export default class SourceList extends React.Component {
   };
 
   readonly state = {
+    isEditing: -1,
     sortable: Sortable,
   };
 
@@ -46,10 +47,22 @@ export default class SourceList extends React.Component {
               <input type="checkbox" value={source.url} onChange={this.onSelect.bind(this)}
                      checked={this.props.selected.includes(source.url)}/>
             )}
-            <div className="SourceList__SourceTitle u-clickable"
-                 onClick={this.props.onPlay ? this.onPlay.bind(this, source) : this.onEdit.bind(this, source.id)}>
-              {source.url}
-            </div>
+            {this.state.isEditing != source.id && (
+              <div className="SourceList__SourceTitle u-clickable"
+                   onClick={this.props.onPlay ? this.onPlay.bind(this, source) : this.onEdit.bind(this, source.id)}>
+                {source.url}
+              </div>
+            )}
+            {this.state.isEditing == source.id && (
+              <form className="SourceList__SourceTitle" onSubmit={this.onEdit.bind(this, -1)}>
+                <input
+                  autoFocus
+                  type="text"
+                  value={source.url}
+                  onBlur={this.onEdit.bind(this, -1)}
+                  onChange={this.onEditSource.bind(this, source.id)}/>
+              </form>
+            )}
             {source.tags && (
               <div id={`tags-${source.id}`} className="SourceList__SourceTags">
                 {source.tags.map((tag) =>
@@ -138,29 +151,33 @@ export default class SourceList extends React.Component {
   }
 
   onEdit(sourceID: number, e: Event) {
-    e.preventDefault();
-    this.props.onStartEdit(sourceID);
-    // If user left input blank, remove it from list of sources
-    // Also prevent user from inputing duplicate source
-    // If new entry is a duplicate, make sure we remove the new entry
-    const newSources = Array<LibrarySource>();
-    for (let source of this.props.sources) {
-      if (source.url != "") {
-        if (!newSources.map((s) => s.url).includes(source.url)) {
-          newSources.push(source);
-        } else {
-          for (let existingSource of newSources) {
-            if (existingSource.url == source.url) {
-              if (existingSource.id > source.id) {
-                newSources[newSources.indexOf(existingSource)] = source;
+    if (this.props.onPlay) { // This is the Library, open the Modal
+      this.props.onStartEdit(sourceID);
+    } else { // Otherwise, just use the simple text input
+      e.preventDefault();
+      this.setState({isEditing: sourceID});
+      // If user left input blank, remove it from list of sources
+      // Also prevent user from inputing duplicate source
+      // If new entry is a duplicate, make sure we remove the new entry
+      const newSources = Array<LibrarySource>();
+      for (let source of this.props.sources) {
+        if (source.url != "") {
+          if (!newSources.map((s) => s.url).includes(source.url)) {
+            newSources.push(source);
+          } else {
+            for (let existingSource of newSources) {
+              if (existingSource.url == source.url) {
+                if (existingSource.id > source.id) {
+                  newSources[newSources.indexOf(existingSource)] = source;
+                }
+                break;
               }
-              break;
             }
           }
         }
       }
+      this.props.onUpdateSources(newSources);
     }
-    this.props.onUpdateSources(newSources);
   }
 
   onEditSource(sourceID: number, e: React.FormEvent<HTMLInputElement>) {
