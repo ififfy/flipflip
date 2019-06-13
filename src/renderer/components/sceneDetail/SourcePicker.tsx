@@ -555,8 +555,14 @@ export default class SourcePicker extends React.Component {
             const tag = filter.substring(0, filter.length-1);
             matchesFilter = source.tags.find((t) => t.name == tag) != null;
           } else { // This is a search filter
-            const regex = new RegExp(filter, "i");
-            matchesFilter = regex.test(source.url);
+            if (filter.startsWith("-")) {
+              filter = filter.substring(1, filter.length);
+              const regex = new RegExp(filter, "i");
+              matchesFilter = !regex.test(source.url);
+            } else {
+              const regex = new RegExp(filter, "i");
+              matchesFilter = regex.test(source.url);
+            }
           }
           if (!matchesFilter) break;
         }
