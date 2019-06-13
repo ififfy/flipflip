@@ -1,17 +1,17 @@
 import {remote} from 'electron';
 import * as React from 'react';
-import rimraf from "rimraf";
-import Sortable from "sortablejs";
-import ReactMultiSelectCheckboxes from 'react-multiselect-checkboxes';
+import CreatableSelect from 'react-select/creatable';
 
-import {SF, ST} from "../../data/const";
-import {arrayMove, getCachePath, getFileGroup, getSourceType} from "../../data/utils";
+import {SF} from "../../data/const";
+import {getFileGroup, getSourceType} from "../../data/utils";
+import SourceList from "./SourceList";
 import LibrarySource from "../library/LibrarySource";
 import Tag from "../library/Tag";
 import URLModal from "../sceneDetail/URLModal";
 import Modal from '../ui/Modal';
 import Config from "../../data/Config";
 import SimpleOptionPicker from "../ui/SimpleOptionPicker";
+import SimpleTextInput from "../ui/SimpleTextInput";
 
 type Props = {
   sources: Array<LibrarySource>,
@@ -37,14 +37,43 @@ export default class SourcePicker extends React.Component {
   readonly state = {
     removeAllIsOpen: false,
     urlImportIsOpen: false,
+    editValue: "",
     isEditing: -1,
-    sortable: Sortable,
     filters: this.props.filters,
     selected: this.props.selected,
+    searchInput: "",
+    forceUpdate: false,
+  };
+
+  handleChange = (search: [{label: string, value: string}]) => {
+    if (search == null) {
+      this.setState({filters: []});
+    } else {
+      this.setState({filters: search.map((s) => s.value)});
+    }
+  };
+  handleInputChange = (searchInput: string) => {
+    this.setState({searchInput})
+  };
+  handleKeyDown = (event: KeyboardEvent) => {
+    if (!this.state.searchInput) return;
+    switch (event.key) {
+      case 'Enter':
+      case 'Tab':
+        this.setState({
+          searchInput: "",
+          filters: this.state.filters.concat(this.state.searchInput.split(" ")),
+        });
+        event.preventDefault();
+    }
+  };
+  confirmEdit = (event: KeyboardEvent) => {
+    if (event.key == 'Enter') {
+      this.onSaveEdit();
+    }
   };
 
   render() {
-    const filtering = this.state.filters.length > 0;
     const displaySources = this.getDisplaySources();
     const tags = new Map<string, number>();
     let untaggedCount = 0;
@@ -80,15 +109,23 @@ export default class SourcePicker extends React.Component {
       }
     });
     for (let filter of this.state.filters) {
-      if (filter == "<Untagged>") {
-        options.push({label: "<Untagged> (" + untaggedCount + ")", value: "<Untagged>"});
-        defaultValues.push({label: "<Untagged> (" + untaggedCount + ")", value: "<Untagged>"});
-      } else if (filter == "<Offline>") {
-        options.push({label: "<Offline> (" + offlineCount + ")", value: "<Offline>"});
-        defaultValues.push({label: "<Offline> (" + offlineCount + ")", value: "<Offline>"});
-      } else {
-        options.push({label: filter + " (" + tags.get(filter) + ")", value: filter});
-        defaultValues.push({label: filter + " (" + tags.get(filter) + ")", value: filter});
+      if (filter == "<Offline>") { // This is offline filter
+        const opt = {label: "<Offline> (" + offlineCount + ")", value: "<Offline>"};
+        options.push(opt);
+        defaultValues.push(opt);
+      } else if (filter == "<Untagged>") { // This is untagged filter
+        const opt = {label: "<Untagged> (" + untaggedCount + ")", value: "<Untagged>"};
+        options.push(opt);
+        defaultValues.push(opt);
+      } else if (filter.endsWith("~")) { // This is a tag filter
+        filter = filter.substring(0, filter.length-1);
+        const opt = {label: filter + " (" + tags.get(filter) + ")", value: filter + "~"};
+        options.push(opt);
+        defaultValues.push(opt);
+      } else { // This is a search filter
+        const opt = {label: filter, value: filter};
+        options.push(opt);
+        defaultValues.push(opt);
       }
     }
 
@@ -100,7 +137,7 @@ export default class SourcePicker extends React.Component {
     }
     for (let tag of tagKeys) {
       if (!this.state.filters.includes(tag)) {
-        options.push({label: tag + " (" + tags.get(tag) + ")", value: tag});
+        options.push({label: tag + " (" + tags.get(tag) + ")", value: tag + "~"});
       }
     }
 
@@ -124,14 +161,21 @@ export default class SourcePicker extends React.Component {
             keys={["Sort Sources"].concat(Object.values(SF))}
             onChange={this.onSort.bind(this)}
           />
-          {options.length > 0 && !this.props.onOpenLibraryImport && (
-            <div className="ReactMultiSelectCheckboxes">
-              <ReactMultiSelectCheckboxes
+          {!this.props.onOpenLibraryImport && (
+            <div className="ReactSelect SourcePicker__Search">
+              <CreatableSelect
+                components={{DropdownIndicator: null,}}
                 value={defaultValues}
                 options={options}
-                placeholderButtonLabel="Filter Tags"
-                onChange={this.onFilter.bind(this)}
+                inputValue={this.state.searchInput}
+                isClearable
+                isMulti
                 rightAligned={true}
+                placeholder="Search ..."
+                formatCreateLabel={(input: string) => "Search for " + input}
+                onChange={this.handleChange}
+                onInputChange={this.handleInputChange}
+                onKeyDown={this.handleKeyDown}
               />
             </div>
           )}
@@ -159,63 +203,39 @@ export default class SourcePicker extends React.Component {
           )}
         </div>
 
-        <div id="sources" className={`SourcePicker__Sources ${this.props.isSelect ? 'm-select' : ''}`}>
-          {displaySources.length == 0 && (
-            <div className="SourcePicker__Empty">
-              {filtering ? "No results" : this.props.emptyMessage}
-            </div>
-          )}
-          {displaySources.map((source) =>
-            <div className={`SourcePicker__Source ${source.offline ? 'm-offline' : ''} ${source.untagged ? 'm-untagged' : ''}`}
-                 key={source.id}>
-              {this.props.isSelect && (
-                <input type="checkbox" value={source.url} onChange={this.onSelect.bind(this)}
-                       checked={this.state.selected.includes(source.url)}/>
-              )}
-              {this.state.isEditing != source.id && (
-                <div className="SourcePicker__SourceTitle u-clickable"
-                     onClick={this.props.onPlay ? this.onPlay.bind(this, source) : this.onEdit.bind(this, source.id)}>
-                  {source.url}
-                </div>
-              )}
-              {this.state.isEditing == source.id && (
-                <form className="SourcePicker__SourceTitle" onSubmit={this.onEdit.bind(this, -1)}>
-                  <input
-                    autoFocus
-                    type="text"
-                    value={source.url}
-                    onBlur={this.onEdit.bind(this, -1)}
-                    onChange={this.onEditSource.bind(this, source.id)}/>
-                </form>
-              )}
-              {source.tags && (
-                <div id={`tags-${source.id}`} className="SourcePicker__SourceTags">
-                  {source.tags.map((tag) =>
-                    <span className="SourcePicker__SourceTag" key={tag.id}>{tag.name}</span>
-                  )}
-                </div>
-              )}
-
-              <div className="u-button u-destructive u-clickable"
-                   onClick={this.onRemove.bind(this, source.id)}
-                   title="Remove">×️
-              </div>
-              {this.props.config.caching.enabled && getSourceType(source.url) != ST.local && (
-                <div className="u-button u-clean u-clickable"
-                     onClick={this.onClean.bind(this, source.id)}
-                     title="Clear cache"/>)}
-              <div className="u-button u-edit u-clickable"
-                   onClick={this.onEdit.bind(this, source.id)}
-                   title="Edit"/>
-            </div>
-          )}
-        </div>
+        <SourceList
+          sources={displaySources}
+          config={this.props.config}
+          forceUpdate={this.state.forceUpdate}
+          isSelect={this.props.isSelect}
+          emptyMessage={this.props.emptyMessage}
+          yOffset={this.props.yOffset}
+          filters={this.state.filters}
+          selected={this.state.selected}
+          onStartEdit={this.onStartEdit.bind(this)}
+          onUpdateSources={this.props.onUpdateSources.bind(this)}
+          onUpdateSelected={this.onUpdateSelected.bind(this)} />
 
         {this.state.removeAllIsOpen && (
           <Modal onClose={this.toggleRemoveAllModal.bind(this)} title="Remove all?">
             <p>{this.props.removeAllMessage}</p>
             <div className="u-button u-float-right" onClick={this.removeAll.bind(this)}>
               {this.props.removeAllConfirm}
+            </div>
+          </Modal>
+        )}
+        {this.state.isEditing !== -1 && (
+          <Modal onClose={this.onEndEdit.bind(this)} title="Edit Source">
+            <SimpleTextInput
+              label="Source URL"
+              value={this.state.editValue}
+              isEnabled={true}
+              onChange={this.onEdit.bind(this)}
+              onKeyDown={this.confirmEdit.bind(this)}
+              autofocus={true}
+            />
+            <div className="u-button u-float-right" onClick={this.onSaveEdit.bind(this)}>
+              Confirm
             </div>
           </Modal>
         )}
@@ -230,44 +250,26 @@ export default class SourcePicker extends React.Component {
     )
   }
 
-  onPlay(source: LibrarySource) {
-    this.props.savePosition(document.getElementById("sources").scrollTop, this.state.filters, this.state.selected);
-    this.props.onPlay(source);
+  shouldComponentUpdate(props: any, state: any): boolean {
+    return (state.forceUpdate ||
+      (this.props.isSelect !== props.isSelect) ||
+      (this.state.removeAllIsOpen !== state.removeAllIsOpen) ||
+      (this.state.urlImportIsOpen !== state.urlImportIsOpen) ||
+      (this.state.isEditing !== state.isEditing) ||
+      (this.state.editValue !== state.editValue) ||
+      (this.state.filters !== state.filters) ||
+      (this.state.selected.length !== state.selected.length) ||
+      (this.state.searchInput !== state.searchInput) ||
+      (this.props.sources !== props.sources));
   }
 
-  onEnd(evt: any) {
-    let newSources = this.props.sources;
-    arrayMove(newSources, evt.oldIndex, evt.newIndex);
-    this.props.onUpdateSources(newSources);
-  }
-
-  componentDidMount() {
-    this.setState({sortable: null});
-    this.initSortable();
-    document.getElementById("sources").scrollTo(0, this.props.yOffset);
-  }
-
-  componentWillUnmount() {
-    if (this.props.savePosition) {
-      this.props.savePosition(document.getElementById("sources").scrollTop, this.state.filters, this.state.selected);
+  componentDidUpdate(prevProps: any, prevState: any): void {
+    if (prevState.forceUpdate) {
+      this.setState({forceUpdate: false});
     }
   }
 
-  componentDidUpdate() {
-    this.initSortable();
-  }
-
-  initSortable() {
-    if (!this.state.sortable && this.props.sources.length > 0) {
-      this.setState({sortable:
-        Sortable.create(document.getElementById('sources'), {
-          animation: 150,
-          easing: "cubic-bezier(1, 0, 0, 1)",
-          onEnd: this.onEnd.bind(this),
-        })
-      });
-    }
-  }
+  nop() {}
 
   // Use alt+P to access import modal
   // Use alt+U to toggle highlighting untagged sources
@@ -301,12 +303,6 @@ export default class SourcePicker extends React.Component {
     this.setState({}); // Trigger update
   }
 
-  nop() {}
-
-  getSourceURLs() {
-    return this.props.sources.map((s) => s.url);
-  }
-
   toggleURLImportModal() {
     this.setState({urlImportIsOpen: !this.state.urlImportIsOpen});
   }
@@ -317,62 +313,9 @@ export default class SourcePicker extends React.Component {
     });
   }
 
-  onClean(sourceID: number) {
-    const sourceURL = this.props.sources.find((s) => s.id == sourceID).url;
-    const fileType = getSourceType(sourceURL);
-    if (fileType != ST.local) {
-      const cachePath = getCachePath(sourceURL, this.props.config);
-      if (!confirm("Are you SURE you want to delete " + cachePath + "?")) return;
-      rimraf.sync(cachePath);
-    }
-  }
-
-  onEdit(sourceID: number, e: Event) {
-    e.preventDefault();
-    this.setState({isEditing: sourceID});
-    // If user left input blank, remove it from list of sources
-    // Also prevent user from inputing duplicate source
-    // If new entry is a duplicate, make sure we remove the new entry
-    const newSources = Array<LibrarySource>();
-    for (let source of this.props.sources) {
-      if (source.url != "") {
-        if (!newSources.map((s) => s.url).includes(source.url)) {
-          newSources.push(source);
-        } else {
-          for (let existingSource of newSources) {
-            if (existingSource.url == source.url) {
-              if (existingSource.id > source.id) {
-                newSources[newSources.indexOf(existingSource)] = source;
-              }
-              break;
-            }
-          }
-        }
-      }
-    }
-    this.props.onUpdateSources(newSources);
-  }
-
-  onEditSource(sourceID: number, e: React.FormEvent<HTMLInputElement>) {
-    this.props.onUpdateSources(this.props.sources.map(
-      function map(source: LibrarySource) {
-        if (source.id == sourceID) {
-          source.offline = false;
-          source.lastCheck = null;
-          source.url = e.currentTarget.value;
-        }
-        return source;
-      })
-    );
-  }
-
   removeAll() {
     this.toggleRemoveAllModal();
     this.props.onUpdateSources([]);
-  }
-
-  onRemove(sourceID: number) {
-    this.props.onUpdateSources(this.props.sources.filter((s) => s.id != sourceID));
   }
 
   onAdd() {
@@ -419,15 +362,47 @@ export default class SourcePicker extends React.Component {
     this.props.onUpdateSources(newLibrary);
   }
 
-  onSelect(event: any) {
-    const source = event.currentTarget.value;
-    const newSelected = this.state.selected;
-    if (newSelected.includes(source)) {
-      newSelected.splice(newSelected.indexOf(source), 1)
+  getSourceURLs() {
+    return this.props.sources.map((s) => s.url);
+  }
+
+  onStartEdit(isEditing: number) {
+    this.setState({
+      isEditing: isEditing,
+      editValue: this.props.sources.find((s) => s.id == isEditing).url,
+    });
+  }
+
+  onEdit(editValue: string) {
+    this.setState({editValue});
+  }
+
+  onSaveEdit() {
+    // If user left input blank, remove it from list of sources
+    // Also prevent user from inputing duplicate source
+    // If new entry is a duplicate, make sure we remove the new entry
+    const newURL = this.state.editValue;
+    if (newURL == "" || this.getSourceURLs().includes(newURL)) {
+      this.props.onUpdateSources(this.props.sources.filter((s) => s.id != this.state.isEditing));
     } else {
-      newSelected.push(source);
+      this.props.onUpdateSources(this.props.sources.map((source: LibrarySource) => {
+        if (source.id == this.state.isEditing) {
+          source.offline = false;
+          source.lastCheck = null;
+          source.url = this.state.editValue;
+        }
+        return source;
+      }));
     }
-    this.setState({selected: newSelected});
+    this.onEndEdit();
+  }
+
+  onEndEdit() {
+    this.setState({isEditing: -1, editValue: ""});
+  }
+
+  onUpdateSelected(selected: Array<string>) {
+    this.setState({selected});
   }
 
   onSelectAll() {
@@ -450,11 +425,6 @@ export default class SourcePicker extends React.Component {
       }
     }
     this.setState({selected: newSelected});
-  }
-
-  onFilter(tags: Array<{ label: string, value: string }>) {
-    this.state.sortable.option("disabled", tags.length > 0);
-    this.setState({filters: tags.map((t) => t.value)});
   }
 
   onSort(algorithm: string) {
@@ -563,35 +533,28 @@ export default class SourcePicker extends React.Component {
         }));
         break;
     }
+    this.setState({forceUpdate: true});
   }
 
   getDisplaySources() {
     let displaySources = [];
-    const untagged = this.state.filters.find((f) => f == "<Untagged>") != null;
-    const offline = this.state.filters.find((f) => f == "<Offline>") != null;
     const filtering = this.state.filters.length > 0;
     if (filtering) {
       for (let source of this.props.sources) {
         let matchesFilter = true;
-        if (untagged) {
-          if (offline && !source.offline) {
-            matchesFilter = false;
+        for (let filter of this.state.filters) {
+          if (filter == "<Offline>") { // This is offline filter
+            matchesFilter = source.offline;
+          } else if (filter == "<Untagged>") { // This is untagged filter
+            matchesFilter = source.tags.length === 0;
+          } else if (filter.endsWith("~")) { // This is a tag filter
+            const tag = filter.substring(0, filter.length-1);
+            matchesFilter = source.tags.find((t) => t.name == tag) != null;
+          } else { // This is a search filter
+            const regex = new RegExp(filter, "i");
+            matchesFilter = regex.test(source.url);
           }
-          if (source.tags.length > 0) {
-            matchesFilter = false;
-          }
-        } else {
-          for (let filter of this.state.filters) {
-            if (filter == "<Offline>") {
-              if (!source.offline) {
-                matchesFilter = false;
-                break;
-              }
-            } else  if (!source.tags.map((s) => s.name).includes(filter)) {
-              matchesFilter = false;
-              break;
-            }
-          }
+          if (!matchesFilter) break;
         }
         if (matchesFilter) {
           displaySources.push(source);

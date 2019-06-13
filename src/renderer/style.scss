@@ -589,30 +589,25 @@ label.SimpleCheckbox {
   }
 }
 
-.ReactMultiSelectCheckboxes > div {
-  > button {
+.ReactSelect > div {
+  z-index: 5;
+
+  > div:first-child {
     margin-top: 4px;
-    height: 2em;
-    padding: 0 0 0 5px;
+    min-height: 2em;
+    max-height: 2em;
     border-radius: 0;
     border-width: 1px;
     box-shadow: none;
     font-size: 13.3px;
     color: black;
 
-    &:after {
-      content: '▼';
-      font-size: 9px;
-      padding-top: 3px;
-      padding-right: 5px;
-    }
-
-    > span > svg {
-      display: none;
+    > div:first-child {
+      display: -webkit-box;
     }
   }
 
-  > div {
+  > div:not(:first-child) {
     margin-top: 0 !important;
     color: black;
 
@@ -646,16 +641,26 @@ label.SimpleCheckbox {
       }
     }
 
-    > .ReactMultiSelectCheckboxes {
+    > .SourcePicker__Search {
+      width: 20rem;
       float: right;
       margin-left: $smallPadding;
     }
   }
 
-  .SourcePicker__Sources {
+  .Modal {
+    .SimpleTextInput {
+      width: 23rem;
+      input {
+        width: 23rem;
+      }
+    }
+  }
+
+  .SourceList__Sources {
     overflow: auto;
 
-    .SourcePicker__Source {
+    .SourceList__Source {
       padding: $smallPadding;
       line-height: 1.5rem;
       height: 2.5rem;
@@ -675,15 +680,15 @@ label.SimpleCheckbox {
         margin-right: 10px;
       }
 
-      .SourcePicker__SourceTitle {
+      .SourceList__SourceTitle {
         color: black !important;
         display: inline-block;
       }
 
-      .SourcePicker__SourceTags {
+      .SourceList__SourceTags {
         display: inline-block;
 
-        .SourcePicker__SourceTag {
+        .SourceList__SourceTag {
           color: $uiGray;
           padding-left: 1rem;
           font-size: 12px;
@@ -702,7 +707,7 @@ label.SimpleCheckbox {
       }
     }
 
-    .SourcePicker__Empty {
+    .SourceList__Empty {
       text-align: center;
       padding: 1em;
     }
@@ -756,7 +761,7 @@ label.SimpleCheckbox {
       }
     }
 
-    .SourcePicker__Sources {
+    .SourceList__Sources {
       position: fixed;
       top: 5.5rem;
       right: 0;
@@ -768,7 +773,7 @@ label.SimpleCheckbox {
         top: 7rem;
       }
 
-      .SourcePicker__SourceTitle {
+      .SourceList__SourceTitle {
         color: white !important;
         > input {
           width: 250px;
