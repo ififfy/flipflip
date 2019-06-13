@@ -212,9 +212,13 @@ export default class SourcePicker extends React.Component {
           yOffset={this.props.yOffset}
           filters={this.state.filters}
           selected={this.state.selected}
-          onStartEdit={this.onStartEdit.bind(this)}
           onUpdateSources={this.props.onUpdateSources.bind(this)}
-          onUpdateSelected={this.onUpdateSelected.bind(this)} />
+          onUpdateSelected={this.onUpdateSelected.bind(this)}
+          onStartEdit={this.onStartEdit.bind(this)}
+          savePosition={this.props.savePosition ? this.props.savePosition.bind(this) : null}
+          onOpenLibraryImport={this.props.onOpenLibraryImport ? this.props.onOpenLibraryImport.bind(this) : null}
+          importSourcesFromLibrary={this.props.importSourcesFromLibrary? this.props.importSourcesFromLibrary.bind(this) : null}
+          onPlay={this.props.onPlay ? this.props.onPlay.bind(this) : null} />
 
         {this.state.removeAllIsOpen && (
           <Modal onClose={this.toggleRemoveAllModal.bind(this)} title="Remove all?">
