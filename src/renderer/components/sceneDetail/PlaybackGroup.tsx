@@ -42,6 +42,10 @@ export default class PlaybackGroup extends React.Component {
           text={"Randomize"}
           isOn={this.props.scene.randomize}
           onChange={this.changeKey.bind(this, 'randomize').bind(this)} />
+        <SimpleCheckbox
+          text={"Show All Images Before Looping"}
+          isOn={this.props.scene.forceAll}
+          onChange={this.changeKey.bind(this, 'forceAll').bind(this)} />
       </ControlGroup>
     );
   }

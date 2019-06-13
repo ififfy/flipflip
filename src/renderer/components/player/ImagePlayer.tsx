@@ -52,6 +52,9 @@ export default class ImagePlayer extends React.Component {
   };
 
   _isMounted = false;
+  _loadedURLs = Array<string>();
+  _nextIndex = 0;
+  _nextSourceIndex = new Map<String, number>();
 
   render() {
     if (this.state.historyPaths.length < 1 || !this.props.hasStarted) return <div className="ImagePlayer m-empty"/>;
@@ -107,6 +110,9 @@ export default class ImagePlayer extends React.Component {
 
   componentDidMount() {
     this._isMounted = true;
+    this._loadedURLs = new Array<string>();
+    this._nextIndex = 0;
+    this._nextSourceIndex = new Map<String, number>();
     if (this.props.advanceHack) {
       this.props.advanceHack.listener = () => {
         // advance, ignoring isPlaying status and not scheduling another
@@ -195,11 +201,17 @@ export default class ImagePlayer extends React.Component {
       return;
     }
 
-    for (let i = 0; i < this.props.maxLoadingAtOnce; i++) {
-      this.runFetchLoop(i, 0, true);
-    }
+    this.startFetchLoops(this.props.maxLoadingAtOnce);
 
     this.advance(true, true);
+  }
+
+  startFetchLoops(max: number, loop = 0) {
+    if (loop < max) {
+      this.runFetchLoop(loop, true);
+      // Put a small delay between our loops
+      setTimeout(this.startFetchLoops.bind(this, max, loop+1), 10);
+    }
   }
 
   cache(i: HTMLImageElement | HTMLVideoElement) {
@@ -252,48 +264,69 @@ export default class ImagePlayer extends React.Component {
     }
   }
 
-  wait(i: number, l: number) {
-    // Wait for the display loop to use an image (it might be fast, or paused)
-    setTimeout(() => this.runFetchLoop(i, l), 100);
-  }
-
-  runFetchLoop(i: number, l: number, isStarting = false) {
+  runFetchLoop(i: number, isStarting = false) {
     if (!this._isMounted && !isStarting) return;
 
     if (this.state.readyToDisplay.length >= this.props.maxLoadingAtOnce) {
-      this.wait(i, l);
+      // Wait for the display loop to use an image (it might be fast, or paused)
+      setTimeout(() => this.runFetchLoop(i), 100);
       return;
     }
 
     let source;
     let collection;
     let url: string;
-    let loopID = (l * this.props.maxLoadingAtOnce) + i;
     if (this.props.scene.weightFunction == WF.sources) {
       source = getRandomListItem(Array.from(this.props.allURLs.keys()));
       collection = this.props.allURLs.get(source);
       if (!(collection && collection.length)) {
-        this.wait(i, l);
+        setTimeout(() => this.runFetchLoop(i), 0);
         return;
+      }
+      if (this.props.scene.forceAll) {
+        collection = collection.filter((u) => !this._loadedURLs.includes(u));
+        if (!(collection && collection.length)) {
+          const remainingLibrary = [].concat.apply([], Array.from(this.props.allURLs.values())).filter((u: string) => !this._loadedURLs.includes(u));
+          if (remainingLibrary.length === 0) {
+            this._loadedURLs = new Array<string>();
+          }
+          setTimeout(() => this.runFetchLoop(i), 0);
+          return;
+        }
       }
       if (this.props.scene.randomize) {
         url = getRandomListItem(collection);
       } else {
-        url = collection[loopID%collection.length];
+        let index = this._nextSourceIndex.get(source);
+        if (!index) {
+          index = 0;
+        }
+        url = collection[index%collection.length];
+        this._nextSourceIndex.set(source, index+1)
       }
     } else {
       collection = [].concat.apply([], Array.from(this.props.allURLs.keys()));
       if (!(collection && collection.length)) {
-        this.wait(i, l);
+        setTimeout(() => this.runFetchLoop(i), 0);
         return;
+      }
+      if (this.props.scene.forceAll) {
+        collection = collection.filter((u: string) => !this._loadedURLs.includes(u));
+        if (!(collection && collection.length)) {
+          this._loadedURLs = new Array<string>();
+          setTimeout(() => this.runFetchLoop(i), 0);
+          return;
+        }
       }
       if (this.props.scene.randomize) {
         url = getRandomListItem(collection);
       } else {
-        url = collection[loopID%collection.length];
+        url = collection[this._nextIndex++%collection.length];
       }
       source = this.props.allURLs.get(url)[0];
     }
+
+    this._loadedURLs.push(url);
 
     if (isVideo(url, false)) {
       const video = document.createElement('video');
@@ -315,7 +348,7 @@ export default class ImagePlayer extends React.Component {
         if (this.state.historyPaths.length === 0) {
           this.advance(false, false);
         }
-        this.runFetchLoop(i, l+1);
+        this.runFetchLoop(i);
       };
 
       const errorCallback = () => {
@@ -370,7 +403,7 @@ export default class ImagePlayer extends React.Component {
         if (this.state.historyPaths.length === 0) {
           this.advance(false, false);
         }
-        this.runFetchLoop(i, l+1);
+        this.runFetchLoop(i);
       };
 
       const errorCallback = () => {
@@ -415,11 +448,11 @@ export default class ImagePlayer extends React.Component {
 
         // Exclude non-animated gifs from gifs
         if (this.props.scene.imageTypeFilter == IF.gifs && info && !info.animated) {
-          this.runFetchLoop(i, l+1);
+          this.runFetchLoop(i);
           return;
           // Exclude animated gifs from stills
         } else if (this.props.scene.imageTypeFilter == IF.stills && info && info.animated) {
-          this.runFetchLoop(i, l+1);
+          this.runFetchLoop(i);
           return;
         }
 
