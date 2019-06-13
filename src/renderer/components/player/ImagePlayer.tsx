@@ -277,7 +277,11 @@ export default class ImagePlayer extends React.Component {
     let collection;
     let url: string;
     if (this.props.scene.weightFunction == WF.sources) {
-      source = getRandomListItem(Array.from(this.props.allURLs.keys()));
+      if (this.props.scene.randomize) {
+        source = getRandomListItem(Array.from(this.props.allURLs.keys()));
+      } else {
+        source = Array.from(this.props.allURLs.keys())[this._nextIndex++%this.props.allURLs.size];
+      }
       collection = this.props.allURLs.get(source);
       if (!(collection && collection.length)) {
         setTimeout(() => this.runFetchLoop(i), 0);
