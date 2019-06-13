@@ -6,7 +6,7 @@ import AudioGroup from "./AudioGroup";
 import EffectGroup from "./EffectGroup";
 import ImageGroup from "./ImageGroup";
 import TextGroup from "./TextGroup";
-import PlaybackGroup from "./PlaybackGroup";
+import TimingGroup from "./TimingGroup";
 import LibrarySource from "../library/LibrarySource";
 import Config from "../../data/Config";
 
@@ -89,9 +89,8 @@ export default class SceneDetail extends React.Component {
         </div>
 
         <div className="SceneDetail__Content ControlGroupGroup">
-          <PlaybackGroup
+          <TimingGroup
             scene={this.props.scene}
-            isPlayer={false}
             onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
           <EffectGroup
@@ -102,6 +101,7 @@ export default class SceneDetail extends React.Component {
 
           <ImageGroup
             scene={this.props.scene}
+            isPlayer={false}
             onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
           <AudioGroup

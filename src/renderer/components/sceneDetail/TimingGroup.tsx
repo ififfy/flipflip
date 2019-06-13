@@ -1,18 +1,15 @@
 import * as React from 'react';
 
-import {TF, WF} from "../../data/const";
+import {TF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
 import Scene from "../../data/Scene";
 import ControlGroup from "./ControlGroup";
 import SimpleOptionPicker from "../ui/SimpleOptionPicker";
 import SimpleNumberInput from "../ui/SimpleNumberInput";
-import SimpleRadioInput from "../ui/SimpleRadioInput";
-import SimpleCheckbox from "../ui/SimpleCheckbox";
 
-export default class PlaybackGroup extends React.Component {
+export default class TimingGroup extends React.Component {
   readonly props: {
     scene: Scene | SceneSettings,
-    isPlayer: boolean,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 
@@ -30,22 +27,6 @@ export default class PlaybackGroup extends React.Component {
           label="Time between images (ms)"
           value={parseInt(this.props.scene.timingConstant, 10)}
           min={0}/>
-        {!this.props.isPlayer && (
-          <SimpleRadioInput
-            label={"Weight"}
-            groupName={"wf"}
-            value={this.props.scene.weightFunction}
-            keys={Object.values(WF)}
-            onChange={this.changeKey.bind(this, 'weightFunction').bind(this)} />
-        )}
-        <SimpleCheckbox
-          text={"Randomize"}
-          isOn={this.props.scene.randomize}
-          onChange={this.changeKey.bind(this, 'randomize').bind(this)} />
-        <SimpleCheckbox
-          text={"Show All Images Before Looping"}
-          isOn={this.props.scene.forceAll}
-          onChange={this.changeKey.bind(this, 'forceAll').bind(this)} />
       </ControlGroup>
     );
   }

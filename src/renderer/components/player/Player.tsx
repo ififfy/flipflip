@@ -15,8 +15,9 @@ import Tag from "../library/Tag";
 import AudioGroup from "../sceneDetail/AudioGroup";
 import EffectGroup from "../sceneDetail/EffectGroup";
 import TextGroup from "../sceneDetail/TextGroup";
-import PlaybackGroup from "../sceneDetail/PlaybackGroup";
+import TimingGroup from "../sceneDetail/TimingGroup";
 import Progress from "../ui/Progress";
+import ImageGroup from "../sceneDetail/ImageGroup";
 
 const {getCurrentWindow, Menu, MenuItem, app} = remote;
 
@@ -219,9 +220,8 @@ export default class Player extends React.Component {
         {this.state.hasStarted && (
           <div className="SceneOptions u-button-sidebar">
             <h2 className="SceneOptionsHeader">Scene Options</h2>
-            <PlaybackGroup
+            <TimingGroup
               scene={this.props.scene}
-              isPlayer={true}
               onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
             <EffectGroup
@@ -229,6 +229,11 @@ export default class Player extends React.Component {
               onUpdateScene={this.props.onUpdateScene.bind(this)}
               allScenes={this.props.scenes}
               libraryPlay={this.props.tags != null}/>
+
+            <ImageGroup
+              scene={this.props.scene}
+              isPlayer={true}
+              onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
             <AudioGroup
               scene={this.props.scene}

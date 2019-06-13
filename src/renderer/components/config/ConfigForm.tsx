@@ -13,7 +13,7 @@ import CacheGroup from "./CacheGroup";
 import EffectGroup from "../sceneDetail/EffectGroup";
 import ImageGroup from "../sceneDetail/ImageGroup";
 import TextGroup from "../sceneDetail/TextGroup";
-import PlaybackGroup from "../sceneDetail/PlaybackGroup";
+import TimingGroup from "../sceneDetail/TimingGroup";
 import Modal from "../ui/Modal";
 import BackupGroup from "./BackupGroup";
 import DisplayGroup from "./DisplayGroup";
@@ -65,9 +65,8 @@ export default class ConfigForm extends React.Component {
         </div>
 
         <div className="Config__Content ControlGroupGroup">
-          <PlaybackGroup
+          <TimingGroup
             scene={this.state.config.defaultScene}
-            isPlayer={false}
             onUpdateScene={this.onUpdateDefaultScene.bind(this)}/>
 
           <EffectGroup
@@ -78,6 +77,7 @@ export default class ConfigForm extends React.Component {
 
           <ImageGroup
             scene={this.state.config.defaultScene}
+            isPlayer={false}
             onUpdateScene={this.onUpdateDefaultScene.bind(this)}/>
 
           <TextGroup
