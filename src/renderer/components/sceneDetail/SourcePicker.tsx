@@ -109,24 +109,14 @@ export default class SourcePicker extends React.Component {
       }
     });
     for (let filter of this.state.filters) {
-      if (filter == "<Offline>") { // This is offline filter
-        const opt = {label: "<Offline> (" + offlineCount + ")", value: "<Offline>"};
-        options.push(opt);
-        defaultValues.push(opt);
-      } else if (filter == "<Untagged>") { // This is untagged filter
-        const opt = {label: "<Untagged> (" + untaggedCount + ")", value: "<Untagged>"};
-        options.push(opt);
-        defaultValues.push(opt);
-      } else if (filter.endsWith("~")) { // This is a tag filter
-        filter = filter.substring(0, filter.length-1);
-        const opt = {label: filter + " (" + tags.get(filter) + ")", value: filter + "~"};
-        options.push(opt);
-        defaultValues.push(opt);
-      } else { // This is a search filter
-        const opt = {label: filter, value: filter};
-        options.push(opt);
-        defaultValues.push(opt);
+      let opt;
+      if (filter.endsWith("~")) { // This is a tag filter
+        opt = {label: filter.substring(0, filter.length-1) + " (Tag)", value: filter};
+      } else {
+        opt = {label: filter, value: filter};
       }
+      options.push(opt);
+      defaultValues.push(opt);
     }
 
     if (untaggedCount > 0 && !this.state.filters.includes("<Untagged>")) {
@@ -136,7 +126,7 @@ export default class SourcePicker extends React.Component {
       options.push({label: "<Offline> (" + offlineCount + ")", value: "<Offline>"});
     }
     for (let tag of tagKeys) {
-      if (!this.state.filters.includes(tag)) {
+      if (!this.state.filters.includes(tag + "~")) {
         options.push({label: tag + " (" + tags.get(tag) + ")", value: tag + "~"});
       }
     }
@@ -149,8 +139,7 @@ export default class SourcePicker extends React.Component {
               <div className={`u-button ${this.state.filters.length > 0 ? 'u-disabled' : 'u-clickable'}`} onClick={this.state.filters.length > 0 ? this.nop : this.onAdd.bind(this)}>+ Add local files</div>
               <div className={`u-button ${this.state.filters.length > 0 ? 'u-disabled' : 'u-clickable'}`} onClick={this.state.filters.length > 0 ? this.nop : this.onAddURL.bind(this)}>+ Add URL</div>
               {this.props.onOpenLibraryImport && (
-                <div className="u-button u-clickable" onClick={this.props.onOpenLibraryImport.bind(this)}>+ Add From
-                  Library</div>
+                <div className="u-button u-clickable" onClick={this.props.onOpenLibraryImport.bind(this)}>+ Add From Library</div>
               )}
             </div>
           )}
@@ -163,6 +152,7 @@ export default class SourcePicker extends React.Component {
           />
           {!this.props.onOpenLibraryImport && (
             <div className="ReactSelect SourcePicker__Search">
+              <div>({displaySources.length} Sources)</div>
               <CreatableSelect
                 components={{DropdownIndicator: null,}}
                 value={defaultValues}
@@ -555,6 +545,7 @@ export default class SourcePicker extends React.Component {
             const tag = filter.substring(0, filter.length-1);
             matchesFilter = source.tags.find((t) => t.name == tag) != null;
           } else { // This is a search filter
+            filter = filter.replace("\\", "\\\\");
             if (filter.startsWith("-")) {
               filter = filter.substring(1, filter.length);
               const regex = new RegExp(filter, "i");

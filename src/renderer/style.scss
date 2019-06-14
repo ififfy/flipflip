@@ -589,30 +589,34 @@ label.SimpleCheckbox {
   }
 }
 
-.ReactSelect > div {
-  z-index: 5;
+.ReactSelect {
+  display: flex;
 
-  > div:first-child {
-    margin-top: 4px;
-    min-height: 2em;
-    max-height: 2em;
-    border-radius: 0;
-    border-width: 1px;
-    box-shadow: none;
-    font-size: 13.3px;
-    color: black;
+  > div:last-child {
+    z-index: 5;
 
     > div:first-child {
-      display: -webkit-box;
+      margin-top: 4px;
+      min-height: 2em;
+      max-height: 2em;
+      border-radius: 0;
+      border-width: 1px;
+      box-shadow: none;
+      font-size: 13.3px;
+      color: black;
+
+      > div:first-child {
+        display: -webkit-box;
+      }
     }
-  }
 
-  > div:not(:first-child) {
-    margin-top: 0 !important;
-    color: black;
+    > div:not(:first-child) {
+      margin-top: 0 !important;
+      color: black;
 
-    > div > div > div > div > input {
-      vertical-align: -2px;
+      > div > div > div > div > input {
+        vertical-align: -2px;
+      }
     }
   }
 }
@@ -642,9 +646,15 @@ label.SimpleCheckbox {
     }
 
     > .SourcePicker__Search {
-      width: 20rem;
       float: right;
       margin-left: $smallPadding;
+      > div:first-child {
+        font-size: 17px;
+        margin: 5px 8px;
+      }
+      > div:last-child {
+        width: 20rem;
+      }
     }
   }
 
