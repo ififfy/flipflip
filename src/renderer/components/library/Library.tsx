@@ -3,7 +3,6 @@ import tumblr from 'tumblr.js';
 import wretch from 'wretch';
 import Snoowrap from "snoowrap";
 
-import {ST} from "../../data/const";
 import LibrarySource from "./LibrarySource";
 import Tag from "./Tag";
 import Config from "../../data/Config";
@@ -52,28 +51,36 @@ export default class Library extends React.Component {
             )}
           </div>
           {!this.props.isSelect && !this.props.isBatchTag && !this.state.showProgress && (
-            <div className="u-button-row-right">
-              <select
-                value={""}
-                onChange={this.onChangeImport.bind(this)}>
-                <option value={""} key={""} disabled={true}>Remote Import</option>
-                <option value={ST.tumblr} key={ST.tumblr}>Tumblr Following</option>
-                <option value={ST.reddit} key={ST.reddit} disabled={this.state.inProgress}>Reddit Subscriptions</option>
-              </select>
+            <div className="Library__Buttons u-button-row-right">
               <div
-                className="Library__MarkOffline u-button u-clickable"
+                className="Library__TumblirImport u-button u-icon-button u-clickable"
+                title="Import Reddit Subscriptions"
+                onClick={this.importReddit.bind(this)}>
+                <div className="u-reddit"/>
+              </div>
+              <div
+                className="Library__TumblirImport u-button u-icon-button u-clickable"
+                title="Import Tumblr Following"
+                onClick={this.importTumblr.bind(this)}>
+                <div className="u-tumblr"/>
+              </div>
+              <div
+                className="Library__MarkOffline u-button u-icon-button u-clickable"
+                title="Mark Offline Sources"
                 onClick={this.markOffline.bind(this)}>
-                Mark Offline
+                <div className="u-mark-offline"/>
               </div>
               <div
-                className="Library__BatchTag u-button u-clickable"
-                onClick={this.props.batchTag.bind(this, true)}>
-                Batch Tag
-              </div>
-              <div
-                className="Library__ManageTags u-button u-clickable"
+                className="Library__ManageTags u-button u-icon-button u-clickable"
+                title="Manage Tags"
                 onClick={this.props.manageTags.bind(this)}>
-                Manage Tags
+                <div className="u-tags"/>
+              </div>
+              <div
+                className="Library__BatchTag u-button u-icon-button u-clickable"
+                title="Batch Tag"
+                onClick={this.props.batchTag.bind(this, true)}>
+                <div className="u-batch"/>
               </div>
             </div>
           )}
@@ -110,15 +117,6 @@ export default class Library extends React.Component {
   }
 
   nop() {}
-
-  onChangeImport(e: React.FormEvent<HTMLSelectElement>) {
-    const importType = e.currentTarget.value;
-    if (importType == ST.tumblr) {
-      this.importTumblr();
-    } else if (importType == ST.reddit) {
-      this.importReddit();
-    }
-  }
 
   goBack() {
     if (this.state.showProgress) {

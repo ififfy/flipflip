@@ -154,6 +154,57 @@ a {
   }
 }
 
+.u-icon-button {
+  margin-top: -4px;
+
+  > div {
+    cursor: pointer;
+    width: 1.5rem;
+    height: 1.5rem;
+    background-size: 1.5rem 1.5rem !important;
+  }
+
+  .u-tags {
+    background: url("./icons/tag.svg") no-repeat;
+  }
+
+  .u-batch {
+    background: url("./icons/batch.svg") no-repeat;
+  }
+
+  .u-mark-offline {
+    background: url("./icons/mark-offline.svg") no-repeat;
+  }
+
+  .u-tumblr {
+    background: url("./icons/tumblr.svg") no-repeat;
+  }
+
+  .u-reddit {
+    background: url("./icons/reddit.svg") no-repeat;
+  }
+
+  .u-play {
+    background: url("./icons/play.svg") no-repeat;
+  }
+
+  .u-pause {
+    background: url("./icons/pause.svg") no-repeat;
+  }
+
+  .u-left-arrow {
+    background: url("./icons/left-arrow.svg") no-repeat;
+  }
+
+  .u-right-arrow {
+    background: url("./icons/right-arrow.svg") no-repeat;
+  }
+
+  .u-fullscreen {
+    background: url("./icons/fullscreen.svg") no-repeat;
+  }
+}
+
 .u-fill-container {
   position: absolute;
   top: 0;
@@ -249,14 +300,6 @@ a {
   width: 1rem;
   height: 1rem;
   background: url("./icons/gear.svg") no-repeat;
-  background-size: 1rem 1rem;
-}
-
-.u-fullscreen {
-  cursor: pointer;
-  width: 1rem;
-  height: 1rem;
-  background: url("./icons/fullscreen.svg") no-repeat;
   background-size: 1rem 1rem;
 }
 

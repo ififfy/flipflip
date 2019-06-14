@@ -82,8 +82,9 @@ export default class SceneDetail extends React.Component {
               </div>
             )}
             <div onClick={this.props.scene.sources.length > 0 ? this.play.bind(this) : this.nop.bind(this)}
-                 className={`u-clickable u-button ${this.props.scene.sources.length > 0 ? '' : 'u-disabled'}`}>
-              Play
+                 title="Play"
+                 className={`u-icon-button u-clickable u-button ${this.props.scene.sources.length > 0 ? '' : 'u-disabled'}`}>
+              <div className="u-play"/>
             </div>
           </div>
         </div>

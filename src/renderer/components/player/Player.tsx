@@ -184,34 +184,38 @@ export default class Player extends React.Component {
               />
             )}
             <div
-              className={`FullscreenButton u-button u-clickable`}
-              onClick={this.toggleFull.bind(this)}
-              style={{verticalAlign: 'bottom'}}>
+              className={`FullscreenButton u-button u-icon-button u-clickable`}
+              title="Toggle Fullscreen"
+              onClick={this.toggleFull.bind(this)}>
               <div className="u-fullscreen"/>
             </div>
             <div
-              className={`HistoryBackButton u-button u-clickable ${canGoBack ? '' : 'u-disabled'}`}
+              className={`HistoryBackButton u-button u-icon-button u-clickable ${canGoBack ? '' : 'u-disabled'}`}
+              title="Backwards"
               onClick={canGoBack ? this.historyBack.bind(this) : this.nop}>
-              &larr; back
+              <div className="u-left-arrow"/>
             </div>
             {this.state.isPlaying && (
               <div
-                className="PauseButton u-button u-clickable"
+                className="PauseButton u-button u-icon-button u-clickable"
+                title="Pause"
                 onClick={this.setPlayPause.bind(this, false)}>
-                Pause
+                <div className="u-pause"/>
               </div>
             )}
             {!this.state.isPlaying && (
               <div
-                className="PlayButton u-button u-clickable"
+                className="PlayButton u-button u-icon-button u-clickable"
+                title="Play"
                 onClick={this.setPlayPause.bind(this, true)}>
-                Play
+                <div className="u-play"/>
               </div>
             )}
             <div
-              className={`HistoryForwardButton u-button u-clickable ${canGoForward ? '' : 'u-disabled'}`}
+              className={`HistoryForwardButton u-button u-icon-button u-clickable ${canGoForward ? '' : 'u-disabled'}`}
+              title="Forwards"
               onClick={canGoForward ? this.historyForward.bind(this) : this.nop}>
-              forward &rarr;
+              <div className="u-right-arrow"/>
             </div>
           </div>
           <div className="BackButton u-button u-clickable" onClick={this.navigateBack.bind(this)}>Back</div>
