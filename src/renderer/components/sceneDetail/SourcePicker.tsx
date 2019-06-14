@@ -61,7 +61,6 @@ export default class SourcePicker extends React.Component {
     filters: this.props.filters,
     selected: this.props.selected,
     searchInput: "",
-    forceUpdate: false,
   };
 
   _selectedTags: Array<any> = null;
@@ -170,26 +169,11 @@ export default class SourcePicker extends React.Component {
     return (
       <div className="SourcePicker" onKeyDown={this.secretHotkey.bind(this)} tabIndex={0}>
         <div className="SourcePicker__Buttons">
-          {!this.props.isSelect && !this.props.isBatchTag && (
-            <div className="SourcePicker__AddButtons">
-              <div className={`u-button ${this.state.filters.length > 0 ? 'u-disabled' : 'u-clickable'}`} onClick={this.state.filters.length > 0 ? this.nop : this.onAdd.bind(this)}>+ Add local files</div>
-              <div className={`u-button ${this.state.filters.length > 0 ? 'u-disabled' : 'u-clickable'}`} onClick={this.state.filters.length > 0 ? this.nop : this.onAddURL.bind(this)}>+ Add URL</div>
-              {this.props.onOpenLibraryImport && (
-                <div className="u-button u-clickable" onClick={this.props.onOpenLibraryImport.bind(this)}>+ Add From Library</div>
-              )}
-            </div>
-          )}
-          <SimpleOptionPicker
-            label=""
-            value="Sort Sources"
-            disableFirst={true}
-            keys={["Sort Sources"].concat(Object.values(SF))}
-            onChange={this.onSort.bind(this)}
-          />
           {!this.props.onOpenLibraryImport && (
             <div className="ReactSelect SourcePicker__Search">
               <div>({displaySources.length} Sources)</div>
               <CreatableSelect
+                className="CreatableSelect"
                 components={{DropdownIndicator: null,}}
                 value={defaultValues}
                 options={options}
@@ -239,16 +223,17 @@ export default class SourcePicker extends React.Component {
         <SourceList
           sources={displaySources}
           config={this.props.config}
-          forceUpdate={this.state.forceUpdate}
           isSelect={this.props.isSelect || this.props.isBatchTag}
           emptyMessage={this.props.emptyMessage}
           yOffset={this.props.yOffset}
           filters={this.state.filters}
           selected={this.state.selected}
           onUpdateSources={this.props.onUpdateSources.bind(this)}
+          addSources={this.addSources.bind(this)}
           onUpdateSelected={this.onUpdateSelected.bind(this)}
           onStartEdit={this.onStartEdit.bind(this)}
           savePosition={this.props.savePosition ? this.props.savePosition.bind(this) : null}
+          onOpenLibraryImport={this.props.onOpenLibraryImport ? this.props.onOpenLibraryImport.bind(this) : null}
           onPlay={this.props.onPlay ? this.props.onPlay.bind(this) : null} />
 
         {this.state.removeAllIsOpen && (
@@ -313,8 +298,7 @@ export default class SourcePicker extends React.Component {
   }
 
   shouldComponentUpdate(props: any, state: any): boolean {
-    return (state.forceUpdate ||
-      (this.props.isSelect !== props.isSelect) ||
+    return ((this.props.isSelect !== props.isSelect) ||
       (this.props.isBatchTag !== props.isBatchTag) ||
       (this.state.removeAllIsOpen !== state.removeAllIsOpen) ||
       (this.state.urlImportIsOpen !== state.urlImportIsOpen) ||
@@ -325,12 +309,6 @@ export default class SourcePicker extends React.Component {
       (this.state.selected.length !== state.selected.length) ||
       (this.state.searchInput !== state.searchInput) ||
       (this.props.sources !== props.sources));
-  }
-
-  componentDidUpdate(prevProps: any, prevState: any): void {
-    if (prevState.forceUpdate) {
-      this.setState({forceUpdate: false});
-    }
   }
 
   nop() {}
@@ -444,28 +422,6 @@ export default class SourcePicker extends React.Component {
     this.props.onUpdateSources([]);
   }
 
-  onAdd() {
-    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory', 'multiSelections']});
-    if (!result) return;
-    this.addSources(result);
-  }
-
-  onAddURL() {
-    let id = this.props.sources.length + 1;
-    this.props.sources.forEach((s) => {
-      id = Math.max(s.id + 1, id);
-    });
-    this.setState({isEditing: id});
-
-    let newLibrary = this.props.sources;
-    newLibrary.unshift(new LibrarySource({
-      url: "",
-      id: id,
-      tags: new Array<Tag>(),
-    }));
-    this.props.onUpdateSources(newLibrary);
-  }
-
   addSources(sources: Array<string>) {
     // dedup
     let sourceURLs = this.getSourceURLs();
@@ -476,7 +432,7 @@ export default class SourcePicker extends React.Component {
       id = Math.max(s.id + 1, id);
     });
 
-    let newLibrary = this.props.sources;
+    let newLibrary = Array.from(this.props.sources);
     for (let url of sources) {
       newLibrary.unshift(new LibrarySource({
         url: url,
@@ -551,115 +507,6 @@ export default class SourcePicker extends React.Component {
       }
     }
     this.setState({selected: newSelected});
-  }
-
-  onSort(algorithm: string) {
-    switch (algorithm) {
-      case SF.alphaA:
-        this.props.onUpdateSources(this.props.sources.sort((a, b) => {
-          const aName = getFileGroup(a.url).toLowerCase();
-          const bName = getFileGroup(b.url).toLowerCase();
-          if (aName < bName) {
-            return -1;
-          } else if (aName > bName) {
-            return 1;
-          } else {
-            const aType = getSourceType(a.url);
-            const bType = getSourceType(b.url);
-            if (aType > bType) {
-              return -1;
-            } else if (aType < bType) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }
-        }));
-        break;
-      case SF.alphaD:
-        this.props.onUpdateSources(this.props.sources.sort((a, b) => {
-          const aName = getFileGroup(a.url).toLowerCase();
-          const bName = getFileGroup(b.url).toLowerCase();
-          if (aName > bName) {
-            return -1;
-          } else if (aName < bName) {
-            return 1;
-          } else {
-            const aType = getSourceType(a.url);
-            const bType = getSourceType(b.url);
-            if (aType > bType) {
-              return -1;
-            } else if (aType < bType) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }
-        }));
-        break;
-      case SF.alphaFullA:
-        this.props.onUpdateSources(this.props.sources.sort((a, b) => {
-          const aUrl = a.url.toLowerCase();
-          const bUrl = b.url.toLocaleLowerCase();
-          if (aUrl < bUrl) {
-            return -1;
-          } else if (aUrl > bUrl) {
-            return 1;
-          } else {
-            return 0;
-          }
-        }));
-        break;
-      case SF.alphaFullD:
-        this.props.onUpdateSources(this.props.sources.sort((a, b) => {
-          const aUrl = a.url.toLowerCase();
-          const bUrl = b.url.toLocaleLowerCase();
-          if (aUrl > bUrl) {
-            return -1;
-          } else if (aUrl < bUrl) {
-            return 1;
-          } else {
-            return 0;
-          }
-        }));
-        break;
-      case SF.dateA:
-        this.props.onUpdateSources(this.props.sources.sort((a, b) => {
-          if (a.id < b.id) {
-            return -1;
-          } else if (a.id > b.id) {
-            return 1;
-          } else {
-            return 0;
-          }
-        }));
-        break;
-      case SF.dateD:
-        this.props.onUpdateSources(this.props.sources.sort((a, b) => {
-          if (a.id > b.id) {
-            return -1;
-          } else if (a.id < b.id) {
-            return 1;
-          } else {
-            return 0;
-          }
-        }));
-        break;
-      case SF.type:
-        this.props.onUpdateSources(this.props.sources.sort((a, b) => {
-          const aType = getSourceType(a.url);
-          const bType = getSourceType(b.url);
-          if (aType > bType) {
-            return -1;
-          } else if (aType < bType) {
-            return 1;
-          } else {
-            return 0;
-          }
-        }));
-        break;
-    }
-    this.setState({forceUpdate: true});
   }
 
   getDisplaySources() {

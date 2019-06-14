@@ -592,7 +592,7 @@ label.SimpleCheckbox {
 .ReactSelect {
   display: flex;
 
-  > div:last-child {
+  > div.CreatableSelect {
     width: 20rem;
     z-index: 5;
 
@@ -626,32 +626,58 @@ label.SimpleCheckbox {
   outline: none;
 
   .SourcePicker__Buttons {
+    display: inline;
     height: 3.2rem;
-
-    > .SourcePicker__AddButtons {
-      float: right;
-      div {
-        margin-left: $smallPadding;
-      }
-    }
-
-    > .SimpleOptionPicker {
-      float: right;
-      margin-left: $smallPadding;
-      select {
-        outline: none;
-        margin-top: 4px;
-        height: 2em;
-        cursor: pointer;
-      }
-    }
 
     > .SourcePicker__Search {
       float: right;
       margin-left: $smallPadding;
-      > div:first-child {
+      > div:not(.CreatableSelect) {
         font-size: 17px;
         margin: 5px 8px;
+      }
+    }
+  }
+
+  .SourceList {
+    width: 100%;
+    display: inline;
+
+    .SourceList__Sources {
+      clear: both;
+    }
+
+    .SourceList__Buttons {
+      height: 3.2rem;
+
+      > .SourceList__AddButtons {
+        float: right;
+
+        div {
+          margin-left: $smallPadding;
+        }
+      }
+
+      > .SimpleOptionPicker {
+        float: right;
+        margin-left: $smallPadding;
+
+        select {
+          outline: none;
+          margin-top: 4px;
+          height: 2em;
+          cursor: pointer;
+        }
+      }
+
+      > .SourcePicker__Search {
+        float: right;
+        margin-left: $smallPadding;
+
+        > div:first-child {
+          font-size: 17px;
+          margin: 5px 8px;
+        }
       }
     }
   }
@@ -753,9 +779,17 @@ label.SimpleCheckbox {
     line-height: $buttonBarHeight;
   }
 
+  .Library__Buttons {
+    margin-top: -4px;
+  }
+
   .SourcePicker {
+    width: 100%;
+    display: flex;
+
     .SourcePicker__Buttons {
-      padding: $smallPadding;
+      flex-grow: 1;
+      padding: $smallPadding 0 $smallPadding $smallPadding;
 
       > .SourcePicker_SelectButtons {
         display: inline-block;
@@ -773,22 +807,30 @@ label.SimpleCheckbox {
       }
     }
 
-    .SourceList__Sources {
-      position: fixed;
-      top: 5.5rem;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      padding: 0 $smallPadding $smallPadding;
+    .SourceList {
+      float: right;
 
-      &.m-select {
-        top: 7rem;
+      .SourceList__Buttons {
+        padding: $smallPadding $smallPadding $smallPadding 0;
       }
 
-      .SourceList__SourceTitle {
-        color: white !important;
-        > input {
-          width: 250px;
+      .SourceList__Sources {
+        position: fixed;
+        top: 5.5rem;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        padding: 0 $smallPadding $smallPadding;
+
+        &.m-select {
+          top: 7rem;
+        }
+
+        .SourceList__SourceTitle {
+          color: white !important;
+          > input {
+            width: 250px;
+          }
         }
       }
     }

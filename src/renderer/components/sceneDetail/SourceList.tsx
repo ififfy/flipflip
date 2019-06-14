@@ -1,26 +1,30 @@
 import * as React from "react";
 import rimraf from "rimraf";
 import Sortable from "sortablejs";
+import {remote} from "electron";
 
-import {arrayMove, getCachePath, getSourceType} from "../../data/utils";
-import {ST} from "../../data/const";
+import {arrayMove, getCachePath, getFileGroup, getSourceType} from "../../data/utils";
+import {SF, ST} from "../../data/const";
 import LibrarySource from "../library/LibrarySource";
+import Tag from "../library/Tag";
 import Config from "../../data/Config";
+import SimpleOptionPicker from "../ui/SimpleOptionPicker";
 
 export default class SourceList extends React.Component {
   readonly props: {
     sources: Array<LibrarySource>,
     config: Config,
-    forceUpdate: boolean,
     isSelect: boolean,
     emptyMessage: string,
     yOffset: number,
     filters: Array<string>,
     selected: Array<string>,
     onUpdateSources(sources: Array<LibrarySource>): void,
+    addSources(sources: Array<string>): void,
     onUpdateSelected(selected: Array<string>): void,
     onStartEdit(isEditing: number): void,
     savePosition?(yOffset: number, filters: Array<string>, selected: Array<string>): void,
+    onOpenLibraryImport?(): void,
     onPlay?(source: LibrarySource): void,
   };
 
@@ -32,56 +36,77 @@ export default class SourceList extends React.Component {
   render() {
     const filtering = this.props.filters.length > 0;
     return (
-      <div id="sources" className={`SourceList__Sources ${this.props.isSelect ? 'm-select' : ''}`}>
-        {this.props.sources.length == 0 && (
-          <div className="SourceList__Empty">
-            {filtering ? "No results" : this.props.emptyMessage}
-          </div>
-        )}
-        {this.props.sources.map((source) =>
-          <div className={`SourceList__Source ${source.offline ? 'm-offline' : ''} ${source.untagged ? 'm-untagged' : ''}`}
-               key={source.id}>
-            {this.props.isSelect && (
-              <input type="checkbox" value={source.url} onChange={this.onSelect.bind(this)}
-                     checked={this.props.selected.includes(source.url)}/>
-            )}
-            {this.state.isEditing != source.id && (
-              <div className="SourceList__SourceTitle u-clickable"
-                   onClick={this.props.onPlay ? this.onPlay.bind(this, source) : this.onEdit.bind(this, source.id)}>
-                {source.url}
-              </div>
-            )}
-            {this.state.isEditing == source.id && (
-              <form className="SourceList__SourceTitle" onSubmit={this.onEdit.bind(this, -1)}>
-                <input
-                  autoFocus
-                  type="text"
-                  value={source.url}
-                  onBlur={this.onEdit.bind(this, -1)}
-                  onChange={this.onEditSource.bind(this, source.id)}/>
-              </form>
-            )}
-            {source.tags && this.props.onPlay &&  (
-              <div id={`tags-${source.id}`} className="SourceList__SourceTags">
-                {source.tags.map((tag) =>
-                  <span className="SourceList__SourceTag" key={tag.id}>{tag.name}</span>
-                )}
-              </div>
-            )}
-
-            <div className="u-button u-destructive u-clickable"
-                 onClick={this.onRemove.bind(this, source.id)}
-                 title="Remove">×️
+      <div className="SourceList" style={{width: `${this.props.isSelect ? '143px' : '357px'}`}}>
+        <div className="SourceList__Buttons u-float-right">
+          {!this.props.isSelect && (
+            <div className="SourceList__AddButtons">
+              <div className={`u-button ${this.props.filters.length > 0 ? 'u-disabled' : 'u-clickable'}`} onClick={this.props.filters.length > 0 ? this.nop : this.onAdd.bind(this)}>+ Add local files</div>
+              <div className={`u-button ${this.props.filters.length > 0 ? 'u-disabled' : 'u-clickable'}`} onClick={this.props.filters.length > 0 ? this.nop : this.onAddURL.bind(this)}>+ Add URL</div>
+              {this.props.onOpenLibraryImport && (
+                <div className="u-button u-clickable" onClick={this.props.onOpenLibraryImport.bind(this)}>+ Add From Library</div>
+              )}
             </div>
-            {this.props.config.caching.enabled && getSourceType(source.url) != ST.local && (
-              <div className="u-button u-clean u-clickable"
-                   onClick={this.onClean.bind(this, source.id)}
-                   title="Clear cache"/>)}
-            <div className="u-button u-edit u-clickable"
-                 onClick={this.onEdit.bind(this, source.id)}
-                 title="Edit"/>
-          </div>
-        )}
+          )}
+          <SimpleOptionPicker
+            label=""
+            value="Sort Sources"
+            disableFirst={true}
+            keys={["Sort Sources"].concat(Object.values(SF))}
+            onChange={this.onSort.bind(this)}
+          />
+        </div>
+
+        <div id="sources" className={`SourceList__Sources ${this.props.isSelect ? 'm-select' : ''}`}>
+          {this.props.sources.length == 0 && (
+            <div className="SourceList__Empty">
+              {filtering ? "No results" : this.props.emptyMessage}
+            </div>
+          )}
+          {this.props.sources.map((source) =>
+            <div className={`SourceList__Source ${source.offline ? 'm-offline' : ''} ${source.untagged ? 'm-untagged' : ''}`}
+                 key={source.id}>
+              {this.props.isSelect && (
+                <input type="checkbox" value={source.url} onChange={this.onSelect.bind(this)}
+                       checked={this.props.selected.includes(source.url)}/>
+              )}
+              {this.state.isEditing != source.id && (
+                <div className="SourceList__SourceTitle u-clickable"
+                     onClick={this.props.onPlay ? this.onPlay.bind(this, source) : this.onEdit.bind(this, source.id)}>
+                  {source.url}
+                </div>
+              )}
+              {this.state.isEditing == source.id && (
+                <form className="SourceList__SourceTitle" onSubmit={this.onEdit.bind(this, -1)}>
+                  <input
+                    autoFocus
+                    type="text"
+                    value={source.url}
+                    onBlur={this.onEdit.bind(this, -1)}
+                    onChange={this.onEditSource.bind(this, source.id)}/>
+                </form>
+              )}
+              {source.tags && this.props.onPlay &&  (
+                <div id={`tags-${source.id}`} className="SourceList__SourceTags">
+                  {source.tags.map((tag) =>
+                    <span className="SourceList__SourceTag" key={tag.id}>{tag.name}</span>
+                  )}
+                </div>
+              )}
+
+              <div className="u-button u-destructive u-clickable"
+                   onClick={this.onRemove.bind(this, source.id)}
+                   title="Remove">×️
+              </div>
+              {this.props.config.caching.enabled && getSourceType(source.url) != ST.local && (
+                <div className="u-button u-clean u-clickable"
+                     onClick={this.onClean.bind(this, source.id)}
+                     title="Clear cache"/>)}
+              <div className="u-button u-edit u-clickable"
+                   onClick={this.onEdit.bind(this, source.id)}
+                   title="Edit"/>
+            </div>
+          )}
+        </div>
       </div>
     )
   }
@@ -95,8 +120,7 @@ export default class SourceList extends React.Component {
   }
 
   shouldComponentUpdate(props:any, state: any) {
-    return (props.forceUpdate ||
-      (this.props.isSelect !== props.isSelect) ||
+    return ((this.props.isSelect !== props.isSelect) ||
       (this.props.filters !== props.filters) ||
       (this.props.selected.length !== props.selected.length) ||
       (this.props.sources !== props.sources))
@@ -147,6 +171,32 @@ export default class SourceList extends React.Component {
       newSelected.push(source);
     }
     this.props.onUpdateSelected(newSelected);
+  }
+
+  onAdd() {
+    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory', 'multiSelections']});
+    if (!result) return;
+    this.props.addSources(result);
+  }
+
+  onAddURL() {
+    let id = this.props.sources.length + 1;
+    this.props.sources.forEach((s) => {
+      id = Math.max(s.id + 1, id);
+    });
+    let newLibrary = Array.from(this.props.sources);
+    newLibrary.unshift(new LibrarySource({
+      url: "",
+      id: id,
+      tags: new Array<Tag>(),
+    }));
+    this.props.onUpdateSources(newLibrary);
+
+    if (this.props.onPlay) {
+      this.props.onStartEdit(id);
+    } else {
+      this.setState({isEditing: id});
+    }
   }
 
   onEdit(sourceID: number, e: Event) {
@@ -204,5 +254,114 @@ export default class SourceList extends React.Component {
 
   onRemove(sourceID: number) {
     this.props.onUpdateSources(this.props.sources.filter((s) => s.id != sourceID));
+  }
+
+  onSort(algorithm: string) {
+    const sources = Array.from(this.props.sources);
+    switch (algorithm) {
+      case SF.alphaA:
+        this.props.onUpdateSources(sources.sort((a, b) => {
+          const aName = getFileGroup(a.url).toLowerCase();
+          const bName = getFileGroup(b.url).toLowerCase();
+          if (aName < bName) {
+            return -1;
+          } else if (aName > bName) {
+            return 1;
+          } else {
+            const aType = getSourceType(a.url);
+            const bType = getSourceType(b.url);
+            if (aType > bType) {
+              return -1;
+            } else if (aType < bType) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }
+        }));
+        break;
+      case SF.alphaD:
+        this.props.onUpdateSources(sources.sort((a, b) => {
+          const aName = getFileGroup(a.url).toLowerCase();
+          const bName = getFileGroup(b.url).toLowerCase();
+          if (aName > bName) {
+            return -1;
+          } else if (aName < bName) {
+            return 1;
+          } else {
+            const aType = getSourceType(a.url);
+            const bType = getSourceType(b.url);
+            if (aType > bType) {
+              return -1;
+            } else if (aType < bType) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }
+        }));
+        break;
+      case SF.alphaFullA:
+        this.props.onUpdateSources(sources.sort((a, b) => {
+          const aUrl = a.url.toLowerCase();
+          const bUrl = b.url.toLocaleLowerCase();
+          if (aUrl < bUrl) {
+            return -1;
+          } else if (aUrl > bUrl) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }));
+        break;
+      case SF.alphaFullD:
+        this.props.onUpdateSources(sources.sort((a, b) => {
+          const aUrl = a.url.toLowerCase();
+          const bUrl = b.url.toLocaleLowerCase();
+          if (aUrl > bUrl) {
+            return -1;
+          } else if (aUrl < bUrl) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }));
+        break;
+      case SF.dateA:
+        this.props.onUpdateSources(sources.sort((a, b) => {
+          if (a.id < b.id) {
+            return -1;
+          } else if (a.id > b.id) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }));
+        break;
+      case SF.dateD:
+        this.props.onUpdateSources(sources.sort((a, b) => {
+          if (a.id > b.id) {
+            return -1;
+          } else if (a.id < b.id) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }));
+        break;
+      case SF.type:
+        this.props.onUpdateSources(sources.sort((a, b) => {
+          const aType = getSourceType(a.url);
+          const bType = getSourceType(b.url);
+          if (aType > bType) {
+            return -1;
+          } else if (aType < bType) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }));
+        break;
+    }
   }
 }
