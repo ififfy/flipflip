@@ -354,12 +354,31 @@ export function importScene(state: State): Object {
   const filePath = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
     {filters: [{name:'All Files (*.*)', extensions: ['*']},{name: 'JSON Document', extensions: ['json']}], properties: ['openFile']});
   if (!filePath || !filePath.length) return;
+  const addToLibrary = confirm("Would you also like to import this Scene's sources into your Library?");
   const scene = new Scene(JSON.parse(fs.readFileSync(filePath[0], 'utf-8')));
   let id = state.scenes.length + 1;
   state.scenes.forEach((s: Scene) => {
     id = Math.max(s.id + 1, id);
   });
   scene.id = id;
+  if (addToLibrary) {
+    const sources = Array.from(scene.sources);
+    const sourceURLs = sources.map((s) => s.url);
+    id = state.library.length + 1;
+    for (let source of state.library) {
+      id = Math.max(source.id+1, id);
+      const indexOf = sourceURLs.indexOf(source.url);
+      if (indexOf >= 0) {
+        sources.splice(indexOf, 1);
+      }
+    }
+    if (sources.length > 0) {
+      alert("Added " + sources.length + " new sources to the Library");
+      return {scenes: state.scenes.concat([scene]), library: state.library.concat(sources), route: [new Route({kind: 'scene', value: scene.id})]};
+    } else {
+      alert("No new sources detected");
+    }
+  }
   return {scenes: state.scenes.concat([scene]), route: [new Route({kind: 'scene', value: scene.id})]};
 }
 
