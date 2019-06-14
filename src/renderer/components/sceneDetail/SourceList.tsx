@@ -21,8 +21,6 @@ export default class SourceList extends React.Component {
     onUpdateSelected(selected: Array<string>): void,
     onStartEdit(isEditing: number): void,
     savePosition?(yOffset: number, filters: Array<string>, selected: Array<string>): void,
-    onOpenLibraryImport?(): void,
-    importSourcesFromLibrary?(sources: Array<string>): void,
     onPlay?(source: LibrarySource): void,
   };
 
@@ -63,7 +61,7 @@ export default class SourceList extends React.Component {
                   onChange={this.onEditSource.bind(this, source.id)}/>
               </form>
             )}
-            {source.tags && (
+            {source.tags && this.props.onPlay &&  (
               <div id={`tags-${source.id}`} className="SourceList__SourceTags">
                 {source.tags.map((tag) =>
                   <span className="SourceList__SourceTag" key={tag.id}>{tag.name}</span>

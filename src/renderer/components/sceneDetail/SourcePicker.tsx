@@ -45,7 +45,7 @@ type Props = {
   onPlay?(source: LibrarySource): void,
   savePosition?(yOffset: number, filters: Array<string>, selected: Array<string>): void,
   onOpenLibraryImport?(): void,
-  importSourcesFromLibrary?(sources: Array<string>): void,
+  importSourcesFromLibrary?(sources: Array<LibrarySource>): void,
   onChangeTextKind?(kind: string): void,
   onChangeTextSource?(hbID: string): void,
 };
@@ -208,7 +208,7 @@ export default class SourcePicker extends React.Component {
             <div className="SourcePicker_SelectButtons">
               {this.props.isSelect && (
                 <div className={`u-button u-float-left ${this.state.selected.length > 0 ? 'u-clickable' : 'u-disabled'}`}
-                     onClick={this.state.selected.length > 0 ? this.props.importSourcesFromLibrary.bind(this, this.state.selected) : this.nop}>
+                     onClick={this.state.selected.length > 0 ? this.importSourcesFromLibrary.bind(this) : this.nop}>
                   Import Selected {this.state.selected.length > 0 ? "(" + this.state.selected.length + ")" : ""}
                 </div>
               )}
@@ -249,8 +249,6 @@ export default class SourcePicker extends React.Component {
           onUpdateSelected={this.onUpdateSelected.bind(this)}
           onStartEdit={this.onStartEdit.bind(this)}
           savePosition={this.props.savePosition ? this.props.savePosition.bind(this) : null}
-          onOpenLibraryImport={this.props.onOpenLibraryImport ? this.props.onOpenLibraryImport.bind(this) : null}
-          importSourcesFromLibrary={this.props.importSourcesFromLibrary? this.props.importSourcesFromLibrary.bind(this) : null}
           onPlay={this.props.onPlay ? this.props.onPlay.bind(this) : null} />
 
         {this.state.removeAllIsOpen && (
@@ -427,6 +425,18 @@ export default class SourcePicker extends React.Component {
       }
     }
     this.toggleBatchTagModal();
+  }
+
+  importSourcesFromLibrary() {
+    const selected = this.state.selected;
+    const sources = new Array<LibrarySource>();
+    for (let url of selected) {
+      const source = this.props.sources.find((s) => s.url == url);
+      if (source) {
+        sources.push(source);
+      }
+    }
+    this.props.importSourcesFromLibrary(sources);
   }
 
   removeAll() {

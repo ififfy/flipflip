@@ -179,22 +179,12 @@ export function openLibraryImport(state: State): Object {
   return {route: state.route.concat(new Route({kind: 'library', value: null})), isSelect: true, librarySelected: []};
 }
 
-export function importFromLibrary(state: State, sources: Array<string>): Object {
+export function importFromLibrary(state: State, sources: Array<LibrarySource>): Object {
   const sceneSources = getActiveScene(state).sources;
   const sceneSourceURLs = sceneSources.map((s) => s.url);
-  let id = sceneSources.length + 1;
-  getActiveScene(state).sources.forEach((s) => {
-    id = Math.max(s.id + 1, id);
-  });
   for (let source of sources) {
-    if (!sceneSourceURLs.includes(source)) {
-      const newSource = new LibrarySource({
-        url: source,
-        id: id,
-        tags: new Array<Tag>(),
-      });
-      sceneSources.unshift(newSource);
-      id += 1;
+    if (!sceneSourceURLs.includes(source.url)) {
+      sceneSources.unshift(source);
     }
   }
   updateScene(state, getActiveScene(state), (s: Scene) => {s.sources = sceneSources});

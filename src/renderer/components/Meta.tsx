@@ -27,7 +27,7 @@ export default class Meta extends React.Component {
     // Actions are functions that take (state, args+) and return {objectDiff}.
     // So we simply call the function and setState(return value).
     // This is basically the Redux pattern with fewer steps.
-    const result = fn(this.state, ...args)
+    const result = fn(this.state, ...args);
     // run `window.logStateChanges = true` to see these
     if ((window as any).logStateChanges) {
       console.log(result);
@@ -81,7 +81,7 @@ export default class Meta extends React.Component {
             goBack={a(actions.goBack)}
             manageTags={a(actions.manageTags)}
             batchTag={a(actions.batchTag)}
-            importSources={a(actions.importFromLibrary)}
+            importSourcesFromLibrary={a(actions.importFromLibrary)}
             onClearReddit={a(actions.clearReddit)}
           />
         )}

@@ -26,7 +26,7 @@ export default class Library extends React.Component {
     savePosition(yOffset: number, filters:Array<string>, selected: Array<string>): void,
     goBack(): void,
     manageTags(): void,
-    importSources(sources: Array<string>): void,
+    importSourcesFromLibrary(sources: Array<LibrarySource>): void,
     batchTag(isBatchTag: boolean): void,
   };
 
@@ -96,7 +96,7 @@ export default class Library extends React.Component {
             onUpdateSources={this.props.onUpdateLibrary}
             onPlay={this.props.onPlay}
             savePosition={this.props.savePosition}
-            importSourcesFromLibrary={this.props.importSources}
+            importSourcesFromLibrary={this.props.importSourcesFromLibrary}
           />
         )}
         {this.state.showProgress && (
