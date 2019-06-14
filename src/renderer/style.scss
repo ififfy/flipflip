@@ -593,6 +593,7 @@ label.SimpleCheckbox {
   display: flex;
 
   > div:last-child {
+    width: 20rem;
     z-index: 5;
 
     > div:first-child {
@@ -652,9 +653,6 @@ label.SimpleCheckbox {
         font-size: 17px;
         margin: 5px 8px;
       }
-      > div:last-child {
-        width: 20rem;
-      }
     }
   }
 
@@ -664,6 +662,10 @@ label.SimpleCheckbox {
       input {
         width: 23rem;
       }
+    }
+
+    .SourcePicker__BatchTag {
+      margin-bottom: $smallPadding * 2;
     }
   }
 

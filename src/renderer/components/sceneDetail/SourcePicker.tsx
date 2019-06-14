@@ -1,5 +1,6 @@
 import {remote} from 'electron';
 import * as React from 'react';
+import Select, { components } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
 import {SF} from "../../data/const";
@@ -13,10 +14,27 @@ import Config from "../../data/Config";
 import SimpleOptionPicker from "../ui/SimpleOptionPicker";
 import SimpleTextInput from "../ui/SimpleTextInput";
 
+const Option = (props: any) => (
+  <div>
+    <components.Option {...props}>
+      <input type="checkbox" checked={props.isSelected} onChange={() => null} />{" "}
+      <label>{props.label}</label>
+    </components.Option>
+  </div>
+);
+
+const MultiValue = (props: any) => (
+  <components.MultiValue {...props}>
+    <span>{props.data.label}</span>
+  </components.MultiValue>
+);
+
 type Props = {
   sources: Array<LibrarySource>,
+  tags?: Array<Tag>,
   config: Config,
   isSelect: boolean,
+  isBatchTag: boolean
   emptyMessage: string,
   removeAllMessage: string,
   removeAllConfirm: string,
@@ -37,6 +55,7 @@ export default class SourcePicker extends React.Component {
   readonly state = {
     removeAllIsOpen: false,
     urlImportIsOpen: false,
+    batchTagIsOpen: false,
     editValue: "",
     isEditing: -1,
     filters: this.props.filters,
@@ -45,27 +64,21 @@ export default class SourcePicker extends React.Component {
     forceUpdate: false,
   };
 
+  _selectedTags: Array<any> = null;
+
   handleChange = (search: [{label: string, value: string}]) => {
     if (search == null) {
       this.setState({filters: []});
     } else {
-      this.setState({filters: search.map((s) => s.value)});
+      let filters = Array<string>();
+      for (let s of search) {
+        filters = filters.concat(s.value.split(" "));
+      }
+      this.setState({filters});
     }
   };
   handleInputChange = (searchInput: string) => {
     this.setState({searchInput})
-  };
-  handleKeyDown = (event: KeyboardEvent) => {
-    if (!this.state.searchInput) return;
-    switch (event.key) {
-      case 'Enter':
-      case 'Tab':
-        this.setState({
-          searchInput: "",
-          filters: this.state.filters.concat(this.state.searchInput.split(" ")),
-        });
-        event.preventDefault();
-    }
   };
   confirmEdit = (event: KeyboardEvent) => {
     if (event.key == 'Enter') {
@@ -131,10 +144,33 @@ export default class SourcePicker extends React.Component {
       }
     }
 
+    let tagSelectValue = new Array<{label: string, value: string}>();
+    if (this.state.batchTagIsOpen) {
+      let commonTags = Array<string>();
+      for (let sourceURL of this.state.selected) {
+        const source = this.props.sources.find((s) => s.url === sourceURL);
+        const tags = source.tags.map((t) => t.name);
+        if (commonTags.length == 0) {
+          commonTags = tags;
+        } else {
+          commonTags = commonTags.filter((t) => tags.includes(t));
+        }
+
+        if (commonTags.length == 0) break;
+      }
+
+      if (commonTags.length > 0) {
+        tagSelectValue = commonTags.map((t) => {return {label: t, value: t}});
+      }
+
+      if (this._selectedTags == null) {
+        this._selectedTags = tagSelectValue;
+      }
+    }
     return (
       <div className="SourcePicker" onKeyDown={this.secretHotkey.bind(this)} tabIndex={0}>
         <div className="SourcePicker__Buttons">
-          {!this.props.isSelect && (
+          {!this.props.isSelect && !this.props.isBatchTag && (
             <div className="SourcePicker__AddButtons">
               <div className={`u-button ${this.state.filters.length > 0 ? 'u-disabled' : 'u-clickable'}`} onClick={this.state.filters.length > 0 ? this.nop : this.onAdd.bind(this)}>+ Add local files</div>
               <div className={`u-button ${this.state.filters.length > 0 ? 'u-disabled' : 'u-clickable'}`} onClick={this.state.filters.length > 0 ? this.nop : this.onAddURL.bind(this)}>+ Add URL</div>
@@ -165,16 +201,23 @@ export default class SourcePicker extends React.Component {
                 formatCreateLabel={(input: string) => "Search for " + input}
                 onChange={this.handleChange}
                 onInputChange={this.handleInputChange}
-                onKeyDown={this.handleKeyDown}
               />
             </div>
           )}
-          {this.props.isSelect && (
+          {(this.props.isSelect || this.props.isBatchTag) && (
             <div className="SourcePicker_SelectButtons">
-              <div className={`u-button u-float-left ${this.state.selected.length > 0 ? 'u-clickable' : 'u-disabled'}`}
-                   onClick={this.state.selected.length > 0 ? this.props.importSourcesFromLibrary.bind(this, this.state.selected) : this.nop}>
-                Import Selected {this.state.selected.length > 0 ? "(" + this.state.selected.length + ")" : ""}
-              </div>
+              {this.props.isSelect && (
+                <div className={`u-button u-float-left ${this.state.selected.length > 0 ? 'u-clickable' : 'u-disabled'}`}
+                     onClick={this.state.selected.length > 0 ? this.props.importSourcesFromLibrary.bind(this, this.state.selected) : this.nop}>
+                  Import Selected {this.state.selected.length > 0 ? "(" + this.state.selected.length + ")" : ""}
+                </div>
+              )}
+              {this.props.isBatchTag && (
+                <div className={`u-button u-float-left ${this.state.selected.length > 0 ? 'u-clickable' : 'u-disabled'}`}
+                     onClick={this.state.selected.length > 0 ? this.toggleBatchTagModal.bind(this) : this.nop}>
+                  Batch Tag Selection {this.state.selected.length > 0 ? "(" + this.state.selected.length + ")" : ""}
+                </div>
+              )}
               <div className="SourcePicker_SelectAllNone">
                 <a href="#" onClick={this.onSelectAll.bind(this)}>
                   Select All
@@ -185,7 +228,7 @@ export default class SourcePicker extends React.Component {
               </div>
             </div>
           )}
-          {!this.props.isSelect && (
+          {!this.props.isSelect && !this.props.isBatchTag && (
             <div className={`u-button u-float-left ${this.props.sources.length == 0 ? 'u-disabled' : 'u-clickable'} `}
                  onClick={this.props.sources.length == 0 ? this.nop : this.toggleRemoveAllModal.bind(this)}>
               - Remove All
@@ -197,7 +240,7 @@ export default class SourcePicker extends React.Component {
           sources={displaySources}
           config={this.props.config}
           forceUpdate={this.state.forceUpdate}
-          isSelect={this.props.isSelect}
+          isSelect={this.props.isSelect || this.props.isBatchTag}
           emptyMessage={this.props.emptyMessage}
           yOffset={this.props.yOffset}
           filters={this.state.filters}
@@ -233,6 +276,33 @@ export default class SourcePicker extends React.Component {
             </div>
           </Modal>
         )}
+        {this.state.batchTagIsOpen && (
+          <Modal onClose={this.toggleBatchTagModal.bind(this)} title="Batch Tag">
+            <p>Choose the tags to be applied to the selected sources</p>
+            <div className="ReactSelect SourcePicker__BatchTag">
+              <Select
+                defaultValue={tagSelectValue}
+                options={this.props.tags.map((tag) => {return {label: tag.name, value: tag.id}})}
+                components={{ Option, MultiValue }}
+                isClearable
+                isMulti
+                closeMenuOnSelect={false}
+                hideSelectedOptions={false}
+                backspaceRemovesValue={false}
+                placeholder="Tag These Sources"
+                onChange={this.selectTags.bind(this)} />
+            </div>
+            <div className="u-button u-float-right" onClick={this.batchTagAdd.bind(this)}>
+              + Add
+            </div>
+            <div className="u-button u-float-right" onClick={this.batchTagRemove.bind(this)}>
+              - Remove
+            </div>
+            <div className="u-button" onClick={this.batchTagOverwrite.bind(this)}>
+              Overwrite
+            </div>
+          </Modal>
+        )}
         {this.state.urlImportIsOpen && (
           <URLModal
             onClose={this.toggleURLImportModal.bind(this)}
@@ -247,8 +317,10 @@ export default class SourcePicker extends React.Component {
   shouldComponentUpdate(props: any, state: any): boolean {
     return (state.forceUpdate ||
       (this.props.isSelect !== props.isSelect) ||
+      (this.props.isBatchTag !== props.isBatchTag) ||
       (this.state.removeAllIsOpen !== state.removeAllIsOpen) ||
       (this.state.urlImportIsOpen !== state.urlImportIsOpen) ||
+      (this.state.batchTagIsOpen !== state.batchTagIsOpen) ||
       (this.state.isEditing !== state.isEditing) ||
       (this.state.editValue !== state.editValue) ||
       (this.state.filters !== state.filters) ||
@@ -302,9 +374,59 @@ export default class SourcePicker extends React.Component {
   }
 
   toggleRemoveAllModal() {
-    this.setState({
-      removeAllIsOpen: !this.state.removeAllIsOpen
-    });
+    this.setState({removeAllIsOpen: !this.state.removeAllIsOpen});
+  }
+
+  toggleBatchTagModal() {
+    this._selectedTags = null;
+    this.setState({batchTagIsOpen: !this.state.batchTagIsOpen});
+  }
+
+  selectTags(selectedTags: [{label: string, value: string}]) {
+    this._selectedTags = selectedTags;
+  }
+
+  batchTagOverwrite() {
+    for (let sourceURL of this.state.selected) {
+      const source = this.props.sources.find((s) => s.url === sourceURL);
+      source.tags = new Array<Tag>();
+      if (this._selectedTags) {
+        for (let tag of this._selectedTags) {
+          source.tags.push(new Tag({name: tag.label, id: tag.value}));
+        }
+      }
+    }
+    this.toggleBatchTagModal();
+  }
+
+  batchTagAdd() {
+    if (this._selectedTags) {
+      for (let sourceURL of this.state.selected) {
+        const source = this.props.sources.find((s) => s.url === sourceURL);
+        const sourceTags = source.tags.map((t) => t.name);
+        for (let tag of this._selectedTags) {
+          if (!sourceTags.includes(tag.label)) {
+            source.tags.push(new Tag({name: tag.label, id: tag.value}));
+          }
+        }
+      }
+    }
+    this.toggleBatchTagModal();
+  }
+
+  batchTagRemove() {
+    if (this._selectedTags) {
+      for (let sourceURL of this.state.selected) {
+        const source = this.props.sources.find((s) => s.url === sourceURL);
+        const sourceTags = source.tags.map((t) => t.name);
+        for (let tag of this._selectedTags) {
+          if (sourceTags.includes(tag.label)) {
+            source.tags.splice(sourceTags.indexOf(tag.label), 1);
+          }
+        }
+      }
+    }
+    this.toggleBatchTagModal();
   }
 
   removeAll() {
@@ -401,7 +523,7 @@ export default class SourcePicker extends React.Component {
 
   onSelectAll() {
     const displaySources = this.getDisplaySources();
-    const newSelected = this.state.selected;
+    const newSelected = Array.from(this.state.selected);
     for (let source of displaySources.map((s) => s.url)) {
       if (!newSelected.includes(source)) {
         newSelected.push(source);
@@ -412,7 +534,7 @@ export default class SourcePicker extends React.Component {
 
   onSelectNone() {
     const displaySources = this.getDisplaySources();
-    const newSelected = this.state.selected;
+    let newSelected = Array.from(this.state.selected);
     for (let source of displaySources.map((s) => s.url)) {
       if (newSelected.includes(source)) {
         newSelected.splice(newSelected.indexOf(source), 1)

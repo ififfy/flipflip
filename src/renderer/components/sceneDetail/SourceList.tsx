@@ -98,6 +98,7 @@ export default class SourceList extends React.Component {
 
   shouldComponentUpdate(props:any, state: any) {
     return (props.forceUpdate ||
+      (this.props.isSelect !== props.isSelect) ||
       (this.props.filters !== props.filters) ||
       (this.props.selected.length !== props.selected.length) ||
       (this.props.sources !== props.sources))
@@ -141,7 +142,7 @@ export default class SourceList extends React.Component {
 
   onSelect(event: any) {
     const source = event.currentTarget.value;
-    const newSelected = this.props.selected;
+    let newSelected = Array.from(this.props.selected);
     if (newSelected.includes(source)) {
       newSelected.splice(newSelected.indexOf(source), 1)
     } else {

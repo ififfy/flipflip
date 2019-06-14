@@ -124,6 +124,7 @@ export default class SceneDetail extends React.Component {
               removeAllMessage="Are you sure you want to remove all sources from this scene?"
               removeAllConfirm="Ok"
               isSelect={false}
+              isBatchTag={false}
               onUpdateSources={this.onChangeSources.bind(this)}
               onOpenLibraryImport={this.props.onOpenLibraryImport.bind(this, this.props.scene)}
               onChangeTextKind={this.changeKey.bind(this, 'textKind').bind(this)}

@@ -71,6 +71,7 @@ export default class Meta extends React.Component {
             tags={this.state.tags}
             config={this.state.config}
             isSelect={this.state.isSelect}
+            isBatchTag={this.state.isBatchTag}
             yOffset={this.state.libraryYOffset}
             filters={this.state.libraryFilters}
             selected={this.state.librarySelected}
@@ -79,6 +80,7 @@ export default class Meta extends React.Component {
             onUpdateLibrary={a(actions.replaceLibrary)}
             goBack={a(actions.goBack)}
             manageTags={a(actions.manageTags)}
+            batchTag={a(actions.batchTag)}
             importSources={a(actions.importFromLibrary)}
             onClearReddit={a(actions.clearReddit)}
           />

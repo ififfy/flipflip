@@ -16,6 +16,7 @@ export default class Library extends React.Component {
     config: Config,
     tags: Array<Tag>,
     isSelect: boolean,
+    isBatchTag: boolean,
     yOffset: number,
     filters: Array<string>,
     selected: Array<string>,
@@ -26,6 +27,7 @@ export default class Library extends React.Component {
     goBack(): void,
     manageTags(): void,
     importSources(sources: Array<string>): void,
+    batchTag(isBatchTag: boolean): void,
   };
 
   readonly state = {
@@ -49,7 +51,7 @@ export default class Library extends React.Component {
               <h2 className="Library__LibraryHeader">Progress</h2>
             )}
           </div>
-          {!this.props.isSelect && !this.state.showProgress && (
+          {!this.props.isSelect && !this.props.isBatchTag && !this.state.showProgress && (
             <div className="u-button-row-right">
               <select
                 value={""}
@@ -64,18 +66,24 @@ export default class Library extends React.Component {
                 Mark Offline
               </div>
               <div
+                className="Library__BatchTag u-button u-clickable"
+                onClick={this.props.batchTag.bind(this, true)}>
+                Batch Tag
+              </div>
+              <div
                 className="Library__ManageTags u-button u-clickable"
                 onClick={this.props.manageTags.bind(this)}>
                 Manage Tags
               </div>
             </div>
           )}
-          <div className="BackButton u-button u-clickable" onClick={this.state.showProgress ? this.hideProgress.bind(this) : this.props.goBack}>Back</div>
+          <div className="BackButton u-button u-clickable" onClick={this.goBack.bind(this)}>{(this.props.isBatchTag ? "Done" : "Back")}</div>
         </div>
 
         {!this.state.showProgress && (
           <SourcePicker
             sources={this.props.library}
+            tags={this.props.tags}
             config={this.props.config}
             yOffset={this.props.yOffset}
             filters={this.props.filters}
@@ -84,6 +92,7 @@ export default class Library extends React.Component {
             removeAllMessage="Are you sure you really wanna delete your library...? ಠ_ಠ"
             removeAllConfirm="Yea... I'm sure"
             isSelect={this.props.isSelect}
+            isBatchTag={this.props.isBatchTag}
             onUpdateSources={this.props.onUpdateLibrary}
             onPlay={this.props.onPlay}
             savePosition={this.props.savePosition}
@@ -111,8 +120,14 @@ export default class Library extends React.Component {
     }
   }
 
-  hideProgress() {
-    this.setState({showProgress: false});
+  goBack() {
+    if (this.state.showProgress) {
+      this.setState({showProgress: false});
+    } else if (this.props.isBatchTag) {
+      this.props.batchTag(false);
+    } else {
+      this.props.goBack();
+    }
   }
 
   importReddit() {

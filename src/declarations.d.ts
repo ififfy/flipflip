@@ -26,6 +26,7 @@ declare module 'gif-info';
 declare module 'request';
 declare module 'progressbar.js';
 declare module 'sortablejs';
+declare module 'react-select';
 declare module 'react-select/creatable';
 declare module 'snoowrap';
 declare module 'rimraf';

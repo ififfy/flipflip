@@ -327,6 +327,10 @@ export function updateTags(state: State, tags: Array<Tag>): Object {
   return {tags: tags, library: newLibrary};
 }
 
+export function batchTag(state: State, isBatchTag: boolean): Object {
+  return {isBatchTag: isBatchTag};
+}
+
 export function toggleTag(state: State, sourceID: number, tag: Tag): Object {
   let newLibrary = state.library;
   for (let source of newLibrary) {
