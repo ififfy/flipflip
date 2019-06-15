@@ -9,13 +9,18 @@ import Scene from '../data/Scene';
 import SimpleOptionPicker from "./ui/SimpleOptionPicker";
 
 class ScenePickerItem extends React.Component {
-  readonly props: { scene: Scene, onSelect(scene: Scene): void };
+  readonly props: {
+    scene: Scene,
+    onSelect(scene: Scene): void,
+    onMouseEnter?(e: MouseEvent): void,
+  };
 
   render() {
     return (
       <div
         className={`ScenePickerItem u-clickable u-draggable ${this.props.scene.tagWeights || this.props.scene.sceneWeights ? 'm-generator' : ''}`}
-        onClick={this.onClick.bind(this)}>
+        onClick={this.onClick.bind(this)}
+        onMouseEnter={this.props.onMouseEnter ? this.props.onMouseEnter.bind(this) : this.nop}>
         <div className="ScenePickerItem__Title">
           {this.props.scene.name}
         </div>
@@ -26,6 +31,8 @@ class ScenePickerItem extends React.Component {
   onClick() {
     this.props.onSelect(this.props.scene);
   }
+
+  nop() {}
 }
 
 class Link extends React.Component {
@@ -69,6 +76,8 @@ export default class ScenePicker extends React.Component {
     newVersionLink: "",
   };
 
+  _jiggling = Array<any>();
+
   render() {
     return (
       <div className="ScenePicker">
@@ -83,10 +92,22 @@ export default class ScenePicker extends React.Component {
                 onChange={this.onSort.bind(this)}
               />
               {this.props.scenes.length > 1 && (
-                <div className="u-random" title="Play a random scene" onClick={this.onRandom.bind(this)}/>
+                <div
+                  className="u-random"
+                  title="Play a random scene"
+                  onClick={this.onRandom.bind(this)}
+                  onMouseEnter={this.jiggle.bind(this)}/>
               )}
-              <div className="u-import" title="Import a scene from a file" onClick={this.props.onImport.bind(this)}/>
-              <div className="u-config" title="Preferences" onClick={this.props.onConfig.bind(this)}/>
+              <div
+                className="u-import"
+                title="Import a scene from a file"
+                onClick={this.props.onImport.bind(this)}
+                onMouseEnter={this.jiggle.bind(this)}/>
+              <div
+                className="u-config"
+                title="Preferences"
+                onClick={this.props.onConfig.bind(this)}
+                onMouseEnter={this.jiggle.bind(this)}/>
             </div>
             <h1>FlipFlip</h1>
             <small>
@@ -115,14 +136,22 @@ export default class ScenePicker extends React.Component {
         </div>
 
         <div className="ScenePicker__Buttons">
-          <div className="ScenePicker__LibraryButton u-clickable" onClick={this.props.onOpenLibrary}>
+          <div
+            className="ScenePicker__LibraryButton u-clickable"
+            onClick={this.props.onOpenLibrary}
+            onMouseEnter={this.jiggle.bind(this)}>
             Library {this.props.libraryCount > 0 ? '(' + this.props.libraryCount + ' Sources)' : ''}
           </div>
-          <div className={`ScenePicker__GenerateSceneButton ${this.props.canGenerate ? 'u-clickable' : 'u-disabled'}`}
-               onClick={this.props.canGenerate ? this.props.onGenerate.bind(this) : this.nop}>
+          <div
+            className={`ScenePicker__GenerateSceneButton ${this.props.canGenerate ? 'u-clickable' : 'u-disabled'}`}
+            onClick={this.props.canGenerate ? this.props.onGenerate.bind(this) : this.nop}
+            onMouseEnter={this.jiggle.bind(this)}>
             + Add Scene Generator
           </div>
-          <div className="ScenePicker__AddSceneButton u-clickable" onClick={this.props.onAdd.bind(this)}>
+          <div
+            className="ScenePicker__AddSceneButton u-clickable"
+            onClick={this.props.onAdd.bind(this)}
+            onMouseEnter={this.jiggle.bind(this)}>
             + Add Scene
           </div>
         </div>
@@ -131,7 +160,10 @@ export default class ScenePicker extends React.Component {
 
         <div className="ScenePicker__Scenes" id="scenes">
           {this.props.scenes.map((scene) =>
-            <ScenePickerItem key={`${scene.id}`} scene={scene} onSelect={this.props.onSelect}/>
+            <ScenePickerItem
+              key={`${scene.id}`} scene={scene}
+              onSelect={this.props.onSelect}
+              onMouseEnter={this.jiggle.bind(this)}/>
           )}
         </div>
       </div>
@@ -176,6 +208,24 @@ export default class ScenePicker extends React.Component {
 
   onRandom() {
     this.props.onSelect(getRandomListItem(this.props.scenes));
+  }
+
+  jiggle(e: MouseEvent) {
+    const target = e.currentTarget;
+    if (!this._jiggling.includes(target)) {
+      if (target instanceof HTMLDivElement && !target.className.includes("u-disabled")) {
+        target.className = target.className + " u-jiggle";
+        this._jiggling.push(target);
+        setTimeout(this.stopJiggling.bind(this, target), 300);
+      }
+    }
+  }
+
+  stopJiggling(et: EventTarget) {
+    if (et instanceof HTMLDivElement) {
+      et.className = et.className.replace(" u-jiggle", "");
+      this._jiggling.splice(this._jiggling.indexOf(et), 1);
+    }
   }
 
   onSort(algorithm: string) {

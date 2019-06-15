@@ -285,9 +285,6 @@ a {
   background: url("./icons/dice.svg") no-repeat;
   background-size: 1.5rem 1.5rem;
   vertical-align: -4px;
-  &:hover {
-    animation: jiggle 0.75s ease-in;
-  }
 }
 
 .u-import {
@@ -296,9 +293,6 @@ a {
   height: 1rem;
   background: url("./icons/down-arrow.svg") no-repeat;
   background-size: 1rem 1rem;
-  &:hover {
-    animation: jiggle 0.75s ease-in;
-  }
 }
 
 .u-config {
@@ -307,9 +301,10 @@ a {
   height: 1rem;
   background: url("./icons/gear.svg") no-repeat;
   background-size: 1rem 1rem;
-  &:hover {
-    animation: jiggle 0.75s ease-in;
-  }
+}
+
+.u-jiggle {
+  animation: jiggle 0.30s ease-in;
 }
 
 .u-show-on-hover-only {
@@ -402,7 +397,6 @@ a {
     }
 
     &:not(.u-disabled):hover {
-      animation: jiggle 0.75s ease-in;
       background-color: $buttonBottom;
     }
   }
@@ -437,7 +431,6 @@ a {
       }
 
       &:not(.u-disabled):hover {
-        animation: jiggle 0.75s ease-in;
         background-color: $buttonBottom;
       }
     }
@@ -1396,16 +1389,16 @@ label.SimpleCheckbox {
 }
 
 @keyframes jiggle {
-  0%, 40% {
+  0%, 100% {
     transform: scale(1.0, 1.0)
   }
-  10% {
+  25% {
     transform: scale(1.1, 0.9)
   }
-  20% {
+  50% {
     transform: scale(0.9, 1.1) translate(0, -5px)
   }
-  30% {
+  75% {
     transform: scale(1.0, 1.0) translate(0, -5px)
   }
 }
