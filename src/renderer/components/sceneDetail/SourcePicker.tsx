@@ -71,7 +71,11 @@ export default class SourcePicker extends React.Component {
     } else {
       let filters = Array<string>();
       for (let s of search) {
-        filters = filters.concat(s.value.split(" "));
+        if (s.value.endsWith("~")) {
+          filters = filters.concat(s.value);
+        } else {
+          filters = filters.concat(s.value.split(" "));
+        }
       }
       this.setState({filters});
     }
