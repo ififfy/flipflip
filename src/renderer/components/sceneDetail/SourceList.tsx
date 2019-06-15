@@ -119,8 +119,13 @@ export default class SourceList extends React.Component {
   nop() {}
 
   componentDidMount() {
-    this.setState({sortable: null});
-    this.initSortable();
+    this.setState({sortable:
+        Sortable.create(document.getElementById('sources'), {
+          animation: 150,
+          easing: "cubic-bezier(1, 0, 0, 1)",
+          onEnd: this.onEnd.bind(this),
+        })
+    });
     document.getElementById("sources").scrollTo(0, this.props.yOffset);
   }
 
@@ -132,27 +137,12 @@ export default class SourceList extends React.Component {
   }
 
   componentDidUpdate(): void {
-    if (this.state.sortable) {
-      this.state.sortable.option("disabled", this.props.filters.length > 0);
-    }
-    this.initSortable();
+    this.state.sortable.option("disabled", this.props.filters.length > 0);
   }
 
   componentWillUnmount() {
     if (this.props.savePosition) {
       this.props.savePosition(document.getElementById("sources").scrollTop, this.props.filters, this.props.selected);
-    }
-  }
-
-  initSortable() {
-    if (!this.state.sortable) {
-      this.setState({sortable:
-          Sortable.create(document.getElementById('sources'), {
-            animation: 150,
-            easing: "cubic-bezier(1, 0, 0, 1)",
-            onEnd: this.onEnd.bind(this),
-          })
-      });
     }
   }
 
