@@ -147,13 +147,18 @@ export default class AppStorage {
     writeFileSync(this.savePath, JSON.stringify(state), 'utf-8');
   }
 
-  backup() {
+  backup(showAlert: boolean): boolean {
     try {
       archiveFile(this.savePath);
     } catch (e) {
-      alert("Backup error:\n" + e);
-      return;
+      if (showAlert) {
+        alert("Backup error:\n" + e);
+      }
+      return false;
     }
-    alert("Backup success!");
+    if (showAlert) {
+      alert("Backup success!");
+    }
+    return true;
   }
 }

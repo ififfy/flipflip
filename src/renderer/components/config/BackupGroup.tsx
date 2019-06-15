@@ -8,7 +8,7 @@ import Modal from "../ui/Modal";
 export default class BackupGroup extends React.Component {
 
   readonly props: {
-    backup(): void,
+    backup(alert: boolean): boolean,
     restore(backupFile: string): void,
     clean(): void,
   };
@@ -122,7 +122,7 @@ export default class BackupGroup extends React.Component {
   }
 
   onBackup() {
-    this.props.backup();
+    this.props.backup(true);
     this.closeConfirm();
     this.refreshBackups();
   }

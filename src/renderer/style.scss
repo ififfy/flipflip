@@ -418,6 +418,7 @@ a {
       &.ScenePicker__LibraryButton {
         font-weight: bold;
         width: 70%;
+        z-index: 2;
       }
 
       &.ScenePicker__GenerateSceneButton {

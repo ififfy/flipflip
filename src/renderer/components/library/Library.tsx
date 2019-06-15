@@ -27,6 +27,9 @@ export default class Library extends React.Component {
     manageTags(): void,
     importSourcesFromLibrary(sources: Array<LibrarySource>): void,
     batchTag(isBatchTag: boolean): void,
+    onBackup(alert: boolean): boolean,
+    onImportLibrary(): void,
+    onExportLibrary(): void,
   };
 
   readonly state = {
@@ -92,18 +95,18 @@ export default class Library extends React.Component {
           </div>
           {!this.props.isSelect && !this.props.isBatchTag && !this.state.showProgress && (
             <div
-              className="Library__Import u-button u-icon-button u-clickable"
-              title="Import Library"
-              /*onClick={this.props.import.bind(this)}*/>
-              <div className="u-import"/>
+              className="Library__Export u-button u-icon-button u-clickable"
+              title="Export Library"
+              onClick={this.props.onExportLibrary.bind(this)}>
+              <div className="u-export"/>
             </div>
           )}
           {!this.props.isSelect && !this.props.isBatchTag && !this.state.showProgress && (
             <div
-              className="Library__Export u-button u-icon-button u-clickable"
-              title="Export Library"
-              /*onClick={this.props.export.bind(this)}*/>
-              <div className="u-export"/>
+              className="Library__Import u-button u-icon-button u-clickable"
+              title="Import Library"
+              onClick={this.props.onImportLibrary.bind(this, this.props.onBackup)}>
+              <div className="u-import"/>
             </div>
           )}
         </div>

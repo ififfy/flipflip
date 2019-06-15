@@ -83,6 +83,9 @@ export default class Meta extends React.Component {
             batchTag={a(actions.batchTag)}
             importSourcesFromLibrary={a(actions.importFromLibrary)}
             onClearReddit={a(actions.clearReddit)}
+            onBackup={appStorage.backup.bind(appStorage)}
+            onImportLibrary={a(actions.importLibrary)}
+            onExportLibrary={a(actions.exportLibrary)}
           />
         )}
 

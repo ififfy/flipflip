@@ -382,6 +382,67 @@ export function importScene(state: State): Object {
   return {scenes: state.scenes.concat([scene]), route: [new Route({kind: 'scene', value: scene.id})]};
 }
 
+export function exportLibrary(state: State): Object {
+  const libraryExport = JSON.stringify(state.library);
+  const fileName = "library_export-" + new Date().getTime() + ".json";
+  remote.dialog.showSaveDialog(remote.getCurrentWindow(),
+    {filters: [{name: 'JSON Document', extensions: ['json']}], defaultPath: fileName}, (filePath) => {
+      if (filePath != null) {
+        fs.writeFileSync(filePath, libraryExport);
+      }
+    });
+  return {};
+}
+
+export function importLibrary(state: State, backup:Function): Object {
+  const filePath = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+    {filters: [{name:'All Files (*.*)', extensions: ['*']},{name: 'JSON Document', extensions: ['json']}], properties: ['openFile']});
+  if (!filePath || !filePath.length) return;
+  if (!backup(false)) { // If backup fails, prompt user to continue
+    if (!confirm("Backup failed. Continue anyway?")) {
+      return;
+    }
+  }
+  const libraryImport = JSON.parse(fs.readFileSync(filePath[0], 'utf-8'));
+  const newLibrary = Array.from(state.library);
+  const newTags = Array.from(state.tags);
+  const myLibrary = newLibrary.map((s) => s.url);
+  const myTags = newTags.map((t) => t.name);
+  let tagID = newTags.length + 1;
+  newTags.forEach((t) => {tagID = Math.max(t.id + 1, tagID);});
+  let sourceID = newLibrary.length + 1;
+  for (let source of libraryImport) {
+    if (source.tags) {
+      for (let tag of source.tags) { // Make sure we have all of these tags
+        if (!myTags.includes(tag.name)) { // Add tags we don't have yet
+          tag.id = tagID++;
+          newTags.push(tag);
+          myTags.push(tag.name);
+        } else {
+          tag.id = myTags.indexOf(tag.name); // Map tags we already have
+        }
+      }
+    } else {
+      source.tags = new Array<Tag>();
+    }
+
+    const indexOf = myLibrary.indexOf(source.url);
+    if (indexOf === -1) { // Add sources we don't have yet
+      source.id = sourceID++;
+      newLibrary.push(source);
+      myLibrary.push(source.url);
+    } else { // If this source is untagged, add imported tags
+      const librarySource = newLibrary[indexOf];
+      if (librarySource.tags.length !== 0) {
+        librarySource.tags = source.tags;
+      }
+    }
+  }
+
+  alert("Import complete!");
+  return {library: newLibrary, tags: newTags};
+}
+
 export function clearTumblr(state: State): Object {
   const newConfig = state.config;
   newConfig.remoteSettings.tumblrKey = "";

@@ -26,7 +26,7 @@ export default class ConfigForm extends React.Component {
     goBack(): void,
     updateConfig(config: Config): void,
     onDefault(): void,
-    onBackup(): void,
+    onBackup(alert: boolean): boolean,
     onRestore(backupFile: string): void,
     onClean(): void,
     onClearTumblr(): void,
