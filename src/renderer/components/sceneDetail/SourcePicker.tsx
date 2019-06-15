@@ -142,6 +142,13 @@ export default class SourcePicker extends React.Component {
         options.push({label: tag + " (" + tags.get(tag) + ")", value: tag + "~"});
       }
     }
+    if (this.state.searchInput.startsWith("-")) {
+      for (let tag of tagKeys) {
+        if (!this.state.filters.includes(tag + "~")) {
+          options.push({label: "-" + tag + " (" + tags.get(tag) + ")", value: "-" + tag + "~"});
+        }
+      }
+    }
 
     let tagSelectValue = new Array<{label: string, value: string}>();
     if (this.state.batchTagIsOpen) {
@@ -521,8 +528,13 @@ export default class SourcePicker extends React.Component {
           } else if (filter == "<Untagged>") { // This is untagged filter
             matchesFilter = source.tags.length === 0;
           } else if (filter.endsWith("~")) { // This is a tag filter
-            const tag = filter.substring(0, filter.length-1);
-            matchesFilter = source.tags.find((t) => t.name == tag) != null;
+            let tag = filter.substring(0, filter.length-1);
+            if (tag.startsWith("-")) {
+              tag = tag.substring(1, tag.length);
+              matchesFilter = source.tags.find((t) => t.name == tag) == null;
+            } else {
+              matchesFilter = source.tags.find((t) => t.name == tag) != null;
+            }
           } else { // This is a search filter
             filter = filter.replace("\\", "\\\\");
             if (filter.startsWith("-")) {
