@@ -84,7 +84,28 @@ export default class Library extends React.Component {
               </div>
             </div>
           )}
-          <div className="BackButton u-button u-clickable" onClick={this.goBack.bind(this)}>{(this.props.isBatchTag ? "Done" : "Back")}</div>
+          <div
+            className="BackButton u-button u-clickable"
+            style={{verticalAlign: '11px'}}
+            onClick={this.goBack.bind(this)}>
+            {(this.props.isBatchTag ? "Done" : "Back")}
+          </div>
+          {!this.props.isSelect && !this.props.isBatchTag && !this.state.showProgress && (
+            <div
+              className="Library__Import u-button u-icon-button u-clickable"
+              title="Import Library"
+              /*onClick={this.props.import.bind(this)}*/>
+              <div className="u-import"/>
+            </div>
+          )}
+          {!this.props.isSelect && !this.props.isBatchTag && !this.state.showProgress && (
+            <div
+              className="Library__Export u-button u-icon-button u-clickable"
+              title="Export Library"
+              /*onClick={this.props.export.bind(this)}*/>
+              <div className="u-export"/>
+            </div>
+          )}
         </div>
 
         {!this.state.showProgress && (

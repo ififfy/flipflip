@@ -16,10 +16,6 @@ $smallPadding: 0.5rem;
 $buttonBarHeight: 2rem + $smallPadding;
 $buttonSidebarWidth: 21rem + $smallPadding;
 
-// Unicode Emoji characters
-$emojiPencil: '\270E';  // ✎
-$emojiTrash:  '\1F5D1'; // 🗑
-
 @font-face {
   font-family: system;
   font-style: normal;
@@ -156,12 +152,24 @@ a {
 
 .u-icon-button {
   margin-top: -4px;
-
   > div {
-    cursor: pointer;
     width: 1.5rem;
     height: 1.5rem;
     background-size: 1.5rem 1.5rem !important;
+  }
+}
+
+.u-small-icon-button {
+  > div {
+    width: 1.0rem;
+    height: 1.0rem;
+    background-size: 1.0rem 1.0rem !important;
+  }
+}
+
+.u-icon-button, .u-small-icon-button, .u-tiny-icon-button {
+  > div {
+    cursor: pointer;
   }
 
   .u-tags {
@@ -200,8 +208,44 @@ a {
     background: url("./icons/right-arrow.svg") no-repeat;
   }
 
+  .u-down-arrow {
+    background: url("./icons/down-arrow.svg") no-repeat;
+  }
+
   .u-fullscreen {
     background: url("./icons/fullscreen.svg") no-repeat;
+  }
+
+  .u-random {
+    background: url("./icons/dice.svg") no-repeat;
+  }
+
+  .u-import {
+    background: url("./icons/down-arrow.svg") no-repeat;
+  }
+
+  .u-config {
+    background: url("./icons/gear.svg") no-repeat;
+  }
+
+  .u-import {
+    background: url("./icons/import.svg") no-repeat;
+  }
+
+  .u-export {
+    background: url("./icons/export.svg") no-repeat;
+  }
+
+  .u-edit {
+    background: url("./icons/pencil.svg") no-repeat;
+  }
+
+  .u-clean {
+    background: url("./icons/clean.svg") no-repeat;
+  }
+
+  .u-delete {
+    background: url("./icons/delete.svg") no-repeat;
   }
 }
 
@@ -258,51 +302,6 @@ a {
   color: white !important;
 }
 
-.u-edit {
- color: #444 !important;
-  transform: scale(-1, 1);
-  cursor: pointer;
- 
-  &:before {
-    content: $emojiPencil;
-  }
-}
-
-.u-clean {
-  color: #444 !important;
-  transform: scale(-1, 1);
-  cursor: pointer;
-
-  &:before {
-    content: $emojiTrash;
-  }
-}
-
-.u-random {
-  cursor: pointer;
-  width: 1.5rem;
-  height: 1.5rem;
-  background: url("./icons/dice.svg") no-repeat;
-  background-size: 1.5rem 1.5rem;
-  vertical-align: -4px;
-}
-
-.u-import {
-  cursor: pointer;
-  width: 1rem;
-  height: 1rem;
-  background: url("./icons/down-arrow.svg") no-repeat;
-  background-size: 1rem 1rem;
-}
-
-.u-config {
-  cursor: pointer;
-  width: 1rem;
-  height: 1rem;
-  background: url("./icons/gear.svg") no-repeat;
-  background-size: 1rem 1rem;
-}
-
 .u-jiggle {
   animation: jiggle 0.30s ease-in;
 }
@@ -349,7 +348,7 @@ a {
         margin: 0;
       }
 
-      div {
+      > div > div {
         margin-left: $smallPadding;
         display: inline-block;
 
@@ -791,6 +790,11 @@ label.SimpleCheckbox {
         line-height: 1.5rem;
         font-weight: bold;
       }
+
+      .u-small-icon-button {
+        padding-left: 3px;
+        padding-top: 3px;
+      }
     }
 
     .SourceList__Empty {
@@ -825,10 +829,6 @@ label.SimpleCheckbox {
     margin-top: 0;
     color: $black !important;
     line-height: $buttonBarHeight;
-  }
-
-  .Library__Buttons {
-    margin-top: -4px;
   }
 
   .SourcePicker {

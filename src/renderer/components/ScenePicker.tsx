@@ -93,21 +93,28 @@ export default class ScenePicker extends React.Component {
               />
               {this.props.scenes.length > 1 && (
                 <div
-                  className="u-random"
+                  className="u-icon-button"
                   title="Play a random scene"
+                  style={{verticalAlign: '-4px'}}
                   onClick={this.onRandom.bind(this)}
-                  onMouseEnter={this.jiggle.bind(this)}/>
+                  onMouseEnter={this.jiggle.bind(this)}>
+                  <div className="u-random"/>
+                </div>
               )}
               <div
-                className="u-import"
+                className="u-small-icon-button"
                 title="Import a scene from a file"
                 onClick={this.props.onImport.bind(this)}
-                onMouseEnter={this.jiggle.bind(this)}/>
+                onMouseEnter={this.jiggle.bind(this)}>
+                <div className="u-down-arrow"/>
+              </div>
               <div
-                className="u-config"
+                className="u-small-icon-button"
                 title="Preferences"
                 onClick={this.props.onConfig.bind(this)}
-                onMouseEnter={this.jiggle.bind(this)}/>
+                onMouseEnter={this.jiggle.bind(this)}>
+                <div className="u-config"/>
+              </div>
             </div>
             <h1>FlipFlip</h1>
             <small>

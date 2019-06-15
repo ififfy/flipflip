@@ -93,17 +93,22 @@ export default class SourceList extends React.Component {
                 </div>
               )}
 
-              <div className="u-button u-destructive u-clickable"
+              <div className="u-button u-small-icon-button u-clickable"
                    onClick={this.onRemove.bind(this, source.id)}
-                   title="Remove">×️
+                   title="Remove">
+                <div className="u-delete"/>
               </div>
               {this.props.config.caching.enabled && getSourceType(source.url) != ST.local && (
-                <div className="u-button u-clean u-clickable"
+                <div className="u-button u-small-icon-button u-clean u-clickable"
                      onClick={this.onClean.bind(this, source.id)}
-                     title="Clear cache"/>)}
-              <div className="u-button u-edit u-clickable"
+                     title="Clear cache">
+                  <div className="u-clean"/>
+                </div>)}
+              <div className="u-button u-small-icon-button u-clickable"
                    onClick={this.onEdit.bind(this, source.id)}
-                   title="Edit"/>
+                   title="Edit">
+                <div className="u-edit"/>
+              </div>
             </div>
           )}
         </div>
