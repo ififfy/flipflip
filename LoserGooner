@@ -1,0 +1,13 @@
+git clone https://github.com/ififfy/flipflip.git
+cd flipflip
+yarn install --dev
+
+# terminal 1:
+yarn development
+
+# terminal 2:
+yarn start
+
+# app is now running, and you can reload at any time.
+# uncomment the "open the dev tools" line in main.ts to get developer
+# tools on launch.
