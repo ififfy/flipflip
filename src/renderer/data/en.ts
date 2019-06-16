@@ -14,10 +14,6 @@ export default new Map<String, String>([
   ['if.gifs', 'Only gifs'],
   ['if.stills', 'Only stills'],
 
-  ['zf.none', 'No zoom'],
-  ['zf.in', 'Zoom In'],
-  ['zf.out', 'Zoom Out'],
-
   ['bt.blur', 'Blurred'],
   ['bt.color', 'Solid Color'],
 

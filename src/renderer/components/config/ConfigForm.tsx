@@ -10,7 +10,8 @@ import Config, {CacheSettings, DisplaySettings, RemoteSettings, SceneSettings} f
 import Scene from "../../data/Scene";
 import APIGroup from "./APIGroup";
 import CacheGroup from "./CacheGroup";
-import EffectGroup from "../sceneDetail/EffectGroup";
+import ImageEffectGroup from "../sceneDetail/ImageEffectGroup";
+import SceneEffectGroup from "../sceneDetail/SceneEffectGroup";
 import ImageGroup from "../sceneDetail/ImageGroup";
 import TextGroup from "../sceneDetail/TextGroup";
 import TimingGroup from "../sceneDetail/TimingGroup";
@@ -69,11 +70,14 @@ export default class ConfigForm extends React.Component {
             scene={this.state.config.defaultScene}
             onUpdateScene={this.onUpdateDefaultScene.bind(this)}/>
 
-          <EffectGroup
+          <SceneEffectGroup
             scene={this.state.config.defaultScene}
-            onUpdateScene={this.onUpdateDefaultScene.bind(this)}
             allScenes={this.props.scenes}
-            libraryPlay={false} />
+            onUpdateScene={this.onUpdateDefaultScene.bind(this)} />
+
+          <ImageEffectGroup
+            scene={this.state.config.defaultScene}
+            onUpdateScene={this.onUpdateDefaultScene.bind(this)} />
 
           <ImageGroup
             scene={this.state.config.defaultScene}

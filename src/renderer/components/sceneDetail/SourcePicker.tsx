@@ -1,17 +1,13 @@
-import {remote} from 'electron';
 import * as React from 'react';
 import Select, { components } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
-import {SF} from "../../data/const";
-import {getFileGroup, getSourceType} from "../../data/utils";
 import SourceList from "./SourceList";
 import LibrarySource from "../library/LibrarySource";
 import Tag from "../library/Tag";
 import URLModal from "../sceneDetail/URLModal";
 import Modal from '../ui/Modal';
 import Config from "../../data/Config";
-import SimpleOptionPicker from "../ui/SimpleOptionPicker";
 import SimpleTextInput from "../ui/SimpleTextInput";
 
 const Option = (props: any) => (

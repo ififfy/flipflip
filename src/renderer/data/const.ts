@@ -19,6 +19,7 @@ const IF = { // image filters
   stills: 'if.stills',
 };
 
+// DEPRECATED
 const ZF = { // zoom functions
   none: 'zf.none',
   in: 'zf.in',

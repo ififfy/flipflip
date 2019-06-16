@@ -3,7 +3,8 @@ import * as React from 'react';
 import Scene from '../../data/Scene';
 import SourcePicker from './SourcePicker';
 import AudioGroup from "./AudioGroup";
-import EffectGroup from "./EffectGroup";
+import ImageEffectGroup from "./ImageEffectGroup";
+import SceneEffectGroup from "./SceneEffectGroup";
 import ImageGroup from "./ImageGroup";
 import TextGroup from "./TextGroup";
 import TimingGroup from "./TimingGroup";
@@ -94,11 +95,14 @@ export default class SceneDetail extends React.Component {
             scene={this.props.scene}
             onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
-          <EffectGroup
+          <SceneEffectGroup
             scene={this.props.scene}
             allScenes={this.props.allScenes}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}
-            libraryPlay={false} />
+            onUpdateScene={this.props.onUpdateScene.bind(this)} />
+
+          <ImageEffectGroup
+            scene={this.props.scene}
+            onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
           <ImageGroup
             scene={this.props.scene}

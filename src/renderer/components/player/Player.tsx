@@ -13,11 +13,12 @@ import ChildCallbackHack from './ChildCallbackHack';
 import HeadlessScenePlayer from './HeadlessScenePlayer';
 import Tag from "../library/Tag";
 import AudioGroup from "../sceneDetail/AudioGroup";
-import EffectGroup from "../sceneDetail/EffectGroup";
+import ImageEffectGroup from "../sceneDetail/ImageEffectGroup";
 import TextGroup from "../sceneDetail/TextGroup";
 import TimingGroup from "../sceneDetail/TimingGroup";
 import Progress from "../ui/Progress";
 import ImageGroup from "../sceneDetail/ImageGroup";
+import SceneEffectGroup from "../sceneDetail/SceneEffectGroup";
 
 const {getCurrentWindow, Menu, MenuItem, app} = remote;
 
@@ -228,11 +229,16 @@ export default class Player extends React.Component {
               scene={this.props.scene}
               onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
-            <EffectGroup
+            {this.props.tags != null && (
+              <SceneEffectGroup
+                scene={this.props.scene}
+                allScenes={this.props.scenes}
+                onUpdateScene={this.props.onUpdateScene.bind(this)} />
+            )}
+
+            <ImageEffectGroup
               scene={this.props.scene}
-              onUpdateScene={this.props.onUpdateScene.bind(this)}
-              allScenes={this.props.scenes}
-              libraryPlay={this.props.tags != null}/>
+              onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
             <ImageGroup
               scene={this.props.scene}

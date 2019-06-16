@@ -1129,15 +1129,6 @@ label.SimpleCheckbox {
   right: 0;
   bottom: 0;
   left: 0;
-
-  .ImageView {
-    img, video {
-      -webkit-animation-fill-mode: forwards;
-      animation-fill-mode: forwards;
-      -webkit-animation-timing-function: ease-out;
-      animation-timing-function: ease-out;
-    }
-  }
 }
 
 .SourceTags {
@@ -1371,24 +1362,6 @@ label.SimpleCheckbox {
   }
 }
 
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes fadeOut {
-  0% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
 @keyframes jiggle {
   0%, 100% {
     transform: scale(1.0, 1.0)
@@ -1401,29 +1374,5 @@ label.SimpleCheckbox {
   }
   75% {
     transform: scale(1.0, 1.0) translate(0, -5px)
-  }
-}
-
-/* Ken Burns effects */
-
-@each $x in -10 0 10 {
-  @each $y in -10 0 10 {
-    @keyframes kb-#{$x}-#{$y} {
-      100% {
-        transform: translate(percentage($x/100), percentage($y/100));
-      }
-    }
-
-    @keyframes kb-#{$x}-#{$y}-zoom {
-      100% {
-        transform: translate(percentage($x*2/100), percentage($y*2/100)) scale(2, 2);
-      }
-    }
-
-    @keyframes kb-#{$x}-#{$y}-zoom-out {
-      100% {
-        transform: translate(percentage($x/100), percentage($y/100)) scale(1, 1);
-      }
-    }
   }
 }
