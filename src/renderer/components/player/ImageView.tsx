@@ -3,9 +3,12 @@ import {animated, useSpring, useTransition} from "react-spring";
 
 import {BT} from "../../data/const";
 
-export const ImageGroup = (data: {image: any, backgroundType: string, backgroundColor: string,
-  horizTransLevel: number, vertTransLevel: number, zoomStart: number, zoomEnd: number,
-  transDuration: number, fadeDuration: number, crossFade: boolean}) => {
+// Numbers are suddenly becoming string when passed to this object,
+// so just cast them when they are used.
+export const ImageGroup = (data: {image: any, backgroundType: any, backgroundColor: any,
+  horizTransLevel: any, vertTransLevel: any, zoomStart: any, zoomEnd: any,
+  transDuration: any, fadeDuration: any, crossFade: boolean}) => {
+
   const fadeTransitions: [{item: any, props: any, key: any}] = useTransition(
     data.image,
     (image: any) => {
@@ -26,60 +29,62 @@ export const ImageGroup = (data: {image: any, backgroundType: string, background
       },
       unique: true, // If this is true, items going in and out with the same key will be re-used
       config: {
-        duration: data.fadeDuration,
+        duration: parseInt(data.fadeDuration, 10),
       },
     }
   );
 
   return (
-    fadeTransitions.map(({item, props, key}) => {
+    <React.Fragment>
+      {fadeTransitions.map(({item, props, key}) => {
 
-      let backgroundStyle;
-      if (data.backgroundType == BT.color) {
-        backgroundStyle = {
-          height: '100%',
-          width: '100%',
-          backgroundColor: data.backgroundColor,
-          backgroundSize: 'cover',
-        };
-      } else {
-        backgroundStyle = {
-          height: '100%',
-          width: '100%',
-          filter: 'blur(8px)',
-          backgroundImage: `url(${item.src})`,
-          backgroundSize: 'cover',
-        };
-      }
-      return (
-        <animated.div className="ImageView u-fill-container" key={key} style={{ ...props }}>
-          <Image src={item.src}
-                 horizTransLevel={data.horizTransLevel}
-                 vertTransLevel={data.vertTransLevel}
-                 zoomStart={data.zoomStart}
-                 zoomEnd={data.zoomEnd}
-                 duration={data.transDuration} />
-          <animated.div
-            style={backgroundStyle}
-          />
-        </animated.div>
-      );
-    })
+        let backgroundStyle;
+        if (data.backgroundType == BT.color) {
+          backgroundStyle = {
+            height: '100%',
+            width: '100%',
+            backgroundColor: data.backgroundColor,
+            backgroundSize: 'cover',
+          };
+        } else {
+          backgroundStyle = {
+            height: '100%',
+            width: '100%',
+            filter: 'blur(8px)',
+            backgroundImage: `url(${item.src})`,
+            backgroundSize: 'cover',
+          };
+        }
+        return (
+          <animated.div className="ImageView u-fill-container" key={key} style={{ ...props }}>
+            <Image src={item.src}
+                   horizTransLevel={data.horizTransLevel}
+                   vertTransLevel={data.vertTransLevel}
+                   zoomStart={data.zoomStart}
+                   zoomEnd={data.zoomEnd}
+                   duration={data.transDuration} />
+            <animated.div
+              style={backgroundStyle}
+            />
+          </animated.div>
+        );
+      })}
+    </React.Fragment>
   );
 };
 
-const Image = (data: {src: string, horizTransLevel: number, vertTransLevel:number,
-  zoomStart: number, zoomEnd: number, duration: number }) => {
+const Image = (data: {src: string, horizTransLevel: any, vertTransLevel: any,
+  zoomStart: any, zoomEnd: any, duration: any }) => {
   const imageProps = useSpring(
     {
       from: {
-        transform: 'translate(0%, 0%) scale(' + data.zoomStart + ')',
+        transform: 'translate(0%, 0%) scale(' + parseInt(data.zoomStart, 10) + ')',
       },
       to: {
-        transform: 'translate(' + data.horizTransLevel + '%, ' + data.vertTransLevel + '%) scale(' + data.zoomEnd + ')',
+        transform: 'translate(' + parseInt(data.horizTransLevel, 10) + '%, ' + parseInt(data.vertTransLevel, 10) + '%) scale(' + parseInt(data.zoomEnd, 10) + ')',
       },
       config: {
-        duration: data.duration,
+        duration: parseInt(data.duration, 10),
       },
     }
   );
@@ -128,9 +133,9 @@ export default class ImageView extends React.Component {
         vertTransLevel={this.props.vertTransLevel}
         zoomStart={this.props.zoomStart}
         zoomEnd={this.props.zoomEnd}
-        transDuration={parseInt(this.props.transDuration, 10)}
+        transDuration={this.props.transDuration}
         crossFade={this.props.crossFade}
-        fadeDuration={parseInt(this.props.fadeDuration, 10)}/>
+        fadeDuration={this.props.fadeDuration}/>
     );
   }
 }
