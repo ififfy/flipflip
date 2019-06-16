@@ -161,6 +161,7 @@ export default class CaptionProgram extends React.Component {
         }
 
         if (!hasError) {
+          PHRASES = [];
           captionLoop(newPromise.hasCanceled);
         }
       });
