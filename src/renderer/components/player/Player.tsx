@@ -229,7 +229,7 @@ export default class Player extends React.Component {
               scene={this.props.scene}
               onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
-            {this.props.tags != null && (
+            {this.props.tags == null && (
               <SceneEffectGroup
                 scene={this.props.scene}
                 allScenes={this.props.scenes}
