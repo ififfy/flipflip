@@ -1129,6 +1129,25 @@ label.SimpleCheckbox {
   right: 0;
   bottom: 0;
   left: 0;
+
+  .ImageView {
+
+    .ImageView__Image {
+      height: 100%;
+      width: 100%;
+      z-index: 2;
+      background-position: center;
+      background-size: contain;
+      background-repeat: no-repeat;
+      position: absolute;
+    }
+
+    .ImageView__Background {
+      height: 100%;
+      width: 100%;
+      background-size: cover;
+    }
+  }
 }
 
 .SourceTags {

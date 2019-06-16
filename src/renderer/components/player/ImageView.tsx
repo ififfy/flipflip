@@ -41,18 +41,12 @@ export const ImageGroup = (data: {image: any, backgroundType: any, backgroundCol
         let backgroundStyle;
         if (data.backgroundType == BT.color) {
           backgroundStyle = {
-            height: '100%',
-            width: '100%',
             backgroundColor: data.backgroundColor,
-            backgroundSize: 'cover',
           };
         } else {
           backgroundStyle = {
-            height: '100%',
-            width: '100%',
             filter: 'blur(8px)',
             backgroundImage: `url(${item.src})`,
-            backgroundSize: 'cover',
           };
         }
         return (
@@ -64,6 +58,7 @@ export const ImageGroup = (data: {image: any, backgroundType: any, backgroundCol
                    zoomEnd={data.zoomEnd}
                    duration={data.transDuration} />
             <animated.div
+              className="ImageView__Background"
               style={backgroundStyle}
             />
           </animated.div>
@@ -90,17 +85,10 @@ const Image = (data: {src: string, horizTransLevel: any, vertTransLevel: any,
   );
 
   const style = {
-    height: '100%',
-    width: '100%',
-    zIndex: 2,
     backgroundImage: `url(${data.src})`,
-    backgroundPosition: 'center',
-    backgroundSize: 'contain',
-    backgroundRepeat: 'no-repeat',
-    position: 'absolute',
   };
 
-  return <animated.div style={{ ...imageProps, ...style}} />
+  return <animated.div className="ImageView__Image" style={{ ...imageProps, ...style}} />
 };
 
 export default class ImageView extends React.Component {
