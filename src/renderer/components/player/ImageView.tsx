@@ -1,179 +1,136 @@
 import * as React from 'react';
-import {BT, HTF, VTF, ZF} from "../../data/const";
+import {animated, useSpring, useTransition} from "react-spring";
 
-const maxFadeSeconds = 5;
+import {BT} from "../../data/const";
+
+export const ImageGroup = (data: {image: any, backgroundType: string, backgroundColor: string,
+  horizTransLevel: number, vertTransLevel: number, zoomStart: number, zoomEnd: number,
+  transDuration: number, fadeDuration: number, crossFade: boolean}) => {
+  const fadeTransitions: [{item: any, props: any, key: any}] = useTransition(
+    data.image,
+    (image: any) => {
+      return image.key
+    },
+    {
+      initial: { // Initial (first time) base values, optional (can be null)
+        opacity: 1,
+      },
+      from: { // Base values, optional
+        opacity: data.crossFade ? 0 : 1,
+      },
+      enter: { // Styles apply for entering elements
+        opacity: 1,
+      },
+      leave: { // Styles apply for leaving elements
+        opacity: data.crossFade ? 0 : 1,
+      },
+      unique: true, // If this is true, items going in and out with the same key will be re-used
+      config: {
+        duration: data.fadeDuration,
+      },
+    }
+  );
+
+  return (
+    fadeTransitions.map(({item, props, key}) => {
+
+      let backgroundStyle;
+      if (data.backgroundType == BT.color) {
+        backgroundStyle = {
+          height: '100%',
+          width: '100%',
+          backgroundColor: data.backgroundColor,
+          backgroundSize: 'cover',
+        };
+      } else {
+        backgroundStyle = {
+          height: '100%',
+          width: '100%',
+          filter: 'blur(8px)',
+          backgroundImage: `url(${item.src})`,
+          backgroundSize: 'cover',
+        };
+      }
+      return (
+        <animated.div className="ImageView u-fill-container" key={key} style={{ ...props }}>
+          <Image src={item.src}
+                 horizTransLevel={data.horizTransLevel}
+                 vertTransLevel={data.vertTransLevel}
+                 zoomStart={data.zoomStart}
+                 zoomEnd={data.zoomEnd}
+                 duration={data.transDuration} />
+          <animated.div
+            style={backgroundStyle}
+          />
+        </animated.div>
+      );
+    })
+  );
+};
+
+const Image = (data: {src: string, horizTransLevel: number, vertTransLevel:number,
+  zoomStart: number, zoomEnd: number, duration: number }) => {
+  const imageProps = useSpring(
+    {
+      from: {
+        transform: 'translate(0%, 0%) scale(' + data.zoomStart + ')',
+      },
+      to: {
+        transform: 'translate(' + data.horizTransLevel + '%, ' + data.vertTransLevel + '%) scale(' + data.zoomEnd + ')',
+      },
+      config: {
+        duration: data.duration,
+      },
+    }
+  );
+
+  const style = {
+    height: '100%',
+    width: '100%',
+    zIndex: 2,
+    backgroundImage: `url(${data.src})`,
+    backgroundPosition: 'center',
+    backgroundSize: 'contain',
+    backgroundRepeat: 'no-repeat',
+    position: 'absolute',
+  };
+
+  return <animated.div style={{ ...imageProps, ...style}} />
+};
 
 export default class ImageView extends React.Component {
   readonly props: {
-    img: HTMLImageElement | HTMLVideoElement,
-    fadeState: string,
-    fadeDuration: number,
+    image: HTMLImageElement | HTMLVideoElement,
     backgroundType: string,
     backgroundColor: string,
-    horizTransType: string,
-    vertTransType: string,
-    zoomType: string,
-    effectLevel: number,
+    horizTransLevel: number,
+    vertTransLevel: number,
+    zoomStart: number,
+    zoomEnd: number,
+    transDuration: number,
+    crossFade: boolean,
+    fadeDuration: number,
   };
 
-  readonly backgroundRef: React.RefObject<any> = React.createRef();
-  readonly contentRef: React.RefObject<any> = React.createRef();
-
-  componentDidMount() {
-    this._applyImage();
-  }
-
-  componentDidUpdate() {
-    this._applyImage();
-  }
-
-  _applyImage() {
-    const el = this.contentRef.current;
-    const bg = this.backgroundRef.current;
-    const img = this.props.img;
-    if (!el || !img) return;
-
-    if (img instanceof HTMLVideoElement) {
-      img.play();
-    }
-
-    const firstChild = el.firstChild;
-    if (firstChild instanceof HTMLImageElement || firstChild instanceof HTMLVideoElement) {
-      if (firstChild.src === img.src) return;
-    }
-
-    const blur = this.props.backgroundType == BT.blur;
-    let bgImg: any;
-    if (blur) {
-      bgImg = this.props.img.cloneNode();
-    }
-
-    const parentWidth = el.offsetWidth;
-    const parentHeight = el.offsetHeight;
-    const parentAspect = parentWidth / parentHeight;
-    let imgWidth;
-    if (img instanceof HTMLImageElement) {
-      imgWidth = img.width;
-    } else {
-      imgWidth = img.videoWidth;
-    }
-    let imgHeight;
-    if (img instanceof HTMLImageElement) {
-      imgHeight = img.height;
-    } else {
-      imgHeight = img.videoHeight;
-    }
-    const imgAspect = imgWidth / imgHeight;
-
-    if (imgAspect < parentAspect) {
-      const scale = parentHeight / imgHeight;
-      img.style.width = 'auto';
-      img.style.height = '100%';
-      img.style.marginTop = '0';
-      img.style.marginLeft = (parentWidth / 2 - imgWidth * scale / 2) + 'px';
-      if (blur) {
-        const bgscale = parentWidth / imgWidth;
-        bgImg.style.width = '100%';
-        bgImg.style.height = 'auto';
-        bgImg.style.marginTop = (parentHeight / 2 - imgHeight * bgscale / 2) + 'px';
-        bgImg.style.marginLeft = '0';
-      }
-    } else {
-      const scale = parentWidth / imgWidth;
-      img.style.width = '100%';
-      img.style.height = 'auto';
-      img.style.marginTop = (parentHeight / 2 - imgHeight * scale / 2) + 'px';
-      img.style.marginLeft = '0';
-      if (blur) {
-        const bgscale = parentHeight / imgHeight;
-        bgImg.style.width = 'auto';
-        bgImg.style.height = '100%';
-        bgImg.style.marginTop = '0';
-        bgImg.style.marginLeft = (parentWidth / 2 - imgWidth * bgscale / 2) + 'px';
-      }
-    }
-
-    if (firstChild) {
-      el.removeChild(firstChild);
-    }
-    if (bg.firstChild) {
-      bg.removeChild(bg.firstChild);
-    }
-
-    el.appendChild(img);
-    if (blur) {
-      if (bgImg instanceof HTMLVideoElement) {
-        bgImg.muted = true;
-        bgImg.volume = 0;
-        bgImg.autoplay = false;
-      }
-      bg.appendChild(bgImg);
-    }
+  shouldComponentUpdate(props: any): boolean {
+    return ((props.image.src !== this.props.image.src) ||
+      (props.transDuration !== this.props.transDuration) ||
+      (props.fadeDuration !== this.props.fadeDuration));
   }
 
   render() {
-    let style = {};
-    const fadeDuration = Math.min(maxFadeSeconds, (this.props.fadeDuration / 1000)) + 's';
-    if (this.props.fadeState === 'in') {
-      style = {
-        animationName: 'fadeIn',
-        opacity: 1,
-        animationDuration: fadeDuration,
-      };
-    } else if (this.props.fadeState === 'out') {
-      style = {
-        animationName: 'fadeOut',
-        opacity: 0,
-        animationDuration: fadeDuration,
-      };
-    }
-
-    let className = "ImageView u-fill-container translate-";
-
-    switch (this.props.horizTransType) {
-      case HTF.none:
-        className += '0-';
-        break;
-      case HTF.right:
-        className += '10-';
-        break;
-      case HTF.left:
-        className += '-10-';
-        break;
-    }
-    switch (this.props.vertTransType) {
-      case VTF.none:
-        className += '0-';
-        break;
-      case VTF.down:
-        className += '10-';
-        break;
-      case VTF.up:
-        className += '-10-';
-        break;
-    }
-    switch (this.props.zoomType) {
-      case ZF.none:
-        className += `${this.props.effectLevel}s`;
-        break;
-      case ZF.in:
-        className += `zoom-${this.props.effectLevel}s`;
-        break;
-      case ZF.out:
-        className += `zoom-out-${this.props.effectLevel}s`;
-    }
-
     return (
-      <div style={style}>
-        <div
-          className={`ImageViewBackground u-fill-container ${this.props.backgroundType == BT.color ? '' : 'm-blur'}`}
-          style={{background: this.props.backgroundType == BT.color ? this.props.backgroundColor : null}}
-          ref={this.backgroundRef}
-        />
-        <div
-          className={className}
-          ref={this.contentRef}
-        />
-      </div>);
+      <ImageGroup
+        image={this.props.image}
+        backgroundType={this.props.backgroundType}
+        backgroundColor={this.props.backgroundColor}
+        horizTransLevel={this.props.horizTransLevel}
+        vertTransLevel={this.props.vertTransLevel}
+        zoomStart={this.props.zoomStart}
+        zoomEnd={this.props.zoomEnd}
+        transDuration={parseInt(this.props.transDuration, 10)}
+        crossFade={this.props.crossFade}
+        fadeDuration={parseInt(this.props.fadeDuration, 10)}/>
+    );
   }
 }

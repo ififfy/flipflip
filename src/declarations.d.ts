@@ -28,6 +28,7 @@ declare module 'progressbar.js';
 declare module 'sortablejs';
 declare module 'react-select';
 declare module 'react-select/creatable';
+declare module 'react-spring';
 declare module 'snoowrap';
 declare module 'rimraf';
 declare module 'get-folder-size';

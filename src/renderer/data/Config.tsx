@@ -1,4 +1,4 @@
-import {BT, HTF, IF, TF, VTF, WF, ZF} from "./const";
+import {BT, HTF, IF, TF, VTF, WF} from "./const";
 
 interface SceneSettingsI {
   [key: string]: string|number|boolean;
@@ -8,11 +8,18 @@ interface SceneSettingsI {
   weightFunction: string;
   randomize: boolean;
   forceAll: boolean;
-  zoomType: string;
-  effectLevel: number;
+  zoom: boolean;
+  zoomStart: number;
+  zoomEnd: number;
   horizTransType: string;
+  horizTransLevel: number;
   vertTransType: string;
+  vertTransLevel: number;
+  transFull: boolean;
+  transDuration: number;
   crossFade: boolean;
+  fadeFull: boolean;
+  fadeDuration : number;
   backgroundType: string;
   backgroundColor: string;
   playFullGif: boolean;
@@ -92,11 +99,18 @@ export class SceneSettings implements SceneSettingsI {
   weightFunction = WF.sources;
   randomize = true;
   forceAll = false;
-  zoomType = ZF.none;
-  effectLevel = 5;
+  zoom = false;
+  zoomStart = 1;
+  zoomEnd = 2;
   horizTransType = HTF.none;
+  horizTransLevel = 10;
   vertTransType = VTF.none;
+  vertTransLevel = 10;
+  transFull = false;
+  transDuration = 5000;
   crossFade = false;
+  fadeFull = false;
+  fadeDuration = 500;
   backgroundType = BT.blur;
   backgroundColor = "#000000";
   playFullGif = false;

@@ -8,7 +8,7 @@ import gifInfo from 'gif-info';
 import getFolderSize from "get-folder-size";
 import IdleTimer from 'react-idle-timer';
 
-import {IF, ST, TF, WF} from '../../data/const';
+import {HTF, IF, ST, TF, VTF, WF} from '../../data/const';
 import {getCachePath, getFileName, getRandomListItem, getSourceType, isVideo, urlToPath} from '../../data/utils';
 import Config from "../../data/Config";
 import Scene from "../../data/Scene";
@@ -59,26 +59,38 @@ export default class ImagePlayer extends React.Component {
   render() {
     if (this.state.historyPaths.length < 1 || !this.props.hasStarted) return <div className="ImagePlayer m-empty"/>;
 
-    const imgs = Array<any>();
-
-    // if user is browsing history, use that image instead
-    if (this.state.historyPaths.length > 0 && !this.props.isPlaying) {
-      let offset = this.props.historyOffset;
-      if (offset <= -this.state.historyPaths.length) {
-        offset = -this.state.historyPaths.length + 1;
-      }
-      const img = this.state.historyPaths[(this.state.historyPaths.length - 1) + offset];
-      (img as any).key = 0;
-      imgs.push(img);
-    } else {
-      const max = this.props.scene.crossFade ? 3 : 2;
-      for (let i = 1; i < max; i++) {
-        const img = this.state.historyPaths[this.state.historyPaths.length - i];
-        if (img) {
-          imgs.push(img);
-        }
-      }
+    let offset = this.props.historyOffset;
+    if (offset <= -this.state.historyPaths.length) {
+      offset = -this.state.historyPaths.length + 1;
     }
+
+    let horizTransLevel = 0;
+    if (this.props.scene.horizTransType == HTF.left) {
+      horizTransLevel = -this.props.scene.horizTransLevel;
+    } else if (this.props.scene.horizTransType == HTF.right) {
+      horizTransLevel = this.props.scene.horizTransLevel;
+    }
+
+    let vertTransLevel = 0;
+    if (this.props.scene.vertTransType == VTF.up) {
+      vertTransLevel = -this.props.scene.vertTransLevel;
+    } else if (this.props.scene.vertTransType == VTF.down) {
+      vertTransLevel = this.props.scene.vertTransLevel;
+    }
+
+    let zoomStart = 1;
+    let zoomEnd = 1;
+    if (this.props.scene.zoom) {
+      zoomStart = this.props.scene.zoomStart;
+      zoomEnd = this.props.scene.zoomEnd;
+    }
+
+    let fadeDuration = 0;
+    if (this.props.scene.crossFade) {
+      fadeDuration = this.props.scene.fadeFull ? this.state.timeToNextFrame : this.props.scene.fadeDuration;
+    }
+
+    const transDuration = this.props.scene.transFull ? this.state.timeToNextFrame : this.props.scene.transDuration;
 
     return (
       <div className="ImagePlayer"
@@ -89,20 +101,17 @@ export default class ImagePlayer extends React.Component {
           onIdle={this.onIdle.bind(this)}
           timeout={2000} />
         <div style={{ animation: this.props.strobe ? "strobe " + this.props.strobeTime + "ms steps(1, end) infinite" : "none" }}>
-          {imgs.map((img) => {
-            return <ImageView
-              img={img}
-              key={(img as any).key}
-              fadeState={this.props.scene.crossFade ? (img.src === imgs[0].src ? 'in' : 'out') : 'none'}
-              fadeDuration={this.state.timeToNextFrame / 2}
-              backgroundType={this.props.scene.backgroundType}
-              backgroundColor={this.props.scene.backgroundColor}
-              horizTransType={this.props.scene.horizTransType}
-              vertTransType={this.props.scene.vertTransType}
-              zoomType={this.props.scene.zoomType}
-              effectLevel={this.props.scene.effectLevel}
-            />;
-          })}
+          <ImageView
+            image={this.state.historyPaths[(this.state.historyPaths.length - 1) + offset]}
+            backgroundType={this.props.scene.backgroundType}
+            backgroundColor={this.props.scene.backgroundColor}
+            horizTransLevel={horizTransLevel}
+            vertTransLevel={vertTransLevel}
+            zoomStart={zoomStart}
+            zoomEnd={zoomEnd}
+            transDuration={transDuration}
+            crossFade={this.props.scene.crossFade}
+            fadeDuration={fadeDuration}/>
         </div>
       </div>
     );
@@ -505,29 +514,31 @@ export default class ImagePlayer extends React.Component {
     // bail if dead
     if (!(isStarting || ignoreIsPlayingStatus || (this.props.isPlaying && this._isMounted))) return;
 
-    this.setState({
-      historyPaths: nextHistoryPaths,
-    });
-    this.props.setHistoryPaths(nextHistoryPaths);
-
-    if (!schedule) return;
-
-    let timeToNextFrame: number = 0;
-    if (this.props.scene.timingFunction === TF.constant) {
-      timeToNextFrame = parseInt(this.props.scene.timingConstant, 10);
-      // If we cannot parse this, default to 1s
-      if (!timeToNextFrame && timeToNextFrame != 0) {
-        timeToNextFrame = 1000;
-      }
+    if (!schedule) {
+      this.setState({
+        historyPaths: nextHistoryPaths,
+      });
+      this.props.setHistoryPaths(nextHistoryPaths);
     } else {
-      timeToNextFrame = TIMING_FUNCTIONS.get(this.props.scene.timingFunction)();
+      let timeToNextFrame: number = 0;
+      if (this.props.scene.timingFunction === TF.constant) {
+        timeToNextFrame = parseInt(this.props.scene.timingConstant, 10);
+        // If we cannot parse this, default to 1s
+        if (!timeToNextFrame && timeToNextFrame != 0) {
+          timeToNextFrame = 1000;
+        }
+      } else {
+        timeToNextFrame = TIMING_FUNCTIONS.get(this.props.scene.timingFunction)();
+      }
+      if (nextImg && nextImg.getAttribute("duration") && timeToNextFrame < parseInt(nextImg.getAttribute("duration"))) {
+        timeToNextFrame = parseInt(nextImg.getAttribute("duration"));
+      }
+      this.setState({
+        historyPaths: nextHistoryPaths,
+        timeToNextFrame,
+        timeoutID: setTimeout(this.advance.bind(this, false, true), timeToNextFrame),
+      });
+      this.props.setHistoryPaths(nextHistoryPaths);
     }
-    if (nextImg && nextImg.getAttribute("duration") && timeToNextFrame < parseInt(nextImg.getAttribute("duration"))) {
-      timeToNextFrame = parseInt(nextImg.getAttribute("duration"));
-    }
-    this.setState({
-      timeToNextFrame,
-      timeoutID: setTimeout(this.advance.bind(this, false, true), timeToNextFrame),
-    });
   }
 };

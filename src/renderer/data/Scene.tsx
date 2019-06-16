@@ -11,11 +11,18 @@ export default class Scene {
   randomize = true;
   forceAll = false;
   imageTypeFilter = IF.any;
-  zoomType = ZF.none;
-  effectLevel: number = 5;
+  zoom = false;
+  zoomStart = 1;
+  zoomEnd = 2;
   horizTransType = HTF.none;
+  horizTransLevel = 10;
   vertTransType = VTF.none;
+  vertTransLevel = 10;
+  transFull = false;
+  transDuration = 5000;
   crossFade = false;
+  fadeFull = false;
+  fadeDuration = 500;
   backgroundType = BT.blur;
   backgroundColor = "#000000";
   strobe = false;
@@ -49,6 +56,8 @@ export default class Scene {
 
   // unused; migration only
   hastebinID: string = "";
+  zoomType = "";
+  effectLevel = 0;
 
   constructor(init?: Partial<Scene>) {
     Object.assign(this, init);
@@ -63,6 +72,22 @@ export default class Scene {
       this.textKind = TOT.hastebin;
       this.textSource = this.hastebinID;
       this.hastebinID = "";
+    }
+
+    if (!this.zoom && this.zoomType != "") {
+      if (this.zoomType == ZF.in) {
+        this.zoom = true;
+      } else if (this.zoomType == ZF.out) {
+        this.zoom = true;
+        this.zoomStart = 1.5;
+        this.zoomEnd = 1.;
+      }
+      this.zoomType = "";
+    }
+
+    if (!this.transDuration && this.effectLevel != 0) {
+      this.transDuration = this.effectLevel * 1000;
+      this.effectLevel = 0;
     }
 
     if (!(this.textKind && this.textKind.length)) {
