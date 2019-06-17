@@ -27,11 +27,9 @@ export default class SimpleNumberInput extends React.Component {
   }
 
   onChange(e: React.FormEvent<HTMLSelectElement>) {
-    if (e.currentTarget.value == "") {
-      this.props.onChange(e.currentTarget.value);
-    } else {
+    if (e.currentTarget.value != "") {
       const value = parseInt(e.currentTarget.value);
-      if ((this.props.min == null || value >= this.props.min) && (this.props.max == null || value <= this.props.max)) {
+      if ((this.props.min == null || value >= this.props.min) && (this.props.max == null || value <= this.props.max) && !isNaN(value)) {
         this.props.onChange(e.currentTarget.value);
       }
     }

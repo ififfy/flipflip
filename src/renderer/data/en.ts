@@ -52,4 +52,8 @@ export default new Map<String, String>([
   ['st.deviantart', 'deviantart'],
   ['st.instagram', 'instagram'],
   ['st.list', 'list'],
+
+  ['sl.top', 'Above All'],
+  ['sl.middle', 'Above Scene'],
+  ['sl.bottom', 'Behind All'],
 ]);

@@ -15,6 +15,7 @@ import Scene from "../../data/Scene";
 import TIMING_FUNCTIONS from '../../data/TIMING_FUNCTIONS';
 import ChildCallbackHack from './ChildCallbackHack';
 import ImageView from './ImageView';
+import {Transition} from "react-spring/renderprops-universal";
 
 class GifInfo {
   animated: boolean;
@@ -31,8 +32,8 @@ export default class ImagePlayer extends React.Component {
     maxLoadingAtOnce: number,
     maxToRememberInHistory: number,
     allURLs: Map<String, Array<string>>,
-    strobe: boolean,
-    strobeTime: number,
+    strobe?: boolean,
+    toggleStrobe?: boolean,
     isPlaying: boolean,
     historyOffset: number,
     setHistoryPaths: (historyPaths: Array<any>) => void,
@@ -94,13 +95,25 @@ export default class ImagePlayer extends React.Component {
 
     return (
       <div className="ImagePlayer"
-           style={{background: this.props.strobe ? this.props.scene.strobeColor : "none", cursor: this.state.hideCursor ? "none" : "initial"}}>
+           style={{cursor: this.state.hideCursor ? "none" : "initial"}}>
+        {this.props.strobe && (
+          <Transition
+            reset
+            unique
+            items={this.props.toggleStrobe}
+            config={{duration: this.props.scene.strobeTime}}
+            from={{ backgroundColor: this.props.scene.strobeColor, opacity: 1}}
+            enter={{ opacity: 0 }}
+            leave={{ opacity: 0 }} >
+            {toggle => props => <div className="Strobe u-fill-container" style={props}/>}
+          </Transition>
+        )}
         <IdleTimer
           ref={null}
           onActive={this.onActive.bind(this)}
           onIdle={this.onIdle.bind(this)}
           timeout={2000} />
-        <div style={{ animation: this.props.strobe ? "strobe " + this.props.strobeTime + "ms steps(1, end) infinite" : "none" }}>
+        <div>
           <ImageView
             image={this.state.historyPaths[(this.state.historyPaths.length - 1) + offset]}
             backgroundType={this.props.scene.backgroundType}
@@ -155,7 +168,7 @@ export default class ImagePlayer extends React.Component {
             props.allURLs !== this.props.allURLs ||
             props.historyOffset !== this.props.historyOffset ||
             props.strobe !== this.props.strobe ||
-            props.strobeTime !== this.props.strobeTime);
+            props.toggleStrobe !== this.props.toggleStrobe);
   }
 
   componentWillReceiveProps(props: any) {

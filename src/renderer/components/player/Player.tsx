@@ -4,7 +4,7 @@ import Sound from 'react-sound';
 import fs from "fs";
 import fileURL from "file-url";
 
-import {ST, TOT} from "../../data/const";
+import {SL, ST, TOT} from "../../data/const";
 import {getCachePath, getSourceType, urlToPath} from '../../data/utils';
 import Config from "../../data/Config";
 import Scene from '../../data/Scene';
@@ -19,6 +19,9 @@ import TimingGroup from "../sceneDetail/TimingGroup";
 import Progress from "../ui/Progress";
 import ImageGroup from "../sceneDetail/ImageGroup";
 import SceneEffectGroup from "../sceneDetail/SceneEffectGroup";
+import {Transition} from "react-spring/renderprops-universal";
+import StrobeGroup from "../sceneDetail/StrobeGroup";
+import ZoomMoveGroup from "../sceneDetail/ZoomMoveGroup";
 
 const {getCurrentWindow, Menu, MenuItem, app} = remote;
 
@@ -51,9 +54,9 @@ export default class Player extends React.Component {
     config: Config,
     goBack(): void,
     scene: Scene,
+    scenes: Array<Scene>,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
     nextScene(): void,
-    scenes?: Array<Scene>,
     tags?: Array<Tag>,
     allTags?: Array<Tag>,
     toggleTag?(sourceID: number, tag: Tag): void,
@@ -68,6 +71,7 @@ export default class Player extends React.Component {
     isOverlayLoaded: false,
     isEmpty: false,
     isPlaying: true,
+    toggleStrobe: false,
     total: 0,
     progress: 0,
     progressMessage: this.props.scene.sources.length > 0 ? this.props.scene.sources[0].url : "",
@@ -79,6 +83,8 @@ export default class Player extends React.Component {
   };
 
   interval: NodeJS.Timer = null;
+  strobeInterval: NodeJS.Timer = null;
+  strobeDelay = 0;
 
   render() {
     const canGoBack = this.state.historyOffset > -(this.state.historyPaths.length - 1);
@@ -88,7 +94,6 @@ export default class Player extends React.Component {
       : (Sound as any).status.PAUSED;
     const tagNames = this.props.tags ? this.props.tags.map((t) => t.name) : [];
     const hasOverlay = (this.props.scene.overlaySceneID !== 0 && this.getScene(this.props.scene.overlaySceneID) != null && this.getScene(this.props.scene.overlaySceneID).sources.length > 0);
-    const overlayStrobe = this.props.scene.strobe && this.props.scene.strobeOverlay;
     const showCaptionProgram = (
       this.props.scene.textSource &&
       this.props.scene.textSource.length &&
@@ -96,15 +101,28 @@ export default class Player extends React.Component {
     const nextScene = this.getScene(this.props.scene.nextSceneID);
     const nextOverlay = nextScene ? this.getScene(nextScene.overlaySceneID) : null;
 
+    const strobeOpacity = this.props.scene.strobeLayer == SL.bottom ? this.props.scene.strobeOpacity : 1;
+
     return (
-      <div className="Player" style={{
-        background: overlayStrobe && this.state.hasStarted ? this.props.scene.strobeColor : "none",
-      }}>
+      <div className="Player">
+        {this.props.scene.strobe && this.state.hasStarted &&
+          (this.props.scene.strobeLayer == SL.top || this.props.scene.strobeLayer == SL.bottom) && (
+          <Transition
+            reset
+            unique
+            items={this.state.toggleStrobe}
+            config={{duration: this.props.scene.strobeTime}}
+            from={{ backgroundColor: this.props.scene.strobeColor, opacity: strobeOpacity}}
+            enter={{ opacity: 0 }}
+            leave={{ opacity: 0 }} >
+            {toggle => props => <div className="Strobe u-fill-container" style={props}/>}
+          </Transition>
+        )}
         {!this.state.hasStarted && !this.state.isEmpty && (
           <Progress
-          total={this.state.total}
-          current={this.state.progress}
-          message={this.state.progressMessage}>
+            total={this.state.total}
+            current={this.state.progress}
+            message={this.state.progressMessage}>
             {this.state.isLoaded && (<div
               className="StartButton u-button u-clickable"
               onClick={this.start.bind(this, true)}>
@@ -116,17 +134,15 @@ export default class Player extends React.Component {
           <div className="EmptyIndicator"><p>I couldn't find anything</p><p>(ಥ﹏ಥ)</p></div>
         )}
 
-        <div style={{
-          animation: overlayStrobe && this.state.hasStarted ? "strobe " + this.props.scene.strobeTime + "ms steps(1, end) infinite" : "none",
-          display: this.state.hasStarted ? "" : "none"}}>
+        <div style={{display: this.state.hasStarted ? "" : "none"}}>
           <HeadlessScenePlayer
             config={this.props.config}
             scene={this.props.scene}
             nextScene={nextScene}
             opacity={1}
             isPlaying={this.state.isPlaying}
-            strobe={!this.props.scene.strobeOverlay && this.props.scene.strobe}
-            strobeTime={this.props.scene.strobeTime}
+            strobe={this.props.scene.strobe && this.props.scene.strobeLayer == SL.middle}
+            toggleStrobe={this.state.toggleStrobe}
             historyOffset={this.state.historyOffset}
             advanceHack={this.state.imagePlayerAdvanceHack}
             deleteHack={this.state.imagePlayerDeleteHack}
@@ -136,7 +152,7 @@ export default class Player extends React.Component {
             firstImageLoaded={this.setMainCanStart.bind(this)}
             setProgress={this.setProgress.bind(this)}
             hasStarted={this.state.hasStarted}
-           />
+          />
 
           {hasOverlay && !this.state.isEmpty && (
             <HeadlessScenePlayer
@@ -145,8 +161,6 @@ export default class Player extends React.Component {
               nextScene={nextOverlay}
               opacity={this.props.scene.overlaySceneOpacity}
               isPlaying={this.state.isPlaying && !this.state.isEmpty}
-              strobe={false}
-              strobeTime={0}
               historyOffset={0}
               setHistoryOffset={this.nop}
               setHistoryPaths={this.nop}
@@ -240,6 +254,14 @@ export default class Player extends React.Component {
               scene={this.props.scene}
               onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
+            <ZoomMoveGroup
+              scene={this.props.scene}
+              onUpdateScene={this.props.onUpdateScene.bind(this)} />
+
+            <StrobeGroup
+              scene={this.props.scene}
+              onUpdateScene={this.props.onUpdateScene.bind(this)} />
+
             <ImageGroup
               scene={this.props.scene}
               isPlayer={true}
@@ -287,6 +309,14 @@ export default class Player extends React.Component {
     if (props.scene.id !== this.props.scene.id) {
       this.start();
     }
+    const strobeDelay = props.scene.strobePulse ? props.scene.strobeDelay : props.scene.strobeTime;
+    if (strobeDelay != this.strobeDelay) {
+      clearInterval(this.strobeInterval);
+      this.strobeDelay = strobeDelay;
+      this.strobeInterval = setInterval(() => {
+        this.setState({toggleStrobe: !this.state.toggleStrobe})
+      }, this.strobeDelay);
+    }
   }
 
   componentDidMount() {
@@ -298,6 +328,9 @@ export default class Player extends React.Component {
 
     this.buildMenu();
     this.interval = setInterval(() => this.nextSceneLoop(), 1000);
+    this.strobeInterval = setInterval(() => {
+      this.setState({toggleStrobe: !this.state.toggleStrobe})
+    }, this.props.scene.strobePulse ? this.props.scene.strobeDelay : this.props.scene.strobeTime);
   }
 
   buildMenu() {
@@ -346,6 +379,7 @@ export default class Player extends React.Component {
 
   componentWillUnmount() {
     clearInterval(this.interval);
+    clearInterval(this.strobeInterval);
     getCurrentWindow().setAlwaysOnTop(false);
     Menu.setApplicationMenu(originalMenu);
     getCurrentWindow().setFullScreen(false);
@@ -558,7 +592,7 @@ export default class Player extends React.Component {
   }
 
   getScene(id: number): Scene {
-    return this.props.scenes.find((s) => s.id === id);
+    return this.props.scenes.find((s) => s.id == id);
   }
 
   /* Menu and hotkey options DON'T DELETE */

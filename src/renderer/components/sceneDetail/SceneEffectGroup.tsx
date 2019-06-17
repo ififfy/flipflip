@@ -20,33 +20,6 @@ export default class SceneEffectGroup extends React.Component {
     return (
       <ControlGroup title="Scene Effects" isNarrow={true}>
         <div className="ControlSubgroup">
-          <SimpleCheckbox
-            text="Strobe"
-            isOn={this.props.scene.strobe}
-            onChange={this.changeKey.bind(this, 'strobe').bind(this)} />
-          {this.props.scene.strobe && (
-            <div className="ControlSubgroup">
-              <SimpleColorPicker
-                onChange={this.changeKey.bind(this, 'strobeColor').bind(this)}
-                label="Color"
-                value={this.props.scene.strobeColor} />
-              <SimpleSliderInput
-                label={"Timing: " + this.props.scene.strobeTime + "ms"}
-                min={1} max={300}
-                value={this.props.scene.strobeTime}
-                isEnabled={true}
-                onChange={this.changeKey.bind(this, 'strobeTime').bind(this)} />
-              <SimpleCheckbox
-                text="Overlay Strobe"
-                isOn={this.props.scene.strobeOverlay}
-                onChange={this.changeKey.bind(this, 'strobeOverlay').bind(this)} />
-            </div>
-          )}
-        </div>
-
-        <hr/>
-
-        <div className="ControlSubgroup">
           <SimpleOptionPicker
             onChange={this.changeKey.bind(this, 'overlaySceneID').bind(this)}
             label="Overlay scene"

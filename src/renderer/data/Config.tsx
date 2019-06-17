@@ -1,4 +1,4 @@
-import {BT, HTF, IF, TF, VTF, WF} from "./const";
+import {BT, HTF, IF, SL, TF, VTF, WF} from "./const";
 
 interface SceneSettingsI {
   [key: string]: string|number|boolean;
@@ -30,7 +30,11 @@ interface SceneSettingsI {
   textSource: string;
 
   strobe: boolean;
+  strobeLayer: string;
+  strobeOpacity: number;
   strobeTime: number;
+  strobeDelay: number;
+  strobePulse: boolean;
   strobeColor: string;
 
   blinkColor: string;
@@ -123,8 +127,11 @@ export class SceneSettings implements SceneSettingsI {
   textSource = "";
 
   strobe = false;
-  strobeOverlay = false;
+  strobeLayer = SL.top;
+  strobeOpacity = 1;
   strobeTime = 200;
+  strobeDelay = 200;
+  strobePulse = false;
   strobeColor = "#FFFFFF";
 
   blinkColor = "#FFFFFF";

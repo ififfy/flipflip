@@ -19,6 +19,8 @@ import Modal from "../ui/Modal";
 import BackupGroup from "./BackupGroup";
 import DisplayGroup from "./DisplayGroup";
 import {getRandomIndex} from "../../data/utils";
+import StrobeGroup from "../sceneDetail/StrobeGroup";
+import ZoomMoveGroup from "../sceneDetail/ZoomMoveGroup";
 
 export default class ConfigForm extends React.Component {
   readonly props: {
@@ -76,6 +78,14 @@ export default class ConfigForm extends React.Component {
             onUpdateScene={this.onUpdateDefaultScene.bind(this)} />
 
           <ImageEffectGroup
+            scene={this.state.config.defaultScene}
+            onUpdateScene={this.onUpdateDefaultScene.bind(this)} />
+
+          <ZoomMoveGroup
+            scene={this.state.config.defaultScene}
+            onUpdateScene={this.onUpdateDefaultScene.bind(this)} />
+
+          <StrobeGroup
             scene={this.state.config.defaultScene}
             onUpdateScene={this.onUpdateDefaultScene.bind(this)} />
 

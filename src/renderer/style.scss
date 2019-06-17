@@ -16,6 +16,21 @@ $smallPadding: 0.5rem;
 $buttonBarHeight: 2rem + $smallPadding;
 $buttonSidebarWidth: 21rem + $smallPadding;
 
+/*
+Current Player Z-Indices (Layering is also effected by opacity)
+-------------------------
+1 Base Scene
+2 Strobe Layer
+3 Overlay Scene
+4 Strobe Layer
+5 Captioning
+6
+7
+8 Tagging Bottom Sidebar
+9 Scene Effects Sidebar
+10 Top Button Row
+*/
+
 @font-face {
   font-family: system;
   font-style: normal;
@@ -82,7 +97,7 @@ a {
   @include noselect;
 
   position: relative;
-  z-index: 2;
+  z-index: 10;
   padding: $smallPadding $smallPadding 0 $smallPadding;
   height: $buttonBarHeight;
   @include buttonBarBackground;
@@ -110,7 +125,7 @@ a {
   bottom: 0;
   overflow: auto;
 
-  z-index: 1;
+  z-index: 9;
   padding: $smallPadding $smallPadding 0 $smallPadding;
   width: $buttonSidebarWidth;
   @include buttonBarBackground;
@@ -1110,6 +1125,15 @@ label.SimpleCheckbox {
     top: 0;
     right: 0;
     left: 0;
+    z-index: 10;
+  }
+
+  .u-button-sidebar {
+    z-index: 9;
+  }
+
+  .Strobe {
+    z-index: 4;
   }
 
   .EmptyIndicator {
@@ -1123,29 +1147,42 @@ label.SimpleCheckbox {
   }
 }
 
-.ImagePlayer {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-
-  .ImageView {
-
-    .ImageView__Image {
-      height: 100%;
-      width: 100%;
-      z-index: 2;
-      background-position: center;
-      background-size: contain;
-      background-repeat: no-repeat;
-      position: absolute;
+.HeadlessScenePlayer {
+  &.m-overlay {
+    .ImagePlayer {
+      z-index: 3;
     }
+  }
 
-    .ImageView__Background {
-      height: 100%;
-      width: 100%;
-      background-size: cover;
+  .Strobe {
+    z-index: 2;
+  }
+
+  .ImagePlayer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    .ImageView {
+
+      .ImageView__Image {
+        height: 100%;
+        width: 100%;
+        z-index: 1;
+        background-position: center;
+        background-size: contain;
+        background-repeat: no-repeat;
+        position: absolute;
+      }
+
+      .ImageView__Background {
+        height: 100%;
+        width: 100%;
+        z-index: 1;
+        background-size: cover;
+      }
     }
   }
 }
@@ -1161,7 +1198,7 @@ label.SimpleCheckbox {
   align-items: center;
   justify-content: center;
 
-  z-index: 2;
+  z-index: 8;
   padding: $smallPadding;
   @include buttonBarBackground;
 
@@ -1314,7 +1351,7 @@ label.SimpleCheckbox {
 }
 
 .CaptionProgram {
-  z-index: 1;
+  z-index: 5;
   pointer-events: none;
   display: table;
   width: 100%;

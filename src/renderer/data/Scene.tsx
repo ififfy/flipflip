@@ -1,4 +1,4 @@
-import {BT, HTF, IF, TF, TOT, VTF, WF, ZF} from './const';
+import {BT, HTF, IF, SL, TF, TOT, VTF, WF, ZF} from './const';
 import LibrarySource from "../components/library/LibrarySource";
 
 export default class Scene {
@@ -26,8 +26,11 @@ export default class Scene {
   backgroundType = BT.blur;
   backgroundColor = "#000000";
   strobe = false;
-  strobeOverlay = false;
+  strobeLayer = SL.top;
+  strobeOpacity = 1;
   strobeTime = 200;
+  strobeDelay = 200;
+  strobePulse = false;
   strobeColor = "#FFFFFF";
   playFullGif = false;
   textKind: string = "";

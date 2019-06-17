@@ -10,6 +10,8 @@ import TextGroup from "./TextGroup";
 import TimingGroup from "./TimingGroup";
 import LibrarySource from "../library/LibrarySource";
 import Config from "../../data/Config";
+import StrobeGroup from "./StrobeGroup";
+import ZoomMoveGroup from "./ZoomMoveGroup";
 
 type Props = {
   scene: Scene,
@@ -101,6 +103,14 @@ export default class SceneDetail extends React.Component {
             onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
           <ImageEffectGroup
+            scene={this.props.scene}
+            onUpdateScene={this.props.onUpdateScene.bind(this)} />
+
+          <ZoomMoveGroup
+            scene={this.props.scene}
+            onUpdateScene={this.props.onUpdateScene.bind(this)} />
+
+          <StrobeGroup
             scene={this.props.scene}
             onUpdateScene={this.props.onUpdateScene.bind(this)} />
 

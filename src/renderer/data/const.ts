@@ -82,6 +82,12 @@ const ST = { // source types
   instagram: 'st.instagram',
 };
 
+const SL = { // strobe layers
+  top: 'sl.top',
+  middle: 'sl.middle',
+  bottom: 'sl.bottom',
+};
+
 export {
-  TF, WF, IF, ZF, HTF, VTF, TOT, BT, GT, TT, SF, ST,
+  TF, WF, IF, ZF, HTF, VTF, TOT, BT, GT, TT, SF, ST, SL
 };
