@@ -3,11 +3,9 @@ import {animated, useSpring, useTransition} from "react-spring";
 
 import {BT} from "../../data/const";
 
-// Numbers are suddenly becoming string when passed to this object,
-// so just cast them when they are used.
-export const ImageGroup = (data: {image: any, backgroundType: any, backgroundColor: any,
-  horizTransLevel: any, vertTransLevel: any, zoomStart: any, zoomEnd: any,
-  transDuration: any, fadeDuration: any, crossFade: boolean}) => {
+export const FadeLayer = (data: {image: any, backgroundType: string, backgroundColor: string,
+  horizTransLevel: number, vertTransLevel: number, zoomStart: number, zoomEnd: number,
+  transDuration: number, fadeDuration: any, crossFade: boolean}) => {
 
   const fadeTransitions: [{item: any, props: any, key: any}] = useTransition(
     data.image,
@@ -37,30 +35,19 @@ export const ImageGroup = (data: {image: any, backgroundType: any, backgroundCol
   return (
     <React.Fragment>
       {fadeTransitions.map(({item, props, key}) => {
-
-        let backgroundStyle;
-        if (data.backgroundType == BT.color) {
-          backgroundStyle = {
-            backgroundColor: data.backgroundColor,
-          };
-        } else {
-          backgroundStyle = {
-            filter: 'blur(8px)',
-            backgroundImage: `url(${item.src})`,
-          };
-        }
         return (
           <animated.div className="ImageView u-fill-container" key={key} style={{ ...props }}>
-            <Image src={item.src}
+            <ZoomMoveLayer image={item}
                    horizTransLevel={data.horizTransLevel}
                    vertTransLevel={data.vertTransLevel}
                    zoomStart={data.zoomStart}
                    zoomEnd={data.zoomEnd}
                    duration={data.transDuration} />
-            <animated.div
-              className="ImageView__Background"
-              style={backgroundStyle}
-            />
+            <Image className="ImageView__Background"
+                   image={item}
+                   backgroundType={data.backgroundType}
+                   backgroundColor={data.backgroundColor}
+                   imageProps={null} />
           </animated.div>
         );
       })}
@@ -68,15 +55,15 @@ export const ImageGroup = (data: {image: any, backgroundType: any, backgroundCol
   );
 };
 
-const Image = (data: {src: string, horizTransLevel: any, vertTransLevel: any,
-  zoomStart: any, zoomEnd: any, duration: any }) => {
+const ZoomMoveLayer = (data: {image: any, horizTransLevel: number, vertTransLevel: number,
+  zoomStart: number, zoomEnd: number, duration: any }) => {
   const imageProps = useSpring(
     {
       from: {
-        transform: 'translate(0%, 0%) scale(' + parseInt(data.zoomStart, 10) + ')',
+        transform: 'translate(0%, 0%) scale(' + data.zoomStart + ')',
       },
       to: {
-        transform: 'translate(' + parseInt(data.horizTransLevel, 10) + '%, ' + parseInt(data.vertTransLevel, 10) + '%) scale(' + parseInt(data.zoomEnd, 10) + ')',
+        transform: 'translate(' + data.horizTransLevel + '%, ' + data.vertTransLevel + '%) scale(' + data.zoomEnd + ')',
       },
       config: {
         duration: parseInt(data.duration, 10),
@@ -84,12 +71,104 @@ const Image = (data: {src: string, horizTransLevel: any, vertTransLevel: any,
     }
   );
 
+  return (
+    <Image className="ImageView__Image"
+           image={data.image}
+           backgroundType={null}
+           backgroundColor={null}
+           imageProps={imageProps} />
+  );
+};
+
+const Image = (data: {className: string, image: any, backgroundType: string, backgroundColor: string, imageProps: any }) => {
+  const parentWidth = window.innerWidth;
+  const parentHeight = window.innerHeight;
+  const parentAspect = parentWidth / parentHeight;
+  let imgWidth;
+  if (data.image instanceof HTMLImageElement) {
+    imgWidth = data.image.width;
+  } else {
+    imgWidth = data.image.videoWidth;
+  }
+  let imgHeight;
+  if (data.image instanceof HTMLImageElement) {
+    imgHeight = data.image.height;
+  } else {
+    imgHeight = data.image.videoHeight;
+  }
+  const imgAspect = imgWidth / imgHeight;
+
+  let width;
+  let height;
+  let marginTop;
+  let marginLeft;
+  if (imgAspect < parentAspect) {
+    if (data.backgroundType != null) {
+      const bgscale = parentWidth / imgWidth;
+      width = '100%';
+      height = 'auto';
+      marginTop = (parentHeight / 2 - imgHeight * bgscale / 2) + 'px';
+      marginLeft = '0';
+    } else {
+      const scale = parentHeight / imgHeight;
+      width = 'auto';
+      height = '100%';
+      marginTop = '0';
+      marginLeft = (parentWidth / 2 - imgWidth * scale / 2) + 'px';
+    }
+  } else {
+    if (data.backgroundType != null) {
+      const bgscale = parentHeight / imgHeight;
+      width = 'auto';
+      height = '100%';
+      marginTop = '0';
+      marginLeft = (parentWidth / 2 - imgWidth * bgscale / 2) + 'px';
+    } else {
+      const scale = parentWidth / imgWidth;
+      width = '100%';
+      height = 'auto';
+      marginTop = (parentHeight / 2 - imgHeight * scale / 2) + 'px';
+      marginLeft = '0';
+    }
+  }
+
+  let backgroundStyle = {};
+  if (data.imageProps == null) {
+    if (data.backgroundType == BT.color) {
+      backgroundStyle = {
+        backgroundColor: data.backgroundColor,
+      };
+    } else {
+      backgroundStyle = {
+        filter: 'blur(8px)',
+      };
+    }
+  }
+
   const style = {
-    backgroundImage: `url(${data.src})`,
+    width: width,
+    height: height,
+    marginTop: marginTop,
+    marginLeft: marginLeft,
   };
 
-  return <animated.div className="ImageView__Image" style={{ ...imageProps, ...style}} />
-};
+  return (
+    <animated.div className={data.className} style={{...data.imageProps, ...backgroundStyle}}>
+      {(data.backgroundType == null || data.backgroundType == BT.blur) && (
+        <React.Fragment>
+          {data.image instanceof HTMLImageElement && (
+            <img src={data.image.src} style={style}/>
+          )}
+          {data.image instanceof HTMLVideoElement && (
+            <video src={data.image.src} style={style} preload="auto" loop autoPlay={data.backgroundType == null} muted/>
+          )}
+        </React.Fragment>
+      )}
+    </animated.div>
+  );
+}
+
+
 
 export default class ImageView extends React.Component {
   readonly props: {
@@ -107,13 +186,20 @@ export default class ImageView extends React.Component {
 
   shouldComponentUpdate(props: any): boolean {
     return ((props.image.src !== this.props.image.src) ||
+      (props.backgroundType !== this.props.backgroundType) ||
+      (props.backgroundColor !== this.props.backgroundColor) ||
+      (props.horizTransLevel !== this.props.horizTransLevel) ||
+      (props.vertTransLevel !== this.props.vertTransLevel) ||
+      (props.zoomStart !== this.props.zoomStart) ||
+      (props.zoomEnd !== this.props.zoomEnd) ||
       (props.transDuration !== this.props.transDuration) ||
+      (props.crossFade !== this.props.crossFade) ||
       (props.fadeDuration !== this.props.fadeDuration));
   }
 
   render() {
     return (
-      <ImageGroup
+      <FadeLayer
         image={this.props.image}
         backgroundType={this.props.backgroundType}
         backgroundColor={this.props.backgroundColor}

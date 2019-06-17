@@ -101,7 +101,7 @@ export default class ImagePlayer extends React.Component {
             reset
             unique
             items={this.props.toggleStrobe}
-            config={{duration: this.props.scene.strobeTime}}
+            config={{duration: (this.props.scene.strobeTime > 0 ? this.props.scene.strobeTime : 10)}}
             from={{ backgroundColor: this.props.scene.strobeColor, opacity: 1}}
             enter={{ opacity: 0 }}
             leave={{ opacity: 0 }} >

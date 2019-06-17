@@ -291,7 +291,7 @@ export default class SceneGenerator extends React.Component {
   }
 
   getScene(id: number): Scene {
-    return this.props.scenes.find((s) => s.id === id);
+    return this.props.scenes.find((s) => s.id == id);
   }
 
   generateScene(tagWeightMap: Map<Tag, TagWeight>, sceneWeightMap: Map<number, TagWeight>) {

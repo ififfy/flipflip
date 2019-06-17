@@ -111,7 +111,7 @@ export default class Player extends React.Component {
             reset
             unique
             items={this.state.toggleStrobe}
-            config={{duration: this.props.scene.strobeTime}}
+            config={{duration: (this.props.scene.strobeTime > 0 ? this.props.scene.strobeTime : 10)}}
             from={{ backgroundColor: this.props.scene.strobeColor, opacity: strobeOpacity}}
             enter={{ opacity: 0 }}
             leave={{ opacity: 0 }} >
