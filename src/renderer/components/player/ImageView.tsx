@@ -37,17 +37,19 @@ export const FadeLayer = (data: {image: any, backgroundType: string, backgroundC
       {fadeTransitions.map(({item, props, key}) => {
         return (
           <animated.div className="ImageView u-fill-container" key={key} style={{ ...props }}>
-            <ZoomMoveLayer image={item}
-                   horizTransLevel={data.horizTransLevel}
-                   vertTransLevel={data.vertTransLevel}
-                   zoomStart={data.zoomStart}
-                   zoomEnd={data.zoomEnd}
-                   duration={data.transDuration} />
-            <Image className="ImageView__Background"
-                   image={item}
-                   backgroundType={data.backgroundType}
-                   backgroundColor={data.backgroundColor}
-                   imageProps={null} />
+            <ZoomMoveLayer
+              image={item}
+              horizTransLevel={data.horizTransLevel}
+              vertTransLevel={data.vertTransLevel}
+              zoomStart={data.zoomStart}
+              zoomEnd={data.zoomEnd}
+              duration={data.transDuration} />
+            <Image
+              className="ImageView__Background"
+              image={item}
+              backgroundType={data.backgroundType}
+              backgroundColor={data.backgroundColor}
+              imageProps={null} />
           </animated.div>
         );
       })}
@@ -105,14 +107,14 @@ const Image = (data: {className: string, image: any, backgroundType: string, bac
   if (imgAspect < parentAspect) {
     if (data.backgroundType != null) {
       const bgscale = parentWidth / imgWidth;
-      width = '100%';
+      width = '101%';
       height = 'auto';
       marginTop = (parentHeight / 2 - imgHeight * bgscale / 2) + 'px';
       marginLeft = '0';
     } else {
       const scale = parentHeight / imgHeight;
       width = 'auto';
-      height = '100%';
+      height = '101%';
       marginTop = '0';
       marginLeft = (parentWidth / 2 - imgWidth * scale / 2) + 'px';
     }
@@ -120,12 +122,12 @@ const Image = (data: {className: string, image: any, backgroundType: string, bac
     if (data.backgroundType != null) {
       const bgscale = parentHeight / imgHeight;
       width = 'auto';
-      height = '100%';
+      height = '101%';
       marginTop = '0';
       marginLeft = (parentWidth / 2 - imgWidth * bgscale / 2) + 'px';
     } else {
       const scale = parentWidth / imgWidth;
-      width = '100%';
+      width = '101%';
       height = 'auto';
       marginTop = (parentHeight / 2 - imgHeight * scale / 2) + 'px';
       marginLeft = '0';
@@ -141,6 +143,7 @@ const Image = (data: {className: string, image: any, backgroundType: string, bac
     } else {
       backgroundStyle = {
         filter: 'blur(8px)',
+        margin: '-5px -10px -10px -5px',
       };
     }
   }
@@ -167,8 +170,6 @@ const Image = (data: {className: string, image: any, backgroundType: string, bac
     </animated.div>
   );
 }
-
-
 
 export default class ImageView extends React.Component {
   readonly props: {
