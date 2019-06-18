@@ -167,7 +167,7 @@ a {
 
 .u-icon-button {
   margin-top: -4px;
-  > div {
+  div {
     width: 1.5rem;
     height: 1.5rem;
     background-size: 1.5rem 1.5rem !important;
@@ -175,7 +175,7 @@ a {
 }
 
 .u-small-icon-button {
-  > div {
+  div {
     width: 1.0rem;
     height: 1.0rem;
     background-size: 1.0rem 1.0rem !important;
@@ -183,7 +183,7 @@ a {
 }
 
 .u-icon-button, .u-small-icon-button, .u-tiny-icon-button {
-  > div {
+  div {
     cursor: pointer;
   }
 
@@ -317,10 +317,6 @@ a {
   color: white !important;
 }
 
-.u-jiggle {
-  animation: jiggle 0.30s ease-in;
-}
-
 .u-show-on-hover-only {
   border-bottom: none;
   background: rgba(0, 0, 0, 0);
@@ -384,36 +380,36 @@ a {
     flex-wrap: wrap;
     overflow: auto;
 
-    & > * {
+    .ScenePickerItem {
       margin-right: $smallPadding;
       height: 4rem;
       min-width: 6rem;
       max-width: 8rem;
+
+      background-color: $white;
+      color: $black !important;
+      padding: $smallPadding * 2;
+      margin-bottom: $smallPadding;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      &.m-generator {
+        border: 2px solid black;
+      }
+
+      .ScenePickerItem__Title {
+        text-align: center;
+      }
+
+      &:not(.u-disabled):hover {
+        background-color: $buttonBottom;
+      }
     }
   }
 
-  .ScenePickerItem {
-    background-color: $white;
-    color: $black !important;
-    padding: $smallPadding * 2;
-    margin-bottom: $smallPadding;
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    &.m-generator {
-      border: 2px solid black;
-    }
-
-    .ScenePickerItem__Title {
-      text-align: center;
-    }
-
-    &:not(.u-disabled):hover {
-      background-color: $buttonBottom;
-    }
-  }
 
   .ScenePicker__Buttons {
     display: inline-flex;
@@ -1077,6 +1073,10 @@ label.SimpleCheckbox {
     padding: $smallPadding;
     overflow: auto;
   }
+
+  .SaveButton {
+    vertical-align: 11px;
+  }
 }
 
 .URLImporter {
@@ -1377,58 +1377,4 @@ label.SimpleCheckbox {
   transition: opacity 0.5s ease-in-out;
   -webkit-text-stroke-width: 1px;
   -webkit-text-stroke-color: black;
-}
-
-@each $x in -10 0 10 {
-  @each $y in -10 0 10 {
-    @for $z from 1 through 20 {
-      .translate-#{$x}-#{$y}-#{$z}s {
-        img, video {
-          -webkit-animation: kb-#{$x}-#{$y} #{$z}s;
-          animation: kb-#{$x}-#{$y} #{$z}s;
-        }
-      }
-
-      .translate-#{$x}-#{$y}-zoom-#{$z}s {
-        img, video {
-          -webkit-animation: kb-#{$x}-#{$y}-zoom #{$z}s;
-          animation: kb-#{$x}-#{$y} #{$z}-zoom #{$z}s;
-          -webkit-transform: scale(1, 1);
-          transform: scale(1, 1);
-        }
-      }
-
-      .translate-#{$x}-#{$y}-zoom-out-#{$z}s {
-        img, video {
-          -webkit-animation: kb-#{$x}-#{$y}-zoom-out #{$z}s;
-          animation: kb-#{$x}-#{$y} #{$z}-zoom-out #{$z}s;
-          -webkit-transform: scale(1.5, 1.5);
-          transform: scale(1.5, 1.5);
-        }
-      }
-    }
-  }
-}
-
-/* Animations */
-
-@keyframes strobe {
-  50% {
-    opacity: 0;
-  }
-}
-
-@keyframes jiggle {
-  0%, 100% {
-    transform: scale(1.0, 1.0)
-  }
-  25% {
-    transform: scale(1.1, 0.9)
-  }
-  50% {
-    transform: scale(0.9, 1.1) translate(0, -5px)
-  }
-  75% {
-    transform: scale(1.0, 1.0) translate(0, -5px)
-  }
 }

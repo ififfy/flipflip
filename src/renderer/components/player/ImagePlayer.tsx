@@ -15,7 +15,7 @@ import Scene from "../../data/Scene";
 import TIMING_FUNCTIONS from '../../data/TIMING_FUNCTIONS';
 import ChildCallbackHack from './ChildCallbackHack';
 import ImageView from './ImageView';
-import {Transition} from "react-spring/renderprops-universal";
+import {Transition, animated} from "react-spring/renderprops";
 
 class GifInfo {
   animated: boolean;
@@ -105,7 +105,7 @@ export default class ImagePlayer extends React.Component {
             from={{ backgroundColor: this.props.scene.strobeColor, opacity: 1}}
             enter={{ opacity: 0 }}
             leave={{ opacity: 0 }} >
-            {toggle => props => <div className="Strobe u-fill-container" style={props}/>}
+            {toggle => props => <animated.div className="Strobe u-fill-container" style={props}/>}
           </Transition>
         )}
         <IdleTimer

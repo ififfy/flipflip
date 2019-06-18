@@ -19,7 +19,7 @@ import TimingGroup from "../sceneDetail/TimingGroup";
 import Progress from "../ui/Progress";
 import ImageGroup from "../sceneDetail/ImageGroup";
 import SceneEffectGroup from "../sceneDetail/SceneEffectGroup";
-import {Transition} from "react-spring/renderprops-universal";
+import {Transition} from "react-spring/renderprops";
 import StrobeGroup from "../sceneDetail/StrobeGroup";
 import ZoomMoveGroup from "../sceneDetail/ZoomMoveGroup";
 

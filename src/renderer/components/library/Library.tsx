@@ -8,6 +8,7 @@ import Tag from "./Tag";
 import Config from "../../data/Config";
 import SourcePicker from "../sceneDetail/SourcePicker";
 import Progress from "../ui/Progress";
+import Jiggle from "../../animations/Jiggle";
 
 export default class Library extends React.Component {
   readonly props: {
@@ -55,36 +56,42 @@ export default class Library extends React.Component {
           </div>
           {!this.props.isSelect && !this.props.isBatchTag && !this.state.showProgress && (
             <div className="Library__Buttons u-button-row-right">
-              <div
-                className="Library__TumblirImport u-button u-icon-button u-clickable"
+              <Jiggle
+                bounce={false}
+                className="Library__RedditImport u-button u-icon-button u-clickable"
                 title="Import Reddit Subscriptions"
-                onClick={this.importReddit.bind(this)}>
+                onClick={this.importReddit.bind(this)}
+              >
                 <div className="u-reddit"/>
-              </div>
-              <div
-                className="Library__TumblirImport u-button u-icon-button u-clickable"
+              </Jiggle>
+              <Jiggle
+                bounce={false}
+                className="Library__TumblrImport u-button u-icon-button u-clickable"
                 title="Import Tumblr Following"
                 onClick={this.importTumblr.bind(this)}>
                 <div className="u-tumblr"/>
-              </div>
-              <div
+              </Jiggle>
+              <Jiggle
+                bounce={false}
                 className="Library__MarkOffline u-button u-icon-button u-clickable"
                 title="Mark Offline Sources"
                 onClick={this.markOffline.bind(this)}>
                 <div className="u-mark-offline"/>
-              </div>
-              <div
+              </Jiggle>
+              <Jiggle
+                bounce={false}
                 className="Library__ManageTags u-button u-icon-button u-clickable"
                 title="Manage Tags"
                 onClick={this.props.manageTags.bind(this)}>
                 <div className="u-tags"/>
-              </div>
-              <div
+              </Jiggle>
+              <Jiggle
+                bounce={false}
                 className="Library__BatchTag u-button u-icon-button u-clickable"
                 title="Batch Tag"
                 onClick={this.props.batchTag.bind(this, true)}>
                 <div className="u-batch"/>
-              </div>
+              </Jiggle>
             </div>
           )}
           <div
@@ -94,20 +101,22 @@ export default class Library extends React.Component {
             {(this.props.isBatchTag ? "Done" : "Back")}
           </div>
           {!this.props.isSelect && !this.props.isBatchTag && !this.state.showProgress && (
-            <div
+            <Jiggle
+              bounce={false}
               className="Library__Export u-button u-icon-button u-clickable"
               title="Export Library"
               onClick={this.props.onExportLibrary.bind(this)}>
               <div className="u-export"/>
-            </div>
+            </Jiggle>
           )}
           {!this.props.isSelect && !this.props.isBatchTag && !this.state.showProgress && (
-            <div
+            <Jiggle
+              bounce={false}
               className="Library__Import u-button u-icon-button u-clickable"
               title="Import Library"
               onClick={this.props.onImportLibrary.bind(this, this.props.onBackup)}>
               <div className="u-import"/>
-            </div>
+            </Jiggle>
           )}
         </div>
 
