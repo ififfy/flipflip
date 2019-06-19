@@ -2,6 +2,7 @@ import * as React from 'react';
 import tumblr from 'tumblr.js';
 import wretch from 'wretch';
 import Snoowrap from "snoowrap";
+import {IgApiClient} from "instagram-private-api";
 
 import LibrarySource from "./LibrarySource";
 import Tag from "./Tag";
@@ -57,6 +58,17 @@ export default class Library extends React.Component {
           </div>
           {!this.props.isSelect && !this.props.isBatchTag && !this.state.showProgress && (
             <div className="Library__Buttons u-button-row-right">
+              {this.props.config.remoteSettings.instagramUsername != "" &&
+                this.props.config.remoteSettings.instagramPassword != "" && (
+                <Jiggle
+                  bounce={false}
+                  className="Library__InstagramImport u-button u-icon-button u-clickable"
+                  title="Import Instagram Following"
+                  onClick={this.importInstagram.bind(this)}
+                >
+                  <div className="u-instagram"/>
+                </Jiggle>
+              )}
               {this.props.config.remoteSettings.twitterAccessTokenKey != "" &&
                 this.props.config.remoteSettings.twitterAccessTokenSecret != "" && (
                 <Jiggle
@@ -394,9 +406,83 @@ export default class Library extends React.Component {
     };
 
     // Show progress bar and kick off loop
-    alert("Your Twitter follows are being imported... You will recieve an alert when the import is finished.");
+    alert("Your Twitter Following is being imported... You will recieve an alert when the import is finished.");
     this.setState({totalProgress: 1, inProgress: true});
     twitterImportLoop();
+  }
+
+  ig: IgApiClient = null;
+  session: any = null;
+  importInstagram() {
+    const processItems = (items: any, next: any) => {
+      let following = [];
+      for (let account of items) {
+        const accountURL = "https://www.instagram.com/" + account.username + "/";
+        following.push(accountURL);
+      }
+
+      // dedup
+      let sourceURLs = this.props.library.map((s) => s.url);
+      following = following.filter((s) => !sourceURLs.includes(s));
+
+      let id = this.props.library.length + 1;
+      this.props.library.forEach((s) => {
+        id = Math.max(s.id + 1, id);
+      });
+
+      // Add to Library
+      let newLibrary = this.props.library;
+      for (let url of following) {
+        newLibrary = newLibrary.concat([new LibrarySource({
+          url: url,
+          id: id,
+          tags: new Array<Tag>(),
+        })]);
+        id += 1;
+      }
+      this.props.onUpdateLibrary(newLibrary);
+
+      // Loop until we run out of blogs
+      setTimeout(instagramImportLoop, 1500);
+      this.setState({next: next, currentProgress: this.state.currentProgress + 1});
+    };
+
+    // Define our loop
+    const instagramImportLoop = () => {
+      if (this.ig == null) {
+        this.ig = new IgApiClient();
+        this.ig.state.generateDevice(this.props.config.remoteSettings.instagramUsername);
+        this.ig.account.login(this.props.config.remoteSettings.instagramUsername, this.props.config.remoteSettings.instagramPassword).then((loggedInUser) => {
+          this.ig.state.serializeCookieJar().then((cookies) => {
+            this.session = JSON.stringify(cookies);
+            const followingFeed = this.ig.feed.accountFollowing(loggedInUser.pk);
+            followingFeed.items().then((items) => {
+              processItems(items, loggedInUser.pk + "~" + followingFeed.serialize());
+            }).catch((e) => {console.error(e);this.ig = null;});
+          }).catch((e) => {console.error(e);this.ig = null;});
+        }).catch((e) => {alert(e);console.error(e);this.ig = null;});
+      } else {
+        this.ig.state.deserializeCookieJar(JSON.parse(this.session)).then((data) => {
+          const id = (this.state.next as string).split("~")[0];
+          const feedSession = (this.state.next as string).split("~")[1];
+          const followingFeed = this.ig.feed.accountFollowing(id);
+          followingFeed.deserialize(feedSession);
+          if (!followingFeed.isMoreAvailable()) {
+            this.setState({next: "", currentProgress: 0, totalProgress: 0, inProgress: false, progressTitle: ""});
+            alert("Instagram Following Import has completed");
+            return;
+          }
+          followingFeed.items().then((items) => {
+            processItems(items, id + "~" + followingFeed.serialize());
+          }).catch((e) => {console.error(e);this.ig = null;});
+        }).catch((e) => {console.error(e);this.ig = null;});
+      }
+    };
+
+    // Show progress bar and kick off loop
+    alert("Your Instagram Following is being imported... You will recieve an alert when the import is finished.");
+    this.setState({totalProgress: 1, inProgress: true});
+    instagramImportLoop();
   }
 
   markOffline() {
