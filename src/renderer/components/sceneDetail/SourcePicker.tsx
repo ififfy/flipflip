@@ -57,6 +57,7 @@ export default class SourcePicker extends React.Component {
     filters: this.props.filters,
     selected: this.props.selected,
     searchInput: "",
+    markUpdate: false,
   };
 
   _selectedTags: Array<any> = null;
@@ -307,6 +308,7 @@ export default class SourcePicker extends React.Component {
   shouldComponentUpdate(props: any, state: any): boolean {
     return ((this.props.isSelect !== props.isSelect) ||
       (this.props.isBatchTag !== props.isBatchTag) ||
+      (this.state.markUpdate !== props.markUpdate) ||
       (this.state.removeAllIsOpen !== state.removeAllIsOpen) ||
       (this.state.urlImportIsOpen !== state.urlImportIsOpen) ||
       (this.state.batchTagIsOpen !== state.batchTagIsOpen) ||
@@ -325,31 +327,29 @@ export default class SourcePicker extends React.Component {
   secretHotkey(e: KeyboardEvent) {
     if (e.altKey && e.key == 'p') {
       this.toggleURLImportModal();
-    } else if (e.altKey && e.key == 'u') {
-      this.toggleUntagged();
+    } else if (e.altKey && e.key == 'm') {
+      this.toggleMarked();
     }
   }
 
-  toggleUntagged() {
+  toggleMarked() {
     let taggingMode = true;
     for (let source of this.props.sources) {
-      if (source.untagged) {
+      if (source.marked) {
         taggingMode = false;
       }
     }
 
-    if (taggingMode) { // We're marking untagged sources
-      for (let source of this.props.sources) {
-        if (source.tags.length === 0) {
-          source.untagged = true;
-        }
+    if (taggingMode) { // We're marking sources
+      for (let source of this.getDisplaySources()) {
+        source.marked = true;
       }
     } else { // We're unmarking sources
       for (let source of this.props.sources) {
-        source.untagged = false;
+        source.marked = false;
       }
     }
-    this.setState({}); // Trigger update
+    this.setState({markUpdate: !this.state.markUpdate}); // Trigger update
   }
 
   toggleURLImportModal() {

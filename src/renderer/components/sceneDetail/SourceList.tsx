@@ -63,7 +63,7 @@ export default class SourceList extends React.Component {
             </div>
           )}
           {this.props.sources.map((source) =>
-            <div className={`SourceList__Source ${source.offline ? 'm-offline' : ''} ${source.untagged ? 'm-untagged' : ''}`}
+            <div className={`SourceList__Source ${source.offline ? 'm-offline' : ''} ${source.marked ? 'm-marked' : ''}`}
                  key={source.id}>
               {this.props.isSelect && (
                 <input type="checkbox" value={source.url} onChange={this.onSelect.bind(this)}
