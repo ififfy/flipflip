@@ -36,7 +36,7 @@ export default class SourceList extends React.Component {
   render() {
     const filtering = this.props.filters.length > 0;
     return (
-      <div className="SourceList" style={{width: `${this.props.isSelect ? '143px' : '357px'}`}}>
+      <div className="SourceList" style={{width: `${this.props.isSelect ? '150px' : '365px'}`}}>
         <div className="SourceList__Buttons u-float-right">
           {!this.props.isSelect && (
             <div className="SourceList__AddButtons">

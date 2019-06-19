@@ -7,40 +7,31 @@ import ImageEffectGroup from "./ImageEffectGroup";
 import SceneEffectGroup from "./SceneEffectGroup";
 import ImageGroup from "./ImageGroup";
 import TextGroup from "./TextGroup";
-import TimingGroup from "./TimingGroup";
 import LibrarySource from "../library/LibrarySource";
 import Config from "../../data/Config";
 import StrobeGroup from "./StrobeGroup";
 import ZoomMoveGroup from "./ZoomMoveGroup";
 
-type Props = {
-  scene: Scene,
-  allScenes: Array<Scene>,
-  config: Config,
-  autoEdit: boolean,
-  goBack(): void,
-  onExport(scene: Scene): void,
-  onPlay(scene: Scene): void,
-  onDelete(scene: Scene): void,
-  onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
-  onOpenLibraryImport(scene: Scene): void,
-  saveScene(): void,
-};
-
 export default class SceneDetail extends React.Component {
-  readonly props: Props;
   readonly nameInputRef: React.RefObject<HTMLInputElement> = React.createRef();
-
-  readonly state: {
-    isEditingName: boolean,
-    isShowingURLModal: boolean,
+  readonly props: {
+    scene: Scene,
+    allScenes: Array<Scene>,
+    config: Config,
+    autoEdit: boolean,
+    goBack(): void,
+    onExport(scene: Scene): void,
+    onPlay(scene: Scene): void,
+    onDelete(scene: Scene): void,
+    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
+    onOpenLibraryImport(scene: Scene): void,
+    saveScene(): void,
   };
 
-  constructor(props: Props) {
-    super(props);
-    this.props = props;
-    this.state = {isEditingName: props.autoEdit, isShowingURLModal: false};
-  }
+  readonly state = {
+    isEditingName: this.props.autoEdit,
+    isShowingURLModal: false,
+  };
 
   render() {
     return (
@@ -93,10 +84,6 @@ export default class SceneDetail extends React.Component {
         </div>
 
         <div className="SceneDetail__Content ControlGroupGroup">
-          <TimingGroup
-            scene={this.props.scene}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-
           <SceneEffectGroup
             scene={this.props.scene}
             allScenes={this.props.allScenes}

@@ -18,7 +18,7 @@ export default class ImageGroup extends React.Component {
   render() {
     return (
       <ControlGroup title="Images" isNarrow={true}>
-        <div className="ControlSubgroup">
+        <div className="ControlSubgroup  m-inline">
           {!this.props.isPlayer && (
             <SimpleOptionPicker
               onChange={this.changeKey.bind(this, 'imageTypeFilter').bind(this)}
@@ -26,12 +26,14 @@ export default class ImageGroup extends React.Component {
               value={this.props.scene.imageTypeFilter}
               keys={Object.values(IF)}/>
           )}
-          {!this.props.isPlayer && (
+          {!this.props.isPlayer && this.props.scene.imageTypeFilter != IF.stills && (
             <SimpleCheckbox
               text="Play Full GIF animations"
               isOn={this.props.scene.playFullGif}
               onChange={this.changeKey.bind(this, 'playFullGif').bind(this)}/>
           )}
+        </div>
+        <div className="ControlSubgroup m-inline">
           {!this.props.isPlayer && (
             <SimpleRadioInput
               label={"Weight"}

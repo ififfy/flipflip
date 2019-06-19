@@ -27,16 +27,20 @@ export default class BackupGroup extends React.Component {
     return(
       <ControlGroup title="Backup" isNarrow={true}>
         <div className="ControlSubgroup">
-          <button onClick={this.onBackup.bind(this)} className="u-button u-clickable" >
-            Backup Data
-          </button>
-          <button onClick={hasBackup ? this.onRestore.bind(this) : this.nop} className={`u-button ${hasBackup ? 'u-clickable' : 'u-disabled'}`} >
-            Restore Backup
-          </button>
-          <button onClick={this.state.backups.length > 1 ? this.onClean.bind(this) : this.nop}
-                  className={`u-button ${this.state.backups.length > 1 ? 'u-clickable' : 'u-disabled'}`} >
-            Clean Backups
-          </button>
+          <div>
+            <button onClick={this.onBackup.bind(this)} className="u-button u-clickable" >
+              Backup Data
+            </button>
+            {" "}
+            <button onClick={hasBackup ? this.onRestore.bind(this) : this.nop} className={`u-button ${hasBackup ? 'u-clickable' : 'u-disabled'}`} >
+              Restore Backup
+            </button>
+            {" "}
+            <button onClick={this.state.backups.length > 1 ? this.onClean.bind(this) : this.nop}
+                    className={`u-button ${this.state.backups.length > 1 ? 'u-clickable' : 'u-disabled'}`} >
+              Clean Backups
+            </button>
+          </div>
         </div>
         <br/>
         <span>

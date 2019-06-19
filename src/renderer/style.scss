@@ -137,6 +137,10 @@ a {
     line-height: $buttonBarHeight;
   }
 
+  .ControlGroup {
+    width: 300px !important;
+  }
+
   opacity: 0;
   left: ($smallPadding*4) - $buttonSidebarWidth;
   transition: opacity 500ms ease-in-out,
@@ -453,70 +457,68 @@ a {
   flex-wrap: wrap;
   align-items: flex-start;
   align-content: flex-start;
-}
 
-.ControlGroup {
-  flex-grow: 1;
+  .ControlGroup {
+    flex-grow: 1;
 
-  margin: 1em 0.5em $smallPadding * 3;
+    margin: 1em 0.5em $smallPadding * 3;
 
-  border: 1px solid $black;
-  padding: ($smallPadding * 2) $smallPadding $smallPadding $smallPadding;
-  position: relative;
+    border: 1px solid $black;
+    padding: ($smallPadding * 2) $smallPadding $smallPadding $smallPadding;
+    position: relative;
 
-  color: $black;
-  background-color: $uiGray;
-
-  &.m-narrow {
-    width: 300px;
-  }
-
-  &.m-wide {
-    width: 100%;
-  }
-
-  &.m-bold {
-    border-width: 3px;
-  }
-
-  .ControlGroup__Title {
-    position: absolute;
-    top: -1em;
-    height: 1em;
-    overflow: visible;
-    padding: 0.15rem 0.6rem;
-    font-weight: bold;
-    font-size: 1rem;
+    color: $black;
     background-color: $uiGray;
-    border-top: 1px solid $black;
-    border-right: 1px solid $black;
-    border-left: 1px solid $black;
 
-    &.m-can-collapse {
-      cursor: pointer;
+    &.m-wide {
+    width: 100%;
     }
 
     &.m-bold {
       border-width: 3px;
+      padding: ($smallPadding * 1.5) $smallPadding $smallPadding $smallPadding;
     }
-  }
-}
 
-.ControlSubgroup {
-  flex-grow: 1;
+    .ControlGroup__Title {
+      position: absolute;
+      top: -1em;
+      height: 1em;
+      overflow: visible;
+      padding: 0.15rem 0.6rem;
+      font-weight: bold;
+      font-size: 1rem;
+      background-color: $uiGray;
+      border-top: 1px solid $black;
+      border-right: 1px solid $black;
+      border-left: 1px solid $black;
 
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  align-content: flex-start;
+      &.m-can-collapse {
+        cursor: pointer;
+      }
 
-  & > * {
-    margin-right: $smallPadding * 2;
+      &.m-bold {
+        border-width: 3px;
+      }
+    }
+
+    .ControlSubgroup {
+      flex-grow: 1;
+
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      align-content: flex-start;
+
+      &.m-inline {
+        display: inline;
+      }
+    }
   }
 }
 
 @mixin control {
   margin-bottom: $smallPadding * 2;
+  margin-right: $smallPadding;
   label {
     display: block;
     margin-bottom: $smallPadding;
@@ -525,12 +527,6 @@ a {
 
 .SimpleOptionPicker, .SimpleTextInput, .SimpleSliderInput, .SimpleCheckbox, .SimpleColorPicker, .SimpleNumberInput, .SimpleRadioInput {
   @include control;
-}
-
-.SimpleOptionPicker {
-  select {
-    max-width: 210px;
-  }
 }
 
 .SimpleNumberInput {
@@ -544,7 +540,8 @@ a {
 }
 
 .SimpleTextInput {
-  input[type=text] {
+  width: 100%;
+  input {
     font-size: 16px;
     font-weight: 400;
     display: block;

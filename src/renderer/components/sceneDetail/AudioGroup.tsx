@@ -13,11 +13,13 @@ export default class AudioGroup extends React.Component {
   render() {
     return (
       <ControlGroup title="Audio" isNarrow={true}>
-        <SimpleURLInput
-          isEnabled={true}
-          onChange={this.onChangeAudioURL.bind(this)}
-          label="URL"
-          value={this.props.scene.audioURL}/>
+        <div className="ControlSubgroup">
+          <SimpleURLInput
+            isEnabled={true}
+            onChange={this.onChangeAudioURL.bind(this)}
+            label="URL"
+            value={this.props.scene.audioURL}/>
+        </div>
       </ControlGroup>
     );
   }

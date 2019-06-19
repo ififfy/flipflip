@@ -25,7 +25,7 @@ export default class TextGroup extends React.Component {
   render() {
     return (
       <ControlGroup title="Text" isNarrow={true}>
-        <div className="ControlSubgroup">
+        <div className="ControlSubgroup m-inline">
           <SimpleOptionPicker
             onChange={this.changeKey.bind(this, 'textKind').bind(this)}
             label="Source"
@@ -51,7 +51,7 @@ export default class TextGroup extends React.Component {
         {this.state.showFontSettings && (
           <div>
             <hr/>
-            <div className="ControlSubgroup">
+            <div className="ControlSubgroup m-inline">
               <SimpleNumberInput
                 label="Blink Font Size (vmin)"
                 value={this.props.scene.blinkFontSize}
@@ -84,7 +84,7 @@ export default class TextGroup extends React.Component {
               )}
             </div>
             <hr/>
-            <div className="ControlSubgroup">
+            <div className="ControlSubgroup m-inline">
               <SimpleNumberInput
                 label="Caption Font Size (vmin)"
                 value={this.props.scene.captionFontSize}
@@ -117,7 +117,7 @@ export default class TextGroup extends React.Component {
               )}
             </div>
             <hr/>
-            <div className="ControlSubgroup">
+            <div className="ControlSubgroup m-inline">
               <SimpleNumberInput
                 label="Big Caption Font Size (vmin)"
                 value={this.props.scene.captionBigFontSize}
@@ -150,7 +150,7 @@ export default class TextGroup extends React.Component {
               )}
             </div>
             <hr/>
-            <div className="ControlSubgroup">
+            <div className="ControlSubgroup m-inline">
               <SimpleNumberInput
                 label="Count Font Size (vmin)"
                 value={this.props.scene.countFontSize}

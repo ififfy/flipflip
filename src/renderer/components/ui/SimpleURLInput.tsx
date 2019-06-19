@@ -19,10 +19,12 @@ export default class SimpleURLInput extends React.Component {
         value={this.props.value}
         isEnabled={this.props.isEnabled}
         onChange={this.props.onChange}>
-        {" "}
-        <button onClick={this.pickFile.bind(this)}>Browse files</button>
-        {" "}
-        <button onClick={this.paste.bind(this)}>Paste</button>
+        <div>
+          {" "}
+          <button onClick={this.pickFile.bind(this)}>Browse files</button>
+          {" "}
+          <button onClick={this.paste.bind(this)}>Paste</button>
+        </div>
       </SimpleTextInput>
     );
   }

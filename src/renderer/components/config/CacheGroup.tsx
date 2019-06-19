@@ -32,32 +32,38 @@ export default class CacheGroup extends React.Component {
                   onClick={this.props.config.caching.enabled ? this.clearCache.bind(this) : this.nop}>ClearCache
           </button>
         </SimpleCheckbox>
-        <SimpleTextInput
-          isEnabled={this.props.config.caching.enabled}
-          label="Caching Directory"
-          value={this.props.config.caching.directory}
-          onChange={this.changeKey.bind(this, 'directory').bind(this)}>
-          {" "}
-          <button className={this.props.config.caching.enabled ? '' : 'u-disabled'}
-                  onClick={this.props.config.caching.enabled ? this.pickDirectory.bind(this) : this.nop}>Browse
-          </button>
-          {" "}
-          <button className={this.props.config.caching.enabled ? '' : 'u-disabled'}
-                  onClick={this.props.config.caching.enabled ? this.paste.bind(this) : this.nop}>Paste
-          </button>
-          {" "}
-          {this.props.config.caching.directory == "" && (
-            <span>You are using the default directory</span>
-          )}
-        </SimpleTextInput>
-        <span>Cache Dir size: {this.state.cacheSize}</span>
-        <SimpleNumberInput
-          label="Caching Directory Max Size (MB):"
-          min={0}
-          value={this.props.config.caching.maxSize}
-          isEnabled={this.props.config.caching.enabled}
-          onChange={this.changeKey.bind(this, 'maxSize').bind(this)}/>
-        <span>Set to 0 for Unlimited</span>
+        <div className="ControlSubgroup m-inline">
+          <SimpleTextInput
+            isEnabled={this.props.config.caching.enabled}
+            label="Caching Directory"
+            value={this.props.config.caching.directory}
+            onChange={this.changeKey.bind(this, 'directory').bind(this)}>
+            <div>
+            {" "}
+            <button className={this.props.config.caching.enabled ? '' : 'u-disabled'}
+                    onClick={this.props.config.caching.enabled ? this.pickDirectory.bind(this) : this.nop}>Browse
+            </button>
+            {" "}
+            <button className={this.props.config.caching.enabled ? '' : 'u-disabled'}
+                    onClick={this.props.config.caching.enabled ? this.paste.bind(this) : this.nop}>Paste
+            </button>
+            {" "}
+            </div>
+            {this.props.config.caching.directory == "" && (
+              <span>You are using the default directory</span>
+            )}
+          </SimpleTextInput>
+        </div>
+        <div className="ControlSubgroup m-inline">
+          <span>Cache Dir size: {this.state.cacheSize}</span>
+          <SimpleNumberInput
+            label="Caching Directory Max Size (MB):"
+            min={0}
+            value={this.props.config.caching.maxSize}
+            isEnabled={this.props.config.caching.enabled}
+            onChange={this.changeKey.bind(this, 'maxSize').bind(this)}/>
+          <span>Set to 0 for Unlimited</span>
+        </div>
       </ControlGroup>
     );
   }

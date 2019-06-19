@@ -15,7 +15,6 @@ import Tag from "../library/Tag";
 import AudioGroup from "../sceneDetail/AudioGroup";
 import ImageEffectGroup from "../sceneDetail/ImageEffectGroup";
 import TextGroup from "../sceneDetail/TextGroup";
-import TimingGroup from "../sceneDetail/TimingGroup";
 import Progress from "../ui/Progress";
 import ImageGroup from "../sceneDetail/ImageGroup";
 import SceneEffectGroup from "../sceneDetail/SceneEffectGroup";
@@ -237,12 +236,8 @@ export default class Player extends React.Component {
         </div>
 
         {this.state.hasStarted && (
-          <div className="SceneOptions u-button-sidebar">
+          <div className="SceneOptions ControlGroupGroup u-button-sidebar">
             <h2 className="SceneOptionsHeader">Scene Options</h2>
-            <TimingGroup
-              scene={this.props.scene}
-              onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-
             {this.props.tags == null && (
               <SceneEffectGroup
                 scene={this.props.scene}

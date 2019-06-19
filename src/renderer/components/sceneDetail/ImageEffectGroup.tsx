@@ -34,13 +34,13 @@ export default class ImageEffectGroup extends React.Component {
 
         <hr/>
 
-        <div className="ControlSubgroup">
+        <div className="ControlSubgroup m-inline">
           <SimpleCheckbox
             text="Cross-fade images"
             isOn={this.props.scene.crossFade}
             onChange={this.changeKey.bind(this, 'crossFade').bind(this)}/>
           {this.props.scene.crossFade && (
-            <div className="ControlSubgroup">
+            <div className="ControlSubgroup m-inline">
               <SimpleCheckbox
                 text="Fade Full Duration"
                 isOn={this.props.scene.fadeFull}

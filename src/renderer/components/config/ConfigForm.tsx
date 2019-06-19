@@ -7,20 +7,19 @@ import {remote} from "electron";
 import http from "http";
 
 import Config, {CacheSettings, DisplaySettings, RemoteSettings, SceneSettings} from "../../data/Config";
+import {getRandomIndex} from "../../data/utils";
 import Scene from "../../data/Scene";
 import APIGroup from "./APIGroup";
 import CacheGroup from "./CacheGroup";
+import BackupGroup from "./BackupGroup";
+import DisplayGroup from "./DisplayGroup";
 import ImageEffectGroup from "../sceneDetail/ImageEffectGroup";
 import SceneEffectGroup from "../sceneDetail/SceneEffectGroup";
 import ImageGroup from "../sceneDetail/ImageGroup";
 import TextGroup from "../sceneDetail/TextGroup";
-import TimingGroup from "../sceneDetail/TimingGroup";
-import Modal from "../ui/Modal";
-import BackupGroup from "./BackupGroup";
-import DisplayGroup from "./DisplayGroup";
-import {getRandomIndex} from "../../data/utils";
 import StrobeGroup from "../sceneDetail/StrobeGroup";
 import ZoomMoveGroup from "../sceneDetail/ZoomMoveGroup";
+import Modal from "../ui/Modal";
 
 export default class ConfigForm extends React.Component {
   readonly props: {
@@ -68,10 +67,6 @@ export default class ConfigForm extends React.Component {
         </div>
 
         <div className="Config__Content ControlGroupGroup">
-          <TimingGroup
-            scene={this.state.config.defaultScene}
-            onUpdateScene={this.onUpdateDefaultScene.bind(this)}/>
-
           <SceneEffectGroup
             scene={this.state.config.defaultScene}
             allScenes={this.props.scenes}

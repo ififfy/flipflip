@@ -25,6 +25,7 @@ export default class APIGroup extends React.Component {
           <div>
             <button onClick={!tumblrAuthorized ? this.props.activateTumblr.bind(this) : this.nop}
                     className={`u-button ${!tumblrAuthorized ? 'u-clickable' : 'u-disabled'}`}>Authorize FlipFlip on Tumblr</button>
+            {" "}
             <button onClick={tumblrAuthorized ? this.props.clearTumblr.bind(this) : this.nop}
                     className={`u-button ${tumblrAuthorized ? 'u-clickable' : 'u-disabled'}`}>Clear Tumblr Token</button>
           </div>
@@ -53,10 +54,13 @@ export default class APIGroup extends React.Component {
         </div>
         <hr/>
         <div className="ControlSubgroup">
-          <button onClick={!redditAuthorized ? this.props.activateReddit.bind(this) : this.nop}
-                  className={`u-button ${!redditAuthorized ? 'u-clickable' : 'u-disabled'}`}>Authorize FlipFlip on Reddit</button>
-          <button onClick={redditAuthorized ? this.props.clearReddit.bind(this) : this.nop}
-                  className={`u-button ${redditAuthorized ? 'u-clickable' : 'u-disabled'}`}>Clear Reddit Token</button>
+          <div>
+            <button onClick={!redditAuthorized ? this.props.activateReddit.bind(this) : this.nop}
+                    className={`u-button ${!redditAuthorized ? 'u-clickable' : 'u-disabled'}`}>Authorize FlipFlip on Reddit</button>
+            {" "}
+            <button onClick={redditAuthorized ? this.props.clearReddit.bind(this) : this.nop}
+                    className={`u-button ${redditAuthorized ? 'u-clickable' : 'u-disabled'}`}>Clear Reddit Token</button>
+          </div>
         </div>
         <hr/>
         <div className="ControlSubgroup">

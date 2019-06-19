@@ -7,14 +7,14 @@ import SimpleNumberInput from "../ui/SimpleNumberInput";
 
 export default class DisplayGroup extends React.Component {
   readonly props: {
-    settings: DisplaySettings
+    settings: DisplaySettings,
     onUpdateSettings(keys: DisplaySettings, fn: (keys: DisplaySettings) => void): void,
   };
 
   render() {
     return (
       <ControlGroup title="Player Settings" isNarrow={true}>
-        <div className="ControlSubgroup">
+        <div className="ControlSubgroup m-inline">
           <SimpleCheckbox
             text={"Always on Top"}
             isOn={this.props.settings.alwaysOnTop}
@@ -33,7 +33,7 @@ export default class DisplayGroup extends React.Component {
             onChange={this.changeKey.bind(this, 'startImmediately').bind(this)}/>
         </div>
         <hr/>
-        <div className="ControlSubgroup">
+        <div className="ControlSubgroup m-inline">
           <SimpleNumberInput
             label={"Min Image Size (px)"}
             value={this.props.settings.minImageSize}

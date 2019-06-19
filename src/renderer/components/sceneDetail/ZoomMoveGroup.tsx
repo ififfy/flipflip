@@ -18,7 +18,7 @@ export default class ZoomMoveGroup extends React.Component {
   render() {
     return (
       <ControlGroup title="Zoom/Move" isNarrow={true}>
-        <div className="ControlSubgroup">
+        <div className="ControlSubgroup m-inline">
           <SimpleCheckbox
             text="Zoom"
             isOn={this.props.scene.zoom}
@@ -77,7 +77,7 @@ export default class ZoomMoveGroup extends React.Component {
         </div>
 
         {(this.props.scene.zoom || this.props.scene.horizTransType != HTF.none || this.props.scene.vertTransType != VTF.none) && (
-          <div className="ControlSubgroup">
+          <div className="ControlSubgroup m-inline">
             <SimpleCheckbox
               text="Zoom/Move Full Duration"
               isOn={this.props.scene.transFull}

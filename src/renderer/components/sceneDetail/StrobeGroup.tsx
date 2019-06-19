@@ -30,12 +30,14 @@ export default class StrobeGroup extends React.Component {
               isOn={this.props.scene.strobePulse}
               onChange={this.changeKey.bind(this, 'strobePulse').bind(this)} />
           )}
-          {this.props.scene.strobe && (
-            <div className="ControlSubgroup">
-              <SimpleColorPicker
-                onChange={this.changeKey.bind(this, 'strobeColor').bind(this)}
-                label="Color"
-                value={this.props.scene.strobeColor} />
+        </div>
+        {this.props.scene.strobe && (
+          <div className="ControlSubgroup m-inline">
+            <SimpleColorPicker
+              onChange={this.changeKey.bind(this, 'strobeColor').bind(this)}
+              label="Color"
+              value={this.props.scene.strobeColor} />
+            <div className="ControlSubgroup m-inline">
               <SimpleNumberInput
                 label={"Strobe Time (ms)"}
                 value={this.props.scene.strobeTime}
@@ -50,6 +52,8 @@ export default class StrobeGroup extends React.Component {
                   isEnabled={this.props.scene.strobe}
                   onChange={this.changeKey.bind(this, 'strobeDelay').bind(this)} />
               )}
+            </div>
+            <div className="ControlSubgroup m-inline">
               <SimpleOptionPicker
                 label="Strobe Layer"
                 value={this.props.scene.strobeLayer}
@@ -65,8 +69,8 @@ export default class StrobeGroup extends React.Component {
                   value={this.props.scene.strobeOpacity * 100}/>
               )}
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </ControlGroup>
     );
   }
