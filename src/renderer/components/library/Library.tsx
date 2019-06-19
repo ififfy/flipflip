@@ -9,6 +9,7 @@ import Config from "../../data/Config";
 import SourcePicker from "../sceneDetail/SourcePicker";
 import Progress from "../ui/Progress";
 import Jiggle from "../../animations/Jiggle";
+import Twitter from "twitter";
 
 export default class Library extends React.Component {
   readonly props: {
@@ -56,21 +57,37 @@ export default class Library extends React.Component {
           </div>
           {!this.props.isSelect && !this.props.isBatchTag && !this.state.showProgress && (
             <div className="Library__Buttons u-button-row-right">
-              <Jiggle
-                bounce={false}
-                className="Library__RedditImport u-button u-icon-button u-clickable"
-                title="Import Reddit Subscriptions"
-                onClick={this.importReddit.bind(this)}
-              >
-                <div className="u-reddit"/>
-              </Jiggle>
-              <Jiggle
-                bounce={false}
-                className="Library__TumblrImport u-button u-icon-button u-clickable"
-                title="Import Tumblr Following"
-                onClick={this.importTumblr.bind(this)}>
-                <div className="u-tumblr"/>
-              </Jiggle>
+              {this.props.config.remoteSettings.twitterAccessTokenKey != "" &&
+                this.props.config.remoteSettings.twitterAccessTokenSecret != "" && (
+                <Jiggle
+                  bounce={false}
+                  className="Library__TwitterImport u-button u-icon-button u-clickable"
+                  title="Import Twitter Following"
+                  onClick={this.importTwitter.bind(this)}
+                >
+                  <div className="u-twitter"/>
+                </Jiggle>
+              )}
+              {this.props.config.remoteSettings.redditRefreshToken != "" && (
+                <Jiggle
+                  bounce={false}
+                  className="Library__RedditImport u-button u-icon-button u-clickable"
+                  title="Import Reddit Subscriptions"
+                  onClick={this.importReddit.bind(this)}
+                >
+                  <div className="u-reddit"/>
+                </Jiggle>
+              )}
+              {this.props.config.remoteSettings.tumblrOAuthToken != "" &&
+                this.props.config.remoteSettings.tumblrOAuthTokenSecret != "" && (
+                <Jiggle
+                  bounce={false}
+                  className="Library__TumblrImport u-button u-icon-button u-clickable"
+                  title="Import Tumblr Following"
+                  onClick={this.importTumblr.bind(this)}>
+                  <div className="u-tumblr"/>
+                </Jiggle>
+              )}
               <Jiggle
                 bounce={false}
                 className="Library__MarkOffline u-button u-icon-button u-clickable"
@@ -161,72 +178,6 @@ export default class Library extends React.Component {
     }
   }
 
-  importReddit() {
-    const reddit = new Snoowrap({
-      userAgent: this.props.config.remoteSettings.redditUserAgent,
-      clientId: this.props.config.remoteSettings.redditClientID,
-      clientSecret: "",
-      refreshToken: this.props.config.remoteSettings.redditRefreshToken,
-    });
-
-    // Define our loop
-    const redditImportLoop = () => {
-      reddit.getSubscriptions({limit: 20, after: this.state.next}).then((subscriptionListing: any) => {
-        if (subscriptionListing.length > 0) {
-          // Get the next 20 blogs
-          let subscriptions = [];
-          for (let sub of subscriptionListing) {
-            const subURL = "http://www.reddit.com" + sub.url;
-            subscriptions.push(subURL);
-          }
-
-          // dedup
-          let sourceURLs = this.props.library.map((s) => s.url);
-          subscriptions = subscriptions.filter((s) => !sourceURLs.includes(s));
-
-          let id = this.props.library.length + 1;
-          this.props.library.forEach((s) => {
-            id = Math.max(s.id + 1, id);
-          });
-
-          // Add to Library
-          let newLibrary = this.props.library;
-          for (let url of subscriptions) {
-            newLibrary.push(new LibrarySource({
-              url: url,
-              id: id,
-              tags: new Array<Tag>(),
-            }));
-            id += 1;
-          }
-          this.props.onUpdateLibrary(newLibrary);
-
-          // Loop until we run out of blogs
-          setTimeout(redditImportLoop, 1500);
-          this.setState({next: subscriptionListing[subscriptionListing.length - 1].name, currentProgress: this.state.currentProgress + 1});
-        } else {
-          this.setState({next: "", currentProgress: 0, totalProgress: 0, inProgress: false, progressTitle: ""});
-          alert("Reddit Subscription Import has completed");
-        }
-      }).catch((err: any) => {
-        // If user is not authenticated for subscriptions, prompt to re-authenticate
-        if (err.statusCode == 403) {
-          alert("You have not authorized FlipFlip to work with Reddit subscriptions. Visit config and authorize FlipFlip to work with Reddit.");
-          this.props.onClearReddit();
-        } else {
-          alert("Error retrieving subscriptions: " + err);
-          console.error(err);
-        }
-        this.setState({currentProgress: 0, totalProgress: 0, inProgress: false, progressTitle: ""});
-      });
-    };
-
-    // Show progress bar and kick off loop
-    alert("Your Reddit subscriptions are being imported... You will recieve an alert when the import is finished.");
-    this.setState({totalProgress: 1, inProgress: true});
-    redditImportLoop();
-  }
-
   importTumblr() {
     // If we don't have an import running
     if (!this.state.inProgress) {
@@ -269,11 +220,11 @@ export default class Library extends React.Component {
           // Add to Library
           let newLibrary = this.props.library;
           for (let url of following) {
-            newLibrary.push(new LibrarySource({
+            newLibrary = newLibrary.concat([new LibrarySource({
               url: url,
               id: id,
               tags: new Array<Tag>(),
-            }));
+            })]);
             id += 1;
           }
           this.props.onUpdateLibrary(newLibrary);
@@ -317,6 +268,135 @@ export default class Library extends React.Component {
       // We already have an import running, just show it
       this.setState({showProgress: true});
     }
+  }
+
+  importReddit() {
+    const reddit = new Snoowrap({
+      userAgent: this.props.config.remoteSettings.redditUserAgent,
+      clientId: this.props.config.remoteSettings.redditClientID,
+      clientSecret: "",
+      refreshToken: this.props.config.remoteSettings.redditRefreshToken,
+    });
+
+    // Define our loop
+    const redditImportLoop = () => {
+      reddit.getSubscriptions({limit: 20, after: this.state.next}).then((subscriptionListing: any) => {
+        if (subscriptionListing.length > 0) {
+          // Get the next 20 blogs
+          let subscriptions = [];
+          for (let sub of subscriptionListing) {
+            const subURL = "http://www.reddit.com" + sub.url;
+            subscriptions.push(subURL);
+          }
+
+          // dedup
+          let sourceURLs = this.props.library.map((s) => s.url);
+          subscriptions = subscriptions.filter((s) => !sourceURLs.includes(s));
+
+          let id = this.props.library.length + 1;
+          this.props.library.forEach((s) => {
+            id = Math.max(s.id + 1, id);
+          });
+
+          // Add to Library
+          let newLibrary = this.props.library;
+          for (let url of subscriptions) {
+            newLibrary = newLibrary.concat([new LibrarySource({
+              url: url,
+              id: id,
+              tags: new Array<Tag>(),
+            })]);
+            id += 1;
+          }
+          this.props.onUpdateLibrary(newLibrary);
+
+          // Loop until we run out of blogs
+          setTimeout(redditImportLoop, 1500);
+          this.setState({next: subscriptionListing[subscriptionListing.length - 1].name, currentProgress: this.state.currentProgress + 1});
+        } else {
+          this.setState({next: "", currentProgress: 0, totalProgress: 0, inProgress: false, progressTitle: ""});
+          alert("Reddit Subscription Import has completed");
+        }
+      }).catch((err: any) => {
+        // If user is not authenticated for subscriptions, prompt to re-authenticate
+        if (err.statusCode == 403) {
+          alert("You have not authorized FlipFlip to work with Reddit subscriptions. Visit config and authorize FlipFlip to work with Reddit.");
+          this.props.onClearReddit();
+        } else {
+          alert("Error retrieving subscriptions: " + err);
+          console.error(err);
+        }
+        this.setState({currentProgress: 0, totalProgress: 0, inProgress: false, progressTitle: ""});
+      });
+    };
+
+    // Show progress bar and kick off loop
+    alert("Your Reddit subscriptions are being imported... You will recieve an alert when the import is finished.");
+    this.setState({totalProgress: 1, inProgress: true});
+    redditImportLoop();
+  }
+
+  importTwitter() {
+    const twitter = new Twitter({
+      consumer_key: this.props.config.remoteSettings.twitterConsumerKey,
+      consumer_secret: this.props.config.remoteSettings.twitterConsumerSecret,
+      access_token_key: this.props.config.remoteSettings.twitterAccessTokenKey,
+      access_token_secret: this.props.config.remoteSettings.twitterAccessTokenSecret,
+    });
+
+    // Define our loop
+    const twitterImportLoop = () => {
+      twitter.get('friends/list', this.state.next =="" ? {count: 200} : {count: 200, cursor: this.state.next}, (error: any, data: any) => {
+        if (error) {
+          alert("Error retrieving following: " + error);
+          console.error(error);
+          this.setState({currentProgress: 0, totalProgress: 0, inProgress: false, progressTitle: ""});
+          return;
+        }
+
+        // Get the next 200 users
+        let following = [];
+        for (let user of data.users) {
+          const userURL = "https://twitter.com/" + user.screen_name;
+          following.push(userURL);
+        }
+
+        // dedup
+        let sourceURLs = this.props.library.map((s) => s.url);
+        following = following.filter((s) => !sourceURLs.includes(s));
+
+        let id = this.props.library.length + 1;
+        this.props.library.forEach((s) => {
+          id = Math.max(s.id + 1, id);
+        });
+
+        // Add to Library
+        let newLibrary = this.props.library;
+        for (let url of following) {
+          newLibrary = newLibrary.concat([new LibrarySource({
+            url: url,
+            id: id,
+            tags: new Array<Tag>(),
+          })]);
+          id += 1;
+        }
+        this.props.onUpdateLibrary(newLibrary);
+
+        if (data.next_cursor == 0) { // We're done
+          this.setState({next: "", currentProgress: 0, totalProgress: 0, inProgress: false, progressTitle: ""});
+          alert("Twitter Following Import has completed");
+        } else {
+          // Loop until we run out of blogs
+          setTimeout(twitterImportLoop, 1500);
+          this.setState({next: data.next_cursor, currentProgress: this.state.currentProgress + 1});
+        }
+      });
+    };
+
+    // Show progress bar and kick off loop
+    alert("Your Twitter follows are being imported... You will recieve an alert when the import is finished.");
+    this.setState({totalProgress: 1, inProgress: true});
+    twitterImportLoop();
   }
 
   markOffline() {

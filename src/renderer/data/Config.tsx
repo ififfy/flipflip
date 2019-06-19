@@ -69,6 +69,11 @@ interface RemoteSettingsI {
   redditDeviceID: string;
   redditRefreshToken: string;
 
+  twitterConsumerKey: string;
+  twitterConsumerSecret: string;
+  twitterAccessTokenKey: string;
+  twitterAccessTokenSecret: string;
+
   instagramUsername: string;
   instagramPassword: string;
 }
@@ -174,6 +179,11 @@ export class RemoteSettings implements RemoteSettingsI {
   redditClientID = "2Iqe-1CsO4VQlA";
   redditDeviceID = "";
   redditRefreshToken = "";
+
+  twitterConsumerKey = "qSRfdIWfpkesYDVJHrRh05wji";
+  twitterConsumerSecret = "ad11IC4CLwVzYyGyYwHKVMP9WwAcKxymw4D9162S5Ex75l5eWw";
+  twitterAccessTokenKey = "";
+  twitterAccessTokenSecret = "";
 
   instagramUsername = "";
   instagramPassword = "";

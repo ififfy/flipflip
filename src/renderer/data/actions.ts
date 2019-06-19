@@ -457,3 +457,10 @@ export function clearReddit(state: State): Object {
   newConfig.remoteSettings.redditRefreshToken = "";
   return {config: newConfig};
 }
+
+export function clearTwitter(state: State): Object {
+  const newConfig = state.config;
+  newConfig.remoteSettings.twitterAccessTokenKey = "";
+  newConfig.remoteSettings.twitterAccessTokenSecret = "";
+  return {config: newConfig};
+}

@@ -164,6 +164,7 @@ export default class Meta extends React.Component {
             onClean={a(actions.cleanBackups)}
             onClearTumblr={a(actions.clearTumblr)}
             onClearReddit={a(actions.clearReddit)}
+            onClearTwitter={a(actions.clearTwitter)}
           />
         )}
       </div>

@@ -33,6 +33,7 @@ export default class ConfigForm extends React.Component {
     onClean(): void,
     onClearTumblr(): void,
     onClearReddit(): void,
+    onClearTwitter(): void,
   };
 
   readonly state = {
@@ -108,6 +109,8 @@ export default class ConfigForm extends React.Component {
             clearTumblr={this.props.onClearTumblr.bind(this)}
             activateReddit={this.showActivateRedditNotice.bind(this)}
             clearReddit={this.props.onClearReddit.bind(this)}
+            activateTwitter={this.showActivateTwitterNotice.bind(this)}
+            clearTwitter={this.props.onClearTwitter.bind(this)}
             onUpdateSettings={this.onUpdateRemoteSettings.bind(this)}/>
 
           <BackupGroup
@@ -151,6 +154,14 @@ export default class ConfigForm extends React.Component {
     messages.push("This is used for finding images on subreddits and user accounts as well as importing your subscriptions.");
     messages.push("FlipFlip does not store any user information or make any changes to your account.");
     this.setState({modalTitle: "Authorize FlipFlip on Reddit", modalMessages: messages, modalFunction: this.activateReddit });
+  }
+
+  showActivateTwitterNotice() {
+    const messages = Array<string>();
+    messages.push("You are about to be directed to Twitter.com to authorize FlipFlip. You should only have to do this once.");
+    messages.push("This is used for finding images on user profiles and for importing your following.");
+    messages.push("FlipFlip does not store any user information or make any changes to your account.");
+    this.setState({modalTitle: "Authorize FlipFlip on Twitter", modalMessages: messages, modalFunction: this.activateTwitter });
   }
 
   closeModal() {
@@ -415,6 +426,102 @@ export default class ConfigForm extends React.Component {
             newMessages.push("Error: " + error);
             this.setState({modalTitle: "Failed", modalMessages: newMessages, modalFunction: this.closeModal});
           }
+        }
+      }
+      res.end();
+    }).listen(65010);
+  }
+
+  activateTwitter() {
+    this.closeModal();
+    // Twitter endpoints
+    const authorizeUrl = 'https://api.twitter.com/oauth/authorize';
+    const requestTokenUrl = 'https://api.twitter.com/oauth/request_token';
+    const accessTokenUrl = 'https://api.twitter.com/oauth/access_token';
+
+    // Default to user's own key
+    const consumerKey = this.props.config.remoteSettings.twitterConsumerKey;
+    const consumerSecret = this.props.config.remoteSettings.twitterConsumerSecret;
+
+    const oauth = new OAuth(
+      requestTokenUrl,
+      accessTokenUrl,
+      consumerKey,
+      consumerSecret,
+      '1.0A',
+      'http://localhost:65010',
+      'HMAC-SHA1'
+    );
+
+    let sharedSecret = "";
+
+    oauth.getOAuthRequestToken((err: {statusCode: number, data: string}, token: string, secret: string) => {
+      if (err) {
+        console.error(err.statusCode + " - " + err.data);
+        const newMessages = Array<string>();
+        newMessages.push("Error: " + err.statusCode + " - " + err.data);
+        this.setState({modalTitle: "Failed", modalMessages: newMessages, modalFunction: this.closeModal});
+        return;
+      }
+
+      sharedSecret = secret;
+      remote.shell.openExternal(authorizeUrl + '?oauth_token=' + token);
+    });
+
+    // Start a server to listen for Twitter OAuth response
+    const server = http.createServer((req, res) => {
+      // Can't seem to get electron to properly return focus to FlipFlip, just alert the user in the response
+      const html = "<html><body><h1>Please return to FlipFlip</h1></body></html>";
+      res.writeHead(200, {"Content-Type": "text/html"});
+      res.write(html);
+
+      if (!req.url.endsWith("favicon.ico")) {
+        if (req.url.includes("oauth_token") && req.url.includes("oauth_verifier")) {
+          const args = req.url.replace("\/?", "").split("&");
+          const oauthToken = args[0].substring(12);
+          const oauthVerifier = args[1].substring(15);
+
+          oauth.getOAuthAccessToken(
+            oauthToken,
+            sharedSecret,
+            oauthVerifier,
+            (err: string, token: string, secret: string) => {
+              if (err) {
+                console.error("Validation failed with error", err);
+                const newMessages = Array<string>();
+                newMessages.push("Error: " + err);
+                this.setState({modalTitle: "Failed", modalMessages: newMessages, modalFunction: this.closeModal});
+                return;
+              }
+
+              // Use prop here and not state, we strictly want to update oauthToken and oauthVerifier
+              const config = this.props.config;
+              config.remoteSettings.twitterAccessTokenKey = token;
+              config.remoteSettings.twitterAccessTokenSecret = secret;
+              this.props.updateConfig(config);
+
+              // Also update state (so our config doesn't get overridden if other changes are saved)
+              const newConfig = this.state.config;
+              newConfig.remoteSettings.twitterAccessTokenKey = token;
+              newConfig.remoteSettings.twitterAccessTokenSecret = secret;
+              const newMessages = Array<string>();
+              newMessages.push("Twitter is now activated.");
+              this.setState({
+                config: newConfig,
+                modalTitle: "Success!",
+                modalMessages: newMessages,
+                modalFunction: this.closeModal
+              });
+
+              // This closes the server
+              server.close();
+              req.connection.destroy();
+            }
+          );
+        } else {
+          const newMessages = Array<string>();
+          newMessages.push("Error: Access Denied");
+          this.setState({modalTitle: "Failed", modalMessages: newMessages, modalFunction: this.closeModal});
         }
       }
       res.end();

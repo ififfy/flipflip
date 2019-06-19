@@ -12,12 +12,15 @@ export default class APIGroup extends React.Component {
     clearTumblr(): void,
     activateReddit(): void,
     clearReddit(): void,
+    activateTwitter(): void,
+    clearTwitter(): void,
     onUpdateSettings(keys: RemoteSettings, fn: (keys: RemoteSettings) => void): void,
   };
 
   render() {
     const tumblrAuthorized = this.props.settings.tumblrOAuthToken != "" && this.props.settings.tumblrOAuthTokenSecret != "";
     const redditAuthorized = this.props.settings.redditRefreshToken != "";
+    const twitterAuthorized = this.props.settings.twitterAccessTokenKey != "" && this.props.settings.twitterAccessTokenSecret != "";
     const indexOf = this.props.settings.tumblrKeys.indexOf(this.props.settings.tumblrKey);
     return (
       <ControlGroup title="API Keys" isNarrow={true}>
@@ -60,6 +63,16 @@ export default class APIGroup extends React.Component {
             {" "}
             <button onClick={redditAuthorized ? this.props.clearReddit.bind(this) : this.nop}
                     className={`u-button ${redditAuthorized ? 'u-clickable' : 'u-disabled'}`}>Clear Reddit Token</button>
+          </div>
+        </div>
+        <hr/>
+        <div className="ControlSubgroup">
+          <div>
+            <button onClick={!twitterAuthorized ? this.props.activateTwitter.bind(this) : this.nop}
+                    className={`u-button ${!twitterAuthorized ? 'u-clickable' : 'u-disabled'}`}>Authorize FlipFlip on Twitter</button>
+            {" "}
+            <button onClick={twitterAuthorized ? this.props.clearTwitter.bind(this) : this.nop}
+                    className={`u-button ${twitterAuthorized ? 'u-clickable' : 'u-disabled'}`}>Clear Twitter Token</button>
           </div>
         </div>
         <hr/>

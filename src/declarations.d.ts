@@ -36,6 +36,7 @@ declare module 'uuid/v4';
 declare module 'system-font-families';
 declare module 'oauth';
 declare module 'imgur';
+declare module 'twitter';
 
 // Type declarations for Clipboard API
 // https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API

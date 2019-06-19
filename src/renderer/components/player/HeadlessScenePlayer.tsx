@@ -7,6 +7,7 @@ import http from 'http';
 import Snoowrap from 'snoowrap';
 import tumblr from "tumblr.js";
 import imgur from "imgur";
+import Twitter from "twitter";
 import {IgApiClient} from "instagram-private-api";
 
 import {IF, ST, WF} from '../../data/const';
@@ -29,6 +30,7 @@ import ImagePlayer from './ImagePlayer';
 let redditAlerted = false;
 let tumblrAlerted = false;
 let tumblr429Alerted = false;
+let twitterAlerted = false;
 let instagramAlerted = false;
 
 // Returns true if array is empty, or only contains empty arrays
@@ -543,32 +545,56 @@ function loadImgur(config: Config, url: string, filter: string, next: any): Canc
 }
 
 function loadTwitter(config: Config, url: string, filter: string, next: any): CancelablePromise {
-  // TODO This endpoint doesn't provide video links (just photos) so a new endpoint or library will be necessary (like one with oauth)
-  return new CancelablePromise((resolve) => {
-      wretch("https://twitter.com/i/profiles/show/" + getFileGroup(url) + "/media_timeline" + (next != 0 ? next : ""))
-        .get()
-        .setTimeout(5000)
-        .onAbort((e) => resolve(null))
-        .notFound((e) => resolve(null))
-        .json((json) => {
-          const itemsHTML = new DOMParser().parseFromString(json.items_html, "text/html");
-          const imageEls = itemsHTML.querySelectorAll(".AdaptiveMedia-photoContainer");
-          let images = Array<string>();
-          for (let image of imageEls) {
-            images.push(image.getAttribute("data-image-url"));
+  let configured = config.remoteSettings.twitterAccessTokenKey != "" && config.remoteSettings.twitterAccessTokenSecret != "";
+  if (configured) {
+    return new CancelablePromise((resolve) => {
+      const twitter = new Twitter({
+        consumer_key: config.remoteSettings.twitterConsumerKey,
+        consumer_secret: config.remoteSettings.twitterConsumerSecret,
+        access_token_key: config.remoteSettings.twitterAccessTokenKey,
+        access_token_secret: config.remoteSettings.twitterAccessTokenSecret,
+      });
+      twitter.get('statuses/user_timeline',
+        next == 0 ? {screen_name: getFileGroup(url), count: 200} : {screen_name: getFileGroup(url), count: 200, max_id: next},
+        (error: any, tweets: any) => {
+        if (error) {
+          resolve(null);
+          return;
+        }
+        let images = Array<string>();
+        let lastID = "";
+        for (let t of tweets) {
+          if (t.extended_entities && t.extended_entities.media) {
+            for (let m of t.extended_entities.media) {
+              if (m.video_info) {
+                images.push(m.video_info.variants[0].url);
+              } else {
+                images.push(m.media_url);
+              }
+            }
+          } else if (t.entities.media) {
+            for (let m of t.entities.media) {
+              images.push(m.media_url);
+            }
           }
-          const tweets = itemsHTML.querySelectorAll(".tweet");
-          if (tweets.length == 0) {
-            resolve(null);
-            return;
-          }
-          const lastTweetID = tweets[tweets.length-1].getAttribute("data-tweet-id");
-          resolve({
-            data: filterPathsToJustPlayable(filter, images, true),
-            next: "?last_note_ts=" + lastTweetID + "&max_position=" + (parseInt(lastTweetID, 10) - 1)
-          });
-        });
-  });
+          lastID = t.id;
+        }
+        if (lastID == next) {
+          resolve(null);
+        } else {
+          resolve({data: images, next: lastID});
+        }
+      })
+    });
+  } else {
+    if (!twitterAlerted) {
+      alert("You haven't authorized FlipFlip to work with Twitter yet.\nVisit Config and click 'Authorzie FlipFlip on Twitter'.");
+      twitterAlerted = true;
+    }
+    return new CancelablePromise((resolve) => {
+      resolve(null);
+    });
+  }
 }
 
 function loadDeviantArt(config: Config, url: string, filter: string, next: any): CancelablePromise {
@@ -745,6 +771,7 @@ export default class HeadlessScenePlayer extends React.Component {
     tumblrAlerted = false;
     tumblr429Alerted = false;
     instagramAlerted = false;
+    twitterAlerted = false;
     let n = 0;
     let newAllURLs = new Map<string, Array<string>>();
 
