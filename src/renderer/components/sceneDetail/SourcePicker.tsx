@@ -229,7 +229,8 @@ export default class SourcePicker extends React.Component {
         </div>
 
         <SourceList
-          sources={displaySources}
+          displaySources={displaySources}
+          sources={this.props.sources}
           config={this.props.config}
           isSelect={this.props.isSelect || this.props.isBatchTag}
           emptyMessage={this.props.emptyMessage}

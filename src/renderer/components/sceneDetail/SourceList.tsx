@@ -12,6 +12,7 @@ import SimpleOptionPicker from "../ui/SimpleOptionPicker";
 
 export default class SourceList extends React.Component {
   readonly props: {
+    displaySources: Array<LibrarySource>,
     sources: Array<LibrarySource>,
     config: Config,
     isSelect: boolean,
@@ -57,12 +58,12 @@ export default class SourceList extends React.Component {
         </div>
 
         <div id="sources" className={`SourceList__Sources ${this.props.isSelect ? 'm-select' : ''}`}>
-          {this.props.sources.length == 0 && (
+          {this.props.displaySources.length == 0 && (
             <div className="SourceList__Empty">
               {filtering ? "No results" : this.props.emptyMessage}
             </div>
           )}
-          {this.props.sources.map((source) =>
+          {this.props.displaySources.map((source) =>
             <div className={`SourceList__Source ${source.offline ? 'm-offline' : ''} ${source.marked ? 'm-marked' : ''}`}
                  key={source.id}>
               {this.props.isSelect && (
@@ -133,7 +134,7 @@ export default class SourceList extends React.Component {
     return ((this.props.isSelect !== props.isSelect) ||
       (this.props.filters !== props.filters) ||
       (this.props.selected.length !== props.selected.length) ||
-      (this.props.sources !== props.sources))
+      (this.props.displaySources !== props.displaySources))
   }
 
   componentDidUpdate(): void {
