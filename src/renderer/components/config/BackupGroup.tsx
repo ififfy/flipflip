@@ -14,8 +14,8 @@ export default class BackupGroup extends React.Component {
   };
 
   readonly state = {
-    backups: Array<string>(),
-    backup: "",
+    backups: Array<{url: string, size: number}>(),
+    backup: (null as {url: string, size: number}),
     confirmMessage: "",
     confirmTitle: "",
     confirmShowSelect: true,
@@ -48,7 +48,7 @@ export default class BackupGroup extends React.Component {
         </span>
         <br/>
         <span>
-          Last Backup: {hasBackup ? this.convertFromEpoch(this.state.backups[0]) : "--"}
+          Last Backup: {hasBackup ? this.convertFromEpoch(this.state.backups[0].url) + " (" + Math.round(this.state.backups[0].size / 1000) + " KB)" : "--"}
         </span>
         {this.state.confirmMessage != "" && (
           <Modal onClose={this.closeConfirm.bind(this)} title={this.state.confirmTitle}>
@@ -56,11 +56,11 @@ export default class BackupGroup extends React.Component {
             {this.state.confirmShowSelect && (
               <div className="SimpleOptionPicker">
                 <select
-                value={this.state.backup}
-                onChange={this.onChangeBackup.bind(this)}>
-                {this.state.backups.map((b) =>
-                  <option value={b} key={b}>{this.convertFromEpoch(b)}</option>
-                )}
+                  value={this.state.backup.url}
+                  onChange={this.onChangeBackup.bind(this)}>
+                  {this.state.backups.map((b) =>
+                    <option value={b.url} key={b.url}>{this.convertFromEpoch(b.url)} ({Math.round(b.size / 1000)} KB)</option>
+                  )}
                 </select>
               </div>
             )}
@@ -90,7 +90,7 @@ export default class BackupGroup extends React.Component {
   }
 
   onChangeBackup(e: React.FormEvent<HTMLSelectElement>) {
-    this.setState({backup: e.currentTarget.value});
+    this.setState({backup: this.state.backups.find((b) => b.url == e.currentTarget.value)});
   }
 
   onClean() {
@@ -120,7 +120,7 @@ export default class BackupGroup extends React.Component {
   }
 
   restore() {
-    this.props.restore(saveDir + path.sep + this.state.backup);
+    this.props.restore(saveDir + path.sep + this.state.backup.url);
     alert("Restore succes!");
     this.closeConfirm();
   }

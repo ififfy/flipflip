@@ -71,7 +71,7 @@ export function cleanBackups(state: State): Object {
   backups.shift(); // Keep the newest backup
   let error;
   for (let backup of backups) {
-    fs.unlink(saveDir + path.sep + backup, (err) => {
+    fs.unlink(saveDir + path.sep + backup.url, (err) => {
       if (err) {
         error = err;
       }

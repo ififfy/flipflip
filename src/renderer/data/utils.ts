@@ -10,18 +10,21 @@ import Config from "./Config";
 
 export const saveDir = path.join(remote.app.getPath('appData'), 'flipflip');
 
-export function getBackups() {
+export function getBackups(): Array<{url: string, size: number}> {
   const files = fs.readdirSync(saveDir);
-  const backups = [];
+  const backups = Array<any>();
   for (let file of files) {
     if (file.startsWith("data.json.")) {
-      backups.push(file);
+      const stats = fs.statSync(saveDir + "/" + file);
+      backups.push({url: file, size: stats.size});
     }
   }
   backups.sort((a, b) => {
-    if (a > b) {
+    const aFile = a.url;
+    const bFile = b.url;
+    if (aFile > bFile) {
       return -1;
-    } else if (a < b) {
+    } else if (aFile < bFile) {
       return 1;
     } else {
       return 0;
