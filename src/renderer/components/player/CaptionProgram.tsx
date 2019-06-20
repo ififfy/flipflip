@@ -161,6 +161,18 @@ export default class CaptionProgram extends React.Component {
         }
 
         if (!hasError) {
+          // Reset all configs
+          STYLES = {};
+          programCounter = 0;
+          PROGRAM= [];
+          BLINK_DURATION = 200;
+          BLINK_DELAY = 80;
+          BLINK_GROUP_DELAY = 1200;
+          CAPTION_DURATION = 2000;
+          CAPTION_DELAY = 1200;
+          COUNT_DURATION = 600;
+          COUNT_DELAY = 400;
+          COUNT_GROUP_DELAY = 1200;
           PHRASES = [];
           captionLoop(newPromise.hasCanceled);
         }
