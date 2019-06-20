@@ -123,19 +123,19 @@ export function getCachePath(source: string, config: Config) {
 export function getSourceType(url: string): string {
   if (/^https?:\/\/([^.]*|(66\.media))\.tumblr\.com/.exec(url) != null) {
     return ST.tumblr;
-  } else if (/^https?:\/\/www.reddit.com\//.exec(url) != null) {
+  } else if (/^https?:\/\/(www\.)?reddit\.com\//.exec(url) != null) {
     return ST.reddit;
-  } else if (/^https?:\/\/www.imagefap.com\//.exec(url) != null) {
+  } else if (/^https?:\/\/(www\.)?imagefap\.com\//.exec(url) != null) {
     return ST.imagefap;
-  } else if (/^https?:\/\/imgur.com\//.exec(url) != null) {
+  } else if (/^https?:\/\/(www\.)?imgur\.com\//.exec(url) != null) {
     return ST.imgur;
-  } else if (/^https?:\/\/www.sex.com\//.exec(url) != null) {
+  } else if (/^https?:\/\/(www\.)?sex\.com\//.exec(url) != null) {
     return ST.sexcom;
-  } else if (/^https?:\/\/twitter.com\//.exec(url) != null) {
+  } else if (/^https?:\/\/(www\.)?twitter\.com\//.exec(url) != null) {
     return ST.twitter;
-  } else if (/^https?:\/\/www.deviantart.com\//.exec(url) != null) {
+  } else if (/^https?:\/\/(www\.)?deviantart\.com\//.exec(url) != null) {
     return ST.deviantart;
-  } else if (/^https?:\/\/www.instagram.com\//.exec(url) != null) {
+  } else if (/^https?:\/\/(www\.)?instagram\.com\//.exec(url) != null) {
     return ST.instagram;
   } else if (/^https?:\/\//.exec(url) != null) { // Arbitrary URL, assume image list
     return ST.list;
