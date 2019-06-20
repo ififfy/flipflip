@@ -197,13 +197,47 @@ export default class ScenePicker extends React.Component {
     wretch("https://api.github.com/repos/ififfy/flipflip/releases")
       .get()
       .json(json => {
-        const newestRelease = json[0];
-        const releaseVersion = newestRelease.tag_name.replace("v", "").replace(".", "").replace(".", "");
-        if (parseInt(releaseVersion, 10) > parseInt(this.props.version.replace(".", "").replace(".", ""), 10)) {
+        const newestReleaseTag = json[0].tag_name;
+        const newestReleaseURL = json[0].html_url;
+        let releaseVersion = newestReleaseTag.replace("v", "").replace(".", "").replace(".", "");
+        let releaseBetaVersion = -1;
+        if (releaseVersion.includes("-")) {
+          const releaseSplit = releaseVersion.split("-");
+          releaseVersion = releaseSplit[0];
+          const betaString = releaseSplit[1];
+          const betaNumber = betaString.replace("beta", "");
+          if (betaNumber == "") {
+            releaseBetaVersion = 0;
+          } else {
+            releaseBetaVersion = parseInt(betaNumber, 10);
+          }
+        }
+        let thisVersion = this.props.version.replace(".", "").replace(".", "");
+        let thisBetaVersion = -1;
+        if (thisVersion.includes("-")) {
+          const releaseSplit = thisVersion.split("-");
+          thisVersion = releaseSplit[0];
+          const betaString = releaseSplit[1];
+          const betaNumber = betaString.replace("beta", "");
+          if (betaNumber == "") {
+            thisBetaVersion = 0;
+          } else {
+            thisBetaVersion = parseInt(betaNumber, 10);
+          }
+        }
+        if (parseInt(releaseVersion, 10) > parseInt(thisVersion, 10)) {
           this.setState({
-            newVersion: newestRelease.tag_name,
-            newVersionLink: newestRelease.html_url,
-          });
+            newVersion: newestReleaseTag,
+            newVersionLink: newestReleaseURL,
+          })
+        } else if (parseInt(releaseVersion, 10) == parseInt(thisVersion, 10)) {
+          if ((releaseBetaVersion == -1 && thisBetaVersion >= 0) ||
+                releaseBetaVersion > thisBetaVersion) {
+            this.setState({
+              newVersion: newestReleaseTag,
+              newVersionLink: newestReleaseURL,
+            })
+          }
         }
       });
   }
