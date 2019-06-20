@@ -810,6 +810,10 @@ label.SimpleCheckbox {
 
     .SourcePicker__BatchTag {
       margin-bottom: $smallPadding * 2;
+
+      > div:first-child {
+        width: 100%;
+      }
     }
   }
 
@@ -826,10 +830,6 @@ label.SimpleCheckbox {
 
       &.m-offline {
         background-color: #ff0000;
-      }
-
-      &.m-marked {
-        background-color: #117900;
       }
 
       > input {
@@ -953,6 +953,12 @@ label.SimpleCheckbox {
 
         &.m-select {
           top: 7rem;
+        }
+
+        .SourceList__Source {
+          &.m-marked {
+            background-color: #117900;
+          }
         }
 
         .SourceList__SourceTitle {
