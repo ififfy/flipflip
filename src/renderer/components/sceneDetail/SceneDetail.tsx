@@ -11,6 +11,7 @@ import LibrarySource from "../library/LibrarySource";
 import Config from "../../data/Config";
 import StrobeGroup from "./StrobeGroup";
 import ZoomMoveGroup from "./ZoomMoveGroup";
+import Jiggle from "../../animations/Jiggle";
 
 export default class SceneDetail extends React.Component {
   readonly nameInputRef: React.RefObject<HTMLInputElement> = React.createRef();
@@ -57,17 +58,22 @@ export default class SceneDetail extends React.Component {
             )}
           </div>
 
-          <div className="BackButton u-button u-clickable" onClick={this.props.goBack}>Back</div>
-          <div
-            className="DeleteButton u-destructive u-button u-clickable"
-            onClick={this.props.onDelete.bind(this, this.props.scene)}>
-            Delete
+          <div style={{float: 'left'}}>
+            <div className="BackButton u-button u-clickable" onClick={this.props.goBack}>Back</div>
+            <div
+              className="DeleteButton u-destructive u-button u-clickable"
+              onClick={this.props.onDelete.bind(this, this.props.scene)}>
+              Delete
+            </div>
           </div>
-          <div
-            className="ExportButton u-button u-clickable"
+
+          <Jiggle
+            bounce={false}
+            className="ExportButton u-button u-icon-button u-clickable"
+            title="Export Scene"
             onClick={this.props.onExport.bind(this, this.props.scene)}>
-            Export Scene
-          </div>
+            <div className="u-export"/>
+          </Jiggle>
 
           <div className="u-button-row-right">
             {(this.props.scene.tagWeights || this.props.scene.sceneWeights) && (
@@ -75,11 +81,13 @@ export default class SceneDetail extends React.Component {
                 Save as New Scene
               </div>
             )}
-            <div onClick={this.props.scene.sources.length > 0 ? this.play.bind(this) : this.nop.bind(this)}
-                 title="Play"
-                 className={`u-icon-button u-clickable u-button ${this.props.scene.sources.length > 0 ? '' : 'u-disabled'}`}>
+            <Jiggle
+              bounce={false}
+              onClick={this.props.scene.sources.length > 0 ? this.play.bind(this) : this.nop.bind(this)}
+              title="Play"
+              className={`u-icon-button u-clickable u-button ${this.props.scene.sources.length > 0 ? '' : 'u-disabled'}`}>
               <div className="u-play"/>
-            </div>
+            </Jiggle>
           </div>
         </div>
 
