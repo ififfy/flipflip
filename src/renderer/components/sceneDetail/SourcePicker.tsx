@@ -179,7 +179,8 @@ export default class SourcePicker extends React.Component {
         <div className="SourcePicker__Buttons">
           {!this.props.onOpenLibraryImport && (
             <div className="ReactSelect SourcePicker__Search">
-              <div>({displaySources.length} Sources)</div>
+              <div className="m-long">({displaySources.length} Sources)</div>
+              <div className="m-short">({displaySources.length})</div>
               <CreatableSelect
                 className="CreatableSelect"
                 components={{DropdownIndicator: null,}}

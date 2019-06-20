@@ -735,6 +735,28 @@ label.SimpleCheckbox {
       > div:not(.CreatableSelect) {
         font-size: 17px;
         margin: 5px 8px;
+
+        &.m-short {
+          display: none;
+        }
+
+        @media screen and (max-width: 665px) {
+          &.m-long {
+            display: none;
+          }
+          &.m-short {
+            display: block;
+          }
+        }
+      }
+
+      .CreatableSelect {
+        @media screen and (max-width: 905px) {
+          width: 10rem;
+        }
+        @media screen and (max-width: 745px) {
+          width: 5rem;
+        }
       }
     }
   }
