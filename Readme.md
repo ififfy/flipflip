@@ -71,6 +71,31 @@ on the project to make changes as you wish. :-)
   
 ## History
 
+### 2.2.0
+- UI Improvements
+- Allow player to play video files (.mp4/.mkv)
+- Allow sources to scrape video files
+- Greatly improve user control over Fade, Zoom, Move, & Strobe effects
+- Allow scenes to be weighted by source or by image
+- Allow scenes to play sources in order or randomized
+- Add option to force all images to play before looping
+- Add Library Search
+- Add Library Batch Tagging
+- Improve Library performance
+- Add Library Import/Export
+- Add Offline filter
+- Add source type logos to sources 
+- Add ability to mark specific sources
+- Add ability to clean cache for specific source
+- Add context link to cache directory
+- Allow Scenes to be exported with Tags
+- Allow Scene Import to optionally add sources to the Library
+- Twitter Following Import
+- Instagram Folowing Import
+- Fix bug with copying link to clipboard
+- Fix bug with caption configs not reseting
+- Misc bug fixes
+
 ### 2.1.1
 - Add more public Tumblr keys
 - Allow users to specify Tumblr keys
