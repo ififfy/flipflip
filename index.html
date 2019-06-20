@@ -3,7 +3,7 @@
         <h1 id="gettingstarted">Getting Started</h1>
 
         <p>When you first open FlipFlip, you should see a screen like this:
-            <img src="https://github.com/ififfy/flipflip/raw/master/doc_images/v2.2/flipflip_home_numbered.png" alt=""/>
+            <img src="https://github.com/ififfy/flipflip/raw/master/doc_images/v2.2/flipflip_home_numbered.png" alt="" />
             <em>Note: Some of these features (3 &amp; 7) will be disabled until they are relevant</em></p>
 
         <ol>
@@ -21,72 +21,56 @@
 
             <li>Open Random Scene (Appears when at least 2 Scenes exist)</li>
 
-            <li><a href="#8-exportimport-scenes">Import Scene</a></li>
+            <li><a href="#8-exportimport-library-and-scenes">Export/Import Library &amp; Scenes</a></li>
 
             <li><a href="#9-flipflip-config">FlipFlip Config</a></li>
         </ol>
 
         <h2 id="1scenes">1. Scenes</h2>
 
-        <p>A <strong>Scene</strong> is the main component of FlipFlip. Each Scene consists of collection of slideshow
-            settings:
-            which images to show, what timing to use, what effects, and more.</p>
+        <p>A <strong>Scene</strong> is the main component of FlipFlip. Each Scene consists of collection of slideshow settings: which images to show, what timing to use, what effects, and more.</p>
 
         <p>To create a Scene, click "+ Add Scene" (1). You will be brought to the Scene Detail page. </p>
 
-        <p><img src="https://github.com/ififfy/flipflip/raw/master/doc_images/v2.2/scene_details.png" alt=""/>
+        <p><img src="https://github.com/ififfy/flipflip/raw/master/doc_images/v2.2/scene_details.png" alt="" />
             When you return to the Home page, you will see your new scene in the list of Scenes (4).</p>
 
         <h3 id="sources">Sources</h3>
 
-        <p>The most important part of any Scene is its <strong>Sources</strong>. This is simply a list of all the places
-            FlipFlip will find images to show. FlipFlip supports sources from (1) Local Directories, (2) A text document
-            with a
-            list of image URLs, or (3) one of the <a href="#currently-supported-remote-sources">currently supported
-                remote
-                sources</a>.</p>
+        <p>The most important part of any Scene is its <strong>Sources</strong>. This is simply a list of all the places FlipFlip will find images to show. FlipFlip supports sources from (1) Local Directories, (2) A text document with a list of image URLs, or (3) one of the <a href="#currently-supported-remote-sources">currently supported remote sources</a>.</p>
 
         <ul>
-            <li>Sources can be ordered Alphabetically (either their full URL or their parsed name), by Date Added, or by
-                Type.
-            </li>
+            <li>Sources can be ordered Alphabetically (either their full URL or their parsed name), by Date Added, or by Type.</li>
 
             <li>Sources can also be manually ordered by drag'n'dropping them.</li>
 
-            <li>To edit a source, click the ✏️ and then make your desired changes. <em>Note: Blank and duplicate sources
-                will be
-                automatically removed</em></li>
+            <li>To edit a source, click the <img src="https://github.com/ififfy/flipflip/raw/master/src/renderer/icons/pencil.svg" alt="Edit" width="20" height="20"> and then make your desired changes. <em>Note: Blank and duplicate sources will be automatically removed</em></li>
 
-            <li>To delete a source, click the ❌.</li>
+            <li>To clear the cache for a source, click the <img src="https://github.com/ififfy/flipflip/raw/master/src/renderer/icons/clean.svg" alt="Clear cache" width="20" height="20"></li>
+
+            <li>To delete a source, click the <img src="https://github.com/ififfy/flipflip/raw/master/src/renderer/icons/delete.svg" alt="Remove" width="20" height="20"></li>
 
             <li>To clear <em>all</em> sources in a scene, click "- Remove All" and confirm.</li>
         </ul>
 
-        <p>For information about adding from the Library, see the <a href="#importing-library-sources-in-scene">Library
-            section</a> section below. For information about exporting/importing a Scene, see the <a
-                href="#8-exportimport-scenes">Export/Import</a> section below.</p>
+        <p>For information about adding from the Library, see the <a href="#importing-library-sources-in-scene">Library section</a> section below. For information about exporting/importing a Scene, see the <a href="#8-exportimport-library-and-scenes">Export/Import</a> section below.</p>
 
         <h4 id="localdirectory">Local Directory</h4>
 
-        <p>The simplest way to use FlipFlip is to click "+ Add local files" and pick a directory on your computer that
-            contains
-            images. FlipFlip will search the entire directory, including subfolders, each time you click "Play".</p>
+        <p>The simplest way to use FlipFlip is to click "+ Add local files" and pick a directory on your computer that contains images. FlipFlip will search the entire directory, including subfolders.</p>
 
         <h4 id="imagelist">Image List</h4>
 
-        <p>If you want to load images from the web, you'll need to create a text file containing one URL per line, like
-            this:</p>
+        <p>If you want to load specific images from the web, you can create a text file containing one URL per line, like this:</p>
 
         <pre><code>https://cdn-images-1.medium.com/max/2000/0*vnYtP9N80SQ0pOOD.png
-        https://cdn-images-1.medium.com/max/2000/0*P1UL5C8Lkyq7wd5P.png
-        https://cdn-images-1.medium.com/max/2000/0*vnYtP9N80SQ0pOOD.png
-        </code></pre>
+https://cdn-images-1.medium.com/max/2000/0*P1UL5C8Lkyq7wd5P.png
+https://cdn-images-1.medium.com/max/2000/0*vnYtP9N80SQ0pOOD.png
+</code></pre>
 
-        <p>Then you can either save that file to your computer, or uploaded it to a text file hosting service like <a
-                href="https://hastebin.com">Hastebin</a> if you want to share it with others.</p>
+        <p>Then you can either save that file to your computer, or uploaded it to a text file hosting service like <a href="https://hastebin.com">Hastebin</a> if you want to share it with others.</p>
 
-        <p>Once you've created this file, click "+ Add URL". Simply type or paste the path to your text file (remote or
-            local).</p>
+        <p>Once you've created this file, click "+ Add URL". Simply type or paste the path to your text file (remote or local).</p>
 
         <h4 id="currentlysupportedremotesources">Currently Supported Remote Sources</h4>
 
@@ -110,8 +94,7 @@
 
         <h4 id="configuringyourowntumblrapikeys">Configuring your own Tumblr API Keys</h4>
 
-        <p>Due to high traffic, Tumblr throttles FlipFlip's use. A number of keys have been provided, but we recommend
-            configuring your own for seamless use. </p>
+        <p>Due to high traffic, Tumblr throttles FlipFlip's use. A number of keys have been provided, but we recommend configuring your own for seamless use. </p>
 
         <ol>
             <li>Login to Tumblr</li>
@@ -128,8 +111,7 @@
 
                     <li>Application Description: <strong>FlipFlip</strong></li>
 
-                    <li>Default callback URL: <strong>https://github.com/ififfy/flipflip</strong></li>
-                </ul>
+                    <li>Default callback URL: <strong>https://github.com/ififfy/flipflip</strong></li></ul>
             </li>
 
             <li>Click Register</li>
@@ -147,39 +129,25 @@
 
         <h4 id="secretgooninatorimport">Secret: Gooninator Import</h4>
 
-        <p>If you have some saved links from the beloved, retired web app Gooninator, you can import them into FlipFlip
-            either
-            as Tumblr blogs (as they were before) or as local directories (to use your backups).</p>
+        <p>If you have some saved links from the beloved, retired web app Gooninator, you can import them into FlipFlip either as Tumblr blogs (as they were before) or as local directories (to use your backups).</p>
 
-        <p>To access this tool, click in the "Sources" area and then press <strong>Alt+P</strong>. You should then see a
-            popup
-            appear. Paste the Gooninator URL, and select whether you'd like to import these sources as Tumblr blogs or
-            Local
-            directories. If you choose to import as local directories, you must also configure the directory where you
-            kept your
-            blog backups.</p>
+        <p>To access this tool, click in the "Sources" area and then press <strong>Alt+P</strong>. You should then see a popup appear. Paste the Gooninator URL, and select whether you'd like to import these sources as Tumblr blogs or Local directories. If you choose to import as local directories, you must also configure the directory where you kept your blog backups.</p>
 
-        <p><img src="https://github.com/ififfy/flipflip/raw/master/doc_images/v2.2/gooninator_import_modal.png" alt=""/>
-        </p>
+        <p><img src="https://github.com/ififfy/flipflip/raw/master/doc_images/v2.2/gooninator_import_modal.png" alt="" /></p>
 
         <h3 id="sceneeffects">Scene Effects</h3>
 
         <p>This section controls how the scene will play out.</p>
 
         <ul>
-            <li>Choose either a constant value (ms) or one of the "variable" options that transition between fast and
-                slow
-                speeds over time.
-            </li>
+            <li>Choose either a constant value (ms) or one of the "variable" options that transition between fast and slow speeds over time.</li>
 
             <li>Choose a scene to overlay over this one (or none). Control overlay opacity.</li>
 
             <li>Choose a scene to transition to after this one (or none). Control timing of next scene (sec).</li>
         </ul>
 
-        <p><em>The "Next Scene" will pre-load in the background and start after the configured time has passed. Effects,
-            audio,
-            text, etc. will also change as configured</em></p>
+        <p><em>The "Next Scene" will pre-load in the background and start after the configured time has passed. Effects, audio, text, etc. will also change as configured</em></p>
 
         <h3 id="imageeffects">Image Effects</h3>
 
@@ -202,7 +170,7 @@
 
             <li>Choose move vertically up/down (or none). Control distance (%).</li>
 
-            <li>Control zoom/move time.</li>
+            <li>Control zoom/move time (ms).</li>
         </ul>
 
         <h3 id="strobe">Strobe</h3>
@@ -230,12 +198,9 @@
 
 
                 <ul>
-                    <li>Weighting by source means each source will be used an even amount (regardless of number of
-                        pictures).
-                    </li>
+                    <li>Weighting by source means each source will be used an even amount (regardless of number of pictures).</li>
 
-                    <li>Weighting by image means each image will be used an even amount (regardless of source).</li>
-                </ul>
+                    <li>Weighting by image means each image will be used an even amount (regardless of source).</li></ul>
             </li>
 
             <li>Choose to randomize playback.</li>
@@ -252,8 +217,7 @@
 
 
                 <ul>
-                    <li>If you pause and unpause, the file will be resumed from where you left off.</li>
-                </ul>
+                    <li>If you pause and unpause, the file will be resumed from where you left off.</li></ul>
             </li>
         </ul>
 
@@ -262,29 +226,20 @@
         <p>This section controls the caption program.</p>
 
         <ul>
-            <li>Choose a text file that follows the <a
-                    href="(https://github.com/ififfy/flipflip/wiki/Caption-script-format)">caption
-                script format</a>.
+            <li>Choose a text file that follows the <a href="(https://github.com/ififfy/flipflip/wiki/Caption-script-format)">caption script format</a>.
 
 
                 <ul>
-                    <li>If the text is hosted on Hastebin, you can simply use the ID, but you could also use the raw
-                        URL.
-                    </li>
-                </ul>
+                    <li>If the text is hosted on Hastebin, you can simply use the ID, but you could also use the raw URL.</li></ul>
             </li>
 
             <li>Click "Font Options" to customize caption font typeface, size, and color.
 
 
                 <ul>
-                    <li>Captions display in 4 types: <code>blink</code>, <code>caption</code>, <code>captionBig</code>,
-                        and
-                        'count'.
-                    </li>
+                    <li>Captions display in 4 types: <code>blink</code>, <code>caption</code>, <code>captionBig</code>, and 'count'.</li>
 
-                    <li>You can customize the font for each of these separately.</li>
-                </ul>
+                    <li>You can customize the font for each of these separately.</li></ul>
             </li>
         </ul>
 
@@ -292,54 +247,32 @@
 
         <h3 id="playingyourscene">Playing Your Scene</h3>
 
-        <p>After you have added at least 1 source and configured your chosen effects, click the play button to start the
-            show!</p>
+        <p>After you have added at least 1 source and configured your chosen effects, click the "Play" button ( <img src="https://github.com/ififfy/flipflip/raw/master/src/renderer/icons/play.svg" alt="Play" width="20" height="20"> ) to start the show!</p>
 
         <h4 id="sceneloading">Scene Loading</h4>
 
-        <p>While a Scene (or its overlay) is loading, a progress indicator will display showing the current source being
-            loaded
-            and the progress so far. If a Scene finishes loading before its overlay, you will see a separate overlay
-            loading
-            indicator as well. When both the Scene and overlay have loaded, the slideshow will begin. To avoid lag and
-            janky
-            playback, it's recommended to let loading finish, but if you want to start early anyway, click "Start Now"
-            when it
-            appears.</p>
+        <p>While a Scene (or its overlay) is loading, a progress indicator will display showing the current source being loaded and the progress so far. If a Scene finishes loading before its overlay, you will see a separate overlay loading indicator as well. When both the Scene and overlay have loaded, the slideshow will begin. To avoid lag and janky playback, it's recommended to let loading finish, but if you want to start early anyway, click "Start Now" when it appears.</p>
 
-        <p><img src="https://github.com/ififfy/flipflip/raw/master/doc_images/v2.2/scene_loading.png" alt=""/></p>
+        <p><img src="https://github.com/ififfy/flipflip/raw/master/doc_images/v2.2/scene_loading.png" alt="" /></p>
 
         <h4 id="playbackcontrols">Playback Controls</h4>
 
-        <p>All scene options (except the image filter) can also be changed while playing a slideshow by hovering over
-            the
-            sidebar on the left.</p>
+        <p>All scene options (except the image filter) can also be changed while playing a slideshow by hovering over the sidebar on the left.</p>
 
-        <p><img src="https://github.com/ififfy/flipflip/raw/master/doc_images/v2.2/player_options.png" alt=""/></p>
+        <p><img src="https://github.com/ififfy/flipflip/raw/master/doc_images/v2.2/player_options.png" alt="" /></p>
 
         <h4 id="imageinfo">Image Info</h4>
 
-        <p>While a Scene is playing, you can right click on an image to get more information about it. The image's
-            source and
-            individual URL are always shown (click to copy to the clipboard). You can also choose to open the source or
-            image
-            directly (will use your system's default app for opening that type of link). If the URL is for a local file,
-            you are
-            given options to view it in Explorer/Finder or delete it from the system (handy for pruning images you don't
-            want in
-            FlipFlip). If it is for a remote file and you have enabled caching, a link to the caching directory is also
-            provided.</p>
+        <p>While a Scene is playing, you can right click on an image to get more information about it. The image's source and individual URL are always shown (click to copy to the clipboard). You can also choose to open the source or image directly (will use your system's default app for opening that type of link). If the URL is for a local file, you are given options to view it in Explorer/Finder or delete it from the system (handy for pruning images you don't want in FlipFlip). If it is for a remote file and you have enabled caching, a link to the caching directory is also provided.</p>
 
-        <p><img src="https://github.com/ififfy/flipflip/raw/master/doc_images/v2.2/image_context_menu.png" alt=""/></p>
+        <p><img src="https://github.com/ififfy/flipflip/raw/master/doc_images/v2.2/image_context_menu.png" alt="" /></p>
 
         <h2 id="2library">2. Library</h2>
 
-        <p>The <strong>Library</strong> is a place for you to collect and manage all your sources. If you had previously
-            used
-            FlipFlip before v2.0, the Library will be automatically populated with all your Scenes' sources.
+        <p>The <strong>Library</strong> is a place for you to collect and manage all your sources. If you had previously used FlipFlip before v2.0, the Library will be automatically populated with all your Scenes' sources.
             To access the Library just click "Library" (2) on the home page.</p>
 
-        <p><img src="https://github.com/ififfy/flipflip/raw/master/doc_images/v2.2/library.png" alt=""/></p>
+        <p><img src="https://github.com/ififfy/flipflip/raw/master/doc_images/v2.2/library.png" alt="" /></p>
 
         <h3 id="addingsources">Adding Sources</h3>
 
@@ -347,14 +280,9 @@
 
         <h3 id="taggingsources">Tagging Sources</h3>
 
-        <p>The main power behind the Library (and driving force of <a href="#3-scene-generators">Scene Generators</a>)
-            is the
-            tagging system.</p>
+        <p>The main power behind the Library (and driving force of <a href="#3-scene-generators">Scene Generators</a>) is the tagging system.</p>
 
-        <p>The first step is to add some tags. Click the "Manage Tags" button ( <img
-                src="https://github.com/ififfy/flipflip/raw/master/src/renderer/icons/tag.svg" alt="Manage Tags"
-                width="20"
-                height="20"> ) in the top right.</p>
+        <p>The first step is to add some tags. Click the "Manage Tags" button ( <img src="https://github.com/ififfy/flipflip/raw/master/src/renderer/icons/tag.svg" alt="Manage Tags" width="20" height="20"> ) in the top right.</p>
 
         <h4 id="managetags">Manage Tags</h4>
 
@@ -365,39 +293,24 @@
 
             <li>To edit a tag, click on the tag and edit the name</li>
 
-            <li>To remove tags, click "- Remove Tags" and click the tags you wish to delete. When done click "Done" or
-                "Back"
-            </li>
+            <li>To remove tags, click "- Remove Tags" and click the tags you wish to delete. When done click "Done" or "Back"</li>
 
-            <li>To manually re-order tags, simply drag'n'drop them. (This is the order which they will appear everywhere
-                else)
-            </li>
+            <li>To manually re-order tags, simply drag'n'drop them. (This is the order which they will appear everywhere else)</li>
 
             <li>When you are done managing tags, click "Apply" or "OK" to save your changes.</li>
         </ul>
 
-        <p><img src="https://github.com/ififfy/flipflip/raw/master/doc_images/v2.2/manage_tags.png" alt=""/></p>
+        <p><img src="https://github.com/ififfy/flipflip/raw/master/doc_images/v2.2/manage_tags.png" alt="" /></p>
 
         <h4 id="taggingasource">Tagging a Source</h4>
 
-        <p>To tag a source in the Library, click the name of the source. This will start a Scene with just that source.
-            To
-            modify the tags, hover towards the bottom of the screen and you will see your tags appear. Toggle tags
-            on/off as
-            desired by clicking on them. When you're done, click "Back" to return to the Library.</p>
+        <p>To tag a source in the Library, click the name of the source. This will start a Scene with just that source. To modify the tags, hover towards the bottom of the screen and you will see your tags appear. Toggle tags on/off as desired by clicking on them. When you're done, click "Back" to return to the Library.</p>
 
-        <p><img src="https://github.com/ififfy/flipflip/raw/master/doc_images/v2.2/tagging.png" alt=""/></p>
+        <p><img src="https://github.com/ififfy/flipflip/raw/master/doc_images/v2.2/tagging.png" alt="" /></p>
 
         <h4 id="batchtagging">Batch Tagging</h4>
 
-        <p>To begin batch tagging, click the "Batch Tag" button ( <img
-                src="https://github.com/ififfy/flipflip/raw/master/src/renderer/icons/batch.svg" alt="Manage Tags"
-                width="20"
-                height="20"> ) in the top right. This will provide a checkbox next to each visible source. Select the
-            sources
-            you would like to batch tag and click "Batch Tag Selection". You will be presented with a pop-up and a
-            number of
-            options.</p>
+        <p>To begin batch tagging, click the "Batch Tag" button ( <img src="https://github.com/ififfy/flipflip/raw/master/src/renderer/icons/batch.svg" alt="Batch Tag" width="20" height="20"> ) in the top right. This will provide a checkbox next to each visible source. Select the sources you would like to batch tag and click "Batch Tag Selection". You will be presented with a pop-up and a number of options.</p>
 
         <ul>
             <li>Select tags and click "Overwrite" to force each selected scene to match those tags</li>
@@ -407,44 +320,48 @@
             <li>Select tags and click "+ Add" to add those tags to each selected scene.</li>
         </ul>
 
-        <h4 id="filtering">Filtering</h4>
+        <h4 id="searchfilter">Search/Filter</h4>
 
-        <p>To assist in search and management, a tag filter has been implemented. This will appear once you have at
-            least 1
-            tagged source. To use it, just click on the drop down and choose the tags you would like to filter by.
-            Alternatively, select <code>&lt;Untagged&gt;</code> to see all of your sources with no tags.</p>
+        <p>Use the search bar to help find or filter the displayed sources. Tags appear with a number indicating how many of the displayed sources have that tag.</p>
+
+        <ul>
+            <li>Click on the search bar and select a tag, <code>&lt;Offline&gt;</code>, or <code>&lt;Untagged&gt;</code>.
+
+
+                <ul>
+                    <li>Start typing to find a particular tag.</li>
+
+                    <li><code>&lt;Offline&gt;</code> shows only sources that have been determined to be offline by <a href="#mark-offline">Mark Offline</a>.</li>
+
+                    <li><code>&lt;Untagged&gt;</code> shows only sources which have no tags.</li></ul>
+            </li>
+
+            <li>Type any term and press "Enter" or "Search for <code>&lt;&gt;</code>" to search. This is not case sensitive.</li>
+
+            <li>Type "-" and then any term or filter to <em>exclude</em> those sources.</li>
+        </ul>
 
         <h4 id="markoffline">Mark Offline</h4>
 
-        <p>As your Library grows, it's possible some sources will become unavailable. To aid in detecting this, click
-            "Mark
-            Offline" to check your sources. When this process completes, unavailable sources will be marked in red.</p>
+        <p>As your Library grows, it's possible some sources will become unavailable. To aid in detecting this, click the "Mark Offline" button ( <img src="https://github.com/ififfy/flipflip/raw/master/src/renderer/icons/mark-offline.svg" alt="Mark Offline" width="20" height="20"> ) to check your sources. When this process completes, unavailable sources will be marked in red.</p>
+
+        <h4 id="marksources">Mark Sources</h4>
+
+        <p>Users may wish to visually highlight certain items. To do this, search/filter the displayed sources until they are the ones you wish to highlight, and then press <strong>Alt+M</strong>. These sources will be colored green and will remain that way after the search/filter is cleared. This may be useful for keeping track of a set of sources you are working on (for instance new sources you are tagging).</p>
 
         <h3 id="importinglibrarysourcesinscene">Importing Library Sources in Scene</h3>
 
-        <p>To import Library sources into a Scene click the "+ Add From Library" button from the scene detail page. This
-            will
-            bring you to a view of your Library with checkboxes next to each source. You can filter and sort this list
-            to assist
-            with locating sources. After you are done selecting the sources you want, click "Import Selected". Your
-            selected
-            sources will now appear in the scene.</p>
+        <p>To import Library sources into a Scene click the "+ Add From Library" button from the scene detail page. This will bring you to a view of your Library with checkboxes next to each source. You can filter and sort this list to assist with locating sources. After you are done selecting the sources you want, click "Import Selected". Your selected sources will now appear in the scene.</p>
 
         <h2 id="3scenegenerators">3. Scene Generators</h2>
 
-        <p><strong>Scene Generators</strong> are a special kind of Scene that uses weighted tags and scenes to generate
-            a
-            randomly selected list of sources from the Library.</p>
+        <p><strong>Scene Generators</strong> are a special kind of Scene that uses weighted tags and scenes to generate a randomly selected list of sources from the Library.</p>
 
-        <p>Once you have at least 1 Scene <em>or</em> at least 1 source and 1 tag in the Library, you can click "+ Add
-            Scene
-            Generator" on the Home page to make a new Generator.</p>
+        <p>Once you have at least 1 Scene <em>or</em> at least 1 source and 1 tag in the Library, you can click "+ Add Scene Generator" on the Home page to make a new Generator.</p>
 
-        <p><img src="https://github.com/ififfy/flipflip/raw/master/doc_images/v2.2/generator.gif" alt=""/></p>
+        <p><img src="https://github.com/ififfy/flipflip/raw/master/doc_images/v2.2/generator.gif" alt="" /></p>
 
-        <p>When you return to the Home page, you will see your new Generator in the list of Scenes (4), however,
-            Generators are
-            distinguished with a <strong>bold</strong> border (5).</p>
+        <p>When you return to the Home page, you will see your new Generator in the list of Scenes (4), however, Generators are distinguished with a <strong>bold</strong> border (5).</p>
 
         <h3 id="weighting">Weighting</h3>
 
@@ -452,15 +369,9 @@
 
         <h4 id="weight">Weight</h4>
 
-        <p>This will be the most commonly used option. The weight value (modified with the slider) acts as a ratio for
-            each tag
-            in relation to other tag weights. <em>Weight is <strong>not</strong> the same as percentage</em>. The
-            calculated
-            percentage is shown next to the weight to help make results clear.</p>
+        <p>This will be the most commonly used option. The weight value (modified with the slider) acts as a ratio for each tag in relation to other tag weights. <em>Weight is <strong>not</strong> the same as percentage</em>. The calculated percentage is shown next to the weight to help make results clear.</p>
 
-        <p>For example, if 3 tags each have weight 1, the ratio would be <code>1:1:1</code> or ~33% each. This would be
-            <em>the
-                same</em> as if they were all weighted as 50 (i.e. <code>50:50:50</code> == <code>1:1:1</code>).</p>
+        <p>For example, if 3 tags each have weight 1, the ratio would be <code>1:1:1</code> or ~33% each. This would be <em>the same</em> as if they were all weighted as 50 (i.e. <code>50:50:50</code> == <code>1:1:1</code>).</p>
 
         <h4 id="require">Require</h4>
 
@@ -472,92 +383,53 @@
 
         <h4 id="scenes">Scenes</h4>
 
-        <p>Scenes can <em>only</em> be weighted (not required/excluded). Other required/excluded tags have no effect on
-            sources
-            from scenes.</p>
+        <p>Scenes can <em>only</em> be weighted (not required/excluded). Other required/excluded tags have no effect on sources from scenes.</p>
 
         <h3 id="generatescene">Generate Scene</h3>
 
-        <p>Once you have weighted each tag/scene to your preference, click "Generate Scene". This will use the tag &amp;
-            scene
-            weights you set up to generate a random selection of sources for your Scene. The default max number of
-            sources is
-            200, but you can lower or raise this to meet your needs.</p>
+        <p>Once you have weighted each tag/scene to your preference, click "Generate Scene". This will use the tag &amp; scene weights you set up to generate a random selection of sources for your Scene. The default max number of sources is 200, but you can lower or raise this to meet your needs.</p>
 
-        <p>Any changes to Timing/Effects/etc. here will be persisted between generated Scenes (using this Generator).
-            The only
-            thing that gets overridden when you click "Generate Scene" is the list of sources. If you are particularly
-            fond of a
-            generated Scene, you can click "Save as New Scene" to save these sources as their own stand-alone Scene.</p>
+        <p>Any changes to Timing/Effects/etc. here will be persisted between generated Scenes (using this Generator). The only thing that gets overridden when you click "Generate Scene" is the list of sources. If you are particularly fond of a generated Scene, you can click "Save as New Scene" to save these sources as their own stand-alone Scene.</p>
 
-        <p>Once you have generated a Scene, you can click the "Previous Scene" button on the tag weights screen to go
-            back to
-            the last Scene generated (and not generate new sources).</p>
+        <p>Once you have generated a Scene, you can click the "Previous Scene" button on the tag weights screen to go back to the last Scene generated (and not generate new sources).</p>
 
-        <h2 id="8exportimportscenes">8. Export/Import Scenes</h2>
+        <h2 id="8exportimportlibraryandscenes">8. Export/Import Library and Scenes</h2>
 
-        <p>FlipFlip makes it easy to share your Scenes with others!</p>
-
-        <p>NOTE: <em>Due to the nature of FlipFlip scenes, we don't recommend you try and export/import Scenes with
-            local
-            directories. This will technically work, but the exporter/importer would have to have the same file paths
-            (or will
-            have to modify them manually). In addition, any exported Generators will be imported as regular Scenes.</em>
-        </p>
+        <p>FlipFlip makes it easy to share your Library or Scenes with others!</p>
 
         <h3 id="export">Export</h3>
 
-        <p>To export, click the Scene you want to export and click the "Export Scene" button in the top left. You will
-            be
-            prompted to save a file. This file is just a long line of text which holds the data about your Scene's
-            configuration. You can also just post this text online for someone to import with (you don't have to share
-            the file
-            directly).</p>
+        <p>Users may wish to export their Library to share with others. To do this, click the "Export" button ( <img src="https://github.com/ififfy/flipflip/raw/master/src/renderer/icons/export.svg" alt="Export" width="20" height="20"> ) in the top Left of the Library. Simply save the json file and share it as you'd like, or keep it as a backup. This file is just a long line of text which holds the data about your Scene's configuration. You can also just post this text online for someone to import with (you don't have to share the file directly).</p>
+
+        <p>To export a Scene, click the Scene you want to export and click the "Export Scene" button ( <img src="https://github.com/ififfy/flipflip/raw/master/src/renderer/icons/export.svg" alt="Export" width="20" height="20"> ) in the top left. Save the file and share just like the Library.</p>
+
+        <p>NOTE: <em>Due to the nature of FlipFlip scenes, we don't recommend you try and export/import Scenes with local directories. This will technically work, but the exporter/importer would have to have the same file paths (or will have to modify them manually). In addition, any exported Generators will be imported as regular Scenes.</em></p>
 
         <h3 id="import">Import</h3>
 
-        <p>To import, click the Import arrow (8) on the Home page. You will be prompted to select a file to import from.
-            If you
-            have a <code>.json</code> export file, simply select it and your Scene will import. If you got a line of
-            text from
-            someone, paste it into a file and save it. Then pick that file during the import.</p>
+        <p>To Import a Library, click the "Import" button ( <img src="https://github.com/ififfy/flipflip/raw/master/src/renderer/icons/import.svg" alt="Import" width="20" height="20"> ) and select the library .json file you'd like to import. Sources you already have will not be duplicated. However, if the imported Library has tags for that source and you do not, the tags will be imported. The tags for any new items will be created and added.</p>
+
+        <p>To import as Scene, click the Import arrow (8) on the Home page. You will be prompted to select a file to import from. If you have a <code>.json</code> export file, simply select it and your Scene will import. If you got a line of text from someone, paste it into a file and save it. Then pick that file during the import.</p>
 
         <h2 id="9flipflipconfig">9. FlipFlip Config</h2>
 
-        <p>FlipFlip now allows you to configure default Scene effects and more! To access the Config page, click the
-            little gear
-            icon (9) on the Home page.</p>
+        <p>FlipFlip allows you to configure default Scene effects and more! To access the Config page, click the little gear icon (9) on the Home page.</p>
 
-        <p>When you are done making changes to the Config, click "Apply" or "OK". Settings will only be saved if they
-            are
-            valid.</p>
+        <p>When you are done making changes to the Config, click "Apply" or "OK". Settings will only be saved if they are valid.</p>
 
-        <p><img src="https://github.com/ififfy/flipflip/raw/master/doc_images/v2.2/config.png" alt=""/></p>
+        <p><img src="https://github.com/ififfy/flipflip/raw/master/doc_images/v2.2/config.png" alt="" /></p>
 
-        <h3 id="timingeffectsimagestext">Timing/Effects/Images/Text</h3>
+        <h3 id="scenedefaults">Scene Defaults</h3>
 
-        <p>Configure default settings for each Scene just like you would in the Scene itself. These preferences will be
-            applied
-            whenever you create a new Scene (or Generator)</p>
+        <p>Configure default settings for each Scene just like you would in the Scene itself. These preferences will be applied whenever you create a new Scene (or Generator).</p>
 
-        <h3 id="player">Player</h3>
+        <h3 id="playersettings">Player Settings</h3>
 
-        <p>These scenes control various player options. Min Image Size is the minimum number of pixels each dimension of
-            an
-            image must be (default: 200 - image must be larger than 200x200). Max in Memory is the maximum number of
-            images to
-            queue up for rendering. Max in History is the maximum number of images to keep in history. Both of these
-            lists are
-            cleared when the slideshow is stopped. Be cautious increasing the Max Loading at Once as this will degrade
-            performance. Likewise, lowering this number may improve performance.</p>
+        <p>These scenes control various player options. Min Image/Video Size is the minimum number of pixels each dimension of an image/video must be (default: 200 - image must be larger than 200x200). Max in Memory is the maximum number of images to queue up for rendering. Max in History is the maximum number of images to keep in history (navigating backwards and forwards). Both of these lists are cleared when the slideshow is stopped. Be cautious increasing the Max Loading at Once as this will degrade performance. Likewise, lowering this number may improve performance.</p>
 
         <h3 id="caching">Caching</h3>
 
-        <p>These settings control the caching abilities of FlipFlip. By default, FlipFlip caches 500MB of images in the
-            <code>appData</code>
-            directory. However, you can customize the caching dir and max size by changing values here. Turning caching
-            off will
-            prevent FlipFlip from reading from or writing to the cache.</p>
+        <p>These settings control the caching abilities of FlipFlip. By default, FlipFlip caches 500MB of images in the <code>appData</code> directory. However, you can customize the caching dir and max size by changing values here. Turning caching off will prevent FlipFlip from reading from or writing to the cache.</p>
 
         <h3 id="apikeys">API Keys</h3>
 
@@ -565,17 +437,11 @@
 
         <h4 id="tumblr">Tumblr</h4>
 
-        <p>By default, Tumblr API keys are provided. However, if you are experiencing 429 responses from Tumblr, you may
-            replace
-            these with your own API keys to improve performance.</p>
+        <p>By default, Tumblr API keys are provided. However, if you are experiencing 429 responses from Tumblr, you may replace these with your own API keys to improve performance.</p>
 
-        <p>In order to import your Tumblr Following, you must first activate FlipFlip with your account. You should only
-            ever
-            have to do this once.</p>
+        <p>In order to import your Tumblr Following, you must first activate FlipFlip with your account. You should only ever have to do this once.</p>
 
-        <p>Tumblr has no Read-Only mode, so read AND write access are requested. FlipFlip does not store any user
-            information or
-            make any changes to your account.</p>
+        <p>Tumblr has no Read-Only mode, so read AND write access are requested. FlipFlip does not store any user information or make any changes to your account.</p>
 
         <ul>
             <li>Click "Activate FlipFlip with Tumblr"</li>
@@ -593,9 +459,7 @@
 
         <h4 id="reddit">Reddit</h4>
 
-        <p>In order to use Reddit Subreddits/Users as sources or import your Subscriptions, you must first active
-            FlipFlip with
-            your account. You should only ever have to do this once.</p>
+        <p>In order to use Reddit Subreddits/Users as sources or import your Subscriptions, you must first activate FlipFlip with your account. You should only ever have to do this once.</p>
 
         <p>FlipFlip does not store any user information or make any changes to your account.</p>
 
@@ -613,12 +477,29 @@
             <li>You should see a Success! message</li>
         </ul>
 
+        <h4 id="twitter">Twitter</h4>
+
+        <p>In order to use Twitter Profiles as sources or import your Following, you must first activate FlipFlip with your account. You should only ever have to do this once.</p>
+
+        <p>FlipFlip does not store any user information or make any changes to your account.</p>
+
+        <ul>
+            <li>Click "Activate FlipFlip with Twitter"</li>
+
+            <li>Click "OK" on the confirmation dialog</li>
+
+            <li>You will be directed to Twitter.com in your browser</li>
+
+            <li>Click "Allow" to give FlipFlip permission</li>
+
+            <li>Go back to FlipFlip</li>
+
+            <li>You should see a Success! message</li>
+        </ul>
+
         <h4 id="instagram">Instagram</h4>
 
-        <p>In order to use Instagram Profiles as sources, you'll need to provide your username and password. FlipFlip
-            does not
-            store any user information or make changes to your account. Your login information is stored locally on your
-            computer and is never shared with anyone or sent to any server.</p>
+        <p>In order to use Instagram Profiles as sources, you'll need to provide your username and password. FlipFlip does not store any user information or make changes to your account. Your login information is stored locally on your computer and is never shared with anyone or sent to any server (besides Instagram, obviously).</p>
 
         <h3 id="backup">Backup</h3>
 
@@ -630,9 +511,7 @@
 
         <h4 id="restorebackup">Restore Backup</h4>
 
-        <p>A dialog will appear with a list the your FlipFlip backups (by date/time). Select the backup you wish to
-            restore and
-            click "Confirm"</p>
+        <p>A dialog will appear with a list the your FlipFlip backups (by date/time). Select the backup you wish to restore and click "Confirm"</p>
 
         <h4 id="clearbackups">Clear Backups</h4>
 
