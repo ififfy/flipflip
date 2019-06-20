@@ -66,7 +66,7 @@ export default class Library extends React.Component {
                   title="Import Instagram Following"
                   onClick={this.importInstagram.bind(this)}
                 >
-                  <div className="u-instagram"/>
+                  <div className="u-instagram-outline"/>
                 </Jiggle>
               )}
               {this.props.config.remoteSettings.twitterAccessTokenKey != "" &&
@@ -77,7 +77,7 @@ export default class Library extends React.Component {
                   title="Import Twitter Following"
                   onClick={this.importTwitter.bind(this)}
                 >
-                  <div className="u-twitter"/>
+                  <div className="u-twitter-outline"/>
                 </Jiggle>
               )}
               {this.props.config.remoteSettings.redditRefreshToken != "" && (
@@ -87,7 +87,7 @@ export default class Library extends React.Component {
                   title="Import Reddit Subscriptions"
                   onClick={this.importReddit.bind(this)}
                 >
-                  <div className="u-reddit"/>
+                  <div className="u-reddit-outline"/>
                 </Jiggle>
               )}
               {this.props.config.remoteSettings.tumblrOAuthToken != "" &&
@@ -97,7 +97,7 @@ export default class Library extends React.Component {
                   className="Library__TumblrImport u-button u-icon-button u-clickable"
                   title="Import Tumblr Following"
                   onClick={this.importTumblr.bind(this)}>
-                  <div className="u-tumblr"/>
+                  <div className="u-tumblr-outline"/>
                 </Jiggle>
               )}
               <Jiggle

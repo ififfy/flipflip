@@ -203,20 +203,56 @@ a {
     background: url("./icons/mark-offline.svg") no-repeat;
   }
 
+  .u-list {
+    background: url("./icons/list.svg") no-repeat;
+  }
+
   .u-tumblr {
-    background: url("./icons/tumblr.svg") no-repeat;
+    background: url("icons/tumblr.svg") no-repeat;
+  }
+
+  .u-tumblr-outline {
+    background: url("icons/tumblr-outline.svg") no-repeat;
   }
 
   .u-reddit {
     background: url("./icons/reddit.svg") no-repeat;
   }
 
+  .u-reddit-outline {
+    background: url("./icons/reddit-outline.svg") no-repeat;
+  }
+
   .u-twitter {
-    background: url("./icons/twitter.svg") no-repeat;
+    background: url("icons/twitter.svg") no-repeat;
+  }
+
+  .u-twitter-outline {
+    background: url("icons/twitter-outline.svg") no-repeat;
   }
 
   .u-instagram {
     background: url("./icons/instagram.svg") no-repeat;
+  }
+
+  .u-instagram-outline {
+    background: url("./icons/instagram-outline.svg") no-repeat;
+  }
+
+  .u-imagefap {
+    background: url("./icons/imagefap.svg") no-repeat;
+  }
+
+  .u-sexcom {
+    background: url("./icons/sexcom.svg") no-repeat;
+  }
+
+  .u-imgur {
+    background: url("./icons/imgur.svg") no-repeat;
+  }
+
+  .u-deviantart {
+    background: url("./icons/deviantart.svg") no-repeat;
   }
 
   .u-play {
@@ -707,10 +743,6 @@ label.SimpleCheckbox {
     width: 100%;
     display: inline;
 
-    .SourceList__Sources {
-      clear: both;
-    }
-
     .SourceList__Buttons {
       height: 3.2rem;
 
@@ -761,6 +793,7 @@ label.SimpleCheckbox {
 
   .SourceList__Sources {
     overflow: auto;
+    clear: both;
 
     .SourceList__Source {
       padding: $smallPadding;
@@ -785,6 +818,7 @@ label.SimpleCheckbox {
       .SourceList__SourceTitle {
         color: black !important;
         display: inline-block;
+        padding-left: 7px;
       }
 
       .SourceList__SourceTags {
@@ -811,6 +845,14 @@ label.SimpleCheckbox {
       .u-small-icon-button {
         padding-left: 3px;
         padding-top: 3px;
+      }
+
+      .SourceIcon {
+        display: inline-block;
+        padding-left: 0;
+        padding-top: 0;
+        width: 1rem;
+        vertical-align: -3px;
       }
     }
 

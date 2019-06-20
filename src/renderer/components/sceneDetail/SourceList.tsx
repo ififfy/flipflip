@@ -5,6 +5,7 @@ import {remote} from "electron";
 
 import {arrayMove, getCachePath, getFileGroup, getSourceType} from "../../data/utils";
 import {SF, ST} from "../../data/const";
+import SourceIcon from "./SourceIcon";
 import LibrarySource from "../library/LibrarySource";
 import Tag from "../library/Tag";
 import Config from "../../data/Config";
@@ -69,6 +70,9 @@ export default class SourceList extends React.Component {
               {this.props.isSelect && (
                 <input type="checkbox" value={source.url} onChange={this.onSelect.bind(this)}
                        checked={this.props.selected.includes(source.url)}/>
+              )}
+              {this.props.onPlay && (
+                <SourceIcon url={source.url}/>
               )}
               {this.state.isEditing != source.id && (
                 <div className="SourceList__SourceTitle u-clickable"
@@ -189,7 +193,8 @@ export default class SourceList extends React.Component {
     this.props.onUpdateSources(newLibrary);
 
     if (this.props.onPlay) {
-      this.props.onStartEdit(id);
+      // Delay this for a second so that the parent layer has updated and added the new source;
+      setTimeout(this.props.onStartEdit.bind(this, id), 10);
     } else {
       this.setState({isEditing: id});
     }
