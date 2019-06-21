@@ -27,7 +27,7 @@ function createWindow() {
     'y': mainWindowState.y,
     'width': mainWindowState.width,
     'height': mainWindowState.height,
-    'icon': __dirname + '/../docs/doc_images/flipflip_logo.png',
+    'icon': path.join(__dirname, 'src/renderer/icons/flipflip_logo.png'),
   });
 
   // Let us register listeners on the window, so we can update the state
