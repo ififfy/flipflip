@@ -238,6 +238,7 @@ export default class SourcePicker extends React.Component {
           yOffset={this.props.yOffset}
           filters={this.state.filters}
           selected={this.state.selected}
+          markUpdate={this.state.markUpdate}
           onUpdateSources={this.props.onUpdateSources.bind(this)}
           addSources={this.addSources.bind(this)}
           onUpdateSelected={this.onUpdateSelected.bind(this)}

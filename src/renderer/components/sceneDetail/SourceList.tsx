@@ -21,6 +21,7 @@ export default class SourceList extends React.Component {
     yOffset: number,
     filters: Array<string>,
     selected: Array<string>,
+    markUpdate: boolean,
     onUpdateSources(sources: Array<LibrarySource>): void,
     addSources(sources: Array<string>): void,
     onUpdateSelected(selected: Array<string>): void,
@@ -135,7 +136,8 @@ export default class SourceList extends React.Component {
   }
 
   shouldComponentUpdate(props:any, state: any) {
-    return ((this.props.isSelect !== props.isSelect) ||
+    return ((this.props.markUpdate !== props.markUpdate) ||
+      (this.props.isSelect !== props.isSelect) ||
       (this.props.filters !== props.filters) ||
       (this.props.selected.length !== props.selected.length) ||
       (this.props.displaySources !== props.displaySources))
