@@ -115,21 +115,28 @@ export default class ScenePicker extends React.Component {
                 <div className="u-config"/>
               </Jiggle>
             </div>
-            <h1>FlipFlip</h1>
-            <small>
-              v{this.props.version}
-              {this.state.newVersion != "" && (
-                <span>
-                  &nbsp;&nbsp;(New Version!&nbsp;
-                  <a onClick={this.openGitRelease.bind(this)} href="#">
-                    {this.state.newVersion}
-                  </a>)
-                </span>
-              )}
-            </small>
+            <div className="Logo">
+              <div className="u-logo"/>
+              <div className="LogoTest">
+                <h1>FlipFlip</h1>
+                <small>
+                  v{this.props.version}
+                  {this.state.newVersion != "" && (
+                    <span>
+                      &nbsp;&nbsp;(New Version!&nbsp;
+                      <a onClick={this.openGitRelease.bind(this)} href="#">
+                        {this.state.newVersion}
+                      </a>)
+                    </span>
+                  )}
+                </small>
+              </div>
+            </div>
           </div>
 
-          <div><Link url="https://github.com/ififfy/flipflip/wiki/FlipFlip-User-Manual">User manual</Link></div>
+          <div>
+            <Link url="https://github.com/ififfy/flipflip/wiki/FlipFlip-User-Manual">User manual</Link>
+          </div>
 
           <div>
             <Link url="https://github.com/ififfy/flipflip/issues">Report a problem or suggest an improvement</Link>

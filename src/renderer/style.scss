@@ -169,6 +169,14 @@ a {
   }
 }
 
+.u-logo {
+  float: left;
+  width: 3.5rem;
+  height: 3.5rem;
+  background: url("./icons/flipflip_logo.png") no-repeat;
+  background-size: 3.5rem 3.5rem;
+}
+
 .u-icon-button {
   margin-top: -4px;
   div {
@@ -402,7 +410,21 @@ a {
       margin-bottom: $smallPadding*2;
     }
 
+    > div:not(.Header) {
+      clear: left;
+    }
+
     .Header {
+      margin-bottom: 4rem;
+
+      .Logo {
+        float: left;
+
+        .LogoText {
+          margin-top: 2px;
+        }
+      }
+
       h1 {
         margin: 0;
       }
