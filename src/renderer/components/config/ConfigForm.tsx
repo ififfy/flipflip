@@ -48,7 +48,7 @@ export default class ConfigForm extends React.Component {
       <div className="Config">
         <div className="u-button-row">
           <div className="u-abs-center">
-            <h2 className="Config__ConfigHeader">Config</h2>
+            <h2 className="Config__ConfigHeader">Preferences</h2>
           </div>
           <div className="u-button-row-right">
             <div className="Config__Apply u-button u-clickable"

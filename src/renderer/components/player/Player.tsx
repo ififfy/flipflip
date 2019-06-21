@@ -28,7 +28,7 @@ const keyMap = {
   playPause: ['Play/Pause (Playing)', 'space'],
   historyBack: ['Back in Time', 'left'],
   historyForward: ['Forward in Time', 'right'],
-  navigateBack: ['Go Back to Scene Details', 'backspace'],
+  navigateBack: ['Go Back to Scene Details', 'escape'],
   toggleFullscreen: ['Toggle Fullscreen', 'CommandOrControl+F'],
   toggleAlwaysOnTop: ['Toggle Always On Top', 'CommandOrControl+T'],
   toggleMenuBarDisplay: ['Toggle Menu Bar', 'CommandOrControl+^'],

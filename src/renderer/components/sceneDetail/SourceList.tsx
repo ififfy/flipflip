@@ -46,7 +46,7 @@ export default class SourceList extends React.Component {
               <div className={`u-button ${this.props.filters.length > 0 ? 'u-disabled' : 'u-clickable'}`} onClick={this.props.filters.length > 0 ? this.nop : this.onAdd.bind(this)}>+ Add local files</div>
               <div className={`u-button ${this.props.filters.length > 0 ? 'u-disabled' : 'u-clickable'}`} onClick={this.props.filters.length > 0 ? this.nop : this.onAddURL.bind(this)}>+ Add URL</div>
               {this.props.onOpenLibraryImport && (
-                <div className="u-button u-clickable" onClick={this.props.onOpenLibraryImport.bind(this)}>+ Add From Library</div>
+                <div className="u-button u-clickable" onClick={this.props.onOpenLibraryImport.bind(this)}>+ Add from Library</div>
               )}
             </div>
           )}
