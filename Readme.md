@@ -4,8 +4,8 @@
   </a>
 </p>
 
+<h1 align="center">FlipFlip</h1>
 <p align="center">
-  <h3>FlipFlip</h3>
   A glorified slideshow, with <i>lots</i> of bells and whistles
 </p>
 
