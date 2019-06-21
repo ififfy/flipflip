@@ -3,7 +3,7 @@ import wretch from 'wretch';
 
 import {CancelablePromise, getRandomListItem} from '../../data/utils'
 
-let STYLES: { [style: string]: string } = {};
+//let STYLES: { [style: string]: string } = {};
 
 let programCounter = 0;
 let PROGRAM: Function[] = [];
@@ -20,7 +20,7 @@ let PHRASES: string[] = [];
 function reset() {
   PROGRAM = [];
   programCounter = 0;
-  STYLES = {};
+  //STYLES = {};
   BLINK_DURATION = 200;
   BLINK_DELAY = 80;
   BLINK_GROUP_DELAY = 1200;
@@ -185,7 +185,7 @@ export default class CaptionProgram extends React.Component {
   }
 
   COMMANDS: { [command: string]: (el: HTMLElement, value: string) => any; } = {
-    saveStyleRules: function (el: HTMLElement, value: string) {
+    /*saveStyleRules: function (el: HTMLElement, value: string) {
       const firstWord = getFirstWord(value);
       const style = getRest(value);
       if (!firstWord || !style) { return null; }
@@ -201,7 +201,7 @@ export default class CaptionProgram extends React.Component {
         el.style.cssText = STYLES[value];
         runNextCommand();
       }
-    },
+    },*/
 
     showText: function (el: HTMLElement, value: string) {
       let textString = getRest(value);
