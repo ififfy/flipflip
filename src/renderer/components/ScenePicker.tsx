@@ -8,6 +8,7 @@ import {arrayMove, getRandomListItem} from "../data/utils";
 import Scene from '../data/Scene';
 import SimpleOptionPicker from "./ui/SimpleOptionPicker";
 import Jiggle from "../animations/Jiggle";
+import VSpin from "../animations/VSpin";
 
 class ScenePickerItem extends React.Component {
   readonly props: {
@@ -116,7 +117,9 @@ export default class ScenePicker extends React.Component {
               </Jiggle>
             </div>
             <div className="Logo">
-              <div className="u-logo"/>
+              <VSpin>
+                <div className="u-logo"/>
+              </VSpin>
               <div className="LogoTest">
                 <h1>FlipFlip</h1>
                 <small>
