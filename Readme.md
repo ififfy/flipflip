@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://ififfy.github.io/flipflip/">
-    <img alt="flipflip" src="./docs/doc_images/flipflip_logo.png">
+    <img alt="flipflip" src="./docs/doc_images/flipflip_logo.png" height=320>
   </a>
 </p>
 
