@@ -1,7 +1,6 @@
 # Changelog
 
-## 2.2.0  <small>(?/2019)</small>
-#### TODO Add stuff here
+## 2.2.0  <small>(06/24/2019)</small>
 - UI Improvements
 - Allow player to play video files (.mp4/.mkv)
 - Allow sources to scrape video files
@@ -22,6 +21,7 @@
 - Allow Scene Import to optionally add sources to the Library
 - Twitter Following Import
 - Instagram Folowing Import
+- Built docs into browseable site
 - Fix bug with copying link to clipboard
 - Fix bug with caption configs not reseting
 - Misc bug fixes
@@ -29,7 +29,7 @@
 ## 2.1.1  <small>(05/28/2019)</small>
 - Add more public Tumblr keys
 - Allow users to specify Tumblr keys
-- Fix bug with  new version alert
+- Fix bug with new version alert
 
 ## 2.1.0 <small>(05/27/2019)</small>
 - Major performance improvements
