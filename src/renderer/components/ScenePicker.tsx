@@ -138,7 +138,7 @@ export default class ScenePicker extends React.Component {
           </div>
 
           <div>
-            <Link url="https://github.com/ififfy/flipflip/wiki/FlipFlip-User-Manual">User manual</Link>
+            <Link url="https://ififfy.github.io/flipflip/#/">User manual</Link>
           </div>
 
           <div>
