@@ -20,7 +20,7 @@
 - Allow Scenes to be exported with Tags
 - Allow Scene Import to optionally add sources to the Library
 - Twitter Following Import
-- Instagram Folowing Import
+- Instagram Following Import
 - Built docs into browseable site
 - Fix bug with copying link to clipboard
 - Fix bug with caption configs not reseting
