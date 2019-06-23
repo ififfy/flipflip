@@ -87,7 +87,8 @@ export default class ImagePlayer extends React.Component {
     }
 
     let fadeDuration = 0;
-    if (this.props.scene.crossFade) {
+    let crossFade = this.props.scene.crossFade;
+    if (crossFade) {
       fadeDuration = this.props.scene.fadeFull ? this.state.timeToNextFrame : this.props.scene.fadeDuration;
     }
 
@@ -123,7 +124,7 @@ export default class ImagePlayer extends React.Component {
             zoomStart={zoomStart}
             zoomEnd={zoomEnd}
             transDuration={transDuration}
-            crossFade={this.props.scene.crossFade}
+            crossFade={crossFade}
             fadeDuration={fadeDuration}/>
         </div>
       </div>
