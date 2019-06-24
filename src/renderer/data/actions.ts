@@ -433,7 +433,7 @@ export function importLibrary(state: State, backup:Function): Object {
       myLibrary.push(source.url);
     } else { // If this source is untagged, add imported tags
       const librarySource = newLibrary[indexOf];
-      if (librarySource.tags.length !== 0) {
+      if (librarySource.tags.length == 0) {
         librarySource.tags = source.tags;
       }
     }
