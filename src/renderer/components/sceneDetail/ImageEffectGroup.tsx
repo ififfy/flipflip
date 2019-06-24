@@ -8,6 +8,7 @@ import SimpleOptionPicker from "../ui/SimpleOptionPicker";
 import SimpleCheckbox from "../ui/SimpleCheckbox";
 import SimpleColorPicker from "../ui/SimpleColorPicker";
 import SimpleNumberInput from "../ui/SimpleNumberInput";
+import SimpleSliderInput from "../ui/SimpleSliderInput";
 
 export default class ImageEffectGroup extends React.Component {
   readonly props: {
@@ -18,7 +19,7 @@ export default class ImageEffectGroup extends React.Component {
   render() {
     return (
       <ControlGroup title="Image Effects" isNarrow={true}>
-        <div className="ControlSubgroup">
+        <div className={`ControlSubgroup ${this.props.scene.backgroundType == BT.blur ? 'm-inline' : ''}`}>
           <SimpleOptionPicker
             onChange={this.changeKey.bind(this, 'backgroundType').bind(this)}
             label="Background"
@@ -29,6 +30,14 @@ export default class ImageEffectGroup extends React.Component {
               onChange={this.changeKey.bind(this, 'backgroundColor').bind(this)}
               label="Color"
               value={this.props.scene.backgroundColor}/>
+          )}
+          {this.props.scene.backgroundType == BT.blur && (
+            <SimpleSliderInput
+              label={"Blur: " + this.props.scene.backgroundBlur + "px"}
+              min={0} max={30}
+              value={this.props.scene.backgroundBlur}
+              isEnabled={this.props.scene.backgroundType == BT.blur}
+              onChange={this.changeKey.bind(this, 'backgroundBlur').bind(this)}/>
           )}
         </div>
 

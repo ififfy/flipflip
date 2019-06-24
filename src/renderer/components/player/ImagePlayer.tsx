@@ -119,6 +119,7 @@ export default class ImagePlayer extends React.Component {
             image={this.state.historyPaths[(this.state.historyPaths.length - 1) + offset]}
             backgroundType={this.props.scene.backgroundType}
             backgroundColor={this.props.scene.backgroundColor}
+            backgroundBlur={this.props.scene.backgroundBlur}
             horizTransLevel={horizTransLevel}
             vertTransLevel={vertTransLevel}
             zoomStart={zoomStart}

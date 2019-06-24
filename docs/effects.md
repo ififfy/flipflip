@@ -17,7 +17,7 @@ text, etc. will also change as configured_
 
 ## Image effects
 This section controls the background and fade effects.
-* Choose either a blurred or solid color background.
+* Choose either a blurred or solid color background. Control blur amount or color.
 * Choose whether to cross-fade images. Control fade duration (ms).
 
 <details>

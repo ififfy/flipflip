@@ -25,6 +25,7 @@ export default class Scene {
   fadeDuration = 500;
   backgroundType = BT.blur;
   backgroundColor = "#000000";
+  backgroundBlur = 8;
   strobe = false;
   strobeLayer = SL.top;
   strobeOpacity = 1;

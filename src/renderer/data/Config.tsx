@@ -22,6 +22,7 @@ interface SceneSettingsI {
   fadeDuration : number;
   backgroundType: string;
   backgroundColor: string;
+  backgroundBlur: number;
   playFullGif: boolean;
   generatorMax: number;
   overlaySceneID: number;
@@ -122,6 +123,7 @@ export class SceneSettings implements SceneSettingsI {
   fadeDuration = 500;
   backgroundType = BT.blur;
   backgroundColor = "#000000";
+  backgroundBlur = 8;
   playFullGif = false;
   generatorMax = 100;
   overlaySceneID = 0;

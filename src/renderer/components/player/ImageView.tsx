@@ -3,9 +3,9 @@ import {animated, useSpring, useTransition} from "react-spring";
 
 import {BT} from "../../data/const";
 
-export const FadeLayer = (data: {image: any, contentRef: any, backgroundRef: any, backgroundType: string, backgroundColor: string,
-  horizTransLevel: number, vertTransLevel: number, zoomStart: number, zoomEnd: number,
-  transDuration: number, fadeDuration: any, crossFade: boolean}) => {
+export const FadeLayer = (data: {image: any, contentRef: any, backgroundRef: any, backgroundType: string,
+  backgroundColor: string, backgroundBlur: number, horizTransLevel: number, vertTransLevel: number,
+  zoomStart: number, zoomEnd: number, transDuration: number, fadeDuration: any, crossFade: boolean}) => {
 
   const fadeTransitions: [{item: any, props: any, key: any}] = useTransition(
     data.image,
@@ -49,6 +49,7 @@ export const FadeLayer = (data: {image: any, contentRef: any, backgroundRef: any
               contentRef={data.backgroundRef}
               backgroundType={data.backgroundType}
               backgroundColor={data.backgroundColor}
+              backgroundBlur={data.backgroundBlur}
               imageProps={null} />
           </animated.div>
         );
@@ -79,11 +80,12 @@ const ZoomMoveLayer = (data: {contentRef: any, horizTransLevel: number, vertTran
       contentRef={data.contentRef}
       backgroundType={null}
       backgroundColor={null}
+      backgroundBlur={null}
       imageProps={imageProps} />
   );
 };
 
-const Image = (data: {className: string, contentRef: any, backgroundType: string, backgroundColor: string, imageProps: any }) => {
+const Image = (data: {className: string, contentRef: any, backgroundType: string, backgroundColor: string, backgroundBlur: number, imageProps: any }) => {
   let backgroundStyle = {};
   if (data.imageProps == null) {
     if (data.backgroundType == BT.color) {
@@ -92,7 +94,7 @@ const Image = (data: {className: string, contentRef: any, backgroundType: string
       };
     } else {
       backgroundStyle = {
-        filter: 'blur(8px)',
+        filter: 'blur(' + data.backgroundBlur + 'px)',
       };
     }
   }
@@ -110,6 +112,7 @@ export default class ImageView extends React.Component {
     image: HTMLImageElement | HTMLVideoElement,
     backgroundType: string,
     backgroundColor: string,
+    backgroundBlur: number,
     horizTransLevel: number,
     vertTransLevel: number,
     zoomStart: number,
@@ -228,6 +231,7 @@ export default class ImageView extends React.Component {
     return ((props.image.src !== this.props.image.src) ||
       (props.backgroundType !== this.props.backgroundType) ||
       (props.backgroundColor !== this.props.backgroundColor) ||
+      (props.backgroundBlur !== this.props.backgroundBlur) ||
       (props.horizTransLevel !== this.props.horizTransLevel) ||
       (props.vertTransLevel !== this.props.vertTransLevel) ||
       (props.zoomStart !== this.props.zoomStart) ||
@@ -243,6 +247,7 @@ export default class ImageView extends React.Component {
         image={this.props.image}
         backgroundType={this.props.backgroundType}
         backgroundColor={this.props.backgroundColor}
+        backgroundBlur={this.props.backgroundBlur}
         horizTransLevel={this.props.horizTransLevel}
         vertTransLevel={this.props.vertTransLevel}
         zoomStart={this.props.zoomStart}
