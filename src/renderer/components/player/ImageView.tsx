@@ -165,25 +165,34 @@ export default class ImageView extends React.Component {
     const blur = this.props.backgroundType == BT.blur;
     let bgImg: any;
     if (blur) {
-      bgImg = document.createElement('canvas');
-      const context = bgImg.getContext('2d');
-      bgImg.width = parentWidth;
-      bgImg.height = parentHeight;
-      bgImg.style.width = '100%';
-      bgImg.style.height = '100%';
-
-      const draw = (v: any, c: CanvasRenderingContext2D, w: number, h: number) => {
-        if(v.paused || v.ended) return false;
-        c.drawImage(v,0,0,w,h);
-        setTimeout(draw,20,v,c,w,h);
-      };
-
-      if (img instanceof HTMLImageElement) {
-        context.drawImage(img,0,0,parentWidth,parentHeight);
+      if (img.src.endsWith(".gif")) {
+        bgImg = img.cloneNode();
+        bgImg.style.width = '100%';
+        bgImg.style.height = '100%';
+        bgImg.style.marginTop = 0;
+        bgImg.style.marginBottom = 0;
       } else {
-        img.addEventListener('play', () => {
+        bgImg = document.createElement('canvas');
+
+        const context = bgImg.getContext('2d');
+        bgImg.width = parentWidth;
+        bgImg.height = parentHeight;
+        bgImg.style.width = '100%';
+        bgImg.style.height = '100%';
+
+        const draw = (v: any, c: CanvasRenderingContext2D, w: number, h: number) => {
+          if (v.paused || v.ended) return false;
+          c.drawImage(v, 0, 0, w, h);
+          setTimeout(draw, 20, v, c, w, h);
+        };
+
+        if (img instanceof HTMLImageElement) {
           draw(img, context, parentWidth, parentHeight);
-        }, false);
+        } else {
+          img.addEventListener('play', () => {
+            draw(img, context, parentWidth, parentHeight);
+          }, false);
+        }
       }
     }
 
