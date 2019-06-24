@@ -167,18 +167,12 @@ export default class ImageView extends React.Component {
     if (blur) {
       if (img.src.endsWith(".gif")) {
         bgImg = img.cloneNode();
-        bgImg.style.width = '100%';
-        bgImg.style.height = '100%';
-        bgImg.style.marginTop = 0;
-        bgImg.style.marginBottom = 0;
       } else {
         bgImg = document.createElement('canvas');
 
         const context = bgImg.getContext('2d');
         bgImg.width = parentWidth;
         bgImg.height = parentHeight;
-        bgImg.style.width = '100%';
-        bgImg.style.height = '100%';
 
         const draw = (v: any, c: CanvasRenderingContext2D, w: number, h: number) => {
           if (v.paused || v.ended) return false;
@@ -202,12 +196,26 @@ export default class ImageView extends React.Component {
       img.style.height = '100%';
       img.style.marginTop = '0';
       img.style.marginLeft = (parentWidth / 2 - imgWidth * scale / 2) + 'px';
+      if (blur) {
+        const bgscale = parentWidth / imgWidth;
+        bgImg.style.width = '100%';
+        bgImg.style.height = (imgHeight * bgscale) + 'px';
+        bgImg.style.marginTop = (parentHeight / 2 - imgHeight * bgscale / 2) + 'px';
+        bgImg.style.marginLeft = '0';
+      }
     } else {
       const scale = parentWidth / imgWidth;
       img.style.width = '100%';
       img.style.height = 'auto';
       img.style.marginTop = (parentHeight / 2 - imgHeight * scale / 2) + 'px';
       img.style.marginLeft = '0';
+      if (blur) {
+        const bgscale = parentHeight / imgHeight;
+        bgImg.style.width = (imgWidth * bgscale) + 'px';
+        bgImg.style.height = '100%';
+        bgImg.style.marginTop = '0';
+        bgImg.style.marginLeft = (parentWidth / 2 - imgWidth * bgscale / 2) + 'px';
+      }
     }
 
     el.appendChild(img);
