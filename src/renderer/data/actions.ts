@@ -419,7 +419,7 @@ export function importLibrary(state: State, backup:Function): Object {
           newTags.push(tag);
           myTags.push(tag.name);
         } else {
-          tag.id = myTags.indexOf(tag.name); // Map tags we already have
+          tag.id = newTags.find((t) => t.name == tag.name).id; // Map tags we already have
         }
       }
     } else {
