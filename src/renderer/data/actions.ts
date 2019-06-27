@@ -213,6 +213,7 @@ export function playSceneFromLibrary(state: State, source: LibrarySource): Objec
     sources: [source],
     libraryID: source.id,
     id: id,
+    forceAll: true,
   });
   return {
     scenes: state.scenes.concat([tempScene]),
