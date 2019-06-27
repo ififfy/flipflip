@@ -332,7 +332,7 @@ export default class Library extends React.Component {
       }).catch((err: any) => {
         // If user is not authenticated for subscriptions, prompt to re-authenticate
         if (err.statusCode == 403) {
-          alert("You have not authorized FlipFlip to work with Reddit subscriptions. Visit config and authorize FlipFlip to work with Reddit.");
+          alert("You have not authorized FlipFlip to work with Reddit subscriptions. Visit Preferences and authorize FlipFlip to work with Reddit.");
           this.props.onClearReddit();
         } else {
           alert("Error retrieving subscriptions: " + err);

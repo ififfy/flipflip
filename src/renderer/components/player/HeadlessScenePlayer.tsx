@@ -175,7 +175,7 @@ function loadTumblr(config: Config, url: string, filter: string, next: any): Can
           console.error("Error retriving " + tumblrID + (next == 0 ? "" : "(Page " + next + " )"));
           console.error(err);
           if (err.message.includes("429 Limit Exceeded") && !tumblr429Alerted && next == 0) {
-            alert("Tumblr has temporarily throttled your FlipFlip due to high traffic. Try again in a few minutes or visit config to try a different Tumblr API key.");
+            alert("Tumblr has temporarily throttled your FlipFlip due to high traffic. Try again in a few minutes or visit Preferences to try a different Tumblr API key.");
             tumblr429Alerted = true;
           }
           resolve(null);
@@ -239,7 +239,7 @@ function loadTumblr(config: Config, url: string, filter: string, next: any): Can
     });
   } else {
     if (!tumblrAlerted) {
-      alert("You haven't authorized FlipFlip to work with Reddit yet.\nVisit Config and click 'Authorzie FlipFlip on Reddit'.");
+      alert("You haven't authorized FlipFlip to work with Tumblr yet.\nVisit Preferences and click 'Authorzie FlipFlip on Tumblr'.");
       tumblrAlerted = true;
     }
     return new CancelablePromise((resolve) => {
@@ -307,7 +307,7 @@ function loadReddit(config: Config, url: string, filter: string, next: any): Can
           }).catch((err: any) => {
             // If user is not authenticated for users, prompt to re-authenticate
             if (err.statusCode == 403) {
-              alert("You have not authorized FlipFlip to work with Reddit users submissions. Visit config and authorize FlipFlip to work with Reddit. Try clearing and re-authorizing FlipFlip with Reddit.");
+              alert("You have not authorized FlipFlip to work with Reddit users submissions. Visit Preferences and authorize FlipFlip to work with Reddit. Try clearing and re-authorizing FlipFlip with Reddit.");
             }
             resolve(null);
           });
@@ -315,7 +315,7 @@ function loadReddit(config: Config, url: string, filter: string, next: any): Can
       });
   } else {
     if (!redditAlerted) {
-      alert("You haven't authorized FlipFlip to work with Reddit yet.\nVisit Config and click 'Authorzie FlipFlip on Reddit'.");
+      alert("You haven't authorized FlipFlip to work with Reddit yet.\nVisit Preferences and click 'Authorzie FlipFlip on Reddit'.");
       redditAlerted = true;
     }
     return new CancelablePromise((resolve) => {
@@ -588,7 +588,7 @@ function loadTwitter(config: Config, url: string, filter: string, next: any): Ca
     });
   } else {
     if (!twitterAlerted) {
-      alert("You haven't authorized FlipFlip to work with Twitter yet.\nVisit Config and click 'Authorzie FlipFlip on Twitter'.");
+      alert("You haven't authorized FlipFlip to work with Twitter yet.\nVisit Preferences and click 'Authorzie FlipFlip on Twitter'.");
       twitterAlerted = true;
     }
     return new CancelablePromise((resolve) => {
@@ -697,7 +697,7 @@ function loadInstagram(config: Config, url: string, filter: string, next: any): 
     }
   } else {
     if (!instagramAlerted) {
-      alert("You haven't authorized FlipFlip to work with Instagram yet.\nVisit Config and populate your username and password.\nNote this information is only kept on your computer and never shared with anyone else.");
+      alert("You haven't authorized FlipFlip to work with Instagram yet.\nVisit Preferences and populate your username and password.\nNote this information is only kept on your computer and never shared with anyone else.");
       instagramAlerted = true;
     }
     return new CancelablePromise((resolve) => {
