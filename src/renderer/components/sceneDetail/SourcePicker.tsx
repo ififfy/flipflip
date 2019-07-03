@@ -91,11 +91,15 @@ export default class SourcePicker extends React.Component {
     const tags = new Map<string, number>();
     let untaggedCount = 0;
     let offlineCount = 0;
+    let markedCount = 0;
     const options = Array<{ label: string, value: string }>();
     const defaultValues = Array<{ label: string, value: string }>();
     for (let source of displaySources) {
       if (source.offline) {
         offlineCount++;
+      }
+      if (source.marked) {
+        markedCount++;
       }
 
       if (source.tags.length > 0) {
@@ -137,6 +141,9 @@ export default class SourcePicker extends React.Component {
     }
     if (offlineCount > 0 && !this.state.filters.includes("<Offline>")) {
       options.push({label: "<Offline> (" + offlineCount + ")", value: "<Offline>"});
+    }
+    if (markedCount > 0 && !this.state.filters.includes("<Marked>")) {
+      options.push({label: "<Marked> (" + markedCount + ")", value: "<Marked>"});
     }
     for (let tag of tagKeys) {
       if (!this.state.filters.includes(tag + "~")) {
@@ -528,7 +535,9 @@ export default class SourcePicker extends React.Component {
         for (let filter of this.state.filters) {
           if (filter == "<Offline>") { // This is offline filter
             matchesFilter = source.offline;
-          } else if (filter == "<Untagged>") { // This is untagged filter
+          } else if (filter == "<Marked>") { // This is a marked filter
+            matchesFilter = source.marked;
+          }else if (filter == "<Untagged>") { // This is untagged filter
             matchesFilter = source.tags.length === 0;
           } else if (filter.endsWith("~")) { // This is a tag filter
             let tag = filter.substring(0, filter.length-1);
