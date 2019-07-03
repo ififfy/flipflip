@@ -848,12 +848,6 @@ label.SimpleCheckbox {
       line-height: 1.5rem;
       height: 2.5rem;
 
-      @include mouseover;
-
-      &.m-offline {
-        background-color: #ff0000;
-      }
-
       > input {
         vertical-align: -2px;
         margin-right: 10px;
@@ -980,7 +974,19 @@ label.SimpleCheckbox {
         .SourceList__Source {
           &.m-marked {
             background-color: #117900;
+            &:hover {
+              background-color: #549d48;
+            }
           }
+
+          &.m-offline {
+            background-color: #ff0000;
+            &:hover {
+              background-color: #fa4848;
+            }
+          }
+
+          @include mouseover;
         }
 
         .SourceList__SourceTitle {
