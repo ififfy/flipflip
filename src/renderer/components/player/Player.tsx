@@ -55,7 +55,7 @@ export default class Player extends React.Component {
     scene: Scene,
     scenes: Array<Scene>,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
-    nextScene(): void,
+    nextScene?(): void,
     tags?: Array<Tag>,
     allTags?: Array<Tag>,
     toggleTag?(sourceID: number, tag: Tag): void,

@@ -144,7 +144,6 @@ export default class Meta extends React.Component {
             scene={scene}
             scenes={this.state.scenes}
             onUpdateScene={a(actions.updateScene)}
-            nextScene={a(actions.nextScene)}
             goBack={a(actions.endPlaySceneFromLibrary)}
             tags={actions.getLibrarySource(this.state).tags}
             allTags={this.state.tags}

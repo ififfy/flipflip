@@ -929,7 +929,7 @@ export default class HeadlessScenePlayer extends React.Component {
   componentWillReceiveProps(props: any) {
     if (props.scene.id !== this.props.scene.id) {
       this.componentWillUnmount();
-      if (this.props.nextScene !== null && props.scene.id === this.props.nextScene.id) { // If the next scene has been played
+      if (this.props.nextScene != null && props.scene.id === this.props.nextScene.id) { // If the next scene has been played
         if (props.nextScene.id === this.props.scene.id) { // Just swap values if we're coming back to this scene again
           const newAllURLs = this.nextAllURLs;
           const newPromiseQueue = this.nextPromiseQueue;

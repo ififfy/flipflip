@@ -135,7 +135,7 @@ export function deleteScene(state: State, scene: Scene): Object {
 export function nextScene(state: State): Object {
   const scene = getActiveScene(state);
   if (scene && scene.nextSceneID !== 0){
-    const nextScene = state.scenes.find((s: Scene) => s.id === getActiveScene(state).nextSceneID);
+    const nextScene = state.scenes.find((s: Scene) => s.id == scene.nextSceneID);
     if (nextScene != null) {
       if (nextScene.tagWeights || nextScene.sceneWeights) {
         return {
