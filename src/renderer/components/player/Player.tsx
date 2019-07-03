@@ -238,12 +238,11 @@ export default class Player extends React.Component {
         {this.state.hasStarted && (
           <div className="SceneOptions ControlGroupGroup u-button-sidebar">
             <h2 className="SceneOptionsHeader">Scene Options</h2>
-            {this.props.tags == null && (
-              <SceneEffectGroup
-                scene={this.props.scene}
-                allScenes={this.props.scenes}
-                onUpdateScene={this.props.onUpdateScene.bind(this)} />
-            )}
+            <SceneEffectGroup
+              scene={this.props.scene}
+              showAll={this.props.tags == null}
+              allScenes={this.props.scenes}
+              onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
             <ImageEffectGroup
               scene={this.props.scene}

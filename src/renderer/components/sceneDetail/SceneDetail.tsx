@@ -94,6 +94,7 @@ export default class SceneDetail extends React.Component {
         <div className="SceneDetail__Content ControlGroupGroup">
           <SceneEffectGroup
             scene={this.props.scene}
+            showAll={true}
             allScenes={this.props.allScenes}
             onUpdateScene={this.props.onUpdateScene.bind(this)} />
 

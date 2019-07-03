@@ -11,6 +11,7 @@ import {TF} from "../../data/const";
 export default class SceneEffectGroup extends React.Component {
   readonly props: {
     scene: Scene | SceneSettings,
+    showAll: boolean
     allScenes: Array<Scene>,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
@@ -34,44 +35,48 @@ export default class SceneEffectGroup extends React.Component {
           )}
         </div>
 
-        <hr/>
+        {this.props.showAll && (
+          <React.Fragment>
+            <hr/>
 
-        <div className="ControlSubgroup m-inline">
-          <SimpleOptionPicker
-            onChange={this.changeKey.bind(this, 'overlaySceneID').bind(this)}
-            label="Overlay scene"
-            value={this.props.scene.overlaySceneID.toString()}
-            parseKeyFunction={this.getSceneName.bind(this)}
-            keys={["0"].concat(this.props.allScenes.filter((s) => s.sources.length > 0).map((s) => s.id.toString()))}/>
-          {this.props.scene.overlaySceneID != 0 && (
-            <SimpleSliderInput
-              isEnabled={this.props.scene.overlaySceneID != 0}
-              onChange={this.onChangeOverlaySceneOpacity.bind(this)}
-              label={"Overlay opacity: " + (this.props.scene.overlaySceneOpacity * 100).toFixed(0) + '%'}
-              min={1}
-              max={99}
-              value={(this.props.scene.overlaySceneOpacity * 100)}/>
-          )}
-        </div>
+            <div className="ControlSubgroup m-inline">
+              <SimpleOptionPicker
+                onChange={this.changeKey.bind(this, 'overlaySceneID').bind(this)}
+                label="Overlay scene"
+                value={this.props.scene.overlaySceneID.toString()}
+                parseKeyFunction={this.getSceneName.bind(this)}
+                keys={["0"].concat(this.props.allScenes.filter((s) => s.sources.length > 0).map((s) => s.id.toString()))}/>
+              {this.props.scene.overlaySceneID != 0 && (
+                <SimpleSliderInput
+                  isEnabled={this.props.scene.overlaySceneID != 0}
+                  onChange={this.onChangeOverlaySceneOpacity.bind(this)}
+                  label={"Overlay opacity: " + (this.props.scene.overlaySceneOpacity * 100).toFixed(0) + '%'}
+                  min={1}
+                  max={99}
+                  value={(this.props.scene.overlaySceneOpacity * 100)}/>
+              )}
+            </div>
 
-        <hr/>
+            <hr/>
 
-        <div className="ControlSubgroup  m-inline">
-          <SimpleOptionPicker
-            onChange={this.changeKey.bind(this, 'nextSceneID').bind(this)}
-            label="Next Scene"
-            value={this.props.scene.nextSceneID.toString()}
-            parseKeyFunction={this.getSceneName.bind(this)}
-            keys={["0"].concat(this.props.allScenes.filter((s) => s.id !== this.props.scene.id && s.sources.length > 0).map((s) => s.id.toString()))}/>
-          {this.props.scene.nextSceneID != 0 && (
-            <SimpleNumberInput
-              label="Time before playing next scene (sec)"
-              min={1}
-              value={this.props.scene.nextSceneTime}
-              isEnabled={this.props.scene.nextSceneID != 0}
-              onChange={this.changeKey.bind(this, 'nextSceneTime').bind(this)}/>
-          )}
-        </div>
+            <div className="ControlSubgroup  m-inline">
+              <SimpleOptionPicker
+                onChange={this.changeKey.bind(this, 'nextSceneID').bind(this)}
+                label="Next Scene"
+                value={this.props.scene.nextSceneID.toString()}
+                parseKeyFunction={this.getSceneName.bind(this)}
+                keys={["0"].concat(this.props.allScenes.filter((s) => s.id !== this.props.scene.id && s.sources.length > 0).map((s) => s.id.toString()))}/>
+              {this.props.scene.nextSceneID != 0 && (
+                <SimpleNumberInput
+                  label="Time before playing next scene (sec)"
+                  min={1}
+                  value={this.props.scene.nextSceneTime}
+                  isEnabled={this.props.scene.nextSceneID != 0}
+                  onChange={this.changeKey.bind(this, 'nextSceneTime').bind(this)}/>
+              )}
+            </div>
+          </React.Fragment>
+        )}
       </ControlGroup>
     );
   }
