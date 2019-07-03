@@ -12,6 +12,7 @@ import CaptionProgram from "./CaptionProgram";
 import ChildCallbackHack from './ChildCallbackHack';
 import HeadlessScenePlayer from './HeadlessScenePlayer';
 import Tag from "../library/Tag";
+import LibrarySource from "../library/LibrarySource";
 import AudioGroup from "../sceneDetail/AudioGroup";
 import ImageEffectGroup from "../sceneDetail/ImageEffectGroup";
 import TextGroup from "../sceneDetail/TextGroup";
@@ -59,6 +60,7 @@ export default class Player extends React.Component {
     tags?: Array<Tag>,
     allTags?: Array<Tag>,
     toggleTag?(sourceID: number, tag: Tag): void,
+    goToTagSource?(source: LibrarySource): void,
   };
 
   readonly state = {
@@ -441,6 +443,14 @@ export default class Player extends React.Component {
         label: 'Delete',
         click: () => {
           this.onDeletePath(path);
+        }
+      }));
+    }
+    if (!this.props.tags) {
+      contextMenu.append(new MenuItem({
+        label: 'Goto Tag Source',
+        click: () => {
+          this.props.goToTagSource(new LibrarySource({url: source}));
         }
       }));
     }

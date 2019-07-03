@@ -208,10 +208,15 @@ export function playSceneFromLibrary(state: State, source: LibrarySource): Objec
   state.scenes.forEach((s: Scene) => {
     id = Math.max(s.id + 1, id);
   });
+  let librarySource = state.library.find((s) => s.url == source.url);
+  if (librarySource == null) {
+    alert("The source " + source.url + " isn't in your Library");
+    return;
+  }
   let tempScene = new Scene({
     name: "library_scene_temp",
     sources: [source],
-    libraryID: source.id,
+    libraryID: librarySource.id,
     id: id,
     forceAll: true,
   });

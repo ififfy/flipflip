@@ -135,6 +135,7 @@ export default class Meta extends React.Component {
             onUpdateScene={a(actions.updateScene)}
             nextScene={a(actions.nextScene)}
             goBack={a(actions.goBack)}
+            goToTagSource={a(actions.playSceneFromLibrary)}
           />
         )}
 
