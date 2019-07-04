@@ -54,6 +54,7 @@ export default class Scene {
   nextSceneID: number = 0;
   nextSceneTime: number = 900;
   libraryID: number = -1;
+  displayedLibrary: Array<LibrarySource> = null;
   audioURL?: string = "";
   tagWeights?: string;
   sceneWeights?: string;

@@ -31,7 +31,9 @@ export function getActiveScene(state: State): Scene | null {
 
 // Returns the active library source, or null if the current route isn't a library source
 export function getLibrarySource(state: State): LibrarySource | null {
-  const libraryID = getActiveScene(state).libraryID;
+  const activeScene = getActiveScene(state);
+  if (activeScene == null) return null;
+  const libraryID = activeScene.libraryID;
   for (let s of state.library) {
     if (s.id == libraryID) {
       return s;
@@ -203,11 +205,16 @@ export function playScene(state: State, scene: Scene): Object {
   return {route: state.route.concat(new Route({kind: 'play', value: scene.id}))};
 }
 
-export function playSceneFromLibrary(state: State, source: LibrarySource): Object {
+export function playSceneFromLibrary(state: State, source: LibrarySource, displayed: Array<LibrarySource>): Object {
   let id = state.scenes.length + 1;
   state.scenes.forEach((s: Scene) => {
     id = Math.max(s.id + 1, id);
   });
+  if (getLibrarySource(state) != null) {
+    state.route.pop();
+    state.route.pop();
+    state.scenes.pop();
+  }
   let librarySource = state.library.find((s) => s.url == source.url);
   if (librarySource == null) {
     alert("The source " + source.url + " isn't in your Library");
@@ -217,6 +224,7 @@ export function playSceneFromLibrary(state: State, source: LibrarySource): Objec
     name: "library_scene_temp",
     sources: [source],
     libraryID: librarySource.id,
+    displayedLibrary: displayed,
     id: id,
     forceAll: true,
   });
@@ -224,6 +232,19 @@ export function playSceneFromLibrary(state: State, source: LibrarySource): Objec
     scenes: state.scenes.concat([tempScene]),
     route: state.route.concat([new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'libraryplay', value: tempScene.id})]),
   };
+}
+
+export function navigateDisplayedLibrary(state: State, offset: number): Object {
+  const activeScene = getActiveScene(state);
+  const displayed = Array.from(activeScene.displayedLibrary);
+  const indexOf = displayed.map((s) => s.url).indexOf(activeScene.sources[0].url);
+  let newIndexOf = indexOf + offset;
+  if (newIndexOf < 0) {
+    newIndexOf = displayed.length - 1;
+  } else if (newIndexOf >= displayed.length) {
+    newIndexOf = 0;
+  }
+  return playSceneFromLibrary(state, displayed[newIndexOf], displayed);
 }
 
 export function endPlaySceneFromLibrary(state: State): Object {

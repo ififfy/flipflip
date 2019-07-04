@@ -149,6 +149,7 @@ export default class Meta extends React.Component {
             tags={actions.getLibrarySource(this.state).tags}
             allTags={this.state.tags}
             toggleTag={a(actions.toggleTag)}
+            navigateTagging={a(actions.navigateDisplayedLibrary)}
           />
         )}
 

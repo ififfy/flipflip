@@ -25,17 +25,6 @@ import ZoomMoveGroup from "../sceneDetail/ZoomMoveGroup";
 
 const {getCurrentWindow, Menu, MenuItem, app} = remote;
 
-const keyMap = {
-  playPause: ['Play/Pause (Playing)', 'space'],
-  historyBack: ['Back in Time', 'left'],
-  historyForward: ['Forward in Time', 'right'],
-  navigateBack: ['Go Back to Scene Details', 'escape'],
-  toggleFullscreen: ['Toggle Fullscreen', 'CommandOrControl+F'],
-  toggleAlwaysOnTop: ['Toggle Always On Top', 'CommandOrControl+T'],
-  toggleMenuBarDisplay: ['Toggle Menu Bar', 'CommandOrControl+^'],
-  onDelete: ['Delete Image', 'Delete'],
-};
-
 let originalMenu = Menu.getApplicationMenu();
 
 function textURL(kind: string, src: string): string {
@@ -61,6 +50,7 @@ export default class Player extends React.Component {
     allTags?: Array<Tag>,
     toggleTag?(sourceID: number, tag: Tag): void,
     goToTagSource?(source: LibrarySource): void,
+    navigateTagging?(offset: number): void,
   };
 
   readonly state = {
@@ -303,7 +293,11 @@ export default class Player extends React.Component {
 
   componentDidUpdate(props: any, state: any) {
     if (props.scene.id !== this.props.scene.id) {
-      this.start();
+      if (this.props.tags) {
+        this.setState({startTime: new Date()});
+      } else {
+        this.setState({hasStarted: true, startTime: new Date()});
+      }
     }
     const strobeDelay = props.scene.strobePulse ? props.scene.strobeDelay : props.scene.strobeTime;
     if (strobeDelay != this.strobeDelay) {
@@ -327,6 +321,29 @@ export default class Player extends React.Component {
     this.strobeInterval = setInterval(() => {
       this.setState({toggleStrobe: !this.state.toggleStrobe})
     }, this.props.scene.strobePulse ? this.props.scene.strobeDelay : this.props.scene.strobeTime);
+  }
+
+  getKeyMap() {
+    const keyMap = new Map<String, Array<string>>([
+      ['playPause', ['Play/Pause (Playing)', 'space']],
+      ['historyBack', ['Back in Time', 'left']],
+      ['historyForward', ['Forward in Time', 'right']],
+      ['navigateBack', ['Go Back to Scene Details', 'escape']],
+      ['toggleFullscreen', ['Toggle Fullscreen', 'CommandOrControl+F']],
+      ['toggleAlwaysOnTop', ['Toggle Always On Top', 'CommandOrControl+T']],
+      ['toggleMenuBarDisplay', ['Toggle Menu Bar', 'CommandOrControl+^']],
+    ]);
+
+    if (this.props.config.caching.enabled) {
+      keyMap.set('onDelete', ['Delete Image', 'Delete']);
+    }
+
+    if (this.props.tags != null) {
+      keyMap.set('prevSource', ['Previous Source', '[']);
+      keyMap.set('nextSource', ['Next Source', ']']);
+    }
+
+    return keyMap;
   }
 
   buildMenu() {
@@ -361,12 +378,12 @@ export default class Player extends React.Component {
       },
       {
         label: 'Player controls',
-        submenu: Object.entries(keyMap).map(([k, v]) => {
+        submenu: Array.from(this.getKeyMap().entries()).map(([k, v]) => {
           const [label, accelerator] = v;
           return {
             label,
             accelerator,
-            click: (this as any)[k].bind(this),
+            click: (this as any)[k as any].bind(this),
           };
         })
       }
@@ -514,7 +531,7 @@ export default class Player extends React.Component {
     } else {
       this.pause()
     }
-    keyMap.playPause = ["Play/Pause " + (play ? "(Playing)" : "(Paused)"), 'space'];
+    this.getKeyMap().set('playPause', ["Play/Pause " + (play ? "(Playing)" : "(Paused)"), 'space']);
     this.buildMenu();
   }
 
@@ -571,21 +588,21 @@ export default class Player extends React.Component {
 
   setAlwaysOnTop(alwaysOnTop: boolean){
     this.props.config.displaySettings.alwaysOnTop = alwaysOnTop;
-    keyMap.toggleAlwaysOnTop = ['Toggle Always On Top ' + (alwaysOnTop ? "(On)" : "(Off)"), 'CommandOrControl+T'];
+    this.getKeyMap().set('toggleAlwaysOnTop', ['Toggle Always On Top ' + (alwaysOnTop ? "(On)" : "(Off)"), 'CommandOrControl+T']);
     this.buildMenu();
     getCurrentWindow().setAlwaysOnTop(alwaysOnTop);
   }
 
   setMenuBarVisibility(showMenu: boolean) {
     this.props.config.displaySettings.showMenu = showMenu;
-    keyMap.toggleMenuBarDisplay = ['Toggle Menu Bar ' + (showMenu ? "(On)" : "(Off)"), 'CommandOrControl+^'];
+    this.getKeyMap().set('toggleMenuBarDisplay', ['Toggle Menu Bar ' + (showMenu ? "(On)" : "(Off)"), 'CommandOrControl+^']);
     this.buildMenu();
     getCurrentWindow().setMenuBarVisibility(showMenu);
   }
 
   setFullscreen(fullScreen: boolean) {
     this.props.config.displaySettings.fullScreen = fullScreen;
-    keyMap.toggleFullscreen = ['Toggle Fullscreen ' + (fullScreen ? "(On)" : "(Off)"), 'CommandOrControl+F'];
+    this.getKeyMap().set('toggleFullscreen', ['Toggle Fullscreen ' + (fullScreen ? "(On)" : "(Off)"), 'CommandOrControl+F']);
     this.buildMenu();
     getCurrentWindow().setFullScreen(fullScreen);
   }
@@ -625,5 +642,29 @@ export default class Player extends React.Component {
 
   toggleFullscreen() {
     this.setFullscreen(!this.props.config.displaySettings.fullScreen);
+  }
+
+  prevSource() {
+    this.navigateTagging(-1);
+  }
+
+  nextSource() {
+    this.navigateTagging(1);
+  }
+
+  navigateTagging(offset: number) {
+    this.setState({
+      isLoaded: false,
+      hasStarted: false,
+      canMainStart: false,
+      isMainLoaded: false,
+      isEmpty: false,
+      historyOffset: 0,
+      historyPaths: Array<any>(),
+      total: 0,
+      progress: 0,
+      progressMessage: this.props.scene.sources.length > 0 ? this.props.scene.sources[0].url : "",
+    });
+    this.props.navigateTagging(offset);
   }
 };

@@ -28,7 +28,7 @@ export default class SourceList extends React.Component {
     onStartEdit(isEditing: number): void,
     savePosition?(yOffset: number, filters: Array<string>, selected: Array<string>): void,
     onOpenLibraryImport?(): void,
-    onPlay?(source: LibrarySource): void,
+    onPlay?(source: LibrarySource, displayed: Array<LibrarySource>): void,
   };
 
   readonly state = {
@@ -161,7 +161,7 @@ export default class SourceList extends React.Component {
 
   onPlay(source: LibrarySource) {
     this.props.savePosition(document.getElementById("sources").scrollTop, this.props.filters, this.props.selected);
-    this.props.onPlay(source);
+    this.props.onPlay(source, this.props.displaySources);
   }
 
   onSelect(event: any) {
