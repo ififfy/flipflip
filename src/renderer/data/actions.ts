@@ -7,7 +7,7 @@ import LibrarySource from "../components/library/LibrarySource";
 import { defaultInitialState } from './AppStorage';
 import Config from "./Config";
 import Tag from "../components/library/Tag";
-import { remote } from "electron";
+import { remote, webFrame } from "electron";
 
 type State = typeof defaultInitialState;
 
@@ -88,6 +88,7 @@ export function cleanBackups(state: State): Object {
 }
 
 export function goBack(state: State): Object {
+  webFrame.clearCache();
   state.route.pop();
   const newRoute = state.route.slice(0);
   return {route: newRoute, autoEdit: false, isSelect: false};
