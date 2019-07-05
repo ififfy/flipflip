@@ -85,6 +85,7 @@ const ST = { // source types
 const SL = { // strobe layers
   top: 'sl.top',
   middle: 'sl.middle',
+  background: 'sl.background',
   bottom: 'sl.bottom',
 };
 

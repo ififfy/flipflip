@@ -1259,6 +1259,10 @@ label.SimpleCheckbox {
 
   .Strobe {
     z-index: 2;
+
+    &.m-background {
+      z-index: 1;
+    }
   }
 
   .ImagePlayer {

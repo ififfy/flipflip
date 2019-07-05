@@ -3,6 +3,7 @@ import * as React from 'react';
 import Sound from 'react-sound';
 import fs from "fs";
 import fileURL from "file-url";
+import {animated, Transition} from "react-spring/renderprops";
 
 import {SL, ST, TOT} from "../../data/const";
 import {getCachePath, getSourceType, urlToPath} from '../../data/utils';
@@ -19,7 +20,6 @@ import TextGroup from "../sceneDetail/TextGroup";
 import Progress from "../ui/Progress";
 import ImageGroup from "../sceneDetail/ImageGroup";
 import SceneEffectGroup from "../sceneDetail/SceneEffectGroup";
-import {Transition} from "react-spring/renderprops";
 import StrobeGroup from "../sceneDetail/StrobeGroup";
 import ZoomMoveGroup from "../sceneDetail/ZoomMoveGroup";
 
@@ -106,7 +106,7 @@ export default class Player extends React.Component {
             from={{ backgroundColor: this.props.scene.strobeColor, opacity: strobeOpacity}}
             enter={{ opacity: 0 }}
             leave={{ opacity: 0 }} >
-            {toggle => props => <div className="Strobe u-fill-container" style={props}/>}
+            {toggle => props => <animated.div className="Strobe u-fill-container" style={props}/>}
           </Transition>
         )}
         {!this.state.hasStarted && !this.state.isEmpty && (
@@ -132,7 +132,7 @@ export default class Player extends React.Component {
             nextScene={nextScene}
             opacity={1}
             isPlaying={this.state.isPlaying}
-            strobe={this.props.scene.strobe && this.props.scene.strobeLayer == SL.middle}
+            strobeLayer={this.props.scene.strobe ? this.props.scene.strobeLayer : null}
             toggleStrobe={this.state.toggleStrobe}
             historyOffset={this.state.historyOffset}
             advanceHack={this.state.imagePlayerAdvanceHack}

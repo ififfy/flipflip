@@ -55,5 +55,6 @@ export default new Map<String, String>([
 
   ['sl.top', 'Above All'],
   ['sl.middle', 'Above Scene'],
+  ['sl.background', 'Behind Image'],
   ['sl.bottom', 'Behind All'],
 ]);

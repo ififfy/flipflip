@@ -7,15 +7,15 @@ import wretch from "wretch";
 import gifInfo from 'gif-info';
 import getFolderSize from "get-folder-size";
 import IdleTimer from 'react-idle-timer';
+import {Transition, animated} from "react-spring/renderprops";
 
-import {HTF, IF, ST, TF, VTF, WF} from '../../data/const';
+import {HTF, IF, SL, ST, TF, VTF, WF} from '../../data/const';
 import {getCachePath, getFileName, getRandomListItem, getSourceType, isVideo, urlToPath} from '../../data/utils';
 import Config from "../../data/Config";
 import Scene from "../../data/Scene";
 import TIMING_FUNCTIONS from '../../data/TIMING_FUNCTIONS';
 import ChildCallbackHack from './ChildCallbackHack';
 import ImageView from './ImageView';
-import {Transition, animated} from "react-spring/renderprops";
 
 class GifInfo {
   animated: boolean;
@@ -32,7 +32,7 @@ export default class ImagePlayer extends React.Component {
     maxLoadingAtOnce: number,
     maxToRememberInHistory: number,
     allURLs: Map<String, Array<string>>,
-    strobe?: boolean,
+    strobeLayer?: string,
     toggleStrobe?: boolean,
     isPlaying: boolean,
     historyOffset: number,
@@ -97,7 +97,7 @@ export default class ImagePlayer extends React.Component {
     return (
       <div className="ImagePlayer"
            style={{cursor: this.state.hideCursor ? "none" : "initial"}}>
-        {this.props.strobe && (
+        {(this.props.strobeLayer == SL.middle || this.props.strobeLayer == SL.background) && (
           <Transition
             reset
             unique
@@ -106,7 +106,7 @@ export default class ImagePlayer extends React.Component {
             from={{ backgroundColor: this.props.scene.strobeColor, opacity: 1}}
             enter={{ opacity: 0 }}
             leave={{ opacity: 0 }} >
-            {toggle => props => <animated.div className="Strobe u-fill-container" style={props}/>}
+            {toggle => props => <animated.div className={`Strobe u-fill-container ${this.props.strobeLayer == SL.background ? 'm-background' : ''}`} style={props}/>}
           </Transition>
         )}
         <IdleTimer
@@ -169,7 +169,7 @@ export default class ImagePlayer extends React.Component {
             props.hasStarted !== this.props.hasStarted ||
             props.allURLs !== this.props.allURLs ||
             props.historyOffset !== this.props.historyOffset ||
-            props.strobe !== this.props.strobe ||
+            props.strobeLayer !== this.props.strobeLayer ||
             props.toggleStrobe !== this.props.toggleStrobe);
   }
 
