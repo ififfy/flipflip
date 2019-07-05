@@ -36,6 +36,7 @@ export default class Scene {
   playFullGif = false;
   playFullVideo = false;
   randomVideoStart = false;
+  continueVideo = false;
   textKind: string = "";
   textSource: string = "";
   blinkColor = "#FFFFFF";

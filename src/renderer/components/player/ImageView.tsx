@@ -120,13 +120,24 @@ export default class ImageView extends React.Component {
     transDuration: number,
     crossFade: boolean,
     fadeDuration: number,
+    continueVideo: boolean,
   };
 
   readonly backgroundRef: React.RefObject<any> = React.createRef();
   readonly contentRef: React.RefObject<any> = React.createRef();
 
+  _durationMap= new Map<string, number>();
+
   componentDidMount() {
+    this._durationMap = new Map<string, number>();
     this._applyImage();
+  }
+
+  componentWillUpdate() {const el = this.contentRef.current;
+    if (el && el.firstChild && el.firstChild instanceof HTMLVideoElement && this.props.continueVideo) {
+      const vid = el.firstChild;
+      this._durationMap.set(vid.src, vid.currentTime);
+    }
   }
 
   componentDidUpdate() {
@@ -219,6 +230,10 @@ export default class ImageView extends React.Component {
         bgImg.style.marginTop = '0';
         bgImg.style.marginLeft = (parentWidth / 2 - imgWidth * bgscale / 2) + 'px';
       }
+    }
+
+    if (img instanceof HTMLVideoElement && this._durationMap.has(img.src) && this.props.continueVideo) {
+      img.currentTime = this._durationMap.get(img.src);
     }
 
     el.appendChild(img);

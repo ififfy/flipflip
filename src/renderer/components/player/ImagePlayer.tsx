@@ -126,7 +126,8 @@ export default class ImagePlayer extends React.Component {
             zoomEnd={zoomEnd}
             transDuration={transDuration}
             crossFade={crossFade}
-            fadeDuration={fadeDuration}/>
+            fadeDuration={fadeDuration}
+            continueVideo={!this.props.scene.playFullVideo && this.props.scene.continueVideo}/>
         </div>
       </div>
     );

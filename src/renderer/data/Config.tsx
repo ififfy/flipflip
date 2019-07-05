@@ -26,6 +26,7 @@ interface SceneSettingsI {
   playFullGif: boolean;
   playFullVideo: boolean;
   randomVideoStart: boolean;
+  continueVideo: boolean;
   generatorMax: number;
   overlaySceneID: number;
   overlaySceneOpacity: number;
@@ -129,6 +130,7 @@ export class SceneSettings implements SceneSettingsI {
   playFullGif = false;
   playFullVideo = false;
   randomVideoStart = false;
+  continueVideo = false;
   generatorMax = 100;
   overlaySceneID = 0;
   overlaySceneOpacity = 0.5;
