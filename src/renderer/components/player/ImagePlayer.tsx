@@ -396,6 +396,9 @@ export default class ImagePlayer extends React.Component {
           setTimeout(errorCallback, 0);
         } else {
           this.cache(video);
+          if (this.props.scene.playFullVideo) {
+            video.setAttribute("duration", (video.duration * 1000).toString());
+          }
           setTimeout(successCallback, 0);
         }
       };

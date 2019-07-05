@@ -27,10 +27,16 @@ export default class ImageGroup extends React.Component {
               keys={Object.values(IF)}/>
           )}
           {!this.props.isPlayer && this.props.scene.imageTypeFilter != IF.stills && (
-            <SimpleCheckbox
-              text="Play Full GIF animations"
-              isOn={this.props.scene.playFullGif}
-              onChange={this.changeKey.bind(this, 'playFullGif').bind(this)}/>
+            <React.Fragment>
+              <SimpleCheckbox
+                text="Play Full GIF"
+                isOn={this.props.scene.playFullGif}
+                onChange={this.changeKey.bind(this, 'playFullGif').bind(this)}/>
+              <SimpleCheckbox
+                text="Play Full Video"
+                isOn={this.props.scene.playFullVideo}
+                onChange={this.changeKey.bind(this, 'playFullVideo').bind(this)}/>
+            </React.Fragment>
           )}
         </div>
         <div className="ControlSubgroup m-inline">
