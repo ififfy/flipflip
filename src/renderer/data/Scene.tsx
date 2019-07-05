@@ -35,6 +35,7 @@ export default class Scene {
   strobeColor = "#FFFFFF";
   playFullGif = false;
   playFullVideo = false;
+  randomVideoStart = false;
   textKind: string = "";
   textSource: string = "";
   blinkColor = "#FFFFFF";

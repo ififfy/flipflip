@@ -519,10 +519,16 @@ export default class ImagePlayer extends React.Component {
     let nextImg;
     if (this.state.readyToDisplay.length) {
       nextImg = this.state.readyToDisplay.shift();
+      if (nextImg instanceof HTMLVideoElement && !this.props.scene.playFullVideo && this.props.scene.randomVideoStart) {
+        nextImg.currentTime = Math.random() * nextImg.duration;
+      }
       nextHistoryPaths = nextHistoryPaths.concat([nextImg]);
     } else if (this.state.historyPaths.length) {
       // no new image ready; just pick a random one from the past 120
       nextImg = getRandomListItem(this.state.historyPaths);
+      if (nextImg instanceof HTMLVideoElement && !this.props.scene.playFullVideo && this.props.scene.randomVideoStart) {
+        nextImg.currentTime = Math.random() * nextImg.duration;
+      }
       nextHistoryPaths = nextHistoryPaths.concat([nextImg]);
     }
     while (nextHistoryPaths.length > this.props.maxInMemory) {

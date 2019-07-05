@@ -56,6 +56,12 @@ export default class ImageGroup extends React.Component {
             text={"Show All Images Before Looping"}
             isOn={this.props.scene.forceAll}
             onChange={this.changeKey.bind(this, 'forceAll').bind(this)} />
+          {!this.props.scene.playFullVideo && (
+            <SimpleCheckbox
+              text={"Start Video at Random Timestamp"}
+              isOn={this.props.scene.randomVideoStart}
+              onChange={this.changeKey.bind(this, 'randomVideoStart').bind(this)} />
+          )}
         </div>
       </ControlGroup>
     );
