@@ -219,7 +219,8 @@ export default class Config {
   remoteSettings = new RemoteSettings();
   caching = new CacheSettings();
   displaySettings = new DisplaySettings();
-  
+  clientID = "";
+
   constructor(init?: Partial<Config>) {
     Object.assign(this, init);
 

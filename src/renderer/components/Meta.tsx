@@ -13,6 +13,7 @@ import SceneGenerator from "./library/SceneGenerator";
 
 import Player from './player/Player';
 import SceneDetail from './sceneDetail/SceneDetail';
+import FFAnalytics from "./ui/FFAnalytics";
 
 const appStorage = new AppStorage();
 
@@ -168,6 +169,12 @@ export default class Meta extends React.Component {
             onClearTwitter={a(actions.clearTwitter)}
           />
         )}
+
+        <FFAnalytics
+          config={this.state.config}
+          onUpdateConfig={a(actions.updateConfig)}
+          version={this.state.version}
+          page={this.state.route.length == 0 ? 'home' : this.state.route[this.state.route.length - 1].kind} />
       </div>
     )
   }
