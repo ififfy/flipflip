@@ -92,7 +92,7 @@ const Image = (data: {className: string, contentRef: any, backgroundType: string
       backgroundStyle = {
         backgroundColor: data.backgroundColor,
       };
-    } else {
+    } else if (data.backgroundType == BT.blur) {
       backgroundStyle = {
         filter: 'blur(' + data.backgroundBlur + 'px)',
       };

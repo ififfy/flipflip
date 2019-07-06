@@ -16,6 +16,7 @@ export default new Map<String, String>([
 
   ['bt.blur', 'Blurred'],
   ['bt.color', 'Solid Color'],
+  ['bt.none', 'None'],
 
   ['htf.none', 'None'],
   ['htf.left', 'Left'],

@@ -29,6 +29,7 @@ const ZF = { // zoom functions
 const BT = { // background type
   blur: 'bt.blur',
   color: 'bt.color',
+  none: 'bt.none',
 };
 
 const HTF = { // horizontal translate functions
