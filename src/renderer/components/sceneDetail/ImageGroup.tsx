@@ -56,18 +56,6 @@ export default class ImageGroup extends React.Component {
             text={"Show All Images Before Looping"}
             isOn={this.props.scene.forceAll}
             onChange={this.changeKey.bind(this, 'forceAll').bind(this)} />
-          {!this.props.scene.playFullVideo && (
-            <React.Fragment>
-              <SimpleCheckbox
-                text={"Start Videos At Random Timestamp"}
-                isOn={this.props.scene.randomVideoStart}
-                onChange={this.changeKey.bind(this, 'randomVideoStart').bind(this)} />
-              <SimpleCheckbox
-                text={"Continue Videos From Last Timestamp"}
-                isOn={this.props.scene.continueVideo}
-                onChange={this.changeKey.bind(this, 'continueVideo').bind(this)} />
-            </React.Fragment>
-          )}
         </div>
       </ControlGroup>
     );

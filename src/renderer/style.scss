@@ -263,6 +263,22 @@ a {
     background: url("./icons/deviantart.svg") no-repeat;
   }
 
+  .u-media-play {
+    background: url("./icons/media-play.svg") no-repeat;
+  }
+
+  .u-media-pause {
+    background: url("./icons/media-pause.svg") no-repeat;
+  }
+
+  .u-media-back {
+    background: url("./icons/media-back.svg") no-repeat;
+  }
+
+  .u-media-forward {
+    background: url("./icons/media-forward.svg") no-repeat;
+  }
+
   .u-play {
     background: url("./icons/play.svg") no-repeat;
   }
@@ -270,6 +286,15 @@ a {
   .u-pause {
     background: url("./icons/pause.svg") no-repeat;
   }
+
+  .u-volume-up {
+    background: url("./icons/volume-up.svg") no-repeat;
+  }
+
+  .u-volume-down {
+    background: url("./icons/volume-down.svg") no-repeat;
+  }
+
 
   .u-left-arrow {
     background: url("./icons/left-arrow.svg") no-repeat;
@@ -281,6 +306,10 @@ a {
 
   .u-down-arrow {
     background: url("./icons/down-arrow.svg") no-repeat;
+  }
+
+  .u-add {
+    background: url("./icons/add.svg") no-repeat;
   }
 
   .u-fullscreen {
@@ -577,6 +606,33 @@ a {
 
       &.m-inline {
         display: inline;
+      }
+    }
+
+    .AudioControlGroup, .VideoControlGroup {
+      h4 {
+        margin-top: 0;
+        margin-bottom: 7px;
+      }
+
+      .VolumeControl {
+        display: flex;
+        .SimpleSliderInput {
+          flex-grow: 1;
+        }
+        .u-small-icon-button {
+          margin-top: 7px;
+        }
+      }
+
+      .TickGroup {
+        > div {
+          display: flex;
+          .SimpleNumberInput {
+            margin: -13px 8px 5px;
+            max-width: 90px;
+          }
+        }
       }
     }
   }

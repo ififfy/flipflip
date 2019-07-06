@@ -19,6 +19,7 @@ import ImageGroup from "../sceneDetail/ImageGroup";
 import TextGroup from "../sceneDetail/TextGroup";
 import StrobeGroup from "../sceneDetail/StrobeGroup";
 import ZoomMoveGroup from "../sceneDetail/ZoomMoveGroup";
+import VideoGroup from "../sceneDetail/VideoGroup";
 import Modal from "../ui/Modal";
 
 export default class ConfigForm extends React.Component {
@@ -87,6 +88,11 @@ export default class ConfigForm extends React.Component {
             onUpdateScene={this.onUpdateDefaultScene.bind(this)} />
 
           <ImageGroup
+            scene={this.state.config.defaultScene}
+            isPlayer={false}
+            onUpdateScene={this.onUpdateDefaultScene.bind(this)}/>
+
+          <VideoGroup
             scene={this.state.config.defaultScene}
             isPlayer={false}
             onUpdateScene={this.onUpdateDefaultScene.bind(this)}/>

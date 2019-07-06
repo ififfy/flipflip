@@ -724,6 +724,7 @@ export default class HeadlessScenePlayer extends React.Component {
     finishedLoading: (empty: boolean) => void,
     setProgress: (tota: number, current: number, message: string) => void,
     hasStarted: boolean,
+    setVideo(video: HTMLVideoElement): void,
   };
 
   readonly state = {
@@ -761,7 +762,8 @@ export default class HeadlessScenePlayer extends React.Component {
             toggleStrobe={this.props.toggleStrobe}
             hasStarted={this.props.hasStarted}
             allURLs={isEmpty(Array.from(this.state.allURLs.values())) ? null : this.state.allURLs}
-            onLoaded={this.props.firstImageLoaded.bind(this)}/>)}
+            onLoaded={this.props.firstImageLoaded.bind(this)}
+            setVideo={this.props.setVideo}/>)}
       </div>
     );
   }

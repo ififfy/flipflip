@@ -1,5 +1,6 @@
 import {BT, HTF, IF, SL, TF, TOT, VTF, WF, ZF} from './const';
 import LibrarySource from "../components/library/LibrarySource";
+import Audio from "../components/library/Audio";
 
 export default class Scene {
   id: number = 0;
@@ -58,7 +59,8 @@ export default class Scene {
   nextSceneTime: number = 900;
   libraryID: number = -1;
   displayedLibrary: Array<LibrarySource> = null;
-  audioURL?: string = "";
+  videoVolume = 0;
+  audios: Array<Audio> = [];
   tagWeights?: string;
   sceneWeights?: string;
 
@@ -66,6 +68,7 @@ export default class Scene {
   hastebinID: string = "";
   zoomType = "";
   effectLevel = 0;
+  audioURL?: string = "";
 
   constructor(init?: Partial<Scene>) {
     Object.assign(this, init);
@@ -96,6 +99,11 @@ export default class Scene {
     if (!this.transDuration && this.effectLevel != 0) {
       this.transDuration = this.effectLevel * 1000;
       this.effectLevel = 0;
+    }
+
+    if (this.audioURL != "") {
+      this.audios.push(new Audio({url: this.audioURL, volume: 100}));
+      this.audioURL = "";
     }
 
     if (!(this.textKind && this.textKind.length)) {

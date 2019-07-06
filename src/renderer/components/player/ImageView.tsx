@@ -120,24 +120,15 @@ export default class ImageView extends React.Component {
     transDuration: number,
     crossFade: boolean,
     fadeDuration: number,
-    continueVideo: boolean,
+    videoVolume: number,
+    setVideo(video: HTMLVideoElement): void,
   };
 
   readonly backgroundRef: React.RefObject<any> = React.createRef();
   readonly contentRef: React.RefObject<any> = React.createRef();
 
-  _durationMap= new Map<string, number>();
-
   componentDidMount() {
-    this._durationMap = new Map<string, number>();
     this._applyImage();
-  }
-
-  componentWillUpdate() {const el = this.contentRef.current;
-    if (el && el.firstChild && el.firstChild instanceof HTMLVideoElement && this.props.continueVideo) {
-      const vid = el.firstChild;
-      this._durationMap.set(vid.src, vid.currentTime);
-    }
   }
 
   componentDidUpdate() {
@@ -150,13 +141,14 @@ export default class ImageView extends React.Component {
     const img = this.props.image;
     if (!el || !img) return;
 
-    if (img instanceof HTMLVideoElement) {
-      img.play();
-    }
-
     const firstChild = el.firstChild;
     if (firstChild instanceof HTMLImageElement || firstChild instanceof HTMLVideoElement) {
       if (firstChild.src === img.src) return;
+    }
+
+    if (img instanceof HTMLVideoElement) {
+      img.volume = this.props.videoVolume / 100;
+      img.play();
     }
 
     const parentWidth = el.offsetWidth;
@@ -232,9 +224,7 @@ export default class ImageView extends React.Component {
       }
     }
 
-    if (img instanceof HTMLVideoElement && this._durationMap.has(img.src) && this.props.continueVideo) {
-      img.currentTime = this._durationMap.get(img.src);
-    }
+    this.props.setVideo(img instanceof HTMLVideoElement ? img : null);
 
     el.appendChild(img);
     if (blur) {

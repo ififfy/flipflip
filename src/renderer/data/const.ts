@@ -1,11 +1,7 @@
 const TF = {  // timing functions
   constant: 'tf.c',
-  variableFaster: 'tf.variableFaster',
-  variableFast: 'tf.variableFast',
-  variableMedium: 'tf.variableMedium',
-  variableSlow: 'tf.variableSlow',
-  variableSlower: 'tf.variableSlower',
-  variableSlowest: 'tf.variableSlowest',
+  random: 'at.random',
+  sin: 'at.sin',
 };
 
 const WF = { // weight functions
@@ -90,6 +86,13 @@ const SL = { // strobe layers
   bottom: 'sl.bottom',
 };
 
+const AT = { // audio ticks
+  constant: 'at.constant',
+  random: 'at.random',
+  sin: 'at.sin',
+  scene: 'at.scene',
+};
+
 export {
-  TF, WF, IF, ZF, HTF, VTF, TOT, BT, GT, TT, SF, ST, SL
+  TF, WF, IF, ZF, HTF, VTF, TOT, BT, GT, TT, SF, ST, SL, AT
 };

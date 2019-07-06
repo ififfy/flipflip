@@ -40,6 +40,7 @@ export default class ImagePlayer extends React.Component {
     setHistoryOffset: (historyOffset: number) => void,
     onLoaded: () => void,
     hasStarted: boolean,
+    setVideo(video: HTMLVideoElement): void,
   };
 
   readonly state = {
@@ -127,7 +128,8 @@ export default class ImagePlayer extends React.Component {
             transDuration={transDuration}
             crossFade={crossFade}
             fadeDuration={fadeDuration}
-            continueVideo={!this.props.scene.playFullVideo && this.props.scene.continueVideo}/>
+            videoVolume={this.props.scene.videoVolume}
+            setVideo={this.props.setVideo}/>
         </div>
       </div>
     );
@@ -358,7 +360,7 @@ export default class ImagePlayer extends React.Component {
     this._loadedURLs.push(url);
 
     if (isVideo(url, false)) {
-      const video = document.createElement('video');
+      let video = document.createElement('video');
       video.setAttribute("source", source);
 
       this.setState({numBeingLoaded: this.state.numBeingLoaded + 1});
@@ -388,6 +390,15 @@ export default class ImagePlayer extends React.Component {
         setTimeout(this.runFetchLoop.bind(this, i), 0);
       };
 
+      if (this.props.scene.continueVideo) {
+        const indexOf = this.state.historyPaths.map((i) => i.src).indexOf(url);
+        if (indexOf >= 0) {
+          video = this.state.historyPaths[indexOf];
+          successCallback();
+          return;
+        }
+      }
+
       video.onloadeddata = () => {
         // images may load immediately, but that messes up the setState()
         // lifecycle, so always load on the next event loop iteration.
@@ -410,9 +421,6 @@ export default class ImagePlayer extends React.Component {
 
       video.src = url;
       video.preload = "auto";
-      video.autoplay = true;
-      video.muted = true;
-      video.volume = 0;
       video.loop = true;
       video.load();
     } else {
@@ -520,14 +528,14 @@ export default class ImagePlayer extends React.Component {
     let nextImg;
     if (this.state.readyToDisplay.length) {
       nextImg = this.state.readyToDisplay.shift();
-      if (nextImg instanceof HTMLVideoElement && !this.props.scene.playFullVideo && this.props.scene.randomVideoStart) {
+      if (nextImg instanceof HTMLVideoElement && !this.props.scene.playFullVideo && this.props.scene.randomVideoStart && (!this.props.scene.continueVideo || !nextImg.currentTime)) {
         nextImg.currentTime = Math.random() * nextImg.duration;
       }
       nextHistoryPaths = nextHistoryPaths.concat([nextImg]);
     } else if (this.state.historyPaths.length) {
       // no new image ready; just pick a random one from the past 120
       nextImg = getRandomListItem(this.state.historyPaths);
-      if (nextImg instanceof HTMLVideoElement && !this.props.scene.playFullVideo && this.props.scene.randomVideoStart) {
+      if (nextImg instanceof HTMLVideoElement && !this.props.scene.playFullVideo && this.props.scene.randomVideoStart && (!this.props.scene.continueVideo || !nextImg.currentTime)) {
         nextImg.currentTime = Math.random() * nextImg.duration;
       }
       nextHistoryPaths = nextHistoryPaths.concat([nextImg]);

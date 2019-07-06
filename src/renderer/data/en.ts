@@ -1,11 +1,7 @@
 export default new Map<String, String>([
-  ['tf.c', 'Constant'],
-  ['tf.variableFaster', 'Variable - Really Fast (0.0s-0.6s)'],
-  ['tf.variableFast', 'Variable - Fast (0.2s-1.2s)'],
-  ['tf.variableMedium', 'Variable - Natural (3.0s-5.0s)'],
-  ['tf.variableSlow', 'Variable - Slow (3.5s-6.5s)'],
-  ['tf.variableSlower', 'Variable - Slower (10s-20s)'],
-  ['tf.variableSlowest', 'Variable - Slowest (30s-60s)'],
+  ['tf.c', 'Constantly'],
+  ['tf.random', 'Randomly'],
+  ['tf.sin', 'Wave'],
 
   ['wf.s', 'By Source'],
   ['wf.i', 'By Image'],
@@ -58,4 +54,9 @@ export default new Map<String, String>([
   ['sl.middle', 'Above Scene'],
   ['sl.background', 'Behind Image'],
   ['sl.bottom', 'Behind All'],
+
+  ['at.constant', 'Constantly'],
+  ['at.random', 'Randomly'],
+  ['at.sin', 'Wave'],
+  ['at.scene', 'With Scene'],
 ]);

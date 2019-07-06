@@ -27,6 +27,7 @@ interface SceneSettingsI {
   playFullVideo: boolean;
   randomVideoStart: boolean;
   continueVideo: boolean;
+  videoVolume: number;
   generatorMax: number;
   overlaySceneID: number;
   overlaySceneOpacity: number;
@@ -131,6 +132,7 @@ export class SceneSettings implements SceneSettingsI {
   playFullVideo = false;
   randomVideoStart = false;
   continueVideo = false;
+  videoVolume = 0;
   generatorMax = 100;
   overlaySceneID = 0;
   overlaySceneOpacity = 0.5;

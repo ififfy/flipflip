@@ -1,6 +1,5 @@
 import {remote} from 'electron';
 import * as React from 'react';
-import Sound from 'react-sound';
 import fs from "fs";
 import fileURL from "file-url";
 import {animated, Transition} from "react-spring/renderprops";
@@ -14,14 +13,15 @@ import ChildCallbackHack from './ChildCallbackHack';
 import HeadlessScenePlayer from './HeadlessScenePlayer';
 import Tag from "../library/Tag";
 import LibrarySource from "../library/LibrarySource";
+import Progress from "../ui/Progress";
 import AudioGroup from "../sceneDetail/AudioGroup";
 import ImageEffectGroup from "../sceneDetail/ImageEffectGroup";
 import TextGroup from "../sceneDetail/TextGroup";
-import Progress from "../ui/Progress";
 import ImageGroup from "../sceneDetail/ImageGroup";
 import SceneEffectGroup from "../sceneDetail/SceneEffectGroup";
 import StrobeGroup from "../sceneDetail/StrobeGroup";
 import ZoomMoveGroup from "../sceneDetail/ZoomMoveGroup";
+import VideoGroup from "../sceneDetail/VideoGroup";
 
 const {getCurrentWindow, Menu, MenuItem, app} = remote;
 
@@ -66,11 +66,13 @@ export default class Player extends React.Component {
     total: 0,
     progress: 0,
     progressMessage: this.props.scene.sources.length > 0 ? this.props.scene.sources[0].url : "",
-    startTime: (null as Date),
+    startTime: null as Date,
     historyOffset: 0,
     historyPaths: Array<any>(),
     imagePlayerAdvanceHack: new ChildCallbackHack(),
     imagePlayerDeleteHack: new ChildCallbackHack(),
+    mainVideo: null as HTMLVideoElement,
+    overlayVideo: null as HTMLVideoElement,
   };
 
   interval: NodeJS.Timer = null;
@@ -80,9 +82,6 @@ export default class Player extends React.Component {
   render() {
     const canGoBack = this.state.historyOffset > -(this.state.historyPaths.length - 1);
     const canGoForward = this.state.historyOffset < 0;
-    const audioPlayStatus = this.state.isPlaying
-      ? (Sound as any).status.PLAYING
-      : (Sound as any).status.PAUSED;
     const tagNames = this.props.tags ? this.props.tags.map((t) => t.name) : [];
     const hasOverlay = (this.props.scene.overlaySceneID !== 0 && this.getScene(this.props.scene.overlaySceneID) != null && this.getScene(this.props.scene.overlaySceneID).sources.length > 0);
     const showCaptionProgram = (
@@ -143,6 +142,7 @@ export default class Player extends React.Component {
             firstImageLoaded={this.setMainCanStart.bind(this)}
             setProgress={this.setProgress.bind(this)}
             hasStarted={this.state.hasStarted}
+            setVideo={this.setMainVideo.bind(this)}
           />
 
           {hasOverlay && !this.state.isEmpty && (
@@ -159,6 +159,7 @@ export default class Player extends React.Component {
               firstImageLoaded={this.setOverlayCanStart.bind(this)}
               setProgress={this.state.isMainLoaded ? this.setProgress.bind(this) : this.nop}
               hasStarted={this.state.hasStarted}
+              setVideo={this.setOverlayVideo.bind(this)}
             />
           )}
         </div>
@@ -182,15 +183,8 @@ export default class Player extends React.Component {
 
         <div className={`u-button-row ${this.state.hasStarted && this.state.isPlaying ? 'u-show-on-hover-only' : ''}`}>
           <div className="u-button-row-right">
-            {this.props.scene.audioURL && this.state.hasStarted && (
-              <Sound
-                url={this.props.scene.audioURL}
-                playStatus={audioPlayStatus}
-                loop={true}
-              />
-            )}
             <div
-              className={`FullscreenButton u-button u-icon-button u-clickable`}
+              className="FullscreenButton u-button u-icon-button u-clickable"
               title="Toggle Fullscreen"
               onClick={this.toggleFull.bind(this)}>
               <div className="u-fullscreen"/>
@@ -230,6 +224,16 @@ export default class Player extends React.Component {
         {this.state.hasStarted && (
           <div className="SceneOptions ControlGroupGroup u-button-sidebar">
             <h2 className="SceneOptionsHeader">Scene Options</h2>
+            <VideoGroup
+              scene={this.props.scene}
+              overlayScene={this.getScene(this.props.scene.overlaySceneID)}
+              isPlaying={this.state.isPlaying}
+              mainVideo={this.state.mainVideo}
+              overlayVideo={this.state.overlayVideo}
+              isPlayer={true}
+              onUpdateScene={this.props.onUpdateScene.bind(this)}
+            />
+
             <SceneEffectGroup
               scene={this.props.scene}
               showAll={this.props.tags == null}
@@ -255,6 +259,9 @@ export default class Player extends React.Component {
 
             <AudioGroup
               scene={this.props.scene}
+              isPlaying={this.state.isPlaying}
+              isPlayer={true}
+              scenePaths={this.state.historyPaths}
               onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
             <TextGroup
@@ -508,6 +515,14 @@ export default class Player extends React.Component {
     if (this.state.isMainLoaded) {
       this.start();
     }
+  }
+
+  setMainVideo(video: HTMLVideoElement) {
+    this.setState({mainVideo: video});
+  }
+
+  setOverlayVideo(video: HTMLVideoElement) {
+    this.setState({overlayVideo: video});
   }
 
   start() {

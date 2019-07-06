@@ -7,6 +7,7 @@ import ImageEffectGroup from "./ImageEffectGroup";
 import SceneEffectGroup from "./SceneEffectGroup";
 import ImageGroup from "./ImageGroup";
 import TextGroup from "./TextGroup";
+import VideoGroup from "./VideoGroup";
 import LibrarySource from "../library/LibrarySource";
 import Config from "../../data/Config";
 import StrobeGroup from "./StrobeGroup";
@@ -117,6 +118,12 @@ export default class SceneDetail extends React.Component {
 
           <AudioGroup
             scene={this.props.scene}
+            isPlayer={false}
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+
+          <VideoGroup
+            scene={this.props.scene}
+            isPlayer={false}
             onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
           <TextGroup
