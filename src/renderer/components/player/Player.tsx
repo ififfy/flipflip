@@ -58,8 +58,8 @@ export default class Player extends React.Component {
     hasStarted: false,
     canMainStart: false,
     isMainLoaded: false,
-    canOverlayStart: false,
-    isOverlayLoaded: false,
+    canOverlaysStart: Array<boolean>(this.getValidOverlays().length).fill(false),
+    areOverlaysLoaded: Array<boolean>(this.getValidOverlays().length).fill(false),
     isEmpty: false,
     isPlaying: true,
     toggleStrobe: false,
@@ -72,7 +72,7 @@ export default class Player extends React.Component {
     imagePlayerAdvanceHack: new ChildCallbackHack(),
     imagePlayerDeleteHack: new ChildCallbackHack(),
     mainVideo: null as HTMLVideoElement,
-    overlayVideo: null as HTMLVideoElement,
+    overlayVideos: Array<HTMLVideoElement>(this.getValidOverlays().length).fill(null),
   };
 
   interval: NodeJS.Timer = null;
@@ -83,14 +83,12 @@ export default class Player extends React.Component {
     const canGoBack = this.state.historyOffset > -(this.state.historyPaths.length - 1);
     const canGoForward = this.state.historyOffset < 0;
     const tagNames = this.props.tags ? this.props.tags.map((t) => t.name) : [];
-    const hasOverlay = (this.props.scene.overlaySceneID !== 0 && this.getScene(this.props.scene.overlaySceneID) != null && this.getScene(this.props.scene.overlaySceneID).sources.length > 0);
+    const validOverlays = this.getValidOverlays();
     const showCaptionProgram = (
       this.props.scene.textSource &&
       this.props.scene.textSource.length &&
       this.state.isPlaying);
     const nextScene = this.getScene(this.props.scene.nextSceneID);
-    const nextOverlay = nextScene ? this.getScene(nextScene.overlaySceneID) : null;
-
     const strobeOpacity = this.props.scene.strobeLayer == SL.bottom ? this.props.scene.strobeOpacity : 1;
 
     return (
@@ -145,22 +143,33 @@ export default class Player extends React.Component {
             setVideo={this.setMainVideo.bind(this)}
           />
 
-          {hasOverlay && !this.state.isEmpty && (
-            <HeadlessScenePlayer
-              config={this.props.config}
-              scene={this.getScene(this.props.scene.overlaySceneID)}
-              nextScene={nextOverlay}
-              opacity={this.props.scene.overlaySceneOpacity}
-              isPlaying={this.state.isPlaying && !this.state.isEmpty}
-              historyOffset={0}
-              setHistoryOffset={this.nop}
-              setHistoryPaths={this.nop}
-              finishedLoading={this.setOverlayLoaded.bind(this)}
-              firstImageLoaded={this.setOverlayCanStart.bind(this)}
-              setProgress={this.state.isMainLoaded ? this.setProgress.bind(this) : this.nop}
-              hasStarted={this.state.hasStarted}
-              setVideo={this.setOverlayVideo.bind(this)}
-            />
+          {validOverlays.length > 0 && !this.state.isEmpty && validOverlays.map((overlay, index) => {
+            let showProgress = this.state.isMainLoaded && !this.state.hasStarted;
+            if (showProgress) {
+              for (let x=0; x < index; x++) {
+                if (!this.state.areOverlaysLoaded[x]) {
+                  showProgress = false;
+                  break;
+                }
+              }
+            }
+            return (
+              <HeadlessScenePlayer
+                key={overlay.id}
+                config={this.props.config}
+                scene={this.getScene(overlay.sceneID)}
+                opacity={overlay.opacity / 100}
+                isPlaying={this.state.isPlaying && !this.state.isEmpty}
+                historyOffset={0}
+                setHistoryOffset={this.nop}
+                setHistoryPaths={this.nop}
+                finishedLoading={this.setOverlayLoaded.bind(this, overlay.id)}
+                firstImageLoaded={this.setOverlayCanStart.bind(this, overlay.id)}
+                setProgress={showProgress ? this.setProgress.bind(this) : this.nop}
+                hasStarted={this.state.hasStarted}
+                setVideo={this.setOverlayVideo.bind(this, overlay.id)}
+              />
+            );}
           )}
         </div>
 
@@ -226,10 +235,10 @@ export default class Player extends React.Component {
             <h2 className="SceneOptionsHeader">Scene Options</h2>
             <VideoGroup
               scene={this.props.scene}
-              overlayScene={this.getScene(this.props.scene.overlaySceneID)}
+              overlayScenes={this.getValidOverlays().map((o) => this.getScene(o.sceneID))}
               isPlaying={this.state.isPlaying}
               mainVideo={this.state.mainVideo}
-              overlayVideo={this.state.overlayVideo}
+              overlayVideos={this.state.overlayVideos}
               isPlayer={true}
               onUpdateScene={this.props.onUpdateScene.bind(this)}
             />
@@ -481,19 +490,30 @@ export default class Player extends React.Component {
     contextMenu.popup({});
   };
 
+  getValidOverlays() {
+    return this.props.scene.overlays.filter((o) => {
+      if (o.sceneID == 0) return false;
+      const getO = this.getScene(o.sceneID);
+      return (getO != null && getO.sources.length > 0);
+    });
+  }
+
   setMainCanStart() {
     if (!this.state.canMainStart) {
       this.setState({canMainStart: true, isEmpty: false});
-      if (this.props.scene.overlaySceneID === 0 || this.getScene(this.props.scene.overlaySceneID) == null || this.state.canOverlayStart) {
+      if (this.getValidOverlays().length == 0 || this.state.canOverlaysStart.find((b) => !b) == null) {
         this.play();
       }
     }
   }
 
-  setOverlayCanStart() {
-    if (!this.state.canOverlayStart) {
-      this.setState({canOverlayStart: true});
-      if (this.state.canMainStart) {
+  setOverlayCanStart(id: number) {
+    if (this.state.canOverlaysStart.find((b) => !b) != null) {
+      const newCOS = this.state.canOverlaysStart;
+      const indexOf = this.getValidOverlays().map((o) => o.id).indexOf(id);
+      newCOS[indexOf] = true;
+      this.setState({canOverlayStart: newCOS});
+      if (this.state.canOverlaysStart.find((b) => !b) == null && this.state.canMainStart) {
         this.play();
       }
     }
@@ -504,15 +524,18 @@ export default class Player extends React.Component {
       this.setState({isEmpty: empty});
     } else {
       this.setState({isMainLoaded: true});
-      if (this.props.scene.overlaySceneID === 0 || this.getScene(this.props.scene.overlaySceneID) == null || this.state.isOverlayLoaded) {
+      if (this.getValidOverlays().length == 0 || this.state.areOverlaysLoaded.find((b) => !b) == null) {
         this.start();
       }
     }
   }
 
-  setOverlayLoaded(empty: boolean) {
-    this.setState({isOverlayLoaded: true});
-    if (this.state.isMainLoaded) {
+  setOverlayLoaded(id: number, empty: boolean) {
+    const newAOL = this.state.areOverlaysLoaded;
+    const indexOf = this.getValidOverlays().map((o) => o.id).indexOf(id);
+    newAOL[indexOf] = true;
+    this.setState({areOverlaysLoaded: newAOL});
+    if (this.state.areOverlaysLoaded.find((b) => !b) == null && this.state.isMainLoaded) {
       this.start();
     }
   }
@@ -521,8 +544,11 @@ export default class Player extends React.Component {
     this.setState({mainVideo: video});
   }
 
-  setOverlayVideo(video: HTMLVideoElement) {
-    this.setState({overlayVideo: video});
+  setOverlayVideo(id: number, video: HTMLVideoElement) {
+    const newOV = this.state.overlayVideos;
+    const indexOf = this.getValidOverlays().map((o) => o.id).indexOf(id);
+    newOV[indexOf] = video;
+    this.setState({overlayVideos: newOV});
   }
 
   start() {

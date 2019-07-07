@@ -1,6 +1,7 @@
 import {BT, HTF, IF, SL, TF, TOT, VTF, WF} from './const';
 import LibrarySource from "../components/library/LibrarySource";
 import Audio from "../components/library/Audio";
+import Overlay from "../components/library/Overlay";
 
 export default class Scene {
   id: number = 0;
@@ -56,8 +57,7 @@ export default class Scene {
   countFontSize = 20;
   countFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
   generatorMax = 100;
-  overlaySceneID: number = 0;
-  overlaySceneOpacity: number = 0.5;
+  overlays: Array<Overlay> = [];
   nextSceneID: number = 0;
   nextSceneTime: number = 900;
   libraryID: number = -1;
@@ -72,15 +72,12 @@ export default class Scene {
   zoomType = "";
   effectLevel = 0;
   audioURL?: string = "";
+  overlaySceneID: number = 0;
+  overlaySceneOpacity: number = 0.5;
 
   constructor(init?: Partial<Scene>) {
     Object.assign(this, init);
     this.sources = this.sources.filter((d) => !!d);
-
-    this.overlaySceneID = parseInt(this.overlaySceneID as any, 10);
-    if (!this.overlaySceneOpacity) {
-      this.overlaySceneOpacity = 0.5;
-    }
 
     if (this.hastebinID.length && !(this.textSource && this.textSource.length)) {
       this.textKind = TOT.hastebin;
@@ -102,6 +99,10 @@ export default class Scene {
     if (!this.transDuration && this.effectLevel != 0) {
       this.transDuration = this.effectLevel * 1000;
       this.effectLevel = 0;
+    }
+    if (this.overlaySceneID != 0) {
+      this.overlays.push(new Overlay({sceneID: this.overlaySceneID, opacity: this.overlaySceneOpacity}));
+      this.overlaySceneID = 0;
     }
 
     if (this.audioURL && this.audioURL != "") {

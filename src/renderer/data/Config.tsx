@@ -1,7 +1,8 @@
 import {BT, HTF, IF, SL, TF, VTF, WF} from "./const";
+import Overlay from "../components/library/Overlay";
 
 interface SceneSettingsI {
-  [key: string]: string|number|boolean;
+  [key: string]: string|number|boolean|Array<Overlay>;
   timingFunction: string;
   timingConstant: number;
   timingMin: number;
@@ -32,8 +33,7 @@ interface SceneSettingsI {
   continueVideo: boolean;
   videoVolume: number;
   generatorMax: number;
-  overlaySceneID: number;
-  overlaySceneOpacity: number;
+  overlays: Array<Overlay>;
   textKind: string;
   textSource: string;
 
@@ -108,7 +108,7 @@ interface DisplaySettingsI {
 }
 
 export class SceneSettings implements SceneSettingsI {
-  [key: string]: string | number | boolean;
+  [key: string]: string | number | boolean | Array<Overlay>;
 
   timingFunction = TF.constant;
   timingConstant = 1000;
@@ -140,8 +140,7 @@ export class SceneSettings implements SceneSettingsI {
   continueVideo = false;
   videoVolume = 0;
   generatorMax = 100;
-  overlaySceneID = 0;
-  overlaySceneOpacity = 0.5;
+  overlays: Array<Overlay> = [];
   nextSceneID = 0;
   nextSceneTime = 900;
   textKind = "";

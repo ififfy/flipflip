@@ -710,7 +710,7 @@ export default class HeadlessScenePlayer extends React.Component {
   readonly props: {
     config: Config,
     scene: Scene,
-    nextScene: Scene,
+    nextScene?: Scene,
     opacity: number,
     isPlaying: boolean,
     strobeLayer?: string,
@@ -925,7 +925,8 @@ export default class HeadlessScenePlayer extends React.Component {
       props.toggleStrobe !== this.props.toggleStrobe ||
       props.hasStarted !== this.props.hasStarted ||
       state.restart !== this.state.restart ||
-      state.promise.source !== this.state.promise.source);
+      state.promise.source !== this.state.promise.source ||
+      (state.allURLs.size > 0 && this.state.allURLs.size == 0));
   }
 
   componentWillReceiveProps(props: any) {
