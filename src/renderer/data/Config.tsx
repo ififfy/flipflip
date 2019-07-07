@@ -3,7 +3,10 @@ import {BT, HTF, IF, SL, TF, VTF, WF} from "./const";
 interface SceneSettingsI {
   [key: string]: string|number|boolean;
   timingFunction: string;
-  timingConstant: string;
+  timingConstant: number;
+  timingMin: number;
+  timingMax: number;
+  timingSinRate: number;
   imageTypeFilter: string;
   weightFunction: string;
   randomize: boolean;
@@ -108,7 +111,10 @@ export class SceneSettings implements SceneSettingsI {
   [key: string]: string | number | boolean;
 
   timingFunction = TF.constant;
-  timingConstant = "1000";
+  timingConstant = 1000;
+  timingMin = 200;
+  timingMax = 1200;
+  timingSinRate = 100;
   imageTypeFilter = IF.any;
   weightFunction = WF.sources;
   randomize = true;

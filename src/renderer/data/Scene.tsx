@@ -1,4 +1,4 @@
-import {BT, HTF, IF, SL, TF, TOT, VTF, WF, ZF} from './const';
+import {BT, HTF, IF, SL, TF, TOT, VTF, WF} from './const';
 import LibrarySource from "../components/library/LibrarySource";
 import Audio from "../components/library/Audio";
 
@@ -7,7 +7,10 @@ export default class Scene {
   name: string = "Unnamed scene";
   sources: Array<LibrarySource> = [];
   timingFunction = TF.constant;
-  timingConstant = "1000";
+  timingConstant = 1000;
+  timingMin = 200;
+  timingMax = 1200;
+  timingSinRate = 100;
   weightFunction = WF.sources;
   randomize = true;
   forceAll = false;
@@ -86,9 +89,9 @@ export default class Scene {
     }
 
     if (!this.zoom && this.zoomType != "") {
-      if (this.zoomType == ZF.in) {
+      if (this.zoomType == 'zf.in') {
         this.zoom = true;
-      } else if (this.zoomType == ZF.out) {
+      } else if (this.zoomType == 'zf.out') {
         this.zoom = true;
         this.zoomStart = 1.5;
         this.zoomEnd = 1.;
@@ -101,30 +104,34 @@ export default class Scene {
       this.effectLevel = 0;
     }
 
-    if (this.audioURL != "") {
-      this.audios.push(new Audio({url: this.audioURL, volume: 100}));
+    if (this.audioURL && this.audioURL != "") {
+      this.audios.push(new Audio({url: this.audioURL}));
       this.audioURL = "";
+    }
+
+    if (typeof this.timingConstant == "string") {
+      this.timingConstant = parseInt(this.timingConstant, 10);
+    }
+
+    if (this.timingFunction == 'tf.variableFaster') {
+      this.timingMin = 0;
+      this.timingMax = 600;
+    } else if (this.timingFunction == 'tf.variableMedium') {
+      this.timingMin = 3000;
+      this.timingMax = 5000;
+    } else if (this.timingFunction == 'tf.variableSlow') {
+      this.timingMin = 3500;
+      this.timingMax = 6500;
+    } else if (this.timingFunction == 'tf.variableSlower') {
+      this.timingMin = 10000;
+      this.timingMax = 20000;
+    } else if (this.timingFunction == 'tf.variableSlowest') {
+      this.timingMin = 30000;
+      this.timingMax = 60000;
     }
 
     if (!(this.textKind && this.textKind.length)) {
       this.textKind = TOT.url;
-    }
-
-    // backward compatible with 1.0.1
-    if (!this.timingFunction.startsWith('tf.')) {
-      this.timingFunction = 'tf.' + this.timingFunction;
-    }
-    if (Object.values(TF).indexOf(this.timingFunction) < 0) {
-      this.timingFunction = TF.constant;
-      this.timingConstant = "1000";
-    }
-
-    // backward compatible with 1.0.1
-    if (!this.imageTypeFilter.startsWith('if.')) {
-      this.imageTypeFilter = 'if.' + this.imageTypeFilter;
-    }
-    if (Object.values(IF).indexOf(this.imageTypeFilter) < 0) {
-      this.imageTypeFilter = IF.any;
     }
   }
 }

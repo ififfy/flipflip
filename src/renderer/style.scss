@@ -609,6 +609,16 @@ a {
       }
     }
 
+    .TimingControlGroup {
+      > div {
+        display: flex;
+        .SimpleNumberInput {
+          margin: -13px 8px 5px;
+          max-width: 90px;
+        }
+      }
+    }
+
     .AudioControlGroup, .VideoControlGroup {
       h4 {
         margin-top: 0;

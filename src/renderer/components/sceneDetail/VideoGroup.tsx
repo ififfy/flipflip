@@ -18,6 +18,7 @@ export default class VideoGroup extends React.Component {
   };
 
   render() {
+    if (!this.props.mainVideo && !this.props.overlayVideo && this.props.isPlayer) return <div/>;
     return (
       <ControlGroup title="Video Controls" isNarrow={true}>
         <div className="ControlSubgroup VideoControlGroup m-inline">

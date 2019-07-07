@@ -15,13 +15,6 @@ const IF = { // image filters
   stills: 'if.stills',
 };
 
-// DEPRECATED
-const ZF = { // zoom functions
-  none: 'zf.none',
-  in: 'zf.in',
-  out: 'zf.out',
-};
-
 const BT = { // background type
   blur: 'bt.blur',
   color: 'bt.color',
@@ -94,5 +87,5 @@ const AT = { // audio ticks
 };
 
 export {
-  TF, WF, IF, ZF, HTF, VTF, TOT, BT, GT, TT, SF, ST, SL, AT
+  TF, WF, IF, HTF, VTF, TOT, BT, GT, TT, SF, ST, SL, AT
 };

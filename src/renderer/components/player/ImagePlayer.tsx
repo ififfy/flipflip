@@ -13,7 +13,6 @@ import {HTF, IF, SL, ST, TF, VTF, WF} from '../../data/const';
 import {getCachePath, getFileName, getRandomListItem, getSourceType, isVideo, urlToPath} from '../../data/utils';
 import Config from "../../data/Config";
 import Scene from "../../data/Scene";
-import TIMING_FUNCTIONS from '../../data/TIMING_FUNCTIONS';
 import ChildCallbackHack from './ChildCallbackHack';
 import ImageView from './ImageView';
 
@@ -554,14 +553,21 @@ export default class ImagePlayer extends React.Component {
       this.props.setHistoryPaths(nextHistoryPaths);
     } else {
       let timeToNextFrame: number = 0;
-      if (this.props.scene.timingFunction === TF.constant) {
-        timeToNextFrame = parseInt(this.props.scene.timingConstant, 10);
-        // If we cannot parse this, default to 1s
-        if (!timeToNextFrame && timeToNextFrame != 0) {
-          timeToNextFrame = 1000;
-        }
-      } else {
-        timeToNextFrame = TIMING_FUNCTIONS.get(this.props.scene.timingFunction)();
+      switch (this.props.scene.timingFunction) {
+        case TF.random:
+          timeToNextFrame = Math.floor(Math.random() * (this.props.scene.timingMax - this.props.scene.timingMin + 1)) + this.props.scene.timingMin;
+          break;
+        case TF.sin:
+          const sinRate = (Math.abs(this.props.scene.timingSinRate - 100) + 2) * 1000;
+          timeToNextFrame = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (this.props.scene.timingMax - this.props.scene.timingMin + 1)) + this.props.scene.timingMin;
+          break;
+        case TF.constant:
+          timeToNextFrame = this.props.scene.timingConstant;
+          // If we cannot parse this, default to 1s
+          if (!timeToNextFrame && timeToNextFrame != 0) {
+            timeToNextFrame = 1000;
+          }
+          break;
       }
       if (nextImg && nextImg.getAttribute("duration") && timeToNextFrame < parseInt(nextImg.getAttribute("duration"))) {
         timeToNextFrame = parseInt(nextImg.getAttribute("duration"));

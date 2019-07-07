@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Sound from "react-sound";
+import Timeout = NodeJS.Timeout;
 
 import {AT} from "../../data/const";
 import Audio from "../library/Audio";
@@ -39,6 +40,7 @@ export default class AudioControl extends React.Component {
   };
 
   _audio = "";
+  _timeout: Timeout = null;
 
   shouldComponentUpdate(props: any, state: any) {
     let audio = JSON.parse(this._audio);
@@ -50,6 +52,7 @@ export default class AudioControl extends React.Component {
       (audio.tickDelay !== props.audio.tickDelay) ||
       (audio.tickMinDelay !== props.audio.tickMinDelay) ||
       (audio.tickMaxDelay !== props.audio.tickMaxDelay) ||
+      (audio.tickSinRate !== props.audio.tickSinRate) ||
       (this.props.scenePaths !== props.scenePaths) ||
       (this.props.isPlaying !== props.isPlaying) ||
       (this.state.playing !== state.playing) ||
@@ -84,7 +87,13 @@ export default class AudioControl extends React.Component {
     }
     this._audio=JSON.stringify(this.props.audio);
   }
-  
+
+  componentWillUnmount() {
+    if(this._timeout != null) {
+      clearTimeout(this._timeout);
+    }
+  }
+
   render() {
     const playing = this.state.playing
       ? (Sound as any).status.PLAYING
@@ -214,6 +223,17 @@ export default class AudioControl extends React.Component {
               ms
             </div>
           )}
+          {this.props.audio.tick && this.props.audio.tickMode == AT.sin && (
+            <div>
+              <SimpleSliderInput
+                label={`Wave Rate: ${this.props.audio.tickSinRate}`}
+                min={1}
+                max={100}
+                value={this.props.audio.tickSinRate}
+                isEnabled={true}
+                onChange={this.props.onEditKey.bind(this, 'tickSinRate')}/>
+            </div>
+          )}
         </div>
         <div className="VolumeControl">
           <div
@@ -241,18 +261,25 @@ export default class AudioControl extends React.Component {
       this.setState({tick: !this.state.tick});
     }
     if (this.props.audio.tick) {
+      let timeout: number = null;
       switch (this.props.audio.tickMode) {
         case AT.random:
-          setTimeout(this.tickLoop.bind(this), (Math.random() * this.props.audio.tickMaxDelay) + this.props.audio.tickMinDelay);
+          timeout = Math.floor(Math.random() * (this.props.audio.tickMaxDelay - this.props.audio.tickMinDelay + 1)) + this.props.audio.tickMinDelay;
           break;
         case AT.sin:
-          setTimeout(this.tickLoop.bind(this), ((Math.sin(Date.now() / 1000) + 1) / 2 * (this.props.audio.tickMaxDelay - this.props.audio.tickMinDelay)) + this.props.audio.tickMinDelay);
+          const sinRate = (Math.abs(this.props.audio.tickSinRate - 100) + 2) * 1000;
+          timeout = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (this.props.audio.tickMaxDelay - this.props.audio.tickMinDelay + 1)) + this.props.audio.tickMinDelay;
           break;
         case AT.constant:
-          setTimeout(this.tickLoop.bind(this), this.props.audio.tickDelay);
+          timeout = this.props.audio.tickDelay;
           break;
       }
+      if (timeout != null) {
+        this._timeout = setTimeout(this.tickLoop.bind(this), timeout);
+        return
+      }
     }
+    this._timeout = null;
   }
 
   onPlay() {

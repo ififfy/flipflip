@@ -18,12 +18,16 @@ export default class AudioGroup extends React.Component {
     return (
       <ControlGroup title="Audio" isNarrow={true}>
         <div className="ControlSubgroup AudioControlGroup m-inline">
-          <h4 style={{float: 'left'}}>Scene Audio</h4>
           <div className="u-small-icon-button u-clickable"
-               style={{float: 'right'}}
+               style={{float: 'left', marginRight: '5px', marginBottom: '7px'}}
                onClick={this.onAdd.bind(this)}
                title="Add Audio">
             <div className="u-add"/>
+          </div>
+          <div className="u-clickable"
+               style={{color: '#010101'}}
+               onClick={this.onAdd.bind(this)}>
+            Add a new track
           </div>
           <div style={{clear: 'both'}}>
             {this.props.scene.audios.map((a, i) =>
@@ -59,7 +63,7 @@ export default class AudioGroup extends React.Component {
   onEditKey(id: number, key: string, value: string) {
     const newAudios = Array.from(this.props.scene.audios);
     const audio: any = newAudios.find((a) => a.id == id);
-    if (["volume", "speed", "tickDelay", "tickMinDelay", "tickMaxDelay"].includes(key)) {
+    if (["volume", "speed", "tickDelay", "tickMinDelay", "tickMaxDelay", "tickSinRate"].includes(key)) {
       audio[key] = parseInt(value, 10);
     } else {
       audio[key] = value;
@@ -72,7 +76,7 @@ export default class AudioGroup extends React.Component {
     this.props.scene.audios.forEach((a) => {
       id = Math.max(a.id + 1, id);
     });
-    const newAudios = this.props.scene.audios.concat([new Audio({id: id, url: "", volume: 100})]);
+    const newAudios = this.props.scene.audios.concat([new Audio({id: id, url: ""})]);
     this.update((s) => {s.audios = newAudios});
   }
 

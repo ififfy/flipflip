@@ -25,14 +25,50 @@ export default class SceneEffectGroup extends React.Component {
             label="Timing"
             value={this.props.scene.timingFunction}
             keys={Object.values(TF)}/>
-          {this.props.scene.timingFunction == TF.constant && (
-            <SimpleNumberInput
-              isEnabled={this.props.scene.timingFunction === TF.constant}
-              onChange={this.changeKey.bind(this, 'timingConstant').bind(this)}
-              label="Time between images (ms)"
-              value={parseInt(this.props.scene.timingConstant, 10)}
-              min={0}/>
-          )}
+          <div className="TimingControlGroup">
+            {this.props.scene.timingFunction == TF.constant && (
+              <div>
+                Every
+                <SimpleNumberInput
+                  label=""
+                  value={this.props.scene.timingConstant}
+                  isEnabled={true}
+                  min={0}
+                  onChange={this.changeKey.bind(this, 'timingConstant').bind(this)}/>
+                ms
+              </div>
+            )}
+            {(this.props.scene.timingFunction == TF.random || this.props.scene.timingFunction == TF.sin) && (
+              <div>
+                Between
+                <SimpleNumberInput
+                  label=""
+                  value={this.props.scene.timingMin}
+                  isEnabled={true}
+                  min={0}
+                  onChange={this.changeKey.bind(this, 'timingMin').bind(this)}/>
+                ms and
+                <SimpleNumberInput
+                  label=""
+                  value={this.props.scene.timingMax}
+                  isEnabled={true}
+                  min={0}
+                  onChange={this.changeKey.bind(this, 'timingMax').bind(this)}/>
+                ms
+              </div>
+            )}
+            {this.props.scene.timingFunction == TF.sin && (
+              <div>
+                <SimpleSliderInput
+                  label={`Wave Rate: ${this.props.scene.timingSinRate}`}
+                  min={1}
+                  max={100}
+                  value={this.props.scene.timingSinRate}
+                  isEnabled={true}
+                  onChange={this.changeKey.bind(this, 'timingSinRate').bind(this)}/>
+              </div>
+            )}
+          </div>
         </div>
 
         {this.props.showAll && (
@@ -91,7 +127,11 @@ export default class SceneEffectGroup extends React.Component {
   }
 
   changeKey(key: string, value: any) {
-    this.update((s) => s[key] = value);
+    if (["timingConstant", "timingMin", "timingMax", "timingSinRate", "nextSceneTime"].includes(key)) {
+      this.update((s) => s[key] = parseInt(value, 10));
+    } else {
+      this.update((s) => s[key] = value);
+    }
   }
 
   onChangeOverlaySceneOpacity(value: number) { this.update((s) => { s.overlaySceneOpacity = value / 100 }); }
