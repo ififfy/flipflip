@@ -68,8 +68,6 @@ export default class Scene {
   sceneWeights?: string;
 
   // unused; migration only
-  hastebinID: string = "";
-  zoomType = "";
   effectLevel = 0;
   audioURL?: string = "";
   overlaySceneID: number = 0;
@@ -78,23 +76,6 @@ export default class Scene {
   constructor(init?: Partial<Scene>) {
     Object.assign(this, init);
     this.sources = this.sources.filter((d) => !!d);
-
-    if (this.hastebinID.length && !(this.textSource && this.textSource.length)) {
-      this.textKind = TOT.hastebin;
-      this.textSource = this.hastebinID;
-      this.hastebinID = "";
-    }
-
-    if (!this.zoom && this.zoomType != "") {
-      if (this.zoomType == 'zf.in') {
-        this.zoom = true;
-      } else if (this.zoomType == 'zf.out') {
-        this.zoom = true;
-        this.zoomStart = 1.5;
-        this.zoomEnd = 1.;
-      }
-      this.zoomType = "";
-    }
 
     if (!this.transDuration && this.effectLevel != 0) {
       this.transDuration = this.effectLevel * 1000;

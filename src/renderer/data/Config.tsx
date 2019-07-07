@@ -60,6 +60,10 @@ interface SceneSettingsI {
   countColor: string;
   countFontSize: number;
   countFontFamily: string;
+
+  // migration only
+  overlaySceneID: number;
+  overlaySceneOpacity: number;
 }
 
 interface RemoteSettingsI {
@@ -169,6 +173,10 @@ export class SceneSettings implements SceneSettingsI {
   countColor = "#FFFFFF";
   countFontSize = 20;
   countFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
+
+  // migration only
+  overlaySceneID = 0;
+  overlaySceneOpacity = 0.5;
 }
 
 export class RemoteSettings implements RemoteSettingsI {
@@ -236,6 +244,8 @@ export default class Config {
 
   constructor(init?: Partial<Config>) {
     Object.assign(this, init);
+
+    if (this.defaultScene.overlaySceneID != 0) this.defaultScene.overlaySceneID = 0;
 
     // Add any missing keys (keeps config up-to-date)
     for (let key of Object.keys(new SceneSettings())) {
