@@ -206,9 +206,13 @@ function loadTumblr(config: Config, url: string, filter: string, next: any): Can
             }
           }
           if (post.body) {
-            const regex = /<img[^(?:src|\/>)]*src=["']([^"']*)[^(?:\/>)]*\/?>/g;
+            const regex = /<img[^(?:src|\/>)]*src=["']([^"']*)[^>]*>/g;
             let imageSource;
             while ((imageSource = regex.exec(post.body)) !== null) {
+              images.push(imageSource[1]);
+            }
+            const regex2 = /<source[^(?:src|\/>)]*src=["']([^"']*)[^>]*>/g;
+            while ((imageSource = regex2.exec(post.body)) !== null) {
               images.push(imageSource[1]);
             }
           }
