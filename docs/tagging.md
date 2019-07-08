@@ -21,6 +21,8 @@ To tag a source in the Library, click the name of the source. This will start a 
 To modify the tags, hover towards the bottom of the screen and you will see your tags appear. Toggle tags on/off as 
 desired by clicking on them. When you're done, click "Back" to return to the Library.
 
+While Tagging, use `[` and `]` to jump to Tagging the previous/next visible source in the Library. 
+
 ![](doc_images/tagging.png)
 
 ## Batch Tagging

@@ -37,8 +37,8 @@ Let's create a simple scene to get you familiar with how things will work
 ## Your first slideshow
 Great! Now your sources have loaded and the slideshow has started!
 
-All scene options (except the image filter) can also be changed while playing a slideshow by hovering 
-over the sidebar on the left.
+Video/Audio controls and all scene options (except the image filter) can also be accessed by hovering 
+over the sidebar on the left while the slideshow is playing.
                                                       
 ![](doc_images/player_options.png) 
 

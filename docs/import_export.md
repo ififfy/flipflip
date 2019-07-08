@@ -10,6 +10,8 @@ left. Save the file and share where you'd like.
 This file is just a long line of text which holds the data about your Scene's configuration. You could also just 
 post this text online for someone to import with (you don't have to share the file directly).
 
+Any overlays will also be exported with this scene. However, those overlays' overlays will not.
+
 ?> NOTE: _Due to the nature of FlipFlip scenes, we don't recommend you try and import/export Scenes with local 
 directories. This will technically work, but the import/exporter would have to have the same file paths (or will 
 have to modify them manually). In addition, any exported Generators will be imported as regular Scenes._
@@ -20,6 +22,8 @@ alt="Import" width="20" height="20"> ) on the Home page. You will be prompted to
 
 If you have a `.json` export file, simply select it and your Scene will import. If you got a line of text from 
 someone, paste it into a file and save it. Then pick that file during the import.
+
+The imported Scene (and any overlays) will be created and you will be brought to the Scene.
 
 ## Library Export
 To export your Library, click the `Export` button ( <img style="vertical-align: -5px" src="doc_icons/export.svg" 

@@ -15,7 +15,7 @@ click `Start Now` when it appears. You can also configure all scenes to start im
 
 ## Playback controls
 All scene options (except the image filter) can also be changed while playing a slideshow by hovering over the sidebar 
-on the left.
+on the left. This is also where you will find video/audio playback controls.
 
 ![](doc_images/player_options.png)
 
@@ -29,6 +29,9 @@ given options to view it in Explorer/Finder or delete it from the system (handy 
 FlipFlip). 
 
 If it is for a remote file and you have enabled caching, a link to the caching directory is also provided.
+
+If this source is in your Library, "GoTo Tag Source" will bring you to Taggin for that source. 
+When you click "Back" you will be brought back to the scene that was playing.
 
 ![](doc_images/image_context_menu.png)
 
@@ -46,5 +49,6 @@ These controls are also available in the bar at the top.
 | Del                   | Delete Image         |
 | **⌘+F** / **Ctrl+F** | Toggle Fullscreen    |
 | **⌘+T** / **Ctrl+T** | Toggle Always On Top |
-| **⌘+^** / **Ctrl+^** | Toggle Menu Bar      |
+| **⌘+G** / **Ctrl+G** | Toggle Menu Bar      |
+| [ ]                   | Navigate Tagging     |
 

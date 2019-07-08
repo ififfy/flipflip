@@ -1,5 +1,28 @@
 # Changelog
 
+## 2.2.1  <small>(07/08/2019)</small>
+- Audio/Video controls
+- Sound in videos
+- Support for WebM and OGG
+- Use multiple overlay layers
+- Use multiple audio layers
+- Ability to tick audio at set/random intervals
+- Finer control over image timing
+- Add context option to go to source tagging
+- Use [ and ] to navigate between sources while tagging
+- Add option for no background
+- Add strobe layer between image and background
+- Add option to play full video
+- Add option to start at random spot in video
+- Add option to continue videos from last timestamp
+- Add Marked filter
+- Export/Import scenes with overlay(s)
+- Fix hover for marked/offline in Library
+- Fix bug hiding Timing while tagging
+- Fix bug with "Next Scene"
+- Fix bug with zoom config 
+- Fix typo in Tumblr alert
+
 ## 2.2.0  <small>(06/24/2019)</small>
 - UI Improvements
 - Allow player to play video files (.mp4/.mkv)
