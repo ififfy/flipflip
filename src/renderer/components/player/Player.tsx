@@ -1,4 +1,5 @@
-import {remote} from 'electron';
+import {remote, shell} from 'electron';
+import defaultMenu from "electron-default-menu";
 import * as React from 'react';
 import fs from "fs";
 import fileURL from "file-url";
@@ -24,8 +25,6 @@ import ZoomMoveGroup from "../sceneDetail/ZoomMoveGroup";
 import VideoGroup from "../sceneDetail/VideoGroup";
 
 const {getCurrentWindow, Menu, MenuItem, app} = remote;
-
-let originalMenu = Menu.getApplicationMenu();
 
 function textURL(kind: string, src: string): string {
   switch (kind) {
@@ -363,54 +362,44 @@ export default class Player extends React.Component {
   }
 
   buildMenu() {
-    Menu.setApplicationMenu(Menu.buildFromTemplate([
-      {
-        label: app.getName(),
-        submenu: [
-          { role: 'quit' },
-        ],
-      },
-      {
-        label: 'Edit',
-        submenu: [
-          { role: 'undo' },
-          { role: 'redo' },
-          { type: 'separator' },
-          { role: 'cut' },
-          { role: 'copy' },
-          { role: 'paste' },
-          { role: 'pasteandmatchstyle' },
-          { role: 'delete' },
-          { role: 'selectall' }
-        ]
-      },
-      {
-        label: 'View',
-        submenu: [
-          { role: 'reload' },
-          { role: 'forcereload' },
-          { role: 'toggledevtools' },
-        ]
-      },
-      {
-        label: 'Player controls',
-        submenu: Array.from(this.getKeyMap().entries()).map(([k, v]) => {
-          const [label, accelerator] = v;
-          return {
-            label,
-            accelerator,
-            click: (this as any)[k as any].bind(this),
-          };
-        })
-      }
-    ]));
+    const menu = defaultMenu(app, shell);
+    menu.splice(2, 1, {
+      label: 'View',
+      submenu: [
+        { role: 'reload' },
+        { role: 'forcereload' },
+        { role: 'toggledevtools' },
+      ]
+    });
+    menu.splice(4, 1, {
+      label: 'Player controls',
+      submenu: Array.from(this.getKeyMap().entries()).map(([k, v]) => {
+        const [label, accelerator] = v;
+        return {
+          label,
+          accelerator,
+          click: (this as any)[k as any].bind(this),
+        };
+      })
+    });
+    Menu.setApplicationMenu(Menu.buildFromTemplate(menu));
   }
 
   componentWillUnmount() {
     clearInterval(this.interval);
     clearInterval(this.strobeInterval);
     getCurrentWindow().setAlwaysOnTop(false);
-    Menu.setApplicationMenu(originalMenu);
+    const menu = defaultMenu(app, shell);
+    menu.splice(2, 1, {
+      label: 'View',
+      submenu: [
+        { role: 'reload' },
+        { role: 'forcereload' },
+        { role: 'toggledevtools' },
+      ]
+    });
+    menu.splice(4, 1);
+    Menu.setApplicationMenu(Menu.buildFromTemplate(menu));
     getCurrentWindow().setFullScreen(false);
     window.removeEventListener('contextmenu', this.showContextMenu);
   }

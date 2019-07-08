@@ -1,5 +1,6 @@
-import {app, BrowserWindow, session} from 'electron';
+import {app, shell, BrowserWindow, session, Menu} from 'electron';
 import windowStateKeeper from 'electron-window-state';
+import defaultMenu from 'electron-default-menu';
 import * as path from 'path';
 import * as url from 'url';
 
@@ -48,6 +49,19 @@ function createWindow() {
   if (process.defaultApp) {
     mainWindow.webContents.openDevTools();
   }
+
+  const menu = defaultMenu(app, shell);
+  menu.splice(2, 1, {
+    label: 'View',
+    submenu: [
+      { role: 'reload' },
+      { role: 'forcereload' },
+      { role: 'toggledevtools' },
+    ]
+  });
+  menu.splice(4, 1);
+
+  Menu.setApplicationMenu(Menu.buildFromTemplate(menu));
 
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {

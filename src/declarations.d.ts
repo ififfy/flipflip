@@ -38,6 +38,7 @@ declare module 'oauth';
 declare module 'imgur';
 declare module 'twitter';
 declare module 'electron-google-analytics';
+declare module 'electron-default-menu';
 
 // Type declarations for Clipboard API
 // https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API
