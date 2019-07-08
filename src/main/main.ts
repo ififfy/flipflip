@@ -51,6 +51,14 @@ function createWindow() {
   }
 
   const menu = defaultMenu(app, shell);
+  if (process.platform !== 'darwin') {
+    menu.splice(0, 0, {
+      label: 'File',
+      submenu: [
+        { role: 'quit' }
+      ]
+    })
+  }
   menu.splice(2, 1, {
     label: 'View',
     submenu: [

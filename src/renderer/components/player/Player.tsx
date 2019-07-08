@@ -363,6 +363,14 @@ export default class Player extends React.Component {
 
   buildMenu() {
     const menu = defaultMenu(app, shell);
+    if (process.platform !== 'darwin') {
+      menu.splice(0, 0, {
+        label: 'File',
+        submenu: [
+          { role: 'quit' }
+        ]
+      })
+    }
     menu.splice(2, 1, {
       label: 'View',
       submenu: [
@@ -390,6 +398,14 @@ export default class Player extends React.Component {
     clearInterval(this.strobeInterval);
     getCurrentWindow().setAlwaysOnTop(false);
     const menu = defaultMenu(app, shell);
+    if (process.platform !== 'darwin') {
+      menu.splice(0, 0, {
+        label: 'File',
+        submenu: [
+          { role: 'quit' }
+        ]
+      })
+    }
     menu.splice(2, 1, {
       label: 'View',
       submenu: [
