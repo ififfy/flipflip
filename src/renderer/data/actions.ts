@@ -364,10 +364,26 @@ export function toggleTag(state: State, sourceID: number, tag: Tag): Object {
 }
 
 export function exportScene(state: State, scene: Scene): Object {
+  const scenesToExport = Array<Scene>();
   const sceneCopy = JSON.parse(JSON.stringify(scene)); // Make a copy
   sceneCopy.tagWeights = null;
   sceneCopy.sceneWeights = null;
-  const sceneExport = JSON.stringify(sceneCopy);
+  scenesToExport.push(sceneCopy);
+  const removeO = Array<number>();
+  for (let o of scene.overlays) {
+    const overlay = state.scenes.find((s) => s.id == o.sceneID);
+    if (overlay == null) {
+      removeO.push(o.id);
+    } else {
+      const overlayCopy = JSON.parse(JSON.stringify(overlay)); // Make a copy
+      overlayCopy.tagWeights = null;
+      overlayCopy.sceneWeights = null;
+      overlayCopy.overlays = null;
+      scenesToExport.push(overlayCopy);
+    }
+  }
+  sceneCopy.overlays = sceneCopy.overlays.filter((o: any) => !removeO.includes(o.id));
+  const sceneExport = JSON.stringify(scenesToExport);
   const fileName = sceneCopy.name + "_export.json";
   remote.dialog.showSaveDialog(remote.getCurrentWindow(),
     {filters: [{name: 'JSON Document', extensions: ['json']}], defaultPath: fileName}, (filePath) => {
@@ -383,31 +399,66 @@ export function importScene(state: State): Object {
     {filters: [{name:'All Files (*.*)', extensions: ['*']},{name: 'JSON Document', extensions: ['json']}], properties: ['openFile']});
   if (!filePath || !filePath.length) return;
   const addToLibrary = confirm("Would you also like to import this Scene's sources into your Library?");
-  const scene = new Scene(JSON.parse(fs.readFileSync(filePath[0], 'utf-8')));
+  let newScenes = state.scenes;
+  let sources = Array<LibrarySource>();
+  const importScenes = JSON.parse(fs.readFileSync(filePath[0], 'utf-8'));
+
+  const scene = new Scene(importScenes[0]);
   let id = state.scenes.length + 1;
   state.scenes.forEach((s: Scene) => {
     id = Math.max(s.id + 1, id);
   });
   scene.id = id;
+  newScenes = newScenes.concat([scene]);
   if (addToLibrary) {
-    const sources = Array.from(scene.sources);
+    sources = sources.concat(scene.sources);
+  }
+
+  const overlays = new Map<number, number>();
+  if (scene.overlays) {
+    for (let o of scene.overlays) {
+      if (overlays.has(o.sceneID)) {
+        o.id = overlays.get(o.sceneID);
+      } else {
+        const sID = o.sceneID;
+        o.sceneID = ++id;
+        overlays.set(sID, o.sceneID);
+      }
+    }
+  }
+  if (overlays.size > 0) {
+    for (let i=1; i < importScenes.length; i++) {
+      const scene = new Scene(importScenes[i]);
+      scene.id = overlays.get(scene.id);
+      newScenes = newScenes.concat([scene]);
+      if (addToLibrary) {
+        sources = sources.concat(scene.sources);
+      }
+    }
+  }
+
+  if (addToLibrary) {
     const sourceURLs = sources.map((s) => s.url);
     id = state.library.length + 1;
     for (let source of state.library) {
       id = Math.max(source.id+1, id);
-      const indexOf = sourceURLs.indexOf(source.url);
+      let indexOf = sourceURLs.indexOf(source.url);
       if (indexOf >= 0) {
-        sources.splice(indexOf, 1);
+        while (indexOf >= 0) {
+          sources.splice(indexOf, 1);
+          sourceURLs.splice(indexOf, 1);
+          indexOf = sourceURLs.indexOf(source.url);
+        }
       }
     }
     if (sources.length > 0) {
       alert("Added " + sources.length + " new sources to the Library");
-      return {scenes: state.scenes.concat([scene]), library: state.library.concat(sources), route: [new Route({kind: 'scene', value: scene.id})]};
+      return {scenes: newScenes, library: state.library.concat(sources), route: [new Route({kind: 'scene', value: scene.id})]};
     } else {
       alert("No new sources detected");
     }
   }
-  return {scenes: state.scenes.concat([scene]), route: [new Route({kind: 'scene', value: scene.id})]};
+  return {scenes: newScenes, route: [new Route({kind: 'scene', value: scene.id})]};
 }
 
 export function exportLibrary(state: State): Object {
