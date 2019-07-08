@@ -340,13 +340,13 @@ export default class Player extends React.Component {
 
   getKeyMap() {
     const keyMap = new Map<String, Array<string>>([
-      ['playPause', ['Play/Pause (Playing)', 'space']],
+      ['playPause', ['Play/Pause ' + (this.state.isPlaying ? '(Playing)' : '(Paused)'), 'space']],
       ['historyBack', ['Back in Time', 'left']],
       ['historyForward', ['Forward in Time', 'right']],
       ['navigateBack', ['Go Back to Scene Details', 'escape']],
-      ['toggleFullscreen', ['Toggle Fullscreen', 'CommandOrControl+F']],
-      ['toggleAlwaysOnTop', ['Toggle Always On Top', 'CommandOrControl+T']],
-      ['toggleMenuBarDisplay', ['Toggle Menu Bar', 'CommandOrControl+^']],
+      ['toggleFullscreen', ['Toggle Fullscreen ' + (this.props.config.displaySettings.fullScreen ? '(On)' : '(Off)'), 'CommandOrControl+F']],
+      ['toggleAlwaysOnTop', ['Toggle Always On Top ' + (this.props.config.displaySettings.alwaysOnTop ? '(On)' : '(Off)'), 'CommandOrControl+T']],
+      ['toggleMenuBarDisplay', ['Toggle Menu Bar ' + (this.props.config.displaySettings.showMenu ? '(On)' : '(Off)'), 'CommandOrControl+G']],
     ]);
 
     if (this.props.config.caching.enabled) {
@@ -577,7 +577,6 @@ export default class Player extends React.Component {
     } else {
       this.pause()
     }
-    this.getKeyMap().set('playPause', ["Play/Pause " + (play ? "(Playing)" : "(Paused)"), 'space']);
     this.buildMenu();
   }
 
@@ -634,21 +633,18 @@ export default class Player extends React.Component {
 
   setAlwaysOnTop(alwaysOnTop: boolean){
     this.props.config.displaySettings.alwaysOnTop = alwaysOnTop;
-    this.getKeyMap().set('toggleAlwaysOnTop', ['Toggle Always On Top ' + (alwaysOnTop ? "(On)" : "(Off)"), 'CommandOrControl+T']);
     this.buildMenu();
     getCurrentWindow().setAlwaysOnTop(alwaysOnTop);
   }
 
   setMenuBarVisibility(showMenu: boolean) {
     this.props.config.displaySettings.showMenu = showMenu;
-    this.getKeyMap().set('toggleMenuBarDisplay', ['Toggle Menu Bar ' + (showMenu ? "(On)" : "(Off)"), 'CommandOrControl+^']);
     this.buildMenu();
     getCurrentWindow().setMenuBarVisibility(showMenu);
   }
 
   setFullscreen(fullScreen: boolean) {
     this.props.config.displaySettings.fullScreen = fullScreen;
-    this.getKeyMap().set('toggleFullscreen', ['Toggle Fullscreen ' + (fullScreen ? "(On)" : "(Off)"), 'CommandOrControl+F']);
     this.buildMenu();
     getCurrentWindow().setFullScreen(fullScreen);
   }
