@@ -11,6 +11,7 @@ const WF = { // weight functions
 
 const IF = { // image filters
   any: 'if.any',
+  videos: 'if.videos',
   gifs: 'if.gifs',
   stills: 'if.stills',
 };

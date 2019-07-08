@@ -7,7 +7,8 @@ export default new Map<String, String>([
   ['wf.i', 'By Image'],
 
   ['if.any', 'All images'],
-  ['if.gifs', 'Only gifs'],
+  ['if.videos', 'Only videos'],
+  ['if.gifs', 'Only animated'],
   ['if.stills', 'Only stills'],
 
   ['bt.blur', 'Blurred'],
