@@ -191,6 +191,17 @@ export default class AudioControl extends React.Component {
                 keys={Object.values(AT)}
                 onChange={this.props.onEditKey.bind(this, 'tickMode').bind(this)} />
             )}
+            {this.props.audio.tick && this.props.audio.tickMode == AT.sin && (
+              <div>
+                <SimpleSliderInput
+                  label={`Wave Rate: ${this.props.audio.tickSinRate}`}
+                  min={1}
+                  max={100}
+                  value={this.props.audio.tickSinRate}
+                  isEnabled={true}
+                  onChange={this.props.onEditKey.bind(this, 'tickSinRate')}/>
+              </div>
+            )}
           </div>
           {this.props.audio.tick && this.props.audio.tickMode == AT.constant && (
             <div>
@@ -221,17 +232,6 @@ export default class AudioControl extends React.Component {
                 min={0}
                 onChange={this.props.onEditKey.bind(this, 'tickMaxDelay')}/>
               ms
-            </div>
-          )}
-          {this.props.audio.tick && this.props.audio.tickMode == AT.sin && (
-            <div>
-              <SimpleSliderInput
-                label={`Wave Rate: ${this.props.audio.tickSinRate}`}
-                min={1}
-                max={100}
-                value={this.props.audio.tickSinRate}
-                isEnabled={true}
-                onChange={this.props.onEditKey.bind(this, 'tickSinRate')}/>
             </div>
           )}
         </div>

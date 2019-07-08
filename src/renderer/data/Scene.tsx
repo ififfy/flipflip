@@ -82,7 +82,7 @@ export default class Scene {
       this.effectLevel = 0;
     }
     if (this.overlaySceneID != 0) {
-      this.overlays.push(new Overlay({sceneID: this.overlaySceneID, opacity: this.overlaySceneOpacity}));
+      this.overlays.push(new Overlay({sceneID: this.overlaySceneID, opacity: this.overlaySceneOpacity * 100}));
       this.overlaySceneID = 0;
     }
 
@@ -96,18 +96,23 @@ export default class Scene {
     }
 
     if (this.timingFunction == 'tf.variableFaster') {
+      this.timingFunction = TF.sin;
       this.timingMin = 0;
       this.timingMax = 600;
     } else if (this.timingFunction == 'tf.variableMedium') {
+      this.timingFunction = TF.sin;
       this.timingMin = 3000;
       this.timingMax = 5000;
     } else if (this.timingFunction == 'tf.variableSlow') {
+      this.timingFunction = TF.sin;
       this.timingMin = 3500;
       this.timingMax = 6500;
     } else if (this.timingFunction == 'tf.variableSlower') {
+      this.timingFunction = TF.sin;
       this.timingMin = 10000;
       this.timingMax = 20000;
     } else if (this.timingFunction == 'tf.variableSlowest') {
+      this.timingFunction = TF.sin;
       this.timingMin = 30000;
       this.timingMax = 60000;
     }

@@ -24,11 +24,11 @@ export default class VideoGroup extends React.Component {
           <SimpleCheckbox
             text={"Start Videos At Random Timestamp"}
             isOn={this.props.scene.randomVideoStart}
-            onChange={this.changeKey.bind(this, 'randomVideoStart').bind(this)} />
+            onChange={this.changeKey.bind(this, 'randomVideoStart', this.props.scene).bind(this)} />
           <SimpleCheckbox
             text={"Continue Videos From Last Timestamp"}
             isOn={this.props.scene.continueVideo}
-            onChange={this.changeKey.bind(this, 'continueVideo').bind(this)} />
+            onChange={this.changeKey.bind(this, 'continueVideo', this.props.scene).bind(this)} />
           {(this.props.mainVideo || !this.props.isPlayer) && (
             <React.Fragment>
               <h4>Scene Video</h4>

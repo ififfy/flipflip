@@ -21,11 +21,24 @@ export default class SceneEffectGroup extends React.Component {
     return (
       <ControlGroup title="Scene Effects" isNarrow={true}>
         <div className="ControlSubgroup m-inline">
-          <SimpleOptionPicker
-            onChange={this.changeKey.bind(this, 'timingFunction').bind(this)}
-            label="Timing"
-            value={this.props.scene.timingFunction}
-            keys={Object.values(TF)}/>
+          <div style={{display: 'flex'}}>
+            <SimpleOptionPicker
+              onChange={this.changeKey.bind(this, 'timingFunction').bind(this)}
+              label="Timing"
+              value={this.props.scene.timingFunction}
+              keys={Object.values(TF)}/>
+            {this.props.scene.timingFunction == TF.sin && (
+              <div>
+                <SimpleSliderInput
+                  label={`Wave Rate: ${this.props.scene.timingSinRate}`}
+                  min={1}
+                  max={100}
+                  value={this.props.scene.timingSinRate}
+                  isEnabled={true}
+                  onChange={this.changeKey.bind(this, 'timingSinRate').bind(this)}/>
+              </div>
+            )}
+          </div>
           <div className="TimingControlGroup">
             {this.props.scene.timingFunction == TF.constant && (
               <div>
@@ -56,17 +69,6 @@ export default class SceneEffectGroup extends React.Component {
                   min={0}
                   onChange={this.changeKey.bind(this, 'timingMax').bind(this)}/>
                 ms
-              </div>
-            )}
-            {this.props.scene.timingFunction == TF.sin && (
-              <div>
-                <SimpleSliderInput
-                  label={`Wave Rate: ${this.props.scene.timingSinRate}`}
-                  min={1}
-                  max={100}
-                  value={this.props.scene.timingSinRate}
-                  isEnabled={true}
-                  onChange={this.changeKey.bind(this, 'timingSinRate').bind(this)}/>
               </div>
             )}
           </div>
@@ -103,7 +105,7 @@ export default class SceneEffectGroup extends React.Component {
                 <div className="u-add"/>
               </div>
               <div className="u-clickable"
-                   style={{color: '#010101'}}
+                   style={{color: '#010101', float: 'left'}}
                    onClick={this.onAddOverlay.bind(this)}>
                 Add a new overlay
               </div>

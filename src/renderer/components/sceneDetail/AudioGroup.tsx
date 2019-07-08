@@ -25,7 +25,7 @@ export default class AudioGroup extends React.Component {
             <div className="u-add"/>
           </div>
           <div className="u-clickable"
-               style={{color: '#010101'}}
+               style={{color: '#010101', float: 'left'}}
                onClick={this.onAdd.bind(this)}>
             Add a new track
           </div>
