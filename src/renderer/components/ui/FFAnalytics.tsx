@@ -15,10 +15,9 @@ export default class FFAnalytics extends React.Component {
     const analytics = new Analytics('UA-143309627-1');
     analytics.screen('flipflip', this.props.version, 'com.ififfy.flipflip', 'com.ififfy.flipflip', this.props.page, this.props.config.clientID)
       .then((response: any) => {
-        if (this.props.config.clientID == "") {
+        if (response.clientID != this.props.config.clientID) {
           this.onSetClientID(response.clientID);
         }
-        return {}
       }).catch((err: any) => {
         console.error(err);
       });
@@ -30,7 +29,9 @@ export default class FFAnalytics extends React.Component {
     this.props.onUpdateConfig(newConfig);
   }
 
-  shouldComponentUpdate(): boolean {return false;}
+  shouldComponentUpdate(props: any): boolean {
+    return (this.props.page !== props.page);
+  }
 
   render() {return (<React.Fragment/>);}
 }
