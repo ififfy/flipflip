@@ -245,7 +245,7 @@ export default class ImagePlayer extends React.Component {
   cache(i: HTMLImageElement | HTMLVideoElement) {
     if (this.props.config.caching.enabled) {
       const fileType = getSourceType(i.src);
-      if (fileType != ST.local) {
+      if (fileType != ST.local && i.src.startsWith("http")) {
         const cachePath = getCachePath(null, this.props.config);
         if (!fs.existsSync(cachePath)) {
           fs.mkdirSync(cachePath)

@@ -94,9 +94,9 @@ export function getFileGroup(url: string) {
       }
       return instagramID;
     case ST.local:
-      return url.substring(url.lastIndexOf(path.sep)+1);
     case ST.list:
-      break;
+    case ST.video:
+      return null;
   }
 }
 
@@ -107,13 +107,21 @@ export function getCachePath(source: string, config: Config) {
       baseDir += path.sep;
     }
     if (source) {
-      return baseDir + en.get(getSourceType(source)) + path.sep + getFileGroup(source) + path.sep;
+      if (getFileGroup(source)) {
+        return baseDir + en.get(getSourceType(source)) + path.sep + getFileGroup(source) + path.sep;
+      } else {
+        return baseDir + en.get(getSourceType(source)) + path.sep;
+      }
     } else {
       return baseDir;
     }
   } else {
     if (source) {
-      return getPath() + path.sep + "ImageCache" + path.sep + en.get(getSourceType(source)) + path.sep + getFileGroup(source) + path.sep;
+      if (getFileGroup(source)) {
+        return getPath() + path.sep + "ImageCache" + path.sep + en.get(getSourceType(source)) + path.sep + getFileGroup(source) + path.sep;
+      } else {
+        return getPath() + path.sep + "ImageCache" + path.sep + en.get(getSourceType(source)) + path.sep;
+      }
     } else {
       return getPath() + path.sep + "ImageCache" + path.sep;
     }

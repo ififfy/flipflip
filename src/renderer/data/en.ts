@@ -49,6 +49,7 @@ export default new Map<String, String>([
   ['st.twitter', 'twitter'],
   ['st.deviantart', 'deviantart'],
   ['st.instagram', 'instagram'],
+  ['st.video', 'video'],
   ['st.list', 'list'],
 
   ['sl.top', 'Above All'],

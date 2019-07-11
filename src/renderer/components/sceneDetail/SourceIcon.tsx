@@ -12,6 +12,9 @@ export default class SourceIcon extends React.Component {
     const type = getSourceType(this.props.url);
     return(
       <div className="SourceIcon u-small-icon-button">
+        {type == ST.video && (
+          <div className="u-video"/>
+        )}
         {type == ST.list && (
           <div className="u-list"/>
         )}

@@ -1,9 +1,10 @@
 import * as React from "react";
+import path from 'path';
 import rimraf from "rimraf";
 import Sortable from "react-sortablejs";
 import {remote} from "electron";
 
-import {getCachePath, getFileGroup, getSourceType, isVideo} from "../../data/utils";
+import {getCachePath, getFileGroup, getFileName, getSourceType, isVideo} from "../../data/utils";
 import {AF, SF, ST} from "../../data/const";
 import SourceIcon from "./SourceIcon";
 import LibrarySource from "../library/LibrarySource";
@@ -125,7 +126,8 @@ export default class SourceList extends React.Component {
                          onClick={this.onClean.bind(this, source.id)}
                          title="Clear cache">
                       <div className="u-clean"/>
-                    </div>)}
+                    </div>
+                  )}
                   <div className="u-button u-small-icon-button u-clickable"
                        onClick={this.onEdit.bind(this, source.id)}
                        title="Edit">
@@ -269,7 +271,12 @@ export default class SourceList extends React.Component {
     const sourceURL = this.props.sources.find((s) => s.id == sourceID).url;
     const fileType = getSourceType(sourceURL);
     if (fileType != ST.local) {
-      const cachePath = getCachePath(sourceURL, this.props.config);
+      let cachePath;
+      if (fileType == ST.video) {
+        cachePath = getCachePath(sourceURL, this.props.config) + path.sep + getFileName(sourceURL);
+      } else {
+        cachePath = getCachePath(sourceURL, this.props.config);
+      }
       if (!confirm("Are you SURE you want to delete " + cachePath + "?")) return;
       rimraf.sync(cachePath);
     }

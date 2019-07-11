@@ -62,7 +62,8 @@ export default class Jiggle extends React.Component {
 
   shouldComponentUpdate(props: any, state: any): boolean {
     return ((this.state.hasStarted !== state.hasStarted) ||
-      (this.state.jiggling !== state.jiggling));
+      (this.state.jiggling !== state.jiggling) ||
+      (this.props.className !== props.className));
   }
 
   render() {
