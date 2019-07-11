@@ -839,10 +839,10 @@ label.SimpleCheckbox {
       }
 
       .CreatableSelect {
-        @media screen and (max-width: 905px) {
+        @media screen and (max-width: 843px) {
           width: 10rem;
         }
-        @media screen and (max-width: 745px) {
+        @media screen and (max-width: 683px) {
           width: 5rem;
         }
       }
@@ -856,17 +856,8 @@ label.SimpleCheckbox {
     .SourceList__Buttons {
       height: 3.2rem;
 
-      > .SourceList__AddButtons {
-        float: right;
-
-        div {
-          margin-left: $smallPadding;
-        }
-      }
-
       > .SimpleOptionPicker {
         float: right;
-        margin-left: $smallPadding;
 
         select {
           outline: none;

@@ -60,4 +60,9 @@ export default new Map<String, String>([
   ['at.random', 'Randomly'],
   ['at.sin', 'Wave'],
   ['at.scene', 'With Scene'],
+
+  ['af.url', '+ URL'],
+  ['af.directory', '+ Local directory'],
+  ['af.videos', '+ Local videos'],
+  ['af.library', '+ From Library'],
 ]);

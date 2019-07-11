@@ -62,6 +62,7 @@ const SF = { // sort function
 
 const ST = { // source types
   local: 'st.local',
+  video: 'st.video',
   list: 'st.list',
   tumblr: 'st.tumblr',
   reddit: 'st.reddit',
@@ -87,6 +88,13 @@ const AT = { // audio ticks
   scene: 'at.scene',
 };
 
+const AF = { // add functions
+  url: 'af.url',
+  directory: 'af.directory',
+  videos: 'af.videos',
+  library: 'af.library',
+};
+
 export {
-  TF, WF, IF, HTF, VTF, TOT, BT, GT, TT, SF, ST, SL, AT
+  TF, WF, IF, HTF, VTF, TOT, BT, GT, TT, SF, ST, SL, AT, AF
 };

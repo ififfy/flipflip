@@ -121,7 +121,9 @@ export function getCachePath(source: string, config: Config) {
 }
 
 export function getSourceType(url: string): string {
-  if (/^https?:\/\/([^.]*|(66\.media))\.tumblr\.com/.exec(url) != null) {
+  if (isVideo(url, true)) {
+    return ST.video;
+  } else if (/^https?:\/\/([^.]*|(66\.media))\.tumblr\.com/.exec(url) != null) {
     return ST.tumblr;
   } else if (/^https?:\/\/(www\.)?reddit\.com\//.exec(url) != null) {
     return ST.reddit;

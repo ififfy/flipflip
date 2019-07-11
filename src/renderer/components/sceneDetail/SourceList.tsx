@@ -3,8 +3,8 @@ import rimraf from "rimraf";
 import Sortable from "react-sortablejs";
 import {remote} from "electron";
 
-import {getCachePath, getFileGroup, getSourceType} from "../../data/utils";
-import {SF, ST} from "../../data/const";
+import {getCachePath, getFileGroup, getSourceType, isVideo} from "../../data/utils";
+import {AF, SF, ST} from "../../data/const";
 import SourceIcon from "./SourceIcon";
 import LibrarySource from "../library/LibrarySource";
 import Tag from "../library/Tag";
@@ -40,16 +40,17 @@ export default class SourceList extends React.Component {
   render() {
     const filtering = this.props.filters.length > 0;
     return (
-      <div className="SourceList" style={{width: `${this.props.isSelect ? '150px' : '365px'}`}}>
+      <div className="SourceList" style={{width: `${this.props.isSelect ? '150px' : '283px'}`}}>
         <div className="SourceList__Buttons u-float-right">
           {!this.props.isSelect && (
-            <div className="SourceList__AddButtons">
-              <div className={`u-button ${this.props.filters.length > 0 ? 'u-disabled' : 'u-clickable'}`} onClick={this.props.filters.length > 0 ? this.nop : this.onAdd.bind(this)}>+ Add local files</div>
-              <div className={`u-button ${this.props.filters.length > 0 ? 'u-disabled' : 'u-clickable'}`} onClick={this.props.filters.length > 0 ? this.nop : this.onAddURL.bind(this)}>+ Add URL</div>
-              {this.props.onOpenLibraryImport && (
-                <div className="u-button u-clickable" onClick={this.props.onOpenLibraryImport.bind(this)}>+ Add from Library</div>
-              )}
-            </div>
+            <SimpleOptionPicker
+              label=""
+              value="+ Add Sources"
+              disableFirst={true}
+              keys={["+ Add Sources"].concat([AF.url, AF.directory, AF.videos]).concat(this.props.onOpenLibraryImport ? [AF.library] : [])}
+              disabled={this.props.filters.length > 0}
+              onChange={this.onAddSource.bind(this)}
+            />
           )}
           <SimpleOptionPicker
             label=""
@@ -178,30 +179,46 @@ export default class SourceList extends React.Component {
     this.props.onUpdateSelected(newSelected);
   }
 
-  onAdd() {
-    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory', 'multiSelections']});
-    if (!result) return;
-    this.props.addSources(result);
-  }
+  onAddSource(type: string) {
+    switch (type) {
+      case AF.url:
+        let id = this.props.sources.length + 1;
+        this.props.sources.forEach((s) => {
+          id = Math.max(s.id + 1, id);
+        });
+        let newLibrary = Array.from(this.props.sources);
+        newLibrary.unshift(new LibrarySource({
+          url: "",
+          id: id,
+          tags: new Array<Tag>(),
+        }));
+        this.props.onUpdateSources(newLibrary);
 
-  onAddURL() {
-    let id = this.props.sources.length + 1;
-    this.props.sources.forEach((s) => {
-      id = Math.max(s.id + 1, id);
-    });
-    let newLibrary = Array.from(this.props.sources);
-    newLibrary.unshift(new LibrarySource({
-      url: "",
-      id: id,
-      tags: new Array<Tag>(),
-    }));
-    this.props.onUpdateSources(newLibrary);
+        if (this.props.onPlay) {
+          // Delay this for a second so that the parent layer has updated and added the new source;
+          setTimeout(this.props.onStartEdit.bind(this, id), 10);
+        } else {
+          this.setState({isEditing: id});
+        }
+        break;
 
-    if (this.props.onPlay) {
-      // Delay this for a second so that the parent layer has updated and added the new source;
-      setTimeout(this.props.onStartEdit.bind(this, id), 10);
-    } else {
-      this.setState({isEditing: id});
+      case AF.directory:
+        let dResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory', 'multiSelections']});
+        if (!dResult) return;
+        this.props.addSources(dResult);
+        break;
+
+      case AF.videos:
+        let vResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+          {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'MP4', extensions: ['mp4']}, {name: 'MKV', extensions: ['mkv']}, {name: 'WebM', extensions: ['webm']}, {name: 'OGG', extensions: ['ogv']}], properties: ['openFile', 'multiSelections']});
+        if (!vResult) return;
+        vResult = vResult.filter((r) => isVideo(r, true));
+        this.props.addSources(vResult);
+        break;
+
+      case AF.library:
+        this.props.onOpenLibraryImport();
+        break;
     }
   }
 

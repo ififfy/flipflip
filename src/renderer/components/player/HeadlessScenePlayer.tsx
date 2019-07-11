@@ -61,6 +61,8 @@ function getPromise(config: Config, url: string, filter: string, next: any): Can
     promise = loadLocalDirectory(config, url, filter, null);
   } else if (sourceType == ST.list) { // Image List
     promise = loadRemoteImageURLList(config, url, filter, null);
+  } else if (sourceType == ST.video) {
+    promise = loadVideo(config, url, filter, null);
   } else { // Paging sources
     let promiseFunction;
     let timeout;
@@ -121,6 +123,15 @@ function loadLocalDirectory(config: Config, url: string, filter: string, next: a
           next: next
         });
       }
+    });
+  });
+}
+
+function loadVideo(config: Config, url: string, filter: string, next: any): CancelablePromise {
+  return new CancelablePromise((resolve) => {
+    resolve({
+      data: filterPathsToJustPlayable(filter, [url], true).map((p) => p.startsWith("http") ? p : fileURL(p)),
+      next: null,
     });
   });
 }

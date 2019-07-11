@@ -8,6 +8,7 @@ export default class SimpleOptionPicker extends React.Component {
     value: string,
     keys: Array<string>,
     disableFirst?: boolean,
+    disabled?: boolean
     parseKeyFunction?(id: string): string,
     onChange(value: string): void,
   };
@@ -19,8 +20,9 @@ export default class SimpleOptionPicker extends React.Component {
           <label>{this.props.label}</label>
         )}
         <select
+          disabled={this.props.disabled}
           value={this.props.value}
-          onChange={this.onChange.bind(this)}>
+          onChange={this.props.disabled ? this.nop : this.onChange.bind(this)}>
           {this.props.keys.map((k, index) => {
             const text = this.props.parseKeyFunction
               ? this.props.parseKeyFunction(k)
@@ -33,6 +35,8 @@ export default class SimpleOptionPicker extends React.Component {
       </div>
     );
   }
+
+  nop() {};
 
   onChange(e: React.FormEvent<HTMLSelectElement>) {
     this.props.onChange(e.currentTarget.value);
