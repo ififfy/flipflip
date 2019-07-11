@@ -3,13 +3,13 @@ import defaultMenu from "electron-default-menu";
 import * as React from 'react';
 import fs from "fs";
 import fileURL from "file-url";
-import {animated, Transition} from "react-spring/renderprops";
 
 import {SL, ST, TOT} from "../../data/const";
 import {getCachePath, getSourceType, urlToPath} from '../../data/utils';
 import Config from "../../data/Config";
 import Scene from '../../data/Scene';
 import CaptionProgram from "./CaptionProgram";
+import Strobe from "./Strobe";
 import ChildCallbackHack from './ChildCallbackHack';
 import HeadlessScenePlayer from './HeadlessScenePlayer';
 import Tag from "../library/Tag";
@@ -59,7 +59,6 @@ export default class Player extends React.Component {
     areOverlaysLoaded: Array<boolean>(this.getValidOverlays().length).fill(false),
     isEmpty: false,
     isPlaying: true,
-    toggleStrobe: false,
     total: 0,
     progress: 0,
     progressMessage: this.props.scene.sources.length > 0 ? this.props.scene.sources[0].url : "",
@@ -73,8 +72,6 @@ export default class Player extends React.Component {
   };
 
   _interval: NodeJS.Timer = null;
-  _strobeInterval: NodeJS.Timer = null;
-  _strobeDelay = 0;
 
   render() {
     const canGoBack = this.state.historyOffset > -(this.state.historyPaths.length - 1);
@@ -89,21 +86,17 @@ export default class Player extends React.Component {
       this.state.hasStarted);
     const showStrobe = this.props.scene.strobe && this.state.hasStarted && this.state.isPlaying &&
       (this.props.scene.strobeLayer == SL.top || this.props.scene.strobeLayer == SL.bottom);
-    const strobeOpacity = this.props.scene.strobeLayer == SL.bottom ? this.props.scene.strobeOpacity : 1;
 
     return (
       <div className="Player">
         {showStrobe && (
-          <Transition
-            reset
-            unique
-            items={this.state.toggleStrobe}
-            config={{duration: (this.props.scene.strobeTime > 0 ? this.props.scene.strobeTime : 10)}}
-            from={{ backgroundColor: this.props.scene.strobeColor, opacity: strobeOpacity}}
-            enter={{ opacity: 0 }}
-            leave={{ opacity: 0 }} >
-            {toggle => props => <animated.div className="Strobe u-fill-container" style={props}/>}
-          </Transition>
+          <Strobe
+            duration={this.props.scene.strobeTime >= 10 ? this.props.scene.strobeTime : 10}
+            pulse={this.props.scene.strobePulse}
+            delay={this.props.scene.strobeDelay}
+            color={this.props.scene.strobeColor}
+            opacity={this.props.scene.strobeLayer == SL.bottom ? this.props.scene.strobeOpacity : 1}
+          />
         )}
         {!this.state.hasStarted && !this.state.isEmpty && (
           <Progress
@@ -130,7 +123,6 @@ export default class Player extends React.Component {
             isPlaying={this.state.isPlaying}
             hasStarted={this.state.hasStarted}
             strobeLayer={this.props.scene.strobe ? this.props.scene.strobeLayer : null}
-            toggleStrobe={this.state.toggleStrobe}
             historyOffset={this.state.historyOffset}
             advanceHack={this.state.imagePlayerAdvanceHack}
             deleteHack={this.state.imagePlayerDeleteHack}
@@ -314,14 +306,6 @@ export default class Player extends React.Component {
         this.setState({hasStarted: true, startTime: new Date()});
       }
     }
-    const strobeDelay = props.scene.strobePulse ? props.scene.strobeDelay : props.scene.strobeTime;
-    if (strobeDelay != this._strobeDelay) {
-      clearInterval(this._strobeInterval);
-      this._strobeDelay = strobeDelay;
-      this._strobeInterval = setInterval(() => {
-        this.setState({toggleStrobe: !this.state.toggleStrobe})
-      }, this._strobeDelay);
-    }
   }
 
   componentDidMount() {
@@ -333,9 +317,6 @@ export default class Player extends React.Component {
 
     this.buildMenu();
     this._interval = setInterval(() => this.nextSceneLoop(), 1000);
-    this._strobeInterval = setInterval(() => {
-      this.setState({toggleStrobe: !this.state.toggleStrobe})
-    }, this.props.scene.strobePulse ? this.props.scene.strobeDelay : this.props.scene.strobeTime);
   }
 
   getKeyMap() {
@@ -395,9 +376,7 @@ export default class Player extends React.Component {
 
   componentWillUnmount() {
     clearInterval(this._interval);
-    clearInterval(this._strobeInterval);
     this._interval = null;
-    this._strobeInterval = null;
     getCurrentWindow().setAlwaysOnTop(false);
     getCurrentWindow().setFullScreen(false);
     const menu = defaultMenu(app, shell);

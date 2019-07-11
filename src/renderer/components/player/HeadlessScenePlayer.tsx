@@ -721,7 +721,6 @@ export default class HeadlessScenePlayer extends React.Component {
     isPlaying: boolean,
     hasStarted: boolean,
     strobeLayer?: string,
-    toggleStrobe?: boolean,
     historyOffset: number,
     advanceHack?: ChildCallbackHack,
     deleteHack?: ChildCallbackHack,
@@ -765,7 +764,6 @@ export default class HeadlessScenePlayer extends React.Component {
             advanceHack={this.props.advanceHack}
             deleteHack={this.props.deleteHack}
             strobeLayer={this.props.strobeLayer}
-            toggleStrobe={this.props.toggleStrobe}
             hasStarted={this.props.hasStarted}
             allURLs={isEmpty(Array.from(this.state.allURLs.values())) ? null : this.state.allURLs}
             onLoaded={this.props.firstImageLoaded.bind(this)}
@@ -935,7 +933,6 @@ export default class HeadlessScenePlayer extends React.Component {
       props.isPlaying !== this.props.isPlaying ||
       props.opacity !== this.props.opacity ||
       props.strobeLayer !== this.props.strobeLayer ||
-      props.toggleStrobe !== this.props.toggleStrobe ||
       props.hasStarted !== this.props.hasStarted ||
       state.restart !== this.state.restart ||
       state.promise.source !== this.state.promise.source ||

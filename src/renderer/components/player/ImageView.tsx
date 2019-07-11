@@ -24,7 +24,7 @@ export const FadeLayer = (data: {image: any, contentRef: any, backgroundRef: any
         opacity: 1,
       },
       leave: { // Styles apply for leaving elements
-        opacity: data.crossFade ? 0 : 1,
+        opacity: data.crossFade ? 0.99 : 1,
       },
       unique: true, // If this is true, items going in and out with the same key will be re-used
       config: {
