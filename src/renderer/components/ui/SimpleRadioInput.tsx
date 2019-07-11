@@ -10,7 +10,7 @@ export default class SimpleRadioInput extends React.Component {
     keys: Array<string>,
     bold?: boolean // Default false
     bottom?: boolean // Default true
-    onChange: (value: string) => void
+    onChange(value: string): void
   };
 
   render() {

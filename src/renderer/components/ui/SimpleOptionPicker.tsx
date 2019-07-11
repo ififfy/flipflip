@@ -8,8 +8,8 @@ export default class SimpleOptionPicker extends React.Component {
     value: string,
     keys: Array<string>,
     disableFirst?: boolean,
-    parseKeyFunction?: (id: string) => string,
-    onChange: (value: string) => void,
+    parseKeyFunction?(id: string): string,
+    onChange(value: string): void,
   };
 
   render() {

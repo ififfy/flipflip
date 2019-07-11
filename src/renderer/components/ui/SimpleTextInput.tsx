@@ -8,8 +8,8 @@ export default class SimpleTextInput extends React.Component {
     autofocus?: boolean
     isPassword?: boolean,
     children?: React.ReactNode,
-    onKeyDown?: (e: any) => void,
-    onChange: (value: string) => void
+    onKeyDown?(e: any): void,
+    onChange(value: string): void
   };
 
   render() {

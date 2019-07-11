@@ -7,7 +7,7 @@ export default class SimpleNumberInput extends React.Component {
     max?: number,
     value: number,
     isEnabled: boolean,
-    onChange: (value: string) => void
+    onChange(value: string): void
   };
 
   render() {

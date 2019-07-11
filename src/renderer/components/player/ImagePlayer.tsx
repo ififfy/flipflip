@@ -8,6 +8,7 @@ import gifInfo from 'gif-info';
 import getFolderSize from "get-folder-size";
 import IdleTimer from 'react-idle-timer';
 import {Transition, animated} from "react-spring/renderprops";
+import Timeout = NodeJS.Timeout;
 
 import {HTF, IF, SL, ST, TF, VTF, WF} from '../../data/const';
 import {getCachePath, getFileName, getRandomListItem, getSourceType, isVideo, urlToPath} from '../../data/utils';
@@ -35,10 +36,10 @@ export default class ImagePlayer extends React.Component {
     toggleStrobe?: boolean,
     isPlaying: boolean,
     historyOffset: number,
-    setHistoryPaths: (historyPaths: Array<any>) => void,
-    setHistoryOffset: (historyOffset: number) => void,
-    onLoaded: () => void,
     hasStarted: boolean,
+    setHistoryPaths(historyPaths: Array<any>): void,
+    setHistoryOffset(historyOffset: number): void,
+    onLoaded(): void,
     setVideo(video: HTMLVideoElement): void,
   };
 
@@ -53,9 +54,11 @@ export default class ImagePlayer extends React.Component {
   };
 
   _isMounted = false;
-  _loadedURLs = Array<string>();
+  _loadedURLs: Array<string> = null;
   _nextIndex = 0;
-  _nextSourceIndex = new Map<String, number>();
+  _nextSourceIndex: Map<String, number> = null;
+  _timeout: Timeout = null;
+  _waitTimeouts: Array<Timeout> = null;
 
   render() {
     if (this.state.historyPaths.length < 1 || !this.props.hasStarted) return <div className="ImagePlayer m-empty"/>;
@@ -139,6 +142,7 @@ export default class ImagePlayer extends React.Component {
     this._loadedURLs = new Array<string>();
     this._nextIndex = 0;
     this._nextSourceIndex = new Map<String, number>();
+    this._waitTimeouts = new Array<Timeout>(this.props.config.displaySettings.maxLoadingAtOnce).fill(null);
     if (this.props.advanceHack) {
       this.props.advanceHack.listener = () => {
         // advance, ignoring isPlaying status and not scheduling another
@@ -156,6 +160,14 @@ export default class ImagePlayer extends React.Component {
 
   componentWillUnmount() {
     this._isMounted = false;
+    this._loadedURLs = null;
+    this._nextSourceIndex = null;
+    clearTimeout(this._timeout);
+    for (let timeout of this._waitTimeouts) {
+      clearTimeout(this._timeout);
+    }
+    this._timeout = null;
+    this._waitTimeouts = null;
     if (this.props.advanceHack) {
       this.props.advanceHack.listener = null;
     }
@@ -167,7 +179,6 @@ export default class ImagePlayer extends React.Component {
   shouldComponentUpdate(props: any, state: any): boolean {
     return (state.hideCursor !== this.state.hideCursor ||
             state.historyPaths !== this.state.historyPaths ||
-            state.timeoutID !== this.state.timeoutID ||
             props.hasStarted !== this.props.hasStarted ||
             props.allURLs !== this.props.allURLs ||
             props.historyOffset !== this.props.historyOffset ||
@@ -178,9 +189,8 @@ export default class ImagePlayer extends React.Component {
   componentWillReceiveProps(props: any) {
     if (!this.props.isPlaying && props.isPlaying) {
       this.start();
-    } else if (!props.isPlaying && this.state.timeoutID != 0) {
-      clearTimeout(this.state.timeoutID);
-      this.setState({timeoutID: 0});
+    } else if (!props.isPlaying) {
+      clearTimeout(this._timeout);
     }
   }
 
@@ -234,9 +244,9 @@ export default class ImagePlayer extends React.Component {
 
   startFetchLoops(max: number, loop = 0) {
     if (loop < max) {
-      this.runFetchLoop(loop, true);
+      this.runFetchLoop(loop);
       // Put a small delay between our loops
-      setTimeout(this.startFetchLoops.bind(this, max, loop+1), 10);
+      this._waitTimeouts[loop] = setTimeout(this.startFetchLoops.bind(this, max, loop+1), 10);
     }
   }
 
@@ -295,7 +305,7 @@ export default class ImagePlayer extends React.Component {
 
     if (this.state.readyToDisplay.length >= this.props.maxLoadingAtOnce) {
       // Wait for the display loop to use an image (it might be fast, or paused)
-      setTimeout(() => this.runFetchLoop(i), 100);
+      this._waitTimeouts[i] = setTimeout(() => this.runFetchLoop(i), 100);
       return;
     }
 
@@ -310,7 +320,7 @@ export default class ImagePlayer extends React.Component {
       }
       collection = this.props.allURLs.get(source);
       if (!(collection && collection.length)) {
-        setTimeout(() => this.runFetchLoop(i), 0);
+        this.runFetchLoop(i);
         return;
       }
       if (this.props.scene.forceAll) {
@@ -320,7 +330,7 @@ export default class ImagePlayer extends React.Component {
           if (remainingLibrary.length === 0) {
             this._loadedURLs = new Array<string>();
           }
-          setTimeout(() => this.runFetchLoop(i), 0);
+          this.runFetchLoop(i);
           return;
         }
       }
@@ -337,14 +347,14 @@ export default class ImagePlayer extends React.Component {
     } else {
       collection = [].concat.apply([], Array.from(this.props.allURLs.keys()));
       if (!(collection && collection.length)) {
-        setTimeout(() => this.runFetchLoop(i), 0);
+        this.runFetchLoop(i);
         return;
       }
       if (this.props.scene.forceAll) {
         collection = collection.filter((u: string) => !this._loadedURLs.includes(u));
         if (!(collection && collection.length)) {
           this._loadedURLs = new Array<string>();
-          setTimeout(() => this.runFetchLoop(i), 0);
+          this.runFetchLoop(i);
           return;
         }
       }
@@ -357,15 +367,18 @@ export default class ImagePlayer extends React.Component {
     }
 
     this._loadedURLs.push(url);
+    this.setState({numBeingLoaded: this.state.numBeingLoaded + 1});
 
     if (isVideo(url, false)) {
       let video = document.createElement('video');
       video.setAttribute("source", source);
 
-      this.setState({numBeingLoaded: this.state.numBeingLoaded + 1});
-
       const successCallback = () => {
         if (!this._isMounted) return;
+        this.cache(video);
+        if (this.props.scene.playFullVideo) {
+          video.setAttribute("duration", (video.duration * 1000).toString());
+        }
         if (this.props.onLoaded && this.state.historyPaths.length == 0) {
           this.props.onLoaded();
         }
@@ -386,7 +399,7 @@ export default class ImagePlayer extends React.Component {
         this.setState({
           numBeingLoaded: Math.max(0, this.state.numBeingLoaded - 1),
         });
-        setTimeout(this.runFetchLoop.bind(this, i), 0);
+        this.runFetchLoop(i);
       };
 
       if (this.props.scene.continueVideo) {
@@ -404,18 +417,14 @@ export default class ImagePlayer extends React.Component {
         // Also, now  we know the image size, so we can finally filter it.
         if (video.videoWidth < this.props.config.displaySettings.minVideoSize
           || video.videoHeight < this.props.config.displaySettings.minVideoSize) {
-          setTimeout(errorCallback, 0);
+          errorCallback();
         } else {
-          this.cache(video);
-          if (this.props.scene.playFullVideo) {
-            video.setAttribute("duration", (video.duration * 1000).toString());
-          }
-          setTimeout(successCallback, 0);
+          successCallback();
         }
       };
 
       video.onerror = () => {
-        setTimeout(errorCallback, 0);
+        errorCallback();
       };
 
       video.src = url;
@@ -426,10 +435,9 @@ export default class ImagePlayer extends React.Component {
       const img = new Image();
       img.setAttribute("source", source);
 
-      this.setState({numBeingLoaded: this.state.numBeingLoaded + 1});
-
       const successCallback = () => {
         if (!this._isMounted) return;
+        this.cache(img);
         if (this.props.onLoaded && this.state.historyPaths.length == 0) {
           this.props.onLoaded();
         }
@@ -450,7 +458,7 @@ export default class ImagePlayer extends React.Component {
         this.setState({
           numBeingLoaded: Math.max(0, this.state.numBeingLoaded - 1),
         });
-        setTimeout(this.runFetchLoop.bind(this, i), 0);
+        this.runFetchLoop(i);
       };
 
       function toArrayBuffer(buf: Buffer) {
@@ -468,15 +476,14 @@ export default class ImagePlayer extends React.Component {
         // Also, now  we know the image size, so we can finally filter it.
         if (img.width < this.props.config.displaySettings.minImageSize
           || img.height < this.props.config.displaySettings.minImageSize) {
-          setTimeout(errorCallback, 0);
+          errorCallback();
         } else {
-          this.cache(img);
-          setTimeout(successCallback, 0);
+          successCallback();
         }
       };
 
       img.onerror = () => {
-        setTimeout(errorCallback, 0);
+        errorCallback();
       };
 
       const processInfo = (info: GifInfo) => {
@@ -523,6 +530,9 @@ export default class ImagePlayer extends React.Component {
   }
 
   advance(isStarting = false, schedule = true, ignoreIsPlayingStatus = false) {
+    // bail if dead
+    if (!(isStarting || ignoreIsPlayingStatus || (this.props.isPlaying && this._isMounted))) return;
+
     let nextHistoryPaths = this.state.historyPaths;
     let nextImg;
     if (this.state.readyToDisplay.length) {
@@ -542,9 +552,6 @@ export default class ImagePlayer extends React.Component {
     while (nextHistoryPaths.length > this.props.maxInMemory) {
       nextHistoryPaths.shift();
     }
-
-    // bail if dead
-    if (!(isStarting || ignoreIsPlayingStatus || (this.props.isPlaying && this._isMounted))) return;
 
     if (!schedule) {
       this.setState({
@@ -575,8 +582,8 @@ export default class ImagePlayer extends React.Component {
       this.setState({
         historyPaths: nextHistoryPaths,
         timeToNextFrame,
-        timeoutID: setTimeout(this.advance.bind(this, false, true), timeToNextFrame),
       });
+      this._timeout = setTimeout(this.advance.bind(this, false, true), timeToNextFrame);
       this.props.setHistoryPaths(nextHistoryPaths);
     }
   }

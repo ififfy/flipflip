@@ -34,9 +34,9 @@ let twitterAlerted = false;
 let instagramAlerted = false;
 
 // Returns true if array is empty, or only contains empty arrays
-const isEmpty = function (allURLs: any[]): boolean {
+function isEmpty(allURLs: any[]): boolean {
   return Array.isArray(allURLs) && allURLs.every(isEmpty);
-};
+}
 
 function filterPathsToJustPlayable(imageTypeFilter: string, paths: Array<string>, strict: boolean): Array<string> {
   switch (imageTypeFilter) {
@@ -724,11 +724,11 @@ export default class HeadlessScenePlayer extends React.Component {
     historyOffset: number,
     advanceHack?: ChildCallbackHack,
     deleteHack?: ChildCallbackHack,
-    setHistoryOffset: (historyOffset: number) => void,
-    setHistoryPaths: (historyPaths: Array<any>) => void,
-    firstImageLoaded: () => void,
-    finishedLoading: (empty: boolean) => void,
-    setProgress: (tota: number, current: number, message: string) => void,
+    setHistoryOffset(historyOffset: number): void,
+    setHistoryPaths(historyPaths: Array<any>): void,
+    firstImageLoaded(): void,
+    finishedLoading(empty: boolean): void,
+    setProgress(tota: number, current: number, message: string): void,
     hasStarted: boolean,
     setVideo(video: HTMLVideoElement): void,
   };
@@ -742,8 +742,8 @@ export default class HeadlessScenePlayer extends React.Component {
     preload: false,
   };
 
-  nextPromiseQueue = Array<{source: string, next: any}>();
-  nextAllURLs = new Map<string, Array<string>>();
+  _nextPromiseQueue: Array<{source: string, next: any}> = null;
+  _nextAllURLs: Map<string, Array<string>> = null;
 
   render() {
     return (
@@ -780,6 +780,8 @@ export default class HeadlessScenePlayer extends React.Component {
     tumblr429Alerted = false;
     instagramAlerted = false;
     twitterAlerted = false;
+    this._nextPromiseQueue = new Array<{source: string, next: any}>();
+    this._nextAllURLs = new Map<string, Array<string>>();
     let n = 0;
     let newAllURLs = new Map<string, Array<string>>();
 
@@ -848,16 +850,16 @@ export default class HeadlessScenePlayer extends React.Component {
           // Just add the new urls to the end of the list
           if (object != null) {
             if (this.props.nextScene.weightFunction == WF.sources) {
-              this.nextAllURLs.set(loadPromise.source, object.data);
+              this._nextAllURLs.set(loadPromise.source, object.data);
             } else {
               for (let d of object.data) {
-                this.nextAllURLs.set(d, [loadPromise.source]);
+                this._nextAllURLs.set(d, [loadPromise.source]);
               }
             }
 
             // If this is a remote URL, queue up the next promise
             if (object.next != null) {
-              this.nextPromiseQueue.push({source: d, next: object.next})
+              this._nextPromiseQueue.push({source: d, next: object.next})
             }
           }
 
@@ -911,7 +913,7 @@ export default class HeadlessScenePlayer extends React.Component {
     if (this.state.preload) {
       this.setState({preload: false});
       promiseLoop();
-      if (this.props.nextScene && isEmpty(Array.from(this.nextAllURLs.values()))) {
+      if (this.props.nextScene && isEmpty(Array.from(this._nextAllURLs.values()))) {
         n = 0;
         nextSourceLoop();
       }
@@ -940,10 +942,10 @@ export default class HeadlessScenePlayer extends React.Component {
       this.componentWillUnmount();
       if (this.props.nextScene != null && props.scene.id === this.props.nextScene.id) { // If the next scene has been played
         if (props.nextScene.id === this.props.scene.id) { // Just swap values if we're coming back to this scene again
-          const newAllURLs = this.nextAllURLs;
-          const newPromiseQueue = this.nextPromiseQueue;
-          this.nextAllURLs = this.state.allURLs;
-          this.nextPromiseQueue = this.state.promiseQueue;
+          const newAllURLs = this._nextAllURLs;
+          const newPromiseQueue = this._nextPromiseQueue;
+          this._nextAllURLs = this.state.allURLs;
+          this._nextPromiseQueue = this.state.promiseQueue;
           this.setState({
             promiseQueue: newPromiseQueue,
             promise: new CancelablePromise((resolve, reject) => {}),
@@ -955,15 +957,15 @@ export default class HeadlessScenePlayer extends React.Component {
 
         } else { // Replace values
           this.setState({
-            promiseQueue: this.nextPromiseQueue,
+            promiseQueue: this._nextPromiseQueue,
             promise: new CancelablePromise((resolve, reject) => {}),
             nextPromise: new CancelablePromise((resolve, reject) => {}),
-            allURLs: this.nextAllURLs,
+            allURLs: this._nextAllURLs,
             preload: true,
             restart: true
           });
-          this.nextPromiseQueue = Array<{source: string, next: any}>();
-          this.nextAllURLs = new Map<string, Array<string>>();
+          this._nextPromiseQueue = Array<{source: string, next: any}>();
+          this._nextAllURLs = new Map<string, Array<string>>();
         }
       } else {
         this.setState({
@@ -988,5 +990,7 @@ export default class HeadlessScenePlayer extends React.Component {
   componentWillUnmount() {
     this.state.nextPromise.cancel();
     this.state.promise.cancel();
+    this._nextPromiseQueue = null;
+    this._nextAllURLs = null;
   }
 }

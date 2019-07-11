@@ -9,7 +9,7 @@ export default class SimpleURLInput extends React.Component {
     label: string,
     value: string,
     isEnabled: boolean,
-    onChange: (value: string) => void
+    onChange(value: string): void
   };
 
   render() {

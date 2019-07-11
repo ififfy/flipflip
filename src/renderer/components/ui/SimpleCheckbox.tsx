@@ -5,7 +5,7 @@ export default class SimpleCheckbox extends React.Component {
     text: string,
     isOn: boolean,
     children?: React.ReactNode,
-    onChange: (isOn: boolean) => void,
+    onChange(isOn: boolean): void,
   };
 
   render() {

@@ -16,6 +16,9 @@ function createWindow() {
     })
   });
 
+  // Enable garbage collection
+  app.commandLine.appendSwitch('js-flags', '--expose_gc');
+
   // Load the previous state with fallback to defaults
   let mainWindowState = windowStateKeeper({
     defaultHeight: 800,

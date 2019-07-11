@@ -1,4 +1,4 @@
-import {remote, shell} from 'electron';
+import {remote, shell, webFrame} from 'electron';
 import defaultMenu from "electron-default-menu";
 import * as React from 'react';
 import fs from "fs";
@@ -74,9 +74,9 @@ export default class Player extends React.Component {
     overlayVideos: Array<HTMLVideoElement>(this.getValidOverlays().length).fill(null),
   };
 
-  interval: NodeJS.Timer = null;
-  strobeInterval: NodeJS.Timer = null;
-  strobeDelay = 0;
+  _interval: NodeJS.Timer = null;
+  _strobeInterval: NodeJS.Timer = null;
+  _strobeDelay = 0;
 
   render() {
     const canGoBack = this.state.historyOffset > -(this.state.historyPaths.length - 1);
@@ -297,7 +297,7 @@ export default class Player extends React.Component {
 
   nextSceneLoop() {
     if (this.props.scene.nextSceneID === 0) {
-      clearInterval(this.interval);
+      clearInterval(this._interval);
     }
     if (this.state.startTime != null &&
       Math.round(Math.abs(new Date().getTime() - this.state.startTime.getTime()) / 1000) >= this.props.scene.nextSceneTime) {
@@ -315,12 +315,12 @@ export default class Player extends React.Component {
       }
     }
     const strobeDelay = props.scene.strobePulse ? props.scene.strobeDelay : props.scene.strobeTime;
-    if (strobeDelay != this.strobeDelay) {
-      clearInterval(this.strobeInterval);
-      this.strobeDelay = strobeDelay;
-      this.strobeInterval = setInterval(() => {
+    if (strobeDelay != this._strobeDelay) {
+      clearInterval(this._strobeInterval);
+      this._strobeDelay = strobeDelay;
+      this._strobeInterval = setInterval(() => {
         this.setState({toggleStrobe: !this.state.toggleStrobe})
-      }, this.strobeDelay);
+      }, this._strobeDelay);
     }
   }
 
@@ -332,8 +332,8 @@ export default class Player extends React.Component {
     window.addEventListener('contextmenu', this.showContextMenu, false);
 
     this.buildMenu();
-    this.interval = setInterval(() => this.nextSceneLoop(), 1000);
-    this.strobeInterval = setInterval(() => {
+    this._interval = setInterval(() => this.nextSceneLoop(), 1000);
+    this._strobeInterval = setInterval(() => {
       this.setState({toggleStrobe: !this.state.toggleStrobe})
     }, this.props.scene.strobePulse ? this.props.scene.strobeDelay : this.props.scene.strobeTime);
   }
@@ -394,9 +394,12 @@ export default class Player extends React.Component {
   }
 
   componentWillUnmount() {
-    clearInterval(this.interval);
-    clearInterval(this.strobeInterval);
+    clearInterval(this._interval);
+    clearInterval(this._strobeInterval);
+    this._interval = null;
+    this._strobeInterval = null;
     getCurrentWindow().setAlwaysOnTop(false);
+    getCurrentWindow().setFullScreen(false);
     const menu = defaultMenu(app, shell);
     if (process.platform !== 'darwin') {
       menu.splice(0, 0, {
@@ -416,8 +419,11 @@ export default class Player extends React.Component {
     });
     menu.splice(4, 1);
     Menu.setApplicationMenu(Menu.buildFromTemplate(menu));
-    getCurrentWindow().setFullScreen(false);
     window.removeEventListener('contextmenu', this.showContextMenu);
+    // Clear ALL the available browser caches
+    global.gc();
+    webFrame.clearCache();
+    remote.getCurrentWindow().webContents.session.clearCache(() => {});
   }
 
   nop() {}

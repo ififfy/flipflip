@@ -2,6 +2,7 @@ import * as React from 'react';
 import SystemFonts from 'system-font-families';
 
 import {TOT} from "../../data/const";
+import {CancelablePromise} from "../../data/utils";
 import {SceneSettings} from "../../data/Config";
 import Scene from "../../data/Scene";
 import ControlGroup from "./ControlGroup";
@@ -21,6 +22,8 @@ export default class TextGroup extends React.Component {
     showFontSettings: false,
     systemFonts: Array<string>(),
   };
+
+  _promise: CancelablePromise = null;
 
   render() {
     return (
@@ -190,14 +193,23 @@ export default class TextGroup extends React.Component {
 
   componentDidMount() {
     // Define system fonts
-    new SystemFonts().getFonts().then(
-      (res: Array<string>) => {
-        this.setState({systemFonts: res});
-      },
-      (err: string) => {
-        console.error(err);
-      }
-    );
+    this._promise = new CancelablePromise((resolve, reject) => {
+      new SystemFonts().getFonts().then((res: Array<string>) => {
+          if (!this._promise.hasCanceled) {
+            this.setState({systemFonts: res});
+          }
+        },
+        (err: string) => {
+          console.error(err);
+        }
+      );
+    });
+  }
+
+  componentWillUnmount() {
+    if (this._promise != null) {
+      this._promise.cancel();
+    }
   }
 
   toggleFontOptions() {

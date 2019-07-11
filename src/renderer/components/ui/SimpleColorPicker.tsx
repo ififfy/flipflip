@@ -4,7 +4,7 @@ export default class SimpleColorPicker extends React.Component {
   readonly props: {
     label: string,
     value: string,
-    onChange: (value: string) => void
+    onChange(value: string): void
   };
 
   render() {

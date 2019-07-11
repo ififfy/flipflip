@@ -71,12 +71,6 @@ export default class DisplayGroup extends React.Component {
 
   nop() {}
 
-  paste(fn: Function) {
-    (navigator as any).clipboard.readText().then((pastedText: string) => {
-      fn(pastedText);
-    });
-  }
-
   update(fn: (keys: any) => void) {
     this.props.onUpdateSettings(this.props.settings, fn);
   }

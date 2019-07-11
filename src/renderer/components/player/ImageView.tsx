@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {animated, useSpring, useTransition} from "react-spring";
+import Timeout = NodeJS.Timeout;
 
 import {BT} from "../../data/const";
 
@@ -126,6 +127,7 @@ export default class ImageView extends React.Component {
 
   readonly backgroundRef: React.RefObject<any> = React.createRef();
   readonly contentRef: React.RefObject<any> = React.createRef();
+  _timeout: Timeout = null;
 
   componentDidMount() {
     this._applyImage();
@@ -133,6 +135,11 @@ export default class ImageView extends React.Component {
 
   componentDidUpdate() {
     this._applyImage();
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this._timeout);
+    this._timeout = null;
   }
 
   _applyImage() {
@@ -181,11 +188,12 @@ export default class ImageView extends React.Component {
         bgImg.height = parentHeight;
 
         const draw = (v: any, c: CanvasRenderingContext2D, w: number, h: number) => {
-          if (v.paused || v.ended) return false;
+          if (v.paused || v.ended) return;
           c.drawImage(v, 0, 0, w, h);
-          setTimeout(draw, 20, v, c, w, h);
+          this._timeout = setTimeout(draw, 20, v, c, w, h);
         };
 
+        clearTimeout(this._timeout);
         if (img instanceof HTMLImageElement) {
           draw(img, context, parentWidth, parentHeight);
         } else {

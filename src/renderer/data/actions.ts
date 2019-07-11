@@ -7,7 +7,7 @@ import LibrarySource from "../components/library/LibrarySource";
 import { defaultInitialState } from './AppStorage';
 import Config from "./Config";
 import Tag from "../components/library/Tag";
-import { remote, webFrame } from "electron";
+import {remote} from "electron";
 
 type State = typeof defaultInitialState;
 
@@ -87,8 +87,29 @@ export function cleanBackups(state: State): Object {
   return {};
 }
 
+export function printMemoryReport() {
+  function format(x: any) {
+    let f = x.toString();
+    while (f.length < 15) {
+      f = " " + f;
+    }
+    f = f.substr(0, 15);
+    return f;
+  }
+  function logB(x: any) {
+    console.log(format(x[0]), format(x[1] / (1000.0*1000)), "MB");
+  }
+  function logKB(x: any) {
+    console.log(format(x[0]), format(x[1] / (1000.0)), "MB");
+  }
+
+  Object.entries(process.memoryUsage()).map(logB);
+  Object.entries(process.getProcessMemoryInfo()).map(logKB);
+  Object.entries(process.getSystemMemoryInfo()).map(logKB);
+  console.log('------')
+}
+
 export function goBack(state: State): Object {
-  webFrame.clearCache();
   state.route.pop();
   const newRoute = state.route.slice(0);
   return {route: newRoute, autoEdit: false, isSelect: false};
