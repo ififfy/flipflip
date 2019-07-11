@@ -1,7 +1,7 @@
 import * as React from "react";
-import Sortable from "sortablejs"
+import Sortable from "react-sortablejs"
 
-import {arrayMove, removeDuplicatesBy} from "../../data/utils";
+import {removeDuplicatesBy} from "../../data/utils";
 import Tag from "./Tag";
 
 export default class TagManager extends React.Component {
@@ -15,8 +15,9 @@ export default class TagManager extends React.Component {
     tags: Array<Tag>(),
     removeTags: false,
     isEditing: -1,
-    sortable: Sortable,
   };
+
+  _sortable: any = null;
 
   render() {
     return (
@@ -53,7 +54,21 @@ export default class TagManager extends React.Component {
           )}
         </div>
 
-        <div id="tags" className="TagManager__Tags">
+        <Sortable
+          className="TagManager__Tags"
+          options={{
+            animation: 150,
+            easing: "cubic-bezier(1, 0, 0, 1)",
+            disabled: this.state.removeTags,
+          }}
+          ref={(node: any) => {
+            if (node) {
+              this._sortable = node.sortable;
+            }
+          }}
+          onChange={(newTags: any) => {
+            this.setState({tags: newTags});
+          }}>
           {this.state.tags.map((tag) =>
             <div className={`TagManager__Tag u-clickable ${this.state.removeTags ? 'u-destructive-bg' : ''}`}
                  onClick={this.state.removeTags ? this.onRemove.bind(this, tag.id) : this.onEdit.bind(this, tag.id)}
@@ -75,7 +90,7 @@ export default class TagManager extends React.Component {
               )}
             </div>
           )}
-        </div>
+        </Sortable>
 
         {this.state.tags.length == 0 && (
           <div className="TagManager__Empty">
@@ -91,26 +106,14 @@ export default class TagManager extends React.Component {
     )
   }
 
-  onEnd(evt: any) {
-    let newTags = this.state.tags;
-    arrayMove(newTags, evt.oldIndex, evt.newIndex);
-    this.setState({tags: newTags});
-  }
-
   componentDidMount() {
-    let sortable = Sortable.create(document.getElementById('tags'), {
-      animation: 150,
-      easing: "cubic-bezier(1, 0, 0, 1)",
-      onEnd: this.onEnd.bind(this),
-    });
-
-    // Make a deep copy of Tags
+        // Make a deep copy of Tags
     // For some reason, shallow copy was still modifying props' Tags
     let newTags = Array<Tag>();
     for (let tag of this.props.tags) {
       newTags.push(JSON.parse(JSON.stringify(tag)));
     }
-    this.setState({sortable: sortable, tags: newTags});
+    this.setState({tags: newTags});
   }
 
   nop() {}
@@ -125,7 +128,7 @@ export default class TagManager extends React.Component {
   }
 
   toggleRemoveMode() {
-    this.state.sortable.option("disabled", !this.state.removeTags);
+    this._sortable.option("disabled", !this.state.removeTags);
     this.setState({removeTags: !this.state.removeTags});
   };
 

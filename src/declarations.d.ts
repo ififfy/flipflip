@@ -25,7 +25,7 @@ declare module 'recursive-readdir';
 declare module 'gif-info';
 declare module 'request';
 declare module 'progressbar.js';
-declare module 'sortablejs';
+declare module 'react-sortablejs';
 declare module 'react-select';
 declare module 'react-select/creatable';
 declare module 'react-spring';

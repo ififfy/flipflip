@@ -1,9 +1,9 @@
 import * as React from "react";
 import rimraf from "rimraf";
-import Sortable from "sortablejs";
+import Sortable from "react-sortablejs";
 import {remote} from "electron";
 
-import {arrayMove, getCachePath, getFileGroup, getSourceType} from "../../data/utils";
+import {getCachePath, getFileGroup, getSourceType} from "../../data/utils";
 import {SF, ST} from "../../data/const";
 import SourceIcon from "./SourceIcon";
 import LibrarySource from "../library/LibrarySource";
@@ -33,8 +33,9 @@ export default class SourceList extends React.Component {
 
   readonly state = {
     isEditing: -1,
-    sortable: Sortable,
   };
+
+  _sortable: any = null;
 
   render() {
     const filtering = this.props.filters.length > 0;
@@ -65,58 +66,73 @@ export default class SourceList extends React.Component {
               {filtering ? "No results" : this.props.emptyMessage}
             </div>
           )}
-          {this.props.displaySources.map((source) =>
-            <div className={`SourceList__Source ${source.offline ? 'm-offline' : ''} ${source.marked ? 'm-marked' : ''}`}
-                 key={source.id}>
-              {this.props.isSelect && (
-                <input type="checkbox" value={source.url} onChange={this.onSelect.bind(this)}
-                       checked={this.props.selected.includes(source.url)}/>
-              )}
-              {this.props.onPlay && (
-                <SourceIcon url={source.url}/>
-              )}
-              {this.state.isEditing != source.id && (
-                <div className="SourceList__SourceTitle u-clickable"
-                     onClick={this.props.onPlay ? this.onPlay.bind(this, source) : this.onEdit.bind(this, source.id)}>
-                  {source.url}
-                </div>
-              )}
-              {this.state.isEditing == source.id && (
-                <form className="SourceList__SourceTitle" onSubmit={this.onEdit.bind(this, -1)}>
-                  <input
-                    autoFocus
-                    type="text"
-                    value={source.url}
-                    onBlur={this.onEdit.bind(this, -1)}
-                    onChange={this.onEditSource.bind(this, source.id)}/>
-                </form>
-              )}
-              {source.tags && this.props.onPlay &&  (
-                <div id={`tags-${source.id}`} className="SourceList__SourceTags">
-                  {source.tags.map((tag) =>
-                    <span className="SourceList__SourceTag" key={tag.id}>{tag.name}</span>
+          <Sortable
+            options={{
+              animation: 150,
+              easing: "cubic-bezier(1, 0, 0, 1)",
+              disabled: filtering,
+            }}
+            ref={(node: any) => {
+              if (node) {
+                this._sortable = node.sortable;
+              }
+            }}
+            onChange={(newSources: any) => {
+              this.props.onUpdateSources(newSources);
+            }}>
+            {this.props.displaySources.map((source) =>
+                <div className={`SourceList__Source ${source.offline ? 'm-offline' : ''} ${source.marked ? 'm-marked' : ''}`}
+                     key={source.id}>
+                  {this.props.isSelect && (
+                    <input type="checkbox" value={source.url} onChange={this.onSelect.bind(this)}
+                           checked={this.props.selected.includes(source.url)}/>
                   )}
-                </div>
-              )}
+                  {this.props.onPlay && (
+                    <SourceIcon url={source.url}/>
+                  )}
+                  {this.state.isEditing != source.id && (
+                    <div className="SourceList__SourceTitle u-clickable"
+                         onClick={this.props.onPlay ? this.onPlay.bind(this, source) : this.onEdit.bind(this, source.id)}>
+                      {source.url}
+                    </div>
+                  )}
+                  {this.state.isEditing == source.id && (
+                    <form className="SourceList__SourceTitle" onSubmit={this.onEdit.bind(this, -1)}>
+                      <input
+                        autoFocus
+                        type="text"
+                        value={source.url}
+                        onBlur={this.onEdit.bind(this, -1)}
+                        onChange={this.onEditSource.bind(this, source.id)}/>
+                    </form>
+                  )}
+                  {source.tags && this.props.onPlay &&  (
+                    <div id={`tags-${source.id}`} className="SourceList__SourceTags">
+                      {source.tags.map((tag) =>
+                        <span className="SourceList__SourceTag" key={tag.id}>{tag.name}</span>
+                      )}
+                    </div>
+                  )}
 
-              <div className="u-button u-small-icon-button u-clickable"
-                   onClick={this.onRemove.bind(this, source.id)}
-                   title="Remove">
-                <div className="u-delete"/>
-              </div>
-              {this.props.config.caching.enabled && getSourceType(source.url) != ST.local && (
-                <div className="u-button u-small-icon-button u-clean u-clickable"
-                     onClick={this.onClean.bind(this, source.id)}
-                     title="Clear cache">
-                  <div className="u-clean"/>
-                </div>)}
-              <div className="u-button u-small-icon-button u-clickable"
-                   onClick={this.onEdit.bind(this, source.id)}
-                   title="Edit">
-                <div className="u-edit"/>
-              </div>
-            </div>
-          )}
+                  <div className="u-button u-small-icon-button u-clickable"
+                       onClick={this.onRemove.bind(this, source.id)}
+                       title="Remove">
+                    <div className="u-delete"/>
+                  </div>
+                  {this.props.config.caching.enabled && getSourceType(source.url) != ST.local && (
+                    <div className="u-button u-small-icon-button u-clean u-clickable"
+                         onClick={this.onClean.bind(this, source.id)}
+                         title="Clear cache">
+                      <div className="u-clean"/>
+                    </div>)}
+                  <div className="u-button u-small-icon-button u-clickable"
+                       onClick={this.onEdit.bind(this, source.id)}
+                       title="Edit">
+                    <div className="u-edit"/>
+                  </div>
+                </div>
+            )}
+          </Sortable>
         </div>
       </div>
     )
@@ -125,13 +141,6 @@ export default class SourceList extends React.Component {
   nop() {}
 
   componentDidMount() {
-    this.setState({sortable:
-        Sortable.create(document.getElementById('sources'), {
-          animation: 150,
-          easing: "cubic-bezier(1, 0, 0, 1)",
-          onEnd: this.onEnd.bind(this),
-        })
-    });
     document.getElementById("sources").scrollTo(0, this.props.yOffset);
   }
 
@@ -140,23 +149,17 @@ export default class SourceList extends React.Component {
       (this.props.isSelect !== props.isSelect) ||
       (this.props.filters !== props.filters) ||
       (this.props.selected.length !== props.selected.length) ||
-      (this.props.displaySources !== props.displaySources))
+      (this.props.displaySources !== props.displaySources));
   }
 
-  componentDidUpdate(): void {
-    this.state.sortable.option("disabled", this.props.filters.length > 0);
+  componentWillUpdate(): void {
+    this._sortable.option("disabled", this.props.filters.length > 0);
   }
 
   componentWillUnmount() {
     if (this.props.savePosition) {
       this.props.savePosition(document.getElementById("sources").scrollTop, this.props.filters, this.props.selected);
     }
-  }
-
-  onEnd(evt: any) {
-    let newSources = this.props.sources;
-    arrayMove(newSources, evt.oldIndex, evt.newIndex);
-    this.props.onUpdateSources(newSources);
   }
 
   onPlay(source: LibrarySource) {

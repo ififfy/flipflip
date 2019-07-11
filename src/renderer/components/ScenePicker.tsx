@@ -1,10 +1,10 @@
 import {remote} from 'electron';
 import * as React from 'react';
 import wretch from 'wretch';
-import Sortable from "sortablejs";
+import Sortable from "react-sortablejs";
 
 import {SF} from "../data/const";
-import {arrayMove, getRandomListItem} from "../data/utils";
+import {getRandomListItem} from "../data/utils";
 import Scene from '../data/Scene';
 import SimpleOptionPicker from "./ui/SimpleOptionPicker";
 import Jiggle from "../animations/Jiggle";
@@ -173,7 +173,15 @@ export default class ScenePicker extends React.Component {
         </div>
 
         <hr/>
-        <div className="ScenePicker__Scenes" id="scenes">
+        <Sortable
+          className="ScenePicker__Scenes"
+          options={{
+            animation: 150,
+            easing: "cubic-bezier(1, 0, 0, 1)",
+          }}
+          onChange={(newScenes: any) => {
+            this.props.onUpdateScenes(newScenes);
+          }}>
           {this.props.scenes.map((scene) =>
             <Jiggle key={scene.id} bounce={true}>
               <ScenePickerItem
@@ -181,29 +189,14 @@ export default class ScenePicker extends React.Component {
                 onSelect={this.props.onSelect}/>
             </Jiggle>
           )}
-        </div>
+        </Sortable>
       </div>
     );
   }
 
   nop() {}
 
-  onEnd(evt: any) {
-    let newScenes = this.props.scenes;
-    arrayMove(newScenes, evt.oldIndex, evt.newIndex);
-    this.props.onUpdateScenes(newScenes);
-  }
-
   componentDidMount() {
-    if (this.props.scenes.length > 0) {
-      Sortable.create(document.getElementById('scenes'), {
-        animation: 150,
-        easing: "cubic-bezier(1, 0, 0, 1)",
-        draggable: ".u-draggable",
-        onEnd: this.onEnd.bind(this),
-      });
-    }
-
     wretch("https://api.github.com/repos/ififfy/flipflip/releases")
       .get()
       .json(json => {
@@ -249,7 +242,8 @@ export default class ScenePicker extends React.Component {
             })
           }
         }
-      });
+      })
+      .catch((e) => console.error(e));
   }
 
   openGitRelease() {

@@ -12,21 +12,11 @@ export default class FFAnalytics extends React.Component {
   };
 
   componentDidMount() {
-    const analytics = new Analytics('UA-143309627-1');
-    analytics.screen('flipflip', this.props.version, 'com.ififfy.flipflip', 'com.ififfy.flipflip', this.props.page, this.props.config.clientID)
-      .then((response: any) => {
-        if (response.clientID != this.props.config.clientID) {
-          this.onSetClientID(response.clientID);
-        }
-      }).catch((err: any) => {
-        console.error(err);
-      });
+    this.sendScreenView();
   }
 
-  onSetClientID(clientID: string) {
-    const newConfig = this.props.config;
-    newConfig.clientID = clientID;
-    this.props.onUpdateConfig(newConfig);
+  componentDidUpdate() {
+    this.sendScreenView();
   }
 
   shouldComponentUpdate(props: any): boolean {
@@ -34,5 +24,23 @@ export default class FFAnalytics extends React.Component {
   }
 
   render() {return (<React.Fragment/>);}
+
+  sendScreenView() {
+    const analytics = new Analytics('UA-143309627-1');
+    analytics.screen('flipflip', this.props.version, 'com.ififfy.flipflip', 'com.ififfy.flipflip', this.props.page, this.props.config.clientID)
+      .then((response: any) => {
+        if (response.clientID != this.props.config.clientID) {
+          this.onSetClientID(response.clientID);
+        }
+      }).catch((err: any) => {
+      console.error(err);
+    });
+  }
+
+  onSetClientID(clientID: string) {
+    const newConfig = this.props.config;
+    newConfig.clientID = clientID;
+    this.props.onUpdateConfig(newConfig);
+  }
 }
 

@@ -60,6 +60,11 @@ export default class Jiggle extends React.Component {
     this.state.jiggling.splice(this.state.jiggling.indexOf(e), 1);
   };
 
+  shouldComponentUpdate(props: any, state: any): boolean {
+    return ((this.state.hasStarted !== state.hasStarted) ||
+      (this.state.jiggling !== state.jiggling));
+  }
+
   render() {
     return (
       <JiggleAnimation
