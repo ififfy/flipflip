@@ -719,6 +719,7 @@ export default class HeadlessScenePlayer extends React.Component {
     nextScene?: Scene,
     opacity: number,
     isPlaying: boolean,
+    hasStarted: boolean,
     strobeLayer?: string,
     toggleStrobe?: boolean,
     historyOffset: number,
@@ -728,8 +729,7 @@ export default class HeadlessScenePlayer extends React.Component {
     setHistoryPaths(historyPaths: Array<any>): void,
     firstImageLoaded(): void,
     finishedLoading(empty: boolean): void,
-    setProgress(tota: number, current: number, message: string): void,
-    hasStarted: boolean,
+    setProgress(total: number, current: number, message: string): void,
     setVideo(video: HTMLVideoElement): void,
   };
 
@@ -887,10 +887,15 @@ export default class HeadlessScenePlayer extends React.Component {
                 let sourceURLs = newAllURLs.get(promise.source);
                 newAllURLs.set(promise.source, sourceURLs.concat(object.data.filter((u) => {
                   const fileName = getFileName(u);
-                  return !sourceURLs.map((u) => getFileName(u)).includes(fileName);
+                  const found = sourceURLs.map((u) => getFileName(u)).includes(fileName);
+                  return !found;
                 })));
               } else {
-                for (let d of object.data) {
+                for (let d of object.data.filter((u) => {
+                  const fileName = getFileName(u);
+                  const found = Array.from(newAllURLs.keys()).map((u) => getFileName(u)).includes(fileName);
+                  return !found;
+                })) {
                   newAllURLs.set(d, [promise.source]);
                 }
               }

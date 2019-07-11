@@ -56,13 +56,12 @@ export default class ImagePlayer extends React.Component {
   _isMounted = false;
   _loadedURLs: Array<string> = null;
   _nextIndex = 0;
+  _nextAdvIndex = 0;
   _nextSourceIndex: Map<String, number> = null;
   _timeout: Timeout = null;
   _waitTimeouts: Array<Timeout> = null;
 
   render() {
-    if (this.state.historyPaths.length < 1 || !this.props.hasStarted) return <div className="ImagePlayer m-empty"/>;
-
     let offset = this.props.historyOffset;
     if (offset <= -this.state.historyPaths.length) {
       offset = -this.state.historyPaths.length + 1;
@@ -117,9 +116,8 @@ export default class ImagePlayer extends React.Component {
           onActive={this.onActive.bind(this)}
           onIdle={this.onIdle.bind(this)}
           timeout={2000} />
-        <div>
           <ImageView
-            image={this.state.historyPaths[(this.state.historyPaths.length - 1) + offset]}
+            image={this.state.historyPaths.length > 0 ? this.state.historyPaths[(this.state.historyPaths.length - 1) + offset] : null}
             backgroundType={this.props.scene.backgroundType}
             backgroundColor={this.props.scene.backgroundColor}
             backgroundBlur={this.props.scene.backgroundBlur}
@@ -131,22 +129,25 @@ export default class ImagePlayer extends React.Component {
             crossFade={crossFade}
             fadeDuration={fadeDuration}
             videoVolume={this.props.scene.videoVolume}
+            onLoaded={this.state.historyPaths.length == 1 ? this.props.onLoaded : this.nop}
             setVideo={this.props.setVideo}/>
-        </div>
       </div>
     );
   }
+
+  nop() {}
 
   componentDidMount() {
     this._isMounted = true;
     this._loadedURLs = new Array<string>();
     this._nextIndex = 0;
+    this._nextAdvIndex = 0;
     this._nextSourceIndex = new Map<String, number>();
     this._waitTimeouts = new Array<Timeout>(this.props.config.displaySettings.maxLoadingAtOnce).fill(null);
     if (this.props.advanceHack) {
       this.props.advanceHack.listener = () => {
-        // advance, ignoring isPlaying status and not scheduling another
-        this.advance(false, false, true);
+        clearTimeout(this._timeout);
+        this.advance(true, true);
       }
     }
     if (this.props.deleteHack) {
@@ -155,6 +156,7 @@ export default class ImagePlayer extends React.Component {
         this.delete();
       }
     }
+    this.startFetchLoops(this.props.maxLoadingAtOnce);
     this.start();
   }
 
@@ -187,16 +189,12 @@ export default class ImagePlayer extends React.Component {
   }
 
   componentWillReceiveProps(props: any) {
-    if (!this.props.isPlaying && props.isPlaying) {
+    if ((!this.props.isPlaying && props.isPlaying) ||
+      (!this.props.allURLs && props.allURLs && !this.props.hasStarted) ||
+      (!this.props.hasStarted && props.hasStarted && !this.props.allURLs)) {
       this.start();
     } else if (!props.isPlaying) {
       clearTimeout(this._timeout);
-    }
-  }
-
-  componentDidUpdate(props: any) {
-    if (props.allURLs == null && this.props.allURLs != null) {
-      this.start();
     }
   }
 
@@ -236,8 +234,6 @@ export default class ImagePlayer extends React.Component {
     if (this.props.allURLs == null) {
       return;
     }
-
-    this.startFetchLoops(this.props.maxLoadingAtOnce);
 
     this.advance(true, true);
   }
@@ -300,8 +296,8 @@ export default class ImagePlayer extends React.Component {
     }
   }
 
-  runFetchLoop(i: number, isStarting = false) {
-    if (!this._isMounted && !isStarting) return;
+  runFetchLoop(i: number) {
+    if (!this._isMounted) return;
 
     if (this.state.readyToDisplay.length >= this.props.maxLoadingAtOnce) {
       // Wait for the display loop to use an image (it might be fast, or paused)
@@ -379,9 +375,6 @@ export default class ImagePlayer extends React.Component {
         if (this.props.scene.playFullVideo) {
           video.setAttribute("duration", (video.duration * 1000).toString());
         }
-        if (this.props.onLoaded && this.state.historyPaths.length == 0) {
-          this.props.onLoaded();
-        }
         (video as any).key = this.state.nextImageID;
         this.setState({
           readyToDisplay: this.state.readyToDisplay.concat([video]),
@@ -438,9 +431,6 @@ export default class ImagePlayer extends React.Component {
       const successCallback = () => {
         if (!this._isMounted) return;
         this.cache(img);
-        if (this.props.onLoaded && this.state.historyPaths.length == 0) {
-          this.props.onLoaded();
-        }
         (img as any).key = this.state.nextImageID;
         this.setState({
           readyToDisplay: this.state.readyToDisplay.concat([img]),
@@ -529,21 +519,20 @@ export default class ImagePlayer extends React.Component {
     }
   }
 
-  advance(isStarting = false, schedule = true, ignoreIsPlayingStatus = false) {
+  advance(force = false, schedule = true) {
     // bail if dead
-    if (!(isStarting || ignoreIsPlayingStatus || (this.props.isPlaying && this._isMounted))) return;
+    if (!(force || (this.props.isPlaying && this._isMounted && (this.props.hasStarted || this.state.historyPaths.length == 0)))) return;
 
     let nextHistoryPaths = this.state.historyPaths;
     let nextImg;
     if (this.state.readyToDisplay.length) {
       nextImg = this.state.readyToDisplay.shift();
-      if (nextImg instanceof HTMLVideoElement && !this.props.scene.playFullVideo && this.props.scene.randomVideoStart && (!this.props.scene.continueVideo || !nextImg.currentTime)) {
-        nextImg.currentTime = Math.random() * nextImg.duration;
-      }
-      nextHistoryPaths = nextHistoryPaths.concat([nextImg]);
-    } else if (this.state.historyPaths.length) {
-      // no new image ready; just pick a random one from the past 120
+    } else if (this.state.historyPaths.length && this.props.config.defaultScene.randomize && !this.props.scene.forceAll) {
       nextImg = getRandomListItem(this.state.historyPaths);
+    } else if (this.state.historyPaths.length) {
+      nextImg = this.state.historyPaths[this._nextAdvIndex++%this.state.historyPaths.length];
+    }
+    if (nextImg) {
       if (nextImg instanceof HTMLVideoElement && !this.props.scene.playFullVideo && this.props.scene.randomVideoStart && (!this.props.scene.continueVideo || !nextImg.currentTime)) {
         nextImg.currentTime = Math.random() * nextImg.duration;
       }

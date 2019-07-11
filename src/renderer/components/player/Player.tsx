@@ -53,11 +53,9 @@ export default class Player extends React.Component {
   };
 
   readonly state = {
-    isLoaded: false,
+    canStart: false,
     hasStarted: false,
-    canMainStart: false,
     isMainLoaded: false,
-    canOverlaysStart: Array<boolean>(this.getValidOverlays().length).fill(false),
     areOverlaysLoaded: Array<boolean>(this.getValidOverlays().length).fill(false),
     isEmpty: false,
     isPlaying: true,
@@ -83,17 +81,19 @@ export default class Player extends React.Component {
     const canGoForward = this.state.historyOffset < 0;
     const tagNames = this.props.tags ? this.props.tags.map((t) => t.name) : [];
     const validOverlays = this.getValidOverlays();
+    const nextScene = this.getScene(this.props.scene.nextSceneID);
     const showCaptionProgram = (
       this.props.scene.textSource &&
       this.props.scene.textSource.length &&
-      this.state.isPlaying);
-    const nextScene = this.getScene(this.props.scene.nextSceneID);
+      this.state.isPlaying &&
+      this.state.hasStarted);
+    const showStrobe = this.props.scene.strobe && this.state.hasStarted && this.state.isPlaying &&
+      (this.props.scene.strobeLayer == SL.top || this.props.scene.strobeLayer == SL.bottom);
     const strobeOpacity = this.props.scene.strobeLayer == SL.bottom ? this.props.scene.strobeOpacity : 1;
 
     return (
       <div className="Player">
-        {this.props.scene.strobe && this.state.hasStarted &&
-          (this.props.scene.strobeLayer == SL.top || this.props.scene.strobeLayer == SL.bottom) && (
+        {showStrobe && (
           <Transition
             reset
             unique
@@ -110,9 +110,9 @@ export default class Player extends React.Component {
             total={this.state.total}
             current={this.state.progress}
             message={this.state.progressMessage}>
-            {this.state.isLoaded && (<div
+            {this.state.canStart && (<div
               className="StartButton u-button u-clickable"
-              onClick={this.start.bind(this, true)}>
+              onClick={this.start.bind(this, this.state.canStart, true)}>
               Start Now
             </div>)}
           </Progress>
@@ -128,6 +128,7 @@ export default class Player extends React.Component {
             nextScene={nextScene}
             opacity={1}
             isPlaying={this.state.isPlaying}
+            hasStarted={this.state.hasStarted}
             strobeLayer={this.props.scene.strobe ? this.props.scene.strobeLayer : null}
             toggleStrobe={this.state.toggleStrobe}
             historyOffset={this.state.historyOffset}
@@ -138,7 +139,6 @@ export default class Player extends React.Component {
             finishedLoading={this.setMainLoaded.bind(this)}
             firstImageLoaded={this.setMainCanStart.bind(this)}
             setProgress={this.setProgress.bind(this)}
-            hasStarted={this.state.hasStarted}
             setVideo={this.setMainVideo.bind(this)}
           />
 
@@ -159,20 +159,20 @@ export default class Player extends React.Component {
                 scene={this.getScene(overlay.sceneID)}
                 opacity={overlay.opacity / 100}
                 isPlaying={this.state.isPlaying && !this.state.isEmpty}
+                hasStarted={this.state.hasStarted}
                 historyOffset={0}
                 setHistoryOffset={this.nop}
                 setHistoryPaths={this.nop}
-                finishedLoading={this.setOverlayLoaded.bind(this, overlay.id)}
-                firstImageLoaded={this.setOverlayCanStart.bind(this, overlay.id)}
+                finishedLoading={this.setOverlayLoaded.bind(this, index)}
+                firstImageLoaded={this.nop}
                 setProgress={showProgress ? this.setProgress.bind(this) : this.nop}
-                hasStarted={this.state.hasStarted}
-                setVideo={this.setOverlayVideo.bind(this, overlay.id)}
+                setVideo={this.setOverlayVideo.bind(this, index)}
               />
             );}
           )}
         </div>
 
-        {this.state.hasStarted && showCaptionProgram && (
+        {showCaptionProgram && (
           <CaptionProgram
             blinkColor={this.props.scene.blinkColor}
             blinkFontSize={this.props.scene.blinkFontSize}
@@ -510,23 +510,9 @@ export default class Player extends React.Component {
   }
 
   setMainCanStart() {
-    if (!this.state.canMainStart) {
-      this.setState({canMainStart: true, isEmpty: false});
-      if (this.getValidOverlays().length == 0 || this.state.canOverlaysStart.find((b) => !b) == null) {
-        this.play();
-      }
-    }
-  }
-
-  setOverlayCanStart(id: number) {
-    if (this.state.canOverlaysStart.find((b) => !b) != null) {
-      const newCOS = this.state.canOverlaysStart;
-      const indexOf = this.getValidOverlays().map((o) => o.id).indexOf(id);
-      newCOS[indexOf] = true;
-      this.setState({canOverlayStart: newCOS});
-      if (this.state.canOverlaysStart.find((b) => !b) == null && this.state.canMainStart) {
-        this.play();
-      }
+    if (!this.state.canStart) {
+      this.setState({canStart: true, isEmpty: false});
+      this.start(true);
     }
   }
 
@@ -535,42 +521,39 @@ export default class Player extends React.Component {
       this.setState({isEmpty: empty});
     } else {
       this.setState({isMainLoaded: true});
-      if (this.getValidOverlays().length == 0 || this.state.areOverlaysLoaded.find((b) => !b) == null) {
-        this.start();
-      }
+      this.play();
     }
   }
 
-  setOverlayLoaded(id: number, empty: boolean) {
+  setOverlayLoaded(index: number, empty: boolean) {
     const newAOL = this.state.areOverlaysLoaded;
-    const indexOf = this.getValidOverlays().map((o) => o.id).indexOf(id);
-    newAOL[indexOf] = true;
+    newAOL[index] = true;
     this.setState({areOverlaysLoaded: newAOL});
-    if (this.state.areOverlaysLoaded.find((b) => !b) == null && this.state.isMainLoaded) {
-      this.start();
-    }
+    this.play();
   }
 
   setMainVideo(video: HTMLVideoElement) {
     this.setState({mainVideo: video});
   }
 
-  setOverlayVideo(id: number, video: HTMLVideoElement) {
+  setOverlayVideo(index: number, video: HTMLVideoElement) {
     const newOV = this.state.overlayVideos;
-    const indexOf = this.getValidOverlays().map((o) => o.id).indexOf(id);
-    newOV[indexOf] = video;
+    newOV[index] = video;
     this.setState({overlayVideos: newOV});
   }
 
-  start() {
-    this.setState({hasStarted: true, startTime: new Date()});
+  start(canStart: boolean, force = false) {
+    const isLoaded = !force && this.state.isMainLoaded && (this.getValidOverlays().length == 0 || this.state.areOverlaysLoaded.find((b) => !b) == null);
+    if (force || ((isLoaded || this.props.config.displaySettings.startImmediately) && canStart)) {
+      this.setState({hasStarted: true, isLoaded: true, startTime: new Date()});
+    } else {
+      this.setState({isLoaded: isLoaded});
+    }
   }
 
   play() {
-    this.setState({isPlaying: true, isLoaded: true, historyOffset: 0});
-    if (this.props.config.displaySettings.startImmediately) {
-      this.start();
-    }
+    this.setState({isPlaying: true, historyOffset: 0});
+    this.start(this.state.canStart);
   }
 
   pause() {
@@ -702,9 +685,8 @@ export default class Player extends React.Component {
 
   navigateTagging(offset: number) {
     this.setState({
-      isLoaded: false,
+      canStart: false,
       hasStarted: false,
-      canMainStart: false,
       isMainLoaded: false,
       isEmpty: false,
       historyOffset: 0,

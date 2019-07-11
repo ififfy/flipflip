@@ -122,6 +122,7 @@ export default class ImageView extends React.Component {
     crossFade: boolean,
     fadeDuration: number,
     videoVolume: number,
+    onLoaded(): void,
     setVideo(video: HTMLVideoElement): void,
   };
 
@@ -158,8 +159,12 @@ export default class ImageView extends React.Component {
       img.play();
     }
 
-    const parentWidth = el.offsetWidth;
-    const parentHeight = el.offsetHeight;
+    let parentWidth = el.offsetWidth;
+    let parentHeight = el.offsetHeight;
+    if (parentWidth == 0 || parentHeight == 0) {
+      parentWidth = window.innerWidth;
+      parentHeight = window.innerHeight;
+    }
     const parentAspect = parentWidth / parentHeight;
     let imgWidth;
     if (img instanceof HTMLImageElement) {
@@ -238,10 +243,13 @@ export default class ImageView extends React.Component {
     if (blur) {
       bg.appendChild(bgImg);
     }
+
+    this.props.onLoaded();
   }
 
   shouldComponentUpdate(props: any): boolean {
-    return ((props.image.src !== this.props.image.src) ||
+    return ((!this.props.image && props.image) ||
+      (props.image && this.props.image && props.image.src !== this.props.image.src) ||
       (props.backgroundType !== this.props.backgroundType) ||
       (props.backgroundColor !== this.props.backgroundColor) ||
       (props.backgroundBlur !== this.props.backgroundBlur) ||
@@ -255,6 +263,13 @@ export default class ImageView extends React.Component {
   }
 
   render() {
+    if (!this.props.image) {
+      return (
+        <div className="ImageView u-fill-container">
+          <div className="ImageView__Image"ref={this.contentRef}/>
+        </div>
+      );
+    }
     return (
       <FadeLayer
         image={this.props.image}
