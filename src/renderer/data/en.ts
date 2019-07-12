@@ -1,7 +1,8 @@
 export default new Map<String, String>([
-  ['tf.c', 'Constantly'],
-  ['tf.random', 'Randomly'],
+  ['tf.c', 'Constant'],
+  ['tf.random', 'Random'],
   ['tf.sin', 'Wave'],
+  ['tf.scene', 'With Scene'],
 
   ['wf.s', 'By Source'],
   ['wf.i', 'By Image'],
@@ -56,11 +57,6 @@ export default new Map<String, String>([
   ['sl.middle', 'Above Scene'],
   ['sl.background', 'Behind Image'],
   ['sl.bottom', 'Behind All'],
-
-  ['at.constant', 'Constantly'],
-  ['at.random', 'Randomly'],
-  ['at.sin', 'Wave'],
-  ['at.scene', 'With Scene'],
 
   ['af.url', '+ URL'],
   ['af.directory', '+ Local directory'],

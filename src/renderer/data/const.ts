@@ -1,7 +1,8 @@
 const TF = {  // timing functions
   constant: 'tf.c',
-  random: 'at.random',
-  sin: 'at.sin',
+  random: 'tf.random',
+  sin: 'tf.sin',
+  scene: 'tf.scene',
 };
 
 const WF = { // weight functions
@@ -81,13 +82,6 @@ const SL = { // strobe layers
   bottom: 'sl.bottom',
 };
 
-const AT = { // audio ticks
-  constant: 'at.constant',
-  random: 'at.random',
-  sin: 'at.sin',
-  scene: 'at.scene',
-};
-
 const AF = { // add functions
   url: 'af.url',
   directory: 'af.directory',
@@ -96,5 +90,5 @@ const AF = { // add functions
 };
 
 export {
-  TF, WF, IF, HTF, VTF, TOT, BT, GT, TT, SF, ST, SL, AT, AF
+  TF, WF, IF, HTF, VTF, TOT, BT, GT, TT, SF, ST, SL, AF
 };

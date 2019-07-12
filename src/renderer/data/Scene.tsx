@@ -32,11 +32,19 @@ export default class Scene {
   backgroundColor = "#000000";
   backgroundBlur = 8;
   strobe = false;
+  strobePulse = false;
   strobeLayer = SL.top;
   strobeOpacity = 1;
+  strobeTF = TF.constant;
   strobeTime = 200;
+  strobeTimeMin = 100;
+  strobeTimeMax = 300;
+  strobeSinRate = 100;
+  strobeDelayTF = TF.constant;
   strobeDelay = 200;
-  strobePulse = false;
+  strobeDelayMin = 100;
+  strobeDelayMax = 300;
+  strobeDelaySinRate = 100;
   strobeColor = "#FFFFFF";
   playFullGif = false;
   playFullVideo = false;
@@ -115,6 +123,10 @@ export default class Scene {
       this.timingFunction = TF.sin;
       this.timingMin = 30000;
       this.timingMax = 60000;
+    } else if (this.timingFunction == "at.random") {
+      this.timingFunction = "tf.random"
+    } else if (this.timingFunction == "at.sin") {
+      this.timingFunction = "tf.sin"
     }
 
     if (!(this.textKind && this.textKind.length)) {

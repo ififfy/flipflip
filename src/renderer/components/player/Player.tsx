@@ -69,9 +69,11 @@ export default class Player extends React.Component {
     imagePlayerDeleteHack: new ChildCallbackHack(),
     mainVideo: null as HTMLVideoElement,
     overlayVideos: Array<HTMLVideoElement>(this.getValidOverlays().length).fill(null),
+    timeToNextFrame: null as number,
   };
 
   _interval: NodeJS.Timer = null;
+  _toggleStrobe = false;
 
   render() {
     const canGoBack = this.state.historyOffset > -(this.state.historyPaths.length - 1);
@@ -91,11 +93,21 @@ export default class Player extends React.Component {
       <div className="Player">
         {showStrobe && (
           <Strobe
-            duration={this.props.scene.strobeTime >= 10 ? this.props.scene.strobeTime : 10}
             pulse={this.props.scene.strobePulse}
-            delay={this.props.scene.strobeDelay}
-            color={this.props.scene.strobeColor}
             opacity={this.props.scene.strobeLayer == SL.bottom ? this.props.scene.strobeOpacity : 1}
+            durationTF={this.props.scene.strobeTF}
+            duration={this.props.scene.strobeTime}
+            durationMin={this.props.scene.strobeTimeMin}
+            durationMax={this.props.scene.strobeTimeMax}
+            sinRate={this.props.scene.strobeSinRate}
+            delayTF={this.props.scene.strobeDelayTF}
+            delay={this.props.scene.strobeDelay}
+            delayMin={this.props.scene.strobeDelayMin}
+            delayMax={this.props.scene.strobeDelayMax}
+            delaySinRate={this.props.scene.strobeDelaySinRate}
+            color={this.props.scene.strobeColor}
+            timeToNextFrame={this.state.timeToNextFrame}
+            toggleStrobe={this._toggleStrobe}
           />
         )}
         {!this.state.hasStarted && !this.state.isEmpty && (
@@ -132,6 +144,7 @@ export default class Player extends React.Component {
             firstImageLoaded={this.setMainCanStart.bind(this)}
             setProgress={this.setProgress.bind(this)}
             setVideo={this.setMainVideo.bind(this)}
+            setTimeToNextFrame={this.setTimeToNextFrame.bind(this)}
           />
 
           {validOverlays.length > 0 && !this.state.isEmpty && validOverlays.map((overlay, index) => {
@@ -509,6 +522,11 @@ export default class Player extends React.Component {
     newAOL[index] = true;
     this.setState({areOverlaysLoaded: newAOL});
     this.play();
+  }
+
+  setTimeToNextFrame(ttnf: number) {
+    this._toggleStrobe = !this._toggleStrobe;
+    this.setState({timeToNextFrame: ttnf});
   }
 
   setMainVideo(video: HTMLVideoElement) {

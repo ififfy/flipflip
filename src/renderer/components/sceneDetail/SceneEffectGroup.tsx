@@ -26,7 +26,7 @@ export default class SceneEffectGroup extends React.Component {
               onChange={this.changeKey.bind(this, 'timingFunction').bind(this)}
               label="Timing"
               value={this.props.scene.timingFunction}
-              keys={Object.values(TF)}/>
+              keys={[TF.constant, TF.random, TF.sin]}/>
             {this.props.scene.timingFunction == TF.sin && (
               <div>
                 <SimpleSliderInput

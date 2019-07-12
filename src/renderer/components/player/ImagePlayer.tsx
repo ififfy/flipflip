@@ -40,6 +40,7 @@ export default class ImagePlayer extends React.Component {
     setHistoryOffset(historyOffset: number): void,
     onLoaded(): void,
     setVideo(video: HTMLVideoElement): void,
+    setTimeToNextFrame?(timeToNextFrame: number): void,
   };
 
   readonly state = {
@@ -59,6 +60,7 @@ export default class ImagePlayer extends React.Component {
   _nextSourceIndex: Map<String, number> = null;
   _timeout: Timeout = null;
   _waitTimeouts: Array<Timeout> = null;
+  _toggleStrobe = false;
 
   render() {
     let offset = this.props.historyOffset;
@@ -100,12 +102,22 @@ export default class ImagePlayer extends React.Component {
            style={{cursor: this.state.hideCursor ? "none" : "initial"}}>
         {(this.props.strobeLayer == SL.middle || this.props.strobeLayer == SL.background) && (
           <Strobe
-            className={`Strobe u-fill-container ${this.props.strobeLayer == SL.background ? 'm-background' : ''}`}
-            duration={this.props.scene.strobeTime >= 10 ? this.props.scene.strobeTime : 10}
             pulse={this.props.scene.strobePulse}
-            delay={this.props.scene.strobeDelay}
-            color={this.props.scene.strobeColor}
             opacity={1}
+            className={this.props.strobeLayer == SL.background ? 'm-background' : ''}
+            durationTF={this.props.scene.strobeTF}
+            duration={this.props.scene.strobeTime}
+            durationMin={this.props.scene.strobeTimeMin}
+            durationMax={this.props.scene.strobeTimeMax}
+            sinRate={this.props.scene.strobeSinRate}
+            delayTF={this.props.scene.strobeDelayTF}
+            delay={this.props.scene.strobeDelay}
+            delayMin={this.props.scene.strobeDelayMin}
+            delayMax={this.props.scene.strobeDelayMax}
+            delaySinRate={this.props.scene.strobeDelaySinRate}
+            color={this.props.scene.strobeColor}
+            timeToNextFrame={this.state.timeToNextFrame}
+            toggleStrobe={this._toggleStrobe}
           />
         )}
         <IdleTimer
@@ -564,6 +576,10 @@ export default class ImagePlayer extends React.Component {
       if (nextImg && nextImg.getAttribute("duration") && timeToNextFrame < parseInt(nextImg.getAttribute("duration"))) {
         timeToNextFrame = parseInt(nextImg.getAttribute("duration"));
       }
+      if (this.props.setTimeToNextFrame) {
+        this.props.setTimeToNextFrame(timeToNextFrame);
+      }
+      this._toggleStrobe = !this._toggleStrobe;
       this.setState({
         historyPaths: nextHistoryPaths,
         timeToNextFrame,

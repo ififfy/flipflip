@@ -1,4 +1,4 @@
-import {AT} from "../../data/const";
+import {TF} from "../../data/const";
 
 export default class Audio {
   id: number = 0;
@@ -6,7 +6,7 @@ export default class Audio {
   volume: number = 100;
   speed: number = 10;
   tick: boolean = false;
-  tickMode: string = AT.constant;
+  tickMode: string = TF.constant;
   tickDelay: number = 1000;
   tickMinDelay: number = 500;
   tickMaxDelay: number = 5000;
@@ -14,5 +14,14 @@ export default class Audio {
 
   constructor(init?: Partial<Audio>) {
     Object.assign(this, init);
+    if (this.tickMode == "at.constant") {
+      this.tickMode = "tf.c";
+    } else if (this.tickMode == "at.random") {
+      this.tickMode = "tf.random";
+    } else if (this.tickMode == "at.sin") {
+      this.tickMode = "tf.sin";
+    } else if (this.tickMode == "at.scene") {
+      this.tickMode = "tf.scene";
+    }
   }
 }

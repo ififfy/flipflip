@@ -38,11 +38,19 @@ interface SceneSettingsI {
   textSource: string;
 
   strobe: boolean;
+  strobePulse: boolean;
   strobeLayer: string;
   strobeOpacity: number;
+  strobeTF: string;
   strobeTime: number;
+  strobeTimeMin: number;
+  strobeTimeMax: number;
+  strobeSinRate: number;
+  strobeDelayTF: string;
   strobeDelay: number;
-  strobePulse: boolean;
+  strobeDelayMin: number;
+  strobeDelayMax: number;
+  strobeDelaySinRate: number;
   strobeColor: string;
 
   blinkColor: string;
@@ -151,11 +159,19 @@ export class SceneSettings implements SceneSettingsI {
   textSource = "";
 
   strobe = false;
+  strobePulse = false;
   strobeLayer = SL.top;
   strobeOpacity = 1;
+  strobeTF = TF.constant;
   strobeTime = 200;
+  strobeTimeMin = 100;
+  strobeTimeMax = 300;
+  strobeSinRate = 100;
+  strobeDelayTF = TF.constant;
   strobeDelay = 200;
-  strobePulse = false;
+  strobeDelayMin = 100;
+  strobeDelayMax = 300;
+  strobeDelaySinRate = 100;
   strobeColor = "#FFFFFF";
 
   blinkColor = "#FFFFFF";
