@@ -90,6 +90,12 @@ function getPromise(config: Config, url: string, filter: string, next: any): Can
     } else if (sourceType == ST.instagram) {
       promiseFunction = loadInstagram;
       timeout = 3000;
+    } else if (sourceType == ST.danbooru) {
+      promiseFunction = loadDanbooru;
+      timeout = 8000;
+    } else if (sourceType == ST.gelbooru) {
+      promiseFunction = loadGelbooru;
+      timeout = 8000;
     }
     if (next == -1) {
       const cachePath = getCachePath(url, config);
@@ -721,6 +727,110 @@ function loadInstagram(config: Config, url: string, filter: string, next: any): 
       resolve(null);
     });
   }
+}
+
+function loadDanbooru(config: Config, url: string, filter: string, next: any): CancelablePromise {
+  const hostRegex = /^(https?:\/\/[^\/]*)\//g;
+  const thisHost = hostRegex.exec(url)[1];
+  let suffix = "";
+  if (url.includes("/pool/")) {
+    suffix = "/pool/show.json?page=" + (next + 1) + "&id=" + url.substring(url.lastIndexOf("/") + 1);
+  } else {
+    suffix = "/post/index.json?limit=20&page=" + (next + 1);
+    const tagRegex = /[?&]tags=(.*)&?/g;
+    let tags;
+    if ((tags = tagRegex.exec(url)) !== null) {
+      suffix += "&tags=" + tags[1];
+    }
+    const titleRegex = /[?&]title=(.*)&?/g;
+    let title;
+    if ((title = titleRegex.exec(url)) !== null) {
+      if (tags == null) {
+        suffix += "&tags=";
+      } else if (!suffix.endsWith("+")) {
+        suffix += "+";
+      }
+      suffix += title[1];
+    }
+  }
+  return new CancelablePromise((resolve) => {
+    wretch(thisHost + suffix)
+      .get()
+      .setTimeout(5000)
+      .badRequest((e) => resolve(null))
+      .notFound((e) => resolve(null))
+      .timeout((e) => resolve(null))
+      .internalError((e) => resolve(null))
+      .onAbort((e) => resolve(null))
+      .json((json: any) => {
+        if (json.length == 0) {
+          resolve(null);
+        }
+
+        let list;
+        if (json.posts) {
+          list = json.posts;
+        } else {
+          list = json;
+        }
+
+        const images = Array<string>();
+        for (let p of list) {
+          if (p.file_url) {
+            let fileURL = p.file_url;
+            if (!p.file_url.startsWith("http")) {
+              fileURL = "https://" + p.file_url;
+            }
+            images.push(fileURL);
+          }
+        }
+
+        resolve({
+          data: filterPathsToJustPlayable(filter, images, true),
+          next: url.includes("/pool/") ? null : next + 1
+        });
+      });
+  });
+}
+
+function loadGelbooru(config: Config, url: string, filter: string, next: any): CancelablePromise {
+  const hostRegex = /^(https?:\/\/[^\/]*)\//g;
+  const thisHost = hostRegex.exec(url)[1];
+  let suffix = "/index.php?page=dapi&s=post&q=index&limit=20&json=1&pid=" + (next + 1);
+  const tagRegex = /[?&]tags=(.*)&?/g;
+  let tags;
+  if ((tags = tagRegex.exec(url)) !== null) {
+    suffix += "&tags=" + tags[1];
+  }
+  return new CancelablePromise((resolve) => {
+    wretch(thisHost + suffix)
+      .get()
+      .setTimeout(5000)
+      .badRequest((e) => resolve(null))
+      .notFound((e) => resolve(null))
+      .timeout((e) => resolve(null))
+      .internalError((e) => resolve(null))
+      .onAbort((e) => resolve(null))
+      .json((json: any) => {
+        if (json.length == 0) {
+          resolve(null);
+        }
+
+        const images = Array<string>();
+        for (let p of json) {
+          if (p.file_url) {
+            images.push(p.file_url);
+          } else if (p.image) {
+            images.push(thisHost + "//images/" + p.directory + "/" + p.image);
+          }
+        }
+
+        resolve({
+          data: filterPathsToJustPlayable(filter, images, true),
+          next: next + 1
+        });
+      });
+  });
 }
 
 export default class HeadlessScenePlayer extends React.Component {

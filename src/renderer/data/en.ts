@@ -50,6 +50,8 @@ export default new Map<String, String>([
   ['st.twitter', 'twitter'],
   ['st.deviantart', 'deviantart'],
   ['st.instagram', 'instagram'],
+  ['st.danbooru', 'danbooru'],
+  ['st.gelbooru', 'gelbooru'],
   ['st.video', 'video'],
   ['st.list', 'list'],
 

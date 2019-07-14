@@ -73,6 +73,8 @@ const ST = { // source types
   twitter: 'st.twitter',
   deviantart: 'st.deviantart',
   instagram: 'st.instagram',
+  danbooru: 'st.danbooru',
+  gelbooru: 'st.gelbooru',
 };
 
 const SL = { // strobe layers

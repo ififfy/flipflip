@@ -45,6 +45,36 @@ export function getFileName(url: string) {
   return url;
 }
 
+export function getSourceType(url: string): string {
+  if (isVideo(url, true)) {
+    return ST.video;
+  } else if (/^https?:\/\/([^.]*|(66\.media))\.tumblr\.com/.exec(url) != null) {
+    return ST.tumblr;
+  } else if (/^https?:\/\/(www\.)?reddit\.com\//.exec(url) != null) {
+    return ST.reddit;
+  } else if (/^https?:\/\/(www\.)?imagefap\.com\//.exec(url) != null) {
+    return ST.imagefap;
+  } else if (/^https?:\/\/(www\.)?imgur\.com\//.exec(url) != null) {
+    return ST.imgur;
+  } else if (/^https?:\/\/(www\.)?sex\.com\//.exec(url) != null) {
+    return ST.sexcom;
+  } else if (/^https?:\/\/(www\.)?twitter\.com\//.exec(url) != null) {
+    return ST.twitter;
+  } else if (/^https?:\/\/(www\.)?deviantart\.com\//.exec(url) != null) {
+    return ST.deviantart;
+  } else if (/^https?:\/\/(www\.)?instagram\.com\//.exec(url) != null) {
+    return ST.instagram;
+  } else if (/^https?:\/\/(www\.)?(hypnohub\.net|danbooru\.donmai\.us|e621\.net)\//.exec(url) != null) {
+    return ST.danbooru;
+  } else if (/^https?:\/\/(www\.)?(gelbooru\.com|.*\.booru\.org|rule34\.xxx|realbooru\.com)\//.exec(url) != null) {
+    return ST.gelbooru;
+  } else if (/^https?:\/\//.exec(url) != null) { // Arbitrary URL, assume image list
+    return ST.list;
+  } else { // Directory
+    return ST.local;
+  }
+}
+
 export function getFileGroup(url: string) {
   switch (getSourceType(url)) {
     case ST.tumblr:
@@ -93,6 +123,34 @@ export function getFileGroup(url: string) {
         instagramID = instagramID.substring(0, instagramID.indexOf("/"));
       }
       return instagramID;
+    case ST.danbooru:
+    case ST.gelbooru:
+      const hostRegex = /^https?:\/\/(?:www\.)?([^.]*)\./g;
+      const host =  hostRegex.exec(url)[1];
+      let danbooruID = "";
+      if (url.includes("/pool/")) {
+        danbooruID = "pool/" + url.substring(url.lastIndexOf("/"));
+      } else {
+        const tagRegex = /[?&]tags=(.*)&?/g;
+        let tags;
+        if ((tags = tagRegex.exec(url)) !== null) {
+          danbooruID = tags[1];
+        }
+        const titleRegex = /[?&]title=(.*)&?/g;
+        let title;
+        if ((title = titleRegex.exec(url)) !== null) {
+          if (tags == null) {
+            danbooruID = ""
+          } else if (!danbooruID.endsWith("+")) {
+            danbooruID += "+";
+          }
+          danbooruID += title[1];
+        }
+        if (danbooruID.endsWith("+")) {
+          danbooruID = danbooruID.substring(0, danbooruID.length - 1);
+        }
+      }
+      return host + "/" + decodeURIComponent(danbooruID);
     case ST.local:
     case ST.list:
     case ST.video:
@@ -125,32 +183,6 @@ export function getCachePath(source: string, config: Config) {
     } else {
       return getPath() + path.sep + "ImageCache" + path.sep;
     }
-  }
-}
-
-export function getSourceType(url: string): string {
-  if (isVideo(url, true)) {
-    return ST.video;
-  } else if (/^https?:\/\/([^.]*|(66\.media))\.tumblr\.com/.exec(url) != null) {
-    return ST.tumblr;
-  } else if (/^https?:\/\/(www\.)?reddit\.com\//.exec(url) != null) {
-    return ST.reddit;
-  } else if (/^https?:\/\/(www\.)?imagefap\.com\//.exec(url) != null) {
-    return ST.imagefap;
-  } else if (/^https?:\/\/(www\.)?imgur\.com\//.exec(url) != null) {
-    return ST.imgur;
-  } else if (/^https?:\/\/(www\.)?sex\.com\//.exec(url) != null) {
-    return ST.sexcom;
-  } else if (/^https?:\/\/(www\.)?twitter\.com\//.exec(url) != null) {
-    return ST.twitter;
-  } else if (/^https?:\/\/(www\.)?deviantart\.com\//.exec(url) != null) {
-    return ST.deviantart;
-  } else if (/^https?:\/\/(www\.)?instagram\.com\//.exec(url) != null) {
-    return ST.instagram;
-  } else if (/^https?:\/\//.exec(url) != null) { // Arbitrary URL, assume image list
-    return ST.list;
-  } else { // Directory
-    return ST.local;
   }
 }
 
