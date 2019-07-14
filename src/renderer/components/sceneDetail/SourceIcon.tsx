@@ -48,6 +48,9 @@ export default class SourceIcon extends React.Component {
         {(type == ST.gelbooru) && (
           <div className="u-gelbooru"/>
         )}
+        {(type == ST.ehentai) && (
+          <div className="u-ehentai"/>
+        )}
       </div>
     )
   }

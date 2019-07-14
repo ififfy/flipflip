@@ -75,6 +75,7 @@ const ST = { // source types
   instagram: 'st.instagram',
   danbooru: 'st.danbooru',
   gelbooru: 'st.gelbooru',
+  ehentai: 'st.ehentai',
 };
 
 const SL = { // strobe layers

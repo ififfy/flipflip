@@ -96,6 +96,9 @@ function getPromise(config: Config, url: string, filter: string, next: any): Can
     } else if (sourceType == ST.gelbooru) {
       promiseFunction = loadGelbooru;
       timeout = 8000;
+    } else if (sourceType == ST.ehentai) {
+      promiseFunction = loadEHentai;
+      timeout = 8000;
     }
     if (next == -1) {
       const cachePath = getCachePath(url, config);
@@ -829,6 +832,45 @@ function loadGelbooru(config: Config, url: string, filter: string, next: any): C
           data: filterPathsToJustPlayable(filter, images, true),
           next: next + 1
         });
+      });
+  });
+}
+
+function loadEHentai(config: Config, url: string, filter: string, next: any): CancelablePromise {
+  return new CancelablePromise((resolve) => {
+    wretch(url + "?p=" + (next + 1))
+      .get()
+      .setTimeout(5000)
+      .onAbort((e) => resolve(null))
+      .notFound((e) => resolve(null))
+      .text((html) => {
+        let imageEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll("#gdt > .gdtm > div > a");
+        if (imageEls.length > 0) {
+          let imageCount = 0;
+          let images = Array<string>();
+          for (let image of imageEls) {
+            wretch(image.getAttribute("href"))
+              .get()
+              .setTimeout(5000)
+              .onAbort((e) => resolve(null))
+              .notFound((e) => resolve(null))
+              .text((html) => {
+                imageCount++;
+                let contentURL = html.match("<img id=\"img\" src=\"(.*?)\"");
+                if (contentURL != null) {
+                  images.push(contentURL[1]);
+                }
+                if (imageCount == imageEls.length) {
+                  resolve({
+                    data: filterPathsToJustPlayable(filter, images, true),
+                    next: next + 1
+                  })
+                }
+              })
+          }
+        } else {
+          resolve(null);
+        }
       });
   });
 }

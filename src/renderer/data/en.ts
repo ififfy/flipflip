@@ -52,6 +52,7 @@ export default new Map<String, String>([
   ['st.instagram', 'instagram'],
   ['st.danbooru', 'danbooru'],
   ['st.gelbooru', 'gelbooru'],
+  ['st.ehentai', 'ehentai'],
   ['st.video', 'video'],
   ['st.list', 'list'],
 

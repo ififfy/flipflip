@@ -68,6 +68,8 @@ export function getSourceType(url: string): string {
     return ST.danbooru;
   } else if (/^https?:\/\/(www\.)?(gelbooru\.com|.*\.booru\.org|rule34\.xxx|realbooru\.com)\//.exec(url) != null) {
     return ST.gelbooru;
+  } else if (/^https?:\/\/(www\.)?e-hentai\.org\/g\//.exec(url) != null) {
+    return ST.ehentai;
   } else if (/^https?:\/\//.exec(url) != null) { // Arbitrary URL, assume image list
     return ST.list;
   } else { // Directory
@@ -151,6 +153,10 @@ export function getFileGroup(url: string) {
         }
       }
       return host + "/" + decodeURIComponent(danbooruID);
+    case ST.ehentai:
+      const galleryRegex = /^https?:\/\/(?:www\.)?e-hentai\.org\/g\/([^\/]*)/g;
+      const gallery = galleryRegex.exec(url);
+      return gallery[1];
     case ST.local:
     case ST.list:
     case ST.video:
