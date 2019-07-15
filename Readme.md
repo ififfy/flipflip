@@ -18,7 +18,7 @@
 * **[Subreddit](https://www.reddit.com/r/flipflip/)**
 
 ## Features
-- Local files + Tumblr, Reddit, Twitter, Instagram, Imugr, DeviantArt & More!
+- Local files + Tumblr, Reddit, Twitter, Instagram, Imugr, DeviantArt, Booru & More!
 - Animated GIF and Video support
 - Visual Effects (Fade, Zoom/Transition, Strobe/Pulse, Overlay)
 - Library and tagging to organize your sources and generate scenes

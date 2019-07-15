@@ -1,8 +1,5 @@
 # Library
-The **Library** is a place for you to collect and manage all your sources. If you had previously used FlipFlip before 
-`v2.0`, the Library will be automatically populated with all your Scenes' sources. 
-
-To access the Library just click `Library` on the Home page.
+The **Library** is a place for you to collect and manage all your sources. To access the Library just click `Library` on the Home page.
 
 ![](doc_images/library.png)
 

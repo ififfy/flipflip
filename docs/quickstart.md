@@ -25,7 +25,7 @@ _Note: Some of these features (3 & 7) will be disabled until they are relevant_
 Let's create a simple scene to get you familiar with how things will work
 * Click `+ Add Scene` to create your first scene.
 * Give your scene a name.
-* In the `Sources` tab, click `+ Add local files`.
+* In the `Sources` tab, click `+ Add Sources`, then click `+ Local directory`.
 * Navigate to a folder with some images you'd like to use and click `Select Folder`.
   * Your selection should now appear in `Sources`.
 * Add some effects if you'd like.

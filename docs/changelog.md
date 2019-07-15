@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.2.2 <small>(07/15/2019)</small>
+- Improve performance
+- Improve scraping
+- E-Hentai & Danbooru/Gelbooru board support
+- Allow single video files as sources
+- Add Video Only option
+- Add more Strobe options
+- Fix bug with progress display hiding too early
+
 ## 2.2.1  <small>(07/08/2019)</small>
 - Audio/Video controls
 - Sound in videos

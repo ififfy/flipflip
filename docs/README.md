@@ -5,7 +5,7 @@
 ##### [Releases](https://github.com/ififfy/flipflip/releases)
 
 ## Features
-* Local files as well as Tumblr, Reddit, Twitter, Instagram, Imgur, DeviantArt & More
+* Local files as well as Tumblr, Reddit, Twitter, Instagram, Imgur, DeviantArt, Booru & More
 * Animated GIF and Video support
 * Visual Effects (Fade, Zoom/Transition, Strobe/Pulse, Overlay)
 * Random or ordered playback

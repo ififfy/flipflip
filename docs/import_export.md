@@ -12,7 +12,7 @@ post this text online for someone to import with (you don't have to share the fi
 
 Any overlays will also be exported with this scene. However, those overlays' overlays will not.
 
-?> NOTE: _Due to the nature of FlipFlip scenes, we don't recommend you try and import/export Scenes with local 
+?> **NOTE:** _Due to the nature of FlipFlip scenes, we don't recommend you try and import/export Scenes with local 
 directories. This will technically work, but the import/exporter would have to have the same file paths (or will 
 have to modify them manually). In addition, any exported Generators will be imported as regular Scenes._
 
