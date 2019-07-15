@@ -338,7 +338,7 @@ export default class ImagePlayer extends React.Component {
   runFetchLoop(i: number) {
     if (!this._isMounted) return;
 
-    if (this.state.readyToDisplay.length >= this.props.maxLoadingAtOnce) {
+    if (this.state.readyToDisplay.length >= this.props.maxLoadingAtOnce || !this.props.allURLs) {
       // Wait for the display loop to use an image (it might be fast, or paused)
       this._waitTimeouts[i] = setTimeout(() => this.runFetchLoop(i), 100);
       return;

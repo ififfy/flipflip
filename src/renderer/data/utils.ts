@@ -134,7 +134,7 @@ export function getFileGroup(url: string) {
       const host =  hostRegex.exec(url)[1];
       let danbooruID = "";
       if (url.includes("/pool/")) {
-        danbooruID = "pool/" + url.substring(url.lastIndexOf("/"));
+        danbooruID = "pool" + url.substring(url.lastIndexOf("/"));
       } else {
         const tagRegex = /[?&]tags=(.*)&?/g;
         let tags;
@@ -161,9 +161,11 @@ export function getFileGroup(url: string) {
       const gallery = galleryRegex.exec(url);
       return gallery[1];
     case ST.local:
+      return url.substring(url.lastIndexOf(path.sep)+1);
     case ST.list:
     case ST.video:
-      return null;
+      let name = url.substring(0, url.lastIndexOf(path.sep));
+      return name.substring(name.lastIndexOf(path.sep)+1);
   }
 }
 
@@ -174,7 +176,7 @@ export function getCachePath(source: string, config: Config) {
       baseDir += path.sep;
     }
     if (source) {
-      if (getFileGroup(source)) {
+      if (source != ST.video) {
         return baseDir + en.get(getSourceType(source)) + path.sep + getFileGroup(source) + path.sep;
       } else {
         return baseDir + en.get(getSourceType(source)) + path.sep;
@@ -184,7 +186,7 @@ export function getCachePath(source: string, config: Config) {
     }
   } else {
     if (source) {
-      if (getFileGroup(source)) {
+      if (source != ST.video) {
         return getPath() + path.sep + "ImageCache" + path.sep + en.get(getSourceType(source)) + path.sep + getFileGroup(source) + path.sep;
       } else {
         return getPath() + path.sep + "ImageCache" + path.sep + en.get(getSourceType(source)) + path.sep;

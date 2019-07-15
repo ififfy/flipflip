@@ -248,6 +248,7 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
     libraryID: librarySource.id,
     displayedLibrary: displayed,
     id: id,
+    continueVideo: true,
     forceAll: true,
   });
   return {
