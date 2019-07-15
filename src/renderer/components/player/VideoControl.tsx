@@ -22,7 +22,10 @@ export default class VideoControl extends React.Component {
 
   readonly state = {
     playing: true,
+    update: true,
   };
+
+  _interval: NodeJS.Timer = null;
 
   render() {
     return(
@@ -30,10 +33,10 @@ export default class VideoControl extends React.Component {
         {this.props.showAll && (
           <React.Fragment>
             <div>
-              <span style={{float: 'right'}}>{getTimeStamp(this.props.video.duration)}</span>
+              <span style={{float: 'right'}}>{getTimeStamp(Math.floor(this.props.video.duration))}</span>
               <SimpleSliderInput
-                label={getTimeStamp(this.props.video.currentTime)}
-                value={this.props.video.currentTime}
+                label={getTimeStamp(Math.floor(this.props.video.currentTime))}
+                value={Math.floor(this.props.video.currentTime)}
                 min={0}
                 max={this.props.video.duration}
                 isEnabled={true}
@@ -130,5 +133,15 @@ export default class VideoControl extends React.Component {
   onChangePosition(position: any) {
     this.setState({position: parseInt(position, 10)});
     this.props.video.currentTime = parseInt(position, 10);
+  }
+
+  componentDidMount() {
+    if (this.props.showAll) {
+      this._interval = setInterval(() => this.setState({update: !this.state.update}), 100);
+    }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this._interval);
   }
 }
