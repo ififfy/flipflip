@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import {BT} from "../../data/const";
+import {BT, TF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
 import ControlGroup from "./ControlGroup";
 import Scene from "../../data/Scene";
@@ -50,18 +50,57 @@ export default class ImageEffectGroup extends React.Component {
             onChange={this.changeKey.bind(this, 'crossFade').bind(this)}/>
           {this.props.scene.crossFade && (
             <div className="ControlSubgroup m-inline">
-              <SimpleCheckbox
-                text="Fade Full Duration"
-                isOn={this.props.scene.fadeFull}
-                onChange={this.changeKey.bind(this, 'fadeFull').bind(this)} />
-              {!this.props.scene.fadeFull && (
-                <SimpleNumberInput
-                  label="Fade Duration (ms)"
-                  min={0}
-                  value={this.props.scene.fadeDuration}
-                  isEnabled={!this.props.scene.fadeFull}
-                  onChange={this.changeKey.bind(this, 'fadeDuration').bind(this)} />
-              )}
+              <div style={{display: 'flex'}}>
+                <SimpleOptionPicker
+                  onChange={this.changeKey.bind(this, 'fadeTF').bind(this)}
+                  label="Fade Length"
+                  value={this.props.scene.fadeTF}
+                  keys={Object.values(TF)}/>
+                {this.props.scene.fadeTF == TF.sin && (
+                  <div>
+                    <SimpleSliderInput
+                      label={`Wave Rate: ${this.props.scene.fadeSinRate}`}
+                      min={1}
+                      max={100}
+                      value={this.props.scene.fadeSinRate}
+                      isEnabled={true}
+                      onChange={this.changeKey.bind(this, 'fadeSinRate').bind(this)}/>
+                  </div>
+                )}
+              </div>
+              <div className="TimingControlGroup">
+                {this.props.scene.fadeTF == TF.constant && (
+                  <div>
+                    For
+                    <SimpleNumberInput
+                      label=""
+                      value={this.props.scene.fadeDuration}
+                      isEnabled={true}
+                      min={0}
+                      onChange={this.changeKey.bind(this, 'fadeDuration').bind(this)}/>
+                    ms
+                  </div>
+                )}
+                {(this.props.scene.fadeTF == TF.random || this.props.scene.fadeTF == TF.sin) && (
+                  <div>
+                    Between
+                    <SimpleNumberInput
+                      label=""
+                      value={this.props.scene.fadeDurationMin}
+                      isEnabled={true}
+                      min={0}
+                      onChange={this.changeKey.bind(this, 'fadeDurationMin').bind(this)}/>
+                    ms and
+                    <SimpleNumberInput
+                      label=""
+                      value={this.props.scene.fadeDurationMax}
+                      isEnabled={true}
+                      min={0}
+                      onChange={this.changeKey.bind(this, 'fadeDurationMax').bind(this)}/>
+                    ms
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
@@ -74,7 +113,11 @@ export default class ImageEffectGroup extends React.Component {
   }
 
   changeKey(key: string, value: any) {
-    this.update((s) => s[key] = value);
+    if (["fadeDuration", "fadeDurationMin", "fadeDurationMax", "fadeSinRate"].includes(key)) {
+      this.update((s) => s[key] = parseInt(value, 10));
+    } else {
+      this.update((s) => s[key] = value);
+    }
   }
 
 }

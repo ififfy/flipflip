@@ -92,10 +92,41 @@ export default class ImagePlayer extends React.Component {
     let fadeDuration = 0;
     let crossFade = this.props.scene.crossFade;
     if (crossFade) {
-      fadeDuration = this.props.scene.fadeFull ? this.state.timeToNextFrame : this.props.scene.fadeDuration;
+      switch (this.props.scene.fadeTF) {
+        case TF.scene:
+          fadeDuration = this.state.timeToNextFrame;
+          break;
+        case TF.constant:
+          fadeDuration = this.props.scene.fadeDuration;
+          break;
+        case TF.random:
+          fadeDuration = Math.floor(Math.random() * (this.props.scene.fadeDurationMax - this.props.scene.fadeDurationMin + 1)) + this.props.scene.fadeDurationMin;
+          break;
+        case TF.sin:
+          const sinRate = (Math.abs(this.props.scene.fadeSinRate - 100) + 2) * 1000;
+          fadeDuration = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (this.props.scene.fadeDurationMax - this.props.scene.fadeDurationMin + 1)) + this.props.scene.fadeDurationMin;
+          break;
+      }
     }
-
-    const transDuration = this.props.scene.transFull ? this.state.timeToNextFrame : this.props.scene.transDuration;
+    
+    let transDuration = 0;
+    if (this.props.scene.zoom) {
+      switch (this.props.scene.transTF) {
+        case TF.scene:
+          transDuration = this.state.timeToNextFrame;
+          break;
+        case TF.constant:
+          transDuration = this.props.scene.transDuration;
+          break;
+        case TF.random:
+          transDuration = Math.floor(Math.random() * (this.props.scene.transDurationMax - this.props.scene.transDurationMin + 1)) + this.props.scene.transDurationMin;
+          break;
+        case TF.sin:
+          const sinRate = (Math.abs(this.props.scene.transSinRate - 100) + 2) * 1000;
+          transDuration = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (this.props.scene.transDurationMax - this.props.scene.transDurationMin + 1)) + this.props.scene.transDurationMin;
+          break;
+      }
+    }
 
     return (
       <div className="ImagePlayer"

@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import {HTF, VTF} from "../../data/const";
+import {HTF, TF, VTF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
 import ControlGroup from "./ControlGroup";
 import Scene from "../../data/Scene";
@@ -78,18 +78,57 @@ export default class ZoomMoveGroup extends React.Component {
 
         {(this.props.scene.zoom || this.props.scene.horizTransType != HTF.none || this.props.scene.vertTransType != VTF.none) && (
           <div className="ControlSubgroup m-inline">
-            <SimpleCheckbox
-              text="Zoom/Move Full Duration"
-              isOn={this.props.scene.transFull}
-              onChange={this.changeKey.bind(this, 'transFull').bind(this)} />
-            {!this.props.scene.transFull && (
-              <SimpleNumberInput
-                label="Zoom/Move Duration (ms)"
-                min={0}
-                value={this.props.scene.transDuration}
-                isEnabled={!this.props.scene.transFull}
-                onChange={this.changeKey.bind(this, 'transDuration').bind(this)} />
-            )}
+            <div style={{display: 'flex'}}>
+              <SimpleOptionPicker
+                onChange={this.changeKey.bind(this, 'transTF').bind(this)}
+                label="Transition Length"
+                value={this.props.scene.transTF}
+                keys={Object.values(TF)}/>
+              {this.props.scene.transTF == TF.sin && (
+                <div>
+                  <SimpleSliderInput
+                    label={`Wave Rate: ${this.props.scene.transSinRate}`}
+                    min={1}
+                    max={100}
+                    value={this.props.scene.transSinRate}
+                    isEnabled={true}
+                    onChange={this.changeKey.bind(this, 'transSinRate').bind(this)}/>
+                </div>
+              )}
+            </div>
+            <div className="TimingControlGroup">
+              {this.props.scene.transTF == TF.constant && (
+                <div>
+                  For
+                  <SimpleNumberInput
+                    label=""
+                    value={this.props.scene.transDuration}
+                    isEnabled={true}
+                    min={0}
+                    onChange={this.changeKey.bind(this, 'transDuration').bind(this)}/>
+                  ms
+                </div>
+              )}
+              {(this.props.scene.transTF == TF.random || this.props.scene.transTF == TF.sin) && (
+                <div>
+                  Between
+                  <SimpleNumberInput
+                    label=""
+                    value={this.props.scene.transDurationMin}
+                    isEnabled={true}
+                    min={0}
+                    onChange={this.changeKey.bind(this, 'transDurationMin').bind(this)}/>
+                  ms and
+                  <SimpleNumberInput
+                    label=""
+                    value={this.props.scene.transDurationMax}
+                    isEnabled={true}
+                    min={0}
+                    onChange={this.changeKey.bind(this, 'transDurationMax').bind(this)}/>
+                  ms
+                </div>
+              )}
+            </div>
           </div>
         )}
       </ControlGroup>
@@ -101,7 +140,11 @@ export default class ZoomMoveGroup extends React.Component {
   }
 
   changeKey(key: string, value: any) {
-    this.update((s) => s[key] = value);
+    if (["zoomStart", "zoomEnd", "horizTransLevel", "vertTransLevel", "transDuration", "transDurationMin", "transDurationMax", "transSinRate"].includes(key)) {
+      this.update((s) => s[key] = parseInt(value, 10));
+    } else {
+      this.update((s) => s[key] = value);
+    }
   }
 
   onChangeZoomStart(value: number) { this.update((s) => { s.zoomStart = value / 10 }); }

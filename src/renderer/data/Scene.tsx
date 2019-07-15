@@ -23,11 +23,17 @@ export default class Scene {
   horizTransLevel = 10;
   vertTransType = VTF.none;
   vertTransLevel = 10;
-  transFull = false;
+  transTF = TF.constant;
   transDuration = 5000;
+  transDurationMin = 1000;
+  transDurationMax = 7000;
+  transSinRate = 100;
   crossFade = false;
-  fadeFull = false;
+  fadeTF = TF.constant;
   fadeDuration = 500;
+  fadeDurationMin = 100;
+  fadeDurationMax = 700;
+  fadeSinRate = 100;
   backgroundType = BT.blur;
   backgroundColor = "#000000";
   backgroundBlur = 8;
@@ -80,6 +86,8 @@ export default class Scene {
   audioURL?: string = "";
   overlaySceneID: number = 0;
   overlaySceneOpacity: number = 0.5;
+  transFull = false;
+  fadeFull = false;
 
   constructor(init?: Partial<Scene>) {
     Object.assign(this, init);
@@ -127,6 +135,16 @@ export default class Scene {
       this.timingFunction = "tf.random"
     } else if (this.timingFunction == "at.sin") {
       this.timingFunction = "tf.sin"
+    }
+
+    if (this.transFull) {
+      this.transTF = TF.scene;
+      this.transFull = false;
+    }
+
+    if (this.fadeFull) {
+      this.fadeTF = TF.scene;
+      this.fadeFull = false;
     }
 
     if (!(this.textKind && this.textKind.length)) {

@@ -12,6 +12,7 @@ interface SceneSettingsI {
   weightFunction: string;
   randomize: boolean;
   forceAll: boolean;
+
   zoom: boolean;
   zoomStart: number;
   zoomEnd: number;
@@ -19,11 +20,18 @@ interface SceneSettingsI {
   horizTransLevel: number;
   vertTransType: string;
   vertTransLevel: number;
-  transFull: boolean;
+  transTF: string;
   transDuration: number;
+  transDurationMin: number;
+  transDurationMax: number;
+  transSinRate: number;
   crossFade: boolean;
-  fadeFull: boolean;
-  fadeDuration : number;
+  fadeTF: string;
+  fadeDuration: number;
+  fadeDurationMin: number;
+  fadeDurationMax: number;
+  fadeSinRate: number;
+
   backgroundType: string;
   backgroundColor: string;
   backgroundBlur: number;
@@ -56,15 +64,12 @@ interface SceneSettingsI {
   blinkColor: string;
   blinkFontSize: number;
   blinkFontFamily: string;
-
   captionColor: string;
   captionFontSize: number;
   captionFontFamily: string;
-
   captionBigColor: string;
   captionBigFontSize: number;
   captionBigFontFamily: string;
-
   countColor: string;
   countFontSize: number;
   countFontFamily: string;
@@ -131,6 +136,7 @@ export class SceneSettings implements SceneSettingsI {
   weightFunction = WF.sources;
   randomize = true;
   forceAll = false;
+
   zoom = false;
   zoomStart = 1;
   zoomEnd = 2;
@@ -138,11 +144,18 @@ export class SceneSettings implements SceneSettingsI {
   horizTransLevel = 10;
   vertTransType = VTF.none;
   vertTransLevel = 10;
-  transFull = false;
+  transTF = TF.constant;
   transDuration = 5000;
+  transDurationMin = 1000;
+  transDurationMax = 7000;
+  transSinRate = 100;
   crossFade = false;
-  fadeFull = false;
+  fadeTF = TF.constant;
   fadeDuration = 500;
+  fadeDurationMin = 100;
+  fadeDurationMax = 700;
+  fadeSinRate = 100;
+
   backgroundType = BT.blur;
   backgroundColor = "#000000";
   backgroundBlur = 8;
@@ -177,15 +190,12 @@ export class SceneSettings implements SceneSettingsI {
   blinkColor = "#FFFFFF";
   blinkFontSize = 20;
   blinkFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
-
   captionColor = "#FFFFFF";
   captionFontSize = 8;
   captionFontFamily = "Helvetica Neue,Helvetica,Arial,sans-serif";
-
   captionBigColor = "#FFFFFF";
   captionBigFontSize = 12;
   captionBigFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
-
   countColor = "#FFFFFF";
   countFontSize = 20;
   countFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
