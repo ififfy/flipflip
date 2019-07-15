@@ -93,8 +93,11 @@ function getPromise(config: Config, url: string, filter: string, next: any): Can
     } else if (sourceType == ST.danbooru) {
       promiseFunction = loadDanbooru;
       timeout = 8000;
-    } else if (sourceType == ST.gelbooru) {
-      promiseFunction = loadGelbooru;
+    } else if (sourceType == ST.gelbooru1) {
+      promiseFunction = loadGelbooru1;
+      timeout = 8000;
+    } else if (sourceType == ST.gelbooru2) {
+      promiseFunction = loadGelbooru2;
       timeout = 8000;
     } else if (sourceType == ST.ehentai) {
       promiseFunction = loadEHentai;
@@ -796,7 +799,61 @@ function loadDanbooru(config: Config, url: string, filter: string, next: any): C
   });
 }
 
-function loadGelbooru(config: Config, url: string, filter: string, next: any): CancelablePromise {
+function loadGelbooru1(config: Config, url: string, filter: string, next: any): CancelablePromise {
+  const hostRegex = /^(https?:\/\/[^\/]*)\//g;
+  const thisHost = hostRegex.exec(url)[1];
+  return new CancelablePromise((resolve) => {
+    wretch(url + "&pid=" + (next * 10))
+      .get()
+      .setTimeout(5000)
+      .onAbort((e) => resolve(null))
+      .notFound((e) => resolve(null))
+      .error(503, (e) => resolve(null))
+      .text((html) => {
+        let imageEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll("span.thumb > a");
+        if (imageEls.length > 0) {
+          let imageCount = 0;
+          let images = Array<string>();
+
+          const getImage = (index: number) => {
+            let link = imageEls.item(index).getAttribute("href");
+            if (!link.startsWith("http")) {
+              link = thisHost + "/" + link;
+            }
+            wretch(link)
+              .get()
+              .setTimeout(5000)
+              .onAbort((e) => resolve(null))
+              .notFound((e) => resolve(null))
+              .error(503, (e) => resolve(null))
+              .text((html) => {
+                imageCount++;
+                let contentURL = html.match("<img alt=\"img\" src=\"(.*?)\"");
+                if (contentURL != null) {
+                  images.push(contentURL[1]);
+                }
+                if (imageCount == imageEls.length || imageCount == 10) {
+                  resolve({
+                    data: filterPathsToJustPlayable(filter, images, true),
+                    next: next + 1
+                  })
+                }
+              });
+
+            if (index < imageEls.length - 1 && index < 9) {
+              setTimeout(getImage.bind(null, index+1), 1000);
+            }
+          };
+
+          setTimeout(getImage.bind(null, 0), 1000);
+        } else {
+          resolve(null);
+        }
+      });
+  });
+}
+
+function loadGelbooru2(config: Config, url: string, filter: string, next: any): CancelablePromise {
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
   const thisHost = hostRegex.exec(url)[1];
   let suffix = "/index.php?page=dapi&s=post&q=index&limit=20&json=1&pid=" + (next + 1);

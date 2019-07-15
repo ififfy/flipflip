@@ -66,8 +66,10 @@ export function getSourceType(url: string): string {
     return ST.instagram;
   } else if (/^https?:\/\/(www\.)?(hypnohub\.net|danbooru\.donmai\.us|e621\.net)\//.exec(url) != null) {
     return ST.danbooru;
-  } else if (/^https?:\/\/(www\.)?(gelbooru\.com|.*\.booru\.org|rule34\.xxx|realbooru\.com)\//.exec(url) != null) {
-    return ST.gelbooru;
+  } else if (/^https?:\/\/(www\.)?(gelbooru\.com|furry\.booru\.org|rule34\.xxx|realbooru\.com)\//.exec(url) != null) {
+    return ST.gelbooru2;
+  } else if (/^https?:\/\/(www\.)?(.*\.booru\.org)\//.exec(url) != null) {
+    return ST.gelbooru1;
   } else if (/^https?:\/\/(www\.)?e-hentai\.org\/g\//.exec(url) != null) {
     return ST.ehentai;
   } else if (/^https?:\/\//.exec(url) != null) { // Arbitrary URL, assume image list
@@ -126,7 +128,8 @@ export function getFileGroup(url: string) {
       }
       return instagramID;
     case ST.danbooru:
-    case ST.gelbooru:
+    case ST.gelbooru1:
+    case ST.gelbooru2:
       const hostRegex = /^https?:\/\/(?:www\.)?([^.]*)\./g;
       const host =  hostRegex.exec(url)[1];
       let danbooruID = "";
