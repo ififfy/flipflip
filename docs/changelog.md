@@ -1,12 +1,13 @@
 # Changelog
 
-## 2.2.2 <small>(07/15/2019)</small>
+## 2.3.0 <small>(07/XX/2019)</small>
+- Multi-window support
+- Allow single video files as sources
+- E-Hentai & Danbooru/Gelbooru board support
 - Improve performance
 - Improve scraping
-- E-Hentai & Danbooru/Gelbooru board support
-- Allow single video files as sources
 - Add Video Only option
-- Add more Strobe options
+- Add more Fade, Translate, Strobe timing options
 - Fix bug with progress display hiding too early
 
 ## 2.2.1  <small>(07/08/2019)</small>

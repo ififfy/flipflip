@@ -267,6 +267,7 @@ export default class Config {
   caching = new CacheSettings();
   displaySettings = new DisplaySettings();
   clientID = "";
+  newWindowAlerted = false;
 
   constructor(init?: Partial<Config>) {
     Object.assign(this, init);

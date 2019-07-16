@@ -23,6 +23,7 @@ import SceneEffectGroup from "../sceneDetail/SceneEffectGroup";
 import StrobeGroup from "../sceneDetail/StrobeGroup";
 import ZoomMoveGroup from "../sceneDetail/ZoomMoveGroup";
 import VideoGroup from "../sceneDetail/VideoGroup";
+import {createMainMenu, createMenuTemplate} from "../../../main/MainMenu";
 
 const {getCurrentWindow, Menu, MenuItem, app} = remote;
 
@@ -327,53 +328,14 @@ export default class Player extends React.Component {
     this.setFullscreen(this.props.config.displaySettings.fullScreen);
 
     window.addEventListener('contextmenu', this.showContextMenu, false);
+    window.addEventListener('keydown', this.onKeyDown, false);
 
     this.buildMenu();
     this._interval = setInterval(() => this.nextSceneLoop(), 1000);
   }
 
-  getKeyMap() {
-    const keyMap = new Map<String, Array<string>>([
-      ['playPause', ['Play/Pause ' + (this.state.isPlaying ? '(Playing)' : '(Paused)'), 'space']],
-      ['historyBack', ['Back in Time', 'left']],
-      ['historyForward', ['Forward in Time', 'right']],
-      ['navigateBack', ['Go Back to Scene Details', 'escape']],
-      ['toggleFullscreen', ['Toggle Fullscreen ' + (this.props.config.displaySettings.fullScreen ? '(On)' : '(Off)'), 'CommandOrControl+F']],
-      ['toggleAlwaysOnTop', ['Toggle Always On Top ' + (this.props.config.displaySettings.alwaysOnTop ? '(On)' : '(Off)'), 'CommandOrControl+T']],
-      ['toggleMenuBarDisplay', ['Toggle Menu Bar ' + (this.props.config.displaySettings.showMenu ? '(On)' : '(Off)'), 'CommandOrControl+G']],
-    ]);
-
-    if (this.props.config.caching.enabled) {
-      keyMap.set('onDelete', ['Delete Image', 'Delete']);
-    }
-
-    if (this.props.tags != null) {
-      keyMap.set('prevSource', ['Previous Source', '[']);
-      keyMap.set('nextSource', ['Next Source', ']']);
-    }
-
-    return keyMap;
-  }
-
   buildMenu() {
-    const menu = defaultMenu(app, shell);
-    if (process.platform !== 'darwin') {
-      menu.splice(0, 0, {
-        label: 'File',
-        submenu: [
-          { role: 'quit' }
-        ]
-      })
-    }
-    menu.splice(2, 1, {
-      label: 'View',
-      submenu: [
-        { role: 'reload' },
-        { role: 'forcereload' },
-        { role: 'toggledevtools' },
-      ]
-    });
-    menu.splice(4, 1, {
+    createMainMenu(Menu, createMenuTemplate(app, {
       label: 'Player controls',
       submenu: Array.from(this.getKeyMap().entries()).map(([k, v]) => {
         const [label, accelerator] = v;
@@ -383,8 +345,7 @@ export default class Player extends React.Component {
           click: (this as any)[k as any].bind(this),
         };
       })
-    });
-    Menu.setApplicationMenu(Menu.buildFromTemplate(menu));
+    }));
   }
 
   componentWillUnmount() {
@@ -392,26 +353,9 @@ export default class Player extends React.Component {
     this._interval = null;
     getCurrentWindow().setAlwaysOnTop(false);
     getCurrentWindow().setFullScreen(false);
-    const menu = defaultMenu(app, shell);
-    if (process.platform !== 'darwin') {
-      menu.splice(0, 0, {
-        label: 'File',
-        submenu: [
-          { role: 'quit' }
-        ]
-      })
-    }
-    menu.splice(2, 1, {
-      label: 'View',
-      submenu: [
-        { role: 'reload' },
-        { role: 'forcereload' },
-        { role: 'toggledevtools' },
-      ]
-    });
-    menu.splice(4, 1);
-    Menu.setApplicationMenu(Menu.buildFromTemplate(menu));
+    createMainMenu(Menu, createMenuTemplate(app));
     window.removeEventListener('contextmenu', this.showContextMenu);
+    window.removeEventListener('keydown', this.onKeyDown);
     // Clear ALL the available browser caches
     global.gc();
     webFrame.clearCache();
@@ -643,6 +587,86 @@ export default class Player extends React.Component {
   getScene(id: number): Scene {
     return this.props.scenes.find((s) => s.id == id);
   }
+
+  getKeyMap() {
+    const keyMap = new Map<String, Array<string>>([
+      ['playPause', ['Play/Pause ' + (this.state.isPlaying ? '(Playing)' : '(Paused)'), 'space']],
+      ['historyBack', ['Back in Time', 'left']],
+      ['historyForward', ['Forward in Time', 'right']],
+      ['navigateBack', ['Go Back to Scene Details', 'escape']],
+      ['toggleFullscreen', ['Toggle Fullscreen ' + (this.props.config.displaySettings.fullScreen ? '(On)' : '(Off)'), 'CommandOrControl+F']],
+      ['toggleAlwaysOnTop', ['Toggle Always On Top ' + (this.props.config.displaySettings.alwaysOnTop ? '(On)' : '(Off)'), 'CommandOrControl+T']],
+      ['toggleMenuBarDisplay', ['Toggle Menu Bar ' + (this.props.config.displaySettings.showMenu ? '(On)' : '(Off)'), 'CommandOrControl+G']],
+    ]);
+
+    if (this.props.config.caching.enabled) {
+      keyMap.set('onDelete', ['Delete Image', 'Delete']);
+    }
+
+    if (this.props.tags != null) {
+      keyMap.set('prevSource', ['Previous Source', '[']);
+      keyMap.set('nextSource', ['Next Source', ']']);
+    }
+
+    return keyMap;
+  }
+
+  onKeyDown = (e: KeyboardEvent) => {
+    switch (e.key) {
+      case ' ':
+        e.preventDefault();
+        this.playPause();
+        break;
+      case 'ArrowLeft':
+        e.preventDefault();
+        this.historyBack();
+        break;
+      case 'ArrowRight':
+        e.preventDefault();
+        this.historyForward();
+        break;
+      case 'Escape':
+        e.preventDefault();
+        this.navigateBack();
+        break;
+      case 'f':
+        if (e.ctrlKey) {
+          e.preventDefault();
+          this.toggleFullscreen();
+        }
+        break;
+      case 't':
+        if (e.ctrlKey) {
+          e.preventDefault();
+          this.toggleAlwaysOnTop();
+        }
+        break;
+      case 'g':
+        if (e.ctrlKey) {
+          e.preventDefault();
+          this.toggleMenuBarDisplay();
+        }
+        break;
+      case 'Delete':
+        if (this.props.config.caching.enabled) {
+          e.preventDefault();
+          this.onDelete();
+        }
+        break;
+      case '[':
+        if (this.props.tags != null) {
+          e.preventDefault();
+          this.prevSource();
+        }
+        break;
+      case ']':
+        if (this.props.tags != null) {
+          e.preventDefault();
+          this.nextSource();
+        }
+        break;
+    }
+  };
 
   /* Menu and hotkey options DON'T DELETE */
 

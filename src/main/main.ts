@@ -1,12 +1,12 @@
-import {app, shell, BrowserWindow, session, Menu} from 'electron';
-import windowStateKeeper from 'electron-window-state';
-import defaultMenu from 'electron-default-menu';
-import * as path from 'path';
-import * as url from 'url';
+import { app, Menu, session } from 'electron';
+import { initializeIpcEvents, releaseIpcEvents } from './IPCEvents';
+import { createMainMenu, createMenuTemplate } from './MainMenu';
+import { createNewWindow } from "./WindowManager";
 
-let mainWindow: Electron.BrowserWindow;
-
-function createWindow() {
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+// Some APIs can only be used after this event occurs.
+app.on('ready', () => {
   session.defaultSession.webRequest.onHeadersReceived((details: any, callback: any) => {
     callback({
       responseHeaders: {
@@ -19,79 +19,13 @@ function createWindow() {
   // Enable garbage collection
   app.commandLine.appendSwitch('js-flags', '--expose_gc');
 
-  // Load the previous state with fallback to defaults
-  let mainWindowState = windowStateKeeper({
-    defaultHeight: 800,
-    defaultWidth: 600,
-  });
-
-  // Create the window using the state information
-  mainWindow = new BrowserWindow({
-    'x': mainWindowState.x,
-    'y': mainWindowState.y,
-    'width': mainWindowState.width,
-    'height': mainWindowState.height,
-    'icon': path.join(__dirname, 'src/renderer/icons/flipflip_logo.png'),
-  });
-
-  // Let us register listeners on the window, so we can update the state
-  // automatically (the listeners will be removed when the window is closed)
-  // and restore the maximized or full screen state
-  mainWindowState.manage(mainWindow);
-
-  // and load the index.html of the app.
-  mainWindow.loadURL(
-    url.format({
-      pathname: path.join(__dirname, './index.html'),
-      protocol: 'file:',
-      slashes: true,
-    })
-  );
-
-  // Open the DevTools.
-  if (process.defaultApp) {
-    mainWindow.webContents.openDevTools();
-  }
-
-  const menu = defaultMenu(app, shell);
-  if (process.platform !== 'darwin') {
-    menu.splice(0, 0, {
-      label: 'File',
-      submenu: [
-        { role: 'quit' }
-      ]
-    })
-  }
-  menu.splice(2, 1, {
-    label: 'View',
-    submenu: [
-      { role: 'reload' },
-      { role: 'forcereload' },
-      { role: 'toggledevtools' },
-    ]
-  });
-  menu.splice(4, 1);
-
-  Menu.setApplicationMenu(Menu.buildFromTemplate(menu));
-
-  // Emitted when the window is closed.
-  mainWindow.on('closed', () => {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null;
-  });
-}
-
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+  createNewWindow();
+  createMainMenu(Menu, createMenuTemplate(app));
+  initializeIpcEvents();
+});
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
+  releaseIpcEvents();
   app.quit();
 });
-
-// In this file you can include the rest of your app"s specific main process
-// code. You can also put them in separate files and require them here.

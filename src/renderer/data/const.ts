@@ -93,6 +93,10 @@ const AF = { // add functions
   library: 'af.library',
 };
 
+const IPC = {
+  newWindow: 'ipc.newWindow',
+};
+
 export {
-  TF, WF, IF, HTF, VTF, TOT, BT, GT, TT, SF, ST, SL, AF
+  TF, WF, IF, HTF, VTF, TOT, BT, GT, TT, SF, ST, SL, AF, IPC
 };

@@ -31,7 +31,7 @@ export default class ImagePlayer extends React.Component {
     maxInMemory: number,
     maxLoadingAtOnce: number,
     maxToRememberInHistory: number,
-    allURLs: Map<String, Array<string>>,
+    allURLs: Map<string, Array<string>>,
     strobeLayer?: string,
     isPlaying: boolean,
     historyOffset: number,
@@ -54,10 +54,11 @@ export default class ImagePlayer extends React.Component {
   };
 
   _isMounted = false;
+  _isLooping = false;
   _loadedURLs: Array<string> = null;
   _nextIndex = 0;
   _nextAdvIndex = 0;
-  _nextSourceIndex: Map<String, number> = null;
+  _nextSourceIndex: Map<string, number> = null;
   _timeout: Timeout = null;
   _waitTimeouts: Array<Timeout> = null;
   _toggleStrobe = false;
@@ -179,10 +180,11 @@ export default class ImagePlayer extends React.Component {
 
   componentDidMount() {
     this._isMounted = true;
+    this._isLooping = false;
     this._loadedURLs = new Array<string>();
     this._nextIndex = 0;
     this._nextAdvIndex = 0;
-    this._nextSourceIndex = new Map<String, number>();
+    this._nextSourceIndex = new Map<string, number>();
     this._waitTimeouts = new Array<Timeout>(this.props.config.displaySettings.maxLoadingAtOnce).fill(null);
     if (this.props.advanceHack) {
       this.props.advanceHack.listener = () => {
@@ -229,8 +231,8 @@ export default class ImagePlayer extends React.Component {
 
   componentWillReceiveProps(props: any) {
     if ((!this.props.isPlaying && props.isPlaying) ||
-      (!this.props.allURLs && props.allURLs && !this.props.hasStarted) ||
-      (!this.props.hasStarted && props.hasStarted && !this.props.allURLs)) {
+      (!this.props.allURLs && props.allURLs && this._isLooping) ||
+      (!this.props.hasStarted && props.hasStarted && !this._isLooping)) {
       this.start();
     } else if (!props.isPlaying) {
       clearTimeout(this._timeout);
@@ -560,7 +562,11 @@ export default class ImagePlayer extends React.Component {
 
   advance(force = false, schedule = true) {
     // bail if dead
-    if (!(force || (this.props.isPlaying && this._isMounted && (this.props.hasStarted || this.state.historyPaths.length == 0)))) return;
+    if (!(force || (this.props.isPlaying && this._isMounted && (this.props.hasStarted || this.state.historyPaths.length == 0)))) {
+      this._isLooping = false;
+      return;
+    }
+    this._isLooping = true;
 
     let nextHistoryPaths = this.state.historyPaths;
     let nextImg;

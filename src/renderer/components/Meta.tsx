@@ -1,21 +1,19 @@
+import { remote } from 'electron';
 import * as React from 'react';
 
 import AppStorage from '../data/AppStorage';
 import * as actions from '../data/actions';
 
 import ScenePicker from './ScenePicker';
-
 import ConfigForm from './config/ConfigForm';
-
 import Library from './library/Library';
 import TagManager from "./library/TagManager";
 import SceneGenerator from "./library/SceneGenerator";
-
 import Player from './player/Player';
 import SceneDetail from './sceneDetail/SceneDetail';
 import FFAnalytics from "./ui/FFAnalytics";
 
-const appStorage = new AppStorage();
+const appStorage = new AppStorage(remote.getCurrentWindow().id);
 
 export default class Meta extends React.Component {
   readonly state = appStorage.initialState;
@@ -53,8 +51,10 @@ export default class Meta extends React.Component {
         {this.state.route.length === 0 && (
           <ScenePicker
             scenes={this.state.scenes}
+            config={this.state.config}
             version={this.state.version}
             libraryCount={this.state.library.length}
+            onUpdateConfig={a(actions.updateConfig)}
             onUpdateScenes={a(actions.replaceScenes)}
             onAdd={a(actions.addScene)}
             onImport={a(actions.importScene)}

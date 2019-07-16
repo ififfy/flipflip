@@ -1,4 +1,4 @@
-export default new Map<String, String>([
+export default new Map<string, string>([
   ['tf.c', 'Constant'],
   ['tf.random', 'Random'],
   ['tf.sin', 'Wave'],

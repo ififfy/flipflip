@@ -9,9 +9,8 @@ import LibrarySource from '../components/library/LibrarySource';
 import Tag from "../components/library/Tag";
 
 /**
- * A compile-time global variable defined in webpack.config'
- *  [plugins] section to pick up the version string from 
- *   package.json
+ * A compile-time global variable defined in webpack.config' [plugins]
+ * section to pick up the version string from package.json
  */
 export declare var __VERSION__: string;
 
@@ -31,9 +30,9 @@ export const defaultInitialState = {
 };
 
 /**
- * Archives a file (if it exists) to same path appending '.{epoch now}' 
- * to the file name 
- * @param {string} filePath 
+ * Archives a file (if it exists) to same path appending '.{epoch now}'
+ * to the file name
+ * @param {string} filePath
  */
 function archiveFile(filePath: string): void {
   if (existsSync(filePath)) {
@@ -45,7 +44,7 @@ export default class AppStorage {
   initialState: any = defaultInitialState;
   savePath: string;
 
-  constructor() {
+  constructor(windowId: number) {
     try {
       mkdirSync(saveDir);
     }
@@ -53,7 +52,6 @@ export default class AppStorage {
       // who cares
     }
     const savePath = path.join(saveDir, 'data.json');
-    console.log("Saving to", savePath);
     try {
       const data = JSON.parse(readFileSync(savePath, 'utf-8'));
       switch (data.version) {
@@ -132,7 +130,7 @@ export default class AppStorage {
       }
     }
     catch (e) {
-      // When an error occurs archive potentially incompatible data.json file 
+      // When an error occurs archive potentially incompatible data.json file
       // This essentially renames the data.json file and thus the app is self-healing
       // in that it will recreate an initial (blank) data.json file on restarting
       // - The archived file being available for investigation.
@@ -140,11 +138,16 @@ export default class AppStorage {
       archiveFile(savePath);
     }
 
-    this.savePath = savePath;
+    if (windowId == 1) {
+      console.log("Saving to", savePath);
+      this.savePath = savePath;
+    }
   }
 
   save(state: any) {
-    writeFileSync(this.savePath, JSON.stringify(state), 'utf-8');
+    if (this.savePath) {
+      writeFileSync(this.savePath, JSON.stringify(state), 'utf-8');
+    }
   }
 
   backup(showAlert: boolean): boolean {

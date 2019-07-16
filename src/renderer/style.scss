@@ -323,6 +323,10 @@ a {
     background: url("./icons/down-arrow.svg") no-repeat;
   }
 
+  .u-new {
+    background: url("./icons/new.svg") no-repeat;
+  }
+
   .u-add {
     background: url("./icons/add.svg") no-repeat;
   }
@@ -543,7 +547,6 @@ a {
       &.ScenePicker__LibraryButton {
         font-weight: bold;
         width: 70%;
-        z-index: 2;
       }
 
       &.ScenePicker__GenerateSceneButton {
@@ -581,7 +584,7 @@ a {
     background-color: $uiGray;
 
     &.m-wide {
-    width: 100%;
+      width: 100%;
     }
 
     &.m-bold {
@@ -1201,7 +1204,7 @@ label.SimpleCheckbox {
 
 .SimpleRadioInput {
   width: 100%;
-  
+
   > div {
     text-align: center;
   }

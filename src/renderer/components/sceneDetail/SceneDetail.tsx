@@ -37,7 +37,7 @@ export default class SceneDetail extends React.Component {
 
   render() {
     return (
-      <div className="SceneDetail" onKeyDown={this.secretHotkey.bind(this)} tabIndex={0}>
+      <div className="SceneDetail" onKeyDown={this.secretHotkey.bind(this)}>
 
         <div className="u-button-row">
           <div className="u-abs-center">
