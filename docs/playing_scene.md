@@ -35,20 +35,28 @@ When you click "Back" you will be brought back to the scene that was playing.
 
 ![](doc_images/image_context_menu.png)
 
+## New Window
+To open additional windows for playing scenes, click the `New Window` button ( 
+<img style="vertical-align: -5px" src="doc_icons/new.svg" alt="Play" width="20" height="20"> ) on the home page.
+You will be warned that any changes made in this new window will not be saved. Extra windows hide access to the
+Library, Preferences, and to adding new scenes. Click a Scene and edit/start as you would usually.
+
+![](doc_images/new_window.png)
+
 ## Player Hotkeys
 A number of hotkeys are available for quickly performing user actions. These functions are also available in the menu.
+These hotkeys only work for the window in focus.
 
 Use the arrow keys (← / →) to navigate through playback history. Use `Space` to pause/resume playback. 
-These controls are also available in the bar at the top.
 
-| Hotkey                | Function             |
-|:---------------------:|:--------------------:|
-| Space                 | Play/Pause           |
-| ← →                   | Navigate History     |
-| Esc                   | Exit Scene           |
-| Del                   | Delete Image         |
-| **⌘+F** / **Ctrl+F** | Toggle Fullscreen    |
-| **⌘+T** / **Ctrl+T** | Toggle Always On Top |
-| **⌘+G** / **Ctrl+G** | Toggle Menu Bar      |
-| [ ]                   | Navigate Tagging     |
+| Hotkey   | Function             |
+|:--------:|:--------------------:|
+| Space    | Play/Pause           |
+| ← →      | Navigate History     |
+| [ ]      | Navigate Tagging     |
+| Esc      | Exit Scene           |
+| Del      | Delete Image         |
+| Ctrl+F   | Toggle Fullscreen    |
+| Ctrl+T   | Toggle Always On Top |
+| Ctrl+G   | Toggle Menu Bar      |
 

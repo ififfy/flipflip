@@ -101,7 +101,7 @@ export default class ScenePicker extends React.Component {
                   onChange={this.onSort.bind(this)}
                 />
               )}
-              {this.state.isFirstWindow && this.props.scenes.length > 1 && (
+              {this.state.isFirstWindow && this.props.scenes.length > 0 && (
                 <Jiggle
                   bounce={false}
                   className="u-small-icon-button"
@@ -178,7 +178,7 @@ export default class ScenePicker extends React.Component {
           )}
           {!this.state.isFirstWindow && (
             <h4>
-              Changes made in this form will not be saved.
+              Changes made in this window will not be saved.
             </h4>
           )}
         </div>

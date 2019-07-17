@@ -9,7 +9,7 @@ No installation necessary, just run `FlipFlip`.
 
 When you first open FlipFlip, you should see a screen like this:
 ![](doc_images/flipflip_home_numbered.png)
-_Note: Some of these features (3 & 7) will be disabled until they are relevant_
+_Note: Some of these features (3, 7, 8) will be disabled until they are relevant_
 
 1. [Add Scene](scenes.md)
 2. [Library](library.md)
@@ -17,9 +17,10 @@ _Note: Some of these features (3 & 7) will be disabled until they are relevant_
 4. Your Scenes (Drag'n'drop to manually order)
 5. A Scene Generator (bold border)
 6. Sort Scenes (Alphabetically ↕️, by Date Added ↕️, by Type)
-7. Open Random Scene (Appears when at least 2 Scenes exist)
-8. [Import Scene](import_export.md)
-9. [Preferences](config.md)
+7. Open a new FlipFlip window (Appears when at least 1 Scene exists)
+8. Open Random Scene (Appears when at least 2 Scenes exist)
+9. [Import Scene](import_export.md)
+10. [Preferences](config.md)
 
 ## Your first scene
 Let's create a simple scene to get you familiar with how things will work

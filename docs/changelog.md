@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.3.0 <small>(07/XX/2019)</small>
+## 2.3.0 <small>(07/17/2019)</small>
 - Multi-window support
 - Allow single video files as sources
 - E-Hentai & Danbooru/Gelbooru board support

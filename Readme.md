@@ -20,6 +20,7 @@
 ## Features
 - Local files + Tumblr, Reddit, Twitter, Instagram, Imugr, DeviantArt, Booru & More!
 - Animated GIF and Video support
+- Multiple windows
 - Visual Effects (Fade, Zoom/Transition, Strobe/Pulse, Overlay)
 - Library and tagging to organize your sources and generate scenes
 - Caption scripting support

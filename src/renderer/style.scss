@@ -637,6 +637,10 @@ a {
       }
     }
 
+    .VideoControlGroup > .SimpleCheckbox {
+      font-size: 13px;
+    }
+
     .AudioControlGroup, .VideoControlGroup {
       h4 {
         margin-top: 0;
@@ -846,7 +850,7 @@ label.SimpleCheckbox {
           display: none;
         }
 
-        @media screen and (max-width: 665px) {
+        @media screen and (max-width: 618px) {
           &.m-long {
             display: none;
           }
@@ -857,10 +861,10 @@ label.SimpleCheckbox {
       }
 
       .CreatableSelect {
-        @media screen and (max-width: 843px) {
+        @media screen and (max-width: 858px) {
           width: 10rem;
         }
-        @media screen and (max-width: 683px) {
+        @media screen and (max-width: 698px) {
           width: 5rem;
         }
       }

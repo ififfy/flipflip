@@ -7,6 +7,7 @@
 ## Features
 * Local files as well as Tumblr, Reddit, Twitter, Instagram, Imgur, DeviantArt, Booru & More
 * Animated GIF and Video support
+* Multiple windows
 * Visual Effects (Fade, Zoom/Transition, Strobe/Pulse, Overlay)
 * Random or ordered playback
 * Timing Control
