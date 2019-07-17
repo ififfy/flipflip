@@ -24,7 +24,7 @@ text, etc. will also change as configured_
 This section controls the background and fade effects.
 * Choose either a blurred or solid color background. Control blur amount or color.
 * Choose whether to cross-fade images.
-* Choose to fade for a constant duration (ms), random, or in a wave.
+* Choose to fade for a constant duration (ms), random, in a wave, or with the scene.
 
 <details>
   <summary>Show Example</summary>
@@ -36,7 +36,7 @@ This section controls image movement.
 * Choose zoom on/off. Control start/end scale.
 * Choose move horizontally left/right (or none). Control distance (%).
 * Choose move vertically up/down (or none). Control distance (%).
-* Choose to zoom/move for a constant duration (ms), random, or in a wave.
+* Choose to zoom/move for a constant duration (ms), random, in a wave, or with the scene
 
 <details>
   <summary>Show Example</summary>
@@ -47,7 +47,7 @@ This section controls image movement.
 This section controls the strobe effect.
 * Choose strobe on/off. Control color, strobe time (ms).
 * Choose delay on/off. Control delay time (ms).
-* Choose to strobe/delay for a constant duration (ms), random, or in a wave.
+* Choose to strobe/delay for a constant duration (ms), random, in a wave, or with the scene
 * Control strobe layer. If at "Behind All", control opacity.
 
 <details>
@@ -69,7 +69,7 @@ This section controls which images are displayed and in what order.
 This section controls the scene's audio component. It also contains the audio controls while playing.
 "Tick" means the audio file will play/restart at a certain interval.
 * Add audio files to loop or "tick".
-* For "Tick", choose to play the audio track at a constant rate (ms), random, or in a wave.
+* For "Tick", choose to play the audio track at a constant rate (ms), random, in a wave, or with the scene
 * Control the volume of each track.
   
 ## Video Controls
