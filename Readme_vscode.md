@@ -63,7 +63,7 @@ Press Control-Alt-D (to get the Debug Menu and select 'Debug FlipFlip')
 
 ### Disable openDevTools()
 
-Some developers prefer Electron's integrated debug tools, which development builds of FlipFlip are currently coded to automatically launch.  The code which performs this automated launch is around lines 46 of [`./main/main.ts`](https://github.com/ififfy/flipflip/blob/master/src/main/main.ts). Look there for ...
+Some developers prefer Electron's integrated debug tools, which development builds of FlipFlip are currently coded to automatically launch.  The code which performs this automated launch is in [`./main/WindowManager.ts`](https://github.com/ififfy/flipflip/blob/master/src/main/WindowManager.ts). Look there for ...
 
 ```ts
 //  Open the DevTools.

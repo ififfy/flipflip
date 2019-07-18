@@ -60,7 +60,8 @@ export function createNewWindow() {
   );
 
   // Open the DevTools.
-  if (process.defaultApp && windowId == 1) {
+    if (process.defaultApp && windowId == 1) {
+    // Comment the following line out to enable attachment of a remote debugger
     newWindow.webContents.openDevTools();
   }
 }
