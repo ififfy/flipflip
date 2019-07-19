@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.3.1 <small>(07/19/2019)</small>
+- Sortable bugfix
+
 ## 2.3.0 <small>(07/17/2019)</small>
 - Multi-window support
 - Allow single video files as sources
