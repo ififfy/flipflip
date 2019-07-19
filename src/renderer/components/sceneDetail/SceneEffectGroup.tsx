@@ -110,7 +110,7 @@ export default class SceneEffectGroup extends React.Component {
                 Add a new overlay
               </div>
               <div style={{clear: 'both'}}>
-                {this.props.scene.overlays.map((overlay, index) =>
+                {this.props.scene.overlays && this.props.scene.overlays.map((overlay, index) =>
                   <React.Fragment key={overlay.id}>
                     <div className="u-small-icon-button u-clickable"
                          style={{float: 'right'}}

@@ -4,7 +4,7 @@ import wretch from 'wretch';
 import Sortable from "react-sortablejs";
 
 import {IPC, SF} from "../data/const";
-import {getRandomListItem} from "../data/utils";
+import {arrayMove, getRandomListItem} from "../data/utils";
 import Scene from '../data/Scene';
 import Config from "../data/Config";
 import SimpleOptionPicker from "./ui/SimpleOptionPicker";
@@ -213,7 +213,9 @@ export default class ScenePicker extends React.Component {
             animation: 150,
             easing: "cubic-bezier(1, 0, 0, 1)",
           }}
-          onChange={(newScenes: any) => {
+          onChange={(order: any, sortable: any, evt: any) => {
+            let newScenes = Array.from(this.props.scenes);
+            arrayMove(newScenes, evt.oldIndex, evt.newIndex);
             this.props.onUpdateScenes(newScenes);
           }}>
           {this.props.scenes.map((scene) =>

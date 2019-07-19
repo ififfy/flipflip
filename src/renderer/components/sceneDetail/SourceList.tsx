@@ -4,7 +4,7 @@ import rimraf from "rimraf";
 import Sortable from "react-sortablejs";
 import {remote} from "electron";
 
-import {getCachePath, getFileGroup, getFileName, getSourceType, isVideo} from "../../data/utils";
+import {arrayMove, getCachePath, getFileGroup, getFileName, getSourceType, isVideo} from "../../data/utils";
 import {AF, SF, ST} from "../../data/const";
 import SourceIcon from "./SourceIcon";
 import LibrarySource from "../library/LibrarySource";
@@ -79,7 +79,9 @@ export default class SourceList extends React.Component {
                 this._sortable = node.sortable;
               }
             }}
-            onChange={(newSources: any) => {
+            onChange={(order: any, sortable: any, evt: any) => {
+              let newSources = Array.from(this.props.sources);
+              arrayMove(newSources, evt.oldIndex, evt.newIndex);
               this.props.onUpdateSources(newSources);
             }}>
             {this.props.displaySources.map((source) =>
@@ -152,7 +154,8 @@ export default class SourceList extends React.Component {
       (this.props.isSelect !== props.isSelect) ||
       (this.props.filters !== props.filters) ||
       (this.props.selected.length !== props.selected.length) ||
-      (this.props.displaySources !== props.displaySources));
+      (this.props.displaySources !== props.displaySources) ||
+      (this.props.sources !== props.sources));
   }
 
   componentWillUpdate(): void {

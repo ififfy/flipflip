@@ -1,7 +1,7 @@
 import * as React from "react";
 import Sortable from "react-sortablejs"
 
-import {removeDuplicatesBy} from "../../data/utils";
+import {arrayMove, removeDuplicatesBy} from "../../data/utils";
 import Tag from "./Tag";
 
 export default class TagManager extends React.Component {
@@ -66,7 +66,9 @@ export default class TagManager extends React.Component {
               this._sortable = node.sortable;
             }
           }}
-          onChange={(newTags: any) => {
+          onChange={(order: any, sortable: any, evt: any) => {
+            let newTags = Array.from(this.state.tags);
+            arrayMove(newTags, evt.oldIndex, evt.newIndex);
             this.setState({tags: newTags});
           }}>
           {this.state.tags.map((tag) =>
