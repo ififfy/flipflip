@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.3.2 <small>(07/24/2019)</small>
+- Next Scene bugfix
+
 ## 2.3.1 <small>(07/19/2019)</small>
 - Sortable bugfix
 
