@@ -1172,7 +1172,7 @@ export default class HeadlessScenePlayer extends React.Component {
       this.state.nextPromise.cancel();
       this.state.promise.cancel();
       if (this.props.nextScene != null && props.scene.id === this.props.nextScene.id) { // If the next scene has been played
-        if (props.nextScene.id === this.props.scene.id) { // Just swap values if we're coming back to this scene again
+        if (props.nextScene && props.nextScene.id === this.props.scene.id) { // Just swap values if we're coming back to this scene again
           const newAllURLs = this._nextAllURLs;
           const newPromiseQueue = this._nextPromiseQueue;
           this._nextAllURLs = this.state.allURLs;
@@ -1185,7 +1185,6 @@ export default class HeadlessScenePlayer extends React.Component {
             preload: true,
             restart: true
           });
-
         } else { // Replace values
           this.setState({
             promiseQueue: this._nextPromiseQueue,
