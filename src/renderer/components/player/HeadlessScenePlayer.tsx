@@ -994,16 +994,21 @@ export default class HeadlessScenePlayer extends React.Component {
     );
   }
 
-  componentDidMount() {
-    redditAlerted = false;
-    tumblrAlerted = false;
-    tumblr429Alerted = false;
-    instagramAlerted = false;
-    twitterAlerted = false;
-    this._nextPromiseQueue = new Array<{source: string, next: any}>();
-    this._nextAllURLs = new Map<string, Array<string>>();
+  componentDidMount(restart = false) {
+    if (!restart) {
+      redditAlerted = false;
+      tumblrAlerted = false;
+      tumblr429Alerted = false;
+      instagramAlerted = false;
+      twitterAlerted = false;
+      this._nextPromiseQueue = new Array<{ source: string, next: any }>();
+      this._nextAllURLs = new Map<string, Array<string>>();
+    }
     let n = 0;
     let newAllURLs = new Map<string, Array<string>>();
+    if (this.state.allURLs.size > 0) {
+      newAllURLs = this.state.allURLs;
+    }
 
     let sourceLoop = () => {
       if (this.state.promise.hasCanceled) return;
@@ -1105,6 +1110,7 @@ export default class HeadlessScenePlayer extends React.Component {
               let newAllURLs = this.state.allURLs;
               if (this.props.scene.weightFunction == WF.sources) {
                 let sourceURLs = newAllURLs.get(promise.source);
+                if (!sourceURLs) sourceURLs = [];
                 newAllURLs.set(promise.source, sourceURLs.concat(object.data.filter((u) => {
                   const fileName = getFileName(u);
                   const found = sourceURLs.map((u) => getFileName(u)).includes(fileName);
@@ -1163,7 +1169,8 @@ export default class HeadlessScenePlayer extends React.Component {
 
   componentWillReceiveProps(props: any) {
     if (props.scene.id !== this.props.scene.id) {
-      this.componentWillUnmount();
+      this.state.nextPromise.cancel();
+      this.state.promise.cancel();
       if (this.props.nextScene != null && props.scene.id === this.props.nextScene.id) { // If the next scene has been played
         if (props.nextScene.id === this.props.scene.id) { // Just swap values if we're coming back to this scene again
           const newAllURLs = this._nextAllURLs;
@@ -1207,7 +1214,7 @@ export default class HeadlessScenePlayer extends React.Component {
   componentDidUpdate() {
     if (this.state.restart == true) {
       this.setState({restart: false});
-      this.componentDidMount();
+      this.componentDidMount(true);
     }
   }
 
