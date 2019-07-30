@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import {IF, WF} from "../../data/const";
+import {IF, OF, WF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
 import Scene from "../../data/Scene";
 import ControlGroup from "./ControlGroup";
@@ -46,16 +46,20 @@ export default class ImageGroup extends React.Component {
               groupName={"wf"}
               value={this.props.scene.weightFunction}
               keys={Object.values(WF)}
-              onChange={this.changeKey.bind(this, 'weightFunction').bind(this)} />
+              onChange={this.changeWeightFunction.bind(this)} />
           )}
-          <SimpleCheckbox
-            text={"Randomize"}
-            isOn={this.props.scene.randomize}
-            onChange={this.changeKey.bind(this, 'randomize').bind(this)} />
-          <SimpleCheckbox
-            text={"Show All Images Before Looping"}
-            isOn={this.props.scene.forceAll}
-            onChange={this.changeKey.bind(this, 'forceAll').bind(this)} />
+          <SimpleRadioInput
+            label={"Order"}
+            groupName={"of"}
+            value={this.props.scene.orderFunction}
+            keys={this.props.scene.sources.length <= 1 || this.props.scene.weightFunction == WF.images ? Object.values(OF) : [OF.ordered, OF.random]}
+            onChange={this.changeKey.bind(this, 'orderFunction').bind(this)} />
+          {this.props.scene.orderFunction == OF.random && (
+            <SimpleCheckbox
+              text={"Show All Images Before Looping"}
+              isOn={this.props.scene.forceAll}
+              onChange={this.changeKey.bind(this, 'forceAll').bind(this)} />
+          )}
         </div>
       </ControlGroup>
     );
@@ -67,5 +71,18 @@ export default class ImageGroup extends React.Component {
 
   changeKey(key: string, value: any) {
     this.update((s) => s[key] = value);
+  }
+
+  changeWeightFunction(wf: string) {
+    if (this.props.scene.orderFunction == OF.strict && (this.props.scene.sources.length > 1 && wf == WF.sources)) {
+      this.update((s) => {
+        s.weightFunction = wf;
+        s.orderFunction = OF.ordered;
+        return s;
+      })
+    } else {
+      this.update((s) => s.weightFunction = wf);
+    }
+
   }
 }

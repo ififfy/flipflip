@@ -141,6 +141,10 @@ a {
     width: 300px !important;
   }
 
+  .SimpleRadioInput__Choice {
+    display: flex;
+  }
+
   opacity: 0;
   left: ($smallPadding*4) - $buttonSidebarWidth;
   transition: opacity 500ms ease-in-out,

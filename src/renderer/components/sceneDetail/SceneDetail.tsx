@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import {OF, WF} from "../../data/const";
 import Scene from '../../data/Scene';
 import SourcePicker from './SourcePicker';
 import AudioGroup from "./AudioGroup";
@@ -196,6 +197,18 @@ export default class SceneDetail extends React.Component {
 
   onChangeName(e: React.FormEvent<HTMLInputElement>) { this.update((s) => { s.name = e.currentTarget.value; }); }
 
-  onChangeSources(sources: Array<LibrarySource>) { this.update((s) => { s.sources = sources; }); }
+  onChangeSources(sources: Array<LibrarySource>) {
+    if (this.props.scene.orderFunction == OF.strict && (sources.length > 1 && this.props.scene.weightFunction == WF.sources)) {
+      this.update((s) => {
+        s.sources = sources;
+        s.orderFunction = OF.ordered;
+        return s;
+      })
+    } else {
+      this.update((s) => {
+        s.sources = sources;
+      });
+    }
+  }
 
 };

@@ -1,8 +1,10 @@
-import {BT, HTF, IF, SL, TF, VTF, WF} from "./const";
+import {BT, HTF, IF, OF, SL, TF, VTF, WF} from "./const";
 import Overlay from "../components/library/Overlay";
 
 interface SceneSettingsI {
-  [key: string]: string|number|boolean|Array<Overlay>;
+  [key: string]: string|Array<string>|number|boolean|Array<Overlay>;
+
+  sources: Array<string>;
   timingFunction: string;
   timingConstant: number;
   timingMin: number;
@@ -10,7 +12,7 @@ interface SceneSettingsI {
   timingSinRate: number;
   imageTypeFilter: string;
   weightFunction: string;
-  randomize: boolean;
+  orderFunction: string;
   forceAll: boolean;
 
   zoom: boolean;
@@ -125,8 +127,9 @@ interface DisplaySettingsI {
 }
 
 export class SceneSettings implements SceneSettingsI {
-  [key: string]: string | number | boolean | Array<Overlay>;
+  [key: string]: string | Array<string> | number | boolean | Array<Overlay>;
 
+  sources: Array<string> = [];
   timingFunction = TF.constant;
   timingConstant = 1000;
   timingMin = 200;
@@ -134,7 +137,7 @@ export class SceneSettings implements SceneSettingsI {
   timingSinRate = 100;
   imageTypeFilter = IF.any;
   weightFunction = WF.sources;
-  randomize = true;
+  orderFunction = OF.random;
   forceAll = false;
 
   zoom = false;

@@ -10,6 +10,12 @@ const WF = { // weight functions
   images: 'wf.i',
 };
 
+const OF = {
+  strict: 'of.strict',
+  ordered: 'of.ordered',
+  random: 'of.random',
+};
+
 const IF = { // image filters
   any: 'if.any',
   videos: 'if.videos',
@@ -98,5 +104,5 @@ const IPC = {
 };
 
 export {
-  TF, WF, IF, HTF, VTF, TOT, BT, GT, TT, SF, ST, SL, AF, IPC
+  TF, WF, OF, IF, HTF, VTF, TOT, BT, GT, TT, SF, ST, SL, AF, IPC
 };

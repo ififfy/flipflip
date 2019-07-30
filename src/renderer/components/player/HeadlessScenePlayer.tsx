@@ -131,7 +131,23 @@ function loadLocalDirectory(config: Config, url: string, filter: string, next: a
         resolve(null);
       } else {
         resolve({
-          data: filterPathsToJustPlayable(filter, rawFiles, true).map((p) => fileURL(p)),
+          data: filterPathsToJustPlayable(filter, rawFiles, true).map((p) => fileURL(p)).sort((a, b) => {
+            let aFile: any = getFileName(a, false);
+            if (parseInt(aFile, 10)) {
+              aFile = parseInt(aFile, 10);
+            }
+            let bFile: any = getFileName(b, false);
+            if (parseInt(aFile, 10)) {
+              aFile = parseInt(aFile, 10);
+            }
+            if (aFile > bFile) {
+              return 1;
+            } else if (aFile < bFile) {
+              return -1;
+            } else {
+              return 0;
+            }
+          }),
           next: next
         });
       }

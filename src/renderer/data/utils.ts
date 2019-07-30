@@ -37,10 +37,13 @@ export function getPath() {
   return path.join(remote.app.getPath('appData'), 'flipflip');
 }
 
-export function getFileName(url: string) {
-  url = url.substring(url.lastIndexOf("/"));
+export function getFileName(url: string, extension = true) {
+  url = url.substring(url.lastIndexOf("/") + 1);
   if (url.includes("?")) {
     url = url.substring(0, url.indexOf("?"));
+  }
+  if (!extension) {
+    url = url.substring(0, url.lastIndexOf("."));
   }
   return url;
 }

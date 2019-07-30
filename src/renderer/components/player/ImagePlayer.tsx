@@ -9,7 +9,7 @@ import getFolderSize from "get-folder-size";
 import IdleTimer from 'react-idle-timer';
 import Timeout = NodeJS.Timeout;
 
-import {HTF, IF, SL, ST, TF, VTF, WF} from '../../data/const';
+import {HTF, IF, OF, SL, ST, TF, VTF, WF} from '../../data/const';
 import {getCachePath, getFileName, getRandomListItem, getSourceType, isVideo, urlToPath} from '../../data/utils';
 import Config from "../../data/Config";
 import Scene from "../../data/Scene";
@@ -44,13 +44,13 @@ export default class ImagePlayer extends React.Component {
   };
 
   readonly state = {
-    numBeingLoaded: 0,
     readyToDisplay: Array<any>(),
     historyPaths: Array<any>(),
     timeToNextFrame: 0,
     timeoutID: 0,
     nextImageID: 0,
     hideCursor: false,
+    orderFunction: this.props.scene.orderFunction,
   };
 
   _isMounted = false;
@@ -223,19 +223,23 @@ export default class ImagePlayer extends React.Component {
   shouldComponentUpdate(props: any, state: any): boolean {
     return (state.hideCursor !== this.state.hideCursor ||
             state.historyPaths !== this.state.historyPaths ||
+            props.isPlaying !== this.props.isPlaying ||
             props.hasStarted !== this.props.hasStarted ||
             props.allURLs !== this.props.allURLs ||
             props.historyOffset !== this.props.historyOffset ||
             props.strobeLayer !== this.props.strobeLayer);
   }
 
-  componentWillReceiveProps(props: any) {
-    if ((!this.props.isPlaying && props.isPlaying) ||
-      (!this.props.allURLs && props.allURLs && this._isLooping) ||
-      (!this.props.hasStarted && props.hasStarted && !this._isLooping)) {
+  componentDidUpdate(props: any, state: any) {
+    if ((!props.isPlaying && this.props.isPlaying) ||
+      (!props.allURLs && this.props.allURLs && this._isLooping) ||
+      (!props.hasStarted && this.props.hasStarted && !this._isLooping)) {
       this.start();
-    } else if (!props.isPlaying) {
+    } else if (!this.props.isPlaying) {
       clearTimeout(this._timeout);
+    }
+    if (this.props.scene.orderFunction !== this.state.orderFunction) {
+      this.setState({readyToDisplay: [], orderFunction: this.props.scene.orderFunction});
     }
   }
 
@@ -341,7 +345,7 @@ export default class ImagePlayer extends React.Component {
     if (!this._isMounted) return;
 
     if (this.state.readyToDisplay.length >= this.props.maxLoadingAtOnce || !this.props.allURLs) {
-      // Wait for the display loop to use an image (it might be fast, or paused)
+      // Wait for the display loop to use an image
       this._waitTimeouts[i] = setTimeout(() => this.runFetchLoop(i), 100);
       return;
     }
@@ -349,66 +353,112 @@ export default class ImagePlayer extends React.Component {
     let source;
     let collection;
     let url: string;
+    let urlIndex: number;
+    let sourceLength: number;
+
+    // For source weighted
     if (this.props.scene.weightFunction == WF.sources) {
-      if (this.props.scene.randomize) {
+
+      // If sorting randomly, get a random source
+      if (this.props.scene.orderFunction == OF.random) {
         source = getRandomListItem(Array.from(this.props.allURLs.keys()));
-      } else {
+      } else { // Else get the next source
         source = Array.from(this.props.allURLs.keys())[this._nextIndex++%this.props.allURLs.size];
       }
+      // Get the urls from the source
       collection = this.props.allURLs.get(source);
+
+      // If we have no urls, loop again
       if (!(collection && collection.length)) {
         this.runFetchLoop(i);
         return;
       }
-      if (this.props.scene.forceAll) {
+
+      // If sorting randomly and forcing all
+      if (this.props.scene.orderFunction == OF.random && this.props.scene.forceAll) {
+        // Filter the available urls to those not played yet
         collection = collection.filter((u) => !this._loadedURLs.includes(u));
+        // If there are no remaining urls for this source
         if (!(collection && collection.length)) {
+          // Make sure all the other sources are also extinguished
           const remainingLibrary = [].concat.apply([], Array.from(this.props.allURLs.values())).filter((u: string) => !this._loadedURLs.includes(u));
+          // If they are, clear loadedURLs
           if (remainingLibrary.length === 0) {
             this._loadedURLs = new Array<string>();
+            collection = this.props.allURLs.get(source);
+          } else { // Else loop again
+            this.runFetchLoop(i);
+            return;
           }
-          this.runFetchLoop(i);
-          return;
         }
       }
-      if (this.props.scene.randomize) {
+
+      // If sorting randomly, get a random URL
+      if (this.props.scene.orderFunction == OF.random) {
         url = getRandomListItem(collection);
-      } else {
+      } else { // Else get the next index for this source
         let index = this._nextSourceIndex.get(source);
         if (!index) {
-          index = 0;
+          if (this._nextSourceIndex.size > 0) {
+            index = Math.min(...this._nextSourceIndex.values());
+          } else {
+            index = 0;
+          }
+        }
+        if (this.props.scene.orderFunction == OF.strict) {
+          urlIndex = index;
+          sourceLength = collection.length;
         }
         url = collection[index%collection.length];
         this._nextSourceIndex.set(source, index+1)
       }
-    } else {
+    } else { // For image weighted
+
+      // Concat all images together
       collection = [].concat.apply([], Array.from(this.props.allURLs.keys()));
+      // If there are none, loop again1
       if (!(collection && collection.length)) {
         this.runFetchLoop(i);
         return;
       }
-      if (this.props.scene.forceAll) {
+
+      // If sorting randomly and forcing all
+      if (this.props.scene.orderFunction == OF.random && this.props.scene.forceAll) {
+        // Filter the available ulls to those not played yet
         collection = collection.filter((u: string) => !this._loadedURLs.includes(u));
+        // If there are no remaining urls, clear loadedURLs
         if (!(collection && collection.length)) {
           this._loadedURLs = new Array<string>();
-          this.runFetchLoop(i);
-          return;
+          collection = [].concat.apply([], Array.from(this.props.allURLs.keys()));
         }
       }
-      if (this.props.scene.randomize) {
+
+      // If sorting randomly, get a random URL
+      if (this.props.scene.orderFunction == OF.random) {
         url = getRandomListItem(collection);
-      } else {
+      } else { // Else get the next index
+        if (this.props.scene.orderFunction == OF.strict) {
+          urlIndex = this._nextIndex;
+          sourceLength = collection.length;
+        }
         url = collection[this._nextIndex++%collection.length];
       }
+
+      // Get the source of this image from the map
       source = this.props.allURLs.get(url)[0];
     }
 
-    this._loadedURLs.push(url);
-    this.setState({numBeingLoaded: this.state.numBeingLoaded + 1});
+    if (this.props.scene.orderFunction == OF.random && this.props.scene.forceAll) {
+      this._loadedURLs.push(url);
+    }
 
     if (isVideo(url, false)) {
       let video = document.createElement('video');
       video.setAttribute("source", source);
+      if (this.props.scene.orderFunction == OF.strict) {
+        video.setAttribute("index", urlIndex.toString());
+        video.setAttribute("length", sourceLength.toString());
+      }
 
       const successCallback = () => {
         if (!this._isMounted) return;
@@ -419,7 +469,6 @@ export default class ImagePlayer extends React.Component {
         (video as any).key = this.state.nextImageID;
         this.setState({
           readyToDisplay: this.state.readyToDisplay.concat([video]),
-          numBeingLoaded: Math.max(0, this.state.numBeingLoaded - 1),
           nextImageID: this.state.nextImageID + 1,
         });
         if (this.state.historyPaths.length === 0) {
@@ -430,9 +479,6 @@ export default class ImagePlayer extends React.Component {
 
       const errorCallback = () => {
         if (!this._isMounted) return;
-        this.setState({
-          numBeingLoaded: Math.max(0, this.state.numBeingLoaded - 1),
-        });
         this.runFetchLoop(i);
       };
 
@@ -468,6 +514,10 @@ export default class ImagePlayer extends React.Component {
     } else {
       const img = new Image();
       img.setAttribute("source", source);
+      if (this.props.scene.orderFunction == OF.strict) {
+        img.setAttribute("index", urlIndex.toString());
+        img.setAttribute("length", sourceLength.toString());
+      }
 
       const successCallback = () => {
         if (!this._isMounted) return;
@@ -475,7 +525,6 @@ export default class ImagePlayer extends React.Component {
         (img as any).key = this.state.nextImageID;
         this.setState({
           readyToDisplay: this.state.readyToDisplay.concat([img]),
-          numBeingLoaded: Math.max(0, this.state.numBeingLoaded - 1),
           nextImageID: this.state.nextImageID + 1,
         });
         if (this.state.historyPaths.length === 0) {
@@ -486,9 +535,6 @@ export default class ImagePlayer extends React.Component {
 
       const errorCallback = () => {
         if (!this._isMounted) return;
-        this.setState({
-          numBeingLoaded: Math.max(0, this.state.numBeingLoaded - 1),
-        });
         this.runFetchLoop(i);
       };
 
@@ -570,19 +616,41 @@ export default class ImagePlayer extends React.Component {
 
     let nextHistoryPaths = this.state.historyPaths;
     let nextImg;
+    if (this.props.scene.orderFunction == OF.strict) {
+      this.state.readyToDisplay.sort((a, b) => {
+        // JavaScript doesn't calculate negative modulos correctly, use this
+        const mod = (x: number, n: number) => (x % n + n) % n;
+        const aStrict = mod((parseInt(a.getAttribute("index"), 10) - this.state.historyPaths.length), parseInt(a.getAttribute("length"), 10));
+        const bStrict = mod((parseInt(b.getAttribute("index"), 10) - this.state.historyPaths.length), parseInt(b.getAttribute("length"), 10));
+        if (aStrict > bStrict) {
+          return 1;
+        } else if (aStrict < bStrict) {
+          return -1;
+        } else {
+          return 0;
+        }
+      });
+    }
     if (this.state.readyToDisplay.length) {
+      // If there is an image ready, display the next image
       nextImg = this.state.readyToDisplay.shift();
-    } else if (this.state.historyPaths.length && this.props.config.defaultScene.randomize && !this.props.scene.forceAll) {
+    } else if (this.state.historyPaths.length && this.props.config.defaultScene.orderFunction == OF.random && !this.props.scene.forceAll) {
+      // If no image is ready, we have a history to choose from, ordering is random, and NOT forcing all
+      // Choose a random image from history to display
       nextImg = getRandomListItem(this.state.historyPaths);
     } else if (this.state.historyPaths.length) {
+      // If no image is ready, we have a history to choose from, and ordering is not random
+      // Show the next image from history
       nextImg = this.state.historyPaths[this._nextAdvIndex++%this.state.historyPaths.length];
     }
+
     if (nextImg) {
       if (nextImg instanceof HTMLVideoElement && !this.props.scene.playFullVideo && this.props.scene.randomVideoStart && (!this.props.scene.continueVideo || !nextImg.currentTime)) {
         nextImg.currentTime = Math.random() * nextImg.duration;
       }
       nextHistoryPaths = nextHistoryPaths.concat([nextImg]);
     }
+
     while (nextHistoryPaths.length > this.props.maxInMemory) {
       nextHistoryPaths.shift();
     }
@@ -617,12 +685,12 @@ export default class ImagePlayer extends React.Component {
         this.props.setTimeToNextFrame(timeToNextFrame);
       }
       this._toggleStrobe = !this._toggleStrobe;
+      this.props.setHistoryPaths(nextHistoryPaths);
       this.setState({
         historyPaths: nextHistoryPaths,
         timeToNextFrame,
       });
       this._timeout = setTimeout(this.advance.bind(this, false, true), timeToNextFrame);
-      this.props.setHistoryPaths(nextHistoryPaths);
     }
   }
 };

@@ -7,6 +7,10 @@ export default new Map<string, string>([
   ['wf.s', 'By Source'],
   ['wf.i', 'By Image'],
 
+  ['of.strict', 'Strictly Ordered'],
+  ['of.ordered', 'Ordered'],
+  ['of.random', 'Randomized'],
+
   ['if.any', 'All images'],
   ['if.videos', 'Only videos'],
   ['if.gifs', 'Only animated'],
