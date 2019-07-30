@@ -1,10 +1,11 @@
 import {BT, HTF, IF, OF, SL, TF, VTF, WF} from "./const";
 import Overlay from "../components/library/Overlay";
+import LibrarySource from "../components/library/LibrarySource";
 
 interface SceneSettingsI {
-  [key: string]: string|Array<string>|number|boolean|Array<Overlay>;
+  [key: string]: string|Array<LibrarySource>|number|boolean|Array<Overlay>;
 
-  sources: Array<string>;
+  sources: Array<LibrarySource>;
   timingFunction: string;
   timingConstant: number;
   timingMin: number;
@@ -127,9 +128,9 @@ interface DisplaySettingsI {
 }
 
 export class SceneSettings implements SceneSettingsI {
-  [key: string]: string | Array<string> | number | boolean | Array<Overlay>;
+  [key: string]: string | Array<LibrarySource> | number | boolean | Array<Overlay>;
 
-  sources: Array<string> = [];
+  sources: Array<LibrarySource> = [];
   timingFunction = TF.constant;
   timingConstant = 1000;
   timingMin = 200;

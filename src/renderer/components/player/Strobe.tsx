@@ -72,7 +72,7 @@ export default class Strobe extends React.Component {
   }
 
   componentWillUpdate(props: any) {
-    if (this.props.durationTF != props.durationTF || this.props.delayTF != props.delayTF) {
+    if (this.props.durationTF != props.durationTF || this.props.delayTF != props.delayTF || this.props.pulse != props.pulse) {
       clearTimeout(this._strobeTimeout);
       if (props.pulse ? props.delayTF != TF.scene : props.durationTF != TF.scene) {
         this.strobeLoop();
