@@ -26,6 +26,7 @@ export default class ImagePlayer extends React.Component {
   readonly props: {
     config: Config,
     scene: Scene,
+    videoVolume: number,
     advanceHack?: ChildCallbackHack,
     deleteHack?: ChildCallbackHack,
     maxInMemory: number,
@@ -168,6 +169,7 @@ export default class ImagePlayer extends React.Component {
             zoomEnd={zoomEnd}
             transDuration={transDuration}
             crossFade={crossFade}
+            crossFadeAudio={this.props.scene.crossFadeAudio}
             fadeDuration={fadeDuration}
             videoVolume={this.props.scene.videoVolume}
             onLoaded={this.state.historyPaths.length == 1 ? this.props.onLoaded : this.nop}
@@ -223,6 +225,7 @@ export default class ImagePlayer extends React.Component {
   shouldComponentUpdate(props: any, state: any): boolean {
     return (state.hideCursor !== this.state.hideCursor ||
             state.historyPaths !== this.state.historyPaths ||
+            props.videoVolume !== this.props.videoVolume ||
             props.isPlaying !== this.props.isPlaying ||
             props.hasStarted !== this.props.hasStarted ||
             props.allURLs !== this.props.allURLs ||
@@ -640,6 +643,14 @@ export default class ImagePlayer extends React.Component {
     if (this.state.readyToDisplay.length) {
       // If there is an image ready, display the next image
       nextImg = this.state.readyToDisplay.shift();
+      if (this.props.scene.continueVideo && nextImg instanceof HTMLVideoElement) {
+        const indexOf = this.state.historyPaths.map((i) => i.src).indexOf(nextImg.src);
+        if (indexOf >= 0) {
+          if (nextImg != this.state.historyPaths[indexOf]) {
+            nextImg = this.state.historyPaths[indexOf];
+          }
+        }
+      }
     } else if (this.state.historyPaths.length && this.props.config.defaultScene.orderFunction == OF.random && !this.props.scene.forceAll) {
       // If no image is ready, we have a history to choose from, ordering is random, and NOT forcing all
       // Choose a random image from history to display

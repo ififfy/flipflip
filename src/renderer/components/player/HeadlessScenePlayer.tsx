@@ -976,6 +976,7 @@ export default class HeadlessScenePlayer extends React.Component {
     allURLs: new Map<string, Array<string>>(),
     restart: false,
     preload: false,
+    videoVolume: this.props.scene.videoVolume,
   };
 
   _nextPromiseQueue: Array<{source: string, next: any}> = null;
@@ -991,6 +992,7 @@ export default class HeadlessScenePlayer extends React.Component {
           <ImagePlayer
             config={this.props.config}
             scene={this.props.scene}
+            videoVolume={this.props.scene.videoVolume}
             isPlaying={this.props.isPlaying}
             historyOffset={this.props.historyOffset}
             setHistoryOffset={this.props.setHistoryOffset}
@@ -1170,7 +1172,8 @@ export default class HeadlessScenePlayer extends React.Component {
   }
 
   shouldComponentUpdate(props: any, state: any): boolean {
-    return (props.scene.id !== this.props.scene.id ||
+    return props.scene.id !== this.props.scene.id ||
+      props.scene.videoVolume !== this.state.videoVolume ||
       (props.nextScene && this.props.nextScene &&
       props.nextScene.id !== this.props.nextScene.id) ||
       props.historyOffset !== this.props.historyOffset ||
@@ -1180,10 +1183,13 @@ export default class HeadlessScenePlayer extends React.Component {
       props.hasStarted !== this.props.hasStarted ||
       state.restart !== this.state.restart ||
       state.promise.source !== this.state.promise.source ||
-      (state.allURLs.size > 0 && this.state.allURLs.size == 0));
+      (state.allURLs.size > 0 && this.state.allURLs.size == 0);
   }
 
   componentDidUpdate(props: any, state: any) {
+    if (this.props.scene.videoVolume !== this.state.videoVolume) {
+      this.setState({videoVolume: this.props.scene.videoVolume});
+    }
     if (props.scene.id !== this.props.scene.id) {
       state.nextPromise.cancel();
       state.promise.cancel();

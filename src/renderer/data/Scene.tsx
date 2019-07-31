@@ -29,6 +29,7 @@ export default class Scene {
   transDurationMax = 7000;
   transSinRate = 100;
   crossFade = false;
+  crossFadeAudio = false;
   fadeTF = TF.constant;
   fadeDuration = 500;
   fadeDurationMin = 100;

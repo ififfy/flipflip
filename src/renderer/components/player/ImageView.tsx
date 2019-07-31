@@ -16,15 +16,19 @@ export const FadeLayer = (data: {image: any, contentRef: any, backgroundRef: any
     {
       initial: { // Initial (first time) base values, optional (can be null)
         opacity: 1,
+        volume: 1,
       },
       from: { // Base values, optional
         opacity: data.crossFade ? 0 : 1,
+        volume: data.crossFade ? 0 : 1,
       },
       enter: { // Styles apply for entering elements
         opacity: 1,
+        volume: 1,
       },
       leave: { // Styles apply for leaving elements
         opacity: data.crossFade ? 0.99 : 1,
+        volume: data.crossFade ? 0 : 1,
       },
       unique: true, // If this is true, items going in and out with the same key will be re-used
       config: {
@@ -37,7 +41,7 @@ export const FadeLayer = (data: {image: any, contentRef: any, backgroundRef: any
     <React.Fragment>
       {fadeTransitions.map(({item, props, key}) => {
         return (
-          <animated.div className="ImageView u-fill-container" key={key} style={{ ...props }}>
+          <animated.div className="ImageView u-fill-container" key={key} volume={props.volume} style={{ ...props }}>
             <ZoomMoveLayer
               contentRef={data.contentRef}
               horizTransLevel={data.horizTransLevel}
@@ -120,17 +124,19 @@ export default class ImageView extends React.Component {
     zoomEnd: number,
     transDuration: number,
     crossFade: boolean,
+    crossFadeAudio: boolean,
     fadeDuration: number,
     videoVolume: number,
     onLoaded(): void,
     setVideo(video: HTMLVideoElement): void,
   };
 
-  readonly backgroundRef: React.RefObject<any> = React.createRef();
-  readonly contentRef: React.RefObject<any> = React.createRef();
-  _timeout: Timeout = null;
+  readonly backgroundRef: React.RefObject<HTMLDivElement> = React.createRef();
+  readonly contentRef: React.RefObject<HTMLDivElement> = React.createRef();
+  _timeout: Map<string, Timeout> = null;
 
   componentDidMount() {
+    this._timeout = new Map<string, Timeout>();
     this._applyImage();
   }
 
@@ -139,8 +145,14 @@ export default class ImageView extends React.Component {
   }
 
   componentWillUnmount() {
-    clearTimeout(this._timeout);
+    this.clearTimeouts();
     this._timeout = null;
+  }
+
+  clearTimeouts() {
+    for (let timeout of this._timeout.values()) {
+      clearTimeout(timeout);
+    }
   }
 
   _applyImage() {
@@ -193,12 +205,17 @@ export default class ImageView extends React.Component {
         bgImg.height = parentHeight;
 
         const draw = (v: any, c: CanvasRenderingContext2D, w: number, h: number) => {
-          if (v.paused || v.ended) return;
+          if (parseFloat(el.parentElement.style.opacity) == 0.99 || v.paused || v.ended) return;
+          if (this.props.crossFade && this.props.crossFadeAudio && v instanceof HTMLVideoElement) {
+            v.volume = (this.props.videoVolume / 100) * parseFloat(el.parentElement.getAttribute("volume"));
+          }
           c.drawImage(v, 0, 0, w, h);
-          this._timeout = setTimeout(draw, 20, v, c, w, h);
+          this._timeout.set(v.src, setTimeout(draw, 20, v, c, w, h));
         };
 
-        clearTimeout(this._timeout);
+        if (!this.props.crossFade) {
+          this.clearTimeouts();
+        }
         if (img instanceof HTMLImageElement) {
           draw(img, context, parentWidth, parentHeight);
         } else {
@@ -258,7 +275,9 @@ export default class ImageView extends React.Component {
       (props.zoomStart !== this.props.zoomStart) ||
       (props.zoomEnd !== this.props.zoomEnd) ||
       (props.transDuration !== this.props.transDuration) ||
+      (props.videoVolume !== this.props.videoVolume) ||
       (props.crossFade !== this.props.crossFade) ||
+      (props.crossFadeAudio !== this.props.crossFadeAudio) ||
       (props.fadeDuration !== this.props.fadeDuration));
   }
 

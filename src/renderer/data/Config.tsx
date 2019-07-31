@@ -29,6 +29,7 @@ interface SceneSettingsI {
   transDurationMax: number;
   transSinRate: number;
   crossFade: boolean;
+  crossFadeAudio: boolean;
   fadeTF: string;
   fadeDuration: number;
   fadeDurationMin: number;
@@ -156,6 +157,7 @@ export class SceneSettings implements SceneSettingsI {
   transDurationMax = 7000;
   transSinRate = 100;
   crossFade = false;
+  crossFadeAudio = false;
   fadeTF = TF.constant;
   fadeDuration = 500;
   fadeDurationMin = 100;
