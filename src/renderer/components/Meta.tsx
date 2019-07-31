@@ -1,7 +1,8 @@
-import { remote } from 'electron';
+import {remote, ipcRenderer, IpcMessageEvent} from 'electron';
 import * as React from 'react';
 
 import AppStorage from '../data/AppStorage';
+import {IPC} from "../data/const";
 import * as actions from '../data/actions';
 
 import ScenePicker from './ScenePicker';
@@ -38,6 +39,11 @@ export default class Meta extends React.Component {
     // We never bother cleaning this up, but that's OK because this is the top level
     // component of the whole app.
     setInterval(() => appStorage.save(this.state), 500);
+    ipcRenderer.on(IPC.startScene, this.startScene.bind(this));
+  }
+
+  startScene(ev: IpcMessageEvent, sceneName: string) {
+    this.applyAction(actions.startFromScene, sceneName);
   }
 
   render() {

@@ -175,6 +175,28 @@ export function nextScene(state: State): Object {
   }
 }
 
+export function startFromScene(state: State, sceneName: string) {
+  const scene = state.scenes.find((s: Scene) => s.name == sceneName);
+  if (scene) {
+    if (scene.sources.length > 0) {
+      if (scene.tagWeights || scene.sceneWeights) {
+        return {
+          route: [new Route({kind: 'generate', value: scene.id}),
+            new Route({kind: 'scene', value: scene.id}), new Route({kind: 'play', value: scene.id})],
+        };
+      } else {
+        return {
+          route: [new Route({kind: 'scene', value: scene.id}), new Route({kind: 'play', value: scene.id})],
+        };
+      }
+    } else {
+      console.error("Scene '" + sceneName+ "' has no sources");
+    }
+  } else {
+    console.error("Couldn't find scene '" + sceneName + "'");
+  }
+}
+
 export function updateConfig(state: State, newConfig: Config): Object {
   return {config: newConfig};
 }

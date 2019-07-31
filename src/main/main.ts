@@ -1,7 +1,7 @@
 import { app, Menu, session } from 'electron';
 import { initializeIpcEvents, releaseIpcEvents } from './IPCEvents';
 import { createMainMenu, createMenuTemplate } from './MainMenu';
-import { createNewWindow } from "./WindowManager";
+import {createNewWindow, startScene} from "./WindowManager";
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -22,6 +22,10 @@ app.on('ready', () => {
   createNewWindow();
   createMainMenu(Menu, createMenuTemplate(app));
   initializeIpcEvents();
+
+  if (process.argv[2]) {
+    setTimeout(startScene.bind(null, process.argv[2]), 1000);
+  }
 });
 
 // Quit when all windows are closed.

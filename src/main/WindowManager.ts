@@ -2,10 +2,20 @@ import {app, BrowserWindow} from 'electron';
 import windowStateKeeper from 'electron-window-state';
 import * as path from 'path';
 import * as url from 'url';
+
 import {releaseIpcEvents} from "./IPCEvents";
+import {IPC} from "../renderer/data/const";
 
 // Current window list
 const currentWindows: Map<number, BrowserWindow> = new Map();
+
+export function startScene(sceneName: string) {
+  const w = currentWindows.get(1);
+  if (w) {
+    console.log("Attempting to start scene '" + sceneName + "'");
+    w.webContents.send(IPC.startScene, sceneName);
+  }
+}
 
 export function createNewWindow() {
   // Load the previous state with fallback to defaults
@@ -60,7 +70,7 @@ export function createNewWindow() {
   );
 
   // Open the DevTools.
-    if (process.defaultApp && windowId == 1) {
+  if (process.defaultApp && windowId == 1) {
     // Comment the following line out to enable attachment of a remote debugger
     newWindow.webContents.openDevTools();
   }
