@@ -169,7 +169,7 @@ function loadRemoteImageURLList(config: Config, url: string, filter: string, nex
     wretch(url)
       .get()
       .text(data => {
-        const lines = data.match(/[^\r\n]+/g).filter((line) => line.startsWith("http"));
+        const lines = data.match(/[^\r\n]+/g).filter((line) => line.startsWith("http://") || line.startsWith("https://") || line.startsWith("file:///"));
         if (lines.length > 0) {
           let convertedSource = Array<string>();
           let convertedCount = 0;
@@ -186,7 +186,7 @@ function loadRemoteImageURLList(config: Config, url: string, filter: string, nex
             });
           }
         } else {
-          console.warn("No lines in", url, "start with 'http://'");
+          console.warn("No lines in", url, " are links or files");
           resolve(null)
         }
       })
