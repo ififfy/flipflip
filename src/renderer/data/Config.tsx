@@ -1,4 +1,4 @@
-import {BT, HTF, IF, OF, SL, TF, VTF, WF} from "./const";
+import {BT, GO, HTF, IF, OF, SL, TF, VO, VTF, WF} from "./const";
 import Overlay from "../components/library/Overlay";
 import LibrarySource from "../components/library/LibrarySource";
 
@@ -38,8 +38,10 @@ interface SceneSettingsI {
   backgroundType: string;
   backgroundColor: string;
   backgroundBlur: number;
-  playFullGif: boolean;
-  playFullVideo: boolean;
+  gifOption: string;
+  gifTimingConstant: number;
+  videoOption: string;
+  videoTimingConstant: number;
   randomVideoStart: boolean;
   continueVideo: boolean;
   videoVolume: number;
@@ -163,8 +165,10 @@ export class SceneSettings implements SceneSettingsI {
   backgroundType = BT.blur;
   backgroundColor = "#000000";
   backgroundBlur = 8;
-  playFullGif = false;
-  playFullVideo = false;
+  gifOption = GO.none;
+  gifTimingConstant = 3000;
+  videoOption = VO.none;
+  videoTimingConstant = 3000;
   randomVideoStart = false;
   continueVideo = false;
   videoVolume = 0;

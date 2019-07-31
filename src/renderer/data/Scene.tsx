@@ -1,4 +1,4 @@
-import {BT, HTF, IF, OF, SL, TF, TOT, VTF, WF} from './const';
+import {BT, GO, HTF, IF, OF, SL, TF, TOT, VO, VTF, WF} from './const';
 import LibrarySource from "../components/library/LibrarySource";
 import Audio from "../components/library/Audio";
 import Overlay from "../components/library/Overlay";
@@ -52,8 +52,10 @@ export default class Scene {
   strobeDelayMax = 300;
   strobeDelaySinRate = 100;
   strobeColor = "#FFFFFF";
-  playFullGif = false;
-  playFullVideo = false;
+  gifOption = GO.none;
+  gifTimingConstant = 3000;
+  videoOption= VO.none;
+  videoTimingConstant = 3000;
   randomVideoStart = false;
   continueVideo = false;
   textKind: string = "";
@@ -88,6 +90,8 @@ export default class Scene {
   overlaySceneOpacity: number = 0.5;
   transFull = false;
   fadeFull = false;
+  playFullGif = false;
+  playFullVideo = false;
 
   constructor(init?: Partial<Scene>) {
     Object.assign(this, init);
@@ -145,6 +149,16 @@ export default class Scene {
     if (this.fadeFull) {
       this.fadeTF = TF.scene;
       this.fadeFull = false;
+    }
+
+    if (this.playFullGif) {
+      this.gifOption = GO.full;
+      this.playFullGif = false;
+    }
+
+    if (this.playFullVideo) {
+      this.videoOption = VO.full;
+      this.playFullVideo = false;
     }
 
     if (!(this.textKind && this.textKind.length)) {

@@ -16,6 +16,14 @@ export default new Map<string, string>([
   ['if.gifs', 'Only animated'],
   ['if.stills', 'Only stills'],
 
+  ['go.none', 'No Change'],
+  ['go.part', 'Play Part'],
+  ['go.full', 'Play Full'],
+
+  ['vo.none', 'No Change'],
+  ['vo.part', 'Play Part'],
+  ['vo.full', 'Play Full'],
+
   ['bt.blur', 'Blurred'],
   ['bt.color', 'Solid Color'],
   ['bt.none', 'None'],

@@ -1,12 +1,13 @@
 import * as React from 'react';
 
-import {IF, OF, WF} from "../../data/const";
+import {GO, IF, OF, VO, WF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
 import Scene from "../../data/Scene";
 import ControlGroup from "./ControlGroup";
 import SimpleCheckbox from "../ui/SimpleCheckbox";
 import SimpleOptionPicker from "../ui/SimpleOptionPicker";
 import SimpleRadioInput from "../ui/SimpleRadioInput";
+import SimpleNumberInput from "../ui/SimpleNumberInput";
 
 export default class ImageGroup extends React.Component {
   readonly props: {
@@ -18,27 +19,54 @@ export default class ImageGroup extends React.Component {
   render() {
     return (
       <ControlGroup title="Images" isNarrow={true}>
-        <div className="ControlSubgroup  m-inline">
-          {!this.props.isPlayer && (
+        {!this.props.isPlayer && (
+          <div className="ControlSubgroup ImageOptionGroup m-inline">
             <SimpleOptionPicker
               onChange={this.changeKey.bind(this, 'imageTypeFilter').bind(this)}
               label="Image Filter"
               value={this.props.scene.imageTypeFilter}
               keys={Object.values(IF)}/>
-          )}
-          {!this.props.isPlayer && this.props.scene.imageTypeFilter != IF.stills && (
-            <React.Fragment>
-              <SimpleCheckbox
-                text="Play Full GIF"
-                isOn={this.props.scene.playFullGif}
-                onChange={this.changeKey.bind(this, 'playFullGif').bind(this)}/>
-              <SimpleCheckbox
-                text="Play Full Video"
-                isOn={this.props.scene.playFullVideo}
-                onChange={this.changeKey.bind(this, 'playFullVideo').bind(this)}/>
-            </React.Fragment>
-          )}
-        </div>
+            {this.props.scene.imageTypeFilter != IF.stills && (
+              <React.Fragment>
+                <SimpleOptionPicker
+                  onChange={this.changeKey.bind(this, 'gifOption').bind(this)}
+                  label="GIF Options"
+                  value={this.props.scene.gifOption}
+                  keys={Object.values(GO)}/>
+                {this.props.scene.gifOption == GO.part && (
+                  <div>
+                    For
+                    <SimpleNumberInput
+                      label=""
+                      value={this.props.scene.gifTimingConstant}
+                      isEnabled={true}
+                      min={0}
+                      onChange={this.changeKey.bind(this, 'gifTimingConstant').bind(this)}/>
+                    ms
+                  </div>
+                )}
+                <SimpleOptionPicker
+                  onChange={this.changeKey.bind(this, 'videoOption').bind(this)}
+                  label="Video Options"
+                  value={this.props.scene.videoOption}
+                  keys={Object.values(VO)}/>
+                {this.props.scene.videoOption == VO.part && (
+                  <div>
+                    For
+                    <SimpleNumberInput
+                      label=""
+                      value={this.props.scene.videoTimingConstant}
+                      isEnabled={true}
+                      min={0}
+                      onChange={this.changeKey.bind(this, 'videoTimingConstant').bind(this)}/>
+                    ms
+                  </div>
+                )}
+              </React.Fragment>
+            )}
+            <hr/>
+          </div>
+        )}
         <div className="ControlSubgroup m-inline">
           {!this.props.isPlayer && (
             <SimpleRadioInput

@@ -23,6 +23,18 @@ const IF = { // image filters
   stills: 'if.stills',
 };
 
+const GO = { // GIF Options
+  none: 'go.none',
+  part: 'go.part',
+  full: 'go.full',
+};
+
+const VO = { // Video Options
+  none: 'vo.none',
+  part: 'vo.part',
+  full: 'vo.full',
+};
+
 const BT = { // background type
   blur: 'bt.blur',
   color: 'bt.color',
@@ -104,5 +116,5 @@ const IPC = {
 };
 
 export {
-  TF, WF, OF, IF, HTF, VTF, TOT, BT, GT, TT, SF, ST, SL, AF, IPC
+  TF, WF, OF, IF, GO, VO, HTF, VTF, TOT, BT, GT, TT, SF, ST, SL, AF, IPC
 };

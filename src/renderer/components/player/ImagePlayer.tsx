@@ -9,7 +9,7 @@ import getFolderSize from "get-folder-size";
 import IdleTimer from 'react-idle-timer';
 import Timeout = NodeJS.Timeout;
 
-import {HTF, IF, OF, SL, ST, TF, VTF, WF} from '../../data/const';
+import {GO, HTF, IF, OF, SL, ST, TF, VO, VTF, WF} from '../../data/const';
 import {getCachePath, getFileName, getRandomListItem, getSourceType, isVideo, urlToPath} from '../../data/utils';
 import Config from "../../data/Config";
 import Scene from "../../data/Scene";
@@ -463,8 +463,10 @@ export default class ImagePlayer extends React.Component {
       const successCallback = () => {
         if (!this._isMounted) return;
         this.cache(video);
-        if (this.props.scene.playFullVideo) {
+        if (this.props.scene.videoOption == VO.full) {
           video.setAttribute("duration", (video.duration * 1000).toString());
+        } else if (this.props.scene.videoOption == VO.part) {
+          video.setAttribute("duration", this.props.scene.videoTimingConstant.toString());
         }
         (video as any).key = this.state.nextImageID;
         this.setState({
@@ -565,8 +567,12 @@ export default class ImagePlayer extends React.Component {
 
       const processInfo = (info: GifInfo) => {
         // If gif is animated and we want to play entire length, store its duration
-        if (this.props.scene.playFullGif && info && info.animated) {
-          img.setAttribute("duration", info.duration);
+        if (info && info.animated) {
+          if (this.props.scene.gifOption == GO.full) {
+            img.setAttribute("duration", info.duration);
+          } else if (this.props.scene.gifOption == GO.part ) {
+            img.setAttribute("duration", this.props.scene.gifTimingConstant.toString());
+          }
         }
 
         // Exclude non-animated gifs from gifs
@@ -582,8 +588,8 @@ export default class ImagePlayer extends React.Component {
         img.src = url;
       };
 
-      // Get gifinfo if we need for imageFilter or playFullGif
-      if ((this.props.scene.imageTypeFilter == IF.gifs || this.props.scene.imageTypeFilter == IF.stills || this.props.scene.playFullGif) && url.toLocaleLowerCase().endsWith('.gif')) {
+      // Get gifinfo if we need for imageFilter or playing full gif
+      if ((this.props.scene.imageTypeFilter == IF.gifs || this.props.scene.imageTypeFilter == IF.stills || this.props.scene.gifOption != GO.none) && url.toLocaleLowerCase().endsWith('.gif')) {
         // Get gif info. See https://github.com/Prinzhorn/gif-info
         try {
           if (url.includes("file:///")) {
@@ -645,7 +651,7 @@ export default class ImagePlayer extends React.Component {
     }
 
     if (nextImg) {
-      if (nextImg instanceof HTMLVideoElement && !this.props.scene.playFullVideo && this.props.scene.randomVideoStart && (!this.props.scene.continueVideo || !nextImg.currentTime)) {
+      if (nextImg instanceof HTMLVideoElement && this.props.scene.videoOption != VO.full && this.props.scene.randomVideoStart && (!this.props.scene.continueVideo || !nextImg.currentTime)) {
         nextImg.currentTime = Math.random() * nextImg.duration;
       }
       nextHistoryPaths = nextHistoryPaths.concat([nextImg]);
