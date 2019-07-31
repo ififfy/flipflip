@@ -32,6 +32,9 @@ function reset() {
   PHRASES = [];
 }
 
+// TODO Timeout's aren't being properly canceled, results in odd behavior when switching scenes
+//      This may also be causing memory leak
+
 const splitFirstWord = function (s: string) {
   const firstSpaceIndex = s.indexOf(" ");
   if (firstSpaceIndex > 0 && firstSpaceIndex < s.length - 1) {
@@ -103,11 +106,11 @@ export default class CaptionProgram extends React.Component {
     return props.url !== this.props.url;
   }
 
-  componentWillReceiveProps(nextProps: { url: string }) {
-    if (!this.el.current || nextProps.url == this.props.url) return;
+  componentDidUpdate(props: any, state: any) {
+    if (!this.el.current || this.props.url == props.url) return;
     this.stop(true);
     reset();
-    this.start(nextProps.url);
+    this.start(this.props.url);
   }
 
   start(url?: string) {
@@ -157,8 +160,8 @@ export default class CaptionProgram extends React.Component {
           }
         }
 
-        function captionLoop(hasCanceled: boolean) {
-          if (hasCanceled) {
+        function captionLoop() {
+          if (newPromise.hasCanceled) {
             return;
           }
           PROGRAM[programCounter](() => {
@@ -166,13 +169,12 @@ export default class CaptionProgram extends React.Component {
             if (programCounter >= PROGRAM.length) {
               programCounter = 0;
             }
-            captionLoop(newPromise.hasCanceled);
+            captionLoop();
           });
         }
 
         if (!hasError) {
-          // Reset all configs
-          captionLoop(newPromise.hasCanceled);
+          captionLoop();
         }
       });
   }

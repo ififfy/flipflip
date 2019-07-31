@@ -158,7 +158,7 @@ export default class SourceList extends React.Component {
       (this.props.sources !== props.sources));
   }
 
-  componentWillUpdate(): void {
+  componentDidUpdate(): void {
     this._sortable.option("disabled", this.props.filters.length > 0);
   }
 

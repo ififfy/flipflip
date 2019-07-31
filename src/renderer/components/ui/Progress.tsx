@@ -24,14 +24,14 @@ export default class Progress extends React.Component {
     );
   }
 
-  componentWillReceiveProps(props: any) {
+  componentDidUpdate(props: any, state: any) {
     let progress;
     if (!this.state) {
       progress = new ProgressBar.Circle('#progress', {
         color: '#FFFFFF',
         strokeWidth: 2,
         text: {
-          value: props.message + "<br/>" + props.current + " / " + props.total,
+          value: this.props.message + "<br/>" + this.props.current + " / " + this.props.total,
         },
         duration: 100,
       });
@@ -39,7 +39,7 @@ export default class Progress extends React.Component {
     } else {
       progress = this.state.progress;
     }
-    progress.animate((props.current + 0.1) / (props.total + 0.1));
-    progress.setText("<p>" + props.message + "</p><p>" + props.current + " / " + props.total + "</p>");
+    progress.animate((this.props.current + 0.1) / (this.props.total + 0.1));
+    progress.setText("<p>" + this.props.message + "</p><p>" + this.props.current + " / " + this.props.total + "</p>");
   }
 };

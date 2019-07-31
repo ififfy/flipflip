@@ -140,9 +140,9 @@ export default class ConfigForm extends React.Component {
     )
   }
 
-  componentWillReceiveProps(props: any) {
-    if (props.config != this.state.config) {
-      this.setState({config: props.config});
+  componentDidUpdate(props: any, state: any) {
+    if (this.props.config != this.state.config) {
+      this.setState({config: this.props.config});
     }
   }
 
@@ -345,6 +345,7 @@ export default class ConfigForm extends React.Component {
                 modalMessages: newMessages,
                 modalFunction: this.closeModal
               });
+              remote.getCurrentWindow().show();
 
               // This closes the server
               server.close();
@@ -355,6 +356,10 @@ export default class ConfigForm extends React.Component {
           const newMessages = Array<string>();
           newMessages.push("Error: Access Denied");
           this.setState({modalTitle: "Failed", modalMessages: newMessages, modalFunction: this.closeModal});
+
+          // This closes the server
+          server.close();
+          req.connection.destroy();
         }
       }
       res.end();
@@ -417,6 +422,7 @@ export default class ConfigForm extends React.Component {
                   modalMessages: newMessages,
                   modalFunction: this.closeModal,
                 });
+                remote.getCurrentWindow().show();
 
                 // This closes the server
                 server.close();
@@ -433,6 +439,10 @@ export default class ConfigForm extends React.Component {
             newMessages.push("Error: " + error);
             this.setState({modalTitle: "Failed", modalMessages: newMessages, modalFunction: this.closeModal});
           }
+
+          // This closes the server
+          server.close();
+          req.connection.destroy();
         }
       }
       res.end();
@@ -519,6 +529,7 @@ export default class ConfigForm extends React.Component {
                 modalMessages: newMessages,
                 modalFunction: this.closeModal
               });
+              remote.getCurrentWindow().show();
 
               // This closes the server
               server.close();
@@ -529,6 +540,10 @@ export default class ConfigForm extends React.Component {
           const newMessages = Array<string>();
           newMessages.push("Error: Access Denied");
           this.setState({modalTitle: "Failed", modalMessages: newMessages, modalFunction: this.closeModal});
+
+          // This closes the server
+          server.close();
+          req.connection.destroy();
         }
       }
       res.end();

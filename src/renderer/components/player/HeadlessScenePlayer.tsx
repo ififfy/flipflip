@@ -1183,16 +1183,16 @@ export default class HeadlessScenePlayer extends React.Component {
       (state.allURLs.size > 0 && this.state.allURLs.size == 0));
   }
 
-  componentWillReceiveProps(props: any) {
+  componentDidUpdate(props: any, state: any) {
     if (props.scene.id !== this.props.scene.id) {
-      this.state.nextPromise.cancel();
-      this.state.promise.cancel();
-      if (this.props.nextScene != null && props.scene.id === this.props.nextScene.id) { // If the next scene has been played
-        if (props.nextScene && props.nextScene.id === this.props.scene.id) { // Just swap values if we're coming back to this scene again
+      state.nextPromise.cancel();
+      state.promise.cancel();
+      if (props.nextScene != null && props.scene.id === this.props.nextScene.id) { // If the next scene has been played
+        if (this.props.nextScene && props.nextScene.id === this.props.scene.id) { // Just swap values if we're coming back to this scene again
           const newAllURLs = this._nextAllURLs;
           const newPromiseQueue = this._nextPromiseQueue;
-          this._nextAllURLs = this.state.allURLs;
-          this._nextPromiseQueue = this.state.promiseQueue;
+          this._nextAllURLs = state.allURLs;
+          this._nextPromiseQueue = state.promiseQueue;
           this.setState({
             promiseQueue: newPromiseQueue,
             promise: new CancelablePromise((resolve, reject) => {}),
@@ -1224,9 +1224,6 @@ export default class HeadlessScenePlayer extends React.Component {
         });
       }
     }
-  }
-
-  componentDidUpdate() {
     if (this.state.restart == true) {
       this.setState({restart: false});
       this.componentDidMount(true);

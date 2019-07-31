@@ -66,19 +66,17 @@ export default class Strobe extends React.Component {
   componentDidMount() {
     if (this.props.pulse ? this.props.delayTF != TF.scene : this.props.durationTF != TF.scene) {
       this.strobeLoop();
-    } else {
-      this.strobe();
     }
   }
 
-  componentWillUpdate(props: any) {
+  componentDidUpdate(props: any) {
     if (this.props.durationTF != props.durationTF || this.props.delayTF != props.delayTF || this.props.pulse != props.pulse) {
       clearTimeout(this._strobeTimeout);
-      if (props.pulse ? props.delayTF != TF.scene : props.durationTF != TF.scene) {
+      if (this.props.pulse ? this.props.delayTF != TF.scene : this.props.durationTF != TF.scene) {
         this.strobeLoop();
       }
     }
-    if ((props.pulse ? props.delayTF == TF.scene : props.durationTF == TF.scene) && this.props.toggleStrobe != props.toggleStrobe) {
+    if ((this.props.pulse ? this.props.delayTF == TF.scene : this.props.durationTF == TF.scene) && this.props.toggleStrobe != props.toggleStrobe) {
       this.strobe();
     }
   }
