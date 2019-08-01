@@ -11,12 +11,25 @@ export default class FFAnalytics extends React.Component {
     onUpdateConfig(config: Config): void,
   };
 
+  _interval: NodeJS.Timeout = null;
+
   componentDidMount() {
     this.sendScreenView();
+    if (this.props.page == 'play') {
+      this._interval = setInterval(this.sendScreenView.bind(this), 240000);
+    }
   }
 
   componentDidUpdate() {
     this.sendScreenView();
+    clearInterval(this._interval);
+    if (this.props.page == 'play') {
+      this._interval = setInterval(this.sendScreenView.bind(this), 240000);
+    }
+  }
+
+  componentWillUnmount() {
+    this._interval = null;
   }
 
   shouldComponentUpdate(props: any): boolean {
