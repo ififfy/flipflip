@@ -4,6 +4,7 @@ import uuidv4 from "uuid/v4";
 import wretch from "wretch";
 import {OAuth} from 'oauth';
 import {remote} from "electron";
+import {IgApiClient, IgCheckpointError, IgLoginTwoFactorRequiredError} from "instagram-private-api";
 import http from "http";
 
 import Config, {CacheSettings, DisplaySettings, RemoteSettings, SceneSettings} from "../../data/Config";
@@ -20,6 +21,7 @@ import TextGroup from "../sceneDetail/TextGroup";
 import StrobeGroup from "../sceneDetail/StrobeGroup";
 import ZoomMoveGroup from "../sceneDetail/ZoomMoveGroup";
 import VideoGroup from "../sceneDetail/VideoGroup";
+import SimpleTextInput from "../ui/SimpleTextInput";
 import Modal from "../ui/Modal";
 
 export default class ConfigForm extends React.Component {
@@ -41,6 +43,8 @@ export default class ConfigForm extends React.Component {
     modalTitle: "",
     modalMessages: new Array<string>(),
     modalFunction: Function(),
+    instagramModal: false,
+    instagramInput: "",
     config: JSON.parse(JSON.stringify(this.props.config)), // Make a copy
   };
 
@@ -118,6 +122,7 @@ export default class ConfigForm extends React.Component {
             clearReddit={this.props.onClearReddit.bind(this)}
             activateTwitter={this.showActivateTwitterNotice.bind(this)}
             clearTwitter={this.props.onClearTwitter.bind(this)}
+            checkInstagram={this.checkInstagram.bind(this)}
             onUpdateSettings={this.onUpdateRemoteSettings.bind(this)}/>
 
           <BackupGroup
@@ -130,6 +135,13 @@ export default class ConfigForm extends React.Component {
           <Modal onClose={this.closeModal.bind(this)} title={this.state.modalTitle}>
             {this.state.modalMessages.map((m) =>
               <p key={(m as any) as number}>{m}</p>
+            )}
+            {this.state.instagramModal && (
+              <SimpleTextInput
+                label=""
+                value={this.state.instagramInput}
+                isEnabled={true}
+                onChange={this.onChangeInstagramInput.bind(this)} />
             )}
             <div className="u-button u-float-right" onClick={this.state.modalFunction.bind(this)}>
               Ok
@@ -144,6 +156,10 @@ export default class ConfigForm extends React.Component {
     if (this.props.config != this.state.config) {
       this.setState({config: this.props.config});
     }
+  }
+
+  onChangeInstagramInput(input: string) {
+    this.setState({instagramInput: input});
   }
 
   showActivateTumblrNotice() {
@@ -172,7 +188,7 @@ export default class ConfigForm extends React.Component {
   }
 
   closeModal() {
-    this.setState({modalTitle: "", modalMessages: Array<string>(), modalFunction: null});
+    this.setState({modalTitle: "", instagramModal: false, modalMessages: Array<string>(), modalFunction: null});
   }
 
   // This should only validate data REQUIRED for FlipFlip to work
@@ -242,6 +258,68 @@ export default class ConfigForm extends React.Component {
     const newConfig = this.state.config;
     fn(newConfig.remoteSettings);
     this.setState({config: newConfig});
+  }
+
+  _ig: IgApiClient = null;
+  checkInstagram() {
+    this._ig = new IgApiClient();
+    this._ig.state.generateDevice(this.state.config.remoteSettings.instagramUsername);
+    this._ig.account.login(this.state.config.remoteSettings.instagramUsername, this.state.config.remoteSettings.instagramPassword).then((loggedInUser) => {
+      const newMessages = Array<string>();
+      newMessages.push("Login to Instagram successful, you should be able to use these sources.");
+      this.setState({modalTitle: "Success!", modalMessages: newMessages, modalFunction: this.closeModal});
+      this._ig = null;
+    }).catch((e) => {
+      if (e instanceof IgLoginTwoFactorRequiredError) {
+        const newMessages = Array<string>();
+        newMessages.push("Enter your two-factor authentication code to confirm login:");
+        this.setState({modalTitle: "Instagram 2FA", instagramModal: true, modalMessages: newMessages, modalFunction: this.tfaInstagram.bind(this, e.response.body.two_factor_info.two_factor_identifier)});
+      } else if (e instanceof IgCheckpointError) {
+        this._ig.challenge.auto(true).then(() => {
+          const newMessages = Array<string>();
+          newMessages.push("Please verify your account to continue: (check your email)");
+          this.setState({modalTitle: "Checkpoint", instagramModal: true, modalMessages: newMessages, modalFunction: this.checkpointInstagram.bind(this)});
+        });
+      } else {
+        alert(e);
+        console.error(e);
+        this._ig = null;
+      }
+    });
+  }
+
+  tfaInstagram(tfaIdentifier: any) {
+    this.closeModal();
+    this._ig.account.twoFactorLogin({
+      twoFactorIdentifier: tfaIdentifier,
+      verificationMethod: '1',
+      trustThisDevice: '1',
+      username: this.state.config.remoteSettings.instagramUsername,
+      verificationCode: this.state.instagramInput,
+    }).then(() => {
+      const newMessages = Array<string>();
+      newMessages.push("Login to Instagram successful, you should be able to use these sources.");
+      this.setState({modalTitle: "Success!", instagramInput: "", modalMessages: newMessages, modalFunction: this.closeModal});
+      this._ig = null;
+    }).catch((e) => {
+      alert(e);
+      console.error(e);
+      this._ig = null;
+    });
+  }
+
+  checkpointInstagram() {
+    this.closeModal();
+    this._ig.challenge.sendSecurityCode(this.state.instagramInput).then(() => {
+      const newMessages = Array<string>();
+      newMessages.push("Login to Instagram successful, you should be able to use these sources.");
+      this.setState({modalTitle: "Success!", instagramInput: "", modalMessages: newMessages, modalFunction: this.closeModal});
+      this._ig = null;
+    }).catch((e) => {
+      alert(e);
+      console.error(e);
+      this._ig = null;
+    });
   }
 
   activateTumblr() {

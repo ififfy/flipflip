@@ -14,6 +14,7 @@ export default class APIGroup extends React.Component {
     clearReddit(): void,
     activateTwitter(): void,
     clearTwitter(): void,
+    checkInstagram(): void,
     onUpdateSettings(keys: RemoteSettings, fn: (keys: RemoteSettings) => void): void,
   };
 
@@ -21,6 +22,7 @@ export default class APIGroup extends React.Component {
     const tumblrAuthorized = this.props.settings.tumblrOAuthToken != "" && this.props.settings.tumblrOAuthTokenSecret != "";
     const redditAuthorized = this.props.settings.redditRefreshToken != "";
     const twitterAuthorized = this.props.settings.twitterAccessTokenKey != "" && this.props.settings.twitterAccessTokenSecret != "";
+    const instagramConfigured = this.props.settings.instagramUsername != "" && this.props.settings.instagramPassword != "";
     const indexOf = this.props.settings.tumblrKeys.indexOf(this.props.settings.tumblrKey);
     return (
       <ControlGroup title="API Keys" isNarrow={true}>
@@ -88,6 +90,8 @@ export default class APIGroup extends React.Component {
             isEnabled={true}
             isPassword={true}
             onChange={this.changeKey.bind(this, 'instagramPassword').bind(this)}/>
+          <button onClick={instagramConfigured ? this.props.checkInstagram.bind(this) : this.nop}
+                  className={`u-button ${instagramConfigured ? 'u-clickable' : 'u-disabled'}`}>Check Instagram Login</button>
         </div>
       </ControlGroup>
     )

@@ -712,7 +712,12 @@ function loadInstagram(config: Config, url: string, filter: string, next: any): 
               }).catch((e) => {console.error(e);resolve(null)});
             }).catch((e) => {console.error(e);resolve(null)});
           }).catch((e) => {console.error(e);resolve(null)});
-        }).catch((e) => {alert(e);console.error(e);ig = null;resolve(null)});
+        }).catch((e) => {
+          alert(e + "\n\nVisit Preferences and click 'Check Instagram Login' to attempt to resolve this issue.");
+          console.error(e);
+          ig = null;
+          resolve(null)
+        });
       });
     } else if (next == 0) {
       return new CancelablePromise((resolve) => {
