@@ -83,6 +83,7 @@ export function getSourceType(url: string): string {
 }
 
 export function getFileGroup(url: string) {
+  let sep;
   switch (getSourceType(url)) {
     case ST.tumblr:
       let tumblrID = url.replace(/https?:\/\//, "");
@@ -164,12 +165,23 @@ export function getFileGroup(url: string) {
       const gallery = galleryRegex.exec(url);
       return gallery[1];
     case ST.list:
-      return url.substring(url.lastIndexOf(path.sep)+1).replace(".txt", "");
+      if (/^https?:\/\//.exec(url) != null) {
+        sep = "/"
+      } else {
+        sep = path.sep;
+      }
+      return url.substring(url.lastIndexOf(sep) + 1).replace(".txt", "");
     case ST.local:
       return url.substring(url.lastIndexOf(path.sep)+1);
     case ST.video:
-      let name = url.substring(0, url.lastIndexOf(path.sep));
-      return name.substring(name.lastIndexOf(path.sep)+1);
+      if (/^https?:\/\//.exec(url) != null) {
+        sep = "/"
+      } else {
+        sep = path.sep;
+      }
+      let name = url.substring(0, url.lastIndexOf(sep));
+      return name.substring(name.lastIndexOf(sep)+1);
+
   }
 }
 
@@ -191,7 +203,7 @@ export function getCachePath(source: string, config: Config) {
   } else {
     if (source) {
       if (source != ST.video) {
-        return getPath() + path.sep + "ImageCache" + path.sep + en.get(getSourceType(source)) + path.sep + getFileGroup(source) + path.sep;
+        return getPath() + path.sep + "ImageCache" + path.sep + en.get(getSourceType(source)) + path.sep + getFileGroup(source);
       } else {
         return getPath() + path.sep + "ImageCache" + path.sep + en.get(getSourceType(source)) + path.sep;
       }

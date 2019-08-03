@@ -62,7 +62,12 @@ function getPromise(config: Config, url: string, filter: string, next: any): Can
   } else if (sourceType == ST.list) { // Image List
     promise = loadRemoteImageURLList(config, url, filter, null);
   } else if (sourceType == ST.video) {
-    promise = loadVideo(config, url, filter, null);
+    const cachePath = getCachePath(url, config) + getFileName(url);
+    if (fs.existsSync(cachePath)) {
+      promise = loadVideo(config, cachePath, filter, null);
+    } else {
+      promise = loadVideo(config, url, filter, null);
+    }
   } else { // Paging sources
     let promiseFunction;
     let timeout;

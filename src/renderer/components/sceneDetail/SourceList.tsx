@@ -1,5 +1,4 @@
 import * as React from "react";
-import path from 'path';
 import rimraf from "rimraf";
 import Sortable from "react-sortablejs";
 import {remote} from "electron";
@@ -123,7 +122,8 @@ export default class SourceList extends React.Component {
                        title="Remove">
                     <div className="u-delete"/>
                   </div>
-                  {this.props.config.caching.enabled && getSourceType(source.url) != ST.local && (
+                  {this.props.config.caching.enabled && getSourceType(source.url) != ST.local &&
+                    (getSourceType(source.url) != ST.video || /^https?:\/\//.exec(source.url) != null) && (
                     <div className="u-button u-small-icon-button u-clean u-clickable"
                          onClick={this.onClean.bind(this, source.id)}
                          title="Clear cache">
@@ -276,7 +276,7 @@ export default class SourceList extends React.Component {
     if (fileType != ST.local) {
       let cachePath;
       if (fileType == ST.video) {
-        cachePath = getCachePath(sourceURL, this.props.config) + path.sep + getFileName(sourceURL);
+        cachePath = getCachePath(sourceURL, this.props.config) + getFileName(sourceURL);
       } else {
         cachePath = getCachePath(sourceURL, this.props.config);
       }
