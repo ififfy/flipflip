@@ -23,6 +23,7 @@ import ZoomMoveGroup from "../sceneDetail/ZoomMoveGroup";
 import VideoGroup from "../sceneDetail/VideoGroup";
 import SimpleTextInput from "../ui/SimpleTextInput";
 import Modal from "../ui/Modal";
+import AudioGroup from "../sceneDetail/AudioGroup";
 
 export default class ConfigForm extends React.Component {
   readonly props: {
@@ -34,18 +35,16 @@ export default class ConfigForm extends React.Component {
     onBackup(alert: boolean): boolean,
     onRestore(backupFile: string): void,
     onClean(): void,
-    onClearTumblr(): void,
-    onClearReddit(): void,
-    onClearTwitter(): void,
   };
 
   readonly state = {
+    config: JSON.parse(JSON.stringify(this.props.config)), // Make a copy
     modalTitle: "",
     modalMessages: new Array<string>(),
     modalFunction: Function(),
     instagramModal: false,
     instagramInput: "",
-    config: JSON.parse(JSON.stringify(this.props.config)), // Make a copy
+    changeMade: false,
   };
 
   render() {
@@ -56,6 +55,10 @@ export default class ConfigForm extends React.Component {
             <h2 className="Config__ConfigHeader">Preferences</h2>
           </div>
           <div className="u-button-row-right">
+            <div className="Config__DefaultButton u-destructive u-button u-clickable"
+                 onClick={this.props.onDefault.bind(this)}>
+              Reset to Defaults
+            </div>
             <div className="Config__Apply u-button u-clickable"
                  onClick={this.applyConfig.bind(this)}>
               Apply
@@ -65,11 +68,7 @@ export default class ConfigForm extends React.Component {
               OK
             </div>
           </div>
-          <div className="BackButton u-button u-clickable" onClick={this.props.goBack}>Back</div>
-          <div className="DefaultButton u-destructive u-button u-clickable"
-               onClick={this.props.onDefault.bind(this)}>
-            Reset to Defaults
-          </div>
+          <div className="BackButton u-button u-clickable" onClick={this.goBack.bind(this)}>Back</div>
         </div>
 
         <div className="Config__Content ControlGroupGroup">
@@ -96,6 +95,11 @@ export default class ConfigForm extends React.Component {
             isPlayer={false}
             onUpdateScene={this.onUpdateDefaultScene.bind(this)}/>
 
+          <AudioGroup
+            scene={this.state.config.defaultScene}
+            isPlayer={false}
+            onUpdateScene={this.onUpdateDefaultScene.bind(this)}/>
+
           <VideoGroup
             scene={this.state.config.defaultScene}
             isPlayer={false}
@@ -117,11 +121,11 @@ export default class ConfigForm extends React.Component {
             settings={this.state.config.remoteSettings}
             activateTumblr={this.showActivateTumblrNotice.bind(this)}
             nextTumblr={this.activateTumblr.bind(this)}
-            clearTumblr={this.props.onClearTumblr.bind(this)}
+            clearTumblr={this.clearTumblr.bind(this)}
             activateReddit={this.showActivateRedditNotice.bind(this)}
-            clearReddit={this.props.onClearReddit.bind(this)}
+            clearReddit={this.clearReddit.bind(this)}
             activateTwitter={this.showActivateTwitterNotice.bind(this)}
-            clearTwitter={this.props.onClearTwitter.bind(this)}
+            clearTwitter={this.clearTwitter.bind(this)}
             checkInstagram={this.checkInstagram.bind(this)}
             onUpdateSettings={this.onUpdateRemoteSettings.bind(this)}/>
 
@@ -153,8 +157,17 @@ export default class ConfigForm extends React.Component {
   }
 
   componentDidUpdate(props: any, state: any) {
-    if (this.props.config != this.state.config) {
-      this.setState({config: this.props.config});
+    if (this.props.config !== props.config) {
+      this.setState({config: JSON.parse(JSON.stringify(this.props.config))});
+    }
+  }
+
+  goBack() {
+    if (this.state.changeMade) {
+      alert("Be sure to press OK if you want to save your changes");
+      this.setState({changeMade: false});
+    } else {
+      this.props.goBack();
     }
   }
 
@@ -187,6 +200,41 @@ export default class ConfigForm extends React.Component {
     this.setState({modalTitle: "Authorize FlipFlip on Twitter", modalMessages: messages, modalFunction: this.activateTwitter });
   }
 
+  clearTumblr() {
+    const newConfig = this.state.config;
+    const newPropsConfig = this.props.config;
+    newConfig.remoteSettings.tumblrKey = "";
+    newPropsConfig.remoteSettings.tumblrKey = "";
+    newConfig.remoteSettings.tumblrSecret = "";
+    newPropsConfig.remoteSettings.tumblrSecret = "";
+    newConfig.remoteSettings.tumblrOAuthToken = "";
+    newPropsConfig.remoteSettings.tumblrOAuthToken = "";
+    newConfig.remoteSettings.tumblrOAuthTokenSecret = "";
+    newPropsConfig.remoteSettings.tumblrOAuthTokenSecret = "";
+    this.setState({config: newConfig});
+    this.props.updateConfig(newPropsConfig);
+  }
+
+  clearReddit() {
+    const newConfig = this.state.config;
+    const newPropsConfig = this.props.config;
+    newConfig.remoteSettings.redditRefreshToken = "";
+    newPropsConfig.remoteSettings.redditRefreshToken = "";
+    this.setState({config: newConfig});
+    this.props.updateConfig(newPropsConfig);
+  }
+
+  clearTwitter() {
+    const newConfig = this.state.config;
+    const newPropsConfig = this.props.config;
+    newConfig.remoteSettings.twitterAccessTokenKey = "";
+    newPropsConfig.remoteSettings.twitterAccessTokenKey = "";
+    newConfig.remoteSettings.twitterAccessTokenSecret = "";
+    newPropsConfig.remoteSettings.twitterAccessTokenSecret = "";
+    this.setState({config: newConfig});
+    this.props.updateConfig(newPropsConfig);
+  }
+
   closeModal() {
     this.setState({modalTitle: "", instagramModal: false, modalMessages: Array<string>(), modalFunction: null});
   }
@@ -194,26 +242,6 @@ export default class ConfigForm extends React.Component {
   // This should only validate data REQUIRED for FlipFlip to work
   validate(): Array<string> {
     let errorMessages = Array<string>();
-    // Validate any data:
-    if (isNaN(parseInt(this.state.config.caching.maxSize))) {
-      errorMessages.push("Invalid Cache Size");
-    }
-    if (isNaN(parseInt(this.state.config.displaySettings.minImageSize))) {
-      errorMessages.push("Invalid Min Image Size");
-    }
-    if (isNaN(parseInt(this.state.config.displaySettings.minVideoSize))) {
-      errorMessages.push("Invalid Min Video Size");
-    }
-    if (isNaN(parseInt(this.state.config.displaySettings.maxInMemory))) {
-      errorMessages.push("Invalid Max in Memory");
-    }
-    if (isNaN(parseInt(this.state.config.displaySettings.maxLoadingAtOnce))) {
-      errorMessages.push("Invalid Max Loading at Once");
-    }
-    if (isNaN(parseInt(this.state.config.displaySettings.maxInHistory))) {
-      errorMessages.push("Invalid Max In History");
-    }
-
     if (this.state.config.caching.directory != "" &&
       !fs.existsSync(this.state.config.caching.directory)) {
       errorMessages.push("Invalid Cache Directory");
@@ -239,25 +267,25 @@ export default class ConfigForm extends React.Component {
   onUpdateDefaultScene(settings: SceneSettings, fn: (settings: SceneSettings) => void) {
     const newConfig = this.state.config;
     fn(newConfig.defaultScene);
-    this.setState({config: newConfig});
+    this.setState({config: newConfig, changeMade: true});
   }
 
   onUpdateDisplaySettings(keys: DisplaySettings, fn: (keys: DisplaySettings) => void) {
     const newConfig = this.state.config;
     fn(newConfig.displaySettings);
-    this.setState({config: newConfig});
+    this.setState({config: newConfig, changeMade: true});
   }
 
   onUpdateCachingSettings(settings: CacheSettings, fn: (settings: CacheSettings) => void) {
     const newConfig = this.state.config;
     fn(newConfig.caching);
-    this.setState({config: newConfig});
+    this.setState({config: newConfig, changeMade: true});
   }
 
   onUpdateRemoteSettings(keys: RemoteSettings, fn: (keys: RemoteSettings) => void) {
     const newConfig = this.state.config;
     fn(newConfig.remoteSettings);
-    this.setState({config: newConfig});
+    this.setState({config: newConfig, changeMade: true});
   }
 
   _ig: IgApiClient = null;

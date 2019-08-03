@@ -89,7 +89,6 @@ export default class Meta extends React.Component {
             manageTags={a(actions.manageTags)}
             batchTag={a(actions.batchTag)}
             importSourcesFromLibrary={a(actions.importFromLibrary)}
-            onClearReddit={a(actions.clearReddit)}
             onBackup={appStorage.backup.bind(appStorage)}
             onImportLibrary={a(actions.importLibrary)}
             onExportLibrary={a(actions.exportLibrary)}
@@ -143,6 +142,7 @@ export default class Meta extends React.Component {
             nextScene={a(actions.nextScene)}
             goBack={a(actions.goBack)}
             goToTagSource={a(actions.playSceneFromLibrary)}
+            getTags={actions.getTags.bind(this, this.state.library)}
           />
         )}
 
@@ -157,6 +157,7 @@ export default class Meta extends React.Component {
             allTags={this.state.tags}
             toggleTag={a(actions.toggleTag)}
             navigateTagging={a(actions.navigateDisplayedLibrary)}
+            getTags={actions.getTags.bind(this, this.state.library)}
           />
         )}
 
@@ -170,9 +171,6 @@ export default class Meta extends React.Component {
             onBackup={appStorage.backup.bind(appStorage)}
             onRestore={a(actions.restoreFromBackup)}
             onClean={a(actions.cleanBackups)}
-            onClearTumblr={a(actions.clearTumblr)}
-            onClearReddit={a(actions.clearReddit)}
-            onClearTwitter={a(actions.clearTwitter)}
           />
         )}
 

@@ -1,39 +1,7 @@
-import * as React from 'react';
-import wretch from 'wretch';
-
-import {CancelablePromise, getRandomListItem} from '../../data/utils'
-
-//let STYLES: { [style: string]: string } = {};
-
-let programCounter = 0;
-let PROGRAM: Function[] = [];
-let BLINK_DURATION = 200;
-let BLINK_DELAY = 80;
-let BLINK_GROUP_DELAY = 1200;
-let CAPTION_DURATION = 2000;
-let CAPTION_DELAY = 1200;
-let COUNT_DURATION = 600;
-let COUNT_DELAY = 400;
-let COUNT_GROUP_DELAY = 1200;
-let PHRASES: string[] = [];
-
-function reset() {
-  PROGRAM = [];
-  programCounter = 0;
-  //STYLES = {};
-  BLINK_DURATION = 200;
-  BLINK_DELAY = 80;
-  BLINK_GROUP_DELAY = 1200;
-  CAPTION_DURATION = 2000;
-  CAPTION_DELAY = 1200;
-  COUNT_DURATION = 600;
-  COUNT_DELAY = 400;
-  COUNT_GROUP_DELAY = 1200;
-  PHRASES = [];
-}
-
-// TODO Timeout's aren't being properly canceled, results in odd behavior when switching scenes
-//      This may also be causing memory leak
+import * as React from "react";
+import Tag from "../library/Tag";
+import {CancelablePromise, getRandomListItem} from "../../data/utils";
+import wretch from "wretch";
 
 const splitFirstWord = function (s: string) {
   const firstSpaceIndex = s.indexOf(" ");
@@ -54,14 +22,6 @@ const getRest = function (s: string) {
   return splitFirstWord(s)[1];
 };
 
-const fnIntArg = function (innerFn: Function) {
-  return function (el: HTMLElement, value: string) {
-    const ms = parseInt(value, 10);
-    if (isNaN(ms)) { return null; }
-    return innerFn(ms);
-  };
-};
-
 export default class CaptionProgram extends React.Component {
   readonly el = React.createRef<HTMLDivElement>();
 
@@ -79,11 +39,26 @@ export default class CaptionProgram extends React.Component {
     countFontSize: number,
     countFontFamily: string,
     url: string,
+    currentSource: string,
+    getTags(source: string): Array<Tag>
   };
 
   readonly state = {
-    runningPromise: new CancelablePromise((resolve, reject) => {})
+    program: Array<Function>(),
+    programCounter: 0,
+    blinkDuration: 200,
+    blinkDelay: 80,
+    blinkGroupDelay: 1200,
+    captionDuration: 2000,
+    captionDelay: 1200,
+    countDuration: 600,
+    countDelay: 400,
+    countGroupDelay: 1200,
+    phrases: Array<string>(),
   };
+
+  _runningPromise: CancelablePromise = null;
+  _timeout: any = null;
 
   render() {
     return (
@@ -93,13 +68,15 @@ export default class CaptionProgram extends React.Component {
     );
   }
 
+  nop() {}
+
   componentDidMount() {
     this.start();
   }
 
   componentWillUnmount() {
-    reset();
-    this.stop(false);
+    this.reset();
+    this.stop();
   }
 
   shouldComponentUpdate(props: any, state: any): boolean {
@@ -108,16 +85,41 @@ export default class CaptionProgram extends React.Component {
 
   componentDidUpdate(props: any, state: any) {
     if (!this.el.current || this.props.url == props.url) return;
-    this.stop(true);
-    reset();
-    this.start(this.props.url);
+    this.stop();
+    this.reset();
+    this.start();
   }
 
-  start(url?: string) {
-    if (url == undefined) {
-      url = this.props.url;
+  reset() {
+    this.setState({
+      program: [],
+      programCounter: 0,
+      blinkDuration: 200,
+      blinkDelay: 80,
+      blinkGroupDelay: 1200,
+      captionDuration: 2000,
+      captionDelay: 1200,
+      countDuration: 600,
+      countDelay: 400,
+      countGroupDelay: 1200,
+      phrases: [],
+    });
+  }
+
+  stop() {
+    if (this._runningPromise) {
+      this._runningPromise.cancel();
+      this._runningPromise = null;
     }
-    const newPromise = new CancelablePromise((resolve, reject) => {
+    if (this._timeout) {
+      clearTimeout(this._timeout);
+      this._timeout = null;
+    }
+  }
+
+  start() {
+    const url = this.props.url;
+    this._runningPromise = new CancelablePromise((resolve, reject) => {
       wretch(url)
         .get()
         .error(503, error => {
@@ -127,275 +129,268 @@ export default class CaptionProgram extends React.Component {
           resolve({data: [data], next: null});
         });
     });
-    this.setState({runningPromise: newPromise});
-    newPromise
-      .then((data) => {
-        let hasError = false;
-        for (let line of data.data[0].split('\n')) {
-          line = line.trim();
+    this._runningPromise.then((data) => {
+      let hasError = false;
+      let newProgram = new Array<Function>();
+      for (let line of data.data[0].split('\n')) {
+        line = line.trim();
 
-          if (line.length == 0 || line[0] === '#') continue;
+        if (line.length == 0 || line[0] == '#') continue;
 
-          const command = getFirstWord(line);
-          if (command) {
-            const value = getRest(line);
-            if (this.COMMANDS[command]) {
-              const fn = this.COMMANDS[command](this.el.current, value);
-              if (fn) {
-                if (command.toLowerCase().startsWith("set")) {
-                  fn(() => {return newPromise.hasCanceled;});
-                } else {
-                  PROGRAM.push(fn);
-                }
-              } else {
-                hasError = true;
-                console.error("Error: '" + line + "' - invalid arguments");
-                break;
-              }
-            } else {
+        const command = getFirstWord(line);
+        const value = getRest(line);
+        let fn, ms;
+        switch (command) {
+          case "count":
+            const split = value.split(" ");
+            if (split.length != 2) {
               hasError = true;
-              console.error("Error: '" + line + "' - unknown command");
+              console.error("Error: '" + line + "' - invalid count command");
               break;
             }
-          }
-        }
-
-        function captionLoop() {
-          if (newPromise.hasCanceled) {
-            return;
-          }
-          PROGRAM[programCounter](() => {
-            programCounter += 1;
-            if (programCounter >= PROGRAM.length) {
-              programCounter = 0;
+            let start = parseInt(split[0], 10);
+            const end = parseInt(split[1], 10);
+            if (isNaN(start) || isNaN(end) || start < 0 || end < 0) {
+              hasError = true;
+              console.error("Error: '" + line + "' - invalid count command");
+              break;
             }
-            captionLoop();
-          });
+            newProgram.push(this.count(start, end));
+            break;
+          case "blink":
+          case "cap":
+          case "bigcap":
+            newProgram.push(this[command](value));
+            break;
+          case "storePhrase":
+            const newPhrases = this.state.phrases;
+            newPhrases.concat([value]);
+            this.setState({phrases: newPhrases});
+            break;
+          case "setBlinkDuration":
+          case "setBlinkDelay":
+          case "setBlinkGroupDelay":
+          case "setCaptionDuration":
+          case "setCaptionDelay":
+          case "setCountDuration":
+          case "setCountDelay":
+          case "setCountGroupDelay":
+          case "wait":
+            ms = parseInt(value, 10);
+            if (isNaN(ms)) {
+              hasError = true;
+              console.error("Error: '" + line + "' - invalid command");
+              break;
+            }
+            fn = this[command](ms);
+            newProgram.push(fn);
+            break;
+          default:
+            hasError = true;
+            console.error("Error: '" + line + "' - unknown command");
         }
+        if (hasError) {
+          break;
+        }
+      }
 
-        if (!hasError) {
-          captionLoop();
-        }
-      });
+      if (!hasError) {
+        this.setState({program: newProgram});
+        this.captionLoop();
+      }
+    })
   }
 
-  stop(setState: boolean) {
-    if (this.state.runningPromise) {
-      this.state.runningPromise.cancel();
-      if (setState) this.setState({runningPromise: null});
+  captionLoop() {
+    this.state.program[this.state.programCounter](() => {
+      let newCounter = this.state.programCounter + 1;
+      if (newCounter >= this.state.program.length) {
+        newCounter = 0;
+      }
+      this.setState({programCounter: newCounter});
+      this.captionLoop();
+    });
+  }
+
+  showText(value: string, ms: number) {
+    return (nextCommand: Function) => {
+      this.el.current.style.opacity = '1';
+      if (value == "$RANDOM_PHRASE") {
+        this.el.current.innerHTML = getRandomListItem(this.state.phrases);
+      } else if (value == "$TAG_PHRASE" && this.props.currentSource) {
+        const tag = getRandomListItem(this.props.getTags(this.props.currentSource).filter((t) => t.phraseString && t.phraseString != ""));
+        if (tag) {
+          const phraseString = tag.phraseString;
+          this.el.current.innerHTML = getRandomListItem(phraseString.split('\n'));
+        }
+      } else {
+        this.el.current.innerHTML = value;
+      }
+      const wait = this.wait(ms);
+      wait(() => {
+        this.el.current.style.opacity = '0';
+        nextCommand();
+      });
     }
   }
 
-  COMMANDS: { [command: string]: (el: HTMLElement, value: string) => any; } = {
-    /*saveStyleRules: function (el: HTMLElement, value: string) {
-      const firstWord = getFirstWord(value);
-      const style = getRest(value);
-      if (!firstWord || !style) { return null; }
+  wait(ms: number) {
+    return (nextCommand: Function) => { this._timeout = setTimeout(nextCommand, ms)};
+  }
 
-      STYLES[firstWord] = STYLES[firstWord] || '';
-      STYLES[firstWord] += style;
+  cap(value: string) {
+    return (nextCommand: Function) => {
+      const showText = this.showText(value, this.state.captionDuration);
+      const wait = this.wait(this.state.captionDelay);
+      this.el.current.style.color = this.props.captionColor;
+      this.el.current.style.fontSize = this.props.captionFontSize + "vmin";
+      this.el.current.style.fontFamily = this.props.captionFontFamily;
+      this.el.current.className = "text-caption";
+      showText(function() { wait(nextCommand); });
+    }
+  }
 
-      return function(f : Function) { f() };
-    },
+  bigcap(value: string) {
+    return (nextCommand: Function) => {
+      const showText = this.showText(value, this.state.captionDuration);
+      const wait = this.wait(this.state.captionDelay);
+      this.el.current.style.color = this.props.captionBigColor;
+      this.el.current.style.fontSize = this.props.captionBigFontSize + "vmin";
+      this.el.current.style.fontFamily = this.props.captionBigFontFamily;
+      this.el.current.className = "text-caption-big";
+      showText(function() { wait(nextCommand); });
+    }
+  }
 
-    applySavedStyle: function (el: HTMLElement, value: string) {
-      return function (runNextCommand: Function) {
-        el.style.cssText = STYLES[value];
-        runNextCommand();
+  blink(value: string) {
+    return (nextCommand: Function) => {
+      let fns = new Array<Function>();
+      let i = 0;
+      for (let word of value.split('/')) {
+        word = word.trim();
+        let j = i;
+        i += 1;
+        fns.push(() => {
+          const showText = this.showText(word, this.state.blinkDuration);
+          const wait = this.wait(this.state.blinkDelay);
+          showText(() => wait(fns[j + 1]));
+        })
       }
-    },*/
+      const lastWait = this.wait(this.state.blinkGroupDelay);
+      fns.push(() => lastWait(nextCommand));
 
-    showText: function (el: HTMLElement, value: string) {
-      let textString = getRest(value);
-      const msString = getFirstWord(value);
-      const ms = parseInt(msString, 10);
-      if (!textString || isNaN(ms)) { return null; }
+      this.el.current.style.color = this.props.blinkColor;
+      this.el.current.style.fontSize = this.props.blinkFontSize + "vmin";
+      this.el.current.style.fontFamily = this.props.blinkFontFamily;
+      this.el.current.className = "text-blink";
+      fns[0]();
+    }
+  }
 
-      if (textString === '$RANDOM_PHRASE') {
-        return function (runNextCommand: Function) {
-          el.style.opacity = '1.0';
-          el.innerHTML = getRandomListItem(PHRASES);
-          setTimeout(function () {
-            el.style.opacity = '0.0';
-            runNextCommand();
-          }, ms);
-        }
+  count(start: number, end: number) {
+    let values = Array<number>();
+    do {
+      values.push(start);
+      if (start == end) {
+        break;
+      } else if (start < end) {
+        start+=1;
+      } else if (start > end) {
+        start-=1;
       }
+    } while (true);
 
-      return function (runNextCommand: Function) {
-        el.style.opacity = '1.0';
-        el.innerHTML = textString;
-        setTimeout(function () {
-          el.style.opacity = '0.0';
-          runNextCommand();
-        }, ms);
+    return (nextCommand: Function) => {
+      let fns = new Array<Function>();
+      let i = 0;
+      for (let val of values) {
+        let j = i;
+        i += 1;
+        fns.push(() => {
+          const showText = this.showText(val.toString(), this.state.countDuration);
+          const wait = this.wait(this.state.countDelay);
+          showText(() => wait(fns[j + 1]));
+        })
       }
-    },
+      const lastWait = this.wait(this.state.countGroupDelay);
+      fns.push(() => lastWait(nextCommand));
 
-    wait: fnIntArg(function(ms : number) {
-      return function(runNextCommand : Function) { setTimeout(runNextCommand, ms); }
-    }),
+      this.el.current.style.color = this.props.countColor;
+      this.el.current.style.fontSize = this.props.countFontSize + "vmin";
+      this.el.current.style.fontFamily = this.props.countFontFamily;
+      this.el.current.className = "text-count";
+      fns[0]();
+    }
+  }
 
-    setBlinkDuration: fnIntArg(function (ms: number) {
-      return function (runNextCommand: Function) {
-        BLINK_DURATION = ms;
-        runNextCommand();
-      }
-    }),
+  setBlinkDuration(ms: number) {
+    return (nextCommand: Function) => {
+      this.setState({blinkDuration: ms});
+      nextCommand();
+    }
+  }
 
-    setBlinkDelay: fnIntArg(function (ms: number) {
-      return function (runNextCommand: Function) {
-        BLINK_DELAY = ms;
-        runNextCommand();
-      }
-    }),
+  setBlinkDelay(ms: number) {
+    return (nextCommand: Function) => {
+      this.setState({blinkDelay: ms});
+      nextCommand();
+    }
+  }
 
-    setBlinkGroupDelay: fnIntArg(function (ms: number) {
-      return function (runNextCommand: Function) {
-        BLINK_GROUP_DELAY = ms;
-        runNextCommand();
-      }
-    }),
+  setBlinkGroupDelay(ms: number) {
+    return (nextCommand: Function) => {
+      this.setState({blinkGroupDelay: ms});
+      nextCommand();
+    }
+  }
 
-    setCaptionDuration: fnIntArg(function (ms: number) {
-      return function (runNextCommand: Function) {
-        CAPTION_DURATION = ms;
-        runNextCommand();
-      }
-    }),
+  setCaptionDuration(ms: number) {
+    return (nextCommand: Function) => {
+      this.setState({captionDuration: ms});
+      nextCommand();
+    }
+  }
 
-    setCaptionDelay: fnIntArg(function (ms: number) {
-      return function (runNextCommand: Function) {
-        CAPTION_DELAY = ms;
-        runNextCommand();
-      }
-    }),
+  setCaptionDelay(ms: number) {
+    return (nextCommand: Function) => {
+      this.setState({captionDelay: ms});
+      nextCommand();
+    }
+  }
 
-    setCountDuration: fnIntArg(function (ms: number) {
-      return function (runNextCommand: Function) {
-        COUNT_DURATION = ms;
-        runNextCommand();
-      }
-    }),
+  setCountDuration(ms: number) {
+    return (nextCommand: Function) => {
+      this.setState({countDuration: ms});
+      nextCommand();
+    }
+  }
 
-    setCountDelay: fnIntArg(function (ms: number) {
-      return function (runNextCommand: Function) {
-        COUNT_DELAY = ms;
-        runNextCommand();
-      }
-    }),
+  setCountDelay(ms: number) {
+    return (nextCommand: Function) => {
+      this.setState({countDelay: ms});
+      nextCommand();
+    }
+  }
 
-    setCountGroupDelay: fnIntArg(function (ms: number) {
-      return function (runNextCommand: Function) {
-        COUNT_GROUP_DELAY = ms;
-        runNextCommand();
-      }
-    }),
-
-    storePhrase: function (el: HTMLElement, value: string) {
-      PHRASES.push(value);
-      return function(f : Function) { f() };
-    },
-
-    blink: function(this: CaptionProgram, el: HTMLElement, value: string) {
-      return function (this: CaptionProgram, runNextCommand: Function) {
-        let fns: Function[] = [];
-        let i = 0;
-        el.style.color = this.props.blinkColor;
-        el.style.fontSize = this.props.blinkFontSize + "vmin";
-        el.style.fontFamily = this.props.blinkFontFamily;
-        el.className = "text-blink";
-        value.split('/').forEach(function (this: CaptionProgram, word: string) {
-          word = word.trim();
-          let j = i;
-          i += 1;
-          fns.push(function (this: CaptionProgram) {
-            const showText = this.COMMANDS.showText(el, BLINK_DURATION + ' ' + word);
-            const wait = this.COMMANDS.wait(el, '' + BLINK_DELAY);
-            showText(function() { wait(fns[j + 1]); });
-          }.bind(this))
-        }.bind(this));
-        const lastWait = this.COMMANDS.wait(el, '' + BLINK_GROUP_DELAY);
-        fns.push(function () {
-          lastWait(runNextCommand);
-        });
-        fns[0]();
-      }.bind(this);
-    }.bind(this),
-
-    cap: function (this: CaptionProgram, el: HTMLElement, value: string) {
-      const showText = this.COMMANDS.showText(el, CAPTION_DURATION + ' ' + value);
-      const wait = this.COMMANDS.wait(el, '' + CAPTION_DELAY);
-      return function (this: CaptionProgram, runNextCommand: Function) {
-        el.style.color = this.props.captionColor;
-        el.style.fontSize = this.props.captionFontSize + "vmin";
-        el.style.fontFamily = this.props.captionFontFamily;
-        el.className = "text-caption";
-        showText(function() { wait(runNextCommand); });
-      }.bind(this)
-    }.bind(this),
-
-    bigcap: function (this: CaptionProgram, el: HTMLElement, value: string) {
-      const showText = this.COMMANDS.showText(el, CAPTION_DURATION + ' ' + value);
-      const wait = this.COMMANDS.wait(el, '' + CAPTION_DELAY);
-      return function (this: CaptionProgram, runNextCommand: Function) {
-        el.style.color = this.props.captionBigColor;
-        el.style.fontSize = this.props.captionBigFontSize + "vmin";
-        el.style.fontFamily = this.props.captionBigFontFamily;
-        el.className = "text-caption-big";
-        showText(function() { wait(runNextCommand); });
-      }.bind(this)
-    }.bind(this),
-
-    count: function(this: CaptionProgram, el: HTMLElement, value: string) {
-      return function (this: CaptionProgram, runNextCommand: Function) {
-        let fns: Function[] = [];
-        el.style.color = this.props.countColor;
-        el.style.fontSize = this.props.countFontSize + "vmin";
-        el.style.fontFamily = this.props.countFontFamily;
-        el.className = "text-count";
-        const split = value.split(" ");
-        if (split.length != 2) {
-          console.error("Invalid count command: "  + value);
-          runNextCommand();
-          return;
-        }
-        let number = parseInt(split[0], 10);
-        const end = parseInt(split[1], 10);
-        if (isNaN(number) || isNaN(end) || number < 0 || end < 0) {
-          console.error("Invalid count command: "  + value);
-          runNextCommand();
-          return;
-        }
-
-        let values = [];
-        do {
-          values.push(number);
-          if (number == end) {
-            break;
-          } else if (number < end) {
-            number+=1;
-          } else if (number > end) {
-            number-=1;
-          }
-        } while (true);
-
-        let i = 0;
-        values.forEach(function (this: CaptionProgram, number: number) {
-          let j = i;
-          i += 1;
-          fns.push(function (this: CaptionProgram) {
-            const showText = this.COMMANDS.showText(el, COUNT_DURATION + ' ' + number);
-            const wait = this.COMMANDS.wait(el, '' + COUNT_DELAY);
-            showText(function() { wait(fns[j + 1]); });
-          }.bind(this));
-        }.bind(this));
-        const lastWait = this.COMMANDS.wait(el, '' + COUNT_GROUP_DELAY);
-        fns.push(function () {
-          lastWait(runNextCommand);
-        });
-        fns[0]();
-      }.bind(this);
-    }.bind(this),
-  };
+  setCountGroupDelay(ms: number) {
+    return (nextCommand: Function) => {
+      this.setState({countGroupDelay: ms});
+      nextCommand();
+    }
+  }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

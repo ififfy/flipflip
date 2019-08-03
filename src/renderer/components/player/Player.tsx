@@ -1,5 +1,4 @@
 import {remote, shell, webFrame} from 'electron';
-import defaultMenu from "electron-default-menu";
 import * as React from 'react';
 import fs from "fs";
 import fileURL from "file-url";
@@ -51,6 +50,7 @@ export default class Player extends React.Component {
     toggleTag?(sourceID: number, tag: Tag): void,
     goToTagSource?(source: LibrarySource): void,
     navigateTagging?(offset: number): void,
+    getTags(source: string): Array<Tag>,
   };
 
   readonly state = {
@@ -192,7 +192,9 @@ export default class Player extends React.Component {
             countColor={this.props.scene.countColor}
             countFontSize={this.props.scene.countFontSize}
             countFontFamily={this.props.scene.countFontFamily}
-            url={textURL(this.props.scene.textKind, this.props.scene.textSource)}/>
+            url={textURL(this.props.scene.textKind, this.props.scene.textSource)}
+            getTags={this.props.getTags}
+            currentSource={this.state.historyPaths.length > 0 ? this.state.historyPaths[0].getAttribute("source") : null}/>
         )}
 
         <div className={`u-button-row ${this.state.hasStarted && this.state.isPlaying ? 'u-show-on-hover-only' : ''}`}>

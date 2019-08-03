@@ -42,6 +42,15 @@ export function getLibrarySource(state: State): LibrarySource | null {
   return null;
 }
 
+export function getTags(library: Array<LibrarySource>, source: string): Array<Tag> {
+  const librarySource = library.find((s) => s.url == source);
+  if (librarySource) {
+    return librarySource.tags;
+  } else {
+    return [];
+  }
+}
+
 /** Actions **/
 // All of these functions return object diffs that you can pass to ReactComponent.setState().
 // The first argument is always a State object, even if it isn't used.
@@ -206,7 +215,7 @@ export function openConfig(state: State): Object {
 }
 
 export function setDefaultConfig(state: State): Object {
-  return {config: new Config(), route: new Array<Route>()};
+  return {config: new Config()};
 }
 
 export function goToScene(state: State, scene: Scene): Object {
@@ -370,6 +379,7 @@ export function updateTags(state: State, tags: Array<Tag>): Object {
       for (let tag of tags) {
         if (t.id == tag.id) {
           t.name = tag.name;
+          t.phraseString = tag.phraseString;
           return t;
         }
       }
@@ -564,26 +574,4 @@ export function importLibrary(state: State, backup:Function): Object {
 
   alert("Import complete!");
   return {library: newLibrary, tags: newTags};
-}
-
-export function clearTumblr(state: State): Object {
-  const newConfig = state.config;
-  newConfig.remoteSettings.tumblrKey = "";
-  newConfig.remoteSettings.tumblrSecret = "";
-  newConfig.remoteSettings.tumblrOAuthToken = "";
-  newConfig.remoteSettings.tumblrOAuthTokenSecret = "";
-  return {config: newConfig};
-}
-
-export function clearReddit(state: State): Object {
-  const newConfig = state.config;
-  newConfig.remoteSettings.redditRefreshToken = "";
-  return {config: newConfig};
-}
-
-export function clearTwitter(state: State): Object {
-  const newConfig = state.config;
-  newConfig.remoteSettings.twitterAccessTokenKey = "";
-  newConfig.remoteSettings.twitterAccessTokenSecret = "";
-  return {config: newConfig};
 }

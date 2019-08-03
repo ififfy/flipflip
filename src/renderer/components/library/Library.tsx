@@ -23,7 +23,6 @@ export default class Library extends React.Component {
     filters: Array<string>,
     selected: Array<string>,
     onUpdateLibrary(sources: Array<LibrarySource>): void,
-    onClearReddit(): void,
     onPlay(source: LibrarySource): void,
     savePosition(yOffset: number, filters:Array<string>, selected: Array<string>): void,
     goBack(): void,
@@ -333,7 +332,6 @@ export default class Library extends React.Component {
         // If user is not authenticated for subscriptions, prompt to re-authenticate
         if (err.statusCode == 403) {
           alert("You have not authorized FlipFlip to work with Reddit subscriptions. Visit Preferences and authorize FlipFlip to work with Reddit.");
-          this.props.onClearReddit();
         } else {
           alert("Error retrieving subscriptions: " + err);
           console.error(err);

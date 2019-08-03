@@ -203,6 +203,10 @@ a {
     cursor: pointer;
   }
 
+  .u-script {
+    background: url("./icons/script.svg") no-repeat;
+  }
+
   .u-tags {
     background: url("./icons/tag.svg") no-repeat;
   }
@@ -1106,14 +1110,14 @@ label.SimpleCheckbox {
     line-height: $buttonBarHeight;
   }
 
-  .TagManager__Buttons {
-    padding: $smallPadding;
-    height: 3.2rem;
+  .TagManager__Add {
+    width: 7rem;
+    text-align: center;
+  }
 
-    & > .u-button {
-      float: right;
-      margin-right: $smallPadding;
-    }
+  .Modal textarea {
+    height: 140px;
+    width: 420px;
   }
 
   .TagManager__Remove, .TagManager__Empty {
@@ -1136,8 +1140,9 @@ label.SimpleCheckbox {
 
     .TagManager__Tag {
       background-color: $white;
-      padding: $smallPadding*3;
+      padding: $smallPadding*6;
       margin-bottom: $smallPadding;
+      position: relative;
 
       &.u-destructive-bg {
         color: $white !important;
@@ -1151,12 +1156,24 @@ label.SimpleCheckbox {
       justify-content: center;
       align-items: center;
 
-      .TagManager_TagTitle {
+      .TagManager__TagTitle {
         text-align: center;
 
         input {
           max-width: 7rem;
         }
+      }
+
+      .TagManager__PhraseButton {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+      }
+
+      .TagManager__RemoveButton {
+        position: absolute;
+        top: 6px;
+        left: 6px;
       }
 
       &:hover {
