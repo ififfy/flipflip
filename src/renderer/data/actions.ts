@@ -360,11 +360,11 @@ export function onUpdateClips(state: State, sourceURL: string, clips: Array<Clip
   const source = newLibrary.find((s) => s.url == sourceURL);
   if (source) {
     source.clips = clips;
-    for (let scene of newScenes) {
-      const sceneSource = scene.sources.find((s) => s.url == sourceURL);
-      if (sceneSource) {
-        sceneSource.clips = clips;
-      }
+  }
+  for (let scene of newScenes) {
+    const sceneSource = scene.sources.find((s) => s.url == sourceURL);
+    if (sceneSource) {
+      sceneSource.clips = clips;
     }
   }
   return {library: newLibrary, scenes: newScenes};

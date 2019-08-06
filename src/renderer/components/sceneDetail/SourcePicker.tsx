@@ -39,7 +39,7 @@ type Props = {
   selected: Array<string>,
   onUpdateSources(sources: Array<LibrarySource>): void,
   onPlay?(source: LibrarySource, displayed: Array<LibrarySource>): void,
-  onClip?(source: LibrarySource): void,
+  onClip(source: LibrarySource): void,
   savePosition?(yOffset: number, filters: Array<string>, selected: Array<string>): void,
   onOpenLibraryImport?(): void,
   importSourcesFromLibrary?(sources: Array<LibrarySource>): void,

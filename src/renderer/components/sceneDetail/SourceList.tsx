@@ -28,8 +28,8 @@ export default class SourceList extends React.Component {
     onStartEdit(isEditing: number): void,
     savePosition?(yOffset: number, filters: Array<string>, selected: Array<string>): void,
     onOpenLibraryImport?(): void,
+    onClip(source: LibrarySource): void,
     onPlay?(source: LibrarySource, displayed: Array<LibrarySource>): void,
-    onClip?(source: LibrarySource): void,
   };
 
   readonly state = {
@@ -131,7 +131,7 @@ export default class SourceList extends React.Component {
                       <div className="u-clean"/>
                     </div>
                   )}
-                  {getSourceType(source.url) == ST.video && this.props.onClip && (
+                  {getSourceType(source.url) == ST.video && (
                     <div className="u-button u-small-icon-button u-clean u-clickable"
                          onClick={this.onClip.bind(this, source)}
                          title="Select Parts of Video">
@@ -182,7 +182,9 @@ export default class SourceList extends React.Component {
   }
 
   onClip(source: LibrarySource) {
-    this.props.savePosition(document.getElementById("sources").scrollTop, this.props.filters, this.props.selected);
+    if (this.props.savePosition) {
+      this.props.savePosition(document.getElementById("sources").scrollTop, this.props.filters, this.props.selected);
+    }
     this.props.onClip(source);
   }
 

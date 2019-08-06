@@ -139,6 +139,7 @@ export default class Meta extends React.Component {
             onExport={a(actions.exportScene)}
             onDelete={a(actions.deleteScene)}
             onPlay={a(actions.playScene)}
+            onClip={a(actions.clipVideo)}
             onUpdateScene={a(actions.updateScene)}
             onOpenLibraryImport={a(actions.openLibraryImport)}
             saveScene={a(actions.saveScene)}

@@ -28,6 +28,7 @@ export default class SceneDetail extends React.Component {
     onDelete(scene: Scene): void,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
     onOpenLibraryImport(scene: Scene): void,
+    onClip(source: LibrarySource): void,
     saveScene(): void,
   };
 
@@ -145,6 +146,7 @@ export default class SceneDetail extends React.Component {
               isSelect={false}
               isBatchTag={false}
               onUpdateSources={this.onChangeSources.bind(this)}
+              onClip={this.props.onClip}
               onOpenLibraryImport={this.props.onOpenLibraryImport.bind(this, this.props.scene)}
               onChangeTextKind={this.changeKey.bind(this, 'textKind').bind(this)}
               onChangeTextSource={this.changeKey.bind(this, 'textSource').bind(this)} />
