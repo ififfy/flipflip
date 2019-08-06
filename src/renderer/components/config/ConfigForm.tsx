@@ -9,6 +9,7 @@ import http from "http";
 
 import Config, {CacheSettings, DisplaySettings, RemoteSettings, SceneSettings} from "../../data/Config";
 import {getRandomIndex} from "../../data/utils";
+import {VC} from "../../data/const";
 import Scene from "../../data/Scene";
 import APIGroup from "./APIGroup";
 import CacheGroup from "./CacheGroup";
@@ -102,7 +103,7 @@ export default class ConfigForm extends React.Component {
 
           <VideoGroup
             scene={this.state.config.defaultScene}
-            isPlayer={false}
+            mode={VC.sceneDetail}
             onUpdateScene={this.onUpdateDefaultScene.bind(this)}/>
 
           <TextGroup

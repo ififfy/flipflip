@@ -3,7 +3,7 @@ import * as React from 'react';
 import fs from "fs";
 import fileURL from "file-url";
 
-import {SL, ST, TOT} from "../../data/const";
+import {SL, ST, TOT, VC} from "../../data/const";
 import {getCachePath, getSourceType, urlToPath} from '../../data/utils';
 import Config from "../../data/Config";
 import Scene from '../../data/Scene';
@@ -44,13 +44,14 @@ export default class Player extends React.Component {
     scene: Scene,
     scenes: Array<Scene>,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
+    getTags(source: string): Array<Tag>,
+    cache(i: HTMLImageElement | HTMLVideoElement): void,
     nextScene?(): void,
     tags?: Array<Tag>,
     allTags?: Array<Tag>,
     toggleTag?(sourceID: number, tag: Tag): void,
     goToTagSource?(source: LibrarySource): void,
     navigateTagging?(offset: number): void,
-    getTags(source: string): Array<Tag>,
   };
 
   readonly state = {
@@ -145,6 +146,7 @@ export default class Player extends React.Component {
             firstImageLoaded={this.setMainCanStart.bind(this)}
             setProgress={this.setProgress.bind(this)}
             setVideo={this.setMainVideo.bind(this)}
+            cache={this.props.cache.bind(this)}
             setTimeToNextFrame={this.setTimeToNextFrame.bind(this)}
           />
 
@@ -173,6 +175,7 @@ export default class Player extends React.Component {
                 firstImageLoaded={this.nop}
                 setProgress={showProgress ? this.setProgress.bind(this) : this.nop}
                 setVideo={this.setOverlayVideo.bind(this, index)}
+                cache={this.props.cache.bind(this)}
               />
             );}
           )}
@@ -246,7 +249,7 @@ export default class Player extends React.Component {
               isPlaying={this.state.isPlaying}
               mainVideo={this.state.mainVideo}
               overlayVideos={this.state.overlayVideos}
-              isPlayer={true}
+              mode={VC.player}
               onUpdateScene={this.props.onUpdateScene.bind(this)}
             />
 

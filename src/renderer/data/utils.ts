@@ -33,6 +33,39 @@ export function getBackups(): Array<{url: string, size: number}> {
   return backups;
 }
 
+export function getTimestamp(secs: number): string {
+  const hours = Math.floor(secs / 3600);
+  const minutes = Math.floor(secs % 3600 / 60);
+  const seconds = Math.floor(secs % 3600 % 60);
+  if (hours > 0) {
+    return hours + ":" + (minutes >= 10 ? minutes : "0" + minutes) + ":" + (seconds >= 10 ? seconds : "0" + seconds);
+  } else {
+    return minutes + ":" + (seconds >= 10 ? seconds : "0" + seconds);
+  }
+}
+
+export function getTimestampValue(value: string): number {
+  const split = value.split(":");
+  const splitInt = [];
+  if (split.length > 3 || split.length == 0) return null;
+  for (let n of split) {
+    if (n != split[0]) {
+      if (n.length != 2) return null;
+    }
+    const int = parseInt(n, 10);
+    if (isNaN(int)) return null;
+    splitInt.push(int);
+  }
+
+  if (split.length == 3) {
+    return (splitInt[0] * 60 * 60) + (splitInt[1] * 60) + splitInt[2];
+  } else if (split.length == 2) {
+    return (splitInt[0] * 60) + splitInt[1];
+  } else if (split.length == 1) {
+    return splitInt[0];
+  }
+}
+
 export function getPath() {
   return path.join(remote.app.getPath('appData'), 'flipflip');
 }

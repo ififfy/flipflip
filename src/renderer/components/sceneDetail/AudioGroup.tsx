@@ -4,14 +4,15 @@ import Scene from "../../data/Scene";
 import ControlGroup from "./ControlGroup";
 import AudioControl from "../player/AudioControl";
 import Audio from "../library/Audio";
+import {SceneSettings} from "../../data/Config";
 
 export default class AudioGroup extends React.Component {
   readonly props: {
-    scene: Scene,
+    scene: Scene | SceneSettings,
     scenePaths?: Array<any>,
     isPlaying?: boolean,
     isPlayer: boolean,
-    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
+    onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 
   render() {

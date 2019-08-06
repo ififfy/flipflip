@@ -23,7 +23,8 @@ export default class Library extends React.Component {
     filters: Array<string>,
     selected: Array<string>,
     onUpdateLibrary(sources: Array<LibrarySource>): void,
-    onPlay(source: LibrarySource): void,
+    onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void,
+    onClip(source: LibrarySource): void,
     savePosition(yOffset: number, filters:Array<string>, selected: Array<string>): void,
     goBack(): void,
     manageTags(): void,
@@ -163,6 +164,7 @@ export default class Library extends React.Component {
             isBatchTag={this.props.isBatchTag}
             onUpdateSources={this.props.onUpdateLibrary}
             onPlay={this.props.onPlay}
+            onClip={this.props.onClip}
             savePosition={this.props.savePosition}
             importSourcesFromLibrary={this.props.importSourcesFromLibrary}
           />

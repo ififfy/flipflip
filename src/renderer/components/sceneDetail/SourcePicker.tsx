@@ -38,7 +38,8 @@ type Props = {
   filters: Array<string>,
   selected: Array<string>,
   onUpdateSources(sources: Array<LibrarySource>): void,
-  onPlay?(source: LibrarySource): void,
+  onPlay?(source: LibrarySource, displayed: Array<LibrarySource>): void,
+  onClip?(source: LibrarySource): void,
   savePosition?(yOffset: number, filters: Array<string>, selected: Array<string>): void,
   onOpenLibraryImport?(): void,
   importSourcesFromLibrary?(sources: Array<LibrarySource>): void,
@@ -250,9 +251,10 @@ export default class SourcePicker extends React.Component {
           addSources={this.addSources.bind(this)}
           onUpdateSelected={this.onUpdateSelected.bind(this)}
           onStartEdit={this.onStartEdit.bind(this)}
-          savePosition={this.props.savePosition ? this.props.savePosition.bind(this) : null}
-          onOpenLibraryImport={this.props.onOpenLibraryImport ? this.props.onOpenLibraryImport.bind(this) : null}
-          onPlay={this.props.onPlay ? this.props.onPlay.bind(this) : null} />
+          savePosition={this.props.savePosition}
+          onOpenLibraryImport={this.props.onOpenLibraryImport}
+          onPlay={this.props.onPlay}
+          onClip={this.props.onClip}/>
 
         {this.state.removeAllIsOpen && (
           <Modal onClose={this.toggleRemoveAllModal.bind(this)} title="Remove all?">

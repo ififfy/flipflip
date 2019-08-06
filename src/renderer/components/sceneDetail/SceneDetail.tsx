@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import {OF, WF} from "../../data/const";
+import {OF, VC, WF} from "../../data/const";
 import Scene from '../../data/Scene';
 import SourcePicker from './SourcePicker';
 import AudioGroup from "./AudioGroup";
@@ -124,7 +124,7 @@ export default class SceneDetail extends React.Component {
 
           <VideoGroup
             scene={this.props.scene}
-            isPlayer={false}
+            mode={VC.sceneDetail}
             onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
           <TextGroup

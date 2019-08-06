@@ -1,13 +1,19 @@
+import {remote} from "electron";
 import * as fs from "fs";
 import path from 'path';
-import {getBackups, saveDir} from "./utils";
-import Scene from "./Scene";
-import { Route } from "./Route";
-import LibrarySource from "../components/library/LibrarySource";
+import wretch from "wretch";
+import {outputFile} from "fs-extra";
+import getFolderSize from "get-folder-size";
+
+import {getBackups, getCachePath, getFileName, getSourceType, saveDir} from "./utils";
+import {ST} from "./const";
 import { defaultInitialState } from './AppStorage';
+import { Route } from "./Route";
+import Scene from "./Scene";
 import Config from "./Config";
+import LibrarySource from "../components/library/LibrarySource";
 import Tag from "../components/library/Tag";
-import {remote} from "electron";
+import Clip from "../components/library/Clip";
 
 type State = typeof defaultInitialState;
 
@@ -29,17 +35,21 @@ export function getActiveScene(state: State): Scene | null {
   return null;
 }
 
+export function getActiveSource(state: State): LibrarySource | null {
+  for (let r of state.route.slice().reverse()) {
+    if (r.kind == 'clip') {
+      const source = state.library.find((s: LibrarySource) => s.id === r.value);
+      if (source) return source;
+    }
+  }
+  return null;
+}
+
 // Returns the active library source, or null if the current route isn't a library source
 export function getLibrarySource(state: State): LibrarySource | null {
   const activeScene = getActiveScene(state);
   if (activeScene == null) return null;
-  const libraryID = activeScene.libraryID;
-  for (let s of state.library) {
-    if (s.id == libraryID) {
-      return s;
-    }
-  }
-  return null;
+  return state.library.find((s) => s.id == activeScene.libraryID);
 }
 
 export function getTags(library: Array<LibrarySource>, source: string): Array<Tag> {
@@ -94,6 +104,56 @@ export function cleanBackups(state: State): Object {
     alert("Cleanup success!");
   }
   return {};
+}
+
+export function cacheImage(state: State, i: HTMLImageElement | HTMLVideoElement) {
+  if (state.config.caching.enabled) {
+    const fileType = getSourceType(i.src);
+    if (fileType != ST.local && i.src.startsWith("http")) {
+      const cachePath = getCachePath(null, state.config);
+      if (!fs.existsSync(cachePath)) {
+        fs.mkdirSync(cachePath)
+      }
+      const maxSize = state.config.caching.maxSize;
+      const sourceCachePath = getCachePath(i.getAttribute("source"), state.config);
+      const filePath = sourceCachePath + getFileName(i.src);
+      const downloadImage = () => {
+        if (!fs.existsSync(filePath)) {
+          wretch(i.src)
+            .get()
+            .blob(blob => {
+              const reader = new FileReader();
+              reader.onload = function () {
+                if (reader.readyState == 2) {
+                  const arrayBuffer = reader.result as ArrayBuffer;
+                  const buffer = Buffer.alloc(arrayBuffer.byteLength);
+                  const view = new Uint8Array(arrayBuffer);
+                  for (let i = 0; i < arrayBuffer.byteLength; ++i) {
+                    buffer[i] = view[i];
+                  }
+                  outputFile(filePath, buffer);
+                }
+              };
+              reader.readAsArrayBuffer(blob);
+            });
+        }
+      };
+      if (maxSize == 0) {
+        downloadImage();
+      } else {
+        getFolderSize(cachePath, (err: string, size: number) => {
+          if (err) {
+            throw err;
+          }
+
+          const mbSize = (size / 1024 / 1024);
+          if (mbSize < maxSize) {
+            downloadImage();
+          }
+        });
+      }
+    }
+  }
 }
 
 export function printMemoryReport() {
@@ -274,18 +334,44 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
     return;
   }
   let tempScene = new Scene({
+    id: id,
     name: "library_scene_temp",
     sources: [source],
     libraryID: librarySource.id,
     displayedLibrary: displayed,
-    id: id,
-    continueVideo: true,
-    forceAll: true,
+    forceAll: state.config.defaultScene.forceAll,
+    backgroundType: state.config.defaultScene.backgroundType,
+    backgroundColor: state.config.defaultScene.backgroundColor,
+    backgroundBlur: state.config.defaultScene.backgroundBlur,
+    randomVideoStart: state.config.defaultScene.randomVideoStart,
+    continueVideo: state.config.defaultScene.continueVideo,
+    playVideoClips: state.config.defaultScene.playVideoClips,
+    videoVolume: state.config.defaultScene.videoVolume,
   });
   return {
     scenes: state.scenes.concat([tempScene]),
     route: state.route.concat([new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'libraryplay', value: tempScene.id})]),
   };
+}
+
+export function onUpdateClips(state: State, sourceURL: string, clips: Array<Clip>) {
+  const newLibrary = state.library;
+  const newScenes = state.scenes;
+  const source = newLibrary.find((s) => s.url == sourceURL);
+  if (source) {
+    source.clips = clips;
+    for (let scene of newScenes) {
+      const sceneSource = scene.sources.find((s) => s.url == sourceURL);
+      if (sceneSource) {
+        sceneSource.clips = clips;
+      }
+    }
+  }
+  return {library: newLibrary, scenes: newScenes};
+}
+
+export function clipVideo(state: State, source: LibrarySource) {
+  return {route: state.route.concat([new Route({kind: 'clip', value: source.id})])};
 }
 
 export function navigateDisplayedLibrary(state: State, offset: number): Object {
@@ -404,17 +490,23 @@ export function batchTag(state: State, isBatchTag: boolean): Object {
 }
 
 export function toggleTag(state: State, sourceID: number, tag: Tag): Object {
-  let newLibrary = state.library;
-  for (let source of newLibrary) {
-    if (source.id == sourceID) {
-      if (source.tags.map((t: Tag) => t.name).includes(tag.name)) {
-        source.tags = source.tags.filter((t: Tag) => t.name != tag.name);
-      } else {
-        source.tags.push(tag);
+  const newLibrary = state.library;
+  const newScenes = state.scenes;
+  const source = newLibrary.find((s) => s.id == sourceID);
+  if (source) {
+    if (source.tags.map((t: Tag) => t.name).includes(tag.name)) {
+      source.tags = source.tags.filter((t: Tag) => t.name != tag.name);
+    } else {
+      source.tags.push(tag);
+    }
+    for (let scene of newScenes) {
+      const sceneSource = scene.sources.find((s) => s.url == source.url);
+      if (sceneSource) {
+        sceneSource.tags = source.tags;
       }
     }
   }
-  return replaceLibrary(state, newLibrary);
+  return {library: newLibrary, scenes: newScenes};
 }
 
 export function exportScene(state: State, scene: Scene): Object {

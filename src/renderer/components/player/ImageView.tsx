@@ -5,8 +5,8 @@ import Timeout = NodeJS.Timeout;
 import {BT} from "../../data/const";
 
 export const FadeLayer = (data: {image: any, contentRef: any, backgroundRef: any, backgroundType: string,
-  backgroundColor: string, backgroundBlur: number, horizTransLevel: number, vertTransLevel: number,
-  zoomStart: number, zoomEnd: number, transDuration: number, fadeDuration: any, crossFade: boolean}) => {
+  backgroundColor: string, backgroundBlur: number, horizTransLevel: number, vertTransLevel: number, zoomStart: number,
+  zoomEnd: number, transDuration: number, fadeDuration: any, crossFade: boolean, videoClipper: boolean}) => {
 
   const fadeTransitions: [{item: any, props: any, key: any}] = useTransition(
     data.image,
@@ -41,7 +41,7 @@ export const FadeLayer = (data: {image: any, contentRef: any, backgroundRef: any
     <React.Fragment>
       {fadeTransitions.map(({item, props, key}) => {
         return (
-          <animated.div className="ImageView u-fill-container" key={key} volume={props.volume} style={{ ...props }}>
+          <animated.div className={`ImageView ${data.videoClipper ? '': 'u-fill-container'}`} key={key} volume={props.volume} style={{ ...props }}>
             <ZoomMoveLayer
               contentRef={data.contentRef}
               horizTransLevel={data.horizTransLevel}
@@ -49,13 +49,15 @@ export const FadeLayer = (data: {image: any, contentRef: any, backgroundRef: any
               zoomStart={data.zoomStart}
               zoomEnd={data.zoomEnd}
               duration={data.transDuration} />
-            <Image
-              className="ImageView__Background"
-              contentRef={data.backgroundRef}
-              backgroundType={data.backgroundType}
-              backgroundColor={data.backgroundColor}
-              backgroundBlur={data.backgroundBlur}
-              imageProps={null} />
+            {!data.videoClipper && (
+              <Image
+                className="ImageView__Background"
+                contentRef={data.backgroundRef}
+                backgroundType={data.backgroundType}
+                backgroundColor={data.backgroundColor}
+                backgroundBlur={data.backgroundBlur}
+                imageProps={null} />
+            )}
           </animated.div>
         );
       })}
@@ -127,16 +129,17 @@ export default class ImageView extends React.Component {
     crossFadeAudio: boolean,
     fadeDuration: number,
     videoVolume: number,
+    videoClipper: boolean,
     onLoaded(): void,
     setVideo(video: HTMLVideoElement): void,
   };
 
   readonly backgroundRef: React.RefObject<HTMLDivElement> = React.createRef();
   readonly contentRef: React.RefObject<HTMLDivElement> = React.createRef();
-  _timeout: Map<string, Timeout> = null;
+  _timeouts: Array<Timeout> = null;
 
   componentDidMount() {
-    this._timeout = new Map<string, Timeout>();
+    this._timeouts = new Array<Timeout>();
     this._applyImage();
   }
 
@@ -146,11 +149,11 @@ export default class ImageView extends React.Component {
 
   componentWillUnmount() {
     this.clearTimeouts();
-    this._timeout = null;
+    this._timeouts = null;
   }
 
   clearTimeouts() {
-    for (let timeout of this._timeout.values()) {
+    for (let timeout of this._timeouts) {
       clearTimeout(timeout);
     }
   }
@@ -161,33 +164,50 @@ export default class ImageView extends React.Component {
     const img = this.props.image;
     if (!el || !img) return;
 
-    const firstChild = el.firstChild;
-    if (firstChild instanceof HTMLImageElement || firstChild instanceof HTMLVideoElement) {
-      if (firstChild.src === img.src) return;
-    }
-
     if (img instanceof HTMLVideoElement) {
       img.volume = this.props.videoVolume / 100;
       img.play();
+      const videoLoop = (v: any) => {
+        if (parseFloat(el.parentElement.style.opacity) == 0.99 || v.ended) {
+          v.removeEventListener('play');
+          return;
+        }
+        if (v.paused) return;
+        if (this.props.crossFade && this.props.crossFadeAudio && v instanceof HTMLVideoElement) {
+          v.volume = (this.props.videoVolume / 100) * parseFloat(el.parentElement.getAttribute("volume"));
+        }
+        if (v.hasAttribute("start") && v.hasAttribute("end")) {
+          const start = v.getAttribute("start");
+          const end = v.getAttribute("end");
+          if (v.currentTime > end) {
+            v.currentTime = start;
+          }
+        }
+        this._timeouts.push(setTimeout(videoLoop, 20, v));
+      };
+      img.addEventListener('play', () => {
+        videoLoop(img);
+      }, false);
     }
 
     let parentWidth = el.offsetWidth;
     let parentHeight = el.offsetHeight;
+    if (this.props.videoClipper) {
+      parentWidth = el.parentElement.offsetWidth;
+      parentHeight = el.parentElement.offsetHeight;
+    }
     if (parentWidth == 0 || parentHeight == 0) {
       parentWidth = window.innerWidth;
       parentHeight = window.innerHeight;
     }
     const parentAspect = parentWidth / parentHeight;
     let imgWidth;
-    if (img instanceof HTMLImageElement) {
-      imgWidth = img.width;
-    } else {
-      imgWidth = img.videoWidth;
-    }
     let imgHeight;
     if (img instanceof HTMLImageElement) {
+      imgWidth = img.width;
       imgHeight = img.height;
     } else {
+      imgWidth = img.videoWidth;
       imgHeight = img.videoHeight;
     }
     const imgAspect = imgWidth / imgHeight;
@@ -205,12 +225,13 @@ export default class ImageView extends React.Component {
         bgImg.height = parentHeight;
 
         const draw = (v: any, c: CanvasRenderingContext2D, w: number, h: number) => {
-          if (parseFloat(el.parentElement.style.opacity) == 0.99 || v.paused || v.ended) return;
-          if (this.props.crossFade && this.props.crossFadeAudio && v instanceof HTMLVideoElement) {
-            v.volume = (this.props.videoVolume / 100) * parseFloat(el.parentElement.getAttribute("volume"));
+          if (parseFloat(el.parentElement.style.opacity) == 0.99 || v.ended) {
+            v.removeEventListener('play');
+            return;
           }
+          if (v.paused) return;
           c.drawImage(v, 0, 0, w, h);
-          this._timeout.set(v.src, setTimeout(draw, 20, v, c, w, h));
+          this._timeouts.push(setTimeout(draw, 20, v, c, w, h));
         };
 
         if (!this.props.crossFade) {
@@ -265,27 +286,29 @@ export default class ImageView extends React.Component {
   }
 
   shouldComponentUpdate(props: any): boolean {
-    return ((!this.props.image && props.image) ||
-      (props.image && this.props.image && props.image.src !== this.props.image.src) ||
-      (props.backgroundType !== this.props.backgroundType) ||
-      (props.backgroundColor !== this.props.backgroundColor) ||
-      (props.backgroundBlur !== this.props.backgroundBlur) ||
-      (props.horizTransLevel !== this.props.horizTransLevel) ||
-      (props.vertTransLevel !== this.props.vertTransLevel) ||
-      (props.zoomStart !== this.props.zoomStart) ||
-      (props.zoomEnd !== this.props.zoomEnd) ||
-      (props.transDuration !== this.props.transDuration) ||
-      (props.videoVolume !== this.props.videoVolume) ||
-      (props.crossFade !== this.props.crossFade) ||
-      (props.crossFadeAudio !== this.props.crossFadeAudio) ||
-      (props.fadeDuration !== this.props.fadeDuration));
+    return (!this.props.image && props.image) ||
+      (props.image && this.props.image &&
+      (props.image.src !== this.props.image.src ||
+      props.image.getAttribute("start") !== this.props.image.getAttribute("start") ||
+      props.image.getAttribute("end") !== this.props.image.getAttribute("end"))) ||
+      props.backgroundType !== this.props.backgroundType ||
+      props.backgroundColor !== this.props.backgroundColor ||
+      props.backgroundBlur !== this.props.backgroundBlur ||
+      props.horizTransLevel !== this.props.horizTransLevel ||
+      props.vertTransLevel !== this.props.vertTransLevel ||
+      props.zoomStart !== this.props.zoomStart ||
+      props.zoomEnd !== this.props.zoomEnd ||
+      props.transDuration !== this.props.transDuration ||
+      props.crossFade !== this.props.crossFade ||
+      props.crossFadeAudio !== this.props.crossFadeAudio ||
+      props.fadeDuration !== this.props.fadeDuration;
   }
 
   render() {
     if (!this.props.image) {
       return (
-        <div className="ImageView u-fill-container">
-          <div className="ImageView__Image"ref={this.contentRef}/>
+        <div className={`ImageView ${this.props.videoClipper ? '': 'u-fill-container'}`}>
+          <div className="ImageView__Image" ref={this.contentRef}/>
         </div>
       );
     }
@@ -302,6 +325,7 @@ export default class ImageView extends React.Component {
         transDuration={this.props.transDuration}
         crossFade={this.props.crossFade}
         fadeDuration={this.props.fadeDuration}
+        videoClipper={this.props.videoClipper}
         contentRef={this.contentRef}
         backgroundRef={this.backgroundRef}/>
     );

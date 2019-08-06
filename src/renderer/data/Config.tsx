@@ -1,9 +1,10 @@
 import {BT, GO, HTF, IF, OF, SL, TF, VO, VTF, WF} from "./const";
 import Overlay from "../components/library/Overlay";
 import LibrarySource from "../components/library/LibrarySource";
+import Audio from "../components/library/Audio";
 
 interface SceneSettingsI {
-  [key: string]: string|Array<LibrarySource>|number|boolean|Array<Overlay>;
+  [key: string]: string | number | boolean | Array<LibrarySource> | Array<Overlay> | Array<Audio>;
 
   sources: Array<LibrarySource>;
   timingFunction: string;
@@ -45,6 +46,7 @@ interface SceneSettingsI {
   videoTimingConstant: number;
   randomVideoStart: boolean;
   continueVideo: boolean;
+  playVideoClips: boolean;
   videoVolume: number;
   generatorMax: number;
   overlays: Array<Overlay>;
@@ -79,6 +81,8 @@ interface SceneSettingsI {
   countColor: string;
   countFontSize: number;
   countFontFamily: string;
+
+  audios: Array<Audio>;
 
   // migration only
   overlaySceneID: number;
@@ -131,7 +135,7 @@ interface DisplaySettingsI {
 }
 
 export class SceneSettings implements SceneSettingsI {
-  [key: string]: string | Array<LibrarySource> | number | boolean | Array<Overlay>;
+  [key: string]: string | number | boolean | Array<LibrarySource> | Array<Overlay> | Array<Audio>;
 
   sources: Array<LibrarySource> = [];
   timingFunction = TF.constant;
@@ -173,6 +177,7 @@ export class SceneSettings implements SceneSettingsI {
   videoTimingConstant = 3000;
   randomVideoStart = false;
   continueVideo = false;
+  playVideoClips = true;
   videoVolume = 0;
   generatorMax = 100;
   overlays: Array<Overlay> = [];
@@ -209,6 +214,8 @@ export class SceneSettings implements SceneSettingsI {
   countColor = "#FFFFFF";
   countFontSize = 20;
   countFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
+
+  audios: Array<Audio> = [];
 
   // migration only
   overlaySceneID = 0;

@@ -16,6 +16,8 @@ $smallPadding: 0.5rem;
 $buttonBarHeight: 2rem + $smallPadding;
 $buttonSidebarWidth: 21rem + $smallPadding;
 
+@import '../../node_modules/react-input-range/lib/css/index.css';
+
 /*
 Current Player Z-Indices (Layering is also effected by opacity)
 -------------------------
@@ -55,6 +57,10 @@ body {
 
 a {
   color: $blue;
+}
+
+.Meta {
+  height: 100%;
 }
 
 @mixin noselect {
@@ -367,6 +373,18 @@ a {
     background: url("./icons/pencil.svg") no-repeat;
   }
 
+  .u-clip {
+    background: url("./icons/clip.svg") no-repeat;
+  }
+
+  .u-save {
+    background: url("./icons/save.svg") no-repeat;
+  }
+
+  .u-back {
+    background: url("./icons/back.svg") no-repeat;
+  }
+
   .u-clean {
     background: url("./icons/clean.svg") no-repeat;
   }
@@ -670,16 +688,6 @@ a {
         margin-bottom: 7px;
       }
 
-      .VolumeControl {
-        display: flex;
-        .SimpleSliderInput {
-          flex-grow: 1;
-        }
-        .u-small-icon-button {
-          margin-top: 7px;
-        }
-      }
-
       .TickGroup {
         > div {
           display: flex;
@@ -690,6 +698,45 @@ a {
         }
       }
     }
+  }
+}
+
+.VolumeControl {
+  display: flex;
+  .SimpleSliderInput {
+    flex-grow: 1;
+  }
+  .u-small-icon-button {
+    margin-top: 7px;
+  }
+}
+
+.VideoSlider {
+  height: 2rem;
+  margin: 1rem 10px;
+
+  .input-range__label--min {
+    left: 3px;
+    bottom: -1rem;
+    color: $black;
+  }
+  .input-range__label--max {
+    right: 10px;
+    bottom: -1rem;
+    color: $black;
+  }
+
+  .input-range__label--value {
+    color: $black;
+  }
+
+  .input-range__track--active {
+    background: #3f96d0;
+  }
+
+  .input-range__slider {
+    background: #3f96d0;
+    border: 1px solid #3f96d0;
   }
 }
 
@@ -1405,6 +1452,79 @@ label.SimpleCheckbox {
         width: 100%;
         z-index: 1;
         background-size: cover;
+      }
+    }
+  }
+}
+
+
+.VideoClipper {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+
+  .ImageView {
+    flex-grow: 1;
+    margin: -5px -10px -10px -5px;
+    background-color: black;
+
+    .ImageView__Image {
+      height: 100%;
+      width: 100%;
+      z-index: 1;
+    }
+  }
+  .VideoClipper__Clipper {
+    @include noselect;
+    @include buttonBarBackground;
+    padding: $smallPadding $smallPadding 0 $smallPadding;
+    height: auto;
+    width: 100%;
+    z-index: 8;
+
+    .VideoClipper__Buttons {
+      display: flex;
+
+      .VideoClipper__ClipList {
+        flex-grow: 1;
+
+        .VideoClipper__Clip {
+          padding: 0.75rem;
+          margin-right: 0.5rem;
+          margin-bottom: 0.5rem;
+        }
+      }
+
+      .VideoClipper__Add {
+        width: 7rem;
+        height: fit-content;
+      }
+    }
+
+
+    .TrackControls {
+      display: flex;
+      margin-top: 0.5rem;
+
+      .TrackInputs {
+        display: flex;
+
+        .u-icon-button {
+          height: fit-content;
+          margin-left: 5px;
+        }
+
+        .SimpleTextInput {
+          margin-bottom: 0;
+          > label {
+            color: $black;
+          }
+        }
+      }
+
+      .VideoSlider {
+        flex-grow: 1;
+        margin: 0.5rem 10px;
       }
     }
   }

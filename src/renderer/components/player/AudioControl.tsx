@@ -2,6 +2,7 @@ import * as React from 'react';
 import Sound from "react-sound";
 import Timeout = NodeJS.Timeout;
 
+import {getTimestamp} from "../../data/utils";
 import {TF} from "../../data/const";
 import Audio from "../library/Audio";
 import SoundTick from "./SoundTick";
@@ -11,16 +12,9 @@ import SimpleCheckbox from "../ui/SimpleCheckbox";
 import SimpleNumberInput from "../ui/SimpleNumberInput";
 import SimpleOptionPicker from "../ui/SimpleOptionPicker";
 
-function getTimeStamp(ms: number): string {
+function getTimestampFromMs(ms: number): string {
   const secs = Math.floor(ms / 1000);
-  const hours = Math.floor(secs / 3600);
-  const minutes = Math.floor(secs % 3600 / 60);
-  const seconds = Math.floor(secs % 3600 % 60);
-  if (hours > 0) {
-    return hours + ":" + (minutes >= 10 ? minutes : "0" + minutes) + ":" + (seconds >= 10 ? seconds : "0" + seconds);
-  } else {
-    return minutes + ":" + (seconds >= 10 ? seconds : "0" + seconds);
-  }
+  return getTimestamp(secs);
 }
 
 export default class AudioControl extends React.Component {
@@ -129,9 +123,9 @@ export default class AudioControl extends React.Component {
               />
             )}
             <div>
-              <span style={{float: 'right'}}>{getTimeStamp(this.state.duration)}</span>
+              <span style={{float: 'right'}}>{getTimestampFromMs(this.state.duration)}</span>
               <SimpleSliderInput
-                label={getTimeStamp(this.state.position)}
+                label={getTimestampFromMs(this.state.position)}
                 value={this.state.position}
                 min={0}
                 max={this.state.duration}

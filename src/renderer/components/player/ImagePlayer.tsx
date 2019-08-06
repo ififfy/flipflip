@@ -2,15 +2,12 @@ import IncomingMessage = Electron.IncomingMessage;
 import * as React from 'react';
 import request from 'request';
 import fs from "fs";
-import {outputFile} from "fs-extra";
-import wretch from "wretch";
 import gifInfo from 'gif-info';
-import getFolderSize from "get-folder-size";
 import IdleTimer from 'react-idle-timer';
 import Timeout = NodeJS.Timeout;
 
-import {GO, HTF, IF, OF, SL, ST, TF, VO, VTF, WF} from '../../data/const';
-import {getCachePath, getFileName, getRandomListItem, getSourceType, isVideo, urlToPath} from '../../data/utils';
+import {GO, HTF, IF, OF, SL, TF, VO, VTF, WF} from '../../data/const';
+import {getRandomListItem, isVideo, urlToPath} from '../../data/utils';
 import Config from "../../data/Config";
 import Scene from "../../data/Scene";
 import ChildCallbackHack from './ChildCallbackHack';
@@ -41,12 +38,13 @@ export default class ImagePlayer extends React.Component {
     setHistoryOffset(historyOffset: number): void,
     onLoaded(): void,
     setVideo(video: HTMLVideoElement): void,
+    cache(i: HTMLImageElement | HTMLVideoElement): void,
     setTimeToNextFrame?(timeToNextFrame: number): void,
   };
 
   readonly state = {
-    readyToDisplay: Array<any>(),
-    historyPaths: Array<any>(),
+    readyToDisplay: Array<HTMLImageElement | HTMLVideoElement>(),
+    historyPaths: Array<HTMLImageElement | HTMLVideoElement>(),
     timeToNextFrame: 0,
     timeoutID: 0,
     nextImageID: 0,
@@ -171,6 +169,7 @@ export default class ImagePlayer extends React.Component {
             crossFade={crossFade}
             crossFadeAudio={this.props.scene.crossFadeAudio}
             fadeDuration={fadeDuration}
+            videoClipper={false}
             videoVolume={this.props.scene.videoVolume}
             onLoaded={this.state.historyPaths.length == 1 ? this.props.onLoaded : this.nop}
             setVideo={this.props.setVideo}/>
@@ -294,56 +293,6 @@ export default class ImagePlayer extends React.Component {
     }
   }
 
-  cache(i: HTMLImageElement | HTMLVideoElement) {
-    if (this.props.config.caching.enabled) {
-      const fileType = getSourceType(i.src);
-      if (fileType != ST.local && i.src.startsWith("http")) {
-        const cachePath = getCachePath(null, this.props.config);
-        if (!fs.existsSync(cachePath)) {
-          fs.mkdirSync(cachePath)
-        }
-        const maxSize = this.props.config.caching.maxSize;
-        const sourceCachePath = getCachePath(i.getAttribute("source"), this.props.config);
-        const filePath = sourceCachePath + getFileName(i.src);
-        const downloadImage = () => {
-          if (!fs.existsSync(filePath)) {
-            wretch(i.src)
-              .get()
-              .blob(blob => {
-                const reader = new FileReader();
-                reader.onload = function () {
-                  if (reader.readyState == 2) {
-                    const arrayBuffer = reader.result as ArrayBuffer;
-                    const buffer = Buffer.alloc(arrayBuffer.byteLength);
-                    const view = new Uint8Array(arrayBuffer);
-                    for (let i = 0; i < arrayBuffer.byteLength; ++i) {
-                      buffer[i] = view[i];
-                    }
-                    outputFile(filePath, buffer);
-                  }
-                };
-                reader.readAsArrayBuffer(blob);
-              });
-          }
-        };
-        if (maxSize == 0) {
-          downloadImage();
-        } else {
-          getFolderSize(cachePath, (err: string, size: number) => {
-            if (err) {
-              throw err;
-            }
-
-            const mbSize = (size / 1024 / 1024);
-            if (mbSize < maxSize) {
-              downloadImage();
-            }
-          });
-        }
-      }
-    }
-  }
-
   runFetchLoop(i: number) {
     if (!this._isMounted) return;
 
@@ -462,15 +411,43 @@ export default class ImagePlayer extends React.Component {
         video.setAttribute("index", urlIndex.toString());
         video.setAttribute("length", sourceLength.toString());
       }
+      let clipRegex = /(.*):::(\d+):(\d+)$/g.exec(url);
+      if (clipRegex != null) {
+        url = clipRegex[1];
+        video.setAttribute("start", clipRegex[2]);
+        video.setAttribute("end", clipRegex[3]);
+      }
 
       const successCallback = () => {
         if (!this._isMounted) return;
-        this.cache(video);
+        this.props.cache(video);
+
         if (this.props.scene.videoOption == VO.full) {
-          video.setAttribute("duration", (video.duration * 1000).toString());
+          let duration;
+          if (video.hasAttribute("start") && video.hasAttribute("end")) {
+            const start = parseInt(video.getAttribute("start"), 10);
+            const end = parseInt(video.getAttribute("end"), 10);
+            duration = end - start;
+          } else {
+            duration = video.duration;
+          }
+          video.setAttribute("duration", (duration * 1000).toString());
         } else if (this.props.scene.videoOption == VO.part) {
           video.setAttribute("duration", this.props.scene.videoTimingConstant.toString());
         }
+
+        if (video.hasAttribute("start") && video.hasAttribute("end")) {
+          const start = parseInt(video.getAttribute("start"), 10);
+          const end = parseInt(video.getAttribute("end"), 10);
+          if (this.props.scene.videoOption != VO.full && this.props.scene.randomVideoStart && (!this.props.scene.continueVideo || !video.currentTime)) {
+            video.currentTime = start + (Math.random() * (end - start));
+          }else if (video.currentTime < start || video.currentTime > end) {
+             video.currentTime = parseInt(video.getAttribute("start"), 10);
+          }
+        } else if (this.props.scene.videoOption != VO.full && this.props.scene.randomVideoStart && (!this.props.scene.continueVideo || !video.currentTime)) {
+          video.currentTime = Math.random() * video.duration;
+        }
+
         (video as any).key = this.state.nextImageID;
         this.setState({
           readyToDisplay: this.state.readyToDisplay.concat([video]),
@@ -488,9 +465,11 @@ export default class ImagePlayer extends React.Component {
       };
 
       if (this.props.scene.continueVideo) {
-        const indexOf = this.state.historyPaths.map((i) => i.src).indexOf(url);
-        if (indexOf >= 0) {
-          video = this.state.historyPaths[indexOf];
+        const videoFind = this.state.historyPaths.find((i) => i.src == url &&
+          i.getAttribute("start") == video.getAttribute("start") &&
+          i.getAttribute("end") == video.getAttribute("end"));
+        if (videoFind) {
+          video = (videoFind as HTMLVideoElement);
           successCallback();
           return;
         }
@@ -526,7 +505,7 @@ export default class ImagePlayer extends React.Component {
 
       const successCallback = () => {
         if (!this._isMounted) return;
-        this.cache(img);
+        this.props.cache(img);
         (img as any).key = this.state.nextImageID;
         this.setState({
           readyToDisplay: this.state.readyToDisplay.concat([img]),
@@ -624,7 +603,7 @@ export default class ImagePlayer extends React.Component {
     this._isLooping = true;
 
     let nextHistoryPaths = this.state.historyPaths;
-    let nextImg;
+    let nextImg: HTMLImageElement | HTMLVideoElement;
     if (this.props.scene.orderFunction == OF.strict) {
       this.state.readyToDisplay.sort((a, b) => {
         // JavaScript doesn't calculate negative modulos correctly, use this
@@ -644,11 +623,11 @@ export default class ImagePlayer extends React.Component {
       // If there is an image ready, display the next image
       nextImg = this.state.readyToDisplay.shift();
       if (this.props.scene.continueVideo && nextImg instanceof HTMLVideoElement) {
-        const indexOf = this.state.historyPaths.map((i) => i.src).indexOf(nextImg.src);
-        if (indexOf >= 0) {
-          if (nextImg != this.state.historyPaths[indexOf]) {
-            nextImg = this.state.historyPaths[indexOf];
-          }
+        const videoFind = this.state.historyPaths.find((i) => i.src == nextImg.src &&
+          i.getAttribute("start") == nextImg.getAttribute("start") &&
+          i.getAttribute("end") == nextImg.getAttribute("end"));
+        if (videoFind) {
+          nextImg = videoFind;
         }
       }
     } else if (this.state.historyPaths.length && this.props.config.defaultScene.orderFunction == OF.random && !this.props.scene.forceAll) {
@@ -662,9 +641,6 @@ export default class ImagePlayer extends React.Component {
     }
 
     if (nextImg) {
-      if (nextImg instanceof HTMLVideoElement && this.props.scene.videoOption != VO.full && this.props.scene.randomVideoStart && (!this.props.scene.continueVideo || !nextImg.currentTime)) {
-        nextImg.currentTime = Math.random() * nextImg.duration;
-      }
       nextHistoryPaths = nextHistoryPaths.concat([nextImg]);
     }
 

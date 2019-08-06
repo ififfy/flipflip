@@ -59,6 +59,7 @@ export default class Scene {
   videoTimingConstant = 3000;
   randomVideoStart = false;
   continueVideo = false;
+  playVideoClips = true;
   textKind: string = "";
   textSource: string = "";
   blinkColor = "#FFFFFF";

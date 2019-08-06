@@ -13,6 +13,7 @@ import SceneGenerator from "./library/SceneGenerator";
 import Player from './player/Player';
 import SceneDetail from './sceneDetail/SceneDetail';
 import FFAnalytics from "./ui/FFAnalytics";
+import VideoClipper from "./player/VideoClipper";
 
 const appStorage = new AppStorage(remote.getCurrentWindow().id);
 
@@ -83,6 +84,7 @@ export default class Meta extends React.Component {
             filters={this.state.libraryFilters}
             selected={this.state.librarySelected}
             onPlay={a(actions.playSceneFromLibrary)}
+            onClip={a(actions.clipVideo)}
             savePosition={a(actions.saveLibraryPosition)}
             onUpdateLibrary={a(actions.replaceLibrary)}
             goBack={a(actions.goBack)}
@@ -92,6 +94,16 @@ export default class Meta extends React.Component {
             onBackup={appStorage.backup.bind(appStorage)}
             onImportLibrary={a(actions.importLibrary)}
             onExportLibrary={a(actions.exportLibrary)}
+          />
+        )}
+
+        {this.isRoute('clip') && (
+          <VideoClipper
+            source={actions.getActiveSource(this.state)}
+            videoVolume={this.state.config.defaultScene.videoVolume}
+            onUpdateClips={a(actions.onUpdateClips)}
+            goBack={a(actions.goBack)}
+            cache={a(actions.cacheImage)}
           />
         )}
 
@@ -143,6 +155,7 @@ export default class Meta extends React.Component {
             goBack={a(actions.goBack)}
             goToTagSource={a(actions.playSceneFromLibrary)}
             getTags={actions.getTags.bind(this, this.state.library)}
+            cache={a(actions.cacheImage.bind(this))}
           />
         )}
 
@@ -158,6 +171,7 @@ export default class Meta extends React.Component {
             toggleTag={a(actions.toggleTag)}
             navigateTagging={a(actions.navigateDisplayedLibrary)}
             getTags={actions.getTags.bind(this, this.state.library)}
+            cache={a(actions.cacheImage)}
           />
         )}
 

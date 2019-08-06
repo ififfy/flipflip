@@ -5,15 +5,16 @@ import {SceneSettings} from "../../data/Config";
 import ControlGroup from "./ControlGroup";
 import VideoControl from "../player/VideoControl";
 import SimpleCheckbox from "../ui/SimpleCheckbox";
+import {VC} from "../../data/const";
 
 export default class VideoGroup extends React.Component {
   readonly props: {
     scene: Scene | SceneSettings,
+    mode: string,
     overlayScenes?: Array<Scene>,
     isPlaying?: boolean,
     mainVideo?: HTMLVideoElement,
     overlayVideos?: Array<HTMLVideoElement>,
-    isPlayer: boolean,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 
@@ -29,12 +30,16 @@ export default class VideoGroup extends React.Component {
             text={"Continue Videos From Last Timestamp"}
             isOn={this.props.scene.continueVideo}
             onChange={this.changeKey.bind(this, 'continueVideo', this.props.scene).bind(this)} />
-          {(this.props.mainVideo || !this.props.isPlayer) && (
+          <SimpleCheckbox
+            text={"Play Selected Clips"}
+            isOn={this.props.scene.playVideoClips}
+            onChange={this.changeKey.bind(this, 'playVideoClips', this.props.scene).bind(this)} />
+          {(this.props.mainVideo || this.props.mode == VC.sceneDetail) && (
             <React.Fragment>
               <h4>Scene Video</h4>
               <VideoControl
                 video={this.props.mainVideo}
-                showAll={this.props.isPlayer}
+                mode={this.props.mode}
                 volume={this.props.scene.videoVolume}
                 onChangeVolume={this.changeKey.bind(this, 'videoVolume', this.props.scene).bind(this)}/>
             </React.Fragment>
@@ -48,7 +53,7 @@ export default class VideoGroup extends React.Component {
                 <h4>{this.props.overlayScenes[indexOf].name} Video</h4>
                 <VideoControl
                   video={overlayVideo}
-                  showAll={this.props.isPlayer}
+                  mode={this.props.mode}
                   volume={this.props.overlayScenes[indexOf].videoVolume}
                   onChangeVolume={this.changeKey.bind(this, 'videoVolume', this.props.overlayScenes[indexOf]).bind(this)}/>
               </React.Fragment>

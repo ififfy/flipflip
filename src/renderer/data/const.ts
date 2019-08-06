@@ -116,6 +116,12 @@ const IPC = {
   startScene: 'ipc.startScene',
 };
 
+const VC = { // Video Control Modes
+  sceneDetail: 'vc.sd',
+  player: 'vc.p',
+  sceneClipper: 'vc.sc',
+};
+
 export {
-  TF, WF, OF, IF, GO, VO, HTF, VTF, TOT, BT, GT, TT, SF, ST, SL, AF, IPC
+  TF, WF, OF, IF, GO, VO, HTF, VTF, TOT, BT, GT, TT, SF, ST, SL, AF, IPC, VC
 };

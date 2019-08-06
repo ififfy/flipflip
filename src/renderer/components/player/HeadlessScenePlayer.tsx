@@ -53,8 +53,10 @@ function filterPathsToJustPlayable(imageTypeFilter: string, paths: Array<string>
 }
 
 // Determine what kind of source we have based on the URL and return associated Promise
-function getPromise(config: Config, url: string, filter: string, next: any): CancelablePromise {
+function getPromise(config: Config, source: any, filter: string, next: any): CancelablePromise {
   let promise;
+  // The LibrarySource is passed the first time, then just the url as a string
+  const url = source.url ? source.url : source;
   const sourceType = getSourceType(url);
 
   if (sourceType == ST.local) { // Local files
@@ -64,9 +66,9 @@ function getPromise(config: Config, url: string, filter: string, next: any): Can
   } else if (sourceType == ST.video) {
     const cachePath = getCachePath(url, config) + getFileName(url);
     if (fs.existsSync(cachePath)) {
-      promise = loadVideo(config, cachePath, filter, null);
+      promise = loadVideo(config, cachePath, filter, source.clips);
     } else {
-      promise = loadVideo(config, url, filter, null);
+      promise = loadVideo(config, url, filter, source.clips);
     }
   } else { // Paging sources
     let promiseFunction;
@@ -160,10 +162,18 @@ function loadLocalDirectory(config: Config, url: string, filter: string, next: a
   });
 }
 
-function loadVideo(config: Config, url: string, filter: string, next: any): CancelablePromise {
+function loadVideo(config: Config, url: string, filter: string, clips: any): CancelablePromise {
   return new CancelablePromise((resolve) => {
+    let path = filterPathsToJustPlayable(filter, [url], true).map((p) => p.startsWith("http") ? p : fileURL(p));
+    if (path.length > 0 && clips && clips.length > 0) {
+      const clipPaths = Array<string>();
+      for (let clip of clips) {
+        clipPaths.push(path[0] + ":::" + clip.start + ":" + clip.end);
+      }
+      path = clipPaths;
+    }
     resolve({
-      data: filterPathsToJustPlayable(filter, [url], true).map((p) => p.startsWith("http") ? p : fileURL(p)),
+      data: path,
       next: null,
     });
   });
@@ -976,6 +986,7 @@ export default class HeadlessScenePlayer extends React.Component {
     finishedLoading(empty: boolean): void,
     setProgress(total: number, current: number, message: string): void,
     setVideo(video: HTMLVideoElement): void,
+    cache(i: HTMLImageElement | HTMLVideoElement): void,
     setTimeToNextFrame?(timeToNextFrame: number): void,
   };
 
@@ -1017,6 +1028,7 @@ export default class HeadlessScenePlayer extends React.Component {
             allURLs={isEmpty(Array.from(this.state.allURLs.values())) ? null : this.state.allURLs}
             onLoaded={this.props.firstImageLoaded.bind(this)}
             setVideo={this.props.setVideo}
+            cache={this.props.cache}
             setTimeToNextFrame={this.props.setTimeToNextFrame}/>)}
       </div>
     );
@@ -1041,14 +1053,17 @@ export default class HeadlessScenePlayer extends React.Component {
     let sourceLoop = () => {
       if (this.state.promise.hasCanceled) return;
 
-      const d = this.props.scene.sources[n] != null ? this.props.scene.sources[n].url : "";
+      const d = JSON.parse(JSON.stringify(this.props.scene.sources[n]));
 
-      let message = d;
+      let message = d ? d.url : "";
       if (this.props.opacity != 1) {
         message = "<p>Loading Overlay...</p>" + message;
       }
       this.props.setProgress(this.props.scene.sources.length, n+1, message);
 
+      if (!this.props.scene.playVideoClips && d.clips) {
+        d.clips = [];
+      }
       const loadPromise = getPromise(this.props.config, d, this.props.scene.imageTypeFilter, -1);
       this.setState({promise: loadPromise});
 
@@ -1070,7 +1085,7 @@ export default class HeadlessScenePlayer extends React.Component {
 
             // If this is a remote URL, queue up the next promise
             if (object.next != null) {
-              newPromiseQueue.push({source: d, next: object.next});
+              newPromiseQueue.push({source: d.url, next: object.next});
             }
           }
 
@@ -1091,7 +1106,10 @@ export default class HeadlessScenePlayer extends React.Component {
     let nextSourceLoop = () => {
       if (this.state.nextPromise.hasCanceled) return;
 
-      const d = this.props.nextScene.sources[n] != null ? this.props.nextScene.sources[n].url : "";
+      const d = JSON.parse(JSON.stringify(this.props.nextScene.sources[n]));
+      if (!this.props.scene.playVideoClips && d.clips) {
+        d.clips = [];
+      }
       const loadPromise = getPromise(this.props.config, d, this.props.nextScene.imageTypeFilter, -1);
       this.setState({nextPromise: loadPromise});
 
@@ -1112,7 +1130,7 @@ export default class HeadlessScenePlayer extends React.Component {
 
             // If this is a remote URL, queue up the next promise
             if (object.next != null) {
-              this._nextPromiseQueue.push({source: d, next: object.next})
+              this._nextPromiseQueue.push({source: d.url, next: object.next})
             }
           }
 
