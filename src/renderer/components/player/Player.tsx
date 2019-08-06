@@ -240,54 +240,53 @@ export default class Player extends React.Component {
           <div className="BackButton u-button u-clickable" onClick={this.navigateBack.bind(this)}>Back</div>
         </div>
 
-        {this.state.hasStarted && (
-          <div className="SceneOptions ControlGroupGroup u-button-sidebar">
-            <h2 className="SceneOptionsHeader">Scene Options</h2>
-            <VideoGroup
-              scene={this.props.scene}
-              overlayScenes={this.getValidOverlays().map((o) => this.getScene(o.sceneID))}
-              isPlaying={this.state.isPlaying}
-              mainVideo={this.state.mainVideo}
-              overlayVideos={this.state.overlayVideos}
-              mode={VC.player}
-              onUpdateScene={this.props.onUpdateScene.bind(this)}
-            />
+        <div className="SceneOptions ControlGroupGroup u-button-sidebar"
+             style={{display: this.state.hasStarted ? "" : "none"}}>
+          <h2 className="SceneOptionsHeader">Scene Options</h2>
+          <VideoGroup
+            scene={this.props.scene}
+            overlayScenes={this.getValidOverlays().map((o) => this.getScene(o.sceneID))}
+            isPlaying={this.state.isPlaying}
+            mainVideo={this.state.mainVideo}
+            overlayVideos={this.state.overlayVideos}
+            mode={VC.player}
+            onUpdateScene={this.props.onUpdateScene.bind(this)}
+          />
 
-            <SceneEffectGroup
-              scene={this.props.scene}
-              showAll={this.props.tags == null}
-              allScenes={this.props.scenes}
-              onUpdateScene={this.props.onUpdateScene.bind(this)} />
+          <SceneEffectGroup
+            scene={this.props.scene}
+            showAll={this.props.tags == null}
+            allScenes={this.props.scenes}
+            onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
-            <ImageEffectGroup
-              scene={this.props.scene}
-              onUpdateScene={this.props.onUpdateScene.bind(this)} />
+          <ImageEffectGroup
+            scene={this.props.scene}
+            onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
-            <ZoomMoveGroup
-              scene={this.props.scene}
-              onUpdateScene={this.props.onUpdateScene.bind(this)} />
+          <ZoomMoveGroup
+            scene={this.props.scene}
+            onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
-            <StrobeGroup
-              scene={this.props.scene}
-              onUpdateScene={this.props.onUpdateScene.bind(this)} />
+          <StrobeGroup
+            scene={this.props.scene}
+            onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
-            <ImageGroup
-              scene={this.props.scene}
-              isPlayer={true}
-              onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+          <ImageGroup
+            scene={this.props.scene}
+            isPlayer={true}
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
-            <AudioGroup
-              scene={this.props.scene}
-              isPlaying={this.state.isPlaying}
-              isPlayer={true}
-              scenePaths={this.state.historyPaths}
-              onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+          <AudioGroup
+            scene={this.props.scene}
+            isPlaying={this.state.hasStarted && this.state.isPlaying}
+            isPlayer={true}
+            scenePaths={this.state.historyPaths}
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
-            <TextGroup
-              scene={this.props.scene}
-              onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-          </div>
-        )}
+          <TextGroup
+            scene={this.props.scene}
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+        </div>
 
         {this.state.hasStarted && this.props.allTags && (
           <div className="SourceTags">

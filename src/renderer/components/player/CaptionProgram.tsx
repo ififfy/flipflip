@@ -202,14 +202,16 @@ export default class CaptionProgram extends React.Component {
   }
 
   captionLoop() {
-    this.state.program[this.state.programCounter](() => {
-      let newCounter = this.state.programCounter + 1;
-      if (newCounter >= this.state.program.length) {
-        newCounter = 0;
-      }
-      this.setState({programCounter: newCounter});
-      this.captionLoop();
-    });
+    if (this.state.program[this.state.programCounter]) {
+      this.state.program[this.state.programCounter](() => {
+        let newCounter = this.state.programCounter + 1;
+        if (newCounter >= this.state.program.length) {
+          newCounter = 0;
+        }
+        this.setState({programCounter: newCounter});
+        this.captionLoop();
+      });
+    }
   }
 
   showText(value: string, ms: number) {
