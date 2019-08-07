@@ -454,6 +454,36 @@ export function replaceLibrary(state: State, library: Array<LibrarySource>): Obj
   return {library: library};
 }
 
+export function setCount(state: State, sourceURL: string, count: number, countComplete: boolean): Object {
+  const newLibrary = state.library;
+  const newScenes = state.scenes;
+  const source = newLibrary.find((s) => s.url == sourceURL);
+  if (source) {
+    if (source.count === undefined) source.count = 0;
+    if (source.countComplete === undefined) source.countComplete = false;
+    if (countComplete) {
+      source.count = count;
+      source.countComplete = true;
+    } else if (count > source.count) {
+      source.count = count;
+    }
+  }
+  for (let scene of newScenes) {
+    const sceneSource = scene.sources.find((s) => s.url == sourceURL);
+    if (sceneSource) {
+      if (sceneSource.count === undefined) sceneSource.count = 0;
+      if (sceneSource.countComplete === undefined) sceneSource.countComplete = false;
+      if (countComplete) {
+        sceneSource.count = count;
+        sceneSource.countComplete = true;
+      } else if (count > sceneSource.count) {
+        sceneSource.count = count;
+      }
+    }
+  }
+  return {library: newLibrary, scenes: newScenes};
+}
+
 export function updateTags(state: State, tags: Array<Tag>): Object {
   // Go through each scene in the library
   let newLibrary = state.library;

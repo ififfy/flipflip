@@ -45,6 +45,7 @@ export default class Player extends React.Component {
     scenes: Array<Scene>,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
     getTags(source: string): Array<Tag>,
+    setCount(sourceURL: string, count: number, countComplete: boolean): void,
     cache(i: HTMLImageElement | HTMLVideoElement): void,
     nextScene?(): void,
     tags?: Array<Tag>,
@@ -146,6 +147,7 @@ export default class Player extends React.Component {
             firstImageLoaded={this.setMainCanStart.bind(this)}
             setProgress={this.setProgress.bind(this)}
             setVideo={this.setMainVideo.bind(this)}
+            setCount={this.props.setCount.bind(this)}
             cache={this.props.cache.bind(this)}
             setTimeToNextFrame={this.setTimeToNextFrame.bind(this)}
           />
@@ -175,6 +177,7 @@ export default class Player extends React.Component {
                 firstImageLoaded={this.nop}
                 setProgress={showProgress ? this.setProgress.bind(this) : this.nop}
                 setVideo={this.setOverlayVideo.bind(this, index)}
+                setCount={this.props.setCount.bind(this)}
                 cache={this.props.cache.bind(this)}
               />
             );}

@@ -7,6 +7,7 @@ import wretch from "wretch";
 import {ST} from "./const";
 import en from "./en";
 import Config from "./Config";
+import LibrarySource from "../components/library/LibrarySource";
 
 export const saveDir = path.join(remote.app.getPath('appData'), 'flipflip');
 
@@ -379,23 +380,32 @@ export function isImage(path: string, strict: boolean): boolean {
 }
 
 // Inspired by https://reactjs.org/blog/2015/12/16/ismounted-antipattern.html
-// In order to assist with processing the next promise, this promise returns
-// a list of strings as well as a value used to build the next promise. This vlaue is
-// null if there is no follow-up promise.
-export class CancelablePromise extends Promise<{data: Array<string>, next: any}> {
+/**
+ * This object is a custom Promise wrapper which enables the ability to cancel the promise.
+ *
+ * In order to assist with processing the next promise, this promise returns a list of strings as well as a
+ * helper object used to build the next promise. This helper object can have the follow values:
+ *   * next - null or a value to use in the follow-up promise
+ *   * count - current count
+ */
+export class CancelablePromise extends Promise<{
+  data: Array<string>, helpers: {next: any, count: number}}> {
   hasCanceled: boolean;
-  source: string;
+  source: LibrarySource;
   timeout: number;
 
 
-  constructor(executor: (resolve: (value?: (PromiseLike<{data: Array<string>, next: any}> | {data: Array<string>, next: any})) => void, reject: (reason?: any) => void) => void) {
+  constructor(executor: (resolve: (value?: (
+    PromiseLike<{data: Array<string>, helpers: {next: any, count: number}}> |
+    {data: Array<string>, helpers: {next: any, count: number}}
+    )) => void, reject: (reason?: any) => void) => void) {
     super(executor);
     this.hasCanceled = false;
-    this.source = "";
+    this.source = null;
     this.timeout = 0;
   }
 
-  getPromise(): Promise<{data: Array<string>, next: any}> {
+  getPromise(): Promise<{data: Array<string>, helpers: {next: any, count: number}}> {
     return new Promise((resolve, reject) => {
       this.then(
         val => this.hasCanceled ? null : resolve(val),

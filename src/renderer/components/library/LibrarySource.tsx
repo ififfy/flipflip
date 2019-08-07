@@ -9,6 +9,8 @@ export default class LibrarySource {
   lastCheck: Date = null;
   tags: Array<Tag>;
   clips: Array<Clip> = [];
+  count: number = 0;
+  countComplete: boolean = false;
 
   constructor(init?: Partial<LibrarySource>) {
     Object.assign(this, init);

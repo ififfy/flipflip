@@ -26,6 +26,7 @@ import Config from "../../data/Config";
 import Scene from '../../data/Scene';
 import ChildCallbackHack from './ChildCallbackHack';
 import ImagePlayer from './ImagePlayer';
+import LibrarySource from "../library/LibrarySource";
 
 let redditAlerted = false;
 let tumblrAlerted = false;
@@ -53,22 +54,26 @@ function filterPathsToJustPlayable(imageTypeFilter: string, paths: Array<string>
 }
 
 // Determine what kind of source we have based on the URL and return associated Promise
-function getPromise(config: Config, source: any, filter: string, next: any): CancelablePromise {
+function getPromise(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   let promise;
-  // The LibrarySource is passed the first time, then just the url as a string
-  const url = source.url ? source.url : source;
-  const sourceType = getSourceType(url);
+  const sourceType = getSourceType(source.url);
 
   if (sourceType == ST.local) { // Local files
-    promise = loadLocalDirectory(config, url, filter, null);
+    helpers.next = null;
+    promise = loadLocalDirectory(config, source, filter, helpers);
   } else if (sourceType == ST.list) { // Image List
-    promise = loadRemoteImageURLList(config, url, filter, null);
+    helpers.next = null;
+    promise = loadRemoteImageURLList(config, source, filter, helpers);
   } else if (sourceType == ST.video) {
-    const cachePath = getCachePath(url, config) + getFileName(url);
+    helpers.next = null;
+    const cachePath = getCachePath(source.url, config) + getFileName(source.url);
     if (fs.existsSync(cachePath)) {
-      promise = loadVideo(config, cachePath, filter, source.clips);
+      const realURL = source.url;
+      source.url = cachePath;
+      promise = loadVideo(config, source, filter, helpers);
+      source.url = realURL;
     } else {
-      promise = loadVideo(config, url, filter, source.clips);
+      promise = loadVideo(config, source, filter, helpers);
     }
   } else { // Paging sources
     let promiseFunction;
@@ -110,26 +115,31 @@ function getPromise(config: Config, source: any, filter: string, next: any): Can
       promiseFunction = loadEHentai;
       timeout = 8000;
     }
-    if (next == -1) {
-      const cachePath = getCachePath(url, config);
+    if (helpers.next == -1) {
+      helpers.next = 0;
+      const cachePath = getCachePath(source.url, config);
       if (fs.existsSync(cachePath) && config.caching.enabled) {
         // If the cache directory exists, use it
-        promise = loadLocalDirectory(config, cachePath, filter, 0);
+        const realURL = source.url;
+        source.url = cachePath;
+        promise = loadLocalDirectory(config, source, filter, helpers);
+        source.url = realURL;
         timeout = 0;
       } else {
-        promise = promiseFunction(config, url, filter, 0);
+        promise = promiseFunction(config, source, filter, helpers);
       }
     } else {
-      promise = promiseFunction(config, url, filter, next);
+      promise = promiseFunction(config, source, filter, helpers);
     }
     promise.timeout = timeout;
   }
-  promise.source = url;
+  promise.source = source;
   return promise;
 }
 
-function loadLocalDirectory(config: Config, url: string, filter: string, next: any): CancelablePromise {
+function loadLocalDirectory(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   const blacklist = ['*.css', '*.html', 'avatar.png'];
+  const url = source.url;
 
   return new CancelablePromise((resolve) => {
     recursiveReaddir(url, blacklist, (err: any, rawFiles: Array<string>) => {
@@ -137,6 +147,10 @@ function loadLocalDirectory(config: Config, url: string, filter: string, next: a
         console.warn(err);
         resolve(null);
       } else {
+        // If this is a local source (not a cacheDir call)
+        if (helpers.next == null) {
+          helpers.count = filterPathsToJustPlayable(IF.any, rawFiles, true).length;
+        }
         resolve({
           data: filterPathsToJustPlayable(filter, rawFiles, true).map((p) => fileURL(p)).sort((a, b) => {
             let aFile: any = getFileName(a, false);
@@ -155,31 +169,36 @@ function loadLocalDirectory(config: Config, url: string, filter: string, next: a
               return 0;
             }
           }),
-          next: next
+          helpers: helpers,
         });
       }
     });
   });
 }
 
-function loadVideo(config: Config, url: string, filter: string, clips: any): CancelablePromise {
+function loadVideo(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+  const url = source.url;
   return new CancelablePromise((resolve) => {
     let path = filterPathsToJustPlayable(filter, [url], true).map((p) => p.startsWith("http") ? p : fileURL(p));
-    if (path.length > 0 && clips && clips.length > 0) {
-      const clipPaths = Array<string>();
-      for (let clip of clips) {
-        clipPaths.push(path[0] + ":::" + clip.start + ":" + clip.end);
+    if (path.length > 0) {
+      helpers.count = 1;
+      if (source.clips && source.clips.length > 0) {
+        const clipPaths = Array<string>();
+        for (let clip of source.clips) {
+          clipPaths.push(path[0] + ":::" + clip.start + ":" + clip.end);
+        }
+        path = clipPaths;
       }
-      path = clipPaths;
     }
     resolve({
       data: path,
-      next: null,
+      helpers: helpers,
     });
   });
 }
 
-function loadRemoteImageURLList(config: Config, url: string, filter: string, next: any): CancelablePromise {
+function loadRemoteImageURLList(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+  const url = source.url;
   return new CancelablePromise((resolve) => {
     wretch(url)
       .get()
@@ -193,9 +212,10 @@ function loadRemoteImageURLList(config: Config, url: string, filter: string, nex
               convertedSource = convertedSource.concat(urls);
               convertedCount++;
               if (convertedCount == lines.length) {
+                helpers.count = filterPathsToJustPlayable(IF.any, convertedSource, true).length;
                 resolve({
                   data: filterPathsToJustPlayable(filter, convertedSource, true),
-                  next: null
+                  helpers: helpers,
                 });
               }
             });
@@ -213,9 +233,10 @@ function loadRemoteImageURLList(config: Config, url: string, filter: string, nex
   });
 }
 
-function loadTumblr(config: Config, url: string, filter: string, next: any): CancelablePromise {
+function loadTumblr(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   let configured = config.remoteSettings.tumblrOAuthToken != "" && config.remoteSettings.tumblrOAuthTokenSecret != "";
   if (configured) {
+    const url = source.url;
     return new CancelablePromise((resolve) => {
       const client = tumblr.createClient({
         consumer_key: config.remoteSettings.tumblrKey,
@@ -226,11 +247,11 @@ function loadTumblr(config: Config, url: string, filter: string, next: any): Can
       // TumblrID takes the form of <blog_name>.tumblr.com
       let tumblrID = url.replace(/https?:\/\//, "");
       tumblrID = tumblrID.replace("/", "");
-      client.blogPosts(tumblrID, {offset: next*20}, (err, data) => {
+      client.blogPosts(tumblrID, {offset: helpers.next*20}, (err, data) => {
         if (err) {
-          console.error("Error retriving " + tumblrID + (next == 0 ? "" : "(Page " + next + " )"));
+          console.error("Error retriving " + tumblrID + (helpers.next == 0 ? "" : "(Page " + helpers.next + " )"));
           console.error(err);
-          if (err.message.includes("429 Limit Exceeded") && !tumblr429Alerted && next == 0) {
+          if (err.message.includes("429 Limit Exceeded") && !tumblr429Alerted && helpers.next == 0) {
             alert("Tumblr has temporarily throttled your FlipFlip due to high traffic. Try again in a few minutes or visit Preferences to try a different Tumblr API key.");
             tumblr429Alerted = true;
           }
@@ -240,7 +261,8 @@ function loadTumblr(config: Config, url: string, filter: string, next: any): Can
 
         // End loop if we're at end of posts
         if (data.posts.length == 0) {
-          resolve(null);
+          helpers.next = null;
+          resolve({data: [], helpers: helpers});
           return;
         }
 
@@ -285,15 +307,18 @@ function loadTumblr(config: Config, url: string, filter: string, next: any): Can
               convertedSource = convertedSource.concat(urls);
               convertedCount++;
               if (convertedCount == images.length) {
+                helpers.next = helpers.next + 1;
+                helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedSource, true).length;
                 resolve({
                   data: filterPathsToJustPlayable(filter, convertedSource, true),
-                  next: (next as number) + 1
+                  helpers: helpers,
                 });
               }
             });
           }
         } else {
-          resolve(null);
+          helpers.next = null;
+          resolve({data: [], helpers: helpers});
         }
       });
     });
@@ -308,44 +333,20 @@ function loadTumblr(config: Config, url: string, filter: string, next: any): Can
   }
 }
 
-function loadReddit(config: Config, url: string, filter: string, next: any): CancelablePromise {
+function loadReddit(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   let configured = config.remoteSettings.redditRefreshToken != "";
   if (configured) {
-      return new CancelablePromise((resolve) => {
-        const reddit = new Snoowrap({
-          userAgent: config.remoteSettings.redditUserAgent,
-          clientId: config.remoteSettings.redditClientID,
-          clientSecret: "",
-          refreshToken: config.remoteSettings.redditRefreshToken,
-        });
-        if (url.includes("/r/")) {
-          reddit.getSubreddit(getFileGroup(url)).getHot({after: next})
-            .then((submissionListing: any) => {
-              if (submissionListing.length > 0) {
-                let convertedListing = Array<string>();
-                let convertedCount = 0;
-                for (let s of submissionListing) {
-                  convertURL(s.url).then((urls: Array<string>) => {
-                    convertedListing = convertedListing.concat(urls);
-                    convertedCount++;
-                    if (convertedCount == submissionListing.length) {
-                      resolve({
-                        data: filterPathsToJustPlayable(filter, convertedListing, true),
-                        next: submissionListing[submissionListing.length - 1].name
-                      });
-                    }
-                  });
-                }
-              } else {
-                resolve(null);
-              }
-            })
-            .catch((error: any) => {
-              resolve(null);
-            });
-        } else if (url.includes("/user/") || url.includes("/u/")) {
-          reddit.getUser(getFileGroup(url)).getSubmissions({after: next})
-            .then((submissionListing: any) => {
+    const url = source.url;
+    return new CancelablePromise((resolve) => {
+      const reddit = new Snoowrap({
+        userAgent: config.remoteSettings.redditUserAgent,
+        clientId: config.remoteSettings.redditClientID,
+        clientSecret: "",
+        refreshToken: config.remoteSettings.redditRefreshToken,
+      });
+      if (url.includes("/r/")) {
+        reddit.getSubreddit(getFileGroup(url)).getHot({after: helpers.next})
+          .then((submissionListing: any) => {
             if (submissionListing.length > 0) {
               let convertedListing = Array<string>();
               let convertedCount = 0;
@@ -354,25 +355,52 @@ function loadReddit(config: Config, url: string, filter: string, next: any): Can
                   convertedListing = convertedListing.concat(urls);
                   convertedCount++;
                   if (convertedCount == submissionListing.length) {
+                    helpers.next = submissionListing[submissionListing.length - 1].name;
+                    helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
                     resolve({
                       data: filterPathsToJustPlayable(filter, convertedListing, true),
-                      next: submissionListing[submissionListing.length - 1].name
+                      helpers: helpers,
                     });
                   }
                 });
               }
             } else {
-              resolve(null);
+              helpers.next = null;
+              resolve({data: [], helpers: helpers});
             }
-          }).catch((err: any) => {
-            // If user is not authenticated for users, prompt to re-authenticate
-            if (err.statusCode == 403) {
-              alert("You have not authorized FlipFlip to work with Reddit users submissions. Visit Preferences and authorize FlipFlip to work with Reddit. Try clearing and re-authorizing FlipFlip with Reddit.");
-            }
+          })
+          .catch((error: any) => {
             resolve(null);
           });
-        }
-      });
+      } else if (url.includes("/user/") || url.includes("/u/")) {
+        reddit.getUser(getFileGroup(url)).getSubmissions({after: helpers.next})
+          .then((submissionListing: any) => {
+          if (submissionListing.length > 0) {
+            let convertedListing = Array<string>();
+            let convertedCount = 0;
+            for (let s of submissionListing) {
+              convertURL(s.url).then((urls: Array<string>) => {
+                convertedListing = convertedListing.concat(urls);
+                convertedCount++;
+                if (convertedCount == submissionListing.length) {
+                  helpers.next = submissionListing[submissionListing.length - 1].name;
+                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
+                  resolve({
+                    data: filterPathsToJustPlayable(filter, convertedListing, true),
+                    helpers: helpers,
+                  });
+                }
+              });
+            }
+          } else {
+            helpers.next = null;
+            resolve({data: [], helpers: helpers});
+          }
+        }).catch((err: any) => {
+          resolve(null);
+        });
+      }
+    });
   } else {
     if (!redditAlerted) {
       alert("You haven't authorized FlipFlip to work with Reddit yet.\nVisit Preferences and click 'Authorzie FlipFlip on Reddit'.");
@@ -384,10 +412,11 @@ function loadReddit(config: Config, url: string, filter: string, next: any): Can
   }
 }
 
-function loadImageFap(config: Config, url: string, filter: string, next: any): CancelablePromise {
-  if (next == 0) {
-    next = [0, 0];
+function loadImageFap(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+  if (helpers.next == 0) {
+    helpers.next = [0, 0];
   }
+  const url = source.url;
   return new CancelablePromise((resolve) => {
     if (url.includes("/pictures/")) {
       wretch("http://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2")
@@ -409,28 +438,32 @@ function loadImageFap(config: Config, url: string, filter: string, next: any): C
                     images.push(contentURL[1]);
                   }
                   if (imageCount == imageEls.length) {
+                    helpers.next = null;
+                    helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
                     resolve({
                       data: filterPathsToJustPlayable(filter, images, true),
-                      next: null
+                      helpers: helpers,
                     });
                   }
                 })
             }
           } else {
-            resolve(null);
+            helpers.next = null;
+            resolve({data: [], helpers: helpers});
           }
         });
     } else if (url.includes("/organizer/")) {
-      wretch(url + "?page=" + next[0])
+      wretch(url + "?page=" + helpers.next[0])
         .get()
         .setTimeout(5000)
         .onAbort((e) => resolve(null))
         .text((html) => {
           let albumEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll("td.blk_galleries > font > a.blk_galleries");
           if (albumEls.length == 0) {
-            resolve(null);
-          } else if (albumEls.length > next[1]) {
-            let albumEl = albumEls[next[1]];
+            helpers.next = null;
+            resolve({data: [], helpers: helpers});
+          } else if (albumEls.length > helpers.next[1]) {
+            let albumEl = albumEls[helpers.next[1]];
             let albumID = albumEl.getAttribute("href").substring(albumEl.getAttribute("href").lastIndexOf("/") + 1);
             wretch("http://www.imagefap.com/gallery/" + albumID + "?view=2")
               .get()
@@ -449,28 +482,29 @@ function loadImageFap(config: Config, url: string, filter: string, next: any): C
                           images.push(contentURL[1]);
                         }
                         if (imageCount == imageEls.length) {
-                          next[1] += 1;
+                          helpers.next[1] += 1;
+                          helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
                           resolve({
                             data: filterPathsToJustPlayable(filter, images, true),
-                            next: next
+                            helpers: helpers,
                           })
                         }
                       });
                   }
                 } else {
-                  next[1] += 1;
+                  helpers.next[1] += 1;
                   resolve({
                     data: [],
-                    next: next
+                    helpers: helpers,
                   })
                 }
               });
           } else {
-            next[0] += 1;
-            next[1] = 0;
+            helpers.next[0] += 1;
+            helpers.next[1] = 0;
             resolve({
               data: [],
-              next: next
+              helpers: helpers,
             })
           }
         });
@@ -482,7 +516,8 @@ function loadImageFap(config: Config, url: string, filter: string, next: any): C
         .text((html) => {
           let videoEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll(".video-js");
           if (videoEls.length == 0) {
-            resolve(null);
+            helpers.next = null;
+            resolve({data: [], helpers: helpers});
           } else {
             let videoURLs = Array<string>();
             for (let el of videoEls) {
@@ -498,9 +533,11 @@ function loadImageFap(config: Config, url: string, filter: string, next: any): C
                 videoURLs.push(videoURL.split("?")[0]);
               }
             }
+            helpers.next = null;
+            helpers.count = helpers.count + videoURLs.length;
             resolve({
               data: videoURLs,
-              next: null
+              helpers: helpers,
             })
           }
         });
@@ -508,13 +545,14 @@ function loadImageFap(config: Config, url: string, filter: string, next: any): C
   });
 }
 
-function loadSexCom(config: Config, url: string, filter: string, next: any): CancelablePromise {
+function loadSexCom(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+  const url = source.url;
   return new CancelablePromise((resolve) => {
     let requestURL;
     if (url.includes("/user/")) {
-      requestURL = "http://www.sex.com/user/" + getFileGroup(url) + "?page=" + (next + 1);
+      requestURL = "http://www.sex.com/user/" + getFileGroup(url) + "?page=" + (helpers.next + 1);
     } else if (url.includes("/gifs/") || url.includes("/pics/") || url.includes("/videos/")) {
-      requestURL = "http://www.sex.com/" + getFileGroup(url) + "?page=" + (next + 1);
+      requestURL = "http://www.sex.com/" + getFileGroup(url) + "?page=" + (helpers.next + 1);
     }
     wretch(requestURL)
       .get()
@@ -534,9 +572,11 @@ function loadSexCom(config: Config, url: string, filter: string, next: any): Can
             }
           }
           if (videos.length == 0) {
+            helpers.next = helpers.next + 1;
+            helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
             resolve({
               data: filterPathsToJustPlayable(filter, images, true),
-              next: next + 1
+              helpers: helpers,
             })
           } else {
             let count = 0;
@@ -544,14 +584,8 @@ function loadSexCom(config: Config, url: string, filter: string, next: any): Can
               wretch("http://www.sex.com" + videoURL)
                 .get()
                 .setTimeout(5000)
-                .onAbort((e) => resolve({
-                  data: filterPathsToJustPlayable(filter, images, true),
-                  next: next + 1,
-                }))
-                .notFound((e) => resolve({
-                  data: filterPathsToJustPlayable(filter, images, true),
-                  next: next + 1,
-                }))
+                .onAbort((e) => resolve(null))
+                .notFound((e) => resolve(null))
                 .text((html) => {
                   count += 1;
 
@@ -573,28 +607,35 @@ function loadSexCom(config: Config, url: string, filter: string, next: any): Can
                     images.push("https://videos1.sex.com/stream/" + date + "/" + vidID +".mp4");
                   }
                   if (count == videos.length) {
+                    helpers.next = helpers.next + 1;
+                    helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
                     resolve({
                       data: filterPathsToJustPlayable(filter, images, true),
-                      next: next + 1
+                      helpers: helpers,
                     })
                   }
                 });
             }
           }
         } else {
-          resolve(null);
+          helpers.next = null;
+          resolve({data: [], helpers: helpers});
         }
       });
   });
 }
 
-function loadImgur(config: Config, url: string, filter: string, next: any): CancelablePromise {
+function loadImgur(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+  const url = source.url;
   return new CancelablePromise((resolve) => {
     imgur.getAlbumInfo(getFileGroup(url))
       .then((json: any) => {
+        const images = json.data.images.map((i: any) => i.link);
+        helpers.next = null;
+        helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
         resolve({
-          data: filterPathsToJustPlayable(filter, json.data.images.map((i: any) => i.link), true),
-          next: null
+          data: filterPathsToJustPlayable(filter, images, true),
+          helpers: helpers,
         })
       })
       .catch((err: any) => {
@@ -604,9 +645,10 @@ function loadImgur(config: Config, url: string, filter: string, next: any): Canc
   });
 }
 
-function loadTwitter(config: Config, url: string, filter: string, next: any): CancelablePromise {
+function loadTwitter(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   let configured = config.remoteSettings.twitterAccessTokenKey != "" && config.remoteSettings.twitterAccessTokenSecret != "";
   if (configured) {
+    const url = source.url;
     return new CancelablePromise((resolve) => {
       const twitter = new Twitter({
         consumer_key: config.remoteSettings.twitterConsumerKey,
@@ -615,7 +657,7 @@ function loadTwitter(config: Config, url: string, filter: string, next: any): Ca
         access_token_secret: config.remoteSettings.twitterAccessTokenSecret,
       });
       twitter.get('statuses/user_timeline',
-        next == 0 ? {screen_name: getFileGroup(url), count: 200} : {screen_name: getFileGroup(url), count: 200, max_id: next},
+        helpers.next == 0 ? {screen_name: getFileGroup(url), count: 200} : {screen_name: getFileGroup(url), count: 200, max_id: helpers.next},
         (error: any, tweets: any) => {
         if (error) {
           resolve(null);
@@ -639,10 +681,13 @@ function loadTwitter(config: Config, url: string, filter: string, next: any): Ca
           }
           lastID = t.id;
         }
-        if (lastID == next) {
-          resolve(null);
+        if (lastID == helpers.next) {
+          helpers.next = null;
+          resolve({data: [], helpers: helpers});
         } else {
-          resolve({data: images, next: lastID});
+          helpers.next = lastID;
+          helpers.count = helpers.count + images.length;
+          resolve({data: images, helpers: helpers});
         }
       })
     });
@@ -657,9 +702,10 @@ function loadTwitter(config: Config, url: string, filter: string, next: any): Ca
   }
 }
 
-function loadDeviantArt(config: Config, url: string, filter: string, next: any): CancelablePromise {
+function loadDeviantArt(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+  const url = source.url;
   return new CancelablePromise((resolve) => {
-    wretch("http://backend.deviantart.com/rss.xml?type=deviation&q=by%3A" + getFileGroup(url) + "+sort%3Atime+meta%3Aall" + (next != 0 ? "&offset=" + next : ""))
+    wretch("http://backend.deviantart.com/rss.xml?type=deviation&q=by%3A" + getFileGroup(url) + "+sort%3Atime+meta%3Aall" + (helpers.next != 0 ? "&offset=" + helpers.next : ""))
       .get()
       .setTimeout(5000)
       .onAbort((e) => resolve(null))
@@ -672,27 +718,31 @@ function loadDeviantArt(config: Config, url: string, filter: string, next: any):
         }
         let images = Array<string>();
         for (let item of xml.getElementsByTagName("item")) {
-          next+=1;
+          helpers.next+=1;
           for (let content of item.getElementsByTagName("media:content")) {
             if (content.getAttribute("medium") == "image") {
               images.push(content.getAttribute("url"));
             }
           }
         }
+        if (!hasNextPage) {
+          helpers.next = null;
+        }
+        helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
         resolve({
           data: filterPathsToJustPlayable(filter, images, true),
-          next: hasNextPage ? next : null
+          helpers: helpers,
         });
       });
   });
 }
-
 let ig: IgApiClient = null;
 let session: any = null;
-function loadInstagram(config: Config, url: string, filter: string, next: any): CancelablePromise {
+function loadInstagram(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   const configured = config.remoteSettings.instagramUsername != "" && config.remoteSettings.instagramPassword != "";
   if (configured) {
-    const processItems = (items: any, resolve: any, next: any) => {
+    const url = source.url;
+    const processItems = (items: any, resolve: any, helpers: {next: any, count: number}) => {
       let images = Array<string>();
       for (let item of items) {
         if (item.carousel_media) {
@@ -707,9 +757,10 @@ function loadInstagram(config: Config, url: string, filter: string, next: any): 
         }
       }
       // Strict filter won't work because instagram media needs the extra parameters on the end
+      helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
       resolve({
         data: filterPathsToJustPlayable(filter, images, false),
-        next: next
+        helpers: helpers,
       });
     };
 
@@ -723,7 +774,8 @@ function loadInstagram(config: Config, url: string, filter: string, next: any): 
             ig.user.getIdByUsername(getFileGroup(url)).then((id) => {
               const userFeed = ig.feed.user(id);
               userFeed.items().then((items) => {
-                processItems(items, resolve, id + "~" + userFeed.serialize());
+                helpers.next = [id, userFeed.serialize()];
+                processItems(items, resolve, helpers);
               }).catch((e) => {console.error(e);resolve(null)});
             }).catch((e) => {console.error(e);resolve(null)});
           }).catch((e) => {console.error(e);resolve(null)});
@@ -734,28 +786,31 @@ function loadInstagram(config: Config, url: string, filter: string, next: any): 
           resolve(null)
         });
       });
-    } else if (next == 0) {
+    } else if (helpers.next == 0) {
       return new CancelablePromise((resolve) => {
         ig.user.getIdByUsername(getFileGroup(url)).then((id) => {
           const userFeed = ig.feed.user(id);
           userFeed.items().then((items) => {
-            processItems(items, resolve, id + "~" + userFeed.serialize());
+            helpers.next = [id, userFeed.serialize()];
+            processItems(items, resolve, helpers);
           }).catch((e) => {console.error(e);resolve(null)});
         }).catch((e) => {console.error(e);resolve(null)});
       });
     } else {
       return new CancelablePromise((resolve) => {
         ig.state.deserializeCookieJar(JSON.parse(session)).then((data) => {
-          const id = (next as string).split("~")[0];
-          const feedSession = (next as string).split("~")[1];
+          const id = helpers.next[0];
+          const feedSession = helpers.next[1];
           const userFeed = ig.feed.user(id);
           userFeed.deserialize(feedSession);
           if (!userFeed.isMoreAvailable()) {
-            resolve(null);
+            helpers.next = null;
+            resolve({data: [], helpers: helpers});
             return;
           }
           userFeed.items().then((items) => {
-            processItems(items, resolve, id + "~" + userFeed.serialize());
+            helpers.next = [id, userFeed.serialize()];
+            processItems(items, resolve, helpers);
           }).catch((e) => {console.error(e);resolve(null)});
         }).catch((e) => {console.error(e);resolve(null)});
       });
@@ -771,14 +826,15 @@ function loadInstagram(config: Config, url: string, filter: string, next: any): 
   }
 }
 
-function loadDanbooru(config: Config, url: string, filter: string, next: any): CancelablePromise {
+function loadDanbooru(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+  const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
   const thisHost = hostRegex.exec(url)[1];
   let suffix = "";
   if (url.includes("/pool/")) {
-    suffix = "/pool/show.json?page=" + (next + 1) + "&id=" + url.substring(url.lastIndexOf("/") + 1);
+    suffix = "/pool/show.json?page=" + (helpers.next + 1) + "&id=" + url.substring(url.lastIndexOf("/") + 1);
   } else {
-    suffix = "/post/index.json?limit=20&page=" + (next + 1);
+    suffix = "/post/index.json?limit=20&page=" + (helpers.next + 1);
     const tagRegex = /[?&]tags=(.*)&?/g;
     let tags;
     if ((tags = tagRegex.exec(url)) !== null) {
@@ -806,7 +862,8 @@ function loadDanbooru(config: Config, url: string, filter: string, next: any): C
       .onAbort((e) => resolve(null))
       .json((json: any) => {
         if (json.length == 0) {
-          resolve(null);
+          helpers.next = null;
+          resolve({data: [], helpers: helpers});
         }
 
         let list;
@@ -827,19 +884,22 @@ function loadDanbooru(config: Config, url: string, filter: string, next: any): C
           }
         }
 
+        helpers.next = url.includes("/pool/") ? null : helpers.next + 1;
+        helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
         resolve({
           data: filterPathsToJustPlayable(filter, images, true),
-          next: url.includes("/pool/") ? null : next + 1
+          helpers: helpers,
         });
       });
   });
 }
 
-function loadGelbooru1(config: Config, url: string, filter: string, next: any): CancelablePromise {
+function loadGelbooru1(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+  const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
   const thisHost = hostRegex.exec(url)[1];
   return new CancelablePromise((resolve) => {
-    wretch(url + "&pid=" + (next * 10))
+    wretch(url + "&pid=" + (helpers.next * 10))
       .get()
       .setTimeout(5000)
       .onAbort((e) => resolve(null))
@@ -869,10 +929,12 @@ function loadGelbooru1(config: Config, url: string, filter: string, next: any): 
                   images.push(contentURL[1]);
                 }
                 if (imageCount == imageEls.length || imageCount == 10) {
+                  helpers.next = helpers.next + 1;
+                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
                   resolve({
                     data: filterPathsToJustPlayable(filter, images, true),
-                    next: next + 1
-                  })
+                    helpers: helpers,
+                  });
                 }
               });
 
@@ -883,16 +945,18 @@ function loadGelbooru1(config: Config, url: string, filter: string, next: any): 
 
           setTimeout(getImage.bind(null, 0), 1000);
         } else {
-          resolve(null);
+          helpers.next = null;
+          resolve({data: [], helpers: helpers});
         }
       });
   });
 }
 
-function loadGelbooru2(config: Config, url: string, filter: string, next: any): CancelablePromise {
+function loadGelbooru2(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+  const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
   const thisHost = hostRegex.exec(url)[1];
-  let suffix = "/index.php?page=dapi&s=post&q=index&limit=20&json=1&pid=" + (next + 1);
+  let suffix = "/index.php?page=dapi&s=post&q=index&limit=20&json=1&pid=" + (helpers.next + 1);
   const tagRegex = /[?&]tags=(.*)&?/g;
   let tags;
   if ((tags = tagRegex.exec(url)) !== null) {
@@ -909,7 +973,8 @@ function loadGelbooru2(config: Config, url: string, filter: string, next: any): 
       .onAbort((e) => resolve(null))
       .json((json: any) => {
         if (json.length == 0) {
-          resolve(null);
+          helpers.next = null;
+          resolve({data: [], helpers: helpers});
         }
 
         const images = Array<string>();
@@ -921,17 +986,20 @@ function loadGelbooru2(config: Config, url: string, filter: string, next: any): 
           }
         }
 
+        helpers.next = helpers.next + 1;
+        helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
         resolve({
           data: filterPathsToJustPlayable(filter, images, true),
-          next: next + 1
+          helpers: helpers,
         });
       });
   });
 }
 
-function loadEHentai(config: Config, url: string, filter: string, next: any): CancelablePromise {
+function loadEHentai(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+  const url = source.url;
   return new CancelablePromise((resolve) => {
-    wretch(url + "?p=" + (next + 1))
+    wretch(url + "?p=" + (helpers.next + 1))
       .get()
       .setTimeout(5000)
       .onAbort((e) => resolve(null))
@@ -954,15 +1022,18 @@ function loadEHentai(config: Config, url: string, filter: string, next: any): Ca
                   images.push(contentURL[1]);
                 }
                 if (imageCount == imageEls.length) {
+                  helpers.next = helpers.next + 1;
+                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
                   resolve({
                     data: filterPathsToJustPlayable(filter, images, true),
-                    next: next + 1
+                    helpers: helpers,
                   })
                 }
               })
           }
         } else {
-          resolve(null);
+          helpers.next = null;
+          resolve({data: [], helpers: helpers});
         }
       });
   });
@@ -986,12 +1057,13 @@ export default class HeadlessScenePlayer extends React.Component {
     finishedLoading(empty: boolean): void,
     setProgress(total: number, current: number, message: string): void,
     setVideo(video: HTMLVideoElement): void,
+    setCount(sourceURL: string, count: number, countComplete: boolean): void,
     cache(i: HTMLImageElement | HTMLVideoElement): void,
     setTimeToNextFrame?(timeToNextFrame: number): void,
   };
 
   readonly state = {
-    promiseQueue: Array<{source: string, next: any}>(),
+    promiseQueue: Array<{source: LibrarySource, helpers: {next: any, count: number}}>(),
     promise: new CancelablePromise((resolve, reject) => {}),
     nextPromise: new CancelablePromise((resolve, reject) => {}),
     allURLs: new Map<string, Array<string>>(),
@@ -1000,7 +1072,7 @@ export default class HeadlessScenePlayer extends React.Component {
     videoVolume: this.props.scene.videoVolume,
   };
 
-  _nextPromiseQueue: Array<{source: string, next: any}> = null;
+  _nextPromiseQueue: Array<{source: LibrarySource, helpers: {next: any, count: number}}> = null;
   _nextAllURLs: Map<string, Array<string>> = null;
 
   render() {
@@ -1041,7 +1113,7 @@ export default class HeadlessScenePlayer extends React.Component {
       tumblr429Alerted = false;
       instagramAlerted = false;
       twitterAlerted = false;
-      this._nextPromiseQueue = new Array<{ source: string, next: any }>();
+      this._nextPromiseQueue = new Array<{ source: LibrarySource, helpers: {next: any, count: number} }>();
       this._nextAllURLs = new Map<string, Array<string>>();
     }
     let n = 0;
@@ -1064,7 +1136,7 @@ export default class HeadlessScenePlayer extends React.Component {
       if (!this.props.scene.playVideoClips && d.clips) {
         d.clips = [];
       }
-      const loadPromise = getPromise(this.props.config, d, this.props.scene.imageTypeFilter, -1);
+      const loadPromise = getPromise(this.props.config, d, this.props.scene.imageTypeFilter, {next: -1, count: 0});
       this.setState({promise: loadPromise});
 
       loadPromise
@@ -1076,17 +1148,18 @@ export default class HeadlessScenePlayer extends React.Component {
           // Just add the new urls to the end of the list
           if (object != null) {
             if (this.props.scene.weightFunction == WF.sources) {
-              newAllURLs.set(loadPromise.source, object.data);
+              newAllURLs.set(loadPromise.source.url, object.data);
             } else {
               for (let d of object.data) {
-                newAllURLs.set(d, [loadPromise.source]);
+                newAllURLs.set(d, [loadPromise.source.url]);
               }
             }
 
             // If this is a remote URL, queue up the next promise
-            if (object.next != null) {
-              newPromiseQueue.push({source: d.url, next: object.next});
+            if (object.helpers.next != null) {
+              newPromiseQueue.push({source: d, helpers: object.helpers});
             }
+            this.props.setCount(d.url, object.helpers.count, object.helpers.next == null);
           }
 
           this.setState({allURLs: newAllURLs, promiseQueue: newPromiseQueue});
@@ -1110,7 +1183,7 @@ export default class HeadlessScenePlayer extends React.Component {
       if (!this.props.scene.playVideoClips && d.clips) {
         d.clips = [];
       }
-      const loadPromise = getPromise(this.props.config, d, this.props.nextScene.imageTypeFilter, -1);
+      const loadPromise = getPromise(this.props.config, d, this.props.nextScene.imageTypeFilter, {next: -1, count: 0});
       this.setState({nextPromise: loadPromise});
 
       loadPromise
@@ -1121,17 +1194,18 @@ export default class HeadlessScenePlayer extends React.Component {
           // Just add the new urls to the end of the list
           if (object != null) {
             if (this.props.nextScene.weightFunction == WF.sources) {
-              this._nextAllURLs.set(loadPromise.source, object.data);
+              this._nextAllURLs.set(loadPromise.source.url, object.data);
             } else {
               for (let d of object.data) {
-                this._nextAllURLs.set(d, [loadPromise.source]);
+                this._nextAllURLs.set(d, [loadPromise.source.url]);
               }
             }
 
             // If this is a remote URL, queue up the next promise
-            if (object.next != null) {
-              this._nextPromiseQueue.push({source: d.url, next: object.next})
+            if (object.helpers.next != null) {
+              this._nextPromiseQueue.push({source: d.url, helpers: object.helpers});
             }
+            this.props.setCount(d.url, object.helpers.count, object.helpers.next == null);
           }
 
           if (n < this.props.nextScene.sources.length) {
@@ -1144,7 +1218,7 @@ export default class HeadlessScenePlayer extends React.Component {
       // Process until queue is empty or player has been stopped
       if (this.state.promiseQueue.length > 0 && !this.state.promise.hasCanceled) {
         const promiseData = this.state.promiseQueue.shift();
-        const promise = getPromise(this.props.config, promiseData.source, this.props.scene.imageTypeFilter, promiseData.next);
+        const promise = getPromise(this.props.config, promiseData.source, this.props.scene.imageTypeFilter, promiseData.helpers);
         this.setState({promise: promise});
 
         promise
@@ -1155,9 +1229,9 @@ export default class HeadlessScenePlayer extends React.Component {
               // Update the correct index with our new images
               let newAllURLs = this.state.allURLs;
               if (this.props.scene.weightFunction == WF.sources) {
-                let sourceURLs = newAllURLs.get(promise.source);
+                let sourceURLs = newAllURLs.get(promise.source.url);
                 if (!sourceURLs) sourceURLs = [];
-                newAllURLs.set(promise.source, sourceURLs.concat(object.data.filter((u) => {
+                newAllURLs.set(promise.source.url, sourceURLs.concat(object.data.filter((u) => {
                   const fileName = getFileName(u);
                   const found = sourceURLs.map((u) => getFileName(u)).includes(fileName);
                   return !found;
@@ -1168,15 +1242,16 @@ export default class HeadlessScenePlayer extends React.Component {
                   const found = Array.from(newAllURLs.keys()).map((u) => getFileName(u)).includes(fileName);
                   return !found;
                 })) {
-                  newAllURLs.set(d, [promise.source]);
+                  newAllURLs.set(d, [promise.source.url]);
                 }
               }
 
               // Add the next promise to the queue
               let newPromiseQueue = this.state.promiseQueue;
-              if (object.next != null) {
-                newPromiseQueue.push({source: promise.source, next: object.next});
+              if (object.helpers.next != null) {
+                newPromiseQueue.push({source: promise.source, helpers: object.helpers});
               }
+              this.props.setCount(promise.source.url, object.helpers.count, object.helpers.next == null);
 
               this.setState({allURLs: newAllURLs, promiseQueue: newPromiseQueue});
             }
@@ -1244,7 +1319,7 @@ export default class HeadlessScenePlayer extends React.Component {
             preload: true,
             restart: true
           });
-          this._nextPromiseQueue = Array<{source: string, next: any}>();
+          this._nextPromiseQueue = Array<{source: LibrarySource, helpers: {next: any, count: number}}>();
           this._nextAllURLs = new Map<string, Array<string>>();
         }
       } else {

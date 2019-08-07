@@ -52,6 +52,8 @@ export default new Map<string, string>([
   ['sf.alphaFullD', 'By Full Title Desc'],
   ['sf.dateA', 'By Date Asc'],
   ['sf.dateD', 'By Date Desc'],
+  ['sf.countA', 'By Count Asc'],
+  ['sf.countD', 'By Count Desc'],
   ['sf.type', 'By Type'],
 
   ['st.tumblr', 'tumblr'],

@@ -126,7 +126,7 @@ export default class CaptionProgram extends React.Component {
           console.warn("Unable to access " + url + " - Service is unavailable");
         })
         .text(data => {
-          resolve({data: [data], next: null});
+          resolve({data: [data], helpers: null});
         });
     });
     this._runningPromise.then((data) => {

@@ -110,7 +110,7 @@ export default class SourceList extends React.Component {
                         onChange={this.onEditSource.bind(this, source.id)}/>
                     </form>
                   )}
-                  {source.tags && this.props.onPlay &&  (
+                  {source.tags && this.props.onPlay && (
                     <div id={`tags-${source.id}`} className="SourceList__SourceTags">
                       {source.tags.map((tag) =>
                         <span className="SourceList__SourceTag" key={tag.id}>{tag.name}</span>
@@ -124,7 +124,7 @@ export default class SourceList extends React.Component {
                     <div className="u-delete"/>
                   </div>
                   {this.props.config.caching.enabled && getSourceType(source.url) != ST.local &&
-                    (getSourceType(source.url) != ST.video || /^https?:\/\//.exec(source.url) != null) && (
+                    (getSourceType(source.url) != ST.video || /^https?:\/\//g.exec(source.url) != null) && (
                     <div className="u-button u-small-icon-button u-clean u-clickable"
                          onClick={this.onClean.bind(this, source.id)}
                          title="Clear cache">
@@ -143,6 +143,9 @@ export default class SourceList extends React.Component {
                        title="Edit">
                     <div className="u-edit"/>
                   </div>
+                  {source.count > 0 && (
+                    <div className="SourceList__SourceCount">({source.count}{source.countComplete ? '' : '+'})</div>
+                  )}
                 </div>
             )}
           </Sortable>
@@ -277,6 +280,8 @@ export default class SourceList extends React.Component {
       function map(source: LibrarySource) {
         if (source.id == sourceID) {
           source.offline = false;
+          source.count = 0;
+          source.countComplete = false;
           source.lastCheck = null;
           source.url = e.currentTarget.value;
         }
@@ -391,6 +396,36 @@ export default class SourceList extends React.Component {
           if (a.id > b.id) {
             return -1;
           } else if (a.id < b.id) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }));
+        break;
+      case SF.countA:
+        this.props.onUpdateSources(sources.sort((a, b) => {
+          if (a.count === undefined) a.count = 0;
+          if (b.count === undefined) b.count = 0;
+          if (a.countComplete === undefined) a.countComplete = false;
+          if (b.countComplete === undefined) b.countComplete = false;
+          if (a.count < b.count) {
+            return -1;
+          } else if (a.count > b.count) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }));
+        break;
+      case SF.countD:
+        this.props.onUpdateSources(sources.sort((a, b) => {
+          if (a.count === undefined) a.count = 0;
+          if (b.count === undefined) b.count = 0;
+          if (a.countComplete === undefined) a.countComplete = false;
+          if (b.countComplete === undefined) b.countComplete = false;
+          if (a.count > b.count) {
+            return -1;
+          } else if (a.count < b.count) {
             return 1;
           } else {
             return 0;

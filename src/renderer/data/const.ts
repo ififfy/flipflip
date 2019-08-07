@@ -76,6 +76,8 @@ const SF = { // sort function
   alphaFullD: 'sf.alphaFullD',
   dateA: 'sf.dateA',
   dateD: 'sf.dateD',
+  countA: 'sf.countA',
+  countD: 'sf.countD',
   type: 'sf.type',
 };
 

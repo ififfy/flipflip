@@ -156,7 +156,8 @@ export default class Meta extends React.Component {
             goBack={a(actions.goBack)}
             goToTagSource={a(actions.playSceneFromLibrary)}
             getTags={actions.getTags.bind(this, this.state.library)}
-            cache={a(actions.cacheImage.bind(this))}
+            setCount={a(actions.setCount)}
+            cache={a(actions.cacheImage)}
           />
         )}
 
@@ -172,6 +173,7 @@ export default class Meta extends React.Component {
             toggleTag={a(actions.toggleTag)}
             navigateTagging={a(actions.navigateDisplayedLibrary)}
             getTags={actions.getTags.bind(this, this.state.library)}
+            setCount={a(actions.setCount)}
             cache={a(actions.cacheImage)}
           />
         )}
