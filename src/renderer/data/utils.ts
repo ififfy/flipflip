@@ -71,7 +71,13 @@ export function getPath() {
 }
 
 export function getFileName(url: string, extension = true) {
-  url = url.substring(url.lastIndexOf("/") + 1);
+  let sep;
+  if (/^(https?:\/\/)|(file:\/\/\/)/g.exec(url) != null) {
+    sep = "/"
+  } else {
+    sep = path.sep;
+  }
+  url = url.substring(url.lastIndexOf(sep) + 1);
   if (url.includes("?")) {
     url = url.substring(0, url.indexOf("?"));
   }
@@ -198,7 +204,7 @@ export function getFileGroup(url: string) {
       const gallery = galleryRegex.exec(url);
       return gallery[1];
     case ST.list:
-      if (/^https?:\/\//.exec(url) != null) {
+      if (/^https?:\/\//g.exec(url) != null) {
         sep = "/"
       } else {
         sep = path.sep;
@@ -207,7 +213,7 @@ export function getFileGroup(url: string) {
     case ST.local:
       return url.substring(url.lastIndexOf(path.sep)+1);
     case ST.video:
-      if (/^https?:\/\//.exec(url) != null) {
+      if (/^https?:\/\//g.exec(url) != null) {
         sep = "/"
       } else {
         sep = path.sep;

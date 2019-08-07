@@ -309,8 +309,8 @@ export default class SourceList extends React.Component {
     switch (algorithm) {
       case SF.alphaA:
         this.props.onUpdateSources(sources.sort((a, b) => {
-          const aName = getFileGroup(a.url).toLowerCase();
-          const bName = getFileGroup(b.url).toLowerCase();
+          const aName = getSourceType(a.url) == ST.video ? getFileName(a.url).toLowerCase() : getFileGroup(a.url).toLowerCase();
+          const bName = getSourceType(b.url) == ST.video ? getFileName(b.url).toLowerCase() : getFileGroup(b.url).toLowerCase();
           if (aName < bName) {
             return -1;
           } else if (aName > bName) {
@@ -330,8 +330,8 @@ export default class SourceList extends React.Component {
         break;
       case SF.alphaD:
         this.props.onUpdateSources(sources.sort((a, b) => {
-          const aName = getFileGroup(a.url).toLowerCase();
-          const bName = getFileGroup(b.url).toLowerCase();
+          const aName = getSourceType(a.url) == ST.video ? getFileName(a.url).toLowerCase() : getFileGroup(a.url).toLowerCase();
+          const bName = getSourceType(b.url) == ST.video ? getFileName(b.url).toLowerCase() : getFileGroup(b.url).toLowerCase();
           if (aName > bName) {
             return -1;
           } else if (aName < bName) {
