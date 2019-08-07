@@ -6,6 +6,7 @@ import ControlGroup from "./ControlGroup";
 import VideoControl from "../player/VideoControl";
 import SimpleCheckbox from "../ui/SimpleCheckbox";
 import {VC} from "../../data/const";
+import SimpleNumberInput from "../ui/SimpleNumberInput";
 
 export default class VideoGroup extends React.Component {
   readonly props: {
@@ -34,6 +35,22 @@ export default class VideoGroup extends React.Component {
             text={"Play Selected Clips"}
             isOn={this.props.scene.playVideoClips}
             onChange={this.changeKey.bind(this, 'playVideoClips', this.props.scene).bind(this)} />
+          {!this.props.scene.playVideoClips && (
+            <div className="VideoSkipGroup">
+              <SimpleNumberInput
+                label="Skip first (ms)"
+                value={this.props.scene.skipVideoStart}
+                min={0}
+                isEnabled={true}
+                onChange={this.changeKey.bind(this, 'skipVideoStart', this.props.scene).bind(this)} />
+              <SimpleNumberInput
+                label="Skip last (ms)"
+                value={this.props.scene.skipVideoEnd}
+                min={0}
+                isEnabled={true}
+                onChange={this.changeKey.bind(this, 'skipVideoEnd', this.props.scene).bind(this)} />
+            </div>
+          )}
           {(this.props.mainVideo || this.props.mode == VC.sceneDetail) && (
             <React.Fragment>
               <h4>Scene Video</h4>

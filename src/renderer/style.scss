@@ -696,6 +696,13 @@ a {
         margin-bottom: 7px;
       }
 
+      .VideoSkipGroup {
+        display: flex;
+        .SimpleNumberInput {
+          max-width: 90px;
+        }
+      }
+
       .TickGroup {
         > div {
           display: flex;

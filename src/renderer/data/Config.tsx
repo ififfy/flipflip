@@ -47,6 +47,8 @@ interface SceneSettingsI {
   randomVideoStart: boolean;
   continueVideo: boolean;
   playVideoClips: boolean;
+  skipVideoStart: number;
+  skipVideoEnd: number;
   videoVolume: number;
   generatorMax: number;
   overlays: Array<Overlay>;
@@ -178,6 +180,8 @@ export class SceneSettings implements SceneSettingsI {
   randomVideoStart = false;
   continueVideo = false;
   playVideoClips = true;
+  skipVideoStart = 0;
+  skipVideoEnd = 0;
   videoVolume = 0;
   generatorMax = 100;
   overlays: Array<Overlay> = [];

@@ -422,6 +422,13 @@ export default class ImagePlayer extends React.Component {
         if (!this._isMounted) return;
         this.props.cache(video);
 
+        if (!video.hasAttribute("start") && !video.hasAttribute("end") &&
+          (this.props.scene.skipVideoStart > 0 || this.props.scene.skipVideoEnd > 0) &&
+          (video.duration - (this.props.scene.skipVideoStart / 1000) - (this.props.scene.skipVideoEnd / 1000)) > 0) {
+          video.setAttribute("start", (this.props.scene.skipVideoStart / 1000).toString());
+          video.setAttribute("end", (video.duration - (this.props.scene.skipVideoEnd / 1000)).toString());
+        }
+
         if (this.props.scene.videoOption == VO.full) {
           let duration;
           if (video.hasAttribute("start") && video.hasAttribute("end")) {

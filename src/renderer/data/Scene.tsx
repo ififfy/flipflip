@@ -60,6 +60,8 @@ export default class Scene {
   randomVideoStart = false;
   continueVideo = false;
   playVideoClips = true;
+  skipVideoStart = 0;
+  skipVideoEnd = 0;
   textKind: string = "";
   textSource: string = "";
   blinkColor = "#FFFFFF";
