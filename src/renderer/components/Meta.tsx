@@ -94,6 +94,7 @@ export default class Meta extends React.Component {
             onBackup={appStorage.backup.bind(appStorage)}
             onImportLibrary={a(actions.importLibrary)}
             onExportLibrary={a(actions.exportLibrary)}
+            blacklistFile={a(actions.blacklistFile)}
           />
         )}
 
@@ -140,6 +141,7 @@ export default class Meta extends React.Component {
             onDelete={a(actions.deleteScene)}
             onPlay={a(actions.playScene)}
             onClip={a(actions.clipVideo)}
+            blacklistFile={a(actions.blacklistFile)}
             onUpdateScene={a(actions.updateScene)}
             onOpenLibraryImport={a(actions.openLibraryImport)}
             saveScene={a(actions.saveScene)}
@@ -158,6 +160,7 @@ export default class Meta extends React.Component {
             getTags={actions.getTags.bind(this, this.state.library)}
             setCount={a(actions.setCount)}
             cache={a(actions.cacheImage)}
+            blacklistFile={a(actions.blacklistFile)}
           />
         )}
 
@@ -175,6 +178,7 @@ export default class Meta extends React.Component {
             getTags={actions.getTags.bind(this, this.state.library)}
             setCount={a(actions.setCount)}
             cache={a(actions.cacheImage)}
+            blacklistFile={a(actions.blacklistFile)}
           />
         )}
 

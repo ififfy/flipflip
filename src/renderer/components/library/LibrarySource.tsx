@@ -7,8 +7,9 @@ export default class LibrarySource {
   offline: boolean = false;
   marked: boolean = false;
   lastCheck: Date = null;
-  tags: Array<Tag>;
+  tags: Array<Tag> = [];
   clips: Array<Clip> = [];
+  blacklist: Array<string> = [];
   count: number = 0;
   countComplete: boolean = false;
 

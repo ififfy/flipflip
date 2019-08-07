@@ -73,7 +73,7 @@ export function getPath() {
 
 export function getFileName(url: string, extension = true) {
   let sep;
-  if (/^(https?:\/\/)|(file:\/\/\/)/g.exec(url) != null) {
+  if (/^(https?:\/\/)|(file:\/\/)/g.exec(url) != null) {
     sep = "/"
   } else {
     sep = path.sep;

@@ -454,6 +454,38 @@ export function replaceLibrary(state: State, library: Array<LibrarySource>): Obj
   return {library: library};
 }
 
+export function blacklistFile(state: State, sourceURL: string, fileToBlacklist: string): Object {
+  const newLibrary = state.library;
+  const newScenes = state.scenes;
+  const source = newLibrary.find((s) => s.url == sourceURL);
+  if (source) {
+    if (source.blacklist === undefined || fileToBlacklist == null) source.blacklist = [];
+    if (fileToBlacklist != null) {
+      source.blacklist.push(fileToBlacklist);
+    }
+  }
+  for (let scene of newScenes) {
+    const sceneSource = scene.sources.find((s) => s.url == sourceURL);
+    if (sceneSource) {
+      if (sceneSource.blacklist === undefined || fileToBlacklist == null) sceneSource.blacklist = [];
+      if (fileToBlacklist != null) {
+        sceneSource.blacklist.push(fileToBlacklist);
+      }
+    }
+  }
+  if (fileToBlacklist != null) {
+    const cachePath = getCachePath(sourceURL, state.config) + getFileName(fileToBlacklist);
+    if (fs.existsSync(cachePath)) {
+      fs.unlink(cachePath, (err) => {
+        if (err) {
+          console.error(err);
+        }
+      });
+    }
+  }
+  return {library: newLibrary, scenes: newScenes};
+}
+
 export function setCount(state: State, sourceURL: string, count: number, countComplete: boolean): Object {
   const newLibrary = state.library;
   const newScenes = state.scenes;

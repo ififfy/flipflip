@@ -33,6 +33,7 @@ export default class Library extends React.Component {
     onBackup(alert: boolean): boolean,
     onImportLibrary(): void,
     onExportLibrary(): void,
+    blacklistFile(sourceURL: string, fileToBlacklist: string): void,
   };
 
   readonly state = {
@@ -165,6 +166,7 @@ export default class Library extends React.Component {
             onUpdateSources={this.props.onUpdateLibrary}
             onPlay={this.props.onPlay}
             onClip={this.props.onClip}
+            onBlacklistFile={this.props.blacklistFile}
             savePosition={this.props.savePosition}
             importSourcesFromLibrary={this.props.importSourcesFromLibrary}
           />

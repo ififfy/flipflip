@@ -38,6 +38,7 @@ type Props = {
   filters: Array<string>,
   selected: Array<string>,
   onUpdateSources(sources: Array<LibrarySource>): void,
+  onBlacklistFile(sourceURL: string, fileToBlacklist: string): void,
   onPlay?(source: LibrarySource, displayed: Array<LibrarySource>): void,
   onClip(source: LibrarySource): void,
   savePosition?(yOffset: number, filters: Array<string>, selected: Array<string>): void,
@@ -254,7 +255,8 @@ export default class SourcePicker extends React.Component {
           savePosition={this.props.savePosition}
           onOpenLibraryImport={this.props.onOpenLibraryImport}
           onPlay={this.props.onPlay}
-          onClip={this.props.onClip}/>
+          onClip={this.props.onClip}
+          onBlacklistFile={this.onBlacklistFile.bind(this)}/>
 
         {this.state.removeAllIsOpen && (
           <Modal onClose={this.toggleRemoveAllModal.bind(this)} title="Remove all?">
@@ -342,6 +344,11 @@ export default class SourcePicker extends React.Component {
     } else if (e.altKey && e.key == 'm') {
       this.toggleMarked();
     }
+  }
+
+  onBlacklistFile(sourceURL: string, fileToBlacklist: string) {
+    this.props.onBlacklistFile(sourceURL, fileToBlacklist);
+    this.setState({markUpdate: !this.state.markUpdate}); // Trigger update
   }
 
   toggleMarked() {

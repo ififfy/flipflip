@@ -46,6 +46,7 @@ export default class Player extends React.Component {
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
     getTags(source: string): Array<Tag>,
     setCount(sourceURL: string, count: number, countComplete: boolean): void,
+    blacklistFile(sourceURL: string, fileToBlacklist: string): void,
     cache(i: HTMLImageElement | HTMLVideoElement): void,
     nextScene?(): void,
     tags?: Array<Tag>,
@@ -380,11 +381,12 @@ export default class Player extends React.Component {
     const img = this.state.historyPaths[(this.state.historyPaths.length - 1) + this.state.historyOffset];
     const url = img.src;
     let source = img.getAttribute("source");
-    if (!source.startsWith("http://") && !source.startsWith("https://")) {
+    if (/^https?:\/\//g.exec(source) == null) {
       source = urlToPath(fileURL(source));
     }
     const isFile = url.startsWith('file://');
     const path = urlToPath(url);
+    const type = getSourceType(source);
     contextMenu.append(new MenuItem({
       label: source,
       click: () => { navigator.clipboard.writeText(source); }
@@ -401,7 +403,7 @@ export default class Player extends React.Component {
       label: 'Open File',
       click: () => { remote.shell.openExternal(url); }
     }));
-    if (this.props.config.caching.enabled && getSourceType(source) != ST.local) {
+    if (this.props.config.caching.enabled && type != ST.local) {
       contextMenu.append(new MenuItem({
         label: 'Open Cached Images',
         click: () => {
@@ -411,6 +413,14 @@ export default class Player extends React.Component {
           } else {
             remote.shell.openExternal(urlToPath(getCachePath(source, this.props.config)));
           }
+        }
+      }));
+    }
+    if ((!isFile && type != ST.video) || type == ST.local) {
+      contextMenu.append(new MenuItem({
+        label: 'Blacklist File',
+        click: () => {
+          this.onBlacklistFile(source, isFile ? path : url);
         }
       }));
     }
@@ -535,6 +545,11 @@ export default class Player extends React.Component {
         historyOffset: this.state.historyOffset + 1,
       });
     }
+  }
+
+  onBlacklistFile(source: string, fileToBlacklist: string) {
+    if (!confirm("Are you sure you want to blacklist " + fileToBlacklist + "?")) return;
+    this.props.blacklistFile(source, fileToBlacklist);
   }
 
   onDeletePath(path: string) {

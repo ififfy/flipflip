@@ -229,6 +229,10 @@ a {
     background: url("./icons/list.svg") no-repeat;
   }
 
+  .u-blacklist {
+    background: url("./icons/blacklist.svg") no-repeat;
+  }
+
   .u-tumblr {
     background: url("icons/tumblr.svg") no-repeat;
   }
@@ -445,6 +449,10 @@ a {
 .u-destructive-bg {
   background-color: $red !important;
   color: white !important;
+}
+
+.u-destructive-border {
+  border: 1px solid $red !important;
 }
 
 .u-show-on-hover-only {

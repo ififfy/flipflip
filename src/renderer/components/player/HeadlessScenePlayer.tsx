@@ -1147,6 +1147,9 @@ export default class HeadlessScenePlayer extends React.Component {
 
           // Just add the new urls to the end of the list
           if (object != null) {
+            if (loadPromise.source.blacklist && loadPromise.source.blacklist.length > 0) {
+              object.data = object.data.filter((url) => !loadPromise.source.blacklist.includes(url));
+            }
             if (this.props.scene.weightFunction == WF.sources) {
               newAllURLs.set(loadPromise.source.url, object.data);
             } else {
@@ -1193,6 +1196,9 @@ export default class HeadlessScenePlayer extends React.Component {
 
           // Just add the new urls to the end of the list
           if (object != null) {
+            if (loadPromise.source.blacklist && loadPromise.source.blacklist.length > 0) {
+              object.data = object.data.filter((url) => !loadPromise.source.blacklist.includes(url));
+            }
             if (this.props.nextScene.weightFunction == WF.sources) {
               this._nextAllURLs.set(loadPromise.source.url, object.data);
             } else {
@@ -1226,6 +1232,10 @@ export default class HeadlessScenePlayer extends React.Component {
           .then((object) => {
             // If we are not at the end of a source
             if (object != null) {
+              if (promise.source.blacklist && promise.source.blacklist.length > 0) {
+                object.data = object.data.filter((url) => !promise.source.blacklist.includes(url));
+              }
+
               // Update the correct index with our new images
               let newAllURLs = this.state.allURLs;
               if (this.props.scene.weightFunction == WF.sources) {

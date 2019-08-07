@@ -26,6 +26,7 @@ export default class SourceList extends React.Component {
     addSources(sources: Array<string>): void,
     onUpdateSelected(selected: Array<string>): void,
     onStartEdit(isEditing: number): void,
+    onBlacklistFile(sourceURL: string, fileToBlacklist: string): void,
     savePosition?(yOffset: number, filters: Array<string>, selected: Array<string>): void,
     onOpenLibraryImport?(): void,
     onClip(source: LibrarySource): void,
@@ -123,6 +124,13 @@ export default class SourceList extends React.Component {
                        title="Remove">
                     <div className="u-delete"/>
                   </div>
+                  {source.blacklist && source.blacklist.length > 0 && (
+                    <div className="u-button u-small-icon-button u-clean u-clickable"
+                         onClick={this.onClearBlacklist.bind(this, source)}
+                         title="Clear Blacklist">
+                      <div className="u-blacklist"/>
+                    </div>
+                  )}
                   {this.props.config.caching.enabled && getSourceType(source.url) != ST.local &&
                     (getSourceType(source.url) != ST.video || /^https?:\/\//g.exec(source.url) != null) && (
                     <div className="u-button u-small-icon-button u-clean u-clickable"
@@ -182,6 +190,10 @@ export default class SourceList extends React.Component {
   onPlay(source: LibrarySource) {
     this.props.savePosition(document.getElementById("sources").scrollTop, this.props.filters, this.props.selected);
     this.props.onPlay(source, this.props.displaySources);
+  }
+
+  onClearBlacklist(source: LibrarySource) {
+    this.props.onBlacklistFile(source.url, null);
   }
 
   onClip(source: LibrarySource) {
