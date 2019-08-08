@@ -9,8 +9,6 @@
       "webRoot": "${workspaceRoot}",
       "port": 9222,
 
-      // **** FOR WINDOWS replace the runtimeExecutable below with:
-      // "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd",
       "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
       "runtimeArgs": [
         "${workspaceFolder}/dist/main.bundle.js",
