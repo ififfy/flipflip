@@ -10,36 +10,9 @@ Install and enable VS Code's [Debugger for Chrome](https://marketplace.visualstu
 
 (Skipable explanatory waffle: VS Code uses the Chrome debugging protocol to communicate with Electron which runs FlipFlip)
 
-## 2 Edit launch.json
+## 2 If on Windows, edit launch.json
 
-On VS Code's "*Debug*" menu select "*Open Configurations*" to edit `.vscode/launch.json` to include the code below
-
-```json
-// (TAKE NOTICE that for MS Windows based environments the "runtimeExecutable" MUST
-// be edited to reflect the slightly different path to the Electron executable)
-
-{
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Debug FlipFlip",
-      "type": "chrome",
-      "request": "launch",
-      "sourceMaps": true,
-      "webRoot": "${workspaceRoot}",
-      "port": 9222,
-
-      // **** FOR WINDOWS replace the runtimeExecutable below with:
-      // "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd",
-      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
-      "runtimeArgs": [
-        "${workspaceFolder}/dist/main.bundle.js",
-         "--remote-debugging-port=9222",
-      ],
-    }
-  ]
-}
-```
+You'll need to edit the value of `runtimeExecutable` in `.vscode/launch.json` to reflec the slightly different path to the Electron executable.
 
 ## 3 Yarn
 
@@ -60,21 +33,6 @@ Press Control-Alt-D (to get the Debug Menu and select 'Debug FlipFlip')
 ![https://code.visualstudio.com/assets/blogs/2018/07/12/logpoints.gif](https://code.visualstudio.com/assets/blogs/2018/07/12/logpoints.gif)
 
 ## 5 After Surgery (Important Aftercare)
-
-### Disable openDevTools()
-
-Some developers prefer Electron's integrated debug tools, which development builds of FlipFlip are currently coded to automatically launch.  The code which performs this automated launch is in [`./main/WindowManager.ts`](https://github.com/ififfy/flipflip/blob/master/src/main/WindowManager.ts). Look there for ...
-
-```ts
-//  Open the DevTools.
-if (process.defaultApp) {
-   mainWindow.webContents.openDevTools();
-}
-```
-
-For the self-operating dental surgeon the above automatic opening of Electron's integrated DevTools has a similar effect as finding once kitted up with oven gloves and jack hammer to perform said root canal surgery on themselves finding that their mouth has been rather inconviently stitched closed before the proceedure began - the stitches need undoing before commencing so....
-
-**YOU WILL NEED TO COMMENT OUT THE CALL TO `openDevTools()` FOR REMOTE DEBUGGING TO WORK**  (And then take care not to check that change back into Github. :)
 
 ### Applying and re-applying breakpoints
 
