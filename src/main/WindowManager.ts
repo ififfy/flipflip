@@ -70,7 +70,10 @@ export function createNewWindow() {
   );
 
   // Open the DevTools.
-  if (process.defaultApp && windowId == 1) {
+  const isDevToolsDisabled = Boolean(process.argv.find((el, i, arr) => {
+    return el == '--no-dev-tools';
+  }));
+  if (process.defaultApp && windowId == 1 && !isDevToolsDisabled) {
     // Comment the following line out to enable attachment of a remote debugger
     newWindow.webContents.openDevTools();
   }

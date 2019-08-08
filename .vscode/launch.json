@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug FlipFlip",
+      "type": "chrome",
+      "request": "launch",
+      "sourceMaps": true,
+      "webRoot": "${workspaceRoot}",
+      "port": 9222,
+
+      // **** FOR WINDOWS replace the runtimeExecutable below with:
+      // "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
+      "runtimeArgs": [
+        "${workspaceFolder}/dist/main.bundle.js",
+         "--remote-debugging-port=9222",
+         "--no-dev-tools"
+      ],
+    }
+  ]
+}

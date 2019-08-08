@@ -23,7 +23,7 @@ app.on('ready', () => {
   createMainMenu(Menu, createMenuTemplate(app));
   initializeIpcEvents();
 
-  if (process.argv[2]) {
+  if (process.argv[2] && process.argv[2] != '--no-dev-tools') {
     setTimeout(startScene.bind(null, process.argv[2]), 1000);
   }
 });
