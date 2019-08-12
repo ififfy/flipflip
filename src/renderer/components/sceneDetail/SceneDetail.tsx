@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import {OF, VC, WF} from "../../data/const";
+import {IF, OF, VC, WF} from "../../data/const";
 import Scene from '../../data/Scene';
 import SourcePicker from './SourcePicker';
 import AudioGroup from "./AudioGroup";
@@ -26,6 +26,7 @@ export default class SceneDetail extends React.Component {
     onExport(scene: Scene): void,
     onPlay(scene: Scene): void,
     onDelete(scene: Scene): void,
+    setupGrid(scene: Scene): void,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
     onOpenLibraryImport(scene: Scene): void,
     onClip(source: LibrarySource): void,
@@ -98,8 +99,10 @@ export default class SceneDetail extends React.Component {
         <div className="SceneDetail__Content ControlGroupGroup">
           <SceneEffectGroup
             scene={this.props.scene}
-            showAll={true}
+            isTagging={false}
+            isConfig={false}
             allScenes={this.props.allScenes}
+            onSetupGrid={this.props.setupGrid.bind(this)}
             onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
           <ImageEffectGroup
@@ -124,10 +127,12 @@ export default class SceneDetail extends React.Component {
             isPlayer={false}
             onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
-          <VideoGroup
-            scene={this.props.scene}
-            mode={VC.sceneDetail}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+          {this.props.scene.imageTypeFilter != IF.stills && (
+            <VideoGroup
+              scene={this.props.scene}
+              mode={VC.sceneDetail}
+              onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+          )}
 
           <TextGroup
             scene={this.props.scene}

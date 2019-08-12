@@ -14,6 +14,7 @@ import Player from './player/Player';
 import SceneDetail from './sceneDetail/SceneDetail';
 import FFAnalytics from "./ui/FFAnalytics";
 import VideoClipper from "./player/VideoClipper";
+import GridSetup from "./player/GridSetup";
 
 const appStorage = new AppStorage(remote.getCurrentWindow().id);
 
@@ -108,6 +109,15 @@ export default class Meta extends React.Component {
           />
         )}
 
+        {this.isRoute('grid') && (
+          <GridSetup
+            scene={scene}
+            allScenes={this.state.scenes}
+            onUpdateGrid={a(actions.onUpdateGrid)}
+            goBack={a(actions.goBack)}
+          />
+        )}
+
         {this.isRoute('tags') && (
           <TagManager
             tags={this.state.tags}
@@ -141,6 +151,7 @@ export default class Meta extends React.Component {
             onDelete={a(actions.deleteScene)}
             onPlay={a(actions.playScene)}
             onClip={a(actions.clipVideo)}
+            setupGrid={a(actions.setupGrid)}
             blacklistFile={a(actions.blacklistFile)}
             onUpdateScene={a(actions.updateScene)}
             onOpenLibraryImport={a(actions.openLibraryImport)}
@@ -160,6 +171,7 @@ export default class Meta extends React.Component {
             getTags={actions.getTags.bind(this, this.state.library)}
             setCount={a(actions.setCount)}
             cache={a(actions.cacheImage)}
+            setupGrid={a(actions.setupGrid)}
             blacklistFile={a(actions.blacklistFile)}
           />
         )}

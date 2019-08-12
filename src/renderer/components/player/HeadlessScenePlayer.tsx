@@ -247,6 +247,10 @@ function loadTumblr(config: Config, source: LibrarySource, filter: string, helpe
       // TumblrID takes the form of <blog_name>.tumblr.com
       let tumblrID = url.replace(/https?:\/\//, "");
       tumblrID = tumblrID.replace("/", "");
+      if (tumblr429Alerted) {
+        resolve(null);
+        return;
+      }
       client.blogPosts(tumblrID, {offset: helpers.next*20}, (err, data) => {
         if (err) {
           console.error("Error retriving " + tumblrID + (helpers.next == 0 ? "" : "(Page " + helpers.next + " )"));

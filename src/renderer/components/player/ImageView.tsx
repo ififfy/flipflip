@@ -6,10 +6,10 @@ import {BT} from "../../data/const";
 
 export const FadeLayer = (data: {image: any, contentRef: any, backgroundRef: any, backgroundType: string,
   backgroundColor: string, backgroundBlur: number, horizTransLevel: number, vertTransLevel: number, zoomStart: number,
-  zoomEnd: number, transDuration: number, fadeDuration: any, crossFade: boolean, videoClipper: boolean}) => {
+  zoomEnd: number, transDuration: number, fadeDuration: any, crossFade: boolean, fitParent: boolean}) => {
 
   const fadeTransitions: [{item: any, props: any, key: any}] = useTransition(
-    data.image,
+    data.image ? data.image : -1,
     (image: any) => {
       return image.key
     },
@@ -41,7 +41,7 @@ export const FadeLayer = (data: {image: any, contentRef: any, backgroundRef: any
     <React.Fragment>
       {fadeTransitions.map(({item, props, key}) => {
         return (
-          <animated.div className={`ImageView ${data.videoClipper ? '': 'u-fill-container'}`} key={key} volume={props.volume} style={{ ...props }}>
+          <animated.div className={`ImageView ${data.fitParent ? '': 'u-fill-container'}`} key={key} volume={props.volume} style={{ ...props }}>
             <ZoomMoveLayer
               contentRef={data.contentRef}
               horizTransLevel={data.horizTransLevel}
@@ -49,15 +49,13 @@ export const FadeLayer = (data: {image: any, contentRef: any, backgroundRef: any
               zoomStart={data.zoomStart}
               zoomEnd={data.zoomEnd}
               duration={data.transDuration} />
-            {!data.videoClipper && (
-              <Image
-                className="ImageView__Background"
-                contentRef={data.backgroundRef}
-                backgroundType={data.backgroundType}
-                backgroundColor={data.backgroundColor}
-                backgroundBlur={data.backgroundBlur}
-                imageProps={null} />
-            )}
+            <Image
+              className="ImageView__Background"
+              contentRef={data.backgroundRef}
+              backgroundType={data.backgroundType}
+              backgroundColor={data.backgroundColor}
+              backgroundBlur={data.backgroundBlur}
+              imageProps={null} />
           </animated.div>
         );
       })}
@@ -129,7 +127,7 @@ export default class ImageView extends React.Component {
     crossFadeAudio: boolean,
     fadeDuration: number,
     videoVolume: number,
-    videoClipper: boolean,
+    fitParent: boolean,
     onLoaded(): void,
     setVideo(video: HTMLVideoElement): void,
   };
@@ -169,7 +167,7 @@ export default class ImageView extends React.Component {
       img.play();
       const videoLoop = (v: any) => {
         if (parseFloat(el.parentElement.style.opacity) == 0.99 || v.ended) {
-          v.removeEventListener('play');
+          v.removeEventListener('play', loop);
           return;
         }
         if (v.paused) return;
@@ -185,14 +183,15 @@ export default class ImageView extends React.Component {
         }
         this._timeouts.push(setTimeout(videoLoop, 20, v));
       };
-      img.addEventListener('play', () => {
+      const loop = () => {
         videoLoop(img);
-      }, false);
+      };
+      img.addEventListener('play', loop.bind(this), false);
     }
 
     let parentWidth = el.offsetWidth;
     let parentHeight = el.offsetHeight;
-    if (this.props.videoClipper) {
+    if (this.props.fitParent) {
       parentWidth = el.parentElement.offsetWidth;
       parentHeight = el.parentElement.offsetHeight;
     }
@@ -200,7 +199,7 @@ export default class ImageView extends React.Component {
       parentWidth = window.innerWidth;
       parentHeight = window.innerHeight;
     }
-    const parentAspect = parentWidth / parentHeight;
+    let parentAspect = parentWidth / parentHeight;
     let imgWidth;
     let imgHeight;
     if (img instanceof HTMLImageElement) {
@@ -210,7 +209,7 @@ export default class ImageView extends React.Component {
       imgWidth = img.videoWidth;
       imgHeight = img.videoHeight;
     }
-    const imgAspect = imgWidth / imgHeight;
+    let imgAspect = imgWidth / imgHeight;
 
     const blur = this.props.backgroundType == BT.blur;
     let bgImg: any;
@@ -226,7 +225,7 @@ export default class ImageView extends React.Component {
 
         const draw = (v: any, c: CanvasRenderingContext2D, w: number, h: number) => {
           if (parseFloat(el.parentElement.style.opacity) == 0.99 || v.ended) {
-            v.removeEventListener('play');
+            v.removeEventListener('play', doDraw);
             return;
           }
           if (v.paused) return;
@@ -237,12 +236,13 @@ export default class ImageView extends React.Component {
         if (!this.props.crossFade) {
           this.clearTimeouts();
         }
-        if (img instanceof HTMLImageElement) {
+        const doDraw = () => {
           draw(img, context, parentWidth, parentHeight);
+        };
+        if (img instanceof HTMLImageElement) {
+          doDraw();
         } else {
-          img.addEventListener('play', () => {
-            draw(img, context, parentWidth, parentHeight);
-          }, false);
+          img.addEventListener('play', doDraw.bind(this), false);
         }
       }
     }
@@ -254,7 +254,7 @@ export default class ImageView extends React.Component {
       img.style.marginTop = '0';
       img.style.marginLeft = (parentWidth / 2 - imgWidth * scale / 2) + 'px';
       if (blur) {
-        const bgscale = parentWidth / imgWidth;
+        const bgscale = (parentWidth + (0.04 * parentWidth)) / imgWidth;
         bgImg.style.width = '100%';
         bgImg.style.height = (imgHeight * bgscale) + 'px';
         bgImg.style.marginTop = (parentHeight / 2 - imgHeight * bgscale / 2) + 'px';
@@ -267,7 +267,7 @@ export default class ImageView extends React.Component {
       img.style.marginTop = (parentHeight / 2 - imgHeight * scale / 2) + 'px';
       img.style.marginLeft = '0';
       if (blur) {
-        const bgscale = parentHeight / imgHeight;
+        const bgscale = (parentHeight + (0.04 * parentHeight)) / imgHeight;
         bgImg.style.width = (imgWidth * bgscale) + 'px';
         bgImg.style.height = '100%';
         bgImg.style.marginTop = '0';
@@ -307,8 +307,9 @@ export default class ImageView extends React.Component {
   render() {
     if (!this.props.image) {
       return (
-        <div className={`ImageView ${this.props.videoClipper ? '': 'u-fill-container'}`}>
+        <div className={`ImageView ${this.props.fitParent ? '': 'u-fill-container'}`}>
           <div className="ImageView__Image" ref={this.contentRef}/>
+          <div className="ImageView__Background" ref={this.backgroundRef}/>
         </div>
       );
     }
@@ -325,7 +326,7 @@ export default class ImageView extends React.Component {
         transDuration={this.props.transDuration}
         crossFade={this.props.crossFade}
         fadeDuration={this.props.fadeDuration}
-        videoClipper={this.props.videoClipper}
+        fitParent={this.props.fitParent}
         contentRef={this.contentRef}
         backgroundRef={this.backgroundRef}/>
     );

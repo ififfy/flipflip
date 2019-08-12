@@ -67,7 +67,7 @@ export default class VideoClipper extends React.Component {
               crossFadeAudio={false}
               fadeDuration={0}
               videoVolume={this.state.videoVolume}
-              videoClipper={true}
+              fitParent={true}
               onLoaded={this.nop}
               setVideo={this.nop}/>
             <div className="VideoClipper__Clipper">
@@ -160,6 +160,10 @@ export default class VideoClipper extends React.Component {
 
   componentDidMount() {
     let video = document.createElement('video');
+
+    video.onerror = () => {
+      console.error("Error loading " + this.props.source.url);
+    };
 
     video.onloadeddata = () => {
       this.props.cache(video);

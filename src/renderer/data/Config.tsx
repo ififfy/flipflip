@@ -4,7 +4,7 @@ import LibrarySource from "../components/library/LibrarySource";
 import Audio from "../components/library/Audio";
 
 interface SceneSettingsI {
-  [key: string]: string | number | boolean | Array<LibrarySource> | Array<Overlay> | Array<Audio>;
+  [key: string]: string | number | boolean | Array<LibrarySource> | Array<Overlay> | Array<Audio> | Array<Array<number>>;
 
   sources: Array<LibrarySource>;
   timingFunction: string;
@@ -85,6 +85,8 @@ interface SceneSettingsI {
   countFontFamily: string;
 
   audios: Array<Audio>;
+  gridView: boolean;
+  grid: Array<Array<number>>;
 
   // migration only
   overlaySceneID: number;
@@ -137,7 +139,7 @@ interface DisplaySettingsI {
 }
 
 export class SceneSettings implements SceneSettingsI {
-  [key: string]: string | number | boolean | Array<LibrarySource> | Array<Overlay> | Array<Audio>;
+  [key: string]: string | number | boolean | Array<LibrarySource> | Array<Overlay> | Array<Audio> | Array<Array<number>>;
 
   sources: Array<LibrarySource> = [];
   timingFunction = TF.constant;
@@ -220,6 +222,8 @@ export class SceneSettings implements SceneSettingsI {
   countFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
 
   audios: Array<Audio> = [];
+  gridView = false;
+  grid: Array<Array<number>> = [[]];
 
   // migration only
   overlaySceneID = 0;

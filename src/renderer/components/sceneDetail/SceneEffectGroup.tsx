@@ -8,12 +8,15 @@ import SimpleSliderInput from "../ui/SimpleSliderInput";
 import SimpleNumberInput from "../ui/SimpleNumberInput";
 import {TF} from "../../data/const";
 import Overlay from "../library/Overlay";
+import SimpleCheckbox from "../ui/SimpleCheckbox";
 
 export default class SceneEffectGroup extends React.Component {
   readonly props: {
     scene: Scene | SceneSettings,
-    showAll: boolean
+    isTagging: boolean,
+    isConfig : boolean,
     allScenes: Array<Scene>,
+    onSetupGrid?(scene: Scene): void,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 
@@ -74,7 +77,7 @@ export default class SceneEffectGroup extends React.Component {
           </div>
         </div>
 
-        {this.props.showAll && (
+        {!this.props.isTagging && (
           <React.Fragment>
             <hr/>
 
@@ -95,51 +98,72 @@ export default class SceneEffectGroup extends React.Component {
               )}
             </div>
 
-            <hr/>
-
-            <div className="ControlSubgroup m-inline">
-              <div className="u-small-icon-button u-clickable"
-                   style={{float: 'left', marginRight: '5px', marginBottom: '7px'}}
-                   onClick={this.onAddOverlay.bind(this)}
-                   title="Add Overlay">
-                <div className="u-add"/>
-              </div>
-              <div className="u-clickable"
-                   style={{color: '#010101', float: 'left'}}
-                   onClick={this.onAddOverlay.bind(this)}>
-                Add a new overlay
-              </div>
-              <div style={{clear: 'both'}}>
-                {this.props.scene.overlays && this.props.scene.overlays.map((overlay, index) =>
-                  <React.Fragment key={overlay.id}>
-                    <div className="u-small-icon-button u-clickable"
-                         style={{float: 'right'}}
-                         onClick={this.onRemoveOverlay.bind(this, overlay.id)}
-                         title="Remove Audio">
-                      <div className="u-delete"/>
+            {!this.props.isConfig && (
+              <React.Fragment>
+                <hr/>
+                <div>
+                  <SimpleCheckbox
+                    text="Grid View"
+                    isOn={this.props.scene.gridView}
+                    onChange={this.changeKey.bind(this, 'gridView').bind(this)} />
+                  {this.props.scene.gridView && (
+                    <div className="u-button u-clickable"
+                         onClick={this.props.onSetupGrid.bind(this, this.props.scene)}>
+                      Setup Grid
                     </div>
-                    <SimpleOptionPicker
-                      onChange={this.onEditKey.bind(this, overlay.id, 'sceneID').bind(this)}
-                      label="Overlay scene"
-                      value={overlay.sceneID.toString()}
-                      parseKeyFunction={this.getSceneName.bind(this)}
-                      keys={["0"].concat(this.props.allScenes.filter((s) => s.sources.length > 0).map((s) => s.id.toString()))}/>
-                    {overlay.sceneID != 0 && (
-                      <SimpleSliderInput
-                        isEnabled={overlay.sceneID != 0}
-                        onChange={this.onEditKey.bind(this, overlay.id, 'opacity').bind(this)}
-                        label={"Overlay opacity: " + overlay.opacity + "%"}
-                        min={0}
-                        max={99}
-                        value={(overlay.opacity)}/>
+                  )}
+                </div>
+              </React.Fragment>
+            )}
+
+            {(!this.props.scene.gridView || this.props.isConfig) && (
+              <React.Fragment>
+                <hr/>
+                <div className="ControlSubgroup m-inline">
+                  <div className="u-small-icon-button u-clickable"
+                       style={{float: 'left', marginRight: '5px', marginBottom: '7px'}}
+                       onClick={this.onAddOverlay.bind(this)}
+                       title="Add Overlay">
+                    <div className="u-add"/>
+                  </div>
+                  <div className="u-clickable"
+                       style={{color: '#010101', float: 'left'}}
+                       onClick={this.onAddOverlay.bind(this)}>
+                    Add a new overlay
+                  </div>
+                  <div style={{clear: 'both'}}>
+                    {this.props.scene.overlays && this.props.scene.overlays.map((overlay, index) =>
+                      <React.Fragment key={overlay.id}>
+                        <div className="u-small-icon-button u-clickable"
+                             style={{float: 'right'}}
+                             onClick={this.onRemoveOverlay.bind(this, overlay.id)}
+                             title="Remove Audio">
+                          <div className="u-delete"/>
+                        </div>
+                        <SimpleOptionPicker
+                          onChange={this.onEditKey.bind(this, overlay.id, 'sceneID').bind(this)}
+                          label="Overlay scene"
+                          value={overlay.sceneID.toString()}
+                          parseKeyFunction={this.getSceneName.bind(this)}
+                          keys={["0"].concat(this.props.allScenes.filter((s) => s.sources.length > 0).map((s) => s.id.toString()))}/>
+                        {overlay.sceneID != 0 && (
+                          <SimpleSliderInput
+                            isEnabled={overlay.sceneID != 0}
+                            onChange={this.onEditKey.bind(this, overlay.id, 'opacity').bind(this)}
+                            label={"Overlay opacity: " + overlay.opacity + "%"}
+                            min={0}
+                            max={99}
+                            value={(overlay.opacity)}/>
+                        )}
+                        {index != this.props.scene.overlays.length - 1 && (
+                          <hr/>
+                        )}
+                      </React.Fragment>
                     )}
-                    {index != this.props.scene.overlays.length - 1 && (
-                      <hr/>
-                    )}
-                  </React.Fragment>
-                )}
-              </div>
-            </div>
+                  </div>
+                </div>
+              </React.Fragment>
+            )}
           </React.Fragment>
         )}
       </ControlGroup>

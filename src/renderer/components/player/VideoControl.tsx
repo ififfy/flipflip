@@ -8,8 +8,8 @@ import SimpleSliderInput from "../ui/SimpleSliderInput";
 export default class VideoControl extends React.Component {
   readonly props: {
     video: HTMLVideoElement,
-    volume: number,
     mode: string,
+    volume?: number,
     clip?: {min: number, max: number},
     onChangeVolume(volume: number): void,
   };
@@ -95,7 +95,7 @@ export default class VideoControl extends React.Component {
                 label=""
                 min={0}
                 max={100}
-                value={this.props.volume}
+                value={this.props.volume ? this.props.volume : this.props.video.volume * 100}
                 isEnabled={true}
                 onChange={this.onChangeVolume.bind(this)}/>
               <div
@@ -167,6 +167,7 @@ export default class VideoControl extends React.Component {
     this.props.onChangeVolume(volume);
     if (this.props.video) {
       this.props.video.volume = volume / 100;
+      this.setState({update: !this.state.update});
     }
   }
 

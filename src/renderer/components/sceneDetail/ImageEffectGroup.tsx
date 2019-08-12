@@ -50,10 +50,12 @@ export default class ImageEffectGroup extends React.Component {
             onChange={this.changeKey.bind(this, 'crossFade').bind(this)}/>
           {this.props.scene.crossFade && (
             <div className="ControlSubgroup m-inline">
-              <SimpleCheckbox
-                text="Cross-fade audio"
-                isOn={this.props.scene.crossFadeAudio}
-                onChange={this.changeKey.bind(this, 'crossFadeAudio').bind(this)}/>
+              {!this.props.scene.gridView && (
+                <SimpleCheckbox
+                  text="Cross-fade audio"
+                  isOn={this.props.scene.crossFadeAudio}
+                  onChange={this.changeKey.bind(this, 'crossFadeAudio').bind(this)}/>
+              )}
               <div style={{display: 'flex'}}>
                 <SimpleOptionPicker
                   onChange={this.changeKey.bind(this, 'fadeTF').bind(this)}

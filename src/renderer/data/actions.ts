@@ -28,7 +28,7 @@ export function isRoute(state: State, kind: string): Boolean {
 // Returns the active scene, or null if the current route isn't a scene
 export function getActiveScene(state: State): Scene | null {
   for (let r of state.route.slice().reverse()) {
-    if (r.kind == 'scene' || r.kind == 'generate') {
+    if (r.kind == 'scene' || r.kind == 'generate' || r.kind == 'grid') {
       return state.scenes.find((s: Scene) => s.id === r.value);
     }
   }
@@ -38,8 +38,12 @@ export function getActiveScene(state: State): Scene | null {
 export function getActiveSource(state: State): LibrarySource | null {
   for (let r of state.route.slice().reverse()) {
     if (r.kind == 'clip') {
-      const source = state.library.find((s: LibrarySource) => s.id === r.value);
+      let source = state.library.find((s: LibrarySource) => s.url === r.value);
       if (source) return source;
+      for (let scene of state.scenes) {
+        source = scene.sources.find((s: LibrarySource) => s.url === r.value);
+        if (source) return source;
+      }
     }
   }
   return null;
@@ -371,7 +375,7 @@ export function onUpdateClips(state: State, sourceURL: string, clips: Array<Clip
 }
 
 export function clipVideo(state: State, source: LibrarySource) {
-  return {route: state.route.concat([new Route({kind: 'clip', value: source.id})])};
+  return {route: state.route.concat([new Route({kind: 'clip', value: source.url})])};
 }
 
 export function navigateDisplayedLibrary(state: State, offset: number): Object {
@@ -569,6 +573,19 @@ export function toggleTag(state: State, sourceID: number, tag: Tag): Object {
     }
   }
   return {library: newLibrary, scenes: newScenes};
+}
+
+export function setupGrid(state: State, scene: Scene) {
+  return {route: state.route.concat([new Route({kind: 'grid', value: scene.id})])};
+}
+
+export function onUpdateGrid(state: State, grid: Array<Array<number>>): Object {
+  const newScenes = state.scenes;
+  const scene = newScenes.find((s) => s.id == getActiveScene(state).id);
+  scene.grid = grid;
+  const newRoute = state.route;
+  newRoute.pop();
+  return {scenes: newScenes, route: newRoute};
 }
 
 export function exportScene(state: State, scene: Scene): Object {

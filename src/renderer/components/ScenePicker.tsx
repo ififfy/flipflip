@@ -13,33 +13,6 @@ import VSpin from "../animations/VSpin";
 import Modal from "./ui/Modal";
 import SimpleCheckbox from "./ui/SimpleCheckbox";
 
-class ScenePickerItem extends React.Component {
-  readonly props: {
-    scene: Scene,
-    onSelect(scene: Scene): void,
-    onMouseEnter?(e: MouseEvent): void,
-  };
-
-  render() {
-    return (
-      <div
-        className={`ScenePickerItem u-clickable u-draggable ${this.props.scene.tagWeights || this.props.scene.sceneWeights ? 'm-generator' : ''}`}
-        onClick={this.onClick.bind(this)}
-        onMouseEnter={this.props.onMouseEnter ? this.props.onMouseEnter.bind(this) : this.nop}>
-        <div className="ScenePickerItem__Title">
-          {this.props.scene.name}
-        </div>
-      </div>
-    );
-  }
-
-  onClick() {
-    this.props.onSelect(this.props.scene);
-  }
-
-  nop() {}
-}
-
 class Link extends React.Component {
   readonly props: {
     url: string,
@@ -220,9 +193,13 @@ export default class ScenePicker extends React.Component {
           }}>
           {this.props.scenes.map((scene) =>
             <Jiggle key={scene.id} bounce={true}>
-              <ScenePickerItem
-                scene={scene}
-                onSelect={this.props.onSelect}/>
+              <div
+                className={`ScenePickerItem u-clickable ${scene.tagWeights || scene.sceneWeights ? 'm-generator' : ''}`}
+                onClick={this.props.onSelect.bind(this, scene)}>
+                <div className="ScenePickerItem__Title">
+                  {scene.name}
+                </div>
+              </div>
             </Jiggle>
           )}
         </Sortable>

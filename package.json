@@ -55,7 +55,7 @@
     "recursive-readdir": "^2.2.2",
     "request": "^2.88.0",
     "snoowrap": "^1.15.2",
-    "sortablejs": "^1.8.1",
+    "sortablejs": "^1.10.0-rc3",
     "system-font-families": "^0.4.1",
     "tumblr.js": "^2.0.0",
     "twitter": "^1.7.1",

@@ -75,7 +75,8 @@ export default class ConfigForm extends React.Component {
         <div className="Config__Content ControlGroupGroup">
           <SceneEffectGroup
             scene={this.state.config.defaultScene}
-            showAll={true}
+            isTagging={false}
+            isConfig={true}
             allScenes={this.props.scenes}
             onUpdateScene={this.onUpdateDefaultScene.bind(this)} />
 

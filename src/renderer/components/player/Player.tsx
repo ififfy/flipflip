@@ -1,9 +1,9 @@
-import {remote, shell, webFrame} from 'electron';
+import {remote, webFrame} from 'electron';
 import * as React from 'react';
 import fs from "fs";
 import fileURL from "file-url";
 
-import {SL, ST, TOT, VC} from "../../data/const";
+import {IF, SL, ST, TOT, VC} from "../../data/const";
 import {getCachePath, getSourceType, urlToPath} from '../../data/utils';
 import Config from "../../data/Config";
 import Scene from '../../data/Scene';
@@ -54,6 +54,7 @@ export default class Player extends React.Component {
     toggleTag?(sourceID: number, tag: Tag): void,
     goToTagSource?(source: LibrarySource): void,
     navigateTagging?(offset: number): void,
+    setupGrid?(scene: Scene): void,
   };
 
   readonly state = {
@@ -61,6 +62,7 @@ export default class Player extends React.Component {
     hasStarted: false,
     isMainLoaded: false,
     areOverlaysLoaded: Array<boolean>(this.getValidOverlays().length).fill(false),
+    isGridLoaded: Array<boolean>(this.getGridLength()).fill(false),
     isEmpty: false,
     isPlaying: true,
     total: 0,
@@ -73,6 +75,7 @@ export default class Player extends React.Component {
     imagePlayerDeleteHack: new ChildCallbackHack(),
     mainVideo: null as HTMLVideoElement,
     overlayVideos: Array<HTMLVideoElement>(this.getValidOverlays().length).fill(null),
+    gridVideos: Array<HTMLVideoElement>(this.getGridLength()).fill(null),
     timeToNextFrame: null as number,
   };
 
@@ -92,6 +95,25 @@ export default class Player extends React.Component {
       this.state.hasStarted);
     const showStrobe = this.props.scene.strobe && this.state.hasStarted && this.state.isPlaying &&
       (this.props.scene.strobeLayer == SL.top || this.props.scene.strobeLayer == SL.bottom);
+
+    let gridStyle = {};
+    if (this.props.scene.gridView) {
+      const height = this.props.scene.grid.length;
+      const width = this.props.scene.grid[0].length;
+      const colSize = 100 / width;
+      const rowSize = 100 / height;
+      let gridTemplateColumns = "";
+      let gridTemplateRows = "";
+      for (let w = 0; w < width; w++) {
+        gridTemplateColumns += colSize.toString() + "% ";
+      }
+      for (let h = 0; h < height; h++) {
+        gridTemplateRows += rowSize.toString() + "% ";
+      }
+      gridStyle = {gridTemplateColumns: gridTemplateColumns, gridTemplateRows: gridTemplateRows}
+    }
+
+    let foundMain = false;
 
     return (
       <div className="Player">
@@ -130,58 +152,114 @@ export default class Player extends React.Component {
           <div className="EmptyIndicator"><p>I couldn't find anything</p><p>(ಥ﹏ಥ)</p></div>
         )}
 
-        <div style={{display: this.state.hasStarted ? "" : "none"}}>
-          <HeadlessScenePlayer
-            config={this.props.config}
-            scene={this.props.scene}
-            nextScene={nextScene}
-            opacity={1}
-            isPlaying={this.state.isPlaying}
-            hasStarted={this.state.hasStarted}
-            strobeLayer={this.props.scene.strobe ? this.props.scene.strobeLayer : null}
-            historyOffset={this.state.historyOffset}
-            advanceHack={this.state.imagePlayerAdvanceHack}
-            deleteHack={this.state.imagePlayerDeleteHack}
-            setHistoryOffset={this.setHistoryOffset.bind(this)}
-            setHistoryPaths={this.setHistoryPaths.bind(this)}
-            finishedLoading={this.setMainLoaded.bind(this)}
-            firstImageLoaded={this.setMainCanStart.bind(this)}
-            setProgress={this.setProgress.bind(this)}
-            setVideo={this.setMainVideo.bind(this)}
-            setCount={this.props.setCount.bind(this)}
-            cache={this.props.cache.bind(this)}
-            setTimeToNextFrame={this.setTimeToNextFrame.bind(this)}
-          />
-
-          {validOverlays.length > 0 && !this.state.isEmpty && validOverlays.map((overlay, index) => {
-            let showProgress = this.state.isMainLoaded && !this.state.hasStarted;
-            if (showProgress) {
-              for (let x=0; x < index; x++) {
-                if (!this.state.areOverlaysLoaded[x]) {
-                  showProgress = false;
-                  break;
-                }
-              }
-            }
-            return (
+        <div className={this.props.scene.gridView ? 'PlayerGrid': ''} style={gridStyle}>
+          {!this.props.scene.gridView && (
+            <React.Fragment>
               <HeadlessScenePlayer
-                key={overlay.id}
                 config={this.props.config}
-                scene={this.getScene(overlay.sceneID)}
-                opacity={overlay.opacity / 100}
-                isPlaying={this.state.isPlaying && !this.state.isEmpty}
+                scene={this.props.scene}
+                nextScene={nextScene}
+                opacity={1}
+                isPlaying={this.state.isPlaying}
                 hasStarted={this.state.hasStarted}
-                historyOffset={0}
-                setHistoryOffset={this.nop}
-                setHistoryPaths={this.nop}
-                finishedLoading={this.setOverlayLoaded.bind(this, index)}
-                firstImageLoaded={this.nop}
-                setProgress={showProgress ? this.setProgress.bind(this) : this.nop}
-                setVideo={this.setOverlayVideo.bind(this, index)}
+                strobeLayer={this.props.scene.strobe ? this.props.scene.strobeLayer : null}
+                historyOffset={this.state.historyOffset}
+                advanceHack={this.state.imagePlayerAdvanceHack}
+                deleteHack={this.state.imagePlayerDeleteHack}
+                setHistoryOffset={this.setHistoryOffset.bind(this)}
+                setHistoryPaths={this.setHistoryPaths.bind(this)}
+                finishedLoading={this.setMainLoaded.bind(this)}
+                firstImageLoaded={this.setMainCanStart.bind(this)}
+                setProgress={this.setProgress.bind(this)}
+                setVideo={this.setMainVideo.bind(this)}
                 setCount={this.props.setCount.bind(this)}
                 cache={this.props.cache.bind(this)}
+                setTimeToNextFrame={this.setTimeToNextFrame.bind(this)}
               />
-            );}
+
+              {validOverlays.length > 0 && !this.state.isEmpty && validOverlays.map((overlay, index) => {
+                let showProgress = this.state.isMainLoaded && !this.state.hasStarted;
+                if (showProgress) {
+                  for (let x=0; x < index; x++) {
+                    if (!this.state.areOverlaysLoaded[x]) {
+                      showProgress = false;
+                      break;
+                    }
+                  }
+                }
+                return (
+                  <HeadlessScenePlayer
+                    key={overlay.id}
+                    config={this.props.config}
+                    scene={this.getScene(overlay.sceneID)}
+                    opacity={overlay.opacity / 100}
+                    isPlaying={this.state.isPlaying && !this.state.isEmpty}
+                    hasStarted={this.state.hasStarted}
+                    historyOffset={0}
+                    setHistoryOffset={this.nop}
+                    setHistoryPaths={this.nop}
+                    finishedLoading={this.setOverlayLoaded.bind(this, index)}
+                    firstImageLoaded={this.nop}
+                    setProgress={showProgress ? this.setProgress.bind(this) : this.nop}
+                    setVideo={this.setOverlayVideo.bind(this, index)}
+                    setCount={this.props.setCount.bind(this)}
+                    cache={this.props.cache.bind(this)}
+                  />
+                );}
+              )}
+            </React.Fragment>
+          )}
+
+          {this.props.scene.gridView && (
+            <React.Fragment>
+              {this.props.scene.grid.map((row, rowIndex) =>
+                <React.Fragment key={rowIndex}>
+                  {row.map((sceneID, colIndex) => {
+                    const index = (rowIndex * row.length) + colIndex;
+                    if (sceneID == 0) return <div key={index} className="HeadlessScenePlayer"/>;
+                    const getO = this.getScene(sceneID);
+                    if (getO == null || getO.sources.length == 0) return <div key={index} className="HeadlessScenePlayer"/>;
+
+                    let isMain = false;
+                    if (!foundMain && sceneID == this.props.scene.id) {
+                      isMain = true;
+                      foundMain = true;
+                    }
+                    let showProgress = !this.state.hasStarted;
+                    if (showProgress) {
+                      for (let x=0; x < index; x++) {
+                        if (!this.state.isGridLoaded[x]) {
+                          showProgress = false;
+                          break;
+                        }
+                      }
+                    }
+                    return (
+                      <HeadlessScenePlayer
+                        key={index}
+                        config={this.props.config}
+                        scene={this.getScene(sceneID)}
+                        nextScene={isMain ? nextScene : null}
+                        opacity={1}
+                        isPlaying={this.state.isPlaying}
+                        hasStarted={this.state.hasStarted}
+                        strobeLayer={this.props.scene.strobe ? this.props.scene.strobeLayer : null}
+                        historyOffset={0}
+                        setHistoryOffset={this.nop}
+                        setHistoryPaths={isMain ? this.setHistoryPaths.bind(this) : this.nop}
+                        finishedLoading={this.setGridLoaded.bind(this, index)}
+                        firstImageLoaded={this.setMainCanStart.bind(this)}
+                        setProgress={showProgress ? this.setProgress.bind(this) : this.nop}
+                        setVideo={this.setGridVideo.bind(this, index)}
+                        setCount={this.props.setCount.bind(this)}
+                        cache={this.props.cache.bind(this)}
+                        setTimeToNextFrame={isMain ? this.setTimeToNextFrame.bind(this) : null}
+                      />
+                    )}
+                  )}
+                </React.Fragment>
+              )}
+            </React.Fragment>
           )}
         </div>
 
@@ -247,20 +325,24 @@ export default class Player extends React.Component {
         <div className="SceneOptions ControlGroupGroup u-button-sidebar"
              style={{display: this.state.hasStarted ? "" : "none"}}>
           <h2 className="SceneOptionsHeader">Scene Options</h2>
-          <VideoGroup
-            scene={this.props.scene}
-            overlayScenes={this.getValidOverlays().map((o) => this.getScene(o.sceneID))}
-            isPlaying={this.state.isPlaying}
-            mainVideo={this.state.mainVideo}
-            overlayVideos={this.state.overlayVideos}
-            mode={VC.player}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}
-          />
+          {this.props.scene.imageTypeFilter != IF.stills && (
+            <VideoGroup
+              scene={this.props.scene}
+              otherScenes={this.props.scene.gridView ? this.getValidGrid().map((o) => this.getScene(o)) : this.getValidOverlays().map((o) => this.getScene(o.sceneID))}
+              isPlaying={this.state.isPlaying}
+              mainVideo={this.state.mainVideo}
+              otherVideos={this.props.scene.gridView ? this.state.gridVideos : this.state.overlayVideos}
+              mode={VC.player}
+              onUpdateScene={this.props.onUpdateScene.bind(this)}
+            />
+          )}
 
           <SceneEffectGroup
             scene={this.props.scene}
-            showAll={this.props.tags == null}
+            isTagging={this.props.tags != null}
+            isConfig={false}
             allScenes={this.props.scenes}
+            onSetupGrid={this.props.setupGrid}
             onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
           <ImageEffectGroup
@@ -340,6 +422,18 @@ export default class Player extends React.Component {
 
     this.buildMenu();
     this._interval = setInterval(() => this.nextSceneLoop(), 1000);
+    for (let rowIndex=0; rowIndex < this.props.scene.grid.length; rowIndex++) {
+      for (let colIndex=0; colIndex < this.props.scene.grid[rowIndex].length; colIndex++) {
+        const sceneID = this.props.scene.grid[rowIndex][colIndex];
+        const index = (rowIndex * this.props.scene.grid[rowIndex].length) + colIndex;
+        if (sceneID == 0) this.setGridLoaded(index, true);
+        const getO = this.getScene(sceneID);
+        if (getO == null || getO.sources.length == 0) this.setGridLoaded(index, true);
+      }
+    }
+    if (this.props.scene.gridView && this.getValidGrid().find((s) => s && s > 10) == null) {
+      this.setState({isEmpty: true});
+    }
   }
 
   buildMenu() {
@@ -462,6 +556,24 @@ export default class Player extends React.Component {
     });
   }
 
+  getValidGrid() {
+    let validGrid = Array<number>();
+    for (let row of this.props.scene.grid) {
+      let newRow = row.map((sceneID: any) => {
+        if (sceneID == 0) return null;
+        const getO = this.getScene(sceneID);
+        if (getO == null || getO.sources.length == 0) return null;
+        return sceneID;
+      });
+      validGrid = validGrid.concat(newRow);
+    }
+    return validGrid;
+  }
+
+  getGridLength() {
+    return (this.props.scene.grid.length * this.props.scene.grid[0].length);
+  }
+
   setMainCanStart() {
     if (!this.state.canStart) {
       this.setState({canStart: true, isEmpty: false});
@@ -485,6 +597,13 @@ export default class Player extends React.Component {
     this.play();
   }
 
+  setGridLoaded(index: number, empty: boolean) {
+    const newIGL = this.state.isGridLoaded;
+    newIGL[index] = true;
+    this.setState({isGridLoaded: newIGL});
+    this.play();
+  }
+
   setTimeToNextFrame(ttnf: number) {
     this._toggleStrobe = !this._toggleStrobe;
     this.setState({timeToNextFrame: ttnf});
@@ -500,8 +619,16 @@ export default class Player extends React.Component {
     this.setState({overlayVideos: newOV});
   }
 
+  setGridVideo(index: number, video: HTMLVideoElement) {
+    const newOV = this.state.gridVideos;
+    newOV[index] = video;
+    this.setState({gridVideos: newOV});
+  }
+
   start(canStart: boolean, force = false) {
-    const isLoaded = !force && this.state.isMainLoaded && (this.getValidOverlays().length == 0 || this.state.areOverlaysLoaded.find((b) => !b) == null);
+    const isLoaded = !force && (
+      (!this.props.scene.gridView && this.state.isMainLoaded && (this.getValidOverlays().length == 0 || this.state.areOverlaysLoaded.find((b) => !b) == null)) ||
+      (this.props.scene.gridView && this.state.isGridLoaded.find((b) => !b) == null));
     if (force || ((isLoaded || this.props.config.displaySettings.startImmediately) && canStart)) {
       this.setState({hasStarted: true, isLoaded: true, startTime: new Date()});
     } else {

@@ -91,6 +91,7 @@ export default class ImagePlayer extends React.Component {
 
     let fadeDuration = 0;
     let crossFade = this.props.scene.crossFade;
+    let crossFadeAudio = this.props.scene.crossFadeAudio && !this.props.scene.gridView;
     if (crossFade) {
       switch (this.props.scene.fadeTF) {
         case TF.scene:
@@ -156,23 +157,23 @@ export default class ImagePlayer extends React.Component {
           onActive={this.onActive.bind(this)}
           onIdle={this.onIdle.bind(this)}
           timeout={2000} />
-          <ImageView
-            image={this.state.historyPaths.length > 0 ? this.state.historyPaths[(this.state.historyPaths.length - 1) + offset] : null}
-            backgroundType={this.props.scene.backgroundType}
-            backgroundColor={this.props.scene.backgroundColor}
-            backgroundBlur={this.props.scene.backgroundBlur}
-            horizTransLevel={horizTransLevel}
-            vertTransLevel={vertTransLevel}
-            zoomStart={zoomStart}
-            zoomEnd={zoomEnd}
-            transDuration={transDuration}
-            crossFade={crossFade}
-            crossFadeAudio={this.props.scene.crossFadeAudio}
-            fadeDuration={fadeDuration}
-            videoClipper={false}
-            videoVolume={this.props.scene.videoVolume}
-            onLoaded={this.state.historyPaths.length == 1 ? this.props.onLoaded : this.nop}
-            setVideo={this.props.setVideo}/>
+        <ImageView
+          image={this.state.historyPaths.length > 0 ? this.state.historyPaths[(this.state.historyPaths.length - 1) + offset] : null}
+          backgroundType={this.props.scene.backgroundType}
+          backgroundColor={this.props.scene.backgroundColor}
+          backgroundBlur={this.props.scene.backgroundBlur}
+          horizTransLevel={horizTransLevel}
+          vertTransLevel={vertTransLevel}
+          zoomStart={zoomStart}
+          zoomEnd={zoomEnd}
+          transDuration={transDuration}
+          crossFade={crossFade}
+          crossFadeAudio={crossFadeAudio}
+          fadeDuration={fadeDuration}
+          fitParent={this.props.scene.gridView}
+          videoVolume={this.props.scene.videoVolume}
+          onLoaded={this.state.historyPaths.length == 1 ? this.props.onLoaded : this.nop}
+          setVideo={this.props.setVideo}/>
       </div>
     );
   }
@@ -448,8 +449,8 @@ export default class ImagePlayer extends React.Component {
           const end = parseInt(video.getAttribute("end"), 10);
           if (this.props.scene.videoOption != VO.full && this.props.scene.randomVideoStart && (!this.props.scene.continueVideo || !video.currentTime)) {
             video.currentTime = start + (Math.random() * (end - start));
-          }else if (video.currentTime < start || video.currentTime > end) {
-             video.currentTime = parseInt(video.getAttribute("start"), 10);
+          } else if (video.currentTime < start || video.currentTime > end) {
+            video.currentTime = parseInt(video.getAttribute("start"), 10);
           }
         } else if (this.props.scene.videoOption != VO.full && this.props.scene.randomVideoStart && (!this.props.scene.continueVideo || !video.currentTime)) {
           video.currentTime = Math.random() * video.duration;
@@ -629,14 +630,6 @@ export default class ImagePlayer extends React.Component {
     if (this.state.readyToDisplay.length) {
       // If there is an image ready, display the next image
       nextImg = this.state.readyToDisplay.shift();
-      if (this.props.scene.continueVideo && nextImg instanceof HTMLVideoElement) {
-        const videoFind = this.state.historyPaths.find((i) => i.src == nextImg.src &&
-          i.getAttribute("start") == nextImg.getAttribute("start") &&
-          i.getAttribute("end") == nextImg.getAttribute("end"));
-        if (videoFind) {
-          nextImg = videoFind;
-        }
-      }
     } else if (this.state.historyPaths.length && this.props.config.defaultScene.orderFunction == OF.random && !this.props.scene.forceAll) {
       // If no image is ready, we have a history to choose from, ordering is random, and NOT forcing all
       // Choose a random image from history to display

@@ -84,6 +84,8 @@ export default class Scene {
   displayedLibrary: Array<LibrarySource> = null;
   videoVolume = 0;
   audios: Array<Audio> = [];
+  gridView = false;
+  grid: Array<Array<number>> = [[]];
   tagWeights?: string;
   sceneWeights?: string;
 

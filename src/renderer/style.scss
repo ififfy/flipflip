@@ -11,6 +11,7 @@ $bodyColor: white;
 $buttonTop: #eaeaea;
 $buttonBottom: #dcdcdc;
 $buttonBorder: #727272;
+$appBG: rgb(52, 104, 152) linear-gradient(180deg, rgba(52, 104, 152, 1) 0%, rgba(24, 50, 76, 1) 100%);
 
 $smallPadding: 0.5rem;
 $buttonBarHeight: 2rem + $smallPadding;
@@ -92,7 +93,7 @@ a {
   right: 0;
   bottom: 0;
   left: 0;
-  background: rgb(52, 104, 152) linear-gradient(180deg, rgba(52, 104, 152, 1) 0%, rgba(24, 50, 76, 1) 100%);
+  background: $appBG;
 }
 
 .u-hidden {
@@ -1377,6 +1378,8 @@ label.SimpleCheckbox {
   right: 0;
   bottom: 0;
   left: 0;
+  z-index: 8;
+  background: $appBG;
 
   display: flex;
   align-items: center;
@@ -1429,6 +1432,44 @@ label.SimpleCheckbox {
     font-size: 25px;
     font-weight: bolder;
   }
+
+  .PlayerGrid {
+    display: grid;
+    width: 100%;
+    height: 100%;
+
+    .HeadlessScenePlayer {
+      z-index: 1;
+      overflow: hidden;
+
+      .ImagePlayer {
+        position: relative;
+        width: 100%;
+        height: 100%;
+
+        .ImageView {
+          width: 100%;
+          height: 100%;
+          position: relative;
+          margin: 0;
+
+          .ImageView__Image {
+            position: relative;
+          }
+
+          .ImageView__Background {
+            width: 104%;
+            height: 104%;
+            margin-left: -2%;
+            margin-top: -2%;
+            z-index: 0;
+            position: absolute;
+            top: 0;
+          }
+        }
+      }
+    }
+  }
 }
 
 .HeadlessScenePlayer {
@@ -1476,6 +1517,70 @@ label.SimpleCheckbox {
   }
 }
 
+.GridSetup {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+
+  .u-button-row {
+    min-height: 2.5rem;
+
+    .u-button-row-right {
+      display: flex;
+
+      .SimpleNumberInput {
+        display: flex;
+        width: 5rem;
+        margin-bottom: 0;
+        align-items: center;
+
+        label {
+          color: black !important;
+          margin-right: $smallPadding;
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+
+  .GridSetup__Grid {
+    flex-grow: 1;
+    display: grid;
+    height: 100%;
+
+    .GridSetup__GridScene, .GridSetup__Scene{
+      height: 100%;
+      width: 100%;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  .GridSetup__Scenes{
+    @include noselect;
+    @include buttonBarBackground;
+    padding: $smallPadding;
+    height: auto;
+    min-height: fit-content;
+    width: 100%;
+    z-index: 8;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+
+    .GridSetup__Scene {
+      padding: $smallPadding*3;
+      margin: $smallPadding $smallPadding 0 $smallPadding;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+}
 
 .VideoClipper {
   display: flex;
@@ -1483,14 +1588,21 @@ label.SimpleCheckbox {
   height: 100%;
 
   .ImageView {
+    position: relative;
     flex-grow: 1;
-    margin: -5px -10px -10px -5px;
-    background-color: black;
 
     .ImageView__Image {
+      position: relative;
       height: 100%;
       width: 100%;
       z-index: 1;
+    }
+    .ImageView__Background {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      z-index: 0;
+      top: 0;
     }
   }
   .VideoClipper__Clipper {

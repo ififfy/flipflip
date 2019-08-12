@@ -12,10 +12,10 @@ export default class VideoGroup extends React.Component {
   readonly props: {
     scene: Scene | SceneSettings,
     mode: string,
-    overlayScenes?: Array<Scene>,
+    otherScenes?: Array<Scene>,
     isPlaying?: boolean,
     mainVideo?: HTMLVideoElement,
-    overlayVideos?: Array<HTMLVideoElement>,
+    otherVideos?: Array<HTMLVideoElement>,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 
@@ -61,18 +61,17 @@ export default class VideoGroup extends React.Component {
                 onChangeVolume={this.changeKey.bind(this, 'videoVolume', this.props.scene).bind(this)}/>
             </React.Fragment>
           )}
-          {this.props.overlayVideos && this.props.overlayVideos.map((overlayVideo, index) => {
-            if (overlayVideo == null) return <React.Fragment key={index}/>;
-            const indexOf = this.props.overlayVideos.map((v) => v == null ? v : v.src).indexOf(overlayVideo.src);
-            if (this.props.overlayScenes[indexOf] == null) return <React.Fragment key={index}/>;
+          {this.props.otherVideos && this.props.otherVideos.map((otherVideo, index) => {
+            if (otherVideo == null) return <React.Fragment key={index}/>;
+            const indexOf = this.props.otherVideos.map((v) => v == null ? v : v.src).indexOf(otherVideo.src);
+            if (this.props.otherScenes[indexOf] == null) return <React.Fragment key={index}/>;
             return (
               <React.Fragment key={index}>
-                <h4>{this.props.overlayScenes[indexOf].name} Video</h4>
+                <h4>{this.props.otherScenes[indexOf].name} Video</h4>
                 <VideoControl
-                  video={overlayVideo}
+                  video={otherVideo}
                   mode={this.props.mode}
-                  volume={this.props.overlayScenes[indexOf].videoVolume}
-                  onChangeVolume={this.changeKey.bind(this, 'videoVolume', this.props.overlayScenes[indexOf]).bind(this)}/>
+                  onChangeVolume={this.props.mainVideo ? this.changeKey.bind(this, 'videoVolume', this.props.otherScenes[indexOf]).bind(this) : this.nop}/>
               </React.Fragment>
             );}
           )}
@@ -80,6 +79,8 @@ export default class VideoGroup extends React.Component {
       </ControlGroup>
     )
   }
+
+  nop() {}
 
   update(scene: Scene, fn: (scene: any) => void) {
     this.props.onUpdateScene(scene, fn);
