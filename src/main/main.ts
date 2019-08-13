@@ -24,7 +24,7 @@ app.on('ready', () => {
   initializeIpcEvents();
 
   // This could be improved, but there are only two command line options currently
-  const sceneName = process.argv.find((el, i, arr) => el != '--no-dev-tools');
+  const sceneName = process.argv.find((el, i, arr) => el != '--no-dev-tools' && !el.endsWith('electron.exe') && !el.endsWith('bundle.js'));
   if (sceneName) {
     setTimeout(startScene.bind(null, sceneName), 1000);
   }
