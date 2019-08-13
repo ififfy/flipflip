@@ -23,8 +23,10 @@ app.on('ready', () => {
   createMainMenu(Menu, createMenuTemplate(app));
   initializeIpcEvents();
 
-  if (process.argv[2] && process.argv[2] != '--no-dev-tools') {
-    setTimeout(startScene.bind(null, process.argv[2]), 1000);
+  // This could be improved, but there are only two command line options currently
+  const sceneName = process.argv.find((el, i, arr) => el != '--no-dev-tools');
+  if (sceneName) {
+    setTimeout(startScene.bind(null, sceneName), 1000);
   }
 });
 
