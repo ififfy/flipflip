@@ -51,7 +51,7 @@
     "react-select": "^3.0.4",
     "react-sortablejs": "^1.5.1",
     "react-sound": "^1.2.0",
-    "react-spring": "^8.0.25",
+    "react-spring": "^8.0.27",
     "recursive-readdir": "^2.2.2",
     "request": "^2.88.0",
     "snoowrap": "^1.15.2",

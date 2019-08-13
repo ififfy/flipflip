@@ -4,7 +4,7 @@ import Timeout = NodeJS.Timeout;
 
 import {BT} from "../../data/const";
 
-export const FadeLayer = (data: {image: any, contentRef: any, backgroundRef: any, backgroundType: string,
+const FadeLayer = (data: {image: any, contentRef: any, backgroundRef: any, backgroundType: string,
   backgroundColor: string, backgroundBlur: number, horizTransLevel: number, vertTransLevel: number, zoomStart: number,
   zoomEnd: number, transDuration: number, fadeDuration: any, crossFade: boolean, fitParent: boolean}) => {
 
@@ -162,33 +162,6 @@ export default class ImageView extends React.Component {
     const img = this.props.image;
     if (!el || !img) return;
 
-    if (img instanceof HTMLVideoElement) {
-      img.volume = this.props.videoVolume / 100;
-      img.play();
-      const videoLoop = (v: any) => {
-        if (parseFloat(el.parentElement.style.opacity) == 0.99 || v.ended) {
-          v.removeEventListener('play', loop);
-          return;
-        }
-        if (v.paused) return;
-        if (this.props.crossFade && this.props.crossFadeAudio && v instanceof HTMLVideoElement) {
-          v.volume = (this.props.videoVolume / 100) * parseFloat(el.parentElement.getAttribute("volume"));
-        }
-        if (v.hasAttribute("start") && v.hasAttribute("end")) {
-          const start = v.getAttribute("start");
-          const end = v.getAttribute("end");
-          if (v.currentTime > end) {
-            v.currentTime = start;
-          }
-        }
-        this._timeouts.push(setTimeout(videoLoop, 20, v));
-      };
-      const loop = () => {
-        videoLoop(img);
-      };
-      img.addEventListener('play', loop.bind(this), false);
-    }
-
     let parentWidth = el.offsetWidth;
     let parentHeight = el.offsetHeight;
     if (this.props.fitParent) {
@@ -211,6 +184,33 @@ export default class ImageView extends React.Component {
     }
     let imgAspect = imgWidth / imgHeight;
 
+    const videoLoop = (v: any) => {
+      if (parseFloat(el.parentElement.style.opacity) == 0.99 || v.ended || v.paused) return;
+      if (this.props.crossFade && this.props.crossFadeAudio && v instanceof HTMLVideoElement) {
+        v.volume = (this.props.videoVolume / 100) * parseFloat(el.parentElement.getAttribute("volume"));
+      }
+      if (v.hasAttribute("start") && v.hasAttribute("end")) {
+        const start = v.getAttribute("start");
+        const end = v.getAttribute("end");
+        if (v.currentTime > end) {
+          v.currentTime = start;
+        }
+      }
+      this._timeouts.push(setTimeout(videoLoop, 100, v));
+    };
+
+    const drawLoop = (v: any, c: CanvasRenderingContext2D, w: number, h: number) => {
+      if (parseFloat(el.parentElement.style.opacity) == 0.99 || v.ended || v.paused) return;
+      c.drawImage(v, 0, 0, w, h);
+      this._timeouts.push(setTimeout(drawLoop, 20, v, c, w, h));
+    };
+
+    if (img instanceof HTMLVideoElement) {
+      img.volume = this.props.videoVolume / 100;
+      img.play();
+      img.onplay = () => videoLoop(img);
+    }
+
     const blur = this.props.backgroundType == BT.blur;
     let bgImg: any;
     if (blur) {
@@ -223,26 +223,16 @@ export default class ImageView extends React.Component {
         bgImg.width = parentWidth;
         bgImg.height = parentHeight;
 
-        const draw = (v: any, c: CanvasRenderingContext2D, w: number, h: number) => {
-          if (parseFloat(el.parentElement.style.opacity) == 0.99 || v.ended) {
-            v.removeEventListener('play', doDraw);
-            return;
-          }
-          if (v.paused) return;
-          c.drawImage(v, 0, 0, w, h);
-          this._timeouts.push(setTimeout(draw, 20, v, c, w, h));
-        };
-
         if (!this.props.crossFade) {
           this.clearTimeouts();
         }
-        const doDraw = () => {
-          draw(img, context, parentWidth, parentHeight);
-        };
         if (img instanceof HTMLImageElement) {
-          doDraw();
+          context.drawImage(img, 0, 0, parentWidth, parentHeight);
         } else {
-          img.addEventListener('play', doDraw.bind(this), false);
+          img.onplay = () => {
+            videoLoop(img);
+            drawLoop(img, context, parentWidth, parentHeight);
+          }
         }
       }
     }
