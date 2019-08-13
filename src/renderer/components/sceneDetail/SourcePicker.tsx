@@ -489,13 +489,14 @@ export default class SourcePicker extends React.Component {
     // If user left input blank, remove it from list of sources
     // Also prevent user from inputing duplicate source
     // If new entry is a duplicate, make sure we remove the new entry
-    const newURL = this.state.editValue;
-    if (newURL == "" || this.getSourceURLs().includes(newURL)) {
+    if (this.state.editValue == "" || this.props.sources.find((s) => s.url == this.state.editValue && s.id != this.state.isEditing) != null) {
       this.props.onUpdateSources(this.props.sources.filter((s) => s.id != this.state.isEditing));
     } else {
       this.props.onUpdateSources(this.props.sources.map((source: LibrarySource) => {
-        if (source.id == this.state.isEditing) {
+        if (source.id == this.state.isEditing && source.url != this.state.editValue) {
           source.offline = false;
+          source.count = 0;
+          source.countComplete = false;
           source.lastCheck = null;
           source.url = this.state.editValue;
         }
