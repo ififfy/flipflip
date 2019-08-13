@@ -4,7 +4,6 @@ import request from 'request';
 import fs from "fs";
 import gifInfo from 'gif-info';
 import IdleTimer from 'react-idle-timer';
-import Timeout = NodeJS.Timeout;
 
 import {GO, HTF, IF, OF, SL, TF, VO, VTF, WF} from '../../data/const';
 import {getRandomListItem, isVideo, urlToPath} from '../../data/utils';
@@ -52,15 +51,15 @@ export default class ImagePlayer extends React.Component {
     orderFunction: this.props.scene.orderFunction,
   };
 
-  _isMounted = false;
-  _isLooping = false;
-  _loadedURLs: Array<string> = null;
-  _nextIndex = 0;
-  _nextAdvIndex = 0;
-  _nextSourceIndex: Map<string, number> = null;
-  _timeout: Timeout = null;
-  _waitTimeouts: Array<Timeout> = null;
-  _toggleStrobe = false;
+  _isMounted: boolean;
+  _isLooping: boolean;
+  _loadedURLs: Array<string>;
+  _nextIndex: number;
+  _nextAdvIndex: number;
+  _nextSourceIndex: Map<string, number>;
+  _timeout: NodeJS.Timeout;
+  _waitTimeouts: Array<NodeJS.Timeout>;
+  _toggleStrobe: boolean;
 
   render() {
     let offset = this.props.historyOffset;
@@ -171,7 +170,7 @@ export default class ImagePlayer extends React.Component {
           crossFadeAudio={crossFadeAudio}
           fadeDuration={fadeDuration}
           fitParent={this.props.scene.gridView}
-          videoVolume={this.props.scene.videoVolume}
+          videoVolume={this.props.hasStarted ? this.props.scene.videoVolume : 0}
           onLoaded={this.state.historyPaths.length == 1 ? this.props.onLoaded : this.nop}
           setVideo={this.props.setVideo}/>
       </div>
@@ -187,7 +186,8 @@ export default class ImagePlayer extends React.Component {
     this._nextIndex = 0;
     this._nextAdvIndex = 0;
     this._nextSourceIndex = new Map<string, number>();
-    this._waitTimeouts = new Array<Timeout>(this.props.config.displaySettings.maxLoadingAtOnce).fill(null);
+    this._waitTimeouts = new Array<NodeJS.Timeout>(this.props.config.displaySettings.maxLoadingAtOnce).fill(null);
+    this._toggleStrobe = false;
     if (this.props.advanceHack) {
       this.props.advanceHack.listener = () => {
         clearTimeout(this._timeout);
@@ -205,9 +205,13 @@ export default class ImagePlayer extends React.Component {
   }
 
   componentWillUnmount() {
-    this._isMounted = false;
+    this._isMounted = null;
+    this._isLooping = null;
     this._loadedURLs = null;
+    this._nextIndex = null;
+    this._nextAdvIndex = null;
     this._nextSourceIndex = null;
+    this._toggleStrobe = null;
     clearTimeout(this._timeout);
     for (let timeout of this._waitTimeouts) {
       clearTimeout(this._timeout);

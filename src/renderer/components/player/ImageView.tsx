@@ -289,6 +289,7 @@ export default class ImageView extends React.Component {
       props.zoomStart !== this.props.zoomStart ||
       props.zoomEnd !== this.props.zoomEnd ||
       props.transDuration !== this.props.transDuration ||
+      props.videoVolume !== this.props.videoVolume ||
       props.crossFade !== this.props.crossFade ||
       props.crossFadeAudio !== this.props.crossFadeAudio ||
       props.fadeDuration !== this.props.fadeDuration;
