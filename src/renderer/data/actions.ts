@@ -1,4 +1,4 @@
-import {remote} from "electron";
+import {remote, webFrame} from "electron";
 import * as fs from "fs";
 import path from 'path';
 import wretch from "wretch";
@@ -170,15 +170,21 @@ export function printMemoryReport() {
     return f;
   }
   function logB(x: any) {
-    console.log(format(x[0]), format(x[1] / (1000.0*1000)), "MB");
+    console.log(format(x[0]), format((x[1] / (1000.0*1000)).toFixed(2)), "MB");
   }
   function logKB(x: any) {
-    console.log(format(x[0]), format(x[1] / (1000.0)), "MB");
+    console.log(format(x[0]), format((x[1] / (1000.0)).toFixed(2)), "MB");
+  }
+  function logCount(x: any) {
+    console.log(format(x[0]), format(x[1].count), format((x[1].size / (1000.0*1000)).toFixed(2)), "MB", format((x[1].liveSize / (1000.0*1000)).toFixed(2)), "MB");
   }
 
   Object.entries(process.memoryUsage()).map(logB);
   Object.entries(process.getProcessMemoryInfo()).map(logKB);
   Object.entries(process.getSystemMemoryInfo()).map(logKB);
+  console.log("\n");
+  console.log(format("object"), format("count"), format("size"), format("liveSize"));
+  Object.entries(webFrame.getResourceUsage()).map(logCount);
   console.log('------')
 }
 

@@ -12,6 +12,8 @@ import Scene from "../../data/Scene";
 import ChildCallbackHack from './ChildCallbackHack';
 import ImageView from './ImageView';
 import Strobe from "./Strobe";
+import {printMemoryReport} from "../../data/actions";
+import {webFrame} from "electron";
 
 class GifInfo {
   animated: boolean;
@@ -56,6 +58,7 @@ export default class ImagePlayer extends React.Component {
   _loadedURLs: Array<string>;
   _nextIndex: number;
   _nextAdvIndex: number;
+  _count: number;
   _nextSourceIndex: Map<string, number>;
   _timeout: NodeJS.Timeout;
   _waitTimeouts: Array<NodeJS.Timeout>;
@@ -185,6 +188,7 @@ export default class ImagePlayer extends React.Component {
     this._loadedURLs = new Array<string>();
     this._nextIndex = 0;
     this._nextAdvIndex = 0;
+    this._count = 0;
     this._nextSourceIndex = new Map<string, number>();
     this._waitTimeouts = new Array<NodeJS.Timeout>(this.props.config.displaySettings.maxLoadingAtOnce).fill(null);
     this._toggleStrobe = false;
@@ -210,6 +214,7 @@ export default class ImagePlayer extends React.Component {
     this._loadedURLs = null;
     this._nextIndex = null;
     this._nextAdvIndex = null;
+    this._count = null;
     this._nextSourceIndex = null;
     this._toggleStrobe = null;
     clearTimeout(this._timeout);
@@ -247,6 +252,12 @@ export default class ImagePlayer extends React.Component {
     }
     if (this.props.scene.orderFunction !== this.state.orderFunction) {
       this.setState({readyToDisplay: [], orderFunction: this.props.scene.orderFunction});
+    }
+
+    if (this._count % this.props.config.displaySettings.maxInMemory == 0) {
+      //printMemoryReport();
+      webFrame.clearCache();
+      //setTimeout(printMemoryReport, 1000);
     }
   }
 
@@ -613,6 +624,7 @@ export default class ImagePlayer extends React.Component {
       return;
     }
     this._isLooping = true;
+    this._count++;
 
     let nextHistoryPaths = this.state.historyPaths;
     let nextImg: HTMLImageElement | HTMLVideoElement;

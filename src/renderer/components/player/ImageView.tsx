@@ -134,7 +134,7 @@ export default class ImageView extends React.Component {
 
   readonly backgroundRef: React.RefObject<HTMLDivElement> = React.createRef();
   readonly contentRef: React.RefObject<HTMLDivElement> = React.createRef();
-  _timeouts: Array<Timeout> = null;
+  _timeouts: Array<Timeout>;
 
   componentDidMount() {
     this._timeouts = new Array<Timeout>();
