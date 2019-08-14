@@ -1196,6 +1196,7 @@ label.SimpleCheckbox {
     display: flex;
     flex-wrap: wrap;
     overflow: auto;
+    max-height: 97vh;
     padding: $smallPadding;
 
     & > * {
