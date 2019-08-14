@@ -386,6 +386,20 @@ export function clipVideo(state: State, source: LibrarySource) {
 
 export function navigateDisplayedLibrary(state: State, offset: number): Object {
   const activeScene = getActiveScene(state);
+  const librarySource = getLibrarySource(state);
+  const tagNames = state.tags.map((t: Tag) => t.name);
+  // Re-order the tags of the source we were playing
+  librarySource.tags = librarySource.tags.sort((a: Tag, b: Tag) => {
+    const aIndex = tagNames.indexOf(a.name);
+    const bIndex = tagNames.indexOf(b.name);
+    if (aIndex < bIndex) {
+      return -1;
+    } else if (aIndex > bIndex) {
+      return 1;
+    } else {
+      return 0;
+    }
+  });
   const displayed = Array.from(activeScene.displayedLibrary);
   const indexOf = displayed.map((s) => s.url).indexOf(activeScene.sources[0].url);
   let newIndexOf = indexOf + offset;
@@ -526,7 +540,6 @@ export function setCount(state: State, sourceURL: string, count: number, countCo
   return {library: newLibrary, scenes: newScenes};
 }
 
-// TODO Make sure tags are properly ordered when navigating with [ ]
 export function updateTags(state: State, tags: Array<Tag>): Object {
   // Go through each scene in the library
   let newLibrary = state.library;
