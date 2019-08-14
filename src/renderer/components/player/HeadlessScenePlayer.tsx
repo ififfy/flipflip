@@ -670,8 +670,8 @@ function loadTwitter(config: Config, source: LibrarySource, filter: string, help
         let images = Array<string>();
         let lastID = "";
         for (let t of tweets) {
-          // Skip FanCentro posts
-          if (t.source.includes("https://fancentro.com")) continue;
+          // Skip FanCentro/OnlyFans posts
+          if (/href="https?:\/\/(fancentro|onlyfans)\.com\/?"/.exec(t.source) != null) continue;
           if (t.extended_entities && t.extended_entities.media) {
             for (let m of t.extended_entities.media) {
               if (m.video_info) {
