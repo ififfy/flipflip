@@ -763,7 +763,7 @@ function loadInstagram(config: Config, source: LibrarySource, filter: string, he
         }
       }
       // Strict filter won't work because instagram media needs the extra parameters on the end
-      helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+      helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
       resolve({
         data: filterPathsToJustPlayable(filter, images, false),
         helpers: helpers,

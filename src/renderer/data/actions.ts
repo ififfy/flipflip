@@ -526,6 +526,7 @@ export function setCount(state: State, sourceURL: string, count: number, countCo
   return {library: newLibrary, scenes: newScenes};
 }
 
+// TODO Make sure tags are properly ordered when navigating with [ ]
 export function updateTags(state: State, tags: Array<Tag>): Object {
   // Go through each scene in the library
   let newLibrary = state.library;
