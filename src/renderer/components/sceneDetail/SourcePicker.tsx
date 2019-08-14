@@ -542,6 +542,7 @@ export default class SourcePicker extends React.Component {
     if (filtering) {
       for (let source of this.props.sources) {
         let matchesFilter = true;
+        let countRegex;
         for (let filter of this.state.filters) {
           if (filter == "<Offline>") { // This is offline filter
             matchesFilter = source.offline;
@@ -556,6 +557,21 @@ export default class SourcePicker extends React.Component {
               matchesFilter = source.tags.find((t) => t.name == tag) == null;
             } else {
               matchesFilter = source.tags.find((t) => t.name == tag) != null;
+            }
+          } else if ((countRegex = /^count(\+?)([>=<])(\d*)$/.exec(filter)) != null) {
+            const all = countRegex[1] == "+";
+            const symbol = countRegex[2];
+            const value = parseInt(countRegex[3], 10);
+            switch (symbol) {
+              case "=":
+                matchesFilter = (all || source.countComplete) && source.count == value;
+                break;
+              case ">":
+                matchesFilter = (all || source.countComplete) && source.count > value;
+                break;
+              case "<":
+                matchesFilter = (all || source.countComplete) && source.count < value;
+                break;
             }
           } else { // This is a search filter
             filter = filter.replace("\\", "\\\\");
