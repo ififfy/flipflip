@@ -246,7 +246,9 @@ export default class ImagePlayer extends React.Component {
     if ((!props.isPlaying && this.props.isPlaying) ||
       (!props.allURLs && this.props.allURLs && this._isLooping) ||
       (!props.hasStarted && this.props.hasStarted && !this._isLooping)) {
-      this.start();
+      if (!this._isLooping) {
+        this.start();
+      }
     } else if (!this.props.isPlaying) {
       clearTimeout(this._timeout);
     }
