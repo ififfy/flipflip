@@ -1,7 +1,8 @@
 import * as React from "react";
+import wretch from "wretch";
+
 import Tag from "../library/Tag";
 import {CancelablePromise, getRandomListItem} from "../../data/utils";
-import wretch from "wretch";
 
 const splitFirstWord = function (s: string) {
   const firstSpaceIndex = s.indexOf(" ");
@@ -140,7 +141,7 @@ export default class CaptionProgram extends React.Component {
         const command = getFirstWord(line);
         const value = getRest(line);
         let fn, ms;
-        switch (command) {
+        switch (command.toLocaleLowerCase()) {
           case "count":
             const split = value.split(" ");
             if (split.length != 2) {
@@ -160,21 +161,21 @@ export default class CaptionProgram extends React.Component {
           case "blink":
           case "cap":
           case "bigcap":
-            newProgram.push(this[command](value));
+            newProgram.push((this as any)[command](value));
             break;
-          case "storePhrase":
+          case "storephrase":
             const newPhrases = this.state.phrases;
             newPhrases.concat([value]);
             this.setState({phrases: newPhrases});
             break;
-          case "setBlinkDuration":
-          case "setBlinkDelay":
-          case "setBlinkGroupDelay":
-          case "setCaptionDuration":
-          case "setCaptionDelay":
-          case "setCountDuration":
-          case "setCountDelay":
-          case "setCountGroupDelay":
+          case "setblinkduration":
+          case "setblinkdelay":
+          case "setblinkgroupdelay":
+          case "setcaptionduration":
+          case "setcaptiondelay":
+          case "setcountduration":
+          case "setcountdelay":
+          case "setcountgroupdelay":
           case "wait":
             ms = parseInt(value, 10);
             if (isNaN(ms)) {
@@ -182,7 +183,7 @@ export default class CaptionProgram extends React.Component {
               console.error("Error: '" + line + "' - invalid command");
               break;
             }
-            fn = this[command](ms);
+            fn = (this as any)[command](ms);
             newProgram.push(fn);
             break;
           default:
