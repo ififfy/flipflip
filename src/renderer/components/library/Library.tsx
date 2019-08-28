@@ -11,6 +11,7 @@ import SourcePicker from "../sceneDetail/SourcePicker";
 import Progress from "../ui/Progress";
 import Jiggle from "../../animations/Jiggle";
 import Twitter from "twitter";
+import {ST} from "../../data/const";
 
 export default class Library extends React.Component {
   readonly props: {
@@ -43,6 +44,7 @@ export default class Library extends React.Component {
     currentProgress: 0,
     progressTitle: "",
     next: "",
+    mode: "",
   };
 
   render() {
@@ -63,9 +65,9 @@ export default class Library extends React.Component {
                 this.props.config.remoteSettings.instagramPassword != "" && (
                 <Jiggle
                   bounce={false}
-                  className="Library__InstagramImport u-button u-icon-button u-clickable"
+                  className={`Library__InstagramImport u-button u-icon-button ${this.state.inProgress ? 'u-disabled' : 'u-clickable'}`}
                   title="Import Instagram Following"
-                  onClick={this.importInstagram.bind(this)}
+                  onClick={this.state.inProgress ? this.nop() : this.importInstagram.bind(this)}
                 >
                   <div className="u-instagram-outline"/>
                 </Jiggle>
@@ -74,9 +76,9 @@ export default class Library extends React.Component {
                 this.props.config.remoteSettings.twitterAccessTokenSecret != "" && (
                 <Jiggle
                   bounce={false}
-                  className="Library__TwitterImport u-button u-icon-button u-clickable"
+                  className={`Library__TwitterImport u-button u-icon-button ${this.state.inProgress ? 'u-disabled' : 'u-clickable'}`}
                   title="Import Twitter Following"
-                  onClick={this.importTwitter.bind(this)}
+                  onClick={this.state.inProgress ? this.nop() : this.importTwitter.bind(this)}
                 >
                   <div className="u-twitter-outline"/>
                 </Jiggle>
@@ -84,9 +86,9 @@ export default class Library extends React.Component {
               {this.props.config.remoteSettings.redditRefreshToken != "" && (
                 <Jiggle
                   bounce={false}
-                  className="Library__RedditImport u-button u-icon-button u-clickable"
+                  className={`Library__RedditImport u-button u-icon-button ${this.state.inProgress ? 'u-disabled' : 'u-clickable'}`}
                   title="Import Reddit Subscriptions"
-                  onClick={this.importReddit.bind(this)}
+                  onClick={this.state.inProgress ? this.nop() : this.importReddit.bind(this)}
                 >
                   <div className="u-reddit-outline"/>
                 </Jiggle>
@@ -95,22 +97,22 @@ export default class Library extends React.Component {
                 this.props.config.remoteSettings.tumblrOAuthTokenSecret != "" && (
                 <Jiggle
                   bounce={false}
-                  className="Library__TumblrImport u-button u-icon-button u-clickable"
+                  className={`Library__TumblrImport u-button u-icon-button ${this.state.inProgress && this.state.mode != ST.tumblr ? 'u-disabled' : 'u-clickable'}`}
                   title="Import Tumblr Following"
-                  onClick={this.importTumblr.bind(this)}>
+                  onClick={this.state.inProgress && this.state.mode != ST.tumblr ? this.nop() : this.importTumblr.bind(this)}>
                   <div className="u-tumblr-outline"/>
                 </Jiggle>
               )}
               <Jiggle
                 bounce={false}
-                className="Library__MarkOffline u-button u-icon-button u-clickable"
+                className={`Library__MarkOffline u-button u-icon-button ${this.state.inProgress && this.state.mode != "offline" ? 'u-disabled' : 'u-clickable'}`}
                 title="Mark Offline Sources"
-                onClick={this.markOffline.bind(this)}>
+                onClick={this.state.inProgress && this.state.mode != "offline" ? this.nop() : this.markOffline.bind(this)}>
                 <div className="u-mark-offline"/>
               </Jiggle>
               <Jiggle
                 bounce={false}
-                className="Library__ManageTags u-button u-icon-button u-clickable"
+                className={`Library__ManageTags u-button u-icon-button u-clickable`}
                 title="Manage Tags"
                 onClick={this.props.manageTags.bind(this)}>
                 <div className="u-tags"/>
@@ -211,7 +213,7 @@ export default class Library extends React.Component {
         client.userFollowing({offset: offset}, (err, data) => {
           if (err) {
             alert("Error retrieving following: " + err);
-            this.setState({currentProgress: 0, totalProgress: 0, inProgress: false, showProgress: false, progressTitle: ""});
+            this.setState({mode: "", currentProgress: 0, totalProgress: 0, inProgress: false, showProgress: false, progressTitle: ""});
             console.error(err);
             return;
           }
@@ -256,7 +258,7 @@ export default class Library extends React.Component {
           if ((nextOffset) < this.state.totalProgress) {
             setTimeout(tumblrImportLoop, 1500);
           } else {
-            this.setState({currentProgress: 0, totalProgress: 0, inProgress: false, showProgress: false, progressTitle: ""});
+            this.setState({mode: "", currentProgress: 0, totalProgress: 0, inProgress: false, showProgress: false, progressTitle: ""});
             alert("Tumblr Following Import has completed");
           }
         });
@@ -272,6 +274,7 @@ export default class Library extends React.Component {
 
         // Show progress bar and kick off loop
         this.setState({
+          mode: ST.tumblr,
           currentProgress: 0,
           totalProgress: data.total_blogs,
           inProgress: true,
@@ -329,7 +332,7 @@ export default class Library extends React.Component {
           setTimeout(redditImportLoop, 1500);
           this.setState({next: subscriptionListing[subscriptionListing.length - 1].name, currentProgress: this.state.currentProgress + 1});
         } else {
-          this.setState({next: "", currentProgress: 0, totalProgress: 0, inProgress: false, progressTitle: ""});
+          this.setState({mode: "", next: "", currentProgress: 0, totalProgress: 0, inProgress: false, progressTitle: ""});
           alert("Reddit Subscription Import has completed");
         }
       }).catch((err: any) => {
@@ -340,13 +343,13 @@ export default class Library extends React.Component {
           alert("Error retrieving subscriptions: " + err);
           console.error(err);
         }
-        this.setState({currentProgress: 0, totalProgress: 0, inProgress: false, progressTitle: ""});
+        this.setState({mode: "", currentProgress: 0, totalProgress: 0, inProgress: false, progressTitle: ""});
       });
     };
 
     // Show progress bar and kick off loop
     alert("Your Reddit subscriptions are being imported... You will recieve an alert when the import is finished.");
-    this.setState({totalProgress: 1, inProgress: true});
+    this.setState({mode: ST.reddit, totalProgress: 1, inProgress: true});
     redditImportLoop();
   }
 
@@ -364,7 +367,7 @@ export default class Library extends React.Component {
         if (error) {
           alert("Error retrieving following: " + error);
           console.error(error);
-          this.setState({currentProgress: 0, totalProgress: 0, inProgress: false, progressTitle: ""});
+          this.setState({mode: "", currentProgress: 0, totalProgress: 0, inProgress: false, progressTitle: ""});
           return;
         }
 
@@ -397,19 +400,19 @@ export default class Library extends React.Component {
         this.props.onUpdateLibrary(newLibrary);
 
         if (data.next_cursor == 0) { // We're done
-          this.setState({next: "", currentProgress: 0, totalProgress: 0, inProgress: false, progressTitle: ""});
+          this.setState({mode: "", next: "", currentProgress: 0, totalProgress: 0, inProgress: false, progressTitle: ""});
           alert("Twitter Following Import has completed");
         } else {
           // Loop until we run out of blogs
           setTimeout(twitterImportLoop, 1500);
-          this.setState({next: data.next_cursor, currentProgress: this.state.currentProgress + 1});
+          this.setState({mode: "", next: data.next_cursor, currentProgress: this.state.currentProgress + 1});
         }
       });
     };
 
     // Show progress bar and kick off loop
     alert("Your Twitter Following is being imported... You will recieve an alert when the import is finished.");
-    this.setState({totalProgress: 1, inProgress: true});
+    this.setState({mode: ST.twitter, totalProgress: 1, inProgress: true});
     twitterImportLoop();
   }
 
@@ -470,7 +473,7 @@ export default class Library extends React.Component {
           const followingFeed = this.ig.feed.accountFollowing(id);
           followingFeed.deserialize(feedSession);
           if (!followingFeed.isMoreAvailable()) {
-            this.setState({next: "", currentProgress: 0, totalProgress: 0, inProgress: false, progressTitle: ""});
+            this.setState({mode: "", next: "", currentProgress: 0, totalProgress: 0, inProgress: false, progressTitle: ""});
             alert("Instagram Following Import has completed");
             return;
           }
@@ -483,7 +486,7 @@ export default class Library extends React.Component {
 
     // Show progress bar and kick off loop
     alert("Your Instagram Following is being imported... You will recieve an alert when the import is finished.");
-    this.setState({totalProgress: 1, inProgress: true});
+    this.setState({mode: ST.instagram, totalProgress: 1, inProgress: true});
     instagramImportLoop();
   }
 
@@ -494,7 +497,7 @@ export default class Library extends React.Component {
       const offlineLoop = () => {
         const offset = this.state.currentProgress;
         if (this.props.library.length == offset) {
-          this.setState({currentProgress: 0, totalProgress: 0, inProgress: false, showProgress: false, progressTitle: ""});
+          this.setState({mode: "", currentProgress: 0, totalProgress: 0, inProgress: false, showProgress: false, progressTitle: ""});
           alert("Offline Check has completed. Remote sources not available are now marked in red.");
         } else if (this.props.library[offset].url.startsWith("http://") ||
                    this.props.library[offset].url.startsWith("https://")) {
@@ -536,6 +539,7 @@ export default class Library extends React.Component {
 
       // Show progress bar and kick off loop
       this.setState({
+        mode: "offline",
         currentProgress: 0,
         totalProgress: this.props.library.length,
         inProgress: true,
