@@ -1,4 +1,4 @@
-import {remote, webFrame} from 'electron';
+import {remote, webFrame, clipboard, nativeImage} from 'electron';
 import * as React from 'react';
 import fs from "fs";
 import fileURL from "file-url";
@@ -489,6 +489,14 @@ export default class Player extends React.Component {
       label: isFile ? path : url,
       click: () => { navigator.clipboard.writeText(isFile ? path : url); }
     }));
+    if (url.toLocaleLowerCase().endsWith(".png") || url.toLocaleLowerCase().endsWith(".jpg") || url.toLocaleLowerCase().endsWith(".jpeg")) {
+      contextMenu.append(new MenuItem({
+        label: 'Copy Image',
+        click: () => {
+          this.copyImageToClipboard(url);
+        }
+      }));
+    }
     contextMenu.append(new MenuItem({
       label: 'Open Source',
       click: () => { remote.shell.openExternal(source); }
@@ -702,6 +710,19 @@ export default class Player extends React.Component {
     this.props.goBack();
   }
 
+  copyImageToClipboard(sourceURL: string) {
+    let url = sourceURL;
+    if (!url) {
+      url = this.state.historyPaths[(this.state.historyPaths.length - 1) + this.state.historyOffset].src;
+    }
+    const isFile = url.startsWith('file://');
+    const path = urlToPath(url);
+    const imagePath = isFile ? path : url;
+    if (imagePath.toLocaleLowerCase().endsWith(".png") || imagePath.toLocaleLowerCase().endsWith(".jpg") || imagePath.toLocaleLowerCase().endsWith(".jpeg")) {
+      clipboard.writeImage(nativeImage.createFromPath(imagePath));
+    }
+  }
+
   setHistoryPaths(paths: Array<any>) {
     this.setState({historyPaths: paths});
   }
@@ -777,6 +798,12 @@ export default class Player extends React.Component {
       case 'Escape':
         e.preventDefault();
         this.navigateBack();
+        break;
+      case 'c':
+        if (e.ctrlKey) {
+          e.preventDefault();
+          this.copyImageToClipboard(null);
+        }
         break;
       case 'f':
         if (e.ctrlKey) {
