@@ -22,12 +22,12 @@ $buttonSidebarWidth: 21rem + $smallPadding;
 /*
 Current Player Z-Indices (Layering is also effected by opacity)
 -------------------------
-1 Base Scene
-2 Strobe Layer
-3 Overlay Scene
-4 Strobe Layer
-5 Captioning
-6
+1 Background
+2 Image Layer
+3 Strobe Layer
+4 Overlay Scene
+5 Strobe Layer
+6 Captioning
 7
 8 Tagging Bottom Sidebar
 9 Scene Effects Sidebar
@@ -1421,7 +1421,7 @@ label.SimpleCheckbox {
   }
 
   .Strobe {
-    z-index: 4;
+    z-index: 5;
   }
 
   .EmptyIndicator {
@@ -1440,7 +1440,10 @@ label.SimpleCheckbox {
     height: 100%;
 
     .HeadlessScenePlayer {
-      z-index: 1;
+      width: 104%;
+      height: 104%;
+      margin-left: -2%;
+      margin-top: -2%;
       overflow: hidden;
 
       .ImagePlayer {
@@ -1449,24 +1452,7 @@ label.SimpleCheckbox {
         height: 100%;
 
         .ImageView {
-          width: 100%;
-          height: 100%;
-          position: relative;
           margin: 0;
-
-          .ImageView__Image {
-            position: relative;
-          }
-
-          .ImageView__Background {
-            width: 104%;
-            height: 104%;
-            margin-left: -2%;
-            margin-top: -2%;
-            z-index: 0;
-            position: absolute;
-            top: 0;
-          }
         }
       }
     }
@@ -1476,12 +1462,12 @@ label.SimpleCheckbox {
 .HeadlessScenePlayer {
   &.m-overlay {
     .ImagePlayer {
-      z-index: 3;
+      z-index: 4;
     }
   }
 
   .Strobe {
-    z-index: 2;
+    z-index: 3;
 
     &.m-background {
       z-index: 1;
@@ -1495,13 +1481,26 @@ label.SimpleCheckbox {
     bottom: 0;
     left: 0;
 
+    .ZoomMoveLayer {
+      z-index: 2;
+    }
+
     .ImageView {
+      z-index: 2;
       margin: -5px -10px -10px -5px;
+
+      .Strobe {
+        z-index: 2;
+
+        &.m-background {
+          z-index: 1;
+        }
+      }
 
       .ImageView__Image {
         height: 100%;
         width: 100%;
-        z-index: 1;
+        z-index: 2;
         background-position: center;
         background-size: contain;
         background-repeat: no-repeat;
@@ -1592,18 +1591,30 @@ label.SimpleCheckbox {
     position: relative;
     flex-grow: 1;
 
+    .FadeLayer {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+
+    .ZoomMoveLayer {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      z-index: 2;
+    }
+
     .ImageView__Image {
       position: relative;
       height: 100%;
       width: 100%;
-      z-index: 1;
+      z-index: 2;
     }
     .ImageView__Background {
       position: absolute;
       height: 100%;
       width: 100%;
-      z-index: 0;
-      top: 0;
+      z-index: 1;
     }
   }
   .VideoClipper__Clipper {
@@ -1720,7 +1731,7 @@ label.SimpleCheckbox {
   left: 0;
   right: 0;
   background-color: rgba(24, 24, 24, 0.3);
-  z-index: 1;
+  z-index: 6;
 
   display: flex;
   align-items: center;
@@ -1743,7 +1754,7 @@ label.SimpleCheckbox {
   $barPadding: ($barHeight - $buttonHeight) / 2;
 
   .Modal__Bar__Container {
-    z-index: 2;
+    z-index: 7;
     position: absolute;
     left: -1px;
     top: -$barHeight;
@@ -1826,7 +1837,7 @@ label.SimpleCheckbox {
 }
 
 .CaptionProgram {
-  z-index: 5;
+  z-index: 6;
   pointer-events: none;
   display: table;
   width: 100%;

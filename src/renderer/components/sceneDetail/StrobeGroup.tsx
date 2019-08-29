@@ -33,16 +33,18 @@ export default class StrobeGroup extends React.Component {
         </div>
         {this.props.scene.strobe && (
           <div className="ControlSubgroup m-inline">
-            <SimpleColorPicker
-              onChange={this.changeKey.bind(this, 'strobeColor').bind(this)}
-              label="Strobe Color"
-              value={this.props.scene.strobeColor} />
             <div className="ControlSubgroup m-inline">
               <SimpleOptionPicker
                 label="Strobe Layer"
                 value={this.props.scene.strobeLayer}
                 keys={Object.values(SL)}
                 onChange={this.changeKey.bind(this, 'strobeLayer').bind(this)}/>
+              {this.props.scene.strobeLayer != SL.image && (
+                <SimpleColorPicker
+                  onChange={this.changeKey.bind(this, 'strobeColor').bind(this)}
+                  label="Strobe Color"
+                  value={this.props.scene.strobeColor} />
+              )}
               {this.props.scene.strobeLayer == SL.bottom && (
                 <SimpleSliderInput
                   isEnabled={this.props.scene.strobeLayer == SL.bottom}

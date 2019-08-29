@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {animated, Transition} from "react-spring/renderprops";
+import {animated, useTransition} from "react-spring";
 
 import {TF} from "../../data/const";
 
@@ -20,7 +20,9 @@ export default class Strobe extends React.Component {
     delayMin: number,
     delayMax: number,
     delaySinRate: number,
-    color: string,
+    color?: string,
+    strobeFunction?: Function,
+    children?: React.ReactNode,
   };
 
   readonly state = {
@@ -33,28 +35,57 @@ export default class Strobe extends React.Component {
 
   render() {
     return (
-      <Transition
-        reset
-        unique
-        items={this.state.toggleStrobe}
-        config={{duration: this.state.duration}}
-        from={{ backgroundColor: this.props.color, opacity: this.props.opacity}}
-        enter={{ opacity: 0 }}
-        leave={{ opacity: 0 }} >
-        {toggle => props =>
-          <animated.div
-            className={this.props.className ? "Strobe u-fill-container " + this.props.className : "Strobe u-fill-container"}
-            style={props}
-          />
-        }
-      </Transition>
-    )
+      <this.StrobeLayer>
+        {this.props.children}
+      </this.StrobeLayer>
+    );
   }
+
+  StrobeLayer = (data: {children: React.ReactNode}) => {
+    const strobeTransitions: [{ item: any, props: any, key: any }] = useTransition(
+      this.state.toggleStrobe,
+      (toggle: any) => {
+        return toggle
+      },
+      {
+        from: {
+          backgroundColor: this.props.color ? this.props.color : "",
+          opacity: 1,
+        },
+        enter: {
+          opacity: 0,
+        },
+        leave: {
+          opacity: 0,
+        },
+        reset: true,
+        unique: true,
+        config: {
+          duration: this.props.duration,
+        },
+      }
+    );
+
+    return (
+      <React.Fragment>
+        {strobeTransitions.map(({item, props, key}) => {
+          return (
+            <animated.div className={this.props.className ? "Strobe u-fill-container " + this.props.className : "Strobe u-fill-container"} key={key} style={{...props}}>
+              {data.children}
+            </animated.div>
+          );
+        })}
+      </React.Fragment>
+    );
+  };
 
   strobe() {
     const duration = this.getDuration();
     const delay = this.props.pulse ? this.getDelay() : duration;
     this.setState({toggleStrobe: !this.state.toggleStrobe, duration: duration, delay: delay});
+    if (this.props.strobeFunction) {
+      this.props.strobeFunction();
+    }
     return delay;
   }
 

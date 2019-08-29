@@ -2,119 +2,16 @@ import * as React from 'react';
 import {animated, useSpring, useTransition} from "react-spring";
 import Timeout = NodeJS.Timeout;
 
-import {BT} from "../../data/const";
-
-const FadeLayer = (data: {image: any, contentRef: any, backgroundRef: any, backgroundType: string,
-  backgroundColor: string, backgroundBlur: number, horizTransLevel: number, vertTransLevel: number, zoomStart: number,
-  zoomEnd: number, transDuration: number, fadeDuration: any, crossFade: boolean, fitParent: boolean}) => {
-
-  const fadeTransitions: [{item: any, props: any, key: any}] = useTransition(
-    data.image ? data.image : -1,
-    (image: any) => {
-      return image.key
-    },
-    {
-      initial: { // Initial (first time) base values, optional (can be null)
-        opacity: 1,
-        volume: 1,
-      },
-      from: { // Base values, optional
-        opacity: data.crossFade ? 0 : 1,
-        volume: data.crossFade ? 0 : 1,
-      },
-      enter: { // Styles apply for entering elements
-        opacity: 1,
-        volume: 1,
-      },
-      leave: { // Styles apply for leaving elements
-        opacity: data.crossFade ? 0.99 : 1,
-        volume: data.crossFade ? 0 : 1,
-      },
-      unique: true, // If this is true, items going in and out with the same key will be re-used
-      config: {
-        duration: parseInt(data.fadeDuration, 10),
-      },
-    }
-  );
-
-  return (
-    <React.Fragment>
-      {fadeTransitions.map(({item, props, key}) => {
-        return (
-          <animated.div className={`ImageView ${data.fitParent ? '': 'u-fill-container'}`} key={key} volume={props.volume} style={{ ...props }}>
-            <ZoomMoveLayer
-              contentRef={data.contentRef}
-              horizTransLevel={data.horizTransLevel}
-              vertTransLevel={data.vertTransLevel}
-              zoomStart={data.zoomStart}
-              zoomEnd={data.zoomEnd}
-              duration={data.transDuration} />
-            <Image
-              className="ImageView__Background"
-              contentRef={data.backgroundRef}
-              backgroundType={data.backgroundType}
-              backgroundColor={data.backgroundColor}
-              backgroundBlur={data.backgroundBlur}
-              imageProps={null} />
-          </animated.div>
-        );
-      })}
-    </React.Fragment>
-  );
-};
-
-const ZoomMoveLayer = (data: {contentRef: any, horizTransLevel: number, vertTransLevel: number,
-  zoomStart: number, zoomEnd: number, duration: any }) => {
-  const imageProps = useSpring(
-    {
-      from: {
-        transform: 'translate(0%, 0%) scale(' + data.zoomStart + ')',
-      },
-      to: {
-        transform: 'translate(' + data.horizTransLevel + '%, ' + data.vertTransLevel + '%) scale(' + data.zoomEnd + ')',
-      },
-      config: {
-        duration: parseInt(data.duration, 10),
-      },
-    }
-  );
-
-  return (
-    <Image
-      className="ImageView__Image"
-      contentRef={data.contentRef}
-      backgroundType={null}
-      backgroundColor={null}
-      backgroundBlur={null}
-      imageProps={imageProps} />
-  );
-};
-
-const Image = (data: {className: string, contentRef: any, backgroundType: string, backgroundColor: string, backgroundBlur: number, imageProps: any }) => {
-  let backgroundStyle = {};
-  if (data.imageProps == null) {
-    if (data.backgroundType == BT.color) {
-      backgroundStyle = {
-        backgroundColor: data.backgroundColor,
-      };
-    } else if (data.backgroundType == BT.blur) {
-      backgroundStyle = {
-        filter: 'blur(' + data.backgroundBlur + 'px)',
-      };
-    }
-  }
-
-  return (
-    <animated.div
-      ref={data.contentRef}
-      className={data.className}
-      style={{...data.imageProps, ...backgroundStyle}} />
-  );
-};
+import {BT, SL} from "../../data/const";
+import Scene from "../../data/Scene";
+import Strobe from "./Strobe";
 
 export default class ImageView extends React.Component {
   readonly props: {
     image: HTMLImageElement | HTMLVideoElement,
+    scene?: Scene,
+    timeToNextFrame?: number,
+    toggleStrobe?: boolean,
     backgroundType: string,
     backgroundColor: string,
     backgroundBlur: number,
@@ -134,6 +31,7 @@ export default class ImageView extends React.Component {
 
   readonly backgroundRef: React.RefObject<HTMLDivElement> = React.createRef();
   readonly contentRef: React.RefObject<HTMLDivElement> = React.createRef();
+  _image: HTMLImageElement | HTMLVideoElement = null;
   _timeouts: Array<Timeout>;
 
   componentDidMount() {
@@ -160,7 +58,7 @@ export default class ImageView extends React.Component {
     const el = this.contentRef.current;
     const bg = this.backgroundRef.current;
     const img = this.props.image;
-    if (!el || !img) return;
+    if (!el || !img || (this._image && img && this._image.src == img.src)) return;
 
     let parentWidth = el.offsetWidth;
     let parentHeight = el.offsetHeight;
@@ -187,7 +85,7 @@ export default class ImageView extends React.Component {
     const videoLoop = (v: any) => {
       if (parseFloat(el.parentElement.style.opacity) == 0.99 || v.ended || v.paused) return;
       if (this.props.crossFade && this.props.crossFadeAudio && v instanceof HTMLVideoElement) {
-        v.volume = (this.props.videoVolume / 100) * parseFloat(el.parentElement.getAttribute("volume"));
+        v.volume = (this.props.videoVolume / 100) * parseFloat(el.parentElement.parentElement.getAttribute("volume"));
       }
       if (v.hasAttribute("start") && v.hasAttribute("end")) {
         const start = v.getAttribute("start");
@@ -204,12 +102,6 @@ export default class ImageView extends React.Component {
       c.drawImage(v, 0, 0, w, h);
       this._timeouts.push(setTimeout(drawLoop, 20, v, c, w, h));
     };
-
-    if (img instanceof HTMLVideoElement) {
-      img.volume = this.props.videoVolume / 100;
-      img.play();
-      img.onplay = () => videoLoop(img);
-    }
 
     const blur = this.props.backgroundType == BT.blur;
     let bgImg: any;
@@ -235,6 +127,14 @@ export default class ImageView extends React.Component {
           }
         }
       }
+    }
+
+    if (img instanceof HTMLVideoElement) {
+      img.volume = this.props.videoVolume / 100;
+      if (!blur) {
+        img.onplay = () => videoLoop(img);
+      }
+      img.play();
     }
 
     if (imgAspect < parentAspect) {
@@ -267,6 +167,7 @@ export default class ImageView extends React.Component {
 
     this.props.setVideo(img instanceof HTMLVideoElement ? img : null);
 
+    this._image = img;
     el.appendChild(img);
     if (blur) {
       bg.appendChild(bgImg);
@@ -281,6 +182,7 @@ export default class ImageView extends React.Component {
       (props.image.src !== this.props.image.src ||
       props.image.getAttribute("start") !== this.props.image.getAttribute("start") ||
       props.image.getAttribute("end") !== this.props.image.getAttribute("end"))) ||
+      (props.scene && props.scene.strobe && props.toggleStrobe !== this.props.toggleStrobe) ||
       props.backgroundType !== this.props.backgroundType ||
       props.backgroundColor !== this.props.backgroundColor ||
       props.backgroundBlur !== this.props.backgroundBlur ||
@@ -298,28 +200,145 @@ export default class ImageView extends React.Component {
   render() {
     if (!this.props.image) {
       return (
-        <div className={`ImageView ${this.props.fitParent ? '': 'u-fill-container'}`}>
+        <div id="ImageView" className="ImageView u-fill-container">
           <div className="ImageView__Image" ref={this.contentRef}/>
           <div className="ImageView__Background" ref={this.backgroundRef}/>
         </div>
       );
     }
+
+    let backgroundStyle = {};
+    if (this.props.backgroundType == BT.color) {
+      backgroundStyle = {
+        backgroundColor: this.props.backgroundColor,
+      };
+    } else if (this.props.backgroundType == BT.blur) {
+      backgroundStyle = {
+        filter: 'blur(' + this.props.backgroundBlur + 'px)',
+      };
+    }
     return (
-      <FadeLayer
-        image={this.props.image}
-        backgroundType={this.props.backgroundType}
-        backgroundColor={this.props.backgroundColor}
-        backgroundBlur={this.props.backgroundBlur}
-        horizTransLevel={this.props.horizTransLevel}
-        vertTransLevel={this.props.vertTransLevel}
-        zoomStart={this.props.zoomStart}
-        zoomEnd={this.props.zoomEnd}
-        transDuration={this.props.transDuration}
-        crossFade={this.props.crossFade}
-        fadeDuration={this.props.fadeDuration}
-        fitParent={this.props.fitParent}
-        contentRef={this.contentRef}
-        backgroundRef={this.backgroundRef}/>
+      <animated.div id="ImageView" className="ImageView u-fill-container">
+        <this.FadeLayer>
+          <this.ZoomMoveLayer>
+            {(this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.image) && (
+              <Strobe
+                strobeFunction={this.strobeImage.bind(this)}
+                toggleStrobe={this.props.toggleStrobe}
+                pulse={this.props.scene.strobePulse}
+                opacity={1}
+                timeToNextFrame={this.props.timeToNextFrame}
+                durationTF={this.props.scene.strobeTF}
+                duration={this.props.scene.strobeTime}
+                durationMin={this.props.scene.strobeTimeMin}
+                durationMax={this.props.scene.strobeTimeMax}
+                sinRate={this.props.scene.strobeSinRate}
+                delayTF={this.props.scene.strobeDelayTF}
+                delay={this.props.scene.strobeDelay}
+                delayMin={this.props.scene.strobeDelayMin}
+                delayMax={this.props.scene.strobeDelayMax}
+                delaySinRate={this.props.scene.strobeDelaySinRate}>
+                <animated.div className="ImageView__Image" ref={this.contentRef}/>
+              </Strobe>
+            )}
+            {(!this.props.scene || !this.props.scene.strobe || this.props.scene.strobeLayer != SL.image) && (
+              <animated.div className="ImageView__Image" ref={this.contentRef}/>
+            )}
+          </this.ZoomMoveLayer>
+          {this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.background && (
+            <Strobe
+              className={'m-background'}
+              toggleStrobe={this.props.toggleStrobe}
+              pulse={this.props.scene.strobePulse}
+              opacity={1}
+              timeToNextFrame={this.props.timeToNextFrame}
+              durationTF={this.props.scene.strobeTF}
+              duration={this.props.scene.strobeTime}
+              durationMin={this.props.scene.strobeTimeMin}
+              durationMax={this.props.scene.strobeTimeMax}
+              sinRate={this.props.scene.strobeSinRate}
+              delayTF={this.props.scene.strobeDelayTF}
+              delay={this.props.scene.strobeDelay}
+              delayMin={this.props.scene.strobeDelayMin}
+              delayMax={this.props.scene.strobeDelayMax}
+              delaySinRate={this.props.scene.strobeDelaySinRate}
+              color={this.props.scene.strobeColor}/>
+          )}
+          <animated.div className="ImageView__Background" ref={this.backgroundRef} style={{...backgroundStyle}}/>
+        </this.FadeLayer>
+      </animated.div>
     );
   }
+
+  strobeImage() {
+    const el = this.contentRef.current;
+    if (el && this._image) {
+      el.appendChild(this._image);
+    }
+  }
+
+  FadeLayer = (data: {children: React.ReactNode}) => {
+    const fadeTransitions: [{item: any, props: any, key: any}] = useTransition(
+      this.props.image,
+      (image: any) => {
+        return image.key
+      },
+      {
+        initial: { // Initial (first time) base values, optional (can be null)
+          opacity: 1,
+          volume: 1,
+        },
+        from: { // Base values, optional
+          opacity: this.props.crossFade ? 0 : 1,
+          volume: this.props.crossFade ? 0 : 1,
+        },
+        enter: { // Styles apply for entering elements
+          opacity: 1,
+          volume: 1,
+        },
+        leave: { // Styles apply for leaving elements
+          opacity: this.props.crossFade ? 0.99 : 1,
+          volume: this.props.crossFade ? 0 : 1,
+        },
+        unique: true, // If this is true, items going in and out with the same key will be re-used
+        config: {
+          duration: this.props.fadeDuration,
+        },
+      }
+    );
+
+    return (
+      <React.Fragment>
+        {fadeTransitions.map(({item, props, key}) => {
+          return (
+            <animated.div className="FadeLayer u-fill-container" key={key} volume={props.volume} style={{ ...props }}>
+              {data.children}
+            </animated.div>
+          );
+        })}
+      </React.Fragment>
+    );
+  };
+
+  ZoomMoveLayer = (data: {children: React.ReactNode}) => {
+    const imageProps = useSpring(
+      {
+        from: {
+          transform: 'translate(0%, 0%) scale(' + this.props.zoomStart + ')',
+        },
+        to: {
+          transform: 'translate(' + this.props.horizTransLevel + '%, ' + this.props.vertTransLevel + '%) scale(' + this.props.zoomEnd + ')',
+        },
+        config: {
+          duration: this.props.transDuration,
+        },
+      }
+    );
+
+    return (
+      <animated.div className="ZoomMoveLayer u-fill-container" style={{ ...imageProps }}>
+        {data.children}
+      </animated.div>
+    );
+  };
 }

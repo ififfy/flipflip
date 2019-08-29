@@ -12,7 +12,6 @@ import Scene from "../../data/Scene";
 import ChildCallbackHack from './ChildCallbackHack';
 import ImageView from './ImageView';
 import Strobe from "./Strobe";
-import {printMemoryReport} from "../../data/actions";
 import {webFrame} from "electron";
 
 class GifInfo {
@@ -134,11 +133,10 @@ export default class ImagePlayer extends React.Component {
     return (
       <div className="ImagePlayer"
            style={{cursor: this.state.hideCursor ? "none" : "initial"}}>
-        {(this.props.strobeLayer == SL.middle || this.props.strobeLayer == SL.background) && (
+        {(this.props.strobeLayer == SL.middle) && (
           <Strobe
             pulse={this.props.scene.strobePulse}
             opacity={1}
-            className={this.props.strobeLayer == SL.background ? 'm-background' : ''}
             durationTF={this.props.scene.strobeTF}
             duration={this.props.scene.strobeTime}
             durationMin={this.props.scene.strobeTimeMin}
@@ -161,6 +159,9 @@ export default class ImagePlayer extends React.Component {
           timeout={2000} />
         <ImageView
           image={this.state.historyPaths.length > 0 ? this.state.historyPaths[(this.state.historyPaths.length - 1) + offset] : null}
+          scene={this.props.scene}
+          timeToNextFrame={this.state.timeToNextFrame}
+          toggleStrobe={this._toggleStrobe}
           backgroundType={this.props.scene.backgroundType}
           backgroundColor={this.props.scene.backgroundColor}
           backgroundBlur={this.props.scene.backgroundBlur}

@@ -73,6 +73,7 @@ export default new Map<string, string>([
 
   ['sl.top', 'Above All'],
   ['sl.middle', 'Above Scene'],
+  ['sl.image', 'Strobe Image'],
   ['sl.background', 'Behind Image'],
   ['sl.bottom', 'Behind All'],
 
