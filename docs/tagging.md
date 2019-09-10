@@ -6,11 +6,12 @@ src="doc_icons/tag.svg" alt="Manage Tags"
 width="20" height="20"> ) in the top right.
 
 ## Manage tags
-From this screen, we can add, remove, and re-order our tags.
+From this screen, we can add, remove, and re-order our tags as well as manage "tag phrases" (for use in captioning scripts).
 
-* To add a new tag click `+ Add` and then type the name of the tag
+* To add a new tag click `+ Add New Tag` and then type the name of the tag
 * To edit a tag, click on the tag and edit the name.
-* To remove tags, click `- Remove Tags` and click the tags you wish to delete. To exit remove mode click `Done`. 
+* To remove a tag, click the <img style="vertical-align: -5px" src="doc_icons/delete.svg" alt="Remove" width="20" height="20">.
+* To edit a tag's "tag phrases", click the <img style="vertical-align: -5px" src="doc_icons/script.svg" alt="Tag Phrases" width="20" height="20">. 
 * To manually re-order tags, simply drag'n'drop them. (This is the order which they will appear everywhere else).
 * **When you are done managing tags, click `Apply` or `OK` to save your changes.**
 

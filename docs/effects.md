@@ -1,35 +1,73 @@
 # Effects
-FlipFlip gives users some pretty finite control over various playback effects.
+FlipFlip provides a number of different ways to control your Scene, with finite control over each effect.
 
-For most options, choose to time as a constant, random, wave, or with the scene.
-  * For random and wave, choose min and max (ms) of time range.
-  * For wave, choose wave rate. _95-100 is generally recommended_ 
+Most effects share the same types of timings (in ms):
+  * Constant: Occurs at a set interval
+  * Random: Occurs at a random interval between min & max (ms)
+  * Wave: Occurs at sin wave between min & max (ms).
+    * You can modify the rate of change as well. _95-100 is generally recommended_ 
+  * With Scene: Occurs when the image changes (shares timing with "Scene Effects")
 
-## Scene effects
+## Scene Effects
 This section controls how the scene will play out.
-* Choose to display images at a constant rate (ms), random, or in a wave.
+
+##### Timing
+* Choose to change images at a constant rate (ms), random, or in a wave.
+
+##### Background
+* Choose between blurred image, solid color, or no background.
+ * Control blur amount or color. 
+
+##### Next Scene
 * Choose a scene to transition to after this one (or none). Control timing of next scene (sec).
+
+?> The "Next Scene" will pre-load in the background and start after the configured time has passed. Effects, audio, 
+text, etc. will also change as configured.
+
+##### Grid View / Overlay
+* [Setup a grid](grid.md) of scenes to play (must include current scene).
+
+**OR**
+
 * Add scene(s) to overlay over this one (or none). Control overlay opacity.
-  * There is no limit to the number of overlays, but you may experience poor performance if you use too many.
 
-_The "Next Scene" will pre-load in the background and start after the configured time has passed. Effects, audio, 
-text, etc. will also change as configured_
+?> There is no limit to the number of scenes you can use with grid/overlay, 
+but you may experience poor performance if you use too many.
 
-<details>
-  <summary>Show Example</summary>
-  <img src="doc_images/timing_ex.gif" alt="Timing Example">
-</details>
+<img src="doc_images/timing_ex.gif" alt="Timing Example">
 
-## Image effects
-This section controls the background and fade effects.
-* Choose either a blurred or solid color background. Control blur amount or color.
-* Choose whether to cross-fade images.
+_An example of **Wave** timing_
+
+## Images/Videos
+This section controls which images/videos filters and ordering as well as image/video settings.
+
+##### Image options
+* Choose to show all images, only videos, only animated (animated gifs/videos only), or only stills.
+* Choose to play the full length (or part) of animated gifs.
+
+##### Video options
+* Choose to play the full length (or part) of videos.
+* Choose to start videos at a random timestamp (starts from beginning by default).
+* Choose to continue videos from last timestamp during this slideshow.
+* Choose to use only [video clips](clips.md) or the entire video.
+  * If you are not using video clips, you can choose to skip the first and last parts of each video (ms)
+* Control video volume for this scene.
+
+##### Order options
+* Weight images by source or by image.
+  * Weighting by source means each source will be used an even amount (regardless of number of pictures).
+  * Weighting by image means each image will be used an even amount (regardless of source).
+* Choose to randomize playback.
+* Choose to show all images before looping.
+
+
+## Crossfade
+This section controls fade effects.
+* Choose whether to cross-fade images/video.
+* Choose whether to cross-fade audio when cross-fading video.
 * Choose to fade for a constant duration (ms), random, in a wave, or with the scene.
 
-<details>
-  <summary>Show Example</summary>
-  <img src="doc_images/fade_ex.gif" alt="Fade Example">
-</details>
+<img src="doc_images/fade_ex.gif" alt="Fade Example">
 
 ## Zoom/Move
 This section controls image movement.
@@ -38,10 +76,7 @@ This section controls image movement.
 * Choose move vertically up/down (or none). Control distance (%).
 * Choose to zoom/move for a constant duration (ms), random, in a wave, or with the scene
 
-<details>
-  <summary>Show Example</summary>
-  <img src="doc_images/zoom_ex.gif" alt="Zoom Example">
-</details>
+<img src="doc_images/zoom_ex.gif" alt="Zoom Example">
 
 ## Strobe
 This section controls the strobe effect.
@@ -50,20 +85,7 @@ This section controls the strobe effect.
 * Choose to strobe/delay for a constant duration (ms), random, in a wave, or with the scene
 * Control strobe layer. If at "Behind All", control opacity.
 
-<details>
-  <summary>Show Example</summary>
-  <img src="doc_images/strobe_ex.gif" alt="Strobe Example">
-</details>
-
-## Images
-This section controls which images are displayed and in what order.
-* Choose to show all images, only gifs (animated only), or only stills.
-* Choose to play the full length of any animated gif.
-* Weight images by source or by image.
-  * Weighting by source means each source will be used an even amount (regardless of number of pictures).
-  * Weighting by image means each image will be used an even amount (regardless of source).
-* Choose to randomize playback.
-* Choose to show all images before looping.
+<img src="doc_images/strobe_ex.gif" alt="Strobe Example">
 
 ## Audio
 This section controls the scene's audio component. It also contains the audio controls while playing.
@@ -71,23 +93,13 @@ This section controls the scene's audio component. It also contains the audio co
 * Add audio files to loop or "tick".
 * For "Tick", choose to play the audio track at a constant rate (ms), random, in a wave, or with the scene
 * Control the volume of each track.
-  
-## Video Controls
-This section controls video settings. While playing, this section contains the video playback controls and appears 
-at the top. This includes controls for any overlay videos.
-* Choose to start videos at a random timestamp (start from beginning by default)
-* Choose to continue videos from last timestamp during this slideshow
-* Control video volume for this scene
 
 ## Text
 This section controls the caption program.
 * Choose a text file that follows the [caption script format](caption_script.md).
   * If the text is hosted on Hastebin, you can simply use the ID, but you could also use the raw URL.
 * Click `Font Options` to customize caption font typeface, size, and color. 
-  * Captions display in 4 types: `blink`, `caption`, `captionBig`, and 'count'.
+  * Captions display in 4 types: `blink`, `caption`, `captionBig`, and `count`.
   * You can customize the font for each of these separately.
   
-<details>
-  <summary>Show Example</summary>
-  <img src="doc_images/caption_ex.gif" alt="Caption Example">
-</details>
+<img src="doc_images/caption_ex.gif" alt="Caption Example">

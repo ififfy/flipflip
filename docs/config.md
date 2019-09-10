@@ -81,9 +81,10 @@ FlipFlip does not store any user information or make any changes to your account
 * You should see a Success! message
 
 #### Instagram
-In order to use Instagram Profiles as sources, you'll need to provide your username and password. 
-FlipFlip does not store any user information or make changes to your account. Your login information is 
-stored locally on your computer and is never shared with anyone or sent to any server (besides Instagram, obviously).
+In order to use Instagram Profiles as sources, you'll need to provide your username and password. Click the 
+`Check Instagram Login` button to confirm your credentials worked. FlipFlip does not store any user information or 
+make changes to your account. Your login information is stored locally on your computer and is never shared with 
+anyone or sent to any server (besides Instagram, obviously).
 
 ## Backup
 Backup your FlipFlip data or restore from a previous backup.

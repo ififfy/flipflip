@@ -6,12 +6,14 @@
 
 ## Features
 * Local files as well as Tumblr, Reddit, Twitter, Instagram, Imgur, DeviantArt, Booru & More
-* Animated GIF and Video support
+* Animated GIF and video support
+* Grid view
 * Multiple windows
-* Visual Effects (Fade, Zoom/Transition, Strobe/Pulse, Overlay)
-* Random or ordered playback
-* Timing Control
+* Visual effects (fade, zoom/transition, strobe/pulse, overlay)
+* Randomizedand ordered playback
+* Timing control
 * Caption scripting support
+* Audio track support
 * Library and Tagging to organize sources and generate slideshows
 * Easy to share!
 

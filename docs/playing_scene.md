@@ -20,18 +20,19 @@ on the left. This is also where you will find video/audio playback controls.
 ![](doc_images/player_options.png)
 
 ## Image info
-While a Scene is playing, you can right click on an image to get more information about it. The image's source and 
-individual URL are always shown (click to copy to the clipboard). You can also choose to open the source or image 
-directly (will use your system's default app for opening that type of link). 
+While a Scene is playing, you can right click on an image to get more information about it.
 
-If the URL is for a local file, you are 
-given options to view it in Explorer/Finder or delete it from the system (handy for pruning images you don't want in 
-FlipFlip). 
-
-If it is for a remote file and you have enabled caching, a link to the caching directory is also provided.
-
-If this source is in your Library, "GoTo Tag Source" will bring you to Taggin for that source. 
-When you click "Back" you will be brought back to the scene that was playing.
+* The image's source and individual URL are always shown (click to copy to the clipboard).
+* Pretty Ctrl+C or select "Copy Image" to attempt to copy the image itself to the clipboard. 
+  * _This does not work for .gif or video._ 
+* You can choose to open the source or image directly.
+ * _Will use your system's default app for opening that type of link._
+* If this image is not from the cache, you can add it to the blacklist for its source. 
+* If this image is a local file, you are given options to view it in Explorer/Finder or delete it from the system. 
+  * _Handy for pruning images you don't want in FlipFlip._ 
+* If this image is a remote file and you have enabled caching, a link to the caching directory is also provided.
+* If this source is in your Library, "GoTo Tag Source" will bring you to Tagging for that source. 
+  * _When you click "Back" you will be brought back to the scene that was playing_.
 
 ![](doc_images/image_context_menu.png)
 
@@ -56,6 +57,7 @@ Use the arrow keys (← / →) to navigate through playback history. Use `Space`
 | [ ]      | Navigate Tagging     |
 | Esc      | Exit Scene           |
 | Del      | Delete Image         |
+| Ctrl+C   | Copy Image           |
 | Ctrl+F   | Toggle Fullscreen    |
 | Ctrl+T   | Toggle Always On Top |
 | Ctrl+G   | Toggle Menu Bar      |

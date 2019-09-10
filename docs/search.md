@@ -9,3 +9,6 @@ displayed sources have that tag.
   * `<Untagged>` shows only sources which have no tags.
 * Type any term and press "Enter" or "Search for ___" to search. This is not case sensitive.
 * Type "-" and then any term or filter to _exclude_ those sources.
+* Type "count>NUM", "count<NUM", or "count=NUM" to query based on source counts. (Replace "NUM" with a number).
+  * This _**excludes**_ counts that are incomplete (still showing "+").
+  * To _**include**_ incomplete counts, type "count+>NUM", "count+<NUM", or "count+=NUM".

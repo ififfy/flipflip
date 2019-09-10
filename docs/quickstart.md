@@ -23,9 +23,12 @@ _Note: Some of these features (3, 7, 8) will be disabled until they are relevant
 10. [Preferences](config.md)
 
 ## Your first scene
-Let's create a simple scene to get you familiar with how things will work
+Let's create a simple scene to get you familiar with how things will work. At first glace, the Scene Detail screen 
+might seem a little complicated, but it's actually very simple once you understand what each input does. 
+For now, focus on `Sources`.
+
 * Click `+ Add Scene` to create your first scene.
-* Give your scene a name.
+* Give your scene a name (click the name up at the top to change it).
 * In the `Sources` tab, click `+ Add Sources`, then click `+ Local directory`.
 * Navigate to a folder with some images you'd like to use and click `Select Folder`.
   * Your selection should now appear in `Sources`.

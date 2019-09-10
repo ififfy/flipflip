@@ -76,17 +76,14 @@ cap $RANDOM_PHRASE
 blink $RANDOM_PHRASE / $RANDOM_PHRASE
 ```
 
-[//]: # (This section has been disabled from CaptionProgram and is commented out)
-[//]: # (## Styling text)
+## Tag phrases
 
-[//]: # (Big bold white text with a black border is easy to read, but you can make it look nicer by using _styles_. Styles are simply CSS strings that you can switch between.)
+Similar to Random phrases, "Tag phrases" are associated with the tag(s) of the currently visible source.
 
-[//]: # (```)
-[//]: # (saveStyleRules ITALIC_RED_STYLE color: red; font-style: italic;)
-[//]: # (saveStyleRules UPSIDE_DOWN_STYLE transform: rotate180deg;)
+Visit the [Tag Manager](tagging.md#manage-tags) to edit each tag's phrases. Then you can use a random one in 
+place of any text like this:
 
-[//]: # (applySavedStyle ITALIC_RED_STYLE)
-[//]: # (cap This text is red)
-[//]: # (applySavedStyle UPSIDE_DOWN_STYLE)
-[//]: # (cap this text is upside down)
-[//]: # (```)
+```
+cap $TAG_PHRASE
+blink $TAG_PHRASE / $TAG_PHRASE
+```

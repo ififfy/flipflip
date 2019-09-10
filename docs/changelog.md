@@ -1,5 +1,32 @@
 # Changelog
 
+## 3.0.0 <small>(XX/XX/2019)</small>
+#### 3.0.0-beta1 <small>(09/10/2019)</small>
+
+- Grid View
+- Select clips from video files
+- Skip start/end of videos
+- Separate timing for gifs/videos
+- Crossfade video audio
+- Strobe Image
+- Strict ordering
+- Source counts
+- Blacklist files in source
+- Tag phrases function for captioning
+- Start scene from command line
+- Copy Image to Clipboard
+- Improve performance
+- Fix video volume while loading bug
+- Fix delay with sound starting
+- Fix Instagram challenges and 2FA
+- Fix image list to allow local list and files
+- Fix TagManager overflow
+- Fix Tag ordering when navigating with [ ]
+- Fix bug with caption script case sensitivity
+- Fix bug with running multiple Library imports
+- Fix double play bug
+- Fix bug with strobe timing
+
 ## 2.3.2 <small>(07/24/2019)</small>
 - Next Scene bugfix
 

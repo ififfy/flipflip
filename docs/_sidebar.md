@@ -5,6 +5,8 @@
   - [Overview](scenes.md)
   - [Sources](sources.md)
   - [Effects](effects.md)
+  - [Grid Setup](grid.md)
+  - [Video Clipper](clips.md)
   - [Playing Scene](playing_scene.md)
   
 - Library

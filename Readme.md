@@ -18,13 +18,17 @@
 * **[Subreddit](https://www.reddit.com/r/flipflip/)**
 
 ## Features
-- Local files + Tumblr, Reddit, Twitter, Instagram, Imugr, DeviantArt, Booru & More!
-- Animated GIF and Video support
-- Multiple windows
-- Visual Effects (Fade, Zoom/Transition, Strobe/Pulse, Overlay)
-- Library and tagging to organize your sources and generate scenes
-- Caption scripting support
-- Easy to share!
+* Local files as well as Tumblr, Reddit, Twitter, Instagram, Imgur, DeviantArt, Booru & More
+* Animated GIF and video support
+* Grid view
+* Multiple windows
+* Visual effects (fade, zoom/transition, strobe/pulse, overlay)
+* Randomizedand ordered playback
+* Timing control
+* Caption scripting support
+* Audio track support
+* Library and Tagging to organize sources and generate slideshows
+* Easy to share!
 
 ## Quick start
 
