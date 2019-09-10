@@ -58,7 +58,10 @@ export default class ImageView extends React.Component {
     const el = this.contentRef.current;
     const bg = this.backgroundRef.current;
     const img = this.props.image;
-    if (!el || !img || (this._image && img && this._image.src == img.src)) return;
+    if (!el || !img) return;
+
+    const firstChild = el.firstChild;
+    if (firstChild && (firstChild as HTMLImageElement | HTMLVideoElement).src == img.src) return;
 
     let parentWidth = el.offsetWidth;
     let parentHeight = el.offsetHeight;

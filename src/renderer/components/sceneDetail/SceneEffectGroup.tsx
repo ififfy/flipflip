@@ -6,9 +6,10 @@ import Scene from "../../data/Scene";
 import SimpleOptionPicker from "../ui/SimpleOptionPicker";
 import SimpleSliderInput from "../ui/SimpleSliderInput";
 import SimpleNumberInput from "../ui/SimpleNumberInput";
-import {TF} from "../../data/const";
+import {BT, TF} from "../../data/const";
 import Overlay from "../library/Overlay";
 import SimpleCheckbox from "../ui/SimpleCheckbox";
+import SimpleColorPicker from "../ui/SimpleColorPicker";
 
 export default class SceneEffectGroup extends React.Component {
   readonly props: {
@@ -75,6 +76,30 @@ export default class SceneEffectGroup extends React.Component {
               </div>
             )}
           </div>
+        </div>
+
+        <hr/>
+
+        <div className={`ControlSubgroup ${this.props.scene.backgroundType == BT.blur ? 'm-inline' : ''}`}>
+          <SimpleOptionPicker
+            onChange={this.changeKey.bind(this, 'backgroundType').bind(this)}
+            label="Background"
+            value={this.props.scene.backgroundType}
+            keys={Object.values(BT)}/>
+          {this.props.scene.backgroundType == BT.color && (
+            <SimpleColorPicker
+              onChange={this.changeKey.bind(this, 'backgroundColor').bind(this)}
+              label="Color"
+              value={this.props.scene.backgroundColor}/>
+          )}
+          {this.props.scene.backgroundType == BT.blur && (
+            <SimpleSliderInput
+              label={"Blur: " + this.props.scene.backgroundBlur + "px"}
+              min={0} max={30}
+              value={this.props.scene.backgroundBlur}
+              isEnabled={this.props.scene.backgroundType == BT.blur}
+              onChange={this.changeKey.bind(this, 'backgroundBlur').bind(this)}/>
+          )}
         </div>
 
         {!this.props.isTagging && (

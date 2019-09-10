@@ -684,7 +684,42 @@ a {
           max-width: 90px;
         }
       }
+    }
 
+    .VideoOptionGroup {
+      > div:not(.VideoSkipGroup) {
+        display: flex;
+        margin-bottom: 10px;
+        label {
+          margin-right: 10px;
+        }
+        .SimpleNumberInput {
+          margin: -13px 8px 5px;
+          max-width: 90px;
+        }
+      }
+
+      h4 {
+        margin-top: 0;
+        margin-bottom: 7px;
+      }
+
+      .VideoSkipGroup {
+        display: flex;
+        margin-bottom: 0;
+        .SimpleNumberInput {
+          max-width: 90px;
+        }
+      }
+    }
+
+    .WeightGroup {
+      > .SimpleRadioInput {
+        margin-bottom: 0;
+      }
+      > .SimpleCheckbox {
+        margin-top: 1rem;
+      }
     }
 
     .VideoControlGroup > .SimpleCheckbox {

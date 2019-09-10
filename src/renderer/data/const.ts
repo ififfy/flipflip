@@ -120,7 +120,6 @@ const IPC = {
 };
 
 const VC = { // Video Control Modes
-  sceneDetail: 'vc.sd',
   player: 'vc.p',
   sceneClipper: 'vc.sc',
 };

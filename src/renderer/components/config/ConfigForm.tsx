@@ -9,19 +9,17 @@ import http from "http";
 
 import Config, {CacheSettings, DisplaySettings, RemoteSettings, SceneSettings} from "../../data/Config";
 import {getRandomIndex} from "../../data/utils";
-import {VC} from "../../data/const";
 import Scene from "../../data/Scene";
 import APIGroup from "./APIGroup";
 import CacheGroup from "./CacheGroup";
 import BackupGroup from "./BackupGroup";
 import DisplayGroup from "./DisplayGroup";
-import ImageEffectGroup from "../sceneDetail/ImageEffectGroup";
+import CrossFadeGroup from "../sceneDetail/CrossFadeGroup";
 import SceneEffectGroup from "../sceneDetail/SceneEffectGroup";
-import ImageGroup from "../sceneDetail/ImageGroup";
+import ImageVideoGroup from "../sceneDetail/ImageVideoGroup";
 import TextGroup from "../sceneDetail/TextGroup";
 import StrobeGroup from "../sceneDetail/StrobeGroup";
 import ZoomMoveGroup from "../sceneDetail/ZoomMoveGroup";
-import VideoGroup from "../sceneDetail/VideoGroup";
 import SimpleTextInput from "../ui/SimpleTextInput";
 import Modal from "../ui/Modal";
 import AudioGroup from "../sceneDetail/AudioGroup";
@@ -80,7 +78,12 @@ export default class ConfigForm extends React.Component {
             allScenes={this.props.scenes}
             onUpdateScene={this.onUpdateDefaultScene.bind(this)} />
 
-          <ImageEffectGroup
+          <ImageVideoGroup
+            scene={this.state.config.defaultScene}
+            isPlayer={false}
+            onUpdateScene={this.onUpdateDefaultScene.bind(this)}/>
+
+          <CrossFadeGroup
             scene={this.state.config.defaultScene}
             onUpdateScene={this.onUpdateDefaultScene.bind(this)} />
 
@@ -92,19 +95,9 @@ export default class ConfigForm extends React.Component {
             scene={this.state.config.defaultScene}
             onUpdateScene={this.onUpdateDefaultScene.bind(this)} />
 
-          <ImageGroup
-            scene={this.state.config.defaultScene}
-            isPlayer={false}
-            onUpdateScene={this.onUpdateDefaultScene.bind(this)}/>
-
           <AudioGroup
             scene={this.state.config.defaultScene}
             isPlayer={false}
-            onUpdateScene={this.onUpdateDefaultScene.bind(this)}/>
-
-          <VideoGroup
-            scene={this.state.config.defaultScene}
-            mode={VC.sceneDetail}
             onUpdateScene={this.onUpdateDefaultScene.bind(this)}/>
 
           <TextGroup

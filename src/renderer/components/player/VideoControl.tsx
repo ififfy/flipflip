@@ -23,26 +23,6 @@ export default class VideoControl extends React.Component {
 
   render() {
     switch(this.props.mode) {
-      case VC.sceneDetail:
-        return (
-          <div className="VolumeControl">
-            <div
-              className="u-small-icon-button">
-              <div className="u-volume-down"/>
-            </div>
-            <SimpleSliderInput
-              label=""
-              min={0}
-              max={100}
-              value={this.props.volume}
-              isEnabled={true}
-              onChange={this.onChangeVolume.bind(this)}/>
-            <div
-              className="u-small-icon-button">
-              <div className="u-volume-up"/>
-            </div>
-          </div>
-        );
       case VC.player:
         return (
           <React.Fragment>
@@ -192,23 +172,21 @@ export default class VideoControl extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.mode != VC.sceneDetail) {
-      this._interval = setInterval(() => {
-        // Trigger update to update position slider
-        this.setState({update: !this.state.update});
-        if (this.props.clip) {
-          if (this.props.video.paused && this.state.playing) {
-            this.setState({playing: false});
-          } else if (!this.props.video.paused && !this.state.playing) {
-            this.setState({playing: true});
-          }
-          if (this.props.video.currentTime < this.props.clip.min ||
-              this.props.video.currentTime > this.props.clip.max) {
-            this.props.video.currentTime = this.props.clip.min;
-          }
+    this._interval = setInterval(() => {
+      // Trigger update to update position slider
+      this.setState({update: !this.state.update});
+      if (this.props.clip) {
+        if (this.props.video.paused && this.state.playing) {
+          this.setState({playing: false});
+        } else if (!this.props.video.paused && !this.state.playing) {
+          this.setState({playing: true});
         }
-      }, 50);
-    }
+        if (this.props.video.currentTime < this.props.clip.min ||
+            this.props.video.currentTime > this.props.clip.max) {
+          this.props.video.currentTime = this.props.clip.min;
+        }
+      }
+    }, 50);
   }
 
   componentWillUnmount() {

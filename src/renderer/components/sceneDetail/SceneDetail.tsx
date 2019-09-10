@@ -1,14 +1,13 @@
 import * as React from 'react';
 
-import {IF, OF, VC, WF} from "../../data/const";
+import {OF, WF} from "../../data/const";
 import Scene from '../../data/Scene';
 import SourcePicker from './SourcePicker';
 import AudioGroup from "./AudioGroup";
-import ImageEffectGroup from "./ImageEffectGroup";
+import CrossFadeGroup from "./CrossFadeGroup";
 import SceneEffectGroup from "./SceneEffectGroup";
-import ImageGroup from "./ImageGroup";
+import ImageVideoGroup from "./ImageVideoGroup";
 import TextGroup from "./TextGroup";
-import VideoGroup from "./VideoGroup";
 import LibrarySource from "../library/LibrarySource";
 import Config from "../../data/Config";
 import StrobeGroup from "./StrobeGroup";
@@ -105,7 +104,12 @@ export default class SceneDetail extends React.Component {
             onSetupGrid={this.props.setupGrid.bind(this)}
             onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
-          <ImageEffectGroup
+          <ImageVideoGroup
+            scene={this.props.scene}
+            isPlayer={false}
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+
+          <CrossFadeGroup
             scene={this.props.scene}
             onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
@@ -117,22 +121,10 @@ export default class SceneDetail extends React.Component {
             scene={this.props.scene}
             onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
-          <ImageGroup
-            scene={this.props.scene}
-            isPlayer={false}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-
           <AudioGroup
             scene={this.props.scene}
             isPlayer={false}
             onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-
-          {this.props.scene.imageTypeFilter != IF.stills && (
-            <VideoGroup
-              scene={this.props.scene}
-              mode={VC.sceneDetail}
-              onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-          )}
 
           <TextGroup
             scene={this.props.scene}

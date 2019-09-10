@@ -15,9 +15,9 @@ import Tag from "../library/Tag";
 import LibrarySource from "../library/LibrarySource";
 import Progress from "../ui/Progress";
 import AudioGroup from "../sceneDetail/AudioGroup";
-import ImageEffectGroup from "../sceneDetail/ImageEffectGroup";
+import CrossFadeGroup from "../sceneDetail/CrossFadeGroup";
 import TextGroup from "../sceneDetail/TextGroup";
-import ImageGroup from "../sceneDetail/ImageGroup";
+import ImageVideoGroup from "../sceneDetail/ImageVideoGroup";
 import SceneEffectGroup from "../sceneDetail/SceneEffectGroup";
 import StrobeGroup from "../sceneDetail/StrobeGroup";
 import ZoomMoveGroup from "../sceneDetail/ZoomMoveGroup";
@@ -152,6 +152,7 @@ export default class Player extends React.Component {
           <div className="EmptyIndicator"><p>I couldn't find anything</p><p>(ಥ﹏ಥ)</p></div>
         )}
 
+        {/*TODO Make grid a grid of Players instead of a grid of HeadlessScenePlayer (move UI out of SceneDetail and as a separate option in ScenePicker)*/}
         <div className={this.props.scene.gridView ? 'PlayerGrid': ''} style={gridStyle}>
           {!this.props.scene.gridView && (
             <React.Fragment>
@@ -345,7 +346,12 @@ export default class Player extends React.Component {
             onSetupGrid={this.props.setupGrid}
             onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
-          <ImageEffectGroup
+          <ImageVideoGroup
+            scene={this.props.scene}
+            isPlayer={true}
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+
+          <CrossFadeGroup
             scene={this.props.scene}
             onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
@@ -356,11 +362,6 @@ export default class Player extends React.Component {
           <StrobeGroup
             scene={this.props.scene}
             onUpdateScene={this.props.onUpdateScene.bind(this)} />
-
-          <ImageGroup
-            scene={this.props.scene}
-            isPlayer={true}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
           <AudioGroup
             scene={this.props.scene}

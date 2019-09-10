@@ -8,8 +8,9 @@ import SimpleCheckbox from "../ui/SimpleCheckbox";
 import SimpleOptionPicker from "../ui/SimpleOptionPicker";
 import SimpleRadioInput from "../ui/SimpleRadioInput";
 import SimpleNumberInput from "../ui/SimpleNumberInput";
+import SimpleSliderInput from "../ui/SimpleSliderInput";
 
-export default class ImageGroup extends React.Component {
+export default class ImageVideoGroup extends React.Component {
   readonly props: {
     scene: Scene | SceneSettings,
     isPlayer: boolean,
@@ -18,7 +19,7 @@ export default class ImageGroup extends React.Component {
 
   render() {
     return (
-      <ControlGroup title="Images" isNarrow={true}>
+      <ControlGroup title="Images/Videos" isNarrow={true}>
         {!this.props.isPlayer && (
           <div className="ControlSubgroup ImageOptionGroup m-inline">
             <SimpleOptionPicker
@@ -26,7 +27,7 @@ export default class ImageGroup extends React.Component {
               label="Image Filter"
               value={this.props.scene.imageTypeFilter}
               keys={Object.values(IF)}/>
-            {this.props.scene.imageTypeFilter != IF.stills && (
+            {this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.videos && (
               <React.Fragment>
                 <SimpleOptionPicker
                   onChange={this.changeKey.bind(this, 'gifOption').bind(this)}
@@ -45,29 +46,84 @@ export default class ImageGroup extends React.Component {
                     ms
                   </div>
                 )}
-                <SimpleOptionPicker
-                  onChange={this.changeKey.bind(this, 'videoOption').bind(this)}
-                  label="Video Options"
-                  value={this.props.scene.videoOption}
-                  keys={Object.values(VO)}/>
-                {this.props.scene.videoOption == VO.part && (
-                  <div>
-                    For
-                    <SimpleNumberInput
-                      label=""
-                      value={this.props.scene.videoTimingConstant}
-                      isEnabled={true}
-                      min={0}
-                      onChange={this.changeKey.bind(this, 'videoTimingConstant').bind(this)}/>
-                    ms
-                  </div>
-                )}
               </React.Fragment>
             )}
             <hr/>
           </div>
         )}
-        <div className="ControlSubgroup m-inline">
+        {this.props.scene.imageTypeFilter != IF.stills && (
+          <div className="ControlSubgroup VideoOptionGroup m-inline">
+            <SimpleOptionPicker
+              onChange={this.changeKey.bind(this, 'videoOption').bind(this)}
+              label="Video Options"
+              value={this.props.scene.videoOption}
+              keys={Object.values(VO)}/>
+            {this.props.scene.videoOption == VO.part && (
+              <div>
+                For
+                <SimpleNumberInput
+                  label=""
+                  value={this.props.scene.videoTimingConstant}
+                  isEnabled={true}
+                  min={0}
+                  onChange={this.changeKey.bind(this, 'videoTimingConstant').bind(this)}/>
+                ms
+              </div>
+            )}
+            <SimpleCheckbox
+              text={"Start Videos At Random Timestamp"}
+              isOn={this.props.scene.randomVideoStart}
+              onChange={this.changeKey.bind(this, 'randomVideoStart').bind(this)} />
+            <SimpleCheckbox
+              text={"Continue Videos From Last Timestamp"}
+              isOn={this.props.scene.continueVideo}
+              onChange={this.changeKey.bind(this, 'continueVideo').bind(this)} />
+            <SimpleCheckbox
+              text={"Play Selected Clips"}
+              isOn={this.props.scene.playVideoClips}
+              onChange={this.changeKey.bind(this, 'playVideoClips').bind(this)} />
+            {!this.props.scene.playVideoClips && (
+              <div className="VideoSkipGroup">
+                <SimpleNumberInput
+                  label="Skip first (ms)"
+                  value={this.props.scene.skipVideoStart}
+                  min={0}
+                  isEnabled={true}
+                  onChange={this.changeKey.bind(this, 'skipVideoStart').bind(this)} />
+                <SimpleNumberInput
+                  label="Skip last (ms)"
+                  value={this.props.scene.skipVideoEnd}
+                  min={0}
+                  isEnabled={true}
+                  onChange={this.changeKey.bind(this, 'skipVideoEnd').bind(this)} />
+              </div>
+            )}
+            {!this.props.isPlayer && (
+              <React.Fragment>
+                <h4>Scene Video</h4>
+                <div className="VolumeControl">
+                  <div
+                    className="u-small-icon-button">
+                    <div className="u-volume-down"/>
+                  </div>
+                  <SimpleSliderInput
+                    label=""
+                    min={0}
+                    max={100}
+                    value={this.props.scene.videoVolume}
+                    isEnabled={true}
+                    onChange={this.changeKey.bind(this, 'videoVolume').bind(this)}/>
+                  <div
+                    className="u-small-icon-button">
+                    <div className="u-volume-up"/>
+                  </div>
+                </div>
+              </React.Fragment>
+            )}
+            <hr/>
+          </div>
+        )}
+        <div className="ControlSubgroup WeightGroup m-inline">
           {!this.props.isPlayer && (
             <SimpleRadioInput
               label={"Weight"}
