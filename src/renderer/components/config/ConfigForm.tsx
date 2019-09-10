@@ -415,11 +415,11 @@ export default class ConfigForm extends React.Component {
             oauthToken,
             sharedSecret,
             oauthVerifier,
-            (err: string, token: string, secret: string) => {
+            (err: any, token: string, secret: string) => {
               if (err) {
                 console.error("Validation failed with error", err);
                 const newMessages = Array<string>();
-                newMessages.push("Error: " + err);
+                newMessages.push("Error: " + err.statusCode + " - " + err.data);
                 this.setState({modalTitle: "Failed", modalMessages: newMessages, modalFunction: this.closeModal});
                 return;
               }
