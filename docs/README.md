@@ -10,7 +10,7 @@
 * Grid view
 * Multiple windows
 * Visual effects (fade, zoom/transition, strobe/pulse, overlay)
-* Randomizedand ordered playback
+* Randomized and ordered playback
 * Timing control
 * Caption scripting support
 * Audio track support
@@ -20,4 +20,4 @@
 ## Community
 Having an issue with FlipFlip? Have a new feature recommendation? Just want to share how much you enjoy it?
 You can reach us on our [GitHub](https://github.com/ififfy/flipflip) or on Reddit at 
-[/r/flipflip](https://www.reddit.com/r/flipflip/).
+[/r/flipflip](https://www.reddit.com/r/flipflip/)..

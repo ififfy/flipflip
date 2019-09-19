@@ -23,7 +23,7 @@
 * Grid view
 * Multiple windows
 * Visual effects (fade, zoom/transition, strobe/pulse, overlay)
-* Randomizedand ordered playback
+* Randomized and ordered playback
 * Timing control
 * Caption scripting support
 * Audio track support
