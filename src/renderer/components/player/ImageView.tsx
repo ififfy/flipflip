@@ -25,6 +25,7 @@ export default class ImageView extends React.Component {
     fadeDuration: number,
     videoVolume: number,
     fitParent: boolean,
+    hasStarted: boolean,
     onLoaded(): void,
     setVideo(video: HTMLVideoElement): void,
   };
@@ -39,8 +40,14 @@ export default class ImageView extends React.Component {
     this._applyImage();
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(props: any) {
     this._applyImage();
+    if (!props.hasStarted && this.props.hasStarted) {
+      const el = this.contentRef.current;
+      if (el && el.firstChild && el.firstChild instanceof HTMLVideoElement) {
+        el.firstChild.volume = this.props.videoVolume / 100;
+      }
+    }
   }
 
   componentWillUnmount() {
@@ -87,7 +94,7 @@ export default class ImageView extends React.Component {
 
     const videoLoop = (v: any) => {
       if (parseFloat(el.parentElement.style.opacity) == 0.99 || v.ended || v.paused) return;
-      if (this.props.crossFade && this.props.crossFadeAudio && v instanceof HTMLVideoElement) {
+      if (this.props.hasStarted && this.props.crossFade && this.props.crossFadeAudio && v instanceof HTMLVideoElement) {
         v.volume = (this.props.videoVolume / 100) * parseFloat(el.parentElement.parentElement.getAttribute("volume"));
       }
       if (v.hasAttribute("start") && v.hasAttribute("end")) {
@@ -133,7 +140,11 @@ export default class ImageView extends React.Component {
     }
 
     if (img instanceof HTMLVideoElement) {
-      img.volume = this.props.videoVolume / 100;
+      if (this.props.hasStarted) {
+        img.volume = this.props.videoVolume / 100;
+      } else {
+        img.volume = 0;
+      }
       if (!blur) {
         img.onplay = () => videoLoop(img);
       }
@@ -197,7 +208,8 @@ export default class ImageView extends React.Component {
       props.videoVolume !== this.props.videoVolume ||
       props.crossFade !== this.props.crossFade ||
       props.crossFadeAudio !== this.props.crossFadeAudio ||
-      props.fadeDuration !== this.props.fadeDuration;
+      props.fadeDuration !== this.props.fadeDuration ||
+      props.hasStarted !== this.props.hasStarted;
   }
 
   render() {

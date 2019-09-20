@@ -174,7 +174,8 @@ export default class ImagePlayer extends React.Component {
           crossFadeAudio={crossFadeAudio}
           fadeDuration={fadeDuration}
           fitParent={this.props.scene.gridView}
-          videoVolume={this.props.hasStarted ? this.props.scene.videoVolume : 0}
+          hasStarted={this.props.hasStarted}
+          videoVolume={this.props.scene.videoVolume}
           onLoaded={this.state.historyPaths.length == 1 ? this.props.onLoaded : this.nop}
           setVideo={this.props.setVideo}/>
       </div>

@@ -68,6 +68,7 @@ export default class VideoClipper extends React.Component {
               fadeDuration={0}
               videoVolume={this.state.videoVolume}
               fitParent={true}
+              hasStarted={true}
               onLoaded={this.nop}
               setVideo={this.nop}/>
             <div className="VideoClipper__Clipper">
