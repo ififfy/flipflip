@@ -245,13 +245,12 @@ export default class ImagePlayer extends React.Component {
   }
 
   componentDidUpdate(props: any, state: any) {
-    if ((!props.isPlaying && this.props.isPlaying) ||
-      (!props.allURLs && this.props.allURLs && this._isLooping) ||
-      (!props.hasStarted && this.props.hasStarted && !this._isLooping)) {
-      if (!this._isLooping) {
-        this.start();
-      }
+    if (((!props.isPlaying && this.props.isPlaying) ||
+      (!props.allURLs && this.props.allURLs) ||
+      (!props.hasStarted && this.props.hasStarted)) && !this._isLooping) {
+      this.start();
     } else if (!this.props.isPlaying) {
+      this._isLooping = false;
       clearTimeout(this._timeout);
     }
     if (this.props.scene.orderFunction !== this.state.orderFunction) {
