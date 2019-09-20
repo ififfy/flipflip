@@ -461,13 +461,17 @@ export function generateScene(state: State): Object {
 }
 
 export function updateScene(state: State, scene: Scene, fn: (scene: Scene) => void): Object {
-  const scenes = state.scenes;
-  for (let s of scenes) {
+  const newScenes = Array<Scene>();
+  for (let s of state.scenes) {
     if (s.id == scene.id) {
-      fn(s);
+      const sceneCopy = JSON.parse(JSON.stringify(s));
+      fn(sceneCopy);
+      newScenes.push(sceneCopy);
+    } else {
+      newScenes.push(s);
     }
   }
-  return {scenes: scenes};
+  return {scenes: newScenes};
 }
 
 export function replaceScenes(state: State, scenes: Array<Scene>): Object {

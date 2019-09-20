@@ -1091,7 +1091,6 @@ export default class HeadlessScenePlayer extends React.Component {
           <ImagePlayer
             config={this.props.config}
             scene={this.props.scene}
-            videoVolume={this.props.scene.videoVolume}
             isPlaying={this.props.isPlaying}
             historyOffset={this.props.historyOffset}
             setHistoryOffset={this.props.setHistoryOffset}
@@ -1291,8 +1290,7 @@ export default class HeadlessScenePlayer extends React.Component {
   }
 
   shouldComponentUpdate(props: any, state: any): boolean {
-    return props.scene.id !== this.props.scene.id ||
-      props.scene.videoVolume !== this.state.videoVolume ||
+    return props.scene !== this.props.scene ||
       (props.nextScene && this.props.nextScene &&
       props.nextScene.id !== this.props.nextScene.id) ||
       props.historyOffset !== this.props.historyOffset ||

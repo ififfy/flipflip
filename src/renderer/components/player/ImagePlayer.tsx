@@ -23,7 +23,6 @@ export default class ImagePlayer extends React.Component {
   readonly props: {
     config: Config,
     scene: Scene,
-    videoVolume: number,
     advanceHack?: ChildCallbackHack,
     deleteHack?: ChildCallbackHack,
     maxInMemory: number,
@@ -69,67 +68,6 @@ export default class ImagePlayer extends React.Component {
       offset = -this.state.historyPaths.length + 1;
     }
 
-    let horizTransLevel = 0;
-    if (this.props.scene.horizTransType == HTF.left) {
-      horizTransLevel = -this.props.scene.horizTransLevel;
-    } else if (this.props.scene.horizTransType == HTF.right) {
-      horizTransLevel = this.props.scene.horizTransLevel;
-    }
-
-    let vertTransLevel = 0;
-    if (this.props.scene.vertTransType == VTF.up) {
-      vertTransLevel = -this.props.scene.vertTransLevel;
-    } else if (this.props.scene.vertTransType == VTF.down) {
-      vertTransLevel = this.props.scene.vertTransLevel;
-    }
-
-    let zoomStart = 1;
-    let zoomEnd = 1;
-    if (this.props.scene.zoom) {
-      zoomStart = this.props.scene.zoomStart;
-      zoomEnd = this.props.scene.zoomEnd;
-    }
-
-    let fadeDuration = 0;
-    let crossFade = this.props.scene.crossFade;
-    let crossFadeAudio = this.props.scene.crossFadeAudio && !this.props.scene.gridView;
-    if (crossFade) {
-      switch (this.props.scene.fadeTF) {
-        case TF.scene:
-          fadeDuration = this.state.timeToNextFrame;
-          break;
-        case TF.constant:
-          fadeDuration = this.props.scene.fadeDuration;
-          break;
-        case TF.random:
-          fadeDuration = Math.floor(Math.random() * (this.props.scene.fadeDurationMax - this.props.scene.fadeDurationMin + 1)) + this.props.scene.fadeDurationMin;
-          break;
-        case TF.sin:
-          const sinRate = (Math.abs(this.props.scene.fadeSinRate - 100) + 2) * 1000;
-          fadeDuration = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (this.props.scene.fadeDurationMax - this.props.scene.fadeDurationMin + 1)) + this.props.scene.fadeDurationMin;
-          break;
-      }
-    }
-    
-    let transDuration = 0;
-    if (this.props.scene.zoom) {
-      switch (this.props.scene.transTF) {
-        case TF.scene:
-          transDuration = this.state.timeToNextFrame;
-          break;
-        case TF.constant:
-          transDuration = this.props.scene.transDuration;
-          break;
-        case TF.random:
-          transDuration = Math.floor(Math.random() * (this.props.scene.transDurationMax - this.props.scene.transDurationMin + 1)) + this.props.scene.transDurationMin;
-          break;
-        case TF.sin:
-          const sinRate = (Math.abs(this.props.scene.transSinRate - 100) + 2) * 1000;
-          transDuration = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (this.props.scene.transDurationMax - this.props.scene.transDurationMin + 1)) + this.props.scene.transDurationMin;
-          break;
-      }
-    }
-
     return (
       <div className="ImagePlayer"
            style={{cursor: this.state.hideCursor ? "none" : "initial"}}>
@@ -162,20 +100,8 @@ export default class ImagePlayer extends React.Component {
           scene={this.props.scene}
           timeToNextFrame={this.state.timeToNextFrame}
           toggleStrobe={this._toggleStrobe}
-          backgroundType={this.props.scene.backgroundType}
-          backgroundColor={this.props.scene.backgroundColor}
-          backgroundBlur={this.props.scene.backgroundBlur}
-          horizTransLevel={horizTransLevel}
-          vertTransLevel={vertTransLevel}
-          zoomStart={zoomStart}
-          zoomEnd={zoomEnd}
-          transDuration={transDuration}
-          crossFade={crossFade}
-          crossFadeAudio={crossFadeAudio}
-          fadeDuration={fadeDuration}
           fitParent={this.props.scene.gridView}
           hasStarted={this.props.hasStarted}
-          videoVolume={this.props.scene.videoVolume}
           onLoaded={this.state.historyPaths.length == 1 ? this.props.onLoaded : this.nop}
           setVideo={this.props.setVideo}/>
       </div>
@@ -236,7 +162,7 @@ export default class ImagePlayer extends React.Component {
   shouldComponentUpdate(props: any, state: any): boolean {
     return (state.hideCursor !== this.state.hideCursor ||
             state.historyPaths !== this.state.historyPaths ||
-            props.videoVolume !== this.props.videoVolume ||
+            props.scene !== this.props.scene ||
             props.isPlaying !== this.props.isPlaying ||
             props.hasStarted !== this.props.hasStarted ||
             props.allURLs !== this.props.allURLs ||

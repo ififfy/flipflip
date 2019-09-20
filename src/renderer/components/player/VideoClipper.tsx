@@ -9,6 +9,7 @@ import LibrarySource from "../library/LibrarySource";
 import Clip from "../library/Clip";
 import SimpleSliderInput from "../ui/SimpleSliderInput";
 import SimpleTextInput from "../ui/SimpleTextInput";
+import Scene from "../../data/Scene";
 
 export default class VideoClipper extends React.Component {
   readonly props: {
@@ -20,10 +21,10 @@ export default class VideoClipper extends React.Component {
   };
 
   readonly state = {
-    video: (null as HTMLVideoElement),
-    videoVolume: this.props.videoVolume,
+    scene: new Scene(),
+    video: null as HTMLVideoElement,
     isEditing: -1,
-    isEditingValue: (null as {min: number, max: number}),
+    isEditingValue: null as {min: number, max: number},
     isEditingStartText: "",
     isEditingEndText: "",
   };
@@ -42,7 +43,7 @@ export default class VideoClipper extends React.Component {
               label=""
               min={0}
               max={100}
-              value={this.state.videoVolume}
+              value={this.state.scene.videoVolume}
               isEnabled={true}
               onChange={this.onChangeVolume.bind(this)} />
             <div
@@ -55,18 +56,8 @@ export default class VideoClipper extends React.Component {
           <React.Fragment>
             <ImageView
               image={this.state.video}
-              backgroundType={BT.color}
-              backgroundColor="#010101"
-              backgroundBlur={0}
-              horizTransLevel={0}
-              vertTransLevel={0}
-              zoomStart={1}
-              zoomEnd={1}
-              transDuration={0}
-              crossFade={false}
-              crossFadeAudio={false}
-              fadeDuration={0}
-              videoVolume={this.state.videoVolume}
+              scene={this.state.scene}
+              timeToNextFrame={0}
               fitParent={true}
               hasStarted={true}
               onLoaded={this.nop}
@@ -141,7 +132,7 @@ export default class VideoClipper extends React.Component {
                 <VideoControl
                   video={this.state.video}
                   mode={VC.sceneClipper}
-                  volume={this.state.videoVolume}
+                  volume={this.state.scene.videoVolume}
                   clip={this.state.isEditingValue}
                   onChangeVolume={this.onChangeVolume.bind(this)}/>
               </div>
@@ -160,6 +151,12 @@ export default class VideoClipper extends React.Component {
   nop() {}
 
   componentDidMount() {
+    const scene = this.state.scene;
+    scene.backgroundType = BT.color;
+    scene.backgroundColor = "#010101";
+    scene.videoVolume = this.props.videoVolume;
+    this.setState({scene: scene});
+
     let video = document.createElement('video');
 
     video.onerror = () => {
@@ -244,7 +241,9 @@ export default class VideoClipper extends React.Component {
   }
 
   onChangeVolume(volume: number) {
-    this.setState({videoVolume: volume});
+    const scene = this.state.scene;
+    scene.videoVolume = volume;
+    this.setState({scene: scene});
     if (this.state.video) {
       this.state.video.volume = volume / 100;
     }
