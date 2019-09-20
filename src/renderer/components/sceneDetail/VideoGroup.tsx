@@ -4,6 +4,7 @@ import Scene from "../../data/Scene";
 import {SceneSettings} from "../../data/Config";
 import ControlGroup from "./ControlGroup";
 import VideoControl from "../player/VideoControl";
+import {VC} from "../../data/const";
 
 export default class VideoGroup extends React.Component {
   readonly props: {
@@ -17,10 +18,11 @@ export default class VideoGroup extends React.Component {
   };
 
   render() {
+    if (!this.props.mainVideo && (!this.props.otherVideos || !this.props.otherVideos.find((v) => v != null)) && this.props.mode == VC.player) return <div/>;
     return (
       <ControlGroup title="Video Controls" isNarrow={true}>
         <div className="ControlSubgroup VideoControlGroup m-inline">
-          {(this.props.mainVideo) && (
+          {this.props.mainVideo && (
             <React.Fragment>
               <h4>Scene Video</h4>
               <VideoControl
