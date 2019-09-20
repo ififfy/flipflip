@@ -164,8 +164,8 @@ export default class CaptionProgram extends React.Component {
             newProgram.push((this as any)[command](value));
             break;
           case "storephrase":
-            const newPhrases = this.state.phrases;
-            newPhrases.concat([value]);
+            let newPhrases = this.state.phrases;
+            newPhrases = newPhrases.concat([value]);
             this.setState({phrases: newPhrases});
             break;
           case "setblinkduration":
