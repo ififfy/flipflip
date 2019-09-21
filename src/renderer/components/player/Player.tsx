@@ -400,6 +400,10 @@ export default class Player extends React.Component {
       Math.round(Math.abs(new Date().getTime() - this.state.startTime.getTime()) / 1000) >= this.props.scene.nextSceneTime) {
       this.setState({startTime: null});
       this.props.nextScene();
+    } else if (!this.state.isPlaying && this.state.startTime) {
+      const startTime = this.state.startTime;
+      startTime.setTime(startTime.getTime() + 1000);
+      this.setState({startTime: startTime});
     }
   }
 
@@ -639,7 +643,7 @@ export default class Player extends React.Component {
       (!this.props.scene.gridView && this.state.isMainLoaded && (this.getValidOverlays().length == 0 || this.state.areOverlaysLoaded.find((b) => !b) == null)) ||
       (this.props.scene.gridView && this.state.isGridLoaded.find((b) => !b) == null));
     if (force || ((isLoaded || this.props.config.displaySettings.startImmediately) && canStart)) {
-      this.setState({hasStarted: true, isLoaded: true, startTime: new Date()});
+      this.setState({hasStarted: true, isLoaded: true, startTime: this.state.startTime ?  this.state.startTime : new Date()});
     } else {
       this.setState({isLoaded: isLoaded});
     }
