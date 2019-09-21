@@ -220,11 +220,13 @@ export default class CaptionProgram extends React.Component {
       this.el.current.style.opacity = '1';
       if (value == "$RANDOM_PHRASE") {
         this.el.current.innerHTML = getRandomListItem(this.state.phrases);
-      } else if (value == "$TAG_PHRASE" && this.props.currentSource) {
-        const tag = getRandomListItem(this.props.getTags(this.props.currentSource).filter((t) => t.phraseString && t.phraseString != ""));
-        if (tag) {
-          const phraseString = tag.phraseString;
-          this.el.current.innerHTML = getRandomListItem(phraseString.split('\n'));
+      } else if (value == "$TAG_PHRASE") {
+        if (this.props.currentSource) {
+          const tag = getRandomListItem(this.props.getTags(this.props.currentSource).filter((t) => t.phraseString && t.phraseString != ""));
+          if (tag) {
+            const phraseString = tag.phraseString;
+            this.el.current.innerHTML = getRandomListItem(phraseString.split('\n'));
+          }
         }
       } else {
         this.el.current.innerHTML = value;
