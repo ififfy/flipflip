@@ -189,6 +189,7 @@ export default class Library extends React.Component {
     if (this.state.showProgress) {
       this.setState({showProgress: false});
     } else if (this.props.isBatchTag) {
+      this.setState({showProgress: false});
       this.props.batchTag(false);
     } else {
       this.props.goBack();

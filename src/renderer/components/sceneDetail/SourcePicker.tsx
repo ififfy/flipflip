@@ -334,6 +334,13 @@ export default class SourcePicker extends React.Component {
       (this.props.sources !== props.sources));
   }
 
+  componentDidUpdate(props: any) {
+    if (props.isBatchTag && !this.props.isBatchTag) {
+      this._selectedTags = null;
+      this.setState({batchTagIsOpen: false});
+    }
+  }
+
   nop() {}
 
   // Use alt+P to access import modal
