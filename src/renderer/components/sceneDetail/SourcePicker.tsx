@@ -388,7 +388,7 @@ export default class SourcePicker extends React.Component {
 
   toggleBatchTagModal() {
     this._selectedTags = null;
-    this.setState({batchTagIsOpen: !this.state.batchTagIsOpen});
+    this.setState({batchTagIsOpen: !this.state.batchTagIsOpen, markUpdate: !this.state.markUpdate}); // Trigger update
   }
 
   selectTags(selectedTags: [{label: string, value: string}]) {
@@ -430,7 +430,9 @@ export default class SourcePicker extends React.Component {
         const sourceTags = source.tags.map((t) => t.name);
         for (let tag of this._selectedTags) {
           if (sourceTags.includes(tag.label)) {
-            source.tags.splice(sourceTags.indexOf(tag.label), 1);
+            const indexOf = sourceTags.indexOf(tag.label);
+            source.tags.splice(indexOf, 1);
+            sourceTags.splice(indexOf, 1);
           }
         }
       }
