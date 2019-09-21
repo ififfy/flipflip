@@ -51,6 +51,7 @@ export default class ImagePlayer extends React.Component {
     orderFunction: this.props.scene.orderFunction,
   };
 
+  readonly idleTimerRef: React.RefObject<HTMLDivElement> = React.createRef();
   _isMounted: boolean;
   _isLooping: boolean;
   _loadedURLs: Array<string>;
@@ -70,7 +71,8 @@ export default class ImagePlayer extends React.Component {
 
     return (
       <div className="ImagePlayer"
-           style={{cursor: this.state.hideCursor ? "none" : "initial"}}>
+           style={{cursor: this.state.hideCursor ? "none" : "initial"}}
+           ref={this.idleTimerRef}>
         {(this.props.strobeLayer == SL.middle) && (
           <Strobe
             pulse={this.props.scene.strobePulse}
@@ -91,7 +93,7 @@ export default class ImagePlayer extends React.Component {
           />
         )}
         <IdleTimer
-          ref={null}
+          ref={ref => {return this.idleTimerRef}}
           onActive={this.onActive.bind(this)}
           onIdle={this.onIdle.bind(this)}
           timeout={2000} />

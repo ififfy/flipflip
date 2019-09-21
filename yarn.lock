@@ -4057,10 +4057,10 @@ react-dom@^16.8.0:
     prop-types "^15.6.2"
     scheduler "^0.13.6"
 
-react-idle-timer@^4.2.3:
-  version "4.2.3"
-  resolved "https://registry.yarnpkg.com/react-idle-timer/-/react-idle-timer-4.2.3.tgz#d4c7e646de0d7d67b26d47a49ac231a15c7350c7"
-  integrity sha512-p+Pf0u3/juGlK7tkSdE4HNBSEIbReqVR41dsGy+/Fyb9YLRXml3QC7Iyu14k+rjuC8plFu76WrAr/j6wgIWshQ==
+react-idle-timer@^4.2.9:
+  version "4.2.9"
+  resolved "https://registry.yarnpkg.com/react-idle-timer/-/react-idle-timer-4.2.9.tgz#9054dc508953521e76fd5255f692ec8a816c304c"
+  integrity sha512-Bj1SaHdCS+YiWgASgmZtr5MEWfsyIg9AWGdpSKbrzlsjpEXYuCe1dsuAetY0ES81w3sz98oUBBj25T4Hl7JXqg==
 
 react-input-autosize@^2.2.1:
   version "2.2.1"
