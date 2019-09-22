@@ -98,7 +98,12 @@ export default class Player extends React.Component {
       (this.props.scene.strobeLayer == SL.top || this.props.scene.strobeLayer == SL.bottom);
 
     let gridStyle = {};
+    let grid;
     if (this.props.scene.gridView) {
+      grid = this.props.scene.grid;
+      if (grid == null || (grid.length == 1 && grid[0].length == 0)) {
+        grid = [[this.props.scene.id]];
+      }
       const height = this.props.scene.grid.length;
       const width = this.props.scene.grid[0].length;
       const colSize = 100 / width;
@@ -214,7 +219,7 @@ export default class Player extends React.Component {
 
           {this.props.scene.gridView && (
             <React.Fragment>
-              {this.props.scene.grid.map((row, rowIndex) =>
+              {grid.map((row, rowIndex) =>
                 <React.Fragment key={rowIndex}>
                   {row.map((sceneID, colIndex) => {
                     const index = (rowIndex * row.length) + colIndex;

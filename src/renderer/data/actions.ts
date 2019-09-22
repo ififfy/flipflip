@@ -14,6 +14,7 @@ import Config from "./Config";
 import LibrarySource from "../components/library/LibrarySource";
 import Tag from "../components/library/Tag";
 import Clip from "../components/library/Clip";
+import Overlay from "../components/library/Overlay";
 
 type State = typeof defaultInitialState;
 
@@ -229,8 +230,19 @@ export function addScene(state: State): Object {
 }
 
 export function deleteScene(state: State, scene: Scene): Object {
+  if (!confirm("Are you SURE you want to delete " + scene.name + "?\nIt will be removed from all overlays and grids.")) return;
+  const newScenes = state.scenes.filter((s: Scene) => s.id != scene.id);
+  for (let s of newScenes) {
+    s.overlays = s.overlays.filter((o) => o.sceneID != scene.id);
+    for (let row of s.grid) {
+      if (row.find((id: any) => parseInt(id) == scene.id) != null) {
+        s.grid = [[]];
+        break;
+      }
+    }
+  }
   return {
-    scenes: state.scenes.filter((s: Scene) => s.id != scene.id),
+    scenes: newScenes,
     route: Array<Route>(),
   };
 }
@@ -588,6 +600,7 @@ export function toggleTag(state: State, sourceID: number, tag: Tag): Object {
       source.tags = source.tags.filter((t: Tag) => t.name != tag.name);
     } else {
       source.tags.push(tag);
+      source.tags[source.tags.length - 1].phraseString = "";
     }
     for (let scene of newScenes) {
       const sceneSource = scene.sources.find((s) => s.url == source.url);
@@ -617,21 +630,41 @@ export function exportScene(state: State, scene: Scene): Object {
   const sceneCopy = JSON.parse(JSON.stringify(scene)); // Make a copy
   sceneCopy.tagWeights = null;
   sceneCopy.sceneWeights = null;
+  sceneCopy.overlays = sceneCopy.overlays.filter((o: Overlay) => o.sceneID != 0);
   scenesToExport.push(sceneCopy);
-  const removeO = Array<number>();
-  for (let o of scene.overlays) {
-    const overlay = state.scenes.find((s) => s.id == o.sceneID);
-    if (overlay == null) {
-      removeO.push(o.id);
-    } else {
-      const overlayCopy = JSON.parse(JSON.stringify(overlay)); // Make a copy
-      overlayCopy.tagWeights = null;
-      overlayCopy.sceneWeights = null;
-      overlayCopy.overlays = null;
-      scenesToExport.push(overlayCopy);
+
+  if (sceneCopy.gridView) {
+    sceneCopy.overlays = [];
+    // Add grid
+    for (let row of sceneCopy.grid) {
+      for (let g of row) {
+        const grid = state.scenes.find((s) => s.id == g);
+        if (grid && !scenesToExport.find((s) => s.id == g)) {
+          const gridCopy = JSON.parse(JSON.stringify(grid)); // Make a copy
+          gridCopy.tagWeights = null;
+          gridCopy.sceneWeights = null;
+          gridCopy.overlays = [];
+          gridCopy.grid = [[]];
+          scenesToExport.push(gridCopy);
+        }
+      }
+    }
+  } else {
+    sceneCopy.grid = [[]];
+    // Add overlays
+    for (let o of sceneCopy.overlays) {
+      const overlay = state.scenes.find((s) => s.id == o.sceneID);
+      if (overlay && !scenesToExport.find((s) => s.id == o.sceneID)) {
+        const overlayCopy = JSON.parse(JSON.stringify(overlay)); // Make a copy
+        overlayCopy.tagWeights = null;
+        overlayCopy.sceneWeights = null;
+        overlayCopy.overlays = [];
+        overlayCopy.grid = [[]];
+        scenesToExport.push(overlayCopy);
+      }
     }
   }
-  sceneCopy.overlays = sceneCopy.overlays.filter((o: any) => !removeO.includes(o.id));
+
   const sceneExport = JSON.stringify(scenesToExport);
   const fileName = sceneCopy.name + "_export.json";
   remote.dialog.showSaveDialog(remote.getCurrentWindow(),
@@ -647,38 +680,56 @@ export function importScene(state: State): Object {
   const filePath = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
     {filters: [{name:'All Files (*.*)', extensions: ['*']},{name: 'JSON Document', extensions: ['json']}], properties: ['openFile']});
   if (!filePath || !filePath.length) return;
+  const importScenes = JSON.parse(fs.readFileSync(filePath[0], 'utf-8'));
+  if (!importScenes[0].id || !importScenes[0].name || !importScenes[0].sources) {
+    alert("Not a valid scene file");
+    return {};
+  }
   const addToLibrary = confirm("Would you also like to import this Scene's sources into your Library?");
   let newScenes = state.scenes;
   let sources = Array<LibrarySource>();
-  const importScenes = JSON.parse(fs.readFileSync(filePath[0], 'utf-8'));
 
   const scene = new Scene(importScenes[0]);
   let id = state.scenes.length + 1;
   state.scenes.forEach((s: Scene) => {
     id = Math.max(s.id + 1, id);
   });
+  const newSceneMap = new Map<number, number>();
+  newSceneMap.set(scene.id, id);
   scene.id = id;
+
   newScenes = newScenes.concat([scene]);
   if (addToLibrary) {
     sources = sources.concat(scene.sources);
   }
-
-  const overlays = new Map<number, number>();
   if (scene.overlays) {
     for (let o of scene.overlays) {
-      if (overlays.has(o.sceneID)) {
-        o.id = overlays.get(o.sceneID);
+      const sID = parseInt(o.sceneID as any);
+      if (newSceneMap.has(sID)) {
+        o.sceneID = newSceneMap.get(sID);
       } else {
-        const sID = o.sceneID;
         o.sceneID = ++id;
-        overlays.set(sID, o.sceneID);
+        newSceneMap.set(sID, o.sceneID);
       }
     }
   }
-  if (overlays.size > 0) {
+  if (scene.grid) {
+    for (let r=0; r < scene.grid.length; r++) {
+      for (let g=0; g < scene.grid[r].length; g++) {
+        const sID = parseInt(scene.grid[r][g] as any);
+        if (newSceneMap.has(sID)) {
+          scene.grid[r][g] = newSceneMap.get(sID);
+        } else {
+          scene.grid[r][g] = ++id;
+          newSceneMap.set(sID, scene.grid[r][g]);
+        }
+      }
+    }
+  }
+  if (newSceneMap.size > 0) {
     for (let i=1; i < importScenes.length; i++) {
       const scene = new Scene(importScenes[i]);
-      scene.id = overlays.get(scene.id);
+      scene.id = newSceneMap.get(scene.id);
       newScenes = newScenes.concat([scene]);
       if (addToLibrary) {
         sources = sources.concat(scene.sources);
@@ -739,6 +790,7 @@ export function importLibrary(state: State, backup:Function): Object {
   let tagID = newTags.length + 1;
   newTags.forEach((t) => {tagID = Math.max(t.id + 1, tagID);});
   let sourceID = newLibrary.length + 1;
+  newLibrary.forEach((s) => {sourceID = Math.max(s.id + 1, sourceID);});
   for (let source of libraryImport) {
     if (source.tags) {
       for (let tag of source.tags) { // Make sure we have all of these tags
@@ -759,10 +811,32 @@ export function importLibrary(state: State, backup:Function): Object {
       source.id = sourceID++;
       newLibrary.push(source);
       myLibrary.push(source.url);
-    } else { // If this source is untagged, add imported tags
+    } else {
+      // If this source is untagged, add imported tags
       const librarySource = newLibrary[indexOf];
       if (librarySource.tags.length == 0) {
         librarySource.tags = source.tags;
+      }
+      // Add new blacklist urls
+      librarySource.blacklist = librarySource.blacklist.concat(source.blacklist.filter((url: string) => !librarySource.blacklist.includes(url)));
+      // Add new clips
+      if (source.clips) {
+        let newID = source.clips.length + 1;
+        for (let clip of source.clips) {
+          let found = false;
+          if (librarySource.clips) {
+            for (let lClip of librarySource.clips) {
+              if (clip.start == lClip.start && clip.end == lClip.end) {
+                found = true;
+                break;
+              }
+            }
+          }
+          if (!found) {
+            clip.id = newID++;
+            librarySource.clips = librarySource.clips.concat([clip]);
+          }
+        }
       }
     }
   }
