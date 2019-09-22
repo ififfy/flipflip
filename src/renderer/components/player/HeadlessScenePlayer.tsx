@@ -652,7 +652,8 @@ function loadImgur(config: Config, source: LibrarySource, filter: string, helper
 function loadTwitter(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   let configured = config.remoteSettings.twitterAccessTokenKey != "" && config.remoteSettings.twitterAccessTokenSecret != "";
   if (configured) {
-    const url = source.url;
+    const excludeRTS = source.url.endsWith("--");
+    const url = source.url.replace("--", "");
     return new CancelablePromise((resolve) => {
       const twitter = new Twitter({
         consumer_key: config.remoteSettings.twitterConsumerKey,
@@ -660,8 +661,9 @@ function loadTwitter(config: Config, source: LibrarySource, filter: string, help
         access_token_key: config.remoteSettings.twitterAccessTokenKey,
         access_token_secret: config.remoteSettings.twitterAccessTokenSecret,
       });
+      // TODO Add UI option for exlucding retweets
       twitter.get('statuses/user_timeline',
-        helpers.next == 0 ? {screen_name: getFileGroup(url), count: 200} : {screen_name: getFileGroup(url), count: 200, max_id: helpers.next},
+        helpers.next == 0 ? {screen_name: getFileGroup(url), count: 200, include_rts: !excludeRTS} : {screen_name: getFileGroup(url), count: 200, include_rts: !excludeRTS, max_id: helpers.next},
         (error: any, tweets: any) => {
         if (error) {
           resolve(null);
