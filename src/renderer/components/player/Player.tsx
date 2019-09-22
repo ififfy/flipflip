@@ -81,6 +81,7 @@ export default class Player extends React.Component {
 
   _interval: NodeJS.Timer = null;
   _toggleStrobe = false;
+  _onSidebar = false;
 
   render() {
     const canGoBack = this.state.historyOffset > -(this.state.historyPaths.length - 1);
@@ -324,7 +325,9 @@ export default class Player extends React.Component {
         </div>
 
         <div className="SceneOptions ControlGroupGroup u-button-sidebar"
-             style={{display: this.state.hasStarted ? "" : "none"}}>
+             style={{display: this.state.hasStarted ? "" : "none"}}
+             onMouseEnter={this.onSidebarMouseEnter.bind(this)}
+             onMouseLeave={this.onSidebarMouseLeave.bind(this)}>
           <h2 className="SceneOptionsHeader">Scene Options</h2>
           {this.props.scene.imageTypeFilter != IF.stills && (
             <VideoGroup
@@ -668,22 +671,26 @@ export default class Player extends React.Component {
   }
 
   historyBack() {
-    if (this.state.historyOffset > -(this.state.historyPaths.length - 1)) {
-      this.setState({
-        isPlaying: false,
-        historyOffset: this.state.historyOffset - 1,
-      });
+    if (!this._onSidebar || document.activeElement.tagName.toLocaleLowerCase() != "input") {
+      if (this.state.historyOffset > -(this.state.historyPaths.length - 1)) {
+        this.setState({
+          isPlaying: false,
+          historyOffset: this.state.historyOffset - 1,
+        });
+      }
     }
   }
 
   historyForward() {
-    if (this.state.historyOffset >= 0) {
-      this.state.imagePlayerAdvanceHack.fire();
-    } else {
-      this.setState({
-        isPlaying: false,
-        historyOffset: this.state.historyOffset + 1,
-      });
+    if (!this._onSidebar || document.activeElement.tagName.toLocaleLowerCase() != "input") {
+      if (this.state.historyOffset >= 0) {
+        this.state.imagePlayerAdvanceHack.fire();
+      } else {
+        this.setState({
+          isPlaying: false,
+          historyOffset: this.state.historyOffset + 1,
+        });
+      }
     }
   }
 
@@ -786,19 +793,34 @@ export default class Player extends React.Component {
     return keyMap;
   }
 
+  onSidebarMouseEnter() {
+    this._onSidebar = true;
+  }
+
+  onSidebarMouseLeave() {
+    this._onSidebar = false;
+  }
+
   onKeyDown = (e: KeyboardEvent) => {
+    const focus = document.activeElement.tagName.toLocaleLowerCase();
     switch (e.key) {
       case ' ':
-        e.preventDefault();
-        this.playPause();
+        if (!this._onSidebar || focus != "input") {
+          e.preventDefault();
+          this.playPause();
+        }
         break;
       case 'ArrowLeft':
-        e.preventDefault();
-        this.historyBack();
+        if (!this._onSidebar || focus != "input") {
+          e.preventDefault();
+          this.historyBack();
+        }
         break;
       case 'ArrowRight':
-        e.preventDefault();
-        this.historyForward();
+        if (!this._onSidebar || focus != "input") {
+          e.preventDefault();
+          this.historyForward();
+        }
         break;
       case 'Escape':
         e.preventDefault();
@@ -829,9 +851,11 @@ export default class Player extends React.Component {
         }
         break;
       case 'Delete':
-        if (this.props.config.caching.enabled) {
-          e.preventDefault();
-          this.onDelete();
+        if (!this._onSidebar || focus != "input") {
+          if (this.props.config.caching.enabled) {
+            e.preventDefault();
+            this.onDelete();
+          }
         }
         break;
       case '[':
@@ -852,17 +876,21 @@ export default class Player extends React.Component {
   /* Menu and hotkey options DON'T DELETE */
 
   onDelete() {
-    const img = this.state.historyPaths[(this.state.historyPaths.length - 1) + this.state.historyOffset];
-    const url = img.src;
-    const isFile = url.startsWith('file://');
-    const path = urlToPath(url);
-    if (isFile) {
-      this.onDeletePath(path);
+    if (!this._onSidebar || document.activeElement.tagName.toLocaleLowerCase() != "input") {
+      const img = this.state.historyPaths[(this.state.historyPaths.length - 1) + this.state.historyOffset];
+      const url = img.src;
+      const isFile = url.startsWith('file://');
+      const path = urlToPath(url);
+      if (isFile) {
+        this.onDeletePath(path);
+      }
     }
   }
 
   playPause() {
-    this.setPlayPause(!this.state.isPlaying)
+    if (!this._onSidebar || document.activeElement.tagName.toLocaleLowerCase() != "input") {
+      this.setPlayPause(!this.state.isPlaying)
+    }
   }
 
   toggleAlwaysOnTop() {
