@@ -32,8 +32,6 @@ type Props = {
   isSelect: boolean,
   isBatchTag: boolean
   emptyMessage: string,
-  removeAllMessage: string,
-  removeAllConfirm: string,
   yOffset: number,
   filters: Array<string>,
   selected: Array<string>,
@@ -260,10 +258,34 @@ export default class SourcePicker extends React.Component {
 
         {this.state.removeAllIsOpen && (
           <Modal onClose={this.toggleRemoveAllModal.bind(this)} title="Remove all?">
-            <p>{this.props.removeAllMessage}</p>
-            <div className="u-button u-float-right" onClick={this.removeAll.bind(this)}>
-              {this.props.removeAllConfirm}
-            </div>
+            {this.props.tags && (
+              <React.Fragment>
+                {this.state.filters.length == 0 && (
+                  <React.Fragment>
+                    <p>Are you sure you really wanna delete your entire library...? ಠ_ಠ</p>
+                    <div className="u-button u-float-right" onClick={this.removeAll.bind(this)}>
+                      Yea... I'm sure
+                    </div>
+                  </React.Fragment>
+                )}
+                {this.state.filters.length > 0 && (
+                  <React.Fragment>
+                    <p>Are you sure you want to remove these sources?</p>
+                    <div className="u-button u-float-right" onClick={this.removeDisplayed.bind(this)}>
+                      Ok
+                    </div>
+                  </React.Fragment>
+                )}
+              </React.Fragment>
+            )}
+            {!this.props.tags && (
+              <React.Fragment>
+                <p>Are you sure you want to remove all sources from this scene?</p>
+                <div className="u-button u-float-right" onClick={this.removeAll.bind(this)}>
+                  Ok
+                </div>
+              </React.Fragment>
+            )}
           </Modal>
         )}
         {this.state.isEditing !== -1 && (
@@ -455,6 +477,12 @@ export default class SourcePicker extends React.Component {
   removeAll() {
     this.toggleRemoveAllModal();
     this.props.onUpdateSources([]);
+  }
+
+  removeDisplayed() {
+    this.toggleRemoveAllModal();
+    const displaySources = this.getDisplaySources().map((s) => s.id);
+    this.props.onUpdateSources(this.props.sources.filter((s) => !displaySources.includes(s.id)));
   }
 
   addSources(sources: Array<string>) {

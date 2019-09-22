@@ -161,8 +161,6 @@ export default class Library extends React.Component {
             filters={this.props.filters}
             selected={this.props.selected}
             emptyMessage="You haven't added anything to the Library yet."
-            removeAllMessage="Are you sure you really wanna delete your library...? ಠ_ಠ"
-            removeAllConfirm="Yea... I'm sure"
             isSelect={this.props.isSelect}
             isBatchTag={this.props.isBatchTag}
             onUpdateSources={this.props.onUpdateLibrary}

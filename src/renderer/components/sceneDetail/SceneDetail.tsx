@@ -139,8 +139,6 @@ export default class SceneDetail extends React.Component {
               filters={[]}
               selected={[]}
               emptyMessage="You haven't added any sources to this Scene yet."
-              removeAllMessage="Are you sure you want to remove all sources from this scene?"
-              removeAllConfirm="Ok"
               isSelect={false}
               isBatchTag={false}
               onUpdateSources={this.onChangeSources.bind(this)}
