@@ -16,7 +16,8 @@ This section controls how the scene will play out.
 
 ##### Background
 * Choose between blurred image, solid color, or no background.
- * Control blur amount or color. 
+ * Control blur amount or color.
+* Choose to force the image to fill the screen. 
 
 ##### Next Scene
 * Choose a scene to transition to after this one (or none). Control timing of next scene (sec).

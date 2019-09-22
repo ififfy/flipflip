@@ -10,11 +10,13 @@ left. Save the file and share where you'd like.
 This file is just a long line of text which holds the data about your Scene's configuration. You could also just 
 post this text online for someone to import with (you don't have to share the file directly).
 
-Any overlays will also be exported with this scene. However, those overlays' overlays will not.
+Any overlays/grids will also be exported with this scene. However, those scenes' overlays & grids will not be exported.
+
+?> Any exported Generators will be imported as regular Scenes
 
 ?> **NOTE:** _Due to the nature of FlipFlip scenes, we don't recommend you try and import/export Scenes with local 
 directories. This will technically work, but the import/exporter would have to have the same file paths (or will 
-have to modify them manually). In addition, any exported Generators will be imported as regular Scenes._
+have to modify them manually)._
 
 ## Scene Import
 To import as Scene, click the `Import` button ( <img style="vertical-align: -5px" src="doc_icons/down-arrow.svg" 
@@ -23,7 +25,10 @@ alt="Import" width="20" height="20"> ) on the Home page. You will be prompted to
 If you have a `.json` export file, simply select it and your Scene will import. If you got a line of text from 
 someone, paste it into a file and save it. Then pick that file during the import.
 
-The imported Scene (and any overlays) will be created and you will be brought to the Scene.
+You can also choose to import this scene's sources into your library.
+
+After confirmation, the imported Scene (and any overlays/grids) will be created and you will be brought to 
+the imported Scene.
 
 ## Library Export
 To export your Library, click the `Export` button ( <img style="vertical-align: -5px" src="doc_icons/export.svg" 
@@ -38,5 +43,6 @@ To import a Library, click the `Import` button ( <img style="vertical-align: -5p
 alt="Import" width="20" height="20"> ) and select the library `.json` file you'd like to import. 
 
 Sources you already have will not be duplicated. However, if the imported Library has tags for a source and you do 
-not, the tags will be imported. The tags for any new items will be created and added.
+not, the tags will be imported. The tags for any new items will be created and added. Any new blacklist urls or clips 
+will be added to existing sources.
 

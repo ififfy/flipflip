@@ -1,6 +1,23 @@
 # Changelog
 
 ## 3.0.0 <small>(XX/XX/2019)</small>
+#### 3.0.0-beta2 <small>(09/23/2019)</small>
+- Allow effects to be changed instantly while playing
+- Add option to fill entire screen
+- Changed library Remove All to only remove visible sources
+- Check local files when marking offline
+- Fix bug where video volume not starting with scene
+- Fix bug with player not restarting
+- Fix cursor hiding while using sidebar
+- Fix hotkeys while using sidebar
+- Fix bug where next scene would play even if paused
+- Fix strobe image effect
+- Fix library and scene import/export
+- Fix bug with video control showing even if no video
+- Fix bug with $RANDOM_PRHASE in captioning
+- Fix bugs with batch tagging
+- Added option to exclude retweets (add "--" to end of Twitter URL)
+
 #### 3.0.0-beta1 <small>(09/10/2019)</small>
 
 - Grid View
