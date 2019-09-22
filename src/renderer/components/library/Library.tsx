@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {existsSync} from "fs";
 import tumblr from 'tumblr.js';
 import wretch from 'wretch';
 import Snoowrap from "snoowrap";
@@ -531,7 +532,12 @@ export default class Library extends React.Component {
               setTimeout(offlineLoop, 100);
             });
         } else {
-          this.setState({currentProgress: offset + 1});
+          this.setState({progressTitle: "Checking...</p><p>" + this.props.library[offset].url, currentProgress: offset + 1});
+          this.props.library[offset].lastCheck = new Date();
+          const exists = existsSync(this.props.library[offset].url);
+          if (!exists) {
+            this.props.library[offset].offline = true;
+          }
           setTimeout(offlineLoop, 100);
         }
       };
