@@ -132,7 +132,7 @@ export default class ImageView extends React.Component {
           img.onplay = () => {
             videoLoop(img);
             drawLoop(img, context, parentWidth, parentHeight);
-          }
+          };
           if (forceBG) {
             drawLoop(img, context, parentWidth, parentHeight);
           }
@@ -149,7 +149,9 @@ export default class ImageView extends React.Component {
       if (!blur) {
         img.onplay = () => videoLoop(img);
       }
-      img.play();
+      if (img.paused) {
+        img.play();
+      }
     }
 
     if (imgAspect < parentAspect) {
@@ -279,8 +281,11 @@ export default class ImageView extends React.Component {
 
   strobeImage() {
     const el = this.contentRef.current;
-    if (el && this._image) {
+    if (el && this._image && this._image.src == this.props.image.src) {
       el.appendChild(this._image);
+      if (this._image instanceof HTMLVideoElement && this._image.paused) {
+        this._image.play();
+      }
     }
   }
 
