@@ -101,6 +101,10 @@ export default class SceneEffectGroup extends React.Component {
               onChange={this.changeKey.bind(this, 'backgroundBlur').bind(this)}/>
           )}
         </div>
+        <SimpleCheckbox
+          text="Fill View"
+          isOn={this.props.scene.fillView}
+          onChange={this.changeKey.bind(this, 'fillView').bind(this)} />
 
         {!this.props.isTagging && (
           <React.Fragment>

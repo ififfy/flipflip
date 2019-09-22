@@ -138,6 +138,20 @@ export default class ImageView extends React.Component {
           }
         }
       }
+
+      if (imgAspect < parentAspect) {
+        const bgscale = (parentWidth + (0.04 * parentWidth)) / imgWidth;
+        bgImg.style.width = '100%';
+        bgImg.style.height = (imgHeight * bgscale) + 'px';
+        bgImg.style.marginTop = (parentHeight / 2 - imgHeight * bgscale / 2) + 'px';
+        bgImg.style.marginLeft = '0';
+      } else {
+        const bgscale = (parentHeight + (0.04 * parentHeight)) / imgHeight;
+        bgImg.style.width = (imgWidth * bgscale) + 'px';
+        bgImg.style.height = '100%';
+        bgImg.style.marginTop = '0';
+        bgImg.style.marginLeft = (parentWidth / 2 - imgWidth * bgscale / 2) + 'px';
+      }
     }
 
     if (img instanceof HTMLVideoElement && !forceBG) {
@@ -154,31 +168,33 @@ export default class ImageView extends React.Component {
       }
     }
 
-    if (imgAspect < parentAspect) {
-      const scale = parentHeight / imgHeight;
-      img.style.width = 'auto';
-      img.style.height = '100%';
-      img.style.marginTop = '0';
-      img.style.marginLeft = (parentWidth / 2 - imgWidth * scale / 2) + 'px';
-      if (blur) {
-        const bgscale = (parentWidth + (0.04 * parentWidth)) / imgWidth;
-        bgImg.style.width = '100%';
-        bgImg.style.height = (imgHeight * bgscale) + 'px';
-        bgImg.style.marginTop = (parentHeight / 2 - imgHeight * bgscale / 2) + 'px';
-        bgImg.style.marginLeft = '0';
+    if (this.props.scene.fillView) {
+      if (imgAspect > parentAspect) {
+        const scale = parentHeight / imgHeight;
+        img.style.width = 'auto';
+        img.style.height = '100%';
+        img.style.marginTop = '0';
+        img.style.marginLeft = (parentWidth / 2 - imgWidth * scale / 2) + 'px';
+      } else {
+        const scale = parentWidth / imgWidth;
+        img.style.width = '100%';
+        img.style.height = 'auto';
+        img.style.marginTop = (parentHeight / 2 - imgHeight * scale / 2) + 'px';
+        img.style.marginLeft = '0';
       }
     } else {
-      const scale = parentWidth / imgWidth;
-      img.style.width = '100%';
-      img.style.height = 'auto';
-      img.style.marginTop = (parentHeight / 2 - imgHeight * scale / 2) + 'px';
-      img.style.marginLeft = '0';
-      if (blur) {
-        const bgscale = (parentHeight + (0.04 * parentHeight)) / imgHeight;
-        bgImg.style.width = (imgWidth * bgscale) + 'px';
-        bgImg.style.height = '100%';
-        bgImg.style.marginTop = '0';
-        bgImg.style.marginLeft = (parentWidth / 2 - imgWidth * bgscale / 2) + 'px';
+      if (imgAspect < parentAspect) {
+        const scale = parentHeight / imgHeight;
+        img.style.width = 'auto';
+        img.style.height = '100%';
+        img.style.marginTop = '0';
+        img.style.marginLeft = (parentWidth / 2 - imgWidth * scale / 2) + 'px';
+      } else {
+        const scale = parentWidth / imgWidth;
+        img.style.width = '100%';
+        img.style.height = 'auto';
+        img.style.marginTop = (parentHeight / 2 - imgHeight * scale / 2) + 'px';
+        img.style.marginLeft = '0';
       }
     }
 

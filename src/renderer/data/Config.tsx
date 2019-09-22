@@ -85,6 +85,7 @@ interface SceneSettingsI {
   countFontFamily: string;
 
   audios: Array<Audio>;
+  fillView: boolean;
   gridView: boolean;
   grid: Array<Array<number>>;
 
@@ -222,6 +223,7 @@ export class SceneSettings implements SceneSettingsI {
   countFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
 
   audios: Array<Audio> = [];
+  fillView = false;
   gridView = false;
   grid: Array<Array<number>> = [[]];
 
