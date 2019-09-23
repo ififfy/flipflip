@@ -30,7 +30,7 @@ type Props = {
   tags?: Array<Tag>,
   config: Config,
   isSelect: boolean,
-  isBatchTag: boolean
+  isBatchTag: boolean,
   emptyMessage: string,
   yOffset: number,
   filters: Array<string>,
@@ -368,9 +368,9 @@ export default class SourcePicker extends React.Component {
   // Use alt+P to access import modal
   // Use alt+U to toggle highlighting untagged sources
   secretHotkey(e: KeyboardEvent) {
-    if (e.altKey && e.key == 'p') {
+    if (e.altKey && (e.key == 'p' || e.key == 'π')) {
       this.toggleURLImportModal();
-    } else if (e.altKey && e.key == 'm') {
+    } else if (e.altKey && (e.key == 'm' || e.key == 'µ')) {
       this.toggleMarked();
     }
   }

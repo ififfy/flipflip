@@ -16,6 +16,7 @@
 - Fix bug with video control showing even if no video
 - Fix bug with $RANDOM_PRHASE in captioning
 - Fix bugs with batch tagging
+- Fix bug alt hotkeys on MacOS
 - Added option to exclude retweets (add "--" to end of Twitter URL)
 
 #### 3.0.0-beta1 <small>(09/10/2019)</small>

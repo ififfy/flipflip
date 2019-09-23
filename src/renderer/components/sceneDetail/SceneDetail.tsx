@@ -35,13 +35,11 @@ export default class SceneDetail extends React.Component {
 
   readonly state = {
     isEditingName: this.props.autoEdit,
-    isShowingURLModal: false,
   };
 
   render() {
     return (
-      <div className="SceneDetail" onKeyDown={this.secretHotkey.bind(this)}>
-
+      <div className="SceneDetail">
         <div className="u-button-row">
           <div className="u-abs-center">
             {this.state.isEditingName && (
@@ -164,17 +162,6 @@ export default class SceneDetail extends React.Component {
 
   play() {
     this.props.onPlay(this.props.scene);
-  }
-
-  toggleURLImportModal() {
-    this.setState({isShowingURLModal: !this.state.isShowingURLModal});
-  }
-
-  // Use alt+P to access import modal
-  secretHotkey(e: KeyboardEvent) {
-    if (e.altKey && e.key == 'p') {
-      this.toggleURLImportModal();
-    }
   }
 
   beginEditingName() {
