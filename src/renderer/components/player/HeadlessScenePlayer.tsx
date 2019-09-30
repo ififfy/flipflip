@@ -661,9 +661,9 @@ function loadTwitter(config: Config, source: LibrarySource, filter: string, help
         access_token_key: config.remoteSettings.twitterAccessTokenKey,
         access_token_secret: config.remoteSettings.twitterAccessTokenSecret,
       });
-      // TODO Add UI option for exlucding retweets
+      // TODO Add UI option for excluding retweets (Fix markOffline)
       twitter.get('statuses/user_timeline',
-        helpers.next == 0 ? {screen_name: getFileGroup(url), count: 200, include_rts: !excludeRTS} : {screen_name: getFileGroup(url), count: 200, include_rts: !excludeRTS, max_id: helpers.next},
+        helpers.next == 0 ? {screen_name: getFileGroup(url), count: 200, include_rts: !excludeRTS, tweet_mode: 'extended'} : {screen_name: getFileGroup(url), count: 200, include_rts: !excludeRTS, tweet_mode: 'extended', max_id: helpers.next},
         (error: any, tweets: any) => {
         if (error) {
           resolve(null);
@@ -672,8 +672,8 @@ function loadTwitter(config: Config, source: LibrarySource, filter: string, help
         let images = Array<string>();
         let lastID = "";
         for (let t of tweets) {
-          // Skip FanCentro/OnlyFans posts
-          if (/href="https?:\/\/(fancentro|onlyfans)\.com\/?"/.exec(t.source) != null) continue;
+          // Skip FanCentro/OnlyFans/ClipTeez posts
+          if (/href="https?:\/\/(fancentro\.com|onlyfans\.com|mykink\.xxx)\/?"/.exec(t.source) != null) continue;
           if (t.extended_entities && t.extended_entities.media) {
             for (let m of t.extended_entities.media) {
               if (m.video_info) {
