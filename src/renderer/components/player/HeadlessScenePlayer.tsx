@@ -736,9 +736,9 @@ function loadDeviantArt(config: Config, source: LibrarySource, filter: string, h
         if (!hasNextPage) {
           helpers.next = null;
         }
-        helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+        helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
         resolve({
-          data: filterPathsToJustPlayable(filter, images, true),
+          data: filterPathsToJustPlayable(filter, images, false),
           helpers: helpers,
         });
       });
