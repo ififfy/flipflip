@@ -95,6 +95,17 @@ export default class ZoomMoveGroup extends React.Component {
                     onChange={this.changeKey.bind(this, 'transSinRate').bind(this)}/>
                 </div>
               )}
+              {this.props.scene.transTF == TF.bpm && (
+                <div>
+                  <SimpleSliderInput
+                    label={`BPM Multiplier: ${this.props.scene.transBPMMulti > 0 ? this.props.scene.transBPMMulti : "1 / " + (-1 * (this.props.scene.transBPMMulti - 2))}`}
+                    min={-8}
+                    max={10}
+                    value={this.props.scene.transBPMMulti}
+                    isEnabled={true}
+                    onChange={this.changeKey.bind(this, 'transBPMMulti').bind(this)}/>
+                </div>
+              )}
             </div>
             <div className="TimingControlGroup">
               {this.props.scene.transTF == TF.constant && (
@@ -140,7 +151,7 @@ export default class ZoomMoveGroup extends React.Component {
   }
 
   changeKey(key: string, value: any) {
-    if (["zoomStart", "zoomEnd", "horizTransLevel", "vertTransLevel", "transDuration", "transDurationMin", "transDurationMax", "transSinRate"].includes(key)) {
+    if (["zoomStart", "zoomEnd", "horizTransLevel", "vertTransLevel", "transDuration", "transDurationMin", "transDurationMax", "transSinRate", "transBPMMulti"].includes(key)) {
       this.update((s) => s[key] = parseInt(value, 10));
     } else {
       this.update((s) => s[key] = value);

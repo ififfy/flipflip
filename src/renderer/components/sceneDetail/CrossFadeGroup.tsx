@@ -48,6 +48,17 @@ export default class CrossFadeGroup extends React.Component {
                       onChange={this.changeKey.bind(this, 'fadeSinRate').bind(this)}/>
                   </div>
                 )}
+                {this.props.scene.fadeTF == TF.bpm && (
+                  <div>
+                    <SimpleSliderInput
+                      label={`BPM Multiplier: ${this.props.scene.fadeBPMMulti > 0 ? this.props.scene.fadeBPMMulti : "1 / " + (-1 * (this.props.scene.fadeBPMMulti - 2))}`}
+                      min={-8}
+                      max={10}
+                      value={this.props.scene.fadeBPMMulti}
+                      isEnabled={true}
+                      onChange={this.changeKey.bind(this, 'fadeBPMMulti').bind(this)}/>
+                  </div>
+                )}
               </div>
               <div className="TimingControlGroup">
                 {this.props.scene.fadeTF == TF.constant && (
@@ -94,7 +105,7 @@ export default class CrossFadeGroup extends React.Component {
   }
 
   changeKey(key: string, value: any) {
-    if (["fadeDuration", "fadeDurationMin", "fadeDurationMax", "fadeSinRate"].includes(key)) {
+    if (["fadeDuration", "fadeDurationMin", "fadeDurationMax", "fadeSinRate", "fadeBPMMulti"].includes(key)) {
       this.update((s) => s[key] = parseInt(value, 10));
     } else {
       this.update((s) => s[key] = value);

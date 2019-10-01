@@ -12,6 +12,7 @@ interface SceneSettingsI {
   timingMin: number;
   timingMax: number;
   timingSinRate: number;
+  timingBPMMulti: number;
   imageTypeFilter: string;
   weightFunction: string;
   orderFunction: string;
@@ -29,6 +30,7 @@ interface SceneSettingsI {
   transDurationMin: number;
   transDurationMax: number;
   transSinRate: number;
+  transBPMMulti: number;
   crossFade: boolean;
   crossFadeAudio: boolean;
   fadeTF: string;
@@ -36,6 +38,7 @@ interface SceneSettingsI {
   fadeDurationMin: number;
   fadeDurationMax: number;
   fadeSinRate: number;
+  fadeBPMMulti: number;
 
   backgroundType: string;
   backgroundColor: string;
@@ -64,11 +67,13 @@ interface SceneSettingsI {
   strobeTimeMin: number;
   strobeTimeMax: number;
   strobeSinRate: number;
+  strobeBPMMulti: number;
   strobeDelayTF: string;
   strobeDelay: number;
   strobeDelayMin: number;
   strobeDelayMax: number;
   strobeDelaySinRate: number;
+  strobeDelayBPMMulti: number;
   strobeColor: string;
 
   blinkColor: string;
@@ -85,6 +90,7 @@ interface SceneSettingsI {
   countFontFamily: string;
 
   audios: Array<Audio>;
+  bpm: number;
   fillView: boolean;
   gridView: boolean;
   grid: Array<Array<number>>;
@@ -148,6 +154,7 @@ export class SceneSettings implements SceneSettingsI {
   timingMin = 200;
   timingMax = 1200;
   timingSinRate = 100;
+  timingBPMMulti = 1;
   imageTypeFilter = IF.any;
   weightFunction = WF.sources;
   orderFunction = OF.random;
@@ -165,6 +172,7 @@ export class SceneSettings implements SceneSettingsI {
   transDurationMin = 1000;
   transDurationMax = 7000;
   transSinRate = 100;
+  transBPMMulti = 1;
   crossFade = false;
   crossFadeAudio = false;
   fadeTF = TF.constant;
@@ -172,6 +180,7 @@ export class SceneSettings implements SceneSettingsI {
   fadeDurationMin = 100;
   fadeDurationMax = 700;
   fadeSinRate = 100;
+  fadeBPMMulti = 1;
 
   backgroundType = BT.blur;
   backgroundColor = "#000000";
@@ -202,11 +211,13 @@ export class SceneSettings implements SceneSettingsI {
   strobeTimeMin = 100;
   strobeTimeMax = 300;
   strobeSinRate = 100;
+  strobeBPMMulti = 1;
   strobeDelayTF = TF.constant;
   strobeDelay = 200;
   strobeDelayMin = 100;
   strobeDelayMax = 300;
   strobeDelaySinRate = 100;
+  strobeDelayBPMMulti = 1;
   strobeColor = "#FFFFFF";
 
   blinkColor = "#FFFFFF";
@@ -223,6 +234,7 @@ export class SceneSettings implements SceneSettingsI {
   countFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
 
   audios: Array<Audio> = [];
+  bpm = 0;
   fillView = false;
   gridView = false;
   grid: Array<Array<number>> = [[]];

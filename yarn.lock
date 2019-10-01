@@ -2766,6 +2766,13 @@ jsesc@~0.5.0:
   resolved "https://registry.yarnpkg.com/jsesc/-/jsesc-0.5.0.tgz#e7dee66e35d6fc16f710fe91d5cf69f70f08911d"
   integrity sha1-597mbjXW/Bb3EP6R1c9p9w8IkR0=
 
+jsmediatags@^3.9.2:
+  version "3.9.2"
+  resolved "https://registry.yarnpkg.com/jsmediatags/-/jsmediatags-3.9.2.tgz#c6846394ea125995c36f196c4a76277b574f0bad"
+  integrity sha512-kbdYK/Jka44aBfIs4+pvu5hJfVqmzcRLs3oT25q94QsT8D6fX31RSZ5nQ+FP/zvmPfllKYZpzw/uoWOE5DmN6Q==
+  dependencies:
+    xhr2 "^0.1.4"
+
 json-bigint@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/json-bigint/-/json-bigint-0.3.0.tgz#0ccd912c4b8270d05f056fbd13814b53d3825b1e"
@@ -5508,6 +5515,11 @@ ws@^1.1.1:
   dependencies:
     options ">=0.0.5"
     ultron "1.0.x"
+
+xhr2@^0.1.4:
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/xhr2/-/xhr2-0.1.4.tgz#7f87658847716db5026323812f818cadab387a5f"
+  integrity sha1-f4dliEdxbbUCYyOBL4GMras4el8=
 
 xmlbuilder@^9.0.7:
   version "9.0.7"

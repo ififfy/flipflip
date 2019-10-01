@@ -125,21 +125,9 @@ export default class Player extends React.Component {
       <div className="Player">
         {showStrobe && (
           <Strobe
-            pulse={this.props.scene.strobePulse}
-            opacity={this.props.scene.strobeLayer == SL.bottom ? this.props.scene.strobeOpacity : 1}
-            durationTF={this.props.scene.strobeTF}
-            duration={this.props.scene.strobeTime}
-            durationMin={this.props.scene.strobeTimeMin}
-            durationMax={this.props.scene.strobeTimeMax}
-            sinRate={this.props.scene.strobeSinRate}
-            delayTF={this.props.scene.strobeDelayTF}
-            delay={this.props.scene.strobeDelay}
-            delayMin={this.props.scene.strobeDelayMin}
-            delayMax={this.props.scene.strobeDelayMax}
-            delaySinRate={this.props.scene.strobeDelaySinRate}
-            color={this.props.scene.strobeColor}
-            timeToNextFrame={this.state.timeToNextFrame}
             toggleStrobe={this._toggleStrobe}
+            timeToNextFrame={this.state.timeToNextFrame}
+            scene={this.props.scene}
           />
         )}
         {!this.state.hasStarted && !this.state.isEmpty && (

@@ -1,8 +1,9 @@
 import * as React from 'react';
 import Sound from "react-sound";
+import jsmediatags from "jsmediatags";
 import Timeout = NodeJS.Timeout;
 
-import {getTimestamp} from "../../data/utils";
+import {getTimestamp, urlToPath} from "../../data/utils";
 import {TF} from "../../data/const";
 import Audio from "../library/Audio";
 import SoundTick from "./SoundTick";
@@ -22,8 +23,10 @@ export default class AudioControl extends React.Component {
     audio: Audio,
     isPlaying: boolean,
     showAll: boolean,
+    detectBPM: boolean,
     scenePaths: Array<any>,
     onEditKey(key: string, value: string): void,
+    onBPM(bpm: number): void,
   };
 
   readonly state = {
@@ -60,6 +63,7 @@ export default class AudioControl extends React.Component {
     if (this.props.showAll) {
       this.tickLoop(true);
     }
+    this.detectBPM();
   }
 
   componentDidUpdate(props: any) {
@@ -79,12 +83,33 @@ export default class AudioControl extends React.Component {
     if (this.props.audio.tick && this.props.audio.tickMode == TF.scene && props.scenePaths && props.scenePaths.length > 0 && props.scenePaths !== this.props.scenePaths) {
       this.setState({tick: !this.state.tick});
     }
+    if (this.props.audio.url != audio.url || this.props.detectBPM != props.detectBPM) {
+      this.detectBPM();
+    }
     this._audio=JSON.stringify(this.props.audio);
   }
 
   componentWillUnmount() {
     if(this._timeout != null) {
       clearTimeout(this._timeout);
+    }
+  }
+
+  detectBPM() {
+    if (this.props.detectBPM) {
+      new jsmediatags.Reader(urlToPath(this.props.audio.url))
+        .setTagsToRead(["TBPM"])
+        .read({
+          onSuccess: (data: any) => {
+            const value = data.tags.TBPM.data;
+            if (value) {
+              this.props.onBPM(value);
+            }
+          },
+          onError: (error: any) => {
+            console.error("Error reading ID3 tags:", error.type, error.info);
+          }
+        });
     }
   }
 

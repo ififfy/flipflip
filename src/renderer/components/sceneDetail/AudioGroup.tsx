@@ -44,7 +44,9 @@ export default class AudioGroup extends React.Component {
                   audio={a}
                   showAll={this.props.isPlayer}
                   isPlaying={this.props.isPlaying}
+                  detectBPM={i == 0}
                   scenePaths={this.props.scenePaths}
+                  onBPM={this.onBPM.bind(this)}
                   onEditKey={this.onEditKey.bind(this, a.id)}/>
                 {i != this.props.scene.audios.length - 1 && (
                   <hr/>
@@ -85,5 +87,9 @@ export default class AudioGroup extends React.Component {
     const newAudios = Array.from(this.props.scene.audios);
     newAudios.splice(newAudios.map((a) => a.id).indexOf(id), 1);
     this.update((s) => {s.audios = newAudios});
+  }
+
+  onBPM(bpm: number) {
+    this.update((s) => {s.bpm = bpm})
   }
 }

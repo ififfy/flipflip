@@ -2,6 +2,7 @@ const TF = {  // timing functions
   constant: 'tf.c',
   random: 'tf.random',
   sin: 'tf.sin',
+  bpm: 'tf.bpm',
   scene: 'tf.scene',
 };
 

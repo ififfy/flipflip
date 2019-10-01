@@ -12,6 +12,7 @@ export default class Scene {
   timingMin = 200;
   timingMax = 1200;
   timingSinRate = 100;
+  timingBPMMulti = 1;
   weightFunction = WF.sources;
   orderFunction = OF.random;
   forceAll = false;
@@ -28,6 +29,7 @@ export default class Scene {
   transDurationMin = 1000;
   transDurationMax = 7000;
   transSinRate = 100;
+  transBPMMulti = 1;
   crossFade = false;
   crossFadeAudio = false;
   fadeTF = TF.constant;
@@ -35,6 +37,7 @@ export default class Scene {
   fadeDurationMin = 100;
   fadeDurationMax = 700;
   fadeSinRate = 100;
+  fadeBPMMulti = 1;
   backgroundType = BT.blur;
   backgroundColor = "#000000";
   backgroundBlur = 8;
@@ -47,11 +50,13 @@ export default class Scene {
   strobeTimeMin = 100;
   strobeTimeMax = 300;
   strobeSinRate = 100;
+  strobeBPMMulti = 1;
   strobeDelayTF = TF.constant;
   strobeDelay = 200;
   strobeDelayMin = 100;
   strobeDelayMax = 300;
   strobeDelaySinRate = 100;
+  strobeDelayBPMMulti = 1;
   strobeColor = "#FFFFFF";
   gifOption = GO.none;
   gifTimingConstant = 3000;
@@ -87,6 +92,7 @@ export default class Scene {
   fillView = false;
   gridView = false;
   grid: Array<Array<number>> = [[]];
+  bpm = 0;
   tagWeights?: string;
   sceneWeights?: string;
 

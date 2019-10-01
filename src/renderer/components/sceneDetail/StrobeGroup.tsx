@@ -74,6 +74,17 @@ export default class StrobeGroup extends React.Component {
                       onChange={this.changeKey.bind(this, 'strobeSinRate').bind(this)}/>
                   </div>
                 )}
+                {this.props.scene.strobeTF == TF.bpm && (
+                  <div>
+                    <SimpleSliderInput
+                      label={`BPM Multiplier: ${this.props.scene.strobeBPMMulti > 0 ? this.props.scene.strobeBPMMulti : "1 / " + (-1 * (this.props.scene.strobeBPMMulti - 2))}`}
+                      min={-8}
+                      max={10}
+                      value={this.props.scene.strobeBPMMulti}
+                      isEnabled={true}
+                      onChange={this.changeKey.bind(this, 'strobeBPMMulti').bind(this)}/>
+                  </div>
+                )}
               </div>
               <div className="TimingControlGroup">
                 {this.props.scene.strobeTF == TF.constant && (
@@ -128,6 +139,17 @@ export default class StrobeGroup extends React.Component {
                           onChange={this.changeKey.bind(this, 'strobeDelaySinRate').bind(this)}/>
                       </div>
                     )}
+                    {this.props.scene.strobeDelayTF == TF.bpm && (
+                      <div>
+                        <SimpleSliderInput
+                          label={`BPM Multiplier: ${this.props.scene.strobeDelayBPMMulti > 0 ? this.props.scene.strobeDelayBPMMulti : "1 / " + (-1 * (this.props.scene.strobeDelayBPMMulti - 2))}`}
+                          min={-8}
+                          max={10}
+                          value={this.props.scene.strobeDelayBPMMulti}
+                          isEnabled={true}
+                          onChange={this.changeKey.bind(this, 'strobeDelayBPMMulti').bind(this)}/>
+                      </div>
+                    )}
                   </div>
                   <div className="TimingControlGroup">
                     {this.props.scene.strobeDelayTF == TF.constant && (
@@ -176,7 +198,7 @@ export default class StrobeGroup extends React.Component {
   }
 
   changeKey(key: string, value: any) {
-    if (["strobeSinRate", "strobeTime", "strobeTimeMin", "strobeTimeMax", "strobeDelaySinRate", "strobeDelay", "strobeDelayMin", "strobeDelayMax"].includes(key)) {
+    if (["strobeBPMMulti", "strobeSinRate", "strobeTime", "strobeTimeMin", "strobeTimeMax", "strobeDelayBPMMulti", "strobeDelaySinRate", "strobeDelay", "strobeDelayMin", "strobeDelayMax"].includes(key)) {
       this.update((s) => s[key] = parseInt(value, 10));
     } else {
       this.update((s) => s[key] = value);

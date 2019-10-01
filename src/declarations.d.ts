@@ -38,6 +38,7 @@ declare module 'system-font-families';
 declare module 'oauth';
 declare module 'imgur';
 declare module 'twitter';
+declare module 'jsmediatags';
 declare module 'electron-google-analytics';
 declare module 'electron-default-menu';
 

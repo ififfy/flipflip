@@ -1,26 +1,15 @@
 import * as React from 'react';
 import {animated, useTransition} from "react-spring";
 
-import {TF} from "../../data/const";
+import {SL, TF} from "../../data/const";
+import Scene from "../../data/Scene";
 
 export default class Strobe extends React.Component {
   readonly props: {
     className?: string,
     toggleStrobe: boolean,
-    pulse: boolean,
-    opacity: number,
     timeToNextFrame: number,
-    durationTF: string,
-    duration: number,
-    durationMin: number,
-    durationMax: number,
-    sinRate: number,
-    delayTF: string,
-    delay: number,
-    delayMin: number,
-    delayMax: number,
-    delaySinRate: number,
-    color?: string,
+    scene: Scene,
     strobeFunction?: Function,
     children?: React.ReactNode,
   };
@@ -49,8 +38,8 @@ export default class Strobe extends React.Component {
       },
       {
         from: {
-          backgroundColor: this.props.color ? this.props.color : "",
-          opacity: 1,
+          backgroundColor: this.props.scene.strobeLayer == SL.image ? "" : this.props.scene.strobeColor,
+          opacity: this.props.scene.strobeLayer == SL.bottom ? this.props.scene.strobeOpacity : 1,
         },
         enter: {
           opacity: 0,
@@ -61,7 +50,7 @@ export default class Strobe extends React.Component {
         reset: true,
         unique: true,
         config: {
-          duration: this.props.duration,
+          duration: this.props.scene.strobeTime,
         },
       }
     );
@@ -81,7 +70,7 @@ export default class Strobe extends React.Component {
 
   strobe() {
     const duration = this.getDuration();
-    const delay = this.props.pulse ? this.getDelay() : duration;
+    const delay = this.props.scene.strobePulse ? this.getDelay() : duration;
     this.setState({toggleStrobe: !this.state.toggleStrobe, duration: duration, delay: delay});
     if (this.props.strobeFunction) {
       this.props.strobeFunction();
@@ -95,21 +84,25 @@ export default class Strobe extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.pulse ? this.props.delayTF != TF.scene : this.props.durationTF != TF.scene) {
+    if (this.props.scene.strobePulse ? this.props.scene.strobeDelayTF != TF.scene : this.props.scene.strobeTF != TF.scene) {
       this.strobeLoop();
     }
   }
 
   componentDidUpdate(props: any) {
-    if (this.props.durationTF != props.durationTF || this.props.delayTF != props.delayTF || this.props.pulse != props.pulse) {
+    if (this.props.scene.strobeTF != props.scene.strobeTF || this.props.scene.strobeDelayTF != props.scene.strobeDelayTF || this.props.scene.strobePulse != props.scene.strobePulse) {
       clearTimeout(this._strobeTimeout);
-      if (this.props.pulse ? this.props.delayTF != TF.scene : this.props.durationTF != TF.scene) {
+      if (this.props.scene.strobePulse ? this.props.scene.strobeDelayTF != TF.scene : this.props.scene.strobeTF != TF.scene) {
         this.strobeLoop();
       }
     }
-    if ((this.props.pulse ? this.props.delayTF == TF.scene : this.props.durationTF == TF.scene) && this.props.toggleStrobe != props.toggleStrobe) {
+    if ((this.props.scene.strobePulse ? this.props.scene.strobeDelayTF == TF.scene : this.props.scene.strobeTF == TF.scene) && this.props.toggleStrobe != props.toggleStrobe) {
       this.strobe();
     }
+  }
+
+  shouldComponentUpdate(props: any, state: any) {
+    return true;
   }
 
   componentWillUnmount() {
@@ -119,16 +112,24 @@ export default class Strobe extends React.Component {
 
   getDuration() {
     let duration;
-    switch (this.props.durationTF) {
+    switch (this.props.scene.strobeTF) {
       case TF.constant:
-        duration = Math.max(this.props.duration, 10);
+        duration = Math.max(this.props.scene.strobeTime, 10);
         break;
       case TF.random:
-        duration = Math.floor(Math.random() * (Math.max(this.props.durationMax, 10) - Math.max(this.props.durationMin, 10) + 1)) + Math.max(this.props.durationMin, 10);
+        duration = Math.floor(Math.random() * (Math.max(this.props.scene.strobeTimeMax, 10) - Math.max(this.props.scene.strobeTimeMin, 10) + 1)) + Math.max(this.props.scene.strobeTimeMin, 10);
         break;
       case TF.sin:
-        const sinRate = (Math.abs(this.props.sinRate - 100) + 2) * 1000;
-        duration = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (Math.max(this.props.durationMax, 10) - Math.max(this.props.durationMin, 10) + 1)) + Math.max(this.props.durationMin, 10);
+        const sinRate = (Math.abs(this.props.scene.strobeSinRate - 100) + 2) * 1000;
+        duration = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (Math.max(this.props.scene.strobeTimeMax, 10) - Math.max(this.props.scene.strobeTimeMin, 10) + 1)) + Math.max(this.props.scene.strobeTimeMin, 10);
+        break;
+      case TF.bpm:
+        const bpmMulti = this.props.scene.strobeBPMMulti > 0 ? this.props.scene.strobeBPMMulti : 1 / (-1 * (this.props.scene.strobeBPMMulti - 2));
+        duration = 60000 / (this.props.scene.bpm * bpmMulti);
+        // If we cannot parse this, default to 1s
+        if (!duration) {
+          duration = 1000;
+        }
         break;
       case TF.scene:
         duration = this.props.timeToNextFrame;
@@ -138,16 +139,24 @@ export default class Strobe extends React.Component {
 
   getDelay() {
     let delay;
-    switch (this.props.delayTF) {
+    switch (this.props.scene.strobeDelayTF) {
       case TF.constant:
-        delay = this.props.delay;
+        delay = this.props.scene.strobeDelay;
         break;
       case TF.random:
-        delay = Math.floor(Math.random() * (this.props.delayMax - this.props.delayMin + 1)) + this.props.delayMin;
+        delay = Math.floor(Math.random() * (this.props.scene.strobeDelayMax - this.props.scene.strobeDelayMin + 1)) + this.props.scene.strobeDelayMin;
         break;
       case TF.sin:
-        const sinRate = (Math.abs(this.props.delaySinRate - 100) + 2) * 1000;
-        delay = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (this.props.delayMax - this.props.delayMin + 1)) + this.props.delayMin;
+        const sinRate = (Math.abs(this.props.scene.strobeDelaySinRate - 100) + 2) * 1000;
+        delay = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (this.props.scene.strobeDelayMax - this.props.scene.strobeDelayMin + 1)) + this.props.scene.strobeDelayMin;
+        break;
+      case TF.bpm:
+        const bpmMulti = this.props.scene.strobeDelayBPMMulti > 0 ? this.props.scene.strobeDelayBPMMulti : 1 / (-1 * (this.props.scene.strobeDelayBPMMulti - 2));
+        delay = 60000 / (this.props.scene.bpm * bpmMulti);
+        // If we cannot parse this, default to 1s
+        if (!delay) {
+          delay = 1000;
+        }
         break;
       case TF.scene:
         delay = this.props.timeToNextFrame;

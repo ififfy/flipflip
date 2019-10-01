@@ -75,22 +75,9 @@ export default class ImagePlayer extends React.Component {
            ref={this.idleTimerRef}>
         {(this.props.strobeLayer == SL.middle) && (
           <Strobe
-            pulse={this.props.scene.strobePulse}
-            opacity={1}
-            durationTF={this.props.scene.strobeTF}
-            duration={this.props.scene.strobeTime}
-            durationMin={this.props.scene.strobeTimeMin}
-            durationMax={this.props.scene.strobeTimeMax}
-            sinRate={this.props.scene.strobeSinRate}
-            delayTF={this.props.scene.strobeDelayTF}
-            delay={this.props.scene.strobeDelay}
-            delayMin={this.props.scene.strobeDelayMin}
-            delayMax={this.props.scene.strobeDelayMax}
-            delaySinRate={this.props.scene.strobeDelaySinRate}
-            color={this.props.scene.strobeColor}
-            timeToNextFrame={this.state.timeToNextFrame}
             toggleStrobe={this._toggleStrobe}
-          />
+            timeToNextFrame={this.state.timeToNextFrame}
+            scene={this.props.scene}/>
         )}
         <IdleTimer
           ref={ref => {return this.idleTimerRef}}
@@ -614,6 +601,14 @@ export default class ImagePlayer extends React.Component {
           timeToNextFrame = this.props.scene.timingConstant;
           // If we cannot parse this, default to 1s
           if (!timeToNextFrame && timeToNextFrame != 0) {
+            timeToNextFrame = 1000;
+          }
+          break;
+        case TF.bpm:
+          const bpmMulti = this.props.scene.timingBPMMulti > 0 ? this.props.scene.timingBPMMulti : 1 / (-1 * (this.props.scene.timingBPMMulti - 2));
+          timeToNextFrame = 60000 / (this.props.scene.bpm * bpmMulti);
+          // If we cannot parse this, default to 1s
+          if (!timeToNextFrame) {
             timeToNextFrame = 1000;
           }
           break;

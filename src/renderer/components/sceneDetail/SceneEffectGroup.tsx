@@ -30,7 +30,7 @@ export default class SceneEffectGroup extends React.Component {
               onChange={this.changeKey.bind(this, 'timingFunction').bind(this)}
               label="Timing"
               value={this.props.scene.timingFunction}
-              keys={[TF.constant, TF.random, TF.sin]}/>
+              keys={[TF.constant, TF.random, TF.sin, TF.bpm]}/>
             {this.props.scene.timingFunction == TF.sin && (
               <div>
                 <SimpleSliderInput
@@ -40,6 +40,17 @@ export default class SceneEffectGroup extends React.Component {
                   value={this.props.scene.timingSinRate}
                   isEnabled={true}
                   onChange={this.changeKey.bind(this, 'timingSinRate').bind(this)}/>
+              </div>
+            )}
+            {this.props.scene.timingFunction == TF.bpm && (
+              <div>
+                <SimpleSliderInput
+                  label={`BPM Multiplier: ${this.props.scene.timingBPMMulti > 0 ? this.props.scene.timingBPMMulti : "1 / " + (-1 * (this.props.scene.timingBPMMulti - 2))}`}
+                  min={-8}
+                  max={10}
+                  value={this.props.scene.timingBPMMulti}
+                  isEnabled={true}
+                  onChange={this.changeKey.bind(this, 'timingBPMMulti').bind(this)}/>
               </div>
             )}
           </div>
@@ -235,7 +246,7 @@ export default class SceneEffectGroup extends React.Component {
   }
 
   changeKey(key: string, value: any) {
-    if (["timingConstant", "timingMin", "timingMax", "timingSinRate", "nextSceneTime"].includes(key)) {
+    if (["timingConstant", "timingMin", "timingMax", "timingSinRate", "timingBPMMulti", "nextSceneTime"].includes(key)) {
       this.update((s) => s[key] = parseInt(value, 10));
     } else {
       this.update((s) => s[key] = value);

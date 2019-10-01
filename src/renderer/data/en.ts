@@ -2,6 +2,7 @@ export default new Map<string, string>([
   ['tf.c', 'Constant'],
   ['tf.random', 'Random'],
   ['tf.sin', 'Wave'],
+  ['tf.bpm', 'Audio BPM'],
   ['tf.scene', 'With Scene'],
 
   ['wf.s', 'By Source'],

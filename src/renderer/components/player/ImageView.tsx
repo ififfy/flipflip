@@ -248,21 +248,10 @@ export default class ImageView extends React.Component {
           <this.ZoomMoveLayer>
             {(this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.image) && (
               <Strobe
-                strobeFunction={this.strobeImage.bind(this)}
                 toggleStrobe={this.props.toggleStrobe}
-                pulse={this.props.scene.strobePulse}
-                opacity={1}
                 timeToNextFrame={this.props.timeToNextFrame}
-                durationTF={this.props.scene.strobeTF}
-                duration={this.props.scene.strobeTime}
-                durationMin={this.props.scene.strobeTimeMin}
-                durationMax={this.props.scene.strobeTimeMax}
-                sinRate={this.props.scene.strobeSinRate}
-                delayTF={this.props.scene.strobeDelayTF}
-                delay={this.props.scene.strobeDelay}
-                delayMin={this.props.scene.strobeDelayMin}
-                delayMax={this.props.scene.strobeDelayMax}
-                delaySinRate={this.props.scene.strobeDelaySinRate}>
+                scene={this.props.scene}
+                strobeFunction={this.strobeImage.bind(this)}>
                 <animated.div className="ImageView__Image" ref={this.contentRef}/>
               </Strobe>
             )}
@@ -274,20 +263,8 @@ export default class ImageView extends React.Component {
             <Strobe
               className={'m-background'}
               toggleStrobe={this.props.toggleStrobe}
-              pulse={this.props.scene.strobePulse}
-              opacity={1}
               timeToNextFrame={this.props.timeToNextFrame}
-              durationTF={this.props.scene.strobeTF}
-              duration={this.props.scene.strobeTime}
-              durationMin={this.props.scene.strobeTimeMin}
-              durationMax={this.props.scene.strobeTimeMax}
-              sinRate={this.props.scene.strobeSinRate}
-              delayTF={this.props.scene.strobeDelayTF}
-              delay={this.props.scene.strobeDelay}
-              delayMin={this.props.scene.strobeDelayMin}
-              delayMax={this.props.scene.strobeDelayMax}
-              delaySinRate={this.props.scene.strobeDelaySinRate}
-              color={this.props.scene.strobeColor}/>
+              scene={this.props.scene}/>
           )}
           <animated.div className="ImageView__Background" ref={this.backgroundRef} style={{...backgroundStyle}}/>
         </this.FadeLayer>
@@ -321,6 +298,14 @@ export default class ImageView extends React.Component {
         case TF.sin:
           const sinRate = (Math.abs(this.props.scene.fadeSinRate - 100) + 2) * 1000;
           fadeDuration = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (this.props.scene.fadeDurationMax - this.props.scene.fadeDurationMin + 1)) + this.props.scene.fadeDurationMin;
+          break;
+        case TF.bpm:
+          const bpmMulti = this.props.scene.fadeBPMMulti > 0 ? this.props.scene.fadeBPMMulti : 1 / (-1 * (this.props.scene.fadeBPMMulti - 2));
+          fadeDuration = 60000 / (this.props.scene.bpm * bpmMulti);
+          // If we cannot parse this, default to 1s
+          if (!fadeDuration) {
+            fadeDuration = 1000;
+          }
           break;
       }
     }
@@ -404,6 +389,14 @@ export default class ImageView extends React.Component {
         case TF.sin:
           const sinRate = (Math.abs(this.props.scene.transSinRate - 100) + 2) * 1000;
           transDuration = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (this.props.scene.transDurationMax - this.props.scene.transDurationMin + 1)) + this.props.scene.transDurationMin;
+          break;
+        case TF.bpm:
+          const bpmMulti = this.props.scene.transBPMMulti > 0 ? this.props.scene.transBPMMulti : 1 / (-1 * (this.props.scene.transBPMMulti - 2));
+          transDuration = 60000 / (this.props.scene.bpm * bpmMulti);
+          // If we cannot parse this, default to 1s
+          if (!transDuration) {
+            transDuration = 1000;
+          }
           break;
       }
     }
