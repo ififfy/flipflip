@@ -125,6 +125,12 @@ const VC = { // Video Control Modes
   sceneClipper: 'vc.sc',
 };
 
+const MO = { // Menu/Modal Constants
+  new: 'me.new',
+  sort: 'me.sort',
+  alert: 'me.alert',
+};
+
 export {
-  TF, WF, OF, IF, GO, VO, HTF, VTF, TOT, BT, GT, TT, SF, ST, SL, AF, IPC, VC
+  TF, WF, OF, IF, GO, VO, HTF, VTF, TOT, BT, GT, TT, SF, ST, SL, AF, IPC, VC, MO
 };

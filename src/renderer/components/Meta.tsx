@@ -1,6 +1,8 @@
 import {remote, ipcRenderer, IpcMessageEvent} from 'electron';
 import * as React from 'react';
 
+import {Box} from "@material-ui/core";
+
 import AppStorage from '../data/AppStorage';
 import {IPC} from "../data/const";
 import * as actions from '../data/actions';
@@ -55,22 +57,22 @@ export default class Meta extends React.Component {
     const a = (fn: any) => this.applyAction.bind(this, fn);
 
     return (
-      <div className="Meta">
+      <Box className="Meta">
         {this.state.route.length === 0 && (
           <ScenePicker
-            scenes={this.state.scenes}
+            canGenerate={(this.state.library.length >= 1 && this.state.tags.length >= 1) || (this.state.scenes.length >= 1)}
             config={this.state.config}
-            version={this.state.version}
             libraryCount={this.state.library.length}
+            scenes={this.state.scenes}
+            version={this.state.version}
+            onAddGenerator={a(actions.addGenerator)}
+            onAddScene={a(actions.addScene)}
+            onImportScene={a(actions.importScene)}
+            onOpenConfig={a(actions.openConfig)}
+            onOpenLibrary={a(actions.openLibrary)}
+            onOpenScene={a(actions.goToScene)}
             onUpdateConfig={a(actions.updateConfig)}
             onUpdateScenes={a(actions.replaceScenes)}
-            onAdd={a(actions.addScene)}
-            onImport={a(actions.importScene)}
-            onSelect={a(actions.goToScene)}
-            onOpenLibrary={a(actions.openLibrary)}
-            onGenerate={a(actions.addGenerator)}
-            onConfig={a(actions.openConfig)}
-            canGenerate={(this.state.library.length >= 1 && this.state.tags.length >= 1) || (this.state.scenes.length >= 1)}
           />
         )}
 
@@ -212,7 +214,7 @@ export default class Meta extends React.Component {
           onUpdateConfig={a(actions.updateConfig)}
           version={this.state.version}
           page={this.state.route.length == 0 ? 'home' : this.state.route[this.state.route.length - 1].kind} />
-      </div>
+      </Box>
     )
   }
 };

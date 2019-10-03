@@ -87,14 +87,14 @@ a {
   border-bottom: 1px solid $black;
 }
 
-.app {
+/*.app {
   position: fixed;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
   background: $appBG;
-}
+}*/
 
 .u-hidden {
   display: none;
@@ -474,131 +474,6 @@ a {
 }
 
 /* components */
-
-.ScenePicker {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-
-  padding: $smallPadding;
-  overflow: auto;
-
-  .About {
-    display: inline-block;
-    width: 100%;
-
-    > div {
-      margin-bottom: $smallPadding*2;
-    }
-
-    > div:not(.Header) {
-      clear: left;
-    }
-
-    .Header {
-      margin-bottom: 4rem;
-
-      .Logo {
-        float: left;
-
-        .LogoText {
-          margin-top: 2px;
-        }
-      }
-
-      h1 {
-        margin: 0;
-      }
-
-      > div > div {
-        margin-left: $smallPadding;
-        display: inline-block;
-
-        &.SimpleOptionPicker {
-          vertical-align: 3px;
-        }
-      }
-
-      select {
-        height: 1.5em;
-      }
-    }
-  }
-
-  .ScenePicker__Scenes {
-    padding-top: 8px;
-    display: flex;
-    flex-wrap: wrap;
-    overflow: auto;
-
-    .ScenePickerItem {
-      margin-right: $smallPadding;
-      height: 4rem;
-      min-width: 6rem;
-      max-width: 8rem;
-
-      background-color: $white;
-      color: $black !important;
-      padding: $smallPadding * 2;
-      margin-bottom: $smallPadding;
-
-      display: flex;
-      justify-content: center;
-      align-items: center;
-
-      &.m-generator {
-        border: 2px solid black;
-      }
-
-      .ScenePickerItem__Title {
-        text-align: center;
-      }
-
-      &:not(.u-disabled):hover {
-        background-color: $buttonBottom;
-      }
-    }
-  }
-
-
-
-  .ScenePicker__Buttons {
-    display: inline-flex;
-    width: 100%;
-
-    div {
-      display: flex;
-      background-color: $white;
-      color: $black !important;
-      height: 4rem;
-      margin-right: $smallPadding;
-
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-
-      &.ScenePicker__LibraryButton {
-        font-weight: bold;
-        width: 70%;
-      }
-
-      &.ScenePicker__GenerateSceneButton {
-        width: 18%;
-        border: 2px solid black;
-      }
-
-      &.ScenePicker__AddSceneButton {
-        width: 12%;
-      }
-
-      &:not(.u-disabled):hover {
-        background-color: $buttonBottom;
-      }
-    }
-  }
-}
 
 .ControlGroupGroup {
   display: flex;
