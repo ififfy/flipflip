@@ -39,6 +39,7 @@ declare module 'oauth';
 declare module 'imgur';
 declare module 'twitter';
 declare module 'jsmediatags';
+declare module 'music-metadata';
 declare module 'electron-google-analytics';
 declare module 'electron-default-menu';
 

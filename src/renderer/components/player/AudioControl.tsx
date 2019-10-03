@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Sound from "react-sound";
-import jsmediatags from "jsmediatags";
+import * as mm from 'music-metadata';
 import Timeout = NodeJS.Timeout;
 
 import {getTimestamp, urlToPath} from "../../data/utils";
@@ -97,18 +97,14 @@ export default class AudioControl extends React.Component {
 
   detectBPM() {
     if (this.props.detectBPM) {
-      new jsmediatags.Reader(urlToPath(this.props.audio.url))
-        .setTagsToRead(["TBPM"])
-        .read({
-          onSuccess: (data: any) => {
-            const value = data.tags.TBPM.data;
-            if (value) {
-              this.props.onBPM(value);
-            }
-          },
-          onError: (error: any) => {
-            console.error("Error reading ID3 tags:", error.type, error.info);
+      mm.parseFile(urlToPath(this.props.audio.url))
+        .then((metadata: any) => {
+          if (metadata && metadata.common && metadata.common.bpm) {
+            this.props.onBPM(metadata.common.bpm);
           }
+        })
+        .catch((err: any) => {
+          console.error("Error reading metadata:", err.message);
         });
     }
   }
