@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Sound from "react-sound";
-import musicMetadata from "music-metadata";
+import * as mm from 'music-metadata';
 import Timeout = NodeJS.Timeout;
 
 import {getTimestamp, urlToPath} from "../../data/utils";
@@ -97,11 +97,15 @@ export default class AudioControl extends React.Component {
 
   detectBPM() {
     if (this.props.detectBPM) {
-      musicMetadata.parseFile(urlToPath(this.props.audio.url)).then(metadata => {
-        this.props.onBPM(metadata.common.bpm);
-      }, error => {
-        console.error("Error reading metadata:", error.type, error.info);
-      });
+      mm.parseFile(urlToPath(this.props.audio.url))
+        .then((metadata: any) => {
+          if (metadata && metadata.common && metadata.common.bpm) {
+            this.props.onBPM(metadata.common.bpm);
+          }
+        })
+        .catch((err: any) => {
+          console.error("Error reading metadata:", err.message);
+        });
     }
   }
 
