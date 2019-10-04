@@ -34,35 +34,11 @@ Current Player Z-Indices (Layering is also effected by opacity)
 10 Top Button Row
 */
 
-@font-face {
-  font-family: system;
-  font-style: normal;
-  font-weight: 300;
-  src: local(".SFNSText-Light"), local(".HelveticaNeueDeskInterface-Light"), local(".LucidaGrandeUI"), local("Ubuntu Light"), local("Segoe UI Light"), local("Roboto-Light"), url('./fonts/Roboto-Light.woff2') format('woff2'), local("DroidSans"), local("Tahoma"), local("Liberation Sans"), local("FreeSans");
-}
-
-*, *::after, *::before {
-  box-sizing: border-box;
-}
-
-html, body {
-  margin: 0;
-  padding: 0;
-}
-
 body {
-  font-family: system, serif;
-  font-size: 14px;
-  color: $bodyColor;
+  overflow: hidden;
 }
 
-a {
-  color: $blue;
-}
-
-.Meta {
-  height: 100%;
-}
+.MuiDrawer-paper::-webkit-scrollbar { width: 0 !important }
 
 @mixin noselect {
   -webkit-touch-callout: none; /* iOS Safari */

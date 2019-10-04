@@ -94,7 +94,8 @@ const styles = (theme: Theme) => createStyles({
   drawerPaper: {
     position: 'relative',
     whiteSpace: 'nowrap',
-    overflow: 'hidden',
+    overflowX: 'hidden',
+    height: '100vh',
     width: drawerWidth,
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
@@ -165,7 +166,8 @@ const styles = (theme: Theme) => createStyles({
   sceneList: {
     display: 'flex',
     flexWrap: 'wrap',
-    overflow: 'auto',
+    overflowY: 'auto',
+    overflowX: 'hidden',
   },
   scene: {
     marginRight: theme.spacing(1),
@@ -449,7 +451,7 @@ class ScenePicker extends React.Component {
               }}>
               {this.props.scenes.map((scene) =>
                 <Jiggle key={scene.id} bounce={true}>
-                  <Card className={clsx(classes.scene, scene.tagWeights != null && classes.generator)}>
+                  <Card className={clsx(classes.scene, (scene.tagWeights || scene.sceneWeights) && classes.generator)}>
                     <CardActionArea onClick={this.props.onOpenScene.bind(this, scene)}>
                       <CardContent>
                         <Typography component="h2" variant="h6">

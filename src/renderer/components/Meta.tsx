@@ -144,20 +144,20 @@ export default class Meta extends React.Component {
 
         {this.isRoute('scene') && (
           <SceneDetail
-            scene={scene}
+            autoEdit={this.state.autoEdit}
             allScenes={this.state.scenes}
             config={this.state.config}
-            autoEdit={this.state.autoEdit}
+            scene={scene}
             goBack={a(actions.goBack)}
-            onExport={a(actions.exportScene)}
-            onDelete={a(actions.deleteScene)}
-            onPlay={a(actions.playScene)}
+            onBlacklistFile={a(actions.blacklistFile)}
             onClip={a(actions.clipVideo)}
-            setupGrid={a(actions.setupGrid)}
-            blacklistFile={a(actions.blacklistFile)}
+            onDelete={a(actions.deleteScene)}
+            onExport={a(actions.exportScene)}
+            onLibraryImport={a(actions.openLibraryImport)}
+            onPlay={a(actions.playScene)}
+            onSaveAsScene={a(actions.saveScene)}
+            onSetupGrid={a(actions.setupGrid)}
             onUpdateScene={a(actions.updateScene)}
-            onOpenLibraryImport={a(actions.openLibraryImport)}
-            saveScene={a(actions.saveScene)}
           />
         )}
 

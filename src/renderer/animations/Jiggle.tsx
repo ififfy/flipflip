@@ -36,7 +36,7 @@ const JiggleAnimation: any = Keyframes.Spring(async (next: any, cancel: any, pro
 
 export default class Jiggle extends React.Component {
   readonly props: {
-    bounce: boolean,
+    bounce?: boolean,
     className?: string,
     title?: string,
     style?: any,
@@ -72,7 +72,7 @@ export default class Jiggle extends React.Component {
         reset
         native
         started={this.state.hasStarted}
-        bounce={this.props.bounce}
+        bounce={this.props.bounce ? this.props.bounce : false}
         onRest={this.stopJiggle.bind(this)}>
         {(props: any) => (
           <animated.div

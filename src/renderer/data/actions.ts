@@ -195,12 +195,12 @@ export function goBack(state: State): Object {
   return {route: newRoute, autoEdit: false, isSelect: false};
 }
 
-export function saveScene(state: State): Object {
+export function saveScene(state: State, scene: Scene): Object {
   let id = state.scenes.length + 1;
   state.scenes.forEach((s: Scene) => {
     id = Math.max(s.id + 1, id);
   });
-  const sceneCopy = JSON.parse(JSON.stringify(getActiveScene(state))); // Make a copy
+  const sceneCopy = JSON.parse(JSON.stringify(scene)); // Make a copy
   sceneCopy.tagWeights = null;
   sceneCopy.sceneWeights = null;
   sceneCopy.id = id;
