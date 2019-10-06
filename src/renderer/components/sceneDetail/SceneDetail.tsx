@@ -252,14 +252,15 @@ class SceneDetail extends React.Component {
     config: Config,
     scene: Scene,
     goBack(): void,
+    onAddSource(scene: Scene, type: string): void,
     onClearBlacklist(sourceURL: string): void,
     onClip(source: LibrarySource): void,
     onDelete(scene: Scene): void,
     onExport(scene: Scene): void,
-    onLibraryImport(): void,
     onPlay(scene: Scene): void,
     onSaveAsScene(scene: Scene): void,
     onSetupGrid(scene: Scene): void,
+    onSort(scene: Scene, algorithm: string, ascending: boolean): void,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
   };
 
@@ -517,7 +518,7 @@ class SceneDetail extends React.Component {
             <Tooltip title="From Library"  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.libraryImportButton, this.state.openMenu != MO.new && classes.addButtonClose)}
-                onClick={this.onAddSource.bind(this, AF.library)}
+                onClick={this.props.onAddSource.bind(this, this.props.scene, AF.library)}
                 size="small">
                 <LocalLibraryIcon className={classes.icon} />
               </Fab>
@@ -525,7 +526,7 @@ class SceneDetail extends React.Component {
             <Tooltip title="Local Video"  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addVideoButton, this.state.openMenu != MO.new && classes.addButtonClose)}
-                onClick={this.onAddSource.bind(this, AF.videos)}
+                onClick={this.props.onAddSource.bind(this, this.props.scene, AF.videos)}
                 size="small">
                 <MovieIcon className={classes.icon} />
               </Fab>
@@ -533,7 +534,7 @@ class SceneDetail extends React.Component {
             <Tooltip title="Local Directory"  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addDirectoryButton, this.state.openMenu != MO.new && classes.addButtonClose)}
-                onClick={this.onAddSource.bind(this, AF.directory)}
+                onClick={this.props.onAddSource.bind(this, this.props.scene, AF.directory)}
                 size="small">
                 <FolderIcon className={classes.icon} />
               </Fab>
@@ -541,7 +542,7 @@ class SceneDetail extends React.Component {
             <Tooltip title="URL"  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addURLButton, this.state.openMenu != MO.new && classes.addButtonClose)}
-                onClick={this.onAddSource.bind(this, AF.url)}
+                onClick={this.props.onAddSource.bind(this, this.props.scene, AF.url)}
                 size="small">
                 <HttpIcon className={classes.icon} />
               </Fab>
@@ -585,10 +586,10 @@ class SceneDetail extends React.Component {
                     <MenuItem key={sf}>
                       <ListItemText primary={en.get(sf)}/>
                       <ListItemSecondaryAction>
-                        <IconButton edge="end" onClick={this.onSort.bind(this, sf, true)}>
+                        <IconButton edge="end" onClick={this.props.onSort.bind(this, this.props.scene, sf, true)}>
                           <ArrowUpwardIcon/>
                         </IconButton>
-                        <IconButton edge="end" onClick={this.onSort.bind(this, sf, false)}>
+                        <IconButton edge="end" onClick={this.props.onSort.bind(this, this.props.scene, sf, false)}>
                           <ArrowDownwardIcon/>
                         </IconButton>
                       </ListItemSecondaryAction>
@@ -697,212 +698,6 @@ class SceneDetail extends React.Component {
   onFinishRemoveAll() {
     this.onUpdateSources([]);
     this.onCloseDialog();
-  }
-
-  onAddSource(type: string) {
-    switch (type) {
-      case AF.url:
-        this.addSources([""]);
-        break;
-
-      case AF.directory:
-        let dResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory', 'multiSelections']});
-        if (!dResult) return;
-        this.addSources(dResult);
-        break;
-
-      case AF.videos:
-        let vResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
-          {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'MP4', extensions: ['mp4']}, {name: 'MKV', extensions: ['mkv']}, {name: 'WebM', extensions: ['webm']}, {name: 'OGG', extensions: ['ogv']}], properties: ['openFile', 'multiSelections']});
-        if (!vResult) return;
-        vResult = vResult.filter((r) => isVideo(r, true));
-        this.addSources(vResult);
-        break;
-
-      case AF.library:
-        this.props.onLibraryImport();
-        break;
-    }
-  }
-
-  addSources(sources: Array<string>) {
-    // dedup
-    let sourceURLs = this.props.scene.sources.map((s) => s.url);
-    sources = sources.filter((s) => !sourceURLs.includes(s));
-
-    let id = this.props.scene.sources.length + 1;
-    this.props.scene.sources.forEach((s) => {
-      id = Math.max(s.id + 1, id);
-    });
-
-    let newSources = Array.from(this.props.scene.sources);
-    for (let url of sources) {
-      console.log("Adding " + id + ": ('" + url + "')");
-      newSources.unshift(new LibrarySource({
-        url: url,
-        id: id,
-        tags: new Array<Tag>(),
-      }));
-      id += 1;
-    }
-    this.onUpdateSources(newSources);
-  }
-
-  onSort(algorithm: string, ascending: boolean) {
-    const sources = Array.from(this.props.scene.sources);
-    switch (algorithm) {
-      case SF.alpha:
-        if (ascending) {
-          this.onUpdateSources(sources.sort((a, b) => {
-            const aName = getSourceType(a.url) == ST.video ? getFileName(a.url).toLowerCase() : getFileGroup(a.url).toLowerCase();
-            const bName = getSourceType(b.url) == ST.video ? getFileName(b.url).toLowerCase() : getFileGroup(b.url).toLowerCase();
-            if (aName < bName) {
-              return -1;
-            } else if (aName > bName) {
-              return 1;
-            } else {
-              const aType = getSourceType(a.url);
-              const bType = getSourceType(b.url);
-              if (aType > bType) {
-                return -1;
-              } else if (aType < bType) {
-                return 1;
-              } else {
-                return 0;
-              }
-            }
-          }));
-        } else {
-          this.onUpdateSources(sources.sort((a, b) => {
-            const aName = getSourceType(a.url) == ST.video ? getFileName(a.url).toLowerCase() : getFileGroup(a.url).toLowerCase();
-            const bName = getSourceType(b.url) == ST.video ? getFileName(b.url).toLowerCase() : getFileGroup(b.url).toLowerCase();
-            if (aName > bName) {
-              return -1;
-            } else if (aName < bName) {
-              return 1;
-            } else {
-              const aType = getSourceType(a.url);
-              const bType = getSourceType(b.url);
-              if (aType > bType) {
-                return -1;
-              } else if (aType < bType) {
-                return 1;
-              } else {
-                return 0;
-              }
-            }
-          }));
-        }
-        break;
-      case SF.alphaFull:
-        if (ascending) {
-          this.onUpdateSources(sources.sort((a, b) => {
-            const aUrl = a.url.toLowerCase();
-            const bUrl = b.url.toLocaleLowerCase();
-            if (aUrl < bUrl) {
-              return -1;
-            } else if (aUrl > bUrl) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }));
-        } else {
-          this.onUpdateSources(sources.sort((a, b) => {
-            const aUrl = a.url.toLowerCase();
-            const bUrl = b.url.toLocaleLowerCase();
-            if (aUrl > bUrl) {
-              return -1;
-            } else if (aUrl < bUrl) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }));
-        }
-        break;
-      case SF.date:
-        if (ascending) {
-          this.onUpdateSources(sources.sort((a, b) => {
-            if (a.id < b.id) {
-              return -1;
-            } else if (a.id > b.id) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }));
-        } else {
-          this.onUpdateSources(sources.sort((a, b) => {
-            if (a.id > b.id) {
-              return -1;
-            } else if (a.id < b.id) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }));
-        }
-        break;
-      case SF.count:
-        if (ascending) {
-          this.onUpdateSources(sources.sort((a, b) => {
-            if (a.count === undefined) a.count = 0;
-            if (b.count === undefined) b.count = 0;
-            if (a.countComplete === undefined) a.countComplete = false;
-            if (b.countComplete === undefined) b.countComplete = false;
-            if (a.count < b.count) {
-              return -1;
-            } else if (a.count > b.count) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }));
-        } else {
-          this.onUpdateSources(sources.sort((a, b) => {
-            if (a.count === undefined) a.count = 0;
-            if (b.count === undefined) b.count = 0;
-            if (a.countComplete === undefined) a.countComplete = false;
-            if (b.countComplete === undefined) b.countComplete = false;
-            if (a.count > b.count) {
-              return -1;
-            } else if (a.count < b.count) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }));
-        }
-        break;
-      case SF.type:
-        if (ascending) {
-          this.onUpdateSources(sources.sort((a, b) => {
-            const aType = getSourceType(a.url);
-            const bType = getSourceType(b.url);
-            if (aType > bType) {
-              return -1;
-            } else if (aType < bType) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }));
-        } else {
-          this.onUpdateSources(sources.sort((a, b) => {
-            const aType = getSourceType(a.url);
-            const bType = getSourceType(b.url);
-            if (aType < bType) {
-              return -1;
-            } else if (aType > bType) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }));
-        }
-        break;
-    }
   }
 }
 

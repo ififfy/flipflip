@@ -5,8 +5,8 @@ import wretch from "wretch";
 import {outputFile} from "fs-extra";
 import getFolderSize from "get-folder-size";
 
-import {getBackups, getCachePath, getFileName, getSourceType, saveDir} from "./utils";
-import {ST} from "./const";
+import {getBackups, getCachePath, getFileGroup, getFileName, getSourceType, isVideo, saveDir} from "./utils";
+import {AF, SF, ST} from "./const";
 import { defaultInitialState } from './AppStorage';
 import { Route } from "./Route";
 import Scene from "./Scene";
@@ -628,6 +628,161 @@ export function onUpdateGrid(state: State, grid: Array<Array<number>>): Object {
   const newRoute = state.route;
   newRoute.pop();
   return {scenes: newScenes, route: newRoute};
+}
+
+export function addSource(state: State, scene: Scene, type: string): Object {
+  let newSources = scene != null ? scene.sources : state.library;
+  switch (type) {
+    case AF.library:
+      return openLibraryImport(state);
+
+    case AF.url:
+      newSources = addSources(newSources, [""]);
+      break;
+
+    case AF.directory:
+      let dResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory', 'multiSelections']});
+      if (!dResult) return;
+      newSources = addSources(newSources, dResult);
+      break;
+
+    case AF.videos:
+      let vResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+        {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'MP4', extensions: ['mp4']}, {name: 'MKV', extensions: ['mkv']}, {name: 'WebM', extensions: ['webm']}, {name: 'OGG', extensions: ['ogv']}], properties: ['openFile', 'multiSelections']});
+      if (!vResult) return;
+      vResult = vResult.filter((r) => isVideo(r, true));
+      newSources = addSources(newSources, vResult);
+      break;
+  }
+  if (scene != null) {
+    const newScenes = state.scenes;
+    const thisScene = newScenes.find((s) => s.id == scene.id);
+    thisScene.sources = newSources;
+    return {scenes: newScenes};
+  } else {
+    return {library: newSources};
+  }
+}
+
+function addSources(originalSources: Array<LibrarySource>, newSources: Array<string>): Array<LibrarySource> {
+  // dedup
+  let sourceURLs = originalSources.map((s) => s.url);
+  newSources = newSources.filter((s) => !sourceURLs.includes(s));
+
+  let id = originalSources.length + 1;
+  originalSources.forEach((s) => {
+    id = Math.max(s.id + 1, id);
+  });
+
+  let combinedSources = Array.from(originalSources);
+  for (let url of newSources) {
+    combinedSources.unshift(new LibrarySource({
+      url: url,
+      id: id,
+      tags: new Array<Tag>(),
+    }));
+    id += 1;
+  }
+  return combinedSources;
+}
+
+export function sortScene(state: State, algorithm: string, ascending: boolean): Object {
+  const getName = (a: Scene) => {
+    return a.name.toLowerCase();
+  };
+  const getCount = (a: Scene) => {
+    return a.sources.length;
+  };
+  const getType = (a: Scene) => {
+    if (a.tagWeights || a.sceneWeights) {
+      return "1";
+    }
+    return "0";
+  };
+  const newScenes = state.scenes.sort(
+    sortFunction(algorithm, ascending, getName, getName, getCount, getType,
+      algorithm == SF.type ? SF.alpha : null));
+  return {scenes: newScenes}
+}
+
+export function sortSources(state: State, scene: Scene, algorithm: string, ascending: boolean): Object {
+  const getName = (a: LibrarySource) => {
+    return getSourceType(a.url) == ST.video ? getFileName(a.url).toLowerCase() : getFileGroup(a.url).toLowerCase();
+  };
+  const getFullName = (a: LibrarySource) => {
+    return a.url.toLowerCase();
+  };
+  const getCount = (a: LibrarySource) => {
+    if (a.count === undefined) a.count = 0;
+    if (a.countComplete === undefined) a.countComplete = false;
+    return a.count;
+  };
+  const getType = (a: LibrarySource) => {
+    return getSourceType(a.url)
+  };
+  let secondary = null;
+  if (algorithm == SF.alpha) {
+    secondary = SF.type;
+  }
+  if (algorithm == SF.type) {
+    secondary = SF.alpha;
+  }
+  if (scene != null) {
+    const newScenes = state.scenes;
+    const thisScene = newScenes.find((s) => s.id == scene.id);
+    thisScene.sources = thisScene.sources.sort(
+      sortFunction(algorithm, ascending, getName, getFullName, getCount, getType, secondary));
+    return {scenes: newScenes};
+  } else {
+    const newLibrary = state.library.sort(
+      sortFunction(algorithm, ascending, getName, getFullName, getCount, getType, secondary));
+    return {library: newLibrary};
+  }
+
+}
+
+function sortFunction(algorithm: string, ascending: boolean, getName: (a: any) => string,
+                      getFullName: (a: any) => string, getCount: (a: any) => number,
+                      getType: (a: any) => string, secondary: string): (a: any, b: any) => number {
+  return (a, b) => {
+    let aValue: any, bValue: any;
+    switch (algorithm) {
+      case SF.alpha:
+        aValue = getName(a);
+        bValue = getName(b);
+        break;
+      case SF.alphaFull:
+        aValue = getFullName(a);
+        bValue = getFullName(b);
+        break;
+      case SF.date:
+        aValue = a.id;
+        bValue = b.id;
+        break;
+      case SF.count:
+        aValue = getCount(a);
+        bValue = getCount(b);
+        break;
+      case SF.type:
+        aValue = getType(a);
+        bValue = getType(b);
+        break;
+      default:
+        aValue = "";
+        bValue = "";
+    }
+    if (aValue < bValue) {
+      return ascending ? -1 : 1;
+    } else if (aValue > bValue) {
+      return ascending ? 1 : -1;
+    } else {
+      if (secondary) {
+        return sortFunction(secondary, true, getName, getFullName, getCount, getType, null)(a, b);
+      } else {
+        return 0;
+      }
+    }
+  }
 }
 
 export function exportScene(state: State, scene: Scene): Object {

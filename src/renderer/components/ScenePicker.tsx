@@ -301,6 +301,7 @@ class ScenePicker extends React.Component {
     onOpenConfig(): void,
     onOpenLibrary(): void,
     onOpenScene(scene: Scene): void,
+    onSort(algorithm: string, ascending: boolean): void,
     onUpdateConfig(config: Config): void,
     onUpdateScenes(scenes: Array<Scene>): void,
   };
@@ -567,10 +568,10 @@ class ScenePicker extends React.Component {
                     <MenuItem key={sf}>
                       <ListItemText primary={en.get(sf)}/>
                       <ListItemSecondaryAction>
-                        <IconButton edge="end" onClick={this.onSort.bind(this, sf, true)}>
+                        <IconButton edge="end" onClick={this.props.onSort.bind(this, sf, true)}>
                           <ArrowUpwardIcon/>
                         </IconButton>
-                        <IconButton edge="end" onClick={this.onSort.bind(this, sf, false)}>
+                        <IconButton edge="end" onClick={this.props.onSort.bind(this, sf, false)}>
                           <ArrowDownwardIcon/>
                         </IconButton>
                       </ListItemSecondaryAction>
@@ -722,107 +723,6 @@ class ScenePicker extends React.Component {
 
   openLink(url: string) {
     remote.shell.openExternal(url);
-  }
-  
-  onSort(sortFunction: string, ascending: boolean) {
-    switch (sortFunction) {
-      case SF.alpha:
-        if (ascending) {
-          this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
-            const aName = a.name.toLowerCase();
-            const bName = b.name.toLowerCase();
-            if (aName < bName) {
-              return -1;
-            } else if (aName > bName) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }));
-        } else {
-          this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
-            const aName = a.name.toLowerCase();
-            const bName = b.name.toLowerCase();
-            if (aName > bName) {
-              return -1;
-            } else if (aName < bName) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }));
-        }
-        break;
-      case SF.date:
-        if (ascending) {
-          this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
-            if (a.id < b.id) {
-              return -1;
-            } else if (a.id > b.id) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }));
-        } else {
-          this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
-            if (a.id > b.id) {
-              return -1;
-            } else if (a.id < b.id) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }));
-        }
-        break;
-      case SF.count:
-        if (ascending) {
-          this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
-            if (a.sources.length < b.sources.length) {
-              return -1;
-            } else if (a.sources.length > b.sources.length) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }));
-        } else {
-          this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
-            if (a.sources.length > b.sources.length) {
-              return -1;
-            } else if (a.sources.length < b.sources.length) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }));
-        }
-        break;
-      case SF.type:
-        if (ascending) {
-          this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
-            if (!(a.tagWeights || a.sceneWeights) && (b.tagWeights || b.sceneWeights)) {
-              return -1;
-            } else if ((a.tagWeights || a.sceneWeights) && !(b.tagWeights || b.sceneWeights)) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }));
-        } else {
-          this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
-            if (!(a.tagWeights || a.sceneWeights) && (b.tagWeights || b.sceneWeights)) {
-              return 1;
-            } else if ((a.tagWeights || a.sceneWeights) && !(b.tagWeights || b.sceneWeights)) {
-              return -1;
-            } else {
-              return 0;
-            }
-          }));
-        }
-        break;
-    }
   }
 }
 

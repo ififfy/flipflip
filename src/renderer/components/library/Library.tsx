@@ -28,6 +28,7 @@ import WarningIcon from '@material-ui/icons/Warning';
 import {getFileGroup, getFileName, getSourceType, isVideo} from "../../data/utils";
 import {AF, MO, SF, ST} from "../../data/const";
 import en from "../../data/en";
+import Scene from "../../data/Scene";
 import SourceIcon from "../sceneDetail/SourceIcon";
 import LibrarySource from "./LibrarySource";
 import Tag from "./Tag";
@@ -206,10 +207,12 @@ class Library extends React.Component {
     library: Array<LibrarySource>,
     tags: Array<Tag>,
     goBack(): void,
+    onAddSource(scene: Scene, type: string): void,
     onBatchTag(isBatchTag: boolean): void,
     onExportLibrary(): void,
     onImportLibrary(): void,
     onManageTags(): void,
+    onSort(scene: Scene, algorithm: string, ascending: boolean): void,
     onUpdateLibrary(sources: Array<LibrarySource>): void,
   };
 
@@ -389,7 +392,7 @@ class Library extends React.Component {
         <Tooltip title="Local Video"  placement="left">
           <Fab
             className={clsx(classes.addButton, classes.addVideoButton, this.state.openMenu != MO.new && classes.addButtonClose)}
-            onClick={this.onAddSource.bind(this, AF.videos)}
+            onClick={this.props.onAddSource.bind(this, null, AF.videos)}
             size="small">
             <MovieIcon className={classes.icon} />
           </Fab>
@@ -397,7 +400,7 @@ class Library extends React.Component {
         <Tooltip title="Local Directory"  placement="left">
           <Fab
             className={clsx(classes.addButton, classes.addDirectoryButton, this.state.openMenu != MO.new && classes.addButtonClose)}
-            onClick={this.onAddSource.bind(this, AF.directory)}
+            onClick={this.props.onAddSource.bind(this, null, AF.directory)}
             size="small">
             <FolderIcon className={classes.icon} />
           </Fab>
@@ -405,7 +408,7 @@ class Library extends React.Component {
         <Tooltip title="URL"  placement="left">
           <Fab
             className={clsx(classes.addButton, classes.addURLButton, this.state.openMenu != MO.new && classes.addButtonClose)}
-            onClick={this.onAddSource.bind(this, AF.url)}
+            onClick={this.props.onAddSource.bind(this, null, AF.url)}
             size="small">
             <HttpIcon className={classes.icon} />
           </Fab>
@@ -449,10 +452,10 @@ class Library extends React.Component {
                 <MenuItem key={sf}>
                   <ListItemText primary={en.get(sf)}/>
                   <ListItemSecondaryAction>
-                    <IconButton edge="end" onClick={this.onSort.bind(this, sf, true)}>
+                    <IconButton edge="end" onClick={this.props.onSort.bind(this, null, sf, true)}>
                       <ArrowUpwardIcon/>
                     </IconButton>
-                    <IconButton edge="end" onClick={this.onSort.bind(this, sf, false)}>
+                    <IconButton edge="end" onClick={this.props.onSort.bind(this, null, sf, false)}>
                       <ArrowDownwardIcon/>
                     </IconButton>
                   </ListItemSecondaryAction>
@@ -516,208 +519,6 @@ class Library extends React.Component {
   onFinishRemoveAll() {
     this.props.onUpdateLibrary([]);
     this.onCloseDialog();
-  }
-
-  onAddSource(type: string) {
-    switch (type) {
-      case AF.url:
-        this.addSources([""]);
-        break;
-
-      case AF.directory:
-        let dResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory', 'multiSelections']});
-        if (!dResult) return;
-        this.addSources(dResult);
-        break;
-
-      case AF.videos:
-        let vResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
-          {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'MP4', extensions: ['mp4']}, {name: 'MKV', extensions: ['mkv']}, {name: 'WebM', extensions: ['webm']}, {name: 'OGG', extensions: ['ogv']}], properties: ['openFile', 'multiSelections']});
-        if (!vResult) return;
-        vResult = vResult.filter((r) => isVideo(r, true));
-        this.addSources(vResult);
-        break;
-    }
-  }
-
-  addSources(sources: Array<string>) {
-    // dedup
-    let sourceURLs = this.props.library.map((s) => s.url);
-    sources = sources.filter((s) => !sourceURLs.includes(s));
-
-    let id = this.props.library.length + 1;
-    this.props.library.forEach((s) => {
-      id = Math.max(s.id + 1, id);
-    });
-
-    let newSources = Array.from(this.props.library);
-    for (let url of sources) {
-      console.log("Adding " + id + ": ('" + url + "')");
-      newSources.unshift(new LibrarySource({
-        url: url,
-        id: id,
-        tags: new Array<Tag>(),
-      }));
-      id += 1;
-    }
-    this.props.onUpdateLibrary(newSources);
-  }
-
-  onSort(algorithm: string, ascending: boolean) {
-    const sources = Array.from(this.props.library);
-    switch (algorithm) {
-      case SF.alpha:
-        if (ascending) {
-          this.props.onUpdateLibrary(sources.sort((a, b) => {
-            const aName = getSourceType(a.url) == ST.video ? getFileName(a.url).toLowerCase() : getFileGroup(a.url).toLowerCase();
-            const bName = getSourceType(b.url) == ST.video ? getFileName(b.url).toLowerCase() : getFileGroup(b.url).toLowerCase();
-            if (aName < bName) {
-              return -1;
-            } else if (aName > bName) {
-              return 1;
-            } else {
-              const aType = getSourceType(a.url);
-              const bType = getSourceType(b.url);
-              if (aType > bType) {
-                return -1;
-              } else if (aType < bType) {
-                return 1;
-              } else {
-                return 0;
-              }
-            }
-          }));
-        } else {
-          this.props.onUpdateLibrary(sources.sort((a, b) => {
-            const aName = getSourceType(a.url) == ST.video ? getFileName(a.url).toLowerCase() : getFileGroup(a.url).toLowerCase();
-            const bName = getSourceType(b.url) == ST.video ? getFileName(b.url).toLowerCase() : getFileGroup(b.url).toLowerCase();
-            if (aName > bName) {
-              return -1;
-            } else if (aName < bName) {
-              return 1;
-            } else {
-              const aType = getSourceType(a.url);
-              const bType = getSourceType(b.url);
-              if (aType > bType) {
-                return -1;
-              } else if (aType < bType) {
-                return 1;
-              } else {
-                return 0;
-              }
-            }
-          }));
-        }
-        break;
-      case SF.alphaFull:
-        if (ascending) {
-          this.props.onUpdateLibrary(sources.sort((a, b) => {
-            const aUrl = a.url.toLowerCase();
-            const bUrl = b.url.toLocaleLowerCase();
-            if (aUrl < bUrl) {
-              return -1;
-            } else if (aUrl > bUrl) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }));
-        } else {
-          this.props.onUpdateLibrary(sources.sort((a, b) => {
-            const aUrl = a.url.toLowerCase();
-            const bUrl = b.url.toLocaleLowerCase();
-            if (aUrl > bUrl) {
-              return -1;
-            } else if (aUrl < bUrl) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }));
-        }
-        break;
-      case SF.date:
-        if (ascending) {
-          this.props.onUpdateLibrary(sources.sort((a, b) => {
-            if (a.id < b.id) {
-              return -1;
-            } else if (a.id > b.id) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }));
-        } else {
-          this.props.onUpdateLibrary(sources.sort((a, b) => {
-            if (a.id > b.id) {
-              return -1;
-            } else if (a.id < b.id) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }));
-        }
-        break;
-      case SF.count:
-        if (ascending) {
-          this.props.onUpdateLibrary(sources.sort((a, b) => {
-            if (a.count === undefined) a.count = 0;
-            if (b.count === undefined) b.count = 0;
-            if (a.countComplete === undefined) a.countComplete = false;
-            if (b.countComplete === undefined) b.countComplete = false;
-            if (a.count < b.count) {
-              return -1;
-            } else if (a.count > b.count) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }));
-        } else {
-          this.props.onUpdateLibrary(sources.sort((a, b) => {
-            if (a.count === undefined) a.count = 0;
-            if (b.count === undefined) b.count = 0;
-            if (a.countComplete === undefined) a.countComplete = false;
-            if (b.countComplete === undefined) b.countComplete = false;
-            if (a.count > b.count) {
-              return -1;
-            } else if (a.count < b.count) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }));
-        }
-        break;
-      case SF.type:
-        if (ascending) {
-          this.props.onUpdateLibrary(sources.sort((a, b) => {
-            const aType = getSourceType(a.url);
-            const bType = getSourceType(b.url);
-            if (aType > bType) {
-              return -1;
-            } else if (aType < bType) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }));
-        } else {
-          this.props.onUpdateLibrary(sources.sort((a, b) => {
-            const aType = getSourceType(a.url);
-            const bType = getSourceType(b.url);
-            if (aType < bType) {
-              return -1;
-            } else if (aType > bType) {
-              return 1;
-            } else {
-              return 0;
-            }
-          }));
-        }
-        break;
-    }
   }
 }
 

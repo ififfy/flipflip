@@ -75,6 +75,7 @@ export default class Meta extends React.Component {
               onOpenConfig={a(actions.openConfig)}
               onOpenLibrary={a(actions.openLibrary)}
               onOpenScene={a(actions.goToScene)}
+              onSort={a(actions.sortScene)}
               onUpdateConfig={a(actions.updateConfig)}
               onUpdateScenes={a(actions.replaceScenes)}
             />
@@ -87,14 +88,15 @@ export default class Meta extends React.Component {
               config={this.state.config}
               scene={scene}
               goBack={a(actions.goBack)}
+              onAddSource={a(actions.addSource)}
               onClearBlacklist={a(actions.clearBlacklist)}
               onClip={a(actions.clipVideo)}
               onDelete={a(actions.deleteScene)}
               onExport={a(actions.exportScene)}
-              onLibraryImport={a(actions.openLibraryImport)}
               onPlay={a(actions.playScene)}
               onSaveAsScene={a(actions.saveScene)}
               onSetupGrid={a(actions.setupGrid)}
+              onSort={a(actions.sortSources)}
               onUpdateScene={a(actions.updateScene)}
             />
           )}
@@ -104,10 +106,12 @@ export default class Meta extends React.Component {
               library={this.state.library}
               tags={this.state.tags}
               goBack={a(actions.goBack)}
+              onAddSource={a(actions.addSource)}
               onBatchTag={a(actions.batchTag)}
               onExportLibrary={a(actions.exportLibrary)}
               onImportLibrary={a(actions.importLibrary)}
               onManageTags={a(actions.manageTags)}
+              onSort={a(actions.sortSources)}
               onUpdateLibrary={a(actions.replaceLibrary)}
               /*library={this.state.library}
               tags={this.state.tags}
