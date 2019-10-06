@@ -15,6 +15,7 @@ import AddIcon from '@material-ui/icons/Add';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
+import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import CasinoIcon from '@material-ui/icons/Casino';
 import GetAppIcon from '@material-ui/icons/GetApp';
@@ -182,6 +183,43 @@ const styles = (theme: Theme) => createStyles({
   sceneTitle: {
     textAlign: 'center',
   },
+  toggle: {
+    zIndex: theme.zIndex.drawer + 1,
+    position: 'absolute',
+    top: '50%',
+    marginLeft: drawerWidth - 25,
+    transition: theme.transitions.create(['margin', 'opacity'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  toggleClose: {
+    marginLeft: theme.spacing(9) - 25,
+    transition: theme.transitions.create(['margin', 'opacity'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  toggleHide: {
+    opacity: 0,
+    transition: theme.transitions.create(['margin', 'opacity'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  toggleIcon: {
+    transition: theme.transitions.create('transform', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  toggleIconOpen: {
+    transform: 'rotate(180deg)',
+    transition: theme.transitions.create('transform', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
   addMenuButton: {
     backgroundColor: theme.palette.primary.dark,
     margin: 0,
@@ -269,6 +307,7 @@ class ScenePicker extends React.Component {
 
   readonly state = {
     drawerOpen: false,
+    drawerHover: false,
     newVersion: "",
     newVersionLink: "",
     isFirstWindow: false,
@@ -317,103 +356,118 @@ class ScenePicker extends React.Component {
         </AppBar>
 
         {this.state.isFirstWindow && (
-          <Drawer
-            variant="permanent"
-            classes={{paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose)}}
-            open={open}>
+          <React.Fragment>
+            <Drawer
+              variant="permanent"
+              classes={{paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose)}}
+              onMouseEnter={this.onMouseEnterDrawer.bind(this)}
+              onMouseLeave={this.onMouseLeaveDrawer.bind(this)}
+              open={open}>
 
-            <div className={classes.drawerToolbar}>
-              <IconButton
-                edge="start"
-                color="inherit"
-                aria-label="Toggle Drawer"
-                onClick={this.onToggleDrawer.bind(this)}>
-                <MenuIcon />
-              </IconButton>
-              <VSpin>
-                <div className={clsx(classes.logo, classes.drawerLogo)}/>
-              </VSpin>
-              <Typography component="h1" variant="h6" color="inherit" noWrap>
-                FlipFlip
-              </Typography>
-            </div>
+              <div className={classes.drawerToolbar}>
+                <IconButton
+                  edge="start"
+                  color="inherit"
+                  aria-label="Toggle Drawer"
+                  onClick={this.onToggleDrawer.bind(this)}>
+                  <MenuIcon />
+                </IconButton>
+                <VSpin>
+                  <div className={clsx(classes.logo, classes.drawerLogo)}/>
+                </VSpin>
+                <Typography component="h1" variant="h6" color="inherit" noWrap>
+                  FlipFlip
+                </Typography>
+              </div>
 
-            <Divider />
+              <Divider />
 
-            <div>
-              <ListItem button onClick={this.props.onOpenLibrary.bind(this)}>
-                <ListItemIcon>
-                  <LocalLibraryIcon />
-                </ListItemIcon>
-                <ListItemText primary="Library" />
-                {this.props.libraryCount > 0 && (
-                  <Chip
-                    className={clsx(classes.chip, !open && classes.chipClose)}
-                    label={this.props.libraryCount}
-                    color='primary'
-                    size='small'
-                    variant='outlined'/>
+              <div>
+                <ListItem button onClick={this.props.onOpenLibrary.bind(this)}>
+                  <ListItemIcon>
+                    <LocalLibraryIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Library" />
+                  {this.props.libraryCount > 0 && (
+                    <Chip
+                      className={clsx(classes.chip, !open && classes.chipClose)}
+                      label={this.props.libraryCount}
+                      color='primary'
+                      size='small'
+                      variant='outlined'/>
+                  )}
+                </ListItem>
+              </div>
+
+              <Divider />
+
+              <div>
+                {this.props.scenes.length > 0 && (
+                  <React.Fragment>
+                    <ListItem button onClick={this.onNewWindow.bind(this)}>
+                      <ListItemIcon>
+                        <OpenInNewIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="New Window" />
+                    </ListItem>
+
+                    <Dialog
+                      open={this.state.openMenu == MO.newWindowAlert}
+                      onClose={this.onCloseDialog.bind(this)}
+                      aria-labelledby="new-window-title"
+                      aria-describedby="new-window-description">
+                      <DialogTitle id="new-window-title">New Window Warning</DialogTitle>
+                      <DialogContent>
+                        <DialogContentText id="new-window-description">
+                          Please be aware that only changes made in the main window (this window) will be saved.
+                        </DialogContentText>
+                      </DialogContent>
+                      <DialogActions>
+                        <Button onClick={this.newWindow.bind(this, true)} color="secondary">
+                          Don't show again
+                        </Button>
+                        <Button onClick={this.newWindow.bind(this, false)} color="primary">
+                          OK
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
+                  </React.Fragment>
                 )}
-              </ListItem>
-            </div>
+                <ListItem button onClick={this.props.onOpenConfig.bind(this)}>
+                  <ListItemIcon>
+                    <SettingsIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Settings" />
+                </ListItem>
+                <ListItem button onClick={this.openLink.bind(this,"https://ififfy.github.io/flipflip/#/")}>
+                  <ListItemIcon>
+                    <HelpIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="User Manual" />
+                </ListItem>
+              </div>
+              <div className={classes.fill}/>
 
-            <Divider />
+              <div className={clsx(classes.drawerBottom, !open && classes.drawerBottomClose)}>
+                <Typography variant="body2" color="inherit" className={classes.drawerText}>
+                  Questions? Suggestions?
+                  <br/>
+                  Visit us on <Link href="#" onClick={this.openLink.bind(this, "https://github.com/ififfy/flipflip")}>GitHub</Link> or <Link href="#" onClick={this.openLink.bind(this, "https://www.reddit.com/r/flipflip")}>Reddit</Link>
+                </Typography>
+              </div>
+            </Drawer>
 
-            <div>
-              {this.props.scenes.length > 0 && (
-                <React.Fragment>
-                  <ListItem button onClick={this.onNewWindow.bind(this)}>
-                    <ListItemIcon>
-                      <OpenInNewIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="New Window" />
-                  </ListItem>
-
-                  <Dialog
-                    open={this.state.openMenu == MO.newWindowAlert}
-                    onClose={this.onCloseDialog.bind(this)}
-                    aria-labelledby="new-window-title"
-                    aria-describedby="new-window-description">
-                    <DialogTitle id="new-window-title">New Window Warning</DialogTitle>
-                    <DialogContent>
-                      <DialogContentText id="new-window-description">
-                        Please be aware that only changes made in the main window (this window) will be saved.
-                      </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                      <Button onClick={this.newWindow.bind(this, true)} color="secondary">
-                        Don't show again
-                      </Button>
-                      <Button onClick={this.newWindow.bind(this, false)} color="primary">
-                        OK
-                      </Button>
-                    </DialogActions>
-                  </Dialog>
-                </React.Fragment>
-              )}
-              <ListItem button onClick={this.props.onOpenConfig.bind(this)}>
-                <ListItemIcon>
-                  <SettingsIcon />
-                </ListItemIcon>
-                <ListItemText primary="Settings" />
-              </ListItem>
-              <ListItem button onClick={this.openLink.bind(this,"https://ififfy.github.io/flipflip/#/")}>
-                <ListItemIcon>
-                  <HelpIcon />
-                </ListItemIcon>
-                <ListItemText primary="User Manual" />
-              </ListItem>
-            </div>
-            <div className={classes.fill}/>
-
-            <div className={clsx(classes.drawerBottom, !open && classes.drawerBottomClose)}>
-              <Typography variant="body2" color="inherit" className={classes.drawerText}>
-                Questions? Suggestions?
-                <br/>
-                Visit us on <Link href="#" onClick={this.openLink.bind(this, "https://github.com/ififfy/flipflip")}>GitHub</Link> or <Link href="#" onClick={this.openLink.bind(this, "https://www.reddit.com/r/flipflip")}>Reddit</Link>
-              </Typography>
-            </div>
-          </Drawer>
+            <Fab
+              className={clsx(classes.toggle, !open && classes.toggleClose, !this.state.drawerHover && classes.toggleHide)}
+              color="primary"
+              size="medium"
+              aria-label="toggle"
+              onMouseEnter={this.onMouseEnterDrawer.bind(this)}
+              onMouseLeave={this.onMouseLeaveDrawer.bind(this)}
+              onClick={this.onToggleDrawer.bind(this)}>
+              <ArrowForwardIosIcon className={clsx(classes.toggleIcon, open && classes.toggleIconOpen)}/>
+            </Fab>
+          </React.Fragment>
         )}
 
         <main className={classes.content}>
@@ -508,7 +562,7 @@ class ScenePicker extends React.Component {
                   keepMounted
                   classes={{paper: classes.sortMenu}}
                   open={this.state.openMenu == MO.sort}
-                  onClose={this.onClickCloseMenu.bind(this)}>
+                  onClose={this.onCloseDialog.bind(this)}>
                   {[SF.alpha, SF.date, SF.count, SF.type].map((sf) =>
                     <MenuItem key={sf}>
                       <ListItemText primary={en.get(sf)}/>
@@ -627,19 +681,35 @@ class ScenePicker extends React.Component {
   }
 
   onClickCloseMenu(e: MouseEvent) {
-    if (this.state.openMenu == MO.sort || this.state.openMenu == MO.new) {
-      let className = (e.target as any).className;
-      if (!(className instanceof string) && className.baseVal != null) {
-        className = className.baseVal;
-      }
-      if (!className.includes("ScenePicker-icon-") && !className.includes("MuiFab-")) {
-        this.setState({menuAnchorEl: null, openMenu: null});
-      }
+    if (this.state.openMenu == MO.new) {
+      let parent: any = e.target;
+      do {
+        let className = parent.className;
+        if (!(className instanceof string) && className.baseVal != null) {
+          className = className.baseVal;
+        }
+        console.log(className);
+        if (className.includes("MuiFab-")) {
+          return;
+        }
+        if (className.includes("ScenePicker-root")) {
+          break;
+        }
+      } while ((parent = parent.parentNode) != null);
+      this.setState({menuAnchorEl: null, openMenu: null});
     }
   }
 
   onCloseDialog() {
     this.setState({menuAnchorEl: null, openMenu: null});
+  }
+
+  onMouseEnterDrawer() {
+    this.setState({drawerHover: true});
+  }
+
+  onMouseLeaveDrawer() {
+    this.setState({drawerHover: false});
   }
 
   onRandomScene() {

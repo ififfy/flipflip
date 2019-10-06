@@ -103,6 +103,14 @@ export default class Meta extends React.Component {
             <Library
               library={this.state.library}
               tags={this.state.tags}
+              goBack={a(actions.goBack)}
+              onBatchTag={a(actions.batchTag)}
+              onExportLibrary={a(actions.exportLibrary)}
+              onImportLibrary={a(actions.importLibrary)}
+              onManageTags={a(actions.manageTags)}
+              onUpdateLibrary={a(actions.replaceLibrary)}
+              /*library={this.state.library}
+              tags={this.state.tags}
               config={this.state.config}
               isSelect={this.state.isSelect}
               isBatchTag={this.state.isBatchTag}
@@ -118,9 +126,7 @@ export default class Meta extends React.Component {
               batchTag={a(actions.batchTag)}
               importSourcesFromLibrary={a(actions.importFromLibrary)}
               onBackup={appStorage.backup.bind(appStorage)}
-              onImportLibrary={a(actions.importLibrary)}
-              onExportLibrary={a(actions.exportLibrary)}
-              blacklistFile={a(actions.blacklistFile)}
+              blacklistFile={a(actions.blacklistFile)}*/
             />
           )}
 

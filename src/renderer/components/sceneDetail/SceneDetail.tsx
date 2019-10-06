@@ -580,7 +580,7 @@ class SceneDetail extends React.Component {
                   keepMounted
                   classes={{paper: classes.sortMenu}}
                   open={this.state.openMenu == MO.sort}
-                  onClose={this.onClickCloseMenu.bind(this)}>
+                  onClose={this.onCloseDialog.bind(this)}>
                   {Object.values(SF).map((sf) =>
                     <MenuItem key={sf}>
                       <ListItemText primary={en.get(sf)}/>
@@ -616,14 +616,22 @@ class SceneDetail extends React.Component {
   }
 
   onClickCloseMenu(e: MouseEvent) {
-    if (this.state.openMenu == MO.sort || this.state.openMenu == MO.new) {
-      let className = (e.target as any).className;
-      if (!(className instanceof string) && className.baseVal != null) {
-        className = className.baseVal;
-      }
-      if (!className.includes("SceneDetail-icon-") && !className.includes("MuiFab-")) {
-        this.setState({menuAnchorEl: null, openMenu: null});
-      }
+    if (this.state.openMenu == MO.new) {
+      let parent: any = e.target;
+      do {
+        let className = parent.className;
+        if (!(className instanceof string) && className.baseVal != null) {
+          className = className.baseVal;
+        }
+        console.log(className);
+        if (className.includes("MuiFab-")) {
+          return;
+        }
+        if (className.includes("SceneDetail-root")) {
+          break;
+        }
+      } while ((parent = parent.parentNode) != null);
+      this.setState({menuAnchorEl: null, openMenu: null});
     }
   }
 
@@ -645,10 +653,6 @@ class SceneDetail extends React.Component {
 
   update(fn: (scene: any) => void) {
     this.props.onUpdateScene(this.props.scene, fn);
-  }
-
-  changeKey(key: string, value: any) {
-    this.update((s) => s[key] = value);
   }
 
   beginEditingName() {

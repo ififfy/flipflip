@@ -1,558 +1,724 @@
-import * as React from 'react';
-import {existsSync} from "fs";
-import tumblr from 'tumblr.js';
-import wretch from 'wretch';
-import Snoowrap from "snoowrap";
-import {IgApiClient} from "instagram-private-api";
+import * as React from "react";
+import clsx from "clsx";
+import {string} from "prop-types";
+import {remote} from "electron";
 
+import {
+  AppBar, Button, Chip, Collapse, Container, createStyles, Dialog, DialogActions, DialogContent, DialogContentText,
+  DialogTitle, Divider, Drawer, Fab, IconButton, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText,
+  ListSubheader, Menu, MenuItem, Theme, Toolbar, Tooltip, Typography, withStyles
+} from "@material-ui/core";
+
+import AddIcon from '@material-ui/icons/Add';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
+import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
+import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
+import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
+import FolderIcon from '@material-ui/icons/Folder';
+import FormatListBulletedIcon from '@material-ui/icons/FormatListBulleted';
+import GetAppIcon from '@material-ui/icons/GetApp';
+import HttpIcon from '@material-ui/icons/Http';
+import LocalOfferIcon from '@material-ui/icons/LocalOffer';
+import MovieIcon from '@material-ui/icons/Movie';
+import PublishIcon from '@material-ui/icons/Publish';
+import SortIcon from '@material-ui/icons/Sort';
+import WarningIcon from '@material-ui/icons/Warning';
+
+import {getFileGroup, getFileName, getSourceType, isVideo} from "../../data/utils";
+import {AF, MO, SF, ST} from "../../data/const";
+import en from "../../data/en";
+import SourceIcon from "../sceneDetail/SourceIcon";
 import LibrarySource from "./LibrarySource";
 import Tag from "./Tag";
-import Config from "../../data/Config";
-import SourcePicker from "../sceneDetail/SourcePicker";
-import Progress from "../ui/Progress";
-import Jiggle from "../../animations/Jiggle";
-import Twitter from "twitter";
-import {ST} from "../../data/const";
 
-export default class Library extends React.Component {
+const drawerWidth = 240;
+
+const styles = (theme: Theme) => createStyles({
+  root: {
+    display: 'flex',
+  },
+  appBar: {
+    zIndex: theme.zIndex.drawer + 1,
+  },
+  appBarSpacer: theme.mixins.toolbar,
+  title: {
+    textAlign: 'center',
+  },
+  drawerPaper: {
+    position: 'relative',
+    whiteSpace: 'nowrap',
+    overflowX: 'hidden',
+    height: '100vh',
+    width: drawerWidth,
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  drawerPaperClose: {
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    width: theme.spacing(7),
+    [theme.breakpoints.up('sm')]: {
+      width: theme.spacing(9),
+    },
+  },
+  drawerTitle: {
+    transition: theme.transitions.create(['height'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  drawerTitleClose: {
+    height: 0,
+    transition: theme.transitions.create(['height'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  chip: {
+    transition: theme.transitions.create(['opacity'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  chipClose: {
+    opacity: 0,
+    transition: theme.transitions.create(['opacity'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  content: {
+    flexGrow: 1,
+    height: '100vh',
+    overflow: 'auto',
+    backgroundColor: (theme.palette.primary as any)["50"],
+  },
+  container: {
+    padding: theme.spacing(0),
+  },
+  toggle: {
+    zIndex: theme.zIndex.drawer + 1,
+    position: 'absolute',
+    top: '50%',
+    marginLeft: drawerWidth - 25,
+    transition: theme.transitions.create(['margin', 'opacity'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  toggleClose: {
+    marginLeft: theme.spacing(9) - 25,
+    transition: theme.transitions.create(['margin', 'opacity'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  toggleHide: {
+    opacity: 0,
+    transition: theme.transitions.create(['margin', 'opacity'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  toggleIcon: {
+    transition: theme.transitions.create('transform', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  toggleIconOpen: {
+    transform: 'rotate(180deg)',
+    transition: theme.transitions.create('transform', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  addMenuButton: {
+    backgroundColor: theme.palette.primary.dark,
+    margin: 0,
+    top: 'auto',
+    right: 20,
+    bottom: 20,
+    left: 'auto',
+    position: 'fixed',
+  },
+  sortMenuButton: {
+    backgroundColor: theme.palette.secondary.dark,
+    margin: 0,
+    top: 'auto',
+    right: 80,
+    bottom: 20,
+    left: 'auto',
+    position: 'fixed',
+  },
+  addButton: {
+    backgroundColor: theme.palette.primary.main,
+    margin: 0,
+    top: 'auto',
+    right: 28,
+    bottom: 25,
+    left: 'auto',
+    position: 'fixed',
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  addURLButton: {
+    marginBottom: 60
+  },
+  addDirectoryButton: {
+    marginBottom: 115
+  },
+  addVideoButton: {
+    marginBottom: 170
+  },
+  removeAllButton: {
+    backgroundColor: theme.palette.error.main,
+    marginBottom: 225,
+  },
+  addButtonClose: {
+    marginBottom: 0,
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  icon: {
+    color: theme.palette.primary.contrastText,
+  },
+  sortMenu: {
+    width: 200,
+  },
+  fill: {
+    flexGrow: 1,
+  },
+});
+
+class Library extends React.Component {
   readonly props: {
+    classes: any,
     library: Array<LibrarySource>,
-    config: Config,
     tags: Array<Tag>,
-    isSelect: boolean,
-    isBatchTag: boolean,
-    yOffset: number,
-    filters: Array<string>,
-    selected: Array<string>,
-    onUpdateLibrary(sources: Array<LibrarySource>): void,
-    onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void,
-    onClip(source: LibrarySource): void,
-    savePosition(yOffset: number, filters:Array<string>, selected: Array<string>): void,
     goBack(): void,
-    manageTags(): void,
-    importSourcesFromLibrary(sources: Array<LibrarySource>): void,
-    batchTag(isBatchTag: boolean): void,
-    onBackup(alert: boolean): boolean,
-    onImportLibrary(): void,
+    onBatchTag(isBatchTag: boolean): void,
     onExportLibrary(): void,
-    blacklistFile(sourceURL: string, fileToBlacklist: string): void,
+    onImportLibrary(): void,
+    onManageTags(): void,
+    onUpdateLibrary(sources: Array<LibrarySource>): void,
   };
 
   readonly state = {
-    inProgress: false,
-    showProgress: false,
-    totalProgress: 0,
-    currentProgress: 0,
-    progressTitle: "",
-    next: "",
-    mode: "",
+    drawerOpen: false,
+    drawerHover: false,
+    menuAnchorEl: null as any,
+    openMenu: null as string,
   };
 
   render() {
+    const classes = this.props.classes;
+    const open = this.state.drawerOpen;
     return (
-      <div className="Library">
-        <div className="u-button-row">
-          <div className="u-abs-center">
-            {!this.state.showProgress && (
-              <h2 className="Library__LibraryHeader">Library</h2>
-            )}
-            {this.state.showProgress && (
-              <h2 className="Library__LibraryHeader">Progress</h2>
-            )}
-          </div>
-          {!this.props.isSelect && !this.props.isBatchTag && !this.state.showProgress && (
-            <div className="Library__Buttons u-button-row-right">
-              {this.props.config.remoteSettings.instagramUsername != "" &&
-                this.props.config.remoteSettings.instagramPassword != "" && (
-                <Jiggle
-                  bounce={false}
-                  className={`Library__InstagramImport u-button u-icon-button ${this.state.inProgress ? 'u-disabled' : 'u-clickable'}`}
-                  title="Import Instagram Following"
-                  onClick={this.state.inProgress ? this.nop() : this.importInstagram.bind(this)}
-                >
-                  <div className="u-instagram-outline"/>
-                </Jiggle>
-              )}
-              {this.props.config.remoteSettings.twitterAccessTokenKey != "" &&
-                this.props.config.remoteSettings.twitterAccessTokenSecret != "" && (
-                <Jiggle
-                  bounce={false}
-                  className={`Library__TwitterImport u-button u-icon-button ${this.state.inProgress ? 'u-disabled' : 'u-clickable'}`}
-                  title="Import Twitter Following"
-                  onClick={this.state.inProgress ? this.nop() : this.importTwitter.bind(this)}
-                >
-                  <div className="u-twitter-outline"/>
-                </Jiggle>
-              )}
-              {this.props.config.remoteSettings.redditRefreshToken != "" && (
-                <Jiggle
-                  bounce={false}
-                  className={`Library__RedditImport u-button u-icon-button ${this.state.inProgress ? 'u-disabled' : 'u-clickable'}`}
-                  title="Import Reddit Subscriptions"
-                  onClick={this.state.inProgress ? this.nop() : this.importReddit.bind(this)}
-                >
-                  <div className="u-reddit-outline"/>
-                </Jiggle>
-              )}
-              {this.props.config.remoteSettings.tumblrOAuthToken != "" &&
-                this.props.config.remoteSettings.tumblrOAuthTokenSecret != "" && (
-                <Jiggle
-                  bounce={false}
-                  className={`Library__TumblrImport u-button u-icon-button ${this.state.inProgress && this.state.mode != ST.tumblr ? 'u-disabled' : 'u-clickable'}`}
-                  title="Import Tumblr Following"
-                  onClick={this.state.inProgress && this.state.mode != ST.tumblr ? this.nop() : this.importTumblr.bind(this)}>
-                  <div className="u-tumblr-outline"/>
-                </Jiggle>
-              )}
-              <Jiggle
-                bounce={false}
-                className={`Library__MarkOffline u-button u-icon-button ${this.state.inProgress && this.state.mode != "offline" ? 'u-disabled' : 'u-clickable'}`}
-                title="Mark Offline Sources"
-                onClick={this.state.inProgress && this.state.mode != "offline" ? this.nop() : this.markOffline.bind(this)}>
-                <div className="u-mark-offline"/>
-              </Jiggle>
-              <Jiggle
-                bounce={false}
-                className={`Library__ManageTags u-button u-icon-button u-clickable`}
-                title="Manage Tags"
-                onClick={this.props.manageTags.bind(this)}>
-                <div className="u-tags"/>
-              </Jiggle>
-              <Jiggle
-                bounce={false}
-                className="Library__BatchTag u-button u-icon-button u-clickable"
-                title="Batch Tag"
-                onClick={this.props.batchTag.bind(this, true)}>
-                <div className="u-batch"/>
-              </Jiggle>
-            </div>
-          )}
-          <div
-            className="BackButton u-button u-clickable"
-            style={{verticalAlign: '11px'}}
-            onClick={this.goBack.bind(this)}>
-            {(this.props.isBatchTag ? "Done" : "Back")}
-          </div>
-          {!this.props.isSelect && !this.props.isBatchTag && !this.state.showProgress && (
-            <Jiggle
-              bounce={false}
-              className="Library__Export u-button u-icon-button u-clickable"
-              title="Export Library"
-              onClick={this.props.onExportLibrary.bind(this)}>
-              <div className="u-export"/>
-            </Jiggle>
-          )}
-          {!this.props.isSelect && !this.props.isBatchTag && !this.state.showProgress && (
-            <Jiggle
-              bounce={false}
-              className="Library__Import u-button u-icon-button u-clickable"
-              title="Import Library"
-              onClick={this.props.onImportLibrary.bind(this, this.props.onBackup)}>
-              <div className="u-import"/>
-            </Jiggle>
-          )}
-        </div>
+      <div className={classes.root} onClick={this.onClickCloseMenu.bind(this)}>
+        <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
+          <Toolbar>
+            <Tooltip title="Back" placement="right-end">
+              <IconButton
+                edge="start"
+                color="inherit"
+                aria-label="Back"
+                onClick={this.props.goBack.bind(this)}>
+                <ArrowBackIcon />
+              </IconButton>
+            </Tooltip>
 
-        {!this.state.showProgress && (
-          <SourcePicker
-            sources={this.props.library}
-            tags={this.props.tags}
-            config={this.props.config}
-            yOffset={this.props.yOffset}
-            filters={this.props.filters}
-            selected={this.props.selected}
-            emptyMessage="You haven't added anything to the Library yet."
-            isSelect={this.props.isSelect}
-            isBatchTag={this.props.isBatchTag}
-            onUpdateSources={this.props.onUpdateLibrary}
-            onPlay={this.props.onPlay}
-            onClip={this.props.onClip}
-            onBlacklistFile={this.props.blacklistFile}
-            savePosition={this.props.savePosition}
-            importSourcesFromLibrary={this.props.importSourcesFromLibrary}
-          />
-        )}
-        {this.state.showProgress && (
-          <Progress
-            total={this.state.totalProgress}
-            current={this.state.currentProgress}
-            message={"<p>" + this.state.progressTitle + "</p><p>You can return to the Library</p>"} />
+            <div className={classes.fill}/>
+            <Typography component="h1" variant="h4" color="inherit" noWrap
+                        className={classes.title}>
+              Library
+            </Typography>
+            <div className={classes.fill}/>
+          </Toolbar>
+        </AppBar>
+
+        <Drawer
+          variant="permanent"
+          classes={{paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose)}}
+          onMouseEnter={this.onMouseEnterDrawer.bind(this)}
+          onMouseLeave={this.onMouseLeaveDrawer.bind(this)}
+          open={false}>
+          <div className={classes.appBarSpacer} />
+
+          <div>
+            <ListItem button onClick={this.props.onManageTags.bind(this)}>
+              <ListItemIcon>
+                <LocalOfferIcon />
+              </ListItemIcon>
+              <ListItemText primary="Manage Tags" />
+              {this.props.tags.length > 0 && (
+                <Chip
+                  className={clsx(classes.chip, !open && classes.chipClose)}
+                  label={this.props.tags.length}
+                  color='primary'
+                  size='small'
+                  variant='outlined'/>
+              )}
+            </ListItem>
+            <ListItem button onClick={this.props.onManageTags.bind(this)}>
+              <ListItemIcon>
+                <FormatListBulletedIcon />
+              </ListItemIcon>
+              <ListItemText primary="Batch Tag" />
+            </ListItem>
+          </div>
+
+          <Divider />
+
+          <div>
+            <Collapse in={open}>
+              <ListSubheader inset>
+                Import Remote Sources
+              </ListSubheader>
+            </Collapse>
+            <ListItem button>
+              <ListItemIcon>
+                <SourceIcon type={ST.tumblr}/>
+              </ListItemIcon>
+              <ListItemText primary="Tumblr" />
+            </ListItem>
+            <ListItem button>
+              <ListItemIcon>
+                <SourceIcon type={ST.reddit}/>
+              </ListItemIcon>
+              <ListItemText primary="Reddit" />
+            </ListItem>
+            <ListItem button>
+              <ListItemIcon>
+                <SourceIcon type={ST.twitter}/>
+              </ListItemIcon>
+              <ListItemText primary="Twitter" />
+            </ListItem>
+            <ListItem button>
+              <ListItemIcon>
+                <SourceIcon type={ST.instagram}/>
+              </ListItemIcon>
+              <ListItemText primary="Instagram" />
+            </ListItem>
+          </div>
+
+          <Divider />
+
+          <div>
+            <ListItem button>
+              <ListItemIcon>
+                <WarningIcon />
+              </ListItemIcon>
+              <ListItemText primary="Mark Offline" />
+            </ListItem>
+          </div>
+
+          <div className={classes.fill}/>
+
+          <div>
+            <ListItem button onClick={this.props.onExportLibrary.bind(this)}>
+              <ListItemIcon>
+                <PublishIcon />
+              </ListItemIcon>
+              <ListItemText primary="Export Library" />
+            </ListItem>
+            <ListItem button onClick={this.props.onImportLibrary.bind(this)}>
+              <ListItemIcon>
+                <GetAppIcon />
+              </ListItemIcon>
+              <ListItemText primary="Import Library" />
+            </ListItem>
+          </div>
+        </Drawer>
+
+        <Fab
+          className={clsx(classes.toggle, !open && classes.toggleClose, !this.state.drawerHover && classes.toggleHide)}
+          color="primary"
+          size="medium"
+          aria-label="toggle"
+          onMouseEnter={this.onMouseEnterDrawer.bind(this)}
+          onMouseLeave={this.onMouseLeaveDrawer.bind(this)}
+          onClick={this.onToggleDrawer.bind(this)}>
+          <ArrowForwardIosIcon className={clsx(classes.toggleIcon, open && classes.toggleIconOpen)}/>
+        </Fab>
+
+        <main className={classes.content}>
+          <div className={classes.appBarSpacer} />
+          <Container maxWidth={false} className={classes.container}>
+            <div/>
+          </Container>
+        </main>
+
+        <Tooltip title="Remove All Sources"  placement="left">
+          <Fab
+            className={clsx(classes.addButton, classes.removeAllButton, this.state.openMenu != MO.new && classes.addButtonClose)}
+            onClick={this.onRemoveAll.bind(this)}
+            size="small">
+            <DeleteSweepIcon className={classes.icon} />
+          </Fab>
+        </Tooltip>
+        <Dialog
+          open={this.state.openMenu == MO.removeAllAlert}
+          onClose={this.onCloseDialog.bind(this)}
+          aria-labelledby="remove-all-title"
+          aria-describedby="remove-all-description">
+          <DialogTitle id="remove-all-title">Remove All Sources</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="remove-all-description">
+              Are you sure you want to remove all sources from this scene?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+              Cancel
+            </Button>
+            <Button onClick={this.onFinishRemoveAll.bind(this)} color="primary">
+              OK
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Tooltip title="Local Video"  placement="left">
+          <Fab
+            className={clsx(classes.addButton, classes.addVideoButton, this.state.openMenu != MO.new && classes.addButtonClose)}
+            onClick={this.onAddSource.bind(this, AF.videos)}
+            size="small">
+            <MovieIcon className={classes.icon} />
+          </Fab>
+        </Tooltip>
+        <Tooltip title="Local Directory"  placement="left">
+          <Fab
+            className={clsx(classes.addButton, classes.addDirectoryButton, this.state.openMenu != MO.new && classes.addButtonClose)}
+            onClick={this.onAddSource.bind(this, AF.directory)}
+            size="small">
+            <FolderIcon className={classes.icon} />
+          </Fab>
+        </Tooltip>
+        <Tooltip title="URL"  placement="left">
+          <Fab
+            className={clsx(classes.addButton, classes.addURLButton, this.state.openMenu != MO.new && classes.addButtonClose)}
+            onClick={this.onAddSource.bind(this, AF.url)}
+            size="small">
+            <HttpIcon className={classes.icon} />
+          </Fab>
+        </Tooltip>
+        <Fab
+          className={classes.addMenuButton}
+          onClick={this.onToggleNewMenu.bind(this)}
+          size="large">
+          <AddIcon className={classes.icon} />
+        </Fab>
+
+        {this.props.library.length >= 2 && (
+          <React.Fragment>
+            <Fab
+              className={classes.sortMenuButton}
+              aria-haspopup="true"
+              aria-controls="sort-menu"
+              aria-label="Sort Sources"
+              onClick={this.onOpenSortMenu.bind(this)}
+              size="medium">
+              <SortIcon className={classes.icon} />
+            </Fab>
+            <Menu
+              id="sort-menu"
+              elevation={1}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'center',
+              }}
+              transformOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+              getContentAnchorEl={null}
+              anchorEl={this.state.menuAnchorEl}
+              keepMounted
+              classes={{paper: classes.sortMenu}}
+              open={this.state.openMenu == MO.sort}
+              onClose={this.onCloseDialog.bind(this)}>
+              {Object.values(SF).map((sf) =>
+                <MenuItem key={sf}>
+                  <ListItemText primary={en.get(sf)}/>
+                  <ListItemSecondaryAction>
+                    <IconButton edge="end" onClick={this.onSort.bind(this, sf, true)}>
+                      <ArrowUpwardIcon/>
+                    </IconButton>
+                    <IconButton edge="end" onClick={this.onSort.bind(this, sf, false)}>
+                      <ArrowDownwardIcon/>
+                    </IconButton>
+                  </ListItemSecondaryAction>
+                </MenuItem>
+              )}
+            </Menu>
+          </React.Fragment>
         )}
       </div>
-    )
+    );
   }
 
-  nop() {}
+  onToggleDrawer() {
+    this.setState({drawerOpen: !this.state.drawerOpen});
+  }
 
-  goBack() {
-    if (this.state.showProgress) {
-      this.setState({showProgress: false});
-    } else if (this.props.isBatchTag) {
-      this.setState({showProgress: false});
-      this.props.batchTag(false);
-    } else {
-      this.props.goBack();
+  onToggleNewMenu() {
+    this.setState({openMenu: this.state.openMenu == MO.new ? null : MO.new});
+  }
+
+  onOpenSortMenu(e: MouseEvent) {
+    this.setState({menuAnchorEl: e.currentTarget, openMenu: MO.sort});
+  }
+
+  onClickCloseMenu(e: MouseEvent) {
+    if (this.state.openMenu == MO.new) {
+      let parent: any = e.target;
+      do {
+        let className = parent.className;
+        if (!(className instanceof string) && className.baseVal != null) {
+          className = className.baseVal;
+        }
+        console.log(className);
+        if (className.includes("MuiFab-")) {
+          return;
+        }
+        if (className.includes("Library-root")) {
+          break;
+        }
+      } while ((parent = parent.parentNode) != null);
+      this.setState({menuAnchorEl: null, openMenu: null});
     }
   }
 
-  importTumblr() {
-    // If we don't have an import running
-    if (!this.state.inProgress) {
-      // Build our Tumblr client
-      const client = tumblr.createClient({
-        consumer_key: this.props.config.remoteSettings.tumblrKey,
-        consumer_secret: this.props.config.remoteSettings.tumblrSecret,
-        token: this.props.config.remoteSettings.tumblrOAuthToken,
-        token_secret: this.props.config.remoteSettings.tumblrOAuthTokenSecret,
-      });
+  onCloseDialog() {
+    this.setState({menuAnchorEl: null, openMenu: null});
+  }
 
-      // Define our loop
-      const tumblrImportLoop = () => {
-        const offset = this.state.currentProgress;
-        // Get the next page of blogs
-        client.userFollowing({offset: offset}, (err, data) => {
-          if (err) {
-            alert("Error retrieving following: " + err);
-            this.setState({mode: "", currentProgress: 0, totalProgress: 0, inProgress: false, showProgress: false, progressTitle: ""});
-            console.error(err);
-            return;
-          }
+  onMouseEnterDrawer() {
+    this.setState({drawerHover: true});
+  }
 
-          // Get the next 20 blogs
-          let following = [];
-          for (let blog of data.blogs) {
-            const blogURL = "http://" + blog.name + ".tumblr.com/";
-            following.push(blogURL);
-          }
+  onMouseLeaveDrawer() {
+    this.setState({drawerHover: false});
+  }
 
-          // dedup
-          let sourceURLs = this.props.library.map((s) => s.url);
-          following = following.filter((b) => !sourceURLs.includes(b));
+  onRemoveAll() {
+    this.setState({openMenu: MO.removeAllAlert});
+  }
 
-          let id = this.props.library.length + 1;
-          this.props.library.forEach((s) => {
-            id = Math.max(s.id + 1, id);
-          });
+  onFinishRemoveAll() {
+    this.props.onUpdateLibrary([]);
+    this.onCloseDialog();
+  }
 
-          // Add to Library
-          let newLibrary = this.props.library;
-          for (let url of following) {
-            newLibrary = newLibrary.concat([new LibrarySource({
-              url: url,
-              id: id,
-              tags: new Array<Tag>(),
-            })]);
-            id += 1;
-          }
-          this.props.onUpdateLibrary(newLibrary);
+  onAddSource(type: string) {
+    switch (type) {
+      case AF.url:
+        this.addSources([""]);
+        break;
 
-          let nextOffset = offset + 20;
-          if (offset > this.state.totalProgress) {
-            nextOffset = this.state.totalProgress;
-          }
+      case AF.directory:
+        let dResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory', 'multiSelections']});
+        if (!dResult) return;
+        this.addSources(dResult);
+        break;
 
-          // Update progress
-          this.setState({currentProgress: nextOffset});
-
-          // Loop until we run out of blogs
-          if ((nextOffset) < this.state.totalProgress) {
-            setTimeout(tumblrImportLoop, 1500);
-          } else {
-            this.setState({mode: "", currentProgress: 0, totalProgress: 0, inProgress: false, showProgress: false, progressTitle: ""});
-            alert("Tumblr Following Import has completed");
-          }
-        });
-      };
-
-      // Make the first call just to check the total blogs
-      client.userFollowing({limit: 0}, (err, data) => {
-        if (err) {
-          alert("Error retrieving following: " + err);
-          console.error(err);
-          return;
-        }
-
-        // Show progress bar and kick off loop
-        this.setState({
-          mode: ST.tumblr,
-          currentProgress: 0,
-          totalProgress: data.total_blogs,
-          inProgress: true,
-          showProgress: true,
-          progressTitle: "Tumblr Following Import"});
-        tumblrImportLoop();
-      });
-    } else {
-      // We already have an import running, just show it
-      this.setState({showProgress: true});
+      case AF.videos:
+        let vResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+          {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'MP4', extensions: ['mp4']}, {name: 'MKV', extensions: ['mkv']}, {name: 'WebM', extensions: ['webm']}, {name: 'OGG', extensions: ['ogv']}], properties: ['openFile', 'multiSelections']});
+        if (!vResult) return;
+        vResult = vResult.filter((r) => isVideo(r, true));
+        this.addSources(vResult);
+        break;
     }
   }
 
-  importReddit() {
-    const reddit = new Snoowrap({
-      userAgent: this.props.config.remoteSettings.redditUserAgent,
-      clientId: this.props.config.remoteSettings.redditClientID,
-      clientSecret: "",
-      refreshToken: this.props.config.remoteSettings.redditRefreshToken,
+  addSources(sources: Array<string>) {
+    // dedup
+    let sourceURLs = this.props.library.map((s) => s.url);
+    sources = sources.filter((s) => !sourceURLs.includes(s));
+
+    let id = this.props.library.length + 1;
+    this.props.library.forEach((s) => {
+      id = Math.max(s.id + 1, id);
     });
 
-    // Define our loop
-    const redditImportLoop = () => {
-      reddit.getSubscriptions({limit: 20, after: this.state.next}).then((subscriptionListing: any) => {
-        if (subscriptionListing.length > 0) {
-          // Get the next 20 blogs
-          let subscriptions = [];
-          for (let sub of subscriptionListing) {
-            const subURL = "http://www.reddit.com" + sub.url;
-            subscriptions.push(subURL);
-          }
-
-          // dedup
-          let sourceURLs = this.props.library.map((s) => s.url);
-          subscriptions = subscriptions.filter((s) => !sourceURLs.includes(s));
-
-          let id = this.props.library.length + 1;
-          this.props.library.forEach((s) => {
-            id = Math.max(s.id + 1, id);
-          });
-
-          // Add to Library
-          let newLibrary = this.props.library;
-          for (let url of subscriptions) {
-            newLibrary = newLibrary.concat([new LibrarySource({
-              url: url,
-              id: id,
-              tags: new Array<Tag>(),
-            })]);
-            id += 1;
-          }
-          this.props.onUpdateLibrary(newLibrary);
-
-          // Loop until we run out of blogs
-          setTimeout(redditImportLoop, 1500);
-          this.setState({next: subscriptionListing[subscriptionListing.length - 1].name, currentProgress: this.state.currentProgress + 1});
-        } else {
-          this.setState({mode: "", next: "", currentProgress: 0, totalProgress: 0, inProgress: false, progressTitle: ""});
-          alert("Reddit Subscription Import has completed");
-        }
-      }).catch((err: any) => {
-        // If user is not authenticated for subscriptions, prompt to re-authenticate
-        if (err.statusCode == 403) {
-          alert("You have not authorized FlipFlip to work with Reddit subscriptions. Visit Preferences and authorize FlipFlip to work with Reddit.");
-        } else {
-          alert("Error retrieving subscriptions: " + err);
-          console.error(err);
-        }
-        this.setState({mode: "", currentProgress: 0, totalProgress: 0, inProgress: false, progressTitle: ""});
-      });
-    };
-
-    // Show progress bar and kick off loop
-    alert("Your Reddit subscriptions are being imported... You will recieve an alert when the import is finished.");
-    this.setState({mode: ST.reddit, totalProgress: 1, inProgress: true});
-    redditImportLoop();
+    let newSources = Array.from(this.props.library);
+    for (let url of sources) {
+      console.log("Adding " + id + ": ('" + url + "')");
+      newSources.unshift(new LibrarySource({
+        url: url,
+        id: id,
+        tags: new Array<Tag>(),
+      }));
+      id += 1;
+    }
+    this.props.onUpdateLibrary(newSources);
   }
 
-  importTwitter() {
-    const twitter = new Twitter({
-      consumer_key: this.props.config.remoteSettings.twitterConsumerKey,
-      consumer_secret: this.props.config.remoteSettings.twitterConsumerSecret,
-      access_token_key: this.props.config.remoteSettings.twitterAccessTokenKey,
-      access_token_secret: this.props.config.remoteSettings.twitterAccessTokenSecret,
-    });
-
-    // Define our loop
-    const twitterImportLoop = () => {
-      twitter.get('friends/list', this.state.next =="" ? {count: 200} : {count: 200, cursor: this.state.next}, (error: any, data: any) => {
-        if (error) {
-          alert("Error retrieving following: " + error);
-          console.error(error);
-          this.setState({mode: "", currentProgress: 0, totalProgress: 0, inProgress: false, progressTitle: ""});
-          return;
-        }
-
-        // Get the next 200 users
-        let following = [];
-        for (let user of data.users) {
-          const userURL = "https://twitter.com/" + user.screen_name;
-          following.push(userURL);
-        }
-
-        // dedup
-        let sourceURLs = this.props.library.map((s) => s.url);
-        following = following.filter((s) => !sourceURLs.includes(s));
-
-        let id = this.props.library.length + 1;
-        this.props.library.forEach((s) => {
-          id = Math.max(s.id + 1, id);
-        });
-
-        // Add to Library
-        let newLibrary = this.props.library;
-        for (let url of following) {
-          newLibrary = newLibrary.concat([new LibrarySource({
-            url: url,
-            id: id,
-            tags: new Array<Tag>(),
-          })]);
-          id += 1;
-        }
-        this.props.onUpdateLibrary(newLibrary);
-
-        if (data.next_cursor == 0) { // We're done
-          this.setState({mode: "", next: "", currentProgress: 0, totalProgress: 0, inProgress: false, progressTitle: ""});
-          alert("Twitter Following Import has completed");
-        } else {
-          // Loop until we run out of blogs
-          setTimeout(twitterImportLoop, 1500);
-          this.setState({mode: "", next: data.next_cursor, currentProgress: this.state.currentProgress + 1});
-        }
-      });
-    };
-
-    // Show progress bar and kick off loop
-    alert("Your Twitter Following is being imported... You will recieve an alert when the import is finished.");
-    this.setState({mode: ST.twitter, totalProgress: 1, inProgress: true});
-    twitterImportLoop();
-  }
-
-  ig: IgApiClient = null;
-  session: any = null;
-  importInstagram() {
-    const processItems = (items: any, next: any) => {
-      let following = [];
-      for (let account of items) {
-        const accountURL = "https://www.instagram.com/" + account.username + "/";
-        following.push(accountURL);
-      }
-
-      // dedup
-      let sourceURLs = this.props.library.map((s) => s.url);
-      following = following.filter((s) => !sourceURLs.includes(s));
-
-      let id = this.props.library.length + 1;
-      this.props.library.forEach((s) => {
-        id = Math.max(s.id + 1, id);
-      });
-
-      // Add to Library
-      let newLibrary = this.props.library;
-      for (let url of following) {
-        newLibrary = newLibrary.concat([new LibrarySource({
-          url: url,
-          id: id,
-          tags: new Array<Tag>(),
-        })]);
-        id += 1;
-      }
-      this.props.onUpdateLibrary(newLibrary);
-
-      // Loop until we run out of blogs
-      setTimeout(instagramImportLoop, 1500);
-      this.setState({next: next, currentProgress: this.state.currentProgress + 1});
-    };
-
-    // Define our loop
-    const instagramImportLoop = () => {
-      if (this.ig == null) {
-        this.ig = new IgApiClient();
-        this.ig.state.generateDevice(this.props.config.remoteSettings.instagramUsername);
-        this.ig.account.login(this.props.config.remoteSettings.instagramUsername, this.props.config.remoteSettings.instagramPassword).then((loggedInUser) => {
-          this.ig.state.serializeCookieJar().then((cookies) => {
-            this.session = JSON.stringify(cookies);
-            const followingFeed = this.ig.feed.accountFollowing(loggedInUser.pk);
-            followingFeed.items().then((items) => {
-              processItems(items, loggedInUser.pk + "~" + followingFeed.serialize());
-            }).catch((e) => {console.error(e);this.ig = null;});
-          }).catch((e) => {console.error(e);this.ig = null;});
-        }).catch((e) => {alert(e);console.error(e);this.ig = null;});
-      } else {
-        this.ig.state.deserializeCookieJar(JSON.parse(this.session)).then((data) => {
-          const id = (this.state.next as string).split("~")[0];
-          const feedSession = (this.state.next as string).split("~")[1];
-          const followingFeed = this.ig.feed.accountFollowing(id);
-          followingFeed.deserialize(feedSession);
-          if (!followingFeed.isMoreAvailable()) {
-            this.setState({mode: "", next: "", currentProgress: 0, totalProgress: 0, inProgress: false, progressTitle: ""});
-            alert("Instagram Following Import has completed");
-            return;
-          }
-          followingFeed.items().then((items) => {
-            processItems(items, id + "~" + followingFeed.serialize());
-          }).catch((e) => {console.error(e);this.ig = null;});
-        }).catch((e) => {console.error(e);this.ig = null;});
-      }
-    };
-
-    // Show progress bar and kick off loop
-    alert("Your Instagram Following is being imported... You will recieve an alert when the import is finished.");
-    this.setState({mode: ST.instagram, totalProgress: 1, inProgress: true});
-    instagramImportLoop();
-  }
-
-  markOffline() {
-    // If we don't have an import running
-    if (!this.state.inProgress) {
-      // Define our loop
-      const offlineLoop = () => {
-        const offset = this.state.currentProgress;
-        if (this.props.library.length == offset) {
-          this.setState({mode: "", currentProgress: 0, totalProgress: 0, inProgress: false, showProgress: false, progressTitle: ""});
-          alert("Offline Check has completed. Remote sources not available are now marked in red.");
-        } else if (this.props.library[offset].url.startsWith("http://") ||
-                   this.props.library[offset].url.startsWith("https://")) {
-          this.setState({progressTitle: "Checking...</p><p>" + this.props.library[offset].url});
-          const lastCheck = this.props.library[offset].lastCheck;
-          if (lastCheck != null) {
-            // If this link was checked within the last week, skip
-            if (new Date().getTime() - new Date(lastCheck).getTime() < 604800000) {
-              this.setState({currentProgress: offset + 1});
-              setTimeout(offlineLoop, 100);
-              return;
+  onSort(algorithm: string, ascending: boolean) {
+    const sources = Array.from(this.props.library);
+    switch (algorithm) {
+      case SF.alpha:
+        if (ascending) {
+          this.props.onUpdateLibrary(sources.sort((a, b) => {
+            const aName = getSourceType(a.url) == ST.video ? getFileName(a.url).toLowerCase() : getFileGroup(a.url).toLowerCase();
+            const bName = getSourceType(b.url) == ST.video ? getFileName(b.url).toLowerCase() : getFileGroup(b.url).toLowerCase();
+            if (aName < bName) {
+              return -1;
+            } else if (aName > bName) {
+              return 1;
+            } else {
+              const aType = getSourceType(a.url);
+              const bType = getSourceType(b.url);
+              if (aType > bType) {
+                return -1;
+              } else if (aType < bType) {
+                return 1;
+              } else {
+                return 0;
+              }
             }
-          }
-
-          this.props.library[offset].lastCheck = new Date();
-          wretch(this.props.library[offset].url)
-            .get()
-            .notFound((res) => {
-              this.props.library[offset].offline = true;
-              this.setState({currentProgress: offset + 1});
-              setTimeout(offlineLoop, 1000);
-            })
-            .res((res) => {
-              this.props.library[offset].offline = false;
-              this.setState({currentProgress: offset + 1});
-              setTimeout(offlineLoop, 1000);
-            })
-            .catch((e) => {
-              console.error(e);
-              this.props.library[offset].lastCheck = null;
-              this.setState({currentProgress: offset + 1});
-              setTimeout(offlineLoop, 100);
-            });
+          }));
         } else {
-          this.setState({progressTitle: "Checking...</p><p>" + this.props.library[offset].url, currentProgress: offset + 1});
-          this.props.library[offset].lastCheck = new Date();
-          const exists = existsSync(this.props.library[offset].url);
-          if (!exists) {
-            this.props.library[offset].offline = true;
-          }
-          setTimeout(offlineLoop, 100);
+          this.props.onUpdateLibrary(sources.sort((a, b) => {
+            const aName = getSourceType(a.url) == ST.video ? getFileName(a.url).toLowerCase() : getFileGroup(a.url).toLowerCase();
+            const bName = getSourceType(b.url) == ST.video ? getFileName(b.url).toLowerCase() : getFileGroup(b.url).toLowerCase();
+            if (aName > bName) {
+              return -1;
+            } else if (aName < bName) {
+              return 1;
+            } else {
+              const aType = getSourceType(a.url);
+              const bType = getSourceType(b.url);
+              if (aType > bType) {
+                return -1;
+              } else if (aType < bType) {
+                return 1;
+              } else {
+                return 0;
+              }
+            }
+          }));
         }
-      };
-
-      // Show progress bar and kick off loop
-      this.setState({
-        mode: "offline",
-        currentProgress: 0,
-        totalProgress: this.props.library.length,
-        inProgress: true,
-        showProgress: true});
-      offlineLoop();
-    } else {
-      // We already have an import running, just show it
-      this.setState({showProgress: true});
+        break;
+      case SF.alphaFull:
+        if (ascending) {
+          this.props.onUpdateLibrary(sources.sort((a, b) => {
+            const aUrl = a.url.toLowerCase();
+            const bUrl = b.url.toLocaleLowerCase();
+            if (aUrl < bUrl) {
+              return -1;
+            } else if (aUrl > bUrl) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }));
+        } else {
+          this.props.onUpdateLibrary(sources.sort((a, b) => {
+            const aUrl = a.url.toLowerCase();
+            const bUrl = b.url.toLocaleLowerCase();
+            if (aUrl > bUrl) {
+              return -1;
+            } else if (aUrl < bUrl) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }));
+        }
+        break;
+      case SF.date:
+        if (ascending) {
+          this.props.onUpdateLibrary(sources.sort((a, b) => {
+            if (a.id < b.id) {
+              return -1;
+            } else if (a.id > b.id) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }));
+        } else {
+          this.props.onUpdateLibrary(sources.sort((a, b) => {
+            if (a.id > b.id) {
+              return -1;
+            } else if (a.id < b.id) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }));
+        }
+        break;
+      case SF.count:
+        if (ascending) {
+          this.props.onUpdateLibrary(sources.sort((a, b) => {
+            if (a.count === undefined) a.count = 0;
+            if (b.count === undefined) b.count = 0;
+            if (a.countComplete === undefined) a.countComplete = false;
+            if (b.countComplete === undefined) b.countComplete = false;
+            if (a.count < b.count) {
+              return -1;
+            } else if (a.count > b.count) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }));
+        } else {
+          this.props.onUpdateLibrary(sources.sort((a, b) => {
+            if (a.count === undefined) a.count = 0;
+            if (b.count === undefined) b.count = 0;
+            if (a.countComplete === undefined) a.countComplete = false;
+            if (b.countComplete === undefined) b.countComplete = false;
+            if (a.count > b.count) {
+              return -1;
+            } else if (a.count < b.count) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }));
+        }
+        break;
+      case SF.type:
+        if (ascending) {
+          this.props.onUpdateLibrary(sources.sort((a, b) => {
+            const aType = getSourceType(a.url);
+            const bType = getSourceType(b.url);
+            if (aType > bType) {
+              return -1;
+            } else if (aType < bType) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }));
+        } else {
+          this.props.onUpdateLibrary(sources.sort((a, b) => {
+            const aType = getSourceType(a.url);
+            const bType = getSourceType(b.url);
+            if (aType < bType) {
+              return -1;
+            } else if (aType > bType) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }));
+        }
+        break;
     }
   }
 }
+
+export default withStyles(styles)(Library as any);
