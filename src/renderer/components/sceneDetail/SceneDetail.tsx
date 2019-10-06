@@ -1,25 +1,41 @@
 import * as React from "react";
+import {string} from "prop-types";
+import {remote} from "electron";
 import clsx from "clsx";
 
 import {
-  AppBar, Box, Container, createStyles, CssBaseline, Drawer, Fab, IconButton, ListItem,
-  ListItemIcon, ListItemText, Tab, Tabs, TextField, Theme, Toolbar, Typography, withStyles
+  AppBar, Box, Button, Container, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
+  Drawer, Fab, IconButton, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Menu, MenuItem, Tab, Tabs,
+  TextField, Theme, Toolbar, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
+import AddIcon from '@material-ui/icons/Add';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
+import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import BuildIcon from '@material-ui/icons/Build';
 import CollectionsIcon from '@material-ui/icons/Collections';
-import DeleteIcon from '@material-ui/icons/Delete';
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
+import FolderIcon from '@material-ui/icons/Folder';
+import HttpIcon from '@material-ui/icons/Http';
+import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
+import MovieIcon from '@material-ui/icons/Movie';
 import PhotoFilterIcon from '@material-ui/icons/PhotoFilter';
 import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import PublishIcon from '@material-ui/icons/Publish';
 import SaveIcon from '@material-ui/icons/Save';
+import SortIcon from '@material-ui/icons/Sort';
 
-import {OF, WF} from "../../data/const";
+import {AF, MO, OF, SF, ST, WF} from "../../data/const";
+import {getFileGroup, getFileName, getSourceType, isVideo} from "../../data/utils";
+import en from "../../data/en";
 import Config from "../../data/Config";
 import Scene from "../../data/Scene";
 import LibrarySource from "../library/LibrarySource";
+import Tag from "../library/Tag";
+import SourceList from "./SourceList";
 import SceneEffectGroup from "./SceneEffectGroup";
 import ImageVideoGroup from "./ImageVideoGroup";
 import CrossFadeGroup from "./CrossFadeGroup";
@@ -27,7 +43,6 @@ import ZoomMoveGroup from "./ZoomMoveGroup";
 import StrobeGroup from "./StrobeGroup";
 import AudioGroup from "./AudioGroup";
 import TextGroup from "./TextGroup";
-import SourcePicker from "./SourcePicker";
 
 const drawerWidth = 240;
 
@@ -83,17 +98,26 @@ const styles = (theme: Theme) => createStyles({
     flexGrow: 1,
     height: '100vh',
     overflow: 'auto',
+    backgroundColor: (theme.palette.primary as any)["50"],
   },
   container: {
-    padding: theme.spacing(1),
+    padding: theme.spacing(0),
   },
   tab: {
     width: drawerWidth,
     height: theme.spacing(12),
-    transition: theme.transitions.create(['width', 'margin'], {
+    transition: theme.transitions.create(['width', 'margin', 'background', 'opacity'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
+    '&:hover': {
+      backgroundColor: 'rgba(0, 0, 0, 0.08)',
+      opacity: 1,
+      transition: theme.transitions.create(['background', 'opacity'], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+    },
   },
   tabClose: {
     minWidth: 0,
@@ -155,6 +179,66 @@ const styles = (theme: Theme) => createStyles({
       duration: theme.transitions.duration.enteringScreen,
     }),
   },
+  addMenuButton: {
+    backgroundColor: theme.palette.primary.dark,
+    margin: 0,
+    top: 'auto',
+    right: 20,
+    bottom: 20,
+    left: 'auto',
+    position: 'fixed',
+  },
+  sortMenuButton: {
+    backgroundColor: theme.palette.secondary.dark,
+    margin: 0,
+    top: 'auto',
+    right: 80,
+    bottom: 20,
+    left: 'auto',
+    position: 'fixed',
+  },
+  addButton: {
+    backgroundColor: theme.palette.primary.main,
+    margin: 0,
+    top: 'auto',
+    right: 28,
+    bottom: 25,
+    left: 'auto',
+    position: 'fixed',
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  addURLButton: {
+    marginBottom: 60
+  },
+  addDirectoryButton: {
+    marginBottom: 115
+  },
+  addVideoButton: {
+    marginBottom: 170
+  },
+  libraryImportButton: {
+    marginBottom: 225,
+  },
+  removeAllButton: {
+    backgroundColor: theme.palette.error.main,
+    marginBottom: 280,
+  },
+  addButtonClose: {
+    marginBottom: 0,
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  icon: {
+    color: theme.palette.primary.contrastText,
+  },
+  sortMenu: {
+    width: 200,
+  },
   fill: {
     flexGrow: 1,
   },
@@ -168,11 +252,11 @@ class SceneDetail extends React.Component {
     config: Config,
     scene: Scene,
     goBack(): void,
-    onBlacklistFile(sourceURL: string, fileToBlacklist: string): void,
+    onClearBlacklist(sourceURL: string): void,
     onClip(source: LibrarySource): void,
     onDelete(scene: Scene): void,
     onExport(scene: Scene): void,
-    onLibraryImport(scene: Scene): void,
+    onLibraryImport(): void,
     onPlay(scene: Scene): void,
     onSaveAsScene(scene: Scene): void,
     onSetupGrid(scene: Scene): void,
@@ -183,6 +267,8 @@ class SceneDetail extends React.Component {
     isEditingName: this.props.autoEdit,
     drawerOpen: false,
     drawerHover: false,
+    menuAnchorEl: null as any,
+    openMenu: null as string,
     openTab: 2,
   };
 
@@ -192,26 +278,29 @@ class SceneDetail extends React.Component {
     const classes = this.props.classes;
     const open = this.state.drawerOpen;
     return (
-      <div className={classes.root}>
-        <CssBaseline />
+      <div className={classes.root} onClick={this.onClickCloseMenu.bind(this)}>
+
         <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
           <Toolbar>
-            <IconButton
-              edge="start"
-              color="inherit"
-              aria-label="Back"
-              onClick={this.props.goBack.bind(this)}>
-              <ArrowBackIcon />
-            </IconButton>
+            <Tooltip title="Back" placement="right-end">
+              <IconButton
+                edge="start"
+                color="inherit"
+                aria-label="Back"
+                onClick={this.props.goBack.bind(this)}>
+                <ArrowBackIcon />
+              </IconButton>
+            </Tooltip>
+
             {this.state.isEditingName && (
               <form onSubmit={this.endEditingName.bind(this)} className={classes.titleField}>
                 <TextField
                   autoFocus
+                  fullWidth
                   id="title"
                   value={this.props.scene.name}
-                  margin="normal"
+                  margin="none"
                   ref={this.nameInputRef}
-                  className={classes.titleField}
                   inputProps={{className: classes.titleInput}}
                   onBlur={this.endEditingName.bind(this)}
                   onChange={this.onChangeName.bind(this)}
@@ -228,6 +317,7 @@ class SceneDetail extends React.Component {
                 <div className={classes.fill}/>
               </React.Fragment>
             )}
+
             <IconButton
               edge="start"
               color="inherit"
@@ -237,6 +327,7 @@ class SceneDetail extends React.Component {
             </IconButton>
           </Toolbar>
         </AppBar>
+
         <Drawer
           variant="permanent"
           classes={{paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose)}}
@@ -244,6 +335,7 @@ class SceneDetail extends React.Component {
           onMouseLeave={this.onMouseLeaveDrawer.bind(this)}
           open={false}>
           <div className={classes.appBarSpacer} />
+
           <div>
             <Tabs
               orientation="vertical"
@@ -260,6 +352,7 @@ class SceneDetail extends React.Component {
             </Tabs>
           </div>
           <div className={classes.fill}/>
+
           <div>
             {(this.props.scene.tagWeights || this.props.scene.sceneWeights) && (
               <ListItem button onClick={this.props.onSaveAsScene.bind(this, this.props.scene)}>
@@ -275,15 +368,37 @@ class SceneDetail extends React.Component {
               </ListItemIcon>
               <ListItemText primary="Export Scene" />
             </ListItem>
-            <ListItem button onClick={this.props.onDelete.bind(this, this.props.scene)}
+            <ListItem button onClick={this.onDeleteScene.bind(this, this.props.scene)}
                       className={classes.deleteItem}>
               <ListItemIcon>
-                <DeleteIcon color="error"/>
+                <DeleteForeverIcon color="error"/>
               </ListItemIcon>
               <ListItemText primary="Delete Scene" />
             </ListItem>
+            <Dialog
+              open={this.state.openMenu == MO.deleteAlert}
+              onClose={this.onCloseDialog.bind(this)}
+              aria-labelledby="delete-title"
+              aria-describedby="delete-description">
+              <DialogTitle id="Delete-title">Delete '{this.props.scene.name}'</DialogTitle>
+              <DialogContent>
+                <DialogContentText id="delete-description">
+                  Are you sure you want to delete {this.props.scene.name}?
+                  It will be automatically removed from all overlays and grids.
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+                  Cancel
+                </Button>
+                <Button onClick={this.onFinishDeleteScene.bind(this)} color="primary">
+                  OK
+                </Button>
+              </DialogActions>
+            </Dialog>
           </div>
         </Drawer>
+
         <Fab
           className={clsx(classes.toggle, !open && classes.toggleClose, !this.state.drawerHover && classes.toggleHide)}
           color="primary"
@@ -294,16 +409,18 @@ class SceneDetail extends React.Component {
           onClick={this.onToggleDrawer.bind(this)}>
           <ArrowForwardIosIcon className={clsx(classes.toggleIcon, open && classes.toggleIconOpen)}/>
         </Fab>
+
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
           <Container maxWidth={false} className={classes.container}>
+
             <Typography
               component="div"
               role="tabpanel"
               hidden={this.state.openTab !== 0}
               id="vertical-tabpanel-0"
               aria-labelledby="vertical-tab-0">
-              <Box p={3}>
+              <Box>
                 <SceneEffectGroup
                   scene={this.props.scene}
                   isTagging={false}
@@ -318,13 +435,14 @@ class SceneDetail extends React.Component {
                   onUpdateScene={this.props.onUpdateScene.bind(this)}/>
               </Box>
             </Typography>
+
             <Typography
               component="div"
               role="tabpanel"
               hidden={this.state.openTab !== 1}
               id="vertical-tabpanel-1"
               aria-labelledby="vertical-tab-1">
-              <Box p={3}>
+              <Box>
                 <CrossFadeGroup
                   scene={this.props.scene}
                   onUpdateScene={this.props.onUpdateScene.bind(this)} />
@@ -347,38 +465,170 @@ class SceneDetail extends React.Component {
                   onUpdateScene={this.props.onUpdateScene.bind(this)}/>
               </Box>
             </Typography>
+
             <Typography
               component="div"
               role="tabpanel"
               hidden={this.state.openTab !== 2}
               id="vertical-tabpanel-2"
               aria-labelledby="vertical-tab-2">
-              <Box p={1}>
-                <SourcePicker
-                  sources={this.props.scene.sources}
-                  config={this.props.config}
-                  yOffset={0}
-                  filters={[]}
-                  selected={[]}
-                  emptyMessage="You haven't added any sources to this Scene yet."
-                  isSelect={false}
-                  isBatchTag={false}
-                  onUpdateSources={this.onChangeSources.bind(this)}
-                  onClip={this.props.onClip}
-                  onBlacklistFile={this.props.onBlacklistFile}
-                  onOpenLibraryImport={this.props.onLibraryImport.bind(this, this.props.scene)}
-                  onChangeTextKind={this.changeKey.bind(this, 'textKind').bind(this)}
-                  onChangeTextSource={this.changeKey.bind(this, 'textSource').bind(this)} />
-              </Box>
+              <SourceList
+                config={this.props.config}
+                newMenuOpen={this.state.openMenu == MO.new}
+                sources={this.props.scene.sources}
+                onClearBlacklist={this.props.onClearBlacklist.bind(this)}
+                onClip={this.props.onClip.bind(this)}
+                onUpdateSources={this.onUpdateSources.bind(this)} />
             </Typography>
+
           </Container>
         </main>
+
+        {this.state.openTab == 2 && (
+          <React.Fragment>
+            <Tooltip title="Remove All Sources"  placement="left">
+              <Fab
+                className={clsx(classes.addButton, classes.removeAllButton, this.state.openMenu != MO.new && classes.addButtonClose)}
+                onClick={this.onRemoveAll.bind(this)}
+                size="small">
+                <DeleteSweepIcon className={classes.icon} />
+              </Fab>
+            </Tooltip>
+            <Dialog
+              open={this.state.openMenu == MO.removeAllAlert}
+              onClose={this.onCloseDialog.bind(this)}
+              aria-labelledby="remove-all-title"
+              aria-describedby="remove-all-description">
+              <DialogTitle id="remove-all-title">Remove All Sources</DialogTitle>
+              <DialogContent>
+                <DialogContentText id="remove-all-description">
+                  Are you sure you want to remove all sources from this scene?
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+                  Cancel
+                </Button>
+                <Button onClick={this.onFinishRemoveAll.bind(this)} color="primary">
+                  OK
+                </Button>
+              </DialogActions>
+            </Dialog>
+            <Tooltip title="From Library"  placement="left">
+              <Fab
+                className={clsx(classes.addButton, classes.libraryImportButton, this.state.openMenu != MO.new && classes.addButtonClose)}
+                onClick={this.onAddSource.bind(this, AF.library)}
+                size="small">
+                <LocalLibraryIcon className={classes.icon} />
+              </Fab>
+            </Tooltip>
+            <Tooltip title="Local Video"  placement="left">
+              <Fab
+                className={clsx(classes.addButton, classes.addVideoButton, this.state.openMenu != MO.new && classes.addButtonClose)}
+                onClick={this.onAddSource.bind(this, AF.videos)}
+                size="small">
+                <MovieIcon className={classes.icon} />
+              </Fab>
+            </Tooltip>
+            <Tooltip title="Local Directory"  placement="left">
+              <Fab
+                className={clsx(classes.addButton, classes.addDirectoryButton, this.state.openMenu != MO.new && classes.addButtonClose)}
+                onClick={this.onAddSource.bind(this, AF.directory)}
+                size="small">
+                <FolderIcon className={classes.icon} />
+              </Fab>
+            </Tooltip>
+            <Tooltip title="URL"  placement="left">
+              <Fab
+                className={clsx(classes.addButton, classes.addURLButton, this.state.openMenu != MO.new && classes.addButtonClose)}
+                onClick={this.onAddSource.bind(this, AF.url)}
+                size="small">
+                <HttpIcon className={classes.icon} />
+              </Fab>
+            </Tooltip>
+            <Fab
+              className={classes.addMenuButton}
+              onClick={this.onToggleNewMenu.bind(this)}
+              size="large">
+              <AddIcon className={classes.icon} />
+            </Fab>
+
+            {this.props.scene.sources.length >= 2 && (
+              <React.Fragment>
+                <Fab
+                  className={classes.sortMenuButton}
+                  aria-haspopup="true"
+                  aria-controls="sort-menu"
+                  aria-label="Sort Sources"
+                  onClick={this.onOpenSortMenu.bind(this)}
+                  size="medium">
+                  <SortIcon className={classes.icon} />
+                </Fab>
+                <Menu
+                  id="sort-menu"
+                  elevation={1}
+                  anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'center',
+                  }}
+                  transformOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                  }}
+                  getContentAnchorEl={null}
+                  anchorEl={this.state.menuAnchorEl}
+                  keepMounted
+                  classes={{paper: classes.sortMenu}}
+                  open={this.state.openMenu == MO.sort}
+                  onClose={this.onClickCloseMenu.bind(this)}>
+                  {Object.values(SF).map((sf) =>
+                    <MenuItem key={sf}>
+                      <ListItemText primary={en.get(sf)}/>
+                      <ListItemSecondaryAction>
+                        <IconButton edge="end" onClick={this.onSort.bind(this, sf, true)}>
+                          <ArrowUpwardIcon/>
+                        </IconButton>
+                        <IconButton edge="end" onClick={this.onSort.bind(this, sf, false)}>
+                          <ArrowDownwardIcon/>
+                        </IconButton>
+                      </ListItemSecondaryAction>
+                    </MenuItem>
+                  )}
+                </Menu>
+              </React.Fragment>
+            )}
+          </React.Fragment>
+          )}
       </div>
     )
   }
 
   onToggleDrawer() {
     this.setState({drawerOpen: !this.state.drawerOpen});
+  }
+
+  onToggleNewMenu() {
+    this.setState({openMenu: this.state.openMenu == MO.new ? null : MO.new});
+  }
+
+  onOpenSortMenu(e: MouseEvent) {
+    this.setState({menuAnchorEl: e.currentTarget, openMenu: MO.sort});
+  }
+
+  onClickCloseMenu(e: MouseEvent) {
+    if (this.state.openMenu == MO.sort || this.state.openMenu == MO.new) {
+      let className = (e.target as any).className;
+      if (!(className instanceof string) && className.baseVal != null) {
+        className = className.baseVal;
+      }
+      if (!className.includes("SceneDetail-icon-") && !className.includes("MuiFab-")) {
+        this.setState({menuAnchorEl: null, openMenu: null});
+      }
+    }
+  }
+
+  onCloseDialog() {
+    this.setState({menuAnchorEl: null, openMenu: null});
   }
 
   onChangeTab(e: any, newTab: number) {
@@ -414,7 +664,7 @@ class SceneDetail extends React.Component {
     this.update((s) => { s.name = e.currentTarget.value; });
   }
 
-  onChangeSources(sources: Array<LibrarySource>) {
+  onUpdateSources(sources: Array<LibrarySource>) {
     if (this.props.scene.orderFunction == OF.strict && (sources.length > 1 && this.props.scene.weightFunction == WF.sources)) {
       this.update((s) => {
         s.sources = sources;
@@ -425,6 +675,229 @@ class SceneDetail extends React.Component {
       this.update((s) => {
         s.sources = sources;
       });
+    }
+  }
+
+  onDeleteScene() {
+    this.setState({openMenu: MO.deleteAlert});
+  }
+
+  onFinishDeleteScene() {
+    this.props.onDelete(this.props.scene);
+  }
+
+  onRemoveAll() {
+    this.setState({openMenu: MO.removeAllAlert});
+  }
+
+  onFinishRemoveAll() {
+    this.onUpdateSources([]);
+    this.onCloseDialog();
+  }
+
+  onAddSource(type: string) {
+    switch (type) {
+      case AF.url:
+        this.addSources([""]);
+        break;
+
+      case AF.directory:
+        let dResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory', 'multiSelections']});
+        if (!dResult) return;
+        this.addSources(dResult);
+        break;
+
+      case AF.videos:
+        let vResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+          {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'MP4', extensions: ['mp4']}, {name: 'MKV', extensions: ['mkv']}, {name: 'WebM', extensions: ['webm']}, {name: 'OGG', extensions: ['ogv']}], properties: ['openFile', 'multiSelections']});
+        if (!vResult) return;
+        vResult = vResult.filter((r) => isVideo(r, true));
+        this.addSources(vResult);
+        break;
+
+      case AF.library:
+        this.props.onLibraryImport();
+        break;
+    }
+  }
+
+  addSources(sources: Array<string>) {
+    // dedup
+    let sourceURLs = this.props.scene.sources.map((s) => s.url);
+    sources = sources.filter((s) => !sourceURLs.includes(s));
+
+    let id = this.props.scene.sources.length + 1;
+    this.props.scene.sources.forEach((s) => {
+      id = Math.max(s.id + 1, id);
+    });
+
+    let newSources = Array.from(this.props.scene.sources);
+    for (let url of sources) {
+      console.log("Adding " + id + ": ('" + url + "')");
+      newSources.unshift(new LibrarySource({
+        url: url,
+        id: id,
+        tags: new Array<Tag>(),
+      }));
+      id += 1;
+    }
+    this.onUpdateSources(newSources);
+  }
+
+  onSort(algorithm: string, ascending: boolean) {
+    const sources = Array.from(this.props.scene.sources);
+    switch (algorithm) {
+      case SF.alpha:
+        if (ascending) {
+          this.onUpdateSources(sources.sort((a, b) => {
+            const aName = getSourceType(a.url) == ST.video ? getFileName(a.url).toLowerCase() : getFileGroup(a.url).toLowerCase();
+            const bName = getSourceType(b.url) == ST.video ? getFileName(b.url).toLowerCase() : getFileGroup(b.url).toLowerCase();
+            if (aName < bName) {
+              return -1;
+            } else if (aName > bName) {
+              return 1;
+            } else {
+              const aType = getSourceType(a.url);
+              const bType = getSourceType(b.url);
+              if (aType > bType) {
+                return -1;
+              } else if (aType < bType) {
+                return 1;
+              } else {
+                return 0;
+              }
+            }
+          }));
+        } else {
+          this.onUpdateSources(sources.sort((a, b) => {
+            const aName = getSourceType(a.url) == ST.video ? getFileName(a.url).toLowerCase() : getFileGroup(a.url).toLowerCase();
+            const bName = getSourceType(b.url) == ST.video ? getFileName(b.url).toLowerCase() : getFileGroup(b.url).toLowerCase();
+            if (aName > bName) {
+              return -1;
+            } else if (aName < bName) {
+              return 1;
+            } else {
+              const aType = getSourceType(a.url);
+              const bType = getSourceType(b.url);
+              if (aType > bType) {
+                return -1;
+              } else if (aType < bType) {
+                return 1;
+              } else {
+                return 0;
+              }
+            }
+          }));
+        }
+        break;
+      case SF.alphaFull:
+        if (ascending) {
+          this.onUpdateSources(sources.sort((a, b) => {
+            const aUrl = a.url.toLowerCase();
+            const bUrl = b.url.toLocaleLowerCase();
+            if (aUrl < bUrl) {
+              return -1;
+            } else if (aUrl > bUrl) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }));
+        } else {
+          this.onUpdateSources(sources.sort((a, b) => {
+            const aUrl = a.url.toLowerCase();
+            const bUrl = b.url.toLocaleLowerCase();
+            if (aUrl > bUrl) {
+              return -1;
+            } else if (aUrl < bUrl) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }));
+        }
+        break;
+      case SF.date:
+        if (ascending) {
+          this.onUpdateSources(sources.sort((a, b) => {
+            if (a.id < b.id) {
+              return -1;
+            } else if (a.id > b.id) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }));
+        } else {
+          this.onUpdateSources(sources.sort((a, b) => {
+            if (a.id > b.id) {
+              return -1;
+            } else if (a.id < b.id) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }));
+        }
+        break;
+      case SF.count:
+        if (ascending) {
+          this.onUpdateSources(sources.sort((a, b) => {
+            if (a.count === undefined) a.count = 0;
+            if (b.count === undefined) b.count = 0;
+            if (a.countComplete === undefined) a.countComplete = false;
+            if (b.countComplete === undefined) b.countComplete = false;
+            if (a.count < b.count) {
+              return -1;
+            } else if (a.count > b.count) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }));
+        } else {
+          this.onUpdateSources(sources.sort((a, b) => {
+            if (a.count === undefined) a.count = 0;
+            if (b.count === undefined) b.count = 0;
+            if (a.countComplete === undefined) a.countComplete = false;
+            if (b.countComplete === undefined) b.countComplete = false;
+            if (a.count > b.count) {
+              return -1;
+            } else if (a.count < b.count) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }));
+        }
+        break;
+      case SF.type:
+        if (ascending) {
+          this.onUpdateSources(sources.sort((a, b) => {
+            const aType = getSourceType(a.url);
+            const bType = getSourceType(b.url);
+            if (aType > bType) {
+              return -1;
+            } else if (aType < bType) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }));
+        } else {
+          this.onUpdateSources(sources.sort((a, b) => {
+            const aType = getSourceType(a.url);
+            const bType = getSourceType(b.url);
+            if (aType < bType) {
+              return -1;
+            } else if (aType > bType) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }));
+        }
+        break;
     }
   }
 }

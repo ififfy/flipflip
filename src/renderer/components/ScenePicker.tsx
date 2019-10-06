@@ -1,22 +1,26 @@
 import * as React from 'react';
 import {ipcRenderer, remote} from "electron";
+import {string} from "prop-types";
 import wretch from "wretch";
 import clsx from 'clsx';
 import Sortable from "react-sortablejs";
 
 import {
-  AppBar, Badge, Button, Card, CardActionArea, CardContent, Chip, Container, createStyles,
-  CssBaseline, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider,
-  Drawer, IconButton, Link, ListItem, ListItemIcon, ListItemText, Menu, MenuItem, Theme,
-  Toolbar, Tooltip, Typography, withStyles
+  AppBar, Badge, Button, Card, CardActionArea, CardContent, Chip, Container, createStyles, Dialog, DialogActions,
+  DialogContent, DialogContentText, DialogTitle, Divider, Drawer, Fab, IconButton, Link, ListItem, ListItemIcon,
+  ListItemSecondaryAction, ListItemText, Menu, MenuItem, Theme, Toolbar, Tooltip, Typography, withStyles
 } from "@material-ui/core";
-import MenuIcon from '@material-ui/icons/Menu';
+
 import AddIcon from '@material-ui/icons/Add';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
+import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
+import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import CasinoIcon from '@material-ui/icons/Casino';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import HelpIcon from '@material-ui/icons/Help';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
+import MenuIcon from '@material-ui/icons/Menu';
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import SettingsIcon from '@material-ui/icons/Settings';
 import SortIcon from '@material-ui/icons/Sort';
@@ -103,7 +107,6 @@ const styles = (theme: Theme) => createStyles({
     }),
   },
   drawerPaperClose: {
-    overflowX: 'hidden',
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
@@ -121,9 +124,6 @@ const styles = (theme: Theme) => createStyles({
     paddingLeft: 20,
     backgroundColor: theme.palette.primary.main,
     ...theme.mixins.toolbar,
-  },
-  drawerText: {
-    whiteSpace: 'normal',
   },
   drawerBottom: {
     width: drawerWidth,
@@ -161,9 +161,10 @@ const styles = (theme: Theme) => createStyles({
     overflow: 'auto',
   },
   container: {
-    padding: theme.spacing(1),
+    padding: theme.spacing(0),
   },
   sceneList: {
+    padding: theme.spacing(1),
     display: 'flex',
     flexWrap: 'wrap',
     overflowY: 'auto',
@@ -180,6 +181,68 @@ const styles = (theme: Theme) => createStyles({
   },
   sceneTitle: {
     textAlign: 'center',
+  },
+  addMenuButton: {
+    backgroundColor: theme.palette.primary.dark,
+    margin: 0,
+    top: 'auto',
+    right: 20,
+    bottom: 20,
+    left: 'auto',
+    position: 'fixed',
+  },
+  sortMenuButton: {
+    backgroundColor: theme.palette.secondary.dark,
+    margin: 0,
+    top: 'auto',
+    right: 80,
+    bottom: 20,
+    left: 'auto',
+    position: 'fixed',
+  },
+  randomButton: {
+    backgroundColor: theme.palette.secondary.light,
+    margin: 0,
+    top: 'auto',
+    right: 135,
+    bottom: 20,
+    left: 'auto',
+    position: 'fixed',
+  },
+  addButton: {
+    backgroundColor: theme.palette.primary.main,
+    margin: 0,
+    top: 'auto',
+    right: 28,
+    bottom: 25,
+    left: 'auto',
+    position: 'fixed',
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  addSceneButton: {
+    marginBottom: 60
+  },
+  addGeneratorButton: {
+    marginBottom: 115
+  },
+  importSceneButton: {
+    marginBottom: 170
+  },
+  addButtonClose: {
+    marginBottom: 0,
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  icon: {
+    color: theme.palette.primary.contrastText,
+  },
+  sortMenu: {
+    width: 200,
   },
   fill: {
     flexGrow: 1,
@@ -210,23 +273,23 @@ class ScenePicker extends React.Component {
     newVersionLink: "",
     isFirstWindow: false,
     menuAnchorEl: null as any,
-    menuOpen: null as string,
+    openMenu: null as string,
   };
 
   render() {
     const classes = this.props.classes;
     const open = this.state.drawerOpen;
     return (
-      <div className={classes.root}>
-        <CssBaseline />
+      <div className={classes.root} onClick={this.onClickCloseMenu.bind(this)}>
+
         <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
           <Toolbar>
             {!open && this.state.isFirstWindow && (
               <IconButton
                 edge="start"
                 color="inherit"
-                aria-label="Open Drawer"
-                onClick={this.onDrawerOpen.bind(this)}
+                aria-label="Toggle Drawer"
+                onClick={this.onToggleDrawer.bind(this)}
                 className={classes.toolbarButton}>
                 <MenuIcon />
               </IconButton>
@@ -252,17 +315,19 @@ class ScenePicker extends React.Component {
             )}
           </Toolbar>
         </AppBar>
+
         {this.state.isFirstWindow && (
           <Drawer
             variant="permanent"
             classes={{paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose)}}
             open={open}>
+
             <div className={classes.drawerToolbar}>
               <IconButton
                 edge="start"
                 color="inherit"
-                aria-label="Close Drawer"
-                onClick={this.onDrawerClose.bind(this)}>
+                aria-label="Toggle Drawer"
+                onClick={this.onToggleDrawer.bind(this)}>
                 <MenuIcon />
               </IconButton>
               <VSpin>
@@ -272,7 +337,9 @@ class ScenePicker extends React.Component {
                 FlipFlip
               </Typography>
             </div>
+
             <Divider />
+
             <div>
               <ListItem button onClick={this.props.onOpenLibrary.bind(this)}>
                 <ListItemIcon>
@@ -289,98 +356,9 @@ class ScenePicker extends React.Component {
                 )}
               </ListItem>
             </div>
+
             <Divider />
-            <div>
-              <ListItem button aria-haspopup="true"
-                        aria-controls="new-menu"
-                        aria-label="New Scene"
-                        onClick={this.onOpenNewMenu.bind(this)}>
-                <ListItemIcon>
-                  <AddCircleIcon />
-                </ListItemIcon>
-                <ListItemText primary="New Scene" />
-              </ListItem>
-              <Menu
-                id="new-menu"
-                elevation={1}
-                anchorOrigin={{
-                  vertical: 'center',
-                  horizontal: 'right',
-                }}
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'left',
-                }}
-                getContentAnchorEl={null}
-                anchorEl={this.state.menuAnchorEl}
-                keepMounted
-                open={this.state.menuOpen == MO.new}
-                onClose={this.onCloseMenu.bind(this)}>
-                <MenuItem onClick={this.props.onAddScene.bind(this)}>
-                  <ListItemIcon>
-                    <AddIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary="New Scene"/>
-                </MenuItem>
-                <MenuItem disabled={!this.props.canGenerate}
-                          onClick={this.props.canGenerate ? this.props.onAddGenerator.bind(this) : this.nop}>
-                  <ListItemIcon>
-                    <AddIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary="New Generator"/>
-                </MenuItem>
-                <MenuItem onClick={this.props.onImportScene.bind(this)}>
-                  <ListItemIcon>
-                    <GetAppIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary="Import Scene"/>
-                </MenuItem>
-              </Menu>
-              {this.props.scenes.length > 1 && (
-                <React.Fragment>
-                  <ListItem button aria-haspopup="true"
-                            aria-controls="sort-menu"
-                            aria-label="Sort Scenes"
-                            onClick={this.onOpenSortMenu.bind(this)}>
-                    <ListItemIcon>
-                      <SortIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Sort Scenes" />
-                  </ListItem>
-                  <Menu
-                    id="sort-menu"
-                    elevation={1}
-                    anchorOrigin={{
-                      vertical: 'center',
-                      horizontal: 'right',
-                    }}
-                    transformOrigin={{
-                      vertical: 'top',
-                      horizontal: 'left',
-                    }}
-                    getContentAnchorEl={null}
-                    anchorEl={this.state.menuAnchorEl}
-                    keepMounted
-                    open={this.state.menuOpen == MO.sort}
-                    onClose={this.onCloseMenu.bind(this)}>
-                    {[SF.alphaA, SF.alphaD, SF.dateA, SF.dateD, SF.type].map((sf) =>
-                      <MenuItem key={sf} onClick={this.onSort.bind(this, sf)}>
-                        <ListItemText primary={en.get(sf)}/>
-                      </MenuItem>
-                    )}
-                  </Menu>
-                </React.Fragment>
-              )}
-              {this.props.scenes.length > 1 && (
-                <ListItem button onClick={this.onRandomScene.bind(this)}>
-                  <ListItemIcon>
-                    <CasinoIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Random Scene" />
-                </ListItem>
-              )}
-            </div>
-            <Divider />
+
             <div>
               {this.props.scenes.length > 0 && (
                 <React.Fragment>
@@ -390,9 +368,10 @@ class ScenePicker extends React.Component {
                     </ListItemIcon>
                     <ListItemText primary="New Window" />
                   </ListItem>
+
                   <Dialog
-                    open={this.state.menuOpen == MO.alert}
-                    onClose={this.onCloseMenu.bind(this)}
+                    open={this.state.openMenu == MO.newWindowAlert}
+                    onClose={this.onCloseDialog.bind(this)}
                     aria-labelledby="new-window-title"
                     aria-describedby="new-window-description">
                     <DialogTitle id="new-window-title">New Window Warning</DialogTitle>
@@ -402,7 +381,7 @@ class ScenePicker extends React.Component {
                       </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                      <Button onClick={this.newWindow.bind(this, true)} color="primary">
+                      <Button onClick={this.newWindow.bind(this, true)} color="secondary">
                         Don't show again
                       </Button>
                       <Button onClick={this.newWindow.bind(this, false)} color="primary">
@@ -426,6 +405,7 @@ class ScenePicker extends React.Component {
               </ListItem>
             </div>
             <div className={classes.fill}/>
+
             <div className={clsx(classes.drawerBottom, !open && classes.drawerBottomClose)}>
               <Typography variant="body2" color="inherit" className={classes.drawerText}>
                 Questions? Suggestions?
@@ -435,6 +415,7 @@ class ScenePicker extends React.Component {
             </div>
           </Drawer>
         )}
+
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
           <Container maxWidth={false} className={classes.container}>
@@ -465,6 +446,95 @@ class ScenePicker extends React.Component {
             </Sortable>
           </Container>
         </main>
+
+        {this.state.isFirstWindow &&  (
+          <React.Fragment>
+            <Tooltip title="Import Scene"  placement="left">
+              <Fab
+                className={clsx(classes.addButton, classes.importSceneButton, this.state.openMenu != MO.new && classes.addButtonClose)}
+                onClick={this.props.onImportScene.bind(this)}
+                size="small">
+                <GetAppIcon className={classes.icon} />
+              </Fab>
+            </Tooltip>
+            <Tooltip title="Add Scene Generator"  placement="left">
+              <Fab
+                className={clsx(classes.addButton, classes.addGeneratorButton, this.state.openMenu != MO.new && classes.addButtonClose)}
+                onClick={this.props.canGenerate ? this.props.onAddGenerator.bind(this) : this.nop}
+                disabled={!this.props.canGenerate}
+                size="small">
+                <AddCircleOutlineIcon className={classes.icon} />
+              </Fab>
+            </Tooltip>
+            <Tooltip title="Add Scene"  placement="left">
+              <Fab
+                className={clsx(classes.addButton, classes.addSceneButton, this.state.openMenu != MO.new && classes.addButtonClose)}
+                onClick={this.props.onAddScene.bind(this)}
+                size="small">
+                <AddCircleIcon className={classes.icon} />
+              </Fab>
+            </Tooltip>
+            <Fab
+              className={classes.addMenuButton}
+              onClick={this.onToggleNewMenu.bind(this)}
+              size="large">
+              <AddIcon className={classes.icon} />
+            </Fab>
+
+            {this.props.scenes.length >= 2 && (
+              <React.Fragment>
+                <Fab
+                  className={classes.sortMenuButton}
+                  aria-haspopup="true"
+                  aria-controls="sort-menu"
+                  aria-label="Sort Scenes"
+                  onClick={this.onOpenSortMenu.bind(this)}
+                  size="medium">
+                  <SortIcon className={classes.icon} />
+                </Fab>
+                <Menu
+                  id="sort-menu"
+                  elevation={1}
+                  anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'center',
+                  }}
+                  transformOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                  }}
+                  getContentAnchorEl={null}
+                  anchorEl={this.state.menuAnchorEl}
+                  keepMounted
+                  classes={{paper: classes.sortMenu}}
+                  open={this.state.openMenu == MO.sort}
+                  onClose={this.onClickCloseMenu.bind(this)}>
+                  {[SF.alpha, SF.date, SF.count, SF.type].map((sf) =>
+                    <MenuItem key={sf}>
+                      <ListItemText primary={en.get(sf)}/>
+                      <ListItemSecondaryAction>
+                        <IconButton edge="end" onClick={this.onSort.bind(this, sf, true)}>
+                          <ArrowUpwardIcon/>
+                        </IconButton>
+                        <IconButton edge="end" onClick={this.onSort.bind(this, sf, false)}>
+                          <ArrowDownwardIcon/>
+                        </IconButton>
+                      </ListItemSecondaryAction>
+                    </MenuItem>
+                  )}
+                </Menu>
+              </React.Fragment>
+            )}
+          </React.Fragment>
+        )}
+        <Tooltip title="Random Scene">
+          <Fab
+            className={classes.randomButton}
+            onClick={this.onRandomScene.bind(this)}
+            size="small">
+            <CasinoIcon className={classes.icon} />
+          </Fab>
+        </Tooltip>
       </div>
     );
   }
@@ -526,15 +596,15 @@ class ScenePicker extends React.Component {
 
   onNewWindow() {
     if (!this.props.config.newWindowAlerted) {
-      this.setState({menuOpen: MO.alert});
+      this.setState({openMenu: MO.newWindowAlert});
     } else {
       this.newWindow(false);
     }
   }
 
   newWindow(hideFutureWarnings: boolean) {
-    if (this.state.menuOpen == MO.alert) {
-      this.setState({menuOpen: null});
+    if (this.state.openMenu == MO.newWindowAlert) {
+      this.setState({openMenu: null});
       if (hideFutureWarnings) {
         let newConfig = this.props.config;
         newConfig.newWindowAlerted = true;
@@ -544,6 +614,38 @@ class ScenePicker extends React.Component {
     ipcRenderer.send(IPC.newWindow);
   }
 
+  onToggleDrawer() {
+    this.setState({drawerOpen: !this.state.drawerOpen});
+  }
+
+  onToggleNewMenu() {
+    this.setState({openMenu: this.state.openMenu == MO.new ? null : MO.new});
+  }
+
+  onOpenSortMenu(e: MouseEvent) {
+    this.setState({menuAnchorEl: e.currentTarget, openMenu: MO.sort});
+  }
+
+  onClickCloseMenu(e: MouseEvent) {
+    if (this.state.openMenu == MO.sort || this.state.openMenu == MO.new) {
+      let className = (e.target as any).className;
+      if (!(className instanceof string) && className.baseVal != null) {
+        className = className.baseVal;
+      }
+      if (!className.includes("ScenePicker-icon-") && !className.includes("MuiFab-")) {
+        this.setState({menuAnchorEl: null, openMenu: null});
+      }
+    }
+  }
+
+  onCloseDialog() {
+    this.setState({menuAnchorEl: null, openMenu: null});
+  }
+
+  onRandomScene() {
+    this.props.onOpenScene(getRandomListItem(this.props.scenes));
+  }
+
   openGitRelease() {
     this.openLink(this.state.newVersionLink);
   }
@@ -551,100 +653,104 @@ class ScenePicker extends React.Component {
   openLink(url: string) {
     remote.shell.openExternal(url);
   }
-
-  onRandomScene() {
-    this.props.onOpenScene(getRandomListItem(this.props.scenes));
-  }
-
-  onDrawerOpen() {
-    this.setState({drawerOpen: true});
-  };
-
-  onDrawerClose() {
-    this.setState({drawerOpen: false});
-  };
-
-  onOpenNewMenu(e: MouseEvent) {
-    this.setState({menuAnchorEl: e.currentTarget, menuOpen: MO.new});
-  }
-
-  onOpenSortMenu(e: MouseEvent) {
-    this.setState({menuAnchorEl: e.currentTarget, menuOpen: MO.sort});
-  }
-
-  onCloseMenu() {
-    this.setState({menuAnchorEl: null, menuOpen: null});
-  }
   
-  onSort(sortFunction: string) {
-    this.onCloseMenu();
+  onSort(sortFunction: string, ascending: boolean) {
     switch (sortFunction) {
-      case SF.alphaA:
-        this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
-          const aName = a.name.toLowerCase();
-          const bName = b.name.toLowerCase();
-          if (aName < bName) {
-            return -1;
-          } else if (aName > bName) {
-            return 1;
-          } else {
-            return 0;
-          }
-        }));
-        break;
-      case SF.alphaD:
-        this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
-          const aName = a.name.toLowerCase();
-          const bName = b.name.toLowerCase();
-          if (aName > bName) {
-            return -1;
-          } else if (aName < bName) {
-            return 1;
-          } else {
-            return 0;
-          }
-        }));
-        break;
-      case SF.dateA:
-        this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
-          if (a.id < b.id) {
-            return -1;
-          } else if (a.id > b.id) {
-            return 1;
-          } else {
-            return 0;
-          }
-        }));
-        break;
-      case SF.dateD:
-        this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
-          if (a.id > b.id) {
-            return -1;
-          } else if (a.id < b.id) {
-            return 1;
-          } else {
-            return 0;
-          }
-        }));
-        break;
-      case SF.type:
-        this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
-          if (!(a.tagWeights || a.sceneWeights) && (b.tagWeights || b.sceneWeights)) {
-            return -1;
-          } else if ((a.tagWeights || a.sceneWeights) && !(b.tagWeights || b.sceneWeights)) {
-            return 1;
-          } else {
+      case SF.alpha:
+        if (ascending) {
+          this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
             const aName = a.name.toLowerCase();
-            const bName = a.name.toLowerCase();
+            const bName = b.name.toLowerCase();
             if (aName < bName) {
               return -1;
-            } else if (a.name > b.name) {
+            } else if (aName > bName) {
               return 1;
             } else {
               return 0;
             }
-          }
-        }));
+          }));
+        } else {
+          this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
+            const aName = a.name.toLowerCase();
+            const bName = b.name.toLowerCase();
+            if (aName > bName) {
+              return -1;
+            } else if (aName < bName) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }));
+        }
+        break;
+      case SF.date:
+        if (ascending) {
+          this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
+            if (a.id < b.id) {
+              return -1;
+            } else if (a.id > b.id) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }));
+        } else {
+          this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
+            if (a.id > b.id) {
+              return -1;
+            } else if (a.id < b.id) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }));
+        }
+        break;
+      case SF.count:
+        if (ascending) {
+          this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
+            if (a.sources.length < b.sources.length) {
+              return -1;
+            } else if (a.sources.length > b.sources.length) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }));
+        } else {
+          this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
+            if (a.sources.length > b.sources.length) {
+              return -1;
+            } else if (a.sources.length < b.sources.length) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }));
+        }
+        break;
+      case SF.type:
+        if (ascending) {
+          this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
+            if (!(a.tagWeights || a.sceneWeights) && (b.tagWeights || b.sceneWeights)) {
+              return -1;
+            } else if ((a.tagWeights || a.sceneWeights) && !(b.tagWeights || b.sceneWeights)) {
+              return 1;
+            } else {
+              return 0;
+            }
+          }));
+        } else {
+          this.props.onUpdateScenes(this.props.scenes.sort((a, b) => {
+            if (!(a.tagWeights || a.sceneWeights) && (b.tagWeights || b.sceneWeights)) {
+              return 1;
+            } else if ((a.tagWeights || a.sceneWeights) && !(b.tagWeights || b.sceneWeights)) {
+              return -1;
+            } else {
+              return 0;
+            }
+          }));
+        }
         break;
     }
   }

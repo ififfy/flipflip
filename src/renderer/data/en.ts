@@ -47,14 +47,10 @@ export default new Map<string, string>([
   ['tt.all', 'Require'],
   ['tt.none', 'Exclude'],
 
-  ['sf.alphaA', 'By Title Asc'],
-  ['sf.alphaD', 'By Title Desc'],
-  ['sf.alphaFullA', 'By Full Title Asc'],
-  ['sf.alphaFullD', 'By Full Title Desc'],
-  ['sf.dateA', 'By Date Asc'],
-  ['sf.dateD', 'By Date Desc'],
-  ['sf.countA', 'By Count Asc'],
-  ['sf.countD', 'By Count Desc'],
+  ['sf.alpha', 'By Title'],
+  ['sf.alphaFull', 'By Full Title'],
+  ['sf.date', 'By Date'],
+  ['sf.count', 'By Count'],
   ['sf.type', 'By Type'],
 
   ['st.tumblr', 'tumblr'],

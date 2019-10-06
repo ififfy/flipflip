@@ -146,7 +146,6 @@ export default class Player extends React.Component {
           <div className="EmptyIndicator"><p>I couldn't find anything</p><p>(ಥ﹏ಥ)</p></div>
         )}
 
-        {/*TODO Make grid a grid of Players instead of a grid of HeadlessScenePlayer (move UI out of SceneDetail and as a separate option in ScenePicker)*/}
         <div className={this.props.scene.gridView ? 'PlayerGrid': ''} style={gridStyle}>
           {!this.props.scene.gridView && (
             <React.Fragment>

@@ -71,14 +71,10 @@ const TT = { // tag type
 };
 
 const SF = { // sort function
-  alphaA: 'sf.alphaA',
-  alphaD: 'sf.alphaD',
-  alphaFullA: 'sf.alphaFullA',
-  alphaFullD: 'sf.alphaFullD',
-  dateA: 'sf.dateA',
-  dateD: 'sf.dateD',
-  countA: 'sf.countA',
-  countD: 'sf.countD',
+  alpha: 'sf.alpha',
+  alphaFull: 'sf.alphaFull',
+  date: 'sf.date',
+  count: 'sf.count',
   type: 'sf.type',
 };
 
@@ -128,7 +124,9 @@ const VC = { // Video Control Modes
 const MO = { // Menu/Modal Constants
   new: 'me.new',
   sort: 'me.sort',
-  alert: 'me.alert',
+  newWindowAlert: 'me.nwalert',
+  removeAllAlert: 'me.raalert',
+  deleteAlert: 'me.dalert',
 };
 
 export {

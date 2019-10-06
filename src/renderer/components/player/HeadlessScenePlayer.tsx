@@ -661,7 +661,6 @@ function loadTwitter(config: Config, source: LibrarySource, filter: string, help
         access_token_key: config.remoteSettings.twitterAccessTokenKey,
         access_token_secret: config.remoteSettings.twitterAccessTokenSecret,
       });
-      // TODO Add UI option for excluding retweets (Fix markOffline)
       twitter.get('statuses/user_timeline',
         helpers.next == 0 ? {screen_name: getFileGroup(url), count: 200, include_rts: !excludeRTS, tweet_mode: 'extended'} : {screen_name: getFileGroup(url), count: 200, include_rts: !excludeRTS, tweet_mode: 'extended', max_id: helpers.next},
         (error: any, tweets: any) => {

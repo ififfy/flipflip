@@ -230,7 +230,6 @@ export function addScene(state: State): Object {
 }
 
 export function deleteScene(state: State, scene: Scene): Object {
-  if (!confirm("Are you SURE you want to delete " + scene.name + "?\nIt will be removed from all overlays and grids.")) return;
   const newScenes = state.scenes.filter((s: Scene) => s.id != scene.id);
   for (let s of newScenes) {
     s.overlays = s.overlays.filter((o) => o.sceneID != scene.id);
@@ -244,6 +243,8 @@ export function deleteScene(state: State, scene: Scene): Object {
   return {
     scenes: newScenes,
     route: Array<Route>(),
+    autoEdit: false,
+    isSeleft: false,
   };
 }
 
@@ -492,6 +493,10 @@ export function replaceScenes(state: State, scenes: Array<Scene>): Object {
 
 export function replaceLibrary(state: State, library: Array<LibrarySource>): Object {
   return {library: library};
+}
+
+export function clearBlacklist(state: State, sourceURL: string): Object {
+  return blacklistFile(state, sourceURL, null);
 }
 
 export function blacklistFile(state: State, sourceURL: string, fileToBlacklist: string): Object {

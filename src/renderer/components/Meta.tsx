@@ -1,11 +1,13 @@
 import {remote, ipcRenderer, IpcMessageEvent} from 'electron';
 import * as React from 'react';
 
-import {Box} from "@material-ui/core";
+import {Box, CssBaseline} from "@material-ui/core";
+import {ThemeProvider} from "@material-ui/styles";
 
 import AppStorage from '../data/AppStorage';
 import {IPC} from "../data/const";
 import * as actions from '../data/actions';
+import theme from '../data/theme';
 
 import ScenePicker from './ScenePicker';
 import ConfigForm from './config/ConfigForm';
@@ -57,164 +59,167 @@ export default class Meta extends React.Component {
     const a = (fn: any) => this.applyAction.bind(this, fn);
 
     return (
-      <Box className="Meta">
-        {this.state.route.length === 0 && (
-          <ScenePicker
-            canGenerate={(this.state.library.length >= 1 && this.state.tags.length >= 1) || (this.state.scenes.length >= 1)}
+      <ThemeProvider theme={theme}>
+        <Box className="Meta">
+          <CssBaseline />
+          {this.state.route.length === 0 && (
+            <ScenePicker
+              canGenerate={(this.state.library.length >= 1 && this.state.tags.length >= 1) || (this.state.scenes.length >= 1)}
+              config={this.state.config}
+              libraryCount={this.state.library.length}
+              scenes={this.state.scenes}
+              version={this.state.version}
+              onAddGenerator={a(actions.addGenerator)}
+              onAddScene={a(actions.addScene)}
+              onImportScene={a(actions.importScene)}
+              onOpenConfig={a(actions.openConfig)}
+              onOpenLibrary={a(actions.openLibrary)}
+              onOpenScene={a(actions.goToScene)}
+              onUpdateConfig={a(actions.updateConfig)}
+              onUpdateScenes={a(actions.replaceScenes)}
+            />
+          )}
+
+          {this.isRoute('scene') && (
+            <SceneDetail
+              autoEdit={this.state.autoEdit}
+              allScenes={this.state.scenes}
+              config={this.state.config}
+              scene={scene}
+              goBack={a(actions.goBack)}
+              onClearBlacklist={a(actions.clearBlacklist)}
+              onClip={a(actions.clipVideo)}
+              onDelete={a(actions.deleteScene)}
+              onExport={a(actions.exportScene)}
+              onLibraryImport={a(actions.openLibraryImport)}
+              onPlay={a(actions.playScene)}
+              onSaveAsScene={a(actions.saveScene)}
+              onSetupGrid={a(actions.setupGrid)}
+              onUpdateScene={a(actions.updateScene)}
+            />
+          )}
+
+          {this.isRoute('library') && (
+            <Library
+              library={this.state.library}
+              tags={this.state.tags}
+              config={this.state.config}
+              isSelect={this.state.isSelect}
+              isBatchTag={this.state.isBatchTag}
+              yOffset={this.state.libraryYOffset}
+              filters={this.state.libraryFilters}
+              selected={this.state.librarySelected}
+              onPlay={a(actions.playSceneFromLibrary)}
+              onClip={a(actions.clipVideo)}
+              savePosition={a(actions.saveLibraryPosition)}
+              onUpdateLibrary={a(actions.replaceLibrary)}
+              goBack={a(actions.goBack)}
+              manageTags={a(actions.manageTags)}
+              batchTag={a(actions.batchTag)}
+              importSourcesFromLibrary={a(actions.importFromLibrary)}
+              onBackup={appStorage.backup.bind(appStorage)}
+              onImportLibrary={a(actions.importLibrary)}
+              onExportLibrary={a(actions.exportLibrary)}
+              blacklistFile={a(actions.blacklistFile)}
+            />
+          )}
+
+          {this.isRoute('clip') && (
+            <VideoClipper
+              source={actions.getActiveSource(this.state)}
+              videoVolume={this.state.config.defaultScene.videoVolume}
+              onUpdateClips={a(actions.onUpdateClips)}
+              goBack={a(actions.goBack)}
+              cache={a(actions.cacheImage)}
+            />
+          )}
+
+          {this.isRoute('grid') && (
+            <GridSetup
+              scene={scene}
+              allScenes={this.state.scenes}
+              onUpdateGrid={a(actions.onUpdateGrid)}
+              goBack={a(actions.goBack)}
+            />
+          )}
+
+          {this.isRoute('tags') && (
+            <TagManager
+              tags={this.state.tags}
+              onUpdateTags={a(actions.updateTags)}
+              goBack={a(actions.goBack)}
+            />
+          )}
+
+          {this.isRoute('generate') && (
+            <SceneGenerator
+              library={this.state.library}
+              tags={this.state.tags}
+              autoEdit={this.state.autoEdit}
+              scenes={this.state.scenes}
+              scene={scene}
+              goBack={a(actions.goBack)}
+              onGenerate={a(actions.generateScene)}
+              onUpdateScene={a(actions.updateScene)}
+              onDelete={a(actions.deleteScene)}
+            />
+          )}
+
+          {this.isRoute('play') && (
+            <Player
+              config={this.state.config}
+              scene={scene}
+              scenes={this.state.scenes}
+              onUpdateScene={a(actions.updateScene)}
+              nextScene={a(actions.nextScene)}
+              goBack={a(actions.goBack)}
+              goToTagSource={a(actions.playSceneFromLibrary)}
+              getTags={actions.getTags.bind(this, this.state.library)}
+              setCount={a(actions.setCount)}
+              cache={a(actions.cacheImage)}
+              setupGrid={a(actions.setupGrid)}
+              blacklistFile={a(actions.blacklistFile)}
+            />
+          )}
+
+          {this.isRoute('libraryplay') && (
+            <Player
+              config={this.state.config}
+              scene={scene}
+              scenes={this.state.scenes}
+              onUpdateScene={a(actions.updateScene)}
+              goBack={a(actions.endPlaySceneFromLibrary)}
+              tags={actions.getLibrarySource(this.state).tags}
+              allTags={this.state.tags}
+              toggleTag={a(actions.toggleTag)}
+              navigateTagging={a(actions.navigateDisplayedLibrary)}
+              getTags={actions.getTags.bind(this, this.state.library)}
+              setCount={a(actions.setCount)}
+              cache={a(actions.cacheImage)}
+              blacklistFile={a(actions.blacklistFile)}
+            />
+          )}
+
+          {this.isRoute('config') && (
+            <ConfigForm
+              config={this.state.config}
+              scenes={this.state.scenes}
+              goBack={a(actions.goBack)}
+              updateConfig={a(actions.updateConfig)}
+              onDefault={a(actions.setDefaultConfig)}
+              onBackup={appStorage.backup.bind(appStorage)}
+              onRestore={a(actions.restoreFromBackup)}
+              onClean={a(actions.cleanBackups)}
+            />
+          )}
+
+          <FFAnalytics
             config={this.state.config}
-            libraryCount={this.state.library.length}
-            scenes={this.state.scenes}
-            version={this.state.version}
-            onAddGenerator={a(actions.addGenerator)}
-            onAddScene={a(actions.addScene)}
-            onImportScene={a(actions.importScene)}
-            onOpenConfig={a(actions.openConfig)}
-            onOpenLibrary={a(actions.openLibrary)}
-            onOpenScene={a(actions.goToScene)}
             onUpdateConfig={a(actions.updateConfig)}
-            onUpdateScenes={a(actions.replaceScenes)}
-          />
-        )}
-
-        {this.isRoute('library') && (
-          <Library
-            library={this.state.library}
-            tags={this.state.tags}
-            config={this.state.config}
-            isSelect={this.state.isSelect}
-            isBatchTag={this.state.isBatchTag}
-            yOffset={this.state.libraryYOffset}
-            filters={this.state.libraryFilters}
-            selected={this.state.librarySelected}
-            onPlay={a(actions.playSceneFromLibrary)}
-            onClip={a(actions.clipVideo)}
-            savePosition={a(actions.saveLibraryPosition)}
-            onUpdateLibrary={a(actions.replaceLibrary)}
-            goBack={a(actions.goBack)}
-            manageTags={a(actions.manageTags)}
-            batchTag={a(actions.batchTag)}
-            importSourcesFromLibrary={a(actions.importFromLibrary)}
-            onBackup={appStorage.backup.bind(appStorage)}
-            onImportLibrary={a(actions.importLibrary)}
-            onExportLibrary={a(actions.exportLibrary)}
-            blacklistFile={a(actions.blacklistFile)}
-          />
-        )}
-
-        {this.isRoute('clip') && (
-          <VideoClipper
-            source={actions.getActiveSource(this.state)}
-            videoVolume={this.state.config.defaultScene.videoVolume}
-            onUpdateClips={a(actions.onUpdateClips)}
-            goBack={a(actions.goBack)}
-            cache={a(actions.cacheImage)}
-          />
-        )}
-
-        {this.isRoute('grid') && (
-          <GridSetup
-            scene={scene}
-            allScenes={this.state.scenes}
-            onUpdateGrid={a(actions.onUpdateGrid)}
-            goBack={a(actions.goBack)}
-          />
-        )}
-
-        {this.isRoute('tags') && (
-          <TagManager
-            tags={this.state.tags}
-            onUpdateTags={a(actions.updateTags)}
-            goBack={a(actions.goBack)}
-          />
-        )}
-
-        {this.isRoute('generate') && (
-          <SceneGenerator
-            library={this.state.library}
-            tags={this.state.tags}
-            autoEdit={this.state.autoEdit}
-            scenes={this.state.scenes}
-            scene={scene}
-            goBack={a(actions.goBack)}
-            onGenerate={a(actions.generateScene)}
-            onUpdateScene={a(actions.updateScene)}
-            onDelete={a(actions.deleteScene)}
-          />
-        )}
-
-        {this.isRoute('scene') && (
-          <SceneDetail
-            autoEdit={this.state.autoEdit}
-            allScenes={this.state.scenes}
-            config={this.state.config}
-            scene={scene}
-            goBack={a(actions.goBack)}
-            onBlacklistFile={a(actions.blacklistFile)}
-            onClip={a(actions.clipVideo)}
-            onDelete={a(actions.deleteScene)}
-            onExport={a(actions.exportScene)}
-            onLibraryImport={a(actions.openLibraryImport)}
-            onPlay={a(actions.playScene)}
-            onSaveAsScene={a(actions.saveScene)}
-            onSetupGrid={a(actions.setupGrid)}
-            onUpdateScene={a(actions.updateScene)}
-          />
-        )}
-
-        {this.isRoute('play') && (
-          <Player
-            config={this.state.config}
-            scene={scene}
-            scenes={this.state.scenes}
-            onUpdateScene={a(actions.updateScene)}
-            nextScene={a(actions.nextScene)}
-            goBack={a(actions.goBack)}
-            goToTagSource={a(actions.playSceneFromLibrary)}
-            getTags={actions.getTags.bind(this, this.state.library)}
-            setCount={a(actions.setCount)}
-            cache={a(actions.cacheImage)}
-            setupGrid={a(actions.setupGrid)}
-            blacklistFile={a(actions.blacklistFile)}
-          />
-        )}
-
-        {this.isRoute('libraryplay') && (
-          <Player
-            config={this.state.config}
-            scene={scene}
-            scenes={this.state.scenes}
-            onUpdateScene={a(actions.updateScene)}
-            goBack={a(actions.endPlaySceneFromLibrary)}
-            tags={actions.getLibrarySource(this.state).tags}
-            allTags={this.state.tags}
-            toggleTag={a(actions.toggleTag)}
-            navigateTagging={a(actions.navigateDisplayedLibrary)}
-            getTags={actions.getTags.bind(this, this.state.library)}
-            setCount={a(actions.setCount)}
-            cache={a(actions.cacheImage)}
-            blacklistFile={a(actions.blacklistFile)}
-          />
-        )}
-
-        {this.isRoute('config') && (
-          <ConfigForm
-            config={this.state.config}
-            scenes={this.state.scenes}
-            goBack={a(actions.goBack)}
-            updateConfig={a(actions.updateConfig)}
-            onDefault={a(actions.setDefaultConfig)}
-            onBackup={appStorage.backup.bind(appStorage)}
-            onRestore={a(actions.restoreFromBackup)}
-            onClean={a(actions.cleanBackups)}
-          />
-        )}
-
-        <FFAnalytics
-          config={this.state.config}
-          onUpdateConfig={a(actions.updateConfig)}
-          version={this.state.version}
-          page={this.state.route.length == 0 ? 'home' : this.state.route[this.state.route.length - 1].kind} />
-      </Box>
+            version={this.state.version}
+            page={this.state.route.length == 0 ? 'home' : this.state.route[this.state.route.length - 1].kind} />
+        </Box>
+      </ThemeProvider>
     )
   }
 };
