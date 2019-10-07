@@ -1,18 +1,16 @@
 import * as React from "react";
 import clsx from "clsx";
-import {string} from "prop-types";
 import CreatableSelect from "react-select/creatable";
 
 import {
-  AppBar, Button, Chip, Collapse, Container, createStyles, Dialog, DialogActions, DialogContent, DialogContentText,
-  DialogTitle, Divider, Drawer, Fab, IconButton, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText,
-  ListSubheader, Menu, MenuItem, Theme, Toolbar, Tooltip, Typography, withStyles
+  AppBar, Backdrop, Button, Chip, Collapse, Container, createStyles, Dialog, DialogActions, DialogContent,
+  DialogContentText, DialogTitle, Divider, Drawer, Fab, IconButton, ListItem, ListItemIcon, ListItemSecondaryAction,
+  ListItemText, ListSubheader, Menu, MenuItem, Theme, Toolbar, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
 import AddIcon from '@material-ui/icons/Add';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
-import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import CancelIcon from '@material-ui/icons/Cancel';
 import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
@@ -21,6 +19,7 @@ import FormatListBulletedIcon from '@material-ui/icons/FormatListBulleted';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import HttpIcon from '@material-ui/icons/Http';
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
+import MenuIcon from'@material-ui/icons/Menu';
 import MovieIcon from '@material-ui/icons/Movie';
 import PublishIcon from '@material-ui/icons/Publish';
 import SortIcon from '@material-ui/icons/Sort';
@@ -44,7 +43,10 @@ const styles = (theme: Theme) => createStyles({
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
   },
-  appBarSpacer: theme.mixins.toolbar,
+  appBarSpacer: {
+    backgroundColor: theme.palette.primary.main,
+    ...theme.mixins.toolbar
+  },
   backButton: {
     float: 'left',
   },
@@ -92,18 +94,20 @@ const styles = (theme: Theme) => createStyles({
       width: theme.spacing(9),
     },
   },
-  drawerTitle: {
-    transition: theme.transitions.create(['height'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
+  drawer: {
+    position: 'absolute',
   },
-  drawerTitleClose: {
-    height: 0,
-    transition: theme.transitions.create(['height'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
+  drawerSpacer: {
+    width: theme.spacing(7),
+    [theme.breakpoints.up('sm')]: {
+      width: theme.spacing(9),
+    },
+  },
+  drawerButton: {
+    backgroundColor: theme.palette.primary.main,
+  },
+  drawerIcon: {
+    color: theme.palette.primary.contrastText,
   },
   chip: {
     transition: theme.transitions.create(['opacity'], {
@@ -126,45 +130,10 @@ const styles = (theme: Theme) => createStyles({
     backgroundColor: (theme.palette.primary as any)["50"],
   },
   container: {
+    display: 'flex',
     padding: theme.spacing(0),
     overflowY: 'auto',
-  },
-  toggle: {
-    zIndex: theme.zIndex.drawer + 1,
-    position: 'absolute',
-    top: '50%',
-    marginLeft: drawerWidth - 25,
-    transition: theme.transitions.create(['margin', 'opacity'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  toggleClose: {
-    marginLeft: theme.spacing(9) - 25,
-    transition: theme.transitions.create(['margin', 'opacity'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  toggleHide: {
-    opacity: 0,
-    transition: theme.transitions.create(['margin', 'opacity'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  toggleIcon: {
-    transition: theme.transitions.create('transform', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  toggleIconOpen: {
-    transform: 'rotate(180deg)',
-    transition: theme.transitions.create('transform', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
+    flexGrow: 1,
   },
   addMenuButton: {
     backgroundColor: theme.palette.primary.dark,
@@ -226,6 +195,14 @@ const styles = (theme: Theme) => createStyles({
   fill: {
     flexGrow: 1,
   },
+  backdrop: {
+    zIndex: theme.zIndex.modal,
+    height: '100%',
+    width: '100%',
+  },
+  backdropTop: {
+    zIndex: theme.zIndex.modal + 1,
+  },
 });
 
 class Library extends React.Component {
@@ -259,7 +236,6 @@ class Library extends React.Component {
 
   readonly state = {
     drawerOpen: false,
-    drawerHover: false,
     filters: this.props.filters,
     menuAnchorEl: null as any,
     openMenu: null as string,
@@ -370,7 +346,7 @@ class Library extends React.Component {
     }
 
     return (
-      <div className={classes.root} onClick={this.onClickCloseMenu.bind(this)}>
+      <div className={classes.root}>
         <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
           <Toolbar>
             <div className={classes.titleBar}>
@@ -420,12 +396,21 @@ class Library extends React.Component {
         </AppBar>
 
         <Drawer
+          className={clsx(classes.drawer, this.state.drawerOpen && classes.backdropTop)}
           variant="permanent"
           classes={{paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose)}}
-          onMouseEnter={this.onMouseEnterDrawer.bind(this)}
-          onMouseLeave={this.onMouseLeaveDrawer.bind(this)}
-          open={false}>
-          <div className={classes.appBarSpacer} />
+          open={this.state.drawerOpen}>
+          <Collapse in={!open}>
+            <div className={classes.appBarSpacer} />
+          </Collapse>
+
+          <ListItem className={classes.drawerButton}>
+            <IconButton onClick={this.onToggleDrawer.bind(this)}>
+              <MenuIcon className={classes.drawerIcon}/>
+            </IconButton>
+          </ListItem>
+
+          <Divider />
 
           <div>
             <ListItem button onClick={this.props.onManageTags.bind(this)}>
@@ -540,33 +525,29 @@ class Library extends React.Component {
           </div>
         </Drawer>
 
-        <Fab
-          className={clsx(classes.toggle, !open && classes.toggleClose, !this.state.drawerHover && classes.toggleHide)}
-          color="primary"
-          size="medium"
-          aria-label="toggle"
-          onMouseEnter={this.onMouseEnterDrawer.bind(this)}
-          onMouseLeave={this.onMouseLeaveDrawer.bind(this)}
-          onClick={this.onToggleDrawer.bind(this)}>
-          <ArrowForwardIosIcon className={clsx(classes.toggleIcon, open && classes.toggleIconOpen)}/>
-        </Fab>
-
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
-          <Container maxWidth={false} className={classes.container}>
-            <SourceList
-              config={this.props.config}
-              newMenuOpen={this.state.openMenu == MO.new}
-              sources={displaySources}
-              onClearBlacklist={this.props.onClearBlacklist.bind(this)}
-              onClip={this.props.onClip.bind(this)}
-              onUpdateSources={this.props.onUpdateLibrary.bind(this)} />
-          </Container>
+          <div className={clsx(classes.root, classes.fill)}>
+            <div className={classes.drawerSpacer}/>
+            <Container maxWidth={false} className={classes.container}>
+              <SourceList
+                config={this.props.config}
+                sources={displaySources}
+                onClearBlacklist={this.props.onClearBlacklist.bind(this)}
+                onClip={this.props.onClip.bind(this)}
+                onUpdateSources={this.props.onUpdateLibrary.bind(this)} />
+            </Container>
+          </div>
         </main>
+
+        <Backdrop
+          className={classes.backdrop}
+          onClick={this.onCloseDialog.bind(this)}
+          open={this.state.openMenu == MO.new || this.state.drawerOpen} />
 
         <Tooltip title="Remove All Sources"  placement="left">
           <Fab
-            className={clsx(classes.addButton, classes.removeAllButton, this.state.openMenu != MO.new && classes.addButtonClose)}
+            className={clsx(classes.addButton, classes.removeAllButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop)}
             onClick={this.onRemoveAll.bind(this)}
             size="small">
             <DeleteSweepIcon className={classes.icon} />
@@ -594,30 +575,30 @@ class Library extends React.Component {
         </Dialog>
         <Tooltip title="Local Video"  placement="left">
           <Fab
-            className={clsx(classes.addButton, classes.addVideoButton, this.state.openMenu != MO.new && classes.addButtonClose)}
-            onClick={this.props.onAddSource.bind(this, null, AF.videos)}
+            className={clsx(classes.addButton, classes.addVideoButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop)}
+            onClick={this.onAddSource.bind(this, AF.videos)}
             size="small">
             <MovieIcon className={classes.icon} />
           </Fab>
         </Tooltip>
         <Tooltip title="Local Directory"  placement="left">
           <Fab
-            className={clsx(classes.addButton, classes.addDirectoryButton, this.state.openMenu != MO.new && classes.addButtonClose)}
-            onClick={this.props.onAddSource.bind(this, null, AF.directory)}
+            className={clsx(classes.addButton, classes.addDirectoryButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop)}
+            onClick={this.onAddSource.bind(this, AF.directory)}
             size="small">
             <FolderIcon className={classes.icon} />
           </Fab>
         </Tooltip>
         <Tooltip title="URL"  placement="left">
           <Fab
-            className={clsx(classes.addButton, classes.addURLButton, this.state.openMenu != MO.new && classes.addButtonClose)}
-            onClick={this.props.onAddSource.bind(this, null, AF.url)}
+            className={clsx(classes.addButton, classes.addURLButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop)}
+            onClick={this.onAddSource.bind(this, AF.url)}
             size="small">
             <HttpIcon className={classes.icon} />
           </Fab>
         </Tooltip>
         <Fab
-          className={classes.addMenuButton}
+          className={clsx(classes.addMenuButton, this.state.openMenu == MO.new && classes.backdropTop)}
           onClick={this.onToggleNewMenu.bind(this)}
           size="large">
           <AddIcon className={classes.icon} />
@@ -671,6 +652,11 @@ class Library extends React.Component {
     );
   }
 
+  onAddSource(addFunction: string) {
+    this.onCloseDialog();
+    this.props.onAddSource(null, addFunction);
+  }
+
   onToggleDrawer() {
     this.setState({drawerOpen: !this.state.drawerOpen});
   }
@@ -683,35 +669,8 @@ class Library extends React.Component {
     this.setState({menuAnchorEl: e.currentTarget, openMenu: MO.sort});
   }
 
-  onClickCloseMenu(e: MouseEvent) {
-    if (this.state.openMenu == MO.new) {
-      let parent: any = e.target;
-      do {
-        let className = parent.className;
-        if (!(className instanceof string) && className.baseVal != null) {
-          className = className.baseVal;
-        }
-        if (className.includes("MuiFab-")) {
-          return;
-        }
-        if (className.includes("Library-root")) {
-          break;
-        }
-      } while ((parent = parent.parentNode) != null);
-      this.setState({menuAnchorEl: null, openMenu: null});
-    }
-  }
-
   onCloseDialog() {
-    this.setState({menuAnchorEl: null, openMenu: null});
-  }
-
-  onMouseEnterDrawer() {
-    this.setState({drawerHover: true});
-  }
-
-  onMouseLeaveDrawer() {
-    this.setState({drawerHover: false});
+    this.setState({menuAnchorEl: null, openMenu: null, drawerOpen: false});
   }
 
   onRemoveAll() {

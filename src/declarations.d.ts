@@ -40,6 +40,9 @@ declare module 'imgur';
 declare module 'twitter';
 declare module 'jsmediatags';
 declare module 'music-metadata';
+declare module 'react-window';
+declare module 'react-sortable-hoc';
+declare module 'react-virtualized-auto-sizer';
 declare module 'electron-google-analytics';
 declare module 'electron-default-menu';
 

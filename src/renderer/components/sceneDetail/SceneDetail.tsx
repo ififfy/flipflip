@@ -1,18 +1,15 @@
 import * as React from "react";
-import {string} from "prop-types";
-import {remote} from "electron";
 import clsx from "clsx";
 
 import {
-  AppBar, Box, Button, Container, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
-  Drawer, Fab, IconButton, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Menu, MenuItem, Tab, Tabs,
-  TextField, Theme, Toolbar, Tooltip, Typography, withStyles
+  AppBar, Backdrop, Box, Button, Collapse, Container, createStyles, Dialog, DialogActions, DialogContent,
+  DialogContentText, DialogTitle, Divider, Drawer, Fab, IconButton, ListItem, ListItemIcon, ListItemSecondaryAction,
+  ListItemText, Menu, MenuItem, Tab, Tabs, TextField, Theme, Toolbar, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
 import AddIcon from '@material-ui/icons/Add';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
-import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import BuildIcon from '@material-ui/icons/Build';
 import CollectionsIcon from '@material-ui/icons/Collections';
@@ -21,6 +18,7 @@ import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
 import FolderIcon from '@material-ui/icons/Folder';
 import HttpIcon from '@material-ui/icons/Http';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
+import MenuIcon from'@material-ui/icons/Menu';
 import MovieIcon from '@material-ui/icons/Movie';
 import PhotoFilterIcon from '@material-ui/icons/PhotoFilter';
 import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
@@ -28,13 +26,11 @@ import PublishIcon from '@material-ui/icons/Publish';
 import SaveIcon from '@material-ui/icons/Save';
 import SortIcon from '@material-ui/icons/Sort';
 
-import {AF, MO, OF, SF, ST, WF} from "../../data/const";
-import {getFileGroup, getFileName, getSourceType, isVideo} from "../../data/utils";
+import {AF, MO, OF, SF, WF} from "../../data/const";
 import en from "../../data/en";
 import Config from "../../data/Config";
 import Scene from "../../data/Scene";
 import LibrarySource from "../library/LibrarySource";
-import Tag from "../library/Tag";
 import SourceList from "./SourceList";
 import SceneEffectGroup from "./SceneEffectGroup";
 import ImageVideoGroup from "./ImageVideoGroup";
@@ -53,7 +49,10 @@ const styles = (theme: Theme) => createStyles({
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
   },
-  appBarSpacer: theme.mixins.toolbar,
+  appBarSpacer: {
+    backgroundColor: theme.palette.primary.main,
+    ...theme.mixins.toolbar
+  },
   title: {
     textAlign: 'center',
   },
@@ -69,6 +68,21 @@ const styles = (theme: Theme) => createStyles({
   noTitle: {
     width: theme.spacing(7),
     height: theme.spacing(7),
+  },
+  drawer: {
+    position: 'absolute',
+  },
+  drawerSpacer: {
+    width: theme.spacing(7),
+    [theme.breakpoints.up('sm')]: {
+      width: theme.spacing(9),
+    },
+  },
+  drawerButton: {
+    backgroundColor: theme.palette.primary.main,
+  },
+  drawerIcon: {
+    color: theme.palette.primary.contrastText,
   },
   drawerPaper: {
     position: 'relative',
@@ -102,8 +116,14 @@ const styles = (theme: Theme) => createStyles({
     backgroundColor: (theme.palette.primary as any)["50"],
   },
   container: {
+    display: 'flex',
     padding: theme.spacing(0),
     overflowY: 'auto',
+    flexGrow: 1,
+  },
+  sourcesSection: {
+    display: 'flex',
+    flexGrow: 1,
   },
   tab: {
     width: drawerWidth,
@@ -143,43 +163,6 @@ const styles = (theme: Theme) => createStyles({
   },
   deleteItem: {
     color: theme.palette.error.main,
-  },
-  toggle: {
-    zIndex: theme.zIndex.drawer + 1,
-    position: 'absolute',
-    top: '50%',
-    marginLeft: drawerWidth - 25,
-    transition: theme.transitions.create(['margin', 'opacity'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  toggleClose: {
-    marginLeft: theme.spacing(9) - 25,
-    transition: theme.transitions.create(['margin', 'opacity'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  toggleHide: {
-    opacity: 0,
-    transition: theme.transitions.create(['margin', 'opacity'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  toggleIcon: {
-    transition: theme.transitions.create('transform', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  toggleIconOpen: {
-    transform: 'rotate(180deg)',
-    transition: theme.transitions.create('transform', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
   },
   addMenuButton: {
     backgroundColor: theme.palette.primary.dark,
@@ -244,6 +227,14 @@ const styles = (theme: Theme) => createStyles({
   fill: {
     flexGrow: 1,
   },
+  backdrop: {
+    zIndex: theme.zIndex.modal,
+    height: '100%',
+    width: '100%',
+  },
+  backdropTop: {
+    zIndex: theme.zIndex.modal + 1,
+  },
 });
 
 class SceneDetail extends React.Component {
@@ -269,7 +260,6 @@ class SceneDetail extends React.Component {
   readonly state = {
     isEditingName: this.props.autoEdit,
     drawerOpen: false,
-    drawerHover: false,
     menuAnchorEl: null as any,
     openMenu: null as string,
     openTab: 2,
@@ -281,7 +271,7 @@ class SceneDetail extends React.Component {
     const classes = this.props.classes;
     const open = this.state.drawerOpen;
     return (
-      <div className={classes.root} onClick={this.onClickCloseMenu.bind(this)}>
+      <div className={classes.root}>
 
         <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
           <Toolbar>
@@ -332,12 +322,21 @@ class SceneDetail extends React.Component {
         </AppBar>
 
         <Drawer
+          className={clsx(classes.drawer, this.state.drawerOpen && classes.backdropTop)}
           variant="permanent"
           classes={{paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose)}}
-          onMouseEnter={this.onMouseEnterDrawer.bind(this)}
-          onMouseLeave={this.onMouseLeaveDrawer.bind(this)}
-          open={false}>
-          <div className={classes.appBarSpacer} />
+          open={this.state.drawerOpen}>
+          <Collapse in={!open}>
+            <div className={classes.appBarSpacer} />
+          </Collapse>
+
+          <ListItem className={classes.drawerButton}>
+            <IconButton onClick={this.onToggleDrawer.bind(this)}>
+              <MenuIcon className={classes.drawerIcon}/>
+            </IconButton>
+          </ListItem>
+
+          <Divider />
 
           <div>
             <Tabs
@@ -402,17 +401,6 @@ class SceneDetail extends React.Component {
           </div>
         </Drawer>
 
-        <Fab
-          className={clsx(classes.toggle, !open && classes.toggleClose, !this.state.drawerHover && classes.toggleHide)}
-          color="primary"
-          size="medium"
-          aria-label="toggle"
-          onMouseEnter={this.onMouseEnterDrawer.bind(this)}
-          onMouseLeave={this.onMouseLeaveDrawer.bind(this)}
-          onClick={this.onToggleDrawer.bind(this)}>
-          <ArrowForwardIosIcon className={clsx(classes.toggleIcon, open && classes.toggleIconOpen)}/>
-        </Fab>
-
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
           <Container maxWidth={false} className={classes.container}>
@@ -470,18 +458,21 @@ class SceneDetail extends React.Component {
             </Typography>
 
             <Typography
+              className={classes.sourcesSection}
               component="div"
               role="tabpanel"
               hidden={this.state.openTab !== 2}
               id="vertical-tabpanel-2"
               aria-labelledby="vertical-tab-2">
-              <SourceList
-                config={this.props.config}
-                newMenuOpen={this.state.openMenu == MO.new}
-                sources={this.props.scene.sources}
-                onClearBlacklist={this.props.onClearBlacklist.bind(this)}
-                onClip={this.props.onClip.bind(this)}
-                onUpdateSources={this.onUpdateSources.bind(this)} />
+              <div className={classes.drawerSpacer}/>
+              <div className={classes.fill}>
+                <SourceList
+                  config={this.props.config}
+                  sources={this.props.scene.sources}
+                  onClearBlacklist={this.props.onClearBlacklist.bind(this)}
+                  onClip={this.props.onClip.bind(this)}
+                  onUpdateSources={this.onUpdateSources.bind(this)} />
+              </div>
             </Typography>
 
           </Container>
@@ -489,9 +480,14 @@ class SceneDetail extends React.Component {
 
         {this.state.openTab == 2 && (
           <React.Fragment>
+            <Backdrop
+              className={classes.backdrop}
+              onClick={this.onCloseDialog.bind(this)}
+              open={this.state.openMenu == MO.new || this.state.drawerOpen} />
+
             <Tooltip title="Remove All Sources"  placement="left">
               <Fab
-                className={clsx(classes.addButton, classes.removeAllButton, this.state.openMenu != MO.new && classes.addButtonClose)}
+                className={clsx(classes.addButton, classes.removeAllButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop)}
                 onClick={this.onRemoveAll.bind(this)}
                 size="small">
                 <DeleteSweepIcon className={classes.icon} />
@@ -519,38 +515,38 @@ class SceneDetail extends React.Component {
             </Dialog>
             <Tooltip title="From Library"  placement="left">
               <Fab
-                className={clsx(classes.addButton, classes.libraryImportButton, this.state.openMenu != MO.new && classes.addButtonClose)}
-                onClick={this.props.onAddSource.bind(this, this.props.scene, AF.library)}
+                className={clsx(classes.addButton, classes.libraryImportButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop)}
+                onClick={this.onAddSource.bind(this, AF.library)}
                 size="small">
                 <LocalLibraryIcon className={classes.icon} />
               </Fab>
             </Tooltip>
             <Tooltip title="Local Video"  placement="left">
               <Fab
-                className={clsx(classes.addButton, classes.addVideoButton, this.state.openMenu != MO.new && classes.addButtonClose)}
-                onClick={this.props.onAddSource.bind(this, this.props.scene, AF.videos)}
+                className={clsx(classes.addButton, classes.addVideoButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop)}
+                onClick={this.onAddSource.bind(this, AF.videos)}
                 size="small">
                 <MovieIcon className={classes.icon} />
               </Fab>
             </Tooltip>
             <Tooltip title="Local Directory"  placement="left">
               <Fab
-                className={clsx(classes.addButton, classes.addDirectoryButton, this.state.openMenu != MO.new && classes.addButtonClose)}
-                onClick={this.props.onAddSource.bind(this, this.props.scene, AF.directory)}
+                className={clsx(classes.addButton, classes.addDirectoryButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop)}
+                onClick={this.onAddSource.bind(this, AF.directory)}
                 size="small">
                 <FolderIcon className={classes.icon} />
               </Fab>
             </Tooltip>
             <Tooltip title="URL"  placement="left">
               <Fab
-                className={clsx(classes.addButton, classes.addURLButton, this.state.openMenu != MO.new && classes.addButtonClose)}
-                onClick={this.props.onAddSource.bind(this, this.props.scene, AF.url)}
+                className={clsx(classes.addButton, classes.addURLButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop)}
+                onClick={this.onAddSource.bind(this, AF.url)}
                 size="small">
                 <HttpIcon className={classes.icon} />
               </Fab>
             </Tooltip>
             <Fab
-              className={classes.addMenuButton}
+              className={clsx(classes.addMenuButton, this.state.openMenu == MO.new && classes.backdropTop)}
               onClick={this.onToggleNewMenu.bind(this)}
               size="large">
               <AddIcon className={classes.icon} />
@@ -606,6 +602,11 @@ class SceneDetail extends React.Component {
     )
   }
 
+  onAddSource(addFunction: string) {
+    this.onCloseDialog();
+    this.props.onAddSource(this.props.scene, addFunction);
+  }
+
   onToggleDrawer() {
     this.setState({drawerOpen: !this.state.drawerOpen});
   }
@@ -618,39 +619,12 @@ class SceneDetail extends React.Component {
     this.setState({menuAnchorEl: e.currentTarget, openMenu: MO.sort});
   }
 
-  onClickCloseMenu(e: MouseEvent) {
-    if (this.state.openMenu == MO.new) {
-      let parent: any = e.target;
-      do {
-        let className = parent.className;
-        if (!(className instanceof string) && className.baseVal != null) {
-          className = className.baseVal;
-        }
-        if (className.includes("MuiFab-")) {
-          return;
-        }
-        if (className.includes("SceneDetail-root")) {
-          break;
-        }
-      } while ((parent = parent.parentNode) != null);
-      this.setState({menuAnchorEl: null, openMenu: null});
-    }
-  }
-
   onCloseDialog() {
-    this.setState({menuAnchorEl: null, openMenu: null});
+    this.setState({menuAnchorEl: null, openMenu: null, drawerOpen: false});
   }
 
   onChangeTab(e: any, newTab: number) {
     this.setState({openTab: newTab});
-  }
-
-  onMouseEnterDrawer() {
-    this.setState({drawerHover: true});
-  }
-
-  onMouseLeaveDrawer() {
-    this.setState({drawerHover: false});
   }
 
   update(fn: (scene: any) => void) {
