@@ -8,7 +8,6 @@ import AppStorage from '../data/AppStorage';
 import {IPC} from "../data/const";
 import * as actions from '../data/actions';
 import theme from '../data/theme';
-
 import ScenePicker from './ScenePicker';
 import ConfigForm from './config/ConfigForm';
 import Library from './library/Library';
@@ -41,6 +40,11 @@ export default class Meta extends React.Component {
     this.setState(result);
   }
 
+  progressAction(fn: any, ...args: any[]) {
+    const getState = () => {return this.state};
+    fn(getState, this.setState.bind(this), ...args);
+  }
+
   componentDidMount() {
     // We never bother cleaning this up, but that's OK because this is the top level
     // component of the whole app.
@@ -57,6 +61,7 @@ export default class Meta extends React.Component {
 
     // Save a lot of typing and potential bugs
     const a = (fn: any) => this.applyAction.bind(this, fn);
+    const p = (fn: any) => this.progressAction.bind(this, fn);
 
     return (
       <ThemeProvider theme={theme}>
@@ -103,31 +108,37 @@ export default class Meta extends React.Component {
 
           {this.isRoute('library') && (
             <Library
+              config={this.state.config}
+              filters={this.state.libraryFilters}
               library={this.state.library}
+              progressCurrent={this.state.progressCurrent}
+              progressMode={this.state.progressMode}
+              progressTitle={this.state.progressTitle}
+              progressTotal={this.state.progressTotal}
               tags={this.state.tags}
               goBack={a(actions.goBack)}
               onAddSource={a(actions.addSource)}
               onBatchTag={a(actions.batchTag)}
+              onClearBlacklist={a(actions.clearBlacklist)}
+              onClip={a(actions.clipVideo)}
               onExportLibrary={a(actions.exportLibrary)}
               onImportLibrary={a(actions.importLibrary)}
+              onImportInstagram={p(actions.importInstagram)}
+              onImportReddit={p(actions.importReddit)}
+              onImportTumblr={p(actions.importTumblr)}
+              onImportTwitter={p(actions.importTwitter)}
               onManageTags={a(actions.manageTags)}
+              onMarkOffline={p(actions.markOffline)}
               onSort={a(actions.sortSources)}
               onUpdateLibrary={a(actions.replaceLibrary)}
-              /*library={this.state.library}
-              tags={this.state.tags}
-              config={this.state.config}
-              isSelect={this.state.isSelect}
+              onUpdateMode={a(actions.setMode)}
+              /*isSelect={this.state.isSelect}
               isBatchTag={this.state.isBatchTag}
               yOffset={this.state.libraryYOffset}
-              filters={this.state.libraryFilters}
               selected={this.state.librarySelected}
               onPlay={a(actions.playSceneFromLibrary)}
               onClip={a(actions.clipVideo)}
               savePosition={a(actions.saveLibraryPosition)}
-              onUpdateLibrary={a(actions.replaceLibrary)}
-              goBack={a(actions.goBack)}
-              manageTags={a(actions.manageTags)}
-              batchTag={a(actions.batchTag)}
               importSourcesFromLibrary={a(actions.importFromLibrary)}
               onBackup={appStorage.backup.bind(appStorage)}
               blacklistFile={a(actions.blacklistFile)}*/

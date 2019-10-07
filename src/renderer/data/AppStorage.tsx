@@ -27,6 +27,11 @@ export const defaultInitialState = {
   libraryYOffset: 0,
   libraryFilters: Array<string>(),
   librarySelected: Array<string>(),
+  progressMode: null as string,
+  progressTitle: null as string,
+  progressCurrent: 0,
+  progressTotal: 0,
+  progressNext: null as string,
 };
 
 /**
@@ -80,6 +85,11 @@ export default class AppStorage {
             libraryYOffset: 0,
             libraryFilters: Array<string>(),
             librarySelected: Array<string>(),
+            progressMode: null as string,
+            progressTitle: null as string,
+            progressCurrent: 0,
+            progressTotal: 0,
+            progressNext: null as string,
           };
           // Hydrate and add the library ! Yay!!! :)
           let libraryID = 0;
@@ -126,6 +136,11 @@ export default class AppStorage {
             libraryYOffset: 0,
             libraryFilters: Array<string>(),
             librarySelected: Array<string>(),
+            progressMode: null as string,
+            progressTitle: null as string,
+            progressCurrent: 0,
+            progressTotal: 0,
+            progressNext: null as string,
           };
       }
     }

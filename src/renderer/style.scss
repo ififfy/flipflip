@@ -40,6 +40,12 @@ body {
 
 .MuiDrawer-paper::-webkit-scrollbar { width: 0 !important }
 
+div.CreatableSelect {
+  > div:first-child {
+    max-height: 64px;
+  }
+}
+
 @mixin noselect {
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */

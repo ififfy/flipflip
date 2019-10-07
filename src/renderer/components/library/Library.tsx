@@ -1,7 +1,7 @@
 import * as React from "react";
 import clsx from "clsx";
 import {string} from "prop-types";
-import {remote} from "electron";
+import CreatableSelect from "react-select/creatable";
 
 import {
   AppBar, Button, Chip, Collapse, Container, createStyles, Dialog, DialogActions, DialogContent, DialogContentText,
@@ -14,6 +14,7 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
+import CancelIcon from '@material-ui/icons/Cancel';
 import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
 import FolderIcon from '@material-ui/icons/Folder';
 import FormatListBulletedIcon from '@material-ui/icons/FormatListBulleted';
@@ -25,11 +26,12 @@ import PublishIcon from '@material-ui/icons/Publish';
 import SortIcon from '@material-ui/icons/Sort';
 import WarningIcon from '@material-ui/icons/Warning';
 
-import {getFileGroup, getFileName, getSourceType, isVideo} from "../../data/utils";
-import {AF, MO, SF, ST} from "../../data/const";
+import {AF, MO, PR, SF, ST} from "../../data/const";
 import en from "../../data/en";
+import Config from "../../data/Config";
 import Scene from "../../data/Scene";
 import SourceIcon from "../sceneDetail/SourceIcon";
+import SourceList from "../sceneDetail/SourceList";
 import LibrarySource from "./LibrarySource";
 import Tag from "./Tag";
 
@@ -43,8 +45,31 @@ const styles = (theme: Theme) => createStyles({
     zIndex: theme.zIndex.drawer + 1,
   },
   appBarSpacer: theme.mixins.toolbar,
+  backButton: {
+    float: 'left',
+  },
   title: {
     textAlign: 'center',
+  },
+  searchBar: {
+    float: 'right',
+    display: 'flex',
+    maxWidth: '100%',
+  },
+  searchCount: {
+    color: theme.palette.primary.contrastText,
+    marginTop: 3,
+    marginRight: theme.spacing(1),
+  },
+  searchSelect: {
+    minWidth: 200,
+    maxWidth: `calc(100% - ${theme.spacing(7)}px)`,
+    maxHeight: theme.mixins.toolbar.minHeight,
+    color: theme.palette.text.primary,
+  },
+  titleBar: {
+    flex: 1,
+    maxWidth: '33%',
   },
   drawerPaper: {
     position: 'relative',
@@ -94,13 +119,15 @@ const styles = (theme: Theme) => createStyles({
     }),
   },
   content: {
+    display: 'flex',
     flexGrow: 1,
+    flexDirection: 'column',
     height: '100vh',
-    overflow: 'auto',
     backgroundColor: (theme.palette.primary as any)["50"],
   },
   container: {
     padding: theme.spacing(0),
+    overflowY: 'auto',
   },
   toggle: {
     zIndex: theme.zIndex.drawer + 1,
@@ -204,48 +231,191 @@ const styles = (theme: Theme) => createStyles({
 class Library extends React.Component {
   readonly props: {
     classes: any,
+    config: Config,
+    filters: Array<string>,
     library: Array<LibrarySource>,
+    progressCurrent: number,
+    progressMode: string,
+    progressTitle: string,
+    progressTotal: number,
     tags: Array<Tag>,
     goBack(): void,
     onAddSource(scene: Scene, type: string): void,
-    onBatchTag(isBatchTag: boolean): void,
+    onBatchTag(): void,
+    onClearBlacklist(sourceURL: string): void,
+    onClip(source: LibrarySource): void,
     onExportLibrary(): void,
     onImportLibrary(): void,
+    onImportInstagram(): void,
+    onImportReddit(): void,
+    onImportTumblr(): void,
+    onImportTwitter(): void,
     onManageTags(): void,
+    onMarkOffline(): void,
     onSort(scene: Scene, algorithm: string, ascending: boolean): void,
     onUpdateLibrary(sources: Array<LibrarySource>): void,
+    onUpdateMode(mode: string): void,
   };
 
   readonly state = {
     drawerOpen: false,
     drawerHover: false,
+    filters: this.props.filters,
     menuAnchorEl: null as any,
     openMenu: null as string,
+    searchInput: "",
+  };
+
+  handleChange = (search: [{label: string, value: string}]) => {
+    if (search == null) {
+      this.setState({filters: []});
+    } else {
+      let filters = Array<string>();
+      for (let s of search) {
+        if (s.value.endsWith("~")) {
+          filters = filters.concat(s.value);
+        } else {
+          filters = filters.concat(s.value.split(" "));
+        }
+      }
+      this.setState({filters});
+    }
+  };
+  handleInputChange = (searchInput: string) => {
+    this.setState({searchInput})
   };
 
   render() {
     const classes = this.props.classes;
     const open = this.state.drawerOpen;
+
+    const tumblrAuthorized = this.props.config.remoteSettings.tumblrOAuthToken != "" &&
+      this.props.config.remoteSettings.tumblrOAuthTokenSecret != "";
+    const redditAuthorized = this.props.config.remoteSettings.redditRefreshToken != "";
+    const twitterAuthorized = this.props.config.remoteSettings.twitterAccessTokenKey != "" &&
+      this.props.config.remoteSettings.twitterAccessTokenSecret != "";
+    const instagramAuthorized = this.props.config.remoteSettings.instagramUsername != "" &&
+      this.props.config.remoteSettings.instagramPassword != "";
+    const remoteAuthorized = tumblrAuthorized || redditAuthorized || twitterAuthorized || instagramAuthorized;
+
+    const displaySources = this.getDisplaySources();
+    const tags = new Map<string, number>();
+    let untaggedCount = 0;
+    let offlineCount = 0;
+    let markedCount = 0;
+    const options = Array<{ label: string, value: string }>();
+    const defaultValues = Array<{ label: string, value: string }>();
+    for (let source of displaySources) {
+      if (source.offline) {
+        offlineCount++;
+      }
+      if (source.marked) {
+        markedCount++;
+      }
+
+      if (source.tags.length > 0) {
+        for (let tag of source.tags) {
+          if (tags.has(tag.name)) {
+            tags.set(tag.name, tags.get(tag.name) + 1);
+          } else {
+            tags.set(tag.name, 1);
+          }
+        }
+      } else {
+        untaggedCount += 1;
+      }
+    }
+    const tagKeys = Array.from(tags.keys()).sort((a, b) => {
+      const aCount = tags.get(a);
+      const bCount = tags.get(b);
+      if (aCount > bCount) {
+        return -1;
+      } else if (aCount < bCount) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+    for (let filter of this.state.filters) {
+      let opt;
+      if (filter.endsWith("~")) { // This is a tag filter
+        opt = {label: filter.substring(0, filter.length-1) + " (Tag)", value: filter};
+      } else {
+        opt = {label: filter, value: filter};
+      }
+      options.push(opt);
+      defaultValues.push(opt);
+    }
+
+    if (untaggedCount > 0 && !this.state.filters.includes("<Untagged>")) {
+      options.push({label: "<Untagged> (" + untaggedCount + ")", value: "<Untagged>"});
+    }
+    if (offlineCount > 0 && !this.state.filters.includes("<Offline>")) {
+      options.push({label: "<Offline> (" + offlineCount + ")", value: "<Offline>"});
+    }
+    if (markedCount > 0 && !this.state.filters.includes("<Marked>")) {
+      options.push({label: "<Marked> (" + markedCount + ")", value: "<Marked>"});
+    }
+    for (let tag of tagKeys) {
+      if (!this.state.filters.includes(tag + "~")) {
+        options.push({label: tag + " (" + tags.get(tag) + ")", value: tag + "~"});
+      }
+    }
+    if (this.state.searchInput.startsWith("-")) {
+      for (let tag of tagKeys) {
+        if (!this.state.filters.includes(tag + "~")) {
+          options.push({label: "-" + tag + " (" + tags.get(tag) + ")", value: "-" + tag + "~"});
+        }
+      }
+    }
+
     return (
       <div className={classes.root} onClick={this.onClickCloseMenu.bind(this)}>
         <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
           <Toolbar>
-            <Tooltip title="Back" placement="right-end">
-              <IconButton
-                edge="start"
-                color="inherit"
-                aria-label="Back"
-                onClick={this.props.goBack.bind(this)}>
-                <ArrowBackIcon />
-              </IconButton>
-            </Tooltip>
+            <div className={classes.titleBar}>
+              <Tooltip title="Back" placement="right-end">
+                <IconButton
+                  edge="start"
+                  color="inherit"
+                  aria-label="Back"
+                  className={classes.backButton}
+                  onClick={this.props.goBack.bind(this)}>
+                  <ArrowBackIcon />
+                </IconButton>
+              </Tooltip>
+            </div>
 
-            <div className={classes.fill}/>
             <Typography component="h1" variant="h4" color="inherit" noWrap
-                        className={classes.title}>
+                        className={clsx(classes.title, classes.titleBar)}>
               Library
             </Typography>
-            <div className={classes.fill}/>
+
+            <div className={classes.titleBar}>
+              <div className={classes.searchBar}>
+                {this.props.library.length > 0 && (
+                  <Chip
+                    className={classes.searchCount}
+                    label={this.props.library.length}
+                    size='medium'
+                    variant='outlined'/>
+                )}
+                <CreatableSelect
+                  className={clsx(classes.searchSelect, "CreatableSelect")}
+                  components={{DropdownIndicator: null,}}
+                  value={defaultValues}
+                  options={options}
+                  inputValue={this.state.searchInput}
+                  isClearable
+                  isMulti
+                  rightAligned={true}
+                  placeholder="Search ..."
+                  formatCreateLabel={(input: string) => "Search for " + input}
+                  onChange={this.handleChange}
+                  onInputChange={this.handleInputChange}
+                />
+              </div>
+            </div>
           </Toolbar>
         </AppBar>
 
@@ -272,7 +442,7 @@ class Library extends React.Component {
                   variant='outlined'/>
               )}
             </ListItem>
-            <ListItem button onClick={this.props.onManageTags.bind(this)}>
+            <ListItem button onClick={this.props.onBatchTag.bind(this)}>
               <ListItemIcon>
                 <FormatListBulletedIcon />
               </ListItemIcon>
@@ -280,50 +450,77 @@ class Library extends React.Component {
             </ListItem>
           </div>
 
+          {remoteAuthorized && (
+            <React.Fragment>
+              <Divider />
+
+              <div>
+                <Collapse in={open}>
+                  <ListSubheader inset>
+                    Import Remote Sources
+                  </ListSubheader>
+                </Collapse>
+                {tumblrAuthorized && (
+                  <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onImportTumblr.bind(this)}>
+                    <ListItemIcon>
+                      <SourceIcon type={ST.tumblr}/>
+                    </ListItemIcon>
+                    <ListItemText primary="Tumblr" />
+                  </ListItem>
+                )}
+                {redditAuthorized && (
+                  <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onImportReddit.bind(this)}>
+                    <ListItemIcon>
+                      <SourceIcon type={ST.reddit}/>
+                    </ListItemIcon>
+                    <ListItemText primary="Reddit" />
+                  </ListItem>
+                )}
+                {twitterAuthorized && (
+                  <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onImportTwitter.bind(this)}>
+                    <ListItemIcon>
+                      <SourceIcon type={ST.twitter}/>
+                    </ListItemIcon>
+                    <ListItemText primary="Twitter" />
+                  </ListItem>
+                )}
+                {instagramAuthorized && (
+                  <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onImportInstagram.bind(this)}>
+                    <ListItemIcon>
+                      <SourceIcon type={ST.instagram}/>
+                    </ListItemIcon>
+                    <ListItemText primary="Instagram" />
+                  </ListItem>
+                )}
+              </div>
+            </React.Fragment>
+          )}
+
           <Divider />
 
           <div>
-            <Collapse in={open}>
-              <ListSubheader inset>
-                Import Remote Sources
-              </ListSubheader>
-            </Collapse>
-            <ListItem button>
-              <ListItemIcon>
-                <SourceIcon type={ST.tumblr}/>
-              </ListItemIcon>
-              <ListItemText primary="Tumblr" />
-            </ListItem>
-            <ListItem button>
-              <ListItemIcon>
-                <SourceIcon type={ST.reddit}/>
-              </ListItemIcon>
-              <ListItemText primary="Reddit" />
-            </ListItem>
-            <ListItem button>
-              <ListItemIcon>
-                <SourceIcon type={ST.twitter}/>
-              </ListItemIcon>
-              <ListItemText primary="Twitter" />
-            </ListItem>
-            <ListItem button>
-              <ListItemIcon>
-                <SourceIcon type={ST.instagram}/>
-              </ListItemIcon>
-              <ListItemText primary="Instagram" />
-            </ListItem>
-          </div>
-
-          <Divider />
-
-          <div>
-            <ListItem button>
+            <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onMarkOffline.bind(this)}>
               <ListItemIcon>
                 <WarningIcon />
               </ListItemIcon>
               <ListItemText primary="Mark Offline" />
             </ListItem>
           </div>
+
+          {this.props.progressMode != null && (
+            <React.Fragment>
+              <Divider />
+
+              <div>
+                <ListItem button onClick={this.props.onUpdateMode.bind(this, PR.cancel)}>
+                  <ListItemIcon>
+                    <CancelIcon color="error"/>
+                  </ListItemIcon>
+                  <ListItemText primary={`Cancel ${this.props.progressMode == PR.offline ? 'Offline Check' : 'Import'}`} />
+                </ListItem>
+              </div>
+            </React.Fragment>
+          )}
 
           <div className={classes.fill}/>
 
@@ -357,7 +554,13 @@ class Library extends React.Component {
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
           <Container maxWidth={false} className={classes.container}>
-            <div/>
+            <SourceList
+              config={this.props.config}
+              newMenuOpen={this.state.openMenu == MO.new}
+              sources={displaySources}
+              onClearBlacklist={this.props.onClearBlacklist.bind(this)}
+              onClip={this.props.onClip.bind(this)}
+              onUpdateSources={this.props.onUpdateLibrary.bind(this)} />
           </Container>
         </main>
 
@@ -374,10 +577,10 @@ class Library extends React.Component {
           onClose={this.onCloseDialog.bind(this)}
           aria-labelledby="remove-all-title"
           aria-describedby="remove-all-description">
-          <DialogTitle id="remove-all-title">Remove All Sources</DialogTitle>
+          <DialogTitle id="remove-all-title">Delete Library</DialogTitle>
           <DialogContent>
             <DialogContentText id="remove-all-description">
-              Are you sure you want to remove all sources from this scene?
+              Are you sure you really wanna delete your entire library...? ಠ_ಠ
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -385,7 +588,7 @@ class Library extends React.Component {
               Cancel
             </Button>
             <Button onClick={this.onFinishRemoveAll.bind(this)} color="primary">
-              OK
+              Yea... I'm sure
             </Button>
           </DialogActions>
         </Dialog>
@@ -488,7 +691,6 @@ class Library extends React.Component {
         if (!(className instanceof string) && className.baseVal != null) {
           className = className.baseVal;
         }
-        console.log(className);
         if (className.includes("MuiFab-")) {
           return;
         }
@@ -519,6 +721,66 @@ class Library extends React.Component {
   onFinishRemoveAll() {
     this.props.onUpdateLibrary([]);
     this.onCloseDialog();
+  }
+
+  getDisplaySources() {
+    let displaySources = [];
+    const filtering = this.state.filters.length > 0;
+    if (filtering) {
+      for (let source of this.props.library) {
+        let matchesFilter = true;
+        let countRegex;
+        for (let filter of this.state.filters) {
+          if (filter == "<Offline>") { // This is offline filter
+            matchesFilter = source.offline;
+          } else if (filter == "<Marked>") { // This is a marked filter
+            matchesFilter = source.marked;
+          }else if (filter == "<Untagged>") { // This is untagged filter
+            matchesFilter = source.tags.length === 0;
+          } else if (filter.endsWith("~")) { // This is a tag filter
+            let tag = filter.substring(0, filter.length-1);
+            if (tag.startsWith("-")) {
+              tag = tag.substring(1, tag.length);
+              matchesFilter = source.tags.find((t) => t.name == tag) == null;
+            } else {
+              matchesFilter = source.tags.find((t) => t.name == tag) != null;
+            }
+          } else if ((countRegex = /^count(\+?)([>=<])(\d*)$/.exec(filter)) != null) {
+            const all = countRegex[1] == "+";
+            const symbol = countRegex[2];
+            const value = parseInt(countRegex[3], 10);
+            switch (symbol) {
+              case "=":
+                matchesFilter = (all || source.countComplete) && source.count == value;
+                break;
+              case ">":
+                matchesFilter = (all || source.countComplete) && source.count > value;
+                break;
+              case "<":
+                matchesFilter = (all || source.countComplete) && source.count < value;
+                break;
+            }
+          } else { // This is a search filter
+            filter = filter.replace("\\", "\\\\");
+            if (filter.startsWith("-")) {
+              filter = filter.substring(1, filter.length);
+              const regex = new RegExp(filter, "i");
+              matchesFilter = !regex.test(source.url);
+            } else {
+              const regex = new RegExp(filter, "i");
+              matchesFilter = regex.test(source.url);
+            }
+          }
+          if (!matchesFilter) break;
+        }
+        if (matchesFilter) {
+          displaySources.push(source);
+        }
+      }
+    } else {
+      displaySources = this.props.library;
+    }
+    return displaySources;
   }
 }
 

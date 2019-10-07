@@ -2,11 +2,16 @@ import {remote, webFrame} from "electron";
 import * as fs from "fs";
 import path from 'path';
 import wretch from "wretch";
+import {existsSync} from "fs";
 import {outputFile} from "fs-extra";
 import getFolderSize from "get-folder-size";
+import tumblr, {TumblrClient} from "tumblr.js";
+import Snoowrap from "snoowrap";
+import Twitter from "twitter";
+import {IgApiClient} from "instagram-private-api";
 
 import {getBackups, getCachePath, getFileGroup, getFileName, getSourceType, isVideo, saveDir} from "./utils";
-import {AF, SF, ST} from "./const";
+import {AF, PR, SF, ST} from "./const";
 import { defaultInitialState } from './AppStorage';
 import { Route } from "./Route";
 import Scene from "./Scene";
@@ -77,6 +82,7 @@ export function restoreFromBackup(state: State, backupFile: string): Object {
       version: data.version,
       autoEdit: data.autoEdit,
       isSelect: data.isSelect,
+      isBatchTag: data.isBatchTag,
       config: new Config(data.config),
       scenes: data.scenes.map((s: any) => new Scene(s)),
       library: data.library.map((s: any) => new LibrarySource(s)),
@@ -85,6 +91,11 @@ export function restoreFromBackup(state: State, backupFile: string): Object {
       libraryYOffset: 0,
       libraryFilters: Array<string>(),
       librarySelected: Array<string>(),
+      progressMode: null as string,
+      progressTitle: null as string,
+      progressCurrent: 0,
+      progressTotal: 0,
+      progressNext: null as string,
     };
   } catch (e) {
     alert("Restore error:\n" + e);
@@ -592,8 +603,8 @@ export function updateTags(state: State, tags: Array<Tag>): Object {
   return {tags: tags, library: newLibrary};
 }
 
-export function batchTag(state: State, isBatchTag: boolean): Object {
-  return {isBatchTag: isBatchTag};
+export function batchTag(state: State): Object {
+  return {isBatchTag: !state.isBatchTag};
 }
 
 export function toggleTag(state: State, sourceID: number, tag: Tag): Object {
@@ -1003,4 +1014,420 @@ export function importLibrary(state: State, backup:Function): Object {
 
   alert("Import complete!");
   return {library: newLibrary, tags: newTags};
+}
+
+export function setMode(state: State, mode: string): Object {
+  return {progressMode: mode};
+}
+
+export function markOffline(getState: () => State, setState: Function) {
+  const offlineLoop = () => {
+    const state = getState();
+    const offset = state.progressCurrent;
+    if (state.progressMode == PR.cancel) {
+      setState({progressMode: null, progressCurrent: 0, progressTotal: 0, progressTitle: ""});
+    } else if (state.library.length == offset) {
+      setState({progressMode: null, progressCurrent: 0, progressTotal: 0, progressTitle: ""});
+      alert("Offline Check has completed. Remote sources not available are now marked in red.");
+    } else if (state.library[offset].url.startsWith("http://") ||
+      state.library[offset].url.startsWith("https://")) {
+      state.progressTitle = state.library[offset].url;
+      setState({progressTitle: state.progressTitle});
+      const lastCheck = state.library[offset].lastCheck;
+      if (lastCheck != null) {
+        // If this link was checked within the last week, skip
+        if (new Date().getTime() - new Date(lastCheck).getTime() < 604800000) {
+          state.progressCurrent = offset + 1;
+          setState({progressCurrent: state.progressCurrent});
+          setTimeout(offlineLoop, 100);
+          return;
+        }
+      }
+
+      state.library[offset].lastCheck = new Date();
+      wretch(state.library[offset].url)
+        .get()
+        .notFound((res) => {
+          state.library[offset].offline = true;
+          state.progressCurrent = offset + 1;
+          setState({progressCurrent: state.progressCurrent});
+          setTimeout(offlineLoop, 1000);
+        })
+        .res((res) => {
+          state.library[offset].offline = false;
+          state.progressCurrent = offset + 1;
+          setState({progressCurrent: state.progressCurrent});
+          setTimeout(offlineLoop, 1000);
+        })
+        .catch((e) => {
+          console.error(e);
+          state.library[offset].lastCheck = null;
+          state.progressCurrent = offset + 1;
+          setState({progressCurrent: state.progressCurrent});
+          setTimeout(offlineLoop, 100);
+        });
+    } else {
+      state.progressTitle = state.library[offset].url;
+      state.progressCurrent = offset + 1;
+      setState({progressTitle: state.progressTitle, progressCurrent: state.progressCurrent});
+      state.library[offset].lastCheck = new Date();
+      const exists = existsSync(state.library[offset].url);
+      if (!exists) {
+        state.library[offset].offline = true;
+      }
+      setTimeout(offlineLoop, 100);
+    }
+  };
+
+  // If we don't have an import running
+  const state = getState();
+  if (!state.progressMode) {
+    state.progressMode = PR.offline;
+    state.progressCurrent = 0;
+    state.progressTotal = state.library.length;
+    setState({
+      progressMode: state.progressMode,
+      progressCurrent: state.progressCurrent,
+      progressTotal: state.progressTotal,
+    });
+    offlineLoop();
+  }
+}
+
+export function importTumblr(getState: () => State, setState: Function) {
+  let client: TumblrClient;
+  // Define our loop
+  const tumblrImportLoop = () => {
+    const state = getState();
+    const offset = state.progressCurrent;
+    if (state.progressMode == PR.cancel) {
+      setState({progressMode: null, progressCurrent: 0, progressTotal: 0});
+      return;
+    }
+    // Get the next page of blogs
+    client.userFollowing({offset: offset}, (err, data) => {
+      if (err) {
+        alert("Error retrieving following: " + err);
+        setState({progressMode: null, progressCurrent: 0, progressTotal: 0});
+        console.error(err);
+        return;
+      }
+
+      // Get the next 20 blogs
+      let following = [];
+      for (let blog of data.blogs) {
+        const blogURL = "http://" + blog.name + ".tumblr.com/";
+        following.push(blogURL);
+      }
+
+      // dedup
+      let sourceURLs = state.library.map((s) => s.url);
+      following = following.filter((b) => !sourceURLs.includes(b));
+
+      let id = state.library.length + 1;
+      state.library.forEach((s) => {
+        id = Math.max(s.id + 1, id);
+      });
+
+      // Add to Library
+      let newLibrary = state.library;
+      for (let url of following) {
+        newLibrary = newLibrary.concat([new LibrarySource({
+          url: url,
+          id: id,
+          tags: new Array<Tag>(),
+        })]);
+        id += 1;
+      }
+      //this.props.onUpdateLibrary(newLibrary);
+
+      let nextOffset = offset + 20;
+      if (offset > state.progressTotal) {
+        nextOffset = state.progressTotal;
+      }
+
+      // Update progress
+      setState({progressCurrent: nextOffset});
+
+      // Loop until we run out of blogs
+      if ((nextOffset) < state.progressTotal) {
+        setTimeout(tumblrImportLoop, 1500);
+      } else {
+        setState({progressMode: null, progressCurrent: 0, progressTotal: 0});
+        alert("Tumblr Following Import has completed");
+      }
+    });
+  };
+
+  // If we don't have an import running
+  const state = getState();
+  if (!state.progressMode) {
+    // Build our Tumblr client
+    client = tumblr.createClient({
+      consumer_key: state.config.remoteSettings.tumblrKey,
+      consumer_secret: state.config.remoteSettings.tumblrSecret,
+      token: state.config.remoteSettings.tumblrOAuthToken,
+      token_secret: state.config.remoteSettings.tumblrOAuthTokenSecret,
+    });
+
+    // Make the first call just to check the total blogs
+    client.userFollowing({limit: 0}, (err, data) => {
+      if (err) {
+        alert("Error retrieving following: " + err);
+        console.error(err);
+        return;
+      }
+
+      state.progressMode = PR.tumblr;
+      state.progressCurrent = 0;
+      state.progressTotal = data.total_blogs;
+      setState({
+        progressMode: state.progressMode,
+        progressCurrent: state.progressCurrent,
+        progressTotal: state.progressTotal,
+      });
+      tumblrImportLoop();
+    });
+  }
+}
+
+export function importReddit(getState: () => State, setState: Function) {
+  let reddit: any;
+  const redditImportLoop = () => {
+    const state = getState();
+    if (state.progressMode == PR.cancel) {
+      setState({progressMode: null, progressNext: null, progressCurrent: 0});
+      return;
+    }
+    reddit.getSubscriptions({limit: 20, after: state.progressNext}).then((subscriptionListing: any) => {
+      if (subscriptionListing.length == 0) {
+        setState({progressMode: null, progressNext: null, progressCurrent: 0});
+        alert("Reddit Subscription Import has completed");
+      } else {
+        // Get the next 20 blogs
+        let subscriptions = [];
+        for (let sub of subscriptionListing) {
+          const subURL = "http://www.reddit.com" + sub.url;
+          subscriptions.push(subURL);
+        }
+
+        // dedup
+        let sourceURLs = state.library.map((s) => s.url);
+        subscriptions = subscriptions.filter((s) => !sourceURLs.includes(s));
+
+        let id = state.library.length + 1;
+        state.library.forEach((s) => {
+          id = Math.max(s.id + 1, id);
+        });
+
+        // Add to Library
+        let newLibrary = state.library;
+        for (let url of subscriptions) {
+          newLibrary = newLibrary.concat([new LibrarySource({
+            url: url,
+            id: id,
+            tags: new Array<Tag>(),
+          })]);
+          id += 1;
+        }
+        //this.props.onUpdateLibrary(newLibrary);
+
+        // Loop until we run out of blogs
+        setTimeout(redditImportLoop, 1500);
+        state.progressNext = subscriptionListing[subscriptionListing.length - 1].name;
+        state.progressCurrent = state.progressCurrent + 1;
+        setState({progressNext: state.progressNext, progressCurrent: state.progressCurrent});
+      }
+    }).catch((err: any) => {
+      // If user is not authenticated for subscriptions, prompt to re-authenticate
+      if (err.statusCode == 403) {
+        alert("You have not authorized FlipFlip to work with Reddit subscriptions. Visit Preferences and authorize FlipFlip to work with Reddit.");
+      } else {
+        alert("Error retrieving subscriptions: " + err);
+        console.error(err);
+      }
+      setState({progressMode: null, progressNext: null, progressCurrent: 0});
+    });
+  };
+
+  const state = getState();
+  if (!state.progressMode) {
+    reddit = new Snoowrap({
+      userAgent: state.config.remoteSettings.redditUserAgent,
+      clientId: state.config.remoteSettings.redditClientID,
+      clientSecret: "",
+      refreshToken: state.config.remoteSettings.redditRefreshToken,
+    });
+
+    // Show progress bar and kick off loop
+    alert("Your Reddit subscriptions are being imported... You will recieve an alert when the import is finished.");
+
+    state.progressMode = PR.reddit;
+    state.progressCurrent = 0;
+    setState({progressMode: state.progressMode, progressCurrent: state.progressCurrent});
+    redditImportLoop();
+  }
+}
+
+export function importTwitter(getState: () => State, setState: Function) {
+  let twitter: any;
+  const twitterImportLoop = () => {
+    const state = getState();
+    if (state.progressMode == PR.cancel) {
+      setState({progressMode: null, progressNext: null, progressCurrent: 0});
+      return;
+    }
+    twitter.get('friends/list', !state.progressNext ? {count: 200} : {count: 200, cursor: state.progressNext}, (error: any, data: any) => {
+      if (error) {
+        alert("Error retrieving following: " + error);
+        console.error(error);
+        setState({progressMode: null, progressNext: null, progressCurrent: 0});
+        return;
+      }
+
+      // Get the next 200 users
+      let following = [];
+      for (let user of data.users) {
+        const userURL = "https://twitter.com/" + user.screen_name;
+        following.push(userURL);
+      }
+
+      // dedup
+      let sourceURLs = state.library.map((s) => s.url);
+      following = following.filter((s) => !sourceURLs.includes(s));
+
+      let id = state.library.length + 1;
+      state.library.forEach((s) => {
+        id = Math.max(s.id + 1, id);
+      });
+
+      // Add to Library
+      let newLibrary = state.library;
+      for (let url of following) {
+        newLibrary = newLibrary.concat([new LibrarySource({
+          url: url,
+          id: id,
+          tags: new Array<Tag>(),
+        })]);
+        id += 1;
+      }
+      //this.props.onUpdateLibrary(newLibrary);
+
+      if (data.next_cursor == 0) { // We're done
+        setState({progressMode: null, progressNext: null, progressCurrent: 0});
+        alert("Twitter Following Import has completed");
+      } else {
+        // Loop until we run out of blogs
+        setTimeout(twitterImportLoop, 1500);
+        state.progressNext = data.next_cursor;
+        state.progressCurrent = state.progressCurrent + 1;
+        setState({progressNext: state.progressNext, progressCurrent: state.progressCurrent});
+      }
+    });
+  };
+
+  const state = getState();
+  if (!state.progressMode) {
+    twitter = new Twitter({
+      consumer_key: state.config.remoteSettings.twitterConsumerKey,
+      consumer_secret: state.config.remoteSettings.twitterConsumerSecret,
+      access_token_key: state.config.remoteSettings.twitterAccessTokenKey,
+      access_token_secret: state.config.remoteSettings.twitterAccessTokenSecret,
+    });
+
+    // Show progress bar and kick off loop
+    alert("Your Twitter Following is being imported... You will recieve an alert when the import is finished.");
+
+    state.progressMode = PR.twitter;
+    state.progressCurrent = 0;
+    setState({progressMode: state.progressMode, progressCurrent: state.progressCurrent});
+    twitterImportLoop();
+  }
+}
+
+let ig: IgApiClient = null;
+let session: any = null;
+export function importInstagram(getState: () => State, setState: Function) {
+  const processItems = (items: any, next: any) => {
+    let following = [];
+    for (let account of items) {
+      const accountURL = "https://www.instagram.com/" + account.username + "/";
+      following.push(accountURL);
+    }
+
+    // dedup
+    let sourceURLs = state.library.map((s) => s.url);
+    following = following.filter((s) => !sourceURLs.includes(s));
+
+    let id = state.library.length + 1;
+    state.library.forEach((s) => {
+      id = Math.max(s.id + 1, id);
+    });
+
+    // Add to Library
+    let newLibrary = state.library;
+    for (let url of following) {
+      newLibrary = newLibrary.concat([new LibrarySource({
+        url: url,
+        id: id,
+        tags: new Array<Tag>(),
+      })]);
+      id += 1;
+    }
+    //this.props.onUpdateLibrary(newLibrary);
+
+    // Loop until we run out of blogs
+    setTimeout(instagramImportLoop, 1500);
+    state.progressNext = next;
+    state.progressCurrent = state.progressCurrent + 1;
+    setState({progressNext: state.progressNext, progressCurrent: state.progressCurrent});
+  };
+
+  // Define our loop
+  const instagramImportLoop = () => {
+    const state = getState();
+    if (state.progressMode == PR.cancel) {
+      setState({progressMode: null, progressNext: null, progressCurrent: 0});
+      return;
+    }
+    if (ig == null) {
+      ig = new IgApiClient();
+      ig.state.generateDevice(state.config.remoteSettings.instagramUsername);
+      ig.account.login(state.config.remoteSettings.instagramUsername, state.config.remoteSettings.instagramPassword).then((loggedInUser) => {
+        ig.state.serializeCookieJar().then((cookies) => {
+          session = JSON.stringify(cookies);
+          const followingFeed = ig.feed.accountFollowing(loggedInUser.pk);
+          followingFeed.items().then((items) => {
+            processItems(items, loggedInUser.pk + "~" + followingFeed.serialize());
+          }).catch((e) => {console.error(e);ig = null;});
+        }).catch((e) => {console.error(e);ig = null;});
+      }).catch((e) => {alert(e);console.error(e);ig = null;});
+    } else {
+      ig.state.deserializeCookieJar(JSON.parse(session)).then((data) => {
+        const id = (state.progressNext as string).split("~")[0];
+        const feedSession = (state.progressNext as string).split("~")[1];
+        const followingFeed = ig.feed.accountFollowing(id);
+        followingFeed.deserialize(feedSession);
+        if (!followingFeed.isMoreAvailable()) {
+          setState({progressMode: null, progressNext: null, progressCurrent: 0});
+          alert("Instagram Following Import has completed");
+          return;
+        }
+        followingFeed.items().then((items) => {
+          processItems(items, id + "~" + followingFeed.serialize());
+        }).catch((e) => {console.error(e);ig = null;});
+      }).catch((e) => {console.error(e);ig = null;});
+    }
+  };
+
+  const state = getState();
+  if (!state.progressMode) {
+    // Show progress bar and kick off loop
+    alert("Your Instagram Following is being imported... You will recieve an alert when the import is finished.");
+
+    state.progressMode = PR.instagram;
+    state.progressCurrent = 0;
+    setState({progressMode: state.progressMode, progressCurrent: state.progressCurrent});
+    instagramImportLoop();
+  }
 }

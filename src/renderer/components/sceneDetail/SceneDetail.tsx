@@ -95,13 +95,15 @@ const styles = (theme: Theme) => createStyles({
     borderRight: `1px solid ${theme.palette.divider}`,
   },
   content: {
+    display: 'flex',
     flexGrow: 1,
+    flexDirection: 'column',
     height: '100vh',
-    overflow: 'auto',
     backgroundColor: (theme.palette.primary as any)["50"],
   },
   container: {
     padding: theme.spacing(0),
+    overflowY: 'auto',
   },
   tab: {
     width: drawerWidth,
@@ -624,7 +626,6 @@ class SceneDetail extends React.Component {
         if (!(className instanceof string) && className.baseVal != null) {
           className = className.baseVal;
         }
-        console.log(className);
         if (className.includes("MuiFab-")) {
           return;
         }

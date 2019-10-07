@@ -129,6 +129,16 @@ const MO = { // Menu/Modal Constants
   deleteAlert: 'me.dalert',
 };
 
+const PR = { // Global progress functions
+  cancel: 'pr.cancel',
+  complete: 'pr.complete',
+  offline: 'pr.offline',
+  tumblr: 'pr.tumblr',
+  reddit: 'pr.reddit',
+  twitter: 'pr.twitter',
+  instagram: 'pr.instagram',
+};
+
 export {
-  TF, WF, OF, IF, GO, VO, HTF, VTF, TOT, BT, GT, TT, SF, ST, SL, AF, IPC, VC, MO
+  TF, WF, OF, IF, GO, VO, HTF, VTF, TOT, BT, GT, TT, SF, ST, SL, AF, IPC, VC, MO, PR
 };

@@ -122,7 +122,7 @@ const styles = (theme: Theme) => createStyles({
     alignItems: 'center',
     justifyContent: 'flex-start',
     color: '#fff',
-    paddingLeft: 20,
+    paddingLeft: 23,
     backgroundColor: theme.palette.primary.main,
     ...theme.mixins.toolbar,
   },
@@ -157,19 +157,19 @@ const styles = (theme: Theme) => createStyles({
   },
   appBarSpacer: theme.mixins.toolbar,
   content: {
+    display: 'flex',
     flexGrow: 1,
+    flexDirection: 'column',
     height: '100vh',
-    overflow: 'auto',
   },
   container: {
     padding: theme.spacing(0),
+    overflowY: 'auto',
   },
   sceneList: {
     padding: theme.spacing(1),
     display: 'flex',
     flexWrap: 'wrap',
-    overflowY: 'auto',
-    overflowX: 'hidden',
   },
   scene: {
     marginRight: theme.spacing(1),
@@ -515,7 +515,7 @@ class ScenePicker extends React.Component {
             <Tooltip title="Add Scene Generator"  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addGeneratorButton, this.state.openMenu != MO.new && classes.addButtonClose)}
-                onClick={this.props.canGenerate ? this.props.onAddGenerator.bind(this) : this.nop}
+                onClick={this.props.onAddGenerator.bind(this)}
                 disabled={!this.props.canGenerate}
                 size="small">
                 <AddCircleOutlineIcon className={classes.icon} />
@@ -593,8 +593,6 @@ class ScenePicker extends React.Component {
       </div>
     );
   }
-
-  nop() {}
 
   componentDidMount() {
     if (remote.getCurrentWindow().id == 1) {
@@ -689,7 +687,6 @@ class ScenePicker extends React.Component {
         if (!(className instanceof string) && className.baseVal != null) {
           className = className.baseVal;
         }
-        console.log(className);
         if (className.includes("MuiFab-")) {
           return;
         }

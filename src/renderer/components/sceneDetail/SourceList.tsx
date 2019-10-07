@@ -106,7 +106,7 @@ class SourceList extends React.Component {
               arrayMove(newSources, evt.oldIndex, evt.newIndex);
               this.props.onUpdateSources(newSources);
             }}>
-            {this.props.sources.map((source, index) =>
+            {this.props.sources.map((source) =>
               <ListItem
                 key={source.id}
                 classes={{container: classes.sourceBG}}
@@ -135,7 +135,7 @@ class SourceList extends React.Component {
                       <div onClick={this.onEdit.bind(this, source.id)}>
                         {source.url}
                       </div>
-                      {source.tags && source.tags.map((tag, index) =>
+                      {source.tags && source.tags.map((tag) =>
                         <Chip
                           key={tag.id}
                           className={classes.actionButton}
