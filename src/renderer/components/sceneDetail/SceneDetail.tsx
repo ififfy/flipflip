@@ -39,6 +39,7 @@ import ZoomMoveGroup from "./ZoomMoveGroup";
 import StrobeGroup from "./StrobeGroup";
 import AudioGroup from "./AudioGroup";
 import TextGroup from "./TextGroup";
+import URLDialog from "./URLDialog";
 
 const drawerWidth = 240;
 
@@ -245,12 +246,13 @@ class SceneDetail extends React.Component {
     config: Config,
     scene: Scene,
     goBack(): void,
-    onAddSource(scene: Scene, type: string): void,
+    onAddSource(scene: Scene, type: string, ...args: any[]): void,
     onClearBlacklist(sourceURL: string): void,
     onClip(source: LibrarySource): void,
     onDelete(scene: Scene): void,
     onExport(scene: Scene): void,
-    onPlay(scene: Scene): void,
+    onPlayScene(scene: Scene): void,
+    onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void,
     onSaveAsScene(scene: Scene): void,
     onSetupGrid(scene: Scene): void,
     onSort(scene: Scene, algorithm: string, ascending: boolean): void,
@@ -271,7 +273,7 @@ class SceneDetail extends React.Component {
     const classes = this.props.classes;
     const open = this.state.drawerOpen;
     return (
-      <div className={classes.root}>
+      <div className={classes.root} onKeyDown={this.secretHotkey.bind(this)} tabIndex={0}>
 
         <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
           <Toolbar>
@@ -315,7 +317,7 @@ class SceneDetail extends React.Component {
               edge="start"
               color="inherit"
               aria-label="Play"
-              onClick={this.props.onPlay.bind(this)}>
+              onClick={this.props.onPlayScene.bind(this)}>
               <PlayCircleOutlineIcon fontSize="large"/>
             </IconButton>
           </Toolbar>
@@ -471,7 +473,8 @@ class SceneDetail extends React.Component {
                   sources={this.props.scene.sources}
                   onClearBlacklist={this.props.onClearBlacklist.bind(this)}
                   onClip={this.props.onClip.bind(this)}
-                  onUpdateSources={this.onUpdateSources.bind(this)} />
+                  onPlay={this.props.onPlay.bind(this)}
+                  onUpdateSources={this.onUpdateSources.bind(this)}/>
               </div>
             </Typography>
 
@@ -552,6 +555,11 @@ class SceneDetail extends React.Component {
               <AddIcon className={classes.icon} />
             </Fab>
 
+            <URLDialog
+              open={this.state.openMenu == MO.urlImport}
+              onImportURL={this.onAddSource.bind(this)}
+              onClose={this.onCloseDialog.bind(this)}
+            />
             {this.props.scene.sources.length >= 2 && (
               <React.Fragment>
                 <Fab
@@ -602,9 +610,17 @@ class SceneDetail extends React.Component {
     )
   }
 
-  onAddSource(addFunction: string) {
+  // Use alt+P to access import modal
+  // Use alt+U to toggle highlighting untagged sources
+  secretHotkey(e: KeyboardEvent) {
+    if (!e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'p' || e.key == 'π')) {
+      this.setState({openMenu: this.state.openMenu == MO.urlImport ? null : MO.urlImport});
+    }
+  }
+
+  onAddSource(addFunction: string, ...args: any[]) {
     this.onCloseDialog();
-    this.props.onAddSource(this.props.scene, addFunction);
+    this.props.onAddSource(this.props.scene, addFunction, ...args);
   }
 
   onToggleDrawer() {

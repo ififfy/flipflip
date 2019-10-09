@@ -67,7 +67,7 @@ export default class AudioGroup extends React.Component {
     const newAudios = Array.from(this.props.scene.audios);
     const audio: any = newAudios.find((a) => a.id == id);
     if (["volume", "speed", "tickDelay", "tickMinDelay", "tickMaxDelay", "tickSinRate"].includes(key)) {
-      audio[key] = parseInt(value, 10);
+      audio[key] = parseInt(value);
     } else {
       audio[key] = value;
     }

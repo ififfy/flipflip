@@ -366,8 +366,8 @@ export default class ImagePlayer extends React.Component {
         if (this.props.scene.videoOption == VO.full) {
           let duration;
           if (video.hasAttribute("start") && video.hasAttribute("end")) {
-            const start = parseInt(video.getAttribute("start"), 10);
-            const end = parseInt(video.getAttribute("end"), 10);
+            const start = parseInt(video.getAttribute("start"));
+            const end = parseInt(video.getAttribute("end"));
             duration = end - start;
           } else {
             duration = video.duration;
@@ -378,12 +378,12 @@ export default class ImagePlayer extends React.Component {
         }
 
         if (video.hasAttribute("start") && video.hasAttribute("end")) {
-          const start = parseInt(video.getAttribute("start"), 10);
-          const end = parseInt(video.getAttribute("end"), 10);
+          const start = parseInt(video.getAttribute("start"));
+          const end = parseInt(video.getAttribute("end"));
           if (this.props.scene.videoOption != VO.full && this.props.scene.randomVideoStart && (!this.props.scene.continueVideo || !video.currentTime)) {
             video.currentTime = start + (Math.random() * (end - start));
           } else if (video.currentTime < start || video.currentTime > end) {
-            video.currentTime = parseInt(video.getAttribute("start"), 10);
+            video.currentTime = parseInt(video.getAttribute("start"));
           }
         } else if (this.props.scene.videoOption != VO.full && this.props.scene.randomVideoStart && (!this.props.scene.continueVideo || !video.currentTime)) {
           video.currentTime = Math.random() * video.duration;
@@ -550,8 +550,8 @@ export default class ImagePlayer extends React.Component {
       this.state.readyToDisplay.sort((a, b) => {
         // JavaScript doesn't calculate negative modulos correctly, use this
         const mod = (x: number, n: number) => (x % n + n) % n;
-        const aStrict = mod((parseInt(a.getAttribute("index"), 10) - this.state.historyPaths.length), parseInt(a.getAttribute("length"), 10));
-        const bStrict = mod((parseInt(b.getAttribute("index"), 10) - this.state.historyPaths.length), parseInt(b.getAttribute("length"), 10));
+        const aStrict = mod((parseInt(a.getAttribute("index")) - this.state.historyPaths.length), parseInt(a.getAttribute("length")));
+        const bStrict = mod((parseInt(b.getAttribute("index")) - this.state.historyPaths.length), parseInt(b.getAttribute("length")));
         if (aStrict > bStrict) {
           return 1;
         } else if (aStrict < bStrict) {

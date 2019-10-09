@@ -334,6 +334,6 @@ export default class AudioControl extends React.Component {
   }
 
   onChangePosition(position: string) {
-    this.setState({position: parseInt(position, 10)});
+    this.setState({position: parseInt(position)});
   }
 }

@@ -154,12 +154,12 @@ function loadLocalDirectory(config: Config, source: LibrarySource, filter: strin
         resolve({
           data: filterPathsToJustPlayable(filter, rawFiles, true).map((p) => fileURL(p)).sort((a, b) => {
             let aFile: any = getFileName(a, false);
-            if (parseInt(aFile, 10)) {
-              aFile = parseInt(aFile, 10);
+            if (parseInt(aFile)) {
+              aFile = parseInt(aFile);
             }
             let bFile: any = getFileName(b, false);
-            if (parseInt(aFile, 10)) {
-              aFile = parseInt(aFile, 10);
+            if (parseInt(aFile)) {
+              aFile = parseInt(aFile);
             }
             if (aFile > bFile) {
               return 1;
@@ -528,8 +528,8 @@ function loadImageFap(config: Config, source: LibrarySource, filter: string, hel
               let videoURL = "";
               let videoDimension = 0;
               for (let source of el.querySelectorAll("source")) {
-                if (parseInt(source.getAttribute("res"), 10) > videoDimension) {
-                  videoDimension = parseInt(source.getAttribute("res"), 10);
+                if (parseInt(source.getAttribute("res")) > videoDimension) {
+                  videoDimension = parseInt(source.getAttribute("res"));
                   videoURL = source.src;
                 }
               }

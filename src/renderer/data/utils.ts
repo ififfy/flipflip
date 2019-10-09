@@ -53,7 +53,7 @@ export function getTimestampValue(value: string): number {
     if (n != split[0]) {
       if (n.length != 2) return null;
     }
-    const int = parseInt(n, 10);
+    const int = parseInt(n);
     if (isNaN(int)) return null;
     splitInt.push(int);
   }

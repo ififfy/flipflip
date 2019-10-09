@@ -124,6 +124,8 @@ const VC = { // Video Control Modes
 const MO = { // Menu/Modal Constants
   new: 'me.new',
   sort: 'me.sort',
+  batchTag: 'me.batchtag',
+  urlImport: 'me.urlimport',
   newWindowAlert: 'me.nwalert',
   removeAllAlert: 'me.raalert',
   deleteAlert: 'me.dalert',

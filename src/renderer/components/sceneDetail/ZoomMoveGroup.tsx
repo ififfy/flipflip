@@ -152,7 +152,7 @@ export default class ZoomMoveGroup extends React.Component {
 
   changeKey(key: string, value: any) {
     if (["zoomStart", "zoomEnd", "horizTransLevel", "vertTransLevel", "transDuration", "transDurationMin", "transDurationMax", "transSinRate", "transBPMMulti"].includes(key)) {
-      this.update((s) => s[key] = parseInt(value, 10));
+      this.update((s) => s[key] = parseInt(value));
     } else {
       this.update((s) => s[key] = value);
     }

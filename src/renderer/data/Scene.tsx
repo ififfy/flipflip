@@ -125,7 +125,7 @@ export default class Scene {
     }
 
     if (typeof this.timingConstant == "string") {
-      this.timingConstant = parseInt(this.timingConstant, 10);
+      this.timingConstant = parseInt(this.timingConstant);
     }
 
     if (this.timingFunction == 'tf.variableFaster') {

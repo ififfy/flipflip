@@ -7,12 +7,13 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import {FixedSizeList} from "react-window";
 
 import {
-  Avatar, Box, Button, Chip, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, Link,
-  List, ListItem, ListItemAvatar, ListItemSecondaryAction, ListItemText, SvgIcon, TextField, Theme, Typography,
-  withStyles
+  Badge, Box, Button, Checkbox, Chip, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, Fab,
+  IconButton, Link, List, ListItem, ListItemAvatar, ListItemSecondaryAction, ListItemText, SvgIcon, TextField, Theme,
+  Typography, withStyles
 } from "@material-ui/core";
 
 import DeleteIcon from '@material-ui/icons/Delete';
+import NotInterestedIcon from '@material-ui/icons/NotInterested';
 
 import {arrayMove, getCachePath, getFileName, getSourceType, urlToPath} from "../../data/utils";
 import {ST} from "../../data/const";
@@ -31,6 +32,16 @@ const styles = (theme: Theme) => createStyles({
   },
   avatar: {
     backgroundColor: theme.palette.primary.main,
+    boxShadow: 'none',
+  },
+  markedSource: {
+    backgroundColor: theme.palette.secondary.main,
+  },
+  sourceIcon: {
+    color: theme.palette.primary.contrastText,
+  },
+  sourceMarkedIcon: {
+    color: theme.palette.secondary.contrastText,
   },
   deleteButton: {
     backgroundColor: theme.palette.error.main,
@@ -63,7 +74,14 @@ class SourceList extends React.Component {
     sources: Array<LibrarySource>,
     onClearBlacklist(sourceURL: string): void,
     onClip(source: LibrarySource): void,
+    onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void,
     onUpdateSources(sources: Array<LibrarySource>): void,
+    isSelect?: boolean,
+    library?: Array<LibrarySource>,
+    selected?: Array<string>,
+    yOffset?: number,
+    onUpdateSelected?(selected: Array<string>): void,
+    savePosition?(): void,
   };
 
   readonly state = {
@@ -72,9 +90,20 @@ class SourceList extends React.Component {
   };
 
   onSortEnd = ({oldIndex, newIndex}: {oldIndex: number, newIndex: number}) => {
-    let newSources = Array.from(this.props.sources);
-    arrayMove(newSources, oldIndex, newIndex);
-    this.props.onUpdateSources(newSources);
+    if (this.props.library) {
+      const oldIndexSource = this.props.sources[oldIndex];
+      const newIndexSource = this.props.sources[newIndex];
+      const libraryURLs = this.props.library.map((s) => s.url);
+      const oldLibraryIndex = libraryURLs.indexOf(oldIndexSource.url);
+      const newLibraryIndex = libraryURLs.indexOf(newIndexSource.url);
+      let newLibrary = Array.from(this.props.library);
+      arrayMove(newLibrary, oldLibraryIndex, newLibraryIndex);
+      this.props.onUpdateSources(newLibrary);
+    } else {
+      let newSources = Array.from(this.props.sources);
+      arrayMove(newSources, oldIndex, newIndex);
+      this.props.onUpdateSources(newSources);
+    }
   };
 
   render() {
@@ -131,8 +160,54 @@ class SourceList extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    this.savePosition();
+  }
+
+  savePosition() {
+    if (this.props.savePosition) {
+      this.props.savePosition();
+    }
+  }
+
   onRemove(source: LibrarySource) {
-    this.props.onUpdateSources(this.props.sources.filter((s) => s.id != source.id));
+    const oldSources = this.props.library ? this.props.library : this.props.sources;
+    this.props.onUpdateSources(oldSources.filter((s) => s.id != source.id));
+  }
+
+  onClip(source: LibrarySource) {
+    this.savePosition();
+    this.props.onClip(source);
+  }
+
+  onSourceIconClick(source: LibrarySource, e: MouseEvent) {
+    const sourceURL = source.url;
+    if (e.shiftKey && !e.ctrlKey) {
+      this.openExternalURL(sourceURL);
+    } else if (!e.shiftKey && e.ctrlKey) {
+      const fileType = getSourceType(sourceURL);
+      let cachePath;
+      if (fileType == ST.video) {
+        cachePath = getCachePath(sourceURL, this.props.config) + getFileName(sourceURL);
+      } else {
+        cachePath = getCachePath(sourceURL, this.props.config);
+      }
+      this.openDirectory(cachePath);
+    } else if (!e.shiftKey && !e.ctrlKey) {
+      this.savePosition();
+      this.props.onPlay(source, this.props.sources);
+    }
+  }
+
+  onToggleSelect(e: MouseEvent) {
+    const source = (e.currentTarget as HTMLInputElement).value;
+    let newSelected = Array.from(this.props.selected);
+    if (newSelected.includes(source)) {
+      newSelected.splice(newSelected.indexOf(source), 1)
+    } else {
+      newSelected.push(source);
+    }
+    this.props.onUpdateSelected(newSelected);
   }
 
   onEdit(sourceID: number, e: Event) {
@@ -142,7 +217,8 @@ class SourceList extends React.Component {
     // Also prevent user from inputing duplicate source
     // If new entry is a duplicate, make sure we remove the new entry
     const newSources = Array<LibrarySource>();
-    for (let source of this.props.sources) {
+    const oldSources = this.props.library ? this.props.library : this.props.sources;
+    for (let source of oldSources) {
       if (source.url != "") {
         if (!newSources.map((s) => s.url).includes(source.url)) {
           newSources.push(source);
@@ -162,7 +238,8 @@ class SourceList extends React.Component {
   }
 
   onEditSource(sourceID: number, e: React.FormEvent<HTMLInputElement>) {
-    this.props.onUpdateSources(this.props.sources.map(
+    const oldSources = this.props.library ? this.props.library : this.props.sources;
+    this.props.onUpdateSources(oldSources.map(
       function map(source: LibrarySource) {
         if (source.id == sourceID) {
           source.offline = false;
@@ -201,10 +278,14 @@ class SourceList extends React.Component {
 
   openDirectory(cachePath: string) {
     if (process.platform === "win32") {
-      remote.shell.openExternal(cachePath);
+      this.openExternalURL(cachePath);
     } else {
-      remote.shell.openExternal(urlToPath(cachePath));
+      this.openExternalURL(urlToPath(cachePath));
     }
+  }
+
+  openExternalURL(url: string) {
+    remote.shell.openExternal(url);
   }
 
   SortableVirtualList = sortableContainer(this.VirtualList.bind(this));
@@ -212,11 +293,11 @@ class SourceList extends React.Component {
   VirtualList(props: any) {
     const { height, width } = props;
 
-    // TODO Make itemSize based on theme.spacing(7)
     return (
       <FixedSizeList
         height={height}
         width={width}
+        initialScrollOffset={this.props.yOffset ? this.props.yOffset : 0}
         itemSize={56}
         itemCount={this.props.sources.length}
         itemData={this.props.sources}
@@ -230,14 +311,30 @@ class SourceList extends React.Component {
   SortableItem = sortableElement(({value}: {value: {index: number, style: any, data: Array<any>}}) => {
     const classes = this.props.classes;
     const index = value.index;
-    const source = value.data[index];
+    const source: LibrarySource = value.data[index];
     return (
-      <div key={source.id} style={value.style} className={index % 2 == 0 ? classes.evenChild : classes.oddChild}>
+      <div key={source.id} style={value.style} className={clsx(index % 2 == 0 ? classes.evenChild : classes.oddChild)}>
         <ListItem className={classes.source}>
+          {this.props.isSelect && (
+            <Checkbox value={source.url} onChange={this.onToggleSelect.bind(this)}
+                      checked={this.props.selected.includes(source.url)}/>
+          )}
           <ListItemAvatar>
-            <Avatar className={classes.avatar}>
-              <SourceIcon url={source.url}/>
-            </Avatar>
+            <Badge
+              invisible={!source.offline}
+              overlap="circle"
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              badgeContent={<NotInterestedIcon />}>
+              <Fab
+                size="small"
+                onClick={this.onSourceIconClick.bind(this, source)}
+                className={clsx(classes.avatar, source.marked && classes.markedSource)}>
+                <SourceIcon url={source.url} className={clsx(classes.sourceIcon, source.marked && classes.sourceMarkedIcon)}/>
+              </Fab>
+            </Badge>
           </ListItemAvatar>
 
           <ListItemText classes={{primary: classes.root}}>
@@ -282,7 +379,7 @@ class SourceList extends React.Component {
               )}
               {getSourceType(source.url) == ST.video && (
                 <IconButton
-                  onClick={this.props.onClip.bind(this, source)}
+                  onClick={this.onClip.bind(this, source)}
                   className={classes.actionButton}
                   edge="end"
                   size="small"

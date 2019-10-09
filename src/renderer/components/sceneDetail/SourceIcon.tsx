@@ -89,7 +89,8 @@ function EHentaiIcon(props: any) {
 export default class SourceIcon extends React.Component {
   readonly props: {
     url?: string,
-    type?: string 
+    type?: string
+    className?: string,
   };
 
   render() {
@@ -101,34 +102,34 @@ export default class SourceIcon extends React.Component {
     }
     switch(type) {
       case ST.local:
-        return <FolderIcon/>;
+        return <FolderIcon className={this.props.className}/>;
       case ST.video:
-        return <MovieIcon/>;
+        return <MovieIcon className={this.props.className}/>;
       case ST.list:
-        return <ListIcon/>;
+        return <ListIcon className={this.props.className}/>;
       case ST.reddit:
-        return <RedditIcon/>;
+        return <RedditIcon className={this.props.className}/>;
       case ST.twitter:
-        return <TwitterIcon/>;
+        return <TwitterIcon className={this.props.className}/>;
       case ST.instagram:
-        return <InstagramIcon/>;
+        return <InstagramIcon className={this.props.className}/>;
       case ST.tumblr:
-        return <TumblrIcon/>;
+        return <TumblrIcon className={this.props.className}/>;
       case ST.imagefap:
-        return <ImageFapIcon/>;
+        return <ImageFapIcon className={this.props.className}/>;
       case ST.sexcom:
-        return <SexComIcon/>;
+        return <SexComIcon className={this.props.className}/>;
       case ST.imgur:
-        return <ImgurIcon/>;
+        return <ImgurIcon className={this.props.className}/>;
       case ST.deviantart:
-        return <DeviantArtIcon/>;
+        return <DeviantArtIcon className={this.props.className}/>;
       case ST.danbooru:
-        return <DanbooruIcon/>;
+        return <DanbooruIcon className={this.props.className}/>;
       case ST.gelbooru1:
       case ST.gelbooru2:
-        return <GelbooruIcon/>;
+        return <GelbooruIcon className={this.props.className}/>;
       case ST.ehentai:
-        return <EHentaiIcon/>;
+        return <EHentaiIcon className={this.props.className}/>;
       default:
         return <div/>
     }

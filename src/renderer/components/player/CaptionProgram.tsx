@@ -149,8 +149,8 @@ export default class CaptionProgram extends React.Component {
               console.error("Error: '" + line + "' - invalid count command");
               break;
             }
-            let start = parseInt(split[0], 10);
-            const end = parseInt(split[1], 10);
+            let start = parseInt(split[0]);
+            const end = parseInt(split[1]);
             if (isNaN(start) || isNaN(end) || start < 0 || end < 0) {
               hasError = true;
               console.error("Error: '" + line + "' - invalid count command");
@@ -177,7 +177,7 @@ export default class CaptionProgram extends React.Component {
           case "setcountdelay":
           case "setcountgroupdelay":
           case "wait":
-            ms = parseInt(value, 10);
+            ms = parseInt(value);
             if (isNaN(ms)) {
               hasError = true;
               console.error("Error: '" + line + "' - invalid command");

@@ -219,7 +219,7 @@ export default class SceneEffectGroup extends React.Component {
     const newOverlays = Array.from(this.props.scene.overlays);
     const overlay: any = newOverlays.find((o) => o.id == id);
     if (["sceneID", "opacity"].includes(key)) {
-      overlay[key] = parseInt(value, 10);
+      overlay[key] = parseInt(value);
     } else {
       overlay[key] = value;
     }
@@ -247,7 +247,7 @@ export default class SceneEffectGroup extends React.Component {
 
   changeKey(key: string, value: any) {
     if (["timingConstant", "timingMin", "timingMax", "timingSinRate", "timingBPMMulti", "nextSceneTime"].includes(key)) {
-      this.update((s) => s[key] = parseInt(value, 10));
+      this.update((s) => s[key] = parseInt(value));
     } else {
       this.update((s) => s[key] = value);
     }

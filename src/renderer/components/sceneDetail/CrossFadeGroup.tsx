@@ -106,7 +106,7 @@ export default class CrossFadeGroup extends React.Component {
 
   changeKey(key: string, value: any) {
     if (["fadeDuration", "fadeDurationMin", "fadeDurationMax", "fadeSinRate", "fadeBPMMulti"].includes(key)) {
-      this.update((s) => s[key] = parseInt(value, 10));
+      this.update((s) => s[key] = parseInt(value));
     } else {
       this.update((s) => s[key] = value);
     }

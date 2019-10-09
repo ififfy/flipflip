@@ -46,6 +46,13 @@ div.CreatableSelect {
   }
 }
 
+#sortable-list {
+  > div {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+}
+
 @mixin noselect {
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */

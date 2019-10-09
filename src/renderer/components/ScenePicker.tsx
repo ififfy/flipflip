@@ -183,43 +183,6 @@ const styles = (theme: Theme) => createStyles({
   sceneTitle: {
     textAlign: 'center',
   },
-  toggle: {
-    zIndex: theme.zIndex.drawer + 1,
-    position: 'absolute',
-    top: '50%',
-    marginLeft: drawerWidth - 25,
-    transition: theme.transitions.create(['margin', 'opacity'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  toggleClose: {
-    marginLeft: theme.spacing(9) - 25,
-    transition: theme.transitions.create(['margin', 'opacity'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  toggleHide: {
-    opacity: 0,
-    transition: theme.transitions.create(['margin', 'opacity'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  toggleIcon: {
-    transition: theme.transitions.create('transform', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  toggleIconOpen: {
-    transform: 'rotate(180deg)',
-    transition: theme.transitions.create('transform', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
   addMenuButton: {
     backgroundColor: theme.palette.primary.dark,
     margin: 0,
@@ -308,7 +271,6 @@ class ScenePicker extends React.Component {
 
   readonly state = {
     drawerOpen: false,
-    drawerHover: false,
     newVersion: "",
     newVersionLink: "",
     isFirstWindow: false,
@@ -361,8 +323,6 @@ class ScenePicker extends React.Component {
             <Drawer
               variant="permanent"
               classes={{paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose)}}
-              onMouseEnter={this.onMouseEnterDrawer.bind(this)}
-              onMouseLeave={this.onMouseLeaveDrawer.bind(this)}
               open={open}>
 
               <div className={classes.drawerToolbar}>
@@ -457,17 +417,6 @@ class ScenePicker extends React.Component {
                 </Typography>
               </div>
             </Drawer>
-
-            <Fab
-              className={clsx(classes.toggle, !open && classes.toggleClose, !this.state.drawerHover && classes.toggleHide)}
-              color="primary"
-              size="medium"
-              aria-label="toggle"
-              onMouseEnter={this.onMouseEnterDrawer.bind(this)}
-              onMouseLeave={this.onMouseLeaveDrawer.bind(this)}
-              onClick={this.onToggleDrawer.bind(this)}>
-              <ArrowForwardIosIcon className={clsx(classes.toggleIcon, open && classes.toggleIconOpen)}/>
-            </Fab>
           </React.Fragment>
         )}
 
@@ -612,7 +561,7 @@ class ScenePicker extends React.Component {
             if (betaNumber == "") {
               releaseBetaVersion = 0;
             } else {
-              releaseBetaVersion = parseInt(betaNumber, 10);
+              releaseBetaVersion = parseInt(betaNumber);
             }
           }
           let thisVersion = this.props.version.replace(".", "").replace(".", "");
@@ -625,15 +574,15 @@ class ScenePicker extends React.Component {
             if (betaNumber == "") {
               thisBetaVersion = 0;
             } else {
-              thisBetaVersion = parseInt(betaNumber, 10);
+              thisBetaVersion = parseInt(betaNumber);
             }
           }
-          if (parseInt(releaseVersion, 10) > parseInt(thisVersion, 10)) {
+          if (parseInt(releaseVersion) > parseInt(thisVersion)) {
             this.setState({
               newVersion: newestReleaseTag,
               newVersionLink: newestReleaseURL,
             })
-          } else if (parseInt(releaseVersion, 10) == parseInt(thisVersion, 10)) {
+          } else if (parseInt(releaseVersion) == parseInt(thisVersion)) {
             if ((releaseBetaVersion == -1 && thisBetaVersion >= 0) ||
               releaseBetaVersion > thisBetaVersion) {
               this.setState({
@@ -700,14 +649,6 @@ class ScenePicker extends React.Component {
 
   onCloseDialog() {
     this.setState({menuAnchorEl: null, openMenu: null});
-  }
-
-  onMouseEnterDrawer() {
-    this.setState({drawerHover: true});
-  }
-
-  onMouseLeaveDrawer() {
-    this.setState({drawerHover: false});
   }
 
   onRandomScene() {

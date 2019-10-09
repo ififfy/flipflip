@@ -28,8 +28,8 @@ export default class VideoControl extends React.Component {
           <React.Fragment>
             <div className="VideoSlider">
               <InputRange
-                minValue={this.props.video.hasAttribute("start") ? parseInt(this.props.video.getAttribute("start"), 10) : 0}
-                maxValue={this.props.video.hasAttribute("end") ? parseInt(this.props.video.getAttribute("end"), 10) : this.props.video.duration}
+                minValue={this.props.video.hasAttribute("start") ? parseInt(this.props.video.getAttribute("start")) : 0}
+                maxValue={this.props.video.hasAttribute("end") ? parseInt(this.props.video.getAttribute("end")) : this.props.video.duration}
                 value={this.props.video.currentTime}
                 formatLabel={(value) => getTimestamp(value)}
                 onChange={this.onChangePosition.bind(this)}/>

@@ -199,7 +199,7 @@ export default class StrobeGroup extends React.Component {
 
   changeKey(key: string, value: any) {
     if (["strobeBPMMulti", "strobeSinRate", "strobeTime", "strobeTimeMin", "strobeTimeMax", "strobeDelayBPMMulti", "strobeDelaySinRate", "strobeDelay", "strobeDelayMin", "strobeDelayMax"].includes(key)) {
-      this.update((s) => s[key] = parseInt(value, 10));
+      this.update((s) => s[key] = parseInt(value));
     } else {
       this.update((s) => s[key] = value);
     }

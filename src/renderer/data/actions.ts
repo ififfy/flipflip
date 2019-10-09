@@ -1,6 +1,6 @@
 import {remote, webFrame} from "electron";
 import * as fs from "fs";
-import path from 'path';
+import path, {sep} from 'path';
 import wretch from "wretch";
 import {existsSync} from "fs";
 import {outputFile} from "fs-extra";
@@ -11,7 +11,7 @@ import Twitter from "twitter";
 import {IgApiClient} from "instagram-private-api";
 
 import {getBackups, getCachePath, getFileGroup, getFileName, getSourceType, isVideo, saveDir} from "./utils";
-import {AF, PR, SF, ST} from "./const";
+import {AF, GT, PR, SF, ST, TOT} from "./const";
 import { defaultInitialState } from './AppStorage';
 import { Route } from "./Route";
 import Scene from "./Scene";
@@ -329,15 +329,9 @@ export function openLibraryImport(state: State): Object {
 }
 
 export function importFromLibrary(state: State, sources: Array<LibrarySource>): Object {
-  const sceneSources = getActiveScene(state).sources;
-  const sceneSourceURLs = sceneSources.map((s) => s.url);
-  for (let source of sources) {
-    if (!sceneSourceURLs.includes(source.url)) {
-      sceneSources.unshift(source);
-    }
-  }
-  updateScene(state, getActiveScene(state), (s: Scene) => {s.sources = sceneSources});
-  return goBack(state);
+  const scene = getActiveScene(state);
+  const sceneSources = addSources(scene.sources, sources.map((s) => s.url));
+  return {...updateScene(state, getActiveScene(state), (s: Scene) => {s.sources = sceneSources}), ...goBack(state)};
 }
 
 export function saveLibraryPosition(state: State, yOffset: number, filters: Array<string>, selected: Array<string>): Object {
@@ -641,7 +635,7 @@ export function onUpdateGrid(state: State, grid: Array<Array<number>>): Object {
   return {scenes: newScenes, route: newRoute};
 }
 
-export function addSource(state: State, scene: Scene, type: string): Object {
+export function addSource(state: State, scene: Scene, type: string, ...args: any[]): Object {
   let newSources = scene != null ? scene.sources : state.library;
   switch (type) {
     case AF.library:
@@ -664,16 +658,82 @@ export function addSource(state: State, scene: Scene, type: string): Object {
       vResult = vResult.filter((r) => isVideo(r, true));
       newSources = addSources(newSources, vResult);
       break;
+
+    case GT.local:
+      if (!args || args.length < 2) {
+        return;
+      }
+      console.log(args);
+      let rootDir = args[1];
+      if (!rootDir.endsWith(sep)) {
+        rootDir += sep;
+      }
+      newSources = addSources(newSources, getImportURLs(args[0], rootDir));
+      break;
+
+    case GT.tumblr:
+      if (!args || args.length < 1) {
+        return;
+      }
+      newSources = addSources(newSources, getImportURLs(args[0]));
+      break;
   }
   if (scene != null) {
     const newScenes = state.scenes;
     const thisScene = newScenes.find((s) => s.id == scene.id);
     thisScene.sources = newSources;
+    if (args) {
+      let importURL = args[0];
+      if (importURL.includes("pastebinId=")) {
+        importURL = importURL.substring(importURL.indexOf("pastebinId=") + 11);
+
+        if (importURL.includes("&")) {
+          importURL = importURL.substring(0, importURL.indexOf("&"));
+        }
+
+        // Update hastebin URL (if present)
+        thisScene.textKind = TOT.hastebin;
+        thisScene.textSource = importURL;
+      }
+    }
     return {scenes: newScenes};
   } else {
     return {library: newSources};
   }
 }
+
+function getImportURLs(importURL: string, rootDir?: string): string[]  {
+  if (importURL.includes("sources=")) {
+    // Remove everything before "sources="
+    importURL = importURL.substring(importURL.indexOf("sources=") + 8);
+
+    if (importURL.includes("&")) {
+      // Remove everything after the sources parameter
+      importURL = importURL.substring(0, importURL.indexOf("&"));
+    }
+
+    // Split into blog names
+    let importURLs = importURL.split("%20");
+    for (let u = 0; u < importURLs.length; u++) {
+      let fullPath;
+      if (rootDir) {
+        fullPath = rootDir + importURLs[u];
+      } else {
+        fullPath = "http://" + importURLs[u] + ".tumblr.com";
+      }
+      if (importURLs.includes(fullPath) || importURLs[u] === sep || importURLs[u] === "") {
+        // Remove index and push u back
+        importURLs.splice(u, 1);
+        u -= 1
+      } else {
+        importURLs[u] = fullPath;
+      }
+    }
+    return importURLs;
+  }
+  return [];
+}
+
 
 function addSources(originalSources: Array<LibrarySource>, newSources: Array<string>): Array<LibrarySource> {
   // dedup
@@ -944,7 +1004,7 @@ export function exportLibrary(state: State): Object {
   return {};
 }
 
-export function importLibrary(state: State, backup:Function): Object {
+export function importLibrary(state: State, backup: Function): Object {
   const filePath = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
     {filters: [{name:'All Files (*.*)', extensions: ['*']},{name: 'JSON Document', extensions: ['json']}], properties: ['openFile']});
   if (!filePath || !filePath.length) return;
