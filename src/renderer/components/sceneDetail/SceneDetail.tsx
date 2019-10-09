@@ -117,14 +117,16 @@ const styles = (theme: Theme) => createStyles({
     backgroundColor: (theme.palette.primary as any)["50"],
   },
   container: {
-    display: 'flex',
+    height: '100%',
     padding: theme.spacing(0),
     overflowY: 'auto',
-    flexGrow: 1,
   },
   sourcesSection: {
+    height: '100%',
+  },
+  tabPanel: {
     display: 'flex',
-    flexGrow: 1,
+    height: '100%',
   },
   tab: {
     width: drawerWidth,
@@ -347,11 +349,17 @@ class SceneDetail extends React.Component {
               onChange={this.onChangeTab.bind(this)}
               aria-label="scene detail tabs"
               className={classes.tabs}>
-              <Tab id="vertical-tab-0" icon={<BuildIcon/>} label={open ? "Options" : ""}
+              <Tab id="vertical-tab-0"
+                   aria-controls="vertical-tabpanel-0"
+                   icon={<BuildIcon/>} label={open ? "Options" : ""}
                    className={clsx(classes.tab, classes.optionsTab, !open && classes.tabClose)}/>
-              <Tab id="vertical-tab-1" icon={<PhotoFilterIcon/>} label={open ? "Effects" : ""}
+              <Tab id="vertical-tab-1"
+                   aria-controls="vertical-tabpanel-1"
+                   icon={<PhotoFilterIcon/>} label={open ? "Effects" : ""}
                    className={clsx(classes.tab, classes.effectsTab, !open && classes.tabClose)}/>
-              <Tab id="vertical-tab-2" icon={<CollectionsIcon/>} label={open ? `Sources (${this.props.scene.sources.length})` : ""}
+              <Tab id="vertical-tab-2"
+                   aria-controls="vertical-tabpanel-2"
+                   icon={<CollectionsIcon/>} label={open ? `Sources (${this.props.scene.sources.length})` : ""}
                    className={clsx(classes.tab, classes.sourcesTab, !open && classes.tabClose)}/>
             </Tabs>
           </div>
@@ -413,20 +421,23 @@ class SceneDetail extends React.Component {
               hidden={this.state.openTab !== 0}
               id="vertical-tabpanel-0"
               aria-labelledby="vertical-tab-0">
-              <Box>
-                <SceneEffectGroup
-                  scene={this.props.scene}
-                  isTagging={false}
-                  isConfig={false}
-                  allScenes={this.props.allScenes}
-                  onSetupGrid={this.props.onSetupGrid.bind(this)}
-                  onUpdateScene={this.props.onUpdateScene.bind(this)} />
+              <div className={classes.tabPanel}>
+                <div className={classes.drawerSpacer}/>
+                <Box className={classes.fill}>
+                  <SceneEffectGroup
+                    scene={this.props.scene}
+                    isTagging={false}
+                    isConfig={false}
+                    allScenes={this.props.allScenes}
+                    onSetupGrid={this.props.onSetupGrid.bind(this)}
+                    onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
-                <ImageVideoGroup
-                  scene={this.props.scene}
-                  isPlayer={false}
-                  onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-              </Box>
+                  <ImageVideoGroup
+                    scene={this.props.scene}
+                    isPlayer={false}
+                    onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+                </Box>
+              </div>
             </Typography>
 
             <Typography
@@ -435,46 +446,51 @@ class SceneDetail extends React.Component {
               hidden={this.state.openTab !== 1}
               id="vertical-tabpanel-1"
               aria-labelledby="vertical-tab-1">
-              <Box>
-                <CrossFadeGroup
-                  scene={this.props.scene}
-                  onUpdateScene={this.props.onUpdateScene.bind(this)} />
+              <div className={classes.tabPanel}>
+                <div className={classes.drawerSpacer}/>
+                <Box className={classes.fill}>
+                  <CrossFadeGroup
+                    scene={this.props.scene}
+                    onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
-                <ZoomMoveGroup
-                  scene={this.props.scene}
-                  onUpdateScene={this.props.onUpdateScene.bind(this)} />
+                  <ZoomMoveGroup
+                    scene={this.props.scene}
+                    onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
-                <StrobeGroup
-                  scene={this.props.scene}
-                  onUpdateScene={this.props.onUpdateScene.bind(this)} />
+                  <StrobeGroup
+                    scene={this.props.scene}
+                    onUpdateScene={this.props.onUpdateScene.bind(this)} />
 
-                <AudioGroup
-                  scene={this.props.scene}
-                  isPlayer={false}
-                  onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+                  <AudioGroup
+                    scene={this.props.scene}
+                    isPlayer={false}
+                    onUpdateScene={this.props.onUpdateScene.bind(this)}/>
 
-                <TextGroup
-                  scene={this.props.scene}
-                  onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-              </Box>
+                  <TextGroup
+                    scene={this.props.scene}
+                    onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+                </Box>
+              </div>
             </Typography>
 
             <Typography
-              className={classes.sourcesSection}
+              className={clsx(this.state.openTab === 2 && classes.sourcesSection)}
               component="div"
               role="tabpanel"
               hidden={this.state.openTab !== 2}
               id="vertical-tabpanel-2"
               aria-labelledby="vertical-tab-2">
-              <div className={classes.drawerSpacer}/>
-              <div className={classes.fill}>
-                <SourceList
-                  config={this.props.config}
-                  sources={this.props.scene.sources}
-                  onClearBlacklist={this.props.onClearBlacklist.bind(this)}
-                  onClip={this.props.onClip.bind(this)}
-                  onPlay={this.props.onPlay.bind(this)}
-                  onUpdateSources={this.onUpdateSources.bind(this)}/>
+              <div className={classes.tabPanel}>
+                <div className={classes.drawerSpacer}/>
+                <Box className={classes.fill}>
+                  <SourceList
+                    config={this.props.config}
+                    sources={this.props.scene.sources}
+                    onClearBlacklist={this.props.onClearBlacklist.bind(this)}
+                    onClip={this.props.onClip.bind(this)}
+                    onPlay={this.props.onPlay.bind(this)}
+                    onUpdateSources={this.onUpdateSources.bind(this)}/>
+                </Box>
               </div>
             </Typography>
 
