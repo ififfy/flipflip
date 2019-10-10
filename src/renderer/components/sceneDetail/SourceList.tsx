@@ -112,7 +112,7 @@ class SourceList extends React.Component {
     return (
       <AutoSizer>
         {({ height, width } : {height: number, width: number}) => (
-          <Box>
+          <React.Fragment>
             {this.props.sources.length == 0 && (
               <Typography component="h1" variant="h2" color="inherit" noWrap className={classes.emptyMessage}>
                 No Sources
@@ -146,7 +146,7 @@ class SourceList extends React.Component {
                 </Button>
               </DialogActions>
             </Dialog>
-          </Box>
+          </React.Fragment>
         )}
       </AutoSizer>
     )

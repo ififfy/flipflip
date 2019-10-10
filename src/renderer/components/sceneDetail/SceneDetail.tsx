@@ -32,14 +32,9 @@ import Config from "../../data/Config";
 import Scene from "../../data/Scene";
 import LibrarySource from "../library/LibrarySource";
 import SourceList from "./SourceList";
-import SceneEffectGroup from "./SceneEffectGroup";
-import ImageVideoGroup from "./ImageVideoGroup";
-import CrossFadeGroup from "./CrossFadeGroup";
-import ZoomMoveGroup from "./ZoomMoveGroup";
-import StrobeGroup from "./StrobeGroup";
-import AudioGroup from "./AudioGroup";
-import TextGroup from "./TextGroup";
 import URLDialog from "./URLDialog";
+import SceneOptions from "./SceneOptions";
+import SceneEffects from "./SceneEffects";
 
 const drawerWidth = 240;
 
@@ -74,9 +69,9 @@ const styles = (theme: Theme) => createStyles({
     position: 'absolute',
   },
   drawerSpacer: {
-    width: theme.spacing(7),
+    minWidth: theme.spacing(7),
     [theme.breakpoints.up('sm')]: {
-      width: theme.spacing(9),
+      minWidth: theme.spacing(9),
     },
   },
   drawerButton: {
@@ -266,7 +261,7 @@ class SceneDetail extends React.Component {
     drawerOpen: false,
     menuAnchorEl: null as any,
     openMenu: null as string,
-    openTab: 2,
+    openTab: 1,
   };
 
   readonly nameInputRef: React.RefObject<HTMLInputElement> = React.createRef();
@@ -424,18 +419,11 @@ class SceneDetail extends React.Component {
               <div className={classes.tabPanel}>
                 <div className={classes.drawerSpacer}/>
                 <Box className={classes.fill}>
-                  <SceneEffectGroup
-                    scene={this.props.scene}
-                    isTagging={false}
-                    isConfig={false}
+                  <SceneOptions
                     allScenes={this.props.allScenes}
+                    scene={this.props.scene}
                     onSetupGrid={this.props.onSetupGrid.bind(this)}
                     onUpdateScene={this.props.onUpdateScene.bind(this)} />
-
-                  <ImageVideoGroup
-                    scene={this.props.scene}
-                    isPlayer={false}
-                    onUpdateScene={this.props.onUpdateScene.bind(this)}/>
                 </Box>
               </div>
             </Typography>
@@ -448,27 +436,10 @@ class SceneDetail extends React.Component {
               aria-labelledby="vertical-tab-1">
               <div className={classes.tabPanel}>
                 <div className={classes.drawerSpacer}/>
-                <Box className={classes.fill}>
-                  <CrossFadeGroup
+                <Box p={2} className={classes.fill}>
+                  <SceneEffects
                     scene={this.props.scene}
                     onUpdateScene={this.props.onUpdateScene.bind(this)} />
-
-                  <ZoomMoveGroup
-                    scene={this.props.scene}
-                    onUpdateScene={this.props.onUpdateScene.bind(this)} />
-
-                  <StrobeGroup
-                    scene={this.props.scene}
-                    onUpdateScene={this.props.onUpdateScene.bind(this)} />
-
-                  <AudioGroup
-                    scene={this.props.scene}
-                    isPlayer={false}
-                    onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-
-                  <TextGroup
-                    scene={this.props.scene}
-                    onUpdateScene={this.props.onUpdateScene.bind(this)}/>
                 </Box>
               </div>
             </Typography>
