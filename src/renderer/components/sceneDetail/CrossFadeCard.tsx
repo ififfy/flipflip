@@ -2,7 +2,7 @@ import * as React from "react";
 import clsx from "clsx";
 
 import {
-  Card, CardContent, Collapse, createStyles, FormControl, FormControlLabel, Grid, Input, InputAdornment, InputLabel,
+  Card, CardContent, Collapse, createStyles, Divider, FormControl, FormControlLabel, Grid, InputAdornment, InputLabel,
   MenuItem, Select, Slider, Switch, TextField, Theme, Typography, withStyles
 } from "@material-ui/core";
 
@@ -16,10 +16,16 @@ const styles = (theme: Theme) => createStyles({
     width: '100%',
   },
   paddingLeft: {
-    paddingLeft: theme.spacing(1),
+    [theme.breakpoints.up('sm')]: {
+      paddingLeft: theme.spacing(1),
+    },
   },
-  paddingTop: {
-    paddingTop: `${theme.spacing(2)}px !important`,
+  endInput: {
+    paddingLeft: theme.spacing(1),
+    paddingTop: 0,
+  },
+  percentInput: {
+    minWidth: theme.spacing(11),
   },
 });
 
@@ -41,18 +47,18 @@ class CrossFadeCard extends React.Component {
     return(
       <Card>
         <CardContent>
-          <Grid container spacing={2} alignItems="center">
+          <Grid container spacing={this.props.scene.crossFade ? 2 : 0} alignItems="center">
             <Grid item xs={12}>
               <Grid container alignItems="center">
-                <Grid item xs={5}>
+                <Grid item xs={12} sm={5}>
                   <FormControlLabel
                     control={
                       <Switch checked={this.props.scene.crossFade}
                                 onChange={this.onBoolInput.bind(this, 'crossFade')}/>
                     }
-                    label="Cross Fade"/>
+                    label="Cross-Fade"/>
                 </Grid>
-                <Grid item xs={7}>
+                <Grid item xs={12} sm={7}>
                   <Collapse in={this.props.scene.crossFade} className={clsx(classes.fullWidth, classes.paddingLeft)}>
                     <FormControlLabel
                       disabled={this.props.scene.gridView}
@@ -68,10 +74,15 @@ class CrossFadeCard extends React.Component {
             </Grid>
             <Grid item xs={12}>
               <Collapse in={this.props.scene.crossFade} className={classes.fullWidth}>
+                <Divider />
+              </Collapse>
+            </Grid>
+            <Grid item xs={12}>
+              <Collapse in={this.props.scene.crossFade} className={classes.fullWidth}>
                 <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={4} className={classes.paddingTop}>
+                  <Grid item xs={12} sm={4} style={{paddingTop: 10}}>
                     <FormControl className={classes.fullWidth}>
-                      <InputLabel>Fade Timing</InputLabel>
+                      <InputLabel>Timing</InputLabel>
                       <Select
                         value={this.props.scene.fadeTF}
                         onChange={this.onInput.bind(this, 'fadeTF')}>
@@ -81,28 +92,28 @@ class CrossFadeCard extends React.Component {
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={8}>
+                  <Grid item xs={12} sm={8}>
                     <Collapse in={this.props.scene.fadeTF == TF.sin} className={classes.fullWidth}>
-                      <Typography id="fade-sin-rate-slider">
+                      <Typography id="fade-sin-rate-slider" variant="caption" component="div" color="textSecondary">
                         Wave Rate
                       </Typography>
-                      <Grid container spacing={2} alignItems="center">
-                        <Grid item xs={9}>
+                      <Grid container alignItems="center">
+                        <Grid item xs>
                           <Slider
                             min={1}
                             value={fadeSinRate}
                             onChange={this.onSliderChange.bind(this, 'fadeSinRate')}
                             aria-labelledby="fade-sin-rate-slider"/>
                         </Grid>
-                        <Grid item xs={3}>
-                          <Input
+                        <Grid item xs={3} className={classes.percentInput}>
+                          <TextField
                             value={fadeSinRate}
-                            margin="dense"
                             onChange={this.onIntInput.bind(this, 'fadeSinRate')}
                             onBlur={this.blurIntKey.bind(this, 'fadeSinRate')}
                             inputProps={{
+                              className: classes.endInput,
                               step: 5,
-                              min: 1,
+                              min: 0,
                               max: 100,
                               type: 'number',
                               'aria-labelledby': 'fade-sin-rate-slider',
@@ -111,7 +122,7 @@ class CrossFadeCard extends React.Component {
                       </Grid>
                     </Collapse>
                     <Collapse in={this.props.scene.fadeTF == TF.bpm} className={classes.fullWidth}>
-                      <Typography id="fade-bpm-multi-slider">
+                      <Typography id="fade-bpm-multi-slider" variant="caption" component="div" color="textSecondary">
                         BPM Multiplier {this.props.scene.fadeBPMMulti > 0 ? this.props.scene.fadeBPMMulti : "1 / " + (-1 * (this.props.scene.fadeBPMMulti - 2))}x
                       </Typography>
                       <Slider
@@ -144,8 +155,8 @@ class CrossFadeCard extends React.Component {
             </Grid>
             <Grid item xs={12}>
               <Collapse in={this.props.scene.crossFade && (this.props.scene.fadeTF == TF.random || this.props.scene.fadeTF == TF.sin)} className={classes.fullWidth}>
-                <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={5}>
+                <Grid container alignItems="center">
+                  <Grid item xs={12} sm={6}>
                     <TextField
                       variant="outlined"
                       label="Between"
@@ -162,14 +173,10 @@ class CrossFadeCard extends React.Component {
                         type: 'number',
                       }}/>
                   </Grid>
-                  <Grid item xs={1}>
-                    <Typography>
-                      and
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={5}>
+                  <Grid item xs={12} sm={6}>
                     <TextField
                       variant="outlined"
+                      label="and"
                       margin="dense"
                       value={fadeDurationMax}
                       onChange={this.onIntInput.bind(this, 'fadeDurationMax')}

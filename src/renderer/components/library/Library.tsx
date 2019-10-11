@@ -130,6 +130,10 @@ const styles = (theme: Theme) => createStyles({
   },
   drawerButton: {
     backgroundColor: theme.palette.primary.main,
+    [theme.breakpoints.down('xs')]: {
+      paddingLeft: 0,
+      paddingRight: 0,
+    },
   },
   drawerIcon: {
     color: theme.palette.primary.contrastText,

@@ -21,40 +21,39 @@ class SceneEffects extends React.Component {
   render() {
     return(
       <Grid container spacing={2} alignItems="center">
-        <Grid item xs={4}>
+        <Grid item xs={12} md={6} lg={4}>
           <CrossFadeCard
             scene={this.props.scene}
             onUpdateScene={this.props.onUpdateScene.bind(this)}
           />
         </Grid>
 
-        <Grid item xs={4}>
-          <ZoomMoveCard/>
-          {/*<ZoomMoveGroup
+        <Grid item xs={12} md={6} lg={4}>
+          <ZoomMoveCard
             scene={this.props.scene}
-            onUpdateScene={this.props.onUpdateScene.bind(this)} />*/}
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
         </Grid>
 
-        <Grid item xs={4}>
-          <StrobeCard/>
-          {/*<StrobeGroup
+        <Grid item xs={12} md={6} lg={4}>
+          <StrobeCard
             scene={this.props.scene}
-            onUpdateScene={this.props.onUpdateScene.bind(this)} />*/}
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
         </Grid>
 
-        <Grid item xs={4}>
-          <AudioCard/>
+        <Grid item xs={12} md={6} lg={4}>
+          <AudioCard
+            scene={this.props.scene}
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
           {/*<AudioGroup
             scene={this.props.scene}
             isPlayer={false}
             onUpdateScene={this.props.onUpdateScene.bind(this)}/>*/}
         </Grid>
 
-        <Grid item xs={4}>
-          <TextCard/>
-          {/*<TextGroup
+        <Grid item xs={12} md={6} lg={4}>
+          <TextCard
             scene={this.props.scene}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}/>*/}
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
         </Grid>
       </Grid>
     );
