@@ -11,6 +11,7 @@ export default class Audio {
   tickMinDelay: number = 500;
   tickMaxDelay: number = 5000;
   tickSinRate: number = 100;
+  tickBPMMulti: number = 1;
 
   constructor(init?: Partial<Audio>) {
     Object.assign(this, init);

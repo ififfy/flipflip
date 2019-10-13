@@ -89,6 +89,7 @@ interface SceneSettingsI {
   countFontSize: number;
   countFontFamily: string;
 
+  audioEnabled: boolean;
   audios: Array<Audio>;
   bpm: number;
   fillView: boolean;
@@ -233,6 +234,7 @@ export class SceneSettings implements SceneSettingsI {
   countFontSize = 20;
   countFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
 
+  audioEnabled = false;
   audios: Array<Audio> = [];
   bpm = 0;
   fillView = false;

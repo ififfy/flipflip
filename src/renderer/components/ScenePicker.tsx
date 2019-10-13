@@ -14,7 +14,6 @@ import AddIcon from '@material-ui/icons/Add';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
-import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import CasinoIcon from '@material-ui/icons/Casino';
 import GetAppIcon from '@material-ui/icons/GetApp';

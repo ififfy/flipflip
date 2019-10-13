@@ -88,6 +88,7 @@ export default class Scene {
   libraryID: number = -1;
   displayedLibrary: Array<LibrarySource> = null;
   videoVolume = 0;
+  audioEnabled = false;
   audios: Array<Audio> = [];
   fillView = false;
   gridView = false;
