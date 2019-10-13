@@ -61,7 +61,7 @@ class ColorPicker extends React.Component {
           </Fab>
           <TextField
             className={classes.colorField}
-            label="Strobe Color"
+            label="Color"
             value={this.props.currentColor}
             onChange={this.props.onChangeColor.bind(this)}/>
           <Menu

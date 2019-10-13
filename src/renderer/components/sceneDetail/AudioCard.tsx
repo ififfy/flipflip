@@ -24,11 +24,6 @@ const styles = (theme: Theme) => createStyles({
   fullWidth: {
     width: '100%',
   },
-  paddingLeft: {
-    [theme.breakpoints.up('sm')]: {
-      paddingLeft: theme.spacing(1),
-    },
-  },
   noPadding: {
     padding: '0 !important',
   },
@@ -172,7 +167,7 @@ class AudioCard extends React.Component {
                           </Grid>
                         </Grid>
                         <Grid item xs={12} className={clsx(!a.tick && classes.noPadding)}>
-                          <Collapse in={a.tick}>
+                          <Collapse in={a.tick} className={classes.fullWidth}>
                             <Grid container spacing={2} alignItems="center">
                               <Grid item xs={12} sm={4}>
                                 <FormControl className={classes.fullWidth}>

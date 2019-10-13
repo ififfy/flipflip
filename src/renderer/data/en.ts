@@ -37,9 +37,6 @@ export default new Map<string, string>([
   ['vtf.up', 'Up'],
   ['vtf.down', 'Down'],
 
-  ['tot.url', 'URL'],
-  ['tot.hastebin', 'Hastebin'],
-
   ['gt.tumblr', 'Tumblr'],
   ['gt.local', 'Local'],
 

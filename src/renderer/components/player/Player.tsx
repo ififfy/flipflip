@@ -3,7 +3,7 @@ import * as React from 'react';
 import fs from "fs";
 import fileURL from "file-url";
 
-import {IF, SL, ST, TOT, VC} from "../../data/const";
+import {IF, SL, ST, VC} from "../../data/const";
 import {getCachePath, getSourceType, urlToPath} from '../../data/utils';
 import Config from "../../data/Config";
 import Scene from '../../data/Scene';
@@ -25,17 +25,6 @@ import VideoGroup from "../sceneDetail/VideoGroup";
 import {createMainMenu, createMenuTemplate} from "../../../main/MainMenu";
 
 const {getCurrentWindow, Menu, MenuItem, app} = remote;
-
-function textURL(kind: string, src: string): string {
-  switch (kind) {
-    case TOT.url:
-      return src;
-    case TOT.hastebin:
-      return `https://hastebin.com/raw/${src}`;
-    default:
-      return src;
-  }
-}
 
 export default class Player extends React.Component {
   readonly props: {
@@ -271,7 +260,7 @@ export default class Player extends React.Component {
             countColor={this.props.scene.countColor}
             countFontSize={this.props.scene.countFontSize}
             countFontFamily={this.props.scene.countFontFamily}
-            url={textURL(this.props.scene.textKind, this.props.scene.textSource)}
+            url={this.props.scene.textSource}
             getTags={this.props.getTags}
             currentSource={this.state.historyPaths.length > 0 ? this.state.historyPaths[0].getAttribute("source") : null}/>
         )}

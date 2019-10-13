@@ -54,11 +54,6 @@ const VTF = { // vertical translate functions
   down: 'vtf.down',
 };
 
-const TOT = { // text overlay type
-  url: 'tot.url',
-  hastebin: 'tot.hastebin',
-};
-
 const GT = { // gooninator import type
   tumblr: 'gt.tumblr',
   local: 'gt.local',
@@ -142,5 +137,5 @@ const PR = { // Global progress functions
 };
 
 export {
-  TF, WF, OF, IF, GO, VO, HTF, VTF, TOT, BT, GT, TT, SF, ST, SL, AF, IPC, VC, MO, PR
+  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, GT, TT, SF, ST, SL, AF, IPC, VC, MO, PR
 };

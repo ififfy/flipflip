@@ -1,7 +1,6 @@
 import * as React from 'react';
 import SystemFonts from 'system-font-families';
 
-import {TOT} from "../../data/const";
 import {CancelablePromise} from "../../data/utils";
 import {SceneSettings} from "../../data/Config";
 import Scene from "../../data/Scene";
@@ -29,12 +28,12 @@ export default class TextGroup extends React.Component {
     return (
       <ControlGroup title="Text" isNarrow={true}>
         <div className="ControlSubgroup m-inline">
-          <SimpleOptionPicker
+          {/*<SimpleOptionPicker
             onChange={this.changeKey.bind(this, 'textKind').bind(this)}
             label="Source"
             value={this.props.scene.textKind}
-            keys={Object.values(TOT)}/>
-          <SimpleURLInput
+            keys={Object.values(TOT)}/>*/}
+          {/*<SimpleURLInput
             isEnabled={true}
             onChange={this.changeKey.bind(this, 'textSource').bind(this)}
             label={(() => {
@@ -45,7 +44,7 @@ export default class TextGroup extends React.Component {
                   return "URL";
               }
             })()}
-            value={this.props.scene.textSource}/>
+            value={this.props.scene.textSource}/>*/}
           <br/>
         </div>
         <div className="ControlSubgroup">

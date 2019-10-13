@@ -55,7 +55,7 @@ interface SceneSettingsI {
   videoVolume: number;
   generatorMax: number;
   overlays: Array<Overlay>;
-  textKind: string;
+  textEnabled: boolean;
   textSource: string;
 
   strobe: boolean;
@@ -200,7 +200,7 @@ export class SceneSettings implements SceneSettingsI {
   overlays: Array<Overlay> = [];
   nextSceneID = 0;
   nextSceneTime = 900;
-  textKind = "";
+  textEnabled = false;
   textSource = "";
 
   strobe = false;

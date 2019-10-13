@@ -11,7 +11,7 @@ import Twitter from "twitter";
 import {IgApiClient} from "instagram-private-api";
 
 import {getBackups, getCachePath, getFileGroup, getFileName, getSourceType, isVideo, saveDir} from "./utils";
-import {AF, GT, PR, SF, ST, TOT} from "./const";
+import {AF, GT, PR, SF, ST} from "./const";
 import { defaultInitialState } from './AppStorage';
 import { Route } from "./Route";
 import Scene from "./Scene";
@@ -691,8 +691,7 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
         }
 
         // Update hastebin URL (if present)
-        thisScene.textKind = TOT.hastebin;
-        thisScene.textSource = importURL;
+        thisScene.textSource = "https://hastebin.com/raw/" + importURL;
       }
     }
     return {scenes: newScenes};

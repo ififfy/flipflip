@@ -42,12 +42,9 @@ class SceneEffects extends React.Component {
 
         <Grid item xs={12} md={6} lg={4}>
           <AudioCard
+            playAudio={false}
             scene={this.props.scene}
             onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-          {/*<AudioGroup
-            scene={this.props.scene}
-            isPlayer={false}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}/>*/}
         </Grid>
 
         <Grid item xs={12} md={6} lg={4}>

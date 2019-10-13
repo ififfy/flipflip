@@ -1,4 +1,4 @@
-import {BT, GO, HTF, IF, OF, SL, TF, TOT, VO, VTF, WF} from './const';
+import {BT, GO, HTF, IF, OF, SL, TF, VO, VTF, WF} from './const';
 import LibrarySource from "../components/library/LibrarySource";
 import Audio from "../components/library/Audio";
 import Overlay from "../components/library/Overlay";
@@ -67,7 +67,7 @@ export default class Scene {
   playVideoClips = true;
   skipVideoStart = 0;
   skipVideoEnd = 0;
-  textKind: string = "";
+  textEnabled = false;
   textSource: string = "";
   blinkColor = "#FFFFFF";
   blinkFontSize = 20;
@@ -99,6 +99,7 @@ export default class Scene {
 
   // unused; migration only
   effectLevel = 0;
+  textKind: string = "";
   audioURL?: string = "";
   overlaySceneID: number = 0;
   overlaySceneOpacity: number = 0.5;
@@ -175,8 +176,9 @@ export default class Scene {
       this.playFullVideo = false;
     }
 
-    if (!(this.textKind && this.textKind.length)) {
-      this.textKind = TOT.url;
+    if (this.textKind && this.textKind == "tot.hastebin") {
+      this.textKind = "";
+      this.textSource = "https://hastebin.com/raw/" + this.textSource;
     }
   }
 }
