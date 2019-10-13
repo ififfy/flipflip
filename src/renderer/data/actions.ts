@@ -663,7 +663,6 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
       if (!args || args.length < 2) {
         return;
       }
-      console.log(args);
       let rootDir = args[1];
       if (!rootDir.endsWith(sep)) {
         rootDir += sep;

@@ -19,32 +19,31 @@ declare module '*.icns' {
   export = value;
 }
 
+declare module 'electron-default-menu';
+declare module 'electron-google-analytics';
+declare module 'get-folder-size';
+declare module 'gif-info';
 declare module 'fs-extra';
 declare module 'file-url';
-declare module 'recursive-readdir';
-declare module 'gif-info';
-declare module 'request';
+declare module 'imgur';
+declare module 'music-metadata';
+declare module 'oauth';
 declare module 'progressbar.js';
-declare module 'sortablejs';
-declare module 'react-sortablejs';
+declare module 'react-color';
 declare module 'react-select';
 declare module 'react-select/creatable';
-declare module 'react-spring';
-declare module 'snoowrap';
-declare module 'rimraf';
-declare module 'get-folder-size';
-declare module 'uuid/v4';
-declare module 'system-font-families';
-declare module 'oauth';
-declare module 'imgur';
-declare module 'twitter';
-declare module 'jsmediatags';
-declare module 'music-metadata';
-declare module 'react-window';
 declare module 'react-sortable-hoc';
+declare module 'react-sortablejs';
+declare module 'react-spring';
 declare module 'react-virtualized-auto-sizer';
-declare module 'electron-google-analytics';
-declare module 'electron-default-menu';
+declare module 'react-window';
+declare module 'recursive-readdir';
+declare module 'request';
+declare module 'rimraf';
+declare module 'snoowrap';
+declare module 'system-font-families';
+declare module 'twitter';
+declare module 'uuid/v4';
 
 // Type declarations for Clipboard API
 // https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API

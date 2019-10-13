@@ -30,11 +30,6 @@ const styles = (theme: Theme) => createStyles({
   percentInput: {
     minWidth: theme.spacing(11),
   },
-  expandGrid: {
-    maxWidth: '100%',
-    width: '100%',
-    flexBasis: 'unset',
-  },
 });
 
 class ZoomMoveCard extends React.Component {
@@ -98,7 +93,7 @@ class ZoomMoveCard extends React.Component {
             </Grid>
             <Grid item xs={12}>
               <Grid container spacing={2} alignItems="center">
-                <Grid item xs={12} sm={3} className={clsx(classes.paddingTop, this.props.scene.horizTransType == HTF.none && classes.expandGrid)}>
+                <Grid item xs={12} sm={this.props.scene.horizTransType != HTF.none ? 3 : 12}>
                   <FormControl className={classes.fullWidth}>
                     <InputLabel>Move Horizontally</InputLabel>
                     <Select
@@ -110,7 +105,7 @@ class ZoomMoveCard extends React.Component {
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid item xs={12} sm={9}>
+                <Grid item xs={12} sm>
                   <Collapse in={this.props.scene.horizTransType != HTF.none} className={classes.fullWidth}>
                     <Grid container spacing={2} alignItems="center">
                       <Grid item xs>
@@ -145,7 +140,7 @@ class ZoomMoveCard extends React.Component {
             </Grid>
             <Grid item xs={12}>
               <Grid container spacing={2} alignItems="center">
-                <Grid item xs={12} sm={3} className={clsx(classes.paddingTop, this.props.scene.vertTransType == VTF.none && classes.expandGrid)}>
+                <Grid item xs={12} sm={this.props.scene.vertTransType != VTF.none ? 3 : 12}>
                   <FormControl className={classes.fullWidth}>
                     <InputLabel>Move Vertically</InputLabel>
                     <Select
@@ -157,7 +152,7 @@ class ZoomMoveCard extends React.Component {
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid item xs={12} sm={9}>
+                <Grid item xs={12} sm>
                   <Collapse in={this.props.scene.vertTransType != VTF.none} className={classes.fullWidth}>
                     <Grid container spacing={2} alignItems="center">
                       <Grid item xs>
@@ -190,15 +185,15 @@ class ZoomMoveCard extends React.Component {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item xs={12} className={!enabled && classes.noPadding}>
+            <Grid item xs={12} className={clsx(!enabled && classes.noPadding)}>
               <Collapse in={enabled} className={classes.fullWidth}>
                 <Divider />
               </Collapse>
             </Grid>
-            <Grid item xs={12} className={!enabled && classes.noPadding}>
+            <Grid item xs={12} className={clsx(!enabled && classes.noPadding)}>
               <Collapse in={enabled} className={classes.fullWidth}>
                 <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={12} sm={4} className={classes.paddingTop}>
+                  <Grid item xs={12} sm={4}>
                     <FormControl className={classes.fullWidth}>
                       <InputLabel>Timing</InputLabel>
                       <Select
@@ -271,7 +266,7 @@ class ZoomMoveCard extends React.Component {
                 </Grid>
               </Collapse>
             </Grid>
-            <Grid item xs={12}  className={!enabled && classes.noPadding}>
+            <Grid item xs={12} className={clsx(!enabled && classes.noPadding)}>
               <Collapse in={enabled && (this.props.scene.transTF == TF.random || this.props.scene.transTF == TF.sin)} className={classes.fullWidth}>
                 <Grid container alignItems="center">
                   <Grid item xs={12} sm={6}>

@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {ipcRenderer, remote} from "electron";
-import {string} from "prop-types";
 import wretch from "wretch";
 import clsx from 'clsx';
 import Sortable from "react-sortablejs";
@@ -633,7 +632,7 @@ class ScenePicker extends React.Component {
       let parent: any = e.target;
       do {
         let className = parent.className;
-        if (!(className instanceof string) && className.baseVal != null) {
+        if ((typeof className !== 'string') && className.baseVal != null) {
           className = className.baseVal;
         }
         if (className.includes("MuiFab-")) {
