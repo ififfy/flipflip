@@ -82,6 +82,7 @@ export default class Scene {
   countFontSize = 20;
   countFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
   generatorMax = 100;
+  overlayEnabled: false;
   overlays: Array<Overlay> = [];
   nextSceneID: number = 0;
   nextSceneTime: number = 900;

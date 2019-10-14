@@ -54,6 +54,7 @@ interface SceneSettingsI {
   skipVideoEnd: number;
   videoVolume: number;
   generatorMax: number;
+  overlayEnabled: boolean;
   overlays: Array<Overlay>;
   textEnabled: boolean;
   textSource: string;
@@ -197,6 +198,7 @@ export class SceneSettings implements SceneSettingsI {
   skipVideoEnd = 0;
   videoVolume = 0;
   generatorMax = 100;
+  overlayEnabled: false;
   overlays: Array<Overlay> = [];
   nextSceneID = 0;
   nextSceneTime = 900;

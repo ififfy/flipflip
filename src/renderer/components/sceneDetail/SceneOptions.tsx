@@ -1,10 +1,10 @@
 import * as React from "react";
 
-import {createStyles, Theme, withStyles} from "@material-ui/core";
+import {createStyles, Grid, Theme, withStyles} from "@material-ui/core";
 
 import Scene from "../../data/Scene";
-import SceneEffectGroup from "./SceneEffectGroup";
-import ImageVideoGroup from "./ImageVideoGroup";
+import SceneEffectCard from "./SceneEffectCard";
+import ImageVideoCard from "./ImageVideoCard";
 
 const styles = (theme: Theme) => createStyles({});
 
@@ -19,20 +19,33 @@ class SceneOptions extends React.Component {
 
   render() {
     return (
-      <React.Fragment>
-        <SceneEffectGroup
+      <Grid container spacing={2}>
+
+        <Grid item xs={12} md={6}>
+          <SceneEffectCard
+            allScenes={this.props.allScenes}
+            scene={this.props.scene}
+            onSetupGrid={this.props.onSetupGrid.bind(this)}
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+        {/*<SceneEffectGroup
           scene={this.props.scene}
           isTagging={false}
           isConfig={false}
           allScenes={this.props.allScenes}
           onSetupGrid={this.props.onSetupGrid.bind(this)}
-          onUpdateScene={this.props.onUpdateScene.bind(this)} />
+          onUpdateScene={this.props.onUpdateScene.bind(this)} />*/}
+        </Grid>
 
-        <ImageVideoGroup
+        <Grid item xs={12} md={6}>
+          <ImageVideoCard
+            scene={this.props.scene}
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+        {/*<ImageVideoGroup
           scene={this.props.scene}
           isPlayer={false}
-          onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-      </React.Fragment>
+          onUpdateScene={this.props.onUpdateScene.bind(this)}/>*/}
+        </Grid>
+      </Grid>
     )
   }
 }

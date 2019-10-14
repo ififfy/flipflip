@@ -265,7 +265,7 @@ class SceneDetail extends React.Component {
     drawerOpen: false,
     menuAnchorEl: null as any,
     openMenu: null as string,
-    openTab: 1,
+    openTab: 0,
   };
 
   readonly nameInputRef: React.RefObject<HTMLInputElement> = React.createRef();
@@ -414,60 +414,66 @@ class SceneDetail extends React.Component {
           <div className={classes.appBarSpacer} />
           <Container maxWidth={false} className={classes.container}>
 
-            <Typography
-              component="div"
-              role="tabpanel"
-              hidden={this.state.openTab !== 0}
-              id="vertical-tabpanel-0"
-              aria-labelledby="vertical-tab-0">
-              <div className={classes.tabPanel}>
-                <div className={classes.drawerSpacer}/>
-                <Box className={classes.fill}>
-                  <SceneOptions
-                    allScenes={this.props.allScenes}
-                    scene={this.props.scene}
-                    onSetupGrid={this.props.onSetupGrid.bind(this)}
-                    onUpdateScene={this.props.onUpdateScene.bind(this)} />
-                </Box>
-              </div>
-            </Typography>
+            {this.state.openTab === 0 && (
+              <Typography
+                component="div"
+                role="tabpanel"
+                hidden={this.state.openTab !== 0}
+                id="vertical-tabpanel-0"
+                aria-labelledby="vertical-tab-0">
+                <div className={classes.tabPanel}>
+                  <div className={classes.drawerSpacer}/>
+                  <Box p={2} className={classes.fill}>
+                    <SceneOptions
+                      allScenes={this.props.allScenes}
+                      scene={this.props.scene}
+                      onSetupGrid={this.props.onSetupGrid.bind(this)}
+                      onUpdateScene={this.props.onUpdateScene.bind(this)} />
+                  </Box>
+                </div>
+              </Typography>
+            )}
 
-            <Typography
-              component="div"
-              role="tabpanel"
-              hidden={this.state.openTab !== 1}
-              id="vertical-tabpanel-1"
-              aria-labelledby="vertical-tab-1">
-              <div className={classes.tabPanel}>
-                <div className={classes.drawerSpacer}/>
-                <Box p={2} className={classes.fill}>
-                  <SceneEffects
-                    scene={this.props.scene}
-                    onUpdateScene={this.props.onUpdateScene.bind(this)} />
-                </Box>
-              </div>
-            </Typography>
+            {this.state.openTab === 1 && (
+              <Typography
+                component="div"
+                role="tabpanel"
+                hidden={this.state.openTab !== 1}
+                id="vertical-tabpanel-1"
+                aria-labelledby="vertical-tab-1">
+                <div className={classes.tabPanel}>
+                  <div className={classes.drawerSpacer}/>
+                  <Box p={2} className={classes.fill}>
+                    <SceneEffects
+                      scene={this.props.scene}
+                      onUpdateScene={this.props.onUpdateScene.bind(this)} />
+                  </Box>
+                </div>
+              </Typography>
+            )}
 
-            <Typography
-              className={clsx(this.state.openTab === 2 && classes.sourcesSection)}
-              component="div"
-              role="tabpanel"
-              hidden={this.state.openTab !== 2}
-              id="vertical-tabpanel-2"
-              aria-labelledby="vertical-tab-2">
-              <div className={classes.tabPanel}>
-                <div className={classes.drawerSpacer}/>
-                <Box className={classes.fill}>
-                  <SourceList
-                    config={this.props.config}
-                    sources={this.props.scene.sources}
-                    onClearBlacklist={this.props.onClearBlacklist.bind(this)}
-                    onClip={this.props.onClip.bind(this)}
-                    onPlay={this.props.onPlay.bind(this)}
-                    onUpdateSources={this.onUpdateSources.bind(this)}/>
-                </Box>
-              </div>
-            </Typography>
+            {this.state.openTab === 2 && (
+              <Typography
+                className={clsx(this.state.openTab === 2 && classes.sourcesSection)}
+                component="div"
+                role="tabpanel"
+                hidden={this.state.openTab !== 2}
+                id="vertical-tabpanel-2"
+                aria-labelledby="vertical-tab-2">
+                <div className={classes.tabPanel}>
+                  <div className={classes.drawerSpacer}/>
+                  <Box className={classes.fill}>
+                    <SourceList
+                      config={this.props.config}
+                      sources={this.props.scene.sources}
+                      onClearBlacklist={this.props.onClearBlacklist.bind(this)}
+                      onClip={this.props.onClip.bind(this)}
+                      onPlay={this.props.onPlay.bind(this)}
+                      onUpdateSources={this.onUpdateSources.bind(this)}/>
+                  </Box>
+                </div>
+              </Typography>
+            )}
 
           </Container>
         </main>

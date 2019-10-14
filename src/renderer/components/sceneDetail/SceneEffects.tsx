@@ -20,18 +20,18 @@ class SceneEffects extends React.Component {
 
   render() {
     return(
-      <Grid container spacing={2} alignItems="center">
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={6} lg={4}>
+          <ZoomMoveCard
+            scene={this.props.scene}
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+        </Grid>
+
         <Grid item xs={12} md={6} lg={4}>
           <CrossFadeCard
             scene={this.props.scene}
             onUpdateScene={this.props.onUpdateScene.bind(this)}
           />
-        </Grid>
-
-        <Grid item xs={12} md={6} lg={4}>
-          <ZoomMoveCard
-            scene={this.props.scene}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
         </Grid>
 
         <Grid item xs={12} md={6} lg={4}>
