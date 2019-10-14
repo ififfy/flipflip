@@ -38,6 +38,7 @@ class ImageVideoCard extends React.Component {
     classes: any,
     scene: Scene | SceneSettings,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
+    isPlayer?: boolean,
   };
 
   render() {
@@ -52,59 +53,65 @@ class ImageVideoCard extends React.Component {
       <Card>
         <CardContent>
           <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} sm={6}>
-              <FormControl className={classes.fullWidth}>
-                <InputLabel>Image Filter</InputLabel>
-                <Select
-                  value={this.props.scene.imageTypeFilter}
-                  onChange={this.onInput.bind(this, 'imageTypeFilter')}>
-                  {Object.values(IF).map((tf) =>
-                    <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
-                  )}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControlLabel
-                control={
-                  <Switch checked={this.props.scene.forceAll}
-                          onChange={this.onBoolInput.bind(this, 'forceAll')}/>
-                }
-                label="Show All Images Before Looping"/>
-            </Grid>
-            <Grid item xs={12} sm={6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.videos) && classes.noPadding)}>
-              <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.videos}>
-                <FormControl className={classes.fullWidth}>
-                  <InputLabel>GIF Options</InputLabel>
-                  <Select
-                    value={this.props.scene.gifOption}
-                    onChange={this.onInput.bind(this, 'gifOption')}>
-                    {Object.values(GO).map((go) =>
-                      <MenuItem key={go} value={go}>{en.get(go)}</MenuItem>
-                    )}
-                  </Select>
-                </FormControl>
-              </Collapse>
-            </Grid>
-            <Grid item xs={12} sm={6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.videos || this.props.scene.gifOption != GO.part) && classes.noPadding)}>
-              <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.videos && this.props.scene.gifOption == GO.part}>
-                <TextField
-                  variant="outlined"
-                  label="For"
-                  margin="dense"
-                  value={gifTimingConstant}
-                  onChange={this.onIntInput.bind(this, 'gifTimingConstant')}
-                  onBlur={this.blurIntKey.bind(this, 'gifTimingConstant')}
-                  InputProps={{
-                    endAdornment: <InputAdornment position="end">ms</InputAdornment>,
-                  }}
-                  inputProps={{
-                    step: 100,
-                    min: 0,
-                    type: 'number',
-                  }}/>
-              </Collapse>
-            </Grid>
+            {!this.props.isPlayer && (
+              <React.Fragment>
+                <Grid item xs={12} sm={6}>
+                  <FormControl className={classes.fullWidth}>
+                    <InputLabel>Image Filter</InputLabel>
+                    <Select
+                      value={this.props.scene.imageTypeFilter}
+                      onChange={this.onInput.bind(this, 'imageTypeFilter')}>
+                      {Object.values(IF).map((tf) =>
+                        <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
+                      )}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <Collapse in={this.props.scene.orderFunction == OF.random}>
+                    <FormControlLabel
+                      control={
+                        <Switch checked={this.props.scene.forceAll}
+                                onChange={this.onBoolInput.bind(this, 'forceAll')}/>
+                      }
+                      label="Show All Images Before Looping"/>
+                  </Collapse>
+                </Grid>
+                <Grid item xs={12} sm={6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.videos) && classes.noPadding)}>
+                  <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.videos}>
+                    <FormControl className={classes.fullWidth}>
+                      <InputLabel>GIF Options</InputLabel>
+                      <Select
+                        value={this.props.scene.gifOption}
+                        onChange={this.onInput.bind(this, 'gifOption')}>
+                        {Object.values(GO).map((go) =>
+                          <MenuItem key={go} value={go}>{en.get(go)}</MenuItem>
+                        )}
+                      </Select>
+                    </FormControl>
+                  </Collapse>
+                </Grid>
+                <Grid item xs={12} sm={6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.videos || this.props.scene.gifOption != GO.part) && classes.noPadding)}>
+                  <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.videos && this.props.scene.gifOption == GO.part}>
+                    <TextField
+                      variant="outlined"
+                      label="For"
+                      margin="dense"
+                      value={gifTimingConstant}
+                      onChange={this.onIntInput.bind(this, 'gifTimingConstant')}
+                      onBlur={this.blurIntKey.bind(this, 'gifTimingConstant')}
+                      InputProps={{
+                        endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+                      }}
+                      inputProps={{
+                        step: 100,
+                        min: 0,
+                        type: 'number',
+                      }}/>
+                  </Collapse>
+                </Grid>
+              </React.Fragment>
+            )}
             <Grid item xs={12} sm={6} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
               <Collapse in={this.props.scene.imageTypeFilter != IF.stills}>
                 <FormControl className={classes.fullWidth}>
@@ -228,18 +235,20 @@ class ImageVideoCard extends React.Component {
             <Grid item xs={12}>
               <Divider />
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl component="fieldset">
-                <FormLabel component="legend">Weighting</FormLabel>
-                <RadioGroup
-                  value={this.props.scene.weightFunction}
-                  onChange={this.onInput.bind(this, 'weightFunction')}>
-                  {Object.values(WF).map((wf) =>
-                    <FormControlLabel key={wf} value={wf} control={<Radio />} label={en.get(wf)} />
-                  )}
-                </RadioGroup>
-              </FormControl>
-            </Grid>
+            {!this.props.isPlayer && (
+              <Grid item xs={12} sm={6}>
+                <FormControl component="fieldset">
+                  <FormLabel component="legend">Weighting</FormLabel>
+                  <RadioGroup
+                    value={this.props.scene.weightFunction}
+                    onChange={this.onInput.bind(this, 'weightFunction')}>
+                    {Object.values(WF).map((wf) =>
+                      <FormControlLabel key={wf} value={wf} control={<Radio />} label={en.get(wf)} />
+                    )}
+                  </RadioGroup>
+                </FormControl>
+              </Grid>
+            )}
             <Grid item xs={12} sm={6}>
               <FormControl component="fieldset">
                 <FormLabel component="legend">Ordering</FormLabel>

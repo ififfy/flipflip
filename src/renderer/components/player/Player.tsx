@@ -14,13 +14,6 @@ import HeadlessScenePlayer from './HeadlessScenePlayer';
 import Tag from "../library/Tag";
 import LibrarySource from "../library/LibrarySource";
 import Progress from "../ui/Progress";
-import AudioGroup from "../sceneDetail/AudioGroup";
-import CrossFadeGroup from "../sceneDetail/CrossFadeGroup";
-import TextGroup from "../sceneDetail/TextGroup";
-import ImageVideoGroup from "../sceneDetail/ImageVideoGroup";
-import SceneEffectGroup from "../sceneDetail/SceneEffectGroup";
-import StrobeGroup from "../sceneDetail/StrobeGroup";
-import ZoomMoveGroup from "../sceneDetail/ZoomMoveGroup";
 import VideoGroup from "../sceneDetail/VideoGroup";
 import {createMainMenu, createMenuTemplate} from "../../../main/MainMenu";
 
@@ -322,41 +315,41 @@ export default class Player extends React.Component {
             />
           )}
 
-          <SceneEffectGroup
+          {/*<SceneEffectGroup
             scene={this.props.scene}
             isTagging={this.props.tags != null}
             isConfig={false}
             allScenes={this.props.scenes}
             onSetupGrid={this.props.setupGrid}
-            onUpdateScene={this.props.onUpdateScene.bind(this)} />
+            onUpdateScene={this.props.onUpdateScene.bind(this)} />*/}
 
-          <ImageVideoGroup
+          {/*<ImageVideoGroup
             scene={this.props.scene}
             isPlayer={true}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>*/}
 
-          <CrossFadeGroup
+          {/*<CrossFadeGroup
             scene={this.props.scene}
-            onUpdateScene={this.props.onUpdateScene.bind(this)} />
+            onUpdateScene={this.props.onUpdateScene.bind(this)} />*/}
 
-          <ZoomMoveGroup
+          {/*<ZoomMoveGroup
             scene={this.props.scene}
-            onUpdateScene={this.props.onUpdateScene.bind(this)} />
+            onUpdateScene={this.props.onUpdateScene.bind(this)} />*/}
 
-          <StrobeGroup
+          {/*<StrobeGroup
             scene={this.props.scene}
-            onUpdateScene={this.props.onUpdateScene.bind(this)} />
+            onUpdateScene={this.props.onUpdateScene.bind(this)} />*/}
 
-          <AudioGroup
+          {/*<AudioGroup
             scene={this.props.scene}
             isPlaying={this.state.hasStarted && this.state.isPlaying}
             isPlayer={true}
             scenePaths={this.state.historyPaths}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>*/}
 
-          <TextGroup
+          {/*<TextGroup
             scene={this.props.scene}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>*/}
         </div>
 
         {this.state.hasStarted && this.props.allTags && (

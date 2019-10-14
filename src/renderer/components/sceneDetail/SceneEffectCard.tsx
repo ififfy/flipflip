@@ -46,6 +46,7 @@ class SceneEffectCard extends React.Component {
     allScenes: Array<Scene>,
     scene: Scene | SceneSettings,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
+    isTagging?: boolean,
   };
 
   render() {
@@ -221,132 +222,136 @@ class SceneEffectCard extends React.Component {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item xs={12}>
-              <Divider />
-            </Grid>
-            <Grid item xs={12}>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs={12} sm={7}>
-                  <FormControl className={classes.fullWidth}>
-                    <InputLabel>Next Scene</InputLabel>
-                    <Select
-                      value={this.props.scene.nextSceneID}
-                      MenuProps={{
-                        PaperProps: {
-                          style: {
-                            maxHeight: 300,
-                          },
-                        },
-                      }}
-                      onChange={this.onInput.bind(this, 'nextSceneID')}>
-                      {["0"].concat(this.props.allScenes.filter((s) => s.id !== this.props.scene.id && s.sources.length > 0).map((s) => s.id.toString())).map((id) =>
-                        <MenuItem key={id} value={id}>{this.getSceneName(id)}</MenuItem>
-                      )}
-                    </Select>
-                  </FormControl>
+            {!this.props.isTagging && (
+              <React.Fragment>
+                <Grid item xs={12}>
+                  <Divider />
                 </Grid>
-                <Grid item xs={12} sm={5}>
-                  <TextField
-                    variant="outlined"
-                    label="Play after"
-                    margin="dense"
-                    value={nextSceneTime}
-                    onChange={this.onIntInput.bind(this, 'nextSceneTime')}
-                    onBlur={this.blurIntKey.bind(this, 'nextSceneTime')}
-                    InputProps={{
-                      endAdornment: <InputAdornment position="end">sec</InputAdornment>,
-                    }}
-                    inputProps={{
-                      min: 0,
-                      type: 'number',
-                    }}/>
-                </Grid>
-              </Grid>
-            </Grid>
-            <Grid item xs={12}>
-              <Divider />
-            </Grid>
-            <Grid item xs={12}>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs>
-                  <FormControlLabel
-                    control={
-                      <Switch checked={this.props.scene.overlayEnabled}
-                              onChange={this.onBoolInput.bind(this, 'overlayEnabled')}/>
-                    }
-                    label="Overlays"/>
-                </Grid>
-                <Grid item>
-                  <Collapse in={this.props.scene.overlayEnabled}>
-                    <Fab
-                      className={classes.addButton}
-                      onClick={this.onAddOverlay.bind(this)}
-                      size="small">
-                      <AddIcon />
-                    </Fab>
-                  </Collapse>
-                </Grid>
-              </Grid>
-            </Grid>
-            {this.props.scene.overlays.map((o) => {
-              const overlayOpacity = typeof o.opacity === 'number' ? o.opacity : 0;
-              return (
-                <React.Fragment key={o.id}>
-                  <Grid item xs={12} className={clsx(!this.props.scene.overlayEnabled && classes.noPadding)}>
-                    <Collapse in={this.props.scene.overlayEnabled} className={classes.fullWidth}>
-                      <Divider/>
-                    </Collapse>
+                <Grid item xs={12}>
+                  <Grid container spacing={2} alignItems="center">
+                    <Grid item xs={12} sm={7}>
+                      <FormControl className={classes.fullWidth}>
+                        <InputLabel>Next Scene</InputLabel>
+                        <Select
+                          value={this.props.scene.nextSceneID}
+                          MenuProps={{
+                            PaperProps: {
+                              style: {
+                                maxHeight: 300,
+                              },
+                            },
+                          }}
+                          onChange={this.onInput.bind(this, 'nextSceneID')}>
+                          {["0"].concat(this.props.allScenes.filter((s) => s.id !== this.props.scene.id && s.sources.length > 0).map((s) => s.id.toString())).map((id) =>
+                            <MenuItem key={id} value={id}>{this.getSceneName(id)}</MenuItem>
+                          )}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={5}>
+                      <TextField
+                        variant="outlined"
+                        label="Play after"
+                        margin="dense"
+                        value={nextSceneTime}
+                        onChange={this.onIntInput.bind(this, 'nextSceneTime')}
+                        onBlur={this.blurIntKey.bind(this, 'nextSceneTime')}
+                        InputProps={{
+                          endAdornment: <InputAdornment position="end">sec</InputAdornment>,
+                        }}
+                        inputProps={{
+                          min: 0,
+                          type: 'number',
+                        }}/>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={12} className={clsx(!this.props.scene.overlayEnabled && classes.noPadding)}>
-                    <Collapse in={this.props.scene.overlayEnabled} className={classes.fullWidth}>
-                      <Grid container spacing={2} alignItems="center">
-                        <Grid item xs={12} sm={5}>
-                          <FormControl className={classes.fullWidth}>
-                            <InputLabel>Overlay</InputLabel>
-                            <Select
-                              value={o.sceneID}
-                              MenuProps={{
-                                PaperProps: {
-                                  style: {
-                                    maxHeight: 300,
-                                  },
-                                },
-                              }}
-                              onChange={this.onOverlayInput.bind(this, o.id, 'sceneID')}>
-                              {["0"].concat(this.props.allScenes.filter((s) => s.sources.length > 0).map((s) => s.id.toString())).map((id) =>
-                                <MenuItem key={id} value={id}>{this.getSceneName(id)}</MenuItem>
-                              )}
-                            </Select>
-                          </FormControl>
-                        </Grid>
-                        <Grid item xs={12} sm={7}>
-                          <Typography id="overlay-opacity-slider" variant="caption" component="div" color="textSecondary">
-                            Overlay Opacity: {o.opacity}%
-                          </Typography>
-                          <Grid container spacing={1} alignItems="center">
-                            <Grid item xs>
-                              <Slider
-                                min={0}
-                                max={99}
-                                value={overlayOpacity}
-                                onChange={this.onOverlaySliderChange.bind(this, o.id, 'opacity')}
-                                aria-labelledby="overlay-opacity-slider"/>
+                </Grid>
+                <Grid item xs={12}>
+                  <Divider />
+                </Grid>
+                <Grid item xs={12}>
+                  <Grid container spacing={2} alignItems="center">
+                    <Grid item xs>
+                      <FormControlLabel
+                        control={
+                          <Switch checked={this.props.scene.overlayEnabled}
+                                  onChange={this.onBoolInput.bind(this, 'overlayEnabled')}/>
+                        }
+                        label="Overlays"/>
+                    </Grid>
+                    <Grid item>
+                      <Collapse in={this.props.scene.overlayEnabled}>
+                        <Fab
+                          className={classes.addButton}
+                          onClick={this.onAddOverlay.bind(this)}
+                          size="small">
+                          <AddIcon />
+                        </Fab>
+                      </Collapse>
+                    </Grid>
+                  </Grid>
+                </Grid>
+                {this.props.scene.overlays.map((o) => {
+                  const overlayOpacity = typeof o.opacity === 'number' ? o.opacity : 0;
+                  return (
+                    <React.Fragment key={o.id}>
+                      <Grid item xs={12} className={clsx(!this.props.scene.overlayEnabled && classes.noPadding)}>
+                        <Collapse in={this.props.scene.overlayEnabled} className={classes.fullWidth}>
+                          <Grid container spacing={2} alignItems="center">
+                            <Grid item xs={12} sm={5}>
+                              <FormControl className={classes.fullWidth}>
+                                <InputLabel>Overlay</InputLabel>
+                                <Select
+                                  value={o.sceneID}
+                                  MenuProps={{
+                                    PaperProps: {
+                                      style: {
+                                        maxHeight: 300,
+                                      },
+                                    },
+                                  }}
+                                  onChange={this.onOverlayInput.bind(this, o.id, 'sceneID')}>
+                                  {["0"].concat(this.props.allScenes.filter((s) => s.sources.length > 0).map((s) => s.id.toString())).map((id) =>
+                                    <MenuItem key={id} value={id}>{this.getSceneName(id)}</MenuItem>
+                                  )}
+                                </Select>
+                              </FormControl>
                             </Grid>
-                            <Grid item>
-                              <Tooltip title="Remove Overlay">
-                                <IconButton
-                                  onClick={this.onRemoveOverlay.bind(this, o.id)}>
-                                  <DeleteIcon color="error"/>
-                                </IconButton>
-                              </Tooltip>
+                            <Grid item xs={12} sm={7}>
+                              <Typography id="overlay-opacity-slider" variant="caption" component="div" color="textSecondary">
+                                Overlay Opacity: {o.opacity}%
+                              </Typography>
+                              <Grid container spacing={1} alignItems="center">
+                                <Grid item xs>
+                                  <Slider
+                                    min={0}
+                                    max={99}
+                                    value={overlayOpacity}
+                                    onChange={this.onOverlaySliderChange.bind(this, o.id, 'opacity')}
+                                    aria-labelledby="overlay-opacity-slider"/>
+                                </Grid>
+                                <Grid item>
+                                  <Tooltip title="Remove Overlay">
+                                    <IconButton
+                                      onClick={this.onRemoveOverlay.bind(this, o.id)}>
+                                      <DeleteIcon color="error"/>
+                                    </IconButton>
+                                  </Tooltip>
+                                </Grid>
+                              </Grid>
                             </Grid>
                           </Grid>
-                        </Grid>
+                        </Collapse>
                       </Grid>
-                    </Collapse>
-                  </Grid>
-                </React.Fragment>
-              )}
+                      <Grid item xs={12} className={clsx(!this.props.scene.overlayEnabled && classes.noPadding)}>
+                        <Collapse in={this.props.scene.overlayEnabled} className={classes.fullWidth}>
+                          <Divider/>
+                        </Collapse>
+                      </Grid>
+                    </React.Fragment>
+                  )}
+                )}
+              </React.Fragment>
             )}
           </Grid>
         </CardContent>

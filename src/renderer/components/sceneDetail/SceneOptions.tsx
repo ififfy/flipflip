@@ -27,23 +27,12 @@ class SceneOptions extends React.Component {
             scene={this.props.scene}
             onSetupGrid={this.props.onSetupGrid.bind(this)}
             onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-        {/*<SceneEffectGroup
-          scene={this.props.scene}
-          isTagging={false}
-          isConfig={false}
-          allScenes={this.props.allScenes}
-          onSetupGrid={this.props.onSetupGrid.bind(this)}
-          onUpdateScene={this.props.onUpdateScene.bind(this)} />*/}
         </Grid>
 
         <Grid item xs={12} md={6}>
           <ImageVideoCard
             scene={this.props.scene}
             onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-        {/*<ImageVideoGroup
-          scene={this.props.scene}
-          isPlayer={false}
-          onUpdateScene={this.props.onUpdateScene.bind(this)}/>*/}
         </Grid>
       </Grid>
     )

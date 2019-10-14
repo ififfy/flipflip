@@ -14,15 +14,8 @@ import APIGroup from "./APIGroup";
 import CacheGroup from "./CacheGroup";
 import BackupGroup from "./BackupGroup";
 import DisplayGroup from "./DisplayGroup";
-import CrossFadeGroup from "../sceneDetail/CrossFadeGroup";
-import SceneEffectGroup from "../sceneDetail/SceneEffectGroup";
-import ImageVideoGroup from "../sceneDetail/ImageVideoGroup";
-import TextGroup from "../sceneDetail/TextGroup";
-import StrobeGroup from "../sceneDetail/StrobeGroup";
-import ZoomMoveGroup from "../sceneDetail/ZoomMoveGroup";
 import SimpleTextInput from "../ui/SimpleTextInput";
 import Modal from "../ui/Modal";
-import AudioGroup from "../sceneDetail/AudioGroup";
 
 export default class ConfigForm extends React.Component {
   readonly props: {
@@ -71,38 +64,38 @@ export default class ConfigForm extends React.Component {
         </div>
 
         <div className="Config__Content ControlGroupGroup">
-          <SceneEffectGroup
+          {/*<SceneEffectGroup
             scene={this.state.config.defaultScene}
             isTagging={false}
             isConfig={true}
             allScenes={this.props.scenes}
-            onUpdateScene={this.onUpdateDefaultScene.bind(this)} />
+            onUpdateScene={this.onUpdateDefaultScene.bind(this)} />*/}
 
-          <ImageVideoGroup
+          {/*<ImageVideoGroup
             scene={this.state.config.defaultScene}
             isPlayer={false}
-            onUpdateScene={this.onUpdateDefaultScene.bind(this)}/>
+            onUpdateScene={this.onUpdateDefaultScene.bind(this)}/>*/}
 
-          <CrossFadeGroup
+          {/*<CrossFadeGroup
             scene={this.state.config.defaultScene}
-            onUpdateScene={this.onUpdateDefaultScene.bind(this)} />
+            onUpdateScene={this.onUpdateDefaultScene.bind(this)} />*/}
 
-          <ZoomMoveGroup
+          {/*<ZoomMoveGroup
             scene={this.state.config.defaultScene}
-            onUpdateScene={this.onUpdateDefaultScene.bind(this)} />
+            onUpdateScene={this.onUpdateDefaultScene.bind(this)} />*/}
 
-          <StrobeGroup
+          {/*<StrobeGroup
             scene={this.state.config.defaultScene}
-            onUpdateScene={this.onUpdateDefaultScene.bind(this)} />
+            onUpdateScene={this.onUpdateDefaultScene.bind(this)} />*/}
 
-          <AudioGroup
+          {/*<AudioGroup
             scene={this.state.config.defaultScene}
             isPlayer={false}
-            onUpdateScene={this.onUpdateDefaultScene.bind(this)}/>
+            onUpdateScene={this.onUpdateDefaultScene.bind(this)}/>*/}
 
-          <TextGroup
+          {/*<TextGroup
             scene={this.state.config.defaultScene}
-            onUpdateScene={this.onUpdateDefaultScene.bind(this)}/>
+            onUpdateScene={this.onUpdateDefaultScene.bind(this)}/>*/}
 
           <DisplayGroup
             settings={this.state.config.displaySettings}
