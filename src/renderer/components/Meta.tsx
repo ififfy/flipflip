@@ -143,6 +143,15 @@ export default class Meta extends React.Component {
             />
           )}
 
+          {this.isRoute('tags') && (
+            <TagManager
+              tags={this.state.tags}
+              goBack={a(actions.goBack)}
+              onSort={a(actions.sortTags)}
+              onUpdateTags={a(actions.updateTags)}
+            />
+          )}
+
           {this.isRoute('clip') && (
             <VideoClipper
               source={actions.getActiveSource(this.state)}
@@ -158,14 +167,6 @@ export default class Meta extends React.Component {
               scene={scene}
               allScenes={this.state.scenes}
               onUpdateGrid={a(actions.onUpdateGrid)}
-              goBack={a(actions.goBack)}
-            />
-          )}
-
-          {this.isRoute('tags') && (
-            <TagManager
-              tags={this.state.tags}
-              onUpdateTags={a(actions.updateTags)}
               goBack={a(actions.goBack)}
             />
           )}

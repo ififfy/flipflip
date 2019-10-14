@@ -153,12 +153,16 @@ const styles = (theme: Theme) => createStyles({
       duration: theme.transitions.duration.leavingScreen,
     }),
   },
-  appBarSpacer: theme.mixins.toolbar,
+  appBarSpacer: {
+    backgroundColor: theme.palette.primary.main,
+    ...theme.mixins.toolbar
+  },
   content: {
     display: 'flex',
     flexGrow: 1,
     flexDirection: 'column',
     height: '100vh',
+    backgroundColor: (theme.palette.primary as any)["50"],
   },
   container: {
     padding: theme.spacing(0),

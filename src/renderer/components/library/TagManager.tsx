@@ -1,138 +1,313 @@
 import * as React from "react";
-import Sortable from "react-sortablejs"
+import clsx from "clsx";
+import Sortable from "react-sortablejs";
 
+import {
+  AppBar, Button, Card, CardActionArea, CardContent, Container, createStyles, Dialog, DialogActions, DialogContent,
+  DialogContentText, DialogTitle, Fab, IconButton, ListItemSecondaryAction, ListItemText, Menu, MenuItem, TextField,
+  Theme, Toolbar, Tooltip, Typography, withStyles
+} from "@material-ui/core";
+
+import AddIcon from '@material-ui/icons/Add';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
+import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
+import DeleteIcon from '@material-ui/icons/Delete';
+import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
+import SortIcon from '@material-ui/icons/Sort';
+
+import {MO, SF} from "../../data/const";
 import {arrayMove, removeDuplicatesBy} from "../../data/utils";
-import Tag from "./Tag";
+import en from "../../data/en";
+import Scene from "../../data/Scene";
 import Jiggle from "../../animations/Jiggle";
-import Modal from "../ui/Modal";
-import SimpleTextInput from "../ui/SimpleTextInput";
+import Tag from "./Tag";
 
-export default class TagManager extends React.Component {
+const styles = (theme: Theme) => createStyles({
+  root: {
+    display: 'flex',
+  },
+  appBar: {
+    zIndex: theme.zIndex.drawer + 1,
+  },
+  appBarSpacer: {
+    backgroundColor: theme.palette.primary.main,
+    ...theme.mixins.toolbar
+  },
+  backButton: {
+    float: 'left',
+  },
+  title: {
+    textAlign: 'center',
+  },
+  titleBar: {
+    flex: 1,
+    maxWidth: '33%',
+  },
+  content: {
+    display: 'flex',
+    flexGrow: 1,
+    flexDirection: 'column',
+    height: '100vh',
+    backgroundColor: (theme.palette.primary as any)["50"],
+  },
+  container: {
+    padding: theme.spacing(0),
+    overflowY: 'auto',
+  },
+  tagList: {
+    padding: theme.spacing(1),
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  tag: {
+    marginRight: theme.spacing(1),
+    marginBottom: theme.spacing(1),
+  },
+  addMenuButton: {
+    backgroundColor: theme.palette.primary.dark,
+    margin: 0,
+    top: 'auto',
+    right: 20,
+    bottom: 20,
+    left: 'auto',
+    position: 'fixed',
+  },
+  sortMenuButton: {
+    backgroundColor: theme.palette.secondary.dark,
+    margin: 0,
+    top: 'auto',
+    right: 80,
+    bottom: 20,
+    left: 'auto',
+    position: 'fixed',
+  },
+  removeAllButton: {
+    backgroundColor: theme.palette.error.main,
+    margin: 0,
+    top: 'auto',
+    right: 130,
+    bottom: 20,
+    left: 'auto',
+    position: 'fixed',
+  },
+  icon: {
+    color: theme.palette.primary.contrastText,
+  },
+  sortMenu: {
+    width: 200,
+  },
+  fill: {
+    flexGrow: 1,
+  },
+  phraseInput: {
+    minWidth: 200,
+    minHeight: 100,
+  },
+});
+
+class TagManager extends React.Component {
   readonly props: {
+    classes: any,
     tags: Array<Tag>,
-    onUpdateTags(tags: Array<Tag>): void,
     goBack(): void,
+    onSort(scene: Scene, algorithm: string, ascending: boolean): void,
+    onUpdateTags(tags: Array<Tag>): void,
   };
 
   readonly state = {
+    openMenu: null as string,
+    menuAnchorEl: null as any,
     tags: Array<Tag>(),
     isEditing: -1,
-    isEditingPhrase: -1,
-    phraseString: "",
-    changeMade: false,
+    tagName: null as string,
+    tagPhrase: null as string,
   };
 
-  _sortable: any = null;
-
   render() {
-    return (
-      <div className="TagManager">
-        <div className="u-button-row">
-          <div className="u-abs-center">
-            <h2 className="TagManager__TagManagerHeader">Tag Manager</h2>
+    const classes = this.props.classes;
+
+    return(
+      <div className={classes.root}>
+        <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
+          <Toolbar>
+            <div className={classes.titleBar}>
+              <Tooltip title="Back" placement="right-end">
+                <IconButton
+                  edge="start"
+                  color="inherit"
+                  aria-label="Back"
+                  className={classes.backButton}
+                  onClick={this.goBack.bind(this)}>
+                  <ArrowBackIcon />
+                </IconButton>
+              </Tooltip>
+            </div>
+
+            <Typography component="h1" variant="h4" color="inherit" noWrap
+                        className={clsx(classes.title, classes.titleBar)}>
+              Tag Manager
+            </Typography>
+
+            <div className={classes.titleBar}/>
+          </Toolbar>
+        </AppBar>
+
+        <main className={classes.content}>
+          <div className={classes.appBarSpacer} />
+
+          <div className={clsx(classes.root, classes.fill)}>
+            <Container maxWidth={false} className={classes.container}>
+              <Sortable
+                className={classes.tagList}
+                options={{
+                  animation: 150,
+                  easing: "cubic-bezier(1, 0, 0, 1)",
+                }}
+                onChange={(order: any, sortable: any, evt: any) => {
+                  let newTags = Array.from(this.state.tags);
+                  arrayMove(newTags, evt.oldIndex, evt.newIndex);
+                  this.setState({tags: newTags});
+                }}>
+                {this.state.tags.map((tag) =>
+                  <Jiggle key={tag.id + tag.name} bounce={true}>
+                    <Card className={classes.tag}>
+                      <CardActionArea onClick={this.onEditTag.bind(this, tag)}>
+                        <CardContent>
+                          <Typography component="h2" variant="h6">
+                            {tag.name}
+                          </Typography>
+                        </CardContent>
+                      </CardActionArea>
+                    </Card>
+                  </Jiggle>
+                )}
+              </Sortable>
+            </Container>
           </div>
-          <div className="u-button-row-right">
-            <div className="TagManager__Add u-button u-clickable"
-                 onClick={this.onAdd.bind(this)}>
-              + Add New Tag
-            </div>
-            <div className="TagManager__Apply u-button u-clickable"
-                 onClick={this.applyConfig.bind(this)}>
-              Apply
-            </div>
-            <div className="TagManager__OK u-button u-clickable"
-                 onClick={this.onOK.bind(this)}>
+          <Dialog
+            open={this.state.isEditing != -1}
+            onClose={this.onCloseDialog.bind(this)}
+            aria-labelledby="edit-title">
+            <DialogTitle id="edit-title">Edit Tag</DialogTitle>
+            <DialogContent>
+              <TextField
+                autoFocus
+                fullWidth
+                label="Name"
+                value={this.state.tagName}
+                margin="dense"
+                onChange={this.onChangeTitle.bind(this)}
+              />
+              <TextField
+                fullWidth
+                multiline
+                label="Tag Phrases"
+                id="phrase"
+                value={this.state.tagPhrase}
+                margin="dense"
+                inputProps={{className: classes.phraseInput}}
+                onChange={this.onChangePhrase.bind(this)}
+              />
+            </DialogContent>
+            <DialogActions>
+              <IconButton onClick={this.onRemoveTag.bind(this)} style={{marginRight: 'auto'}}>
+                <DeleteIcon color="error"/>
+              </IconButton>
+              <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+                Cancel
+              </Button>
+              <Button onClick={this.onFinishEdit.bind(this)} color="primary">
+                OK
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </main>
+
+        <Fab
+          disabled={this.props.tags.length == 0}
+          className={classes.removeAllButton}
+          onClick={this.onRemoveAll.bind(this)}
+          size="small">
+          <DeleteSweepIcon className={classes.icon} />
+        </Fab>
+        <Dialog
+          open={this.state.openMenu == MO.removeAllAlert}
+          onClose={this.onCloseDialog.bind(this)}
+          aria-labelledby="remove-all-title"
+          aria-describedby="remove-all-description">
+          <DialogTitle id="remove-all-title">Delete Tags</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="remove-all-description">
+              Are you sure you want to remove all Tags? This will untag all sources as well.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+              Cancel
+            </Button>
+            <Button onClick={this.onFinishRemoveAll.bind(this)} color="primary">
               OK
-            </div>
-          </div>
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Fab
+          className={classes.addMenuButton}
+          onClick={this.onAddTag.bind(this)}
+          size="large">
+          <AddIcon className={classes.icon} />
+        </Fab>
 
-          <div className="BackButton u-button u-clickable" onClick={this.goBack.bind(this)}>Back</div>
-        </div>
-
-        <Sortable
-          className="TagManager__Tags"
-          options={{
-            animation: 150,
-            easing: "cubic-bezier(1, 0, 0, 1)",
-          }}
-          ref={(node: any) => {
-            if (node) {
-              this._sortable = node.sortable;
-            }
-          }}
-          onChange={(order: any, sortable: any, evt: any) => {
-            let newTags = Array.from(this.state.tags);
-            arrayMove(newTags, evt.oldIndex, evt.newIndex);
-            this.setState({tags: newTags});
-          }}>
-          {this.state.tags.map((tag) =>
-            <div
-              className="TagManager__Tag u-clickable"
-              key={tag.id}>
-              {this.state.isEditing != tag.id && (
-                <React.Fragment>
-                  <Jiggle
-                    bounce={false}
-                    className="TagManager__RemoveButton u-icon-button"
-                    title="Delete Tag"
-                    onClick={this.onRemove.bind(this, tag.id)}>
-                    <div className="u-delete"/>
-                  </Jiggle>
-                  <Jiggle
-                    bounce={false}
-                    className="TagManager__PhraseButton u-icon-button"
-                    title="Edit Tag Phrases"
-                    onClick={this.onEditPhrase.bind(this, tag.id)}>
-                    <div className="u-script"/>
-                  </Jiggle>
-                  <div
-                    className="TagManager__TagTitle"
-                    onClick={this.onEdit.bind(this, tag.id)}>
-                    {tag.name}
-                  </div>
-                </React.Fragment>
+        {this.props.tags.length >= 2 && (
+          <React.Fragment>
+            <Fab
+              className={classes.sortMenuButton}
+              aria-haspopup="true"
+              aria-controls="sort-menu"
+              aria-label="Sort Tags"
+              onClick={this.onOpenSortMenu.bind(this)}
+              size="medium">
+              <SortIcon className={classes.icon} />
+            </Fab>
+            <Menu
+              id="sort-menu"
+              elevation={1}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'center',
+              }}
+              transformOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+              getContentAnchorEl={null}
+              anchorEl={this.state.menuAnchorEl}
+              keepMounted
+              classes={{paper: classes.sortMenu}}
+              open={this.state.openMenu == MO.sort}
+              onClose={this.onCloseDialog.bind(this)}>
+              {[SF.alpha, SF.date].map((sf) =>
+                <MenuItem key={sf}>
+                  <ListItemText primary={en.get(sf)}/>
+                  <ListItemSecondaryAction>
+                    <IconButton edge="end" onClick={this.props.onSort.bind(this, sf, true)}>
+                      <ArrowUpwardIcon/>
+                    </IconButton>
+                    <IconButton edge="end" onClick={this.props.onSort.bind(this, sf, false)}>
+                      <ArrowDownwardIcon/>
+                    </IconButton>
+                  </ListItemSecondaryAction>
+                </MenuItem>
               )}
-              {this.state.isEditing == tag.id && (
-                <form className="TagManager_TagTitle" onSubmit={this.onEdit.bind(this, -1)}>
-                  <input
-                    autoFocus
-                    type="text"
-                    value={tag.name}
-                    onBlur={this.onEdit.bind(this, -1)}
-                    onChange={this.onEditTag.bind(this, tag.id)}/>
-                </form>
-              )}
-            </div>
-          )}
-        </Sortable>
-
-        {this.state.tags.length == 0 && (
-          <div className="TagManager__Empty">
-            You haven't added any tags yet.
-          </div>
-        )}
-
-        {this.state.isEditingPhrase != -1 && (
-          <Modal onClose={this.cancelEditPhrase.bind(this)} title={`Tag Phrases: ${this.state.tags.find((t) => t.id == this.state.isEditingPhrase).name}`}>
-            <p>Enter phrases associated with this tag, used with $TAG_PHRASE</p>
-            <p>Enter one phrase per line and hit Save.</p>
-            <SimpleTextInput
-              label=""
-              textArea={true}
-              value={this.state.phraseString}
-              isEnabled={true}
-              onChange={this.onChangePhraseString.bind(this)}/>
-            <div className="u-button u-float-right" onClick={this.savePhraseString.bind(this)}>
-              Save
-            </div>
-          </Modal>
+            </Menu>
+          </React.Fragment>
         )}
       </div>
-    )
+    );
   }
 
   componentDidMount() {
-        // Make a deep copy of Tags
+    // Make a deep copy of Tags
     // For some reason, shallow copy was still modifying props' Tags
     let newTags = Array<Tag>();
     for (let tag of this.props.tags) {
@@ -141,31 +316,16 @@ export default class TagManager extends React.Component {
     this.setState({tags: newTags});
   }
 
-  nop() {}
-
   goBack() {
-    if (this.state.changeMade) {
-      alert("Be sure to press OK if you want to save your changes");
-      this.setState({changeMade: false});
-    } else {
-      this.props.goBack();
-    }
-  }
-
-  onOK() {
-    this.applyConfig();
+    this.props.onUpdateTags(this.state.tags);
     this.props.goBack();
   }
 
-  applyConfig() {
-    this.props.onUpdateTags(this.state.tags);
+  onCloseDialog() {
+    this.setState({menuAnchorEl: null, openMenu: null, isEditing: -1, tagName: null, tagPhrase: null});
   }
 
-  onRemove(tagID: number) {
-    this.setState({tags: this.state.tags.filter((t) => t.id != tagID), changeMade: true});
-  }
-
-  onAdd() {
+  onAddTag() {
     let id = this.state.tags.length + 1;
     this.state.tags.forEach((s) => {
       id = Math.max(s.id + 1, id);
@@ -175,52 +335,49 @@ export default class TagManager extends React.Component {
     });
 
     let newTags = this.state.tags;
-    newTags.push(new Tag({
+    newTags = newTags.concat([new Tag({
       name: "",
       id: id,
-    }));
-    this.setState({isEditing: id, tags: newTags, changeMade: true});
+    })]);
+    this.setState({isEditing: id, tags: newTags});
   }
 
-  onEdit(tagID: number, e: Event) {
-    e.preventDefault();
-    // If user left input blank, remove it from list of sources
-    // Also prevent user from inputing duplicate source
-    this.setState({isEditing: tagID, changeMade: true, tags:
-      removeDuplicatesBy((t: Tag) => t.name,
-        this.state.tags.filter((t) => t.name != ""))});
+  onRemoveTag() {
+    this.setState({tags: this.state.tags.filter((t) => t.id != this.state.isEditing), isEditing: -1, tagName: null, tagPhrase: null});
   }
 
-  onEditTag(tagID: number, e: React.FormEvent<HTMLInputElement>) {
-    this.setState({
-      tags: this.state.tags.map(
-        function map(tag: Tag) {
-          if (tag.id == tagID) {
-            tag.name = e.currentTarget.value;
-          }
-          return tag;
-        }), changeMade: true
-    });
+  onChangeTitle(e: MouseEvent) {
+    this.setState({tagName: (e.currentTarget as HTMLInputElement).value});
   }
 
-  onEditPhrase(tagID: number) {
-    let tag = this.state.tags.find((t) => t.id == tagID);
-    this.setState({ isEditingPhrase: tagID, phraseString: tag.phraseString });
+  onChangePhrase(e: MouseEvent) {
+    this.setState({tagPhrase: (e.currentTarget as HTMLInputElement).value});
   }
 
-  savePhraseString() {
-    let newTags = this.state.tags;
-    let tag = this.state.tags.find((t) => t.id == this.state.isEditingPhrase);
-    tag.phraseString = this.state.phraseString;
-    this.setState({tags: newTags, isEditingPhrase: -1, phraseString: "", changeMade: true});
+  onEditTag(tag: Tag) {
+    console.log(tag);
+    this.setState({isEditing: tag.id, tagName: tag.name, tagPhrase: tag.phraseString});
   }
 
-  cancelEditPhrase() {
-    this.setState({ isEditingPhrase: -1, phraseString: "" });
+  onFinishEdit() {
+    const tag = this.state.tags.find((t) => t.id == this.state.isEditing);
+    tag.name = this.state.tagName;
+    tag.phraseString = this.state.tagPhrase;
+    this.setState({tags: removeDuplicatesBy((t: Tag) => t.name, this.state.tags.filter((t) => t.name != "")), isEditing: -1, tagName: null, tagPhrase: null});
   }
 
-  onChangePhraseString(phraseString: string) {
-    this.setState({ phraseString: phraseString });
+  onRemoveAll() {
+    this.setState({openMenu: MO.removeAllAlert});
   }
 
+  onOpenSortMenu(e: MouseEvent) {
+    this.setState({menuAnchorEl: e.currentTarget, openMenu: MO.sort});
+  }
+
+  onFinishRemoveAll() {
+    this.props.onUpdateTags([]);
+    this.onCloseDialog();
+  }
 }
+
+export default withStyles(styles)(TagManager as any);

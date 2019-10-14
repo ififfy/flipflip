@@ -244,12 +244,13 @@ export function deleteScene(state: State, scene: Scene): Object {
   const newScenes = state.scenes.filter((s: Scene) => s.id != scene.id);
   for (let s of newScenes) {
     s.overlays = s.overlays.filter((o) => o.sceneID != scene.id);
-    for (let row of s.grid) {
+    // TODO Fix this
+    /*for (let row of s.grid) {
       if (row.find((id: any) => parseInt(id) == scene.id) != null) {
         s.grid = [[]];
         break;
       }
-    }
+    }*/
   }
   return {
     scenes: newScenes,
@@ -747,7 +748,7 @@ export function sortScene(state: State, algorithm: string, ascending: boolean): 
     return "0";
   };
   const newScenes = state.scenes.sort(
-    sortFunction(algorithm, ascending, getName, getName, getCount, getType,
+    sortFunction(algorithm, ascending, getName, null, getCount, getType,
       algorithm == SF.type ? SF.alpha : null));
   return {scenes: newScenes}
 }
@@ -785,7 +786,15 @@ export function sortSources(state: State, scene: Scene, algorithm: string, ascen
       sortFunction(algorithm, ascending, getName, getFullName, getCount, getType, secondary));
     return {library: newLibrary};
   }
+}
 
+export function sortTags(state: State, algorithm: string, ascending: boolean): Object {
+  const getName = (a: Tag) => {
+    return a.name.toLowerCase();
+  };
+  const newTags = state.tags.sort(
+    sortFunction(algorithm, ascending, getName, null, null, null, null));
+  return {tags: newTags}
 }
 
 function sortFunction(algorithm: string, ascending: boolean, getName: (a: any) => string,

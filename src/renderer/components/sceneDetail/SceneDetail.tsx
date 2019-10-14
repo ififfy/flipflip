@@ -408,7 +408,7 @@ class SceneDetail extends React.Component {
               <DialogContent>
                 <DialogContentText id="delete-description">
                   Are you sure you want to delete {this.props.scene.name}?
-                  It will be automatically removed from all overlays and grids.
+                  It will be automatically removed from all overlays/grids.
                 </DialogContentText>
               </DialogContent>
               <DialogActions>
@@ -518,6 +518,7 @@ class SceneDetail extends React.Component {
 
             <Tooltip title="Remove All Sources"  placement="left">
               <Fab
+                disabled={this.props.scene.sources.length == 0}
                 className={clsx(classes.addButton, classes.removeAllButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop)}
                 onClick={this.onRemoveAll.bind(this)}
                 size="small">
