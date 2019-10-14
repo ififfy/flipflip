@@ -34,7 +34,7 @@ export function isRoute(state: State, kind: string): Boolean {
 // Returns the active scene, or null if the current route isn't a scene
 export function getActiveScene(state: State): Scene | null {
   for (let r of state.route.slice().reverse()) {
-    if (r.kind == 'scene' || r.kind == 'generate' || r.kind == 'grid') {
+    if (r.kind == 'scene' || r.kind == 'grid') {
       return state.scenes.find((s: Scene) => s.id === r.value);
     }
   }
@@ -264,16 +264,9 @@ export function nextScene(state: State): Object {
   if (scene && scene.nextSceneID !== 0){
     const nextScene = state.scenes.find((s: Scene) => s.id == scene.nextSceneID);
     if (nextScene != null) {
-      if (nextScene.tagWeights || nextScene.sceneWeights) {
-        return {
-          route: [new Route({kind: 'generate', value: scene.id}),
-          new Route({kind: 'scene', value: nextScene.id}), new Route({kind: 'play', value: nextScene.id})],
-        };
-      } else {
-        return {
-          route: [new Route({kind: 'scene', value: nextScene.id}), new Route({kind: 'play', value: nextScene.id})],
-        };
-      }
+      return {
+        route: [new Route({kind: 'scene', value: nextScene.id}), new Route({kind: 'play', value: nextScene.id})],
+      };
     }
   }
 }
@@ -282,16 +275,9 @@ export function startFromScene(state: State, sceneName: string) {
   const scene = state.scenes.find((s: Scene) => s.name == sceneName);
   if (scene) {
     if (scene.sources.length > 0) {
-      if (scene.tagWeights || scene.sceneWeights) {
-        return {
-          route: [new Route({kind: 'generate', value: scene.id}),
-            new Route({kind: 'scene', value: scene.id}), new Route({kind: 'play', value: scene.id})],
-        };
-      } else {
-        return {
-          route: [new Route({kind: 'scene', value: scene.id}), new Route({kind: 'play', value: scene.id})],
-        };
-      }
+      return {
+        route: [new Route({kind: 'scene', value: scene.id}), new Route({kind: 'play', value: scene.id})],
+      };
     } else {
       console.error("Scene '" + sceneName+ "' has no sources");
     }
@@ -313,11 +299,7 @@ export function setDefaultConfig(state: State): Object {
 }
 
 export function goToScene(state: State, scene: Scene): Object {
-  if (scene.tagWeights || scene.sceneWeights) {
-    return {route: [new Route({kind: 'generate', value: scene.id})]};
-  } else {
-    return {route: [new Route({kind: 'scene', value: scene.id})]};
-  }
+  return {route: [new Route({kind: 'scene', value: scene.id})]};
 }
 
 export function openLibrary(state: State): Object {
@@ -469,13 +451,9 @@ export function addGenerator(state: State): Object {
   });
   return {
     scenes: state.scenes.concat([scene]),
-    route: [new Route({kind: 'generate', value: scene.id})],
+    route: [new Route({kind: 'scene', value: scene.id})],
     autoEdit: true
   };
-}
-
-export function generateScene(state: State): Object {
-  return {route: state.route.concat(new Route({kind: 'scene', value: getActiveScene(state).id}))};
 }
 
 export function updateScene(state: State, scene: Scene, fn: (scene: Scene) => void): Object {

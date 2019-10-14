@@ -94,12 +94,12 @@ interface SceneSettingsI {
   audios: Array<Audio>;
   bpm: number;
   fillView: boolean;
-  gridView: boolean;
-  grid: Array<Array<number>>;
 
   // migration only
   overlaySceneID: number;
   overlaySceneOpacity: number;
+  gridView: boolean;
+  grid: Array<Array<number>>;
 }
 
 interface RemoteSettingsI {
@@ -240,12 +240,12 @@ export class SceneSettings implements SceneSettingsI {
   audios: Array<Audio> = [];
   bpm = 0;
   fillView = false;
-  gridView = false;
-  grid: Array<Array<number>> = [[]];
 
   // migration only
   overlaySceneID = 0;
   overlaySceneOpacity = 0.5;
+  gridView = false;
+  grid: Array<Array<number>> = [[]];
 }
 
 export class RemoteSettings implements RemoteSettingsI {

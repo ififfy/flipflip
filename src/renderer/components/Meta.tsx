@@ -12,7 +12,6 @@ import ScenePicker from './ScenePicker';
 import ConfigForm from './config/ConfigForm';
 import Library from './library/Library';
 import TagManager from "./library/TagManager";
-import SceneGenerator from "./library/SceneGenerator";
 import Player from './player/Player';
 import SceneDetail from './sceneDetail/SceneDetail';
 import FFAnalytics from "./ui/FFAnalytics";
@@ -91,7 +90,9 @@ export default class Meta extends React.Component {
               autoEdit={this.state.autoEdit}
               allScenes={this.state.scenes}
               config={this.state.config}
+              library={this.state.library}
               scene={scene}
+              tags={this.state.tags}
               goBack={a(actions.goBack)}
               onAddSource={a(actions.addSource)}
               onClearBlacklist={a(actions.clearBlacklist)}
@@ -101,7 +102,6 @@ export default class Meta extends React.Component {
               onPlayScene={a(actions.playScene)}
               onPlay={a(actions.playSceneFromLibrary)}
               onSaveAsScene={a(actions.saveScene)}
-              onSetupGrid={a(actions.setupGrid)}
               onSort={a(actions.sortSources)}
               onUpdateScene={a(actions.updateScene)}
             />
@@ -167,20 +167,6 @@ export default class Meta extends React.Component {
               tags={this.state.tags}
               onUpdateTags={a(actions.updateTags)}
               goBack={a(actions.goBack)}
-            />
-          )}
-
-          {this.isRoute('generate') && (
-            <SceneGenerator
-              library={this.state.library}
-              tags={this.state.tags}
-              autoEdit={this.state.autoEdit}
-              scenes={this.state.scenes}
-              scene={scene}
-              goBack={a(actions.goBack)}
-              onGenerate={a(actions.generateScene)}
-              onUpdateScene={a(actions.updateScene)}
-              onDelete={a(actions.deleteScene)}
             />
           )}
 

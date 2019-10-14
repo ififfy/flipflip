@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import {createStyles, Grid, Theme, withStyles} from "@material-ui/core";
+import {Card, CardContent, createStyles, Grid, Theme, withStyles} from "@material-ui/core";
 
 import Scene from "../../data/Scene";
 import CrossFadeCard from "./CrossFadeCard";
@@ -22,35 +22,54 @@ class SceneEffects extends React.Component {
     return(
       <Grid container spacing={2}>
         <Grid item xs={12} md={6} lg={4}>
-          <ZoomMoveCard
-            scene={this.props.scene}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+          <Card>
+            <CardContent>
+              <ZoomMoveCard
+                scene={this.props.scene}
+                onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+            </CardContent>
+          </Card>
         </Grid>
 
         <Grid item xs={12} md={6} lg={4}>
-          <CrossFadeCard
-            scene={this.props.scene}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}
-          />
+          <Card>
+            <CardContent>
+              <CrossFadeCard
+                scene={this.props.scene}
+                onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+            </CardContent>
+          </Card>
         </Grid>
 
         <Grid item xs={12} md={6} lg={4}>
-          <StrobeCard
-            scene={this.props.scene}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+          <Card>
+            <CardContent>
+              <StrobeCard
+                scene={this.props.scene}
+                onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+            </CardContent>
+          </Card>
         </Grid>
 
         <Grid item xs={12} md={6} lg={4}>
-          <AudioCard
-            scene={this.props.scene}
-            startPlaying={false}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+          <Card>
+            <CardContent>
+              <AudioCard
+                scene={this.props.scene}
+                startPlaying={false}
+                onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+            </CardContent>
+          </Card>
         </Grid>
 
         <Grid item xs={12} md={6} lg={4}>
-          <TextCard
-            scene={this.props.scene}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+          <Card>
+            <CardContent>
+              <TextCard
+                scene={this.props.scene}
+                onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+            </CardContent>
+          </Card>
         </Grid>
       </Grid>
     );

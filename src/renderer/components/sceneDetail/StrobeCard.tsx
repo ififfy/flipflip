@@ -55,336 +55,332 @@ class StrobeCard extends React.Component {
     const strobeDelayMin = typeof this.props.scene.strobeDelayMin === 'number' ? this.props.scene.strobeDelayMin : 0;
     const strobeDelayMax = typeof this.props.scene.strobeDelayMax === 'number' ? this.props.scene.strobeDelayMax : 0;
     return(
-      <Card>
-        <CardContent>
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12}>
-              <Grid container alignItems="center">
-                <Grid item xs={12} sm={5}>
-                  <FormControlLabel
-                    control={
-                      <Switch checked={this.props.scene.strobe}
-                              onChange={this.onBoolInput.bind(this, 'strobe')}/>
-                    }
-                    label="Strobe"/>
-                </Grid>
-                <Grid item xs={12} sm={7}>
-                  <Collapse in={this.props.scene.strobe} className={clsx(classes.fullWidth, classes.paddingLeft)}>
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={this.props.scene.strobePulse}
-                          onChange={this.onBoolInput.bind(this, 'strobePulse')}/>
-                      }
-                      label="Add Delay"/>
-                  </Collapse>
-                </Grid>
-              </Grid>
+      <Grid container spacing={2} alignItems="center">
+        <Grid item xs={12}>
+          <Grid container alignItems="center">
+            <Grid item xs={12} sm={5}>
+              <FormControlLabel
+                control={
+                  <Switch checked={this.props.scene.strobe}
+                          onChange={this.onBoolInput.bind(this, 'strobe')}/>
+                }
+                label="Strobe"/>
             </Grid>
-            <Grid item xs={12} className={clsx((!this.props.scene.strobe || this.props.scene.strobeLayer == SL.image) && classes.noPadding)}>
-              <Collapse in={this.props.scene.strobe && this.props.scene.strobeLayer != SL.image} className={classes.fullWidth}>
-                <ColorPicker
-                  currentColor={this.props.scene.strobeColor}
-                  onChangeColor={this.onInput.bind(this, 'strobeColor')}/>
-              </Collapse>
-            </Grid>
-            <Grid item xs={12} className={clsx(!this.props.scene.strobe && classes.noPadding)}>
-              <Collapse in={this.props.scene.strobe} className={classes.fullWidth}>
-                <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={12} sm={this.props.scene.strobeLayer == SL.bottom ? 4 : 12} className={classes.paddingTop}>
-                    <FormControl className={classes.fullWidth}>
-                      <InputLabel>Strobe Layer</InputLabel>
-                      <Select
-                        value={this.props.scene.strobeLayer}
-                        onChange={this.onInput.bind(this, 'strobeLayer')}>
-                        {Object.values(SL).map((sl) =>
-                          <MenuItem key={sl} value={sl}>{en.get(sl)}</MenuItem>
-                        )}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm className={clsx(this.props.scene.strobeLayer != SL.bottom && classes.noPadding)}>
-                    <Collapse in={this.props.scene.strobeLayer == SL.bottom} className={classes.fullWidth}>
-                      <Typography id="strobe-opacity-slider" variant="caption" component="div" color="textSecondary">
-                        Strobe Opacity
-                      </Typography>
-                      <Grid container spacing={2} alignItems="center">
-                        <Grid item xs>
-                          <Slider
-                            min={0}
-                            value={strobeOpacity * 100}
-                            onChange={this.onPercentSliderChange.bind(this, 'strobeOpacity')}
-                            aria-labelledby="strobe-opacity-slider"/>
-                        </Grid>
-                        <Grid item xs={3} className={classes.percentInput}>
-                          <TextField
-                            value={Math.round(strobeOpacity * 100)}
-                            margin="dense"
-                            onChange={this.onPercentIntInput.bind(this, 'strobeOpacity')}
-                            onBlur={this.blurPercentIntKey.bind(this, 'strobeOpacity')}
-                            InputProps={{
-                              endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                            }}
-                            inputProps={{
-                              className: classes.endInput,
-                              step: 5,
-                              min: 0,
-                              max: 100,
-                              type: 'number',
-                              'aria-labelledby': 'strobe-opacity-slider',
-                            }}/>
-                        </Grid>
-                      </Grid>
-                    </Collapse>
-                  </Grid>
-                </Grid>
-              </Collapse>
-            </Grid>
-            <Grid item xs={12} className={clsx(!this.props.scene.strobe && classes.noPadding)}>
-              <Collapse in={this.props.scene.strobe} className={classes.fullWidth}>
-                <Divider />
-              </Collapse>
-            </Grid>
-            <Grid item xs={12} className={clsx(!this.props.scene.strobe && classes.noPadding)}>
-              <Collapse in={this.props.scene.strobe} className={classes.fullWidth}>
-                <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={12} sm={4} style={{paddingTop: 10}}>
-                    <FormControl className={classes.fullWidth}>
-                      <InputLabel>Timing</InputLabel>
-                      <Select
-                        value={this.props.scene.strobeTF}
-                        onChange={this.onInput.bind(this, 'strobeTF')}>
-                        {Object.values(TF).map((tf) =>
-                          <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
-                        )}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={8}>
-                    <Collapse in={this.props.scene.strobeTF == TF.sin} className={classes.fullWidth}>
-                      <Typography id="strobe-sin-rate-slider" variant="caption" component="div" color="textSecondary">
-                        Wave Rate
-                      </Typography>
-                      <Grid container alignItems="center">
-                        <Grid item xs>
-                          <Slider
-                            min={1}
-                            value={strobeSinRate}
-                            onChange={this.onSliderChange.bind(this, 'strobeSinRate')}
-                            aria-labelledby="strobe-sin-rate-slider"/>
-                        </Grid>
-                        <Grid item xs={3} className={classes.percentInput}>
-                          <TextField
-                            value={strobeSinRate}
-                            onChange={this.onIntInput.bind(this, 'strobeSinRate')}
-                            onBlur={this.blurIntKey.bind(this, 'strobeSinRate')}
-                            inputProps={{
-                              className: classes.endInput,
-                              step: 5,
-                              min: 0,
-                              max: 100,
-                              type: 'number',
-                              'aria-labelledby': 'strobe-sin-rate-slider',
-                            }}/>
-                        </Grid>
-                      </Grid>
-                    </Collapse>
-                    <Collapse in={this.props.scene.strobeTF == TF.bpm} className={classes.fullWidth}>
-                      <Typography id="strobe-bpm-multi-slider" variant="caption" component="div" color="textSecondary">
-                        BPM Multiplier {this.props.scene.strobeBPMMulti > 0 ? this.props.scene.strobeBPMMulti : "1 / " + (-1 * (this.props.scene.strobeBPMMulti - 2))}x
-                      </Typography>
-                      <Slider
-                        min={-8}
-                        max={10}
-                        value={strobeBPMMulti}
-                        onChange={this.onSliderChange.bind(this, 'strobeBPMMulti')}
-                        aria-labelledby="strobe-bpm-multi-slider"/>
-                    </Collapse>
-                    <Collapse in={this.props.scene.strobeTF == TF.constant} className={classes.fullWidth}>
-                      <TextField
-                        variant="outlined"
-                        label="For"
-                        margin="dense"
-                        value={strobeTime}
-                        onChange={this.onIntInput.bind(this, 'strobeTime')}
-                        onBlur={this.blurIntKey.bind(this, 'strobeTime')}
-                        InputProps={{
-                          endAdornment: <InputAdornment position="end">ms</InputAdornment>,
-                        }}
-                        inputProps={{
-                          step: 100,
-                          min: 0,
-                          type: 'number',
-                        }}/>
-                    </Collapse>
-                  </Grid>
-                </Grid>
-              </Collapse>
-            </Grid>
-            <Grid item xs={12} className={clsx(!this.props.scene.strobe && classes.noPadding)}>
-              <Collapse in={this.props.scene.strobe && (this.props.scene.strobeTF == TF.random || this.props.scene.strobeTF == TF.sin)} className={classes.fullWidth}>
-                <Grid container alignItems="center">
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      variant="outlined"
-                      label="Between"
-                      margin="dense"
-                      value={strobeTimeMin}
-                      onChange={this.onIntInput.bind(this, 'strobeTimeMin')}
-                      onBlur={this.blurIntKey.bind(this, 'strobeTimeMin')}
-                      InputProps={{
-                        endAdornment: <InputAdornment position="end">ms</InputAdornment>,
-                      }}
-                      inputProps={{
-                        step: 100,
-                        min: 0,
-                        type: 'number',
-                      }}/>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      variant="outlined"
-                      label="and"
-                      margin="dense"
-                      value={strobeTimeMax}
-                      onChange={this.onIntInput.bind(this, 'strobeTimeMax')}
-                      onBlur={this.blurIntKey.bind(this, 'strobeTimeMax')}
-                      InputProps={{
-                        endAdornment: <InputAdornment position="end">ms</InputAdornment>,
-                      }}
-                      inputProps={{
-                        step: 100,
-                        min: 0,
-                        type: 'number',
-                      }}/>
-                  </Grid>
-                </Grid>
-              </Collapse>
-            </Grid>
-            <Grid item xs={12} className={clsx((!this.props.scene.strobe || !this.props.scene.strobePulse)  && classes.noPadding)}>
-              <Collapse in={this.props.scene.strobe && this.props.scene.strobePulse} className={classes.fullWidth}>
-                <Divider />
-              </Collapse>
-            </Grid>
-            <Grid item xs={12} className={clsx((!this.props.scene.strobe || !this.props.scene.strobePulse) && classes.noPadding)}>
-              <Collapse in={this.props.scene.strobe && this.props.scene.strobePulse} className={classes.fullWidth}>
-                <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={12} sm={4} style={{paddingTop: 10}}>
-                    <FormControl className={classes.fullWidth}>
-                      <InputLabel>Delay Timing</InputLabel>
-                      <Select
-                        value={this.props.scene.strobeDelayTF}
-                        onChange={this.onInput.bind(this, 'strobeDelayTF')}>
-                        {Object.values(TF).map((tf) =>
-                          <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
-                        )}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={8}>
-                    <Collapse in={this.props.scene.strobeDelayTF == TF.sin} className={classes.fullWidth}>
-                      <Typography id="strobe-delay-sin-rate-slider" variant="caption" component="div" color="textSecondary">
-                        Wave Rate
-                      </Typography>
-                      <Grid container alignItems="center">
-                        <Grid item xs>
-                          <Slider
-                            min={1}
-                            value={strobeDelaySinRate}
-                            onChange={this.onSliderChange.bind(this, 'strobeDelaySinRate')}
-                            aria-labelledby="strobe-delay-sin-rate-slider"/>
-                        </Grid>
-                        <Grid item xs={3} className={classes.percentInput}>
-                          <TextField
-                            value={strobeDelaySinRate}
-                            onChange={this.onIntInput.bind(this, 'strobeDelaySinRate')}
-                            onBlur={this.blurIntKey.bind(this, 'strobeDelaySinRate')}
-                            inputProps={{
-                              className: classes.endInput,
-                              step: 5,
-                              min: 0,
-                              max: 100,
-                              type: 'number',
-                              'aria-labelledby': 'strobe-delay-sin-rate-slider',
-                            }}/>
-                        </Grid>
-                      </Grid>
-                    </Collapse>
-                    <Collapse in={this.props.scene.strobeDelayTF == TF.bpm} className={classes.fullWidth}>
-                      <Typography id="strobe-delay-bpm-multi-slider" variant="caption" component="div" color="textSecondary">
-                        BPM Multiplier {this.props.scene.strobeDelayBPMMulti > 0 ? this.props.scene.strobeDelayBPMMulti : "1 / " + (-1 * (this.props.scene.strobeDelayBPMMulti - 2))}x
-                      </Typography>
-                      <Slider
-                        min={-8}
-                        max={10}
-                        value={strobeDelayBPMMulti}
-                        onChange={this.onSliderChange.bind(this, 'strobeDelayBPMMulti')}
-                        aria-labelledby="strobe-delay-bpm-multi-slider"/>
-                    </Collapse>
-                    <Collapse in={this.props.scene.strobeDelayTF == TF.constant} className={classes.fullWidth}>
-                      <TextField
-                        variant="outlined"
-                        label="For"
-                        margin="dense"
-                        value={strobeDelay}
-                        onChange={this.onIntInput.bind(this, 'strobeDelay')}
-                        onBlur={this.blurIntKey.bind(this, 'strobeDelay')}
-                        InputProps={{
-                          endAdornment: <InputAdornment position="end">ms</InputAdornment>,
-                        }}
-                        inputProps={{
-                          step: 100,
-                          min: 0,
-                          type: 'number',
-                        }}/>
-                    </Collapse>
-                  </Grid>
-                </Grid>
-              </Collapse>
-            </Grid>
-            <Grid item xs={12} className={clsx((!this.props.scene.strobe || !this.props.scene.strobePulse) && classes.noPadding)}>
-              <Collapse in={this.props.scene.strobe && this.props.scene.strobePulse && (this.props.scene.strobeDelayTF == TF.random || this.props.scene.strobeDelayTF == TF.sin)} className={classes.fullWidth}>
-                <Grid container alignItems="center">
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      variant="outlined"
-                      label="Between"
-                      margin="dense"
-                      value={strobeDelayMin}
-                      onChange={this.onIntInput.bind(this, 'strobeDelayMin')}
-                      onBlur={this.blurIntKey.bind(this, 'strobeDelayMin')}
-                      InputProps={{
-                        endAdornment: <InputAdornment position="end">ms</InputAdornment>,
-                      }}
-                      inputProps={{
-                        step: 100,
-                        min: 0,
-                        type: 'number',
-                      }}/>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      variant="outlined"
-                      label="and"
-                      margin="dense"
-                      value={strobeDelayMax}
-                      onChange={this.onIntInput.bind(this, 'strobeDelayMax')}
-                      onBlur={this.blurIntKey.bind(this, 'strobeDelayMax')}
-                      InputProps={{
-                        endAdornment: <InputAdornment position="end">ms</InputAdornment>,
-                      }}
-                      inputProps={{
-                        step: 100,
-                        min: 0,
-                        type: 'number',
-                      }}/>
-                  </Grid>
-                </Grid>
+            <Grid item xs={12} sm={7}>
+              <Collapse in={this.props.scene.strobe} className={clsx(classes.fullWidth, classes.paddingLeft)}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={this.props.scene.strobePulse}
+                      onChange={this.onBoolInput.bind(this, 'strobePulse')}/>
+                  }
+                  label="Add Delay"/>
               </Collapse>
             </Grid>
           </Grid>
-        </CardContent>
-      </Card>
+        </Grid>
+        <Grid item xs={12} className={clsx((!this.props.scene.strobe || this.props.scene.strobeLayer == SL.image) && classes.noPadding)}>
+          <Collapse in={this.props.scene.strobe && this.props.scene.strobeLayer != SL.image} className={classes.fullWidth}>
+            <ColorPicker
+              currentColor={this.props.scene.strobeColor}
+              onChangeColor={this.onInput.bind(this, 'strobeColor')}/>
+          </Collapse>
+        </Grid>
+        <Grid item xs={12} className={clsx(!this.props.scene.strobe && classes.noPadding)}>
+          <Collapse in={this.props.scene.strobe} className={classes.fullWidth}>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} sm={this.props.scene.strobeLayer == SL.bottom ? 4 : 12} className={classes.paddingTop}>
+                <FormControl className={classes.fullWidth}>
+                  <InputLabel>Strobe Layer</InputLabel>
+                  <Select
+                    value={this.props.scene.strobeLayer}
+                    onChange={this.onInput.bind(this, 'strobeLayer')}>
+                    {Object.values(SL).map((sl) =>
+                      <MenuItem key={sl} value={sl}>{en.get(sl)}</MenuItem>
+                    )}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm className={clsx(this.props.scene.strobeLayer != SL.bottom && classes.noPadding)}>
+                <Collapse in={this.props.scene.strobeLayer == SL.bottom} className={classes.fullWidth}>
+                  <Typography id="strobe-opacity-slider" variant="caption" component="div" color="textSecondary">
+                    Strobe Opacity
+                  </Typography>
+                  <Grid container spacing={2} alignItems="center">
+                    <Grid item xs>
+                      <Slider
+                        min={0}
+                        value={strobeOpacity * 100}
+                        onChange={this.onPercentSliderChange.bind(this, 'strobeOpacity')}
+                        aria-labelledby="strobe-opacity-slider"/>
+                    </Grid>
+                    <Grid item xs={3} className={classes.percentInput}>
+                      <TextField
+                        value={Math.round(strobeOpacity * 100)}
+                        margin="dense"
+                        onChange={this.onPercentIntInput.bind(this, 'strobeOpacity')}
+                        onBlur={this.blurPercentIntKey.bind(this, 'strobeOpacity')}
+                        InputProps={{
+                          endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                        }}
+                        inputProps={{
+                          className: classes.endInput,
+                          step: 5,
+                          min: 0,
+                          max: 100,
+                          type: 'number',
+                          'aria-labelledby': 'strobe-opacity-slider',
+                        }}/>
+                    </Grid>
+                  </Grid>
+                </Collapse>
+              </Grid>
+            </Grid>
+          </Collapse>
+        </Grid>
+        <Grid item xs={12} className={clsx(!this.props.scene.strobe && classes.noPadding)}>
+          <Collapse in={this.props.scene.strobe} className={classes.fullWidth}>
+            <Divider />
+          </Collapse>
+        </Grid>
+        <Grid item xs={12} className={clsx(!this.props.scene.strobe && classes.noPadding)}>
+          <Collapse in={this.props.scene.strobe} className={classes.fullWidth}>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} sm={4} style={{paddingTop: 10}}>
+                <FormControl className={classes.fullWidth}>
+                  <InputLabel>Timing</InputLabel>
+                  <Select
+                    value={this.props.scene.strobeTF}
+                    onChange={this.onInput.bind(this, 'strobeTF')}>
+                    {Object.values(TF).map((tf) =>
+                      <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
+                    )}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Collapse in={this.props.scene.strobeTF == TF.sin} className={classes.fullWidth}>
+                  <Typography id="strobe-sin-rate-slider" variant="caption" component="div" color="textSecondary">
+                    Wave Rate
+                  </Typography>
+                  <Grid container alignItems="center">
+                    <Grid item xs>
+                      <Slider
+                        min={1}
+                        value={strobeSinRate}
+                        onChange={this.onSliderChange.bind(this, 'strobeSinRate')}
+                        aria-labelledby="strobe-sin-rate-slider"/>
+                    </Grid>
+                    <Grid item xs={3} className={classes.percentInput}>
+                      <TextField
+                        value={strobeSinRate}
+                        onChange={this.onIntInput.bind(this, 'strobeSinRate')}
+                        onBlur={this.blurIntKey.bind(this, 'strobeSinRate')}
+                        inputProps={{
+                          className: classes.endInput,
+                          step: 5,
+                          min: 0,
+                          max: 100,
+                          type: 'number',
+                          'aria-labelledby': 'strobe-sin-rate-slider',
+                        }}/>
+                    </Grid>
+                  </Grid>
+                </Collapse>
+                <Collapse in={this.props.scene.strobeTF == TF.bpm} className={classes.fullWidth}>
+                  <Typography id="strobe-bpm-multi-slider" variant="caption" component="div" color="textSecondary">
+                    BPM Multiplier {this.props.scene.strobeBPMMulti > 0 ? this.props.scene.strobeBPMMulti : "1 / " + (-1 * (this.props.scene.strobeBPMMulti - 2))}x
+                  </Typography>
+                  <Slider
+                    min={-8}
+                    max={10}
+                    value={strobeBPMMulti}
+                    onChange={this.onSliderChange.bind(this, 'strobeBPMMulti')}
+                    aria-labelledby="strobe-bpm-multi-slider"/>
+                </Collapse>
+                <Collapse in={this.props.scene.strobeTF == TF.constant} className={classes.fullWidth}>
+                  <TextField
+                    variant="outlined"
+                    label="For"
+                    margin="dense"
+                    value={strobeTime}
+                    onChange={this.onIntInput.bind(this, 'strobeTime')}
+                    onBlur={this.blurIntKey.bind(this, 'strobeTime')}
+                    InputProps={{
+                      endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+                    }}
+                    inputProps={{
+                      step: 100,
+                      min: 0,
+                      type: 'number',
+                    }}/>
+                </Collapse>
+              </Grid>
+            </Grid>
+          </Collapse>
+        </Grid>
+        <Grid item xs={12} className={clsx(!this.props.scene.strobe && classes.noPadding)}>
+          <Collapse in={this.props.scene.strobe && (this.props.scene.strobeTF == TF.random || this.props.scene.strobeTF == TF.sin)} className={classes.fullWidth}>
+            <Grid container alignItems="center">
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  variant="outlined"
+                  label="Between"
+                  margin="dense"
+                  value={strobeTimeMin}
+                  onChange={this.onIntInput.bind(this, 'strobeTimeMin')}
+                  onBlur={this.blurIntKey.bind(this, 'strobeTimeMin')}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+                  }}
+                  inputProps={{
+                    step: 100,
+                    min: 0,
+                    type: 'number',
+                  }}/>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  variant="outlined"
+                  label="and"
+                  margin="dense"
+                  value={strobeTimeMax}
+                  onChange={this.onIntInput.bind(this, 'strobeTimeMax')}
+                  onBlur={this.blurIntKey.bind(this, 'strobeTimeMax')}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+                  }}
+                  inputProps={{
+                    step: 100,
+                    min: 0,
+                    type: 'number',
+                  }}/>
+              </Grid>
+            </Grid>
+          </Collapse>
+        </Grid>
+        <Grid item xs={12} className={clsx((!this.props.scene.strobe || !this.props.scene.strobePulse)  && classes.noPadding)}>
+          <Collapse in={this.props.scene.strobe && this.props.scene.strobePulse} className={classes.fullWidth}>
+            <Divider />
+          </Collapse>
+        </Grid>
+        <Grid item xs={12} className={clsx((!this.props.scene.strobe || !this.props.scene.strobePulse) && classes.noPadding)}>
+          <Collapse in={this.props.scene.strobe && this.props.scene.strobePulse} className={classes.fullWidth}>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} sm={4} style={{paddingTop: 10}}>
+                <FormControl className={classes.fullWidth}>
+                  <InputLabel>Delay Timing</InputLabel>
+                  <Select
+                    value={this.props.scene.strobeDelayTF}
+                    onChange={this.onInput.bind(this, 'strobeDelayTF')}>
+                    {Object.values(TF).map((tf) =>
+                      <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
+                    )}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Collapse in={this.props.scene.strobeDelayTF == TF.sin} className={classes.fullWidth}>
+                  <Typography id="strobe-delay-sin-rate-slider" variant="caption" component="div" color="textSecondary">
+                    Wave Rate
+                  </Typography>
+                  <Grid container alignItems="center">
+                    <Grid item xs>
+                      <Slider
+                        min={1}
+                        value={strobeDelaySinRate}
+                        onChange={this.onSliderChange.bind(this, 'strobeDelaySinRate')}
+                        aria-labelledby="strobe-delay-sin-rate-slider"/>
+                    </Grid>
+                    <Grid item xs={3} className={classes.percentInput}>
+                      <TextField
+                        value={strobeDelaySinRate}
+                        onChange={this.onIntInput.bind(this, 'strobeDelaySinRate')}
+                        onBlur={this.blurIntKey.bind(this, 'strobeDelaySinRate')}
+                        inputProps={{
+                          className: classes.endInput,
+                          step: 5,
+                          min: 0,
+                          max: 100,
+                          type: 'number',
+                          'aria-labelledby': 'strobe-delay-sin-rate-slider',
+                        }}/>
+                    </Grid>
+                  </Grid>
+                </Collapse>
+                <Collapse in={this.props.scene.strobeDelayTF == TF.bpm} className={classes.fullWidth}>
+                  <Typography id="strobe-delay-bpm-multi-slider" variant="caption" component="div" color="textSecondary">
+                    BPM Multiplier {this.props.scene.strobeDelayBPMMulti > 0 ? this.props.scene.strobeDelayBPMMulti : "1 / " + (-1 * (this.props.scene.strobeDelayBPMMulti - 2))}x
+                  </Typography>
+                  <Slider
+                    min={-8}
+                    max={10}
+                    value={strobeDelayBPMMulti}
+                    onChange={this.onSliderChange.bind(this, 'strobeDelayBPMMulti')}
+                    aria-labelledby="strobe-delay-bpm-multi-slider"/>
+                </Collapse>
+                <Collapse in={this.props.scene.strobeDelayTF == TF.constant} className={classes.fullWidth}>
+                  <TextField
+                    variant="outlined"
+                    label="For"
+                    margin="dense"
+                    value={strobeDelay}
+                    onChange={this.onIntInput.bind(this, 'strobeDelay')}
+                    onBlur={this.blurIntKey.bind(this, 'strobeDelay')}
+                    InputProps={{
+                      endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+                    }}
+                    inputProps={{
+                      step: 100,
+                      min: 0,
+                      type: 'number',
+                    }}/>
+                </Collapse>
+              </Grid>
+            </Grid>
+          </Collapse>
+        </Grid>
+        <Grid item xs={12} className={clsx((!this.props.scene.strobe || !this.props.scene.strobePulse) && classes.noPadding)}>
+          <Collapse in={this.props.scene.strobe && this.props.scene.strobePulse && (this.props.scene.strobeDelayTF == TF.random || this.props.scene.strobeDelayTF == TF.sin)} className={classes.fullWidth}>
+            <Grid container alignItems="center">
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  variant="outlined"
+                  label="Between"
+                  margin="dense"
+                  value={strobeDelayMin}
+                  onChange={this.onIntInput.bind(this, 'strobeDelayMin')}
+                  onBlur={this.blurIntKey.bind(this, 'strobeDelayMin')}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+                  }}
+                  inputProps={{
+                    step: 100,
+                    min: 0,
+                    type: 'number',
+                  }}/>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  variant="outlined"
+                  label="and"
+                  margin="dense"
+                  value={strobeDelayMax}
+                  onChange={this.onIntInput.bind(this, 'strobeDelayMax')}
+                  onBlur={this.blurIntKey.bind(this, 'strobeDelayMax')}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+                  }}
+                  inputProps={{
+                    step: 100,
+                    min: 0,
+                    type: 'number',
+                  }}/>
+              </Grid>
+            </Grid>
+          </Collapse>
+        </Grid>
+      </Grid>
     );
   }
 

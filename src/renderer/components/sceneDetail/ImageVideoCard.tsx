@@ -50,91 +50,54 @@ class ImageVideoCard extends React.Component {
     const skipVideoEnd = typeof this.props.scene.skipVideoEnd === 'number' ? this.props.scene.skipVideoEnd : 0;
     const videoVolume = typeof this.props.scene.videoVolume === 'number' ? this.props.scene.videoVolume : 0;
     return(
-      <Card>
-        <CardContent>
-          <Grid container spacing={2} alignItems="center">
-            {!this.props.isPlayer && (
-              <React.Fragment>
-                <Grid item xs={12} sm={6}>
-                  <FormControl className={classes.fullWidth}>
-                    <InputLabel>Image Filter</InputLabel>
-                    <Select
-                      value={this.props.scene.imageTypeFilter}
-                      onChange={this.onInput.bind(this, 'imageTypeFilter')}>
-                      {Object.values(IF).map((tf) =>
-                        <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
-                      )}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Collapse in={this.props.scene.orderFunction == OF.random}>
-                    <FormControlLabel
-                      control={
-                        <Switch checked={this.props.scene.forceAll}
-                                onChange={this.onBoolInput.bind(this, 'forceAll')}/>
-                      }
-                      label="Show All Images Before Looping"/>
-                  </Collapse>
-                </Grid>
-                <Grid item xs={12} sm={6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.videos) && classes.noPadding)}>
-                  <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.videos}>
-                    <FormControl className={classes.fullWidth}>
-                      <InputLabel>GIF Options</InputLabel>
-                      <Select
-                        value={this.props.scene.gifOption}
-                        onChange={this.onInput.bind(this, 'gifOption')}>
-                        {Object.values(GO).map((go) =>
-                          <MenuItem key={go} value={go}>{en.get(go)}</MenuItem>
-                        )}
-                      </Select>
-                    </FormControl>
-                  </Collapse>
-                </Grid>
-                <Grid item xs={12} sm={6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.videos || this.props.scene.gifOption != GO.part) && classes.noPadding)}>
-                  <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.videos && this.props.scene.gifOption == GO.part}>
-                    <TextField
-                      variant="outlined"
-                      label="For"
-                      margin="dense"
-                      value={gifTimingConstant}
-                      onChange={this.onIntInput.bind(this, 'gifTimingConstant')}
-                      onBlur={this.blurIntKey.bind(this, 'gifTimingConstant')}
-                      InputProps={{
-                        endAdornment: <InputAdornment position="end">ms</InputAdornment>,
-                      }}
-                      inputProps={{
-                        step: 100,
-                        min: 0,
-                        type: 'number',
-                      }}/>
-                  </Collapse>
-                </Grid>
-              </React.Fragment>
-            )}
-            <Grid item xs={12} sm={6} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
-              <Collapse in={this.props.scene.imageTypeFilter != IF.stills}>
+      <Grid container spacing={2} alignItems="center">
+        {!this.props.isPlayer && (
+          <React.Fragment>
+            <Grid item xs={12} sm={6}>
+              <FormControl className={classes.fullWidth}>
+                <InputLabel>Image Filter</InputLabel>
+                <Select
+                  value={this.props.scene.imageTypeFilter}
+                  onChange={this.onInput.bind(this, 'imageTypeFilter')}>
+                  {Object.values(IF).map((tf) =>
+                    <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Collapse in={this.props.scene.orderFunction == OF.random}>
+                <FormControlLabel
+                  control={
+                    <Switch checked={this.props.scene.forceAll}
+                            onChange={this.onBoolInput.bind(this, 'forceAll')}/>
+                  }
+                  label="Show All Images Before Looping"/>
+              </Collapse>
+            </Grid>
+            <Grid item xs={12} sm={6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.videos) && classes.noPadding)}>
+              <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.videos}>
                 <FormControl className={classes.fullWidth}>
-                  <InputLabel>Video Options</InputLabel>
+                  <InputLabel>GIF Options</InputLabel>
                   <Select
-                    value={this.props.scene.videoOption}
-                    onChange={this.onInput.bind(this, 'videoOption')}>
-                    {Object.values(VO).map((vo) =>
-                      <MenuItem key={vo} value={vo}>{en.get(vo)}</MenuItem>
+                    value={this.props.scene.gifOption}
+                    onChange={this.onInput.bind(this, 'gifOption')}>
+                    {Object.values(GO).map((go) =>
+                      <MenuItem key={go} value={go}>{en.get(go)}</MenuItem>
                     )}
                   </Select>
                 </FormControl>
               </Collapse>
             </Grid>
-            <Grid item xs={12} sm={6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.videoOption != VO.part) && classes.noPadding)}>
-              <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.videoOption == VO.part}>
+            <Grid item xs={12} sm={6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.videos || this.props.scene.gifOption != GO.part) && classes.noPadding)}>
+              <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.videos && this.props.scene.gifOption == GO.part}>
                 <TextField
                   variant="outlined"
                   label="For"
                   margin="dense"
-                  value={videoTimingConstant}
-                  onChange={this.onIntInput.bind(this, 'videoTimingConstant')}
-                  onBlur={this.blurIntKey.bind(this, 'videoTimingConstant')}
+                  value={gifTimingConstant}
+                  onChange={this.onIntInput.bind(this, 'gifTimingConstant')}
+                  onBlur={this.blurIntKey.bind(this, 'gifTimingConstant')}
                   InputProps={{
                     endAdornment: <InputAdornment position="end">ms</InputAdornment>,
                   }}
@@ -145,128 +108,161 @@ class ImageVideoCard extends React.Component {
                   }}/>
               </Collapse>
             </Grid>
-            <Grid item xs={12} sm={6} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
-              <Collapse in={this.props.scene.imageTypeFilter != IF.stills}>
-                <FormControlLabel
-                  control={
-                    <Switch checked={this.props.scene.randomVideoStart}
-                            size="small"
-                            onChange={this.onBoolInput.bind(this, 'randomVideoStart')}/>
-                  }
-                  label="Start at Random Time"/>
-              </Collapse>
-            </Grid>
-            <Grid item xs={12} sm={6} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
-              <Collapse in={this.props.scene.imageTypeFilter != IF.stills}>
-                <FormControlLabel
-                  control={
-                    <Switch checked={this.props.scene.continueVideo}
-                            size="small"
-                            onChange={this.onBoolInput.bind(this, 'continueVideo')}/>
-                  }
-                  label="Continue Videos"/>
-              </Collapse>
-            </Grid>
-            <Grid item xs={12} sm={4} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
-              <Collapse in={this.props.scene.imageTypeFilter != IF.stills}>
-                <FormControlLabel
-                  control={
-                    <Switch checked={this.props.scene.playVideoClips}
-                            size="small"
-                            onChange={this.onBoolInput.bind(this, 'playVideoClips')}/>
-                  }
-                  label="Use Clips"/>
-              </Collapse>
-            </Grid>
-            <Grid item xs={12} sm={4} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
-              <Collapse in={this.props.scene.imageTypeFilter != IF.stills && !this.props.scene.playVideoClips}>
-                <TextField
-                  variant="outlined"
-                  label="Skip First"
-                  margin="dense"
-                  value={skipVideoStart}
-                  onChange={this.onIntInput.bind(this, 'skipVideoStart')}
-                  onBlur={this.blurIntKey.bind(this, 'skipVideoStart')}
-                  InputProps={{
-                    endAdornment: <InputAdornment position="end">ms</InputAdornment>,
-                  }}
-                  inputProps={{
-                    step: 100,
-                    min: 0,
-                    type: 'number',
-                  }}/>
-              </Collapse>
-            </Grid>
-            <Grid item xs={12} sm={4} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.playVideoClips) && classes.noPadding)}>
-              <Collapse in={this.props.scene.imageTypeFilter != IF.stills && !this.props.scene.playVideoClips}>
-                <TextField
-                  variant="outlined"
-                  label="Skip Last"
-                  margin="dense"
-                  value={skipVideoEnd}
-                  onChange={this.onIntInput.bind(this, 'skipVideoEnd')}
-                  onBlur={this.blurIntKey.bind(this, 'skipVideoEnd')}
-                  InputProps={{
-                    endAdornment: <InputAdornment position="end">ms</InputAdornment>,
-                  }}
-                  inputProps={{
-                    step: 100,
-                    min: 0,
-                    type: 'number',
-                  }}/>
-              </Collapse>
-            </Grid>
-            <Grid item xs={12} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
-              <Collapse in={this.props.scene.imageTypeFilter != IF.stills}>
-                <Grid container spacing={1} alignItems="center">
-                  <Grid item>
-                    <VolumeDownIcon />
-                  </Grid>
-                  <Grid item xs>
-                    <Slider value={videoVolume}
-                            onChange={this.onSliderChange.bind(this, 'videoVolume')}/>
-                  </Grid>
-                  <Grid item>
-                    <VolumeUpIcon />
-                  </Grid>
-                </Grid>
-              </Collapse>
-            </Grid>
-            <Grid item xs={12}>
-              <Divider />
-            </Grid>
-            {!this.props.isPlayer && (
-              <Grid item xs={12} sm={6}>
-                <FormControl component="fieldset">
-                  <FormLabel component="legend">Weighting</FormLabel>
-                  <RadioGroup
-                    value={this.props.scene.weightFunction}
-                    onChange={this.onInput.bind(this, 'weightFunction')}>
-                    {Object.values(WF).map((wf) =>
-                      <FormControlLabel key={wf} value={wf} control={<Radio />} label={en.get(wf)} />
-                    )}
-                  </RadioGroup>
-                </FormControl>
+          </React.Fragment>
+        )}
+        <Grid item xs={12} sm={6} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
+          <Collapse in={this.props.scene.imageTypeFilter != IF.stills}>
+            <FormControl className={classes.fullWidth}>
+              <InputLabel>Video Options</InputLabel>
+              <Select
+                value={this.props.scene.videoOption}
+                onChange={this.onInput.bind(this, 'videoOption')}>
+                {Object.values(VO).map((vo) =>
+                  <MenuItem key={vo} value={vo}>{en.get(vo)}</MenuItem>
+                )}
+              </Select>
+            </FormControl>
+          </Collapse>
+        </Grid>
+        <Grid item xs={12} sm={6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.videoOption != VO.part) && classes.noPadding)}>
+          <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.videoOption == VO.part}>
+            <TextField
+              variant="outlined"
+              label="For"
+              margin="dense"
+              value={videoTimingConstant}
+              onChange={this.onIntInput.bind(this, 'videoTimingConstant')}
+              onBlur={this.blurIntKey.bind(this, 'videoTimingConstant')}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+              }}
+              inputProps={{
+                step: 100,
+                min: 0,
+                type: 'number',
+              }}/>
+          </Collapse>
+        </Grid>
+        <Grid item xs={12} sm={6} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
+          <Collapse in={this.props.scene.imageTypeFilter != IF.stills}>
+            <FormControlLabel
+              control={
+                <Switch checked={this.props.scene.randomVideoStart}
+                        size="small"
+                        onChange={this.onBoolInput.bind(this, 'randomVideoStart')}/>
+              }
+              label="Start at Random Time"/>
+          </Collapse>
+        </Grid>
+        <Grid item xs={12} sm={6} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
+          <Collapse in={this.props.scene.imageTypeFilter != IF.stills}>
+            <FormControlLabel
+              control={
+                <Switch checked={this.props.scene.continueVideo}
+                        size="small"
+                        onChange={this.onBoolInput.bind(this, 'continueVideo')}/>
+              }
+              label="Continue Videos"/>
+          </Collapse>
+        </Grid>
+        <Grid item xs={12} sm={4} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
+          <Collapse in={this.props.scene.imageTypeFilter != IF.stills}>
+            <FormControlLabel
+              control={
+                <Switch checked={this.props.scene.playVideoClips}
+                        size="small"
+                        onChange={this.onBoolInput.bind(this, 'playVideoClips')}/>
+              }
+              label="Use Clips"/>
+          </Collapse>
+        </Grid>
+        <Grid item xs={12} sm={4} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
+          <Collapse in={this.props.scene.imageTypeFilter != IF.stills && !this.props.scene.playVideoClips}>
+            <TextField
+              variant="outlined"
+              label="Skip First"
+              margin="dense"
+              value={skipVideoStart}
+              onChange={this.onIntInput.bind(this, 'skipVideoStart')}
+              onBlur={this.blurIntKey.bind(this, 'skipVideoStart')}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+              }}
+              inputProps={{
+                step: 100,
+                min: 0,
+                type: 'number',
+              }}/>
+          </Collapse>
+        </Grid>
+        <Grid item xs={12} sm={4} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.playVideoClips) && classes.noPadding)}>
+          <Collapse in={this.props.scene.imageTypeFilter != IF.stills && !this.props.scene.playVideoClips}>
+            <TextField
+              variant="outlined"
+              label="Skip Last"
+              margin="dense"
+              value={skipVideoEnd}
+              onChange={this.onIntInput.bind(this, 'skipVideoEnd')}
+              onBlur={this.blurIntKey.bind(this, 'skipVideoEnd')}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+              }}
+              inputProps={{
+                step: 100,
+                min: 0,
+                type: 'number',
+              }}/>
+          </Collapse>
+        </Grid>
+        <Grid item xs={12} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
+          <Collapse in={this.props.scene.imageTypeFilter != IF.stills}>
+            <Grid container spacing={1} alignItems="center">
+              <Grid item>
+                <VolumeDownIcon />
               </Grid>
-            )}
-            <Grid item xs={12} sm={6}>
-              <FormControl component="fieldset">
-                <FormLabel component="legend">Ordering</FormLabel>
-                <RadioGroup
-                  value={this.props.scene.orderFunction}
-                  onChange={this.onInput.bind(this, 'orderFunction')}>
-                  <FormControlLabel
-                    disabled={this.props.scene.sources.length > 1 && this.props.scene.weightFunction != WF.images}
-                    key={OF.strict} value={OF.strict} control={<Radio />} label={en.get(OF.strict)} />
-                  {[OF.ordered, OF.random].map((wf) =>
-                    <FormControlLabel key={wf} value={wf} control={<Radio />} label={en.get(wf)} />
-                  )}
-                </RadioGroup>
-              </FormControl>
+              <Grid item xs>
+                <Slider value={videoVolume}
+                        onChange={this.onSliderChange.bind(this, 'videoVolume')}/>
+              </Grid>
+              <Grid item>
+                <VolumeUpIcon />
+              </Grid>
             </Grid>
+          </Collapse>
+        </Grid>
+        <Grid item xs={12}>
+          <Divider />
+        </Grid>
+        {!this.props.isPlayer && (
+          <Grid item xs={12} sm={6}>
+            <FormControl component="fieldset">
+              <FormLabel component="legend">Weighting</FormLabel>
+              <RadioGroup
+                value={this.props.scene.weightFunction}
+                onChange={this.onInput.bind(this, 'weightFunction')}>
+                {Object.values(WF).map((wf) =>
+                  <FormControlLabel key={wf} value={wf} control={<Radio />} label={en.get(wf)} />
+                )}
+              </RadioGroup>
+            </FormControl>
           </Grid>
-        </CardContent>
-      </Card>
+        )}
+        <Grid item xs={12} sm={6}>
+          <FormControl component="fieldset">
+            <FormLabel component="legend">Ordering</FormLabel>
+            <RadioGroup
+              value={this.props.scene.orderFunction}
+              onChange={this.onInput.bind(this, 'orderFunction')}>
+              <FormControlLabel
+                disabled={this.props.scene.sources.length > 1 && this.props.scene.weightFunction != WF.images}
+                key={OF.strict} value={OF.strict} control={<Radio />} label={en.get(OF.strict)} />
+              {[OF.ordered, OF.random].map((wf) =>
+                <FormControlLabel key={wf} value={wf} control={<Radio />} label={en.get(wf)} />
+              )}
+            </RadioGroup>
+          </FormControl>
+        </Grid>
+      </Grid>
     );
   }
 

@@ -17,6 +17,7 @@ import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
 import FolderIcon from '@material-ui/icons/Folder';
 import HttpIcon from '@material-ui/icons/Http';
+import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import MenuIcon from'@material-ui/icons/Menu';
 import MovieIcon from '@material-ui/icons/Movie';
@@ -31,10 +32,12 @@ import en from "../../data/en";
 import Config from "../../data/Config";
 import Scene from "../../data/Scene";
 import LibrarySource from "../library/LibrarySource";
+import Tag from "../library/Tag";
+import SceneEffects from "./SceneEffects";
+import SceneGenerator from "./SceneGenerator";
+import SceneOptions from "./SceneOptions";
 import SourceList from "./SourceList";
 import URLDialog from "./URLDialog";
-import SceneOptions from "./SceneOptions";
-import SceneEffects from "./SceneEffects";
 
 const drawerWidth = 240;
 
@@ -163,6 +166,9 @@ const styles = (theme: Theme) => createStyles({
   sourcesTab: {
     ariaControls: 'vertical-tabpanel-2',
   },
+  generateTab: {
+    ariaControls: 'vertical-tabpanel-3',
+  },
   deleteItem: {
     color: theme.palette.error.main,
   },
@@ -245,7 +251,9 @@ class SceneDetail extends React.Component {
     allScenes: Array<Scene>,
     autoEdit: boolean,
     config: Config,
+    library: Array<LibrarySource>,
     scene: Scene,
+    tags: Array<Tag>,
     goBack(): void,
     onAddSource(scene: Scene, type: string, ...args: any[]): void,
     onClearBlacklist(sourceURL: string): void,
@@ -255,7 +263,6 @@ class SceneDetail extends React.Component {
     onPlayScene(scene: Scene): void,
     onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void,
     onSaveAsScene(scene: Scene): void,
-    onSetupGrid(scene: Scene): void,
     onSort(scene: Scene, algorithm: string, ascending: boolean): void,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
   };
@@ -265,7 +272,7 @@ class SceneDetail extends React.Component {
     drawerOpen: false,
     menuAnchorEl: null as any,
     openMenu: null as string,
-    openTab: 0,
+    openTab: this.props.scene.tagWeights || this.props.scene.sceneWeights ? 3 : 2,
   };
 
   readonly nameInputRef: React.RefObject<HTMLInputElement> = React.createRef();
@@ -360,6 +367,12 @@ class SceneDetail extends React.Component {
                    aria-controls="vertical-tabpanel-2"
                    icon={<CollectionsIcon/>} label={open ? `Sources (${this.props.scene.sources.length})` : ""}
                    className={clsx(classes.tab, classes.sourcesTab, !open && classes.tabClose)}/>
+              {(this.props.scene.tagWeights || this.props.scene.sceneWeights) && (
+                <Tab id="vertical-tab-3"
+                     aria-controls="vertical-tabpanel-3"
+                     icon={<LocalOfferIcon/>} label={open ? "Generate" : ""}
+                     className={clsx(classes.tab, classes.generateTab, !open && classes.tabClose)}/>
+              )}
             </Tabs>
           </div>
           <div className={classes.fill}/>
@@ -427,7 +440,6 @@ class SceneDetail extends React.Component {
                     <SceneOptions
                       allScenes={this.props.allScenes}
                       scene={this.props.scene}
-                      onSetupGrid={this.props.onSetupGrid.bind(this)}
                       onUpdateScene={this.props.onUpdateScene.bind(this)} />
                   </Box>
                 </div>
@@ -470,6 +482,25 @@ class SceneDetail extends React.Component {
                       onClip={this.props.onClip.bind(this)}
                       onPlay={this.props.onPlay.bind(this)}
                       onUpdateSources={this.onUpdateSources.bind(this)}/>
+                  </Box>
+                </div>
+              </Typography>
+            )}
+
+            {(this.props.scene.tagWeights || this.props.scene.sceneWeights) && this.state.openTab === 3 && (
+              <Typography
+                className={clsx(this.state.openTab === 3 && classes.generateSection)}
+                component="div"
+                role="tabpanel"
+                hidden={this.state.openTab !== 3}
+                id="vertical-tabpanel-3"
+                aria-labelledby="vertical-tab-3">
+                <div className={classes.tabPanel}>
+                  <div className={classes.drawerSpacer}/>
+                  <Box className={classes.fill}>
+                    <SceneGenerator
+                      scene={this.props.scene}
+                      onUpdateScene={this.props.onUpdateScene.bind(this)} />
                   </Box>
                 </div>
               </Typography>

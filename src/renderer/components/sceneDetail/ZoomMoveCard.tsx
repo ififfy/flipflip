@@ -54,261 +54,257 @@ class ZoomMoveCard extends React.Component {
     const transDurationMax = typeof this.props.scene.transDurationMax === 'number' ? this.props.scene.transDurationMax : 0;
 
     return(
-      <Card>
-        <CardContent>
+      <Grid container spacing={2} alignItems="center">
+        <Grid item xs={12}>
+          <FormControlLabel
+            control={
+              <Switch checked={this.props.scene.zoom}
+                      onChange={this.onBoolInput.bind(this, 'zoom')}/>
+            }
+            label="Zoom"/>
+          <Collapse in={this.props.scene.zoom} className={classes.fullWidth}>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} sm={6}>
+                <Typography id="zoom-start-slider">
+                  Zoom Start: {zoomStart}x
+                </Typography>
+                <Slider
+                  min={1}
+                  max={50}
+                  value={zoomStart*10}
+                  onChange={this.onZoomSliderChange.bind(this, 'zoomStart')}
+                  aria-labelledby="zoom-start-slider"/>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography id="zoom-end-slider">
+                  Zoom End: {zoomEnd}x
+                </Typography>
+                <Slider
+                  min={1}
+                  max={50}
+                  value={zoomEnd*10}
+                  onChange={this.onZoomSliderChange.bind(this, 'zoomEnd')}
+                  aria-labelledby="zoom-end-slider"/>
+              </Grid>
+            </Grid>
+          </Collapse>
+        </Grid>
+        <Grid item xs={12}>
           <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12}>
-              <FormControlLabel
-                control={
-                  <Switch checked={this.props.scene.zoom}
-                          onChange={this.onBoolInput.bind(this, 'zoom')}/>
-                }
-                label="Zoom"/>
-              <Collapse in={this.props.scene.zoom} className={classes.fullWidth}>
+            <Grid item xs={12} sm={this.props.scene.horizTransType != HTF.none ? 3 : 12}>
+              <FormControl className={classes.fullWidth}>
+                <InputLabel>Move Horizontally</InputLabel>
+                <Select
+                  value={this.props.scene.horizTransType}
+                  onChange={this.onInput.bind(this, 'horizTransType')}>
+                  {Object.values(HTF).map((tf) =>
+                    <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm>
+              <Collapse in={this.props.scene.horizTransType != HTF.none} className={classes.fullWidth}>
                 <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={12} sm={6}>
-                    <Typography id="zoom-start-slider">
-                      Zoom Start: {zoomStart}x
-                    </Typography>
+                  <Grid item xs>
                     <Slider
-                      min={1}
-                      max={50}
-                      value={zoomStart*10}
-                      onChange={this.onZoomSliderChange.bind(this, 'zoomStart')}
-                      aria-labelledby="zoom-start-slider"/>
+                      min={0}
+                      value={horizTransLevel}
+                      onChange={this.onSliderChange.bind(this, 'horizTransLevel')}
+                      aria-labelledby="horiz-trans-level-slider"/>
                   </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography id="zoom-end-slider">
-                      Zoom End: {zoomEnd}x
-                    </Typography>
-                    <Slider
-                      min={1}
-                      max={50}
-                      value={zoomEnd*10}
-                      onChange={this.onZoomSliderChange.bind(this, 'zoomEnd')}
-                      aria-labelledby="zoom-end-slider"/>
-                  </Grid>
-                </Grid>
-              </Collapse>
-            </Grid>
-            <Grid item xs={12}>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs={12} sm={this.props.scene.horizTransType != HTF.none ? 3 : 12}>
-                  <FormControl className={classes.fullWidth}>
-                    <InputLabel>Move Horizontally</InputLabel>
-                    <Select
-                      value={this.props.scene.horizTransType}
-                      onChange={this.onInput.bind(this, 'horizTransType')}>
-                      {Object.values(HTF).map((tf) =>
-                        <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
-                      )}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm>
-                  <Collapse in={this.props.scene.horizTransType != HTF.none} className={classes.fullWidth}>
-                    <Grid container spacing={2} alignItems="center">
-                      <Grid item xs>
-                        <Slider
-                          min={0}
-                          value={horizTransLevel}
-                          onChange={this.onSliderChange.bind(this, 'horizTransLevel')}
-                          aria-labelledby="horiz-trans-level-slider"/>
-                      </Grid>
-                      <Grid item xs={3} className={classes.percentInput}>
-                        <TextField
-                          value={horizTransLevel}
-                          margin="dense"
-                          onChange={this.onIntInput.bind(this, 'horizTransLevel')}
-                          onBlur={this.blurIntKey.bind(this, 'horizTransLevel')}
-                          InputProps={{
-                            endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                          }}
-                          inputProps={{
-                            className: classes.endInput,
-                            step: 5,
-                            min: 0,
-                            max: 100,
-                            type: 'number',
-                            'aria-labelledby': 'horiz-trans-level-slider',
-                          }}/>
-                      </Grid>
-                    </Grid>
-                  </Collapse>
-                </Grid>
-              </Grid>
-            </Grid>
-            <Grid item xs={12}>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs={12} sm={this.props.scene.vertTransType != VTF.none ? 3 : 12}>
-                  <FormControl className={classes.fullWidth}>
-                    <InputLabel>Move Vertically</InputLabel>
-                    <Select
-                      value={this.props.scene.vertTransType}
-                      onChange={this.onInput.bind(this, 'vertTransType')}>
-                      {Object.values(VTF).map((tf) =>
-                        <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
-                      )}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm>
-                  <Collapse in={this.props.scene.vertTransType != VTF.none} className={classes.fullWidth}>
-                    <Grid container spacing={2} alignItems="center">
-                      <Grid item xs>
-                        <Slider
-                          min={0}
-                          value={vertTransLevel}
-                          onChange={this.onSliderChange.bind(this, 'vertTransLevel')}
-                          aria-labelledby="vert-trans-level-slider"/>
-                      </Grid>
-                      <Grid item xs={3} className={classes.percentInput}>
-                        <TextField
-                          value={vertTransLevel}
-                          margin="dense"
-                          onChange={this.onIntInput.bind(this, 'vertTransLevel')}
-                          onBlur={this.blurIntKey.bind(this, 'vertTransLevel')}
-                          InputProps={{
-                            endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                          }}
-                          inputProps={{
-                            className: classes.endInput,
-                            step: 5,
-                            min: 0,
-                            max: 100,
-                            type: 'number',
-                            'aria-labelledby': 'vert-trans-level-slider',
-                          }}/>
-                      </Grid>
-                    </Grid>
-                  </Collapse>
-                </Grid>
-              </Grid>
-            </Grid>
-            <Grid item xs={12} className={clsx(!enabled && classes.noPadding)}>
-              <Collapse in={enabled} className={classes.fullWidth}>
-                <Divider />
-              </Collapse>
-            </Grid>
-            <Grid item xs={12} className={clsx(!enabled && classes.noPadding)}>
-              <Collapse in={enabled} className={classes.fullWidth}>
-                <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={12} sm={4}>
-                    <FormControl className={classes.fullWidth}>
-                      <InputLabel>Timing</InputLabel>
-                      <Select
-                        value={this.props.scene.transTF}
-                        onChange={this.onInput.bind(this, 'transTF')}>
-                        {Object.values(TF).map((tf) =>
-                          <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
-                        )}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={8}>
-                    <Collapse in={this.props.scene.transTF == TF.sin} className={classes.fullWidth}>
-                      <Typography id="trans-sin-rate-slider" variant="caption" component="div" color="textSecondary">
-                        Wave Rate
-                      </Typography>
-                      <Grid container alignItems="center">
-                        <Grid item xs>
-                          <Slider
-                            min={1}
-                            value={transSinRate}
-                            onChange={this.onSliderChange.bind(this, 'transSinRate')}
-                            aria-labelledby="trans-sin-rate-slider"/>
-                        </Grid>
-                        <Grid item xs={3} className={classes.percentInput}>
-                          <TextField
-                            value={transSinRate}
-                            onChange={this.onIntInput.bind(this, 'transSinRate')}
-                            onBlur={this.blurIntKey.bind(this, 'transSinRate')}
-                            inputProps={{
-                              className: classes.endInput,
-                              step: 5,
-                              min: 0,
-                              max: 100,
-                              type: 'number',
-                              'aria-labelledby': 'trans-sin-rate-slider',
-                            }}/>
-                        </Grid>
-                      </Grid>
-                    </Collapse>
-                    <Collapse in={this.props.scene.transTF == TF.bpm} className={classes.fullWidth}>
-                      <Typography id="trans-bpm-multi-slider" variant="caption" component="div" color="textSecondary">
-                        BPM Multiplier {this.props.scene.transBPMMulti > 0 ? this.props.scene.transBPMMulti : "1 / " + (-1 * (this.props.scene.transBPMMulti - 2))}x
-                      </Typography>
-                      <Slider
-                        min={-8}
-                        max={10}
-                        value={transBPMMulti}
-                        onChange={this.onSliderChange.bind(this, 'transBPMMulti')}
-                        aria-labelledby="trans-bpm-multi-slider"/>
-                    </Collapse>
-                    <Collapse in={this.props.scene.transTF == TF.constant} className={classes.fullWidth}>
-                      <TextField
-                        variant="outlined"
-                        label="For"
-                        margin="dense"
-                        value={transDuration}
-                        onChange={this.onIntInput.bind(this, 'transDuration')}
-                        onBlur={this.blurIntKey.bind(this, 'transDuration')}
-                        InputProps={{
-                          endAdornment: <InputAdornment position="end">ms</InputAdornment>,
-                        }}
-                        inputProps={{
-                          step: 100,
-                          min: 0,
-                          type: 'number',
-                        }}/>
-                    </Collapse>
-                  </Grid>
-                </Grid>
-              </Collapse>
-            </Grid>
-            <Grid item xs={12} className={clsx(!enabled && classes.noPadding)}>
-              <Collapse in={enabled && (this.props.scene.transTF == TF.random || this.props.scene.transTF == TF.sin)} className={classes.fullWidth}>
-                <Grid container alignItems="center">
-                  <Grid item xs={12} sm={6}>
+                  <Grid item xs={3} className={classes.percentInput}>
                     <TextField
-                      variant="outlined"
-                      label="Between"
+                      value={horizTransLevel}
                       margin="dense"
-                      value={transDurationMin}
-                      onChange={this.onIntInput.bind(this, 'transDurationMin')}
-                      onBlur={this.blurIntKey.bind(this, 'transDurationMin')}
+                      onChange={this.onIntInput.bind(this, 'horizTransLevel')}
+                      onBlur={this.blurIntKey.bind(this, 'horizTransLevel')}
                       InputProps={{
-                        endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+                        endAdornment: <InputAdornment position="end">%</InputAdornment>,
                       }}
                       inputProps={{
-                        step: 100,
+                        className: classes.endInput,
+                        step: 5,
                         min: 0,
+                        max: 100,
                         type: 'number',
-                      }}/>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      variant="outlined"
-                      label="and"
-                      margin="dense"
-                      value={transDurationMax}
-                      onChange={this.onIntInput.bind(this, 'transDurationMax')}
-                      onBlur={this.blurIntKey.bind(this, 'transDurationMax')}
-                      InputProps={{
-                        endAdornment: <InputAdornment position="end">ms</InputAdornment>,
-                      }}
-                      inputProps={{
-                        step: 100,
-                        min: 0,
-                        type: 'number',
+                        'aria-labelledby': 'horiz-trans-level-slider',
                       }}/>
                   </Grid>
                 </Grid>
               </Collapse>
             </Grid>
           </Grid>
-        </CardContent>
-      </Card>
+        </Grid>
+        <Grid item xs={12}>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={12} sm={this.props.scene.vertTransType != VTF.none ? 3 : 12}>
+              <FormControl className={classes.fullWidth}>
+                <InputLabel>Move Vertically</InputLabel>
+                <Select
+                  value={this.props.scene.vertTransType}
+                  onChange={this.onInput.bind(this, 'vertTransType')}>
+                  {Object.values(VTF).map((tf) =>
+                    <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm>
+              <Collapse in={this.props.scene.vertTransType != VTF.none} className={classes.fullWidth}>
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs>
+                    <Slider
+                      min={0}
+                      value={vertTransLevel}
+                      onChange={this.onSliderChange.bind(this, 'vertTransLevel')}
+                      aria-labelledby="vert-trans-level-slider"/>
+                  </Grid>
+                  <Grid item xs={3} className={classes.percentInput}>
+                    <TextField
+                      value={vertTransLevel}
+                      margin="dense"
+                      onChange={this.onIntInput.bind(this, 'vertTransLevel')}
+                      onBlur={this.blurIntKey.bind(this, 'vertTransLevel')}
+                      InputProps={{
+                        endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                      }}
+                      inputProps={{
+                        className: classes.endInput,
+                        step: 5,
+                        min: 0,
+                        max: 100,
+                        type: 'number',
+                        'aria-labelledby': 'vert-trans-level-slider',
+                      }}/>
+                  </Grid>
+                </Grid>
+              </Collapse>
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid item xs={12} className={clsx(!enabled && classes.noPadding)}>
+          <Collapse in={enabled} className={classes.fullWidth}>
+            <Divider />
+          </Collapse>
+        </Grid>
+        <Grid item xs={12} className={clsx(!enabled && classes.noPadding)}>
+          <Collapse in={enabled} className={classes.fullWidth}>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} sm={4}>
+                <FormControl className={classes.fullWidth}>
+                  <InputLabel>Timing</InputLabel>
+                  <Select
+                    value={this.props.scene.transTF}
+                    onChange={this.onInput.bind(this, 'transTF')}>
+                    {Object.values(TF).map((tf) =>
+                      <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
+                    )}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Collapse in={this.props.scene.transTF == TF.sin} className={classes.fullWidth}>
+                  <Typography id="trans-sin-rate-slider" variant="caption" component="div" color="textSecondary">
+                    Wave Rate
+                  </Typography>
+                  <Grid container alignItems="center">
+                    <Grid item xs>
+                      <Slider
+                        min={1}
+                        value={transSinRate}
+                        onChange={this.onSliderChange.bind(this, 'transSinRate')}
+                        aria-labelledby="trans-sin-rate-slider"/>
+                    </Grid>
+                    <Grid item xs={3} className={classes.percentInput}>
+                      <TextField
+                        value={transSinRate}
+                        onChange={this.onIntInput.bind(this, 'transSinRate')}
+                        onBlur={this.blurIntKey.bind(this, 'transSinRate')}
+                        inputProps={{
+                          className: classes.endInput,
+                          step: 5,
+                          min: 0,
+                          max: 100,
+                          type: 'number',
+                          'aria-labelledby': 'trans-sin-rate-slider',
+                        }}/>
+                    </Grid>
+                  </Grid>
+                </Collapse>
+                <Collapse in={this.props.scene.transTF == TF.bpm} className={classes.fullWidth}>
+                  <Typography id="trans-bpm-multi-slider" variant="caption" component="div" color="textSecondary">
+                    BPM Multiplier {this.props.scene.transBPMMulti > 0 ? this.props.scene.transBPMMulti : "1 / " + (-1 * (this.props.scene.transBPMMulti - 2))}x
+                  </Typography>
+                  <Slider
+                    min={-8}
+                    max={10}
+                    value={transBPMMulti}
+                    onChange={this.onSliderChange.bind(this, 'transBPMMulti')}
+                    aria-labelledby="trans-bpm-multi-slider"/>
+                </Collapse>
+                <Collapse in={this.props.scene.transTF == TF.constant} className={classes.fullWidth}>
+                  <TextField
+                    variant="outlined"
+                    label="For"
+                    margin="dense"
+                    value={transDuration}
+                    onChange={this.onIntInput.bind(this, 'transDuration')}
+                    onBlur={this.blurIntKey.bind(this, 'transDuration')}
+                    InputProps={{
+                      endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+                    }}
+                    inputProps={{
+                      step: 100,
+                      min: 0,
+                      type: 'number',
+                    }}/>
+                </Collapse>
+              </Grid>
+            </Grid>
+          </Collapse>
+        </Grid>
+        <Grid item xs={12} className={clsx(!enabled && classes.noPadding)}>
+          <Collapse in={enabled && (this.props.scene.transTF == TF.random || this.props.scene.transTF == TF.sin)} className={classes.fullWidth}>
+            <Grid container alignItems="center">
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  variant="outlined"
+                  label="Between"
+                  margin="dense"
+                  value={transDurationMin}
+                  onChange={this.onIntInput.bind(this, 'transDurationMin')}
+                  onBlur={this.blurIntKey.bind(this, 'transDurationMin')}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+                  }}
+                  inputProps={{
+                    step: 100,
+                    min: 0,
+                    type: 'number',
+                  }}/>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  variant="outlined"
+                  label="and"
+                  margin="dense"
+                  value={transDurationMax}
+                  onChange={this.onIntInput.bind(this, 'transDurationMax')}
+                  onBlur={this.blurIntKey.bind(this, 'transDurationMax')}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+                  }}
+                  inputProps={{
+                    step: 100,
+                    min: 0,
+                    type: 'number',
+                  }}/>
+              </Grid>
+            </Grid>
+          </Collapse>
+        </Grid>
+      </Grid>
     );
   }
 

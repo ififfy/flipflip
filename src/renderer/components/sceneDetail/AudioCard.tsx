@@ -29,43 +29,39 @@ class AudioCard extends React.Component {
     const classes = this.props.classes;
 
     return(
-      <Card>
-        <CardContent>
+      <Grid container spacing={2} alignItems="center">
+        <Grid item xs={12}>
           <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12}>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs>
-                  <FormControlLabel
-                    control={
-                      <Switch checked={this.props.scene.audioEnabled}
-                              onChange={this.onBoolInput.bind(this, 'audioEnabled')}/>
-                    }
-                    label="Audio Tracks"/>
-                </Grid>
-                <Grid item>
-                  <Collapse in={this.props.scene.audioEnabled}>
-                    <Fab
-                      className={classes.addButton}
-                      onClick={this.onAddAudioTrack.bind(this)}
-                      size="small">
-                      <AddIcon />
-                    </Fab>
-                  </Collapse>
-                </Grid>
-              </Grid>
+            <Grid item xs>
+              <FormControlLabel
+                control={
+                  <Switch checked={this.props.scene.audioEnabled}
+                          onChange={this.onBoolInput.bind(this, 'audioEnabled')}/>
+                }
+                label="Audio Tracks"/>
             </Grid>
-            {this.props.scene.audios.map((a,i) =>
-              <AudioControl
-                key={a.id}
-                audio={a}
-                detectBPM={i == 0}
-                scene={this.props.scene}
-                startPlaying={this.props.startPlaying}
-                onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-            )}
+            <Grid item>
+              <Collapse in={this.props.scene.audioEnabled}>
+                <Fab
+                  className={classes.addButton}
+                  onClick={this.onAddAudioTrack.bind(this)}
+                  size="small">
+                  <AddIcon />
+                </Fab>
+              </Collapse>
+            </Grid>
           </Grid>
-        </CardContent>
-      </Card>
+        </Grid>
+        {this.props.scene.audios.map((a,i) =>
+          <AudioControl
+            key={a.id}
+            audio={a}
+            detectBPM={i == 0}
+            scene={this.props.scene}
+            startPlaying={this.props.startPlaying}
+            onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+        )}
+      </Grid>
     );
   }
 

@@ -122,6 +122,42 @@ export default class AppStorage {
           }
           this.initialState.scenes = newScenes;
           break;
+        case "2.0.0":
+        case "2.1.0":
+        case "2.1.1":
+        case "2.2.0":
+        case "2.2.1":
+        case "2.3.0":
+        case "2.3.1":
+        case "2.3.2":
+        case "3.0.0-beta1":
+        case "3.0.0-beta2":
+          this.initialState = {
+            version: __VERSION__,
+            autoEdit: data.autoEdit,
+            isSelect: data.isSelect,
+            isBatchTag: data.isBatchTag,
+            config: new Config(data.config),
+            scenes: data.scenes.map((s: any) => new Scene(s)),
+            library: data.library.map((s: any) => new LibrarySource(s)),
+            tags: data.tags.map((t: any) => new Tag(t)),
+            route: data.route.map((s: any) => new Route(s)),
+            libraryYOffset: 0,
+            libraryFilters: Array<string>(),
+            librarySelected: Array<string>(),
+            progressMode: null as string,
+            progressTitle: null as string,
+            progressCurrent: 0,
+            progressTotal: 0,
+            progressNext: null as string,
+          };
+          for (let r of this.initialState.route) {
+            if (r.kind == 'generate' || r.kind == 'grid') {
+              this.initialState.route = [];
+              break;
+            }
+          }
+          break;
         default:
           this.initialState = {
             version: __VERSION__,

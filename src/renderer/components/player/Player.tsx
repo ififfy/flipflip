@@ -3,6 +3,8 @@ import * as React from 'react';
 import fs from "fs";
 import fileURL from "file-url";
 
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+
 import {IF, SL, ST, VC} from "../../data/const";
 import {getCachePath, getSourceType, urlToPath} from '../../data/utils';
 import Config from "../../data/Config";
@@ -16,6 +18,14 @@ import LibrarySource from "../library/LibrarySource";
 import Progress from "../ui/Progress";
 import VideoGroup from "../sceneDetail/VideoGroup";
 import {createMainMenu, createMenuTemplate} from "../../../main/MainMenu";
+import SceneOptionCard from "../sceneDetail/SceneOptionCard";
+import ImageVideoCard from "../sceneDetail/ImageVideoCard";
+import ZoomMoveCard from "../sceneDetail/ZoomMoveCard";
+import CrossFadeCard from "../sceneDetail/CrossFadeCard";
+import StrobeCard from "../sceneDetail/StrobeCard";
+import AudioCard from "../sceneDetail/AudioCard";
+import TextCard from "../sceneDetail/TextCard";
+import {ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Typography} from "@material-ui/core";
 
 const {getCurrentWindow, Menu, MenuItem, app} = remote;
 
@@ -315,41 +325,101 @@ export default class Player extends React.Component {
             />
           )}
 
-          {/*<SceneEffectGroup
-            scene={this.props.scene}
-            isTagging={this.props.tags != null}
-            isConfig={false}
-            allScenes={this.props.scenes}
-            onSetupGrid={this.props.setupGrid}
-            onUpdateScene={this.props.onUpdateScene.bind(this)} />*/}
+          <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+            <ExpansionPanelSummary
+              expandIcon={<ExpandMoreIcon />}
+            >
+              <Typography>Scene Options</Typography>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+              <SceneOptionCard
+                allScenes={this.props.scenes}
+                isTagging={this.props.tags != null}
+                scene={this.props.scene}
+                onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
 
-          {/*<ImageVideoGroup
-            scene={this.props.scene}
-            isPlayer={true}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}/>*/}
+          <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+            <ExpansionPanelSummary
+              expandIcon={<ExpandMoreIcon />}
+            >
+              <Typography>Image/Video Options</Typography>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+              <ImageVideoCard
+                isPlayer
+                scene={this.props.scene}
+                onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
 
-          {/*<CrossFadeGroup
-            scene={this.props.scene}
-            onUpdateScene={this.props.onUpdateScene.bind(this)} />*/}
+          <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+            <ExpansionPanelSummary
+              expandIcon={<ExpandMoreIcon />}
+            >
+              <Typography>Zoom/Move</Typography>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+              <ZoomMoveCard
+                scene={this.props.scene}
+                onUpdateScene={this.props.onUpdateScene.bind(this)} />
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
 
-          {/*<ZoomMoveGroup
-            scene={this.props.scene}
-            onUpdateScene={this.props.onUpdateScene.bind(this)} />*/}
+          <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+            <ExpansionPanelSummary
+              expandIcon={<ExpandMoreIcon />}
+            >
+              <Typography>Cross-Fade</Typography>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+              <CrossFadeCard
+                scene={this.props.scene}
+                onUpdateScene={this.props.onUpdateScene.bind(this)} />
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
 
-          {/*<StrobeGroup
-            scene={this.props.scene}
-            onUpdateScene={this.props.onUpdateScene.bind(this)} />*/}
+          <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+            <ExpansionPanelSummary
+              expandIcon={<ExpandMoreIcon />}
+            >
+              <Typography>Strobe</Typography>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+              <StrobeCard
+                scene={this.props.scene}
+                onUpdateScene={this.props.onUpdateScene.bind(this)} />
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
 
-          {/*<AudioGroup
-            scene={this.props.scene}
-            isPlaying={this.state.hasStarted && this.state.isPlaying}
-            isPlayer={true}
-            scenePaths={this.state.historyPaths}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}/>*/}
+          <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+            <ExpansionPanelSummary
+              expandIcon={<ExpandMoreIcon />}
+            >
+              <Typography>Audio Tracks</Typography>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+              <AudioCard
+                scene={this.props.scene}
+                scenePaths={this.state.historyPaths}
+                startPlaying={true}
+                onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
 
-          {/*<TextGroup
-            scene={this.props.scene}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}/>*/}
+          <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+            <ExpansionPanelSummary
+              expandIcon={<ExpandMoreIcon />}
+            >
+              <Typography>Text Overlay</Typography>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+              <TextCard
+                scene={this.props.scene}
+                onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+            </ExpansionPanelDetails>
+          </ExpansionPanel>
         </div>
 
         {this.state.hasStarted && this.props.allTags && (

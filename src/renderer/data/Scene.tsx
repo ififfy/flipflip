@@ -92,8 +92,6 @@ export default class Scene {
   audioEnabled = false;
   audios: Array<Audio> = [];
   fillView = false;
-  gridView = false;
-  grid: Array<Array<number>> = [[]];
   bpm = 0;
   tagWeights?: string;
   sceneWeights?: string;
@@ -108,10 +106,19 @@ export default class Scene {
   fadeFull = false;
   playFullGif = false;
   playFullVideo = false;
+  gridView = false;
+  grid: Array<Array<number>> = null;
 
   constructor(init?: Partial<Scene>) {
     Object.assign(this, init);
     this.sources = this.sources.filter((d) => !!d);
+
+    if (this.gridView) {
+      this.gridView = false;
+    }
+    if (this.grid) {
+      this.grid = null;
+    }
 
     if (!this.transDuration && this.effectLevel != 0) {
       this.transDuration = this.effectLevel * 1000;

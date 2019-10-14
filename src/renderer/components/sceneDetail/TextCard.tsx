@@ -51,225 +51,221 @@ class TextCard extends React.Component {
     const classes = this.props.classes;
 
     return(
-      <Card>
-        <CardContent>
+      <Grid container spacing={2} alignItems="center">
+        <Grid item xs={12}>
           <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12}>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs>
-                  <FormControlLabel
-                    control={
-                      <Switch checked={this.props.scene.textEnabled}
-                              onChange={this.onBoolInput.bind(this, 'textEnabled')}/>
-                    }
-                    label="Text Overlay"/>
-                </Grid>
-                {this.state.systemFonts.length > 0 && (
-                  <Grid item>
-                    <Collapse in={this.props.scene.textEnabled}>
-                      <Tooltip title="Toggle Font Options">
-                        <IconButton
-                          onClick={this.onToggleFontVisiblity.bind(this)}>
-                          {this.state.showFonts ? <VisibilityIcon/> : <VisibilityOffIcon/>}
-                        </IconButton>
-                      </Tooltip>
-                    </Collapse>
-                  </Grid>
-                )}
+            <Grid item xs>
+              <FormControlLabel
+                control={
+                  <Switch checked={this.props.scene.textEnabled}
+                          onChange={this.onBoolInput.bind(this, 'textEnabled')}/>
+                }
+                label="Text Overlay"/>
+            </Grid>
+            {this.state.systemFonts.length > 0 && (
+              <Grid item>
+                <Collapse in={this.props.scene.textEnabled}>
+                  <Tooltip title="Toggle Font Options">
+                    <IconButton
+                      onClick={this.onToggleFontVisiblity.bind(this)}>
+                      {this.state.showFonts ? <VisibilityIcon/> : <VisibilityOffIcon/>}
+                    </IconButton>
+                  </Tooltip>
+                </Collapse>
+              </Grid>
+            )}
+          </Grid>
+        </Grid>
+        <Grid item xs={12} className={clsx(!this.props.scene.textEnabled && classes.noPadding)}>
+          <Collapse in={this.props.scene.textEnabled} className={classes.fullWidth}>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12}>
+                <TextField
+                  label="Script URL"
+                  fullWidth
+                  placeholder="Paste URL Here"
+                  margin="dense"
+                  value={this.props.scene.textSource}
+                  InputProps={{
+                    endAdornment:
+                      <InputAdornment position="end">
+                        <Tooltip title="Open File">
+                          <IconButton
+                            onClick={this.onOpenFile.bind(this)}>
+                            <FolderIcon/>
+                          </IconButton>
+                        </Tooltip>
+                      </InputAdornment>,
+                  }}
+                  onChange={this.onInput.bind(this, 'textSource')}/>
               </Grid>
             </Grid>
-            <Grid item xs={12} className={clsx(!this.props.scene.textEnabled && classes.noPadding)}>
-              <Collapse in={this.props.scene.textEnabled} className={classes.fullWidth}>
-                <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Script URL"
-                      fullWidth
-                      placeholder="Paste URL Here"
-                      margin="dense"
-                      value={this.props.scene.textSource}
-                      InputProps={{
-                        endAdornment:
-                          <InputAdornment position="end">
-                            <Tooltip title="Open File">
-                              <IconButton
-                                onClick={this.onOpenFile.bind(this)}>
-                                <FolderIcon/>
-                              </IconButton>
-                            </Tooltip>
-                          </InputAdornment>,
-                      }}
-                      onChange={this.onInput.bind(this, 'textSource')}/>
-                  </Grid>
-                </Grid>
-              </Collapse>
+          </Collapse>
+        </Grid>
+        <Grid item xs={12} className={clsx((!this.props.scene.textEnabled || !this.state.showFonts) && classes.noPadding)}>
+          <Collapse in={this.props.scene.textEnabled && this.state.showFonts} className={classes.fullWidth}>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={8}>
+                <FormControl className={classes.fullWidth}>
+                  <InputLabel>Blink Font</InputLabel>
+                  <Select
+                    value={this.props.scene.blinkFontFamily}
+                    style={{fontFamily: this.props.scene.blinkFontFamily}}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 300,
+                        },
+                      },
+                    }}
+                    onChange={this.onInput.bind(this, 'blinkFontFamily')}>
+                    {this.state.systemFonts.map((f) =>
+                      <MenuItem key={f} value={f} style={{fontFamily: f}}>{f}</MenuItem>
+                    )}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  label="Size"
+                  margin="dense"
+                  value={this.props.scene.blinkFontSize}
+                  onChange={this.onIntInput.bind(this, 'blinkFontSize')}
+                  onBlur={this.blurIntKey.bind(this, 'blinkFontSize')}
+                  inputProps={{
+                    min: 1,
+                    type: 'number',
+                  }}/>
+              </Grid>
+              <Grid item xs={12}>
+                <ColorPicker
+                  currentColor={this.props.scene.blinkColor}
+                  onChangeColor={this.onInput.bind(this, 'blinkColor')}/>
+              </Grid>
             </Grid>
-            <Grid item xs={12} className={clsx((!this.props.scene.textEnabled || !this.state.showFonts) && classes.noPadding)}>
-              <Collapse in={this.props.scene.textEnabled && this.state.showFonts} className={classes.fullWidth}>
-                <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={8}>
-                    <FormControl className={classes.fullWidth}>
-                      <InputLabel>Blink Font</InputLabel>
-                      <Select
-                        value={this.props.scene.blinkFontFamily}
-                        style={{fontFamily: this.props.scene.blinkFontFamily}}
-                        MenuProps={{
-                          PaperProps: {
-                            style: {
-                              maxHeight: 300,
-                            },
-                          },
-                        }}
-                        onChange={this.onInput.bind(this, 'blinkFontFamily')}>
-                        {this.state.systemFonts.map((f) =>
-                          <MenuItem key={f} value={f} style={{fontFamily: f}}>{f}</MenuItem>
-                        )}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <TextField
-                      label="Size"
-                      margin="dense"
-                      value={this.props.scene.blinkFontSize}
-                      onChange={this.onIntInput.bind(this, 'blinkFontSize')}
-                      onBlur={this.blurIntKey.bind(this, 'blinkFontSize')}
-                      inputProps={{
-                        min: 1,
-                        type: 'number',
-                      }}/>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <ColorPicker
-                      currentColor={this.props.scene.blinkColor}
-                      onChangeColor={this.onInput.bind(this, 'blinkColor')}/>
-                  </Grid>
-                </Grid>
-                <Divider className={classes.fontDivider}/>
-                <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={8}>
-                    <FormControl className={classes.fullWidth}>
-                      <InputLabel>Caption Font</InputLabel>
-                      <Select
-                        value={this.props.scene.captionFontFamily}
-                        style={{fontFamily: this.props.scene.captionFontFamily}}
-                        MenuProps={{
-                          PaperProps: {
-                            style: {
-                              maxHeight: 300,
-                            },
-                          },
-                        }}
-                        onChange={this.onInput.bind(this, 'captionFontFamily')}>
-                        {this.state.systemFonts.map((f) =>
-                          <MenuItem key={f} value={f} style={{fontFamily: f}}>{f}</MenuItem>
-                        )}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <TextField
-                      label="Size"
-                      margin="dense"
-                      value={this.props.scene.captionFontSize}
-                      onChange={this.onIntInput.bind(this, 'captionFontSize')}
-                      onBlur={this.blurIntKey.bind(this, 'captionFontSize')}
-                      inputProps={{
-                        min: 1,
-                        type: 'number',
-                      }}/>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <ColorPicker
-                      currentColor={this.props.scene.captionColor}
-                      onChangeColor={this.onInput.bind(this, 'captionColor')}/>
-                  </Grid>
-                </Grid>
-                <Divider className={classes.fontDivider}/>
-                <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={8}>
-                    <FormControl className={classes.fullWidth}>
-                      <InputLabel>Big Caption Font</InputLabel>
-                      <Select
-                        value={this.props.scene.captionBigFontFamily}
-                        style={{fontFamily: this.props.scene.captionBigFontFamily}}
-                        MenuProps={{
-                          PaperProps: {
-                            style: {
-                              maxHeight: 300,
-                            },
-                          },
-                        }}
-                        onChange={this.onInput.bind(this, 'captionBigFontFamily')}>
-                        {this.state.systemFonts.map((f) =>
-                          <MenuItem key={f} value={f} style={{fontFamily: f}}>{f}</MenuItem>
-                        )}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <TextField
-                      label="Size"
-                      margin="dense"
-                      value={this.props.scene.captionBigFontSize}
-                      onChange={this.onIntInput.bind(this, 'captionBigFontSize')}
-                      onBlur={this.blurIntKey.bind(this, 'captionBigFontSize')}
-                      inputProps={{
-                        min: 1,
-                        type: 'number',
-                      }}/>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <ColorPicker
-                      currentColor={this.props.scene.captionBigColor}
-                      onChangeColor={this.onInput.bind(this, 'captionBigColor')}/>
-                  </Grid>
-                </Grid>
-                <Divider className={classes.fontDivider}/>
-                <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={8}>
-                    <FormControl className={classes.fullWidth}>
-                      <InputLabel>Count Font</InputLabel>
-                      <Select
-                        value={this.props.scene.countFontFamily}
-                        style={{fontFamily: this.props.scene.countFontFamily}}
-                        MenuProps={{
-                          PaperProps: {
-                            style: {
-                              maxHeight: 300,
-                            },
-                          },
-                        }}
-                        onChange={this.onInput.bind(this, 'countFontFamily')}>
-                        {this.state.systemFonts.map((f) =>
-                          <MenuItem key={f} value={f} style={{fontFamily: f}}>{f}</MenuItem>
-                        )}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <TextField
-                      label="Size"
-                      margin="dense"
-                      value={this.props.scene.countFontSize}
-                      onChange={this.onIntInput.bind(this, 'countFontSize')}
-                      onBlur={this.blurIntKey.bind(this, 'countFontSize')}
-                      inputProps={{
-                        min: 1,
-                        type: 'number',
-                      }}/>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <ColorPicker
-                      currentColor={this.props.scene.countColor}
-                      onChangeColor={this.onInput.bind(this, 'countColor')}/>
-                  </Grid>
-                </Grid>
-              </Collapse>
+            <Divider className={classes.fontDivider}/>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={8}>
+                <FormControl className={classes.fullWidth}>
+                  <InputLabel>Caption Font</InputLabel>
+                  <Select
+                    value={this.props.scene.captionFontFamily}
+                    style={{fontFamily: this.props.scene.captionFontFamily}}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 300,
+                        },
+                      },
+                    }}
+                    onChange={this.onInput.bind(this, 'captionFontFamily')}>
+                    {this.state.systemFonts.map((f) =>
+                      <MenuItem key={f} value={f} style={{fontFamily: f}}>{f}</MenuItem>
+                    )}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  label="Size"
+                  margin="dense"
+                  value={this.props.scene.captionFontSize}
+                  onChange={this.onIntInput.bind(this, 'captionFontSize')}
+                  onBlur={this.blurIntKey.bind(this, 'captionFontSize')}
+                  inputProps={{
+                    min: 1,
+                    type: 'number',
+                  }}/>
+              </Grid>
+              <Grid item xs={12}>
+                <ColorPicker
+                  currentColor={this.props.scene.captionColor}
+                  onChangeColor={this.onInput.bind(this, 'captionColor')}/>
+              </Grid>
             </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
+            <Divider className={classes.fontDivider}/>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={8}>
+                <FormControl className={classes.fullWidth}>
+                  <InputLabel>Big Caption Font</InputLabel>
+                  <Select
+                    value={this.props.scene.captionBigFontFamily}
+                    style={{fontFamily: this.props.scene.captionBigFontFamily}}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 300,
+                        },
+                      },
+                    }}
+                    onChange={this.onInput.bind(this, 'captionBigFontFamily')}>
+                    {this.state.systemFonts.map((f) =>
+                      <MenuItem key={f} value={f} style={{fontFamily: f}}>{f}</MenuItem>
+                    )}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  label="Size"
+                  margin="dense"
+                  value={this.props.scene.captionBigFontSize}
+                  onChange={this.onIntInput.bind(this, 'captionBigFontSize')}
+                  onBlur={this.blurIntKey.bind(this, 'captionBigFontSize')}
+                  inputProps={{
+                    min: 1,
+                    type: 'number',
+                  }}/>
+              </Grid>
+              <Grid item xs={12}>
+                <ColorPicker
+                  currentColor={this.props.scene.captionBigColor}
+                  onChangeColor={this.onInput.bind(this, 'captionBigColor')}/>
+              </Grid>
+            </Grid>
+            <Divider className={classes.fontDivider}/>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={8}>
+                <FormControl className={classes.fullWidth}>
+                  <InputLabel>Count Font</InputLabel>
+                  <Select
+                    value={this.props.scene.countFontFamily}
+                    style={{fontFamily: this.props.scene.countFontFamily}}
+                    MenuProps={{
+                      PaperProps: {
+                        style: {
+                          maxHeight: 300,
+                        },
+                      },
+                    }}
+                    onChange={this.onInput.bind(this, 'countFontFamily')}>
+                    {this.state.systemFonts.map((f) =>
+                      <MenuItem key={f} value={f} style={{fontFamily: f}}>{f}</MenuItem>
+                    )}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  label="Size"
+                  margin="dense"
+                  value={this.props.scene.countFontSize}
+                  onChange={this.onIntInput.bind(this, 'countFontSize')}
+                  onBlur={this.blurIntKey.bind(this, 'countFontSize')}
+                  inputProps={{
+                    min: 1,
+                    type: 'number',
+                  }}/>
+              </Grid>
+              <Grid item xs={12}>
+                <ColorPicker
+                  currentColor={this.props.scene.countColor}
+                  onChangeColor={this.onInput.bind(this, 'countColor')}/>
+              </Grid>
+            </Grid>
+          </Collapse>
+        </Grid>
+      </Grid>
     );
   }
 
