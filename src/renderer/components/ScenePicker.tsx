@@ -182,9 +182,6 @@ const styles = (theme: Theme) => createStyles({
     borderColor: theme.palette.primary.main,
     borderStyle: 'solid',
   },
-  sceneTitle: {
-    textAlign: 'center',
-  },
   addMenuButton: {
     backgroundColor: theme.palette.primary.dark,
     margin: 0,

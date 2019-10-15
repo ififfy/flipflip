@@ -7,8 +7,8 @@ import clsx from "clsx";
 
 
 import {
-  AppBar, createStyles, Divider, Drawer, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, IconButton,
-  Theme, Toolbar, Tooltip, Typography, withStyles
+  AppBar, Card, CardActionArea, CardContent, createStyles, Divider, Drawer, ExpansionPanel, ExpansionPanelDetails,
+  ExpansionPanelSummary, IconButton, Theme, Toolbar, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -125,6 +125,58 @@ const styles = (theme: Theme) => createStyles({
       duration: theme.transitions.duration.leavingScreen,
     }),
   },
+  tagDrawer: {
+    zIndex: theme.zIndex.drawer + 1,
+    position: 'absolute',
+    transition: theme.transitions.create('height', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  tagDrawerHover: {
+    transition: theme.transitions.create('height', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  tagDrawerPaper: {
+    transform: 'scale(0)',
+    transformOrigin: 'bottom left',
+    backgroundColor: (theme.palette.primary as any)["50"],
+    transition: theme.transitions.create('transform', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  tagDrawerPaperHover: {
+    transform: 'scale(1)',
+    transition: theme.transitions.create('transform', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  hoverTagDrawer: {
+    zIndex: theme.zIndex.drawer + 1,
+    position: 'absolute',
+    bottom: 0,
+    opacity: 0,
+    width: '100%',
+    height: theme.spacing(5),
+  },
+  tagList: {
+    padding: theme.spacing(1),
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+  },
+  tag: {
+    marginRight: theme.spacing(1),
+    marginBottom: theme.spacing(1),
+  },
+  selectedTag: {
+    backgroundColor: theme.palette.primary.light,
+    color: theme.palette.primary.contrastText,
+  },
   fill: {
     flexGrow: 1,
   },
@@ -172,12 +224,14 @@ class Player extends React.Component {
     timeToNextFrame: null as number,
     appBarHover: false,
     drawerHover: false,
+    tagDrawerHover: false,
   };
 
   _interval: NodeJS.Timer = null;
   _toggleStrobe = false;
   _appBarTimeout: any = null;
   _drawerTimeout: any = null;
+  _tagDrawerTimeout: any = null;
 
   render() {
     const classes = this.props.classes;
@@ -394,10 +448,9 @@ class Player extends React.Component {
               </IconButton>
             </Tooltip>
 
-
             <div className={classes.fill}/>
             <Typography component="h1" variant="h4" color="inherit" noWrap className={classes.title}>
-              {this.props.scene.name}
+              {this.props.tags ? this.props.scene.sources[0].url : this.props.scene.name}
             </Typography>
             <div className={classes.fill}/>
 
@@ -569,18 +622,35 @@ class Player extends React.Component {
           </ExpansionPanel>
         </Drawer>
 
+        <div
+          className={classes.hoverTagDrawer}
+          onMouseEnter={this.onMouseEnterTagDrawer.bind(this)}
+          onMouseLeave={this.onMouseLeaveTagDrawer.bind(this)}/>
+
         {this.state.hasStarted && this.props.allTags && (
-          <div className="SourceTags">
-            {this.props.allTags.map((tag) =>
-              <div className={`SourceTag u-clickable ${tagNames && tagNames.includes(tag.name) ? 'u-selected' : ''}`}
-                   onClick={this.props.toggleTag.bind(this, this.props.scene.libraryID, tag)}
-                   key={tag.id}>
-                <div className="SourceTagTitle">
-                  {tag.name}
-                </div>
-              </div>
-            )}
-          </div>
+          <Drawer
+            variant="permanent"
+            anchor="bottom"
+            className={clsx(classes.tagDrawer, this.state.tagDrawerHover && classes.tagDrawerHover)}
+            classes={{paper: clsx(classes.tagDrawerPaper, this.state.tagDrawerHover && classes.tagDrawerPaperHover)}}
+            open={this.state.tagDrawerHover}
+            onMouseEnter={this.onMouseEnterTagDrawer.bind(this)}
+            onMouseLeave={this.onMouseLeaveTagDrawer.bind(this)}>
+            <div className={classes.tagList}>
+              {this.props.allTags.map((tag) =>
+                <Card className={clsx(classes.tag, tagNames && tagNames.includes(tag.name) && classes.selectedTag)} key={tag.id}>
+                  <CardActionArea onClick={this.props.toggleTag.bind(this, this.props.scene.libraryID, tag)}>
+                    <CardContent>
+                      <Typography component="h6" variant="body2">
+                        {tag.name}
+                      </Typography>
+                    </CardContent>
+                  </CardActionArea>
+                </Card>
+              )}
+            </div>
+
+          </Drawer>
         )}
       </div>
     );
@@ -653,6 +723,8 @@ class Player extends React.Component {
     clearInterval(this._interval);
     clearTimeout(this._appBarTimeout);
     this._appBarTimeout = null;
+    this._drawerTimeout = null;
+    this._tagDrawerTimeout = null;
     this._interval = null;
     getCurrentWindow().setAlwaysOnTop(false);
     getCurrentWindow().setFullScreen(false);
@@ -1015,6 +1087,19 @@ class Player extends React.Component {
     this._drawerTimeout = setTimeout(this.closeDrawer.bind(this), 1000);
   }
 
+  onMouseEnterTagDrawer() {
+    clearTimeout(this._tagDrawerTimeout);
+    this.setState({tagDrawerHover: true});
+  }
+
+  closeTagDrawer() {
+    this.setState({tagDrawerHover: false});
+  }
+
+  onMouseLeaveTagDrawer() {
+    clearTimeout(this._tagDrawerTimeout);
+    this._tagDrawerTimeout = setTimeout(this.closeTagDrawer.bind(this), 1000);
+  }
   onKeyDown = (e: KeyboardEvent) => {
     const focus = document.activeElement.tagName.toLocaleLowerCase();
     switch (e.key) {
