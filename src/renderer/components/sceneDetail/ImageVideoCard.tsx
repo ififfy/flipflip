@@ -2,7 +2,7 @@ import * as React from "react";
 import clsx from "clsx";
 
 import {
-  Card, CardContent, Collapse, createStyles, Divider, FormControl, FormControlLabel, FormLabel, Grid, InputAdornment,
+  Collapse, createStyles, Divider, FormControl, FormControlLabel, FormLabel, Grid, InputAdornment,
   InputLabel, MenuItem, Radio, RadioGroup, Select, Slider, Switch, TextField, Theme, withStyles
 } from "@material-ui/core";
 
@@ -37,6 +37,7 @@ class ImageVideoCard extends React.Component {
   readonly props: {
     classes: any,
     scene: Scene | SceneSettings,
+    sidebar: boolean,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
     isPlayer?: boolean,
   };
@@ -53,7 +54,7 @@ class ImageVideoCard extends React.Component {
       <Grid container spacing={2} alignItems="center">
         {!this.props.isPlayer && (
           <React.Fragment>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
               <FormControl className={classes.fullWidth}>
                 <InputLabel>Image Filter</InputLabel>
                 <Select
@@ -65,7 +66,7 @@ class ImageVideoCard extends React.Component {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
               <Collapse in={this.props.scene.orderFunction == OF.random}>
                 <FormControlLabel
                   control={
@@ -75,7 +76,7 @@ class ImageVideoCard extends React.Component {
                   label="Show All Images Before Looping"/>
               </Collapse>
             </Grid>
-            <Grid item xs={12} sm={6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.videos) && classes.noPadding)}>
+            <Grid item xs={12} sm={this.props.sidebar ? 12 : 6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.videos) && classes.noPadding)}>
               <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.videos}>
                 <FormControl className={classes.fullWidth}>
                   <InputLabel>GIF Options</InputLabel>
@@ -89,7 +90,7 @@ class ImageVideoCard extends React.Component {
                 </FormControl>
               </Collapse>
             </Grid>
-            <Grid item xs={12} sm={6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.videos || this.props.scene.gifOption != GO.part) && classes.noPadding)}>
+            <Grid item xs={12} sm={this.props.sidebar ? 12 : 6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.videos || this.props.scene.gifOption != GO.part) && classes.noPadding)}>
               <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.videos && this.props.scene.gifOption == GO.part}>
                 <TextField
                   variant="outlined"
@@ -110,7 +111,7 @@ class ImageVideoCard extends React.Component {
             </Grid>
           </React.Fragment>
         )}
-        <Grid item xs={12} sm={6} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
+        <Grid item xs={12} sm={this.props.sidebar ? 12 : 6} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
           <Collapse in={this.props.scene.imageTypeFilter != IF.stills}>
             <FormControl className={classes.fullWidth}>
               <InputLabel>Video Options</InputLabel>
@@ -124,7 +125,7 @@ class ImageVideoCard extends React.Component {
             </FormControl>
           </Collapse>
         </Grid>
-        <Grid item xs={12} sm={6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.videoOption != VO.part) && classes.noPadding)}>
+        <Grid item xs={12} sm={this.props.sidebar ? 12 : 6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.videoOption != VO.part) && classes.noPadding)}>
           <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.videoOption == VO.part}>
             <TextField
               variant="outlined"
@@ -143,7 +144,7 @@ class ImageVideoCard extends React.Component {
               }}/>
           </Collapse>
         </Grid>
-        <Grid item xs={12} sm={6} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
+        <Grid item xs={12} sm={this.props.sidebar ? 12 : 6} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
           <Collapse in={this.props.scene.imageTypeFilter != IF.stills}>
             <FormControlLabel
               control={
@@ -154,7 +155,7 @@ class ImageVideoCard extends React.Component {
               label="Start at Random Time"/>
           </Collapse>
         </Grid>
-        <Grid item xs={12} sm={6} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
+        <Grid item xs={12} sm={this.props.sidebar ? 12 : 6} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
           <Collapse in={this.props.scene.imageTypeFilter != IF.stills}>
             <FormControlLabel
               control={
@@ -165,7 +166,7 @@ class ImageVideoCard extends React.Component {
               label="Continue Videos"/>
           </Collapse>
         </Grid>
-        <Grid item xs={12} sm={4} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
+        <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
           <Collapse in={this.props.scene.imageTypeFilter != IF.stills}>
             <FormControlLabel
               control={
@@ -176,7 +177,7 @@ class ImageVideoCard extends React.Component {
               label="Use Clips"/>
           </Collapse>
         </Grid>
-        <Grid item xs={12} sm={4} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
+        <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
           <Collapse in={this.props.scene.imageTypeFilter != IF.stills && !this.props.scene.playVideoClips}>
             <TextField
               variant="outlined"
@@ -195,7 +196,7 @@ class ImageVideoCard extends React.Component {
               }}/>
           </Collapse>
         </Grid>
-        <Grid item xs={12} sm={4} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.playVideoClips) && classes.noPadding)}>
+        <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.playVideoClips) && classes.noPadding)}>
           <Collapse in={this.props.scene.imageTypeFilter != IF.stills && !this.props.scene.playVideoClips}>
             <TextField
               variant="outlined"
@@ -234,7 +235,7 @@ class ImageVideoCard extends React.Component {
           <Divider />
         </Grid>
         {!this.props.isPlayer && (
-          <Grid item xs={12} sm={6}>
+          <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
             <FormControl component="fieldset">
               <FormLabel component="legend">Weighting</FormLabel>
               <RadioGroup
@@ -247,7 +248,7 @@ class ImageVideoCard extends React.Component {
             </FormControl>
           </Grid>
         )}
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
           <FormControl component="fieldset">
             <FormLabel component="legend">Ordering</FormLabel>
             <RadioGroup

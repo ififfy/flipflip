@@ -119,7 +119,7 @@ const styles = (theme: Theme) => createStyles({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    color: '#fff',
+    color: theme.palette.primary.contrastText,
     paddingLeft: 23,
     backgroundColor: theme.palette.primary.main,
     ...theme.mixins.toolbar,

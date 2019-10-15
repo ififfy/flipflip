@@ -1,10 +1,24 @@
 import {remote, webFrame, clipboard, nativeImage} from 'electron';
+const {getCurrentWindow, Menu, MenuItem, app} = remote;
 import * as React from 'react';
 import fs from "fs";
 import fileURL from "file-url";
+import clsx from "clsx";
 
+
+import {
+  AppBar, createStyles, Divider, Drawer, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, IconButton,
+  Theme, Toolbar, Tooltip, Typography, withStyles
+} from "@material-ui/core";
+
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import ForwardIcon from '@material-ui/icons/Forward';
+import FullscreenIcon from '@material-ui/icons/Fullscreen';
+import PauseIcon from '@material-ui/icons/Pause';
+import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 
+import {createMainMenu, createMenuTemplate} from "../../../main/MainMenu";
 import {IF, SL, ST, VC} from "../../data/const";
 import {getCachePath, getSourceType, urlToPath} from '../../data/utils';
 import Config from "../../data/Config";
@@ -17,7 +31,6 @@ import Tag from "../library/Tag";
 import LibrarySource from "../library/LibrarySource";
 import Progress from "../ui/Progress";
 import VideoGroup from "../sceneDetail/VideoGroup";
-import {createMainMenu, createMenuTemplate} from "../../../main/MainMenu";
 import SceneOptionCard from "../sceneDetail/SceneOptionCard";
 import ImageVideoCard from "../sceneDetail/ImageVideoCard";
 import ZoomMoveCard from "../sceneDetail/ZoomMoveCard";
@@ -25,28 +38,116 @@ import CrossFadeCard from "../sceneDetail/CrossFadeCard";
 import StrobeCard from "../sceneDetail/StrobeCard";
 import AudioCard from "../sceneDetail/AudioCard";
 import TextCard from "../sceneDetail/TextCard";
-import {ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Typography} from "@material-ui/core";
 
-const {getCurrentWindow, Menu, MenuItem, app} = remote;
+const drawerWidth = 340;
 
-export default class Player extends React.Component {
+const styles = (theme: Theme) => createStyles({
+  root: {
+    display: 'flex',
+  },
+  appBar: {
+    zIndex: theme.zIndex.drawer + 1,
+    height: theme.spacing(8),
+    marginTop: -theme.spacing(8) - 3,
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  appBarHover: {
+    marginTop: 0,
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  appBarSpacer: {
+    backgroundColor: theme.palette.primary.main,
+    ...theme.mixins.toolbar
+  },
+  hoverBar: {
+    zIndex: theme.zIndex.drawer + 1,
+    position: 'absolute',
+    opacity: 0,
+    height: theme.spacing(5),
+    width: '100%',
+    ... theme.mixins.toolbar,
+  },
+  title: {
+    textAlign: 'center',
+  },
+  drawerToolbar: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: (theme.palette.primary as any)["50"],
+    ...theme.mixins.toolbar,
+  },
+  drawer: {
+    zIndex: theme.zIndex.drawer,
+    width: drawerWidth,
+    marginLeft: -drawerWidth - 3,
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  drawerHover: {
+    marginLeft: 0,
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  hoverDrawer: {
+    zIndex: theme.zIndex.drawer,
+    position: 'absolute',
+    opacity: 0,
+    width: theme.spacing(5),
+    height: '100%',
+  },
+  drawerPaper: {
+    position: 'relative',
+    whiteSpace: 'nowrap',
+    overflowX: 'hidden',
+    height: '100vh',
+    width: 0,
+    backgroundColor: (theme.palette.primary as any)["50"],
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  drawerPaperHover: {
+    width: drawerWidth,
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+  },
+  fill: {
+    flexGrow: 1,
+  },
+});
+
+class Player extends React.Component {
   readonly props: {
+    classes: any,
     config: Config,
-    goBack(): void,
     scene: Scene,
     scenes: Array<Scene>,
-    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
-    getTags(source: string): Array<Tag>,
-    setCount(sourceURL: string, count: number, countComplete: boolean): void,
     blacklistFile(sourceURL: string, fileToBlacklist: string): void,
     cache(i: HTMLImageElement | HTMLVideoElement): void,
-    nextScene?(): void,
-    tags?: Array<Tag>,
+    getTags(source: string): Array<Tag>,
+    goBack(): void,
+    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
+    setCount(sourceURL: string, count: number, countComplete: boolean): void,
     allTags?: Array<Tag>,
-    toggleTag?(sourceID: number, tag: Tag): void,
+    tags?: Array<Tag>,
     goToTagSource?(source: LibrarySource): void,
     navigateTagging?(offset: number): void,
-    setupGrid?(scene: Scene): void,
+    nextScene?(): void,
+    toggleTag?(sourceID: number, tag: Tag): void,
   };
 
   readonly state = {
@@ -69,13 +170,17 @@ export default class Player extends React.Component {
     overlayVideos: Array<HTMLVideoElement>(this.getValidOverlays().length).fill(null),
     gridVideos: Array<HTMLVideoElement>(this.getGridLength()).fill(null),
     timeToNextFrame: null as number,
+    appBarHover: false,
+    drawerHover: false,
   };
 
   _interval: NodeJS.Timer = null;
   _toggleStrobe = false;
-  _onSidebar = false;
+  _appBarTimeout: any = null;
+  _drawerTimeout: any = null;
 
   render() {
+    const classes = this.props.classes;
     const canGoBack = this.state.historyOffset > -(this.state.historyPaths.length - 1);
     const canGoForward = this.state.historyOffset < 0;
     const tagNames = this.props.tags ? this.props.tags.map((t) => t.name) : [];
@@ -114,7 +219,7 @@ export default class Player extends React.Component {
     let foundMain = false;
 
     return (
-      <div className="Player">
+      <div className={clsx(classes.root, "Player")}>
         {showStrobe && (
           <Strobe
             toggleStrobe={this._toggleStrobe}
@@ -268,51 +373,86 @@ export default class Player extends React.Component {
             currentSource={this.state.historyPaths.length > 0 ? this.state.historyPaths[0].getAttribute("source") : null}/>
         )}
 
-        <div className={`u-button-row ${this.state.hasStarted && this.state.isPlaying ? 'u-show-on-hover-only' : ''}`}>
-          <div className="u-button-row-right">
-            <div
-              className="FullscreenButton u-button u-icon-button u-clickable"
-              title="Toggle Fullscreen"
-              onClick={this.toggleFull.bind(this)}>
-              <div className="u-fullscreen"/>
-            </div>
-            <div
-              className={`HistoryBackButton u-button u-icon-button u-clickable ${canGoBack ? '' : 'u-disabled'}`}
-              title="Backwards"
-              onClick={canGoBack ? this.historyBack.bind(this) : this.nop}>
-              <div className="u-left-arrow"/>
-            </div>
-            {this.state.isPlaying && (
-              <div
-                className="PauseButton u-button u-icon-button u-clickable"
-                title="Pause"
-                onClick={this.setPlayPause.bind(this, false)}>
-                <div className="u-pause"/>
-              </div>
-            )}
-            {!this.state.isPlaying && (
-              <div
-                className="PlayButton u-button u-icon-button u-clickable"
-                title="Play"
-                onClick={this.setPlayPause.bind(this, true)}>
-                <div className="u-play"/>
-              </div>
-            )}
-            <div
-              className={`HistoryForwardButton u-button u-icon-button u-clickable ${canGoForward ? '' : 'u-disabled'}`}
-              title="Forwards"
-              onClick={canGoForward ? this.historyForward.bind(this) : this.nop}>
-              <div className="u-right-arrow"/>
-            </div>
-          </div>
-          <div className="BackButton u-button u-clickable" onClick={this.navigateBack.bind(this)}>Back</div>
-        </div>
+        <div
+          className={classes.hoverBar}
+          onMouseEnter={this.onMouseEnterAppBar.bind(this)}
+          onMouseLeave={this.onMouseLeaveAppBar.bind(this)}/>
 
-        <div className="SceneOptions ControlGroupGroup u-button-sidebar"
-             style={{display: this.state.hasStarted ? "" : "none"}}
-             onMouseEnter={this.onSidebarMouseEnter.bind(this)}
-             onMouseLeave={this.onSidebarMouseLeave.bind(this)}>
-          <h2 className="SceneOptionsHeader">Scene Options</h2>
+        <AppBar
+          position="absolute"
+          onMouseEnter={this.onMouseEnterAppBar.bind(this)}
+          onMouseLeave={this.onMouseLeaveAppBar.bind(this)}
+          className={clsx(classes.appBar, this.state.appBarHover && classes.appBarHover)}>
+          <Toolbar>
+            <Tooltip title="Back" placement="right-end">
+              <IconButton
+                edge="start"
+                color="inherit"
+                aria-label="Back"
+                onClick={this.props.goBack.bind(this)}>
+                <ArrowBackIcon />
+              </IconButton>
+            </Tooltip>
+
+
+            <div className={classes.fill}/>
+            <Typography component="h1" variant="h4" color="inherit" noWrap className={classes.title}>
+              {this.props.scene.name}
+            </Typography>
+            <div className={classes.fill}/>
+
+            <IconButton
+              disabled={!canGoBack}
+              edge="start"
+              color="inherit"
+              aria-label="FullScreen"
+              onClick={this.toggleFull.bind(this)}>
+              <FullscreenIcon fontSize="large"/>
+            </IconButton>
+            <Divider component="div" orientation="vertical" style={{height: 48, margin: '0 14px 0 3px'}}/>
+            <IconButton
+              disabled={!canGoBack}
+              edge="start"
+              color="inherit"
+              aria-label="Backward"
+              onClick={this.historyBack.bind(this)}>
+              <ForwardIcon fontSize="large" style={{transform: 'rotate(180deg)'}}/>
+            </IconButton>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label={this.state.isPlaying ? "Pause" : "Play"}
+              onClick={this.setPlayPause.bind(this, !this.state.isPlaying)}>
+              {this.state.isPlaying ? <PauseIcon fontSize="large"/> : <PlayArrowIcon fontSize="large"/>}
+            </IconButton>
+            <IconButton
+              disabled={!canGoForward}
+              edge="start"
+              color="inherit"
+              aria-label="Forward"
+              onClick={this.historyForward.bind(this)}>
+              <ForwardIcon fontSize="large"/>
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+
+        <div
+          className={classes.hoverDrawer}
+          onMouseEnter={this.onMouseEnterDrawer.bind(this)}
+          onMouseLeave={this.onMouseLeaveDrawer.bind(this)}/>
+
+        <Drawer
+          variant="permanent"
+          className={clsx(classes.drawer, this.state.drawerHover && classes.drawerHover)}
+          classes={{paper: clsx(classes.drawerPaper, this.state.drawerHover && classes.drawerPaperHover)}}
+          open={this.state.drawerHover}
+          onMouseEnter={this.onMouseEnterDrawer.bind(this)}
+          onMouseLeave={this.onMouseLeaveDrawer.bind(this)}>
+          <div className={classes.drawerToolbar}>
+            <Typography variant="h4">
+              Settings
+            </Typography>
+          </div>
           {this.props.scene.imageTypeFilter != IF.stills && (
             <VideoGroup
               scene={this.props.scene}
@@ -333,6 +473,7 @@ export default class Player extends React.Component {
             </ExpansionPanelSummary>
             <ExpansionPanelDetails>
               <SceneOptionCard
+                sidebar
                 allScenes={this.props.scenes}
                 isTagging={this.props.tags != null}
                 scene={this.props.scene}
@@ -348,6 +489,7 @@ export default class Player extends React.Component {
             </ExpansionPanelSummary>
             <ExpansionPanelDetails>
               <ImageVideoCard
+                sidebar
                 isPlayer
                 scene={this.props.scene}
                 onUpdateScene={this.props.onUpdateScene.bind(this)}/>
@@ -362,6 +504,7 @@ export default class Player extends React.Component {
             </ExpansionPanelSummary>
             <ExpansionPanelDetails>
               <ZoomMoveCard
+                sidebar
                 scene={this.props.scene}
                 onUpdateScene={this.props.onUpdateScene.bind(this)} />
             </ExpansionPanelDetails>
@@ -375,6 +518,7 @@ export default class Player extends React.Component {
             </ExpansionPanelSummary>
             <ExpansionPanelDetails>
               <CrossFadeCard
+                sidebar
                 scene={this.props.scene}
                 onUpdateScene={this.props.onUpdateScene.bind(this)} />
             </ExpansionPanelDetails>
@@ -388,12 +532,13 @@ export default class Player extends React.Component {
             </ExpansionPanelSummary>
             <ExpansionPanelDetails>
               <StrobeCard
+                sidebar
                 scene={this.props.scene}
                 onUpdateScene={this.props.onUpdateScene.bind(this)} />
             </ExpansionPanelDetails>
           </ExpansionPanel>
 
-          <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+          <ExpansionPanel>
             <ExpansionPanelSummary
               expandIcon={<ExpandMoreIcon />}
             >
@@ -401,6 +546,7 @@ export default class Player extends React.Component {
             </ExpansionPanelSummary>
             <ExpansionPanelDetails>
               <AudioCard
+                sidebar
                 scene={this.props.scene}
                 scenePaths={this.state.historyPaths}
                 startPlaying={true}
@@ -416,11 +562,12 @@ export default class Player extends React.Component {
             </ExpansionPanelSummary>
             <ExpansionPanelDetails>
               <TextCard
+                sidebar
                 scene={this.props.scene}
                 onUpdateScene={this.props.onUpdateScene.bind(this)}/>
             </ExpansionPanelDetails>
           </ExpansionPanel>
-        </div>
+        </Drawer>
 
         {this.state.hasStarted && this.props.allTags && (
           <div className="SourceTags">
@@ -474,7 +621,7 @@ export default class Player extends React.Component {
 
     this.buildMenu();
     this._interval = setInterval(() => this.nextSceneLoop(), 1000);
-    for (let rowIndex=0; rowIndex < this.props.scene.grid.length; rowIndex++) {
+    /*for (let rowIndex=0; rowIndex < this.props.scene.grid.length; rowIndex++) {
       for (let colIndex=0; colIndex < this.props.scene.grid[rowIndex].length; colIndex++) {
         const sceneID = this.props.scene.grid[rowIndex][colIndex];
         const index = (rowIndex * this.props.scene.grid[rowIndex].length) + colIndex;
@@ -482,10 +629,10 @@ export default class Player extends React.Component {
         const getO = this.getScene(sceneID);
         if (getO == null || getO.sources.length == 0) this.setGridLoaded(index, true);
       }
-    }
-    if (this.props.scene.gridView && this.getValidGrid().find((s) => s && s > 10) == null) {
+    }*/
+    /*if (this.props.scene.gridView && this.getValidGrid().find((s) => s && s > 10) == null) {
       this.setState({isEmpty: true});
-    }
+    }*/
   }
 
   buildMenu() {
@@ -504,6 +651,8 @@ export default class Player extends React.Component {
 
   componentWillUnmount() {
     clearInterval(this._interval);
+    clearTimeout(this._appBarTimeout);
+    this._appBarTimeout = null;
     this._interval = null;
     getCurrentWindow().setAlwaysOnTop(false);
     getCurrentWindow().setFullScreen(false);
@@ -517,6 +666,20 @@ export default class Player extends React.Component {
   }
 
   nop() {}
+
+  onMouseEnterAppBar() {
+    clearTimeout(this._appBarTimeout);
+    this.setState({appBarHover: true});
+  }
+
+  closeAppBar() {
+    this.setState({appBarHover: false});
+  }
+
+  onMouseLeaveAppBar() {
+    clearTimeout(this._appBarTimeout);
+    this._appBarTimeout = setTimeout(this.closeAppBar.bind(this), 1000);
+  }
 
   setProgress(total: number, current: number, message: string) {
     this.setState({total: total, progress: current, progressMessage: message});
@@ -631,7 +794,8 @@ export default class Player extends React.Component {
   }
 
   getGridLength() {
-    return (this.props.scene.grid.length * this.props.scene.grid[0].length);
+    return 0;
+    //return (this.props.scene.grid.length * this.props.scene.grid[0].length);
   }
 
   setMainCanStart() {
@@ -715,7 +879,7 @@ export default class Player extends React.Component {
   }
 
   historyBack() {
-    if (!this._onSidebar || document.activeElement.tagName.toLocaleLowerCase() != "input") {
+    if (!this.state.drawerHover || document.activeElement.tagName.toLocaleLowerCase() != "input") {
       if (this.state.historyOffset > -(this.state.historyPaths.length - 1)) {
         this.setState({
           isPlaying: false,
@@ -726,7 +890,7 @@ export default class Player extends React.Component {
   }
 
   historyForward() {
-    if (!this._onSidebar || document.activeElement.tagName.toLocaleLowerCase() != "input") {
+    if (!this.state.drawerHover || document.activeElement.tagName.toLocaleLowerCase() != "input") {
       if (this.state.historyOffset >= 0) {
         this.state.imagePlayerAdvanceHack.fire();
       } else {
@@ -837,31 +1001,37 @@ export default class Player extends React.Component {
     return keyMap;
   }
 
-  onSidebarMouseEnter() {
-    this._onSidebar = true;
+  onMouseEnterDrawer() {
+    clearTimeout(this._drawerTimeout);
+    this.setState({drawerHover: true});
   }
 
-  onSidebarMouseLeave() {
-    this._onSidebar = false;
+  closeDrawer() {
+    this.setState({drawerHover: false});
+  }
+
+  onMouseLeaveDrawer() {
+    clearTimeout(this._drawerTimeout);
+    this._drawerTimeout = setTimeout(this.closeDrawer.bind(this), 1000);
   }
 
   onKeyDown = (e: KeyboardEvent) => {
     const focus = document.activeElement.tagName.toLocaleLowerCase();
     switch (e.key) {
       case ' ':
-        if (!this._onSidebar || focus != "input") {
+        if (!this.state.drawerHover || focus != "input") {
           e.preventDefault();
           this.playPause();
         }
         break;
       case 'ArrowLeft':
-        if (!this._onSidebar || focus != "input") {
+        if (!this.state.drawerHover || focus != "input") {
           e.preventDefault();
           this.historyBack();
         }
         break;
       case 'ArrowRight':
-        if (!this._onSidebar || focus != "input") {
+        if (!this.state.drawerHover || focus != "input") {
           e.preventDefault();
           this.historyForward();
         }
@@ -895,7 +1065,7 @@ export default class Player extends React.Component {
         }
         break;
       case 'Delete':
-        if (!this._onSidebar || focus != "input") {
+        if (!this.state.drawerHover || focus != "input") {
           if (this.props.config.caching.enabled) {
             e.preventDefault();
             this.onDelete();
@@ -920,7 +1090,7 @@ export default class Player extends React.Component {
   /* Menu and hotkey options DON'T DELETE */
 
   onDelete() {
-    if (!this._onSidebar || document.activeElement.tagName.toLocaleLowerCase() != "input") {
+    if (!this.state.drawerHover || document.activeElement.tagName.toLocaleLowerCase() != "input") {
       const img = this.state.historyPaths[(this.state.historyPaths.length - 1) + this.state.historyOffset];
       const url = img.src;
       const isFile = url.startsWith('file://');
@@ -932,7 +1102,7 @@ export default class Player extends React.Component {
   }
 
   playPause() {
-    if (!this._onSidebar || document.activeElement.tagName.toLocaleLowerCase() != "input") {
+    if (!this.state.drawerHover || document.activeElement.tagName.toLocaleLowerCase() != "input") {
       this.setPlayPause(!this.state.isPlaying)
     }
   }
@@ -971,4 +1141,6 @@ export default class Player extends React.Component {
     });
     this.props.navigateTagging(offset);
   }
-};
+}
+
+export default withStyles(styles)(Player as any);

@@ -2,7 +2,7 @@ import * as React from "react";
 import clsx from "clsx";
 
 import {
-  Card, CardContent, Collapse, createStyles, Divider, FormControl, FormControlLabel, Grid, InputAdornment, InputLabel,
+  Collapse, createStyles, Divider, FormControl, FormControlLabel, Grid, InputAdornment, InputLabel,
   MenuItem, Select, Slider, Switch, TextField, Theme, Typography, withStyles
 } from "@material-ui/core";
 
@@ -33,6 +33,7 @@ class CrossFadeCard extends React.Component {
   readonly props: {
     classes: any,
     scene: Scene | SceneSettings,
+    sidebar: boolean,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 
@@ -48,7 +49,7 @@ class CrossFadeCard extends React.Component {
       <Grid container spacing={this.props.scene.crossFade ? 2 : 0} alignItems="center">
         <Grid item xs={12}>
           <Grid container alignItems="center">
-            <Grid item xs={12} sm={5}>
+            <Grid item xs={12} sm={this.props.sidebar ? 12 : 5}>
               <FormControlLabel
                 control={
                   <Switch checked={this.props.scene.crossFade}
@@ -56,7 +57,7 @@ class CrossFadeCard extends React.Component {
                 }
                 label="Cross-Fade"/>
             </Grid>
-            <Grid item xs={12} sm={7}>
+            <Grid item xs={12} sm={this.props.sidebar ? 12 : 7}>
               <Collapse in={this.props.scene.crossFade} className={clsx(classes.fullWidth, classes.paddingLeft)}>
                 <FormControlLabel
                   control={
@@ -77,7 +78,7 @@ class CrossFadeCard extends React.Component {
         <Grid item xs={12}>
           <Collapse in={this.props.scene.crossFade} className={classes.fullWidth}>
             <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12} sm={4} style={{paddingTop: 10}}>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} style={{paddingTop: 10}}>
                 <FormControl className={classes.fullWidth}>
                   <InputLabel>Timing</InputLabel>
                   <Select
@@ -89,7 +90,7 @@ class CrossFadeCard extends React.Component {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={8}>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 8}>
                 <Collapse in={this.props.scene.fadeTF == TF.sin} className={classes.fullWidth}>
                   <Typography id="fade-sin-rate-slider" variant="caption" component="div" color="textSecondary">
                     Wave Rate
@@ -153,7 +154,7 @@ class CrossFadeCard extends React.Component {
         <Grid item xs={12}>
           <Collapse in={this.props.scene.crossFade && (this.props.scene.fadeTF == TF.random || this.props.scene.fadeTF == TF.sin)} className={classes.fullWidth}>
             <Grid container alignItems="center">
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                 <TextField
                   variant="outlined"
                   label="Between"
@@ -170,7 +171,7 @@ class CrossFadeCard extends React.Component {
                     type: 'number',
                   }}/>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                 <TextField
                   variant="outlined"
                   label="and"

@@ -56,6 +56,7 @@ class AudioControl extends React.Component {
     detectBPM: boolean,
     scene: Scene,
     scenePaths: Array<any>,
+    sidebar: boolean,
     startPlaying: boolean,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
@@ -135,7 +136,7 @@ class AudioControl extends React.Component {
               </Grid>
               <Grid item xs={12}>
                 <Grid container spacing={1} alignItems="center" justify="center">
-                  <Grid item xs={12} sm>
+                  <Grid item xs={12} sm={this.props.sidebar ? 12 : 'auto'}>
                     <Grid container spacing={1} alignItems="center">
                       <Grid item>
                         <Typography id="strobe-opacity-slider" variant="caption" component="div" color="textSecondary">
@@ -222,7 +223,7 @@ class AudioControl extends React.Component {
               <Grid item xs={12} className={clsx(!audio.tick && classes.noPadding)}>
                 <Collapse in={audio.tick} className={classes.fullWidth}>
                   <Grid container spacing={2} alignItems="center">
-                    <Grid item xs={12} sm={4}>
+                    <Grid item xs={12} sm={this.props.sidebar ? 12 : 4}>
                       <FormControl className={classes.fullWidth}>
                         <InputLabel>Timing</InputLabel>
                         <Select
@@ -234,7 +235,7 @@ class AudioControl extends React.Component {
                         </Select>
                       </FormControl>
                     </Grid>
-                    <Grid item xs={12} sm={8}>
+                    <Grid item xs={12} sm={this.props.sidebar ? 12 : 8}>
                       <Collapse in={audio.tickMode == TF.sin} className={classes.fullWidth}>
                         <Typography id="tick-sin-rate-slider" variant="caption" component="div"
                                     color="textSecondary">
@@ -301,7 +302,7 @@ class AudioControl extends React.Component {
               <Grid item xs={12} className={clsx(!audio.tick && classes.noPadding)}>
                 <Collapse in={audio.tick && (audio.tickMode == TF.random || audio.tickMode == TF.sin)} className={classes.fullWidth}>
                   <Grid container alignItems="center">
-                    <Grid item xs={12} sm={6}>
+                    <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                       <TextField
                         variant="outlined"
                         label="Between"
@@ -318,7 +319,7 @@ class AudioControl extends React.Component {
                           type: 'number',
                         }}/>
                     </Grid>
-                    <Grid item xs={12} sm={6}>
+                    <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                       <TextField
                         variant="outlined"
                         label="and"

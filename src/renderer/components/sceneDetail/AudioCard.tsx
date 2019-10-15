@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import {
-  Card, CardContent, Collapse, createStyles, Fab, FormControlLabel, Grid, Switch, Theme, withStyles
+  Collapse, createStyles, Fab, FormControlLabel, Grid, Switch, Theme, withStyles
 } from "@material-ui/core";
 
 import AddIcon from '@material-ui/icons/Add';
@@ -21,6 +21,7 @@ class AudioCard extends React.Component {
   readonly props: {
     classes: any,
     scene: Scene | SceneSettings,
+    sidebar: boolean,
     startPlaying: boolean,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
@@ -58,6 +59,7 @@ class AudioCard extends React.Component {
             audio={a}
             detectBPM={i == 0}
             scene={this.props.scene}
+            sidebar={this.props.sidebar}
             startPlaying={this.props.startPlaying}
             onUpdateScene={this.props.onUpdateScene.bind(this)}/>
         )}

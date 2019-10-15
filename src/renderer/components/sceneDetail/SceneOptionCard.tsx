@@ -2,7 +2,7 @@ import * as React from "react";
 import clsx from "clsx";
 
 import {
-  Card, CardContent, Collapse, createStyles, Divider, Fab, FormControl, FormControlLabel, Grid, IconButton,
+  Collapse, createStyles, Divider, Fab, FormControl, FormControlLabel, Grid, IconButton,
   InputAdornment, InputLabel, MenuItem, Select, Slider, Switch, TextField, Theme, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
@@ -45,6 +45,7 @@ class SceneOptionCard extends React.Component {
     classes: any,
     allScenes: Array<Scene>,
     scene: Scene | SceneSettings,
+    sidebar: boolean,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
     isTagging?: boolean,
   };
@@ -63,7 +64,7 @@ class SceneOptionCard extends React.Component {
       <Grid container spacing={2} alignItems="center">
         <Grid item xs={12}>
           <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} sm={4} style={{paddingTop: 10}}>
+            <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} style={{paddingTop: 10}}>
               <FormControl className={classes.fullWidth}>
                 <InputLabel>Timing</InputLabel>
                 <Select
@@ -75,7 +76,7 @@ class SceneOptionCard extends React.Component {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} sm={8}>
+            <Grid item xs={12} sm={this.props.sidebar ? 12 : 8}>
               <Collapse in={this.props.scene.timingFunction == TF.sin} className={classes.fullWidth}>
                 <Typography id="scene-sin-rate-slider" variant="caption" component="div" color="textSecondary">
                   Wave Rate
@@ -138,7 +139,7 @@ class SceneOptionCard extends React.Component {
         <Grid item xs={12}>
           <Collapse in={this.props.scene.timingFunction == TF.random || this.props.scene.timingFunction == TF.sin} className={classes.fullWidth}>
             <Grid container alignItems="center">
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                 <TextField
                   variant="outlined"
                   label="Between"
@@ -155,7 +156,7 @@ class SceneOptionCard extends React.Component {
                     type: 'number',
                   }}/>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                 <TextField
                   variant="outlined"
                   label="and"
@@ -180,7 +181,7 @@ class SceneOptionCard extends React.Component {
         </Grid>
         <Grid item xs={12}>
           <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} sm={4}>
+            <Grid item xs={this.props.sidebar ? 8 : 12} sm={this.props.sidebar ? 8 : 4}>
               <FormControl className={classes.fullWidth}>
                 <InputLabel>Background</InputLabel>
                 <Select
@@ -191,16 +192,31 @@ class SceneOptionCard extends React.Component {
                   )}
                 </Select>
               </FormControl>
-              <FormControlLabel
-                style={{paddingTop: 6}}
-                control={
-                  <Switch checked={this.props.scene.fillView}
-                          size="small"
-                          onChange={this.onBoolInput.bind(this, 'fillView')}/>
-                }
-                label="Fill View"/>
+              {!this.props.sidebar && (
+                <FormControlLabel
+                  style={{paddingTop: 6}}
+                  control={
+                    <Switch checked={this.props.scene.fillView}
+                            size="small"
+                            onChange={this.onBoolInput.bind(this, 'fillView')}/>
+                  }
+                  label="Fill View"/>
+              )}
             </Grid>
-            <Grid item xs={12} sm={8}>
+            {this.props.sidebar && (
+              <Grid item xs={4}>
+                <FormControlLabel
+                  style={{paddingTop: 6}}
+                  control={
+                    <Switch checked={this.props.scene.fillView}
+                            size="small"
+                            onChange={this.onBoolInput.bind(this, 'fillView')}/>
+                  }
+                  label="Fill View"/>
+              </Grid>
+            )}
+
+            <Grid item xs={12} sm={this.props.sidebar ? 12 : 8}>
               <Collapse in={this.props.scene.backgroundType == BT.blur} className={classes.fullWidth}>
                 <Typography id="scene-bg-color-slider" variant="caption" component="div" color="textSecondary">
                   Blur: {this.props.scene.backgroundBlur}px
@@ -227,7 +243,7 @@ class SceneOptionCard extends React.Component {
             </Grid>
             <Grid item xs={12}>
               <Grid container spacing={2} alignItems="center">
-                <Grid item xs={12} sm={7}>
+                <Grid item xs={12} sm={this.props.sidebar ? 12 : 7}>
                   <FormControl className={classes.fullWidth}>
                     <InputLabel>Next Scene</InputLabel>
                     <Select
@@ -246,7 +262,7 @@ class SceneOptionCard extends React.Component {
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid item xs={12} sm={5}>
+                <Grid item xs={12} sm={this.props.sidebar ? 12 : 5}>
                   <TextField
                     variant="outlined"
                     label="Play after"
@@ -296,7 +312,7 @@ class SceneOptionCard extends React.Component {
                   <Grid item xs={12} className={clsx(!this.props.scene.overlayEnabled && classes.noPadding)}>
                     <Collapse in={this.props.scene.overlayEnabled} className={classes.fullWidth}>
                       <Grid container spacing={2} alignItems="center">
-                        <Grid item xs={12} sm={5}>
+                        <Grid item xs={12} sm={this.props.sidebar ? 12 : 5}>
                           <FormControl className={classes.fullWidth}>
                             <InputLabel>Overlay</InputLabel>
                             <Select
@@ -315,7 +331,7 @@ class SceneOptionCard extends React.Component {
                             </Select>
                           </FormControl>
                         </Grid>
-                        <Grid item xs={12} sm={7}>
+                        <Grid item xs={12} sm={this.props.sidebar ? 12 : 7}>
                           <Typography id="overlay-opacity-slider" variant="caption" component="div" color="textSecondary">
                             Overlay Opacity: {o.opacity}%
                           </Typography>

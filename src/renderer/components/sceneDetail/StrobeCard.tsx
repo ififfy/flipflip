@@ -2,7 +2,7 @@ import * as React from "react";
 import clsx from "clsx";
 
 import {
-  Card, CardContent, Collapse, createStyles, Divider, FormControl, FormControlLabel, Grid, InputAdornment, InputLabel,
+  Collapse, createStyles, Divider, FormControl, FormControlLabel, Grid, InputAdornment, InputLabel,
   MenuItem, Select, Slider, Switch, TextField, Theme, Typography, withStyles
 } from "@material-ui/core";
 
@@ -37,6 +37,7 @@ class StrobeCard extends React.Component {
   readonly props: {
     classes: any,
     scene: Scene | SceneSettings,
+    sidebar: boolean,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 
@@ -58,7 +59,7 @@ class StrobeCard extends React.Component {
       <Grid container spacing={2} alignItems="center">
         <Grid item xs={12}>
           <Grid container alignItems="center">
-            <Grid item xs={12} sm={5}>
+            <Grid item xs={12} sm={this.props.sidebar ? 12 : 5}>
               <FormControlLabel
                 control={
                   <Switch checked={this.props.scene.strobe}
@@ -66,7 +67,7 @@ class StrobeCard extends React.Component {
                 }
                 label="Strobe"/>
             </Grid>
-            <Grid item xs={12} sm={7}>
+            <Grid item xs={12} sm={this.props.sidebar ? 12 : 7}>
               <Collapse in={this.props.scene.strobe} className={clsx(classes.fullWidth, classes.paddingLeft)}>
                 <FormControlLabel
                   control={
@@ -89,7 +90,7 @@ class StrobeCard extends React.Component {
         <Grid item xs={12} className={clsx(!this.props.scene.strobe && classes.noPadding)}>
           <Collapse in={this.props.scene.strobe} className={classes.fullWidth}>
             <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12} sm={this.props.scene.strobeLayer == SL.bottom ? 4 : 12} className={classes.paddingTop}>
+              <Grid item xs={12} sm={!this.props.sidebar && this.props.scene.strobeLayer == SL.bottom ? 4 : 12} className={classes.paddingTop}>
                 <FormControl className={classes.fullWidth}>
                   <InputLabel>Strobe Layer</InputLabel>
                   <Select
@@ -101,7 +102,7 @@ class StrobeCard extends React.Component {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm className={clsx(this.props.scene.strobeLayer != SL.bottom && classes.noPadding)}>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 'auto'} className={clsx(this.props.scene.strobeLayer != SL.bottom && classes.noPadding)}>
                 <Collapse in={this.props.scene.strobeLayer == SL.bottom} className={classes.fullWidth}>
                   <Typography id="strobe-opacity-slider" variant="caption" component="div" color="textSecondary">
                     Strobe Opacity
@@ -146,7 +147,7 @@ class StrobeCard extends React.Component {
         <Grid item xs={12} className={clsx(!this.props.scene.strobe && classes.noPadding)}>
           <Collapse in={this.props.scene.strobe} className={classes.fullWidth}>
             <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12} sm={4} style={{paddingTop: 10}}>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} style={{paddingTop: 10}}>
                 <FormControl className={classes.fullWidth}>
                   <InputLabel>Timing</InputLabel>
                   <Select
@@ -158,7 +159,7 @@ class StrobeCard extends React.Component {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={8}>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 8}>
                 <Collapse in={this.props.scene.strobeTF == TF.sin} className={classes.fullWidth}>
                   <Typography id="strobe-sin-rate-slider" variant="caption" component="div" color="textSecondary">
                     Wave Rate
@@ -222,7 +223,7 @@ class StrobeCard extends React.Component {
         <Grid item xs={12} className={clsx(!this.props.scene.strobe && classes.noPadding)}>
           <Collapse in={this.props.scene.strobe && (this.props.scene.strobeTF == TF.random || this.props.scene.strobeTF == TF.sin)} className={classes.fullWidth}>
             <Grid container alignItems="center">
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                 <TextField
                   variant="outlined"
                   label="Between"
@@ -239,7 +240,7 @@ class StrobeCard extends React.Component {
                     type: 'number',
                   }}/>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                 <TextField
                   variant="outlined"
                   label="and"
@@ -267,7 +268,7 @@ class StrobeCard extends React.Component {
         <Grid item xs={12} className={clsx((!this.props.scene.strobe || !this.props.scene.strobePulse) && classes.noPadding)}>
           <Collapse in={this.props.scene.strobe && this.props.scene.strobePulse} className={classes.fullWidth}>
             <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12} sm={4} style={{paddingTop: 10}}>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} style={{paddingTop: 10}}>
                 <FormControl className={classes.fullWidth}>
                   <InputLabel>Delay Timing</InputLabel>
                   <Select
@@ -279,7 +280,7 @@ class StrobeCard extends React.Component {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={8}>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 8}>
                 <Collapse in={this.props.scene.strobeDelayTF == TF.sin} className={classes.fullWidth}>
                   <Typography id="strobe-delay-sin-rate-slider" variant="caption" component="div" color="textSecondary">
                     Wave Rate
@@ -343,7 +344,7 @@ class StrobeCard extends React.Component {
         <Grid item xs={12} className={clsx((!this.props.scene.strobe || !this.props.scene.strobePulse) && classes.noPadding)}>
           <Collapse in={this.props.scene.strobe && this.props.scene.strobePulse && (this.props.scene.strobeDelayTF == TF.random || this.props.scene.strobeDelayTF == TF.sin)} className={classes.fullWidth}>
             <Grid container alignItems="center">
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                 <TextField
                   variant="outlined"
                   label="Between"
@@ -360,7 +361,7 @@ class StrobeCard extends React.Component {
                     type: 'number',
                   }}/>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                 <TextField
                   variant="outlined"
                   label="and"

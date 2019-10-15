@@ -5,7 +5,7 @@ import fileURL from "file-url";
 import SystemFonts from "system-font-families";
 
 import {
-  Card, CardContent, Collapse, createStyles, Divider, FormControl, FormControlLabel, Grid, IconButton, InputAdornment,
+  Collapse, createStyles, Divider, FormControl, FormControlLabel, Grid, IconButton, InputAdornment,
   InputLabel, MenuItem, Select, Switch, TextField, Theme, Tooltip, withStyles
 } from "@material-ui/core";
 
@@ -39,6 +39,7 @@ class TextCard extends React.Component {
   readonly props: {
     classes: any,
     scene: Scene | SceneSettings,
+    sidebar: boolean,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 
@@ -139,6 +140,7 @@ class TextCard extends React.Component {
               </Grid>
               <Grid item xs={12}>
                 <ColorPicker
+                  sidebar={this.props.sidebar}
                   currentColor={this.props.scene.blinkColor}
                   onChangeColor={this.onInput.bind(this, 'blinkColor')}/>
               </Grid>
