@@ -88,7 +88,7 @@ class ColorPicker extends React.Component {
               onChange={this.onChangeColor.bind(this)}/>
           </Menu>
         </Grid>
-        <Grid item xs={12} sm={this.props.sidebar ? 12 : 'auto'}>
+        <Grid item xs={12} sm={this.props.sidebar ? 12 : true}>
           <Grid container alignItems="center">
             {COLORS.map((c) =>
               <Grid key={c} item>

@@ -57,7 +57,7 @@ class AudioCard extends React.Component {
           <AudioControl
             key={a.id}
             audio={a}
-            detectBPM={i == 0}
+            isFirst={i == 0}
             scene={this.props.scene}
             sidebar={this.props.sidebar}
             startPlaying={this.props.startPlaying}

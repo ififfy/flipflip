@@ -102,7 +102,7 @@ class StrobeCard extends React.Component {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={this.props.sidebar ? 12 : 'auto'} className={clsx(this.props.scene.strobeLayer != SL.bottom && classes.noPadding)}>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : true} className={clsx(this.props.scene.strobeLayer != SL.bottom && classes.noPadding)}>
                 <Collapse in={this.props.scene.strobeLayer == SL.bottom} className={classes.fullWidth}>
                   <Typography id="strobe-opacity-slider" variant="caption" component="div" color="textSecondary">
                     Strobe Opacity

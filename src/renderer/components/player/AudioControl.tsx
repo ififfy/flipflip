@@ -53,7 +53,7 @@ class AudioControl extends React.Component {
   readonly props: {
     classes: any,
     audio: Audio,
-    detectBPM: boolean,
+    isFirst: boolean,
     scene: Scene,
     scenePaths: Array<any>,
     sidebar: boolean,
@@ -84,6 +84,13 @@ class AudioControl extends React.Component {
     const tickMaxDelay = typeof audio.tickMaxDelay === 'number' ? audio.tickMaxDelay : 0;
     return(
       <React.Fragment key={audio.id}>
+        {!this.props.isFirst && (
+          <Grid item xs={12} className={clsx(!this.props.scene.audioEnabled && classes.noPadding)}>
+            <Collapse in={this.props.scene.audioEnabled} className={classes.fullWidth}>
+              <Divider/>
+            </Collapse>
+          </Grid>
+        )}
         {this.props.audio.tick && (
           <SoundTick
             url={this.props.audio.url}
@@ -136,7 +143,7 @@ class AudioControl extends React.Component {
               </Grid>
               <Grid item xs={12}>
                 <Grid container spacing={1} alignItems="center" justify="center">
-                  <Grid item xs={12} sm={this.props.sidebar ? 12 : 'auto'}>
+                  <Grid item xs={12} sm={this.props.sidebar ? 12 : true}>
                     <Grid container spacing={1} alignItems="center">
                       <Grid item>
                         <Typography id="strobe-opacity-slider" variant="caption" component="div" color="textSecondary">
@@ -144,10 +151,10 @@ class AudioControl extends React.Component {
                         </Typography>
                       </Grid>
                       <Grid item xs>
-                      <Slider
-                        value={this.state.position}
-                        max={this.state.duration}
-                        onChange={this.onChangePosition.bind(this)}/>
+                        <Slider
+                          value={this.state.position}
+                          max={this.state.duration}
+                          onChange={this.onChangePosition.bind(this)}/>
                       </Grid>
                       <Grid item>
                         <Typography id="strobe-opacity-slider" variant="caption" component="div" color="textSecondary">
@@ -342,11 +349,6 @@ class AudioControl extends React.Component {
             </Grid>
           </Collapse>
         </Grid>
-        <Grid item xs={12} className={clsx(!this.props.scene.audioEnabled && classes.noPadding)}>
-          <Collapse in={this.props.scene.audioEnabled} className={classes.fullWidth}>
-            <Divider/>
-          </Collapse>
-        </Grid>
       </React.Fragment>
     );
   }
@@ -372,7 +374,7 @@ class AudioControl extends React.Component {
     if (this.props.audio.tick && this.props.audio.tickMode == TF.scene && props.scenePaths && props.scenePaths.length > 0 && props.scenePaths !== this.props.scenePaths) {
       this.setState({tick: !this.state.tick});
     }
-    if (this.props.audio.url != audio.url || this.props.detectBPM != props.detectBPM) {
+    if (this.props.audio.url != audio.url || this.props.isFirst != props.isFirst) {
       this.detectBPM();
     }
     this._audio=JSON.stringify(this.props.audio);
@@ -385,7 +387,7 @@ class AudioControl extends React.Component {
   }
 
   detectBPM() {
-    if (this.props.detectBPM) {
+    if (this.props.isFirst) {
       mm.parseFile(urlToPath(this.props.audio.url))
         .then((metadata: any) => {
           if (metadata && metadata.common && metadata.common.bpm) {

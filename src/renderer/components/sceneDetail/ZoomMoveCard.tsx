@@ -104,7 +104,7 @@ class ZoomMoveCard extends React.Component {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} sm={this.props.sidebar ? 12 : 'auto'}>
+            <Grid item xs={12} sm={this.props.sidebar ? 12 : true}>
               <Collapse in={this.props.scene.horizTransType != HTF.none} className={classes.fullWidth}>
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs>
@@ -151,7 +151,7 @@ class ZoomMoveCard extends React.Component {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} sm={this.props.sidebar ? 12 : 'auto'}>
+            <Grid item xs={12} sm={this.props.sidebar ? 12 : true}>
               <Collapse in={this.props.scene.vertTransType != VTF.none} className={classes.fullWidth}>
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs>
