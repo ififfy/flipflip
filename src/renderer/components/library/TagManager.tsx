@@ -224,39 +224,36 @@ class TagManager extends React.Component {
           </Dialog>
         </main>
 
-        <Fab
-          disabled={this.props.tags.length == 0}
-          className={classes.removeAllButton}
-          onClick={this.onRemoveAll.bind(this)}
-          size="small">
-          <DeleteSweepIcon className={classes.icon} />
-        </Fab>
-        <Dialog
-          open={this.state.openMenu == MO.removeAllAlert}
-          onClose={this.onCloseDialog.bind(this)}
-          aria-labelledby="remove-all-title"
-          aria-describedby="remove-all-description">
-          <DialogTitle id="remove-all-title">Delete Tags</DialogTitle>
-          <DialogContent>
-            <DialogContentText id="remove-all-description">
-              Are you sure you want to remove all Tags? This will untag all sources as well.
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
-              Cancel
-            </Button>
-            <Button onClick={this.onFinishRemoveAll.bind(this)} color="primary">
-              OK
-            </Button>
-          </DialogActions>
-        </Dialog>
-        <Fab
-          className={classes.addMenuButton}
-          onClick={this.onAddTag.bind(this)}
-          size="large">
-          <AddIcon className={classes.icon} />
-        </Fab>
+        {this.props.tags.length > 0 && (
+          <React.Fragment>
+            <Fab
+              className={classes.removeAllButton}
+              onClick={this.onRemoveAll.bind(this)}
+              size="small">
+              <DeleteSweepIcon className={classes.icon} />
+            </Fab>
+            <Dialog
+              open={this.state.openMenu == MO.removeAllAlert}
+              onClose={this.onCloseDialog.bind(this)}
+              aria-labelledby="remove-all-title"
+              aria-describedby="remove-all-description">
+              <DialogTitle id="remove-all-title">Delete Tags</DialogTitle>
+              <DialogContent>
+                <DialogContentText id="remove-all-description">
+                  Are you sure you want to remove all Tags? This will untag all sources as well.
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+                  Cancel
+                </Button>
+                <Button onClick={this.onFinishRemoveAll.bind(this)} color="primary">
+                  OK
+                </Button>
+              </DialogActions>
+            </Dialog>
+          </React.Fragment>
+        )}
 
         {this.props.tags.length >= 2 && (
           <React.Fragment>
@@ -302,6 +299,13 @@ class TagManager extends React.Component {
             </Menu>
           </React.Fragment>
         )}
+
+        <Fab
+          className={classes.addMenuButton}
+          onClick={this.onAddTag.bind(this)}
+          size="large">
+          <AddIcon className={classes.icon} />
+        </Fab>
       </div>
     );
   }
@@ -355,7 +359,6 @@ class TagManager extends React.Component {
   }
 
   onEditTag(tag: Tag) {
-    console.log(tag);
     this.setState({isEditing: tag.id, tagName: tag.name, tagPhrase: tag.phraseString});
   }
 

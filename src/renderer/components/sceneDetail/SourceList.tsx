@@ -7,7 +7,7 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import {FixedSizeList} from "react-window";
 
 import {
-  Badge, Box, Button, Checkbox, Chip, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, Fab,
+  Badge, Button, Checkbox, Chip, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, Fab,
   IconButton, Link, List, ListItem, ListItemAvatar, ListItemSecondaryAction, ListItemText, SvgIcon, TextField, Theme,
   Typography, withStyles
 } from "@material-ui/core";

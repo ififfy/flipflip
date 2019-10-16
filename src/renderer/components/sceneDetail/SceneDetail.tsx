@@ -2,16 +2,18 @@ import * as React from "react";
 import clsx from "clsx";
 
 import {
-  AppBar, Backdrop, Box, Button, Collapse, Container, createStyles, Dialog, DialogActions, DialogContent,
+  AppBar, Backdrop, Badge, Box, Button, Collapse, Container, createStyles, Dialog, DialogActions, DialogContent,
   DialogContentText, DialogTitle, Divider, Drawer, Fab, IconButton, ListItem, ListItemIcon, ListItemSecondaryAction,
   ListItemText, Menu, MenuItem, Tab, Tabs, TextField, Theme, Toolbar, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
 import AddIcon from '@material-ui/icons/Add';
+import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import BuildIcon from '@material-ui/icons/Build';
+import CachedIcon from '@material-ui/icons/Cached';
 import CollectionsIcon from '@material-ui/icons/Collections';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
@@ -27,12 +29,13 @@ import PublishIcon from '@material-ui/icons/Publish';
 import SaveIcon from '@material-ui/icons/Save';
 import SortIcon from '@material-ui/icons/Sort';
 
-import {AF, MO, OF, SF, WF} from "../../data/const";
+import {AF, MO, OF, SF, TT, WF} from "../../data/const";
 import en from "../../data/en";
 import Config from "../../data/Config";
 import Scene from "../../data/Scene";
 import LibrarySource from "../library/LibrarySource";
 import Tag from "../library/Tag";
+import WeightGroup from "../library/WeightGroup";
 import SceneEffects from "./SceneEffects";
 import SceneGenerator from "./SceneGenerator";
 import SceneOptions from "./SceneOptions";
@@ -172,6 +175,25 @@ const styles = (theme: Theme) => createStyles({
   deleteItem: {
     color: theme.palette.error.main,
   },
+  removeAllWGButton: {
+    backgroundColor: theme.palette.error.main,
+    margin: 0,
+    top: 'auto',
+    right: 135,
+    bottom: 20,
+    left: 'auto',
+    position: 'fixed',
+  },
+  generateTooltip: {
+    top: 'auto',
+    right: 20,
+    bottom: 20,
+    left: 'auto',
+    position: 'fixed',
+    borderRadius: '50%',
+    width: theme.spacing(7),
+    height: theme.spacing(7),
+  },
   addMenuButton: {
     backgroundColor: theme.palette.primary.dark,
     margin: 0,
@@ -183,6 +205,7 @@ const styles = (theme: Theme) => createStyles({
   },
   sortMenuButton: {
     backgroundColor: theme.palette.secondary.dark,
+    color: theme.palette.secondary.contrastText,
     margin: 0,
     top: 'auto',
     right: 80,
@@ -229,8 +252,16 @@ const styles = (theme: Theme) => createStyles({
   icon: {
     color: theme.palette.primary.contrastText,
   },
+  maxMenu: {
+    paddingLeft: theme.spacing(1),
+    paddingRight: theme.spacing(2),
+    width: 100,
+  },
   sortMenu: {
     width: 200,
+  },
+  tagMenu: {
+    maxHeight: 400,
   },
   fill: {
     flexGrow: 1,
@@ -260,6 +291,7 @@ class SceneDetail extends React.Component {
     onClip(source: LibrarySource): void,
     onDelete(scene: Scene): void,
     onExport(scene: Scene): void,
+    onGenerate(scene: Scene): void,
     onPlayScene(scene: Scene): void,
     onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void,
     onSaveAsScene(scene: Scene): void,
@@ -272,7 +304,7 @@ class SceneDetail extends React.Component {
     drawerOpen: false,
     menuAnchorEl: null as any,
     openMenu: null as string,
-    openTab: this.props.scene.tagWeights || this.props.scene.sceneWeights ? 3 : 2,
+    openTab: this.props.scene.generatorWeights ? 3 : 2,
   };
 
   readonly nameInputRef: React.RefObject<HTMLInputElement> = React.createRef();
@@ -367,7 +399,7 @@ class SceneDetail extends React.Component {
                    aria-controls="vertical-tabpanel-2"
                    icon={<CollectionsIcon/>} label={open ? `Sources (${this.props.scene.sources.length})` : ""}
                    className={clsx(classes.tab, classes.sourcesTab, !open && classes.tabClose)}/>
-              {(this.props.scene.tagWeights || this.props.scene.sceneWeights) && (
+              {this.props.scene.generatorWeights && (
                 <Tab id="vertical-tab-3"
                      aria-controls="vertical-tabpanel-3"
                      icon={<LocalOfferIcon/>} label={open ? "Generate" : ""}
@@ -378,7 +410,7 @@ class SceneDetail extends React.Component {
           <div className={classes.fill}/>
 
           <div>
-            {(this.props.scene.tagWeights || this.props.scene.sceneWeights) && (
+            {this.props.scene.generatorWeights && (
               <ListItem button onClick={this.props.onSaveAsScene.bind(this, this.props.scene)}>
                 <ListItemIcon>
                   <SaveIcon />
@@ -487,7 +519,7 @@ class SceneDetail extends React.Component {
               </Typography>
             )}
 
-            {(this.props.scene.tagWeights || this.props.scene.sceneWeights) && this.state.openTab === 3 && (
+            {this.props.scene.generatorWeights && this.state.openTab === 3 && (
               <Typography
                 className={clsx(this.state.openTab === 3 && classes.generateSection)}
                 component="div"
@@ -497,9 +529,10 @@ class SceneDetail extends React.Component {
                 aria-labelledby="vertical-tab-3">
                 <div className={classes.tabPanel}>
                   <div className={classes.drawerSpacer}/>
-                  <Box className={classes.fill}>
+                  <Box p={1} className={classes.fill}>
                     <SceneGenerator
                       scene={this.props.scene}
+                      tags={this.props.tags}
                       onUpdateScene={this.props.onUpdateScene.bind(this)} />
                   </Box>
                 </div>
@@ -509,22 +542,23 @@ class SceneDetail extends React.Component {
           </Container>
         </main>
 
+        <Backdrop
+          className={classes.backdrop}
+          onClick={this.onCloseDialog.bind(this)}
+          open={this.state.openMenu == MO.new || this.state.drawerOpen} />
+
         {this.state.openTab == 2 && (
           <React.Fragment>
-            <Backdrop
-              className={classes.backdrop}
-              onClick={this.onCloseDialog.bind(this)}
-              open={this.state.openMenu == MO.new || this.state.drawerOpen} />
-
-            <Tooltip title="Remove All Sources"  placement="left">
-              <Fab
-                disabled={this.props.scene.sources.length == 0}
-                className={clsx(classes.addButton, classes.removeAllButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop)}
-                onClick={this.onRemoveAll.bind(this)}
-                size="small">
-                <DeleteSweepIcon className={classes.icon} />
-              </Fab>
-            </Tooltip>
+            {this.props.scene.sources.length > 0 && (
+              <Tooltip title="Remove All Sources"  placement="left">
+                <Fab
+                  className={clsx(classes.addButton, classes.removeAllButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop)}
+                  onClick={this.onRemoveAll.bind(this)}
+                  size="small">
+                  <DeleteSweepIcon className={classes.icon} />
+                </Fab>
+              </Tooltip>
+            )}
             <Dialog
               open={this.state.openMenu == MO.removeAllAlert}
               onClose={this.onCloseDialog.bind(this)}
@@ -634,7 +668,131 @@ class SceneDetail extends React.Component {
               </React.Fragment>
             )}
           </React.Fragment>
-          )}
+        )}
+
+        {this.state.openTab == 3 && (
+          <React.Fragment>
+            {this.props.scene.generatorWeights.length > 0 && (
+              <React.Fragment>
+                <Fab
+                  className={classes.removeAllWGButton}
+                  onClick={this.onRemoveAll.bind(this)}
+                  size="small">
+                  <DeleteSweepIcon className={classes.icon} />
+                </Fab>
+                <Dialog
+                  open={this.state.openMenu == MO.removeAllAlert}
+                  onClose={this.onCloseDialog.bind(this)}
+                  aria-labelledby="remove-all-title"
+                  aria-describedby="remove-all-description">
+                  <DialogTitle id="remove-all-title">Delete Rules</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText id="remove-all-description">
+                      Are you sure you want to remove all rules?
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+                      Cancel
+                    </Button>
+                    <Button onClick={this.onFinishRemoveAllRules.bind(this)} color="primary">
+                      OK
+                    </Button>
+                  </DialogActions>
+                </Dialog>
+              </React.Fragment>
+            )}
+            <Fab
+              className={classes.sortMenuButton}
+              onClick={this.onOpenMaxMenu.bind(this)}
+              size="medium">
+              {this.props.scene.generatorMax}
+            </Fab>
+            <Menu
+              id="max-menu"
+              elevation={1}
+              anchorOrigin={{
+                vertical: 'center',
+                horizontal: 'center',
+              }}
+              transformOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+              getContentAnchorEl={null}
+              anchorEl={this.state.menuAnchorEl}
+              keepMounted
+              classes={{paper: classes.maxMenu}}
+              open={this.state.openMenu == MO.max}
+              onClose={this.onCloseDialog.bind(this)}>
+              <TextField
+                label="Max"
+                margin="dense"
+                value={this.props.scene.generatorMax}
+                onChange={this.onIntInput.bind(this, 'generatorMax')}
+                onBlur={this.blurIntKey.bind(this, 'generatorMax')}
+                inputProps={{
+                  min: 1,
+                  type: 'number',
+                }}/>
+            </Menu>
+            <Tooltip title="Adv Rule"  placement="left">
+              <Fab
+                className={clsx(classes.addButton, classes.addDirectoryButton)}
+                onClick={this.onAddAdvWG.bind(this)}
+                size="small">
+                <AddCircleOutlineIcon className={classes.icon} />
+              </Fab>
+            </Tooltip>
+            <Tooltip title="Simple Rule"  placement="left">
+              <Fab
+                className={clsx(classes.addButton, classes.addURLButton)}
+                onClick={this.onOpenTagMenu.bind(this)}
+                size="small">
+                <AddIcon className={classes.icon} />
+              </Fab>
+            </Tooltip>
+            <Tooltip title="Generate Sources" placement="top-end">
+              <span className={classes.generateTooltip} style={!this.areWeightsValid() ? { pointerEvents: "none" } : {}}>
+                <Fab
+                  disabled={!this.areWeightsValid()}
+                  className={classes.addMenuButton}
+                  onClick={this.onGenerate.bind(this)}
+                  size="large">
+                  <Badge
+                    color="secondary"
+                    max={100}
+                    invisible={this.areWeightsValid()}
+                    badgeContent={this.getRemainingPercent()}>
+                    <CachedIcon className={classes.icon} />
+                  </Badge>
+                </Fab>
+              </span>
+            </Tooltip>
+            <Menu
+              elevation={1}
+              anchorOrigin={{
+                vertical: 'center',
+                horizontal: 'center',
+              }}
+              transformOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+              getContentAnchorEl={null}
+              anchorEl={this.state.menuAnchorEl}
+              keepMounted
+              classes={{paper: classes.tagMenu}}
+              open={this.state.openMenu == MO.simpleRule}
+              onClose={this.onCloseDialog.bind(this)}>
+              {this.props.tags.filter((t) => !this.props.scene.generatorWeights.map((wg) => wg.tag ? wg.tag.name : "").includes(t.name)).map((t) =>
+                <MenuItem key={t.id} onClick={this.onAddSimpleWG.bind(this, t)}>
+                  <ListItemText primary={t.name}/>
+                </MenuItem>
+              )}
+            </Menu>
+          </React.Fragment>
+        )}
       </div>
     )
   }
@@ -645,6 +803,91 @@ class SceneDetail extends React.Component {
     if (!e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'p' || e.key == 'π')) {
       this.setState({openMenu: this.state.openMenu == MO.urlImport ? null : MO.urlImport});
     }
+  }
+
+  onOpenMaxMenu(e: MouseEvent) {
+    this.setState({menuAnchorEl: e.currentTarget, openMenu: MO.max});
+  }
+
+  getRemainingPercent(): number {
+    let remaining = 100;
+    for (let wg of this.props.scene.generatorWeights) {
+      if (wg.type == TT.weight) {
+        remaining = remaining - wg.percent;
+      }
+    }
+    return remaining;
+  }
+
+  areRulesValid(wg: WeightGroup) {
+    let rulesHasAll = false;
+    let rulesHasWeight = false;
+    let rulesRemaining = 100;
+    for (let rule of wg.rules) {
+      if (rule.type == TT.weight) {
+        rulesRemaining = rulesRemaining - rule.percent;
+        rulesHasWeight = true;
+      }
+      if (rule.type == TT.all) {
+        rulesHasAll = true;
+      }
+    }
+    return (rulesRemaining == 100 && rulesHasAll && !rulesHasWeight) || rulesRemaining == 0;
+  }
+
+  areWeightsValid(): boolean {
+    let remaining = 100;
+    let hasAll = false;
+    let hasWeight = false;
+    for (let wg of this.props.scene.generatorWeights) {
+      if (wg.rules) {
+        const rulesValid = this.areRulesValid(wg);
+        if (!rulesValid) return false;
+      }
+      if (wg.type == TT.weight) {
+        remaining = remaining - wg.percent;
+        hasWeight = true;
+      }
+      if (wg.type == TT.all) {
+        hasAll = true;
+      }
+    }
+
+    return (remaining == 100 && hasAll && !hasWeight) || remaining == 0;
+  }
+
+  onGenerate() {
+    this.props.onGenerate(this.props.scene);
+    // TODO If no sources, show snackbar
+    this.setState({openTab: 2});
+  }
+
+  onAddAdvWG() {
+    const wg = new WeightGroup();
+    wg.name = "Empty Adv Rule";
+    wg.percent = 0;
+    wg.type = TT.weight;
+    wg.rules = [];
+    const generatorWeights = this.props.scene.generatorWeights.concat([wg]);
+    this.changeKey('generatorWeights', generatorWeights);
+  }
+
+  onAddSimpleWG(tag: Tag) {
+    const wg = new WeightGroup();
+    wg.name = tag.name;
+    wg.percent = 0;
+    wg.type = TT.weight;
+    wg.tag = tag;
+    const generatorWeights = this.props.scene.generatorWeights.concat([wg]);
+    this.changeKey('generatorWeights', generatorWeights);
+  }
+
+  onFinishRemoveAllRules() {
+    this.changeKey('generatorWeights', []);
+  }
+
+  onOpenTagMenu(e: MouseEvent) {
+    this.setState({menuAnchorEl: e.currentTarget, openMenu: MO.simpleRule});
   }
 
   onAddSource(addFunction: string, ...args: any[]) {
@@ -672,6 +915,29 @@ class SceneDetail extends React.Component {
     this.setState({openTab: newTab});
   }
 
+  blurIntKey(key: string, e: MouseEvent) {
+    const min = (e.currentTarget as any).min ? (e.currentTarget as any).min : null;
+    const max = (e.currentTarget as any).max ? (e.currentTarget as any).max : null;
+    if (min && (this.props.scene as any)[key] < min) {
+      this.changeIntKey(key, min);
+    } else if (max && (this.props.scene as any)[key] > max) {
+      this.changeIntKey(key, max);
+    }
+  }
+
+  changeIntKey(key:string, intString: string) {
+    this.changeKey(key, intString === '' ? '' : Number(intString));
+  }
+
+  onIntInput(key: string, e: MouseEvent) {
+    const input = (e.target as HTMLInputElement);
+    this.changeKey(key, input.value === '' ? '' : Number(input.value));
+  }
+
+  changeKey(key: string, value: any) {
+    this.update((s) => s[key] = value);
+  }
+
   update(fn: (scene: any) => void) {
     this.props.onUpdateScene(this.props.scene, fn);
   }
@@ -686,7 +952,7 @@ class SceneDetail extends React.Component {
   }
 
   onChangeName(e: React.FormEvent<HTMLInputElement>) {
-    this.update((s) => { s.name = e.currentTarget.value; });
+    this.changeKey('name', e.currentTarget.value);
   }
 
   onUpdateSources(sources: Array<LibrarySource>) {

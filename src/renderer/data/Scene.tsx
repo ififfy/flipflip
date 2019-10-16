@@ -1,7 +1,8 @@
-import {BT, GO, HTF, IF, OF, SL, TF, VO, VTF, WF} from './const';
+import {BT, GO, HTF, IF, OF, SL, TF, TT, VO, VTF, WF} from './const';
 import LibrarySource from "../components/library/LibrarySource";
 import Audio from "../components/library/Audio";
 import Overlay from "../components/library/Overlay";
+import WeightGroup from "../components/library/WeightGroup";
 
 export default class Scene {
   id: number = 0;
@@ -93,8 +94,7 @@ export default class Scene {
   audios: Array<Audio> = [];
   fillView = false;
   bpm = 0;
-  tagWeights?: string;
-  sceneWeights?: string;
+  generatorWeights?: Array<WeightGroup> = null;
 
   // unused; migration only
   effectLevel = 0;
@@ -108,6 +108,8 @@ export default class Scene {
   playFullVideo = false;
   gridView = false;
   grid: Array<Array<number>> = null;
+  tagWeights?: string;
+  sceneWeights?: string;
 
   constructor(init?: Partial<Scene>) {
     Object.assign(this, init);

@@ -1098,7 +1098,7 @@ class Player extends React.Component {
 
   onMouseLeaveTagDrawer() {
     clearTimeout(this._tagDrawerTimeout);
-    this._tagDrawerTimeout = setTimeout(this.closeTagDrawer.bind(this), 1000);
+    this._tagDrawerTimeout = setTimeout(this.closeTagDrawer.bind(this), 500);
   }
   onKeyDown = (e: KeyboardEvent) => {
     const focus = document.activeElement.tagName.toLocaleLowerCase();

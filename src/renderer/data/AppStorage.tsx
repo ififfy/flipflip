@@ -7,6 +7,8 @@ import Config from "./Config";
 import Scene from './Scene';
 import LibrarySource from '../components/library/LibrarySource';
 import Tag from "../components/library/Tag";
+import {TT} from "./const";
+import WeightGroup from "../components/library/WeightGroup";
 
 /**
  * A compile-time global variable defined in webpack.config' [plugins]
@@ -155,6 +157,130 @@ export default class AppStorage {
             if (r.kind == 'generate' || r.kind == 'grid') {
               this.initialState.route = [];
               break;
+            }
+          }
+
+          // Port to new generator format
+          for (let scene of this.initialState.scenes) {
+            // If this is a generator scene
+            if (scene.tagWeights || scene.sceneWeights) {
+              scene.generatorWeights = [];
+              // Get weights for this scene
+              const tagWeights = new Map<Tag, { type: string, value: number }>(JSON.parse(scene.tagWeights));
+              let sceneWeights = new Map<number, { type: string, value: number }>();
+              if (scene.sceneWeights != null) {
+                sceneWeights = new Map<number, { type: string, value: number }>(JSON.parse(scene.sceneWeights));
+              }
+              const weights = Array.from(tagWeights.values()).concat(Array.from(sceneWeights.values()));
+              const sum = weights.length > 0 ? weights.map((w) => w.value).reduce((total, value) => Number(total) + Number(value)) : 0;
+
+              // For each tag weight
+              for (let tag of tagWeights.keys()) {
+                const weight = tagWeights.get(tag);
+                // If this is relevant
+                if (weight.type != TT.weight || weight.value > 0) {
+                  // Add as weight group
+                  const wg = new WeightGroup();
+                  // Convert weight to percentage
+                  if (weight.value > 0) {
+                    wg.percent = Math.round((weight.value / sum) * 100);
+                  } else {
+                    wg.percent = 0;
+                  }
+                  wg.type = weight.type;
+                  wg.tag = tag;
+                  wg.name = tag.name;
+
+                  scene.generatorWeights.push(wg);
+                }
+              }
+
+              // For each scene weight
+              for (let sceneID of sceneWeights.keys()) {
+                const weight = sceneWeights.get(sceneID);
+                // If this is relevant
+                if (weight.value > 0) {
+                  const wg = new WeightGroup();
+                  wg.percent = Math.round((weight.value / sum) * 100);
+                  wg.type = TT.weight;
+
+                  // Build a set of rules from this scene's weights
+                  const tagScene = this.initialState.scenes.find((s: Scene) => s.id == sceneID);
+                  if (tagScene.tagWeights) {
+                    const tagWeights = new Map<Tag, { type: string, value: number }>(JSON.parse(tagScene.tagWeights));
+                    const weights = Array.from(tagWeights.values());
+                    const swSum = weights.length > 0 ? weights.map((w) => w.value).reduce((total, value) => Number(total) + Number(value)) : 0;
+                    const rules = new Array<WeightGroup>();
+                    let name = "";
+
+                    // For each tag weight
+                    for (let tag of tagWeights.keys()) {
+                      const weight = tagWeights.get(tag);
+                      // If this is relevant
+                      if (weight.type != TT.weight || weight.value > 0) {
+                        // Add as weight group
+                        const rule = new WeightGroup();
+                        if (weight.value > 0) {
+                          rule.percent = Math.round((weight.value / swSum) * 100);
+                        } else {
+                          rule.percent = 0;
+                        }
+                        rule.type = weight.type;
+                        rule.tag = tag;
+                        rule.name = tag.name;
+                        rules.push(rule);
+                        const comma = name != "";
+                        if (comma) name = name + ", ";
+                        switch (weight.type) {
+                          case TT.weight:
+                            name = name + rule.percent + "% " + rule.name;
+                            break;
+                          case TT.all:
+                            name = name + "Y " + rule.name;
+                            break;
+                          case TT.none:
+                            name = name + "N " + rule.name;
+                            break;
+                        }
+                      }
+                    }
+
+                    // Ensure weights are valid
+                    let remaining = 100;
+                    for (let rule of rules) {
+                      if (rule.type == TT.weight) {
+                        remaining = remaining - rule.percent;
+                      }
+                    }
+                    if (remaining != 0 && remaining != 100) {
+                      rules[0].percent = rules[0].percent + remaining;
+                    }
+
+                    // Add rules
+                    wg.rules = rules;
+                    wg.name = name;
+                    scene.generatorWeights.push(wg);
+                  }
+                }
+              }
+
+              // Ensure weights are valid
+              let remaining = 100;
+              for (let wg of scene.generatorWeights) {
+                if (wg.type == TT.weight) {
+                  remaining = remaining - wg.percent;
+                }
+              }
+              if (remaining != 0 && remaining != 100) {
+                for (let wg of scene.generatorWeights) {
+                  if (wg.type == TT.weight) {
+                    wg.percent = wg.percent + remaining;
+                    break;
+                  }
+                }
+              }
+
+              // TODO Clear tagWeights && sceneWeights
             }
           }
           break;

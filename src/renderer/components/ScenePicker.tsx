@@ -209,6 +209,16 @@ const styles = (theme: Theme) => createStyles({
     left: 'auto',
     position: 'fixed',
   },
+  generateTooltip: {
+    top: 'auto',
+    right: 28,
+    bottom: 140,
+    left: 'auto',
+    position: 'fixed',
+    borderRadius: '50%',
+    width: theme.spacing(5),
+    height: theme.spacing(5),
+  },
   addButton: {
     backgroundColor: theme.palette.primary.main,
     margin: 0,
@@ -435,7 +445,7 @@ class ScenePicker extends React.Component {
               }}>
               {this.props.scenes.map((scene) =>
                 <Jiggle key={scene.id} bounce={true}>
-                  <Card className={clsx(classes.scene, (scene.tagWeights || scene.sceneWeights) && classes.generator)}>
+                  <Card className={clsx(classes.scene, scene.generatorWeights && classes.generator)}>
                     <CardActionArea onClick={this.props.onOpenScene.bind(this, scene)}>
                       <CardContent>
                         <Typography component="h2" variant="h6">
@@ -461,13 +471,15 @@ class ScenePicker extends React.Component {
               </Fab>
             </Tooltip>
             <Tooltip title="Add Scene Generator"  placement="left">
-              <Fab
-                className={clsx(classes.addButton, classes.addGeneratorButton, this.state.openMenu != MO.new && classes.addButtonClose)}
-                onClick={this.props.onAddGenerator.bind(this)}
-                disabled={!this.props.canGenerate}
-                size="small">
-                <AddCircleOutlineIcon className={classes.icon} />
-              </Fab>
+              <span className={classes.generateTooltip} style={!this.props.canGenerate ? { pointerEvents: "none" } : {}}>
+                <Fab
+                  className={clsx(classes.addButton, classes.addGeneratorButton, this.state.openMenu != MO.new && classes.addButtonClose)}
+                  onClick={this.props.onAddGenerator.bind(this)}
+                  disabled={!this.props.canGenerate}
+                  size="small">
+                  <AddCircleOutlineIcon className={classes.icon} />
+                </Fab>
+              </span>
             </Tooltip>
             <Tooltip title="Add Scene"  placement="left">
               <Fab

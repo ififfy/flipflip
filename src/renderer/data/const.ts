@@ -124,6 +124,8 @@ const MO = { // Menu/Modal Constants
   newWindowAlert: 'mo.nwalert',
   removeAllAlert: 'mo.raalert',
   deleteAlert: 'mo.dalert',
+  simpleRule: 'mo.srule',
+  max: 'mo.max',
 };
 
 const PR = { // Global progress functions

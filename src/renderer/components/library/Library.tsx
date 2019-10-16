@@ -681,15 +681,17 @@ class Library extends React.Component {
 
         {!this.props.isSelect && !this.props.isBatchTag && (
           <React.Fragment>
-            <Tooltip title="Remove All Sources"  placement="left">
-              <Fab
-                className={clsx(classes.addButton, classes.removeAllButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
-                disabled={this.props.library.length == 0 || this.state.filters.length > 0}
-                onClick={this.onRemoveAll.bind(this)}
-                size="small">
-                <DeleteSweepIcon className={classes.icon} />
-              </Fab>
-            </Tooltip>
+            {this.props.library.length > 0 && this.state.filters.length == 0 && (
+              <Tooltip title="Remove All Sources"  placement="left">
+                <Fab
+                  className={clsx(classes.addButton, classes.removeAllButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
+                  disabled={this.props.library.length == 0 || this.state.filters.length > 0}
+                  onClick={this.onRemoveAll.bind(this)}
+                  size="small">
+                  <DeleteSweepIcon className={classes.icon} />
+                </Fab>
+              </Tooltip>
+            )}
             <Dialog
               open={this.state.openMenu == MO.removeAllAlert}
               onClose={this.onCloseDialog.bind(this)}

@@ -10,8 +10,17 @@ import Snoowrap from "snoowrap";
 import Twitter from "twitter";
 import {IgApiClient} from "instagram-private-api";
 
-import {getBackups, getCachePath, getFileGroup, getFileName, getSourceType, isVideo, saveDir} from "./utils";
-import {AF, GT, PR, SF, ST} from "./const";
+import {
+  getBackups,
+  getCachePath,
+  getFileGroup,
+  getFileName,
+  getRandomIndex,
+  getSourceType,
+  isVideo,
+  saveDir
+} from "./utils";
+import {AF, GT, PR, SF, ST, TT} from "./const";
 import { defaultInitialState } from './AppStorage';
 import { Route } from "./Route";
 import Scene from "./Scene";
@@ -212,8 +221,7 @@ export function saveScene(state: State, scene: Scene): Object {
     id = Math.max(s.id + 1, id);
   });
   const sceneCopy = JSON.parse(JSON.stringify(scene)); // Make a copy
-  sceneCopy.tagWeights = null;
-  sceneCopy.sceneWeights = null;
+  sceneCopy.generatorWeights = null;
   sceneCopy.id = id;
   return {
     scenes: state.scenes.concat([sceneCopy]),
@@ -446,8 +454,7 @@ export function addGenerator(state: State): Object {
     id: id,
     name: "New generator",
     sources: new Array<LibrarySource>(),
-    tagWeights: "[]",
-    sceneWeights: "[]",
+    generatorWeights: [],
     ...state.config.defaultScene,
   });
   return {
@@ -455,6 +462,158 @@ export function addGenerator(state: State): Object {
     route: [new Route({kind: 'scene', value: scene.id})],
     autoEdit: true
   };
+}
+
+function reduceList(sources: Array<LibrarySource>, limit: number): Array<LibrarySource> {
+  while (sources.length > limit) {
+    sources.splice(getRandomIndex(sources), 1);
+  }
+  return sources;
+}
+
+export function generateScene(state: State, scene: Scene): Object {
+  const newScene = state.scenes.find((s) => s.id == scene.id);
+
+  // Record all the groups we're requiring/excluding
+  const allTags = newScene.generatorWeights.filter((wg) => wg.type == TT.all && !wg.rules).map((wg) => wg.tag);
+  const noneTags = newScene.generatorWeights.filter((wg) => wg.type == TT.none && !wg.rules).map((wg) => wg.tag);
+  let reqAdvSources: Array<LibrarySource> = null;
+  let excAdvSources: Array<LibrarySource> = null;
+
+  // Build list of sources
+  let genSources = new Array<LibrarySource>();
+
+  // First, build all our adv rules
+  for (let wg of newScene.generatorWeights) {
+    if (wg.rules) {
+      // Build this adv rule like a regular set of simple rules
+      // First get tags to require/exclude
+      const allTags = wg.rules.filter((wg) => wg.type == TT.all).map((wg) => wg.tag);
+      const noneTags = wg.rules.filter((wg) => wg.type == TT.none).map((wg) => wg.tag);
+
+      let rulesSources = new Array<LibrarySource>();
+      // If we don't have any weights, calculate by just require/exclude
+      if (allTags.length + noneTags.length == wg.rules.length) {
+        const sources = state.library.filter((s) => {
+          for (let at of allTags) {
+            if (!s.tags.find((t) => t.id == at.id)) {
+              return false;
+            }
+          }
+          for (let nt of noneTags) {
+            if (s.tags.find((t) => t.id == nt.id)) {
+              return false;
+            }
+          }
+          return true;
+        });
+        rulesSources = reduceList(sources, Math.round(newScene.generatorMax));
+      } else {
+        // Otherwise, generate sources for each weighted rule
+        for (let rule of wg.rules) {
+          if (rule.type == TT.weight) {
+            const sources = state.library.filter((s) => {
+              if (!s.tags.find((t) => t.id == rule.tag.id)) {
+                return false;
+              }
+              for (let at of allTags) {
+                if (!s.tags.find((t) => t.id == at.id)) {
+                  return false;
+                }
+              }
+              for (let nt of noneTags) {
+                if (s.tags.find((t) => t.id == nt.id)) {
+                  return false;
+                }
+              }
+              return true;
+            });
+            rulesSources = rulesSources.concat(reduceList(sources, Math.round(newScene.generatorMax * (rule.percent / 100))));
+          }
+        }
+      }
+      switch (wg.type) {
+        // If this adv rule is weighted, add the percentage of sources to the master list
+        case TT.weight:
+          genSources = genSources.concat(reduceList(rulesSources, Math.round(newScene.generatorMax * (wg.percent / 100))));
+          break;
+        // If this adv rule is all, add the sources to the require list
+        case TT.all:
+          if (!reqAdvSources) {
+            reqAdvSources = rulesSources;
+          } else {
+            reqAdvSources = reqAdvSources.filter((s) => !!rulesSources.find((source) => source.url == s.url));
+          }
+          break;
+        // If this adv rule is none, add the sources to the excl list
+        case TT.none:
+          if (!excAdvSources) {
+            excAdvSources = rulesSources;
+          } else {
+            excAdvSources = excAdvSources.concat(rulesSources);
+          }
+          break;
+      }
+    }
+  }
+
+  // Now, build our simple rules
+  // If we don't have any weights, calculate by just require/exclude
+  if (allTags.length + noneTags.length == newScene.generatorWeights.length) {
+    const sources = state.library.filter((s) => {
+      if (reqAdvSources && !reqAdvSources.find((source) => source.id == s.id)) {
+        return false;
+      }
+      if (excAdvSources && !excAdvSources.find((source) => source.id == s.id)) {
+        return false;
+      }
+
+      for (let at of allTags) {
+        if (!s.tags.find((t) => t.id == at.id)) {
+          return false;
+        }
+      }
+      for (let nt of noneTags) {
+        if (s.tags.find((t) => t.id == nt.id)) {
+          return false;
+        }
+      }
+      return true;
+    });
+    genSources = reduceList(sources, Math.round(newScene.generatorMax));
+  } else {
+    // Otherwise, generate sources for each weight
+    for (let wg of newScene.generatorWeights) {
+      if (wg.rules) continue;
+      if (wg.type == TT.weight) {
+        const sources = state.library.filter((s) => {
+          if (!s.tags.find((t) => t.id == wg.tag.id)) {
+            return false;
+          }
+          if (reqAdvSources && !reqAdvSources.find((source) => source.id == s.id)) {
+            return false;
+          }
+          if (excAdvSources && !excAdvSources.find((source) => source.id == s.id)) {
+            return false;
+          }
+
+          for (let at of allTags) {
+            if (!s.tags.find((t) => t.id == at.id)) {
+              return false;
+            }
+          }
+          for (let nt of noneTags) {
+            if (s.tags.find((t) => t.id == nt.id)) {
+              return false;
+            }
+          }
+          return true;
+        });
+        genSources = genSources.concat(reduceList(sources, Math.round(newScene.generatorMax * (wg.percent / 100))));
+      }
+    }
+  }
+  return updateScene(state, scene, (s) => s.sources = genSources);
 }
 
 export function updateScene(state: State, scene: Scene, fn: (scene: Scene) => void): Object {
@@ -742,7 +901,7 @@ export function sortScene(state: State, algorithm: string, ascending: boolean): 
     return a.sources.length;
   };
   const getType = (a: Scene) => {
-    if (a.tagWeights || a.sceneWeights) {
+    if (a.generatorWeights) {
       return "1";
     }
     return "0";
@@ -844,8 +1003,7 @@ function sortFunction(algorithm: string, ascending: boolean, getName: (a: any) =
 export function exportScene(state: State, scene: Scene): Object {
   const scenesToExport = Array<Scene>();
   const sceneCopy = JSON.parse(JSON.stringify(scene)); // Make a copy
-  sceneCopy.tagWeights = null;
-  sceneCopy.sceneWeights = null;
+  sceneCopy.generatorWeights = null;
   sceneCopy.overlays = sceneCopy.overlays.filter((o: Overlay) => o.sceneID != 0);
   scenesToExport.push(sceneCopy);
 
@@ -857,8 +1015,7 @@ export function exportScene(state: State, scene: Scene): Object {
         const grid = state.scenes.find((s) => s.id == g);
         if (grid && !scenesToExport.find((s) => s.id == g)) {
           const gridCopy = JSON.parse(JSON.stringify(grid)); // Make a copy
-          gridCopy.tagWeights = null;
-          gridCopy.sceneWeights = null;
+          gridCopy.generatorWeights = null;
           gridCopy.overlays = [];
           gridCopy.grid = [[]];
           scenesToExport.push(gridCopy);
@@ -872,8 +1029,7 @@ export function exportScene(state: State, scene: Scene): Object {
       const overlay = state.scenes.find((s) => s.id == o.sceneID);
       if (overlay && !scenesToExport.find((s) => s.id == o.sceneID)) {
         const overlayCopy = JSON.parse(JSON.stringify(overlay)); // Make a copy
-        overlayCopy.tagWeights = null;
-        overlayCopy.sceneWeights = null;
+        overlayCopy.generatorWeights = null;
         overlayCopy.overlays = [];
         overlayCopy.grid = [[]];
         scenesToExport.push(overlayCopy);

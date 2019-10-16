@@ -442,7 +442,6 @@ class AudioControl extends React.Component {
   }
 
   onChangePosition(e: MouseEvent, value: number) {
-    console.log(value);
     this.setState({position: value});
   }
 

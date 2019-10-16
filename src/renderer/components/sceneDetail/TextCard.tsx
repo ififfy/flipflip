@@ -333,7 +333,6 @@ class TextCard extends React.Component {
     this.changeKey(key, intString === '' ? '' : Number(intString));
   }
 
-
   changeKey(key: string, value: any) {
     this.update((s) => s[key] = value);
   }
