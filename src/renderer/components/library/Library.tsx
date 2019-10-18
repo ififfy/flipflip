@@ -859,7 +859,7 @@ class Library extends React.Component {
     }
   }
 
-  onAddSource(addFunction: string, ...args: any[]) {
+  onAddSource(addFunction: string, e: MouseEvent, ...args: any[]) {
     this.onCloseDialog();
     this.props.onAddSource(null, addFunction, ...args);
   }

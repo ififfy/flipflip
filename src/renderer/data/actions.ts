@@ -18,6 +18,7 @@ import {
   getRandomIndex,
   getSourceType,
   isVideo,
+  removeDuplicatesBy,
   saveDir
 } from "./utils";
 import {AF, GT, PR, SF, ST, TT} from "./const";
@@ -631,7 +632,8 @@ export function generateScene(state: State, scene: Scene): Object {
       }
     }
   }
-  genSources = shuffle(genSources);
+  genSources = shuffle(removeDuplicatesBy((s: LibrarySource) => s.url, genSources));
+  genSources.forEach((s, i) => s.id = i);
   return updateScene(state, scene, (s) => s.sources = genSources);
 }
 
@@ -838,7 +840,7 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
     const newScenes = state.scenes;
     const thisScene = newScenes.find((s) => s.id == scene.id);
     thisScene.sources = newSources;
-    if (args) {
+    if (args.length > 0) {
       let importURL = args[0];
       if (importURL.includes("pastebinId=")) {
         importURL = importURL.substring(importURL.indexOf("pastebinId=") + 11);

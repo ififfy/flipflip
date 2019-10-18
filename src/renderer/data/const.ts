@@ -138,6 +138,13 @@ const PR = { // Global progress functions
   instagram: 'pr.instagram',
 };
 
+const SB = { // Snackbar variants
+  error: 'sb.error',
+  warning: 'sb.warning',
+  info: 'sb.info',
+  success: 'sb.success',
+};
+
 export {
-  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, GT, TT, SF, ST, SL, AF, IPC, VC, MO, PR
+  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, GT, TT, SF, ST, SL, AF, IPC, VC, MO, PR, SB
 };

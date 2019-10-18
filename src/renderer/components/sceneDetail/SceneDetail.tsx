@@ -4,7 +4,8 @@ import clsx from "clsx";
 import {
   AppBar, Backdrop, Badge, Box, Button, Collapse, Container, createStyles, Dialog, DialogActions, DialogContent,
   DialogContentText, DialogTitle, Divider, Drawer, Fab, IconButton, ListItem, ListItemIcon, ListItemSecondaryAction,
-  ListItemText, Menu, MenuItem, Tab, Tabs, TextField, Theme, Toolbar, Tooltip, Typography, withStyles
+  ListItemText, Menu, MenuItem, Slide, Snackbar, SnackbarContent, Tab, Tabs, TextField, Theme, Toolbar, Tooltip,
+  Typography, withStyles
 } from "@material-ui/core";
 
 import AddIcon from '@material-ui/icons/Add';
@@ -28,8 +29,9 @@ import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import PublishIcon from '@material-ui/icons/Publish';
 import SaveIcon from '@material-ui/icons/Save';
 import SortIcon from '@material-ui/icons/Sort';
+import WarningIcon from '@material-ui/icons/Warning';
 
-import {AF, MO, OF, SF, TT, WF} from "../../data/const";
+import {AF, MO, OF, SB, SF, TT, WF} from "../../data/const";
 import en from "../../data/en";
 import Config from "../../data/Config";
 import Scene from "../../data/Scene";
@@ -274,6 +276,15 @@ const styles = (theme: Theme) => createStyles({
   backdropTop: {
     zIndex: theme.zIndex.modal + 1,
   },
+  snackbarIcon: {
+    fontSize: 20,
+    opacity: 0.9,
+    marginRight: theme.spacing(1),
+  },
+  snackbarMessage: {
+    display: 'flex',
+    alignItems: 'center',
+  },
 });
 
 class SceneDetail extends React.Component {
@@ -305,6 +316,8 @@ class SceneDetail extends React.Component {
     menuAnchorEl: null as any,
     openMenu: null as string,
     openTab: this.props.scene.generatorWeights ? 3 : 2,
+    snackbar: null as string,
+    snackbarType: null as string,
   };
 
   readonly nameInputRef: React.RefObject<HTMLInputElement> = React.createRef();
@@ -793,6 +806,23 @@ class SceneDetail extends React.Component {
             </Menu>
           </React.Fragment>
         )}
+        <Snackbar
+          open={!!this.state.snackbar}
+          autoHideDuration={5000}
+          ClickAwayListenerProps={{mouseEvent: false}}
+          onClose={this.onCloseSnackbar.bind(this)}
+          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
+          <SnackbarContent
+            message={
+              <span className={classes.snackbarMessage}>
+                {this.state.snackbarType == SB.warning && (
+                  <WarningIcon color="inherit" className={classes.snackbarIcon}/>
+                )}
+                {this.state.snackbar}
+              </span>
+            }
+          />
+        </Snackbar>
       </div>
     )
   }
@@ -803,6 +833,10 @@ class SceneDetail extends React.Component {
     if (!e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'p' || e.key == 'π')) {
       this.setState({openMenu: this.state.openMenu == MO.urlImport ? null : MO.urlImport});
     }
+  }
+
+  onCloseSnackbar() {
+    this.setState({snackbar: null, snackbarType: null});
   }
 
   onOpenMaxMenu(e: MouseEvent) {
@@ -858,8 +892,15 @@ class SceneDetail extends React.Component {
 
   onGenerate() {
     this.props.onGenerate(this.props.scene);
-    // TODO If no sources, show snackbar
-    this.setState({openTab: 2});
+    setTimeout(this.generateCallback.bind(this), 250);
+  }
+
+  generateCallback() {
+    if (this.props.scene.sources.length == 0) {
+      this.setState({snackbar: "Sorry, no sources were found for these rules", snackbarType: SB.warning});
+    } else {
+      this.setState({openTab: 2});
+    }
   }
 
   onAddAdvWG() {
@@ -890,7 +931,7 @@ class SceneDetail extends React.Component {
     this.setState({menuAnchorEl: e.currentTarget, openMenu: MO.simpleRule});
   }
 
-  onAddSource(addFunction: string, ...args: any[]) {
+  onAddSource(addFunction: string, e: MouseEvent, ...args: any[]) {
     this.onCloseDialog();
     this.props.onAddSource(this.props.scene, addFunction, ...args);
   }

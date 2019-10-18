@@ -30,6 +30,9 @@ const styles = (theme: Theme) => createStyles({
     textAlign: 'center',
     marginTop: '25vh',
   },
+  emptyMessage2: {
+    textAlign: 'center',
+  },
   avatar: {
     backgroundColor: theme.palette.primary.main,
     boxShadow: 'none',
@@ -109,16 +112,24 @@ class SourceList extends React.Component {
   render() {
     const classes = this.props.classes;
 
-    return (
-      <AutoSizer>
-        {({ height, width } : {height: number, width: number}) => (
-          <React.Fragment>
-            {this.props.sources.length == 0 && (
-              <Typography component="h1" variant="h2" color="inherit" noWrap className={classes.emptyMessage}>
-                No Sources
-              </Typography>
-            )}
+    if (this.props.sources.length == 0) {
+      return (
+        <React.Fragment>
+          <Typography component="h1" variant="h3" color="inherit" noWrap className={classes.emptyMessage}>
+            乁( ◔ ౪◔)「
+          </Typography>
+          <Typography component="h1" variant="h4" color="inherit" noWrap className={classes.emptyMessage2}>
+            Nothing here
+          </Typography>
+        </React.Fragment>
 
+      );
+    }
+
+    return (
+      <React.Fragment>
+        <AutoSizer>
+          {({ height, width } : {height: number, width: number}) => (
             <List id="sortable-list" disablePadding>
               <this.SortableVirtualList
                 helperContainer={() => document.getElementById("sortable-list")}
@@ -127,28 +138,27 @@ class SourceList extends React.Component {
                 width={width}
                 onSortEnd={this.onSortEnd.bind(this)}/>
             </List>
-
-            <Dialog
-              open={this.state.cachePath != null}
-              onClose={this.onCloseClean.bind(this)}
-              aria-describedby="clean-cache-description">
-              <DialogContent>
-                <DialogContentText id="clean-cache-description">
-                  Are you SURE you want to delete <Link href="#" onClick={this.openDirectory.bind(this, this.state.cachePath)}>{this.state.cachePath}</Link> ?
-                </DialogContentText>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={this.onCloseClean.bind(this)} color="secondary">
-                  Cancel
-                </Button>
-                <Button onClick={this.onFinishClean.bind(this)} color="primary">
-                  OK
-                </Button>
-              </DialogActions>
-            </Dialog>
-          </React.Fragment>
-        )}
-      </AutoSizer>
+          )}
+        </AutoSizer>
+        <Dialog
+          open={this.state.cachePath != null}
+          onClose={this.onCloseClean.bind(this)}
+          aria-describedby="clean-cache-description">
+          <DialogContent>
+            <DialogContentText id="clean-cache-description">
+              Are you SURE you want to delete <Link href="#" onClick={this.openDirectory.bind(this, this.state.cachePath)}>{this.state.cachePath}</Link> ?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.onCloseClean.bind(this)} color="secondary">
+              Cancel
+            </Button>
+            <Button onClick={this.onFinishClean.bind(this)} color="primary">
+              OK
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </React.Fragment>
     )
   }
 
