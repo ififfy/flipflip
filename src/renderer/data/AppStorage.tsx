@@ -280,7 +280,8 @@ export default class AppStorage {
                 }
               }
 
-              // TODO Clear tagWeights && sceneWeights
+              scene.tagWeights = null;
+              scene.sceneWeights = null;
             }
           }
           break;
