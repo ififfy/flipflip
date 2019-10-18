@@ -1,7 +1,7 @@
 import {BT, GO, HTF, IF, OF, SL, TF, VO, VTF, WF} from "./const";
-import Overlay from "../components/library/Overlay";
-import LibrarySource from "../components/library/LibrarySource";
-import Audio from "../components/library/Audio";
+import Overlay from "./Overlay";
+import LibrarySource from "./LibrarySource";
+import Audio from "./Audio";
 
 interface SceneSettingsI {
   [key: string]: string | number | boolean | Array<LibrarySource> | Array<Overlay> | Array<Audio> | Array<Array<number>>;

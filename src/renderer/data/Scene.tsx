@@ -1,8 +1,8 @@
 import {BT, GO, HTF, IF, OF, SL, TF, TT, VO, VTF, WF} from './const';
-import LibrarySource from "../components/library/LibrarySource";
-import Audio from "../components/library/Audio";
-import Overlay from "../components/library/Overlay";
-import WeightGroup from "../components/library/WeightGroup";
+import LibrarySource from "./LibrarySource";
+import Audio from "./Audio";
+import Overlay from "./Overlay";
+import WeightGroup from "./WeightGroup";
 
 export default class Scene {
   id: number = 0;

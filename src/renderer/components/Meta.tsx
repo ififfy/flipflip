@@ -4,19 +4,19 @@ import * as React from 'react';
 import {Box, CssBaseline} from "@material-ui/core";
 import {ThemeProvider} from "@material-ui/styles";
 
-import AppStorage from '../data/AppStorage';
 import {IPC} from "../data/const";
 import * as actions from '../data/actions';
+import AppStorage from '../data/AppStorage';
 import theme from '../data/theme';
+import FFAnalytics from "./FFAnalytics";
 import ScenePicker from './ScenePicker';
 import ConfigForm from './config/ConfigForm';
 import Library from './library/Library';
 import TagManager from "./library/TagManager";
+import GridSetup from "./library/GridSetup";
+import VideoClipper from "./library/VideoClipper";
 import Player from './player/Player';
 import SceneDetail from './sceneDetail/SceneDetail';
-import FFAnalytics from "./ui/FFAnalytics";
-import VideoClipper from "./player/VideoClipper";
-import GridSetup from "./player/GridSetup";
 
 const appStorage = new AppStorage(remote.getCurrentWindow().id);
 

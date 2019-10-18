@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import {DisplaySettings} from "../../data/Config";
-import ControlGroup from "../sceneDetail/ControlGroup";
+import ControlGroup from "../ui/ControlGroup";
 import SimpleCheckbox from "../ui/SimpleCheckbox";
 import SimpleNumberInput from "../ui/SimpleNumberInput";
 

@@ -3,11 +3,11 @@ import * as React from "react";
 import {Card, CardContent, createStyles, Grid, Theme, withStyles} from "@material-ui/core";
 
 import Scene from "../../data/Scene";
-import CrossFadeCard from "./CrossFadeCard";
-import ZoomMoveCard from "./ZoomMoveCard";
-import StrobeCard from "./StrobeCard";
-import AudioCard from "./AudioCard";
-import TextCard from "./TextCard";
+import AudioCard from "../configGroups/AudioCard";
+import CrossFadeCard from "../configGroups/CrossFadeCard";
+import StrobeCard from "../configGroups/StrobeCard";
+import TextCard from "../configGroups/TextCard";
+import ZoomMoveCard from "../configGroups/ZoomMoveCard";
 
 const styles = (theme: Theme) => createStyles({});
 

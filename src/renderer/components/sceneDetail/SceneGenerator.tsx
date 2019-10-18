@@ -14,10 +14,10 @@ import EditIcon from '@material-ui/icons/Edit';
 import NotInterestedIcon from '@material-ui/icons/NotInterested';
 
 import {TT} from "../../data/const";
-import Scene from "../../data/Scene";
 import en from "../../data/en";
-import WeightGroup from "../library/WeightGroup";
-import Tag from "../library/Tag";
+import Scene from "../../data/Scene";
+import Tag from "../../data/Tag";
+import WeightGroup from "../../data/WeightGroup";
 
 const styles = (theme: Theme) => createStyles({
   listElement: {

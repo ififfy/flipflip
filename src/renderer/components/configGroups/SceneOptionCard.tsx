@@ -12,8 +12,8 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import {BT, TF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
 import en from "../../data/en";
+import Overlay from "../../data/Overlay";
 import Scene from "../../data/Scene";
-import Overlay from "../library/Overlay";
 import ColorPicker from "../ui/ColorPicker";
 
 const styles = (theme: Theme) => createStyles({

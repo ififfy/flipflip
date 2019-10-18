@@ -1,4 +1,4 @@
-import {TF} from "../../data/const";
+import {TF} from "./const";
 
 export default class Audio {
   id: number = 0;

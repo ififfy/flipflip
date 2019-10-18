@@ -1,18 +1,18 @@
 import IncomingMessage = Electron.IncomingMessage;
+import {webFrame} from "electron";
 import * as React from 'react';
 import request from 'request';
 import fs from "fs";
 import gifInfo from 'gif-info';
 import IdleTimer from 'react-idle-timer';
 
-import {GO, HTF, IF, OF, SL, TF, VO, VTF, WF} from '../../data/const';
+import {GO, IF, OF, SL, TF, VO, WF} from '../../data/const';
 import {getRandomListItem, isVideo, urlToPath} from '../../data/utils';
 import Config from "../../data/Config";
 import Scene from "../../data/Scene";
 import ChildCallbackHack from './ChildCallbackHack';
 import ImageView from './ImageView';
 import Strobe from "./Strobe";
-import {webFrame} from "electron";
 
 class GifInfo {
   animated: boolean;

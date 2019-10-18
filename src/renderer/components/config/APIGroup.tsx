@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import {RemoteSettings} from "../../data/Config";
-import ControlGroup from "../sceneDetail/ControlGroup";
+import ControlGroup from "../ui/ControlGroup";
 import SimpleTextInput from "../ui/SimpleTextInput";
 
 export default class APIGroup extends React.Component {

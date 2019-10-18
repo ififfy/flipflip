@@ -7,9 +7,9 @@ import {
 import AddIcon from '@material-ui/icons/Add';
 
 import {SceneSettings} from "../../data/Config";
+import Audio from "../../data/Audio";
 import Scene from "../../data/Scene";
 import AudioControl from "../player/AudioControl";
-import Audio from "../library/Audio";
 
 const styles = (theme: Theme) => createStyles({
   addButton: {

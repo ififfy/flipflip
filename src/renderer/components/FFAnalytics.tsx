@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Analytics from "electron-google-analytics";
 
-import Config from "../../data/Config";
+import Config from "../data/Config";
 
 export default class FFAnalytics extends React.Component {
   readonly props: {

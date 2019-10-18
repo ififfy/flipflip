@@ -23,10 +23,10 @@ import {
   isImageOrVideo,
 } from "../../data/utils";
 import Config from "../../data/Config";
+import LibrarySource from "../../data/LibrarySource";
 import Scene from '../../data/Scene';
 import ChildCallbackHack from './ChildCallbackHack';
 import ImagePlayer from './ImagePlayer';
-import LibrarySource from "../library/LibrarySource";
 
 let redditAlerted = false;
 let tumblrAlerted = false;

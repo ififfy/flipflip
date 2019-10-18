@@ -8,8 +8,8 @@ import {
 
 import {TF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
-import Scene from "../../data/Scene";
 import en from "../../data/en";
+import Scene from "../../data/Scene";
 
 const styles = (theme: Theme) => createStyles({
   fullWidth: {

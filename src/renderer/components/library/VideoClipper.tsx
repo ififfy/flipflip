@@ -3,13 +3,13 @@ import InputRange from "react-input-range";
 
 import {BT, VC} from "../../data/const";
 import {getTimestamp, getTimestampValue} from "../../data/utils";
-import ImageView from "./ImageView";
-import VideoControl from "./VideoControl";
-import LibrarySource from "../library/LibrarySource";
-import Clip from "../library/Clip";
+import ImageView from "../player/ImageView";
+import VideoControl from "../player/VideoControl";
+import Clip from "../../data/Clip";
+import LibrarySource from "../../data/LibrarySource";
+import Scene from "../../data/Scene";
 import SimpleSliderInput from "../ui/SimpleSliderInput";
 import SimpleTextInput from "../ui/SimpleTextInput";
-import Scene from "../../data/Scene";
 
 export default class VideoClipper extends React.Component {
   readonly props: {

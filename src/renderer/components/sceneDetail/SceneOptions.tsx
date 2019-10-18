@@ -3,8 +3,8 @@ import * as React from "react";
 import {Card, CardContent, createStyles, Grid, Theme, withStyles} from "@material-ui/core";
 
 import Scene from "../../data/Scene";
-import SceneOptionCard from "./SceneOptionCard";
-import ImageVideoCard from "./ImageVideoCard";
+import ImageVideoCard from "../configGroups/ImageVideoCard";
+import SceneOptionCard from "../configGroups/SceneOptionCard";
 
 const styles = (theme: Theme) => createStyles({});
 

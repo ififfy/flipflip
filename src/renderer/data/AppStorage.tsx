@@ -3,12 +3,12 @@ import path from 'path';
 
 import { removeDuplicatesBy, saveDir } from "./utils";
 import { Route } from './Route';
+import {TT} from "./const";
+import LibrarySource from '../data/LibrarySource';
+import Tag from "../data/Tag";
+import WeightGroup from "../data/WeightGroup";
 import Config from "./Config";
 import Scene from './Scene';
-import LibrarySource from '../components/library/LibrarySource';
-import Tag from "../components/library/Tag";
-import {TT} from "./const";
-import WeightGroup from "../components/library/WeightGroup";
 
 /**
  * A compile-time global variable defined in webpack.config' [plugins]

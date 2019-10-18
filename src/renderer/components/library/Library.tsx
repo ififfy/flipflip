@@ -31,12 +31,12 @@ import SortIcon from '@material-ui/icons/Sort';
 import {AF, MO, PR, SF, ST} from "../../data/const";
 import en from "../../data/en";
 import Config from "../../data/Config";
+import LibrarySource from "../../data/LibrarySource";
 import Scene from "../../data/Scene";
-import SourceIcon from "../sceneDetail/SourceIcon";
-import SourceList from "../sceneDetail/SourceList";
+import Tag from "../../data/Tag";
+import SourceIcon from "./SourceIcon";
+import SourceList from "./SourceList";
 import URLDialog from "../sceneDetail/URLDialog";
-import LibrarySource from "./LibrarySource";
-import Tag from "./Tag";
 
 const Option = (props: any) => (
   <div>

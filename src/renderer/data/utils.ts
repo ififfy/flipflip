@@ -7,7 +7,7 @@ import wretch from "wretch";
 import {ST} from "./const";
 import en from "./en";
 import Config from "./Config";
-import LibrarySource from "../components/library/LibrarySource";
+import LibrarySource from "./LibrarySource";
 
 export const saveDir = path.join(remote.app.getPath('appData'), 'flipflip');
 

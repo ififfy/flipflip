@@ -24,8 +24,8 @@ import {getTimestamp, urlToPath} from "../../data/utils";
 import {SceneSettings} from "../../data/Config";
 import {TF} from "../../data/const";
 import en from "../../data/en";
+import Audio from "../../data/Audio";
 import Scene from "../../data/Scene";
-import Audio from "../library/Audio";
 import SoundTick from "./SoundTick";
 
 const styles = (theme: Theme) => createStyles({

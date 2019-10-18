@@ -17,9 +17,9 @@ import NotInterestedIcon from '@material-ui/icons/NotInterested';
 
 import {arrayMove, getCachePath, getFileName, getSourceType, urlToPath} from "../../data/utils";
 import {ST} from "../../data/const";
-import Config from "../../data/Config"
-import LibrarySource from "../library/LibrarySource";
-import Tag from "../library/Tag";
+import Config from "../../data/Config";
+import LibrarySource from "../../data/LibrarySource";
+import Tag from "../../data/Tag";
 import SourceIcon from "./SourceIcon";
 
 const styles = (theme: Theme) => createStyles({

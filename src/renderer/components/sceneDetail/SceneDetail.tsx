@@ -34,15 +34,15 @@ import WarningIcon from '@material-ui/icons/Warning';
 import {AF, MO, OF, SB, SF, TT, WF} from "../../data/const";
 import en from "../../data/en";
 import Config from "../../data/Config";
+import LibrarySource from "../../data/LibrarySource";
 import Scene from "../../data/Scene";
-import LibrarySource from "../library/LibrarySource";
-import Tag from "../library/Tag";
-import WeightGroup from "../library/WeightGroup";
+import Tag from "../../data/Tag";
+import WeightGroup from "../../data/WeightGroup";
 import SceneEffects from "./SceneEffects";
 import SceneGenerator from "./SceneGenerator";
 import SceneOptions from "./SceneOptions";
-import SourceList from "./SourceList";
 import URLDialog from "./URLDialog";
+import SourceList from "../library/SourceList";
 
 const drawerWidth = 240;
 

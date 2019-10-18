@@ -1,10 +1,10 @@
 import * as React from 'react';
 
-import Scene from "../../data/Scene";
-import {SceneSettings} from "../../data/Config";
-import ControlGroup from "./ControlGroup";
-import VideoControl from "../player/VideoControl";
 import {VC} from "../../data/const";
+import {SceneSettings} from "../../data/Config";
+import Scene from "../../data/Scene";
+import ControlGroup from "../ui/ControlGroup";
+import VideoControl from "../player/VideoControl";
 
 export default class VideoGroup extends React.Component {
   readonly props: {

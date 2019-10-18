@@ -26,10 +26,10 @@ import { defaultInitialState } from './AppStorage';
 import { Route } from "./Route";
 import Scene from "./Scene";
 import Config from "./Config";
-import LibrarySource from "../components/library/LibrarySource";
-import Tag from "../components/library/Tag";
-import Clip from "../components/library/Clip";
-import Overlay from "../components/library/Overlay";
+import Clip from "../data/Clip";
+import LibrarySource from "../data/LibrarySource";
+import Overlay from "../data/Overlay";
+import Tag from "../data/Tag";
 
 type State = typeof defaultInitialState;
 

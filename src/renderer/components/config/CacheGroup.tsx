@@ -6,7 +6,7 @@ import getFolderSize from 'get-folder-size';
 
 import {getCachePath} from "../../data/utils";
 import Config, {CacheSettings} from "../../data/Config";
-import ControlGroup from "../sceneDetail/ControlGroup";
+import ControlGroup from "../ui/ControlGroup";
 import SimpleCheckbox from "../ui/SimpleCheckbox";
 import SimpleNumberInput from "../ui/SimpleNumberInput";
 import SimpleTextInput from "../ui/SimpleTextInput";

@@ -1,8 +1,8 @@
 import * as React from "react";
 import wretch from "wretch";
 
-import Tag from "../library/Tag";
 import {CancelablePromise, getRandomListItem} from "../../data/utils";
+import Tag from "../../data/Tag";
 
 const splitFirstWord = function (s: string) {
   const firstSpaceIndex = s.indexOf(" ");

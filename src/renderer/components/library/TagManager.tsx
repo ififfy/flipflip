@@ -20,8 +20,8 @@ import {MO, SF} from "../../data/const";
 import {arrayMove, removeDuplicatesBy} from "../../data/utils";
 import en from "../../data/en";
 import Scene from "../../data/Scene";
+import Tag from "../../data/Tag";
 import Jiggle from "../../animations/Jiggle";
-import Tag from "./Tag";
 
 const styles = (theme: Theme) => createStyles({
   root: {
