@@ -8,14 +8,15 @@ import CrossFadeCard from "../configGroups/CrossFadeCard";
 import StrobeCard from "../configGroups/StrobeCard";
 import TextCard from "../configGroups/TextCard";
 import ZoomMoveCard from "../configGroups/ZoomMoveCard";
+import {SceneSettings} from "../../data/Config";
 
 const styles = (theme: Theme) => createStyles({});
 
 class SceneEffects extends React.Component {
   readonly props: {
     classes: any,
-    scene: Scene,
-    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
+    scene: Scene | SceneSettings,
+    onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 
   render() {

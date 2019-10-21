@@ -10,7 +10,7 @@ import {SL, TF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
 import en from "../../data/en";
 import Scene from "../../data/Scene";
-import ColorPicker from "../ui/ColorPicker";
+import ColorPicker from "../config/ColorPicker";
 
 const styles = (theme: Theme) => createStyles({
   fullWidth: {

@@ -14,7 +14,7 @@ import {SceneSettings} from "../../data/Config";
 import en from "../../data/en";
 import Overlay from "../../data/Overlay";
 import Scene from "../../data/Scene";
-import ColorPicker from "../ui/ColorPicker";
+import ColorPicker from "../config/ColorPicker";
 
 const styles = (theme: Theme) => createStyles({
   fullWidth: {

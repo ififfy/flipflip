@@ -5,6 +5,7 @@ import {Card, CardContent, createStyles, Grid, Theme, withStyles} from "@materia
 import Scene from "../../data/Scene";
 import ImageVideoCard from "../configGroups/ImageVideoCard";
 import SceneOptionCard from "../configGroups/SceneOptionCard";
+import {SceneSettings} from "../../data/Config";
 
 const styles = (theme: Theme) => createStyles({});
 
@@ -12,8 +13,8 @@ class SceneOptions extends React.Component {
   readonly props: {
     classes: any,
     allScenes: Array<Scene>,
-    scene: Scene,
-    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
+    scene: Scene | SceneSettings,
+    onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 
   render() {

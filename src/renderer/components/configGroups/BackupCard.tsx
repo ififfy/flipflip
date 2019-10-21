@@ -1,0 +1,325 @@
+import * as React from "react";
+import path from "path";
+import clsx from "clsx";
+
+import {
+  Button, Chip, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl,
+  Grid, InputLabel, MenuItem, Select, Slide, Snackbar, SnackbarContent, Theme, withStyles
+} from "@material-ui/core";
+
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import DeleteIcon from '@material-ui/icons/Delete';
+import ErrorIcon from '@material-ui/icons/Error';
+import RestoreIcon from '@material-ui/icons/Restore';
+import SaveIcon from '@material-ui/icons/Save';
+
+import {getBackups, saveDir} from "../../data/utils";
+import {MO} from "../../data/const";
+
+const styles = (theme: Theme) => createStyles({
+  buttonGrid: {
+    textAlign: 'center',
+  },
+  chipGrid: {
+    paddingTop: theme.spacing(1),
+  },
+  hideXS: {
+    [theme.breakpoints.down('xs')]: {
+      display: 'none'
+    },
+  },
+  showXS: {
+    [theme.breakpoints.up('sm')]: {
+      display: 'none'
+    },
+  },
+  snackbarIcon: {
+    fontSize: 20,
+    opacity: 0.9,
+    marginRight: theme.spacing(1),
+  },
+  snackbarMessage: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+});
+
+class BackupCard extends React.Component {
+  readonly props: {
+    classes: any,
+    onBackup(): void,
+    onClean(): void,
+    onRestore(backupFile: string): void,
+  };
+
+  readonly state = {
+    backups: Array<{url: string, size: number}>(),
+    backup: (null as {url: string, size: number}),
+    openMenu: null as string,
+    restoreSnack: false,
+    backupSnack: false,
+    cleanSnack: false,
+    errorSnack: null as any,
+  };
+
+  render() {
+    const classes = this.props.classes;
+    const hasBackup = this.state.backups.length > 0;
+    return(
+      <React.Fragment>
+        <Grid container spacing={2} alignItems="center" justify="center">
+          <Grid item xs={"auto"} className={classes.buttonGrid}>
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              onClick={this.onBackup.bind(this)}
+              startIcon={<SaveIcon />}
+            >
+              Backup Data
+            </Button>
+          </Grid>
+          <Grid item xs={"auto"} className={classes.buttonGrid}>
+            <Button
+              variant="contained"
+              color="secondary"
+              size="large"
+              disabled={!hasBackup}
+              onClick={this.onRestore.bind(this)}
+              startIcon={<RestoreIcon />}
+            >
+              Restore Backup
+            </Button>
+          </Grid>
+          <Grid item xs={"auto"} className={classes.buttonGrid}>
+            <Button
+              variant="contained"
+              color="inherit"
+              size="large"
+              disabled={this.state.backups.length <= 1}
+              onClick={this.onClean.bind(this)}
+              startIcon={<DeleteIcon />}
+            >
+              Clean Backups
+            </Button>
+          </Grid>
+        </Grid>
+        <Grid container spacing={2} alignItems="center" justify="center" className={classes.chipGrid}>
+          <Grid item xs={"auto"} className={classes.buttonGrid}>
+            <Chip
+              label={`Backups: ${hasBackup ? this.state.backups.length : "--"}`}
+              color="primary"
+              variant="outlined"/>
+          </Grid>
+          <Grid item xs={"auto"} className={clsx(classes.buttonGrid, classes.hideXS)}>
+            <Chip
+              label={`Latest: ${hasBackup ? this.convertFromEpoch(this.state.backups[0].url) + " (" + Math.round(this.state.backups[0].size / 1000) + " KB)" : "--"}`}
+              color="secondary"
+              variant="outlined"/>
+          </Grid>
+          <Grid item xs={"auto"} className={clsx(classes.buttonGrid, classes.showXS)}>
+            <Chip
+              label={`Latest: ${hasBackup ? this.convertFromEpoch(this.state.backups[0].url) : "--"}`}
+              color="secondary"
+              variant="outlined"/>
+          </Grid>
+        </Grid>
+        <Dialog
+          open={this.state.openMenu == MO.deleteAlert}
+          onClose={this.onCloseDialog.bind(this)}
+          aria-labelledby="remove-all-title"
+          aria-describedby="remove-all-description">
+          <DialogTitle id="remove-all-title">Clean backups</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="remove-all-description">
+              You are about to clean your backups. This will leave only the latest backup.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+              Cancel
+            </Button>
+            <Button onClick={this.onFinishClean.bind(this)} color="primary">
+              Continue
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog
+          open={this.state.openMenu == MO.restore}
+          onClose={this.onCloseDialog.bind(this)}
+          aria-labelledby="restore-title"
+          aria-describedby="restore-description">
+          <DialogTitle id="restore-title">Restore Backup</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="restore-description">
+              Choose a backup to restore from:
+            </DialogContentText>
+            {this.state.backup && (
+              <FormControl>
+                <InputLabel>Backups</InputLabel>
+                <Select
+                  value={this.state.backup.url}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 300,
+                      },
+                    },
+                  }}
+                  onChange={this.onChangeBackup.bind(this)}>
+                  {this.state.backups.map((b) =>
+                    <MenuItem value={b.url} key={b.url}>{this.convertFromEpoch(b.url)} ({Math.round(b.size / 1000)} KB)</MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+              Cancel
+            </Button>
+            <Button onClick={this.onFinishRestore.bind(this)} color="primary">
+              Restore
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Snackbar
+          open={this.state.restoreSnack}
+          autoHideDuration={5000}
+          onClose={this.onCloseRestoreSnack.bind(this)}
+          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
+          <SnackbarContent
+            message={
+              <span className={classes.snackbarMessage}>
+                  <CheckCircleIcon color="secondary" className={classes.snackbarIcon}/>
+                  Restore succes!
+              </span>
+            }
+          />
+        </Snackbar>
+        <Snackbar
+          open={this.state.backupSnack}
+          autoHideDuration={5000}
+          onClose={this.onCloseBackupSnack.bind(this)}
+          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
+          <SnackbarContent
+            message={
+              <span className={classes.snackbarMessage}>
+                  <CheckCircleIcon color="primary" className={classes.snackbarIcon}/>
+                  Backup succes!
+              </span>
+            }
+          />
+        </Snackbar>
+        <Snackbar
+          open={this.state.cleanSnack}
+          autoHideDuration={5000}
+          onClose={this.onCloseCleanSnack.bind(this)}
+          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
+          <SnackbarContent
+            message={
+              <span className={classes.snackbarMessage}>
+                  <CheckCircleIcon color="inherit" className={classes.snackbarIcon}/>
+                  Clean succes!
+              </span>
+            }
+          />
+        </Snackbar>
+        <Snackbar
+          open={!!this.state.errorSnack}
+          autoHideDuration={10000}
+          onClose={this.onCloseErrorSnack.bind(this)}
+          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
+          <SnackbarContent
+            message={
+              <span className={classes.snackbarMessage}>
+                  <ErrorIcon color="error" className={classes.snackbarIcon}/>
+                  Error: {this.state.errorSnack ? this.state.errorSnack.message : ""}
+              </span>
+            }
+          />
+        </Snackbar>
+      </React.Fragment>
+    );
+  }
+
+  componentDidMount() {
+    this.refreshBackups();
+  }
+
+  refreshBackups() {
+    this.setState({backups: getBackups()});
+  }
+
+  onChangeBackup(e: MouseEvent) {
+    const input = (e.target as HTMLInputElement);
+    this.setState({backup: this.state.backups.find((b) => b.url == input.value)});
+  }
+
+  convertFromEpoch(backupFile: string) {
+    const epochString = backupFile.substring(backupFile.lastIndexOf(".") + 1);
+    const date = new Date(Number.parseInt(epochString));
+    return date.toLocaleString();
+  }
+
+  onBackup() {
+    try {
+      this.props.onBackup();
+      this.setState({backupSnack: true});
+    } catch (e) {
+      this.setState({errorSnack: e});
+    }
+    this.refreshBackups();
+  }
+
+  onClean() {
+    this.setState({backup: this.state.backups[0], openMenu: MO.deleteAlert});
+  }
+
+  onFinishClean() {
+    this.onCloseDialog();
+    try {
+      this.props.onClean();
+      this.setState({cleanSnack: true});
+    } catch (e) {
+      this.setState({errorSnack: e});
+    }
+    this.refreshBackups();
+  }
+
+  onRestore() {
+    this.setState({backup: this.state.backups[0], openMenu: MO.restore});
+  }
+
+  onFinishRestore() {
+    this.onCloseDialog();
+    try {
+      this.props.onRestore(saveDir + path.sep + this.state.backup.url);
+      this.setState({restoreSnack: true});
+    } catch (e) {
+      this.setState({errorSnack: e});
+    }
+  }
+
+  onCloseRestoreSnack() {
+    this.setState({restoreSnack: false});
+  }
+
+  onCloseBackupSnack() {
+    this.setState({backupSnack: false});
+  }
+
+  onCloseCleanSnack() {
+    this.setState({cleanSnack: false});
+  }
+
+  onCloseErrorSnack() {
+    this.setState({errorSnack: null});
+  }
+
+  onCloseDialog() {
+    this.setState({openMenu: null});
+  }
+}
+
+export default withStyles(styles)(BackupCard as any);

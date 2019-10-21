@@ -328,18 +328,7 @@ export default class AppStorage {
     }
   }
 
-  backup(showAlert: boolean): boolean {
-    try {
-      archiveFile(this.savePath);
-    } catch (e) {
-      if (showAlert) {
-        alert("Backup error:\n" + e);
-      }
-      return false;
-    }
-    if (showAlert) {
-      alert("Backup success!");
-    }
-    return true;
+  backup() {
+    archiveFile(this.savePath);
   }
 }

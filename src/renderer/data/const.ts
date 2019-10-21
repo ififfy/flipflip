@@ -126,6 +126,11 @@ const MO = { // Menu/Modal Constants
   deleteAlert: 'mo.dalert',
   simpleRule: 'mo.srule',
   max: 'mo.max',
+  error: 'mo.error',
+  backup: 'mo.backup',
+  restore: 'mo.restore',
+  signIn: 'mo.signin',
+  signOut: 'mo.signout',
 };
 
 const PR = { // Global progress functions
@@ -145,6 +150,11 @@ const SB = { // Snackbar variants
   success: 'sb.success',
 };
 
+const IG = { // Instagram modes
+  tfa: 'ig.tfa',
+  checkpoint: 'ig.checkpoint',
+};
+
 export {
-  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, GT, TT, SF, ST, SL, AF, IPC, VC, MO, PR, SB
+  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, GT, TT, SF, ST, SL, AF, IPC, VC, MO, PR, SB, IG
 };

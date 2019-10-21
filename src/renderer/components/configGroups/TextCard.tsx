@@ -16,7 +16,7 @@ import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import {SceneSettings} from "../../data/Config";
 import {CancelablePromise} from "../../data/utils";
 import Scene from "../../data/Scene";
-import ColorPicker from "../ui/ColorPicker";
+import ColorPicker from "../config/ColorPicker";
 
 const styles = (theme: Theme) => createStyles({
   fullWidth: {

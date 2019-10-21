@@ -328,7 +328,7 @@ class SceneDetail extends React.Component {
     return (
       <div className={classes.root} onKeyDown={this.secretHotkey.bind(this)} tabIndex={0}>
 
-        <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
+        <AppBar position="absolute" className={classes.appBar}>
           <Toolbar>
             <Tooltip title="Back" placement="right-end">
               <IconButton

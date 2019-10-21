@@ -13,8 +13,8 @@ import ScenePicker from './ScenePicker';
 import ConfigForm from './config/ConfigForm';
 import Library from './library/Library';
 import TagManager from "./library/TagManager";
-import GridSetup from "./library/GridSetup";
-import VideoClipper from "./library/VideoClipper";
+import GridSetup from "./config/GridSetup";
+import VideoClipper from "./config/VideoClipper";
 import Player from './player/Player';
 import SceneDetail from './sceneDetail/SceneDetail';
 
@@ -212,11 +212,11 @@ export default class Meta extends React.Component {
               config={this.state.config}
               scenes={this.state.scenes}
               goBack={a(actions.goBack)}
-              updateConfig={a(actions.updateConfig)}
-              onDefault={a(actions.setDefaultConfig)}
               onBackup={appStorage.backup.bind(appStorage)}
+              onClean={actions.cleanBackups}
+              onDefault={a(actions.setDefaultConfig)}
               onRestore={a(actions.restoreFromBackup)}
-              onClean={a(actions.cleanBackups)}
+              onUpdateConfig={a(actions.updateConfig)}
             />
           )}
 

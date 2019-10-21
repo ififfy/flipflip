@@ -86,50 +86,34 @@ export function getTags(library: Array<LibrarySource>, source: string): Array<Ta
 // The first argument is always a State object, even if it isn't used.
 
 export function restoreFromBackup(state: State, backupFile: string): Object {
-  try {
-    const data = JSON.parse(fs.readFileSync(backupFile, 'utf-8'));
-    return {
-      version: data.version,
-      autoEdit: data.autoEdit,
-      isSelect: data.isSelect,
-      isBatchTag: data.isBatchTag,
-      config: new Config(data.config),
-      scenes: data.scenes.map((s: any) => new Scene(s)),
-      library: data.library.map((s: any) => new LibrarySource(s)),
-      tags: data.tags.map((t: any) => new Tag(t)),
-      route: data.route.map((s: any) => new Route(s)),
-      libraryYOffset: 0,
-      libraryFilters: Array<string>(),
-      librarySelected: Array<string>(),
-      progressMode: null as string,
-      progressTitle: null as string,
-      progressCurrent: 0,
-      progressTotal: 0,
-      progressNext: null as string,
-    };
-  } catch (e) {
-    alert("Restore error:\n" + e);
-    return {};
-  }
+  const data = JSON.parse(fs.readFileSync(backupFile, 'utf-8'));
+  return {
+    version: data.version,
+    autoEdit: data.autoEdit,
+    isSelect: data.isSelect,
+    isBatchTag: data.isBatchTag,
+    config: new Config(data.config),
+    scenes: data.scenes.map((s: any) => new Scene(s)),
+    library: data.library.map((s: any) => new LibrarySource(s)),
+    tags: data.tags.map((t: any) => new Tag(t)),
+    route: data.route.map((s: any) => new Route(s)),
+    libraryYOffset: 0,
+    libraryFilters: Array<string>(),
+    librarySelected: Array<string>(),
+    progressMode: null as string,
+    progressTitle: null as string,
+    progressCurrent: 0,
+    progressTotal: 0,
+    progressNext: null as string,
+  };
 }
 
-export function cleanBackups(state: State): Object {
+export function cleanBackups() {
   const backups = getBackups();
   backups.shift(); // Keep the newest backup
-  let error;
   for (let backup of backups) {
-    fs.unlink(saveDir + path.sep + backup.url, (err) => {
-      if (err) {
-        error = err;
-      }
-    });
+    fs.unlinkSync(saveDir + path.sep + backup.url);
   }
-  if (error) {
-    alert("Cleanup error:\n" + error);
-  } else {
-    alert("Cleanup success!");
-  }
-  return {};
 }
 
 export function cacheImage(state: State, i: HTMLImageElement | HTMLVideoElement) {
@@ -1170,7 +1154,7 @@ export function importLibrary(state: State, backup: Function): Object {
   const filePath = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
     {filters: [{name:'All Files (*.*)', extensions: ['*']},{name: 'JSON Document', extensions: ['json']}], properties: ['openFile']});
   if (!filePath || !filePath.length) return;
-  if (!backup(false)) { // If backup fails, prompt user to continue
+  if (!backup()) { // If backup fails, prompt user to continue
     if (!confirm("Backup failed. Continue anyway?")) {
       return;
     }
