@@ -1,7 +1,6 @@
 import * as React from "react";
 import clsx from "clsx";
 import Select, { components } from 'react-select';
-import CreatableSelect from "react-select/creatable";
 
 import {
   AppBar, Backdrop, Badge, Button, Checkbox, Chip, Collapse, Container, createStyles, Dialog, DialogActions,
@@ -34,6 +33,7 @@ import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
 import Scene from "../../data/Scene";
 import Tag from "../../data/Tag";
+import LibrarySearch from "./LibrarySearch";
 import SourceIcon from "./SourceIcon";
 import SourceList from "./SourceList";
 import URLDialog from "../sceneDetail/URLDialog";
@@ -80,12 +80,6 @@ const styles = (theme: Theme) => createStyles({
     color: theme.palette.primary.contrastText,
     marginTop: 3,
     marginRight: theme.spacing(1),
-  },
-  searchSelect: {
-    minWidth: 200,
-    maxWidth: `calc(100% - ${theme.spacing(7)}px)`,
-    maxHeight: theme.mixins.toolbar.minHeight,
-    color: theme.palette.text.primary,
   },
   titleBar: {
     flex: 1,
@@ -306,32 +300,13 @@ class Library extends React.Component {
   };
 
   readonly state = {
+    displaySources: Array<LibrarySource>(),
     drawerOpen: false,
     filters: this.props.filters,
     selected: this.props.selected,
     selectedTags: Array<{label: string, value: string}>(),
     menuAnchorEl: null as any,
     openMenu: null as string,
-    searchInput: "",
-  };
-
-  handleChange = (search: [{label: string, value: string}]) => {
-    if (search == null) {
-      this.setState({filters: []});
-    } else {
-      let filters = Array<string>();
-      for (let s of search) {
-        if (s.value.endsWith("~")) {
-          filters = filters.concat(s.value);
-        } else {
-          filters = filters.concat(s.value.split(" "));
-        }
-      }
-      this.setState({filters});
-    }
-  };
-  handleInputChange = (searchInput: string) => {
-    this.setState({searchInput})
   };
 
   render() {
@@ -356,77 +331,6 @@ class Library extends React.Component {
       case PR.twitter:
       case PR.instagram:
         cancelProgressMessage = "Cancel Import";
-    }
-
-    const displaySources = this.getDisplaySources();
-    const tags = new Map<string, number>();
-    let untaggedCount = 0;
-    let offlineCount = 0;
-    let markedCount = 0;
-    const options = Array<{ label: string, value: string }>();
-    const defaultValues = Array<{ label: string, value: string }>();
-    for (let source of displaySources) {
-      if (source.offline) {
-        offlineCount++;
-      }
-      if (source.marked) {
-        markedCount++;
-      }
-
-      if (source.tags.length > 0) {
-        for (let tag of source.tags) {
-          if (tags.has(tag.name)) {
-            tags.set(tag.name, tags.get(tag.name) + 1);
-          } else {
-            tags.set(tag.name, 1);
-          }
-        }
-      } else {
-        untaggedCount += 1;
-      }
-    }
-    const tagKeys = Array.from(tags.keys()).sort((a, b) => {
-      const aCount = tags.get(a);
-      const bCount = tags.get(b);
-      if (aCount > bCount) {
-        return -1;
-      } else if (aCount < bCount) {
-        return 1;
-      } else {
-        return 0;
-      }
-    });
-    for (let filter of this.state.filters) {
-      let opt;
-      if (filter.endsWith("~")) { // This is a tag filter
-        opt = {label: filter.substring(0, filter.length-1) + " (Tag)", value: filter};
-      } else {
-        opt = {label: filter, value: filter};
-      }
-      options.push(opt);
-      defaultValues.push(opt);
-    }
-
-    if (untaggedCount > 0 && !this.state.filters.includes("<Untagged>")) {
-      options.push({label: "<Untagged> (" + untaggedCount + ")", value: "<Untagged>"});
-    }
-    if (offlineCount > 0 && !this.state.filters.includes("<Offline>")) {
-      options.push({label: "<Offline> (" + offlineCount + ")", value: "<Offline>"});
-    }
-    if (markedCount > 0 && !this.state.filters.includes("<Marked>")) {
-      options.push({label: "<Marked> (" + markedCount + ")", value: "<Marked>"});
-    }
-    for (let tag of tagKeys) {
-      if (!this.state.filters.includes(tag + "~")) {
-        options.push({label: tag + " (" + tags.get(tag) + ")", value: tag + "~"});
-      }
-    }
-    if (this.state.searchInput.startsWith("-")) {
-      for (let tag of tagKeys) {
-        if (!this.state.filters.includes(tag + "~")) {
-          options.push({label: "-" + tag + " (" + tags.get(tag) + ")", value: "-" + tag + "~"});
-        }
-      }
     }
 
     return (
@@ -460,20 +364,10 @@ class Library extends React.Component {
                     size='medium'
                     variant='outlined'/>
                 )}
-                <CreatableSelect
-                  className={clsx(classes.searchSelect, "CreatableSelect")}
-                  components={{DropdownIndicator: null,}}
-                  value={defaultValues}
-                  options={options}
-                  inputValue={this.state.searchInput}
-                  isClearable
-                  isMulti
-                  rightAligned={true}
-                  placeholder="Search ..."
-                  formatCreateLabel={(input: string) => "Search for " + input}
-                  onChange={this.handleChange}
-                  onInputChange={this.handleInputChange}
-                />
+                <LibrarySearch
+                  displaySources={this.state.displaySources}
+                  filters={this.state.filters}
+                  onUpdateFilters={this.onUpdateFilters.bind(this)}/>
               </div>
             </div>
           </Toolbar>
@@ -621,7 +515,7 @@ class Library extends React.Component {
                 isSelect={this.props.isSelect || this.props.isBatchTag}
                 library={this.props.library}
                 selected={this.state.selected}
-                sources={displaySources}
+                sources={this.state.displaySources}
                 yOffset={this.props.yOffset}
                 onClearBlacklist={this.props.onClearBlacklist.bind(this)}
                 onClip={this.props.onClip.bind(this)}
@@ -840,6 +734,16 @@ class Library extends React.Component {
     );
   }
 
+  componentDidMount() {
+    this.setState({displaySources: this.getDisplaySources()});
+  }
+
+  componentDidUpdate(props: any, state: any) {
+    if (state.filters != this.state.filters || props.library != this.props.library) {
+      this.setState({displaySources: this.getDisplaySources()});
+    }
+  }
+
   // Use alt+P to access import modal
   // Use alt+U to toggle highlighting untagged sources
   secretHotkey(e: KeyboardEvent) {
@@ -857,6 +761,10 @@ class Library extends React.Component {
     } else {
       this.props.goBack();
     }
+  }
+
+  onUpdateFilters(filters: Array<string>) {
+    this.setState({filters: filters, displaySources: this.getDisplaySources()});
   }
 
   onAddSource(addFunction: string, e: MouseEvent, ...args: any[]) {
@@ -918,7 +826,7 @@ class Library extends React.Component {
   }
 
   onSelectAll() {
-    const displaySources = this.getDisplaySources();
+    const displaySources = this.state.displaySources;
     const newSelected = Array.from(this.state.selected);
     for (let source of displaySources.map((s) => s.url)) {
       if (!newSelected.includes(source)) {
@@ -929,7 +837,7 @@ class Library extends React.Component {
   }
 
   onSelectNone() {
-    const displaySources = this.getDisplaySources();
+    const displaySources = this.state.displaySources;
     let newSelected = Array.from(this.state.selected);
     for (let source of displaySources.map((s) => s.url)) {
       if (newSelected.includes(source)) {
@@ -950,7 +858,7 @@ class Library extends React.Component {
     let taggingMode = this.props.library.find((s) => s.marked) == null;
 
     if (taggingMode) { // We're marking sources
-      for (let source of this.getDisplaySources()) {
+      for (let source of this.state.displaySources) {
         source.marked = true;
       }
     } else { // We're unmarking sources
