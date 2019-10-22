@@ -585,7 +585,7 @@ class Library extends React.Component {
                   <ListItemIcon>
                     <CancelIcon color="error"/>
                   </ListItemIcon>
-                  <ListItemText primary={cancelProgressMessage} />1
+                  <ListItemText primary={cancelProgressMessage} />
                 </ListItem>
               </div>
             </React.Fragment>

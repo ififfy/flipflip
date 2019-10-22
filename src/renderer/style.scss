@@ -76,19 +76,6 @@ div.CreatableSelect {
   border-bottom: 1px solid $black;
 }
 
-/*.app {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background: $appBG;
-}*/
-
-.u-hidden {
-  display: none;
-}
-
 .u-button-row {
   @include noselect;
 
@@ -113,48 +100,6 @@ div.CreatableSelect {
   }
 }
 
-.u-button-sidebar {
-  @include noselect;
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  overflow: auto;
-
-  z-index: 9;
-  padding: $smallPadding $smallPadding 0 $smallPadding;
-  width: $buttonSidebarWidth;
-  @include buttonBarBackground;
-
-  .SceneOptionsHeader {
-    display: inline-block;
-    margin-top: 0;
-    color: $black !important;
-    line-height: $buttonBarHeight;
-  }
-
-  .ControlGroup {
-    width: 300px !important;
-  }
-
-  .SimpleRadioInput__Choice {
-    display: flex;
-  }
-
-  opacity: 0;
-  left: ($smallPadding*4) - $buttonSidebarWidth;
-  transition: opacity 500ms ease-in-out,
-  left 500ms ease-in-out;
-}
-
-
-.u-button-sidebar:hover {
-  left: 0;
-  opacity: 1;
-  transition: opacity 500ms ease-in-out, left 500ms ease-in-out;
-}
-
-
 .u-button {
   padding: $smallPadding;
   border: 1px solid $buttonBorder;
@@ -167,14 +112,6 @@ div.CreatableSelect {
   &:not(.u-disabled):hover {
     border: 1px solid $white;
   }
-}
-
-.u-logo {
-  float: left;
-  width: 3.5rem;
-  height: 3.5rem;
-  background: url("./icons/flipflip_logo.png") no-repeat;
-  background-size: 3.5rem 3.5rem;
 }
 
 .u-icon-button {
@@ -199,94 +136,6 @@ div.CreatableSelect {
     cursor: pointer;
   }
 
-  .u-script {
-    background: url("./icons/script.svg") no-repeat;
-  }
-
-  .u-tags {
-    background: url("./icons/tag.svg") no-repeat;
-  }
-
-  .u-batch {
-    background: url("./icons/batch.svg") no-repeat;
-  }
-
-  .u-mark-offline {
-    background: url("./icons/mark-offline.svg") no-repeat;
-  }
-
-  .u-list {
-    background: url("./icons/list.svg") no-repeat;
-  }
-
-  .u-blacklist {
-    background: url("./icons/blacklist.svg") no-repeat;
-  }
-
-  .u-tumblr {
-    background: url("icons/tumblr.svg") no-repeat;
-  }
-
-  .u-tumblr-outline {
-    background: url("icons/tumblr-outline.svg") no-repeat;
-  }
-
-  .u-reddit {
-    background: url("./icons/reddit.svg") no-repeat;
-  }
-
-  .u-reddit-outline {
-    background: url("./icons/reddit-outline.svg") no-repeat;
-  }
-
-  .u-twitter {
-    background: url("icons/twitter.svg") no-repeat;
-  }
-
-  .u-twitter-outline {
-    background: url("icons/twitter-outline.svg") no-repeat;
-  }
-
-  .u-instagram {
-    background: url("./icons/instagram.svg") no-repeat;
-  }
-
-  .u-instagram-outline {
-    background: url("./icons/instagram-outline.svg") no-repeat;
-  }
-
-  .u-ehentai {
-    background: url("./icons/ehentai.png") no-repeat;
-  }
-
-  .u-gelbooru {
-    background: url("./icons/gelbooru.png") no-repeat;
-  }
-
-  .u-danbooru {
-    background: url("./icons/danbooru.png") no-repeat;
-  }
-
-  .u-imagefap {
-    background: url("./icons/imagefap.svg") no-repeat;
-  }
-
-  .u-sexcom {
-    background: url("./icons/sexcom.svg") no-repeat;
-  }
-
-  .u-imgur {
-    background: url("./icons/imgur.svg") no-repeat;
-  }
-
-  .u-deviantart {
-    background: url("./icons/deviantart.svg") no-repeat;
-  }
-
-  .u-video {
-    background: url("./icons/video.svg") no-repeat;
-  }
-
   .u-media-play {
     background: url("./icons/media-play.svg") no-repeat;
   }
@@ -303,14 +152,6 @@ div.CreatableSelect {
     background: url("./icons/media-forward.svg") no-repeat;
   }
 
-  .u-play {
-    background: url("./icons/play.svg") no-repeat;
-  }
-
-  .u-pause {
-    background: url("./icons/pause.svg") no-repeat;
-  }
-
   .u-volume-up {
     background: url("./icons/volume-up.svg") no-repeat;
   }
@@ -319,68 +160,8 @@ div.CreatableSelect {
     background: url("./icons/volume-down.svg") no-repeat;
   }
 
-  .u-left-arrow {
-    background: url("./icons/left-arrow.svg") no-repeat;
-  }
-
-  .u-right-arrow {
-    background: url("./icons/right-arrow.svg") no-repeat;
-  }
-
-  .u-down-arrow {
-    background: url("./icons/down-arrow.svg") no-repeat;
-  }
-
-  .u-new {
-    background: url("./icons/new.svg") no-repeat;
-  }
-
-  .u-add {
-    background: url("./icons/add.svg") no-repeat;
-  }
-
-  .u-fullscreen {
-    background: url("./icons/fullscreen.svg") no-repeat;
-  }
-
-  .u-random {
-    background: url("./icons/dice.svg") no-repeat;
-  }
-
-  .u-import {
-    background: url("./icons/down-arrow.svg") no-repeat;
-  }
-
-  .u-config {
-    background: url("./icons/gear.svg") no-repeat;
-  }
-
-  .u-import {
-    background: url("./icons/import.svg") no-repeat;
-  }
-
-  .u-export {
-    background: url("./icons/export.svg") no-repeat;
-  }
-
-  .u-edit {
-    background: url("./icons/pencil.svg") no-repeat;
-  }
-
-  .u-clip {
-    background: url("./icons/clip.svg") no-repeat;
-  }
-
   .u-save {
     background: url("./icons/save.svg") no-repeat;
-  }
-
-  .u-back {
-    background: url("./icons/back.svg") no-repeat;
-  }
-
-  .u-clean {
-    background: url("./icons/clean.svg") no-repeat;
   }
 
   .u-delete {
@@ -402,24 +183,6 @@ div.CreatableSelect {
   }
 }
 
-.u-abs-center {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  text-align: center;
-  z-index: -1;
-}
-
-.u-float-left {
-  float: left !important;
-}
-
-.u-float-right {
-  float: right !important;
-}
-
 /* attributes */
 
 .u-clickable {
@@ -432,189 +195,7 @@ div.CreatableSelect {
   cursor: default;
 }
 
-.u-destructive {
-  color: $red !important;
-}
-
-.u-destructive-bg {
-  background-color: $red !important;
-  color: white !important;
-}
-
-.u-destructive-border {
-  border: 1px solid $red !important;
-}
-
-.u-show-on-hover-only {
-  border-bottom: none;
-  background: rgba(0, 0, 0, 0);
-
-  & > * {
-    visibility: hidden;
-  }
-
-  &:hover {
-    @include buttonBarBackground;
-  }
-
-  &:hover > * {
-    visibility: visible !important;
-  }
-}
-
 /* components */
-
-.ControlGroupGroup {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  align-content: flex-start;
-
-  .ControlGroup {
-    flex-grow: 1;
-
-    margin: 1em 0.5em $smallPadding * 3;
-
-    border: 1px solid $black;
-    padding: ($smallPadding * 2) $smallPadding $smallPadding $smallPadding;
-    position: relative;
-
-    color: $black;
-    background-color: $uiGray;
-
-    &.m-wide {
-      width: 100%;
-    }
-
-    &.m-bold {
-      border-width: 3px;
-      padding: ($smallPadding * 1.5) $smallPadding $smallPadding $smallPadding;
-    }
-
-    .ControlGroup__Title {
-      position: absolute;
-      top: -1em;
-      height: 1em;
-      overflow: visible;
-      padding: 0.15rem 0.6rem;
-      font-weight: bold;
-      font-size: 1rem;
-      background-color: $uiGray;
-      border-top: 1px solid $black;
-      border-right: 1px solid $black;
-      border-left: 1px solid $black;
-
-      &.m-can-collapse {
-        cursor: pointer;
-      }
-
-      &.m-bold {
-        border-width: 3px;
-      }
-    }
-
-    .ControlSubgroup {
-      flex-grow: 1;
-
-      display: flex;
-      flex-wrap: wrap;
-      align-items: flex-start;
-      align-content: flex-start;
-
-      &.m-inline {
-        display: inline;
-      }
-    }
-
-    .TimingControlGroup {
-      > div {
-        display: flex;
-        .SimpleNumberInput {
-          margin: -13px 8px 5px;
-          max-width: 90px;
-        }
-      }
-    }
-
-    .ImageOptionGroup {
-      > div {
-        display: flex;
-        margin-bottom: 10px;
-        label {
-          margin-right: 10px;
-        }
-        .SimpleNumberInput {
-          margin: -13px 8px 5px;
-          max-width: 90px;
-        }
-      }
-    }
-
-    .VideoOptionGroup {
-      > div:not(.VideoSkipGroup) {
-        display: flex;
-        margin-bottom: 10px;
-        label {
-          margin-right: 10px;
-        }
-        .SimpleNumberInput {
-          margin: -13px 8px 5px;
-          max-width: 90px;
-        }
-      }
-
-      h4 {
-        margin-top: 0;
-        margin-bottom: 7px;
-      }
-
-      .VideoSkipGroup {
-        display: flex;
-        margin-bottom: 0;
-        .SimpleNumberInput {
-          max-width: 90px;
-        }
-      }
-    }
-
-    .WeightGroup {
-      > .SimpleRadioInput {
-        margin-bottom: 0;
-      }
-      > .SimpleCheckbox {
-        margin-top: 1rem;
-      }
-    }
-
-    .VideoControlGroup > .SimpleCheckbox {
-      font-size: 13px;
-    }
-
-    .AudioControlGroup, .VideoControlGroup {
-      h4 {
-        margin-top: 0;
-        margin-bottom: 7px;
-      }
-
-      .VideoSkipGroup {
-        display: flex;
-        .SimpleNumberInput {
-          max-width: 90px;
-        }
-      }
-
-      .TickGroup {
-        > div {
-          display: flex;
-          .SimpleNumberInput {
-            margin: -13px 8px 5px;
-            max-width: 90px;
-          }
-        }
-      }
-    }
-  }
-}
 
 .VolumeControl {
   display: flex;
@@ -623,35 +204,6 @@ div.CreatableSelect {
   }
   .u-small-icon-button {
     margin-top: 7px;
-  }
-}
-
-.VideoSlider {
-  height: 2rem;
-  margin: 1rem 10px;
-
-  .input-range__label--min {
-    left: 3px;
-    bottom: -1rem;
-    color: $black;
-  }
-  .input-range__label--max {
-    right: 10px;
-    bottom: -1rem;
-    color: $black;
-  }
-
-  .input-range__label--value {
-    color: $black;
-  }
-
-  .input-range__track--active {
-    background: #3f96d0;
-  }
-
-  .input-range__slider {
-    background: #3f96d0;
-    border: 1px solid #3f96d0;
   }
 }
 
@@ -738,124 +290,6 @@ label.SimpleCheckbox {
 
   > *:not(input) {
     margin-bottom: -2px;
-  }
-}
-
-.Config {
-  .Config__ConfigHeader {
-    display: inline-block;
-    margin-top: 0;
-    color: $black !important;
-    line-height: $buttonBarHeight;
-  }
-
-  .Config__Content {
-    position: fixed;
-    top: $buttonBarHeight;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    padding: $smallPadding;
-    overflow: auto;
-  }
-}
-
-.TagManager {
-  .TagManager__TagManagerHeader {
-    display: inline-block;
-    margin-top: 0;
-    color: $black !important;
-    line-height: $buttonBarHeight;
-  }
-
-  .TagManager__Add {
-    width: 7rem;
-    text-align: center;
-  }
-
-  .Modal textarea {
-    height: 140px;
-    width: 420px;
-  }
-
-  .TagManager__Remove, .TagManager__Empty {
-    text-align: center;
-    padding: 1em;
-  }
-
-  .TagManager__Tags {
-    display: flex;
-    flex-wrap: wrap;
-    overflow: auto;
-    max-height: 97vh;
-    padding: $smallPadding;
-
-    & > * {
-      margin-right: $smallPadding;
-      height: 4rem;
-      min-width: 6rem;
-      max-width: 8rem;
-    }
-
-    .TagManager__Tag {
-      background-color: $white;
-      padding: $smallPadding*6;
-      margin-bottom: $smallPadding;
-      position: relative;
-
-      &.u-destructive-bg {
-        color: $white !important;
-      }
-
-      &:not(.u-destructive-bg) {
-        color: $black !important;
-      }
-
-      display: flex;
-      justify-content: center;
-      align-items: center;
-
-      .TagManager__TagTitle {
-        text-align: center;
-
-        input {
-          max-width: 7rem;
-        }
-      }
-
-      .TagManager__PhraseButton {
-        position: absolute;
-        top: 6px;
-        right: 6px;
-      }
-
-      .TagManager__RemoveButton {
-        position: absolute;
-        top: 6px;
-        left: 6px;
-      }
-
-      &:hover {
-        background-color: $buttonBottom;
-      }
-    }
-  }
-}
-
-.SimpleRadioInput {
-  width: 100%;
-
-  > div {
-    text-align: center;
-  }
-
-  &.m-no-margin-bottom {
-    margin-bottom: 0;
-  }
-
-  .SimpleRadioInput__Choice {
-    margin-right: 2rem;
-    cursor: pointer;
   }
 }
 
@@ -1155,56 +589,6 @@ label.SimpleCheckbox {
         flex-grow: 1;
         margin: 0.5rem 10px;
       }
-    }
-  }
-}
-
-.SourceTags {
-  @include noselect;
-  position: absolute;
-  display: flex;
-  flex-wrap: wrap;
-  height: auto;
-  line-height: 1.5rem;
-  width: 100%;
-  align-items: center;
-  justify-content: center;
-
-  z-index: 8;
-  padding: $smallPadding;
-  @include buttonBarBackground;
-
-  opacity: 0;
-  bottom: -3rem;
-  transition: opacity 500ms ease-in-out,
-  bottom 500ms ease-in-out;
-
-  &:hover {
-    bottom: 0;
-    opacity: 1;
-    transition: opacity 500ms ease-in-out, bottom 500ms ease-in-out;
-  }
-
-  .SourceTag {
-    background-color: $white;
-    padding: $smallPadding;
-    margin: $smallPadding $smallPadding 0 $smallPadding;
-    color: $black !important;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    .SourceTagTitle {
-      text-align: center;
-    }
-
-    &.u-selected {
-      background-color: #ccc;
-    }
-
-    &:hover {
-      background-color: #ccc;
     }
   }
 }

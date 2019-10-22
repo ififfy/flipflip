@@ -332,7 +332,7 @@ class ConfigForm extends React.Component {
                       config={this.state.config}
                       onBackup={this.props.onBackup.bind(this)}
                       onClean={this.props.onClean.bind(this)}
-                      onRestore={this.props.onRestore.bind(this)}
+                      onRestore={this.onRestore.bind(this)}
                       onUpdateCachingSettings={this.onUpdateCachingSettings.bind(this)}
                       onUpdateConfig={this.onUpdateConfig.bind(this)}
                       onUpdateDisplaySettings={this.onUpdateDisplaySettings.bind(this)}
@@ -426,6 +426,11 @@ class ConfigForm extends React.Component {
     return errorMessages;
   }
 
+  onRestore(backupFile: string) {
+    this.setState({changeMade: false});
+    this.props.onRestore(backupFile);
+  }
+
   onUpdateConfig(fn: (config: Config) => void) {
     const newConfig = this.props.config;
     fn(newConfig);
@@ -453,7 +458,7 @@ class ConfigForm extends React.Component {
   onUpdateRemoteSettings(fn: (keys: RemoteSettings) => void) {
     const newConfig = this.state.config;
     fn(newConfig.remoteSettings);
-    this.setState({config: newConfig, changeMade: true});
+    this.setState({config: newConfig});
   }
 
   onToggleDrawer() {

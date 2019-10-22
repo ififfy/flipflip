@@ -241,6 +241,7 @@ class Player extends React.Component {
     const validOverlays = this.getValidOverlays();
     const nextScene = this.getScene(this.props.scene.nextSceneID);
     const showCaptionProgram = (
+      this.props.scene.textEnabled &&
       this.props.scene.textSource &&
       this.props.scene.textSource.length &&
       this.state.isPlaying &&
@@ -322,7 +323,8 @@ class Player extends React.Component {
                 setTimeToNextFrame={this.setTimeToNextFrame.bind(this)}
               />
 
-              {validOverlays.length > 0 && !this.state.isEmpty && validOverlays.map((overlay, index) => {
+              {this.props.scene.overlayEnabled && validOverlays.length > 0 &&
+               !this.state.isEmpty && validOverlays.map((overlay, index) => {
                 let showProgress = this.state.isMainLoaded && !this.state.hasStarted;
                 if (showProgress) {
                   for (let x=0; x < index; x++) {
@@ -591,7 +593,7 @@ class Player extends React.Component {
             </ExpansionPanelDetails>
           </ExpansionPanel>
 
-          <ExpansionPanel>
+          <ExpansionPanel TransitionProps={{ unmountOnExit: this.props.scene.audioEnabled }}>
             <ExpansionPanelSummary
               expandIcon={<ExpandMoreIcon />}
             >

@@ -1327,16 +1327,17 @@ export function importTumblr(getState: () => State, setState: Function) {
       }
 
       // dedup
-      let sourceURLs = state.library.map((s) => s.url);
+      const newestState = getState();
+      let sourceURLs = newestState.library.map((s) => s.url);
       following = following.filter((b) => !sourceURLs.includes(b));
 
-      let id = state.library.length + 1;
-      state.library.forEach((s) => {
+      let id = newestState.library.length + 1;
+      newestState.library.forEach((s) => {
         id = Math.max(s.id + 1, id);
       });
 
       // Add to Library
-      let newLibrary = state.library;
+      let newLibrary = newestState.library;
       for (let url of following) {
         newLibrary = newLibrary.concat([new LibrarySource({
           url: url,
@@ -1345,7 +1346,7 @@ export function importTumblr(getState: () => State, setState: Function) {
         })]);
         id += 1;
       }
-      //this.props.onUpdateLibrary(newLibrary);
+      setState({library: newLibrary});
 
       let nextOffset = offset + 20;
       if (offset > state.progressTotal) {
@@ -1418,16 +1419,17 @@ export function importReddit(getState: () => State, setState: Function) {
         }
 
         // dedup
-        let sourceURLs = state.library.map((s) => s.url);
+        const newestState = getState();
+        let sourceURLs = newestState.library.map((s) => s.url);
         subscriptions = subscriptions.filter((s) => !sourceURLs.includes(s));
 
-        let id = state.library.length + 1;
-        state.library.forEach((s) => {
+        let id = newestState.library.length + 1;
+        newestState.library.forEach((s) => {
           id = Math.max(s.id + 1, id);
         });
 
         // Add to Library
-        let newLibrary = state.library;
+        let newLibrary = newestState.library;
         for (let url of subscriptions) {
           newLibrary = newLibrary.concat([new LibrarySource({
             url: url,
@@ -1436,7 +1438,7 @@ export function importReddit(getState: () => State, setState: Function) {
           })]);
           id += 1;
         }
-        //this.props.onUpdateLibrary(newLibrary);
+        setState({library: newLibrary});
 
         // Loop until we run out of blogs
         setTimeout(redditImportLoop, 1500);
@@ -1485,8 +1487,10 @@ export function importTwitter(getState: () => State, setState: Function) {
     }
     twitter.get('friends/list', !state.progressNext ? {count: 200} : {count: 200, cursor: state.progressNext}, (error: any, data: any) => {
       if (error) {
-        alert("Error retrieving following: " + error);
-        console.error(error);
+        for (let e of error) {
+          alert("Error retrieving following: " + e.code + " - " + e.message);
+          console.error("Error retrieving following: " + e.code + " - " + e.message);
+        }
         setState({progressMode: null, progressNext: null, progressCurrent: 0});
         return;
       }
@@ -1499,16 +1503,17 @@ export function importTwitter(getState: () => State, setState: Function) {
       }
 
       // dedup
-      let sourceURLs = state.library.map((s) => s.url);
+      const newestState = getState();
+      let sourceURLs = newestState.library.map((s) => s.url);
       following = following.filter((s) => !sourceURLs.includes(s));
 
-      let id = state.library.length + 1;
-      state.library.forEach((s) => {
+      let id = newestState.library.length + 1;
+      newestState.library.forEach((s) => {
         id = Math.max(s.id + 1, id);
       });
 
       // Add to Library
-      let newLibrary = state.library;
+      let newLibrary = newestState.library;
       for (let url of following) {
         newLibrary = newLibrary.concat([new LibrarySource({
           url: url,
@@ -1517,7 +1522,7 @@ export function importTwitter(getState: () => State, setState: Function) {
         })]);
         id += 1;
       }
-      //this.props.onUpdateLibrary(newLibrary);
+      setState({library: newLibrary});
 
       if (data.next_cursor == 0) { // We're done
         setState({progressMode: null, progressNext: null, progressCurrent: 0});
@@ -1562,16 +1567,17 @@ export function importInstagram(getState: () => State, setState: Function) {
     }
 
     // dedup
-    let sourceURLs = state.library.map((s) => s.url);
+    const newestState = getState();
+    let sourceURLs = newestState.library.map((s) => s.url);
     following = following.filter((s) => !sourceURLs.includes(s));
 
-    let id = state.library.length + 1;
-    state.library.forEach((s) => {
+    let id = newestState.library.length + 1;
+    newestState.library.forEach((s) => {
       id = Math.max(s.id + 1, id);
     });
 
     // Add to Library
-    let newLibrary = state.library;
+    let newLibrary = newestState.library;
     for (let url of following) {
       newLibrary = newLibrary.concat([new LibrarySource({
         url: url,
@@ -1580,7 +1586,7 @@ export function importInstagram(getState: () => State, setState: Function) {
       })]);
       id += 1;
     }
-    //this.props.onUpdateLibrary(newLibrary);
+    setState({library: newLibrary});
 
     // Loop until we run out of blogs
     setTimeout(instagramImportLoop, 1500);

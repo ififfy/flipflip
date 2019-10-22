@@ -91,7 +91,7 @@ class AudioControl extends React.Component {
             </Collapse>
           </Grid>
         )}
-        {this.props.audio.tick && (
+        {this.props.scene.audioEnabled && this.props.audio.tick && (
           <SoundTick
             url={this.props.audio.url}
             playing={playing}
@@ -100,7 +100,7 @@ class AudioControl extends React.Component {
             tick={this.state.tick}
           />
         )}
-        {!this.props.audio.tick && (
+        {this.props.scene.audioEnabled && !this.props.audio.tick && (
           <Sound
             url={this.props.audio.url}
             playStatus={playing}
