@@ -53,6 +53,10 @@ div.CreatableSelect {
   }
 }
 
+#force-webpack-to-load-logo {
+  background: url("./icons/flipflip_logo.png") no-repeat;
+}
+
 @mixin noselect {
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */
