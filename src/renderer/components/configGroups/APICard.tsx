@@ -73,7 +73,9 @@ class APICard extends React.Component {
     errorSnack: null as string,
     server: null as any,
     instagramMode: null as string,
-    instagramInput: "",
+    input1: "",
+    input2: "",
+    input3: "",
   };
 
   render() {
@@ -236,14 +238,14 @@ class APICard extends React.Component {
                   fullWidth
                   margin="dense"
                   label="Tumblr OAuth Consumer Key"
-                  value={this.props.settings.tumblrKey}
-                  onChange={this.onInput.bind(this, 'tumblrKey')}/>
+                  value={this.state.input1}
+                  onChange={this.onInput1.bind(this)}/>
                 <TextField
                   fullWidth
                   margin="dense"
                   label="Tumblr OAuth Consumer Secret"
-                  value={this.props.settings.tumblrSecret}
-                  onChange={this.onInput.bind(this, 'tumblrSecret')}/>
+                  value={this.state.input2}
+                  onChange={this.onInput2.bind(this)}/>
               </div>
             </div>
           </DialogContent>
@@ -252,7 +254,7 @@ class APICard extends React.Component {
               Cancel
             </Button>
             <Button
-              disabled={this.props.settings.tumblrKey.length != 50 || this.props.settings.tumblrSecret.length != 50}
+              disabled={this.state.input1.length != 50 || this.state.input2.length != 50}
               onClick={this.onContinueAuthTumblr.bind(this)} color="primary">
               Authorize FlipFlip on Tumblr
             </Button>
@@ -317,7 +319,7 @@ class APICard extends React.Component {
 
         <Dialog
           open={this.state.openMenu == MO.signIn && this.state.menuType == ST.instagram}
-          onClose={this.onCloseInstagramDialog.bind(this)}
+          onClose={this.onCloseDialog.bind(this)}
           aria-labelledby="instagram-title"
           aria-describedby="instagram-description">
           <DialogTitle id="instagram-title">
@@ -336,16 +338,16 @@ class APICard extends React.Component {
               disabled={this.state.instagramMode != null}
               margin="dense"
               label="Instagram Username"
-              value={this.props.settings.instagramUsername}
-              onChange={this.onInput.bind(this, 'instagramUsername')}/>
+              value={this.state.input1}
+              onChange={this.onInput1.bind(this)}/>
             <TextField
               fullWidth
               disabled={this.state.instagramMode != null}
               margin="dense"
               label="Instagram Password"
               type="password"
-              value={this.props.settings.instagramPassword}
-              onChange={this.onInput.bind(this, 'instagramPassword')}/>
+              value={this.state.input2}
+              onChange={this.onInput2.bind(this)}/>
             <Collapse in={this.state.instagramMode == IG.tfa}>
               <DialogContentText id="instagram-description">
                 Enter your two-factor authentication code to confirm login:
@@ -354,8 +356,8 @@ class APICard extends React.Component {
                 fullWidth
                 margin="dense"
                 label="Instagram 2FA"
-                value={this.state.instagramInput}
-                onChange={this.onInstagramInput.bind(this)}/>
+                value={this.state.input3}
+                onChange={this.onInput3.bind(this)}/>
             </Collapse>
             <Collapse in={this.state.instagramMode == IG.checkpoint}>
               <DialogContentText id="instagram-description">
@@ -365,31 +367,31 @@ class APICard extends React.Component {
                 fullWidth
                 margin="dense"
                 label="Instagram Checkpoint"
-                value={this.state.instagramInput}
-                onChange={this.onInstagramInput.bind(this)}/>
+                value={this.state.input3}
+                onChange={this.onInput3.bind(this)}/>
             </Collapse>
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.onCloseInstagramDialog.bind(this)} color="secondary">
+            <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
               Cancel
             </Button>
             {this.state.instagramMode == IG.tfa && (
               <Button
-                disabled={this.props.settings.instagramInput.length == 0}
+                disabled={this.state.input3.length == 0}
                 onClick={this.onTFAInstagram.bind(this)} color="primary">
                 Authorize FlipFlip on Instagram
               </Button>
             )}
             {this.state.instagramMode == IG.checkpoint && (
               <Button
-                disabled={this.props.settings.instagramInput.length == 0}
+                disabled={this.state.input3.length == 0}
                 onClick={this.onCheckpointInstagram.bind(this)} color="primary">
                 Authorize FlipFlip on Instagram
               </Button>
             )}
             {this.state.instagramMode == null && (
               <Button
-                disabled={this.props.settings.instagramUsername.length == 0 || this.props.settings.instagramPassword.length == 0}
+                disabled={this.state.input1.length == 0 || this.state.input2.length == 0}
                 onClick={this.onFinishAuthInstagram.bind(this)} color="primary">
                 Authorize FlipFlip on Instagram
               </Button>
@@ -499,10 +501,20 @@ class APICard extends React.Component {
   }
 
   onAuthTumblr() {
-    this.setState({openMenu: MO.new, menuType: ST.tumblr});
+    this.setState({
+      openMenu: MO.new,
+      menuType: ST.tumblr,
+      input1: this.props.settings.tumblrKey,
+      input2: this.props.settings.tumblrSecret
+    });
   }
 
   onContinueAuthTumblr() {
+    // Update state
+    this.props.onUpdateSettings((s) => {
+      s.tumblrKey = this.state.input1;
+      s.tumblrSecret = this.state.input2;
+    });
     this.setState({openMenu: MO.signIn, menuType: ST.tumblr});
   }
 
@@ -512,10 +524,12 @@ class APICard extends React.Component {
     if (value == 0) {
       this.changeKey('tumblrKey', "");
       this.changeKey('tumblrSecret', "");
+      this.setState({input1: "", input2: ""});
     } else {
       const indexOf = value-1;
       this.changeKey('tumblrKey', this.props.settings.tumblrKeys[indexOf]);
       this.changeKey('tumblrSecret', this.props.settings.tumblrSecrets[indexOf]);
+      this.setState({input1: this.props.settings.tumblrKeys[indexOf], input2: this.props.settings.tumblrSecrets[indexOf]});
     }
   }
 
@@ -528,21 +542,11 @@ class APICard extends React.Component {
   }
 
   onAuthInstagram() {
-    this.setState({openMenu: MO.signIn, menuType: ST.instagram});
-  }
-
-  onInstagramInput(e: MouseEvent) {
-    const input = (e.target as HTMLInputElement);
-    this.setState({instagramInput: input.value});
+    this.setState({openMenu: MO.signIn, menuType: ST.instagram, input1: this.props.settings.instagramUsername, input2: this.props.settings.instagramPassword});
   }
 
   onCloseDialog() {
-    this.setState({openMenu: null, menuType: null, instagramInput: "", instagramMode: null});
-  }
-
-  onCloseInstagramDialog() {
-    this.onCloseDialog();
-    this.changeKey('instagramPassword', "");
+    this.setState({openMenu: null, menuType: null, input1: "", input2: "", input3: "", instagramMode: null});
   }
 
   openLink(url: string) {
@@ -565,9 +569,19 @@ class APICard extends React.Component {
     this.setState({errorSnack: null});
   }
 
-  onInput(key: string, e: MouseEvent) {
+  onInput1(e: MouseEvent) {
     const input = (e.target as HTMLInputElement);
-    this.changeKey(key, input.value);
+    this.setState({input1: input.value});
+  }
+
+  onInput2(e: MouseEvent) {
+    const input = (e.target as HTMLInputElement);
+    this.setState({input2: input.value});
+  }
+
+  onInput3(e: MouseEvent) {
+    const input = (e.target as HTMLInputElement);
+    this.setState({input3: input.value});
   }
 
   changeKey(key: string, value: any) {
@@ -859,12 +873,17 @@ class APICard extends React.Component {
   onFinishAuthInstagram() {
     this._ig = new IgApiClient();
     this._tfa = null;
-    this._ig.state.generateDevice(this.props.settings.instagramUsername);
-    this._ig.account.login(this.props.settings.instagramUsername, this.props.settings.instagramPassword).then((loggedInUser) => {
+    this._ig.state.generateDevice(this.state.input1);
+    this._ig.account.login(this.state.input1, this.state.input2).then((loggedInUser) => {
       // Update props
       this.props.onUpdateConfig((c) => {
-        c.remoteSettings.instagramUsername = this.props.settings.instagramUsername;
-        c.remoteSettings.instagramPassword = this.props.settings.instagramPassword;
+        c.remoteSettings.instagramUsername = this.state.input1;
+        c.remoteSettings.instagramPassword = this.state.input2;
+      });
+      // Update state
+      this.props.onUpdateSettings((s) => {
+        s.instagramUsername = this.state.input1;
+        s.instagramPassword = this.state.input2;
       });
       this.setState({successSnack: "Instagram is activated"});
       this.onCloseDialog();
@@ -878,7 +897,7 @@ class APICard extends React.Component {
           this.setState({instagramMode: IG.checkpoint});
         });
       } else {
-        this.onCloseInstagramDialog();
+        this.onCloseDialog();
         console.error(e);
         this.setState({errorSnack: e.message});
         this._ig = null;
@@ -892,19 +911,24 @@ class APICard extends React.Component {
       verificationMethod: '1',
       trustThisDevice: '1',
       username: this.props.settings.instagramUsername,
-      verificationCode: this.state.instagramInput,
+      verificationCode: this.state.input3,
     }).then(() => {
       // Update props
       this.props.onUpdateConfig((c) => {
-        c.remoteSettings.instagramUsername = this.props.settings.instagramUsername;
-        c.remoteSettings.instagramPassword = this.props.settings.instagramPassword;
+        c.remoteSettings.instagramUsername = this.state.input1;
+        c.remoteSettings.instagramPassword = this.state.input2;
+      });
+      // Update state
+      this.props.onUpdateSettings((s) => {
+        s.instagramUsername = this.state.input1;
+        s.instagramPassword = this.state.input2;
       });
       this.setState({successSnack: "Instagram is activated"});
       this.onCloseDialog();
       this._ig = null;
       this._tfa = null;
     }).catch((e) => {
-      this.onCloseInstagramDialog();
+      this.onCloseDialog();
       console.error(e);
       this.setState({errorSnack: e.message});
       this._ig = null;
@@ -913,17 +937,22 @@ class APICard extends React.Component {
   }
 
   onCheckpointInstagram() {
-    this._ig.challenge.sendSecurityCode(this.state.instagramInput).then(() => {
+    this._ig.challenge.sendSecurityCode(this.state.input3).then(() => {
       // Update props
       this.props.onUpdateConfig((c) => {
-        c.remoteSettings.instagramUsername = this.props.settings.instagramUsername;
-        c.remoteSettings.instagramPassword = this.props.settings.instagramPassword;
+        c.remoteSettings.instagramUsername = this.state.input1;
+        c.remoteSettings.instagramPassword = this.state.input2;
+      });
+      // Update state
+      this.props.onUpdateSettings((s) => {
+        s.instagramUsername = this.state.input1;
+        s.instagramPassword = this.state.input2;
       });
       this.setState({successSnack: "Instagram is activated"});
       this.onCloseDialog();
       this._ig = null;
     }).catch((e) => {
-      this.onCloseInstagramDialog();
+      this.onCloseDialog();
       console.error(e);
       this.setState({errorSnack: e.message});
       this._ig = null;
