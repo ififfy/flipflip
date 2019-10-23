@@ -18,7 +18,7 @@ import PauseIcon from '@material-ui/icons/Pause';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 
 import {createMainMenu, createMenuTemplate} from "../../../main/MainMenu";
-import {IF, SL, ST, VC} from "../../data/const";
+import {IF, SL, ST} from "../../data/const";
 import {getCachePath, getSourceType, urlToPath} from '../../data/utils';
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
@@ -35,7 +35,7 @@ import ImageVideoCard from "../configGroups/ImageVideoCard";
 import SceneOptionCard from "../configGroups/SceneOptionCard";
 import StrobeCard from "../configGroups/StrobeCard";
 import TextCard from "../configGroups/TextCard";
-import VideoGroup from "../configGroups/VideoGroup";
+import VideoCard from "../configGroups/VideoCard";
 import ZoomMoveCard from "../configGroups/ZoomMoveCard";
 
 const drawerWidth = 340;
@@ -496,16 +496,24 @@ class Player extends React.Component {
               Settings
             </Typography>
           </div>
+
           {this.props.scene.imageTypeFilter != IF.stills && (
-            <VideoGroup
-              scene={this.props.scene}
-              otherScenes={this.props.scene.gridView ? this.getValidGrid().map((o) => this.getScene(o)) : this.getValidOverlays().map((o) => this.getScene(o.sceneID))}
-              isPlaying={this.state.isPlaying}
-              mainVideo={this.state.mainVideo}
-              otherVideos={this.props.scene.gridView ? this.state.gridVideos : this.state.overlayVideos}
-              mode={VC.player}
-              onUpdateScene={this.props.onUpdateScene.bind(this)}
-            />
+            <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+              <ExpansionPanelSummary
+                expandIcon={<ExpandMoreIcon />}
+              >
+                <Typography>Video Controls</Typography>
+              </ExpansionPanelSummary>
+              <ExpansionPanelDetails>
+                <VideoCard
+                  scene={this.props.scene}
+                  otherScenes={this.getValidOverlays().map((o) => this.getScene(o.sceneID))}
+                  isPlaying={this.state.isPlaying}
+                  mainVideo={this.state.mainVideo}
+                  otherVideos={this.state.overlayVideos}
+                  onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+              </ExpansionPanelDetails>
+            </ExpansionPanel>
           )}
 
           <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>

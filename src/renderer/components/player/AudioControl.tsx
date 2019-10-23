@@ -521,7 +521,7 @@ class AudioControl extends React.Component {
   }
 
   onBack() {
-    let position = this.state.position - 15000;
+    let position = this.state.position - 10000;
     if (position < 0) {
       position = 0;
     }
@@ -529,7 +529,7 @@ class AudioControl extends React.Component {
   }
 
   onForward() {
-    let position = this.state.position + 15000;
+    let position = this.state.position + 10000;
     if (position > this.state.duration) {
       position = this.state.duration;
     }

@@ -12,7 +12,6 @@ import VolumeUpIcon from '@material-ui/icons/VolumeUp';
 
 
 import {getTimestamp} from "../../data/utils";
-import {VC} from "../../data/const";
 import Clip from "../../data/Clip";
 
 const styles = (theme: Theme) => createStyles({
@@ -46,7 +45,7 @@ class VideoControl extends React.Component {
   readonly props: {
     classes: any,
     video: HTMLVideoElement,
-    mode: string,
+    player?: boolean,
     volume?: number,
     clip?: Array<number>,
     clips?: Array<Clip>,
@@ -61,64 +60,61 @@ class VideoControl extends React.Component {
 
   render() {
     const classes = this.props.classes;
-    if (this.props.mode == VC.sceneClipper) {
-      return (
-        <Grid container spacing={1} alignItems="center">
-          <Grid item xs className={classes.timeSlider}>
-            <Slider
-              min={this.props.clip ? this.props.clip[0] : 0}
-              max={this.props.clip ? this.props.clip[1] : this.props.video.duration}
-              color={this.props.clip ? "secondary" : "primary"}
-              value={this.props.video.currentTime}
-              ValueLabelComponent={(props) => <StyledValueLabel {...props}/>}
-              valueLabelDisplay="on"
-              valueLabelFormat={(value) => getTimestamp(value)}
-              marks={this.state.marks}
-              onChange={this.onChangePosition.bind(this)}/>
-          </Grid>
-          <Grid item>
-            <Grid container alignItems="center">
-              <Grid item xs={12} style={{textAlign: 'center'}}>
-                <Tooltip title="Jump Back">
-                  <IconButton
-                    onClick={this.onBack.bind(this)}>
-                    <Replay10Icon/>
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title={this.state.playing ? "Pause" : "Play"}>
-                  <IconButton
-                    onClick={this.state.playing ? this.onPause.bind(this) : this.onPlay.bind(this)}>
-                    {this.state.playing ? <PauseIcon/> : <PlayArrowIcon/>}
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Jump Forward">
-                  <IconButton
-                    onClick={this.onForward.bind(this)}>
-                    <Forward10Icon/>
-                  </IconButton>
-                </Tooltip>
-              </Grid>
-              <Grid item xs={12}>
-                <Grid container spacing={1}>
-                  <Grid item>
-                    <VolumeDownIcon/>
-                  </Grid>
-                  <Grid item xs>
-                    <Slider value={this.props.volume ? this.props.volume : this.props.video.volume * 100}
-                            onChange={this.onChangeVolume.bind(this)}
-                            aria-labelledby="audio-volume-slider"/>
-                  </Grid>
-                  <Grid item>
-                    <VolumeUpIcon/>
-                  </Grid>
+    return (
+      <Grid container spacing={1} alignItems="center" justify={this.props.player ? "center" : "flex-start"}>
+        <Grid item xs={this.props.player ? 12 : true} className={classes.timeSlider}>
+          <Slider
+            min={this.props.clip ? this.props.clip[0] : 0}
+            max={this.props.clip ? this.props.clip[1] : this.props.video.duration}
+            color={this.props.clip ? "secondary" : "primary"}
+            value={this.props.video.currentTime}
+            ValueLabelComponent={(props) => <StyledValueLabel {...props}/>}
+            valueLabelDisplay="on"
+            valueLabelFormat={(value) => getTimestamp(value)}
+            marks={this.state.marks}
+            onChange={this.onChangePosition.bind(this)}/>
+        </Grid>
+        <Grid item>
+          <Grid container alignItems="center">
+            <Grid item xs={12} style={{textAlign: 'center'}}>
+              <Tooltip title="Jump Back">
+                <IconButton
+                  onClick={this.onBack.bind(this)}>
+                  <Replay10Icon/>
+                </IconButton>
+              </Tooltip>
+              <Tooltip title={this.state.playing ? "Pause" : "Play"}>
+                <IconButton
+                  onClick={this.state.playing ? this.onPause.bind(this) : this.onPlay.bind(this)}>
+                  {this.state.playing ? <PauseIcon/> : <PlayArrowIcon/>}
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Jump Forward">
+                <IconButton
+                  onClick={this.onForward.bind(this)}>
+                  <Forward10Icon/>
+                </IconButton>
+              </Tooltip>
+            </Grid>
+            <Grid item xs={12}>
+              <Grid container spacing={1}>
+                <Grid item>
+                  <VolumeDownIcon/>
+                </Grid>
+                <Grid item xs>
+                  <Slider value={this.props.volume ? this.props.volume : this.props.video.volume * 100}
+                          onChange={this.onChangeVolume.bind(this)}
+                          aria-labelledby="audio-volume-slider"/>
+                </Grid>
+                <Grid item>
+                  <VolumeUpIcon/>
                 </Grid>
               </Grid>
             </Grid>
           </Grid>
         </Grid>
-      );
-    }
-    return <div/>;
+      </Grid>
+    );
   }
 
   _interval: any = null;
@@ -143,8 +139,8 @@ class VideoControl extends React.Component {
   }
 
   componentDidUpdate(props: any) {
-    // If the clip has changed, or we don't have the expected number of marks
-    if (this.props.clip != props.clip ||
+    // If the clip/video has changed, or we don't have the expected number of marks
+    if (this.props.clip != props.clip || this.props.video != props.video ||
       (this.props.clips && this.state.marks.length !=
         (this.props.clip ? 2 : this.props.clips.length + 2))) {
       this.setState({marks: this.getMarks()});
@@ -185,7 +181,7 @@ class VideoControl extends React.Component {
   }
 
   onBack() {
-    let position = this.props.video.currentTime - 15;
+    let position = this.props.video.currentTime - 10;
     if (position < 0) {
       position = 0;
     }
@@ -193,7 +189,7 @@ class VideoControl extends React.Component {
   }
 
   onForward() {
-    let position = this.props.video.currentTime + 15;
+    let position = this.props.video.currentTime + 10;
     if (position > this.props.video.duration) {
       position = this.props.video.duration;
     }

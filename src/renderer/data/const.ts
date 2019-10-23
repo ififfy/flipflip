@@ -111,11 +111,6 @@ const IPC = {
   startScene: 'ipc.startScene',
 };
 
-const VC = { // Video Control Modes
-  player: 'vc.p',
-  sceneClipper: 'vc.sc',
-};
-
 const MO = { // Menu/Modal Constants
   new: 'mo.new',
   sort: 'mo.sort',
@@ -156,5 +151,5 @@ const IG = { // Instagram modes
 };
 
 export {
-  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, GT, TT, SF, ST, SL, AF, IPC, VC, MO, PR, SB, IG
+  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG
 };

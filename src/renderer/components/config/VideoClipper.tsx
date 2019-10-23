@@ -14,7 +14,7 @@ import KeyboardReturnIcon from '@material-ui/icons/KeyboardReturn';
 import SaveIcon from '@material-ui/icons/Save';
 
 import {getTimestamp, getTimestampValue} from "../../data/utils";
-import {BT, VC} from "../../data/const";
+import {BT} from "../../data/const";
 import LibrarySource from "../../data/LibrarySource";
 import Clip from "../../data/Clip";
 import Scene from "../../data/Scene";
@@ -201,13 +201,15 @@ class VideoClipper extends React.Component {
                   <Collapse in={this.state.isEditing == -1}>
                     <Grid container spacing={1} alignItems="center">
                       <Grid item>
-                        <Fab
-                          color="primary"
-                          size="small"
-                          className={clsx(classes.fab, classes.addFab)}
-                          onClick={this.onAdd.bind(this)}>
-                          <AddIcon/>
-                        </Fab>
+                        <Tooltip title="New Clip" placement="top">
+                          <Fab
+                            color="primary"
+                            size="small"
+                            className={clsx(classes.fab, classes.addFab)}
+                            onClick={this.onAdd.bind(this)}>
+                            <AddIcon/>
+                          </Fab>
+                        </Tooltip>
                       </Grid>
                       {this.props.source.clips.map((c) =>
                         <Grid key={c.id} item>
@@ -250,26 +252,32 @@ class VideoClipper extends React.Component {
                           onChange={this.onChangeEndText.bind(this)}/>
                       </Grid>
                       <Grid item>
-                        <Fab
-                          color="primary"
-                          size="small"
-                          className={classes.fab}
-                          onClick={this.onSave.bind(this)}>
-                          <SaveIcon/>
-                        </Fab>
+                        <Tooltip title="Save" placement="top">
+                          <Fab
+                            color="primary"
+                            size="small"
+                            className={classes.fab}
+                            onClick={this.onSave.bind(this)}>
+                            <SaveIcon/>
+                          </Fab>
+                        </Tooltip>
                       </Grid>
                       <Grid item>
-                        <Fab
-                          size="small"
-                          className={clsx(classes.fab, classes.removeFab)}
-                          onClick={this.onRemove.bind(this)}>
-                          <DeleteIcon color="inherit" />
-                        </Fab>
+                        <Tooltip title="Delete Clip" placement="top">
+                          <Fab
+                            size="small"
+                            className={clsx(classes.fab, classes.removeFab)}
+                            onClick={this.onRemove.bind(this)}>
+                            <DeleteIcon color="inherit" />
+                          </Fab>
+                        </Tooltip>
                       </Grid>
                       <Grid item>
-                        <IconButton onClick={this.onCancel.bind(this)}>
-                          <KeyboardReturnIcon/>
-                        </IconButton>
+                        <Tooltip title="Cancel" placement="top">
+                          <IconButton onClick={this.onCancel.bind(this)}>
+                            <KeyboardReturnIcon/>
+                          </IconButton>
+                        </Tooltip>
                       </Grid>
                     </Grid>
                   </Collapse>
@@ -277,7 +285,6 @@ class VideoClipper extends React.Component {
                 <Grid item xs={12}>
                   <VideoControl
                     video={this.state.video}
-                    mode={VC.sceneClipper}
                     volume={this.state.scene.videoVolume}
                     clip={this.state.isEditing == -1 ? null : this.state.isEditingValue}
                     clips={this.props.source.clips}
