@@ -1,154 +1,295 @@
-import * as React from 'react';
-import InputRange from "react-input-range";
+import * as React from "react";
+import clsx from "clsx";
 
-import {BT, VC} from "../../data/const";
+import {
+  AppBar, Button, CircularProgress, Collapse, Container, createStyles, Drawer, Fab, Grid, IconButton, Slider, TextField,
+  Theme, Toolbar, Tooltip, Typography, withStyles
+} from "@material-ui/core";
+import ValueLabel from "@material-ui/core/Slider/ValueLabel";
+
+import AddIcon from '@material-ui/icons/Add';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import DeleteIcon from '@material-ui/icons/Delete';
+import KeyboardReturnIcon from '@material-ui/icons/KeyboardReturn';
+import SaveIcon from '@material-ui/icons/Save';
+
 import {getTimestamp, getTimestampValue} from "../../data/utils";
+import {BT, VC} from "../../data/const";
+import LibrarySource from "../../data/LibrarySource";
+import Clip from "../../data/Clip";
+import Scene from "../../data/Scene";
 import ImageView from "../player/ImageView";
 import VideoControl from "../player/VideoControl";
-import Clip from "../../data/Clip";
-import LibrarySource from "../../data/LibrarySource";
-import Scene from "../../data/Scene";
-import SimpleSliderInput from "../ui/SimpleSliderInput";
-import SimpleTextInput from "../ui/SimpleTextInput";
 
-export default class VideoClipper extends React.Component {
+const styles = (theme: Theme) => createStyles({
+  root: {
+    display: 'flex',
+  },
+  content: {
+    display: 'flex',
+    flexGrow: 1,
+    flexDirection: 'column',
+    height: '100vh',
+    backgroundColor: (theme.palette.primary as any)["50"],
+  },
+  videoContent: {
+    display: 'flex',
+    flexGrow: 1,
+    flexDirection: 'column',
+    height: '100vh',
+    backgroundColor: theme.palette.common.black,
+  },
+  container: {
+    flexGrow: 1,
+    padding: theme.spacing(0),
+    overflowY: 'auto',
+    position: 'relative',
+  },
+  progress: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    display: 'flex',
+  },
+  appBar: {
+    height: theme.spacing(8),
+  },
+  drawerSpacer: {
+    height: theme.spacing(17.5),
+  },
+  title: {
+    textAlign: 'center',
+  },
+  clipDrawerPaper: {
+    backgroundColor: (theme.palette.primary as any)["50"],
+  },
+  emptyMessage: {
+    textAlign: 'center',
+    marginTop: '25vh',
+  },
+  emptyMessage2: {
+    textAlign: 'center',
+  },
+  timeSlider: {
+    marginLeft: theme.spacing(2),
+    marginRight: theme.spacing(3),
+    marginTop: theme.spacing(2),
+  },
+  clipField: {
+    maxWidth: theme.spacing(8),
+  },
+  fab: {
+    boxShadow: 'none',
+  },
+  addFab: {
+    marginLeft: theme.spacing(1),
+  },
+  removeFab: {
+    backgroundColor: theme.palette.error.main,
+    color: theme.palette.error.contrastText,
+  },
+  fill: {
+    flexGrow: 1,
+  },
+});
+
+const StyledValueLabel = withStyles((theme: Theme) => createStyles({
+  offset: {
+    top: -5,
+    left: 'calc(-50% + 8px)',
+    fontSize: '1rem',
+  },
+  circle: {
+    width: theme.spacing(1),
+    height: theme.spacing(1),
+    backgroundColor: 'transparent',
+  },
+  label: {
+    color: theme.palette.text.primary,
+  }
+}))(ValueLabel as any);
+
+class VideoClipper extends React.Component {
   readonly props: {
+    classes: any,
     source: LibrarySource,
     videoVolume: number,
-    onUpdateClips(url: string, clips: Array<Clip>): void,
-    goBack(): void,
     cache(video: HTMLVideoElement): void,
+    goBack(): void,
+    onUpdateClips(url: string, clips: Array<Clip>): void,
   };
 
   readonly state = {
     scene: new Scene(),
     video: null as HTMLVideoElement,
+    empty: false,
     isEditing: -1,
-    isEditingValue: null as {min: number, max: number},
+    isEditingValue: [0,0],
     isEditingStartText: "",
     isEditingEndText: "",
   };
 
   render() {
-    return (
-      <div className="VideoClipper">
-        <div className="u-button-row">
-          <div className="BackButton u-button u-clickable" onClick={this.props.goBack.bind(this)}>Back</div>
-          <div className="VolumeControl u-button-row-right" style={{marginTop: '-4px'}}>
-            <div
-              className="u-small-icon-button">
-              <div className="u-volume-down"/>
-            </div>
-            <SimpleSliderInput
-              label=""
-              min={0}
-              max={100}
-              value={this.state.scene.videoVolume}
-              isEnabled={true}
-              onChange={this.onChangeVolume.bind(this)} />
-            <div
-              className="u-small-icon-button">
-              <div className="u-volume-up"/>
-            </div>
-          </div>
-        </div>
+    const classes = this.props.classes;
+
+    return(
+      <div className={clsx(classes.root, "VideoClipper")}>
+        <AppBar
+          className={classes.appBar}>
+          <Toolbar>
+            <Tooltip title="Back" placement="right-end">
+              <IconButton
+                edge="start"
+                color="inherit"
+                aria-label="Back"
+                onClick={this.props.goBack.bind(this)}>
+                <ArrowBackIcon />
+              </IconButton>
+            </Tooltip>
+
+            <div className={classes.fill}/>
+            <Typography component="h1" variant="h4" color="inherit" noWrap className={classes.title}>
+              {this.props.source.url}
+            </Typography>
+            <div className={classes.fill}/>
+          </Toolbar>
+        </AppBar>
+
+        {!this.state.video && !this.state.empty && (
+          <main className={classes.content}>
+            <div className={classes.appBar}/>
+            <Container maxWidth={false} className={clsx(classes.container, classes.progress)}>
+              <CircularProgress size={200} />
+            </Container>
+          </main>
+        )}
+
+        {!this.state.video && this.state.empty && (
+          <main className={classes.content}>
+            <div className={classes.appBar}/>
+            <Container maxWidth={false} className={classes.container}>
+              <Typography component="h1" variant="h3" color="inherit" noWrap className={classes.emptyMessage}>
+                (ಥ﹏ಥ)
+              </Typography>
+              <Typography component="h1" variant="h4" color="inherit" noWrap className={classes.emptyMessage2}>
+                I couldn't find anything
+              </Typography>
+            </Container>
+          </main>
+        )}
+
         {this.state.video && (
           <React.Fragment>
-            <ImageView
-              image={this.state.video}
-              scene={this.state.scene}
-              timeToNextFrame={0}
-              fitParent={true}
-              hasStarted={true}
-              onLoaded={this.nop}
-              setVideo={this.nop}/>
-            <div className="VideoClipper__Clipper">
-              {this.state.isEditing == -1 && (
-                <div className="VideoClipper__Buttons">
-                  {this.props.source.clips && (
-                    <div className="VideoClipper__ClipList">
+            <main className={classes.videoContent}>
+              <div className={classes.appBar}/>
+              <Container maxWidth={false} className={classes.container}>
+                <ImageView
+                  image={this.state.video}
+                  scene={this.state.scene}
+                  fitParent
+                  hasStarted/>
+              </Container>
+              <div className={classes.drawerSpacer}/>
+            </main>
+
+            <Drawer
+              variant="permanent"
+              anchor="bottom"
+              classes={{paper: classes.clipDrawerPaper}}
+              open>
+              <Grid container alignItems="center">
+                <Grid item xs={12}>
+                  <Collapse in={this.state.isEditing == -1}>
+                    <Grid container spacing={1} alignItems="center">
+                      <Grid item>
+                        <Fab
+                          color="primary"
+                          size="small"
+                          className={clsx(classes.fab, classes.addFab)}
+                          onClick={this.onAdd.bind(this)}>
+                          <AddIcon/>
+                        </Fab>
+                      </Grid>
                       {this.props.source.clips.map((c) =>
-                        <div className="VideoClipper__Clip u-button u-clickable"
-                             key={c.id}
-                             onClick={this.onEdit.bind(this, c)}>
-                          {c.id}
-                        </div>
+                        <Grid key={c.id} item>
+                          <Button
+                            variant="contained"
+                            color="secondary"
+                            size="large"
+                            onClick={this.onEdit.bind(this, c)}>
+                            {c.id}
+                          </Button>
+                        </Grid>
                       )}
-                    </div>
-                  )}
-                  <div className="VideoClipper__Add u-button u-clickable"
-                       onClick={this.onAdd.bind(this)}>
-                    + Add New Clip
-                  </div>
-                </div>
-              )}
-              {this.state.isEditing != -1 && (
-                <div className="TrackControls">
-                  <div className="VideoSlider">
-                    <InputRange
-                      draggableTrack
-                      minValue={0}
-                      maxValue={this.state.video.duration}
-                      value={this.state.isEditingValue}
-                      formatLabel={(value) => getTimestamp(value)}
-                      onChange={this.onChangeValue.bind(this)}/>
-                  </div>
-                  <div className="TrackInputs"
-                       style={{maxWidth: this.state.isEditing == 0 ?  '14.5rem': '17.5rem'}}>
-                    <SimpleTextInput
-                      label="Start"
-                      value={this.state.isEditingStartText}
-                      isEnabled={true}
-                      onChange={this.onChangeStartText.bind(this)}/>
-                    <SimpleTextInput
-                      label="End"
-                      value={this.state.isEditingEndText}
-                      isEnabled={true}
-                      onChange={this.onChangeEndText.bind(this)}/>
-                    <div
-                      className="u-button u-icon-button u-clickable"
-                      title="Save"
-                      onClick={this.onSave.bind(this)}>
-                      <div className="u-save"/>
-                    </div>
-                    {this.state.isEditing > 0 && (
-                      <div
-                        className="u-button u-icon-button u-clickable"
-                        title="Delete"
-                        onClick={this.onRemove.bind(this)}>
-                        <div className="u-delete"/>
-                      </div>
-                    )}
-                    <div
-                      className="u-button u-icon-button u-clickable"
-                      title="Cancel"
-                      onClick={this.onCancel.bind(this)}>
-                      <div className="u-back"/>
-                    </div>
-                  </div>
-                </div>
-              )}
-              <div>
-                <VideoControl
-                  video={this.state.video}
-                  mode={VC.sceneClipper}
-                  volume={this.state.scene.videoVolume}
-                  clip={this.state.isEditingValue}
-                  onChangeVolume={this.onChangeVolume.bind(this)}/>
-              </div>
-            </div>
+                    </Grid>
+                  </Collapse>
+                  <Collapse in={this.state.isEditing != -1}>
+                    <Grid container spacing={1} alignItems="center">
+                      <Grid item xs className={classes.timeSlider}>
+                        <Slider
+                          min={0}
+                          max={this.state.video.duration}
+                          value={this.state.isEditingValue}
+                          ValueLabelComponent={(props) => <StyledValueLabel {...props}/>}
+                          valueLabelDisplay="on"
+                          valueLabelFormat={(value) => getTimestamp(value)}
+                          marks={[{value: 0, label: getTimestamp(0)}, {value: this.state.video.duration, label: getTimestamp(this.state.video.duration)}]}
+                          onChange={this.onChangePosition.bind(this)}/>
+                      </Grid>
+                      <Grid item>
+                        <TextField
+                          className={classes.clipField}
+                          label="Start"
+                          value={this.state.isEditingStartText}
+                          onChange={this.onChangeStartText.bind(this)}/>
+                      </Grid>
+                      <Grid item>
+                        <TextField
+                          className={classes.clipField}
+                          label="End"
+                          value={this.state.isEditingEndText}
+                          onChange={this.onChangeEndText.bind(this)}/>
+                      </Grid>
+                      <Grid item>
+                        <Fab
+                          color="primary"
+                          size="small"
+                          className={classes.fab}
+                          onClick={this.onSave.bind(this)}>
+                          <SaveIcon/>
+                        </Fab>
+                      </Grid>
+                      <Grid item>
+                        <Fab
+                          size="small"
+                          className={clsx(classes.fab, classes.removeFab)}
+                          onClick={this.onRemove.bind(this)}>
+                          <DeleteIcon color="inherit" />
+                        </Fab>
+                      </Grid>
+                      <Grid item>
+                        <IconButton onClick={this.onCancel.bind(this)}>
+                          <KeyboardReturnIcon/>
+                        </IconButton>
+                      </Grid>
+                    </Grid>
+                  </Collapse>
+                </Grid>
+                <Grid item xs={12}>
+                  <VideoControl
+                    video={this.state.video}
+                    mode={VC.sceneClipper}
+                    volume={this.state.scene.videoVolume}
+                    clip={this.state.isEditing == -1 ? null : this.state.isEditingValue}
+                    clips={this.props.source.clips}
+                    onChangeVolume={this.onChangeVolume.bind(this)}/>
+                </Grid>
+              </Grid>
+            </Drawer>
           </React.Fragment>
         )}
-        {!this.state.video && (
-          <div className="ProgressIndicator">
-          <h1>Loading...</h1>
-        </div>
-        )}
       </div>
-    )
+    );
   }
-
-  nop() {}
 
   componentDidMount() {
     const scene = this.state.scene;
@@ -161,6 +302,7 @@ export default class VideoClipper extends React.Component {
 
     video.onerror = () => {
       console.error("Error loading " + this.props.source.url);
+      this.setState({empty: true});
     };
 
     video.onloadeddata = () => {
@@ -177,7 +319,7 @@ export default class VideoClipper extends React.Component {
   onAdd() {
     this.setState({
       isEditing: 0,
-      isEditingValue: {min: 0, max: this.state.video.duration},
+      isEditingValue: [0, this.state.video.duration],
       isEditingStartText: getTimestamp(0),
       isEditingEndText: getTimestamp(this.state.video.duration),
     });
@@ -186,7 +328,7 @@ export default class VideoClipper extends React.Component {
   onEdit(clip: Clip) {
     this.setState({
       isEditing: clip.id,
-      isEditingValue: {min: clip.start, max: clip.end},
+      isEditingValue: [clip.start, clip.end],
       isEditingStartText: getTimestamp(clip.start),
       isEditingEndText: getTimestamp(clip.end),
     });
@@ -200,8 +342,8 @@ export default class VideoClipper extends React.Component {
     const source = this.props.source;
     let clip = source.clips.find((c) => c.id == this.state.isEditing);
     if (clip) {
-      clip.start = this.state.isEditingValue.min;
-      clip.end = this.state.isEditingValue.max;
+      clip.start = this.state.isEditingValue[0];
+      clip.end = this.state.isEditingValue[1];
     } else {
       const newClip = new Clip();
       let id = source.clips.length + 1;
@@ -209,8 +351,8 @@ export default class VideoClipper extends React.Component {
         id = Math.max(c.id + 1, id);
       });
       newClip.id = id;
-      newClip.start = this.state.isEditingValue.min;
-      newClip.end = this.state.isEditingValue.max;
+      newClip.start = this.state.isEditingValue[0];
+      newClip.end = this.state.isEditingValue[1];
       source.clips.push(newClip);
     }
     this.props.onUpdateClips(source.url, source.clips);
@@ -219,7 +361,7 @@ export default class VideoClipper extends React.Component {
 
   onRemove() {
     if (this.state.isEditing > 0) {
-      const source = this.props.source;
+      const source =  this.props.source;
       source.clips = source.clips.filter((c) => c.id !== this.state.isEditing);
       source.clips.forEach((c) => {
         if (c.id > this.state.isEditing) {
@@ -249,18 +391,18 @@ export default class VideoClipper extends React.Component {
     }
   }
 
-  onChangeValue(value: {min: number, max: number}) {
-    let min = value.min;
-    let max = value.max;
+  onChangePosition(e: MouseEvent, values: Array<number>) {
+    let min = values[0];
+    let max = values[1];
     if (min < 0) min = 0;
     if (max < 0) max = 0;
     if (min > this.state.video.duration) min = this.state.video.duration;
     if (max > this.state.video.duration) max = this.state.video.duration;
 
     if (this.state.video.paused) {
-      if (value.min != this.state.isEditingValue.min) {
+      if (values[0] != this.state.isEditingValue[0]) {
         this.state.video.currentTime = min;
-      } else if (value.max != this.state.isEditingValue.max) {
+      } else if (values[1] != this.state.isEditingValue[1]) {
         this.state.video.currentTime = max;
       }
     } else {
@@ -272,25 +414,29 @@ export default class VideoClipper extends React.Component {
     }
 
     this.setState({
-      isEditingValue: {min: min, max: max},
+      isEditingValue: [min, max],
       isEditingStartText: getTimestamp(min),
       isEditingEndText: getTimestamp(max),
     });
   }
 
-  onChangeStartText(value: string) {
-    this.setState({isEditingStartText: value});
-    let timestampValue = getTimestampValue(value);
+  onChangeStartText(e: MouseEvent) {
+    const input = (e.target as HTMLInputElement);
+    this.setState({isEditingStartText: input.value});
+    let timestampValue = getTimestampValue(input.value);
     if (timestampValue) {
-      this.onChangeValue({min: timestampValue, max: this.state.isEditingValue.max});
+      this.onChangePosition(null, [timestampValue, this.state.isEditingValue[1]]);
     }
   }
 
-  onChangeEndText(value: string) {
-    this.setState({isEditingEndText: value});
-    let timestampValue = getTimestampValue(value);
+  onChangeEndText(e: MouseEvent) {
+    const input = (e.target as HTMLInputElement);
+    this.setState({isEditingEndText: input.value});
+    let timestampValue = getTimestampValue(input.value);
     if (timestampValue) {
-      this.onChangeValue({min: this.state.isEditingValue.min, max: timestampValue});
+      this.onChangePosition(null, [this.state.isEditingValue[0], timestampValue]);
     }
   }
 }
+
+export default withStyles(styles)(VideoClipper as any);

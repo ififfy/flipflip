@@ -1,135 +1,176 @@
-import * as React from 'react';
-import InputRange from 'react-input-range';
+import * as React from "react";
+
+import {createStyles, Grid, IconButton, Slider, Theme, Tooltip, withStyles} from "@material-ui/core";
+import ValueLabel from "@material-ui/core/Slider/ValueLabel";
+
+import Forward10Icon from '@material-ui/icons/Forward10';
+import Replay10Icon from '@material-ui/icons/Replay10';
+import PauseIcon from '@material-ui/icons/Pause';
+import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import VolumeDownIcon from '@material-ui/icons/VolumeDown';
+import VolumeUpIcon from '@material-ui/icons/VolumeUp';
+
 
 import {getTimestamp} from "../../data/utils";
 import {VC} from "../../data/const";
-import SimpleSliderInput from "../ui/SimpleSliderInput";
+import Clip from "../../data/Clip";
 
-export default class VideoControl extends React.Component {
+const styles = (theme: Theme) => createStyles({
+  root: {
+    display: 'flex',
+  },
+  timeSlider: {
+    marginLeft: theme.spacing(2),
+    marginRight: theme.spacing(3),
+    marginTop: theme.spacing(2),
+  },
+});
+
+const StyledValueLabel = withStyles((theme: Theme) => createStyles({
+  offset: {
+    top: -5,
+    left: 'calc(-50% + 8px)',
+    fontSize: '1rem',
+  },
+  circle: {
+    width: theme.spacing(1),
+    height: theme.spacing(1),
+    backgroundColor: 'transparent',
+  },
+  label: {
+    color: theme.palette.text.primary,
+  }
+}))(ValueLabel as any);
+
+class VideoControl extends React.Component {
   readonly props: {
+    classes: any,
     video: HTMLVideoElement,
     mode: string,
     volume?: number,
-    clip?: {min: number, max: number},
-    onChangeVolume(volume: number): void,
+    clip?: Array<number>,
+    clips?: Array<Clip>,
+      onChangeVolume(volume: number): void,
   };
 
   readonly state = {
     playing: true,
     update: true,
+    marks: Array<{value: number, label: string}>(),
   };
 
-  _interval: NodeJS.Timer = null;
-
   render() {
-    switch(this.props.mode) {
-      case VC.player:
-        return (
-          <React.Fragment>
-            <div className="VideoSlider">
-              <InputRange
-                minValue={this.props.video.hasAttribute("start") ? parseInt(this.props.video.getAttribute("start")) : 0}
-                maxValue={this.props.video.hasAttribute("end") ? parseInt(this.props.video.getAttribute("end")) : this.props.video.duration}
-                value={this.props.video.currentTime}
-                formatLabel={(value) => getTimestamp(value)}
-                onChange={this.onChangePosition.bind(this)}/>
-            </div>
-            <div className="VideoControls">
-              <div
-                className="u-button u-icon-button u-clickable"
-                title="Back"
-                onClick={this.onBack.bind(this)}>
-                <div className="u-media-back"/>
-              </div>
-              {!this.state.playing && (
-                <div
-                  className="u-button u-icon-button u-clickable"
-                  title="Play"
-                  style={{margin: "0 5px"}}
-                  onClick={this.onPlay.bind(this)}>
-                  <div className="u-media-play"/>
-                </div>
-              )}
-              {this.state.playing && (
-                <div
-                  className="u-button u-icon-button u-clickable"
-                  title="Pause"
-                  style={{margin: "0 5px"}}
-                  onClick={this.onPause.bind(this)}>
-                  <div className="u-media-pause"/>
-                </div>
-              )}
-              <div
-                className="u-button u-icon-button u-clickable"
-                title="Forward"
-                onClick={this.onForward.bind(this)}>
-                <div className="u-media-forward"/>
-              </div>
-            </div>
-            <div className="VolumeControl">
-              <div
-                className="u-small-icon-button">
-                <div className="u-volume-down"/>
-              </div>
-              <SimpleSliderInput
-                label=""
-                min={0}
-                max={100}
-                value={this.props.volume ? this.props.volume : this.props.video.volume * 100}
-                isEnabled={true}
-                onChange={this.onChangeVolume.bind(this)}/>
-              <div
-                className="u-small-icon-button">
-                <div className="u-volume-up"/>
-              </div>
-            </div>
-          </React.Fragment>
-        );
-      case VC.sceneClipper:
-        return (
-          <div className="TrackControls">
-            <div className="VideoSlider">
-              <InputRange
-                minValue={this.props.clip ? this.props.clip.min : 0}
-                maxValue={this.props.clip ? this.props.clip.max : this.props.video.duration}
-                value={this.props.video.currentTime}
-                formatLabel={(value) => getTimestamp(value)}
-                onChange={this.onChangePosition.bind(this)}/>
-            </div>
-            <div className="VideoControls">
-              <div
-                className="u-button u-icon-button u-clickable"
-                title="Back"
-                onClick={this.onBack.bind(this)}>
-                <div className="u-media-back"/>
-              </div>
-              {!this.state.playing && (
-                <div
-                  className="u-button u-icon-button u-clickable"
-                  title="Play"
-                  style={{margin: "0 5px"}}
-                  onClick={this.onPlay.bind(this)}>
-                  <div className="u-media-play"/>
-                </div>
-              )}
-              {this.state.playing && (
-                <div
-                  className="u-button u-icon-button u-clickable"
-                  title="Pause"
-                  style={{margin: "0 5px"}}
-                  onClick={this.onPause.bind(this)}>
-                  <div className="u-media-pause"/>
-                </div>
-              )}
-              <div
-                className="u-button u-icon-button u-clickable"
-                title="Forward"
-                onClick={this.onForward.bind(this)}>
-                <div className="u-media-forward"/>
-              </div>
-            </div>
-          </div>
-        );
+    const classes = this.props.classes;
+    if (this.props.mode == VC.sceneClipper) {
+      return (
+        <Grid container spacing={1} alignItems="center">
+          <Grid item xs className={classes.timeSlider}>
+            <Slider
+              min={this.props.clip ? this.props.clip[0] : 0}
+              max={this.props.clip ? this.props.clip[1] : this.props.video.duration}
+              color={this.props.clip ? "secondary" : "primary"}
+              value={this.props.video.currentTime}
+              ValueLabelComponent={(props) => <StyledValueLabel {...props}/>}
+              valueLabelDisplay="on"
+              valueLabelFormat={(value) => getTimestamp(value)}
+              marks={this.state.marks}
+              onChange={this.onChangePosition.bind(this)}/>
+          </Grid>
+          <Grid item>
+            <Grid container alignItems="center">
+              <Grid item xs={12} style={{textAlign: 'center'}}>
+                <Tooltip title="Jump Back">
+                  <IconButton
+                    onClick={this.onBack.bind(this)}>
+                    <Replay10Icon/>
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title={this.state.playing ? "Pause" : "Play"}>
+                  <IconButton
+                    onClick={this.state.playing ? this.onPause.bind(this) : this.onPlay.bind(this)}>
+                    {this.state.playing ? <PauseIcon/> : <PlayArrowIcon/>}
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Jump Forward">
+                  <IconButton
+                    onClick={this.onForward.bind(this)}>
+                    <Forward10Icon/>
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+              <Grid item xs={12}>
+                <Grid container spacing={1}>
+                  <Grid item>
+                    <VolumeDownIcon/>
+                  </Grid>
+                  <Grid item xs>
+                    <Slider value={this.props.volume ? this.props.volume : this.props.video.volume * 100}
+                            onChange={this.onChangeVolume.bind(this)}
+                            aria-labelledby="audio-volume-slider"/>
+                  </Grid>
+                  <Grid item>
+                    <VolumeUpIcon/>
+                  </Grid>
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+      );
+    }
+    return <div/>;
+  }
+
+  _interval: any = null;
+  componentDidMount() {
+    this._interval = setInterval(() => {
+      if (!this.props.video.paused) {
+        this.triggerUpdate();
+      }
+      if (this.props.clip) {
+        if (this.props.video.paused && this.state.playing) {
+          this.setState({playing: false});
+        } else if (!this.props.video.paused && !this.state.playing) {
+          this.setState({playing: true});
+        }
+        if (this.props.video.currentTime < this.props.clip[0] ||
+          this.props.video.currentTime > this.props.clip[1]) {
+          this.props.video.currentTime = this.props.clip[0];
+        }
+      }
+    }, 50);
+    this.setState({marks: this.getMarks()});
+  }
+
+  componentDidUpdate(props: any) {
+    // If the clip has changed, or we don't have the expected number of marks
+    if (this.props.clip != props.clip ||
+      (this.props.clips && this.state.marks.length !=
+        (this.props.clip ? 2 : this.props.clips.length + 2))) {
+      this.setState({marks: this.getMarks()});
+    }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this._interval);
+  }
+
+  triggerUpdate() {
+    this.setState({update: !this.state.update});
+  }
+
+  onChangePosition(e: MouseEvent, position: number) {
+    this.props.video.currentTime = position;
+    if (this.props.video.paused) {
+      this.triggerUpdate();
+    }
+  }
+
+  onChangeVolume(e: MouseEvent, volume: number) {
+    this.props.onChangeVolume(volume);
+    if (this.props.video) {
+      this.props.video.volume = volume / 100;
+      this.triggerUpdate();
     }
   }
 
@@ -143,20 +184,12 @@ export default class VideoControl extends React.Component {
     this.props.video.pause();
   }
 
-  onChangeVolume(volume: number) {
-    this.props.onChangeVolume(volume);
-    if (this.props.video) {
-      this.props.video.volume = volume / 100;
-      this.setState({update: !this.state.update});
-    }
-  }
-
   onBack() {
     let position = this.props.video.currentTime - 15;
     if (position < 0) {
       position = 0;
     }
-    this.onChangePosition(position);
+    this.onChangePosition(null, position);
   }
 
   onForward() {
@@ -164,32 +197,20 @@ export default class VideoControl extends React.Component {
     if (position > this.props.video.duration) {
       position = this.props.video.duration;
     }
-    this.onChangePosition(position);
+    this.onChangePosition(null, position);
   }
 
-  onChangePosition(position: number) {
-    this.props.video.currentTime = position;
-  }
-
-  componentDidMount() {
-    this._interval = setInterval(() => {
-      // Trigger update to update position slider
-      this.setState({update: !this.state.update});
-      if (this.props.clip) {
-        if (this.props.video.paused && this.state.playing) {
-          this.setState({playing: false});
-        } else if (!this.props.video.paused && !this.state.playing) {
-          this.setState({playing: true});
-        }
-        if (this.props.video.currentTime < this.props.clip.min ||
-            this.props.video.currentTime > this.props.clip.max) {
-          this.props.video.currentTime = this.props.clip.min;
-        }
+  getMarks(): Array<{value: number, label: string}> {
+    const min = this.props.clip ?  this.props.clip[0] : 0;
+    const max = this.props.clip ? this.props.clip[1] : this.props.video.duration;
+    const marks = [{value: min, label: getTimestamp(min)}, {value: max, label: getTimestamp(max)}];
+    if (!this.props.clip && this.props.clips) {
+      for (let clip of this.props.clips) {
+        marks.push({value: clip.start, label: clip.id.toString()})
       }
-    }, 50);
-  }
-
-  componentWillUnmount() {
-    clearInterval(this._interval);
+    }
+    return marks;
   }
 }
+
+export default withStyles(styles)(VideoControl as any);

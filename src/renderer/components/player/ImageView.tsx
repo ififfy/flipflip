@@ -9,14 +9,13 @@ import Strobe from "./Strobe";
 export default class ImageView extends React.Component {
   readonly props: {
     image: HTMLImageElement | HTMLVideoElement,
-    scene?: Scene,
-    videoVolume?: number,
-    timeToNextFrame?: number,
-    toggleStrobe?: boolean,
     fitParent: boolean,
     hasStarted: boolean,
-    onLoaded(): void,
-    setVideo(video: HTMLVideoElement): void,
+    scene: Scene,
+    timeToNextFrame?: number,
+    toggleStrobe?: boolean,
+    onLoaded?(): void,
+    setVideo?(video: HTMLVideoElement): void,
   };
 
   readonly backgroundRef: React.RefObject<HTMLDivElement> = React.createRef();
@@ -199,7 +198,9 @@ export default class ImageView extends React.Component {
     }
 
     if (!forceBG) {
-      this.props.setVideo(img instanceof HTMLVideoElement ? img : null);
+      if (this.props.setVideo) {
+        this.props.setVideo(img instanceof HTMLVideoElement ? img : null);
+      }
 
       this._image = img;
       el.appendChild(img);
@@ -208,7 +209,9 @@ export default class ImageView extends React.Component {
       bg.appendChild(bgImg);
     }
 
-    this.props.onLoaded();
+    if (this.props.onLoaded) {
+      this.props.onLoaded();
+    }
   }
 
   shouldComponentUpdate(props: any): boolean {

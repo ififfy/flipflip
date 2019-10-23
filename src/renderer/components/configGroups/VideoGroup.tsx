@@ -4,7 +4,6 @@ import {VC} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
 import Scene from "../../data/Scene";
 import ControlGroup from "../ui/ControlGroup";
-import VideoControl from "../player/VideoControl";
 
 export default class VideoGroup extends React.Component {
   readonly props: {
@@ -25,11 +24,11 @@ export default class VideoGroup extends React.Component {
           {this.props.mainVideo && (
             <React.Fragment>
               <h4>Scene Video</h4>
-              <VideoControl
+              {/*<VideoControl
                 video={this.props.mainVideo}
                 mode={this.props.mode}
                 volume={this.props.scene.videoVolume}
-                onChangeVolume={this.changeKey.bind(this, 'videoVolume', this.props.scene).bind(this)}/>
+                onChangeVolume={this.changeKey.bind(this, 'videoVolume', this.props.scene).bind(this)}/>*/}
             </React.Fragment>
           )}
           {this.props.otherVideos && this.props.otherVideos.map((otherVideo, index) => {
@@ -39,10 +38,10 @@ export default class VideoGroup extends React.Component {
             return (
               <React.Fragment key={index}>
                 <h4>{this.props.otherScenes[indexOf].name} Video</h4>
-                <VideoControl
+                {/*<VideoControl
                   video={otherVideo}
                   mode={this.props.mode}
-                  onChangeVolume={this.props.mainVideo ? this.changeKey.bind(this, 'videoVolume', this.props.otherScenes[indexOf]).bind(this) : this.nop}/>
+                  onChangeVolume={this.props.mainVideo ? this.changeKey.bind(this, 'videoVolume', this.props.otherScenes[indexOf]).bind(this) : this.nop}/>*/}
               </React.Fragment>
             );}
           )}

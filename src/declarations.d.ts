@@ -19,6 +19,7 @@ declare module '*.icns' {
   export = value;
 }
 
+declare module "@material-ui/core/Slider/ValueLabel"
 declare module 'electron-default-menu';
 declare module 'electron-google-analytics';
 declare module 'get-folder-size';

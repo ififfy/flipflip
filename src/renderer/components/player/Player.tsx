@@ -5,7 +5,6 @@ import fs from "fs";
 import fileURL from "file-url";
 import clsx from "clsx";
 
-
 import {
   AppBar, Card, CardActionArea, CardContent, createStyles, Divider, Drawer, ExpansionPanel, ExpansionPanelDetails,
   ExpansionPanelSummary, IconButton, Theme, Toolbar, Tooltip, Typography, withStyles
@@ -128,16 +127,6 @@ const styles = (theme: Theme) => createStyles({
   tagDrawer: {
     zIndex: theme.zIndex.drawer + 1,
     position: 'absolute',
-    transition: theme.transitions.create('height', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  tagDrawerHover: {
-    transition: theme.transitions.create('height', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
   },
   tagDrawerPaper: {
     transform: 'scale(0)',
@@ -457,7 +446,6 @@ class Player extends React.Component {
             <div className={classes.fill}/>
 
             <IconButton
-              disabled={!canGoBack}
               edge="start"
               color="inherit"
               aria-label="FullScreen"
@@ -633,7 +621,7 @@ class Player extends React.Component {
           <Drawer
             variant="permanent"
             anchor="bottom"
-            className={clsx(classes.tagDrawer, this.state.tagDrawerHover && classes.tagDrawerHover)}
+            className={classes.tagDrawer}
             classes={{paper: clsx(classes.tagDrawerPaper, this.state.tagDrawerHover && classes.tagDrawerPaperHover)}}
             open={this.state.tagDrawerHover}
             onMouseEnter={this.onMouseEnterTagDrawer.bind(this)}

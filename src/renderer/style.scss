@@ -332,18 +332,6 @@ label.SimpleCheckbox {
   bottom: 0;
   left: 0;
 
-  .u-button-row {
-    position: absolute;
-    top: 0;
-    right: 0;
-    left: 0;
-    z-index: 10;
-  }
-
-  .u-button-sidebar {
-    z-index: 9;
-  }
-
   .Strobe {
     z-index: 5;
   }
@@ -507,14 +495,7 @@ label.SimpleCheckbox {
 }
 
 .VideoClipper {
-  display: flex;
-  flex-flow: column;
-  height: 100%;
-
   .ImageView {
-    position: relative;
-    flex-grow: 1;
-
     .FadeLayer {
       position: absolute;
       height: 100%;
@@ -539,60 +520,6 @@ label.SimpleCheckbox {
       height: 100%;
       width: 100%;
       z-index: 1;
-    }
-  }
-  .VideoClipper__Clipper {
-    @include noselect;
-    @include buttonBarBackground;
-    padding: $smallPadding $smallPadding 0 $smallPadding;
-    height: auto;
-    width: 100%;
-    z-index: 8;
-
-    .VideoClipper__Buttons {
-      display: flex;
-
-      .VideoClipper__ClipList {
-        flex-grow: 1;
-
-        .VideoClipper__Clip {
-          padding: 0.75rem;
-          margin-right: 0.5rem;
-          margin-bottom: 0.5rem;
-        }
-      }
-
-      .VideoClipper__Add {
-        width: 7rem;
-        height: fit-content;
-      }
-    }
-
-
-    .TrackControls {
-      display: flex;
-      margin-top: 0.5rem;
-
-      .TrackInputs {
-        display: flex;
-
-        .u-icon-button {
-          height: fit-content;
-          margin-left: 5px;
-        }
-
-        .SimpleTextInput {
-          margin-bottom: 0;
-          > label {
-            color: $black;
-          }
-        }
-      }
-
-      .VideoSlider {
-        flex-grow: 1;
-        margin: 0.5rem 10px;
-      }
     }
   }
 }
