@@ -174,7 +174,6 @@ const styles = (theme: Theme) => createStyles({
     display: 'flex',
     flexGrow: 1,
     flexDirection: 'column',
-    height: '100vh',
     backgroundColor: (theme.palette.primary as any)["50"],
     zIndex: 10,
   },
@@ -206,6 +205,18 @@ const styles = (theme: Theme) => createStyles({
   startNowButton: {
     marginTop: theme.spacing(1),
   },
+  gridRoot: {
+    width: '104%',
+    height: '104%',
+    marginLeft: '-2%',
+    marginTop: '-2%',
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  full: {
+    height: '100%',
+    width: '100%',
+  },
   fill: {
     flexGrow: 1,
   },
@@ -217,17 +228,18 @@ class Player extends React.Component {
     config: Config,
     scene: Scene,
     scenes: Array<Scene>,
-    blacklistFile(sourceURL: string, fileToBlacklist: string): void,
     cache(i: HTMLImageElement | HTMLVideoElement): void,
     getTags(source: string): Array<Tag>,
     goBack(): void,
-    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
     setCount(sourceURL: string, count: number, countComplete: boolean): void,
     allTags?: Array<Tag>,
+    gridView?: boolean,
     tags?: Array<Tag>,
+    blacklistFile?(sourceURL: string, fileToBlacklist: string): void,
     goToTagSource?(source: LibrarySource): void,
     navigateTagging?(offset: number): void,
     nextScene?(): void,
+    onUpdateScene?(scene: Scene, fn: (scene: Scene) => void): void,
     toggleTag?(sourceID: number, tag: Tag): void,
   };
 
@@ -236,7 +248,6 @@ class Player extends React.Component {
     hasStarted: false,
     isMainLoaded: false,
     areOverlaysLoaded: Array<boolean>(this.getValidOverlays().length).fill(false),
-    //isGridLoaded: Array<boolean>(this.getGridLength()).fill(false),
     isEmpty: false,
     isPlaying: true,
     total: 0,
@@ -249,7 +260,6 @@ class Player extends React.Component {
     imagePlayerDeleteHack: new ChildCallbackHack(),
     mainVideo: null as HTMLVideoElement,
     overlayVideos: Array<HTMLVideoElement>(this.getValidOverlays().length).fill(null),
-    //gridVideos: Array<HTMLVideoElement>(this.getGridLength()).fill(null),
     timeToNextFrame: null as number,
     appBarHover: false,
     drawerHover: false,
@@ -278,32 +288,8 @@ class Player extends React.Component {
     const showStrobe = this.props.scene.strobe && this.state.hasStarted && this.state.isPlaying &&
       (this.props.scene.strobeLayer == SL.top || this.props.scene.strobeLayer == SL.bottom);
 
-    /*let gridStyle = {};
-    let grid;
-    if (this.props.scene.gridView) {
-      grid = this.props.scene.grid;
-      if (grid == null || (grid.length == 1 && grid[0].length == 0)) {
-        grid = [[this.props.scene.id]];
-      }
-      const height = this.props.scene.grid.length;
-      const width = this.props.scene.grid[0].length;
-      const colSize = 100 / width;
-      const rowSize = 100 / height;
-      let gridTemplateColumns = "";
-      let gridTemplateRows = "";
-      for (let w = 0; w < width; w++) {
-        gridTemplateColumns += colSize.toString() + "% ";
-      }
-      for (let h = 0; h < height; h++) {
-        gridTemplateRows += rowSize.toString() + "% ";
-      }
-      gridStyle = {gridTemplateColumns: gridTemplateColumns, gridTemplateRows: gridTemplateRows}
-    }
-
-    let foundMain = false;*/
-
     return (
-      <div className={clsx(classes.root)}>
+      <div className={clsx(classes.root, this.props.gridView && classes.gridRoot)}>
         {showStrobe && (
           <Strobe
             className={classes.strobe}
@@ -359,6 +345,7 @@ class Player extends React.Component {
             scene={this.props.scene}
             nextScene={nextScene}
             opacity={1}
+            gridView={this.props.gridView}
             isPlaying={this.state.isPlaying}
             hasStarted={this.state.hasStarted}
             strobeLayer={this.props.scene.strobe ? this.props.scene.strobeLayer : null}
@@ -393,6 +380,7 @@ class Player extends React.Component {
                 config={this.props.config}
                 scene={this.getScene(overlay.sceneID)}
                 opacity={overlay.opacity / 100}
+                gridView={this.props.gridView}
                 isPlaying={this.state.isPlaying && !this.state.isEmpty}
                 hasStarted={this.state.hasStarted}
                 historyOffset={0}
@@ -407,58 +395,6 @@ class Player extends React.Component {
               />
             );}
           )}
-
-          {/*{this.props.scene.gridView && (
-            <React.Fragment>
-              {grid.map((row, rowIndex) =>
-                <React.Fragment key={rowIndex}>
-                  {row.map((sceneID, colIndex) => {
-                    const index = (rowIndex * row.length) + colIndex;
-                    if (sceneID == 0) return <div key={index} className="HeadlessScenePlayer"/>;
-                    const getO = this.getScene(sceneID);
-                    if (getO == null || getO.sources.length == 0) return <div key={index} className="HeadlessScenePlayer"/>;
-
-                    let isMain = false;
-                    if (!foundMain && sceneID == this.props.scene.id) {
-                      isMain = true;
-                      foundMain = true;
-                    }
-                    let showProgress = !this.state.hasStarted;
-                    if (showProgress) {
-                      for (let x=0; x < index; x++) {
-                        if (!this.state.isGridLoaded[x]) {
-                          showProgress = false;
-                          break;
-                        }
-                      }
-                    }
-                    return (
-                      <HeadlessScenePlayer
-                        key={index}
-                        config={this.props.config}
-                        scene={this.getScene(sceneID)}
-                        nextScene={isMain ? nextScene : null}
-                        opacity={1}
-                        isPlaying={this.state.isPlaying}
-                        hasStarted={this.state.hasStarted}
-                        strobeLayer={this.props.scene.strobe ? this.props.scene.strobeLayer : null}
-                        historyOffset={0}
-                        setHistoryOffset={this.nop}
-                        setHistoryPaths={isMain ? this.setHistoryPaths.bind(this) : this.nop}
-                        finishedLoading={this.setGridLoaded.bind(this, index)}
-                        firstImageLoaded={this.setMainCanStart.bind(this)}
-                        setProgress={showProgress ? this.setProgress.bind(this) : this.nop}
-                        setVideo={this.setGridVideo.bind(this, index)}
-                        setCount={this.props.setCount.bind(this)}
-                        cache={this.props.cache.bind(this)}
-                        setTimeToNextFrame={isMain ? this.setTimeToNextFrame.bind(this) : null}
-                      />
-                    )}
-                  )}
-                </React.Fragment>
-              )}
-            </React.Fragment>
-          )}*/}
         </div>
 
         {showCaptionProgram && (
@@ -480,242 +416,246 @@ class Player extends React.Component {
             currentSource={this.state.historyPaths.length > 0 ? this.state.historyPaths[0].getAttribute("source") : null}/>
         )}
 
-        <div
-          className={classes.hoverBar}
-          onMouseEnter={this.onMouseEnterAppBar.bind(this)}
-          onMouseLeave={this.onMouseLeaveAppBar.bind(this)}/>
+        {!this.props.gridView && (
+          <React.Fragment>
+            <div
+              className={classes.hoverBar}
+              onMouseEnter={this.onMouseEnterAppBar.bind(this)}
+              onMouseLeave={this.onMouseLeaveAppBar.bind(this)}/>
 
-        <AppBar
-          position="absolute"
-          onMouseEnter={this.onMouseEnterAppBar.bind(this)}
-          onMouseLeave={this.onMouseLeaveAppBar.bind(this)}
-          className={clsx(classes.appBar, (!this.state.hasStarted || this.state.isEmpty || this.state.appBarHover) && classes.appBarHover)}>
-          <Toolbar>
-            <Tooltip title="Back" placement="right-end">
-              <IconButton
-                edge="start"
-                color="inherit"
-                aria-label="Back"
-                onClick={this.props.goBack.bind(this)}>
-                <ArrowBackIcon />
-              </IconButton>
-            </Tooltip>
+            <AppBar
+              position="absolute"
+              onMouseEnter={this.onMouseEnterAppBar.bind(this)}
+              onMouseLeave={this.onMouseLeaveAppBar.bind(this)}
+              className={clsx(classes.appBar, (!this.state.hasStarted || this.state.isEmpty || this.state.appBarHover) && classes.appBarHover)}>
+              <Toolbar>
+                <Tooltip title="Back" placement="right-end">
+                  <IconButton
+                    edge="start"
+                    color="inherit"
+                    aria-label="Back"
+                    onClick={this.props.goBack.bind(this)}>
+                    <ArrowBackIcon />
+                  </IconButton>
+                </Tooltip>
 
-            <div className={classes.fill}/>
-            <Typography component="h1" variant="h4" color="inherit" noWrap className={classes.title}>
-              {this.props.tags ? this.props.scene.sources[0].url : this.props.scene.name}
-            </Typography>
-            <div className={classes.fill}/>
+                <div className={classes.fill}/>
+                <Typography component="h1" variant="h4" color="inherit" noWrap className={classes.title}>
+                  {this.props.tags ? this.props.scene.sources[0].url : this.props.scene.name}
+                </Typography>
+                <div className={classes.fill}/>
 
-            <Tooltip title="Toggle Fullscreen">
-              <IconButton
-                edge="start"
-                color="inherit"
-                aria-label="FullScreen"
-                onClick={this.toggleFull.bind(this)}>
-                <FullscreenIcon fontSize="large"/>
-              </IconButton>
-            </Tooltip>
-            <Divider component="div" orientation="vertical" style={{height: 48, margin: '0 14px 0 3px'}}/>
-            <IconButton
-              disabled={!canGoBack}
-              edge="start"
-              color="inherit"
-              aria-label="Backward"
-              onClick={this.historyBack.bind(this)}>
-              <ForwardIcon fontSize="large" style={{transform: 'rotate(180deg)'}}/>
-            </IconButton>
-            <IconButton
-              edge="start"
-              color="inherit"
-              aria-label={this.state.isPlaying ? "Pause" : "Play"}
-              onClick={this.setPlayPause.bind(this, !this.state.isPlaying)}>
-              {this.state.isPlaying ? <PauseIcon fontSize="large"/> : <PlayArrowIcon fontSize="large"/>}
-            </IconButton>
-            <IconButton
-              disabled={!canGoForward}
-              edge="start"
-              color="inherit"
-              aria-label="Forward"
-              onClick={this.historyForward.bind(this)}>
-              <ForwardIcon fontSize="large"/>
-            </IconButton>
-          </Toolbar>
-        </AppBar>
+                <Tooltip title="Toggle Fullscreen">
+                  <IconButton
+                    edge="start"
+                    color="inherit"
+                    aria-label="FullScreen"
+                    onClick={this.toggleFull.bind(this)}>
+                    <FullscreenIcon fontSize="large"/>
+                  </IconButton>
+                </Tooltip>
+                <Divider component="div" orientation="vertical" style={{height: 48, margin: '0 14px 0 3px'}}/>
+                <IconButton
+                  disabled={!canGoBack}
+                  edge="start"
+                  color="inherit"
+                  aria-label="Backward"
+                  onClick={this.historyBack.bind(this)}>
+                  <ForwardIcon fontSize="large" style={{transform: 'rotate(180deg)'}}/>
+                </IconButton>
+                <IconButton
+                  edge="start"
+                  color="inherit"
+                  aria-label={this.state.isPlaying ? "Pause" : "Play"}
+                  onClick={this.setPlayPause.bind(this, !this.state.isPlaying)}>
+                  {this.state.isPlaying ? <PauseIcon fontSize="large"/> : <PlayArrowIcon fontSize="large"/>}
+                </IconButton>
+                <IconButton
+                  disabled={!canGoForward}
+                  edge="start"
+                  color="inherit"
+                  aria-label="Forward"
+                  onClick={this.historyForward.bind(this)}>
+                  <ForwardIcon fontSize="large"/>
+                </IconButton>
+              </Toolbar>
+            </AppBar>
 
 
-        <div
-          className={classes.hoverDrawer}
-          onMouseEnter={this.onMouseEnterDrawer.bind(this)}
-          onMouseLeave={this.onMouseLeaveDrawer.bind(this)}/>
+            <div
+              className={classes.hoverDrawer}
+              onMouseEnter={this.onMouseEnterDrawer.bind(this)}
+              onMouseLeave={this.onMouseLeaveDrawer.bind(this)}/>
 
-        {this.state.hasStarted && !this.state.isEmpty && (
-          <Drawer
-            variant="permanent"
-            className={clsx(classes.drawer, this.state.drawerHover && classes.drawerHover)}
-            classes={{paper: clsx(classes.drawerPaper, this.state.drawerHover && classes.drawerPaperHover)}}
-            open={this.state.drawerHover}
-            onMouseEnter={this.onMouseEnterDrawer.bind(this)}
-            onMouseLeave={this.onMouseLeaveDrawer.bind(this)}>
-            <div className={classes.drawerToolbar}>
-              <Typography variant="h4">
-                Settings
-              </Typography>
-            </div>
+            {this.state.hasStarted && !this.state.isEmpty && (
+              <Drawer
+                variant="permanent"
+                className={clsx(classes.drawer, this.state.drawerHover && classes.drawerHover)}
+                classes={{paper: clsx(classes.drawerPaper, this.state.drawerHover && classes.drawerPaperHover)}}
+                open={this.state.drawerHover}
+                onMouseEnter={this.onMouseEnterDrawer.bind(this)}
+                onMouseLeave={this.onMouseLeaveDrawer.bind(this)}>
+                <div className={classes.drawerToolbar}>
+                  <Typography variant="h4">
+                    Settings
+                  </Typography>
+                </div>
 
-            {this.props.scene.imageTypeFilter != IF.stills && (
-              <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                <ExpansionPanelSummary
-                  expandIcon={<ExpandMoreIcon />}
-                >
-                  <Typography>Video Controls</Typography>
-                </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
-                  <VideoCard
-                    scene={this.props.scene}
-                    otherScenes={this.getValidOverlays().map((o) => this.getScene(o.sceneID))}
-                    isPlaying={this.state.isPlaying}
-                    mainVideo={this.state.mainVideo}
-                    otherVideos={this.state.overlayVideos}
-                    onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-                </ExpansionPanelDetails>
-              </ExpansionPanel>
+                {this.props.scene.imageTypeFilter != IF.stills && (
+                  <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+                    <ExpansionPanelSummary
+                      expandIcon={<ExpandMoreIcon />}
+                    >
+                      <Typography>Video Controls</Typography>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                      <VideoCard
+                        scene={this.props.scene}
+                        otherScenes={this.getValidOverlays().map((o) => this.getScene(o.sceneID))}
+                        isPlaying={this.state.isPlaying}
+                        mainVideo={this.state.mainVideo}
+                        otherVideos={this.state.overlayVideos}
+                        onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+                    </ExpansionPanelDetails>
+                  </ExpansionPanel>
+                )}
+
+                <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+                  <ExpansionPanelSummary
+                    expandIcon={<ExpandMoreIcon />}
+                  >
+                    <Typography>Scene Options</Typography>
+                  </ExpansionPanelSummary>
+                  <ExpansionPanelDetails>
+                    <SceneOptionCard
+                      sidebar
+                      allScenes={this.props.scenes}
+                      isTagging={this.props.tags != null}
+                      scene={this.props.scene}
+                      onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+                  </ExpansionPanelDetails>
+                </ExpansionPanel>
+
+                <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+                  <ExpansionPanelSummary
+                    expandIcon={<ExpandMoreIcon />}
+                  >
+                    <Typography>Image/Video Options</Typography>
+                  </ExpansionPanelSummary>
+                  <ExpansionPanelDetails>
+                    <ImageVideoCard
+                      sidebar
+                      isPlayer
+                      scene={this.props.scene}
+                      onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+                  </ExpansionPanelDetails>
+                </ExpansionPanel>
+
+                <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+                  <ExpansionPanelSummary
+                    expandIcon={<ExpandMoreIcon />}
+                  >
+                    <Typography>Zoom/Move</Typography>
+                  </ExpansionPanelSummary>
+                  <ExpansionPanelDetails>
+                    <ZoomMoveCard
+                      sidebar
+                      scene={this.props.scene}
+                      onUpdateScene={this.props.onUpdateScene.bind(this)} />
+                  </ExpansionPanelDetails>
+                </ExpansionPanel>
+
+                <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+                  <ExpansionPanelSummary
+                    expandIcon={<ExpandMoreIcon />}
+                  >
+                    <Typography>Cross-Fade</Typography>
+                  </ExpansionPanelSummary>
+                  <ExpansionPanelDetails>
+                    <CrossFadeCard
+                      sidebar
+                      scene={this.props.scene}
+                      onUpdateScene={this.props.onUpdateScene.bind(this)} />
+                  </ExpansionPanelDetails>
+                </ExpansionPanel>
+
+                <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+                  <ExpansionPanelSummary
+                    expandIcon={<ExpandMoreIcon />}
+                  >
+                    <Typography>Strobe</Typography>
+                  </ExpansionPanelSummary>
+                  <ExpansionPanelDetails>
+                    <StrobeCard
+                      sidebar
+                      scene={this.props.scene}
+                      onUpdateScene={this.props.onUpdateScene.bind(this)} />
+                  </ExpansionPanelDetails>
+                </ExpansionPanel>
+
+                <ExpansionPanel TransitionProps={{ unmountOnExit: this.props.scene.audioEnabled }}>
+                  <ExpansionPanelSummary
+                    expandIcon={<ExpandMoreIcon />}
+                  >
+                    <Typography>Audio Tracks</Typography>
+                  </ExpansionPanelSummary>
+                  <ExpansionPanelDetails>
+                    <AudioCard
+                      sidebar
+                      scene={this.props.scene}
+                      scenePaths={this.state.historyPaths}
+                      startPlaying={true}
+                      onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+                  </ExpansionPanelDetails>
+                </ExpansionPanel>
+
+                <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+                  <ExpansionPanelSummary
+                    expandIcon={<ExpandMoreIcon />}
+                  >
+                    <Typography>Text Overlay</Typography>
+                  </ExpansionPanelSummary>
+                  <ExpansionPanelDetails>
+                    <TextCard
+                      sidebar
+                      scene={this.props.scene}
+                      onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+                  </ExpansionPanelDetails>
+                </ExpansionPanel>
+              </Drawer>
             )}
 
-            <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-              <ExpansionPanelSummary
-                expandIcon={<ExpandMoreIcon />}
-              >
-                <Typography>Scene Options</Typography>
-              </ExpansionPanelSummary>
-              <ExpansionPanelDetails>
-                <SceneOptionCard
-                  sidebar
-                  allScenes={this.props.scenes}
-                  isTagging={this.props.tags != null}
-                  scene={this.props.scene}
-                  onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-              </ExpansionPanelDetails>
-            </ExpansionPanel>
+            <div
+              className={classes.hoverTagDrawer}
+              onMouseEnter={this.onMouseEnterTagDrawer.bind(this)}
+              onMouseLeave={this.onMouseLeaveTagDrawer.bind(this)}/>
 
-            <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-              <ExpansionPanelSummary
-                expandIcon={<ExpandMoreIcon />}
-              >
-                <Typography>Image/Video Options</Typography>
-              </ExpansionPanelSummary>
-              <ExpansionPanelDetails>
-                <ImageVideoCard
-                  sidebar
-                  isPlayer
-                  scene={this.props.scene}
-                  onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-              </ExpansionPanelDetails>
-            </ExpansionPanel>
+            {this.state.hasStarted && this.props.allTags && (
+              <Drawer
+                variant="permanent"
+                anchor="bottom"
+                className={classes.tagDrawer}
+                classes={{paper: clsx(classes.tagDrawerPaper, this.state.tagDrawerHover && classes.tagDrawerPaperHover)}}
+                open={this.state.tagDrawerHover}
+                onMouseEnter={this.onMouseEnterTagDrawer.bind(this)}
+                onMouseLeave={this.onMouseLeaveTagDrawer.bind(this)}>
+                <div className={classes.tagList}>
+                  {this.props.allTags.map((tag) =>
+                    <Card className={clsx(classes.tag, tagNames && tagNames.includes(tag.name) && classes.selectedTag)} key={tag.id}>
+                      <CardActionArea onClick={this.props.toggleTag.bind(this, this.props.scene.libraryID, tag)}>
+                        <CardContent>
+                          <Typography component="h6" variant="body2">
+                            {tag.name}
+                          </Typography>
+                        </CardContent>
+                      </CardActionArea>
+                    </Card>
+                  )}
+                </div>
 
-            <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-              <ExpansionPanelSummary
-                expandIcon={<ExpandMoreIcon />}
-              >
-                <Typography>Zoom/Move</Typography>
-              </ExpansionPanelSummary>
-              <ExpansionPanelDetails>
-                <ZoomMoveCard
-                  sidebar
-                  scene={this.props.scene}
-                  onUpdateScene={this.props.onUpdateScene.bind(this)} />
-              </ExpansionPanelDetails>
-            </ExpansionPanel>
-
-            <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-              <ExpansionPanelSummary
-                expandIcon={<ExpandMoreIcon />}
-              >
-                <Typography>Cross-Fade</Typography>
-              </ExpansionPanelSummary>
-              <ExpansionPanelDetails>
-                <CrossFadeCard
-                  sidebar
-                  scene={this.props.scene}
-                  onUpdateScene={this.props.onUpdateScene.bind(this)} />
-              </ExpansionPanelDetails>
-            </ExpansionPanel>
-
-            <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-              <ExpansionPanelSummary
-                expandIcon={<ExpandMoreIcon />}
-              >
-                <Typography>Strobe</Typography>
-              </ExpansionPanelSummary>
-              <ExpansionPanelDetails>
-                <StrobeCard
-                  sidebar
-                  scene={this.props.scene}
-                  onUpdateScene={this.props.onUpdateScene.bind(this)} />
-              </ExpansionPanelDetails>
-            </ExpansionPanel>
-
-            <ExpansionPanel TransitionProps={{ unmountOnExit: this.props.scene.audioEnabled }}>
-              <ExpansionPanelSummary
-                expandIcon={<ExpandMoreIcon />}
-              >
-                <Typography>Audio Tracks</Typography>
-              </ExpansionPanelSummary>
-              <ExpansionPanelDetails>
-                <AudioCard
-                  sidebar
-                  scene={this.props.scene}
-                  scenePaths={this.state.historyPaths}
-                  startPlaying={true}
-                  onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-              </ExpansionPanelDetails>
-            </ExpansionPanel>
-
-            <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-              <ExpansionPanelSummary
-                expandIcon={<ExpandMoreIcon />}
-              >
-                <Typography>Text Overlay</Typography>
-              </ExpansionPanelSummary>
-              <ExpansionPanelDetails>
-                <TextCard
-                  sidebar
-                  scene={this.props.scene}
-                  onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-              </ExpansionPanelDetails>
-            </ExpansionPanel>
-          </Drawer>
-        )}
-
-        <div
-          className={classes.hoverTagDrawer}
-          onMouseEnter={this.onMouseEnterTagDrawer.bind(this)}
-          onMouseLeave={this.onMouseLeaveTagDrawer.bind(this)}/>
-
-        {this.state.hasStarted && this.props.allTags && (
-          <Drawer
-            variant="permanent"
-            anchor="bottom"
-            className={classes.tagDrawer}
-            classes={{paper: clsx(classes.tagDrawerPaper, this.state.tagDrawerHover && classes.tagDrawerPaperHover)}}
-            open={this.state.tagDrawerHover}
-            onMouseEnter={this.onMouseEnterTagDrawer.bind(this)}
-            onMouseLeave={this.onMouseLeaveTagDrawer.bind(this)}>
-            <div className={classes.tagList}>
-              {this.props.allTags.map((tag) =>
-                <Card className={clsx(classes.tag, tagNames && tagNames.includes(tag.name) && classes.selectedTag)} key={tag.id}>
-                  <CardActionArea onClick={this.props.toggleTag.bind(this, this.props.scene.libraryID, tag)}>
-                    <CardContent>
-                      <Typography component="h6" variant="body2">
-                        {tag.name}
-                      </Typography>
-                    </CardContent>
-                  </CardActionArea>
-                </Card>
-              )}
-            </div>
-
-          </Drawer>
+              </Drawer>
+            )}
+          </React.Fragment>
         )}
       </div>
     );
@@ -751,23 +691,12 @@ class Player extends React.Component {
     this.setMenuBarVisibility(this.props.config.displaySettings.showMenu);
     this.setFullscreen(this.props.config.displaySettings.fullScreen);
 
-    window.addEventListener('contextmenu', this.showContextMenu, false);
-    window.addEventListener('keydown', this.onKeyDown, false);
-
-    this.buildMenu();
-    this._interval = setInterval(() => this.nextSceneLoop(), 1000);
-    /*for (let rowIndex=0; rowIndex < this.props.scene.grid.length; rowIndex++) {
-      for (let colIndex=0; colIndex < this.props.scene.grid[rowIndex].length; colIndex++) {
-        const sceneID = this.props.scene.grid[rowIndex][colIndex];
-        const index = (rowIndex * this.props.scene.grid[rowIndex].length) + colIndex;
-        if (sceneID == 0) this.setGridLoaded(index, true);
-        const getO = this.getScene(sceneID);
-        if (getO == null || getO.sources.length == 0) this.setGridLoaded(index, true);
-      }
-    }*/
-    /*if (this.props.scene.gridView && this.getValidGrid().find((s) => s && s > 10) == null) {
-      this.setState({isEmpty: true});
-    }*/
+    if (!this.props.gridView) {
+      window.addEventListener('contextmenu', this.showContextMenu, false);
+      window.addEventListener('keydown', this.onKeyDown, false);
+      this.buildMenu();
+      this._interval = setInterval(() => this.nextSceneLoop(), 1000);
+    }
   }
 
   buildMenu() {
@@ -793,9 +722,11 @@ class Player extends React.Component {
     this._interval = null;
     getCurrentWindow().setAlwaysOnTop(false);
     getCurrentWindow().setFullScreen(false);
-    createMainMenu(Menu, createMenuTemplate(app));
-    window.removeEventListener('contextmenu', this.showContextMenu);
-    window.removeEventListener('keydown', this.onKeyDown);
+    if (!this.props.gridView) {
+      createMainMenu(Menu, createMenuTemplate(app));
+      window.removeEventListener('contextmenu', this.showContextMenu);
+      window.removeEventListener('keydown', this.onKeyDown);
+    }
     // Clear ALL the available browser caches
     global.gc();
     webFrame.clearCache();
@@ -916,24 +847,6 @@ class Player extends React.Component {
     });
   }
 
-  /*getValidGrid() {
-    let validGrid = Array<number>();
-    for (let row of this.props.scene.grid) {
-      let newRow = row.map((sceneID: any) => {
-        if (sceneID == 0) return null;
-        const getO = this.getScene(sceneID);
-        if (getO == null || getO.sources.length == 0) return null;
-        return sceneID;
-      });
-      validGrid = validGrid.concat(newRow);
-    }
-    return validGrid;
-  }*/
-
-  /*getGridLength() {
-    return (this.props.scene.grid.length * this.props.scene.grid[0].length);
-  }*/
-
   setMainCanStart() {
     if (!this.state.canStart) {
       this.setState({canStart: true, isEmpty: false});
@@ -957,13 +870,6 @@ class Player extends React.Component {
     this.play();
   }
 
-  /*setGridLoaded(index: number, empty: boolean) {
-    const newIGL = this.state.isGridLoaded;
-    newIGL[index] = true;
-    this.setState({isGridLoaded: newIGL});
-    this.play();
-  }*/
-
   setTimeToNextFrame(ttnf: number) {
     this._toggleStrobe = !this._toggleStrobe;
     this.setState({timeToNextFrame: ttnf});
@@ -978,12 +884,6 @@ class Player extends React.Component {
     newOV[index] = video;
     this.setState({overlayVideos: newOV});
   }
-
-  /*setGridVideo(index: number, video: HTMLVideoElement) {
-    const newOV = this.state.gridVideos;
-    newOV[index] = video;
-    this.setState({gridVideos: newOV});
-  }*/
 
   start(canStart: boolean, force = false) {
     const isLoaded = !force && (this.state.isMainLoaded && (this.getValidOverlays().length == 0 || this.state.areOverlaysLoaded.find((b) => !b) == null));

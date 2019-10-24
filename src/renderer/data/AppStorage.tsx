@@ -9,6 +9,7 @@ import Tag from "../data/Tag";
 import WeightGroup from "../data/WeightGroup";
 import Config from "./Config";
 import Scene from './Scene';
+import SceneGrid from "./SceneGrid";
 
 /**
  * A compile-time global variable defined in webpack.config' [plugins]
@@ -20,6 +21,7 @@ export const defaultInitialState = {
   version: __VERSION__,
   config: new Config(),
   scenes: Array<Scene>(),
+  grids: Array<SceneGrid>(),
   library: Array<LibrarySource>(),
   tags: Array<Tag>(),
   route: Array<Route>(),
@@ -81,6 +83,7 @@ export default class AppStorage {
             isBatchTag: data.isBatchTag ? data.isBatchTag : false,
             config: data.config ? new Config(data.config) : new Config(),
             scenes: Array<Scene>(),
+            grids: Array<SceneGrid>(),
             library: Array<LibrarySource>(),
             tags: Array<Tag>(),
             route: data.route.map((s: any) => new Route(s)),
@@ -141,6 +144,7 @@ export default class AppStorage {
             isBatchTag: data.isBatchTag,
             config: new Config(data.config),
             scenes: data.scenes.map((s: any) => new Scene(s)),
+            grids: Array<SceneGrid>(),
             library: data.library.map((s: any) => new LibrarySource(s)),
             tags: data.tags.map((t: any) => new Tag(t)),
             route: data.route.map((s: any) => new Route(s)),
@@ -293,6 +297,7 @@ export default class AppStorage {
             isBatchTag: data.isBatchTag,
             config: new Config(data.config),
             scenes: data.scenes.map((s: any) => new Scene(s)),
+            grids: data.grids.map((g: any) => new SceneGrid(g)),
             library: data.library.map((s: any) => new LibrarySource(s)),
             tags: data.tags.map((t: any) => new Tag(t)),
             route: data.route.map((s: any) => new Route(s)),

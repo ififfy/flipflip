@@ -1,28 +1,117 @@
-import * as React from 'react';
-import Sortable from "react-sortablejs";
+import * as React from "react";
+import clsx from "clsx";
 
+import {
+  AppBar, Button, Container, createStyles, Fab, IconButton, ListItemText, Menu, MenuItem, TextField, Theme, Toolbar,
+  Tooltip, Typography, withStyles
+} from "@material-ui/core";
+
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import DeleteIcon from '@material-ui/icons/Delete';
+import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
+
+import SceneGrid from "../../data/SceneGrid";
 import Scene from "../../data/Scene";
-import SimpleNumberInput from "../ui/SimpleNumberInput";
 
-export default class GridSetup extends React.Component {
+const styles = (theme: Theme) => createStyles({
+  root: {
+    display: 'flex',
+    height: '100vh',
+  },
+  appBar: {
+    zIndex: theme.zIndex.drawer + 1,
+  },
+  appBarSpacer: {
+    ...theme.mixins.toolbar
+  },
+  title: {
+    textAlign: 'center',
+  },
+  titleField: {
+    width: '100%',
+    margin: 0,
+  },
+  titleInput: {
+    color: theme.palette.common.white,
+    textAlign: 'center',
+    fontSize: theme.typography.h4.fontSize,
+  },
+  noTitle: {
+    width: theme.spacing(7),
+    height: theme.spacing(7),
+  },
+  content: {
+    display: 'flex',
+    flexGrow: 1,
+    flexDirection: 'column',
+    backgroundColor: (theme.palette.primary as any)["50"],
+  },
+  container: {
+    height: '100%',
+    padding: theme.spacing(0),
+  },
+  dimensionInput: {
+    color: `${theme.palette.primary.contrastText} !important`,
+  },
+  grid: {
+    flexGrow: 1,
+    display: 'grid',
+    height: '100%',
+  },
+  gridCell: {
+    height: '100%',
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  sceneMenu: {
+    maxHeight: 400,
+  },
+  deleteButton: {
+    backgroundColor: theme.palette.error.dark,
+    margin: 0,
+    top: 'auto',
+    right: 20,
+    bottom: 20,
+    left: 'auto',
+    position: 'fixed',
+  },
+  deleteIcon: {
+    color: theme.palette.error.contrastText,
+  },
+  fill: {
+    flexGrow: 1,
+  },
+});
+
+class GridSetup extends React.Component {
   readonly props: {
-    scene: Scene,
+    classes: any,
     allScenes: Array<Scene>,
-    onUpdateGrid(grid: Array<Array<number>>): void,
+    autoEdit: boolean,
+    grid: SceneGrid,
     goBack(): void,
+    onDelete(grid: SceneGrid): void,
+    onPlayGrid(grid: SceneGrid): void,
+    onUpdateGrid(grid: SceneGrid, fn: (grid: SceneGrid) => void): void,
   };
 
   readonly state = {
-    height: this.props.scene.grid && this.props.scene.grid.length > 0 &&
-            this.props.scene.grid[0].length ? this.props.scene.grid.length : 1,
-    width: this.props.scene.grid && this.props.scene.grid.length > 0 &&
-           this.props.scene.grid[0].length > 0 ? this.props.scene.grid[0].length : 1,
-    grid: this.props.scene.grid && this.props.scene.grid.length > 0 &&
-          this.props.scene.grid[0].length ? (JSON.parse(JSON.stringify(this.props.scene.grid)) as Array<Array<number>>)
-          : [[this.props.scene.id]],
+    isEditingName: this.props.autoEdit,
+    isEditing: null as Array<number>,
+    menuAnchorEl: null as any,
+    height: this.props.grid.grid && this.props.grid.grid.length > 0 &&
+    this.props.grid.grid[0].length ? this.props.grid.grid.length : 1,
+    width: this.props.grid.grid && this.props.grid.grid.length > 0 &&
+    this.props.grid.grid[0].length > 0 ? this.props.grid.grid[0].length : 1,
   };
 
+  readonly nameInputRef: React.RefObject<HTMLInputElement> = React.createRef();
+
   render() {
+    const classes = this.props.classes;
+
     const colSize = 100 / this.state.width;
     const rowSize = 100 / this.state.height;
     let gridTemplateColumns = "";
@@ -34,109 +123,171 @@ export default class GridSetup extends React.Component {
       gridTemplateRows += rowSize.toString() + "% ";
     }
 
-    let count = 0;
-    for (let row of this.state.grid) {
-      for (let col of row) {
-        if (col != null) count++;
-      }
-    }
-    const full = count == this.state.height * this.state.width;
+    return(
+      <div className={classes.root}>
 
-    return (
-      <div className="GridSetup">
-        <div className="u-button-row">
-          <div className="BackButton u-button u-clickable" onClick={this.props.goBack.bind(this)}>Back</div>
-          <div className="u-button-row-right">
-            <SimpleNumberInput
+        <AppBar position="absolute" className={classes.appBar}>
+          <Toolbar>
+            <Tooltip title="Back" placement="right-end">
+              <IconButton
+                edge="start"
+                color="inherit"
+                aria-label="Back"
+                onClick={this.goBack.bind(this)}>
+                <ArrowBackIcon />
+              </IconButton>
+            </Tooltip>
+
+            {/*TODO Drive this off state so it responds faster*/}
+            {this.state.isEditingName && (
+              <form onSubmit={this.endEditingName.bind(this)} className={classes.titleField}>
+                <TextField
+                  autoFocus
+                  fullWidth
+                  id="title"
+                  value={this.props.grid.name}
+                  margin="none"
+                  ref={this.nameInputRef}
+                  inputProps={{className: classes.titleInput}}
+                  onBlur={this.endEditingName.bind(this)}
+                  onChange={this.onChangeName.bind(this)}
+                />
+              </form>
+            )}
+            {!this.state.isEditingName && (
+              <React.Fragment>
+                <div className={classes.fill}/>
+                <Typography component="h1" variant="h4" color="inherit" noWrap
+                            className={clsx(classes.title, this.props.grid.name.length == 0 && classes.noTitle)} onClick={this.beginEditingName.bind(this)}>
+                  {this.props.grid.name}
+                </Typography>
+                <div className={classes.fill}/>
+              </React.Fragment>
+            )}
+
+            <TextField
               label="Height"
+              margin="dense"
               value={this.state.height}
-              min={1}
-              max={5}
-              isEnabled={true}
-              onChange={this.onUpdateHeight.bind(this)}/>
-            <SimpleNumberInput
+              onChange={this.onHeightInput.bind(this)}
+              onBlur={this.blurHeight.bind(this)}
+              variant="filled"
+              InputLabelProps={{className: classes.dimensionInput}}
+              inputProps={{
+                className: classes.dimensionInput,
+                min: 1,
+                max: 5,
+                type: 'number',
+              }}/>
+            <TextField
               label="Width"
+              margin="dense"
               value={this.state.width}
-              min={1}
-              max={5}
-              isEnabled={true}
-              onChange={this.onUpdateWidth.bind(this)}/>
-            <div
-              className={`u-button ${full ? 'u-clickable' : 'u-disabled'}`}
-              onClick={full ? this.props.onUpdateGrid.bind(this, this.state.grid) : this.nop}>Save</div>
-          </div>
-        </div>
-        <Sortable
-          className="GridSetup__Grid"
-          style={{gridTemplateColumns: gridTemplateColumns, gridTemplateRows: gridTemplateRows}}
-          options={{
-            group: 'shared',
-            animation: 150,
-            easing: "cubic-bezier(1, 0, 0, 1)",
-          }}
-          onChange={(order: any, sortable: any, evt: any) => {
-            let newGrid = [];
-            let newRow = [];
-            for (let id of order) {
-              newRow.push(id);
-              if (newRow.length == this.state.width) {
-                newGrid.push(newRow);
-                newRow = [];
-              }
-              if (newGrid.length == this.state.height) break;
-            }
-            if (newRow.length > 0 && newGrid.length < this.state.height) {
-              newGrid.push(newRow);
-            }
-            this.setState({grid: newGrid});
-          }}>
-          {this.state.grid.map((row, rowIndex) =>
-            <React.Fragment key={rowIndex}>
-              {row.map((sceneID, colIndex) => {
-                const scene = this.props.allScenes.find((s) => s.id == sceneID);
-                if (scene) {
-                  return (
-                    <div
-                      key={colIndex}
-                      onClick={this.onRemove.bind(this, rowIndex, colIndex)}
-                      data-id={scene.id}
-                      className="GridSetup__GridScene u-button">
-                      {scene.name}
-                    </div>
-                  )
-                }
-              })}
-            </React.Fragment>
-          )}
-        </Sortable>
-        <Sortable
-          className="GridSetup__Scenes"
-          options={{
-            group: {name: "shared", pull: "clone", put: false},
-            sort: false,
-            animation: 150,
-            easing: "cubic-bezier(1, 0, 0, 1)",
-          }}>
-          {this.props.allScenes.map((scene) =>
-            <div key={scene.id} data-id={scene.id} className="GridSetup__Scene u-button">
-              {scene.name}
+              onChange={this.onWidthInput.bind(this)}
+              onBlur={this.blurWidth.bind(this)}
+              variant="filled"
+              InputLabelProps={{className: classes.dimensionInput}}
+              inputProps={{
+                className: classes.dimensionInput,
+                min: 1,
+                max: 5,
+                type: 'number',
+              }}/>
+            <IconButton
+              edge="end"
+              color="inherit"
+              aria-label="Play"
+              onClick={this.onPlayGrid.bind(this)}>
+              <PlayCircleOutlineIcon fontSize="large"/>
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+
+        <main className={classes.content}>
+          <div className={classes.appBarSpacer} />
+          <Container maxWidth={false} className={classes.container}>
+            <div className={classes.grid}
+                 style={{gridTemplateColumns: gridTemplateColumns, gridTemplateRows: gridTemplateRows}}>
+              {this.props.grid.grid.map((row, rowIndex) =>
+                <React.Fragment key={rowIndex}>
+                  {row.map((sceneID, colIndex) => {
+                    const scene = this.props.allScenes.find((s) => s.id == sceneID);
+                    return (
+                      <Button
+                        className={classes.gridCell}
+                        key={colIndex}
+                        variant="outlined"
+                        onClick={this.onClickCell.bind(this, rowIndex, colIndex)}>
+                        {scene ? scene.name : ""}
+                      </Button>
+                    );
+                  })}
+                </React.Fragment>
+              )}
             </div>
-          )}
-        </Sortable>
+            <Menu
+              id="scene-menu"
+              elevation={1}
+              anchorOrigin={{
+                vertical: 'center',
+                horizontal: 'center',
+              }}
+              transformOrigin={{
+                vertical: 'bottom',
+                horizontal: 'center',
+              }}
+              getContentAnchorEl={null}
+              anchorEl={this.state.menuAnchorEl}
+              keepMounted
+              classes={{paper: classes.sceneMenu}}
+              open={!!this.state.isEditing}
+              onClose={this.onCloseMenu.bind(this)}>
+              <MenuItem key={-1} onClick={this.onChooseScene.bind(this, -1)}>
+                <ListItemText primary={"~~EMPTY~~"}/>
+              </MenuItem>
+              {this.props.allScenes.map((s) =>
+                <MenuItem key={s.id} onClick={this.onChooseScene.bind(this, s.id)}>
+                  <ListItemText primary={s.name}/>
+                </MenuItem>
+              )}
+            </Menu>
+            <Fab
+              className={classes.deleteButton}
+              onClick={this.props.onDelete.bind(this, this.props.grid)}
+              size="small">
+              <DeleteIcon className={classes.deleteIcon}/>
+            </Fab>
+          </Container>
+        </main>
       </div>
-    )
+    );
   }
 
-  nop() {}
+  onClickCell(rowIndex: number, colIndex: number, e: MouseEvent) {
+    this.setState({menuAnchorEl: e.currentTarget, isEditing: [rowIndex, colIndex]});
+  }
+
+  onChooseScene(sceneID: number) {
+    const row = this.state.isEditing[0];
+    const col = this.state.isEditing[1];
+    const newGrid = this.props.grid.grid;
+    newGrid[row][col] = sceneID;
+    this.changeKey('grid', newGrid);
+    this.onCloseMenu();
+  }
+
+  onCloseMenu() {
+    this.setState({isEditing: null});
+  }
 
   getNewGrid(height: number, width: number) {
-    let grid = this.state.grid;
+    let grid = this.props.grid.grid;
 
     // Adjust height
     if (grid.length > height) {
       grid.splice(height, grid.length - height);
     } else if (grid.length < height) {
-      const newRow = Array<number>(width);
+      const newRow = Array<number>(width).fill(-1);
       grid.push(newRow);
     }
     // Adjust width
@@ -145,56 +296,91 @@ export default class GridSetup extends React.Component {
         row.splice(width, row.length - width);
       } else if (row.length < width) {
         while (row.length < width) {
-          row.push(null);
+          row.push(-1);
         }
       }
-    }
-
-    // Ensure this scene is always present in the grid
-    let found = false;
-    for (let row of grid) {
-      for (let scene of row) {
-        if (scene == this.props.scene.id) {
-          found = true;
-          break;
-        }
-      }
-      if (found) break;
-    }
-    if (!found) {
-      grid[0][0] = this.props.scene.id;
     }
     return grid;
   }
 
   onUpdateHeight(height: number) {
     const grid = this.getNewGrid(height, this.state.width);
-    this.setState({height: height, grid: grid});
+    this.changeKey('grid', grid);
+    this.setState({height: height});
   }
 
   onUpdateWidth(width: number) {
     const grid = this.getNewGrid(this.state.height, width);
-    this.setState({width: width, grid: grid});
+    this.changeKey('grid', grid);
+    this.setState({width: width});
   }
 
-  onRemove(row: number, col: number) {
-    const grid = this.state.grid;
-    let gridRow = grid[row];
-    gridRow.splice(col, 1);
-    // Ensure this scene is always present in the grid
-    let found = false;
-    for (let row of grid) {
-      for (let scene of row) {
-        if (scene == this.props.scene.id) {
-          found = true;
-          break;
-        }
-      }
-      if (found) break;
+  onHeightInput(e: MouseEvent) {
+    const input = (e.target as HTMLInputElement);
+    if (input.value === '') {
+      this.onUpdateHeight(1);
+    } else {
+      this.onUpdateHeight(Number(input.value));
     }
-    if (!found) {
-      grid[0][0] = this.props.scene.id;
+  }
+
+  blurHeight(e: MouseEvent) {
+    const min = (e.currentTarget as any).min ? (e.currentTarget as any).min : null;
+    const max = (e.currentTarget as any).max ? (e.currentTarget as any).max : null;
+    if (min && this.state.height < min) {
+      this.onUpdateHeight(min);
+    } else if (max && this.state.height > max) {
+      this.onUpdateHeight(max);
     }
-    this.setState({grid: grid});
+  }
+
+  onWidthInput(e: MouseEvent) {
+    const input = (e.target as HTMLInputElement);
+    if (input.value === '') {
+      this.onUpdateWidth(1);
+    } else {
+      this.onUpdateWidth(Number(input.value));
+    }
+  }
+
+  blurWidth(e: MouseEvent) {
+    const min = (e.currentTarget as any).min ? (e.currentTarget as any).min : null;
+    const max = (e.currentTarget as any).max ? (e.currentTarget as any).max : null;
+    if (min && this.state.width < min) {
+      this.onUpdateWidth(min);
+    } else if (max && this.state.width > max) {
+      this.onUpdateWidth(max);
+    }
+  }
+
+  beginEditingName() {
+    this.setState({isEditingName: true});
+  }
+
+  endEditingName(e: Event) {
+    e.preventDefault();
+    this.setState({isEditingName: false});
+  }
+
+  onChangeName(e: React.FormEvent<HTMLInputElement>) {
+    this.changeKey('name', e.currentTarget.value);
+  }
+
+  changeKey(key: string, value: any) {
+    this.update((s) => s[key] = value);
+  }
+
+  update(fn: (scene: any) => void) {
+    this.props.onUpdateGrid(this.props.grid, fn);
+  }
+
+  goBack() {
+    this.props.goBack();
+  }
+
+  onPlayGrid() {
+    this.props.onPlayGrid(this.props.grid);
   }
 }
+
+export default withStyles(styles)(GridSetup as any);

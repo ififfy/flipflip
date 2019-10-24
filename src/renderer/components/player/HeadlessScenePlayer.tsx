@@ -1053,6 +1053,7 @@ export default class HeadlessScenePlayer extends React.Component {
     nextScene?: Scene,
     opacity: number,
     isPlaying: boolean,
+    gridView: boolean,
     hasStarted: boolean,
     strobeLayer?: string,
     historyOffset: number,
@@ -1092,6 +1093,7 @@ export default class HeadlessScenePlayer extends React.Component {
             scene={this.props.scene}
             isOverlay={this.props.opacity != 1}
             isPlaying={this.props.isPlaying}
+            gridView={this.props.gridView}
             historyOffset={this.props.historyOffset}
             setHistoryOffset={this.props.setHistoryOffset}
             setHistoryPaths={this.props.setHistoryPaths}

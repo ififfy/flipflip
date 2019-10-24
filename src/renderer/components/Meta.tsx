@@ -17,6 +17,7 @@ import GridSetup from "./config/GridSetup";
 import VideoClipper from "./config/VideoClipper";
 import Player from './player/Player';
 import SceneDetail from './sceneDetail/SceneDetail';
+import GridPlayer from "./player/GridPlayer";
 
 const appStorage = new AppStorage(remote.getCurrentWindow().id);
 
@@ -57,6 +58,7 @@ export default class Meta extends React.Component {
 
   render() {
     const scene = actions.getActiveScene(this.state);
+    const grid = actions.getActiveGrid(this.state);
 
     // Save a lot of typing and potential bugs
     const a = (fn: any, ...args: any[]) => this.applyAction.bind(this, fn, ...args);
@@ -68,20 +70,25 @@ export default class Meta extends React.Component {
           <CssBaseline />
           {this.state.route.length === 0 && (
             <ScenePicker
-              canGenerate={(this.state.library.length >= 1 && this.state.tags.length >= 1) || (this.state.scenes.length >= 1)}
+              canGenerate={this.state.library.length >= 1 && this.state.tags.length >= 1}
+              canGrid={this.state.scenes.length > 0}
               config={this.state.config}
+              grids={this.state.grids}
               libraryCount={this.state.library.length}
               scenes={this.state.scenes}
               version={this.state.version}
               onAddGenerator={a(actions.addGenerator)}
+              onAddGrid={a(actions.addGrid)}
               onAddScene={a(actions.addScene)}
               onImportScene={a(actions.importScene)}
               onOpenConfig={a(actions.openConfig)}
               onOpenLibrary={a(actions.openLibrary)}
               onOpenScene={a(actions.goToScene)}
+              onOpenGrid={a(actions.goToGrid)}
               onSort={a(actions.sortScene)}
               onUpdateConfig={a(actions.updateConfig)}
               onUpdateScenes={a(actions.replaceScenes)}
+              onUpdateGrids={a(actions.replaceGrids)}
             />
           )}
 
@@ -165,10 +172,13 @@ export default class Meta extends React.Component {
 
           {this.isRoute('grid') && (
             <GridSetup
-              scene={scene}
               allScenes={this.state.scenes}
-              onUpdateGrid={a(actions.onUpdateGrid)}
+              autoEdit={this.state.autoEdit}
+              grid={grid}
               goBack={a(actions.goBack)}
+              onDelete={a(actions.deleteGrid)}
+              onPlayGrid={a(actions.playGrid)}
+              onUpdateGrid={a(actions.updateGrid)}
             />
           )}
 
@@ -184,7 +194,6 @@ export default class Meta extends React.Component {
               getTags={actions.getTags.bind(this, this.state.library)}
               setCount={a(actions.setCount)}
               cache={a(actions.cacheImage)}
-              setupGrid={a(actions.setupGrid)}
               blacklistFile={a(actions.blacklistFile)}
             />
           )}
@@ -204,6 +213,18 @@ export default class Meta extends React.Component {
               setCount={a(actions.setCount)}
               cache={a(actions.cacheImage)}
               blacklistFile={a(actions.blacklistFile)}
+            />
+          )}
+
+          {this.isRoute('gridplay') && (
+            <GridPlayer
+              config={this.state.config}
+              grid={grid}
+              scenes={this.state.scenes}
+              cache={a(actions.cacheImage)}
+              getTags={actions.getTags.bind(this, this.state.library)}
+              goBack={a(actions.goBack)}
+              setCount={a(actions.setCount)}
             />
           )}
 

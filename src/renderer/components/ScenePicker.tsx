@@ -7,19 +7,20 @@ import Sortable from "react-sortablejs";
 import {
   AppBar, Badge, Button, Card, CardActionArea, CardContent, Chip, Container, createStyles, Dialog, DialogActions,
   DialogContent, DialogContentText, DialogTitle, Divider, Drawer, Fab, IconButton, Link, ListItem, ListItemIcon,
-  ListItemSecondaryAction, ListItemText, Menu, MenuItem, Theme, Toolbar, Tooltip, Typography, withStyles
+  ListItemSecondaryAction, ListItemText, Menu, MenuItem, Tab, Tabs, Theme, Toolbar, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
 import AddIcon from '@material-ui/icons/Add';
-import AddCircleIcon from '@material-ui/icons/AddCircle';
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import CasinoIcon from '@material-ui/icons/Casino';
 import GetAppIcon from '@material-ui/icons/GetApp';
+import GridOnIcon from '@material-ui/icons/GridOn';
 import HelpIcon from '@material-ui/icons/Help';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import MenuIcon from '@material-ui/icons/Menu';
+import MovieIcon from '@material-ui/icons/Movie';
+import MovieFilterIcon from '@material-ui/icons/MovieFilter';
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import SettingsIcon from '@material-ui/icons/Settings';
 import SortIcon from '@material-ui/icons/Sort';
@@ -32,6 +33,7 @@ import Config from "../data/Config";
 import Scene from "../data/Scene";
 import Jiggle from "../animations/Jiggle";
 import VSpin from "../animations/VSpin";
+import SceneGrid from "../data/SceneGrid";
 
 const drawerWidth = 240;
 
@@ -219,6 +221,16 @@ const styles = (theme: Theme) => createStyles({
     width: theme.spacing(5),
     height: theme.spacing(5),
   },
+  gridTooltip: {
+    top: 'auto',
+    right: 28,
+    bottom: 195,
+    left: 'auto',
+    position: 'fixed',
+    borderRadius: '50%',
+    width: theme.spacing(5),
+    height: theme.spacing(5),
+  },
   addButton: {
     backgroundColor: theme.palette.primary.main,
     margin: 0,
@@ -233,13 +245,16 @@ const styles = (theme: Theme) => createStyles({
     }),
   },
   addSceneButton: {
-    marginBottom: 60
+    marginBottom: 60,
   },
   addGeneratorButton: {
-    marginBottom: 115
+    marginBottom: 115,
+  },
+  addGridButton: {
+    marginBottom: 170,
   },
   importSceneButton: {
-    marginBottom: 170
+    marginBottom: 225,
   },
   addButtonClose: {
     marginBottom: 0,
@@ -254,6 +269,45 @@ const styles = (theme: Theme) => createStyles({
   sortMenu: {
     width: 200,
   },
+  tabs: {
+    borderRight: `1px solid ${theme.palette.divider}`,
+  },
+  tab: {
+    width: drawerWidth,
+    height: theme.spacing(12),
+    transition: theme.transitions.create(['width', 'margin', 'background', 'opacity'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    '&:hover': {
+      backgroundColor: 'rgba(0, 0, 0, 0.08)',
+      opacity: 1,
+      transition: theme.transitions.create(['background', 'opacity'], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+    },
+  },
+  tabClose: {
+    minWidth: 0,
+    transition: theme.transitions.create(['width', 'margin'], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    width: theme.spacing(7),
+    [theme.breakpoints.up('sm')]: {
+      width: theme.spacing(9),
+    },
+  },
+  sceneTab: {
+    ariaControls: 'vertical-tabpanel-0',
+  },
+  generatorTab: {
+    ariaControls: 'vertical-tabpanel-1',
+  },
+  gridTab: {
+    ariaControls: 'vertical-tabpanel-2',
+  },
   fill: {
     flexGrow: 1,
   },
@@ -263,19 +317,24 @@ class ScenePicker extends React.Component {
   readonly props: {
     classes: any,
     canGenerate: boolean,
+    canGrid: boolean,
     config: Config,
+    grids: Array<SceneGrid>,
     libraryCount: number,
     scenes: Array<Scene>,
     version: string,
     onAddGenerator(): void,
+    onAddGrid(): void,
     onAddScene(): void,
     onImportScene(): void,
     onOpenConfig(): void,
     onOpenLibrary(): void,
     onOpenScene(scene: Scene): void,
+    onOpenGrid(grid: SceneGrid): void,
     onSort(algorithm: string, ascending: boolean): void,
     onUpdateConfig(config: Config): void,
     onUpdateScenes(scenes: Array<Scene>): void,
+    onUpdateGrids(grids: Array<SceneGrid>): void,
   };
 
   readonly state = {
@@ -285,6 +344,7 @@ class ScenePicker extends React.Component {
     isFirstWindow: false,
     menuAnchorEl: null as any,
     openMenu: null as string,
+    openTab: 0,
   };
 
   render() {
@@ -348,6 +408,30 @@ class ScenePicker extends React.Component {
                 <Typography component="h1" variant="h6" color="inherit" noWrap>
                   FlipFlip
                 </Typography>
+              </div>
+
+              <Divider />
+
+              <div>
+                <Tabs
+                  orientation="vertical"
+                  value={this.state.openTab}
+                  onChange={this.onChangeTab.bind(this)}
+                  aria-label="scene picker tabs"
+                  className={classes.tabs}>
+                  <Tab id="vertical-tab-0"
+                       aria-controls="vertical-tabpanel-0"
+                       icon={<MovieIcon/>} label={open ? `Scenes (${this.props.scenes.filter((s) => !s.generatorWeights).length})` : ""}
+                       className={clsx(classes.tab, classes.sceneTab, !open && classes.tabClose)}/>
+                  <Tab id="vertical-tab-1"
+                       aria-controls="vertical-tabpanel-1"
+                       icon={<MovieFilterIcon/>} label={open ? `Scene Generators (${this.props.scenes.filter((s) => !!s.generatorWeights).length})` : ""}
+                       className={clsx(classes.tab, classes.generatorTab, !open && classes.tabClose)}/>
+                  <Tab id="vertical-tab-2"
+                       aria-controls="vertical-tabpanel-2"
+                       icon={<GridOnIcon/>} label={open ? `Scene Grids (${this.props.grids.length})` : ""}
+                       className={clsx(classes.tab, classes.gridTab, !open && classes.tabClose)}/>
+                </Tabs>
               </div>
 
               <Divider />
@@ -432,31 +516,122 @@ class ScenePicker extends React.Component {
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
           <Container maxWidth={false} className={classes.container}>
-            <Sortable
-              className={classes.sceneList}
-              options={{
-                animation: 150,
-                easing: "cubic-bezier(1, 0, 0, 1)",
-              }}
-              onChange={(order: any, sortable: any, evt: any) => {
-                let newScenes = Array.from(this.props.scenes);
-                arrayMove(newScenes, evt.oldIndex, evt.newIndex);
-                this.props.onUpdateScenes(newScenes);
-              }}>
-              {this.props.scenes.map((scene) =>
-                <Jiggle key={scene.id} bounce={true}>
-                  <Card className={clsx(classes.scene, scene.generatorWeights && classes.generator)}>
-                    <CardActionArea onClick={this.props.onOpenScene.bind(this, scene)}>
-                      <CardContent>
-                        <Typography component="h2" variant="h6">
-                          {scene.name}
-                        </Typography>
-                      </CardContent>
-                    </CardActionArea>
-                  </Card>
-                </Jiggle>
-              )}
-            </Sortable>
+
+            {this.state.openTab === 0 && (
+              <Typography
+                component="div"
+                role="tabpanel"
+                hidden={this.state.openTab !== 0}
+                id="vertical-tabpanel-0"
+                aria-labelledby="vertical-tab-0">
+                <Sortable
+                  className={classes.sceneList}
+                  options={{
+                    animation: 150,
+                    easing: "cubic-bezier(1, 0, 0, 1)",
+                  }}
+                  onChange={(order: any, sortable: any, evt: any) => {
+                    let newScenes = Array.from(this.props.scenes);
+                    arrayMove(newScenes, evt.oldIndex, evt.newIndex);
+                    this.props.onUpdateScenes(newScenes);
+                  }}>
+                  {this.props.scenes.map((scene) => {
+                    if (scene.generatorWeights) return <div key={scene.id}/>;
+                    else {
+                      return (
+                        <Jiggle key={scene.id} bounce={true}>
+                          <Card className={classes.scene}>
+                            <CardActionArea onClick={this.props.onOpenScene.bind(this, scene)}>
+                              <CardContent>
+                                <Typography component="h2" variant="h6">
+                                  {scene.name}
+                                </Typography>
+                              </CardContent>
+                            </CardActionArea>
+                          </Card>
+                        </Jiggle>
+                      )
+                    }
+                  })}
+                </Sortable>
+              </Typography>
+            )}
+
+            {this.state.openTab === 1 && (
+              <Typography
+                component="div"
+                role="tabpanel"
+                hidden={this.state.openTab !== 1}
+                id="vertical-tabpanel-1"
+                aria-labelledby="vertical-tab-1">
+                <Sortable
+                  className={classes.sceneList}
+                  options={{
+                    animation: 150,
+                    easing: "cubic-bezier(1, 0, 0, 1)",
+                  }}
+                  onChange={(order: any, sortable: any, evt: any) => {
+                    let newScenes = Array.from(this.props.scenes);
+                    arrayMove(newScenes, evt.oldIndex, evt.newIndex);
+                    this.props.onUpdateScenes(newScenes);
+                  }}>
+                  {this.props.scenes.map((scene) => {
+                    if (!scene.generatorWeights) return <div key={scene.id}/>;
+                    else {
+                      return (
+                        <Jiggle key={scene.id} bounce={true}>
+                          <Card className={classes.scene}>
+                            <CardActionArea onClick={this.props.onOpenScene.bind(this, scene)}>
+                              <CardContent>
+                                <Typography component="h2" variant="h6">
+                                  {scene.name}
+                                </Typography>
+                              </CardContent>
+                            </CardActionArea>
+                          </Card>
+                        </Jiggle>
+                      )
+                    }
+                  })}
+                </Sortable>
+              </Typography>
+            )}
+
+            {this.state.openTab === 2 && (
+              <Typography
+                component="div"
+                role="tabpanel"
+                hidden={this.state.openTab !== 2}
+                id="vertical-tabpanel-2"
+                aria-labelledby="vertical-tab-2">
+                <Sortable
+                  className={classes.sceneList}
+                  options={{
+                    animation: 150,
+                    easing: "cubic-bezier(1, 0, 0, 1)",
+                  }}
+                  onChange={(order: any, sortable: any, evt: any) => {
+                    let newGrids = Array.from(this.props.grids);
+                    arrayMove(newGrids, evt.oldIndex, evt.newIndex);
+                    this.props.onUpdateGrids(newGrids);
+                  }}>
+                  {this.props.grids.map((grid) =>
+                    <Jiggle key={grid.id} bounce={true}>
+                      <Card className={classes.scene}>
+                        <CardActionArea onClick={this.props.onOpenGrid.bind(this, grid)}>
+                          <CardContent>
+                            <Typography component="h2" variant="h6">
+                              {grid.name}
+                            </Typography>
+                          </CardContent>
+                        </CardActionArea>
+                      </Card>
+                    </Jiggle>
+                  )}
+                </Sortable>
+              </Typography>
+            )}
+
           </Container>
         </main>
 
@@ -470,6 +645,17 @@ class ScenePicker extends React.Component {
                 <GetAppIcon className={classes.icon} />
               </Fab>
             </Tooltip>
+            <Tooltip title="Add Scene Grid"  placement="left">
+              <span className={classes.gridTooltip} style={!this.props.canGrid ? { pointerEvents: "none" } : {}}>
+                <Fab
+                  className={clsx(classes.addButton, classes.addGridButton, this.state.openMenu != MO.new && classes.addButtonClose)}
+                  onClick={this.props.onAddGrid.bind(this)}
+                  disabled={!this.props.canGrid}
+                  size="small">
+                  <GridOnIcon className={classes.icon} />
+                </Fab>
+              </span>
+            </Tooltip>
             <Tooltip title="Add Scene Generator"  placement="left">
               <span className={classes.generateTooltip} style={!this.props.canGenerate ? { pointerEvents: "none" } : {}}>
                 <Fab
@@ -477,7 +663,7 @@ class ScenePicker extends React.Component {
                   onClick={this.props.onAddGenerator.bind(this)}
                   disabled={!this.props.canGenerate}
                   size="small">
-                  <AddCircleOutlineIcon className={classes.icon} />
+                  <MovieFilterIcon className={classes.icon} />
                 </Fab>
               </span>
             </Tooltip>
@@ -486,7 +672,7 @@ class ScenePicker extends React.Component {
                 className={clsx(classes.addButton, classes.addSceneButton, this.state.openMenu != MO.new && classes.addButtonClose)}
                 onClick={this.props.onAddScene.bind(this)}
                 size="small">
-                <AddCircleIcon className={classes.icon} />
+                <MovieIcon className={classes.icon} />
               </Fab>
             </Tooltip>
             <Fab
@@ -605,6 +791,10 @@ class ScenePicker extends React.Component {
         })
         .catch((e) => console.error(e));
     }
+  }
+
+  onChangeTab(e: any, newTab: number) {
+    this.setState({openTab: newTab});
   }
 
   onNewWindow() {

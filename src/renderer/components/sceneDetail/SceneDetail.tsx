@@ -340,6 +340,7 @@ class SceneDetail extends React.Component {
               </IconButton>
             </Tooltip>
 
+            {/*TODO Drive this off state so it responds faster*/}
             {this.state.isEditingName && (
               <form onSubmit={this.endEditingName.bind(this)} className={classes.titleField}>
                 <TextField

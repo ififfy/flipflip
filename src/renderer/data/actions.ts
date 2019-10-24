@@ -30,6 +30,7 @@ import Clip from "../data/Clip";
 import LibrarySource from "../data/LibrarySource";
 import Overlay from "../data/Overlay";
 import Tag from "../data/Tag";
+import SceneGrid from "./SceneGrid";
 
 type State = typeof defaultInitialState;
 
@@ -44,8 +45,17 @@ export function isRoute(state: State, kind: string): Boolean {
 // Returns the active scene, or null if the current route isn't a scene
 export function getActiveScene(state: State): Scene | null {
   for (let r of state.route.slice().reverse()) {
-    if (r.kind == 'scene' || r.kind == 'grid') {
+    if (r.kind == 'scene') {
       return state.scenes.find((s: Scene) => s.id === r.value);
+    }
+  }
+  return null;
+}
+
+export function getActiveGrid(state: State): SceneGrid | null {
+  for (let r of state.route.slice().reverse()) {
+    if (r.kind == 'grid') {
+      return state.grids.find((g: SceneGrid) => g.id === r.value);
     }
   }
   return null;
@@ -94,6 +104,7 @@ export function restoreFromBackup(state: State, backupFile: string): Object {
     isBatchTag: data.isBatchTag,
     config: new Config(data.config),
     scenes: data.scenes.map((s: any) => new Scene(s)),
+    grids: data.grids ? data.grids.map((g: any) => new SceneGrid(g)) : Array<SceneGrid>(),
     library: data.library.map((s: any) => new LibrarySource(s)),
     tags: data.tags.map((t: any) => new Tag(t)),
     route: data.route.map((s: any) => new Route(s)),
@@ -237,16 +248,32 @@ export function deleteScene(state: State, scene: Scene): Object {
   const newScenes = state.scenes.filter((s: Scene) => s.id != scene.id);
   for (let s of newScenes) {
     s.overlays = s.overlays.filter((o) => o.sceneID != scene.id);
-    // TODO Fix this
-    /*for (let row of s.grid) {
-      if (row.find((id: any) => parseInt(id) == scene.id) != null) {
-        s.grid = [[]];
-        break;
-      }
-    }*/
+  }
+  const newGrids = state.grids;
+  for (let g of newGrids) {
+    for (let row of g.grid) {
+      row = row.map((sceneID) => {
+        if (sceneID == scene.id) {
+          return -1;
+        } else {
+          return sceneID;
+        }
+      });
+    }
   }
   return {
     scenes: newScenes,
+    grids: newGrids,
+    route: Array<Route>(),
+    autoEdit: false,
+    isSeleft: false,
+  };
+}
+
+export function deleteGrid(state: State, grid: SceneGrid): Object {
+  const newGrids = state.grids.filter((g: SceneGrid) => g.id != grid.id);
+  return {
+    grids: newGrids,
     route: Array<Route>(),
     autoEdit: false,
     isSeleft: false,
@@ -296,6 +323,10 @@ export function goToScene(state: State, scene: Scene): Object {
   return {route: [new Route({kind: 'scene', value: scene.id})]};
 }
 
+export function goToGrid(state: State, scene: Scene): Object {
+  return {route: [new Route({kind: 'grid', value: scene.id})]};
+}
+
 export function openLibrary(state: State): Object {
   return {route: [new Route({kind: 'library', value: null})]};
 }
@@ -316,6 +347,10 @@ export function saveLibraryPosition(state: State, yOffset: number, filters: Arra
     libraryFilters: filters,
     librarySelected: selected,
   };
+}
+
+export function playGrid(state: State, grid: SceneGrid): Object {
+  return {route: state.route.concat(new Route({kind: 'gridplay', value: grid.id}))};
 }
 
 export function playScene(state: State, scene: Scene): Object {
@@ -430,6 +465,23 @@ export function manageTags(state: State): Object {
   return {route: state.route.concat(new Route({kind: 'tags', value: null}))};
 }
 
+export function addGrid(state: State): Object {
+  let id = state.grids.length + 1;
+  state.grids.forEach((g: SceneGrid) => {
+    id = Math.max(g.id + 1, id);
+  });
+  let grid = new SceneGrid({
+    id: id,
+    name: "New Grid",
+    grid: [[-1]],
+  });
+  return {
+    grids: state.grids.concat([grid]),
+    route: [new Route({kind: 'grid', value: grid.id})],
+    autoEdit: true,
+  };
+}
+
 export function addGenerator(state: State): Object {
   let id = state.scenes.length + 1;
   state.scenes.forEach((s: Scene) => {
@@ -437,7 +489,7 @@ export function addGenerator(state: State): Object {
   });
   let scene = new Scene({
     id: id,
-    name: "New generator",
+    name: "New Generator",
     sources: new Array<LibrarySource>(),
     generatorWeights: [],
     ...state.config.defaultScene,
@@ -635,8 +687,26 @@ export function updateScene(state: State, scene: Scene, fn: (scene: Scene) => vo
   return {scenes: newScenes};
 }
 
+export function updateGrid(state: State, grid: SceneGrid, fn: (grid: SceneGrid) => void): Object {
+  const newGrids = Array<SceneGrid>();
+  for (let g of state.grids) {
+    if (g.id == grid.id) {
+      const gridCopy = JSON.parse(JSON.stringify(g));
+      fn(gridCopy);
+      newGrids.push(gridCopy);
+    } else {
+      newGrids.push(g);
+    }
+  }
+  return {grids: newGrids};
+}
+
 export function replaceScenes(state: State, scenes: Array<Scene>): Object {
   return {scenes: scenes};
+}
+
+export function replaceGrids(state: State, grids: Array<SceneGrid>): Object {
+  return {grids: grids};
 }
 
 export function replaceLibrary(state: State, library: Array<LibrarySource>): Object {
@@ -763,19 +833,6 @@ export function toggleTag(state: State, sourceID: number, tag: Tag): Object {
     }
   }
   return {library: newLibrary, scenes: newScenes};
-}
-
-export function setupGrid(state: State, scene: Scene) {
-  return {route: state.route.concat([new Route({kind: 'grid', value: scene.id})])};
-}
-
-export function onUpdateGrid(state: State, grid: Array<Array<number>>): Object {
-  const newScenes = state.scenes;
-  const scene = newScenes.find((s) => s.id == getActiveScene(state).id);
-  scene.grid = grid;
-  const newRoute = state.route;
-  newRoute.pop();
-  return {scenes: newScenes, route: newRoute};
 }
 
 export function addSource(state: State, scene: Scene, type: string, ...args: any[]): Object {
@@ -1013,7 +1070,6 @@ export function exportScene(state: State, scene: Scene): Object {
   scenesToExport.push(sceneCopy);
 
   if (sceneCopy.gridView) {
-    sceneCopy.overlays = [];
     // Add grid
     for (let row of sceneCopy.grid) {
       for (let g of row) {
@@ -1022,13 +1078,11 @@ export function exportScene(state: State, scene: Scene): Object {
           const gridCopy = JSON.parse(JSON.stringify(grid)); // Make a copy
           gridCopy.generatorWeights = null;
           gridCopy.overlays = [];
-          gridCopy.grid = [[]];
           scenesToExport.push(gridCopy);
         }
       }
     }
   } else {
-    sceneCopy.grid = [[]];
     // Add overlays
     for (let o of sceneCopy.overlays) {
       const overlay = state.scenes.find((s) => s.id == o.sceneID);
@@ -1036,7 +1090,6 @@ export function exportScene(state: State, scene: Scene): Object {
         const overlayCopy = JSON.parse(JSON.stringify(overlay)); // Make a copy
         overlayCopy.generatorWeights = null;
         overlayCopy.overlays = [];
-        overlayCopy.grid = [[]];
         scenesToExport.push(overlayCopy);
       }
     }
@@ -1087,19 +1140,6 @@ export function importScene(state: State): Object {
       } else {
         o.sceneID = ++id;
         newSceneMap.set(sID, o.sceneID);
-      }
-    }
-  }
-  if (scene.grid) {
-    for (let r=0; r < scene.grid.length; r++) {
-      for (let g=0; g < scene.grid[r].length; g++) {
-        const sID = parseInt(scene.grid[r][g] as any);
-        if (newSceneMap.has(sID)) {
-          scene.grid[r][g] = newSceneMap.get(sID);
-        } else {
-          scene.grid[r][g] = ++id;
-          newSceneMap.set(sID, scene.grid[r][g]);
-        }
       }
     }
   }

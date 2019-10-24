@@ -24,11 +24,13 @@ class GifInfo {
 
 const styles = (theme: Theme) => createStyles({
   imagePlayer: {
-    position: 'fixed',
     top: 0,
     right: 0,
     bottom: 0,
     left: 0,
+  },
+  notGridPlayer: {
+    position: 'fixed',
   },
   overlayPlayer: {
     zIndex: 4,
@@ -43,6 +45,7 @@ class ImagePlayer extends React.Component {
     classes: any,
     config: Config,
     scene: Scene,
+    gridView: boolean,
     advanceHack?: ChildCallbackHack,
     deleteHack?: ChildCallbackHack,
     maxInMemory: number,
@@ -92,7 +95,7 @@ class ImagePlayer extends React.Component {
     }
 
     return (
-      <div className={clsx(classes.imagePlayer, this.props.isOverlay && classes.overlayPlayer)}
+      <div className={clsx(classes.imagePlayer, !this.props.gridView && classes.notGridPlayer, this.props.isOverlay && classes.overlayPlayer)}
            style={{cursor: this.state.hideCursor ? "none" : "initial"}}
            ref={this.idleTimerRef}>
         {(this.props.strobeLayer == SL.middle) && (
