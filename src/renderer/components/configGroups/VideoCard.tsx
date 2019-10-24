@@ -22,12 +22,16 @@ class VideoCard extends React.Component {
     return(
       <Grid container spacing={2} alignItems="center">
         <Grid item xs={12}>
-          <Typography>Scene Video</Typography>
-          <VideoControl
-            video={this.props.mainVideo}
-            player
-            volume={this.props.scene.videoVolume}
-            onChangeVolume={this.changeKey.bind(this, 'videoVolume', this.props.scene).bind(this)}/>
+          {this.props.mainVideo && (
+            <React.Fragment>
+              <Typography>Scene Video</Typography>
+            <VideoControl
+              video={this.props.mainVideo}
+              player
+              volume={this.props.scene.videoVolume}
+              onChangeVolume={this.changeKey.bind(this, 'videoVolume', this.props.scene).bind(this)}/>
+            </React.Fragment>
+          )}
         </Grid>
         {this.props.otherVideos && this.props.otherVideos.map((otherVideo, index) => {
           if (otherVideo == null) return <React.Fragment key={index}/>;

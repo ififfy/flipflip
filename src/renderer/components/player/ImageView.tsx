@@ -1,13 +1,59 @@
 import * as React from 'react';
 import {animated, useSpring, useTransition} from "react-spring";
+import clsx from "clsx";
 import Timeout = NodeJS.Timeout;
+
+import {createStyles, Theme, withStyles} from "@material-ui/core";
 
 import {BT, HTF, SL, TF, VTF} from "../../data/const";
 import Scene from "../../data/Scene";
 import Strobe from "./Strobe";
 
-export default class ImageView extends React.Component {
+const styles = (theme: Theme) => createStyles({
+  imageView: {
+    zIndex: 2,
+    margin: '-5px -10px -10px -5px',
+  },
+  image: {
+    height: '100%',
+    width: '100%',
+    zIndex: 2,
+    backgroundPosition: 'center',
+    backgroundSize: 'contain',
+    backgroundRepeat: 'no-repeat',
+    position: 'absolute',
+  },
+  background: {
+    height: '100%',
+    width: '100%',
+    zIndex: 1,
+    backgroundSize: 'cover',
+  },
+  fadeLayer: {
+
+  },
+  zoomLayer: {
+    zIndex: 2,
+  },
+  strobe: {
+    zIndex: 2,
+  },
+  backgroundStrobe: {
+    zIndex: 1,
+  },
+  fillContainer: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    overflow: 'hidden',
+  },
+});
+
+class ImageView extends React.Component {
   readonly props: {
+    classes: any,
     image: HTMLImageElement | HTMLVideoElement,
     fitParent: boolean,
     hasStarted: boolean,
@@ -226,11 +272,13 @@ export default class ImageView extends React.Component {
   }
 
   render() {
+    const classes = this.props.classes;
+
     if (!this.props.image) {
       return (
-        <div id="ImageView" className="ImageView u-fill-container">
-          <div className="ImageView__Image" ref={this.contentRef}/>
-          <div className="ImageView__Background" ref={this.backgroundRef}/>
+        <div className={clsx(classes.imageView, classes.fillContainer)}>
+          <div className={classes.image} ref={this.contentRef}/>
+          <div className={classes.background} ref={this.backgroundRef}/>
         </div>
       );
     }
@@ -246,30 +294,31 @@ export default class ImageView extends React.Component {
       };
     }
     return (
-      <animated.div id="ImageView" className="ImageView u-fill-container">
+      <animated.div className={clsx(classes.imageView, classes.fillContainer)}>
         <this.FadeLayer>
           <this.ZoomMoveLayer>
             {(this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.image) && (
               <Strobe
+                className={classes.strobe}
                 toggleStrobe={this.props.toggleStrobe}
                 timeToNextFrame={this.props.timeToNextFrame}
                 scene={this.props.scene}
                 strobeFunction={this.strobeImage.bind(this)}>
-                <animated.div className="ImageView__Image" ref={this.contentRef}/>
+                <animated.div className={classes.image} ref={this.contentRef}/>
               </Strobe>
             )}
             {(!this.props.scene || !this.props.scene.strobe || this.props.scene.strobeLayer != SL.image) && (
-              <animated.div className="ImageView__Image" ref={this.contentRef}/>
+              <animated.div className={classes.image} ref={this.contentRef}/>
             )}
           </this.ZoomMoveLayer>
           {this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.background && (
             <Strobe
-              className={'m-background'}
+              className={classes.backgroundStrobe}
               toggleStrobe={this.props.toggleStrobe}
               timeToNextFrame={this.props.timeToNextFrame}
               scene={this.props.scene}/>
           )}
-          <animated.div className="ImageView__Background" ref={this.backgroundRef} style={{...backgroundStyle}}/>
+          <animated.div className={classes.background} ref={this.backgroundRef} style={{...backgroundStyle}}/>
         </this.FadeLayer>
       </animated.div>
     );
@@ -342,11 +391,12 @@ export default class ImageView extends React.Component {
       }
     );
 
+    const classes = this.props.classes;
     return (
       <React.Fragment>
         {fadeTransitions.map(({item, props, key}) => {
           return (
-            <animated.div className="FadeLayer u-fill-container" key={key} volume={props.volume} style={{ ...props }}>
+            <animated.div className={clsx(classes.fadeLayer, classes.fillContainer)} key={key} volume={props.volume} style={{ ...props }}>
               {data.children}
             </animated.div>
           );
@@ -418,10 +468,13 @@ export default class ImageView extends React.Component {
       }
     );
 
+    const classes = this.props.classes;
     return (
-      <animated.div className="ZoomMoveLayer u-fill-container" style={{ ...imageProps }}>
+      <animated.div className={clsx(classes.zoomLayer, classes.fillContainer)} style={{ ...imageProps }}>
         {data.children}
       </animated.div>
     );
   };
 }
+
+export default withStyles(styles)(ImageView as any);

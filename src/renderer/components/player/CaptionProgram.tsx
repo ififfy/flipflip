@@ -1,5 +1,8 @@
 import * as React from "react";
 import wretch from "wretch";
+import clsx from "clsx";
+
+import {createStyles, Theme, withStyles} from "@material-ui/core";
 
 import {CancelablePromise, getRandomListItem} from "../../data/utils";
 import Tag from "../../data/Tag";
@@ -23,10 +26,53 @@ const getRest = function (s: string) {
   return splitFirstWord(s)[1];
 };
 
-export default class CaptionProgram extends React.Component {
+const styles = (theme: Theme) => createStyles({
+  root: {
+    zIndex: 6,
+    pointerEvents: 'none',
+    display: 'table',
+    width: '100%',
+    height: '100%',
+  },
+  fillContainer: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    overflow: 'hidden',
+  },
+  innderDiv: {
+    display: 'table-cell',
+  },
+  text: {
+    textAlign: 'center',
+    verticalAlign: 'middle',
+    webkitTextStrokeWidth: 1,
+    webkitTextStrokeColor: theme.palette.common.black,
+    transition: theme.transitions.create('opacity', {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.shortest,
+    }),
+  },
+  captionText: {
+    textAlign: 'center',
+    verticalAlign: 'bottom',
+    paddingBottom: '20vmin',
+    webkitTextStrokeWidth: 1,
+    webkitTextStrokeColor: theme.palette.common.black,
+    transition: theme.transitions.create('opacity', {
+      easing: theme.transitions.easing.easeInOut,
+      duration: theme.transitions.duration.complex,
+    }),
+  },
+});
+
+class CaptionProgram extends React.Component {
   readonly el = React.createRef<HTMLDivElement>();
 
   readonly props: {
+    classes: any,
     blinkColor: string,
     blinkFontSize: number,
     blinkFontFamily: string,
@@ -62,9 +108,10 @@ export default class CaptionProgram extends React.Component {
   _timeout: any = null;
 
   render() {
+    const classes = this.props.classes;
     return (
-      <div className="CaptionProgram u-fill-container">
-        <div ref={this.el}/>
+      <div className={clsx(classes.root, classes.fillContainer)}>
+        <div className={classes.innderDiv} ref={this.el}/>
       </div>
     );
   }
@@ -250,7 +297,7 @@ export default class CaptionProgram extends React.Component {
       this.el.current.style.color = this.props.captionColor;
       this.el.current.style.fontSize = this.props.captionFontSize + "vmin";
       this.el.current.style.fontFamily = this.props.captionFontFamily;
-      this.el.current.className = "text-caption";
+      this.el.current.className = this.props.classes.captionText;
       showText(function() { wait(nextCommand); });
     }
   }
@@ -262,7 +309,7 @@ export default class CaptionProgram extends React.Component {
       this.el.current.style.color = this.props.captionBigColor;
       this.el.current.style.fontSize = this.props.captionBigFontSize + "vmin";
       this.el.current.style.fontFamily = this.props.captionBigFontFamily;
-      this.el.current.className = "text-caption-big";
+      this.el.current.className = this.props.classes.text;
       showText(function() { wait(nextCommand); });
     }
   }
@@ -287,7 +334,7 @@ export default class CaptionProgram extends React.Component {
       this.el.current.style.color = this.props.blinkColor;
       this.el.current.style.fontSize = this.props.blinkFontSize + "vmin";
       this.el.current.style.fontFamily = this.props.blinkFontFamily;
-      this.el.current.className = "text-blink";
+      this.el.current.className = this.props.classes.text;
       fns[0]();
     }
   }
@@ -323,7 +370,7 @@ export default class CaptionProgram extends React.Component {
       this.el.current.style.color = this.props.countColor;
       this.el.current.style.fontSize = this.props.countFontSize + "vmin";
       this.el.current.style.fontFamily = this.props.countFontFamily;
-      this.el.current.className = "text-count";
+      this.el.current.className = this.props.classes.text;
       fns[0]();
     }
   }
@@ -385,17 +432,4 @@ export default class CaptionProgram extends React.Component {
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+export default withStyles(styles)(CaptionProgram as any);

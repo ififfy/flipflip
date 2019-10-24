@@ -1084,14 +1084,13 @@ export default class HeadlessScenePlayer extends React.Component {
 
   render() {
     return (
-      <div
-        className={`HeadlessScenePlayer ${this.props.opacity != 1 ? 'm-overlay' : ''}`}
-        style={{opacity: this.props.opacity}}>
+      <div style={{opacity: this.props.opacity}}>
 
         {this.state.allURLs.size > 0 && this.state.restart == false && (
           <ImagePlayer
             config={this.props.config}
             scene={this.props.scene}
+            isOverlay={this.props.opacity != 1}
             isPlaying={this.props.isPlaying}
             historyOffset={this.props.historyOffset}
             setHistoryOffset={this.props.setHistoryOffset}

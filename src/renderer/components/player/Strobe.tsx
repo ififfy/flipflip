@@ -1,11 +1,27 @@
 import * as React from 'react';
 import {animated, useTransition} from "react-spring";
+import clsx from "clsx";
+
+import {createStyles, Theme, withStyles} from "@material-ui/core";
 
 import {SL, TF} from "../../data/const";
 import Scene from "../../data/Scene";
 
-export default class Strobe extends React.Component {
+
+const styles = (theme: Theme) => createStyles({
+  fillContainer: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    overflow: 'hidden',
+  },
+});
+
+class Strobe extends React.Component {
   readonly props: {
+    classes: any,
     className?: string,
     toggleStrobe: boolean,
     timeToNextFrame: number,
@@ -55,11 +71,12 @@ export default class Strobe extends React.Component {
       }
     );
 
+    const classes = this.props.classes;
     return (
       <React.Fragment>
         {strobeTransitions.map(({item, props, key}) => {
           return (
-            <animated.div className={this.props.className ? "Strobe u-fill-container " + this.props.className : "Strobe u-fill-container"} key={key} style={{...props}}>
+            <animated.div className={clsx(classes.fillContainer, this.props.className)} key={key} style={{...props}}>
               {data.children}
             </animated.div>
           );
@@ -164,3 +181,5 @@ export default class Strobe extends React.Component {
     return delay;
   }
 }
+
+export default withStyles(styles)(Strobe as any);

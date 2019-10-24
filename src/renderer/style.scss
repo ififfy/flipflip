@@ -1,23 +1,14 @@
-$blue: #ccccff;
-$red: #d00;
-$mouseover: #eee;
 $black: #010101;
 $white: white;
 $yellow: #ffeeb1;
 $buttonBarColorTop: #ffeeb1;
 $buttonBarColorBottom: #ffcd09;
-$uiGray: #d8d8d8;
-$bodyColor: white;
 $buttonTop: #eaeaea;
 $buttonBottom: #dcdcdc;
 $buttonBorder: #727272;
-$appBG: rgb(52, 104, 152) linear-gradient(180deg, rgba(52, 104, 152, 1) 0%, rgba(24, 50, 76, 1) 100%);
 
 $smallPadding: 0.5rem;
 $buttonBarHeight: 2rem + $smallPadding;
-$buttonSidebarWidth: 21rem + $smallPadding;
-
-@import '../../node_modules/react-input-range/lib/css/index.css';
 
 /*
 Current Player Z-Indices (Layering is also effected by opacity)
@@ -63,12 +54,6 @@ div.CreatableSelect {
   -moz-user-select: none; /* Firefox */
   -ms-user-select: none; /* Internet Explorer/Edge */
   user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
-}
-
-@mixin mouseover {
-  &:hover {
-    background-color: rgba(240, 240, 240, 0.3);
-  }
 }
 
 @mixin yellowGradient {
@@ -118,61 +103,6 @@ div.CreatableSelect {
   }
 }
 
-.u-icon-button {
-  margin-top: -4px;
-  div {
-    width: 1.5rem;
-    height: 1.5rem;
-    background-size: 1.5rem 1.5rem !important;
-  }
-}
-
-.u-small-icon-button {
-  div {
-    width: 1.0rem;
-    height: 1.0rem;
-    background-size: 1.0rem 1.0rem !important;
-  }
-}
-
-.u-icon-button, .u-small-icon-button, .u-tiny-icon-button {
-  div {
-    cursor: pointer;
-  }
-
-  .u-media-play {
-    background: url("./icons/media-play.svg") no-repeat;
-  }
-
-  .u-media-pause {
-    background: url("./icons/media-pause.svg") no-repeat;
-  }
-
-  .u-media-back {
-    background: url("./icons/media-back.svg") no-repeat;
-  }
-
-  .u-media-forward {
-    background: url("./icons/media-forward.svg") no-repeat;
-  }
-
-  .u-volume-up {
-    background: url("./icons/volume-up.svg") no-repeat;
-  }
-
-  .u-volume-down {
-    background: url("./icons/volume-down.svg") no-repeat;
-  }
-
-  .u-save {
-    background: url("./icons/save.svg") no-repeat;
-  }
-
-  .u-delete {
-    background: url("./icons/delete.svg") no-repeat;
-  }
-}
-
 .u-fill-container {
   position: absolute;
   top: 0;
@@ -201,16 +131,6 @@ div.CreatableSelect {
 
 /* components */
 
-.VolumeControl {
-  display: flex;
-  .SimpleSliderInput {
-    flex-grow: 1;
-  }
-  .u-small-icon-button {
-    margin-top: 7px;
-  }
-}
-
 @mixin control {
   margin-bottom: $smallPadding * 2;
   margin-right: $smallPadding;
@@ -234,196 +154,25 @@ div.CreatableSelect {
   }
 }
 
-.SimpleTextInput {
+.PlayerGrid {
+  display: grid;
   width: 100%;
-  input {
-    font-size: 16px;
-    font-weight: 400;
-    display: block;
-    width: 100%;
-    margin-bottom: 0;
-  }
-}
+  height: 100%;
 
-.SimpleSliderInput {
-  input[type=range] {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 10px;
-    border-radius: 5px;
-    outline: none;
-    -webkit-transition: opacity .2s ease-in-out;
-    transition: opacity .2s ease-in-out;
+  .HeadlessScenePlayer {
+    width: 104%;
+    height: 104%;
+    margin-left: -2%;
+    margin-top: -2%;
+    overflow: hidden;
 
-    &:disabled {
-      opacity: 0.3;
-    }
-
-    &::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 17px;
-      height: 17px;
-      border-radius: 50%;
-      background: #3f96d0;
-      cursor: pointer;
-    }
-
-    &::-moz-range-thumb {
-      width: 17px;
-      height: 17px;
-      border-radius: 50%;
-      background: #3f96d0;
-      cursor: pointer;
-    }
-  }
-}
-
-label.SimpleCheckbox {
-  display: block;
-
-  input {
-    width: 13px;
-    height: 13px;
-    padding: 0;
-    margin: 0 $smallPadding;
-    vertical-align: bottom;
-    position: relative;
-    top: -1px;
-    *overflow: hidden;
-  }
-
-  > *:not(input) {
-    margin-bottom: -2px;
-  }
-}
-
-.ProgressIndicator {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 8;
-  background: $appBG;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  .ProgressContainer {
-    width: 22rem;
-    height: 22rem;
-  }
-
-  .StartButton {
-    position: absolute;
-    margin-top: 5rem;
-  }
-
-  p {
-    text-align: center;
-  }
-}
-
-.Player {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-
-  .Strobe {
-    z-index: 5;
-  }
-
-  .EmptyIndicator {
-    position: fixed;
-    top: 50%;
-    right: 0;
-    left: 0;
-    text-align: center;
-    font-size: 25px;
-    font-weight: bolder;
-  }
-
-  .PlayerGrid {
-    display: grid;
-    width: 100%;
-    height: 100%;
-
-    .HeadlessScenePlayer {
-      width: 104%;
-      height: 104%;
-      margin-left: -2%;
-      margin-top: -2%;
-      overflow: hidden;
-
-      .ImagePlayer {
-        position: relative;
-        width: 100%;
-        height: 100%;
-
-        .ImageView {
-          margin: 0;
-        }
-      }
-    }
-  }
-}
-
-.HeadlessScenePlayer {
-  &.m-overlay {
     .ImagePlayer {
-      z-index: 4;
-    }
-  }
+      position: relative;
+      width: 100%;
+      height: 100%;
 
-  .Strobe {
-    z-index: 3;
-
-    &.m-background {
-      z-index: 1;
-    }
-  }
-
-  .ImagePlayer {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-
-    .ZoomMoveLayer {
-      z-index: 2;
-    }
-
-    .ImageView {
-      z-index: 2;
-      margin: -5px -10px -10px -5px;
-
-      .Strobe {
-        z-index: 2;
-
-        &.m-background {
-          z-index: 1;
-        }
-      }
-
-      .ImageView__Image {
-        height: 100%;
-        width: 100%;
-        z-index: 2;
-        background-position: center;
-        background-size: contain;
-        background-repeat: no-repeat;
-        position: absolute;
-      }
-
-      .ImageView__Background {
-        height: 100%;
-        width: 100%;
-        z-index: 1;
-        background-size: cover;
+      .ImageView {
+        margin: 0;
       }
     }
   }
@@ -492,63 +241,4 @@ label.SimpleCheckbox {
       align-items: center;
     }
   }
-}
-
-.VideoClipper {
-  .ImageView {
-    .FadeLayer {
-      position: absolute;
-      height: 100%;
-      width: 100%;
-    }
-
-    .ZoomMoveLayer {
-      position: absolute;
-      height: 100%;
-      width: 100%;
-      z-index: 2;
-    }
-
-    .ImageView__Image {
-      position: relative;
-      height: 100%;
-      width: 100%;
-      z-index: 2;
-    }
-    .ImageView__Background {
-      position: absolute;
-      height: 100%;
-      width: 100%;
-      z-index: 1;
-    }
-  }
-}
-
-.CaptionProgram {
-  z-index: 6;
-  pointer-events: none;
-  display: table;
-  width: 100%;
-  height: 100%;
-
-  & > div {
-    display: table-cell;
-  }
-}
-
-.text-blink, .text-caption-big, .text-count {
-  text-align: center;
-  vertical-align: middle;
-  transition: opacity 0.1s ease-out;
-  -webkit-text-stroke-width: 1px;
-  -webkit-text-stroke-color: black;
-}
-
-.text-caption {
-  text-align: center;
-  vertical-align: bottom;
-  padding-bottom: 20vmin;
-  transition: opacity 0.5s ease-in-out;
-  -webkit-text-stroke-width: 1px;
-  -webkit-text-stroke-color: black;
 }

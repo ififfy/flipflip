@@ -42,7 +42,6 @@ const styles = (theme: Theme) => createStyles({
   container: {
     flexGrow: 1,
     padding: theme.spacing(0),
-    overflowY: 'auto',
     position: 'relative',
   },
   progress: {
@@ -61,6 +60,7 @@ const styles = (theme: Theme) => createStyles({
   },
   clipDrawerPaper: {
     backgroundColor: (theme.palette.primary as any)["50"],
+    padding: theme.spacing(1),
   },
   emptyMessage: {
     textAlign: 'center',

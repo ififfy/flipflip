@@ -5,6 +5,9 @@ import request from 'request';
 import fs from "fs";
 import gifInfo from 'gif-info';
 import IdleTimer from 'react-idle-timer';
+import clsx from "clsx";
+
+import {createStyles, Theme, withStyles} from "@material-ui/core";
 
 import {GO, IF, OF, SL, TF, VO, WF} from '../../data/const';
 import {getRandomListItem, isVideo, urlToPath} from '../../data/utils';
@@ -19,8 +22,25 @@ class GifInfo {
   duration: string;
 }
 
-export default class ImagePlayer extends React.Component {
+const styles = (theme: Theme) => createStyles({
+  imagePlayer: {
+    position: 'fixed',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+  },
+  overlayPlayer: {
+    zIndex: 4,
+  },
+  strobe: {
+    zIndex: 3,
+  },
+});
+
+class ImagePlayer extends React.Component {
   readonly props: {
+    classes: any,
     config: Config,
     scene: Scene,
     advanceHack?: ChildCallbackHack,
@@ -30,6 +50,7 @@ export default class ImagePlayer extends React.Component {
     maxToRememberInHistory: number,
     allURLs: Map<string, Array<string>>,
     strobeLayer?: string,
+    isOverlay: boolean,
     isPlaying: boolean,
     historyOffset: number,
     hasStarted: boolean,
@@ -64,17 +85,19 @@ export default class ImagePlayer extends React.Component {
   _toggleStrobe: boolean;
 
   render() {
+    const classes = this.props.classes;
     let offset = this.props.historyOffset;
     if (offset <= -this.state.historyPaths.length) {
       offset = -this.state.historyPaths.length + 1;
     }
 
     return (
-      <div className="ImagePlayer"
+      <div className={clsx(classes.imagePlayer, this.props.isOverlay && classes.overlayPlayer)}
            style={{cursor: this.state.hideCursor ? "none" : "initial"}}
            ref={this.idleTimerRef}>
         {(this.props.strobeLayer == SL.middle) && (
           <Strobe
+            className={classes.strobe}
             toggleStrobe={this._toggleStrobe}
             timeToNextFrame={this.state.timeToNextFrame}
             scene={this.props.scene}/>
@@ -629,3 +652,5 @@ export default class ImagePlayer extends React.Component {
     }
   }
 };
+
+export default withStyles(styles)(ImagePlayer as any);
