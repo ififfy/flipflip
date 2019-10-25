@@ -55,6 +55,7 @@ const styles = (theme: Theme) => createStyles({
     overflowX: 'hidden',
     height: '100vh',
     width: drawerWidth,
+    zIndex: theme.zIndex.drawer + 2,
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -65,6 +66,7 @@ const styles = (theme: Theme) => createStyles({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
+    zIndex: theme.zIndex.drawer,
     width: theme.spacing(7),
     [theme.breakpoints.up('sm')]: {
       width: theme.spacing(9),

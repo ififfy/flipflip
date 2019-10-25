@@ -226,12 +226,14 @@ class TagManager extends React.Component {
 
         {this.props.tags.length > 0 && (
           <React.Fragment>
-            <Fab
-              className={classes.removeAllButton}
-              onClick={this.onRemoveAll.bind(this)}
-              size="small">
-              <DeleteSweepIcon className={classes.icon} />
-            </Fab>
+            <Tooltip title="Remove All Tags">
+              <Fab
+                className={classes.removeAllButton}
+                onClick={this.onRemoveAll.bind(this)}
+                size="small">
+                <DeleteSweepIcon className={classes.icon} />
+              </Fab>
+            </Tooltip>
             <Dialog
               open={this.state.openMenu == MO.removeAllAlert}
               onClose={this.onCloseDialog.bind(this)}

@@ -405,7 +405,7 @@ class Library extends React.Component {
                   variant='outlined'/>
               )}
             </ListItem>
-            <ListItem button onClick={this.props.onBatchTag.bind(this)}>
+            <ListItem button onClick={this.onBatchTag.bind(this)}>
               <ListItemIcon>
                 <FormatListBulletedIcon />
               </ListItemIcon>
@@ -752,6 +752,11 @@ class Library extends React.Component {
     } else if (!e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'm' || e.key == 'µ')) {
       this.toggleMarked();
     }
+  }
+
+  onBatchTag() {
+    this.onCloseDialog();
+    this.props.onBatchTag();
   }
 
   goBack() {

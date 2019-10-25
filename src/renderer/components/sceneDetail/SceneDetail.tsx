@@ -415,7 +415,7 @@ class SceneDetail extends React.Component {
               {this.props.scene.generatorWeights && (
                 <Tab id="vertical-tab-3"
                      aria-controls="vertical-tabpanel-3"
-                     icon={<LocalOfferIcon/>} label={open ? "Generate" : ""}
+                     icon={<LocalOfferIcon/>} label={open ? `Generate (${this.props.scene.generatorWeights.length})` : ""}
                      className={clsx(classes.tab, classes.generateTab, !open && classes.tabClose)}/>
               )}
             </Tabs>
@@ -684,12 +684,14 @@ class SceneDetail extends React.Component {
           <React.Fragment>
             {this.props.scene.generatorWeights.length > 0 && (
               <React.Fragment>
-                <Fab
-                  className={classes.removeAllWGButton}
-                  onClick={this.onRemoveAll.bind(this)}
-                  size="small">
-                  <DeleteSweepIcon className={classes.icon} />
-                </Fab>
+                <Tooltip title="Remove All Rules" placement="top-end">
+                  <Fab
+                    className={classes.removeAllWGButton}
+                    onClick={this.onRemoveAll.bind(this)}
+                    size="small">
+                    <DeleteSweepIcon className={classes.icon} />
+                  </Fab>
+                </Tooltip>
                 <Dialog
                   open={this.state.openMenu == MO.removeAllAlert}
                   onClose={this.onCloseDialog.bind(this)}
@@ -712,12 +714,14 @@ class SceneDetail extends React.Component {
                 </Dialog>
               </React.Fragment>
             )}
-            <Fab
-              className={classes.sortMenuButton}
-              onClick={this.onOpenMaxMenu.bind(this)}
-              size="medium">
-              {this.props.scene.generatorMax}
-            </Fab>
+            <Tooltip title="Max" placement="top">
+              <Fab
+                className={classes.sortMenuButton}
+                onClick={this.onOpenMaxMenu.bind(this)}
+                size="medium">
+                {this.props.scene.generatorMax}
+              </Fab>
+            </Tooltip>
             <Menu
               id="max-menu"
               elevation={1}
