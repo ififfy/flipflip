@@ -75,11 +75,13 @@ export default class Meta extends React.Component {
               config={this.state.config}
               grids={this.state.grids}
               libraryCount={this.state.library.length}
+              openTab={this.state.openTab}
               scenes={this.state.scenes}
               version={this.state.version}
               onAddGenerator={a(actions.addGenerator)}
               onAddGrid={a(actions.addGrid)}
               onAddScene={a(actions.addScene)}
+              onChangeTab={a(actions.changeScenePickerTab)}
               onImportScene={a(actions.importScene)}
               onOpenConfig={a(actions.openConfig)}
               onOpenLibrary={a(actions.openLibrary)}

@@ -95,6 +95,7 @@ export default class Scene {
   fillView = false;
   bpm = 0;
   generatorWeights?: Array<WeightGroup> = null;
+  openTab = 2;
 
   // unused; migration only
   effectLevel = 0;

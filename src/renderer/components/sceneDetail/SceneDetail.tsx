@@ -315,7 +315,6 @@ class SceneDetail extends React.Component {
     drawerOpen: false,
     menuAnchorEl: null as any,
     openMenu: null as string,
-    openTab: this.props.scene.generatorWeights ? 3 : 2,
     snackbar: null as string,
     snackbarType: null as string,
   };
@@ -397,7 +396,7 @@ class SceneDetail extends React.Component {
           <div>
             <Tabs
               orientation="vertical"
-              value={this.state.openTab}
+              value={this.props.scene.openTab}
               onChange={this.onChangeTab.bind(this)}
               aria-label="scene detail tabs"
               className={classes.tabs}>
@@ -473,11 +472,11 @@ class SceneDetail extends React.Component {
           <div className={classes.appBarSpacer} />
           <Container maxWidth={false} className={classes.container}>
 
-            {this.state.openTab === 0 && (
+            {this.props.scene.openTab === 0 && (
               <Typography
                 component="div"
                 role="tabpanel"
-                hidden={this.state.openTab !== 0}
+                hidden={this.props.scene.openTab !== 0}
                 id="vertical-tabpanel-0"
                 aria-labelledby="vertical-tab-0">
                 <div className={classes.tabPanel}>
@@ -492,11 +491,10 @@ class SceneDetail extends React.Component {
               </Typography>
             )}
 
-            {this.state.openTab === 1 && (
+            {this.props.scene.openTab === 1 && (
               <Typography
                 component="div"
                 role="tabpanel"
-                hidden={this.state.openTab !== 1}
                 id="vertical-tabpanel-1"
                 aria-labelledby="vertical-tab-1">
                 <div className={classes.tabPanel}>
@@ -510,12 +508,11 @@ class SceneDetail extends React.Component {
               </Typography>
             )}
 
-            {this.state.openTab === 2 && (
+            {this.props.scene.openTab === 2 && (
               <Typography
-                className={clsx(this.state.openTab === 2 && classes.sourcesSection)}
+                className={clsx(this.props.scene.openTab === 2 && classes.sourcesSection)}
                 component="div"
                 role="tabpanel"
-                hidden={this.state.openTab !== 2}
                 id="vertical-tabpanel-2"
                 aria-labelledby="vertical-tab-2">
                 <div className={classes.tabPanel}>
@@ -533,12 +530,11 @@ class SceneDetail extends React.Component {
               </Typography>
             )}
 
-            {this.props.scene.generatorWeights && this.state.openTab === 3 && (
+            {this.props.scene.generatorWeights && this.props.scene.openTab === 3 && (
               <Typography
-                className={clsx(this.state.openTab === 3 && classes.generateSection)}
+                className={clsx(this.props.scene.openTab === 3 && classes.generateSection)}
                 component="div"
                 role="tabpanel"
-                hidden={this.state.openTab !== 3}
                 id="vertical-tabpanel-3"
                 aria-labelledby="vertical-tab-3">
                 <div className={classes.tabPanel}>
@@ -561,7 +557,7 @@ class SceneDetail extends React.Component {
           onClick={this.onCloseDialog.bind(this)}
           open={this.state.openMenu == MO.new || this.state.drawerOpen} />
 
-        {this.state.openTab == 2 && (
+        {this.props.scene.openTab == 2 && (
           <React.Fragment>
             {this.props.scene.sources.length > 0 && (
               <Tooltip title="Remove All Sources"  placement="left">
@@ -684,7 +680,7 @@ class SceneDetail extends React.Component {
           </React.Fragment>
         )}
 
-        {this.state.openTab == 3 && (
+        {this.props.scene.openTab == 3 && (
           <React.Fragment>
             {this.props.scene.generatorWeights.length > 0 && (
               <React.Fragment>
@@ -900,7 +896,7 @@ class SceneDetail extends React.Component {
     if (this.props.scene.sources.length == 0) {
       this.setState({snackbar: "Sorry, no sources were found for these rules", snackbarType: SB.warning});
     } else {
-      this.setState({openTab: 2});
+      this.onChangeTab(null, 2);
     }
   }
 
@@ -954,7 +950,7 @@ class SceneDetail extends React.Component {
   }
 
   onChangeTab(e: any, newTab: number) {
-    this.setState({openTab: newTab});
+    this.changeKey('openTab', newTab);
   }
 
   blurIntKey(key: string, e: MouseEvent) {

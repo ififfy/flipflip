@@ -102,6 +102,7 @@ export function restoreFromBackup(state: State, backupFile: string): Object {
     autoEdit: data.autoEdit,
     isSelect: data.isSelect,
     isBatchTag: data.isBatchTag,
+    openTab: data.openTab ? data.openTab : 0,
     config: new Config(data.config),
     scenes: data.scenes.map((s: any) => new Scene(s)),
     grids: data.grids ? data.grids.map((g: any) => new SceneGrid(g)) : Array<SceneGrid>(),
@@ -224,6 +225,10 @@ export function saveScene(state: State, scene: Scene): Object {
     route: [new Route({kind: 'scene', value: sceneCopy.id})],
     autoEdit: true,
   };
+}
+
+export function changeScenePickerTab(state: State, e: MouseEvent, newTab: number) {
+  return {openTab: newTab};
 }
 
 export function addScene(state: State): Object {
@@ -492,6 +497,7 @@ export function addGenerator(state: State): Object {
     name: "New Generator",
     sources: new Array<LibrarySource>(),
     generatorWeights: [],
+    openTab: 3,
     ...state.config.defaultScene,
   });
   return {

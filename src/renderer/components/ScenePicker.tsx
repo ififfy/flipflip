@@ -321,11 +321,13 @@ class ScenePicker extends React.Component {
     config: Config,
     grids: Array<SceneGrid>,
     libraryCount: number,
+    openTab: number,
     scenes: Array<Scene>,
     version: string,
     onAddGenerator(): void,
     onAddGrid(): void,
     onAddScene(): void,
+    onChangeTab(e: any, newTab: number): void,
     onImportScene(): void,
     onOpenConfig(): void,
     onOpenLibrary(): void,
@@ -344,7 +346,6 @@ class ScenePicker extends React.Component {
     isFirstWindow: false,
     menuAnchorEl: null as any,
     openMenu: null as string,
-    openTab: 0,
   };
 
   render() {
@@ -415,8 +416,8 @@ class ScenePicker extends React.Component {
               <div>
                 <Tabs
                   orientation="vertical"
-                  value={this.state.openTab}
-                  onChange={this.onChangeTab.bind(this)}
+                  value={this.props.openTab}
+                  onChange={this.props.onChangeTab.bind(this)}
                   aria-label="scene picker tabs"
                   className={classes.tabs}>
                   <Tab id="vertical-tab-0"
@@ -517,11 +518,11 @@ class ScenePicker extends React.Component {
           <div className={classes.appBarSpacer} />
           <Container maxWidth={false} className={classes.container}>
 
-            {this.state.openTab === 0 && (
+            {this.props.openTab === 0 && (
               <Typography
                 component="div"
                 role="tabpanel"
-                hidden={this.state.openTab !== 0}
+                hidden={this.props.openTab !== 0}
                 id="vertical-tabpanel-0"
                 aria-labelledby="vertical-tab-0">
                 <Sortable
@@ -557,11 +558,11 @@ class ScenePicker extends React.Component {
               </Typography>
             )}
 
-            {this.state.openTab === 1 && (
+            {this.props.openTab === 1 && (
               <Typography
                 component="div"
                 role="tabpanel"
-                hidden={this.state.openTab !== 1}
+                hidden={this.props.openTab !== 1}
                 id="vertical-tabpanel-1"
                 aria-labelledby="vertical-tab-1">
                 <Sortable
@@ -597,11 +598,11 @@ class ScenePicker extends React.Component {
               </Typography>
             )}
 
-            {this.state.openTab === 2 && (
+            {this.props.openTab === 2 && (
               <Typography
                 component="div"
                 role="tabpanel"
-                hidden={this.state.openTab !== 2}
+                hidden={this.props.openTab !== 2}
                 id="vertical-tabpanel-2"
                 aria-labelledby="vertical-tab-2">
                 <Sortable
@@ -791,10 +792,6 @@ class ScenePicker extends React.Component {
         })
         .catch((e) => console.error(e));
     }
-  }
-
-  onChangeTab(e: any, newTab: number) {
-    this.setState({openTab: newTab});
   }
 
   onNewWindow() {
