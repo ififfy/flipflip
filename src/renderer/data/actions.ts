@@ -356,7 +356,7 @@ export function openLibraryImport(state: State): Object {
 
 export function importFromLibrary(state: State, sources: Array<LibrarySource>): Object {
   const scene = getActiveScene(state);
-  const sceneSources = addSources(scene.sources, sources.map((s) => s.url));
+  const sceneSources = mergeSources(scene.sources, sources);
   return {...updateScene(state, getActiveScene(state), (s: Scene) => {s.sources = sceneSources}), ...goBack(state)};
 }
 
@@ -949,6 +949,25 @@ function getImportURLs(importURL: string, rootDir?: string): string[]  {
     return importURLs;
   }
   return [];
+}
+
+function mergeSources(originalSources: Array<LibrarySource>, newSources: Array<LibrarySource>): Array<LibrarySource> {
+  // dedup
+  let sourceURLs = originalSources.map((s) => s.url);
+  newSources = newSources.filter((s) => !sourceURLs.includes(s.url));
+
+  let id = originalSources.length + 1;
+  originalSources.forEach((s) => {
+    id = Math.max(s.id + 1, id);
+  });
+
+  let combinedSources = Array.from(originalSources);
+  for (let newSource of newSources) {
+    newSource.id = id;
+    combinedSources.unshift(newSource);
+    id += 1;
+  }
+  return combinedSources;
 }
 
 
