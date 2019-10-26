@@ -78,6 +78,7 @@ class SourceListItem extends React.Component {
     onStartEdit(id: number): void,
     onToggleSelect(): void,
     savePosition(): void,
+    systemMessage(message: string): void,
   };
 
   readonly state = {
@@ -233,7 +234,11 @@ class SourceListItem extends React.Component {
       this.openDirectory(cachePath);
     } else if (!e.shiftKey && !e.ctrlKey) {
       this.props.savePosition();
-      this.props.onPlay(source, this.props.sources);
+      try {
+        this.props.onPlay(source, this.props.sources);
+      } catch (e) {
+        this.props.systemMessage("The source " + source.url + " isn't in your Library");
+      }
     }
   }
 

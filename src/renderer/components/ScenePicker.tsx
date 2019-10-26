@@ -328,7 +328,7 @@ class ScenePicker extends React.Component {
     onAddGrid(): void,
     onAddScene(): void,
     onChangeTab(e: any, newTab: number): void,
-    onImportScene(): void,
+    onImportScene(addToLibrary: boolean): void,
     onOpenConfig(): void,
     onOpenLibrary(): void,
     onOpenScene(scene: Scene): void,
@@ -641,7 +641,7 @@ class ScenePicker extends React.Component {
             <Tooltip title="Import Scene"  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.importSceneButton, this.state.openMenu != MO.new && classes.addButtonClose)}
-                onClick={this.props.onImportScene.bind(this)}
+                onClick={this.onImportScene.bind(this)}
                 size="small">
                 <GetAppIcon className={classes.icon} />
               </Fab>
@@ -737,6 +737,30 @@ class ScenePicker extends React.Component {
             <CasinoIcon className={classes.icon} />
           </Fab>
         </Tooltip>
+
+        <Dialog
+          open={this.state.openMenu == MO.urlImport}
+          onClose={this.onCloseDialog.bind(this)}
+          aria-labelledby="import-title"
+          aria-describedby="import-description">
+          <DialogTitle id="import-title">Import Scene</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="import-description">
+              You are about to import a Scene. Would you also like to import this Scene's sources into your Library?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.onCloseDialog.bind(this)} color="default">
+              Cancel
+            </Button>
+            <Button onClick={this.onFinishImportScene.bind(this, false)} color="secondary">
+              Just Import Scene
+            </Button>
+            <Button onClick={this.onFinishImportScene.bind(this, true)} color="primary">
+              Import Sources into Library
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     );
   }
@@ -792,6 +816,15 @@ class ScenePicker extends React.Component {
         })
         .catch((e) => console.error(e));
     }
+  }
+
+  onImportScene() {
+    this.setState({openMenu: MO.urlImport});
+  }
+
+  onFinishImportScene(addToLibrary: boolean) {
+    this.props.onImportScene(addToLibrary);
+    this.onCloseDialog();
   }
 
   onNewWindow() {

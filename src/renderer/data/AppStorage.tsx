@@ -37,6 +37,8 @@ export const defaultInitialState = {
   progressCurrent: 0,
   progressTotal: 0,
   progressNext: null as string,
+  systemMessage: null as string,
+  systemSnack: null as string,
 };
 
 /**
@@ -97,6 +99,8 @@ export default class AppStorage {
             progressCurrent: 0,
             progressTotal: 0,
             progressNext: null as string,
+            systemMessage: null as string,
+            systemSnack: null as string,
           };
           // Hydrate and add the library ! Yay!!! :)
           let libraryID = 0;
@@ -159,6 +163,8 @@ export default class AppStorage {
             progressCurrent: 0,
             progressTotal: 0,
             progressNext: null as string,
+            systemMessage: null as string,
+            systemSnack: null as string,
           };
           for (let r of this.initialState.route) {
             if (r.kind == 'generate' || r.kind == 'grid') {
@@ -313,6 +319,8 @@ export default class AppStorage {
             progressCurrent: 0,
             progressTotal: 0,
             progressNext: null as string,
+            systemMessage: null as string,
+            systemSnack: null as string,
           };
       }
     }

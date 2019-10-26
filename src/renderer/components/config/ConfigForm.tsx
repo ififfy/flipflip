@@ -190,11 +190,11 @@ class ConfigForm extends React.Component {
             <div className={classes.fill}/>
             <Typography component="h1" variant="h4" color="inherit" noWrap
                         className={classes.title}>
-              Preferences
+              Settings
             </Typography>
             <div className={classes.fill}/>
 
-            <Tooltip title="Confirm Preferences">
+            <Tooltip title="Confirm Settings">
               <IconButton
                 edge="start"
                 color="inherit"

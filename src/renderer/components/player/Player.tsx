@@ -6,9 +6,9 @@ import fileURL from "file-url";
 import clsx from "clsx";
 
 import {
-  AppBar, Button, Card, CardActionArea, CardContent, CircularProgress, Container, createStyles, Divider, Drawer,
-  ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, IconButton, Theme, Toolbar, Tooltip, Typography,
-  withStyles
+  AppBar, Button, Card, CardActionArea, CardContent, CircularProgress, Container, createStyles, Dialog, DialogActions,
+  DialogContent, DialogContentText, DialogTitle, Divider, Drawer, ExpansionPanel, ExpansionPanelDetails,
+  ExpansionPanelSummary, IconButton, Link, Theme, Toolbar, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -213,6 +213,9 @@ const styles = (theme: Theme) => createStyles({
     overflow: 'hidden',
     position: 'relative',
   },
+  wordWrap: {
+    wordWrap: 'break-word',
+  },
   full: {
     height: '100%',
     width: '100%',
@@ -232,6 +235,7 @@ class Player extends React.Component {
     getTags(source: string): Array<Tag>,
     goBack(): void,
     setCount(sourceURL: string, count: number, countComplete: boolean): void,
+    systemMessage(message: string): void,
     allTags?: Array<Tag>,
     gridView?: boolean,
     tags?: Array<Tag>,
@@ -264,6 +268,10 @@ class Player extends React.Component {
     appBarHover: false,
     drawerHover: false,
     tagDrawerHover: false,
+    blacklistSource: null as LibrarySource,
+    blacklistFile: null as string,
+    deletePath: null as string,
+    deleteError: null as string,
   };
 
   _interval: NodeJS.Timer = null;
@@ -361,6 +369,7 @@ class Player extends React.Component {
             setCount={this.props.setCount.bind(this)}
             cache={this.props.cache.bind(this)}
             setTimeToNextFrame={this.setTimeToNextFrame.bind(this)}
+            systemMessage={this.props.systemMessage.bind(this)}
           />
 
           {this.props.scene.overlayEnabled && validOverlays.length > 0 &&
@@ -392,6 +401,7 @@ class Player extends React.Component {
                 setVideo={this.setOverlayVideo.bind(this, index)}
                 setCount={this.props.setCount.bind(this)}
                 cache={this.props.cache.bind(this)}
+                systemMessage={this.props.systemMessage.bind(this)}
               />
             );}
           )}
@@ -655,6 +665,61 @@ class Player extends React.Component {
 
               </Drawer>
             )}
+
+            <Dialog
+              open={!!this.state.blacklistFile}
+              onClose={this.onCloseDialog.bind(this)}
+              aria-labelledby="blacklist-title"
+              aria-describedby="blacklist-description">
+              <DialogTitle id="blacklist-title">Blacklist File</DialogTitle>
+              <DialogContent>
+                <DialogContentText id="blacklist-description">
+                  Are you sure you want to blacklist <Link className={classes.wordWrap} href="#" onClick={this.openLink.bind(this, this.state.blacklistFile)}>{this.state.blacklistFile}</Link> ?
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+                  Cancel
+                </Button>
+                <Button onClick={this.onFinishBlacklistFile.bind(this)} color="primary">
+                  Yes
+                </Button>
+              </DialogActions>
+            </Dialog>
+
+            <Dialog
+              open={!!this.state.deletePath}
+              onClose={this.onCloseDialog.bind(this)}
+              aria-labelledby="delete-title"
+              aria-describedby="delete-description">
+              <DialogTitle id="delete-title">Delete File</DialogTitle>
+              <DialogContent>
+                {this.state.deletePath && (
+                  <DialogContentText id="delete-description">
+                    Are you sure you want to delete <Link className={classes.wordWrap} href="#" onClick={this.openLink.bind(this, this.state.deletePath)}>{this.state.deletePath}</Link>
+                  </DialogContentText>
+                )}
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+                  Cancel
+                </Button>
+                <Button onClick={this.onFinishDeletePath.bind(this)} color="primary">
+                  Yes
+                </Button>
+              </DialogActions>
+            </Dialog>
+
+            <Dialog
+              open={!!this.state.deleteError}
+              onClose={this.onCloseDialog.bind(this)}
+              aria-describedby="delete-error-description">
+              <DialogContent>
+                <DialogContentText className={classes.wordWrap} id="delete-error-description">
+                  {this.state.deleteError}
+                </DialogContentText>
+              </DialogContent>
+            </Dialog>
           </React.Fragment>
         )}
       </div>
@@ -936,25 +1001,41 @@ class Player extends React.Component {
     }
   }
 
+  onCloseDialog() {
+    this.setState({blacklistSource: null, blacklistFile: null, deletePath: null, deleteError: null});
+  }
+
   onBlacklistFile(source: string, fileToBlacklist: string) {
-    if (!confirm("Are you sure you want to blacklist " + fileToBlacklist + "?")) return;
+    this.setState({blacklistSource: source, blacklistFile: fileToBlacklist});
+  }
+
+  onFinishBlacklistFile(source: string, fileToBlacklist: string) {
     this.props.blacklistFile(source, fileToBlacklist);
+    this.onCloseDialog();
   }
 
   onDeletePath(path: string) {
-    if (!confirm("Are you sure you want to delete " + path + "?")) return;
     if (fs.existsSync(path)) {
-      fs.unlink(path, (err) => {
-        if (err) {
-          alert("An error ocurred while deleting the file: " + err.message);
-          console.error(err);
-        } else {
-          this.state.imagePlayerDeleteHack.fire();
-        }
-      });
+      this.setState({deletePath: path});
     } else {
-      alert("This file doesn't exist, cannot delete");
+      this.setState({deletePath: null, deleteError: "This file doesn't exist, cannot delete"});
     }
+  }
+
+  onFinishDeletePath() {
+    fs.unlink(this.state.deletePath, (err) => {
+      if (err) {
+        this.setState({deletePath: null, deleteError: "An error ocurred while deleting the file: " + err.message});
+        console.error(err);
+      } else {
+        this.state.imagePlayerDeleteHack.fire();
+        this.onCloseDialog();
+      }
+    });
+  }
+
+  openLink(url: string) {
+    remote.shell.openExternal(url);
   }
 
   navigateBack() {

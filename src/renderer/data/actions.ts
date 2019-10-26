@@ -117,6 +117,8 @@ export function restoreFromBackup(state: State, backupFile: string): Object {
     progressCurrent: 0,
     progressTotal: 0,
     progressNext: null as string,
+    systemMessage: null as string,
+    systemSnack: null as string,
   };
 }
 
@@ -227,7 +229,19 @@ export function saveScene(state: State, scene: Scene): Object {
   };
 }
 
-export function changeScenePickerTab(state: State, e: MouseEvent, newTab: number) {
+export function closeMessage(state: State): Object {
+  return {systemMessage: null, systemSnack: null};
+}
+
+export function systemMessage(state: State, message: string): Object {
+  return {systemMessage: message};
+}
+
+export function systemSnack(state: State, message: string): Object {
+  return {systemSnack: message};
+}
+
+export function changeScenePickerTab(state: State, e: MouseEvent, newTab: number): Object {
   return {openTab: newTab};
 }
 
@@ -374,8 +388,7 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
   }
   let librarySource = state.library.find((s) => s.url == source.url);
   if (librarySource == null) {
-    alert("The source " + source.url + " isn't in your Library");
-    return;
+    throw new Error();
   }
   let tempScene = new Scene({
     id: id,
@@ -1112,16 +1125,14 @@ export function exportScene(state: State, scene: Scene): Object {
   return {};
 }
 
-export function importScene(state: State): Object {
+export function importScene(state: State, addToLibrary: boolean): Object {
   const filePath = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
     {filters: [{name:'All Files (*.*)', extensions: ['*']},{name: 'JSON Document', extensions: ['json']}], properties: ['openFile']});
   if (!filePath || !filePath.length) return;
   const importScenes = JSON.parse(fs.readFileSync(filePath[0], 'utf-8'));
   if (!importScenes[0].id || !importScenes[0].name || !importScenes[0].sources) {
-    alert("Not a valid scene file");
-    return {};
+    return {systemMessage: "Not a valid scene file"};
   }
-  const addToLibrary = confirm("Would you also like to import this Scene's sources into your Library?");
   let newScenes = state.scenes;
   let sources = Array<LibrarySource>();
 
@@ -1175,10 +1186,14 @@ export function importScene(state: State): Object {
       }
     }
     if (sources.length > 0) {
-      alert("Added " + sources.length + " new sources to the Library");
-      return {scenes: newScenes, library: state.library.concat(sources), route: [new Route({kind: 'scene', value: scene.id})]};
+      return {
+        systemSnack: "Added " + sources.length + " new sources to the Library",
+        scenes: newScenes,
+        library: state.library.concat(sources),
+        route: [new Route({kind: 'scene', value: scene.id})]
+      };
     } else {
-      alert("No new sources detected");
+      return {systemSnack: "No new sources detected"};
     }
   }
   return {scenes: newScenes, route: [new Route({kind: 'scene', value: scene.id})]};
@@ -1200,11 +1215,7 @@ export function importLibrary(state: State, backup: Function): Object {
   const filePath = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
     {filters: [{name:'All Files (*.*)', extensions: ['*']},{name: 'JSON Document', extensions: ['json']}], properties: ['openFile']});
   if (!filePath || !filePath.length) return;
-  if (!backup()) { // If backup fails, prompt user to continue
-    if (!confirm("Backup failed. Continue anyway?")) {
-      return;
-    }
-  }
+  backup();
   const libraryImport = JSON.parse(fs.readFileSync(filePath[0], 'utf-8'));
   const newLibrary = Array.from(state.library);
   const newTags = Array.from(state.tags);
@@ -1264,8 +1275,7 @@ export function importLibrary(state: State, backup: Function): Object {
     }
   }
 
-  alert("Import complete!");
-  return {library: newLibrary, tags: newTags};
+  return {systemSnack: "Library Import complete!", library: newLibrary, tags: newTags};
 }
 
 export function setMode(state: State, mode: string): Object {
@@ -1279,8 +1289,13 @@ export function markOffline(getState: () => State, setState: Function) {
     if (state.progressMode == PR.cancel) {
       setState({progressMode: null, progressCurrent: 0, progressTotal: 0, progressTitle: ""});
     } else if (state.library.length == offset) {
-      setState({progressMode: null, progressCurrent: 0, progressTotal: 0, progressTitle: ""});
-      alert("Offline Check has completed. Remote sources not available are now marked in red.");
+      setState({
+        systemSnack: "Offline Check has completed. Remote sources not available are now marked in red.",
+        progressMode: null,
+        progressCurrent: 0,
+        progressTotal: 0,
+        progressTitle: ""
+      });
     } else if (state.library[offset].url.startsWith("http://") ||
       state.library[offset].url.startsWith("https://")) {
       state.progressTitle = state.library[offset].url;
@@ -1359,8 +1374,7 @@ export function importTumblr(getState: () => State, setState: Function) {
     // Get the next page of blogs
     client.userFollowing({offset: offset}, (err, data) => {
       if (err) {
-        alert("Error retrieving following: " + err);
-        setState({progressMode: null, progressCurrent: 0, progressTotal: 0});
+        setState({systemMessage: "Error retrieving following: " + err, progressMode: null, progressCurrent: 0, progressTotal: 0});
         console.error(err);
         return;
       }
@@ -1406,8 +1420,7 @@ export function importTumblr(getState: () => State, setState: Function) {
       if ((nextOffset) < state.progressTotal) {
         setTimeout(tumblrImportLoop, 1500);
       } else {
-        setState({progressMode: null, progressCurrent: 0, progressTotal: 0});
-        alert("Tumblr Following Import has completed");
+        setState({systemSnack: "Tumblr Following Import has completed", progressMode: null, progressCurrent: 0, progressTotal: 0});
       }
     });
   };
@@ -1426,7 +1439,7 @@ export function importTumblr(getState: () => State, setState: Function) {
     // Make the first call just to check the total blogs
     client.userFollowing({limit: 0}, (err, data) => {
       if (err) {
-        alert("Error retrieving following: " + err);
+        setState({systemMessage: "Error retrieving following: " + err, progressMode: null, progressCurrent: 0, progressTotal: 0});
         console.error(err);
         return;
       }
@@ -1454,8 +1467,7 @@ export function importReddit(getState: () => State, setState: Function) {
     }
     reddit.getSubscriptions({limit: 20, after: state.progressNext}).then((subscriptionListing: any) => {
       if (subscriptionListing.length == 0) {
-        setState({progressMode: null, progressNext: null, progressCurrent: 0});
-        alert("Reddit Subscription Import has completed");
+        setState({systemSnack: "Reddit Subscription Import has completed", progressMode: null, progressNext: null, progressCurrent: 0});
       } else {
         // Get the next 20 blogs
         let subscriptions = [];
@@ -1493,14 +1505,8 @@ export function importReddit(getState: () => State, setState: Function) {
         setState({progressNext: state.progressNext, progressCurrent: state.progressCurrent});
       }
     }).catch((err: any) => {
-      // If user is not authenticated for subscriptions, prompt to re-authenticate
-      if (err.statusCode == 403) {
-        alert("You have not authorized FlipFlip to work with Reddit subscriptions. Visit Preferences and authorize FlipFlip to work with Reddit.");
-      } else {
-        alert("Error retrieving subscriptions: " + err);
-        console.error(err);
-      }
-      setState({progressMode: null, progressNext: null, progressCurrent: 0});
+      console.error(err);
+      setState({systemMessage: "Error retrieving subscriptions: " + err, progressMode: null, progressNext: null, progressCurrent: 0});
     });
   };
 
@@ -1514,11 +1520,12 @@ export function importReddit(getState: () => State, setState: Function) {
     });
 
     // Show progress bar and kick off loop
-    alert("Your Reddit subscriptions are being imported... You will recieve an alert when the import is finished.");
-
     state.progressMode = PR.reddit;
     state.progressCurrent = 0;
-    setState({progressMode: state.progressMode, progressCurrent: state.progressCurrent});
+    setState({
+      systemSnack: "Your Reddit subscriptions are being imported... You will recieve an alert when the import is finished.",
+      progressMode: state.progressMode, progressCurrent: state.progressCurrent
+    });
     redditImportLoop();
   }
 }
@@ -1533,11 +1540,12 @@ export function importTwitter(getState: () => State, setState: Function) {
     }
     twitter.get('friends/list', !state.progressNext ? {count: 200} : {count: 200, cursor: state.progressNext}, (error: any, data: any) => {
       if (error) {
+        let message = "Error retrieving following:";
         for (let e of error) {
-          alert("Error retrieving following: " + e.code + " - " + e.message);
+          message = message + "\n" + e.code + " - " + e.message;
           console.error("Error retrieving following: " + e.code + " - " + e.message);
         }
-        setState({progressMode: null, progressNext: null, progressCurrent: 0});
+        setState({systemMessage: message, progressMode: null, progressNext: null, progressCurrent: 0});
         return;
       }
 
@@ -1571,8 +1579,7 @@ export function importTwitter(getState: () => State, setState: Function) {
       setState({library: newLibrary});
 
       if (data.next_cursor == 0) { // We're done
-        setState({progressMode: null, progressNext: null, progressCurrent: 0});
-        alert("Twitter Following Import has completed");
+        setState({systemSnack: "Twitter Following Import has completed", progressMode: null, progressNext: null, progressCurrent: 0});
       } else {
         // Loop until we run out of blogs
         setTimeout(twitterImportLoop, 1500);
@@ -1593,11 +1600,12 @@ export function importTwitter(getState: () => State, setState: Function) {
     });
 
     // Show progress bar and kick off loop
-    alert("Your Twitter Following is being imported... You will recieve an alert when the import is finished.");
-
     state.progressMode = PR.twitter;
     state.progressCurrent = 0;
-    setState({progressMode: state.progressMode, progressCurrent: state.progressCurrent});
+    setState({
+      systemSnack: "Your Twitter Following is being imported... You will recieve an alert when the import is finished.",
+      progressMode: state.progressMode, progressCurrent: state.progressCurrent
+    });
     twitterImportLoop();
   }
 }
@@ -1641,6 +1649,12 @@ export function importInstagram(getState: () => State, setState: Function) {
     setState({progressNext: state.progressNext, progressCurrent: state.progressCurrent});
   };
 
+  const error = (error: string) => {
+    setState({systemMessage: error, progressMode: null, progressNext: null, progressCurrent: 0});
+    console.error(error);
+    ig = null;
+  };
+
   // Define our loop
   const instagramImportLoop = () => {
     const state = getState();
@@ -1657,9 +1671,9 @@ export function importInstagram(getState: () => State, setState: Function) {
           const followingFeed = ig.feed.accountFollowing(loggedInUser.pk);
           followingFeed.items().then((items) => {
             processItems(items, loggedInUser.pk + "~" + followingFeed.serialize());
-          }).catch((e) => {console.error(e);ig = null;});
-        }).catch((e) => {console.error(e);ig = null;});
-      }).catch((e) => {alert(e);console.error(e);ig = null;});
+          }).catch((e) => {error(e);});
+        }).catch((e) => {error(e);});
+      }).catch((e) => {error(e);});
     } else {
       ig.state.deserializeCookieJar(JSON.parse(session)).then((data) => {
         const id = (state.progressNext as string).split("~")[0];
@@ -1667,25 +1681,25 @@ export function importInstagram(getState: () => State, setState: Function) {
         const followingFeed = ig.feed.accountFollowing(id);
         followingFeed.deserialize(feedSession);
         if (!followingFeed.isMoreAvailable()) {
-          setState({progressMode: null, progressNext: null, progressCurrent: 0});
-          alert("Instagram Following Import has completed");
+          setState({systemSnack: "Instagram Following Import has completed", progressMode: null, progressNext: null, progressCurrent: 0});
           return;
         }
         followingFeed.items().then((items) => {
           processItems(items, id + "~" + followingFeed.serialize());
-        }).catch((e) => {console.error(e);ig = null;});
-      }).catch((e) => {console.error(e);ig = null;});
+        }).catch((e) => {error(e);});
+      }).catch((e) => {error(e);});
     }
   };
 
   const state = getState();
   if (!state.progressMode) {
     // Show progress bar and kick off loop
-    alert("Your Instagram Following is being imported... You will recieve an alert when the import is finished.");
-
     state.progressMode = PR.instagram;
     state.progressCurrent = 0;
-    setState({progressMode: state.progressMode, progressCurrent: state.progressCurrent});
+    setState({
+      systemSnack: "Your Instagram Following is being imported... You will recieve an alert when the import is finished.",
+      progressMode: state.progressMode, progressCurrent: state.progressCurrent
+    });
     instagramImportLoop();
   }
 }

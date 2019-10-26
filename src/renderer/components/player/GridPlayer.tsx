@@ -89,6 +89,7 @@ class GridPlayer extends React.Component {
     getTags(source: string): Array<Tag>,
     goBack(): void,
     setCount(sourceURL: string, count: number, countComplete: boolean): void,
+    systemMessage(message: string): void,
   };
 
   readonly state = {
@@ -177,6 +178,7 @@ class GridPlayer extends React.Component {
                             getTags={this.props.getTags.bind(this)}
                             goBack={this.props.goBack.bind(this)}
                             setCount={this.props.setCount.bind(this)}
+                            systemMessage={this.props.systemMessage.bind(this)}
                           />
                         )}
                       </div>

@@ -308,6 +308,7 @@ class SceneDetail extends React.Component {
     onSaveAsScene(scene: Scene): void,
     onSort(scene: Scene, algorithm: string, ascending: boolean): void,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
+    systemMessage(message: string): void,
   };
 
   readonly state = {
@@ -524,7 +525,8 @@ class SceneDetail extends React.Component {
                       onClearBlacklist={this.props.onClearBlacklist.bind(this)}
                       onClip={this.props.onClip.bind(this)}
                       onPlay={this.props.onPlay.bind(this)}
-                      onUpdateSources={this.onUpdateSources.bind(this)}/>
+                      onUpdateSources={this.onUpdateSources.bind(this)}
+                      systemMessage={this.props.systemMessage.bind(this)}/>
                   </Box>
                 </div>
               </Typography>

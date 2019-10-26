@@ -36,6 +36,7 @@ class SourceList extends React.Component {
     onClip(source: LibrarySource): void,
     onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void,
     onUpdateSources(sources: Array<LibrarySource>): void,
+    systemMessage(message: string): void,
     isSelect?: boolean,
     library?: Array<LibrarySource>,
     selected?: Array<string>,
@@ -268,6 +269,7 @@ class SourceList extends React.Component {
         onStartEdit={this.onStartEdit.bind(this)}
         onToggleSelect={this.onToggleSelect.bind(this)}
         savePosition={this.savePosition.bind(this)}
+        systemMessage={this.props.systemMessage.bind(this)}
       />
     )});
 

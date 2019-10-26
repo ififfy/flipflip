@@ -54,26 +54,26 @@ function filterPathsToJustPlayable(imageTypeFilter: string, paths: Array<string>
 }
 
 // Determine what kind of source we have based on the URL and return associated Promise
-function getPromise(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function getPromise(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   let promise;
   const sourceType = getSourceType(source.url);
 
   if (sourceType == ST.local) { // Local files
     helpers.next = null;
-    promise = loadLocalDirectory(config, source, filter, helpers);
+    promise = loadLocalDirectory(systemMessage, config, source, filter, helpers);
   } else if (sourceType == ST.list) { // Image List
     helpers.next = null;
-    promise = loadRemoteImageURLList(config, source, filter, helpers);
+    promise = loadRemoteImageURLList(systemMessage, config, source, filter, helpers);
   } else if (sourceType == ST.video) {
     helpers.next = null;
     const cachePath = getCachePath(source.url, config) + getFileName(source.url);
     if (fs.existsSync(cachePath)) {
       const realURL = source.url;
       source.url = cachePath;
-      promise = loadVideo(config, source, filter, helpers);
+      promise = loadVideo(systemMessage, config, source, filter, helpers);
       source.url = realURL;
     } else {
-      promise = loadVideo(config, source, filter, helpers);
+      promise = loadVideo(systemMessage, config, source, filter, helpers);
     }
   } else { // Paging sources
     let promiseFunction;
@@ -122,14 +122,14 @@ function getPromise(config: Config, source: LibrarySource, filter: string, helpe
         // If the cache directory exists, use it
         const realURL = source.url;
         source.url = cachePath;
-        promise = loadLocalDirectory(config, source, filter, helpers);
+        promise = loadLocalDirectory(systemMessage, config, source, filter, helpers);
         source.url = realURL;
         timeout = 0;
       } else {
-        promise = promiseFunction(config, source, filter, helpers);
+        promise = promiseFunction(systemMessage, config, source, filter, helpers);
       }
     } else {
-      promise = promiseFunction(config, source, filter, helpers);
+      promise = promiseFunction(systemMessage, config, source, filter, helpers);
     }
     promise.timeout = timeout;
   }
@@ -137,7 +137,7 @@ function getPromise(config: Config, source: LibrarySource, filter: string, helpe
   return promise;
 }
 
-function loadLocalDirectory(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadLocalDirectory(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   const blacklist = ['*.css', '*.html', 'avatar.png'];
   const url = source.url;
 
@@ -176,7 +176,7 @@ function loadLocalDirectory(config: Config, source: LibrarySource, filter: strin
   });
 }
 
-function loadVideo(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadVideo(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   const url = source.url;
   return new CancelablePromise((resolve) => {
     let path = filterPathsToJustPlayable(filter, [url], true).map((p) => p.startsWith("http") ? p : fileURL(p));
@@ -197,7 +197,7 @@ function loadVideo(config: Config, source: LibrarySource, filter: string, helper
   });
 }
 
-function loadRemoteImageURLList(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadRemoteImageURLList(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   const url = source.url;
   return new CancelablePromise((resolve) => {
     wretch(url)
@@ -233,7 +233,7 @@ function loadRemoteImageURLList(config: Config, source: LibrarySource, filter: s
   });
 }
 
-function loadTumblr(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadTumblr(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   let configured = config.remoteSettings.tumblrOAuthToken != "" && config.remoteSettings.tumblrOAuthTokenSecret != "";
   if (configured) {
     const url = source.url;
@@ -256,7 +256,7 @@ function loadTumblr(config: Config, source: LibrarySource, filter: string, helpe
           console.error("Error retriving " + tumblrID + (helpers.next == 0 ? "" : "(Page " + helpers.next + " )"));
           console.error(err);
           if (err.message.includes("429 Limit Exceeded") && !tumblr429Alerted && helpers.next == 0) {
-            alert("Tumblr has temporarily throttled your FlipFlip due to high traffic. Try again in a few minutes or visit Preferences to try a different Tumblr API key.");
+            systemMessage("Tumblr has temporarily throttled your FlipFlip due to high traffic. Try again in a few minutes or visit Settings to try a different Tumblr API key.");
             tumblr429Alerted = true;
           }
           resolve(null);
@@ -328,7 +328,7 @@ function loadTumblr(config: Config, source: LibrarySource, filter: string, helpe
     });
   } else {
     if (!tumblrAlerted) {
-      alert("You haven't authorized FlipFlip to work with Tumblr yet.\nVisit Preferences and click 'Authorzie FlipFlip on Tumblr'.");
+      systemMessage("You haven't authorized FlipFlip to work with Tumblr yet.\nVisit Settings to authorize Tumblr.");
       tumblrAlerted = true;
     }
     return new CancelablePromise((resolve) => {
@@ -337,7 +337,7 @@ function loadTumblr(config: Config, source: LibrarySource, filter: string, helpe
   }
 }
 
-function loadReddit(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadReddit(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   let configured = config.remoteSettings.redditRefreshToken != "";
   if (configured) {
     const url = source.url;
@@ -407,7 +407,7 @@ function loadReddit(config: Config, source: LibrarySource, filter: string, helpe
     });
   } else {
     if (!redditAlerted) {
-      alert("You haven't authorized FlipFlip to work with Reddit yet.\nVisit Preferences and click 'Authorzie FlipFlip on Reddit'.");
+      systemMessage("You haven't authorized FlipFlip to work with Reddit yet.\nVisit Settings to authorize Reddit.");
       redditAlerted = true;
     }
     return new CancelablePromise((resolve) => {
@@ -416,7 +416,7 @@ function loadReddit(config: Config, source: LibrarySource, filter: string, helpe
   }
 }
 
-function loadImageFap(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadImageFap(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   if (helpers.next == 0) {
     helpers.next = [0, 0];
   }
@@ -549,7 +549,7 @@ function loadImageFap(config: Config, source: LibrarySource, filter: string, hel
   });
 }
 
-function loadSexCom(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadSexCom(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   const url = source.url;
   return new CancelablePromise((resolve) => {
     let requestURL;
@@ -629,7 +629,7 @@ function loadSexCom(config: Config, source: LibrarySource, filter: string, helpe
   });
 }
 
-function loadImgur(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadImgur(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   const url = source.url;
   return new CancelablePromise((resolve) => {
     imgur.getAlbumInfo(getFileGroup(url))
@@ -649,7 +649,7 @@ function loadImgur(config: Config, source: LibrarySource, filter: string, helper
   });
 }
 
-function loadTwitter(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadTwitter(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   let configured = config.remoteSettings.twitterAccessTokenKey != "" && config.remoteSettings.twitterAccessTokenSecret != "";
   if (configured) {
     const excludeRTS = source.url.endsWith("--");
@@ -700,7 +700,7 @@ function loadTwitter(config: Config, source: LibrarySource, filter: string, help
     });
   } else {
     if (!twitterAlerted) {
-      alert("You haven't authorized FlipFlip to work with Twitter yet.\nVisit Preferences and click 'Authorzie FlipFlip on Twitter'.");
+      systemMessage("You haven't authorized FlipFlip to work with Twitter yet.\nVisit Settings to authorize Twitter.");
       twitterAlerted = true;
     }
     return new CancelablePromise((resolve) => {
@@ -709,7 +709,7 @@ function loadTwitter(config: Config, source: LibrarySource, filter: string, help
   }
 }
 
-function loadDeviantArt(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadDeviantArt(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   const url = source.url;
   return new CancelablePromise((resolve) => {
     wretch("http://backend.deviantart.com/rss.xml?type=deviation&q=by%3A" + getFileGroup(url) + "+sort%3Atime+meta%3Aall" + (helpers.next != 0 ? "&offset=" + helpers.next : ""))
@@ -745,7 +745,7 @@ function loadDeviantArt(config: Config, source: LibrarySource, filter: string, h
 }
 let ig: IgApiClient = null;
 let session: any = null;
-function loadInstagram(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadInstagram(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   const configured = config.remoteSettings.instagramUsername != "" && config.remoteSettings.instagramPassword != "";
   if (configured) {
     const url = source.url;
@@ -787,7 +787,7 @@ function loadInstagram(config: Config, source: LibrarySource, filter: string, he
             }).catch((e) => {console.error(e);resolve(null)});
           }).catch((e) => {console.error(e);resolve(null)});
         }).catch((e) => {
-          alert(e + "\n\nVisit Preferences and click 'Check Instagram Login' to attempt to resolve this issue.");
+          systemMessage(e + "\n\nVisit Settings to authorize Instagram and attempt to resolve this issue.");
           console.error(e);
           ig = null;
           resolve(null)
@@ -824,7 +824,7 @@ function loadInstagram(config: Config, source: LibrarySource, filter: string, he
     }
   } else {
     if (!instagramAlerted) {
-      alert("You haven't authorized FlipFlip to work with Instagram yet.\nVisit Preferences and populate your username and password.\nNote this information is only kept on your computer and never shared with anyone else.");
+      systemMessage("You haven't authorized FlipFlip to work with Instagram yet.\nVisit Settings to authorize Instagram.");
       instagramAlerted = true;
     }
     return new CancelablePromise((resolve) => {
@@ -833,7 +833,7 @@ function loadInstagram(config: Config, source: LibrarySource, filter: string, he
   }
 }
 
-function loadDanbooru(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadDanbooru(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
   const thisHost = hostRegex.exec(url)[1];
@@ -901,7 +901,7 @@ function loadDanbooru(config: Config, source: LibrarySource, filter: string, hel
   });
 }
 
-function loadGelbooru1(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadGelbooru1(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
   const thisHost = hostRegex.exec(url)[1];
@@ -959,7 +959,7 @@ function loadGelbooru1(config: Config, source: LibrarySource, filter: string, he
   });
 }
 
-function loadGelbooru2(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadGelbooru2(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
   const thisHost = hostRegex.exec(url)[1];
@@ -1003,7 +1003,7 @@ function loadGelbooru2(config: Config, source: LibrarySource, filter: string, he
   });
 }
 
-function loadEHentai(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadEHentai(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   const url = source.url;
   return new CancelablePromise((resolve) => {
     wretch(url + "?p=" + (helpers.next + 1))
@@ -1067,6 +1067,7 @@ export default class HeadlessScenePlayer extends React.Component {
     setVideo(video: HTMLVideoElement): void,
     setCount(sourceURL: string, count: number, countComplete: boolean): void,
     cache(i: HTMLImageElement | HTMLVideoElement): void,
+    systemMessage(message: string): void,
     setTimeToNextFrame?(timeToNextFrame: number): void,
   };
 
@@ -1143,7 +1144,7 @@ export default class HeadlessScenePlayer extends React.Component {
       if (!this.props.scene.playVideoClips && d.clips) {
         d.clips = [];
       }
-      const loadPromise = getPromise(this.props.config, d, this.props.scene.imageTypeFilter, {next: -1, count: 0});
+      const loadPromise = getPromise(this.props.systemMessage, this.props.config, d, this.props.scene.imageTypeFilter, {next: -1, count: 0});
       this.setState({promise: loadPromise});
 
       loadPromise
@@ -1193,7 +1194,7 @@ export default class HeadlessScenePlayer extends React.Component {
       if (!this.props.scene.playVideoClips && d.clips) {
         d.clips = [];
       }
-      const loadPromise = getPromise(this.props.config, d, this.props.nextScene.imageTypeFilter, {next: -1, count: 0});
+      const loadPromise = getPromise(this.props.systemMessage, this.props.config, d, this.props.nextScene.imageTypeFilter, {next: -1, count: 0});
       this.setState({nextPromise: loadPromise});
 
       loadPromise
@@ -1231,7 +1232,7 @@ export default class HeadlessScenePlayer extends React.Component {
       // Process until queue is empty or player has been stopped
       if (this.state.promiseQueue.length > 0 && !this.state.promise.hasCanceled) {
         const promiseData = this.state.promiseQueue.shift();
-        const promise = getPromise(this.props.config, promiseData.source, this.props.scene.imageTypeFilter, promiseData.helpers);
+        const promise = getPromise(this.props.systemMessage, this.props.config, promiseData.source, this.props.scene.imageTypeFilter, promiseData.helpers);
         this.setState({promise: promise});
 
         promise

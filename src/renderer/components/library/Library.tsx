@@ -4,8 +4,9 @@ import Select, { components } from 'react-select';
 
 import {
   AppBar, Backdrop, Badge, Button, Checkbox, Chip, Collapse, Container, createStyles, Dialog, DialogActions,
-  DialogContent, DialogContentText, DialogTitle, Divider, Drawer, Fab, IconButton, ListItem, ListItemIcon,
-  ListItemSecondaryAction, ListItemText, ListSubheader, Menu, MenuItem, Theme, Toolbar, Tooltip, Typography, withStyles
+  DialogContent, DialogContentText, DialogTitle, Divider, Drawer, Fab, IconButton, LinearProgress, ListItem,
+  ListItemIcon, ListItemSecondaryAction, ListItemText, ListSubheader, Menu, MenuItem, Theme, Toolbar, Tooltip,
+  Typography, withStyles
 } from "@material-ui/core";
 
 import AddIcon from '@material-ui/icons/Add';
@@ -297,6 +298,7 @@ class Library extends React.Component {
     onUpdateLibrary(sources: Array<LibrarySource>): void,
     onUpdateMode(mode: string): void,
     savePosition(yOffset: number, filters:Array<string>, selected: Array<string>): void,
+    systemMessage(message: string): void,
   };
 
   readonly state = {
@@ -481,6 +483,12 @@ class Library extends React.Component {
                   </ListItemIcon>
                   <ListItemText primary={cancelProgressMessage} />
                 </ListItem>
+                {(this.props.progressMode === PR.offline || this.props.progressMode === PR.tumblr) && (
+                  <LinearProgress variant="determinate" value={Math.round((this.props.progressCurrent / this.props.progressTotal) * 100)}/>
+                )}
+                {this.props.progressMode !== PR.offline && this.props.progressMode !== PR.tumblr && (
+                  <LinearProgress variant={this.props.progressMode === PR.cancel ? "query" : "indeterminate"}/>
+                )}
               </div>
             </React.Fragment>
           )}
@@ -522,7 +530,8 @@ class Library extends React.Component {
                 onPlay={this.props.onPlay.bind(this)}
                 onUpdateSelected={this.onUpdateSelected.bind(this)}
                 onUpdateSources={this.props.onUpdateLibrary.bind(this)}
-                savePosition={this.savePosition.bind(this)}/>
+                savePosition={this.savePosition.bind(this)}
+                systemMessage={this.props.systemMessage.bind(this)}/>
             </Container>
           </div>
         </main>

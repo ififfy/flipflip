@@ -1,7 +1,7 @@
 import {remote, ipcRenderer, IpcMessageEvent} from 'electron';
 import * as React from 'react';
 
-import {Box, CssBaseline} from "@material-ui/core";
+import {Box, CssBaseline, Dialog, DialogContent, DialogContentText, Slide, Snackbar, SnackbarContent} from "@material-ui/core";
 import {ThemeProvider} from "@material-ui/styles";
 
 import {IPC} from "../data/const";
@@ -114,6 +114,7 @@ export default class Meta extends React.Component {
               onSaveAsScene={a(actions.saveScene)}
               onSort={a(actions.sortSources)}
               onUpdateScene={a(actions.updateScene)}
+              systemMessage={a(actions.systemMessage)}
             />
           )}
 
@@ -150,6 +151,7 @@ export default class Meta extends React.Component {
               onUpdateLibrary={a(actions.replaceLibrary)}
               onUpdateMode={a(actions.setMode)}
               savePosition={a(actions.saveLibraryPosition)}
+              systemMessage={a(actions.systemMessage)}
             />
           )}
 
@@ -197,6 +199,7 @@ export default class Meta extends React.Component {
               setCount={a(actions.setCount)}
               cache={a(actions.cacheImage)}
               blacklistFile={a(actions.blacklistFile)}
+              systemMessage={a(actions.systemMessage)}
             />
           )}
 
@@ -215,6 +218,7 @@ export default class Meta extends React.Component {
               setCount={a(actions.setCount)}
               cache={a(actions.cacheImage)}
               blacklistFile={a(actions.blacklistFile)}
+              systemMessage={a(actions.systemMessage)}
             />
           )}
 
@@ -227,6 +231,7 @@ export default class Meta extends React.Component {
               getTags={actions.getTags.bind(this, this.state.library)}
               goBack={a(actions.goBack)}
               setCount={a(actions.setCount)}
+              systemMessage={a(actions.systemMessage)}
             />
           )}
 
@@ -242,6 +247,31 @@ export default class Meta extends React.Component {
               onUpdateConfig={a(actions.updateConfig)}
             />
           )}
+
+          <Dialog
+            open={!!this.state.systemMessage}
+            onClose={a(actions.closeMessage)}
+            aria-describedby="message-description">
+            <DialogContent>
+              <DialogContentText id="message-description">
+                {this.state.systemMessage}
+              </DialogContentText>
+            </DialogContent>
+          </Dialog>
+
+          <Snackbar
+            open={!!this.state.systemSnack}
+            autoHideDuration={2000}
+            onClose={a(actions.closeMessage)}
+            TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
+            <SnackbarContent
+              message={
+                <span style={{display: 'flex', alignItems: 'center',}}>
+                  {this.state.systemSnack}
+              </span>
+              }
+            />
+          </Snackbar>
 
           <FFAnalytics
             config={this.state.config}
