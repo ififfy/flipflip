@@ -63,6 +63,7 @@ class CrossFadeCard extends React.Component {
                   control={
                     <Switch
                       checked={this.props.scene.crossFadeAudio}
+                      size="small"
                       onChange={this.onBoolInput.bind(this, 'crossFadeAudio')}/>
                   }
                   label="Cross-Fade Audio"/>

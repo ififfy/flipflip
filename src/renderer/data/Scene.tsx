@@ -70,6 +70,7 @@ export default class Scene {
   skipVideoEnd = 0;
   textEnabled = false;
   textSource: string = "";
+  textEndStop = false;
   blinkColor = "#FFFFFF";
   blinkFontSize = 20;
   blinkFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";

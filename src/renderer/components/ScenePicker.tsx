@@ -327,7 +327,7 @@ class ScenePicker extends React.Component {
     onAddGenerator(): void,
     onAddGrid(): void,
     onAddScene(): void,
-    onChangeTab(e: any, newTab: number): void,
+    onChangeTab(newTab: number): void,
     onImportScene(addToLibrary: boolean): void,
     onOpenConfig(): void,
     onOpenLibrary(): void,
@@ -417,7 +417,7 @@ class ScenePicker extends React.Component {
                 <Tabs
                   orientation="vertical"
                   value={this.props.openTab}
-                  onChange={this.props.onChangeTab.bind(this)}
+                  onChange={this.onChangeTab.bind(this)}
                   aria-label="scene picker tabs"
                   className={classes.tabs}>
                   <Tab id="vertical-tab-0"
@@ -832,6 +832,12 @@ class ScenePicker extends React.Component {
       this.setState({openMenu: MO.newWindowAlert});
     } else {
       this.newWindow(false);
+    }
+  }
+
+  onChangeTab(e: MouseEvent, tab: number) {
+    if (this.props.openTab != tab) {
+      this.props.onChangeTab(tab);
     }
   }
 

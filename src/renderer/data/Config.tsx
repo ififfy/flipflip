@@ -58,6 +58,7 @@ interface SceneSettingsI {
   overlays: Array<Overlay>;
   textEnabled: boolean;
   textSource: string;
+  textEndStop: boolean;
 
   strobe: boolean;
   strobePulse: boolean;
@@ -204,6 +205,7 @@ export class SceneSettings implements SceneSettingsI {
   nextSceneTime = 900;
   textEnabled = false;
   textSource = "";
+  textEndStop = false;
 
   strobe = false;
   strobePulse = false;

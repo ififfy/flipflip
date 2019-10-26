@@ -444,7 +444,7 @@ class ConfigForm extends React.Component {
     this.props.onUpdateConfig(newConfig);
   }
 
-  onUpdateDefaultScene(fn: (settings: SceneSettings) => void) {
+  onUpdateDefaultScene(defualtScene: SceneSettings, fn: (settings: SceneSettings) => void) {
     const newConfig = this.state.config;
     fn(newConfig.defaultScene);
     this.setState({config: newConfig, changeMade: true});

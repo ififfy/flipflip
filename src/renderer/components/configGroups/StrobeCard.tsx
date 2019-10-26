@@ -73,6 +73,7 @@ class StrobeCard extends React.Component {
                   control={
                     <Switch
                       checked={this.props.scene.strobePulse}
+                      size="small"
                       onChange={this.onBoolInput.bind(this, 'strobePulse')}/>
                   }
                   label="Add Delay"/>

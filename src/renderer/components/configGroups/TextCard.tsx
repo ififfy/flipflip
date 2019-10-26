@@ -62,6 +62,15 @@ class TextCard extends React.Component {
                           onChange={this.onBoolInput.bind(this, 'textEnabled')}/>
                 }
                 label="Text Overlay"/>
+                <Collapse in={this.props.scene.textEnabled}>
+                  <FormControlLabel
+                    control={
+                      <Switch checked={this.props.scene.textEndStop}
+                              size="small"
+                              onChange={this.onBoolInput.bind(this, 'textEndStop')}/>
+                    }
+                    label="Stop at End"/>
+                </Collapse>
             </Grid>
             {this.state.systemFonts.length > 0 && (
               <Grid item>

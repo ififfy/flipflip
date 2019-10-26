@@ -272,7 +272,7 @@ export function systemSnack(state: State, message: string): Object {
   return {systemSnack: message};
 }
 
-export function changeScenePickerTab(state: State, e: MouseEvent, newTab: number): Object {
+export function changeScenePickerTab(state: State, newTab: number): Object {
   return {openTab: newTab};
 }
 

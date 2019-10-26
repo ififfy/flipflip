@@ -2,7 +2,7 @@ import * as React from "react";
 import { SketchPicker } from 'react-color';
 
 import {
-  createStyles,Fab, Grid, Menu, TextField, Theme, withStyles
+  createStyles, Fab, Grid, Menu, TextField, Theme, Tooltip, withStyles
 } from "@material-ui/core";
 
 const styles = (theme: Theme) => createStyles({
@@ -53,13 +53,15 @@ class ColorPicker extends React.Component {
     return(
       <Grid container alignItems="center">
         <Grid item className={classes.colorGrid}>
-          <Fab
-            className={classes.colorButton}
-            style={{backgroundColor: this.props.currentColor}}
-            onClick={this.onToggleColorPicker.bind(this)}
-            size="medium">
-            <div/>
-          </Fab>
+          <Tooltip title="Pick Color">
+            <Fab
+              className={classes.colorButton}
+              style={{backgroundColor: this.props.currentColor}}
+              onClick={this.onToggleColorPicker.bind(this)}
+              size="medium">
+              <div/>
+            </Fab>
+          </Tooltip>
           <TextField
             className={classes.colorField}
             label="Color"
