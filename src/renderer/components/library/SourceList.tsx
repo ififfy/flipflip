@@ -20,7 +20,7 @@ import SourceListItem from "./SourceListItem";
 const styles = (theme: Theme) => createStyles({
   emptyMessage: {
     textAlign: 'center',
-    marginTop: '25vh',
+    marginTop: '25%',
   },
   emptyMessage2: {
     textAlign: 'center',

@@ -23,7 +23,7 @@ import HttpIcon from '@material-ui/icons/Http';
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import MenuIcon from'@material-ui/icons/Menu';
 import MovieIcon from '@material-ui/icons/Movie';
-import NotInterestedIcon from '@material-ui/icons/NotInterested';
+import OfflineBoltIcon from '@material-ui/icons/OfflineBolt';
 import PublishIcon from '@material-ui/icons/Publish';
 import SelectAllIcon from '@material-ui/icons/SelectAll';
 import SortIcon from '@material-ui/icons/Sort';
@@ -71,6 +71,21 @@ const styles = (theme: Theme) => createStyles({
   },
   title: {
     textAlign: 'center',
+    flexGrow: 1,
+  },
+  headerBar: {
+    display: 'flex',
+    alignItems: 'center',
+    whiteSpace: 'nowrap',
+    flexWrap: 'nowrap',
+  },
+  headerLeft: {
+    flexBasis: '20%',
+  },
+  headerRight: {
+    flexBasis: '20%',
+    justifyContent: 'flex-end',
+    display: 'flex',
   },
   searchBar: {
     float: 'right',
@@ -81,10 +96,6 @@ const styles = (theme: Theme) => createStyles({
     color: theme.palette.primary.contrastText,
     marginTop: 3,
     marginRight: theme.spacing(1),
-  },
-  titleBar: {
-    flex: 1,
-    maxWidth: '33%',
   },
   drawerPaper: {
     position: 'relative',
@@ -338,8 +349,8 @@ class Library extends React.Component {
     return (
       <div className={classes.root} onKeyDown={this.secretHotkey.bind(this)} tabIndex={0}>
         <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
-          <Toolbar>
-            <div className={classes.titleBar}>
+          <Toolbar className={classes.headerBar}>
+            <div className={classes.headerLeft}>
               <Tooltip title={this.props.isSelect ? "Cancel Import" : "Back"} placement="right-end">
                 <IconButton
                   edge="start"
@@ -357,7 +368,7 @@ class Library extends React.Component {
               Library
             </Typography>
 
-            <div className={classes.titleBar}>
+            <div className={classes.headerRight}>
               <div className={classes.searchBar}>
                 {this.props.library.length > 0 && (
                   <Chip
@@ -466,7 +477,7 @@ class Library extends React.Component {
           <div>
             <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onMarkOffline.bind(this)}>
               <ListItemIcon>
-                <NotInterestedIcon />
+                <OfflineBoltIcon />
               </ListItemIcon>
               <ListItemText primary="Mark Offline" />
             </ListItem>

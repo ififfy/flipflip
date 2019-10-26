@@ -26,6 +26,21 @@ const styles = (theme: Theme) => createStyles({
   },
   title: {
     textAlign: 'center',
+    flexGrow: 1,
+  },
+  headerBar: {
+    display: 'flex',
+    alignItems: 'center',
+    whiteSpace: 'nowrap',
+    flexWrap: 'nowrap',
+  },
+  headerLeft: {
+    flexBasis: '13%',
+  },
+  headerRight: {
+    flexBasis: '13%',
+    justifyContent: 'flex-end',
+    display: 'flex',
   },
   titleField: {
     width: '100%',
@@ -52,6 +67,7 @@ const styles = (theme: Theme) => createStyles({
   },
   dimensionInput: {
     color: `${theme.palette.primary.contrastText} !important`,
+    minWidth: theme.spacing(6),
   },
   grid: {
     flexGrow: 1,
@@ -127,16 +143,18 @@ class GridSetup extends React.Component {
       <div className={classes.root}>
 
         <AppBar position="absolute" className={classes.appBar}>
-          <Toolbar>
-            <Tooltip title="Back" placement="right-end">
-              <IconButton
-                edge="start"
-                color="inherit"
-                aria-label="Back"
-                onClick={this.goBack.bind(this)}>
-                <ArrowBackIcon />
-              </IconButton>
-            </Tooltip>
+          <Toolbar className={classes.headerBar}>
+            <div className={classes.headerLeft}>
+              <Tooltip title="Back" placement="right-end">
+                <IconButton
+                  edge="start"
+                  color="inherit"
+                  aria-label="Back"
+                  onClick={this.goBack.bind(this)}>
+                  <ArrowBackIcon />
+                </IconButton>
+              </Tooltip>
+            </div>
 
             {/*TODO Drive this off state so it responds faster*/}
             {this.state.isEditingName && (
@@ -155,51 +173,49 @@ class GridSetup extends React.Component {
               </form>
             )}
             {!this.state.isEditingName && (
-              <React.Fragment>
-                <div className={classes.fill}/>
-                <Typography component="h1" variant="h4" color="inherit" noWrap
-                            className={clsx(classes.title, this.props.grid.name.length == 0 && classes.noTitle)} onClick={this.beginEditingName.bind(this)}>
-                  {this.props.grid.name}
-                </Typography>
-                <div className={classes.fill}/>
-              </React.Fragment>
+              <Typography component="h1" variant="h4" color="inherit" noWrap
+                          className={clsx(classes.title, this.props.grid.name.length == 0 && classes.noTitle)} onClick={this.beginEditingName.bind(this)}>
+                {this.props.grid.name}
+              </Typography>
             )}
 
-            <TextField
-              label="Height"
-              margin="dense"
-              value={this.state.height}
-              onChange={this.onHeightInput.bind(this)}
-              onBlur={this.blurHeight.bind(this)}
-              variant="filled"
-              InputLabelProps={{className: classes.dimensionInput}}
-              inputProps={{
-                className: classes.dimensionInput,
-                min: 1,
-                max: 5,
-                type: 'number',
-              }}/>
-            <TextField
-              label="Width"
-              margin="dense"
-              value={this.state.width}
-              onChange={this.onWidthInput.bind(this)}
-              onBlur={this.blurWidth.bind(this)}
-              variant="filled"
-              InputLabelProps={{className: classes.dimensionInput}}
-              inputProps={{
-                className: classes.dimensionInput,
-                min: 1,
-                max: 5,
-                type: 'number',
-              }}/>
-            <IconButton
-              edge="end"
-              color="inherit"
-              aria-label="Play"
-              onClick={this.onPlayGrid.bind(this)}>
-              <PlayCircleOutlineIcon fontSize="large"/>
-            </IconButton>
+            <div className={classes.headerRight}>
+              <TextField
+                label="Height"
+                margin="dense"
+                value={this.state.height}
+                onChange={this.onHeightInput.bind(this)}
+                onBlur={this.blurHeight.bind(this)}
+                variant="filled"
+                InputLabelProps={{className: classes.dimensionInput}}
+                inputProps={{
+                  className: classes.dimensionInput,
+                  min: 1,
+                  max: 5,
+                  type: 'number',
+                }}/>
+              <TextField
+                label="Width"
+                margin="dense"
+                value={this.state.width}
+                onChange={this.onWidthInput.bind(this)}
+                onBlur={this.blurWidth.bind(this)}
+                variant="filled"
+                InputLabelProps={{className: classes.dimensionInput}}
+                inputProps={{
+                  className: classes.dimensionInput,
+                  min: 1,
+                  max: 5,
+                  type: 'number',
+                }}/>
+              <IconButton
+                edge="end"
+                color="inherit"
+                aria-label="Play"
+                onClick={this.onPlayGrid.bind(this)}>
+                <PlayCircleOutlineIcon fontSize="large"/>
+              </IconButton>
+            </div>
           </Toolbar>
         </AppBar>
 

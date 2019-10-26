@@ -368,6 +368,7 @@ class SceneDetail extends React.Component {
             )}
 
             <IconButton
+              disabled={this.props.scene.sources.length == 0}
               edge="start"
               color="inherit"
               aria-label="Play"

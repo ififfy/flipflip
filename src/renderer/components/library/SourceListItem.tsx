@@ -4,11 +4,11 @@ import {remote} from "electron";
 
 import {
   Badge, Checkbox, Chip, createStyles, Fab, IconButton, ListItem, ListItemAvatar, ListItemSecondaryAction, ListItemText,
-  SvgIcon, TextField, Theme, withStyles
+  SvgIcon, TextField, Theme, Typography, withStyles
 } from "@material-ui/core";
 
 import DeleteIcon from '@material-ui/icons/Delete';
-import NotInterestedIcon from '@material-ui/icons/NotInterested';
+import OfflineBoltIcon from '@material-ui/icons/OfflineBolt';
 
 import {getCachePath, getFileName, getSourceType, urlToPath} from "../../data/utils";
 import {ST} from "../../data/const";
@@ -46,11 +46,32 @@ const styles = (theme: Theme) => createStyles({
   deleteIcon: {
     color: theme.palette.error.contrastText,
   },
+  errorIcon: {
+    color: theme.palette.error.main,
+    backgroundColor: theme.palette.error.contrastText,
+    borderRadius: '50%',
+  },
   actionButton: {
     marginLeft: theme.spacing(1),
   },
   countChip: {
     marginRight: theme.spacing(1),
+    [theme.breakpoints.down('xs')]: {
+      display: 'none',
+    },
+  },
+  fullTag: {
+    [theme.breakpoints.down('sm')]: {
+      display: 'none',
+    },
+  },
+  simpleTag: {
+    [theme.breakpoints.up('md')]: {
+      display: 'none',
+    },
+    [theme.breakpoints.down('xs')]: {
+      display: 'none',
+    },
   },
   urlField: {
     width: '100%',
@@ -103,7 +124,7 @@ class SourceListItem extends React.Component {
                 vertical: 'top',
                 horizontal: 'left',
               }}
-              badgeContent={<NotInterestedIcon />}>
+              badgeContent={<OfflineBoltIcon className={classes.errorIcon} />}>
               <Fab
                 size="small"
                 onClick={this.onSourceIconClick.bind(this, this.props.source)}
@@ -128,17 +149,28 @@ class SourceListItem extends React.Component {
             )}
             {this.props.isEditing != this.props.source.id && (
               <React.Fragment>
-                <div onClick={this.onStartEdit.bind(this, this.props.source)}>
+                <Typography
+                  noWrap
+                  onClick={this.onStartEdit.bind(this, this.props.source)}>
                   {this.props.source.url}
-                </div>
+                </Typography>
                 {this.props.source.tags && this.props.source.tags.map((tag: Tag) =>
+                  <React.Fragment>
                   <Chip
                     key={tag.id}
-                    className={classes.actionButton}
+                    className={clsx(classes.actionButton, classes.fullTag)}
                     label={tag.name}
                     color="primary"
                     size="small"
                     variant="outlined"/>
+                    <Chip
+                      key={tag.id}
+                      className={clsx(classes.actionButton, classes.simpleTag)}
+                      label={this.getSimpleTag(tag.name)}
+                      color="primary"
+                      size="small"
+                      variant="outlined"/>
+                  </React.Fragment>
                 )}
               </React.Fragment>
             )}
@@ -217,6 +249,11 @@ class SourceListItem extends React.Component {
         </ListItem>
       </div>
     );
+  }
+
+  getSimpleTag(tagName: string) {
+    tagName = tagName.replace( /[a-z]/g, '' ).replace( /\s/g, '' );
+    return tagName;
   }
 
   onSourceIconClick(source: LibrarySource, e: MouseEvent) {

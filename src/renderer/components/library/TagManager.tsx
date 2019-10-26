@@ -39,10 +39,16 @@ const styles = (theme: Theme) => createStyles({
   },
   title: {
     textAlign: 'center',
+    flexGrow: 1,
   },
-  titleBar: {
-    flex: 1,
-    maxWidth: '33%',
+  headerBar: {
+    display: 'flex',
+    alignItems: 'center',
+    whiteSpace: 'nowrap',
+    flexWrap: 'nowrap',
+  },
+  headerLeft: {
+    flexBasis: '3%',
   },
   content: {
     display: 'flex',
@@ -130,8 +136,8 @@ class TagManager extends React.Component {
     return(
       <div className={classes.root}>
         <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
-          <Toolbar>
-            <div className={classes.titleBar}>
+          <Toolbar className={classes.headerBar}>
+            <div className={classes.headerLeft}>
               <Tooltip title="Back" placement="right-end">
                 <IconButton
                   edge="start"
@@ -149,7 +155,7 @@ class TagManager extends React.Component {
               Tag Manager
             </Typography>
 
-            <div className={classes.titleBar}/>
+            <div className={classes.headerLeft}/>
           </Toolbar>
         </AppBar>
 

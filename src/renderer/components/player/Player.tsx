@@ -78,6 +78,21 @@ const styles = (theme: Theme) => createStyles({
   },
   title: {
     textAlign: 'center',
+    flexGrow: 1,
+  },
+  headerBar: {
+    display: 'flex',
+    alignItems: 'center',
+    whiteSpace: 'nowrap',
+    flexWrap: 'nowrap',
+  },
+  headerLeft: {
+    flexBasis: '20%',
+  },
+  headerRight: {
+    flexBasis: '20%',
+    justifyContent: 'flex-end',
+    display: 'flex',
   },
   drawerToolbar: {
     display: 'flex',
@@ -194,7 +209,7 @@ const styles = (theme: Theme) => createStyles({
   },
   emptyMessage: {
     textAlign: 'center',
-    marginTop: '25vh',
+    marginTop: '25%',
   },
   emptyMessage2: {
     textAlign: 'center',
@@ -438,56 +453,58 @@ class Player extends React.Component {
               onMouseEnter={this.onMouseEnterAppBar.bind(this)}
               onMouseLeave={this.onMouseLeaveAppBar.bind(this)}
               className={clsx(classes.appBar, (!this.state.hasStarted || this.state.isEmpty || this.state.appBarHover) && classes.appBarHover)}>
-              <Toolbar>
-                <Tooltip title="Back" placement="right-end">
-                  <IconButton
-                    edge="start"
-                    color="inherit"
-                    aria-label="Back"
-                    onClick={this.props.goBack.bind(this)}>
-                    <ArrowBackIcon />
-                  </IconButton>
-                </Tooltip>
+              <Toolbar className={classes.headerBar}>
+                <div className={classes.headerLeft}>
+                  <Tooltip title="Back" placement="right-end">
+                    <IconButton
+                      edge="start"
+                      color="inherit"
+                      aria-label="Back"
+                      onClick={this.props.goBack.bind(this)}>
+                      <ArrowBackIcon />
+                    </IconButton>
+                  </Tooltip>
+                </div>
 
-                <div className={classes.fill}/>
                 <Typography component="h1" variant="h4" color="inherit" noWrap className={classes.title}>
                   {this.props.tags ? this.props.scene.sources[0].url : this.props.scene.name}
                 </Typography>
-                <div className={classes.fill}/>
 
-                <Tooltip title="Toggle Fullscreen">
+                <div className={classes.headerRight}>
+                  <Tooltip title="Toggle Fullscreen">
+                    <IconButton
+                      edge="start"
+                      color="inherit"
+                      aria-label="FullScreen"
+                      onClick={this.toggleFull.bind(this)}>
+                      <FullscreenIcon fontSize="large"/>
+                    </IconButton>
+                  </Tooltip>
+                  <Divider component="div" orientation="vertical" style={{height: 48, margin: '0 14px 0 3px'}}/>
+                  <IconButton
+                    disabled={!canGoBack}
+                    edge="start"
+                    color="inherit"
+                    aria-label="Backward"
+                    onClick={this.historyBack.bind(this)}>
+                    <ForwardIcon fontSize="large" style={{transform: 'rotate(180deg)'}}/>
+                  </IconButton>
                   <IconButton
                     edge="start"
                     color="inherit"
-                    aria-label="FullScreen"
-                    onClick={this.toggleFull.bind(this)}>
-                    <FullscreenIcon fontSize="large"/>
+                    aria-label={this.state.isPlaying ? "Pause" : "Play"}
+                    onClick={this.setPlayPause.bind(this, !this.state.isPlaying)}>
+                    {this.state.isPlaying ? <PauseIcon fontSize="large"/> : <PlayArrowIcon fontSize="large"/>}
                   </IconButton>
-                </Tooltip>
-                <Divider component="div" orientation="vertical" style={{height: 48, margin: '0 14px 0 3px'}}/>
-                <IconButton
-                  disabled={!canGoBack}
-                  edge="start"
-                  color="inherit"
-                  aria-label="Backward"
-                  onClick={this.historyBack.bind(this)}>
-                  <ForwardIcon fontSize="large" style={{transform: 'rotate(180deg)'}}/>
-                </IconButton>
-                <IconButton
-                  edge="start"
-                  color="inherit"
-                  aria-label={this.state.isPlaying ? "Pause" : "Play"}
-                  onClick={this.setPlayPause.bind(this, !this.state.isPlaying)}>
-                  {this.state.isPlaying ? <PauseIcon fontSize="large"/> : <PlayArrowIcon fontSize="large"/>}
-                </IconButton>
-                <IconButton
-                  disabled={!canGoForward}
-                  edge="start"
-                  color="inherit"
-                  aria-label="Forward"
-                  onClick={this.historyForward.bind(this)}>
-                  <ForwardIcon fontSize="large"/>
-                </IconButton>
+                  <IconButton
+                    disabled={!canGoForward}
+                    edge="start"
+                    color="inherit"
+                    aria-label="Forward"
+                    onClick={this.historyForward.bind(this)}>
+                    <ForwardIcon fontSize="large"/>
+                  </IconButton>
+                </div>
               </Toolbar>
             </AppBar>
 

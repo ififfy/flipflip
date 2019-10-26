@@ -57,6 +57,16 @@ const styles = (theme: Theme) => createStyles({
   },
   title: {
     textAlign: 'center',
+    flexGrow: 1,
+  },
+  headerBar: {
+    display: 'flex',
+    alignItems: 'center',
+    whiteSpace: 'nowrap',
+    flexWrap: 'nowrap',
+  },
+  headerLeft: {
+    flexBasis: '3%',
   },
   clipDrawerPaper: {
     backgroundColor: (theme.palette.primary as any)["50"],
@@ -64,7 +74,7 @@ const styles = (theme: Theme) => createStyles({
   },
   emptyMessage: {
     textAlign: 'center',
-    marginTop: '25vh',
+    marginTop: '25%',
   },
   emptyMessage2: {
     textAlign: 'center',
@@ -135,22 +145,24 @@ class VideoClipper extends React.Component {
       <div className={clsx(classes.root, "VideoClipper")}>
         <AppBar
           className={classes.appBar}>
-          <Toolbar>
-            <Tooltip title="Back" placement="right-end">
-              <IconButton
-                edge="start"
-                color="inherit"
-                aria-label="Back"
-                onClick={this.props.goBack.bind(this)}>
-                <ArrowBackIcon />
-              </IconButton>
-            </Tooltip>
+          <Toolbar className={classes.headerBar}>
+            <div className={classes.headerLeft}>
+              <Tooltip title="Back" placement="right-end">
+                <IconButton
+                  edge="start"
+                  color="inherit"
+                  aria-label="Back"
+                  onClick={this.props.goBack.bind(this)}>
+                  <ArrowBackIcon />
+                </IconButton>
+              </Tooltip>
+            </div>
 
-            <div className={classes.fill}/>
             <Typography component="h1" variant="h4" color="inherit" noWrap className={classes.title}>
               {this.props.source.url}
             </Typography>
-            <div className={classes.fill}/>
+
+            <div className={classes.headerLeft}/>
           </Toolbar>
         </AppBar>
 
