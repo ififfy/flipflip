@@ -236,7 +236,7 @@ class SourceList extends React.Component {
         height={height}
         width={width}
         initialScrollOffset={this.props.yOffset ? this.props.yOffset : 0}
-        itemSize={theme.spacing(7)}
+        itemSize={56}
         itemCount={this.props.sources.length}
         itemData={this.props.sources}
         itemKey={(index: number, data: any) => data[index].id}

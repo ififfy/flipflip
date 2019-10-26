@@ -65,7 +65,7 @@ const styles = (theme: Theme) => createStyles({
     margin: 0,
   },
   titleInput: {
-    color: theme.palette.common.white,
+    color: theme.palette.primary.contrastText,
     textAlign: 'center',
     fontSize: theme.typography.h4.fontSize,
   },
@@ -121,7 +121,7 @@ const styles = (theme: Theme) => createStyles({
     flexGrow: 1,
     flexDirection: 'column',
     height: '100vh',
-    backgroundColor: (theme.palette.primary as any)["50"],
+    backgroundColor: theme.palette.background.default,
   },
   container: {
     height: '100%',

@@ -264,6 +264,7 @@ class SceneOptionCard extends React.Component {
                 </Grid>
                 <Grid item xs={12} sm={this.props.sidebar ? 12 : 5}>
                   <TextField
+                    disabled={this.props.scene.nextSceneID == 0}
                     variant="outlined"
                     label="Play after"
                     margin="dense"

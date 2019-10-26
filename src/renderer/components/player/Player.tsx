@@ -98,7 +98,7 @@ const styles = (theme: Theme) => createStyles({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: (theme.palette.primary as any)["50"],
+    backgroundColor: theme.palette.background.default,
     ...theme.mixins.toolbar,
   },
   drawer: {
@@ -130,7 +130,7 @@ const styles = (theme: Theme) => createStyles({
     overflowX: 'hidden',
     height: '100vh',
     width: 0,
-    backgroundColor: (theme.palette.primary as any)["50"],
+    backgroundColor: theme.palette.background.default,
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -150,7 +150,7 @@ const styles = (theme: Theme) => createStyles({
   tagDrawerPaper: {
     transform: 'scale(0)',
     transformOrigin: 'bottom left',
-    backgroundColor: (theme.palette.primary as any)["50"],
+    backgroundColor: theme.palette.background.default,
     transition: theme.transitions.create('transform', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -189,13 +189,20 @@ const styles = (theme: Theme) => createStyles({
     display: 'flex',
     flexGrow: 1,
     flexDirection: 'column',
-    backgroundColor: (theme.palette.primary as any)["50"],
+    backgroundColor: theme.palette.background.default,
     zIndex: 10,
   },
   container: {
     flexGrow: 1,
     padding: theme.spacing(0),
     position: 'relative',
+  },
+  player: {
+    position: 'fixed',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0
   },
   progress: {
     alignItems: 'center',
@@ -213,9 +220,6 @@ const styles = (theme: Theme) => createStyles({
   },
   emptyMessage2: {
     textAlign: 'center',
-  },
-  strobe: {
-    zIndex: 5,
   },
   startNowButton: {
     marginTop: theme.spacing(1),
@@ -238,6 +242,9 @@ const styles = (theme: Theme) => createStyles({
   fill: {
     flexGrow: 1,
   },
+  hidden: {
+    display: 'none',
+  }
 });
 
 class Player extends React.Component {
@@ -315,7 +322,7 @@ class Player extends React.Component {
       <div className={clsx(classes.root, this.props.gridView && classes.gridRoot)}>
         {showStrobe && (
           <Strobe
-            className={classes.strobe}
+            zIndex={5}
             toggleStrobe={this._toggleStrobe}
             timeToNextFrame={this.state.timeToNextFrame}
             scene={this.props.scene}
@@ -362,7 +369,7 @@ class Player extends React.Component {
           </main>
         )}
 
-        <div>
+        <div className={clsx(!this.props.gridView && classes.player, !this.state.hasStarted && classes.hidden)}>
           <HeadlessScenePlayer
             config={this.props.config}
             scene={this.props.scene}
@@ -508,179 +515,182 @@ class Player extends React.Component {
               </Toolbar>
             </AppBar>
 
-
-            <div
-              className={classes.hoverDrawer}
-              onMouseEnter={this.onMouseEnterDrawer.bind(this)}
-              onMouseLeave={this.onMouseLeaveDrawer.bind(this)}/>
-
             {this.state.hasStarted && !this.state.isEmpty && (
-              <Drawer
-                variant="permanent"
-                className={clsx(classes.drawer, this.state.drawerHover && classes.drawerHover)}
-                classes={{paper: clsx(classes.drawerPaper, this.state.drawerHover && classes.drawerPaperHover)}}
-                open={this.state.drawerHover}
-                onMouseEnter={this.onMouseEnterDrawer.bind(this)}
-                onMouseLeave={this.onMouseLeaveDrawer.bind(this)}>
-                <div className={classes.drawerToolbar}>
-                  <Typography variant="h4">
-                    Settings
-                  </Typography>
-                </div>
+              <React.Fragment>
+                <div
+                  className={classes.hoverDrawer}
+                  onMouseEnter={this.onMouseEnterDrawer.bind(this)}
+                  onMouseLeave={this.onMouseLeaveDrawer.bind(this)}/>
 
-                {this.props.scene.imageTypeFilter != IF.stills && (
+                <Drawer
+                  variant="permanent"
+                  className={clsx(classes.drawer, this.state.drawerHover && classes.drawerHover)}
+                  classes={{paper: clsx(classes.drawerPaper, this.state.drawerHover && classes.drawerPaperHover)}}
+                  open={this.state.drawerHover}
+                  onMouseEnter={this.onMouseEnterDrawer.bind(this)}
+                  onMouseLeave={this.onMouseLeaveDrawer.bind(this)}>
+                  <div className={classes.drawerToolbar}>
+                    <Typography variant="h4">
+                      Settings
+                    </Typography>
+                  </div>
+
+                  {this.props.scene.imageTypeFilter != IF.stills && (
+                    <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+                      <ExpansionPanelSummary
+                        expandIcon={<ExpandMoreIcon />}
+                      >
+                        <Typography>Video Controls</Typography>
+                      </ExpansionPanelSummary>
+                      <ExpansionPanelDetails>
+                        <VideoCard
+                          scene={this.props.scene}
+                          otherScenes={this.getValidOverlays().map((o) => this.getScene(o.sceneID))}
+                          isPlaying={this.state.isPlaying}
+                          mainVideo={this.state.mainVideo}
+                          otherVideos={this.state.overlayVideos}
+                          onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+                      </ExpansionPanelDetails>
+                    </ExpansionPanel>
+                  )}
+
                   <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
                     <ExpansionPanelSummary
                       expandIcon={<ExpandMoreIcon />}
                     >
-                      <Typography>Video Controls</Typography>
+                      <Typography>Scene Options</Typography>
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails>
-                      <VideoCard
+                      <SceneOptionCard
+                        sidebar
+                        allScenes={this.props.scenes}
+                        isTagging={this.props.tags != null}
                         scene={this.props.scene}
-                        otherScenes={this.getValidOverlays().map((o) => this.getScene(o.sceneID))}
-                        isPlaying={this.state.isPlaying}
-                        mainVideo={this.state.mainVideo}
-                        otherVideos={this.state.overlayVideos}
                         onUpdateScene={this.props.onUpdateScene.bind(this)}/>
                     </ExpansionPanelDetails>
                   </ExpansionPanel>
-                )}
 
-                <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                  <ExpansionPanelSummary
-                    expandIcon={<ExpandMoreIcon />}
-                  >
-                    <Typography>Scene Options</Typography>
-                  </ExpansionPanelSummary>
-                  <ExpansionPanelDetails>
-                    <SceneOptionCard
-                      sidebar
-                      allScenes={this.props.scenes}
-                      isTagging={this.props.tags != null}
-                      scene={this.props.scene}
-                      onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-                  </ExpansionPanelDetails>
-                </ExpansionPanel>
+                  <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+                    <ExpansionPanelSummary
+                      expandIcon={<ExpandMoreIcon />}
+                    >
+                      <Typography>Image/Video Options</Typography>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                      <ImageVideoCard
+                        sidebar
+                        isPlayer
+                        scene={this.props.scene}
+                        onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+                    </ExpansionPanelDetails>
+                  </ExpansionPanel>
 
-                <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                  <ExpansionPanelSummary
-                    expandIcon={<ExpandMoreIcon />}
-                  >
-                    <Typography>Image/Video Options</Typography>
-                  </ExpansionPanelSummary>
-                  <ExpansionPanelDetails>
-                    <ImageVideoCard
-                      sidebar
-                      isPlayer
-                      scene={this.props.scene}
-                      onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-                  </ExpansionPanelDetails>
-                </ExpansionPanel>
+                  <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+                    <ExpansionPanelSummary
+                      expandIcon={<ExpandMoreIcon />}
+                    >
+                      <Typography>Zoom/Move</Typography>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                      <ZoomMoveCard
+                        sidebar
+                        scene={this.props.scene}
+                        onUpdateScene={this.props.onUpdateScene.bind(this)} />
+                    </ExpansionPanelDetails>
+                  </ExpansionPanel>
 
-                <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                  <ExpansionPanelSummary
-                    expandIcon={<ExpandMoreIcon />}
-                  >
-                    <Typography>Zoom/Move</Typography>
-                  </ExpansionPanelSummary>
-                  <ExpansionPanelDetails>
-                    <ZoomMoveCard
-                      sidebar
-                      scene={this.props.scene}
-                      onUpdateScene={this.props.onUpdateScene.bind(this)} />
-                  </ExpansionPanelDetails>
-                </ExpansionPanel>
+                  <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+                    <ExpansionPanelSummary
+                      expandIcon={<ExpandMoreIcon />}
+                    >
+                      <Typography>Cross-Fade</Typography>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                      <CrossFadeCard
+                        sidebar
+                        scene={this.props.scene}
+                        onUpdateScene={this.props.onUpdateScene.bind(this)} />
+                    </ExpansionPanelDetails>
+                  </ExpansionPanel>
 
-                <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                  <ExpansionPanelSummary
-                    expandIcon={<ExpandMoreIcon />}
-                  >
-                    <Typography>Cross-Fade</Typography>
-                  </ExpansionPanelSummary>
-                  <ExpansionPanelDetails>
-                    <CrossFadeCard
-                      sidebar
-                      scene={this.props.scene}
-                      onUpdateScene={this.props.onUpdateScene.bind(this)} />
-                  </ExpansionPanelDetails>
-                </ExpansionPanel>
+                  <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+                    <ExpansionPanelSummary
+                      expandIcon={<ExpandMoreIcon />}
+                    >
+                      <Typography>Strobe</Typography>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                      <StrobeCard
+                        sidebar
+                        scene={this.props.scene}
+                        onUpdateScene={this.props.onUpdateScene.bind(this)} />
+                    </ExpansionPanelDetails>
+                  </ExpansionPanel>
 
-                <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                  <ExpansionPanelSummary
-                    expandIcon={<ExpandMoreIcon />}
-                  >
-                    <Typography>Strobe</Typography>
-                  </ExpansionPanelSummary>
-                  <ExpansionPanelDetails>
-                    <StrobeCard
-                      sidebar
-                      scene={this.props.scene}
-                      onUpdateScene={this.props.onUpdateScene.bind(this)} />
-                  </ExpansionPanelDetails>
-                </ExpansionPanel>
+                  <ExpansionPanel TransitionProps={{ unmountOnExit: this.props.scene.audioEnabled }}>
+                    <ExpansionPanelSummary
+                      expandIcon={<ExpandMoreIcon />}
+                    >
+                      <Typography>Audio Tracks</Typography>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                      <AudioCard
+                        sidebar
+                        scene={this.props.scene}
+                        scenePaths={this.state.historyPaths}
+                        startPlaying={true}
+                        onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+                    </ExpansionPanelDetails>
+                  </ExpansionPanel>
 
-                <ExpansionPanel TransitionProps={{ unmountOnExit: this.props.scene.audioEnabled }}>
-                  <ExpansionPanelSummary
-                    expandIcon={<ExpandMoreIcon />}
-                  >
-                    <Typography>Audio Tracks</Typography>
-                  </ExpansionPanelSummary>
-                  <ExpansionPanelDetails>
-                    <AudioCard
-                      sidebar
-                      scene={this.props.scene}
-                      scenePaths={this.state.historyPaths}
-                      startPlaying={true}
-                      onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-                  </ExpansionPanelDetails>
-                </ExpansionPanel>
-
-                <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                  <ExpansionPanelSummary
-                    expandIcon={<ExpandMoreIcon />}
-                  >
-                    <Typography>Text Overlay</Typography>
-                  </ExpansionPanelSummary>
-                  <ExpansionPanelDetails>
-                    <TextCard
-                      sidebar
-                      scene={this.props.scene}
-                      onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-                  </ExpansionPanelDetails>
-                </ExpansionPanel>
-              </Drawer>
+                  <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+                    <ExpansionPanelSummary
+                      expandIcon={<ExpandMoreIcon />}
+                    >
+                      <Typography>Text Overlay</Typography>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                      <TextCard
+                        sidebar
+                        scene={this.props.scene}
+                        onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+                    </ExpansionPanelDetails>
+                  </ExpansionPanel>
+                </Drawer>
+              </React.Fragment>
             )}
 
-            <div
-              className={classes.hoverTagDrawer}
-              onMouseEnter={this.onMouseEnterTagDrawer.bind(this)}
-              onMouseLeave={this.onMouseLeaveTagDrawer.bind(this)}/>
-
             {this.state.hasStarted && this.props.allTags && (
-              <Drawer
-                variant="permanent"
-                anchor="bottom"
-                className={classes.tagDrawer}
-                classes={{paper: clsx(classes.tagDrawerPaper, this.state.tagDrawerHover && classes.tagDrawerPaperHover)}}
-                open={this.state.tagDrawerHover}
-                onMouseEnter={this.onMouseEnterTagDrawer.bind(this)}
-                onMouseLeave={this.onMouseLeaveTagDrawer.bind(this)}>
-                <div className={classes.tagList}>
-                  {this.props.allTags.map((tag) =>
-                    <Card className={clsx(classes.tag, tagNames && tagNames.includes(tag.name) && classes.selectedTag)} key={tag.id}>
-                      <CardActionArea onClick={this.props.toggleTag.bind(this, this.props.scene.libraryID, tag)}>
-                        <CardContent>
-                          <Typography component="h6" variant="body2">
-                            {tag.name}
-                          </Typography>
-                        </CardContent>
-                      </CardActionArea>
-                    </Card>
-                  )}
-                </div>
+              <React.Fragment>
+                <div
+                  className={classes.hoverTagDrawer}
+                  onMouseEnter={this.onMouseEnterTagDrawer.bind(this)}
+                  onMouseLeave={this.onMouseLeaveTagDrawer.bind(this)}/>
 
-              </Drawer>
+                <Drawer
+                  variant="permanent"
+                  anchor="bottom"
+                  className={classes.tagDrawer}
+                  classes={{paper: clsx(classes.tagDrawerPaper, this.state.tagDrawerHover && classes.tagDrawerPaperHover)}}
+                  open={this.state.tagDrawerHover}
+                  onMouseEnter={this.onMouseEnterTagDrawer.bind(this)}
+                  onMouseLeave={this.onMouseLeaveTagDrawer.bind(this)}>
+                  <div className={classes.tagList}>
+                    {this.props.allTags.map((tag) =>
+                      <Card className={clsx(classes.tag, tagNames && tagNames.includes(tag.name) && classes.selectedTag)} key={tag.id}>
+                        <CardActionArea onClick={this.props.toggleTag.bind(this, this.props.scene.libraryID, tag)}>
+                          <CardContent>
+                            <Typography component="h6" variant="body2">
+                              {tag.name}
+                            </Typography>
+                          </CardContent>
+                        </CardActionArea>
+                      </Card>
+                    )}
+                  </div>
+
+                </Drawer>
+              </React.Fragment>
             )}
 
             <Dialog
@@ -968,7 +978,7 @@ class Player extends React.Component {
   }
 
   start(canStart: boolean, force = false) {
-    const isLoaded = !force && (this.state.isMainLoaded && (this.getValidOverlays().length == 0 || this.state.areOverlaysLoaded.find((b) => !b) == null));
+    const isLoaded = !force && (this.state.isMainLoaded && (!this.props.scene.overlayEnabled || this.getValidOverlays().length == 0 || this.state.areOverlaysLoaded.find((b) => !b) == null));
     if (force || (canStart && (isLoaded || this.props.config.displaySettings.startImmediately))) {
       this.setState({hasStarted: true, isLoaded: true, startTime: this.state.startTime ?  this.state.startTime : new Date()});
     } else {

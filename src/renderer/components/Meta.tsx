@@ -1,13 +1,14 @@
 import {remote, ipcRenderer, IpcMessageEvent} from 'electron';
 import * as React from 'react';
 
-import {Box, CssBaseline, Dialog, DialogContent, DialogContentText, Slide, Snackbar, SnackbarContent} from "@material-ui/core";
+import {
+  Box, createMuiTheme, CssBaseline, Dialog, DialogContent, DialogContentText, Slide, Snackbar, SnackbarContent
+} from "@material-ui/core";
 import {ThemeProvider} from "@material-ui/styles";
 
 import {IPC} from "../data/const";
 import * as actions from '../data/actions';
 import AppStorage from '../data/AppStorage';
-import theme from '../data/theme';
 import FFAnalytics from "./FFAnalytics";
 import ScenePicker from './ScenePicker';
 import ConfigForm from './config/ConfigForm';
@@ -65,7 +66,7 @@ export default class Meta extends React.Component {
     const p = (fn: any) => this.progressAction.bind(this, fn);
 
     return (
-      <ThemeProvider theme={theme}>
+      <ThemeProvider theme={createMuiTheme(this.state.theme)}>
         <Box className="Meta">
           <CssBaseline />
           {this.state.route.length === 0 && (
@@ -239,11 +240,14 @@ export default class Meta extends React.Component {
             <ConfigForm
               config={this.state.config}
               scenes={this.state.scenes}
+              theme={this.state.theme}
               goBack={a(actions.goBack)}
               onBackup={appStorage.backup.bind(appStorage)}
+              onChangeThemeColor={a(actions.changeThemeColor)}
               onClean={actions.cleanBackups}
               onDefault={a(actions.setDefaultConfig)}
               onRestore={a(actions.restoreFromBackup)}
+              onToggleDarkMode={a(actions.toggleDarkMode)}
               onUpdateConfig={a(actions.updateConfig)}
             />
           )}

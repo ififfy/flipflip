@@ -38,7 +38,7 @@ class ColorPicker extends React.Component {
   readonly props: {
     classes: any,
     currentColor: string,
-    sidebar: boolean,
+    sidebar?: boolean,
     onChangeColor(e: any): void,
   };
 

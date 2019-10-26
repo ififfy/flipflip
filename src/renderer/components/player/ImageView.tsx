@@ -1,59 +1,13 @@
 import * as React from 'react';
 import {animated, useSpring, useTransition} from "react-spring";
-import clsx from "clsx";
 import Timeout = NodeJS.Timeout;
-
-import {createStyles, Theme, withStyles} from "@material-ui/core";
 
 import {BT, HTF, SL, TF, VTF} from "../../data/const";
 import Scene from "../../data/Scene";
 import Strobe from "./Strobe";
 
-const styles = (theme: Theme) => createStyles({
-  imageView: {
-    zIndex: 2,
-    margin: '-5px -10px -10px -5px',
-  },
-  image: {
-    height: '100%',
-    width: '100%',
-    zIndex: 2,
-    backgroundPosition: 'center',
-    backgroundSize: 'contain',
-    backgroundRepeat: 'no-repeat',
-    position: 'absolute',
-  },
-  background: {
-    height: '100%',
-    width: '100%',
-    zIndex: 1,
-    backgroundSize: 'cover',
-  },
-  fadeLayer: {
-
-  },
-  zoomLayer: {
-    zIndex: 2,
-  },
-  strobe: {
-    zIndex: 2,
-  },
-  backgroundStrobe: {
-    zIndex: 1,
-  },
-  fillContainer: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    overflow: 'hidden',
-  },
-});
-
-class ImageView extends React.Component {
+export default class ImageView extends React.Component {
   readonly props: {
-    classes: any,
     image: HTMLImageElement | HTMLVideoElement,
     fitParent: boolean,
     hasStarted: boolean,
@@ -272,13 +226,38 @@ class ImageView extends React.Component {
   }
 
   render() {
-    const classes = this.props.classes;
-
     if (!this.props.image) {
       return (
-        <div className={clsx(classes.imageView, classes.fillContainer)}>
-          <div className={classes.image} ref={this.contentRef}/>
-          <div className={classes.background} ref={this.backgroundRef}/>
+        <div
+          style={{
+            zIndex: 2,
+            margin: '-5px -10px -10px -5px',
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
+            overflow: 'hidden',
+          }}>
+          <div
+            ref={this.contentRef}
+            style={{
+              height: '100%',
+              width: '100%',
+              zIndex: 2,
+              backgroundPosition: 'center',
+              backgroundSize: 'contain',
+              backgroundRepeat: 'no-repeat',
+              position: 'absolute',
+            }}/>
+          <div
+            ref={this.backgroundRef}
+            style={{
+              height: '100%',
+              width: '100%',
+              zIndex: 1,
+              backgroundSize: 'cover',
+            }}/>
         </div>
       );
     }
@@ -294,31 +273,69 @@ class ImageView extends React.Component {
       };
     }
     return (
-      <animated.div className={clsx(classes.imageView, classes.fillContainer)}>
+      <animated.div
+        style={{
+          zIndex: 2,
+          margin: '-5px -10px -10px -5px',
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          overflow: 'hidden',
+        }}>
         <this.FadeLayer>
           <this.ZoomMoveLayer>
             {(this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.image) && (
               <Strobe
-                className={classes.strobe}
+                zIndex={2}
                 toggleStrobe={this.props.toggleStrobe}
                 timeToNextFrame={this.props.timeToNextFrame}
                 scene={this.props.scene}
                 strobeFunction={this.strobeImage.bind(this)}>
-                <animated.div className={classes.image} ref={this.contentRef}/>
+                <animated.div
+                  ref={this.contentRef}
+                  style={{
+                    height: '100%',
+                    width: '100%',
+                    zIndex: 2,
+                    backgroundPosition: 'center',
+                    backgroundSize: 'contain',
+                    backgroundRepeat: 'no-repeat',
+                    position: 'absolute',
+                  }}/>
               </Strobe>
             )}
             {(!this.props.scene || !this.props.scene.strobe || this.props.scene.strobeLayer != SL.image) && (
-              <animated.div className={classes.image} ref={this.contentRef}/>
+              <animated.div
+                ref={this.contentRef}
+                style={{
+                  height: '100%',
+                  width: '100%',
+                  zIndex: 2,
+                  backgroundPosition: 'center',
+                  backgroundSize: 'contain',
+                  backgroundRepeat: 'no-repeat',
+                  position: 'absolute',
+                }}/>
             )}
           </this.ZoomMoveLayer>
           {this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.background && (
             <Strobe
-              className={classes.backgroundStrobe}
+              zIndex={1}
               toggleStrobe={this.props.toggleStrobe}
               timeToNextFrame={this.props.timeToNextFrame}
               scene={this.props.scene}/>
           )}
-          <animated.div className={classes.background} ref={this.backgroundRef} style={{...backgroundStyle}}/>
+          <animated.div
+            ref={this.backgroundRef}
+            style={{
+              height: '100%',
+              width: '100%',
+              zIndex: 1,
+              backgroundSize: 'cover',
+              ...backgroundStyle
+            }}/>
         </this.FadeLayer>
       </animated.div>
     );
@@ -391,12 +408,22 @@ class ImageView extends React.Component {
       }
     );
 
-    const classes = this.props.classes;
     return (
       <React.Fragment>
         {fadeTransitions.map(({item, props, key}) => {
           return (
-            <animated.div className={clsx(classes.fadeLayer, classes.fillContainer)} key={key} volume={props.volume} style={{ ...props }}>
+            <animated.div
+              key={key}
+              volume={props.volume}
+              style={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                bottom: 0,
+                left: 0,
+                overflow: 'hidden',
+                ...props
+              }}>
               {data.children}
             </animated.div>
           );
@@ -468,13 +495,20 @@ class ImageView extends React.Component {
       }
     );
 
-    const classes = this.props.classes;
     return (
-      <animated.div className={clsx(classes.zoomLayer, classes.fillContainer)} style={{ ...imageProps }}>
+      <animated.div
+        style={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          overflow: 'hidden',
+          zIndex: 2,
+          ...imageProps
+        }}>
         {data.children}
       </animated.div>
     );
   };
 }
-
-export default withStyles(styles)(ImageView as any);

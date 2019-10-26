@@ -55,7 +55,7 @@ const styles = (theme: Theme) => createStyles({
     flexGrow: 1,
     flexDirection: 'column',
     height: '100vh',
-    backgroundColor: (theme.palette.primary as any)["50"],
+    backgroundColor: theme.palette.background.default,
   },
   container: {
     padding: theme.spacing(0),

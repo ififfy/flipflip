@@ -3,6 +3,7 @@ import clsx from "clsx";
 import CreatableSelect from "react-select/creatable";
 
 import {createStyles, Theme, withStyles} from "@material-ui/core";
+import {grey} from "@material-ui/core/colors";
 
 import LibrarySource from "../../data/LibrarySource";
 
@@ -11,7 +12,7 @@ const styles = (theme: Theme) => createStyles({
     minWidth: 200,
     maxWidth: `calc(100% - ${theme.spacing(7)}px)`,
     maxHeight: theme.mixins.toolbar.minHeight,
-    color: theme.palette.text.primary,
+    color: grey[900],
   },
 });
 

@@ -133,7 +133,7 @@ const styles = (theme: Theme) => createStyles({
     flexGrow: 1,
     flexDirection: 'column',
     height: '100vh',
-    backgroundColor: (theme.palette.primary as any)["50"],
+    backgroundColor: theme.palette.background.default,
   },
   container: {
     height: '100%',
@@ -150,12 +150,14 @@ class ConfigForm extends React.Component {
     classes: any,
     config: Config,
     scenes: Array<Scene>,
+    theme: Theme,
     goBack(): void,
     onBackup(): void,
+    onChangeThemeColor(colorTheme: any, primary: boolean): void,
     onClean(): void,
     onDefault(): void,
     onRestore(backupFile: string): void,
-    onClean(): void,
+    onToggleDarkMode(): void,
     onUpdateConfig(config: Config): void,
   };
 
@@ -332,9 +334,12 @@ class ConfigForm extends React.Component {
                   <Box p={2} className={classes.fill}>
                     <GeneralConfig
                       config={this.state.config}
+                      theme={this.props.theme}
                       onBackup={this.props.onBackup.bind(this)}
+                      onChangeThemeColor={this.props.onChangeThemeColor.bind(this)}
                       onClean={this.props.onClean.bind(this)}
                       onRestore={this.onRestore.bind(this)}
+                      onToggleDarkMode={this.props.onToggleDarkMode.bind(this)}
                       onUpdateCachingSettings={this.onUpdateCachingSettings.bind(this)}
                       onUpdateConfig={this.onUpdateConfig.bind(this)}
                       onUpdateDisplaySettings={this.onUpdateDisplaySettings.bind(this)}

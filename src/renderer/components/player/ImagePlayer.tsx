@@ -35,9 +35,6 @@ const styles = (theme: Theme) => createStyles({
   overlayPlayer: {
     zIndex: 4,
   },
-  strobe: {
-    zIndex: 3,
-  },
 });
 
 class ImagePlayer extends React.Component {
@@ -100,7 +97,7 @@ class ImagePlayer extends React.Component {
            ref={this.idleTimerRef}>
         {(this.props.strobeLayer == SL.middle) && (
           <Strobe
-            className={classes.strobe}
+            zIndex={3}
             toggleStrobe={this._toggleStrobe}
             timeToNextFrame={this.state.timeToNextFrame}
             scene={this.props.scene}/>

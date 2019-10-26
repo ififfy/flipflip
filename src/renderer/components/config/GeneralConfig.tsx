@@ -8,6 +8,7 @@ import PlayerNumCard from "../configGroups/PlayerNumCard";
 import CacheCard from "../configGroups/CacheCard";
 import BackupCard from "../configGroups/BackupCard";
 import APICard from "../configGroups/APICard";
+import ThemeCard from "../configGroups/ThemeCard";
 
 const styles = (theme: Theme) => createStyles({});
 
@@ -15,9 +16,12 @@ class GeneralConfig extends React.Component {
   readonly props: {
     classes: any,
     config: Config,
+    theme: Theme,
     onBackup(): void,
+    onChangeThemeColor(colorTheme: any, primary: boolean): void,
     onClean(): void,
     onRestore(backupFile: string): void,
+    onToggleDarkMode(): void,
     onUpdateCachingSettings(fn: (settings: CacheSettings) => void): void,
     onUpdateDisplaySettings(fn: (settings: DisplaySettings) => void): void,
     onUpdateRemoteSettings(fn: (settings: RemoteSettings) => void): void,
@@ -75,6 +79,17 @@ class GeneralConfig extends React.Component {
                 onBackup={this.props.onBackup.bind(this)}
                 onRestore={this.props.onRestore.bind(this)}
                 onClean={this.props.onClean.bind(this)}/>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} sm={"auto"}>
+          <Card>
+            <CardContent>
+              <ThemeCard
+                theme={this.props.theme}
+                onChangeThemeColor={this.props.onChangeThemeColor.bind(this)}
+                onToggleDarkMode={this.props.onToggleDarkMode.bind(this)} />
             </CardContent>
           </Card>
         </Grid>

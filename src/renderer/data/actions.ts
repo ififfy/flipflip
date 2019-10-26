@@ -21,6 +21,7 @@ import {
   removeDuplicatesBy,
   saveDir
 } from "./utils";
+import defaultTheme from "./theme";
 import {AF, GT, PR, SF, ST, TT} from "./const";
 import { defaultInitialState } from './AppStorage';
 import { Route } from "./Route";
@@ -119,7 +120,37 @@ export function restoreFromBackup(state: State, backupFile: string): Object {
     progressNext: null as string,
     systemMessage: null as string,
     systemSnack: null as string,
+    theme: data.theme ? data.theme : defaultTheme,
   };
+}
+
+export function changeThemeColor(state: State, colorTheme: any, primary: boolean): Object {
+  const newTheme = state.theme;
+  if (primary) {
+    newTheme.palette.primary = colorTheme;
+    const type = newTheme.palette.type;
+    if (type === "dark") {
+      (newTheme.palette as any).background = {};
+    } else if (type === "light") {
+      (newTheme.palette as any).background = {default: colorTheme[50]};
+    }
+  } else {
+    newTheme.palette.secondary = colorTheme;
+  }
+  return {theme: newTheme};
+}
+
+export function toggleDarkMode(state: State): Object {
+  const newTheme = state.theme;
+  const type = newTheme.palette.type;
+  if (type === "dark") {
+    newTheme.palette.type = "light";
+    (newTheme.palette as any).background = {default: newTheme.palette.primary[50]};
+  } else if (type === "light") {
+    newTheme.palette.type = "dark";
+    (newTheme.palette as any).background = {};
+  }
+  return {theme: newTheme};
 }
 
 export function cleanBackups() {

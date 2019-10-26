@@ -16,16 +16,17 @@ import Tag from "../../data/Tag";
 import SourceIcon from "./SourceIcon";
 import LibrarySource from "../../data/LibrarySource";
 import Config from "../../data/Config";
+import {grey} from "@material-ui/core/colors";
 
 const styles = (theme: Theme) => createStyles({
   root: {
     display: 'flex',
   },
   oddChild: {
-    backgroundColor: (theme.palette.primary as any)["100"],
+    backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["100"] : grey[900],
   },
   evenChild: {
-    backgroundColor: (theme.palette.primary as any)["50"],
+    backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["50"] : theme.palette.background.default,
   },
   avatar: {
     backgroundColor: theme.palette.primary.main,
@@ -155,16 +156,14 @@ class SourceListItem extends React.Component {
                   {this.props.source.url}
                 </Typography>
                 {this.props.source.tags && this.props.source.tags.map((tag: Tag) =>
-                  <React.Fragment>
-                  <Chip
-                    key={tag.id}
-                    className={clsx(classes.actionButton, classes.fullTag)}
-                    label={tag.name}
-                    color="primary"
-                    size="small"
-                    variant="outlined"/>
+                  <React.Fragment key={tag.id}>
                     <Chip
-                      key={tag.id}
+                      className={clsx(classes.actionButton, classes.fullTag)}
+                      label={tag.name}
+                      color="primary"
+                      size="small"
+                      variant="outlined"/>
+                    <Chip
                       className={clsx(classes.actionButton, classes.simpleTag)}
                       label={this.getSimpleTag(tag.name)}
                       color="primary"

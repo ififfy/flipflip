@@ -30,7 +30,7 @@ const styles = (theme: Theme) => createStyles({
     flexGrow: 1,
     flexDirection: 'column',
     height: '100vh',
-    backgroundColor: (theme.palette.primary as any)["50"],
+    backgroundColor: theme.palette.background.default,
   },
   videoContent: {
     display: 'flex',
@@ -69,7 +69,7 @@ const styles = (theme: Theme) => createStyles({
     flexBasis: '3%',
   },
   clipDrawerPaper: {
-    backgroundColor: (theme.palette.primary as any)["50"],
+    backgroundColor: theme.palette.background.default,
     padding: theme.spacing(1),
   },
   emptyMessage: {

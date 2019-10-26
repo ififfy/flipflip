@@ -10,6 +10,7 @@ import WeightGroup from "../data/WeightGroup";
 import Config from "./Config";
 import Scene from './Scene';
 import SceneGrid from "./SceneGrid";
+import defaultTheme from "./theme";
 
 /**
  * A compile-time global variable defined in webpack.config' [plugins]
@@ -39,6 +40,7 @@ export const defaultInitialState = {
   progressNext: null as string,
   systemMessage: null as string,
   systemSnack: null as string,
+  theme: defaultTheme,
 };
 
 /**
@@ -101,6 +103,7 @@ export default class AppStorage {
             progressNext: null as string,
             systemMessage: null as string,
             systemSnack: null as string,
+            theme: defaultTheme,
           };
           // Hydrate and add the library ! Yay!!! :)
           let libraryID = 0;
@@ -165,6 +168,7 @@ export default class AppStorage {
             progressNext: null as string,
             systemMessage: null as string,
             systemSnack: null as string,
+            theme: defaultTheme,
           };
           for (let r of this.initialState.route) {
             if (r.kind == 'generate' || r.kind == 'grid') {
@@ -321,6 +325,7 @@ export default class AppStorage {
             progressNext: null as string,
             systemMessage: null as string,
             systemSnack: null as string,
+            theme: data.theme,
           };
       }
     }
