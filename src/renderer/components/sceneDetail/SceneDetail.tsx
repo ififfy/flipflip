@@ -70,7 +70,7 @@ const styles = (theme: Theme) => createStyles({
     fontSize: theme.typography.h4.fontSize,
   },
   noTitle: {
-    width: theme.spacing(7),
+    width: '33%',
     height: theme.spacing(7),
   },
   drawer: {
@@ -312,7 +312,7 @@ class SceneDetail extends React.Component {
   };
 
   readonly state = {
-    isEditingName: this.props.autoEdit,
+    isEditingName: this.props.autoEdit ? this.props.scene.name : null as string,
     drawerOpen: false,
     menuAnchorEl: null as any,
     openMenu: null as string,
@@ -340,14 +340,13 @@ class SceneDetail extends React.Component {
               </IconButton>
             </Tooltip>
 
-            {/*TODO Drive this off state so it responds faster*/}
-            {this.state.isEditingName && (
+            {this.state.isEditingName != null && (
               <form onSubmit={this.endEditingName.bind(this)} className={classes.titleField}>
                 <TextField
                   autoFocus
                   fullWidth
                   id="title"
-                  value={this.props.scene.name}
+                  value={this.state.isEditingName}
                   margin="none"
                   ref={this.nameInputRef}
                   inputProps={{className: classes.titleInput}}
@@ -356,7 +355,7 @@ class SceneDetail extends React.Component {
                 />
               </form>
             )}
-            {!this.state.isEditingName && (
+            {this.state.isEditingName == null && (
               <React.Fragment>
                 <div className={classes.fill}/>
                 <Typography component="h1" variant="h4" color="inherit" noWrap
@@ -988,16 +987,17 @@ class SceneDetail extends React.Component {
   }
 
   beginEditingName() {
-    this.setState({isEditingName: true});
+    this.setState({isEditingName: this.props.scene.name});
   }
 
   endEditingName(e: Event) {
     e.preventDefault();
-    this.setState({isEditingName: false});
+    this.changeKey('name', this.state.isEditingName);
+    this.setState({isEditingName: null});
   }
 
   onChangeName(e: React.FormEvent<HTMLInputElement>) {
-    this.changeKey('name', e.currentTarget.value);
+    this.setState({isEditingName:  e.currentTarget.value});
   }
 
   onUpdateSources(sources: Array<LibrarySource>) {

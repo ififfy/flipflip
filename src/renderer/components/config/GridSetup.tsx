@@ -43,8 +43,9 @@ const styles = (theme: Theme) => createStyles({
     display: 'flex',
   },
   titleField: {
-    width: '100%',
     margin: 0,
+    textAlign: 'center',
+    flexGrow: 1,
   },
   titleInput: {
     color: theme.palette.common.white,
@@ -52,7 +53,7 @@ const styles = (theme: Theme) => createStyles({
     fontSize: theme.typography.h4.fontSize,
   },
   noTitle: {
-    width: theme.spacing(7),
+    width: '33%',
     height: theme.spacing(7),
   },
   content: {
@@ -114,7 +115,7 @@ class GridSetup extends React.Component {
   };
 
   readonly state = {
-    isEditingName: this.props.autoEdit,
+    isEditingName: this.props.autoEdit ? this.props.grid.name : null as string,
     isEditing: null as Array<number>,
     menuAnchorEl: null as any,
     height: this.props.grid.grid && this.props.grid.grid.length > 0 &&
@@ -156,14 +157,13 @@ class GridSetup extends React.Component {
               </Tooltip>
             </div>
 
-            {/*TODO Drive this off state so it responds faster*/}
-            {this.state.isEditingName && (
+            {this.state.isEditingName != null && (
               <form onSubmit={this.endEditingName.bind(this)} className={classes.titleField}>
                 <TextField
                   autoFocus
                   fullWidth
                   id="title"
-                  value={this.props.grid.name}
+                  value={this.state.isEditingName}
                   margin="none"
                   ref={this.nameInputRef}
                   inputProps={{className: classes.titleInput}}
@@ -172,7 +172,7 @@ class GridSetup extends React.Component {
                 />
               </form>
             )}
-            {!this.state.isEditingName && (
+            {this.state.isEditingName == null && (
               <Typography component="h1" variant="h4" color="inherit" noWrap
                           className={clsx(classes.title, this.props.grid.name.length == 0 && classes.noTitle)} onClick={this.beginEditingName.bind(this)}>
                 {this.props.grid.name}
@@ -370,16 +370,17 @@ class GridSetup extends React.Component {
   }
 
   beginEditingName() {
-    this.setState({isEditingName: true});
+    this.setState({isEditingName: this.props.grid.name});
   }
 
   endEditingName(e: Event) {
     e.preventDefault();
-    this.setState({isEditingName: false});
+    this.changeKey('name', this.state.isEditingName);
+    this.setState({isEditingName: null});
   }
 
   onChangeName(e: React.FormEvent<HTMLInputElement>) {
-    this.changeKey('name', e.currentTarget.value);
+    this.setState({isEditingName:  e.currentTarget.value});
   }
 
   changeKey(key: string, value: any) {
