@@ -42,14 +42,12 @@ const styles = (theme: Theme) => createStyles({
     left: 0,
     overflow: 'hidden',
   },
-  innderDiv: {
+  innerDiv: {
     display: 'table-cell',
   },
   text: {
     textAlign: 'center',
     verticalAlign: 'middle',
-    webkitTextStrokeWidth: 1,
-    webkitTextStrokeColor: theme.palette.common.black,
     transition: theme.transitions.create('opacity', {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.shortest,
@@ -59,8 +57,6 @@ const styles = (theme: Theme) => createStyles({
     textAlign: 'center',
     verticalAlign: 'bottom',
     paddingBottom: '20vmin',
-    webkitTextStrokeWidth: 1,
-    webkitTextStrokeColor: theme.palette.common.black,
     transition: theme.transitions.create('opacity', {
       easing: theme.transitions.easing.easeInOut,
       duration: theme.transitions.duration.complex,
@@ -87,7 +83,9 @@ class CaptionProgram extends React.Component {
     countFontFamily: string,
     url: string,
     currentSource: string,
+    textEndStop: boolean,
     getTags(source: string): Array<Tag>
+    goBack(): void,
   };
 
   readonly state = {
@@ -111,7 +109,7 @@ class CaptionProgram extends React.Component {
     const classes = this.props.classes;
     return (
       <div className={clsx(classes.root, classes.fillContainer)}>
-        <div className={classes.innderDiv} ref={this.el}/>
+        <div ref={this.el}/>
       </div>
     );
   }
@@ -254,6 +252,10 @@ class CaptionProgram extends React.Component {
       this.state.program[this.state.programCounter](() => {
         let newCounter = this.state.programCounter + 1;
         if (newCounter >= this.state.program.length) {
+          if (this.props.textEndStop) {
+            this.props.goBack();
+            return;
+          }
           newCounter = 0;
         }
         this.setState({programCounter: newCounter});
@@ -297,7 +299,7 @@ class CaptionProgram extends React.Component {
       this.el.current.style.color = this.props.captionColor;
       this.el.current.style.fontSize = this.props.captionFontSize + "vmin";
       this.el.current.style.fontFamily = this.props.captionFontFamily;
-      this.el.current.className = this.props.classes.captionText;
+      this.el.current.className = clsx(this.props.classes.innerDiv, this.props.classes.captionText);
       showText(function() { wait(nextCommand); });
     }
   }
@@ -309,7 +311,7 @@ class CaptionProgram extends React.Component {
       this.el.current.style.color = this.props.captionBigColor;
       this.el.current.style.fontSize = this.props.captionBigFontSize + "vmin";
       this.el.current.style.fontFamily = this.props.captionBigFontFamily;
-      this.el.current.className = this.props.classes.text;
+      this.el.current.className = clsx(this.props.classes.innerDiv, this.props.classes.text);
       showText(function() { wait(nextCommand); });
     }
   }
@@ -334,7 +336,7 @@ class CaptionProgram extends React.Component {
       this.el.current.style.color = this.props.blinkColor;
       this.el.current.style.fontSize = this.props.blinkFontSize + "vmin";
       this.el.current.style.fontFamily = this.props.blinkFontFamily;
-      this.el.current.className = this.props.classes.text;
+      this.el.current.className = clsx(this.props.classes.innerDiv, this.props.classes.text);
       fns[0]();
     }
   }
@@ -370,7 +372,7 @@ class CaptionProgram extends React.Component {
       this.el.current.style.color = this.props.countColor;
       this.el.current.style.fontSize = this.props.countFontSize + "vmin";
       this.el.current.style.fontFamily = this.props.countFontFamily;
-      this.el.current.className = this.props.classes.text;
+      this.el.current.className = clsx(this.props.classes.innerDiv, this.props.classes.text);
       fns[0]();
     }
   }

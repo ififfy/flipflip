@@ -339,11 +339,13 @@ class Library extends React.Component {
     switch (this.props.progressMode) {
       case PR.offline:
         cancelProgressMessage = "Cancel Offline Check";
+        break;
       case PR.tumblr:
       case PR.reddit:
       case PR.twitter:
       case PR.instagram:
         cancelProgressMessage = "Cancel Import";
+        break;
     }
 
     return (

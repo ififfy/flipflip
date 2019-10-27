@@ -23,6 +23,7 @@ class AudioCard extends React.Component {
     scene: Scene | SceneSettings,
     sidebar: boolean,
     startPlaying: boolean,
+    goBack(): void,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 
@@ -61,6 +62,8 @@ class AudioCard extends React.Component {
             scene={this.props.scene}
             sidebar={this.props.sidebar}
             startPlaying={this.props.startPlaying}
+            stopAtEnd={a.stopAtEnd}
+            goBack={this.props.goBack.bind(this)}
             onUpdateScene={this.props.onUpdateScene.bind(this)}/>
         )}
       </Grid>

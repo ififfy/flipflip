@@ -58,6 +58,7 @@ class SceneEffects extends React.Component {
               <AudioCard
                 scene={this.props.scene}
                 startPlaying={false}
+                goBack={this.nop.bind(this)}
                 onUpdateScene={this.props.onUpdateScene.bind(this)}/>
             </CardContent>
           </Card>
@@ -75,6 +76,8 @@ class SceneEffects extends React.Component {
       </Grid>
     );
   }
+
+  nop() {}
 }
 
 export default withStyles(styles)(SceneEffects as any);

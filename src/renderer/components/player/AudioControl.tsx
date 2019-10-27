@@ -58,6 +58,7 @@ class AudioControl extends React.Component {
     scenePaths: Array<any>,
     sidebar: boolean,
     startPlaying: boolean,
+    goBack(): void,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 
@@ -110,6 +111,7 @@ class AudioControl extends React.Component {
             volume={this.props.audio.volume}
             position={this.state.position}
             onPlaying={this.onPlaying.bind(this)}
+            onFinishedPlaying={this.onFinishedPlaying.bind(this)}
           />
         )}
         <Grid item xs={12} className={clsx(!this.props.scene.audioEnabled && classes.noPadding)}>
@@ -203,14 +205,26 @@ class AudioControl extends React.Component {
               <Grid item xs={12}>
                 <Grid container spacing={2} alignItems="center">
                   <Grid item>
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          size="small"
-                          checked={audio.tick}
-                          onChange={this.onAudioBoolInput.bind(this, 'tick')}/>
-                      }
-                      label="Tick"/>
+                    <Collapse in={!audio.tick}>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            size="small"
+                            checked={audio.stopAtEnd}
+                            onChange={this.onAudioBoolInput.bind(this, 'stopAtEnd')}/>
+                        }
+                        label="Stop at End"/>
+                    </Collapse>
+                    <Collapse in={!audio.stopAtEnd}>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            size="small"
+                            checked={audio.tick}
+                            onChange={this.onAudioBoolInput.bind(this, 'tick')}/>
+                        }
+                        label="Tick"/>
+                    </Collapse>
                   </Grid>
                   <Divider component="div" orientation="vertical" style={{height: 48}}/>
                   <Grid item xs>
@@ -387,7 +401,7 @@ class AudioControl extends React.Component {
   }
 
   detectBPM() {
-    if (this.props.isFirst) {
+    if (this.props.isFirst && this.props.audio.url) {
       mm.parseFile(urlToPath(this.props.audio.url))
         .then((metadata: any) => {
           if (metadata && metadata.common && metadata.common.bpm) {
@@ -498,6 +512,12 @@ class AudioControl extends React.Component {
 
   update(fn: (scene: any) => void) {
     this.props.onUpdateScene(this.props.scene, fn);
+  }
+
+  onFinishedPlaying() {
+    if (this.props.audio.stopAtEnd && this.props.goBack) {
+      this.props.goBack();
+    }
   }
 
   onPlaying(soundData: any) {

@@ -444,7 +444,9 @@ class Player extends React.Component {
             countFontSize={this.props.scene.countFontSize}
             countFontFamily={this.props.scene.countFontFamily}
             url={this.props.scene.textSource}
-            getTags={this.props.getTags}
+            textEndStop={this.props.scene.textEndStop}
+            getTags={this.props.getTags.bind(this)}
+            goBack={this.props.goBack.bind(this)}
             currentSource={this.state.historyPaths.length > 0 ? this.state.historyPaths[0].getAttribute("source") : null}/>
         )}
 
@@ -639,6 +641,7 @@ class Player extends React.Component {
                         scene={this.props.scene}
                         scenePaths={this.state.historyPaths}
                         startPlaying={true}
+                        goBack={this.props.goBack.bind(this)}
                         onUpdateScene={this.props.onUpdateScene.bind(this)}/>
                     </ExpansionPanelDetails>
                   </ExpansionPanel>
