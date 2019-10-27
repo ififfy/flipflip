@@ -2,7 +2,7 @@ import * as React from 'react';
 import {animated, useSpring, useTransition} from "react-spring";
 import Timeout = NodeJS.Timeout;
 
-import {BT, HTF, SL, TF, VTF} from "../../data/const";
+import {BT, HTF, IT, SL, TF, VTF} from "../../data/const";
 import Scene from "../../data/Scene";
 import Strobe from "./Strobe";
 
@@ -167,34 +167,62 @@ export default class ImageView extends React.Component {
       }
     }
 
-    if (this.props.scene.fillView) {
-      if (imgAspect > parentAspect) {
-        const scale = parentHeight / imgHeight;
+    switch(this.props.scene.imageType) {
+      case (IT.fitBestClip):
+        if (imgAspect > parentAspect) {
+          const scale = parentHeight / imgHeight;
+          img.style.width = 'auto';
+          img.style.height = '100%';
+          img.style.marginTop = '0';
+          img.style.marginLeft = (parentWidth / 2 - imgWidth * scale / 2) + 'px';
+        } else {
+          const scale = parentWidth / imgWidth;
+          img.style.width = '100%';
+          img.style.height = 'auto';
+          img.style.marginTop = (parentHeight / 2 - imgHeight * scale / 2) + 'px';
+          img.style.marginLeft = '0';
+        }
+        break;
+      default:
+      case (IT.fitBestNoClip):
+        if (imgAspect < parentAspect) {
+          const scale = parentHeight / imgHeight;
+          img.style.width = 'auto';
+          img.style.height = '100%';
+          img.style.marginTop = '0';
+          img.style.marginLeft = (parentWidth / 2 - imgWidth * scale / 2) + 'px';
+        } else {
+          const scale = parentWidth / imgWidth;
+          img.style.width = '100%';
+          img.style.height = 'auto';
+          img.style.marginTop = (parentHeight / 2 - imgHeight * scale / 2) + 'px';
+          img.style.marginLeft = '0';
+        }
+        break;
+      case (IT.stretch):
+        img.style.width = '100%';
+        img.style.height = '100%';
+        break;
+      case (IT.center):
+        const top = Math.max(parentHeight - imgHeight, 0);
+        const left = Math.max(parentWidth - imgWidth, 0);
+        img.style.marginTop = top / 2 + 'px';
+        img.style.marginLeft = left / 2 + 'px';
+        break;
+      case (IT.fitWidth):
+        const hScale = parentWidth / imgWidth;
+        img.style.width = '100%';
+        img.style.height = 'auto';
+        img.style.marginTop = (parentHeight / 2 - imgHeight * hScale / 2) + 'px';
+        img.style.marginLeft = '0';
+        break;
+      case (IT.fitHeight):
+        const wScale = parentHeight / imgHeight;
         img.style.width = 'auto';
         img.style.height = '100%';
         img.style.marginTop = '0';
-        img.style.marginLeft = (parentWidth / 2 - imgWidth * scale / 2) + 'px';
-      } else {
-        const scale = parentWidth / imgWidth;
-        img.style.width = '100%';
-        img.style.height = 'auto';
-        img.style.marginTop = (parentHeight / 2 - imgHeight * scale / 2) + 'px';
-        img.style.marginLeft = '0';
-      }
-    } else {
-      if (imgAspect < parentAspect) {
-        const scale = parentHeight / imgHeight;
-        img.style.width = 'auto';
-        img.style.height = '100%';
-        img.style.marginTop = '0';
-        img.style.marginLeft = (parentWidth / 2 - imgWidth * scale / 2) + 'px';
-      } else {
-        const scale = parentWidth / imgWidth;
-        img.style.width = '100%';
-        img.style.height = 'auto';
-        img.style.marginTop = (parentHeight / 2 - imgHeight * scale / 2) + 'px';
-        img.style.marginLeft = '0';
-      }
+        img.style.marginLeft = (parentWidth / 2 - imgWidth * wScale / 2) + 'px';
+        break;
     }
 
     if (!forceBG) {

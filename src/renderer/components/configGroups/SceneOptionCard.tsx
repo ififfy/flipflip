@@ -9,7 +9,7 @@ import {
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 
-import {BT, TF} from "../../data/const";
+import {BT, IT, TF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
 import en from "../../data/en";
 import Overlay from "../../data/Overlay";
@@ -181,6 +181,19 @@ class SceneOptionCard extends React.Component {
         </Grid>
         <Grid item xs={12}>
           <Grid container spacing={2} alignItems="center">
+            <Grid item xs={this.props.sidebar ? 8 : 12} sm={this.props.sidebar ? 8 : 6}>
+              <FormControl className={classes.fullWidth}>
+                <InputLabel>Image Sizing</InputLabel>
+                <Select
+                  value={this.props.scene.imageType}
+                  onChange={this.onInput.bind(this, 'imageType')}>
+                  {Object.values(IT).map((it) =>
+                    <MenuItem key={it} value={it}>{en.get(it)}</MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}/>
             <Grid item xs={this.props.sidebar ? 8 : 12} sm={this.props.sidebar ? 8 : 4}>
               <FormControl className={classes.fullWidth}>
                 <InputLabel>Background</InputLabel>
@@ -192,30 +205,7 @@ class SceneOptionCard extends React.Component {
                   )}
                 </Select>
               </FormControl>
-              {!this.props.sidebar && (
-                <FormControlLabel
-                  style={{paddingTop: 6}}
-                  control={
-                    <Switch checked={this.props.scene.fillView}
-                            size="small"
-                            onChange={this.onBoolInput.bind(this, 'fillView')}/>
-                  }
-                  label="Fill View"/>
-              )}
             </Grid>
-            {this.props.sidebar && (
-              <Grid item xs={4}>
-                <FormControlLabel
-                  style={{paddingTop: 6}}
-                  control={
-                    <Switch checked={this.props.scene.fillView}
-                            size="small"
-                            onChange={this.onBoolInput.bind(this, 'fillView')}/>
-                  }
-                  label="Fill View"/>
-              </Grid>
-            )}
-
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 8}>
               <Collapse in={this.props.scene.backgroundType == BT.blur} className={classes.fullWidth}>
                 <Typography id="scene-bg-color-slider" variant="caption" component="div" color="textSecondary">

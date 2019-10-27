@@ -42,6 +42,15 @@ const BT = { // background type
   none: 'bt.none',
 };
 
+const IT = { // image type
+  fitBestNoClip: 'it.fitBestNoClip',
+  fitBestClip: 'it.fitBestClip',
+  stretch: 'it.stretch',
+  center: 'it.center',
+  fitWidth: 'it.fitWidth',
+  fitHeight: 'it.fitHeight',
+};
+
 const HTF = { // horizontal translate functions
   none: 'htf.none',
   left: 'htf.left',
@@ -151,5 +160,5 @@ const IG = { // Instagram modes
 };
 
 export {
-  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG
+  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG
 };

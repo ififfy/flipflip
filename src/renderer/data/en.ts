@@ -29,6 +29,13 @@ export default new Map<string, string>([
   ['bt.color', 'Solid Color'],
   ['bt.none', 'None'],
 
+  ['it.fitBestNoClip', 'Fit Best (No Clipping)'],
+  ['it.fitBestClip', 'Fit Best (Clip Edges)'],
+  ['it.stretch', 'Stretch'],
+  ['it.center', 'Center'],
+  ['it.fitWidth', 'Fit Width'],
+  ['it.fitHeight', 'Fit Height'],
+
   ['htf.none', 'None'],
   ['htf.left', 'Left'],
   ['htf.right', 'Right'],

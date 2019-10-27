@@ -1,4 +1,4 @@
-import {BT, GO, HTF, IF, OF, SL, TF, VO, VTF, WF} from "./const";
+import {BT, GO, HTF, IF, IT, OF, SL, TF, VO, VTF, WF} from "./const";
 import Overlay from "./Overlay";
 import LibrarySource from "./LibrarySource";
 import Audio from "./Audio";
@@ -40,6 +40,7 @@ interface SceneSettingsI {
   fadeSinRate: number;
   fadeBPMMulti: number;
 
+  imageType: string;
   backgroundType: string;
   backgroundColor: string;
   backgroundBlur: number;
@@ -94,7 +95,6 @@ interface SceneSettingsI {
   audioEnabled: boolean;
   audios: Array<Audio>;
   bpm: number;
-  fillView: boolean;
 
   // migration only
   overlaySceneID: number;
@@ -185,6 +185,7 @@ export class SceneSettings implements SceneSettingsI {
   fadeSinRate = 100;
   fadeBPMMulti = 1;
 
+  imageType = IT.fitBestNoClip;
   backgroundType = BT.blur;
   backgroundColor = "#000000";
   backgroundBlur = 8;
@@ -241,7 +242,6 @@ export class SceneSettings implements SceneSettingsI {
   audioEnabled = false;
   audios: Array<Audio> = [];
   bpm = 0;
-  fillView = false;
 
   // migration only
   overlaySceneID = 0;

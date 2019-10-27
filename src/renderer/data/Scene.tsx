@@ -1,4 +1,4 @@
-import {BT, GO, HTF, IF, OF, SL, TF, TT, VO, VTF, WF} from './const';
+import {BT, GO, HTF, IF, IT, OF, SL, TF, VO, VTF, WF} from './const';
 import LibrarySource from "./LibrarySource";
 import Audio from "./Audio";
 import Overlay from "./Overlay";
@@ -39,6 +39,7 @@ export default class Scene {
   fadeDurationMax = 700;
   fadeSinRate = 100;
   fadeBPMMulti = 1;
+  imageType = IT.fitBestNoClip;
   backgroundType = BT.blur;
   backgroundColor = "#000000";
   backgroundBlur = 8;
@@ -93,7 +94,6 @@ export default class Scene {
   videoVolume = 0;
   audioEnabled = false;
   audios: Array<Audio> = [];
-  fillView = false;
   bpm = 0;
   generatorWeights?: Array<WeightGroup> = null;
   openTab = 2;
