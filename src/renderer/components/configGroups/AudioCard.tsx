@@ -25,6 +25,7 @@ class AudioCard extends React.Component {
     startPlaying: boolean,
     goBack(): void,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
+    scenePaths?: Array<any>,
   };
 
   render() {
@@ -60,6 +61,7 @@ class AudioCard extends React.Component {
             audio={a}
             isFirst={i == 0}
             scene={this.props.scene}
+            scenePaths={this.props.scenePaths}
             sidebar={this.props.sidebar}
             startPlaying={this.props.startPlaying}
             stopAtEnd={a.stopAtEnd}

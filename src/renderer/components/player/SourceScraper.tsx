@@ -1046,7 +1046,7 @@ function loadEHentai(systemMessage: Function, config: Config, source: LibrarySou
   });
 }
 
-export default class HeadlessScenePlayer extends React.Component {
+export default class SourceScraper extends React.Component {
   readonly props: {
     config: Config,
     scene: Scene,
