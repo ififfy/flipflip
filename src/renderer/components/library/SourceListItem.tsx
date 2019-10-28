@@ -4,7 +4,7 @@ import {remote} from "electron";
 
 import {
   Badge, Checkbox, Chip, createStyles, Fab, IconButton, ListItem, ListItemAvatar, ListItemSecondaryAction, ListItemText,
-  SvgIcon, TextField, Theme, Typography, withStyles
+  SvgIcon, TextField, Theme, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -126,12 +126,22 @@ class SourceListItem extends React.Component {
                 horizontal: 'left',
               }}
               badgeContent={<OfflineBoltIcon className={classes.errorIcon} />}>
-              <Fab
-                size="small"
-                onClick={this.onSourceIconClick.bind(this, this.props.source)}
-                className={clsx(classes.avatar, this.props.source.marked && classes.markedSource)}>
-                <SourceIcon url={this.props.source.url} className={clsx(classes.sourceIcon, this.props.source.marked && classes.sourceMarkedIcon)}/>
-              </Fab>
+              <Tooltip title={
+                <div>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Click: Library Tagging
+                  <br/>
+                  Shift+Click: Open Source
+                  <br/>
+                  &nbsp;&nbsp;Ctrl+Click: Open Cache
+                </div>
+              }>
+                <Fab
+                  size="small"
+                  onClick={this.onSourceIconClick.bind(this, this.props.source)}
+                  className={clsx(classes.avatar, this.props.source.marked && classes.markedSource)}>
+                  <SourceIcon url={this.props.source.url} className={clsx(classes.sourceIcon, this.props.source.marked && classes.sourceMarkedIcon)}/>
+                </Fab>
+                </Tooltip>
             </Badge>
           </ListItemAvatar>
 

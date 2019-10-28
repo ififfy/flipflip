@@ -64,7 +64,6 @@ class AudioCard extends React.Component {
             scenePaths={this.props.scenePaths}
             sidebar={this.props.sidebar}
             startPlaying={this.props.startPlaying}
-            stopAtEnd={a.stopAtEnd}
             goBack={this.props.goBack.bind(this)}
             onUpdateScene={this.props.onUpdateScene.bind(this)}/>
         )}

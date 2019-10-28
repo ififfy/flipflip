@@ -254,6 +254,9 @@ const styles = (theme: Theme) => createStyles({
   icon: {
     color: theme.palette.primary.contrastText,
   },
+  playButton: {
+    boxShadow: 'none',
+  },
   maxMenu: {
     paddingLeft: theme.spacing(1),
     paddingRight: theme.spacing(2),
@@ -366,14 +369,14 @@ class SceneDetail extends React.Component {
               </React.Fragment>
             )}
 
-            <IconButton
+            <Fab
+              className={classes.playButton}
               disabled={this.props.scene.sources.length == 0}
-              edge="start"
-              color="inherit"
+              color="secondary"
               aria-label="Play"
               onClick={this.props.onPlayScene.bind(this)}>
               <PlayCircleOutlineIcon fontSize="large"/>
-            </IconButton>
+            </Fab>
           </Toolbar>
         </AppBar>
 

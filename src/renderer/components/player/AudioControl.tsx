@@ -106,11 +106,11 @@ class AudioControl extends React.Component {
             url={this.props.audio.url}
             playStatus={playing}
             playbackRate={this.props.audio.speed / 10}
-            loop={true}
-            autoLoad={true}
+            loop={!this.props.audio.stopAtEnd}
             volume={this.props.audio.volume}
             position={this.state.position}
             onPlaying={this.onPlaying.bind(this)}
+            onError={this.onError.bind(this)}
             onFinishedPlaying={this.onFinishedPlaying.bind(this)}
           />
         )}
@@ -250,9 +250,11 @@ class AudioControl extends React.Component {
                         <Select
                           value={audio.tickMode}
                           onChange={this.onAudioInput.bind(this, 'tickMode')}>
-                          {Object.values(TF).map((tf) =>
-                            <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
-                          )}
+                          {Object.values(TF).map((tf) => {
+                            if (tf != TF.bpm || !this.props.isFirst) {
+                              return <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>;
+                            } else return;
+                          })}
                         </Select>
                       </FormControl>
                     </Grid>
@@ -503,6 +505,11 @@ class AudioControl extends React.Component {
     const audio: any = newAudios.find((a) => a.id == this.props.audio.id);
     const input = (e.target as HTMLInputElement);
     audio[key] = input.checked;
+    if (key == 'tick' && input.checked) {
+      audio.stopAtEnd = !input.checked;
+    } else if (key == 'stopAtEnd' && input.checked) {
+      audio.tick = !input.checked;
+    }
     this.changeKey('audios', newAudios);
   }
 
@@ -529,7 +536,11 @@ class AudioControl extends React.Component {
     if (soundData.duration) {
       duration = soundData.duration;
     }
-    this.setState({position: position, duration: duration})
+    this.setState({position: position , duration: duration});
+  }
+
+  onError(errorCode: number, description: string) {
+    console.error(errorCode + " - " + description);
   }
 
   onPlay() {
