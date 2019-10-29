@@ -202,8 +202,10 @@ class SceneGenerator extends React.Component {
               <Slider
                 className={classes.editSlider}
                 max={this.getRemainingPercent() + isWeighing.percent}
-                value={isWeighing.percent}
-                onChange={this.onGroupSliderChange.bind(this, this.state.isWeighing, 'percent')}
+                defaultValue={isWeighing.percent}
+                onChangeCommitted={this.onGroupSliderChange.bind(this, this.state.isWeighing, 'percent')}
+                valueLabelDisplay={'auto'}
+                valueLabelFormat={(v) => v + "%"}
                 orientation="vertical"/>
             </div>
           )}

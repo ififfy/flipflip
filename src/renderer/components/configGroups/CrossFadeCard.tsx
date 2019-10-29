@@ -113,8 +113,9 @@ class CrossFadeCard extends React.Component {
                     <Grid item xs>
                       <Slider
                         min={1}
-                        value={fadeSinRate}
-                        onChange={this.onSliderChange.bind(this, 'fadeSinRate')}
+                        defaultValue={fadeSinRate}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'fadeSinRate')}
+                        valueLabelDisplay={'auto'}
                         aria-labelledby="fade-sin-rate-slider"/>
                     </Grid>
                     <Grid item xs={3} className={classes.percentInput}>
@@ -140,8 +141,10 @@ class CrossFadeCard extends React.Component {
                   <Slider
                     min={-8}
                     max={10}
-                    value={fadeBPMMulti}
-                    onChange={this.onSliderChange.bind(this, 'fadeBPMMulti')}
+                    defaultValue={fadeBPMMulti}
+                    onChangeCommitted={this.onSliderChange.bind(this, 'fadeBPMMulti')}
+                    valueLabelDisplay={'auto'}
+                    valueLabelFormat={(v) => v > 0 ? v + "x" : "1/" + (-1 * (v - 2)) + "x"}
                     aria-labelledby="fade-bpm-multi-slider"/>
                 </Collapse>
                 <Collapse in={this.props.scene.fadeTF == TF.constant} className={classes.fullWidth}>

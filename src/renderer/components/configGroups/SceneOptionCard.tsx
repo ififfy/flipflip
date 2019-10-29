@@ -97,8 +97,9 @@ class SceneOptionCard extends React.Component {
                   <Grid item xs>
                     <Slider
                       min={1}
-                      value={timingSinRate}
-                      onChange={this.onSliderChange.bind(this, 'timingSinRate')}
+                      defaultValue={timingSinRate}
+                      onChangeCommitted={this.onSliderChange.bind(this, 'timingSinRate')}
+                      valueLabelDisplay={'auto'}
                       aria-labelledby="scene-sin-rate-slider"/>
                   </Grid>
                   <Grid item xs={3} className={classes.percentInput}>
@@ -124,8 +125,10 @@ class SceneOptionCard extends React.Component {
                 <Slider
                   min={-8}
                   max={10}
-                  value={timingBPMMulti}
-                  onChange={this.onSliderChange.bind(this, 'timingBPMMulti')}
+                  defaultValue={timingBPMMulti}
+                  onChangeCommitted={this.onSliderChange.bind(this, 'timingBPMMulti')}
+                  valueLabelDisplay={'auto'}
+                  valueLabelFormat={(v) => v > 0 ? v + "x" : "1/" + (-1 * (v - 2)) + "x"}
                   aria-labelledby="scene-bpm-multi-slider"/>
               </Collapse>
               <Collapse in={this.props.scene.timingFunction == TF.constant} className={classes.fullWidth}>
@@ -226,8 +229,10 @@ class SceneOptionCard extends React.Component {
                 <Slider
                   min={0}
                   max={30}
-                  value={backgroundBlur}
-                  onChange={this.onSliderChange.bind(this, 'backgroundBlur')}
+                  defaultValue={backgroundBlur}
+                  onChangeCommitted={this.onSliderChange.bind(this, 'backgroundBlur')}
+                  valueLabelDisplay={'auto'}
+                  valueLabelFormat={(v) => v + "px"}
                   aria-labelledby="scene-bg-color-slider"/>
               </Collapse>
               <Collapse in={this.props.scene.backgroundType == BT.color} className={classes.fullWidth}>
@@ -343,8 +348,10 @@ class SceneOptionCard extends React.Component {
                               <Slider
                                 min={0}
                                 max={99}
-                                value={overlayOpacity}
-                                onChange={this.onOverlaySliderChange.bind(this, o.id, 'opacity')}
+                                defaultValue={overlayOpacity}
+                                onChangeCommitted={this.onOverlaySliderChange.bind(this, o.id, 'opacity')}
+                                valueLabelDisplay={'auto'}
+                                valueLabelFormat={(v) => v + "%"}
                                 aria-labelledby="overlay-opacity-slider"/>
                             </Grid>
                             <Grid item>
@@ -392,22 +399,6 @@ class SceneOptionCard extends React.Component {
   getSceneName(id: string): string {
     if (id === "0") return "None";
     return this.props.allScenes.filter((s) => s.id.toString() === id)[0].name;
-  }
-
-  blurOverlayIntKey(id: number, key: string, e: MouseEvent) {
-    const min = (e.currentTarget as any).min ? (e.currentTarget as any).min : null;
-    const max = (e.currentTarget as any).max ? (e.currentTarget as any).max : null;
-    if (min && (this.props.scene as any)[key] < min) {
-      const newOverlays = this.props.scene.overlays;
-      const overlay: any = newOverlays.find((o) => o.id == id);
-      overlay[key] = min === '' ? '' : Number(min);
-      this.changeKey('overlays', newOverlays);
-    } else if (max && (this.props.scene as any)[key] > max) {
-      const newOverlays = this.props.scene.overlays;
-      const overlay: any = newOverlays.find((o) => o.id == id);
-      overlay[key] = max === '' ? '' : Number(max);
-      this.changeKey('overlays', newOverlays);
-    }
   }
 
   onOverlaySliderChange(id: number, key: string, e: MouseEvent, value: number) {

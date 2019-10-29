@@ -238,8 +238,9 @@ class ImageVideoCard extends React.Component {
                   <VolumeDownIcon />
                 </Grid>
                 <Grid item xs>
-                  <Slider value={videoVolume}
-                          onChange={this.onSliderChange.bind(this, 'videoVolume')}/>
+                  <Slider
+                    defaultValue={videoVolume}
+                    onChangeCommitted={this.onSliderChange.bind(this, 'videoVolume')}/>
                 </Grid>
                 <Grid item>
                   <VolumeUpIcon />

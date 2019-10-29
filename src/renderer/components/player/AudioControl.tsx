@@ -235,8 +235,10 @@ class AudioControl extends React.Component {
                     <Slider
                       min={5}
                       max={40}
-                      value={audioSpeed}
-                      onChange={this.onAudioSliderChange.bind(this, 'speed')}
+                      defaultValue={audioSpeed}
+                      onChangeCommitted={this.onAudioSliderChange.bind(this, 'speed')}
+                      valueLabelDisplay={'auto'}
+                      valueLabelFormat={(v) => v/10 + "x"}
                       aria-labelledby="audio-speed-slider"/>
                   </Grid>
                 </Grid>
@@ -268,8 +270,9 @@ class AudioControl extends React.Component {
                           <Grid item xs>
                             <Slider
                               min={1}
-                              value={tickSinRate}
-                              onChange={this.onAudioSliderChange.bind(this, 'tickSinRate')}
+                              defaultValue={tickSinRate}
+                              onChangeCommitted={this.onAudioSliderChange.bind(this, 'tickSinRate')}
+                              valueLabelDisplay={'auto'}
                               aria-labelledby="tick-sin-rate-slider"/>
                           </Grid>
                           <Grid item xs={3} className={classes.percentInput}>
@@ -297,8 +300,10 @@ class AudioControl extends React.Component {
                         <Slider
                           min={-8}
                           max={10}
-                          value={tickBPMMulti}
-                          onChange={this.onAudioSliderChange.bind(this, 'tickBPMMulti')}
+                          defaultValue={tickBPMMulti}
+                          onChangeCommitted={this.onAudioSliderChange.bind(this, 'tickBPMMulti')}
+                          valueLabelDisplay={'auto'}
+                          valueLabelFormat={(v) => v > 0 ? v + "x" : "1/" + (-1 * (v - 2)) + "x"}
                           aria-labelledby="tick-bpm-multi-slider"/>
                       </Collapse>
                       <Collapse in={audio.tickMode == TF.constant} className={classes.fullWidth}>

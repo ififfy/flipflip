@@ -113,9 +113,10 @@ class StrobeCard extends React.Component {
                   <Grid container spacing={2} alignItems="center">
                     <Grid item xs>
                       <Slider
-                        min={0}
-                        value={strobeOpacity * 100}
-                        onChange={this.onPercentSliderChange.bind(this, 'strobeOpacity')}
+                        defaultValue={strobeOpacity * 100}
+                        onChangeCommitted={this.onPercentSliderChange.bind(this, 'strobeOpacity')}
+                        valueLabelDisplay={'auto'}
+                        valueLabelFormat={(v) => v + "%"}
                         aria-labelledby="strobe-opacity-slider"/>
                     </Grid>
                     <Grid item xs={3} className={classes.percentInput}>
@@ -171,8 +172,9 @@ class StrobeCard extends React.Component {
                     <Grid item xs>
                       <Slider
                         min={1}
-                        value={strobeSinRate}
-                        onChange={this.onSliderChange.bind(this, 'strobeSinRate')}
+                        defaultValue={strobeSinRate}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'strobeSinRate')}
+                        valueLabelDisplay={'auto'}
                         aria-labelledby="strobe-sin-rate-slider"/>
                     </Grid>
                     <Grid item xs={3} className={classes.percentInput}>
@@ -198,8 +200,10 @@ class StrobeCard extends React.Component {
                   <Slider
                     min={-8}
                     max={10}
-                    value={strobeBPMMulti}
-                    onChange={this.onSliderChange.bind(this, 'strobeBPMMulti')}
+                    defaultValue={strobeBPMMulti}
+                    onChangeCommitted={this.onSliderChange.bind(this, 'strobeBPMMulti')}
+                    valueLabelDisplay={'auto'}
+                    valueLabelFormat={(v) => v > 0 ? v + "x" : "1/" + (-1 * (v - 2)) + "x"}
                     aria-labelledby="strobe-bpm-multi-slider"/>
                 </Collapse>
                 <Collapse in={this.props.scene.strobeTF == TF.constant} className={classes.fullWidth}>
@@ -292,8 +296,9 @@ class StrobeCard extends React.Component {
                     <Grid item xs>
                       <Slider
                         min={1}
-                        value={strobeDelaySinRate}
-                        onChange={this.onSliderChange.bind(this, 'strobeDelaySinRate')}
+                        defaultValue={strobeDelaySinRate}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'strobeDelaySinRate')}
+                        valueLabelDisplay={'auto'}
                         aria-labelledby="strobe-delay-sin-rate-slider"/>
                     </Grid>
                     <Grid item xs={3} className={classes.percentInput}>
@@ -319,8 +324,10 @@ class StrobeCard extends React.Component {
                   <Slider
                     min={-8}
                     max={10}
-                    value={strobeDelayBPMMulti}
-                    onChange={this.onSliderChange.bind(this, 'strobeDelayBPMMulti')}
+                    defaultValue={strobeDelayBPMMulti}
+                    onChangeCommitted={this.onSliderChange.bind(this, 'strobeDelayBPMMulti')}
+                    valueLabelDisplay={'auto'}
+                    valueLabelFormat={(v) => v > 0 ? v + "x" : "1/" + (-1 * (v - 2)) + "x"}
                     aria-labelledby="strobe-delay-bpm-multi-slider"/>
                 </Collapse>
                 <Collapse in={this.props.scene.strobeDelayTF == TF.constant} className={classes.fullWidth}>

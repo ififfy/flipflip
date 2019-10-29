@@ -85,8 +85,10 @@ class ZoomMoveCard extends React.Component {
                 <Slider
                   min={1}
                   max={50}
-                  value={zoomStart*10}
-                  onChange={this.onZoomSliderChange.bind(this, 'zoomStart')}
+                  defaultValue={zoomStart*10}
+                  onChangeCommitted={this.onZoomSliderChange.bind(this, 'zoomStart')}
+                  valueLabelDisplay={'auto'}
+                  valueLabelFormat={(v) => v/10}
                   aria-labelledby="zoom-start-slider"/>
               </Grid>
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
@@ -96,8 +98,10 @@ class ZoomMoveCard extends React.Component {
                 <Slider
                   min={1}
                   max={50}
-                  value={zoomEnd*10}
-                  onChange={this.onZoomSliderChange.bind(this, 'zoomEnd')}
+                  defaultValue={zoomEnd*10}
+                  onChangeCommitted={this.onZoomSliderChange.bind(this, 'zoomEnd')}
+                  valueLabelDisplay={'auto'}
+                  valueLabelFormat={(v) => v/10}
                   aria-labelledby="zoom-end-slider"/>
               </Grid>
             </Grid>
@@ -122,9 +126,9 @@ class ZoomMoveCard extends React.Component {
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs>
                     <Slider
-                      min={0}
-                      value={horizTransLevel}
-                      onChange={this.onSliderChange.bind(this, 'horizTransLevel')}
+                      defaultValue={horizTransLevel}
+                      onChangeCommitted={this.onSliderChange.bind(this, 'horizTransLevel')}
+                      valueLabelDisplay={'auto'}
                       aria-labelledby="horiz-trans-level-slider"/>
                   </Grid>
                   <Grid item xs={3} className={classes.percentInput}>
@@ -169,9 +173,9 @@ class ZoomMoveCard extends React.Component {
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs>
                     <Slider
-                      min={0}
-                      value={vertTransLevel}
-                      onChange={this.onSliderChange.bind(this, 'vertTransLevel')}
+                      defaultValue={vertTransLevel}
+                      onChangeCommitted={this.onSliderChange.bind(this, 'vertTransLevel')}
+                      valueLabelDisplay={'auto'}
                       aria-labelledby="vert-trans-level-slider"/>
                   </Grid>
                   <Grid item xs={3} className={classes.percentInput}>
@@ -227,8 +231,9 @@ class ZoomMoveCard extends React.Component {
                     <Grid item xs>
                       <Slider
                         min={1}
-                        value={transSinRate}
-                        onChange={this.onSliderChange.bind(this, 'transSinRate')}
+                        defaultValue={transSinRate}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'transSinRate')}
+                        valueLabelDisplay={'auto'}
                         aria-labelledby="trans-sin-rate-slider"/>
                     </Grid>
                     <Grid item xs={3} className={classes.percentInput}>
@@ -254,8 +259,10 @@ class ZoomMoveCard extends React.Component {
                   <Slider
                     min={-8}
                     max={10}
-                    value={transBPMMulti}
-                    onChange={this.onSliderChange.bind(this, 'transBPMMulti')}
+                    defaultValue={transBPMMulti}
+                    onChangeCommitted={this.onSliderChange.bind(this, 'transBPMMulti')}
+                    valueLabelDisplay={'auto'}
+                    valueLabelFormat={(v) => v > 0 ? v + "x" : "1/" + (-1 * (v - 2)) + "x"}
                     aria-labelledby="trans-bpm-multi-slider"/>
                 </Collapse>
                 <Collapse in={this.props.scene.transTF == TF.constant} className={classes.fullWidth}>
