@@ -126,8 +126,8 @@ class TagManager extends React.Component {
     menuAnchorEl: null as any,
     tags: Array<Tag>(),
     isEditing: -1,
-    tagName: null as string,
-    tagPhrase: null as string,
+    tagName: "",
+    tagPhrase: "",
   };
 
   render() {
@@ -193,13 +193,14 @@ class TagManager extends React.Component {
           </div>
           <Dialog
             open={this.state.isEditing != -1}
-            onClose={this.onCloseDialog.bind(this)}
+            onClose={this.onCloseEditDialog.bind(this)}
             aria-labelledby="edit-title">
             <DialogTitle id="edit-title">Edit Tag</DialogTitle>
             <DialogContent>
               <TextField
                 autoFocus
                 fullWidth
+                required
                 label="Name"
                 value={this.state.tagName}
                 margin="dense"
@@ -209,6 +210,7 @@ class TagManager extends React.Component {
                 fullWidth
                 multiline
                 label="Tag Phrases"
+                helperText="These are used in place of $TAG_PHRASE for Caption scripts. One per line."
                 id="phrase"
                 value={this.state.tagPhrase}
                 margin="dense"
@@ -220,10 +222,10 @@ class TagManager extends React.Component {
               <IconButton onClick={this.onRemoveTag.bind(this)} style={{marginRight: 'auto'}}>
                 <DeleteIcon color="error"/>
               </IconButton>
-              <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+              <Button onClick={this.onCloseEditDialog.bind(this)} color="secondary">
                 Cancel
               </Button>
-              <Button onClick={this.onFinishEdit.bind(this)} color="primary">
+              <Button disabled={!this.state.tagName} onClick={this.onFinishEdit.bind(this)} color="primary">
                 OK
               </Button>
             </DialogActions>
@@ -334,7 +336,7 @@ class TagManager extends React.Component {
   }
 
   onCloseDialog() {
-    this.setState({menuAnchorEl: null, openMenu: null, isEditing: -1, tagName: null, tagPhrase: null});
+    this.setState({menuAnchorEl: null, openMenu: null, isEditing: -1, tagName: "", tagPhrase: ""});
   }
 
   onAddTag() {
@@ -351,11 +353,11 @@ class TagManager extends React.Component {
       name: "",
       id: id,
     })]);
-    this.setState({isEditing: id, tags: newTags});
+    this.setState({isEditing: id, tagName: "", tagPhrase: "", tags: newTags});
   }
 
   onRemoveTag() {
-    this.setState({tags: this.state.tags.filter((t) => t.id != this.state.isEditing), isEditing: -1, tagName: null, tagPhrase: null});
+    this.setState({tags: this.state.tags.filter((t) => t.id != this.state.isEditing), isEditing: -1, tagName: "", tagPhrase: ""});
   }
 
   onChangeTitle(e: MouseEvent) {
@@ -374,7 +376,7 @@ class TagManager extends React.Component {
     const tag = this.state.tags.find((t) => t.id == this.state.isEditing);
     tag.name = this.state.tagName;
     tag.phraseString = this.state.tagPhrase;
-    this.setState({tags: removeDuplicatesBy((t: Tag) => t.name, this.state.tags.filter((t) => t.name != "")), isEditing: -1, tagName: null, tagPhrase: null});
+    this.setState({tags: removeDuplicatesBy((t: Tag) => t.name, this.state.tags.filter((t) => t.name != "")), isEditing: -1, tagName: "", tagPhrase: ""});
   }
 
   onRemoveAll() {
@@ -383,6 +385,14 @@ class TagManager extends React.Component {
 
   onOpenSortMenu(e: MouseEvent) {
     this.setState({menuAnchorEl: e.currentTarget, openMenu: MO.sort});
+  }
+
+  onCloseEditDialog() {
+    if (this.state.isEditing == this.state.tags[this.state.tags.length - 1].id && this.state.tagName === "") {
+      this.onRemoveTag();
+    } else {
+      this.onCloseDialog();
+    }
   }
 
   onFinishRemoveAll() {

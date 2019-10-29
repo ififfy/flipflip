@@ -138,6 +138,7 @@ export default class Meta extends React.Component {
               progressTotal={this.state.progressTotal}
               selected={this.state.librarySelected}
               tags={this.state.tags}
+              tutorial={this.state.tutorial}
               yOffset={this.state.libraryYOffset}
               goBack={a(actions.goBack)}
               onAddSource={a(actions.addSource)}
@@ -155,6 +156,7 @@ export default class Meta extends React.Component {
               onMarkOffline={p(actions.markOffline)}
               onPlay={a(actions.playSceneFromLibrary)}
               onSort={a(actions.sortSources)}
+              onTutorial={a(actions.doneTutorial)}
               onUpdateLibrary={a(actions.replaceLibrary)}
               onUpdateMode={a(actions.setMode)}
               savePosition={a(actions.saveLibraryPosition)}

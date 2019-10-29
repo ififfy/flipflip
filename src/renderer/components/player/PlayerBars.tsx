@@ -561,6 +561,8 @@ class PlayerBars extends React.Component {
     clearInterval(this._interval);
     this._interval = null;
     clearTimeout(this._appBarTimeout);
+    clearTimeout(this._drawerTimeout);
+    clearTimeout(this._tagDrawerTimeout);
     this._appBarTimeout = null;
     this._drawerTimeout = null;
     this._tagDrawerTimeout = null;

@@ -212,6 +212,16 @@ const PT = { // Player Tutorials
   done: 'done',
 };
 
+const LT = { // Library Tutorials
+  welcome: 'lt1',
+  library: 'lt2',
+  toolbar: 'lt3',
+  sidebar1: 'lt4',
+  sidebar2: 'lt5',
+  final: 'lt6',
+  done: 'dont',
+};
+
 export {
-  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG, SPT, SDT, PT,
+  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG, SPT, SDT, PT, LT,
 };

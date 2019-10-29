@@ -28,7 +28,7 @@ import PublishIcon from '@material-ui/icons/Publish';
 import SelectAllIcon from '@material-ui/icons/SelectAll';
 import SortIcon from '@material-ui/icons/Sort';
 
-import {AF, MO, PR, SF, ST} from "../../data/const";
+import {AF, LT, MO, PR, SF, SPT, ST} from "../../data/const";
 import en from "../../data/en";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
@@ -260,9 +260,6 @@ const styles = (theme: Theme) => createStyles({
     height: '100%',
     width: '100%',
   },
-  backdropTop: {
-    zIndex: theme.zIndex.modal + 1,
-  },
   hidden: {
     opacity: 0,
     transition: theme.transitions.create(['margin', 'opacity'], {
@@ -273,6 +270,17 @@ const styles = (theme: Theme) => createStyles({
   noScroll: {
     overflow: 'visible',
   },
+  backdropTop: {
+    zIndex: theme.zIndex.modal + 1,
+  },
+  highlight: {
+    borderWidth: 2,
+    borderColor: theme.palette.secondary.main,
+    borderStyle: 'solid',
+  },
+  disable: {
+    pointerEvents: 'none',
+  }
 });
 
 class Library extends React.Component {
@@ -289,6 +297,7 @@ class Library extends React.Component {
     progressTotal: number,
     selected: Array<string>,
     tags: Array<Tag>,
+    tutorial: string,
     yOffset: number,
     goBack(): void,
     onAddSource(scene: Scene, type: string, ...args: any[]): void,
@@ -306,6 +315,7 @@ class Library extends React.Component {
     onMarkOffline(): void,
     onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void,
     onSort(scene: Scene, algorithm: string, ascending: boolean): void,
+    onTutorial(tutorial: string): void,
     onUpdateLibrary(sources: Array<LibrarySource>): void,
     onUpdateMode(mode: string): void,
     savePosition(yOffset: number, filters:Array<string>, selected: Array<string>): void,
@@ -350,7 +360,7 @@ class Library extends React.Component {
 
     return (
       <div className={classes.root} onKeyDown={this.secretHotkey.bind(this)} tabIndex={0}>
-        <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
+        <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift, this.props.tutorial == LT.toolbar && clsx(classes.backdropTop, classes.disable))}>
           <Toolbar className={classes.headerBar}>
             <div className={classes.headerLeft}>
               <Tooltip title={this.props.isSelect ? "Cancel Import" : "Back"} placement="right-end">
@@ -371,7 +381,7 @@ class Library extends React.Component {
             </Typography>
 
             <div className={classes.headerRight}>
-              <div className={classes.searchBar}>
+              <div className={clsx(classes.searchBar, this.props.tutorial == LT.toolbar && classes.highlight)}>
                 {this.props.library.length > 0 && (
                   <Chip
                     className={classes.searchCount}
@@ -389,7 +399,7 @@ class Library extends React.Component {
         </AppBar>
 
         <Drawer
-          className={clsx(classes.drawer, this.state.drawerOpen && classes.backdropTop)}
+          className={clsx(classes.drawer, (this.props.tutorial == LT.sidebar1 || this.props.tutorial == LT.sidebar2 || this.state.drawerOpen) && classes.backdropTop, this.props.tutorial == LT.sidebar2 && classes.highlight)}
           variant="permanent"
           classes={{paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose, (this.props.isSelect || this.props.isBatchTag) && classes.drawerPaperHidden)}}
           open={this.state.drawerOpen}>
@@ -398,14 +408,16 @@ class Library extends React.Component {
           </Collapse>
 
           <ListItem className={classes.drawerButton}>
-            <IconButton onClick={this.onToggleDrawer.bind(this)}>
+            <IconButton
+              className={clsx(this.props.tutorial == LT.sidebar1 && classes.highlight)}
+              onClick={this.onToggleDrawer.bind(this)}>
               <MenuIcon className={classes.drawerIcon}/>
             </IconButton>
           </ListItem>
 
           <Divider />
 
-          <div>
+          <div className={clsx(this.props.tutorial != null && classes.disable)}>
             <ListItem button onClick={this.props.onManageTags.bind(this)}>
               <ListItemIcon>
                 <LocalOfferIcon />
@@ -432,7 +444,7 @@ class Library extends React.Component {
             <React.Fragment>
               <Divider />
 
-              <div>
+              <div className={clsx(this.props.tutorial != null && classes.disable)}>
                 <Collapse in={open}>
                   <ListSubheader inset>
                     Import Remote Sources
@@ -476,7 +488,7 @@ class Library extends React.Component {
 
           <Divider />
 
-          <div>
+          <div className={clsx(this.props.tutorial != null && classes.disable)}>
             <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onMarkOffline.bind(this)}>
               <ListItemIcon>
                 <OfflineBoltIcon />
@@ -508,7 +520,7 @@ class Library extends React.Component {
 
           <div className={classes.fill}/>
 
-          <div>
+          <div className={clsx(this.props.tutorial != null && classes.disable)}>
             <ListItem button onClick={this.props.onExportLibrary.bind(this)}>
               <ListItemIcon>
                 <PublishIcon />
@@ -552,7 +564,7 @@ class Library extends React.Component {
         <Backdrop
           className={classes.backdrop}
           onClick={this.onCloseDialog.bind(this)}
-          open={this.state.openMenu == MO.new || this.state.drawerOpen} />
+          open={this.props.tutorial == null && (this.state.openMenu == MO.new || this.state.drawerOpen)} />
 
         {(this.props.isSelect || this.props.isBatchTag) && (
           <React.Fragment>
@@ -764,6 +776,9 @@ class Library extends React.Component {
     if (state.filters != this.state.filters || props.library != this.props.library) {
       this.setState({displaySources: this.getDisplaySources()});
     }
+    if (this.props.tutorial == LT.final && this.state.drawerOpen) {
+      this.setState({drawerOpen: false});
+    }
   }
 
   // Use alt+P to access import modal
@@ -812,6 +827,9 @@ class Library extends React.Component {
   }
 
   onToggleDrawer() {
+    if (this.props.tutorial == LT.sidebar1) {
+      this.props.onTutorial(LT.sidebar1);
+    }
     this.setState({drawerOpen: !this.state.drawerOpen});
   }
 

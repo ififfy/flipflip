@@ -22,7 +22,7 @@ import {
   saveDir
 } from "./utils";
 import defaultTheme from "./theme";
-import {AF, BT, GT, IF, OF, PR, PT, SDT, SF, SPT, ST, TF, TT} from "./const";
+import {AF, BT, GT, IF, LT, OF, PR, PT, SDT, SF, SPT, ST, TF, TT} from "./const";
 import { defaultInitialState } from './AppStorage';
 import { Route } from "./Route";
 import Scene from "./Scene";
@@ -166,6 +166,7 @@ export function skipTutorials(state: State): Object {
   newConfig.tutorials.scenePicker = 'done';
   newConfig.tutorials.sceneDetail = 'done';
   newConfig.tutorials.player = 'done';
+  newConfig.tutorials.library = 'done';
   // TODO Add rest of these
   return {config: newConfig, tutorial: null}
 }
@@ -193,6 +194,13 @@ export function doneTutorial(state: State, tutorial: string): Object {
       state.config.tutorials.player = 'done';
     } else {
       state.config.tutorials.player = tutorial;
+    }
+  } else if (isRoute(state, 'library')) {
+    if (tutorial == LT.final) {
+      newTutorial = null;
+      state.config.tutorials.library = 'done';
+    } else {
+      state.config.tutorials.library = tutorial;
     }
   }
   // TODO Add rest of these
@@ -462,7 +470,7 @@ export function goToGrid(state: State, scene: Scene): Object {
 }
 
 export function openLibrary(state: State): Object {
-  return {route: [new Route({kind: 'library', value: null})]};
+  return {route: [new Route({kind: 'library', value: null})], tutorial: state.config.tutorials.library == null ? LT.welcome : null};
 }
 
 export function openLibraryImport(state: State): Object {
@@ -986,7 +994,7 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
       animalTag.id = 1000001;
       animalTag.name = "Animals";
       combinedSources.unshift(new LibrarySource({
-        url: "https://cuteanimals.tumblr.com",
+        url: "https://imgur.com/a/mMslVXT",
         id: id,
         tags: [cuteTag, animalTag],
         count: 100,

@@ -20,7 +20,7 @@ import HttpIcon from '@material-ui/icons/Http';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import MovieIcon from '@material-ui/icons/Movie';
 
-import {PT, SDT, SPT, TF} from "../data/const";
+import {LT, PT, SDT, SPT, TF} from "../data/const";
 import {Route} from "../data/Route";
 import Config from "../data/Config";
 import Scene from "../data/Scene";
@@ -235,7 +235,7 @@ class Tutorial extends React.Component {
             <DialogTitle id="tutorial-title">Sources</DialogTitle>
             <DialogContent>
               <DialogContentText id="tutorial-description">
-                Great! Usually, you'd enter the URL for your source, but we've gone ahead and added cute animals for now.
+                Great! Usually, you'd enter the URL for your source, but we've gone ahead and added it for you this time.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 Actions have been disabled for this tutorial, but <b>let's look at each part of the source...</b>
@@ -254,7 +254,7 @@ class Tutorial extends React.Component {
             <DialogTitle id="tutorial-title">Source</DialogTitle>
             <DialogContent>
               <DialogContentText id="tutorial-description">
-                Next to each source is its <b>Avatar</b>. This will display the <b>type of source</b> (Tumblr in this case) and you
+                Next to each source is its <b>Avatar</b>. This will display the <b>type of source</b> (Imgur in this case) and you
                 can <b>click it</b> to do the following:
               </DialogContentText>
               <DialogContentText id="tutorial-description">
@@ -819,10 +819,10 @@ class Tutorial extends React.Component {
             <DialogTitle id="tutorial-title">Player</DialogTitle>
             <DialogContent>
               <DialogContentText id="tutorial-description">
-                To the left is a <b>sidebar</b> with almost all of the <b>options and effects from Scene Detail</b>.
+                To the left is a <b>sidebar</b> with <b>options and effects from Scene Detail</b>.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
-                <b>To improve performance</b>, each section is compressed until needed.
+                <i><b>To improve performance</b>, each section is compressed until needed.</i>
               </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -841,7 +841,7 @@ class Tutorial extends React.Component {
                 While <b>Tagging a source</b> in your <b>Library</b>, the set of tags will appear when you hover near the bottom.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
-                <i>Since we're not tagging, <b>there's nothing there</b>.</i>
+                🡇 <i>Since we're not tagging, <b>there's nothing there</b>.</i> 🡇
               </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -869,6 +869,129 @@ class Tutorial extends React.Component {
             <DialogActions>
               <Button onClick={this.onContinue.bind(this)} color="primary">
                 Back to Player
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+
+
+      case LT.welcome:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Library</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                This is your <b>Library</b>. Here you can <b>organize</b> all your different sources and use them <b>with your Scenes</b>.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onSkip.bind(this)} color="secondary">
+                Skip Tutorial
+              </Button>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case LT.library:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Library</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                The real power of the <b>Library</b> is the <b>Tagging</b> system. You can <b>Tag</b> sources
+                by <b>clicking the Avatar</b> next to it, or you can activate <b>batch tagging</b> in the sidebar.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                After you've tagged a few sources, you can create a <b>Scene Generator</b>. This is a special kind of
+                Scene which uses <b>tag based <u>rules</u></b> to randomly generate a set of sources.
+                <br/>
+                <i>e.g. A scene with 50% <b>cats</b> and 50% <b>llamas</b>.</i>
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case LT.toolbar:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Library</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                Use the <b>search bar</b> in the top right to <b>filter the sources</b> you are viewing. This can also
+                be very helpful when <b>tagging</b> and <b>importing</b> sources.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case LT.sidebar1:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Library</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                The sidebar has some other helpful tools.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                <b>Click the Hamburger button to expand the sidebar</b>
+              </DialogContentText>
+            </DialogContent>
+          </React.Fragment>;
+        break;
+      case LT.sidebar2:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Library</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                From here we can <b>manage tags</b>, <b>batch tag sources</b>, <b>import remote sources</b>, and <b>mark offline sources</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                <b>Remote source imports</b> (<i>Tumblr</i>, <i>Reddit</i>, <i>Twitter</i>, <i>Instagram</i>) will appear after you have logged into the relevant service in <b>Settings</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                While any of these processes are running, you will see a <b>progress bar</b>. Feel free to <b>continue using FlipFlip</b>. You will be <b>alerted</b> when the job is finished.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case LT.final:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Library</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                That's about it for the <b>Library</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                You can easily get your Library started by adding <b>local directories</b> or <b>videos</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                Alternatively, you can head to <b>Settings</b> (from the home page) and activate
+                <i>Tumblr</i>, <i>Reddit</i>, <i>Twitter</i>, and/or <i>Instagram</i> and then come back here to <b>import your sources</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                After you've <b>added a few tags</b>, you can <b>tag Sources by clicking their Avatar</b>.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Back to Library
               </Button>
             </DialogActions>
           </React.Fragment>;
@@ -1062,8 +1185,33 @@ class Tutorial extends React.Component {
             // We're done, don't show
             this.setTutorial(null);
             return;
-
-
+          default:
+            return;
+        }
+      case "library":
+        switch (this.props.config.tutorials.library) {
+          case LT.welcome:
+            this.setTutorial(LT.library);
+            return;
+          case LT.library:
+            this.setTutorial(LT.toolbar);
+            return;
+          case LT.toolbar:
+            this.setTutorial(LT.sidebar1);
+            return;
+          case LT.sidebar1:
+            this.setTutorial(LT.sidebar2);
+            return;
+          case LT.sidebar2:
+            this.setTutorial(LT.final);
+            return;
+          case LT.final:
+          case LT.done:
+            // We're done, don't show
+            this.setTutorial(null);
+            return;
+          default:
+            return;
         }
     }
   }
