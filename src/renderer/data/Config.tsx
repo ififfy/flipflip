@@ -148,6 +148,16 @@ interface DisplaySettingsI {
   maxInHistory: number;
 }
 
+interface TutorialsI {
+  [key: string]: string;
+
+  scenePicker: string;
+  sceneDetail: string;
+  sceneGenerator: string;
+  sceneGrid: string;
+  library: string;
+}
+
 export class SceneSettings implements SceneSettingsI {
   [key: string]: string | number | boolean | Array<LibrarySource> | Array<Overlay> | Array<Audio> | Array<Array<number>>;
 
@@ -306,11 +316,22 @@ export class DisplaySettings  implements DisplaySettingsI {
   maxInHistory = 500;
 }
 
+export class Tutorials implements TutorialsI {
+  [key: string]: string;
+
+  scenePicker = null as string;
+  sceneDetail = null as string;
+  sceneGenerator = null as string;
+  sceneGrid = null as string;
+  library = null as string;
+}
+
 export default class Config {
   defaultScene = new SceneSettings();
   remoteSettings = new RemoteSettings();
   caching = new CacheSettings();
   displaySettings = new DisplaySettings();
+  tutorials = new Tutorials();
   clientID = "";
   newWindowAlerted = false;
 
@@ -338,6 +359,11 @@ export default class Config {
     for (let key of Object.keys(new DisplaySettings())) {
       if (this.displaySettings[key] == null) {
         this.displaySettings[key] = new DisplaySettings()[key];
+      }
+    }
+    for (let key of Object.keys(new Tutorials())) {
+      if (this.tutorials[key] == null) {
+        this.tutorials[key] = new Tutorials()[key];
       }
     }
   }

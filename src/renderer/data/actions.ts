@@ -22,7 +22,7 @@ import {
   saveDir
 } from "./utils";
 import defaultTheme from "./theme";
-import {AF, GT, PR, SF, ST, TT} from "./const";
+import {AF, BT, GT, IF, OF, PR, SDT, SF, SPT, ST, TF, TT} from "./const";
 import { defaultInitialState } from './AppStorage';
 import { Route } from "./Route";
 import Scene from "./Scene";
@@ -34,6 +34,14 @@ import Tag from "../data/Tag";
 import SceneGrid from "./SceneGrid";
 
 type State = typeof defaultInitialState;
+
+// TODO - Long Term
+//      Fix/Improve resonsive design
+//      Make audios ordered by default, allow synchronous playback
+//      Implement tutorials
+//      Add UI option for excluding retweets (Fix markOffline)
+//      Resize ImageView when screen resizes ?
+//      Mosaic view for cards
 
 /** Getters **/
 
@@ -120,6 +128,7 @@ export function restoreFromBackup(state: State, backupFile: string): Object {
     progressNext: null as string,
     systemMessage: null as string,
     systemSnack: null as string,
+    tutorial: null as string,
     theme: data.theme ? data.theme : defaultTheme,
   };
 }
@@ -138,6 +147,47 @@ export function changeThemeColor(state: State, colorTheme: any, primary: boolean
     newTheme.palette.secondary = colorTheme;
   }
   return {theme: newTheme};
+}
+
+export function startTutorial(state: State): Object {
+  if (state.config.tutorials.scenePicker == null) {
+    return {tutorial: SPT.welcome}
+  } else {
+    return {}
+  }
+}
+
+export function setTutorial(state: State, tutorial: string): Object {
+  return {tutorial: tutorial};
+}
+
+export function skipTutorials(state: State): Object {
+  const newConfig = state.config;
+  newConfig.tutorials.scenePicker = 'done';
+  newConfig.tutorials.sceneDetail = 'done';
+  // TODO Add rest of these
+  return {config: newConfig, tutorial: null}
+}
+
+export function doneTutorial(state: State, tutorial: string): Object {
+  const newConfig = state.config;
+  let newTutorial = state.tutorial;
+  if (state.route.length == 0) {
+    if (tutorial == SPT.add2) {
+      newTutorial = null;
+      state.config.tutorials.scenePicker = 'done';
+    } else {
+      state.config.tutorials.scenePicker = tutorial;
+    }
+  } else if (isRoute(state, 'scene')) {
+    if (tutorial == SDT.play) {
+      newTutorial = null;
+      state.config.tutorials.sceneDetail = 'done';
+    }
+    state.config.tutorials.sceneDetail = tutorial;
+  }
+  // TODO Add rest of these
+  return {config: newConfig, tutorial: newTutorial};
 }
 
 export function toggleDarkMode(state: State): Object {
@@ -277,6 +327,8 @@ export function changeScenePickerTab(state: State, newTab: number): Object {
 }
 
 export function addScene(state: State): Object {
+  const tutorial = state.config.tutorials.sceneDetail == null;
+  let newTutorial = null;
   let id = state.scenes.length + 1;
   state.scenes.forEach((s: Scene) => {
     id = Math.max(s.id + 1, id);
@@ -287,10 +339,33 @@ export function addScene(state: State): Object {
     sources: new Array<LibrarySource>(),
     ...state.config.defaultScene,
   });
+  if (tutorial) {
+    scene.name = "Cute Stuff";
+    scene.timingFunction = TF.constant;
+    scene.timingConstant = 1000;
+    scene.nextSceneID = 0;
+    scene.overlayEnabled = false;
+    scene.imageTypeFilter = IF.any;
+    scene.orderFunction = OF.random;
+    scene.zoom = false;
+    scene.zoomStart = 1;
+    scene.zoomEnd = 2;
+    scene.transTF = TF.constant;
+    scene.transSinRate = 97;
+    scene.transDuration = 5000;
+    scene.transDurationMin = 1000;
+    scene.transDurationMax = 2000;
+    scene.crossFade = false;
+    scene.fadeTF = TF.constant;
+    scene.fadeDuration = 500;
+    scene.backgroundType = BT.blur;
+    newTutorial = SDT.welcome;
+  }
   return {
     scenes: state.scenes.concat([scene]),
+    tutorial: newTutorial,
     route: [new Route({kind: 'scene', value: scene.id})],
-    autoEdit: true,
+    autoEdit: !tutorial,
   };
 }
 
@@ -541,7 +616,7 @@ export function addGenerator(state: State): Object {
     name: "New Generator",
     sources: new Array<LibrarySource>(),
     generatorWeights: [],
-    openTab: 3,
+    openTab: 4,
     ...state.config.defaultScene,
   });
   return {
@@ -888,11 +963,36 @@ export function toggleTag(state: State, sourceID: number, tag: Tag): Object {
 export function addSource(state: State, scene: Scene, type: string, ...args: any[]): Object {
   let newSources = scene != null ? scene.sources : state.library;
   switch (type) {
+    case "tutorial":
+      let id = newSources.length + 1;
+      newSources.forEach((s) => {
+        id = Math.max(s.id + 1, id);
+      });
+
+      let combinedSources = Array.from(newSources);
+      const cuteTag = new Tag();
+      cuteTag.id = 1000000;
+      cuteTag.name = "Cute";
+      const animalTag = new Tag();
+      animalTag.id = 1000001;
+      animalTag.name = "Animals";
+      combinedSources.unshift(new LibrarySource({
+        url: "https://cuteanimals.tumblr.com",
+        id: id,
+        tags: [cuteTag, animalTag],
+        count: 100,
+      }));
+      newSources = combinedSources;
+      break;
     case AF.library:
       return openLibraryImport(state);
 
     case AF.url:
-      newSources = addSources(newSources, [""]);
+      if (!args || args.length != 1) {
+        newSources = addSources(newSources, [""]);
+      } else {
+        newSources = addSources(newSources, args[0]);
+      }
       break;
 
     case AF.directory:
@@ -910,7 +1010,7 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
       break;
 
     case GT.local:
-      if (!args || args.length < 2) {
+      if (!args || args.length != 2) {
         return;
       }
       let rootDir = args[1];
@@ -921,7 +1021,7 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
       break;
 
     case GT.tumblr:
-      if (!args || args.length < 1) {
+      if (!args || args.length != 1) {
         return;
       }
       newSources = addSources(newSources, getImportURLs(args[0]));

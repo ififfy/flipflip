@@ -11,7 +11,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import OfflineBoltIcon from '@material-ui/icons/OfflineBolt';
 
 import {getCachePath, getFileName, getSourceType, urlToPath} from "../../data/utils";
-import {ST} from "../../data/const";
+import {SDT, ST} from "../../data/const";
 import Tag from "../../data/Tag";
 import SourceIcon from "./SourceIcon";
 import LibrarySource from "../../data/LibrarySource";
@@ -78,6 +78,14 @@ const styles = (theme: Theme) => createStyles({
     width: '100%',
     margin: 0,
   },
+  highlight: {
+    borderWidth: 2,
+    borderColor: theme.palette.secondary.main,
+    borderStyle: 'solid',
+  },
+  disable: {
+    pointerEvents: 'none',
+  }
 });
 
 class SourceListItem extends React.Component {
@@ -91,6 +99,7 @@ class SourceListItem extends React.Component {
     source: LibrarySource,
     sources: Array<LibrarySource>,
     style: any,
+    tutorial: string,
     onClean(source: LibrarySource): void,
     onClearBlacklist(sourceURL: string): void,
     onClip(source: LibrarySource): void,
@@ -109,9 +118,11 @@ class SourceListItem extends React.Component {
 
   render() {
     const classes = this.props.classes;
-
     return(
-      <div style={this.props.style} className={clsx(this.props.index % 2 == 0 ? classes.evenChild : classes.oddChild)}>
+      <div style={this.props.style}
+           className={clsx(this.props.index % 2 == 0 ? classes.evenChild : classes.oddChild,
+             this.props.tutorial == SDT.source && classes.highlight,
+             this.props.tutorial && classes.disable)}>
         <ListItem>
           {this.props.isSelect && (
             <Checkbox value={this.props.source.url} onChange={this.props.onToggleSelect.bind(this)}
@@ -138,7 +149,7 @@ class SourceListItem extends React.Component {
                 <Fab
                   size="small"
                   onClick={this.onSourceIconClick.bind(this, this.props.source)}
-                  className={clsx(classes.avatar, this.props.source.marked && classes.markedSource)}>
+                  className={clsx(classes.avatar, this.props.source.marked && classes.markedSource, this.props.tutorial == SDT.sourceAvatar && classes.highlight)}>
                   <SourceIcon url={this.props.source.url} className={clsx(classes.sourceIcon, this.props.source.marked && classes.sourceMarkedIcon)}/>
                 </Fab>
                 </Tooltip>
@@ -162,19 +173,20 @@ class SourceListItem extends React.Component {
               <React.Fragment>
                 <Typography
                   noWrap
+                  className={clsx(this.props.tutorial == SDT.sourceTitle && classes.highlight)}
                   onClick={this.onStartEdit.bind(this, this.props.source)}>
                   {this.props.source.url}
                 </Typography>
                 {this.props.source.tags && this.props.source.tags.map((tag: Tag) =>
                   <React.Fragment key={tag.id}>
                     <Chip
-                      className={clsx(classes.actionButton, classes.fullTag)}
+                      className={clsx(classes.actionButton, classes.fullTag, this.props.tutorial == SDT.sourceTags && classes.highlight)}
                       label={tag.name}
                       color="primary"
                       size="small"
                       variant="outlined"/>
                     <Chip
-                      className={clsx(classes.actionButton, classes.simpleTag)}
+                      className={clsx(classes.actionButton, classes.simpleTag, this.props.tutorial == SDT.sourceTags && classes.highlight)}
                       label={this.getSimpleTag(tag.name)}
                       color="primary"
                       size="small"
@@ -186,10 +198,10 @@ class SourceListItem extends React.Component {
           </ListItemText>
 
           {this.props.isEditing != this.props.source.id && (
-            <ListItemSecondaryAction className={classes.source}>
+            <ListItemSecondaryAction className={clsx(classes.source, this.props.tutorial == SDT.sourceButtons && classes.highlight)}>
               {this.props.source.count > 0 && (
                 <Chip
-                  className={classes.countChip}
+                  className={clsx(classes.countChip, this.props.tutorial == SDT.sourceCount && classes.highlight)}
                   label={`${this.props.source.count}${this.props.source.countComplete ? '' : '+'}`}
                   color="primary"
                   size="small"/>

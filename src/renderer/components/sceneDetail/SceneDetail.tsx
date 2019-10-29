@@ -13,6 +13,7 @@ import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
+import AudiotrackIcon from '@material-ui/icons/Audiotrack';
 import BuildIcon from '@material-ui/icons/Build';
 import CachedIcon from '@material-ui/icons/Cached';
 import CollectionsIcon from '@material-ui/icons/Collections';
@@ -31,7 +32,7 @@ import SaveIcon from '@material-ui/icons/Save';
 import SortIcon from '@material-ui/icons/Sort';
 import WarningIcon from '@material-ui/icons/Warning';
 
-import {AF, MO, OF, SB, SF, TT, WF} from "../../data/const";
+import {AF, MO, OF, SB, SDT, SF, TT, WF} from "../../data/const";
 import en from "../../data/en";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
@@ -43,6 +44,7 @@ import SceneGenerator from "./SceneGenerator";
 import SceneOptions from "./SceneOptions";
 import URLDialog from "./URLDialog";
 import SourceList from "../library/SourceList";
+import AudioTextEffects from "./AudioTextEffects";
 
 const drawerWidth = 240;
 
@@ -168,11 +170,14 @@ const styles = (theme: Theme) => createStyles({
   effectsTab: {
     ariaControls: 'vertical-tabpanel-1',
   },
-  sourcesTab: {
+  audioTextTab: {
     ariaControls: 'vertical-tabpanel-2',
   },
-  generateTab: {
+  sourcesTab: {
     ariaControls: 'vertical-tabpanel-3',
+  },
+  generateTab: {
+    ariaControls: 'vertical-tabpanel-4',
   },
   deleteItem: {
     color: theme.palette.error.main,
@@ -276,9 +281,6 @@ const styles = (theme: Theme) => createStyles({
     height: '100%',
     width: '100%',
   },
-  backdropTop: {
-    zIndex: theme.zIndex.modal + 1,
-  },
   snackbarIcon: {
     fontSize: 20,
     opacity: 0.9,
@@ -288,6 +290,17 @@ const styles = (theme: Theme) => createStyles({
     display: 'flex',
     alignItems: 'center',
   },
+  backdropTop: {
+    zIndex: theme.zIndex.modal + 1,
+  },
+  highlight: {
+    borderWidth: 2,
+    borderColor: theme.palette.secondary.main,
+    borderStyle: 'solid',
+  },
+  disable: {
+    pointerEvents: 'none',
+  }
 });
 
 class SceneDetail extends React.Component {
@@ -299,6 +312,7 @@ class SceneDetail extends React.Component {
     library: Array<LibrarySource>,
     scene: Scene,
     tags: Array<Tag>,
+    tutorial: string,
     goBack(): void,
     onAddSource(scene: Scene, type: string, ...args: any[]): void,
     onClearBlacklist(sourceURL: string): void,
@@ -310,6 +324,7 @@ class SceneDetail extends React.Component {
     onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void,
     onSaveAsScene(scene: Scene): void,
     onSort(scene: Scene, algorithm: string, ascending: boolean): void,
+    onTutorial(tutorial: string): void,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
     systemMessage(message: string): void,
   };
@@ -331,7 +346,7 @@ class SceneDetail extends React.Component {
     return (
       <div className={classes.root} onKeyDown={this.secretHotkey.bind(this)} tabIndex={0}>
 
-        <AppBar position="absolute" className={classes.appBar}>
+        <AppBar position="absolute" className={clsx(classes.appBar, (this.props.tutorial == SDT.title || this.props.tutorial == SDT.play) && classes.backdropTop)}>
           <Toolbar>
             <Tooltip title="Back" placement="right-end">
               <IconButton
@@ -362,7 +377,7 @@ class SceneDetail extends React.Component {
               <React.Fragment>
                 <div className={classes.fill}/>
                 <Typography component="h1" variant="h4" color="inherit" noWrap
-                            className={clsx(classes.title, this.props.scene.name.length == 0 && classes.noTitle)} onClick={this.beginEditingName.bind(this)}>
+                            className={clsx(classes.title, this.props.scene.name.length == 0 && classes.noTitle, this.props.tutorial == SDT.title && classes.highlight)} onClick={this.beginEditingName.bind(this)}>
                   {this.props.scene.name}
                 </Typography>
                 <div className={classes.fill}/>
@@ -370,18 +385,18 @@ class SceneDetail extends React.Component {
             )}
 
             <Fab
-              className={classes.playButton}
+              className={clsx(classes.playButton, this.props.tutorial == SDT.play && classes.highlight)}
               disabled={this.props.scene.sources.length == 0}
               color="secondary"
               aria-label="Play"
-              onClick={this.props.onPlayScene.bind(this)}>
+              onClick={this.onPlayScene.bind(this)}>
               <PlayCircleOutlineIcon fontSize="large"/>
             </Fab>
           </Toolbar>
         </AppBar>
 
         <Drawer
-          className={clsx(classes.drawer, this.state.drawerOpen && classes.backdropTop)}
+          className={clsx(classes.drawer, (this.state.drawerOpen || this.props.tutorial == SDT.options1 || this.props.tutorial == SDT.effects1) && classes.backdropTop)}
           variant="permanent"
           classes={{paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose)}}
           open={this.state.drawerOpen}>
@@ -407,18 +422,22 @@ class SceneDetail extends React.Component {
               <Tab id="vertical-tab-0"
                    aria-controls="vertical-tabpanel-0"
                    icon={<BuildIcon/>} label={open ? "Options" : ""}
-                   className={clsx(classes.tab, classes.optionsTab, !open && classes.tabClose)}/>
+                   className={clsx(classes.tab, classes.optionsTab, !open && classes.tabClose, this.props.tutorial == SDT.options1 && classes.highlight, this.props.tutorial == SDT.effects1 && classes.disable)}/>
               <Tab id="vertical-tab-1"
                    aria-controls="vertical-tabpanel-1"
                    icon={<PhotoFilterIcon/>} label={open ? "Effects" : ""}
-                   className={clsx(classes.tab, classes.effectsTab, !open && classes.tabClose)}/>
+                   className={clsx(classes.tab, classes.effectsTab, !open && classes.tabClose, this.props.tutorial == SDT.options1 && classes.disable, this.props.tutorial == SDT.effects1 && classes.highlight)}/>
               <Tab id="vertical-tab-2"
                    aria-controls="vertical-tabpanel-2"
+                   icon={<AudiotrackIcon/>} label={open ? "Audio/Text" : ""}
+                   className={clsx(classes.tab, classes.audioTextTab, !open && classes.tabClose, this.props.tutorial == SDT.options1 && classes.disable, (this.props.tutorial == SDT.options1 || this.props.tutorial == SDT.effects1) && classes.disable)}/>
+              <Tab id="vertical-tab-3"
+                   aria-controls="vertical-tabpanel-3"
                    icon={<CollectionsIcon/>} label={open ? `Sources (${this.props.scene.sources.length})` : ""}
-                   className={clsx(classes.tab, classes.sourcesTab, !open && classes.tabClose)}/>
+                   className={clsx(classes.tab, classes.sourcesTab, !open && classes.tabClose, (this.props.tutorial == SDT.options1 || this.props.tutorial == SDT.effects1) && classes.disable)}/>
               {this.props.scene.generatorWeights && (
-                <Tab id="vertical-tab-3"
-                     aria-controls="vertical-tabpanel-3"
+                <Tab id="vertical-tab-4"
+                     aria-controls="vertical-tabpanel-4"
                      icon={<LocalOfferIcon/>} label={open ? `Generate (${this.props.scene.generatorWeights.length})` : ""}
                      className={clsx(classes.tab, classes.generateTab, !open && classes.tabClose)}/>
               )}
@@ -428,21 +447,21 @@ class SceneDetail extends React.Component {
 
           <div>
             {this.props.scene.generatorWeights && (
-              <ListItem button onClick={this.props.onSaveAsScene.bind(this, this.props.scene)}>
+              <ListItem button onClick={this.props.onSaveAsScene.bind(this, this.props.scene)} className={clsx((this.props.tutorial == SDT.options1 || this.props.tutorial == SDT.effects1) && classes.disable)}>
                 <ListItemIcon>
                   <SaveIcon />
                 </ListItemIcon>
                 <ListItemText primary="Save as Scene" />
               </ListItem>
             )}
-            <ListItem button onClick={this.props.onExport.bind(this, this.props.scene)}>
+            <ListItem button onClick={this.props.onExport.bind(this, this.props.scene)} className={clsx((this.props.tutorial == SDT.options1 || this.props.tutorial == SDT.effects1) && classes.disable)}>
               <ListItemIcon>
                 <PublishIcon />
               </ListItemIcon>
               <ListItemText primary="Export Scene" />
             </ListItem>
             <ListItem button onClick={this.onDeleteScene.bind(this, this.props.scene)}
-                      className={classes.deleteItem}>
+                      className={clsx(classes.deleteItem, (this.props.tutorial == SDT.options1 || this.props.tutorial == SDT.effects1) && classes.disable)}>
               <ListItemIcon>
                 <DeleteForeverIcon color="error"/>
               </ListItemIcon>
@@ -489,6 +508,7 @@ class SceneDetail extends React.Component {
                     <SceneOptions
                       allScenes={this.props.allScenes}
                       scene={this.props.scene}
+                      tutorial={this.props.tutorial}
                       onUpdateScene={this.props.onUpdateScene.bind(this)} />
                   </Box>
                 </div>
@@ -506,6 +526,7 @@ class SceneDetail extends React.Component {
                   <Box p={2} className={classes.fill}>
                     <SceneEffects
                       scene={this.props.scene}
+                      tutorial={this.props.tutorial}
                       onUpdateScene={this.props.onUpdateScene.bind(this)} />
                   </Box>
                 </div>
@@ -514,17 +535,35 @@ class SceneDetail extends React.Component {
 
             {this.props.scene.openTab === 2 && (
               <Typography
-                className={clsx(this.props.scene.openTab === 2 && classes.sourcesSection)}
                 component="div"
                 role="tabpanel"
                 id="vertical-tabpanel-2"
                 aria-labelledby="vertical-tab-2">
                 <div className={classes.tabPanel}>
                   <div className={classes.drawerSpacer}/>
+                  <Box p={2} className={classes.fill}>
+                    <AudioTextEffects
+                      scene={this.props.scene}
+                      onUpdateScene={this.props.onUpdateScene.bind(this)} />
+                  </Box>
+                </div>
+              </Typography>
+            )}
+
+            {this.props.scene.openTab === 3 && (
+              <Typography
+                className={clsx(this.props.scene.openTab === 3 && classes.sourcesSection)}
+                component="div"
+                role="tabpanel"
+                id="vertical-tabpanel-3"
+                aria-labelledby="vertical-tab-3">
+                <div className={classes.tabPanel}>
+                  <div className={classes.drawerSpacer}/>
                   <Box className={classes.fill}>
                     <SourceList
                       config={this.props.config}
                       sources={this.props.scene.sources}
+                      tutorial={this.props.tutorial}
                       onClearBlacklist={this.props.onClearBlacklist.bind(this)}
                       onClip={this.props.onClip.bind(this)}
                       onPlay={this.props.onPlay.bind(this)}
@@ -535,13 +574,13 @@ class SceneDetail extends React.Component {
               </Typography>
             )}
 
-            {this.props.scene.generatorWeights && this.props.scene.openTab === 3 && (
+            {this.props.scene.generatorWeights && this.props.scene.openTab === 4 && (
               <Typography
-                className={clsx(this.props.scene.openTab === 3 && classes.generateSection)}
+                className={clsx(this.props.scene.openTab === 4 && classes.generateSection)}
                 component="div"
                 role="tabpanel"
-                id="vertical-tabpanel-3"
-                aria-labelledby="vertical-tab-3">
+                id="vertical-tabpanel-4"
+                aria-labelledby="vertical-tab-4">
                 <div className={classes.tabPanel}>
                   <div className={classes.drawerSpacer}/>
                   <Box p={1} className={classes.fill}>
@@ -560,14 +599,14 @@ class SceneDetail extends React.Component {
         <Backdrop
           className={classes.backdrop}
           onClick={this.onCloseDialog.bind(this)}
-          open={this.state.openMenu == MO.new || this.state.drawerOpen} />
+          open={!this.props.tutorial && (this.state.openMenu == MO.new || this.state.drawerOpen)} />
 
-        {this.props.scene.openTab == 2 && (
+        {this.props.scene.openTab == 3 && (
           <React.Fragment>
             {this.props.scene.sources.length > 0 && (
               <Tooltip title="Remove All Sources"  placement="left">
                 <Fab
-                  className={clsx(classes.addButton, classes.removeAllButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop)}
+                  className={clsx(classes.addButton, classes.removeAllButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.props.tutorial && classes.disable)}
                   onClick={this.onRemoveAll.bind(this)}
                   size="small">
                   <DeleteSweepIcon className={classes.icon} />
@@ -596,7 +635,7 @@ class SceneDetail extends React.Component {
             </Dialog>
             <Tooltip title="From Library"  placement="left">
               <Fab
-                className={clsx(classes.addButton, classes.libraryImportButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop)}
+                className={clsx(classes.addButton, classes.libraryImportButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.props.tutorial && classes.disable)}
                 onClick={this.onAddSource.bind(this, AF.library)}
                 size="small">
                 <LocalLibraryIcon className={classes.icon} />
@@ -604,7 +643,7 @@ class SceneDetail extends React.Component {
             </Tooltip>
             <Tooltip title="Local Video"  placement="left">
               <Fab
-                className={clsx(classes.addButton, classes.addVideoButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop)}
+                className={clsx(classes.addButton, classes.addVideoButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.props.tutorial && classes.disable)}
                 onClick={this.onAddSource.bind(this, AF.videos)}
                 size="small">
                 <MovieIcon className={classes.icon} />
@@ -612,7 +651,7 @@ class SceneDetail extends React.Component {
             </Tooltip>
             <Tooltip title="Local Directory"  placement="left">
               <Fab
-                className={clsx(classes.addButton, classes.addDirectoryButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop)}
+                className={clsx(classes.addButton, classes.addDirectoryButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.props.tutorial && classes.disable)}
                 onClick={this.onAddSource.bind(this, AF.directory)}
                 size="small">
                 <FolderIcon className={classes.icon} />
@@ -620,14 +659,14 @@ class SceneDetail extends React.Component {
             </Tooltip>
             <Tooltip title="URL"  placement="left">
               <Fab
-                className={clsx(classes.addButton, classes.addURLButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop)}
+                className={clsx(classes.addButton, classes.addURLButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.openMenu != MO.new && classes.addButtonClose, this.props.tutorial == SDT.add2 && classes.highlight)}
                 onClick={this.onAddSource.bind(this, AF.url)}
                 size="small">
                 <HttpIcon className={classes.icon} />
               </Fab>
             </Tooltip>
             <Fab
-              className={clsx(classes.addMenuButton, this.state.openMenu == MO.new && classes.backdropTop)}
+              className={clsx(classes.addMenuButton, this.state.openMenu == MO.new && classes.backdropTop, (this.props.tutorial == SDT.add1 || this.props.tutorial == SDT.add2) && classes.backdropTop, this.props.tutorial == SDT.add1 && classes.highlight)}
               onClick={this.onToggleNewMenu.bind(this)}
               size="large">
               <AddIcon className={classes.icon} />
@@ -685,7 +724,7 @@ class SceneDetail extends React.Component {
           </React.Fragment>
         )}
 
-        {this.props.scene.openTab == 3 && (
+        {this.props.scene.openTab == 4 && (
           <React.Fragment>
             {this.props.scene.generatorWeights.length > 0 && (
               <React.Fragment>
@@ -849,6 +888,13 @@ class SceneDetail extends React.Component {
     this.setState({menuAnchorEl: e.currentTarget, openMenu: MO.max});
   }
 
+  onPlayScene() {
+    if (this.props.tutorial == SDT.play) {
+      this.props.onTutorial(SDT.play);
+    }
+    this.props.onPlayScene(this.props.scene);
+  }
+
   getRemainingPercent(): number {
     let remaining = 100;
     for (let wg of this.props.scene.generatorWeights) {
@@ -939,7 +985,12 @@ class SceneDetail extends React.Component {
 
   onAddSource(addFunction: string, e: MouseEvent, ...args: any[]) {
     this.onCloseDialog();
-    this.props.onAddSource(this.props.scene, addFunction, ...args);
+    if (this.props.tutorial == SDT.add2) {
+      this.props.onTutorial(SDT.add2);
+      this.props.onAddSource(this.props.scene, "tutorial");
+    } else {
+      this.props.onAddSource(this.props.scene, addFunction, ...args);
+    }
   }
 
   onToggleDrawer() {
@@ -947,6 +998,9 @@ class SceneDetail extends React.Component {
   }
 
   onToggleNewMenu() {
+    if (this.props.tutorial == SDT.add1) {
+      this.props.onTutorial(SDT.add1);
+    }
     this.setState({openMenu: this.state.openMenu == MO.new ? null : MO.new});
   }
 
@@ -959,6 +1013,14 @@ class SceneDetail extends React.Component {
   }
 
   onChangeTab(e: any, newTab: number) {
+    if (this.props.tutorial == SDT.options1) {
+      this.props.onTutorial(SDT.options1);
+      this.setState({drawerOpen: false});
+    }
+    if (this.props.tutorial == SDT.effects1) {
+      this.props.onTutorial(SDT.effects1);
+      this.setState({drawerOpen: false});
+    }
     this.changeKey('openTab', newTab);
   }
 

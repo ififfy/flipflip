@@ -40,6 +40,7 @@ export const defaultInitialState = {
   progressNext: null as string,
   systemMessage: null as string,
   systemSnack: null as string,
+  tutorial: null as string,
   theme: defaultTheme,
 };
 
@@ -103,6 +104,7 @@ export default class AppStorage {
             progressNext: null as string,
             systemMessage: null as string,
             systemSnack: null as string,
+            tutorial: null as string,
             theme: defaultTheme,
           };
           // Hydrate and add the library ! Yay!!! :)
@@ -157,7 +159,7 @@ export default class AppStorage {
             grids: Array<SceneGrid>(),
             library: data.library.map((s: any) => new LibrarySource(s)),
             tags: data.tags.map((t: any) => new Tag(t)),
-            route: data.route.map((s: any) => new Route(s)),
+            route: [],
             libraryYOffset: 0,
             libraryFilters: Array<string>(),
             librarySelected: Array<string>(),
@@ -168,14 +170,9 @@ export default class AppStorage {
             progressNext: null as string,
             systemMessage: null as string,
             systemSnack: null as string,
+            tutorial: null as string,
             theme: defaultTheme,
           };
-          for (let r of this.initialState.route) {
-            if (r.kind == 'generate' || r.kind == 'grid') {
-              this.initialState.route = [];
-              break;
-            }
-          }
 
           // Port to new generator format
           for (let scene of this.initialState.scenes) {
@@ -325,6 +322,7 @@ export default class AppStorage {
             progressNext: null as string,
             systemMessage: null as string,
             systemSnack: null as string,
+            tutorial: data.tutorial,
             theme: data.theme,
           };
       }

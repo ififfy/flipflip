@@ -112,8 +112,8 @@ class TextCard extends React.Component {
             </Grid>
           </Collapse>
         </Grid>
-        <Grid item xs={12} className={clsx((!this.props.scene.textEnabled || !this.state.showFonts) && classes.noPadding)}>
-          <Collapse in={this.props.scene.textEnabled && this.state.showFonts} className={classes.fullWidth}>
+        {this.props.scene.textEnabled && this.state.showFonts && (
+          <Grid item xs={12} className={clsx((!this.props.scene.textEnabled || !this.state.showFonts) && classes.noPadding)}>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={8}>
                 <FormControl className={classes.fullWidth}>
@@ -274,8 +274,8 @@ class TextCard extends React.Component {
                   onChangeColor={this.onInput.bind(this, 'countColor')}/>
               </Grid>
             </Grid>
-          </Collapse>
-        </Grid>
+          </Grid>
+        )}
       </Grid>
     );
   }

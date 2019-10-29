@@ -159,6 +159,50 @@ const IG = { // Instagram modes
   checkpoint: 'ig.checkpoint',
 };
 
+const SPT = { // Scene Picker Tutorials
+  welcome: 'spt1',
+  scenePicker: 'spt2',
+  drawer: 'spt3',
+  add1: 'spt4',
+  add2: 'spt5',
+  done: 'done',
+};
+
+const SDT = { // Scene Detail Tutorials
+  welcome: 'sdt1',
+  title: 'sdt2',
+  add1: 'sdt3',
+  add2: 'sdt4',
+  source: 'sdt5',
+  sourceAvatar: 'sdt6',
+  sourceTitle: 'sdt7',
+  sourceTags: 'sdt8',
+  sourceCount: 'sdt9',
+  sourceButtons: 'sdt10',
+  options1: 'sdt11',
+  options2: 'sdt12',
+  optionsLeft: 'sdt13',
+  timing: 'sdt14',
+  imageSizing: 'sdt15',
+  nextScene: 'sdt16',
+  overlays: 'sdt17',
+  optionsRight: 'sdt18',
+  imageOptions: 'sdt19',
+  videoOptions: 'sdt20',
+  weighting: 'sdt21',
+  ordering: 'sdt22',
+  effects1: 'sdt23',
+  effects2: 'sdt24',
+  zoom1: 'sdt25',
+  zoom2: 'sdt26',
+  zoom3: 'sdt27',
+  zoom4: 'sdt28',
+  fade1: 'sdt29',
+  fade2: 'sdt30',
+  play: 'sdt31',
+  done: 'done',
+};
+
 export {
-  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG
+  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG, SPT, SDT,
 };

@@ -27,7 +27,7 @@ import SortIcon from '@material-ui/icons/Sort';
 import SystemUpdateIcon from '@material-ui/icons/SystemUpdate';
 
 import {arrayMove, getRandomListItem} from "../data/utils";
-import {IPC, MO, SF} from "../data/const";
+import {IPC, MO, SF, SPT} from "../data/const";
 import en from "../data/en";
 import Config from "../data/Config";
 import Scene from "../data/Scene";
@@ -179,11 +179,6 @@ const styles = (theme: Theme) => createStyles({
     marginRight: theme.spacing(1),
     marginBottom: theme.spacing(1),
   },
-  generator: {
-    borderWidth: 2,
-    borderColor: theme.palette.primary.main,
-    borderStyle: 'solid',
-  },
   addMenuButton: {
     backgroundColor: theme.palette.primary.dark,
     margin: 0,
@@ -311,6 +306,17 @@ const styles = (theme: Theme) => createStyles({
   fill: {
     flexGrow: 1,
   },
+  backdropTop: {
+    zIndex: theme.zIndex.modal + 1,
+  },
+  highlight: {
+    borderWidth: 2,
+    borderColor: theme.palette.secondary.main,
+    borderStyle: 'solid',
+  },
+  disable: {
+    pointerEvents: 'none',
+  }
 });
 
 class ScenePicker extends React.Component {
@@ -323,6 +329,7 @@ class ScenePicker extends React.Component {
     libraryCount: number,
     openTab: number,
     scenes: Array<Scene>,
+    tutorial: string,
     version: string,
     onAddGenerator(): void,
     onAddGrid(): void,
@@ -333,10 +340,12 @@ class ScenePicker extends React.Component {
     onOpenLibrary(): void,
     onOpenScene(scene: Scene): void,
     onOpenGrid(grid: SceneGrid): void,
+    onTutorial(tutorial: string): void,
     onSort(algorithm: string, ascending: boolean): void,
     onUpdateConfig(config: Config): void,
     onUpdateScenes(scenes: Array<Scene>): void,
     onUpdateGrids(grids: Array<SceneGrid>): void,
+    startTutorial(): void,
   };
 
   readonly state = {
@@ -354,15 +363,15 @@ class ScenePicker extends React.Component {
     return (
       <div className={classes.root} onClick={this.onClickCloseMenu.bind(this)}>
 
-        <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
+        <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift, this.props.tutorial == SPT.scenePicker && classes.backdropTop)}>
           <Toolbar>
             {!open && this.state.isFirstWindow && (
               <IconButton
                 edge="start"
                 color="inherit"
                 aria-label="Toggle Drawer"
-                onClick={this.onToggleDrawer.bind(this)}
-                className={classes.toolbarButton}>
+                className={clsx(this.props.tutorial == SPT.scenePicker && classes.highlight)}
+                onClick={this.onToggleDrawer.bind(this)}>
                 <MenuIcon />
               </IconButton>
             )}
@@ -392,6 +401,7 @@ class ScenePicker extends React.Component {
           <React.Fragment>
             <Drawer
               variant="permanent"
+              className={this.props.tutorial == SPT.drawer ? clsx(classes.backdropTop, classes.disable, classes.highlight) : ''}
               classes={{paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose)}}
               open={open}>
 
@@ -540,8 +550,8 @@ class ScenePicker extends React.Component {
                     if (scene.generatorWeights) return <div key={scene.id}/>;
                     else {
                       return (
-                        <Jiggle key={scene.id} bounce={true}>
-                          <Card className={classes.scene}>
+                        <Jiggle key={scene.id} bounce={true} className={classes.scene}>
+                          <Card>
                             <CardActionArea onClick={this.props.onOpenScene.bind(this, scene)}>
                               <CardContent>
                                 <Typography component="h2" variant="h6">
@@ -580,8 +590,8 @@ class ScenePicker extends React.Component {
                     if (!scene.generatorWeights) return <div key={scene.id}/>;
                     else {
                       return (
-                        <Jiggle key={scene.id} bounce={true}>
-                          <Card className={classes.scene}>
+                        <Jiggle key={scene.id} bounce={true} className={classes.scene}>
+                          <Card>
                             <CardActionArea onClick={this.props.onOpenScene.bind(this, scene)}>
                               <CardContent>
                                 <Typography component="h2" variant="h6">
@@ -617,8 +627,8 @@ class ScenePicker extends React.Component {
                     this.props.onUpdateGrids(newGrids);
                   }}>
                   {this.props.grids.map((grid) =>
-                    <Jiggle key={grid.id} bounce={true}>
-                      <Card className={classes.scene}>
+                    <Jiggle key={grid.id} bounce={true} className={classes.scene}>
+                      <Card>
                         <CardActionArea onClick={this.props.onOpenGrid.bind(this, grid)}>
                           <CardContent>
                             <Typography component="h2" variant="h6">
@@ -670,14 +680,14 @@ class ScenePicker extends React.Component {
             </Tooltip>
             <Tooltip title="Add Scene"  placement="left">
               <Fab
-                className={clsx(classes.addButton, classes.addSceneButton, this.state.openMenu != MO.new && classes.addButtonClose)}
-                onClick={this.props.onAddScene.bind(this)}
+                className={clsx(classes.addButton, classes.addSceneButton, this.state.openMenu != MO.new && classes.addButtonClose, this.props.tutorial == SPT.add2 && clsx(classes.backdropTop, classes.highlight))}
+                onClick={this.onAddScene.bind(this)}
                 size="small">
                 <MovieIcon className={classes.icon} />
               </Fab>
             </Tooltip>
             <Fab
-              className={classes.addMenuButton}
+              className={clsx(classes.addMenuButton, (this.props.tutorial == SPT.add1 || this.props.tutorial == SPT.add2) && classes.backdropTop, this.props.tutorial == SPT.add1 && classes.highlight)}
               onClick={this.onToggleNewMenu.bind(this)}
               size="large">
               <AddIcon className={classes.icon} />
@@ -766,6 +776,7 @@ class ScenePicker extends React.Component {
   }
 
   componentDidMount() {
+    this.props.startTutorial();
     if (remote.getCurrentWindow().id == 1) {
       this.setState({isFirstWindow: true});
       wretch("https://api.github.com/repos/ififfy/flipflip/releases")
@@ -854,11 +865,24 @@ class ScenePicker extends React.Component {
   }
 
   onToggleDrawer() {
+    if (this.props.tutorial == SPT.scenePicker) {
+      this.props.onTutorial(SPT.scenePicker);
+    }
     this.setState({drawerOpen: !this.state.drawerOpen});
   }
 
   onToggleNewMenu() {
+    if (this.props.tutorial == SPT.add1) {
+      this.props.onTutorial(SPT.add1);
+    }
     this.setState({openMenu: this.state.openMenu == MO.new ? null : MO.new});
+  }
+
+  onAddScene() {
+    if (this.props.tutorial == SPT.add2) {
+      this.props.onTutorial(SPT.add2);
+    }
+    this.props.onAddScene();
   }
 
   onOpenSortMenu(e: MouseEvent) {

@@ -6,7 +6,7 @@ import {
   MenuItem, Select, Slider, Switch, TextField, Theme, Typography, withStyles
 } from "@material-ui/core";
 
-import {HTF, TF, VTF} from "../../data/const";
+import {HTF, SDT, TF, VTF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
 import en from "../../data/en";
 import Scene from "../../data/Scene";
@@ -30,6 +30,17 @@ const styles = (theme: Theme) => createStyles({
   percentInput: {
     minWidth: theme.spacing(11),
   },
+  backdropTop: {
+    zIndex: `${theme.zIndex.modal + 1} !important` as any,
+  },
+  highlight: {
+    borderWidth: 2,
+    borderColor: theme.palette.secondary.main,
+    borderStyle: 'solid',
+  },
+  disable: {
+    pointerEvents: 'none',
+  }
 });
 
 class ZoomMoveCard extends React.Component {
@@ -37,6 +48,7 @@ class ZoomMoveCard extends React.Component {
     classes: any,
     scene: Scene | SceneSettings,
     sidebar: boolean,
+    tutorial: string,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 
@@ -56,14 +68,15 @@ class ZoomMoveCard extends React.Component {
 
     return(
       <Grid container spacing={2} alignItems="center">
-        <Grid item xs={12}>
+        <Grid item xs={12} className={clsx(this.props.tutorial != null && this.props.tutorial != SDT.zoom1 && this.props.tutorial != SDT.zoom2 && classes.disable)}>
           <FormControlLabel
+            className={clsx(this.props.tutorial == SDT.zoom1 && classes.highlight)}
             control={
               <Switch checked={this.props.scene.zoom}
                       onChange={this.onBoolInput.bind(this, 'zoom')}/>
             }
             label="Zoom"/>
-          <Collapse in={this.props.scene.zoom} className={classes.fullWidth}>
+          <Collapse in={this.props.scene.zoom} className={clsx(classes.fullWidth, this.props.tutorial == SDT.zoom2 && classes.highlight)}>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                 <Typography id="zoom-start-slider">
@@ -90,7 +103,7 @@ class ZoomMoveCard extends React.Component {
             </Grid>
           </Collapse>
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12} className={clsx(this.props.tutorial && classes.disable)}>
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} sm={!this.props.sidebar && this.props.scene.horizTransType != HTF.none ? 3 : 12}>
               <FormControl className={classes.fullWidth}>
@@ -137,7 +150,7 @@ class ZoomMoveCard extends React.Component {
             </Grid>
           </Grid>
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12} className={clsx(this.props.tutorial && classes.disable)}>
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} sm={!this.props.sidebar && this.props.scene.vertTransType != VTF.none ? 3 : 12}>
               <FormControl className={classes.fullWidth}>
@@ -189,14 +202,15 @@ class ZoomMoveCard extends React.Component {
             <Divider />
           </Collapse>
         </Grid>
-        <Grid item xs={12} className={clsx(!enabled && classes.noPadding)}>
+        <Grid item xs={12} className={clsx(!enabled && classes.noPadding, this.props.tutorial != null && this.props.tutorial != SDT.zoom3 && classes.disable)}>
           <Collapse in={enabled} className={classes.fullWidth}>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 4}>
-                <FormControl className={classes.fullWidth}>
+                <FormControl className={clsx(classes.fullWidth, this.props.tutorial == SDT.zoom3 && clsx(classes.highlight, classes.backdropTop))}>
                   <InputLabel>Timing</InputLabel>
                   <Select
                     value={this.props.scene.transTF}
+                    MenuProps={this.props.tutorial == SDT.zoom3 ? {className: classes.backdropTop} : {}}
                     onChange={this.onInput.bind(this, 'transTF')}>
                     {Object.values(TF).map((tf) =>
                       <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
@@ -265,7 +279,7 @@ class ZoomMoveCard extends React.Component {
             </Grid>
           </Collapse>
         </Grid>
-        <Grid item xs={12} className={clsx(!enabled && classes.noPadding)}>
+        <Grid item xs={12} className={clsx(!enabled && classes.noPadding, this.props.tutorial != null && classes.disable, this.props.tutorial == SDT.zoom4 && classes.highlight)}>
           <Collapse in={enabled && (this.props.scene.transTF == TF.random || this.props.scene.transTF == TF.sin)} className={classes.fullWidth}>
             <Grid container alignItems="center">
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
@@ -320,6 +334,10 @@ class ZoomMoveCard extends React.Component {
   }
 
   onZoomSliderChange(key: string, e: MouseEvent, value: number) {
+    if (this.props.tutorial == SDT.zoom2) {
+      if (key == 'zoomStart' && this.props.scene.zoomStart == 0.8) return;
+      if (key == 'zoomEnd' && this.props.scene.zoomEnd == 1.2) return;
+    }
     this.changeKey(key, value / 10);
   }
 

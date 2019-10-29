@@ -81,13 +81,15 @@ class StrobeCard extends React.Component {
             </Grid>
           </Grid>
         </Grid>
-        <Grid item xs={12} className={clsx((!this.props.scene.strobe || this.props.scene.strobeLayer == SL.image) && classes.noPadding)}>
-          <Collapse in={this.props.scene.strobe && this.props.scene.strobeLayer != SL.image} className={classes.fullWidth}>
-            <ColorPicker
-              currentColor={this.props.scene.strobeColor}
-              onChangeColor={this.onInput.bind(this, 'strobeColor')}/>
-          </Collapse>
-        </Grid>
+        {this.props.scene.strobe && (
+          <Grid item xs={12} className={clsx((!this.props.scene.strobe || this.props.scene.strobeLayer == SL.image) && classes.noPadding)}>
+            <Collapse in={this.props.scene.strobe && this.props.scene.strobeLayer != SL.image} className={classes.fullWidth}>
+              <ColorPicker
+                currentColor={this.props.scene.strobeColor}
+                onChangeColor={this.onInput.bind(this, 'strobeColor')}/>
+            </Collapse>
+          </Grid>
+        )}
         <Grid item xs={12} className={clsx(!this.props.scene.strobe && classes.noPadding)}>
           <Collapse in={this.props.scene.strobe} className={classes.fullWidth}>
             <Grid container spacing={2} alignItems="center">

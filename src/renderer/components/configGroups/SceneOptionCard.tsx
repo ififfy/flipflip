@@ -9,7 +9,7 @@ import {
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 
-import {BT, IT, TF} from "../../data/const";
+import {BT, IT, SDT, TF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
 import en from "../../data/en";
 import Overlay from "../../data/Overlay";
@@ -38,6 +38,17 @@ const styles = (theme: Theme) => createStyles({
   addButton: {
     boxShadow: 'none',
   },
+  backdropTop: {
+    zIndex: theme.zIndex.modal + 1,
+  },
+  highlight: {
+    borderWidth: 2,
+    borderColor: theme.palette.secondary.main,
+    borderStyle: 'solid',
+  },
+  disable: {
+    pointerEvents: 'none',
+  }
 });
 
 class SceneOptionCard extends React.Component {
@@ -46,6 +57,7 @@ class SceneOptionCard extends React.Component {
     allScenes: Array<Scene>,
     scene: Scene | SceneSettings,
     sidebar: boolean,
+    tutorial: string,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
     isTagging?: boolean,
   };
@@ -62,7 +74,7 @@ class SceneOptionCard extends React.Component {
     const nextSceneTime = typeof this.props.scene.nextSceneTime === 'number' ? this.props.scene.nextSceneTime : 0;
     return(
       <Grid container spacing={2} alignItems="center">
-        <Grid item xs={12}>
+        <Grid item xs={12} className={clsx(this.props.tutorial == SDT.timing && classes.highlight)}>
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} style={{paddingTop: 10}}>
               <FormControl className={classes.fullWidth}>
@@ -179,7 +191,7 @@ class SceneOptionCard extends React.Component {
         <Grid item xs={12}>
           <Divider />
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12} className={clsx(this.props.tutorial == SDT.imageSizing && classes.highlight)}>
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={this.props.sidebar ? 8 : 12} sm={this.props.sidebar ? 8 : 6}>
               <FormControl className={classes.fullWidth}>
@@ -231,7 +243,7 @@ class SceneOptionCard extends React.Component {
             <Grid item xs={12}>
               <Divider />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} className={clsx(this.props.tutorial == SDT.nextScene && classes.highlight)}>
               <Grid container spacing={2} alignItems="center">
                 <Grid item xs={12} sm={this.props.sidebar ? 12 : 7}>
                   <FormControl className={classes.fullWidth}>
@@ -274,7 +286,7 @@ class SceneOptionCard extends React.Component {
             <Grid item xs={12}>
               <Divider />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} className={clsx(this.props.tutorial == SDT.overlays && classes.highlight)}>
               <Grid container spacing={2} alignItems="center">
                 <Grid item xs>
                   <FormControlLabel

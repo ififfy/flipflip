@@ -19,6 +19,7 @@ import VideoClipper from "./config/VideoClipper";
 import Player from './player/Player';
 import SceneDetail from './sceneDetail/SceneDetail';
 import GridPlayer from "./player/GridPlayer";
+import Tutorial from "./Tutorial";
 
 const appStorage = new AppStorage(remote.getCurrentWindow().id);
 
@@ -78,6 +79,7 @@ export default class Meta extends React.Component {
               libraryCount={this.state.library.length}
               openTab={this.state.openTab}
               scenes={this.state.scenes}
+              tutorial={this.state.tutorial}
               version={this.state.version}
               onAddGenerator={a(actions.addGenerator)}
               onAddGrid={a(actions.addGrid)}
@@ -88,10 +90,12 @@ export default class Meta extends React.Component {
               onOpenLibrary={a(actions.openLibrary)}
               onOpenScene={a(actions.goToScene)}
               onOpenGrid={a(actions.goToGrid)}
+              onTutorial={a(actions.doneTutorial)}
               onSort={a(actions.sortScene)}
               onUpdateConfig={a(actions.updateConfig)}
               onUpdateScenes={a(actions.replaceScenes)}
               onUpdateGrids={a(actions.replaceGrids)}
+              startTutorial={a(actions.startTutorial)}
             />
           )}
 
@@ -103,6 +107,7 @@ export default class Meta extends React.Component {
               library={this.state.library}
               scene={scene}
               tags={this.state.tags}
+              tutorial={this.state.tutorial}
               goBack={a(actions.goBack)}
               onAddSource={a(actions.addSource)}
               onClearBlacklist={a(actions.clearBlacklist)}
@@ -114,6 +119,7 @@ export default class Meta extends React.Component {
               onPlay={a(actions.playSceneFromLibrary)}
               onSaveAsScene={a(actions.saveScene)}
               onSort={a(actions.sortSources)}
+              onTutorial={a(actions.doneTutorial)}
               onUpdateScene={a(actions.updateScene)}
               systemMessage={a(actions.systemMessage)}
             />
@@ -276,6 +282,18 @@ export default class Meta extends React.Component {
               }
             />
           </Snackbar>
+
+          {this.state.tutorial && (
+            <Tutorial
+              config={this.state.config}
+              route={this.state.route}
+              scene={scene}
+              tutorial={this.state.tutorial}
+              onSetTutorial={a(actions.setTutorial)}
+              onDoneTutorial={a(actions.doneTutorial)}
+              onSkipAllTutorials={a(actions.skipTutorials)}
+            />
+          )}
 
           <FFAnalytics
             config={this.state.config}

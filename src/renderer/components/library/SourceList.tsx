@@ -4,6 +4,7 @@ import {remote} from "electron";
 import {sortableContainer, sortableElement} from 'react-sortable-hoc';
 import AutoSizer from "react-virtualized-auto-sizer";
 import {FixedSizeList} from "react-window";
+import clsx from "clsx";
 
 import {
   Button, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, Link, List, Theme, Typography,
@@ -11,10 +12,9 @@ import {
 } from "@material-ui/core";
 
 import {arrayMove, getCachePath, getFileName, getSourceType, urlToPath} from "../../data/utils";
-import {ST} from "../../data/const";
+import {SDT, ST} from "../../data/const";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
-import theme from '../../data/theme';
 import SourceListItem from "./SourceListItem";
 
 const styles = (theme: Theme) => createStyles({
@@ -25,6 +25,9 @@ const styles = (theme: Theme) => createStyles({
   emptyMessage2: {
     textAlign: 'center',
   },
+  backdropTop: {
+    zIndex: theme.zIndex.modal + 1,
+  },
 });
 
 class SourceList extends React.Component {
@@ -32,6 +35,7 @@ class SourceList extends React.Component {
     classes: any,
     config: Config,
     sources: Array<LibrarySource>,
+    tutorial: string,
     onClearBlacklist(sourceURL: string): void,
     onClip(source: LibrarySource): void,
     onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void,
@@ -88,7 +92,13 @@ class SourceList extends React.Component {
       <React.Fragment>
         <AutoSizer>
           {({ height, width } : {height: number, width: number}) => (
-            <List id="sortable-list" disablePadding>
+            <List id="sortable-list" disablePadding
+                  className={clsx((this.props.tutorial == SDT.source ||
+                    this.props.tutorial == SDT.sourceAvatar ||
+                    this.props.tutorial == SDT.sourceTitle ||
+                    this.props.tutorial == SDT.sourceTags ||
+                    this.props.tutorial == SDT.sourceCount ||
+                    this.props.tutorial == SDT.sourceButtons) && classes.backdropTop)}>
               <this.SortableVirtualList
                 helperContainer={() => document.getElementById("sortable-list")}
                 distance={5}
@@ -233,12 +243,12 @@ class SourceList extends React.Component {
 
     return (
       <FixedSizeList
-        height={height}
+        height={this.props.tutorial ? 60 : height}
         width={width}
         initialScrollOffset={this.props.yOffset ? this.props.yOffset : 0}
         itemSize={56}
-        itemCount={this.props.sources.length}
-        itemData={this.props.sources}
+        itemCount={this.props.tutorial ? 1 : this.props.sources.length}
+        itemData={this.props.tutorial ? [this.props.sources[0]] : this.props.sources}
         itemKey={(index: number, data: any) => data[index].id}
         overscanCount={10}>
         {this.Row.bind(this)}
@@ -260,6 +270,7 @@ class SourceList extends React.Component {
         source={source}
         sources={this.props.sources}
         style={value.style}
+        tutorial={this.props.tutorial}
         onClean={this.onClean.bind(this)}
         onClearBlacklist={this.props.onClearBlacklist.bind(this)}
         onClip={this.props.onClip.bind(this)}

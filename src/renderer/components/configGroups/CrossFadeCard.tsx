@@ -6,7 +6,7 @@ import {
   MenuItem, Select, Slider, Switch, TextField, Theme, Typography, withStyles
 } from "@material-ui/core";
 
-import {TF} from "../../data/const";
+import {SDT, TF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
 import en from "../../data/en";
 import Scene from "../../data/Scene";
@@ -27,6 +27,17 @@ const styles = (theme: Theme) => createStyles({
   percentInput: {
     minWidth: theme.spacing(11),
   },
+  backdropTop: {
+    zIndex: `${theme.zIndex.modal + 1} !important` as any,
+  },
+  highlight: {
+    borderWidth: 2,
+    borderColor: theme.palette.secondary.main,
+    borderStyle: 'solid',
+  },
+  disable: {
+    pointerEvents: 'none',
+  }
 });
 
 class CrossFadeCard extends React.Component {
@@ -34,6 +45,7 @@ class CrossFadeCard extends React.Component {
     classes: any,
     scene: Scene | SceneSettings,
     sidebar: boolean,
+    tutorial: string,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 
@@ -47,10 +59,11 @@ class CrossFadeCard extends React.Component {
     const fadeDurationMax = typeof this.props.scene.fadeDurationMax === 'number' ? this.props.scene.fadeDurationMax : 0;
     return(
       <Grid container spacing={this.props.scene.crossFade ? 2 : 0} alignItems="center">
-        <Grid item xs={12}>
+        <Grid item xs={12}  className={clsx(this.props.tutorial != null && this.props.tutorial != SDT.fade1 && classes.disable)}>
           <Grid container alignItems="center">
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 5}>
               <FormControlLabel
+                className={clsx(this.props.tutorial == SDT.fade1 && classes.highlight)}
                 control={
                   <Switch checked={this.props.scene.crossFade}
                             onChange={this.onBoolInput.bind(this, 'crossFade')}/>
@@ -76,7 +89,7 @@ class CrossFadeCard extends React.Component {
             <Divider />
           </Collapse>
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12} className={clsx(this.props.tutorial != null && classes.disable, this.props.tutorial == SDT.fade2 && classes.highlight)}>
           <Collapse in={this.props.scene.crossFade} className={classes.fullWidth}>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} style={{paddingTop: 10}}>
@@ -152,7 +165,7 @@ class CrossFadeCard extends React.Component {
             </Grid>
           </Collapse>
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12} className={clsx(this.props.tutorial != null && classes.disable)}>
           <Collapse in={this.props.scene.crossFade && (this.props.scene.fadeTF == TF.random || this.props.scene.fadeTF == TF.sin)} className={classes.fullWidth}>
             <Grid container alignItems="center">
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>

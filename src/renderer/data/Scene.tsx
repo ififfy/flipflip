@@ -96,7 +96,7 @@ export default class Scene {
   audios: Array<Audio> = [];
   bpm = 0;
   generatorWeights?: Array<WeightGroup> = null;
-  openTab = 2;
+  openTab = 3;
 
   // unused; migration only
   effectLevel = 0;
