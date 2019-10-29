@@ -22,7 +22,7 @@ import {
   saveDir
 } from "./utils";
 import defaultTheme from "./theme";
-import {AF, BT, GT, IF, OF, PR, SDT, SF, SPT, ST, TF, TT} from "./const";
+import {AF, BT, GT, IF, OF, PR, PT, SDT, SF, SPT, ST, TF, TT} from "./const";
 import { defaultInitialState } from './AppStorage';
 import { Route } from "./Route";
 import Scene from "./Scene";
@@ -165,6 +165,7 @@ export function skipTutorials(state: State): Object {
   const newConfig = state.config;
   newConfig.tutorials.scenePicker = 'done';
   newConfig.tutorials.sceneDetail = 'done';
+  newConfig.tutorials.player = 'done';
   // TODO Add rest of these
   return {config: newConfig, tutorial: null}
 }
@@ -183,8 +184,16 @@ export function doneTutorial(state: State, tutorial: string): Object {
     if (tutorial == SDT.play) {
       newTutorial = null;
       state.config.tutorials.sceneDetail = 'done';
+    } else {
+      state.config.tutorials.sceneDetail = tutorial;
     }
-    state.config.tutorials.sceneDetail = tutorial;
+  } else if (isRoute(state, 'play')) {
+    if (tutorial == PT.final) {
+      newTutorial = null;
+      state.config.tutorials.player = 'done';
+    } else {
+      state.config.tutorials.player = tutorial;
+    }
   }
   // TODO Add rest of these
   return {config: newConfig, tutorial: newTutorial};
@@ -479,7 +488,7 @@ export function playGrid(state: State, grid: SceneGrid): Object {
 }
 
 export function playScene(state: State, scene: Scene): Object {
-  return {route: state.route.concat(new Route({kind: 'play', value: scene.id}))};
+  return {route: state.route.concat(new Route({kind: 'play', value: scene.id})), tutorial: state.config.tutorials.player == null ? PT.welcome : null};
 }
 
 export function playSceneFromLibrary(state: State, source: LibrarySource, displayed: Array<LibrarySource>): Object {

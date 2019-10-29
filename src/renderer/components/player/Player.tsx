@@ -86,6 +86,17 @@ const styles = (theme: Theme) => createStyles({
   },
   hidden: {
     display: 'none',
+  },
+  backdropTop: {
+    zIndex: theme.zIndex.modal + 1,
+  },
+  highlight: {
+    borderWidth: 2,
+    borderColor: theme.palette.secondary.main,
+    borderStyle: 'solid',
+  },
+  disable: {
+    pointerEvents: 'none',
   }
 });
 
@@ -95,6 +106,7 @@ class Player extends React.Component {
     config: Config,
     scene: Scene,
     scenes: Array<Scene>,
+    tutorial: string,
     cache(i: HTMLImageElement | HTMLVideoElement): void,
     getTags(source: string): Array<Tag>,
     goBack(): void,
@@ -147,7 +159,7 @@ class Player extends React.Component {
       (this.props.scene.strobeLayer == SL.top || this.props.scene.strobeLayer == SL.bottom);
 
     return (
-      <div className={clsx(classes.root, this.props.gridView && classes.gridRoot)}>
+      <div className={clsx(classes.root, this.props.gridView && classes.gridRoot, this.props.tutorial != null && classes.disable)}>
         {showStrobe && (
           <Strobe
             zIndex={5}
@@ -212,6 +224,7 @@ class Player extends React.Component {
             scene={this.props.scene}
             scenes={this.props.scenes}
             title={this.props.tags ? this.props.scene.sources[0].url : this.props.scene.name}
+            tutorial={this.props.tutorial}
             goBack={this.props.goBack.bind(this)}
             historyBack={this.historyBack.bind(this)}
             historyForward={this.historyForward.bind(this)}

@@ -1,4 +1,6 @@
 import * as React from "react";
+import clsx from "clsx";
+import {remote} from "electron";
 
 import {
   Button,
@@ -18,11 +20,10 @@ import HttpIcon from '@material-ui/icons/Http';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import MovieIcon from '@material-ui/icons/Movie';
 
-import {SDT, SPT, TF} from "../data/const";
+import {PT, SDT, SPT, TF} from "../data/const";
 import {Route} from "../data/Route";
 import Config from "../data/Config";
 import Scene from "../data/Scene";
-import clsx from "clsx";
 
 const styles = (theme: Theme) => createStyles({
   deleteIcon: {
@@ -151,13 +152,15 @@ class Tutorial extends React.Component {
             </DialogContent>
           </React.Fragment>;
         break;
+
+
       case SDT.welcome:
         dialogBody =
           <React.Fragment>
             <DialogTitle id="tutorial-title">Scene Detail</DialogTitle>
             <DialogContent>
               <DialogContentText id="tutorial-description">
-                Welcome to your first Scene! A Scene is the main component of FlipFlip, where you can specify all your effects and options.
+                You've started your first Scene! A Scene is the main component of FlipFlip, where you can specify all your effects and options.
               </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -773,6 +776,103 @@ class Tutorial extends React.Component {
             </DialogContent>
           </React.Fragment>;
         break;
+
+
+      case PT.welcome:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Player</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                Welcome to your first Scene! Here your Scene will play out according to your configuration.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onSkip.bind(this)} color="secondary">
+                Skip Tutorial
+              </Button>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case PT.toolbar:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Player</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                Up at the top is the <b>toolbar</b>. Here you can <b>control the Scene playback</b> or <b>return to Scene Detail</b>.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case PT.sidebar:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Player</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                To the left is a <b>sidebar</b> with almost all of the <b>options and effects from Scene Detail</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                <b>To improve performance</b>, each section is compressed until needed.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case PT.tagging:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Player</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                While <b>Tagging a source</b> in your <b>Library</b>, the set of tags will appear when you hover near the bottom.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                <i>Since we're not tagging, <b>there's nothing there</b>.</i>
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case PT.final:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Player</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                Well that about covers all the basics! You've learned how to <b>add a Scene</b>, <b>configure it</b>, and <b>begin playback</b>!
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                Be sure to check out the <Link href="#" onClick={this.openLink.bind(this, "https://ififfy.github.io/flipflip/#")}>FlipFlip docs</Link> if you need any help.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                <b>Enjoy FlipFlip!</b>
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Back to Player
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
     }
 
     return(
@@ -803,7 +903,6 @@ class Tutorial extends React.Component {
   }
 
   showNextTutorial() {
-    console.log("showNext: " + this.getRoute() + " - " + this.props.config.tutorials.sceneDetail);
     switch (this.getRoute()) {
       case "picker":
         switch (this.props.config.tutorials.scenePicker) {
@@ -941,6 +1040,30 @@ class Tutorial extends React.Component {
             // We're done, don't show
             this.setTutorial(null);
             return;
+          default:
+            return;
+        }
+      case "play":
+        switch (this.props.config.tutorials.player) {
+          case PT.welcome:
+            this.setTutorial(PT.toolbar);
+            return;
+          case PT.toolbar:
+            this.setTutorial(PT.sidebar);
+            return;
+          case PT.sidebar:
+            this.setTutorial(PT.tagging);
+            return;
+          case PT.tagging:
+            this.setTutorial(PT.final);
+            return;
+          case PT.final:
+          case PT.done:
+            // We're done, don't show
+            this.setTutorial(null);
+            return;
+
+
         }
     }
   }
@@ -960,6 +1083,10 @@ class Tutorial extends React.Component {
   getRoute() {
     if (this.props.route.length < 1) return "picker";
     return this.props.route[this.props.route.length - 1].kind;
+  }
+
+  openLink(url: string) {
+    remote.shell.openExternal(url);
   }
 }
 

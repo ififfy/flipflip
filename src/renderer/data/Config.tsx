@@ -321,6 +321,7 @@ export class Tutorials implements TutorialsI {
 
   scenePicker = null as string;
   sceneDetail = null as string;
+  player = null as string;
   sceneGenerator = null as string;
   sceneGrid = null as string;
   library = null as string;

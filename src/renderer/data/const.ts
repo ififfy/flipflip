@@ -203,6 +203,15 @@ const SDT = { // Scene Detail Tutorials
   done: 'done',
 };
 
+const PT = { // Player Tutorials
+  welcome: 'pt1',
+  toolbar: 'pt2',
+  sidebar: 'pt3',
+  tagging: 'pt4',
+  final: 'pt5',
+  done: 'done',
+};
+
 export {
-  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG, SPT, SDT,
+  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG, SPT, SDT, PT,
 };

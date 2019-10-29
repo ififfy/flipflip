@@ -19,7 +19,7 @@ import PauseIcon from '@material-ui/icons/Pause';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 
 import {createMainMenu, createMenuTemplate} from "../../../main/MainMenu";
-import {IF, ST} from "../../data/const";
+import {IF, PT, ST} from "../../data/const";
 import {getCachePath, getSourceType, urlToPath} from "../../data/utils";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
@@ -177,6 +177,17 @@ const styles = (theme: Theme) => createStyles({
   wordWrap: {
     wordWrap: 'break-word',
   },
+  backdropTop: {
+    zIndex: theme.zIndex.modal + 1,
+  },
+  highlight: {
+    borderWidth: 2,
+    borderColor: theme.palette.secondary.main,
+    borderStyle: 'solid',
+  },
+  disable: {
+    pointerEvents: 'none',
+  }
 });
 
 class PlayerBars extends React.Component {
@@ -195,6 +206,7 @@ class PlayerBars extends React.Component {
     scene: Scene,
     scenes: Array<Scene>,
     title: string,
+    tutorial: string,
     goBack(): void,
     historyBack(): void,
     historyForward(): void,
@@ -242,7 +254,7 @@ class PlayerBars extends React.Component {
           position="absolute"
           onMouseEnter={this.onMouseEnterAppBar.bind(this)}
           onMouseLeave={this.onMouseLeaveAppBar.bind(this)}
-          className={clsx(classes.appBar, (!this.props.hasStarted || this.props.isEmpty || this.state.appBarHover) && classes.appBarHover)}>
+          className={clsx(classes.appBar, (this.props.tutorial == PT.toolbar || !this.props.hasStarted || this.props.isEmpty || this.state.appBarHover) && classes.appBarHover, this.props.tutorial == PT.toolbar && clsx(classes.backdropTop, classes.highlight))}>
           <Toolbar className={classes.headerBar}>
             <div className={classes.headerLeft}>
               <Tooltip title="Back" placement="right-end">
@@ -307,9 +319,9 @@ class PlayerBars extends React.Component {
 
             <Drawer
               variant="permanent"
-              className={clsx(classes.drawer, this.state.drawerHover && classes.drawerHover)}
-              classes={{paper: clsx(classes.drawerPaper, this.state.drawerHover && classes.drawerPaperHover)}}
-              open={this.state.drawerHover}
+              className={clsx(classes.drawer, (this.props.tutorial == PT.sidebar || this.state.drawerHover) && classes.drawerHover)}
+              classes={{paper: clsx(classes.drawerPaper, (this.props.tutorial == PT.sidebar || this.state.drawerHover) && classes.drawerPaperHover, this.props.tutorial == PT.toolbar && clsx(classes.backdropTop, classes.highlight))}}
+              open={this.props.tutorial == PT.sidebar || this.state.drawerHover}
               onMouseEnter={this.onMouseEnterDrawer.bind(this)}
               onMouseLeave={this.onMouseLeaveDrawer.bind(this)}>
               <div className={classes.drawerToolbar}>
@@ -676,6 +688,7 @@ class PlayerBars extends React.Component {
   }
 
   buildMenu() {
+    if (this.props.tutorial != null) return;
     createMainMenu(Menu, createMenuTemplate(app, {
       label: 'Player controls',
       submenu: Array.from(this.getKeyMap().entries()).map(([k, v]) => {
@@ -690,6 +703,7 @@ class PlayerBars extends React.Component {
   }
 
   showContextMenu = () => {
+    if (this.props.tutorial != null) return;
     const contextMenu = new Menu();
     const img = this.props.historyPaths[(this.props.historyPaths.length - 1) + this.props.historyOffset];
     const url = img.src;

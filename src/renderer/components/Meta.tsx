@@ -198,6 +198,7 @@ export default class Meta extends React.Component {
               config={this.state.config}
               scene={scene}
               scenes={this.state.scenes}
+              tutorial={this.state.tutorial}
               onUpdateScene={a(actions.updateScene)}
               nextScene={a(actions.nextScene)}
               goBack={a(actions.goBack)}
