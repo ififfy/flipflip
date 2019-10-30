@@ -1,19 +1,15 @@
 import * as React from "react";
 
-import {Card, CardContent, createStyles, Grid, Theme, withStyles} from "@material-ui/core";
+import {Card, CardContent, Grid} from "@material-ui/core";
 
 import Scene from "../../data/Scene";
 import AudioCard from "../configGroups/AudioCard";
 import TextCard from "../configGroups/TextCard";
 import {SceneSettings} from "../../data/Config";
 
-const styles = (theme: Theme) => createStyles({});
-
-class AudioTextEffects extends React.Component {
+export default class AudioTextEffects extends React.Component {
   readonly props: {
-    classes: any,
     scene: Scene | SceneSettings,
-    tutorial: string,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 
@@ -47,5 +43,3 @@ class AudioTextEffects extends React.Component {
 
   nop() {}
 }
-
-export default withStyles(styles)(AudioTextEffects as any);

@@ -1325,7 +1325,6 @@ class Tutorial extends React.Component {
 
   setTutorial(tutorial: string) {
     if (this.props.tutorial != tutorial) {
-      console.log("Set - " + tutorial);
       this.props.onSetTutorial(tutorial);
     }
   }

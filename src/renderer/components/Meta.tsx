@@ -66,8 +66,9 @@ export default class Meta extends React.Component {
     const a = (fn: any, ...args: any[]) => this.applyAction.bind(this, fn, ...args);
     const p = (fn: any) => this.progressAction.bind(this, fn);
 
+    const theme = createMuiTheme(this.state.theme);
     return (
-      <ThemeProvider theme={createMuiTheme(this.state.theme)}>
+      <ThemeProvider theme={theme}>
         <Box className="Meta">
           <CssBaseline />
           {this.state.route.length === 0 && (
@@ -205,6 +206,7 @@ export default class Meta extends React.Component {
               config={this.state.config}
               scene={scene}
               scenes={this.state.scenes}
+              theme={theme}
               tutorial={this.state.tutorial}
               onUpdateScene={a(actions.updateScene)}
               nextScene={a(actions.nextScene)}
@@ -223,6 +225,8 @@ export default class Meta extends React.Component {
               config={this.state.config}
               scene={scene}
               scenes={this.state.scenes}
+              theme={theme}
+              tutorial={this.state.tutorial}
               onUpdateScene={a(actions.updateScene)}
               goBack={a(actions.endPlaySceneFromLibrary)}
               tags={actions.getLibrarySource(this.state).tags}
@@ -242,6 +246,7 @@ export default class Meta extends React.Component {
               config={this.state.config}
               grid={grid}
               scenes={this.state.scenes}
+              theme={theme}
               cache={a(actions.cacheImage)}
               getTags={actions.getTags.bind(this, this.state.library)}
               goBack={a(actions.goBack)}

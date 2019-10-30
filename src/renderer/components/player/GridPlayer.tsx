@@ -85,6 +85,7 @@ class GridPlayer extends React.Component {
     config: Config,
     grid: SceneGrid,
     scenes: Array<Scene>,
+    theme: Theme,
     cache(i: HTMLImageElement | HTMLVideoElement): void,
     getTags(source: string): Array<Tag>,
     goBack(): void,
@@ -174,6 +175,8 @@ class GridPlayer extends React.Component {
                             scene={scene}
                             gridView
                             scenes={this.props.scenes}
+                            theme={this.props.theme}
+                            tutorial={null}
                             cache={this.props.cache.bind(this)}
                             getTags={this.props.getTags.bind(this)}
                             goBack={this.props.goBack.bind(this)}

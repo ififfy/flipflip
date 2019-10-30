@@ -22,24 +22,8 @@ class GifInfo {
   duration: string;
 }
 
-const styles = (theme: Theme) => createStyles({
-  imagePlayer: {
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-  },
-  notGridPlayer: {
-    position: 'fixed',
-  },
-  overlayPlayer: {
-    zIndex: 4,
-  },
-});
-
-class ImagePlayer extends React.Component {
+export default class ImagePlayer extends React.Component {
   readonly props: {
-    classes: any,
     config: Config,
     scene: Scene,
     gridView: boolean,
@@ -85,15 +69,23 @@ class ImagePlayer extends React.Component {
   _toggleStrobe: boolean;
 
   render() {
-    const classes = this.props.classes;
     let offset = this.props.historyOffset;
     if (offset <= -this.state.historyPaths.length) {
       offset = -this.state.historyPaths.length + 1;
     }
 
+    const style: any = {
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+      position: this.props.gridView ? 'static' : 'fixed',
+      zIndex: this.props.isOverlay ? 4 : 'auto',
+      cursor: this.state.hideCursor ? 'none' : 'initial',
+    };
+
     return (
-      <div className={clsx(classes.imagePlayer, !this.props.gridView && classes.notGridPlayer, this.props.isOverlay && classes.overlayPlayer)}
-           style={{cursor: this.state.hideCursor ? "none" : "initial"}}
+      <div style={style}
            ref={this.idleTimerRef}>
         {(this.props.strobeLayer == SL.middle) && (
           <Strobe
@@ -652,5 +644,3 @@ class ImagePlayer extends React.Component {
     }
   }
 };
-
-export default withStyles(styles)(ImagePlayer as any);

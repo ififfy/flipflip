@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import {Card, CardContent, createStyles, Grid, Theme, withStyles} from "@material-ui/core";
+import {Card, CardContent, Grid, Theme} from "@material-ui/core";
 
 import Config, {CacheSettings, DisplaySettings, RemoteSettings} from "../../data/Config";
 import PlayerBoolCard from "../configGroups/PlayerBoolCard";
@@ -10,11 +10,8 @@ import BackupCard from "../configGroups/BackupCard";
 import APICard from "../configGroups/APICard";
 import ThemeCard from "../configGroups/ThemeCard";
 
-const styles = (theme: Theme) => createStyles({});
-
-class GeneralConfig extends React.Component {
+export default class GeneralConfig extends React.Component {
   readonly props: {
-    classes: any,
     config: Config,
     theme: Theme,
     onBackup(): void,
@@ -97,5 +94,3 @@ class GeneralConfig extends React.Component {
     );
   }
 }
-
-export default withStyles(styles)(GeneralConfig as any);

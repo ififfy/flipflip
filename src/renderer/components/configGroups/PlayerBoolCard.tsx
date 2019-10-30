@@ -1,14 +1,11 @@
 import * as React from "react";
 
-import {createStyles, FormControlLabel, Grid, Switch, Theme, Tooltip, withStyles} from "@material-ui/core";
+import {FormControlLabel, Grid, Switch, Tooltip} from "@material-ui/core";
 
 import {DisplaySettings} from "../../data/Config";
 
-const styles = (theme: Theme) => createStyles({});
-
-class PlayerBoolCard extends React.Component {
+export default class PlayerBoolCard extends React.Component {
   readonly props: {
-    classes: any,
     settings: DisplaySettings,
     onUpdateSettings(fn: (settings: DisplaySettings) => void): void,
   };
@@ -68,5 +65,3 @@ class PlayerBoolCard extends React.Component {
     this.props.onUpdateSettings(fn);
   }
 }
-
-export default withStyles(styles)(PlayerBoolCard as any);

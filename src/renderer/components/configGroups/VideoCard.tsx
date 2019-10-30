@@ -1,15 +1,12 @@
 import * as React from "react";
 
-import {createStyles, Grid, Theme, Typography, withStyles} from "@material-ui/core";
+import { Grid, Typography} from "@material-ui/core";
 
 import Scene from "../../data/Scene";
 import VideoControl from "../player/VideoControl";
 
-const styles = (theme: Theme) => createStyles({});
-
-class VideoCard extends React.Component {
+export default class VideoCard extends React.Component {
   readonly props: {
-    classes: any,
     scene: Scene,
     otherScenes?: Array<Scene>,
     isPlaying?: boolean,
@@ -61,5 +58,3 @@ class VideoCard extends React.Component {
     this.props.onUpdateScene(scene, fn);
   }
 }
-
-export default withStyles(styles)(VideoCard as any);

@@ -571,6 +571,24 @@ class PlayerBars extends React.Component {
     window.removeEventListener('keydown', this.onKeyDown);
   }
 
+  shouldComponentUpdate(props: any, state: any) {
+    return this.props.hasStarted !== props.hasStarted ||
+      !props.hasStarted ||
+      this.props.isEmpty !== props.isEmpty ||
+      props.isEmpty ||
+      this.props.tutorial !== props.tutorial ||
+      this.state.appBarHover !== state.appBarHover ||
+      state.appBarHover ||
+      this.state.drawerHover !== state.drawerHover ||
+      state.drawerHover ||
+      this.state.tagDrawerHover !== state.tagDrawerHover ||
+      state.tagDrawerHover ||
+      this.state.blacklistSource !== state.blacklistSource ||
+      this.state.blacklistFile !== state.blacklistFile ||
+      this.state.deletePath !== state.deletePath ||
+      this.state.deleteError !== state.deleteError;
+  }
+
   getScene(id: number): Scene {
     return this.props.scenes.find((s) => s.id == id);
   }

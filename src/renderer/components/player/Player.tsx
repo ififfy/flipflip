@@ -1,10 +1,9 @@
 import {remote, webFrame} from 'electron';
 const {getCurrentWindow} = remote;
 import * as React from 'react';
-import clsx from "clsx";
 
 import {
-  Button, CircularProgress, Container, createStyles, Theme, Typography, withStyles
+  Button, CircularProgress, Container, Theme, Typography
 } from "@material-ui/core";
 
 import {SL} from "../../data/const";
@@ -18,94 +17,12 @@ import SourceScraper from './SourceScraper';
 import Strobe from "./Strobe";
 import PlayerBars from "./PlayerBars";
 
-const styles = (theme: Theme) => createStyles({
-  root: {
-    display: 'flex',
-    position: 'fixed',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-  },
-  appBarSpacer: {
-    ...theme.mixins.toolbar
-  },
-  content: {
-    display: 'flex',
-    flexGrow: 1,
-    flexDirection: 'column',
-    backgroundColor: theme.palette.background.default,
-    zIndex: 10,
-  },
-  container: {
-    flexGrow: 1,
-    padding: theme.spacing(0),
-    position: 'relative',
-  },
-  player: {
-    position: 'fixed',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0
-  },
-  progress: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    display: 'flex',
-  },
-  progressMessage: {
-    position: 'absolute',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  emptyMessage: {
-    textAlign: 'center',
-    marginTop: '25%',
-  },
-  emptyMessage2: {
-    textAlign: 'center',
-  },
-  startNowButton: {
-    marginTop: theme.spacing(1),
-  },
-  gridRoot: {
-    width: '104%',
-    height: '104%',
-    marginLeft: '-2%',
-    marginTop: '-2%',
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  full: {
-    height: '100%',
-    width: '100%',
-  },
-  fill: {
-    flexGrow: 1,
-  },
-  hidden: {
-    display: 'none',
-  },
-  backdropTop: {
-    zIndex: theme.zIndex.modal + 1,
-  },
-  highlight: {
-    borderWidth: 2,
-    borderColor: theme.palette.secondary.main,
-    borderStyle: 'solid',
-  },
-  disable: {
-    pointerEvents: 'none',
-  }
-});
-
-class Player extends React.Component {
+export default class Player extends React.Component {
   readonly props: {
-    classes: any,
     config: Config,
     scene: Scene,
     scenes: Array<Scene>,
+    theme: Theme,
     tutorial: string,
     cache(i: HTMLImageElement | HTMLVideoElement): void,
     getTags(source: string): Array<Tag>,
@@ -147,7 +64,6 @@ class Player extends React.Component {
   _toggleStrobe = false;
 
   render() {
-    const classes = this.props.classes;
     const nextScene = this.getScene(this.props.scene.nextSceneID);
     const showCaptionProgram = (
       this.props.scene.textEnabled &&
@@ -158,8 +74,57 @@ class Player extends React.Component {
     const showStrobe = this.props.scene.strobe && this.state.hasStarted && this.state.isPlaying &&
       (this.props.scene.strobeLayer == SL.top || this.props.scene.strobeLayer == SL.bottom);
 
+    let rootStyle: any;
+    if (this.props.gridView) {
+      rootStyle = {
+        display: 'flex',
+        position: 'relative',
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+        width: '104%',
+        height: '104%',
+        marginLeft: '-2%',
+        marginTop: '-2%',
+        overflow: 'hidden',
+      }
+    } else {
+      rootStyle = {
+        display: 'flex',
+        position: 'fixed',
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+      };
+    }
+    if (this.props.tutorial != null) {
+      rootStyle = {
+        ...rootStyle,
+        pointerEvents: 'none',
+      }
+    }
+
+    let playerStyle: any = {};
+    if (!this.props.gridView) {
+      playerStyle = {
+        position: 'fixed',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0
+      };
+    }
+    if (!this.state.hasStarted) {
+      playerStyle = {
+        ...playerStyle,
+        display: 'none',
+      }
+    }
+
     return (
-      <div className={clsx(classes.root, this.props.gridView && classes.gridRoot, this.props.tutorial != null && classes.disable)}>
+      <div style={rootStyle}>
         {showStrobe && (
           <Strobe
             zIndex={5}
@@ -169,13 +134,35 @@ class Player extends React.Component {
           />
         )}
         {!this.state.hasStarted && !this.state.isEmpty && (
-          <main className={classes.content}>
-            <Container maxWidth={false} className={clsx(classes.container, classes.progress)}>
+          <main style={{
+            display: 'flex',
+            flexGrow: 1,
+            flexDirection: 'column',
+            backgroundColor: this.props.theme.palette.background.default,
+            zIndex: 10,
+          }}>
+            <Container
+              maxWidth={false}
+              style={{
+                flexGrow: 1,
+                padding: this.props.theme.spacing(0),
+                position: 'relative',
+                alignItems: 'center',
+                justifyContent: 'center',
+                display: 'flex',
+              }}>
               <CircularProgress
                 size={300}
                 value={Math.round((this.state.progress / this.state.total) * 100)}
                 variant="static"/>
-                <div className={clsx(classes.progress, classes.progressMessage)}>
+                <div
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    display: 'flex',
+                    position: 'absolute',
+                    flexDirection: 'column',
+                  }}>
                   <Typography component="h1" variant="h6" color="inherit" noWrap>
                     {this.state.progress} / {this.state.total}
                   </Typography>
@@ -184,7 +171,9 @@ class Player extends React.Component {
                   </Typography>
                   {this.state.canStart && (
                     <Button
-                      className={classes.startNowButton}
+                      style={{
+                        marginTop: this.props.theme.spacing(1),
+                      }}
                       variant="contained"
                       color="secondary"
                       onClick={this.start.bind(this, this.state.canStart, true)}>
@@ -196,13 +185,31 @@ class Player extends React.Component {
           </main>
         )}
         {this.state.isEmpty && (
-          <main className={classes.content}>
-            <div className={classes.appBarSpacer}/>
-            <Container maxWidth={false} className={classes.container}>
-              <Typography component="h1" variant="h3" color="inherit" noWrap className={classes.emptyMessage}>
+          <main
+            style={{
+              display: 'flex',
+              flexGrow: 1,
+              flexDirection: 'column',
+              backgroundColor: this.props.theme.palette.background.default,
+              zIndex: 10,
+            }} >
+            <div style={{...this.props.theme.mixins.toolbar as any}}/>
+            <Container
+              maxWidth={false}
+              style={{
+                flexGrow: 1,
+                padding: this.props.theme.spacing(0),
+                position: 'relative',
+              }}>
+              <Typography component="h1" variant="h3" color="inherit" noWrap
+                          style={{
+                            textAlign: 'center',
+                            marginTop: '25%',
+                          }}>
                 (ಥ﹏ಥ)
               </Typography>
-              <Typography component="h1" variant="h4" color="inherit" noWrap className={classes.emptyMessage2}>
+              <Typography component="h1" variant="h4" color="inherit" noWrap
+                          style={{textAlign: 'center'}}>
                 I couldn't find anything
               </Typography>
             </Container>
@@ -240,7 +247,7 @@ class Player extends React.Component {
           />
         )}
 
-        <div className={clsx(!this.props.gridView && classes.player, !this.state.hasStarted && classes.hidden)}>
+        <div style={playerStyle}>
           <SourceScraper
             config={this.props.config}
             scene={this.props.scene}
@@ -367,8 +374,7 @@ class Player extends React.Component {
   }
 
   shouldComponentUpdate(props: any, state: any): boolean {
-    return !props.scene.hasStarted ||
-      this.props.scene !== props.scene ||
+    return this.props.scene !== props.scene ||
       this.props.tags !== props.tags ||
       this.state.canStart !== state.canStart ||
       this.state.hasStarted !== state.hasStarted ||
@@ -487,5 +493,3 @@ class Player extends React.Component {
     this.props.navigateTagging(offset);
   }
 }
-
-export default withStyles(styles)(Player as any);

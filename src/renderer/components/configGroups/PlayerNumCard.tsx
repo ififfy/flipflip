@@ -1,14 +1,11 @@
 import * as React from "react";
 
-import {createStyles, Grid, InputAdornment, TextField, Theme, Tooltip, withStyles} from "@material-ui/core";
+import {Grid, InputAdornment, TextField, Tooltip} from "@material-ui/core";
 
 import {DisplaySettings} from "../../data/Config";
 
-const styles = (theme: Theme) => createStyles({});
-
-class PlayerNumCard extends React.Component {
+export default class PlayerNumCard extends React.Component {
   readonly props: {
-    classes: any,
     settings: DisplaySettings,
     onUpdateSettings(fn: (settings: DisplaySettings) => void): void,
   };
@@ -51,7 +48,7 @@ class PlayerNumCard extends React.Component {
           </Tooltip>
         </Grid>
         <Grid item xs={12}>
-          <Tooltip title="The maximum number of images/videos to queue up for rendering. Reduce this number to reduce memory usage.">
+          <Tooltip title="The maximum number of images/videos to queue up for rendering. Reduce this number to reduce memory usage and improve performance.">
             <TextField
               label="Max in Memory"
               margin="dense"
@@ -65,7 +62,7 @@ class PlayerNumCard extends React.Component {
           </Tooltip>
         </Grid>
         <Grid item xs={12}>
-          <Tooltip title="The maximum number of images/videos to keep in player history. Reduce this number to reduce memory usage.">
+          <Tooltip title="The maximum number of images/videos to keep in player history. Reduce this number to reduce memory usage and improve performance.">
             <TextField
               label="Max in History"
               margin="dense"
@@ -123,5 +120,3 @@ class PlayerNumCard extends React.Component {
     this.props.onUpdateSettings(fn);
   }
 }
-
-export default withStyles(styles)(PlayerNumCard as any);
