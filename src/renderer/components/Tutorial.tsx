@@ -8,13 +8,14 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle, IconButton,
+  DialogTitle,
   Link, SvgIcon,
   Theme,
   withStyles
 } from "@material-ui/core";
 
 import DeleteIcon from '@material-ui/icons/Delete';
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import FolderIcon from '@material-ui/icons/Folder';
 import HttpIcon from '@material-ui/icons/Http';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
@@ -841,7 +842,7 @@ class Tutorial extends React.Component {
                 While <b>Tagging a source</b> in your <b>Library</b>, the set of tags will appear when you hover near the bottom.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
-                🡇 <i>Since we're not tagging, <b>there's nothing there</b>.</i> 🡇
+                <ArrowDownwardIcon/> <i>Since we're not tagging, <b>there's nothing there</b>.</i> <ArrowDownwardIcon/>
               </DialogContentText>
             </DialogContent>
             <DialogActions>
