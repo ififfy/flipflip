@@ -12,6 +12,7 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import BuildIcon from '@material-ui/icons/Build';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import ErrorIcon from '@material-ui/icons/Error';
+import LiveHelpIcon from '@material-ui/icons/LiveHelp';
 import MenuIcon from'@material-ui/icons/Menu';
 import PhotoFilterIcon from '@material-ui/icons/PhotoFilter';
 import RestoreIcon from '@material-ui/icons/Restore';
@@ -156,6 +157,7 @@ class ConfigForm extends React.Component {
     onChangeThemeColor(colorTheme: any, primary: boolean): void,
     onClean(): void,
     onDefault(): void,
+    onResetTutorials(): void,
     onRestore(backupFile: string): void,
     onToggleDarkMode(): void,
     onUpdateConfig(config: Config): void,
@@ -249,6 +251,23 @@ class ConfigForm extends React.Component {
           <div className={classes.fill}/>
 
           <div>
+            <ListItem
+              disabled={
+                this.props.config.tutorials.scenePicker == null &&
+                this.props.config.tutorials.sceneDetail == null &&
+                this.props.config.tutorials.player == null &&
+                this.props.config.tutorials.library == null &&
+                this.props.config.tutorials.sceneGenerator == null &&
+                this.props.config.tutorials.sceneGrid == null &&
+                this.props.config.tutorials.videoClipper == null
+              }
+              button onClick={this.props.onResetTutorials.bind(this)}
+              className={classes.deleteItem}>
+              <ListItemIcon>
+                <LiveHelpIcon color="error"/>
+              </ListItemIcon>
+              <ListItemText primary="Reset Tutorials" />
+            </ListItem>
             <ListItem button onClick={this.onRestoreDefaults.bind(this)}
                       className={classes.deleteItem}>
               <ListItemIcon>

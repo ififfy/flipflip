@@ -22,7 +22,7 @@ import {
   saveDir
 } from "./utils";
 import defaultTheme from "./theme";
-import {AF, BT, GT, IF, LT, OF, PR, PT, SDGT, SDT, SF, SGT, SPT, ST, TF, TT, VCT} from "./const";
+import {AF, BT, DONE, GT, IF, LT, OF, PR, PT, SDGT, SDT, SF, SGT, SPT, ST, TF, TT, VCT} from "./const";
 import { defaultInitialState } from './AppStorage';
 import { Route } from "./Route";
 import Scene from "./Scene";
@@ -163,13 +163,25 @@ export function setTutorial(state: State, tutorial: string): Object {
 
 export function skipTutorials(state: State): Object {
   const newConfig = state.config;
-  newConfig.tutorials.scenePicker = 'done';
-  newConfig.tutorials.sceneDetail = 'done';
-  newConfig.tutorials.player = 'done';
-  newConfig.tutorials.library = 'done';
-  newConfig.tutorials.sceneGenerator = 'done';
-  newConfig.tutorials.sceneGrid = 'done';
-  newConfig.tutorials.videoClipper = 'done';
+  newConfig.tutorials.scenePicker = DONE;
+  newConfig.tutorials.sceneDetail = DONE;
+  newConfig.tutorials.player = DONE;
+  newConfig.tutorials.library = DONE;
+  newConfig.tutorials.sceneGenerator = DONE;
+  newConfig.tutorials.sceneGrid = DONE;
+  newConfig.tutorials.videoClipper = DONE;
+  return {config: newConfig, tutorial: null}
+}
+
+export function resetTutorials(state: State): Object {
+  const newConfig = state.config;
+  newConfig.tutorials.scenePicker = null;
+  newConfig.tutorials.sceneDetail = null;
+  newConfig.tutorials.player = null;
+  newConfig.tutorials.library = null;
+  newConfig.tutorials.sceneGenerator = null;
+  newConfig.tutorials.sceneGrid = null;
+  newConfig.tutorials.videoClipper = null;
   return {config: newConfig, tutorial: null}
 }
 
@@ -179,7 +191,7 @@ export function doneTutorial(state: State, tutorial: string): Object {
   if (state.route.length == 0) {
     if (tutorial == SPT.add2) {
       newTutorial = null;
-      state.config.tutorials.scenePicker = 'done';
+      state.config.tutorials.scenePicker = DONE;
     } else {
       state.config.tutorials.scenePicker = tutorial;
     }
@@ -187,14 +199,14 @@ export function doneTutorial(state: State, tutorial: string): Object {
     if (getActiveScene(state).generatorWeights) {
       if (tutorial == SDGT.final || tutorial == SDGT.finalError) {
         newTutorial = null;
-        state.config.tutorials.sceneGenerator = 'done';
+        state.config.tutorials.sceneGenerator = DONE;
       } else {
         state.config.tutorials.sceneGenerator = tutorial;
       }
     } else {
       if (tutorial == SDT.play) {
         newTutorial = null;
-        state.config.tutorials.sceneDetail = 'done';
+        state.config.tutorials.sceneDetail = DONE;
       } else {
         state.config.tutorials.sceneDetail = tutorial;
       }
@@ -202,28 +214,28 @@ export function doneTutorial(state: State, tutorial: string): Object {
   } else if (isRoute(state, 'play')) {
     if (tutorial == PT.final) {
       newTutorial = null;
-      state.config.tutorials.player = 'done';
+      state.config.tutorials.player = DONE;
     } else {
       state.config.tutorials.player = tutorial;
     }
   } else if (isRoute(state, 'library')) {
     if (tutorial == LT.final) {
       newTutorial = null;
-      state.config.tutorials.library = 'done';
+      state.config.tutorials.library = DONE;
     } else {
       state.config.tutorials.library = tutorial;
     }
   } else if (isRoute(state, 'grid')) {
     if (tutorial == SGT.final) {
       newTutorial = null;
-      state.config.tutorials.sceneGrid = 'done';
+      state.config.tutorials.sceneGrid = DONE;
     } else {
       state.config.tutorials.sceneGrid = tutorial;
     }
   } else if (isRoute(state, 'clip')) {
     if (tutorial == VCT.final) {
       newTutorial = null;
-      state.config.tutorials.videoClipper = 'done';
+      state.config.tutorials.videoClipper = DONE;
     } else {
       state.config.tutorials.videoClipper = tutorial;
     }

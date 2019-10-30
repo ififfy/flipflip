@@ -159,13 +159,15 @@ const IG = { // Instagram modes
   checkpoint: 'ig.checkpoint',
 };
 
+const DONE = 'done';
+
 const SPT = { // Scene Picker Tutorials
   welcome: 'spt1',
   scenePicker: 'spt2',
   drawer: 'spt3',
   add1: 'spt4',
   add2: 'spt5',
-  done: 'done',
+  done: DONE,
 };
 
 const SDT = { // Scene Detail Tutorials
@@ -200,7 +202,7 @@ const SDT = { // Scene Detail Tutorials
   fade1: 'sdt29',
   fade2: 'sdt30',
   play: 'sdt31',
-  done: 'done',
+  done: DONE,
 };
 
 const PT = { // Player Tutorials
@@ -209,7 +211,7 @@ const PT = { // Player Tutorials
   sidebar: 'pt3',
   tagging: 'pt4',
   final: 'pt5',
-  done: 'done',
+  done: DONE,
 };
 
 const LT = { // Library Tutorials
@@ -219,7 +221,7 @@ const LT = { // Library Tutorials
   sidebar1: 'lt4',
   sidebar2: 'lt5',
   final: 'lt6',
-  done: 'done',
+  done: DONE,
 };
 
 const SDGT = { // Scene Generator Tutorials
@@ -231,7 +233,7 @@ const SDGT = { // Scene Generator Tutorials
   generateError: 'sdgt5E',
   final: 'sdgt6',
   finalError: 'sdgt6E',
-  done: 'done',
+  done: DONE,
 };
 
 const SGT = { // Scene Grid Tutorials
@@ -239,7 +241,7 @@ const SGT = { // Scene Grid Tutorials
   dimensions: 'sgt2',
   cells: 'sgt3',
   final: 'sgdt4',
-  done: 'done',
+  done: DONE,
 };
 
 const VCT = { // Video Clipper Tutorials
@@ -248,9 +250,9 @@ const VCT = { // Video Clipper Tutorials
   clips: 'vct3',
   clip: 'vct4',
   final: 'vct5',
-  done: 'done',
+  done: DONE,
 };
 
 export {
-  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG, SPT, SDT, PT, LT, SDGT, SGT, VCT
+  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG, SPT, SDT, PT, LT, SDGT, SGT, VCT, DONE
 };

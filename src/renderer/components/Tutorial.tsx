@@ -20,7 +20,7 @@ import HttpIcon from '@material-ui/icons/Http';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import MovieIcon from '@material-ui/icons/Movie';
 
-import {LT, PT, SDGT, SDT, SGT, SPT, TF, VCT} from "../data/const";
+import {DONE, LT, PT, SDGT, SDT, SGT, SPT, TF, VCT} from "../data/const";
 import {Route} from "../data/Route";
 import Config from "../data/Config";
 import Scene from "../data/Scene";
@@ -1596,7 +1596,7 @@ class Tutorial extends React.Component {
   }
 
   onSkip() {
-    this.props.onDoneTutorial('done');
+    this.props.onDoneTutorial(DONE);
   }
 
   onContinue() {

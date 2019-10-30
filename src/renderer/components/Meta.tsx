@@ -261,6 +261,7 @@ export default class Meta extends React.Component {
               onClean={actions.cleanBackups}
               onDefault={a(actions.setDefaultConfig)}
               onRestore={a(actions.restoreFromBackup)}
+              onResetTutorials={a(actions.resetTutorials)}
               onToggleDarkMode={a(actions.toggleDarkMode)}
               onUpdateConfig={a(actions.updateConfig)}
             />
