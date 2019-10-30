@@ -92,7 +92,7 @@ class AudioControl extends React.Component {
             </Collapse>
           </Grid>
         )}
-        {this.props.scene.audioEnabled && this.props.audio.tick && (
+        {this.props.scene.audioEnabled && (this.props.audio.tick && this.props.sidebar) && (
           <SoundTick
             url={this.props.audio.url}
             playing={playing}
@@ -101,12 +101,12 @@ class AudioControl extends React.Component {
             tick={this.state.tick}
           />
         )}
-        {this.props.scene.audioEnabled && !this.props.audio.tick && (
+        {this.props.scene.audioEnabled && (!this.props.audio.tick || !this.props.sidebar) && (
           <Sound
             url={this.props.audio.url}
             playStatus={playing}
             playbackRate={this.props.audio.speed / 10}
-            loop={!this.props.audio.stopAtEnd}
+            loop={!this.props.audio.stopAtEnd && this.props.sidebar}
             volume={this.props.audio.volume}
             position={this.state.position}
             onPlaying={this.onPlaying.bind(this)}
@@ -412,6 +412,7 @@ class AudioControl extends React.Component {
       mm.parseFile(urlToPath(this.props.audio.url))
         .then((metadata: any) => {
           if (metadata && metadata.common && metadata.common.bpm) {
+            console.log(metadata.common.bpm);
             this.changeKey('bpm', metadata.common.bpm);
           }
         })
@@ -437,6 +438,14 @@ class AudioControl extends React.Component {
           break;
         case TF.constant:
           timeout = this.props.audio.tickDelay;
+          break;
+        case TF.bpm:
+          const bpmMulti = this.props.audio.tickBPMMulti > 0 ? this.props.audio.tickBPMMulti : 1 / (-1 * (this.props.audio.tickBPMMulti - 2));
+          timeout = 60000 / (this.props.scene.bpm * bpmMulti);
+          // If we cannot parse this, default to 1s
+          if (!timeout) {
+            timeout = 1000;
+          }
           break;
       }
       if (timeout != null) {
@@ -529,6 +538,9 @@ class AudioControl extends React.Component {
   onFinishedPlaying() {
     if (this.props.audio.stopAtEnd && this.props.goBack) {
       this.props.goBack();
+    }
+    if (!this.props.sidebar) {
+      this.setState({position: 0, playing: false});
     }
   }
 

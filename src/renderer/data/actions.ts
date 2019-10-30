@@ -35,6 +35,13 @@ import SceneGrid from "./SceneGrid";
 
 type State = typeof defaultInitialState;
 
+// TODO - Long Term
+//      Fix/Improve resonsive design
+//      Make audios ordered by default, allow synchronous playback
+//      Add UI option for excluding retweets (Fix markOffline)
+//      Resize ImageView when screen resizes ?
+//      Mosaic view for cards
+
 /** Getters **/
 
 // Returns true if the last route matches the given kind

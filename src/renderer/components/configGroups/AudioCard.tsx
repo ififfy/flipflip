@@ -71,10 +71,6 @@ class AudioCard extends React.Component {
     );
   }
 
-  onBPM(bpm: number) {
-    this.changeKey('bpm', bpm);
-  }
-
   onAddAudioTrack() {
     let id = this.props.scene.audios.length + 1;
     this.props.scene.audios.forEach((a) => {
