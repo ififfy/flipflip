@@ -47,7 +47,7 @@ export default new Map<string, string>([
   ['gt.tumblr', 'Tumblr'],
   ['gt.local', 'Local'],
 
-  ['tt.weight', 'Weight'],
+  ['tt.weight', 'Percent'],
   ['tt.all', 'Require'],
   ['tt.none', 'Exclude'],
 

@@ -20,7 +20,7 @@ import HttpIcon from '@material-ui/icons/Http';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import MovieIcon from '@material-ui/icons/Movie';
 
-import {LT, PT, SDT, SPT, TF} from "../data/const";
+import {LT, PT, SDGT, SDT, SPT, TF} from "../data/const";
 import {Route} from "../data/Route";
 import Config from "../data/Config";
 import Scene from "../data/Scene";
@@ -996,6 +996,137 @@ class Tutorial extends React.Component {
             </DialogActions>
           </React.Fragment>;
         break;
+
+
+      case SDGT.welcome:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Scene Generator</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                You've made your first <b>Scene Generator</b>!
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                Here, you can use your <b>tagged sources</b> to generate <b>random scenes</b>.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onSkip.bind(this)} color="secondary">
+                Skip Tutorial
+              </Button>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case SDGT.buttons:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Scene Generator</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                In the bottom right, you can change the <b>max number of sources</b> to generate and <b>make new rules</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                In order to <b>generate a scene</b>, your rules need to <b>add up to <u>100%</u></b>. You'll see
+                the <b>remaining percent</b> above the <b>Generate button</b>
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                To begin, <b>make a Simple Rule</b>
+              </DialogContentText>
+            </DialogContent>
+          </React.Fragment>;
+        break;
+      case SDGT.edit1:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Simple Rule</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                To edit a rule, <b>click its Icon</b>
+              </DialogContentText>
+            </DialogContent>
+          </React.Fragment>;
+        break;
+      case SDGT.edit2:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Simple Rule</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                Each Simple Rule has 3 options:
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                <b>Percent</b>: This tag should make up N% of the sources
+                <br/>
+                <b>Require</b>: All sources need this tag
+                <br/>
+                <b>Exclude</b>: No source can have this tag
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                <b>Set this Rule to <u>Require</u></b>
+              </DialogContentText>
+            </DialogContent>
+          </React.Fragment>;
+        break;
+      case SDGT.generate:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Scene Generator</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                Great! Now <b>every source</b> in this Generator will <b>require this tag</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                <b>Click the Generate Button!</b>
+              </DialogContentText>
+            </DialogContent>
+          </React.Fragment>;
+        break;
+      case SDGT.final:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Scene Generator</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                <b>And that's it!</b> That's all you need to <b>generate scenes</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                The more <b>tagged scenes</b> you have in your <b>Library</b>, the better generators will work. If you
+                need to <b>combine</b> tag rules, you can make an <b>Advanced Rule</b>.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Back to Scene Detail
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case SDGT.finalError:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Scene Generator (Error)</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                <b>Whoops!</b> Looks like you <b>don't have any sources</b> with that <b>tag</b>...You'll need to <b>tag some sources</b> for generators to work.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                In any case, <b>that's it!</b> That's all you need to <b>generate scenes</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                The more <b>tagged scenes</b> you have in your <b>Library</b>, the better generators will work. If you
+                need to <b>combine</b> tag rules, you can make an <b>Advanced Rule</b>.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Back to Scene Detail
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
     }
 
     return(
@@ -1051,121 +1182,151 @@ class Tutorial extends React.Component {
             return;
         }
       case "scene":
-        switch (this.props.config.tutorials.sceneDetail) {
-          case SDT.welcome:
-            this.setTutorial(SDT.title);
-            return;
-          case SDT.title:
-            this.setTutorial(SDT.add1);
-            return;
-          case SDT.add1:
-            this.setTutorial(SDT.add2);
-            return;
-          case SDT.add2:
-            this.setTutorial(SDT.source);
-            return;
-          case SDT.source:
-            this.setTutorial(SDT.sourceAvatar);
-            return;
-          case SDT.sourceAvatar:
-            this.setTutorial(SDT.sourceTitle);
-            return;
-          case SDT.sourceTitle:
-            this.setTutorial(SDT.sourceTags);
-            return;
-          case SDT.sourceTags:
-            this.setTutorial(SDT.sourceCount);
-            return;
-          case SDT.sourceCount:
-            this.setTutorial(SDT.sourceButtons);
-            return;
-          case SDT.sourceButtons:
-            this.setTutorial(SDT.options1);
-            return;
-          case SDT.options1:
-            this.setTutorial(SDT.options2);
-            return;
-          case SDT.options2:
-            this.setTutorial(SDT.optionsLeft);
-            return;
-          case SDT.optionsLeft:
-            this.setTutorial(SDT.timing);
-            return;
-          case SDT.timing:
-            this.setTutorial(SDT.imageSizing);
-            return;
-          case SDT.imageSizing:
-            this.setTutorial(SDT.nextScene);
-            return;
-          case SDT.nextScene:
-            this.setTutorial(SDT.overlays);
-            return;
-          case SDT.overlays:
-            this.setTutorial(SDT.optionsRight);
-            return;
-          case SDT.optionsRight:
-            this.setTutorial(SDT.imageOptions);
-            return;
-          case SDT.imageOptions:
-            this.setTutorial(SDT.videoOptions);
-            return;
-          case SDT.videoOptions:
-            this.setTutorial(SDT.weighting);
-            return;
-          case SDT.weighting:
-            this.setTutorial(SDT.ordering);
-            return;
-          case SDT.ordering:
-            this.setTutorial(SDT.effects1);
-            return;
-          case SDT.effects1:
-            this.setTutorial(SDT.effects2);
-            return;
-          case SDT.effects2:
-            if (this.props.scene.zoom == true) {
-              this.props.onDoneTutorial(SDT.zoom1);
-            } else {
-              this.setTutorial(SDT.zoom1);
-            }
-            return;
-          case SDT.zoom1:
-            if (this.props.scene.zoomStart == 0.8 && this.props.scene.zoomEnd == 1.2) {
-              this.props.onDoneTutorial(SDT.zoom2);
-            } else {
-              this.setTutorial(SDT.zoom2);
-            }
-            return;
-          case SDT.zoom2:
-            if (this.props.scene.transTF == TF.sin) {
-              this.props.onDoneTutorial(SDT.zoom3);
-            } else {
-              this.setTutorial(SDT.zoom3);
-            }
-            return;
-          case SDT.zoom3:
-            this.setTutorial(SDT.zoom4);
-            return;
-          case SDT.zoom4:
-            if (this.props.scene.crossFade) {
-              this.props.onDoneTutorial(SDT.fade1);
-            } else {
-              this.setTutorial(SDT.fade1);
-            }
-            return;
-          case SDT.fade1:
-            this.setTutorial(SDT.fade2);
-            return;
-          case SDT.fade2:
-            this.setTutorial(SDT.play);
-            return;
-          case SDT.play:
-          case SDT.done:
-            // We're done, don't show
-            this.setTutorial(null);
-            return;
-          default:
-            return;
+        if (this.props.scene.generatorWeights == null) {
+          switch (this.props.config.tutorials.sceneDetail) {
+            case SDT.welcome:
+              this.setTutorial(SDT.title);
+              return;
+            case SDT.title:
+              this.setTutorial(SDT.add1);
+              return;
+            case SDT.add1:
+              this.setTutorial(SDT.add2);
+              return;
+            case SDT.add2:
+              this.setTutorial(SDT.source);
+              return;
+            case SDT.source:
+              this.setTutorial(SDT.sourceAvatar);
+              return;
+            case SDT.sourceAvatar:
+              this.setTutorial(SDT.sourceTitle);
+              return;
+            case SDT.sourceTitle:
+              this.setTutorial(SDT.sourceTags);
+              return;
+            case SDT.sourceTags:
+              this.setTutorial(SDT.sourceCount);
+              return;
+            case SDT.sourceCount:
+              this.setTutorial(SDT.sourceButtons);
+              return;
+            case SDT.sourceButtons:
+              this.setTutorial(SDT.options1);
+              return;
+            case SDT.options1:
+              this.setTutorial(SDT.options2);
+              return;
+            case SDT.options2:
+              this.setTutorial(SDT.optionsLeft);
+              return;
+            case SDT.optionsLeft:
+              this.setTutorial(SDT.timing);
+              return;
+            case SDT.timing:
+              this.setTutorial(SDT.imageSizing);
+              return;
+            case SDT.imageSizing:
+              this.setTutorial(SDT.nextScene);
+              return;
+            case SDT.nextScene:
+              this.setTutorial(SDT.overlays);
+              return;
+            case SDT.overlays:
+              this.setTutorial(SDT.optionsRight);
+              return;
+            case SDT.optionsRight:
+              this.setTutorial(SDT.imageOptions);
+              return;
+            case SDT.imageOptions:
+              this.setTutorial(SDT.videoOptions);
+              return;
+            case SDT.videoOptions:
+              this.setTutorial(SDT.weighting);
+              return;
+            case SDT.weighting:
+              this.setTutorial(SDT.ordering);
+              return;
+            case SDT.ordering:
+              this.setTutorial(SDT.effects1);
+              return;
+            case SDT.effects1:
+              this.setTutorial(SDT.effects2);
+              return;
+            case SDT.effects2:
+              if (this.props.scene.zoom == true) {
+                this.props.onDoneTutorial(SDT.zoom1);
+              } else {
+                this.setTutorial(SDT.zoom1);
+              }
+              return;
+            case SDT.zoom1:
+              if (this.props.scene.zoomStart == 0.8 && this.props.scene.zoomEnd == 1.2) {
+                this.props.onDoneTutorial(SDT.zoom2);
+              } else {
+                this.setTutorial(SDT.zoom2);
+              }
+              return;
+            case SDT.zoom2:
+              if (this.props.scene.transTF == TF.sin) {
+                this.props.onDoneTutorial(SDT.zoom3);
+              } else {
+                this.setTutorial(SDT.zoom3);
+              }
+              return;
+            case SDT.zoom3:
+              this.setTutorial(SDT.zoom4);
+              return;
+            case SDT.zoom4:
+              if (this.props.scene.crossFade) {
+                this.props.onDoneTutorial(SDT.fade1);
+              } else {
+                this.setTutorial(SDT.fade1);
+              }
+              return;
+            case SDT.fade1:
+              this.setTutorial(SDT.fade2);
+              return;
+            case SDT.fade2:
+              this.setTutorial(SDT.play);
+              return;
+            case SDT.play:
+            case SDT.done:
+              // We're done, don't show
+              this.setTutorial(null);
+              return;
+          }
+        } else {
+          switch (this.props.config.tutorials.sceneGenerator) {
+            case SDGT.welcome:
+              this.setTutorial(SDGT.buttons);
+              return;
+            case SDGT.buttons:
+              this.setTutorial(SDGT.edit1);
+              return;
+            case SDGT.edit1:
+              this.setTutorial(SDGT.edit2);
+              return;
+            case SDGT.edit2:
+              this.setTutorial(SDGT.generate);
+              return;
+            case SDGT.generate:
+              this.setTutorial(SDGT.final);
+              return;
+            case SDGT.generateError:
+              this.setTutorial(SDGT.finalError);
+              return;
+            case SDGT.final:
+            case SDGT.finalError:
+            case SDGT.done:
+              // We're done, don't show
+              this.setTutorial(null);
+              return;
+            default:
+              return;
+          }
         }
+        return;
       case "play":
         switch (this.props.config.tutorials.player) {
           case PT.welcome:

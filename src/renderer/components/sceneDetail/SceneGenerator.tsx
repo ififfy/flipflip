@@ -6,6 +6,7 @@ import {
   Grid, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Menu, MenuItem, Radio,
   RadioGroup, Slider, TextField, Theme, withStyles
 } from "@material-ui/core";
+import ValueLabel from "@material-ui/core/Slider/ValueLabel";
 
 import AddIcon from '@material-ui/icons/Add';
 import CheckIcon from '@material-ui/icons/Check';
@@ -13,7 +14,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import NotInterestedIcon from '@material-ui/icons/NotInterested';
 
-import {TT} from "../../data/const";
+import {SDGT, TT} from "../../data/const";
 import en from "../../data/en";
 import Scene from "../../data/Scene";
 import Tag from "../../data/Tag";
@@ -48,6 +49,7 @@ const styles = (theme: Theme) => createStyles({
   editList: {
     display: 'flex',
     padding: theme.spacing(1),
+    overflow: 'hidden',
   },
   fullHeight: {
     height: '100%',
@@ -55,6 +57,7 @@ const styles = (theme: Theme) => createStyles({
   slider: {
     height: 'auto',
     transform: 'scaleY(1)',
+    zIndex: theme.zIndex.modal + 1,
     transition: theme.transitions.create('transform', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -62,6 +65,7 @@ const styles = (theme: Theme) => createStyles({
   },
   sliderClose: {
     transform: 'scaleY(0)',
+    zIndex: 'auto',
     transition: theme.transitions.create('transform', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
@@ -73,19 +77,45 @@ const styles = (theme: Theme) => createStyles({
   noAlignSelf: {
     alignSelf: 'unset',
   },
-  topMenu : {
-    zIndex: `${theme.zIndex.modal + 1} !important` as any,
-  },
   tagMenu: {
     maxHeight: 400,
   },
+  backdropTop: {
+    zIndex: `${theme.zIndex.modal + 1} !important` as any,
+  },
+  highlight: {
+    borderWidth: 2,
+    borderColor: theme.palette.secondary.main,
+    borderStyle: 'solid',
+  },
+  disable: {
+    pointerEvents: 'none',
+  }
 });
+
+const StyledValueLabel = withStyles({
+  offset: {
+    top: -10,
+    left: 'calc(-50% + 28px)',
+  },
+  circle: {
+    borderRadius: '0 50% 50% 50%',
+  },
+  open: {},
+  thumb: {
+    '&$open $offset': {
+      transform: 'scale(1)',
+    },
+  },
+})(ValueLabel);
 
 class SceneGenerator extends React.Component {
   readonly props: {
     classes: any,
     scene: Scene,
     tags: Array<Tag>,
+    tutorial: string,
+    onTutorial(tutorial: string): void,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
   };
 
@@ -107,12 +137,12 @@ class SceneGenerator extends React.Component {
     return(
       <Grid container spacing={1}>
         {this.props.scene.generatorWeights.map((wg, i) =>
-          <Grid key={i} item xs={12} sm={6} md={4} lg={3}>
+          <Grid key={i} item xs={12} sm={6} md={4} lg={3} className={clsx((this.props.tutorial == SDGT.edit1 || this.props.tutorial == SDGT.edit2) && classes.backdropTop)}>
             <Card>
               <CardHeader
                 classes={{action: classes.noAlignSelf}}
                 avatar={
-                  <IconButton className={classes.cardAvatarButton} onClick={this.onWeighGroup.bind(this, i)}>
+                  <IconButton className={clsx(classes.cardAvatarButton, this.props.tutorial == SDGT.edit1 && classes.highlight)} onClick={this.onWeighGroup.bind(this, i)}>
                     {wg.type == TT.weight && (
                       <Avatar className={clsx(classes.cardAvatar, wg.rules && !this.areRulesValid(wg) && classes.cardAvatarError)}>
                         {wg.percent}
@@ -137,7 +167,9 @@ class SceneGenerator extends React.Component {
                         <EditIcon />
                       </IconButton>
                     )}
-                    <IconButton size="small" onClick={this.onDeleteGroup.bind(this, i)}>
+                    <IconButton size="small"
+                                className={clsx(this.props.tutorial == SDGT.edit1 && classes.disable)}
+                                onClick={this.onDeleteGroup.bind(this, i)}>
                       <DeleteIcon color="error" />
                     </IconButton>
                   </React.Fragment>
@@ -193,8 +225,8 @@ class SceneGenerator extends React.Component {
           getContentAnchorEl={null}
           anchorEl={this.state.menuAnchorEl}
           keepMounted
-          className={clsx(this.state.isEditing != -1 && classes.topMenu)}
-          classes={{list: classes.editList, paper: clsx(this.state.isEditing != -1 && classes.topMenu)}}
+          className={clsx((this.state.isEditing != -1 || this.props.tutorial == SDGT.edit2) && classes.backdropTop)}
+          classes={{list: classes.editList, paper: clsx(this.state.isEditing != -1 && classes.backdropTop, this.props.tutorial == SDGT.edit2 && classes.highlight)}}
           open={this.state.isWeighing != -1}
           onClose={this.onCloseMenu.bind(this)}>
           {this.state.isWeighing != -1 && (
@@ -206,6 +238,7 @@ class SceneGenerator extends React.Component {
                 onChangeCommitted={this.onGroupSliderChange.bind(this, this.state.isWeighing, 'percent')}
                 valueLabelDisplay={'auto'}
                 valueLabelFormat={(v) => v + "%"}
+                ValueLabelComponent={StyledValueLabel as any}
                 orientation="vertical"/>
             </div>
           )}
@@ -215,7 +248,9 @@ class SceneGenerator extends React.Component {
               value={isWeighing.type}
               onChange={this.onGroupInput.bind(this, this.state.isWeighing, 'type')}>
               {Object.values(TT).map((tt) =>
-                <FormControlLabel key={tt} value={tt} control={<Radio />} label={en.get(tt)} />
+                <FormControlLabel key={tt} value={tt}
+                                  control={<Radio className={clsx(this.props.tutorial == SDGT.edit2 && tt == TT.all && classes.highlight)}/>}
+                                  label={en.get(tt)} />
               )}
             </RadioGroup>
           )}
@@ -397,6 +432,9 @@ class SceneGenerator extends React.Component {
   }
 
   onWeighGroup(index: number, e: MouseEvent) {
+    if (this.props.tutorial == SDGT.edit1) {
+      this.props.onTutorial(SDGT.edit1);
+    }
     this.setState({menuAnchorEl: e.currentTarget, isWeighing: index});
   }
 
@@ -433,6 +471,12 @@ class SceneGenerator extends React.Component {
       const wg = generatorWeights[this.state.isEditing];
       const rule = wg.rules[index];
       (rule as any)[key] = input.value;
+    }
+    if (this.props.tutorial == SDGT.edit2) {
+      if (generatorWeights.length == 1 && generatorWeights[0].type == TT.all) {
+        this.props.onTutorial(SDGT.edit2);
+        this.onCloseDialog();
+      }
     }
     this.changeKey("generatorWeights", generatorWeights);
   }

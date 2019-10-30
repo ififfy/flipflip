@@ -32,7 +32,7 @@ import SaveIcon from '@material-ui/icons/Save';
 import SortIcon from '@material-ui/icons/Sort';
 import WarningIcon from '@material-ui/icons/Warning';
 
-import {AF, MO, OF, SB, SDT, SF, TT, WF} from "../../data/const";
+import {AF, MO, OF, SB, SDGT, SDT, SF, TT, WF} from "../../data/const";
 import en from "../../data/en";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
@@ -291,7 +291,7 @@ const styles = (theme: Theme) => createStyles({
     alignItems: 'center',
   },
   backdropTop: {
-    zIndex: theme.zIndex.modal + 1,
+    zIndex: `${theme.zIndex.modal + 1} !important` as any,
   },
   highlight: {
     borderWidth: 2,
@@ -563,7 +563,7 @@ class SceneDetail extends React.Component {
                     <SourceList
                       config={this.props.config}
                       sources={this.props.scene.sources}
-                      tutorial={this.props.tutorial}
+                      tutorial={this.props.tutorial == SDGT.final ? null : this.props.tutorial}
                       onClearBlacklist={this.props.onClearBlacklist.bind(this)}
                       onClip={this.props.onClip.bind(this)}
                       onPlay={this.props.onPlay.bind(this)}
@@ -587,6 +587,8 @@ class SceneDetail extends React.Component {
                     <SceneGenerator
                       scene={this.props.scene}
                       tags={this.props.tags}
+                      tutorial={this.props.tutorial}
+                      onTutorial={this.props.onTutorial.bind(this)}
                       onUpdateScene={this.props.onUpdateScene.bind(this)} />
                   </Box>
                 </div>
@@ -760,7 +762,7 @@ class SceneDetail extends React.Component {
             )}
             <Tooltip title="Max" placement="top">
               <Fab
-                className={classes.sortMenuButton}
+                className={clsx(classes.sortMenuButton, this.props.tutorial == SDGT.buttons && clsx(classes.backdropTop, classes.disable))}
                 onClick={this.onOpenMaxMenu.bind(this)}
                 size="medium">
                 {this.props.scene.generatorMax}
@@ -796,7 +798,7 @@ class SceneDetail extends React.Component {
             </Menu>
             <Tooltip title="Adv Rule"  placement="left">
               <Fab
-                className={clsx(classes.addButton, classes.addDirectoryButton)}
+                className={clsx(classes.addButton, classes.addDirectoryButton, this.props.tutorial == SDGT.buttons && clsx(classes.backdropTop, classes.disable))}
                 onClick={this.onAddAdvWG.bind(this)}
                 size="small">
                 <AddCircleOutlineIcon className={classes.icon} />
@@ -804,17 +806,17 @@ class SceneDetail extends React.Component {
             </Tooltip>
             <Tooltip title="Simple Rule"  placement="left">
               <Fab
-                className={clsx(classes.addButton, classes.addURLButton)}
+                className={clsx(classes.addButton, classes.addURLButton, this.props.tutorial == SDGT.buttons && clsx(classes.backdropTop, classes.highlight))}
                 onClick={this.onOpenTagMenu.bind(this)}
                 size="small">
                 <AddIcon className={classes.icon} />
               </Fab>
             </Tooltip>
             <Tooltip title="Generate Sources" placement="top-end">
-              <span className={classes.generateTooltip} style={!this.areWeightsValid() ? { pointerEvents: "none" } : {}}>
+              <span className={clsx(classes.generateTooltip, this.props.tutorial == SDGT.buttons && clsx(classes.backdropTop, classes.disable), this.props.tutorial == SDGT.generate && classes.backdropTop)} style={!this.areWeightsValid() ? { pointerEvents: "none" } : {}}>
                 <Fab
                   disabled={!this.areWeightsValid()}
-                  className={classes.addMenuButton}
+                  className={clsx(classes.addMenuButton, this.props.tutorial == SDGT.generate && classes.highlight)}
                   onClick={this.onGenerate.bind(this)}
                   size="large">
                   <Badge
@@ -840,7 +842,8 @@ class SceneDetail extends React.Component {
               getContentAnchorEl={null}
               anchorEl={this.state.menuAnchorEl}
               keepMounted
-              classes={{paper: classes.tagMenu}}
+              className={clsx(this.props.tutorial == SDGT.buttons && classes.backdropTop)}
+              classes={{paper: clsx(classes.tagMenu, this.props.tutorial == SDGT.buttons && clsx(classes.backdropTop, classes.highlight))}}
               open={this.state.openMenu == MO.simpleRule}
               onClose={this.onCloseDialog.bind(this)}>
               {this.props.tags.filter((t) => !this.props.scene.generatorWeights.map((wg) => wg.tag ? wg.tag.name : "").includes(t.name)).map((t) =>
@@ -950,8 +953,14 @@ class SceneDetail extends React.Component {
   generateCallback() {
     if (this.props.scene.sources.length == 0) {
       this.setState({snackbar: "Sorry, no sources were found for these rules", snackbarType: SB.warning});
+      if (this.props.tutorial == SDGT.generate) {
+        this.props.onTutorial(SDGT.generateError);
+      }
     } else {
-      this.onChangeTab(null, 2);
+      this.onChangeTab(null, 3);
+      if (this.props.tutorial == SDGT.generate) {
+        this.props.onTutorial(SDGT.generate);
+      }
     }
   }
 
@@ -966,6 +975,10 @@ class SceneDetail extends React.Component {
   }
 
   onAddSimpleWG(tag: Tag) {
+    if (this.props.tutorial == SDGT.buttons) {
+      this.props.onTutorial(SDGT.buttons);
+      this.onCloseDialog();
+    }
     const wg = new WeightGroup();
     wg.name = tag.name;
     wg.percent = 0;

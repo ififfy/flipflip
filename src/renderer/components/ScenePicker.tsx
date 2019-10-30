@@ -721,7 +721,7 @@ class ScenePicker extends React.Component {
                   classes={{paper: classes.sortMenu}}
                   open={this.state.openMenu == MO.sort}
                   onClose={this.onCloseDialog.bind(this)}>
-                  {[SF.alpha, SF.date, SF.count, SF.type].map((sf) =>
+                  {[SF.alpha, SF.date, SF.count].map((sf) =>
                     <MenuItem key={sf}>
                       <ListItemText primary={en.get(sf)}/>
                       <ListItemSecondaryAction>

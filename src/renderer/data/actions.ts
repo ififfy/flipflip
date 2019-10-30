@@ -22,7 +22,7 @@ import {
   saveDir
 } from "./utils";
 import defaultTheme from "./theme";
-import {AF, BT, GT, IF, LT, OF, PR, PT, SDT, SF, SPT, ST, TF, TT} from "./const";
+import {AF, BT, GT, IF, LT, OF, PR, PT, SDGT, SDT, SF, SGT, SPT, ST, TF, TT} from "./const";
 import { defaultInitialState } from './AppStorage';
 import { Route } from "./Route";
 import Scene from "./Scene";
@@ -159,7 +159,8 @@ export function skipTutorials(state: State): Object {
   newConfig.tutorials.sceneDetail = 'done';
   newConfig.tutorials.player = 'done';
   newConfig.tutorials.library = 'done';
-  // TODO Add rest of these
+  newConfig.tutorials.sceneGenerator = 'done';
+  newConfig.tutorials.sceneGrid = 'done';
   return {config: newConfig, tutorial: null}
 }
 
@@ -174,11 +175,20 @@ export function doneTutorial(state: State, tutorial: string): Object {
       state.config.tutorials.scenePicker = tutorial;
     }
   } else if (isRoute(state, 'scene')) {
-    if (tutorial == SDT.play) {
-      newTutorial = null;
-      state.config.tutorials.sceneDetail = 'done';
+    if (getActiveScene(state).generatorWeights) {
+      if (tutorial == SDGT.final || tutorial == SDGT.finalError) {
+        newTutorial = null;
+        state.config.tutorials.sceneGenerator = 'done';
+      } else {
+        state.config.tutorials.sceneGenerator = tutorial;
+      }
     } else {
-      state.config.tutorials.sceneDetail = tutorial;
+      if (tutorial == SDT.play) {
+        newTutorial = null;
+        state.config.tutorials.sceneDetail = 'done';
+      } else {
+        state.config.tutorials.sceneDetail = tutorial;
+      }
     }
   } else if (isRoute(state, 'play')) {
     if (tutorial == PT.final) {
@@ -194,8 +204,14 @@ export function doneTutorial(state: State, tutorial: string): Object {
     } else {
       state.config.tutorials.library = tutorial;
     }
+  } else if (isRoute(state, 'sceneGrid')) {
+    if (tutorial == SGT.final) {
+      newTutorial = null;
+      state.config.tutorials.sceneGrid = 'done';
+    } else {
+      state.config.tutorials.sceneGrid = tutorial;
+    }
   }
-  // TODO Add rest of these
   return {config: newConfig, tutorial: newTutorial};
 }
 
@@ -631,7 +647,8 @@ export function addGenerator(state: State): Object {
   return {
     scenes: state.scenes.concat([scene]),
     route: [new Route({kind: 'scene', value: scene.id})],
-    autoEdit: true
+    autoEdit: true,
+    tutorial: state.config.tutorials.sceneGenerator == null ? SDGT.welcome : null
   };
 }
 

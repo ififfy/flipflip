@@ -219,9 +219,27 @@ const LT = { // Library Tutorials
   sidebar1: 'lt4',
   sidebar2: 'lt5',
   final: 'lt6',
-  done: 'dont',
+  done: 'done',
+};
+
+const SDGT = { // Scene Generator Tutorials
+  welcome: 'sdgt1',
+  buttons: 'sdgt2',
+  edit1: 'sdgt3',
+  edit2: 'sdgt4',
+  generate: 'sdgt5',
+  generateError: 'sdgt5E',
+  final: 'sdgt6',
+  finalError: 'sdgt6E',
+  done: 'done',
+};
+
+const SGT = { // Scene Grid Tutorials
+  welcome: 'sgt1',
+  final: 'sgdtX',
+  done: 'done',
 };
 
 export {
-  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG, SPT, SDT, PT, LT,
+  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG, SPT, SDT, PT, LT, SDGT, SGT
 };
