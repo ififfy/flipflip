@@ -176,7 +176,10 @@ export default class Meta extends React.Component {
           {this.isRoute('clip') && (
             <VideoClipper
               source={actions.getActiveSource(this.state)}
+              tutorial={this.state.tutorial}
               videoVolume={this.state.config.defaultScene.videoVolume}
+              onTutorial={a(actions.doneTutorial)}
+              onStartVCTutorial={a(actions.startVCTutorial)}
               onUpdateClips={a(actions.onUpdateClips)}
               goBack={a(actions.goBack)}
               cache={a(actions.cacheImage)}

@@ -46,7 +46,7 @@ class VideoControl extends React.Component {
     classes: any,
     video: HTMLVideoElement,
     player?: boolean,
-    volume?: number,
+    volume?: any,
     clip?: Array<number>,
     clips?: Array<Clip>,
       onChangeVolume(volume: number): void,
@@ -102,9 +102,8 @@ class VideoControl extends React.Component {
                   <VolumeDownIcon/>
                 </Grid>
                 <Grid item xs>
-                  <Slider value={this.props.volume ? this.props.volume : this.props.video.volume * 100}
-                          onChange={this.onChangeVolume.bind(this)}
-                          aria-labelledby="audio-volume-slider"/>
+                  <Slider value={this.props.volume ? parseInt(this.props.volume) : this.props.video.volume * 100}
+                          onChange={this.onChangeVolume.bind(this)} />
                 </Grid>
                 <Grid item>
                   <VolumeUpIcon/>

@@ -22,7 +22,7 @@ import {
   saveDir
 } from "./utils";
 import defaultTheme from "./theme";
-import {AF, BT, GT, IF, LT, OF, PR, PT, SDGT, SDT, SF, SGT, SPT, ST, TF, TT} from "./const";
+import {AF, BT, GT, IF, LT, OF, PR, PT, SDGT, SDT, SF, SGT, SPT, ST, TF, TT, VCT} from "./const";
 import { defaultInitialState } from './AppStorage';
 import { Route } from "./Route";
 import Scene from "./Scene";
@@ -149,6 +149,14 @@ export function startTutorial(state: State): Object {
   }
 }
 
+export function startVCTutorial(state: State): Object {
+  if (state.config.tutorials.videoClipper == null) {
+    return {tutorial: VCT.welcome}
+  } else {
+    return {}
+  }
+}
+
 export function setTutorial(state: State, tutorial: string): Object {
   return {tutorial: tutorial};
 }
@@ -161,6 +169,7 @@ export function skipTutorials(state: State): Object {
   newConfig.tutorials.library = 'done';
   newConfig.tutorials.sceneGenerator = 'done';
   newConfig.tutorials.sceneGrid = 'done';
+  newConfig.tutorials.videoClipper = 'done';
   return {config: newConfig, tutorial: null}
 }
 
@@ -210,6 +219,13 @@ export function doneTutorial(state: State, tutorial: string): Object {
       state.config.tutorials.sceneGrid = 'done';
     } else {
       state.config.tutorials.sceneGrid = tutorial;
+    }
+  } else if (isRoute(state, 'clip')) {
+    if (tutorial == VCT.final) {
+      newTutorial = null;
+      state.config.tutorials.videoClipper = 'done';
+    } else {
+      state.config.tutorials.videoClipper = tutorial;
     }
   }
   return {config: newConfig, tutorial: newTutorial};

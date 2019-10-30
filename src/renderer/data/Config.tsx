@@ -325,6 +325,7 @@ export class Tutorials implements TutorialsI {
   library = null as string;
   sceneGenerator = null as string;
   sceneGrid = null as string;
+  videoClipper = null as string;
 }
 
 export default class Config {

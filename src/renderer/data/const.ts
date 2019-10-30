@@ -242,6 +242,15 @@ const SGT = { // Scene Grid Tutorials
   done: 'done',
 };
 
+const VCT = { // Video Clipper Tutorials
+  welcome: 'vct1',
+  controls: 'vct2',
+  clips: 'vct3',
+  clip: 'vct4',
+  final: 'vct5',
+  done: 'done',
+};
+
 export {
-  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG, SPT, SDT, PT, LT, SDGT, SGT
+  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG, SPT, SDT, PT, LT, SDGT, SGT, VCT
 };

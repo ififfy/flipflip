@@ -20,7 +20,7 @@ import HttpIcon from '@material-ui/icons/Http';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import MovieIcon from '@material-ui/icons/Movie';
 
-import {LT, PT, SDGT, SDT, SGT, SPT, TF} from "../data/const";
+import {LT, PT, SDGT, SDT, SGT, SPT, TF, VCT} from "../data/const";
 import {Route} from "../data/Route";
 import Config from "../data/Config";
 import Scene from "../data/Scene";
@@ -1206,6 +1206,100 @@ class Tutorial extends React.Component {
             </DialogActions>
           </React.Fragment>;
         break;
+
+
+      case VCT.welcome:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Video Clipper</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                Welcome to the <b>Video Clipper</b>
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                Here, you can <b>select parts of a video</b> to use <b>during playback</b>.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onSkip.bind(this)} color="secondary">
+                Skip Tutorial
+              </Button>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case VCT.controls:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Video Clipper</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                At the <b>bottom of the screen</b> are the typical <b>video controls</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                You can <b>seek</b> through the video, <b>play/pause</b>, and change the <b>volume</b>. You
+                will also see the <b>start time</b> of the clips you make <b>show up</b> on the seek bar.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case VCT.clips:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Video Clipper</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                Above the video controls are your <b>Clips</b>. You can <b>edit</b> a clip by <b>clicking its button</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                To make a new Clip <b>Click the +</b>
+              </DialogContentText>
+            </DialogContent>
+          </React.Fragment>;
+        break;
+      case VCT.clip:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Video Clipper</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                Now, you can <b>slide the start and end</b> to the desired points (or <b>enter the timestamp </b>in the text field).
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                The <b>main video controls</b> will let you preview your clip.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                When you are done be sure to <b>Click the Save button</b>.
+              </DialogContentText>
+            </DialogContent>
+          </React.Fragment>;
+        break;
+      case VCT.final:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Video Clipper</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                That's all there is to <b>making clips</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                <i>Be sure to enable <b>Use Clips</b> in your <b>Scenes</b> if you want to use your <b>clips</b></i>
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Back to Video Clipper
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
     }
 
     return(
@@ -1466,6 +1560,28 @@ class Tutorial extends React.Component {
             return;
           case SGT.final:
           case SGT.done:
+            // We're done, don't show
+            this.setTutorial(null);
+            return;
+          default:
+            return;
+        }
+      case "clip":
+        switch (this.props.config.tutorials.videoClipper) {
+          case VCT.welcome:
+            this.setTutorial(VCT.controls);
+            return;
+          case VCT.controls:
+            this.setTutorial(VCT.clips);
+            return;
+          case VCT.clips:
+            this.setTutorial(VCT.clip);
+            return;
+          case VCT.clip:
+            this.setTutorial(VCT.final);
+            return;
+          case VCT.final:
+          case VCT.done:
             // We're done, don't show
             this.setTutorial(null);
             return;

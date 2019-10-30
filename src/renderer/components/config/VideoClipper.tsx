@@ -14,7 +14,7 @@ import KeyboardReturnIcon from '@material-ui/icons/KeyboardReturn';
 import SaveIcon from '@material-ui/icons/Save';
 
 import {getTimestamp, getTimestampValue} from "../../data/utils";
-import {BT} from "../../data/const";
+import {BT, VCT} from "../../data/const";
 import LibrarySource from "../../data/LibrarySource";
 import Clip from "../../data/Clip";
 import Scene from "../../data/Scene";
@@ -100,6 +100,17 @@ const styles = (theme: Theme) => createStyles({
   fill: {
     flexGrow: 1,
   },
+  backdropTop: {
+    zIndex: theme.zIndex.modal + 1,
+  },
+  highlight: {
+    borderWidth: 2,
+    borderColor: theme.palette.secondary.main,
+    borderStyle: 'solid',
+  },
+  disable: {
+    pointerEvents: 'none',
+  }
 });
 
 const StyledValueLabel = withStyles((theme: Theme) => createStyles({
@@ -122,9 +133,12 @@ class VideoClipper extends React.Component {
   readonly props: {
     classes: any,
     source: LibrarySource,
+    tutorial: string,
     videoVolume: number,
     cache(video: HTMLVideoElement): void,
     goBack(): void,
+    onTutorial(tutorial: string): void,
+    onStartVCTutorial(): void,
     onUpdateClips(url: string, clips: Array<Clip>): void,
   };
 
@@ -206,18 +220,19 @@ class VideoClipper extends React.Component {
             <Drawer
               variant="permanent"
               anchor="bottom"
+              className={clsx((this.props.tutorial == VCT.controls || this.props.tutorial == VCT.clips || this.props.tutorial == VCT.clip) && classes.backdropTop)}
               classes={{paper: classes.clipDrawerPaper}}
               open>
               <Grid container alignItems="center">
                 <Grid item xs={12}>
                   <Collapse in={this.state.isEditing == -1}>
-                    <Grid container spacing={1} alignItems="center">
-                      <Grid item>
+                    <Grid container spacing={1} alignItems="center" className={clsx(this.props.tutorial == VCT.controls && classes.disable, this.props.tutorial == VCT.clips && classes.highlight)}>
+                      <Grid key={-1} item>
                         <Tooltip title="New Clip" placement="top">
                           <Fab
                             color="primary"
                             size="small"
-                            className={clsx(classes.fab, classes.addFab)}
+                            className={clsx(classes.fab, classes.addFab, this.props.tutorial == VCT.clips && classes.highlight)}
                             onClick={this.onAdd.bind(this)}>
                             <AddIcon/>
                           </Fab>
@@ -229,6 +244,7 @@ class VideoClipper extends React.Component {
                             variant="contained"
                             color="secondary"
                             size="large"
+                            className={clsx(this.props.tutorial == VCT.clips && classes.disable)}
                             onClick={this.onEdit.bind(this, c)}>
                             {c.id}
                           </Button>
@@ -237,7 +253,7 @@ class VideoClipper extends React.Component {
                     </Grid>
                   </Collapse>
                   <Collapse in={this.state.isEditing != -1}>
-                    <Grid container spacing={1} alignItems="center">
+                    <Grid container spacing={1} alignItems="center" className={clsx(this.props.tutorial == VCT.clip && classes.highlight)}>
                       <Grid item xs className={classes.timeSlider}>
                         <Slider
                           min={0}
@@ -268,7 +284,7 @@ class VideoClipper extends React.Component {
                           <Fab
                             color="primary"
                             size="small"
-                            className={classes.fab}
+                            className={clsx(classes.fab, this.props.tutorial == VCT.clip && classes.highlight)}
                             onClick={this.onSave.bind(this)}>
                             <SaveIcon/>
                           </Fab>
@@ -278,7 +294,7 @@ class VideoClipper extends React.Component {
                         <Tooltip title="Delete Clip" placement="top">
                           <Fab
                             size="small"
-                            className={clsx(classes.fab, classes.removeFab)}
+                            className={clsx(classes.fab, classes.removeFab, this.props.tutorial == VCT.clip && classes.disable)}
                             onClick={this.onRemove.bind(this)}>
                             <DeleteIcon color="inherit" />
                           </Fab>
@@ -286,7 +302,9 @@ class VideoClipper extends React.Component {
                       </Grid>
                       <Grid item>
                         <Tooltip title="Cancel" placement="top">
-                          <IconButton onClick={this.onCancel.bind(this)}>
+                          <IconButton
+                            className={clsx(this.props.tutorial == VCT.clip && classes.disable)}
+                            onClick={this.onCancel.bind(this)}>
                             <KeyboardReturnIcon/>
                           </IconButton>
                         </Tooltip>
@@ -294,7 +312,7 @@ class VideoClipper extends React.Component {
                     </Grid>
                   </Collapse>
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={12} className={clsx(this.props.tutorial == VCT.controls && classes.highlight)}>
                   <VideoControl
                     video={this.state.video}
                     volume={this.state.scene.videoVolume}
@@ -327,6 +345,7 @@ class VideoClipper extends React.Component {
     video.onloadeddata = () => {
       this.props.cache(video);
       this.setState({video: video});
+      this.props.onStartVCTutorial();
     };
 
     video.src = this.props.source.url;
@@ -336,6 +355,9 @@ class VideoClipper extends React.Component {
   }
 
   onAdd() {
+    if (this.props.tutorial == VCT.clips) {
+      this.props.onTutorial(VCT.clips);
+    }
     this.setState({
       isEditing: 0,
       isEditingValue: [0, this.state.video.duration],
@@ -358,6 +380,9 @@ class VideoClipper extends React.Component {
   }
 
   onSave() {
+    if (this.props.tutorial == VCT.clip) {
+      this.props.onTutorial(VCT.clip);
+    }
     const source = this.props.source;
     let clip = source.clips.find((c) => c.id == this.state.isEditing);
     if (clip) {
