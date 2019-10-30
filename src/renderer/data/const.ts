@@ -236,7 +236,9 @@ const SDGT = { // Scene Generator Tutorials
 
 const SGT = { // Scene Grid Tutorials
   welcome: 'sgt1',
-  final: 'sgdtX',
+  dimensions: 'sgt2',
+  cells: 'sgt3',
+  final: 'sgdt4',
   done: 'done',
 };
 

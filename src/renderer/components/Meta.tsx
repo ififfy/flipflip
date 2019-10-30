@@ -188,9 +188,11 @@ export default class Meta extends React.Component {
               allScenes={this.state.scenes}
               autoEdit={this.state.autoEdit}
               grid={grid}
+              tutorial={this.state.tutorial}
               goBack={a(actions.goBack)}
               onDelete={a(actions.deleteGrid)}
               onPlayGrid={a(actions.playGrid)}
+              onTutorial={a(actions.doneTutorial)}
               onUpdateGrid={a(actions.updateGrid)}
             />
           )}

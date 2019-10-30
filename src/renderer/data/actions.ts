@@ -204,7 +204,7 @@ export function doneTutorial(state: State, tutorial: string): Object {
     } else {
       state.config.tutorials.library = tutorial;
     }
-  } else if (isRoute(state, 'sceneGrid')) {
+  } else if (isRoute(state, 'grid')) {
     if (tutorial == SGT.final) {
       newTutorial = null;
       state.config.tutorials.sceneGrid = 'done';
@@ -628,6 +628,7 @@ export function addGrid(state: State): Object {
     grids: state.grids.concat([grid]),
     route: [new Route({kind: 'grid', value: grid.id})],
     autoEdit: true,
+    tutorial: state.config.tutorials.sceneGrid == null ? SGT.welcome : null
   };
 }
 

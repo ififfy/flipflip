@@ -12,6 +12,7 @@ import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 
 import SceneGrid from "../../data/SceneGrid";
 import Scene from "../../data/Scene";
+import {SGT} from "../../data/const";
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -100,6 +101,17 @@ const styles = (theme: Theme) => createStyles({
   fill: {
     flexGrow: 1,
   },
+  backdropTop: {
+    zIndex: theme.zIndex.modal + 1,
+  },
+  highlight: {
+    borderWidth: 2,
+    borderColor: theme.palette.secondary.main,
+    borderStyle: 'solid',
+  },
+  disable: {
+    pointerEvents: 'none',
+  }
 });
 
 class GridSetup extends React.Component {
@@ -108,9 +120,11 @@ class GridSetup extends React.Component {
     allScenes: Array<Scene>,
     autoEdit: boolean,
     grid: SceneGrid,
+    tutorial: string,
     goBack(): void,
     onDelete(grid: SceneGrid): void,
     onPlayGrid(grid: SceneGrid): void,
+    onTutorial(tutorial: string): void,
     onUpdateGrid(grid: SceneGrid, fn: (grid: SceneGrid) => void): void,
   };
 
@@ -143,7 +157,7 @@ class GridSetup extends React.Component {
     return(
       <div className={classes.root}>
 
-        <AppBar position="absolute" className={classes.appBar}>
+        <AppBar position="absolute" className={clsx(classes.appBar, this.props.tutorial == SGT.dimensions && classes.backdropTop)}>
           <Toolbar className={classes.headerBar}>
             <div className={classes.headerLeft}>
               <Tooltip title="Back" placement="right-end">
@@ -151,6 +165,7 @@ class GridSetup extends React.Component {
                   edge="start"
                   color="inherit"
                   aria-label="Back"
+                  className={clsx(this.props.tutorial == SGT.dimensions && classes.disable)}
                   onClick={this.goBack.bind(this)}>
                   <ArrowBackIcon />
                 </IconButton>
@@ -174,7 +189,7 @@ class GridSetup extends React.Component {
             )}
             {this.state.isEditingName == null && (
               <Typography component="h1" variant="h4" color="inherit" noWrap
-                          className={clsx(classes.title, this.props.grid.name.length == 0 && classes.noTitle)} onClick={this.beginEditingName.bind(this)}>
+                          className={clsx(classes.title, this.props.grid.name.length == 0 && classes.noTitle, this.props.tutorial == SGT.dimensions && classes.disable)} onClick={this.beginEditingName.bind(this)}>
                 {this.props.grid.name}
               </Typography>
             )}
@@ -187,6 +202,7 @@ class GridSetup extends React.Component {
                 onChange={this.onHeightInput.bind(this)}
                 onBlur={this.blurHeight.bind(this)}
                 variant="filled"
+                className={clsx(this.props.tutorial == SGT.dimensions && classes.highlight)}
                 InputLabelProps={{className: classes.dimensionInput}}
                 inputProps={{
                   className: classes.dimensionInput,
@@ -201,6 +217,7 @@ class GridSetup extends React.Component {
                 onChange={this.onWidthInput.bind(this)}
                 onBlur={this.blurWidth.bind(this)}
                 variant="filled"
+                className={clsx(this.props.tutorial == SGT.dimensions && classes.highlight)}
                 InputLabelProps={{className: classes.dimensionInput}}
                 inputProps={{
                   className: classes.dimensionInput,
@@ -212,6 +229,7 @@ class GridSetup extends React.Component {
                 edge="end"
                 color="inherit"
                 aria-label="Play"
+                className={clsx(this.props.tutorial == SGT.dimensions && classes.disable)}
                 onClick={this.onPlayGrid.bind(this)}>
                 <PlayCircleOutlineIcon fontSize="large"/>
               </IconButton>
@@ -277,6 +295,19 @@ class GridSetup extends React.Component {
         </main>
       </div>
     );
+  }
+
+  componentDidUpdate() {
+    if (this.props.tutorial == SGT.dimensions && this.state.width ==2 && this.state.height == 2) {
+      this.props.onTutorial(SGT.dimensions);
+      const sceneID = this.props.allScenes[0].id;
+      const newGrid = this.props.grid.grid;
+      newGrid[0][0] = sceneID;
+      newGrid[0][1] = sceneID;
+      newGrid[1][0] = sceneID;
+      newGrid[1][1] = sceneID;
+      this.changeKey('grid', newGrid);
+    }
   }
 
   onClickCell(rowIndex: number, colIndex: number, e: MouseEvent) {

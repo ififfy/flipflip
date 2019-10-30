@@ -20,7 +20,7 @@ import HttpIcon from '@material-ui/icons/Http';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import MovieIcon from '@material-ui/icons/Movie';
 
-import {LT, PT, SDGT, SDT, SPT, TF} from "../data/const";
+import {LT, PT, SDGT, SDT, SGT, SPT, TF} from "../data/const";
 import {Route} from "../data/Route";
 import Config from "../data/Config";
 import Scene from "../data/Scene";
@@ -1127,6 +1127,85 @@ class Tutorial extends React.Component {
             </DialogActions>
           </React.Fragment>;
         break;
+
+
+      case SGT.welcome:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Scene Grid</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                Welcome to your your first <b>Scene Grid</b>!
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                Here, you can play your <b>Scenes</b> simultaneously in a <b>grid format</b>.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onSkip.bind(this)} color="secondary">
+                Skip Tutorial
+              </Button>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case SGT.dimensions:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Scene Grid</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                You can change the <b>dimensions of the grid in the top right</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                <b>Make this grid <u>2x2</u></b>
+              </DialogContentText>
+            </DialogContent>
+          </React.Fragment>;
+        break;
+      case SGT.cells:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Scene Grid</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                Now you have a <b>grid</b> of <b>4 Scenes</b>!
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                To change a grid cell, <b>click the cell</b> and <b>select a Scene</b>. You can also keep the cell <b>EMPTY</b> if you want.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                <i>For the purpose of this tutorial, we've <b>filled the grid</b> already</i>.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case SGT.final:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Scene Grid</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                That's all there is to <b>Scene Grids</b>. You're ready to play the grid!
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                Please be aware that <b>typical Scene controls and configs</b> are <b><u>not</u> available</b> in the Scene Grid player.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Back to Scene Grid
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
     }
 
     return(
@@ -1368,6 +1447,25 @@ class Tutorial extends React.Component {
             return;
           case LT.final:
           case LT.done:
+            // We're done, don't show
+            this.setTutorial(null);
+            return;
+          default:
+            return;
+        }
+      case "grid":
+        switch (this.props.config.tutorials.sceneGrid) {
+          case SGT.welcome:
+            this.setTutorial(SGT.dimensions);
+            return;
+          case SGT.dimensions:
+            this.setTutorial(SGT.cells);
+            return;
+          case SGT.cells:
+            this.setTutorial(SGT.final);
+            return;
+          case SGT.final:
+          case SGT.done:
             // We're done, don't show
             this.setTutorial(null);
             return;
