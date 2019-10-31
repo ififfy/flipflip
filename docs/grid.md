@@ -1,17 +1,15 @@
-# Grid Setup
+# Scene Grid
 
-?> Note: This feature is in early beta and may not work as expected.
+?> Note: This feature is still in beta and may not work as expected.
 
-To play your scene in a grid, first make sure `Grid View` is checked, then click the `Setup Grid` button.
+A Scene Grid allows you to play your Scenes simultaneously in a grid format. To make one, click the `+` from the
+Scene Picker (Home) and select `Scene Grid`.
 
-Start by changing the `Height` and `Width` at the top to match the dimensions you'd like. You will see the grid 
-grow/shrink to match your selected size.
+![](doc_images/grid.png) 
 
-Now, start dragging your scenes into the grid spots. To remove a scene from the grid, just click it.
+This is the main Grid Setup. In the top right, you can alter the height and width dimensions of the grid.
 
-When you're done, click Save (you can only save a full grid).
-
-<img src="doc_images/grid_setup_ex.gif" alt="Grid Setup Example">
+To edit a cell, simply click it, and select the Scene you want to be there. Alternatively you can leave a cell **EMPTY**
 
 Start your scene as normal and your grid should work:
 

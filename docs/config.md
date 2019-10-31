@@ -1,13 +1,16 @@
-# Preferences
-FlipFlip allows you to configure default Scene effects and more! To access the Preferences page, click the little 
-gear icon &nbsp; ( <img style="vertical-align: -5px" src="doc_icons/gear.svg" alt="Preferences" width="20" height="20"> ) 
-on the Home page.
+# Settings
+The main purpose of Settings is to configure defaults for new Scenes (You cannot set default Audio or Text). 
+Some other General Settings exist to help customize your FlipFlip experience. To access the Settings page, click the 
+`Settings` icon ( 
+<img style="vertical-align: -5px" src="doc_icons/gear.svg" alt="Settings" width="20" height="20"> ) in the Scene Picker
+(Home) sidebar.
 
-When you are done making changes to the Preferences, click `Apply` or `OK`. Settings will only be saved if they are valid.
+When you are done making changes to the Settings, click the `OK` button ( <img style="vertical-align: -5px" 
+src="doc_icons/ok.svg" alt="OK" width="20" height="20"> ). Settings will only be saved if they are valid.
 
 ![](doc_images/config.png)
 
-## Scene Defaults
+## Scene Default Option/Effects
 Configure default settings for each Scene just like you would in the Scene itself. These preferences will be applied 
 whenever you create a new Scene (or Generator).
 
@@ -37,7 +40,7 @@ Turning caching off will prevent FlipFlip from reading from or writing to the ca
 ## API Keys
 These settings control how remote sources are used. 
 
-#### Tumblr
+### Tumblr
 By default, Tumblr API keys are provided. However, if you are experiencing 429 responses from Tumblr, you may replace 
 these with your own API keys to improve performance. Instructions for getting your own API key are [here](tumblr_api.md). 
 
@@ -47,44 +50,49 @@ have to do this once.
 Tumblr has no Read-Only mode, so read AND write access are requested. FlipFlip does not store any user information or 
 make any changes to your account.
 
-* Click `Activate FlipFlip with Tumblr`
+* Click the `Tumblr` icon
 * Click `OK` on the confirmation dialog
 * You will be directed to Tumblr.com in your browser
 * Click `Allow` to give FlipFlip read permission
 * Go back to FlipFlip
 * You should see a Success! message
 
-#### Reddit
+### Reddit
 In order to use Reddit Subreddits/Users as sources or import your Subscriptions, you must first activate FlipFlip 
 with your account. You should only ever have to do this once.
 
 FlipFlip does not store any user information or make any changes to your account.
 
-* Click `Activate FlipFlip with Reddit`
+* Click the `Reddit` icon
 * Click `OK` on the confirmation dialog
 * You will be directed to Reddit.com in your browser
 * Click `Allow` to give FlipFlip read permission
 * Go back to FlipFlip
 * You should see a Success! message
 
-#### Twitter
+### Twitter
 In order to use Twitter Profiles as sources or import your Following, you must first activate FlipFlip with your 
 account. You should only ever have to do this once.
 
 FlipFlip does not store any user information or make any changes to your account.
 
-* Click `Activate FlipFlip with Twitter`
+* Click the `Twitter` icon
 * Click `OK` on the confirmation dialog
 * You will be directed to Twitter.com in your browser
 * Click `Allow` to give FlipFlip permission
 * Go back to FlipFlip
 * You should see a Success! message
 
-#### Instagram
-In order to use Instagram Profiles as sources, you'll need to provide your username and password. Click the 
-`Check Instagram Login` button to confirm your credentials worked. FlipFlip does not store any user information or 
-make changes to your account. Your login information is stored locally on your computer and is never shared with 
-anyone or sent to any server (besides Instagram, obviously).
+### Instagram
+In order to use Instagram Profiles as sources, you'll need to provide your username and password.
+
+FlipFlip does not store any user information or make changes to your account. Your login information is stored locally 
+on your computer and is never shared with anyone or sent to any server (besides Instagram, obviously).
+
+* Click the `Instagram` icon
+* Enter your Username and Password
+* Click `Authorize FlipFlip on Instagram`
+* You should see a Success! message
 
 ## Backup
 Backup your FlipFlip data or restore from a previous backup.
@@ -94,7 +102,12 @@ This creates a backup with all your current FlipFlip data (preferences, library,
 
 #### Restore Backup
 A dialog will appear with a list the your FlipFlip backups (by date/time). Select the backup you wish to 
-restore and click `Confirm`
+restore and click `Restore`
 
 #### Clean Backups
 Backups might build up over time. Click `Clean Backups` to delete all but the most recent backup.
+
+## Theme
+The FlipFlip UI allows you to customize the **Primary** and **Secondary** colors. You can also toggle Dark Mode on/off here
+
+![](doc_images/flipflip_colors.png)

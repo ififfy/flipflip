@@ -10,8 +10,9 @@ your own for seamless use.
     * Application Description: **FlipFlip**
     * Default callback URL: **`https://github.com/ififfy/flipflip`**
 1. Click Register
-1. Copy the "OAuth Consumer Key" into the FlipFlip Preferences
-1. Click `Show secret key` and copy the secret into the FlipFlip Preferences
-1. Return to FlipFlip and click `Authorize FlipFlip on Tumblr`
+1. Return to FlipFlip Settings and click the `Tumblr` icon
+1. Copy the "OAuth Consumer Key" into the FlipFlip
+1. Click `Show secret key` and copy the secret into the FlipFlip
+1. In FlipFlip, click `Authorize FlipFlip on Tumblr`
 1. Click `Allow` when the prompt appears in your browser
 1. Return to FlipFlip and you should see a confirmation!

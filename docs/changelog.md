@@ -1,6 +1,15 @@
 # Changelog
 
 ## 3.0.0 <small>(XX/XX/2019)</small>
+#### 3.0.0-beta3 <small>(10/31/2019)</small>
+- Material UI redesign
+- Interactive Tutorials
+- Added BPM timing options
+- Allow Caption and Audio to end scene
+- Fixed DeviantArt scraping
+- Fixed Twitter scraping
+- Improve API authorization flow
+
 #### 3.0.0-beta2 <small>(09/23/2019)</small>
 - Allow effects to be changed instantly while playing
 - Add option to fill entire screen

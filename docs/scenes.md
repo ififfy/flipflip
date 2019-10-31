@@ -1,9 +1,9 @@
 # Scenes Overview
 
-A **Scene** is the main component of FlipFlip. Each Scene consists of collection of slideshow settings: 
-which images/videos to show, what timing to use, what effects, and more.
+A **Scene** is the main component of FlipFlip. Each Scene has 4 tabs: [`OPTIONS`](options.md), [`EFFECTS`](effects.md),
+[`AUDIO/TEXT`](audio_text.md), and [`SOURCES`](sources.md).
 
-To create a Scene, click `+ Add Scene` from the Home screen. This will bring you to the Scene Detail page. 
+To create a Scene, click `+` and then `Add Scene` from the the Scene Picker (Home). This will bring you to the Scene Detail page. 
 When you return to the Home page, you will see your new scene in the list of Scenes.
 
-![](doc_images/scene_details.png)
+![](doc_images/scene_detail_sources.png)

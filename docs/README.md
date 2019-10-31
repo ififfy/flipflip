@@ -20,4 +20,13 @@
 ## Community
 Having an issue with FlipFlip? Have a new feature recommendation? Just want to share how much you enjoy it?
 You can reach us on our [GitHub](https://github.com/ififfy/flipflip) or on Reddit at 
-[/r/flipflip](https://www.reddit.com/r/flipflip/)..
+[/r/flipflip](https://www.reddit.com/r/flipflip/).
+
+
+
+
+
+
+
+
+// TODO Search for ".md#" and ensure links still work

@@ -1,8 +1,10 @@
 # Sources
-The most important part of any Scene is its **Sources**. This is simply a list of all the places FlipFlip will 
-find images/videos to show. FlipFlip supports sources from (1) Local Directories, (2) A text document with a list of 
+**Sources** are the most important part of any Scene. A **source* is a place FlipFlip will find images/videos for 
+this Scene. FlipFlip supports sources from (1) Local Directories, (2) A text document with a list of 
 image/video URLs, (3) a single video file URL, or (4) one of the 
 [currently supported remote sources](#currently-supported-remote-sources).
+
+![](doc_images/scene_detail_sources.png)
 
 * Sources can be ordered Alphabetically (either their full URL or their parsed name), by Date Added, by Count, or by Type.
 * Sources can also be manually ordered by drag'n'dropping them.
@@ -11,20 +13,19 @@ image/video URLs, (3) a single video file URL, or (4) one of the
 
 ## Modifying sources
 #### Adding new source
-Click `+ Add Sources` and choose one of the following options:
-* Click `+ URL` to input the URL of a remote source or video file.
-* Click `+ Local directory` to lookup local directories.
-* Click `+ Local video` to look up local video files.
-* Click `+ From Library` to import sources from the Library.
+Click `+` and choose one of the following options:
+* Click `URL` to input the URL of a remote source or video file.
+* Click `Local directory` to lookup local directories.
+* Click `Local video` to look up local video files.
+* Click `From Library` to import sources from the Library.
   * For more information about this process see the [Import from Library](import_from_library.md) section.
 
 #### Editing existing source
-* To edit a source, click the <img style="vertical-align: -5px" src="doc_icons/pencil.svg" alt="Edit" width="20" height="20"> 
-and then make your desired changes. 
+* To edit a source, click its URL and then make your desired changes. 
   * _Note: Blank and duplicate sources will be automatically removed._
 * To clear the cache for a source, click the <img style="vertical-align: -5px" src="doc_icons/clean.svg" 
 alt="Clear cache" width="20" height="20">
-  * _This will only appear for remote sources._
+  * _This will only appear if caching is enabled and only for remote sources._
 * To select [clips](clips.md) for a source, click the <img style="vertical-align: -5px" src="doc_icons/clip.svg" 
 alt="Video Clipper" width="20" height="20">
   * _This will only appear for video sources._
@@ -32,12 +33,10 @@ alt="Video Clipper" width="20" height="20">
 alt="Clear cache" width="20" height="20">
   * _This will only appear for sources which have a blacklist._
 * To delete a source, click the <img style="vertical-align: -5px" src="doc_icons/delete.svg" alt="Remove" width="20" height="20">
-* To clear _all_ sources in a scene, click `- Remove All` and confirm.
 
 ## Source types
-
 #### Local Directory
-The simplest way to use FlipFlip is to select `+ Local directory` and pick a directory on your computer that contains 
+The simplest way to use FlipFlip is to add a `Local directory` and pick a directory on your computer that contains 
 images. FlipFlip will search the entire directory, including subfolders.
 
 #### Image List
@@ -50,11 +49,11 @@ https://cdn-images-1.medium.com/max/2000/0*vnYtP9N80SQ0pOOD.png
 Then you can either save that file to your computer, or uploaded it to a text file hosting service like 
 [Hastebin](https://hastebin.com) if you want to share it with others.
 
-Once you've created this file, click `+ URL`. Simply type or paste the path to your raw text file (remote or local).
+Once you've created this file, add a `URL`. Simply type or paste the path to your raw text file (remote or local).
 
 #### Video File
 You can add individual video files as sources too. These can be either local files or remote files. To add a 
-local video file, click `+ Local video` and choose the video(s) you want to add.
+local video file, add a `Local video` and choose the video(s) you want to add.
 
 ?> **NOTE:** _Each video will be weighted as its own source._
 

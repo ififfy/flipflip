@@ -6,12 +6,12 @@ each video, the "Video Clipper" allows you to curate "clips" from a video source
 To get started, create a video source (either in a Scene or in the Library). **NOTE:** This **_MUST_** be a direct
 video URL (local or remote). 
 
-Then, click the <img style="vertical-align: -5px" src="doc_icons/clip.svg" alt="Clear cache" width="20" height="20"> 
+Then, click the <img style="vertical-align: -5px" src="doc_icons/clip.svg" alt="Clip" width="20" height="20"> 
 next to the source to go to the "Video Clipper" interface:
 
 ![](doc_images/video_clipper.png) 
 
-To create a new clip, click `+ Add New Clip`. To edit/view an existing clip, just click its number.
+To create a new clip, click the `+`. To edit/view an existing clip, just click its number.
 
 A slider will appear allowing you to select the start and end of this clip. You can also enter/modify the timestamp
 directly for more precise selection. 

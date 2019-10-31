@@ -1,25 +1,23 @@
-- [Getting started](quickstart.md)
-
 - Scenes
 
   - [Overview](scenes.md)
-  - [Sources](sources.md)
+  - [Options](options.md)
   - [Effects](effects.md)
-  - [Grid Setup](grid.md)
-  - [Video Clipper](clips.md)
+  - [Audio/Text](audio_text.md)
+  - [Sources](sources.md)
   - [Playing Scene](playing_scene.md)
+  - [Scene Generators](scene_generators.md)
+  - [Scene Grid](grid.md)
   
 - Library
 
   - [Overview](library.md)
   - [Tagging](tagging.md)
-  - [Search/Filter](search.md)
-  - [Import from Library](import_from_library.md)
-  - [Mark Offline](mark_offline.md)
+  - [Import from Library](import_from_library.md)  
   
-- [Scene Generators](scene_generators.md)
+- [Settings](config.md)
+- [Video Clipper](clips.md)
 - [Import/Export](import_export.md)
-- [Preferences](config.md)
 - [Caption Script Format](caption_script.md)
 - [Developers](developers.md)
 - [Changelog](changelog.md)

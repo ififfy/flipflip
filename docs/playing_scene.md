@@ -8,10 +8,9 @@ and the progress so far. If a Scene finishes loading before its overlay, you wil
 indicator as well. When both the Scene and overlay have loaded, the slideshow will begin. 
 
 ?> To avoid lag and janky playback, it's recommended to let loading finish, but if you want to start early anyway, 
-click `Start Now` when it appears. You can also configure all scenes to start immediately in [Preferences](config.md#player-settings).
+click `Start Now` when it appears. You can also configure all scenes to start immediately in [Settings](config.md#player-settings).
 
 ![](doc_images/scene_loading.png)
-
 
 ## Playback controls
 All scene options (except the image filter) can also be changed while playing a slideshow by hovering over the sidebar 

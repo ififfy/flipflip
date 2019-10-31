@@ -8,35 +8,25 @@ No installation necessary, just run `FlipFlip`.
 ## FlipFlip Home
 
 When you first open FlipFlip, you should see a screen like this:
-![](doc_images/flipflip_home_numbered.png)
-_Note: Some of these features (3, 7, 8) will be disabled until they are relevant_
-
-1. [Add Scene](scenes.md)
-2. [Library](library.md)
-3. [Add Scene Generator](scene_generators.md)
-4. Your Scenes (Drag'n'drop to manually order)
-5. A Scene Generator (bold border)
-6. Sort Scenes (Alphabetically ↕️, by Date Added ↕️, by Type)
-7. Open a new FlipFlip window (Appears when at least 1 Scene exists)
-8. Open Random Scene (Appears when at least 2 Scenes exist)
-9. [Import Scene](import_export.md)
-10. [Preferences](config.md)
+![](doc_images/flipflip_home.png)
+_Note: Some of these features will be disabled until they are relevant_
 
 ## Your first scene
-Let's create a simple scene to get you familiar with how things will work. At first glace, the Scene Detail screen 
-might seem a little complicated, but it's actually very simple once you understand what each input does. 
-For now, focus on `Sources`.
+The interactive tutorials should guide you through everything you need to know (You can reset these in settings).
+However, a short guide to getting started has been provided here as well:
 
-* Click `+ Add Scene` to create your first scene.
-* Give your scene a name (click the name up at the top to change it).
-* In the `Sources` tab, click `+ Add Sources`, then click `+ Local directory`.
+Let's create a simple scene to get you familiar with how things will work.
+
+* From Scene Picker (Home), click the `+` button and then `Add Scene`
+* You will be brought to the [Scene Detail](scenes.md) page, and to the [Sources](sources.md) tab
+* Click the `+` button and then `Local directory`.
 * Navigate to a folder with some images you'd like to use and click `Select Folder`.
   * Your selection should now appear in `Sources`.
 * Add some effects if you'd like.
   * You can read more about effects [here](effects.md).
 * Click the `Play` button ( <img style="vertical-align: -5px" src="doc_icons/play.svg" alt="Edit" width="20" height="20"> )
 
-![](doc_images/scene_details.png)
+![](doc_images/scene_detail_sources.png)
 
 ## Your first slideshow
 Great! Now your sources have loaded and the slideshow has started!
