@@ -62,6 +62,9 @@ const styles = (theme: Theme) => createStyles({
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
   },
+  appBarSpacerWrapper: {
+    ...theme.mixins.toolbar,
+  },
   appBarSpacer: {
     backgroundColor: theme.palette.primary.main,
     ...theme.mixins.toolbar
@@ -136,6 +139,7 @@ const styles = (theme: Theme) => createStyles({
   },
   drawerButton: {
     backgroundColor: theme.palette.primary.main,
+    minHeight: theme.spacing(6),
     [theme.breakpoints.down('xs')]: {
       paddingLeft: 0,
       paddingRight: 0,
@@ -403,9 +407,11 @@ class Library extends React.Component {
           variant="permanent"
           classes={{paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose, (this.props.isSelect || this.props.isBatchTag) && classes.drawerPaperHidden)}}
           open={this.state.drawerOpen}>
-          <Collapse in={!open}>
-            <div className={classes.appBarSpacer} />
-          </Collapse>
+          <div className={clsx(!open && classes.appBarSpacerWrapper)}>
+            <Collapse in={!open}>
+              <div className={classes.appBarSpacer} />
+            </Collapse>
+          </div>
 
           <ListItem className={classes.drawerButton}>
             <IconButton

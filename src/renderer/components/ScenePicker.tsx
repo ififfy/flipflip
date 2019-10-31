@@ -206,6 +206,10 @@ const styles = (theme: Theme) => createStyles({
     left: 'auto',
     position: 'fixed',
   },
+  extraWindowRandomButton :{
+    right: 28,
+    bottom: 25,
+  },
   generateTooltip: {
     top: 'auto',
     right: 28,
@@ -741,7 +745,7 @@ class ScenePicker extends React.Component {
         )}
         <Tooltip title="Random Scene">
           <Fab
-            className={classes.randomButton}
+            className={clsx(classes.randomButton, !this.state.isFirstWindow && classes.extraWindowRandomButton)}
             onClick={this.onRandomScene.bind(this)}
             size="small">
             <CasinoIcon className={classes.icon} />

@@ -356,6 +356,7 @@ export function saveScene(state: State, scene: Scene): Object {
   const sceneCopy = JSON.parse(JSON.stringify(scene)); // Make a copy
   sceneCopy.generatorWeights = null;
   sceneCopy.id = id;
+  sceneCopy.openTab = 3;
   return {
     scenes: state.scenes.concat([sceneCopy]),
     route: [new Route({kind: 'scene', value: sceneCopy.id})],
@@ -1495,7 +1496,7 @@ export function markOffline(getState: () => State, setState: Function) {
       setState({progressMode: null, progressCurrent: 0, progressTotal: 0, progressTitle: ""});
     } else if (state.library.length == offset) {
       setState({
-        systemSnack: "Offline Check has completed. Remote sources not available are now marked in red.",
+        systemSnack: "Offline Check has completed. Remote sources not available are now marked.",
         progressMode: null,
         progressCurrent: 0,
         progressTotal: 0,
