@@ -17,7 +17,7 @@ import {
   getFileName,
   getRandomIndex,
   getSourceType,
-  isVideo,
+  isVideo, randomizeList,
   removeDuplicatesBy,
   saveDir
 } from "./utils";
@@ -689,24 +689,6 @@ function reduceList(sources: Array<LibrarySource>, limit: number): Array<Library
   return sources;
 }
 
-function shuffle(array: Array<any>) {
-  let currentIndex = array.length, temporaryValue, randomIndex;
-
-  // While there remain elements to shuffle...
-  while (0 !== currentIndex) {
-    // Pick a remaining element...
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex -= 1;
-
-    // And swap it with the current element.
-    temporaryValue = array[currentIndex];
-    array[currentIndex] = array[randomIndex];
-    array[randomIndex] = temporaryValue;
-  }
-
-  return array;
-}
-
 export function generateScene(state: State, scene: Scene): Object {
   const newScene = state.scenes.find((s) => s.id == scene.id);
 
@@ -849,7 +831,8 @@ export function generateScene(state: State, scene: Scene): Object {
       }
     }
   }
-  genSources = shuffle(removeDuplicatesBy((s: LibrarySource) => s.url, genSources));
+  genSources = randomizeList(removeDuplicatesBy((s: LibrarySource) => s.url, genSources));
+  genSources = JSON.parse(JSON.stringify(genSources));
   genSources.forEach((s, i) => s.id = i);
   return updateScene(state, scene, (s) => s.sources = genSources);
 }

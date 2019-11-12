@@ -8,6 +8,7 @@ import {
   ListItemIcon, ListItemSecondaryAction, ListItemText, ListSubheader, Menu, MenuItem, Theme, Toolbar, Tooltip,
   Typography, withStyles
 } from "@material-ui/core";
+import {grey} from "@material-ui/core/colors";
 
 import AddIcon from '@material-ui/icons/Add';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -28,7 +29,7 @@ import PublishIcon from '@material-ui/icons/Publish';
 import SelectAllIcon from '@material-ui/icons/SelectAll';
 import SortIcon from '@material-ui/icons/Sort';
 
-import {AF, LT, MO, PR, SF, SPT, ST} from "../../data/const";
+import {AF, LT, MO, PR, SF, ST} from "../../data/const";
 import en from "../../data/en";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
@@ -38,20 +39,6 @@ import LibrarySearch from "./LibrarySearch";
 import SourceIcon from "./SourceIcon";
 import SourceList from "./SourceList";
 import URLDialog from "../sceneDetail/URLDialog";
-
-const Option = (props: any) => (
-  <div>
-    <components.Option {...props}>
-      <Checkbox color="default" checked={props.isSelected} onChange={() => null} />{" "}
-      <label>{props.label}</label>
-    </components.Option>
-  </div>
-);
-const MultiValue = (props: any) => (
-  <components.MultiValue {...props}>
-    <span>{props.data.label}</span>
-  </components.MultiValue>
-);
 
 const drawerWidth = 240;
 
@@ -256,6 +243,9 @@ const styles = (theme: Theme) => createStyles({
   sortMenu: {
     width: 200,
   },
+  searchSelect: {
+    color: grey[900],
+  },
   fill: {
     flexGrow: 1,
   },
@@ -336,9 +326,25 @@ class Library extends React.Component {
     openMenu: null as string,
   };
 
+  Option = (props: any) => (
+    <div>
+      <components.Option {...props}>
+        <Checkbox className={this.props.classes.searchSelect} checked={props.isSelected} onChange={() => null} />{" "}
+        <label>{props.label}</label>
+      </components.Option>
+    </div>
+  );
+  MultiValue = (props: any) => (
+    <components.MultiValue {...props}>
+      <span>{props.data.label}</span>
+    </components.MultiValue>
+  );
+
   render() {
     const classes = this.props.classes;
     const open = this.state.drawerOpen;
+    const Option = this.Option;
+    const MultiValue = this.MultiValue;
 
     const tumblrAuthorized = this.props.config.remoteSettings.tumblrOAuthToken != "" &&
       this.props.config.remoteSettings.tumblrOAuthTokenSecret != "";
@@ -745,6 +751,7 @@ class Library extends React.Component {
               Choose tags to add, remove, or overwrite on the selected source(s)
             </DialogContentText>
             <Select
+              className={classes.searchSelect}
               defaultValue={this.state.selectedTags}
               options={this.props.tags.map((tag) => {return {label: tag.name, value: tag.id}})}
               components={{ Option, MultiValue }}

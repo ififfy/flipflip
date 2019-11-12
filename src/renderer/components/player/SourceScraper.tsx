@@ -10,7 +10,7 @@ import imgur from "imgur";
 import Twitter from "twitter";
 import {IgApiClient} from "instagram-private-api";
 
-import {IF, ST, WF} from '../../data/const';
+import {IF, OF, ST, WF} from '../../data/const';
 import {
   CancelablePromise,
   convertURL,
@@ -20,7 +20,7 @@ import {
   getSourceType,
   isImage,
   isVideo,
-  isImageOrVideo,
+  isImageOrVideo, randomizeList,
 } from "../../data/utils";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
@@ -1130,10 +1130,14 @@ export default class SourceScraper extends React.Component {
       newAllURLs = this.state.allURLs;
     }
 
+    const sources = this.props.scene.orderFunction == OF.random ?
+      randomizeList(JSON.parse(JSON.stringify(this.props.scene.sources))) :
+      JSON.parse(JSON.stringify(this.props.scene.sources));
+
     let sourceLoop = () => {
       if (this.state.promise.hasCanceled) return;
 
-      const d = JSON.parse(JSON.stringify(this.props.scene.sources[n]));
+      const d = sources[n];
 
       let message = d ? d.url : "";
       if (this.props.opacity != 1) {
@@ -1190,7 +1194,7 @@ export default class SourceScraper extends React.Component {
     let nextSourceLoop = () => {
       if (this.state.nextPromise.hasCanceled) return;
 
-      const d = JSON.parse(JSON.stringify(this.props.nextScene.sources[n]));
+      const d = sources[n];
       if (!this.props.scene.playVideoClips && d.clips) {
         d.clips = [];
       }

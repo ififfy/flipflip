@@ -412,7 +412,6 @@ class AudioControl extends React.Component {
       mm.parseFile(urlToPath(this.props.audio.url))
         .then((metadata: any) => {
           if (metadata && metadata.common && metadata.common.bpm) {
-            console.log(metadata.common.bpm);
             this.changeKey('bpm', metadata.common.bpm);
           }
         })
