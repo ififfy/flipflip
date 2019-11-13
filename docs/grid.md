@@ -1,7 +1,5 @@
 # Scene Grid
 
-?> Note: This feature is still in beta and may not work as expected.
-
 A Scene Grid allows you to play your Scenes simultaneously in a grid format. To make one, click the `+` from the
 Scene Picker (Home) and select `Scene Grid`.
 

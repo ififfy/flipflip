@@ -156,10 +156,12 @@ const styles = (theme: Theme) => createStyles({
     backgroundColor: theme.palette.background.default,
   },
   container: {
-    display: 'flex',
     padding: theme.spacing(0),
     overflow: 'hidden',
     flexGrow: 1,
+  },
+  containerNotEmpty: {
+    display: 'flex',
   },
   addMenuButton: {
     backgroundColor: theme.palette.primary.dark,
@@ -228,7 +230,12 @@ const styles = (theme: Theme) => createStyles({
   },
   removeAllButton: {
     backgroundColor: theme.palette.error.main,
-    marginBottom: 225,
+    margin: 0,
+    top: 'auto',
+    right: 130,
+    bottom: 20,
+    left: 'auto',
+    position: 'fixed',
   },
   addButtonClose: {
     marginBottom: 0,
@@ -554,7 +561,7 @@ class Library extends React.Component {
             {!this.props.isSelect && !this.props.isBatchTag &&  (
               <div className={classes.drawerSpacer}/>
             )}
-            <Container maxWidth={false} className={classes.container}>
+            <Container maxWidth={false} className={clsx(classes.container, this.state.displaySources.length > 0 && classes.containerNotEmpty)}>
               <SourceList
                 config={this.props.config}
                 isSelect={this.props.isSelect || this.props.isBatchTag}
@@ -621,11 +628,10 @@ class Library extends React.Component {
 
         {!this.props.isSelect && !this.props.isBatchTag && (
           <React.Fragment>
-            {this.props.library.length > 0 && this.state.filters.length == 0 && (
-              <Tooltip title="Remove All Sources"  placement="left">
+            {this.props.library.length > 0 && (
+              <Tooltip title={this.state.filters.length == 0 ? "Delete All Sources" : "Delete These Sources"}  placement="left">
                 <Fab
-                  className={clsx(classes.addButton, classes.removeAllButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
-                  disabled={this.props.library.length == 0 || this.state.filters.length > 0}
+                  className={classes.removeAllButton}
                   onClick={this.onRemoveAll.bind(this)}
                   size="small">
                   <DeleteSweepIcon className={classes.icon} />
@@ -637,20 +643,42 @@ class Library extends React.Component {
               onClose={this.onCloseDialog.bind(this)}
               aria-labelledby="remove-all-title"
               aria-describedby="remove-all-description">
-              <DialogTitle id="remove-all-title">Delete Library</DialogTitle>
-              <DialogContent>
-                <DialogContentText id="remove-all-description">
-                  Are you sure you really wanna delete your entire library...? ಠ_ಠ
-                </DialogContentText>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
-                  Cancel
-                </Button>
-                <Button onClick={this.onFinishRemoveAll.bind(this)} color="primary">
-                  Yea... I'm sure
-                </Button>
-              </DialogActions>
+              {this.state.filters.length == 0 && (
+                <React.Fragment>
+                  <DialogTitle id="remove-all-title">Delete Library</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText id="remove-all-description">
+                      Are you sure you really wanna delete your entire library...? ಠ_ಠ
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+                      Cancel
+                    </Button>
+                    <Button onClick={this.onFinishRemoveAll.bind(this)} color="primary">
+                      Yea... I'm sure
+                    </Button>
+                  </DialogActions>
+                </React.Fragment>
+              )}
+              {this.state.filters.length > 0 && (
+                <React.Fragment>
+                  <DialogTitle id="remove-all-title">Delete Sources</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText id="remove-all-description">
+                      Are you sure you want to remove these sources from your library?
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+                      Cancel
+                    </Button>
+                    <Button onClick={this.onFinishRemoveVisible.bind(this)} color="primary">
+                      Confirm
+                    </Button>
+                  </DialogActions>
+                </React.Fragment>
+              )}
             </Dialog>
             <Tooltip title="Local Video"  placement="left">
               <Fab
@@ -867,6 +895,12 @@ class Library extends React.Component {
     this.onCloseDialog();
   }
 
+  onFinishRemoveVisible() {
+    this.props.onUpdateLibrary(this.props.library.filter((s) => !this.state.displaySources.includes(s)));
+    this.onCloseDialog();
+    this.setState({filters: []});
+  }
+
   onImportFromLibrary() {
     const selected = this.state.selected;
     const sources = new Array<LibrarySource>();
@@ -907,9 +941,11 @@ class Library extends React.Component {
 
   savePosition() {
     const sortableList = document.getElementById("sortable-list");
-    const scrollElement = sortableList.firstElementChild;
-    const scrollTop = scrollElement ? scrollElement.scrollTop : 0;
-    this.props.savePosition(scrollTop, this.state.filters, this.state.selected);
+    if (sortableList) {
+      const scrollElement = sortableList.firstElementChild;
+      const scrollTop = scrollElement ? scrollElement.scrollTop : 0;
+      this.props.savePosition(scrollTop, this.state.filters, this.state.selected);
+    }
   }
 
   toggleMarked() {

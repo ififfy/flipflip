@@ -1,6 +1,12 @@
 # Changelog
 
-## 3.0.0 <small>(XX/XX/2019)</small>
+## 3.0.0 <small>(11/13/2019)</small>
+- Fix bug with caption script styling
+- Fix bug with empty library
+- Fix bug with randomization
+- Fix bug with generating sources
+- Fix bug with darkmode text
+
 #### 3.0.0-beta3 <small>(10/31/2019)</small>
 - Material UI redesign
 - Interactive Tutorials

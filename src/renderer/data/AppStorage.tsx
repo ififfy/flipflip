@@ -298,6 +298,10 @@ export default class AppStorage {
               scene.sceneWeights = null;
             }
           }
+
+          for (let i = 0; i < this.initialState.library.length; i++) {
+            this.initialState.library[i].id = i;
+          }
           break;
         case "3.0.0-beta3":
           this.initialState = {
