@@ -274,36 +274,45 @@ export default class Player extends React.Component {
 
           {this.props.scene.overlayEnabled && this.props.scene.overlays.length > 0 &&
            !this.state.isEmpty && this.props.scene.overlays.map((overlay, index) => {
-            let showProgress = this.state.isMainLoaded && !this.state.hasStarted;
-            if (showProgress) {
-              for (let x=0; x < index; x++) {
-                if (!this.state.areOverlaysLoaded[x]) {
-                  showProgress = false;
-                  break;
+              let showProgress = this.state.isMainLoaded && !this.state.hasStarted;
+              if (showProgress) {
+                for (let x = 0; x < index; x++) {
+                  if (!this.state.areOverlaysLoaded[x]) {
+                    showProgress = false;
+                    break;
+                  }
                 }
               }
+              const overlayScene = this.getScene(overlay.sceneID);
+              if (overlayScene) {
+                return (
+                  <SourceScraper
+                    key={overlay.id}
+                    config={this.props.config}
+                    scene={this.getScene(overlay.sceneID)}
+                    opacity={overlay.opacity / 100}
+                    gridView={this.props.gridView}
+                    isPlaying={this.state.isPlaying && !this.state.isEmpty}
+                    hasStarted={this.state.hasStarted}
+                    historyOffset={0}
+                    setHistoryOffset={this.nop}
+                    setHistoryPaths={this.nop}
+                    finishedLoading={this.setOverlayLoaded.bind(this, index)}
+                    firstImageLoaded={this.nop}
+                    setProgress={showProgress ? this.setProgress.bind(this) : this.nop}
+                    setVideo={this.setOverlayVideo.bind(this, index)}
+                    setCount={this.props.setCount.bind(this)}
+                    cache={this.props.cache.bind(this)}
+                    systemMessage={this.props.systemMessage.bind(this)}
+                  />
+                );
+              } else {
+                if (!this.state.areOverlaysLoaded[index]) {
+                  this.setOverlayLoaded(index, true);
+                }
+                return <div key={overlay.id}/>;
+              }
             }
-            return (
-              <SourceScraper
-                key={overlay.id}
-                config={this.props.config}
-                scene={this.getScene(overlay.sceneID)}
-                opacity={overlay.opacity / 100}
-                gridView={this.props.gridView}
-                isPlaying={this.state.isPlaying && !this.state.isEmpty}
-                hasStarted={this.state.hasStarted}
-                historyOffset={0}
-                setHistoryOffset={this.nop}
-                setHistoryPaths={this.nop}
-                finishedLoading={this.setOverlayLoaded.bind(this, index)}
-                firstImageLoaded={this.nop}
-                setProgress={showProgress ? this.setProgress.bind(this) : this.nop}
-                setVideo={this.setOverlayVideo.bind(this, index)}
-                setCount={this.props.setCount.bind(this)}
-                cache={this.props.cache.bind(this)}
-                systemMessage={this.props.systemMessage.bind(this)}
-              />
-            );}
           )}
         </div>
 
