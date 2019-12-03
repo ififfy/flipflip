@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.1 <small>(12/03/2019)</small>
+- Fix bug with empty overlay
+- Fix bug with imagefap scraper
+
 ## 3.0.0 <small>(11/13/2019)</small>
 - Fix bug with caption script styling
 - Fix bug with empty library
