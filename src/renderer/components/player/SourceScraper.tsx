@@ -443,9 +443,9 @@ function loadImageFap(systemMessage: Function, config: Config, source: LibrarySo
                   }
                   if (imageCount == imageEls.length) {
                     helpers.next = null;
-                    helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+                    helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
                     resolve({
-                      data: filterPathsToJustPlayable(filter, images, true),
+                      data: filterPathsToJustPlayable(filter, images, false),
                       helpers: helpers,
                     });
                   }
