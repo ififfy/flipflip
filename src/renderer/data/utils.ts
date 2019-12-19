@@ -373,7 +373,7 @@ export function isImageOrVideo(path: string, strict: boolean): boolean {
 export function isVideo(path: string, strict: boolean): boolean {
   if (path == null) return false;
   const p = path.toLowerCase();
-  const acceptableExtensions = [".mp4", ".mkv", ".webm", ".ogv"];
+  const acceptableExtensions = [".mp4", ".mkv", ".webm", ".ogv", ".mov"];
   for (let ext of acceptableExtensions) {
     if (strict) {
       if (p.endsWith(ext)) return true;

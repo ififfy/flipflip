@@ -1042,7 +1042,7 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
 
     case AF.videos:
       let vResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
-        {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'MP4', extensions: ['mp4']}, {name: 'MKV', extensions: ['mkv']}, {name: 'WebM', extensions: ['webm']}, {name: 'OGG', extensions: ['ogv']}], properties: ['openFile', 'multiSelections']});
+        {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'MP4 - MPEG-4 video files', extensions: ['mp4']}, {name: 'MKV - Matroska video files', extensions: ['mkv']}, {name: 'WEBM - File', extensions: ['webm']}, {name: 'OGG', extensions: ['ogv']}], properties: ['openFile', 'multiSelections']});
       if (!vResult) return;
       vResult = vResult.filter((r) => isVideo(r, true));
       newSources = addSources(newSources, vResult);

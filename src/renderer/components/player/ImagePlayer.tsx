@@ -5,9 +5,6 @@ import request from 'request';
 import fs from "fs";
 import gifInfo from 'gif-info';
 import IdleTimer from 'react-idle-timer';
-import clsx from "clsx";
-
-import {createStyles, Theme, withStyles} from "@material-ui/core";
 
 import {GO, IF, OF, SL, TF, VO, WF} from '../../data/const';
 import {getRandomListItem, isVideo, urlToPath} from '../../data/utils';
