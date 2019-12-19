@@ -39,6 +39,7 @@ import LibrarySearch from "./LibrarySearch";
 import SourceIcon from "./SourceIcon";
 import SourceList from "./SourceList";
 import URLDialog from "../sceneDetail/URLDialog";
+import {getSourceType} from "../../data/utils";
 
 const drawerWidth = 240;
 
@@ -1039,13 +1040,21 @@ class Library extends React.Component {
             matchesFilter = source.marked;
           }else if (filter == "<Untagged>") { // This is untagged filter
             matchesFilter = source.tags.length === 0;
-          } else if (filter.endsWith("~")) { // This is a tag filter
-            let tag = filter.substring(0, filter.length-1);
-            if (tag.startsWith("-")) {
-              tag = tag.substring(1, tag.length);
+          } else if ((filter.startsWith("[") || filter.startsWith("-[")) && filter.endsWith("]")) { // This is a tag filter
+            if (filter.startsWith("-")) {
+              let tag = filter.substring(2, filter.length-1);
               matchesFilter = source.tags.find((t) => t.name == tag) == null;
             } else {
+              let tag = filter.substring(1, filter.length-1);
               matchesFilter = source.tags.find((t) => t.name == tag) != null;
+            }
+          } else if ((filter.startsWith("{") || filter.startsWith("-{")) && filter.endsWith("}")) { // This is a type filter
+            if (filter.startsWith("-")) {
+              let type = filter.substring(2, filter.length-1);
+              matchesFilter = en.get(getSourceType(source.url)) != type;
+            } else {
+              let type = filter.substring(1, filter.length-1);
+              matchesFilter = en.get(getSourceType(source.url)) == type;
             }
           } else if ((countRegex = /^count(\+?)([>=<])(\d*)$/.exec(filter)) != null) {
             const all = countRegex[1] == "+";

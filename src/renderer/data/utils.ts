@@ -226,6 +226,7 @@ export function getFileGroup(url: string) {
 }
 
 export function getCachePath(source: string, config: Config) {
+  const typeDir = en.get(getSourceType(source)).toLowerCase();
   if (config.caching.directory != "") {
     let baseDir = config.caching.directory;
     if (!baseDir.endsWith(path.sep)) {
@@ -233,9 +234,9 @@ export function getCachePath(source: string, config: Config) {
     }
     if (source) {
       if (source != ST.video) {
-        return baseDir + en.get(getSourceType(source)) + path.sep + getFileGroup(source) + path.sep;
+        return baseDir + typeDir + path.sep + getFileGroup(source) + path.sep;
       } else {
-        return baseDir + en.get(getSourceType(source)) + path.sep;
+        return baseDir + typeDir + path.sep;
       }
     } else {
       return baseDir;
@@ -243,9 +244,9 @@ export function getCachePath(source: string, config: Config) {
   } else {
     if (source) {
       if (source != ST.video) {
-        return getPath() + path.sep + "ImageCache" + path.sep + en.get(getSourceType(source)) + path.sep + getFileGroup(source);
+        return getPath() + path.sep + "ImageCache" + path.sep + typeDir + path.sep + getFileGroup(source);
       } else {
-        return getPath() + path.sep + "ImageCache" + path.sep + en.get(getSourceType(source)) + path.sep;
+        return getPath() + path.sep + "ImageCache" + path.sep + typeDir + path.sep;
       }
     } else {
       return getPath() + path.sep + "ImageCache" + path.sep;

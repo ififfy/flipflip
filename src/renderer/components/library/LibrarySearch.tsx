@@ -6,6 +6,8 @@ import {createStyles, Theme, withStyles} from "@material-ui/core";
 import {grey} from "@material-ui/core/colors";
 
 import LibrarySource from "../../data/LibrarySource";
+import {getSourceType} from "../../data/utils";
+import en from "../../data/en";
 
 const styles = (theme: Theme) => createStyles({
   searchSelect: {
@@ -64,6 +66,7 @@ class LibrarySearch extends React.Component {
 
   update() {
     const tags = new Map<string, number>();
+    const types = new Map<string, number>();
     let untaggedCount = 0;
     let offlineCount = 0;
     let markedCount = 0;
@@ -88,6 +91,13 @@ class LibrarySearch extends React.Component {
       } else {
         untaggedCount += 1;
       }
+
+      const type = en.get(getSourceType(source.url));
+      if (types.has(type)) {
+        types.set(type, types.get(type) + 1);
+      } else {
+        types.set(type, 1);
+      }
     }
     const tagKeys = Array.from(tags.keys()).sort((a, b) => {
       const aCount = tags.get(a);
@@ -100,13 +110,19 @@ class LibrarySearch extends React.Component {
         return 0;
       }
     });
-    for (let filter of this.props.filters) {
-      let opt;
-      if (filter.endsWith("~")) { // This is a tag filter
-        opt = {label: filter.substring(0, filter.length-1) + " (Tag)", value: filter};
+    const typeKeys = Array.from(types.keys()).sort((a, b) => {
+      const aCount = types.get(a);
+      const bCount = types.get(b);
+      if (aCount > bCount) {
+        return -1;
+      } else if (aCount < bCount) {
+        return 1;
       } else {
-        opt = {label: filter, value: filter};
+        return 0;
       }
+    });
+    for (let filter of this.props.filters) {
+      const opt = {label: filter, value: filter};
       options.push(opt);
       defaultValues.push(opt);
     }
@@ -121,14 +137,28 @@ class LibrarySearch extends React.Component {
       options.push({label: "<Marked> (" + markedCount + ")", value: "<Marked>"});
     }
     for (let tag of tagKeys) {
-      if (!this.props.filters.includes(tag + "~")) {
-        options.push({label: tag + " (" + tags.get(tag) + ")", value: tag + "~"});
+      const opt = "[" + tag + "]";
+      if (!this.props.filters.includes(opt)) {
+        options.push({label: tag + " (" + tags.get(tag) + ")", value: opt});
+      }
+    }
+    for (let type of typeKeys) {
+      const opt = "{" + type + "}";
+      if (!this.props.filters.includes(opt)) {
+        options.push({label: type + " (" + types.get(type) + ")", value: opt});
       }
     }
     if (this.state.searchInput.startsWith("-")) {
       for (let tag of tagKeys) {
-        if (!this.props.filters.includes(tag + "~")) {
-          options.push({label: "-" + tag + " (" + tags.get(tag) + ")", value: "-" + tag + "~"});
+        const opt = "[" + tag + "]";
+        if (!this.props.filters.includes(opt)) {
+          options.push({label: "-" + tag + " (" + tags.get(tag) + ")", value: "-" + opt});
+        }
+      }
+      for (let type of typeKeys) {
+        const opt = "{" + type + "}";
+        if (!this.props.filters.includes(opt)) {
+          options.push({label: "-" + type + " (" + types.get(type) + ")", value: "-" + opt});
         }
       }
     }
@@ -141,7 +171,7 @@ class LibrarySearch extends React.Component {
     } else {
       let filters = Array<string>();
       for (let s of search) {
-        if (s.value.endsWith("~")) {
+        if (((s.value.startsWith("[") || s.value.startsWith("-[")) && s.value.endsWith("]")) || ((s.value.startsWith("{") || s.value.startsWith("-{")) && s.value.endsWith("}"))) {
           filters = filters.concat(s.value);
         } else {
           filters = filters.concat(s.value.split(" "));
