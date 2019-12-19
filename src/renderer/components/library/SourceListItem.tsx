@@ -205,10 +205,17 @@ class SourceListItem extends React.Component {
 
           {this.props.isEditing != this.props.source.id && (
             <ListItemSecondaryAction className={clsx(classes.source, this.props.tutorial == SDT.sourceButtons && classes.highlight)}>
-              {this.props.source.count > 0 && (
+              {(this.props.source.count > 0 && getSourceType(this.props.source.url) != ST.video) && (
                 <Chip
                   className={clsx(classes.countChip, this.props.tutorial == SDT.sourceCount && classes.highlight)}
                   label={`${this.props.source.count}${this.props.source.countComplete ? '' : '+'}`}
+                  color="primary"
+                  size="small"/>
+              )}
+              {(this.props.source.clips && this.props.source.clips.length > 0 && getSourceType(this.props.source.url) == ST.video) && (
+                <Chip
+                  className={classes.countChip}
+                  label={this.props.source.clips.length}
                   color="primary"
                   size="small"/>
               )}
