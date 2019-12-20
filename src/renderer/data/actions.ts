@@ -104,6 +104,7 @@ export function restoreFromBackup(state: State, backupFile: string): Object {
     isSelect: data.isSelect,
     isBatchTag: data.isBatchTag,
     openTab: data.openTab ? data.openTab : 0,
+    displayedSources: Array<LibrarySource>(),
     config: new Config(data.config),
     scenes: data.scenes.map((s: any) => new Scene(s)),
     grids: data.grids ? data.grids.map((g: any) => new SceneGrid(g)) : Array<SceneGrid>(),
@@ -555,7 +556,6 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
     name: "library_scene_temp",
     sources: [source],
     libraryID: librarySource.id,
-    displayedLibrary: displayed,
     forceAll: state.config.defaultScene.forceAll,
     backgroundType: state.config.defaultScene.backgroundType,
     backgroundColor: state.config.defaultScene.backgroundColor,
@@ -566,6 +566,7 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
     videoVolume: state.config.defaultScene.videoVolume,
   });
   return {
+    displayedSources: displayed,
     scenes: state.scenes.concat([tempScene]),
     route: state.route.concat([new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'libraryplay', value: tempScene.id})]),
   };
@@ -587,8 +588,30 @@ export function onUpdateClips(state: State, sourceURL: string, clips: Array<Clip
   return {library: newLibrary, scenes: newScenes};
 }
 
-export function clipVideo(state: State, source: LibrarySource) {
-  return {route: state.route.concat([new Route({kind: 'clip', value: source.url})])};
+export function clipVideo(state: State, source: LibrarySource, displayed: Array<LibrarySource>) {
+  if (getActiveSource(state) != null) {
+    state.route.pop();
+  }
+  return {
+    displayedSources: displayed,
+    route: state.route.concat([new Route({kind: 'clip', value: source.url})])
+  };
+}
+
+export function navigateClipping(state: State, offset: number): Object {
+  const displayed = Array.from(state.displayedSources);
+  let newIndexOf = displayed.map((s) => s.url).indexOf(getActiveSource(state).url);
+  let newSource;
+  do {
+    newIndexOf = newIndexOf + offset;
+    if (newIndexOf < 0) {
+      newIndexOf = displayed.length - 1;
+    } else if (newIndexOf >= displayed.length) {
+      newIndexOf = 0;
+    }
+    newSource = displayed[newIndexOf];
+  } while (getSourceType(newSource.url) != ST.video);
+  return clipVideo(state, newSource, displayed);
 }
 
 export function navigateDisplayedLibrary(state: State, offset: number): Object {
@@ -607,7 +630,7 @@ export function navigateDisplayedLibrary(state: State, offset: number): Object {
       return 0;
     }
   });
-  const displayed = Array.from(activeScene.displayedLibrary);
+  const displayed = Array.from(state.displayedSources);
   const indexOf = displayed.map((s) => s.url).indexOf(activeScene.sources[0].url);
   let newIndexOf = indexOf + offset;
   if (newIndexOf < 0) {
@@ -1028,16 +1051,16 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
 
     case AF.url:
       if (!args || args.length != 1) {
-        newSources = addSources(newSources, [""]);
+        newSources = addSources(newSources, [""], state.library);
       } else {
-        newSources = addSources(newSources, args[0]);
+        newSources = addSources(newSources, args[0], state.library);
       }
       break;
 
     case AF.directory:
       let dResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory', 'multiSelections']});
       if (!dResult) return;
-      newSources = addSources(newSources, dResult);
+      newSources = addSources(newSources, dResult, state.library);
       break;
 
     case AF.videos:
@@ -1045,7 +1068,7 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
         {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'MP4 - MPEG-4 video files', extensions: ['mp4']}, {name: 'MKV - Matroska video files', extensions: ['mkv']}, {name: 'WEBM - File', extensions: ['webm']}, {name: 'OGG', extensions: ['ogv']}], properties: ['openFile', 'multiSelections']});
       if (!vResult) return;
       vResult = vResult.filter((r) => isVideo(r, true));
-      newSources = addSources(newSources, vResult);
+      newSources = addSources(newSources, vResult, state.library);
       break;
 
     case GT.local:
@@ -1056,14 +1079,14 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
       if (!rootDir.endsWith(sep)) {
         rootDir += sep;
       }
-      newSources = addSources(newSources, getImportURLs(args[0], rootDir));
+      newSources = addSources(newSources, getImportURLs(args[0], rootDir), state.library);
       break;
 
     case GT.tumblr:
       if (!args || args.length != 1) {
         return;
       }
-      newSources = addSources(newSources, getImportURLs(args[0]));
+      newSources = addSources(newSources, getImportURLs(args[0]), state.library);
       break;
   }
   if (scene != null) {
@@ -1141,7 +1164,7 @@ function mergeSources(originalSources: Array<LibrarySource>, newSources: Array<L
 }
 
 
-function addSources(originalSources: Array<LibrarySource>, newSources: Array<string>): Array<LibrarySource> {
+function addSources(originalSources: Array<LibrarySource>, newSources: Array<string>, library: Array<LibrarySource>): Array<LibrarySource> {
   // dedup
   let sourceURLs = originalSources.map((s) => s.url);
   newSources = newSources.filter((s) => !sourceURLs.includes(s));
@@ -1153,10 +1176,16 @@ function addSources(originalSources: Array<LibrarySource>, newSources: Array<str
 
   let combinedSources = Array.from(originalSources);
   for (let url of newSources) {
+    const librarySource = library.find((s) => s.url === url);
+    console.log(librarySource);
     combinedSources.unshift(new LibrarySource({
       url: url,
       id: id,
-      tags: new Array<Tag>(),
+      tags: librarySource ? librarySource.tags : [],
+      clips: librarySource ? librarySource.clips : [],
+      blacklist: librarySource ? librarySource.blacklist : [],
+      count: librarySource ? librarySource.count : 0,
+      countComplete: librarySource ? librarySource.countComplete : false,
     }));
     id += 1;
   }

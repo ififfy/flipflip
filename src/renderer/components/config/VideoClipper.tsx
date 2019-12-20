@@ -137,6 +137,7 @@ class VideoClipper extends React.Component {
     videoVolume: number,
     cache(video: HTMLVideoElement): void,
     goBack(): void,
+    navigateClipping(offset: number): void,
     onTutorial(tutorial: string): void,
     onStartVCTutorial(): void,
     onUpdateClips(url: string, clips: Array<Clip>): void,
@@ -329,12 +330,35 @@ class VideoClipper extends React.Component {
   }
 
   componentDidMount() {
+    window.addEventListener('keydown', this.onKeyDown, false);
+
     const scene = this.state.scene;
     scene.backgroundType = BT.color;
     scene.backgroundColor = "#010101";
     scene.videoVolume = this.props.videoVolume;
     this.setState({scene: scene});
+    this.initVideo();
+  }
 
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this.onKeyDown);
+  }
+
+  componentDidUpdate(props: any) {
+    if (this.props.source.url !== props.source.url) {
+      this.setState({
+        video: null as HTMLVideoElement,
+        empty: false,
+        isEditing: -1,
+        isEditingValue: [0,0],
+        isEditingStartText: "",
+        isEditingEndText: "",
+      });
+      this.initVideo();
+    }
+  }
+
+  initVideo() {
     let video = document.createElement('video');
 
     video.onerror = () => {
@@ -480,6 +504,31 @@ class VideoClipper extends React.Component {
     if (timestampValue) {
       this.onChangePosition(null, [this.state.isEditingValue[0], timestampValue]);
     }
+  }
+
+  onKeyDown = (e: KeyboardEvent) => {
+    switch (e.key) {
+      case 'Escape':
+        e.preventDefault();
+        this.props.goBack();
+        break;
+      case '[':
+        e.preventDefault();
+        this.prevSource();
+        break;
+      case ']':
+        e.preventDefault();
+        this.nextSource();
+        break;
+    }
+  };
+
+  prevSource() {
+    this.props.navigateClipping(-1);
+  }
+
+  nextSource() {
+    this.props.navigateClipping(1);
   }
 }
 

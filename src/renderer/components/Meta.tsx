@@ -183,6 +183,7 @@ export default class Meta extends React.Component {
               onStartVCTutorial={a(actions.startVCTutorial)}
               onUpdateClips={a(actions.onUpdateClips)}
               goBack={a(actions.goBack)}
+              navigateClipping={a(actions.navigateClipping)}
               cache={a(actions.cacheImage)}
             />
           )}

@@ -108,7 +108,7 @@ class SourceListItem extends React.Component {
     tutorial: string,
     onClean(source: LibrarySource): void,
     onClearBlacklist(sourceURL: string): void,
-    onClip(source: LibrarySource): void,
+    onClip(source: LibrarySource, displaySources: Array<LibrarySource>): void,
     onEndEdit(newURL: string): void,
     onPlay(source: LibrarySource, displaySources: Array<LibrarySource>): void,
     onRemove(source: LibrarySource): void,
@@ -154,7 +154,7 @@ class SourceListItem extends React.Component {
               }>
                 <Fab
                   size="small"
-                  onClick={this.onSourceIconClick.bind(this, this.props.source)}
+                  onClick={this.onSourceIconClick.bind(this)}
                   className={clsx(classes.avatar, this.props.source.marked && classes.markedSource, this.props.tutorial == SDT.sourceAvatar && classes.highlight)}>
                   <SourceIcon url={this.props.source.url} className={clsx(classes.sourceIcon, this.props.source.marked && classes.sourceMarkedIcon)}/>
                 </Fab>
@@ -290,8 +290,8 @@ class SourceListItem extends React.Component {
     return tagName;
   }
 
-  onSourceIconClick(source: LibrarySource, e: MouseEvent) {
-    const sourceURL = source.url;
+  onSourceIconClick(e: MouseEvent) {
+    const sourceURL = this.props.source.url;
     if (e.shiftKey && !e.ctrlKey) {
       this.openExternalURL(sourceURL);
     } else if (!e.shiftKey && e.ctrlKey) {
@@ -306,16 +306,16 @@ class SourceListItem extends React.Component {
     } else if (!e.shiftKey && !e.ctrlKey) {
       this.props.savePosition();
       try {
-        this.props.onPlay(source, this.props.sources);
+        this.props.onPlay(this.props.source, this.props.sources);
       } catch (e) {
-        this.props.systemMessage("The source " + source.url + " isn't in your Library");
+        this.props.systemMessage("The source " + sourceURL + " isn't in your Library");
       }
     }
   }
 
   onClip() {
     this.props.savePosition();
-    this.props.onClip(this.props.source);
+    this.props.onClip(this.props.source, this.props.sources);
   }
 
   onStartEdit(s: LibrarySource) {

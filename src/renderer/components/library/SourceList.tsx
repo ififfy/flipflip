@@ -34,15 +34,16 @@ class SourceList extends React.Component {
   readonly props: {
     classes: any,
     config: Config,
+    isLibrary: boolean
+    library: Array<LibrarySource>,
     sources: Array<LibrarySource>,
     tutorial: string,
     onClearBlacklist(sourceURL: string): void,
-    onClip(source: LibrarySource): void,
+    onClip(source: LibrarySource, displayed: Array<LibrarySource>): void,
     onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void,
     onUpdateSources(sources: Array<LibrarySource>): void,
     systemMessage(message: string): void,
     isSelect?: boolean,
-    library?: Array<LibrarySource>,
     selected?: Array<string>,
     yOffset?: number,
     onUpdateSelected?(selected: Array<string>): void,
@@ -55,7 +56,7 @@ class SourceList extends React.Component {
   };
 
   onSortEnd = ({oldIndex, newIndex}: {oldIndex: number, newIndex: number}) => {
-    if (this.props.library) {
+    if (this.props.isLibrary) {
       const oldIndexSource = this.props.sources[oldIndex];
       const newIndexSource = this.props.sources[newIndex];
       const libraryURLs = this.props.library.map((s) => s.url);
@@ -149,7 +150,7 @@ class SourceList extends React.Component {
   }
 
   onRemove(source: LibrarySource) {
-    const oldSources = this.props.library ? this.props.library : this.props.sources;
+    const oldSources = this.props.isLibrary ? this.props.library : this.props.sources;
     this.props.onUpdateSources(oldSources.filter((s) => s.id != source.id));
   }
 
@@ -170,14 +171,18 @@ class SourceList extends React.Component {
 
   onEndEdit(newURL: string) {
     const newSources = Array<LibrarySource>();
-    let oldSources = this.props.library ? this.props.library : this.props.sources;
+    let oldSources = this.props.isLibrary ? this.props.library : this.props.sources;
     oldSources = oldSources.map((source: LibrarySource) => {
+      const librarySource = this.props.isLibrary ? null : this.props.library.find((s) => s.url == newURL);
       if (source.id == this.state.isEditing) {
         source.offline = false;
-        source.count = 0;
-        source.countComplete = false;
         source.lastCheck = null;
         source.url = newURL;
+        source.tags = librarySource && librarySource.tags ? librarySource.tags : source.tags;
+        source.clips = librarySource && librarySource.clips ? librarySource.clips : source.clips;
+        source.blacklist = librarySource && librarySource.blacklist ? librarySource.blacklist : source.blacklist;
+        source.count = librarySource ? librarySource.count : 0;
+        source.countComplete = librarySource ? librarySource.countComplete : false;
       }
       return source;
     });

@@ -305,7 +305,7 @@ class Library extends React.Component {
     onAddSource(scene: Scene, type: string, ...args: any[]): void,
     onBatchTag(): void,
     onClearBlacklist(sourceURL: string): void,
-    onClip(source: LibrarySource): void,
+    onClip(source: LibrarySource, displayed: Array<LibrarySource>): void,
     onExportLibrary(): void,
     onImportFromLibrary(sources: Array<LibrarySource>): void,
     onImportLibrary(): void,
@@ -566,6 +566,7 @@ class Library extends React.Component {
               <SourceList
                 config={this.props.config}
                 isSelect={this.props.isSelect || this.props.isBatchTag}
+                isLibrary={true}
                 library={this.props.library}
                 selected={this.state.selected}
                 sources={this.state.displaySources}

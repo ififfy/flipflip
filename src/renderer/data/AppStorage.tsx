@@ -30,6 +30,7 @@ export const defaultInitialState = {
   isSelect: false,
   isBatchTag: false,
   openTab: 0,
+  displayedSources: Array<LibrarySource>(),
   libraryYOffset: 0,
   libraryFilters: Array<string>(),
   librarySelected: Array<string>(),
@@ -88,6 +89,7 @@ export default class AppStorage {
             isSelect: data.isSelect ? data.isSelect : false,
             isBatchTag: data.isBatchTag ? data.isBatchTag : false,
             openTab: data.openTab ? data.openTab : 0,
+            displayedSources: Array<LibrarySource>(),
             config: data.config ? new Config(data.config) : new Config(),
             scenes: Array<Scene>(),
             grids: Array<SceneGrid>(),
@@ -154,6 +156,7 @@ export default class AppStorage {
             isSelect: data.isSelect,
             isBatchTag: data.isBatchTag,
             openTab: 0,
+            displayedSources: Array<LibrarySource>(),
             config: new Config(data.config),
             scenes: data.scenes.map((s: any) => new Scene(s)),
             grids: Array<SceneGrid>(),
@@ -303,13 +306,14 @@ export default class AppStorage {
             this.initialState.library[i].id = i;
           }
           break;
-        case "3.0.0-beta3":
+        default:
           this.initialState = {
             version: __VERSION__,
             autoEdit: data.autoEdit,
             isSelect: data.isSelect,
             isBatchTag: data.isBatchTag,
             openTab: data.openTab,
+            displayedSources: Array<LibrarySource>(),
             config: new Config(data.config),
             scenes: data.scenes.map((s: any) => new Scene(s)),
             grids: data.grids.map((g: any) => new SceneGrid(g)),
@@ -333,32 +337,6 @@ export default class AppStorage {
             this.initialState.library[i].id = i;
           }
           break;
-        default:
-          this.initialState = {
-            version: __VERSION__,
-            autoEdit: data.autoEdit,
-            isSelect: data.isSelect,
-            isBatchTag: data.isBatchTag,
-            openTab: data.openTab,
-            config: new Config(data.config),
-            scenes: data.scenes.map((s: any) => new Scene(s)),
-            grids: data.grids.map((g: any) => new SceneGrid(g)),
-            library: data.library.map((s: any) => new LibrarySource(s)),
-            tags: data.tags.map((t: any) => new Tag(t)),
-            route: data.route.map((s: any) => new Route(s)),
-            libraryYOffset: 0,
-            libraryFilters: Array<string>(),
-            librarySelected: Array<string>(),
-            progressMode: null as string,
-            progressTitle: null as string,
-            progressCurrent: 0,
-            progressTotal: 0,
-            progressNext: null as string,
-            systemMessage: null as string,
-            systemSnack: null as string,
-            tutorial: data.tutorial,
-            theme: data.theme,
-          };
       }
     }
     catch (e) {

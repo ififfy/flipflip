@@ -320,7 +320,7 @@ class SceneDetail extends React.Component {
     goBack(): void,
     onAddSource(scene: Scene, type: string, ...args: any[]): void,
     onClearBlacklist(sourceURL: string): void,
-    onClip(source: LibrarySource): void,
+    onClip(source: LibrarySource, displayed: Array<LibrarySource>): void,
     onDelete(scene: Scene): void,
     onExport(scene: Scene): void,
     onGenerate(scene: Scene): void,
@@ -568,6 +568,8 @@ class SceneDetail extends React.Component {
                   <Box className={classes.fill}>
                     <SourceList
                       config={this.props.config}
+                      isLibrary={false}
+                      library={this.props.library}
                       sources={this.props.scene.sources}
                       tutorial={this.props.tutorial == SDGT.final ? null : this.props.tutorial}
                       onClearBlacklist={this.props.onClearBlacklist.bind(this)}
