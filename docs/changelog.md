@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.0.2 <small>(12/20/2019)</small>
+- Add hover effect to source list
+- Add .mov as supported video type
+- Add type filters to library search
+- Allow switching between sources in video clipper
+- Fix bug with inheriting tags/clips/blacklist from library
+
 ## 3.0.1 <small>(12/03/2019)</small>
 - Fix bug with empty overlay
 - Fix bug with imagefap scraper

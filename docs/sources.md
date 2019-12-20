@@ -10,6 +10,24 @@ image/video URLs, (3) a single video file URL, or (4) one of the
 * Sources can also be manually ordered by drag'n'dropping them.
 * A count of usable images/videos will appear next to each source.
   * "**+**" indicates an incomplete count (didn't reach the end, but has _at least_ that many images & videos).
+  
+## Supported filetypes
+The following filetypes are supported by FlipFlip:
+
+### Images
+* .gif
+* .png
+* .jpeg / .jpg
+* .webp
+* .tiff
+* .svg
+
+### Video
+* .mp4
+* .mkv
+* .webm
+* .ogv
+* .mov (some may not work)
 
 ## Modifying sources
 #### Adding new source

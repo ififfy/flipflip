@@ -8,15 +8,17 @@ icon in the Scene Picker (Home) sidebar ( <img style="vertical-align: -5px" src=
 Sources are added to the Library and sorted just like in a [Scene](sources.md#modifying-sources).
 
 ## Search/Filter
-Use the search bar to help find or filter the displayed sources. Tags appear with a number indicating how many of the 
-displayed sources have that tag.
+Use the search bar to help find or filter the displayed sources. Tags/Types appear with a number indicating how many of 
+the displayed sources have that tagvpe.
 
-* Click on the search bar and select a tag, `<Offline>`, `<Marked>`, or `<Untagged>`.
-  * Start typing to find a particular tag.
+* Click on the search bar and select a tag, type, `<Offline>`, `<Marked>`, or `<Untagged>`.
+  * Start typing to find a particular tag/type.
   * `<Offline>` shows only sources that have been determined to be offline by [Mark Offline](mark_offline.md).
   * `<Marked>` shows only sources that have been [marked](#marking-sources).
   * `<Untagged>` shows only sources which have no tags.
 * Type any term and press "Enter" or "Search for ___" to search. This is not case sensitive.
+* Type a tag surrounded by "[" and "]" to search by tag.
+* Type a type surrounded by "{" and "}" to search by type.
 * Type "-" and then any term or filter to _exclude_ those sources.
 * Type "count>NUM", "count<NUM", or "count=NUM" to query based on source counts. (Replace "NUM" with a number).
   * This _**excludes**_ counts that are incomplete (still showing "+").

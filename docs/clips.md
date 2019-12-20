@@ -22,5 +22,7 @@ this clip.
   * _This only appears for saved clips._
 * Click <img style="vertical-align: -5px" src="doc_icons/back.svg" alt="Cancel" width="20" height="20"> to cancel changes.
 
+While Clipping, use `[` and `]` to jump to Clipping the previous/next visible video in the Library. 
+
 ?> Note: If clips don't seem to be working, ensure that "Play Selected Clips" is enabled for your scene (otherwise, 
 it will play from the entire video).
