@@ -215,18 +215,23 @@ class VideoControl extends React.Component {
   }
 
   onKeyDown = (e: KeyboardEvent) => {
+    const focus = document.activeElement.tagName.toLocaleLowerCase();
     switch (e.key) {
       case ' ':
         e.preventDefault();
         this.state.playing ? this.onPause() : this.onPlay();
         break;
       case 'ArrowLeft':
-        e.preventDefault();
-        this.onBack();
+        if (focus != "input") {
+          e.preventDefault();
+          this.onBack();
+        }
         break;
       case 'ArrowRight':
-        e.preventDefault();
-        this.onForward();
+        if (focus != "input") {
+          e.preventDefault();
+          this.onForward();
+        }
         break;
     }
   };
