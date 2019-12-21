@@ -321,6 +321,7 @@ class VideoClipper extends React.Component {
                     volume={this.state.scene.videoVolume}
                     clip={this.state.isEditing == -1 ? null : this.state.isEditingValue}
                     clips={this.props.source.clips}
+                    useHotkeys
                     onChangeVolume={this.onChangeVolume.bind(this)}/>
                 </Grid>
               </Grid>

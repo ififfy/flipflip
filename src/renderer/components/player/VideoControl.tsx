@@ -45,11 +45,12 @@ class VideoControl extends React.Component {
   readonly props: {
     classes: any,
     video: HTMLVideoElement,
+    useHotkeys?: boolean,
     player?: boolean,
     volume?: any,
     clip?: Array<number>,
     clips?: Array<Clip>,
-      onChangeVolume(volume: number): void,
+    onChangeVolume(volume: number): void,
   };
 
   readonly state = {
@@ -135,6 +136,9 @@ class VideoControl extends React.Component {
       }
     }, 50);
     this.setState({marks: this.getMarks()});
+    if (this.props.useHotkeys) {
+      window.addEventListener('keydown', this.onKeyDown, false);
+    }
   }
 
   componentDidUpdate(props: any) {
@@ -148,6 +152,9 @@ class VideoControl extends React.Component {
 
   componentWillUnmount() {
     clearInterval(this._interval);
+    if (this.props.useHotkeys) {
+      window.removeEventListener('keydown', this.onKeyDown);
+    }
   }
 
   triggerUpdate() {
@@ -206,6 +213,23 @@ class VideoControl extends React.Component {
     }
     return marks;
   }
+
+  onKeyDown = (e: KeyboardEvent) => {
+    switch (e.key) {
+      case ' ':
+        e.preventDefault();
+        this.state.playing ? this.onPause() : this.onPlay();
+        break;
+      case 'ArrowLeft':
+        e.preventDefault();
+        this.onBack();
+        break;
+      case 'ArrowRight':
+        e.preventDefault();
+        this.onForward();
+        break;
+    }
+  };
 }
 
 export default withStyles(styles)(VideoControl as any);

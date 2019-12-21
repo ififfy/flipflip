@@ -377,7 +377,7 @@ class Library extends React.Component {
     }
 
     return (
-      <div className={classes.root} onKeyDown={this.secretHotkey.bind(this)} tabIndex={0}>
+      <div className={classes.root}>
         <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift, this.props.tutorial == LT.toolbar && clsx(classes.backdropTop, classes.disable))}>
           <Toolbar className={classes.headerBar}>
             <div className={classes.headerLeft}>
@@ -813,6 +813,7 @@ class Library extends React.Component {
 
   componentDidMount() {
     this.setState({displaySources: this.getDisplaySources()});
+    window.addEventListener('keydown', this.onKeyDown, false);
   }
 
   componentDidUpdate(props: any, state: any) {
@@ -824,9 +825,13 @@ class Library extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this.onKeyDown);
+  }
+
   // Use alt+P to access import modal
   // Use alt+U to toggle highlighting untagged sources
-  secretHotkey(e: KeyboardEvent) {
+  onKeyDown = (e: KeyboardEvent) => {
     if (!e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'p' || e.key == 'π')) {
       this.setState({openMenu: this.state.openMenu == MO.urlImport ? null : MO.urlImport});
     } else if (!e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'm' || e.key == 'µ')) {

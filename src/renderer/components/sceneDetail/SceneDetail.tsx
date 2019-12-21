@@ -348,7 +348,7 @@ class SceneDetail extends React.Component {
     const classes = this.props.classes;
     const open = this.state.drawerOpen;
     return (
-      <div className={classes.root} onKeyDown={this.secretHotkey.bind(this)} tabIndex={0}>
+      <div className={classes.root}>
 
         <AppBar position="absolute" className={clsx(classes.appBar, (this.props.tutorial == SDT.title || this.props.tutorial == SDT.play) && classes.backdropTop)}>
           <Toolbar>
@@ -883,9 +883,17 @@ class SceneDetail extends React.Component {
     )
   }
 
+  componentDidMount() {
+    window.addEventListener('keydown', this.onKeyDown, false);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this.onKeyDown);
+  }
+
   // Use alt+P to access import modal
   // Use alt+U to toggle highlighting untagged sources
-  secretHotkey(e: KeyboardEvent) {
+  onKeyDown = (e: KeyboardEvent) => {
     if (!e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'p' || e.key == 'π')) {
       this.setState({openMenu: this.state.openMenu == MO.urlImport ? null : MO.urlImport});
     }
