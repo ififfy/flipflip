@@ -271,6 +271,7 @@ class VideoClipper extends React.Component {
                           className={classes.clipField}
                           label="Start"
                           value={this.state.isEditingStartText}
+                          onDoubleClick={this.onClickStartText.bind(this)}
                           onChange={this.onChangeStartText.bind(this)}/>
                       </Grid>
                       <Grid item>
@@ -278,6 +279,7 @@ class VideoClipper extends React.Component {
                           className={classes.clipField}
                           label="End"
                           value={this.state.isEditingEndText}
+                          onDoubleClick={this.onClickEndText.bind(this)}
                           onChange={this.onChangeEndText.bind(this)}/>
                       </Grid>
                       <Grid item>
@@ -497,6 +499,11 @@ class VideoClipper extends React.Component {
     }
   }
 
+  onClickStartText() {
+    this.setState({isEditingStartText: getTimestamp(this.state.video.currentTime)});
+    this.onChangePosition(null, [this.state.video.currentTime, this.state.isEditingValue[1]]);
+  }
+
   onChangeEndText(e: MouseEvent) {
     const input = (e.target as HTMLInputElement);
     this.setState({isEditingEndText: input.value});
@@ -504,6 +511,11 @@ class VideoClipper extends React.Component {
     if (timestampValue) {
       this.onChangePosition(null, [this.state.isEditingValue[0], timestampValue]);
     }
+  }
+
+  onClickEndText() {
+    this.setState({isEditingEndText: getTimestamp(this.state.video.currentTime)});
+    this.onChangePosition(null, [this.state.isEditingValue[0], this.state.video.currentTime]);
   }
 
   onKeyDown = (e: KeyboardEvent) => {

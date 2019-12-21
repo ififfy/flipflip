@@ -14,7 +14,7 @@ next to the source to go to the "Video Clipper" interface:
 To create a new clip, click the `+`. To edit/view an existing clip, just click its number.
 
 A slider will appear allowing you to select the start and end of this clip. You can also enter/modify the timestamp
-directly for more precise selection. 
+directly for more precise selection. Double click "Start" or "End" to set it to the player's current timestamp.
 
 * Click <img style="vertical-align: -5px" src="doc_icons/save.svg" alt="Save" width="20" height="20"> to save changes to 
 this clip.
