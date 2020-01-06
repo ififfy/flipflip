@@ -349,6 +349,21 @@ export function goBack(state: State): Object {
   return {route: newRoute, autoEdit: false, isSelect: false};
 }
 
+export function cloneScene(state: State, scene: Scene): Object {
+  let id = state.scenes.length + 1;
+  state.scenes.forEach((s: Scene) => {
+    id = Math.max(s.id + 1, id);
+  });
+  const sceneCopy = JSON.parse(JSON.stringify(scene)); // Make a copy
+  sceneCopy.id = id;
+  return {
+    scenes: state.scenes.concat([sceneCopy]),
+    route: [new Route({kind: 'scene', value: sceneCopy.id})],
+    autoEdit: true,
+    systemSnack: "Clone successful!"
+  };
+}
+
 export function saveScene(state: State, scene: Scene): Object {
   let id = state.scenes.length + 1;
   state.scenes.forEach((s: Scene) => {
@@ -362,6 +377,7 @@ export function saveScene(state: State, scene: Scene): Object {
     scenes: state.scenes.concat([sceneCopy]),
     route: [new Route({kind: 'scene', value: sceneCopy.id})],
     autoEdit: true,
+    systemSnack: "Save successful!"
   };
 }
 

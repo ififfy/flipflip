@@ -113,6 +113,7 @@ export default class Meta extends React.Component {
               onAddSource={a(actions.addSource)}
               onClearBlacklist={a(actions.clearBlacklist)}
               onClip={a(actions.clipVideo)}
+              onCloneScene={a(actions.cloneScene)}
               onDelete={a(actions.deleteScene)}
               onExport={a(actions.exportScene)}
               onGenerate={a(actions.generateScene)}

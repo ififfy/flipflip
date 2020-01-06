@@ -19,6 +19,7 @@ import CachedIcon from '@material-ui/icons/Cached';
 import CollectionsIcon from '@material-ui/icons/Collections';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
+import FileCopyIcon from '@material-ui/icons/FileCopy';
 import FolderIcon from '@material-ui/icons/Folder';
 import HttpIcon from '@material-ui/icons/Http';
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
@@ -321,6 +322,7 @@ class SceneDetail extends React.Component {
     onAddSource(scene: Scene, type: string, ...args: any[]): void,
     onClearBlacklist(sourceURL: string): void,
     onClip(source: LibrarySource, displayed: Array<LibrarySource>): void,
+    onCloneScene(scene: Scene): void,
     onDelete(scene: Scene): void,
     onExport(scene: Scene): void,
     onGenerate(scene: Scene): void,
@@ -341,8 +343,6 @@ class SceneDetail extends React.Component {
     snackbar: null as string,
     snackbarType: null as string,
   };
-
-  readonly nameInputRef: React.RefObject<HTMLInputElement> = React.createRef();
 
   render() {
     const classes = this.props.classes;
@@ -370,7 +370,6 @@ class SceneDetail extends React.Component {
                   id="title"
                   value={this.state.isEditingName}
                   margin="none"
-                  ref={this.nameInputRef}
                   inputProps={{className: classes.titleInput}}
                   onBlur={this.endEditingName.bind(this)}
                   onChange={this.onChangeName.bind(this)}
@@ -460,6 +459,12 @@ class SceneDetail extends React.Component {
                 <ListItemText primary="Save as Scene" />
               </ListItem>
             )}
+            <ListItem button onClick={this.props.onCloneScene.bind(this, this.props.scene)} className={clsx((this.props.tutorial == SDT.options1 || this.props.tutorial == SDT.effects1) && classes.disable)}>
+              <ListItemIcon>
+                <FileCopyIcon />
+              </ListItemIcon>
+              <ListItemText primary={`Clone ${this.props.scene.generatorWeights ? 'Generator' : 'Scene'}`} />
+            </ListItem>
             <ListItem button onClick={this.props.onExport.bind(this, this.props.scene)} className={clsx((this.props.tutorial == SDT.options1 || this.props.tutorial == SDT.effects1) && classes.disable)}>
               <ListItemIcon>
                 <PublishIcon />
@@ -891,13 +896,19 @@ class SceneDetail extends React.Component {
     window.removeEventListener('keydown', this.onKeyDown);
   }
 
+  componentDidUpdate(props: any) {
+    if (!props.autoEdit && this.props.autoEdit) {
+      this.setState({isEditingName: this.props.scene.name});
+    }
+  }
+
   // Use alt+P to access import modal
   // Use alt+U to toggle highlighting untagged sources
   onKeyDown = (e: KeyboardEvent) => {
     if (!e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'p' || e.key == 'π')) {
       this.setState({openMenu: this.state.openMenu == MO.urlImport ? null : MO.urlImport});
     }
-  }
+  };
 
   onCloseSnackbar() {
     this.setState({snackbar: null, snackbarType: null});
