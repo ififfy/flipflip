@@ -287,6 +287,7 @@ export default class Meta extends React.Component {
           <Snackbar
             open={!!this.state.systemSnack}
             autoHideDuration={2000}
+            key={this.state.systemSnack + new Date()}
             onClose={a(actions.closeMessage)}
             TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
             <SnackbarContent
