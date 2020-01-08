@@ -50,6 +50,7 @@ interface SceneSettingsI {
   videoTimingConstant: number;
   randomVideoStart: boolean;
   continueVideo: boolean;
+  rotatePortrait: boolean;
   playVideoClips: boolean;
   skipVideoStart: number;
   skipVideoEnd: number;
@@ -205,6 +206,7 @@ export class SceneSettings implements SceneSettingsI {
   videoTimingConstant = 3000;
   randomVideoStart = false;
   continueVideo = false;
+  rotatePortrait = false;
   playVideoClips = true;
   skipVideoStart = 0;
   skipVideoEnd = 0;

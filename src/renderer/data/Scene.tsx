@@ -66,6 +66,7 @@ export default class Scene {
   videoTimingConstant = 3000;
   randomVideoStart = false;
   continueVideo = false;
+  rotatePortrait = false;
   playVideoClips = true;
   skipVideoStart = 0;
   skipVideoEnd = 0;

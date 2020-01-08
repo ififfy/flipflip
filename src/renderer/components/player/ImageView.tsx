@@ -110,6 +110,8 @@ export default class ImageView extends React.Component {
       this._timeouts.push(setTimeout(drawLoop, 20, v, c, w, h));
     };
 
+    const rotateVideo = img instanceof HTMLVideoElement && this.props.scene.rotatePortrait && imgWidth < imgHeight;
+
     const blur = this.props.scene.backgroundType == BT.blur;
     let bgImg: any;
     if (blur) {
@@ -117,6 +119,9 @@ export default class ImageView extends React.Component {
         bgImg = img.cloneNode();
       } else {
         bgImg = document.createElement('canvas');
+        if (rotateVideo) {
+          bgImg.style.transform = "rotate(270deg)";
+        }
 
         const context = bgImg.getContext('2d');
         bgImg.width = parentWidth;
@@ -167,61 +172,134 @@ export default class ImageView extends React.Component {
       }
     }
 
-    switch(this.props.scene.imageType) {
+    switch (this.props.scene.imageType) {
       case (IT.fitBestClip):
-        if (imgAspect > parentAspect) {
-          const scale = parentHeight / imgHeight;
-          img.style.width = 'auto';
-          img.style.height = '100%';
-          img.style.marginTop = '0';
-          img.style.marginLeft = (parentWidth / 2 - imgWidth * scale / 2) + 'px';
+        if (rotateVideo) {
+          imgAspect = imgHeight / imgWidth;
+          if (imgAspect < parentAspect) {
+            const scale = parentWidth / imgHeight;
+            img.style.height = parentWidth.toString() + "px";
+            img.style.marginLeft = '-' + imgWidth * scale + 'px';
+            img.style.marginTop = (parentHeight / 2 - imgWidth * scale / 2) + 'px';
+
+            img.style.transform = "rotate(270deg)";
+            img.style.transformOrigin = "top right";
+          } else {
+            const scale = parentHeight / imgWidth;
+            img.style.width = parentHeight.toString() + "px";
+            img.style.marginLeft = (-parentHeight  + (parentWidth / 2 - imgHeight * scale / 2)) + 'px';
+
+            img.style.transform = "rotate(270deg)";
+            img.style.transformOrigin = "top right";
+          }
         } else {
-          const scale = parentWidth / imgWidth;
-          img.style.width = '100%';
-          img.style.height = 'auto';
-          img.style.marginTop = (parentHeight / 2 - imgHeight * scale / 2) + 'px';
-          img.style.marginLeft = '0';
+          if (imgAspect > parentAspect) {
+            const scale = parentHeight / imgHeight;
+            img.style.width = 'auto';
+            img.style.height = '100%';
+            img.style.marginTop = '0';
+            img.style.marginLeft = (parentWidth / 2 - imgWidth * scale / 2) + 'px';
+          } else {
+            const scale = parentWidth / imgWidth;
+            img.style.width = '100%';
+            img.style.height = 'auto';
+            img.style.marginTop = (parentHeight / 2 - imgHeight * scale / 2) + 'px';
+            img.style.marginLeft = '0';
+          }
         }
         break;
       default:
       case (IT.fitBestNoClip):
-        if (imgAspect < parentAspect) {
-          const scale = parentHeight / imgHeight;
-          img.style.width = 'auto';
-          img.style.height = '100%';
-          img.style.marginTop = '0';
-          img.style.marginLeft = (parentWidth / 2 - imgWidth * scale / 2) + 'px';
+        if (rotateVideo) {
+          imgAspect = imgHeight / imgWidth;
+          if (imgAspect < parentAspect) {
+            const scale = parentHeight / imgWidth;
+            img.style.width = parentHeight.toString() + "px";
+            img.style.marginLeft = (-parentHeight  + (parentWidth / 2 - imgHeight * scale / 2)) + 'px';
+
+            img.style.transform = "rotate(270deg)";
+            img.style.transformOrigin = "top right";
+          } else {
+            const scale = parentWidth / imgHeight;
+            img.style.height = parentWidth.toString() + "px";
+            img.style.marginLeft = '-' + imgWidth * scale + 'px';
+            img.style.marginTop = (parentHeight / 2 - imgWidth * scale / 2) + 'px';
+
+            img.style.transform = "rotate(270deg)";
+            img.style.transformOrigin = "top right";
+          }
         } else {
-          const scale = parentWidth / imgWidth;
-          img.style.width = '100%';
-          img.style.height = 'auto';
-          img.style.marginTop = (parentHeight / 2 - imgHeight * scale / 2) + 'px';
-          img.style.marginLeft = '0';
+          if (imgAspect < parentAspect) {
+            const scale = parentHeight / imgHeight;
+            img.style.width = 'auto';
+            img.style.height = '100%';
+            img.style.marginTop = '0';
+            img.style.marginLeft = (parentWidth / 2 - imgWidth * scale / 2) + 'px';
+          } else {
+            const scale = parentWidth / imgWidth;
+            img.style.width = '100%';
+            img.style.height = 'auto';
+            img.style.marginTop = (parentHeight / 2 - imgHeight * scale / 2) + 'px';
+            img.style.marginLeft = '0';
+          }
         }
         break;
       case (IT.stretch):
-        img.style.width = '100%';
-        img.style.height = '100%';
+        if (rotateVideo) {
+          const scale = parentWidth / imgHeight;
+          img.style.height = parentWidth.toString() + "px";
+          img.style.marginLeft = '-' + imgWidth * scale + 'px';
+          img.style.marginTop = (parentHeight / 2 - imgWidth * scale / 2) + 'px';
+
+          img.style.transform = "rotate(270deg)";
+          img.style.transformOrigin = "top right";
+        } else {
+          img.style.width = '100%';
+          img.style.height = '100%';
+        }
         break;
       case (IT.center):
+        if (rotateVideo) {
+          img.style.transform = "rotate(270deg)";
+          img.style.transformOrigin = "center";
+        }
         const top = Math.max(parentHeight - imgHeight, 0);
         const left = Math.max(parentWidth - imgWidth, 0);
         img.style.marginTop = top / 2 + 'px';
         img.style.marginLeft = left / 2 + 'px';
         break;
       case (IT.fitWidth):
-        const hScale = parentWidth / imgWidth;
-        img.style.width = '100%';
-        img.style.height = 'auto';
-        img.style.marginTop = (parentHeight / 2 - imgHeight * hScale / 2) + 'px';
-        img.style.marginLeft = '0';
+        if (rotateVideo) {
+          const scale = parentHeight / imgWidth;
+          img.style.width = parentHeight.toString() + "px";
+          img.style.marginLeft = (-parentHeight  + (parentWidth / 2 - imgHeight * scale / 2)) + 'px';
+
+          img.style.transform = "rotate(270deg)";
+          img.style.transformOrigin = "top right";
+        } else {
+          const hScale = parentWidth / imgWidth;
+          img.style.width = '100%';
+          img.style.height = 'auto';
+          img.style.marginTop = (parentHeight / 2 - imgHeight * hScale / 2) + 'px';
+          img.style.marginLeft = '0';
+        }
         break;
       case (IT.fitHeight):
-        const wScale = parentHeight / imgHeight;
-        img.style.width = 'auto';
-        img.style.height = '100%';
-        img.style.marginTop = '0';
-        img.style.marginLeft = (parentWidth / 2 - imgWidth * wScale / 2) + 'px';
+        if (rotateVideo) {
+          const scale = parentWidth / imgHeight;
+          img.style.height = parentWidth.toString() + "px";
+          img.style.marginLeft = '-' + imgWidth * scale + 'px';
+          img.style.marginTop = (parentHeight / 2 - imgWidth * scale / 2) + 'px';
+
+          img.style.transform = "rotate(270deg)";
+          img.style.transformOrigin = "top right";
+        } else {
+          const wScale = parentHeight / imgHeight;
+          img.style.width = 'auto';
+          img.style.height = '100%';
+          img.style.marginTop = '0';
+          img.style.marginLeft = (parentWidth / 2 - imgWidth * wScale / 2) + 'px';
+        }
         break;
     }
 

@@ -160,7 +160,7 @@ class ImageVideoCard extends React.Component {
                 }}/>
             </Collapse>
           </Grid>
-          <Grid item xs={12} sm={this.props.sidebar ? 12 : 6} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
+          <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} md={6} lg={4} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
             <Collapse in={this.props.scene.imageTypeFilter != IF.stills}>
               <FormControlLabel
                 control={
@@ -171,7 +171,7 @@ class ImageVideoCard extends React.Component {
                 label="Start at Random Time"/>
             </Collapse>
           </Grid>
-          <Grid item xs={12} sm={this.props.sidebar ? 12 : 6} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
+          <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} md={6} lg={4} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
             <Collapse in={this.props.scene.imageTypeFilter != IF.stills}>
               <FormControlLabel
                 control={
@@ -180,6 +180,17 @@ class ImageVideoCard extends React.Component {
                           onChange={this.onBoolInput.bind(this, 'continueVideo')}/>
                 }
                 label="Continue Videos"/>
+            </Collapse>
+          </Grid>
+          <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} md={6} lg={4} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
+            <Collapse in={this.props.scene.imageTypeFilter != IF.stills}>
+              <FormControlLabel
+                control={
+                  <Switch checked={this.props.scene.rotatePortrait}
+                          size="small"
+                          onChange={this.onBoolInput.bind(this, 'rotatePortrait')}/>
+                }
+                label="Rotate Portrait Videos"/>
             </Collapse>
           </Grid>
           <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
