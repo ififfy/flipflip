@@ -17,7 +17,9 @@ import {
   getFileName,
   getRandomIndex,
   getSourceType,
-  isVideo, randomizeList,
+  isVideo,
+  isVideoPlaylist,
+  randomizeList,
   removeDuplicatesBy,
   saveDir
 } from "./utils";
@@ -1081,9 +1083,9 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
 
     case AF.videos:
       let vResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
-        {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'MP4 - MPEG-4 video files', extensions: ['mp4']}, {name: 'MKV - Matroska video files', extensions: ['mkv']}, {name: 'WEBM - File', extensions: ['webm']}, {name: 'OGG', extensions: ['ogv']}], properties: ['openFile', 'multiSelections']});
+        {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'Video files', extensions: ['mp4', 'mkv', 'webm', 'ogv', 'mov']}, {name: 'Playlist files', extensions: ['asx', 'm3u8', 'pls', 'xspf']}], properties: ['openFile', 'multiSelections']});
       if (!vResult) return;
-      vResult = vResult.filter((r) => isVideo(r, true));
+      vResult = vResult.filter((r) => isVideo(r, true) || isVideoPlaylist(r, true));
       newSources = addSources(newSources, vResult, state.library);
       break;
 
@@ -1193,7 +1195,6 @@ function addSources(originalSources: Array<LibrarySource>, newSources: Array<str
   let combinedSources = Array.from(originalSources);
   for (let url of newSources) {
     const librarySource = library.find((s) => s.url === url);
-    console.log(librarySource);
     combinedSources.unshift(new LibrarySource({
       url: url,
       id: id,
@@ -1229,7 +1230,8 @@ export function sortScene(state: State, algorithm: string, ascending: boolean): 
 
 export function sortSources(state: State, scene: Scene, algorithm: string, ascending: boolean): Object {
   const getName = (a: LibrarySource) => {
-    return getSourceType(a.url) == ST.video ? getFileName(a.url).toLowerCase() : getFileGroup(a.url).toLowerCase();
+    const sourceType = getSourceType(a.url);
+    return sourceType == ST.video || sourceType == ST.playlist ? getFileName(a.url).toLowerCase() : getFileGroup(a.url).toLowerCase();
   };
   const getFullName = (a: LibrarySource) => {
     return a.url.toLowerCase();

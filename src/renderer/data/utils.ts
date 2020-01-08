@@ -91,6 +91,8 @@ export function getFileName(url: string, extension = true) {
 export function getSourceType(url: string): string {
   if (isVideo(url, true)) {
     return ST.video;
+  } else if (isVideoPlaylist(url, true)) {
+    return ST.playlist;
   } else if (/^https?:\/\/([^.]*|(66\.media))\.tumblr\.com/.exec(url) != null) {
     return ST.tumblr;
   } else if (/^https?:\/\/(www\.)?reddit\.com\//.exec(url) != null) {
@@ -214,6 +216,7 @@ export function getFileGroup(url: string) {
     case ST.local:
       return url.substring(url.lastIndexOf(path.sep)+1);
     case ST.video:
+    case ST.playlist:
       if (/^https?:\/\//g.exec(url) != null) {
         sep = "/"
       } else {
@@ -233,7 +236,7 @@ export function getCachePath(source: string, config: Config) {
       baseDir += path.sep;
     }
     if (source) {
-      if (source != ST.video) {
+      if (source != ST.video && source != ST.playlist) {
         return baseDir + typeDir + path.sep + getFileGroup(source) + path.sep;
       } else {
         return baseDir + typeDir + path.sep;
@@ -243,7 +246,7 @@ export function getCachePath(source: string, config: Config) {
     }
   } else {
     if (source) {
-      if (source != ST.video) {
+      if (source != ST.video && source != ST.playlist) {
         return getPath() + path.sep + "ImageCache" + path.sep + typeDir + path.sep + getFileGroup(source);
       } else {
         return getPath() + path.sep + "ImageCache" + path.sep + typeDir + path.sep;
@@ -375,6 +378,20 @@ export function isVideo(path: string, strict: boolean): boolean {
   if (path == null) return false;
   const p = path.toLowerCase();
   const acceptableExtensions = [".mp4", ".mkv", ".webm", ".ogv", ".mov"];
+  for (let ext of acceptableExtensions) {
+    if (strict) {
+      if (p.endsWith(ext)) return true;
+    } else {
+      if (p.includes(ext)) return true;
+    }
+  }
+  return false;
+}
+
+export function isVideoPlaylist(path: string, strict: boolean): boolean {
+  if (path == null) return false;
+  const p = path.toLowerCase();
+  const acceptableExtensions = [".asx", ".m3u8", ".pls", ".xspf"];
   for (let ext of acceptableExtensions) {
     if (strict) {
       if (p.endsWith(ext)) return true;

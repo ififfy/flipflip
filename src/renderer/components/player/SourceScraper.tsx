@@ -75,6 +75,17 @@ function getPromise(systemMessage: Function, config: Config, source: LibrarySour
     } else {
       promise = loadVideo(systemMessage, config, source, filter, helpers);
     }
+  } else if (sourceType == ST.playlist) {
+    helpers.next = null;
+    const cachePath = getCachePath(source.url, config) + getFileName(source.url);
+    if (fs.existsSync(cachePath)) {
+      const realURL = source.url;
+      source.url = cachePath;
+      promise = loadPlaylist(systemMessage, config, source, filter, helpers);
+      source.url = realURL;
+    } else {
+      promise = loadPlaylist(systemMessage, config, source, filter, helpers);
+    }
   } else { // Paging sources
     let promiseFunction;
     let timeout;
@@ -194,6 +205,48 @@ function loadVideo(systemMessage: Function, config: Config, source: LibrarySourc
       data: path,
       helpers: helpers,
     });
+  });
+}
+
+function loadPlaylist(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+  const url = source.url;
+  return new CancelablePromise((resolve) => {
+    wretch(url)
+      .get()
+      .text(data => {
+        const urls = [];
+        if (url.endsWith(".asx")) {
+          const refs = new DOMParser().parseFromString(data, "text/xml").getElementsByTagName("Ref");
+          for (let l of refs) {
+            urls.push(l.getAttribute("href"));
+          }
+        } else if (url.endsWith(".m3u8")) {
+          for (let l of data.split("\n")) {
+            if (l.length > 0 && !l.startsWith("#")) {
+              urls.push(l.trim());
+            }
+          }
+        } else if (url.endsWith(".pls")) {
+          for (let l of data.split("\n")) {
+            if (l.startsWith("File")) {
+              urls.push(l.split("=")[1].trim());
+            }
+          }
+        } else if (url.endsWith(".xspf")) {
+          const locations = new DOMParser().parseFromString(data, "text/xml").getElementsByTagName("location");
+          for (let l of locations) {
+            urls.push(l.innerHTML);
+          }
+        }
+
+        if (urls.length > 0) {
+          helpers.count = urls.length;
+        }
+        resolve({
+          data: filterPathsToJustPlayable(filter, urls, true),
+          helpers: helpers,
+        });
+      });
   });
 }
 

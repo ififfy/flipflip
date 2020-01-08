@@ -7,6 +7,7 @@ import ListIcon from '@material-ui/icons/List';
 import MovieIcon from '@material-ui/icons/Movie';
 import RedditIcon from '@material-ui/icons/Reddit';
 import TwitterIcon from '@material-ui/icons/Twitter';
+import SubscriptionsIcon from '@material-ui/icons/Subscriptions';
 
 import {getSourceType} from "../../data/utils";
 import {ST} from "../../data/const";
@@ -151,6 +152,8 @@ export default class SourceIcon extends React.Component {
         return <FolderIcon className={this.props.className}/>;
       case ST.video:
         return <MovieIcon className={this.props.className}/>;
+      case ST.playlist:
+        return <SubscriptionsIcon className={this.props.className}/>;
       case ST.list:
         return <ListIcon className={this.props.className}/>;
       case ST.reddit:

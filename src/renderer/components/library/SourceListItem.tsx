@@ -254,7 +254,8 @@ class SourceListItem extends React.Component {
                 </IconButton>
               )}
               {this.props.config.caching.enabled && getSourceType(this.props.source.url) != ST.local &&
-              (getSourceType(this.props.source.url) != ST.video || /^https?:\/\//g.exec(this.props.source.url) != null) && (
+              ((getSourceType(this.props.source.url) != ST.video && getSourceType(this.props.source.url) != ST.playlist)
+                || /^https?:\/\//g.exec(this.props.source.url) != null) && (
                 <React.Fragment>
                   <IconButton
                     onClick={this.props.onClean.bind(this, this.props.source)}
@@ -297,7 +298,7 @@ class SourceListItem extends React.Component {
     } else if (!e.shiftKey && e.ctrlKey) {
       const fileType = getSourceType(sourceURL);
       let cachePath;
-      if (fileType == ST.video) {
+      if (fileType == ST.video || fileType == ST.playlist) {
         cachePath = getCachePath(sourceURL, this.props.config) + getFileName(sourceURL);
       } else {
         cachePath = getCachePath(sourceURL, this.props.config);

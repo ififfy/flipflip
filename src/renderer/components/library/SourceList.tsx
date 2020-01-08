@@ -211,7 +211,7 @@ class SourceList extends React.Component {
     const fileType = getSourceType(sourceURL);
     if (fileType != ST.local) {
       let cachePath;
-      if (fileType == ST.video) {
+      if (fileType == ST.video || fileType == ST.playlist) {
         cachePath = getCachePath(sourceURL, this.props.config) + getFileName(sourceURL);
       } else {
         cachePath = getCachePath(sourceURL, this.props.config);

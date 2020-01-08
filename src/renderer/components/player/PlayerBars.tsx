@@ -753,7 +753,7 @@ class PlayerBars extends React.Component {
         }
       }));
     }
-    if ((!isFile && type != ST.video) || type == ST.local) {
+    if ((!isFile && type != ST.video && type != ST.playlist) || type == ST.local) {
       contextMenu.append(new MenuItem({
         label: 'Blacklist File',
         click: () => {

@@ -70,6 +70,7 @@ export default new Map<string, string>([
   ['st.gelbooru2', 'Gelbooru'],
   ['st.ehentai', 'EHentai'],
   ['st.video', 'Video'],
+  ['st.playlist', 'Playlist'],
   ['st.list', 'List'],
   ['st.local', 'Local'],
 

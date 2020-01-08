@@ -85,6 +85,7 @@ const SF = { // sort function
 const ST = { // source types
   local: 'st.local',
   video: 'st.video',
+  playlist: 'st.playlist',
   list: 'st.list',
   tumblr: 'st.tumblr',
   reddit: 'st.reddit',
