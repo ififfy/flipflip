@@ -164,6 +164,12 @@ export default class ImageView extends React.Component {
       } else {
         img.volume = 0;
       }
+      if (this.props.scene.videoRandomSpeed) {
+        const randomSpeed = Math.floor(Math.random() * this.props.scene.videoSpeedMax) + this.props.scene.videoSpeedMin;
+        img.playbackRate = randomSpeed / 10;
+      } else {
+        img.playbackRate = this.props.scene.videoSpeed / 10;
+      }
       if (!blur) {
         img.onplay = () => videoLoop(img);
       }

@@ -228,7 +228,7 @@ class AudioControl extends React.Component {
                   </Grid>
                   <Divider component="div" orientation="vertical" style={{height: 48}}/>
                   <Grid item xs>
-                    <Typography id="tick-sin-rate-slider" variant="caption" component="div"
+                    <Typography id="audio-speed-slider" variant="caption" component="div"
                                 color="textSecondary">
                       Speed {audioSpeed / 10}x
                     </Typography>

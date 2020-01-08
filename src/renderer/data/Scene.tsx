@@ -92,6 +92,10 @@ export default class Scene {
   nextSceneTime: number = 900;
   libraryID: number = -1;
   videoVolume = 0;
+  videoSpeed = 10;
+  videoRandomSpeed = false;
+  videoSpeedMin = 5;
+  videoSpeedMax = 20;
   audioEnabled = false;
   audios: Array<Audio> = [];
   bpm = 0;

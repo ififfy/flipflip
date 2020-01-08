@@ -3,7 +3,7 @@ import clsx from "clsx";
 
 import {
   Collapse, createStyles, Divider, FormControl, FormControlLabel, FormLabel, Grid, InputAdornment,
-  InputLabel, MenuItem, Radio, RadioGroup, Select, Slider, Switch, TextField, Theme, withStyles
+  InputLabel, MenuItem, Radio, RadioGroup, Select, Slider, Switch, TextField, Theme, Typography, withStyles
 } from "@material-ui/core";
 
 
@@ -160,7 +160,66 @@ class ImageVideoCard extends React.Component {
                 }}/>
             </Collapse>
           </Grid>
-          <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} md={6} lg={4} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
+          <Grid item xs={12} sm={this.props.sidebar ? 12 : 8} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
+            <Collapse in={this.props.scene.imageTypeFilter != IF.stills && !this.props.scene.videoRandomSpeed}>
+              <Typography id="video-speed-slider" variant="caption" component="div"
+                          color="textSecondary">
+                Video Speed {this.props.scene.videoSpeed / 10}x
+              </Typography>
+              <Slider
+                min={1}
+                max={40}
+                defaultValue={this.props.scene.videoSpeed}
+                onChangeCommitted={this.onSliderChange.bind(this, 'videoSpeed')}
+                valueLabelDisplay={'auto'}
+                valueLabelFormat={(v) => v/10 + "x"}
+                aria-labelledby="video-speed-slider"/>
+            </Collapse>
+            <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.videoRandomSpeed}>
+              <Grid container spacing={1}>
+                <Grid item xs={6}>
+                  <Typography id="video-speed-min-slider" variant="caption" component="div"
+                              color="textSecondary">
+                    Video Speed Min {this.props.scene.videoSpeedMin / 10}x
+                  </Typography>
+                  <Slider
+                    min={1}
+                    max={40}
+                    defaultValue={this.props.scene.videoSpeedMin}
+                    onChangeCommitted={this.onSliderChange.bind(this, 'videoSpeedMin')}
+                    valueLabelDisplay={'auto'}
+                    valueLabelFormat={(v) => v/10 + "x"}
+                    aria-labelledby="video-speed-min-slider"/>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography id="video-speed-max-slider" variant="caption" component="div"
+                              color="textSecondary">
+                    Video Speed Max {this.props.scene.videoSpeedMax / 10}x
+                  </Typography>
+                  <Slider
+                    min={1}
+                    max={40}
+                    defaultValue={this.props.scene.videoSpeedMax}
+                    onChangeCommitted={this.onSliderChange.bind(this, 'videoSpeedMax')}
+                    valueLabelDisplay={'auto'}
+                    valueLabelFormat={(v) => v/10 + "x"}
+                    aria-labelledby="video-speed-max-slider"/>
+                </Grid>
+              </Grid>
+            </Collapse>
+          </Grid>
+          <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
+            <Collapse in={this.props.scene.imageTypeFilter != IF.stills}>
+              <FormControlLabel
+                control={
+                  <Switch checked={this.props.scene.videoRandomSpeed}
+                          size="small"
+                          onChange={this.onBoolInput.bind(this, 'videoRandomSpeed')}/>
+                }
+                label="Random Speed"/>
+            </Collapse>
+          </Grid>
+          <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} md={this.props.sidebar ? 12 : 6} lg={this.props.sidebar ? 12 : 4} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
             <Collapse in={this.props.scene.imageTypeFilter != IF.stills}>
               <FormControlLabel
                 control={
@@ -171,7 +230,7 @@ class ImageVideoCard extends React.Component {
                 label="Start at Random Time"/>
             </Collapse>
           </Grid>
-          <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} md={6} lg={4} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
+          <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} md={this.props.sidebar ? 12 : 6} lg={this.props.sidebar ? 12 : 4} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
             <Collapse in={this.props.scene.imageTypeFilter != IF.stills}>
               <FormControlLabel
                 control={
@@ -182,7 +241,7 @@ class ImageVideoCard extends React.Component {
                 label="Continue Videos"/>
             </Collapse>
           </Grid>
-          <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} md={6} lg={4} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
+          <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} md={this.props.sidebar ? 12 : 6} lg={this.props.sidebar ? 12 : 4} className={clsx(this.props.scene.imageTypeFilter == IF.stills && classes.noPadding)}>
             <Collapse in={this.props.scene.imageTypeFilter != IF.stills}>
               <FormControlLabel
                 control={
