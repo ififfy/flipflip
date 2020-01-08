@@ -591,9 +591,9 @@ function loadImageFap(systemMessage: Function, config: Config, source: LibrarySo
               }
             }
             helpers.next = null;
-            helpers.count = helpers.count + videoURLs.length;
+            helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, videoURLs, true).length;
             resolve({
-              data: videoURLs,
+              data: filterPathsToJustPlayable(filter, videoURLs, true),
               helpers: helpers,
             })
           }
@@ -746,8 +746,8 @@ function loadTwitter(systemMessage: Function, config: Config, source: LibrarySou
           resolve({data: [], helpers: helpers});
         } else {
           helpers.next = lastID;
-          helpers.count = helpers.count + images.length;
-          resolve({data: images, helpers: helpers});
+          helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+          resolve({data: filterPathsToJustPlayable(filter, images, true), helpers: helpers});
         }
       })
     });
