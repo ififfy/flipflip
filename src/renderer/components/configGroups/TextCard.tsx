@@ -62,7 +62,7 @@ class TextCard extends React.Component {
                           onChange={this.onBoolInput.bind(this, 'textEnabled')}/>
                 }
                 label="Text Overlay"/>
-                <Collapse in={this.props.scene.textEnabled}>
+                <Collapse in={this.props.scene.textEnabled && !this.props.scene.textNextScene}>
                   <FormControlLabel
                     control={
                       <Switch checked={this.props.scene.textEndStop}
@@ -71,6 +71,15 @@ class TextCard extends React.Component {
                     }
                     label="Stop at End"/>
                 </Collapse>
+              <Collapse in={this.props.scene.textEnabled && !this.props.scene.textEndStop}>
+                <FormControlLabel
+                  control={
+                    <Switch checked={this.props.scene.textNextScene}
+                            size="small"
+                            onChange={this.onBoolInput.bind(this, 'textNextScene')}/>
+                  }
+                  label="Next Scene at End"/>
+              </Collapse>
             </Grid>
             {this.state.systemFonts.length > 0 && (
               <Grid item>

@@ -65,6 +65,7 @@ interface SceneSettingsI {
   textEnabled: boolean;
   textSource: string;
   textEndStop: boolean;
+  textNextScene: boolean;
 
   strobe: boolean;
   strobePulse: boolean;
@@ -229,6 +230,7 @@ export class SceneSettings implements SceneSettingsI {
   textEnabled = false;
   textSource = "";
   textEndStop = false;
+  textNextScene = false;
 
   strobe = false;
   strobePulse = false;

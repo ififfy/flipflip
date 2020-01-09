@@ -73,6 +73,7 @@ export default class Scene {
   textEnabled = false;
   textSource: string = "";
   textEndStop = false;
+  textNextScene = false;
   blinkColor = "#FFFFFF";
   blinkFontSize = 20;
   blinkFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";

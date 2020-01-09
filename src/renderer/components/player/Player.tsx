@@ -334,8 +334,10 @@ export default class Player extends React.Component {
             countFontFamily={this.props.scene.countFontFamily}
             url={this.props.scene.textSource}
             textEndStop={this.props.scene.textEndStop}
+            textNextScene={this.props.scene.textNextScene}
             getTags={this.props.getTags.bind(this)}
             goBack={this.props.goBack.bind(this)}
+            playNextScene={this.props.nextScene}
             currentSource={this.state.historyPaths.length > 0 ? this.state.historyPaths[0].getAttribute("source") : null}/>
         )}
       </div>

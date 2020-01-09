@@ -42,8 +42,10 @@ export default class CaptionProgram extends React.Component {
     url: string,
     currentSource: string,
     textEndStop: boolean,
+    textNextScene: boolean,
     getTags(source: string): Array<Tag>
     goBack(): void,
+    playNextScene(): void,
   };
 
   readonly state = {
@@ -221,6 +223,10 @@ export default class CaptionProgram extends React.Component {
         if (newCounter >= this.state.program.length) {
           if (this.props.textEndStop) {
             this.props.goBack();
+            return;
+          }
+          if (this.props.textNextScene) {
+            this.props.playNextScene();
             return;
           }
           newCounter = 0;
