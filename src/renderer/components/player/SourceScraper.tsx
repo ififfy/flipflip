@@ -1194,7 +1194,7 @@ export default class SourceScraper extends React.Component {
       JSON.parse(JSON.stringify(this.props.nextScene.sources)) : [];
 
     let sourceLoop = () => {
-      if (this.state.promise.hasCanceled) return;
+      if (this.state.promise.hasCanceled || this.props.scene.sources.length == 0) return;
 
       const d = sources[n];
 
@@ -1242,7 +1242,7 @@ export default class SourceScraper extends React.Component {
           } else {
             this.props.finishedLoading(isEmpty(Array.from(newAllURLs.values())));
             promiseLoop();
-            if (this.props.nextScene) {
+            if (this.props.nextScene && this.props.playNextScene) {
               n = 0;
               nextSourceLoop();
             }

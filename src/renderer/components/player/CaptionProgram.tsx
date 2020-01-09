@@ -225,7 +225,7 @@ export default class CaptionProgram extends React.Component {
             this.props.goBack();
             return;
           }
-          if (this.props.textNextScene) {
+          if (this.props.textNextScene && this.props.playNextScene) {
             this.props.playNextScene();
             return;
           }

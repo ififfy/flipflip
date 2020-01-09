@@ -279,11 +279,17 @@ class GridSetup extends React.Component {
               <MenuItem key={-1} onClick={this.onChooseScene.bind(this, -1)}>
                 <ListItemText primary={"~~EMPTY~~"}/>
               </MenuItem>
-              {this.props.allScenes.map((s) =>
-                <MenuItem key={s.id} onClick={this.onChooseScene.bind(this, s.id)}>
-                  <ListItemText primary={s.name}/>
-                </MenuItem>
-              )}
+              {this.props.allScenes.map((s) => {
+                if (s.sources.length > 0) {
+                  return (
+                    <MenuItem key={s.id} onClick={this.onChooseScene.bind(this, s.id)}>
+                      <ListItemText primary={s.name}/>
+                    </MenuItem>
+                  );
+                } else {
+                  return;
+                }
+              })}
             </Menu>
             <Fab
               className={classes.deleteButton}

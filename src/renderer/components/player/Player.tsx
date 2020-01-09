@@ -271,7 +271,7 @@ export default class Player extends React.Component {
             cache={this.props.cache.bind(this)}
             setTimeToNextFrame={this.setTimeToNextFrame.bind(this)}
             systemMessage={this.props.systemMessage.bind(this)}
-            playNextScene={this.props.nextScene.bind(this)}
+            playNextScene={this.props.nextScene}
           />
 
           {this.props.scene.overlayEnabled && this.props.scene.overlays.length > 0 &&

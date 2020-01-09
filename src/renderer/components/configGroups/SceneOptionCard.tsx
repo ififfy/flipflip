@@ -280,30 +280,32 @@ class SceneOptionCard extends React.Component {
                   </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={this.props.sidebar ? 12 : 5}>
-                  <TextField
-                    disabled={this.props.scene.nextSceneID == 0}
-                    variant="outlined"
-                    label="Play after"
-                    margin="dense"
-                    value={nextSceneTime}
-                    onChange={this.onIntInput.bind(this, 'nextSceneTime')}
-                    onBlur={this.blurIntKey.bind(this, 'nextSceneTime')}
-                    InputProps={{
-                      endAdornment: <InputAdornment position="end">sec</InputAdornment>,
-                    }}
-                    inputProps={{
-                      min: 0,
-                      type: 'number',
-                    }}/>
+                  <Collapse in={this.props.scene.nextSceneID != 0}>
+                    <TextField
+                      variant="outlined"
+                      label="Play after"
+                      margin="dense"
+                      value={nextSceneTime}
+                      onChange={this.onIntInput.bind(this, 'nextSceneTime')}
+                      onBlur={this.blurIntKey.bind(this, 'nextSceneTime')}
+                      InputProps={{
+                        endAdornment: <InputAdornment position="end">sec</InputAdornment>,
+                      }}
+                      inputProps={{
+                        min: 0,
+                        type: 'number',
+                      }}/>
+                  </Collapse>
                 </Grid>
                 <Grid item xs>
-                  <FormControlLabel
-                    disabled={this.props.scene.nextSceneID == 0}
-                    control={
-                      <Switch checked={this.props.scene.nextSceneAllImages}
-                              onChange={this.onBoolInput.bind(this, 'nextSceneAllImages')}/>
-                    }
-                    label="Play After All Images"/>
+                  <Collapse in={this.props.scene.nextSceneID != 0}>
+                    <FormControlLabel
+                      control={
+                        <Switch checked={this.props.scene.nextSceneAllImages}
+                                onChange={this.onBoolInput.bind(this, 'nextSceneAllImages')}/>
+                      }
+                      label="Play After All Images"/>
+                  </Collapse>
                 </Grid>
               </Grid>
             </Grid>

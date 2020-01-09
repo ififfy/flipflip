@@ -568,7 +568,7 @@ export default class ImagePlayer extends React.Component {
 
     let nextHistoryPaths = this.state.historyPaths;
     let nextImg: HTMLImageElement | HTMLVideoElement;
-    if (this.props.scene.nextSceneAllImages && this.props.scene.nextSceneID !== 0) {
+    if (this.props.scene.nextSceneAllImages && this.props.scene.nextSceneID != 0 && this.props.playNextScene) {
       let remainingLibrary;
       if (this.props.scene.weightFunction == WF.sources) {
         remainingLibrary = [].concat.apply([], Array.from(this.props.allURLs.values())).filter((u: string) => !this._playedURLs.includes(u));
@@ -618,7 +618,7 @@ export default class ImagePlayer extends React.Component {
       nextHistoryPaths.shift();
     }
 
-    if (this.props.scene.nextSceneAllImages && this.props.scene.nextSceneID !== 0 && nextImg && nextImg.src) {
+    if (this.props.scene.nextSceneAllImages && this.props.scene.nextSceneID != 0 && this.props.playNextScene && nextImg && nextImg.src) {
       this._playedURLs.push(nextImg.src);
     }
 
