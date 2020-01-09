@@ -1189,6 +1189,10 @@ export default class SourceScraper extends React.Component {
       randomizeList(JSON.parse(JSON.stringify(this.props.scene.sources))) :
       JSON.parse(JSON.stringify(this.props.scene.sources));
 
+    const nextSources = this.props.nextScene ? this.props.nextScene.orderFunction == OF.random ?
+      randomizeList(JSON.parse(JSON.stringify(this.props.nextScene.sources))) :
+      JSON.parse(JSON.stringify(this.props.nextScene.sources)) : [];
+
     let sourceLoop = () => {
       if (this.state.promise.hasCanceled) return;
 
@@ -1249,7 +1253,7 @@ export default class SourceScraper extends React.Component {
     let nextSourceLoop = () => {
       if (this.state.nextPromise.hasCanceled) return;
 
-      const d = sources[n];
+      const d = nextSources[n];
       if (!this.props.scene.playVideoClips && d.clips) {
         d.clips = [];
       }

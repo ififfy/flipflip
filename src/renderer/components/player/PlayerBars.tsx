@@ -422,7 +422,7 @@ class PlayerBars extends React.Component {
                 </ExpansionPanelDetails>
               </ExpansionPanel>
 
-              <ExpansionPanel TransitionProps={{ unmountOnExit: !this.props.scene.audioEnabled }}>
+              <ExpansionPanel TransitionProps={{ unmountOnExit: !this.props.scene.audioEnabled && this.props.scene.nextSceneID === 0 }}>
                 <ExpansionPanelSummary
                   expandIcon={<ExpandMoreIcon />}
                 >

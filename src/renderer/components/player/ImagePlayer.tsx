@@ -576,6 +576,7 @@ export default class ImagePlayer extends React.Component {
         remainingLibrary = [].concat.apply([], Array.from(this.props.allURLs.keys())).filter((u: string) => !this._playedURLs.includes(u));
       }
       if (remainingLibrary.length === 0) {
+        this._playedURLs = new Array<string>();
         this.props.playNextScene();
         return;
       }
