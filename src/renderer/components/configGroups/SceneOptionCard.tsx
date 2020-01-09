@@ -15,6 +15,7 @@ import en from "../../data/en";
 import Overlay from "../../data/Overlay";
 import Scene from "../../data/Scene";
 import ColorPicker from "../config/ColorPicker";
+import ColorSetPicker from "../config/ColorSetPicker";
 
 const styles = (theme: Theme) => createStyles({
   fullWidth: {
@@ -236,9 +237,18 @@ class SceneOptionCard extends React.Component {
                   aria-labelledby="scene-bg-color-slider"/>
               </Collapse>
               <Collapse in={this.props.scene.backgroundType == BT.color} className={classes.fullWidth}>
-                <ColorPicker
-                  currentColor={this.props.scene.backgroundColor}
-                  onChangeColor={this.onInput.bind(this, 'backgroundColor')}/>
+                {this.props.scene.backgroundType == BT.color && (
+                  <ColorPicker
+                    currentColor={this.props.scene.backgroundColor}
+                    onChangeColor={this.onInput.bind(this, 'backgroundColor')}/>
+                )}
+              </Collapse>
+              <Collapse in={this.props.scene.backgroundType == BT.colorSet} className={classes.fullWidth}>
+                {this.props.scene.backgroundType == BT.colorSet && (
+                  <ColorSetPicker
+                    currentColors={this.props.scene.backgroundColorSet}
+                    onChangeColors={this.onInput.bind(this, 'backgroundColorSet')}/>
+                )}
               </Collapse>
             </Grid>
           </Grid>

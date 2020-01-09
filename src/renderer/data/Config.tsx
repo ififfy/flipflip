@@ -1,10 +1,10 @@
-import {BT, GO, HTF, IF, IT, OF, SL, TF, VO, VTF, WF} from "./const";
+import {BT, GO, HTF, IF, IT, OF, SC, SL, TF, VO, VTF, WF} from "./const";
 import Overlay from "./Overlay";
 import LibrarySource from "./LibrarySource";
 import Audio from "./Audio";
 
 interface SceneSettingsI {
-  [key: string]: string | number | boolean | Array<LibrarySource> | Array<Overlay> | Array<Audio> | Array<Array<number>>;
+  [key: string]: string | number | boolean | Array<LibrarySource> | Array<Overlay> | Array<Audio> | Array<Array<number>> | Array<string>;
 
   sources: Array<LibrarySource>;
   timingFunction: string;
@@ -43,6 +43,7 @@ interface SceneSettingsI {
   imageType: string;
   backgroundType: string;
   backgroundColor: string;
+  backgroundColorSet: Array<string>;
   backgroundBlur: number;
   gifOption: string;
   gifTimingConstant: number;
@@ -83,7 +84,9 @@ interface SceneSettingsI {
   strobeDelayMax: number;
   strobeDelaySinRate: number;
   strobeDelayBPMMulti: number;
+  strobeColorType: string;
   strobeColor: string;
+  strobeColorSet: Array<string>;
 
   blinkColor: string;
   blinkFontSize: number;
@@ -166,7 +169,7 @@ interface TutorialsI {
 }
 
 export class SceneSettings implements SceneSettingsI {
-  [key: string]: string | number | boolean | Array<LibrarySource> | Array<Overlay> | Array<Audio> | Array<Array<number>>;
+  [key: string]: string | number | boolean | Array<LibrarySource> | Array<Overlay> | Array<Audio> | Array<Array<number>> | Array<string>;
 
   sources: Array<LibrarySource> = [];
   timingFunction = TF.constant;
@@ -205,6 +208,7 @@ export class SceneSettings implements SceneSettingsI {
   imageType = IT.fitBestNoClip;
   backgroundType = BT.blur;
   backgroundColor = "#000000";
+  backgroundColorSet: Array<string> = [];
   backgroundBlur = 8;
   gifOption = GO.none;
   gifTimingConstant = 3000;
@@ -248,7 +252,9 @@ export class SceneSettings implements SceneSettingsI {
   strobeDelayMax = 300;
   strobeDelaySinRate = 100;
   strobeDelayBPMMulti = 1;
+  strobeColorType = SC.color;
   strobeColor = "#FFFFFF";
+  strobeColorSet: Array<string> = [];
 
   blinkColor = "#FFFFFF";
   blinkFontSize = 20;

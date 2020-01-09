@@ -1,4 +1,4 @@
-import {BT, GO, HTF, IF, IT, OF, SL, TF, VO, VTF, WF} from './const';
+import {BT, GO, HTF, IF, IT, OF, SC, SL, TF, VO, VTF, WF} from './const';
 import LibrarySource from "./LibrarySource";
 import Audio from "./Audio";
 import Overlay from "./Overlay";
@@ -42,6 +42,7 @@ export default class Scene {
   imageType = IT.fitBestNoClip;
   backgroundType = BT.blur;
   backgroundColor = "#000000";
+  backgroundColorSet: Array<string> = [];
   backgroundBlur = 8;
   strobe = false;
   strobePulse = false;
@@ -59,7 +60,9 @@ export default class Scene {
   strobeDelayMax = 300;
   strobeDelaySinRate = 100;
   strobeDelayBPMMulti = 1;
+  strobeColorType = SC.color;
   strobeColor = "#FFFFFF";
+  strobeColorSet: Array<string> = [];
   gifOption = GO.none;
   gifTimingConstant = 3000;
   videoOption= VO.none;

@@ -1,7 +1,8 @@
 import * as React from 'react';
 import {animated, useTransition} from "react-spring";
 
-import {SL, TF} from "../../data/const";
+import {getRandomColor, getRandomListItem} from "../../data/utils";
+import {SC, SL, TF} from "../../data/const";
 import Scene from "../../data/Scene";
 
 export default class Strobe extends React.Component {
@@ -30,6 +31,20 @@ export default class Strobe extends React.Component {
     );
   }
 
+  getStrobeColor() {
+    if (this.props.scene.strobeColorType == SC.color) {
+      return this.props.scene.strobeColor;
+    } else if (this.props.scene.strobeColorType == SC.colorSet) {
+      if (this.props.scene.strobeColorSet.length > 0) {
+        return getRandomListItem(this.props.scene.strobeColorSet);
+      } else {
+        return "";
+      }
+    } else {
+      return getRandomColor();
+    }
+  }
+
   StrobeLayer = (data: {children: React.ReactNode}) => {
     const strobeTransitions: [{ item: any, props: any, key: any }] = useTransition(
       this.state.toggleStrobe,
@@ -38,7 +53,7 @@ export default class Strobe extends React.Component {
       },
       {
         from: {
-          backgroundColor: this.props.scene.strobeLayer == SL.image ? "" : this.props.scene.strobeColor,
+          backgroundColor: this.props.scene.strobeLayer == SL.image ? "" : this.getStrobeColor(),
           opacity: this.props.scene.strobeLayer == SL.bottom ? this.props.scene.strobeOpacity : 1,
         },
         enter: {

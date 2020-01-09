@@ -27,7 +27,13 @@ export default new Map<string, string>([
 
   ['bt.blur', 'Blurred'],
   ['bt.color', 'Solid Color'],
+  ['bt.colorset', 'Set of Colors'],
+  ['bt.colorrand', 'Random Colors'],
   ['bt.none', 'None'],
+
+  ['sc.color', 'Solid Color'],
+  ['sc.colorset', 'Set of Colors'],
+  ['sc.colorrand', 'Random Colors'],
 
   ['it.fitBestNoClip', 'Fit Best (No Clipping)'],
   ['it.fitBestClip', 'Fit Best (Clip Edges)'],

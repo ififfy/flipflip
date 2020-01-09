@@ -2,6 +2,7 @@ import * as React from 'react';
 import {animated, useSpring, useTransition} from "react-spring";
 import Timeout = NodeJS.Timeout;
 
+import {getRandomColor, getRandomListItem} from "../../data/utils";
 import {BT, HTF, IT, SL, TF, VTF} from "../../data/const";
 import Scene from "../../data/Scene";
 import Strobe from "./Strobe";
@@ -378,6 +379,14 @@ export default class ImageView extends React.Component {
     if (this.props.scene.backgroundType == BT.color) {
       backgroundStyle = {
         backgroundColor: this.props.scene.backgroundColor,
+      };
+    } else if (this.props.scene.backgroundType == BT.colorSet) {
+      backgroundStyle = {
+        backgroundColor: getRandomListItem(this.props.scene.backgroundColorSet),
+      };
+    } else if (this.props.scene.backgroundType == BT.colorRand) {
+      backgroundStyle = {
+        backgroundColor: getRandomColor(),
       };
     } else if (this.props.scene.backgroundType == BT.blur) {
       backgroundStyle = {

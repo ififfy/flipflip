@@ -6,11 +6,12 @@ import {
   MenuItem, Select, Slider, Switch, TextField, Theme, Typography, withStyles
 } from "@material-ui/core";
 
-import {SL, TF} from "../../data/const";
+import {SC, SL, TF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
 import en from "../../data/en";
 import Scene from "../../data/Scene";
 import ColorPicker from "../config/ColorPicker";
+import ColorSetPicker from "../config/ColorSetPicker";
 
 const styles = (theme: Theme) => createStyles({
   fullWidth: {
@@ -81,15 +82,38 @@ class StrobeCard extends React.Component {
             </Grid>
           </Grid>
         </Grid>
-        {this.props.scene.strobe && (
-          <Grid item xs={12} className={clsx((!this.props.scene.strobe || this.props.scene.strobeLayer == SL.image) && classes.noPadding)}>
-            <Collapse in={this.props.scene.strobe && this.props.scene.strobeLayer != SL.image} className={classes.fullWidth}>
+        <Grid item xs={12} className={clsx((!this.props.scene.strobe || this.props.scene.strobeLayer == SL.image) && classes.noPadding)}>
+          <Collapse in={this.props.scene.strobe && this.props.scene.strobeLayer != SL.image} className={classes.fullWidth}>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} sm={!this.props.sidebar && this.props.scene.strobeLayer == SL.bottom ? 4 : 12} className={classes.paddingTop}>
+                <FormControl className={classes.fullWidth}>
+                  <InputLabel>Color Type</InputLabel>
+                  <Select
+                    value={this.props.scene.strobeColorType}
+                    onChange={this.onInput.bind(this, 'strobeColorType')}>
+                    {Object.values(SC).map((sc) =>
+                      <MenuItem key={sc} value={sc}>{en.get(sc)}</MenuItem>
+                    )}
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+          </Collapse>
+        </Grid>
+        <Grid item xs={12} className={clsx((!this.props.scene.strobe || this.props.scene.strobeLayer == SL.image) && classes.noPadding)}>
+          <Collapse in={this.props.scene.strobe && this.props.scene.strobeLayer != SL.image && this.props.scene.strobeColorType != SC.colorRand} className={classes.fullWidth}>
+            {this.props.scene.strobe && this.props.scene.strobeLayer != SL.image && this.props.scene.strobeColorType == SC.color && (
               <ColorPicker
                 currentColor={this.props.scene.strobeColor}
                 onChangeColor={this.onInput.bind(this, 'strobeColor')}/>
-            </Collapse>
-          </Grid>
-        )}
+            )}
+            {this.props.scene.strobe && this.props.scene.strobeLayer != SL.image && this.props.scene.strobeColorType == SC.colorSet && (
+              <ColorSetPicker
+                currentColors={this.props.scene.strobeColorSet}
+                onChangeColors={this.onInput.bind(this, 'strobeColorSet')}/>
+            )}
+          </Collapse>
+        </Grid>
         <Grid item xs={12} className={clsx(!this.props.scene.strobe && classes.noPadding)}>
           <Collapse in={this.props.scene.strobe} className={classes.fullWidth}>
             <Grid container spacing={2} alignItems="center">

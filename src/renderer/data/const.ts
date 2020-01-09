@@ -39,7 +39,15 @@ const VO = { // Video Options
 const BT = { // background type
   blur: 'bt.blur',
   color: 'bt.color',
+  colorSet: 'bt.colorset',
+  colorRand: 'bt.colorrand',
   none: 'bt.none',
+};
+
+const SC = { // strobe color type
+  color: 'bt.color',
+  colorSet: 'bt.colorset',
+  colorRand: 'bt.colorrand',
 };
 
 const IT = { // image type
@@ -255,5 +263,5 @@ const VCT = { // Video Clipper Tutorials
 };
 
 export {
-  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG, SPT, SDT, PT, LT, SDGT, SGT, VCT, DONE
+  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, SC, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG, SPT, SDT, PT, LT, SDGT, SGT, VCT, DONE
 };
