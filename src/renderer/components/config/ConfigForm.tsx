@@ -24,6 +24,7 @@ import Scene from "../../data/Scene";
 import GeneralConfig from "./GeneralConfig";
 import SceneOptions from "../sceneDetail/SceneOptions";
 import SceneEffects from "../sceneDetail/SceneEffects";
+import {portablePath} from "../../data/utils";
 
 const drawerWidth = 240;
 
@@ -363,6 +364,7 @@ class ConfigForm extends React.Component {
                       onBackup={this.props.onBackup.bind(this)}
                       onChangeThemeColor={this.props.onChangeThemeColor.bind(this)}
                       onClean={this.props.onClean.bind(this)}
+                      onPortableOverride={this.onPortableOverride.bind(this)}
                       onRestore={this.onRestore.bind(this)}
                       onToggleDarkMode={this.props.onToggleDarkMode.bind(this)}
                       onUpdateCachingSettings={this.onUpdateCachingSettings.bind(this)}
@@ -456,6 +458,10 @@ class ConfigForm extends React.Component {
       errorMessages = "Invalid Cache Directory";
     }
     return errorMessages;
+  }
+
+  onPortableOverride() {
+    this.onRestore(portablePath);
   }
 
   onRestore(backupFile: string) {

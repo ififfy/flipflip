@@ -10,6 +10,8 @@ import Config from "./Config";
 import LibrarySource from "./LibrarySource";
 
 export const saveDir = path.join(remote.app.getPath('appData'), 'flipflip');
+export const savePath = path.join(saveDir, 'data.json');
+export const portablePath = path.join(path.dirname(remote.app.getAppPath()), 'data.json');
 
 export function getBackups(): Array<{url: string, size: number}> {
   const files = fs.readdirSync(saveDir);

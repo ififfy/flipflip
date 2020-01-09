@@ -145,6 +145,7 @@ interface DisplaySettingsI {
   showMenu: boolean;
   fullScreen: boolean;
   startImmediately: boolean;
+  portableMode: boolean;
 
   minImageSize: number;
   minVideoSize: number;
@@ -318,6 +319,7 @@ export class DisplaySettings  implements DisplaySettingsI {
   showMenu = true;
   fullScreen = false;
   startImmediately = false;
+  portableMode = false;
 
   minVideoSize = 200;
   minImageSize = 200;

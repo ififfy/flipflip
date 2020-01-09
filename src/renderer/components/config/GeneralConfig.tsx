@@ -17,6 +17,7 @@ export default class GeneralConfig extends React.Component {
     onBackup(): void,
     onChangeThemeColor(colorTheme: any, primary: boolean): void,
     onClean(): void,
+    onPortableOverride(): void,
     onRestore(backupFile: string): void,
     onToggleDarkMode(): void,
     onUpdateCachingSettings(fn: (settings: CacheSettings) => void): void,
@@ -33,6 +34,7 @@ export default class GeneralConfig extends React.Component {
             <CardContent>
               <PlayerBoolCard
                 settings={this.props.config.displaySettings}
+                onPortableOverride={this.props.onPortableOverride.bind(this)}
                 onUpdateSettings={this.props.onUpdateDisplaySettings.bind(this)}/>
             </CardContent>
           </Card>

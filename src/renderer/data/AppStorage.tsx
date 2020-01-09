@@ -1,7 +1,6 @@
 import { mkdirSync, existsSync, readFileSync, renameSync, writeFileSync } from 'fs';
-import path from 'path';
 
-import { removeDuplicatesBy, saveDir } from "./utils";
+import {portablePath, removeDuplicatesBy, saveDir, savePath} from "./utils";
 import { Route } from './Route';
 import {TT} from "./const";
 import LibrarySource from '../data/LibrarySource';
@@ -67,15 +66,18 @@ export default class AppStorage {
     catch (e) {
       // who cares
     }
-    const savePath = path.join(saveDir, 'data.json');
     try {
-      const data = JSON.parse(readFileSync(savePath, 'utf-8'));
+      let data = JSON.parse(readFileSync(savePath, 'utf-8'));
+      const portableMode = data.config.displaySettings.portableMode;
+      if (portableMode) {
+        data = JSON.parse(readFileSync(portablePath, 'utf-8'));
+      }
       switch (data.version) {
         // When no version number found in data.json -- assume pre-v2.0.0 format
         // This should fail safe and self heal.
         case undefined:
           // Preserve the existing file - so as not to destroy user's data
-          archiveFile(savePath);
+          archiveFile(portableMode ? portablePath : savePath);
           // Create Library from aggregate of previous scenes' directories
           let sources = Array<string>();
           for (let scene of data.scenes) {
@@ -357,10 +359,14 @@ export default class AppStorage {
   save(state: any) {
     if (this.savePath) {
       writeFileSync(this.savePath, JSON.stringify(state), 'utf-8');
+      if (state.config.displaySettings.portableMode) {
+        writeFileSync(portablePath, JSON.stringify(state), 'utf-8');
+      }
     }
+
   }
 
   backup() {
-    archiveFile(this.savePath);
+    archiveFile(savePath);
   }
 }
