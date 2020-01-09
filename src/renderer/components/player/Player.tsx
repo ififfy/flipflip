@@ -237,6 +237,7 @@ export default class Player extends React.Component {
             historyForward={this.historyForward.bind(this)}
             navigateTagging={this.navigateTagging.bind(this)}
             onUpdateScene={this.props.onUpdateScene.bind(this)}
+            playNextScene={this.props.nextScene}
             play={this.play.bind(this)}
             pause={this.pause.bind(this)}
             allTags={this.props.allTags}

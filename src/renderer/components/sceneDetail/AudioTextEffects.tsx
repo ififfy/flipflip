@@ -22,7 +22,6 @@ export default class AudioTextEffects extends React.Component {
               <AudioCard
                 scene={this.props.scene}
                 startPlaying={false}
-                goBack={this.nop.bind(this)}
                 onUpdateScene={this.props.onUpdateScene.bind(this)}/>
             </CardContent>
           </Card>
@@ -40,6 +39,4 @@ export default class AudioTextEffects extends React.Component {
       </Grid>
     );
   }
-
-  nop() {}
 }

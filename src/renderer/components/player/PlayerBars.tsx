@@ -212,6 +212,7 @@ class PlayerBars extends React.Component {
     historyForward(): void,
     navigateTagging(offset: number): void,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
+    playNextScene(): void,
     play(): void,
     pause(): void,
     allTags?: Array<Tag>,
@@ -434,8 +435,9 @@ class PlayerBars extends React.Component {
                     scene={this.props.scene}
                     scenePaths={this.props.historyPaths}
                     startPlaying={true}
+                    onUpdateScene={this.props.onUpdateScene.bind(this)}
                     goBack={this.props.goBack.bind(this)}
-                    onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+                    playNextScene={this.props.playNextScene.bind(this)}/>
                 </ExpansionPanelDetails>
               </ExpansionPanel>
 

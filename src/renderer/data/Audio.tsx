@@ -6,6 +6,7 @@ export default class Audio {
   volume: number = 100;
   speed: number = 10;
   stopAtEnd: boolean = false;
+  nextSceneAtEnd: boolean = false;
   tick: boolean = false;
   tickMode: string = TF.constant;
   tickDelay: number = 1000;

@@ -58,8 +58,9 @@ class AudioControl extends React.Component {
     scenePaths: Array<any>,
     sidebar: boolean,
     startPlaying: boolean,
-    goBack(): void,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
+    goBack?(): void,
+    playNextScene?(): void,
   };
 
   readonly state = {
@@ -106,7 +107,7 @@ class AudioControl extends React.Component {
             url={this.props.audio.url}
             playStatus={playing}
             playbackRate={this.props.audio.speed / 10}
-            loop={!this.props.audio.stopAtEnd && this.props.sidebar}
+            loop={!this.props.audio.stopAtEnd && !this.props.audio.nextSceneAtEnd && this.props.sidebar}
             volume={this.props.audio.volume}
             position={this.state.position}
             onPlaying={this.onPlaying.bind(this)}
@@ -205,7 +206,7 @@ class AudioControl extends React.Component {
               <Grid item xs={12}>
                 <Grid container spacing={2} alignItems="center">
                   <Grid item>
-                    <Collapse in={!audio.tick}>
+                    <Collapse in={!audio.tick && !audio.nextSceneAtEnd}>
                       <FormControlLabel
                         control={
                           <Switch
@@ -215,7 +216,17 @@ class AudioControl extends React.Component {
                         }
                         label="Stop at End"/>
                     </Collapse>
-                    <Collapse in={!audio.stopAtEnd}>
+                    <Collapse in={!audio.tick && !audio.stopAtEnd}>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            size="small"
+                            checked={audio.nextSceneAtEnd}
+                            onChange={this.onAudioBoolInput.bind(this, 'nextSceneAtEnd')}/>
+                        }
+                        label="Next Scene at End"/>
+                    </Collapse>
+                    <Collapse in={!audio.stopAtEnd && !audio.nextSceneAtEnd}>
                       <FormControlLabel
                         control={
                           <Switch
@@ -520,8 +531,13 @@ class AudioControl extends React.Component {
     audio[key] = input.checked;
     if (key == 'tick' && input.checked) {
       audio.stopAtEnd = !input.checked;
+      audio.nextSceneAtEnd = !input.checked;
     } else if (key == 'stopAtEnd' && input.checked) {
       audio.tick = !input.checked;
+      audio.nextSceneAtEnd = !input.checked;
+    } else if (key == 'nextSceneAtEnd' && input.checked) {
+      audio.tick = !input.checked;
+      audio.stopAtEnd = !input.checked;
     }
     this.changeKey('audios', newAudios);
   }
@@ -537,6 +553,10 @@ class AudioControl extends React.Component {
   onFinishedPlaying() {
     if (this.props.audio.stopAtEnd && this.props.goBack) {
       this.props.goBack();
+    }
+    if (this.props.audio.nextSceneAtEnd && this.props.playNextScene) {
+      this.props.playNextScene();
+      this.setState({position: 0, duration: 0});
     }
     if (!this.props.sidebar) {
       this.setState({position: 0, playing: false});
