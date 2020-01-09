@@ -90,6 +90,7 @@ export default class Scene {
   overlays: Array<Overlay> = [];
   nextSceneID: number = 0;
   nextSceneTime: number = 900;
+  nextSceneAllImages = false;
   libraryID: number = -1;
   videoVolume = 0;
   videoSpeed = 10;

@@ -1122,6 +1122,7 @@ export default class SourceScraper extends React.Component {
     cache(i: HTMLImageElement | HTMLVideoElement): void,
     systemMessage(message: string): void,
     setTimeToNextFrame?(timeToNextFrame: number): void,
+    playNextScene?(): void,
   };
 
   readonly state = {
@@ -1162,6 +1163,7 @@ export default class SourceScraper extends React.Component {
             onLoaded={this.props.firstImageLoaded.bind(this)}
             setVideo={this.props.setVideo}
             cache={this.props.cache}
+            playNextScene={this.props.playNextScene}
             setTimeToNextFrame={this.props.setTimeToNextFrame}/>)}
       </div>
     );

@@ -41,6 +41,7 @@ export default class ImagePlayer extends React.Component {
     setVideo(video: HTMLVideoElement): void,
     cache(i: HTMLImageElement | HTMLVideoElement): void,
     setTimeToNextFrame?(timeToNextFrame: number): void,
+    playNextScene?(): void,
   };
 
   readonly state = {
@@ -57,6 +58,7 @@ export default class ImagePlayer extends React.Component {
   _isMounted: boolean;
   _isLooping: boolean;
   _loadedURLs: Array<string>;
+  _playedURLs: Array<string>;
   _nextIndex: number;
   _nextAdvIndex: number;
   _count: number;
@@ -115,6 +117,7 @@ export default class ImagePlayer extends React.Component {
     this._isMounted = true;
     this._isLooping = false;
     this._loadedURLs = new Array<string>();
+    this._playedURLs = new Array<string>();
     this._nextIndex = 0;
     this._nextAdvIndex = 0;
     this._count = 0;
@@ -141,6 +144,7 @@ export default class ImagePlayer extends React.Component {
     this._isMounted = null;
     this._isLooping = null;
     this._loadedURLs = null;
+    this._playedURLs = null;
     this._nextIndex = null;
     this._nextAdvIndex = null;
     this._count = null;
@@ -414,6 +418,9 @@ export default class ImagePlayer extends React.Component {
 
       const errorCallback = () => {
         if (!this._isMounted) return;
+        if (video && video.src) {
+          this._playedURLs.push(video.src);
+        }
         this.runFetchLoop(i);
       };
 
@@ -472,6 +479,9 @@ export default class ImagePlayer extends React.Component {
 
       const errorCallback = () => {
         if (!this._isMounted) return;
+        if (img && img.src) {
+          this._playedURLs.push(img.src);
+        }
         this.runFetchLoop(i);
       };
 
@@ -558,6 +568,19 @@ export default class ImagePlayer extends React.Component {
 
     let nextHistoryPaths = this.state.historyPaths;
     let nextImg: HTMLImageElement | HTMLVideoElement;
+    if (this.props.scene.nextSceneAllImages && this.props.scene.nextSceneID !== 0) {
+      let remainingLibrary;
+      if (this.props.scene.weightFunction == WF.sources) {
+        remainingLibrary = [].concat.apply([], Array.from(this.props.allURLs.values())).filter((u: string) => !this._playedURLs.includes(u));
+      } else {
+        remainingLibrary = [].concat.apply([], Array.from(this.props.allURLs.keys())).filter((u: string) => !this._playedURLs.includes(u));
+      }
+      if (remainingLibrary.length === 0) {
+        this.props.playNextScene();
+        return;
+      }
+    }
+
     if (this.props.scene.orderFunction == OF.strict) {
       this.state.readyToDisplay.sort((a, b) => {
         // JavaScript doesn't calculate negative modulos correctly, use this
@@ -592,6 +615,10 @@ export default class ImagePlayer extends React.Component {
 
     while (nextHistoryPaths.length > this.props.maxInMemory) {
       nextHistoryPaths.shift();
+    }
+
+    if (this.props.scene.nextSceneAllImages && this.props.scene.nextSceneID !== 0 && nextImg && nextImg.src) {
+      this._playedURLs.push(nextImg.src);
     }
 
     if (!schedule) {

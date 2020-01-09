@@ -225,6 +225,7 @@ export class SceneSettings implements SceneSettingsI {
   overlays: Array<Overlay> = [];
   nextSceneID = 0;
   nextSceneTime = 900;
+  nextSceneAllImages = false;
   textEnabled = false;
   textSource = "";
   textEndStop = false;

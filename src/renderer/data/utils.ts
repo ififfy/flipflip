@@ -69,10 +69,6 @@ export function getTimestampValue(value: string): number {
   }
 }
 
-export function getPath() {
-  return path.join(remote.app.getPath('appData'), 'flipflip');
-}
-
 export function getFileName(url: string, extension = true) {
   let sep;
   if (/^(https?:\/\/)|(file:\/\/)/g.exec(url) != null) {
@@ -249,12 +245,12 @@ export function getCachePath(source: string, config: Config) {
   } else {
     if (source) {
       if (source != ST.video && source != ST.playlist) {
-        return getPath() + path.sep + "ImageCache" + path.sep + typeDir + path.sep + getFileGroup(source);
+        return saveDir + path.sep + "ImageCache" + path.sep + typeDir + path.sep + getFileGroup(source);
       } else {
-        return getPath() + path.sep + "ImageCache" + path.sep + typeDir + path.sep;
+        return saveDir + path.sep + "ImageCache" + path.sep + typeDir + path.sep;
       }
     } else {
-      return getPath() + path.sep + "ImageCache" + path.sep;
+      return saveDir + path.sep + "ImageCache" + path.sep;
     }
   }
 }

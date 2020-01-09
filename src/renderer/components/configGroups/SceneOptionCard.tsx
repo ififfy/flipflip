@@ -286,6 +286,15 @@ class SceneOptionCard extends React.Component {
                       type: 'number',
                     }}/>
                 </Grid>
+                <Grid item xs>
+                  <FormControlLabel
+                    disabled={this.props.scene.nextSceneID == 0}
+                    control={
+                      <Switch checked={this.props.scene.nextSceneAllImages}
+                              onChange={this.onBoolInput.bind(this, 'nextSceneAllImages')}/>
+                    }
+                    label="Play After All Images"/>
+                </Grid>
               </Grid>
             </Grid>
             <Grid item xs={12}>
