@@ -558,8 +558,10 @@ class Tutorial extends React.Component {
             <DialogTitle id="tutorial-title">Video Options</DialogTitle>
             <DialogContent>
               <DialogContentText id="tutorial-description">
-                You can <b>control how long videos will play</b> for. You can also choose to <b>start videos at a random
-                timestamp</b> and/or to <b>have videos continue</b> (rather than restart each time they appear).
+                You can <b>control how long videos will play</b> for and <b>at what speed</b>. You can also choose to
+                <b>start videos at a random timestamp</b> and/or to <b>have videos continue</b> (rather than restart
+                each time they appear). You can also choose to <b>rotate portrait videos</b> so they appear in
+                landsacpe orientation.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 Lastly, you can <b>choose to use Clips or not</b>. Clips can only be created for individual videos and
