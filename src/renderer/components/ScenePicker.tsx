@@ -369,7 +369,7 @@ class ScenePicker extends React.Component {
 
         <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift, this.props.tutorial == SPT.scenePicker && classes.backdropTop)}>
           <Toolbar>
-            {!open && this.state.isFirstWindow && (
+            {!open && (
               <IconButton
                 edge="start"
                 color="inherit"
@@ -380,7 +380,7 @@ class ScenePicker extends React.Component {
               </IconButton>
             )}
             <VSpin>
-              <div className={clsx(classes.logo, open && classes.titleOut, !this.state.isFirstWindow && classes.drawerLogo)}/>
+              <div className={clsx(classes.logo, open && classes.titleOut)}/>
             </VSpin>
             <Typography component="h1" variant="h4" color="inherit" noWrap className={clsx(classes.title, open && classes.titleOut)}>
               FlipFlip
@@ -401,54 +401,54 @@ class ScenePicker extends React.Component {
           </Toolbar>
         </AppBar>
 
-        {this.state.isFirstWindow && (
-          <React.Fragment>
-            <Drawer
-              variant="permanent"
-              className={this.props.tutorial == SPT.drawer ? clsx(classes.backdropTop, classes.disable, classes.highlight) : ''}
-              classes={{paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose)}}
-              open={open}>
+        <Drawer
+          variant="permanent"
+          className={this.props.tutorial == SPT.drawer ? clsx(classes.backdropTop, classes.disable, classes.highlight) : ''}
+          classes={{paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose)}}
+          open={open}>
 
-              <div className={classes.drawerToolbar}>
-                <IconButton
-                  edge="start"
-                  color="inherit"
-                  aria-label="Toggle Drawer"
-                  onClick={this.onToggleDrawer.bind(this)}>
-                  <MenuIcon />
-                </IconButton>
-                <VSpin>
-                  <div className={clsx(classes.logo, classes.drawerLogo)}/>
-                </VSpin>
-                <Typography component="h1" variant="h6" color="inherit" noWrap>
-                  FlipFlip
-                </Typography>
-              </div>
+          <div className={classes.drawerToolbar}>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="Toggle Drawer"
+              onClick={this.onToggleDrawer.bind(this)}>
+              <MenuIcon />
+            </IconButton>
+            <VSpin>
+              <div className={clsx(classes.logo, classes.drawerLogo)}/>
+            </VSpin>
+            <Typography component="h1" variant="h6" color="inherit" noWrap>
+              FlipFlip
+            </Typography>
+          </div>
 
-              <Divider />
+          <Divider />
 
-              <div>
-                <Tabs
-                  orientation="vertical"
-                  value={this.props.openTab}
-                  onChange={this.onChangeTab.bind(this)}
-                  aria-label="scene picker tabs"
-                  className={classes.tabs}>
-                  <Tab id="vertical-tab-0"
-                       aria-controls="vertical-tabpanel-0"
-                       icon={<MovieIcon/>} label={open ? `Scenes (${this.props.scenes.filter((s) => !s.generatorWeights).length})` : ""}
-                       className={clsx(classes.tab, classes.sceneTab, !open && classes.tabClose)}/>
-                  <Tab id="vertical-tab-1"
-                       aria-controls="vertical-tabpanel-1"
-                       icon={<MovieFilterIcon/>} label={open ? `Scene Generators (${this.props.scenes.filter((s) => !!s.generatorWeights).length})` : ""}
-                       className={clsx(classes.tab, classes.generatorTab, !open && classes.tabClose)}/>
-                  <Tab id="vertical-tab-2"
-                       aria-controls="vertical-tabpanel-2"
-                       icon={<GridOnIcon/>} label={open ? `Scene Grids (${this.props.grids.length})` : ""}
-                       className={clsx(classes.tab, classes.gridTab, !open && classes.tabClose)}/>
-                </Tabs>
-              </div>
+          <div>
+            <Tabs
+              orientation="vertical"
+              value={this.props.openTab}
+              onChange={this.onChangeTab.bind(this)}
+              aria-label="scene picker tabs"
+              className={classes.tabs}>
+              <Tab id="vertical-tab-0"
+                   aria-controls="vertical-tabpanel-0"
+                   icon={<MovieIcon/>} label={open ? `Scenes (${this.props.scenes.filter((s) => !s.generatorWeights).length})` : ""}
+                   className={clsx(classes.tab, classes.sceneTab, !open && classes.tabClose)}/>
+              <Tab id="vertical-tab-1"
+                   aria-controls="vertical-tabpanel-1"
+                   icon={<MovieFilterIcon/>} label={open ? `Scene Generators (${this.props.scenes.filter((s) => !!s.generatorWeights).length})` : ""}
+                   className={clsx(classes.tab, classes.generatorTab, !open && classes.tabClose)}/>
+              <Tab id="vertical-tab-2"
+                   aria-controls="vertical-tabpanel-2"
+                   icon={<GridOnIcon/>} label={open ? `Scene Grids (${this.props.grids.length})` : ""}
+                   className={clsx(classes.tab, classes.gridTab, !open && classes.tabClose)}/>
+            </Tabs>
+          </div>
 
+          {this.state.isFirstWindow && (
+            <React.Fragment>
               <Divider />
 
               <div>
@@ -515,18 +515,18 @@ class ScenePicker extends React.Component {
                   <ListItemText primary="User Manual" />
                 </ListItem>
               </div>
-              <div className={classes.fill}/>
+            </React.Fragment>
+          )}
+          <div className={classes.fill}/>
 
-              <div className={clsx(classes.drawerBottom, !open && classes.drawerBottomClose)}>
-                <Typography variant="body2" color="inherit" className={classes.drawerText}>
-                  Questions? Suggestions?
-                  <br/>
-                  Visit us on <Link href="#" onClick={this.openLink.bind(this, "https://github.com/ififfy/flipflip")}>GitHub</Link> or <Link href="#" onClick={this.openLink.bind(this, "https://www.reddit.com/r/flipflip")}>Reddit</Link>
-                </Typography>
-              </div>
-            </Drawer>
-          </React.Fragment>
-        )}
+          <div className={clsx(classes.drawerBottom, !open && classes.drawerBottomClose)}>
+            <Typography variant="body2" color="inherit" className={classes.drawerText}>
+              Questions? Suggestions?
+              <br/>
+              Visit us on <Link href="#" onClick={this.openLink.bind(this, "https://github.com/ififfy/flipflip")}>GitHub</Link> or <Link href="#" onClick={this.openLink.bind(this, "https://www.reddit.com/r/flipflip")}>Reddit</Link>
+            </Typography>
+          </div>
+        </Drawer>
 
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
