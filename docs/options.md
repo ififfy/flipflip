@@ -33,13 +33,19 @@ This setting controls the aspect ratio and size of the displayed image:
 This setting controls the background for this Scene:
 * **Blurred** - Control the blur amount
 * **Solid Color** - Control the background color
+* **Set of Colors** - Control the set of colors. Color will change with each image, in random order.
+* **Random Colors** - Color will change with each image.
 * **None**
 
 #### Next Scene
-Choose a Scene to transition to after this one (or none). Control the timing of the Next Scene (sec).
+Choose a Scene to transition to after this one (or none). Control the timing of the Next Scene (sec) and if the Next 
+Scene should play after all images from the current Scene have played.
 
-?> The "Next Scene" will pre-load in the background and start after the configured time has passed. Options, effects, 
-audio/text, etc. will also change as configured.
+You can also choose to move to the next scene after an audio clip has ended or after the captioning script has completed.
+You will find these options in the audio and text settings, respectively.
+
+?> The "Next Scene" will pre-load in the background and start when a configured end condition is met (time, images, audio, text). 
+Scene options, effects, audio/text, etc. will also change as configured.
 
 #### Overlay
 Add Scene(s) to overlay over this one (or none). Control each overlay opacity.
@@ -69,8 +75,11 @@ This setting overrides Scene timing specifically for videos.
 * **Play Full**
 
 Videos also have a number of other settings:
+* **Video Speed** - Choose the playback speed of videos.
+* **Random Speed** - Choose to play videos at random speeds and specify the range of speeds.
 * **Start at Random Time** - Starts videos at a random timestamp (videos start from beginning by default).
 * **Continue Videos** - Continue videos from last timestamp during this slideshow (videos restart by default).
+* **Rotate Portrait Videos** - Rotates any portrait videos 90° to the left (play landscape).
 * **Use Clips** - Choose to use only [video clips](clips.md) or the entire video.
   * If you are not using video clips, you can choose to skip the first and last parts of each video (ms)
 * Control **video volume** for this scene.

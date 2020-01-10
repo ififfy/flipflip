@@ -682,7 +682,7 @@ class Library extends React.Component {
                 </React.Fragment>
               )}
             </Dialog>
-            <Tooltip title="Local Video"  placement="left">
+            <Tooltip title="Local Video/Playlist"  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addVideoButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
                 disabled={this.state.filters.length > 0}

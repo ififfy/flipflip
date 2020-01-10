@@ -31,8 +31,9 @@ This section controls fade effects.
 
 ## Strobe
 This section controls the strobe effect.
-* Choose strobe on/off. Control color, strobe time (ms).
+* Choose strobe on/off. Control strobe time (ms).
 * Choose delay on/off. Control delay time (ms).
+* Control color(s). Choose single color, set of colors, or random colors.
 * Control strobe layer. If at "Behind All", control opacity.
 * Control strobe/delay timing options.
 

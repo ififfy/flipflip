@@ -1,7 +1,7 @@
 # Sources
 **Sources** are the most important part of any Scene. A **source* is a place FlipFlip will find images/videos for 
 this Scene. FlipFlip supports sources from (1) Local Directories, (2) A text document with a list of 
-image/video URLs, (3) a single video file URL, or (4) one of the 
+image/video URLs, (3) a single video file URL, (4) a single playlsit file URL, or (5) one of the 
 [currently supported remote sources](#currently-supported-remote-sources).
 
 ![](doc_images/scene_detail_sources.png)
@@ -10,6 +10,7 @@ image/video URLs, (3) a single video file URL, or (4) one of the
 * Sources can also be manually ordered by drag'n'dropping them.
 * A count of usable images/videos will appear next to each source.
   * "**+**" indicates an incomplete count (didn't reach the end, but has _at least_ that many images & videos).
+  * Video sources will display the number of clips as their count
   
 ## Supported filetypes
 The following filetypes are supported by FlipFlip:
@@ -22,19 +23,25 @@ The following filetypes are supported by FlipFlip:
 * .tiff
 * .svg
 
-### Video
+### Videos
 * .mp4
 * .mkv
 * .webm
 * .ogv
 * .mov (some may not work)
 
+### Playlists
+* .asx
+* .m3u8
+* .pls
+* .xspf
+
 ## Modifying sources
 #### Adding new source
 Click `+` and choose one of the following options:
-* Click `URL` to input the URL of a remote source or video file.
+* Click `URL` to input the URL of a remote source or video/playlist file.
 * Click `Local directory` to lookup local directories.
-* Click `Local video` to look up local video files.
+* Click `Local video/playlist` to look up local video files and playlist files.
 * Click `From Library` to import sources from the Library.
   * For more information about this process see the [Import from Library](import_from_library.md) section.
 
@@ -69,11 +76,11 @@ Then you can either save that file to your computer, or uploaded it to a text fi
 
 Once you've created this file, add a `URL`. Simply type or paste the path to your raw text file (remote or local).
 
-#### Video File
-You can add individual video files as sources too. These can be either local files or remote files. To add a 
-local video file, add a `Local video` and choose the video(s) you want to add.
+#### Video/Playlist File
+You can add individual video or playlsit files as sources too. These can be either local files or remote files. To add a 
+local video/playlist file, add a `Local video/playlsit` and choose the video(s) or playlist(s) you want to add.
 
-?> **NOTE:** _Each video will be weighted as its own source._
+?> **NOTE:** _Each video/playlist will be weighted as its own source._
 
 #### Currently Supported Remote Sources
 
@@ -83,11 +90,11 @@ local video file, add a `Local video` and choose the video(s) you want to add.
 * <img style="vertical-align: -2px" src="doc_icons/instagram.svg" alt="Instagram" width="15" height="15"> Instagram Profile
 * <img style="vertical-align: -2px" src="doc_icons/imgur.svg" alt="Imgur" width="15" height="15"> Imgur Album
 * <img style="vertical-align: -2px" src="doc_icons/deviantart.svg" alt="DeviantArt" width="15" height="15"> DeviantArt User
-* <img style="vertical-align: -2px" src="doc_icons/sexcom.svg" alt="Sex.com" width="15" height="15"> Sex.com Gallery/User
 * <img style="vertical-align: -2px; margin-right: 5px" src="doc_icons/imagefap.png" alt="ImageFap" width="15" height="15">ImageFap Gallery/Organizer
 * <img style="vertical-align: -2px; margin-right: 5px" src="doc_icons/danbooru.png" alt="Danbooru" width="15" height="15">Danbooru Tag/User/Pool
 * <img style="vertical-align: -2px; margin-right: 5px" src="doc_icons/gelbooru.png" alt="Gelbooru" width="15" height="15">Gelbooru Tag
 * <img style="vertical-align: -2px; margin-right: 5px" src="doc_icons/ehentai.png" alt="E-Hentai" width="15" height="15">E-Hentai Gallery
+* ~~<img style="vertical-align: -2px" src="doc_icons/sexcom.svg" alt="Sex.com" width="15" height="15"> Sex.com Gallery/User~~ _Currently broken_
 
 #### Gooninator import
 If you have some saved links from the beloved, retired web app Gooninator, you can import them into FlipFlip either as 

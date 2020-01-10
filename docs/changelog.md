@@ -1,5 +1,24 @@
 # Changelog
 
+## 3.0.3 <small>(01/10/2020)</small>
+- Add Portable Mode (saves in same directory as FlipFlip)
+- Add ability to designate video playback speed
+- Add more color options to background and strobe (single, set, or random colors)
+- Add ability to move to next scene after all images are played
+- Add ability to move to next scene when an audio track ends
+- Add ability to move to next scene when the caption script completes
+- Add ability to clone scenes
+- Add video control hotkeys to video clipper
+- Double click Start/End in video clipper to set as current timestamp
+- Add support for .asx, .m3u8, .pls, and .xspf playlist files 
+- Add option to rotate portrait videos
+- Fix bugs with loading and playing next scene
+- Fix bug when playing grid with empty scene
+- Fix bug with pop-up messages
+- Fix bug with drawer in new window
+- Fix ImageFap scraping
+- Fix Twitter scraping
+
 ## 3.0.2 <small>(12/20/2019)</small>
 - Add hover effect to source list
 - Add .mov as supported video type

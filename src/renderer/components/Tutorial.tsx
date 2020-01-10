@@ -218,7 +218,7 @@ class Tutorial extends React.Component {
               <DialogContentText id="tutorial-description">
                 <LocalLibraryIcon /> Import Sources from the Library
                 <br/>
-                <MovieIcon /> Add Local Videos
+                <MovieIcon /> Add Local Videos/Playlists
                 <br/>
                 <FolderIcon /> Add Local Directories
                 <br/>

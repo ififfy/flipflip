@@ -88,6 +88,6 @@ export default new Map<string, string>([
 
   ['af.url', '+ URL'],
   ['af.directory', '+ Local directory'],
-  ['af.videos', '+ Local videos'],
+  ['af.videos', '+ Local video/playlist'],
   ['af.library', '+ From Library'],
 ]);

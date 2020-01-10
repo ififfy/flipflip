@@ -656,7 +656,7 @@ class SceneDetail extends React.Component {
                 <LocalLibraryIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip title="Local Video"  placement="left">
+            <Tooltip title="Local Video/Playlist"  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addVideoButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.props.tutorial && classes.disable)}
                 onClick={this.onAddSource.bind(this, AF.videos)}

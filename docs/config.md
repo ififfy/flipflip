@@ -22,6 +22,8 @@ These settings control various player options.
 * `Fullscreen` - display player in fullscreen mode
 * `Start Immediately` - don't wait for full scene to load, start as soon as first image loads
   * _Be aware this may cause the beginning to be janky, while the sources continue loading_
+* `Portable Mode` - Portable Mode will save a copy of your data in the same directory as the FlipFlip executable, 
+as well as the default save path. This needs to be enabled on each machine.
 
 
 * `Min Image/Video Size` - the minimum number of pixels each dimension of an image/video must be 

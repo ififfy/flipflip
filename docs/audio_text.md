@@ -8,6 +8,7 @@ This card allows you to layer multiple audio tracks over your Scene. It also con
 * **Tick** - The audio file will play/restart at a certain interval.
   * Control tick timing options.
 * **Stop at End** - The Scene will stop when the audio track ends.
+* **Next Scene at End** - The Next Scene will play when the audio track ends.
 * **Speed** - Control the playback speed of this track.
 
 FlipFlip will check for BPM metadata of the **first audio** file, which can then be used for timing the scene or effects. 
@@ -23,6 +24,7 @@ This card allows you to play a caption script over your Scene. Choose a text fil
 the [caption script format](caption_script.md). This can be a local file or a remote URL.
 
 * **Stop at End** - The Scene will stop when the caption script ends.
+* **Next Scene at End** - The Next Scene will play when the audio track ends.
 
 ?> By default, the font options are hidden. Click the **eye icon** to show/hide font options.
   
