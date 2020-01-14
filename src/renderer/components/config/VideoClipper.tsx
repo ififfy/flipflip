@@ -2,8 +2,8 @@ import * as React from "react";
 import clsx from "clsx";
 
 import {
-  AppBar, Button, CircularProgress, Collapse, Container, createStyles, Drawer, Fab, Grid, IconButton, Slider, TextField,
-  Theme, Toolbar, Tooltip, Typography, withStyles
+  AppBar, Button, Card, CardActionArea, CardContent, CircularProgress, Collapse, Container, createStyles, Drawer,
+  Fab, Grid, IconButton, Slider, TextField, Theme, Toolbar, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 import ValueLabel from "@material-ui/core/Slider/ValueLabel";
 
@@ -11,11 +11,14 @@ import AddIcon from '@material-ui/icons/Add';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import DeleteIcon from '@material-ui/icons/Delete';
 import KeyboardReturnIcon from '@material-ui/icons/KeyboardReturn';
+import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import SaveIcon from '@material-ui/icons/Save';
+import SystemUpdateAltIcon from '@material-ui/icons/SystemUpdateAlt';
 
 import {getTimestamp, getTimestampValue} from "../../data/utils";
 import {BT, VCT} from "../../data/const";
 import LibrarySource from "../../data/LibrarySource";
+import Tag from "../../data/Tag";
 import Clip from "../../data/Clip";
 import Scene from "../../data/Scene";
 import ImageView from "../player/ImageView";
@@ -71,6 +74,27 @@ const styles = (theme: Theme) => createStyles({
   clipDrawerPaper: {
     backgroundColor: theme.palette.background.default,
     padding: theme.spacing(1),
+  },
+  tagList: {
+    padding: theme.spacing(1),
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+  },
+  tag: {
+    marginRight: theme.spacing(1),
+    marginBottom: theme.spacing(1),
+  },
+  tagContent: {
+    padding: theme.spacing(1),
+  },
+  selectedTag: {
+    backgroundColor: theme.palette.primary.light,
+    color: theme.palette.primary.contrastText,
+  },
+  tagButtons: {
+    display: 'flex',
+    flexDirection: 'column',
   },
   emptyMessage: {
     textAlign: 'center',
@@ -132,6 +156,7 @@ const StyledValueLabel = withStyles((theme: Theme) => createStyles({
 class VideoClipper extends React.Component {
   readonly props: {
     classes: any,
+    allTags: Array<Tag>,
     source: LibrarySource,
     tutorial: string,
     videoVolume: number,
@@ -147,14 +172,19 @@ class VideoClipper extends React.Component {
     scene: new Scene(),
     video: null as HTMLVideoElement,
     empty: false,
-    isEditing: -1,
+    isEditing: null as Clip,
     isEditingValue: [0,0],
     isEditingStartText: "",
     isEditingEndText: "",
+    isTagging: false,
   };
 
   render() {
     const classes = this.props.classes;
+    let tagNames: Array<string> = [];
+    if (!!this.state.isEditing && this.state.isEditing.tags) {
+      tagNames = this.state.isEditing.tags.map((t) => t.name);
+    }
 
     return(
       <div className={clsx(classes.root, "VideoClipper")}>
@@ -218,114 +248,177 @@ class VideoClipper extends React.Component {
               <div className={classes.drawerSpacer}/>
             </main>
 
-            <Drawer
-              variant="permanent"
-              anchor="bottom"
-              className={clsx((this.props.tutorial == VCT.controls || this.props.tutorial == VCT.clips || this.props.tutorial == VCT.clip) && classes.backdropTop)}
-              classes={{paper: classes.clipDrawerPaper}}
-              open>
-              <Grid container alignItems="center">
-                <Grid item xs={12}>
-                  <Collapse in={this.state.isEditing == -1}>
-                    <Grid container spacing={1} alignItems="center" className={clsx(this.props.tutorial == VCT.controls && classes.disable, this.props.tutorial == VCT.clips && classes.highlight)}>
-                      <Grid key={-1} item>
-                        <Tooltip title="New Clip" placement="top">
-                          <Fab
-                            color="primary"
-                            size="small"
-                            className={clsx(classes.fab, classes.addFab, this.props.tutorial == VCT.clips && classes.highlight)}
-                            onClick={this.onAdd.bind(this)}>
-                            <AddIcon/>
-                          </Fab>
-                        </Tooltip>
-                      </Grid>
-                      {this.props.source.clips.map((c) =>
-                        <Grid key={c.id} item>
-                          <Button
-                            variant="contained"
-                            color="secondary"
-                            size="large"
-                            className={clsx(this.props.tutorial == VCT.clips && classes.disable)}
-                            onClick={this.onEdit.bind(this, c)}>
-                            {c.id}
-                          </Button>
+            {!this.state.isTagging &&  (
+              <Drawer
+                variant="permanent"
+                anchor="bottom"
+                className={clsx((this.props.tutorial == VCT.controls || this.props.tutorial == VCT.clips || this.props.tutorial == VCT.clip) && classes.backdropTop)}
+                classes={{paper: classes.clipDrawerPaper}}
+                open>
+                <Grid container alignItems="center">
+                  <Grid item xs={12}>
+                    <Collapse in={!this.state.isEditing}>
+                      <Grid container spacing={1} alignItems="center" className={clsx(this.props.tutorial == VCT.controls && classes.disable, this.props.tutorial == VCT.clips && classes.highlight)}>
+                        <Grid key={-1} item>
+                          <Tooltip title="New Clip" placement="top">
+                            <Fab
+                              color="primary"
+                              size="small"
+                              className={clsx(classes.fab, classes.addFab, this.props.tutorial == VCT.clips && classes.highlight)}
+                              onClick={this.onAdd.bind(this)}>
+                              <AddIcon/>
+                            </Fab>
+                          </Tooltip>
                         </Grid>
+                        {this.props.source.clips.map((c) =>
+                          <Grid key={c.id} item>
+                            <Button
+                              variant="contained"
+                              color="secondary"
+                              size="large"
+                              className={clsx(this.props.tutorial == VCT.clips && classes.disable)}
+                              onClick={this.onEdit.bind(this, c)}>
+                              {c.id}
+                            </Button>
+                          </Grid>
+                        )}
+                      </Grid>
+                    </Collapse>
+                    <Collapse in={!!this.state.isEditing}>
+                      <Grid container spacing={1} alignItems="center" className={clsx(this.props.tutorial == VCT.clip && classes.highlight)}>
+                        <Grid item xs className={classes.timeSlider}>
+                          <Slider
+                            min={0}
+                            max={this.state.video.duration}
+                            value={this.state.isEditingValue}
+                            ValueLabelComponent={(props) => <StyledValueLabel {...props}/>}
+                            valueLabelDisplay="on"
+                            valueLabelFormat={(value) => getTimestamp(value)}
+                            marks={[{value: 0, label: getTimestamp(0)}, {value: this.state.video.duration, label: getTimestamp(this.state.video.duration)}]}
+                            onChange={this.onChangePosition.bind(this)}/>
+                        </Grid>
+                        <Grid item>
+                          <TextField
+                            className={classes.clipField}
+                            label="Start"
+                            value={this.state.isEditingStartText}
+                            onDoubleClick={this.onClickStartText.bind(this)}
+                            onChange={this.onChangeStartText.bind(this)}/>
+                        </Grid>
+                        <Grid item>
+                          <TextField
+                            className={classes.clipField}
+                            label="End"
+                            value={this.state.isEditingEndText}
+                            onDoubleClick={this.onClickEndText.bind(this)}
+                            onChange={this.onChangeEndText.bind(this)}/>
+                        </Grid>
+                        <Grid item>
+                          <Tooltip title="Save" placement="top">
+                            <Fab
+                              color="primary"
+                              size="small"
+                              className={clsx(classes.fab, this.props.tutorial == VCT.clip && classes.highlight)}
+                              onClick={this.onSave.bind(this)}>
+                              <SaveIcon/>
+                            </Fab>
+                          </Tooltip>
+                        </Grid>
+                        <Grid item>
+                          <Tooltip title="Tag Clip" placement="top">
+                            <Fab
+                              color="secondary"
+                              size="small"
+                              className={clsx(classes.fab, this.props.tutorial == VCT.clip && classes.disable)}
+                              onClick={this.onTag.bind(this)}>
+                              <LocalOfferIcon/>
+                            </Fab>
+                          </Tooltip>
+                        </Grid>
+                        <Grid item>
+                          <Tooltip title="Delete Clip" placement="top">
+                            <Fab
+                              size="small"
+                              className={clsx(classes.fab, classes.removeFab, this.props.tutorial == VCT.clip && classes.disable)}
+                              onClick={this.onRemove.bind(this)}>
+                              <DeleteIcon color="inherit" />
+                            </Fab>
+                          </Tooltip>
+                        </Grid>
+                        <Grid item>
+                          <Tooltip title="Cancel" placement="top">
+                            <IconButton
+                              className={clsx(this.props.tutorial == VCT.clip && classes.disable)}
+                              onClick={this.onCancel.bind(this)}>
+                              <KeyboardReturnIcon/>
+                            </IconButton>
+                          </Tooltip>
+                        </Grid>
+                      </Grid>
+                    </Collapse>
+                  </Grid>
+                  <Grid item xs={12} className={clsx(this.props.tutorial == VCT.controls && classes.highlight)}>
+                    <VideoControl
+                      video={this.state.video}
+                      volume={this.state.scene.videoVolume}
+                      clip={!this.state.isEditing ? null : this.state.isEditingValue}
+                      clips={this.props.source.clips}
+                      useHotkeys
+                      onChangeVolume={this.onChangeVolume.bind(this)}/>
+                  </Grid>
+                </Grid>
+              </Drawer>
+            )}
+            {this.state.isTagging && (
+              <Drawer
+                variant="permanent"
+                anchor="bottom"
+                classes={{paper: classes.clipDrawerPaper}}
+                open>
+                <Grid container alignItems="center">
+                  <Grid item xs>
+                    <div className={classes.tagList}>
+                      {this.props.allTags.map((tag) =>
+                        <Card className={clsx(classes.tag, tagNames && tagNames.includes(tag.name) && classes.selectedTag)} key={tag.id}>
+                          <CardActionArea onClick={this.toggleTag.bind(this, tag)}>
+                            <CardContent className={classes.tagContent}>
+                              <Typography component="h6" variant="body2">
+                                {tag.name}
+                              </Typography>
+                            </CardContent>
+                          </CardActionArea>
+                        </Card>
                       )}
-                    </Grid>
-                  </Collapse>
-                  <Collapse in={this.state.isEditing != -1}>
-                    <Grid container spacing={1} alignItems="center" className={clsx(this.props.tutorial == VCT.clip && classes.highlight)}>
-                      <Grid item xs className={classes.timeSlider}>
-                        <Slider
-                          min={0}
-                          max={this.state.video.duration}
-                          value={this.state.isEditingValue}
-                          ValueLabelComponent={(props) => <StyledValueLabel {...props}/>}
-                          valueLabelDisplay="on"
-                          valueLabelFormat={(value) => getTimestamp(value)}
-                          marks={[{value: 0, label: getTimestamp(0)}, {value: this.state.video.duration, label: getTimestamp(this.state.video.duration)}]}
-                          onChange={this.onChangePosition.bind(this)}/>
-                      </Grid>
-                      <Grid item>
-                        <TextField
-                          className={classes.clipField}
-                          label="Start"
-                          value={this.state.isEditingStartText}
-                          onDoubleClick={this.onClickStartText.bind(this)}
-                          onChange={this.onChangeStartText.bind(this)}/>
-                      </Grid>
-                      <Grid item>
-                        <TextField
-                          className={classes.clipField}
-                          label="End"
-                          value={this.state.isEditingEndText}
-                          onDoubleClick={this.onClickEndText.bind(this)}
-                          onChange={this.onChangeEndText.bind(this)}/>
-                      </Grid>
-                      <Grid item>
-                        <Tooltip title="Save" placement="top">
-                          <Fab
-                            color="primary"
-                            size="small"
-                            className={clsx(classes.fab, this.props.tutorial == VCT.clip && classes.highlight)}
-                            onClick={this.onSave.bind(this)}>
-                            <SaveIcon/>
-                          </Fab>
-                        </Tooltip>
-                      </Grid>
-                      <Grid item>
-                        <Tooltip title="Delete Clip" placement="top">
-                          <Fab
-                            size="small"
-                            className={clsx(classes.fab, classes.removeFab, this.props.tutorial == VCT.clip && classes.disable)}
-                            onClick={this.onRemove.bind(this)}>
-                            <DeleteIcon color="inherit" />
-                          </Fab>
-                        </Tooltip>
-                      </Grid>
-                      <Grid item>
-                        <Tooltip title="Cancel" placement="top">
-                          <IconButton
-                            className={clsx(this.props.tutorial == VCT.clip && classes.disable)}
-                            onClick={this.onCancel.bind(this)}>
-                            <KeyboardReturnIcon/>
-                          </IconButton>
-                        </Tooltip>
-                      </Grid>
-                    </Grid>
-                  </Collapse>
+                    </div>
+                  </Grid>
+                  <Grid item className={classes.tagButtons}>
+                    <Tooltip title="Inherit Source Tags">
+                      <Fab
+                        color="primary"
+                        size="small"
+                        onClick={this.onInherit.bind(this)}>
+                        <SystemUpdateAltIcon/>
+                      </Fab>
+                    </Tooltip>
+                    <Tooltip title="End Tagging" placement="top">
+                      <IconButton
+                        onClick={this.onTag.bind(this)}>
+                        <KeyboardReturnIcon/>
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item xs={12} className={clsx(this.props.tutorial == VCT.controls && classes.highlight)}>
+                    <VideoControl
+                      video={this.state.video}
+                      volume={this.state.scene.videoVolume}
+                      clip={!this.state.isEditing ? null : this.state.isEditingValue}
+                      clips={this.props.source.clips}
+                      useHotkeys
+                      onChangeVolume={this.onChangeVolume.bind(this)}/>
+                  </Grid>
                 </Grid>
-                <Grid item xs={12} className={clsx(this.props.tutorial == VCT.controls && classes.highlight)}>
-                  <VideoControl
-                    video={this.state.video}
-                    volume={this.state.scene.videoVolume}
-                    clip={this.state.isEditing == -1 ? null : this.state.isEditingValue}
-                    clips={this.props.source.clips}
-                    useHotkeys
-                    onChangeVolume={this.onChangeVolume.bind(this)}/>
-                </Grid>
-              </Grid>
-            </Drawer>
+              </Drawer>
+            )}
           </React.Fragment>
         )}
       </div>
@@ -352,7 +445,7 @@ class VideoClipper extends React.Component {
       this.setState({
         video: null as HTMLVideoElement,
         empty: false,
-        isEditing: -1,
+        isEditing: null,
         isEditingValue: [0,0],
         isEditingStartText: "",
         isEditingEndText: "",
@@ -385,8 +478,18 @@ class VideoClipper extends React.Component {
     if (this.props.tutorial == VCT.clips) {
       this.props.onTutorial(VCT.clips);
     }
+    const source = this.props.source;
+    const newClip = new Clip();
+    let id = source.clips.length + 1;
+    source.clips.forEach((c) => {
+      id = Math.max(c.id + 1, id);
+    });
+    newClip.id = id;
+    newClip.start = this.state.isEditingValue[0];
+    newClip.end = this.state.isEditingValue[1];
+    newClip.tags = source.tags;
     this.setState({
-      isEditing: 0,
+      isEditing: newClip,
       isEditingValue: [0, this.state.video.duration],
       isEditingStartText: getTimestamp(0),
       isEditingEndText: getTimestamp(this.state.video.duration),
@@ -395,7 +498,7 @@ class VideoClipper extends React.Component {
 
   onEdit(clip: Clip) {
     this.setState({
-      isEditing: clip.id,
+      isEditing: clip,
       isEditingValue: [clip.start, clip.end],
       isEditingStartText: getTimestamp(clip.start),
       isEditingEndText: getTimestamp(clip.end),
@@ -406,36 +509,57 @@ class VideoClipper extends React.Component {
     this.closeEdit();
   }
 
-  onSave() {
+  onSave(close: boolean = true) {
     if (this.props.tutorial == VCT.clip) {
       this.props.onTutorial(VCT.clip);
     }
     const source = this.props.source;
-    let clip = source.clips.find((c) => c.id == this.state.isEditing);
+    let clip = source.clips.find((c) => c.id == this.state.isEditing.id);
     if (clip) {
       clip.start = this.state.isEditingValue[0];
       clip.end = this.state.isEditingValue[1];
     } else {
-      const newClip = new Clip();
-      let id = source.clips.length + 1;
-      source.clips.forEach((c) => {
-        id = Math.max(c.id + 1, id);
-      });
-      newClip.id = id;
-      newClip.start = this.state.isEditingValue[0];
-      newClip.end = this.state.isEditingValue[1];
-      source.clips.push(newClip);
+      this.state.isEditing.start = this.state.isEditingValue[0];
+      this.state.isEditing.end = this.state.isEditingValue[1];
+      source.clips = source.clips.concat([this.state.isEditing]);
     }
     this.props.onUpdateClips(source.url, source.clips);
-    this.closeEdit();
+    if (close) {
+      this.closeEdit();
+    }
+  }
+
+  onTag() {
+    this.setState({isTagging: !this.state.isTagging});
+  }
+
+  onInherit() {
+    const source = this.props.source;
+    let clip = source.clips.find((c) => c.id === this.state.isEditing.id);
+    this.state.isEditing.tags = source.tags;
+    clip.tags = source.tags;
+    this.props.onUpdateClips(source.url, source.clips);
+  }
+
+  toggleTag(tag: Tag) {
+    const source = this.props.source;
+    let clip = source.clips.find((c) => c.id === this.state.isEditing.id);
+    if (clip.tags.find((t) => t.name === tag.name)) {
+      clip.tags = clip.tags.filter((t) => t.name !== tag.name);
+    } else {
+      clip.tags = clip.tags.concat([tag]);
+    }
+    this.state.isEditing.tags = clip.tags;
+    this.props.onUpdateClips(source.url, source.clips);
   }
 
   onRemove() {
-    if (this.state.isEditing > 0) {
-      const source =  this.props.source;
-      source.clips = source.clips.filter((c) => c.id !== this.state.isEditing);
+    const source =  this.props.source;
+    const clip = source.clips.find((c) => c.id === this.state.isEditing.id);
+    if (clip) {
+      source.clips = source.clips.filter((c) => c.id !== this.state.isEditing.id);
       source.clips.forEach((c) => {
-        if (c.id > this.state.isEditing) {
+        if (c.id > this.state.isEditing.id) {
           c.id = c.id - 1;
         }
       });
@@ -446,8 +570,8 @@ class VideoClipper extends React.Component {
 
   closeEdit() {
     this.setState({
-      isEditing: -1,
-      isEditingValue: null,
+      isEditing: null,
+      isEditingValue: [0, 0],
       isEditingStartText: "",
       isEditingEndText: "",
     });
@@ -523,18 +647,57 @@ class VideoClipper extends React.Component {
     switch (e.key) {
       case 'Escape':
         e.preventDefault();
-        this.props.goBack();
+        if (this.state.isTagging) {
+          this.onTag();
+        } else if (!!this.state.isEditing) {
+          const clip = this.props.source.clips.find((c) => c.id == this.state.isEditing.id);
+          if (clip) {
+            this.onSave();
+          } else {
+            this.closeEdit();
+          }
+        } else {
+          this.props.goBack();
+        }
         break;
       case '[':
         e.preventDefault();
-        this.prevSource();
+        if (this.state.isEditing) {
+          this.prevClip();
+        } else {
+          this.prevSource();
+        }
         break;
       case ']':
         e.preventDefault();
-        this.nextSource();
+        if (this.state.isEditing) {
+          this.nextClip();
+        } else {
+          this.nextSource();
+        }
         break;
     }
   };
+
+  prevClip() {
+    this.onSave(false);
+    let indexOf = this.props.source.clips.indexOf(this.state.isEditing);
+    indexOf -= 1;
+    if (indexOf < 0) {
+      indexOf = this.props.source.clips.length - 1;
+    }
+    this.onEdit(this.props.source.clips[indexOf]);
+  }
+
+  nextClip() {
+    this.onSave(false);
+    let indexOf = this.props.source.clips.indexOf(this.state.isEditing);
+    indexOf += 1;
+    if (indexOf >= this.props.source.clips.length) {
+      indexOf = 0
+    }
+    this.onEdit(this.props.source.clips[indexOf]);
+  }
 
   prevSource() {
     this.props.navigateClipping(-1);

@@ -177,6 +177,7 @@ export default class Meta extends React.Component {
 
           {this.isRoute('clip') && (
             <VideoClipper
+              allTags={this.state.tags}
               source={actions.getActiveSource(this.state)}
               tutorial={this.state.tutorial}
               videoVolume={this.state.config.defaultScene.videoVolume}

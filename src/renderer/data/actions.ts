@@ -1026,7 +1026,7 @@ export function toggleTag(state: State, sourceID: number, tag: Tag): Object {
   const newScenes = state.scenes;
   const source = newLibrary.find((s) => s.id == sourceID);
   if (source) {
-    if (source.tags.map((t: Tag) => t.name).includes(tag.name)) {
+    if (source.tags.find((t: Tag) => t.name == tag.name)) {
       source.tags = source.tags.filter((t: Tag) => t.name != tag.name);
     } else {
       source.tags.push(tag);
