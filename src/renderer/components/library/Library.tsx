@@ -88,6 +88,10 @@ const styles = (theme: Theme) => createStyles({
     marginTop: 3,
     marginRight: theme.spacing(1),
   },
+  displayCount: {
+    marginTop: 3,
+    marginRight: theme.spacing(1),
+  },
   drawerPaper: {
     position: 'relative',
     whiteSpace: 'nowrap',
@@ -406,6 +410,12 @@ class Library extends React.Component {
                     label={this.props.library.length}
                     size='medium'
                     variant='outlined'/>
+                )}
+                {this.state.filters.length > 0 && (
+                  <Chip
+                    className={classes.displayCount}
+                    label={this.state.displaySources.length}
+                    size='medium'/>
                 )}
                 <LibrarySearch
                   displaySources={this.state.displaySources}
