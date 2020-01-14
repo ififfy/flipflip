@@ -847,7 +847,7 @@ class Library extends React.Component {
     } else if (!e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'm' || e.key == 'µ')) {
       this.toggleMarked();
     }
-  }
+  };
 
   onBatchTag() {
     this.onCloseDialog();

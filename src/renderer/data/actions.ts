@@ -1241,6 +1241,9 @@ export function sortSources(state: State, scene: Scene, algorithm: string, ascen
   const getCount = (a: LibrarySource) => {
     if (a.count === undefined) a.count = 0;
     if (a.countComplete === undefined) a.countComplete = false;
+    if (getSourceType(a.url) == ST.video) {
+      return a.clips.length;
+    }
     return a.count;
   };
   const getType = (a: LibrarySource) => {
@@ -1260,7 +1263,7 @@ export function sortSources(state: State, scene: Scene, algorithm: string, ascen
       sortFunction(algorithm, ascending, getName, getFullName, getCount, getType, secondary));
     return {scenes: newScenes};
   } else {
-    const newLibrary = state.library.sort(
+    const newLibrary = state.library.concat().sort(
       sortFunction(algorithm, ascending, getName, getFullName, getCount, getType, secondary));
     return {library: newLibrary};
   }
