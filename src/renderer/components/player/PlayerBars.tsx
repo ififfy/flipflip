@@ -7,7 +7,7 @@ import fs from "fs";
 
 import {
   AppBar, Button, Card, CardActionArea, CardContent, createStyles, Dialog, DialogActions, DialogContent,
-  DialogContentText, DialogTitle, Divider, Drawer, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary,
+  DialogContentText, DialogTitle, Divider, Drawer, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Grid,
   IconButton, Link, Theme, Toolbar, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
@@ -34,6 +34,7 @@ import StrobeCard from "../configGroups/StrobeCard";
 import AudioCard from "../configGroups/AudioCard";
 import TextCard from "../configGroups/TextCard";
 import VideoCard from "../configGroups/VideoCard";
+import VideoControl from "./VideoControl";
 
 const drawerWidth = 340;
 
@@ -473,19 +474,30 @@ class PlayerBars extends React.Component {
               open={this.state.tagDrawerHover}
               onMouseEnter={this.onMouseEnterTagDrawer.bind(this)}
               onMouseLeave={this.onMouseLeaveTagDrawer.bind(this)}>
-              <div className={classes.tagList}>
-                {this.props.allTags.map((tag) =>
-                  <Card className={clsx(classes.tag, tagNames && tagNames.includes(tag.name) && classes.selectedTag)} key={tag.id}>
-                    <CardActionArea onClick={this.props.toggleTag.bind(this, this.props.scene.libraryID, tag)}>
-                      <CardContent className={classes.tagContent}>
-                        <Typography component="h6" variant="body2">
-                          {tag.name}
-                        </Typography>
-                      </CardContent>
-                    </CardActionArea>
-                  </Card>
-                )}
-              </div>
+              <Grid container>
+                <div className={classes.tagList}>
+                  {this.props.allTags.map((tag) =>
+                    <Card className={clsx(classes.tag, tagNames && tagNames.includes(tag.name) && classes.selectedTag)} key={tag.id}>
+                      <CardActionArea onClick={this.props.toggleTag.bind(this, this.props.scene.libraryID, tag)}>
+                        <CardContent className={classes.tagContent}>
+                          <Typography component="h6" variant="body2">
+                            {tag.name}
+                          </Typography>
+                        </CardContent>
+                      </CardActionArea>
+                    </Card>
+                  )}
+                </div>
+                <Grid item xs={12}>
+                  {this.props.scene.sources.length == 1 && getSourceType(this.props.scene.sources[0].url) == ST.video && (
+                    <VideoControl
+                      video={this.props.mainVideo}
+                      volume={this.props.scene.videoVolume}
+                      useHotkeys
+                      onChangeVolume={() => {}}/>
+                  )}
+                </Grid>
+              </Grid>
 
             </Drawer>
           </React.Fragment>
