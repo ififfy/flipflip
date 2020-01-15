@@ -78,7 +78,7 @@ class ZoomMoveCard extends React.Component {
             label="Zoom" />
           <Collapse in={this.props.scene.zoom} className={clsx(classes.fullWidth, this.props.tutorial == SDT.zoom2 && classes.highlight)}>
             <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+              <Grid item xs={12} sm={12}>
                 <FormControl className={classes.fullWidth}>
                   <InputLabel>Zoom Direction</InputLabel>
                   <Select
