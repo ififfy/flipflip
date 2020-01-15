@@ -1,4 +1,4 @@
-import {BT, GO, HTF, IF, IT, OF, SC, SL, TF, VO, VTF, WF} from "./const";
+import {BT, GO, HTF, IF, IT, OF, SC, SL, TF, VO, VTF, WF, ZD} from "./const";
 import Overlay from "./Overlay";
 import LibrarySource from "./LibrarySource";
 import Audio from "./Audio";
@@ -19,8 +19,9 @@ interface SceneSettingsI {
   forceAll: boolean;
 
   zoom: boolean;
-  zoomStart: number;
-  zoomEnd: number;
+  minimumZoom: number;
+  maximumZoom: number;
+  zoomDirection: string;
   horizTransType: string;
   horizTransLevel: number;
   vertTransType: string;
@@ -184,8 +185,9 @@ export class SceneSettings implements SceneSettingsI {
   forceAll = false;
 
   zoom = false;
-  zoomStart = 1;
-  zoomEnd = 2;
+  minimumZoom = 1;
+  maximumZoom = 2;
+  zoomDirection = ZD.in;
   horizTransType = HTF.none;
   horizTransLevel = 10;
   vertTransType = VTF.none;

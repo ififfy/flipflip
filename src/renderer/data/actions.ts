@@ -421,8 +421,8 @@ export function addScene(state: State): Object {
     scene.imageTypeFilter = IF.any;
     scene.orderFunction = OF.random;
     scene.zoom = false;
-    scene.zoomStart = 1;
-    scene.zoomEnd = 2;
+    scene.minimumZoom = 1;
+    scene.maximumZoom = 2;
     scene.transTF = TF.constant;
     scene.transSinRate = 97;
     scene.transDuration = 5000;

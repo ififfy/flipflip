@@ -1,4 +1,4 @@
-import {BT, GO, HTF, IF, IT, OF, SC, SL, TF, VO, VTF, WF} from './const';
+import {BT, GO, HTF, IF, IT, OF, SC, SL, TF, VO, VTF, WF, ZD} from './const';
 import LibrarySource from "./LibrarySource";
 import Audio from "./Audio";
 import Overlay from "./Overlay";
@@ -19,8 +19,9 @@ export default class Scene {
   forceAll = false;
   imageTypeFilter = IF.any;
   zoom = false;
-  zoomStart = 1;
-  zoomEnd = 2;
+  minimumZoom = 1;
+  maximumZoom = 2;
+  zoomDirection = ZD.in;
   horizTransType = HTF.none;
   horizTransLevel = 10;
   vertTransType = VTF.none;

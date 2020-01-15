@@ -63,12 +63,14 @@ const HTF = { // horizontal translate functions
   none: 'htf.none',
   left: 'htf.left',
   right: 'htf.right',
+  random: 'htf.random',
 };
 
 const VTF = { // vertical translate functions
   none: 'vtf.none',
   up: 'vtf.up',
   down: 'vtf.down',
+  random: 'vtf.random',
 };
 
 const GT = { // gooninator import type
@@ -262,6 +264,12 @@ const VCT = { // Video Clipper Tutorials
   done: DONE,
 };
 
+const ZD = { // Zoom Direction
+  in: 'zd.in',
+  out: 'zd.out',
+  random: 'zd.random',
+}
+
 export {
-  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, SC, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG, SPT, SDT, PT, LT, SDGT, SGT, VCT, DONE
+  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, SC, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG, SPT, SDT, PT, LT, SDGT, SGT, VCT, DONE, ZD
 };

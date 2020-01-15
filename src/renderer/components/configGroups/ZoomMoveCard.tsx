@@ -6,8 +6,8 @@ import {
   MenuItem, Select, Slider, Switch, TextField, Theme, Typography, withStyles
 } from "@material-ui/core";
 
-import {HTF, SDT, TF, VTF} from "../../data/const";
-import {SceneSettings} from "../../data/Config";
+import { HTF, SDT, TF, VTF, ZD} from "../../data/const";
+import { SceneSettings } from "../../data/Config";
 import en from "../../data/en";
 import Scene from "../../data/Scene";
 
@@ -56,8 +56,8 @@ class ZoomMoveCard extends React.Component {
     const classes = this.props.classes;
 
     const enabled = this.props.scene.zoom || this.props.scene.horizTransType != HTF.none || this.props.scene.vertTransType != VTF.none;
-    const zoomStart = typeof this.props.scene.zoomStart === 'number' ? this.props.scene.zoomStart : 0;
-    const zoomEnd = typeof this.props.scene.zoomEnd === 'number' ? this.props.scene.zoomEnd : 0;
+    const minimumZoom = typeof this.props.scene.minimumZoom === 'number' ? this.props.scene.minimumZoom : 0;
+    const maximumZoom = typeof this.props.scene.maximumZoom === 'number' ? this.props.scene.maximumZoom : 0;
     const horizTransLevel = typeof this.props.scene.horizTransLevel === 'number' ? this.props.scene.horizTransLevel : 0;
     const vertTransLevel = typeof this.props.scene.vertTransLevel === 'number' ? this.props.scene.vertTransLevel : 0;
     const transSinRate = typeof this.props.scene.transSinRate === 'number' ? this.props.scene.transSinRate : 0;
@@ -66,43 +66,55 @@ class ZoomMoveCard extends React.Component {
     const transDurationMin = typeof this.props.scene.transDurationMin === 'number' ? this.props.scene.transDurationMin : 0;
     const transDurationMax = typeof this.props.scene.transDurationMax === 'number' ? this.props.scene.transDurationMax : 0;
 
-    return(
+    return (
       <Grid container spacing={2} alignItems="center">
         <Grid item xs={12} className={clsx(this.props.tutorial != null && this.props.tutorial != SDT.zoom1 && this.props.tutorial != SDT.zoom2 && classes.disable)}>
           <FormControlLabel
             className={clsx(this.props.tutorial == SDT.zoom1 && classes.highlight)}
             control={
               <Switch checked={this.props.scene.zoom}
-                      onChange={this.onBoolInput.bind(this, 'zoom')}/>
+                onChange={this.onBoolInput.bind(this, 'zoom')} />
             }
-            label="Zoom"/>
+            label="Zoom" />
           <Collapse in={this.props.scene.zoom} className={clsx(classes.fullWidth, this.props.tutorial == SDT.zoom2 && classes.highlight)}>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                <FormControl className={classes.fullWidth}>
+                  <InputLabel>Zoom Direction</InputLabel>
+                  <Select
+                    value={this.props.scene.zoomDirection}
+                    onChange={this.onInput.bind(this, 'zoomDirection')}>
+                    {Object.values(ZD).map((zd) =>
+                      <MenuItem key={zd} value={zd}>{en.get(zd)}</MenuItem>
+                    )}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                 <Typography id="zoom-start-slider">
-                  Zoom Start: {zoomStart}x
+                  Minimum Zoom: {minimumZoom}x
                 </Typography>
                 <Slider
                   min={1}
                   max={50}
-                  defaultValue={zoomStart*10}
-                  onChangeCommitted={this.onZoomSliderChange.bind(this, 'zoomStart')}
+                  defaultValue={minimumZoom * 10}
+                  onChangeCommitted={this.onZoomSliderChange.bind(this, 'minimumZoom')}
                   valueLabelDisplay={'auto'}
-                  valueLabelFormat={(v) => v/10}
-                  aria-labelledby="zoom-start-slider"/>
+                  valueLabelFormat={(v) => v / 10}
+                  aria-labelledby="zoom-start-slider" />
               </Grid>
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                 <Typography id="zoom-end-slider">
-                  Zoom End: {zoomEnd}x
+                  Maximum Zoom: {maximumZoom}x
                 </Typography>
                 <Slider
                   min={1}
                   max={50}
-                  defaultValue={zoomEnd*10}
-                  onChangeCommitted={this.onZoomSliderChange.bind(this, 'zoomEnd')}
+                  defaultValue={maximumZoom * 10}
+                  onChangeCommitted={this.onZoomSliderChange.bind(this, 'maximumZoom')}
                   valueLabelDisplay={'auto'}
-                  valueLabelFormat={(v) => v/10}
-                  aria-labelledby="zoom-end-slider"/>
+                  valueLabelFormat={(v) => v / 10}
+                  aria-labelledby="zoom-end-slider" />
               </Grid>
             </Grid>
           </Collapse>
@@ -129,7 +141,7 @@ class ZoomMoveCard extends React.Component {
                       defaultValue={horizTransLevel}
                       onChangeCommitted={this.onSliderChange.bind(this, 'horizTransLevel')}
                       valueLabelDisplay={'auto'}
-                      aria-labelledby="horiz-trans-level-slider"/>
+                      aria-labelledby="horiz-trans-level-slider" />
                   </Grid>
                   <Grid item xs={3} className={classes.percentInput}>
                     <TextField
@@ -147,7 +159,7 @@ class ZoomMoveCard extends React.Component {
                         max: 100,
                         type: 'number',
                         'aria-labelledby': 'horiz-trans-level-slider',
-                      }}/>
+                      }} />
                   </Grid>
                 </Grid>
               </Collapse>
@@ -176,7 +188,7 @@ class ZoomMoveCard extends React.Component {
                       defaultValue={vertTransLevel}
                       onChangeCommitted={this.onSliderChange.bind(this, 'vertTransLevel')}
                       valueLabelDisplay={'auto'}
-                      aria-labelledby="vert-trans-level-slider"/>
+                      aria-labelledby="vert-trans-level-slider" />
                   </Grid>
                   <Grid item xs={3} className={classes.percentInput}>
                     <TextField
@@ -194,7 +206,7 @@ class ZoomMoveCard extends React.Component {
                         max: 100,
                         type: 'number',
                         'aria-labelledby': 'vert-trans-level-slider',
-                      }}/>
+                      }} />
                   </Grid>
                 </Grid>
               </Collapse>
@@ -214,7 +226,7 @@ class ZoomMoveCard extends React.Component {
                   <InputLabel>Timing</InputLabel>
                   <Select
                     value={this.props.scene.transTF}
-                    MenuProps={this.props.tutorial == SDT.zoom3 ? {className: classes.backdropTop} : {}}
+                    MenuProps={this.props.tutorial == SDT.zoom3 ? { className: classes.backdropTop } : {}}
                     onChange={this.onInput.bind(this, 'transTF')}>
                     {Object.values(TF).map((tf) =>
                       <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
@@ -234,7 +246,7 @@ class ZoomMoveCard extends React.Component {
                         defaultValue={transSinRate}
                         onChangeCommitted={this.onSliderChange.bind(this, 'transSinRate')}
                         valueLabelDisplay={'auto'}
-                        aria-labelledby="trans-sin-rate-slider"/>
+                        aria-labelledby="trans-sin-rate-slider" />
                     </Grid>
                     <Grid item xs={3} className={classes.percentInput}>
                       <TextField
@@ -248,7 +260,7 @@ class ZoomMoveCard extends React.Component {
                           max: 100,
                           type: 'number',
                           'aria-labelledby': 'trans-sin-rate-slider',
-                        }}/>
+                        }} />
                     </Grid>
                   </Grid>
                 </Collapse>
@@ -263,7 +275,7 @@ class ZoomMoveCard extends React.Component {
                     onChangeCommitted={this.onSliderChange.bind(this, 'transBPMMulti')}
                     valueLabelDisplay={'auto'}
                     valueLabelFormat={(v) => v > 0 ? v + "x" : "1/" + (-1 * (v - 2)) + "x"}
-                    aria-labelledby="trans-bpm-multi-slider"/>
+                    aria-labelledby="trans-bpm-multi-slider" />
                 </Collapse>
                 <Collapse in={this.props.scene.transTF == TF.constant} className={classes.fullWidth}>
                   <TextField
@@ -280,7 +292,7 @@ class ZoomMoveCard extends React.Component {
                       step: 100,
                       min: 0,
                       type: 'number',
-                    }}/>
+                    }} />
                 </Collapse>
               </Grid>
             </Grid>
@@ -304,7 +316,7 @@ class ZoomMoveCard extends React.Component {
                     step: 100,
                     min: 0,
                     type: 'number',
-                  }}/>
+                  }} />
               </Grid>
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                 <TextField
@@ -321,7 +333,7 @@ class ZoomMoveCard extends React.Component {
                     step: 100,
                     min: 0,
                     type: 'number',
-                  }}/>
+                  }} />
               </Grid>
             </Grid>
           </Collapse>
@@ -342,8 +354,8 @@ class ZoomMoveCard extends React.Component {
 
   onZoomSliderChange(key: string, e: MouseEvent, value: number) {
     if (this.props.tutorial == SDT.zoom2) {
-      if (key == 'zoomStart' && this.props.scene.zoomStart == 0.8) return;
-      if (key == 'zoomEnd' && this.props.scene.zoomEnd == 1.2) return;
+      if (key == 'minimumZoom' && this.props.scene.minimumZoom == 0.8) return;
+      if (key == 'maximumZoom' && this.props.scene.maximumZoom == 1.2) return;
     }
     this.changeKey(key, value / 10);
   }
@@ -372,7 +384,7 @@ class ZoomMoveCard extends React.Component {
     this.props.onUpdateScene(this.props.scene, fn);
   }
 
-  changeIntKey(key:string, intString: string) {
+  changeIntKey(key: string, intString: string) {
     this.changeKey(key, intString === '' ? '' : Number(intString));
   }
 

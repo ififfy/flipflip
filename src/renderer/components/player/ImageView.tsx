@@ -3,7 +3,7 @@ import {animated, useSpring, useTransition} from "react-spring";
 import Timeout = NodeJS.Timeout;
 
 import {getRandomColor, getRandomListItem} from "../../data/utils";
-import {BT, HTF, IT, SL, TF, VTF} from "../../data/const";
+import {BT, HTF, IT, SL, TF, VTF, ZD} from "../../data/const";
 import Scene from "../../data/Scene";
 import Strobe from "./Strobe";
 
@@ -555,24 +555,29 @@ export default class ImageView extends React.Component {
 
   ZoomMoveLayer = (data: {children: React.ReactNode}) => {
     let horizTransLevel = 0;
-    if (this.props.scene.horizTransType == HTF.left) {
+    if (this.props.scene.horizTransType == HTF.left || (this.props.scene.horizTransType == HTF.random && Math.floor(Math.random() * 2))) {
       horizTransLevel = -this.props.scene.horizTransLevel;
-    } else if (this.props.scene.horizTransType == HTF.right) {
+    } else if (this.props.scene.horizTransType == HTF.right || this.props.scene.horizTransType == HTF.random) {
       horizTransLevel = this.props.scene.horizTransLevel;
     }
 
     let vertTransLevel = 0;
-    if (this.props.scene.vertTransType == VTF.up) {
+    if (this.props.scene.vertTransType == VTF.up || (this.props.scene.vertTransType == VTF.random && Math.floor(Math.random() * 2))) {
       vertTransLevel = -this.props.scene.vertTransLevel;
-    } else if (this.props.scene.vertTransType == VTF.down) {
+    } else if (this.props.scene.vertTransType == VTF.down || this.props.scene.vertTransType == VTF.random) {
       vertTransLevel = this.props.scene.vertTransLevel;
     }
 
     let zoomStart = 1;
     let zoomEnd = 1;
     if (this.props.scene.zoom) {
-      zoomStart = this.props.scene.zoomStart;
-      zoomEnd = this.props.scene.zoomEnd;
+      if (this.props.scene.zoomDirection == ZD.in || (this.props.scene.zoomDirection == ZD.random && Math.floor(Math.random() * 2))) {
+        zoomStart = this.props.scene.minimumZoom;
+        zoomEnd = this.props.scene.maximumZoom;
+      } else if (this.props.scene.zoomDirection == ZD.out || this.props.scene.zoomDirection == ZD.random) {
+        zoomStart = this.props.scene.maximumZoom;
+        zoomEnd = this.props.scene.minimumZoom;
+      }
     }
 
     let transDuration = 0;
