@@ -19,8 +19,8 @@ export default class Scene {
   forceAll = false;
   imageTypeFilter = IF.any;
   zoom = false;
-  minimumZoom = 1;
-  maximumZoom = 2;
+  zoomMinimum = 1;
+  zoomMaximum = 2;
   zoomDirection = ZD.in;
   horizTransType = HTF.none;
   horizTransLevel = 10;

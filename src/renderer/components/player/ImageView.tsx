@@ -570,13 +570,15 @@ export default class ImageView extends React.Component {
 
     let zoomStart = 1;
     let zoomEnd = 1;
+    console.log("debug 1");
     if (this.props.scene.zoom) {
+    console.log("debug 2", this.props);
       if (this.props.scene.zoomDirection == ZD.in || (this.props.scene.zoomDirection == ZD.random && Math.floor(Math.random() * 2))) {
-        zoomStart = this.props.scene.minimumZoom;
-        zoomEnd = this.props.scene.maximumZoom;
+        zoomStart = this.props.scene.zoomMinimum;
+        zoomEnd = this.props.scene.zoomMaximum;
       } else if (this.props.scene.zoomDirection == ZD.out || this.props.scene.zoomDirection == ZD.random) {
-        zoomStart = this.props.scene.maximumZoom;
-        zoomEnd = this.props.scene.minimumZoom;
+        zoomStart = this.props.scene.zoomMaximum;
+        zoomEnd = this.props.scene.zoomMinimum;
       }
     }
 

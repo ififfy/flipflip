@@ -56,8 +56,8 @@ class ZoomMoveCard extends React.Component {
     const classes = this.props.classes;
 
     const enabled = this.props.scene.zoom || this.props.scene.horizTransType != HTF.none || this.props.scene.vertTransType != VTF.none;
-    const minimumZoom = typeof this.props.scene.minimumZoom === 'number' ? this.props.scene.minimumZoom : 0;
-    const maximumZoom = typeof this.props.scene.maximumZoom === 'number' ? this.props.scene.maximumZoom : 0;
+    const zoomMinimum = typeof this.props.scene.zoomMinimum === 'number' ? this.props.scene.zoomMinimum : 0;
+    const zoomMaximum = typeof this.props.scene.zoomMaximum === 'number' ? this.props.scene.zoomMaximum : 0;
     const horizTransLevel = typeof this.props.scene.horizTransLevel === 'number' ? this.props.scene.horizTransLevel : 0;
     const vertTransLevel = typeof this.props.scene.vertTransLevel === 'number' ? this.props.scene.vertTransLevel : 0;
     const transSinRate = typeof this.props.scene.transSinRate === 'number' ? this.props.scene.transSinRate : 0;
@@ -92,26 +92,26 @@ class ZoomMoveCard extends React.Component {
               </Grid>
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                 <Typography id="zoom-start-slider">
-                  Minimum Zoom: {minimumZoom}x
+                  Minimum Zoom: {zoomMinimum}x
                 </Typography>
                 <Slider
                   min={1}
                   max={50}
-                  defaultValue={minimumZoom * 10}
-                  onChangeCommitted={this.onZoomSliderChange.bind(this, 'minimumZoom')}
+                  defaultValue={zoomMinimum * 10}
+                  onChangeCommitted={this.onZoomSliderChange.bind(this, 'zoomMinimum')}
                   valueLabelDisplay={'auto'}
                   valueLabelFormat={(v) => v / 10}
                   aria-labelledby="zoom-start-slider" />
               </Grid>
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                 <Typography id="zoom-end-slider">
-                  Maximum Zoom: {maximumZoom}x
+                  Maximum Zoom: {zoomMaximum}x
                 </Typography>
                 <Slider
                   min={1}
                   max={50}
-                  defaultValue={maximumZoom * 10}
-                  onChangeCommitted={this.onZoomSliderChange.bind(this, 'maximumZoom')}
+                  defaultValue={zoomMaximum * 10}
+                  onChangeCommitted={this.onZoomSliderChange.bind(this, 'zoomMaximum')}
                   valueLabelDisplay={'auto'}
                   valueLabelFormat={(v) => v / 10}
                   aria-labelledby="zoom-end-slider" />
@@ -354,8 +354,8 @@ class ZoomMoveCard extends React.Component {
 
   onZoomSliderChange(key: string, e: MouseEvent, value: number) {
     if (this.props.tutorial == SDT.zoom2) {
-      if (key == 'minimumZoom' && this.props.scene.minimumZoom == 0.8) return;
-      if (key == 'maximumZoom' && this.props.scene.maximumZoom == 1.2) return;
+      if (key == 'zoomMinimum' && this.props.scene.zoomMinimum == 0.8) return;
+      if (key == 'zoomMaximum' && this.props.scene.zoomMaximum == 1.2) return;
     }
     this.changeKey(key, value / 10);
   }

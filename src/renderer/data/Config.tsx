@@ -19,8 +19,8 @@ interface SceneSettingsI {
   forceAll: boolean;
 
   zoom: boolean;
-  minimumZoom: number;
-  maximumZoom: number;
+  zoomMinimum: number;
+  zoomMaximum: number;
   zoomDirection: string;
   horizTransType: string;
   horizTransLevel: number;
@@ -185,8 +185,8 @@ export class SceneSettings implements SceneSettingsI {
   forceAll = false;
 
   zoom = false;
-  minimumZoom = 1;
-  maximumZoom = 2;
+  zoomMinimum = 1;
+  zoomMaximum = 2;
   zoomDirection = ZD.in;
   horizTransType = HTF.none;
   horizTransLevel = 10;

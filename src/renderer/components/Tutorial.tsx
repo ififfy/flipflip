@@ -1436,7 +1436,7 @@ class Tutorial extends React.Component {
               }
               return;
             case SDT.zoom1:
-              if (this.props.scene.minimumZoom == 0.8 && this.props.scene.maximumZoom == 1.2) {
+              if (this.props.scene.zoomMinimum == 0.8 && this.props.scene.zoomMaximum == 1.2) {
                 this.props.onDoneTutorial(SDT.zoom2);
               } else {
                 this.setTutorial(SDT.zoom2);
