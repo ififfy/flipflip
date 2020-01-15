@@ -695,7 +695,6 @@ class Library extends React.Component {
             <Tooltip title="Local Video/Playlist"  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addVideoButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
-                disabled={this.state.filters.length > 0}
                 onClick={this.onAddSource.bind(this, AF.videos)}
                 size="small">
                 <MovieIcon className={classes.icon} />
@@ -704,7 +703,6 @@ class Library extends React.Component {
             <Tooltip title="Local Directory"  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addDirectoryButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
-                disabled={this.state.filters.length > 0}
                 onClick={this.onAddSource.bind(this, AF.directory)}
                 size="small">
                 <FolderIcon className={classes.icon} />
@@ -713,7 +711,6 @@ class Library extends React.Component {
             <Tooltip title="URL"  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addURLButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
-                disabled={this.state.filters.length > 0}
                 onClick={this.onAddSource.bind(this, AF.url)}
                 size="small">
                 <HttpIcon className={classes.icon} />
