@@ -166,7 +166,7 @@ export default class ImageView extends React.Component {
         img.volume = 0;
       }
       if (this.props.scene.videoRandomSpeed) {
-        const randomSpeed = Math.floor(Math.random() * this.props.scene.videoSpeedMax) + this.props.scene.videoSpeedMin;
+        const randomSpeed = Math.floor(Math.random() * (this.props.scene.videoSpeedMax - this.props.scene.videoSpeedMin + 1)) + this.props.scene.videoSpeedMin;
         img.playbackRate = randomSpeed / 10;
       } else {
         img.playbackRate = this.props.scene.videoSpeed / 10;
@@ -556,24 +556,55 @@ export default class ImageView extends React.Component {
 
   ZoomMoveLayer = (data: {children: React.ReactNode}) => {
     let horizTransLevel = 0;
-    if (this.props.scene.horizTransType == HTF.left) {
-      horizTransLevel = -this.props.scene.horizTransLevel;
-    } else if (this.props.scene.horizTransType == HTF.right) {
+    if (this.props.scene.horizTransType != HTF.none) {
       horizTransLevel = this.props.scene.horizTransLevel;
+      if (this.props.scene.horizTransRandom) {
+        horizTransLevel = Math.floor(Math.random() * (this.props.scene.horizTransLevelMax - this.props.scene.horizTransLevelMin + 1)) + this.props.scene.horizTransLevelMin;
+      }
+      if (this.props.scene.horizTransType == HTF.left) {
+        horizTransLevel = -horizTransLevel;
+      } else if (this.props.scene.horizTransType == HTF.right) {
+        // Already set
+      } else if (this.props.scene.horizTransType == HTF.random) {
+        const type = Math.floor(Math.random() * 2);
+        if (type) {
+          horizTransLevel = -horizTransLevel;
+        } else {
+          // Alreaedy set
+        }
+      }
     }
 
     let vertTransLevel = 0;
-    if (this.props.scene.vertTransType == VTF.up) {
-      vertTransLevel = -this.props.scene.vertTransLevel;
-    } else if (this.props.scene.vertTransType == VTF.down) {
+    if (this.props.scene.vertTransType != VTF.none) {
       vertTransLevel = this.props.scene.vertTransLevel;
+      if (this.props.scene.vertTransRandom) {
+        vertTransLevel = Math.floor(Math.random() * (this.props.scene.vertTransLevelMax - this.props.scene.vertTransLevelMin + 1)) + this.props.scene.vertTransLevelMin;
+      }
+      if (this.props.scene.vertTransType == VTF.up) {
+        vertTransLevel = -vertTransLevel;
+      } else if (this.props.scene.vertTransType == VTF.down) {
+        // Already set
+      } else if (this.props.scene.vertTransType == VTF.random) {
+        const type = Math.floor(Math.random() * 2);
+        if (type) {
+          vertTransLevel = -vertTransLevel;
+        } else {
+          // Already set
+        }
+      }
     }
 
     let zoomStart = 1;
     let zoomEnd = 1;
     if (this.props.scene.zoom) {
-      zoomStart = this.props.scene.zoomStart;
-      zoomEnd = this.props.scene.zoomEnd;
+      if (this.props.scene.zoomRandom) {
+        zoomStart = (Math.floor(Math.random() * (this.props.scene.zoomStartMax*10 - this.props.scene.zoomStartMin*10 + 1)) + this.props.scene.zoomStartMin*10) / 10;
+        zoomEnd = (Math.floor(Math.random() * (this.props.scene.zoomEndMax*10 - this.props.scene.zoomEndMin*10 + 1)) + this.props.scene.zoomEndMin*10) / 10;
+      } else {
+        zoomStart = this.props.scene.zoomStart;
+        zoomEnd = this.props.scene.zoomEnd;
+      }
     }
 
     let transDuration = 0;

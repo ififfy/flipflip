@@ -45,10 +45,12 @@ export default new Map<string, string>([
   ['htf.none', 'None'],
   ['htf.left', 'Left'],
   ['htf.right', 'Right'],
+  ['htf.random', 'Left/Right'],
 
   ['vtf.none', 'None'],
   ['vtf.up', 'Up'],
   ['vtf.down', 'Down'],
+  ['vtf.random', 'Up/Down'],
 
   ['gt.tumblr', 'Tumblr'],
   ['gt.local', 'Local'],

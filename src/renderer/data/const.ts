@@ -63,12 +63,14 @@ const HTF = { // horizontal translate functions
   none: 'htf.none',
   left: 'htf.left',
   right: 'htf.right',
+  random: 'htf.random',
 };
 
 const VTF = { // vertical translate functions
   none: 'vtf.none',
   up: 'vtf.up',
   down: 'vtf.down',
+  random: 'vtf.random',
 };
 
 const GT = { // gooninator import type

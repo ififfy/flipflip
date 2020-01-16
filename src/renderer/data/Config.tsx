@@ -20,11 +20,22 @@ interface SceneSettingsI {
 
   zoom: boolean;
   zoomStart: number;
+  zoomStartMax: number;
+  zoomStartMin: number;
   zoomEnd: number;
+  zoomEndMax: number;
+  zoomEndMin: number;
+  zoomRandom: boolean;
   horizTransType: string;
   horizTransLevel: number;
+  horizTransLevelMax: number;
+  horizTransLevelMin: number;
+  horizTransRandom: boolean;
   vertTransType: string;
   vertTransLevel: number;
+  vertTransLevelMax: number;
+  vertTransLevelMin: number;
+  vertTransRandom: boolean;
   transTF: string;
   transDuration: number;
   transDurationMin: number;
@@ -184,11 +195,22 @@ export class SceneSettings implements SceneSettingsI {
 
   zoom = false;
   zoomStart = 1;
+  zoomStartMax = 1;
+  zoomStartMin = 0.5;
   zoomEnd = 2;
+  zoomEndMax = 2;
+  zoomEndMin = 1.5;
+  zoomRandom = false;
   horizTransType = HTF.none;
   horizTransLevel = 10;
+  horizTransLevelMax = 10;
+  horizTransLevelMin = 5;
+  horizTransRandom = false;
   vertTransType = VTF.none;
   vertTransLevel = 10;
+  vertTransLevelMax = 10;
+  vertTransLevelMin = 5;
+  vertTransRandom = false;
   transTF = TF.constant;
   transDuration = 5000;
   transDurationMin = 1000;
