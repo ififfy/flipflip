@@ -336,6 +336,7 @@ class Library extends React.Component {
     selectedTags: Array<{label: string, value: string}>(),
     menuAnchorEl: null as any,
     openMenu: null as string,
+    markSources: false,
   };
 
   Option = (props: any) => (
@@ -420,6 +421,7 @@ class Library extends React.Component {
                 <LibrarySearch
                   displaySources={this.state.displaySources}
                   filters={this.state.filters}
+                  update={this.state.markSources}
                   onUpdateFilters={this.onUpdateFilters.bind(this)}/>
               </div>
             </div>
@@ -975,6 +977,7 @@ class Library extends React.Component {
       }
     }
     this.props.onUpdateLibrary(this.props.library);
+    this.setState({markSources: !this.state.markSources});
   }
 
   batchTagOverwrite() {

@@ -23,6 +23,7 @@ class LibrarySearch extends React.Component {
     classes: any,
     displaySources: Array<LibrarySource>,
     filters: Array<string>,
+    update: boolean,
     onUpdateFilters(filter: Array<string>): void,
   };
 
@@ -58,7 +59,9 @@ class LibrarySearch extends React.Component {
 
   componentDidUpdate(props: any) {
     if (props) {
-      if (props.filters != this.props.filters || props.displaySources != this.props.displaySources) {
+      if (props.filters != this.props.filters ||
+        props.displaySources != this.props.displaySources ||
+        props.update != this.props.update) {
         this.update();
       }
     }
