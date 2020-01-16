@@ -264,12 +264,6 @@ const VCT = { // Video Clipper Tutorials
   done: DONE,
 };
 
-const ZD = { // Zoom Direction
-  in: 'zd.in',
-  out: 'zd.out',
-  random: 'zd.random',
-}
-
 export {
-  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, SC, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG, SPT, SDT, PT, LT, SDGT, SGT, VCT, DONE, ZD
+  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, SC, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG, SPT, SDT, PT, LT, SDGT, SGT, VCT, DONE
 };

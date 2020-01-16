@@ -42,19 +42,15 @@ export default new Map<string, string>([
   ['it.fitWidth', 'Fit Width'],
   ['it.fitHeight', 'Fit Height'],
 
-  ['zd.in', 'In'],
-  ['zd.out', 'Out'],
-  ['zd.random', 'Random'],
-
   ['htf.none', 'None'],
   ['htf.left', 'Left'],
   ['htf.right', 'Right'],
-  ['htf.random', 'Random'],
+  ['htf.random', 'Left/Right'],
 
   ['vtf.none', 'None'],
   ['vtf.up', 'Up'],
   ['vtf.down', 'Down'],
-  ['vtf.random', 'Random'],
+  ['vtf.random', 'Up/Down'],
 
   ['gt.tumblr', 'Tumblr'],
   ['gt.local', 'Local'],

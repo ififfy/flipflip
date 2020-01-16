@@ -694,7 +694,7 @@ class Tutorial extends React.Component {
               <DialogContentText id="tutorial-description">
                 We just want a mild zoom.
                 <br/>
-                So <b>set Minimum Zoom to <u>0.8</u></b> and <b>set Maximum Zoom to <u>1.2</u></b>
+                So <b>set Zoom Start to <u>0.8</u></b> and <b>set Zoom End to <u>1.2</u></b>
               </DialogContentText>
             </DialogContent>
           </React.Fragment>;
@@ -1436,7 +1436,7 @@ class Tutorial extends React.Component {
               }
               return;
             case SDT.zoom1:
-              if (this.props.scene.zoomMinimum == 0.8 && this.props.scene.zoomMaximum == 1.2) {
+              if (this.props.scene.zoomStart == 0.8 && this.props.scene.zoomEnd == 1.2) {
                 this.props.onDoneTutorial(SDT.zoom2);
               } else {
                 this.setTutorial(SDT.zoom2);
