@@ -63,6 +63,8 @@ class SceneOptionCard extends React.Component {
     isTagging?: boolean,
   };
 
+  readonly sinInputRef: React.RefObject<HTMLInputElement> = React.createRef();
+
   render() {
     const classes = this.props.classes;
 
@@ -97,6 +99,7 @@ class SceneOptionCard extends React.Component {
                 <Grid container alignItems="center">
                   <Grid item xs>
                     <Slider
+                      ref={this.sinInputRef}
                       min={1}
                       defaultValue={timingSinRate}
                       onChangeCommitted={this.onSliderChange.bind(this, 'timingSinRate')}
@@ -440,10 +443,20 @@ class SceneOptionCard extends React.Component {
   blurIntKey(key: string, e: MouseEvent) {
     const min = (e.currentTarget as any).min ? (e.currentTarget as any).min : null;
     const max = (e.currentTarget as any).max ? (e.currentTarget as any).max : null;
+    let value = (e.currentTarget as any).value;
     if (min && (this.props.scene as any)[key] < min) {
+      value = min;
       this.changeIntKey(key, min);
     } else if (max && (this.props.scene as any)[key] > max) {
+      value = max;
       this.changeIntKey(key, max);
+    }
+
+    // Update uncontrolled slider
+    if (key == 'timingSinRate') {
+      (this.sinInputRef.current.children.item(1) as any).style.width = value + '%';
+      (this.sinInputRef.current.children.item(3) as any).style.left = value + '%';
+      this.sinInputRef.current.children.item(3).children.item(0).children.item(0).children.item(0).innerHTML = value;
     }
   }
 

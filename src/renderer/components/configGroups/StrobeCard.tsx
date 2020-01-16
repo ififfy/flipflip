@@ -42,6 +42,9 @@ class StrobeCard extends React.Component {
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 
+  readonly sinInputRef: React.RefObject<HTMLInputElement> = React.createRef();
+  readonly delaySinInputRef: React.RefObject<HTMLInputElement> = React.createRef();
+
   render() {
     const classes = this.props.classes;
 
@@ -195,6 +198,7 @@ class StrobeCard extends React.Component {
                   <Grid container alignItems="center">
                     <Grid item xs>
                       <Slider
+                        ref={this.sinInputRef}
                         min={1}
                         defaultValue={strobeSinRate}
                         onChangeCommitted={this.onSliderChange.bind(this, 'strobeSinRate')}
@@ -319,6 +323,7 @@ class StrobeCard extends React.Component {
                   <Grid container alignItems="center">
                     <Grid item xs>
                       <Slider
+                        ref={this.delaySinInputRef}
                         min={1}
                         defaultValue={strobeDelaySinRate}
                         onChangeCommitted={this.onSliderChange.bind(this, 'strobeDelaySinRate')}
@@ -441,10 +446,24 @@ class StrobeCard extends React.Component {
   blurIntKey(key: string, e: MouseEvent) {
     const min = (e.currentTarget as any).min ? (e.currentTarget as any).min : null;
     const max = (e.currentTarget as any).max ? (e.currentTarget as any).max : null;
+    let value = (e.currentTarget as any).value;
     if (min && (this.props.scene as any)[key] < min) {
+      value = min;
       this.changeIntKey(key, min);
     } else if (max && (this.props.scene as any)[key] > max) {
+      value = max;
       this.changeIntKey(key, max);
+    }
+
+    // Update uncontrolled sliders
+    if (key == 'strobeSinRate') {
+      (this.sinInputRef.current.children.item(1) as any).style.width = value + '%';
+      (this.sinInputRef.current.children.item(3) as any).style.left = value + '%';
+      this.sinInputRef.current.children.item(3).children.item(0).children.item(0).children.item(0).innerHTML = value;
+    } else if (key == 'strobeDelaySinRate') {
+      (this.delaySinInputRef.current.children.item(1) as any).style.width = value + '%';
+      (this.delaySinInputRef.current.children.item(3) as any).style.left = value + '%';
+      this.delaySinInputRef.current.children.item(3).children.item(0).children.item(0).children.item(0).innerHTML = value;
     }
   }
 

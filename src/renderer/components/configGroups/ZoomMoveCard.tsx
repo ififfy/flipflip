@@ -52,6 +52,10 @@ class ZoomMoveCard extends React.Component {
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 
+  readonly horizInputRef: React.RefObject<HTMLInputElement> = React.createRef();
+  readonly vertInputRef: React.RefObject<HTMLInputElement> = React.createRef();
+  readonly sinInputRef: React.RefObject<HTMLInputElement> = React.createRef();
+
   render() {
     const classes = this.props.classes;
 
@@ -225,6 +229,7 @@ class ZoomMoveCard extends React.Component {
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs>
                     <Slider
+                      ref={this.horizInputRef}
                       defaultValue={horizTransLevel}
                       onChangeCommitted={this.onSliderChange.bind(this, 'horizTransLevel')}
                       valueLabelDisplay={'auto'}
@@ -316,6 +321,7 @@ class ZoomMoveCard extends React.Component {
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs>
                     <Slider
+                      ref={this.vertInputRef}
                       defaultValue={vertTransLevel}
                       onChangeCommitted={this.onSliderChange.bind(this, 'vertTransLevel')}
                       valueLabelDisplay={'auto'}
@@ -400,6 +406,7 @@ class ZoomMoveCard extends React.Component {
                   <Grid container alignItems="center">
                     <Grid item xs>
                       <Slider
+                        ref={this.sinInputRef}
                         min={1}
                         defaultValue={transSinRate}
                         onChangeCommitted={this.onSliderChange.bind(this, 'transSinRate')}
@@ -503,10 +510,28 @@ class ZoomMoveCard extends React.Component {
   blurIntKey(key: string, e: MouseEvent) {
     const min = (e.currentTarget as any).min ? (e.currentTarget as any).min : null;
     const max = (e.currentTarget as any).max ? (e.currentTarget as any).max : null;
+    let value = (e.currentTarget as any).value;
     if (min && (this.props.scene as any)[key] < min) {
+      value = min;
       this.changeIntKey(key, min);
     } else if (max && (this.props.scene as any)[key] > max) {
+      value = max;
       this.changeIntKey(key, max);
+    }
+
+    // Update uncontrolled sliders
+    if (key == 'horizTransLevel') {
+      (this.horizInputRef.current.children.item(1) as any).style.width = value + '%';
+      (this.horizInputRef.current.children.item(3) as any).style.left = value + '%';
+      this.horizInputRef.current.children.item(3).children.item(0).children.item(0).children.item(0).innerHTML = value;
+    } else if (key == 'vertTransLevel') {
+      (this.vertInputRef.current.children.item(1) as any).style.width = value + '%';
+      (this.vertInputRef.current.children.item(3) as any).style.left = value + '%';
+      this.vertInputRef.current.children.item(3).children.item(0).children.item(0).children.item(0).innerHTML = value;
+    } else if (key == 'transSinRate') {
+      (this.sinInputRef.current.children.item(1) as any).style.width = value + '%';
+      (this.sinInputRef.current.children.item(3) as any).style.left = value + '%';
+      this.sinInputRef.current.children.item(3).children.item(0).children.item(0).children.item(0).innerHTML = value;
     }
   }
 
