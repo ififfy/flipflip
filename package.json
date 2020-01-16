@@ -65,6 +65,7 @@
     "system-font-families": "^0.4.1",
     "tumblr.js": "^2.0.0",
     "twitter": "^1.7.1",
+    "web-audio-beat-detector": "^7.0.81",
     "wretch": "^1.4.2"
   }
 }

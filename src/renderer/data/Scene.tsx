@@ -103,7 +103,6 @@ export default class Scene {
   videoSpeedMax = 20;
   audioEnabled = false;
   audios: Array<Audio> = [];
-  bpm = 0;
   generatorWeights?: Array<WeightGroup> = null;
   openTab = 3;
 

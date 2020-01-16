@@ -331,6 +331,15 @@ export function arrayMove(arr: any[], old_index: number, new_index: number) {
   arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
 }
 
+export function toArrayBuffer(buf: Buffer) {
+  let ab = new ArrayBuffer(buf.length);
+  let view = new Uint8Array(ab);
+  for (let j = 0; j < buf.length; ++j) {
+    view[j] = buf[j];
+  }
+  return ab;
+}
+
 export function getRandomColor() {
   let letters = '0123456789ABCDEF';
   let color = '#';

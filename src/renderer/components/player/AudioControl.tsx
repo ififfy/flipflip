@@ -4,14 +4,21 @@ import clsx from "clsx";
 import {remote} from "electron";
 import fileURL from "file-url";
 import * as mm from "music-metadata";
+import { analyze } from 'web-audio-beat-detector';
+import { readFileSync } from 'fs';
 import Timeout = NodeJS.Timeout;
+import {green, red} from "@material-ui/core/colors";
 
 import {
+  CircularProgress,
   Collapse, createStyles, Divider, FormControl, FormControlLabel, Grid, IconButton, InputAdornment, InputLabel,
-  MenuItem, Select, Slider, Switch, TextField, Theme, Tooltip, Typography, withStyles
+  MenuItem, Select, Slider, SvgIcon, Switch, TextField, Theme, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
+import AudiotrackIcon from '@material-ui/icons/Audiotrack';
+import CheckIcon from '@material-ui/icons/Check';
 import DeleteIcon from '@material-ui/icons/Delete';
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import FolderIcon from '@material-ui/icons/Folder';
 import Forward10Icon from '@material-ui/icons/Forward10';
 import Replay10Icon from '@material-ui/icons/Replay10';
@@ -20,7 +27,7 @@ import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import VolumeDownIcon from '@material-ui/icons/VolumeDown';
 import VolumeUpIcon from '@material-ui/icons/VolumeUp';
 
-import {getTimestamp, urlToPath} from "../../data/utils";
+import {getTimestamp, toArrayBuffer, urlToPath} from "../../data/utils";
 import {SceneSettings} from "../../data/Config";
 import {TF} from "../../data/const";
 import en from "../../data/en";
@@ -41,6 +48,29 @@ const styles = (theme: Theme) => createStyles({
   },
   percentInput: {
     minWidth: theme.spacing(11),
+  },
+  bpmIcon: {
+    color: theme.palette.primary.contrastText,
+  },
+  bpmProgress: {
+    position: 'absolute',
+    right: 67,
+  },
+  tagProgress: {
+    position: 'absolute',
+    right: 20,
+  },
+  success: {
+    backgroundColor: green[500],
+    '&:hover': {
+      backgroundColor: green[700],
+    },
+  },
+  failure: {
+    backgroundColor: red[500],
+    '&:hover': {
+      backgroundColor: red[700],
+    },
   },
 });
 
@@ -68,6 +98,12 @@ class AudioControl extends React.Component {
     position: 0,
     duration: 0,
     tick: false,
+    loadingBPM: false,
+    successBPM: false,
+    errorBPM: false,
+    loadingTag: false,
+    successTag: false,
+    errorTag: false,
   };
 
   render() {
@@ -239,18 +275,67 @@ class AudioControl extends React.Component {
                   </Grid>
                   <Divider component="div" orientation="vertical" style={{height: 48}}/>
                   <Grid item xs>
-                    <Typography id="audio-speed-slider" variant="caption" component="div"
-                                color="textSecondary">
-                      Speed {audioSpeed / 10}x
-                    </Typography>
-                    <Slider
-                      min={5}
-                      max={40}
-                      defaultValue={audioSpeed}
-                      onChangeCommitted={this.onAudioSliderChange.bind(this, 'speed')}
-                      valueLabelDisplay={'auto'}
-                      valueLabelFormat={(v) => v/10 + "x"}
-                      aria-labelledby="audio-speed-slider"/>
+                    <Grid container>
+                      {this.props.isFirst && (
+                        <Grid item xs={12}>
+                          <TextField
+                            variant="outlined"
+                            label="BPM"
+                            margin="dense"
+                            value={this.props.audio.bpm}
+                            onChange={this.onAudioIntInput.bind(this, 'bpm')}
+                            onBlur={this.blurAudioIntKey.bind(this, 'bpm')}
+                            InputProps={{
+                              endAdornment:
+                                <InputAdornment position="end">
+                                  <Tooltip title="Detect BPM">
+                                    <IconButton
+                                      className={clsx(this.state.successBPM && classes.success, this.state.errorBPM && classes.failure)}
+                                      onClick={this.onDetectBPM.bind(this)}>
+                                      {this.state.successBPM ? <CheckIcon/> :
+                                        this.state.errorBPM ? <ErrorOutlineIcon/> :
+                                        <SvgIcon className={classes.bpmIcon} viewBox="0 0 24 24" fontSize="small">
+                                          <path
+                                            d="M12,1.75L8.57,2.67L4.07,19.5C4.06,19.5 4,19.84 4,20C4,21.11 4.89,22 6,22H18C19.11,22 20,21.11 20,20C20,19.84 19.94,19.5 19.93,19.5L15.43,2.67L12,1.75M10.29,4H13.71L17.2,17H13V12H11V17H6.8L10.29,4M11,5V9H10V11H14V9H13V5H11Z"/>
+                                        </SvgIcon>
+                                      }
+                                    </IconButton>
+                                  </Tooltip>
+                                  {this.state.loadingBPM && <CircularProgress size={34} className={classes.bpmProgress} />}
+                                  <Tooltip title="Read BPM Metadata">
+                                    <IconButton
+                                      className={clsx(this.state.successTag && classes.success, this.state.errorTag && classes.failure)}
+                                      onClick={this.onReadBPMTag.bind(this)}>
+                                      {this.state.successTag ? <CheckIcon/> :
+                                        this.state.errorTag ? <ErrorOutlineIcon/> :
+                                          <AudiotrackIcon className={classes.bpmIcon}/>
+                                      }
+                                    </IconButton>
+                                  </Tooltip>
+                                  {this.state.loadingTag && <CircularProgress size={34} className={classes.tagProgress} />}
+                                </InputAdornment>,
+                            }}
+                            inputProps={{
+                              min: 0,
+                              type: 'number',
+                            }}/>
+                        </Grid>
+                      )}
+                      <Grid item xs={12}>
+                        <Typography id="audio-speed-slider" variant="caption" component="div"
+                                    color="textSecondary">
+                          Speed {audioSpeed / 10}x
+                        </Typography>
+                        <Slider
+                          min={5}
+                          max={40}
+                          defaultValue={audioSpeed}
+                          onChangeCommitted={this.onAudioSliderChange.bind(this, 'speed')}
+                          valueLabelDisplay={'auto'}
+                          valueLabelFormat={(v) => v/10 + "x"}
+                          aria-labelledby="audio-speed-slider"/>
+                      </Grid>
+                    </Grid>
                   </Grid>
                 </Grid>
               </Grid>
@@ -392,7 +477,6 @@ class AudioControl extends React.Component {
     if (this.props.startPlaying) {
       this.tickLoop(true);
     }
-    this.detectBPM();
   }
 
   componentDidUpdate(props: any) {
@@ -406,9 +490,6 @@ class AudioControl extends React.Component {
     if (this.props.audio.tick && this.props.audio.tickMode == TF.scene && props.scenePaths && props.scenePaths.length > 0 && props.scenePaths !== this.props.scenePaths) {
       this.setState({tick: !this.state.tick});
     }
-    if (this.props.audio.url != audio.url || this.props.isFirst != props.isFirst) {
-      this.detectBPM();
-    }
     this._audio=JSON.stringify(this.props.audio);
   }
 
@@ -418,17 +499,58 @@ class AudioControl extends React.Component {
     }
   }
 
-  detectBPM() {
-    if (this.props.isFirst && this.props.audio.url) {
+  onReadBPMTag() {
+    if (this.props.audio.url && !this.state.loadingTag) {
+      this.setState({loadingTag: true});
       mm.parseFile(urlToPath(this.props.audio.url))
         .then((metadata: any) => {
           if (metadata && metadata.common && metadata.common.bpm) {
-            this.changeKey('bpm', metadata.common.bpm);
+            const newAudios = this.props.scene.audios;
+            const audio: any = newAudios.find((a) => a.id == this.props.audio.id);
+            audio.bpm = metadata.common.bpm;
+            this.changeKey('audios', newAudios);
+            this.setState({loadingTag: false, successTag: true});
+            setTimeout(() => {this.setState({successTag: false})}, 3000);
+          } else {
+            this.setState({loadingTag: false, errorTag: true});
+            setTimeout(() => {this.setState({errorTag: false})}, 3000);
           }
         })
         .catch((err: any) => {
           console.error("Error reading metadata:", err.message);
+          this.setState({loadingTag: false, errorTag: true});
+          setTimeout(() => {this.setState({errorTag: false})}, 3000);
         });
+    }
+  }
+
+  onDetectBPM() {
+    if (this.props.audio.url && !this.state.loadingBPM) {
+      this.setState({loadingBPM: true});
+      let data = toArrayBuffer(readFileSync(urlToPath(this.props.audio.url)));
+      let context = new AudioContext();
+      context.decodeAudioData(data, (buffer) => {
+        analyze(buffer)
+          .then((tempo: number) => {
+            const newAudios = this.props.scene.audios;
+            const audio: any = newAudios.find((a) => a.id == this.props.audio.id);
+            audio.bpm = tempo.toFixed(2);
+            this.changeKey('audios', newAudios);
+            this.setState({loadingBPM: false, successBPM: true});
+            setTimeout(() => {this.setState({successBPM: false})}, 3000);
+          })
+          .catch((err: any) => {
+            console.error("Error analyzing");
+            console.error(err);
+            this.setState({loadingBPM: false, errorBPM: true});
+            setTimeout(() => {this.setState({errorBPM: false})}, 3000);
+
+          });
+      }, (err) => {
+        console.error(err);
+        this.setState({loadingBPM: false, errorBPM: true});
+        setTimeout(() => {this.setState({errorBPM: false})}, 3000);
+      });
     }
   }
 
@@ -451,7 +573,7 @@ class AudioControl extends React.Component {
           break;
         case TF.bpm:
           const bpmMulti = this.props.audio.tickBPMMulti > 0 ? this.props.audio.tickBPMMulti : 1 / (-1 * (this.props.audio.tickBPMMulti - 2));
-          timeout = 60000 / (this.props.scene.bpm * bpmMulti);
+          timeout = 60000 / (this.props.audio.bpm * bpmMulti);
           // If we cannot parse this, default to 1s
           if (!timeout) {
             timeout = 1000;

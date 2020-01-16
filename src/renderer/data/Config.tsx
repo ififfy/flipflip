@@ -103,7 +103,6 @@ interface SceneSettingsI {
 
   audioEnabled: boolean;
   audios: Array<Audio>;
-  bpm: number;
 
   // migration only
   overlaySceneID: number;
@@ -271,7 +270,6 @@ export class SceneSettings implements SceneSettingsI {
 
   audioEnabled = false;
   audios: Array<Audio> = [];
-  bpm = 0;
 
   // migration only
   overlaySceneID = 0;

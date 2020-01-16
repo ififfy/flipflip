@@ -151,7 +151,8 @@ export default class Strobe extends React.Component {
         break;
       case TF.bpm:
         const bpmMulti = this.props.scene.strobeBPMMulti > 0 ? this.props.scene.strobeBPMMulti : 1 / (-1 * (this.props.scene.strobeBPMMulti - 2));
-        duration = 60000 / (this.props.scene.bpm * bpmMulti);
+        const bpm = this.props.scene.audios.length > 0 ? this.props.scene.audios[0].bpm : 60;
+        duration = 60000 / (bpm * bpmMulti);
         // If we cannot parse this, default to 1s
         if (!duration) {
           duration = 1000;
@@ -178,7 +179,8 @@ export default class Strobe extends React.Component {
         break;
       case TF.bpm:
         const bpmMulti = this.props.scene.strobeDelayBPMMulti > 0 ? this.props.scene.strobeDelayBPMMulti : 1 / (-1 * (this.props.scene.strobeDelayBPMMulti - 2));
-        delay = 60000 / (this.props.scene.bpm * bpmMulti);
+        const bpm = this.props.scene.audios.length > 0 ? this.props.scene.audios[0].bpm : 60;
+        delay = 60000 / (bpm * bpmMulti);
         // If we cannot parse this, default to 1s
         if (!delay) {
           delay = 1000;

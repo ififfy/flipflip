@@ -7,7 +7,7 @@ import gifInfo from 'gif-info';
 import IdleTimer from 'react-idle-timer';
 
 import {GO, IF, OF, SL, TF, VO, WF} from '../../data/const';
-import {getRandomListItem, isVideo, urlToPath} from '../../data/utils';
+import {getRandomListItem, isVideo, toArrayBuffer, urlToPath} from '../../data/utils';
 import Config from "../../data/Config";
 import Scene from "../../data/Scene";
 import ChildCallbackHack from './ChildCallbackHack';
@@ -485,15 +485,6 @@ export default class ImagePlayer extends React.Component {
         this.runFetchLoop(i);
       };
 
-      function toArrayBuffer(buf: Buffer) {
-        let ab = new ArrayBuffer(buf.length);
-        let view = new Uint8Array(ab);
-        for (let j = 0; j < buf.length; ++j) {
-          view[j] = buf[j];
-        }
-        return ab;
-      }
-
       img.onload = () => {
         // images may load immediately, but that messes up the setState()
         // lifecycle, so always load on the next event loop iteration.
@@ -646,7 +637,8 @@ export default class ImagePlayer extends React.Component {
           break;
         case TF.bpm:
           const bpmMulti = this.props.scene.timingBPMMulti > 0 ? this.props.scene.timingBPMMulti : 1 / (-1 * (this.props.scene.timingBPMMulti - 2));
-          timeToNextFrame = 60000 / (this.props.scene.bpm * bpmMulti);
+          const bpm = this.props.scene.audios.length > 0 ? this.props.scene.audios[0].bpm : 60;
+          timeToNextFrame = 60000 / (bpm * bpmMulti);
           // If we cannot parse this, default to 1s
           if (!timeToNextFrame) {
             timeToNextFrame = 1000;

@@ -491,7 +491,8 @@ export default class ImageView extends React.Component {
           break;
         case TF.bpm:
           const bpmMulti = this.props.scene.fadeBPMMulti > 0 ? this.props.scene.fadeBPMMulti : 1 / (-1 * (this.props.scene.fadeBPMMulti - 2));
-          fadeDuration = 60000 / (this.props.scene.bpm * bpmMulti);
+          const bpm = this.props.scene.audios.length > 0 ? this.props.scene.audios[0].bpm : 60;
+          fadeDuration = 60000 / (bpm * bpmMulti);
           // If we cannot parse this, default to 1s
           if (!fadeDuration) {
             fadeDuration = 1000;
@@ -593,7 +594,8 @@ export default class ImageView extends React.Component {
           break;
         case TF.bpm:
           const bpmMulti = this.props.scene.transBPMMulti > 0 ? this.props.scene.transBPMMulti : 1 / (-1 * (this.props.scene.transBPMMulti - 2));
-          transDuration = 60000 / (this.props.scene.bpm * bpmMulti);
+          const bpm = this.props.scene.audios.length > 0 ? this.props.scene.audios[0].bpm : 60;
+          transDuration = 60000 / (bpm * bpmMulti);
           // If we cannot parse this, default to 1s
           if (!transDuration) {
             transDuration = 1000;
