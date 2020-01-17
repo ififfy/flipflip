@@ -207,9 +207,9 @@ class VideoControl extends React.Component {
     const max = this.props.clip ? this.props.clip[1] : this.props.video.duration;
     const marks = [{value: min, label: getTimestamp(min)}, {value: max, label: getTimestamp(max)}];
     if (!this.props.clip && this.props.clips) {
-      for (let clip of this.props.clips) {
-        marks.push({value: clip.start, label: clip.id.toString()})
-      }
+      this.props.clips.forEach((clip, index) => {
+        marks.push({value: clip.start, label: (index+1).toString()})
+      })
     }
     return marks;
   }

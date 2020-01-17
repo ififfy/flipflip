@@ -1,5 +1,6 @@
 import * as React from "react";
 import clsx from "clsx";
+import {green, red} from "@material-ui/core/colors";
 
 import {
   AppBar, Button, Card, CardActionArea, CardContent, CircularProgress, Collapse, Container, createStyles, Drawer,
@@ -9,6 +10,8 @@ import ValueLabel from "@material-ui/core/Slider/ValueLabel";
 
 import AddIcon from '@material-ui/icons/Add';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import CheckIcon from '@material-ui/icons/Check';
+import CloseIcon from '@material-ui/icons/Close';
 import DeleteIcon from '@material-ui/icons/Delete';
 import KeyboardReturnIcon from '@material-ui/icons/KeyboardReturn';
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
@@ -134,7 +137,19 @@ const styles = (theme: Theme) => createStyles({
   },
   disable: {
     pointerEvents: 'none',
-  }
+  },
+  enabledClip: {
+    backgroundColor: green[500],
+    '&:hover': {
+      backgroundColor: green[700],
+    },
+  },
+  disabledClip: {
+    backgroundColor: red[500],
+    '&:hover': {
+      backgroundColor: red[700],
+    },
+  },
 });
 
 const StyledValueLabel = withStyles((theme: Theme) => createStyles({
@@ -157,6 +172,7 @@ class VideoClipper extends React.Component {
   readonly props: {
     classes: any,
     allTags: Array<Tag>,
+    isLibrary: boolean,
     source: LibrarySource,
     tutorial: string,
     videoVolume: number,
@@ -165,6 +181,7 @@ class VideoClipper extends React.Component {
     navigateClipping(offset: number): void,
     onTutorial(tutorial: string): void,
     onStartVCTutorial(): void,
+    onSetDisabledClips(disabledClips: Array<number>): void,
     onUpdateClips(url: string, clips: Array<Clip>): void,
   };
 
@@ -270,7 +287,7 @@ class VideoClipper extends React.Component {
                             </Fab>
                           </Tooltip>
                         </Grid>
-                        {this.props.source.clips.map((c) =>
+                        {this.props.source.clips.map((c, index) =>
                           <Grid key={c.id} item>
                             <Button
                               variant="contained"
@@ -278,7 +295,7 @@ class VideoClipper extends React.Component {
                               size="large"
                               className={clsx(this.props.tutorial == VCT.clips && classes.disable)}
                               onClick={this.onEdit.bind(this, c)}>
-                              {c.id}
+                              {index + 1}
                             </Button>
                           </Grid>
                         )}
@@ -286,6 +303,20 @@ class VideoClipper extends React.Component {
                     </Collapse>
                     <Collapse in={!!this.state.isEditing}>
                       <Grid container spacing={1} alignItems="center" className={clsx(this.props.tutorial == VCT.clip && classes.highlight)}>
+                        {!this.props.isLibrary && this.state.isEditing && this.props.source.clips.find((c) => c.id == this.state.isEditing.id) && (
+                          <Grid item>
+                            <Tooltip title={this.props.source.disabledClips && this.props.source.disabledClips.includes(this.state.isEditing.id) ? "Disabled" : "Enabled"} placement="top">
+                              <Fab
+                                size="small"
+                                className={clsx(classes.fab,
+                                  !this.props.source.disabledClips || !this.props.source.disabledClips.includes(this.state.isEditing.id) && classes.enabledClip,
+                                  this.props.source.disabledClips && this.props.source.disabledClips.includes(this.state.isEditing.id) && classes.disabledClip)}
+                                onClick={this.onToggleClip.bind(this)}>
+                                {this.props.source.disabledClips && this.props.source.disabledClips.includes(this.state.isEditing.id) ? <CloseIcon/> : <CheckIcon/>}
+                              </Fab>
+                            </Tooltip>
+                          </Grid>
+                        )}
                         <Grid item xs className={classes.timeSlider}>
                           <Slider
                             min={0}
@@ -529,6 +560,10 @@ class VideoClipper extends React.Component {
     }
   }
 
+  onToggleClip() {
+    this.props.onSetDisabledClips(this.props.source.disabledClips ? this.props.source.disabledClips.concat(this.state.isEditing.id) : [this.state.isEditing.id]);
+  }
+
   onTag() {
     this.setState({isTagging: !this.state.isTagging});
   }
@@ -558,12 +593,8 @@ class VideoClipper extends React.Component {
     const clip = source.clips.find((c) => c.id === this.state.isEditing.id);
     if (clip) {
       source.clips = source.clips.filter((c) => c.id !== this.state.isEditing.id);
-      source.clips.forEach((c) => {
-        if (c.id > this.state.isEditing.id) {
-          c.id = c.id - 1;
-        }
-      });
       this.props.onUpdateClips(source.url, source.clips);
+      this.props.onSetDisabledClips(this.props.source.disabledClips ? this.props.source.disabledClips.filter((n) => n != this.state.isEditing.id) : []);
     }
     this.closeEdit();
   }

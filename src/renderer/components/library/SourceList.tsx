@@ -7,15 +7,16 @@ import {FixedSizeList} from "react-window";
 import clsx from "clsx";
 
 import {
-  Button, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, Link, List, Theme, Typography,
-  withStyles
+  Button, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, Link, List, ListItemSecondaryAction,
+  ListItemText, Menu, MenuItem, Switch, Theme, Typography, withStyles
 } from "@material-ui/core";
 
-import {arrayMove, getCachePath, getFileName, getSourceType, urlToPath} from "../../data/utils";
+import {arrayMove, getCachePath, getFileName, getSourceType, getTimestamp, urlToPath} from "../../data/utils";
 import {SDT, ST} from "../../data/const";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
 import SourceListItem from "./SourceListItem";
+import Clip from "../../data/Clip";
 
 const styles = (theme: Theme) => createStyles({
   emptyMessage: {
@@ -28,6 +29,9 @@ const styles = (theme: Theme) => createStyles({
   backdropTop: {
     zIndex: theme.zIndex.modal + 1,
   },
+  marginRight: {
+    marginRight: theme.spacing(1),
+  }
 });
 
 class SourceList extends React.Component {
@@ -53,6 +57,9 @@ class SourceList extends React.Component {
   readonly state = {
     cachePath: null as string,
     isEditing: -1,
+    mouseX: null as any,
+    mouseY: null as any,
+    clipMenu: null as LibrarySource,
   };
 
   onSortEnd = ({oldIndex, newIndex}: {oldIndex: number, newIndex: number}) => {
@@ -109,6 +116,34 @@ class SourceList extends React.Component {
             </List>
           )}
         </AutoSizer>
+        <Menu
+          id="clip-menu"
+          elevation={1}
+          anchorReference="anchorPosition"
+          anchorPosition={
+            this.state.mouseY !== null && this.state.mouseX !== null
+              ? { top: this.state.mouseY, left: this.state.mouseX }
+              : undefined
+          }
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+          keepMounted
+          open={!!this.state.clipMenu}
+          onClose={this.onCloseDialog.bind(this)}>
+          {!!this.state.clipMenu && this.state.clipMenu.clips.map((c, index) =>
+            <MenuItem key={c.id}>
+              <ListItemText primary={"(" + (index+1) + ") " + getTimestamp(c.start) + " - " + getTimestamp(c.end)} className={classes.marginRight}/>
+              <ListItemSecondaryAction>
+                <Switch
+                  size="small"
+                  checked={!this.state.clipMenu.disabledClips || !this.state.clipMenu.disabledClips.includes(c.id)}
+                  onChange={this.onToggleClip.bind(this, this.state.clipMenu, c)} />
+              </ListItemSecondaryAction>
+            </MenuItem>
+          )}
+        </Menu>
         <Dialog
           open={this.state.cachePath != null}
           onClose={this.onCloseClean.bind(this)}
@@ -163,6 +198,19 @@ class SourceList extends React.Component {
       newSelected.push(source);
     }
     this.props.onUpdateSelected(newSelected);
+  }
+
+  onToggleClip(s: LibrarySource, c: Clip) {
+    const oldSources = this.props.sources;
+    const source = oldSources.find((ls) => ls.id == s.id);
+    if (!source.disabledClips) {
+      source.disabledClips = [c.id];
+    } else if (source.disabledClips.includes(c.id)) {
+      source.disabledClips = source.disabledClips.filter((d) => d != c.id);
+    } else {
+      source.disabledClips = source.disabledClips.concat(c.id);
+    }
+    this.props.onUpdateSources(oldSources);
   }
 
   onStartEdit(id: number) {
@@ -241,6 +289,14 @@ class SourceList extends React.Component {
     remote.shell.openExternal(url);
   }
 
+  onOpenClipMenu(source: LibrarySource, e: MouseEvent) {
+    this.setState({mouseX: e.clientX, mouseY: e.clientY, clipMenu: source});
+  }
+
+  onCloseDialog() {
+    this.setState({menuAnchorEl: null, clipMenu: false});
+  }
+
   SortableVirtualList = sortableContainer(this.VirtualList.bind(this));
 
   VirtualList(props: any) {
@@ -271,6 +327,7 @@ class SourceList extends React.Component {
         config={this.props.config}
         index={index}
         isEditing={this.state.isEditing}
+        isLibrary={this.props.isLibrary}
         isSelect={this.props.isSelect}
         source={source}
         sources={this.props.sources}
@@ -280,10 +337,12 @@ class SourceList extends React.Component {
         onClearBlacklist={this.props.onClearBlacklist.bind(this)}
         onClip={this.props.onClip.bind(this)}
         onEndEdit={this.onEndEdit.bind(this)}
+        onOpenClipMenu={this.onOpenClipMenu.bind(this)}
         onPlay={this.props.onPlay.bind(this)}
         onRemove={this.onRemove.bind(this)}
         onStartEdit={this.onStartEdit.bind(this)}
         onToggleSelect={this.onToggleSelect.bind(this)}
+        onToggleClip={this.onToggleClip.bind(this)}
         savePosition={this.savePosition.bind(this)}
         systemMessage={this.props.systemMessage.bind(this)}
       />

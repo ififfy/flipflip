@@ -9,6 +9,7 @@ export default class LibrarySource {
   lastCheck: Date = null;
   tags: Array<Tag> = [];
   clips: Array<Clip> = [];
+  disabledClips: Array<number> = [];
   blacklist: Array<string> = [];
   count: number = 0;
   countComplete: boolean = false;

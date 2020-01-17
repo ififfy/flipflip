@@ -179,10 +179,12 @@ export default class Meta extends React.Component {
             <VideoClipper
               allTags={this.state.tags}
               source={actions.getActiveSource(this.state)}
+              isLibrary={!actions.getActiveScene(this.state)}
               tutorial={this.state.tutorial}
               videoVolume={this.state.config.defaultScene.videoVolume}
               onTutorial={a(actions.doneTutorial)}
               onStartVCTutorial={a(actions.startVCTutorial)}
+              onSetDisabledClips={a(actions.setDisabledClips)}
               onUpdateClips={a(actions.onUpdateClips)}
               goBack={a(actions.goBack)}
               navigateClipping={a(actions.navigateClipping)}

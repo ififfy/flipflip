@@ -196,7 +196,9 @@ function loadVideo(systemMessage: Function, config: Config, source: LibrarySourc
       if (source.clips && source.clips.length > 0) {
         const clipPaths = Array<string>();
         for (let clip of source.clips) {
-          clipPaths.push(path[0] + ":::" + clip.start + ":" + clip.end);
+          if (!source.disabledClips || !source.disabledClips.includes(clip.id)) {
+            clipPaths.push(path[0] + ":::" + clip.start + ":" + clip.end);
+          }
         }
         path = clipPaths;
       }

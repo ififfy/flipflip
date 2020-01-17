@@ -67,12 +67,7 @@ export function getActiveGrid(state: State): SceneGrid | null {
 export function getActiveSource(state: State): LibrarySource | null {
   for (let r of state.route.slice().reverse()) {
     if (r.kind == 'clip') {
-      let source = state.library.find((s: LibrarySource) => s.url === r.value);
-      if (source) return source;
-      for (let scene of state.scenes) {
-        source = scene.sources.find((s: LibrarySource) => s.url === r.value);
-        if (source) return source;
-      }
+      return r.value;
     }
   }
   return null;
@@ -603,6 +598,7 @@ export function onUpdateClips(state: State, sourceURL: string, clips: Array<Clip
     const sceneSource = scene.sources.find((s) => s.url == sourceURL);
     if (sceneSource) {
       sceneSource.clips = clips;
+      sceneSource.disabledClips = sceneSource.disabledClips ? sceneSource.disabledClips.filter((n) => sceneSource.clips.find((c) => c.id == n)) : [];
     }
   }
   return {library: newLibrary, scenes: newScenes};
@@ -614,8 +610,20 @@ export function clipVideo(state: State, source: LibrarySource, displayed: Array<
   }
   return {
     displayedSources: displayed,
-    route: state.route.concat([new Route({kind: 'clip', value: source.url})])
+    route: state.route.concat([new Route({kind: 'clip', value: source})])
   };
+}
+
+export function setDisabledClips(state: State, disabled: Array<number>) {
+  const activeScene = getActiveScene(state);
+  if (activeScene) {
+    return updateScene(state, activeScene, (s) => {
+      const source = s.sources.find((ls) => ls.url == getActiveSource(state).url);
+      if (source) {
+        source.disabledClips = disabled;
+      }
+    })
+  }
 }
 
 export function navigateClipping(state: State, offset: number): Object {

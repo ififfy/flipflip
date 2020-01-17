@@ -12,6 +12,7 @@ import OfflineBoltIcon from '@material-ui/icons/OfflineBolt';
 
 import {getCachePath, getFileName, getSourceType, urlToPath} from "../../data/utils";
 import {SDT, ST} from "../../data/const";
+import Clip from "../../data/Clip";
 import Tag from "../../data/Tag";
 import SourceIcon from "./SourceIcon";
 import LibrarySource from "../../data/LibrarySource";
@@ -101,6 +102,7 @@ class SourceListItem extends React.Component {
     config: Config,
     index: number,
     isEditing: number,
+    isLibrary: boolean,
     isSelect: boolean,
     source: LibrarySource,
     sources: Array<LibrarySource>,
@@ -110,10 +112,12 @@ class SourceListItem extends React.Component {
     onClearBlacklist(sourceURL: string): void,
     onClip(source: LibrarySource, displaySources: Array<LibrarySource>): void,
     onEndEdit(newURL: string): void,
+    onOpenClipMenu(source: LibrarySource): void,
     onPlay(source: LibrarySource, displaySources: Array<LibrarySource>): void,
     onRemove(source: LibrarySource): void,
     onStartEdit(id: number): void,
     onToggleSelect(): void,
+    onToggleClip(source: LibrarySource, clip: Clip): void,
     savePosition(): void,
     systemMessage(message: string): void,
   };
@@ -212,7 +216,15 @@ class SourceListItem extends React.Component {
                   color="primary"
                   size="small"/>
               )}
-              {(this.props.source.clips && this.props.source.clips.length > 0 && getSourceType(this.props.source.url) == ST.video) && (
+              {(!this.props.isLibrary && this.props.source.clips && this.props.source.clips.length > 0 && getSourceType(this.props.source.url) == ST.video) && (
+                <Chip
+                  className={classes.countChip}
+                  label={(this.props.source.disabledClips ? this.props.source.clips.filter((c) => !this.props.source.disabledClips.includes(c.id)) : this.props.source.clips).length + "/" + this.props.source.clips.length}
+                  onClick={this.props.onOpenClipMenu.bind(this, this.props.source)}
+                  color="primary"
+                  size="small"/>
+              )}
+              {(this.props.isLibrary && this.props.source.clips && this.props.source.clips.length > 0 && getSourceType(this.props.source.url) == ST.video) && (
                 <Chip
                   className={classes.countChip}
                   label={this.props.source.clips.length}
