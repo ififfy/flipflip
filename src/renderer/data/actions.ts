@@ -80,9 +80,17 @@ export function getLibrarySource(state: State): LibrarySource | null {
   return state.library.find((s) => s.id == activeScene.libraryID);
 }
 
-export function getTags(library: Array<LibrarySource>, source: string): Array<Tag> {
+export function getTags(library: Array<LibrarySource>, source: string, clipID?: string): Array<Tag> {
   const librarySource = library.find((s) => s.url == source);
   if (librarySource) {
+    if (clipID) {
+      const clip = librarySource.clips.find((c) => c.id.toString() == clipID);
+      if (clip) {
+        if (clip.tags && clip.tags.length > 0) {
+          return clip.tags;
+        }
+      }
+    }
     return librarySource.tags;
   } else {
     return [];
@@ -746,143 +754,370 @@ export function generateScene(state: State, scene: Scene): Object {
   // Record all the groups we're requiring/excluding
   const allTags = newScene.generatorWeights.filter((wg) => wg.type == TT.all && !wg.rules).map((wg) => wg.tag);
   const noneTags = newScene.generatorWeights.filter((wg) => wg.type == TT.none && !wg.rules).map((wg) => wg.tag);
+  // Sources to require
   let reqAdvSources: Array<LibrarySource> = null;
+  // Sources to exclude
   let excAdvSources: Array<LibrarySource> = null;
 
-  // Build list of sources
+  // Build generator's list of sources
   let genSources = new Array<LibrarySource>();
 
   // First, build all our adv rules
-  for (let wg of newScene.generatorWeights) {
-    if (wg.rules) {
-      // Build this adv rule like a regular set of simple rules
-      // First get tags to require/exclude
-      const allTags = wg.rules.filter((wg) => wg.type == TT.all).map((wg) => wg.tag);
-      const noneTags = wg.rules.filter((wg) => wg.type == TT.none).map((wg) => wg.tag);
+  for (let wg of newScene.generatorWeights.filter((wg) => !!wg.rules)) {
+    // Build each adv rule like a regular set of simple rules
+    // First get tags to require/exclude
+    const allTags = wg.rules.filter((wg) => wg.type == TT.all).map((wg) => wg.tag);
+    const noneTags = wg.rules.filter((wg) => wg.type == TT.none).map((wg) => wg.tag);
 
-      let rulesSources = new Array<LibrarySource>();
-      // If we don't have any weights, calculate by just require/exclude
-      if (allTags.length + noneTags.length == wg.rules.length) {
-        const sources = state.library.filter((s) => {
-          for (let at of allTags) {
-            if (!s.tags.find((t) => t.id == at.id)) {
-              return false;
+    // Build this rule's list of sources
+    let rulesSources = new Array<LibrarySource>();
+
+    // If we don't have any weights, calculate by just require/exclude
+    if (allTags.length + noneTags.length == wg.rules.length) {
+      let sources = [];
+      // For each source in the library
+      for (let s of state.library) {
+        let addedClip = false;
+        let invalidClips = [];
+        // If this is a video with clips
+        if (getSourceType(s.url) == ST.video && s.clips && s.clips.length > 0) {
+          // Weight each clip first
+          for (let c of s.clips) {
+            // If clip is not tagged, default to source tags
+            let cTags = c.tags && c.tags.length > 0 ? c.tags : s.tags;
+            let b = false;
+
+            // Filter out clips which don't have allTags
+            for (let at of allTags) {
+              if (!cTags.find((t) => t.id == at.id)) {
+                invalidClips.push(c.id);
+                b = true;
+                break;
+              }
             }
-          }
-          for (let nt of noneTags) {
-            if (s.tags.find((t) => t.id == nt.id)) {
-              return false;
+            if (b) continue;
+
+            // Filter out clips which have noneTags
+            for (let nt of noneTags) {
+              if (cTags.find((t) => t.id == nt.id)) {
+                invalidClips.push(c.id);
+                b = true;
+                break;
+              }
             }
-          }
-          return true;
-        });
-        rulesSources = reduceList(sources, Math.round(newScene.generatorMax));
-      } else {
-        // Otherwise, generate sources for each weighted rule
-        for (let rule of wg.rules) {
-          if (rule.type == TT.weight) {
-            const sources = state.library.filter((s) => {
-              if (!s.tags.find((t) => t.id == rule.tag.id)) {
-                return false;
-              }
-              for (let at of allTags) {
-                if (!s.tags.find((t) => t.id == at.id)) {
-                  return false;
-                }
-              }
-              for (let nt of noneTags) {
-                if (s.tags.find((t) => t.id == nt.id)) {
-                  return false;
-                }
-              }
-              return true;
-            });
-            rulesSources = rulesSources.concat(reduceList(sources, Math.round(newScene.generatorMax * (rule.percent / 100))));
+            if (b) continue;
+
+            // If this clip is valid, mark as added
+            addedClip = true;
           }
         }
-      }
-      switch (wg.type) {
-        // If this adv rule is weighted, add the percentage of sources to the master list
-        case TT.weight:
-          genSources = genSources.concat(reduceList(rulesSources, Math.round(newScene.generatorMax * (wg.percent / 100))));
-          break;
-        // If this adv rule is all, add the sources to the require list
-        case TT.all:
-          if (!reqAdvSources) {
-            reqAdvSources = rulesSources;
-          } else {
-            reqAdvSources = reqAdvSources.filter((s) => !!rulesSources.find((source) => source.url == s.url));
+
+        // If we're not already adding a clip, check the source tags
+        if (!addedClip) {
+          let b = false;
+
+          // Filter out sources which don't have allTags
+          for (let at of allTags) {
+            if (!s.tags.find((t) => t.id == at.id)) {
+              b = true;
+              break;
+            }
           }
-          break;
-        // If this adv rule is none, add the sources to the excl list
-        case TT.none:
-          if (!excAdvSources) {
-            excAdvSources = rulesSources;
-          } else {
-            excAdvSources = excAdvSources.concat(rulesSources);
+          if (b) continue;
+
+          // Filter out sources which have noneTags
+          for (let nt of noneTags) {
+            if (s.tags.find((t) => t.id == nt.id)) {
+              b = true;
+              break;
+            }
           }
-          break;
+          if (b) continue;
+        } else {
+          // If we're adding a clip, mark invalid ones
+          s.disabledClips = invalidClips;
+        }
+        sources.push(s);
       }
+      rulesSources = sources;
+    } else {
+      // Otherwise, generate sources for each weighted rule
+      for (let rule of wg.rules) {
+        if (rule.type == TT.weight) {
+          let sources = [];
+          // For each source in the library
+          for (let s of state.library) {
+            let addedClip = false;
+            let invalidClips = [];
+            // If this is a video with clips
+            if (getSourceType(s.url) == ST.video && s.clips && s.clips.length > 0) {
+              // Weight each clip first
+              for (let c of s.clips) {
+                // If clip is not tagged, default to source tags
+                let cTags = c.tags && c.tags.length > 0 ? c.tags : s.tags;
+                let b = false;
+
+                // Filter out clips which don't have this tag
+                if (!cTags.find((t) => t.id == rule.tag.id)) {
+                  invalidClips.push(c.id);
+                  continue;
+                }
+
+                // Filter out clips which don't have allTags
+                for (let at of allTags) {
+                  if (!cTags.find((t) => t.id == at.id)) {
+                    invalidClips.push(c.id);
+                    b = true;
+                    break;
+                  }
+                }
+                if (b) continue;
+
+                // Filter out clips which have noneTags
+                for (let nt of noneTags) {
+                  if (cTags.find((t) => t.id == nt.id)) {
+                    invalidClips.push(c.id);
+                    b = true;
+                    break;
+                  }
+                }
+                if (b) continue;
+
+                // If this clip is valid, mark as added
+                addedClip = true;
+              }
+            }
+
+            // If we've not already added a clip, check the source tags
+            if (!addedClip) {
+              let b = false;
+
+              // Filter out sources which don't have this tag
+              if (!s.tags.find((t) => t.id == rule.tag.id)) {
+                continue
+              }
+
+              // Filter out sources which don't have allTags
+              for (let at of allTags) {
+                if (!s.tags.find((t) => t.id == at.id)) {
+                  b = true;
+                  break;
+                }
+              }
+              if (b) continue;
+
+              // Filter out sources which have noneTags
+              for (let nt of noneTags) {
+                if (s.tags.find((t) => t.id == nt.id)) {
+                  b = true;
+                  break;
+                }
+              }
+              if (b) continue;
+            } else {
+              // If we're adding a clip, mark invalid ones
+              s.disabledClips = invalidClips;
+            }
+            sources.push(s);
+          }
+          // Randomize list and reduce
+          rulesSources = rulesSources.concat(reduceList(randomizeList(sources), Math.round(newScene.generatorMax * (rule.percent / 100))));
+        }
+      }
+    }
+    switch (wg.type) {
+      // If this adv rule is weighted, add the percentage of sources to the master list
+      case TT.weight:
+        genSources = genSources.concat(reduceList(randomizeList(rulesSources), Math.round(newScene.generatorMax * (wg.percent / 100))));
+        break;
+      // If this adv rule is all, add the sources to the require list
+      case TT.all:
+        if (!reqAdvSources) {
+          reqAdvSources = rulesSources;
+        } else {
+          reqAdvSources = reqAdvSources.filter((s) => !!rulesSources.find((source) => source.url == s.url));
+        }
+        break;
+      // If this adv rule is none, add the sources to the excl list
+      case TT.none:
+        if (!excAdvSources) {
+          excAdvSources = rulesSources;
+        } else {
+          excAdvSources = excAdvSources.concat(rulesSources);
+        }
+        break;
     }
   }
 
   // Now, build our simple rules
   // If we don't have any weights, calculate by just require/exclude
   if (allTags.length + noneTags.length == newScene.generatorWeights.length) {
-    const sources = state.library.filter((s) => {
+    let sources = [];
+    for (let s of state.library) {
+      // Filter out sources which are not in required list
       if (reqAdvSources && !reqAdvSources.find((source) => source.id == s.id)) {
-        return false;
+        continue;
       }
-      if (excAdvSources && !excAdvSources.find((source) => source.id == s.id)) {
-        return false;
+      // Filter out sources which are in exclude list
+      if (excAdvSources && excAdvSources.find((source) => source.id == s.id)) {
+        continue;
       }
 
-      for (let at of allTags) {
-        if (!s.tags.find((t) => t.id == at.id)) {
-          return false;
+      let addedClip = false;
+      let invalidClips = [];
+      // If this is a video with clips
+      if (getSourceType(s.url) == ST.video && s.clips && s.clips.length > 0) {
+        // Weight each clip first
+        for (let c of s.clips) {
+          // If clip is not tagged, default to source tags
+          let cTags = c.tags && c.tags.length > 0 ? c.tags : s.tags;
+          let b = false;
+
+          // Filter out clips which don't have allTags
+          for (let at of allTags) {
+            if (!cTags.find((t) => t.id == at.id)) {
+              invalidClips.push(c.id);
+              b = true;
+              break;
+            }
+          }
+          if (b) continue;
+
+          // Filter out clips which have noneTags
+          for (let nt of noneTags) {
+            if (cTags.find((t) => t.id == nt.id)) {
+              invalidClips.push(c.id);
+              b = true;
+              break;
+            }
+          }
+          if (b) continue;
+
+          // If this clip is valid, mark as added
+          addedClip = true;
         }
       }
-      for (let nt of noneTags) {
-        if (s.tags.find((t) => t.id == nt.id)) {
-          return false;
+
+      // If we're not already adding a clip, check the source tags
+      if (!addedClip) {
+        let b = false;
+
+        // Filter out sources which don't have allTags
+        for (let at of allTags) {
+          if (!s.tags.find((t) => t.id == at.id)) {
+            b = true;
+            break;
+          }
         }
+        if (b) continue;
+
+        // Filter out sources which have noneTags
+        for (let nt of noneTags) {
+          if (s.tags.find((t) => t.id == nt.id)) {
+            b = true;
+            break;
+          }
+        }
+        if (b) continue;
+      } else {
+        // If we're adding a clip, mark invalid ones
+        s.disabledClips = invalidClips;
       }
-      return true;
-    });
-    genSources = reduceList(sources, Math.round(newScene.generatorMax));
+      sources.push(s);
+    }
+    genSources = sources;
   } else {
     // Otherwise, generate sources for each weight
-    for (let wg of newScene.generatorWeights) {
-      if (wg.rules) continue;
-      if (wg.type == TT.weight) {
-        const sources = state.library.filter((s) => {
+    for (let wg of newScene.generatorWeights.filter((wg) => !wg.rules && wg.type == TT.weight)) {
+      let sources = [];
+      // For each source in the library
+      for (let s of state.library) {
+        // Filter out sources which are not in required list
+        if (reqAdvSources && !reqAdvSources.find((source) => source.id == s.id)) {
+          continue;
+        }
+        // Filter out sources which are in exclude list
+        if (excAdvSources && excAdvSources.find((source) => source.id == s.id)) {
+          continue;
+        }
+
+        let addedClip = false;
+        let invalidClips = [];
+        // If this is a video with clips
+        if (getSourceType(s.url) == ST.video && s.clips && s.clips.length > 0) {
+          // Weight each clip first
+          for (let c of s.clips) {
+            // If clip is not tagged, default to source tags
+            let cTags = c.tags && c.tags.length > 0 ? c.tags : s.tags;
+            let b = false;
+
+            // Filter out clip which don't have this tag
+            if (!cTags.find((t) => t.id == wg.tag.id)) {
+              invalidClips.push(c.id);
+              continue;
+            }
+
+            // Filter out clips which don't have allTags
+            for (let at of allTags) {
+              if (!cTags.find((t) => t.id == at.id)) {
+                invalidClips.push(c.id);
+                b = true;
+                break;
+              }
+            }
+            if (b) continue;
+
+            // Filter out clips which have noneTags
+            for (let nt of noneTags) {
+              if (cTags.find((t) => t.id == nt.id)) {
+                invalidClips.push(c.id);
+                b = true;
+                break;
+              }
+            }
+            if (b) continue;
+
+            // If this clip is valid, mark as added
+            addedClip = true;
+          }
+        }
+
+        // If we're not already adding a clip, check the source tags
+        if (!addedClip) {
+          let b = false;
+
+          // Filter out sources which don't have this tag
           if (!s.tags.find((t) => t.id == wg.tag.id)) {
-            return false;
-          }
-          if (reqAdvSources && !reqAdvSources.find((source) => source.id == s.id)) {
-            return false;
-          }
-          if (excAdvSources && !excAdvSources.find((source) => source.id == s.id)) {
-            return false;
+            continue;
           }
 
+          // Filter out sources which don't have allTags
           for (let at of allTags) {
             if (!s.tags.find((t) => t.id == at.id)) {
-              return false;
+              b = true;
+              break;
             }
           }
+          if (b) continue;
+
+          // Filter out sources which have noneTags
           for (let nt of noneTags) {
             if (s.tags.find((t) => t.id == nt.id)) {
-              return false;
+              b = true;
+              break;
             }
           }
-          return true;
-        });
-        genSources = genSources.concat(reduceList(sources, Math.round(newScene.generatorMax * (wg.percent / 100))));
+          if (b) continue;
+        } else {
+          // If we're adding a clip, mark invalid ones
+          s.disabledClips = invalidClips;
+        }
+        sources.push(s);
       }
+      genSources = genSources.concat(reduceList(sources, Math.round(newScene.generatorMax * (wg.percent / 100))));
     }
   }
-  genSources = randomizeList(removeDuplicatesBy((s: LibrarySource) => s.url, genSources));
+  genSources = reduceList(randomizeList(removeDuplicatesBy((s: LibrarySource) => s.url, genSources)), newScene.generatorMax);
   genSources = JSON.parse(JSON.stringify(genSources));
   genSources.forEach((s, i) => s.id = i);
   return updateScene(state, scene, (s) => s.sources = genSources);
@@ -997,6 +1232,7 @@ export function setCount(state: State, sourceURL: string, count: number, countCo
 export function updateTags(state: State, tags: Array<Tag>): Object {
   // Go through each scene in the library
   let newLibrary = state.library;
+  let newScenes = state.scenes;
   const tagIDs = tags.map((t) => t.id);
   for (let source of newLibrary) {
     // Remove deleted tags, update any edited tags, and order the same as tags
@@ -1021,6 +1257,92 @@ export function updateTags(state: State, tags: Array<Tag>): Object {
         return 0;
       }
     });
+    if (source.clips) {
+      for (let clip of source.clips) {
+        // Remove deleted tags, update any edited tags, and order the same as tags
+        if (clip.tags) {
+          clip.tags = clip.tags.filter((t: Tag) => tagIDs.includes(t.id));
+        } else {
+          clip.tags = [];
+        }
+        clip.tags = clip.tags.map((t: Tag) => {
+          for (let tag of tags) {
+            if (t.id == tag.id) {
+              t.name = tag.name;
+              t.phraseString = tag.phraseString;
+              return t;
+            }
+          }
+        });
+        clip.tags = clip.tags.sort((a: Tag, b: Tag) => {
+          const aIndex = tagIDs.indexOf(a.id);
+          const bIndex = tagIDs.indexOf(b.id);
+          if (aIndex < bIndex) {
+            return -1;
+          } else if (aIndex > bIndex) {
+            return 1;
+          } else {
+            return 0;
+          }
+        });
+      }
+    }
+  }
+  for (let scene of newScenes) {
+    for (let source of scene.sources) {
+      // Remove deleted tags, update any edited tags, and order the same as tags
+      source.tags = source.tags.filter((t: Tag) => tagIDs.includes(t.id));
+      source.tags = source.tags.map((t: Tag) => {
+        for (let tag of tags) {
+          if (t.id == tag.id) {
+            t.name = tag.name;
+            t.phraseString = tag.phraseString;
+            return t;
+          }
+        }
+      });
+      source.tags = source.tags.sort((a: Tag, b: Tag) => {
+        const aIndex = tagIDs.indexOf(a.id);
+        const bIndex = tagIDs.indexOf(b.id);
+        if (aIndex < bIndex) {
+          return -1;
+        } else if (aIndex > bIndex) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+      if (source.clips) {
+        for (let clip of source.clips) {
+          // Remove deleted tags, update any edited tags, and order the same as tags
+          if (clip.tags) {
+            clip.tags = clip.tags.filter((t: Tag) => tagIDs.includes(t.id));
+          } else {
+            clip.tags = [];
+          }
+          clip.tags = clip.tags.map((t: Tag) => {
+            for (let tag of tags) {
+              if (t.id == tag.id) {
+                t.name = tag.name;
+                t.phraseString = tag.phraseString;
+                return t;
+              }
+            }
+          });
+          clip.tags = clip.tags.sort((a: Tag, b: Tag) => {
+            const aIndex = tagIDs.indexOf(a.id);
+            const bIndex = tagIDs.indexOf(b.id);
+            if (aIndex < bIndex) {
+              return -1;
+            } else if (aIndex > bIndex) {
+              return 1;
+            } else {
+              return 0;
+            }
+          });
+        }
+      }
+    }
   }
   return {tags: tags, library: newLibrary};
 }
@@ -1038,7 +1360,6 @@ export function toggleTag(state: State, sourceID: number, tag: Tag): Object {
       source.tags = source.tags.filter((t: Tag) => t.name != tag.name);
     } else {
       source.tags.push(tag);
-      source.tags[source.tags.length - 1].phraseString = "";
     }
     for (let scene of newScenes) {
       const sceneSource = scene.sources.find((s) => s.url == source.url);

@@ -41,9 +41,10 @@ export default class CaptionProgram extends React.Component {
     countFontFamily: string,
     url: string,
     currentSource: string,
+    currentClip: string,
     textEndStop: boolean,
     textNextScene: boolean,
-    getTags(source: string): Array<Tag>
+    getTags(source: string, clipID?: string): Array<Tag>
     goBack(): void,
     playNextScene(): void,
   };
@@ -244,7 +245,7 @@ export default class CaptionProgram extends React.Component {
         this.el.current.innerHTML = getRandomListItem(this.state.phrases);
       } else if (value == "$TAG_PHRASE") {
         if (this.props.currentSource) {
-          const tag = getRandomListItem(this.props.getTags(this.props.currentSource).filter((t) => t.phraseString && t.phraseString != ""));
+          const tag = getRandomListItem(this.props.getTags(this.props.currentSource, this.props.currentClip).filter((t) => t.phraseString && t.phraseString != ""));
           if (tag) {
             const phraseString = tag.phraseString;
             this.el.current.innerHTML = getRandomListItem(phraseString.split('\n'));

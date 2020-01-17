@@ -361,11 +361,12 @@ export default class ImagePlayer extends React.Component {
         video.setAttribute("index", urlIndex.toString());
         video.setAttribute("length", sourceLength.toString());
       }
-      let clipRegex = /(.*):::(\d+\.?\d*):(\d+\.?\d*)$/g.exec(url);
+      let clipRegex = /(.*):::(\d+):::(\d+\.?\d*):(\d+\.?\d*)$/g.exec(url);
       if (clipRegex != null) {
         url = clipRegex[1];
-        video.setAttribute("start", clipRegex[2]);
-        video.setAttribute("end", clipRegex[3]);
+        video.setAttribute("clip", clipRegex[2]);
+        video.setAttribute("start", clipRegex[3]);
+        video.setAttribute("end", clipRegex[4]);
       }
 
       const successCallback = () => {
