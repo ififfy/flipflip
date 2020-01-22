@@ -366,16 +366,18 @@ class VideoClipper extends React.Component {
                             </Fab>
                           </Tooltip>
                         </Grid>
-                        <Grid item>
-                          <Tooltip title="Delete Clip" placement="top">
-                            <Fab
-                              size="small"
-                              className={clsx(classes.fab, classes.removeFab, this.props.tutorial == VCT.clip && classes.disable)}
-                              onClick={this.onRemove.bind(this)}>
-                              <DeleteIcon color="inherit" />
-                            </Fab>
-                          </Tooltip>
-                        </Grid>
+                        {this.state.isEditing && this.props.source.clips.find((c) => c.id == this.state.isEditing.id) && (
+                          <Grid item>
+                            <Tooltip title="Delete Clip" placement="top">
+                              <Fab
+                                size="small"
+                                className={clsx(classes.fab, classes.removeFab, this.props.tutorial == VCT.clip && classes.disable)}
+                                onClick={this.onRemove.bind(this)}>
+                                <DeleteIcon color="inherit" />
+                              </Fab>
+                            </Tooltip>
+                          </Grid>
+                        )}
                         <Grid item>
                           <Tooltip title="Cancel" placement="top">
                             <IconButton
@@ -518,7 +520,7 @@ class VideoClipper extends React.Component {
     newClip.id = id;
     newClip.start = this.state.isEditingValue[0];
     newClip.end = this.state.isEditingValue[1];
-    newClip.tags = source.tags;
+    newClip.tags = source.tags.concat();
     this.setState({
       isEditing: newClip,
       isEditingValue: [0, this.state.video.duration],
@@ -572,20 +574,31 @@ class VideoClipper extends React.Component {
     const source = this.props.source;
     let clip = source.clips.find((c) => c.id === this.state.isEditing.id);
     this.state.isEditing.tags = source.tags;
-    clip.tags = source.tags;
-    this.props.onUpdateClips(source.url, source.clips);
+    if (clip) {
+      clip.tags = source.tags.concat();
+      this.props.onUpdateClips(source.url, source.clips);
+    }
   }
 
   toggleTag(tag: Tag) {
     const source = this.props.source;
     let clip = source.clips.find((c) => c.id === this.state.isEditing.id);
-    if (clip.tags.find((t) => t.name === tag.name)) {
-      clip.tags = clip.tags.filter((t) => t.name !== tag.name);
+    if (clip) {
+      if (clip.tags.find((t) => t.name === tag.name)) {
+        clip.tags = clip.tags.filter((t) => t.name !== tag.name);
+      } else {
+        clip.tags = clip.tags.concat([tag]);
+      }
+      this.props.onUpdateClips(source.url, source.clips);
     } else {
-      clip.tags = clip.tags.concat([tag]);
+      const isEditing = this.state.isEditing;
+      if (isEditing.tags.find((t) => t.name === tag.name)) {
+        isEditing.tags = isEditing.tags.filter((t) => t.name !== tag.name);
+      } else {
+        isEditing.tags = isEditing.tags.concat([tag]);
+      }
+      this.setState({isEditing: isEditing});
     }
-    this.state.isEditing.tags = clip.tags;
-    this.props.onUpdateClips(source.url, source.clips);
   }
 
   onRemove() {
