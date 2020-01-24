@@ -223,14 +223,15 @@ class SourceList extends React.Component {
     oldSources = oldSources.map((source: LibrarySource) => {
       const librarySource = this.props.isLibrary ? null : this.props.library.find((s) => s.url == newURL);
       if (source.id == this.state.isEditing) {
-        source.offline = false;
-        source.lastCheck = null;
+        const sourceChanged = source.url != newURL;
+        source.offline = sourceChanged ? false: source.offline;
+        source.lastCheck = sourceChanged ? null : source.lastCheck;
         source.url = newURL;
         source.tags = librarySource && librarySource.tags ? librarySource.tags : source.tags;
         source.clips = librarySource && librarySource.clips ? librarySource.clips : source.clips;
         source.blacklist = librarySource && librarySource.blacklist ? librarySource.blacklist : source.blacklist;
-        source.count = librarySource ? librarySource.count : 0;
-        source.countComplete = librarySource ? librarySource.countComplete : false;
+        source.count = librarySource ? librarySource.count : sourceChanged ? 0 : source.count;
+        source.countComplete = librarySource ? librarySource.countComplete : sourceChanged ? false : source.countComplete;
       }
       return source;
     });
