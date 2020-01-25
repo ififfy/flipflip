@@ -13,14 +13,16 @@ import {
   Tooltip
 } from "@material-ui/core";
 
-import {DisplaySettings} from "../../data/Config";
+import {DisplaySettings, GeneralSettings} from "../../data/Config";
 import {portablePath} from "../../data/utils";
 
 export default class PlayerBoolCard extends React.Component {
   readonly props: {
-    settings: DisplaySettings,
-    onUpdateSettings(fn: (settings: DisplaySettings) => void): void,
+    displaySettings: DisplaySettings,
+    generalSettings: GeneralSettings,
     onPortableOverride(): void,
+    onUpdateDisplaySettings(fn: (settings: DisplaySettings) => void): void,
+    onUpdateGeneralSettings(fn: (settings: GeneralSettings) => void): void,
   };
 
   readonly state = {
@@ -33,7 +35,7 @@ export default class PlayerBoolCard extends React.Component {
         <Grid item xs={12}>
           <FormControlLabel
             control={
-              <Switch checked={this.props.settings.alwaysOnTop}
+              <Switch checked={this.props.displaySettings.alwaysOnTop}
                       onChange={this.onBoolInput.bind(this, 'alwaysOnTop')}/>
             }
             label="Always On Top"/>
@@ -41,7 +43,7 @@ export default class PlayerBoolCard extends React.Component {
         <Grid item xs={12}>
           <FormControlLabel
             control={
-              <Switch checked={this.props.settings.showMenu}
+              <Switch checked={this.props.displaySettings.showMenu}
                       onChange={this.onBoolInput.bind(this, 'showMenu')}/>
             }
             label="Show Menu"/>
@@ -49,7 +51,7 @@ export default class PlayerBoolCard extends React.Component {
         <Grid item xs={12}>
           <FormControlLabel
             control={
-              <Switch checked={this.props.settings.fullScreen}
+              <Switch checked={this.props.displaySettings.fullScreen}
                       onChange={this.onBoolInput.bind(this, 'fullScreen')}/>
             }
             label="Fullscreen"/>
@@ -58,7 +60,7 @@ export default class PlayerBoolCard extends React.Component {
           <Tooltip title="If enabled, the player will start as soon as first image loads. If disabled, the player will load the first set of images from all sources before starting.">
             <FormControlLabel
               control={
-                <Switch checked={this.props.settings.startImmediately}
+                <Switch checked={this.props.displaySettings.startImmediately}
                         onChange={this.onBoolInput.bind(this, 'startImmediately')}/>
               }
               label="Start Immediately"/>
@@ -69,7 +71,7 @@ export default class PlayerBoolCard extends React.Component {
           <Tooltip title="Portable Mode will save a copy of your data in the same directory as the FlipFlip executable, as well as the default save path. This needs to be enabled on each machine.">
             <FormControlLabel
               control={
-                <Switch checked={this.props.settings.portableMode}
+                <Switch checked={this.props.generalSettings.portableMode}
                         onChange={this.onTogglePortable.bind(this)}/>
               }
               label="Portable Mode"/>
@@ -104,7 +106,7 @@ export default class PlayerBoolCard extends React.Component {
       // Ask whether to keep local or keep portable
       this.onToggleDialog();
     }
-    this.changeKey('portableMode', checked);
+    this.props.onUpdateGeneralSettings((s) => s.portableMode = checked);
   }
 
   onToggleDialog() {
@@ -127,6 +129,6 @@ export default class PlayerBoolCard extends React.Component {
   }
 
   update(fn: (settings: any) => void) {
-    this.props.onUpdateSettings(fn);
+    this.props.onUpdateDisplaySettings(fn);
   }
 }

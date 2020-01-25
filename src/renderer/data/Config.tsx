@@ -159,13 +159,20 @@ interface DisplaySettingsI {
   showMenu: boolean;
   fullScreen: boolean;
   startImmediately: boolean;
-  portableMode: boolean;
 
   minImageSize: number;
   minVideoSize: number;
   maxInMemory: number;
   maxLoadingAtOnce: number;
   maxInHistory: number;
+}
+
+interface GeneralSettingsI {
+  [key: string]: number | boolean;
+
+  portableMode: boolean;
+  autoBackup: boolean;
+  autoBackupDays: number;
 }
 
 interface TutorialsI {
@@ -348,13 +355,20 @@ export class DisplaySettings  implements DisplaySettingsI {
   showMenu = true;
   fullScreen = false;
   startImmediately = false;
-  portableMode = false;
 
   minVideoSize = 200;
   minImageSize = 200;
   maxInMemory = 120;
   maxLoadingAtOnce = 5;
   maxInHistory = 500;
+}
+
+export class GeneralSettings  implements GeneralSettingsI {
+  [key: string]: number | boolean;
+
+  portableMode = false;
+  autoBackup = false;
+  autoBackupDays = 1;
 }
 
 export class Tutorials implements TutorialsI {
@@ -374,14 +388,13 @@ export default class Config {
   remoteSettings = new RemoteSettings();
   caching = new CacheSettings();
   displaySettings = new DisplaySettings();
+  generalSettings = new GeneralSettings();
   tutorials = new Tutorials();
   clientID = "";
   newWindowAlerted = false;
 
   constructor(init?: Partial<Config>) {
     Object.assign(this, init);
-
-    if (this.defaultScene.overlaySceneID != 0) this.defaultScene.overlaySceneID = 0;
 
     // Add any missing keys (keeps config up-to-date)
     for (let key of Object.keys(new SceneSettings())) {
@@ -404,10 +417,21 @@ export default class Config {
         this.displaySettings[key] = new DisplaySettings()[key];
       }
     }
+    for (let key of Object.keys(new GeneralSettings())) {
+      if (this.generalSettings[key] == null) {
+        this.generalSettings[key] = new GeneralSettings()[key];
+      }
+    }
     for (let key of Object.keys(new Tutorials())) {
       if (this.tutorials[key] == null) {
         this.tutorials[key] = new Tutorials()[key];
       }
+    }
+
+    if (this.defaultScene && this.defaultScene.overlaySceneID != 0) this.defaultScene.overlaySceneID = 0;
+    if (this.displaySettings && (this.displaySettings as any).portableMode == true) {
+      (this.displaySettings as any).portableMode = undefined;
+      this.generalSettings.portableMode = true;
     }
   }
 }

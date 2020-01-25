@@ -19,7 +19,7 @@ import RestoreIcon from '@material-ui/icons/Restore';
 import SettingsIcon from '@material-ui/icons/Settings';
 
 import {MO} from "../../data/const";
-import Config, {CacheSettings, DisplaySettings, RemoteSettings, SceneSettings} from "../../data/Config";
+import Config, { CacheSettings, DisplaySettings, GeneralSettings, RemoteSettings, SceneSettings } from "../../data/Config";
 import Scene from "../../data/Scene";
 import GeneralConfig from "./GeneralConfig";
 import SceneOptions from "../sceneDetail/SceneOptions";
@@ -369,6 +369,7 @@ class ConfigForm extends React.Component {
                       onToggleDarkMode={this.props.onToggleDarkMode.bind(this)}
                       onUpdateCachingSettings={this.onUpdateCachingSettings.bind(this)}
                       onUpdateConfig={this.onUpdateConfig.bind(this)}
+                      onUpdateGeneralSettings={this.onUpdateGeneralSettings.bind(this)}
                       onUpdateDisplaySettings={this.onUpdateDisplaySettings.bind(this)}
                       onUpdateRemoteSettings={this.onUpdateRemoteSettings.bind(this)} />
                   </Box>
@@ -473,11 +474,18 @@ class ConfigForm extends React.Component {
     const newConfig = this.props.config;
     fn(newConfig);
     this.props.onUpdateConfig(newConfig);
+    this.setState({config: newConfig, changeMade: false});
   }
 
   onUpdateDefaultScene(defualtScene: SceneSettings, fn: (settings: SceneSettings) => void) {
     const newConfig = this.state.config;
     fn(newConfig.defaultScene);
+    this.setState({config: newConfig, changeMade: true});
+  }
+
+  onUpdateGeneralSettings(fn: (keys: GeneralSettings) => void) {
+    const newConfig = this.state.config;
+    fn(newConfig.generalSettings);
     this.setState({config: newConfig, changeMade: true});
   }
 

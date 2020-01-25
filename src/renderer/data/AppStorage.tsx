@@ -1,6 +1,6 @@
 import { mkdirSync, existsSync, readFileSync, renameSync, writeFileSync } from 'fs';
 
-import {portablePath, removeDuplicatesBy, saveDir, savePath} from "./utils";
+import {getBackups, portablePath, removeDuplicatesBy, saveDir, savePath} from "./utils";
 import { Route } from './Route';
 import {TT} from "./const";
 import LibrarySource from '../data/LibrarySource';
@@ -361,6 +361,19 @@ export default class AppStorage {
       writeFileSync(this.savePath, JSON.stringify(state), 'utf-8');
       if (state.config.displaySettings.portableMode) {
         writeFileSync(portablePath, JSON.stringify(state), 'utf-8');
+      }
+    }
+
+    if (state.config.generalSettings.autoBackup) {
+      const backups = getBackups();
+      if (backups.length == 0) {
+        this.backup();
+      } else {
+        const lastBackup = backups[0];
+        const epoch = parseInt(lastBackup.url.substring(lastBackup.url.lastIndexOf(".") + 1));
+        if (Date.now()  - epoch > (86400000 * state.config.generalSettings.autoBackupDays)) {
+          this.backup();
+        }
       }
     }
 

@@ -2,7 +2,7 @@ import * as React from "react";
 
 import {Card, CardContent, Grid, Theme} from "@material-ui/core";
 
-import Config, {CacheSettings, DisplaySettings, RemoteSettings} from "../../data/Config";
+import Config, {CacheSettings, DisplaySettings, GeneralSettings, RemoteSettings} from "../../data/Config";
 import PlayerBoolCard from "../configGroups/PlayerBoolCard";
 import PlayerNumCard from "../configGroups/PlayerNumCard";
 import CacheCard from "../configGroups/CacheCard";
@@ -22,6 +22,7 @@ export default class GeneralConfig extends React.Component {
     onToggleDarkMode(): void,
     onUpdateCachingSettings(fn: (settings: CacheSettings) => void): void,
     onUpdateDisplaySettings(fn: (settings: DisplaySettings) => void): void,
+    onUpdateGeneralSettings(fn: (settings: GeneralSettings) => void): void,
     onUpdateRemoteSettings(fn: (settings: RemoteSettings) => void): void,
     onUpdateConfig(fn: (config: Config) => void): void,
   };
@@ -33,9 +34,11 @@ export default class GeneralConfig extends React.Component {
           <Card>
             <CardContent>
               <PlayerBoolCard
-                settings={this.props.config.displaySettings}
+                displaySettings={this.props.config.displaySettings}
+                generalSettings={this.props.config.generalSettings}
                 onPortableOverride={this.props.onPortableOverride.bind(this)}
-                onUpdateSettings={this.props.onUpdateDisplaySettings.bind(this)}/>
+                onUpdateDisplaySettings={this.props.onUpdateDisplaySettings.bind(this)}
+                onUpdateGeneralSettings={this.props.onUpdateGeneralSettings.bind(this)}/>
             </CardContent>
           </Card>
         </Grid>
@@ -75,9 +78,11 @@ export default class GeneralConfig extends React.Component {
           <Card>
             <CardContent>
               <BackupCard
+                settings={this.props.config.generalSettings}
                 onBackup={this.props.onBackup.bind(this)}
                 onRestore={this.props.onRestore.bind(this)}
-                onClean={this.props.onClean.bind(this)}/>
+                onClean={this.props.onClean.bind(this)}
+                onUpdateSettings={this.props.onUpdateGeneralSettings.bind(this)}/>
             </CardContent>
           </Card>
         </Grid>

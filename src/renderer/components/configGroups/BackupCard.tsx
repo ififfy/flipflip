@@ -4,7 +4,8 @@ import clsx from "clsx";
 
 import {
   Button, Chip, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl,
-  Grid, InputLabel, MenuItem, Select, Slide, Snackbar, SnackbarContent, Theme, withStyles
+  FormControlLabel, Grid, InputLabel, MenuItem, Select, Slide, Snackbar, SnackbarContent, Switch, TextField,
+  Theme, withStyles
 } from "@material-ui/core";
 
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
@@ -15,6 +16,7 @@ import SaveIcon from '@material-ui/icons/Save';
 
 import {getBackups, saveDir} from "../../data/utils";
 import {MO} from "../../data/const";
+import {GeneralSettings} from "../../data/Config";
 
 const styles = (theme: Theme) => createStyles({
   buttonGrid: {
@@ -47,9 +49,11 @@ const styles = (theme: Theme) => createStyles({
 class BackupCard extends React.Component {
   readonly props: {
     classes: any,
+    settings: GeneralSettings,
     onBackup(): void,
     onClean(): void,
     onRestore(backupFile: string): void,
+    onUpdateSettings(fn: (settings: GeneralSettings) => void): void,
   };
 
   readonly state = {
@@ -67,6 +71,26 @@ class BackupCard extends React.Component {
     const hasBackup = this.state.backups.length > 0;
     return(
       <React.Fragment>
+        <Grid container spacing={2} alignItems="center" justify="center" className={classes.chipGrid}>
+          <Grid item xs={"auto"} className={classes.buttonGrid}>
+            <FormControlLabel
+              control={
+                <Switch checked={this.props.settings.autoBackup}
+                        onChange={this.onBoolInput.bind(this, 'autoBackup')}/>
+              }
+              label="Auto Backup"/>
+          </Grid>
+          <Grid item xs={"auto"} className={classes.buttonGrid}>
+            <TextField
+              value={this.props.settings.autoBackupDays}
+              onChange={this.onIntInput.bind(this, 'autoBackupDays')}
+              onBlur={this.blurIntKey.bind(this, 'autoBackupDays')}
+              inputProps={{
+                min: 1,
+                type: 'number',
+              }}/>
+          </Grid>
+        </Grid>
         <Grid container spacing={2} alignItems="center" justify="center">
           <Grid item xs={"auto"} className={classes.buttonGrid}>
             <Button
@@ -319,6 +343,39 @@ class BackupCard extends React.Component {
 
   onCloseDialog() {
     this.setState({openMenu: null});
+  }
+
+  blurIntKey(key: string, e: MouseEvent) {
+    const min = (e.currentTarget as any).min ? (e.currentTarget as any).min : null;
+    const max = (e.currentTarget as any).max ? (e.currentTarget as any).max : null;
+    if (min && (this.props.settings as any)[key] < min) {
+      this.changeIntKey(key, min);
+    } else if (max && (this.props.settings as any)[key] > max) {
+      this.changeIntKey(key, max);
+    }
+  }
+
+  onIntInput(key: string, e: MouseEvent) {
+    const input = (e.target as HTMLInputElement);
+    this.changeKey(key, input.value === '' ? '' : Number(input.value));
+  }
+
+  changeIntKey(key:string, intString: string) {
+    this.changeKey(key, intString === '' ? '' : Number(intString));
+  }
+
+  onBoolInput(key: string, e: MouseEvent) {
+    const input = (e.target as HTMLInputElement);
+    const checked = input.checked;
+    this.changeKey(key, checked);
+  }
+
+  changeKey(key: string, value: any) {
+    this.update((s) => s[key] = value);
+  }
+
+  update(fn: (scene: any) => void) {
+    this.props.onUpdateSettings(fn);
   }
 }
 
