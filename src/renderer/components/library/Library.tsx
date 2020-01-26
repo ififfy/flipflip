@@ -23,6 +23,7 @@ import GetAppIcon from '@material-ui/icons/GetApp';
 import HttpIcon from '@material-ui/icons/Http';
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import MenuIcon from'@material-ui/icons/Menu';
+import MergeTypeIcon from '@material-ui/icons/MergeType';
 import MovieIcon from '@material-ui/icons/Movie';
 import OfflineBoltIcon from '@material-ui/icons/OfflineBolt';
 import PublishIcon from '@material-ui/icons/Publish';
@@ -470,6 +471,12 @@ class Library extends React.Component {
               </ListItemIcon>
               <ListItemText primary="Batch Tag" />
             </ListItem>
+            <ListItem button onClick={this.onFindMerges.bind(this)}>
+              <ListItemIcon>
+                <MergeTypeIcon />
+              </ListItemIcon>
+              <ListItemText primary="Find Mergeables" />
+            </ListItem>
           </div>
 
           {remoteAuthorized && (
@@ -853,6 +860,51 @@ class Library extends React.Component {
     this.props.onBatchTag();
   }
 
+  onFindMerges() {
+    this.onUpdateFilters(["<Mergeable>"]);
+  }
+
+  getMerges() {
+    let merges: Array<LibrarySource> = [];
+    let remainingLibrary = this.props.library.filter((ls) => getSourceType(ls.url) == ST.local && ls.tags.length > 0);
+    // While we still have sources left to check
+    while (remainingLibrary.length > 0) {
+      // Grab the first source in the list
+      const source = remainingLibrary.splice(0, 1)[0];
+      let matches = [source];
+
+      // For the rest of the sources
+      for (let rs of remainingLibrary) {
+        // Compare tags
+        if (rs.tags.length == source.tags.length) {
+          let hasAllTags = true;
+          const tagNames = source.tags.map((t) => t.name);
+          for (let tag of rs.tags) {
+            if (!tagNames.includes(tag.name)) {
+              hasAllTags = false;
+            }
+          }
+          // If the tags are the same, add to matches
+          if (hasAllTags) {
+            matches.push(rs);
+          }
+        }
+      }
+      // If we've found matches
+      if (matches.length > 1) {
+        for (let m of matches) {
+          if (m != source) {
+            // Remove them from the remaining library
+            remainingLibrary.splice(remainingLibrary.indexOf(m), 1);
+          }
+        }
+        // Add to the master lit of mergeables
+        merges = merges.concat(matches);
+      }
+    }
+    return merges;
+  }
+
   goBack() {
     if (this.props.isBatchTag) {
       this.setState({selected: [], selectedTags: []});
@@ -1046,11 +1098,14 @@ class Library extends React.Component {
     let displaySources = [];
     const filtering = this.state.filters.length > 0;
     if (filtering) {
-      for (let source of this.props.library) {
+      const mergeSources = this.state.filters.includes("<Mergeable>") ? this.getMerges() : null;
+      for (let source of mergeSources ? mergeSources : this.props.library) {
         let matchesFilter = true;
         let countRegex;
         for (let filter of this.state.filters) {
-          if (filter == "<Offline>") { // This is offline filter
+          if (filter == "<Mergeable>") {
+            matchesFilter = mergeSources.includes(source);
+          } else if (filter == "<Offline>") { // This is offline filter
             matchesFilter = source.offline;
           } else if (filter == "<Marked>") { // This is a marked filter
             matchesFilter = source.marked;
