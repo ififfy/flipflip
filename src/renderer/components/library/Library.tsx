@@ -701,7 +701,7 @@ class Library extends React.Component {
                 </React.Fragment>
               )}
             </Dialog>
-            <Tooltip title="Local Video/Playlist"  placement="left">
+            <Tooltip title={this.state.filters.length > 0 ? "" : "Local Video/Playlist"}  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addVideoButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
                 onClick={this.onAddSource.bind(this, AF.videos)}
@@ -709,7 +709,7 @@ class Library extends React.Component {
                 <MovieIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip title="Local Directory"  placement="left">
+            <Tooltip title={this.state.filters.length > 0 ? "" : "Local Directory"}  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addDirectoryButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
                 onClick={this.onAddSource.bind(this, AF.directory)}
@@ -717,7 +717,7 @@ class Library extends React.Component {
                 <FolderIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip title="URL"  placement="left">
+            <Tooltip title={this.state.filters.length > 0 ? "" : "URL"}  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addURLButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
                 onClick={this.onAddSource.bind(this, AF.url)}
@@ -1131,15 +1131,18 @@ class Library extends React.Component {
             const all = countRegex[1] == "+";
             const symbol = countRegex[2];
             const value = parseInt(countRegex[3]);
+            const type = getSourceType(source.url);
+            const count = type == ST.video ? source.clips.length : source.count;
+            const countComplete = type == ST.video ? true : source.countComplete;
             switch (symbol) {
               case "=":
-                matchesFilter = (all || source.countComplete) && source.count == value;
+                matchesFilter = (all || countComplete) && count == value;
                 break;
               case ">":
-                matchesFilter = (all || source.countComplete) && source.count > value;
+                matchesFilter = (all || countComplete) && count > value;
                 break;
               case "<":
-                matchesFilter = (all || source.countComplete) && source.count < value;
+                matchesFilter = (all || countComplete) && count < value;
                 break;
             }
           } else { // This is a search filter
