@@ -20,7 +20,7 @@ import {
   getSourceType,
   isImage,
   isVideo,
-  isImageOrVideo, randomizeList,
+  isImageOrVideo, randomizeList, isVideoPlaylist,
 } from "../../data/utils";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
@@ -730,11 +730,16 @@ function loadTwitter(systemMessage: Function, config: Config, source: LibrarySou
           if (/href="https?:\/\/(fancentro\.com|onlyfans\.com|mykink\.xxx)\/?"/.exec(t.source) != null) continue;
           if (t.extended_entities && t.extended_entities.media) {
             for (let m of t.extended_entities.media) {
+              let url;
               if (m.video_info) {
-                images.push(m.video_info.variants[0].url);
+                url = m.video_info.variants[0].url;
               } else {
-                images.push(m.media_url);
+                url = m.media_url;
               }
+              if (url.includes("?")) {
+                url = url.substring(0, url.lastIndexOf("?"));
+              }
+              images.push(url);
             }
           } else if (t.entities.media) {
             for (let m of t.entities.media) {
