@@ -1529,6 +1529,7 @@ function addSources(originalSources: Array<LibrarySource>, newSources: Array<str
     combinedSources.unshift(new LibrarySource({
       url: url,
       id: id,
+      lastCheck: new Date(),
       tags: librarySource ? librarySource.tags : [],
       clips: librarySource ? librarySource.clips : [],
       blacklist: librarySource ? librarySource.blacklist : [],
@@ -1853,97 +1854,121 @@ export function setMode(state: State, mode: string): Object {
 }
 
 export function markOffline(getState: () => State, setState: Function) {
+  const win = remote.getCurrentWindow();
+  const state = getState();
+  const actionableLibrary = state.library.filter((ls) => {
+    if (ls.url.startsWith("http://") || ls.url.startsWith("https://")) {
+      // If this link was checked within the last week, skip
+      return new Date().getTime() - new Date(ls.lastCheck).getTime() >= 604800000;
+    }
+    return true;
+  });
+
   const offlineLoop = () => {
     const state = getState();
     const offset = state.progressCurrent;
     if (state.progressMode == PR.cancel) {
+      win.setProgressBar(-1);
       setState({progressMode: null, progressCurrent: 0, progressTotal: 0, progressTitle: ""});
-    } else if (state.library.length == offset) {
+    } else if (actionableLibrary.length == offset) {
+      win.setProgressBar(-1);
       setState({
-        systemSnack: "Offline Check has completed. Remote sources not available are now marked.",
+        systemSnack: "Offline Check has completed. Sources not available are now marked.",
         progressMode: null,
         progressCurrent: 0,
         progressTotal: 0,
         progressTitle: ""
       });
-    } else if (state.library[offset].url.startsWith("http://") ||
-      state.library[offset].url.startsWith("https://")) {
-      state.progressTitle = state.library[offset].url;
+    } else if (actionableLibrary[offset].url.startsWith("http://") ||
+      actionableLibrary[offset].url.startsWith("https://")) {
+      const actionSource = actionableLibrary[offset];
+      state.progressTitle = actionSource.url;
       setState({progressTitle: state.progressTitle});
-      const lastCheck = state.library[offset].lastCheck;
-      if (lastCheck != null) {
-        // If this link was checked within the last week, skip
-        if (new Date().getTime() - new Date(lastCheck).getTime() < 604800000) {
-          state.progressCurrent = offset + 1;
-          setState({progressCurrent: state.progressCurrent});
-          setTimeout(offlineLoop, 100);
-          return;
-        }
-      }
 
-      state.library[offset].lastCheck = new Date();
-      wretch(state.library[offset].url)
-        .get()
-        .notFound((res) => {
-          state.library[offset].offline = true;
-          state.progressCurrent = offset + 1;
-          setState({progressCurrent: state.progressCurrent});
-          setTimeout(offlineLoop, 1000);
-        })
-        .res((res) => {
-          state.library[offset].offline = false;
-          state.progressCurrent = offset + 1;
-          setState({progressCurrent: state.progressCurrent});
-          setTimeout(offlineLoop, 1000);
-        })
-        .catch((e) => {
-          console.error(e);
-          state.library[offset].lastCheck = null;
-          state.progressCurrent = offset + 1;
-          setState({progressCurrent: state.progressCurrent});
-          setTimeout(offlineLoop, 100);
-        });
+      const librarySource = state.library.find((s) => s.url == actionSource.url);
+      if (librarySource) {
+        console.log("Checking " + actionSource.url + " (" + state.progressCurrent + "/" + state.progressTotal + ")");
+        librarySource.lastCheck = new Date();
+        wretch(librarySource.url)
+          .get()
+          .notFound((res) => {
+            librarySource.offline = true;
+            state.progressCurrent = offset + 1;
+            setState({progressCurrent: state.progressCurrent});
+            win.setProgressBar(state.progressCurrent / state.progressTotal);
+            setTimeout(offlineLoop, 1000);
+          })
+          .res((res) => {
+            librarySource.offline = false;
+            state.progressCurrent = offset + 1;
+            setState({progressCurrent: state.progressCurrent});
+            win.setProgressBar(state.progressCurrent / state.progressTotal);
+            setTimeout(offlineLoop, 1000);
+          })
+          .catch((e) => {
+            console.error(e);
+            librarySource.lastCheck = null;
+            state.progressCurrent = offset + 1;
+            setState({progressCurrent: state.progressCurrent});
+            win.setProgressBar(state.progressCurrent / state.progressTotal);
+            setTimeout(offlineLoop, 100);
+          });
+      } else {
+        // Skip if removed from library during check
+        state.progressCurrent = offset + 1;
+        setState({progressCurrent: state.progressCurrent});
+        win.setProgressBar(state.progressCurrent / state.progressTotal);
+        setTimeout(offlineLoop, 100);
+      }
     } else {
-      state.progressTitle = state.library[offset].url;
+      const actionSource = actionableLibrary[offset];
+      state.progressTitle = actionSource.url;
       state.progressCurrent = offset + 1;
       setState({progressTitle: state.progressTitle, progressCurrent: state.progressCurrent});
-      state.library[offset].lastCheck = new Date();
-      const exists = existsSync(state.library[offset].url);
+      win.setProgressBar(state.progressCurrent / state.progressTotal);
+
+      console.log("Checking " + actionSource.url + " (" + state.progressCurrent + "/" + state.progressTotal + ")");
+
+      actionSource.lastCheck = new Date();
+      const exists = existsSync(actionSource.url);
       if (!exists) {
-        state.library[offset].offline = true;
+        actionSource.offline = true;
       }
-      setTimeout(offlineLoop, 100);
+      setTimeout(offlineLoop, 10);
     }
   };
 
   // If we don't have an import running
-  const state = getState();
   if (!state.progressMode) {
     state.progressMode = PR.offline;
     state.progressCurrent = 0;
-    state.progressTotal = state.library.length;
+    state.progressTotal = actionableLibrary.length;
     setState({
       progressMode: state.progressMode,
       progressCurrent: state.progressCurrent,
       progressTotal: state.progressTotal,
     });
+    win.setProgressBar(state.progressCurrent / state.progressTotal);
     offlineLoop();
   }
 }
 
 export function importTumblr(getState: () => State, setState: Function) {
   let client: TumblrClient;
+  const win = remote.getCurrentWindow();
   // Define our loop
   const tumblrImportLoop = () => {
     const state = getState();
     const offset = state.progressCurrent;
     if (state.progressMode == PR.cancel) {
+      win.setProgressBar(-1);
       setState({progressMode: null, progressCurrent: 0, progressTotal: 0});
       return;
     }
     // Get the next page of blogs
     client.userFollowing({offset: offset}, (err, data) => {
       if (err) {
+        win.setProgressBar(-1);
         setState({systemMessage: "Error retrieving following: " + err, progressMode: null, progressCurrent: 0, progressTotal: 0});
         console.error(err);
         return;
@@ -1985,11 +2010,13 @@ export function importTumblr(getState: () => State, setState: Function) {
 
       // Update progress
       setState({progressCurrent: nextOffset});
+      win.setProgressBar(nextOffset / state.progressTotal);
 
       // Loop until we run out of blogs
       if ((nextOffset) < state.progressTotal) {
         setTimeout(tumblrImportLoop, 1500);
       } else {
+        win.setProgressBar(-1);
         setState({systemSnack: "Tumblr Following Import has completed", progressMode: null, progressCurrent: 0, progressTotal: 0});
       }
     });
@@ -2009,6 +2036,7 @@ export function importTumblr(getState: () => State, setState: Function) {
     // Make the first call just to check the total blogs
     client.userFollowing({limit: 0}, (err, data) => {
       if (err) {
+        win.setProgressBar(-1);
         setState({systemMessage: "Error retrieving following: " + err, progressMode: null, progressCurrent: 0, progressTotal: 0});
         console.error(err);
         return;
@@ -2022,6 +2050,7 @@ export function importTumblr(getState: () => State, setState: Function) {
         progressCurrent: state.progressCurrent,
         progressTotal: state.progressTotal,
       });
+      win.setProgressBar(state.progressCurrent / state.progressTotal);
       tumblrImportLoop();
     });
   }
@@ -2029,14 +2058,17 @@ export function importTumblr(getState: () => State, setState: Function) {
 
 export function importReddit(getState: () => State, setState: Function) {
   let reddit: any;
+  const win = remote.getCurrentWindow();
   const redditImportLoop = () => {
     const state = getState();
     if (state.progressMode == PR.cancel) {
+      win.setProgressBar(-1);
       setState({progressMode: null, progressNext: null, progressCurrent: 0});
       return;
     }
     reddit.getSubscriptions({limit: 20, after: state.progressNext}).then((subscriptionListing: any) => {
       if (subscriptionListing.length == 0) {
+        win.setProgressBar(-1);
         setState({systemSnack: "Reddit Subscription Import has completed", progressMode: null, progressNext: null, progressCurrent: 0});
       } else {
         // Get the next 20 blogs
@@ -2073,9 +2105,11 @@ export function importReddit(getState: () => State, setState: Function) {
         state.progressNext = subscriptionListing[subscriptionListing.length - 1].name;
         state.progressCurrent = state.progressCurrent + 1;
         setState({progressNext: state.progressNext, progressCurrent: state.progressCurrent});
+        win.setProgressBar(2);
       }
     }).catch((err: any) => {
       console.error(err);
+      win.setProgressBar(-1);
       setState({systemMessage: "Error retrieving subscriptions: " + err, progressMode: null, progressNext: null, progressCurrent: 0});
     });
   };
@@ -2096,15 +2130,18 @@ export function importReddit(getState: () => State, setState: Function) {
       systemSnack: "Your Reddit subscriptions are being imported... You will recieve an alert when the import is finished.",
       progressMode: state.progressMode, progressCurrent: state.progressCurrent
     });
+    win.setProgressBar(2);
     redditImportLoop();
   }
 }
 
 export function importTwitter(getState: () => State, setState: Function) {
   let twitter: any;
+  const win = remote.getCurrentWindow();
   const twitterImportLoop = () => {
     const state = getState();
     if (state.progressMode == PR.cancel) {
+      win.setProgressBar(-1);
       setState({progressMode: null, progressNext: null, progressCurrent: 0});
       return;
     }
@@ -2115,6 +2152,7 @@ export function importTwitter(getState: () => State, setState: Function) {
           message = message + "\n" + e.code + " - " + e.message;
           console.error("Error retrieving following: " + e.code + " - " + e.message);
         }
+        win.setProgressBar(-1);
         setState({systemMessage: message, progressMode: null, progressNext: null, progressCurrent: 0});
         return;
       }
@@ -2149,6 +2187,7 @@ export function importTwitter(getState: () => State, setState: Function) {
       setState({library: newLibrary});
 
       if (data.next_cursor == 0) { // We're done
+        win.setProgressBar(-1);
         setState({systemSnack: "Twitter Following Import has completed", progressMode: null, progressNext: null, progressCurrent: 0});
       } else {
         // Loop until we run out of blogs
@@ -2156,6 +2195,7 @@ export function importTwitter(getState: () => State, setState: Function) {
         state.progressNext = data.next_cursor;
         state.progressCurrent = state.progressCurrent + 1;
         setState({progressNext: state.progressNext, progressCurrent: state.progressCurrent});
+        win.setProgressBar(2);
       }
     });
   };
@@ -2176,6 +2216,7 @@ export function importTwitter(getState: () => State, setState: Function) {
       systemSnack: "Your Twitter Following is being imported... You will recieve an alert when the import is finished.",
       progressMode: state.progressMode, progressCurrent: state.progressCurrent
     });
+    win.setProgressBar(2);
     twitterImportLoop();
   }
 }
@@ -2183,6 +2224,7 @@ export function importTwitter(getState: () => State, setState: Function) {
 let ig: IgApiClient = null;
 let session: any = null;
 export function importInstagram(getState: () => State, setState: Function) {
+  const win = remote.getCurrentWindow();
   const processItems = (items: any, next: any) => {
     let following = [];
     for (let account of items) {
@@ -2217,9 +2259,11 @@ export function importInstagram(getState: () => State, setState: Function) {
     state.progressNext = next;
     state.progressCurrent = state.progressCurrent + 1;
     setState({progressNext: state.progressNext, progressCurrent: state.progressCurrent});
+    win.setProgressBar(2);
   };
 
   const error = (error: string) => {
+    win.setProgressBar(-1);
     setState({systemMessage: error, progressMode: null, progressNext: null, progressCurrent: 0});
     console.error(error);
     ig = null;
@@ -2229,6 +2273,7 @@ export function importInstagram(getState: () => State, setState: Function) {
   const instagramImportLoop = () => {
     const state = getState();
     if (state.progressMode == PR.cancel) {
+      win.setProgressBar(-1);
       setState({progressMode: null, progressNext: null, progressCurrent: 0});
       return;
     }
@@ -2252,6 +2297,7 @@ export function importInstagram(getState: () => State, setState: Function) {
         followingFeed.deserialize(feedSession);
         if (!followingFeed.isMoreAvailable()) {
           ig = null;
+          win.setProgressBar(-1);
           setState({systemSnack: "Instagram Following Import has completed", progressMode: null, progressNext: null, progressCurrent: 0});
           return;
         }
@@ -2271,6 +2317,7 @@ export function importInstagram(getState: () => State, setState: Function) {
       systemSnack: "Your Instagram Following is being imported... You will recieve an alert when the import is finished.",
       progressMode: state.progressMode, progressCurrent: state.progressCurrent
     });
+    win.setProgressBar(2);
     instagramImportLoop();
   }
 }
