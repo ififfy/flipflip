@@ -4,8 +4,8 @@ import clsx from "clsx";
 
 import {
   Button, Chip, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl,
-  FormControlLabel, Grid, InputLabel, MenuItem, Select, Slide, Snackbar, SnackbarContent, Switch, TextField,
-  Theme, withStyles
+  FormControlLabel, Grid, InputAdornment, InputLabel, MenuItem, Select, Slide, Snackbar, SnackbarContent, Switch,
+  TextField, Theme, withStyles
 } from "@material-ui/core";
 
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
@@ -44,6 +44,9 @@ const styles = (theme: Theme) => createStyles({
     display: 'flex',
     alignItems: 'center',
   },
+  backupDays: {
+    width: theme.spacing(16),
+  }
 });
 
 class BackupCard extends React.Component {
@@ -82,9 +85,17 @@ class BackupCard extends React.Component {
           </Grid>
           <Grid item xs={"auto"} className={classes.buttonGrid}>
             <TextField
+              className={classes.backupDays}
+              disabled={!this.props.settings.autoBackup}
+              variant="outlined"
+              label="Every"
+              margin="dense"
               value={this.props.settings.autoBackupDays}
               onChange={this.onIntInput.bind(this, 'autoBackupDays')}
               onBlur={this.blurIntKey.bind(this, 'autoBackupDays')}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">Days</InputAdornment>,
+              }}
               inputProps={{
                 min: 1,
                 type: 'number',
