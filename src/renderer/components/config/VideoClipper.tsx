@@ -663,7 +663,7 @@ class VideoClipper extends React.Component {
     const input = (e.target as HTMLInputElement);
     this.setState({isEditingStartText: input.value});
     let timestampValue = getTimestampValue(input.value);
-    if (timestampValue) {
+    if (timestampValue != null) {
       this.onChangePosition(null, [timestampValue, this.state.isEditingValue[1]]);
     }
   }
@@ -677,7 +677,7 @@ class VideoClipper extends React.Component {
     const input = (e.target as HTMLInputElement);
     this.setState({isEditingEndText: input.value});
     let timestampValue = getTimestampValue(input.value);
-    if (timestampValue) {
+    if (timestampValue != null) {
       this.onChangePosition(null, [this.state.isEditingValue[0], timestampValue]);
     }
   }

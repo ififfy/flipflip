@@ -51,11 +51,11 @@ export function getTimestampValue(value: string): number {
   const split = value.split(":");
   const splitInt = [];
   if (split.length > 3 || split.length == 0) return null;
-  for (let n of split) {
-    if (n != split[0]) {
-      if (n.length != 2) return null;
+  for (let n = 0; n < split.length; n++) {
+    if (n != 0) {
+      if (split[n].length != 2) return null;
     }
-    const int = parseInt(n);
+    const int = parseInt(split[n]);
     if (isNaN(int)) return null;
     splitInt.push(int);
   }
