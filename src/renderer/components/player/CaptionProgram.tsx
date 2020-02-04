@@ -238,22 +238,27 @@ export default class CaptionProgram extends React.Component {
     }
   }
 
+  getPhrase(value: string) {
+    if (value == "$RANDOM_PHRASE") {
+      return getRandomListItem(this.state.phrases);
+    } else if (value == "$TAG_PHRASE") {
+      if (this.props.currentSource) {
+        const tag = getRandomListItem(this.props.getTags(this.props.currentSource, this.props.currentClip).filter((t) => t.phraseString && t.phraseString != ""));
+        if (tag) {
+          const phraseString = tag.phraseString;
+          return getRandomListItem(phraseString.split('\n'));
+        }
+      }
+      return "";
+    } else {
+      return value;
+    }
+  }
+
   showText(value: string, ms: number) {
     return (nextCommand: Function) => {
       this.el.current.style.opacity = '1';
-      if (value == "$RANDOM_PHRASE") {
-        this.el.current.innerHTML = getRandomListItem(this.state.phrases);
-      } else if (value == "$TAG_PHRASE") {
-        if (this.props.currentSource) {
-          const tag = getRandomListItem(this.props.getTags(this.props.currentSource, this.props.currentClip).filter((t) => t.phraseString && t.phraseString != ""));
-          if (tag) {
-            const phraseString = tag.phraseString;
-            this.el.current.innerHTML = getRandomListItem(phraseString.split('\n'));
-          }
-        }
-      } else {
-        this.el.current.innerHTML = value;
-      }
+      this.el.current.innerHTML = value;
       const wait = this.wait(ms);
       wait(() => {
         this.el.current.style.opacity = '0';
@@ -268,7 +273,7 @@ export default class CaptionProgram extends React.Component {
 
   cap(value: string) {
     return (nextCommand: Function) => {
-      const showText = this.showText(value, this.state.captionDuration);
+      const showText = this.showText(this.getPhrase(value), this.state.captionDuration);
       const wait = this.wait(this.state.captionDelay);
       this.el.current.style.color = this.props.captionColor;
       this.el.current.style.fontSize = this.props.captionFontSize + "vmin";
@@ -284,7 +289,7 @@ export default class CaptionProgram extends React.Component {
 
   bigcap(value: string) {
     return (nextCommand: Function) => {
-      const showText = this.showText(value, this.state.captionDuration);
+      const showText = this.showText(this.getPhrase(value), this.state.captionDuration);
       const wait = this.wait(this.state.captionDelay);
       this.el.current.style.color = this.props.captionBigColor;
       this.el.current.style.fontSize = this.props.captionBigFontSize + "vmin";
@@ -301,6 +306,7 @@ export default class CaptionProgram extends React.Component {
     return (nextCommand: Function) => {
       let fns = new Array<Function>();
       let i = 0;
+      value = this.getPhrase(value);
       for (let word of value.split('/')) {
         word = word.trim();
         let j = i;
