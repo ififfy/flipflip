@@ -492,7 +492,6 @@ class PlayerBars extends React.Component {
                   {this.props.scene.sources.length == 1 && getSourceType(this.props.scene.sources[0].url) == ST.video && (
                     <VideoControl
                       video={this.props.mainVideo}
-                      volume={this.props.scene.videoVolume}
                       useHotkeys
                       onChangeVolume={() => {}}/>
                   )}
