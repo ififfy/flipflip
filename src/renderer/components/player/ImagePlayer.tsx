@@ -419,7 +419,7 @@ export default class ImagePlayer extends React.Component {
 
       const errorCallback = () => {
         if (!this._isMounted) return;
-        if (video && video.src) {
+        if (this.props.scene.nextSceneAllImages && this.props.scene.nextSceneID != 0 && this.props.playNextScene && video && video.src) {
           this._playedURLs.push(video.src);
         }
         this.runFetchLoop(i);
@@ -480,7 +480,7 @@ export default class ImagePlayer extends React.Component {
 
       const errorCallback = () => {
         if (!this._isMounted) return;
-        if (img && img.src) {
+        if (this.props.scene.nextSceneAllImages && this.props.scene.nextSceneID != 0 && this.props.playNextScene && img && img.src) {
           this._playedURLs.push(img.src);
         }
         this.runFetchLoop(i);
