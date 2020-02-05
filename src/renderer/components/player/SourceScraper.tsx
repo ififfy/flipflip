@@ -273,6 +273,17 @@ function loadRemoteImageURLList(systemMessage: Function, config: Config, source:
                   helpers: helpers,
                 });
               }
+            })
+            .catch ((error: any) => {
+              console.error(error);
+              convertedCount++;
+              if (convertedCount == lines.length) {
+                helpers.count = filterPathsToJustPlayable(IF.any, convertedSource, true).length;
+                resolve({
+                  data: filterPathsToJustPlayable(filter, convertedSource, true),
+                  helpers: helpers,
+                });
+              }
             });
           }
         } else {
@@ -373,6 +384,18 @@ function loadTumblr(systemMessage: Function, config: Config, source: LibrarySour
                   helpers: helpers,
                 });
               }
+            })
+            .catch ((error: any) => {
+              console.error(error);
+              convertedCount++;
+              if (convertedCount == images.length) {
+                helpers.next = helpers.next + 1;
+                helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedSource, true).length;
+                resolve({
+                  data: filterPathsToJustPlayable(filter, convertedSource, true),
+                  helpers: helpers,
+                });
+              }
             });
           }
         } else {
@@ -421,6 +444,18 @@ function loadReddit(systemMessage: Function, config: Config, source: LibrarySour
                       helpers: helpers,
                     });
                   }
+                })
+                .catch ((error: any) => {
+                  console.error(error);
+                  convertedCount++;
+                  if (convertedCount == submissionListing.length) {
+                    helpers.next = submissionListing[submissionListing.length - 1].name;
+                    helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
+                    resolve({
+                      data: filterPathsToJustPlayable(filter, convertedListing, true),
+                      helpers: helpers,
+                    });
+                  }
                 });
               }
             } else {
@@ -440,6 +475,17 @@ function loadReddit(systemMessage: Function, config: Config, source: LibrarySour
             for (let s of submissionListing) {
               convertURL(s.url).then((urls: Array<string>) => {
                 convertedListing = convertedListing.concat(urls);
+                convertedCount++;
+                if (convertedCount == submissionListing.length) {
+                  helpers.next = submissionListing[submissionListing.length - 1].name;
+                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
+                  resolve({
+                    data: filterPathsToJustPlayable(filter, convertedListing, true),
+                    helpers: helpers,
+                  });
+                }
+              })
+              .catch ((error: any) => {
                 convertedCount++;
                 if (convertedCount == submissionListing.length) {
                   helpers.next = submissionListing[submissionListing.length - 1].name;
