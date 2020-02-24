@@ -810,11 +810,11 @@ class Library extends React.Component {
               onChange={this.onSelectTags.bind(this)} />
           </DialogContent>
           <DialogActions>
-            <Button disabled={this.state.selectedTags.length == 0}
+            <Button disabled={this.state.selectedTags && this.state.selectedTags.length == 0}
                     onClick={this.batchTagRemove.bind(this)} color="secondary">
               - Remove
             </Button>
-            <Button disabled={this.state.selectedTags.length == 0}
+            <Button disabled={this.state.selectedTags && this.state.selectedTags.length == 0}
                     onClick={this.batchTagAdd.bind(this)} color="secondary">
               + Add
             </Button>
