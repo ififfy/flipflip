@@ -19,5 +19,6 @@
 - [Video Clipper](clips.md)
 - [Import/Export](import_export.md)
 - [Caption Script Format](caption_script.md)
+- [Screen Capture](screen_capture.md)
 - [Developers](developers.md)
 - [Changelog](changelog.md)
