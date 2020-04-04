@@ -49,9 +49,6 @@ const styles = (theme: Theme) => createStyles({
   percentInput: {
     minWidth: theme.spacing(11),
   },
-  bpmIcon: {
-    color: theme.palette.primary.contrastText,
-  },
   bpmProgress: {
     position: 'absolute',
     right: 67,
@@ -294,7 +291,7 @@ class AudioControl extends React.Component {
                                       onClick={this.onDetectBPM.bind(this)}>
                                       {this.state.successBPM ? <CheckIcon/> :
                                         this.state.errorBPM ? <ErrorOutlineIcon/> :
-                                        <SvgIcon className={classes.bpmIcon} viewBox="0 0 24 24" fontSize="small">
+                                        <SvgIcon viewBox="0 0 24 24" fontSize="small">
                                           <path
                                             d="M12,1.75L8.57,2.67L4.07,19.5C4.06,19.5 4,19.84 4,20C4,21.11 4.89,22 6,22H18C19.11,22 20,21.11 20,20C20,19.84 19.94,19.5 19.93,19.5L15.43,2.67L12,1.75M10.29,4H13.71L17.2,17H13V12H11V17H6.8L10.29,4M11,5V9H10V11H14V9H13V5H11Z"/>
                                         </SvgIcon>
@@ -308,7 +305,7 @@ class AudioControl extends React.Component {
                                       onClick={this.onReadBPMTag.bind(this)}>
                                       {this.state.successTag ? <CheckIcon/> :
                                         this.state.errorTag ? <ErrorOutlineIcon/> :
-                                          <AudiotrackIcon className={classes.bpmIcon}/>
+                                          <AudiotrackIcon/>
                                       }
                                     </IconButton>
                                   </Tooltip>
@@ -527,31 +524,46 @@ class AudioControl extends React.Component {
   onDetectBPM() {
     if (this.props.audio.url && !this.state.loadingBPM) {
       this.setState({loadingBPM: true});
-      let data = toArrayBuffer(readFileSync(urlToPath(this.props.audio.url)));
-      let context = new AudioContext();
-      context.decodeAudioData(data, (buffer) => {
-        analyze(buffer)
-          .then((tempo: number) => {
-            const newAudios = this.props.scene.audios;
-            const audio: any = newAudios.find((a) => a.id == this.props.audio.id);
-            audio.bpm = tempo.toFixed(2);
-            this.changeKey('audios', newAudios);
-            this.setState({loadingBPM: false, successBPM: true});
-            setTimeout(() => {this.setState({successBPM: false})}, 3000);
-          })
-          .catch((err: any) => {
-            console.error("Error analyzing");
-            console.error(err);
-            this.setState({loadingBPM: false, errorBPM: true});
-            setTimeout(() => {this.setState({errorBPM: false})}, 3000);
+      try {
+        let data = toArrayBuffer(readFileSync(urlToPath(this.props.audio.url)));
+        let context = new AudioContext();
+        context.decodeAudioData(data, (buffer) => {
+          analyze(buffer)
+            .then((tempo: number) => {
+              const newAudios = this.props.scene.audios;
+              const audio: any = newAudios.find((a) => a.id == this.props.audio.id);
+              audio.bpm = tempo.toFixed(2);
+              this.changeKey('audios', newAudios);
+              this.setState({loadingBPM: false, successBPM: true});
+              setTimeout(() => {
+                this.setState({successBPM: false})
+              }, 3000);
+            })
+            .catch((err: any) => {
+              console.error("Error analyzing");
+              console.error(err);
+              this.setState({loadingBPM: false, errorBPM: true});
+              setTimeout(() => {
+                this.setState({errorBPM: false})
+              }, 3000);
 
-          });
-      }, (err) => {
-        console.error(err);
+            });
+        }, (err) => {
+          console.error(err);
+          this.setState({loadingBPM: false, errorBPM: true});
+          setTimeout(() => {
+            this.setState({errorBPM: false})
+          }, 3000);
+        });
+      } catch (e) {
+        console.error(e);
         this.setState({loadingBPM: false, errorBPM: true});
-        setTimeout(() => {this.setState({errorBPM: false})}, 3000);
-      });
+        setTimeout(() => {
+          this.setState({errorBPM: false})
+        }, 3000);
+      }
     }
+
   }
 
   tickLoop(starting: boolean = false) {

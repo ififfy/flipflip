@@ -26,13 +26,13 @@ const styles = (theme: Theme) => createStyles({
   oddChild: {
     backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["100"] : grey[900],
     '&:hover': {
-      backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["500"] : '#080808',
+      backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["200"] : '#080808',
     },
   },
   evenChild: {
     backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["50"] : theme.palette.background.default,
     '&:hover': {
-      backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["500"] : '#080808',
+      backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["200"] : '#080808',
     },
   },
   avatar: {

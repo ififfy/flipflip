@@ -25,7 +25,7 @@ export default class Scene {
   zoomEnd = 2;
   zoomEndMax = 2;
   zoomEndMin = 1.5;
-  zoomRandom = true;
+  zoomRandom = false;
   horizTransType = HTF.none;
   horizTransLevel = 10;
   horizTransLevelMax = 10;
