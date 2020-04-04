@@ -1,5 +1,19 @@
 # Changelog
 
+## 3.0.4 <small>(04/06/2020)</small>
+- Add ability to auto-backup
+- Allow clips to be tagged
+- Add ability to find mergeable local directories
+- Allow BPM to be detected, read, or input
+- Allow clips to be toggled on off in a scene
+- Add random option for zoom/translation
+- Allow RANDOM_PHRASE and TAG_PHRASE to work with blink
+- Add display count to Library
+- Add progress display on taskbar
+- Fix bug with clip loading
+- Fix bug with sorting/searching by count
+- Fix Twitter scraping
+
 ## 3.0.3 <small>(01/10/2020)</small>
 - Add Portable Mode (saves in same directory as FlipFlip)
 - Add ability to designate video playback speed

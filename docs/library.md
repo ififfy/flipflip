@@ -32,13 +32,13 @@ way after the search/filter is cleared. This may be useful for keeping track of 
 
 ![](doc_images/library_marked.png)
 
-## Mark Offline
-As your Library grows, it's possible some sources will become unavailable. To aid in detecting this, click the 
-`Mark Offline` button ( <img style="vertical-align: -5px" src="doc_icons/mark-offline.svg" alt="Mark Offline" 
-width="20" height="20"> ) to check your sources. When this process completes, unavailable sources will be marked with 
-an offline icon.
-
-![](doc_images/library_offline.png)
+## Find Mergeables
+When you have a large number of local directories, it may be helpful to find those which share the tags so that you can
+merge them together. To do this, click `Find Mergeables` ( <img style="vertical-align: -5px" 
+src="doc_icons/merge.svg" alt="Find Mergeables" width="20" height="20"> ) in the sidebar. You will then see a list of
+local sources sorted into sets. Each set shares the same tags and could each (in theory) be merged into one source.
+This, of course, is entirely up to the discretion of the user and FlipFlip does not have the ability to automatically
+merge these folders (they must be merged manually and the extra sources deleted).  
 
 ## Import Remote Sources
 The Library provides the ability to import sources from **Tumblr**, **Reddit**, **Instagram**, and **Twitter**. These
@@ -47,3 +47,11 @@ You can only run one import at a time. While a import is running, a progress bar
 
 ?> FlipFlip may become slow while importing sources, but you can feel free to navigate away from the Library. You will
 be alerted when your import has completed. 
+
+## Mark Offline
+As your Library grows, it's possible some sources will become unavailable. To aid in detecting this, click the 
+`Mark Offline` button ( <img style="vertical-align: -5px" src="doc_icons/mark-offline.svg" alt="Mark Offline" 
+width="20" height="20"> ) to check your sources. When this process completes, unavailable sources will be marked with 
+an offline icon.
+
+![](doc_images/library_offline.png)

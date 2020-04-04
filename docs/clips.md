@@ -18,6 +18,11 @@ directly for more precise selection. Double click "Start" or "End" to set it to 
 
 * Click <img style="vertical-align: -5px" src="doc_icons/save.svg" alt="Save" width="20" height="20"> to save changes to 
 this clip.
+* Click <img style="vertical-align: -5px" src="doc_icons/tag.svg" alt="Tag" width="20" height="20"> to start tagging this clip.
+  * New clips will ineherit the source's current tags.
+  * Chaging a source's tags doesn't change its clips' tags.
+  * Clip tags will be used for Scene Generators which have "Use Clips" is on, otherwise source tags will be used
+    * If a clip has _no_ tags, it acts as though it has its source's tags during Scene Generation.
 * Click <img style="vertical-align: -5px" src="doc_icons/delete.svg" alt="Delete" width="20" height="20"> to remove this clip.
   * _This only appears for saved clips._
 * Click <img style="vertical-align: -5px" src="doc_icons/back.svg" alt="Cancel" width="20" height="20"> to cancel changes.
@@ -25,5 +30,5 @@ this clip.
 While Clipping use Space to play/pause and use ← → to jump back/foward in 10sec intervals. Use `[` and `]` to jump to 
 Clipping the previous/next visible video in the Library.  
 
-?> Note: If clips don't seem to be working, ensure that "Play Selected Clips" is enabled for your scene (otherwise, 
-it will play from the entire video).
+?> Note: If clips don't seem to be working, ensure that "Use Clips" is enabled for your scene (otherwise, 
+it will play from the entire video). 

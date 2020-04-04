@@ -14,9 +14,9 @@ FlipFlip effects all share the same types of timings (in ms):
 
 ## Zoom/Move
 This section controls image movement.
-* Choose zoom on/off. Control start/end scale.
-* Choose move horizontally left/right (or none). Control distance (%).
-* Choose move vertically up/down (or none). Control distance (%).
+* Choose zoom on/off. Control start/end scale and randomization.
+* Choose move horizontally left/right/either (or none). Control distance (%) and randomization.
+* Choose move vertically up/down/either (or none). Control distance (%) and randomization.
 * Control zoom/move timing options.
 
 <img src="doc_images/zoom_ex.gif" alt="Zoom Example">

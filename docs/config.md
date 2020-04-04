@@ -99,6 +99,9 @@ on your computer and is never shared with anyone or sent to any server (besides 
 ## Backup
 Backup your FlipFlip data or restore from a previous backup.
 
+#### Auto Backup
+Turn this on to automatically create a backup every time the number of configured days passes.
+
 #### Backup Data
 This creates a backup with all your current FlipFlip data (preferences, library, scenes, etc.)
 

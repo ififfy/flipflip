@@ -10,7 +10,7 @@ image/video URLs, (3) a single video file URL, (4) a single playlsit file URL, o
 * Sources can also be manually ordered by drag'n'dropping them.
 * A count of usable images/videos will appear next to each source.
   * "**+**" indicates an incomplete count (didn't reach the end, but has _at least_ that many images & videos).
-  * Video sources will display the number of clips as their count
+  * Video sources will display the number of clips as their count. You can click this count to toggle clips on/off for a scene.
   
 ## Supported filetypes
 The following filetypes are supported by FlipFlip:
