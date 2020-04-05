@@ -73,7 +73,9 @@ class Tutorial extends React.Component {
             <DialogTitle id="tutorial-title">Welcome to FlipFlip!</DialogTitle>
             <DialogContent>
               <DialogContentText id="tutorial-description">
-                Welcome and thank you for using FlipFlip. Let's get you started!
+                <b>Welcome</b> and thank you for using FlipFlip! We <b>recommend going through the tutorials</b> to get
+                acquainted with how things work, but feel free to jump right in if you prefer. You can always reset
+                tutorials in the Settings.
               </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -331,6 +333,11 @@ class Tutorial extends React.Component {
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 <SvgIcon>
+                  <path fill="none" d="M0 0h24v24H0z"/>
+                  <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/>
+                </SvgIcon> Source Options (Displays for video/Reddit/Twitter sources)
+                <br/>
+                <SvgIcon>
                   <path d="M11 21H7V19H11V21M15.5 19H17V21H13V19H13.2L11.8 12.9L9.3 13.5C9.2 14 9 14.4 8.8
                           14.8C7.9 16.3 6 16.7 4.5 15.8C3 14.9 2.6 13 3.5 11.5C4.4 10 6.3 9.6 7.8 10.5C8.2 10.7 8.5
                           11.1 8.7 11.4L11.2 10.8L10.6 8.3C10.2 8.2 9.8 8 9.4 7.8C8 6.9 7.5 5 8.4 3.5C9.3 2 11.2
@@ -346,7 +353,7 @@ class Tutorial extends React.Component {
                   <path d="M2 6V8H14V6H2M2 10V12H11V10H2M14.17 10.76L12.76 12.17L15.59 15L12.76 17.83L14.17
                           19.24L17 16.41L19.83 19.24L21.24 17.83L18.41 15L21.24 12.17L19.83 10.76L17 13.59L14.17
                           10.76M2 14V16H11V14H2Z" />
-                </SvgIcon> Clear Blacklist (Displays for sources that have a blacklist)
+                </SvgIcon> Edit Blacklist (Displays for sources that have a blacklist)
                 <br/>
                 <SvgIcon>
                   <path d="M19.36 2.72L20.78 4.14L15.06 9.85C16.13 11.39 16.28 13.24 15.38 14.44L9.06
@@ -559,7 +566,7 @@ class Tutorial extends React.Component {
             <DialogContent>
               <DialogContentText id="tutorial-description">
                 You can <b>control how long videos will play</b> for and <b>at what speed</b>. You can also choose to
-                <b>start videos at a random timestamp</b> and/or to <b>have videos continue</b> (rather than restart
+                <b> start videos at a random timestamp</b> and/or to <b>have videos continue</b> (rather than restart
                 each time they appear). You can also choose to <b>rotate portrait videos</b> so they appear in
                 landsacpe orientation.
               </DialogContentText>
