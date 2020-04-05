@@ -7,9 +7,9 @@ import {FixedSizeList} from "react-window";
 import clsx from "clsx";
 
 import {
-  Button, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, FormControl, IconButton,
-  InputAdornment, InputLabel, Link, List, ListItemSecondaryAction, ListItemText, Menu, MenuItem, Select, Switch,
-  TextField, Theme, Tooltip, Typography, withStyles
+  Button, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, FormControl, FormControlLabel,
+  IconButton, InputAdornment, InputLabel, Link, List, ListItemSecondaryAction, ListItemText, Menu, MenuItem,
+  Select, Switch, TextField, Theme, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
 import FolderIcon from "@material-ui/icons/Folder";
@@ -234,7 +234,7 @@ class SourceList extends React.Component {
                       </Tooltip>
                     </InputAdornment>,
                 }}
-                onChange={this.onChangSubtitleFile.bind(this)}
+                onChange={this.onSourceInput.bind(this, 'subtitleFile')}
               />
             </DialogContent>
           </Dialog>
@@ -253,7 +253,7 @@ class SourceList extends React.Component {
                 <Select
                   disabled={this.state.sourceOptions.url.includes("/user/") || this.state.sourceOptions.url.includes("/u/")}
                   value={this.state.sourceOptions.redditFunc == null ? RF.hot : this.state.sourceOptions.redditFunc}
-                  onChange={this.onChangeRedditFunc.bind(this)}>
+                  onChange={this.onSourceInput.bind(this, 'redditFunc')}>
                   {Object.values(RF).map((rf) =>
                     <MenuItem key={rf} value={rf}>{en.get(rf)}</MenuItem>
                   )}
@@ -264,7 +264,7 @@ class SourceList extends React.Component {
                   className={classes.fullWidth}
                   disabled={this.state.sourceOptions.url.includes("/user/") || this.state.sourceOptions.url.includes("/u/")}
                   value={this.state.sourceOptions.redditTime == null ? RT.day : this.state.sourceOptions.redditTime}
-                  onChange={this.onChangeRedditTime.bind(this)}>
+                  onChange={this.onSourceInput.bind(this, 'redditTime')}>
                   {Object.values(RT).map((rt) =>
                     <MenuItem key={rt} value={rt}>{en.get(rt)}</MenuItem>
                   )}
@@ -272,6 +272,34 @@ class SourceList extends React.Component {
               )}
               {(this.state.sourceOptions.url.includes("/user/") || this.state.sourceOptions.url.includes("/u/")) &&
               <DialogContentText>This only applies to subreddits, not user profiles</DialogContentText>}
+            </DialogContent>
+          </Dialog>
+        )}
+        {this.state.sourceOptionsType == ST.twitter && (
+          <Dialog
+            open={this.state.sourceOptionsType == ST.twitter}
+            onClose={this.onCloseSourceOptions.bind(this)}
+            aria-describedby="twitter-options-description">
+            <DialogContent>
+              <DialogContentText id="twitter-options-description">
+                Twitter Options ({this.state.sourceOptions.url})
+              </DialogContentText>
+              <FormControlLabel
+                control={
+                  <Switch
+                    size="small"
+                    checked={this.state.sourceOptions.includeReplies}
+                    onChange={this.onSourceBoolInput.bind(this, 'includeReplies')}/>
+                }
+                label="Include Replies"/>
+              <FormControlLabel
+                control={
+                  <Switch
+                    size="small"
+                    checked={this.state.sourceOptions.includeRetweets}
+                    onChange={this.onSourceBoolInput.bind(this, 'includeRetweets')}/>
+                }
+                label="Include Retweets"/>
             </DialogContent>
           </Dialog>
         )}
@@ -439,31 +467,28 @@ class SourceList extends React.Component {
   onOpenSubtitleFile() {
     let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'Web Video Text Tracks (WebVTT)', extensions: ['vtt']}], properties: ['openFile']});
     if (!result || !result.length) return;
-    this.onSetSubtitleFile(result[0]);
+    this.changeKey('subtitleFile', result[0]);
   }
 
-  onChangSubtitleFile(e: MouseEvent) {
-    this.onSetSubtitleFile((e.target as HTMLInputElement).value);
+  onSourceInput(key: string, e: MouseEvent) {
+    const input = (e.target as HTMLInputElement);
+    this.changeKey(key, input.value);
   }
 
-  onSetSubtitleFile(subtitleFile: string) {
+  onSourceBoolInput(key: string, e: MouseEvent) {
+    const input = (e.target as HTMLInputElement);
+    const checked = input.checked;
+    this.changeKey(key, checked);
+  }
+
+  changeKey(key: string, value: any) {
+    this.update((s) => s[key] = value);
+  }
+
+  update(fn: (librarySource: any) => void) {
     let sources = this.props.sources;
     let source = sources.find((s) => s.url == this.state.sourceOptions.url);
-    source.subtitleFile = subtitleFile;
-    this.props.onUpdateSources(sources);
-  }
-
-  onChangeRedditFunc(e: MouseEvent) {
-    let sources = this.props.sources;
-    let source = sources.find((s) => s.url == this.state.sourceOptions.url);
-    source.redditFunc = (e.target as HTMLInputElement).value;
-    this.props.onUpdateSources(sources);
-  }
-
-  onChangeRedditTime(e: MouseEvent) {
-    let sources = this.props.sources;
-    let source = sources.find((s) => s.url == this.state.sourceOptions.url);
-    source.redditTime = (e.target as HTMLInputElement).value;
+    fn(source);
     this.props.onUpdateSources(sources);
   }
 

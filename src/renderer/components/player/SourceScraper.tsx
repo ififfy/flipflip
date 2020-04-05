@@ -794,8 +794,9 @@ function loadImgur(systemMessage: Function, config: Config, source: LibrarySourc
 function loadTwitter(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   let configured = config.remoteSettings.twitterAccessTokenKey != "" && config.remoteSettings.twitterAccessTokenSecret != "";
   if (configured) {
-    const excludeRTS = source.url.endsWith("--");
-    const url = source.url.replace("--", "");
+    const includeRetweets = source.includeRetweets;
+    const includeReplies = source.includeReplies;
+    const url = source.url;
     return new CancelablePromise((resolve) => {
       const twitter = new Twitter({
         consumer_key: config.remoteSettings.twitterConsumerKey,
@@ -804,7 +805,7 @@ function loadTwitter(systemMessage: Function, config: Config, source: LibrarySou
         access_token_secret: config.remoteSettings.twitterAccessTokenSecret,
       });
       twitter.get('statuses/user_timeline',
-        helpers.next == 0 ? {screen_name: getFileGroup(url), count: 200, include_rts: !excludeRTS, tweet_mode: 'extended'} : {screen_name: getFileGroup(url), count: 200, include_rts: !excludeRTS, tweet_mode: 'extended', max_id: helpers.next},
+        helpers.next == 0 ? {screen_name: getFileGroup(url), count: 200, exclude_replies: !includeReplies, include_rts: includeRetweets, tweet_mode: 'extended'} : {screen_name: getFileGroup(url), count: 200, exclude_replies: !includeReplies, include_rts: includeRetweets, tweet_mode: 'extended', max_id: helpers.next},
         (error: any, tweets: any) => {
         if (error) {
           resolve(null);

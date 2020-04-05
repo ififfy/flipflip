@@ -58,7 +58,8 @@ Click `+` and choose one of the following options:
 alt="Options" width="20" height="20">
   * This will only show up for certain types of sources:
     * _**Video** - specify a subtitle file_
-    * _**Reddit**_ - specify feed for subreddits (i.e. "Hot", "Top", "New", etc.)
+    * _**Reddit** - specify feed for subreddits (i.e. "Hot", "Top", "New", etc.)_
+    * _**Twitter** - include/exclude retweets and replies_
 * To edit the blacklist for a source, click the <img style="vertical-align: -5px" src="doc_icons/blacklist.svg" 
 alt="Blacklist" width="20" height="20">
   * _This will only appear for sources which have a blacklist._
