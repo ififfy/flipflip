@@ -29,6 +29,7 @@ export default class Player extends React.Component {
     goBack(): void,
     setCount(sourceURL: string, count: number, countComplete: boolean): void,
     systemMessage(message: string): void,
+    preventSleep?: boolean,
     allTags?: Array<Tag>,
     gridView?: boolean,
     tags?: Array<Tag>,
@@ -62,6 +63,7 @@ export default class Player extends React.Component {
 
   _interval: NodeJS.Timer = null;
   _toggleStrobe = false;
+  _powerSaveID: number = null;
 
   render() {
     const nextScene = this.getScene(this.props.scene.nextSceneID);
@@ -374,6 +376,9 @@ export default class Player extends React.Component {
     if (!this.props.gridView) {
       this._interval = setInterval(() => this.nextSceneLoop(), 1000);
     }
+    if (this.props.preventSleep) {
+      this._powerSaveID = remote.powerSaveBlocker.start('prevent-display-sleep');
+    }
   }
 
   componentWillUnmount() {
@@ -385,6 +390,10 @@ export default class Player extends React.Component {
     global.gc();
     webFrame.clearCache();
     remote.getCurrentWindow().webContents.session.clearCache(() => {});
+    if (this.props.preventSleep || this._powerSaveID != null) {
+      remote.powerSaveBlocker.stop(this._powerSaveID);
+      this._powerSaveID = null;
+    }
   }
 
   shouldComponentUpdate(props: any, state: any): boolean {

@@ -171,6 +171,7 @@ class GridPlayer extends React.Component {
                       <div className={classes.gridCell} key={colIndex}>
                         {scene && (
                           <Player
+                            preventSleep={rowIndex == 0 && colIndex == 0}
                             config={this.props.config}
                             scene={scene}
                             gridView

@@ -1,12 +1,12 @@
 # Changelog
 
-## 3.0.4 <small>(04/05/2020)</small>
+## 3.0.4 <small>(04/06/2020)</small>
 - Add subtitle support (WebVTT)
 - Add ability to auto-backup
 - Allow clips to be tagged
 - Add ability to find mergeable local directories
 - Allow BPM to be detected, read, or input
-- Allow clips to be toggled on off in a scene
+- Allow clips to be individually toggled on off in a scene
 - Add random option for zoom/translation
 - Allow RANDOM_PHRASE and TAG_PHRASE to work with blink
 - Add display count to Library
@@ -14,6 +14,7 @@
 - Add options for Reddit feeds
 - Add options for Twitter feeds
 - Add ability to view and edit blacklist
+- Prevent screensaver while playing slideshow
 - Fix blacklisting
 - Fix bug with clip loading
 - Fix bug with sorting/searching by count

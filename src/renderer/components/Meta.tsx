@@ -210,6 +210,7 @@ export default class Meta extends React.Component {
 
           {this.isRoute('play') && (
             <Player
+              preventSleep
               config={this.state.config}
               scene={scene}
               scenes={this.state.scenes}
@@ -229,6 +230,7 @@ export default class Meta extends React.Component {
 
           {this.isRoute('libraryplay') && (
             <Player
+              preventSleep
               config={this.state.config}
               scene={scene}
               scenes={this.state.scenes}
