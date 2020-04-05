@@ -324,6 +324,7 @@ class SceneDetail extends React.Component {
     onClip(source: LibrarySource, displayed: Array<LibrarySource>): void,
     onCloneScene(scene: Scene): void,
     onDelete(scene: Scene): void,
+    onEditBlacklist(sourceURL: string, blacklist: string): void,
     onExport(scene: Scene): void,
     onGenerate(scene: Scene): void,
     onPlayScene(scene: Scene): void,
@@ -579,6 +580,7 @@ class SceneDetail extends React.Component {
                       tutorial={this.props.tutorial == SDGT.final ? null : this.props.tutorial}
                       onClearBlacklist={this.props.onClearBlacklist.bind(this)}
                       onClip={this.props.onClip.bind(this)}
+                      onEditBlacklist={this.props.onEditBlacklist.bind(this)}
                       onPlay={this.props.onPlay.bind(this)}
                       onUpdateSources={this.onUpdateSources.bind(this)}
                       systemMessage={this.props.systemMessage.bind(this)}/>

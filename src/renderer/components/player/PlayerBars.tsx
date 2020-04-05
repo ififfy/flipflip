@@ -227,7 +227,7 @@ class PlayerBars extends React.Component {
     appBarHover: false,
     drawerHover: false,
     tagDrawerHover: false,
-    blacklistSource: null as LibrarySource,
+    blacklistSource: null as string,
     blacklistFile: null as string,
     deletePath: null as string,
     deleteError: null as string,
@@ -642,8 +642,8 @@ class PlayerBars extends React.Component {
     this.setState({blacklistSource: source, blacklistFile: fileToBlacklist});
   }
 
-  onFinishBlacklistFile(source: string, fileToBlacklist: string) {
-    this.props.blacklistFile(source, fileToBlacklist);
+  onFinishBlacklistFile() {
+    this.props.blacklistFile(this.state.blacklistSource, this.state.blacklistFile);
     this.onCloseDialog();
   }
 

@@ -1167,6 +1167,23 @@ export function clearBlacklist(state: State, sourceURL: string): Object {
   return blacklistFile(state, sourceURL, null);
 }
 
+export function editBlacklist(state: State, sourceURL: string, blacklist: string): Object {
+  const newBlacklist = blacklist.split("\n").filter((s) => /^\w*$/.exec(s) == null);
+  const newLibrary = state.library;
+  const newScenes = state.scenes;
+  const source = newLibrary.find((s) => s.url == sourceURL);
+  if (source) {
+    source.blacklist = newBlacklist;
+  }
+  for (let scene of newScenes) {
+    const sceneSource = scene.sources.find((s) => s.url == sourceURL);
+    if (sceneSource) {
+      sceneSource.blacklist = newBlacklist;
+    }
+  }
+  return {library: newLibrary, scenes: newScenes};
+}
+
 export function blacklistFile(state: State, sourceURL: string, fileToBlacklist: string): Object {
   const newLibrary = state.library;
   const newScenes = state.scenes;
@@ -1182,7 +1199,9 @@ export function blacklistFile(state: State, sourceURL: string, fileToBlacklist: 
     if (sceneSource) {
       if (sceneSource.blacklist === undefined || fileToBlacklist == null) sceneSource.blacklist = [];
       if (fileToBlacklist != null) {
-        sceneSource.blacklist.push(fileToBlacklist);
+        if (!sceneSource.blacklist.includes(fileToBlacklist)) {
+          sceneSource.blacklist.push(fileToBlacklist);
+        }
       }
     }
   }
@@ -1887,7 +1906,6 @@ export function markOffline(getState: () => State, setState: Function) {
 
       const librarySource = state.library.find((s) => s.url == actionSource.url);
       if (librarySource) {
-        console.log("Checking " + actionSource.url + " (" + state.progressCurrent + "/" + state.progressTotal + ")");
         librarySource.lastCheck = new Date();
         wretch(librarySource.url)
           .get()
@@ -1926,8 +1944,6 @@ export function markOffline(getState: () => State, setState: Function) {
       state.progressCurrent = offset + 1;
       setState({progressTitle: state.progressTitle, progressCurrent: state.progressCurrent});
       win.setProgressBar(state.progressCurrent / state.progressTotal);
-
-      console.log("Checking " + actionSource.url + " (" + state.progressCurrent + "/" + state.progressTotal + ")");
 
       actionSource.lastCheck = new Date();
       const exists = existsSync(actionSource.url);

@@ -10,6 +10,8 @@
 - Allow RANDOM_PHRASE and TAG_PHRASE to work with blink
 - Add display count to Library
 - Add progress display on taskbar
+- Add ability to view and edit blacklist
+- Fix blacklisting
 - Fix bug with clip loading
 - Fix bug with sorting/searching by count
 - Fix Twitter scraping

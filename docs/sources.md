@@ -54,9 +54,10 @@ alt="Clear cache" width="20" height="20">
 * To select [clips](clips.md) for a source, click the <img style="vertical-align: -5px" src="doc_icons/clip.svg" 
 alt="Video Clipper" width="20" height="20">
   * _This will only appear for video sources._
-* To clear the blacklist for a source, click the <img style="vertical-align: -5px" src="doc_icons/blacklist.svg" 
+* To edit the blacklist for a source, click the <img style="vertical-align: -5px" src="doc_icons/blacklist.svg" 
 alt="Clear cache" width="20" height="20">
   * _This will only appear for sources which have a blacklist._
+  * _To clear the blacklist, **Shift** click the button._
 * To delete a source, click the <img style="vertical-align: -5px" src="doc_icons/delete.svg" alt="Remove" width="20" height="20">
 
 ## Source types

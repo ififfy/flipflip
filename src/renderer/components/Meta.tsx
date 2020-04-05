@@ -115,6 +115,7 @@ export default class Meta extends React.Component {
               onClip={a(actions.clipVideo)}
               onCloneScene={a(actions.cloneScene)}
               onDelete={a(actions.deleteScene)}
+              onEditBlacklist={a(actions.editBlacklist)}
               onExport={a(actions.exportScene)}
               onGenerate={a(actions.generateScene)}
               onPlayScene={a(actions.playScene)}
@@ -147,6 +148,7 @@ export default class Meta extends React.Component {
               onBatchTag={a(actions.batchTag)}
               onClearBlacklist={a(actions.clearBlacklist)}
               onClip={a(actions.clipVideo)}
+              onEditBlacklist={a(actions.editBlacklist)}
               onExportLibrary={a(actions.exportLibrary)}
               onImportFromLibrary={a(actions.importFromLibrary)}
               onImportLibrary={a(actions.importLibrary, appStorage.backup.bind(appStorage))}

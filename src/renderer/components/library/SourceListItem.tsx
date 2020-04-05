@@ -111,6 +111,7 @@ class SourceListItem extends React.Component {
     onClean(source: LibrarySource): void,
     onClearBlacklist(sourceURL: string): void,
     onClip(source: LibrarySource, displaySources: Array<LibrarySource>): void,
+    onEditBlacklist(source: LibrarySource): void,
     onEndEdit(newURL: string): void,
     onOpenClipMenu(source: LibrarySource): void,
     onPlay(source: LibrarySource, displaySources: Array<LibrarySource>): void,
@@ -253,7 +254,7 @@ class SourceListItem extends React.Component {
               )}
               {this.props.source.blacklist && this.props.source.blacklist.length > 0 && (
                 <IconButton
-                  onClick={this.props.onClearBlacklist.bind(this, this.props.source.url)}
+                  onClick={this.onClickBlacklist.bind(this)}
                   className={classes.actionButton}
                   edge="end"
                   size="small"
@@ -329,6 +330,14 @@ class SourceListItem extends React.Component {
   onClip() {
     this.props.savePosition();
     this.props.onClip(this.props.source, this.props.sources);
+  }
+
+  onClickBlacklist(e: MouseEvent) {
+    if (e.shiftKey) {
+      this.props.onClearBlacklist(this.props.source.url);
+    } else {
+      this.props.onEditBlacklist(this.props.source);
+    }
   }
 
   onStartEdit(s: LibrarySource) {

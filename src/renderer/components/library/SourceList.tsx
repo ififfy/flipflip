@@ -8,7 +8,7 @@ import clsx from "clsx";
 
 import {
   Button, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, Link, List, ListItemSecondaryAction,
-  ListItemText, Menu, MenuItem, Switch, Theme, Typography, withStyles
+  ListItemText, Menu, MenuItem, Switch, TextField, Theme, Typography, withStyles
 } from "@material-ui/core";
 
 import {arrayMove, getCachePath, getFileName, getSourceType, getTimestamp, urlToPath} from "../../data/utils";
@@ -31,7 +31,14 @@ const styles = (theme: Theme) => createStyles({
   },
   marginRight: {
     marginRight: theme.spacing(1),
-  }
+  },
+  blacklistInput: {
+    minWidth: 200,
+    minHeight: 100,
+    whiteSpace: 'nowrap',
+    overflowX: 'hidden',
+    overflowY: 'auto !important' as any,
+  },
 });
 
 class SourceList extends React.Component {
@@ -44,6 +51,7 @@ class SourceList extends React.Component {
     tutorial: string,
     onClearBlacklist(sourceURL: string): void,
     onClip(source: LibrarySource, displayed: Array<LibrarySource>): void,
+    onEditBlacklist(sourceURL: string, blacklist: string): void,
     onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void,
     onUpdateSources(sources: Array<LibrarySource>): void,
     systemMessage(message: string): void,
@@ -60,6 +68,8 @@ class SourceList extends React.Component {
     mouseX: null as any,
     mouseY: null as any,
     clipMenu: null as LibrarySource,
+    blacklistSource: null as string,
+    editBlacklist: null as string,
   };
 
   onSortEnd = ({oldIndex, newIndex}: {oldIndex: number, newIndex: number}) => {
@@ -159,6 +169,34 @@ class SourceList extends React.Component {
             </Button>
             <Button onClick={this.onFinishClean.bind(this)} color="primary">
               OK
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Dialog
+          open={this.state.blacklistSource != null}
+          onClose={this.onCloseBlacklist.bind(this)}
+          aria-describedby="edit-blacklist-description">
+          <DialogContent>
+            <DialogContentText id="edit-blacklist-description">
+              Blacklist ({this.state.blacklistSource})
+            </DialogContentText>
+            <TextField
+              fullWidth
+              multiline
+              helperText="One URL to blacklist per line"
+              id="blacklist"
+              value={this.state.editBlacklist}
+              margin="dense"
+              inputProps={{className: classes.blacklistInput}}
+              onChange={this.onChangeBlacklist.bind(this)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.onCloseBlacklist.bind(this)} color="secondary">
+              Cancel
+            </Button>
+            <Button onClick={this.onFinishBlacklist.bind(this)} color="primary">
+              Save
             </Button>
           </DialogActions>
         </Dialog>
@@ -298,6 +336,24 @@ class SourceList extends React.Component {
     this.setState({menuAnchorEl: null, clipMenu: false});
   }
 
+  onCloseBlacklist() {
+    this.setState({blacklistSource: null, editBlacklist: null});
+  }
+
+  onFinishBlacklist() {
+    this.props.onEditBlacklist(this.state.blacklistSource, this.state.editBlacklist);
+    this.onCloseBlacklist();
+  }
+
+  onChangeBlacklist(e: MouseEvent) {
+    this.setState({editBlacklist: (e.currentTarget as HTMLInputElement).value});
+  }
+
+  onEditBlacklist(source: LibrarySource) {
+    this.setState({blacklistSource: source.url, editBlacklist: source.blacklist.join("\n")});
+  }
+
+
   SortableVirtualList = sortableContainer(this.VirtualList.bind(this));
 
   VirtualList(props: any) {
@@ -337,6 +393,7 @@ class SourceList extends React.Component {
         onClean={this.onClean.bind(this)}
         onClearBlacklist={this.props.onClearBlacklist.bind(this)}
         onClip={this.props.onClip.bind(this)}
+        onEditBlacklist={this.onEditBlacklist.bind(this)}
         onEndEdit={this.onEndEdit.bind(this)}
         onOpenClipMenu={this.onOpenClipMenu.bind(this)}
         onPlay={this.props.onPlay.bind(this)}
