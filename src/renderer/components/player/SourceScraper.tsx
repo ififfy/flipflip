@@ -678,9 +678,9 @@ function loadSexCom(systemMessage: Function, config: Config, source: LibrarySour
           }
           if (videos.length == 0) {
             helpers.next = helpers.next + 1;
-            helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+            helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
             resolve({
-              data: filterPathsToJustPlayable(filter, images, true),
+              data: filterPathsToJustPlayable(filter, images, false),
               helpers: helpers,
             })
           } else {

@@ -503,6 +503,11 @@ export default class ImagePlayer extends React.Component {
       };
 
       const processInfo = (info: GifInfo) => {
+        if (info == null) {
+          this.runFetchLoop(i);
+          return;
+        }
+
         // If gif is animated and we want to play entire length, store its duration
         if (info && info.animated) {
           if (this.props.scene.gifOption == GO.full) {
@@ -535,6 +540,7 @@ export default class ImagePlayer extends React.Component {
             request.get({url, encoding: null}, function (err: Error, res: IncomingMessage, body: Buffer) {
               if (err) {
                 console.error(err);
+                processInfo(null);
                 return;
               }
               processInfo(gifInfo(toArrayBuffer(body)));

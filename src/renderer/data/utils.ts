@@ -99,7 +99,7 @@ export function getSourceType(url: string): string {
     return ST.imagefap;
   } else if (/^https?:\/\/(www\.)?imgur\.com\//.exec(url) != null) {
     return ST.imgur;
-  } else if (/^https?:\/\/(www\.)?sex\.com\//.exec(url) != null) {
+  } else if (/^https?:\/\/(www\.)?(cdn\.)?sex\.com\//.exec(url) != null) {
     return ST.sexcom;
   } else if (/^https?:\/\/(www\.)?twitter\.com\//.exec(url) != null) {
     return ST.twitter;
