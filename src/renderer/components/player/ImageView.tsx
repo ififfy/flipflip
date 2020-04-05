@@ -6,6 +6,7 @@ import {getRandomColor, getRandomListItem} from "../../data/utils";
 import {BT, HTF, IT, SL, TF, VTF} from "../../data/const";
 import Scene from "../../data/Scene";
 import Strobe from "./Strobe";
+import wretch from "wretch";
 
 export default class ImageView extends React.Component {
   readonly props: {
@@ -88,6 +89,26 @@ export default class ImageView extends React.Component {
       imgHeight = img.videoHeight;
     }
     let imgAspect = imgWidth / imgHeight;
+
+    if (img instanceof HTMLVideoElement && img.hasAttribute("subtitles")) {
+      try {
+        let subURL = img.getAttribute("subtitles");
+        wretch(subURL)
+          .get()
+          .blob((blob) => {
+            let track: any = document.createElement("track");
+            track.kind = "captions";
+            track.label = "English";
+            track.srclang = "en";
+            track.src = URL.createObjectURL(blob);
+            img.append(track);
+            track.mode = "showing";
+            img.textTracks[0].mode = "showing";
+          });
+      } catch (e) {
+        console.error(e);
+      }
+    }
 
     const videoLoop = (v: any) => {
       if (parseFloat(el.parentElement.style.opacity) == 0.99 || v.ended || v.paused) return;

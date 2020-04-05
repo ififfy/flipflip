@@ -190,21 +190,28 @@ function loadLocalDirectory(systemMessage: Function, config: Config, source: Lib
 function loadVideo(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   const url = source.url;
   return new CancelablePromise((resolve) => {
-    let path = filterPathsToJustPlayable(filter, [url], true).map((p) => p.startsWith("http") ? p : fileURL(p));
-    if (path.length > 0) {
+    let paths = filterPathsToJustPlayable(filter, [url], true).map((p) => p.startsWith("http") ? p : fileURL(p));
+    if (paths.length > 0) {
+      let path = paths[0];
       helpers.count = 1;
+
+      if (source.subtitleFile != null && source.subtitleFile.length > 0) {
+        path = path + "|||" + source.subtitleFile;
+      }
       if (source.clips && source.clips.length > 0) {
         const clipPaths = Array<string>();
         for (let clip of source.clips) {
           if (!source.disabledClips || !source.disabledClips.includes(clip.id)) {
-            clipPaths.push(path[0] + ":::" + clip.id + ":::" + clip.start + ":" + clip.end);
+            clipPaths.push(path + ":::" + clip.id + ":::" + clip.start + ":" + clip.end);
           }
         }
-        path = clipPaths;
+        paths = clipPaths;
+      } else {
+        paths = [path];
       }
     }
     resolve({
-      data: path,
+      data: paths,
       helpers: helpers,
     });
   });

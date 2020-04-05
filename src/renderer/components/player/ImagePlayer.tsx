@@ -361,6 +361,11 @@ export default class ImagePlayer extends React.Component {
         video.setAttribute("index", urlIndex.toString());
         video.setAttribute("length", sourceLength.toString());
       }
+      let subtitleSplit = url.split("|||");
+      if (subtitleSplit.length > 1) {
+        url = subtitleSplit[0];
+        video.setAttribute("subtitles", subtitleSplit[1]);
+      }
       let clipRegex = /(.*):::(\d+):::(\d+\.?\d*):(\d+\.?\d*)$/g.exec(url);
       if (clipRegex != null) {
         url = clipRegex[1];

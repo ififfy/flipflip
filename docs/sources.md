@@ -36,6 +36,12 @@ The following filetypes are supported by FlipFlip:
 * .pls
 * .xspf
 
+## Subtitles
+* .vtt
+
+?> While VTT files are not the most common, there are many [online tools](https://subtitletools.com/convert-to-vtt-online) 
+which can easily convert more common formats (e.g. SRT, SSA/ASS, SBV, etc.) to WebVTT.
+
 ## Modifying sources
 #### Adding new source
 Click `+` and choose one of the following options:
@@ -48,16 +54,20 @@ Click `+` and choose one of the following options:
 #### Editing existing source
 * To edit a source, click its URL and then make your desired changes. 
   * _Note: Blank and duplicate sources will be automatically removed._
+* To see additional options for a source click the <img style="vertical-align: -5px" src="doc_icons/build.svg" 
+alt="Options" width="20" height="20">
+  * This will only show up for certain types of sources:
+    * _**Video** - specify a subtitle file_  
+* To edit the blacklist for a source, click the <img style="vertical-align: -5px" src="doc_icons/blacklist.svg" 
+alt="Blacklist" width="20" height="20">
+  * _This will only appear for sources which have a blacklist._
+  * _To clear the blacklist, **Shift** click the button._
 * To clear the cache for a source, click the <img style="vertical-align: -5px" src="doc_icons/clean.svg" 
 alt="Clear cache" width="20" height="20">
   * _This will only appear if caching is enabled and only for remote sources._
 * To select [clips](clips.md) for a source, click the <img style="vertical-align: -5px" src="doc_icons/clip.svg" 
 alt="Video Clipper" width="20" height="20">
   * _This will only appear for video sources._
-* To edit the blacklist for a source, click the <img style="vertical-align: -5px" src="doc_icons/blacklist.svg" 
-alt="Clear cache" width="20" height="20">
-  * _This will only appear for sources which have a blacklist._
-  * _To clear the blacklist, **Shift** click the button._
 * To delete a source, click the <img style="vertical-align: -5px" src="doc_icons/delete.svg" alt="Remove" width="20" height="20">
 
 ## Source types

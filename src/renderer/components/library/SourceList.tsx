@@ -7,9 +7,11 @@ import {FixedSizeList} from "react-window";
 import clsx from "clsx";
 
 import {
-  Button, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, Link, List, ListItemSecondaryAction,
-  ListItemText, Menu, MenuItem, Switch, TextField, Theme, Typography, withStyles
+  Button, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, InputAdornment, Link,
+  List, ListItemSecondaryAction, ListItemText, Menu, MenuItem, Switch, TextField, Theme, Tooltip, Typography, withStyles
 } from "@material-ui/core";
+
+import FolderIcon from "@material-ui/icons/Folder";
 
 import {arrayMove, getCachePath, getFileName, getSourceType, getTimestamp, urlToPath} from "../../data/utils";
 import {SDT, ST} from "../../data/const";
@@ -70,6 +72,8 @@ class SourceList extends React.Component {
     clipMenu: null as LibrarySource,
     blacklistSource: null as string,
     editBlacklist: null as string,
+    sourceOptionsType: null as string,
+    sourceOptions: null as LibrarySource,
   };
 
   onSortEnd = ({oldIndex, newIndex}: {oldIndex: number, newIndex: number}) => {
@@ -184,7 +188,6 @@ class SourceList extends React.Component {
               fullWidth
               multiline
               helperText="One URL to blacklist per line"
-              id="blacklist"
               value={this.state.editBlacklist}
               margin="dense"
               inputProps={{className: classes.blacklistInput}}
@@ -199,6 +202,36 @@ class SourceList extends React.Component {
               Save
             </Button>
           </DialogActions>
+        </Dialog>
+        <Dialog
+          open={this.state.sourceOptionsType == ST.video}
+          onClose={this.onCloseSourceOptions.bind(this)}
+          aria-describedby="video-options-description">
+          <DialogContent>
+            <DialogContentText id="edit-blacklist-description">
+              Video Options ({this.state.sourceOptions == null ? "" : this.state.sourceOptions.url})
+            </DialogContentText>
+            <TextField
+              label="Subtitle File"
+              fullWidth
+              placeholder="Paste URL Here"
+              margin="dense"
+              value={this.state.sourceOptions == null ? "" :
+                this.state.sourceOptions.subtitleFile == null ? "" : this.state.sourceOptions.subtitleFile}
+              InputProps={{
+                endAdornment:
+                  <InputAdornment position="end">
+                    <Tooltip title="Open File">
+                      <IconButton
+                        onClick={this.onOpenSubtitleFile.bind(this)}>
+                        <FolderIcon/>
+                      </IconButton>
+                    </Tooltip>
+                  </InputAdornment>,
+              }}
+              onChange={this.onChangSubtitleFile.bind(this)}
+            />
+          </DialogContent>
         </Dialog>
       </React.Fragment>
     )
@@ -353,6 +386,30 @@ class SourceList extends React.Component {
     this.setState({blacklistSource: source.url, editBlacklist: source.blacklist.join("\n")});
   }
 
+  onCloseSourceOptions() {
+    this.setState({sourceOptions: null, sourceOptionsType: null});
+  }
+
+  onSourceOptions(source: LibrarySource) {
+    this.setState({sourceOptions: source, sourceOptionsType: getSourceType(source.url)});
+  }
+
+  onOpenSubtitleFile() {
+    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'Web Video Text Tracks (WebVTT)', extensions: ['vtt']}], properties: ['openFile']});
+    if (!result || !result.length) return;
+    this.onSetSubtitleFile(result[0]);
+  }
+
+  onChangSubtitleFile(e: MouseEvent) {
+    this.onSetSubtitleFile((e.target as HTMLInputElement).value);
+  }
+
+  onSetSubtitleFile(subtitleFile: string) {
+    let sources = this.props.sources;
+    let source = sources.find((s) => s.url == this.state.sourceOptions.url);
+    source.subtitleFile = subtitleFile;
+    this.props.onUpdateSources(sources);
+  }
 
   SortableVirtualList = sortableContainer(this.VirtualList.bind(this));
 
@@ -398,6 +455,7 @@ class SourceList extends React.Component {
         onOpenClipMenu={this.onOpenClipMenu.bind(this)}
         onPlay={this.props.onPlay.bind(this)}
         onRemove={this.onRemove.bind(this)}
+        onSourceOptions={this.onSourceOptions.bind(this)}
         onStartEdit={this.onStartEdit.bind(this)}
         onToggleSelect={this.onToggleSelect.bind(this)}
         onToggleClip={this.onToggleClip.bind(this)}

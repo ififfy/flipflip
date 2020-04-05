@@ -7,6 +7,7 @@ import {
   SvgIcon, TextField, Theme, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
+import BuildIcon from '@material-ui/icons/Build';
 import DeleteIcon from '@material-ui/icons/Delete';
 import OfflineBoltIcon from '@material-ui/icons/OfflineBolt';
 
@@ -116,6 +117,7 @@ class SourceListItem extends React.Component {
     onOpenClipMenu(source: LibrarySource): void,
     onPlay(source: LibrarySource, displaySources: Array<LibrarySource>): void,
     onRemove(source: LibrarySource): void,
+    onSourceOptions(source: LibrarySource): void,
     onStartEdit(id: number): void,
     onToggleSelect(): void,
     onToggleClip(source: LibrarySource, clip: Clip): void,
@@ -129,6 +131,7 @@ class SourceListItem extends React.Component {
 
   render() {
     const classes = this.props.classes;
+    const sourceType = getSourceType(this.props.source.url);
     return(
       <div style={this.props.style}
            className={clsx(this.props.index % 2 == 0 ? classes.evenChild : classes.oddChild,
@@ -210,14 +213,14 @@ class SourceListItem extends React.Component {
 
           {this.props.isEditing != this.props.source.id && (
             <ListItemSecondaryAction className={clsx(classes.source, this.props.tutorial == SDT.sourceButtons && classes.highlight)}>
-              {(this.props.source.count > 0 && getSourceType(this.props.source.url) != ST.video) && (
+              {(this.props.source.count > 0 && sourceType != ST.video) && (
                 <Chip
                   className={clsx(classes.countChip, this.props.tutorial == SDT.sourceCount && classes.highlight)}
                   label={`${this.props.source.count}${this.props.source.countComplete ? '' : '+'}`}
                   color="primary"
                   size="small"/>
               )}
-              {(!this.props.isLibrary && this.props.source.clips && this.props.source.clips.length > 0 && getSourceType(this.props.source.url) == ST.video) && (
+              {(!this.props.isLibrary && this.props.source.clips && this.props.source.clips.length > 0 && sourceType == ST.video) && (
                 <Chip
                   className={classes.countChip}
                   label={(this.props.source.disabledClips ? this.props.source.clips.filter((c) => !this.props.source.disabledClips.includes(c.id)) : this.props.source.clips).length + "/" + this.props.source.clips.length}
@@ -225,14 +228,24 @@ class SourceListItem extends React.Component {
                   color="primary"
                   size="small"/>
               )}
-              {(this.props.isLibrary && this.props.source.clips && this.props.source.clips.length > 0 && getSourceType(this.props.source.url) == ST.video) && (
+              {(this.props.isLibrary && this.props.source.clips && this.props.source.clips.length > 0 && sourceType == ST.video) && (
                 <Chip
                   className={classes.countChip}
                   label={this.props.source.clips.length}
                   color="primary"
                   size="small"/>
               )}
-              {getSourceType(this.props.source.url) == ST.video && (
+              {(sourceType == ST.video || sourceType == ST.twitter || sourceType == ST.reddit) && (
+                <IconButton
+                  onClick={this.props.onSourceOptions.bind(this, this.props.source)}
+                  className={classes.actionButton}
+                  edge="end"
+                  size="small"
+                  aria-label="options">
+                  <BuildIcon/>
+                </IconButton>
+              )}
+              {sourceType == ST.video && (
                 <IconButton
                   onClick={this.onClip.bind(this)}
                   className={classes.actionButton}
@@ -266,8 +279,8 @@ class SourceListItem extends React.Component {
                   </SvgIcon>
                 </IconButton>
               )}
-              {this.props.config.caching.enabled && getSourceType(this.props.source.url) != ST.local &&
-              ((getSourceType(this.props.source.url) != ST.video && getSourceType(this.props.source.url) != ST.playlist)
+              {this.props.config.caching.enabled && sourceType != ST.local &&
+              ((sourceType != ST.video && sourceType != ST.playlist)
                 || /^https?:\/\//g.exec(this.props.source.url) != null) && (
                 <React.Fragment>
                   <IconButton

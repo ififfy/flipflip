@@ -14,6 +14,10 @@ export default class LibrarySource {
   count: number = 0;
   countComplete: boolean = false;
 
+  // Type specific properties
+  // Video
+  subtitleFile: string;
+
   constructor(init?: Partial<LibrarySource>) {
     Object.assign(this, init);
   }
