@@ -92,4 +92,17 @@ export default new Map<string, string>([
   ['af.directory', '+ Local directory'],
   ['af.videos', '+ Local video/playlist'],
   ['af.library', '+ From Library'],
+
+  ['rf.hot', 'Hot'],
+  ['rf.new', 'New'],
+  ['rf.top', 'Top'],
+  ['rf.cont', 'Controversial'],
+  ['rf.rising', 'Rising'],
+
+  ['hour', 'Last Hour'],
+  ['day', 'Last Day'],
+  ['week', 'Lasy Week'],
+  ['month', 'Last Month'],
+  ['year', 'Last Year'],
+  ['all', 'All Time'],
 ]);

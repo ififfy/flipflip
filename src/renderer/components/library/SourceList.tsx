@@ -7,18 +7,20 @@ import {FixedSizeList} from "react-window";
 import clsx from "clsx";
 
 import {
-  Button, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, IconButton, InputAdornment, Link,
-  List, ListItemSecondaryAction, ListItemText, Menu, MenuItem, Switch, TextField, Theme, Tooltip, Typography, withStyles
+  Button, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, FormControl, IconButton,
+  InputAdornment, InputLabel, Link, List, ListItemSecondaryAction, ListItemText, Menu, MenuItem, Select, Switch,
+  TextField, Theme, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
 import FolderIcon from "@material-ui/icons/Folder";
 
 import {arrayMove, getCachePath, getFileName, getSourceType, getTimestamp, urlToPath} from "../../data/utils";
-import {SDT, ST} from "../../data/const";
+import {RF, RT, SDT, ST} from "../../data/const";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
 import SourceListItem from "./SourceListItem";
 import Clip from "../../data/Clip";
+import en from "../../data/en";
 
 const styles = (theme: Theme) => createStyles({
   emptyMessage: {
@@ -40,6 +42,9 @@ const styles = (theme: Theme) => createStyles({
     whiteSpace: 'nowrap',
     overflowX: 'hidden',
     overflowY: 'auto !important' as any,
+  },
+  fullWidth: {
+    width: '100%',
   },
 });
 
@@ -203,36 +208,73 @@ class SourceList extends React.Component {
             </Button>
           </DialogActions>
         </Dialog>
-        <Dialog
-          open={this.state.sourceOptionsType == ST.video}
-          onClose={this.onCloseSourceOptions.bind(this)}
-          aria-describedby="video-options-description">
-          <DialogContent>
-            <DialogContentText id="edit-blacklist-description">
-              Video Options ({this.state.sourceOptions == null ? "" : this.state.sourceOptions.url})
-            </DialogContentText>
-            <TextField
-              label="Subtitle File"
-              fullWidth
-              placeholder="Paste URL Here"
-              margin="dense"
-              value={this.state.sourceOptions == null ? "" :
-                this.state.sourceOptions.subtitleFile == null ? "" : this.state.sourceOptions.subtitleFile}
-              InputProps={{
-                endAdornment:
-                  <InputAdornment position="end">
-                    <Tooltip title="Open File">
-                      <IconButton
-                        onClick={this.onOpenSubtitleFile.bind(this)}>
-                        <FolderIcon/>
-                      </IconButton>
-                    </Tooltip>
-                  </InputAdornment>,
-              }}
-              onChange={this.onChangSubtitleFile.bind(this)}
-            />
-          </DialogContent>
-        </Dialog>
+        {this.state.sourceOptionsType == ST.video && (
+          <Dialog
+            open={this.state.sourceOptionsType == ST.video}
+            onClose={this.onCloseSourceOptions.bind(this)}
+            aria-describedby="video-options-description">
+            <DialogContent>
+              <DialogContentText id="video-options-description">
+                Video Options ({this.state.sourceOptions.url})
+              </DialogContentText>
+              <TextField
+                label="Subtitle File"
+                fullWidth
+                placeholder="Paste URL Here"
+                margin="dense"
+                value={this.state.sourceOptions.subtitleFile == null ? "" : this.state.sourceOptions.subtitleFile}
+                InputProps={{
+                  endAdornment:
+                    <InputAdornment position="end">
+                      <Tooltip title="Open File">
+                        <IconButton
+                          onClick={this.onOpenSubtitleFile.bind(this)}>
+                          <FolderIcon/>
+                        </IconButton>
+                      </Tooltip>
+                    </InputAdornment>,
+                }}
+                onChange={this.onChangSubtitleFile.bind(this)}
+              />
+            </DialogContent>
+          </Dialog>
+        )}
+        {this.state.sourceOptionsType == ST.reddit && (
+          <Dialog
+            open={this.state.sourceOptionsType == ST.reddit}
+            onClose={this.onCloseSourceOptions.bind(this)}
+            aria-describedby="reddit-options-description">
+            <DialogContent>
+              <DialogContentText id="reddit-options-description">
+                Reddit Options ({this.state.sourceOptions.url})
+              </DialogContentText>
+              <FormControl className={classes.fullWidth}>
+                <InputLabel>Post Order</InputLabel>
+                <Select
+                  disabled={this.state.sourceOptions.url.includes("/user/") || this.state.sourceOptions.url.includes("/u/")}
+                  value={this.state.sourceOptions.redditFunc == null ? RF.hot : this.state.sourceOptions.redditFunc}
+                  onChange={this.onChangeRedditFunc.bind(this)}>
+                  {Object.values(RF).map((rf) =>
+                    <MenuItem key={rf} value={rf}>{en.get(rf)}</MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+              {this.state.sourceOptions.redditFunc == RF.top && (
+                <Select
+                  className={classes.fullWidth}
+                  disabled={this.state.sourceOptions.url.includes("/user/") || this.state.sourceOptions.url.includes("/u/")}
+                  value={this.state.sourceOptions.redditTime == null ? RT.day : this.state.sourceOptions.redditTime}
+                  onChange={this.onChangeRedditTime.bind(this)}>
+                  {Object.values(RT).map((rt) =>
+                    <MenuItem key={rt} value={rt}>{en.get(rt)}</MenuItem>
+                  )}
+                </Select>
+              )}
+              {(this.state.sourceOptions.url.includes("/user/") || this.state.sourceOptions.url.includes("/u/")) &&
+              <DialogContentText>This only applies to subreddits, not user profiles</DialogContentText>}
+            </DialogContent>
+          </Dialog>
+        )}
       </React.Fragment>
     )
   }
@@ -408,6 +450,20 @@ class SourceList extends React.Component {
     let sources = this.props.sources;
     let source = sources.find((s) => s.url == this.state.sourceOptions.url);
     source.subtitleFile = subtitleFile;
+    this.props.onUpdateSources(sources);
+  }
+
+  onChangeRedditFunc(e: MouseEvent) {
+    let sources = this.props.sources;
+    let source = sources.find((s) => s.url == this.state.sourceOptions.url);
+    source.redditFunc = (e.target as HTMLInputElement).value;
+    this.props.onUpdateSources(sources);
+  }
+
+  onChangeRedditTime(e: MouseEvent) {
+    let sources = this.props.sources;
+    let source = sources.find((s) => s.url == this.state.sourceOptions.url);
+    source.redditTime = (e.target as HTMLInputElement).value;
     this.props.onUpdateSources(sources);
   }
 

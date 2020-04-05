@@ -10,7 +10,7 @@ import imgur from "imgur";
 import Twitter from "twitter";
 import {IgApiClient} from "instagram-private-api";
 
-import {IF, OF, ST, WF} from '../../data/const';
+import {IF, OF, RF, RT, ST, WF} from '../../data/const';
 import {
   CancelablePromise,
   convertURL,
@@ -195,18 +195,22 @@ function loadVideo(systemMessage: Function, config: Config, source: LibrarySourc
       let path = paths[0];
       helpers.count = 1;
 
-      if (source.subtitleFile != null && source.subtitleFile.length > 0) {
-        path = path + "|||" + source.subtitleFile;
-      }
       if (source.clips && source.clips.length > 0) {
         const clipPaths = Array<string>();
         for (let clip of source.clips) {
           if (!source.disabledClips || !source.disabledClips.includes(clip.id)) {
-            clipPaths.push(path + ":::" + clip.id + ":::" + clip.start + ":" + clip.end);
+            let clipPath = path + ":::" + clip.id + ":::" + clip.start + ":" + clip.end;
+            if (source.subtitleFile != null && source.subtitleFile.length > 0) {
+              clipPath = clipPath + "|||" + source.subtitleFile;
+            }
+            clipPaths.push(clipPath);
           }
         }
         paths = clipPaths;
       } else {
+        if (source.subtitleFile != null && source.subtitleFile.length > 0) {
+          path = path + "|||" + source.subtitleFile;
+        }
         paths = [path];
       }
     }
@@ -434,45 +438,75 @@ function loadReddit(systemMessage: Function, config: Config, source: LibrarySour
         refreshToken: config.remoteSettings.redditRefreshToken,
       });
       if (url.includes("/r/")) {
-        reddit.getSubreddit(getFileGroup(url)).getHot({after: helpers.next})
-          .then((submissionListing: any) => {
-            if (submissionListing.length > 0) {
-              let convertedListing = Array<string>();
-              let convertedCount = 0;
-              for (let s of submissionListing) {
-                convertURL(s.url).then((urls: Array<string>) => {
-                  convertedListing = convertedListing.concat(urls);
-                  convertedCount++;
-                  if (convertedCount == submissionListing.length) {
-                    helpers.next = submissionListing[submissionListing.length - 1].name;
-                    helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
-                    resolve({
-                      data: filterPathsToJustPlayable(filter, convertedListing, true),
-                      helpers: helpers,
-                    });
-                  }
-                })
-                .catch ((error: any) => {
-                  console.error(error);
-                  convertedCount++;
-                  if (convertedCount == submissionListing.length) {
-                    helpers.next = submissionListing[submissionListing.length - 1].name;
-                    helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
-                    resolve({
-                      data: filterPathsToJustPlayable(filter, convertedListing, true),
-                      helpers: helpers,
-                    });
-                  }
-                });
-              }
-            } else {
-              helpers.next = null;
-              resolve({data: [], helpers: helpers});
+        const handleSubmissions = (submissionListing: any) => {
+          if (submissionListing.length > 0) {
+            let convertedListing = Array<string>();
+            let convertedCount = 0;
+            for (let s of submissionListing) {
+              convertURL(s.url).then((urls: Array<string>) => {
+                convertedListing = convertedListing.concat(urls);
+                convertedCount++;
+                if (convertedCount == submissionListing.length) {
+                  helpers.next = submissionListing[submissionListing.length - 1].name;
+                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
+                  resolve({
+                    data: filterPathsToJustPlayable(filter, convertedListing, true),
+                    helpers: helpers,
+                  });
+                }
+              })
+              .catch ((error: any) => {
+                console.error(error);
+                convertedCount++;
+                if (convertedCount == submissionListing.length) {
+                  helpers.next = submissionListing[submissionListing.length - 1].name;
+                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
+                  resolve({
+                    data: filterPathsToJustPlayable(filter, convertedListing, true),
+                    helpers: helpers,
+                  });
+                }
+              });
             }
-          })
-          .catch((error: any) => {
-            resolve(null);
-          });
+          } else {
+            helpers.next = null;
+            resolve({data: [], helpers: helpers});
+          }
+        };
+        const errorSubmission = (error: any) => {
+          console.error(error);
+          resolve(null);
+        };
+
+        switch (source.redditFunc) {
+          default:
+          case RF.hot:
+            reddit.getSubreddit(getFileGroup(url)).getHot({after: helpers.next})
+              .then(handleSubmissions)
+              .catch(errorSubmission);
+            break;
+          case RF.new:
+            reddit.getSubreddit(getFileGroup(url)).getNew({after: helpers.next})
+              .then(handleSubmissions)
+              .catch(errorSubmission);
+            break;
+          case RF.top:
+            const time = source.redditTime == null ? RT.day : source.redditTime;
+            reddit.getSubreddit(getFileGroup(url)).getTop({time: time, after: helpers.next})
+              .then(handleSubmissions)
+              .catch(errorSubmission);
+            break;
+          case RF.controversial:
+            reddit.getSubreddit(getFileGroup(url)).getControversial({after: helpers.next})
+              .then(handleSubmissions)
+              .catch(errorSubmission);
+            break;
+          case RF.rising:
+            reddit.getSubreddit(getFileGroup(url)).getRising({after: helpers.next})
+              .then(handleSubmissions)
+              .catch(errorSubmission);
+            break;
+        }
       } else if (url.includes("/user/") || url.includes("/u/")) {
         reddit.getUser(getFileGroup(url)).getSubmissions({after: helpers.next})
           .then((submissionListing: any) => {

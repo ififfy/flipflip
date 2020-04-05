@@ -11,6 +11,7 @@
 - Allow RANDOM_PHRASE and TAG_PHRASE to work with blink
 - Add display count to Library
 - Add progress display on taskbar
+- Add options for Reddit feed
 - Add ability to view and edit blacklist
 - Fix blacklisting
 - Fix bug with clip loading

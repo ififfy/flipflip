@@ -17,6 +17,9 @@ export default class LibrarySource {
   // Type specific properties
   // Video
   subtitleFile: string;
+  // Reddit
+  redditFunc: string;
+  redditTime: string;
 
   constructor(init?: Partial<LibrarySource>) {
     Object.assign(this, init);

@@ -170,6 +170,23 @@ const IG = { // Instagram modes
   checkpoint: 'ig.checkpoint',
 };
 
+const RF = { // Reddit functions
+  hot: 'rf.hot',
+  new: 'rf.new',
+  top: 'rf.top',
+  controversial: 'rf.cont',
+  rising: 'rf.rising',
+};
+
+const RT = { // Reddit timespan
+  hour: 'hour',
+  day: 'day',
+  week: 'week',
+  month: 'month',
+  year: 'year',
+  all: 'all',
+};
+
 const DONE = 'done';
 
 const SPT = { // Scene Picker Tutorials
@@ -265,5 +282,5 @@ const VCT = { // Video Clipper Tutorials
 };
 
 export {
-  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, SC, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG, SPT, SDT, PT, LT, SDGT, SGT, VCT, DONE
+  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, SC, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG, RF, RT, SPT, SDT, PT, LT, SDGT, SGT, VCT, DONE
 };
