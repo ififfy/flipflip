@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.0.4 <small>(04/06/2020)</small>
+## 3.0.4 <small>(04/05/2020)</small>
 - Add subtitle support (WebVTT)
 - Add ability to auto-backup
 - Allow clips to be tagged
