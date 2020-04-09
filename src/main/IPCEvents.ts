@@ -1,10 +1,10 @@
-import { ipcMain, IpcMessageEvent } from 'electron'
+import { ipcMain, IpcMainEvent } from 'electron'
 
 import { createNewWindow } from './WindowManager'
 import {IPC} from "../renderer/data/const";
 
 // Define functions
-function onRequestCreateNewWindow(ev: IpcMessageEvent) {
+function onRequestCreateNewWindow(event: IpcMainEvent) {
   createNewWindow();
 }
 

@@ -601,7 +601,7 @@ class AudioControl extends React.Component {
   }
 
   onOpenFile() {
-    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openFile']});
+    let result = remote.dialog.showOpenDialogSync(remote.getCurrentWindow(), {properties: ['openFile']});
     if (!result || !result.length) return;
     const newAudios = this.props.scene.audios;
     const audio: any = newAudios.find((a) => a.id == this.props.audio.id);

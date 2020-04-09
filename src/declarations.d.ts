@@ -29,7 +29,6 @@ declare module 'file-url';
 declare module 'imgur';
 declare module 'music-metadata';
 declare module 'oauth';
-declare module 'progressbar.js';
 declare module 'react-color';
 declare module 'react-select';
 declare module 'react-select/creatable';

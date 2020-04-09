@@ -316,7 +316,7 @@ class TextCard extends React.Component {
   }
 
   onOpenFile() {
-    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openFile']});
+    let result = remote.dialog.showOpenDialogSync(remote.getCurrentWindow(), {properties: ['openFile']});
     if (!result || !result.length) return;
     this.changeKey('textSource', fileURL(result[0]));
   }

@@ -188,8 +188,8 @@ class CacheCard extends React.Component {
   }
 
   onCacheDirChange() {
-    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']});
-    if (!result) return;
+    let result = remote.dialog.showOpenDialogSync(remote.getCurrentWindow(), {properties: ['openDirectory']});
+    if (!result || !result.length) return;
     this.changeKey('directory', result[0]);
   }
 
