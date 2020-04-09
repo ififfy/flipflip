@@ -66,6 +66,8 @@ export default class ImagePlayer extends React.Component {
   _timeout: NodeJS.Timeout;
   _waitTimeouts: Array<NodeJS.Timeout>;
   _toggleStrobe: boolean;
+  _runFetchLoopCallRequests: Array<number>;
+  _animationFrameHandle: number;
 
   render() {
     let offset = this.props.historyOffset;
@@ -114,6 +116,7 @@ export default class ImagePlayer extends React.Component {
   nop() {}
 
   componentDidMount() {
+    this._runFetchLoopCallRequests = [];
     this._isMounted = true;
     this._isLooping = false;
     this._loadedURLs = new Array<string>();
@@ -233,6 +236,8 @@ export default class ImagePlayer extends React.Component {
     }
 
     this.advance(true, true);
+
+    window.requestAnimationFrame(this.animationFrame);
   }
 
   startFetchLoops(max: number, loop = 0) {
@@ -243,12 +248,23 @@ export default class ImagePlayer extends React.Component {
     }
   }
 
+  animationFrame = () => {
+    while (this._runFetchLoopCallRequests.length > 0) {
+      this.runFetchLoop(this._runFetchLoopCallRequests.shift());
+    }
+    this._animationFrameHandle = requestAnimationFrame(this.animationFrame);
+  }
+
+  queueRunFetchLoop(i: number) {
+    this._runFetchLoopCallRequests.push(i);
+  }
+
   runFetchLoop(i: number) {
     if (!this._isMounted) return;
 
     if (this.state.readyToDisplay.length >= this.props.maxLoadingAtOnce || !this.props.allURLs) {
       // Wait for the display loop to use an image
-      this._waitTimeouts[i] = setTimeout(() => this.runFetchLoop(i), 100);
+      this._waitTimeouts[i] = setTimeout(() => this.queueRunFetchLoop(i), 100);
       return;
     }
 
@@ -272,7 +288,7 @@ export default class ImagePlayer extends React.Component {
 
       // If we have no urls, loop again
       if (!(collection && collection.length)) {
-        this.runFetchLoop(i);
+        this.queueRunFetchLoop(i);
         return;
       }
 
@@ -289,7 +305,7 @@ export default class ImagePlayer extends React.Component {
             this._loadedURLs = new Array<string>();
             collection = this.props.allURLs.get(source);
           } else { // Else loop again
-            this.runFetchLoop(i);
+            this.queueRunFetchLoop(i);
             return;
           }
         }
@@ -320,7 +336,7 @@ export default class ImagePlayer extends React.Component {
       collection = [].concat.apply([], Array.from(this.props.allURLs.keys()));
       // If there are none, loop again1
       if (!(collection && collection.length)) {
-        this.runFetchLoop(i);
+        this.queueRunFetchLoop(i);
         return;
       }
 
@@ -419,7 +435,7 @@ export default class ImagePlayer extends React.Component {
         if (this.state.historyPaths.length === 0) {
           this.advance(false, false);
         }
-        this.runFetchLoop(i);
+        this.queueRunFetchLoop(i);
       };
 
       const errorCallback = () => {
@@ -427,7 +443,7 @@ export default class ImagePlayer extends React.Component {
         if (this.props.scene.nextSceneAllImages && this.props.scene.nextSceneID != 0 && this.props.playNextScene && video && video.src) {
           this._playedURLs.push(video.src);
         }
-        this.runFetchLoop(i);
+        this.queueRunFetchLoop(i);
       };
 
       if (this.props.scene.continueVideo) {
@@ -480,7 +496,7 @@ export default class ImagePlayer extends React.Component {
         if (this.state.historyPaths.length === 0) {
           this.advance(false, false);
         }
-        this.runFetchLoop(i);
+        this.queueRunFetchLoop(i);
       };
 
       const errorCallback = () => {
@@ -488,7 +504,7 @@ export default class ImagePlayer extends React.Component {
         if (this.props.scene.nextSceneAllImages && this.props.scene.nextSceneID != 0 && this.props.playNextScene && img && img.src) {
           this._playedURLs.push(img.src);
         }
-        this.runFetchLoop(i);
+        this.queueRunFetchLoop(i);
       };
 
       img.onload = () => {
@@ -509,7 +525,7 @@ export default class ImagePlayer extends React.Component {
 
       const processInfo = (info: GifInfo) => {
         if (info == null) {
-          this.runFetchLoop(i);
+          this.queueRunFetchLoop(i);
           return;
         }
 
@@ -524,11 +540,11 @@ export default class ImagePlayer extends React.Component {
 
         // Exclude non-animated gifs from gifs
         if (this.props.scene.imageTypeFilter == IF.gifs && info && !info.animated) {
-          this.runFetchLoop(i);
+          this.queueRunFetchLoop(i);
           return;
           // Exclude animated gifs from stills
         } else if (this.props.scene.imageTypeFilter == IF.stills && info && info.animated) {
-          this.runFetchLoop(i);
+          this.queueRunFetchLoop(i);
           return;
         }
 
