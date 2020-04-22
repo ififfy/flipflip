@@ -1211,7 +1211,7 @@ export default class SourceScraper extends React.Component {
     setHistoryPaths(historyPaths: Array<any>): void,
     firstImageLoaded(): void,
     finishedLoading(empty: boolean): void,
-    setProgress(total: number, current: number, message: string): void,
+    setProgress(total: number, current: number, message: string[]): void,
     setVideo(video: HTMLVideoElement): void,
     setCount(sourceURL: string, count: number, countComplete: boolean): void,
     cache(i: HTMLImageElement | HTMLVideoElement): void,
@@ -1293,9 +1293,9 @@ export default class SourceScraper extends React.Component {
 
       const d = sources[n];
 
-      let message = d ? d.url : "";
+      let message = d ? [d.url] : [""];
       if (this.props.opacity != 1) {
-        message = "<p>Loading Overlay...</p>" + message;
+        message = ["Loading '" + this.props.scene.name + "'...", message];
       }
       this.props.setProgress(this.props.scene.sources.length, n+1, message);
 

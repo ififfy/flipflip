@@ -50,7 +50,7 @@ export default class Player extends React.Component {
     isPlaying: true,
     total: 0,
     progress: 0,
-    progressMessage: this.props.scene.sources.length > 0 ? this.props.scene.sources[0].url : "",
+    progressMessage: this.props.scene.sources.length > 0 ? [this.props.scene.sources[0].url] : [""],
     startTime: null as Date,
     historyOffset: 0,
     historyPaths: Array<any>(),
@@ -168,9 +168,11 @@ export default class Player extends React.Component {
                   <Typography component="h1" variant="h6" color="inherit" noWrap>
                     {this.state.progress} / {this.state.total}
                   </Typography>
-                  <Typography component="h1" variant="h5" color="inherit" noWrap>
-                    {this.state.progressMessage}
-                  </Typography>
+                  {this.state.progressMessage.map((message) =>
+                    <Typography component="h1" variant="h5" color="inherit" noWrap>
+                      {message}
+                    </Typography>
+                  )}
                   {this.state.canStart && (
                     <Button
                       style={{
@@ -401,6 +403,7 @@ export default class Player extends React.Component {
       this.props.tags !== props.tags ||
       this.state.canStart !== state.canStart ||
       this.state.hasStarted !== state.hasStarted ||
+      this.state.isMainLoaded !== state.isMainLoaded ||
       this.state.areOverlaysLoaded !== state.areOverlaysLoaded ||
       this.state.isEmpty !== state.isEmpty ||
       this.state.isPlaying !== state.isPlaying ||
@@ -415,7 +418,7 @@ export default class Player extends React.Component {
 
   nop() {}
 
-  setProgress(total: number, current: number, message: string) {
+  setProgress(total: number, current: number, message: string[]) {
     this.setState({total: total, progress: current, progressMessage: message});
   }
 
@@ -511,7 +514,7 @@ export default class Player extends React.Component {
       historyPaths: Array<any>(),
       total: 0,
       progress: 0,
-      progressMessage: this.props.scene.sources.length > 0 ? this.props.scene.sources[0].url : "",
+      progressMessage: this.props.scene.sources.length > 0 ? [this.props.scene.sources[0].url] : [""],
     });
     this.props.navigateTagging(offset);
   }
