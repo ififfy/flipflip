@@ -5,6 +5,8 @@ export default class WeightGroup {
   percent: number;
   type: string;
   tag: Tag;
+  max: number;
+  chosen: number;
   rules: Array<WeightGroup>;
 
   constructor(init?: Partial<Tag>) {

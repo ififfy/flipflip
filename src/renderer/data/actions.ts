@@ -928,7 +928,10 @@ export function generateScene(state: State, scene: Scene): Object {
     switch (wg.type) {
       // If this adv rule is weighted, add the percentage of sources to the master list
       case TT.weight:
-        genSources = genSources.concat(reduceList(randomizeList(rulesSources), Math.round(newScene.generatorMax * (wg.percent / 100))));
+        wg.max = rulesSources.length;
+        let chosenSources = reduceList(randomizeList(rulesSources), Math.round(newScene.generatorMax * (wg.percent / 100)))
+        genSources = genSources.concat(chosenSources);
+        wg.chosen = chosenSources.length;
         break;
       // If this adv rule is all, add the sources to the require list
       case TT.all:
@@ -1114,7 +1117,10 @@ export function generateScene(state: State, scene: Scene): Object {
         }
         sources.push(s);
       }
-      genSources = genSources.concat(reduceList(sources, Math.round(newScene.generatorMax * (wg.percent / 100))));
+      wg.max = sources.length;
+      let chosenSources = reduceList(sources, Math.round(newScene.generatorMax * (wg.percent / 100)));
+      genSources = genSources.concat(chosenSources);
+      wg.chosen = chosenSources.length;
     }
   }
   genSources = reduceList(randomizeList(removeDuplicatesBy((s: LibrarySource) => s.url, genSources)), newScene.generatorMax);

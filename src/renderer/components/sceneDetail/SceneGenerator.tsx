@@ -2,9 +2,9 @@ import * as React from "react";
 import clsx from "clsx";
 
 import {
-  Avatar, Card, CardContent, CardHeader, createStyles, Dialog, DialogContent, DialogTitle, Divider, FormControlLabel,
-  Grid, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Menu, MenuItem, Radio,
-  RadioGroup, Slider, TextField, Theme, withStyles
+  Avatar, Card, CardContent, CardHeader, Chip, createStyles, Dialog, DialogContent, DialogTitle, Divider,
+  FormControlLabel, Grid, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Menu,
+  MenuItem, Radio, RadioGroup, Slider, TextField, Theme, withStyles
 } from "@material-ui/core";
 import ValueLabel from "@material-ui/core/Slider/ValueLabel";
 
@@ -162,6 +162,12 @@ class SceneGenerator extends React.Component {
                 }
                 action={
                   <React.Fragment>
+                    {wg.chosen && (
+                      <Chip
+                        label={wg.chosen + "/" + wg.max}
+                        color='secondary'
+                        size='small'/>
+                    )}
                     {wg.rules && (
                       <IconButton size="small" onClick={this.onEditGroup.bind(this, i)}>
                         <EditIcon />
@@ -402,7 +408,7 @@ class SceneGenerator extends React.Component {
     const generatorWeights = this.props.scene.generatorWeights;
     const wg = generatorWeights[this.state.isEditing];
     wg.rules = wg.rules.concat([newWG]);
-    this.changeKey("generatorWeights", generatorWeights);
+    this.changeGeneratorWeights(generatorWeights);
   }
 
   onClickAddRule(e: MouseEvent) {
@@ -421,14 +427,14 @@ class SceneGenerator extends React.Component {
     const generatorWeights = this.props.scene.generatorWeights;
     const wg = generatorWeights[this.state.isEditing];
     wg.rules.splice(index, 1);
-    this.changeKey("generatorWeights", generatorWeights);
+    this.changeGeneratorWeights(generatorWeights);
   }
 
   onGroupNameChange(e: MouseEvent) {
     const generatorWeights = this.props.scene.generatorWeights;
     const wg = generatorWeights[this.state.isEditing];
     wg.name = (e.target as HTMLInputElement).value;
-    this.changeKey("generatorWeights", generatorWeights);
+    this.changeGeneratorWeights(generatorWeights);
   }
 
   onWeighGroup(index: number, e: MouseEvent) {
@@ -445,7 +451,7 @@ class SceneGenerator extends React.Component {
   onDeleteGroup(index: number) {
     const generatorWeights = this.props.scene.generatorWeights;
     generatorWeights.splice(index, 1);
-    this.changeKey("generatorWeights", generatorWeights);
+    this.changeGeneratorWeights(generatorWeights);
   }
 
   onGroupSliderChange(index: number, key: string, e: MouseEvent, value: number) {
@@ -458,7 +464,7 @@ class SceneGenerator extends React.Component {
       const rule = wg.rules[index];
       (rule as any)[key] = value;
     }
-    this.changeKey("generatorWeights", generatorWeights);
+    this.changeGeneratorWeights(generatorWeights);
   }
 
   onGroupInput(index: number, key: string, e: MouseEvent) {
@@ -478,11 +484,17 @@ class SceneGenerator extends React.Component {
         this.onCloseDialog();
       }
     }
-    this.changeKey("generatorWeights", generatorWeights);
+    this.changeGeneratorWeights(generatorWeights);
   }
 
-  changeKey(key: string, value: any) {
-    this.update((s) => s[key] = value);
+  changeGeneratorWeights(weights: WeightGroup[]) {
+    for (let wg of weights) {
+      wg.max = null;
+      wg.chosen = null;
+    }
+    this.update((s) => {
+      s.generatorWeights = weights;
+    });
   }
 
   update(fn: (scene: any) => void) {
