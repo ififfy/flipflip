@@ -306,8 +306,7 @@ export default class CaptionProgram extends React.Component {
     return (nextCommand: Function) => {
       let fns = new Array<Function>();
       let i = 0;
-      value = this.getPhrase(value);
-      for (let word of value.split('/')) {
+      for (let word of this.getPhrase(value).split('/')) {
         word = word.trim();
         let j = i;
         i += 1;
