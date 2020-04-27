@@ -238,7 +238,7 @@ export default class Meta extends React.Component {
               tutorial={this.state.tutorial}
               onUpdateScene={a(actions.updateScene)}
               goBack={a(actions.endPlaySceneFromLibrary)}
-              tags={actions.getLibrarySource(this.state).tags}
+              tags={actions.getLibrarySource(this.state)?.tags}
               allTags={this.state.tags}
               toggleTag={a(actions.toggleTag)}
               navigateTagging={a(actions.navigateDisplayedLibrary)}
