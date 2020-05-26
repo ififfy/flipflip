@@ -107,7 +107,7 @@ export function getSourceType(url: string): string {
     return ST.deviantart;
   } else if (/^https?:\/\/(www\.)?instagram\.com\//.exec(url) != null) {
     return ST.instagram;
-  } else if (/^https?:\/\/(www\.)?(hypnohub\.net|danbooru\.donmai\.us|e621\.net)\//.exec(url) != null) {
+  } else if (/^https?:\/\/(www\.)?(lolibooru\.moe|hypnohub\.net|danbooru\.donmai\.us|e621\.net)\//.exec(url) != null) {
     return ST.danbooru;
   } else if (/^https?:\/\/(www\.)?(gelbooru\.com|furry\.booru\.org|rule34\.xxx|realbooru\.com)\//.exec(url) != null) {
     return ST.gelbooru2;
