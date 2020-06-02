@@ -4,6 +4,13 @@ FlipFlip is an Electron app written in TypeScript and React.
 
 ## Setup
 
+You will need to download and install the following tools:
+
+* [Git](https://git-scm.com/downloads)
+* [Yarn](https://classic.yarnpkg.com/en/docs/install)
+* [NodeJS](https://nodejs.org/en/download/)
+
+Then, in a Bash shell, run the following:
 ```sh
 git clone https://github.com/ififfy/flipflip.git
 cd flipflip
