@@ -32,17 +32,18 @@ export default class Strobe extends React.Component {
   }
 
   getStrobeColor() {
+    let color = null;
     if (this.props.scene.strobeColorType == SC.color) {
-      return this.props.scene.strobeColor;
+      color = this.props.scene.strobeColor;
     } else if (this.props.scene.strobeColorType == SC.colorSet) {
       if (this.props.scene.strobeColorSet.length > 0) {
-        return getRandomListItem(this.props.scene.strobeColorSet);
-      } else {
-        return "";
+        color = getRandomListItem(this.props.scene.strobeColorSet);
       }
     } else {
-      return getRandomColor();
+      color = getRandomColor();
     }
+    const validColor = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/g.exec(color);
+    return validColor ? color : "";
   }
 
   StrobeLayer = (data: {children: React.ReactNode}) => {
