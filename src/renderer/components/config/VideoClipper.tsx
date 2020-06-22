@@ -330,6 +330,7 @@ class VideoClipper extends React.Component {
                         </Grid>
                         <Grid item>
                           <TextField
+                            id="start"
                             className={classes.clipField}
                             label="Start"
                             value={this.state.isEditingStartText}
@@ -338,6 +339,7 @@ class VideoClipper extends React.Component {
                         </Grid>
                         <Grid item>
                           <TextField
+                            id="end"
                             className={classes.clipField}
                             label="End"
                             value={this.state.isEditingEndText}
@@ -663,6 +665,10 @@ class VideoClipper extends React.Component {
     const input = (e.target as HTMLInputElement);
     this.setState({isEditingStartText: input.value});
     let timestampValue = getTimestampValue(input.value);
+    this.onChangeStartTextValue(timestampValue);
+  }
+
+  onChangeStartTextValue(timestampValue: number) {
     if (timestampValue != null) {
       this.onChangePosition(null, [timestampValue, this.state.isEditingValue[1]]);
     }
@@ -677,6 +683,10 @@ class VideoClipper extends React.Component {
     const input = (e.target as HTMLInputElement);
     this.setState({isEditingEndText: input.value});
     let timestampValue = getTimestampValue(input.value);
+    this.onChangeStartTextValue(timestampValue);
+  }
+
+  onChangeEndTextValue(timestampValue: number) {
     if (timestampValue != null) {
       this.onChangePosition(null, [this.state.isEditingValue[0], timestampValue]);
     }
@@ -688,6 +698,9 @@ class VideoClipper extends React.Component {
   }
 
   onKeyDown = (e: KeyboardEvent) => {
+    const focus = document.activeElement.tagName.toLocaleLowerCase();
+    const start = document.activeElement.id == "start";
+    const end = document.activeElement.id == "end";
     switch (e.key) {
       case 'Escape':
         e.preventDefault();
@@ -718,6 +731,26 @@ class VideoClipper extends React.Component {
           this.nextClip();
         } else {
           this.nextSource();
+        }
+        break;
+      case 'ArrowDown':
+        if (focus == "input") {
+          e.preventDefault();
+          if (start) {
+            this.onChangeStartTextValue(getTimestampValue(this.state.isEditingStartText) - 1);
+          } else if (end) {
+            this.onChangeEndTextValue(getTimestampValue(this.state.isEditingEndText) - 1);
+          }
+        }
+        break;
+      case 'ArrowUp':
+        if (focus == "input") {
+          e.preventDefault();
+          if (start) {
+            this.onChangeStartTextValue(getTimestampValue(this.state.isEditingStartText) + 1);
+          } else if (end) {
+            this.onChangeEndTextValue(getTimestampValue(this.state.isEditingEndText) + 1);
+          }
         }
         break;
     }
