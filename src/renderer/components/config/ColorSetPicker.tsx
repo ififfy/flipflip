@@ -91,7 +91,7 @@ class ColorSetPicker extends React.Component {
         <Grid item xs>
           <Grid container alignItems="center">
             {this.props.currentColors.map((c, index) =>
-              <Grid key={c} item>
+              <Grid key={c + index} item>
                 <Fab
                   id={"color-" + index}
                   className={clsx(classes.colorPickerButton, index == this.state.pickerIndex && classes.pickedColor)}

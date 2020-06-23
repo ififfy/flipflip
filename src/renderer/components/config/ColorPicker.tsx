@@ -43,7 +43,7 @@ class ColorPicker extends React.Component {
   };
 
   readonly state = {
-    pickerOpen: false,
+    pickerColor: null as any,
     pickerAnchorEl: null as any,
   };
 
@@ -56,7 +56,7 @@ class ColorPicker extends React.Component {
           <Tooltip title="Pick Color">
             <Fab
               className={classes.colorButton}
-              style={{backgroundColor: this.props.currentColor}}
+              style={{backgroundColor: !!this.state.pickerColor ? !!this.state.pickerColor.hex ? this.state.pickerColor.hex : this.state.pickerColor : this.props.currentColor}}
               onClick={this.onToggleColorPicker.bind(this)}
               size="medium">
               <div/>
@@ -65,7 +65,7 @@ class ColorPicker extends React.Component {
           <TextField
             className={classes.colorField}
             label="Color"
-            value={this.props.currentColor}
+            value={!!this.state.pickerColor ? !!this.state.pickerColor.hex ? this.state.pickerColor.hex : this.state.pickerColor : this.props.currentColor}
             onChange={this.props.onChangeColor.bind(this)}/>
           <Menu
             id="color-picker"
@@ -81,13 +81,13 @@ class ColorPicker extends React.Component {
             getContentAnchorEl={null}
             anchorEl={this.state.pickerAnchorEl}
             keepMounted
-            open={this.state.pickerOpen}
+            open={!!this.state.pickerColor}
             onClose={this.onToggleColorPicker.bind(this)}>
             <SketchPicker
-              color={this.props.currentColor}
+              color={!!this.state.pickerColor ? this.state.pickerColor : this.props.currentColor}
               disableAlpha={false}
               presetColors={[]}
-              onChange={this.onChangeColor.bind(this)}/>
+              onChange={this.onChangePickerColor.bind(this)}/>
           </Menu>
         </Grid>
         <Grid item xs={12} sm={this.props.sidebar ? 12 : true}>
@@ -111,7 +111,16 @@ class ColorPicker extends React.Component {
   }
 
   onToggleColorPicker(e: MouseEvent) {
-    this.setState({pickerOpen: !this.state.pickerOpen, pickerAnchorEl: this.state.pickerOpen ? null : e.currentTarget});
+    if (!!this.state.pickerColor) {
+      this.onChangeColor(this.state.pickerColor);
+      this.setState({pickerColor: null, pickerAnchorEl: null});
+    } else {
+      this.setState({pickerColor: this.props.currentColor, pickerAnchorEl: e.currentTarget});
+    }
+  }
+
+  onChangePickerColor(color: any) {
+    this.setState({pickerColor: color});
   }
 
   onChangeColor(color: any) {
