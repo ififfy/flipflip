@@ -428,8 +428,8 @@ export function addScene(state: State): Object {
     scene.transTF = TF.constant;
     scene.transSinRate = 97;
     scene.transDuration = 5000;
-    scene.transDurationMin = 1000;
-    scene.transDurationMax = 2000;
+    scene.transDurationMin = 2000;
+    scene.transDurationMax = 5000;
     scene.crossFade = false;
     scene.fadeTF = TF.constant;
     scene.fadeDuration = 500;

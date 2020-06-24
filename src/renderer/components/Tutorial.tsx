@@ -729,7 +729,10 @@ class Tutorial extends React.Component {
             <DialogTitle id="tutorial-title">Zoom</DialogTitle>
             <DialogContent>
               <DialogContentText id="tutorial-description">
-                Since our scene is changing every second, we'll leave the <b>wave between <u>1000 ms</u> and <u>2000 ms</u></b>.
+                Our scene is changing every second, but since we want to enable cross-fade too, we'll leave the <b>wave between <u>2000 ms</u> and <u>5000 ms</u></b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                That way the zoom animation doesn't stop before the image has faded out.
               </DialogContentText>
             </DialogContent>
             <DialogActions>
