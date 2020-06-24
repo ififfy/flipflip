@@ -324,7 +324,7 @@ class Library extends React.Component {
     onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void,
     onSort(scene: Scene, algorithm: string, ascending: boolean): void,
     onTutorial(tutorial: string): void,
-    onUpdateLibrary(sources: Array<LibrarySource>): void,
+    onUpdateLibrary(fn: (library: Array<LibrarySource>) => void): void,
     onUpdateMode(mode: string): void,
     savePosition(yOffset: number, filters:Array<string>, selected: Array<string>): void,
     systemMessage(message: string): void,
@@ -338,7 +338,6 @@ class Library extends React.Component {
     selectedTags: Array<{label: string, value: string}>(),
     menuAnchorEl: null as any,
     openMenu: null as string,
-    markSources: false,
   };
 
   Option = (props: any) => (
@@ -423,7 +422,6 @@ class Library extends React.Component {
                 <LibrarySearch
                   displaySources={this.state.displaySources}
                   filters={this.state.filters}
-                  update={this.state.markSources}
                   onUpdateFilters={this.onUpdateFilters.bind(this)}/>
               </div>
             </div>
@@ -586,7 +584,6 @@ class Library extends React.Component {
               <SourceList
                 config={this.props.config}
                 isSelect={this.props.isSelect || this.props.isBatchTag}
-                isLibrary={true}
                 library={this.props.library}
                 selected={this.state.selected}
                 sources={this.state.displaySources}
@@ -596,7 +593,7 @@ class Library extends React.Component {
                 onEditBlacklist={this.props.onEditBlacklist.bind(this)}
                 onPlay={this.props.onPlay.bind(this)}
                 onUpdateSelected={this.onUpdateSelected.bind(this)}
-                onUpdateSources={this.props.onUpdateLibrary.bind(this)}
+                onUpdateLibrary={this.props.onUpdateLibrary.bind(this)}
                 savePosition={this.savePosition.bind(this)}
                 systemMessage={this.props.systemMessage.bind(this)}/>
             </Container>
@@ -961,12 +958,19 @@ class Library extends React.Component {
   }
 
   onFinishRemoveAll() {
-    this.props.onUpdateLibrary([]);
+    this.props.onUpdateLibrary((l) => []);
     this.onCloseDialog();
   }
 
   onFinishRemoveVisible() {
-    this.props.onUpdateLibrary(this.props.library.filter((s) => !this.state.displaySources.includes(s)));
+    this.props.onUpdateLibrary((l) => {
+      const displayIDs = this.state.displaySources.map((s) => s.id);
+      for (let i = l.length -1; i >= 0 ; i--) {
+        if (displayIDs.includes(l[i].id)) {
+          l.splice(i, 1);
+        }
+      }
+    });
     this.onCloseDialog();
     this.setState({filters: []});
   }
@@ -1020,18 +1024,19 @@ class Library extends React.Component {
 
   toggleMarked() {
     let taggingMode = this.props.library.find((s) => s.marked) == null;
-
     if (taggingMode) { // We're marking sources
-      for (let source of this.state.displaySources) {
-        source.marked = true;
-      }
+      this.props.onUpdateLibrary((l) => {
+        for (let source of this.state.displaySources) {
+          l.find((s) => s.id == source.id).marked = true;
+        }
+      });
     } else { // We're unmarking sources
-      for (let source of this.props.library) {
-        source.marked = false;
-      }
+      this.props.onUpdateLibrary((l) => {
+        for (let source of l) {
+          source.marked = false;
+        }
+      });
     }
-    this.props.onUpdateLibrary(this.props.library);
-    this.setState({markSources: !this.state.markSources});
   }
 
   batchTagOverwrite() {

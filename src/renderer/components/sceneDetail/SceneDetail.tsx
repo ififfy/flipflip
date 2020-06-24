@@ -574,7 +574,6 @@ class SceneDetail extends React.Component {
                   <Box className={classes.fill}>
                     <SourceList
                       config={this.props.config}
-                      isLibrary={false}
                       library={this.props.library}
                       sources={this.props.scene.sources}
                       tutorial={this.props.tutorial == SDGT.final ? null : this.props.tutorial}
@@ -582,7 +581,7 @@ class SceneDetail extends React.Component {
                       onClip={this.props.onClip.bind(this)}
                       onEditBlacklist={this.props.onEditBlacklist.bind(this)}
                       onPlay={this.props.onPlay.bind(this)}
-                      onUpdateSources={this.onUpdateSources.bind(this)}
+                      onUpdateScene={this.update.bind(this)}
                       systemMessage={this.props.systemMessage.bind(this)}/>
                   </Box>
                 </div>
@@ -1107,20 +1106,6 @@ class SceneDetail extends React.Component {
     this.setState({isEditingName:  e.currentTarget.value});
   }
 
-  onUpdateSources(sources: Array<LibrarySource>) {
-    if (this.props.scene.orderFunction == OF.strict && (sources.length > 1 && this.props.scene.weightFunction == WF.sources)) {
-      this.update((s) => {
-        s.sources = sources;
-        s.orderFunction = OF.ordered;
-        return s;
-      })
-    } else {
-      this.update((s) => {
-        s.sources = sources;
-      });
-    }
-  }
-
   onDeleteScene() {
     this.setState({openMenu: MO.deleteAlert});
   }
@@ -1134,7 +1119,7 @@ class SceneDetail extends React.Component {
   }
 
   onFinishRemoveAll() {
-    this.onUpdateSources([]);
+    this.update((s) => s.sources = []);
     this.onCloseDialog();
   }
 }

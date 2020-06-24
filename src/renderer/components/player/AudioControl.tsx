@@ -1,11 +1,12 @@
 import * as React from "react";
 import Sound from "react-sound";
 import clsx from "clsx";
-import {remote} from "electron";
+import {IncomingMessage, remote} from "electron";
 import fileURL from "file-url";
 import * as mm from "music-metadata";
 import { analyze } from 'web-audio-beat-detector';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
+import request from "request";
 import Timeout = NodeJS.Timeout;
 import {green, red} from "@material-ui/core/colors";
 
@@ -502,10 +503,7 @@ class AudioControl extends React.Component {
       mm.parseFile(urlToPath(this.props.audio.url))
         .then((metadata: any) => {
           if (metadata && metadata.common && metadata.common.bpm) {
-            const newAudios = this.props.scene.audios;
-            const audio: any = newAudios.find((a) => a.id == this.props.audio.id);
-            audio.bpm = metadata.common.bpm;
-            this.changeKey('audios', newAudios);
+            this.changeKey('bpm', metadata.common.bpm);
             this.setState({loadingTag: false, successTag: true});
             setTimeout(() => {this.setState({successTag: false})}, 3000);
           } else {
@@ -612,16 +610,13 @@ class AudioControl extends React.Component {
   onOpenFile() {
     let result = remote.dialog.showOpenDialogSync(remote.getCurrentWindow(), {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'MP3 Audio', extensions: ['mp3']}, {name: 'MPEG-4 Audio', extensions: ['mp4']}], properties: ['openFile']});
     if (!result || !result.length) return;
-    const newAudios = this.props.scene.audios;
-    const audio: any = newAudios.find((a) => a.id == this.props.audio.id);
-    audio.url = fileURL(result[0]);
-    this.changeKey('audios', newAudios);
+    this.changeKey('url', fileURL(result[0]));
   }
 
   onDeleteAudioTrack() {
-    const newAudios = this.props.scene.audios;
-    newAudios.splice(newAudios.map((a) => a.id).indexOf(this.props.audio.id), 1);
-    this.changeKey('audios', newAudios);
+    this.update((s) => {
+      s.audios.splice(s.audios.map((a: Audio) => a.id).indexOf(this.props.audio.id), 1);
+    })
   }
 
   onChangePosition(e: MouseEvent, value: number) {
@@ -632,61 +627,69 @@ class AudioControl extends React.Component {
     const min = (e.currentTarget as any).min ? (e.currentTarget as any).min : null;
     const max = (e.currentTarget as any).max ? (e.currentTarget as any).max : null;
     if (min && (this.props.scene as any)[key] < min) {
-      const newAudios = this.props.scene.audios;
-      const audio: any = newAudios.find((a) => a.id == this.props.audio.id);
-      audio[key] = min === '' ? '' : Number(min);
-      this.changeKey('audios', newAudios);
+      this.changeKey(key, min === '' ? '' : Number(min));
     } else if (max && (this.props.scene as any)[key] > max) {
-      const newAudios = this.props.scene.audios;
-      const audio: any = newAudios.find((a) => a.id == this.props.audio.id);
-      audio[key] = max === '' ? '' : Number(max);
-      this.changeKey('audios', newAudios);
+      this.changeKey(key, max === '' ? '' : Number(max));
     }
   }
 
   onAudioSliderChange(key: string, e: MouseEvent, value: number) {
-    const newAudios = this.props.scene.audios;
-    const audio: any = newAudios.find((a) => a.id == this.props.audio.id);
-    audio[key] = value;
-    this.changeKey('audios', newAudios);
+    this.changeKey(key, value);
   }
 
   onAudioIntInput(key: string, e: MouseEvent) {
-    const newAudios = this.props.scene.audios;
-    const audio: any = newAudios.find((a) => a.id == this.props.audio.id);
     const input = (e.target as HTMLInputElement);
-    audio[key] = input.value === '' ? '' : Number(input.value);
-    this.changeKey('audios', newAudios);
+    this.changeKey(key, input.value === '' ? '' : Number(input.value));
   }
 
   onAudioInput(key: string, e: MouseEvent) {
-    const newAudios = this.props.scene.audios;
-    const audio: any = newAudios.find((a) => a.id == this.props.audio.id);
     const input = (e.target as HTMLInputElement);
-    audio[key] = input.value;
-    this.changeKey('audios', newAudios);
+    this.changeKey(key, input.value);
   }
 
   onAudioBoolInput(key: string, e: MouseEvent) {
-    const newAudios = this.props.scene.audios;
-    const audio: any = newAudios.find((a) => a.id == this.props.audio.id);
     const input = (e.target as HTMLInputElement);
-    audio[key] = input.checked;
-    if (key == 'tick' && input.checked) {
-      audio.stopAtEnd = !input.checked;
-      audio.nextSceneAtEnd = !input.checked;
-    } else if (key == 'stopAtEnd' && input.checked) {
-      audio.tick = !input.checked;
-      audio.nextSceneAtEnd = !input.checked;
-    } else if (key == 'nextSceneAtEnd' && input.checked) {
-      audio.tick = !input.checked;
-      audio.stopAtEnd = !input.checked;
+    switch (key) {
+      case 'tick':
+        if (input.checked) {
+          this.update((s) => {
+            const audio = s.audios.find((a: Audio) => a.id == this.props.audio.id);
+            audio.tick = true;
+            audio.stopAtEnd = false;
+            audio.nextSceneAtEnd = false;
+          });
+        } else {
+          this.changeKey(key, false);
+        }
+        break;
+      case 'stopAtEnd':
+        if (input.checked) {
+          this.update((s) => {
+            const audio = s.audios.find((a: Audio) => a.id == this.props.audio.id);
+            audio.stopAtEnd = true;
+            audio.tick = false;
+            audio.nextSceneAtEnd = false;
+          });
+        } else {
+          this.changeKey(key, false);
+        }
+        break;
+      case 'nextSceneAtEnd':
+        if (input.checked) {
+          this.update((s) => {
+            const audio = s.audios.find((a: Audio) => a.id == this.props.audio.id);
+            audio.nextSceneAtEnd = true;
+            audio.tick = false;
+            audio.stopAtEnd = false;
+          });
+        } else {
+          this.changeKey(key, false);
+        }
     }
-    this.changeKey('audios', newAudios);
   }
 
   changeKey(key: string, value: any) {
-    this.update((s) => s[key] = value);
+    this.update((s) => s.audios.find((a: Audio) => a.id == this.props.audio.id)[key] = value);
   }
 
   update(fn: (scene: any) => void) {

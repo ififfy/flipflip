@@ -426,18 +426,16 @@ class SceneOptionCard extends React.Component {
   }
 
   onOverlaySliderChange(id: number, key: string, e: MouseEvent, value: number) {
-    const newOverlays = this.props.scene.overlays;
-    const overlay: any = newOverlays.find((o) => o.id == id);
-    overlay[key] = value;
-    this.changeKey('overlays', newOverlays);
+    this.changeOverlayKey(id, key, value);
   }
 
   onOverlayInput(id: number, key: string, e: MouseEvent) {
-    const newOverlays = this.props.scene.overlays;
-    const overlay: any = newOverlays.find((o) => o.id == id);
     const input = (e.target as HTMLInputElement);
-    overlay[key] = input.value;
-    this.changeKey('overlays', newOverlays);
+    this.changeOverlayKey(id, key, input.value);
+  }
+
+  changeOverlayKey(id: number, key: string, value: any) {
+    this.update((s) => s.overlays.find((o: Overlay) => o.id == id)[key] = value);
   }
 
   blurIntKey(key: string, e: MouseEvent) {

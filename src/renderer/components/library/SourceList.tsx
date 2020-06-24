@@ -21,6 +21,7 @@ import LibrarySource from "../../data/LibrarySource";
 import SourceListItem from "./SourceListItem";
 import Clip from "../../data/Clip";
 import en from "../../data/en";
+import Scene from "../../data/Scene";
 
 const styles = (theme: Theme) => createStyles({
   emptyMessage: {
@@ -55,7 +56,6 @@ class SourceList extends React.Component {
   readonly props: {
     classes: any,
     config: Config,
-    isLibrary: boolean
     library: Array<LibrarySource>,
     sources: Array<LibrarySource>,
     tutorial: string,
@@ -63,11 +63,12 @@ class SourceList extends React.Component {
     onClip(source: LibrarySource, displayed: Array<LibrarySource>): void,
     onEditBlacklist(sourceURL: string, blacklist: string): void,
     onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void,
-    onUpdateSources(sources: Array<LibrarySource>): void,
     systemMessage(message: string): void,
     isSelect?: boolean,
     selected?: Array<string>,
     yOffset?: number,
+    onUpdateLibrary?(fn: (library: Array<LibrarySource>) => void): void,
+    onUpdateScene?(fn: (scene: Scene) => void): void,
     onUpdateSelected?(selected: Array<string>): void,
     savePosition?(): void,
   };
@@ -85,19 +86,19 @@ class SourceList extends React.Component {
   };
 
   onSortEnd = ({oldIndex, newIndex}: {oldIndex: number, newIndex: number}) => {
-    if (this.props.isLibrary) {
-      const oldIndexSource = this.props.sources[oldIndex];
-      const newIndexSource = this.props.sources[newIndex];
-      const libraryURLs = this.props.library.map((s) => s.url);
-      const oldLibraryIndex = libraryURLs.indexOf(oldIndexSource.url);
-      const newLibraryIndex = libraryURLs.indexOf(newIndexSource.url);
-      let newLibrary = Array.from(this.props.library);
-      arrayMove(newLibrary, oldLibraryIndex, newLibraryIndex);
-      this.props.onUpdateSources(newLibrary);
-    } else {
-      let newSources = Array.from(this.props.sources);
-      arrayMove(newSources, oldIndex, newIndex);
-      this.props.onUpdateSources(newSources);
+    if (this.props.onUpdateLibrary) {
+      this.props.onUpdateLibrary((l) => {
+        const oldIndexSource = this.props.sources[oldIndex];
+        const newIndexSource = this.props.sources[newIndex];
+        const libraryURLs = l.map((s: LibrarySource) => s.url);
+        const oldLibraryIndex = libraryURLs.indexOf(oldIndexSource.url);
+        const newLibraryIndex = libraryURLs.indexOf(newIndexSource.url);
+        arrayMove(l, oldLibraryIndex, newLibraryIndex);
+      });
+    } else if (this.props.onUpdateScene) {
+      this.props.onUpdateScene((s) => {
+        arrayMove(s.sources, oldIndex, newIndex);
+      });
     }
   };
 
@@ -329,8 +330,18 @@ class SourceList extends React.Component {
   }
 
   onRemove(source: LibrarySource) {
-    const oldSources = this.props.isLibrary ? this.props.library : this.props.sources;
-    this.props.onUpdateSources(oldSources.filter((s) => s.id != source.id));
+    if (this.props.onUpdateScene) {
+      this.props.onUpdateScene((s) => s.sources = s.sources.filter((s) => s.id != source.id));
+    } else if (this.props.onUpdateLibrary) {
+      this.props.onUpdateLibrary((l) => {
+        l.forEach((s, index) => {
+          if (s.id == source.id) {
+            l.splice(index, 1);
+            return;
+          }
+        });
+      });
+    }
   }
 
   onToggleSelect(e: MouseEvent) {
@@ -345,16 +356,17 @@ class SourceList extends React.Component {
   }
 
   onToggleClip(s: LibrarySource, c: Clip) {
-    const oldSources = this.props.sources;
-    const source = oldSources.find((ls) => ls.id == s.id);
-    if (!source.disabledClips) {
-      source.disabledClips = [c.id];
-    } else if (source.disabledClips.includes(c.id)) {
-      source.disabledClips = source.disabledClips.filter((d) => d != c.id);
-    } else {
-      source.disabledClips = source.disabledClips.concat(c.id);
-    }
-    this.props.onUpdateSources(oldSources);
+    this.props.onUpdateScene((scene) => {
+      const source = scene.sources.find((ls) => ls.id == s.id);
+      if (!source.disabledClips) {
+        source.disabledClips = [c.id];
+      } else if (source.disabledClips.includes(c.id)) {
+        source.disabledClips = source.disabledClips.filter((d: number) => d != c.id);
+      } else {
+        source.disabledClips = source.disabledClips.concat(c.id);
+      }
+      this.setState({clipMenu: source});
+    });
   }
 
   onStartEdit(id: number) {
@@ -362,40 +374,70 @@ class SourceList extends React.Component {
   }
 
   onEndEdit(newURL: string) {
-    const newSources = Array<LibrarySource>();
-    let oldSources = this.props.isLibrary ? this.props.library : this.props.sources;
-    oldSources = oldSources.map((source: LibrarySource) => {
-      const librarySource = this.props.isLibrary ? null : this.props.library.find((s) => s.url == newURL);
-      if (source.id == this.state.isEditing) {
-        const sourceChanged = source.url != newURL;
-        source.offline = sourceChanged ? false: source.offline;
-        source.lastCheck = sourceChanged ? null : source.lastCheck;
-        source.url = newURL;
-        source.tags = librarySource && librarySource.tags ? librarySource.tags : source.tags;
-        source.clips = librarySource && librarySource.clips ? librarySource.clips : source.clips;
-        source.blacklist = librarySource && librarySource.blacklist ? librarySource.blacklist : source.blacklist;
-        source.count = librarySource ? librarySource.count : sourceChanged ? 0 : source.count;
-        source.countComplete = librarySource ? librarySource.countComplete : sourceChanged ? false : source.countComplete;
-      }
-      return source;
-    });
-    for (let source of oldSources) {
-      if (source.url != "") {
-        if (!newSources.map((s) => s.url).includes(source.url)) {
-          newSources.push(source);
-        } else {
-          for (let existingSource of newSources) {
-            if (existingSource.url == source.url) {
-              if (existingSource.id > source.id) {
-                newSources[newSources.indexOf(existingSource)] = source;
+    if (this.props.onUpdateScene) {
+      this.props.onUpdateScene((s) => {
+        const editSource = s.sources.find((s) => s.id == this.state.isEditing);
+        const librarySource = this.props.library.find((s) => s.url == newURL);
+        const sourceChanged = editSource.url != newURL;
+        editSource.offline = sourceChanged ? false: editSource.offline;
+        editSource.lastCheck = sourceChanged ? null : editSource.lastCheck;
+        editSource.url = newURL;
+        editSource.tags = librarySource && librarySource.tags ? librarySource.tags : editSource.tags;
+        editSource.clips = librarySource && librarySource.clips ? librarySource.clips : editSource.clips;
+        editSource.blacklist = librarySource && librarySource.blacklist ? librarySource.blacklist : editSource.blacklist;
+        editSource.count = librarySource ? librarySource.count : sourceChanged ? 0 : editSource.count;
+        editSource.countComplete = librarySource ? librarySource.countComplete : sourceChanged ? false : editSource.countComplete;
+
+        const newSources = Array<LibrarySource>();
+        for (let source of s.sources) {
+          if (/^\s*$/.exec(source.url) == null) {
+            if (!newSources.map((s) => s.url).includes(source.url)) {
+              newSources.push(source);
+            } else {
+              for (let existingSource of newSources) {
+                if (existingSource.url == source.url) {
+                  if (existingSource.id > source.id) {
+                    newSources[newSources.indexOf(existingSource)] = source;
+                  }
+                  break;
+                }
               }
-              break;
             }
           }
         }
-      }
+        s.sources = newSources;
+      });
+    } else if (this.props.onUpdateLibrary) {
+      this.props.onUpdateLibrary((l) => {
+        const editSource = l.find((s) => s.id == this.state.isEditing);
+        const sourceChanged = editSource.url != newURL;
+        editSource.offline = sourceChanged ? false : editSource.offline;
+        editSource.lastCheck = sourceChanged ? null : editSource.lastCheck;
+        editSource.url = newURL;
+        editSource.count = sourceChanged ? 0 : editSource.count;
+        editSource.countComplete = sourceChanged ? false : editSource.countComplete;
+
+        const newSources = Array<LibrarySource>();
+        for (let source of l) {
+          if (/^\s*$/.exec(source.url) == null) {
+            if (!newSources.map((s) => s.url).includes(source.url)) {
+              newSources.push(source);
+            } else {
+              for (let existingSource of newSources) {
+                if (existingSource.url == source.url) {
+                  if (existingSource.id > source.id) {
+                    newSources[newSources.indexOf(existingSource)] = source;
+                  }
+                  break;
+                }
+              }
+            }
+          }
+        }
+        l.splice(0, l.length);
+        Array.prototype.push.apply(l, [].concat(newSources));
+      });
     }
-    this.props.onUpdateSources(newSources);
     this.setState({isEditing: -1});
   }
 
@@ -485,14 +527,19 @@ class SourceList extends React.Component {
   }
 
   changeKey(key: string, value: any) {
-    this.update((s) => s[key] = value);
-  }
-
-  update(fn: (librarySource: any) => void) {
-    let sources = this.props.sources;
-    let source = sources.find((s) => s.url == this.state.sourceOptions.url);
-    fn(source);
-    this.props.onUpdateSources(sources);
+    if (this.props.onUpdateScene) {
+      this.props.onUpdateScene((s) => {
+        const source = s.sources.find((s) => s.url == this.state.sourceOptions.url);
+        (source as any)[key] = value;
+        this.setState({sourceOptions: source});
+      });
+    } else if (this.props.onUpdateLibrary) {
+      this.props.onUpdateLibrary((l) => {
+        const source = l.find((s) => s.url == this.state.sourceOptions.url);
+        (source as any)[key] = value;
+        this.setState({sourceOptions: source});
+      });
+    }
   }
 
   SortableVirtualList = sortableContainer(this.VirtualList.bind(this));
@@ -525,7 +572,7 @@ class SourceList extends React.Component {
         config={this.props.config}
         index={index}
         isEditing={this.state.isEditing}
-        isLibrary={this.props.isLibrary}
+        isLibrary={!!this.props.onUpdateLibrary}
         isSelect={this.props.isSelect}
         source={source}
         sources={this.props.sources}

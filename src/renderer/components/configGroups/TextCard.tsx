@@ -59,7 +59,7 @@ class TextCard extends React.Component {
               <FormControlLabel
                 control={
                   <Switch checked={this.props.scene.textEnabled}
-                          onChange={this.onBoolInput.bind(this, 'textEnabled')}/>
+                          onChange={this.onToggleEnable.bind(this)}/>
                 }
                 label="Text Overlay"/>
                 <Collapse in={this.props.scene.textEnabled && !this.props.scene.textNextScene}>
@@ -67,7 +67,7 @@ class TextCard extends React.Component {
                     control={
                       <Switch checked={this.props.scene.textEndStop}
                               size="small"
-                              onChange={this.onBoolInput.bind(this, 'textEndStop')}/>
+                              onChange={this.onToggleEndStop.bind(this)}/>
                     }
                     label="Stop at End"/>
                 </Collapse>
@@ -76,7 +76,7 @@ class TextCard extends React.Component {
                   control={
                     <Switch checked={this.props.scene.textNextScene}
                             size="small"
-                            onChange={this.onBoolInput.bind(this, 'textNextScene')}/>
+                            onChange={this.onToggleNextScene.bind(this)}/>
                   }
                   label="Next Scene at End"/>
               </Collapse>
@@ -321,10 +321,29 @@ class TextCard extends React.Component {
     this.changeKey('textSource', fileURL(result[0]));
   }
 
-  onBoolInput(key: string, e: MouseEvent) {
+  onToggleEnable(e: MouseEvent) {
     const input = (e.target as HTMLInputElement);
-    const checked = input.checked;
-    this.changeKey(key, checked);
+    this.changeKey('textEnabled', input.checked);
+  }
+
+  onToggleEndStop(e: MouseEvent) {
+    const input = (e.target as HTMLInputElement);
+    this.update((s) => {
+      s.textEndStop = input.checked;
+      if (input.checked) {
+        s.textNextScene = false;
+      }
+    });
+  }
+
+  onToggleNextScene(e: MouseEvent) {
+    const input = (e.target as HTMLInputElement);
+    this.update((s) => {
+      s.textNextScene = input.checked;
+      if (input.checked) {
+        s.textEndStop = false;
+      }
+    });
   }
 
   blurIntKey(key: string, e: MouseEvent) {

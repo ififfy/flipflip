@@ -50,8 +50,22 @@ export default class Meta extends React.Component {
   componentDidMount() {
     // We never bother cleaning this up, but that's OK because this is the top level
     // component of the whole app.
-    setInterval(() => appStorage.save(this.state), 500);
     ipcRenderer.on(IPC.startScene, this.startScene.bind(this));
+    setInterval(this.queueSave.bind(this), 500);
+  }
+
+  _queueSave = false;
+  _lastSave: Date = null;
+  queueSave() {
+    if (this._queueSave && (this._lastSave == null || new Date().getTime() - this._lastSave.getTime() > 3000)) {
+      appStorage.save(this.state);
+      this._lastSave = new Date();
+      this._queueSave = false;
+    }
+  }
+
+  componentDidUpdate(prevProps: any, prevState: any) {
+    this._queueSave = true;
   }
 
   startScene(ev: IpcMessageEvent, sceneName: string) {
@@ -161,7 +175,7 @@ export default class Meta extends React.Component {
               onPlay={a(actions.playSceneFromLibrary)}
               onSort={a(actions.sortSources)}
               onTutorial={a(actions.doneTutorial)}
-              onUpdateLibrary={a(actions.replaceLibrary)}
+              onUpdateLibrary={a(actions.updateLibrary)}
               onUpdateMode={a(actions.setMode)}
               savePosition={a(actions.saveLibraryPosition)}
               systemMessage={a(actions.systemMessage)}

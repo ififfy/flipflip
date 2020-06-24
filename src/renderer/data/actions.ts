@@ -24,7 +24,7 @@ import {
   saveDir
 } from "./utils";
 import defaultTheme from "./theme";
-import {AF, BT, DONE, GT, IF, LT, OF, PR, PT, SDGT, SDT, SF, SGT, SPT, ST, TF, TT, VCT} from "./const";
+import {AF, BT, DONE, GT, IF, LT, OF, PR, PT, SDGT, SDT, SF, SGT, SPT, ST, TF, TT, VCT, WF} from "./const";
 import { defaultInitialState } from './AppStorage';
 import { Route } from "./Route";
 import Scene from "./Scene";
@@ -132,7 +132,7 @@ export function restoreFromBackup(state: State, backupFile: string): Object {
 }
 
 export function changeThemeColor(state: State, colorTheme: any, primary: boolean): Object {
-  const newTheme = state.theme;
+  const newTheme = JSON.parse(JSON.stringify(state.theme));
   if (primary) {
     newTheme.palette.primary = colorTheme;
     const type = newTheme.palette.type;
@@ -345,12 +345,11 @@ export function printMemoryReport() {
   console.log("\n");
   console.log(format("object"), format("count"), format("size"), format("liveSize"));
   Object.entries(webFrame.getResourceUsage()).map(logCount);
-  console.log('------')
+  console.log('------');
 }
 
 export function goBack(state: State): Object {
-  state.route.pop();
-  const newRoute = state.route.slice(0);
+  const newRoute = state.route.slice(0, state.route.length - 1);
   return {route: newRoute, autoEdit: false, isSelect: false};
 }
 
@@ -1135,6 +1134,9 @@ export function updateScene(state: State, scene: Scene, fn: (scene: Scene) => vo
     if (s.id == scene.id) {
       const sceneCopy = JSON.parse(JSON.stringify(s));
       fn(sceneCopy);
+      if (sceneCopy.orderFunction == OF.strict && sceneCopy.sources.length > 1 && sceneCopy.weightFunction == WF.sources) {
+        sceneCopy.orderFunction = OF.ordered;
+      }
       newScenes.push(sceneCopy);
     } else {
       newScenes.push(s);
@@ -1165,8 +1167,10 @@ export function replaceGrids(state: State, grids: Array<SceneGrid>): Object {
   return {grids: grids};
 }
 
-export function replaceLibrary(state: State, library: Array<LibrarySource>): Object {
-  return {library: library};
+export function updateLibrary(state: State, fn: (library: Array<LibrarySource>) => void): Object {
+  const libraryCopy = JSON.parse(JSON.stringify(state.library));
+  fn(libraryCopy);
+  return {library: libraryCopy};
 }
 
 export function clearBlacklist(state: State, sourceURL: string): Object {
@@ -1397,76 +1401,7 @@ export function toggleTag(state: State, sourceID: number, tag: Tag): Object {
 }
 
 export function addSource(state: State, scene: Scene, type: string, ...args: any[]): Object {
-  let newSources = scene != null ? scene.sources : state.library;
-  switch (type) {
-    case "tutorial":
-      let id = newSources.length + 1;
-      newSources.forEach((s) => {
-        id = Math.max(s.id + 1, id);
-      });
-
-      let combinedSources = Array.from(newSources);
-      const cuteTag = new Tag();
-      cuteTag.id = 1000000;
-      cuteTag.name = "Cute";
-      const animalTag = new Tag();
-      animalTag.id = 1000001;
-      animalTag.name = "Animals";
-      combinedSources.unshift(new LibrarySource({
-        url: "https://imgur.com/a/mMslVXT",
-        id: id,
-        tags: [cuteTag, animalTag],
-        count: 100,
-      }));
-      newSources = combinedSources;
-      break;
-    case AF.library:
-      return openLibraryImport(state);
-
-    case AF.url:
-      if (!args || args.length != 1) {
-        newSources = addSources(newSources, [""], state.library);
-      } else {
-        newSources = addSources(newSources, args[0], state.library);
-      }
-      break;
-
-    case AF.directory:
-      let dResult = remote.dialog.showOpenDialogSync(remote.getCurrentWindow(), {properties: ['openDirectory', 'multiSelections']});
-      if (!dResult) return;
-      newSources = addSources(newSources, dResult, state.library);
-      break;
-
-    case AF.videos:
-      let vResult = remote.dialog.showOpenDialogSync(remote.getCurrentWindow(),
-        {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'Video files', extensions: ['mp4', 'mkv', 'webm', 'ogv', 'mov']}, {name: 'Playlist files', extensions: ['asx', 'm3u8', 'pls', 'xspf']}], properties: ['openFile', 'multiSelections']});
-      if (!vResult) return;
-      vResult = vResult.filter((r) => isVideo(r, true) || isVideoPlaylist(r, true));
-      newSources = addSources(newSources, vResult, state.library);
-      break;
-
-    case GT.local:
-      if (!args || args.length != 2) {
-        return;
-      }
-      let rootDir = args[1];
-      if (!rootDir.endsWith(sep)) {
-        rootDir += sep;
-      }
-      newSources = addSources(newSources, getImportURLs(args[0], rootDir), state.library);
-      break;
-
-    case GT.tumblr:
-      if (!args || args.length != 1) {
-        return;
-      }
-      newSources = addSources(newSources, getImportURLs(args[0]), state.library);
-      break;
-  }
-  if (scene != null) {
-    const newScenes = state.scenes;
-    const thisScene = newScenes.find((s) => s.id == scene.id);
-    thisScene.sources = newSources;
+  const handleArgs = (s: Scene) => {
     if (args.length > 0) {
       let importURL = args[0];
       if (importURL.includes("pastebinId=")) {
@@ -1477,12 +1412,114 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
         }
 
         // Update hastebin URL (if present)
-        thisScene.textSource = "https://hastebin.com/raw/" + importURL;
+        s.textSource = "https://hastebin.com/raw/" + importURL;
       }
     }
-    return {scenes: newScenes};
-  } else {
-    return {library: newSources};
+  }
+
+  switch (type) {
+    case "tutorial":
+      return updateScene(state, scene, (s) => {
+        let id = s.sources.length + 1;
+        s.sources.forEach((s) => {
+          id = Math.max(s.id + 1, id);
+        });
+
+        let combinedSources = Array.from(s.sources);
+        const cuteTag = new Tag();
+        cuteTag.id = 1000000;
+        cuteTag.name = "Cute";
+        const animalTag = new Tag();
+        animalTag.id = 1000001;
+        animalTag.name = "Animals";
+        combinedSources.unshift(new LibrarySource({
+          url: "https://imgur.com/a/mMslVXT",
+          id: id,
+          tags: [cuteTag, animalTag],
+          count: 100,
+        }));
+        s.sources = combinedSources;
+      })
+
+    case AF.library:
+      return openLibraryImport(state);
+
+    case AF.url:
+      if (!args || args.length != 1) {
+        if (scene != null) {
+          return updateScene(state, scene, (s) => {
+            addSources(s.sources, [""], state.library);
+            handleArgs(s);
+          })
+        } else {
+          return updateLibrary(state, (l) => {addSources(l, [""], state.library)});
+        }
+      } else {
+        if (scene != null) {
+          return updateScene(state, scene, (s) => {
+            addSources(s.sources, args[0], state.library);
+            handleArgs(s);
+          })
+        } else {
+          return updateLibrary(state, (l) =>  addSources(l, args[0], state.library));
+        }
+      }
+
+    case AF.directory:
+      let dResult = remote.dialog.showOpenDialogSync(remote.getCurrentWindow(), {properties: ['openDirectory', 'multiSelections']});
+      if (!dResult) return;
+      if (scene != null) {
+        return updateScene(state, scene, (s) => {
+          addSources(s.sources, dResult, state.library);
+          handleArgs(s);
+        })
+      } else {
+        return updateLibrary(state, (l) =>  addSources(l, dResult, state.library));
+      }
+
+    case AF.videos:
+      let vResult = remote.dialog.showOpenDialogSync(remote.getCurrentWindow(),
+        {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'Video files', extensions: ['mp4', 'mkv', 'webm', 'ogv', 'mov']}, {name: 'Playlist files', extensions: ['asx', 'm3u8', 'pls', 'xspf']}], properties: ['openFile', 'multiSelections']});
+      if (!vResult) return;
+      vResult = vResult.filter((r) => isVideo(r, true) || isVideoPlaylist(r, true));
+      if (scene != null) {
+        return updateScene(state, scene, (s) => {
+          addSources(s.sources, vResult, state.library);
+          handleArgs(s);
+        })
+      } else {
+        return updateLibrary(state, (l) =>  addSources(l, vResult, state.library));
+      }
+
+    case GT.local:
+      if (!args || args.length < 2) {
+        return;
+      }
+      let rootDir = args[1];
+      if (!rootDir.endsWith(sep)) {
+        rootDir += sep;
+      }
+      if (scene != null) {
+        return updateScene(state, scene, (s) => {
+          addSources(s.sources, getImportURLs(args[0], rootDir), state.library);
+          handleArgs(s);
+        })
+      } else {
+        return updateLibrary(state, (l) =>  addSources(l, getImportURLs(args[0], rootDir), state.library));
+      }
+
+    case GT.tumblr:
+      if (!args || args.length < 1) {
+        return;
+      }
+      if (scene != null) {
+        return updateScene(state, scene, (s) => {
+          addSources(s.sources, getImportURLs(args[0]), state.library);
+          handleArgs(s);
+        })
+      } else {
+        return updateLibrary(state, (l) =>  addSources(l, getImportURLs(args[0]), state.library));
+      }
   }
 }
 
@@ -1538,7 +1575,7 @@ function mergeSources(originalSources: Array<LibrarySource>, newSources: Array<L
 }
 
 
-function addSources(originalSources: Array<LibrarySource>, newSources: Array<string>, library: Array<LibrarySource>): Array<LibrarySource> {
+function addSources(originalSources: Array<LibrarySource>, newSources: Array<string>, library: Array<LibrarySource>) {
   // dedup
   let sourceURLs = originalSources.map((s) => s.url);
   newSources = newSources.filter((s) => !sourceURLs.includes(s));
@@ -1548,10 +1585,9 @@ function addSources(originalSources: Array<LibrarySource>, newSources: Array<str
     id = Math.max(s.id + 1, id);
   });
 
-  let combinedSources = Array.from(originalSources);
   for (let url of newSources) {
     const librarySource = library.find((s) => s.url === url);
-    combinedSources.unshift(new LibrarySource({
+    originalSources.unshift(new LibrarySource({
       url: url,
       id: id,
       lastCheck: new Date(),
@@ -1563,7 +1599,6 @@ function addSources(originalSources: Array<LibrarySource>, newSources: Array<str
     }));
     id += 1;
   }
-  return combinedSources;
 }
 
 export function sortScene(state: State, algorithm: string, ascending: boolean): Object {
@@ -1604,7 +1639,7 @@ export function sortSources(state: State, scene: Scene, algorithm: string, ascen
   const getType = (a: LibrarySource) => {
     return getSourceType(a.url)
   };
-  let secondary = null;
+  let secondary: string = null;
   if (algorithm == SF.alpha) {
     secondary = SF.type;
   }
@@ -1614,9 +1649,8 @@ export function sortSources(state: State, scene: Scene, algorithm: string, ascen
   if (scene != null) {
     const newScenes = state.scenes;
     const thisScene = newScenes.find((s) => s.id == scene.id);
-    thisScene.sources = thisScene.sources.sort(
-      sortFunction(algorithm, ascending, getName, getFullName, getCount, getType, secondary));
-    return {scenes: newScenes};
+    return updateScene(state, scene, (s) => s.sources = s.sources.sort(
+      sortFunction(algorithm, ascending, getName, getFullName, getCount, getType, secondary)));
   } else {
     const newLibrary = state.library.concat().sort(
       sortFunction(algorithm, ascending, getName, getFullName, getCount, getType, secondary));
@@ -1668,7 +1702,7 @@ function sortFunction(algorithm: string, ascending: boolean, getName: (a: any) =
     } else if (aValue > bValue) {
       return ascending ? 1 : -1;
     } else {
-      if (secondary) {
+      if (!!secondary) {
         return sortFunction(secondary, true, getName, getFullName, getCount, getType, null)(a, b);
       } else {
         return 0;
