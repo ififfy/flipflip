@@ -522,45 +522,54 @@ class AudioControl extends React.Component {
   }
 
   onDetectBPM() {
+    const bpmError = () => {
+      this.setState({loadingBPM: false, errorBPM: true});
+      setTimeout(() => {
+        this.setState({errorBPM: false})
+      }, 3000);
+    }
+
+    const detectBPM = (data: ArrayBuffer) => {
+      let context = new AudioContext();
+      context.decodeAudioData(data, (buffer) => {
+        analyze(buffer)
+          .then((tempo: number) => {
+            this.changeKey('bpm', tempo.toFixed(2));
+            this.setState({loadingBPM: false, successBPM: true});
+            setTimeout(() => {
+              this.setState({successBPM: false})
+            }, 3000);
+          })
+          .catch((err: any) => {
+            console.error("Error analyzing");
+            console.error(err);
+            bpmError();
+          });
+      }, (err) => {
+        console.error(err);
+        bpmError();
+      });
+    }
+
     if (this.props.audio.url && !this.state.loadingBPM) {
       this.setState({loadingBPM: true});
       try {
-        let data = toArrayBuffer(readFileSync(urlToPath(this.props.audio.url)));
-        let context = new AudioContext();
-        context.decodeAudioData(data, (buffer) => {
-          analyze(buffer)
-            .then((tempo: number) => {
-              const newAudios = this.props.scene.audios;
-              const audio: any = newAudios.find((a) => a.id == this.props.audio.id);
-              audio.bpm = tempo.toFixed(2);
-              this.changeKey('audios', newAudios);
-              this.setState({loadingBPM: false, successBPM: true});
-              setTimeout(() => {
-                this.setState({successBPM: false})
-              }, 3000);
-            })
-            .catch((err: any) => {
-              console.error("Error analyzing");
+        const url = this.props.audio.url;
+        if (existsSync(urlToPath(url))) {
+          detectBPM(toArrayBuffer(readFileSync(urlToPath(url))));
+        } else {
+          request.get({url, encoding: null}, function (err: Error, res: IncomingMessage, body: Buffer) {
+            if (err) {
               console.error(err);
-              this.setState({loadingBPM: false, errorBPM: true});
-              setTimeout(() => {
-                this.setState({errorBPM: false})
-              }, 3000);
-
-            });
-        }, (err) => {
-          console.error(err);
-          this.setState({loadingBPM: false, errorBPM: true});
-          setTimeout(() => {
-            this.setState({errorBPM: false})
-          }, 3000);
-        });
+              bpmError();
+              return;
+            }
+            detectBPM(toArrayBuffer(body));
+          });
+        }
       } catch (e) {
         console.error(e);
-        this.setState({loadingBPM: false, errorBPM: true});
-        setTimeout(() => {
-          this.setState({errorBPM: false})
-        }, 3000);
+        bpmError();
       }
     }
 
@@ -601,7 +610,7 @@ class AudioControl extends React.Component {
   }
 
   onOpenFile() {
-    let result = remote.dialog.showOpenDialogSync(remote.getCurrentWindow(), {properties: ['openFile']});
+    let result = remote.dialog.showOpenDialogSync(remote.getCurrentWindow(), {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'MP3 Audio', extensions: ['mp3']}, {name: 'MPEG-4 Audio', extensions: ['mp4']}], properties: ['openFile']});
     if (!result || !result.length) return;
     const newAudios = this.props.scene.audios;
     const audio: any = newAudios.find((a) => a.id == this.props.audio.id);
