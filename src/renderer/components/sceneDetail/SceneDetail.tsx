@@ -1128,8 +1128,8 @@ class SceneDetail extends React.Component {
           const id = overlay.sceneID.toString().replace('999', '');
           const oScene = this.props.allSceneGrids.find((s) => s.id.toString() == id);
           for (let row of oScene.grid) {
-            for (let sceneID of row) {
-              const gScene = this.props.allScenes.find((s) => s.id == sceneID);
+            for (let cell of row) {
+              const gScene = this.props.allScenes.find((s) => s.id == cell.sceneID);
               if (gScene && gScene.generatorWeights && gScene.regenerate && areWeightsValid(gScene)) {
                 generateScenes.push(gScene);
               }

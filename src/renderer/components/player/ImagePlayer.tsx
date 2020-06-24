@@ -300,7 +300,7 @@ export default class ImagePlayer extends React.Component {
   animationFrame = () => {
     if (!this._isMounted) return;
     let requestAnimation = false;
-    // TODO Ensure this logic is sound
+    // TODO Prevent scenes with 1 source from continually cycling
     //if (this.state.readyToDisplay.length < this.props.maxLoadingAtOnce && this.props.allURLs && this.props.allURLs.size != 1) {
     if (this.state.readyToDisplay.length < this.props.maxLoadingAtOnce && this.props.allURLs) {
       while (this._runFetchLoopCallRequests.length > 0) {

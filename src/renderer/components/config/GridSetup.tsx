@@ -1,8 +1,9 @@
 import * as React from "react";
 import clsx from "clsx";
+import Draggable, {DraggableData} from "react-draggable";
 
 import {
-  AppBar, Button, Container, createStyles, Fab, IconButton, ListItemText, Menu, MenuItem, TextField, Theme, Toolbar,
+  AppBar, Button, Container, createStyles, Fab, FormControlLabel, IconButton, Menu, Switch, TextField, Theme, Toolbar,
   Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
@@ -11,10 +12,11 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 
 import {SGT} from "../../data/const";
+import {areWeightsValid} from "../../data/utils";
+import Scene from "../../data/Scene";
 import SceneSelect from "../configGroups/SceneSelect";
 import SceneGrid from "../../data/SceneGrid";
-import Scene from "../../data/Scene";
-import {areWeightsValid} from "../../data/utils";
+import SceneGridCell from "../../data/SceneGridCell";
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -85,6 +87,10 @@ const styles = (theme: Theme) => createStyles({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  gridCellLabel: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
   sceneMenu: {
     minHeight: 365,
     minWidth: 250,
@@ -97,6 +103,7 @@ const styles = (theme: Theme) => createStyles({
     bottom: 20,
     left: 'auto',
     position: 'fixed',
+    zIndex: 3,
   },
   deleteIcon: {
     color: theme.palette.error.contrastText,
@@ -122,7 +129,7 @@ class GridSetup extends React.Component {
     classes: any,
     allScenes: Array<Scene>,
     autoEdit: boolean,
-    grid: SceneGrid,
+    scene: SceneGrid,
     tutorial: string,
     goBack(): void,
     onDelete(grid: SceneGrid): void,
@@ -133,16 +140,19 @@ class GridSetup extends React.Component {
   };
 
   readonly state = {
-    isEditingName: this.props.autoEdit ? this.props.grid.name : null as string,
+    isEditingName: this.props.autoEdit ? this.props.scene.name : null as string,
     isEditing: null as Array<number>,
     menuAnchorEl: null as any,
-    height: this.props.grid.grid && this.props.grid.grid.length > 0 &&
-    this.props.grid.grid[0].length ? this.props.grid.grid.length : 1,
-    width: this.props.grid.grid && this.props.grid.grid.length > 0 &&
-    this.props.grid.grid[0].length > 0 ? this.props.grid.grid[0].length : 1,
+    height: this.props.scene.grid && this.props.scene.grid.length > 0 &&
+    this.props.scene.grid[0].length ? this.props.scene.grid.length : 1,
+    width: this.props.scene.grid && this.props.scene.grid.length > 0 &&
+    this.props.scene.grid[0].length > 0 ? this.props.scene.grid[0].length : 1,
+    dragging: false,
   };
 
   readonly nameInputRef: React.RefObject<HTMLInputElement> = React.createRef();
+
+  _colors = ["#FF0000", "#FFA500", "#FFFF00", "#008000", "#0000FF", "#EE82EE", "#4B0082"]
 
   render() {
     const classes = this.props.classes;
@@ -156,6 +166,29 @@ class GridSetup extends React.Component {
     }
     for (let h = 0; h < this.state.height; h++) {
       gridTemplateRows += rowSize.toString() + "% ";
+    }
+
+    let count = 0;
+    let colors = Array<Array<string>>();
+    for (let r = 0; r < this.state.height; r++) {
+      let row = Array<string>();
+      for (let c = 0; c < this.state.width; c++) {
+        row.push("");
+      }
+      colors.push(row);
+    }
+    for (let r = 0; r < this.props.scene.grid.length; r++) {
+      for (let c = 0; c < this.props.scene.grid[r].length; c++) {
+        const cell = this.props.scene.grid[r][c];
+        if (cell.sceneCopy && cell.sceneCopy.length > 0) {
+          let color = colors[cell.sceneCopy[0]][cell.sceneCopy[1]];
+          if (color == "") {
+            color = this._colors[count++];
+            colors[cell.sceneCopy[0]][cell.sceneCopy[1]] = color;
+          }
+          colors[r][c] = color;
+        }
+      }
     }
 
     return(
@@ -193,8 +226,8 @@ class GridSetup extends React.Component {
             )}
             {this.state.isEditingName == null && (
               <Typography component="h1" variant="h4" color="inherit" noWrap
-                          className={clsx(classes.title, this.props.grid.name.length == 0 && classes.noTitle, this.props.tutorial == SGT.dimensions && classes.disable)} onClick={this.beginEditingName.bind(this)}>
-                {this.props.grid.name}
+                          className={clsx(classes.title, this.props.scene.name.length == 0 && classes.noTitle, this.props.tutorial == SGT.dimensions && classes.disable)} onClick={this.beginEditingName.bind(this)}>
+                {this.props.scene.name}
               </Typography>
             )}
 
@@ -246,18 +279,41 @@ class GridSetup extends React.Component {
           <Container maxWidth={false} className={classes.container}>
             <div className={classes.grid}
                  style={{gridTemplateColumns: gridTemplateColumns, gridTemplateRows: gridTemplateRows}}>
-              {this.props.grid.grid.map((row, rowIndex) =>
+              {this.props.scene.grid.map((row, rowIndex) =>
                 <React.Fragment key={rowIndex}>
-                  {row.map((sceneID, colIndex) => {
-                    const scene = this.props.allScenes.find((s) => s.id == sceneID);
+                  {row.map((cell, colIndex) => {
+                    let scene = this.props.allScenes.find((s) => s.id == cell.sceneID);
+                    let sceneCopy = null;
+                    if (cell.sceneCopy && cell.sceneCopy.length > 0) {
+                      sceneCopy = this.props.allScenes.find((s) => s.id == this.props.scene.grid[cell.sceneCopy[0]][cell.sceneCopy[1]].sceneID);
+                    }
                     return (
-                      <Button
-                        className={classes.gridCell}
+                      <Draggable
                         key={colIndex}
-                        variant="outlined"
-                        onClick={this.onClickCell.bind(this, rowIndex, colIndex)}>
-                        {scene ? scene.name : "~~EMPTY~~"}
-                      </Button>
+                        bounds='#app'
+                        position={{x:0,y:0}}
+                        defaultClassNameDragging={classes.dragging}
+                        onStop={this.onDragStop.bind(this, rowIndex, colIndex)}
+                        onDrag={this.onDrag.bind(this)}
+                      >
+                        <Button
+                          id={rowIndex + "-" + colIndex}
+                          className={classes.gridCell}
+                          classes={{
+                            label: classes.gridCellLabel
+                          }}
+                          style={colors[rowIndex][colIndex] == "" ? {} : {borderStyle: 'solid', borderWidth: 10, borderColor: colors[rowIndex][colIndex]}}
+                          variant="outlined">
+                          {scene ? scene.name : sceneCopy ? "*" + sceneCopy.name + "*" : ""}
+                          {sceneCopy && (
+                            <FormControlLabel
+                              control={
+                                <Switch size={"small"} checked={cell.mirror}/>
+                              }
+                              label="Mirror"/>
+                          )}
+                        </Button>
+                      </Draggable>
                     );
                   })}
                 </React.Fragment>
@@ -283,7 +339,7 @@ class GridSetup extends React.Component {
               {!!this.state.isEditing &&
                 <SceneSelect
                   allScenes={this.props.allScenes}
-                  value={this.props.grid.grid[this.state.isEditing[0]][this.state.isEditing[1]]}
+                  value={this.props.scene.grid[this.state.isEditing[0]][this.state.isEditing[1]]}
                   menuIsOpen
                   autoFocus
                   onlyExtra
@@ -294,7 +350,7 @@ class GridSetup extends React.Component {
             </Menu>
             <Fab
               className={classes.deleteButton}
-              onClick={this.props.onDelete.bind(this, this.props.grid)}
+              onClick={this.props.onDelete.bind(this, this.props.scene)}
               size="small">
               <DeleteIcon className={classes.deleteIcon}/>
             </Fab>
@@ -305,51 +361,49 @@ class GridSetup extends React.Component {
   }
 
   componentDidUpdate() {
+    // TODO Make sure Grid tutorial works
     if (this.props.tutorial == SGT.dimensions && this.state.width ==2 && this.state.height == 2) {
       this.props.onTutorial(SGT.dimensions);
       const sceneID = this.props.allScenes[0].id;
-      const newGrid = this.props.grid.grid;
-      newGrid[0][0] = sceneID;
-      newGrid[0][1] = sceneID;
-      newGrid[1][0] = sceneID;
-      newGrid[1][1] = sceneID;
+      const newGrid = this.props.scene.grid;
+      newGrid[0][0].sceneID = sceneID;
+      newGrid[0][1].sceneID = sceneID;
+      newGrid[1][0].sceneID = sceneID;
+      newGrid[1][1].sceneID = sceneID;
       this.changeKey('grid', newGrid);
     } else if (this.props.tutorial == SGT.cells) {
       let height = this.state.height;
       let width = this.state.width;
       let changed = false;
-      if (this.props.grid.grid.length != height) {
-        height = this.props.grid.grid.length;
+      if (this.props.scene.grid.length != height) {
+        height = this.props.scene.grid.length;
         this.setState({height: height});
         changed = true;
       }
-      if (this.props.grid.grid[0].length != width) {
-        width = this.props.grid.grid[0].length;
+      if (this.props.scene.grid[0].length != width) {
+        width = this.props.scene.grid[0].length;
         this.setState({width: width});
         changed = true;
       }
       if (changed && width == 2 && height == 2) {
         this.props.onTutorial(SGT.dimensions);
         const sceneID = this.props.allScenes[0].id;
-        const newGrid = this.props.grid.grid;
-        newGrid[0][0] = sceneID;
-        newGrid[0][1] = sceneID;
-        newGrid[1][0] = sceneID;
-        newGrid[1][1] = sceneID;
+        const newGrid = this.props.scene.grid;
+        newGrid[0][0].sceneID = sceneID;
+        newGrid[0][1].sceneID = sceneID;
+        newGrid[1][0].sceneID = sceneID;
+        newGrid[1][1].sceneID = sceneID;
         this.changeKey('grid', newGrid);
       }
     }
   }
 
-  onClickCell(rowIndex: number, colIndex: number, e: MouseEvent) {
-    this.setState({menuAnchorEl: e.currentTarget, isEditing: [rowIndex, colIndex]});
-  }
-
   onChooseScene(sceneID: number) {
     const row = this.state.isEditing[0];
     const col = this.state.isEditing[1];
-    const newGrid = this.props.grid.grid;
-    newGrid[row][col] = sceneID;
+    const newGrid = this.props.scene.grid;
+    newGrid[row][col].sceneID = sceneID;
+    newGrid[row][col].sceneCopy = [];
     this.changeKey('grid', newGrid);
     this.onCloseMenu();
   }
@@ -359,13 +413,16 @@ class GridSetup extends React.Component {
   }
 
   getNewGrid(height: number, width: number) {
-    let grid = this.props.grid.grid;
+    let grid = this.props.scene.grid;
 
     // Adjust height
     if (grid.length > height) {
       grid.splice(height, grid.length - height);
     } else if (grid.length < height) {
-      const newRow = Array<number>(width).fill(-1);
+      const newRow = Array<SceneGridCell>(width);
+      for (let c = 0; c < newRow.length; c++) {
+        newRow[c] = new SceneGridCell();
+      }
       grid.push(newRow);
     }
     // Adjust width
@@ -374,7 +431,7 @@ class GridSetup extends React.Component {
         row.splice(width, row.length - width);
       } else if (row.length < width) {
         while (row.length < width) {
-          row.push(-1);
+          row.push(new SceneGridCell());
         }
       }
     }
@@ -431,8 +488,54 @@ class GridSetup extends React.Component {
     }
   }
 
+  onDrag() {
+    if (!this.state.dragging) {
+      this.setState({dragging: true});
+    }
+  }
+
+  onDragStop(rowIndex: number, colIndex: number, e: MouseEvent, position: DraggableData) {
+    if (this.state.dragging) {
+      this.onDragDrop(rowIndex, colIndex , e, position);
+    } else {
+      this.onClickCell(rowIndex, colIndex, e);
+    }
+    this.setState({dragging: false});
+  }
+
+  onDragDrop(rowIndex: number, colIndex: number, e: any, position: DraggableData) {
+    if (!e.path || e.path.length == 0) return;
+
+    const newRowIndex = e.path[0].id.split("-")[0];
+    const newColIndex = e.path[0].id.split("-")[1];
+    if (rowIndex == newRowIndex && colIndex == newColIndex || this.props.scene.grid[rowIndex][colIndex].sceneID == -1) return;
+
+    const newGrid = this.props.scene.grid;
+    newGrid[newRowIndex][newColIndex].sceneID = -1;
+    if (newGrid[rowIndex][colIndex].sceneCopy && newGrid[rowIndex][colIndex].sceneCopy.length > 0) {
+      newGrid[newRowIndex][newColIndex].sceneCopy = newGrid[rowIndex][colIndex].sceneCopy;
+    } else {
+      newGrid[newRowIndex][newColIndex].sceneCopy = [rowIndex, colIndex];
+    }
+    this.changeKey('grid', newGrid);
+  }
+
+  onClickCell(rowIndex: number, colIndex: number, e: MouseEvent) {
+    if ((e.target as Element).className?.includes("MuiSwitch-input")) {
+      this.onToggleMirror(rowIndex, colIndex);
+    } else {
+      this.setState({menuAnchorEl: e.target, isEditing: [rowIndex, colIndex], reset: null});
+    }
+  }
+
+  onToggleMirror(rowIndex: number, colIndex: number) {
+    const newGrid = this.props.scene.grid;
+    newGrid[rowIndex][colIndex].mirror = !newGrid[rowIndex][colIndex].mirror;
+    this.changeKey('grid', newGrid);
+  }
+
   beginEditingName() {
-    this.setState({isEditingName: this.props.grid.name});
+    this.setState({isEditingName: this.props.scene.name});
   }
 
   endEditingName(e: Event) {
@@ -450,7 +553,7 @@ class GridSetup extends React.Component {
   }
 
   update(fn: (scene: any) => void) {
-    this.props.onUpdateGrid(this.props.grid, fn);
+    this.props.onUpdateGrid(this.props.scene, fn);
   }
 
   goBack() {
@@ -460,9 +563,9 @@ class GridSetup extends React.Component {
   onPlayGrid() {
     // Regenerate scene(s) before playback
     const generateScenes: Array<Scene> = []
-    for (let row of this.props.grid.grid) {
-      for (let sceneID of row) {
-        const gScene = this.props.allScenes.find((s) => s.id == sceneID);
+    for (let row of this.props.scene.grid) {
+      for (let cell of row) {
+        const gScene = this.props.allScenes.find((s) => s.id == cell.sceneID);
         if (gScene && gScene.generatorWeights && gScene.regenerate && areWeightsValid(gScene)) {
           generateScenes.push(gScene);
         }
@@ -484,7 +587,7 @@ class GridSetup extends React.Component {
       this.props.onGenerate(generateScenes);
     }
 
-    this.props.onPlayGrid(this.props.grid);
+    this.props.onPlayGrid(this.props.scene);
   }
 
   getSceneName(id: string): string {

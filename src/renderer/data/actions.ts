@@ -44,6 +44,7 @@ import SceneGrid from "./SceneGrid";
 import Playlist from "./Playlist";
 import CaptionScript from "./CaptionScript";
 import SceneGroup from "./SceneGroup";
+import SceneGridCell from "./SceneGridCell";
 
 type State = typeof defaultInitialState;
 
@@ -612,11 +613,9 @@ export function deleteScenes(state: State, sceneIDs: Array<number>): Object {
   const newGrids = state.grids.filter((g: SceneGrid) => !deleteGrids.includes(g.id));
   for (let g of newGrids) {
     for (let row of g.grid) {
-      row = row.map((sceneID) => {
-        if (deleteScenes.includes(sceneID)) {
-          return -1;
-        } else {
-          return sceneID;
+      row.forEach((cell) => {
+        if (deleteScenes.includes(cell.sceneID)) {
+          cell.sceneID = -1;
         }
       });
     }
@@ -641,11 +640,11 @@ export function deleteScene(state: State, scene: Scene): Object {
   const newGrids = state.grids;
   for (let g of newGrids) {
     for (let row of g.grid) {
-      row = row.map((sceneID) => {
-        if (sceneID == scene.id) {
-          return -1;
+      row = row.map((cell) => {
+        if (cell.sceneID == scene.id) {
+          return new SceneGridCell();
         } else {
-          return sceneID;
+          return cell;
         }
       });
     }
@@ -1066,7 +1065,7 @@ export function addGrid(state: State): Object {
   let grid = new SceneGrid({
     id: id,
     name: "New Grid",
-    grid: [[-1]],
+    grid: [[new SceneGridCell()]],
   });
   return {
     grids: state.grids.concat([grid]),
@@ -2784,9 +2783,9 @@ export function exportScene(state: State, scene: Scene): Object {
           gridsToExport.push(gridCopy);
           for (let r of grid.grid) {
             for (let c of r) {
-              if (c != -1) {
-                const cell = state.scenes.find((s) => s.id == c);
-                if (cell && !scenesToExport.find((s) => s.id == c)) {
+              if (c.sceneID != -1) {
+                const cell = state.scenes.find((s) => s.id == c.sceneID);
+                if (cell && !scenesToExport.find((s) => s.id == c.sceneID)) {
                   const cellCopy = JSON.parse(JSON.stringify(cell)); // Make a copy
                   cellCopy.generatorWeights = null;
                   cellCopy.openTab = 3;
@@ -2902,7 +2901,7 @@ export function importScene(state: State, importScenes: any, addToLibrary: boole
               if (!newSceneMap.has(cellID)) {
                 newSceneMap.set(cellID, id++);
               }
-              grid.grid[r][c] = newSceneMap.get(cellID);
+              grid.grid[r][c].sceneID = newSceneMap.get(cellID);
             }
           }
         }

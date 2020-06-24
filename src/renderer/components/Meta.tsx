@@ -346,7 +346,7 @@ export default class Meta extends React.Component {
               <GridSetup
                 allScenes={this.state.scenes}
                 autoEdit={this.state.specialMode == SP.autoEdit}
-                grid={grid}
+                scene={grid}
                 tutorial={this.state.tutorial}
                 goBack={a(actions.goBack)}
                 onDelete={a(actions.deleteGrid)}
@@ -410,8 +410,8 @@ export default class Meta extends React.Component {
             {this.isRoute('gridplay') && (
               <GridPlayer
                 config={this.state.config}
-                grid={grid}
-                scenes={this.state.scenes}
+                scene={grid}
+                allScenes={this.state.scenes}
                 sceneGrids={this.state.grids}
                 theme={theme}
                 cache={a(actions.cacheImage)}

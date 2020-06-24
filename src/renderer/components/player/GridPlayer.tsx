@@ -91,8 +91,8 @@ class GridPlayer extends React.Component {
   readonly props: {
     classes: any,
     config: Config,
-    grid: SceneGrid,
-    scenes: Array<Scene>,
+    scene: SceneGrid,
+    allScenes: Array<Scene>,
     sceneGrids: Array<SceneGrid>,
     theme: Theme,
     advanceHacks?: Array<ChildCallbackHack>,
@@ -110,11 +110,11 @@ class GridPlayer extends React.Component {
 
   readonly state = {
     appBarHover: false,
-    grid: JSON.parse(JSON.stringify(this.props.grid)) as SceneGrid,
-    height: this.props.grid.grid && this.props.grid.grid.length > 0 &&
-    this.props.grid.grid[0].length ? this.props.grid.grid.length : 1,
-    width: this.props.grid.grid && this.props.grid.grid.length > 0 &&
-    this.props.grid.grid[0].length > 0 ? this.props.grid.grid[0].length : 1,
+    grid: JSON.parse(JSON.stringify(this.props.scene)) as SceneGrid,
+    height: this.props.scene.grid && this.props.scene.grid.length > 0 &&
+    this.props.scene.grid[0].length ? this.props.scene.grid.length : 1,
+    width: this.props.scene.grid && this.props.scene.grid.length > 0 &&
+    this.props.scene.grid[0].length > 0 ? this.props.scene.grid[0].length : 1,
     isLoaded: new Array<Array<boolean>>(),
     hideCursor: false,
   };
@@ -163,7 +163,7 @@ class GridPlayer extends React.Component {
 
                 <div className={classes.fill}/>
                 <Typography component="h1" variant="h4" color="inherit" noWrap className={classes.title}>
-                  {this.props.grid.name}
+                  {this.props.scene.name}
                 </Typography>
                 <div className={classes.fill}/>
 
@@ -194,55 +194,62 @@ class GridPlayer extends React.Component {
                  style={{gridTemplateColumns: gridTemplateColumns, gridTemplateRows: gridTemplateRows}}>
               {this.state.grid.grid.map((row, rowIndex) =>
                 <React.Fragment key={rowIndex}>
-                  {row.map((sceneID, colIndex) => {
-                    const scene = this.props.scenes.find((s) => s.id == sceneID);
-                    const newLoaded = this.state.isLoaded;
-                    let changed = false;
-                    while (newLoaded.length <= rowIndex) {
-                      newLoaded.push([]);
-                      changed = true
+                  {row.map((cell, colIndex) => {
+                    if (cell.sceneID) {
+                      const scene = this.props.allScenes.find((s) => s.id == cell.sceneID);
+                      const newLoaded = this.state.isLoaded;
+                      let changed = false;
+                      while (newLoaded.length <= rowIndex) {
+                        newLoaded.push([]);
+                        changed = true
+                      }
+                      while (newLoaded[rowIndex].length <= colIndex) {
+                        newLoaded[rowIndex].push(false);
+                        changed = true
+                      }
+                      if (changed) {
+                        setTimeout(() => this.setState({isLoaded: newLoaded}), 200);
+                      }
+                      if (!scene && !newLoaded[rowIndex][colIndex]) {
+                        setTimeout(() => this.setCellLoaded(rowIndex, colIndex), 200);
+                      }
+                      const loadingIndex = [].concat.apply([], newLoaded).indexOf(false);
+                      const showProgress = loadingIndex >= 0 && loadingIndex == (rowIndex * row.length) + colIndex;
+                      return (
+                        <div className={clsx(classes.gridCell, !scene && classes.hidden)} key={colIndex}>
+                          {scene && (
+                            <Player
+                              preventSleep={rowIndex == 0 && colIndex == 0}
+                              advanceHack={this.props.advanceHacks ? this.props.advanceHacks[(rowIndex * row.length) + colIndex] : undefined}
+                              config={this.props.config}
+                              hasStarted={this.props.hasStarted}
+                              scene={scene}
+                              nextScene={this.nextScene.bind(this, rowIndex, colIndex)}
+                              gridView
+                              scenes={this.props.allScenes}
+                              sceneGrids={this.props.sceneGrids}
+                              theme={this.props.theme}
+                              tutorial={null}
+                              captionScale={1 / Math.sqrt(row.length * this.props.scene.grid.length)}
+                              allLoaded={[].concat.apply([], this.state.isLoaded).find((l: boolean) => !l) == null}
+                              cache={this.props.cache.bind(this)}
+                              getTags={this.props.getTags.bind(this)}
+                              goBack={this.props.goBack.bind(this)}
+                              onLoaded={this.setCellLoaded.bind(this, rowIndex, colIndex)}
+                              setCount={this.props.setCount.bind(this)}
+                              setProgress={showProgress ? this.props.setProgress : this.nop}
+                              setVideo={this.props.setVideo ? this.props.setVideo.bind(this, (rowIndex * row.length) + colIndex) : undefined}
+                              systemMessage={this.props.systemMessage.bind(this)}
+                            />
+                          )}
+                        </div>
+                      );
+                    } else if (cell.sceneCopy) {
+                      // TODO
+                      return <div/>
+                    } else {
+                      return <div/>
                     }
-                    while (newLoaded[rowIndex].length <= colIndex) {
-                      newLoaded[rowIndex].push(false);
-                      changed = true
-                    }
-                    if (changed) {
-                      setTimeout(() => this.setState({isLoaded: newLoaded}), 200);
-                    }
-                    if (!scene && !newLoaded[rowIndex][colIndex]) {
-                      setTimeout(() => this.setCellLoaded(rowIndex, colIndex), 200);
-                    }
-                    const loadingIndex = [].concat.apply([], newLoaded).indexOf(false);
-                    const showProgress = loadingIndex >= 0 && loadingIndex == (rowIndex * row.length) + colIndex;
-                    return (
-                      <div className={clsx(classes.gridCell, !scene && classes.hidden)} key={colIndex}>
-                        {scene && (
-                          <Player
-                            preventSleep={rowIndex == 0 && colIndex == 0}
-                            advanceHack={this.props.advanceHacks ? this.props.advanceHacks[(rowIndex * row.length) + colIndex] : undefined}
-                            config={this.props.config}
-                            hasStarted={this.props.hasStarted}
-                            scene={scene}
-                            nextScene={this.nextScene.bind(this, rowIndex, colIndex)}
-                            gridView
-                            scenes={this.props.scenes}
-                            sceneGrids={this.props.sceneGrids}
-                            theme={this.props.theme}
-                            tutorial={null}
-                            captionScale={1 / Math.sqrt(row.length * this.props.grid.grid.length)}
-                            allLoaded={[].concat.apply([], this.state.isLoaded).find((l: boolean) => !l) == null}
-                            cache={this.props.cache.bind(this)}
-                            getTags={this.props.getTags.bind(this)}
-                            goBack={this.props.goBack.bind(this)}
-                            onLoaded={this.setCellLoaded.bind(this, rowIndex, colIndex)}
-                            setCount={this.props.setCount.bind(this)}
-                            setProgress={showProgress ? this.props.setProgress : this.nop}
-                            setVideo={this.props.setVideo ? this.props.setVideo.bind(this, (rowIndex * row.length) + colIndex) : undefined}
-                            systemMessage={this.props.systemMessage.bind(this)}
-                          />
-                        )}
-                      </div>
-                    );
                   })}
                 </React.Fragment>
               )}
@@ -256,13 +263,13 @@ class GridPlayer extends React.Component {
   nop() {}
 
   nextScene(rowIndex: number, colIndex: number) {
-    const sceneID = this.state.grid.grid[rowIndex][colIndex];
-    const scene = this.props.scenes.find((s) => s.id == sceneID);
+    const cell = this.state.grid.grid[rowIndex][colIndex];
+    const scene = this.props.allScenes.find((s) => s.id == cell.sceneID);
     const newGrid = this.state.grid;
     if (scene.nextSceneID == -1) {
-      newGrid.grid[rowIndex][colIndex] = scene.nextSceneRandomID;
+      newGrid.grid[rowIndex][colIndex].sceneID = scene.nextSceneRandomID;
     } else {
-      newGrid.grid[rowIndex][colIndex] = scene.nextSceneID;
+      newGrid.grid[rowIndex][colIndex].sceneID = scene.nextSceneID;
     }
     this.setState({grid: newGrid});
   }

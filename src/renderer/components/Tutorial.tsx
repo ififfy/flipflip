@@ -29,6 +29,7 @@ import {Route} from "../data/Route";
 import Config from "../data/Config";
 import Scene from "../data/Scene";
 import SceneGrid from "../data/SceneGrid";
+import SceneGridCell from "../data/SceneGridCell";
 
 const styles = (theme: Theme) => createStyles({
   deleteIcon: {
@@ -2204,7 +2205,8 @@ class Tutorial extends React.Component {
         (this.props.scene as Scene).crossFade = true;
         break;
       case SGT.dimensions:
-        (this.props.scene as SceneGrid).grid = [[-1, -1], [-1, -1]];
+        (this.props.scene as SceneGrid).grid = [[new SceneGridCell({sceneID: -1}), new SceneGridCell({sceneID: -1})],
+          [new SceneGridCell({sceneID: -1}), new SceneGridCell({sceneID: -1})]];
         break;
     }
     this.onContinue();
