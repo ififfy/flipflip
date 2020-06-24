@@ -20,7 +20,7 @@
     "electron-packager": "^14.2.1",
     "file-loader": "^6.0.0",
     "html-webpack-plugin": "^4.0.4",
-    "node-sass": "^4.12.0",
+    "node-sass": "^4.14.1",
     "rimraf": "^3.0.2",
     "sass-loader": "^8.0.2",
     "style-loader": "^1.1.3",

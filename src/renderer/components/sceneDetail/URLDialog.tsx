@@ -23,7 +23,7 @@ class URLDialog extends React.Component {
     classes: any,
     open: boolean,
     onClose(): void,
-    onImportURL(type: string, ...args: any[]): void,
+    onImportURL(type: string, e: MouseEvent, ...args: any[]): void,
   };
 
   readonly state = {
@@ -104,7 +104,7 @@ class URLDialog extends React.Component {
   }
 
   onImportURL() {
-    this.props.onImportURL(this.state.importType, this.state.importURL, this.state.rootDir);
+    this.props.onImportURL(this.state.importType, null, this.state.importURL, this.state.rootDir);
     this.props.onClose();
   }
 }

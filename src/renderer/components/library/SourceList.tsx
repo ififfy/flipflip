@@ -439,7 +439,7 @@ class SourceList extends React.Component {
   }
 
   onCloseDialog() {
-    this.setState({menuAnchorEl: null, clipMenu: false});
+    this.setState({menuAnchorEl: null, clipMenu: null});
   }
 
   onCloseBlacklist() {
@@ -542,7 +542,6 @@ class SourceList extends React.Component {
         onSourceOptions={this.onSourceOptions.bind(this)}
         onStartEdit={this.onStartEdit.bind(this)}
         onToggleSelect={this.onToggleSelect.bind(this)}
-        onToggleClip={this.onToggleClip.bind(this)}
         savePosition={this.savePosition.bind(this)}
         systemMessage={this.props.systemMessage.bind(this)}
       />

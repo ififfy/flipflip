@@ -520,7 +520,7 @@ class ConfigForm extends React.Component {
   }
 
   onFinishRestoreDefaults() {
-    this.props.onDefault.bind(this);
+    this.props.onDefault();
   }
 
   onCloseDialog() {

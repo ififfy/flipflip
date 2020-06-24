@@ -207,6 +207,11 @@ export default class Scene {
       this.playFullVideo = false;
     }
 
+    if (this.textEndStop && this.textNextScene) {
+      this.textEndStop = false;
+      this.textNextScene = false;
+    }
+
     if (this.textKind && this.textKind == "tot.hastebin") {
       this.textKind = "";
       this.textSource = "https://hastebin.com/raw/" + this.textSource;

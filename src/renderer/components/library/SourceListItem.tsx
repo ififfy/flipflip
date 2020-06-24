@@ -120,7 +120,6 @@ class SourceListItem extends React.Component {
     onSourceOptions(source: LibrarySource): void,
     onStartEdit(id: number): void,
     onToggleSelect(): void,
-    onToggleClip(source: LibrarySource, clip: Clip): void,
     savePosition(): void,
     systemMessage(message: string): void,
   };
