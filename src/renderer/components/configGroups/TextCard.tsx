@@ -5,7 +5,7 @@ import fileURL from "file-url";
 import SystemFonts from "system-font-families";
 
 import {
-  Collapse, createStyles, Divider, FormControl, FormControlLabel, Grid, IconButton, InputAdornment,
+  CircularProgress, Collapse, createStyles, Divider, FormControl, FormControlLabel, Grid, IconButton, InputAdornment,
   InputLabel, MenuItem, Select, Switch, TextField, Theme, Tooltip, withStyles
 } from "@material-ui/core";
 
@@ -32,7 +32,10 @@ const styles = (theme: Theme) => createStyles({
   fontDivider: {
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(2),
-  }
+  },
+  fontProgress: {
+    position: 'absolute',
+  },
 });
 
 class TextCard extends React.Component {
@@ -45,6 +48,7 @@ class TextCard extends React.Component {
 
   readonly state = {
     showFonts: false,
+    loadingFonts: true,
     systemFonts: Array<string>(),
   };
 
@@ -81,18 +85,17 @@ class TextCard extends React.Component {
                   label="Next Scene at End"/>
               </Collapse>
             </Grid>
-            {this.state.systemFonts.length > 0 && (
-              <Grid item>
-                <Collapse in={this.props.scene.textEnabled}>
-                  <Tooltip title="Toggle Font Options">
-                    <IconButton
-                      onClick={this.onToggleFontVisiblity.bind(this)}>
-                      {this.state.showFonts ? <VisibilityIcon/> : <VisibilityOffIcon/>}
-                    </IconButton>
-                  </Tooltip>
-                </Collapse>
-              </Grid>
-            )}
+            <Grid item>
+              <Collapse in={this.props.scene.textEnabled}>
+                {this.state.loadingFonts && <CircularProgress size={46} className={classes.fontProgress} />}
+                <Tooltip title="Toggle Font Options">
+                  <IconButton
+                    onClick={this.onToggleFontVisiblity.bind(this)}>
+                    {this.state.showFonts ? <VisibilityIcon/> : <VisibilityOffIcon/>}
+                  </IconButton>
+                </Tooltip>
+              </Collapse>
+            </Grid>
           </Grid>
         </Grid>
         <Grid item xs={12} className={clsx(!this.props.scene.textEnabled && classes.noPadding)}>
@@ -129,6 +132,7 @@ class TextCard extends React.Component {
                   <InputLabel>Blink Font</InputLabel>
                   <Select
                     value={this.props.scene.blinkFontFamily}
+                    disabled={this.state.systemFonts.length == 0}
                     style={{fontFamily: this.props.scene.blinkFontFamily}}
                     MenuProps={{
                       PaperProps: {
@@ -170,6 +174,7 @@ class TextCard extends React.Component {
                   <InputLabel>Caption Font</InputLabel>
                   <Select
                     value={this.props.scene.captionFontFamily}
+                    disabled={this.state.systemFonts.length == 0}
                     style={{fontFamily: this.props.scene.captionFontFamily}}
                     MenuProps={{
                       PaperProps: {
@@ -210,6 +215,7 @@ class TextCard extends React.Component {
                   <InputLabel>Big Caption Font</InputLabel>
                   <Select
                     value={this.props.scene.captionBigFontFamily}
+                    disabled={this.state.systemFonts.length == 0}
                     style={{fontFamily: this.props.scene.captionBigFontFamily}}
                     MenuProps={{
                       PaperProps: {
@@ -250,6 +256,7 @@ class TextCard extends React.Component {
                   <InputLabel>Count Font</InputLabel>
                   <Select
                     value={this.props.scene.countFontFamily}
+                    disabled={this.state.systemFonts.length == 0}
                     style={{fontFamily: this.props.scene.countFontFamily}}
                     MenuProps={{
                       PaperProps: {
@@ -295,7 +302,7 @@ class TextCard extends React.Component {
     this._promise = new CancelablePromise((resolve, reject) => {
       new SystemFonts().getFonts().then((res: Array<string>) => {
           if (!this._promise.hasCanceled) {
-            this.setState({systemFonts: res});
+            this.setState({systemFonts: res, loadingFonts: false});
           }
         },
         (err: string) => {
