@@ -28,12 +28,14 @@ const IF = { // image filters
 const GO = { // GIF Options
   none: 'go.none',
   part: 'go.part',
+  partr: 'go.partr',
   full: 'go.full',
 };
 
 const VO = { // Video Options
   none: 'vo.none',
   part: 'vo.part',
+  partr: 'vo.partr',
   full: 'vo.full',
 };
 

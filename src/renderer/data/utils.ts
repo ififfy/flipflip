@@ -372,6 +372,10 @@ export function getRandomIndex(list: any[]) {
   return Math.floor(Math.random() * list.length)
 }
 
+export function getRandomNumber(min: number, max: number) {
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
 export function getRandomListItem(list: any[], count: number = 1) {
   if (count <= 0) {
     return;

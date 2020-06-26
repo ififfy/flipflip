@@ -76,8 +76,12 @@ export default class Scene {
   strobeColorSet: Array<string> = [];
   gifOption = GO.none;
   gifTimingConstant = 3000;
+  gifTimingMin = 1000;
+  gifTimingMax = 3000;
   videoOption= VO.none;
   videoTimingConstant = 3000;
+  videoTimingMin = 1000;
+  videoTimingMax = 3000;
   randomVideoStart = false;
   continueVideo = false;
   rotatePortrait = false;

@@ -61,7 +61,11 @@ class ImageVideoCard extends React.Component {
     const classes = this.props.classes;
 
     const gifTimingConstant = typeof this.props.scene.gifTimingConstant === 'number' ? this.props.scene.gifTimingConstant : 0;
+    const gifTimingMin = typeof this.props.scene.gifTimingMin === 'number' ? this.props.scene.gifTimingMin : 0;
+    const gifTimingMax = typeof this.props.scene.gifTimingMax === 'number' ? this.props.scene.gifTimingMax : 0;
     const videoTimingConstant = typeof this.props.scene.videoTimingConstant === 'number' ? this.props.scene.videoTimingConstant : 0;
+    const videoTimingMin = typeof this.props.scene.videoTimingMin === 'number' ? this.props.scene.videoTimingMin : 0;
+    const videoTimingMax = typeof this.props.scene.videoTimingMax === 'number' ? this.props.scene.videoTimingMax : 0;
     const skipVideoStart = typeof this.props.scene.skipVideoStart === 'number' ? this.props.scene.skipVideoStart : 0;
     const skipVideoEnd = typeof this.props.scene.skipVideoEnd === 'number' ? this.props.scene.skipVideoEnd : 0;
     const videoVolume = typeof this.props.scene.videoVolume === 'number' ? this.props.scene.videoVolume : 0;
@@ -105,7 +109,7 @@ class ImageVideoCard extends React.Component {
                 </FormControl>
               </Collapse>
             </Grid>
-            <Grid item xs={12} sm={this.props.sidebar ? 12 : 6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.videos || this.props.scene.gifOption != GO.part) && classes.noPadding)}>
+            <Grid item xs={12} sm={this.props.sidebar ? 12 : 6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.videos || this.props.scene.gifOption == GO.none || this.props.scene.gifOption == GO.full) && classes.noPadding)}>
               <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.videos && this.props.scene.gifOption == GO.part}>
                 <TextField
                   variant="outlined"
@@ -114,6 +118,38 @@ class ImageVideoCard extends React.Component {
                   value={gifTimingConstant}
                   onChange={this.onIntInput.bind(this, 'gifTimingConstant')}
                   onBlur={this.blurIntKey.bind(this, 'gifTimingConstant')}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+                  }}
+                  inputProps={{
+                    step: 100,
+                    min: 0,
+                    type: 'number',
+                  }}/>
+              </Collapse>
+              <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.videos && this.props.scene.gifOption == GO.partr}>
+                <TextField
+                  variant="outlined"
+                  label="Between"
+                  margin="dense"
+                  value={gifTimingMin}
+                  onChange={this.onIntInput.bind(this, 'gifTimingMin')}
+                  onBlur={this.blurIntKey.bind(this, 'gifTimingMin')}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+                  }}
+                  inputProps={{
+                    step: 100,
+                    min: 0,
+                    type: 'number',
+                  }}/>
+                <TextField
+                  variant="outlined"
+                  label="and"
+                  margin="dense"
+                  value={gifTimingMax}
+                  onChange={this.onIntInput.bind(this, 'gifTimingMax')}
+                  onBlur={this.blurIntKey.bind(this, 'gifTimingMax')}
                   InputProps={{
                     endAdornment: <InputAdornment position="end">ms</InputAdornment>,
                   }}
@@ -141,7 +177,7 @@ class ImageVideoCard extends React.Component {
               </FormControl>
             </Collapse>
           </Grid>
-          <Grid item xs={12} sm={this.props.sidebar ? 12 : 6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.images || this.props.scene.videoOption != VO.part) && classes.noPadding)}>
+          <Grid item xs={12} sm={this.props.sidebar ? 12 : 6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.images || this.props.scene.videoOption == VO.none || this.props.scene.videoOption == VO.full) && classes.noPadding)}>
             <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.images && this.props.scene.videoOption == VO.part}>
               <TextField
                 variant="outlined"
@@ -150,6 +186,38 @@ class ImageVideoCard extends React.Component {
                 value={videoTimingConstant}
                 onChange={this.onIntInput.bind(this, 'videoTimingConstant')}
                 onBlur={this.blurIntKey.bind(this, 'videoTimingConstant')}
+                InputProps={{
+                  endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+                }}
+                inputProps={{
+                  step: 100,
+                  min: 0,
+                  type: 'number',
+                }}/>
+            </Collapse>
+            <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.images && this.props.scene.videoOption == VO.partr}>
+              <TextField
+                variant="outlined"
+                label="Between"
+                margin="dense"
+                value={videoTimingMin}
+                onChange={this.onIntInput.bind(this, 'videoTimingMin')}
+                onBlur={this.blurIntKey.bind(this, 'videoTimingMin')}
+                InputProps={{
+                  endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+                }}
+                inputProps={{
+                  step: 100,
+                  min: 0,
+                  type: 'number',
+                }}/>
+              <TextField
+                variant="outlined"
+                label="and"
+                margin="dense"
+                value={videoTimingMax}
+                onChange={this.onIntInput.bind(this, 'videoTimingMax')}
+                onBlur={this.blurIntKey.bind(this, 'videoTimingMax')}
                 InputProps={{
                   endAdornment: <InputAdornment position="end">ms</InputAdornment>,
                 }}

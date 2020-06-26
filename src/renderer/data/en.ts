@@ -19,11 +19,13 @@ export default new Map<string, string>([
   ['if.stills', 'Only stills'],
 
   ['go.none', 'No Change'],
-  ['go.part', 'Play Part'],
+  ['go.part', 'Play Part (Constant)'],
+  ['go.partr', 'Play Part (Random)'],
   ['go.full', 'Play Full'],
 
   ['vo.none', 'No Change'],
-  ['vo.part', 'Play Part'],
+  ['vo.part', 'Play Part (Constant)'],
+  ['vo.partr', 'Play Part (Random)'],
   ['vo.full', 'Play Full'],
 
   ['bt.blur', 'Blurred'],

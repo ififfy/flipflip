@@ -7,7 +7,7 @@ import gifInfo from 'gif-info';
 import IdleTimer from 'react-idle-timer';
 
 import {GO, IF, OF, SL, TF, VO, WF} from '../../data/const';
-import {getRandomListItem, isVideo, toArrayBuffer, urlToPath} from '../../data/utils';
+import {getRandomListItem, getRandomNumber, isVideo, toArrayBuffer, urlToPath} from '../../data/utils';
 import Config from "../../data/Config";
 import Scene from "../../data/Scene";
 import ChildCallbackHack from './ChildCallbackHack';
@@ -413,6 +413,8 @@ export default class ImagePlayer extends React.Component {
           video.setAttribute("duration", (duration * 1000).toString());
         } else if (this.props.scene.videoOption == VO.part) {
           video.setAttribute("duration", this.props.scene.videoTimingConstant.toString());
+        } else if (this.props.scene.videoOption == VO.partr) {
+          video.setAttribute("duration", getRandomNumber(this.props.scene.videoTimingMin, this.props.scene.videoTimingMax).toString());
         }
 
         if (video.hasAttribute("start") && video.hasAttribute("end")) {
@@ -533,8 +535,10 @@ export default class ImagePlayer extends React.Component {
         if (info && info.animated) {
           if (this.props.scene.gifOption == GO.full) {
             img.setAttribute("duration", info.duration);
-          } else if (this.props.scene.gifOption == GO.part ) {
+          } else if (this.props.scene.gifOption == GO.part) {
             img.setAttribute("duration", this.props.scene.gifTimingConstant.toString());
+          } else if (this.props.scene.gifOption == GO.partr) {
+            img.setAttribute("duration", getRandomNumber(this.props.scene.gifTimingMin, this.props.scene.gifTimingMax).toString());
           }
         }
 

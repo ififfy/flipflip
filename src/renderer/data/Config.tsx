@@ -58,8 +58,12 @@ interface SceneSettingsI {
   backgroundBlur: number;
   gifOption: string;
   gifTimingConstant: number;
+  gifTimingMin: number;
+  gifTimingMax: number;
   videoOption: string;
   videoTimingConstant: number;
+  videoTimingMin: number;
+  videoTimingMax: number;
   randomVideoStart: boolean;
   continueVideo: boolean;
   rotatePortrait: boolean;
@@ -240,8 +244,12 @@ export class SceneSettings implements SceneSettingsI {
   backgroundBlur = 8;
   gifOption = GO.none;
   gifTimingConstant = 3000;
+  gifTimingMin = 1000;
+  gifTimingMax = 3000;
   videoOption = VO.none;
   videoTimingConstant = 3000;
+  videoTimingMin = 1000;
+  videoTimingMax = 3000;
   randomVideoStart = false;
   continueVideo = false;
   rotatePortrait = false;
