@@ -45,6 +45,7 @@ function filterPathsToJustPlayable(imageTypeFilter: string, paths: Array<string>
     case IF.any:
       return paths.filter((p) => isImageOrVideo(p, strict));
     case IF.stills:
+    case IF.images:
       return paths.filter((p) => isImage(p, strict));
     case IF.gifs:
       return paths.filter((p) => p.toLowerCase().endsWith('.gif') || isVideo(p, strict));

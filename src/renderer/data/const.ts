@@ -21,6 +21,7 @@ const IF = { // image filters
   any: 'if.any',
   videos: 'if.videos',
   gifs: 'if.gifs',
+  images: 'if.images',
   stills: 'if.stills',
 };
 

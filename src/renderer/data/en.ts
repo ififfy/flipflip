@@ -12,9 +12,10 @@ export default new Map<string, string>([
   ['of.ordered', 'Ordered'],
   ['of.random', 'Randomized'],
 
-  ['if.any', 'All images'],
+  ['if.any', 'All files'],
   ['if.videos', 'Only videos'],
   ['if.gifs', 'Only animated'],
+  ['if.images', 'Only image files'],
   ['if.stills', 'Only stills'],
 
   ['go.none', 'No Change'],

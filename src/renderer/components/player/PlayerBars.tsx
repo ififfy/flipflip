@@ -332,7 +332,7 @@ class PlayerBars extends React.Component {
                 </Typography>
               </div>
 
-              {this.props.scene.imageTypeFilter != IF.stills && (
+              {this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.images && (
                 <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
                   <ExpansionPanelSummary
                     expandIcon={<ExpandMoreIcon />}
