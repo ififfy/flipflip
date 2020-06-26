@@ -462,6 +462,7 @@ class VideoClipper extends React.Component {
 
   componentDidMount() {
     window.addEventListener('keydown', this.onKeyDown, false);
+    window.addEventListener('wheel', this.onScroll, false);
 
     const scene = this.state.scene;
     scene.backgroundType = BT.color;
@@ -473,6 +474,7 @@ class VideoClipper extends React.Component {
 
   componentWillUnmount() {
     window.removeEventListener('keydown', this.onKeyDown);
+    window.removeEventListener('wheel', this.onScroll);
   }
 
   componentDidUpdate(props: any) {
@@ -695,6 +697,17 @@ class VideoClipper extends React.Component {
   onClickEndText() {
     this.setState({isEditingEndText: getTimestamp(this.state.video.currentTime)});
     this.onChangePosition(null, [this.state.isEditingValue[0], this.state.video.currentTime]);
+  }
+
+  onScroll = (e: WheelEvent) => {
+    const volumeChange = (e.deltaY / 100) * -5;
+    let newVolume = this.state.scene.videoVolume + volumeChange;
+    if (newVolume < 0) {
+      newVolume = 0;
+    } else if (newVolume > 100) {
+      newVolume = 100;
+    }
+    this.onChangeVolume(newVolume);
   }
 
   onKeyDown = (e: KeyboardEvent) => {

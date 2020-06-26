@@ -381,11 +381,13 @@ export default class Player extends React.Component {
     if (this.props.preventSleep) {
       this._powerSaveID = remote.powerSaveBlocker.start('prevent-display-sleep');
     }
+    window.addEventListener('wheel', this.onScroll, false);
   }
 
   componentWillUnmount() {
     clearInterval(this._interval);
     this._interval = null;
+    window.removeEventListener('wheel', this.onScroll);
     getCurrentWindow().setAlwaysOnTop(false);
     getCurrentWindow().setFullScreen(false);
     // Clear ALL the available browser caches
@@ -417,6 +419,17 @@ export default class Player extends React.Component {
   }
 
   nop() {}
+
+  onScroll = (e: WheelEvent) => {
+    const volumeChange = (e.deltaY / 100) * -5;
+    let newVolume = parseInt(this.props.scene.videoVolume as any) + volumeChange;
+    if (newVolume < 0) {
+      newVolume = 0;
+    } else if (newVolume > 100) {
+      newVolume = 100;
+    }
+    this.props.onUpdateScene(this.props.scene, (s) => s.videoVolume = newVolume);
+  }
 
   setProgress(total: number, current: number, message: string[]) {
     this.setState({total: total, progress: current, progressMessage: message});
