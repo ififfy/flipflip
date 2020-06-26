@@ -191,7 +191,7 @@ function loadLocalDirectory(systemMessage: Function, config: Config, source: Lib
 function loadVideo(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   const url = source.url;
   return new CancelablePromise((resolve) => {
-    let paths = filterPathsToJustPlayable(filter, [url], true).map((p) => p.startsWith("http") ? p : fileURL(p));
+    let paths = filterPathsToJustPlayable(filter, [url], false).map((p) => p.startsWith("http") ? p : fileURL(p));
     if (paths.length > 0) {
       let path = paths[0];
       helpers.count = 1;
@@ -260,7 +260,12 @@ function loadPlaylist(systemMessage: Function, config: Config, source: LibrarySo
           data: filterPathsToJustPlayable(filter, urls, true),
           helpers: helpers,
         });
-      });
+      })
+      .catch((e) => {
+        console.warn("Fetch error on", url);
+        console.warn(e);
+        resolve(null);
+      });;
   });
 }
 
@@ -566,9 +571,9 @@ function loadImageFap(systemMessage: Function, config: Config, source: LibrarySo
   const url = source.url;
   return new CancelablePromise((resolve) => {
     if (url.includes("/pictures/")) {
-      wretch("http://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2")
+      wretch("https://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2")
         .get()
-        .setTimeout(5000)
+        .setTimeout(10000)
         .onAbort((e) => resolve(null))
         .text((html) => {
           let imageEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll(".expp-container > form > table > tbody > tr > td");
@@ -576,7 +581,7 @@ function loadImageFap(systemMessage: Function, config: Config, source: LibrarySo
             let imageCount = 0;
             let images = Array<string>();
             for (let image of imageEls) {
-              wretch("http://www.imagefap.com/photo/" + image.id + "/")
+              wretch("https://www.imagefap.com/photo/" + image.id + "/")
                 .get()
                 .text((html) => {
                   imageCount++;
@@ -602,7 +607,7 @@ function loadImageFap(systemMessage: Function, config: Config, source: LibrarySo
     } else if (url.includes("/organizer/")) {
       wretch(url + "?page=" + helpers.next[0])
         .get()
-        .setTimeout(5000)
+        .setTimeout(10000)
         .onAbort((e) => resolve(null))
         .text((html) => {
           let albumEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll("td.blk_galleries > font > a.blk_galleries");
@@ -612,7 +617,7 @@ function loadImageFap(systemMessage: Function, config: Config, source: LibrarySo
           } else if (albumEls.length > helpers.next[1]) {
             let albumEl = albumEls[helpers.next[1]];
             let albumID = albumEl.getAttribute("href").substring(albumEl.getAttribute("href").lastIndexOf("/") + 1);
-            wretch("http://www.imagefap.com/gallery/" + albumID + "?view=2")
+            wretch("https://www.imagefap.com/gallery/" + albumID + "?view=2")
               .get()
               .text((html) => {
                 let imageEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll(".expp-container > form > table > tbody > tr > td");
@@ -620,7 +625,7 @@ function loadImageFap(systemMessage: Function, config: Config, source: LibrarySo
                   let images = Array<string>();
                   let imageCount = 0;
                   for (let image of imageEls) {
-                    wretch("http://www.imagefap.com/photo/" + image.id + "/")
+                    wretch("https://www.imagefap.com/photo/" + image.id + "/")
                       .get()
                       .text((html) => {
                         imageCount++;
@@ -654,40 +659,41 @@ function loadImageFap(systemMessage: Function, config: Config, source: LibrarySo
               helpers: helpers,
             })
           }
+        })
+        .catch((e) => {
+          console.log(e);
         });
     } else if (url.includes("/video.php?vid=")) {
-      wretch(url)
+      helpers.next = null;
+      resolve({data: [], helpers: helpers});
+      // This doesn't work anymore due to src url requiring referer
+      /*wretch(url)
         .get()
-        .setTimeout(5000)
+        .setTimeout(10000)
         .onAbort((e) => resolve(null))
         .text((html) => {
-          let videoEls = new DOMParser().parseFromString(html, "text/html").querySelectorAll(".video-js");
-          if (videoEls.length == 0) {
-            helpers.next = null;
-            resolve({data: [], helpers: helpers});
-          } else {
+          const findVideoURLs = /url: '(https:\/\/cdn-fck\.moviefap\.com\/moviefap\/.*)',/g.exec(html);
+          if (findVideoURLs) {
             let videoURLs = Array<string>();
-            for (let el of videoEls) {
-              let videoURL = "";
-              let videoDimension = 0;
-              for (let source of el.querySelectorAll("source")) {
-                if (parseInt(source.getAttribute("res")) > videoDimension) {
-                  videoDimension = parseInt(source.getAttribute("res"));
-                  videoURL = source.src;
-                }
-              }
-              if (videoURL != "") {
-                videoURLs.push(videoURL.split("?")[0]);
+            for (let v of findVideoURLs) {
+              if (!v.startsWith('url:')) {
+                videoURLs.push(v);
               }
             }
             helpers.next = null;
-            helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, videoURLs, true).length;
+            helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, videoURLs, false).length;
             resolve({
-              data: filterPathsToJustPlayable(filter, videoURLs, true),
+              data: filterPathsToJustPlayable(filter, videoURLs, false),
               helpers: helpers,
-            })
+            });
+          } else {
+            helpers.next = null;
+            resolve({data: [], helpers: helpers});
           }
-        });
+        });*/
+    } else {
+      helpers.next = null;
+      resolve({data: [], helpers: helpers});
     }
   });
 }
@@ -695,11 +701,14 @@ function loadImageFap(systemMessage: Function, config: Config, source: LibrarySo
 function loadSexCom(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   const url = source.url;
   return new CancelablePromise((resolve) => {
-    let requestURL;
+    // This doesn't work anymore due to src url requiring referer
+    helpers.next = null;
+    resolve({data: [], helpers: helpers});
+    /*let requestURL;
     if (url.includes("/user/")) {
-      requestURL = "http://www.sex.com/user/" + getFileGroup(url) + "?page=" + (helpers.next + 1);
+      requestURL = "https://www.sex.com/user/" + getFileGroup(url) + "?page=" + (helpers.next + 1);
     } else if (url.includes("/gifs/") || url.includes("/pics/") || url.includes("/videos/")) {
-      requestURL = "http://www.sex.com/" + getFileGroup(url) + "?page=" + (helpers.next + 1);
+      requestURL = "https://www.sex.com/" + getFileGroup(url) + "?page=" + (helpers.next + 1);
     }
     wretch(requestURL)
       .get()
@@ -728,7 +737,7 @@ function loadSexCom(systemMessage: Function, config: Config, source: LibrarySour
           } else {
             let count = 0;
             for (let videoURL of videos) {
-              wretch("http://www.sex.com" + videoURL)
+              wretch("https://www.sex.com" + videoURL)
                 .get()
                 .setTimeout(5000)
                 .onAbort((e) => resolve(null))
@@ -768,7 +777,7 @@ function loadSexCom(systemMessage: Function, config: Config, source: LibrarySour
           helpers.next = null;
           resolve({data: [], helpers: helpers});
         }
-      });
+      });*/
   });
 }
 
@@ -861,7 +870,7 @@ function loadTwitter(systemMessage: Function, config: Config, source: LibrarySou
 function loadDeviantArt(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   const url = source.url;
   return new CancelablePromise((resolve) => {
-    wretch("http://backend.deviantart.com/rss.xml?type=deviation&q=by%3A" + getFileGroup(url) + "+sort%3Atime+meta%3Aall" + (helpers.next != 0 ? "&offset=" + helpers.next : ""))
+    wretch("https://backend.deviantart.com/rss.xml?type=deviation&q=by%3A" + getFileGroup(url) + "+sort%3Atime+meta%3Aall" + (helpers.next != 0 ? "&offset=" + helpers.next : ""))
       .get()
       .setTimeout(5000)
       .onAbort((e) => resolve(null))

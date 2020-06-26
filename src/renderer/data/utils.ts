@@ -87,7 +87,7 @@ export function getFileName(url: string, extension = true) {
 }
 
 export function getSourceType(url: string): string {
-  if (isVideo(url, true)) {
+  if (isVideo(url, false)) {
     return ST.video;
   } else if (isVideoPlaylist(url, true)) {
     return ST.playlist;
