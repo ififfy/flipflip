@@ -316,7 +316,7 @@ export default class Meta extends React.Component {
               message={
                 <span style={{display: 'flex', alignItems: 'center',}}>
                   {this.state.systemSnack}
-              </span>
+                </span>
               }
             />
           </Snackbar>

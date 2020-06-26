@@ -43,7 +43,8 @@ export default class ImageView extends React.Component {
     if (!props.hasStarted && this.props.hasStarted) {
       const el = this.contentRef.current;
       if (el && el.firstChild && el.firstChild instanceof HTMLVideoElement) {
-        el.firstChild.volume = this.props.scene.videoVolume / 100;
+        const volume = el.firstChild.hasAttribute("volume") ? parseInt(el.firstChild.getAttribute("volume")) : this.props.scene.videoVolume;
+        el.firstChild.volume = volume / 100;
       }
     }
   }
@@ -114,7 +115,8 @@ export default class ImageView extends React.Component {
       if (parseFloat(el.parentElement.style.opacity) == 0.99 || v.ended || v.paused) return;
       let crossFadeAudio = this.props.scene.crossFadeAudio && !this.props.scene.gridView;
       if (this.props.hasStarted && this.props.scene.crossFade && crossFadeAudio && v instanceof HTMLVideoElement) {
-        v.volume = (this.props.scene.videoVolume / 100) * parseFloat(el.parentElement.parentElement.getAttribute("volume"));
+        const volume = v.hasAttribute("volume") ? parseInt(v.getAttribute("volume")) : this.props.scene.videoVolume;
+        v.volume = (volume / 100) * parseFloat(el.parentElement.parentElement.getAttribute("volume"));
       }
       if (v.hasAttribute("start") && v.hasAttribute("end")) {
         const start = v.getAttribute("start");
@@ -182,7 +184,8 @@ export default class ImageView extends React.Component {
 
     if (img instanceof HTMLVideoElement && !forceBG) {
       if (this.props.hasStarted) {
-        img.volume = this.props.scene.videoVolume / 100;
+        const volume = img.hasAttribute("volume") ? parseInt(img.getAttribute("volume")) : this.props.scene.videoVolume;
+        img.volume = volume / 100;
       } else {
         img.volume = 0;
       }

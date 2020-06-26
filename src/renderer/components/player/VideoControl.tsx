@@ -48,7 +48,8 @@ class VideoControl extends React.Component {
     useHotkeys?: boolean,
     player?: boolean,
     volume?: any,
-    clip?: Array<number>,
+    clip?: Clip,
+    clipValue?: Array<number>,
     clips?: Array<Clip>,
     onChangeVolume(volume: number): void,
   };
@@ -65,9 +66,9 @@ class VideoControl extends React.Component {
       <Grid container spacing={1} alignItems="center" justify={this.props.player ? "center" : "flex-start"}>
         <Grid item xs={this.props.player ? 12 : true} className={classes.timeSlider}>
           <Slider
-            min={this.props.clip ? this.props.clip[0] : 0}
-            max={this.props.clip ? this.props.clip[1] : this.props.video.duration}
-            color={this.props.clip ? "secondary" : "primary"}
+            min={this.props.clipValue ? this.props.clipValue[0] : 0}
+            max={this.props.clipValue ? this.props.clipValue[1] : this.props.video.duration}
+            color={this.props.clipValue ? "secondary" : "primary"}
             value={this.props.video.currentTime}
             ValueLabelComponent={(props) => <StyledValueLabel {...props}/>}
             valueLabelDisplay="on"
@@ -104,7 +105,8 @@ class VideoControl extends React.Component {
                 </Grid>
                 <Grid item xs>
                   <Slider value={this.props.volume ? parseInt(this.props.volume) : this.props.video.volume * 100}
-                          onChange={this.onChangeVolume.bind(this)} />
+                          onChange={this.onChangeVolume.bind(this)}
+                          marks={this.props.clip && this.props.clip.volume != null ? [{value: this.props.clip.volume, label: "↑"}] : []}/>
                 </Grid>
                 <Grid item>
                   <VolumeUpIcon/>
@@ -123,15 +125,15 @@ class VideoControl extends React.Component {
       if (!this.props.video.paused) {
         this.triggerUpdate();
       }
-      if (this.props.clip) {
+      if (this.props.clipValue) {
         if (this.props.video.paused && this.state.playing) {
           this.setState({playing: false});
         } else if (!this.props.video.paused && !this.state.playing) {
           this.setState({playing: true});
         }
-        if (this.props.video.currentTime < this.props.clip[0] ||
-          this.props.video.currentTime > this.props.clip[1]) {
-          this.props.video.currentTime = this.props.clip[0];
+        if (this.props.video.currentTime < this.props.clipValue[0] ||
+          this.props.video.currentTime > this.props.clipValue[1]) {
+          this.props.video.currentTime = this.props.clipValue[0];
         }
       }
     }, 50);
@@ -143,9 +145,9 @@ class VideoControl extends React.Component {
 
   componentDidUpdate(props: any) {
     // If the clip/video has changed, or we don't have the expected number of marks
-    if (this.props.clip != props.clip || this.props.video != props.video ||
+    if (this.props.clipValue != props.clipValue || this.props.video != props.video ||
       (this.props.clips && this.state.marks.length !=
-        (this.props.clip ? 2 : this.props.clips.length + 2))) {
+        (this.props.clipValue ? 2 : this.props.clips.length + 2))) {
       this.setState({marks: this.getMarks()});
     }
   }
@@ -203,10 +205,10 @@ class VideoControl extends React.Component {
   }
 
   getMarks(): Array<{value: number, label: string}> {
-    const min = this.props.clip ?  this.props.clip[0] : 0;
-    const max = this.props.clip ? this.props.clip[1] : this.props.video.duration;
+    const min = this.props.clipValue ?  this.props.clipValue[0] : 0;
+    const max = this.props.clipValue ? this.props.clipValue[1] : this.props.video.duration;
     const marks = [{value: min, label: getTimestamp(min)}, {value: max, label: getTimestamp(max)}];
-    if (!this.props.clip && this.props.clips) {
+    if (!this.props.clipValue && this.props.clips) {
       this.props.clips.forEach((clip, index) => {
         marks.push({value: clip.start, label: (index+1).toString()})
       })

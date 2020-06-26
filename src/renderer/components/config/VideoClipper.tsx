@@ -4,7 +4,7 @@ import {green, red} from "@material-ui/core/colors";
 
 import {
   AppBar, Button, Card, CardActionArea, CardContent, CircularProgress, Collapse, Container, createStyles, Drawer,
-  Fab, Grid, IconButton, Slider, TextField, Theme, Toolbar, Tooltip, Typography, withStyles
+  Fab, Grid, IconButton, Slider, SvgIcon, TextField, Theme, Toolbar, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 import ValueLabel from "@material-ui/core/Slider/ValueLabel";
 
@@ -368,6 +368,20 @@ class VideoClipper extends React.Component {
                             </Fab>
                           </Tooltip>
                         </Grid>
+                        <Grid item>
+                          <Tooltip title="Set Volume" placement="top">
+                            <Fab
+                              color="secondary"
+                              size="small"
+                              className={clsx(classes.fab, this.props.tutorial == VCT.clip && classes.disable)}
+                              onClick={this.onSetVolume.bind(this)}
+                              onContextMenu={this.onClearVolume.bind(this)}>
+                              <SvgIcon viewBox="0 0 24 24">
+                                <path d="M3 9V15H7L12 20V4L7 9H3M16 15H14V9H16V15M20 19H18V5H20V19Z" />
+                              </SvgIcon>
+                            </Fab>
+                          </Tooltip>
+                        </Grid>
                         {this.state.isEditing && this.props.source.clips.find((c) => c.id == this.state.isEditing.id) && (
                           <Grid item>
                             <Tooltip title="Delete Clip" placement="top">
@@ -396,7 +410,8 @@ class VideoClipper extends React.Component {
                     <VideoControl
                       video={this.state.video}
                       volume={this.state.scene.videoVolume}
-                      clip={!this.state.isEditing ? null : this.state.isEditingValue}
+                      clip={!this.state.isEditing ? null : this.state.isEditing}
+                      clipValue={!this.state.isEditing ? null : this.state.isEditingValue}
                       clips={this.props.source.clips}
                       useHotkeys
                       onChangeVolume={this.onChangeVolume.bind(this)}/>
@@ -534,6 +549,9 @@ class VideoClipper extends React.Component {
   }
 
   onEdit(clip: Clip) {
+    if (clip.volume != null) {
+      this.onChangeVolume(clip.volume);
+    }
     this.setState({
       isEditing: clip,
       isEditingValue: [clip.start, clip.end],
@@ -574,10 +592,33 @@ class VideoClipper extends React.Component {
     this.setState({isTagging: !this.state.isTagging});
   }
 
+  onClearVolume() {
+    const source = this.props.source;
+    let fn = (c: Clip): Clip => {c.volume = null; return c;};
+    this.setState({isEditing: fn(this.state.isEditing)});
+    let clip = source.clips.find((c) => c.id === this.state.isEditing.id);
+    if (clip) {
+      clip.volume = null;
+      this.props.onUpdateClips(source.url, source.clips);
+    }
+  }
+
+  onSetVolume() {
+    const source = this.props.source;
+    let fn = (c: Clip): Clip => {c.volume = parseInt(this.state.scene.videoVolume as any); return c;};
+    this.setState({isEditing: fn(this.state.isEditing)});
+    let clip = source.clips.find((c) => c.id === this.state.isEditing.id);
+    if (clip) {
+      clip.volume = this.state.scene.videoVolume;
+      this.props.onUpdateClips(source.url, source.clips);
+    }
+  }
+
   onInherit() {
     const source = this.props.source;
+    let fn = (c: Clip): Clip => {c.tags = source.tags; return c;};
+    this.setState({isEditing: fn(this.state.isEditing)});
     let clip = source.clips.find((c) => c.id === this.state.isEditing.id);
-    this.state.isEditing.tags = source.tags;
     if (clip) {
       clip.tags = source.tags.concat();
       this.props.onUpdateClips(source.url, source.clips);
