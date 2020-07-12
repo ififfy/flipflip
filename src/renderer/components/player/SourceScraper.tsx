@@ -27,6 +27,7 @@ import LibrarySource from "../../data/LibrarySource";
 import Scene from '../../data/Scene';
 import ChildCallbackHack from './ChildCallbackHack';
 import ImagePlayer from './ImagePlayer';
+import * as path from "path";
 
 let redditAlerted = false;
 let tumblrAlerted = false;
@@ -1290,16 +1291,46 @@ export default class SourceScraper extends React.Component {
       newAllURLs = this.state.allURLs;
     }
 
-    const sources = this.props.scene.sourceOrderFunction == SOF.random ?
-      randomizeList(JSON.parse(JSON.stringify(this.props.scene.sources))) :
-      JSON.parse(JSON.stringify(this.props.scene.sources));
+    let sceneSources = new Array<LibrarySource>();
+    for (let source of this.props.scene.sources) {
+      if (source.dirOfSources && getSourceType(source.url) == ST.local) {
+        const directories = fs.readdirSync(source.url, { withFileTypes: true })
+          .filter(dirent => dirent.isDirectory())
+          .map(dirent => dirent.name);
+        for (let d of directories) {
+          sceneSources.push(new LibrarySource({url: source.url + path.sep + d}));
+        }
+      } else {
+        sceneSources.push(source);
+      }
+    }
 
-    const nextSources = this.props.nextScene ? this.props.nextScene.sourceOrderFunction == SOF.random ?
-      randomizeList(JSON.parse(JSON.stringify(this.props.nextScene.sources))) :
-      JSON.parse(JSON.stringify(this.props.nextScene.sources)) : [];
+    const sources = this.props.scene.sourceOrderFunction == SOF.random ?
+      randomizeList(JSON.parse(JSON.stringify(sceneSources))) :
+      JSON.parse(JSON.stringify(sceneSources));
+
+    let nextSources = new Array<LibrarySource>();
+    if (this.props.nextScene) {
+      let nextSceneSources = new Array<LibrarySource>();
+      for (let source of this.props.nextScene.sources) {
+        if (source.dirOfSources && getSourceType(source.url) == ST.local) {
+          const directories = fs.readdirSync(source.url, { withFileTypes: true })
+            .filter(dirent => dirent.isDirectory())
+            .map(dirent => dirent.name);
+          for (let d of directories) {
+            nextSceneSources.push(new LibrarySource({url: source.url + path.sep + d}));
+          }
+        } else {
+          nextSceneSources.push(source);
+        }
+      }
+      nextSources = this.props.nextScene.sourceOrderFunction == SOF.random ?
+        randomizeList(JSON.parse(JSON.stringify(nextSceneSources))) :
+        JSON.parse(JSON.stringify(nextSceneSources));
+    }
 
     let sourceLoop = () => {
-      if (this.state.promise.hasCanceled || this.props.scene.sources.length == 0) return;
+      if (this.state.promise.hasCanceled || sceneSources.length == 0) return;
 
       const d = sources[n];
 
@@ -1307,7 +1338,7 @@ export default class SourceScraper extends React.Component {
       if (this.props.opacity != 1) {
         message = ["Loading '" + this.props.scene.name + "'...", message];
       }
-      this.props.setProgress(this.props.scene.sources.length, n+1, message);
+      this.props.setProgress(sceneSources.length, n+1, message);
 
       if (!this.props.scene.playVideoClips && d.clips) {
         d.clips = [];
@@ -1342,7 +1373,7 @@ export default class SourceScraper extends React.Component {
           }
 
           this.setState({allURLs: newAllURLs, promiseQueue: newPromiseQueue});
-          if (n < this.props.scene.sources.length) {
+          if (n < sceneSources.length) {
             setTimeout(sourceLoop, loadPromise.timeout);
           } else {
             this.props.finishedLoading(isEmpty(Array.from(newAllURLs.values())));
@@ -1385,12 +1416,12 @@ export default class SourceScraper extends React.Component {
 
             // If this is a remote URL, queue up the next promise
             if (object.helpers.next != null) {
-              this._nextPromiseQueue.push({source: d.url, helpers: object.helpers});
+              this._nextPromiseQueue.push({source: d, helpers: object.helpers});
             }
             this.props.setCount(d.url, object.helpers.count, object.helpers.next == null);
           }
 
-          if (n < this.props.nextScene.sources.length) {
+          if (n < nextSources.length) {
             setTimeout(nextSourceLoop, loadPromise.timeout);
           }
         });
@@ -1509,7 +1540,7 @@ export default class SourceScraper extends React.Component {
         }
       } else {
         this.setState({
-          promiseQueue: Array<{ source: string, next: any }>(),
+          promiseQueue: Array<{ source: LibrarySource, helpers: {next: any, count: number}}>(),
           promise: new CancelablePromise((resolve, reject) => {}),
           nextPromise: new CancelablePromise((resolve, reject) => {}),
           allURLs: new Map<string, Array<string>>(),

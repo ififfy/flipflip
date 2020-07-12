@@ -94,7 +94,7 @@ class ImageVideoCard extends React.Component {
                   }
                   label="Avoid Repeating Images"/>
               </Collapse>
-              <Collapse in={this.props.scene.sources.length > 1 && this.props.scene.weightFunction == WF.sources}>
+              <Collapse in={this.props.scene.weightFunction == WF.sources}>
                 <FormControlLabel
                   control={
                     <Switch checked={this.props.scene.fullSource}
@@ -410,7 +410,7 @@ class ImageVideoCard extends React.Component {
                   onChange={this.onInput.bind(this, 'weightFunction')}>
                   {Object.values(WF).map((wf) =>
                     <FormControlLabel
-                      disabled={this.props.scene.sources.length <= 1}
+                      disabled={this.props.scene.sources.length < 1 || (this.props.scene.sources.length == 1 && !this.props.scene.sources[0].dirOfSources)}
                       key={wf}
                       value={wf}
                       control={<Radio />}
@@ -428,7 +428,7 @@ class ImageVideoCard extends React.Component {
                 onChange={this.onInput.bind(this, 'sourceOrderFunction')}>
                 {Object.values(SOF).map((wf) =>
                   <FormControlLabel
-                    disabled={this.props.scene.sources.length <= 1 || this.props.scene.weightFunction == WF.images}
+                    disabled={this.props.scene.weightFunction == WF.images || this.props.scene.sources.length < 1 || (this.props.scene.sources.length == 1 && !this.props.scene.sources[0].dirOfSources)}
                     key={wf}
                     value={wf}
                     control={<Radio />} label={en.get(wf)} />
@@ -443,7 +443,7 @@ class ImageVideoCard extends React.Component {
                 value={this.props.scene.orderFunction}
                 onChange={this.onInput.bind(this, 'orderFunction')}>
                 <FormControlLabel
-                  disabled={this.props.scene.sources.length > 1 && this.props.scene.weightFunction != WF.images}
+                  disabled={this.props.scene.weightFunction == WF.sources && (this.props.scene.sources.length > 1 || (this.props.scene.sources.length == 1 && this.props.scene.sources[0].dirOfSources))}
                   key={OF.strict} value={OF.strict} control={<Radio />} label={en.get(OF.strict)} />
                 {[OF.ordered, OF.random].map((wf) =>
                   <FormControlLabel key={wf} value={wf} control={<Radio />} label={en.get(wf)} />

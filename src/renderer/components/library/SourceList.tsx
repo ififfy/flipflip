@@ -212,6 +212,24 @@ class SourceList extends React.Component {
             </Button>
           </DialogActions>
         </Dialog>
+        {this.state.sourceOptionsType == ST.local && (
+          <Dialog
+            open={this.state.sourceOptionsType == ST.local}
+            onClose={this.onCloseSourceOptions.bind(this)}
+            aria-describedby="local-options-description">
+            <DialogContent>
+              <DialogContentText id="local-options-description">
+                Directory Options ({this.state.sourceOptions.url})
+              </DialogContentText>
+              <FormControlLabel
+                control={
+                  <Switch checked={this.state.sourceOptions.dirOfSources}
+                          onChange={this.onSourceBoolInput.bind(this, 'dirOfSources')}/>
+                }
+                label="Treat Inner Directories as Sources"/>
+            </DialogContent>
+          </Dialog>
+        )}
         {this.state.sourceOptionsType == ST.video && (
           <Dialog
             open={this.state.sourceOptionsType == ST.video}

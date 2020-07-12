@@ -15,6 +15,8 @@ export default class LibrarySource {
   countComplete: boolean = false;
 
   // Type specific properties
+  // Local
+  dirOfSources: boolean = false;
   // Video
   subtitleFile: string;
   // Reddit
