@@ -1,5 +1,7 @@
 import * as React from "react";
 import clsx from "clsx";
+import {existsSync} from "fs";
+import * as path from "path";
 import {remote} from "electron";
 
 import {
@@ -13,7 +15,6 @@ import OfflineBoltIcon from '@material-ui/icons/OfflineBolt';
 
 import {getCachePath, getFileName, getSourceType, urlToPath} from "../../data/utils";
 import {SDT, ST} from "../../data/const";
-import Clip from "../../data/Clip";
 import Tag from "../../data/Tag";
 import SourceIcon from "./SourceIcon";
 import LibrarySource from "../../data/LibrarySource";
@@ -324,11 +325,17 @@ class SourceListItem extends React.Component {
       const fileType = getSourceType(sourceURL);
       let cachePath;
       if (fileType == ST.video || fileType == ST.playlist) {
-        cachePath = getCachePath(sourceURL, this.props.config) + getFileName(sourceURL);
+        if (existsSync(getCachePath(sourceURL, this.props.config) + getFileName(sourceURL))) {
+          cachePath = getCachePath(sourceURL, this.props.config) + getFileName(sourceURL);
+        } else if (existsSync(sourceURL)) {
+          remote.shell.showItemInFolder(sourceURL);
+        }
       } else {
         cachePath = getCachePath(sourceURL, this.props.config);
       }
-      this.openDirectory(cachePath);
+      if (cachePath) {
+        this.openDirectory(cachePath);
+      }
     } else if (!e.shiftKey && !e.ctrlKey) {
       this.props.savePosition();
       try {
