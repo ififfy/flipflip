@@ -11,6 +11,11 @@ const WF = { // weight functions
   images: 'wf.i',
 };
 
+const SOF = {
+  ordered: 'sof.ordered',
+  random: 'sof.random',
+};
+
 const OF = {
   strict: 'of.strict',
   ordered: 'of.ordered',
@@ -285,5 +290,5 @@ const VCT = { // Video Clipper Tutorials
 };
 
 export {
-  TF, WF, OF, IF, GO, VO, HTF, VTF, BT, SC, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG, RF, RT, SPT, SDT, PT, LT, SDGT, SGT, VCT, DONE
+  TF, WF, SOF, OF, IF, GO, VO, HTF, VTF, BT, SC, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG, RF, RT, SPT, SDT, PT, LT, SDGT, SGT, VCT, DONE
 };

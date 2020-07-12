@@ -1,4 +1,4 @@
-import {BT, GO, HTF, IF, IT, OF, SC, SL, TF, VO, VTF, WF} from "./const";
+import {BT, GO, HTF, IF, IT, OF, SC, SL, SOF, TF, VO, VTF, WF} from "./const";
 import Overlay from "./Overlay";
 import LibrarySource from "./LibrarySource";
 import Audio from "./Audio";
@@ -15,8 +15,10 @@ interface SceneSettingsI {
   timingBPMMulti: number;
   imageTypeFilter: string;
   weightFunction: string;
+  sourceOrderFunction: string;
   orderFunction: string;
   forceAll: boolean;
+  fullSource: boolean;
 
   zoom: boolean;
   zoomStart: number;
@@ -201,8 +203,10 @@ export class SceneSettings implements SceneSettingsI {
   timingBPMMulti = 1;
   imageTypeFilter = IF.any;
   weightFunction = WF.sources;
+  sourceOrderFunction = SOF.random;
   orderFunction = OF.random;
   forceAll = false;
+  fullSource = false;
 
   zoom = false;
   zoomStart = 1;

@@ -8,6 +8,9 @@ export default new Map<string, string>([
   ['wf.s', 'By Source'],
   ['wf.i', 'By Image'],
 
+  ['sof.ordered', 'Ordered'],
+  ['sof.random', 'Randomized'],
+
   ['of.strict', 'Strictly Ordered'],
   ['of.ordered', 'Ordered'],
   ['of.random', 'Randomized'],

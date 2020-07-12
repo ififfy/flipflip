@@ -10,7 +10,7 @@ import imgur from "imgur";
 import Twitter from "twitter";
 import {IgApiClient} from "instagram-private-api";
 
-import {IF, OF, RF, RT, ST, WF} from '../../data/const';
+import {IF, RF, RT, SOF, ST, WF} from '../../data/const';
 import {
   CancelablePromise,
   convertURL,
@@ -1290,11 +1290,11 @@ export default class SourceScraper extends React.Component {
       newAllURLs = this.state.allURLs;
     }
 
-    const sources = this.props.scene.orderFunction == OF.random ?
+    const sources = this.props.scene.sourceOrderFunction == SOF.random ?
       randomizeList(JSON.parse(JSON.stringify(this.props.scene.sources))) :
       JSON.parse(JSON.stringify(this.props.scene.sources));
 
-    const nextSources = this.props.nextScene ? this.props.nextScene.orderFunction == OF.random ?
+    const nextSources = this.props.nextScene ? this.props.nextScene.sourceOrderFunction == SOF.random ?
       randomizeList(JSON.parse(JSON.stringify(this.props.nextScene.sources))) :
       JSON.parse(JSON.stringify(this.props.nextScene.sources)) : [];
 

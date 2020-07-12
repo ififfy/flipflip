@@ -1,4 +1,4 @@
-import {BT, GO, HTF, IF, IT, OF, SC, SL, TF, VO, VTF, WF} from './const';
+import {BT, GO, HTF, IF, IT, OF, SC, SL, SOF, TF, VO, VTF, WF} from './const';
 import LibrarySource from "./LibrarySource";
 import Audio from "./Audio";
 import Overlay from "./Overlay";
@@ -15,8 +15,10 @@ export default class Scene {
   timingSinRate = 100;
   timingBPMMulti = 1;
   weightFunction = WF.sources;
+  sourceOrderFunction = SOF.random;
   orderFunction = OF.random;
   forceAll = false;
+  fullSource = false;
   imageTypeFilter = IF.any;
   zoom = false;
   zoomStart = 1;

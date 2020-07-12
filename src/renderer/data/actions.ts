@@ -421,6 +421,7 @@ export function addScene(state: State): Object {
     scene.nextSceneID = 0;
     scene.overlayEnabled = false;
     scene.imageTypeFilter = IF.any;
+    scene.sourceOrderFunction = OF.random;
     scene.orderFunction = OF.random;
     scene.zoom = false;
     scene.zoomStart = 1;

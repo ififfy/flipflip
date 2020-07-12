@@ -10,7 +10,7 @@ import {
 import VolumeDownIcon from '@material-ui/icons/VolumeDown';
 import VolumeUpIcon from '@material-ui/icons/VolumeUp';
 
-import {GO, IF, OF, SDT, VO, WF} from "../../data/const";
+import {GO, IF, OF, SDT, SOF, VO, WF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
 import en from "../../data/en";
 import Scene from "../../data/Scene";
@@ -92,7 +92,15 @@ class ImageVideoCard extends React.Component {
                     <Switch checked={this.props.scene.forceAll}
                             onChange={this.onBoolInput.bind(this, 'forceAll')}/>
                   }
-                  label="Show All Images Before Looping"/>
+                  label="Avoid Repeating Images"/>
+              </Collapse>
+              <Collapse in={this.props.scene.sources.length > 1 && this.props.scene.weightFunction == WF.sources}>
+                <FormControlLabel
+                  control={
+                    <Switch checked={this.props.scene.fullSource}
+                            onChange={this.onBoolInput.bind(this, 'fullSource')}/>
+                  }
+                  label="Play Full Sources"/>
               </Collapse>
             </Grid>
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.videos) && classes.noPadding)}>
@@ -394,22 +402,43 @@ class ImageVideoCard extends React.Component {
         </Grid>
         <Grid container spacing={2} alignItems="center">
           {!this.props.isPlayer && (
-            <Grid item xs={12} sm={this.props.sidebar ? 12 : 6} className={clsx(this.props.tutorial == SDT.weighting && classes.highlight)}>
+            <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} className={clsx(this.props.tutorial == SDT.weighting && classes.highlight)}>
               <FormControl component="fieldset">
                 <FormLabel component="legend">Weighting</FormLabel>
                 <RadioGroup
                   value={this.props.scene.weightFunction}
                   onChange={this.onInput.bind(this, 'weightFunction')}>
                   {Object.values(WF).map((wf) =>
-                    <FormControlLabel key={wf} value={wf} control={<Radio />} label={en.get(wf)} />
+                    <FormControlLabel
+                      disabled={this.props.scene.sources.length <= 1}
+                      key={wf}
+                      value={wf}
+                      control={<Radio />}
+                      label={en.get(wf)} />
                   )}
                 </RadioGroup>
               </FormControl>
             </Grid>
           )}
-          <Grid item xs={12} sm={this.props.sidebar ? 12 : 6} className={clsx(this.props.tutorial == SDT.ordering && classes.highlight)}>
+          <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} className={clsx(this.props.tutorial == SDT.ordering && classes.highlight)}>
             <FormControl component="fieldset">
-              <FormLabel component="legend">Ordering</FormLabel>
+              <FormLabel component="legend">Source Ordering</FormLabel>
+              <RadioGroup
+                value={this.props.scene.sourceOrderFunction}
+                onChange={this.onInput.bind(this, 'sourceOrderFunction')}>
+                {Object.values(SOF).map((wf) =>
+                  <FormControlLabel
+                    disabled={this.props.scene.sources.length <= 1 || this.props.scene.weightFunction == WF.images}
+                    key={wf}
+                    value={wf}
+                    control={<Radio />} label={en.get(wf)} />
+                )}
+              </RadioGroup>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} className={clsx(this.props.tutorial == SDT.ordering && classes.highlight)}>
+            <FormControl component="fieldset">
+              <FormLabel component="legend">Image Ordering</FormLabel>
               <RadioGroup
                 value={this.props.scene.orderFunction}
                 onChange={this.onInput.bind(this, 'orderFunction')}>
