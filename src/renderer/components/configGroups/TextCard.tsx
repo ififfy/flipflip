@@ -127,7 +127,7 @@ class TextCard extends React.Component {
         {this.props.scene.textEnabled && this.state.showFonts && (
           <Grid item xs={12} className={clsx((!this.props.scene.textEnabled || !this.state.showFonts) && classes.noPadding)}>
             <Grid container spacing={2} alignItems="center">
-              <Grid item xs={8}>
+              <Grid item xs={9}>
                 <FormControl className={classes.fullWidth}>
                   <InputLabel>Blink Font</InputLabel>
                   <Select
@@ -148,13 +148,16 @@ class TextCard extends React.Component {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={3}>
                 <TextField
                   label="Size"
                   margin="dense"
                   value={this.props.scene.blinkFontSize}
                   onChange={this.onIntInput.bind(this, 'blinkFontSize')}
                   onBlur={this.blurIntKey.bind(this, 'blinkFontSize')}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">px</InputAdornment>,
+                  }}
                   inputProps={{
                     min: 1,
                     type: 'number',
@@ -166,10 +169,47 @@ class TextCard extends React.Component {
                   currentColor={this.props.scene.blinkColor}
                   onChangeColor={this.onInput.bind(this, 'blinkColor')}/>
               </Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={
+                    <Switch checked={this.props.scene.blinkBorder}
+                            size="small"
+                            onChange={this.onBoolInput.bind(this, 'blinkBorder')}/>
+                  }
+                  label="Border"/>
+              </Grid>
+              <Grid item xs={this.props.sidebar ? 12 : 3}>
+                <Collapse in={this.props.scene.blinkBorder}>
+                  <TextField
+                    label="Width"
+                    margin="dense"
+                    value={this.props.scene.blinkBorderpx}
+                    onChange={this.onIntInput.bind(this, 'blinkBorderpx')}
+                    onBlur={this.blurIntKey.bind(this, 'blinkBorderpx')}
+                    InputProps={{
+                      endAdornment: <InputAdornment position="end">px</InputAdornment>,
+                    }}
+                    inputProps={{
+                      min: 1,
+                      type: 'number',
+                    }}/>
+                </Collapse>
+              </Grid>
+              <Grid item xs={this.props.sidebar ? 12 : 9}>
+                <Collapse in={this.props.scene.blinkBorder}>
+                  {!this.props.scene.blinkBorder && (<div/>)}
+                  {this.props.scene.blinkBorder && (
+                    <ColorPicker
+                      sidebar={this.props.sidebar}
+                      currentColor={this.props.scene.blinkBorderColor}
+                      onChangeColor={this.onInput.bind(this, 'blinkBorderColor')}/>
+                  )}
+                </Collapse>
+              </Grid>
             </Grid>
             <Divider className={classes.fontDivider}/>
             <Grid container spacing={2} alignItems="center">
-              <Grid item xs={8}>
+              <Grid item xs={9}>
                 <FormControl className={classes.fullWidth}>
                   <InputLabel>Caption Font</InputLabel>
                   <Select
@@ -190,13 +230,16 @@ class TextCard extends React.Component {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={3}>
                 <TextField
                   label="Size"
                   margin="dense"
                   value={this.props.scene.captionFontSize}
                   onChange={this.onIntInput.bind(this, 'captionFontSize')}
                   onBlur={this.blurIntKey.bind(this, 'captionFontSize')}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">px</InputAdornment>,
+                  }}
                   inputProps={{
                     min: 1,
                     type: 'number',
@@ -207,10 +250,47 @@ class TextCard extends React.Component {
                   currentColor={this.props.scene.captionColor}
                   onChangeColor={this.onInput.bind(this, 'captionColor')}/>
               </Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={
+                    <Switch checked={this.props.scene.captionBorder}
+                            size="small"
+                            onChange={this.onBoolInput.bind(this, 'captionBorder')}/>
+                  }
+                  label="Border"/>
+              </Grid>
+              <Grid item xs={this.props.sidebar ? 12 : 3}>
+                <Collapse in={this.props.scene.captionBorder}>
+                  <TextField
+                    label="Width"
+                    margin="dense"
+                    value={this.props.scene.captionBorderpx}
+                    onChange={this.onIntInput.bind(this, 'captionBorderpx')}
+                    onBlur={this.blurIntKey.bind(this, 'captionBorderpx')}
+                    InputProps={{
+                      endAdornment: <InputAdornment position="end">px</InputAdornment>,
+                    }}
+                    inputProps={{
+                      min: 1,
+                      type: 'number',
+                    }}/>
+                </Collapse>
+              </Grid>
+              <Grid item xs={this.props.sidebar ? 12 : 9}>
+                <Collapse in={this.props.scene.captionBorder}>
+                  {!this.props.scene.captionBorder && (<div/>)}
+                  {this.props.scene.captionBorder && (
+                    <ColorPicker
+                      sidebar={this.props.sidebar}
+                      currentColor={this.props.scene.captionBorderColor}
+                      onChangeColor={this.onInput.bind(this, 'captionBorderColor')}/>
+                  )}
+                </Collapse>
+              </Grid>
             </Grid>
             <Divider className={classes.fontDivider}/>
             <Grid container spacing={2} alignItems="center">
-              <Grid item xs={8}>
+              <Grid item xs={9}>
                 <FormControl className={classes.fullWidth}>
                   <InputLabel>Big Caption Font</InputLabel>
                   <Select
@@ -231,13 +311,16 @@ class TextCard extends React.Component {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={3}>
                 <TextField
                   label="Size"
                   margin="dense"
                   value={this.props.scene.captionBigFontSize}
                   onChange={this.onIntInput.bind(this, 'captionBigFontSize')}
                   onBlur={this.blurIntKey.bind(this, 'captionBigFontSize')}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">px</InputAdornment>,
+                  }}
                   inputProps={{
                     min: 1,
                     type: 'number',
@@ -248,10 +331,47 @@ class TextCard extends React.Component {
                   currentColor={this.props.scene.captionBigColor}
                   onChangeColor={this.onInput.bind(this, 'captionBigColor')}/>
               </Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={
+                    <Switch checked={this.props.scene.captionBigBorder}
+                            size="small"
+                            onChange={this.onBoolInput.bind(this, 'captionBigBorder')}/>
+                  }
+                  label="Border"/>
+              </Grid>
+              <Grid item xs={this.props.sidebar ? 12 : 3}>
+                <Collapse in={this.props.scene.captionBigBorder}>
+                  <TextField
+                    label="Width"
+                    margin="dense"
+                    value={this.props.scene.captionBigBorderpx}
+                    onChange={this.onIntInput.bind(this, 'captionBigBorderpx')}
+                    onBlur={this.blurIntKey.bind(this, 'captionBigBorderpx')}
+                    InputProps={{
+                      endAdornment: <InputAdornment position="end">px</InputAdornment>,
+                    }}
+                    inputProps={{
+                      min: 1,
+                      type: 'number',
+                    }}/>
+                </Collapse>
+              </Grid>
+              <Grid item xs={this.props.sidebar ? 12 : 9}>
+                <Collapse in={this.props.scene.captionBigBorder}>
+                  {!this.props.scene.captionBigBorder && (<div/>)}
+                  {this.props.scene.captionBigBorder && (
+                    <ColorPicker
+                      sidebar={this.props.sidebar}
+                      currentColor={this.props.scene.captionBigBorderColor}
+                      onChangeColor={this.onInput.bind(this, 'captionBigBorderColor')}/>
+                  )}
+                </Collapse>
+              </Grid>
             </Grid>
             <Divider className={classes.fontDivider}/>
             <Grid container spacing={2} alignItems="center">
-              <Grid item xs={8}>
+              <Grid item xs={9}>
                 <FormControl className={classes.fullWidth}>
                   <InputLabel>Count Font</InputLabel>
                   <Select
@@ -272,13 +392,16 @@ class TextCard extends React.Component {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={4}>
+              <Grid item xs={3}>
                 <TextField
                   label="Size"
                   margin="dense"
                   value={this.props.scene.countFontSize}
                   onChange={this.onIntInput.bind(this, 'countFontSize')}
                   onBlur={this.blurIntKey.bind(this, 'countFontSize')}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">px</InputAdornment>,
+                  }}
                   inputProps={{
                     min: 1,
                     type: 'number',
@@ -288,6 +411,43 @@ class TextCard extends React.Component {
                 <ColorPicker
                   currentColor={this.props.scene.countColor}
                   onChangeColor={this.onInput.bind(this, 'countColor')}/>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={
+                    <Switch checked={this.props.scene.countBorder}
+                            size="small"
+                            onChange={this.onBoolInput.bind(this, 'countBorder')}/>
+                  }
+                  label="Border"/>
+              </Grid>
+              <Grid item xs={this.props.sidebar ? 12 : 3}>
+                <Collapse in={this.props.scene.countBorder}>
+                  <TextField
+                    label="Width"
+                    margin="dense"
+                    value={this.props.scene.countBorderpx}
+                    onChange={this.onIntInput.bind(this, 'countBorderpx')}
+                    onBlur={this.blurIntKey.bind(this, 'countBorderpx')}
+                    InputProps={{
+                      endAdornment: <InputAdornment position="end">px</InputAdornment>,
+                    }}
+                    inputProps={{
+                      min: 1,
+                      type: 'number',
+                    }}/>
+                </Collapse>
+              </Grid>
+              <Grid item xs={this.props.sidebar ? 12 : 9}>
+                <Collapse in={this.props.scene.countBorder}>
+                  {!this.props.scene.countBorder && (<div/>)}
+                  {this.props.scene.countBorder && (
+                    <ColorPicker
+                      sidebar={this.props.sidebar}
+                      currentColor={this.props.scene.countBorderColor}
+                      onChangeColor={this.onInput.bind(this, 'countBorderColor')}/>
+                  )}
+                </Collapse>
               </Grid>
             </Grid>
           </Grid>
@@ -366,6 +526,12 @@ class TextCard extends React.Component {
   onIntInput(key: string, e: MouseEvent) {
     const input = (e.target as HTMLInputElement);
     this.changeKey(key, input.value === '' ? '' : Number(input.value));
+  }
+
+  onBoolInput(key: string, e: MouseEvent) {
+    const input = (e.target as HTMLInputElement);
+    const checked = input.checked;
+    this.changeKey(key, checked);
   }
 
   onInput(key: string, e: MouseEvent) {

@@ -30,15 +30,27 @@ export default class CaptionProgram extends React.Component {
     blinkColor: string,
     blinkFontSize: number,
     blinkFontFamily: string,
+    blinkBorder: boolean,
+    blinkBorderpx: number,
+    blinkBorderColor: string,
     captionColor: string,
     captionFontSize: number,
     captionFontFamily: string,
+    captionBorder: boolean,
+    captionBorderpx: number,
+    captionBorderColor: string,
     captionBigColor: string,
     captionBigFontSize: number,
     captionBigFontFamily: string,
+    captionBigBorder: boolean,
+    captionBigBorderpx: number,
+    captionBigBorderColor: string,
     countColor: string,
     countFontSize: number,
     countFontFamily: string,
+    countBorder: boolean,
+    countBorderpx: number,
+    countBorderColor: string,
     url: string,
     currentSource: string,
     currentClip: string,
@@ -283,6 +295,9 @@ export default class CaptionProgram extends React.Component {
       this.el.current.style.verticalAlign = 'bottom';
       this.el.current.style.paddingBottom = '20vmin';
       this.el.current.style.transition = 'opacity 0.5s ease-in-out';
+      if (this.props.captionBorder) {
+        this.el.current.style.webkitTextStroke = this.props.captionBorderpx + 'px ' + this.props.captionBorderColor;
+      }
       showText(function() { wait(nextCommand); });
     }
   }
@@ -298,6 +313,9 @@ export default class CaptionProgram extends React.Component {
       this.el.current.style.textAlign = 'center';
       this.el.current.style.verticalAlign = 'middle';
       this.el.current.style.transition = 'opacity 0.1s ease-out';
+      if (this.props.captionBigBorder) {
+        this.el.current.style.webkitTextStroke = this.props.captionBigBorderpx + 'px ' + this.props.captionBigBorderColor;
+      }
       showText(function() { wait(nextCommand); });
     }
   }
@@ -326,6 +344,9 @@ export default class CaptionProgram extends React.Component {
       this.el.current.style.textAlign = 'center';
       this.el.current.style.verticalAlign = 'middle';
       this.el.current.style.transition = 'opacity 0.1s ease-out';
+      if (this.props.blinkBorder) {
+        this.el.current.style.webkitTextStroke = this.props.blinkBorderpx + 'px ' + this.props.blinkBorderColor;
+      }
       fns[0]();
     }
   }
@@ -365,6 +386,9 @@ export default class CaptionProgram extends React.Component {
       this.el.current.style.textAlign = 'center';
       this.el.current.style.verticalAlign = 'middle';
       this.el.current.style.transition = 'opacity 0.1s ease-out';
+      if (this.props.countBorder) {
+        this.el.current.style.webkitTextStroke = this.props.countBorderpx + 'px ' + this.props.countBorderColor;
+      }
       fns[0]();
     }
   }
