@@ -1260,7 +1260,6 @@ export default class SourceScraper extends React.Component {
             setHistoryPaths={this.props.setHistoryPaths}
             maxInMemory={this.props.config.displaySettings.maxInMemory}
             maxLoadingAtOnce={this.props.config.displaySettings.maxLoadingAtOnce}
-            maxToRememberInHistory={this.props.config.displaySettings.maxInHistory}
             advanceHack={this.props.advanceHack}
             deleteHack={this.props.deleteHack}
             strobeLayer={this.props.strobeLayer}

@@ -283,7 +283,7 @@ class SceneOptionCard extends React.Component {
                   </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={this.props.sidebar ? 12 : 5}>
-                  <Collapse in={this.props.scene.nextSceneID != 0}>
+                  <Collapse in={this.props.scene.nextSceneID != 0 && !this.props.scene.nextSceneAllImages}>
                     <TextField
                       variant="outlined"
                       label="Play after"

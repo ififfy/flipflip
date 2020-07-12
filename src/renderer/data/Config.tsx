@@ -18,6 +18,7 @@ interface SceneSettingsI {
   sourceOrderFunction: string;
   orderFunction: string;
   forceAll: boolean;
+  forceAllSource: boolean;
   fullSource: boolean;
 
   zoom: boolean;
@@ -182,7 +183,6 @@ interface DisplaySettingsI {
   minVideoSize: number;
   maxInMemory: number;
   maxLoadingAtOnce: number;
-  maxInHistory: number;
 }
 
 interface GeneralSettingsI {
@@ -218,6 +218,7 @@ export class SceneSettings implements SceneSettingsI {
   sourceOrderFunction = SOF.random;
   orderFunction = OF.random;
   forceAll = false;
+  forceAllSource = false;
   fullSource = false;
 
   zoom = false;
@@ -396,7 +397,6 @@ export class DisplaySettings  implements DisplaySettingsI {
   minImageSize = 200;
   maxInMemory = 120;
   maxLoadingAtOnce = 5;
-  maxInHistory = 500;
 }
 
 export class GeneralSettings  implements GeneralSettingsI {

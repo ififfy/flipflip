@@ -86,14 +86,6 @@ class ImageVideoCard extends React.Component {
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
-              <Collapse in={this.props.scene.orderFunction == OF.random}>
-                <FormControlLabel
-                  control={
-                    <Switch checked={this.props.scene.forceAll}
-                            onChange={this.onBoolInput.bind(this, 'forceAll')}/>
-                  }
-                  label="Avoid Repeating Images"/>
-              </Collapse>
               <Collapse in={this.props.scene.weightFunction == WF.sources}>
                 <FormControlLabel
                   control={
@@ -435,6 +427,16 @@ class ImageVideoCard extends React.Component {
                 )}
               </RadioGroup>
             </FormControl>
+            <Collapse in={this.props.scene.sourceOrderFunction == SOF.random}>
+              <FormControlLabel
+                control={
+                  <Switch checked={this.props.scene.forceAllSource}
+                          disabled={this.props.scene.weightFunction == WF.images || this.props.scene.sources.length < 1 || (this.props.scene.sources.length == 1 && !this.props.scene.sources[0].dirOfSources)}
+                          size="small"
+                          onChange={this.onBoolInput.bind(this, 'forceAllSource')}/>
+                }
+                label="Avoid Repeats"/>
+            </Collapse>
           </Grid>
           <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} className={clsx(this.props.tutorial == SDT.ordering && classes.highlight)}>
             <FormControl component="fieldset">
@@ -442,14 +444,20 @@ class ImageVideoCard extends React.Component {
               <RadioGroup
                 value={this.props.scene.orderFunction}
                 onChange={this.onInput.bind(this, 'orderFunction')}>
-                <FormControlLabel
-                  disabled={this.props.scene.weightFunction == WF.sources && (this.props.scene.sources.length > 1 || (this.props.scene.sources.length == 1 && this.props.scene.sources[0].dirOfSources))}
-                  key={OF.strict} value={OF.strict} control={<Radio />} label={en.get(OF.strict)} />
-                {[OF.ordered, OF.random].map((wf) =>
+                {Object.values(OF).map((wf) =>
                   <FormControlLabel key={wf} value={wf} control={<Radio />} label={en.get(wf)} />
                 )}
               </RadioGroup>
             </FormControl>
+            <Collapse in={this.props.scene.orderFunction == OF.random}>
+              <FormControlLabel
+                control={
+                  <Switch checked={this.props.scene.forceAll}
+                          size="small"
+                          onChange={this.onBoolInput.bind(this, 'forceAll')}/>
+                }
+                label="Avoid Repeats"/>
+            </Collapse>
           </Grid>
         </Grid>
       </Grid>

@@ -18,6 +18,7 @@ export default class Scene {
   sourceOrderFunction = SOF.random;
   orderFunction = OF.random;
   forceAll = false;
+  forceAllSource = false;
   fullSource = false;
   imageTypeFilter = IF.any;
   zoom = false;

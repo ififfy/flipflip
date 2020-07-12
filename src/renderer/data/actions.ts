@@ -1135,9 +1135,6 @@ export function updateScene(state: State, scene: Scene, fn: (scene: Scene) => vo
     if (s.id == scene.id) {
       const sceneCopy = JSON.parse(JSON.stringify(s));
       fn(sceneCopy);
-      if (sceneCopy.orderFunction == OF.strict && sceneCopy.sources.length > 1 && sceneCopy.weightFunction == WF.sources) {
-        sceneCopy.orderFunction = OF.ordered;
-      }
       newScenes.push(sceneCopy);
     } else {
       newScenes.push(s);

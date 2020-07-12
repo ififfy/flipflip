@@ -28,7 +28,6 @@ export default class ImagePlayer extends React.Component {
     deleteHack?: ChildCallbackHack,
     maxInMemory: number,
     maxLoadingAtOnce: number,
-    maxToRememberInHistory: number,
     allURLs: Map<string, Array<string>>,
     strobeLayer?: string,
     isOverlay: boolean,
@@ -56,6 +55,7 @@ export default class ImagePlayer extends React.Component {
   readonly idleTimerRef: React.RefObject<HTMLDivElement> = React.createRef();
   _isMounted: boolean;
   _isLooping: boolean;
+  _loadedSources: Array<string>;
   _loadedURLs: Array<string>;
   _playedURLs: Array<string>;
   _nextIndex: number;
@@ -119,6 +119,7 @@ export default class ImagePlayer extends React.Component {
     this._runFetchLoopCallRequests = [];
     this._isMounted = true;
     this._isLooping = false;
+    this._loadedSources = new Array<string>();
     this._loadedURLs = new Array<string>();
     this._playedURLs = new Array<string>();
     this._nextIndex = -1;
@@ -147,6 +148,7 @@ export default class ImagePlayer extends React.Component {
   componentWillUnmount() {
     this._isMounted = null;
     this._isLooping = null;
+    this._loadedSources = null;
     this._loadedURLs = null;
     this._playedURLs = null;
     this._nextIndex = null;
@@ -274,6 +276,7 @@ export default class ImagePlayer extends React.Component {
     let collection: string[];
     let url: string;
     let urlIndex: number;
+    let sourceIndex: number = null;
     let sourceLength: number;
 
     // For source weighted
@@ -281,19 +284,40 @@ export default class ImagePlayer extends React.Component {
 
       // If sorting randomly, get a random source
       if (this.props.scene.sourceOrderFunction == SOF.random) {
-        const keys = Array.from(this.props.allURLs.keys());
+        let keys = Array.from(this.props.allURLs.keys());
+
         // If we're playing full sources
         if (this.props.scene.fullSource) {
           // If this is the first loop or source is done get next source
           if (this._nextIndex == -1 || this._sourceComplete) {
+            if (this.props.scene.forceAllSource) {
+              // Filter the available urls to those not played yet
+              keys = keys.filter((s) => !this._loadedSources.includes(s));
+              // If there are no remaining urls for this source
+              if (!(keys && keys.length)) {
+                this._loadedSources = new Array<string>();
+                keys = Array.from(this.props.allURLs.keys());
+              }
+            }
             source = getRandomListItem(keys);
-            this._nextIndex = keys.indexOf(source);
+            this._nextIndex = Array.from(this.props.allURLs.keys()).indexOf(source);
             this._sourceComplete = false;
+            this._loadedSources.push(source);
           } else { // Play same source
             source = keys[this._nextIndex];
           }
         } else {
+          if (this.props.scene.forceAllSource) {
+            // Filter the available urls to those not played yet
+            keys = keys.filter((s) => !this._loadedSources.includes(s));
+            // If there are no remaining urls for this source
+            if (!(keys && keys.length)) {
+              this._loadedSources = new Array<string>();
+              keys = Array.from(this.props.allURLs.keys());
+            }
+          }
           source = getRandomListItem(keys);
+          this._loadedSources.push(source);
         }
       } else { // Else get the next source
         // If we're playing full sources
@@ -308,6 +332,7 @@ export default class ImagePlayer extends React.Component {
         } else {
           source = Array.from(this.props.allURLs.keys())[++this._nextIndex % this.props.allURLs.size];
         }
+        sourceIndex = this._nextIndex % this.props.allURLs.size;
       }
       // Get the urls from the source
       collection = this.props.allURLs.get(source);
@@ -319,7 +344,7 @@ export default class ImagePlayer extends React.Component {
       }
 
       // If sorting randomly and forcing all
-      if ((this.props.scene.orderFunction == OF.random && this.props.scene.forceAll) || this.props.scene.fullSource) {
+      if (this.props.scene.orderFunction == OF.random && (this.props.scene.forceAll || this.props.scene.fullSource)) {
         // Filter the available urls to those not played yet
         collection = collection.filter((u) => !this._loadedURLs.includes(u));
         // If there are no remaining urls for this source
@@ -360,6 +385,9 @@ export default class ImagePlayer extends React.Component {
           urlIndex = index;
           sourceLength = collection.length;
         }
+        if (this.props.scene.fullSource && index % collection.length == collection.length - 1) {
+          this._sourceComplete = true;
+        }
         url = collection[index%collection.length];
         this._nextSourceIndex.set(source, index+1);
       }
@@ -399,7 +427,7 @@ export default class ImagePlayer extends React.Component {
       source = this.props.allURLs.get(url)[0];
     }
 
-    if ((this.props.scene.orderFunction == OF.random && this.props.scene.forceAll) || (this.props.scene.weightFunction == WF.sources && this.props.scene.fullSource)) {
+    if (this.props.scene.orderFunction == OF.random && (this.props.scene.forceAll || (this.props.scene.weightFunction == WF.sources && this.props.scene.fullSource))) {
       this._loadedURLs.push(url);
     }
 
@@ -409,6 +437,9 @@ export default class ImagePlayer extends React.Component {
       if (this.props.scene.orderFunction == OF.strict) {
         video.setAttribute("index", urlIndex.toString());
         video.setAttribute("length", sourceLength.toString());
+        if (sourceIndex != null) {
+          video.setAttribute("sindex", sourceIndex.toString());
+        }
       }
       let subtitleSplit = url.split("|||");
       if (subtitleSplit.length > 1) {
@@ -521,6 +552,9 @@ export default class ImagePlayer extends React.Component {
       if (this.props.scene.orderFunction == OF.strict) {
         img.setAttribute("index", urlIndex.toString());
         img.setAttribute("length", sourceLength.toString());
+        if (sourceIndex != null) {
+          img.setAttribute("sindex", sourceIndex.toString());
+        }
       }
 
       const successCallback = () => {
@@ -623,7 +657,6 @@ export default class ImagePlayer extends React.Component {
       return;
     }
     this._isLooping = true;
-    this._count++;
 
     let nextHistoryPaths = this.state.historyPaths;
     let nextImg: HTMLImageElement | HTMLVideoElement;
@@ -645,14 +678,26 @@ export default class ImagePlayer extends React.Component {
       this.state.readyToDisplay.sort((a, b) => {
         // JavaScript doesn't calculate negative modulos correctly, use this
         const mod = (x: number, n: number) => (x % n + n) % n;
-        const aStrict = mod((parseInt(a.getAttribute("index")) - this.state.historyPaths.length), parseInt(a.getAttribute("length")));
-        const bStrict = mod((parseInt(b.getAttribute("index")) - this.state.historyPaths.length), parseInt(b.getAttribute("length")));
+        const aStrict = mod((parseInt(a.getAttribute("index")) - this._count), parseInt(a.getAttribute("length")));
+        const bStrict = mod((parseInt(b.getAttribute("index")) - this._count), parseInt(b.getAttribute("length")));
         if (aStrict > bStrict) {
           return 1;
         } else if (aStrict < bStrict) {
           return -1;
         } else {
-          return 0;
+          if (a.hasAttribute("sindex") && b.hasAttribute("sindex")) {
+            const aSource = parseInt(a.getAttribute("sindex"));
+            const bSource = parseInt(b.getAttribute("sindex"));
+            if (aSource > bSource) {
+              return 1;
+            } else if (aSource < bSource) {
+              return -1;
+            } else {
+              return 0;
+            }
+          } else {
+            return 0;
+          }
         }
       });
     }
@@ -725,6 +770,7 @@ export default class ImagePlayer extends React.Component {
         historyPaths: nextHistoryPaths,
         timeToNextFrame,
       });
+      this._count++;
       this._timeout = setTimeout(this.advance.bind(this, false, true), timeToNextFrame);
     }
   }
