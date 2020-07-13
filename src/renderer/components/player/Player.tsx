@@ -17,6 +17,7 @@ import ChildCallbackHack from './ChildCallbackHack';
 import SourceScraper from './SourceScraper';
 import Strobe from "./Strobe";
 import PlayerBars from "./PlayerBars";
+import PictureGrid from "./PictureGrid";
 
 export default class Player extends React.Component {
   readonly props: {
@@ -60,6 +61,7 @@ export default class Player extends React.Component {
     mainVideo: null as HTMLVideoElement,
     overlayVideos: Array<HTMLVideoElement>(this.props.scene.overlays.length).fill(null),
     timeToNextFrame: null as number,
+    recentPictureGrid: false,
   };
 
   _interval: NodeJS.Timer = null;
@@ -170,7 +172,7 @@ export default class Player extends React.Component {
                     {this.state.progress} / {this.state.total}
                   </Typography>
                   {this.state.progressMessage.map((message) =>
-                    <Typography component="h1" variant="h5" color="inherit" noWrap>
+                    <Typography key={message} component="h1" variant="h5" color="inherit" noWrap>
                       {message}
                     </Typography>
                   )}
@@ -237,10 +239,12 @@ export default class Player extends React.Component {
             scenes={this.props.scenes}
             title={this.props.tags ? this.props.scene.sources[0].url : this.props.scene.name}
             tutorial={this.props.tutorial}
-            goBack={this.props.goBack.bind(this)}
+            recentPictureGrid={this.state.recentPictureGrid}
+            goBack={this.goBack.bind(this)}
             historyBack={this.historyBack.bind(this)}
             historyForward={this.historyForward.bind(this)}
             navigateTagging={this.navigateTagging.bind(this)}
+            onRecentPictureGrid={this.onRecentPictureGrid.bind(this)}
             onUpdateScene={this.props.onUpdateScene.bind(this)}
             playNextScene={this.props.nextScene}
             play={this.play.bind(this)}
@@ -251,6 +255,11 @@ export default class Player extends React.Component {
             goToTagSource={this.props.goToTagSource}
             toggleTag={this.props.toggleTag}
           />
+        )}
+
+        {this.state.recentPictureGrid && (
+          <PictureGrid
+            pictures={this.state.historyPaths} />
         )}
 
         <div style={playerStyle}>
@@ -450,12 +459,14 @@ export default class Player extends React.Component {
       this.state.historyOffset !== state.historyOffset ||
       this.state.historyPaths !== state.historyPaths ||
       this.state.mainVideo !== state.mainVideo ||
-      this.state.overlayVideos !== state.overlayVideos;
+      this.state.overlayVideos !== state.overlayVideos ||
+      this.state.recentPictureGrid !== state.recentPictureGrid;
   }
 
   nop() {}
 
   onScroll = (e: WheelEvent) => {
+    if (this.state.recentPictureGrid) return;
     const volumeChange = (e.deltaY / 100) * -5;
     let newVolume = parseInt(this.props.scene.videoVolume as any) + volumeChange;
     if (newVolume < 0) {
@@ -517,6 +528,15 @@ export default class Player extends React.Component {
     }
   }
 
+  goBack() {
+    if (this.state.recentPictureGrid) {
+      this.setState({recentPictureGrid: false});
+      this.play();
+    } else {
+      this.props.goBack();
+    }
+  }
+
   play() {
     this.setState({isPlaying: true, historyOffset: 0});
     this.start(this.state.canStart);
@@ -565,5 +585,10 @@ export default class Player extends React.Component {
       progressMessage: this.props.scene.sources.length > 0 ? [this.props.scene.sources[0].url] : [""],
     });
     this.props.navigateTagging(offset);
+  }
+
+  onRecentPictureGrid() {
+    this.pause();
+    this.setState({recentPictureGrid: true});
   }
 }

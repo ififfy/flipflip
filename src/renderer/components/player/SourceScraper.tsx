@@ -1388,6 +1388,11 @@ export default class SourceScraper extends React.Component {
     let nextSourceLoop = () => {
       if (this.state.nextPromise.hasCanceled) return;
 
+      if (!this.props.isPlaying) {
+        setTimeout(nextSourceLoop, 500);
+        return;
+      }
+
       const d = nextSources[n];
       if (!this.props.scene.playVideoClips && d.clips) {
         d.clips = [];
@@ -1429,6 +1434,11 @@ export default class SourceScraper extends React.Component {
     let promiseLoop = () => {
       // Process until queue is empty or player has been stopped
       if (this.state.promiseQueue.length > 0 && !this.state.promise.hasCanceled) {
+        if (!this.props.isPlaying) {
+          setTimeout(promiseLoop, 500);
+          return;
+        }
+
         const promiseData = this.state.promiseQueue.shift();
         const promise = getPromise(this.props.systemMessage, this.props.config, promiseData.source, this.props.scene.imageTypeFilter, promiseData.helpers);
         this.setState({promise: promise});

@@ -208,10 +208,12 @@ class PlayerBars extends React.Component {
     scenes: Array<Scene>,
     title: string,
     tutorial: string,
+    recentPictureGrid: boolean,
     goBack(): void,
     historyBack(): void,
     historyForward(): void,
     navigateTagging(offset: number): void,
+    onRecentPictureGrid(): void,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
     playNextScene(): void,
     play(): void,
@@ -256,7 +258,7 @@ class PlayerBars extends React.Component {
           position="absolute"
           onMouseEnter={this.onMouseEnterAppBar.bind(this)}
           onMouseLeave={this.onMouseLeaveAppBar.bind(this)}
-          className={clsx(classes.appBar, (this.props.tutorial == PT.toolbar || !this.props.hasStarted || this.props.isEmpty || this.state.appBarHover) && classes.appBarHover, this.props.tutorial == PT.toolbar && clsx(classes.backdropTop, classes.highlight))}>
+          className={clsx(classes.appBar, (this.props.tutorial == PT.toolbar || !this.props.hasStarted || this.props.isEmpty || this.props.recentPictureGrid || this.state.appBarHover) && classes.appBarHover, this.props.tutorial == PT.toolbar && clsx(classes.backdropTop, classes.highlight))}>
           <Toolbar className={classes.headerBar}>
             <div className={classes.headerLeft}>
               <Tooltip title="Back" placement="right-end">
@@ -312,7 +314,7 @@ class PlayerBars extends React.Component {
           </Toolbar>
         </AppBar>
 
-        {this.props.hasStarted && !this.props.isEmpty && (
+        {this.props.hasStarted && !this.props.isEmpty && !this.props.recentPictureGrid && (
           <React.Fragment>
             <div
               className={classes.hoverDrawer}
@@ -717,10 +719,10 @@ class PlayerBars extends React.Component {
     }));
   }
 
-  showContextMenu = () => {
+  showContextMenu = (e: MouseEvent) => {
     if (this.props.tutorial != null) return;
     const contextMenu = new Menu();
-    const img = this.props.historyPaths[(this.props.historyPaths.length - 1) + this.props.historyOffset];
+    const img = this.props.recentPictureGrid ? e.target : this.props.historyPaths[(this.props.historyPaths.length - 1) + this.props.historyOffset];
     const url = img.src;
     let source = img.getAttribute("source");
     if (/^https?:\/\//g.exec(source) == null) {
@@ -798,6 +800,14 @@ class PlayerBars extends React.Component {
         label: 'Goto Tag Source',
         click: () => {
           this.props.goToTagSource(new LibrarySource({url: source}));
+        }
+      }));
+    }
+    if (!this.props.recentPictureGrid) {
+      contextMenu.append(new MenuItem({
+        label: 'Recent Picture Grid',
+        click: () => {
+          this.props.onRecentPictureGrid();
         }
       }));
     }
