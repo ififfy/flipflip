@@ -125,6 +125,8 @@ export default class Scene {
   nextSceneID: number = 0;
   nextSceneTime: number = 900;
   nextSceneAllImages = false;
+  nextSceneRandomID: number = 0;
+  nextSceneRandoms: Array<number> = [];
   libraryID: number = -1;
   videoVolume = 0;
   videoSpeed = 10;

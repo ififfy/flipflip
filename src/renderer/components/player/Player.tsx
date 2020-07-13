@@ -7,6 +7,7 @@ import {
 } from "@material-ui/core";
 
 import {SL} from "../../data/const";
+import {getRandomListItem} from "../../data/utils";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
 import Scene from '../../data/Scene';
@@ -66,7 +67,7 @@ export default class Player extends React.Component {
   _powerSaveID: number = null;
 
   render() {
-    const nextScene = this.getScene(this.props.scene.nextSceneID);
+    const nextScene = this.getScene(this.props.scene.nextSceneID == -1 ? this.props.scene.nextSceneRandomID : this.props.scene.nextSceneID);
     const showCaptionProgram = (
       this.props.scene.textEnabled &&
       this.props.scene.textSource &&
@@ -383,6 +384,17 @@ export default class Player extends React.Component {
       } else {
         this.setState({hasStarted: true, startTime: new Date()});
       }
+      if (this.props.scene.nextSceneID == -1) {
+        let sceneID: number;
+        if (this.props.scene.nextSceneRandoms.length == 0) {
+          sceneID = getRandomListItem(this.props.scenes.map((s) => s.id));
+        } else {
+          sceneID = getRandomListItem(this.props.scene.nextSceneRandoms);
+        }
+        this.props.onUpdateScene(this.props.scene, (s) => {
+          s.nextSceneRandomID = sceneID;
+        })
+      }
     }
   }
 
@@ -392,6 +404,17 @@ export default class Player extends React.Component {
     }
     if (this.props.preventSleep) {
       this._powerSaveID = remote.powerSaveBlocker.start('prevent-display-sleep');
+    }
+    if (this.props.scene.nextSceneID == -1) {
+      let sceneID: number;
+      if (this.props.scene.nextSceneRandoms.length == 0) {
+        sceneID = getRandomListItem(this.props.scenes.map((s) => s.id));
+      } else {
+        sceneID = getRandomListItem(this.props.scene.nextSceneRandoms);
+      }
+      this.props.onUpdateScene(this.props.scene, (s) => {
+        s.nextSceneRandomID = sceneID;
+      })
     }
     window.addEventListener('wheel', this.onScroll, false);
   }

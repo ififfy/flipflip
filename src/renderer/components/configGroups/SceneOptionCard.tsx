@@ -2,12 +2,14 @@ import * as React from "react";
 import clsx from "clsx";
 
 import {
-  Collapse, createStyles, Divider, Fab, FormControl, FormControlLabel, Grid, IconButton,
-  InputAdornment, InputLabel, MenuItem, Select, Slider, Switch, TextField, Theme, Tooltip, Typography, withStyles
+  Button, Collapse, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, Divider, Fab, FormControl,
+  FormControlLabel, Grid, IconButton, InputAdornment, InputLabel, MenuItem, Select, Slider, Switch, TextField, Theme,
+  Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
+import ListIcon from '@material-ui/icons/List';
 
 import {BT, IT, SDT, TF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
@@ -49,6 +51,14 @@ const styles = (theme: Theme) => createStyles({
   },
   disable: {
     pointerEvents: 'none',
+  },
+  randomScene: {
+    display: 'block',
+  },
+  randomSceneList: {
+    maxHeight: '400px',
+    overflowY: 'scroll',
+    padding: theme.spacing(1),
   }
 });
 
@@ -62,6 +72,10 @@ class SceneOptionCard extends React.Component {
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
     isTagging?: boolean,
   };
+
+  readonly state = {
+    randomSceneList: null as Array<number>,
+  }
 
   readonly sinInputRef: React.RefObject<HTMLInputElement> = React.createRef();
 
@@ -275,12 +289,62 @@ class SceneOptionCard extends React.Component {
                           },
                         },
                       }}
+                      endAdornment={this.props.scene.nextSceneID != -1 ? null :
+                        <InputAdornment position="start">
+                          <Tooltip title="Select Scenes">
+                            <IconButton
+                              onClick={this.onRandomSceneDialog.bind(this)}>
+                              <ListIcon/>
+                            </IconButton>
+                          </Tooltip>
+                        </InputAdornment>
+                      }
                       onChange={this.onInput.bind(this, 'nextSceneID')}>
-                      {["0"].concat(this.props.allScenes.filter((s) => s.id !== this.props.scene.id && s.sources.length > 0).map((s) => s.id.toString())).map((id) =>
+                      {["0", "-1"].concat(this.props.allScenes.filter((s) => s.id !== this.props.scene.id && s.sources.length > 0).map((s) => s.id.toString())).map((id) =>
                         <MenuItem key={id} value={id}>{this.getSceneName(id)}</MenuItem>
                       )}
                     </Select>
                   </FormControl>
+                  <Dialog
+                    open={this.state.randomSceneList != null}
+                    onClose={this.onRandomSceneDialog.bind(this)}
+                    aria-describedby="random-scene-description">
+                    <DialogContent>
+                      <DialogContentText id="random-scene-description">
+                        Select which scenes to include:
+                      </DialogContentText>
+                      <div className={classes.randomSceneList}>
+                        {this.props.allScenes.map((s) =>
+                          <FormControlLabel
+                            key={s.id}
+                            className={classes.randomScene}
+                            control={
+                              <Switch
+                                checked={this.state.randomSceneList != null ? this.state.randomSceneList.includes(s.id) : this.props.scene.nextSceneRandoms.includes(s.id)}
+                                size="small"
+                                onChange={this.onToggleRandomScene.bind(this, s.id)}/>
+                            }
+                            label={s.name}/>
+                          )}
+                      </div>
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={this.onSelectNone.bind(this)} color="default">
+                        Select None
+                      </Button>
+                      <Button onClick={this.onSelectAll.bind(this)} color="default">
+                        Select All
+                      </Button>
+                    </DialogActions>
+                    <DialogActions>
+                      <Button onClick={this.onRandomSceneDialog.bind(this)} color="secondary">
+                        Cancel
+                      </Button>
+                      <Button onClick={this.onSaveRandomScene.bind(this)} color="primary">
+                        Save
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
                 </Grid>
                 <Grid item xs={12} sm={this.props.sidebar ? 12 : 5}>
                   <Collapse in={this.props.scene.nextSceneID != 0 && !this.props.scene.nextSceneAllImages}>
@@ -422,7 +486,8 @@ class SceneOptionCard extends React.Component {
 
   getSceneName(id: string): string {
     if (id === "0") return "None";
-    return this.props.allScenes.filter((s) => s.id.toString() === id)[0].name;
+    if (id === "-1") return "Random";
+    return this.props.allScenes.find((s) => s.id.toString() === id).name;
   }
 
   onOverlaySliderChange(id: number, key: string, e: MouseEvent, value: number) {
@@ -488,6 +553,35 @@ class SceneOptionCard extends React.Component {
 
   changeKey(key: string, value: any) {
     this.update((s) => s[key] = value);
+  }
+
+  onRandomSceneDialog() {
+    if (this.state.randomSceneList != null) {
+      this.setState({randomSceneList: null});
+    } else {
+      this.setState({randomSceneList: this.props.scene.nextSceneRandoms});
+    }
+  }
+
+  onToggleRandomScene(sceneID: number) {
+    if (this.state.randomSceneList.includes(sceneID)) {
+      this.setState({randomSceneList: this.state.randomSceneList.filter((s) => s != sceneID)});
+    } else {
+      this.setState({randomSceneList: this.state.randomSceneList.concat([sceneID])});
+    }
+  }
+
+  onSelectNone() {
+    this.setState({randomSceneList: []});
+  }
+
+  onSelectAll() {
+    this.setState({randomSceneList: this.props.allScenes.map((s) => s.id)});
+  }
+
+  onSaveRandomScene() {
+    this.changeKey("nextSceneRandoms", this.state.randomSceneList);
+    this.onRandomSceneDialog();
   }
 }
 

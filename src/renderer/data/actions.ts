@@ -16,6 +16,7 @@ import {
   getFileGroup,
   getFileName,
   getRandomIndex,
+  getRandomListItem,
   getSourceType,
   isVideo,
   isVideoPlaylist,
@@ -448,6 +449,10 @@ export function addScene(state: State): Object {
 export function deleteScene(state: State, scene: Scene): Object {
   const newScenes = state.scenes.filter((s: Scene) => s.id != scene.id);
   for (let s of newScenes) {
+    if (s.nextSceneID == scene.id) {
+      s.nextSceneID = 0;
+    }
+    s.nextSceneRandoms = s.nextSceneRandoms.filter((s) => s != scene.id);
     s.overlays = s.overlays.filter((o) => o.sceneID != scene.id);
   }
   const newGrids = state.grids;
@@ -484,7 +489,12 @@ export function deleteGrid(state: State, grid: SceneGrid): Object {
 export function nextScene(state: State): Object {
   const scene = getActiveScene(state);
   if (scene && scene.nextSceneID !== 0){
-    const nextScene = state.scenes.find((s: Scene) => s.id == scene.nextSceneID);
+    let nextScene;
+    if (scene.nextSceneID == -1) {
+      nextScene = state.scenes.find((s: Scene) => s.id == scene.nextSceneRandomID);
+    } else {
+      nextScene = state.scenes.find((s: Scene) => s.id == scene.nextSceneID);
+    }
     if (nextScene != null) {
       return {
         route: [new Route({kind: 'scene', value: nextScene.id}), new Route({kind: 'play', value: nextScene.id})],

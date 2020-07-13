@@ -662,7 +662,7 @@ function loadImageFap(systemMessage: Function, config: Config, source: LibrarySo
           }
         })
         .catch((e) => {
-          console.log(e);
+          console.error(e);
         });
     } else if (url.includes("/video.php?vid=")) {
       helpers.next = null;

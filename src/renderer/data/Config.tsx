@@ -4,7 +4,7 @@ import LibrarySource from "./LibrarySource";
 import Audio from "./Audio";
 
 interface SceneSettingsI {
-  [key: string]: string | number | boolean | Array<LibrarySource> | Array<Overlay> | Array<Audio> | Array<Array<number>> | Array<string>;
+  [key: string]: string | number | boolean | Array<LibrarySource> | Array<Overlay> | Array<Audio> | Array<Array<number>> | Array<string> | Array<number>;
 
   sources: Array<LibrarySource>;
   timingFunction: string;
@@ -204,7 +204,7 @@ interface TutorialsI {
 }
 
 export class SceneSettings implements SceneSettingsI {
-  [key: string]: string | number | boolean | Array<LibrarySource> | Array<Overlay> | Array<Audio> | Array<Array<number>> | Array<string>;
+  [key: string]: string | number | boolean | Array<LibrarySource> | Array<Overlay> | Array<Audio> | Array<Array<number>> | Array<string> | Array<number>;
 
   sources: Array<LibrarySource> = [];
   timingFunction = TF.constant;
@@ -284,6 +284,7 @@ export class SceneSettings implements SceneSettingsI {
   nextSceneID = 0;
   nextSceneTime = 900;
   nextSceneAllImages = false;
+  nextSceneRandoms: Array<number> = [];
   textEnabled = false;
   textSource = "";
   textEndStop = false;
