@@ -28,9 +28,8 @@ as well as the default save path. This needs to be enabled on each machine.
 
 * `Min Image/Video Size` - the minimum number of pixels each dimension of an image/video must be 
 (default: 200 - image's width _and_ height must be larger than 200px).
-* `Max in Memory` - the maximum number of images to queue up for rendering.
-* `Max in History` - the maximum number of images to keep in history (navigating backwards and forwards).
-  * Images in memory and in history are cleared when the slideshow is stopped.
+* `Max in Memory` - the maximum number of images to keep in history (navigating backwards and forwards).
+  * Images in memory/history are cleared when the slideshow is stopped.
 * `Max Loading at Once` - the number of threads to have loading images.
   * _Be cautious increasing this number as this will degrade performance._
 

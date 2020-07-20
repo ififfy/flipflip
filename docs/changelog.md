@@ -1,5 +1,28 @@
 # Changelog
 
+## 3.0.5 <small>(07/20/2020)</small>
+- Add filter for only image files
+- Add separate ordering for sources vs images
+- Add randomized Play Part option for gifs and videos
+- Allow random Next Scene from list
+- Allow exact phrase search in Library
+- Allow volume to be saved per clip
+- Add ↑/↓ hotkeys to Video Clipper timestamps
+- Add scrollwheel controls to video volume
+- Add option for border on caption text
+- Show chosen/total counts on generator rules
+- Allow bpm detection for remote files
+- Add ability for local sources to treat inner-directories as individual sources
+- Add ability to view recent files in a grid
+- Performance Improvements
+- Make font loading more obvious
+- Fix bug with reloading while tagging
+- Fix bug with overlay loading text
+- Fix bug with random phrase not splitting properly
+- Fix bug with invalid strobe color
+- Fix bug with color picker
+- Fix bug with restoring default config
+
 ## 3.0.4 <small>(04/06/2020)</small>
 - Add subtitle support (WebVTT)
 - Add ability to auto-backup

@@ -540,7 +540,7 @@ class Tutorial extends React.Component {
             <DialogTitle id="tutorial-title">Image Options</DialogTitle>
             <DialogContent>
               <DialogContentText id="tutorial-description">
-                You can <b>filter images</b> to just <b>videos</b>, <b>animated</b> (gif and video), <b>no video</b> (gif and still), or <b>stills</b>.
+                You can <b>filter images</b> to just <b>videos</b>, <b>animated</b> (gif and video), <b>image files</b>, or <b>stills</b>.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 When <b>Play Full Sources</b> is enabled, FlipFlip will play all images in a source before proceeding to the next one.

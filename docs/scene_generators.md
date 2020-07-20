@@ -35,6 +35,10 @@ Once your rules are valid, click the `Generate` button ( <img style="vertical-al
 alt="Generate" width="20" height="20"> ). This will use the rules you set up to generate a random selection of sources 
 for your Scene. The default max number of sources is 200, but you can lower or raise this to meet your needs.
 
+After generating a scene, you will see a number (`X/Y`) next to each Percent rule. This tells you how many sources 
+were chosen during generation from the total that fit your rules. This can help in finding a optimal MAX number for your
+specific rules.
+
 Any changes to Effects here will be persisted between generated Scenes (using this Generator). The only thing that 
 gets overridden when you click `Generate` is the list of sources. If you are particularly fond of a generated 
 Scene, you can click `Save as Scene` in the sidebar to save these sources as their own stand-alone Scene.

@@ -41,6 +41,9 @@ This setting controls the background for this Scene:
 Choose a Scene to transition to after this one (or none). Control the timing of the Next Scene (sec) and if the Next 
 Scene should play after all images from the current Scene have played.
 
+Rather than picking a single scene, you can select "Random". Click <img style="vertical-align: -5px" src="doc_icons/list.svg" alt="List" width="20" height="20">
+to select the scenes you'd like to be randomly picked from.
+
 You can also choose to move to the next scene after an audio clip has ended or after the captioning script has completed.
 You will find these options in the audio and text settings, respectively.
 
@@ -60,18 +63,25 @@ This setting controls which images will display:
 * **All Images**
 * **Only Video**
 * **Only Animated** - Videos _and_ Animated GIFs
+* **Only Image Files**
 * **Only Stills**
+
+#### Play Full Sources
+By default, FlipFlip will play 1 image from a source before moving to the next. If you would rather play all images of
+a source before moving to the next, enable this option.
 
 #### GIF Options
 This setting overrides Scene timing specifically for animated GIFs.
 * **No Change** 
-* **Play Part** - Play GIFs for a certain length
+* **Play Part (Constant)** - Play GIFs for a certain length
+* **Play Part (Random)** - Play GIFs for a random length (between min and max)
 * **Play Full**
 
 #### Video Options
 This setting overrides Scene timing specifically for videos.
 * **No Change** 
-* **Play Part** - Play videos for a certain length
+* **Play Part (Constant)** - Play videos for a certain length
+* **Play Part (Random)** - Play videos for a random length (between min and max)
 * **Play Full**
 
 Videos also have a number of other settings:
@@ -89,7 +99,12 @@ This setting controls how the images are weighted.
 * **By source** - each source will be used an even amount (regardless of number of pictures).
 * **By image** - each image will be used an even amount (regardless of source).
   
-#### Ordering
+#### Source Ordering
+This setting controls the order sources will be used.
+* **Ordered**
+* **Randomized**  
+  
+#### Image Ordering
 This setting controls the order images will appear.
 * **Strictly Ordered**
 * **Ordered**
@@ -97,3 +112,6 @@ This setting controls the order images will appear.
 
 ?> Typically, FlipFlip will show images in the order they load. However, *strictly ordered* will force
 FlipFlip to wait for the next image to be ready before displaying.
+
+#### Avoid Repeats
+When ordering sources/images randomly, enabling this option will ensure all sources/images are used before repeating.

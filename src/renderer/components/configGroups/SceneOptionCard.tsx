@@ -57,7 +57,7 @@ const styles = (theme: Theme) => createStyles({
   },
   randomSceneList: {
     maxHeight: '400px',
-    overflowY: 'scroll',
+    overflowY: 'auto',
     padding: theme.spacing(1),
   }
 });

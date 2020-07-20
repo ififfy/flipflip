@@ -17,6 +17,8 @@ the displayed sources have that tagvpe.
   * `<Marked>` shows only sources that have been [marked](#marking-sources).
   * `<Untagged>` shows only sources which have no tags.
 * Type any term and press "Enter" or "Search for ___" to search. This is not case sensitive.
+* Type a phrase surrounded by " and " to search that exact phrase.
+  * By default -- without this option, FlipFlip splits separate words into separate search terms. 
 * Type a tag surrounded by "[" and "]" to search by tag.
 * Type a type surrounded by "{" and "}" to search by type.
 * Type "-" and then any term or filter to _exclude_ those sources.

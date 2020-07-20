@@ -11,10 +11,7 @@ const styles = (theme: Theme) => createStyles({
     backgroundColor: theme.palette.background.default,
   },
   grid: {
-    overflowY: 'scroll',
-  },
-  gridItem: {
-    lineHeight: 1,
+    overflowY: 'auto',
   },
   image: {
     width: '100%',
@@ -49,10 +46,10 @@ class PictureGrid extends React.Component {
         <div className={classes.appBarSpacer} />
         <Grid container className={classes.grid}>
           {grid.map((c, x) =>
-            <Grid key={x} xs={3} item className={classes.gridItem}>
+            <Grid key={x} xs={3} item>
               <Grid container>
                 {c.map((p, y) =>
-                  <Grid key={y} xs={12} item className={classes.gridItem}>
+                  <Grid key={y} xs={12} item>
                     {p instanceof HTMLImageElement && (
                       <img className={classes.image} src={p.src} {...{source: p.getAttribute("source")}}/>
                     )}
