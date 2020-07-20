@@ -43,6 +43,7 @@ class SceneOptions extends React.Component {
       this.props.tutorial == SDT.imageOptions ||
       this.props.tutorial == SDT.videoOptions ||
       this.props.tutorial == SDT.weighting ||
+      this.props.tutorial == SDT.sordering ||
       this.props.tutorial == SDT.ordering;
     return (
       <Grid container spacing={2}>

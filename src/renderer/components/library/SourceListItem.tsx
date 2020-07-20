@@ -157,7 +157,7 @@ class SourceListItem extends React.Component {
                   <br/>
                   Shift+Click: Open Source
                   <br/>
-                  &nbsp;&nbsp;Ctrl+Click: Open Cache
+                  &nbsp;&nbsp;Ctrl+Click: {sourceType == ST.video ? 'Reveal File' : 'Open Cache'}
                 </div>
               }>
                 <Fab

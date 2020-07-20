@@ -265,7 +265,7 @@ class Tutorial extends React.Component {
                 <br/>
                 Shift+Click: <b>Externally opens url/directory</b>
                 <br/>
-                Ctrl+Click: <b>Opens caching directory</b>
+                Ctrl+Click: <b>Opens caching directory</b> (reveals local video files)
               </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -474,7 +474,7 @@ class Tutorial extends React.Component {
             <DialogTitle id="tutorial-title">Next Scene</DialogTitle>
             <DialogContent>
               <DialogContentText id="tutorial-description">
-                You can <b>link scenes together</b>! Just choose the <b>next scene</b> to play and <b>how many <u>seconds</u></b> it should start after.
+                You can <b>link scenes together</b>! Just choose the <b>next scene</b> to play and <b>how many <u>seconds</u></b> it should start after. You can also choose to start the next scene after all images in this scene have been shown.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 <i>We'll leave this disabled for this tutorial</i>
@@ -540,7 +540,10 @@ class Tutorial extends React.Component {
             <DialogTitle id="tutorial-title">Image Options</DialogTitle>
             <DialogContent>
               <DialogContentText id="tutorial-description">
-                You can <b>filter images</b> to just <b>videos</b>, <b>animated</b>, or <b>stills</b>.
+                You can <b>filter images</b> to just <b>videos</b>, <b>animated</b> (gif and video), <b>no video</b> (gif and still), or <b>stills</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                When <b>Play Full Sources</b> is enabled, FlipFlip will play all images in a source before proceeding to the next one.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 You can also <b>control how long GIFs will play</b> for. This takes priority over scene timing.
@@ -617,20 +620,48 @@ class Tutorial extends React.Component {
             </DialogActions>
           </React.Fragment>;
         break;
+      case SDT.sordering:
+        left = true;
+        top = true;
+        maxWidth = "xs";
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Source Ordering</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                You can choose how to <b>order your sources</b>. Unless "Play Full Sources" is enabled, FlipFlip will play 1 image from a source before moving to the next.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                When sorting randomly, enable <b>Avoid Repeats</b> to ensure all other sources are used before repeating.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                <i>Since we only have 1 source, ordering is irrelevant</i>.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
       case SDT.ordering:
         left = true;
         top = true;
         maxWidth = "xs";
         dialogBody =
           <React.Fragment>
-            <DialogTitle id="tutorial-title">Ordering</DialogTitle>
+            <DialogTitle id="tutorial-title">Image Ordering</DialogTitle>
             <DialogContent>
               <DialogContentText id="tutorial-description">
-                You can choose how to order our images. Typically, it's best to use <b>random</b>, but you may want to <b>order</b> or even <b>strictly order</b> your sources.
+                You can choose how to <b>order your images</b>. Typically, it's best to use <b>random</b>, but you may want to <b>order</b> or even <b>strictly order</b> your sources.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 Typically, FlipFlip will show images in the order they load. However, <b>strictly ordered</b> will force
                 FlipFlip to wait for the next image to be ready before displaying.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                When sorting randomly, enable <b>Avoid Repeats</b> to ensure all other images are shown before repeating.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 <i>We'll keep it ordered <b>randomly</b></i>.
@@ -688,6 +719,11 @@ class Tutorial extends React.Component {
                 Let's add some effects to our scene. <b>First, enable Zoom</b>.
               </DialogContentText>
             </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onSkipStep.bind(this)} color="secondary">
+                Skip
+              </Button>
+            </DialogActions>
           </React.Fragment>;
         break;
       case SDT.zoom2:
@@ -704,6 +740,11 @@ class Tutorial extends React.Component {
                 So <b>set Zoom Start to <u>0.8</u></b> and <b>set Zoom End to <u>1.2</u></b>
               </DialogContentText>
             </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onSkipStep.bind(this)} color="secondary">
+                Skip
+              </Button>
+            </DialogActions>
           </React.Fragment>;
         break;
       case SDT.zoom3:
@@ -718,6 +759,11 @@ class Tutorial extends React.Component {
                 Great! Now let's change the zoom timing to be <b>Wave</b>.
               </DialogContentText>
             </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onSkipStep.bind(this)} color="secondary">
+                Skip
+              </Button>
+            </DialogActions>
           </React.Fragment>;
         break;
       case SDT.zoom4:
@@ -754,6 +800,11 @@ class Tutorial extends React.Component {
                 Great! Now, let's <b>enable Cross-Fade</b>
               </DialogContentText>
             </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onSkipStep.bind(this)} color="secondary">
+                Skip
+              </Button>
+            </DialogActions>
           </React.Fragment>;
         break;
       case SDT.fade2:
@@ -1430,6 +1481,9 @@ class Tutorial extends React.Component {
               this.setTutorial(SDT.weighting);
               return;
             case SDT.weighting:
+              this.setTutorial(SDT.sordering);
+              return;
+            case SDT.sordering:
               this.setTutorial(SDT.ordering);
               return;
             case SDT.ordering:
@@ -1609,6 +1663,25 @@ class Tutorial extends React.Component {
 
   onSkip() {
     this.props.onDoneTutorial(DONE);
+  }
+
+  onSkipStep() {
+    switch (this.props.tutorial) {
+      case SDT.zoom1:
+        this.props.scene.zoom = true;
+        break;
+      case SDT.zoom2:
+        this.props.scene.zoomStart = 0.8;
+        this.props.scene.zoomEnd = 1.2;
+        break;
+      case SDT.zoom3:
+        this.props.scene.transTF = TF.sin;
+        break;
+      case SDT.fade1:
+        this.props.scene.crossFade = true;
+        break;
+    }
+    this.onContinue();
   }
 
   onContinue() {

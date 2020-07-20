@@ -412,7 +412,7 @@ class ImageVideoCard extends React.Component {
               </FormControl>
             </Grid>
           )}
-          <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} className={clsx(this.props.tutorial == SDT.ordering && classes.highlight)}>
+          <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} className={clsx(this.props.tutorial == SDT.sordering && classes.highlight)}>
             <FormControl component="fieldset">
               <FormLabel component="legend">Source Ordering</FormLabel>
               <RadioGroup

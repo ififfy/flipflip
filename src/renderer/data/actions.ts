@@ -25,7 +25,7 @@ import {
   saveDir
 } from "./utils";
 import defaultTheme from "./theme";
-import {AF, BT, DONE, GT, IF, LT, OF, PR, PT, SDGT, SDT, SF, SGT, SPT, ST, TF, TT, VCT, WF} from "./const";
+import {AF, BT, DONE, GT, IF, LT, OF, PR, PT, SDGT, SDT, SF, SGT, SOF, SPT, ST, TF, TT, VCT, WF} from "./const";
 import { defaultInitialState } from './AppStorage';
 import { Route } from "./Route";
 import Scene from "./Scene";
@@ -422,7 +422,7 @@ export function addScene(state: State): Object {
     scene.nextSceneID = 0;
     scene.overlayEnabled = false;
     scene.imageTypeFilter = IF.any;
-    scene.sourceOrderFunction = OF.random;
+    scene.sourceOrderFunction = SOF.random;
     scene.orderFunction = OF.random;
     scene.zoom = false;
     scene.zoomStart = 1;

@@ -228,6 +228,7 @@ const SDT = { // Scene Detail Tutorials
   imageOptions: 'sdt19',
   videoOptions: 'sdt20',
   weighting: 'sdt21',
+  sordering: 'sdt32',
   ordering: 'sdt22',
   effects1: 'sdt23',
   effects2: 'sdt24',
