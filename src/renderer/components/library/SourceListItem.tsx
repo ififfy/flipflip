@@ -113,6 +113,7 @@ class SourceListItem extends React.Component {
     onClean(source: LibrarySource): void,
     onClearBlacklist(sourceURL: string): void,
     onClip(source: LibrarySource, displaySources: Array<LibrarySource>): void,
+    onDelete(source: LibrarySource): void;
     onEditBlacklist(source: LibrarySource): void,
     onEndEdit(newURL: string): void,
     onOpenClipMenu(source: LibrarySource): void,
@@ -319,7 +320,9 @@ class SourceListItem extends React.Component {
 
   onSourceIconClick(e: MouseEvent) {
     const sourceURL = this.props.source.url;
-    if (e.shiftKey && !e.ctrlKey) {
+    if (e.shiftKey && e.ctrlKey && e.altKey) {
+      this.props.onDelete(this.props.source);
+    } else if (e.shiftKey && !e.ctrlKey) {
       this.openExternalURL(sourceURL);
     } else if (!e.shiftKey && e.ctrlKey) {
       const fileType = getSourceType(sourceURL);

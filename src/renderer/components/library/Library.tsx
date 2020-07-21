@@ -1,5 +1,7 @@
 import * as React from "react";
 import clsx from "clsx";
+import {readdir} from "fs";
+import {move} from "fs-extra";
 import Select, { components } from 'react-select';
 
 import {
@@ -31,6 +33,7 @@ import SelectAllIcon from '@material-ui/icons/SelectAll';
 import SortIcon from '@material-ui/icons/Sort';
 
 import {AF, LT, MO, PR, SF, ST} from "../../data/const";
+import {getCachePath, getLocalPath, getSourceType} from "../../data/utils";
 import en from "../../data/en";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
@@ -40,7 +43,6 @@ import LibrarySearch from "./LibrarySearch";
 import SourceIcon from "./SourceIcon";
 import SourceList from "./SourceList";
 import URLDialog from "../sceneDetail/URLDialog";
-import {getSourceType} from "../../data/utils";
 
 const drawerWidth = 240;
 
@@ -338,6 +340,7 @@ class Library extends React.Component {
     selectedTags: Array<{label: string, value: string}>(),
     menuAnchorEl: null as any,
     openMenu: null as string,
+    moveDialog: false,
   };
 
   Option = (props: any) => (
@@ -822,6 +825,26 @@ class Library extends React.Component {
             </Button>
           </DialogActions>
         </Dialog>
+        <Dialog
+          open={this.state.moveDialog}
+          onClose={this.onCloseMoveDialog.bind(this)}
+          aria-describedby="move-description">
+          <DialogTitle id="move-title">Localize Offline Sources</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="move-description">
+              You are about to convert all offline sources to local sources. Any cached images will be moved to a
+              local directory. Offline sources without cached images will be removed from the Library.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.onCloseMoveDialog.bind(this)} color="secondary">
+              Cancel
+            </Button>
+            <Button onClick={this.onFinishMove.bind(this)} color="primary">
+              Confirm
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     );
   }
@@ -845,14 +868,61 @@ class Library extends React.Component {
   }
 
   // Use alt+P to access import modal
-  // Use alt+U to toggle highlighting untagged sources
+  // Use alt+M to toggle highlighting  sources
+  // Use alt+L to move cached offline sources to local sources
   onKeyDown = (e: KeyboardEvent) => {
     if (!e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'p' || e.key == 'π')) {
       this.setState({openMenu: this.state.openMenu == MO.urlImport ? null : MO.urlImport});
     } else if (!e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'm' || e.key == 'µ')) {
       this.toggleMarked();
+    } else if (!e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'l' || e.key == '¬')) {
+      this.moveOffline();
     }
   };
+
+  moveOffline() {
+    this.setState({moveDialog: true});
+  }
+
+  onFinishMove() {
+    for (let source of this.props.library) {
+      if (source.offline) {
+        const cachePath = getCachePath(source.url, this.props.config);
+        readdir(cachePath, (error, files) => {
+          if (!!error || files.length == 0) {
+            this.props.onUpdateLibrary((l) => {
+              l.forEach((s, index) => {
+                if (s.id == source.id) {
+                  l.splice(index, 1);
+                  return;
+                }
+              });
+            });
+          } else {
+            const localPath = getLocalPath(source.url, this.props.config);
+            move(cachePath, localPath, console.error);
+            this.props.onUpdateLibrary((l) => {
+              l.forEach((s, index) => {
+                if (s.id == source.id) {
+                  s.url = localPath;
+                  s.offline = false;
+                  s.lastCheck = null;
+                  s.count = files.length;
+                  s.countComplete = true;
+                  return;
+                }
+              });
+            });
+          }
+        });
+      }
+    }
+    this.onCloseMoveDialog();
+  }
+
+  onCloseMoveDialog() {
+    this.setState({moveDialog: false});
+  }
 
   onBatchTag() {
     this.onCloseDialog();

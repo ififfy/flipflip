@@ -1,5 +1,6 @@
 import * as React from "react";
 import rimraf from "rimraf";
+import {existsSync, unlinkSync} from "fs";
 import {remote} from "electron";
 import {sortableContainer, sortableElement} from 'react-sortable-hoc';
 import AutoSizer from "react-virtualized-auto-sizer";
@@ -83,6 +84,7 @@ class SourceList extends React.Component {
     editBlacklist: null as string,
     sourceOptionsType: null as string,
     sourceOptions: null as LibrarySource,
+    deleteDialog: null as LibrarySource,
   };
 
   onSortEnd = ({oldIndex, newIndex}: {oldIndex: number, newIndex: number}) => {
@@ -325,6 +327,26 @@ class SourceList extends React.Component {
             </DialogContent>
           </Dialog>
         )}
+        {this.state.deleteDialog != null && (
+          <Dialog
+            open={this.state.deleteDialog != null}
+            onClose={this.onCloseDeleteDialog.bind(this)}
+            aria-describedby="delete-description">
+            <DialogContent>
+              <DialogContentText id="delete-description">
+                Are you sure you want to delete {this.state.deleteDialog.url}?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onCloseDeleteDialog.bind(this)} color="secondary">
+                Cancel
+              </Button>
+              <Button onClick={this.onFinishDelete.bind(this)} color="primary">
+                Delete
+              </Button>
+            </DialogActions>
+          </Dialog>
+        )}
       </React.Fragment>
     )
   }
@@ -345,6 +367,28 @@ class SourceList extends React.Component {
     if (this.props.savePosition) {
       this.props.savePosition();
     }
+  }
+
+  onDelete(source: LibrarySource) {
+    const fileType = getSourceType(source.url);
+    if ((fileType == ST.local || fileType == ST.video || fileType == ST.playlist || fileType == ST.list) && existsSync(source.url)) {
+      this.setState({deleteDialog: source});
+    }
+  }
+
+  onCloseDeleteDialog() {
+    this.setState({deleteDialog: null});
+  }
+
+  onFinishDelete() {
+    const fileType = getSourceType(this.state.deleteDialog.url);
+    if (fileType == ST.local) {
+      rimraf.sync(this.state.deleteDialog.url);
+    } else if (fileType == ST.video || fileType == ST.playlist || fileType == ST.list) {
+      unlinkSync(this.state.deleteDialog.url);
+    }
+    this.onRemove(this.state.deleteDialog);
+    this.onCloseDeleteDialog();
   }
 
   onRemove(source: LibrarySource) {
@@ -599,6 +643,7 @@ class SourceList extends React.Component {
         onClean={this.onClean.bind(this)}
         onClearBlacklist={this.props.onClearBlacklist.bind(this)}
         onClip={this.props.onClip.bind(this)}
+        onDelete={this.onDelete.bind(this)}
         onEditBlacklist={this.onEditBlacklist.bind(this)}
         onEndEdit={this.onEndEdit.bind(this)}
         onOpenClipMenu={this.onOpenClipMenu.bind(this)}

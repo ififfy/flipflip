@@ -16,7 +16,6 @@ import {
   getFileGroup,
   getFileName,
   getRandomIndex,
-  getRandomListItem,
   getSourceType,
   isVideo,
   isVideoPlaylist,
@@ -25,7 +24,7 @@ import {
   saveDir
 } from "./utils";
 import defaultTheme from "./theme";
-import {AF, BT, DONE, GT, IF, LT, OF, PR, PT, SDGT, SDT, SF, SGT, SOF, SPT, ST, TF, TT, VCT, WF} from "./const";
+import {AF, BT, DONE, GT, IF, LT, OF, PR, PT, SDGT, SDT, SF, SGT, SOF, SPT, ST, TF, TT, VCT} from "./const";
 import { defaultInitialState } from './AppStorage';
 import { Route } from "./Route";
 import Scene from "./Scene";
@@ -1655,8 +1654,6 @@ export function sortSources(state: State, scene: Scene, algorithm: string, ascen
     secondary = SF.alpha;
   }
   if (scene != null) {
-    const newScenes = state.scenes;
-    const thisScene = newScenes.find((s) => s.id == scene.id);
     return updateScene(state, scene, (s) => s.sources = s.sources.sort(
       sortFunction(algorithm, ascending, getName, getFullName, getCount, getType, secondary)));
   } else {

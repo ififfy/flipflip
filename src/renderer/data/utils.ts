@@ -226,8 +226,16 @@ export function getFileGroup(url: string) {
   }
 }
 
+export function getLocalPath(source: string, config: Config) {
+  return cachePath(source, "local", config);
+}
+
 export function getCachePath(source: string, config: Config) {
   const typeDir = en.get(getSourceType(source)).toLowerCase();
+  return cachePath(source, typeDir, config);
+}
+
+function cachePath(source: string, typeDir: string, config: Config) {
   if (config.caching.directory != "") {
     let baseDir = config.caching.directory;
     if (!baseDir.endsWith(path.sep)) {
