@@ -212,7 +212,12 @@ export function getFileGroup(url: string) {
       }
       return url.substring(url.lastIndexOf(sep) + 1).replace(".txt", "");
     case ST.local:
-      return url.substring(url.lastIndexOf(path.sep)+1);
+      if (url.endsWith(path.sep)) {
+        url = url.substring(0, url.length - 1);
+        return url.substring(url.lastIndexOf(path.sep)+1);
+      } else {
+        return url.substring(url.lastIndexOf(path.sep)+1);
+      }
     case ST.video:
     case ST.playlist:
       if (/^https?:\/\//g.exec(url) != null) {
@@ -301,11 +306,35 @@ export async function convertURL(url: string): Promise<Array<string>> {
       gfycatID = gfycatID.substring(gfycatID.lastIndexOf("/") + 1);
       return ["https://giant.gfycat.com/" + gfycatID + ".mp4"];
     } else {
+      gfycat = new DOMParser().parseFromString(html, "text/html").querySelectorAll("#webmSource");
+      if (gfycat.length > 0) {
+        return [(gfycat[0] as any).src];
+      }
       gfycatMatch = null;
     }
   }
 
-  if (!imgurMatch && !imgurAlbumMatch && !gfycatMatch) {
+  // If this is redgif page, return redgif image
+  let redgifMatch = url.match("^https?://(?:www\.)?redgifs\.com/watch/(\\w*)$");
+  if (redgifMatch != null) {
+    let html = await wretch(url).get().notFound(() => {return [url]}).text();
+    let redgif = new DOMParser().parseFromString(html, "text/html").querySelectorAll("#video-" + redgifMatch[1] + " > source");
+    if (redgif.length > 0) {
+      for (let source of redgif) {
+        if ((source as any).type == "video/webm") {
+          return [(source as any).src];
+        }
+      }
+    } else {
+      redgifMatch = null;
+    }
+  }
+
+  if (url.includes("redgifs") || url.includes("gfycat")) {
+    console.log("Possible missed file: " + url);
+  }
+
+  if (!imgurMatch && !imgurAlbumMatch && !gfycatMatch && !redgifMatch) {
     return [url];
   }
 }
