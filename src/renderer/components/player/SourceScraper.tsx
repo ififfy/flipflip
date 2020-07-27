@@ -1293,11 +1293,16 @@ export default class SourceScraper extends React.Component {
     let sceneSources = new Array<LibrarySource>();
     for (let source of this.props.scene.sources) {
       if (source.dirOfSources && getSourceType(source.url) == ST.local) {
-        const directories = fs.readdirSync(source.url, { withFileTypes: true })
-          .filter(dirent => dirent.isDirectory())
-          .map(dirent => dirent.name);
-        for (let d of directories) {
-          sceneSources.push(new LibrarySource({url: source.url + path.sep + d}));
+        try {
+          const directories = fs.readdirSync(source.url, {withFileTypes: true})
+            .filter(dirent => dirent.isDirectory())
+            .map(dirent => dirent.name);
+          for (let d of directories) {
+            sceneSources.push(new LibrarySource({url: source.url + path.sep + d}));
+          }
+        } catch (e) {
+          sceneSources.push(new LibrarySource({url: source.url}));
+          console.error(e);
         }
       } else {
         sceneSources.push(source);
@@ -1313,11 +1318,16 @@ export default class SourceScraper extends React.Component {
       let nextSceneSources = new Array<LibrarySource>();
       for (let source of this.props.nextScene.sources) {
         if (source.dirOfSources && getSourceType(source.url) == ST.local) {
-          const directories = fs.readdirSync(source.url, { withFileTypes: true })
-            .filter(dirent => dirent.isDirectory())
-            .map(dirent => dirent.name);
-          for (let d of directories) {
-            nextSceneSources.push(new LibrarySource({url: source.url + path.sep + d}));
+          try {
+            const directories = fs.readdirSync(source.url, {withFileTypes: true})
+              .filter(dirent => dirent.isDirectory())
+              .map(dirent => dirent.name);
+            for (let d of directories) {
+              nextSceneSources.push(new LibrarySource({url: source.url + path.sep + d}));
+            }
+          } catch (e) {
+            nextSceneSources.push(new LibrarySource({url: source.url}));
+            console.error(e);
           }
         } else {
           nextSceneSources.push(source);
