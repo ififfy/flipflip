@@ -425,13 +425,17 @@ export default class Player extends React.Component {
         s.nextSceneRandomID = sceneID;
       })
     }
-    window.addEventListener('wheel', this.onScroll, false);
+    if (this.props.tags == null) {
+      window.addEventListener('wheel', this.onScroll, false);
+    }
   }
 
   componentWillUnmount() {
     clearInterval(this._interval);
     this._interval = null;
-    window.removeEventListener('wheel', this.onScroll);
+    if (this.props.tags == null) {
+      window.removeEventListener('wheel', this.onScroll);
+    }
     getCurrentWindow().setAlwaysOnTop(false);
     getCurrentWindow().setFullScreen(false);
     // Clear ALL the available browser caches
