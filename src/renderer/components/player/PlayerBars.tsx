@@ -272,9 +272,11 @@ class PlayerBars extends React.Component {
               </Tooltip>
             </div>
 
-            <Typography component="h1" variant="h4" color="inherit" noWrap className={classes.title}>
-              {this.props.title}
-            </Typography>
+            <Tooltip title={this.props.title}>
+              <Typography component="h1" variant="h4" color="inherit" noWrap className={classes.title}>
+                {this.props.title}
+              </Typography>
+            </Tooltip>
 
             <div className={classes.headerRight}>
               <Tooltip title="Toggle Fullscreen">
