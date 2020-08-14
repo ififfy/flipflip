@@ -246,6 +246,15 @@ class PlayerBars extends React.Component {
     const canGoBack = this.props.historyOffset > -(this.props.historyPaths.length - 1);
     const canGoForward = this.props.historyOffset < 0;
     const tagNames = this.props.tags ? this.props.tags.map((t) => t.name) : [];
+    let clipValue = null;
+    let clipID: number = null;
+    let source = null;
+    if (this.props.mainVideo && this.props.mainVideo.hasAttribute("start") && this.props.mainVideo.hasAttribute("end")) {
+      clipValue = [parseInt(this.props.mainVideo.getAttribute("start")), parseInt(this.props.mainVideo.getAttribute("end"))]
+      clipID = parseInt(this.props.mainVideo.getAttribute("clip"));
+      const sourceURL = this.props.mainVideo.getAttribute("source");
+      source = this.props.scene.sources.find((s) => s.url == sourceURL);
+    }
 
     return(
       <React.Fragment>
@@ -496,6 +505,9 @@ class PlayerBars extends React.Component {
                   {this.props.scene.sources.length == 1 && getSourceType(this.props.scene.sources[0].url) == ST.video && (
                     <VideoControl
                       video={this.props.mainVideo}
+                      clip={source ? source.clips.find((c) => c.id == clipID) : null}
+                      clipValue={clipValue ? clipValue : null}
+                      clips={source ? source.clips : null}
                       useHotkeys
                       onChangeVolume={() => {}}/>
                   )}
