@@ -675,7 +675,7 @@ class VideoClipper extends React.Component {
     }
   }
 
-  onChangePosition(e: MouseEvent, values: Array<number>) {
+  onChangePosition(e: MouseEvent, values: Array<number>, forceStart = false, forceEnd = false) {
     let min = values[0];
     let max = values[1];
     if (min < 0) min = 0;
@@ -684,9 +684,9 @@ class VideoClipper extends React.Component {
     if (max > this.state.video.duration) max = this.state.video.duration;
 
     if (this.state.video.paused) {
-      if (values[0] != this.state.isEditingValue[0]) {
+      if (forceStart || values[0] != this.state.isEditingValue[0]) {
         this.state.video.currentTime = min;
-      } else if (values[1] != this.state.isEditingValue[1]) {
+      } else if (forceEnd || values[1] != this.state.isEditingValue[1]) {
         this.state.video.currentTime = max;
       }
     } else {
@@ -711,9 +711,9 @@ class VideoClipper extends React.Component {
     this.onChangeStartTextValue(timestampValue);
   }
 
-  onChangeStartTextValue(timestampValue: number) {
+  onChangeStartTextValue(timestampValue: number, force = false) {
     if (timestampValue != null) {
-      this.onChangePosition(null, [timestampValue, this.state.isEditingValue[1]]);
+      this.onChangePosition(null, [timestampValue, this.state.isEditingValue[1]], force, false);
     }
   }
 
@@ -729,9 +729,9 @@ class VideoClipper extends React.Component {
     this.onChangeStartTextValue(timestampValue);
   }
 
-  onChangeEndTextValue(timestampValue: number) {
+  onChangeEndTextValue(timestampValue: number, force = false) {
     if (timestampValue != null) {
-      this.onChangePosition(null, [this.state.isEditingValue[0], timestampValue]);
+      this.onChangePosition(null, [this.state.isEditingValue[0], timestampValue], false, force);
     }
   }
 
@@ -791,9 +791,13 @@ class VideoClipper extends React.Component {
         if (focus == "input") {
           e.preventDefault();
           if (start) {
-            this.onChangeStartTextValue(getTimestampValue(this.state.isEditingStartText) - 1);
+            const timestampValue = getTimestampValue(this.state.isEditingStartText);
+            const startValue = timestampValue-1 >= 0 ? timestampValue-1 : 0;
+            this.onChangeStartTextValue(startValue, true);
           } else if (end) {
-            this.onChangeEndTextValue(getTimestampValue(this.state.isEditingEndText) - 1);
+            const timestampValue = getTimestampValue(this.state.isEditingEndText);
+            const endValue = timestampValue-1 >= 0 ? timestampValue-1 : 0;
+            this.onChangeEndTextValue(endValue, true);
           }
         }
         break;
@@ -801,9 +805,13 @@ class VideoClipper extends React.Component {
         if (focus == "input") {
           e.preventDefault();
           if (start) {
-            this.onChangeStartTextValue(getTimestampValue(this.state.isEditingStartText) + 1);
+            const timestampValue = getTimestampValue(this.state.isEditingStartText);
+            const startValue = timestampValue+1 <= this.state.video.duration ? timestampValue+1 : Math.floor(this.state.video.duration);
+            this.onChangeStartTextValue(startValue, true);
           } else if (end) {
-            this.onChangeEndTextValue(getTimestampValue(this.state.isEditingEndText) + 1);
+            const timestampValue = getTimestampValue(this.state.isEditingEndText);
+            const endValue = timestampValue+1 <= this.state.video.duration ? timestampValue+1 : Math.floor(this.state.video.duration);
+            this.onChangeEndTextValue(endValue, true);
           }
         }
         break;
