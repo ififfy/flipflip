@@ -314,12 +314,11 @@ class PlayerBars extends React.Component {
                 {this.props.isPlaying ? <PauseIcon fontSize="large"/> : <PlayArrowIcon fontSize="large"/>}
               </IconButton>
               <IconButton
-                disabled={!canGoForward}
                 edge="start"
                 color="inherit"
                 aria-label="Forward"
                 onClick={this.historyForward.bind(this)}>
-                <ForwardIcon fontSize="large"/>
+                <ForwardIcon fontSize="large" style={canGoForward ? {} : {color: 'rgba(255, 255, 255, 0.3)', backgroundColor: 'transparent'}}/>
               </IconButton>
             </div>
           </Toolbar>
