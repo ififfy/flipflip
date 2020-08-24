@@ -27,6 +27,7 @@ import defaultTheme from "./theme";
 import {AF, BT, DONE, GT, IF, LT, OF, PR, PT, SDGT, SDT, SF, SGT, SOF, SPT, ST, TF, TT, VCT} from "./const";
 import { defaultInitialState } from './AppStorage';
 import { Route } from "./Route";
+import en from "./en";
 import Scene from "./Scene";
 import Config from "./Config";
 import Clip from "../data/Clip";
@@ -761,8 +762,11 @@ export function generateScene(state: State, scene: Scene): Object {
   const newScene = state.scenes.find((s) => s.id == scene.id);
 
   // Record all the groups we're requiring/excluding
-  const allTags = newScene.generatorWeights.filter((wg) => wg.type == TT.all && !wg.rules).map((wg) => wg.tag);
-  const noneTags = newScene.generatorWeights.filter((wg) => wg.type == TT.none && !wg.rules).map((wg) => wg.tag);
+  const allTags = newScene.generatorWeights.filter((wg) => wg.type == TT.all && !wg.rules && !wg.tag.typeTag).map((wg) => wg.tag);
+  const noneTags = newScene.generatorWeights.filter((wg) => wg.type == TT.none && !wg.rules && !wg.tag.typeTag).map((wg) => wg.tag);
+  const allTypes = newScene.generatorWeights.filter((wg) => wg.type == TT.all && !wg.rules && wg.tag.typeTag).map((wg) => wg.tag.name);
+  const noneTypes = newScene.generatorWeights.filter((wg) =>wg.type == TT.none && !wg.rules && wg.tag.typeTag).map((wg) => wg.tag.name);
+
   // Sources to require
   let reqAdvSources: Array<LibrarySource> = null;
   // Sources to exclude
@@ -775,21 +779,25 @@ export function generateScene(state: State, scene: Scene): Object {
   for (let wg of newScene.generatorWeights.filter((wg) => !!wg.rules)) {
     // Build each adv rule like a regular set of simple rules
     // First get tags to require/exclude
-    const allTags = wg.rules.filter((wg) => wg.type == TT.all).map((wg) => wg.tag);
-    const noneTags = wg.rules.filter((wg) => wg.type == TT.none).map((wg) => wg.tag);
+    const allTags = wg.rules.filter((wg) => !wg.tag.typeTag && wg.type == TT.all).map((wg) => wg.tag);
+    const noneTags = wg.rules.filter((wg) => !wg.tag.typeTag && wg.type == TT.none).map((wg) => wg.tag);
+    const allTypes = wg.rules.filter((wg) => wg.tag.typeTag && wg.type == TT.all).map((wg) => wg.tag.name);
+    const noneTypes = wg.rules.filter((wg) => wg.tag.typeTag && wg.type == TT.none).map((wg) => wg.tag.name);
 
     // Build this rule's list of sources
     let rulesSources = new Array<LibrarySource>();
 
     // If we don't have any weights, calculate by just require/exclude
-    if (allTags.length + noneTags.length == wg.rules.length) {
+    if (allTags.length + noneTags.length + allTypes.length + noneTypes.length == wg.rules.length) {
       let sources = [];
       // For each source in the library
       for (let s of state.library) {
         let addedClip = false;
         let invalidClips = [];
+        const sType = getSourceType(s.url);
+        const sTypeEn = en.get(sType);
         // If this is a video with clips
-        if (getSourceType(s.url) == ST.video && s.clips && s.clips.length > 0) {
+        if (sType == ST.video && s.clips && s.clips.length > 0) {
           // Weight each clip first
           for (let c of s.clips) {
             // If clip is not tagged, default to source tags
@@ -809,6 +817,26 @@ export function generateScene(state: State, scene: Scene): Object {
             // Filter out clips which have noneTags
             for (let nt of noneTags) {
               if (cTags.find((t) => t.id == nt.id)) {
+                invalidClips.push(c.id);
+                b = true;
+                break;
+              }
+            }
+            if (b) continue;
+
+            // Filter out clips which don't have allTypes
+            for (let at of allTypes) {
+              if (at != sTypeEn) {
+                invalidClips.push(c.id);
+                b = true;
+                break;
+              }
+            }
+            if (b) continue;
+
+            // Filter out clips which have noneTypes
+            for (let nt of noneTypes) {
+              if (nt == sTypeEn) {
                 invalidClips.push(c.id);
                 b = true;
                 break;
@@ -842,6 +870,24 @@ export function generateScene(state: State, scene: Scene): Object {
             }
           }
           if (b) continue;
+
+          // Filter out sources which don't have allTypes
+          for (let at of allTypes) {
+            if (at != sTypeEn) {
+              b = true;
+              break;
+            }
+          }
+          if (b) continue;
+
+          // Filter out sources which have noneTypes
+          for (let nt of noneTypes) {
+            if (nt == sTypeEn) {
+              b = true;
+              break;
+            }
+          }
+          if (b) continue;
         } else {
           // If we're adding a clip, mark invalid ones
           s.disabledClips = invalidClips;
@@ -858,8 +904,10 @@ export function generateScene(state: State, scene: Scene): Object {
           for (let s of state.library) {
             let addedClip = false;
             let invalidClips = [];
+            const sType = getSourceType(s.url);
+            const sTypeEn = en.get(sType);
             // If this is a video with clips
-            if (getSourceType(s.url) == ST.video && s.clips && s.clips.length > 0) {
+            if (sType == ST.video && s.clips && s.clips.length > 0) {
               // Weight each clip first
               for (let c of s.clips) {
                 // If clip is not tagged, default to source tags
@@ -885,6 +933,26 @@ export function generateScene(state: State, scene: Scene): Object {
                 // Filter out clips which have noneTags
                 for (let nt of noneTags) {
                   if (cTags.find((t) => t.id == nt.id)) {
+                    invalidClips.push(c.id);
+                    b = true;
+                    break;
+                  }
+                }
+                if (b) continue;
+
+                // Filter out clips which don't have allTypes
+                for (let at of allTypes) {
+                  if (at != sTypeEn) {
+                    invalidClips.push(c.id);
+                    b = true;
+                    break;
+                  }
+                }
+                if (b) continue;
+
+                // Filter out clips which have noneTypes
+                for (let nt of noneTypes) {
+                  if (nt == sTypeEn) {
                     invalidClips.push(c.id);
                     b = true;
                     break;
@@ -918,6 +986,24 @@ export function generateScene(state: State, scene: Scene): Object {
               // Filter out sources which have noneTags
               for (let nt of noneTags) {
                 if (s.tags.find((t) => t.id == nt.id)) {
+                  b = true;
+                  break;
+                }
+              }
+              if (b) continue;
+
+              // Filter out sources which don't have allTyoes
+              for (let at of allTypes) {
+                if (at != sTypeEn) {
+                  b = true;
+                  break;
+                }
+              }
+              if (b) continue;
+
+              // Filter out sources which have noneTypes
+              for (let nt of noneTypes) {
+                if (nt == sTypeEn) {
                   b = true;
                   break;
                 }
@@ -963,7 +1049,7 @@ export function generateScene(state: State, scene: Scene): Object {
 
   // Now, build our simple rules
   // If we don't have any weights, calculate by just require/exclude
-  if (allTags.length + noneTags.length == newScene.generatorWeights.length) {
+  if (allTags.length + noneTags.length + allTypes.length + noneTypes.length == newScene.generatorWeights.length) {
     let sources = [];
     for (let s of state.library) {
       // Filter out sources which are not in required list
@@ -977,8 +1063,10 @@ export function generateScene(state: State, scene: Scene): Object {
 
       let addedClip = false;
       let invalidClips = [];
+      const sType = getSourceType(s.url);
+      const sTypeEn = en.get(sType);
       // If this is a video with clips
-      if (getSourceType(s.url) == ST.video && s.clips && s.clips.length > 0) {
+      if (sType == ST.video && s.clips && s.clips.length > 0) {
         // Weight each clip first
         for (let c of s.clips) {
           // If clip is not tagged, default to source tags
@@ -998,6 +1086,26 @@ export function generateScene(state: State, scene: Scene): Object {
           // Filter out clips which have noneTags
           for (let nt of noneTags) {
             if (cTags.find((t) => t.id == nt.id)) {
+              invalidClips.push(c.id);
+              b = true;
+              break;
+            }
+          }
+          if (b) continue;
+
+          // Filter out clips which don't have allTypes
+          for (let at of allTypes) {
+            if (at != sTypeEn) {
+              invalidClips.push(c.id);
+              b = true;
+              break;
+            }
+          }
+          if (b) continue;
+
+          // Filter out clips which have noneTypes
+          for (let nt of noneTypes) {
+            if (nt == sTypeEn) {
               invalidClips.push(c.id);
               b = true;
               break;
@@ -1031,6 +1139,24 @@ export function generateScene(state: State, scene: Scene): Object {
           }
         }
         if (b) continue;
+
+        // Filter out sources which don't have allTypes
+        for (let at of allTypes) {
+          if (at != sTypeEn) {
+            b = true;
+            break;
+          }
+        }
+        if (b) continue;
+
+        // Filter out sources which have noneTypes
+        for (let nt of noneTypes) {
+          if (nt == sTypeEn) {
+            b = true;
+            break;
+          }
+        }
+        if (b) continue;
       } else {
         // If we're adding a clip, mark invalid ones
         s.disabledClips = invalidClips;
@@ -1055,18 +1181,27 @@ export function generateScene(state: State, scene: Scene): Object {
 
         let addedClip = false;
         let invalidClips = [];
+        const sType = getSourceType(s.url);
+        const sTypeEn = en.get(sType);
         // If this is a video with clips
-        if (getSourceType(s.url) == ST.video && s.clips && s.clips.length > 0) {
+        if (sType == ST.video && s.clips && s.clips.length > 0) {
           // Weight each clip first
           for (let c of s.clips) {
             // If clip is not tagged, default to source tags
             let cTags = c.tags && c.tags.length > 0 ? c.tags : s.tags;
             let b = false;
 
-            // Filter out clip which don't have this tag
-            if (!cTags.find((t) => t.id == wg.tag.id)) {
-              invalidClips.push(c.id);
-              continue;
+            // Filter out clip which don't have this type/tag
+            if (wg.tag.typeTag) {
+              if (wg.tag.name != sTypeEn) {
+                invalidClips.push(c.id);
+                continue;
+              }
+            } else {
+              if (!cTags.find((t) => t.id == wg.tag.id)) {
+                invalidClips.push(c.id);
+                continue;
+              }
             }
 
             // Filter out clips which don't have allTags
@@ -1089,6 +1224,26 @@ export function generateScene(state: State, scene: Scene): Object {
             }
             if (b) continue;
 
+            // Filter out clips which don't have allTypes
+            for (let at of allTypes) {
+              if (at != sTypeEn) {
+                invalidClips.push(c.id);
+                b = true;
+                break;
+              }
+            }
+            if (b) continue;
+
+            // Filter out clips which have noneTypes
+            for (let nt of noneTypes) {
+              if (nt == sTypeEn) {
+                invalidClips.push(c.id);
+                b = true;
+                break;
+              }
+            }
+            if (b) continue;
+
             // If this clip is valid, mark as added
             addedClip = true;
           }
@@ -1099,8 +1254,14 @@ export function generateScene(state: State, scene: Scene): Object {
           let b = false;
 
           // Filter out sources which don't have this tag
-          if (!s.tags.find((t) => t.id == wg.tag.id)) {
-            continue;
+          if (wg.tag.typeTag) {
+            if (wg.tag.name != sTypeEn) {
+              continue;
+            }
+          } else {
+            if (!s.tags.find((t) => t.id == wg.tag.id)) {
+              continue;
+            }
           }
 
           // Filter out sources which don't have allTags
@@ -1115,6 +1276,24 @@ export function generateScene(state: State, scene: Scene): Object {
           // Filter out sources which have noneTags
           for (let nt of noneTags) {
             if (s.tags.find((t) => t.id == nt.id)) {
+              b = true;
+              break;
+            }
+          }
+          if (b) continue;
+
+          // Filter out sources which don't have allTypes
+          for (let at of allTypes) {
+            if (at != sTypeEn) {
+              b = true;
+              break;
+            }
+          }
+          if (b) continue;
+
+          // Filter out sources which have noneTypes
+          for (let nt of noneTypes) {
+            if (nt == sTypeEn) {
               b = true;
               break;
             }

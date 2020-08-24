@@ -33,7 +33,8 @@ import SaveIcon from '@material-ui/icons/Save';
 import SortIcon from '@material-ui/icons/Sort';
 import WarningIcon from '@material-ui/icons/Warning';
 
-import {AF, MO, OF, SB, SDGT, SDT, SF, TT, WF} from "../../data/const";
+import {AF, MO, SB, SDGT, SDT, SF, ST, TT} from "../../data/const";
+import {getSourceType} from "../../data/utils";
 import en from "../../data/en";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
@@ -343,11 +344,16 @@ class SceneDetail extends React.Component {
     openMenu: null as string,
     snackbar: null as string,
     snackbarType: null as string,
+    usedTypes: null as Array<string>,
   };
 
   render() {
     const classes = this.props.classes;
     const open = this.state.drawerOpen;
+    let id = 999;
+    const validTags = this.props.scene.openTab != 4 || this.state.usedTypes == null ? null :
+                            this.props.tags.concat(this.state.usedTypes.map((k) =>  new Tag({id: id++, name: en.get(k), typeTag: true})))
+                            .filter((t) => !this.props.scene.generatorWeights.map((wg) => wg.tag ? wg.tag.name : "").includes(t.name));
     return (
       <div className={classes.root}>
 
@@ -601,6 +607,7 @@ class SceneDetail extends React.Component {
                     <SceneGenerator
                       scene={this.props.scene}
                       tags={this.props.tags}
+                      usedTypes={this.state.usedTypes}
                       tutorial={this.props.tutorial}
                       onTutorial={this.props.onTutorial.bind(this)}
                       onUpdateScene={this.props.onUpdateScene.bind(this)} />
@@ -860,7 +867,7 @@ class SceneDetail extends React.Component {
               classes={{paper: clsx(classes.tagMenu, this.props.tutorial == SDGT.buttons && clsx(classes.backdropTop, classes.highlight))}}
               open={this.state.openMenu == MO.simpleRule}
               onClose={this.onCloseDialog.bind(this)}>
-              {this.props.tags.filter((t) => !this.props.scene.generatorWeights.map((wg) => wg.tag ? wg.tag.name : "").includes(t.name)).map((t) =>
+              {validTags != null && validTags.map((t) =>
                 <MenuItem key={t.id} onClick={this.onAddSimpleWG.bind(this, t)}>
                   <ListItemText primary={t.name}/>
                 </MenuItem>
@@ -891,6 +898,15 @@ class SceneDetail extends React.Component {
 
   componentDidMount() {
     window.addEventListener('keydown', this.onKeyDown, false);
+    const usedTypesSet = new Set<string>();
+    for (let ls of this.props.library) {
+      usedTypesSet.add(getSourceType(ls.url));
+    }
+    let usedTypes = Object.values(ST).filter((t) => usedTypesSet.has(t));
+    if (usedTypes.includes(ST.gelbooru1) && usedTypes.includes(ST.gelbooru2)) {
+      usedTypes = usedTypes.filter((t) => t != ST.gelbooru2);
+    }
+    this.setState({usedTypes: usedTypes});
   }
 
   componentWillUnmount() {

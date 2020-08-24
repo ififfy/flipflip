@@ -114,6 +114,7 @@ class SceneGenerator extends React.Component {
     classes: any,
     scene: Scene,
     tags: Array<Tag>,
+    usedTypes: Array<string>,
     tutorial: string,
     onTutorial(tutorial: string): void,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
@@ -133,6 +134,10 @@ class SceneGenerator extends React.Component {
       this.props.scene.generatorWeights[this.state.isEditing].rules[this.state.isWeighing];
     const isEditing: WeightGroup = this.state.isEditing == -1 ? null :
       this.props.scene.generatorWeights[this.state.isEditing];
+    let id = 999;
+    const validTags = this.state.isEditing == -1 || this.props.usedTypes == null ? null :
+                            this.props.tags.concat(this.props.usedTypes.map((k) => new Tag({id: id++, name: en.get(k), typeTag: true})))
+                            .filter((t) => !this.props.scene.generatorWeights[this.state.isEditing].rules.map((wg) => wg.tag ? wg.tag.name : "").includes(t.name))
 
     return(
       <Grid container spacing={1}>
@@ -328,7 +333,7 @@ class SceneGenerator extends React.Component {
                   classes={{paper: classes.tagMenu}}
                   open={this.state.addRule}
                   onClose={this.onCloseAddRule.bind(this)}>
-                  {this.props.tags.filter((t) => !this.props.scene.generatorWeights[this.state.isEditing].rules.map((wg) => wg.tag ? wg.tag.name : "").includes(t.name)).map((t) =>
+                  {validTags != null && validTags.map((t) =>
                     <MenuItem key={t.id} onClick={this.onAddRule.bind(this, t)}>
                       <ListItemText primary={t.name}/>
                     </MenuItem>
