@@ -323,6 +323,7 @@ class ConfigForm extends React.Component {
                     <SceneOptions
                       allScenes={this.props.scenes}
                       scene={this.state.config.defaultScene}
+                      isConfig
                       onUpdateScene={this.onUpdateDefaultScene.bind(this)} />
                   </Box>
                 </div>

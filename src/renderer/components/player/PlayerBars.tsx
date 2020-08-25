@@ -389,6 +389,7 @@ class PlayerBars extends React.Component {
                   <ImageVideoCard
                     sidebar
                     isPlayer
+                    isConfig={false}
                     scene={this.props.scene}
                     onUpdateScene={this.props.onUpdateScene.bind(this)}/>
                 </ExpansionPanelDetails>

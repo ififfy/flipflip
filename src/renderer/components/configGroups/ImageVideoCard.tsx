@@ -53,6 +53,7 @@ class ImageVideoCard extends React.Component {
     scene: Scene | SceneSettings,
     sidebar: boolean,
     tutorial: string,
+    isConfig: boolean,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
     isPlayer?: boolean,
   };
@@ -69,6 +70,7 @@ class ImageVideoCard extends React.Component {
     const skipVideoStart = typeof this.props.scene.skipVideoStart === 'number' ? this.props.scene.skipVideoStart : 0;
     const skipVideoEnd = typeof this.props.scene.skipVideoEnd === 'number' ? this.props.scene.skipVideoEnd : 0;
     const videoVolume = typeof this.props.scene.videoVolume === 'number' ? this.props.scene.videoVolume : 0;
+    const disableWeightOptions = !this.props.isConfig && (this.props.scene.sources.length == 0 || (this.props.scene.sources.length == 1 && !this.props.scene.sources[0].dirOfSources));
     return(
       <Grid container alignItems="center">
         {!this.props.isPlayer && (
@@ -402,7 +404,7 @@ class ImageVideoCard extends React.Component {
                   onChange={this.onInput.bind(this, 'weightFunction')}>
                   {Object.values(WF).map((wf) =>
                     <FormControlLabel
-                      disabled={this.props.scene.sources.length < 1 || (this.props.scene.sources.length == 1 && !this.props.scene.sources[0].dirOfSources)}
+                      disabled={disableWeightOptions}
                       key={wf}
                       value={wf}
                       control={<Radio />}
@@ -420,7 +422,7 @@ class ImageVideoCard extends React.Component {
                 onChange={this.onInput.bind(this, 'sourceOrderFunction')}>
                 {Object.values(SOF).map((wf) =>
                   <FormControlLabel
-                    disabled={this.props.scene.weightFunction == WF.images || this.props.scene.sources.length < 1 || (this.props.scene.sources.length == 1 && !this.props.scene.sources[0].dirOfSources)}
+                    disabled={this.props.scene.weightFunction == WF.images || disableWeightOptions}
                     key={wf}
                     value={wf}
                     control={<Radio />} label={en.get(wf)} />
@@ -431,7 +433,7 @@ class ImageVideoCard extends React.Component {
               <FormControlLabel
                 control={
                   <Switch checked={this.props.scene.forceAllSource}
-                          disabled={this.props.scene.weightFunction == WF.images || this.props.scene.sources.length < 1 || (this.props.scene.sources.length == 1 && !this.props.scene.sources[0].dirOfSources)}
+                          disabled={this.props.scene.weightFunction == WF.images || disableWeightOptions}
                           size="small"
                           onChange={this.onBoolInput.bind(this, 'forceAllSource')}/>
                 }

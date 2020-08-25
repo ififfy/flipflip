@@ -29,6 +29,7 @@ class SceneOptions extends React.Component {
     allScenes: Array<Scene>,
     scene: Scene | SceneSettings,
     tutorial: string,
+    isConfig: boolean,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 
@@ -64,6 +65,7 @@ class SceneOptions extends React.Component {
             <CardContent>
               <ImageVideoCard
                 scene={this.props.scene}
+                isConfig={this.props.isConfig}
                 tutorial={this.props.tutorial}
                 onUpdateScene={this.props.onUpdateScene.bind(this)}/>
             </CardContent>
