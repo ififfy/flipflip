@@ -468,6 +468,12 @@ export default class ImagePlayer extends React.Component {
           video.setAttribute("end", (video.duration - (this.props.scene.skipVideoEnd / 1000)).toString());
         }
 
+        let speed = this.props.scene.videoSpeed;
+        if (this.props.scene.videoRandomSpeed) {
+          speed = Math.floor(Math.random() * (this.props.scene.videoSpeedMax - this.props.scene.videoSpeedMin + 1)) + this.props.scene.videoSpeedMin;
+        }
+        video.setAttribute("speed", speed.toString());
+
         if (this.props.scene.videoOption == VO.full) {
           let duration;
           if (video.hasAttribute("start") && video.hasAttribute("end")) {
@@ -477,7 +483,7 @@ export default class ImagePlayer extends React.Component {
           } else {
             duration = video.duration;
           }
-          video.setAttribute("duration", (duration * 1000).toString());
+          video.setAttribute("duration", (duration * 1000 / (speed / 10)).toString());
         } else if (this.props.scene.videoOption == VO.part) {
           video.setAttribute("duration", this.props.scene.videoTimingConstant.toString());
         } else if (this.props.scene.videoOption == VO.partr) {
