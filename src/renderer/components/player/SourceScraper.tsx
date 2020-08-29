@@ -192,16 +192,24 @@ function loadLocalDirectory(systemMessage: Function, config: Config, source: Lib
 function loadVideo(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
   const url = source.url;
   return new CancelablePromise((resolve) => {
-    let paths = filterPathsToJustPlayable(filter, [url], false).map((p) => p.startsWith("http") ? p : fileURL(p));
-    if (paths.length > 0) {
-      let path = paths[0];
+    const missingVideo = () => {
+      resolve({
+        data: [],
+        helpers: helpers,
+      });
+    }
+    const ifExists = (url: string) => {
+      if (!url.startsWith("http")) {
+        url = fileURL(url);
+      }
       helpers.count = 1;
 
+      let paths;
       if (source.clips && source.clips.length > 0) {
         const clipPaths = Array<string>();
         for (let clip of source.clips) {
           if (!source.disabledClips || !source.disabledClips.includes(clip.id)) {
-            let clipPath = path + ":::" + clip.id + ":" + (clip.volume != null ? clip.volume : "-") + ":::" + clip.start + ":" + clip.end;
+            let clipPath = url + ":::" + clip.id + ":" + (clip.volume != null ? clip.volume : "-") + ":::" + clip.start + ":" + clip.end;
             if (source.subtitleFile != null && source.subtitleFile.length > 0) {
               clipPath = clipPath + "|||" + source.subtitleFile;
             }
@@ -211,15 +219,36 @@ function loadVideo(systemMessage: Function, config: Config, source: LibrarySourc
         paths = clipPaths;
       } else {
         if (source.subtitleFile != null && source.subtitleFile.length > 0) {
-          path = path + "|||" + source.subtitleFile;
+          url = url + "|||" + source.subtitleFile;
         }
-        paths = [path];
+        paths = [url];
+      }
+      resolve({
+        data: paths,
+        helpers: helpers,
+      });
+    }
+
+    if (!isVideo(url, false)) {
+      missingVideo();
+    }
+    if (url.startsWith("http")) {
+      wretch(url)
+        .get()
+        .notFound((e) => {
+          missingVideo();
+        })
+        .res((r) => {
+          ifExists(url);
+        })
+    } else {
+      const exists = fs.existsSync(url);
+      if (exists) {
+        ifExists(url);
+      } else {
+        missingVideo();
       }
     }
-    resolve({
-      data: paths,
-      helpers: helpers,
-    });
   });
 }
 
