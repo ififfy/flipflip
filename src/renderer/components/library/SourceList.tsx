@@ -572,7 +572,7 @@ class SourceList extends React.Component {
   }
 
   onOpenSubtitleFile() {
-    let result = remote.dialog.showOpenDialogSync(remote.getCurrentWindow(), {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'Web Video Text Tracks (WebVTT)', extensions: ['vtt']}], properties: ['openFile']});
+    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'Web Video Text Tracks (WebVTT)', extensions: ['vtt']}], properties: ['openFile']});
     if (!result || !result.length) return;
     this.changeKey('subtitleFile', result[0]);
   }

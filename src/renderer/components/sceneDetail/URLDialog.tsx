@@ -98,7 +98,7 @@ class URLDialog extends React.Component {
   }
 
   onRootChange() {
-    let result = remote.dialog.showOpenDialogSync(remote.getCurrentWindow(), {properties: ['openDirectory']});
+    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']});
     if (!result || !result.length) return;
     this.setState({rootDir: result[0]});
   }

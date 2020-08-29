@@ -1652,7 +1652,7 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
       }
 
     case AF.directory:
-      let dResult = remote.dialog.showOpenDialogSync(remote.getCurrentWindow(), {properties: ['openDirectory', 'multiSelections']});
+      let dResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory', 'multiSelections']});
       if (!dResult) return;
       if (scene != null) {
         return updateScene(state, scene, (s) => {
@@ -1664,7 +1664,7 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
       }
 
     case AF.videos:
-      let vResult = remote.dialog.showOpenDialogSync(remote.getCurrentWindow(),
+      let vResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
         {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'Video files', extensions: ['mp4', 'mkv', 'webm', 'ogv', 'mov']}, {name: 'Playlist files', extensions: ['asx', 'm3u8', 'pls', 'xspf']}], properties: ['openFile', 'multiSelections']});
       if (!vResult) return;
       vResult = vResult.filter((r) => isVideo(r, true) || isVideoPlaylist(r, true));
@@ -1930,16 +1930,17 @@ export function exportScene(state: State, scene: Scene): Object {
 
   const sceneExport = JSON.stringify(scenesToExport);
   const fileName = sceneCopy.name + "_export.json";
-  const filePath = remote.dialog.showSaveDialogSync(remote.getCurrentWindow(),
-    {filters: [{name: 'JSON Document', extensions: ['json']}], defaultPath: fileName});
-  if (filePath != null) {
-    fs.writeFileSync(filePath, sceneExport);
-  }
+  remote.dialog.showSaveDialog(remote.getCurrentWindow(),
+    {filters: [{name: 'JSON Document', extensions: ['json']}], defaultPath: fileName}, (filePath) => {
+      if (filePath != null) {
+        fs.writeFileSync(filePath, sceneExport);
+      }
+  });
   return {};
 }
 
 export function importScene(state: State, addToLibrary: boolean): Object {
-  const filePath = remote.dialog.showOpenDialogSync(remote.getCurrentWindow(),
+  const filePath = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
     {filters: [{name:'All Files (*.*)', extensions: ['*']},{name: 'JSON Document', extensions: ['json']}], properties: ['openFile']});
   if (!filePath || !filePath.length) return;
   const importScenes = JSON.parse(fs.readFileSync(filePath[0], 'utf-8'));
@@ -2015,16 +2016,17 @@ export function importScene(state: State, addToLibrary: boolean): Object {
 export function exportLibrary(state: State): Object {
   const libraryExport = JSON.stringify(state.library);
   const fileName = "library_export-" + new Date().getTime() + ".json";
-  const filePath = remote.dialog.showSaveDialogSync(remote.getCurrentWindow(),
-    {filters: [{name: 'JSON Document', extensions: ['json']}], defaultPath: fileName});
-  if (filePath != null) {
-    fs.writeFileSync(filePath, libraryExport);
-  }
+  remote.dialog.showSaveDialog(remote.getCurrentWindow(),
+    {filters: [{name: 'JSON Document', extensions: ['json']}], defaultPath: fileName}, (filePath) => {
+      if (filePath != null) {
+        fs.writeFileSync(filePath, libraryExport);
+      }
+    });
   return {};
 }
 
 export function importLibrary(state: State, backup: Function): Object {
-  const filePath = remote.dialog.showOpenDialogSync(remote.getCurrentWindow(),
+  const filePath = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
     {filters: [{name:'All Files (*.*)', extensions: ['*']},{name: 'JSON Document', extensions: ['json']}], properties: ['openFile']});
   if (!filePath || !filePath.length) return;
   backup();

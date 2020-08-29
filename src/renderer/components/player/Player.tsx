@@ -441,7 +441,7 @@ export default class Player extends React.Component {
     // Clear ALL the available browser caches
     global.gc();
     webFrame.clearCache();
-    remote.getCurrentWindow().webContents.session.clearCache().then(() => {});
+    remote.getCurrentWindow().webContents.session.clearCache(() => {});
     if (this.props.preventSleep || this._powerSaveID != null) {
       remote.powerSaveBlocker.stop(this._powerSaveID);
       this._powerSaveID = null;

@@ -608,7 +608,7 @@ class AudioControl extends React.Component {
   }
 
   onOpenFile() {
-    let result = remote.dialog.showOpenDialogSync(remote.getCurrentWindow(), {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'MP3 Audio', extensions: ['mp3']}, {name: 'MPEG-4 Audio', extensions: ['mp4']}], properties: ['openFile']});
+    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'MP3 Audio', extensions: ['mp3']}, {name: 'MPEG-4 Audio', extensions: ['mp4']}], properties: ['openFile']});
     if (!result || !result.length) return;
     this.changeKey('url', fileURL(result[0]));
   }
