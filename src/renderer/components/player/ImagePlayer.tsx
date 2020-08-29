@@ -307,15 +307,6 @@ export default class ImagePlayer extends React.Component {
             source = keys[this._nextIndex];
           }
         } else {
-          if (this.props.scene.forceAllSource) {
-            // Filter the available urls to those not played yet
-            keys = keys.filter((s) => !this._loadedSources.includes(s));
-            // If there are no remaining urls for this source
-            if (!(keys && keys.length)) {
-              this._loadedSources = new Array<string>();
-              keys = Array.from(this.props.allURLs.keys());
-            }
-          }
           source = getRandomListItem(keys);
           this._loadedSources.push(source);
         }
