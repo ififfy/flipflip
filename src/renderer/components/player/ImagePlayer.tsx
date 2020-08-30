@@ -512,17 +512,6 @@ export default class ImagePlayer extends React.Component {
         this.queueRunFetchLoop(i);
       };
 
-      if (this.props.scene.continueVideo) {
-        const videoFind = this.state.historyPaths.find((i) => i.src == url &&
-          i.getAttribute("start") == video.getAttribute("start") &&
-          i.getAttribute("end") == video.getAttribute("end"));
-        if (videoFind) {
-          video = (videoFind as HTMLVideoElement);
-          successCallback();
-          return;
-        }
-      }
-
       video.onloadeddata = () => {
         // images may load immediately, but that messes up the setState()
         // lifecycle, so always load on the next event loop iteration.
@@ -712,6 +701,14 @@ export default class ImagePlayer extends React.Component {
     }
 
     if (nextImg) {
+      if (this.props.scene.continueVideo && nextImg instanceof HTMLVideoElement) {
+        const videoFind = Array.from(this.state.historyPaths).reverse().find((i) => i.src == nextImg.src &&
+          i.getAttribute("start") == nextImg.getAttribute("start") &&
+          i.getAttribute("end") == nextImg.getAttribute("end"));
+        if (videoFind) {
+          nextImg = videoFind;
+        }
+      }
       nextHistoryPaths = nextHistoryPaths.concat([nextImg]);
     }
 
