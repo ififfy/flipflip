@@ -225,8 +225,10 @@ class SourceList extends React.Component {
               </DialogContentText>
               <FormControlLabel
                 control={
-                  <Switch checked={this.state.sourceOptions.dirOfSources}
-                          onChange={this.onSourceBoolInput.bind(this, 'dirOfSources')}/>
+                  <Tooltip title={"Enable this to treat directories directly inside this one as their own individual sources"}>
+                    <Switch checked={this.state.sourceOptions.dirOfSources}
+                            onChange={this.onSourceBoolInput.bind(this, 'dirOfSources')}/>
+                  </Tooltip>
                 }
                 label="Treat Inner Directories as Sources"/>
             </DialogContent>

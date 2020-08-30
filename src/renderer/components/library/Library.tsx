@@ -453,32 +453,39 @@ class Library extends React.Component {
           <Divider />
 
           <div className={clsx(this.props.tutorial != null && classes.disable)}>
-            <ListItem button onClick={this.props.onManageTags.bind(this)}>
-              <ListItemIcon>
-                <LocalOfferIcon />
-              </ListItemIcon>
-              <ListItemText primary="Manage Tags" />
-              {this.props.tags.length > 0 && (
-                <Chip
-                  className={clsx(classes.chip, !open && classes.chipClose)}
-                  label={this.props.tags.length}
-                  color='primary'
-                  size='small'
-                  variant='outlined'/>
-              )}
-            </ListItem>
-            <ListItem button onClick={this.onBatchTag.bind(this)}>
-              <ListItemIcon>
-                <FormatListBulletedIcon />
-              </ListItemIcon>
-              <ListItemText primary="Batch Tag" />
-            </ListItem>
-            <ListItem button onClick={this.onFindMerges.bind(this)}>
-              <ListItemIcon>
-                <MergeTypeIcon />
-              </ListItemIcon>
-              <ListItemText primary="Find Mergeables" />
-            </ListItem>
+
+            <Tooltip title={this.state.drawerOpen ? "" : "Manage Tags"}>
+              <ListItem button onClick={this.props.onManageTags.bind(this)}>
+                <ListItemIcon>
+                  <LocalOfferIcon />
+                </ListItemIcon>
+                <ListItemText primary="Manage Tags" />
+                {this.props.tags.length > 0 && (
+                  <Chip
+                    className={clsx(classes.chip, !open && classes.chipClose)}
+                    label={this.props.tags.length}
+                    color='primary'
+                    size='small'
+                    variant='outlined'/>
+                )}
+              </ListItem>
+            </Tooltip>
+            <Tooltip title={this.state.drawerOpen ? "" : "Batch Tag"}>
+              <ListItem button onClick={this.onBatchTag.bind(this)}>
+                <ListItemIcon>
+                  <FormatListBulletedIcon />
+                </ListItemIcon>
+                <ListItemText primary="Batch Tag" />
+              </ListItem>
+            </Tooltip>
+            <Tooltip title={"Identify local sources which have identical tags"}>
+              <ListItem button onClick={this.onFindMerges.bind(this)}>
+                <ListItemIcon>
+                  <MergeTypeIcon />
+                </ListItemIcon>
+                <ListItemText primary="Find Mergeables" />
+              </ListItem>
+            </Tooltip>
           </div>
 
           {remoteAuthorized && (
@@ -492,36 +499,44 @@ class Library extends React.Component {
                   </ListSubheader>
                 </Collapse>
                 {tumblrAuthorized && (
-                  <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onImportTumblr.bind(this)}>
-                    <ListItemIcon>
-                      <SourceIcon type={ST.tumblr}/>
-                    </ListItemIcon>
-                    <ListItemText primary="Tumblr" />
-                  </ListItem>
+                  <Tooltip title={this.state.drawerOpen ? "" : "Import from Tumblr"}>
+                    <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onImportTumblr.bind(this)}>
+                      <ListItemIcon>
+                        <SourceIcon type={ST.tumblr}/>
+                      </ListItemIcon>
+                      <ListItemText primary="Tumblr" />
+                    </ListItem>
+                  </Tooltip>
                 )}
                 {redditAuthorized && (
-                  <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onImportReddit.bind(this)}>
-                    <ListItemIcon>
-                      <SourceIcon type={ST.reddit}/>
-                    </ListItemIcon>
-                    <ListItemText primary="Reddit" />
-                  </ListItem>
+                  <Tooltip title={this.state.drawerOpen ? "" : "Import from Reddit"}>
+                    <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onImportReddit.bind(this)}>
+                      <ListItemIcon>
+                        <SourceIcon type={ST.reddit}/>
+                      </ListItemIcon>
+                      <ListItemText primary="Reddit" />
+                    </ListItem>
+                  </Tooltip>
                 )}
                 {twitterAuthorized && (
-                  <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onImportTwitter.bind(this)}>
-                    <ListItemIcon>
-                      <SourceIcon type={ST.twitter}/>
-                    </ListItemIcon>
-                    <ListItemText primary="Twitter" />
-                  </ListItem>
+                  <Tooltip title={this.state.drawerOpen ? "" : "Import from Twitter"}>
+                    <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onImportTwitter.bind(this)}>
+                      <ListItemIcon>
+                        <SourceIcon type={ST.twitter}/>
+                      </ListItemIcon>
+                      <ListItemText primary="Twitter" />
+                    </ListItem>
+                  </Tooltip>
                 )}
                 {instagramAuthorized && (
-                  <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onImportInstagram.bind(this)}>
-                    <ListItemIcon>
-                      <SourceIcon type={ST.instagram}/>
-                    </ListItemIcon>
-                    <ListItemText primary="Instagram" />
-                  </ListItem>
+                  <Tooltip title={this.state.drawerOpen ? "" : "Import from Instagram"}>
+                    <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onImportInstagram.bind(this)}>
+                      <ListItemIcon>
+                        <SourceIcon type={ST.instagram}/>
+                      </ListItemIcon>
+                      <ListItemText primary="Instagram" />
+                    </ListItem>
+                  </Tooltip>
                 )}
               </div>
             </React.Fragment>
@@ -530,12 +545,14 @@ class Library extends React.Component {
           <Divider />
 
           <div className={clsx(this.props.tutorial != null && classes.disable)}>
-            <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onMarkOffline.bind(this)}>
-              <ListItemIcon>
-                <OfflineBoltIcon />
-              </ListItemIcon>
-              <ListItemText primary="Mark Offline" />
-            </ListItem>
+            <Tooltip title={"Identify sources which are not accessible"}>
+              <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onMarkOffline.bind(this)}>
+                <ListItemIcon>
+                  <OfflineBoltIcon />
+                </ListItemIcon>
+                <ListItemText primary="Mark Offline" />
+              </ListItem>
+            </Tooltip>
           </div>
 
           {this.props.progressMode != null && (
@@ -543,12 +560,14 @@ class Library extends React.Component {
               <Divider />
 
               <div>
-                <ListItem button onClick={this.props.onUpdateMode.bind(this, PR.cancel)}>
-                  <ListItemIcon>
-                    <CancelIcon color="error"/>
-                  </ListItemIcon>
-                  <ListItemText primary={cancelProgressMessage} />
-                </ListItem>
+                <Tooltip title={this.state.drawerOpen ? "" : cancelProgressMessage}>
+                  <ListItem button onClick={this.props.onUpdateMode.bind(this, PR.cancel)}>
+                    <ListItemIcon>
+                      <CancelIcon color="error"/>
+                    </ListItemIcon>
+                    <ListItemText primary={cancelProgressMessage} />
+                  </ListItem>
+                </Tooltip>
                 {(this.props.progressMode === PR.offline || this.props.progressMode === PR.tumblr) && (
                   <LinearProgress variant="determinate" value={Math.round((this.props.progressCurrent / this.props.progressTotal) * 100)}/>
                 )}
@@ -562,18 +581,22 @@ class Library extends React.Component {
           <div className={classes.fill}/>
 
           <div className={clsx(this.props.tutorial != null && classes.disable)}>
-            <ListItem button onClick={this.props.onExportLibrary.bind(this)}>
-              <ListItemIcon>
-                <PublishIcon />
-              </ListItemIcon>
-              <ListItemText primary="Export Library" />
-            </ListItem>
-            <ListItem button onClick={this.props.onImportLibrary.bind(this)}>
-              <ListItemIcon>
-                <GetAppIcon />
-              </ListItemIcon>
-              <ListItemText primary="Import Library" />
-            </ListItem>
+            <Tooltip title={this.state.drawerOpen ? "" : "Export Library"}>
+              <ListItem button onClick={this.props.onExportLibrary.bind(this)}>
+                <ListItemIcon>
+                  <PublishIcon />
+                </ListItemIcon>
+                <ListItemText primary="Export Library" />
+              </ListItem>
+            </Tooltip>
+            <Tooltip title={this.state.drawerOpen ? "" : "Import Library"}>
+              <ListItem button onClick={this.props.onImportLibrary.bind(this)}>
+                <ListItemIcon>
+                  <GetAppIcon />
+                </ListItemIcon>
+                <ListItemText primary="Import Library" />
+              </ListItem>
+            </Tooltip>
           </div>
         </Drawer>
 

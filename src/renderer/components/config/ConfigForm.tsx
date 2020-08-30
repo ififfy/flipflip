@@ -258,30 +258,34 @@ class ConfigForm extends React.Component {
           <div className={classes.fill}/>
 
           <div>
-            <ListItem
-              disabled={
-                this.props.config.tutorials.scenePicker == null &&
-                this.props.config.tutorials.sceneDetail == null &&
-                this.props.config.tutorials.player == null &&
-                this.props.config.tutorials.library == null &&
-                this.props.config.tutorials.sceneGenerator == null &&
-                this.props.config.tutorials.sceneGrid == null &&
-                this.props.config.tutorials.videoClipper == null
-              }
-              button onClick={this.props.onResetTutorials.bind(this)}
-              className={classes.deleteItem}>
-              <ListItemIcon>
-                <LiveHelpIcon color="error"/>
-              </ListItemIcon>
-              <ListItemText primary="Reset Tutorials" />
-            </ListItem>
-            <ListItem button onClick={this.onRestoreDefaults.bind(this)}
-                      className={classes.deleteItem}>
-              <ListItemIcon>
-                <RestoreIcon color="error"/>
-              </ListItemIcon>
-              <ListItemText primary="Restore Defaults" />
-            </ListItem>
+            <Tooltip title={this.state.drawerOpen ? "" : "Reset Tutorials"}>
+              <ListItem
+                disabled={
+                  this.props.config.tutorials.scenePicker == null &&
+                  this.props.config.tutorials.sceneDetail == null &&
+                  this.props.config.tutorials.player == null &&
+                  this.props.config.tutorials.library == null &&
+                  this.props.config.tutorials.sceneGenerator == null &&
+                  this.props.config.tutorials.sceneGrid == null &&
+                  this.props.config.tutorials.videoClipper == null
+                }
+                button onClick={this.props.onResetTutorials.bind(this)}
+                className={classes.deleteItem}>
+                <ListItemIcon>
+                  <LiveHelpIcon color="error"/>
+                </ListItemIcon>
+                <ListItemText primary="Reset Tutorials" />
+              </ListItem>
+            </Tooltip>
+            <Tooltip title={this.state.drawerOpen ? "" : "Restore Defaults"}>
+              <ListItem button onClick={this.onRestoreDefaults.bind(this)}
+                        className={classes.deleteItem}>
+                <ListItemIcon>
+                  <RestoreIcon color="error"/>
+                </ListItemIcon>
+                <ListItemText primary="Restore Defaults" />
+              </ListItem>
+            </Tooltip>
             <Dialog
               open={this.state.openMenu == MO.deleteAlert}
               onClose={this.onCloseDialog.bind(this)}

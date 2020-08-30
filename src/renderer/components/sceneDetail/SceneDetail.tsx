@@ -466,25 +466,31 @@ class SceneDetail extends React.Component {
                 <ListItemText primary="Save as Scene" />
               </ListItem>
             )}
-            <ListItem button onClick={this.props.onCloneScene.bind(this, this.props.scene)} className={clsx((this.props.tutorial == SDT.options1 || this.props.tutorial == SDT.effects1) && classes.disable)}>
-              <ListItemIcon>
-                <FileCopyIcon />
-              </ListItemIcon>
-              <ListItemText primary={`Clone ${this.props.scene.generatorWeights ? 'Generator' : 'Scene'}`} />
-            </ListItem>
-            <ListItem button onClick={this.props.onExport.bind(this, this.props.scene)} className={clsx((this.props.tutorial == SDT.options1 || this.props.tutorial == SDT.effects1) && classes.disable)}>
-              <ListItemIcon>
-                <PublishIcon />
-              </ListItemIcon>
-              <ListItemText primary="Export Scene" />
-            </ListItem>
-            <ListItem button onClick={this.onDeleteScene.bind(this, this.props.scene)}
-                      className={clsx(classes.deleteItem, (this.props.tutorial == SDT.options1 || this.props.tutorial == SDT.effects1) && classes.disable)}>
-              <ListItemIcon>
-                <DeleteForeverIcon color="error"/>
-              </ListItemIcon>
-              <ListItemText primary="Delete Scene" />
-            </ListItem>
+            <Tooltip title={this.state.drawerOpen ? "" : `Clone ${this.props.scene.generatorWeights ? 'Generator' : 'Scene'}`}>
+              <ListItem button onClick={this.props.onCloneScene.bind(this, this.props.scene)} className={clsx((this.props.tutorial == SDT.options1 || this.props.tutorial == SDT.effects1) && classes.disable)}>
+                <ListItemIcon>
+                  <FileCopyIcon />
+                </ListItemIcon>
+                <ListItemText primary={`Clone ${this.props.scene.generatorWeights ? 'Generator' : 'Scene'}`} />
+              </ListItem>
+            </Tooltip>
+            <Tooltip title={this.state.drawerOpen ? "" : "Export Scene"}>
+              <ListItem button onClick={this.props.onExport.bind(this, this.props.scene)} className={clsx((this.props.tutorial == SDT.options1 || this.props.tutorial == SDT.effects1) && classes.disable)}>
+                <ListItemIcon>
+                  <PublishIcon />
+                </ListItemIcon>
+                <ListItemText primary="Export Scene" />
+              </ListItem>
+            </Tooltip>
+            <Tooltip title={this.state.drawerOpen ? "" : "Delete Scene"}>
+              <ListItem button onClick={this.onDeleteScene.bind(this, this.props.scene)}
+                        className={clsx(classes.deleteItem, (this.props.tutorial == SDT.options1 || this.props.tutorial == SDT.effects1) && classes.disable)}>
+                <ListItemIcon>
+                  <DeleteForeverIcon color="error"/>
+                </ListItemIcon>
+                <ListItemText primary="Delete Scene" />
+              </ListItem>
+            </Tooltip>
             <Dialog
               open={this.state.openMenu == MO.deleteAlert}
               onClose={this.onCloseDialog.bind(this)}

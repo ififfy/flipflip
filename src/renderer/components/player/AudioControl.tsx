@@ -263,10 +263,12 @@ class AudioControl extends React.Component {
                     <Collapse in={!audio.stopAtEnd && !audio.nextSceneAtEnd}>
                       <FormControlLabel
                         control={
-                          <Switch
-                            size="small"
-                            checked={audio.tick}
-                            onChange={this.onAudioBoolInput.bind(this, 'tick')}/>
+                          <Tooltip title={"Repeat track at particular interval"}>
+                            <Switch
+                              size="small"
+                              checked={audio.tick}
+                              onChange={this.onAudioBoolInput.bind(this, 'tick')}/>
+                          </Tooltip>
                         }
                         label="Tick"/>
                     </Collapse>

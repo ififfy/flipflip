@@ -3,7 +3,7 @@ import clsx from "clsx";
 
 import {
   Collapse, createStyles, Divider, FormControl, FormControlLabel, FormLabel, Grid, InputAdornment,
-  InputLabel, MenuItem, Radio, RadioGroup, Select, Slider, Switch, TextField, Theme, Typography, withStyles
+  InputLabel, MenuItem, Radio, RadioGroup, Select, Slider, Switch, TextField, Theme, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
 
@@ -91,8 +91,10 @@ class ImageVideoCard extends React.Component {
               <Collapse in={this.props.scene.weightFunction == WF.sources}>
                 <FormControlLabel
                   control={
-                    <Switch checked={this.props.scene.fullSource}
-                            onChange={this.onBoolInput.bind(this, 'fullSource')}/>
+                    <Tooltip title={"Play all images in a source before proceeding to the next one"}>
+                      <Switch checked={this.props.scene.fullSource}
+                              onChange={this.onBoolInput.bind(this, 'fullSource')}/>
+                    </Tooltip>
                   }
                   label="Play Full Sources"/>
               </Collapse>
@@ -304,9 +306,11 @@ class ImageVideoCard extends React.Component {
             <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.images}>
               <FormControlLabel
                 control={
-                  <Switch checked={this.props.scene.continueVideo}
-                          size="small"
-                          onChange={this.onBoolInput.bind(this, 'continueVideo')}/>
+                  <Tooltip title={"Each time a video is played, continue from where it left off. Default: Start from beginning"}>
+                    <Switch checked={this.props.scene.continueVideo}
+                            size="small"
+                            onChange={this.onBoolInput.bind(this, 'continueVideo')}/>
+                  </Tooltip>
                 }
                 label="Continue Videos"/>
             </Collapse>
@@ -315,9 +319,11 @@ class ImageVideoCard extends React.Component {
             <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.images}>
               <FormControlLabel
                 control={
-                  <Switch checked={this.props.scene.rotatePortrait}
-                          size="small"
-                          onChange={this.onBoolInput.bind(this, 'rotatePortrait')}/>
+                  <Tooltip title={"Play portrait videos in landscape mode"}>
+                    <Switch checked={this.props.scene.rotatePortrait}
+                            size="small"
+                            onChange={this.onBoolInput.bind(this, 'rotatePortrait')}/>
+                  </Tooltip>
                 }
                 label="Rotate Portrait Videos"/>
             </Collapse>

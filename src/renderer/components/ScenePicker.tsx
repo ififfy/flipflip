@@ -452,20 +452,22 @@ class ScenePicker extends React.Component {
               <Divider />
 
               <div>
-                <ListItem button onClick={this.props.onOpenLibrary.bind(this)}>
-                  <ListItemIcon>
-                    <LocalLibraryIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Library" />
-                  {this.props.libraryCount > 0 && (
-                    <Chip
-                      className={clsx(classes.chip, !open && classes.chipClose)}
-                      label={this.props.libraryCount}
-                      color='primary'
-                      size='small'
-                      variant='outlined'/>
-                  )}
-                </ListItem>
+                <Tooltip title={this.state.drawerOpen ? "" : "Library"}>
+                  <ListItem button onClick={this.props.onOpenLibrary.bind(this)}>
+                    <ListItemIcon>
+                      <LocalLibraryIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Library" />
+                    {this.props.libraryCount > 0 && (
+                      <Chip
+                        className={clsx(classes.chip, !open && classes.chipClose)}
+                        label={this.props.libraryCount}
+                        color='primary'
+                        size='small'
+                        variant='outlined'/>
+                    )}
+                  </ListItem>
+                </Tooltip>
               </div>
 
               <Divider />
@@ -473,12 +475,14 @@ class ScenePicker extends React.Component {
               <div>
                 {this.props.scenes.length > 0 && (
                   <React.Fragment>
-                    <ListItem button onClick={this.onNewWindow.bind(this)}>
-                      <ListItemIcon>
-                        <OpenInNewIcon />
-                      </ListItemIcon>
-                      <ListItemText primary="New Window" />
-                    </ListItem>
+                    <Tooltip title={this.state.drawerOpen ? "" : "New Window"}>
+                      <ListItem button onClick={this.onNewWindow.bind(this)}>
+                        <ListItemIcon>
+                          <OpenInNewIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="New Window" />
+                      </ListItem>
+                    </Tooltip>
 
                     <Dialog
                       open={this.state.openMenu == MO.newWindowAlert}
@@ -502,18 +506,22 @@ class ScenePicker extends React.Component {
                     </Dialog>
                   </React.Fragment>
                 )}
-                <ListItem button onClick={this.props.onOpenConfig.bind(this)}>
-                  <ListItemIcon>
-                    <SettingsIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Settings" />
-                </ListItem>
-                <ListItem button onClick={this.openLink.bind(this,"https://ififfy.github.io/flipflip/#/")}>
-                  <ListItemIcon>
-                    <HelpIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="User Manual" />
-                </ListItem>
+                <Tooltip title={this.state.drawerOpen ? "" : "Settings"}>
+                  <ListItem button onClick={this.props.onOpenConfig.bind(this)}>
+                    <ListItemIcon>
+                      <SettingsIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Settings" />
+                  </ListItem>
+                </Tooltip>
+                <Tooltip title={this.state.drawerOpen ? "" : "User Manual"}>
+                  <ListItem button onClick={this.openLink.bind(this,"https://ififfy.github.io/flipflip/#/")}>
+                    <ListItemIcon>
+                      <HelpIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="User Manual" />
+                  </ListItem>
+                </Tooltip>
               </div>
             </React.Fragment>
           )}
