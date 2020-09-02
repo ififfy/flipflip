@@ -7,6 +7,7 @@ import {BT, HTF, IT, SL, TF, VTF} from "../../data/const";
 import Scene from "../../data/Scene";
 import Strobe from "./Strobe";
 import wretch from "wretch";
+import FadeInOut from "./FadeInOut";
 
 export default class ImageView extends React.Component {
   readonly props: {
@@ -352,7 +353,7 @@ export default class ImageView extends React.Component {
       (props.image.src !== this.props.image.src ||
       props.image.getAttribute("start") !== this.props.image.getAttribute("start") ||
       props.image.getAttribute("end") !== this.props.image.getAttribute("end"))) ||
-      (props.scene.strobe && props.toggleStrobe !== this.props.toggleStrobe) ||
+      ((props.scene.strobe || props.scene.fadeInOut) && props.toggleStrobe !== this.props.toggleStrobe) ||
       props.scene !== this.props.scene ||
       props.hasStarted !== this.props.hasStarted;
   }
@@ -424,15 +425,34 @@ export default class ImageView extends React.Component {
           left: 0,
           overflow: 'hidden',
         }}>
-        <this.FadeLayer>
-          <this.ZoomMoveLayer>
-            {(this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.image) && (
-              <Strobe
-                zIndex={2}
-                toggleStrobe={this.props.toggleStrobe}
-                timeToNextFrame={this.props.timeToNextFrame}
-                scene={this.props.scene}
-                strobeFunction={this.strobeImage.bind(this)}>
+        <FadeInOut
+          toggleFade={this.props.toggleStrobe}
+          timeToNextFrame={this.props.timeToNextFrame}
+          scene={this.props.scene}
+          fadeFunction={this.strobeImage.bind(this)}>
+          <this.FadeLayer>
+            <this.ZoomMoveLayer>
+              {(this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.image) && (
+                <Strobe
+                  zIndex={2}
+                  toggleStrobe={this.props.toggleStrobe}
+                  timeToNextFrame={this.props.timeToNextFrame}
+                  scene={this.props.scene}
+                  strobeFunction={this.strobeImage.bind(this)}>
+                  <animated.div
+                    ref={this.contentRef}
+                    style={{
+                      height: '100%',
+                      width: '100%',
+                      zIndex: 2,
+                      backgroundPosition: 'center',
+                      backgroundSize: 'contain',
+                      backgroundRepeat: 'no-repeat',
+                      position: 'absolute',
+                    }}/>
+                </Strobe>
+              )}
+              {(!this.props.scene || !this.props.scene.strobe || this.props.scene.strobeLayer != SL.image) && (
                 <animated.div
                   ref={this.contentRef}
                   style={{
@@ -444,39 +464,26 @@ export default class ImageView extends React.Component {
                     backgroundRepeat: 'no-repeat',
                     position: 'absolute',
                   }}/>
-              </Strobe>
+              )}
+            </this.ZoomMoveLayer>
+            {this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.background && (
+              <Strobe
+                zIndex={1}
+                toggleStrobe={this.props.toggleStrobe}
+                timeToNextFrame={this.props.timeToNextFrame}
+                scene={this.props.scene}/>
             )}
-            {(!this.props.scene || !this.props.scene.strobe || this.props.scene.strobeLayer != SL.image) && (
-              <animated.div
-                ref={this.contentRef}
-                style={{
-                  height: '100%',
-                  width: '100%',
-                  zIndex: 2,
-                  backgroundPosition: 'center',
-                  backgroundSize: 'contain',
-                  backgroundRepeat: 'no-repeat',
-                  position: 'absolute',
-                }}/>
-            )}
-          </this.ZoomMoveLayer>
-          {this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.background && (
-            <Strobe
-              zIndex={1}
-              toggleStrobe={this.props.toggleStrobe}
-              timeToNextFrame={this.props.timeToNextFrame}
-              scene={this.props.scene}/>
-          )}
-          <animated.div
-            ref={this.backgroundRef}
-            style={{
-              height: '100%',
-              width: '100%',
-              zIndex: 1,
-              backgroundSize: 'cover',
-              ...backgroundStyle
-            }}/>
-        </this.FadeLayer>
+            <animated.div
+              ref={this.backgroundRef}
+              style={{
+                height: '100%',
+                width: '100%',
+                zIndex: 1,
+                backgroundSize: 'cover',
+                ...backgroundStyle
+              }}/>
+          </this.FadeLayer>
+        </FadeInOut>
       </animated.div>
     );
   }

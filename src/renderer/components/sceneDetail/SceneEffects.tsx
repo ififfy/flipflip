@@ -9,6 +9,7 @@ import Scene from "../../data/Scene";
 import CrossFadeCard from "../configGroups/CrossFadeCard";
 import StrobeCard from "../configGroups/StrobeCard";
 import ZoomMoveCard from "../configGroups/ZoomMoveCard";
+import FadeIOCard from "../configGroups/FadeIOCard";
 
 const styles = (theme: Theme) => createStyles({
   backdropTop: {
@@ -57,6 +58,17 @@ class SceneEffects extends React.Component {
           <Card>
             <CardContent>
               <CrossFadeCard
+                scene={this.props.scene}
+                tutorial={this.props.tutorial}
+                onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} md={6} lg={4}>
+          <Card>
+            <CardContent>
+              <FadeIOCard
                 scene={this.props.scene}
                 tutorial={this.props.tutorial}
                 onUpdateScene={this.props.onUpdateScene.bind(this)}/>

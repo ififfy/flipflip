@@ -53,6 +53,20 @@ interface SceneSettingsI {
   fadeDurationMax: number;
   fadeSinRate: number;
   fadeBPMMulti: number;
+  fadeInOut: boolean;
+  fadeIOPulse: boolean;
+  fadeIOTF: string;
+  fadeIODuration: number;
+  fadeIODurationMin: number;
+  fadeIODurationMax: number;
+  fadeIOSinRate: number;
+  fadeIOBPMMulti: number;
+  fadeIODelayTF: string;
+  fadeIODelay: number;
+  fadeIODelayMin: number;
+  fadeIODelayMax: number;
+  fadeIODelaySinRate: number;
+  fadeIODelayBPMMulti: number;
 
   imageType: string;
   backgroundType: string;
@@ -253,6 +267,20 @@ export class SceneSettings implements SceneSettingsI {
   fadeDurationMax = 700;
   fadeSinRate = 100;
   fadeBPMMulti = 1;
+  fadeInOut = false;
+  fadeIOPulse = false;
+  fadeIOTF = TF.constant;
+  fadeIODuration = 2000;
+  fadeIODurationMin = 2000;
+  fadeIODurationMax = 5000;
+  fadeIOSinRate = 100;
+  fadeIOBPMMulti = 1;
+  fadeIODelayTF = TF.constant;
+  fadeIODelay = 2000;
+  fadeIODelayMin = 2000;
+  fadeIODelayMax = 5000;
+  fadeIODelaySinRate = 100;
+  fadeIODelayBPMMulti = 1;
 
   imageType = IT.fitBestNoClip;
   backgroundType = BT.blur;
