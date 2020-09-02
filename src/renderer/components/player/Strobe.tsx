@@ -66,7 +66,7 @@ export default class Strobe extends React.Component {
         reset: true,
         unique: true,
         config: {
-          duration: this.props.scene.strobeTime,
+          duration: this.state.duration,
         },
       }
     );

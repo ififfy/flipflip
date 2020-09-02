@@ -190,7 +190,7 @@ export default class ImageView extends React.Component {
       } else {
         img.volume = 0;
       }
-      img.playbackRate = parseInt(img.getAttribute("speed")) / 10;
+      img.playbackRate = img.hasAttribute("speed") ? parseInt(img.getAttribute("speed")) / 10 : 1;
       if (!blur) {
         img.onplay = () => videoLoop(img);
       }
