@@ -574,6 +574,7 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
   if (librarySource == null) {
     throw new Error("Source not found in Library");
   }
+  librarySource.disabledClips =  [];
   let id = state.scenes.length + 1;
   state.scenes.forEach((s: Scene) => {
     id = Math.max(s.id + 1, id);
@@ -586,7 +587,7 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
   let tempScene = new Scene({
     id: id,
     name: "library_scene_temp",
-    sources: [source],
+    sources: [librarySource],
     libraryID: librarySource.id,
     forceAll: state.config.defaultScene.forceAll,
     backgroundType: state.config.defaultScene.backgroundType,
