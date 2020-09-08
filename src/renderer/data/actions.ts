@@ -569,6 +569,11 @@ export function playScene(state: State, scene: Scene): Object {
 }
 
 export function playSceneFromLibrary(state: State, source: LibrarySource, displayed: Array<LibrarySource>): Object {
+  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, "\\");
+  let librarySource = state.library.find((s) => s.url == sourceURL);
+  if (librarySource == null) {
+    throw new Error("Source not found in Library");
+  }
   let id = state.scenes.length + 1;
   state.scenes.forEach((s: Scene) => {
     id = Math.max(s.id + 1, id);
@@ -577,10 +582,6 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
     state.route.pop();
     state.route.pop();
     state.scenes.pop();
-  }
-  let librarySource = state.library.find((s) => s.url == source.url);
-  if (librarySource == null) {
-    throw new Error();
   }
   let tempScene = new Scene({
     id: id,
