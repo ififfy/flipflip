@@ -358,6 +358,8 @@ class PlayerBars extends React.Component {
                       otherScenes={this.props.scene.overlays.map((o) => this.getScene(o.sceneID))}
                       isPlaying={this.props.isPlaying}
                       mainVideo={this.props.mainVideo}
+                      mainClip={source ? source.clips.find((c) => c.id == clipID) : null}
+                      mainClipValue={clipValue ? clipValue : null}
                       otherVideos={this.props.overlayVideos}
                       onUpdateScene={this.props.onUpdateScene.bind(this)}/>
                   </ExpansionPanelDetails>
@@ -508,7 +510,6 @@ class PlayerBars extends React.Component {
                       video={this.props.mainVideo}
                       clip={source ? source.clips.find((c) => c.id == clipID) : null}
                       clipValue={clipValue ? clipValue : null}
-                      clips={source ? source.clips : null}
                       useHotkeys
                       onChangeVolume={() => {}}/>
                   )}
