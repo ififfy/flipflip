@@ -234,6 +234,7 @@ export default class Meta extends React.Component {
               nextScene={a(actions.nextScene)}
               goBack={a(actions.goBack)}
               goToTagSource={a(actions.playSceneFromLibrary)}
+              goToClipSource={a(actions.clipVideo)}
               getTags={actions.getTags.bind(this, this.state.library)}
               setCount={a(actions.setCount)}
               cache={a(actions.cacheImage)}

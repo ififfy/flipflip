@@ -37,6 +37,7 @@ export default class Player extends React.Component {
     tags?: Array<Tag>,
     blacklistFile?(sourceURL: string, fileToBlacklist: string): void,
     goToTagSource?(source: LibrarySource): void,
+    goToClipSource?(source: LibrarySource): void,
     navigateTagging?(offset: number): void,
     nextScene?(): void,
     onUpdateScene?(scene: Scene, fn: (scene: Scene) => void): void,
@@ -253,6 +254,7 @@ export default class Player extends React.Component {
             tags={this.props.tags}
             blacklistFile={this.props.blacklistFile}
             goToTagSource={this.props.goToTagSource}
+            goToClipSource={this.props.goToClipSource}
             toggleTag={this.props.toggleTag}
           />
         )}
