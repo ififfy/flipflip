@@ -72,7 +72,7 @@ class FadeIOCard extends React.Component {
                   <Switch checked={this.props.scene.fadeInOut}
                           onChange={this.onBoolInput.bind(this, 'fadeInOut')}/>
                 }
-                label="Fade In Out"/>
+                label="Fade In/Out"/>
             </Grid>
           </Grid>
         </Grid>

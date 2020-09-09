@@ -35,6 +35,7 @@ import AudioCard from "../configGroups/AudioCard";
 import TextCard from "../configGroups/TextCard";
 import VideoCard from "../configGroups/VideoCard";
 import VideoControl from "./VideoControl";
+import FadeIOCard from "../configGroups/FadeIOCard";
 
 const drawerWidth = 340;
 
@@ -423,6 +424,19 @@ class PlayerBars extends React.Component {
                     sidebar
                     scene={this.props.scene}
                     onUpdateScene={this.props.onUpdateScene.bind(this)} />
+                </ExpansionPanelDetails>
+              </ExpansionPanel>
+
+              <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+                <ExpansionPanelSummary
+                  expandIcon={<ExpandMoreIcon />}
+                >
+                  <Typography>Fade In/Out</Typography>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails>
+                  <FadeIOCard
+                    scene={this.props.scene}
+                    onUpdateScene={this.props.onUpdateScene.bind(this)}/>
                 </ExpansionPanelDetails>
               </ExpansionPanel>
 
