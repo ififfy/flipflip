@@ -818,14 +818,14 @@ class PlayerBars extends React.Component {
           this.props.goToTagSource(new LibrarySource({url: source}));
         }
       }));
-      if (type == ST.video) {
-        contextMenu.append(new MenuItem({
-          label: 'Goto Clip Source',
-          click: () => {
-            this.props.goToClipSource(new LibrarySource({url: source}));
-          }
-        }));
-      }
+    }
+    if (type == ST.video) {
+      contextMenu.append(new MenuItem({
+        label: 'Goto Clip Source',
+        click: () => {
+          this.props.goToClipSource(new LibrarySource({url: source}));
+        }
+      }));
     }
     if (!this.props.recentPictureGrid) {
       contextMenu.append(new MenuItem({

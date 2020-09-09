@@ -9,12 +9,15 @@ import {
 import ValueLabel from "@material-ui/core/Slider/ValueLabel";
 
 import AddIcon from '@material-ui/icons/Add';
+import ArrowLeftIcon from '@material-ui/icons/ArrowLeft';
+import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import CheckIcon from '@material-ui/icons/Check';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import NotInterestedIcon from '@material-ui/icons/NotInterested';
 
 import {SDGT, TT} from "../../data/const";
+import {arrayMove} from "../../data/utils";
 import en from "../../data/en";
 import Scene from "../../data/Scene";
 import Tag from "../../data/Tag";
@@ -139,87 +142,107 @@ class SceneGenerator extends React.Component {
                             this.props.tags.concat(this.props.usedTypes.map((k) => new Tag({id: id++, name: en.get(k), typeTag: true})))
                             .filter((t) => !this.props.scene.generatorWeights[this.state.isEditing].rules.map((wg) => wg.tag ? wg.tag.name : "").includes(t.name))
 
+    const weights = Array.from(this.props.scene.generatorWeights);
+    let grid = Array<Array<any>>();
+    for (let w=0; w<weights.length; w++) {
+      if (!grid[w%4]) {
+        grid[w%4] = [];
+      }
+      grid[w%4].push(weights[w]);
+    }
     return(
       <Grid container spacing={1}>
-        {this.props.scene.generatorWeights.map((wg, i) =>
-          <Grid key={i} item xs={12} sm={6} md={4} lg={3} className={clsx((this.props.tutorial == SDGT.edit1 || this.props.tutorial == SDGT.edit2) && classes.backdropTop)}>
-            <Card>
-              <CardHeader
-                classes={{action: classes.noAlignSelf}}
-                avatar={
-                  <IconButton className={clsx(classes.cardAvatarButton, this.props.tutorial == SDGT.edit1 && classes.highlight)} onClick={this.onWeighGroup.bind(this, i)}>
-                    {wg.type == TT.weight && (
-                      <Avatar className={clsx(classes.cardAvatar, wg.rules && !this.areRulesValid(wg) && classes.cardAvatarError)}>
-                        {wg.percent}
-                      </Avatar>
-                    )}
-                    {wg.type == TT.all && (
-                      <Avatar className={clsx(classes.cardAvatar, wg.rules && !this.areRulesValid(wg) && classes.cardAvatarError)}>
-                        <CheckIcon/>
-                      </Avatar>
-                    )}
-                    {wg.type == TT.none && (
-                      <Avatar className={clsx(classes.cardAvatar, wg.rules && !this.areRulesValid(wg) && classes.cardAvatarError)}>
-                        <NotInterestedIcon/>
-                      </Avatar>
-                    )}
-                  </IconButton>
-                }
-                action={
-                  <React.Fragment>
-                    {wg.chosen && (
-                      <Chip
-                        label={wg.chosen + "/" + wg.max}
-                        color='secondary'
-                        size='small'/>
-                    )}
+        {grid.map((c, x) =>
+          <Grid key={x} item xs={12} sm={6} md={4} lg={3} className={clsx((this.props.tutorial == SDGT.edit1 || this.props.tutorial == SDGT.edit2) && classes.backdropTop)}>
+            <Grid container spacing={1}>
+              {c.map((wg: WeightGroup, y) =>
+                <Grid key={y} xs={12} item className={classes.image}>
+                  <Card>
+                    <CardHeader
+                      classes={{action: classes.noAlignSelf}}
+                      avatar={
+                        <IconButton className={clsx(classes.cardAvatarButton, this.props.tutorial == SDGT.edit1 && classes.highlight)} onClick={this.onWeighGroup.bind(this, (y*4)+x)}>
+                          {wg.type == TT.weight && (
+                            <Avatar className={clsx(classes.cardAvatar, wg.rules && !this.areRulesValid(wg) && classes.cardAvatarError)}>
+                              {wg.percent}
+                            </Avatar>
+                          )}
+                          {wg.type == TT.all && (
+                            <Avatar className={clsx(classes.cardAvatar, wg.rules && !this.areRulesValid(wg) && classes.cardAvatarError)}>
+                              <CheckIcon/>
+                            </Avatar>
+                          )}
+                          {wg.type == TT.none && (
+                            <Avatar className={clsx(classes.cardAvatar, wg.rules && !this.areRulesValid(wg) && classes.cardAvatarError)}>
+                              <NotInterestedIcon/>
+                            </Avatar>
+                          )}
+                        </IconButton>
+                      }
+                      action={
+                        <React.Fragment>
+                          {wg.chosen && (
+                            <Chip
+                              label={wg.chosen + "/" + wg.max}
+                              color='secondary'
+                              size='small'/>
+                          )}
+                          {wg.rules && (
+                            <IconButton size="small" onClick={this.onEditGroup.bind(this, (y*4)+x)}>
+                              <EditIcon />
+                            </IconButton>
+                          )}
+                          <IconButton size="small" onClick={this.onMoveLeft.bind(this, (y*4)+x)} disabled={(y*4)+x == 0}>
+                            <ArrowLeftIcon />
+                          </IconButton>
+                          <IconButton size="small" onClick={this.onMoveRight.bind(this, (y*4)+x)} disabled={(y*4)+x == this.props.scene.generatorWeights.length - 1}>
+                            <ArrowRightIcon />
+                          </IconButton>
+                          <IconButton size="small"
+                                      className={clsx(this.props.tutorial == SDGT.edit1 && classes.disable)}
+                                      onClick={this.onDeleteGroup.bind(this, (y*4)+x)}>
+                            <DeleteIcon color="error" />
+                          </IconButton>
+                        </React.Fragment>
+                      }
+                      title={wg.name}/>
                     {wg.rules && (
-                      <IconButton size="small" onClick={this.onEditGroup.bind(this, i)}>
-                        <EditIcon />
-                      </IconButton>
+                      <React.Fragment>
+                        <Divider/>
+                        <CardContent className={classes.listElement}>
+                          <List>
+                            {wg.rules.map((wg, i) =>
+                              <ListItem key={i}>
+                                <ListItemIcon>
+                                  <React.Fragment>
+                                    {wg.type == TT.weight && (
+                                      <Avatar>
+                                        {wg.percent}
+                                      </Avatar>
+                                    )}
+                                    {wg.type == TT.all && (
+                                      <Avatar>
+                                        <CheckIcon/>
+                                      </Avatar>
+                                    )}
+                                    {wg.type == TT.none && (
+                                      <Avatar>
+                                        <NotInterestedIcon/>
+                                      </Avatar>
+                                    )}
+                                  </React.Fragment>
+                                </ListItemIcon>
+                                <ListItemText primary={wg.tag.name} />
+                              </ListItem>
+                            )}
+                          </List>
+                        </CardContent>
+                      </React.Fragment>
                     )}
-                    <IconButton size="small"
-                                className={clsx(this.props.tutorial == SDGT.edit1 && classes.disable)}
-                                onClick={this.onDeleteGroup.bind(this, i)}>
-                      <DeleteIcon color="error" />
-                    </IconButton>
-                  </React.Fragment>
-                }
-                title={wg.name}/>
-              {wg.rules && (
-                <React.Fragment>
-                  <Divider/>
-                  <CardContent className={classes.listElement}>
-                    <List>
-                      {wg.rules.map((wg, i) =>
-                        <ListItem key={i}>
-                          <ListItemIcon>
-                            <React.Fragment>
-                              {wg.type == TT.weight && (
-                                <Avatar>
-                                  {wg.percent}
-                                </Avatar>
-                              )}
-                              {wg.type == TT.all && (
-                                <Avatar>
-                                <CheckIcon/>
-                                </Avatar>
-                              )}
-                              {wg.type == TT.none && (
-                                <Avatar>
-                                  <NotInterestedIcon/>
-                                </Avatar>
-                              )}
-                            </React.Fragment>
-                          </ListItemIcon>
-                          <ListItemText primary={wg.tag.name} />
-                        </ListItem>
-                      )}
-                    </List>
-                  </CardContent>
-                </React.Fragment>
+                  </Card>
+                </Grid>
               )}
-            </Card>
+            </Grid>
           </Grid>
         )}
         <Menu
@@ -490,6 +513,18 @@ class SceneGenerator extends React.Component {
       }
     }
     this.changeGeneratorWeights(generatorWeights);
+  }
+
+  onMoveRight(index: number) {
+    this.update((s) => {
+      arrayMove(s.generatorWeights, index, index+1);
+    })
+  }
+
+  onMoveLeft(index: number) {
+    this.update((s) => {
+      arrayMove(s.generatorWeights, index, index-1);
+    })
   }
 
   changeGeneratorWeights(weights: WeightGroup[]) {
