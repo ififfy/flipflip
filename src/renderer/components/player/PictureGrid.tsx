@@ -1,5 +1,7 @@
 import * as React from "react";
 import {createStyles, Grid, Theme, withStyles} from "@material-ui/core";
+import ImageView from "./ImageView";
+import Scene from "../../data/Scene";
 
 const styles = (theme: Theme) => createStyles({
   content: {
@@ -49,13 +51,13 @@ class PictureGrid extends React.Component {
             <Grid key={x} xs={3} item>
               <Grid container>
                 {c.map((p, y) =>
-                  <Grid key={y} xs={12} item>
-                    {p instanceof HTMLImageElement && (
-                      <img className={classes.image} src={p.src} {...{source: p.getAttribute("source")}}/>
-                    )}
-                    {p instanceof HTMLVideoElement && (
-                      <video className={classes.image} src={p.src} loop muted autoPlay {...{source: p.getAttribute("source")}}/>
-                    )}
+                  <Grid key={y} xs={12} item className={classes.image}>
+                    <ImageView
+                      image={p}
+                      fitParent={true}
+                      hasStarted={true}
+                      scene={null}
+                      pictureGrid/>
                   </Grid>
                 )}
               </Grid>

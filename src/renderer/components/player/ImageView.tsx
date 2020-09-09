@@ -17,6 +17,7 @@ export default class ImageView extends React.Component {
     scene: Scene,
     timeToNextFrame?: number,
     toggleStrobe?: boolean,
+    pictureGrid?: boolean,
     onLoaded?(): void,
     setVideo?(video: HTMLVideoElement): void,
   };
@@ -33,7 +34,7 @@ export default class ImageView extends React.Component {
 
   componentDidUpdate(props: any) {
     let force = false;
-    if (this.props.scene.backgroundType !== props.scene.backgroundType) {
+    if (!this.props.pictureGrid && this.props.scene.backgroundType !== props.scene.backgroundType) {
       if (this.props.scene.backgroundType === BT.blur) {
         force = true;
       } else if (props.scene.backgroundType === BT.blur) {
@@ -114,8 +115,8 @@ export default class ImageView extends React.Component {
 
     const videoLoop = (v: any) => {
       if (parseFloat(el.parentElement.style.opacity) == 0.99 || v.ended || v.paused) return;
-      let crossFadeAudio = this.props.scene.crossFadeAudio && !this.props.scene.gridView;
-      if (this.props.hasStarted && this.props.scene.crossFade && crossFadeAudio && v instanceof HTMLVideoElement) {
+      let crossFadeAudio = !this.props.pictureGrid && this.props.scene.crossFadeAudio && !this.props.scene.gridView;
+      if (!this.props.pictureGrid && this.props.hasStarted && this.props.scene.crossFade && crossFadeAudio && v instanceof HTMLVideoElement) {
         const volume = v.hasAttribute("volume") ? parseInt(v.getAttribute("volume")) : this.props.scene.videoVolume;
         v.volume = (volume / 100) * parseFloat(el.parentElement.parentElement.getAttribute("volume"));
       }
@@ -135,9 +136,9 @@ export default class ImageView extends React.Component {
       this._timeouts.push(setTimeout(drawLoop, 20, v, c, w, h));
     };
 
-    const rotateVideo = img instanceof HTMLVideoElement && this.props.scene.rotatePortrait && imgWidth < imgHeight;
+    const rotateVideo = img instanceof HTMLVideoElement && !this.props.pictureGrid && this.props.scene.rotatePortrait && imgWidth < imgHeight;
 
-    const blur = this.props.scene.backgroundType == BT.blur;
+    const blur = !this.props.pictureGrid && this.props.scene.backgroundType == BT.blur;
     let bgImg: any;
     if (blur) {
       if (img.src.endsWith(".gif")) {
@@ -184,7 +185,7 @@ export default class ImageView extends React.Component {
     }
 
     if (img instanceof HTMLVideoElement && !forceBG) {
-      if (this.props.hasStarted) {
+      if (!this.props.pictureGrid && this.props.hasStarted) {
         const volume = img.hasAttribute("volume") ? parseInt(img.getAttribute("volume")) : this.props.scene.videoVolume;
         img.volume = volume / 100;
       } else {
@@ -199,11 +200,81 @@ export default class ImageView extends React.Component {
       }
     }
 
-    switch (this.props.scene.imageType) {
-      case (IT.fitBestClip):
-        if (rotateVideo) {
-          imgAspect = imgHeight / imgWidth;
-          if (imgAspect < parentAspect) {
+    if (!this.props.pictureGrid) {
+      switch (this.props.scene.imageType) {
+        case (IT.fitBestClip):
+          if (rotateVideo) {
+            imgAspect = imgHeight / imgWidth;
+            if (imgAspect < parentAspect) {
+              const scale = parentWidth / imgHeight;
+              img.style.height = parentWidth.toString() + "px";
+              img.style.marginLeft = '-' + imgWidth * scale + 'px';
+              img.style.marginTop = (parentHeight / 2 - imgWidth * scale / 2) + 'px';
+
+              img.style.transform = "rotate(270deg)";
+              img.style.transformOrigin = "top right";
+            } else {
+              const scale = parentHeight / imgWidth;
+              img.style.width = parentHeight.toString() + "px";
+              img.style.marginLeft = (-parentHeight + (parentWidth / 2 - imgHeight * scale / 2)) + 'px';
+
+              img.style.transform = "rotate(270deg)";
+              img.style.transformOrigin = "top right";
+            }
+          } else {
+            if (imgAspect > parentAspect) {
+              const scale = parentHeight / imgHeight;
+              img.style.width = 'auto';
+              img.style.height = '100%';
+              img.style.marginTop = '0';
+              img.style.marginLeft = (parentWidth / 2 - imgWidth * scale / 2) + 'px';
+            } else {
+              const scale = parentWidth / imgWidth;
+              img.style.width = '100%';
+              img.style.height = 'auto';
+              img.style.marginTop = (parentHeight / 2 - imgHeight * scale / 2) + 'px';
+              img.style.marginLeft = '0';
+            }
+          }
+          break;
+        default:
+        case (IT.fitBestNoClip):
+          if (rotateVideo) {
+            imgAspect = imgHeight / imgWidth;
+            if (imgAspect < parentAspect) {
+              const scale = parentHeight / imgWidth;
+              img.style.width = parentHeight.toString() + "px";
+              img.style.marginLeft = (-parentHeight + (parentWidth / 2 - imgHeight * scale / 2)) + 'px';
+
+              img.style.transform = "rotate(270deg)";
+              img.style.transformOrigin = "top right";
+            } else {
+              const scale = parentWidth / imgHeight;
+              img.style.height = parentWidth.toString() + "px";
+              img.style.marginLeft = '-' + imgWidth * scale + 'px';
+              img.style.marginTop = (parentHeight / 2 - imgWidth * scale / 2) + 'px';
+
+              img.style.transform = "rotate(270deg)";
+              img.style.transformOrigin = "top right";
+            }
+          } else {
+            if (imgAspect < parentAspect) {
+              const scale = parentHeight / imgHeight;
+              img.style.width = 'auto';
+              img.style.height = '100%';
+              img.style.marginTop = '0';
+              img.style.marginLeft = (parentWidth / 2 - imgWidth * scale / 2) + 'px';
+            } else {
+              const scale = parentWidth / imgWidth;
+              img.style.width = '100%';
+              img.style.height = 'auto';
+              img.style.marginTop = (parentHeight / 2 - imgHeight * scale / 2) + 'px';
+              img.style.marginLeft = '0';
+            }
+          }
+          break;
+        case (IT.stretch):
+          if (rotateVideo) {
             const scale = parentWidth / imgHeight;
             img.style.height = parentWidth.toString() + "px";
             img.style.marginLeft = '-' + imgWidth * scale + 'px';
@@ -212,41 +283,38 @@ export default class ImageView extends React.Component {
             img.style.transform = "rotate(270deg)";
             img.style.transformOrigin = "top right";
           } else {
+            img.style.width = '100%';
+            img.style.height = '100%';
+          }
+          break;
+        case (IT.center):
+          if (rotateVideo) {
+            img.style.transform = "rotate(270deg)";
+            img.style.transformOrigin = "center";
+          }
+          const top = Math.max(parentHeight - imgHeight, 0);
+          const left = Math.max(parentWidth - imgWidth, 0);
+          img.style.marginTop = top / 2 + 'px';
+          img.style.marginLeft = left / 2 + 'px';
+          break;
+        case (IT.fitWidth):
+          if (rotateVideo) {
             const scale = parentHeight / imgWidth;
             img.style.width = parentHeight.toString() + "px";
-            img.style.marginLeft = (-parentHeight  + (parentWidth / 2 - imgHeight * scale / 2)) + 'px';
+            img.style.marginLeft = (-parentHeight + (parentWidth / 2 - imgHeight * scale / 2)) + 'px';
 
             img.style.transform = "rotate(270deg)";
             img.style.transformOrigin = "top right";
-          }
-        } else {
-          if (imgAspect > parentAspect) {
-            const scale = parentHeight / imgHeight;
-            img.style.width = 'auto';
-            img.style.height = '100%';
-            img.style.marginTop = '0';
-            img.style.marginLeft = (parentWidth / 2 - imgWidth * scale / 2) + 'px';
           } else {
-            const scale = parentWidth / imgWidth;
+            const hScale = parentWidth / imgWidth;
             img.style.width = '100%';
             img.style.height = 'auto';
-            img.style.marginTop = (parentHeight / 2 - imgHeight * scale / 2) + 'px';
+            img.style.marginTop = (parentHeight / 2 - imgHeight * hScale / 2) + 'px';
             img.style.marginLeft = '0';
           }
-        }
-        break;
-      default:
-      case (IT.fitBestNoClip):
-        if (rotateVideo) {
-          imgAspect = imgHeight / imgWidth;
-          if (imgAspect < parentAspect) {
-            const scale = parentHeight / imgWidth;
-            img.style.width = parentHeight.toString() + "px";
-            img.style.marginLeft = (-parentHeight  + (parentWidth / 2 - imgHeight * scale / 2)) + 'px';
-
-            img.style.transform = "rotate(270deg)";
-            img.style.transformOrigin = "top right";
-          } else {
+          break;
+        case (IT.fitHeight):
+          if (rotateVideo) {
             const scale = parentWidth / imgHeight;
             img.style.height = parentWidth.toString() + "px";
             img.style.marginLeft = '-' + imgWidth * scale + 'px';
@@ -254,80 +322,20 @@ export default class ImageView extends React.Component {
 
             img.style.transform = "rotate(270deg)";
             img.style.transformOrigin = "top right";
-          }
-        } else {
-          if (imgAspect < parentAspect) {
-            const scale = parentHeight / imgHeight;
+          } else {
+            const wScale = parentHeight / imgHeight;
             img.style.width = 'auto';
             img.style.height = '100%';
             img.style.marginTop = '0';
-            img.style.marginLeft = (parentWidth / 2 - imgWidth * scale / 2) + 'px';
-          } else {
-            const scale = parentWidth / imgWidth;
-            img.style.width = '100%';
-            img.style.height = 'auto';
-            img.style.marginTop = (parentHeight / 2 - imgHeight * scale / 2) + 'px';
-            img.style.marginLeft = '0';
+            img.style.marginLeft = (parentWidth / 2 - imgWidth * wScale / 2) + 'px';
           }
-        }
-        break;
-      case (IT.stretch):
-        if (rotateVideo) {
-          const scale = parentWidth / imgHeight;
-          img.style.height = parentWidth.toString() + "px";
-          img.style.marginLeft = '-' + imgWidth * scale + 'px';
-          img.style.marginTop = (parentHeight / 2 - imgWidth * scale / 2) + 'px';
-
-          img.style.transform = "rotate(270deg)";
-          img.style.transformOrigin = "top right";
-        } else {
-          img.style.width = '100%';
-          img.style.height = '100%';
-        }
-        break;
-      case (IT.center):
-        if (rotateVideo) {
-          img.style.transform = "rotate(270deg)";
-          img.style.transformOrigin = "center";
-        }
-        const top = Math.max(parentHeight - imgHeight, 0);
-        const left = Math.max(parentWidth - imgWidth, 0);
-        img.style.marginTop = top / 2 + 'px';
-        img.style.marginLeft = left / 2 + 'px';
-        break;
-      case (IT.fitWidth):
-        if (rotateVideo) {
-          const scale = parentHeight / imgWidth;
-          img.style.width = parentHeight.toString() + "px";
-          img.style.marginLeft = (-parentHeight  + (parentWidth / 2 - imgHeight * scale / 2)) + 'px';
-
-          img.style.transform = "rotate(270deg)";
-          img.style.transformOrigin = "top right";
-        } else {
-          const hScale = parentWidth / imgWidth;
-          img.style.width = '100%';
-          img.style.height = 'auto';
-          img.style.marginTop = (parentHeight / 2 - imgHeight * hScale / 2) + 'px';
-          img.style.marginLeft = '0';
-        }
-        break;
-      case (IT.fitHeight):
-        if (rotateVideo) {
-          const scale = parentWidth / imgHeight;
-          img.style.height = parentWidth.toString() + "px";
-          img.style.marginLeft = '-' + imgWidth * scale + 'px';
-          img.style.marginTop = (parentHeight / 2 - imgWidth * scale / 2) + 'px';
-
-          img.style.transform = "rotate(270deg)";
-          img.style.transformOrigin = "top right";
-        } else {
-          const wScale = parentHeight / imgHeight;
-          img.style.width = 'auto';
-          img.style.height = '100%';
-          img.style.marginTop = '0';
-          img.style.marginLeft = (parentWidth / 2 - imgWidth * wScale / 2) + 'px';
-        }
-        break;
+          break;
+      }
+    } else {
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.marginTop = '0';
+      img.style.marginLeft = '0';
     }
 
     if (!forceBG) {
@@ -337,6 +345,9 @@ export default class ImageView extends React.Component {
 
       this._image = img;
       el.appendChild(img);
+      if (img instanceof HTMLVideoElement && this.props.pictureGrid && img.paused) {
+        img.play();
+      }
     }
     if (blur) {
       bg.appendChild(bgImg);
@@ -353,7 +364,7 @@ export default class ImageView extends React.Component {
       (props.image.src !== this.props.image.src ||
       props.image.getAttribute("start") !== this.props.image.getAttribute("start") ||
       props.image.getAttribute("end") !== this.props.image.getAttribute("end"))) ||
-      ((props.scene.strobe || props.scene.fadeInOut) && props.toggleStrobe !== this.props.toggleStrobe) ||
+      (props.scene && (props.scene.strobe || props.scene.fadeInOut) && props.toggleStrobe !== this.props.toggleStrobe) ||
       props.scene !== this.props.scene ||
       props.hasStarted !== this.props.hasStarted;
   }
@@ -392,6 +403,11 @@ export default class ImageView extends React.Component {
               backgroundSize: 'cover',
             }}/>
         </div>
+      );
+    } else if (this.props.pictureGrid) {
+      return (
+        <animated.div
+          ref={this.contentRef}/>
       );
     }
 
