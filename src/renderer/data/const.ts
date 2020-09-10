@@ -63,6 +63,7 @@ const IT = { // image type
   fitBestClip: 'it.fitBestClip',
   stretch: 'it.stretch',
   center: 'it.center',
+  centerNoClip: 'it.centerNoClip',
   fitWidth: 'it.fitWidth',
   fitHeight: 'it.fitHeight',
 };

@@ -45,6 +45,7 @@ export default new Map<string, string>([
   ['it.fitBestClip', 'Fit Best (Clip Edges)'],
   ['it.stretch', 'Stretch'],
   ['it.center', 'Center'],
+  ['it.centerNoClip', 'Center (No Clipping)'],
   ['it.fitWidth', 'Fit Width'],
   ['it.fitHeight', 'Fit Height'],
 
