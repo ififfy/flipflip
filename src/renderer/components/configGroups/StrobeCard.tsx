@@ -223,15 +223,15 @@ class StrobeCard extends React.Component {
                 </Collapse>
                 <Collapse in={this.props.scene.strobeTF == TF.bpm} className={classes.fullWidth}>
                   <Typography id="strobe-bpm-multi-slider" variant="caption" component="div" color="textSecondary">
-                    BPM Multiplier {this.props.scene.strobeBPMMulti > 0 ? this.props.scene.strobeBPMMulti : "1 / " + (-1 * (this.props.scene.strobeBPMMulti - 2))}x
+                    BPM Multiplier {this.props.scene.strobeBPMMulti / 10}x
                   </Typography>
                   <Slider
-                    min={-8}
-                    max={10}
+                    min={1}
+                    max={100}
                     defaultValue={strobeBPMMulti}
                     onChangeCommitted={this.onSliderChange.bind(this, 'strobeBPMMulti')}
                     valueLabelDisplay={'auto'}
-                    valueLabelFormat={(v) => v > 0 ? v + "x" : "1/" + (-1 * (v - 2)) + "x"}
+                    valueLabelFormat={(v) => (v / 10) + "x"}
                     aria-labelledby="strobe-bpm-multi-slider"/>
                 </Collapse>
                 <Collapse in={this.props.scene.strobeTF == TF.constant} className={classes.fullWidth}>
@@ -348,15 +348,15 @@ class StrobeCard extends React.Component {
                 </Collapse>
                 <Collapse in={this.props.scene.strobeDelayTF == TF.bpm} className={classes.fullWidth}>
                   <Typography id="strobe-delay-bpm-multi-slider" variant="caption" component="div" color="textSecondary">
-                    BPM Multiplier {this.props.scene.strobeDelayBPMMulti > 0 ? this.props.scene.strobeDelayBPMMulti : "1 / " + (-1 * (this.props.scene.strobeDelayBPMMulti - 2))}x
+                    BPM Multiplier {this.props.scene.strobeDelayBPMMulti / 10}x
                   </Typography>
                   <Slider
-                    min={-8}
-                    max={10}
+                    min={1}
+                    max={100}
                     defaultValue={strobeDelayBPMMulti}
                     onChangeCommitted={this.onSliderChange.bind(this, 'strobeDelayBPMMulti')}
                     valueLabelDisplay={'auto'}
-                    valueLabelFormat={(v) => v > 0 ? v + "x" : "1/" + (-1 * (v - 2)) + "x"}
+                    valueLabelFormat={(v) => (v / 10) + "x"}
                     aria-labelledby="strobe-delay-bpm-multi-slider"/>
                 </Collapse>
                 <Collapse in={this.props.scene.strobeDelayTF == TF.constant} className={classes.fullWidth}>

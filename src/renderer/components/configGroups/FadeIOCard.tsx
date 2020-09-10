@@ -132,15 +132,15 @@ class FadeIOCard extends React.Component {
                 </Collapse>
                 <Collapse in={this.props.scene.fadeIOTF == TF.bpm} className={classes.fullWidth}>
                   <Typography id="fadeio-bpm-multi-slider" variant="caption" component="div" color="textSecondary">
-                    BPM Multiplier {this.props.scene.fadeIOBPMMulti > 0 ? this.props.scene.fadeIOBPMMulti : "1 / " + (-1 * (this.props.scene.fadeIOBPMMulti - 2))}x
+                    BPM Multiplier {this.props.scene.fadeIOBPMMulti / 10}x
                   </Typography>
                   <Slider
-                    min={-8}
-                    max={10}
+                    min={1}
+                    max={100}
                     defaultValue={fadeBPMMulti}
                     onChangeCommitted={this.onSliderChange.bind(this, 'fadeIOBPMMulti')}
                     valueLabelDisplay={'auto'}
-                    valueLabelFormat={(v) => v > 0 ? v + "x" : "1/" + (-1 * (v - 2)) + "x"}
+                    valueLabelFormat={(v) => (v / 10) + "x"}
                     aria-labelledby="fadeio-bpm-multi-slider"/>
                 </Collapse>
                 <Collapse in={this.props.scene.fadeIOTF == TF.constant} className={classes.fullWidth}>

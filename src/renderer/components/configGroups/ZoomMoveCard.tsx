@@ -431,15 +431,15 @@ class ZoomMoveCard extends React.Component {
                 </Collapse>
                 <Collapse in={this.props.scene.transTF == TF.bpm} className={classes.fullWidth}>
                   <Typography id="trans-bpm-multi-slider" variant="caption" component="div" color="textSecondary">
-                    BPM Multiplier {this.props.scene.transBPMMulti > 0 ? this.props.scene.transBPMMulti : "1 / " + (-1 * (this.props.scene.transBPMMulti - 2))}x
+                    BPM Multiplier {this.props.scene.transBPMMulti / 10}x
                   </Typography>
                   <Slider
-                    min={-8}
-                    max={10}
+                    min={1}
+                    max={100}
                     defaultValue={transBPMMulti}
                     onChangeCommitted={this.onSliderChange.bind(this, 'transBPMMulti')}
                     valueLabelDisplay={'auto'}
-                    valueLabelFormat={(v) => v > 0 ? v + "x" : "1/" + (-1 * (v - 2)) + "x"}
+                    valueLabelFormat={(v) => (v / 10) + "x"}
                     aria-labelledby="trans-bpm-multi-slider" />
                 </Collapse>
                 <Collapse in={this.props.scene.transTF == TF.constant} className={classes.fullWidth}>

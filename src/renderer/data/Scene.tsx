@@ -268,5 +268,27 @@ export default class Scene {
       this.textKind = "";
       this.textSource = "https://hastebin.com/raw/" + this.textSource;
     }
+
+    if (this.timingBPMMulti <= 0) {
+      this.timingBPMMulti = 1 / (-1 * (this.timingBPMMulti - 2));
+    }
+    if (this.fadeBPMMulti <= 0) {
+      this.fadeBPMMulti = 1 / (-1 * (this.fadeBPMMulti - 2));
+    }
+    if (this.fadeIOBPMMulti <= 0) {
+      this.fadeIOBPMMulti = 1 / (-1 * (this.fadeIOBPMMulti - 2));
+    }
+    if (this.panBPMMulti <= 0) {
+      this.panBPMMulti = 1 / (-1 * (this.panBPMMulti - 2));
+    }
+    if (this.transBPMMulti <= 0) {
+      this.transBPMMulti = 1 / (-1 * (this.transBPMMulti - 2));
+    }
+    if (this.strobeBPMMulti <= 0) {
+      this.strobeBPMMulti = 1 / (-1 * (this.strobeBPMMulti - 2));
+    }
+    if (this.strobeDelayBPMMulti <= 0) {
+      this.strobeDelayBPMMulti = 1 / (-1 * (this.strobeDelayBPMMulti - 2));
+    }
   }
 }

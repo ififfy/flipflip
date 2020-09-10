@@ -139,15 +139,15 @@ class CrossFadeCard extends React.Component {
                 </Collapse>
                 <Collapse in={this.props.scene.fadeTF == TF.bpm} className={classes.fullWidth}>
                   <Typography id="fade-bpm-multi-slider" variant="caption" component="div" color="textSecondary">
-                    BPM Multiplier {this.props.scene.fadeBPMMulti > 0 ? this.props.scene.fadeBPMMulti : "1 / " + (-1 * (this.props.scene.fadeBPMMulti - 2))}x
+                    BPM Multiplier {this.props.scene.fadeBPMMulti / 10}x
                   </Typography>
                   <Slider
-                    min={-8}
-                    max={10}
+                    min={1}
+                    max={100}
                     defaultValue={fadeBPMMulti}
                     onChangeCommitted={this.onSliderChange.bind(this, 'fadeBPMMulti')}
                     valueLabelDisplay={'auto'}
-                    valueLabelFormat={(v) => v > 0 ? v + "x" : "1/" + (-1 * (v - 2)) + "x"}
+                    valueLabelFormat={(v) => (v / 10) + "x"}
                     aria-labelledby="fade-bpm-multi-slider"/>
                 </Collapse>
                 <Collapse in={this.props.scene.fadeTF == TF.constant} className={classes.fullWidth}>

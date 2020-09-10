@@ -138,15 +138,15 @@ class SceneOptionCard extends React.Component {
               </Collapse>
               <Collapse in={this.props.scene.timingFunction == TF.bpm} className={classes.fullWidth}>
                 <Typography id="scene-bpm-multi-slider" variant="caption" component="div" color="textSecondary">
-                  BPM Multiplier {this.props.scene.timingBPMMulti > 0 ? this.props.scene.timingBPMMulti : "1 / " + (-1 * (this.props.scene.timingBPMMulti - 2))}x
+                  BPM Multiplier {this.props.scene.timingBPMMulti / 10}x
                 </Typography>
                 <Slider
-                  min={-8}
-                  max={10}
+                  min={1}
+                  max={100}
                   defaultValue={timingBPMMulti}
                   onChangeCommitted={this.onSliderChange.bind(this, 'timingBPMMulti')}
                   valueLabelDisplay={'auto'}
-                  valueLabelFormat={(v) => v > 0 ? v + "x" : "1/" + (-1 * (v - 2)) + "x"}
+                  valueLabelFormat={(v) => (v / 10) + "x"}
                   aria-labelledby="scene-bpm-multi-slider"/>
               </Collapse>
               <Collapse in={this.props.scene.timingFunction == TF.constant} className={classes.fullWidth}>
