@@ -126,16 +126,10 @@ export default class FadeInOut extends React.Component {
   };
 
   fade() {
-    //const duration = this.state.toggleFade ? this.state.duration : this.getDuration();
     const duration = this.getDuration();
     const delay = this.props.scene.fadeIOPulse ? this.getDelay() : duration;
     this.setState({toggleFade: !this.state.toggleFade, duration: duration, delay: delay});
-    if (this.props.scene.fadeIOTF == TF.scene) {
-      this.props.fadeFunction();
-      //setTimeout(this.props.fadeFunction.bind(this), 50);
-    } else {
-      this.props.fadeFunction();
-    }
+    this.props.fadeFunction();
     return delay;
   }
 
@@ -154,21 +148,12 @@ export default class FadeInOut extends React.Component {
   }
 
   componentDidUpdate(props: any) {
-    // TODO Test turning on/off during playback
     if (this.props.scene.fadeInOut) {
       if (this.props.scene.fadeIOTF != props.scene.fadeIOTF || this.props.scene.fadeIODelayTF != props.scene.fadeIODelayTF || this.props.scene.fadeIOPulse != props.scene.fadeIOPulse) {
         clearTimeout(this._fadeTimeout);
         if (this.props.scene.fadeIOPulse ? this.props.scene.fadeIODelayTF != TF.scene : this.props.scene.fadeIOTF != TF.scene) {
           this.fadeLoop();
         }
-      }
-      if ((this.props.scene.fadeIOPulse ? this.props.scene.fadeIODelayTF == TF.scene : this.props.scene.fadeIOTF == TF.scene) && this.props.toggleFade != props.toggleFade) {
-        /*const delay = this.fade();
-        clearTimeout(this._fadeTimeout);
-        this._fadeTimeout = setTimeout(() => {
-          console.log("OUT");
-          this.fade();
-        }, delay);*/
       }
     }
   }

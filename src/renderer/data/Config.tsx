@@ -67,6 +67,23 @@ interface SceneSettingsI {
   fadeIODelayMax: number;
   fadeIODelaySinRate: number;
   fadeIODelayBPMMulti: number;
+  panning: boolean;
+  panTF: string;
+  panDuration: number;
+  panDurationMin: number;
+  panDurationMax: number;
+  panSinRate: number;
+  panBPMMulti: number;
+  panHorizTransType: string;
+  panHorizTransLevel: number;
+  panHorizTransLevelMax: number;
+  panHorizTransLevelMin: number;
+  panHorizTransRandom: boolean;
+  panVertTransType: string;
+  panVertTransLevel: number;
+  panVertTransLevelMax: number;
+  panVertTransLevelMin: number;
+  panVertTransRandom: boolean;
 
   imageType: string;
   backgroundType: string;
@@ -281,6 +298,23 @@ export class SceneSettings implements SceneSettingsI {
   fadeIODelayMax = 5000;
   fadeIODelaySinRate = 100;
   fadeIODelayBPMMulti = 1;
+  panning = false;
+  panTF = TF.constant;
+  panDuration = 2000;
+  panDurationMin = 2000;
+  panDurationMax = 5000;
+  panSinRate = 100;
+  panBPMMulti = 1;
+  panHorizTransType = HTF.none;
+  panHorizTransLevel = 10;
+  panHorizTransLevelMax = 10;
+  panHorizTransLevelMin = 5;
+  panHorizTransRandom = false;
+  panVertTransType = VTF.none;
+  panVertTransLevel = 10;
+  panVertTransLevelMax = 10;
+  panVertTransLevelMin = 5;
+  panVertTransRandom = false;
 
   imageType = IT.fitBestNoClip;
   backgroundType = BT.blur;

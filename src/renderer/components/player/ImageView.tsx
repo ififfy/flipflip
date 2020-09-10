@@ -8,6 +8,7 @@ import Scene from "../../data/Scene";
 import Strobe from "./Strobe";
 import wretch from "wretch";
 import FadeInOut from "./FadeInOut";
+import Panning from "./Panning";
 
 export default class ImageView extends React.Component {
   readonly props: {
@@ -448,13 +449,32 @@ export default class ImageView extends React.Component {
           fadeFunction={this.strobeImage.bind(this)}>
           <this.FadeLayer>
             <this.ZoomMoveLayer>
-              {(this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.image) && (
-                <Strobe
-                  zIndex={2}
-                  toggleStrobe={this.props.toggleStrobe}
-                  timeToNextFrame={this.props.timeToNextFrame}
-                  scene={this.props.scene}
-                  strobeFunction={this.strobeImage.bind(this)}>
+              <Panning
+                togglePan={this.props.toggleStrobe}
+                timeToNextFrame={this.props.timeToNextFrame}
+                scene={this.props.scene}
+                panFunction={this.strobeImage.bind(this)}>
+                {(this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.image) && (
+                  <Strobe
+                    zIndex={2}
+                    toggleStrobe={this.props.toggleStrobe}
+                    timeToNextFrame={this.props.timeToNextFrame}
+                    scene={this.props.scene}
+                    strobeFunction={this.strobeImage.bind(this)}>
+                    <animated.div
+                      ref={this.contentRef}
+                      style={{
+                        height: '100%',
+                        width: '100%',
+                        zIndex: 2,
+                        backgroundPosition: 'center',
+                        backgroundSize: 'contain',
+                        backgroundRepeat: 'no-repeat',
+                        position: 'absolute',
+                      }}/>
+                  </Strobe>
+                )}
+                {(!this.props.scene || !this.props.scene.strobe || this.props.scene.strobeLayer != SL.image) && (
                   <animated.div
                     ref={this.contentRef}
                     style={{
@@ -466,21 +486,8 @@ export default class ImageView extends React.Component {
                       backgroundRepeat: 'no-repeat',
                       position: 'absolute',
                     }}/>
-                </Strobe>
-              )}
-              {(!this.props.scene || !this.props.scene.strobe || this.props.scene.strobeLayer != SL.image) && (
-                <animated.div
-                  ref={this.contentRef}
-                  style={{
-                    height: '100%',
-                    width: '100%',
-                    zIndex: 2,
-                    backgroundPosition: 'center',
-                    backgroundSize: 'contain',
-                    backgroundRepeat: 'no-repeat',
-                    position: 'absolute',
-                  }}/>
-              )}
+                )}
+              </Panning>
             </this.ZoomMoveLayer>
             {this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.background && (
               <Strobe
@@ -650,7 +657,7 @@ export default class ImageView extends React.Component {
     }
 
     let transDuration = 0;
-    if (this.props.scene.zoom) {
+    if (this.props.scene.zoom || this.props.scene.horizTransType != HTF.none || this.props.scene.vertTransType != VTF.none) {
       switch (this.props.scene.transTF) {
         case TF.scene:
           transDuration = this.props.timeToNextFrame;

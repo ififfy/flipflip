@@ -36,6 +36,7 @@ import TextCard from "../configGroups/TextCard";
 import VideoCard from "../configGroups/VideoCard";
 import VideoControl from "./VideoControl";
 import FadeIOCard from "../configGroups/FadeIOCard";
+import PanningCard from "../configGroups/PanningCard";
 
 const drawerWidth = 340;
 
@@ -431,6 +432,20 @@ class PlayerBars extends React.Component {
                 <ExpansionPanelSummary
                   expandIcon={<ExpandMoreIcon />}
                 >
+                  <Typography>Strobe</Typography>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails>
+                  <StrobeCard
+                    sidebar
+                    scene={this.props.scene}
+                    onUpdateScene={this.props.onUpdateScene.bind(this)} />
+                </ExpansionPanelDetails>
+              </ExpansionPanel>
+
+              <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+                <ExpansionPanelSummary
+                  expandIcon={<ExpandMoreIcon />}
+                >
                   <Typography>Fade In/Out</Typography>
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails>
@@ -444,13 +459,12 @@ class PlayerBars extends React.Component {
                 <ExpansionPanelSummary
                   expandIcon={<ExpandMoreIcon />}
                 >
-                  <Typography>Strobe</Typography>
+                  <Typography>Panning</Typography>
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails>
-                  <StrobeCard
-                    sidebar
+                  <PanningCard
                     scene={this.props.scene}
-                    onUpdateScene={this.props.onUpdateScene.bind(this)} />
+                    onUpdateScene={this.props.onUpdateScene.bind(this)}/>
                 </ExpansionPanelDetails>
               </ExpansionPanel>
 
