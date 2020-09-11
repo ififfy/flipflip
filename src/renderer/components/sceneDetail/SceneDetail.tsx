@@ -34,7 +34,6 @@ import SortIcon from '@material-ui/icons/Sort';
 import WarningIcon from '@material-ui/icons/Warning';
 
 import {AF, MO, SB, SDGT, SDT, SF, ST, TT} from "../../data/const";
-import {getSourceType} from "../../data/utils";
 import en from "../../data/en";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
@@ -45,6 +44,7 @@ import SceneEffects from "./SceneEffects";
 import SceneGenerator from "./SceneGenerator";
 import SceneOptions from "./SceneOptions";
 import URLDialog from "./URLDialog";
+import LibrarySearch from "../library/LibrarySearch";
 import SourceList from "../library/SourceList";
 import AudioTextEffects from "./AudioTextEffects";
 
@@ -277,7 +277,8 @@ const styles = (theme: Theme) => createStyles({
     width: 200,
   },
   tagMenu: {
-    maxHeight: 400,
+    minHeight: 365,
+    minWidth: 250,
   },
   fill: {
     flexGrow: 1,
@@ -344,16 +345,11 @@ class SceneDetail extends React.Component {
     openMenu: null as string,
     snackbar: null as string,
     snackbarType: null as string,
-    usedTypes: null as Array<string>,
   };
 
   render() {
     const classes = this.props.classes;
     const open = this.state.drawerOpen;
-    let id = 999;
-    const validTags = this.props.scene.openTab != 4 || this.state.usedTypes == null ? null :
-                            this.props.tags.concat(this.state.usedTypes.map((k) =>  new Tag({id: id++, name: en.get(k), typeTag: true})))
-                            .filter((t) => !this.props.scene.generatorWeights.map((wg) => wg.tag ? wg.tag.name : "").includes(t.name));
     return (
       <div className={classes.root}>
 
@@ -611,9 +607,9 @@ class SceneDetail extends React.Component {
                   <div className={classes.drawerSpacer}/>
                   <Box p={1} className={classes.fill}>
                     <SceneGenerator
+                      library={this.props.library}
                       scene={this.props.scene}
                       tags={this.props.tags}
-                      usedTypes={this.state.usedTypes}
                       tutorial={this.props.tutorial}
                       onTutorial={this.props.onTutorial.bind(this)}
                       onUpdateScene={this.props.onUpdateScene.bind(this)} />
@@ -873,11 +869,17 @@ class SceneDetail extends React.Component {
               classes={{paper: clsx(classes.tagMenu, this.props.tutorial == SDGT.buttons && clsx(classes.backdropTop, classes.highlight))}}
               open={this.state.openMenu == MO.simpleRule}
               onClose={this.onCloseDialog.bind(this)}>
-              {validTags != null && validTags.map((t) =>
-                <MenuItem key={t.id} onClick={this.onAddSimpleWG.bind(this, t)}>
-                  <ListItemText primary={t.name}/>
-                </MenuItem>
-              )}
+              {this.state.openMenu == MO.simpleRule &&
+                <LibrarySearch
+                  displaySources={this.props.library}
+                  filters={this.props.scene.generatorWeights.filter((wg) => !wg.rules).map((wg) => wg.name)}
+                  placeholder={"Search ..."}
+                  autoFocus
+                  onlyTagsAndTypes
+                  menuIsOpen
+                  controlShouldRenderValue={false}
+                  onUpdateFilters={this.onAddSimpleWG.bind(this)}/>
+              }
             </Menu>
           </React.Fragment>
         )}
@@ -904,15 +906,6 @@ class SceneDetail extends React.Component {
 
   componentDidMount() {
     window.addEventListener('keydown', this.onKeyDown, false);
-    const usedTypesSet = new Set<string>();
-    for (let ls of this.props.library) {
-      usedTypesSet.add(getSourceType(ls.url));
-    }
-    let usedTypes = Object.values(ST).filter((t) => usedTypesSet.has(t));
-    if (usedTypes.includes(ST.gelbooru1) && usedTypes.includes(ST.gelbooru2)) {
-      usedTypes = usedTypes.filter((t) => t != ST.gelbooru2);
-    }
-    this.setState({usedTypes: usedTypes});
   }
 
   componentWillUnmount() {
@@ -1024,18 +1017,29 @@ class SceneDetail extends React.Component {
     this.changeKey('generatorWeights', generatorWeights);
   }
 
-  onAddSimpleWG(tag: Tag) {
+  onAddSimpleWG(filters: Array<string>) {
     if (this.props.tutorial == SDGT.buttons) {
       this.props.onTutorial(SDGT.buttons);
       this.onCloseDialog();
     }
-    const wg = new WeightGroup();
-    wg.name = tag.name;
-    wg.percent = 0;
-    wg.type = TT.weight;
-    wg.tag = tag;
-    const generatorWeights = this.props.scene.generatorWeights.concat([wg]);
-    this.changeKey('generatorWeights', generatorWeights);
+    const tagName = filters[filters.length - 1];
+    let tag = this.props.tags.find((t) => t.name == tagName)
+    if (tag == null && tagName.startsWith("{") && tagName.endsWith("}")) {
+      const maxID = this.props.tags.reduce(
+        (max, t) => (t.id > max ? t.id : max),
+        this.props.tags[0].id
+      );
+      tag = new Tag({id: maxID+1, name: tagName.substring(1, tagName.length-1), typeTag: true});
+    }
+    if (tag) {
+      const wg = new WeightGroup();
+      wg.name = tag.name;
+      wg.percent = 0;
+      wg.type = TT.weight;
+      wg.tag = tag;
+      const generatorWeights = this.props.scene.generatorWeights.concat([wg]);
+      this.changeKey('generatorWeights', generatorWeights);
+    }
   }
 
   onFinishRemoveAllRules() {

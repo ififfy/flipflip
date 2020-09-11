@@ -22,6 +22,8 @@ import en from "../../data/en";
 import Scene from "../../data/Scene";
 import Tag from "../../data/Tag";
 import WeightGroup from "../../data/WeightGroup";
+import LibrarySearch from "../library/LibrarySearch";
+import LibrarySource from "../../data/LibrarySource";
 
 const styles = (theme: Theme) => createStyles({
   listElement: {
@@ -81,7 +83,8 @@ const styles = (theme: Theme) => createStyles({
     alignSelf: 'unset',
   },
   tagMenu: {
-    maxHeight: 400,
+    minHeight: 365,
+    minWidth: 250,
   },
   backdropTop: {
     zIndex: `${theme.zIndex.modal + 1} !important` as any,
@@ -115,9 +118,9 @@ const StyledValueLabel = withStyles({
 class SceneGenerator extends React.Component {
   readonly props: {
     classes: any,
+    library: Array<LibrarySource>,
     scene: Scene,
     tags: Array<Tag>,
-    usedTypes: Array<string>,
     tutorial: string,
     onTutorial(tutorial: string): void,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
@@ -137,10 +140,6 @@ class SceneGenerator extends React.Component {
       this.props.scene.generatorWeights[this.state.isEditing].rules[this.state.isWeighing];
     const isEditing: WeightGroup = this.state.isEditing == -1 ? null :
       this.props.scene.generatorWeights[this.state.isEditing];
-    let id = 999;
-    const validTags = this.state.isEditing == -1 || this.props.usedTypes == null ? null :
-                            this.props.tags.concat(this.props.usedTypes.map((k) => new Tag({id: id++, name: en.get(k), typeTag: true})))
-                            .filter((t) => !this.props.scene.generatorWeights[this.state.isEditing].rules.map((wg) => wg.tag ? wg.tag.name : "").includes(t.name))
 
     const weights = Array.from(this.props.scene.generatorWeights);
     let grid = Array<Array<any>>();
@@ -356,11 +355,15 @@ class SceneGenerator extends React.Component {
                   classes={{paper: classes.tagMenu}}
                   open={this.state.addRule}
                   onClose={this.onCloseAddRule.bind(this)}>
-                  {validTags != null && validTags.map((t) =>
-                    <MenuItem key={t.id} onClick={this.onAddRule.bind(this, t)}>
-                      <ListItemText primary={t.name}/>
-                    </MenuItem>
-                  )}
+                  <LibrarySearch
+                    displaySources={this.props.library}
+                    filters={this.props.scene.generatorWeights[this.state.isEditing].rules.filter((wg) => !wg.rules).map((wg) => wg.name)}
+                    placeholder={"Search ..."}
+                    autoFocus
+                    onlyTagsAndTypes
+                    menuIsOpen
+                    controlShouldRenderValue={false}
+                    onUpdateFilters={this.onAddRule.bind(this)}/>
                 </Menu>
               </div>
             )}
@@ -427,16 +430,27 @@ class SceneGenerator extends React.Component {
     }
   }
 
-  onAddRule(tag: Tag) {
-    const newWG = new WeightGroup();
-    newWG.name = tag.name;
-    newWG.percent = 0;
-    newWG.type = TT.weight;
-    newWG.tag = tag;
-    const generatorWeights = this.props.scene.generatorWeights;
-    const wg = generatorWeights[this.state.isEditing];
-    wg.rules = wg.rules.concat([newWG]);
-    this.changeGeneratorWeights(generatorWeights);
+  onAddRule(filters: Array<string>) {
+    const tagName = filters[filters.length - 1];
+    let tag = this.props.tags.find((t) => t.name == tagName)
+    if (tag == null && tagName.startsWith("{") && tagName.endsWith("}")) {
+      const maxID = this.props.tags.reduce(
+        (max, t) => (t.id > max ? t.id : max),
+        this.props.tags[0].id
+      );
+      tag = new Tag({id: maxID+1, name: tagName.substring(1, tagName.length-1), typeTag: true});
+    }
+    if (tag) {
+      const newWG = new WeightGroup();
+      newWG.name = tag.name;
+      newWG.percent = 0;
+      newWG.type = TT.weight;
+      newWG.tag = tag;
+      const generatorWeights = this.props.scene.generatorWeights;
+      const wg = generatorWeights[this.state.isEditing];
+      wg.rules = wg.rules.concat([newWG]);
+      this.changeGeneratorWeights(generatorWeights);
+    }
   }
 
   onClickAddRule(e: MouseEvent) {

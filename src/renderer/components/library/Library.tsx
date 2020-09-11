@@ -258,9 +258,6 @@ const styles = (theme: Theme) => createStyles({
   sortMenu: {
     width: 200,
   },
-  searchSelect: {
-    color: grey[900],
-  },
   fill: {
     flexGrow: 1,
   },
@@ -337,31 +334,15 @@ class Library extends React.Component {
     drawerOpen: false,
     filters: this.props.filters,
     selected: this.props.selected,
-    selectedTags: Array<{label: string, value: string}>(),
+    selectedTags: Array<string>(),
     menuAnchorEl: null as any,
     openMenu: null as string,
     moveDialog: false,
   };
 
-  Option = (props: any) => (
-    <div>
-      <components.Option {...props}>
-        <Checkbox className={this.props.classes.searchSelect} checked={props.isSelected} onChange={() => null} />{" "}
-        <label>{props.label}</label>
-      </components.Option>
-    </div>
-  );
-  MultiValue = (props: any) => (
-    <components.MultiValue {...props}>
-      <span>{props.data.label}</span>
-    </components.MultiValue>
-  );
-
   render() {
     const classes = this.props.classes;
     const open = this.state.drawerOpen;
-    const Option = this.Option;
-    const MultiValue = this.MultiValue;
 
     const tumblrAuthorized = this.props.config.remoteSettings.tumblrOAuthToken != "" &&
       this.props.config.remoteSettings.tumblrOAuthTokenSecret != "";
@@ -425,6 +406,8 @@ class Library extends React.Component {
                 <LibrarySearch
                   displaySources={this.state.displaySources}
                   filters={this.state.filters}
+                  placeholder={"Search ..."}
+                  isCreatable
                   onUpdateFilters={this.onUpdateFilters.bind(this)}/>
               </div>
             </div>
@@ -821,18 +804,16 @@ class Library extends React.Component {
             <DialogContentText id="batch-tag-description">
               Choose tags to add, remove, or overwrite on the selected source(s)
             </DialogContentText>
-            <Select
-              className={classes.searchSelect}
-              defaultValue={this.state.selectedTags}
-              options={this.props.tags.map((tag) => {return {label: tag.name, value: tag.id}})}
-              components={{ Option, MultiValue }}
-              isClearable
-              isMulti
-              closeMenuOnSelect={false}
-              hideSelectedOptions={false}
-              backspaceRemovesValue={false}
-              placeholder="Tag These Sources"
-              onChange={this.onSelectTags.bind(this)} />
+            {this.state.openMenu == MO.batchTag &&
+              <LibrarySearch
+                displaySources={this.props.library}
+                filters={this.state.selectedTags}
+                placeholder={"Tag These Sources"}
+                onlyTags
+                showCheckboxes
+                hideSelectedOptions={false}
+                onUpdateFilters={this.onSelectTags.bind(this)}/>
+            }
           </DialogContent>
           <DialogActions>
             <Button disabled={this.state.selectedTags && this.state.selectedTags.length == 0}
@@ -1023,7 +1004,7 @@ class Library extends React.Component {
     }
   }
 
-  onSelectTags(selectedTags: [{label: string, value: string}]) {
+  onSelectTags(selectedTags: Array<string>) {
     this.setState({selectedTags: selectedTags});
   }
 
@@ -1137,7 +1118,7 @@ class Library extends React.Component {
       const source = this.props.library.find((s) => s.url === sourceURL);
       source.tags = new Array<Tag>();
       for (let tag of this.state.selectedTags) {
-        source.tags.push(new Tag({name: tag.label, id: parseInt(tag.value)}));
+        source.tags.push(new Tag({name: tag, id: this.props.tags.find((t) => t.name == tag).id}));
       }
     }
     this.onCloseDialog();
@@ -1148,8 +1129,8 @@ class Library extends React.Component {
       const source = this.props.library.find((s) => s.url === sourceURL);
       const sourceTags = source.tags.map((t) => t.name);
       for (let tag of this.state.selectedTags) {
-        if (!sourceTags.includes(tag.label)) {
-          source.tags.push(new Tag({name: tag.label, id: parseInt(tag.value)}));
+        if (!sourceTags.includes(tag)) {
+          source.tags.push(new Tag({name: tag, id: this.props.tags.find((t) => t.name == tag).id}));
         }
       }
     }
@@ -1161,8 +1142,8 @@ class Library extends React.Component {
       const source = this.props.library.find((s) => s.url === sourceURL);
       const sourceTags = source.tags.map((t) => t.name);
       for (let tag of this.state.selectedTags) {
-        if (sourceTags.includes(tag.label)) {
-          const indexOf = sourceTags.indexOf(tag.label);
+        if (sourceTags.includes(tag)) {
+          const indexOf = sourceTags.indexOf(tag);
           source.tags.splice(indexOf, 1);
           sourceTags.splice(indexOf, 1);
         }
@@ -1172,7 +1153,7 @@ class Library extends React.Component {
   }
 
   getSelectedTags() {
-    let tagSelectValue = new Array<{label: string, value: string}>();
+    let tagSelectValue = new Array<string>();
     let commonTags = Array<Tag>();
     for (let sourceURL of this.state.selected) {
       const source = this.props.library.find((s) => s.url === sourceURL);
@@ -1188,7 +1169,7 @@ class Library extends React.Component {
     }
 
     if (commonTags.length > 0) {
-      tagSelectValue = commonTags.map((t) => {return {label: t.name, value: t.id.toString()}});
+      tagSelectValue = commonTags.map((t) => t.name);
     }
 
     return tagSelectValue;
