@@ -781,16 +781,16 @@ export function generateScene(state: State, scene: Scene): Object {
   for (let wg of newScene.generatorWeights.filter((wg) => !!wg.rules)) {
     // Build each adv rule like a regular set of simple rules
     // First get tags to require/exclude
-    const allTags = wg.rules.filter((wg) => !wg.tag.typeTag && wg.type == TT.all).map((wg) => wg.tag);
-    const noneTags = wg.rules.filter((wg) => !wg.tag.typeTag && wg.type == TT.none).map((wg) => wg.tag);
-    const allTypes = wg.rules.filter((wg) => wg.tag.typeTag && wg.type == TT.all).map((wg) => wg.tag.name);
-    const noneTypes = wg.rules.filter((wg) => wg.tag.typeTag && wg.type == TT.none).map((wg) => wg.tag.name);
+    const ruleAllTags = wg.rules.filter((wg) => !wg.tag.typeTag && wg.type == TT.all).map((wg) => wg.tag);
+    const ruleNoneTags = wg.rules.filter((wg) => !wg.tag.typeTag && wg.type == TT.none).map((wg) => wg.tag);
+    const ruleAllTypes = wg.rules.filter((wg) => wg.tag.typeTag && wg.type == TT.all).map((wg) => wg.tag.name);
+    const ruleNoneTypes = wg.rules.filter((wg) => wg.tag.typeTag && wg.type == TT.none).map((wg) => wg.tag.name);
 
     // Build this rule's list of sources
     let rulesSources = new Array<LibrarySource>();
 
     // If we don't have any weights, calculate by just require/exclude
-    if (allTags.length + noneTags.length + allTypes.length + noneTypes.length == wg.rules.length) {
+    if (ruleAllTags.length + ruleNoneTags.length + ruleAllTypes.length + ruleNoneTypes.length == wg.rules.length) {
       let sources = [];
       // For each source in the library
       for (let s of state.library) {
@@ -806,7 +806,15 @@ export function generateScene(state: State, scene: Scene): Object {
             let cTags = c.tags && c.tags.length > 0 ? c.tags : s.tags;
             let b = false;
 
-            // Filter out clips which don't have allTags
+            // Filter out clips which don't have ruleAllTags/allTags
+            for (let at of ruleAllTags) {
+              if (!cTags.find((t) => t.id == at.id)) {
+                invalidClips.push(c.id);
+                b = true;
+                break;
+              }
+            }
+            if (b) continue;
             for (let at of allTags) {
               if (!cTags.find((t) => t.id == at.id)) {
                 invalidClips.push(c.id);
@@ -816,7 +824,15 @@ export function generateScene(state: State, scene: Scene): Object {
             }
             if (b) continue;
 
-            // Filter out clips which have noneTags
+            // Filter out clips which have ruleNoneTags/noneTags
+            for (let nt of ruleNoneTags) {
+              if (cTags.find((t) => t.id == nt.id)) {
+                invalidClips.push(c.id);
+                b = true;
+                break;
+              }
+            }
+            if (b) continue
             for (let nt of noneTags) {
               if (cTags.find((t) => t.id == nt.id)) {
                 invalidClips.push(c.id);
@@ -826,17 +842,37 @@ export function generateScene(state: State, scene: Scene): Object {
             }
             if (b) continue;
 
-            // Filter out clips which don't have allTypes
+            // Filter out clips which don't have ruleAllTypes/allTypes
+            for (let at of ruleAllTypes) {
+              if (at != sTypeEn) {
+                invalidClips.push(c.id);
+                b = true;
+                break;
+              } else {
+                console.log(sTypeEn)
+              }
+            }
+            if (b) continue;
             for (let at of allTypes) {
               if (at != sTypeEn) {
+                invalidClips.push(c.id);
+                b = true;
+                break;
+              } else {
+                console.log(sTypeEn)
+              }
+            }
+            if (b) continue;
+
+            // Filter out clips which have ruleNoneTypes/noneTypes
+            for (let nt of ruleNoneTypes) {
+              if (nt == sTypeEn) {
                 invalidClips.push(c.id);
                 b = true;
                 break;
               }
             }
             if (b) continue;
-
-            // Filter out clips which have noneTypes
             for (let nt of noneTypes) {
               if (nt == sTypeEn) {
                 invalidClips.push(c.id);
@@ -855,7 +891,14 @@ export function generateScene(state: State, scene: Scene): Object {
         if (!addedClip) {
           let b = false;
 
-          // Filter out sources which don't have allTags
+          // Filter out sources which don't have ruleAllTags/allTags
+          for (let at of ruleAllTags) {
+            if (!s.tags.find((t) => t.id == at.id)) {
+              b = true;
+              break;
+            }
+          }
+          if (b) continue;
           for (let at of allTags) {
             if (!s.tags.find((t) => t.id == at.id)) {
               b = true;
@@ -864,7 +907,14 @@ export function generateScene(state: State, scene: Scene): Object {
           }
           if (b) continue;
 
-          // Filter out sources which have noneTags
+          // Filter out sources which have ruleNoneTags/noneTags
+          for (let nt of ruleNoneTags) {
+            if (s.tags.find((t) => t.id == nt.id)) {
+              b = true;
+              break;
+            }
+          }
+          if (b) continue;
           for (let nt of noneTags) {
             if (s.tags.find((t) => t.id == nt.id)) {
               b = true;
@@ -873,16 +923,34 @@ export function generateScene(state: State, scene: Scene): Object {
           }
           if (b) continue;
 
-          // Filter out sources which don't have allTypes
+          // Filter out sources which don't have ruleAllTypes/allTypes
+          for (let at of ruleAllTypes) {
+            if (at != sTypeEn) {
+              b = true;
+              break;
+            } else {
+              console.log(sTypeEn)
+            }
+          }
+          if (b) continue;
           for (let at of allTypes) {
             if (at != sTypeEn) {
+              b = true;
+              break;
+            } else {
+              console.log(sTypeEn)
+            }
+          }
+          if (b) continue;
+
+          // Filter out sources which have ruleNonTypes/noneTypes
+          for (let nt of ruleNoneTypes) {
+            if (nt == sTypeEn) {
               b = true;
               break;
             }
           }
           if (b) continue;
-
-          // Filter out sources which have noneTypes
           for (let nt of noneTypes) {
             if (nt == sTypeEn) {
               b = true;
@@ -922,7 +990,15 @@ export function generateScene(state: State, scene: Scene): Object {
                   continue;
                 }
 
-                // Filter out clips which don't have allTags
+                // Filter out clips which don't have ruleAllTags/allTags
+                for (let at of ruleAllTags) {
+                  if (!cTags.find((t) => t.id == at.id)) {
+                    invalidClips.push(c.id);
+                    b = true;
+                    break;
+                  }
+                }
+                if (b) continue;
                 for (let at of allTags) {
                   if (!cTags.find((t) => t.id == at.id)) {
                     invalidClips.push(c.id);
@@ -932,7 +1008,15 @@ export function generateScene(state: State, scene: Scene): Object {
                 }
                 if (b) continue;
 
-                // Filter out clips which have noneTags
+                // Filter out clips which have ruleNonTags/noneTags
+                for (let nt of ruleNoneTags) {
+                  if (cTags.find((t) => t.id == nt.id)) {
+                    invalidClips.push(c.id);
+                    b = true;
+                    break;
+                  }
+                }
+                if (b) continue;
                 for (let nt of noneTags) {
                   if (cTags.find((t) => t.id == nt.id)) {
                     invalidClips.push(c.id);
@@ -942,7 +1026,15 @@ export function generateScene(state: State, scene: Scene): Object {
                 }
                 if (b) continue;
 
-                // Filter out clips which don't have allTypes
+                // Filter out clips which don't have ruleAllTypes/allTypes
+                for (let at of ruleAllTypes) {
+                  if (at != sTypeEn) {
+                    invalidClips.push(c.id);
+                    b = true;
+                    break;
+                  }
+                }
+                if (b) continue;
                 for (let at of allTypes) {
                   if (at != sTypeEn) {
                     invalidClips.push(c.id);
@@ -952,7 +1044,15 @@ export function generateScene(state: State, scene: Scene): Object {
                 }
                 if (b) continue;
 
-                // Filter out clips which have noneTypes
+                // Filter out clips which have ruleNoneTypes/noneTypes
+                for (let nt of ruleNoneTypes) {
+                  if (nt == sTypeEn) {
+                    invalidClips.push(c.id);
+                    b = true;
+                    break;
+                  }
+                }
+                if (b) continue;
                 for (let nt of noneTypes) {
                   if (nt == sTypeEn) {
                     invalidClips.push(c.id);
@@ -976,7 +1076,14 @@ export function generateScene(state: State, scene: Scene): Object {
                 continue
               }
 
-              // Filter out sources which don't have allTags
+              // Filter out sources which don't have ruleAllTags/allTags
+              for (let at of ruleAllTags) {
+                if (!s.tags.find((t) => t.id == at.id)) {
+                  b = true;
+                  break;
+                }
+              }
+              if (b) continue;
               for (let at of allTags) {
                 if (!s.tags.find((t) => t.id == at.id)) {
                   b = true;
@@ -985,7 +1092,14 @@ export function generateScene(state: State, scene: Scene): Object {
               }
               if (b) continue;
 
-              // Filter out sources which have noneTags
+              // Filter out sources which have ruleNoneTags/noneTags
+              for (let nt of ruleNoneTags) {
+                if (s.tags.find((t) => t.id == nt.id)) {
+                  b = true;
+                  break;
+                }
+              }
+              if (b) continue;
               for (let nt of noneTags) {
                 if (s.tags.find((t) => t.id == nt.id)) {
                   b = true;
@@ -994,7 +1108,14 @@ export function generateScene(state: State, scene: Scene): Object {
               }
               if (b) continue;
 
-              // Filter out sources which don't have allTyoes
+              // Filter out sources which don't have ruleAllTypes/allTypes
+              for (let at of ruleAllTypes) {
+                if (at != sTypeEn) {
+                  b = true;
+                  break;
+                }
+              }
+              if (b) continue;
               for (let at of allTypes) {
                 if (at != sTypeEn) {
                   b = true;
@@ -1003,7 +1124,14 @@ export function generateScene(state: State, scene: Scene): Object {
               }
               if (b) continue;
 
-              // Filter out sources which have noneTypes
+              // Filter out sources which have ruleNoneTypes/noneTypes
+              for (let nt of ruleNoneTypes) {
+                if (nt == sTypeEn) {
+                  b = true;
+                  break;
+                }
+              }
+              if (b) continue;
               for (let nt of noneTypes) {
                 if (nt == sTypeEn) {
                   b = true;
