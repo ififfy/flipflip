@@ -326,6 +326,7 @@ class SceneOptionCard extends React.Component {
                     value={this.props.scene.nextSceneID}
                     getSceneName={this.getSceneName.bind(this)}
                     onChange={this.changeIntKey.bind(this, 'nextSceneID')}
+                    includeExtra
                     onRandomSceneDialog={this.onRandomSceneDialog.bind(this)}
                   />
                   <Dialog
@@ -337,20 +338,6 @@ class SceneOptionCard extends React.Component {
                       <DialogContentText id="random-scene-description">
                         Select which scenes to include:
                       </DialogContentText>
-                      {/*<div className={classes.randomSceneList}>
-                        {this.props.allScenes.map((s) =>
-                          <FormControlLabel
-                            key={s.id}
-                            className={classes.randomScene}
-                            control={
-                              <Switch
-                                checked={this.state.randomSceneList != null ? this.state.randomSceneList.includes(s.id) : this.props.scene.nextSceneRandoms.includes(s.id)}
-                                size="small"
-                                onChange={this.onToggleRandomScene.bind(this, s.id)}/>
-                            }
-                            label={s.name}/>
-                          )}
-                      </div>*/}
                       <MultiSceneSelect
                         scene={this.props.scene}
                         allScenes={this.props.allScenes}

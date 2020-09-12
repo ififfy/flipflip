@@ -245,8 +245,6 @@ export default class ImageView extends React.Component {
           }
           const cTop = Math.max(parentHeight - imgHeight, 0);
           const cLeft = Math.max(parentWidth - imgWidth, 0);
-          console.log("Top: " + cTop);
-          console.log("Left: " + cLeft);
           if (cTop != 0 || cLeft != 0) {
             img.style.marginTop = cTop / 2 + 'px';
             img.style.marginLeft = cLeft / 2 + 'px';

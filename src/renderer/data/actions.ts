@@ -848,8 +848,6 @@ export function generateScene(state: State, scene: Scene): Object {
                 invalidClips.push(c.id);
                 b = true;
                 break;
-              } else {
-                console.log(sTypeEn)
               }
             }
             if (b) continue;
@@ -858,8 +856,6 @@ export function generateScene(state: State, scene: Scene): Object {
                 invalidClips.push(c.id);
                 b = true;
                 break;
-              } else {
-                console.log(sTypeEn)
               }
             }
             if (b) continue;
@@ -928,8 +924,6 @@ export function generateScene(state: State, scene: Scene): Object {
             if (at != sTypeEn) {
               b = true;
               break;
-            } else {
-              console.log(sTypeEn)
             }
           }
           if (b) continue;
@@ -937,8 +931,6 @@ export function generateScene(state: State, scene: Scene): Object {
             if (at != sTypeEn) {
               b = true;
               break;
-            } else {
-              console.log(sTypeEn)
             }
           }
           if (b) continue;

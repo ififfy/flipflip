@@ -10,9 +10,10 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import DeleteIcon from '@material-ui/icons/Delete';
 import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 
+import {SGT} from "../../data/const";
+import SceneSelect from "../configGroups/SceneSelect";
 import SceneGrid from "../../data/SceneGrid";
 import Scene from "../../data/Scene";
-import {SGT} from "../../data/const";
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -84,7 +85,8 @@ const styles = (theme: Theme) => createStyles({
     alignItems: 'center',
   },
   sceneMenu: {
-    maxHeight: 400,
+    minHeight: 365,
+    minWidth: 250,
   },
   deleteButton: {
     backgroundColor: theme.palette.error.dark,
@@ -252,7 +254,7 @@ class GridSetup extends React.Component {
                         key={colIndex}
                         variant="outlined"
                         onClick={this.onClickCell.bind(this, rowIndex, colIndex)}>
-                        {scene ? scene.name : ""}
+                        {scene ? scene.name : "~~EMPTY~~"}
                       </Button>
                     );
                   })}
@@ -276,20 +278,18 @@ class GridSetup extends React.Component {
               classes={{paper: classes.sceneMenu}}
               open={!!this.state.isEditing}
               onClose={this.onCloseMenu.bind(this)}>
-              <MenuItem key={-1} onClick={this.onChooseScene.bind(this, -1)}>
-                <ListItemText primary={"~~EMPTY~~"}/>
-              </MenuItem>
-              {this.props.allScenes.map((s) => {
-                if (s.sources.length > 0) {
-                  return (
-                    <MenuItem key={s.id} onClick={this.onChooseScene.bind(this, s.id)}>
-                      <ListItemText primary={s.name}/>
-                    </MenuItem>
-                  );
-                } else {
-                  return;
-                }
-              })}
+              {!!this.state.isEditing &&
+                <SceneSelect
+                  scene={null}
+                  allScenes={this.props.allScenes}
+                  value={this.props.grid.grid[this.state.isEditing[0]][this.state.isEditing[1]]}
+                  menuIsOpen
+                  autoFocus
+                  onlyExtra
+                  getSceneName={this.getSceneName.bind(this)}
+                  onChange={this.onChooseScene.bind(this)}
+                  />
+              }
             </Menu>
             <Fab
               className={classes.deleteButton}
@@ -434,6 +434,11 @@ class GridSetup extends React.Component {
 
   onPlayGrid() {
     this.props.onPlayGrid(this.props.grid);
+  }
+
+  getSceneName(id: string): string {
+    if (id === "-1") return "~~EMPTY~~";
+    return this.props.allScenes.find((s) => s.id.toString() === id).name;
   }
 }
 
