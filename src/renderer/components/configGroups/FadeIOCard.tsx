@@ -60,12 +60,11 @@ class FadeIOCard extends React.Component {
     const fadeDurationMin = typeof this.props.scene.fadeIODurationMin === 'number' ? this.props.scene.fadeIODurationMin : 0;
     const fadeDurationMax = typeof this.props.scene.fadeIODurationMax === 'number' ? this.props.scene.fadeIODurationMax : 0;
     return(
-      <Grid container spacing={this.props.scene.fadeInOut ? 2 : 0} alignItems="center">
-        <Grid item xs={12} className={clsx(this.props.tutorial != null && this.props.tutorial != SDT.fade1 && classes.disable)}>
+      <Grid container spacing={this.props.scene.fadeInOut ? 2 : 0} alignItems="center" className={clsx(this.props.tutorial != null && classes.disable)}>
+        <Grid item xs={12}>
           <Grid container alignItems="center">
             <Grid item xs={11}>
               <FormControlLabel
-                className={clsx(this.props.tutorial == SDT.fade1 && classes.highlight)}
                 control={
                   <Switch checked={this.props.scene.fadeInOut}
                           onChange={this.onBoolInput.bind(this, 'fadeInOut')}/>
@@ -84,7 +83,7 @@ class FadeIOCard extends React.Component {
             <Divider />
           </Collapse>
         </Grid>
-        <Grid item xs={12} className={clsx(this.props.tutorial != null && classes.disable, this.props.tutorial == SDT.fade2 && classes.highlight)}>
+        <Grid item xs={12}>
           <Collapse in={this.props.scene.fadeInOut} className={classes.fullWidth}>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} style={{paddingTop: 10}}>
@@ -164,7 +163,7 @@ class FadeIOCard extends React.Component {
             </Grid>
           </Collapse>
         </Grid>
-        <Grid item xs={12} className={clsx(this.props.tutorial != null && classes.disable)}>
+        <Grid item xs={12}>
           <Collapse in={this.props.scene.fadeInOut && (this.props.scene.fadeIOTF == TF.random || this.props.scene.fadeIOTF == TF.sin)} className={classes.fullWidth}>
             <Grid container alignItems="center">
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>

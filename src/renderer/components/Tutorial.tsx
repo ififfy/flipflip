@@ -267,6 +267,12 @@ class Tutorial extends React.Component {
                 <br/>
                 Ctrl+Click: <b>Opens caching directory</b> (reveals local video files)
               </DialogContentText>
+              <hr/>
+              <DialogContentText id="tutorial-description">
+                Ctrl+Alt+Shift+Click: <b>Deletes this local source</b>
+                <br/>
+                &emsp;(WARNING: This will delete the file(s) from your system)
+              </DialogContentText>
             </DialogContent>
             <DialogActions>
               <Button onClick={this.onContinue.bind(this)} color="primary">
@@ -297,7 +303,7 @@ class Tutorial extends React.Component {
             <DialogTitle id="tutorial-title">Source</DialogTitle>
             <DialogContent>
               <DialogContentText id="tutorial-description">
-                These are the source's <b>Tags</b>. <b>You can add/remove tags and tag sources in the Library</b>.
+                These are the source's <b>Tags</b>. <b>You can use the Library to create/delete tags and to tag sources</b>.
               </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -313,7 +319,7 @@ class Tutorial extends React.Component {
             <DialogTitle id="tutorial-title">Source</DialogTitle>
             <DialogContent>
               <DialogContentText id="tutorial-description">
-                This is the source's <b>Count</b>. Each source remebers the number of images/videos available. When a <b>+</b> is next to the number, that means the count is incomplete, and there may be more images/videos.
+                This is the source's <b>Count</b>. Each source remembers the number of images/videos available. When a <b>+</b> is next to the number, that means the count is incomplete, and there may be more images/videos.
               </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -695,6 +701,9 @@ class Tutorial extends React.Component {
             <DialogContent>
               <DialogContentText id="tutorial-description">
                 This is the effects tab. Here you can toggle and customize effects: <b>zoom/move</b>, <b>cross fade</b> and <b>strobe</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                There are also two new effects: <b>fade in/out</b> and <b>panning</b>. These effects are still being improved and may produce unexpected results.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 <i><b>Audio tracks</b> and <b>text overlays</b> are located in the Audio/Text tab.</i>

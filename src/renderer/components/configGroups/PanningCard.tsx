@@ -71,12 +71,11 @@ class PanningCard extends React.Component {
     const vertTransLevelMax = typeof this.props.scene.panVertTransLevelMax === 'number' ? this.props.scene.panVertTransLevelMax : 0;
     const vertTransLevelMin = typeof this.props.scene.panVertTransLevelMin === 'number' ? this.props.scene.panVertTransLevelMin : 0;
     return(
-      <Grid container spacing={this.props.scene.panning ? 2 : 0} alignItems="center">
-        <Grid item xs={12}  className={clsx(this.props.tutorial != null && this.props.tutorial != SDT.fade1 && classes.disable)}>
+      <Grid container spacing={this.props.scene.panning ? 2 : 0} alignItems="center" className={clsx(this.props.tutorial != null && classes.disable)}>
+        <Grid item xs={12}>
           <Grid container alignItems="center">
             <Grid item xs={11}>
               <FormControlLabel
-                className={clsx(this.props.tutorial == SDT.fade1 && classes.highlight)}
                 control={
                   <Switch checked={this.props.scene.panning}
                           onChange={this.onBoolInput.bind(this, 'panning')}/>
@@ -95,7 +94,7 @@ class PanningCard extends React.Component {
             <Divider />
           </Collapse>
         </Grid>
-        <Grid item xs={12} className={clsx(this.props.tutorial && classes.disable)}>
+        <Grid item xs={12}>
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} sm={!this.props.sidebar && this.props.scene.panHorizTransType != HTF.none ? 5 : 12}>
               <Collapse in={this.props.scene.panning} className={clsx(classes.fullWidth, classes.paddingLeft)}>
@@ -189,7 +188,7 @@ class PanningCard extends React.Component {
             <Divider />
           </Collapse>
         </Grid>
-        <Grid item xs={12} className={clsx(this.props.tutorial && classes.disable)}>
+        <Grid item xs={12}>
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} sm={!this.props.sidebar && this.props.scene.panVertTransType != VTF.none ? 5 : 12}>
               <Collapse in={this.props.scene.panning} className={clsx(classes.fullWidth, classes.paddingLeft)}>
@@ -283,7 +282,7 @@ class PanningCard extends React.Component {
             <Divider />
           </Collapse>
         </Grid>
-        <Grid item xs={12} className={clsx(this.props.tutorial != null && classes.disable, this.props.tutorial == SDT.fade2 && classes.highlight)}>
+        <Grid item xs={12}>
           <Collapse in={this.props.scene.panning} className={classes.fullWidth}>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} style={{paddingTop: 10}}>
@@ -363,7 +362,7 @@ class PanningCard extends React.Component {
             </Grid>
           </Collapse>
         </Grid>
-        <Grid item xs={12} className={clsx(this.props.tutorial != null && classes.disable)}>
+        <Grid item xs={12}>
           <Collapse in={this.props.scene.panning && (this.props.scene.panTF == TF.random || this.props.scene.panTF == TF.sin)} className={classes.fullWidth}>
             <Grid container alignItems="center">
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
