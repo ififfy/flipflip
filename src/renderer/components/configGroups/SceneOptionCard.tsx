@@ -1,10 +1,32 @@
 import * as React from "react";
 import clsx from "clsx";
+import Select from "react-select";
 
 import {
-  Button, Collapse, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, Divider, Fab, FormControl,
-  FormControlLabel, Grid, IconButton, InputAdornment, InputLabel, MenuItem, Select, Slider, Switch, TextField, Theme,
-  Tooltip, Typography, withStyles
+  Button,
+  Collapse,
+  createStyles,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  Divider,
+  Fab,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select as MSelect,
+  Slider,
+  Switch,
+  TextField,
+  Theme,
+  Tooltip,
+  Typography,
+  withStyles
 } from "@material-ui/core";
 
 import AddIcon from '@material-ui/icons/Add';
@@ -13,11 +35,13 @@ import ListIcon from '@material-ui/icons/List';
 
 import {BT, IT, SDT, TF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
+import SceneSelect from "./SceneSelect";
 import en from "../../data/en";
 import Overlay from "../../data/Overlay";
 import Scene from "../../data/Scene";
 import ColorPicker from "../config/ColorPicker";
 import ColorSetPicker from "../config/ColorSetPicker";
+import MultiSceneSelect from "./MultiSceneSelect";
 
 const styles = (theme: Theme) => createStyles({
   fullWidth: {
@@ -30,6 +54,13 @@ const styles = (theme: Theme) => createStyles({
   },
   noPadding: {
     padding: '0 !important',
+  },
+  noTopPadding: {
+    paddingTop: '0 !important',
+  },
+  selectOffset: {
+    paddingTop: '10px !important',
+    paddingBottom: '0 !important',
   },
   endInput: {
     paddingLeft: theme.spacing(1),
@@ -55,11 +86,19 @@ const styles = (theme: Theme) => createStyles({
   randomScene: {
     display: 'block',
   },
-  randomSceneList: {
-    maxHeight: '400px',
-    overflowY: 'auto',
-    padding: theme.spacing(1),
-  }
+  selectText: {
+    color: theme.palette.text.secondary,
+  },
+  error: {
+    color: theme.palette.error.main,
+  },
+  noScroll: {
+    overflow: 'visible',
+  },
+  randomSceneDialog: {
+    minWidth: 400,
+    overflow: 'visible',
+  },
 });
 
 class SceneOptionCard extends React.Component {
@@ -89,20 +128,20 @@ class SceneOptionCard extends React.Component {
     const timingMax = typeof this.props.scene.timingMax === 'number' ? this.props.scene.timingMax : 0;
     const backgroundBlur = typeof this.props.scene.backgroundBlur === 'number' ? this.props.scene.backgroundBlur : 0;
     const nextSceneTime = typeof this.props.scene.nextSceneTime === 'number' ? this.props.scene.nextSceneTime : 0;
-    return(
+    return (
       <Grid container spacing={2} alignItems="center">
         <Grid item xs={12} className={clsx(this.props.tutorial == SDT.timing && classes.highlight)}>
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} style={{paddingTop: 10}}>
               <FormControl className={classes.fullWidth}>
                 <InputLabel>Timing</InputLabel>
-                <Select
+                <MSelect
                   value={this.props.scene.timingFunction}
                   onChange={this.onInput.bind(this, 'timingFunction')}>
                   {[TF.constant, TF.random, TF.sin, TF.bpm].map((tf) =>
                     <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
                   )}
-                </Select>
+                </MSelect>
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 8}>
@@ -170,7 +209,8 @@ class SceneOptionCard extends React.Component {
           </Grid>
         </Grid>
         <Grid item xs={12}>
-          <Collapse in={this.props.scene.timingFunction == TF.random || this.props.scene.timingFunction == TF.sin} className={classes.fullWidth}>
+          <Collapse in={this.props.scene.timingFunction == TF.random || this.props.scene.timingFunction == TF.sin}
+                    className={classes.fullWidth}>
             <Grid container alignItems="center">
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                 <TextField
@@ -210,33 +250,33 @@ class SceneOptionCard extends React.Component {
           </Collapse>
         </Grid>
         <Grid item xs={12}>
-          <Divider />
+          <Divider/>
         </Grid>
         <Grid item xs={12} className={clsx(this.props.tutorial == SDT.imageSizing && classes.highlight)}>
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={this.props.sidebar ? 8 : 12} sm={this.props.sidebar ? 8 : 6}>
               <FormControl className={classes.fullWidth}>
                 <InputLabel>Image Sizing</InputLabel>
-                <Select
+                <MSelect
                   value={this.props.scene.imageType}
                   onChange={this.onInput.bind(this, 'imageType')}>
                   {Object.values(IT).map((it) =>
                     <MenuItem key={it} value={it}>{en.get(it)}</MenuItem>
                   )}
-                </Select>
+                </MSelect>
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}/>
             <Grid item xs={this.props.sidebar ? 8 : 12} sm={this.props.sidebar ? 8 : 4}>
               <FormControl className={classes.fullWidth}>
                 <InputLabel>Background</InputLabel>
-                <Select
+                <MSelect
                   value={this.props.scene.backgroundType}
                   onChange={this.onInput.bind(this, 'backgroundType')}>
                   {Object.values(BT).map((bt) =>
                     <MenuItem key={bt} value={bt}>{en.get(bt)}</MenuItem>
                   )}
-                </Select>
+                </MSelect>
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 8}>
@@ -273,47 +313,31 @@ class SceneOptionCard extends React.Component {
         {!this.props.isTagging && (
           <React.Fragment>
             <Grid item xs={12}>
-              <Divider />
+              <Divider/>
             </Grid>
             <Grid item xs={12} className={clsx(this.props.tutorial == SDT.nextScene && classes.highlight)}>
               <Grid container spacing={2} alignItems="center">
-                <Grid item xs={12} sm={this.props.sidebar ? 12 : 7}>
-                  <FormControl className={classes.fullWidth}>
-                    <InputLabel>Next Scene</InputLabel>
-                    <Select
-                      value={this.props.scene.nextSceneID}
-                      MenuProps={{
-                        PaperProps: {
-                          style: {
-                            maxHeight: 300,
-                          },
-                        },
-                      }}
-                      endAdornment={this.props.scene.nextSceneID != -1 ? null :
-                        <InputAdornment position="start">
-                          <Tooltip title="Select Scenes">
-                            <IconButton
-                              onClick={this.onRandomSceneDialog.bind(this)}>
-                              <ListIcon/>
-                            </IconButton>
-                          </Tooltip>
-                        </InputAdornment>
-                      }
-                      onChange={this.onInput.bind(this, 'nextSceneID')}>
-                      {["0", "-1"].concat(this.props.allScenes.filter((s) => s.id !== this.props.scene.id && s.sources.length > 0).map((s) => s.id.toString())).map((id) =>
-                        <MenuItem key={id} value={id}>{this.getSceneName(id)}</MenuItem>
-                      )}
-                    </Select>
-                  </FormControl>
+                <Grid item className={classes.noTopPadding} xs={this.props.scene.nextSceneID == -1 ? 10 : 12}
+                      sm={this.props.scene.nextSceneID == -1 ? this.props.sidebar ? 10 : 5 : this.props.sidebar ? 12 : 7}>
+                  <Typography className={classes.selectText} variant="caption">Next Scene</Typography>
+                  <SceneSelect
+                    scene={this.props.scene}
+                    allScenes={this.props.allScenes}
+                    value={this.props.scene.nextSceneID}
+                    getSceneName={this.getSceneName.bind(this)}
+                    onChange={this.changeIntKey.bind(this, 'nextSceneID')}
+                    onRandomSceneDialog={this.onRandomSceneDialog.bind(this)}
+                  />
                   <Dialog
+                    classes={{paper: classes.randomSceneDialog}}
                     open={this.state.randomSceneList != null}
                     onClose={this.onRandomSceneDialog.bind(this)}
                     aria-describedby="random-scene-description">
-                    <DialogContent>
+                    <DialogContent classes={{root: classes.noScroll}}>
                       <DialogContentText id="random-scene-description">
                         Select which scenes to include:
                       </DialogContentText>
-                      <div className={classes.randomSceneList}>
+                      {/*<div className={classes.randomSceneList}>
                         {this.props.allScenes.map((s) =>
                           <FormControlLabel
                             key={s.id}
@@ -326,7 +350,14 @@ class SceneOptionCard extends React.Component {
                             }
                             label={s.name}/>
                           )}
-                      </div>
+                      </div>*/}
+                      <MultiSceneSelect
+                        scene={this.props.scene}
+                        allScenes={this.props.allScenes}
+                        values={this.state.randomSceneList != null ? this.state.randomSceneList : this.props.scene.nextSceneRandoms}
+                        getSceneName={this.getSceneName.bind(this)}
+                        onChange={this.changeRandomScenes.bind(this)}
+                      />
                     </DialogContent>
                     <DialogActions>
                       <Button onClick={this.onSelectNone.bind(this)} color="default">
@@ -346,7 +377,19 @@ class SceneOptionCard extends React.Component {
                     </DialogActions>
                   </Dialog>
                 </Grid>
-                <Grid item xs={12} sm={this.props.sidebar ? 12 : 5}>
+                {this.props.scene.nextSceneID == -1 &&
+                <Grid item className={classes.selectOffset}>
+                  <Tooltip
+                    title={this.props.scene.nextSceneRandoms.length == 0 ? "Select Scenes (EMPTY)" : "Select Scenes"}>
+                    <IconButton
+                      className={clsx(this.props.scene.nextSceneRandoms.length == 0 && classes.error)}
+                      onClick={this.onRandomSceneDialog.bind(this)}>
+                      <ListIcon/>
+                    </IconButton>
+                  </Tooltip>
+                </Grid>
+                }
+                <Grid item className={classes.selectOffset} xs={12} sm={this.props.sidebar ? 12 : 5}>
                   <Collapse in={this.props.scene.nextSceneID != 0 && !this.props.scene.nextSceneAllImages}>
                     <TextField
                       variant="outlined"
@@ -377,7 +420,7 @@ class SceneOptionCard extends React.Component {
               </Grid>
             </Grid>
             <Grid item xs={12}>
-              <Divider />
+              <Divider/>
             </Grid>
             <Grid item xs={12} className={clsx(this.props.tutorial == SDT.overlays && classes.highlight)}>
               <Grid container spacing={2} alignItems="center">
@@ -395,73 +438,66 @@ class SceneOptionCard extends React.Component {
                       className={classes.addButton}
                       onClick={this.onAddOverlay.bind(this)}
                       size="small">
-                      <AddIcon />
+                      <AddIcon/>
                     </Fab>
                   </Collapse>
                 </Grid>
               </Grid>
             </Grid>
             {this.props.scene.overlays.map((o) => {
-              const overlayOpacity = typeof o.opacity === 'number' ? o.opacity : 0;
-              return (
-                <React.Fragment key={o.id}>
-                  <Grid item xs={12} className={clsx(!this.props.scene.overlayEnabled && classes.noPadding)}>
-                    <Collapse in={this.props.scene.overlayEnabled} className={classes.fullWidth}>
-                      <Grid container spacing={2} alignItems="center">
-                        <Grid item xs={12} sm={this.props.sidebar ? 12 : 5}>
-                          <FormControl className={classes.fullWidth}>
-                            <InputLabel>Overlay</InputLabel>
-                            <Select
+                const overlayOpacity = typeof o.opacity === 'number' ? o.opacity : 0;
+                return (
+                  <React.Fragment key={o.id}>
+                    <Grid item xs={12} className={clsx(!this.props.scene.overlayEnabled && classes.noPadding)}>
+                      <Collapse in={this.props.scene.overlayEnabled} className={classes.fullWidth}>
+                        <Grid container spacing={2} alignItems="center">
+                          <Grid item xs={12} sm={this.props.sidebar ? 12 : 5}>
+                            <Typography className={classes.selectText} variant="caption">Overlay</Typography>
+                            <SceneSelect
+                              scene={this.props.scene}
+                              allScenes={this.props.allScenes}
                               value={o.sceneID}
-                              MenuProps={{
-                                PaperProps: {
-                                  style: {
-                                    maxHeight: 300,
-                                  },
-                                },
-                              }}
-                              onChange={this.onOverlayInput.bind(this, o.id, 'sceneID')}>
-                              {["0"].concat(this.props.allScenes.filter((s) => s.sources.length > 0).map((s) => s.id.toString())).map((id) =>
-                                <MenuItem key={id} value={id}>{this.getSceneName(id)}</MenuItem>
-                              )}
-                            </Select>
-                          </FormControl>
-                        </Grid>
-                        <Grid item xs={12} sm={this.props.sidebar ? 12 : 7}>
-                          <Typography id="overlay-opacity-slider" variant="caption" component="div" color="textSecondary">
-                            Overlay Opacity: {o.opacity}%
-                          </Typography>
-                          <Grid container spacing={1} alignItems="center">
-                            <Grid item xs>
-                              <Slider
-                                min={0}
-                                max={99}
-                                defaultValue={overlayOpacity}
-                                onChangeCommitted={this.onOverlaySliderChange.bind(this, o.id, 'opacity')}
-                                valueLabelDisplay={'auto'}
-                                valueLabelFormat={(v) => v + "%"}
-                                aria-labelledby="overlay-opacity-slider"/>
-                            </Grid>
-                            <Grid item>
-                              <Tooltip title="Remove Overlay">
-                                <IconButton
-                                  onClick={this.onRemoveOverlay.bind(this, o.id)}>
-                                  <DeleteIcon color="error"/>
-                                </IconButton>
-                              </Tooltip>
+                              getSceneName={this.getSceneName.bind(this)}
+                              onChange={this.changeOverlayIntKey.bind(this, o.id, 'sceneID')}
+                            />
+                          </Grid>
+                          <Grid item xs={12} sm={this.props.sidebar ? 12 : 7}>
+                            <Typography id="overlay-opacity-slider" variant="caption" component="div"
+                                        color="textSecondary">
+                              Overlay Opacity: {o.opacity}%
+                            </Typography>
+                            <Grid container spacing={1} alignItems="center">
+                              <Grid item xs>
+                                <Slider
+                                  min={0}
+                                  max={99}
+                                  defaultValue={overlayOpacity}
+                                  onChangeCommitted={this.onOverlaySliderChange.bind(this, o.id, 'opacity')}
+                                  valueLabelDisplay={'auto'}
+                                  valueLabelFormat={(v) => v + "%"}
+                                  aria-labelledby="overlay-opacity-slider"/>
+                              </Grid>
+                              <Grid item>
+                                <Tooltip title="Remove Overlay">
+                                  <IconButton
+                                    onClick={this.onRemoveOverlay.bind(this, o.id)}>
+                                    <DeleteIcon color="error"/>
+                                  </IconButton>
+                                </Tooltip>
+                              </Grid>
                             </Grid>
                           </Grid>
                         </Grid>
-                      </Grid>
-                    </Collapse>
-                  </Grid>
-                  <Grid item xs={12} className={clsx(!this.props.scene.overlayEnabled && classes.noPadding)}>
-                    <Collapse in={this.props.scene.overlayEnabled} className={classes.fullWidth}>
-                      <Divider/>
-                    </Collapse>
-                  </Grid>
-                </React.Fragment>
-              )}
+                      </Collapse>
+                    </Grid>
+                    <Grid item xs={12} className={clsx(!this.props.scene.overlayEnabled && classes.noPadding)}>
+                      <Collapse in={this.props.scene.overlayEnabled} className={classes.fullWidth}>
+                        <Divider/>
+                      </Collapse>
+                    </Grid>
+                  </React.Fragment>
+                )
+              }
             )}
           </React.Fragment>
         )}
@@ -475,13 +511,17 @@ class SceneOptionCard extends React.Component {
       id = Math.max(o.id + 1, id);
     });
     const newOverlays = this.props.scene.overlays.concat([new Overlay({id: id})]);
-    this.update((s) => {s.overlays = newOverlays});
+    this.update((s) => {
+      s.overlays = newOverlays
+    });
   }
 
   onRemoveOverlay(id: number) {
     const newOverlays = Array.from(this.props.scene.overlays);
     newOverlays.splice(newOverlays.map((o) => o.id).indexOf(id), 1);
-    this.update((s) => {s.overlays = newOverlays});
+    this.update((s) => {
+      s.overlays = newOverlays
+    });
   }
 
   getSceneName(id: string): string {
@@ -501,6 +541,10 @@ class SceneOptionCard extends React.Component {
 
   changeOverlayKey(id: number, key: string, value: any) {
     this.update((s) => s.overlays.find((o: Overlay) => o.id == id)[key] = value);
+  }
+
+  changeOverlayIntKey(id: number, key: string, intString: string) {
+    this.changeOverlayKey(id, key, intString === '' ? '' : Number(intString));
   }
 
   blurIntKey(key: string, e: MouseEvent) {
@@ -547,7 +591,7 @@ class SceneOptionCard extends React.Component {
     this.props.onUpdateScene(this.props.scene, fn);
   }
 
-  changeIntKey(key:string, intString: string) {
+  changeIntKey(key: string, intString: string) {
     this.changeKey(key, intString === '' ? '' : Number(intString));
   }
 
@@ -563,12 +607,8 @@ class SceneOptionCard extends React.Component {
     }
   }
 
-  onToggleRandomScene(sceneID: number) {
-    if (this.state.randomSceneList.includes(sceneID)) {
-      this.setState({randomSceneList: this.state.randomSceneList.filter((s) => s != sceneID)});
-    } else {
-      this.setState({randomSceneList: this.state.randomSceneList.concat([sceneID])});
-    }
+  changeRandomScenes(sceneIDs: Array<number>) {
+    this.setState({randomSceneList: sceneIDs});
   }
 
   onSelectNone() {

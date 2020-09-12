@@ -809,6 +809,7 @@ class Library extends React.Component {
                 displaySources={this.props.library}
                 filters={this.state.selectedTags}
                 placeholder={"Tag These Sources"}
+                isClearable
                 onlyTags
                 showCheckboxes
                 hideSelectedOptions={false}

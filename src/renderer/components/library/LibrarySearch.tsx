@@ -31,6 +31,7 @@ class LibrarySearch extends React.Component {
     autoFocus?: boolean,
     controlShouldRenderValue?: boolean,
     hideSelectedOptions?: boolean,
+    isClearable?: boolean
     isCreatable?: boolean,
     menuIsOpen?: boolean,
     onlyTags?: boolean,
@@ -91,7 +92,7 @@ class LibrarySearch extends React.Component {
           components={{ Option, MultiValue }}
           menuIsOpen={this.props.menuIsOpen}
           autoFocus={this.props.autoFocus}
-          isClearable
+          isClearable={this.props.isClearable}
           isMulti
           controlShouldRenderValue={this.props.controlShouldRenderValue}
           hideSelectedOptions={this.props.hideSelectedOptions}

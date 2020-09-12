@@ -20,6 +20,9 @@ const styles = (theme: Theme) => createStyles({
   },
   disable: {
     pointerEvents: 'none',
+  },
+  overflow: {
+    overflow: "inherit"
   }
 });
 
@@ -49,7 +52,7 @@ class SceneOptions extends React.Component {
     return (
       <Grid container spacing={2}>
         <Grid item xs={12} md={6} className={clsx(tutorial1 && clsx(classes.backdropTop, classes.disable))}>
-          <Card className={clsx(this.props.tutorial == SDT.optionsLeft && classes.highlight)}>
+          <Card classes={{root: classes.overflow}} className={clsx(this.props.tutorial == SDT.optionsLeft && classes.highlight)}>
             <CardContent>
               <SceneOptionCard
                 allScenes={this.props.allScenes}
