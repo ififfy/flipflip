@@ -151,7 +151,7 @@ export default class Strobe extends React.Component {
         duration = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (Math.max(this.props.scene.strobeTimeMax, 10) - Math.max(this.props.scene.strobeTimeMin, 10) + 1)) + Math.max(this.props.scene.strobeTimeMin, 10);
         break;
       case TF.bpm:
-        const bpmMulti = this.props.scene.strobeBPMMulti > 0 ? this.props.scene.strobeBPMMulti : 1 / (-1 * (this.props.scene.strobeBPMMulti - 2));
+        const bpmMulti = this.props.scene.strobeBPMMulti / 10;
         const bpm = this.props.scene.audios.length > 0 ? this.props.scene.audios[0].bpm : 60;
         duration = 60000 / (bpm * bpmMulti);
         // If we cannot parse this, default to 1s
@@ -179,7 +179,7 @@ export default class Strobe extends React.Component {
         delay = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (this.props.scene.strobeDelayMax - this.props.scene.strobeDelayMin + 1)) + this.props.scene.strobeDelayMin;
         break;
       case TF.bpm:
-        const bpmMulti = this.props.scene.strobeDelayBPMMulti > 0 ? this.props.scene.strobeDelayBPMMulti : 1 / (-1 * (this.props.scene.strobeDelayBPMMulti - 2));
+        const bpmMulti = this.props.scene.strobeDelayBPMMulti / 10;
         const bpm = this.props.scene.audios.length > 0 ? this.props.scene.audios[0].bpm : 60;
         delay = 60000 / (bpm * bpmMulti);
         // If we cannot parse this, default to 1s

@@ -358,9 +358,11 @@ class SceneGenerator extends React.Component {
                   <LibrarySearch
                     displaySources={this.props.library}
                     filters={this.props.scene.generatorWeights[this.state.isEditing].rules.filter((wg) => !wg.rules).map((wg) => wg.name)}
+                    tags={this.props.tags}
                     placeholder={"Search ..."}
                     autoFocus
                     onlyTagsAndTypes
+                    onlyUsed
                     menuIsOpen
                     controlShouldRenderValue={false}
                     onUpdateFilters={this.onAddRule.bind(this)}/>

@@ -873,9 +873,11 @@ class SceneDetail extends React.Component {
                 <LibrarySearch
                   displaySources={this.props.library}
                   filters={this.props.scene.generatorWeights.filter((wg) => !wg.rules).map((wg) => wg.name)}
+                  tags={this.props.tags}
                   placeholder={"Search ..."}
                   autoFocus
                   onlyTagsAndTypes
+                  onlyUsed
                   menuIsOpen
                   controlShouldRenderValue={false}
                   onUpdateFilters={this.onAddSimpleWG.bind(this)}/>

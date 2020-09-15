@@ -6,9 +6,11 @@ import CreatableSelect from "react-select/creatable";
 import {Checkbox, createStyles, Theme, withStyles} from "@material-ui/core";
 import {grey} from "@material-ui/core/colors";
 
-import LibrarySource from "../../data/LibrarySource";
 import {getSourceType} from "../../data/utils";
 import en from "../../data/en";
+import Audio from "../../data/Audio";
+import LibrarySource from "../../data/LibrarySource";
+import Tag from "../../data/Tag";
 
 const styles = (theme: Theme) => createStyles({
   searchSelect: {
@@ -26,6 +28,7 @@ class LibrarySearch extends React.Component {
   readonly props: {
     classes: any,
     displaySources: Array<LibrarySource>,
+    tags: Array<Tag>,
     filters: Array<string>,
     placeholder: string,
     autoFocus?: boolean,
@@ -34,8 +37,10 @@ class LibrarySearch extends React.Component {
     isClearable?: boolean
     isCreatable?: boolean,
     menuIsOpen?: boolean,
+    noTypes?: boolean,
     onlyTags?: boolean,
     onlyTagsAndTypes?: boolean,
+    onlyUsed?: boolean
     showCheckboxes?: boolean,
     onUpdateFilters(filter: Array<string>): void,
   };
@@ -119,6 +124,9 @@ class LibrarySearch extends React.Component {
 
   update() {
     const tags = new Map<string, number>();
+    if (!this.props.onlyUsed) {
+      this.props.tags.forEach((t) => tags.set(t.name, 0));
+    }
     const types = new Map<string, number>();
     let untaggedCount = 0;
     let offlineCount = 0;
@@ -197,7 +205,7 @@ class LibrarySearch extends React.Component {
         options.push({label: tag + " (" + tags.get(tag) + ")", value: opt});
       }
     }
-    if (!this.props.onlyTags) {
+    if (!this.props.onlyTags && !this.props.noTypes) {
       for (let type of typeKeys) {
         const opt = this.props.isCreatable ? "{" + type + "}" : type;
         if (!this.props.filters.includes(opt)) {

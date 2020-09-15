@@ -87,7 +87,7 @@ export default class Meta extends React.Component {
           <CssBaseline />
           {this.state.route.length === 0 && (
             <ScenePicker
-              canGenerate={this.state.library.length >= 1 && this.state.tags.length >= 1}
+              canGenerate={this.state.library.length >= 1}
               canGrid={this.state.scenes.length > 0}
               config={this.state.config}
               grids={this.state.grids}

@@ -184,7 +184,7 @@ export default class FadeInOut extends React.Component {
         duration = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (Math.max(this.props.scene.fadeIODurationMax, 10) - Math.max(this.props.scene.fadeIODurationMin, 10) + 1)) + Math.max(this.props.scene.fadeIODurationMin, 10);
         break;
       case TF.bpm:
-        const bpmMulti = this.props.scene.fadeIOBPMMulti > 0 ? this.props.scene.fadeIOBPMMulti : 1 / (-1 * (this.props.scene.fadeIOBPMMulti - 2));
+        const bpmMulti = this.props.scene.fadeIOBPMMulti / 10;
         const bpm = this.props.scene.audios.length > 0 ? this.props.scene.audios[0].bpm : 60;
         duration = 60000 / (bpm * bpmMulti);
         // If we cannot parse this, default to 1s
@@ -213,7 +213,7 @@ export default class FadeInOut extends React.Component {
         delay = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (this.props.scene.fadeIODelayMax - this.props.scene.fadeIODelayMin + 1)) + this.props.scene.fadeIODelayMin;
         break;
       case TF.bpm:
-        const bpmMulti = this.props.scene.fadeIODelayBPMMulti > 0 ? this.props.scene.fadeIODelayBPMMulti : 1 / (-1 * (this.props.scene.fadeIODelayBPMMulti - 2));
+        const bpmMulti = this.props.scene.fadeIODelayBPMMulti / 10;
         const bpm = this.props.scene.audios.length > 0 ? this.props.scene.audios[0].bpm : 60;
         delay = 60000 / (bpm * bpmMulti);
         // If we cannot parse this, default to 1s

@@ -220,7 +220,7 @@ export default class Panning extends React.Component {
         duration = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (Math.max(this.props.scene.panDurationMax, 10) - Math.max(this.props.scene.panDurationMin, 10) + 1)) + Math.max(this.props.scene.panDurationMin, 10);
         break;
       case TF.bpm:
-        const bpmMulti = this.props.scene.panBPMMulti > 0 ? this.props.scene.panBPMMulti : 1 / (-1 * (this.props.scene.panBPMMulti - 2));
+        const bpmMulti = this.props.scene.panBPMMulti / 10;
         const bpm = this.props.scene.audios.length > 0 ? this.props.scene.audios[0].bpm : 60;
         duration = 60000 / (bpm * bpmMulti);
         // If we cannot parse this, default to 1s

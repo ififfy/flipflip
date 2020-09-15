@@ -454,18 +454,18 @@ export default class ImageView extends React.Component {
           left: 0,
           overflow: 'hidden',
         }}>
-        <FadeInOut
-          toggleFade={this.props.toggleStrobe}
+        <Panning
+          togglePan={this.props.toggleStrobe}
           timeToNextFrame={this.props.timeToNextFrame}
           scene={this.props.scene}
-          fadeFunction={this.strobeImage.bind(this)}>
-          <this.FadeLayer>
-            <this.ZoomMoveLayer>
-              <Panning
-                togglePan={this.props.toggleStrobe}
-                timeToNextFrame={this.props.timeToNextFrame}
-                scene={this.props.scene}
-                panFunction={this.strobeImage.bind(this)}>
+          panFunction={this.strobeImage.bind(this)}>
+          <FadeInOut
+            toggleFade={this.props.toggleStrobe}
+            timeToNextFrame={this.props.timeToNextFrame}
+            scene={this.props.scene}
+            fadeFunction={this.strobeImage.bind(this)}>
+            <this.FadeLayer>
+              <this.ZoomMoveLayer>
                 {(this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.image) && (
                   <Strobe
                     zIndex={2}
@@ -499,15 +499,30 @@ export default class ImageView extends React.Component {
                       position: 'absolute',
                     }}/>
                 )}
-              </Panning>
-            </this.ZoomMoveLayer>
-            {this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.background && (
-              <Strobe
-                zIndex={1}
-                toggleStrobe={this.props.toggleStrobe}
-                timeToNextFrame={this.props.timeToNextFrame}
-                scene={this.props.scene}/>
-            )}
+              </this.ZoomMoveLayer>
+              {this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.background && (
+                <Strobe
+                  zIndex={1}
+                  toggleStrobe={this.props.toggleStrobe}
+                  timeToNextFrame={this.props.timeToNextFrame}
+                  scene={this.props.scene}/>
+              )}
+              {!this.props.scene.panning && (
+                <animated.div
+                  ref={this.backgroundRef}
+                  style={{
+                    height: '100%',
+                    width: '100%',
+                    zIndex: 1,
+                    backgroundSize: 'cover',
+                    ...backgroundStyle
+                  }}/>
+              )}
+            </this.FadeLayer>
+          </FadeInOut>
+        </Panning>
+        {this.props.scene.panning && (
+          <this.FadeLayer>
             <animated.div
               ref={this.backgroundRef}
               style={{
@@ -518,7 +533,7 @@ export default class ImageView extends React.Component {
                 ...backgroundStyle
               }}/>
           </this.FadeLayer>
-        </FadeInOut>
+        )}
       </animated.div>
     );
   }
@@ -551,7 +566,7 @@ export default class ImageView extends React.Component {
           fadeDuration = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (this.props.scene.fadeDurationMax - this.props.scene.fadeDurationMin + 1)) + this.props.scene.fadeDurationMin;
           break;
         case TF.bpm:
-          const bpmMulti = this.props.scene.fadeBPMMulti > 0 ? this.props.scene.fadeBPMMulti : 1 / (-1 * (this.props.scene.fadeBPMMulti - 2));
+          const bpmMulti = this.props.scene.fadeBPMMulti / 10;
           const bpm = this.props.scene.audios.length > 0 ? this.props.scene.audios[0].bpm : 60;
           fadeDuration = 60000 / (bpm * bpmMulti);
           // If we cannot parse this, default to 1s
@@ -685,7 +700,7 @@ export default class ImageView extends React.Component {
           transDuration = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (this.props.scene.transDurationMax - this.props.scene.transDurationMin + 1)) + this.props.scene.transDurationMin;
           break;
         case TF.bpm:
-          const bpmMulti = this.props.scene.transBPMMulti > 0 ? this.props.scene.transBPMMulti : 1 / (-1 * (this.props.scene.transBPMMulti - 2));
+          const bpmMulti = this.props.scene.transBPMMulti / 10;
           const bpm = this.props.scene.audios.length > 0 ? this.props.scene.audios[0].bpm : 60;
           transDuration = 60000 / (bpm * bpmMulti);
           // If we cannot parse this, default to 1s

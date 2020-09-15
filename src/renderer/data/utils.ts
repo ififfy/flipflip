@@ -331,7 +331,7 @@ export async function convertURL(url: string): Promise<Array<string>> {
   }
 
   if (url.includes("redgifs") || url.includes("gfycat")) {
-    console.log("Possible missed file: " + url);
+    console.warn("Possible missed file: " + url);
   }
 
   if (!imgurMatch && !imgurAlbumMatch && !gfycatMatch && !redgifMatch) {

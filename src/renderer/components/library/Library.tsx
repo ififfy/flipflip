@@ -384,7 +384,7 @@ class Library extends React.Component {
             </div>
 
             <Typography component="h1" variant="h4" color="inherit" noWrap
-                        className={clsx(classes.title, classes.titleBar)}>
+                        className={classes.title}>
               Library
             </Typography>
 
@@ -406,8 +406,10 @@ class Library extends React.Component {
                 <LibrarySearch
                   displaySources={this.state.displaySources}
                   filters={this.state.filters}
+                  tags={this.props.tags}
                   placeholder={"Search ..."}
                   isCreatable
+                  onlyUsed
                   onUpdateFilters={this.onUpdateFilters.bind(this)}/>
               </div>
             </div>
@@ -808,6 +810,7 @@ class Library extends React.Component {
               <LibrarySearch
                 displaySources={this.props.library}
                 filters={this.state.selectedTags}
+                tags={this.props.tags}
                 placeholder={"Tag These Sources"}
                 isClearable
                 onlyTags
@@ -1033,7 +1036,9 @@ class Library extends React.Component {
   }
 
   onFinishRemoveAll() {
-    this.props.onUpdateLibrary((l) => []);
+    this.props.onUpdateLibrary((l) => {
+      l.splice(0, l.length);
+    });
     this.onCloseDialog();
   }
 

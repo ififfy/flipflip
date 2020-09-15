@@ -353,6 +353,13 @@ class SourceList extends React.Component {
     )
   }
 
+  componentDidMount() {
+    addEventListener('keydown', this.onKeyDown, false);
+    addEventListener('keyup', this.onKeyUp, false);
+    this._shiftDown = false;
+    this._lastChecked = null;
+  }
+
   componentDidUpdate(props: any) {
     if (this.props.sources.length != props.sources.length &&
       this.props.sources.length > 0 &&
@@ -362,7 +369,19 @@ class SourceList extends React.Component {
   }
 
   componentWillUnmount() {
+    removeEventListener('keydown', this.onKeyDown);
+    addEventListener('keyup', this.onKeyUp);
+    this._shiftDown = null;
+    this._lastChecked = null;
     this.savePosition();
+  }
+
+  _shiftDown = false;
+  onKeyDown = (e: KeyboardEvent) => {
+    if (e.key == 'Shift') this._shiftDown = true;
+  }
+  onKeyUp = (e: KeyboardEvent) => {
+    if (e.key == 'Shift') this._shiftDown = false;
   }
 
   savePosition() {
@@ -408,14 +427,30 @@ class SourceList extends React.Component {
     }
   }
 
+  _lastChecked: string = null;
   onToggleSelect(e: MouseEvent) {
     const source = (e.currentTarget as HTMLInputElement).value;
     let newSelected = Array.from(this.props.selected);
     if (newSelected.includes(source)) {
       newSelected.splice(newSelected.indexOf(source), 1)
     } else {
+      if (this.props.sources.map((s) => s.url).includes(this._lastChecked) && this._shiftDown) {
+        let start = false;
+        for (let s of this.props.sources) {
+          if (start && (s.url == source || s.url == this._lastChecked)) {
+            break;
+          }
+          if (start) {
+            newSelected.push(s.url);
+          }
+          if (!start && (s.url == source || s.url == this._lastChecked)) {
+            start = true;
+          }
+        }
+      }
       newSelected.push(source);
     }
+    this._lastChecked = source;
     this.props.onUpdateSelected(newSelected);
   }
 

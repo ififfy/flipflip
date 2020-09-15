@@ -103,8 +103,18 @@ class PanningCard extends React.Component {
                   <Select
                     value={this.props.scene.panHorizTransType}
                     onChange={this.onInput.bind(this, 'panHorizTransType')}>
-                    {Object.values(HTF).map((tf) =>
-                      <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
+                    {Object.values(HTF).map((tf) => {
+                        switch (tf) {
+                          case HTF.left:
+                            return <MenuItem key={tf} value={tf}>{en.get(tf)} to {en.get(HTF.right)}</MenuItem>
+                          case HTF.right:
+                            return <MenuItem key={tf} value={tf}>{en.get(tf)} to {en.get(HTF.left)}</MenuItem>
+                          case HTF.random:
+                            return <MenuItem key={tf} value={tf}>{en.get(tf)} to Right/Left</MenuItem>
+                          default:
+                            return <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
+                        }
+                      }
                     )}
                   </Select>
                 </FormControl>
@@ -197,8 +207,18 @@ class PanningCard extends React.Component {
                   <Select
                     value={this.props.scene.panVertTransType}
                     onChange={this.onInput.bind(this, 'panVertTransType')}>
-                    {Object.values(VTF).map((tf) =>
-                      <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
+                    {Object.values(VTF).map((tf) => {
+                        switch (tf) {
+                          case VTF.up:
+                            return <MenuItem key={tf} value={tf}>{en.get(tf)} to {en.get(VTF.down)}</MenuItem>
+                          case VTF.down:
+                            return <MenuItem key={tf} value={tf}>{en.get(tf)} to {en.get(VTF.up)}</MenuItem>
+                          case VTF.random:
+                            return <MenuItem key={tf} value={tf}>{en.get(tf)} to Down/Up</MenuItem>
+                          default:
+                            return <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
+                        }
+                      }
                     )}
                   </Select>
                 </FormControl>

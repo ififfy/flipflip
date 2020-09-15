@@ -390,16 +390,15 @@ class AudioControl extends React.Component {
                       <Collapse in={audio.tickMode == TF.bpm} className={classes.fullWidth}>
                         <Typography id="tick-bpm-multi-slider" variant="caption" component="div"
                                     color="textSecondary">
-                          BPM
-                          Multiplier {audio.tickBPMMulti > 0 ? audio.tickBPMMulti : "1 / " + (-1 * (audio.tickBPMMulti - 2))}x
+                          BPM Multiplier {audio.tickBPMMulti / 10}x
                         </Typography>
                         <Slider
-                          min={-8}
-                          max={10}
+                          min={1}
+                          max={100}
                           defaultValue={tickBPMMulti}
                           onChangeCommitted={this.onAudioSliderChange.bind(this, 'tickBPMMulti')}
                           valueLabelDisplay={'auto'}
-                          valueLabelFormat={(v) => v > 0 ? v + "x" : "1/" + (-1 * (v - 2)) + "x"}
+                          valueLabelFormat={(v) => (v / 10) + "x"}
                           aria-labelledby="tick-bpm-multi-slider"/>
                       </Collapse>
                       <Collapse in={audio.tickMode == TF.constant} className={classes.fullWidth}>
@@ -593,7 +592,7 @@ class AudioControl extends React.Component {
           timeout = this.props.audio.tickDelay;
           break;
         case TF.bpm:
-          const bpmMulti = this.props.audio.tickBPMMulti > 0 ? this.props.audio.tickBPMMulti : 1 / (-1 * (this.props.audio.tickBPMMulti - 2));
+          const bpmMulti = this.props.audio.tickBPMMulti / 10;
           timeout = 60000 / (this.props.audio.bpm * bpmMulti);
           // If we cannot parse this, default to 1s
           if (!timeout) {

@@ -13,7 +13,7 @@ export default class Scene {
   timingMin = 200;
   timingMax = 1200;
   timingSinRate = 100;
-  timingBPMMulti = 1;
+  timingBPMMulti = 10;
   weightFunction = WF.sources;
   sourceOrderFunction = SOF.random;
   orderFunction = OF.random;
@@ -44,7 +44,7 @@ export default class Scene {
   transDurationMin = 1000;
   transDurationMax = 7000;
   transSinRate = 100;
-  transBPMMulti = 1;
+  transBPMMulti = 10;
   crossFade = false;
   crossFadeAudio = false;
   fadeTF = TF.constant;
@@ -52,7 +52,7 @@ export default class Scene {
   fadeDurationMin = 100;
   fadeDurationMax = 700;
   fadeSinRate = 100;
-  fadeBPMMulti = 1;
+  fadeBPMMulti = 10;
   fadeInOut = false;
   fadeIOPulse = false;
   fadeIOTF = TF.constant;
@@ -60,20 +60,20 @@ export default class Scene {
   fadeIODurationMin = 2000;
   fadeIODurationMax = 5000;
   fadeIOSinRate = 100;
-  fadeIOBPMMulti = 1;
+  fadeIOBPMMulti = 10;
   fadeIODelayTF = TF.constant;
   fadeIODelay = 2000;
   fadeIODelayMin = 2000;
   fadeIODelayMax = 5000;
   fadeIODelaySinRate = 100;
-  fadeIODelayBPMMulti = 1;
+  fadeIODelayBPMMulti = 10;
   panning = false;
   panTF = TF.constant;
   panDuration = 2000;
   panDurationMin = 2000;
   panDurationMax = 5000;
   panSinRate = 100;
-  panBPMMulti = 1;
+  panBPMMulti = 10;
   panHorizTransType = HTF.none;
   panHorizTransLevel = 10;
   panHorizTransLevelMax = 10;
@@ -98,13 +98,13 @@ export default class Scene {
   strobeTimeMin = 100;
   strobeTimeMax = 300;
   strobeSinRate = 100;
-  strobeBPMMulti = 1;
+  strobeBPMMulti = 10;
   strobeDelayTF = TF.constant;
   strobeDelay = 200;
   strobeDelayMin = 100;
   strobeDelayMax = 300;
   strobeDelaySinRate = 100;
-  strobeDelayBPMMulti = 1;
+  strobeDelayBPMMulti = 10;
   strobeColorType = SC.color;
   strobeColor = "#FFFFFF";
   strobeColorSet: Array<string> = [];
@@ -270,25 +270,19 @@ export default class Scene {
     }
 
     if (this.timingBPMMulti <= 0) {
-      this.timingBPMMulti = 1 / (-1 * (this.timingBPMMulti - 2));
-    }
-    if (this.fadeBPMMulti <= 0) {
-      this.fadeBPMMulti = 1 / (-1 * (this.fadeBPMMulti - 2));
-    }
-    if (this.fadeIOBPMMulti <= 0) {
-      this.fadeIOBPMMulti = 1 / (-1 * (this.fadeIOBPMMulti - 2));
-    }
-    if (this.panBPMMulti <= 0) {
-      this.panBPMMulti = 1 / (-1 * (this.panBPMMulti - 2));
+      this.timingBPMMulti = -1 * (this.timingBPMMulti - 2);
     }
     if (this.transBPMMulti <= 0) {
-      this.transBPMMulti = 1 / (-1 * (this.transBPMMulti - 2));
+      this.transBPMMulti = -1 * (this.transBPMMulti - 2);
+    }
+    if (this.fadeBPMMulti <= 0) {
+      this.fadeBPMMulti = -1 * (this.fadeBPMMulti - 2);
     }
     if (this.strobeBPMMulti <= 0) {
-      this.strobeBPMMulti = 1 / (-1 * (this.strobeBPMMulti - 2));
+      this.strobeBPMMulti = -1 * (this.strobeBPMMulti - 2);
     }
     if (this.strobeDelayBPMMulti <= 0) {
-      this.strobeDelayBPMMulti = 1 / (-1 * (this.strobeDelayBPMMulti - 2));
+      this.strobeDelayBPMMulti = -1 * (this.strobeDelayBPMMulti - 2);
     }
   }
 }
