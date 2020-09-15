@@ -72,6 +72,13 @@ export default new Map<string, string>([
   ['sf.count', 'By Count'],
   ['sf.type', 'By Type'],
 
+  ['asf.url', 'By URL'],
+  ['asf.name', 'By Name'],
+  ['asf.artist', 'By Artist'],
+  ['asf.album', 'By Album'],
+  ['asf.date', 'By Date'],
+  ['asf.duration', 'By Duration'],
+
   ['st.tumblr', 'Tumblr'],
   ['st.reddit', 'Reddit'],
   ['st.imagefap', 'ImageFap'],
@@ -88,6 +95,7 @@ export default new Map<string, string>([
   ['st.playlist', 'Playlist'],
   ['st.list', 'List'],
   ['st.local', 'Local'],
+  ['st.audio', 'Audio'],
 
   ['sl.top', 'Above All'],
   ['sl.middle', 'Above Scene'],
@@ -96,6 +104,7 @@ export default new Map<string, string>([
   ['sl.bottom', 'Behind All'],
 
   ['af.url', '+ URL'],
+  ['af.audios', '+ Local audio'],
   ['af.directory', '+ Local directory'],
   ['af.videos', '+ Local video/playlist'],
   ['af.library', '+ From Library'],

@@ -101,6 +101,15 @@ const SF = { // sort function
   type: 'sf.type',
 };
 
+const ASF = { // audio sort function
+  url: 'asf.url',
+  name: 'asf.name',
+  artist: 'asf.artist',
+  album: 'asf.album',
+  date: 'asf.date',
+  duration: 'asf.duration',
+};
+
 const ST = { // source types
   local: 'st.local',
   video: 'st.video',
@@ -118,6 +127,7 @@ const ST = { // source types
   gelbooru1: 'st.gelbooru1',
   gelbooru2: 'st.gelbooru2',
   ehentai: 'st.ehentai',
+  audio: 'st.audio'
 };
 
 const SL = { // strobe layers
@@ -133,6 +143,7 @@ const AF = { // add functions
   directory: 'af.directory',
   videos: 'af.videos',
   library: 'af.library',
+  audios: 'af.audio',
 };
 
 const IPC = {
@@ -144,6 +155,7 @@ const MO = { // Menu/Modal Constants
   new: 'mo.new',
   sort: 'mo.sort',
   batchTag: 'mo.batchtag',
+  batchEdit: 'mo.batchedit',
   urlImport: 'mo.urlimport',
   newWindowAlert: 'mo.nwalert',
   removeAllAlert: 'mo.raalert',
@@ -160,6 +172,7 @@ const MO = { // Menu/Modal Constants
 const PR = { // Global progress functions
   cancel: 'pr.cancel',
   complete: 'pr.complete',
+  audioOffline: 'pr.audioOffline',
   offline: 'pr.offline',
   tumblr: 'pr.tumblr',
   reddit: 'pr.reddit',
@@ -317,5 +330,5 @@ const EA = { // Easings
 }
 
 export {
-  TF, WF, SOF, OF, IF, GO, VO, HTF, VTF, BT, SC, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG, RF, RT, SPT, SDT, PT, LT, SDGT, SGT, VCT, EA, DONE
+  TF, WF, SOF, OF, IF, GO, VO, HTF, VTF, BT, SC, IT, GT, TT, SF, ASF, ST, SL, AF, IPC, MO, PR, SB, IG, RF, RT, SPT, SDT, PT, LT, SDGT, SGT, VCT, EA, DONE
 };

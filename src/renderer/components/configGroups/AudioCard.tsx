@@ -7,9 +7,8 @@ import {
 import AddIcon from '@material-ui/icons/Add';
 
 import {SceneSettings} from "../../data/Config";
-import Audio from "../../data/Audio";
 import Scene from "../../data/Scene";
-import AudioControl from "../player/AudioControl";
+import AudioPlaylist from "../player/AudioPlaylist";
 
 const styles = (theme: Theme) => createStyles({
   addButton: {
@@ -56,11 +55,11 @@ class AudioCard extends React.Component {
             </Grid>
           </Grid>
         </Grid>
-        {this.props.scene.audios && this.props.scene.audios.map((a,i) =>
-          <AudioControl
-            key={a.id}
-            audio={a}
-            isFirst={i == 0}
+        {this.props.scene.audioPlaylists.map((a,i) =>
+          <AudioPlaylist
+            key={i}
+            playlistIndex={i}
+            audios={a}
             scene={this.props.scene}
             scenePaths={this.props.scenePaths}
             sidebar={this.props.sidebar}
@@ -74,12 +73,13 @@ class AudioCard extends React.Component {
   }
 
   onAddAudioTrack() {
-    let id = this.props.scene.audios.length + 1;
+    // TODO
+    /*let id = this.props.scene.audios.length + 1;
     this.props.scene.audios.forEach((a) => {
       id = Math.max(a.id + 1, id);
     });
     const newAudios = this.props.scene.audios.concat([new Audio({id: id, url: ""})]);
-    this.changeKey('audios', newAudios);
+    this.changeKey('audios', newAudios);*/
   }
 
   onBoolInput(key: string, e: MouseEvent) {

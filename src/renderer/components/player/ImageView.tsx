@@ -9,6 +9,7 @@ import Strobe from "./Strobe";
 import wretch from "wretch";
 import FadeInOut from "./FadeInOut";
 import Panning from "./Panning";
+import Audio from "../../data/Audio";
 
 export default class ImageView extends React.Component {
   readonly props: {
@@ -17,6 +18,7 @@ export default class ImageView extends React.Component {
     hasStarted: boolean,
     scene: Scene,
     hideOverflow?: boolean,
+    currentAudio?: Audio,
     timeToNextFrame?: number,
     toggleStrobe?: boolean,
     pictureGrid?: boolean,
@@ -458,12 +460,14 @@ export default class ImageView extends React.Component {
         <Panning
           image={this.props.image}
           togglePan={this.props.toggleStrobe}
+          currentAudio={this.props.currentAudio}
           timeToNextFrame={this.props.timeToNextFrame}
           hideOverflow={this.props.hideOverflow}
           scene={this.props.scene}
           panFunction={this.strobeImage.bind(this)}>
           <FadeInOut
             toggleFade={this.props.toggleStrobe}
+            currentAudio={this.props.currentAudio}
             timeToNextFrame={this.props.timeToNextFrame}
             hideOverflow={this.props.hideOverflow}
             scene={this.props.scene}
@@ -472,6 +476,7 @@ export default class ImageView extends React.Component {
               <this.ZoomMoveLayer>
                 {(this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.image) && (
                   <Strobe
+                    currentAudio={this.props.currentAudio}
                     zIndex={2}
                     toggleStrobe={this.props.toggleStrobe}
                     hideOverflow={this.props.hideOverflow}
@@ -509,6 +514,7 @@ export default class ImageView extends React.Component {
               </this.ZoomMoveLayer>
               {this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.background && (
                 <Strobe
+                  currentAudio={this.props.currentAudio}
                   zIndex={1}
                   toggleStrobe={this.props.toggleStrobe}
                   hideOverflow
@@ -575,7 +581,7 @@ export default class ImageView extends React.Component {
           break;
         case TF.bpm:
           const bpmMulti = this.props.scene.fadeBPMMulti / 10;
-          const bpm = this.props.scene.audios.length > 0 ? this.props.scene.audios[0].bpm : 60;
+          const bpm = this.props.currentAudio ? this.props.currentAudio.bpm : 60;
           fadeDuration = 60000 / (bpm * bpmMulti);
           // If we cannot parse this, default to 1s
           if (!fadeDuration) {
@@ -710,7 +716,7 @@ export default class ImageView extends React.Component {
           break;
         case TF.bpm:
           const bpmMulti = this.props.scene.transBPMMulti / 10;
-          const bpm = this.props.scene.audios.length > 0 ? this.props.scene.audios[0].bpm : 60;
+          const bpm = this.props.currentAudio ? this.props.currentAudio.bpm : 60;
           transDuration = 60000 / (bpm * bpmMulti);
           // If we cannot parse this, default to 1s
           if (!transDuration) {

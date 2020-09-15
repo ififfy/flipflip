@@ -13,6 +13,7 @@ import Scene from "../../data/Scene";
 import ChildCallbackHack from './ChildCallbackHack';
 import ImageView from './ImageView';
 import Strobe from "./Strobe";
+import Audio from "../../data/Audio";
 
 class GifInfo {
   animated: boolean;
@@ -23,6 +24,7 @@ export default class ImagePlayer extends React.Component {
   readonly props: {
     config: Config,
     scene: Scene,
+    currentAudio: Audio,
     gridView: boolean,
     advanceHack?: ChildCallbackHack,
     deleteHack?: ChildCallbackHack,
@@ -90,6 +92,7 @@ export default class ImagePlayer extends React.Component {
            ref={this.idleTimerRef}>
         {(this.props.strobeLayer == SL.middle) && (
           <Strobe
+            currentAudio={this.props.currentAudio}
             zIndex={3}
             toggleStrobe={this._toggleStrobe}
             timeToNextFrame={this.state.timeToNextFrame}
@@ -102,6 +105,7 @@ export default class ImagePlayer extends React.Component {
           timeout={2000} />
         <ImageView
           image={this.state.historyPaths.length > 0 ? this.state.historyPaths[(this.state.historyPaths.length - 1) + offset] : null}
+          currentAudio={this.props.currentAudio}
           scene={this.props.scene}
           timeToNextFrame={this.state.timeToNextFrame}
           toggleStrobe={this._toggleStrobe}
@@ -745,7 +749,7 @@ export default class ImagePlayer extends React.Component {
           break;
         case TF.bpm:
           const bpmMulti = this.props.scene.timingBPMMulti / 10;
-          const bpm = this.props.scene.audios.length > 0 ? this.props.scene.audios[0].bpm : 60;
+          const bpm = this.props.currentAudio ? this.props.currentAudio.bpm : 60;
           timeToNextFrame = 60000 / (bpm * bpmMulti);
           // If we cannot parse this, default to 1s
           if (!timeToNextFrame) {

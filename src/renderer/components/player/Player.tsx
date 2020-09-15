@@ -18,6 +18,8 @@ import SourceScraper from './SourceScraper';
 import Strobe from "./Strobe";
 import PlayerBars from "./PlayerBars";
 import PictureGrid from "./PictureGrid";
+import Audio from "../../data/Audio";
+import ImageView from "./ImageView";
 
 export default class Player extends React.Component {
   readonly props: {
@@ -45,9 +47,9 @@ export default class Player extends React.Component {
   };
 
   readonly state = {
-    canStart: false,
-    hasStarted: false,
-    isMainLoaded: false,
+    canStart: this.props.scene.audioScene,
+    hasStarted: this.props.scene.audioScene,
+    isMainLoaded: this.props.scene.audioScene,
     areOverlaysLoaded: Array<boolean>(this.props.scene.overlays.length).fill(false),
     isEmpty: false,
     isPlaying: true,
@@ -61,8 +63,10 @@ export default class Player extends React.Component {
     imagePlayerDeleteHack: new ChildCallbackHack(),
     mainVideo: null as HTMLVideoElement,
     overlayVideos: Array<HTMLVideoElement>(this.props.scene.overlays.length).fill(null),
+    currentAudio: this.props.scene.audioScene ? this.props.scene.audioPlaylists[0][0] : null as Audio,
     timeToNextFrame: null as number,
     recentPictureGrid: false,
+    thumbImage: null as HTMLImageElement,
   };
 
   _interval: NodeJS.Timer = null;
@@ -133,6 +137,7 @@ export default class Player extends React.Component {
       <div style={rootStyle}>
         {showStrobe && (
           <Strobe
+            currentAudio={this.state.currentAudio}
             zIndex={5}
             toggleStrobe={this._toggleStrobe}
             timeToNextFrame={this.state.timeToNextFrame}
@@ -238,7 +243,7 @@ export default class Player extends React.Component {
             overlayVideos={this.state.overlayVideos}
             scene={this.props.scene}
             scenes={this.props.scenes}
-            title={this.props.tags ? this.props.scene.sources[0].url : this.props.scene.name}
+            title={this.props.tags ? (this.props.scene.audioScene ? this.state.currentAudio.name : this.props.scene.sources[0].url) : this.props.scene.name}
             tutorial={this.props.tutorial}
             recentPictureGrid={this.state.recentPictureGrid}
             goBack={this.goBack.bind(this)}
@@ -265,32 +270,44 @@ export default class Player extends React.Component {
         )}
 
         <div style={playerStyle}>
-          <SourceScraper
-            config={this.props.config}
-            scene={this.props.scene}
-            nextScene={nextScene}
-            opacity={1}
-            gridView={this.props.gridView}
-            isPlaying={this.state.isPlaying}
-            hasStarted={this.state.hasStarted}
-            strobeLayer={this.props.scene.strobe ? this.props.scene.strobeLayer : null}
-            historyOffset={this.state.historyOffset}
-            advanceHack={this.state.imagePlayerAdvanceHack}
-            deleteHack={this.state.imagePlayerDeleteHack}
-            setHistoryOffset={this.setHistoryOffset.bind(this)}
-            setHistoryPaths={this.setHistoryPaths.bind(this)}
-            finishedLoading={this.setMainLoaded.bind(this)}
-            firstImageLoaded={this.setMainCanStart.bind(this)}
-            setProgress={this.setProgress.bind(this)}
-            setVideo={this.setMainVideo.bind(this)}
-            setCount={this.props.setCount.bind(this)}
-            cache={this.props.cache.bind(this)}
-            setTimeToNextFrame={this.setTimeToNextFrame.bind(this)}
-            systemMessage={this.props.systemMessage.bind(this)}
-            playNextScene={this.props.nextScene}
-          />
+          {this.props.scene.audioScene && (
+            <ImageView
+              image={this.state.thumbImage}
+              currentAudio={this.state.currentAudio}
+              scene={this.props.scene}
+              fitParent
+              hasStarted
+              />
+          )}
+          {!this.props.scene.audioScene && (
+            <SourceScraper
+              config={this.props.config}
+              scene={this.props.scene}
+              nextScene={nextScene}
+              currentAudio={this.state.currentAudio}
+              opacity={1}
+              gridView={this.props.gridView}
+              isPlaying={this.state.isPlaying}
+              hasStarted={this.state.hasStarted}
+              strobeLayer={this.props.scene.strobe ? this.props.scene.strobeLayer : null}
+              historyOffset={this.state.historyOffset}
+              advanceHack={this.state.imagePlayerAdvanceHack}
+              deleteHack={this.state.imagePlayerDeleteHack}
+              setHistoryOffset={this.setHistoryOffset.bind(this)}
+              setHistoryPaths={this.setHistoryPaths.bind(this)}
+              finishedLoading={this.setMainLoaded.bind(this)}
+              firstImageLoaded={this.setMainCanStart.bind(this)}
+              setProgress={this.setProgress.bind(this)}
+              setVideo={this.setMainVideo.bind(this)}
+              setCount={this.props.setCount.bind(this)}
+              cache={this.props.cache.bind(this)}
+              setTimeToNextFrame={this.setTimeToNextFrame.bind(this)}
+              systemMessage={this.props.systemMessage.bind(this)}
+              playNextScene={this.props.nextScene}
+            />
+          )}
 
-          {this.props.scene.overlayEnabled && this.props.scene.overlays.length > 0 &&
+          {!this.props.scene.audioScene && this.props.scene.overlayEnabled && this.props.scene.overlays.length > 0 &&
            !this.state.isEmpty && this.props.scene.overlays.map((overlay, index) => {
               let showProgress = this.state.isMainLoaded && !this.state.hasStarted;
               if (showProgress) {
@@ -308,6 +325,7 @@ export default class Player extends React.Component {
                     key={overlay.id}
                     config={this.props.config}
                     scene={this.getScene(overlay.sceneID)}
+                    currentAudio={this.state.currentAudio}
                     opacity={overlay.opacity / 100}
                     gridView={this.props.gridView}
                     isPlaying={this.state.isPlaying && !this.state.isEmpty}
@@ -389,6 +407,17 @@ export default class Player extends React.Component {
   }
 
   componentDidUpdate(props: any, state: any) {
+    if (this.state.currentAudio && state.currentAudio != this.state.currentAudio) {
+      let thumbImage = new Image();
+      if (this.state.currentAudio.thumb) {
+        thumbImage.src = this.state.currentAudio.thumb;
+      } else {
+        thumbImage.src = 'src/renderer/icons/flipflip_logo.png';
+      }
+      thumbImage.onload = () => {
+        this.setState({thumbImage: thumbImage});
+      };
+    }
     if (props.scene.id !== this.props.scene.id) {
       if (this.props.tags) {
         this.setState({startTime: new Date()});
@@ -430,6 +459,17 @@ export default class Player extends React.Component {
     if (this.props.tags == null) {
       window.addEventListener('wheel', this.onScroll, false);
     }
+    if (this.state.currentAudio) {
+      let thumbImage = new Image();
+      if (this.state.currentAudio.thumb) {
+        thumbImage.src = this.state.currentAudio.thumb;
+      } else {
+        thumbImage.src = 'src/renderer/icons/flipflip_logo.png';
+      }
+      thumbImage.onload = () => {
+        this.setState({thumbImage: thumbImage});
+      };
+    }
   }
 
   componentWillUnmount() {
@@ -466,7 +506,8 @@ export default class Player extends React.Component {
       this.state.historyPaths !== state.historyPaths ||
       this.state.mainVideo !== state.mainVideo ||
       this.state.overlayVideos !== state.overlayVideos ||
-      this.state.recentPictureGrid !== state.recentPictureGrid;
+      this.state.recentPictureGrid !== state.recentPictureGrid ||
+      this.state.thumbImage !== state.thumbImage;
   }
 
   nop() {}

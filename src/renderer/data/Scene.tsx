@@ -201,8 +201,9 @@ export default class Scene {
   videoRandomSpeed = false;
   videoSpeedMin = 5;
   videoSpeedMax = 20;
+  audioScene = false;
   audioEnabled = false;
-  audios: Array<Audio> = [];
+  audioPlaylists: Array<Array<Audio>> = [];
   generatorWeights?: Array<WeightGroup> = null;
   openTab = 3;
 
@@ -220,6 +221,7 @@ export default class Scene {
   grid: Array<Array<number>> = null;
   tagWeights?: string;
   sceneWeights?: string;
+  audios: Array<Audio>;
 
   constructor(init?: Partial<Scene>) {
     Object.assign(this, init);
@@ -320,6 +322,11 @@ export default class Scene {
     }
     if (this.strobeDelayBPMMulti <= 0) {
       this.strobeDelayBPMMulti = -1 * (this.strobeDelayBPMMulti - 2);
+    }
+
+    if (this.audios) {
+      this.audioPlaylists = this.audios.map((a) => [a]);
+      this.audios = null;
     }
   }
 }

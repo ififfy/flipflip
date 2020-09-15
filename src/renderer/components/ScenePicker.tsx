@@ -17,6 +17,7 @@ import CasinoIcon from '@material-ui/icons/Casino';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import GridOnIcon from '@material-ui/icons/GridOn';
 import HelpIcon from '@material-ui/icons/Help';
+import LibraryMusicIcon from '@material-ui/icons/LibraryMusic';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import MenuIcon from '@material-ui/icons/Menu';
 import MovieIcon from '@material-ui/icons/Movie';
@@ -330,6 +331,7 @@ class ScenePicker extends React.Component {
     canGrid: boolean,
     config: Config,
     grids: Array<SceneGrid>,
+    audioLibraryCount: number,
     libraryCount: number,
     openTab: number,
     scenes: Array<Scene>,
@@ -341,6 +343,7 @@ class ScenePicker extends React.Component {
     onChangeTab(newTab: number): void,
     onImportScene(addToLibrary: boolean): void,
     onOpenConfig(): void,
+    onOpenAudioLibrary(): void,
     onOpenLibrary(): void,
     onOpenScene(scene: Scene): void,
     onOpenGrid(grid: SceneGrid): void,
@@ -462,6 +465,22 @@ class ScenePicker extends React.Component {
                       <Chip
                         className={clsx(classes.chip, !open && classes.chipClose)}
                         label={this.props.libraryCount}
+                        color='primary'
+                        size='small'
+                        variant='outlined'/>
+                    )}
+                  </ListItem>
+                </Tooltip>
+                <Tooltip title={this.state.drawerOpen ? "" : "Audio Library"}>
+                  <ListItem button onClick={this.props.onOpenAudioLibrary.bind(this)}>
+                    <ListItemIcon>
+                      <LibraryMusicIcon/>
+                    </ListItemIcon>
+                    <ListItemText primary="Audio Library" />
+                    {this.props.audioLibraryCount > 0 && (
+                      <Chip
+                        className={clsx(classes.chip, !open && classes.chipClose)}
+                        label={this.props.audioLibraryCount}
                         color='primary'
                         size='small'
                         variant='outlined'/>

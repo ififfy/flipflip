@@ -539,6 +539,7 @@ class SceneDetail extends React.Component {
               <Typography
                 component="div"
                 role="tabpanel"
+                hidden={this.props.scene.openTab !== 1}
                 id="vertical-tabpanel-1"
                 aria-labelledby="vertical-tab-1">
                 <div className={classes.tabPanel}>
@@ -558,6 +559,7 @@ class SceneDetail extends React.Component {
               <Typography
                 component="div"
                 role="tabpanel"
+                hidden={this.props.scene.openTab !== 2}
                 id="vertical-tabpanel-2"
                 aria-labelledby="vertical-tab-2">
                 <div className={classes.tabPanel}>
@@ -576,6 +578,7 @@ class SceneDetail extends React.Component {
                 className={clsx(this.props.scene.openTab === 3 && classes.sourcesSection)}
                 component="div"
                 role="tabpanel"
+                hidden={this.props.scene.openTab !== 3}
                 id="vertical-tabpanel-3"
                 aria-labelledby="vertical-tab-3">
                 <div className={classes.tabPanel}>
@@ -602,6 +605,7 @@ class SceneDetail extends React.Component {
                 className={clsx(this.props.scene.openTab === 4 && classes.generateSection)}
                 component="div"
                 role="tabpanel"
+                hidden={this.props.scene.openTab !== 4}
                 id="vertical-tabpanel-4"
                 aria-labelledby="vertical-tab-4">
                 <div className={classes.tabPanel}>

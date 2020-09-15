@@ -27,7 +27,7 @@ const styles = (theme: Theme) => createStyles({
 class LibrarySearch extends React.Component {
   readonly props: {
     classes: any,
-    displaySources: Array<LibrarySource>,
+    displaySources: Array<LibrarySource | Audio>,
     tags: Array<Tag>,
     filters: Array<string>,
     placeholder: string,

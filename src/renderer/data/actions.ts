@@ -24,10 +24,13 @@ import {
   saveDir
 } from "./utils";
 import defaultTheme from "./theme";
-import {AF, BT, DONE, GT, IF, LT, OF, PR, PT, SDGT, SDT, SF, SGT, SOF, SPT, ST, TF, TT, VCT} from "./const";
+import {
+  AF, ASF, BT, DONE, GT, HTF, IF, IT, LT, OF, PR, PT, SDGT, SDT, SF, SGT, SL, SOF, SPT, ST, TF, TT, VCT, VTF
+} from "./const";
 import { defaultInitialState } from './AppStorage';
 import { Route } from "./Route";
 import en from "./en";
+import Audio from "./Audio";
 import Scene from "./Scene";
 import Config from "./Config";
 import Clip from "../data/Clip";
@@ -81,6 +84,13 @@ export function getLibrarySource(state: State): LibrarySource | null {
   return state.library.find((s) => s.id == activeScene.libraryID);
 }
 
+// Returns the active audio source, or null if the current route isn't a audio source
+export function getAudioSource(state: State): Audio | null {
+  const activeScene = getActiveScene(state);
+  if (activeScene == null) return null;
+  return state.audios.find((s) => s.id == activeScene.libraryID);
+}
+
 export function getTags(library: Array<LibrarySource>, source: string, clipID?: string): Array<Tag> {
   const librarySource = library.find((s) => s.url == source);
   if (librarySource) {
@@ -109,17 +119,22 @@ export function restoreFromBackup(state: State, backupFile: string): Object {
     autoEdit: data.autoEdit,
     isSelect: data.isSelect,
     isBatchTag: data.isBatchTag,
+    isBatchEdit: data.isBatchEdit,
     openTab: data.openTab ? data.openTab : 0,
     displayedSources: Array<LibrarySource>(),
     config: new Config(data.config),
     scenes: data.scenes.map((s: any) => new Scene(s)),
     grids: data.grids ? data.grids.map((g: any) => new SceneGrid(g)) : Array<SceneGrid>(),
+    audios: data.audios ? data.audios.map((a: any) => new Audio(a)) : Array <Audio>(),
     library: data.library.map((s: any) => new LibrarySource(s)),
     tags: data.tags.map((t: any) => new Tag(t)),
     route: data.route.map((s: any) => new Route(s)),
     libraryYOffset: 0,
     libraryFilters: Array<string>(),
     librarySelected: Array<string>(),
+    audioYOffset: 0,
+    audioFilters: Array<string>(),
+    audioSelected: Array<string>(),
     progressMode: null as string,
     progressTitle: null as string,
     progressCurrent: 0,
@@ -542,8 +557,18 @@ export function openLibrary(state: State): Object {
   return {route: [new Route({kind: 'library', value: null})], tutorial: state.config.tutorials.library == null ? LT.welcome : null};
 }
 
+export function openAudios(state: State): Object {
+  // TODO Audio tutorial?
+  return {route: [new Route({kind: 'audios', value: null})]};
+}
+
 export function openLibraryImport(state: State): Object {
   return {route: state.route.concat(new Route({kind: 'library', value: null})), isSelect: true, librarySelected: []};
+}
+
+export function importAudioFromLibrary(state: State, sources: Array<LibrarySource>): Object {
+  // TODO
+  return {};
 }
 
 export function importFromLibrary(state: State, sources: Array<LibrarySource>): Object {
@@ -560,12 +585,60 @@ export function saveLibraryPosition(state: State, yOffset: number, filters: Arra
   };
 }
 
+export function saveAudioPosition(state: State, yOffset: number, filters: Array<string>, selected: Array<string>): Object {
+  return {
+    audioYOffset: yOffset,
+    audioFilters: filters,
+    audioSelected: selected,
+  };
+}
+
 export function playGrid(state: State, grid: SceneGrid): Object {
   return {route: state.route.concat(new Route({kind: 'gridplay', value: grid.id}))};
 }
 
 export function playScene(state: State, scene: Scene): Object {
   return {route: state.route.concat(new Route({kind: 'play', value: scene.id})), tutorial: state.config.tutorials.player == null ? PT.welcome : null};
+}
+
+export function playAudio(state: State, source: Audio, displayed: Array<Audio>): Object {
+  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, "\\");
+  let librarySource = state.audios.find((s) => s.url == sourceURL);
+  if (librarySource == null) {
+    throw new Error("Source not found in Library");
+  }
+  let id = state.scenes.length + 1;
+  state.scenes.forEach((s: Scene) => {
+    id = Math.max(s.id + 1, id);
+  });
+  displayed = displayed.filter((a) => a.url != source.url);
+  displayed.unshift(source);
+  let tempScene = new Scene({
+    id: id,
+    name: "audio_scene_temp",
+    libraryID: librarySource.id,
+    audioScene: true,
+    audioEnabled: true,
+    audioPlaylists: [displayed],
+    strobe: true,
+    strobeTime: 10000,
+    strobeLayer: SL.image,
+    panning: true,
+    panDuration: 20000,
+    panHorizTransType: HTF.random,
+    panHorizTransLevelMax: 50,
+    panHorizTransLevelMin: 10,
+    panHorizTransRandom: true,
+    panVertTransType: VTF.random,
+    panVertTransLevelMax: 50,
+    panVertTransLevelMin: 10,
+    panVertTransRandom: true,
+    imageType: IT.centerNoClip,
+  });
+  return {
+    scenes: state.scenes.concat([tempScene]),
+    route: state.route.concat([new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'libraryplay', value: tempScene.id})]),
+  };
 }
 
 export function playSceneFromLibrary(state: State, source: LibrarySource, displayed: Array<LibrarySource>): Object {
@@ -1475,6 +1548,13 @@ export function replaceGrids(state: State, grids: Array<SceneGrid>): Object {
   return {grids: grids};
 }
 
+export function updateAudioLibrary(state: State, fn: (audios: Array<Audio>) => void): Object {
+  const audiosCopy = JSON.parse(JSON.stringify(state.audios));
+  fn(audiosCopy);
+  return {audios: audiosCopy};
+
+}
+
 export function updateLibrary(state: State, fn: (library: Array<LibrarySource>) => void): Object {
   const libraryCopy = JSON.parse(JSON.stringify(state.library));
   fn(libraryCopy);
@@ -1686,6 +1766,23 @@ export function updateTags(state: State, tags: Array<Tag>): Object {
 
 export function batchTag(state: State): Object {
   return {isBatchTag: !state.isBatchTag};
+}
+
+export function batchEdit(state: State): Object {
+  return {isBatchEdit: !state.isBatchEdit};
+}
+
+export function toggleAudioTag(state: State, sourceID: number, tag: Tag): Object {
+  const newAudios = state.audios;
+  const source = newAudios.find((s) => s.id == sourceID);
+  if (source) {
+    if (source.tags.find((t: Tag) => t.name == tag.name)) {
+      source.tags = source.tags.filter((t: Tag) => t.name != tag.name);
+    } else {
+      source.tags.push(tag);
+    }
+  }
+  return {audios: newAudios};
 }
 
 export function toggleTag(state: State, sourceID: number, tag: Tag): Object {
@@ -1928,6 +2025,61 @@ export function sortScene(state: State, algorithm: string, ascending: boolean): 
   return {scenes: newScenes}
 }
 
+export function sortAudioSources(state: State, algorithm: string, ascending: boolean): Object {
+
+  const newLibrary = state.audios.concat().sort(audioSortFunction(algorithm, ascending));
+  return {audios: newLibrary};
+}
+
+function audioSortFunction(algorithm: string, ascending: boolean): (a: Audio, b: Audio) => number {
+  return (a, b) => {
+    let secondary = null;
+    let aValue: any, bValue: any;
+    switch (algorithm) {
+      case ASF.url:
+        aValue = a.url;
+        bValue = b.url;
+        break;
+      case ASF.name:
+        aValue = a.name;
+        bValue = b.name;
+        break;
+      case ASF.artist:
+        aValue = a.artist;
+        bValue = b.artist;
+        secondary = ASF.album;
+        break;
+      case ASF.album:
+        aValue = a.album;
+        bValue = b.album;
+        secondary = ASF.name;
+        break;
+      case ASF.date:
+        aValue = a.id;
+        bValue = b.id;
+        break;
+      case ASF.duration:
+        aValue = a.duration;
+        bValue = b.duration;
+        break;
+      default:
+        aValue = "";
+        bValue = "";
+    }
+    if (aValue < bValue) {
+      return ascending ? -1 : 1;
+    } else if (aValue > bValue) {
+      return ascending ? 1 : -1;
+    } else {
+      if (!!secondary) {
+        return audioSortFunction(secondary, true)(a, b);
+      } else {
+        return 0;
+      }
+    }
+  }
+}
+
 export function sortSources(state: State, scene: Scene, algorithm: string, ascending: boolean): Object {
   const getName = (a: LibrarySource) => {
     const sourceType = getSourceType(a.url);
@@ -2133,6 +2285,16 @@ export function importScene(state: State, addToLibrary: boolean): Object {
     }
   }
   return {scenes: newScenes, route: [new Route({kind: 'scene', value: scene.id})]};
+}
+
+export function exportAudioLibrary(state: State): Object {
+  // TODO
+  return {};
+}
+
+export function importAudioLibrary(state: State, backup: Function): Object {
+  // TODO
+  return {};
 }
 
 export function exportLibrary(state: State): Object {

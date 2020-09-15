@@ -81,7 +81,7 @@ class AudioControl extends React.Component {
   readonly props: {
     classes: any,
     audio: Audio,
-    isFirst: boolean,
+    playlistIndex: number,
     scene: Scene,
     scenePaths: Array<any>,
     sidebar: boolean,
@@ -120,7 +120,7 @@ class AudioControl extends React.Component {
     const tickMaxDelay = typeof audio.tickMaxDelay === 'number' ? audio.tickMaxDelay : 0;
     return(
       <React.Fragment key={audio.id}>
-        {!this.props.isFirst && (
+        {this.props.playlistIndex != 0 && (
           <Grid item xs={12} className={clsx(!this.props.scene.audioEnabled && classes.noPadding)}>
             <Collapse in={this.props.scene.audioEnabled} className={classes.fullWidth}>
               <Divider/>
@@ -276,7 +276,7 @@ class AudioControl extends React.Component {
                   <Divider component="div" orientation="vertical" style={{height: 48}}/>
                   <Grid item xs>
                     <Grid container>
-                      {this.props.isFirst && (
+                      {this.props.playlistIndex == 0 && (
                         <Grid item xs={12}>
                           <TextField
                             variant="outlined"
@@ -349,7 +349,7 @@ class AudioControl extends React.Component {
                           value={audio.tickMode}
                           onChange={this.onAudioInput.bind(this, 'tickMode')}>
                           {Object.values(TF).map((tf) => {
-                            if (tf != TF.bpm || !this.props.isFirst) {
+                            if (tf != TF.bpm || this.props.playlistIndex != 0) {
                               return <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>;
                             } else return;
                           })}
@@ -616,7 +616,7 @@ class AudioControl extends React.Component {
 
   onDeleteAudioTrack() {
     this.update((s) => {
-      s.audios.splice(s.audios.map((a: Audio) => a.id).indexOf(this.props.audio.id), 1);
+      s.audioPlaylists[this.props.playlistIndex].splice(s.audioPlaylists[this.props.playlistIndex].map((a: Audio) => a.id).indexOf(this.props.audio.id), 1);
     })
   }
 
@@ -654,7 +654,7 @@ class AudioControl extends React.Component {
       case 'tick':
         if (input.checked) {
           this.update((s) => {
-            const audio = s.audios.find((a: Audio) => a.id == this.props.audio.id);
+            const audio = s.audioPlaylists[this.props.playlistIndex].find((a: Audio) => a.id == this.props.audio.id);
             audio.tick = true;
             audio.stopAtEnd = false;
             audio.nextSceneAtEnd = false;
@@ -666,7 +666,7 @@ class AudioControl extends React.Component {
       case 'stopAtEnd':
         if (input.checked) {
           this.update((s) => {
-            const audio = s.audios.find((a: Audio) => a.id == this.props.audio.id);
+            const audio = s.audioPlaylists[this.props.playlistIndex].find((a: Audio) => a.id == this.props.audio.id);
             audio.stopAtEnd = true;
             audio.tick = false;
             audio.nextSceneAtEnd = false;
@@ -678,7 +678,7 @@ class AudioControl extends React.Component {
       case 'nextSceneAtEnd':
         if (input.checked) {
           this.update((s) => {
-            const audio = s.audios.find((a: Audio) => a.id == this.props.audio.id);
+            const audio = s.audioPlaylists[this.props.playlistIndex].find((a: Audio) => a.id == this.props.audio.id);
             audio.nextSceneAtEnd = true;
             audio.tick = false;
             audio.stopAtEnd = false;
@@ -690,7 +690,7 @@ class AudioControl extends React.Component {
   }
 
   changeKey(key: string, value: any) {
-    this.update((s) => s.audios.find((a: Audio) => a.id == this.props.audio.id)[key] = value);
+    this.update((s) => s.audioPlaylists[this.props.playlistIndex].find((a: Audio) => a.id == this.props.audio.id)[key] = value);
   }
 
   update(fn: (scene: any) => void) {

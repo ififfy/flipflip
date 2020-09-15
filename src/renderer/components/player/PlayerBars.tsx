@@ -347,135 +347,139 @@ class PlayerBars extends React.Component {
                 </Typography>
               </div>
 
-              {this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.images && (
-                <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                  <ExpansionPanelSummary
-                    expandIcon={<ExpandMoreIcon />}
-                  >
-                    <Typography>Video Controls</Typography>
-                  </ExpansionPanelSummary>
-                  <ExpansionPanelDetails>
-                    <VideoCard
-                      scene={this.props.scene}
-                      otherScenes={this.props.scene.overlays.map((o) => this.getScene(o.sceneID))}
-                      isPlaying={this.props.isPlaying}
-                      mainVideo={this.props.mainVideo}
-                      mainClip={source ? source.clips.find((c) => c.id == clipID) : null}
-                      mainClipValue={clipValue ? clipValue : null}
-                      otherVideos={this.props.overlayVideos}
-                      onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-                  </ExpansionPanelDetails>
-                </ExpansionPanel>
+              {!this.props.scene.audioScene && (
+                <React.Fragment>
+                  {this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.images && (
+                    <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+                      <ExpansionPanelSummary
+                        expandIcon={<ExpandMoreIcon />}
+                      >
+                        <Typography>Video Controls</Typography>
+                      </ExpansionPanelSummary>
+                      <ExpansionPanelDetails>
+                        <VideoCard
+                          scene={this.props.scene}
+                          otherScenes={this.props.scene.overlays.map((o) => this.getScene(o.sceneID))}
+                          isPlaying={this.props.isPlaying}
+                          mainVideo={this.props.mainVideo}
+                          mainClip={source ? source.clips.find((c) => c.id == clipID) : null}
+                          mainClipValue={clipValue ? clipValue : null}
+                          otherVideos={this.props.overlayVideos}
+                          onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+                      </ExpansionPanelDetails>
+                    </ExpansionPanel>
+                  )}
+
+                  <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+                    <ExpansionPanelSummary
+                      expandIcon={<ExpandMoreIcon />}
+                    >
+                      <Typography>Scene Options</Typography>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                      <SceneOptionCard
+                        sidebar
+                        allScenes={this.props.scenes}
+                        isTagging={this.props.tags != null}
+                        scene={this.props.scene}
+                        onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+                    </ExpansionPanelDetails>
+                  </ExpansionPanel>
+
+                  <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+                    <ExpansionPanelSummary
+                      expandIcon={<ExpandMoreIcon />}
+                    >
+                      <Typography>Image/Video Options</Typography>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                      <ImageVideoCard
+                        sidebar
+                        isPlayer
+                        isConfig={false}
+                        scene={this.props.scene}
+                        onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+                    </ExpansionPanelDetails>
+                  </ExpansionPanel>
+
+                  <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+                    <ExpansionPanelSummary
+                      expandIcon={<ExpandMoreIcon />}
+                    >
+                      <Typography>Zoom/Move</Typography>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                      <ZoomMoveCard
+                        sidebar
+                        scene={this.props.scene}
+                        easingControls={this.props.config.displaySettings.easingControls}
+                        onUpdateScene={this.props.onUpdateScene.bind(this)} />
+                    </ExpansionPanelDetails>
+                  </ExpansionPanel>
+
+                  <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+                    <ExpansionPanelSummary
+                      expandIcon={<ExpandMoreIcon />}
+                    >
+                      <Typography>Cross-Fade</Typography>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                      <CrossFadeCard
+                        sidebar
+                        scene={this.props.scene}
+                        easingControls={this.props.config.displaySettings.easingControls}
+                        onUpdateScene={this.props.onUpdateScene.bind(this)} />
+                    </ExpansionPanelDetails>
+                  </ExpansionPanel>
+
+                  <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+                    <ExpansionPanelSummary
+                      expandIcon={<ExpandMoreIcon />}
+                    >
+                      <Typography>Strobe</Typography>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                      <StrobeCard
+                        sidebar
+                        scene={this.props.scene}
+                        easingControls={this.props.config.displaySettings.easingControls}
+                        onUpdateScene={this.props.onUpdateScene.bind(this)} />
+                    </ExpansionPanelDetails>
+                  </ExpansionPanel>
+
+                  <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+                    <ExpansionPanelSummary
+                      expandIcon={<ExpandMoreIcon />}
+                    >
+                      <Typography>Fade In/Out</Typography>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                      <FadeIOCard
+                        sidebar
+                        scene={this.props.scene}
+                        easingControls={this.props.config.displaySettings.easingControls}
+                        onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+                    </ExpansionPanelDetails>
+                  </ExpansionPanel>
+
+                  <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+                    <ExpansionPanelSummary
+                      expandIcon={<ExpandMoreIcon />}
+                    >
+                      <Typography>Panning</Typography>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                      <PanningCard
+                        sidebar
+                        scene={this.props.scene}
+                        easingControls={this.props.config.displaySettings.easingControls}
+                        onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+                    </ExpansionPanelDetails>
+                  </ExpansionPanel>
+                </React.Fragment>
               )}
 
-              <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                <ExpansionPanelSummary
-                  expandIcon={<ExpandMoreIcon />}
-                >
-                  <Typography>Scene Options</Typography>
-                </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
-                  <SceneOptionCard
-                    sidebar
-                    allScenes={this.props.scenes}
-                    isTagging={this.props.tags != null}
-                    scene={this.props.scene}
-                    onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-                </ExpansionPanelDetails>
-              </ExpansionPanel>
-
-              <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                <ExpansionPanelSummary
-                  expandIcon={<ExpandMoreIcon />}
-                >
-                  <Typography>Image/Video Options</Typography>
-                </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
-                  <ImageVideoCard
-                    sidebar
-                    isPlayer
-                    isConfig={false}
-                    scene={this.props.scene}
-                    onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-                </ExpansionPanelDetails>
-              </ExpansionPanel>
-
-              <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                <ExpansionPanelSummary
-                  expandIcon={<ExpandMoreIcon />}
-                >
-                  <Typography>Zoom/Move</Typography>
-                </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
-                  <ZoomMoveCard
-                    sidebar
-                    scene={this.props.scene}
-                    easingControls={this.props.config.displaySettings.easingControls}
-                    onUpdateScene={this.props.onUpdateScene.bind(this)} />
-                </ExpansionPanelDetails>
-              </ExpansionPanel>
-
-              <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                <ExpansionPanelSummary
-                  expandIcon={<ExpandMoreIcon />}
-                >
-                  <Typography>Cross-Fade</Typography>
-                </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
-                  <CrossFadeCard
-                    sidebar
-                    scene={this.props.scene}
-                    easingControls={this.props.config.displaySettings.easingControls}
-                    onUpdateScene={this.props.onUpdateScene.bind(this)} />
-                </ExpansionPanelDetails>
-              </ExpansionPanel>
-
-              <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                <ExpansionPanelSummary
-                  expandIcon={<ExpandMoreIcon />}
-                >
-                  <Typography>Strobe</Typography>
-                </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
-                  <StrobeCard
-                    sidebar
-                    scene={this.props.scene}
-                    easingControls={this.props.config.displaySettings.easingControls}
-                    onUpdateScene={this.props.onUpdateScene.bind(this)} />
-                </ExpansionPanelDetails>
-              </ExpansionPanel>
-
-              <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                <ExpansionPanelSummary
-                  expandIcon={<ExpandMoreIcon />}
-                >
-                  <Typography>Fade In/Out</Typography>
-                </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
-                  <FadeIOCard
-                    sidebar
-                    scene={this.props.scene}
-                    easingControls={this.props.config.displaySettings.easingControls}
-                    onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-                </ExpansionPanelDetails>
-              </ExpansionPanel>
-
-              <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                <ExpansionPanelSummary
-                  expandIcon={<ExpandMoreIcon />}
-                >
-                  <Typography>Panning</Typography>
-                </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
-                  <PanningCard
-                    sidebar
-                    scene={this.props.scene}
-                    easingControls={this.props.config.displaySettings.easingControls}
-                    onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-                </ExpansionPanelDetails>
-              </ExpansionPanel>
-
-              <ExpansionPanel TransitionProps={{ unmountOnExit: !this.props.scene.audioEnabled && this.props.scene.nextSceneID === 0 }}>
+              <ExpansionPanel defaultExpanded={this.props.scene.audioScene} TransitionProps={{ unmountOnExit: !this.props.scene.audioEnabled && this.props.scene.nextSceneID === 0 }}>
                 <ExpansionPanelSummary
                   expandIcon={<ExpandMoreIcon />}
                 >
@@ -493,19 +497,21 @@ class PlayerBars extends React.Component {
                 </ExpansionPanelDetails>
               </ExpansionPanel>
 
-              <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                <ExpansionPanelSummary
-                  expandIcon={<ExpandMoreIcon />}
-                >
-                  <Typography>Text Overlay</Typography>
-                </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
-                  <TextCard
-                    sidebar
-                    scene={this.props.scene}
-                    onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-                </ExpansionPanelDetails>
-              </ExpansionPanel>
+              {!this.props.scene.audioScene && (
+                <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
+                  <ExpansionPanelSummary
+                    expandIcon={<ExpandMoreIcon />}
+                  >
+                    <Typography>Text Overlay</Typography>
+                  </ExpansionPanelSummary>
+                  <ExpansionPanelDetails>
+                    <TextCard
+                      sidebar
+                      scene={this.props.scene}
+                      onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+                  </ExpansionPanelDetails>
+                </ExpansionPanel>
+              )}
             </Drawer>
           </React.Fragment>
         )}
@@ -888,7 +894,7 @@ class PlayerBars extends React.Component {
       keyMap.set('onDelete', ['Delete Image', 'Delete']);
     }
 
-    if (this.props.tags != null) {
+    if (!this.props.scene.audioScene && this.props.tags != null) {
       keyMap.set('prevSource', ['Previous Source', '[']);
       keyMap.set('nextSource', ['Next Source', ']']);
     }
@@ -908,12 +914,14 @@ class PlayerBars extends React.Component {
       case 'ArrowLeft':
         if (!this.state.drawerHover || focus != "input") {
           e.preventDefault();
+          // TODO Navigate audio playlist
           this.historyBack();
         }
         break;
       case 'ArrowRight':
         if (!this.state.drawerHover || focus != "input") {
           e.preventDefault();
+          // TODO Navigate audio playlist
           this.historyForward();
         }
         break;
@@ -954,13 +962,13 @@ class PlayerBars extends React.Component {
         }
         break;
       case '[':
-        if (this.props.tags != null) {
+        if (!this.props.scene.audioScene && this.props.tags != null) {
           e.preventDefault();
           this.prevSource();
         }
         break;
       case ']':
-        if (this.props.tags != null) {
+        if (!this.props.scene.audioScene && this.props.tags != null) {
           e.preventDefault();
           this.nextSource();
         }

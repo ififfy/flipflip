@@ -11,6 +11,7 @@ import SubscriptionsIcon from '@material-ui/icons/Subscriptions';
 
 import {getSourceType} from "../../data/utils";
 import {ST} from "../../data/const";
+import AudiotrackIcon from "@material-ui/icons/Audiotrack";
 
 function TumblrIcon(props: any) {
   return (
@@ -148,6 +149,8 @@ export default class SourceIcon extends React.Component {
       type = this.props.type;
     }
     switch(type) {
+      case ST.audio:
+        return <AudiotrackIcon className={this.props.className} />
       case ST.local:
         return <FolderIcon className={this.props.className}/>;
       case ST.video:

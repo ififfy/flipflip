@@ -4,9 +4,11 @@ import {animated, useTransition} from "react-spring";
 import {getEaseFunction, getRandomColor, getRandomListItem} from "../../data/utils";
 import {SC, SL, TF} from "../../data/const";
 import Scene from "../../data/Scene";
+import Audio from "../../data/Audio";
 
 export default class Strobe extends React.Component {
   readonly props: {
+    currentAudio: Audio
     zIndex: number,
     toggleStrobe: boolean,
     timeToNextFrame: number,
@@ -154,7 +156,7 @@ export default class Strobe extends React.Component {
         break;
       case TF.bpm:
         const bpmMulti = this.props.scene.strobeBPMMulti / 10;
-        const bpm = this.props.scene.audios.length > 0 ? this.props.scene.audios[0].bpm : 60;
+        const bpm = this.props.currentAudio ? this.props.currentAudio.bpm : 60;
         duration = 60000 / (bpm * bpmMulti);
         // If we cannot parse this, default to 1s
         if (!duration) {
@@ -182,7 +184,7 @@ export default class Strobe extends React.Component {
         break;
       case TF.bpm:
         const bpmMulti = this.props.scene.strobeDelayBPMMulti / 10;
-        const bpm = this.props.scene.audios.length > 0 ? this.props.scene.audios[0].bpm : 60;
+        const bpm = this.props.currentAudio ? this.props.currentAudio.bpm : 60;
         delay = 60000 / (bpm * bpmMulti);
         // If we cannot parse this, default to 1s
         if (!delay) {

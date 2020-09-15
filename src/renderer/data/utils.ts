@@ -4,6 +4,7 @@ import path from 'path';
 import * as fs from "fs";
 import wretch from "wretch";
 import * as easings from 'd3-ease';
+import crypto from "crypto";
 
 import {EA, ST} from "./const";
 import en from "./en";
@@ -138,7 +139,9 @@ export function getFileName(url: string, extension = true) {
 }
 
 export function getSourceType(url: string): string {
-  if (isVideo(url, false)) {
+  if (isAudio(url, false)) {
+    return ST.audio;
+  } else if (isVideo(url, false)) {
     return ST.video;
   } else if (isVideoPlaylist(url, true)) {
     return ST.playlist;
@@ -281,6 +284,24 @@ export function getFileGroup(url: string) {
 
   }
 }
+
+export function generateThumbnailFile(cachePath: string, data: Buffer): string {
+  let checksumThumbnailPath = cachePath;
+  if (!checksumThumbnailPath.endsWith(path.sep)) {
+    checksumThumbnailPath += path.sep;
+  }
+  checksumThumbnailPath += "thumbs" + path.sep;
+  if (!fs.existsSync(checksumThumbnailPath)) {
+    fs.mkdirSync(checksumThumbnailPath);
+  }
+  const checksum = crypto.createHash('md5').update(data).digest('hex');
+  checksumThumbnailPath += checksum + ".png";
+  if (!fs.existsSync(checksumThumbnailPath)) {
+    fs.writeFileSync(checksumThumbnailPath, data);
+  }
+  return checksumThumbnailPath;
+}
+
 
 export function getLocalPath(source: string, config: Config) {
   return cachePath(source, "local", config);
@@ -480,6 +501,20 @@ export function getRandomListItem(list: any[], count: number = 1) {
 
 export function isImageOrVideo(path: string, strict: boolean): boolean {
   return (isImage(path, strict) || isVideo(path, strict));
+}
+
+export function isAudio(path: string, strict: boolean): boolean {
+  if (path == null) return false;
+  const p = path.toLowerCase();
+  const acceptableExtensions = [".mp3", ".m4a", ".wav", ".ogg"];
+  for (let ext of acceptableExtensions) {
+    if (strict) {
+      if (p.endsWith(ext)) return true;
+    } else {
+      if (p.includes(ext)) return true;
+    }
+  }
+  return false;
 }
 
 export function isVideo(path: string, strict: boolean): boolean {

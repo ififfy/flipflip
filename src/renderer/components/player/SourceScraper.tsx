@@ -20,7 +20,8 @@ import {
   getSourceType,
   isImage,
   isVideo,
-  isImageOrVideo, randomizeList, isVideoPlaylist,
+  isImageOrVideo,
+  randomizeList
 } from "../../data/utils";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
@@ -28,6 +29,7 @@ import Scene from '../../data/Scene';
 import ChildCallbackHack from './ChildCallbackHack';
 import ImagePlayer from './ImagePlayer';
 import * as path from "path";
+import Audio from "../../data/Audio";
 
 let redditAlerted = false;
 let tumblrAlerted = false;
@@ -1239,6 +1241,7 @@ export default class SourceScraper extends React.Component {
     config: Config,
     scene: Scene,
     nextScene?: Scene,
+    currentAudio: Audio,
     opacity: number,
     isPlaying: boolean,
     gridView: boolean,
@@ -1281,6 +1284,7 @@ export default class SourceScraper extends React.Component {
           <ImagePlayer
             config={this.props.config}
             scene={this.props.scene}
+            currentAudio={this.props.currentAudio}
             isOverlay={this.props.opacity != 1}
             isPlaying={this.props.isPlaying}
             gridView={this.props.gridView}

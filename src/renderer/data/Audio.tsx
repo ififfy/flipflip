@@ -1,8 +1,13 @@
 import {TF} from "./const";
+import Tag from "./Tag";
 
 export default class Audio {
   id: number = 0;
   url: string;
+  offline: boolean = false;
+  marked: boolean = false;
+  lastCheck: Date = null;
+  tags: Array<Tag> = [];
   volume: number = 100;
   speed: number = 10;
   stopAtEnd: boolean = false;
@@ -15,6 +20,14 @@ export default class Audio {
   tickSinRate: number = 100;
   tickBPMMulti: number = 10;
   bpm: number = 0;
+
+  thumb: string;
+  name: string;
+  artist: string;
+  album: string;
+  duration: number;
+  trackNum: number;
+  comment: string;
 
   constructor(init?: Partial<Audio>) {
     Object.assign(this, init);

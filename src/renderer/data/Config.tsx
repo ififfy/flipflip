@@ -4,7 +4,7 @@ import LibrarySource from "./LibrarySource";
 import Audio from "./Audio";
 
 interface SceneSettingsI {
-  [key: string]: string | number | boolean | Array<LibrarySource> | Array<Overlay> | Array<Audio> | Array<Array<number>> | Array<string> | Array<number>;
+  [key: string]: string | number | boolean | Array<any>;
 
   sources: Array<LibrarySource>;
   timingFunction: string;
@@ -199,8 +199,10 @@ interface SceneSettingsI {
   countBorderpx: number;
   countBorderColor: string;
 
+  audioScene: boolean;
   audioEnabled: boolean;
   audios: Array<Audio>;
+  audioPlaylists: Array<Array<Audio>>;
 
   // migration only
   overlaySceneID: number;
@@ -273,7 +275,7 @@ interface TutorialsI {
 }
 
 export class SceneSettings implements SceneSettingsI {
-  [key: string]: string | number | boolean | Array<LibrarySource> | Array<Overlay> | Array<Audio> | Array<Array<number>> | Array<string> | Array<number>;
+  [key: string]: string | number | boolean | Array<any>;
 
   sources: Array<LibrarySource> = [];
   timingFunction = TF.constant;
@@ -472,8 +474,10 @@ export class SceneSettings implements SceneSettingsI {
   countBorderpx = 5;
   countBorderColor = "#000000";
 
+  audioScene = false;
   audioEnabled = false;
   audios: Array<Audio> = [];
+  audioPlaylists: Array<Array<Audio>> = [];
 
   // migration only
   overlaySceneID = 0;

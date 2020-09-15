@@ -6,6 +6,7 @@ import {
 } from "@material-ui/core";
 import {ThemeProvider} from "@material-ui/styles";
 
+import {getCachePath} from "../data/utils";
 import {IPC} from "../data/const";
 import * as actions from '../data/actions';
 import AppStorage from '../data/AppStorage';
@@ -20,6 +21,7 @@ import Player from './player/Player';
 import SceneDetail from './sceneDetail/SceneDetail';
 import GridPlayer from "./player/GridPlayer";
 import Tutorial from "./Tutorial";
+import AudioLibrary from "./library/AudioLibrary";
 
 const appStorage = new AppStorage(remote.getCurrentWindow().id);
 
@@ -91,6 +93,7 @@ export default class Meta extends React.Component {
               canGrid={this.state.scenes.length > 0}
               config={this.state.config}
               grids={this.state.grids}
+              audioLibraryCount={this.state.audios.length}
               libraryCount={this.state.library.length}
               openTab={this.state.openTab}
               scenes={this.state.scenes}
@@ -102,6 +105,7 @@ export default class Meta extends React.Component {
               onChangeTab={a(actions.changeScenePickerTab)}
               onImportScene={a(actions.importScene)}
               onOpenConfig={a(actions.openConfig)}
+              onOpenAudioLibrary={a(actions.openAudios)}
               onOpenLibrary={a(actions.openLibrary)}
               onOpenScene={a(actions.goToScene)}
               onOpenGrid={a(actions.goToGrid)}
@@ -182,6 +186,40 @@ export default class Meta extends React.Component {
             />
           )}
 
+          {this.isRoute('audios') && (
+            <AudioLibrary
+              cachePath={getCachePath(null, this.state.config)}
+              filters={this.state.audioFilters}
+              isBatchTag={this.state.isBatchTag}
+              isBatchEdit={this.state.isBatchEdit}
+              isSelect={this.state.isSelect}
+              library={this.state.audios}
+              progressCurrent={this.state.progressCurrent}
+              progressMode={this.state.progressMode}
+              progressTitle={this.state.progressTitle}
+              progressTotal={this.state.progressTotal}
+              selected={this.state.audioSelected}
+              tags={this.state.tags}
+              tutorial={this.state.tutorial}
+              yOffset={this.state.audioYOffset}
+              goBack={a(actions.goBack)}
+              onBatchTag={a(actions.batchTag)}
+              onBatchEdit={a(actions.batchEdit)}
+              onExportLibrary={a(actions.exportAudioLibrary)}
+              onImportFromLibrary={a(actions.importAudioFromLibrary)}
+              onImportLibrary={a(actions.importAudioLibrary, appStorage.backup.bind(appStorage))}
+              onManageTags={a(actions.manageTags)}
+              onMarkOffline={p(actions.markOffline)}
+              onPlay={a(actions.playAudio)}
+              onSort={a(actions.sortAudioSources)}
+              onTutorial={a(actions.doneTutorial)}
+              onUpdateLibrary={a(actions.updateAudioLibrary)}
+              onUpdateMode={a(actions.setMode)}
+              savePosition={a(actions.saveAudioPosition)}
+              systemMessage={a(actions.systemMessage)}
+            />
+          )}
+
           {this.isRoute('tags') && (
             <TagManager
               tags={this.state.tags}
@@ -253,9 +291,9 @@ export default class Meta extends React.Component {
               tutorial={this.state.tutorial}
               onUpdateScene={a(actions.updateScene)}
               goBack={a(actions.endPlaySceneFromLibrary)}
-              tags={actions.getLibrarySource(this.state)?.tags}
+              tags={scene.audioScene ? actions.getAudioSource(this.state)?.tags : actions.getLibrarySource(this.state)?.tags}
               allTags={this.state.tags}
-              toggleTag={a(actions.toggleTag)}
+              toggleTag={scene.audioScene ? a(actions.toggleAudioTag) : a(actions.toggleTag)}
               navigateTagging={a(actions.navigateDisplayedLibrary)}
               getTags={actions.getTags.bind(this, this.state.library)}
               setCount={a(actions.setCount)}
