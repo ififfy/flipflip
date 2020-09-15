@@ -438,7 +438,8 @@ class GridSetup extends React.Component {
 
   getSceneName(id: string): string {
     if (id === "-1") return "~~EMPTY~~";
-    return this.props.allScenes.find((s) => s.id.toString() === id).name;
+    const scene = this.props.allScenes.find((s) => s.id.toString() === id)
+    return scene ? scene.name : "~~EMPTY~~";
   }
 }
 
