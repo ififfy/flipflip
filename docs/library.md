@@ -57,3 +57,15 @@ width="20" height="20"> ) to check your sources. When this process completes, un
 an offline icon.
 
 ![](doc_images/library_offline.png)
+
+### Localize Offline Content
+When a source goes offline, you may want to retain the cached images in their own source. After marking sources offline, 
+press **Alt+L**. After confirming your action, your offline sources will be moved to a local directory and the source 
+URL updated. Any offline sources without cached images will simply be removed.
+
+## Delete Source Content
+Sometimes, you may want to be able to totally delete a source from your file system. To do this, **Shift+Ctrl+Alt+Click**
+the source's avatar icon. You will be prompted to confirm this choice, after which the source in FlipFlip and the file(s)
+on your system will be deleted.
+
+?> **Note**: This can only be done for local sources (directories or videos)

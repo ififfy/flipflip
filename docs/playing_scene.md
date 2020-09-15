@@ -30,7 +30,9 @@ While a Scene is playing, you can right click on an image to get more informatio
 * If this image is a local file, you are given options to view it in Explorer/Finder or delete it from the system. 
   * _Handy for pruning images you don't want in FlipFlip._ 
 * If this image is a remote file and you have enabled caching, a link to the caching directory is also provided.
-* If this source is in your Library, "GoTo Tag Source" will bring you to Tagging for that source. 
+* If this source is in your Library, "Goto Tag Source" will bring you to Tagging for that source. 
+  * _When you click "Back" you will be brought back to the scene that was playing._
+* If this  is a video source, "Goto Clip Source" will bring you to Video Clipper for that source. 
   * _When you click "Back" you will be brought back to the scene that was playing._
 * Select "Recent Picture Grid" to view a grid of recently played files. 
   * _This will auto-pause playback. Press the back arrow to return to normal playback._

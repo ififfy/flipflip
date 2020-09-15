@@ -26,6 +26,7 @@ This setting controls the aspect ratio and size of the displayed image:
 * **Fit Best (Clip Edges)**
 * **Stretch**
 * **Center**
+* **Center (No Clipping)**
 * **Fit Width**
 * **Fit Height**
 

@@ -1,5 +1,35 @@
 # Changelog
 
+## 3.0.6 <small>(09/16/2020)</small>
+- New Effect: Continuous Fade In/Out (BETA)
+- New Effect: Continuous Panning (BETA)
+- Add option for Center (No Clipping)
+- Add additional tooltips to UI
+- Use searchable select throughout app when selecting Tags/Scenes
+- Add option to localize offline library content
+- Add option to delete source from file system
+- Improve Picture Grid
+- Improve Scene Generator
+- Allow scene generators to match on source type
+- Allow next button to be clicked to force next source
+- Allow "/" in $RANDOM_PHRASE to correctly blink
+- Increase granularity of BPM multiplier (x0.1-x10.0)
+- Add context option for "Goto Clip Source"
+- Fix bug with "Goto Tag Source"
+- Fix bug with batch tagging only showing used tags
+- Fix bug with full video playback at non-standard speed
+- Fix bug with default weighting in config
+- Fix bug with video timeline not displaying clip
+- Fix bug with inner directories
+- Fix bug with missing video
+- Fix bug with source ordering
+- Fix bug with continue video
+- Fix bug with strobe timing
+- Fix bug with playback speed
+- Fix bug with disabled clips
+- Fix redgif/gfycat parsing
+- Revert Electron to latest working version
+
 ## 3.0.5 <small>(07/20/2020)</small>
 - Add filter for only image files
 - Add separate ordering for sources vs images
