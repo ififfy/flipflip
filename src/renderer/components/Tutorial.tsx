@@ -1080,7 +1080,7 @@ class Tutorial extends React.Component {
                 You've made your first <b>Scene Generator</b>!
               </DialogContentText>
               <DialogContentText id="tutorial-description">
-                Here, you can use your <b>tagged sources</b> to generate <b>random scenes</b>.
+                Here, you can use your <b>tagged sources</b> or <b>types</b> to generate <b>random scenes</b>.
               </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -1131,11 +1131,11 @@ class Tutorial extends React.Component {
                 Each Simple Rule has 3 options:
               </DialogContentText>
               <DialogContentText id="tutorial-description">
-                <b>Percent</b>: This tag should make up N% of the sources
+                <b>Percent</b>: This tag/type should make up N% of the sources
                 <br/>
-                <b>Require</b>: All sources need this tag
+                <b>Require</b>: All sources need this tag/type
                 <br/>
-                <b>Exclude</b>: No source can have this tag
+                <b>Exclude</b>: No source can have this tag/type
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 <b>Set this Rule to <u>Require</u></b>
@@ -1149,7 +1149,7 @@ class Tutorial extends React.Component {
             <DialogTitle id="tutorial-title">Scene Generator</DialogTitle>
             <DialogContent>
               <DialogContentText id="tutorial-description">
-                Great! Now <b>every source</b> in this Generator will <b>require this tag</b>.
+                Great! Now <b>every source</b> in this Generator will <b>require this tag/type</b>.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 <b>Click the Generate Button!</b>
@@ -1167,7 +1167,7 @@ class Tutorial extends React.Component {
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 The more <b>tagged scenes</b> you have in your <b>Library</b>, the better generators will work. If you
-                need to <b>combine</b> tag rules, you can make an <b>Advanced Rule</b>.
+                need to <b>combine</b> tag/type rules, you can make an <b>Advanced Rule</b>.
               </DialogContentText>
             </DialogContent>
             <DialogActions>

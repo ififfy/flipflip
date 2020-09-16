@@ -1029,7 +1029,7 @@ class SceneDetail extends React.Component {
     if (tag == null) {
       const maxID = this.props.tags.reduce(
         (max, t) => (t.id > max ? t.id : max),
-        this.props.tags[0].id
+        this.props.tags[0] ? this.props.tags[0].id : 1
       );
       tag = new Tag({id: maxID+1, name: tagName, typeTag: true});
     }
