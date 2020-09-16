@@ -56,7 +56,7 @@ class AudioCard extends React.Component {
             </Grid>
           </Grid>
         </Grid>
-        {this.props.scene.audios.map((a,i) =>
+        {this.props.scene.audios && this.props.scene.audios.map((a,i) =>
           <AudioControl
             key={a.id}
             audio={a}

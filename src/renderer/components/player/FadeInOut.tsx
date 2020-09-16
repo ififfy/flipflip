@@ -113,7 +113,7 @@ export default class FadeInOut extends React.Component {
                 right: 0,
                 bottom: 0,
                 left: 0,
-                overflow: 'hidden',
+                overflow: this.props.scene.panning ? 'visible': 'hidden',
                 zIndex: 2,
                 ...props
               }}>

@@ -435,12 +435,12 @@ class SceneGenerator extends React.Component {
   onAddRule(filters: Array<string>) {
     const tagName = filters[filters.length - 1];
     let tag = this.props.tags.find((t) => t.name == tagName)
-    if (tag == null && tagName.startsWith("{") && tagName.endsWith("}")) {
+    if (tag == null) {
       const maxID = this.props.tags.reduce(
         (max, t) => (t.id > max ? t.id : max),
         this.props.tags[0].id
       );
-      tag = new Tag({id: maxID+1, name: tagName.substring(1, tagName.length-1), typeTag: true});
+      tag = new Tag({id: maxID+1, name: tagName, typeTag: true});
     }
     if (tag) {
       const newWG = new WeightGroup();
