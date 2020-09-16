@@ -6,7 +6,7 @@ import {
   MenuItem, Select, Slider, Switch, TextField, Theme, Typography, withStyles
 } from "@material-ui/core";
 
-import {HTF, SDT, TF, VTF} from "../../data/const";
+import {EA, HTF, RF, SDT, TF, VTF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
 import en from "../../data/en";
 import Scene from "../../data/Scene";
@@ -418,6 +418,157 @@ class PanningCard extends React.Component {
                     min: 0,
                     type: 'number',
                   }}/>
+              </Grid>
+            </Grid>
+          </Collapse>
+        </Grid>
+        <Grid item xs={12} className={clsx(!this.props.scene.panning && classes.noPadding)}>
+          <Collapse in={this.props.scene.panning} className={classes.fullWidth}>
+            <Divider />
+          </Collapse>
+        </Grid>
+        <Grid item xs={12}>
+          <Collapse in={this.props.scene.panning} className={classes.fullWidth}>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                <FormControl className={classes.fullWidth}>
+                  <InputLabel>Start Ease</InputLabel>
+                  <Select
+                    value={this.props.scene.panStartEase}
+                    onChange={this.onInput.bind(this, 'panStartEase')}>
+                    {Object.values(EA).map((rf) =>
+                      <MenuItem key={rf} value={rf}>{en.get(rf)}</MenuItem>
+                    )}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                <Collapse in={this.props.scene.panStartEase == EA.polyIn || this.props.scene.panStartEase == EA.polyOut || this.props.scene.panStartEase == EA.polyInOut} className={classes.fullWidth}>
+                  <Typography id="start-exp-slider" variant="caption" component="div" color="textSecondary">
+                    Exponent: {this.props.scene.panStartExp / 2}
+                  </Typography>
+                  <Slider
+                    min={1}
+                    max={10}
+                    defaultValue={this.props.scene.panStartExp}
+                    onChangeCommitted={this.onSliderChange.bind(this, 'panStartExp')}
+                    valueLabelDisplay={'auto'}
+                    valueLabelFormat={(v) => v/2}
+                    aria-labelledby="start-exp-slider"/>
+                </Collapse>
+                <Collapse in={this.props.scene.panStartEase == EA.backIn || this.props.scene.panStartEase == EA.backOut || this.props.scene.panStartEase == EA.backInOut} className={classes.fullWidth}>
+                  <Typography id="start-ov-slider" variant="caption" component="div" color="textSecondary">
+                    Overshoot: {this.props.scene.panStartOv / 2}
+                  </Typography>
+                  <Slider
+                    min={1}
+                    max={10}
+                    defaultValue={this.props.scene.panStartOv}
+                    onChangeCommitted={this.onSliderChange.bind(this, 'panStartOv')}
+                    valueLabelDisplay={'auto'}
+                    valueLabelFormat={(v) => v/2}
+                    aria-labelledby="start-ov-slider"/>
+                </Collapse>
+              </Grid>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                <Collapse in={this.props.scene.panStartEase == EA.elasticIn || this.props.scene.panStartEase == EA.elasticOut || this.props.scene.panStartEase == EA.elasticInOut} className={classes.fullWidth}>
+                  <Typography id="start-amp-slider" variant="caption" component="div" color="textSecondary">
+                    Amplitude: {this.props.scene.panStartAmp / 20}
+                  </Typography>
+                  <Slider
+                    min={1}
+                    max={40}
+                    defaultValue={this.props.scene.panStartAmp}
+                    onChangeCommitted={this.onSliderChange.bind(this, 'panStartAmp')}
+                    valueLabelDisplay={'auto'}
+                    valueLabelFormat={(v) => v/20}
+                    aria-labelledby="start-amp-slider"/>
+                </Collapse>
+              </Grid>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                <Collapse in={this.props.scene.panStartEase == EA.elasticIn || this.props.scene.panStartEase == EA.elasticOut || this.props.scene.panStartEase == EA.elasticInOut} className={classes.fullWidth}>
+                  <Typography id="start-per-slider" variant="caption" component="div" color="textSecondary">
+                    Period: {this.props.scene.panStartPer / 20}
+                  </Typography>
+                  <Slider
+                    min={1}
+                    max={20}
+                    defaultValue={this.props.scene.panStartPer}
+                    onChangeCommitted={this.onSliderChange.bind(this, 'panStartPer')}
+                    valueLabelDisplay={'auto'}
+                    valueLabelFormat={(v) => v/20}
+                    aria-labelledby="start-per-slider"/>
+                </Collapse>
+              </Grid>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                <FormControl className={classes.fullWidth}>
+                  <InputLabel>End Ease</InputLabel>
+                  <Select
+                    value={this.props.scene.panEndEase}
+                    onChange={this.onInput.bind(this, 'panEndEase')}>
+                    {Object.values(EA).map((rf) =>
+                      <MenuItem key={rf} value={rf}>{en.get(rf)}</MenuItem>
+                    )}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                <Collapse in={this.props.scene.panEndEase == EA.polyIn || this.props.scene.panEndEase == EA.polyOut || this.props.scene.panEndEase == EA.polyInOut} className={classes.fullWidth}>
+                <Typography id="end-exp-slider" variant="caption" component="div" color="textSecondary">
+                    Exponent: {this.props.scene.panEndExp / 2}
+                  </Typography>
+                  <Slider
+                    min={1}
+                    max={10}
+                    defaultValue={this.props.scene.panEndExp}
+                    onChangeCommitted={this.onSliderChange.bind(this, 'panEndExp')}
+                    valueLabelDisplay={'auto'}
+                    valueLabelFormat={(v) => v/2}
+                    aria-labelledby="end-exp-slider"/>
+                </Collapse>
+                <Collapse in={this.props.scene.panEndEase == EA.backIn || this.props.scene.panEndEase == EA.backOut || this.props.scene.panEndEase == EA.backInOut} className={classes.fullWidth}>
+                <Typography id="end-ov-slider" variant="caption" component="div" color="textSecondary">
+                    Overshoot: {this.props.scene.panEndOv / 2}
+                  </Typography>
+                  <Slider
+                    min={1}
+                    max={10}
+                    defaultValue={this.props.scene.panEndOv}
+                    onChangeCommitted={this.onSliderChange.bind(this, 'panEndOv')}
+                    valueLabelDisplay={'auto'}
+                    valueLabelFormat={(v) => v/2}
+                    aria-labelledby="end-ov-slider"/>
+                </Collapse>
+              </Grid>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                <Collapse in={this.props.scene.panEndEase == EA.elasticIn || this.props.scene.panEndEase == EA.elasticOut || this.props.scene.panEndEase == EA.elasticInOut} className={classes.fullWidth}>
+                <Typography id="end-amp-slider" variant="caption" component="div" color="textSecondary">
+                    Amplitude: {this.props.scene.panEndAmp / 20}
+                  </Typography>
+                  <Slider
+                    min={1}
+                    max={40}
+                    defaultValue={this.props.scene.panEndAmp}
+                    onChangeCommitted={this.onSliderChange.bind(this, 'panEndAmp')}
+                    valueLabelDisplay={'auto'}
+                    valueLabelFormat={(v) => v/20}
+                    aria-labelledby="end-amp-slider"/>
+                </Collapse>
+              </Grid>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                <Collapse in={this.props.scene.panEndEase == EA.elasticIn || this.props.scene.panEndEase == EA.elasticOut || this.props.scene.panEndEase == EA.elasticInOut} className={classes.fullWidth}>
+                <Typography id="end-per-slider" variant="caption" component="div" color="textSecondary">
+                    Period: {this.props.scene.panEndPer / 20}
+                  </Typography>
+                  <Slider
+                    min={1}
+                    max={20}
+                    defaultValue={this.props.scene.panEndPer}
+                    onChangeCommitted={this.onSliderChange.bind(this, 'panEndPer')}
+                    valueLabelDisplay={'auto'}
+                    valueLabelFormat={(v) => v/20}
+                    aria-labelledby="end-per-slider"/>
+                </Collapse>
               </Grid>
             </Grid>
           </Collapse>

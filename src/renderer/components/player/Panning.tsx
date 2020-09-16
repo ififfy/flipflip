@@ -1,9 +1,9 @@
 import * as React from 'react';
 import {animated, useTransition} from "react-spring";
-import * as easings from 'd3-ease';
 
 import {HTF, TF, VTF} from "../../data/const";
 import Scene from "../../data/Scene";
+import {getEaseFunction} from "../../data/utils";
 
 export default class Panning extends React.Component {
   readonly props: {
@@ -105,7 +105,8 @@ export default class Panning extends React.Component {
           },
           config: {
             duration: this.getDuration(),
-            easing : this._panOut ? easings.easeQuadOut : easings.easeQuadIn,
+            easing : this._panOut ? getEaseFunction(this.props.scene.panStartEase, this.props.scene.panStartExp, this.props.scene.panStartAmp, this.props.scene.panStartPer, this.props.scene.panStartOv) :
+              getEaseFunction(this.props.scene.panEndEase, this.props.scene.panEndExp, this.props.scene.panEndAmp, this.props.scene.panEndPer, this.props.scene.panEndOv)
           },
         }
       );
@@ -139,7 +140,8 @@ export default class Panning extends React.Component {
           },
           config: {
             duration: this.state.duration,
-            easing : this.state.togglePan ? easings.easeCubicIn : easings.easeCubicOut,
+            easing : this.state.togglePan ? getEaseFunction(this.props.scene.panStartEase, this.props.scene.panStartExp, this.props.scene.panStartAmp, this.props.scene.panStartPer, this.props.scene.panStartOv) :
+              getEaseFunction(this.props.scene.panEndEase, this.props.scene.panEndExp, this.props.scene.panEndAmp, this.props.scene.panEndPer, this.props.scene.panEndOv)
           },
         }
       );

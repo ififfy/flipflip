@@ -3,8 +3,9 @@ import {URL} from "url";
 import path from 'path';
 import * as fs from "fs";
 import wretch from "wretch";
+import * as easings from 'd3-ease';
 
-import {ST} from "./const";
+import {EA, ST} from "./const";
 import en from "./en";
 import Config from "./Config";
 import LibrarySource from "./LibrarySource";
@@ -12,6 +13,56 @@ import LibrarySource from "./LibrarySource";
 export const saveDir = path.join(remote.app.getPath('appData'), 'flipflip');
 export const savePath = path.join(saveDir, 'data.json');
 export const portablePath = path.join(path.dirname(remote.app.getAppPath()), 'data.json');
+
+export function getEaseFunction(ea: string, exp: number, amp: number, per: number, ov: number) {
+  switch(ea) {
+    case EA.liner:
+      return easings.easeLinear;
+    case EA.sinIn:
+      return easings.easeSinIn;
+    case EA.sinOut:
+      return easings.easeSinOut;
+    case EA.sinInOut:
+      return easings.easeSinInOut;
+    case EA.expIn:
+      return easings.easeExpIn;
+    case EA.expOut:
+      return easings.easeExpOut;
+    case EA.expInOut:
+      return easings.easeExpInOut;
+    case EA.circleIn:
+      return easings.easeCircleIn;
+    case EA.circleOut:
+      return easings.easeCircleOut;
+    case EA.circleInOut:
+      return easings.easeCircleInOut;
+    case EA.bounceIn:
+      return easings.easeBounceIn;
+    case EA.bounceOut:
+      return easings.easeBounceOut;
+    case EA.bounceInOut:
+      return easings.easeBounceInOut;
+    case EA.polyIn:
+      return easings.easePolyIn.exponent(exp);
+    case EA.polyOut:
+      return easings.easePolyOut.exponent(exp);
+    case EA.polyInOut:
+      return easings.easePolyInOut.exponent(exp);
+    case EA.elasticIn:
+      return easings.easeElasticIn.amplitude(amp).period(per);
+    case EA.elasticOut:
+      return easings.easeElasticOut.amplitude(amp).period(per);
+    case EA.elasticInOut:
+      return easings.easeElasticInOut.amplitude(amp).period(per);
+    case EA.backIn:
+      return easings.easeBackIn.overshoot(ov);
+    case EA.backOut:
+      return easings.easeBackOut.overshoot(ov);
+    case EA.backInOut:
+      return easings.easeBackInOut.overshoot(ov);
+      
+  }
+}
 
 export function getBackups(): Array<{url: string, size: number}> {
   const files = fs.readdirSync(saveDir);

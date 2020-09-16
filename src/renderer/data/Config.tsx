@@ -1,4 +1,4 @@
-import {BT, GO, HTF, IF, IT, OF, SC, SL, SOF, TF, VO, VTF, WF} from "./const";
+import {BT, EA, GO, HTF, IF, IT, OF, SC, SL, SOF, TF, VO, VTF, WF} from "./const";
 import Overlay from "./Overlay";
 import LibrarySource from "./LibrarySource";
 import Audio from "./Audio";
@@ -84,6 +84,16 @@ interface SceneSettingsI {
   panVertTransLevelMax: number;
   panVertTransLevelMin: number;
   panVertTransRandom: boolean;
+  panStartEase: string;
+  panStartExp: number;
+  panStartAmp: number;
+  panStartPer: number;
+  panStartOv: number;
+  panEndEase: string;
+  panEndExp: number;
+  panEndAmp: number;
+  panEndPer: number;
+  panEndOv: number;
 
   imageType: string;
   backgroundType: string;
@@ -315,6 +325,16 @@ export class SceneSettings implements SceneSettingsI {
   panVertTransLevelMax = 10;
   panVertTransLevelMin = 5;
   panVertTransRandom = false;
+  panStartEase = EA.liner;
+  panStartExp = 6;
+  panStartAmp = 20;
+  panStartPer = 6;
+  panStartOv = 3;
+  panEndEase = EA.liner;
+  panEndExp = 6;
+  panEndAmp = 20;
+  panEndPer = 6;
+  panEndOv = 3;
 
   imageType = IT.fitBestNoClip;
   backgroundType = BT.blur;

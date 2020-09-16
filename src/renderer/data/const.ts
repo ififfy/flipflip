@@ -291,6 +291,31 @@ const VCT = { // Video Clipper Tutorials
   done: DONE,
 };
 
+const EA = { // Easings
+  liner: 'ea.liner',
+  sinIn: 'ea.sinIn',
+  sinOut: 'ea.sinOut',
+  sinInOut: 'ea.sinInOut',
+  expIn: 'ea.expIn',
+  expOut: 'ea.expOut',
+  expInOut: 'ea.expInOut',
+  circleIn: 'ea.circleIn',
+  circleOut: 'ea.circleOut',
+  circleInOut: 'ea.circleInOut',
+  bounceIn: 'ea.bounceIn',
+  bounceOut: 'ea.bounceOut',
+  bounceInOut: 'ea.bounceInOut',
+  polyIn: 'ea.polyIn',
+  polyOut: 'ea.polyOut',
+  polyInOut: 'ea.polyInOut',
+  elasticIn: 'ea.elasticIn',
+  elasticOut: 'ea.elasticOut',
+  elasticInOut: 'ea.elasticInOut',
+  backIn: 'ea.backIn',
+  backOut: 'ea.backOut',
+  backInOut: 'ea.backInOut',
+}
+
 export {
-  TF, WF, SOF, OF, IF, GO, VO, HTF, VTF, BT, SC, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG, RF, RT, SPT, SDT, PT, LT, SDGT, SGT, VCT, DONE
+  TF, WF, SOF, OF, IF, GO, VO, HTF, VTF, BT, SC, IT, GT, TT, SF, ST, SL, AF, IPC, MO, PR, SB, IG, RF, RT, SPT, SDT, PT, LT, SDGT, SGT, VCT, EA, DONE
 };
