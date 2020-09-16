@@ -20,6 +20,7 @@ declare module '*.icns' {
 }
 
 declare module "@material-ui/core/Slider/ValueLabel"
+declare module 'd3-ease';
 declare module 'electron-default-menu';
 declare module 'electron-google-analytics';
 declare module 'get-folder-size';

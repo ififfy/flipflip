@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {animated, useTransition} from "react-spring";
+import * as easings from 'd3-ease';
 
 import {HTF, TF, VTF} from "../../data/const";
 import Scene from "../../data/Scene";
@@ -104,6 +105,7 @@ export default class Panning extends React.Component {
           },
           config: {
             duration: this.getDuration(),
+            easing : this._panOut ? easings.easeQuadOut : easings.easeQuadIn,
           },
         }
       );
@@ -137,6 +139,7 @@ export default class Panning extends React.Component {
           },
           config: {
             duration: this.state.duration,
+            easing : this.state.togglePan ? easings.easeCubicIn : easings.easeCubicOut,
           },
         }
       );
