@@ -6,7 +6,7 @@ import {
   MenuItem, Select, Slider, Switch, TextField, Theme, Typography, withStyles
 } from "@material-ui/core";
 
-import {SDT, TF} from "../../data/const";
+import {EA, SDT, TF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
 import en from "../../data/en";
 import Scene from "../../data/Scene";
@@ -44,6 +44,7 @@ class CrossFadeCard extends React.Component {
   readonly props: {
     classes: any,
     scene: Scene | SceneSettings,
+    easingControls: boolean,
     sidebar: boolean,
     tutorial: string,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
@@ -211,6 +212,91 @@ class CrossFadeCard extends React.Component {
             </Grid>
           </Collapse>
         </Grid>
+        {this.props.easingControls && (
+          <React.Fragment>
+            <Grid item xs={12} className={clsx(!this.props.scene.crossFade && classes.noPadding)}>
+              <Collapse in={this.props.scene.crossFade} className={classes.fullWidth}>
+                <Divider />
+              </Collapse>
+            </Grid>
+            <Grid item xs={12}>
+              <Collapse in={this.props.scene.crossFade} className={classes.fullWidth}>
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                    <FormControl className={classes.fullWidth}>
+                      <InputLabel>Easing</InputLabel>
+                      <Select
+                        value={this.props.scene.fadeEase}
+                        onChange={this.onInput.bind(this, 'fadeEase')}>
+                        {Object.values(EA).map((rf) =>
+                          <MenuItem key={rf} value={rf}>{en.get(rf)}</MenuItem>
+                        )}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                    <Collapse in={this.props.scene.fadeEase == EA.polyIn || this.props.scene.fadeEase == EA.polyOut || this.props.scene.fadeEase == EA.polyInOut} className={classes.fullWidth}>
+                      <Typography id="exp-slider" variant="caption" component="div" color="textSecondary">
+                        Exponent: {this.props.scene.fadeExp / 2}
+                      </Typography>
+                      <Slider
+                        min={1}
+                        max={10}
+                        defaultValue={this.props.scene.fadeExp}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'fadeExp')}
+                        valueLabelDisplay={'auto'}
+                        valueLabelFormat={(v) => v/2}
+                        aria-labelledby="exp-slider"/>
+                    </Collapse>
+                    <Collapse in={this.props.scene.fadeEase == EA.backIn || this.props.scene.fadeEase == EA.backOut || this.props.scene.fadeEase == EA.backInOut} className={classes.fullWidth}>
+                      <Typography id="ov-slider" variant="caption" component="div" color="textSecondary">
+                        Overshoot: {this.props.scene.fadeOv / 2}
+                      </Typography>
+                      <Slider
+                        min={1}
+                        max={10}
+                        defaultValue={this.props.scene.fadeOv}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'fadeOv')}
+                        valueLabelDisplay={'auto'}
+                        valueLabelFormat={(v) => v/2}
+                        aria-labelledby="ov-slider"/>
+                    </Collapse>
+                  </Grid>
+                  <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                    <Collapse in={this.props.scene.fadeEase == EA.elasticIn || this.props.scene.fadeEase == EA.elasticOut || this.props.scene.fadeEase == EA.elasticInOut} className={classes.fullWidth}>
+                      <Typography id="amp-slider" variant="caption" component="div" color="textSecondary">
+                        Amplitude: {this.props.scene.fadeAmp / 20}
+                      </Typography>
+                      <Slider
+                        min={1}
+                        max={40}
+                        defaultValue={this.props.scene.fadeAmp}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'fadeAmp')}
+                        valueLabelDisplay={'auto'}
+                        valueLabelFormat={(v) => v/20}
+                        aria-labelledby="amp-slider"/>
+                    </Collapse>
+                  </Grid>
+                  <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                    <Collapse in={this.props.scene.fadeEase == EA.elasticIn || this.props.scene.fadeEase == EA.elasticOut || this.props.scene.fadeEase == EA.elasticInOut} className={classes.fullWidth}>
+                      <Typography id="per-slider" variant="caption" component="div" color="textSecondary">
+                        Period: {this.props.scene.fadePer / 20}
+                      </Typography>
+                      <Slider
+                        min={1}
+                        max={20}
+                        defaultValue={this.props.scene.fadePer}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'fadePer')}
+                        valueLabelDisplay={'auto'}
+                        valueLabelFormat={(v) => v/20}
+                        aria-labelledby="per-slider"/>
+                    </Collapse>
+                  </Grid>
+                </Grid>
+              </Collapse>
+            </Grid>
+          </React.Fragment>
+        )}
       </Grid>
     );
   }

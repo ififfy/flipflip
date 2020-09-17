@@ -30,6 +30,7 @@ class SceneEffects extends React.Component {
   readonly props: {
     classes: any,
     scene: Scene | SceneSettings,
+    easingControls: boolean,
     tutorial: string,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
@@ -49,6 +50,7 @@ class SceneEffects extends React.Component {
             <CardContent>
               <ZoomMoveCard
                 scene={this.props.scene}
+                easingControls={this.props.easingControls}
                 tutorial={this.props.tutorial}
                 onUpdateScene={this.props.onUpdateScene.bind(this)}/>
             </CardContent>
@@ -60,6 +62,7 @@ class SceneEffects extends React.Component {
             <CardContent>
               <CrossFadeCard
                 scene={this.props.scene}
+                easingControls={this.props.easingControls}
                 tutorial={this.props.tutorial}
                 onUpdateScene={this.props.onUpdateScene.bind(this)}/>
             </CardContent>
@@ -71,6 +74,7 @@ class SceneEffects extends React.Component {
             <CardContent>
               <StrobeCard
                 scene={this.props.scene}
+                easingControls={this.props.easingControls}
                 onUpdateScene={this.props.onUpdateScene.bind(this)}/>
             </CardContent>
           </Card>
@@ -81,6 +85,7 @@ class SceneEffects extends React.Component {
             <CardContent>
               <FadeIOCard
                 scene={this.props.scene}
+                easingControls={this.props.easingControls}
                 tutorial={this.props.tutorial}
                 onUpdateScene={this.props.onUpdateScene.bind(this)}/>
             </CardContent>
@@ -92,6 +97,7 @@ class SceneEffects extends React.Component {
             <CardContent>
               <PanningCard
                 scene={this.props.scene}
+                easingControls={this.props.easingControls}
                 tutorial={this.props.tutorial}
                 onUpdateScene={this.props.onUpdateScene.bind(this)}/>
             </CardContent>

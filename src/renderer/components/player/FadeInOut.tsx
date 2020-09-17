@@ -1,8 +1,9 @@
 import * as React from 'react';
 import {animated, useTransition} from "react-spring";
 
-import {SC, SL, TF} from "../../data/const";
+import {TF} from "../../data/const";
 import Scene from "../../data/Scene";
+import {getEaseFunction} from "../../data/utils";
 
 export default class FadeInOut extends React.Component {
   readonly props: {
@@ -62,6 +63,8 @@ export default class FadeInOut extends React.Component {
           unique: true,
           config: {
             duration: this.getDuration(),
+            easing : this._fadeOut ? getEaseFunction(this.props.scene.fadeIOStartEase, this.props.scene.fadeIOStartExp, this.props.scene.fadeIOStartAmp, this.props.scene.fadeIOStartPer, this.props.scene.fadeIOStartOv) :
+              getEaseFunction(this.props.scene.fadeIOEndEase, this.props.scene.fadeIOEndExp, this.props.scene.fadeIOEndAmp, this.props.scene.fadeIOEndPer, this.props.scene.fadeIOEndOv)
           },
         }
       );
@@ -96,6 +99,8 @@ export default class FadeInOut extends React.Component {
           unique: true,
           config: {
             duration: this.state.duration,
+            easing : this.state.toggleFade ? getEaseFunction(this.props.scene.panStartEase, this.props.scene.panStartExp, this.props.scene.panStartAmp, this.props.scene.panStartPer, this.props.scene.panStartOv) :
+              getEaseFunction(this.props.scene.panEndEase, this.props.scene.panEndExp, this.props.scene.panEndAmp, this.props.scene.panEndPer, this.props.scene.panEndOv)
           },
         }
       );

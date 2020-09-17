@@ -65,6 +65,16 @@ export default class PlayerBoolCard extends React.Component {
               }
               label="Start Immediately"/>
           </Tooltip>
+        </Grid>
+        <Grid item xs={12}>
+          <Tooltip title="If enabled, additional controls for controlling 'easing' will be available in the Effect section.">
+            <FormControlLabel
+              control={
+                <Switch checked={this.props.displaySettings.easingControls}
+                        onChange={this.onBoolInput.bind(this, 'easingControls')}/>
+              }
+              label="Show Adv Easing Controls"/>
+          </Tooltip>
           <Divider />
         </Grid>
         <Grid item xs={12}>

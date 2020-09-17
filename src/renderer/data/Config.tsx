@@ -45,6 +45,11 @@ interface SceneSettingsI {
   transDurationMax: number;
   transSinRate: number;
   transBPMMulti: number;
+  transEase: string;
+  transExp: number;
+  transAmp: number;
+  transPer: number;
+  transOv: number;
   crossFade: boolean;
   crossFadeAudio: boolean;
   fadeTF: string;
@@ -53,6 +58,11 @@ interface SceneSettingsI {
   fadeDurationMax: number;
   fadeSinRate: number;
   fadeBPMMulti: number;
+  fadeEase: string;
+  fadeExp: number;
+  fadeAmp: number;
+  fadePer: number;
+  fadeOv: number;
   fadeInOut: boolean;
   fadeIOPulse: boolean;
   fadeIOTF: string;
@@ -67,6 +77,16 @@ interface SceneSettingsI {
   fadeIODelayMax: number;
   fadeIODelaySinRate: number;
   fadeIODelayBPMMulti: number;
+  fadeIOStartEase: string;
+  fadeIOStartExp: number;
+  fadeIOStartAmp: number;
+  fadeIOStartPer: number;
+  fadeIOStartOv: number;
+  fadeIOEndEase: string;
+  fadeIOEndExp: number;
+  fadeIOEndAmp: number;
+  fadeIOEndPer: number;
+  fadeIOEndOv: number;
   panning: boolean;
   panTF: string;
   panDuration: number;
@@ -146,6 +166,11 @@ interface SceneSettingsI {
   strobeColorType: string;
   strobeColor: string;
   strobeColorSet: Array<string>;
+  strobeEase: string;
+  strobeExp: number;
+  strobeAmp: number;
+  strobePer: number;
+  strobeOv: number;
 
   blinkColor: string;
   blinkFontSize: number;
@@ -219,6 +244,7 @@ interface DisplaySettingsI {
   showMenu: boolean;
   fullScreen: boolean;
   startImmediately: boolean;
+  easingControls: boolean;
 
   minImageSize: number;
   minVideoSize: number;
@@ -286,6 +312,11 @@ export class SceneSettings implements SceneSettingsI {
   transDurationMax = 7000;
   transSinRate = 100;
   transBPMMulti = 10;
+  transEase = EA.linear;
+  transExp = 6;
+  transAmp = 20;
+  transPer = 6;
+  transOv = 3;
   crossFade = false;
   crossFadeAudio = false;
   fadeTF = TF.constant;
@@ -294,6 +325,11 @@ export class SceneSettings implements SceneSettingsI {
   fadeDurationMax = 700;
   fadeSinRate = 100;
   fadeBPMMulti = 10;
+  fadeEase = EA.linear;
+  fadeExp = 6;
+  fadeAmp = 20;
+  fadePer = 6;
+  fadeOv = 3;
   fadeInOut = false;
   fadeIOPulse = false;
   fadeIOTF = TF.constant;
@@ -308,6 +344,16 @@ export class SceneSettings implements SceneSettingsI {
   fadeIODelayMax = 5000;
   fadeIODelaySinRate = 100;
   fadeIODelayBPMMulti = 10;
+  fadeIOStartEase = EA.linear;
+  fadeIOStartExp = 6;
+  fadeIOStartAmp = 20;
+  fadeIOStartPer = 6;
+  fadeIOStartOv = 3;
+  fadeIOEndEase = EA.linear;
+  fadeIOEndExp = 6;
+  fadeIOEndAmp = 20;
+  fadeIOEndPer = 6;
+  fadeIOEndOv = 3;
   panning = false;
   panTF = TF.constant;
   panDuration = 2000;
@@ -325,12 +371,12 @@ export class SceneSettings implements SceneSettingsI {
   panVertTransLevelMax = 10;
   panVertTransLevelMin = 5;
   panVertTransRandom = false;
-  panStartEase = EA.liner;
+  panStartEase = EA.linear;
   panStartExp = 6;
   panStartAmp = 20;
   panStartPer = 6;
   panStartOv = 3;
-  panEndEase = EA.liner;
+  panEndEase = EA.linear;
   panEndExp = 6;
   panEndAmp = 20;
   panEndPer = 6;
@@ -391,6 +437,11 @@ export class SceneSettings implements SceneSettingsI {
   strobeColorType = SC.color;
   strobeColor = "#FFFFFF";
   strobeColorSet: Array<string> = [];
+  strobeEase = EA.linear;
+  strobeExp = 6;
+  strobeAmp = 20;
+  strobePer = 6;
+  strobeOv = 3;
 
   blinkColor = "#FFFFFF";
   blinkFontSize = 20;
@@ -475,6 +526,7 @@ export class DisplaySettings  implements DisplaySettingsI {
   showMenu = true;
   fullScreen = false;
   startImmediately = false;
+  easingControls = false;
 
   minVideoSize = 200;
   minImageSize = 200;

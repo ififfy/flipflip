@@ -292,7 +292,7 @@ const VCT = { // Video Clipper Tutorials
 };
 
 const EA = { // Easings
-  liner: 'ea.liner',
+  linear: 'ea.linear',
   sinIn: 'ea.sinIn',
   sinOut: 'ea.sinOut',
   sinInOut: 'ea.sinInOut',

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {animated, useTransition} from "react-spring";
 
-import {getRandomColor, getRandomListItem} from "../../data/utils";
+import {getEaseFunction, getRandomColor, getRandomListItem} from "../../data/utils";
 import {SC, SL, TF} from "../../data/const";
 import Scene from "../../data/Scene";
 
@@ -67,6 +67,7 @@ export default class Strobe extends React.Component {
         unique: true,
         config: {
           duration: this.state.duration,
+          easing : getEaseFunction(this.props.scene.strobeEase, this.props.scene.strobeExp, this.props.scene.strobeAmp, this.props.scene.strobePer, this.props.scene.strobeOv)
         },
       }
     );

@@ -410,6 +410,7 @@ class PlayerBars extends React.Component {
                   <ZoomMoveCard
                     sidebar
                     scene={this.props.scene}
+                    easingControls={this.props.config.displaySettings.easingControls}
                     onUpdateScene={this.props.onUpdateScene.bind(this)} />
                 </ExpansionPanelDetails>
               </ExpansionPanel>
@@ -424,6 +425,7 @@ class PlayerBars extends React.Component {
                   <CrossFadeCard
                     sidebar
                     scene={this.props.scene}
+                    easingControls={this.props.config.displaySettings.easingControls}
                     onUpdateScene={this.props.onUpdateScene.bind(this)} />
                 </ExpansionPanelDetails>
               </ExpansionPanel>
@@ -438,6 +440,7 @@ class PlayerBars extends React.Component {
                   <StrobeCard
                     sidebar
                     scene={this.props.scene}
+                    easingControls={this.props.config.displaySettings.easingControls}
                     onUpdateScene={this.props.onUpdateScene.bind(this)} />
                 </ExpansionPanelDetails>
               </ExpansionPanel>
@@ -450,7 +453,9 @@ class PlayerBars extends React.Component {
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails>
                   <FadeIOCard
+                    sidebar
                     scene={this.props.scene}
+                    easingControls={this.props.config.displaySettings.easingControls}
                     onUpdateScene={this.props.onUpdateScene.bind(this)}/>
                 </ExpansionPanelDetails>
               </ExpansionPanel>
@@ -463,7 +468,9 @@ class PlayerBars extends React.Component {
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails>
                   <PanningCard
+                    sidebar
                     scene={this.props.scene}
+                    easingControls={this.props.config.displaySettings.easingControls}
                     onUpdateScene={this.props.onUpdateScene.bind(this)}/>
                 </ExpansionPanelDetails>
               </ExpansionPanel>

@@ -6,7 +6,7 @@ import {
   MenuItem, Select, Slider, Switch, TextField, Theme, Typography, withStyles
 } from "@material-ui/core";
 
-import { HTF, SDT, TF, VTF } from "../../data/const";
+import {EA, HTF, SDT, TF, VTF} from "../../data/const";
 import { SceneSettings } from "../../data/Config";
 import en from "../../data/en";
 import Scene from "../../data/Scene";
@@ -47,6 +47,7 @@ class ZoomMoveCard extends React.Component {
   readonly props: {
     classes: any,
     scene: Scene | SceneSettings,
+    easingControls: boolean,
     sidebar: boolean,
     tutorial: string,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
@@ -503,6 +504,91 @@ class ZoomMoveCard extends React.Component {
             </Grid>
           </Collapse>
         </Grid>
+        {this.props.easingControls && (
+          <React.Fragment>
+            <Grid item xs={12} className={clsx(!enabled && classes.noPadding)}>
+              <Collapse in={enabled} className={classes.fullWidth}>
+                <Divider />
+              </Collapse>
+            </Grid>
+            <Grid item xs={12}>
+              <Collapse in={enabled} className={classes.fullWidth}>
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                    <FormControl className={classes.fullWidth}>
+                      <InputLabel>Easing</InputLabel>
+                      <Select
+                        value={this.props.scene.transEase}
+                        onChange={this.onInput.bind(this, 'transEase')}>
+                        {Object.values(EA).map((rf) =>
+                          <MenuItem key={rf} value={rf}>{en.get(rf)}</MenuItem>
+                        )}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                    <Collapse in={this.props.scene.transEase == EA.polyIn || this.props.scene.transEase == EA.polyOut || this.props.scene.transEase == EA.polyInOut} className={classes.fullWidth}>
+                      <Typography id="exp-slider" variant="caption" component="div" color="textSecondary">
+                        Exponent: {this.props.scene.transExp / 2}
+                      </Typography>
+                      <Slider
+                        min={1}
+                        max={10}
+                        defaultValue={this.props.scene.transExp}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'transExp')}
+                        valueLabelDisplay={'auto'}
+                        valueLabelFormat={(v) => v/2}
+                        aria-labelledby="exp-slider"/>
+                    </Collapse>
+                    <Collapse in={this.props.scene.transEase == EA.backIn || this.props.scene.transEase == EA.backOut || this.props.scene.transEase == EA.backInOut} className={classes.fullWidth}>
+                      <Typography id="ov-slider" variant="caption" component="div" color="textSecondary">
+                        Overshoot: {this.props.scene.transOv / 2}
+                      </Typography>
+                      <Slider
+                        min={1}
+                        max={10}
+                        defaultValue={this.props.scene.transOv}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'transOv')}
+                        valueLabelDisplay={'auto'}
+                        valueLabelFormat={(v) => v/2}
+                        aria-labelledby="ov-slider"/>
+                    </Collapse>
+                  </Grid>
+                  <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                    <Collapse in={this.props.scene.transEase == EA.elasticIn || this.props.scene.transEase == EA.elasticOut || this.props.scene.transEase == EA.elasticInOut} className={classes.fullWidth}>
+                      <Typography id="amp-slider" variant="caption" component="div" color="textSecondary">
+                        Amplitude: {this.props.scene.transAmp / 20}
+                      </Typography>
+                      <Slider
+                        min={1}
+                        max={40}
+                        defaultValue={this.props.scene.transAmp}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'transAmp')}
+                        valueLabelDisplay={'auto'}
+                        valueLabelFormat={(v) => v/20}
+                        aria-labelledby="amp-slider"/>
+                    </Collapse>
+                  </Grid>
+                  <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                    <Collapse in={this.props.scene.transEase == EA.elasticIn || this.props.scene.transEase == EA.elasticOut || this.props.scene.transEase == EA.elasticInOut} className={classes.fullWidth}>
+                      <Typography id="per-slider" variant="caption" component="div" color="textSecondary">
+                        Period: {this.props.scene.transPer / 20}
+                      </Typography>
+                      <Slider
+                        min={1}
+                        max={20}
+                        defaultValue={this.props.scene.transPer}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'transPer')}
+                        valueLabelDisplay={'auto'}
+                        valueLabelFormat={(v) => v/20}
+                        aria-labelledby="per-slider"/>
+                    </Collapse>
+                  </Grid>
+                </Grid>
+              </Collapse>
+            </Grid>
+          </React.Fragment>
+        )}
       </Grid>
     );
   }

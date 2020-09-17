@@ -113,7 +113,7 @@ export default new Map<string, string>([
   ['year', 'Last Year'],
   ['all', 'All Time'],
 
-  ['ea.liner', 'Liner'],
+  ['ea.linear', 'Linear'],
   ['ea.sinIn', 'Sin In'],
   ['ea.sinOut', 'Sin Out'],
   ['ea.sinInOut', 'Sin InOut'],

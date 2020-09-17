@@ -2,7 +2,7 @@ import * as React from 'react';
 import {animated, useSpring, useTransition} from "react-spring";
 import Timeout = NodeJS.Timeout;
 
-import {getRandomColor, getRandomListItem} from "../../data/utils";
+import {getEaseFunction, getRandomColor, getRandomListItem} from "../../data/utils";
 import {BT, HTF, IT, SL, TF, VTF} from "../../data/const";
 import Scene from "../../data/Scene";
 import Strobe from "./Strobe";
@@ -602,6 +602,7 @@ export default class ImageView extends React.Component {
         unique: true, // If this is true, items going in and out with the same key will be re-used
         config: {
           duration: fadeDuration,
+          easing : getEaseFunction(this.props.scene.fadeEase, this.props.scene.fadeExp, this.props.scene.fadeAmp, this.props.scene.fadePer, this.props.scene.fadeOv)
         },
       }
     );
@@ -721,6 +722,7 @@ export default class ImageView extends React.Component {
         },
         config: {
           duration: transDuration,
+          easing : getEaseFunction(this.props.scene.transEase, this.props.scene.transExp, this.props.scene.transAmp, this.props.scene.transPer, this.props.scene.transOv)
         },
       }
     );

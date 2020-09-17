@@ -6,7 +6,7 @@ import {
   MenuItem, Select, Slider, Switch, TextField, Theme, Typography, withStyles
 } from "@material-ui/core";
 
-import {SC, SL, TF} from "../../data/const";
+import {EA, SC, SL, TF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
 import en from "../../data/en";
 import Scene from "../../data/Scene";
@@ -38,6 +38,7 @@ class StrobeCard extends React.Component {
   readonly props: {
     classes: any,
     scene: Scene | SceneSettings,
+    easingControls: boolean,
     sidebar: boolean,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
@@ -420,6 +421,91 @@ class StrobeCard extends React.Component {
             </Grid>
           </Collapse>
         </Grid>
+        {this.props.easingControls && (
+          <React.Fragment>
+            <Grid item xs={12} className={clsx(!this.props.scene.strobe && classes.noPadding)}>
+              <Collapse in={this.props.scene.strobe} className={classes.fullWidth}>
+                <Divider />
+              </Collapse>
+            </Grid>
+            <Grid item xs={12}>
+              <Collapse in={this.props.scene.strobe} className={classes.fullWidth}>
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                    <FormControl className={classes.fullWidth}>
+                      <InputLabel>Easing</InputLabel>
+                      <Select
+                        value={this.props.scene.strobeEase}
+                        onChange={this.onInput.bind(this, 'strobeEase')}>
+                        {Object.values(EA).map((rf) =>
+                          <MenuItem key={rf} value={rf}>{en.get(rf)}</MenuItem>
+                        )}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                    <Collapse in={this.props.scene.strobeEase == EA.polyIn || this.props.scene.strobeEase == EA.polyOut || this.props.scene.strobeEase == EA.polyInOut} className={classes.fullWidth}>
+                      <Typography id="exp-slider" variant="caption" component="div" color="textSecondary">
+                        Exponent: {this.props.scene.strobeExp / 2}
+                      </Typography>
+                      <Slider
+                        min={1}
+                        max={10}
+                        defaultValue={this.props.scene.strobeExp}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'strobeExp')}
+                        valueLabelDisplay={'auto'}
+                        valueLabelFormat={(v) => v/2}
+                        aria-labelledby="exp-slider"/>
+                    </Collapse>
+                    <Collapse in={this.props.scene.strobeEase == EA.backIn || this.props.scene.strobeEase == EA.backOut || this.props.scene.strobeEase == EA.backInOut} className={classes.fullWidth}>
+                      <Typography id="ov-slider" variant="caption" component="div" color="textSecondary">
+                        Overshoot: {this.props.scene.strobeOv / 2}
+                      </Typography>
+                      <Slider
+                        min={1}
+                        max={10}
+                        defaultValue={this.props.scene.strobeOv}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'strobeOv')}
+                        valueLabelDisplay={'auto'}
+                        valueLabelFormat={(v) => v/2}
+                        aria-labelledby="ov-slider"/>
+                    </Collapse>
+                  </Grid>
+                  <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                    <Collapse in={this.props.scene.strobeEase == EA.elasticIn || this.props.scene.strobeEase == EA.elasticOut || this.props.scene.strobeEase == EA.elasticInOut} className={classes.fullWidth}>
+                      <Typography id="amp-slider" variant="caption" component="div" color="textSecondary">
+                        Amplitude: {this.props.scene.strobeAmp / 20}
+                      </Typography>
+                      <Slider
+                        min={1}
+                        max={40}
+                        defaultValue={this.props.scene.strobeAmp}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'strobeAmp')}
+                        valueLabelDisplay={'auto'}
+                        valueLabelFormat={(v) => v/20}
+                        aria-labelledby="amp-slider"/>
+                    </Collapse>
+                  </Grid>
+                  <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                    <Collapse in={this.props.scene.strobeEase == EA.elasticIn || this.props.scene.strobeEase == EA.elasticOut || this.props.scene.strobeEase == EA.elasticInOut} className={classes.fullWidth}>
+                      <Typography id="per-slider" variant="caption" component="div" color="textSecondary">
+                        Period: {this.props.scene.strobePer / 20}
+                      </Typography>
+                      <Slider
+                        min={1}
+                        max={20}
+                        defaultValue={this.props.scene.strobePer}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'strobePer')}
+                        valueLabelDisplay={'auto'}
+                        valueLabelFormat={(v) => v/20}
+                        aria-labelledby="per-slider"/>
+                    </Collapse>
+                  </Grid>
+                </Grid>
+              </Collapse>
+            </Grid>
+          </React.Fragment>
+        )}
       </Grid>
     );
   }

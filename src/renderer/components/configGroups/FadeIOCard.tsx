@@ -6,7 +6,7 @@ import {
   MenuItem, Select, Slider, Switch, TextField, Theme, Typography, withStyles
 } from "@material-ui/core";
 
-import {SDT, TF} from "../../data/const";
+import {EA, SDT, TF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
 import en from "../../data/en";
 import Scene from "../../data/Scene";
@@ -44,6 +44,7 @@ class FadeIOCard extends React.Component {
   readonly props: {
     classes: any,
     scene: Scene | SceneSettings,
+    easingControls: boolean,
     sidebar: boolean,
     tutorial: string,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
@@ -203,6 +204,161 @@ class FadeIOCard extends React.Component {
             </Grid>
           </Collapse>
         </Grid>
+        {this.props.easingControls && (
+          <React.Fragment>
+            <Grid item xs={12} className={clsx(!this.props.scene.fadeInOut && classes.noPadding)}>
+              <Collapse in={this.props.scene.fadeInOut} className={classes.fullWidth}>
+                <Divider />
+              </Collapse>
+            </Grid>
+            <Grid item xs={12}>
+              <Collapse in={this.props.scene.fadeInOut} className={classes.fullWidth}>
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                    <FormControl className={classes.fullWidth}>
+                      <InputLabel>Start Easing</InputLabel>
+                      <Select
+                        value={this.props.scene.fadeIOStartEase}
+                        onChange={this.onInput.bind(this, 'fadeIOStartEase')}>
+                        {Object.values(EA).map((rf) =>
+                          <MenuItem key={rf} value={rf}>{en.get(rf)}</MenuItem>
+                        )}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                    <Collapse in={this.props.scene.fadeIOStartEase == EA.polyIn || this.props.scene.fadeIOStartEase == EA.polyOut || this.props.scene.fadeIOStartEase == EA.polyInOut} className={classes.fullWidth}>
+                      <Typography id="start-exp-slider" variant="caption" component="div" color="textSecondary">
+                        Exponent: {this.props.scene.fadeIOStartExp / 2}
+                      </Typography>
+                      <Slider
+                        min={1}
+                        max={10}
+                        defaultValue={this.props.scene.fadeIOStartExp}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'fadeIOStartExp')}
+                        valueLabelDisplay={'auto'}
+                        valueLabelFormat={(v) => v/2}
+                        aria-labelledby="start-exp-slider"/>
+                    </Collapse>
+                    <Collapse in={this.props.scene.fadeIOStartEase == EA.backIn || this.props.scene.fadeIOStartEase == EA.backOut || this.props.scene.fadeIOStartEase == EA.backInOut} className={classes.fullWidth}>
+                      <Typography id="start-ov-slider" variant="caption" component="div" color="textSecondary">
+                        Overshoot: {this.props.scene.fadeIOStartOv / 2}
+                      </Typography>
+                      <Slider
+                        min={1}
+                        max={10}
+                        defaultValue={this.props.scene.fadeIOStartOv}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'fadeIOStartOv')}
+                        valueLabelDisplay={'auto'}
+                        valueLabelFormat={(v) => v/2}
+                        aria-labelledby="start-ov-slider"/>
+                    </Collapse>
+                  </Grid>
+                  <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                    <Collapse in={this.props.scene.fadeIOStartEase == EA.elasticIn || this.props.scene.fadeIOStartEase == EA.elasticOut || this.props.scene.fadeIOStartEase == EA.elasticInOut} className={classes.fullWidth}>
+                      <Typography id="start-amp-slider" variant="caption" component="div" color="textSecondary">
+                        Amplitude: {this.props.scene.fadeIOStartAmp / 20}
+                      </Typography>
+                      <Slider
+                        min={1}
+                        max={40}
+                        defaultValue={this.props.scene.fadeIOStartAmp}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'fadeIOStartAmp')}
+                        valueLabelDisplay={'auto'}
+                        valueLabelFormat={(v) => v/20}
+                        aria-labelledby="start-amp-slider"/>
+                    </Collapse>
+                  </Grid>
+                  <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                    <Collapse in={this.props.scene.fadeIOStartEase == EA.elasticIn || this.props.scene.fadeIOStartEase == EA.elasticOut || this.props.scene.fadeIOStartEase == EA.elasticInOut} className={classes.fullWidth}>
+                      <Typography id="start-per-slider" variant="caption" component="div" color="textSecondary">
+                        Period: {this.props.scene.fadeIOStartPer / 20}
+                      </Typography>
+                      <Slider
+                        min={1}
+                        max={20}
+                        defaultValue={this.props.scene.fadeIOStartPer}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'fadeIOStartPer')}
+                        valueLabelDisplay={'auto'}
+                        valueLabelFormat={(v) => v/20}
+                        aria-labelledby="start-per-slider"/>
+                    </Collapse>
+                  </Grid>
+                  <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                    <FormControl className={classes.fullWidth}>
+                      <InputLabel>End Easing</InputLabel>
+                      <Select
+                        value={this.props.scene.fadeIOEndEase}
+                        onChange={this.onInput.bind(this, 'fadeIOEndEase')}>
+                        {Object.values(EA).map((rf) =>
+                          <MenuItem key={rf} value={rf}>{en.get(rf)}</MenuItem>
+                        )}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                    <Collapse in={this.props.scene.fadeIOEndEase == EA.polyIn || this.props.scene.fadeIOEndEase == EA.polyOut || this.props.scene.fadeIOEndEase == EA.polyInOut} className={classes.fullWidth}>
+                      <Typography id="end-exp-slider" variant="caption" component="div" color="textSecondary">
+                        Exponent: {this.props.scene.fadeIOEndExp / 2}
+                      </Typography>
+                      <Slider
+                        min={1}
+                        max={10}
+                        defaultValue={this.props.scene.fadeIOEndExp}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'fadeIOEndExp')}
+                        valueLabelDisplay={'auto'}
+                        valueLabelFormat={(v) => v/2}
+                        aria-labelledby="end-exp-slider"/>
+                    </Collapse>
+                    <Collapse in={this.props.scene.fadeIOEndEase == EA.backIn || this.props.scene.fadeIOEndEase == EA.backOut || this.props.scene.fadeIOEndEase == EA.backInOut} className={classes.fullWidth}>
+                      <Typography id="end-ov-slider" variant="caption" component="div" color="textSecondary">
+                        Overshoot: {this.props.scene.fadeIOEndOv / 2}
+                      </Typography>
+                      <Slider
+                        min={1}
+                        max={10}
+                        defaultValue={this.props.scene.fadeIOEndOv}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'fadeIOEndOv')}
+                        valueLabelDisplay={'auto'}
+                        valueLabelFormat={(v) => v/2}
+                        aria-labelledby="end-ov-slider"/>
+                    </Collapse>
+                  </Grid>
+                  <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                    <Collapse in={this.props.scene.fadeIOEndEase == EA.elasticIn || this.props.scene.fadeIOEndEase == EA.elasticOut || this.props.scene.fadeIOEndEase == EA.elasticInOut} className={classes.fullWidth}>
+                      <Typography id="end-amp-slider" variant="caption" component="div" color="textSecondary">
+                        Amplitude: {this.props.scene.fadeIOEndAmp / 20}
+                      </Typography>
+                      <Slider
+                        min={1}
+                        max={40}
+                        defaultValue={this.props.scene.fadeIOEndAmp}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'fadeIOEndAmp')}
+                        valueLabelDisplay={'auto'}
+                        valueLabelFormat={(v) => v/20}
+                        aria-labelledby="end-amp-slider"/>
+                    </Collapse>
+                  </Grid>
+                  <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                    <Collapse in={this.props.scene.fadeIOEndEase == EA.elasticIn || this.props.scene.fadeIOEndEase == EA.elasticOut || this.props.scene.fadeIOEndEase == EA.elasticInOut} className={classes.fullWidth}>
+                      <Typography id="end-per-slider" variant="caption" component="div" color="textSecondary">
+                        Period: {this.props.scene.fadeIOEndPer / 20}
+                      </Typography>
+                      <Slider
+                        min={1}
+                        max={20}
+                        defaultValue={this.props.scene.fadeIOEndPer}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'fadeIOEndPer')}
+                        valueLabelDisplay={'auto'}
+                        valueLabelFormat={(v) => v/20}
+                        aria-labelledby="end-per-slider"/>
+                    </Collapse>
+                  </Grid>
+                </Grid>
+              </Collapse>
+            </Grid>
+          </React.Fragment>
+        )}
       </Grid>
     );
   }

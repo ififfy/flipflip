@@ -16,7 +16,7 @@ export const portablePath = path.join(path.dirname(remote.app.getAppPath()), 'da
 
 export function getEaseFunction(ea: string, exp: number, amp: number, per: number, ov: number) {
   switch(ea) {
-    case EA.liner:
+    case EA.linear:
       return easings.easeLinear;
     case EA.sinIn:
       return easings.easeSinIn;

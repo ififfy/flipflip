@@ -545,6 +545,7 @@ class SceneDetail extends React.Component {
                   <div className={classes.drawerSpacer}/>
                   <Box p={2} className={classes.fill}>
                     <SceneEffects
+                      easingControls={this.props.config.displaySettings.easingControls}
                       scene={this.props.scene}
                       tutorial={this.props.tutorial}
                       onUpdateScene={this.props.onUpdateScene.bind(this)} />

@@ -345,6 +345,7 @@ class ConfigForm extends React.Component {
                   <div className={classes.drawerSpacer}/>
                   <Box p={2} className={classes.fill}>
                     <SceneEffects
+                      easingControls={this.state.config.displaySettings.easingControls}
                       scene={this.state.config.defaultScene}
                       onUpdateScene={this.onUpdateDefaultScene.bind(this)} />
                   </Box>
