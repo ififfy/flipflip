@@ -11,6 +11,7 @@ export default class Strobe extends React.Component {
     toggleStrobe: boolean,
     timeToNextFrame: number,
     scene: Scene,
+    hideOverflow?: boolean,
     strobeFunction?: Function,
     children?: React.ReactNode,
   };

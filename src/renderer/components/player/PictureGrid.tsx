@@ -54,8 +54,8 @@ class PictureGrid extends React.Component {
                   <Grid key={y} xs={12} item className={classes.image}>
                     <ImageView
                       image={p}
-                      fitParent={true}
-                      hasStarted={true}
+                      fitParent
+                      hasStarted
                       scene={null}
                       pictureGrid/>
                   </Grid>

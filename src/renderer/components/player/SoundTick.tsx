@@ -20,7 +20,7 @@ export default class SoundTick extends React.Component {
         url={this.props.url}
         playStatus={this.props.playing}
         playbackRate={this.props.speed}
-        autoLoad={true}
+        autoLoad
         loop={false}
         volume={this.props.volume}
         playFromPosition={0}/>

@@ -105,7 +105,8 @@ export default class ImagePlayer extends React.Component {
           scene={this.props.scene}
           timeToNextFrame={this.state.timeToNextFrame}
           toggleStrobe={this._toggleStrobe}
-          fitParent={this.props.scene.gridView}
+          fitParent={this.props.gridView}
+          hideOverflow={this.props.gridView}
           hasStarted={this.props.hasStarted}
           onLoaded={this.state.historyPaths.length == 1 ? this.props.onLoaded : this.nop}
           setVideo={this.props.setVideo}/>

@@ -81,7 +81,7 @@ class LibrarySearch extends React.Component {
           inputValue={this.state.searchInput}
           isClearable
           isMulti
-          rightAligned={true}
+          rightAligned
           placeholder={this.props.placeholder}
           formatCreateLabel={(input: string) => "Search for " + input}
           onChange={this.handleChange}

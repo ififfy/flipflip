@@ -176,7 +176,7 @@ class TagManager extends React.Component {
                   this.setState({tags: newTags});
                 }}>
                 {this.state.tags.map((tag) =>
-                  <Jiggle key={tag.id + tag.name} bounce={true}>
+                  <Jiggle key={tag.id + tag.name} bounce>
                     <Card className={classes.tag}>
                       <CardActionArea onClick={this.onEditTag.bind(this, tag)}>
                         <CardContent>

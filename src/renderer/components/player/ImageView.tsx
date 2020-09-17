@@ -16,6 +16,7 @@ export default class ImageView extends React.Component {
     fitParent: boolean,
     hasStarted: boolean,
     scene: Scene,
+    hideOverflow?: boolean,
     timeToNextFrame?: number,
     toggleStrobe?: boolean,
     pictureGrid?: boolean,
@@ -394,7 +395,7 @@ export default class ImageView extends React.Component {
             right: 0,
             bottom: 0,
             left: 0,
-            overflow: this.props.scene.panning ? 'visible': 'hidden',
+            overflow: this.props.hideOverflow ? 'hidden' : 'visible',
           }}>
           <div
             ref={this.contentRef}
@@ -455,13 +456,16 @@ export default class ImageView extends React.Component {
           overflow: 'hidden',
         }}>
         <Panning
+          image={this.props.image}
           togglePan={this.props.toggleStrobe}
           timeToNextFrame={this.props.timeToNextFrame}
+          hideOverflow={this.props.hideOverflow}
           scene={this.props.scene}
           panFunction={this.strobeImage.bind(this)}>
           <FadeInOut
             toggleFade={this.props.toggleStrobe}
             timeToNextFrame={this.props.timeToNextFrame}
+            hideOverflow={this.props.hideOverflow}
             scene={this.props.scene}
             fadeFunction={this.strobeImage.bind(this)}>
             <this.FadeLayer>
@@ -470,10 +474,12 @@ export default class ImageView extends React.Component {
                   <Strobe
                     zIndex={2}
                     toggleStrobe={this.props.toggleStrobe}
+                    hideOverflow={this.props.hideOverflow}
                     timeToNextFrame={this.props.timeToNextFrame}
                     scene={this.props.scene}
                     strobeFunction={this.strobeImage.bind(this)}>
                     <animated.div
+                      id="image"
                       ref={this.contentRef}
                       style={{
                         height: '100%',
@@ -488,6 +494,7 @@ export default class ImageView extends React.Component {
                 )}
                 {(!this.props.scene || !this.props.scene.strobe || this.props.scene.strobeLayer != SL.image) && (
                   <animated.div
+                    id="image"
                     ref={this.contentRef}
                     style={{
                       height: '100%',
@@ -504,6 +511,7 @@ export default class ImageView extends React.Component {
                 <Strobe
                   zIndex={1}
                   toggleStrobe={this.props.toggleStrobe}
+                  hideOverflow
                   timeToNextFrame={this.props.timeToNextFrame}
                   scene={this.props.scene}/>
               )}
@@ -620,7 +628,7 @@ export default class ImageView extends React.Component {
                 right: 0,
                 bottom: 0,
                 left: 0,
-                overflow: this.props.scene.panning ? 'visible': 'hidden',
+                overflow: this.props.hideOverflow ? 'hidden' : 'visible',
                 ...props
               }}>
               {data.children}
@@ -647,7 +655,7 @@ export default class ImageView extends React.Component {
         if (type) {
           horizTransLevel = -horizTransLevel;
         } else {
-          // Alreaedy set
+          // Already set
         }
       }
     }
@@ -735,7 +743,7 @@ export default class ImageView extends React.Component {
           right: 0,
           bottom: 0,
           left: 0,
-          overflow: this.props.scene.panning ? 'visible': 'hidden',
+          overflow: this.props.hideOverflow ? 'hidden' : 'visible',
           zIndex: 2,
           ...imageProps
         }}>

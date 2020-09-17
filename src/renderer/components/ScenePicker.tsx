@@ -562,7 +562,7 @@ class ScenePicker extends React.Component {
                     if (scene.generatorWeights) return <div key={scene.id}/>;
                     else {
                       return (
-                        <Jiggle key={scene.id} bounce={true} className={classes.scene}>
+                        <Jiggle key={scene.id} bounce className={classes.scene}>
                           <Card>
                             <CardActionArea onClick={this.props.onOpenScene.bind(this, scene)}>
                               <CardContent>
@@ -602,7 +602,7 @@ class ScenePicker extends React.Component {
                     if (!scene.generatorWeights) return <div key={scene.id}/>;
                     else {
                       return (
-                        <Jiggle key={scene.id} bounce={true} className={classes.scene}>
+                        <Jiggle key={scene.id} bounce className={classes.scene}>
                           <Card>
                             <CardActionArea onClick={this.props.onOpenScene.bind(this, scene)}>
                               <CardContent>
@@ -639,7 +639,7 @@ class ScenePicker extends React.Component {
                     this.props.onUpdateGrids(newGrids);
                   }}>
                   {this.props.grids.map((grid) =>
-                    <Jiggle key={grid.id} bounce={true} className={classes.scene}>
+                    <Jiggle key={grid.id} bounce className={classes.scene}>
                       <Card>
                         <CardActionArea onClick={this.props.onOpenGrid.bind(this, grid)}>
                           <CardContent>

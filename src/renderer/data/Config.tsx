@@ -95,11 +95,13 @@ interface SceneSettingsI {
   panSinRate: number;
   panBPMMulti: number;
   panHorizTransType: string;
+  panHorizTransImg: boolean;
   panHorizTransLevel: number;
   panHorizTransLevelMax: number;
   panHorizTransLevelMin: number;
   panHorizTransRandom: boolean;
   panVertTransType: string;
+  panVertTransImg: boolean;
   panVertTransLevel: number;
   panVertTransLevelMax: number;
   panVertTransLevelMin: number;
@@ -362,11 +364,13 @@ export class SceneSettings implements SceneSettingsI {
   panSinRate = 100;
   panBPMMulti = 10;
   panHorizTransType = HTF.none;
+  panHorizTransImg = false;
   panHorizTransLevel = 10;
   panHorizTransLevelMax = 10;
   panHorizTransLevelMin = 5;
   panHorizTransRandom = false;
   panVertTransType = VTF.none;
+  panVertTransImg = false;
   panVertTransLevel = 10;
   panVertTransLevelMax = 10;
   panVertTransLevelMin = 5;

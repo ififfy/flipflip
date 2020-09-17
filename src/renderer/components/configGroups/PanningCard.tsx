@@ -107,11 +107,11 @@ class PanningCard extends React.Component {
                     {Object.values(HTF).map((tf) => {
                         switch (tf) {
                           case HTF.left:
-                            return <MenuItem key={tf} value={tf}>{en.get(tf)} to {en.get(HTF.right)}</MenuItem>
+                            return <MenuItem key={tf} value={tf}>{en.get(tf)} then {en.get(HTF.right)}</MenuItem>
                           case HTF.right:
-                            return <MenuItem key={tf} value={tf}>{en.get(tf)} to {en.get(HTF.left)}</MenuItem>
+                            return <MenuItem key={tf} value={tf}>{en.get(tf)} then {en.get(HTF.left)}</MenuItem>
                           case HTF.random:
-                            return <MenuItem key={tf} value={tf}>{en.get(tf)} to Right/Left</MenuItem>
+                            return <MenuItem key={tf} value={tf}>Random</MenuItem>
                           default:
                             return <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
                         }
@@ -123,7 +123,7 @@ class PanningCard extends React.Component {
             </Grid>
             <Grid item xs={12} sm={!this.props.sidebar && this.props.scene.panHorizTransType != HTF.none ? 7 : 12}
                   className={clsx((!this.props.scene.panning || this.props.scene.panHorizTransType == HTF.none) && classes.noPadding)}>
-              <Collapse in={this.props.scene.panning && this.props.scene.panHorizTransType != HTF.none} className={clsx(classes.fullWidth, classes.paddingLeft)}>
+              <Collapse in={this.props.scene.panning && !this.props.scene.panHorizTransImg && this.props.scene.panHorizTransType != HTF.none} className={clsx(classes.fullWidth, classes.paddingLeft)}>
                 <FormControlLabel
                   control={
                     <Switch checked={this.props.scene.panHorizTransRandom}
@@ -132,9 +132,18 @@ class PanningCard extends React.Component {
                   }
                   label="Randomize"/>
               </Collapse>
+              <Collapse in={this.props.scene.panning && this.props.scene.panHorizTransType != HTF.none} className={clsx(classes.fullWidth, classes.paddingLeft)}>
+                <FormControlLabel
+                  control={
+                    <Switch checked={this.props.scene.panHorizTransImg}
+                            size="small"
+                            onChange={this.onBoolInput.bind(this, 'panHorizTransImg')}/>
+                  }
+                  label="Use Img Width"/>
+              </Collapse>
             </Grid>
             <Grid item xs={12} className={clsx((!this.props.scene.panning || this.props.scene.panHorizTransType == HTF.none) && classes.noPadding)}>
-              <Collapse in={this.props.scene.panning && this.props.scene.panHorizTransType != HTF.none && !this.props.scene.panHorizTransRandom} className={classes.fullWidth}>
+              <Collapse in={this.props.scene.panning && !this.props.scene.panHorizTransImg && this.props.scene.panHorizTransType != HTF.none && !this.props.scene.panHorizTransRandom} className={classes.fullWidth}>
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs>
                     <Slider
@@ -165,7 +174,7 @@ class PanningCard extends React.Component {
                   </Grid>
                 </Grid>
               </Collapse>
-              <Collapse in={this.props.scene.panning && this.props.scene.panHorizTransType != HTF.none && this.props.scene.panHorizTransRandom} className={classes.fullWidth}>
+              <Collapse in={this.props.scene.panning && !this.props.scene.panHorizTransImg && this.props.scene.panHorizTransType != HTF.none && this.props.scene.panHorizTransRandom} className={classes.fullWidth}>
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                     <Typography id="horiz-trans-min-slider">
@@ -211,11 +220,11 @@ class PanningCard extends React.Component {
                     {Object.values(VTF).map((tf) => {
                         switch (tf) {
                           case VTF.up:
-                            return <MenuItem key={tf} value={tf}>{en.get(tf)} to {en.get(VTF.down)}</MenuItem>
+                            return <MenuItem key={tf} value={tf}>{en.get(tf)} then {en.get(VTF.down)}</MenuItem>
                           case VTF.down:
-                            return <MenuItem key={tf} value={tf}>{en.get(tf)} to {en.get(VTF.up)}</MenuItem>
+                            return <MenuItem key={tf} value={tf}>{en.get(tf)} then {en.get(VTF.up)}</MenuItem>
                           case VTF.random:
-                            return <MenuItem key={tf} value={tf}>{en.get(tf)} to Down/Up</MenuItem>
+                            return <MenuItem key={tf} value={tf}>Random</MenuItem>
                           default:
                             return <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
                         }
@@ -227,7 +236,7 @@ class PanningCard extends React.Component {
             </Grid>
             <Grid item xs={12} sm={!this.props.sidebar && this.props.scene.panVertTransType != VTF.none ? 7 : 12}
                   className={clsx((!this.props.scene.panning || this.props.scene.panVertTransType == VTF.none) && classes.noPadding)}>
-              <Collapse in={this.props.scene.panning && this.props.scene.panVertTransType != VTF.none} className={clsx(classes.fullWidth, classes.paddingLeft)}>
+              <Collapse in={this.props.scene.panning && !this.props.scene.panVertTransImg && this.props.scene.panVertTransType != VTF.none} className={clsx(classes.fullWidth, classes.paddingLeft)}>
                 <FormControlLabel
                   control={
                     <Switch checked={this.props.scene.panVertTransRandom}
@@ -236,9 +245,18 @@ class PanningCard extends React.Component {
                   }
                   label="Randomize"/>
               </Collapse>
+              <Collapse in={this.props.scene.panning && this.props.scene.panVertTransType != VTF.none} className={clsx(classes.fullWidth, classes.paddingLeft)}>
+                <FormControlLabel
+                  control={
+                    <Switch checked={this.props.scene.panVertTransImg}
+                            size="small"
+                            onChange={this.onBoolInput.bind(this, 'panVertTransImg')}/>
+                  }
+                  label="Use Img Height"/>
+              </Collapse>
             </Grid>
             <Grid id="test" item xs={12} className={clsx((!this.props.scene.panning || this.props.scene.panVertTransType == VTF.none) && classes.noPadding)}>
-              <Collapse in={this.props.scene.panning && this.props.scene.panVertTransType != VTF.none && !this.props.scene.panVertTransRandom} className={classes.fullWidth}>
+              <Collapse in={this.props.scene.panning && !this.props.scene.panVertTransImg && this.props.scene.panVertTransType != VTF.none && !this.props.scene.panVertTransRandom} className={classes.fullWidth}>
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs>
                     <Slider
@@ -269,7 +287,7 @@ class PanningCard extends React.Component {
                   </Grid>
                 </Grid>
               </Collapse>
-              <Collapse in={this.props.scene.panning && this.props.scene.panVertTransType != VTF.none && this.props.scene.panVertTransRandom} className={classes.fullWidth}>
+              <Collapse in={this.props.scene.panning && !this.props.scene.panVertTransImg && this.props.scene.panVertTransType != VTF.none && this.props.scene.panVertTransRandom} className={classes.fullWidth}>
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                     <Typography id="vert-trans-min-slider">
@@ -313,7 +331,7 @@ class PanningCard extends React.Component {
                     value={this.props.scene.panTF}
                     onChange={this.onInput.bind(this, 'panTF')}>
                     {Object.values(TF).map((tf) =>
-                      <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
+                      <MenuItem key={tf} value={tf} disabled={tf == TF.scene}>{en.get(tf)}</MenuItem>
                     )}
                   </Select>
                 </FormControl>

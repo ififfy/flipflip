@@ -95,11 +95,13 @@ export default class Scene {
   panSinRate = 100;
   panBPMMulti = 10;
   panHorizTransType = HTF.none;
+  panHorizTransImg = false;
   panHorizTransLevel = 10;
   panHorizTransLevelMax = 10;
   panHorizTransLevelMin = 5;
   panHorizTransRandom = false;
   panVertTransType = VTF.none;
+  panVertTransImg = false;
   panVertTransLevel = 10;
   panVertTransLevelMax = 10;
   panVertTransLevelMin = 5;

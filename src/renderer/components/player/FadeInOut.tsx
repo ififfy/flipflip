@@ -11,6 +11,7 @@ export default class FadeInOut extends React.Component {
     timeToNextFrame: number,
     scene: Scene,
     fadeFunction: Function,
+    hideOverflow?: boolean,
     children?: React.ReactNode,
   };
 
@@ -63,8 +64,8 @@ export default class FadeInOut extends React.Component {
           unique: true,
           config: {
             duration: this.getDuration(),
-            easing : this._fadeOut ? getEaseFunction(this.props.scene.fadeIOStartEase, this.props.scene.fadeIOStartExp, this.props.scene.fadeIOStartAmp, this.props.scene.fadeIOStartPer, this.props.scene.fadeIOStartOv) :
-              getEaseFunction(this.props.scene.fadeIOEndEase, this.props.scene.fadeIOEndExp, this.props.scene.fadeIOEndAmp, this.props.scene.fadeIOEndPer, this.props.scene.fadeIOEndOv)
+            easing : this._fadeOut ? getEaseFunction(this.props.scene.fadeIOEndEase, this.props.scene.fadeIOEndExp, this.props.scene.fadeIOEndAmp, this.props.scene.fadeIOEndPer, this.props.scene.fadeIOEndOv) :
+              getEaseFunction(this.props.scene.fadeIOStartEase, this.props.scene.fadeIOStartExp, this.props.scene.fadeIOStartAmp, this.props.scene.fadeIOStartPer, this.props.scene.fadeIOStartOv)
           },
         }
       );
@@ -99,8 +100,8 @@ export default class FadeInOut extends React.Component {
           unique: true,
           config: {
             duration: this.state.duration,
-            easing : this.state.toggleFade ? getEaseFunction(this.props.scene.panStartEase, this.props.scene.panStartExp, this.props.scene.panStartAmp, this.props.scene.panStartPer, this.props.scene.panStartOv) :
-              getEaseFunction(this.props.scene.panEndEase, this.props.scene.panEndExp, this.props.scene.panEndAmp, this.props.scene.panEndPer, this.props.scene.panEndOv)
+            easing : this.state.toggleFade ? getEaseFunction(this.props.scene.panEndEase, this.props.scene.panEndExp, this.props.scene.panEndAmp, this.props.scene.panEndPer, this.props.scene.panEndOv) :
+              getEaseFunction(this.props.scene.panStartEase, this.props.scene.panStartExp, this.props.scene.panStartAmp, this.props.scene.panStartPer, this.props.scene.panStartOv)
           },
         }
       );
@@ -118,7 +119,7 @@ export default class FadeInOut extends React.Component {
                 right: 0,
                 bottom: 0,
                 left: 0,
-                overflow: this.props.scene.panning ? 'visible': 'hidden',
+                overflow: this.props.hideOverflow ? 'hidden' : 'visible',
                 zIndex: 2,
                 ...props
               }}>

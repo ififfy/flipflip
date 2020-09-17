@@ -11,6 +11,8 @@ export default class Panning extends React.Component {
     timeToNextFrame: number,
     scene: Scene,
     panFunction: Function,
+    image?: HTMLImageElement | HTMLVideoElement,
+    hideOverflow?: boolean,
     children?: React.ReactNode,
   };
 
@@ -36,6 +38,8 @@ export default class Panning extends React.Component {
 
 
   _lastToggle: any = null;
+  _lastHorizRandom: number = 0;
+  _lastVertRandom: number = 0;
   PanningLayer = (data: {children: React.ReactNode}) => {
     const sceneTiming = this.props.scene.panTF == TF.scene;
     if (this.props.togglePan != this._lastToggle) {
@@ -43,46 +47,85 @@ export default class Panning extends React.Component {
       this._lastToggle = this.props.togglePan;
     }
     let panTransitions: [{ item: any, props: any, key: any }];
+    const image = this.props.image;
 
     let horizTransLevel = 0;
+    let horizPix = false;
     if (this.props.scene.panHorizTransType != HTF.none) {
-      horizTransLevel = this.props.scene.panHorizTransLevel;
-      if (this.props.scene.panHorizTransRandom) {
-        horizTransLevel = Math.floor(Math.random() * (this.props.scene.panHorizTransLevelMax - this.props.scene.panHorizTransLevelMin + 1)) + this.props.scene.panHorizTransLevelMin;
+      if (image && this.props.scene.panHorizTransImg) {
+        const width = image.offsetWidth;
+        const parentWidth = window.innerWidth;
+        const widthDiff = Math.max(width - parentWidth, 0);
+        horizTransLevel = widthDiff / 2;
+        horizPix = true;
+      } else {
+        horizTransLevel = this.props.scene.panHorizTransLevel;
+        if (this.props.scene.panHorizTransRandom) {
+          horizTransLevel = Math.floor(Math.random() * (this.props.scene.panHorizTransLevelMax - this.props.scene.panHorizTransLevelMin + 1)) + this.props.scene.panHorizTransLevelMin;
+        }
       }
       if (this.props.scene.panHorizTransType == HTF.left) {
         horizTransLevel = -horizTransLevel;
       } else if (this.props.scene.panHorizTransType == HTF.right) {
         // Already set
       } else if (this.props.scene.panHorizTransType == HTF.random) {
-        const type = Math.floor(Math.random() * 2);
-        if (type) {
-          horizTransLevel = -horizTransLevel;
+        if ((sceneTiming && this._panOut) || (!sceneTiming && this.state.togglePan)) {
+          const type = Math.floor(Math.random() * 2);
+          if (type) {
+            horizTransLevel = -horizTransLevel;
+          } else {
+            // Already set
+          }
+          this._lastHorizRandom = type;
         } else {
-          // Alreaedy set
+          if (this._lastHorizRandom == 0) {
+            // Already set
+          } else {
+            horizTransLevel = -horizTransLevel;
+          }
         }
       }
     }
+    const horizSuffix = horizPix ? "px" : "%";
 
     let vertTransLevel = 0;
+    let vertPix = false;
     if (this.props.scene.panVertTransType != VTF.none) {
-      vertTransLevel = this.props.scene.panVertTransLevel;
-      if (this.props.scene.panVertTransRandom) {
-        vertTransLevel = Math.floor(Math.random() * (this.props.scene.panVertTransLevelMax - this.props.scene.panVertTransLevelMin + 1)) + this.props.scene.panVertTransLevelMin;
+      if (image && this.props.scene.panVertTransImg) {
+        const height = image.offsetHeight;
+        const parentHeight = window.innerHeight;
+        const heightDiff = Math.max(height - parentHeight, 0);
+        vertTransLevel = heightDiff / 2;
+        vertPix = true;
+      } else {
+        vertTransLevel = this.props.scene.panVertTransLevel;
+        if (this.props.scene.panVertTransRandom) {
+          vertTransLevel = Math.floor(Math.random() * (this.props.scene.panVertTransLevelMax - this.props.scene.panVertTransLevelMin + 1)) + this.props.scene.panVertTransLevelMin;
+        }
       }
       if (this.props.scene.panVertTransType == VTF.up) {
         vertTransLevel = -vertTransLevel;
       } else if (this.props.scene.panVertTransType == VTF.down) {
         // Already set
       } else if (this.props.scene.panVertTransType == VTF.random) {
-        const type = Math.floor(Math.random() * 2);
-        if (type) {
-          vertTransLevel = -vertTransLevel;
+        if ((sceneTiming && this._panOut) || (!sceneTiming && this.state.togglePan)) {
+          const type = Math.floor(Math.random() * 2);
+          if (type) {
+            vertTransLevel = -vertTransLevel;
+          } else {
+            // Already set
+          }
+          this._lastVertRandom = type;
         } else {
-          // Already set
+          if (this._lastVertRandom == 0) {
+            // Already set
+          } else {
+            vertTransLevel = -vertTransLevel;
+          }
         }
       }
     }
+    const vertSuffix = vertPix ? "px" : "%";
 
     const horizTransLevelNeg = -horizTransLevel;
     const vertTransLevelNeg = -vertTransLevel;
@@ -95,18 +138,18 @@ export default class Panning extends React.Component {
         },
         {
           from: {
-            transform: this._panOut ? 'translate(' + horizTransLevel + '%, ' + vertTransLevel + '%)' : 'translate(' + horizTransLevelNeg + '%, ' + vertTransLevelNeg + '%)',
+            transform: this._panOut ? 'translate(' + horizTransLevel + horizSuffix + ', ' + vertTransLevel + vertSuffix + ')' : 'translate(' + horizTransLevelNeg + horizSuffix + ', ' + vertTransLevelNeg + vertSuffix + ')',
           },
           enter: {
-            transform: this._panOut ? 'translate(' + horizTransLevelNeg + '%, ' + vertTransLevelNeg + '%)' : 'translate(' + horizTransLevel + '%, ' + vertTransLevel + '%)',
+            transform: this._panOut ? 'translate(' + horizTransLevelNeg + horizSuffix + ', ' + vertTransLevelNeg + vertSuffix + ')' : 'translate(' + horizTransLevel + horizSuffix + ', ' + vertTransLevel + vertSuffix + ')',
           },
           leave: {
-            transform: this._panOut ? 'translate(' + horizTransLevel + '%, ' + vertTransLevel + '%)' : 'translate(' + horizTransLevelNeg + '%, ' + vertTransLevelNeg + '%)',
+            transform: this._panOut ? 'translate(' + horizTransLevel + horizSuffix + ', ' + vertTransLevel + vertSuffix + ')' : 'translate(' + horizTransLevelNeg + horizSuffix + ', ' + vertTransLevelNeg + vertSuffix + ')',
           },
           config: {
             duration: this.getDuration(),
-            easing : this._panOut ? getEaseFunction(this.props.scene.panStartEase, this.props.scene.panStartExp, this.props.scene.panStartAmp, this.props.scene.panStartPer, this.props.scene.panStartOv) :
-              getEaseFunction(this.props.scene.panEndEase, this.props.scene.panEndExp, this.props.scene.panEndAmp, this.props.scene.panEndPer, this.props.scene.panEndOv)
+            easing : this._panOut ? getEaseFunction(this.props.scene.panEndEase, this.props.scene.panEndExp, this.props.scene.panEndAmp, this.props.scene.panEndPer, this.props.scene.panEndOv) :
+              getEaseFunction(this.props.scene.panStartEase, this.props.scene.panStartExp, this.props.scene.panStartAmp, this.props.scene.panStartPer, this.props.scene.panStartOv)
           },
         }
       );
@@ -130,13 +173,13 @@ export default class Panning extends React.Component {
         },
         {
           from: {
-            transform: this.state.togglePan ? 'translate(' + horizTransLevel + '%, ' + vertTransLevel + '%)' : 'translate(' + horizTransLevelNeg + '%, ' + vertTransLevelNeg + '%)',
+            transform: this.state.togglePan ? 'translate(' + horizTransLevelNeg + horizSuffix + ', ' + vertTransLevelNeg + vertSuffix + ')' : 'translate(' + horizTransLevel + horizSuffix + ', ' + vertTransLevel + vertSuffix + ')',
           },
           enter: {
-            transform: this.state.togglePan ? 'translate(' + horizTransLevelNeg + '%, ' + vertTransLevelNeg + '%)' : 'translate(' + horizTransLevel + '%, ' + vertTransLevel + '%)',
+            transform: this.state.togglePan ? 'translate(' + horizTransLevel + horizSuffix + ', ' + vertTransLevel + vertSuffix + ')' : 'translate(' + horizTransLevelNeg + horizSuffix + ', ' + vertTransLevelNeg + vertSuffix + ')',
           },
           leave: {
-            transform: this.state.togglePan ? 'translate(' + horizTransLevel + '%, ' + vertTransLevel + '%)' : 'translate(' + horizTransLevelNeg + '%, ' + vertTransLevelNeg + '%)',
+            transform: this.state.togglePan ? 'translate(' + horizTransLevelNeg + horizSuffix + ', ' + vertTransLevelNeg + vertSuffix + ')' : 'translate(' + horizTransLevel + horizSuffix + ', ' + vertTransLevel + vertSuffix + ')',
           },
           config: {
             duration: this.state.duration,
@@ -159,7 +202,7 @@ export default class Panning extends React.Component {
                 right: 0,
                 bottom: 0,
                 left: 0,
-                overflow: this.props.scene.panning ? 'visible': 'hidden',
+                overflow: this.props.hideOverflow ? 'hidden' : 'visible',
                 zIndex: 2,
                 ...props
               }}>
@@ -171,22 +214,31 @@ export default class Panning extends React.Component {
     );
   };
 
-  pan() {
+  panIn() {
     const duration = this.getDuration();
-    this.setState({togglePan: !this.state.togglePan, duration: duration});
+    this.setState({togglePan: true, duration: duration});
     this.props.panFunction();
     return duration;
   }
 
-  panLoop() {
-    const delay = this.pan();
-    this._panTimeout = setTimeout(this.panLoop.bind(this), delay);
+  panOut() {
+    const duration = this.getDuration();
+    this.setState({togglePan: false, duration: duration});
+    this.props.panFunction();
+    return duration;
+  }
+
+  panLoop(panIn: boolean) {
+    const delay = panIn ? this.panIn() : this.panOut();
+    this._panTimeout = setTimeout(this.panLoop.bind(this, !panIn), delay);
   }
 
   componentDidMount() {
     this._panOut = false;
+    this._lastHorizRandom = 0;
+    this._lastVertRandom = 0;
     if (this.props.scene.panning && this.props.scene.panTF != TF.scene) {
-      this.panLoop();
+      this.panLoop(true);
     }
   }
 
@@ -194,7 +246,7 @@ export default class Panning extends React.Component {
     if (this.props.scene.panning && this.props.scene.panTF != props.scene.panTF) {
       clearTimeout(this._panTimeout);
       if (this.props.scene.panTF != TF.scene) {
-        this.panLoop();
+        this.panLoop(true);
       }
     }
   }
@@ -209,6 +261,9 @@ export default class Panning extends React.Component {
     clearTimeout(this._panTimeout);
     this._panTimeout = null;
     this._panOut = null;
+    this._lastToggle = null;
+    this._lastHorizRandom = null;
+    this._lastVertRandom = null;
   }
 
   getDuration() {
