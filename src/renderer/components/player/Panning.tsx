@@ -53,9 +53,12 @@ export default class Panning extends React.Component {
     let horizPix = false;
     if (this.props.scene.panHorizTransType != HTF.none) {
       if (image && this.props.scene.panHorizTransImg) {
+        const height = image.offsetHeight;
         const width = image.offsetWidth;
+        const parentHeight = window.innerHeight;
         const parentWidth = window.innerWidth;
-        const widthDiff = Math.max(width - parentWidth, 0);
+        const heightDiff = Math.max(height - parentHeight, 0);
+        const widthDiff = Math.max(width - parentWidth - heightDiff, 0);
         horizTransLevel = widthDiff / 2;
         horizPix = true;
       } else {
@@ -93,8 +96,11 @@ export default class Panning extends React.Component {
     if (this.props.scene.panVertTransType != VTF.none) {
       if (image && this.props.scene.panVertTransImg) {
         const height = image.offsetHeight;
+        const width = image.offsetWidth;
         const parentHeight = window.innerHeight;
-        const heightDiff = Math.max(height - parentHeight, 0);
+        const parentWidth = window.innerWidth;
+        const widthDiff = Math.max(width - parentWidth, 0);
+        const heightDiff = Math.max(height - parentHeight - widthDiff, 0);
         vertTransLevel = heightDiff / 2;
         vertPix = true;
       } else {
