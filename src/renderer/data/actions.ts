@@ -132,6 +132,7 @@ export function restoreFromBackup(state: State, backupFile: string): Object {
     libraryYOffset: 0,
     libraryFilters: Array<string>(),
     librarySelected: Array<string>(),
+    audioOpenTab: data.audioOpenTab ? data.audioOpenTab : 0,
     audioYOffset: 0,
     audioFilters: Array<string>(),
     audioSelected: Array<string>(),
@@ -415,6 +416,10 @@ export function systemSnack(state: State, message: string): Object {
 
 export function changeScenePickerTab(state: State, newTab: number): Object {
   return {openTab: newTab};
+}
+
+export function changeAudioLibraryTab(state: State, newTab: number): Object {
+  return {audioOpenTab: newTab};
 }
 
 export function addScene(state: State): Object {

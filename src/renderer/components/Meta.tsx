@@ -194,6 +194,7 @@ export default class Meta extends React.Component {
               isBatchEdit={this.state.isBatchEdit}
               isSelect={this.state.isSelect}
               library={this.state.audios}
+              openTab={this.state.audioOpenTab}
               progressCurrent={this.state.progressCurrent}
               progressMode={this.state.progressMode}
               progressTitle={this.state.progressTitle}
@@ -205,6 +206,7 @@ export default class Meta extends React.Component {
               goBack={a(actions.goBack)}
               onBatchTag={a(actions.batchTag)}
               onBatchEdit={a(actions.batchEdit)}
+              onChangeTab={a(actions.changeAudioLibraryTab)}
               onExportLibrary={a(actions.exportAudioLibrary)}
               onImportFromLibrary={a(actions.importAudioFromLibrary)}
               onImportLibrary={a(actions.importAudioLibrary, appStorage.backup.bind(appStorage))}

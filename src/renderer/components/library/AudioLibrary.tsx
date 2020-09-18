@@ -401,6 +401,7 @@ class AudioLibrary extends React.Component {
     isBatchEdit: boolean,
     isSelect: boolean,
     library: Array<Audio>,
+    openTab: number,
     progressCurrent: number,
     progressMode: string,
     progressTitle: string,
@@ -412,6 +413,7 @@ class AudioLibrary extends React.Component {
     goBack(): void,
     onBatchTag(): void,
     onBatchEdit(): void,
+    onChangeTab(newTab: number): void,
     onExportLibrary(): void,
     onImportFromLibrary(sources: Array<Audio>): void,
     onImportLibrary(): void,
@@ -428,7 +430,6 @@ class AudioLibrary extends React.Component {
 
   readonly state = {
     displaySources: Array<Audio>(),
-    openTab: 0,
     drawerOpen: false,
     filters: this.props.filters,
     selected: this.props.selected,
@@ -527,7 +528,7 @@ class AudioLibrary extends React.Component {
           <div>
             <Tabs
               orientation="vertical"
-              value={this.state.openTab}
+              value={this.props.openTab}
               onChange={this.onChangeTab.bind(this)}
               aria-label="audio library tabs"
               className={classes.tabs}>
@@ -647,11 +648,11 @@ class AudioLibrary extends React.Component {
           <div className={classes.appBarSpacer} />
           <Container maxWidth={false} className={classes.container}>
 
-            {this.state.openTab === 0 && (
+            {this.props.openTab === 0 && (
               <Typography
                 component="div"
                 role="tabpanel"
-                hidden={this.state.openTab !== 0}
+                hidden={this.props.openTab !== 0}
                 id="vertical-tabpanel-0"
                 aria-labelledby="vertical-tab-0">
                 <div className={classes.tabPanel}>
@@ -662,12 +663,12 @@ class AudioLibrary extends React.Component {
               </Typography>
             )}
 
-            {this.state.openTab === 1 && (
+            {this.props.openTab === 1 && (
               <Typography
                 className={classes.tabSection}
                 component="div"
                 role="tabpanel"
-                hidden={this.state.openTab !== 1}
+                hidden={this.props.openTab !== 1}
                 id="vertical-tabpanel-1"
                 aria-labelledby="vertical-tab-1">
                 <div className={classes.tabPanel}>
@@ -681,12 +682,12 @@ class AudioLibrary extends React.Component {
               </Typography>
             )}
 
-            {this.state.openTab === 2 && (
+            {this.props.openTab === 2 && (
               <Typography
                 className={classes.tabSection}
                 component="div"
                 role="tabpanel"
-                hidden={this.state.openTab !== 2}
+                hidden={this.props.openTab !== 2}
                 id="vertical-tabpanel-2"
                 aria-labelledby="vertical-tab-2">
                 <div className={classes.tabPanel}>
@@ -701,12 +702,12 @@ class AudioLibrary extends React.Component {
               </Typography>
             )}
 
-            {this.state.openTab === 3 && (
+            {this.props.openTab === 3 && (
               <Typography
                 className={classes.tabSection}
                 component="div"
                 role="tabpanel"
-                hidden={this.state.openTab !== 3}
+                hidden={this.props.openTab !== 3}
                 id="vertical-tabpanel-3"
                 aria-labelledby="vertical-tab-3">
                 <div className={classes.tabPanel}>
@@ -1112,7 +1113,7 @@ class AudioLibrary extends React.Component {
   };
 
   onChangeTab(e: any, newTab: number) {
-    this.setState({openTab: newTab});
+    this.props.onChangeTab(newTab);
   }
 
   onClickArtist(artist: string) {
