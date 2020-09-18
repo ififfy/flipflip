@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import {
-  Collapse, createStyles, Fab, FormControlLabel, Grid, Switch, Theme, withStyles
+  Collapse, createStyles, Divider, Fab, FormControlLabel, Grid, Switch, Theme, Tooltip, withStyles
 } from "@material-ui/core";
 
 import AddIcon from '@material-ui/icons/Add';
@@ -23,6 +23,7 @@ class AudioCard extends React.Component {
     sidebar: boolean,
     startPlaying: boolean,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
+    onAddTracks?(playlistIndex: number): void,
     scenePaths?: Array<any>,
     goBack?(): void,
     playNextScene?(): void,
@@ -30,9 +31,8 @@ class AudioCard extends React.Component {
 
   render() {
     const classes = this.props.classes;
-
     return(
-      <Grid container spacing={2} alignItems="center">
+      <Grid container alignItems="center">
         <Grid item xs={12}>
           <Grid container spacing={2} alignItems="center">
             <Grid item xs>
@@ -44,42 +44,45 @@ class AudioCard extends React.Component {
                 label="Audio Tracks"/>
             </Grid>
             <Grid item>
-              <Collapse in={this.props.scene.audioEnabled}>
-                <Fab
-                  className={classes.addButton}
-                  onClick={this.onAddAudioTrack.bind(this)}
-                  size="small">
-                  <AddIcon />
-                </Fab>
+              <Collapse in={this.props.scene.audioEnabled && !this.props.startPlaying}>
+                <Tooltip title={"Add Playlist"}>
+                  <Fab
+                    className={classes.addButton}
+                    onClick={this.onAddAudioTrack.bind(this)}
+                    size="small">
+                    <AddIcon />
+                  </Fab>
+                </Tooltip>
               </Collapse>
             </Grid>
           </Grid>
         </Grid>
-        {this.props.scene.audioPlaylists.map((a,i) =>
-          <AudioPlaylist
-            key={i}
-            playlistIndex={i}
-            audios={a}
-            scene={this.props.scene}
-            scenePaths={this.props.scenePaths}
-            sidebar={this.props.sidebar}
-            startPlaying={this.props.startPlaying}
-            onUpdateScene={this.props.onUpdateScene.bind(this)}
-            goBack={this.props.goBack}
-            playNextScene={this.props.playNextScene}/>
+        {this.props.scene.audioPlaylists.map((a, i) =>
+          <Grid item xs={12} key={i}>
+            <Collapse in={this.props.scene.audioEnabled}>
+              <AudioPlaylist
+                playlistIndex={i}
+                audios={a}
+                scene={this.props.scene}
+                scenePaths={this.props.scenePaths}
+                sidebar={this.props.sidebar}
+                startPlaying={this.props.startPlaying}
+                onAddTracks={this.props.onAddTracks}
+                onUpdateScene={this.props.onUpdateScene.bind(this)}
+                goBack={this.props.goBack}
+                playNextScene={this.props.playNextScene}/>
+              {i != this.props.scene.audioPlaylists.length-1 && (
+                <Divider/>
+              )}
+            </Collapse>
+          </Grid>
         )}
       </Grid>
     );
   }
 
   onAddAudioTrack() {
-    // TODO
-    /*let id = this.props.scene.audios.length + 1;
-    this.props.scene.audios.forEach((a) => {
-      id = Math.max(a.id + 1, id);
-    });
-    const newAudios = this.props.scene.audios.concat([new Audio({id: id, url: ""})]);
-    this.changeKey('audios', newAudios);*/
+    this.changeKey('audioPlaylists', this.props.scene.audioPlaylists.concat([[]]));
   }
 
   onBoolInput(key: string, e: MouseEvent) {

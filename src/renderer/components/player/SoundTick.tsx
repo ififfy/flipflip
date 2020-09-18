@@ -8,6 +8,7 @@ export default class SoundTick extends React.Component {
     speed: number,
     volume: number,
     tick: boolean,
+    onPlaying(soundData: any): void,
   };
 
   shouldComponentUpdate(props: any) {
@@ -23,6 +24,7 @@ export default class SoundTick extends React.Component {
         autoLoad
         loop={false}
         volume={this.props.volume}
+        onPlaying={this.props.onPlaying.bind(this)}
         playFromPosition={0}/>
     );
   }

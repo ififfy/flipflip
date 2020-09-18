@@ -1,5 +1,6 @@
 import * as React from "react";
 import {remote} from "electron";
+import path from 'path';
 import clsx from "clsx";
 import * as mm from "music-metadata";
 import {existsSync, readFileSync} from "fs";
@@ -36,7 +37,7 @@ import SortIcon from '@material-ui/icons/Sort';
 import {red} from "@material-ui/core/colors";
 
 import {generateThumbnailFile, isAudio, isImage} from "../../data/utils";
-import {AF, ASF, LT, MO, PR, SDGT, SP} from "../../data/const";
+import {AF, ASF, LT, MO, SP} from "../../data/const";
 import en from "../../data/en";
 import Audio from "../../data/Audio";
 import Playlist from "../../data/Playlist";
@@ -1359,6 +1360,9 @@ class AudioLibrary extends React.Component {
               if (metadata.format) {
                 newAudio.duration = metadata.format.duration;
               }
+            }
+            if (!newAudio.name) {
+              newAudio.name = url.substring(url.lastIndexOf(path.sep) + 1, url.lastIndexOf("."));
             }
             originalSources.unshift(newAudio);
             addSourceLoop();

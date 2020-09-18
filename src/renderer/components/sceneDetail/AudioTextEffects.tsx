@@ -10,6 +10,7 @@ import {SceneSettings} from "../../data/Config";
 export default class AudioTextEffects extends React.Component {
   readonly props: {
     scene: Scene | SceneSettings,
+    onAddTracks(playlistIndex: number): void,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 
@@ -22,6 +23,7 @@ export default class AudioTextEffects extends React.Component {
               <AudioCard
                 scene={this.props.scene}
                 startPlaying={false}
+                onAddTracks={this.props.onAddTracks.bind(this)}
                 onUpdateScene={this.props.onUpdateScene.bind(this)}/>
             </CardContent>
           </Card>

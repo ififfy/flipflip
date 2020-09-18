@@ -54,6 +54,8 @@ export default class Meta extends React.Component {
     // component of the whole app.
     ipcRenderer.on(IPC.startScene, this.startScene.bind(this));
     setInterval(this.queueSave.bind(this), 500);
+    // Disable react-sound's verbose console output
+    (window as any).soundManager.setup({debugMode: false});
   }
 
   _queueSave = false;
@@ -129,6 +131,7 @@ export default class Meta extends React.Component {
               tutorial={this.state.tutorial}
               goBack={a(actions.goBack)}
               onAddSource={a(actions.addSource)}
+              onAddTracks={a(actions.addTracks)}
               onClearBlacklist={a(actions.clearBlacklist)}
               onClip={a(actions.clipVideo)}
               onCloneScene={a(actions.cloneScene)}

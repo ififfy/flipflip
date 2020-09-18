@@ -1,26 +1,10 @@
 import * as React from "react";
 import Sound from "react-sound";
 import clsx from "clsx";
-import {IncomingMessage, remote} from "electron";
-import fileURL from "file-url";
-import * as mm from "music-metadata";
-import { analyze } from 'web-audio-beat-detector';
-import { readFileSync, existsSync } from 'fs';
-import request from "request";
 import Timeout = NodeJS.Timeout;
-import {green, red} from "@material-ui/core/colors";
 
-import {
-  CircularProgress,
-  Collapse, createStyles, Divider, FormControl, FormControlLabel, Grid, IconButton, InputAdornment, InputLabel,
-  MenuItem, Select, Slider, SvgIcon, Switch, TextField, Theme, Tooltip, Typography, withStyles
-} from "@material-ui/core";
+import {Collapse, createStyles, Grid, IconButton, Slider, Theme, Tooltip, Typography, withStyles} from "@material-ui/core";
 
-import AudiotrackIcon from '@material-ui/icons/Audiotrack';
-import CheckIcon from '@material-ui/icons/Check';
-import DeleteIcon from '@material-ui/icons/Delete';
-import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
-import FolderIcon from '@material-ui/icons/Folder';
 import Forward10Icon from '@material-ui/icons/Forward10';
 import Replay10Icon from '@material-ui/icons/Replay10';
 import PauseIcon from '@material-ui/icons/Pause';
@@ -28,10 +12,9 @@ import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import VolumeDownIcon from '@material-ui/icons/VolumeDown';
 import VolumeUpIcon from '@material-ui/icons/VolumeUp';
 
-import {getTimestamp, toArrayBuffer, urlToPath} from "../../data/utils";
+import {getTimestamp} from "../../data/utils";
 import {SceneSettings} from "../../data/Config";
 import {TF} from "../../data/const";
-import en from "../../data/en";
 import Audio from "../../data/Audio";
 import Scene from "../../data/Scene";
 import SoundTick from "./SoundTick";
@@ -42,33 +25,6 @@ const styles = (theme: Theme) => createStyles({
   },
   noPadding: {
     padding: '0 !important',
-  },
-  endInput: {
-    paddingLeft: theme.spacing(1),
-    paddingTop: 0,
-  },
-  percentInput: {
-    minWidth: theme.spacing(11),
-  },
-  bpmProgress: {
-    position: 'absolute',
-    right: 67,
-  },
-  tagProgress: {
-    position: 'absolute',
-    right: 20,
-  },
-  success: {
-    backgroundColor: green[500],
-    '&:hover': {
-      backgroundColor: green[700],
-    },
-  },
-  failure: {
-    backgroundColor: red[500],
-    '&:hover': {
-      backgroundColor: red[700],
-    },
   },
 });
 
@@ -84,9 +40,9 @@ class AudioControl extends React.Component {
     playlistIndex: number,
     scene: Scene,
     scenePaths: Array<any>,
-    sidebar: boolean,
     startPlaying: boolean,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
+    onTrackEnd(): void,
     goBack?(): void,
     playNextScene?(): void,
   };
@@ -96,12 +52,6 @@ class AudioControl extends React.Component {
     position: 0,
     duration: 0,
     tick: false,
-    loadingBPM: false,
-    successBPM: false,
-    errorBPM: false,
-    loadingTag: false,
-    successTag: false,
-    errorTag: false,
   };
 
   render() {
@@ -112,36 +62,23 @@ class AudioControl extends React.Component {
       : (Sound as any).status.PAUSED;
 
     const audioVolume = typeof audio.volume === 'number' ? audio.volume : 0;
-    const audioSpeed = typeof audio.speed === 'number' ? audio.speed : 0;
-    const tickSinRate = typeof audio.tickSinRate === 'number' ? audio.tickSinRate : 0;
-    const tickBPMMulti = typeof audio.tickBPMMulti === 'number' ? audio.tickBPMMulti : 0;
-    const tickDelay = typeof audio.tickDelay === 'number' ? audio.tickDelay : 0;
-    const tickMinDelay = typeof audio.tickMinDelay === 'number' ? audio.tickMinDelay : 0;
-    const tickMaxDelay = typeof audio.tickMaxDelay === 'number' ? audio.tickMaxDelay : 0;
     return(
       <React.Fragment key={audio.id}>
-        {this.props.playlistIndex != 0 && (
-          <Grid item xs={12} className={clsx(!this.props.scene.audioEnabled && classes.noPadding)}>
-            <Collapse in={this.props.scene.audioEnabled} className={classes.fullWidth}>
-              <Divider/>
-            </Collapse>
-          </Grid>
-        )}
-        {this.props.scene.audioEnabled && (this.props.audio.tick && this.props.sidebar) && (
+        {this.props.scene.audioEnabled && this.props.audio.tick && (
           <SoundTick
             url={this.props.audio.url}
             playing={playing}
             speed={this.props.audio.speed / 10}
             volume={this.props.audio.volume}
             tick={this.state.tick}
+            onPlaying={this.onPlaying.bind(this)}
           />
         )}
-        {this.props.scene.audioEnabled && (!this.props.audio.tick || !this.props.sidebar) && (
+        {this.props.scene.audioEnabled && !this.props.audio.tick && (
           <Sound
             url={this.props.audio.url}
             playStatus={playing}
             playbackRate={this.props.audio.speed / 10}
-            loop={!this.props.audio.stopAtEnd && !this.props.audio.nextSceneAtEnd && this.props.sidebar}
             volume={this.props.audio.volume}
             position={this.state.position}
             onPlaying={this.onPlaying.bind(this)}
@@ -153,34 +90,8 @@ class AudioControl extends React.Component {
           <Collapse in={this.props.scene.audioEnabled} className={classes.fullWidth}>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12}>
-                <TextField
-                  label="Audio URL"
-                  fullWidth
-                  placeholder="Paste URL Here"
-                  margin="dense"
-                  value={audio.url}
-                  InputProps={{
-                    endAdornment:
-                      <InputAdornment position="end">
-                        <Tooltip title="Open File">
-                          <IconButton
-                            onClick={this.onOpenFile.bind(this)}>
-                            <FolderIcon/>
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Remove Audio">
-                          <IconButton
-                            onClick={this.onDeleteAudioTrack.bind(this)}>
-                            <DeleteIcon color="error"/>
-                          </IconButton>
-                        </Tooltip>
-                      </InputAdornment>,
-                  }}
-                  onChange={this.onAudioInput.bind(this, 'url')}/>
-              </Grid>
-              <Grid item xs={12}>
                 <Grid container spacing={1} alignItems="center" justify="center">
-                  <Grid item xs={12} sm={this.props.sidebar ? 12 : true}>
+                  <Grid item xs={12} sm={12}>
                     <Grid container spacing={1} alignItems="center">
                       <Grid item>
                         <Typography id="strobe-opacity-slider" variant="caption" component="div" color="textSecondary">
@@ -237,231 +148,6 @@ class AudioControl extends React.Component {
                   </Grid>
                 </Grid>
               </Grid>
-              <Grid item xs={12}>
-                <Grid container spacing={2} alignItems="center">
-                  <Grid item>
-                    <Collapse in={!audio.tick && !audio.nextSceneAtEnd}>
-                      <FormControlLabel
-                        control={
-                          <Switch
-                            size="small"
-                            checked={audio.stopAtEnd}
-                            onChange={this.onAudioBoolInput.bind(this, 'stopAtEnd')}/>
-                        }
-                        label="Stop at End"/>
-                    </Collapse>
-                    <Collapse in={!audio.tick && !audio.stopAtEnd}>
-                      <FormControlLabel
-                        control={
-                          <Switch
-                            size="small"
-                            checked={audio.nextSceneAtEnd}
-                            onChange={this.onAudioBoolInput.bind(this, 'nextSceneAtEnd')}/>
-                        }
-                        label="Next Scene at End"/>
-                    </Collapse>
-                    <Collapse in={!audio.stopAtEnd && !audio.nextSceneAtEnd}>
-                      <FormControlLabel
-                        control={
-                          <Tooltip title={"Repeat track at particular interval"}>
-                            <Switch
-                              size="small"
-                              checked={audio.tick}
-                              onChange={this.onAudioBoolInput.bind(this, 'tick')}/>
-                          </Tooltip>
-                        }
-                        label="Tick"/>
-                    </Collapse>
-                  </Grid>
-                  <Divider component="div" orientation="vertical" style={{height: 48}}/>
-                  <Grid item xs>
-                    <Grid container>
-                      {this.props.playlistIndex == 0 && (
-                        <Grid item xs={12}>
-                          <TextField
-                            variant="outlined"
-                            label="BPM"
-                            margin="dense"
-                            value={this.props.audio.bpm}
-                            onChange={this.onAudioIntInput.bind(this, 'bpm')}
-                            onBlur={this.blurAudioIntKey.bind(this, 'bpm')}
-                            InputProps={{
-                              endAdornment:
-                                <InputAdornment position="end">
-                                  <Tooltip title="Detect BPM">
-                                    <IconButton
-                                      className={clsx(this.state.successBPM && classes.success, this.state.errorBPM && classes.failure)}
-                                      onClick={this.onDetectBPM.bind(this)}>
-                                      {this.state.successBPM ? <CheckIcon/> :
-                                        this.state.errorBPM ? <ErrorOutlineIcon/> :
-                                        <SvgIcon viewBox="0 0 24 24" fontSize="small">
-                                          <path
-                                            d="M12,1.75L8.57,2.67L4.07,19.5C4.06,19.5 4,19.84 4,20C4,21.11 4.89,22 6,22H18C19.11,22 20,21.11 20,20C20,19.84 19.94,19.5 19.93,19.5L15.43,2.67L12,1.75M10.29,4H13.71L17.2,17H13V12H11V17H6.8L10.29,4M11,5V9H10V11H14V9H13V5H11Z"/>
-                                        </SvgIcon>
-                                      }
-                                    </IconButton>
-                                  </Tooltip>
-                                  {this.state.loadingBPM && <CircularProgress size={34} className={classes.bpmProgress} />}
-                                  <Tooltip title="Read BPM Metadata">
-                                    <IconButton
-                                      className={clsx(this.state.successTag && classes.success, this.state.errorTag && classes.failure)}
-                                      onClick={this.onReadBPMTag.bind(this)}>
-                                      {this.state.successTag ? <CheckIcon/> :
-                                        this.state.errorTag ? <ErrorOutlineIcon/> :
-                                          <AudiotrackIcon/>
-                                      }
-                                    </IconButton>
-                                  </Tooltip>
-                                  {this.state.loadingTag && <CircularProgress size={34} className={classes.tagProgress} />}
-                                </InputAdornment>,
-                            }}
-                            inputProps={{
-                              min: 0,
-                              type: 'number',
-                            }}/>
-                        </Grid>
-                      )}
-                      <Grid item xs={12}>
-                        <Typography id="audio-speed-slider" variant="caption" component="div"
-                                    color="textSecondary">
-                          Speed {audioSpeed / 10}x
-                        </Typography>
-                        <Slider
-                          min={5}
-                          max={40}
-                          defaultValue={audioSpeed}
-                          onChangeCommitted={this.onAudioSliderChange.bind(this, 'speed')}
-                          valueLabelDisplay={'auto'}
-                          valueLabelFormat={(v) => v/10 + "x"}
-                          aria-labelledby="audio-speed-slider"/>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              </Grid>
-              <Grid item xs={12} className={clsx(!audio.tick && classes.noPadding)}>
-                <Collapse in={audio.tick} className={classes.fullWidth}>
-                  <Grid container spacing={2} alignItems="center">
-                    <Grid item xs={12} sm={this.props.sidebar ? 12 : 4}>
-                      <FormControl className={classes.fullWidth}>
-                        <InputLabel>Timing</InputLabel>
-                        <Select
-                          value={audio.tickMode}
-                          onChange={this.onAudioInput.bind(this, 'tickMode')}>
-                          {Object.values(TF).map((tf) => {
-                            if (tf != TF.bpm || this.props.playlistIndex != 0) {
-                              return <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>;
-                            } else return;
-                          })}
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={12} sm={this.props.sidebar ? 12 : 8}>
-                      <Collapse in={audio.tickMode == TF.sin} className={classes.fullWidth}>
-                        <Typography id="tick-sin-rate-slider" variant="caption" component="div"
-                                    color="textSecondary">
-                          Wave Rate
-                        </Typography>
-                        <Grid container alignItems="center">
-                          <Grid item xs>
-                            <Slider
-                              min={1}
-                              defaultValue={tickSinRate}
-                              onChangeCommitted={this.onAudioSliderChange.bind(this, 'tickSinRate')}
-                              valueLabelDisplay={'auto'}
-                              aria-labelledby="tick-sin-rate-slider"/>
-                          </Grid>
-                          <Grid item xs={3} className={classes.percentInput}>
-                            <TextField
-                              value={tickSinRate}
-                              onChange={this.onAudioIntInput.bind(this, 'tickSinRate')}
-                              onBlur={this.blurAudioIntKey.bind(this, 'tickSinRate')}
-                              inputProps={{
-                                className: classes.endInput,
-                                step: 5,
-                                min: 0,
-                                max: 100,
-                                type: 'number',
-                                'aria-labelledby': 'tick-sin-rate-slider',
-                              }}/>
-                          </Grid>
-                        </Grid>
-                      </Collapse>
-                      <Collapse in={audio.tickMode == TF.bpm} className={classes.fullWidth}>
-                        <Typography id="tick-bpm-multi-slider" variant="caption" component="div"
-                                    color="textSecondary">
-                          BPM Multiplier {audio.tickBPMMulti / 10}x
-                        </Typography>
-                        <Slider
-                          min={1}
-                          max={100}
-                          defaultValue={tickBPMMulti}
-                          onChangeCommitted={this.onAudioSliderChange.bind(this, 'tickBPMMulti')}
-                          valueLabelDisplay={'auto'}
-                          valueLabelFormat={(v) => (v / 10) + "x"}
-                          aria-labelledby="tick-bpm-multi-slider"/>
-                      </Collapse>
-                      <Collapse in={audio.tickMode == TF.constant} className={classes.fullWidth}>
-                        <TextField
-                          variant="outlined"
-                          label="For"
-                          margin="dense"
-                          value={tickDelay}
-                          onChange={this.onAudioIntInput.bind(this, 'tickDelay')}
-                          onBlur={this.blurAudioIntKey.bind(this, 'tickDelay')}
-                          InputProps={{
-                            endAdornment: <InputAdornment position="end">ms</InputAdornment>,
-                          }}
-                          inputProps={{
-                            step: 100,
-                            min: 0,
-                            type: 'number',
-                          }}/>
-                      </Collapse>
-                    </Grid>
-                  </Grid>
-                </Collapse>
-              </Grid>
-              <Grid item xs={12} className={clsx(!audio.tick && classes.noPadding)}>
-                <Collapse in={audio.tick && (audio.tickMode == TF.random || audio.tickMode == TF.sin)} className={classes.fullWidth}>
-                  <Grid container alignItems="center">
-                    <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
-                      <TextField
-                        variant="outlined"
-                        label="Between"
-                        margin="dense"
-                        value={tickMinDelay}
-                        onChange={this.onAudioIntInput.bind(this, 'tickMinDelay')}
-                        onBlur={this.blurAudioIntKey.bind(this, 'tickMinDelay')}
-                        InputProps={{
-                          endAdornment: <InputAdornment position="end">ms</InputAdornment>,
-                        }}
-                        inputProps={{
-                          step: 100,
-                          min: 0,
-                          type: 'number',
-                        }}/>
-                    </Grid>
-                    <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
-                      <TextField
-                        variant="outlined"
-                        label="and"
-                        margin="dense"
-                        value={tickMaxDelay}
-                        onChange={this.onAudioIntInput.bind(this, 'tickMaxDelay')}
-                        onBlur={this.blurAudioIntKey.bind(this, 'tickMaxDelay')}
-                        InputProps={{
-                          endAdornment: <InputAdornment position="end">ms</InputAdornment>,
-                        }}
-                        inputProps={{
-                          step: 100,
-                          min: 0,
-                          type: 'number',
-                        }}/>
-                    </Grid>
-                  </Grid>
-                </Collapse>
-              </Grid>
             </Grid>
           </Collapse>
         </Grid>
@@ -498,82 +184,6 @@ class AudioControl extends React.Component {
     }
   }
 
-  onReadBPMTag() {
-    if (this.props.audio.url && !this.state.loadingTag) {
-      this.setState({loadingTag: true});
-      mm.parseFile(urlToPath(this.props.audio.url))
-        .then((metadata: any) => {
-          if (metadata && metadata.common && metadata.common.bpm) {
-            this.changeKey('bpm', metadata.common.bpm);
-            this.setState({loadingTag: false, successTag: true});
-            setTimeout(() => {this.setState({successTag: false})}, 3000);
-          } else {
-            this.setState({loadingTag: false, errorTag: true});
-            setTimeout(() => {this.setState({errorTag: false})}, 3000);
-          }
-        })
-        .catch((err: any) => {
-          console.error("Error reading metadata:", err.message);
-          this.setState({loadingTag: false, errorTag: true});
-          setTimeout(() => {this.setState({errorTag: false})}, 3000);
-        });
-    }
-  }
-
-  onDetectBPM() {
-    const bpmError = () => {
-      this.setState({loadingBPM: false, errorBPM: true});
-      setTimeout(() => {
-        this.setState({errorBPM: false})
-      }, 3000);
-    }
-
-    const detectBPM = (data: ArrayBuffer) => {
-      let context = new AudioContext();
-      context.decodeAudioData(data, (buffer) => {
-        analyze(buffer)
-          .then((tempo: number) => {
-            this.changeKey('bpm', tempo.toFixed(2));
-            this.setState({loadingBPM: false, successBPM: true});
-            setTimeout(() => {
-              this.setState({successBPM: false})
-            }, 3000);
-          })
-          .catch((err: any) => {
-            console.error("Error analyzing");
-            console.error(err);
-            bpmError();
-          });
-      }, (err) => {
-        console.error(err);
-        bpmError();
-      });
-    }
-
-    if (this.props.audio.url && !this.state.loadingBPM) {
-      this.setState({loadingBPM: true});
-      try {
-        const url = this.props.audio.url;
-        if (existsSync(urlToPath(url))) {
-          detectBPM(toArrayBuffer(readFileSync(urlToPath(url))));
-        } else {
-          request.get({url, encoding: null}, function (err: Error, res: IncomingMessage, body: Buffer) {
-            if (err) {
-              console.error(err);
-              bpmError();
-              return;
-            }
-            detectBPM(toArrayBuffer(body));
-          });
-        }
-      } catch (e) {
-        console.error(e);
-        bpmError();
-      }
-    }
-
-  }
-
   tickLoop(starting: boolean = false) {
     if (!starting) {
       this.setState({tick: !this.state.tick});
@@ -608,85 +218,12 @@ class AudioControl extends React.Component {
     this._timeout = null;
   }
 
-  onOpenFile() {
-    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'MP3 Audio', extensions: ['mp3']}, {name: 'MPEG-4 Audio', extensions: ['mp4']}], properties: ['openFile']});
-    if (!result || !result.length) return;
-    this.changeKey('url', fileURL(result[0]));
-  }
-
-  onDeleteAudioTrack() {
-    this.update((s) => {
-      s.audioPlaylists[this.props.playlistIndex].splice(s.audioPlaylists[this.props.playlistIndex].map((a: Audio) => a.id).indexOf(this.props.audio.id), 1);
-    })
-  }
-
   onChangePosition(e: MouseEvent, value: number) {
     this.setState({position: value});
   }
 
-  blurAudioIntKey(key: string, e: MouseEvent) {
-    const min = (e.currentTarget as any).min ? (e.currentTarget as any).min : null;
-    const max = (e.currentTarget as any).max ? (e.currentTarget as any).max : null;
-    if (min && (this.props.scene as any)[key] < min) {
-      this.changeKey(key, min === '' ? '' : Number(min));
-    } else if (max && (this.props.scene as any)[key] > max) {
-      this.changeKey(key, max === '' ? '' : Number(max));
-    }
-  }
-
   onAudioSliderChange(key: string, e: MouseEvent, value: number) {
     this.changeKey(key, value);
-  }
-
-  onAudioIntInput(key: string, e: MouseEvent) {
-    const input = (e.target as HTMLInputElement);
-    this.changeKey(key, input.value === '' ? '' : Number(input.value));
-  }
-
-  onAudioInput(key: string, e: MouseEvent) {
-    const input = (e.target as HTMLInputElement);
-    this.changeKey(key, input.value);
-  }
-
-  onAudioBoolInput(key: string, e: MouseEvent) {
-    const input = (e.target as HTMLInputElement);
-    switch (key) {
-      case 'tick':
-        if (input.checked) {
-          this.update((s) => {
-            const audio = s.audioPlaylists[this.props.playlistIndex].find((a: Audio) => a.id == this.props.audio.id);
-            audio.tick = true;
-            audio.stopAtEnd = false;
-            audio.nextSceneAtEnd = false;
-          });
-        } else {
-          this.changeKey(key, false);
-        }
-        break;
-      case 'stopAtEnd':
-        if (input.checked) {
-          this.update((s) => {
-            const audio = s.audioPlaylists[this.props.playlistIndex].find((a: Audio) => a.id == this.props.audio.id);
-            audio.stopAtEnd = true;
-            audio.tick = false;
-            audio.nextSceneAtEnd = false;
-          });
-        } else {
-          this.changeKey(key, false);
-        }
-        break;
-      case 'nextSceneAtEnd':
-        if (input.checked) {
-          this.update((s) => {
-            const audio = s.audioPlaylists[this.props.playlistIndex].find((a: Audio) => a.id == this.props.audio.id);
-            audio.nextSceneAtEnd = true;
-            audio.tick = false;
-            audio.stopAtEnd = false;
-          });
-        } else {
-          this.changeKey(key, false);
-        }
-    }
   }
 
   changeKey(key: string, value: any) {
@@ -700,13 +237,12 @@ class AudioControl extends React.Component {
   onFinishedPlaying() {
     if (this.props.audio.stopAtEnd && this.props.goBack) {
       this.props.goBack();
-    }
-    if (this.props.audio.nextSceneAtEnd && this.props.playNextScene) {
+    } else if (this.props.audio.nextSceneAtEnd && this.props.playNextScene) {
       this.props.playNextScene();
       this.setState({position: 0, duration: 0});
-    }
-    if (!this.props.sidebar) {
-      this.setState({position: 0, playing: false});
+    } else {
+      this.props.onTrackEnd();
+      this.setState({position: 0, duration: 0});
     }
   }
 

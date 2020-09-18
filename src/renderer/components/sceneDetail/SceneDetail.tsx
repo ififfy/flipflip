@@ -322,6 +322,7 @@ class SceneDetail extends React.Component {
     tutorial: string,
     goBack(): void,
     onAddSource(scene: Scene, type: string, ...args: any[]): void,
+    onAddTracks(playlistIndex: number): void,
     onClearBlacklist(sourceURL: string): void,
     onClip(source: LibrarySource, displayed: Array<LibrarySource>): void,
     onCloneScene(scene: Scene): void,
@@ -567,6 +568,7 @@ class SceneDetail extends React.Component {
                   <Box p={2} className={classes.fill}>
                     <AudioTextEffects
                       scene={this.props.scene}
+                      onAddTracks={this.props.onAddTracks.bind(this)}
                       onUpdateScene={this.props.onUpdateScene.bind(this)} />
                   </Box>
                 </div>

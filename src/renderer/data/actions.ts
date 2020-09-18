@@ -568,9 +568,9 @@ export function openLibraryImport(state: State): Object {
   return {route: state.route.concat(new Route({kind: 'library', value: null})), specialMode: SP.select, librarySelected: []};
 }
 
-export function importAudioFromLibrary(state: State, sources: Array<LibrarySource>): Object {
-  // TODO
-  return {};
+export function importAudioFromLibrary(state: State, sources: Array<Audio>): Object {
+  const playlistIndex = state.route[state.route.length - 1].value;
+  return {...updateScene(state, getActiveScene(state), (s: Scene) => {s.audioPlaylists[playlistIndex] = s.audioPlaylists[playlistIndex].concat(sources)}), ...goBack(state)};
 }
 
 export function importFromLibrary(state: State, sources: Array<LibrarySource>): Object {
@@ -1827,6 +1827,10 @@ export function toggleTag(state: State, sourceID: number, tag: Tag): Object {
     }
   }
   return {library: newLibrary, scenes: newScenes};
+}
+
+export function addTracks(state: State, playlistIndex: number) {
+  return {route: state.route.concat(new Route({kind: 'audios', value: playlistIndex})), specialMode: SP.select, audioSelected: new Array<string>(), audioOpenTab: 3};
 }
 
 export function addSource(state: State, scene: Scene, type: string, ...args: any[]): Object {
