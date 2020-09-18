@@ -19,6 +19,10 @@ const styles = (theme: Theme) => createStyles({
     height: 0,
     paddingTop: "56.25%" // 16:9
   },
+  mediaIcon: {
+    width: '100%',
+    height: 'auto',
+  },
   underlineTitle: {
     textDecoration: 'underline',
   },
@@ -89,7 +93,7 @@ class AudioArtistList extends React.Component {
                   onMouseLeave={this.onMouseLeave.bind(this)}>
               <Avatar alt={a} src={thumb} className={clsx(classes.large, this.state.hover == a && classes.shadow)}>
                 {thumb == null && (
-                  <AudiotrackIcon/>
+                  <AudiotrackIcon className={classes.mediaIcon}/>
                 )}
               </Avatar>
               <Typography

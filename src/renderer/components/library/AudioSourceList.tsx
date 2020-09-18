@@ -38,6 +38,7 @@ import en from "../../data/en";
 import {analyze} from "web-audio-beat-detector";
 import request from "request";
 import {green, red} from "@material-ui/core/colors";
+import Playlist from "../../data/Playlist";
 
 const styles = (theme: Theme) => createStyles({
   emptyMessage: {
@@ -135,11 +136,13 @@ class AudioSourceList extends React.Component {
     selected: Array<string>,
     sources: Array<Audio>,
     yOffset: number,
+    playlist?: string,
     onClickAlbum(album: string): void,
     onClickArtist(artist: string): void,
     onPlay(source: Audio, displayed: Array<Audio>): void,
     onUpdateSelected(selected: Array<string>): void,
     onUpdateLibrary(fn: (library: Array<Audio>) => void): void,
+    onUpdatePlaylists(fn: (playlists: Array<Playlist>) => void): void,
     savePosition(): void,
     systemMessage(message: string): void,
   };
@@ -157,14 +160,25 @@ class AudioSourceList extends React.Component {
   };
 
   onSortEnd = ({oldIndex, newIndex}: {oldIndex: number, newIndex: number}) => {
-    this.props.onUpdateLibrary((l) => {
-      const oldIndexSource = this.props.sources[oldIndex];
-      const newIndexSource = this.props.sources[newIndex];
-      const libraryURLs = l.map((s: Audio) => s.url);
-      const oldLibraryIndex = libraryURLs.indexOf(oldIndexSource.url);
-      const newLibraryIndex = libraryURLs.indexOf(newIndexSource.url);
-      arrayMove(l, oldLibraryIndex, newLibraryIndex);
-    });
+    if (this.props.playlist) {
+      this.props.onUpdatePlaylists((pl) => {
+        const playlist = pl.find((p) => p.name == this.props.playlist);
+        const oldIndexSource = this.props.sources[oldIndex];
+        const newIndexSource = this.props.sources[newIndex];
+        const oldPlaylistIndex = playlist.audios.indexOf(oldIndexSource.id);
+        const newPlaylistIndex = playlist.audios.indexOf(newIndexSource.id);
+        arrayMove(playlist.audios, oldPlaylistIndex, newPlaylistIndex);
+      });
+    } else {
+      this.props.onUpdateLibrary((l) => {
+        const oldIndexSource = this.props.sources[oldIndex];
+        const newIndexSource = this.props.sources[newIndex];
+        const libraryURLs = l.map((s: Audio) => s.url);
+        const oldLibraryIndex = libraryURLs.indexOf(oldIndexSource.url);
+        const newLibraryIndex = libraryURLs.indexOf(newIndexSource.url);
+        arrayMove(l, oldLibraryIndex, newLibraryIndex);
+      });
+    }
   };
 
   render() {
@@ -518,7 +532,7 @@ class AudioSourceList extends React.Component {
                 margin="normal"
                 label="Album"
                 onChange={this.onEditSourceInfo.bind(this, 'album')}/>
-              <TextField
+              {/*<TextField
                 className={classes.inputShort}
                 value={this.state.sourceEdit.trackNum}
                 margin="normal"
@@ -527,7 +541,7 @@ class AudioSourceList extends React.Component {
                   min: 0,
                   type: 'number',
                 }}
-                onChange={this.onEditSourceInfo.bind(this, 'trackNum')}/>
+                onChange={this.onEditSourceInfo.bind(this, 'trackNum')}/>*/}
               <TextField
                 className={classes.inputFull}
                 value={this.state.sourceEdit.comment}
@@ -599,14 +613,26 @@ class AudioSourceList extends React.Component {
   }
 
   onRemove(source: Audio) {
-    this.props.onUpdateLibrary((l) => {
-      l.forEach((s, index) => {
-        if (s.id == source.id) {
-          l.splice(index, 1);
-          return;
-        }
+    if (this.props.playlist) {
+      this.props.onUpdatePlaylists((pl) => {
+        const playlist = pl.find((p) => p.name == this.props.playlist);
+        playlist.audios.forEach((a, index) => {
+          if (a == source.id) {
+            playlist.audios.splice(index, 1);
+            return;
+          }
+        });
       });
-    });
+    } else {
+      this.props.onUpdateLibrary((l) => {
+        l.forEach((s, index) => {
+          if (s.id == source.id) {
+            l.splice(index, 1);
+            return;
+          }
+        });
+      });
+    }
   }
 
   _lastChecked: string = null;
@@ -893,7 +919,7 @@ class AudioSourceList extends React.Component {
         itemSize={56}
         itemCount={this.props.sources.length}
         itemData={this.props.sources}
-        itemKey={(index: number, data: any) => data[index].id}
+        itemKey={(index: number, data: any) => index}
         overscanCount={10}>
         {this.Row.bind(this)}
       </FixedSizeList>
@@ -905,7 +931,7 @@ class AudioSourceList extends React.Component {
     const source: Audio = value.data[index];
     return (
       <AudioSourceListItem
-        key={source.id}
+        key={index}
         checked={this.props.isSelect ? this.props.selected.includes(source.url) : false}
         index={index}
         isSelect={this.props.isSelect}

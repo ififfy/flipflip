@@ -11,6 +11,7 @@ import Config from "./Config";
 import Scene from './Scene';
 import SceneGrid from "./SceneGrid";
 import defaultTheme from "./theme";
+import Playlist from "./Playlist";
 
 /**
  * A compile-time global variable defined in webpack.config' [plugins]
@@ -25,12 +26,10 @@ export const defaultInitialState = {
   grids: Array<SceneGrid>(),
   library: Array<LibrarySource>(),
   audios: Array<Audio>(),
+  playlists: Array<Playlist>(),
   tags: Array<Tag>(),
   route: Array<Route>(),
-  autoEdit: false,
-  isSelect: false,
-  isBatchTag: false,
-  isBatchEdit: false,
+  specialMode: null as string,
   openTab: 0,
   displayedSources: Array<LibrarySource>(),
   libraryYOffset: 0,
@@ -94,16 +93,14 @@ export default class AppStorage {
           // Create our initialState object
           this.initialState = {
             version: __VERSION__,
-            autoEdit: data.autoEdit,
-            isSelect: data.isSelect ? data.isSelect : false,
-            isBatchTag: data.isBatchTag ? data.isBatchTag : false,
-            isBatchEdit: data.isBatchEdit ? data.isBatchEdit : false,
+            specialMode: data.specialMode ? data.specialMode : null,
             openTab: data.openTab ? data.openTab : 0,
             displayedSources: Array<LibrarySource>(),
             config: data.config ? new Config(data.config) : new Config(),
             scenes: Array<Scene>(),
             grids: Array<SceneGrid>(),
             audios: Array<Audio>(),
+            playlists: Array<Playlist>(),
             library: Array<LibrarySource>(),
             tags: Array<Tag>(),
             route: data.route.map((s: any) => new Route(s)),
@@ -167,16 +164,14 @@ export default class AppStorage {
         case "3.0.0-beta2":
           this.initialState = {
             version: __VERSION__,
-            autoEdit: data.autoEdit,
-            isSelect: data.isSelect,
-            isBatchTag: data.isBatchTag,
-            isBatchEdit: data.isBatchEdit,
+            specialMode: data.specialMode,
             openTab: 0,
             displayedSources: Array<LibrarySource>(),
             config: new Config(data.config),
             scenes: data.scenes.map((s: any) => new Scene(s)),
             grids: Array<SceneGrid>(),
             audios: Array<Audio>(),
+            playlists: Array<Playlist>(),
             library: data.library.map((s: any) => new LibrarySource(s)),
             tags: data.tags.map((t: any) => new Tag(t)),
             route: [],
@@ -330,23 +325,21 @@ export default class AppStorage {
         default:
           this.initialState = {
             version: __VERSION__,
-            autoEdit: data.autoEdit,
-            isSelect: data.isSelect,
-            isBatchTag: data.isBatchTag,
-            isBatchEdit: data.isBatchEdit,
+            specialMode: data.specialMode,
             openTab: data.openTab,
             displayedSources: Array<LibrarySource>(),
             config: new Config(data.config),
             scenes: data.scenes.map((s: any) => new Scene(s)),
             grids: data.grids.map((g: any) => new SceneGrid(g)),
-            audios: data.audios.map((s: any) => new Audio(s)),
+            audios: data.audios.map((a: any) => new Audio(a)),
+            playlists: data.playlists.map((p: any) => new Playlist(p)),
             library: data.library.map((s: any) => new LibrarySource(s)),
             tags: data.tags.map((t: any) => new Tag(t)),
             route: data.route.map((s: any) => new Route(s)),
             libraryYOffset: 0,
             libraryFilters: Array<string>(),
             librarySelected: Array<string>(),
-            audioOpenTab: data.audioOpenTab ? data.audioOpenTab : 3,
+            audioOpenTab: data.audioOpenTab,
             audioYOffset: 0,
             audioFilters: Array<string>(),
             audioSelected: Array<string>(),

@@ -156,6 +156,8 @@ const MO = { // Menu/Modal Constants
   sort: 'mo.sort',
   batchTag: 'mo.batchtag',
   batchEdit: 'mo.batchedit',
+  playlist: 'mo.playlist',
+  newPlaylist: 'mo.newplaylist',
   urlImport: 'mo.urlimport',
   newWindowAlert: 'mo.nwalert',
   removeAllAlert: 'mo.raalert',
@@ -329,6 +331,14 @@ const EA = { // Easings
   backInOut: 'ea.backInOut',
 }
 
+const SP = { // Special modes
+  addToPlaylist: 'sp.addToPlaylist',
+  autoEdit: 'sp.autoEdit',
+  batchTag: 'sp.batchTag',
+  batchEdit: 'sp.batchEdit',
+  select: 'sp.select',
+}
+
 export {
-  TF, WF, SOF, OF, IF, GO, VO, HTF, VTF, BT, SC, IT, GT, TT, SF, ASF, ST, SL, AF, IPC, MO, PR, SB, IG, RF, RT, SPT, SDT, PT, LT, SDGT, SGT, VCT, EA, DONE
+  SP, TF, WF, SOF, OF, IF, GO, VO, HTF, VTF, BT, SC, IT, GT, TT, SF, ASF, ST, SL, AF, IPC, MO, PR, SB, IG, RF, RT, SPT, SDT, PT, LT, SDGT, SGT, VCT, EA, DONE
 };

@@ -26,7 +26,7 @@ export default class Audio {
   artist: string;
   album: string;
   duration: number;
-  trackNum: number;
+  trackNum: number; // TODO Do something or remove along with input
   comment: string;
 
   constructor(init?: Partial<Audio>) {

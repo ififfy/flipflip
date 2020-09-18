@@ -7,7 +7,7 @@ import {
 import {ThemeProvider} from "@material-ui/styles";
 
 import {getCachePath} from "../data/utils";
-import {IPC} from "../data/const";
+import {IPC, SP} from "../data/const";
 import * as actions from '../data/actions';
 import AppStorage from '../data/AppStorage';
 import FFAnalytics from "./FFAnalytics";
@@ -120,7 +120,7 @@ export default class Meta extends React.Component {
 
           {this.isRoute('scene') && (
             <SceneDetail
-              autoEdit={this.state.autoEdit}
+              autoEdit={this.state.specialMode == SP.autoEdit}
               allScenes={this.state.scenes}
               config={this.state.config}
               library={this.state.library}
@@ -150,14 +150,13 @@ export default class Meta extends React.Component {
             <Library
               config={this.state.config}
               filters={this.state.libraryFilters}
-              isBatchTag={this.state.isBatchTag}
-              isSelect={this.state.isSelect}
               library={this.state.library}
               progressCurrent={this.state.progressCurrent}
               progressMode={this.state.progressMode}
               progressTitle={this.state.progressTitle}
               progressTotal={this.state.progressTotal}
               selected={this.state.librarySelected}
+              specialMode={this.state.specialMode}
               tags={this.state.tags}
               tutorial={this.state.tutorial}
               yOffset={this.state.libraryYOffset}
@@ -190,20 +189,16 @@ export default class Meta extends React.Component {
             <AudioLibrary
               cachePath={getCachePath(null, this.state.config)}
               filters={this.state.audioFilters}
-              isBatchTag={this.state.isBatchTag}
-              isBatchEdit={this.state.isBatchEdit}
-              isSelect={this.state.isSelect}
               library={this.state.audios}
               openTab={this.state.audioOpenTab}
-              progressCurrent={this.state.progressCurrent}
-              progressMode={this.state.progressMode}
-              progressTitle={this.state.progressTitle}
-              progressTotal={this.state.progressTotal}
+              playlists={this.state.playlists}
               selected={this.state.audioSelected}
+              specialMode={this.state.specialMode}
               tags={this.state.tags}
               tutorial={this.state.tutorial}
               yOffset={this.state.audioYOffset}
               goBack={a(actions.goBack)}
+              onAddToPlaylist={a(actions.addToPlaylist)}
               onBatchTag={a(actions.batchTag)}
               onBatchEdit={a(actions.batchEdit)}
               onChangeTab={a(actions.changeAudioLibraryTab)}
@@ -211,11 +206,12 @@ export default class Meta extends React.Component {
               onImportFromLibrary={a(actions.importAudioFromLibrary)}
               onImportLibrary={a(actions.importAudioLibrary, appStorage.backup.bind(appStorage))}
               onManageTags={a(actions.manageTags)}
-              onMarkOffline={p(actions.markOffline)}
               onPlay={a(actions.playAudio)}
               onSort={a(actions.sortAudioSources)}
+              onSortPlaylist={a(actions.sortPlaylist)}
               onTutorial={a(actions.doneTutorial)}
               onUpdateLibrary={a(actions.updateAudioLibrary)}
+              onUpdatePlaylists={a(actions.updatePlaylists)}
               onUpdateMode={a(actions.setMode)}
               savePosition={a(actions.saveAudioPosition)}
               systemMessage={a(actions.systemMessage)}
@@ -251,7 +247,7 @@ export default class Meta extends React.Component {
           {this.isRoute('grid') && (
             <GridSetup
               allScenes={this.state.scenes}
-              autoEdit={this.state.autoEdit}
+              autoEdit={this.state.specialMode == SP.autoEdit}
               grid={grid}
               tutorial={this.state.tutorial}
               goBack={a(actions.goBack)}

@@ -101,18 +101,21 @@ const styles = (theme: Theme) => createStyles({
   trackName: {
     maxWidth: 400,
     width: '100%',
+    userSelect: 'none',
   },
   trackDuration: {
     width: 75,
     textAign: 'end',
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(3),
+    userSelect: 'none',
   },
   artistContainer: {
     minWidth: 225,
   },
   trackArtist: {
     display: 'inline-block',
+    userSelect: 'none',
     cursor: 'pointer',
     '&:hover': {
       textDecoration: 'underline',
@@ -123,6 +126,7 @@ const styles = (theme: Theme) => createStyles({
   },
   trackAlbum: {
     display: 'inline-block',
+    userSelect: 'none',
     cursor: 'pointer',
     '&:hover': {
       textDecoration: 'underline',

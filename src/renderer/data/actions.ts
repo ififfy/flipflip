@@ -25,7 +25,7 @@ import {
 } from "./utils";
 import defaultTheme from "./theme";
 import {
-  AF, ASF, BT, DONE, GT, HTF, IF, IT, LT, OF, PR, PT, SDGT, SDT, SF, SGT, SL, SOF, SPT, ST, TF, TT, VCT, VTF
+  AF, ASF, BT, DONE, GT, HTF, IF, IT, LT, OF, PR, PT, SDGT, SDT, SF, SGT, SL, SOF, SP, SPT, ST, TF, TT, VCT, VTF
 } from "./const";
 import { defaultInitialState } from './AppStorage';
 import { Route } from "./Route";
@@ -38,6 +38,7 @@ import LibrarySource from "../data/LibrarySource";
 import Overlay from "../data/Overlay";
 import Tag from "../data/Tag";
 import SceneGrid from "./SceneGrid";
+import Playlist from "./Playlist";
 
 type State = typeof defaultInitialState;
 
@@ -116,16 +117,14 @@ export function restoreFromBackup(state: State, backupFile: string): Object {
   const data = JSON.parse(fs.readFileSync(backupFile, 'utf-8'));
   return {
     version: data.version,
-    autoEdit: data.autoEdit,
-    isSelect: data.isSelect,
-    isBatchTag: data.isBatchTag,
-    isBatchEdit: data.isBatchEdit,
+    specialMode: data.specialMode ? data.specialMode : null,
     openTab: data.openTab ? data.openTab : 0,
     displayedSources: Array<LibrarySource>(),
     config: new Config(data.config),
     scenes: data.scenes.map((s: any) => new Scene(s)),
     grids: data.grids ? data.grids.map((g: any) => new SceneGrid(g)) : Array<SceneGrid>(),
     audios: data.audios ? data.audios.map((a: any) => new Audio(a)) : Array <Audio>(),
+    playlists: data.playlists ? data.playlists.map((p: any) => new Playlist(p)) : Array <Playlist>(),
     library: data.library.map((s: any) => new LibrarySource(s)),
     tags: data.tags.map((t: any) => new Tag(t)),
     route: data.route.map((s: any) => new Route(s)),
@@ -367,7 +366,7 @@ export function printMemoryReport() {
 
 export function goBack(state: State): Object {
   const newRoute = state.route.slice(0, state.route.length - 1);
-  return {route: newRoute, autoEdit: false, isSelect: false};
+  return {route: newRoute, specialMode: null};
 }
 
 export function cloneScene(state: State, scene: Scene): Object {
@@ -380,7 +379,7 @@ export function cloneScene(state: State, scene: Scene): Object {
   return {
     scenes: state.scenes.concat([sceneCopy]),
     route: [new Route({kind: 'scene', value: sceneCopy.id})],
-    autoEdit: true,
+    specialMode: SP.autoEdit,
     systemSnack: "Clone successful!"
   };
 }
@@ -397,7 +396,7 @@ export function saveScene(state: State, scene: Scene): Object {
   return {
     scenes: state.scenes.concat([sceneCopy]),
     route: [new Route({kind: 'scene', value: sceneCopy.id})],
-    autoEdit: true,
+    specialMode: SP.autoEdit,
     systemSnack: "Save successful!"
   };
 }
@@ -462,7 +461,7 @@ export function addScene(state: State): Object {
     scenes: state.scenes.concat([scene]),
     tutorial: newTutorial,
     route: [new Route({kind: 'scene', value: scene.id})],
-    autoEdit: !tutorial,
+    specialMode: !tutorial ? SP.autoEdit : null,
   };
 }
 
@@ -491,8 +490,7 @@ export function deleteScene(state: State, scene: Scene): Object {
     scenes: newScenes,
     grids: newGrids,
     route: Array<Route>(),
-    autoEdit: false,
-    isSeleft: false,
+    specialMode: null,
   };
 }
 
@@ -501,8 +499,7 @@ export function deleteGrid(state: State, grid: SceneGrid): Object {
   return {
     grids: newGrids,
     route: Array<Route>(),
-    autoEdit: false,
-    isSeleft: false,
+    specialMode: null,
   };
 }
 
@@ -568,7 +565,7 @@ export function openAudios(state: State): Object {
 }
 
 export function openLibraryImport(state: State): Object {
-  return {route: state.route.concat(new Route({kind: 'library', value: null})), isSelect: true, librarySelected: []};
+  return {route: state.route.concat(new Route({kind: 'library', value: null})), specialMode: SP.select, librarySelected: []};
 }
 
 export function importAudioFromLibrary(state: State, sources: Array<LibrarySource>): Object {
@@ -805,7 +802,7 @@ export function addGrid(state: State): Object {
   return {
     grids: state.grids.concat([grid]),
     route: [new Route({kind: 'grid', value: grid.id})],
-    autoEdit: true,
+    specialMode: SP.autoEdit,
     tutorial: state.config.tutorials.sceneGrid == null ? SGT.welcome : null
   };
 }
@@ -826,7 +823,7 @@ export function addGenerator(state: State): Object {
   return {
     scenes: state.scenes.concat([scene]),
     route: [new Route({kind: 'scene', value: scene.id})],
-    autoEdit: true,
+    specialMode: SP.autoEdit,
     tutorial: state.config.tutorials.sceneGenerator == null ? SDGT.welcome : null
   };
 }
@@ -1553,11 +1550,16 @@ export function replaceGrids(state: State, grids: Array<SceneGrid>): Object {
   return {grids: grids};
 }
 
+export function updatePlaylists(state: State, fn: (playlists: Array<Playlist>) => void): Object {
+  const playlistsCopy = JSON.parse(JSON.stringify(state.playlists));
+  fn(playlistsCopy);
+  return {playlists: playlistsCopy};
+}
+
 export function updateAudioLibrary(state: State, fn: (audios: Array<Audio>) => void): Object {
   const audiosCopy = JSON.parse(JSON.stringify(state.audios));
   fn(audiosCopy);
   return {audios: audiosCopy};
-
 }
 
 export function updateLibrary(state: State, fn: (library: Array<LibrarySource>) => void): Object {
@@ -1769,12 +1771,29 @@ export function updateTags(state: State, tags: Array<Tag>): Object {
   return {tags: tags, library: newLibrary};
 }
 
+export function addToPlaylist(state: State): Object {
+  if (state.specialMode == SP.addToPlaylist) {
+    return {specialMode: null, audioOpenTab: 3};
+  } else {
+    return {specialMode: SP.addToPlaylist, audioOpenTab: 3};
+  }
+}
+
 export function batchTag(state: State): Object {
-  return {isBatchTag: !state.isBatchTag, audioOpenTab: 3};
+  if (state.specialMode == SP.batchTag) {
+    return {specialMode: null, audioOpenTab: 3};
+  } else {
+    return {specialMode: SP.batchTag, audioOpenTab: 3};
+  }
+
 }
 
 export function batchEdit(state: State): Object {
-  return {isBatchEdit: !state.isBatchEdit, audioOpenTab: 3};
+  if (state.specialMode == SP.batchEdit) {
+    return {specialMode: null, audioOpenTab: 3};
+  } else {
+    return {specialMode: SP.batchEdit, audioOpenTab: 3};
+  }
 }
 
 export function toggleAudioTag(state: State, sourceID: number, tag: Tag): Object {
@@ -2030,8 +2049,17 @@ export function sortScene(state: State, algorithm: string, ascending: boolean): 
   return {scenes: newScenes}
 }
 
-export function sortAudioSources(state: State, algorithm: string, ascending: boolean): Object {
+export function sortPlaylist(state: State, playlistName: string, algorithm: string, ascending: boolean): Object {
+  const newPlaylists = Array.from(state.playlists);
+  const playlist = newPlaylists.find((p) => p.name == playlistName);
+  if (playlist) {
+    playlist.audios = playlist.audios.map((aID) => state.audios.find((a) => a.id==aID)).concat().sort(audioSortFunction(algorithm, ascending)).map((a) => a.id);
+    return {playlists: newPlaylists};
+  }
+  return {};
+}
 
+export function sortAudioSources(state: State, algorithm: string, ascending: boolean): Object {
   const newLibrary = state.audios.concat().sort(audioSortFunction(algorithm, ascending));
   return {audios: newLibrary};
 }

@@ -32,7 +32,7 @@ import PublishIcon from '@material-ui/icons/Publish';
 import SelectAllIcon from '@material-ui/icons/SelectAll';
 import SortIcon from '@material-ui/icons/Sort';
 
-import {AF, LT, MO, PR, SF, ST} from "../../data/const";
+import {AF, LT, MO, PR, SF, SP, ST} from "../../data/const";
 import {getCachePath, getLocalPath, getSourceType} from "../../data/utils";
 import en from "../../data/en";
 import Config from "../../data/Config";
@@ -294,14 +294,13 @@ class Library extends React.Component {
     classes: any,
     config: Config,
     filters: Array<string>,
-    isBatchTag: boolean,
-    isSelect: boolean,
     library: Array<LibrarySource>,
     progressCurrent: number,
     progressMode: string,
     progressTitle: string,
     progressTotal: number,
     selected: Array<string>,
+    specialMode: string,
     tags: Array<Tag>,
     tutorial: string,
     yOffset: number,
@@ -371,7 +370,7 @@ class Library extends React.Component {
         <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift, this.props.tutorial == LT.toolbar && clsx(classes.backdropTop, classes.disable))}>
           <Toolbar className={classes.headerBar}>
             <div className={classes.headerLeft}>
-              <Tooltip title={this.props.isSelect ? "Cancel Import" : "Back"} placement="right-end">
+              <Tooltip title={this.props.specialMode == SP.select ? "Cancel Import" : "Back"} placement="right-end">
                 <IconButton
                   edge="start"
                   color="inherit"
@@ -419,7 +418,7 @@ class Library extends React.Component {
         <Drawer
           className={clsx(classes.drawer, (this.props.tutorial == LT.sidebar1 || this.props.tutorial == LT.sidebar2 || this.state.drawerOpen) && classes.backdropTop, this.props.tutorial == LT.sidebar2 && classes.highlight)}
           variant="permanent"
-          classes={{paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose, (this.props.isSelect || this.props.isBatchTag) && classes.drawerPaperHidden)}}
+          classes={{paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose, this.props.specialMode && classes.drawerPaperHidden)}}
           open={this.state.drawerOpen}>
           <div className={clsx(!open && classes.appBarSpacerWrapper)}>
             <Collapse in={!open}>
@@ -588,13 +587,13 @@ class Library extends React.Component {
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
           <div className={clsx(classes.root, classes.fill)}>
-            {!this.props.isSelect && !this.props.isBatchTag &&  (
+            {!this.props.specialMode &&  (
               <div className={classes.drawerSpacer}/>
             )}
             <Container maxWidth={false} className={clsx(classes.container, this.state.displaySources.length > 0 && classes.containerNotEmpty)}>
               <SourceList
                 config={this.props.config}
-                isSelect={this.props.isSelect || this.props.isBatchTag}
+                isSelect={!!this.props.specialMode}
                 library={this.props.library}
                 selected={this.state.selected}
                 sources={this.state.displaySources}
@@ -616,7 +615,7 @@ class Library extends React.Component {
           onClick={this.onCloseDialog.bind(this)}
           open={this.props.tutorial == null && (this.state.openMenu == MO.new || this.state.drawerOpen)} />
 
-        {(this.props.isSelect || this.props.isBatchTag) && (
+        {this.props.specialMode && (
           <React.Fragment>
             <Tooltip title="Clear"  placement="top-end">
               <Fab
@@ -634,7 +633,7 @@ class Library extends React.Component {
                 <SelectAllIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip title={this.props.isBatchTag ? "Batch Tag" : "Import"}  placement="top-end">
+            <Tooltip title={this.props.specialMode == SP.batchTag ? "Batch Tag" : "Import"}  placement="top-end">
               <Badge
                 className={classes.importBadge}
                 color="secondary"
@@ -643,12 +642,12 @@ class Library extends React.Component {
                 <Fab
                   className={classes.addMenuButton}
                   disabled={this.state.selected.length == 0}
-                  onClick={this.props.isBatchTag ? this.onToggleBatchTagModal.bind(this) : this.onImportFromLibrary.bind(this)}
+                  onClick={this.props.specialMode == SP.batchTag ? this.onToggleBatchTagModal.bind(this) : this.onImportFromLibrary.bind(this)}
                   size="large">
-                  {this.props.isSelect && (
+                  {this.props.specialMode == SP.select && (
                     <GetAppIcon className={classes.icon} />
                   )}
-                  {this.props.isBatchTag && (
+                  {this.props.specialMode == SP.batchTag && (
                     <LocalOfferIcon className={classes.icon} />
                   )}
                 </Fab>
@@ -657,7 +656,7 @@ class Library extends React.Component {
           </React.Fragment>
         )}
 
-        {!this.props.isSelect && !this.props.isBatchTag && (
+        {!this.props.specialMode && (
           <React.Fragment>
             {this.props.library.length > 0 && (
               <Tooltip title={this.state.filters.length == 0 ? "Delete All Sources" : "Delete These Sources"}  placement="left">
@@ -714,6 +713,7 @@ class Library extends React.Component {
             <Tooltip title={this.state.filters.length > 0 ? "" : "Local Video/Playlist"}  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addVideoButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
+                disabled={this.state.filters.length > 0}
                 onClick={this.onAddSource.bind(this, AF.videos)}
                 size="small">
                 <MovieIcon className={classes.icon} />
@@ -722,6 +722,7 @@ class Library extends React.Component {
             <Tooltip title={this.state.filters.length > 0 ? "" : "Local Directory"}  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addDirectoryButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
+                disabled={this.state.filters.length > 0}
                 onClick={this.onAddSource.bind(this, AF.directory)}
                 size="small">
                 <FolderIcon className={classes.icon} />
@@ -730,6 +731,7 @@ class Library extends React.Component {
             <Tooltip title={this.state.filters.length > 0 ? "" : "URL"}  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addURLButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
+                disabled={this.state.filters.length > 0}
                 onClick={this.onAddSource.bind(this, AF.url)}
                 size="small">
                 <HttpIcon className={classes.icon} />
@@ -983,7 +985,7 @@ class Library extends React.Component {
   }
 
   goBack() {
-    if (this.props.isBatchTag) {
+    if (this.props.specialMode == SP.batchTag) {
       this.setState({selected: [], selectedTags: []});
       this.props.onBatchTag();
     } else {

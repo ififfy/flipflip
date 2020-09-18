@@ -3,6 +3,8 @@ import clsx from "clsx";
 
 import {Card, CardContent, CardMedia, createStyles, Grid, Theme, Tooltip, Typography, withStyles} from "@material-ui/core";
 
+import AudiotrackIcon from '@material-ui/icons/Audiotrack';
+
 import Audio from "../../data/Audio";
 
 const styles = (theme: Theme) => createStyles({
@@ -16,6 +18,10 @@ const styles = (theme: Theme) => createStyles({
   media: {
     height: 0,
     paddingTop: "100%" // 16:9  = 56.25%
+  },
+  mediaIcon: {
+    width: '100%',
+    height: 'auto',
   },
   underlineTitle: {
     textDecoration: 'underline',
@@ -81,11 +87,15 @@ class AudioAlbumList extends React.Component {
                   onMouseEnter={this.onMouseEnter.bind(this, a)}
                   onMouseLeave={this.onMouseLeave.bind(this)}>
               <Card classes={{root: classes.root}}>
-                <CardMedia
-                  className={classes.media}
-                  image={thumb}
-                  title={a}
-                />
+                {thumb &&  (
+                  <CardMedia
+                    className={classes.media}
+                    image={thumb}
+                    title={a}/>
+                )}
+                {!thumb && (
+                  <AudiotrackIcon className={classes.mediaIcon}/>
+                )}
                 <CardContent classes={{root: classes.cardContent}}>
                   <Tooltip title={a} enterDelay={800}>
                     <Typography

@@ -7,8 +7,8 @@ import wretch from "wretch";
 
 import {
   AppBar, Backdrop, Badge, Box, Button, Chip, CircularProgress, Collapse, Container, createStyles, Dialog,
-  DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Drawer, Fab, IconButton, LinearProgress,
-  ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Menu, MenuItem, Tab, Tabs, TextField, Theme, Toolbar,
+  DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Drawer, Fab, IconButton, ListItem,
+  ListItemIcon, ListItemSecondaryAction, ListItemText, Menu, MenuItem, Tab, Tabs, TextField, Theme, Toolbar,
   Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
@@ -18,7 +18,6 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import AudiotrackIcon from '@material-ui/icons/Audiotrack';
-import CancelIcon from '@material-ui/icons/Cancel';
 import ClearIcon from '@material-ui/icons/Clear';
 import DeleteIcon from "@material-ui/icons/Delete";
 import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
@@ -28,8 +27,8 @@ import GetAppIcon from '@material-ui/icons/GetApp';
 import HttpIcon from '@material-ui/icons/Http';
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import MenuIcon from'@material-ui/icons/Menu';
-import OfflineBoltIcon from '@material-ui/icons/OfflineBolt';
 import PersonIcon from '@material-ui/icons/Person';
+import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
 import QueueMusicIcon from '@material-ui/icons/QueueMusic';
 import SelectAllIcon from '@material-ui/icons/SelectAll';
 import SortIcon from '@material-ui/icons/Sort';
@@ -37,15 +36,17 @@ import SortIcon from '@material-ui/icons/Sort';
 import {red} from "@material-ui/core/colors";
 
 import {generateThumbnailFile, isAudio, isImage} from "../../data/utils";
-import {AF, ASF, LT, MO, PR} from "../../data/const";
+import {AF, ASF, LT, MO, PR, SDGT, SP} from "../../data/const";
 import en from "../../data/en";
 import Audio from "../../data/Audio";
-import Scene from "../../data/Scene";
+import Playlist from "../../data/Playlist";
 import Tag from "../../data/Tag";
 import LibrarySearch from "./LibrarySearch";
 import AudioSourceList from "./AudioSourceList";
 import AudioArtistList from "./AudioArtistList";
 import AudioAlbumList from "./AudioAlbumList";
+import PlaylistSelect from "../configGroups/PlaylistSelect";
+import PlaylistList from "./PlaylistList";
 
 const drawerWidth = 240;
 
@@ -260,6 +261,10 @@ const styles = (theme: Theme) => createStyles({
   sortMenu: {
     width: 200,
   },
+  playlistMenu: {
+    minHeight: 365,
+    minWidth: 250,
+  },
   fill: {
     flexGrow: 1,
   },
@@ -397,20 +402,16 @@ class AudioLibrary extends React.Component {
     classes: any,
     cachePath: string,
     filters: Array<string>,
-    isBatchTag: boolean,
-    isBatchEdit: boolean,
-    isSelect: boolean,
     library: Array<Audio>,
     openTab: number,
-    progressCurrent: number,
-    progressMode: string,
-    progressTitle: string,
-    progressTotal: number,
+    playlists: Array<Playlist>,
     selected: Array<string>,
+    specialMode: string,
     tags: Array<Tag>,
     tutorial: string,
     yOffset: number,
     goBack(): void,
+    onAddToPlaylist(): void,
     onBatchTag(): void,
     onBatchEdit(): void,
     onChangeTab(newTab: number): void,
@@ -418,11 +419,12 @@ class AudioLibrary extends React.Component {
     onImportFromLibrary(sources: Array<Audio>): void,
     onImportLibrary(): void,
     onManageTags(): void,
-    onMarkOffline(): void,
     onPlay(source: Audio, displayed: Array<Audio>): void,
-    onSort(scene: Scene, algorithm: string, ascending: boolean): void,
+    onSort(algorithm: string, ascending: boolean): void,
+    onSortPlaylist(playist: string, algorithm: string, ascending: boolean): void,
     onTutorial(tutorial: string): void,
     onUpdateLibrary(fn: (library: Array<Audio>) => void): void,
+    onUpdatePlaylists(fn: (playlists: Array<Playlist>) => void): void,
     onUpdateMode(mode: string): void,
     savePosition(yOffset: number, filters:Array<string>, selected: Array<string>): void,
     systemMessage(message: string): void,
@@ -445,20 +447,13 @@ class AudioLibrary extends React.Component {
   render() {
     const classes = this.props.classes;
     const open = this.state.drawerOpen;
-
-    let cancelProgressMessage;
-    switch (this.props.progressMode) {
-      case PR.audioOffline:
-        cancelProgressMessage = "Cancel Offline Check";
-        break;
-    }
-
+    const playlist = this.state.filters.find((f) => f.startsWith("playlist:"))?.replace("playlist:", "");
     return (
       <div className={classes.root}>
         <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift, this.props.tutorial == LT.toolbar && clsx(classes.backdropTop, classes.disable))}>
           <Toolbar className={classes.headerBar}>
             <div className={classes.headerLeft}>
-              <Tooltip title={this.props.isSelect ? "Cancel Import" : "Back"} placement="right-end">
+              <Tooltip title={this.props.specialMode == SP.select ? "Cancel Import" : "Back"} placement="right-end">
                 <IconButton
                   edge="start"
                   color="inherit"
@@ -507,7 +502,7 @@ class AudioLibrary extends React.Component {
         <Drawer
           className={clsx(classes.drawer, (this.props.tutorial == LT.sidebar1 || this.props.tutorial == LT.sidebar2 || this.state.drawerOpen) && classes.backdropTop, this.props.tutorial == LT.sidebar2 && classes.highlight)}
           variant="permanent"
-          classes={{paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose, (this.props.isSelect || this.props.isBatchTag || this.props.isBatchEdit) && classes.drawerPaperHidden)}}
+          classes={{paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose, this.props.specialMode && classes.drawerPaperHidden)}}
           open={this.state.drawerOpen}>
           <div className={clsx(!open && classes.appBarSpacerWrapper)}>
             <Collapse in={!open}>
@@ -571,6 +566,14 @@ class AudioLibrary extends React.Component {
                 )}
               </ListItem>
             </Tooltip>
+            <Tooltip title={this.state.drawerOpen ? "" : "Add to Playlist"}>
+              <ListItem button onClick={this.onAddToPlaylist.bind(this)}>
+                <ListItemIcon>
+                  <PlaylistAddIcon />
+                </ListItemIcon>
+                <ListItemText primary="Add to Playlist" />
+              </ListItem>
+            </Tooltip>
             <Tooltip title={this.state.drawerOpen ? "" : "Batch Tag"}>
               <ListItem button onClick={this.onBatchTag.bind(this)}>
                 <ListItemIcon>
@@ -588,39 +591,6 @@ class AudioLibrary extends React.Component {
               </ListItem>
             </Tooltip>
           </div>
-
-          <Divider />
-
-          <div className={clsx(this.props.tutorial != null && classes.disable)}>
-            <Tooltip title={"Identify sources which are not accessible"}>
-              <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onMarkOffline.bind(this)}>
-                <ListItemIcon>
-                  <OfflineBoltIcon />
-                </ListItemIcon>
-                <ListItemText primary="Mark Offline" />
-              </ListItem>
-            </Tooltip>
-          </div>
-
-          {this.props.progressMode != null && (
-            <React.Fragment>
-              <Divider />
-
-              <div>
-                <Tooltip title={this.state.drawerOpen ? "" : cancelProgressMessage}>
-                  <ListItem button onClick={this.props.onUpdateMode.bind(this, PR.cancel)}>
-                    <ListItemIcon>
-                      <CancelIcon color="error"/>
-                    </ListItemIcon>
-                    <ListItemText primary={cancelProgressMessage} />
-                  </ListItem>
-                </Tooltip>
-                {this.props.progressMode === PR.audioOffline && (
-                  <LinearProgress variant="determinate" value={Math.round((this.props.progressCurrent / this.props.progressTotal) * 100)}/>
-                )}
-              </div>
-            </React.Fragment>
-          )}
 
           <div className={classes.fill}/>
 
@@ -658,6 +628,10 @@ class AudioLibrary extends React.Component {
                 <div className={classes.tabPanel}>
                   <div className={classes.drawerSpacer}/>
                   <Box p={2} className={classes.fill}>
+                    <PlaylistList
+                      playlists={this.props.playlists}
+                      audios={this.props.library}
+                      onClickPlaylist={this.onClickPlaylist.bind(this)}/>
                   </Box>
                 </div>
               </Typography>
@@ -711,21 +685,23 @@ class AudioLibrary extends React.Component {
                 id="vertical-tabpanel-3"
                 aria-labelledby="vertical-tab-3">
                 <div className={classes.tabPanel}>
-                  {!this.props.isSelect && !this.props.isBatchTag && !this.props.isBatchEdit &&  (
+                  {!this.props.specialMode &&  (
                     <div className={classes.drawerSpacer}/>
                   )}
                   <Box className={classes.fill}>
                     <AudioSourceList
                       cachePath={this.props.cachePath}
-                      isSelect={this.props.isSelect || this.props.isBatchTag || this.props.isBatchEdit}
+                      isSelect={!!this.props.specialMode}
                       selected={this.state.selected}
                       sources={this.state.displaySources}
                       yOffset={this.props.yOffset}
+                      playlist={playlist}
                       onClickAlbum={this.onClickAlbum.bind(this)}
                       onClickArtist={this.onClickArtist.bind(this)}
                       onPlay={this.props.onPlay.bind(this)}
                       onUpdateSelected={this.onUpdateSelected.bind(this)}
                       onUpdateLibrary={this.props.onUpdateLibrary.bind(this)}
+                      onUpdatePlaylists={this.props.onUpdatePlaylists.bind(this)}
                       savePosition={this.savePosition.bind(this)}
                       systemMessage={this.props.systemMessage.bind(this)}/>
                   </Box>
@@ -741,7 +717,7 @@ class AudioLibrary extends React.Component {
           onClick={this.onCloseDialog.bind(this)}
           open={this.props.tutorial == null && (this.state.openMenu == MO.new || this.state.drawerOpen)} />
 
-        {(this.props.isSelect || this.props.isBatchTag || this.props.isBatchEdit) && (
+        {(this.props.specialMode) && (
           <React.Fragment>
             <Tooltip title="Clear"  placement="top-end">
               <Fab
@@ -759,7 +735,7 @@ class AudioLibrary extends React.Component {
                 <SelectAllIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            {this.props.isBatchTag && (
+            {this.props.specialMode == SP.batchTag && (
               <Tooltip title={"Batch Tag"}  placement="top-end">
                 <Badge
                   className={classes.importBadge}
@@ -776,7 +752,7 @@ class AudioLibrary extends React.Component {
                 </Badge>
               </Tooltip>
             )}
-            {this.props.isBatchEdit && (
+            {this.props.specialMode == SP.batchEdit && (
               <Tooltip title={"Batch Edit"}  placement="top-end">
                 <Badge
                   className={classes.importBadge}
@@ -793,7 +769,24 @@ class AudioLibrary extends React.Component {
                 </Badge>
               </Tooltip>
             )}
-            {!this.props.isBatchTag && !this.props.isBatchEdit && (
+            {this.props.specialMode == SP.addToPlaylist && (
+              <Tooltip title={"Add to Playlist"}  placement="top-end">
+                <Badge
+                  className={classes.importBadge}
+                  color="secondary"
+                  badgeContent={this.state.selected.length}
+                  max={999}>
+                  <Fab
+                    className={classes.addMenuButton}
+                    disabled={this.state.selected.length == 0}
+                    onClick={this.onTogglePlaylistDialog.bind(this)}
+                    size="large">
+                    <PlaylistAddIcon className={classes.icon} />
+                  </Fab>
+                </Badge>
+              </Tooltip>
+            )}
+            {this.props.specialMode == SP.select && (
               <Tooltip title={"Import"}  placement="top-end">
                 <Badge
                   className={classes.importBadge}
@@ -814,10 +807,10 @@ class AudioLibrary extends React.Component {
           </React.Fragment>
         )}
 
-        {!this.props.isSelect && !this.props.isBatchTag && !this.props.isBatchEdit && this.props.openTab == 3 && (
+        {!this.props.specialMode && this.props.openTab == 3 && (
           <React.Fragment>
             {this.props.library.length > 0 && (
-              <Tooltip title={this.state.filters.length == 0 ? "Delete All Sources" : "Delete These Sources"}  placement="left">
+              <Tooltip title={this.state.filters.length == 0 ? "Delete All Sources" : playlist ? "Delete Playlist" : "Delete These Sources"}  placement="left">
                 <Fab
                   className={classes.removeAllButton}
                   onClick={this.onRemoveAll.bind(this)}
@@ -849,7 +842,7 @@ class AudioLibrary extends React.Component {
                   </DialogActions>
                 </React.Fragment>
               )}
-              {this.state.filters.length > 0 && (
+              {this.state.filters.length > 0 && !playlist && (
                 <React.Fragment>
                   <DialogTitle id="remove-all-title">Delete Sources</DialogTitle>
                   <DialogContent>
@@ -867,10 +860,29 @@ class AudioLibrary extends React.Component {
                   </DialogActions>
                 </React.Fragment>
               )}
+              {this.state.filters.length > 0 && playlist && (
+                <React.Fragment>
+                  <DialogTitle id="remove-all-title">Delete Playlist</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText id="remove-all-description">
+                      Are you sure you want to delete this playlist?
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+                      Cancel
+                    </Button>
+                    <Button onClick={this.onFinishRemovePlaylist.bind(this)} color="primary">
+                      Confirm
+                    </Button>
+                  </DialogActions>
+                </React.Fragment>
+              )}
             </Dialog>
             <Tooltip title={this.state.filters.length > 0 ? "" : "Local Audio"}  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addLocalButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
+                disabled={this.state.filters.length > 0}
                 onClick={this.onAddSource.bind(this, AF.audios)}
                 size="small">
                 <AudiotrackIcon className={classes.icon} />
@@ -879,6 +891,7 @@ class AudioLibrary extends React.Component {
             <Tooltip title={this.state.filters.length > 0 ? "" : "URL"}  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addURLButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
+                disabled={this.state.filters.length > 0}
                 onClick={this.onAddSource.bind(this, AF.url)}
                 size="small">
                 <HttpIcon className={classes.icon} />
@@ -924,10 +937,10 @@ class AudioLibrary extends React.Component {
                     <MenuItem key={sf}>
                       <ListItemText primary={en.get(sf)}/>
                       <ListItemSecondaryAction>
-                        <IconButton edge="end" onClick={this.props.onSort.bind(this, sf, true)}>
+                        <IconButton edge="end" onClick={playlist? this.props.onSortPlaylist.bind(this, playlist, sf, true) : this.props.onSort.bind(this, sf, true)}>
                           <ArrowUpwardIcon/>
                         </IconButton>
-                        <IconButton edge="end" onClick={this.props.onSort.bind(this, sf, false)}>
+                        <IconButton edge="end" onClick={playlist ? this.props.onSortPlaylist.bind(this, playlist, sf, false) : this.props.onSort.bind(this, sf, false)}>
                           <ArrowDownwardIcon/>
                         </IconButton>
                       </ListItemSecondaryAction>
@@ -947,7 +960,7 @@ class AudioLibrary extends React.Component {
             aria-labelledby="add-url-title">
             <DialogTitle id="add-url-title">Add Audio URL</DialogTitle>
             <DialogContent className={classes.noScroll}>
-              <DialogContentText id="batch-tag-description">
+              <DialogContentText id="add-url-description">
                 Enter the URL of the audio file:
               </DialogContentText>
               <TextField
@@ -969,10 +982,63 @@ class AudioLibrary extends React.Component {
           </Dialog>
         )}
 
+        {this.state.openMenu == MO.playlist && (
+          <Menu
+            elevation={1}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'center',
+            }}
+            transformOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            getContentAnchorEl={null}
+            anchorEl={this.state.menuAnchorEl}
+            keepMounted
+            classes={{paper: classes.playlistMenu}}
+            open={this.state.openMenu == MO.playlist}
+            onClose={this.onCloseDialog.bind(this)}>
+            <PlaylistSelect
+              playlists={this.props.playlists}
+              menuIsOpen
+              autoFocus
+              onChange={this.onChoosePlaylist.bind(this)} />
+          </Menu>
+        )}
+
+        {this.state.openMenu == MO.newPlaylist && (
+          <Dialog
+            classes={{paper: clsx(classes.noScroll, classes.urlDialog)}}
+            open={this.state.openMenu == MO.newPlaylist}
+            onClose={this.onCloseDialog.bind(this)}
+            aria-labelledby="add-playlist-title">
+            <DialogTitle id="add-playist-title">New Playlist</DialogTitle>
+            <DialogContent className={classes.noScroll}>
+              <TextField
+                label="Name"
+                fullWidth
+                placeholder="Name your playlist"
+                margin="dense"
+                value={this.state.importURL}
+                onChange={this.onURLChange.bind(this)}/>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+                Cancel
+              </Button>
+              <Button
+                onClick={this.onAddPlaylist.bind(this)} color="primary">
+                Create Playlist
+              </Button>
+            </DialogActions>
+          </Dialog>
+        )}
+
         {this.state.openMenu == MO.batchEdit && (
           <Dialog
             open={this.state.openMenu == MO.batchEdit}
-            onClose={this.onCloseDialog.bind(this)}
+            onClose={this.onToggleBatchEditModal.bind(this)}
             aria-describedby="edit-description">
             <DialogContent>
               <Typography variant="h6">Batch Edit song info</Typography>
@@ -1012,16 +1078,6 @@ class AudioLibrary extends React.Component {
                 margin="normal"
                 label="Album"
                 onChange={this.onEditBatch.bind(this, 'album')}/>
-              <TextField
-                className={classes.inputShort}
-                value={this.state.commonAudio.trackNum}
-                margin="normal"
-                label="Track #"
-                inputProps={{
-                  min: 0,
-                  type: 'number',
-                }}
-                onChange={this.onEditBatch.bind(this, 'trackNum')}/>
               <TextField
                 className={classes.inputFull}
                 value={this.state.commonAudio.comment}
@@ -1093,7 +1149,7 @@ class AudioLibrary extends React.Component {
   }
 
   componentDidUpdate(props: any, state: any) {
-    if (state.filters != this.state.filters || props.library != this.props.library) {
+    if (state.filters != this.state.filters || props.library != this.props.library || props.playlists != this.props.playlists) {
       this.setState({displaySources: this.getDisplaySources()});
     }
     if (this.props.tutorial == LT.final && this.state.drawerOpen) {
@@ -1102,6 +1158,7 @@ class AudioLibrary extends React.Component {
   }
 
   componentWillUnmount() {
+    this.savePosition();
     window.removeEventListener('keydown', this.onKeyDown);
   }
 
@@ -1116,12 +1173,24 @@ class AudioLibrary extends React.Component {
     this.props.onChangeTab(newTab);
   }
 
+  onClickPlaylist(playlist: string) {
+    this.props.onChangeTab(3);
+    this.setState({filters: ["playlist:" + playlist]});
+  }
+
   onClickArtist(artist: string) {
-    this.setState({openTab: 2, filters: ["artist:" + artist]})
+    this.props.onChangeTab(2);
+    this.setState({filters: ["artist:" + artist]})
   }
 
   onClickAlbum(album: string) {
-    this.setState({openTab: 3, filters: ["album:" + album]})
+    this.props.onChangeTab(3);
+    this.setState({filters: ["album:" + album]})
+  }
+
+  onAddToPlaylist() {
+    this.onCloseDialog();
+    this.props.onAddToPlaylist();
   }
 
   onBatchTag() {
@@ -1136,12 +1205,15 @@ class AudioLibrary extends React.Component {
 
 
   goBack() {
-    if (this.props.isBatchTag) {
+    if (this.props.specialMode == SP.batchTag) {
       this.setState({selected: [], selectedTags: []});
       this.props.onBatchTag();
-    } else if (this.props.isBatchEdit) {
+    } else if (this.props.specialMode == SP.batchEdit) {
       this.setState({selected: [], selectedTags: []});
       this.props.onBatchEdit();
+    } else if (this.props.specialMode == SP.addToPlaylist) {
+      this.setState({selected: [], selectedTags: []});
+      this.props.onAddToPlaylist();
     } else {
       this.props.goBack();
     }
@@ -1313,10 +1385,47 @@ class AudioLibrary extends React.Component {
 
   onToggleBatchEditModal() {
     if (this.state.openMenu == MO.batchEdit) {
-      this.setState({openMenu: null, selectedTags: []});
+      this.setState({openMenu: null, commonAudio: null});
     } else {
       this.setState({openMenu: MO.batchEdit, commonAudio: this.getCommonAudio()});
     }
+  }
+
+  onTogglePlaylistDialog(e: MouseEvent) {
+    if (this.state.openMenu == MO.playlist) {
+      this.setState({menuAnchorEl: null, openMenu: null});
+    } else {
+      this.setState({menuAnchorEl: e.currentTarget, openMenu: MO.playlist});
+    }
+  }
+
+  onChoosePlaylist(playlistID: number) {
+    if (playlistID == -1) {
+      this.setState({openMenu: MO.newPlaylist});
+    } else {
+      this.props.onUpdatePlaylists((ps) => {
+        const playlist = ps.find((p) => p.id == playlistID);
+        if (playlist) {
+          playlist.audios = playlist.audios.concat(this.state.selected.map((s) => this.props.library.find((a) => a.url == s)?.id));
+        }
+      });
+      this.goBack();
+      this.onCloseDialog();
+    }
+  }
+
+  onAddPlaylist() {
+    const name = this.state.importURL;
+    let id = this.props.playlists.length + 1;
+    this.props.playlists.forEach((p) => {
+      id = Math.max(p.id + 1, id);
+    });
+    const playlist = new Playlist({id: id, name: name, audios: this.state.selected.map((s) => this.props.library.find((a) => a.url == s)?.id)});
+    this.props.onUpdatePlaylists((ps) => {
+      ps.push(playlist);
+    });
+    this.goBack();
+    this.onCloseDialog();
   }
 
   onSelectTags(selectedTags: Array<string>) {
@@ -1351,6 +1460,20 @@ class AudioLibrary extends React.Component {
       l.splice(0, l.length);
     });
     this.onCloseDialog();
+  }
+
+  onFinishRemovePlaylist() {
+    this.props.onUpdatePlaylists((pl) => {
+      const playlistName = this.state.filters.find((f) => f.startsWith("playlist:"))?.replace("playlist:", "");
+      pl.forEach((p, index) => {
+        if (p.name == playlistName) {
+          pl.splice(index, 1);
+          return
+        }
+      })
+    });
+    this.onCloseDialog();
+    this.setState({filters: []});
   }
 
   onFinishRemoveVisible() {
@@ -1410,6 +1533,8 @@ class AudioLibrary extends React.Component {
       const scrollElement = sortableList.firstElementChild;
       const scrollTop = scrollElement ? scrollElement.scrollTop : 0;
       this.props.savePosition(scrollTop, this.state.filters, this.state.selected);
+    } else {
+      this.props.savePosition(0, this.state.filters, this.state.selected);
     }
   }
 
@@ -1559,12 +1684,13 @@ class AudioLibrary extends React.Component {
     let displaySources = [];
     const filtering = this.state.filters.length > 0;
     if (filtering) {
-      for (let source of this.props.library) {
+      const playlistName = this.state.filters.find((f) => f.startsWith("playlist:"))?.replace("playlist:", "");
+      const playlist = this.props.playlists.find((p) => p.name == playlistName);
+      const library: Array<Audio> = playlist ? playlist.audios.map((aID) => this.props.library.find((a) => a.id==aID)) : this.props.library;
+      for (let source of library) {
         let matchesFilter = true;
         for (let filter of this.state.filters) {
-          if (filter == "<Offline>") { // This is offline filter
-            matchesFilter = source.offline;
-          } else if (filter == "<Marked>") { // This is a marked filter
+          if (filter == "<Marked>") { // This is a marked filter
             matchesFilter = source.marked;
           }else if (filter == "<Untagged>") { // This is untagged filter
             matchesFilter = source.tags.length === 0;
@@ -1588,7 +1714,7 @@ class AudioLibrary extends React.Component {
               matchesFilter = regex.test(source.artist);
             }
           } else if (filter.startsWith("album:")) {
-            filter = filter.replace("album:","");
+            filter = filter.replace("album:", "");
             filter = filter.replace("\\", "\\\\");
             if (filter.startsWith("-")) {
               filter = filter.substring(1, filter.length);
@@ -1597,6 +1723,14 @@ class AudioLibrary extends React.Component {
             } else {
               const regex = new RegExp(filter, "i");
               matchesFilter = regex.test(source.album);
+            }
+          } else if (filter.startsWith("playlist:")) {
+            filter = filter.replace("playlist:", "");
+            const playlist = this.props.playlists.find((p) => p.name == filter);
+            if (playlist) {
+              matchesFilter = playlist.audios.includes(source.id);
+            } else {
+              matchesFilter = false;
             }
           } else { // This is a search filter
             filter = filter.replace("\\", "\\\\");
