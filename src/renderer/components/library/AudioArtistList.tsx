@@ -1,7 +1,9 @@
 import * as React from "react";
 import clsx from "clsx";
 
-import {Card, CardContent, CardMedia, createStyles, Grid, Theme, Typography, withStyles} from "@material-ui/core";
+import {Avatar, createStyles, Theme, Typography, withStyles} from "@material-ui/core";
+
+import AudiotrackIcon from "@material-ui/icons/Audiotrack";
 
 import Audio from "../../data/Audio";
 
@@ -20,8 +22,24 @@ const styles = (theme: Theme) => createStyles({
   underlineTitle: {
     textDecoration: 'underline',
   },
-  pointer: {
+  shadow: {
+    boxShadow: theme.shadows[10],
+  },
+  artistContainer: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  artist: {
+    paddingTop: 0,
+    textAlign: 'center',
     cursor: 'pointer',
+  },
+  large: {
+    width: theme.spacing(20),
+    height: theme.spacing(20),
+    borderStyle: "double",
+    borderColor: theme.palette.text.primary,
+    borderWidth: 2,
   },
 });
 
@@ -54,36 +72,36 @@ class AudioArtistList extends React.Component {
     }
 
     const artists = Array.from(this.state.artists.keys());
+    const width = window.innerWidth - 104;
+    const numIcons = Math.floor(width / 178);
+    const remainingWidth = width - (numIcons * 178);
+    const padding = Math.floor(remainingWidth / numIcons / 2) + 8;
     return (
-      <Grid container spacing={2} >
+      <div className={classes.artistContainer}>
         {artists.map((a) => {
           let thumb: string = this.state.artists.get(a);
           if (thumb) thumb = thumb.replace(/\\/g,"/");
           return (
-            <Grid key={a} item xs={6} md={3} lg={2} className={classes.pointer}
+            <div key={a} className={classes.artist}
+                  style={{padding: padding}}
                   onClick={this.props.onClickArtist.bind(this, a)}
                   onMouseEnter={this.onMouseEnter.bind(this, a)}
                   onMouseLeave={this.onMouseLeave.bind(this)}>
-              <Card>
-                <CardMedia
-                  className={classes.media}
-                  image={thumb}
-                  title={a}
-                />
-                <CardContent>
-                  <Typography
-                    className={clsx(this.state.hover == a && classes.underlineTitle)}
-                    variant="h6"
-                    color="textSecondary"
-                    component="p">
-                    {a}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
+              <Avatar alt={a} src={thumb} className={clsx(classes.large, this.state.hover == a && classes.shadow)}>
+                {thumb == null && (
+                  <AudiotrackIcon/>
+                )}
+              </Avatar>
+              <Typography
+                noWrap
+                className={clsx(this.state.hover == a && classes.underlineTitle)}
+                variant={"h6"}>
+                {a}
+              </Typography>
+            </div>
           )
         })}
-      </Grid>
+      </div>
     )
   }
 

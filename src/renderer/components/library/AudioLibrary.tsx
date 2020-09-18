@@ -131,8 +131,10 @@ const styles = (theme: Theme) => createStyles({
   },
   drawerSpacer: {
     width: theme.spacing(7),
+    minWidth: theme.spacing(7),
     [theme.breakpoints.up('sm')]: {
       width: theme.spacing(9),
+      minWidth: theme.spacing(9),
     },
   },
   drawerButton: {
@@ -692,7 +694,8 @@ class AudioLibrary extends React.Component {
                   <Box p={2} className={classes.fill}>
                     <AudioAlbumList
                       sources={this.state.displaySources}
-                      onClickAlbum={this.onClickAlbum.bind(this)}/>
+                      onClickAlbum={this.onClickAlbum.bind(this)}
+                      onClickArtist={this.onClickArtist.bind(this)}/>
                   </Box>
                 </div>
               </Typography>

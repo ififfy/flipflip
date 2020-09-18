@@ -1,7 +1,7 @@
 import * as React from "react";
 import clsx from "clsx";
 
-import {Card, CardContent, CardMedia, createStyles, Grid, Theme, Typography, withStyles} from "@material-ui/core";
+import {Card, CardContent, CardMedia, createStyles, Grid, Theme, Tooltip, Typography, withStyles} from "@material-ui/core";
 
 import Audio from "../../data/Audio";
 
@@ -15,7 +15,7 @@ const styles = (theme: Theme) => createStyles({
   },
   media: {
     height: 0,
-    paddingTop: "56.25%" // 16:9
+    paddingTop: "100%" // 16:9  = 56.25%
   },
   underlineTitle: {
     textDecoration: 'underline',
@@ -23,6 +23,19 @@ const styles = (theme: Theme) => createStyles({
   pointer: {
     cursor: 'pointer',
   },
+  root: {
+    borderRadius: 1,
+  },
+  cardContent: {
+    '&:last-child': {
+      paddingBottom: theme.spacing(2),
+    },
+  },
+  artist: {
+    '&:hover': {
+      textDecoration: 'underline',
+    },
+  }
 });
 
 class AudioAlbumList extends React.Component {
@@ -30,6 +43,7 @@ class AudioAlbumList extends React.Component {
     classes: any,
     sources: Array<Audio>,
     onClickAlbum(album: string): void,
+    onClickArtist(artist: string): void,
   };
 
   readonly state = {
@@ -57,26 +71,38 @@ class AudioAlbumList extends React.Component {
     return (
       <Grid container spacing={2}>
         {albums.map((a) => {
-          let thumb: string = this.state.albums.get(a);
+          const data = this.state.albums.get(a);
+          let thumb: string = data.thumb;
           if (thumb) thumb = thumb.replace(/\\/g,"/");
+          const artist = data.artist;
           return (
-            <Grid key={a} item xs={6} md={3} lg={2} className={classes.pointer}
-                  onClick={this.props.onClickAlbum.bind(this, a)}
+            <Grid key={a} item xs={6} sm={4} md={3} lg={2} className={classes.pointer}
+                  onClick={this.onClickAlbum.bind(this, a)}
                   onMouseEnter={this.onMouseEnter.bind(this, a)}
                   onMouseLeave={this.onMouseLeave.bind(this)}>
-              <Card>
+              <Card classes={{root: classes.root}}>
                 <CardMedia
                   className={classes.media}
                   image={thumb}
                   title={a}
                 />
-                <CardContent>
+                <CardContent classes={{root: classes.cardContent}}>
+                  <Tooltip title={a} enterDelay={800}>
+                    <Typography
+                      className={clsx(this.state.hover == a && classes.underlineTitle)}
+                      noWrap
+                      variant="body1">
+                      {a}
+                    </Typography>
+                  </Tooltip>
                   <Typography
-                    className={clsx(this.state.hover == a && classes.underlineTitle)}
-                    variant="h6"
+                    id={"artist-link"}
+                    noWrap
+                    onClick={this.props.onClickArtist.bind(this, artist)}
+                    className={classes.artist}
                     color="textSecondary"
-                    component="p">
-                    {a}
+                    variant="body2">
+                    {artist}
                   </Typography>
                 </CardContent>
               </Card>
@@ -93,6 +119,14 @@ class AudioAlbumList extends React.Component {
     }
   }
 
+  onClickAlbum(album: string, e: MouseEvent) {
+    const target: any = e.target;
+    const id = target.getAttribute("id");
+    if (id != "artist-link") {
+      this.props.onClickAlbum(album);
+    }
+  }
+
   onMouseEnter(album: string) {
     this.setState({hover: album});
   }
@@ -101,11 +135,16 @@ class AudioAlbumList extends React.Component {
     this.setState({hover: null});
   }
 
-  getAlbums(): Map<string, string> {
-    const albumMap = new Map<string, string>();
+  getAlbums(): Map<string, { artist: string, thumb: string }> {
+    const va = "Various Artists";
+    const albumMap = new Map<string, { artist: string, thumb: string }>();
     for (let song of this.props.sources) {
-      if (song.album && (!albumMap.has(song.album) || !albumMap.get(song.album))) {
-        albumMap.set(song.album, song.thumb);
+      if (song.album && (!albumMap.has(song.album) || !albumMap.get(song.album).thumb || (albumMap.get(song.album).artist != song.artist && albumMap.get(song.album).artist != va))) {
+        if (albumMap.has(song.album) && albumMap.get(song.album).artist != song.artist) {
+          albumMap.set(song.album, {artist: va, thumb: song.thumb});
+        } else {
+          albumMap.set(song.album, {artist: song.artist, thumb: song.thumb});
+        }
       }
     }
     return albumMap;
