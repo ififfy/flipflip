@@ -138,7 +138,22 @@ class AudioAlbumList extends React.Component {
   getAlbums(): Map<string, { artist: string, thumb: string }> {
     const va = "Various Artists";
     const albumMap = new Map<string, { artist: string, thumb: string }>();
-    for (let song of this.props.sources) {
+    const songs = Array.from(this.props.sources).sort((a, b) => {
+      if (a.album > b.album) {
+        return 1;
+      } else if (a.album < b.album) {
+        return -1;
+      } else {
+        if (a.name > b.name) {
+          return 1;
+        } else if (a.name < b.name) {
+          return -1;
+        } else {
+          return 0;
+        }
+      }
+    });
+    for (let song of songs) {
       if (song.album && (!albumMap.has(song.album) || !albumMap.get(song.album).thumb || (albumMap.get(song.album).artist != song.artist && albumMap.get(song.album).artist != va))) {
         if (albumMap.has(song.album) && albumMap.get(song.album).artist != song.artist) {
           albumMap.set(song.album, {artist: va, thumb: song.thumb});

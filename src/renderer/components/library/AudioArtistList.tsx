@@ -121,7 +121,22 @@ class AudioArtistList extends React.Component {
 
   getArtists(): Map<string, string> {
     const artistsMap = new Map<string, string>();
-    for (let song of this.props.sources) {
+    const songs = Array.from(this.props.sources).sort((a, b) => {
+      if (a.artist > b.artist) {
+        return 1;
+      } else if (a.artist < b.artist) {
+        return -1;
+      } else {
+        if (a.name > b.name) {
+          return 1;
+        } else if (a.name < b.name) {
+          return -1;
+        } else {
+          return 0;
+        }
+      }
+    });
+    for (let song of songs) {
       if (song.artist && (!artistsMap.has(song.artist) || !artistsMap.get(song.artist))) {
         artistsMap.set(song.artist, song.thumb);
       }

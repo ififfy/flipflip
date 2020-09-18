@@ -132,7 +132,7 @@ export function restoreFromBackup(state: State, backupFile: string): Object {
     libraryYOffset: 0,
     libraryFilters: Array<string>(),
     librarySelected: Array<string>(),
-    audioOpenTab: data.audioOpenTab ? data.audioOpenTab : 0,
+    audioOpenTab: data.audioOpenTab ? data.audioOpenTab : 3,
     audioYOffset: 0,
     audioFilters: Array<string>(),
     audioSelected: Array<string>(),
@@ -1770,11 +1770,11 @@ export function updateTags(state: State, tags: Array<Tag>): Object {
 }
 
 export function batchTag(state: State): Object {
-  return {isBatchTag: !state.isBatchTag};
+  return {isBatchTag: !state.isBatchTag, audioOpenTab: 3};
 }
 
 export function batchEdit(state: State): Object {
-  return {isBatchEdit: !state.isBatchEdit};
+  return {isBatchEdit: !state.isBatchEdit, audioOpenTab: 3};
 }
 
 export function toggleAudioTag(state: State, sourceID: number, tag: Tag): Object {

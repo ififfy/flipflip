@@ -814,7 +814,7 @@ class AudioLibrary extends React.Component {
           </React.Fragment>
         )}
 
-        {!this.props.isSelect && !this.props.isBatchTag && !this.props.isBatchEdit && (
+        {!this.props.isSelect && !this.props.isBatchTag && !this.props.isBatchEdit && this.props.openTab == 3 && (
           <React.Fragment>
             {this.props.library.length > 0 && (
               <Tooltip title={this.state.filters.length == 0 ? "Delete All Sources" : "Delete These Sources"}  placement="left">
