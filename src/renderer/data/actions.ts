@@ -25,7 +25,7 @@ import {
 } from "./utils";
 import defaultTheme from "./theme";
 import {
-  AF, ASF, BT, DONE, GT, HTF, IF, IT, LT, OF, PR, PT, SDGT, SDT, SF, SGT, SL, SOF, SP, SPT, ST, TF, TT, VCT, VTF
+  AF, ASF, BT, DONE, GT, HTF, IF, IT, LT, OF, PR, PT, RP, SDGT, SDT, SF, SGT, SL, SOF, SP, SPT, ST, TF, TT, VCT, VTF
 } from "./const";
 import { defaultInitialState } from './AppStorage';
 import { Route } from "./Route";
@@ -570,7 +570,7 @@ export function openLibraryImport(state: State): Object {
 
 export function importAudioFromLibrary(state: State, sources: Array<Audio>): Object {
   const playlistIndex = state.route[state.route.length - 1].value;
-  return {...updateScene(state, getActiveScene(state), (s: Scene) => {s.audioPlaylists[playlistIndex] = s.audioPlaylists[playlistIndex].concat(sources)}), ...goBack(state)};
+  return {...updateScene(state, getActiveScene(state), (s: Scene) => {s.audioPlaylists[playlistIndex].audios = s.audioPlaylists[playlistIndex].audios.concat(sources)}), ...goBack(state)};
 }
 
 export function importFromLibrary(state: State, sources: Array<LibrarySource>): Object {
@@ -621,7 +621,7 @@ export function playAudio(state: State, source: Audio, displayed: Array<Audio>):
     libraryID: librarySource.id,
     audioScene: true,
     audioEnabled: true,
-    audioPlaylists: [displayed],
+    audioPlaylists: [{audios: displayed, shuffle: false, repeat: RP.all}],
     strobe: true,
     strobeTime: 10000,
     strobeLayer: SL.image,

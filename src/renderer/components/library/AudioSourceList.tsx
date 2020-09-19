@@ -231,6 +231,16 @@ class AudioSourceList extends React.Component {
           }
         });
       });
+      this.props.onUpdatePlaylists((pl) => {
+        pl.forEach((playlist, pIndex) => {
+          playlist.audios.forEach((a, index) => {
+            if (a == source.id) {
+              playlist.audios.splice(index, 1);
+              return;
+            }
+          });
+        });
+      });
     }
   }
 
@@ -279,7 +289,7 @@ class AudioSourceList extends React.Component {
 
   onFinishSourceOptions(newAudio: Audio) {
     this.props.onUpdateLibrary((a) => {
-      let editSource = a.find((a) => a.id == this.state.sourceEdit.id);
+      let editSource = a.find((a) => a.id == this.state.sourceOptions.id);
       Object.assign(editSource, newAudio);
     })
     this.onCloseSourceOptions();

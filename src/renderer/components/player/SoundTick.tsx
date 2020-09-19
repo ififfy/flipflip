@@ -9,6 +9,8 @@ export default class SoundTick extends React.Component {
     volume: number,
     tick: boolean,
     onPlaying(soundData: any): void,
+    onError(errorCode: number, description: string): void,
+    onFinishedPlaying(): void,
   };
 
   shouldComponentUpdate(props: any) {
@@ -25,7 +27,9 @@ export default class SoundTick extends React.Component {
         loop={false}
         volume={this.props.volume}
         onPlaying={this.props.onPlaying.bind(this)}
-        playFromPosition={0}/>
+        onError={this.props.onError.bind(this)}
+        onFinishedPlaying={this.props.onFinishedPlaying.bind(this)}
+        playFromPosition={this.props.tick ? 0 : 1}/>
     );
   }
 }

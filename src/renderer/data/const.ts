@@ -44,6 +44,12 @@ const VO = { // Video Options
   full: 'vo.full',
 };
 
+const RP = { // Audio Repeat Options
+  none: 'rp.none',
+  one: 'rp.one',
+  all: 'rp.all',
+}
+
 const BT = { // background type
   blur: 'bt.blur',
   color: 'bt.color',
@@ -340,5 +346,5 @@ const SP = { // Special modes
 }
 
 export {
-  SP, TF, WF, SOF, OF, IF, GO, VO, HTF, VTF, BT, SC, IT, GT, TT, SF, ASF, ST, SL, AF, IPC, MO, PR, SB, IG, RF, RT, SPT, SDT, PT, LT, SDGT, SGT, VCT, EA, DONE
+  AF, ASF, BT, DONE, EA, GO, GT, HTF, IF, IG, IPC, IT, LT, MO, OF, PR, PT, RF, RP, RT, SB, SC, SDGT, SDT, SF, SGT, SL, SOF,SP, SPT, ST, TF, TT, VCT, VO, VTF, WF
 };

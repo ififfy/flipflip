@@ -29,9 +29,10 @@ import VolumeUpIcon from "@material-ui/icons/VolumeUp";
 import {green, red} from "@material-ui/core/colors";
 
 import {toArrayBuffer} from "../../data/utils";
-import {TF} from "../../data/const";
+import {RP, TF} from "../../data/const";
 import en from "../../data/en";
 import Audio from "../../data/Audio";
+import AudioControl from "../player/AudioControl";
 
 const styles = (theme: Theme) => createStyles({
   bpmProgress: {
@@ -110,19 +111,14 @@ class AudioOptions extends React.Component {
                 onChange={this.onSourceInput.bind(this, 'url')}/>
             </Grid>
             <Grid item xs={12}>
-              <Grid container spacing={1} alignItems="center">
-                <Grid item>
-                  <VolumeDownIcon />
-                </Grid>
-                <Grid item xs>
-                  <Slider value={this.state.audio.volume}
-                          onChange={this.onSourceSliderChange.bind(this, 'volume')}
-                          aria-labelledby="audio-volume-slider" />
-                </Grid>
-                <Grid item>
-                  <VolumeUpIcon />
-                </Grid>
-              </Grid>
+              <AudioControl
+                audio={this.state.audio}
+                audioEnabled={true}
+                lastTrack={true}
+                repeat={RP.one}
+                scenePaths={[]}
+                startPlaying={false}
+                onAudioSliderChange={this.onSourceSliderChange.bind(this, 'volume')}/>
             </Grid>
             <Grid item xs={12}>
               <Grid container spacing={2} alignItems="center">

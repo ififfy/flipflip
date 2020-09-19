@@ -243,7 +243,7 @@ export default class Player extends React.Component {
             overlayVideos={this.state.overlayVideos}
             scene={this.props.scene}
             scenes={this.props.scenes}
-            title={this.props.tags ? (this.props.scene.audioScene ? this.state.currentAudio.name : this.props.scene.sources[0].url) : this.props.scene.name}
+            title={this.props.tags ? (this.props.scene.audioScene ? this.state.currentAudio ? this.state.currentAudio.name : "Loading..." : this.props.scene.sources[0].url) : this.props.scene.name}
             tutorial={this.props.tutorial}
             recentPictureGrid={this.state.recentPictureGrid}
             goBack={this.goBack.bind(this)}
@@ -508,7 +508,8 @@ export default class Player extends React.Component {
       this.state.mainVideo !== state.mainVideo ||
       this.state.overlayVideos !== state.overlayVideos ||
       this.state.recentPictureGrid !== state.recentPictureGrid ||
-      this.state.thumbImage !== state.thumbImage;
+      this.state.thumbImage !== state.thumbImage ||
+      this.state.currentAudio !== state.currentAudio;
   }
 
   nop() {}

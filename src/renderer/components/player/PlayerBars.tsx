@@ -917,15 +917,17 @@ class PlayerBars extends React.Component {
       case 'ArrowLeft':
         if (!this.state.drawerHover || focus != "input") {
           e.preventDefault();
-          // TODO Navigate audio playlist
-          this.historyBack();
+          if (!this.props.scene.audioScene) {
+            this.historyBack();
+          }
         }
         break;
       case 'ArrowRight':
         if (!this.state.drawerHover || focus != "input") {
           e.preventDefault();
-          // TODO Navigate audio playlist
-          this.historyForward();
+          if (!this.props.scene.audioScene) {
+            this.historyForward();
+          }
         }
         break;
       case 'Escape':

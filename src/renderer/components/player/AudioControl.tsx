@@ -9,14 +9,14 @@ import Forward10Icon from '@material-ui/icons/Forward10';
 import Replay10Icon from '@material-ui/icons/Replay10';
 import PauseIcon from '@material-ui/icons/Pause';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import SkipNextIcon from '@material-ui/icons/SkipNext';
+import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
 import VolumeDownIcon from '@material-ui/icons/VolumeDown';
 import VolumeUpIcon from '@material-ui/icons/VolumeUp';
 
 import {getTimestamp} from "../../data/utils";
-import {SceneSettings} from "../../data/Config";
-import {TF} from "../../data/const";
+import {RP, TF} from "../../data/const";
 import Audio from "../../data/Audio";
-import Scene from "../../data/Scene";
 import SoundTick from "./SoundTick";
 
 const styles = (theme: Theme) => createStyles({
@@ -37,12 +37,14 @@ class AudioControl extends React.Component {
   readonly props: {
     classes: any,
     audio: Audio,
-    playlistIndex: number,
-    scene: Scene,
+    audioEnabled: boolean
+    lastTrack: boolean,
+    repeat: string,
     scenePaths: Array<any>,
     startPlaying: boolean,
-    onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
-    onTrackEnd(): void,
+    onAudioSliderChange(e: MouseEvent, value: number): void,
+    nextTrack?(): void,
+    prevTrack?(): void,
     goBack?(): void,
     playNextScene?(): void,
   };
@@ -64,7 +66,7 @@ class AudioControl extends React.Component {
     const audioVolume = typeof audio.volume === 'number' ? audio.volume : 0;
     return(
       <React.Fragment key={audio.id}>
-        {this.props.scene.audioEnabled && this.props.audio.tick && (
+        {this.props.audioEnabled && this.props.audio.tick && this.state.playing && (
           <SoundTick
             url={this.props.audio.url}
             playing={playing}
@@ -72,9 +74,11 @@ class AudioControl extends React.Component {
             volume={this.props.audio.volume}
             tick={this.state.tick}
             onPlaying={this.onPlaying.bind(this)}
+            onError={this.onError.bind(this)}
+            onFinishedPlaying={this.onFinishedPlaying.bind(this)}
           />
         )}
-        {this.props.scene.audioEnabled && !this.props.audio.tick && (
+        {this.props.audioEnabled && !this.props.audio.tick && (
           <Sound
             url={this.props.audio.url}
             playStatus={playing}
@@ -86,8 +90,8 @@ class AudioControl extends React.Component {
             onFinishedPlaying={this.onFinishedPlaying.bind(this)}
           />
         )}
-        <Grid item xs={12} className={clsx(!this.props.scene.audioEnabled && classes.noPadding)}>
-          <Collapse in={this.props.scene.audioEnabled} className={classes.fullWidth}>
+        <Grid item xs={12} className={clsx(!this.props.audioEnabled && classes.noPadding)}>
+          <Collapse in={this.props.audioEnabled} className={classes.fullWidth}>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12}>
                 <Grid container spacing={1} alignItems="center" justify="center">
@@ -112,6 +116,14 @@ class AudioControl extends React.Component {
                     </Grid>
                   </Grid>
                   <Grid item>
+                    {this.props.prevTrack && (
+                      <Tooltip title="Prev Track">
+                        <IconButton
+                          onClick={this.props.prevTrack.bind(this)}>
+                          <SkipPreviousIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )}
                     <Tooltip title="Jump Back">
                       <IconButton
                         onClick={this.onBack.bind(this)}>
@@ -130,6 +142,14 @@ class AudioControl extends React.Component {
                         <Forward10Icon />
                       </IconButton>
                     </Tooltip>
+                    {this.props.nextTrack && (
+                      <Tooltip title="Next Track">
+                        <IconButton
+                          onClick={this.props.nextTrack.bind(this)}>
+                          <SkipNextIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )}
                   </Grid>
                 </Grid>
               </Grid>
@@ -140,7 +160,7 @@ class AudioControl extends React.Component {
                   </Grid>
                   <Grid item xs>
                     <Slider value={audioVolume}
-                            onChange={this.onAudioSliderChange.bind(this, 'volume')}
+                            onChange={this.onAudioSliderChange.bind(this)}
                             aria-labelledby="audio-volume-slider" />
                   </Grid>
                   <Grid item>
@@ -155,27 +175,28 @@ class AudioControl extends React.Component {
     );
   }
 
-  _audio = "";
   _timeout: Timeout = null;
   componentDidMount() {
-    this._audio=JSON.stringify(this.props.audio);
-    if (this.props.startPlaying) {
+    if (this.state.playing) {
       this.tickLoop(true);
     }
   }
 
-  componentDidUpdate(props: any) {
-    let audio = JSON.parse(this._audio);
-    if ((this.props.audio.tick && !audio.tick) ||
-      (this.props.audio.tick && audio.tickMode == TF.scene && this.props.audio.tickMode != TF.scene)){
-      if (this.props.startPlaying) {
-        this.tickLoop(true);
+  componentDidUpdate(props: any, state: any) {
+    if ((this.props.audio.tick && !props.audio.tick) ||
+      (this.props.audio.tick && props.audio.tickMode == TF.scene && this.props.audio.tickMode != TF.scene)){
+      this.tickLoop(true);
+    }
+    if (this.state.playing != state.playing) {
+      if (this.state.playing && this.props.audio.tick && this.props.audio.tickMode != TF.scene) {
+        this.tickLoop(true)
+      } else {
+        clearTimeout(this._timeout);
       }
     }
     if (this.props.audio.tick && this.props.audio.tickMode == TF.scene && props.scenePaths && props.scenePaths.length > 0 && props.scenePaths !== this.props.scenePaths) {
       this.setState({tick: !this.state.tick});
     }
-    this._audio=JSON.stringify(this.props.audio);
   }
 
   componentWillUnmount() {
@@ -222,16 +243,9 @@ class AudioControl extends React.Component {
     this.setState({position: value});
   }
 
-  onAudioSliderChange(key: string, e: MouseEvent, value: number) {
-    this.changeKey(key, value);
-  }
-
-  changeKey(key: string, value: any) {
-    this.update((s) => s.audioPlaylists[this.props.playlistIndex].find((a: Audio) => a.id == this.props.audio.id)[key] = value);
-  }
-
-  update(fn: (scene: any) => void) {
-    this.props.onUpdateScene(this.props.scene, fn);
+  onAudioSliderChange(e: MouseEvent, value: number) {
+    this.props.audio.volume = value;
+    this.props.onAudioSliderChange(e, value);
   }
 
   onFinishedPlaying() {
@@ -241,8 +255,19 @@ class AudioControl extends React.Component {
       this.props.playNextScene();
       this.setState({position: 0, duration: 0});
     } else {
-      this.props.onTrackEnd();
-      this.setState({position: 0, duration: 0});
+      if (this.props.repeat == RP.all) {
+        this.props.nextTrack();
+        this.setState({position: 0, duration: 0});
+      } else if (this.props.repeat == RP.one) {
+        this.setState({position: 0, duration: 0});
+      } else if (this.props.repeat == RP.none) {
+        if (!this.props.lastTrack) {
+          this.props.nextTrack();
+          this.setState({position: 0, duration: 0});
+        } else {
+          this.setState({playing: false});
+        }
+      }
     }
   }
 

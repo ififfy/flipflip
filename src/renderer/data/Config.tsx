@@ -202,7 +202,7 @@ interface SceneSettingsI {
   audioScene: boolean;
   audioEnabled: boolean;
   audios: Array<Audio>;
-  audioPlaylists: Array<Array<Audio>>;
+  audioPlaylists: Array<{audios: Array<Audio>, shuffle: boolean, repeat: string}>;
 
   // migration only
   overlaySceneID: number;
@@ -477,7 +477,7 @@ export class SceneSettings implements SceneSettingsI {
   audioScene = false;
   audioEnabled = false;
   audios: Array<Audio> = [];
-  audioPlaylists: Array<Array<Audio>> = [];
+  audioPlaylists: Array<{audios: Array<Audio>, shuffle: boolean, repeat: string}> = [];
 
   // migration only
   overlaySceneID = 0;

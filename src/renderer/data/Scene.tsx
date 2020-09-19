@@ -1,4 +1,5 @@
-import {BT, EA, GO, HTF, IF, IT, OF, SC, SL, SOF, TF, VO, VTF, WF} from './const';
+import path from "path";
+import {BT, EA, GO, HTF, IF, IT, OF, RP, SC, SL, SOF, TF, VO, VTF, WF} from './const';
 import LibrarySource from "./LibrarySource";
 import Audio from "./Audio";
 import Overlay from "./Overlay";
@@ -203,7 +204,7 @@ export default class Scene {
   videoSpeedMax = 20;
   audioScene = false;
   audioEnabled = false;
-  audioPlaylists: Array<Array<Audio>> = [];
+  audioPlaylists: Array<{audios: Array<Audio>, shuffle: boolean, repeat: string}> = [];
   generatorWeights?: Array<WeightGroup> = null;
   openTab = 3;
 
@@ -325,7 +326,12 @@ export default class Scene {
     }
 
     if (this.audios) {
-      this.audioPlaylists = this.audios.map((a) => [a]);
+      this.audioPlaylists = this.audios.map((a) => {
+        if (!a.name) {
+          a.name = a.url.substring(a.url.lastIndexOf(path.sep) + 1, a.url.lastIndexOf("."));
+        }
+        return {audios: [a], shuffle: false, repeat: RP.all};
+      });
       this.audios = null;
     }
   }

@@ -7,9 +7,11 @@ import {
 import AddIcon from '@material-ui/icons/Add';
 
 import {SceneSettings} from "../../data/Config";
+import {RP} from "../../data/const";
 import Scene from "../../data/Scene";
 import Audio from "../../data/Audio";
 import AudioPlaylist from "../player/AudioPlaylist";
+import AudioOptions from "../library/AudioOptions";
 
 const styles = (theme: Theme) => createStyles({
   addButton: {
@@ -31,6 +33,11 @@ class AudioCard extends React.Component {
     setCurrentAudio?(audio: Audio): void,
   };
 
+  readonly state = {
+    sourceOptionsPlaylist: -1,
+    sourceOptions: null as Audio,
+  }
+
   render() {
     const classes = this.props.classes;
     return(
@@ -50,7 +57,7 @@ class AudioCard extends React.Component {
                 <Tooltip title={"Add Playlist"}>
                   <Fab
                     className={classes.addButton}
-                    onClick={this.onAddAudioTrack.bind(this)}
+                    onClick={this.onAddPlaylist.bind(this)}
                     size="small">
                     <AddIcon />
                   </Fab>
@@ -59,17 +66,18 @@ class AudioCard extends React.Component {
             </Grid>
           </Grid>
         </Grid>
-        {this.props.scene.audioPlaylists.map((a, i) =>
+        {this.props.scene.audioPlaylists.map((playlist, i) =>
           <Grid item xs={12} key={i}>
             <Collapse in={this.props.scene.audioEnabled}>
               <AudioPlaylist
                 playlistIndex={i}
-                audios={a}
+                playlist={playlist}
                 scene={this.props.scene}
                 scenePaths={this.props.scenePaths}
                 sidebar={this.props.sidebar}
                 startPlaying={this.props.startPlaying}
                 onAddTracks={this.props.onAddTracks}
+                onSourceOptions={this.onSourceOptions.bind(this)}
                 onUpdateScene={this.props.onUpdateScene.bind(this)}
                 setCurrentAudio={i==0 && this.props.setCurrentAudio ? this.props.setCurrentAudio.bind(this) : this.nop}
                 goBack={this.props.goBack}
@@ -80,14 +88,38 @@ class AudioCard extends React.Component {
             </Collapse>
           </Grid>
         )}
+        {this.state.sourceOptions != null && (
+          <AudioOptions
+            audio={this.state.sourceOptions}
+            onCancel={this.onCloseSourceOptions.bind(this)}
+            onFinishEdit={this.onFinishSourceOptions.bind(this)}
+          />
+        )}
       </Grid>
     );
   }
 
   nop() {}
 
-  onAddAudioTrack() {
-    this.changeKey('audioPlaylists', this.props.scene.audioPlaylists.concat([[]]));
+  onFinishSourceOptions(newAudio: Audio) {
+    this.props.onUpdateScene(this.props.scene, (s) => {
+      const playlist = this.props.scene.audioPlaylists[this.state.sourceOptionsPlaylist];
+      let editSource = playlist.audios.find((a) => a.id == this.state.sourceOptions.id);
+      Object.assign(editSource, newAudio);
+    })
+    this.onCloseSourceOptions();
+  }
+
+  onCloseSourceOptions() {
+    this.setState({sourceOptions: null, sourceOptionsPlaylist: -1});
+  }
+
+  onSourceOptions(playlistIndex: number, audio: Audio) {
+    this.setState({sourceOptions: audio, sourceOptionsPlaylist: playlistIndex});
+  }
+
+  onAddPlaylist() {
+    this.changeKey('audioPlaylists', this.props.scene.audioPlaylists.concat([{audios: [], shuffle: false, repeat: RP.all}]));
   }
 
   onBoolInput(key: string, e: MouseEvent) {

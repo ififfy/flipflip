@@ -506,9 +506,9 @@ class AudioLibrary extends React.Component {
 
           <Divider />
 
-          <div className={clsx((this.props.tutorial != null || this.props.specialMode != null) && classes.disable)}>
+          <div className={clsx(this.props.tutorial != null && classes.disable)}>
             <Tooltip title={this.state.drawerOpen ? "" : "Manage Tags"}>
-              <ListItem button onClick={this.props.onManageTags.bind(this)}>
+              <ListItem button onClick={this.props.onManageTags.bind(this)} disabled={this.props.specialMode != null}>
                 <ListItemIcon>
                   <LocalOfferIcon />
                 </ListItemIcon>
@@ -524,7 +524,7 @@ class AudioLibrary extends React.Component {
               </ListItem>
             </Tooltip>
             <Tooltip title={this.state.drawerOpen ? "" : "Add to Playlist"}>
-              <ListItem button onClick={this.onAddToPlaylist.bind(this)}>
+              <ListItem button onClick={this.onAddToPlaylist.bind(this)} disabled={this.props.specialMode != null}>
                 <ListItemIcon>
                   <PlaylistAddIcon />
                 </ListItemIcon>
@@ -532,7 +532,7 @@ class AudioLibrary extends React.Component {
               </ListItem>
             </Tooltip>
             <Tooltip title={this.state.drawerOpen ? "" : "Batch Tag"}>
-              <ListItem button onClick={this.onBatchTag.bind(this)}>
+              <ListItem button onClick={this.onBatchTag.bind(this)} disabled={this.props.specialMode != null}>
                 <ListItemIcon>
                   <FormatListBulletedIcon />
                 </ListItemIcon>
@@ -540,7 +540,7 @@ class AudioLibrary extends React.Component {
               </ListItem>
             </Tooltip>
             <Tooltip title={this.state.drawerOpen ? "" : "Batch Edit"}>
-              <ListItem button onClick={this.onBatchEdit.bind(this)}>
+              <ListItem button onClick={this.onBatchEdit.bind(this)} disabled={this.props.specialMode != null}>
                 <ListItemIcon>
                   <EditIcon />
                 </ListItemIcon>
@@ -923,7 +923,7 @@ class AudioLibrary extends React.Component {
                 fullWidth
                 placeholder="Paste URL Here"
                 margin="dense"
-                value={this.state.importURL}
+                value={this.state.importURL == null ? "" : this.state.importURL}
                 onChange={this.onURLChange.bind(this)}/>
             </DialogContent>
             <DialogActions>
@@ -975,7 +975,7 @@ class AudioLibrary extends React.Component {
                 fullWidth
                 placeholder="Name your playlist"
                 margin="dense"
-                value={this.state.importURL}
+                value={this.state.importURL == null ? "" : this.state.importURL}
                 onChange={this.onURLChange.bind(this)}/>
             </DialogContent>
             <DialogActions>
@@ -1194,7 +1194,7 @@ class AudioLibrary extends React.Component {
               }
             }
             if (!newAudio.name) {
-              newAudio.name = url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("."));
+              newAudio.name = url.substring(url.lastIndexOf(path.sep) + 1, url.lastIndexOf("."));
             }
             originalSources.unshift(newAudio);
             this.props.onUpdateLibrary((l) => {
@@ -1316,6 +1316,9 @@ class AudioLibrary extends React.Component {
 
   onAddPlaylist() {
     const name = this.state.importURL;
+    for (let playlist of this.props.playlists) {
+      if (name == playlist.name) return;
+    }
     let id = this.props.playlists.length + 1;
     this.props.playlists.forEach((p) => {
       id = Math.max(p.id + 1, id);
