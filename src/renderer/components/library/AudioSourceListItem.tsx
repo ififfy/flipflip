@@ -94,6 +94,7 @@ const styles = (theme: Theme) => createStyles({
     display: 'flex',
     justifyContent: 'center',
     cursor: 'pointer',
+    userSelect: 'none',
   },
   thumbImage: {
     height: '100%',

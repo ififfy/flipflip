@@ -53,6 +53,7 @@ class AudioPlaylist extends React.Component {
     scenePaths?: Array<any>,
     goBack?(): void,
     playNextScene?(): void,
+    setCurrentAudio?(audio: Audio): void,
   };
 
   readonly state = {
@@ -138,10 +139,19 @@ class AudioPlaylist extends React.Component {
     }
   }
 
+  componentDidMount() {
+    if (this.props.setCurrentAudio) {
+      this.props.setCurrentAudio(this.props.audios[this.state.currentIndex]);
+    }
+  }
+
   nextTrack() {
     let nextTrack = this.state.currentIndex + 1;
     if (nextTrack >= this.props.audios.length) {
       nextTrack = 0;
+    }
+    if (this.props.setCurrentAudio) {
+      this.props.setCurrentAudio(this.props.audios[nextTrack]);
     }
     this.setState({currentIndex: nextTrack});
   }

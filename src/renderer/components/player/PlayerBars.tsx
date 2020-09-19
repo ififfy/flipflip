@@ -37,6 +37,7 @@ import VideoCard from "../configGroups/VideoCard";
 import VideoControl from "./VideoControl";
 import FadeIOCard from "../configGroups/FadeIOCard";
 import PanningCard from "../configGroups/PanningCard";
+import Audio from "../../data/Audio";
 
 const drawerWidth = 340;
 
@@ -220,6 +221,7 @@ class PlayerBars extends React.Component {
     playNextScene(): void,
     play(): void,
     pause(): void,
+    setCurrentAudio(audio: Audio): void,
     allTags?: Array<Tag>,
     tags?: Array<Tag>,
     blacklistFile?(sourceURL: string, fileToBlacklist: string): void,
@@ -493,7 +495,8 @@ class PlayerBars extends React.Component {
                     startPlaying
                     onUpdateScene={this.props.onUpdateScene.bind(this)}
                     goBack={this.props.goBack.bind(this)}
-                    playNextScene={this.props.playNextScene}/>
+                    playNextScene={this.props.playNextScene}
+                    setCurrentAudio={this.props.setCurrentAudio.bind(this)}/>
                 </ExpansionPanelDetails>
               </ExpansionPanel>
 

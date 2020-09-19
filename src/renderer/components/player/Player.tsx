@@ -63,7 +63,7 @@ export default class Player extends React.Component {
     imagePlayerDeleteHack: new ChildCallbackHack(),
     mainVideo: null as HTMLVideoElement,
     overlayVideos: Array<HTMLVideoElement>(this.props.scene.overlays.length).fill(null),
-    currentAudio: this.props.scene.audioScene ? this.props.scene.audioPlaylists[0][0] : null as Audio,
+    currentAudio: null as Audio,
     timeToNextFrame: null as number,
     recentPictureGrid: false,
     thumbImage: null as HTMLImageElement,
@@ -255,6 +255,7 @@ export default class Player extends React.Component {
             playNextScene={this.props.nextScene}
             play={this.play.bind(this)}
             pause={this.pause.bind(this)}
+            setCurrentAudio={this.setCurrentAudio.bind(this)}
             allTags={this.props.allTags}
             tags={this.props.tags}
             blacklistFile={this.props.blacklistFile}
@@ -522,6 +523,10 @@ export default class Player extends React.Component {
       newVolume = 100;
     }
     this.props.onUpdateScene(this.props.scene, (s) => s.videoVolume = newVolume);
+  }
+
+  setCurrentAudio(audio: Audio) {
+    this.setState({currentAudio: audio});
   }
 
   setProgress(total: number, current: number, message: string[]) {

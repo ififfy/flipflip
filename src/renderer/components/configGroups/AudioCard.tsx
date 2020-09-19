@@ -8,6 +8,7 @@ import AddIcon from '@material-ui/icons/Add';
 
 import {SceneSettings} from "../../data/Config";
 import Scene from "../../data/Scene";
+import Audio from "../../data/Audio";
 import AudioPlaylist from "../player/AudioPlaylist";
 
 const styles = (theme: Theme) => createStyles({
@@ -27,6 +28,7 @@ class AudioCard extends React.Component {
     scenePaths?: Array<any>,
     goBack?(): void,
     playNextScene?(): void,
+    setCurrentAudio?(audio: Audio): void,
   };
 
   render() {
@@ -69,6 +71,7 @@ class AudioCard extends React.Component {
                 startPlaying={this.props.startPlaying}
                 onAddTracks={this.props.onAddTracks}
                 onUpdateScene={this.props.onUpdateScene.bind(this)}
+                setCurrentAudio={i==0 && this.props.setCurrentAudio ? this.props.setCurrentAudio.bind(this) : this.nop}
                 goBack={this.props.goBack}
                 playNextScene={this.props.playNextScene}/>
               {i != this.props.scene.audioPlaylists.length-1 && (
@@ -80,6 +83,8 @@ class AudioCard extends React.Component {
       </Grid>
     );
   }
+
+  nop() {}
 
   onAddAudioTrack() {
     this.changeKey('audioPlaylists', this.props.scene.audioPlaylists.concat([[]]));

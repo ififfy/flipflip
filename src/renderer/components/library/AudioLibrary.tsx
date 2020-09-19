@@ -3,7 +3,7 @@ import {remote} from "electron";
 import path from 'path';
 import clsx from "clsx";
 import * as mm from "music-metadata";
-import {existsSync, readFileSync} from "fs";
+import {existsSync} from "fs";
 import wretch from "wretch";
 
 import {
@@ -20,7 +20,6 @@ import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import AudiotrackIcon from '@material-ui/icons/Audiotrack';
 import ClearIcon from '@material-ui/icons/Clear';
-import DeleteIcon from "@material-ui/icons/Delete";
 import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
 import EditIcon from '@material-ui/icons/Edit';
 import FormatListBulletedIcon from '@material-ui/icons/FormatListBulleted';
@@ -36,7 +35,7 @@ import SortIcon from '@material-ui/icons/Sort';
 
 import {red} from "@material-ui/core/colors";
 
-import {generateThumbnailFile, isAudio, isImage} from "../../data/utils";
+import {generateThumbnailFile, isAudio} from "../../data/utils";
 import {AF, ASF, LT, MO, SP} from "../../data/const";
 import en from "../../data/en";
 import Audio from "../../data/Audio";
@@ -48,6 +47,7 @@ import AudioArtistList from "./AudioArtistList";
 import AudioAlbumList from "./AudioAlbumList";
 import PlaylistSelect from "../configGroups/PlaylistSelect";
 import PlaylistList from "./PlaylistList";
+import AudioEdit from "./AudioEdit";
 
 const drawerWidth = 240;
 
@@ -308,48 +308,6 @@ const styles = (theme: Theme) => createStyles({
       backgroundColor: red[700],
     },
   },
-  trackThumb: {
-    height: 140,
-    width: 140,
-    overflow: 'hidden',
-    display: 'inline-flex',
-    justifyContent: 'center',
-    position: 'absolute',
-  },
-  pointer: {
-    cursor: 'pointer',
-  },
-  input: {
-    width: '100%',
-    maxWidth: 365,
-    marginRight: theme.spacing(4),
-  },
-  inputShort: {
-    width: 75,
-  },
-  inputFull: {
-    width: '100%',
-    maxWidth: 530,
-  },
-  thumbImage: {
-    height: '100%',
-  },
-  deleteThumbButton: {
-    backgroundColor: theme.palette.error.main,
-    position: 'absolute',
-    bottom: '3%',
-    right: '6%',
-  },
-  deleteIcon: {
-    color: theme.palette.error.contrastText,
-  },
-  audioIcon: {
-    height: '100%',
-    width: '100%',
-  },
-  actions: {
-    marginRight: theme.spacing(3),
-  },
   tabSection: {
     height: '100%',
   },
@@ -442,7 +400,6 @@ class AudioLibrary extends React.Component {
     importURL: null as string,
     loadingMetadata: false,
     error: false,
-    commonAudio: null as Audio,
   };
 
   render() {
@@ -503,7 +460,7 @@ class AudioLibrary extends React.Component {
         <Drawer
           className={clsx(classes.drawer, (this.props.tutorial == LT.sidebar1 || this.props.tutorial == LT.sidebar2 || this.state.drawerOpen) && classes.backdropTop, this.props.tutorial == LT.sidebar2 && classes.highlight)}
           variant="permanent"
-          classes={{paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose, this.props.specialMode && classes.drawerPaperHidden)}}
+          classes={{paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose)}}
           open={this.state.drawerOpen}>
           <div className={clsx(!open && classes.appBarSpacerWrapper)}>
             <Collapse in={!open}>
@@ -549,8 +506,7 @@ class AudioLibrary extends React.Component {
 
           <Divider />
 
-          <div className={clsx(this.props.tutorial != null && classes.disable)}>
-
+          <div className={clsx((this.props.tutorial != null || this.props.specialMode != null) && classes.disable)}>
             <Tooltip title={this.state.drawerOpen ? "" : "Manage Tags"}>
               <ListItem button onClick={this.props.onManageTags.bind(this)}>
                 <ListItemIcon>
@@ -686,9 +642,7 @@ class AudioLibrary extends React.Component {
                 id="vertical-tabpanel-3"
                 aria-labelledby="vertical-tab-3">
                 <div className={classes.tabPanel}>
-                  {!this.props.specialMode &&  (
-                    <div className={classes.drawerSpacer}/>
-                  )}
+                  <div className={classes.drawerSpacer}/>
                   <Box className={classes.fill}>
                     <AudioSourceList
                       cachePath={this.props.cachePath}
@@ -718,7 +672,7 @@ class AudioLibrary extends React.Component {
           onClick={this.onCloseDialog.bind(this)}
           open={this.props.tutorial == null && (this.state.openMenu == MO.new || this.state.drawerOpen)} />
 
-        {(this.props.specialMode) && (
+        {this.props.specialMode && this.props.openTab == 3 && (
           <React.Fragment>
             <Tooltip title="Clear"  placement="top-end">
               <Fab
@@ -763,7 +717,7 @@ class AudioLibrary extends React.Component {
                   <Fab
                     className={classes.addMenuButton}
                     disabled={this.state.selected.length == 0}
-                    onClick={this.onToggleBatchEditModal.bind(this)}
+                    onClick={this.onShowBatchEditModal.bind(this)}
                     size="large">
                     <EditIcon className={classes.icon} />
                   </Fab>
@@ -1037,65 +991,13 @@ class AudioLibrary extends React.Component {
         )}
 
         {this.state.openMenu == MO.batchEdit && (
-          <Dialog
-            open={this.state.openMenu == MO.batchEdit}
-            onClose={this.onToggleBatchEditModal.bind(this)}
-            aria-describedby="edit-description">
-            <DialogContent>
-              <Typography variant="h6">Batch Edit song info</Typography>
-              <TextField
-                className={classes.input}
-                value={this.state.commonAudio.name}
-                margin="normal"
-                label="Name"
-                onChange={this.onEditBatch.bind(this, 'name')}/>
-              <div className={clsx(classes.trackThumb, this.state.commonAudio.thumb == null && classes.pointer)} onClick={this.state.commonAudio.thumb == null ? this.loadThumb.bind(this) : this.nop}>
-                {this.state.commonAudio.thumb != null && (
-                  <React.Fragment>
-                    <IconButton
-                      onClick={this.onRemoveThumb.bind(this)}
-                      className={classes.deleteThumbButton}
-                      edge="end"
-                      size="small"
-                      aria-label="delete">
-                      <DeleteIcon className={classes.deleteIcon} color="inherit"/>
-                    </IconButton>
-                    <img className={classes.thumbImage} src={this.state.commonAudio.thumb}/>
-                  </React.Fragment>
-                )}
-                {this.state.commonAudio.thumb == null && (
-                  <AudiotrackIcon className={classes.audioIcon} />
-                )}
-              </div>
-              <TextField
-                className={classes.input}
-                value={this.state.commonAudio.artist}
-                margin="normal"
-                label="Artist"
-                onChange={this.onEditBatch.bind(this, 'artist')}/>
-              <TextField
-                className={classes.input}
-                value={this.state.commonAudio.album}
-                margin="normal"
-                label="Album"
-                onChange={this.onEditBatch.bind(this, 'album')}/>
-              <TextField
-                className={classes.inputFull}
-                value={this.state.commonAudio.comment}
-                margin="normal"
-                label="Comment"
-                multiline
-                onChange={this.onEditBatch.bind(this, 'comment')}/>
-            </DialogContent>
-            <DialogActions className={classes.actions}>
-              <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
-                Cancel
-              </Button>
-              <Button onClick={this.onFinishBatchEdit.bind(this)} color="primary">
-                Save
-              </Button>
-            </DialogActions>
-          </Dialog>
+          <AudioEdit
+            audio={this.getCommonAudio()}
+            cachePath={this.props.cachePath}
+            title={"Batch Edit song info"}
+            onCancel={this.onCloseDialog.bind(this)}
+            onFinishBatchEdit={this.onFinishBatchEdit.bind(this)}
+          />
         )}
 
         {this.state.openMenu == MO.batchTag && (
@@ -1141,8 +1043,6 @@ class AudioLibrary extends React.Component {
       </div>
     );
   }
-
-  nop() {}
 
   componentDidMount() {
     this.setState({displaySources: this.getDisplaySources()});
@@ -1387,12 +1287,8 @@ class AudioLibrary extends React.Component {
     }
   }
 
-  onToggleBatchEditModal() {
-    if (this.state.openMenu == MO.batchEdit) {
-      this.setState({openMenu: null, commonAudio: null});
-    } else {
-      this.setState({openMenu: MO.batchEdit, commonAudio: this.getCommonAudio()});
-    }
+  onShowBatchEditModal() {
+    this.setState({openMenu: MO.batchEdit});
   }
 
   onTogglePlaylistDialog(e: MouseEvent) {
@@ -1452,7 +1348,7 @@ class AudioLibrary extends React.Component {
   }
 
   onCloseDialog() {
-    this.setState({menuAnchorEl: null, openMenu: null, drawerOpen: false, importURL: null, commonAudio: null});
+    this.setState({menuAnchorEl: null, openMenu: null, drawerOpen: false, importURL: null});
   }
 
   onRemoveAll() {
@@ -1559,45 +1455,18 @@ class AudioLibrary extends React.Component {
     }
   }
 
-  onEditBatch(key: string, e: MouseEvent) {
-    const input = (e.target as HTMLInputElement);
-    const newAudio = new Audio(this.state.commonAudio);
-    (newAudio as any)[key] = input.value;
-    this.setState({commonAudio: newAudio});
-  }
-
-  onRemoveThumb(e: MouseEvent) {
-    e.preventDefault();
-    const newAudio = new Audio(this.state.commonAudio);
-    newAudio.thumb = null;
-    this.setState({commonAudio: newAudio});
-  }
-
-  loadThumb() {
-    let iResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
-      {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'Image files', extensions: ["gif", "png", "jpeg", "jpg", "webp", "tiff", "svg"]}], properties: ['openFile']});
-    if (!iResult) return;
-    iResult = iResult.filter((i) => isImage(i, true));
-    if (iResult.length > 0) {
-      const newAudio = this.state.commonAudio;
-      newAudio.thumb = generateThumbnailFile(this.props.cachePath, readFileSync(iResult[0]));
-      this.setState({commonAudio: newAudio});
-    }
-  }
-
-  onFinishBatchEdit() {
+  onFinishBatchEdit(common: Audio) {
     const keys = ["thumb", "name", "artist", "album", "comment"];
-    let common: any = this.state.commonAudio;
     this.props.onUpdateLibrary((l) => {
       for (let sourceURL of this.state.selected) {
         const source: any = l.find((s) => s.url === sourceURL);
         for (let key of keys) {
-          if (!common[key] != null) {
-            source[key] = common[key];
+          if ((common as any)[key] != null && (common as any)[key] != "") {
+            source[key] = (common as any)[key];
           }
         }
       }
-    })
+    });
     this.onCloseDialog();
   }
 
