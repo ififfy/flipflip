@@ -164,6 +164,7 @@ const MO = { // Menu/Modal Constants
   batchEdit: 'mo.batchedit',
   playlist: 'mo.playlist',
   newPlaylist: 'mo.newplaylist',
+  playlistDuplicates: 'mo.playlistduplicates',
   urlImport: 'mo.urlimport',
   newWindowAlert: 'mo.nwalert',
   removeAllAlert: 'mo.raalert',

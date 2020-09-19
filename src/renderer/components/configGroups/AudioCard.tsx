@@ -67,26 +67,32 @@ class AudioCard extends React.Component {
           </Grid>
         </Grid>
         {this.props.scene.audioPlaylists.map((playlist, i) =>
-          <Grid item xs={12} key={i}>
-            <Collapse in={this.props.scene.audioEnabled}>
-              <AudioPlaylist
-                playlistIndex={i}
-                playlist={playlist}
-                scene={this.props.scene}
-                scenePaths={this.props.scenePaths}
-                sidebar={this.props.sidebar}
-                startPlaying={this.props.startPlaying}
-                onAddTracks={this.props.onAddTracks}
-                onSourceOptions={this.onSourceOptions.bind(this)}
-                onUpdateScene={this.props.onUpdateScene.bind(this)}
-                setCurrentAudio={i==0 && this.props.setCurrentAudio ? this.props.setCurrentAudio.bind(this) : this.nop}
-                goBack={this.props.goBack}
-                playNextScene={this.props.playNextScene}/>
-              {i != this.props.scene.audioPlaylists.length-1 && (
-                <Divider/>
-              )}
-            </Collapse>
-          </Grid>
+          <React.Fragment key={i}>
+            <Grid item xs={12}>
+              <Collapse in={this.props.scene.audioEnabled}>
+                <AudioPlaylist
+                  playlistIndex={i}
+                  playlist={playlist}
+                  scene={this.props.scene}
+                  scenePaths={this.props.scenePaths}
+                  sidebar={this.props.sidebar}
+                  startPlaying={this.props.startPlaying}
+                  onAddTracks={this.props.onAddTracks}
+                  onSourceOptions={this.onSourceOptions.bind(this)}
+                  onUpdateScene={this.props.onUpdateScene.bind(this)}
+                  setCurrentAudio={i==0 && this.props.setCurrentAudio ? this.props.setCurrentAudio.bind(this) : this.nop}
+                  goBack={this.props.goBack}
+                  playNextScene={this.props.playNextScene}/>
+              </Collapse>
+            </Grid>
+            {i != this.props.scene.audioPlaylists.length-1 && (
+              <Grid item xs={12}>
+                <Collapse in={this.props.scene.audioEnabled}>
+                  <Divider/>
+                </Collapse>
+              </Grid>
+            )}
+          </React.Fragment>
         )}
         {this.state.sourceOptions != null && (
           <AudioOptions

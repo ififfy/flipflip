@@ -397,6 +397,7 @@ class AudioLibrary extends React.Component {
     selectedTags: Array<string>(),
     menuAnchorEl: null as any,
     openMenu: null as string,
+    playlistID: null as number,
     importURL: null as string,
     loadingMetadata: false,
     error: false,
@@ -965,7 +966,7 @@ class AudioLibrary extends React.Component {
         {this.state.openMenu == MO.newPlaylist && (
           <Dialog
             classes={{paper: clsx(classes.noScroll, classes.urlDialog)}}
-            open={this.state.openMenu == MO.newPlaylist}
+            open={true}
             onClose={this.onCloseDialog.bind(this)}
             aria-labelledby="add-playlist-title">
             <DialogTitle id="add-playist-title">New Playlist</DialogTitle>
@@ -985,6 +986,28 @@ class AudioLibrary extends React.Component {
               <Button
                 onClick={this.onAddPlaylist.bind(this)} color="primary">
                 Create Playlist
+              </Button>
+            </DialogActions>
+          </Dialog>
+        )}
+
+        {this.state.openMenu == MO.playlistDuplicates && (
+          <Dialog
+            classes={{paper: clsx(classes.noScroll, classes.urlDialog)}}
+            open={true}
+            onClose={this.onCloseDialog.bind(this)}
+            aria-labelledby="duplicate-title">
+            <DialogTitle id="duplicate-title">Add duplicate songs?</DialogTitle>
+            <DialogContent className={classes.noScroll}>
+              Some of these songs are already in this playlist
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onSkipDuplicates.bind(this)} color="secondary">
+                Skip Duplicates
+              </Button>
+              <Button
+                onClick={this.onAddDuplicates.bind(this)} color="primary">
+                Add Anyway
               </Button>
             </DialogActions>
           </Dialog>
@@ -1303,6 +1326,17 @@ class AudioLibrary extends React.Component {
     if (playlistID == -1) {
       this.setState({openMenu: MO.newPlaylist});
     } else {
+      // Check to see if playlist already has any of these tracks
+      const playlist = this.props.playlists.find((p) => p.id == playlistID);
+      for (let url of this.state.selected) {
+        const audio = this.props.library.find((a) => a.url == url);
+        if (playlist.audios.includes(audio.id)) {
+          // If so, show alert before adding to playlist
+          this.setState({openMenu: MO.playlistDuplicates, playlistID: playlistID});
+          return;
+        }
+      }
+      // Otherwise, add tracks to playlist
       this.props.onUpdatePlaylists((ps) => {
         const playlist = ps.find((p) => p.id == playlistID);
         if (playlist) {
@@ -1312,6 +1346,39 @@ class AudioLibrary extends React.Component {
       this.goBack();
       this.onCloseDialog();
     }
+  }
+
+  onSkipDuplicates() {
+    this.props.onUpdatePlaylists((ps) => {
+      const playlist = ps.find((p) => p.id == this.state.playlistID);
+      if (playlist) {
+        for (let url of this.state.selected) {
+          const audio = this.props.library.find((a) => a.url == url);
+          if (!playlist.audios.includes(audio.id)) {
+            playlist.audios.push(audio.id);
+          }
+        }
+        for (let aID of playlist.audios) {
+          const audio = this.props.library.find((a) => a.id == aID);
+          if (!this.state.selected.includes(audio.url)) {
+            playlist.audios.push(audio.id);
+          }
+        }
+      }
+    });
+    this.goBack();
+    this.onCloseDialog();
+  }
+
+  onAddDuplicates() {
+    this.props.onUpdatePlaylists((ps) => {
+      const playlist = ps.find((p) => p.id == this.state.playlistID);
+      if (playlist) {
+        playlist.audios = playlist.audios.concat(this.state.selected.map((s) => this.props.library.find((a) => a.url == s)?.id));
+      }
+    });
+    this.goBack();
+    this.onCloseDialog();
   }
 
   onAddPlaylist() {
@@ -1351,7 +1418,7 @@ class AudioLibrary extends React.Component {
   }
 
   onCloseDialog() {
-    this.setState({menuAnchorEl: null, openMenu: null, drawerOpen: false, importURL: null});
+    this.setState({menuAnchorEl: null, openMenu: null, drawerOpen: false, importURL: null, playlistID: null});
   }
 
   onRemoveAll() {
