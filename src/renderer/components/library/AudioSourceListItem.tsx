@@ -183,7 +183,10 @@ class AudioSourceListItem extends React.Component {
                 horizontal: 'left',
               }}
               badgeContent={<OfflineBoltIcon className={classes.errorIcon} />}>
-              <Tooltip placement={this.props.source.comment ? 'right' : 'bottom'} classes={this.props.source.comment ? {tooltip: classes.bigTooltip} : null} title={
+              <Tooltip placement={this.props.source.comment ? 'right' : 'bottom'}
+                       classes={this.props.source.comment ? {tooltip: classes.bigTooltip} : null}
+                       arrow={!!this.props.source.comment || this.props.source.tags.length > 0}
+                       title={
                 this.props.source.comment || this.props.source.tags.length > 0 ?
                   <div>
                     {this.props.source.comment}

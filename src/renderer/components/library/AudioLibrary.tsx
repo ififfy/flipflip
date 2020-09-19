@@ -1019,7 +1019,7 @@ class AudioLibrary extends React.Component {
             cachePath={this.props.cachePath}
             title={"Batch Edit song info"}
             onCancel={this.onCloseDialog.bind(this)}
-            onFinishBatchEdit={this.onFinishBatchEdit.bind(this)}
+            onFinishEdit={this.onFinishBatchEdit.bind(this)}
           />
         )}
 

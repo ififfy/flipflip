@@ -94,7 +94,7 @@ class AudioEdit extends React.Component {
           <Typography variant="h6">{this.props.title}</Typography>
           <TextField
             className={classes.input}
-            value={this.state.audio.name}
+            value={this.state.audio.name == null ? "" : this.state.audio.name}
             margin="normal"
             label="Name"
             onChange={this.onEdit.bind(this, 'name')}/>
@@ -118,19 +118,19 @@ class AudioEdit extends React.Component {
           </div>
           <TextField
             className={classes.input}
-            value={this.state.audio.artist}
+            value={this.state.audio.artist == null ? "" : this.state.audio.artist}
             margin="normal"
             label="Artist"
             onChange={this.onEdit.bind(this, 'artist')}/>
           <TextField
             className={classes.input}
-            value={this.state.audio.album}
+            value={this.state.audio.album == null ? "" : this.state.audio.album}
             margin="normal"
             label="Album"
             onChange={this.onEdit.bind(this, 'album')}/>
           <TextField
             className={classes.inputFull}
-            value={this.state.audio.comment}
+            value={this.state.audio.comment == null ? "" : this.state.audio.comment}
             margin="normal"
             label="Comment"
             multiline

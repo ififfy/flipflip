@@ -176,10 +176,12 @@ class AudioControl extends React.Component {
   }
 
   _timeout: Timeout = null;
+  _queueNextTrack = false;
   componentDidMount() {
     if (this.state.playing) {
       this.tickLoop(true);
     }
+    this._queueNextTrack = false;
   }
 
   componentDidUpdate(props: any, state: any) {
@@ -195,7 +197,13 @@ class AudioControl extends React.Component {
       }
     }
     if (this.props.audio.tick && this.props.audio.tickMode == TF.scene && props.scenePaths && props.scenePaths.length > 0 && props.scenePaths !== this.props.scenePaths) {
-      this.setState({tick: !this.state.tick});
+      if (this._queueNextTrack) {
+        this._queueNextTrack = false;
+        this.props.nextTrack();
+        this.setState({tick: !this.state.tick, position: 0, duration: 0});
+      } else {
+        this.setState({tick: !this.state.tick});
+      }
     }
   }
 
@@ -203,11 +211,18 @@ class AudioControl extends React.Component {
     if(this._timeout != null) {
       clearTimeout(this._timeout);
     }
+    this._queueNextTrack = null;
   }
 
   tickLoop(starting: boolean = false) {
     if (!starting) {
-      this.setState({tick: !this.state.tick});
+      if (this._queueNextTrack) {
+        this._queueNextTrack = false;
+        this.props.nextTrack();
+        this.setState({tick: !this.state.tick, position: 0, duration: 0});
+      } else {
+        this.setState({tick: !this.state.tick});
+      }
     }
     if (this.props.audio.tick) {
       let timeout: number = null;
@@ -256,14 +271,22 @@ class AudioControl extends React.Component {
       this.setState({position: 0, duration: 0});
     } else {
       if (this.props.repeat == RP.all) {
-        this.props.nextTrack();
-        this.setState({position: 0, duration: 0});
+        if (this.props.audio.tick) {
+          this._queueNextTrack = true;
+        } else {
+          this.props.nextTrack();
+          this.setState({position: 0, duration: 0});
+        }
       } else if (this.props.repeat == RP.one) {
         this.setState({position: 0, duration: 0});
       } else if (this.props.repeat == RP.none) {
         if (!this.props.lastTrack) {
-          this.props.nextTrack();
-          this.setState({position: 0, duration: 0});
+          if (this.props.audio.tick) {
+            this._queueNextTrack = true;
+          } else {
+            this.props.nextTrack();
+            this.setState({position: 0, duration: 0});
+          }
         } else {
           this.setState({playing: false});
         }
