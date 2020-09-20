@@ -131,13 +131,10 @@ class AudioArtistList extends React.Component {
       } else if (a.artist < b.artist) {
         return -1;
       } else {
-        if (a.name > b.name) {
-          return 1;
-        } else if (a.name < b.name) {
-          return -1;
-        } else {
-          return 0;
-        }
+        const reA = /^(A\s|a\s|The\s|the\s)/g
+        const aValue = a.name.replace(reA, "");
+        const bValue = b.name.replace(reA, "");
+        return aValue.localeCompare(bValue, 'en', { numeric: true });
       }
     });
     for (let song of songs) {

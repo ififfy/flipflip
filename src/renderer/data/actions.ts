@@ -2078,9 +2078,12 @@ function audioSortFunction(algorithm: string, ascending: boolean): (a: Audio, b:
         bValue = b.url;
         break;
       case ASF.name:
-        aValue = a.name;
-        bValue = b.name;
-        break;
+        const reA = /^(A\s|a\s|The\s|the\s)/g
+        aValue = a.name.replace(reA, "");
+        bValue = b.name.replace(reA, "");
+
+        const compare = aValue.localeCompare(bValue, 'en', { numeric: true });
+        return ascending ? compare : compare * -1;
       case ASF.artist:
         aValue = a.artist;
         bValue = b.artist;
