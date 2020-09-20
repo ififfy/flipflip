@@ -200,7 +200,7 @@ const styles = (theme: Theme) => createStyles({
     backgroundColor: theme.palette.secondary.dark,
     margin: 0,
     top: 'auto',
-    right: 80,
+    right: 130,
     bottom: 20,
     left: 'auto',
     position: 'fixed',
@@ -209,7 +209,7 @@ const styles = (theme: Theme) => createStyles({
     backgroundColor: theme.palette.secondary.light,
     margin: 0,
     top: 'auto',
-    right: 130,
+    right: 180,
     bottom: 20,
     left: 'auto',
     position: 'fixed',
@@ -354,6 +354,12 @@ const styles = (theme: Theme) => createStyles({
   songsTab: {
     ariaControls: 'vertical-tabpanel-3',
   },
+  addProgress: {
+    position: 'absolute',
+    bottom: 18,
+    right: 18,
+    zIndex: 1,
+  },
 });
 
 class AudioLibrary extends React.Component {
@@ -400,6 +406,7 @@ class AudioLibrary extends React.Component {
     playlistID: null as number,
     importURL: null as string,
     loadingMetadata: false,
+    loadingSources: false,
     error: false,
   };
 
@@ -853,6 +860,7 @@ class AudioLibrary extends React.Component {
                 <HttpIcon className={classes.icon} />
               </Fab>
             </Tooltip>
+            {this.state.loadingSources && <CircularProgress size={60} color="secondary" className={classes.addProgress} />}
             <Fab
               className={clsx(classes.addMenuButton, this.state.openMenu == MO.new && classes.backdropTop)}
               disabled={this.state.filters.length > 0}
@@ -860,51 +868,52 @@ class AudioLibrary extends React.Component {
               size="large">
               <AddIcon className={classes.icon} />
             </Fab>
+          </React.Fragment>
+        )}
 
-            {this.props.library.length >= 2 && (
-              <React.Fragment>
-                <Fab
-                  className={classes.sortMenuButton}
-                  aria-haspopup="true"
-                  aria-controls="sort-menu"
-                  aria-label="Sort Sources"
-                  onClick={this.onOpenSortMenu.bind(this)}
-                  size="medium">
-                  <SortIcon className={classes.icon} />
-                </Fab>
-                <Menu
-                  id="sort-menu"
-                  elevation={1}
-                  anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'center',
-                  }}
-                  transformOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'right',
-                  }}
-                  getContentAnchorEl={null}
-                  anchorEl={this.state.menuAnchorEl}
-                  keepMounted
-                  classes={{paper: classes.sortMenu}}
-                  open={this.state.openMenu == MO.sort}
-                  onClose={this.onCloseDialog.bind(this)}>
-                  {Object.values(ASF).map((sf) =>
-                    <MenuItem key={sf}>
-                      <ListItemText primary={en.get(sf)}/>
-                      <ListItemSecondaryAction>
-                        <IconButton edge="end" onClick={playlist? this.props.onSortPlaylist.bind(this, playlist, sf, true) : this.props.onSort.bind(this, sf, true)}>
-                          <ArrowUpwardIcon/>
-                        </IconButton>
-                        <IconButton edge="end" onClick={playlist ? this.props.onSortPlaylist.bind(this, playlist, sf, false) : this.props.onSort.bind(this, sf, false)}>
-                          <ArrowDownwardIcon/>
-                        </IconButton>
-                      </ListItemSecondaryAction>
-                    </MenuItem>
-                  )}
-                </Menu>
-              </React.Fragment>
-            )}
+        {this.props.openTab == 3 && (
+          <React.Fragment>
+            <Fab
+              disabled={this.props.library.length < 2}
+              className={classes.sortMenuButton}
+              aria-haspopup="true"
+              aria-controls="sort-menu"
+              aria-label="Sort Sources"
+              onClick={this.onOpenSortMenu.bind(this)}
+              size="medium">
+              <SortIcon className={classes.icon} />
+            </Fab>
+            <Menu
+              id="sort-menu"
+              elevation={1}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'center',
+              }}
+              transformOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+              getContentAnchorEl={null}
+              anchorEl={this.state.menuAnchorEl}
+              keepMounted
+              classes={{paper: classes.sortMenu}}
+              open={this.state.openMenu == MO.sort}
+              onClose={this.onCloseDialog.bind(this)}>
+              {Object.values(ASF).map((sf) =>
+                <MenuItem key={sf}>
+                  <ListItemText primary={en.get(sf)}/>
+                  <ListItemSecondaryAction>
+                    <IconButton edge="end" onClick={playlist? this.props.onSortPlaylist.bind(this, playlist, sf, true) : this.props.onSort.bind(this, sf, true)}>
+                      <ArrowUpwardIcon/>
+                    </IconButton>
+                    <IconButton edge="end" onClick={playlist ? this.props.onSortPlaylist.bind(this, playlist, sf, false) : this.props.onSort.bind(this, sf, false)}>
+                      <ArrowDownwardIcon/>
+                    </IconButton>
+                  </ListItemSecondaryAction>
+                </MenuItem>
+              )}
+            </Menu>
           </React.Fragment>
         )}
 
@@ -1163,6 +1172,7 @@ class AudioLibrary extends React.Component {
           {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'Audio files', extensions: ['mp3', 'm4a', 'wav', 'ogg']}], properties: ['openFile', 'multiSelections']});
         if (!aResult) return;
         aResult = aResult.filter((r) => isAudio(r, true));
+        this.setState({loadingSources: true});
         this.addAudioSources(aResult);
         break;
     }
@@ -1255,6 +1265,7 @@ class AudioLibrary extends React.Component {
           l.splice(0, l.length);
           l.push(...originalSources);
         });
+        this.setState({loadingSources: false});
         return;
       }
 

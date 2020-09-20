@@ -236,7 +236,9 @@ class LibrarySearch extends React.Component {
     } else {
       let filters = Array<string>();
       for (let s of search) {
-        if (!this.props.isCreatable || ((s.value.startsWith("[") || s.value.startsWith("-[")) && s.value.endsWith("]")) || ((s.value.startsWith("{") || s.value.startsWith("-{")) && s.value.endsWith("}"))) {
+        if (!this.props.isCreatable || ((s.value.startsWith("[") || s.value.startsWith("-[")) && s.value.endsWith("]")) ||
+          ((s.value.startsWith("{") || s.value.startsWith("-{")) && s.value.endsWith("}")) || s.value.startsWith("playlist:") ||
+          s.value.startsWith("artist:") || s.value.startsWith("album:")) {
           filters = filters.concat(s.value);
         } else if ((s.value.startsWith('"') && s.value.endsWith('"')) ||
                     (s.value.startsWith('\'') && s.value.endsWith('\''))) {

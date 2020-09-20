@@ -2,7 +2,7 @@ import * as React from "react";
 import Sortable from "react-sortablejs";
 
 import {
-  Avatar,
+  Avatar, Chip,
   createStyles,
   IconButton,
   List,
@@ -22,7 +22,7 @@ import RepeatIcon from '@material-ui/icons/Repeat';
 import RepeatOneIcon from '@material-ui/icons/RepeatOne';
 import ShuffleIcon from '@material-ui/icons/Shuffle';
 
-import {arrayMove, randomizeList} from "../../data/utils";
+import {arrayMove, getTimestamp, randomizeList} from "../../data/utils";
 import {RP} from "../../data/const";
 import AudioControl from "./AudioControl";
 import Audio from "../../data/Audio";
@@ -39,6 +39,9 @@ const styles = (theme: Theme) => createStyles({
   thumb: {
     width: theme.spacing(6),
     height: theme.spacing(6),
+  },
+  playlistAction: {
+    textAlign: 'center',
   },
   left: {
     float: 'left',
@@ -131,6 +134,11 @@ class AudioPlaylist extends React.Component {
                 </ListItemIcon>
                 <ListItemText primary={a.name} />
                 <ListItemSecondaryAction>
+                  <Chip
+                    label={getTimestamp(a.duration)}
+                    color='default'
+                    size='small'
+                    variant='outlined'/>
                   <IconButton edge="end" onClick={this.props.onSourceOptions.bind(this, this.props.playlistIndex, a)}>
                     <BuildIcon/>
                   </IconButton>
@@ -141,7 +149,7 @@ class AudioPlaylist extends React.Component {
               </ListItem>
             )}
           </Sortable>
-          <div>
+          <div className={classes.playlistAction}>
             <div className={classes.left}>
               <Tooltip title={"Shuffle " + (this.props.playlist.shuffle ? "(On)" : "(Off)")}>
                 <IconButton onClick={this.toggleShuffle.bind(this)}>
@@ -162,12 +170,17 @@ class AudioPlaylist extends React.Component {
                 </IconButton>
               </Tooltip>
             </div>
+            <Tooltip title="Add Tracks">
+              <IconButton onClick={this.props.onAddTracks.bind(this, this.props.playlistIndex)}>
+                <AddIcon/>
+              </IconButton>
+            </Tooltip>
             <div className={classes.right}>
-              <Tooltip title="Add Tracks">
-                <IconButton onClick={this.props.onAddTracks.bind(this, this.props.playlistIndex)}>
-                  <AddIcon/>
-                </IconButton>
-              </Tooltip>
+              <Chip
+                label={getTimestamp(this.props.playlist.audios.reduce((total, a) => total + a.duration, 0))}
+                color='default'
+                size='small'
+                variant='outlined'/>
               <Tooltip title="Remove Playlist">
                 <IconButton onClick={this.removePlaylist.bind(this)}>
                   <ClearIcon color={"error"}/>
