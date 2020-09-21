@@ -46,6 +46,7 @@ class AudioControl extends React.Component {
     nextTrack?(): void,
     prevTrack?(): void,
     goBack?(): void,
+    playTrack?(url: string): void,
     playNextScene?(): void,
   };
 
@@ -264,6 +265,9 @@ class AudioControl extends React.Component {
   }
 
   onFinishedPlaying() {
+    if (this.props.playTrack) {
+      this.props.playTrack(this.props.audio.url);
+    }
     if (this.props.audio.stopAtEnd && this.props.goBack) {
       this.props.goBack();
     } else if (this.props.audio.nextSceneAtEnd && this.props.playNextScene) {

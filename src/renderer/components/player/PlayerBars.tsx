@@ -7,7 +7,7 @@ import fs from "fs";
 
 import {
   AppBar, Button, Card, CardActionArea, CardContent, createStyles, Dialog, DialogActions, DialogContent,
-  DialogContentText, DialogTitle, Divider, Drawer, ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, Grid,
+  DialogContentText, DialogTitle, Divider, Drawer, Accordion, AccordionDetails, AccordionSummary, Grid,
   IconButton, Link, Theme, Toolbar, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
@@ -227,6 +227,7 @@ class PlayerBars extends React.Component {
     blacklistFile?(sourceURL: string, fileToBlacklist: string): void,
     goToTagSource?(source: LibrarySource): void,
     goToClipSource?(source: LibrarySource): void,
+    playTrack?(url: string): void,
     toggleTag?(sourceID: number, tag: Tag): void,
   };
 
@@ -352,13 +353,13 @@ class PlayerBars extends React.Component {
               {!this.props.scene.audioScene && (
                 <React.Fragment>
                   {this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.images && (
-                    <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                      <ExpansionPanelSummary
+                    <Accordion TransitionProps={{ unmountOnExit: true }}>
+                      <AccordionSummary
                         expandIcon={<ExpandMoreIcon />}
                       >
                         <Typography>Video Controls</Typography>
-                      </ExpansionPanelSummary>
-                      <ExpansionPanelDetails>
+                      </AccordionSummary>
+                      <AccordionDetails>
                         <VideoCard
                           scene={this.props.scene}
                           otherScenes={this.props.scene.overlays.map((o) => this.getScene(o.sceneID))}
@@ -368,126 +369,126 @@ class PlayerBars extends React.Component {
                           mainClipValue={clipValue ? clipValue : null}
                           otherVideos={this.props.overlayVideos}
                           onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-                      </ExpansionPanelDetails>
-                    </ExpansionPanel>
+                      </AccordionDetails>
+                    </Accordion>
                   )}
 
-                  <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                    <ExpansionPanelSummary
+                  <Accordion TransitionProps={{ unmountOnExit: true }}>
+                    <AccordionSummary
                       expandIcon={<ExpandMoreIcon />}
                     >
                       <Typography>Scene Options</Typography>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
+                    </AccordionSummary>
+                    <AccordionDetails>
                       <SceneOptionCard
                         sidebar
                         allScenes={this.props.scenes}
                         isTagging={this.props.tags != null}
                         scene={this.props.scene}
                         onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-                    </ExpansionPanelDetails>
-                  </ExpansionPanel>
+                    </AccordionDetails>
+                  </Accordion>
 
-                  <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                    <ExpansionPanelSummary
+                  <Accordion TransitionProps={{ unmountOnExit: true }}>
+                    <AccordionSummary
                       expandIcon={<ExpandMoreIcon />}
                     >
                       <Typography>Image/Video Options</Typography>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
+                    </AccordionSummary>
+                    <AccordionDetails>
                       <ImageVideoCard
                         sidebar
                         isPlayer
                         isConfig={false}
                         scene={this.props.scene}
                         onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-                    </ExpansionPanelDetails>
-                  </ExpansionPanel>
+                    </AccordionDetails>
+                  </Accordion>
 
-                  <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                    <ExpansionPanelSummary
+                  <Accordion TransitionProps={{ unmountOnExit: true }}>
+                    <AccordionSummary
                       expandIcon={<ExpandMoreIcon />}
                     >
                       <Typography>Zoom/Move</Typography>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
+                    </AccordionSummary>
+                    <AccordionDetails>
                       <ZoomMoveCard
                         sidebar
                         scene={this.props.scene}
                         easingControls={this.props.config.displaySettings.easingControls}
                         onUpdateScene={this.props.onUpdateScene.bind(this)} />
-                    </ExpansionPanelDetails>
-                  </ExpansionPanel>
+                    </AccordionDetails>
+                  </Accordion>
 
-                  <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                    <ExpansionPanelSummary
+                  <Accordion TransitionProps={{ unmountOnExit: true }}>
+                    <AccordionSummary
                       expandIcon={<ExpandMoreIcon />}
                     >
                       <Typography>Cross-Fade</Typography>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
+                    </AccordionSummary>
+                    <AccordionDetails>
                       <CrossFadeCard
                         sidebar
                         scene={this.props.scene}
                         easingControls={this.props.config.displaySettings.easingControls}
                         onUpdateScene={this.props.onUpdateScene.bind(this)} />
-                    </ExpansionPanelDetails>
-                  </ExpansionPanel>
+                    </AccordionDetails>
+                  </Accordion>
 
-                  <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                    <ExpansionPanelSummary
+                  <Accordion TransitionProps={{ unmountOnExit: true }}>
+                    <AccordionSummary
                       expandIcon={<ExpandMoreIcon />}
                     >
                       <Typography>Strobe</Typography>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
+                    </AccordionSummary>
+                    <AccordionDetails>
                       <StrobeCard
                         sidebar
                         scene={this.props.scene}
                         easingControls={this.props.config.displaySettings.easingControls}
                         onUpdateScene={this.props.onUpdateScene.bind(this)} />
-                    </ExpansionPanelDetails>
-                  </ExpansionPanel>
+                    </AccordionDetails>
+                  </Accordion>
 
-                  <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                    <ExpansionPanelSummary
+                  <Accordion TransitionProps={{ unmountOnExit: true }}>
+                    <AccordionSummary
                       expandIcon={<ExpandMoreIcon />}
                     >
                       <Typography>Fade In/Out</Typography>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
+                    </AccordionSummary>
+                    <AccordionDetails>
                       <FadeIOCard
                         sidebar
                         scene={this.props.scene}
                         easingControls={this.props.config.displaySettings.easingControls}
                         onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-                    </ExpansionPanelDetails>
-                  </ExpansionPanel>
+                    </AccordionDetails>
+                  </Accordion>
 
-                  <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                    <ExpansionPanelSummary
+                  <Accordion TransitionProps={{ unmountOnExit: true }}>
+                    <AccordionSummary
                       expandIcon={<ExpandMoreIcon />}
                     >
                       <Typography>Panning</Typography>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
+                    </AccordionSummary>
+                    <AccordionDetails>
                       <PanningCard
                         sidebar
                         scene={this.props.scene}
                         easingControls={this.props.config.displaySettings.easingControls}
                         onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-                    </ExpansionPanelDetails>
-                  </ExpansionPanel>
+                    </AccordionDetails>
+                  </Accordion>
                 </React.Fragment>
               )}
 
-              <ExpansionPanel defaultExpanded={this.props.scene.audioScene} TransitionProps={{ unmountOnExit: !this.props.scene.audioEnabled && this.props.scene.nextSceneID === 0 }}>
-                <ExpansionPanelSummary
+              <Accordion defaultExpanded={this.props.scene.audioScene} TransitionProps={{ unmountOnExit: !this.props.scene.audioEnabled && this.props.scene.nextSceneID === 0 }}>
+                <AccordionSummary
                   expandIcon={<ExpandMoreIcon />}
                 >
                   <Typography>Audio Tracks</Typography>
-                </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
+                </AccordionSummary>
+                <AccordionDetails>
                   <AudioCard
                     sidebar
                     scene={this.props.scene}
@@ -495,25 +496,26 @@ class PlayerBars extends React.Component {
                     startPlaying
                     onUpdateScene={this.props.onUpdateScene.bind(this)}
                     goBack={this.props.goBack.bind(this)}
+                    playTrack={this.props.playTrack}
                     playNextScene={this.props.playNextScene}
                     setCurrentAudio={this.props.setCurrentAudio.bind(this)}/>
-                </ExpansionPanelDetails>
-              </ExpansionPanel>
+                </AccordionDetails>
+              </Accordion>
 
               {!this.props.scene.audioScene && (
-                <ExpansionPanel TransitionProps={{ unmountOnExit: true }}>
-                  <ExpansionPanelSummary
+                <Accordion TransitionProps={{ unmountOnExit: true }}>
+                  <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}
                   >
                     <Typography>Text Overlay</Typography>
-                  </ExpansionPanelSummary>
-                  <ExpansionPanelDetails>
+                  </AccordionSummary>
+                  <AccordionDetails>
                     <TextCard
                       sidebar
                       scene={this.props.scene}
                       onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-                  </ExpansionPanelDetails>
-                </ExpansionPanel>
+                  </AccordionDetails>
+                </Accordion>
               )}
             </Drawer>
           </React.Fragment>

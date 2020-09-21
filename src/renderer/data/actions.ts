@@ -603,6 +603,17 @@ export function playScene(state: State, scene: Scene): Object {
   return {route: state.route.concat(new Route({kind: 'play', value: scene.id})), tutorial: state.config.tutorials.player == null ? PT.welcome : null};
 }
 
+export function playTrack(state: State, url: string) {
+  return updateAudioLibrary(state, (l) => {
+    for (let a of l) {
+      if (a.url == url) {
+        a.playedCount++;
+        break;
+      }
+    }
+  })
+}
+
 export function playAudio(state: State, source: Audio, displayed: Array<Audio>): Object {
   const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, "\\");
   let librarySource = state.audios.find((s) => s.url == sourceURL);
@@ -2092,11 +2103,16 @@ function audioSortFunction(algorithm: string, ascending: boolean): (a: Audio, b:
       case ASF.album:
         aValue = a.album;
         bValue = b.album;
-        secondary = ASF.name;
+        secondary = ASF.trackNum;
         break;
       case ASF.date:
         aValue = a.id;
         bValue = b.id;
+        break;
+      case ASF.trackNum:
+        aValue = a.trackNum;
+        bValue = b.trackNum
+        secondary = ASF.name;
         break;
       case ASF.duration:
         aValue = a.duration;

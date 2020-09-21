@@ -4,10 +4,9 @@ import Tag from "./Tag";
 export default class Audio {
   id: number = 0;
   url: string;
-  offline: boolean = false;
   marked: boolean = false;
-  lastCheck: Date = null;
   tags: Array<Tag> = [];
+
   volume: number = 100;
   speed: number = 10;
   stopAtEnd: boolean = false;
@@ -25,8 +24,10 @@ export default class Audio {
   name: string;
   artist: string;
   album: string;
+  trackNum: number;
   duration: number;
   comment: string;
+  playedCount: number = 0;
 
   constructor(init?: Partial<Audio>) {
     Object.assign(this, init);

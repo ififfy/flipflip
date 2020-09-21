@@ -114,6 +114,7 @@ const ASF = { // audio sort function
   album: 'asf.album',
   date: 'asf.date',
   duration: 'asf.duration',
+  trackNum: 'asf.tracknum',
 };
 
 const ST = { // source types

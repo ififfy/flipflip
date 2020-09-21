@@ -272,6 +272,7 @@ export default class Meta extends React.Component {
               onUpdateScene={a(actions.updateScene)}
               nextScene={a(actions.nextScene)}
               goBack={a(actions.goBack)}
+              playTrack={a(actions.playTrack)}
               goToTagSource={a(actions.playSceneFromLibrary)}
               goToClipSource={a(actions.clipVideo)}
               getTags={actions.getTags.bind(this, this.state.library)}
@@ -292,6 +293,7 @@ export default class Meta extends React.Component {
               tutorial={this.state.tutorial}
               onUpdateScene={a(actions.updateScene)}
               goBack={a(actions.endPlaySceneFromLibrary)}
+              playTrack={a(actions.playTrack)}
               tags={scene.audioScene ? actions.getAudioSource(this.state)?.tags : actions.getLibrarySource(this.state)?.tags}
               allTags={this.state.tags}
               toggleTag={scene.audioScene ? a(actions.toggleAudioTag) : a(actions.toggleTag)}

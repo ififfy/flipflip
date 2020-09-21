@@ -19,7 +19,7 @@ import {
 import AudiotrackIcon from "@material-ui/icons/Audiotrack";
 import DeleteIcon from "@material-ui/icons/Delete";
 
-import {generateThumbnailFile, isImage} from "../../data/utils";
+import {extractMusicMetadata, generateThumbnailFile, isImage} from "../../data/utils";
 import Audio from "../../data/Audio";
 
 const styles = (theme: Theme) => createStyles({
@@ -129,6 +129,16 @@ class AudioEdit extends React.Component {
             label="Album"
             onChange={this.onEdit.bind(this, 'album')}/>
           <TextField
+            className={classes.inputShort}
+            value={this.state.audio.trackNum == null ? "" : this.state.audio.trackNum}
+            margin="normal"
+            label="Track #"
+            inputProps={{
+              min: 0,
+              type: 'number',
+            }}
+            onChange={this.onEdit.bind(this, 'trackNum')}/>
+          <TextField
             className={classes.inputFull}
             value={this.state.audio.comment == null ? "" : this.state.audio.comment}
             margin="normal"
@@ -187,17 +197,7 @@ class AudioEdit extends React.Component {
       .then((metadata: any) => {
         if (metadata) {
           const newAudio = new Audio(this.state.audio);
-          if (metadata.common) {
-            newAudio.name = metadata.common.title;
-            newAudio.album = metadata.common.album;
-            newAudio.artist = metadata.common.artist;
-            if (metadata.common.picture && metadata.common.picture.length > 0) {
-              newAudio.thumb = generateThumbnailFile(this.props.cachePath, metadata.common.picture[0].data);
-            }
-          }
-          if (metadata.format) {
-            newAudio.duration = metadata.format.duration;
-          }
+          extractMusicMetadata(newAudio, metadata, this.props.cachePath);
           this.setState({audio: newAudio});
         }
       })

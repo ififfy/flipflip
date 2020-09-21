@@ -10,6 +10,7 @@ import {EA, ST} from "./const";
 import en from "./en";
 import Config from "./Config";
 import LibrarySource from "./LibrarySource";
+import Audio from "./Audio";
 
 export const saveDir = path.join(remote.app.getPath('appData'), 'flipflip');
 export const savePath = path.join(saveDir, 'data.json');
@@ -300,6 +301,32 @@ export function generateThumbnailFile(cachePath: string, data: Buffer): string {
     fs.writeFileSync(checksumThumbnailPath, data);
   }
   return checksumThumbnailPath;
+}
+
+export function extractMusicMetadata(audio: Audio, metadata: any, cachePath: string) {
+  if (metadata.common) {
+    if (metadata.common.title) {
+      audio.name = metadata.common.title;
+    }
+    if (metadata.common.album) {
+      audio.album = metadata.common.album;
+    }
+    if (metadata.common.artist) {
+      audio.artist = metadata.common.artist;
+    }
+    if (metadata.common.picture && metadata.common.picture.length > 0) {
+      audio.thumb = generateThumbnailFile(cachePath, metadata.common.picture[0].data);
+    }
+    if (metadata.common.track && metadata.common.track.no) {
+      audio.trackNum = parseInt(metadata.common.track.no);
+    }
+    if (metadata.common.bpm) {
+      audio.bpm = parseInt(metadata.common.bpm);
+    }
+  }
+  if (metadata.format) {
+    audio.duration = metadata.format.duration;
+  }
 }
 
 

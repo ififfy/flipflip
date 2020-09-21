@@ -39,6 +39,9 @@ const styles = (theme: Theme) => createStyles({
     backgroundColor: theme.palette.primary.main,
     boxShadow: 'none',
   },
+  listAvatar: {
+    width: 56,
+  },
   markedSource: {
     backgroundColor: theme.palette.secondary.main,
   },
@@ -98,6 +101,9 @@ const styles = (theme: Theme) => createStyles({
   },
   thumbImage: {
     height: '100%',
+  },
+  trackNum: {
+    top: 17,
   },
   trackName: {
     maxWidth: 400,
@@ -174,15 +180,12 @@ class AudioSourceListItem extends React.Component {
             <Checkbox value={this.props.source.url} onChange={this.props.onToggleSelect.bind(this)}
                       checked={this.props.checked}/>
           )}
-          <ListItemAvatar>
+          <ListItemAvatar className={classes.listAvatar}>
             <Badge
-              invisible={!this.props.source.offline}
-              overlap="circle"
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-              badgeContent={<OfflineBoltIcon className={classes.errorIcon} />}>
+              classes={{anchorOriginTopRightRectangle: classes.trackNum}}
+              invisible={!this.props.source.trackNum}
+              color="primary"
+              badgeContent={this.props.source.trackNum}>
               <Tooltip placement={this.props.source.comment ? 'right' : 'bottom'}
                        PopperProps={{modifiers:{
                          preventOverflow: {
@@ -260,6 +263,12 @@ class AudioSourceListItem extends React.Component {
 
           {this.props.source.id && (
             <ListItemSecondaryAction className={clsx(classes.source)}>
+              {this.props.source.playedCount > 0 && (
+                <Chip
+                  label={this.props.source.playedCount}
+                  color="primary"
+                  size="small"/>
+              )}
               <IconButton
                 onClick={this.props.onEditSource.bind(this, this.props.source)}
                 className={classes.actionButton}

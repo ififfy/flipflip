@@ -43,6 +43,7 @@ export default class Player extends React.Component {
     navigateTagging?(offset: number): void,
     nextScene?(): void,
     onUpdateScene?(scene: Scene, fn: (scene: Scene) => void): void,
+    playTrack?(url: string): void,
     toggleTag?(sourceID: number, tag: Tag): void,
   };
 
@@ -255,6 +256,7 @@ export default class Player extends React.Component {
             playNextScene={this.props.nextScene}
             play={this.play.bind(this)}
             pause={this.pause.bind(this)}
+            playTrack={this.props.playTrack}
             setCurrentAudio={this.setCurrentAudio.bind(this)}
             allTags={this.props.allTags}
             tags={this.props.tags}

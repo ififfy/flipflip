@@ -35,7 +35,7 @@ import SortIcon from '@material-ui/icons/Sort';
 
 import {red} from "@material-ui/core/colors";
 
-import {generateThumbnailFile, isAudio} from "../../data/utils";
+import {extractMusicMetadata, isAudio} from "../../data/utils";
 import {AF, ASF, LT, MO, SP} from "../../data/const";
 import en from "../../data/en";
 import Audio from "../../data/Audio";
@@ -900,7 +900,7 @@ class AudioLibrary extends React.Component {
               classes={{paper: classes.sortMenu}}
               open={this.state.openMenu == MO.sort}
               onClose={this.onCloseDialog.bind(this)}>
-              {Object.values(ASF).map((sf) =>
+              {Object.values(ASF).filter((f) => f!=ASF.trackNum).map((sf) =>
                 <MenuItem key={sf}>
                   <ListItemText primary={en.get(sf)}/>
                   <ListItemSecondaryAction>
@@ -1198,7 +1198,6 @@ class AudioLibrary extends React.Component {
     const newAudio = new Audio({
       url: url,
       id: id,
-      lastCheck: new Date(),
       tags: [],
     });
     id += 1;
@@ -1214,17 +1213,7 @@ class AudioLibrary extends React.Component {
         mm.parseBuffer(Buffer.from(buffer))
           .then((metadata: any) => {
             if (metadata) {
-              if (metadata.common) {
-                newAudio.name = metadata.common.title;
-                newAudio.album = metadata.common.album;
-                newAudio.artist = metadata.common.artist;
-                if (metadata.common.picture && metadata.common.picture.length > 0) {
-                  newAudio.thumb = generateThumbnailFile(this.props.cachePath, metadata.common.picture[0].data);
-                }
-              }
-              if (metadata.format) {
-                newAudio.duration = metadata.format.duration;
-              }
+              extractMusicMetadata(newAudio, metadata, this.props.cachePath);
             }
             if (!newAudio.name) {
               newAudio.name = url.substring(url.lastIndexOf(path.sep) + 1, url.lastIndexOf("."));
@@ -1276,24 +1265,13 @@ class AudioLibrary extends React.Component {
         const newAudio = new Audio({
           url: url,
           id: id,
-          lastCheck: new Date(),
           tags: [],
         });
         id += 1;
         mm.parseFile(url)
           .then((metadata: any) => {
             if (metadata) {
-              if (metadata.common) {
-                newAudio.name = metadata.common.title;
-                newAudio.album = metadata.common.album;
-                newAudio.artist = metadata.common.artist;
-                if (metadata.common.picture && metadata.common.picture.length > 0) {
-                  newAudio.thumb = generateThumbnailFile(this.props.cachePath, metadata.common.picture[0].data);
-                }
-              }
-              if (metadata.format) {
-                newAudio.duration = metadata.format.duration;
-              }
+              extractMusicMetadata(newAudio, metadata, this.props.cachePath);
             }
             if (!newAudio.name) {
               newAudio.name = url.substring(url.lastIndexOf(path.sep) + 1, url.lastIndexOf("."));
