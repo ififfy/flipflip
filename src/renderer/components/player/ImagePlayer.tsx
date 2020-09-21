@@ -67,6 +67,7 @@ export default class ImagePlayer extends React.Component {
   _nextSourceIndex: Map<string, number>;
   _timeout: NodeJS.Timeout;
   _waitTimeouts: Array<NodeJS.Timeout>;
+  _imgLoadTimeouts: Array<NodeJS.Timeout>;
   _toggleStrobe: boolean;
   _runFetchLoopCallRequests: Array<number>;
   _animationFrameHandle: number;
@@ -133,6 +134,7 @@ export default class ImagePlayer extends React.Component {
     this._count = 0;
     this._nextSourceIndex = new Map<string, number>();
     this._waitTimeouts = new Array<NodeJS.Timeout>(this.props.config.displaySettings.maxLoadingAtOnce).fill(null);
+    this._imgLoadTimeouts = new Array<NodeJS.Timeout>(this.props.config.displaySettings.maxLoadingAtOnce).fill(null);
     this._toggleStrobe = false;
     if (this.props.advanceHack) {
       this.props.advanceHack.listener = () => {
@@ -164,7 +166,10 @@ export default class ImagePlayer extends React.Component {
     this._toggleStrobe = null;
     clearTimeout(this._timeout);
     for (let timeout of this._waitTimeouts) {
-      clearTimeout(this._timeout);
+      clearTimeout(timeout);
+    }
+    for (let timeout of this._imgLoadTimeouts) {
+      clearTimeout(timeout);
     }
     this._timeout = null;
     this._waitTimeouts = null;
@@ -549,6 +554,7 @@ export default class ImagePlayer extends React.Component {
       }
 
       const successCallback = () => {
+        clearTimeout(this._imgLoadTimeouts[i]);
         if (!this._isMounted) return;
         this.props.cache(img);
         (img as any).key = this.state.nextImageID;
@@ -563,6 +569,7 @@ export default class ImagePlayer extends React.Component {
       };
 
       const errorCallback = () => {
+        clearTimeout(this._imgLoadTimeouts[i]);
         if (!this._isMounted) return;
         if (this.props.scene.nextSceneAllImages && this.props.scene.nextSceneID != 0 && this.props.playNextScene && img && img.src) {
           this._playedURLs.push(img.src);
@@ -582,7 +589,7 @@ export default class ImagePlayer extends React.Component {
         }
       };
 
-      img.onerror = () => {
+      img.onerror = img.onabort = () => {
         errorCallback();
       };
 
@@ -614,6 +621,8 @@ export default class ImagePlayer extends React.Component {
         }
 
         img.src = url;
+        clearTimeout(this._imgLoadTimeouts[i]);
+        this._imgLoadTimeouts[i] = setTimeout(() => errorCallback, 5000);
       };
 
       // Get gifinfo if we need for imageFilter or playing full gif
@@ -637,6 +646,8 @@ export default class ImagePlayer extends React.Component {
         }
       } else {
         img.src = url;
+        clearTimeout(this._imgLoadTimeouts[i]);
+        this._imgLoadTimeouts[i] = setTimeout(() => errorCallback, 5000);
       }
     }
   }
