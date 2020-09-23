@@ -116,6 +116,7 @@ const ASF = { // audio sort function
   duration: 'asf.duration',
   trackNum: 'asf.tracknum',
   playedCount: 'asf.playedcount',
+  random: 'asf.random',
 };
 
 const ST = { // source types

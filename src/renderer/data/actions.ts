@@ -2083,8 +2083,12 @@ export function sortPlaylist(state: State, playlistName: string, algorithm: stri
 }
 
 export function sortAudioSources(state: State, algorithm: string, ascending: boolean): Object {
-  const newLibrary = state.audios.concat().sort(audioSortFunction(algorithm, ascending));
-  return {audios: newLibrary};
+  if (algorithm == ASF.random) {
+    return {audios: randomizeList(state.audios.concat())};
+  } else {
+    const newLibrary = state.audios.concat().sort(audioSortFunction(algorithm, ascending));
+    return {audios: newLibrary};
+  }
 }
 
 function audioSortFunction(algorithm: string, ascending: boolean): (a: Audio, b: Audio) => number {

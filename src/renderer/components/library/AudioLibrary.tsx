@@ -31,6 +31,7 @@ import PersonIcon from '@material-ui/icons/Person';
 import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
 import QueueMusicIcon from '@material-ui/icons/QueueMusic';
 import SelectAllIcon from '@material-ui/icons/SelectAll';
+import ShuffleIcon from '@material-ui/icons/Shuffle';
 import SortIcon from '@material-ui/icons/Sort';
 
 import {red} from "@material-ui/core/colors";
@@ -900,7 +901,7 @@ class AudioLibrary extends React.Component {
               classes={{paper: classes.sortMenu}}
               open={this.state.openMenu == MO.sort}
               onClose={this.onCloseDialog.bind(this)}>
-              {Object.values(ASF).filter((f) => f!=ASF.trackNum).map((sf) =>
+              {Object.values(ASF).filter((f) => f!=ASF.trackNum && f!=ASF.random).map((sf) =>
                 <MenuItem key={sf}>
                   <ListItemText primary={en.get(sf)}/>
                   <ListItemSecondaryAction>
@@ -913,6 +914,14 @@ class AudioLibrary extends React.Component {
                   </ListItemSecondaryAction>
                 </MenuItem>
               )}
+              <MenuItem key={ASF.random}>
+                <ListItemText primary={en.get(ASF.random)}/>
+                <ListItemSecondaryAction>
+                  <IconButton edge="end" onClick={playlist? this.props.onSortPlaylist.bind(this, playlist, ASF.random, true) : this.props.onSort.bind(this, ASF.random, true)}>
+                    <ShuffleIcon/>
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </MenuItem>
             </Menu>
           </React.Fragment>
         )}
