@@ -2126,6 +2126,11 @@ function audioSortFunction(algorithm: string, ascending: boolean): (a: Audio, b:
         aValue = a.duration;
         bValue = b.duration;
         break;
+      case ASF.playedCount:
+        aValue = a.playedCount;
+        bValue = b.playedCount;
+        secondary = ASF.artist;
+        break;
       default:
         aValue = "";
         bValue = "";

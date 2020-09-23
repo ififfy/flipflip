@@ -79,10 +79,10 @@ class AudioArtistList extends React.Component {
     }
 
     const artists = Array.from(this.state.artists.keys());
-    const width = window.innerWidth - 104;
-    const numIcons = Math.floor(width / 178);
+    const width = window.innerWidth - 104; // 72px drawer + 2x18px padding
+    const numIcons = Math.floor(width / 178); // 160xp width + 2x9px padding
     const remainingWidth = width - (numIcons * 178);
-    const padding = Math.floor(remainingWidth / numIcons / 2) + 8;
+    const padding = Math.floor(remainingWidth / numIcons / 2) + 6;
     return (
       <div className={classes.artistContainer}>
         {artists.map((a) => {

@@ -78,6 +78,7 @@ export default new Map<string, string>([
   ['asf.album', 'By Album'],
   ['asf.date', 'By Date'],
   ['asf.duration', 'By Duration'],
+  ['asf.playedcount', 'By Play Count'],
 
   ['st.tumblr', 'Tumblr'],
   ['st.reddit', 'Reddit'],

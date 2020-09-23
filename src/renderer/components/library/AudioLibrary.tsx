@@ -1628,6 +1628,7 @@ class AudioLibrary extends React.Component {
       const library: Array<Audio> = playlist ? playlist.audios.map((aID) => this.props.library.find((a) => a.id==aID)) : this.props.library;
       for (let source of library) {
         let matchesFilter = true;
+        let countRegex;
         for (let filter of this.state.filters) {
           if (filter == "<Marked>") { // This is a marked filter
             matchesFilter = source.marked;
@@ -1698,6 +1699,21 @@ class AudioLibrary extends React.Component {
                 const regex = new RegExp(filter, "i");
                 matchesFilter = regex.test(source.comment);
               }
+            }
+          } else if ((countRegex = /^count([>=<])(\d*)$/.exec(filter)) != null) {
+            const symbol = countRegex[1];
+            const value = parseInt(countRegex[2]);
+            const count = source.playedCount;
+            switch (symbol) {
+              case "=":
+                matchesFilter = count == value;
+                break;
+              case ">":
+                matchesFilter = count > value;
+                break;
+              case "<":
+                matchesFilter = count < value;
+                break;
             }
           } else if (((filter.startsWith('"') || filter.startsWith('-"')) && filter.endsWith('"')) ||
             ((filter.startsWith('\'') || filter.startsWith('-\'')) && filter.endsWith('\''))) {
