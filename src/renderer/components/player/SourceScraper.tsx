@@ -129,6 +129,9 @@ function getPromise(systemMessage: Function, config: Config, source: LibrarySour
     } else if (sourceType == ST.ehentai) {
       promiseFunction = loadEHentai;
       timeout = 8000;
+    } else if (sourceType == ST.bdsmlr) {
+      promiseFunction = loadBDSMlr;
+      timeout = 8000;
     }
     if (helpers.next == -1) {
       helpers.next = 0;
@@ -1228,6 +1231,42 @@ function loadEHentai(systemMessage: Function, config: Config, source: LibrarySou
                 }
               })
           }
+        } else {
+          helpers.next = null;
+          resolve({data: [], helpers: helpers});
+        }
+      });
+  });
+}
+
+function loadBDSMlr(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+  const url = source.url;
+  return new CancelablePromise((resolve) => {
+    wretch(url + "/rss?page=" + (helpers.next + 1))
+      .get()
+      .setTimeout(5000)
+      .onAbort((e) => resolve(null))
+      .notFound((e) => resolve(null))
+      .text((html) => {
+        let itemEls = new DOMParser().parseFromString(html, "text/xml").querySelectorAll("item");
+        if (itemEls.length > 0) {
+          let imageCount = 0;
+          let images = Array<string>();
+          for (let item of itemEls) {
+            const embeddedImages = item.querySelectorAll("description > img");
+            if (embeddedImages.length > 0) {
+              for (let image of embeddedImages) {
+                imageCount++;
+                images.push(image.getAttribute("src"));
+              }
+            }
+          }
+          helpers.next = helpers.next + 1;
+          helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+          resolve({
+            data: filterPathsToJustPlayable(filter, images, true),
+            helpers: helpers,
+          });
         } else {
           helpers.next = null;
           resolve({data: [], helpers: helpers});

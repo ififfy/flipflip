@@ -171,6 +171,8 @@ export function getSourceType(url: string): string {
     return ST.gelbooru1;
   } else if (/^https?:\/\/(www\.)?e-hentai\.org\/g\//.exec(url) != null) {
     return ST.ehentai;
+  } else if (/^https?:\/\/[^.]*\.bdsmlr\.com/.exec(url) != null) {
+    return ST.bdsmlr;
   } else if (/(^https?:\/\/)|(\.txt$)/.exec(url) != null) { // Arbitrary URL, assume image list
     return ST.list;
   } else { // Directory
