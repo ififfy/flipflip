@@ -288,6 +288,16 @@ const LT = { // Library Tutorials
   done: DONE,
 };
 
+const ALT = { // Audio Library Tutorials
+  welcome: 'alt1',
+  library: 'alt2',
+  toolbar: 'alt3',
+  sidebar1: 'alt4',
+  sidebar2: 'alt5',
+  final: 'alt6',
+  done: DONE,
+};
+
 const SDGT = { // Scene Generator Tutorials
   welcome: 'sdgt1',
   buttons: 'sdgt2',
@@ -351,5 +361,5 @@ const SP = { // Special modes
 }
 
 export {
-  AF, ASF, BT, DONE, EA, GO, GT, HTF, IF, IG, IPC, IT, LT, MO, OF, PR, PT, RF, RP, RT, SB, SC, SDGT, SDT, SF, SGT, SL, SOF,SP, SPT, ST, TF, TT, VCT, VO, VTF, WF
+  AF, ALT, ASF, BT, DONE, EA, GO, GT, HTF, IF, IG, IPC, IT, LT, MO, OF, PR, PT, RF, RP, RT, SB, SC, SDGT, SDT, SF, SGT, SL, SOF,SP, SPT, ST, TF, TT, VCT, VO, VTF, WF
 };

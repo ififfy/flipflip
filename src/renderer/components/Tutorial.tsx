@@ -21,7 +21,7 @@ import HttpIcon from '@material-ui/icons/Http';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import MovieIcon from '@material-ui/icons/Movie';
 
-import {DONE, LT, PT, SDGT, SDT, SGT, SPT, TF, VCT} from "../data/const";
+import {ALT, DONE, LT, PT, SDGT, SDT, SGT, SPT, TF, VCT} from "../data/const";
 import {Route} from "../data/Route";
 import Config from "../data/Config";
 import Scene from "../data/Scene";
@@ -1071,6 +1071,118 @@ class Tutorial extends React.Component {
         break;
 
 
+      case ALT.welcome:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Audio Library</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                This is your <b>Audio Library</b>. Similar to the Source Library, here you can <b>organize</b> all
+                your different audio tracks and use them <b>with your Scenes</b>.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onSkip.bind(this)} color="secondary">
+                Skip Tutorial
+              </Button>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case ALT.library:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Audio Library</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                To get started, click the + icon and <b>add tracks</b> from your computer or from an online URL. Any <b>track
+                metadata</b> will be <b>automatically detected</b> and applied.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                Just like the Source Library, click a track's <b>Avatar</b> to play it and apply tags.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case ALT.toolbar:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Audio Library</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                Use the <b>search bar</b> in the top right to <b>filter the tracks</b> you are viewing. By default, a
+                text search will <b>return matches</b> from a track's <b>url</b>, <b>name</b>, <b>artist</b>, and/or <b>album</b>.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case ALT.sidebar1:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Audio Library</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                Use the sidebar to navigate between <b>Playlist</b>, <b>Artist</b>, <b>Album</b>, and <b>Track</b> views.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                <b>Click the Hamburger button to expand the sidebar</b>
+              </DialogContentText>
+            </DialogContent>
+          </React.Fragment>;
+        break;
+      case ALT.sidebar2:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Audio Library</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                From here we can also <b>manage tags</b>, <b>add tracks to playlists</b>, <b>batch tag tracks</b>,
+                and <b>batch edit tracks</b>.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case ALT.final:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Audio Library</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                That's about it for the <b>Audio Library</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                You can easily get your Library started by adding some <b>local tracks</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                After you've <b>added a few tags</b>, you can <b>tag tracks by clicking their Avatar</b>.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Back to Audio Library
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+
+
       case SDGT.welcome:
         dialogBody =
           <React.Fragment>
@@ -1616,6 +1728,31 @@ class Tutorial extends React.Component {
             return;
           case LT.final:
           case LT.done:
+            // We're done, don't show
+            this.setTutorial(null);
+            return;
+          default:
+            return;
+        }
+      case "audios":
+        switch (this.props.config.tutorials.audios) {
+          case ALT.welcome:
+            this.setTutorial(ALT.library);
+            return;
+          case ALT.library:
+            this.setTutorial(ALT.toolbar);
+            return;
+          case ALT.toolbar:
+            this.setTutorial(ALT.sidebar1);
+            return;
+          case ALT.sidebar1:
+            this.setTutorial(ALT.sidebar2);
+            return;
+          case ALT.sidebar2:
+            this.setTutorial(ALT.final);
+            return;
+          case ALT.final:
+          case ALT.done:
             // We're done, don't show
             this.setTutorial(null);
             return;

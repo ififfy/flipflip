@@ -205,9 +205,7 @@ export default class Meta extends React.Component {
               onBatchTag={a(actions.batchTag)}
               onBatchEdit={a(actions.batchEdit)}
               onChangeTab={a(actions.changeAudioLibraryTab)}
-              onExportLibrary={a(actions.exportAudioLibrary)}
               onImportFromLibrary={a(actions.importAudioFromLibrary)}
-              onImportLibrary={a(actions.importAudioLibrary, appStorage.backup.bind(appStorage))}
               onManageTags={a(actions.manageTags)}
               onPlay={a(actions.playAudio)}
               onSort={a(actions.sortAudioSources)}

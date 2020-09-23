@@ -273,6 +273,7 @@ interface TutorialsI {
   sceneGenerator: string;
   sceneGrid: string;
   library: string;
+  audios: string;
 }
 
 export class SceneSettings implements SceneSettingsI {
@@ -559,6 +560,7 @@ export class Tutorials implements TutorialsI {
   sceneDetail = null as string;
   player = null as string;
   library = null as string;
+  audios = null as string;
   sceneGenerator = null as string;
   sceneGrid = null as string;
   videoClipper = null as string;

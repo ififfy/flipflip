@@ -25,7 +25,33 @@ import {
 } from "./utils";
 import defaultTheme from "./theme";
 import {
-  AF, ASF, BT, DONE, GT, HTF, IF, IT, LT, OF, PR, PT, RP, SDGT, SDT, SF, SGT, SL, SOF, SP, SPT, ST, TF, TT, VCT, VTF
+  AF,
+  ALT,
+  ASF,
+  BT,
+  DONE,
+  GT,
+  HTF,
+  IF,
+  IT,
+  LT,
+  OF,
+  PR,
+  PT,
+  RP,
+  SDGT,
+  SDT,
+  SF,
+  SGT,
+  SL,
+  SOF,
+  SP,
+  SPT,
+  ST,
+  TF,
+  TT,
+  VCT,
+  VTF
 } from "./const";
 import { defaultInitialState } from './AppStorage';
 import { Route } from "./Route";
@@ -254,6 +280,13 @@ export function doneTutorial(state: State, tutorial: string): Object {
       state.config.tutorials.library = DONE;
     } else {
       state.config.tutorials.library = tutorial;
+    }
+  } else if (isRoute(state, 'audios')) {
+    if (tutorial == ALT.final) {
+      newTutorial = null;
+      state.config.tutorials.audios = DONE;
+    } else {
+      state.config.tutorials.audios = tutorial;
     }
   } else if (isRoute(state, 'grid')) {
     if (tutorial == SGT.final) {
@@ -568,8 +601,7 @@ export function openLibrary(state: State): Object {
 }
 
 export function openAudios(state: State): Object {
-  // TODO Audio tutorial?
-  return {route: [new Route({kind: 'audios', value: null})]};
+  return {route: [new Route({kind: 'audios', value: null})], tutorial: state.config.tutorials.audios == null ? ALT.welcome : null};
 }
 
 export function openLibraryImport(state: State): Object {
@@ -2358,16 +2390,6 @@ export function importScene(state: State, addToLibrary: boolean): Object {
     }
   }
   return {scenes: newScenes, route: [new Route({kind: 'scene', value: scene.id})]};
-}
-
-export function exportAudioLibrary(state: State): Object {
-  // TODO
-  return {};
-}
-
-export function importAudioLibrary(state: State, backup: Function): Object {
-  // TODO
-  return {};
 }
 
 export function exportLibrary(state: State): Object {

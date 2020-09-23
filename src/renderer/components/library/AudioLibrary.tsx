@@ -37,7 +37,7 @@ import SortIcon from '@material-ui/icons/Sort';
 import {red} from "@material-ui/core/colors";
 
 import {extractMusicMetadata, isAudio} from "../../data/utils";
-import {AF, ASF, LT, MO, SP} from "../../data/const";
+import {AF, ASF, ALT, MO, SP} from "../../data/const";
 import en from "../../data/en";
 import Audio from "../../data/Audio";
 import Playlist from "../../data/Playlist";
@@ -381,9 +381,7 @@ class AudioLibrary extends React.Component {
     onBatchTag(): void,
     onBatchEdit(): void,
     onChangeTab(newTab: number): void,
-    onExportLibrary(): void,
     onImportFromLibrary(sources: Array<Audio>): void,
-    onImportLibrary(): void,
     onManageTags(): void,
     onPlay(source: Audio, displayed: Array<Audio>): void,
     onSort(algorithm: string, ascending: boolean): void,
@@ -417,7 +415,7 @@ class AudioLibrary extends React.Component {
     const playlist = this.state.filters.find((f) => f.startsWith("playlist:"))?.replace("playlist:", "");
     return (
       <div className={classes.root}>
-        <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift, this.props.tutorial == LT.toolbar && clsx(classes.backdropTop, classes.disable))}>
+        <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift, this.props.tutorial == ALT.toolbar && clsx(classes.backdropTop, classes.disable))}>
           <Toolbar className={classes.headerBar}>
             <div className={classes.headerLeft}>
               <Tooltip title={this.props.specialMode == SP.select ? "Cancel Import" : "Back"} placement="right-end">
@@ -438,7 +436,7 @@ class AudioLibrary extends React.Component {
             </Typography>
 
             <div className={classes.headerRight}>
-              <div className={clsx(classes.searchBar, this.props.tutorial == LT.toolbar && classes.highlight)}>
+              <div className={clsx(classes.searchBar, this.props.tutorial == ALT.toolbar && classes.highlight)}>
                 {this.props.library.length > 0 && (
                   <Chip
                     className={classes.searchCount}
@@ -467,7 +465,7 @@ class AudioLibrary extends React.Component {
         </AppBar>
 
         <Drawer
-          className={clsx(classes.drawer, (this.props.tutorial == LT.sidebar1 || this.props.tutorial == LT.sidebar2 || this.state.drawerOpen) && classes.backdropTop, this.props.tutorial == LT.sidebar2 && classes.highlight)}
+          className={clsx(classes.drawer, (this.props.tutorial == ALT.sidebar1 || this.props.tutorial == ALT.sidebar2 || this.state.drawerOpen) && classes.backdropTop, this.props.tutorial == ALT.sidebar2 && classes.highlight)}
           variant="permanent"
           classes={{paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose)}}
           open={this.state.drawerOpen}>
@@ -479,7 +477,7 @@ class AudioLibrary extends React.Component {
 
           <ListItem className={classes.drawerButton}>
             <IconButton
-              className={clsx(this.props.tutorial == LT.sidebar1 && classes.highlight)}
+              className={clsx(this.props.tutorial == ALT.sidebar1 && classes.highlight)}
               onClick={this.onToggleDrawer.bind(this)}>
               <MenuIcon className={classes.drawerIcon}/>
             </IconButton>
@@ -508,7 +506,7 @@ class AudioLibrary extends React.Component {
                    className={clsx(classes.tab, classes.albumsTab, !open && classes.tabClose)}/>
               <Tab id="vertical-tab-3"
                    aria-controls="vertical-tabpanel-3"
-                   icon={<AudiotrackIcon/>} label={open ? "Sogs" : ""}
+                   icon={<AudiotrackIcon/>} label={open ? "Songs" : ""}
                    className={clsx(classes.tab, classes.songsTab, !open && classes.tabClose)}/>
             </Tabs>
           </div>
@@ -559,25 +557,6 @@ class AudioLibrary extends React.Component {
           </div>
 
           <div className={classes.fill}/>
-
-          {/*<div className={clsx(this.props.tutorial != null && classes.disable)}>
-            <Tooltip title={this.state.drawerOpen ? "" : "Export Library"}>
-              <ListItem button onClick={this.props.onExportLibrary.bind(this)}>
-                <ListItemIcon>
-                  <PublishIcon />
-                </ListItemIcon>
-                <ListItemText primary="Export Library" />
-              </ListItem>
-            </Tooltip>
-            <Tooltip title={this.state.drawerOpen ? "" : "Import Library"}>
-              <ListItem button onClick={this.props.onImportLibrary.bind(this)}>
-                <ListItemIcon>
-                  <GetAppIcon />
-                </ListItemIcon>
-                <ListItemText primary="Import Library" />
-              </ListItem>
-            </Tooltip>
-          </div>*/}
         </Drawer>
 
         <main className={classes.content}>
@@ -1094,7 +1073,7 @@ class AudioLibrary extends React.Component {
     if (state.filters != this.state.filters || props.library != this.props.library || props.playlists != this.props.playlists) {
       this.setState({displaySources: this.getDisplaySources()});
     }
-    if (this.props.tutorial == LT.final && this.state.drawerOpen) {
+    if (this.props.tutorial == ALT.final && this.state.drawerOpen) {
       this.setState({drawerOpen: false});
     }
   }
@@ -1402,8 +1381,8 @@ class AudioLibrary extends React.Component {
   }
 
   onToggleDrawer() {
-    if (this.props.tutorial == LT.sidebar1) {
-      this.props.onTutorial(LT.sidebar1);
+    if (this.props.tutorial == ALT.sidebar1) {
+      this.props.onTutorial(ALT.sidebar1);
     }
     this.setState({drawerOpen: !this.state.drawerOpen});
   }
