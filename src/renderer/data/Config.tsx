@@ -249,6 +249,7 @@ interface DisplaySettingsI {
   fullScreen: boolean;
   startImmediately: boolean;
   easingControls: boolean;
+  audioAlert: boolean;
 
   minImageSize: number;
   minVideoSize: number;
@@ -535,6 +536,7 @@ export class DisplaySettings  implements DisplaySettingsI {
   fullScreen = false;
   startImmediately = false;
   easingControls = false;
+  audioAlert = true;
 
   minVideoSize = 200;
   minImageSize = 200;

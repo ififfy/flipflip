@@ -20,6 +20,7 @@ import PlayerBars from "./PlayerBars";
 import PictureGrid from "./PictureGrid";
 import Audio from "../../data/Audio";
 import ImageView from "./ImageView";
+import AudioAlert from "./AudioAlert";
 
 export default class Player extends React.Component {
   readonly props: {
@@ -283,6 +284,11 @@ export default class Player extends React.Component {
               hasStarted
               removeChild
               />
+          )}
+          {(this.props.config.displaySettings.audioAlert || this.props.tags) && (
+            <AudioAlert
+              audio={this.state.currentAudio}
+            />
           )}
           {!this.props.scene.audioScene && (
             <SourceScraper

@@ -75,6 +75,16 @@ export default class PlayerBoolCard extends React.Component {
               }
               label="Show Adv Easing Controls"/>
           </Tooltip>
+        </Grid>
+        <Grid item xs={12}>
+          <Tooltip title="If enabled, track information will appear during playback whenever a new audio track starts.">
+            <FormControlLabel
+              control={
+                <Switch checked={this.props.displaySettings.audioAlert}
+                        onChange={this.onBoolInput.bind(this, 'audioAlert')}/>
+              }
+              label="Show Audio Info"/>
+          </Tooltip>
           <Divider />
         </Grid>
         <Grid item xs={12}>
