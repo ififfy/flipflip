@@ -1111,14 +1111,15 @@ class AudioLibrary extends React.Component {
     this.setState({filters: ["playlist:" + playlist]});
   }
 
-  onClickArtist(artist: string) {
+  onClickArtist(artist: string, e: MouseEvent) {
+    e.stopPropagation();
     this.props.onChangeTab(2);
-    this.setState({filters: ["artist:" + artist]})
+    this.setState({filters: this.state.filters.filter((f) => !f.startsWith("album:") && !f.startsWith("artist:")).concat(["artist:" + artist])})
   }
 
   onClickAlbum(album: string) {
     this.props.onChangeTab(3);
-    this.setState({filters: ["album:" + album]})
+    this.setState({filters: this.state.filters.filter((f) => !f.startsWith("album:") && !f.startsWith("artist:")).concat(["album:" + album])})
   }
 
   onAddToPlaylist() {
@@ -1515,7 +1516,7 @@ class AudioLibrary extends React.Component {
   }
 
   onFinishBatchEdit(common: Audio) {
-    const keys = ["thumb", "name", "artist", "album", "comment"];
+    const keys = ["thumb", "name", "artist", "album", "comment", "trackNum"];
     this.props.onUpdateLibrary((l) => {
       for (let sourceURL of this.state.selected) {
         const source: any = l.find((s) => s.url === sourceURL);
@@ -1530,46 +1531,52 @@ class AudioLibrary extends React.Component {
   }
 
   batchTagOverwrite() {
-    for (let sourceURL of this.state.selected) {
-      const source = this.props.library.find((s) => s.url === sourceURL);
-      source.tags = new Array<Tag>();
-      for (let tag of this.state.selectedTags) {
-        source.tags.push(new Tag({name: tag, id: this.props.tags.find((t) => t.name == tag).id}));
+    this.props.onUpdateLibrary((l) => {
+      for (let sourceURL of this.state.selected) {
+        const source = l.find((s) => s.url === sourceURL);
+        source.tags = new Array<Tag>();
+        for (let tag of this.state.selectedTags) {
+          source.tags.push(new Tag({name: tag, id: this.props.tags.find((t) => t.name == tag).id}));
+        }
       }
-    }
+    });
     this.onCloseDialog();
   }
 
   batchTagAdd() {
-    for (let sourceURL of this.state.selected) {
-      const source = this.props.library.find((s) => s.url === sourceURL);
-      const sourceTags = source.tags.map((t) => t.name);
-      for (let tag of this.state.selectedTags) {
-        if (!sourceTags.includes(tag)) {
-          source.tags.push(new Tag({name: tag, id: this.props.tags.find((t) => t.name == tag).id}));
+    this.props.onUpdateLibrary((l) => {
+      for (let sourceURL of this.state.selected) {
+        const source = l.find((s) => s.url === sourceURL);
+        const sourceTags = source.tags.map((t) => t.name);
+        for (let tag of this.state.selectedTags) {
+          if (!sourceTags.includes(tag)) {
+            source.tags.push(new Tag({name: tag, id: this.props.tags.find((t) => t.name == tag).id}));
+          }
         }
       }
-    }
+    });
     this.onCloseDialog();
   }
 
   batchTagRemove() {
-    for (let sourceURL of this.state.selected) {
-      const source = this.props.library.find((s) => s.url === sourceURL);
-      const sourceTags = source.tags.map((t) => t.name);
-      for (let tag of this.state.selectedTags) {
-        if (sourceTags.includes(tag)) {
-          const indexOf = sourceTags.indexOf(tag);
-          source.tags.splice(indexOf, 1);
-          sourceTags.splice(indexOf, 1);
+    this.props.onUpdateLibrary((l) => {
+      for (let sourceURL of this.state.selected) {
+        const source = l.find((s) => s.url === sourceURL);
+        const sourceTags = source.tags.map((t) => t.name);
+        for (let tag of this.state.selectedTags) {
+          if (sourceTags.includes(tag)) {
+            const indexOf = sourceTags.indexOf(tag);
+            source.tags.splice(indexOf, 1);
+            sourceTags.splice(indexOf, 1);
+          }
         }
       }
-    }
+    });
     this.onCloseDialog();
   }
 
   getCommonAudio() {
-    const keys = ["thumb", "name", "artist", "album", "comment"];
+    const keys = ["thumb", "name", "artist", "album", "comment", "trackNum"];
     let common: any = new Audio();
     for (let sourceURL of this.state.selected) {
       const source: any = this.props.library.find((s) => s.url === sourceURL);
@@ -1634,27 +1641,37 @@ class AudioLibrary extends React.Component {
               let tag = filter.substring(1, filter.length - 1);
               matchesFilter = source.tags.find((t) => t.name == tag) != null;
             }
-          } else if (filter.startsWith("artist:")) {
+          } else if (filter.startsWith("artist:") || filter.startsWith("-artist:")) {
             filter = filter.replace("artist:","");
-            filter = filter.replace("\\", "\\\\");
             if (filter.startsWith("-")) {
               filter = filter.substring(1, filter.length);
-              const regex = new RegExp(filter, "i");
-              matchesFilter = !regex.test(source.artist);
+              if (filter.length == 0) {
+                matchesFilter = source.artist && source.artist.length > 0;
+              } else {
+                matchesFilter = filter != source.artist;
+              }
             } else {
-              const regex = new RegExp(filter, "i");
-              matchesFilter = regex.test(source.artist);
+              if (filter.length == 0) {
+                matchesFilter = !source.artist || source.artist.length == 0;
+              } else {
+                matchesFilter = filter == source.artist;
+              }
             }
-          } else if (filter.startsWith("album:")) {
+          } else if (filter.startsWith("album:") || filter.startsWith("-album:")) {
             filter = filter.replace("album:", "");
-            filter = filter.replace("\\", "\\\\");
             if (filter.startsWith("-")) {
               filter = filter.substring(1, filter.length);
-              const regex = new RegExp(filter, "i");
-              matchesFilter = !regex.test(source.album);
+              if (filter.length == 0) {
+                matchesFilter = source.album && source.album.length > 0;
+              } else {
+                matchesFilter = filter != source.album;
+              }
             } else {
-              const regex = new RegExp(filter, "i");
-              matchesFilter = regex.test(source.album);
+              if (filter.length == 0) {
+                matchesFilter = !source.album || source.album.length == 0;
+              } else {
+                matchesFilter = filter == source.album;
+              }
             }
           } else if (filter.startsWith("playlist:")) {
             filter = filter.replace("playlist:", "");
@@ -1663,6 +1680,35 @@ class AudioLibrary extends React.Component {
               matchesFilter = playlist.audios.includes(source.id);
             } else {
               matchesFilter = false;
+            }
+          } else if (filter.startsWith("comment:") || filter.startsWith("-comment:")) {
+            filter = filter.replace("comment:", "");
+            if (filter.startsWith("-")) {
+              filter = filter.substring(1, filter.length);
+              if (filter.length == 0) {
+                matchesFilter = source.comment && source.comment.length > 0;
+              } else {
+                const regex = new RegExp(filter, "i");
+                matchesFilter = !regex.test(source.comment);
+              }
+            } else {
+              if (filter.length == 0) {
+                matchesFilter = !source.comment || source.comment.length == 0;
+              } else {
+                const regex = new RegExp(filter, "i");
+                matchesFilter = regex.test(source.comment);
+              }
+            }
+          } else if (((filter.startsWith('"') || filter.startsWith('-"')) && filter.endsWith('"')) ||
+            ((filter.startsWith('\'') || filter.startsWith('-\'')) && filter.endsWith('\''))) {
+            if (filter.startsWith("-")) {
+              filter = filter.substring(2, filter.length - 1);
+              const regex = new RegExp(filter, "i");
+              matchesFilter = !regex.test(source.url) && !regex.test(source.name) && !regex.test(source.artist) && !regex.test(source.album);
+            } else {
+              filter = filter.substring(1, filter.length - 1);
+              const regex = new RegExp(filter, "i");
+              matchesFilter = regex.test(source.url) || regex.test(source.name) || regex.test(source.artist) || regex.test(source.album);
             }
           } else { // This is a search filter
             filter = filter.replace("\\", "\\\\");

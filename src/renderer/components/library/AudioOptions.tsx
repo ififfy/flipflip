@@ -23,8 +23,6 @@ import {
 import AudiotrackIcon from "@material-ui/icons/Audiotrack";
 import CheckIcon from "@material-ui/icons/Check";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
-import VolumeDownIcon from "@material-ui/icons/VolumeDown";
-import VolumeUpIcon from "@material-ui/icons/VolumeUp";
 
 import {green, red} from "@material-ui/core/colors";
 

@@ -61,6 +61,7 @@ class AudioSourceList extends React.Component {
     sourceOptions: null as Audio,
     deleteDialog: null as Audio,
     sourceEdit: null as Audio,
+    lastSelected: null as number,
   };
 
   onSortEnd = ({oldIndex, newIndex}: {oldIndex: number, newIndex: number}) => {
@@ -106,7 +107,7 @@ class AudioSourceList extends React.Component {
       <React.Fragment>
         <AutoSizer>
           {({ height, width } : {height: number, width: number}) => (
-            <List id="sortable-list" disablePadding>
+            <List id="sortable-list" disablePadding onClick={this.clearLastSelected.bind(this)}>
               <this.SortableVirtualList
                 helperContainer={() => document.getElementById("sortable-list")}
                 distance={5}
@@ -156,8 +157,6 @@ class AudioSourceList extends React.Component {
     )
   }
 
-  nop() {}
-
   componentDidMount() {
     addEventListener('keydown', this.onKeyDown, false);
     addEventListener('keyup', this.onKeyUp, false);
@@ -180,7 +179,8 @@ class AudioSourceList extends React.Component {
       this.props.sources != props.sources ||
       this.state.sourceOptions != state.sourceOptions ||
       this.state.deleteDialog != state.deleteDialog ||
-      this.state.sourceEdit != state.sourceEdit;
+      this.state.sourceEdit != state.sourceEdit ||
+      this.state.lastSelected != state.lastSelected;
   }
 
   _shiftDown = false;
@@ -271,12 +271,32 @@ class AudioSourceList extends React.Component {
     this.props.onUpdateSelected(newSelected);
   }
 
-  onEditSource(audio: Audio) {
-    this.setState({sourceEdit: new Audio(audio)})
+  clearLastSelected() {
+    if (!this.state.sourceEdit && !this.state.sourceOptions) {
+      this.setState({lastSelected: null});
+    }
+  }
+
+  onEditSource(audio: Audio, e: MouseEvent) {
+    e.stopPropagation();
+    this.setState({sourceEdit: new Audio(audio), lastSelected: audio.id});
   }
 
   onCloseSourceEditDialog() {
     this.setState({sourceEdit: null});
+  }
+
+  onSourceOptions(source: Audio, e: MouseEvent) {
+    e.stopPropagation();
+    this.setState({sourceOptions: source, lastSelected: source.id});
+  }
+
+  onCloseSourceOptions() {
+    this.setState({sourceOptions: null});
+  }
+
+  onCloseDialog() {
+    this.setState({menuAnchorEl: null, clipMenu: null});
   }
 
   onFinishSourceEdit(newAudio: Audio) {
@@ -307,17 +327,6 @@ class AudioSourceList extends React.Component {
     remote.shell.openExternal(url);
   }
 
-  onCloseDialog() {
-    this.setState({menuAnchorEl: null, clipMenu: null});
-  }
-
-  onCloseSourceOptions() {
-    this.setState({sourceOptions: null});
-  }
-
-  onSourceOptions(source: Audio) {
-    this.setState({sourceOptions: source});
-  }
 
   SortableVirtualList = sortableContainer(this.VirtualList.bind(this));
 
@@ -348,6 +357,7 @@ class AudioSourceList extends React.Component {
         checked={this.props.isSelect ? this.props.selected.includes(source.url) : false}
         index={index}
         isSelect={this.props.isSelect}
+        lastSelected={source.id == this.state.lastSelected}
         source={source}
         sources={this.props.sources}
         style={value.style}

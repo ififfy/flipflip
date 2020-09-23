@@ -65,6 +65,7 @@ const styles = (theme: Theme) => createStyles({
     marginLeft: theme.spacing(1),
   },
   countChip: {
+    userSelect: 'none',
     marginRight: theme.spacing(1),
     [theme.breakpoints.down('xs')]: {
       display: 'none',
@@ -94,7 +95,10 @@ const styles = (theme: Theme) => createStyles({
   },
   disable: {
     pointerEvents: 'none',
-  }
+  },
+  noUserSelect: {
+    userSelect: 'none',
+  },
 });
 
 class SourceListItem extends React.Component {
@@ -188,20 +192,20 @@ class SourceListItem extends React.Component {
               <React.Fragment>
                 <Typography
                   noWrap
-                  className={clsx(this.props.tutorial == SDT.sourceTitle && classes.highlight)}
+                  className={clsx(classes.noUserSelect, this.props.tutorial == SDT.sourceTitle && classes.highlight)}
                   onClick={this.onStartEdit.bind(this, this.props.source)}>
                   {this.props.source.url}
                 </Typography>
                 {this.props.source.tags && this.props.source.tags.map((tag: Tag) =>
                   <React.Fragment key={tag.id}>
                     <Chip
-                      className={clsx(classes.actionButton, classes.fullTag, this.props.tutorial == SDT.sourceTags && classes.highlight)}
+                      className={clsx(classes.noUserSelect, classes.actionButton, classes.fullTag, this.props.tutorial == SDT.sourceTags && classes.highlight)}
                       label={tag.name}
                       color="primary"
                       size="small"
                       variant="outlined"/>
                     <Chip
-                      className={clsx(classes.actionButton, classes.simpleTag, this.props.tutorial == SDT.sourceTags && classes.highlight)}
+                      className={clsx(classes.noUserSelect, classes.actionButton, classes.simpleTag, this.props.tutorial == SDT.sourceTags && classes.highlight)}
                       label={this.getSimpleTag(tag.name)}
                       color="primary"
                       size="small"

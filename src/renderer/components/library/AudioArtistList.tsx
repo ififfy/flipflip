@@ -38,6 +38,9 @@ const styles = (theme: Theme) => createStyles({
     textAlign: 'center',
     cursor: 'pointer',
   },
+  trackArtist: {
+    maxWidth: theme.spacing(20),
+  },
   large: {
     width: theme.spacing(20),
     height: theme.spacing(20),
@@ -97,8 +100,8 @@ class AudioArtistList extends React.Component {
                 )}
               </Avatar>
               <Typography
-                noWrap
-                className={clsx(this.state.hover == a && classes.underlineTitle)}
+                display={"block"}
+                className={clsx(classes.trackArtist, this.state.hover == a && classes.underlineTitle)}
                 variant={"h6"}>
                 {a}
               </Typography>

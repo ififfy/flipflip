@@ -73,6 +73,7 @@ class AudioAlbumList extends React.Component {
       );
     }
 
+    const va = "Various Artists";
     const albums = Array.from(this.state.albums.keys());
     return (
       <Grid container spacing={2}>
@@ -81,9 +82,10 @@ class AudioAlbumList extends React.Component {
           let thumb: string = data.thumb;
           if (thumb) thumb = thumb.replace(/\\/g,"/");
           const artist = data.artist;
+          const count = data.count;
           return (
             <Grid key={a} item xs={6} sm={4} md={3} lg={2} className={classes.pointer}
-                  onClick={this.onClickAlbum.bind(this, a)}
+                  onClick={this.props.onClickAlbum.bind(this, a)}
                   onMouseEnter={this.onMouseEnter.bind(this, a)}
                   onMouseLeave={this.onMouseLeave.bind(this)}>
               <Card classes={{root: classes.root}}>
@@ -108,11 +110,18 @@ class AudioAlbumList extends React.Component {
                   <Typography
                     id={"artist-link"}
                     noWrap
-                    onClick={this.props.onClickArtist.bind(this, artist)}
-                    className={classes.artist}
+                    onClick={artist == va ? this.nop : this.props.onClickArtist.bind(this, artist)}
+                    className={clsx(artist != va && classes.artist)}
                     color="textSecondary"
                     variant="body2">
                     {artist}
+                  </Typography>
+                  <Typography
+                    noWrap
+                    className={classes.songCount}
+                    color="textSecondary"
+                    variant="body2">
+                    {count} {count == 1 ? "song" : "songs"}
                   </Typography>
                 </CardContent>
               </Card>
@@ -123,17 +132,11 @@ class AudioAlbumList extends React.Component {
     )
   }
 
+  nop() {}
+
   componentDidUpdate(props: any) {
     if (props.sources != this.props.sources) {
       this.setState({albums: this.getAlbums()});
-    }
-  }
-
-  onClickAlbum(album: string, e: MouseEvent) {
-    const target: any = e.target;
-    const id = target.getAttribute("id");
-    if (id != "artist-link") {
-      this.props.onClickAlbum(album);
     }
   }
 
@@ -145,28 +148,40 @@ class AudioAlbumList extends React.Component {
     this.setState({hover: null});
   }
 
-  getAlbums(): Map<string, { artist: string, thumb: string }> {
+  getAlbums(): Map<string, { artist: string, thumb: string, count: number }> {
     const va = "Various Artists";
-    const albumMap = new Map<string, { artist: string, thumb: string }>();
+    const albumMap = new Map<string, { artist: string, thumb: string, count: number }>();
     const songs = Array.from(this.props.sources).sort((a, b) => {
       if (a.album > b.album) {
         return 1;
       } else if (a.album < b.album) {
         return -1;
       } else {
-        const reA = /^(A\s|a\s|The\s|the\s)/g
-        const aValue = a.name.replace(reA, "");
-        const bValue = b.name.replace(reA, "");
-        return aValue.localeCompare(bValue, 'en', { numeric: true });
+        if (a.trackNum > b.trackNum) {
+          return 1;
+        } else if (a.trackNum < b.trackNum) {
+          return -1;
+        } else {
+          const reA = /^(A\s|a\s|The\s|the\s)/g
+          const aValue = a.name.replace(reA, "");
+          const bValue = b.name.replace(reA, "");
+          return aValue.localeCompare(bValue, 'en', {numeric: true});
+        }
       }
     });
     for (let song of songs) {
       if (song.album && (!albumMap.has(song.album) || !albumMap.get(song.album).thumb || (albumMap.get(song.album).artist != song.artist && albumMap.get(song.album).artist != va))) {
         if (albumMap.has(song.album) && albumMap.get(song.album).artist != song.artist) {
-          albumMap.set(song.album, {artist: va, thumb: song.thumb});
+          albumMap.set(song.album, {artist: va, thumb: song.thumb, count: 0});
         } else {
-          albumMap.set(song.album, {artist: song.artist, thumb: song.thumb});
+          albumMap.set(song.album, {artist: song.artist, thumb: song.thumb, count: 0});
         }
+      }
+    }
+    for (let song of songs) {
+      if (song.album) {
+        const album = albumMap.get(song.album);
+        albumMap.set(song.album, {artist: album.artist, thumb: album.thumb, count: album.count + 1});
       }
     }
     return albumMap;

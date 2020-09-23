@@ -22,6 +22,7 @@ export default class ImageView extends React.Component {
     timeToNextFrame?: number,
     toggleStrobe?: boolean,
     pictureGrid?: boolean,
+    removeChild?: boolean
     onLoaded?(): void,
     setVideo?(video: HTMLVideoElement): void,
   };
@@ -360,12 +361,18 @@ export default class ImageView extends React.Component {
       }
 
       this._image = img;
+      if (this.props.removeChild && el.hasChildNodes()) {
+        el.removeChild(el.children.item(0));
+      }
       el.appendChild(img);
       if (img instanceof HTMLVideoElement && this.props.pictureGrid && img.paused) {
         img.play();
       }
     }
     if (blur) {
+      if (this.props.removeChild && bg.hasChildNodes()) {
+        bg.removeChild(bg.children.item(0));
+      }
       bg.appendChild(bgImg);
     }
 

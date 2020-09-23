@@ -5,6 +5,7 @@ import * as fs from "fs";
 import wretch from "wretch";
 import * as easings from 'd3-ease';
 import crypto from "crypto";
+import {readFileSync} from "fs";
 
 import {EA, ST} from "./const";
 import en from "./en";
@@ -324,8 +325,14 @@ export function extractMusicMetadata(audio: Audio, metadata: any, cachePath: str
       audio.bpm = parseInt(metadata.common.bpm);
     }
   }
-  if (metadata.format) {
+  if (metadata.format && metadata.format.duration) {
     audio.duration = metadata.format.duration;
+  } else {
+    const data = toArrayBuffer(readFileSync(audio.url));
+    let context = new AudioContext();
+    context.decodeAudioData(data, (buffer) => {
+      audio.duration = buffer.duration;
+    });
   }
 }
 

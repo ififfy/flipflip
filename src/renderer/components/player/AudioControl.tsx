@@ -186,6 +186,9 @@ class AudioControl extends React.Component {
   }
 
   componentDidUpdate(props: any, state: any) {
+    if (this.props.audio.url != props.audio.url) {
+      this.setState({position: 0, duration: 0});
+    }
     if ((this.props.audio.tick && !props.audio.tick) ||
       (this.props.audio.tick && props.audio.tickMode == TF.scene && this.props.audio.tickMode != TF.scene)){
       this.tickLoop(true);

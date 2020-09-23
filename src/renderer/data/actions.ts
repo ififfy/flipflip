@@ -92,6 +92,14 @@ export function getAudioSource(state: State): Audio | null {
   return state.audios.find((s) => s.id == activeScene.libraryID);
 }
 
+export function changeAudioRoute(state: State, aID: number): Object {
+  const activeScene = getActiveScene(state);
+  if (activeScene) {
+    activeScene.libraryID = aID;
+  }
+  return {};
+}
+
 export function getTags(library: Array<LibrarySource>, source: string, clipID?: string): Array<Tag> {
   const librarySource = library.find((s) => s.url == source);
   if (librarySource) {
@@ -624,8 +632,7 @@ export function playAudio(state: State, source: Audio, displayed: Array<Audio>):
   state.scenes.forEach((s: Scene) => {
     id = Math.max(s.id + 1, id);
   });
-  displayed = displayed.filter((a) => a.url != source.url);
-  displayed.unshift(source);
+  const startIndex = displayed.indexOf(displayed.find((a) => a.url == source.url));;
   let tempScene = new Scene({
     id: id,
     name: "audio_scene_temp",
@@ -633,6 +640,7 @@ export function playAudio(state: State, source: Audio, displayed: Array<Audio>):
     audioScene: true,
     audioEnabled: true,
     audioPlaylists: [{audios: displayed, shuffle: false, repeat: RP.all}],
+    audioStartIndex: startIndex,
     strobe: true,
     strobeTime: 10000,
     strobeLayer: SL.image,
@@ -2110,8 +2118,8 @@ function audioSortFunction(algorithm: string, ascending: boolean): (a: Audio, b:
         bValue = b.id;
         break;
       case ASF.trackNum:
-        aValue = a.trackNum;
-        bValue = b.trackNum
+        aValue = parseInt(a.trackNum as any);
+        bValue = parseInt(b.trackNum as any);
         secondary = ASF.name;
         break;
       case ASF.duration:

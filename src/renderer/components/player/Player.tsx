@@ -44,6 +44,7 @@ export default class Player extends React.Component {
     nextScene?(): void,
     onUpdateScene?(scene: Scene, fn: (scene: Scene) => void): void,
     playTrack?(url: string): void,
+    changeAudioRoute?(aID: number): void,
     toggleTag?(sourceID: number, tag: Tag): void,
   };
 
@@ -280,6 +281,7 @@ export default class Player extends React.Component {
               scene={this.props.scene}
               fitParent
               hasStarted
+              removeChild
               />
           )}
           {!this.props.scene.audioScene && (
@@ -530,6 +532,9 @@ export default class Player extends React.Component {
 
   setCurrentAudio(audio: Audio) {
     this.setState({currentAudio: audio});
+    if (this.props.changeAudioRoute) {
+      this.props.changeAudioRoute(audio.id);
+    }
   }
 
   setProgress(total: number, current: number, message: string[]) {

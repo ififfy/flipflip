@@ -299,6 +299,7 @@ export default class Meta extends React.Component {
               toggleTag={scene.audioScene ? a(actions.toggleAudioTag) : a(actions.toggleTag)}
               navigateTagging={a(actions.navigateDisplayedLibrary)}
               getTags={actions.getTags.bind(this, this.state.library)}
+              changeAudioRoute={a(actions.changeAudioRoute)}
               setCount={a(actions.setCount)}
               cache={a(actions.cacheImage)}
               blacklistFile={a(actions.blacklistFile)}

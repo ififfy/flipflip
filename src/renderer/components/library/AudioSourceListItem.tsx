@@ -35,6 +35,9 @@ const styles = (theme: Theme) => createStyles({
       backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["200"] : '#080808',
     },
   },
+  lastSelected: {
+    backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["200"] : '#0F0F0F',
+  },
   avatar: {
     backgroundColor: theme.palette.primary.main,
     boxShadow: 'none',
@@ -65,19 +68,6 @@ const styles = (theme: Theme) => createStyles({
   actionButton: {
     marginLeft: theme.spacing(1),
   },
-  fullTag: {
-    [theme.breakpoints.down('sm')]: {
-      display: 'none',
-    },
-  },
-  simpleTag: {
-    [theme.breakpoints.up('md')]: {
-      display: 'none',
-    },
-    [theme.breakpoints.down('xs')]: {
-      display: 'none',
-    },
-  },
   urlField: {
     width: '100%',
     margin: 0,
@@ -106,7 +96,7 @@ const styles = (theme: Theme) => createStyles({
     top: 17,
   },
   trackName: {
-    maxWidth: 400,
+    maxWidth: 500,
     width: '100%',
     userSelect: 'none',
   },
@@ -118,7 +108,7 @@ const styles = (theme: Theme) => createStyles({
     userSelect: 'none',
   },
   artistContainer: {
-    minWidth: 225,
+    minWidth: 250,
   },
   trackArtist: {
     display: 'inline-block',
@@ -143,6 +133,9 @@ const styles = (theme: Theme) => createStyles({
     fontSize: "medium",
     maxWidth: 500,
   },
+  tagChips: {
+    textAlign: 'center',
+  },
 });
 
 class AudioSourceListItem extends React.Component {
@@ -151,6 +144,7 @@ class AudioSourceListItem extends React.Component {
     checked: boolean,
     index: number,
     isSelect: boolean,
+    lastSelected: boolean,
     source: Audio,
     sources: Array<Audio>,
     style: any,
@@ -174,7 +168,7 @@ class AudioSourceListItem extends React.Component {
     const classes = this.props.classes;
     return(
       <div style={this.props.style}
-           className={clsx(this.props.index % 2 == 0 ? classes.evenChild : classes.oddChild)}>
+           className={clsx(this.props.index % 2 == 0 ? classes.evenChild : classes.oddChild, this.props.lastSelected && classes.lastSelected)}>
         <ListItem>
           {this.props.isSelect && (
             <Checkbox value={this.props.source.url} onChange={this.props.onToggleSelect.bind(this)}
@@ -184,38 +178,33 @@ class AudioSourceListItem extends React.Component {
             <Badge
               classes={{anchorOriginTopRightRectangle: classes.trackNum}}
               invisible={!this.props.source.trackNum}
+              max={999}
               color="primary"
               badgeContent={this.props.source.trackNum}>
               <Tooltip placement={this.props.source.comment ? 'right' : 'bottom'}
-                       PopperProps={{modifiers:{
+                       PopperProps={this.props.source.comment || this.props.source.tags.length > 0 ? {modifiers:{
                          preventOverflow: {
                           enabled: true,
-                          boundariesElement: 'scrollParent',
+                          boundariesElement: 'viewport',
                         }
-                       }}}
+                       }} : {}}
                        classes={this.props.source.comment ? {tooltip: classes.bigTooltip} : null}
                        arrow={!!this.props.source.comment || this.props.source.tags.length > 0}
                        title={
                 this.props.source.comment || this.props.source.tags.length > 0 ?
                   <div>
                     {this.props.source.comment}
-                    <br/>
-                    {this.props.source.tags && this.props.source.tags.map((tag: Tag) =>
-                      <React.Fragment key={tag.id}>
-                        <Chip
-                          className={clsx(classes.actionButton, classes.fullTag)}
-                          label={tag.name}
-                          color="primary"
-                          size="small"
-                          variant="outlined"/>
-                        <Chip
-                          className={clsx(classes.actionButton, classes.simpleTag)}
-                          label={this.getSimpleTag(tag.name)}
-                          color="primary"
-                          size="small"
-                          variant="outlined"/>
-                      </React.Fragment>
-                    )}
+                    {this.props.source.comment && this.props.source.tags.length > 0 && (<br/>)}
+                    <div className={classes.tagChips}>
+                      {this.props.source.tags && this.props.source.tags.map((tag: Tag) =>
+                        <React.Fragment key={tag.id}>
+                          <Chip
+                            label={tag.name}
+                            color="primary"
+                            size="small"/>
+                        </React.Fragment>
+                      )}
+                    </div>
                   </div>
                     :
                   <div>
@@ -298,11 +287,6 @@ class AudioSourceListItem extends React.Component {
         </ListItem>
       </div>
     );
-  }
-
-  getSimpleTag(tagName: string) {
-    tagName = tagName.replace( /[a-z]/g, '' ).replace( /\s/g, '' );
-    return tagName;
   }
 
   onSourceIconClick(e: MouseEvent) {

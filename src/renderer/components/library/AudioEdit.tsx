@@ -137,7 +137,7 @@ class AudioEdit extends React.Component {
               min: 0,
               type: 'number',
             }}
-            onChange={this.onEdit.bind(this, 'trackNum')}/>
+            onChange={this.onEditInt.bind(this, 'trackNum')}/>
           <TextField
             className={classes.inputFull}
             value={this.state.audio.comment == null ? "" : this.state.audio.comment}
@@ -164,6 +164,13 @@ class AudioEdit extends React.Component {
   }
 
   nop() {}
+
+  onEditInt(key: string, e: MouseEvent) {
+    const input = (e.target as HTMLInputElement);
+    const newAudio = new Audio(this.state.audio);
+    (newAudio as any)[key] = parseInt(input.value);
+    this.setState({audio: newAudio});
+  }
 
   onEdit(key: string, e: MouseEvent) {
     const input = (e.target as HTMLInputElement);

@@ -72,7 +72,7 @@ class AudioPlaylist extends React.Component {
   };
 
   readonly state = {
-    currentIndex: 0,
+    currentIndex: this.props.playlistIndex == 0 ? this.props.scene.audioStartIndex : 0,
     playingAudios: Array<Audio>(),
   }
 
