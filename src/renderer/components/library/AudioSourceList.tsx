@@ -36,6 +36,18 @@ const styles = (theme: Theme) => createStyles({
   backdropTop: {
     zIndex: theme.zIndex.modal + 1,
   },
+  arrow: {
+    position: 'absolute',
+    bottom: 20,
+    right: 35,
+    fontSize: 220,
+    transform: 'rotateY(0deg) rotate(45deg)'
+  },
+  arrowMessage: {
+    position: 'absolute',
+    bottom: 260,
+    right: 160,
+  }
 });
 
 class AudioSourceList extends React.Component {
@@ -44,8 +56,10 @@ class AudioSourceList extends React.Component {
     cachePath: string,
     isSelect: boolean,
     selected: Array<string>,
+    showHelp: boolean,
     sources: Array<Audio>,
     yOffset: number,
+    tutorial: string,
     playlist?: string,
     onClickAlbum(album: string): void,
     onClickArtist(artist: string): void,
@@ -98,6 +112,16 @@ class AudioSourceList extends React.Component {
           <Typography component="h1" variant="h4" color="inherit" noWrap className={classes.emptyMessage2}>
             Nothing here
           </Typography>
+          {this.props.showHelp && (
+            <React.Fragment>
+              <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.arrowMessage}>
+                Add new tracks
+              </Typography>
+              <div className={classes.arrow}>
+                →
+              </div>
+            </React.Fragment>
+          )}
         </React.Fragment>
 
       );
@@ -177,6 +201,7 @@ class AudioSourceList extends React.Component {
       this.props.playlist != props.playlist ||
       this.props.selected != props.selected ||
       this.props.sources != props.sources ||
+      this.props.tutorial != props.tutorial ||
       this.state.sourceOptions != state.sourceOptions ||
       this.state.deleteDialog != state.deleteDialog ||
       this.state.sourceEdit != state.sourceEdit ||

@@ -50,6 +50,18 @@ const styles = (theme: Theme) => createStyles({
   },
   wordWrap: {
     wordWrap: 'break-word',
+  },
+  arrow: {
+    position: 'absolute',
+    bottom: 20,
+    right: 35,
+    fontSize: 220,
+    transform: 'rotateY(0deg) rotate(45deg)'
+  },
+  arrowMessage: {
+    position: 'absolute',
+    bottom: 260,
+    right: 160,
   }
 });
 
@@ -58,6 +70,7 @@ class SourceList extends React.Component {
     classes: any,
     config: Config,
     library: Array<LibrarySource>,
+    showHelp: boolean,
     sources: Array<LibrarySource>,
     tutorial: string,
     onClearBlacklist(sourceURL: string): void,
@@ -116,6 +129,16 @@ class SourceList extends React.Component {
           <Typography component="h1" variant="h4" color="inherit" noWrap className={classes.emptyMessage2}>
             Nothing here
           </Typography>
+          {this.props.showHelp && (
+            <React.Fragment>
+              <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.arrowMessage}>
+                Add new sources
+              </Typography>
+              <div className={classes.arrow}>
+                →
+              </div>
+            </React.Fragment>
+          )}
         </React.Fragment>
 
       );

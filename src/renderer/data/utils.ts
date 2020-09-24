@@ -310,6 +310,7 @@ export function extractMusicMetadata(audio: Audio, metadata: any, cachePath: str
   if (metadata.common) {
     if (metadata.common.title) {
       audio.name = metadata.common.title;
+      console.log(audio.name);
     }
     if (metadata.common.album) {
       audio.album = metadata.common.album;

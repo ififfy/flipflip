@@ -174,62 +174,68 @@ class AudioSourceListItem extends React.Component {
             <Checkbox value={this.props.source.url} onChange={this.props.onToggleSelect.bind(this)}
                       checked={this.props.checked}/>
           )}
-          <ListItemAvatar className={classes.listAvatar}>
-            <Badge
-              classes={{anchorOriginTopRightRectangle: classes.trackNum}}
-              invisible={!this.props.source.trackNum}
-              max={999}
-              color="primary"
-              badgeContent={this.props.source.trackNum}>
-              <Tooltip placement={this.props.source.comment ? 'right' : 'bottom'}
-                       PopperProps={this.props.source.comment || this.props.source.tags.length > 0 ? {modifiers:{
-                         preventOverflow: {
-                          enabled: true,
-                          boundariesElement: 'viewport',
-                        }
-                       }} : {}}
-                       classes={this.props.source.comment ? {tooltip: classes.bigTooltip} : null}
-                       arrow={!!this.props.source.comment || this.props.source.tags.length > 0}
-                       title={
-                this.props.source.comment || this.props.source.tags.length > 0 ?
-                  <div>
-                    {this.props.source.comment}
-                    {this.props.source.comment && this.props.source.tags.length > 0 && (<br/>)}
-                    <div className={classes.tagChips}>
-                      {this.props.source.tags && this.props.source.tags.map((tag: Tag) =>
-                        <React.Fragment key={tag.id}>
-                          <Chip
-                            label={tag.name}
-                            color="primary"
-                            size="small"/>
-                        </React.Fragment>
-                      )}
+          <Badge
+            anchorOrigin={{vertical: 'top', horizontal: 'left'}}
+            variant={"dot"}
+            invisible={!this.props.source.marked}
+            color="secondary">
+            <ListItemAvatar className={classes.listAvatar}>
+              <Badge
+                classes={{anchorOriginTopRightRectangle: classes.trackNum}}
+                invisible={!this.props.source.trackNum}
+                max={999}
+                color="primary"
+                badgeContent={this.props.source.trackNum}>
+                <Tooltip placement={this.props.source.comment ? 'right' : 'bottom'}
+                         PopperProps={this.props.source.comment || this.props.source.tags.length > 0 ? {modifiers:{
+                           preventOverflow: {
+                            enabled: true,
+                            boundariesElement: 'viewport',
+                          }
+                         }} : {}}
+                         classes={this.props.source.comment ? {tooltip: classes.bigTooltip} : null}
+                         arrow={!!this.props.source.comment || this.props.source.tags.length > 0}
+                         title={
+                  this.props.source.comment || this.props.source.tags.length > 0 ?
+                    <div>
+                      {this.props.source.comment}
+                      {this.props.source.comment && this.props.source.tags.length > 0 && (<br/>)}
+                      <div className={classes.tagChips}>
+                        {this.props.source.tags && this.props.source.tags.map((tag: Tag) =>
+                          <React.Fragment key={tag.id}>
+                            <Chip
+                              label={tag.name}
+                              color="primary"
+                              size="small"/>
+                          </React.Fragment>
+                        )}
+                      </div>
                     </div>
+                      :
+                    <div>
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Click: Library Tagging
+                      <br/>
+                      Shift+Click: Open Source
+                      <br/>
+                      &nbsp;&nbsp;Ctrl+Click: Reveal File}
+                    </div>
+                }>
+                  <div onClick={this.onSourceIconClick.bind(this)} className={classes.trackThumb}>
+                    {this.props.source.thumb != null && (
+                      <img className={classes.thumbImage} src={this.props.source.thumb}/>
+                    )}
+                    {this.props.source.thumb == null && (
+                      <Fab
+                        size="small"
+                        className={clsx(classes.avatar, this.props.source.marked && classes.markedSource)}>
+                        <SourceIcon url={this.props.source.url} className={clsx(classes.sourceIcon, this.props.source.marked && classes.sourceMarkedIcon)}/>
+                      </Fab>
+                    )}
                   </div>
-                    :
-                  <div>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Click: Library Tagging
-                    <br/>
-                    Shift+Click: Open Source
-                    <br/>
-                    &nbsp;&nbsp;Ctrl+Click: Reveal File}
-                  </div>
-              }>
-                <div onClick={this.onSourceIconClick.bind(this)} className={classes.trackThumb}>
-                  {this.props.source.thumb != null && (
-                    <img className={classes.thumbImage} src={this.props.source.thumb}/>
-                  )}
-                  {this.props.source.thumb == null && (
-                    <Fab
-                      size="small"
-                      className={clsx(classes.avatar, this.props.source.marked && classes.markedSource)}>
-                      <SourceIcon url={this.props.source.url} className={clsx(classes.sourceIcon, this.props.source.marked && classes.sourceMarkedIcon)}/>
-                    </Fab>
-                  )}
-                </div>
-              </Tooltip>
-            </Badge>
-          </ListItemAvatar>
+                </Tooltip>
+              </Badge>
+            </ListItemAvatar>
+          </Badge>
 
           <ListItemText classes={{primary: classes.root}}>
             <Typography noWrap className={classes.trackName}>

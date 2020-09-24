@@ -49,6 +49,7 @@ class PlaylistList extends React.Component {
     classes: any,
     playlists: Array<Playlist>,
     audios: Array<Audio>,
+    showHelp: boolean,
     onClickPlaylist(playlist: string): void,
   };
 
@@ -68,6 +69,11 @@ class PlaylistList extends React.Component {
           <Typography component="h1" variant="h4" color="inherit" noWrap className={classes.emptyMessage2}>
             Nothing here
           </Typography>
+          {this.props.showHelp && (
+            <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.emptyMessage2}>
+              Create playlists by clicking "Add to Playlist" in the sidebar
+            </Typography>
+          )}
         </React.Fragment>
 
       );

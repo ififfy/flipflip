@@ -54,6 +54,7 @@ class AudioArtistList extends React.Component {
   readonly props: {
     classes: any,
     sources: Array<Audio>,
+    showHelp: boolean,
     onClickArtist(artist: string): void,
   };
 
@@ -73,6 +74,11 @@ class AudioArtistList extends React.Component {
           <Typography component="h1" variant="h4" color="inherit" noWrap className={classes.emptyMessage2}>
             Nothing here
           </Typography>
+          {this.props.showHelp && (
+            <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.emptyMessage2}>
+              Add tracks by going to the "Songs" tab and clicking the +
+            </Typography>
+          )}
         </React.Fragment>
 
       );

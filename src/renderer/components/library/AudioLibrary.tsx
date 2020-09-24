@@ -576,6 +576,7 @@ class AudioLibrary extends React.Component {
                     <PlaylistList
                       playlists={this.props.playlists}
                       audios={this.props.library}
+                      showHelp={!this.props.specialMode && this.state.filters.length == 0}
                       onClickPlaylist={this.onClickPlaylist.bind(this)}/>
                   </Box>
                 </div>
@@ -595,6 +596,7 @@ class AudioLibrary extends React.Component {
                   <Box p={2} className={classes.fill}>
                     <AudioArtistList
                       sources={this.state.displaySources}
+                      showHelp={!this.props.specialMode && this.state.filters.length == 0}
                       onClickArtist={this.onClickArtist.bind(this)}/>
                   </Box>
                 </div>
@@ -614,6 +616,7 @@ class AudioLibrary extends React.Component {
                   <Box p={2} className={classes.fill}>
                     <AudioAlbumList
                       sources={this.state.displaySources}
+                      showHelp={!this.props.specialMode && this.state.filters.length == 0}
                       onClickAlbum={this.onClickAlbum.bind(this)}
                       onClickArtist={this.onClickArtist.bind(this)}/>
                   </Box>
@@ -636,7 +639,9 @@ class AudioLibrary extends React.Component {
                       cachePath={this.props.cachePath}
                       isSelect={!!this.props.specialMode}
                       selected={this.state.selected}
+                      showHelp={!this.props.specialMode && this.state.filters.length == 0}
                       sources={this.state.displaySources}
+                      tutorial={this.props.tutorial}
                       yOffset={this.props.yOffset}
                       playlist={playlist}
                       onClickAlbum={this.onClickAlbum.bind(this)}
@@ -1091,7 +1096,9 @@ class AudioLibrary extends React.Component {
   };
 
   onChangeTab(e: any, newTab: number) {
-    this.props.onChangeTab(newTab);
+    if (newTab != this.props.openTab) {
+      this.props.onChangeTab(newTab);
+    }
   }
 
   onClickPlaylist(playlist: string) {

@@ -13,7 +13,7 @@
 * Randomized and ordered playback
 * Timing control
 * Caption scripting support
-* Audio track support
+* Audio track/playlist support and Audio Library to organize tracks
 * Library and Tagging to organize sources and generate slideshows
 * Easy to share!
 

@@ -14,7 +14,7 @@ next to the source to go to the "Video Clipper" interface:
 To create a new clip, click the `+`. To edit/view an existing clip, just click its number.
 
 A slider will appear allowing you to select the start and end of this clip. You can also enter/modify the timestamp
-directly for more precise selection. Double click "Start" or "End" to set it to the player's current timestamp. Use ↑/↓
+directly for more precise selection. Double click `Start` or `End` to set it to the player's current timestamp. Use ↑/↓
 keys to move the selected timestamp up/down 1 second.
 
 * Click <img style="vertical-align: -5px" src="doc_icons/save.svg" alt="Save" width="20" height="20"> to save changes to 
@@ -22,7 +22,7 @@ this clip.
 * Click <img style="vertical-align: -5px" src="doc_icons/tag.svg" alt="Tag" width="20" height="20"> to start tagging this clip.
   * New clips will ineherit the source's current tags.
   * Chaging a source's tags doesn't change its clips' tags.
-  * Clip tags will be used for Scene Generators which have "Use Clips" is on, otherwise source tags will be used
+  * Clip tags will be used for Scene Generators which have `Use Clips` on, otherwise source tags will be used
     * If a clip has _no_ tags, it acts as though it has its source's tags during Scene Generation.
 * Click <img style="vertical-align: -5px" src="doc_icons/volume.svg" alt="Volume" width="20" height="20"> to set the volume
 of this clip to the current volume. Right click to reset the volume.

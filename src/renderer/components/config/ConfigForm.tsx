@@ -265,6 +265,7 @@ class ConfigForm extends React.Component {
                   this.props.config.tutorials.sceneDetail == null &&
                   this.props.config.tutorials.player == null &&
                   this.props.config.tutorials.library == null &&
+                  this.props.config.tutorials.audios == null &&
                   this.props.config.tutorials.sceneGenerator == null &&
                   this.props.config.tutorials.sceneGrid == null &&
                   this.props.config.tutorials.videoClipper == null

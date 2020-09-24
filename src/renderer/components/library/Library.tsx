@@ -596,6 +596,7 @@ class Library extends React.Component {
                 isSelect={!!this.props.specialMode}
                 library={this.props.library}
                 selected={this.state.selected}
+                showHelp={!this.props.specialMode && this.state.filters.length == 0}
                 sources={this.state.displaySources}
                 yOffset={this.props.yOffset}
                 onClearBlacklist={this.props.onClearBlacklist.bind(this)}

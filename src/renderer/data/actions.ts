@@ -223,6 +223,7 @@ export function skipTutorials(state: State): Object {
   newConfig.tutorials.sceneDetail = DONE;
   newConfig.tutorials.player = DONE;
   newConfig.tutorials.library = DONE;
+  newConfig.tutorials.audios = DONE;
   newConfig.tutorials.sceneGenerator = DONE;
   newConfig.tutorials.sceneGrid = DONE;
   newConfig.tutorials.videoClipper = DONE;
@@ -235,6 +236,7 @@ export function resetTutorials(state: State): Object {
   newConfig.tutorials.sceneDetail = null;
   newConfig.tutorials.player = null;
   newConfig.tutorials.library = null;
+  newConfig.tutorials.audios = null;
   newConfig.tutorials.sceneGenerator = null;
   newConfig.tutorials.sceneGrid = null;
   newConfig.tutorials.videoClipper = null;
@@ -816,7 +818,12 @@ export function navigateDisplayedLibrary(state: State, offset: number): Object {
 }
 
 export function endPlaySceneFromLibrary(state: State): Object {
-  const librarySource = getLibrarySource(state);
+  let librarySource;
+  if (getActiveScene(state).audioScene) {
+    librarySource = getAudioSource(state);
+  } else {
+    librarySource = getLibrarySource(state);
+  }
   state.scenes.pop();
   const tagNames = state.tags.map((t: Tag) => t.name);
   // Re-order the tags of the source we were playing

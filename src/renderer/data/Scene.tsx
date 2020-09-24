@@ -4,6 +4,7 @@ import LibrarySource from "./LibrarySource";
 import Audio from "./Audio";
 import Overlay from "./Overlay";
 import WeightGroup from "./WeightGroup";
+import {urlToPath} from "./utils";
 
 export default class Scene {
   id: number = 0;
@@ -329,7 +330,13 @@ export default class Scene {
     if (this.audios) {
       this.audioPlaylists = this.audios.map((a) => {
         if (!a.name) {
-          a.name = a.url.substring(a.url.lastIndexOf(path.sep) + 1, a.url.lastIndexOf("."));
+          if (a.url.startsWith("http")) {
+            a.name = a.url.substring(a.url.lastIndexOf("\/") + 1, a.url.lastIndexOf("."))
+          } else {
+            a.url = urlToPath(a.url).replace(/\//g, path.sep);
+            a.name = a.url.substring(a.url.lastIndexOf(path.sep) + 1, a.url.lastIndexOf("."));
+          }
+          a.duration = 0;
         }
         return {audios: [a], shuffle: false, repeat: RP.all};
       });

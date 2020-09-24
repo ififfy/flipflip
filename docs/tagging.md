@@ -4,6 +4,8 @@ The main power behind the Library (and driving force of [Scene Generators](scene
 The first step is to add some tags. Click the `Manage Tags` button ( <img style="vertical-align: -5px" 
 src="doc_icons/tag.svg" alt="Manage Tags" width="20" height="20"> ) in the sidebar.
 
+?> **Note**: Tags are shared between regular sources and audio tracks
+
 ## Manage tags
 From this screen, we can add, remove, and re-order our tags as well as manage "tag phrases" (for use in captioning scripts).
 
@@ -16,7 +18,7 @@ From this screen, we can add, remove, and re-order our tags as well as manage "t
 
 ## Tagging a source
 To tag a source in the Library, click the source's Avatar. This will start a Scene with just that source. 
-To modify the tags, hover towards the bottom of the screen and you will see your tags appear. Toggle tags on/off as 
+To modify the tags, hover towards the bottom of the screen, and you will see your tags appear. Toggle tags on/off as 
 desired by clicking on them. When you're done, click "Back" to return to the Library.
 
 While Tagging, use `[` and `]` to jump to Tagging the previous/next visible source in the Library. 
@@ -33,5 +35,7 @@ will be presented with a pop-up and a number of options.
 * Select tags and click `Overwrite` to force each selected scene to match those tags
 * Select tags and click `- Remove` to remove those tags from each selected scene.
 * Select tags and click `+ Add` to add those tags to each selected scene.
+
+?> **Tip**: Use the _SHIFT_ key to quickly select multiple sources
 
 ![](doc_images/library_batch.png)

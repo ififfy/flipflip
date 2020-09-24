@@ -1,6 +1,12 @@
 # Changelog
 
-## 3.0.6 <small>(09/16/2020)</small>
+#### 3.1.0-beta1 <small>(09/25/2020)</small>
+- Easing Controls
+- Audio Library
+- Allow multiple audio playlists within Scene
+- Fix bug where scraping threads would die
+
+## 3.0.7 <small>(09/16/2020)</small>
 - New Effect: Continuous Fade In/Out (BETA)
 - New Effect: Continuous Panning (BETA)
 - Add option for Center (No Clipping)

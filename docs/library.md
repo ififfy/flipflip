@@ -9,26 +9,26 @@ Sources are added to the Library and sorted just like in a [Scene](sources.md#mo
 
 ## Search/Filter
 Use the search bar to help find or filter the displayed sources. Tags/Types appear with a number indicating how many of 
-the displayed sources have that tagvpe.
+the displayed sources have that tag/type.
 
 * Click on the search bar and select a tag, type, `<Offline>`, `<Marked>`, or `<Untagged>`.
   * Start typing to find a particular tag/type.
   * `<Offline>` shows only sources that have been determined to be offline by [Mark Offline](mark_offline.md).
   * `<Marked>` shows only sources that have been [marked](#marking-sources).
   * `<Untagged>` shows only sources which have no tags.
-* Type any term and press "Enter" or "Search for ___" to search. This is not case sensitive.
-* Type a phrase surrounded by " and " to search that exact phrase.
+* Type any term and press "Enter" or "Search for ___" to search. This is not case-sensitive.
+* Type a phrase surrounded by `"` and `"` to search that exact phrase.
   * By default -- without this option, FlipFlip splits separate words into separate search terms. 
-* Type a tag surrounded by "[" and "]" to search by tag.
-* Type a type surrounded by "{" and "}" to search by type.
-* Type "-" and then any term or filter to _exclude_ those sources.
-* Type "count>NUM", "count<NUM", or "count=NUM" to query based on source counts. (Replace "NUM" with a number).
+* Type a tag surrounded by `[` and `]` to search by tag.
+* Type a type surrounded by `{`` and `}` to search by type.
+* Type `-` and then any term or filter to _exclude_ those sources.
+* Type `count>NUM`, `count<NUM`, or `count=NUM` to query based on source counts. (Replace `NUM` with a number).
   * This _**excludes**_ counts that are incomplete (still showing "+").
-  * To _**include**_ incomplete counts, type "count+>NUM", "count+<NUM", or "count+=NUM".
+  * To _**include**_ incomplete counts, type `count+>NUM`, `count+<NUM`, or `count+=NUM`.
   
 ## Marking Sources
 Users may wish to visually highlight certain items. To do this, search/filter the displayed sources until they are 
-the ones you wish to highlight, and then press **Alt+M**. These sources will be colored green and will remain that 
+the ones you wish to highlight, and then press **Alt+M**. These sources will be colored differently and will remain that 
 way after the search/filter is cleared. This may be useful for keeping track of a set of sources you are working on 
 (for instance new sources you are tagging). 
 
@@ -40,7 +40,7 @@ merge them together. To do this, click `Find Mergeables` ( <img style="vertical-
 src="doc_icons/merge.svg" alt="Find Mergeables" width="20" height="20"> ) in the sidebar. You will then see a list of
 local sources sorted into sets. Each set shares the same tags and could each (in theory) be merged into one source.
 This, of course, is entirely up to the discretion of the user and FlipFlip does not have the ability to automatically
-merge these folders (they must be merged manually and the extra sources deleted).  
+merge these folders (they must be merged manually, and the extra sources deleted).  
 
 ## Import Remote Sources
 The Library provides the ability to import sources from **Tumblr**, **Reddit**, **Instagram**, and **Twitter**. These
@@ -60,7 +60,7 @@ an offline icon.
 
 ### Localize Offline Content
 When a source goes offline, you may want to retain the cached images in their own source. After marking sources offline, 
-press **Alt+L**. After confirming your action, your offline sources will be moved to a local directory and the source 
+press **Alt+L**. After confirming your action, your offline sources will be moved to a local directory, and the source 
 URL updated. Any offline sources without cached images will simply be removed.
 
 ## Delete Source Content

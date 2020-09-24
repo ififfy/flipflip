@@ -5,4 +5,6 @@ with locating sources. After you're done selecting the sources you want, click t
 <img style="vertical-align: -5px" src="doc_icons/import.svg" alt="Import" width="20" height="20"> ). 
 Your selected sources will now appear in the scene.
 
+?> **Tip**: Use the _SHIFT_ key to quickly select multiple sources
+
 ![](doc_images/library_import.png)

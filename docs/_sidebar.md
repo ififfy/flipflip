@@ -15,6 +15,12 @@
   - [Tagging](tagging.md)
   - [Import from Library](import_from_library.md)  
   
+- Audio Library
+
+  - [Overview](audio_library.md)
+  - [Tagging](audio_tagging.md)
+  - [Import from Library](audio_import_from_library.md)  
+  
 - [Settings](config.md)
 - [Video Clipper](clips.md)
 - [Import/Export](import_export.md)
