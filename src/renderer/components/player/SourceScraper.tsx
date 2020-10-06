@@ -1240,7 +1240,7 @@ function loadEHentai(systemMessage: Function, config: Config, source: LibrarySou
 }
 
 function loadBDSMlr(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
-  const url = source.url;
+  const url = getFileGroup(source.url);
   return new CancelablePromise((resolve) => {
     wretch(url + "/rss?page=" + (helpers.next + 1))
       .get()

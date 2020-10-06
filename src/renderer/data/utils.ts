@@ -171,7 +171,7 @@ export function getSourceType(url: string): string {
     return ST.gelbooru1;
   } else if (/^https?:\/\/(www\.)?e-hentai\.org\/g\//.exec(url) != null) {
     return ST.ehentai;
-  } else if (/^https?:\/\/[^.]*\.bdsmlr\.com/.exec(url) != null) {
+  } else if (/^https?:\/\/[^.]*\.bdsmlr\.com[^.]*/.exec(url) != null) {
     return ST.bdsmlr;
   } else if (/(^https?:\/\/)|(\.txt$)/.exec(url) != null) { // Arbitrary URL, assume image list
     return ST.list;
@@ -285,7 +285,13 @@ export function getFileGroup(url: string) {
       }
       let name = url.substring(0, url.lastIndexOf(sep));
       return name.substring(name.lastIndexOf(sep)+1);
-
+    case ST.bdsmlr:
+      //We already add "/rss" to bdsmlr URLs
+      if (url.endsWith("/")) {
+        return url.substring(0, url.length - 1);
+      } else if (url.endsWith("/rss")) {
+        return url.substring(0, url.indexOf("/rss"))
+      }
   }
 }
 
