@@ -41,6 +41,25 @@ import Audio from "../../data/Audio";
 
 const drawerWidth = 340;
 
+const hexToRGB = (h: string) => {
+  let r = "0", g = "0", b = "0";
+
+  // 3 digits
+  if (h.length == 4) {
+    r = "0x" + h[1] + h[1];
+    g = "0x" + h[2] + h[2];
+    b = "0x" + h[3] + h[3];
+
+    // 6 digits
+  } else if (h.length == 7) {
+    r = "0x" + h[1] + h[2];
+    g = "0x" + h[3] + h[4];
+    b = "0x" + h[5] + h[6];
+  }
+
+  return "rgb("+ +r + "," + +g + "," + +b + ", 0.6)";
+}
+
 const styles = (theme: Theme) => createStyles({
   hoverBar: {
     zIndex: theme.zIndex.drawer + 1,
@@ -140,7 +159,7 @@ const styles = (theme: Theme) => createStyles({
   tagDrawerPaper: {
     transform: 'scale(0)',
     transformOrigin: 'bottom left',
-    backgroundColor: theme.palette.background.default,
+    backgroundColor: hexToRGB(theme.palette.background.default),
     transition: theme.transitions.create('transform', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
