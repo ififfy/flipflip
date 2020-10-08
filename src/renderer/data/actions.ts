@@ -753,12 +753,17 @@ export function onUpdateClips(state: State, sourceURL: string, clips: Array<Clip
 }
 
 export function clipVideo(state: State, source: LibrarySource, displayed: Array<LibrarySource>) {
+  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, "\\");
+  let librarySource = state.library.find((s) => s.url == sourceURL);
   if (getActiveSource(state) != null) {
     state.route.pop();
   }
+  if (!displayed) {
+    displayed = state.displayedSources;
+  }
   return {
     displayedSources: displayed,
-    route: state.route.concat([new Route({kind: 'clip', value: source})])
+    route: state.route.concat([new Route({kind: 'clip', value: librarySource})])
   };
 }
 

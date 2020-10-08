@@ -300,6 +300,7 @@ export default class Meta extends React.Component {
               changeAudioRoute={a(actions.changeAudioRoute)}
               setCount={a(actions.setCount)}
               cache={a(actions.cacheImage)}
+              goToClipSource={a(actions.clipVideo)}
               blacklistFile={a(actions.blacklistFile)}
               systemMessage={a(actions.systemMessage)}
             />
