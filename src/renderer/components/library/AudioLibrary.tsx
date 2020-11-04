@@ -1092,6 +1092,8 @@ class AudioLibrary extends React.Component {
   onKeyDown = (e: KeyboardEvent) => {
     if (!e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'm' || e.key == 'µ')) {
       this.toggleMarked();
+    } else if (e.key == 'Escape' && this.props.specialMode != null) {
+      this.goBack();
     }
   };
 

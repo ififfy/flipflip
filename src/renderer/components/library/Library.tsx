@@ -885,6 +885,8 @@ class Library extends React.Component {
       this.toggleMarked();
     } else if (!e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'l' || e.key == '¬')) {
       this.moveOffline();
+    } else if (e.key == 'Escape' && this.props.specialMode != null) {
+      this.goBack();
     }
   };
 
