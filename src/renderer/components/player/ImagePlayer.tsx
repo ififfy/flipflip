@@ -459,6 +459,7 @@ export default class ImagePlayer extends React.Component {
       }
 
       const successCallback = () => {
+        clearTimeout(this._imgLoadTimeouts[i]);
         if (!this._isMounted) return;
         this.props.cache(video);
 
@@ -515,6 +516,7 @@ export default class ImagePlayer extends React.Component {
       };
 
       const errorCallback = () => {
+        clearTimeout(this._imgLoadTimeouts[i]);
         if (!this._isMounted) return;
         if (this.props.scene.nextSceneAllImages && this.props.scene.nextSceneID != 0 && this.props.playNextScene && video && video.src) {
           this._playedURLs.push(video.src);
@@ -534,13 +536,17 @@ export default class ImagePlayer extends React.Component {
         }
       };
 
-      video.onerror = () => {
+      video.onerror = video.onabort = () => {
         errorCallback();
       };
 
       video.src = url;
       video.preload = "auto";
       video.loop = true;
+
+      clearTimeout(this._imgLoadTimeouts[i]);
+      this._imgLoadTimeouts[i] = setTimeout(() => errorCallback, 15000);
+
       video.load();
     } else {
       const img = new Image();
