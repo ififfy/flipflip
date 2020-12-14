@@ -515,6 +515,7 @@ class PlayerBars extends React.Component {
                     startPlaying
                     onUpdateScene={this.props.onUpdateScene.bind(this)}
                     goBack={this.props.goBack.bind(this)}
+                    orderAudioTags={this.orderAudioTags.bind(this)}
                     playTrack={this.props.playTrack}
                     playNextScene={this.props.playNextScene}
                     setCurrentAudio={this.props.setCurrentAudio.bind(this)}/>
@@ -938,17 +939,13 @@ class PlayerBars extends React.Component {
       case 'ArrowLeft':
         if (!this.state.drawerHover || focus != "input") {
           e.preventDefault();
-          if (!this.props.scene.audioScene) {
-            this.historyBack();
-          }
+          this.historyBack();
         }
         break;
       case 'ArrowRight':
         if (!this.state.drawerHover || focus != "input") {
           e.preventDefault();
-          if (!this.props.scene.audioScene) {
-            this.historyForward();
-          }
+          this.historyForward();
         }
         break;
       case 'Escape':
@@ -990,17 +987,37 @@ class PlayerBars extends React.Component {
       case '[':
         if (!this.props.scene.audioScene && this.props.tags != null) {
           e.preventDefault();
-          this.prevSource();
+          if (!this.props.scene.audioScene) {
+            this.prevSource();
+          }
         }
         break;
       case ']':
         if (!this.props.scene.audioScene && this.props.tags != null) {
           e.preventDefault();
-          this.nextSource();
+          if (!this.props.scene.audioScene) {
+            this.nextSource();
+          }
         }
         break;
     }
   };
+
+  orderAudioTags(audio: Audio) {
+    const tagNames = this.props.allTags.map((t: Tag) => t.name);
+    // Re-order the tags of the audio we were playing
+    audio.tags = audio.tags.sort((a: Tag, b: Tag) => {
+      const aIndex = tagNames.indexOf(a.name);
+      const bIndex = tagNames.indexOf(b.name);
+      if (aIndex < bIndex) {
+        return -1;
+      } else if (aIndex > bIndex) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+  }
 
   setPlayPause(play: boolean) {
     if (play) {

@@ -1719,6 +1719,7 @@ export function setCount(state: State, sourceURL: string, count: number, countCo
 export function updateTags(state: State, tags: Array<Tag>): Object {
   // Go through each scene in the library
   let newLibrary = state.library;
+  let newAudios = state.audios;
   let newScenes = state.scenes;
   const tagIDs = tags.map((t) => t.id);
   for (let source of newLibrary) {
@@ -1774,6 +1775,30 @@ export function updateTags(state: State, tags: Array<Tag>): Object {
         });
       }
     }
+  }
+  for (let source of newAudios) {
+    // Remove deleted tags, update any edited tags, and order the same as tags
+    source.tags = source.tags.filter((t: Tag) => tagIDs.includes(t.id));
+    source.tags = source.tags.map((t: Tag) => {
+      for (let tag of tags) {
+        if (t.id == tag.id) {
+          t.name = tag.name;
+          t.phraseString = tag.phraseString;
+          return t;
+        }
+      }
+    });
+    source.tags = source.tags.sort((a: Tag, b: Tag) => {
+      const aIndex = tagIDs.indexOf(a.id);
+      const bIndex = tagIDs.indexOf(b.id);
+      if (aIndex < bIndex) {
+        return -1;
+      } else if (aIndex > bIndex) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
   }
   for (let scene of newScenes) {
     for (let source of scene.sources) {

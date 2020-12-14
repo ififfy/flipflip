@@ -29,6 +29,7 @@ class AudioCard extends React.Component {
     onAddTracks?(playlistIndex: number): void,
     scenePaths?: Array<any>,
     goBack?(): void,
+    orderAudioTags?(audio: Audio): void,
     playTrack?(url: string): void,
     playNextScene?(): void,
     setCurrentAudio?(audio: Audio): void,
@@ -83,6 +84,7 @@ class AudioCard extends React.Component {
                   onUpdateScene={this.props.onUpdateScene.bind(this)}
                   setCurrentAudio={i==0 && this.props.setCurrentAudio ? this.props.setCurrentAudio.bind(this) : this.nop}
                   goBack={this.props.goBack}
+                  orderAudioTags={this.props.orderAudioTags}
                   playTrack={this.props.playTrack}
                   playNextScene={this.props.playNextScene}/>
               </Collapse>

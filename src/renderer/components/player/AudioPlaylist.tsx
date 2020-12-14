@@ -66,6 +66,7 @@ class AudioPlaylist extends React.Component {
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
     scenePaths?: Array<any>,
     goBack?(): void,
+    orderAudioTags?(audio: Audio): void,
     playTrack?(url: string): void,
     playNextScene?(): void,
     setCurrentAudio?(audio: Audio): void,
@@ -219,12 +220,14 @@ class AudioPlaylist extends React.Component {
 
   onKeyDown = (e: KeyboardEvent) => {
     switch (e.key) {
-      case 'ArrowLeft':
+      case '[':
         e.preventDefault();
+        this.props.orderAudioTags(this.props.playlist.audios[this.state.currentIndex]);
         this.prevTrack();
         break;
-      case 'ArrowRight':
+      case ']':
         e.preventDefault();
+        this.props.orderAudioTags(this.props.playlist.audios[this.state.currentIndex]);
         this.nextTrack();
         break;
     }
