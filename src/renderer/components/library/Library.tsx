@@ -1244,21 +1244,21 @@ class Library extends React.Component {
             ((filter.startsWith('\'') || filter.startsWith('-\'')) && filter.endsWith('\''))) {
             if (filter.startsWith("-")) {
               filter = filter.substring(2, filter.length - 1);
-              const regex = new RegExp(filter, "i");
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
               matchesFilter = !regex.test(source.url);
             } else {
               filter = filter.substring(1, filter.length - 1);
-              const regex = new RegExp(filter, "i");
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
               matchesFilter = regex.test(source.url);
             }
           } else { // This is a search filter
             filter = filter.replace("\\", "\\\\");
             if (filter.startsWith("-")) {
               filter = filter.substring(1, filter.length);
-              const regex = new RegExp(filter, "i");
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
               matchesFilter = !regex.test(source.url);
             } else {
-              const regex = new RegExp(filter, "i");
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
               matchesFilter = regex.test(source.url);
             }
           }
