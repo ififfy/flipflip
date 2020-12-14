@@ -247,9 +247,9 @@ export default class ImageView extends React.Component {
             img.style.transform = "rotate(270deg)";
             img.style.transformOrigin = "center";
           }
-          const cTop = Math.max(parentHeight - imgHeight, 0);
-          const cLeft = Math.max(parentWidth - imgWidth, 0);
-          if (cTop != 0 || cLeft != 0) {
+          const cTop = parentHeight - imgHeight;
+          const cLeft = parentWidth - imgWidth;
+          if (cTop >= 0 && cLeft >= 0) {
             img.style.marginTop = cTop / 2 + 'px';
             img.style.marginLeft = cLeft / 2 + 'px';
             break;
@@ -309,8 +309,8 @@ export default class ImageView extends React.Component {
             img.style.transform = "rotate(270deg)";
             img.style.transformOrigin = "center";
           }
-          const top = Math.max(parentHeight - imgHeight, 0);
-          const left = Math.max(parentWidth - imgWidth, 0);
+          const top = parentHeight - imgHeight;
+          const left = parentWidth - imgWidth;
           img.style.marginTop = top / 2 + 'px';
           img.style.marginLeft = left / 2 + 'px';
           break;
