@@ -58,7 +58,7 @@ function filterPathsToJustPlayable(imageTypeFilter: string, paths: Array<string>
 }
 
 // Determine what kind of source we have based on the URL and return associated Promise
-function getPromise(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function getPromise(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   let promise;
   const sourceType = getSourceType(source.url);
 
@@ -155,7 +155,7 @@ function getPromise(systemMessage: Function, config: Config, source: LibrarySour
   return promise;
 }
 
-function loadLocalDirectory(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadLocalDirectory(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   const blacklist = ['*.css', '*.html', 'avatar.png'];
   const url = source.url;
 
@@ -194,7 +194,7 @@ function loadLocalDirectory(systemMessage: Function, config: Config, source: Lib
   });
 }
 
-function loadVideo(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadVideo(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   const url = source.url;
   return new CancelablePromise((resolve) => {
     const missingVideo = () => {
@@ -257,7 +257,7 @@ function loadVideo(systemMessage: Function, config: Config, source: LibrarySourc
   });
 }
 
-function loadPlaylist(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadPlaylist(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   const url = source.url;
   return new CancelablePromise((resolve) => {
     wretch(url)
@@ -300,11 +300,11 @@ function loadPlaylist(systemMessage: Function, config: Config, source: LibrarySo
         console.warn("Fetch error on", url);
         console.warn(e);
         resolve(null);
-      });;
+      });
   });
 }
 
-function loadRemoteImageURLList(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadRemoteImageURLList(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   const url = source.url;
   return new CancelablePromise((resolve) => {
     wretch(url)
@@ -351,7 +351,7 @@ function loadRemoteImageURLList(systemMessage: Function, config: Config, source:
   });
 }
 
-function loadTumblr(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadTumblr(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   let configured = config.remoteSettings.tumblrOAuthToken != "" && config.remoteSettings.tumblrOAuthTokenSecret != "";
   if (configured) {
     const url = source.url;
@@ -467,7 +467,7 @@ function loadTumblr(systemMessage: Function, config: Config, source: LibrarySour
   }
 }
 
-function loadReddit(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadReddit(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   let configured = config.remoteSettings.redditRefreshToken != "";
   if (configured) {
     const url = source.url;
@@ -599,7 +599,7 @@ function loadReddit(systemMessage: Function, config: Config, source: LibrarySour
   }
 }
 
-function loadImageFap(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadImageFap(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   if (helpers.next == 0) {
     helpers.next = [0, 0];
   }
@@ -733,7 +733,7 @@ function loadImageFap(systemMessage: Function, config: Config, source: LibrarySo
   });
 }
 
-function loadSexCom(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadSexCom(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   const url = source.url;
   return new CancelablePromise((resolve) => {
     // This doesn't work anymore due to src url requiring referer
@@ -816,7 +816,7 @@ function loadSexCom(systemMessage: Function, config: Config, source: LibrarySour
   });
 }
 
-function loadImgur(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadImgur(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   const url = source.url;
   return new CancelablePromise((resolve) => {
     imgur.getAlbumInfo(getFileGroup(url))
@@ -836,7 +836,7 @@ function loadImgur(systemMessage: Function, config: Config, source: LibrarySourc
   });
 }
 
-function loadTwitter(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadTwitter(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   let configured = config.remoteSettings.twitterAccessTokenKey != "" && config.remoteSettings.twitterAccessTokenSecret != "";
   if (configured) {
     const includeRetweets = source.includeRetweets;
@@ -902,7 +902,7 @@ function loadTwitter(systemMessage: Function, config: Config, source: LibrarySou
   }
 }
 
-function loadDeviantArt(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadDeviantArt(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   const url = source.url;
   return new CancelablePromise((resolve) => {
     wretch("https://backend.deviantart.com/rss.xml?type=deviation&q=by%3A" + getFileGroup(url) + "+sort%3Atime+meta%3Aall" + (helpers.next != 0 ? "&offset=" + helpers.next : ""))
@@ -938,11 +938,11 @@ function loadDeviantArt(systemMessage: Function, config: Config, source: Library
 }
 let ig: IgApiClient = null;
 let session: any = null;
-function loadInstagram(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadInstagram(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   const configured = config.remoteSettings.instagramUsername != "" && config.remoteSettings.instagramPassword != "";
   if (configured) {
     const url = source.url;
-    const processItems = (items: any, resolve: any, helpers: {next: any, count: number}) => {
+    const processItems = (items: any, resolve: any, helpers: {next: any, count: number, retries: number}) => {
       let images = Array<string>();
       for (let item of items) {
         if (item.carousel_media) {
@@ -1026,7 +1026,7 @@ function loadInstagram(systemMessage: Function, config: Config, source: LibraryS
   }
 }
 
-function loadDanbooru(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadDanbooru(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
   const thisHost = hostRegex.exec(url)[1];
@@ -1094,7 +1094,7 @@ function loadDanbooru(systemMessage: Function, config: Config, source: LibrarySo
   });
 }
 
-function loadGelbooru1(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadGelbooru1(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
   const thisHost = hostRegex.exec(url)[1];
@@ -1152,7 +1152,7 @@ function loadGelbooru1(systemMessage: Function, config: Config, source: LibraryS
   });
 }
 
-function loadGelbooru2(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadGelbooru2(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
   const thisHost = hostRegex.exec(url)[1];
@@ -1196,7 +1196,7 @@ function loadGelbooru2(systemMessage: Function, config: Config, source: LibraryS
   });
 }
 
-function loadEHentai(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadEHentai(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   const url = source.url;
   return new CancelablePromise((resolve) => {
     wretch(url + "?p=" + (helpers.next + 1))
@@ -1239,18 +1239,32 @@ function loadEHentai(systemMessage: Function, config: Config, source: LibrarySou
   });
 }
 
-function loadBDSMlr(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadBDSMlr(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   let url = source.url;
   if (url.endsWith("/rss")) {
     url = url.substring(0, url.indexOf("/rss"))
   }
   return new CancelablePromise((resolve) => {
+    const retry = () => {
+      if (helpers.retries < 3) {
+        helpers.retries += 1;
+        resolve({
+          data: [],
+          helpers: helpers,
+        });
+      } else {
+        resolve(null);
+      }
+    }
+
     wretch(url + "/rss?page=" + (helpers.next + 1))
       .get()
       .setTimeout(5000)
-      .onAbort((e) => resolve(null))
+      .onAbort(retry)
       .notFound((e) => resolve(null))
+      .internalError(retry)
       .text((html) => {
+        helpers.retries = 0;
         let itemEls = new DOMParser().parseFromString(html, "text/xml").querySelectorAll("item");
         if (itemEls.length > 0) {
           let imageCount = 0;
@@ -1306,7 +1320,7 @@ export default class SourceScraper extends React.Component {
   };
 
   readonly state = {
-    promiseQueue: Array<{source: LibrarySource, helpers: {next: any, count: number}}>(),
+    promiseQueue: Array<{source: LibrarySource, helpers: {next: any, count: number, retries: number}}>(),
     promise: new CancelablePromise((resolve, reject) => {}),
     nextPromise: new CancelablePromise((resolve, reject) => {}),
     allURLs: new Map<string, Array<string>>(),
@@ -1315,7 +1329,7 @@ export default class SourceScraper extends React.Component {
     videoVolume: this.props.scene.videoVolume,
   };
 
-  _nextPromiseQueue: Array<{source: LibrarySource, helpers: {next: any, count: number}}> = null;
+  _nextPromiseQueue: Array<{source: LibrarySource, helpers: {next: any, count: number, retries: number}}> = null;
   _nextAllURLs: Map<string, Array<string>> = null;
 
   render() {
@@ -1356,7 +1370,7 @@ export default class SourceScraper extends React.Component {
       tumblr429Alerted = false;
       instagramAlerted = false;
       twitterAlerted = false;
-      this._nextPromiseQueue = new Array<{ source: LibrarySource, helpers: {next: any, count: number} }>();
+      this._nextPromiseQueue = new Array<{ source: LibrarySource, helpers: {next: any, count: number, retries: number} }>();
       this._nextAllURLs = new Map<string, Array<string>>();
     }
     let n = 0;
@@ -1427,7 +1441,7 @@ export default class SourceScraper extends React.Component {
       if (!this.props.scene.playVideoClips && d.clips) {
         d.clips = [];
       }
-      const loadPromise = getPromise(this.props.systemMessage, this.props.config, d, this.props.scene.imageTypeFilter, {next: -1, count: 0});
+      const loadPromise = getPromise(this.props.systemMessage, this.props.config, d, this.props.scene.imageTypeFilter, {next: -1, count: 0, retries: 0});
       this.setState({promise: loadPromise});
 
       loadPromise
@@ -1482,7 +1496,7 @@ export default class SourceScraper extends React.Component {
       if (!this.props.scene.playVideoClips && d.clips) {
         d.clips = [];
       }
-      const loadPromise = getPromise(this.props.systemMessage, this.props.config, d, this.props.nextScene.imageTypeFilter, {next: -1, count: 0});
+      const loadPromise = getPromise(this.props.systemMessage, this.props.config, d, this.props.nextScene.imageTypeFilter, {next: -1, count: 0, retries: 0});
       this.setState({nextPromise: loadPromise});
 
       loadPromise
@@ -1629,12 +1643,12 @@ export default class SourceScraper extends React.Component {
             preload: true,
             restart: true
           });
-          this._nextPromiseQueue = Array<{source: LibrarySource, helpers: {next: any, count: number}}>();
+          this._nextPromiseQueue = Array<{source: LibrarySource, helpers: {next: any, count: number, retries: number}}>();
           this._nextAllURLs = new Map<string, Array<string>>();
         }
       } else {
         this.setState({
-          promiseQueue: Array<{ source: LibrarySource, helpers: {next: any, count: number}}>(),
+          promiseQueue: Array<{ source: LibrarySource, helpers: {next: any, count: number, retries: number}}>(),
           promise: new CancelablePromise((resolve, reject) => {}),
           nextPromise: new CancelablePromise((resolve, reject) => {}),
           allURLs: new Map<string, Array<string>>(),

@@ -314,7 +314,6 @@ export function extractMusicMetadata(audio: Audio, metadata: any, cachePath: str
   if (metadata.common) {
     if (metadata.common.title) {
       audio.name = metadata.common.title;
-      console.log(audio.name);
     }
     if (metadata.common.album) {
       audio.album = metadata.common.album;
@@ -610,15 +609,15 @@ export function isImage(path: string, strict: boolean): boolean {
  *   * count - current count
  */
 export class CancelablePromise extends Promise<{
-  data: Array<string>, helpers: {next: any, count: number}}> {
+  data: Array<string>, helpers: {next: any, count: number, retries: number}}> {
   hasCanceled: boolean;
   source: LibrarySource;
   timeout: number;
 
 
   constructor(executor: (resolve: (value?: (
-    PromiseLike<{data: Array<string>, helpers: {next: any, count: number}}> |
-    {data: Array<string>, helpers: {next: any, count: number}}
+    PromiseLike<{data: Array<string>, helpers: {next: any, count: number, retries: number}}> |
+    {data: Array<string>, helpers: {next: any, count: number, retries: number}}
     )) => void, reject: (reason?: any) => void) => void) {
     super(executor);
     this.hasCanceled = false;
@@ -626,7 +625,7 @@ export class CancelablePromise extends Promise<{
     this.timeout = 0;
   }
 
-  getPromise(): Promise<{data: Array<string>, helpers: {next: any, count: number}}> {
+  getPromise(): Promise<{data: Array<string>, helpers: {next: any, count: number, retries: number}}> {
     return new Promise((resolve, reject) => {
       this.then(
         val => this.hasCanceled ? null : resolve(val),
