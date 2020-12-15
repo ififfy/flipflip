@@ -2,7 +2,7 @@ import * as React from "react";
 import {remote} from "electron";
 import clsx from "clsx";
 import fileURL from "file-url";
-import SystemFonts from "system-font-families";
+import fontList from "font-list";
 
 import {
   CircularProgress, Collapse, createStyles, Divider, FormControl, FormControlLabel, Grid, IconButton, InputAdornment,
@@ -460,7 +460,14 @@ class TextCard extends React.Component {
   componentDidMount() {
     // Define system fonts
     this._promise = new CancelablePromise((resolve, reject) => {
-      new SystemFonts().getFonts().then((res: Array<string>) => {
+      fontList.getFonts().then((res: Array<string>) => {
+          res = res.map((r) => {
+            if (r.startsWith("\"") && r.endsWith("\"")) {
+              return r.substring(1, r.length - 1);
+            } else {
+              return r;
+            }
+          })
           if (!this._promise.hasCanceled) {
             this.setState({systemFonts: res, loadingFonts: false});
           }
