@@ -435,7 +435,7 @@ export default class Player extends React.Component {
       } else {
         this.setState({hasStarted: true, startTime: new Date()});
       }
-      if (this.props.scene.nextSceneID == -1) {
+      if (this.props.scene.nextSceneID == -1 && this.props.onUpdateScene) {
         let sceneID: number;
         if (this.props.scene.nextSceneRandoms.length == 0) {
           sceneID = getRandomListItem(this.props.scenes.map((s) => s.id));
@@ -456,7 +456,7 @@ export default class Player extends React.Component {
     if (this.props.preventSleep) {
       this._powerSaveID = remote.powerSaveBlocker.start('prevent-display-sleep');
     }
-    if (this.props.scene.nextSceneID == -1) {
+    if (this.props.scene.nextSceneID == -1 && this.props.onUpdateScene) {
       let sceneID: number;
       if (this.props.scene.nextSceneRandoms.length == 0) {
         sceneID = getRandomListItem(this.props.scenes.map((s) => s.id));
@@ -525,7 +525,7 @@ export default class Player extends React.Component {
   nop() {}
 
   onScroll = (e: WheelEvent) => {
-    if (this.state.recentPictureGrid) return;
+    if (this.state.recentPictureGrid || !this.props.onUpdateScene) return;
     const volumeChange = (e.deltaY / 100) * -5;
     let newVolume = parseInt(this.props.scene.videoVolume as any) + volumeChange;
     if (newVolume < 0) {
