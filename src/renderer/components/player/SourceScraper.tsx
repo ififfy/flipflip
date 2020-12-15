@@ -548,6 +548,44 @@ function loadReddit(systemMessage: Function, config: Config, source: LibrarySour
               .catch(errorSubmission);
             break;
         }
+      } else if (url.includes("/saved")) {
+        reddit.getUser(getFileGroup(url)).getSavedContent()
+          .then((submissionListing: any) => {
+          if (submissionListing.length > 0) {
+            let convertedListing = Array<string>();
+            let convertedCount = 0;
+            for (let s of submissionListing) {
+              convertURL(s.url).then((urls: Array<string>) => {
+                convertedListing = convertedListing.concat(urls);
+                convertedCount++;
+                if (convertedCount == submissionListing.length) {
+                  helpers.next = null;
+                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
+                  resolve({
+                    data: filterPathsToJustPlayable(filter, convertedListing, true),
+                    helpers: helpers,
+                  });
+                }
+              })
+              .catch ((error: any) => {
+                convertedCount++;
+                if (convertedCount == submissionListing.length) {
+                  helpers.next = null;
+                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
+                  resolve({
+                    data: filterPathsToJustPlayable(filter, convertedListing, true),
+                    helpers: helpers,
+                  });
+                }
+              });
+            }
+          } else {
+            helpers.next = null;
+            resolve({data: [], helpers: helpers});
+          }
+        }).catch((err: any) => {
+          resolve(null);
+        });
       } else if (url.includes("/user/") || url.includes("/u/")) {
         reddit.getUser(getFileGroup(url)).getSubmissions({after: helpers.next})
           .then((submissionListing: any) => {

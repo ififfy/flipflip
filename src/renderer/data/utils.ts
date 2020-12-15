@@ -189,7 +189,8 @@ export function getFileGroup(url: string) {
       return tumblrID;
     case ST.reddit:
       let redditID = url;
-      if (url.endsWith("/")) redditID = redditID.slice(0, url.lastIndexOf("/"));
+      if (redditID.endsWith("/")) redditID = redditID.slice(0, url.lastIndexOf("/"));
+      if (redditID.endsWith("/saved")) redditID = redditID.replace("/saved", "");
       redditID = redditID.substring(redditID.lastIndexOf("/") + 1);
       return redditID;
     case ST.imagefap:
