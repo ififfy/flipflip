@@ -285,7 +285,11 @@ export function getFileGroup(url: string) {
       }
       let name = url.substring(0, url.lastIndexOf(sep));
       return name.substring(name.lastIndexOf(sep)+1);
-
+    case ST.bdsmlr:
+      let bdsmlrID = url.replace(/https?:\/\//, "");
+      bdsmlrID = bdsmlrID.replace(/\/rss/, "");
+      bdsmlrID = bdsmlrID.replace(/\.bdsmlr\.com\/?/, "");
+      return bdsmlrID;
   }
 }
 

@@ -1240,7 +1240,10 @@ function loadEHentai(systemMessage: Function, config: Config, source: LibrarySou
 }
 
 function loadBDSMlr(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
-  const url = source.url;
+  let url = source.url;
+  if (url.endsWith("/rss")) {
+    url = url.substring(0, url.indexOf("/rss"))
+  }
   return new CancelablePromise((resolve) => {
     wretch(url + "/rss?page=" + (helpers.next + 1))
       .get()
