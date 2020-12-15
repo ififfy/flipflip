@@ -374,7 +374,9 @@ function loadTumblr(systemMessage: Function, config: Config, source: LibrarySour
           console.error("Error retriving " + tumblrID + (helpers.next == 0 ? "" : "(Page " + helpers.next + " )"));
           console.error(err);
           if (err.message.includes("429 Limit Exceeded") && !tumblr429Alerted && helpers.next == 0) {
-            systemMessage("Tumblr has temporarily throttled your FlipFlip due to high traffic. Try again in a few minutes or visit Settings to try a different Tumblr API key.");
+            if (!config.remoteSettings.silenceTumblrAlert) {
+              systemMessage("Tumblr has temporarily throttled your FlipFlip due to high traffic. Try again in a few minutes or visit Settings to try a different Tumblr API key.");
+            }
             tumblr429Alerted = true;
           }
           resolve(null);

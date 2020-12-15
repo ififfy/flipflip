@@ -212,7 +212,7 @@ interface SceneSettingsI {
 }
 
 interface RemoteSettingsI {
-  [key: string]: string | Array<string>;
+  [key: string]: string | Array<string> | boolean;
   tumblrKeys: Array<string>;
   tumblrSecrets: Array<string>;
 
@@ -220,6 +220,7 @@ interface RemoteSettingsI {
   tumblrSecret: string;
   tumblrOAuthToken: string;
   tumblrOAuthTokenSecret: string;
+  silenceTumblrAlert: boolean;
 
   redditUserAgent: string;
   redditClientID: string;
@@ -489,7 +490,7 @@ export class SceneSettings implements SceneSettingsI {
 }
 
 export class RemoteSettings implements RemoteSettingsI {
-  [key: string]: string | Array<string>;
+  [key: string]: string | Array<string> | boolean;
 
   tumblrKeys = ["BaQquvlxQeRhKRyViknF98vseIdcBEyDrzJBpHxvAiMPHCKR2l",
     "G4iZd6FBiyDxHVUpNqtOTDu4woWzfp8WuH3tTrT3MC16GTmNzq",
@@ -506,6 +507,7 @@ export class RemoteSettings implements RemoteSettingsI {
   tumblrSecret = "";
   tumblrOAuthToken = "";
   tumblrOAuthTokenSecret = "";
+  silenceTumblrAlert = false;
 
   redditUserAgent = "desktop:flipflip:v2.0.0 (by /u/ififfy)";
   redditClientID = "2Iqe-1CsO4VQlA";

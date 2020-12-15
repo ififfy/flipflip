@@ -9,7 +9,7 @@ import {IgApiClient, IgCheckpointError, IgLoginTwoFactorRequiredError} from "ins
 
 import {
   Avatar, Button, Collapse, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
-  Fab, FormControlLabel, Grid, Link, Radio, RadioGroup, Slide, Snackbar, SnackbarContent, TextField, Theme,
+  Fab, FormControlLabel, Grid, Link, Radio, RadioGroup, Slide, Snackbar, SnackbarContent, Switch, TextField, Theme,
   Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
@@ -17,7 +17,7 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import ErrorIcon from '@material-ui/icons/Error';
 
 import Config, {RemoteSettings} from "../../data/Config";
-import {IG, MO, ST, TT} from "../../data/const";
+import {IG, MO, ST} from "../../data/const";
 import en from "../../data/en";
 import SourceIcon from "../library/SourceIcon";
 
@@ -46,6 +46,9 @@ const styles = (theme: Theme) => createStyles({
   },
   tumblrFields: {
     paddingTop: theme.spacing(2),
+  },
+  center: {
+    textAlign: 'center',
   },
   snackbarIcon: {
     fontSize: 20,
@@ -145,6 +148,15 @@ class APICard extends React.Component {
                 <SourceIcon className={classes.icon} type={ST.instagram}/>
               </Fab>
             </Tooltip>
+          </Grid>
+          <Grid item xs={12} className={classes.center}>
+            <FormControlLabel
+              control={
+                <Switch checked={this.props.settings.silenceTumblrAlert}
+                        disabled={!tumblrAuthorized}
+                        onChange={this.onBoolInput.bind(this, 'silenceTumblrAlert')}/>
+              }
+              label="Silence Tumblr Throttle Alert"/>
           </Grid>
         </Grid>
 
@@ -582,6 +594,13 @@ class APICard extends React.Component {
   onInput3(e: MouseEvent) {
     const input = (e.target as HTMLInputElement);
     this.setState({input3: input.value});
+  }
+
+  onBoolInput(key: string, e: MouseEvent) {
+    const input = (e.target as HTMLInputElement);
+    const checked = input.checked;
+    this.props.onUpdateSettings((s) => s[key] = checked);
+    this.props.onUpdateConfig((s) => s.remoteSettings[key] = checked);
   }
 
   changeKey(key: string, value: any) {
