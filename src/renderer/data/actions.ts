@@ -1114,10 +1114,16 @@ export function generateScene(state: State, scene: Scene): Object {
                 let cTags = c.tags && c.tags.length > 0 ? c.tags : s.tags;
                 let b = false;
 
-                // Filter out clips which don't have this tag
-                if (!cTags.find((t) => t.id == rule.tag.id)) {
-                  invalidClips.push(c.id);
-                  continue;
+                // Filter out clips which don't have this tag/type
+                if (rule.tag.typeTag) {
+                  if (sTypeEn != rule.tag.name) {
+                    continue
+                  }
+                } else {
+                  if (!cTags.find((t) => t.id == rule.tag.id)) {
+                    invalidClips.push(c.id);
+                    continue;
+                  }
                 }
 
                 // Filter out clips which don't have ruleAllTags/allTags
@@ -1201,9 +1207,15 @@ export function generateScene(state: State, scene: Scene): Object {
             if (!addedClip) {
               let b = false;
 
-              // Filter out sources which don't have this tag
-              if (!s.tags.find((t) => t.id == rule.tag.id)) {
-                continue
+              // Filter out sources which don't have this tag/type
+              if (rule.tag.typeTag) {
+                if (sTypeEn != rule.tag.name) {
+                  continue
+                }
+              } else {
+                if (!s.tags.find((t) => t.id == rule.tag.id)) {
+                  continue
+                }
               }
 
               // Filter out sources which don't have ruleAllTags/allTags
