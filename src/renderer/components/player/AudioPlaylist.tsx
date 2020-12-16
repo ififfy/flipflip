@@ -98,6 +98,7 @@ class AudioPlaylist extends React.Component {
           <AudioControl
             audio={audio}
             audioEnabled={this.props.scene.audioEnabled}
+            singleTrack={this.state.playingAudios.length == 1}
             lastTrack={this.state.currentIndex == this.state.playingAudios.length - 1}
             repeat={this.props.playlist.repeat}
             scenePaths={this.props.scenePaths}

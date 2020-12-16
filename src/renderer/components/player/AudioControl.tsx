@@ -37,7 +37,8 @@ class AudioControl extends React.Component {
   readonly props: {
     classes: any,
     audio: Audio,
-    audioEnabled: boolean
+    audioEnabled: boolean,
+    singleTrack: boolean,
     lastTrack: boolean,
     repeat: string,
     scenePaths: Array<any>,
@@ -268,9 +269,11 @@ class AudioControl extends React.Component {
   }
 
   onFinishedPlaying() {
+    // Increment play count upon finish
     if (this.props.playTrack) {
       this.props.playTrack(this.props.audio.url);
     }
+
     if (this.props.audio.stopAtEnd && this.props.goBack) {
       this.props.goBack();
     } else if (this.props.audio.nextSceneAtEnd && this.props.playNextScene) {
@@ -281,11 +284,15 @@ class AudioControl extends React.Component {
         if (this.props.audio.tick) {
           this._queueNextTrack = true;
         } else {
-          this.props.nextTrack();
-          this.setState({position: 0, duration: 0});
+          if (this.props.singleTrack) {
+            this.setState({position: 1});
+          } else {
+            this.props.nextTrack();
+            this.setState({position: 0, duration: 0});
+          }
         }
       } else if (this.props.repeat == RP.one) {
-        this.setState({position: 0, duration: 0});
+        this.setState({position: 1});
       } else if (this.props.repeat == RP.none) {
         if (!this.props.lastTrack) {
           if (this.props.audio.tick) {

@@ -112,6 +112,7 @@ class AudioOptions extends React.Component {
               <AudioControl
                 audio={this.state.audio}
                 audioEnabled={true}
+                singleTrack={true}
                 lastTrack={true}
                 repeat={RP.one}
                 scenePaths={[]}
