@@ -724,7 +724,7 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
     backgroundBlur: state.config.defaultScene.backgroundBlur,
     rotatePortrait: state.config.defaultScene.rotatePortrait,
     randomVideoStart: state.config.defaultScene.randomVideoStart,
-    continueVideo: state.config.defaultScene.continueVideo,
+    continueVideo:  getSourceType(source.url) == ST.video || state.config.defaultScene.continueVideo,
     playVideoClips: state.config.defaultScene.playVideoClips,
     videoVolume: state.config.defaultScene.videoVolume,
   });
