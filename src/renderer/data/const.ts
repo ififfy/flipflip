@@ -360,6 +360,13 @@ const SP = { // Special modes
   select: 'sp.select',
 }
 
+const WC = { // Watermark corner
+  bottomRight: 'wc.bottomRight',
+  bottomLeft: 'wc.bottomLeft',
+  topRight: 'wc.topRight',
+  topLeft: 'wc.topLeft',
+}
+
 export {
-  AF, ALT, ASF, BT, DONE, EA, GO, GT, HTF, IF, IG, IPC, IT, LT, MO, OF, PR, PT, RF, RP, RT, SB, SC, SDGT, SDT, SF, SGT, SL, SOF,SP, SPT, ST, TF, TT, VCT, VO, VTF, WF
+  AF, ALT, ASF, BT, DONE, EA, GO, GT, HTF, IF, IG, IPC, IT, LT, MO, OF, PR, PT, RF, RP, RT, SB, SC, SDGT, SDT, SF, SGT, SL, SOF,SP, SPT, ST, TF, TT, VCT, VO, VTF, WC, WF
 };

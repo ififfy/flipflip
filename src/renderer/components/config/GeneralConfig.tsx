@@ -9,6 +9,7 @@ import CacheCard from "../configGroups/CacheCard";
 import BackupCard from "../configGroups/BackupCard";
 import APICard from "../configGroups/APICard";
 import ThemeCard from "../configGroups/ThemeCard";
+import WatermarkCard from "../configGroups/WatermarkCard";
 
 export default class GeneralConfig extends React.Component {
   readonly props: {
@@ -94,6 +95,16 @@ export default class GeneralConfig extends React.Component {
                 theme={this.props.theme}
                 onChangeThemeColor={this.props.onChangeThemeColor.bind(this)}
                 onToggleDarkMode={this.props.onToggleDarkMode.bind(this)} />
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} sm={4} md={3} lg={3}>
+          <Card>
+            <CardContent>
+              <WatermarkCard
+                settings={this.props.config.generalSettings}
+                onUpdateSettings={this.props.onUpdateGeneralSettings.bind(this)}/>
             </CardContent>
           </Card>
         </Grid>

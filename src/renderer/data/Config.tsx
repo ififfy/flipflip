@@ -1,4 +1,4 @@
-import {BT, EA, GO, HTF, IF, IT, OF, SC, SL, SOF, TF, VO, VTF, WF} from "./const";
+import {BT, EA, GO, HTF, IF, IT, OF, SC, SL, SOF, TF, VO, VTF, WC, WF} from "./const";
 import Overlay from "./Overlay";
 import LibrarySource from "./LibrarySource";
 import Audio from "./Audio";
@@ -259,11 +259,17 @@ interface DisplaySettingsI {
 }
 
 interface GeneralSettingsI {
-  [key: string]: number | boolean;
+  [key: string]: number | boolean | string;
 
   portableMode: boolean;
   autoBackup: boolean;
   autoBackupDays: number;
+  watermark: boolean;
+  watermarkCorner: string;
+  watermarkText: string;
+  watermarkFontFamily: string;
+  watermarkFontSize: number;
+  watermarkColor: string;
 }
 
 interface TutorialsI {
@@ -548,11 +554,17 @@ export class DisplaySettings  implements DisplaySettingsI {
 }
 
 export class GeneralSettings  implements GeneralSettingsI {
-  [key: string]: number | boolean;
+  [key: string]: number | boolean | string;
 
   portableMode = false;
   autoBackup = false;
   autoBackupDays = 1;
+  watermark = false;
+  watermarkCorner = WC.bottomRight;
+  watermarkText = "";
+  watermarkFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
+  watermarkFontSize = 14;
+  watermarkColor = "#FFFFFF";
 }
 
 export class Tutorials implements TutorialsI {

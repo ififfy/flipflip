@@ -118,6 +118,11 @@ export default new Map<string, string>([
   ['rf.cont', 'Controversial'],
   ['rf.rising', 'Rising'],
 
+  ['wc.bottomRight', 'Bottom Right'],
+  ['wc.bottomLeft', 'Bottom Left'],
+  ['wc.topRight', 'Top Right'],
+  ['wc.topLeft', 'Top Left'],
+
   ['hour', 'Last Hour'],
   ['day', 'Last Day'],
   ['week', 'Lasy Week'],

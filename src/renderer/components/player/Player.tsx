@@ -6,8 +6,8 @@ import {
   Button, CircularProgress, Container, Theme, Typography
 } from "@material-ui/core";
 
-import {SL} from "../../data/const";
-import {getRandomListItem} from "../../data/utils";
+import {SL, WC} from "../../data/const";
+import {getFileGroup, getFileName, getRandomListItem} from "../../data/utils";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
 import Scene from '../../data/Scene';
@@ -133,6 +133,56 @@ export default class Player extends React.Component {
       playerStyle = {
         ...playerStyle,
         display: 'none',
+      }
+    }
+
+    let watermarkStyle: any = {}
+    let watermarkText = "";
+    if (this.props.config.generalSettings.watermark) {
+      watermarkStyle = {
+        position: 'absolute',
+        zIndex: 11,
+        whiteSpace: 'pre',
+        fontFamily: this.props.config.generalSettings.watermarkFontFamily,
+        fontSize: this.props.config.generalSettings.watermarkFontSize,
+        color: this.props.config.generalSettings.watermarkColor
+      };
+      switch (this.props.config.generalSettings.watermarkCorner) {
+        case WC.bottomRight:
+          watermarkStyle.bottom = 5;
+          watermarkStyle.right = 5;
+          watermarkStyle.textAlign = 'right';
+          break;
+        case WC.bottomLeft:
+          watermarkStyle.bottom = 5;
+          watermarkStyle.left = 5;
+          watermarkStyle.textAlign = 'left';
+          break;
+        case WC.topRight:
+          watermarkStyle.top = 5;
+          watermarkStyle.right = 5;
+          watermarkStyle.textAlign = 'right';
+          break;
+        case WC.topLeft:
+          watermarkStyle.top = 5;
+          watermarkStyle.left = 5;
+          watermarkStyle.textAlign = 'left';
+          break;
+      }
+
+      watermarkText = this.props.config.generalSettings.watermarkText;
+      watermarkText = watermarkText.replace("{scene_name}", this.props.scene.name);
+      const img = this.state.historyPaths[(this.state.historyPaths.length - 1) + this.state.historyOffset];
+      if (img) {
+        watermarkText = watermarkText.replace("{source_name}", getFileGroup(img.getAttribute("source")));
+        watermarkText = watermarkText.replace("{source_url}", img.getAttribute("source"));
+        watermarkText = watermarkText.replace("{file_name}", decodeURIComponent(getFileName(img.src)));
+        watermarkText = watermarkText.replace("{file_url}", decodeURIComponent(img.src));
+      } else {
+        watermarkText = watermarkText.replace("{source_name}", "");
+        watermarkText = watermarkText.replace("{source_url}", "");
+        watermarkText = watermarkText.replace("{file_name}", "");
+        watermarkText = watermarkText.replace("{file_url}", "");
       }
     }
 
@@ -275,6 +325,11 @@ export default class Player extends React.Component {
         )}
 
         <div style={playerStyle}>
+          {this.props.config.generalSettings.watermark && (
+            <div style={watermarkStyle}>
+              {watermarkText}
+            </div>
+          )}
           {this.props.scene.audioScene && (
             <ImageView
               image={this.state.thumbImage}
