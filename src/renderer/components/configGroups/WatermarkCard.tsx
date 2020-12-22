@@ -50,6 +50,16 @@ class WatermarkCard extends React.Component {
                            {"{file_url}"} - URL of the current file
                            <br/>
                            {"{file_name}"} - Name of the current file
+                           <br/>
+                           {"{audio_url}"} - URL of the currently playing audio file
+                           <br/>
+                           {"{audio_name}"} - Name of the currently playing audio file
+                           <br/>
+                           {"{audio_title}"} - Title of the currently playing audio file
+                           <br/>
+                           {"{audio_artist}"} - Artist of the currently playing audio file
+                           <br/>
+                           {"{audio_name}"} - Album of the currently playing audio file
                          </div>
                        }>
                 <FormControlLabel

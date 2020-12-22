@@ -7,7 +7,7 @@ import {
 } from "@material-ui/core";
 
 import {SL, WC} from "../../data/const";
-import {getFileGroup, getFileName, getRandomListItem} from "../../data/utils";
+import {getFileGroup, getFileName, getRandomListItem, urlToPath} from "../../data/utils";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
 import Scene from '../../data/Scene';
@@ -174,15 +174,40 @@ export default class Player extends React.Component {
       watermarkText = watermarkText.replace("{scene_name}", this.props.scene.name);
       const img = this.state.historyPaths[(this.state.historyPaths.length - 1) + this.state.historyOffset];
       if (img) {
-        watermarkText = watermarkText.replace("{source_name}", getFileGroup(img.getAttribute("source")));
         watermarkText = watermarkText.replace("{source_url}", img.getAttribute("source"));
+        watermarkText = watermarkText.replace("{source_name}", getFileGroup(img.getAttribute("source")));
+        watermarkText = watermarkText.replace("{file_url}", urlToPath(img.src));
         watermarkText = watermarkText.replace("{file_name}", decodeURIComponent(getFileName(img.src)));
-        watermarkText = watermarkText.replace("{file_url}", decodeURIComponent(img.src));
       } else {
-        watermarkText = watermarkText.replace("{source_name}", "");
-        watermarkText = watermarkText.replace("{source_url}", "");
-        watermarkText = watermarkText.replace("{file_name}", "");
-        watermarkText = watermarkText.replace("{file_url}", "");
+        watermarkText = watermarkText.replace(/\s*\{source_url\}\s*/g, "");
+        watermarkText = watermarkText.replace(/\s*\{source_name\}\s*/g, "");
+        watermarkText = watermarkText.replace(/\s*\{file_url\}\s*/g, "");
+        watermarkText = watermarkText.replace(/\s*\{file_name\}\s*/g, "");
+      }
+      if (this.state.currentAudio) {
+        watermarkText = watermarkText.replace("{audio_url}", this.state.currentAudio.url);
+        watermarkText = watermarkText.replace("{audio_name}", getFileName(this.state.currentAudio.url));
+        if (this.state.currentAudio.name) {
+          watermarkText = watermarkText.replace("{audio_title}", this.state.currentAudio.name);
+        } else {
+          watermarkText = watermarkText.replace(/\s*\{audio_title\}\s*/g, "");
+        }
+        if (this.state.currentAudio.artist) {
+          watermarkText = watermarkText.replace("{audio_artist}", this.state.currentAudio.artist);
+        } else {
+          watermarkText = watermarkText.replace(/\s*\{audio_artist\}\s*/g, "");
+        }
+        if (this.state.currentAudio.album) {
+          watermarkText = watermarkText.replace("{audio_album}", this.state.currentAudio.album);
+        } else {
+          watermarkText = watermarkText.replace(/\s*\{audio_album\}\s*/g, "");
+        }
+      } else {
+        watermarkText = watermarkText.replace(/\s*\{audio_url\}\s*/g, "");
+        watermarkText = watermarkText.replace(/\s*\{audio_name\}\s*/g, "");
+        watermarkText = watermarkText.replace(/\s*\{audio_title\}\s*/g, "");
+        watermarkText = watermarkText.replace(/\s*\{audio_artist\}\s*/g, "");
+        watermarkText = watermarkText.replace(/\s*\{audio_album\}\s*/g, "");
       }
     }
 
