@@ -109,6 +109,26 @@ class AudioPlaylist extends React.Component {
             onAudioSliderChange={this.onAudioSliderChange.bind(this)}
             goBack={this.props.goBack}
             playNextScene={this.props.playNextScene}/>
+          <div className={classes.playlistAction}>
+            <Tooltip title={"Shuffle " + (this.props.playlist.shuffle ? "(On)" : "(Off)")}>
+              <IconButton onClick={this.toggleShuffle.bind(this)}>
+                <ShuffleIcon color={this.props.playlist.shuffle ? "primary" : undefined}/>
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={"Repeat " + (this.props.playlist.repeat == RP.none ? "(Off)" : this.props.playlist.repeat == RP.all ? "(All)" : "(One)")}>
+              <IconButton onClick={this.changeRepeat.bind(this)}>
+                {this.props.playlist.repeat == RP.none && (
+                  <RepeatIcon />
+                )}
+                {this.props.playlist.repeat == RP.all && (
+                  <RepeatIcon color={"primary"}/>
+                )}
+                {this.props.playlist.repeat == RP.one && (
+                  <RepeatOneIcon color={"primary"} />
+                )}
+              </IconButton>
+            </Tooltip>
+          </div>
         </React.Fragment>
       );
     } else {
