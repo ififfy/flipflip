@@ -90,6 +90,7 @@ export default new Map<string, string>([
   ['st.deviantart', 'DeviantArt'],
   ['st.instagram', 'Instagram'],
   ['st.danbooru', 'Danbooru'],
+  ['st.e621', 'E621'],
   ['st.gelbooru1', 'Gelbooru'],
   ['st.gelbooru2', 'Gelbooru'],
   ['st.ehentai', 'EHentai'],

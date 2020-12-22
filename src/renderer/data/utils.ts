@@ -163,10 +163,12 @@ export function getSourceType(url: string): string {
     return ST.deviantart;
   } else if (/^https?:\/\/(www\.)?instagram\.com\//.exec(url) != null) {
     return ST.instagram;
-  } else if (/^https?:\/\/(www\.)?(lolibooru\.moe|hypnohub\.net|danbooru\.donmai\.us|e621\.net)\//.exec(url) != null) {
+  } else if (/^https?:\/\/(www\.)?(lolibooru\.moe|hypnohub\.net|danbooru\.donmai\.us)\//.exec(url) != null) {
     return ST.danbooru;
   } else if (/^https?:\/\/(www\.)?(gelbooru\.com|furry\.booru\.org|rule34\.xxx|realbooru\.com)\//.exec(url) != null) {
     return ST.gelbooru2;
+  } else if (/^https?:\/\/(www\.)?(e621\.net)\//.exec(url) != null) {
+    return ST.e621;
   } else if (/^https?:\/\/(www\.)?(.*\.booru\.org)\//.exec(url) != null) {
     return ST.gelbooru1;
   } else if (/^https?:\/\/(www\.)?e-hentai\.org\/g\//.exec(url) != null) {
@@ -230,6 +232,23 @@ export function getFileGroup(url: string) {
         instagramID = instagramID.substring(0, instagramID.indexOf("/"));
       }
       return instagramID;
+    case ST.e621:
+      const hostRegexE621 = /^https?:\/\/(?:www\.)?([^.]*)\./g;
+      const hostE621 =  hostRegexE621.exec(url)[1];
+      let E621ID = "";
+      if (url.includes("/pools/")) {
+        E621ID = "pool" + url.substring(url.lastIndexOf("/"));
+      } else {
+        const tagRegex = /[?&]tags=(.*)&?/g;
+        let tags;
+        if ((tags = tagRegex.exec(url)) !== null) {
+          E621ID = tags[1];
+        }
+        if (E621ID.endsWith("+")) {
+          E621ID = E621ID.substring(0, E621ID.length - 1);
+        }
+      }
+      return hostE621 + "/" + decodeURIComponent(E621ID);
     case ST.danbooru:
     case ST.gelbooru1:
     case ST.gelbooru2:

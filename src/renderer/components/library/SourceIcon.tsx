@@ -184,6 +184,7 @@ export default class SourceIcon extends React.Component {
       case ST.deviantart:
         return <DeviantArtIcon className={this.props.className}/>;
       case ST.danbooru:
+      case ST.e621:
         return <DanbooruIcon className={this.props.className}/>;
       case ST.gelbooru1:
       case ST.gelbooru2:

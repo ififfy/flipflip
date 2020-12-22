@@ -120,6 +120,9 @@ function getPromise(systemMessage: Function, config: Config, source: LibrarySour
     } else if (sourceType == ST.danbooru) {
       promiseFunction = loadDanbooru;
       timeout = 8000;
+    } else if (sourceType == ST.e621) {
+      promiseFunction = loadE621;
+      timeout = 8000;
     } else if (sourceType == ST.gelbooru1) {
       promiseFunction = loadGelbooru1;
       timeout = 8000;
@@ -1062,6 +1065,109 @@ function loadInstagram(systemMessage: Function, config: Config, source: LibraryS
     }
     return new CancelablePromise((resolve) => {
       resolve(null);
+    });
+  }
+}
+
+function loadE621(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
+  const url = source.url;
+  const hostRegex = /^(https?:\/\/[^\/]*)\//g;
+  const thisHost = hostRegex.exec(url)[1];
+  let suffix = "";
+  if (url.includes("/pools/")) {
+    suffix = "/pools.json?search[id]=" + url.substring(url.lastIndexOf("/") + 1);
+
+    return new CancelablePromise((resolve) => {
+      wretch(thisHost + suffix)
+        .get()
+        .setTimeout(5000)
+        .badRequest((e) => resolve(null))
+        .notFound((e) => resolve(null))
+        .timeout((e) => resolve(null))
+        .internalError((e) => resolve(null))
+        .onAbort((e) => resolve(null))
+        .json((json: any) => {
+          if (json.length == 0) {
+            helpers.next = null;
+            resolve({data: [], helpers: helpers});
+            return;
+          }
+
+          const count = json[0].post_count;
+          const images = Array<string>();
+          for (let postID of json[0].post_ids) {
+            suffix = "/posts/" + postID + ".json";
+            wretch(thisHost + suffix)
+              .get()
+              .setTimeout(5000)
+              .badRequest((e) => resolve(null))
+              .notFound((e) => resolve(null))
+              .timeout((e) => resolve(null))
+              .internalError((e) => resolve(null))
+              .onAbort((e) => resolve(null))
+              .json((json: any) => {
+                if (json.post && json.post.file.url) {
+                  let fileURL = json.post.file.url;
+                  if (!fileURL.startsWith("http")) {
+                    fileURL = "https://" + fileURL;
+                  }
+                  images.push(fileURL);
+                }
+
+                if (images.length == count) {
+                  helpers.next = null;
+                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+                  resolve({
+                    data: filterPathsToJustPlayable(filter, images, true),
+                    helpers: helpers,
+                  });
+                }
+              });
+          }
+        });
+    });
+  } else {
+    suffix = "/posts.json?limit=20&page=" + (helpers.next + 1);
+    const tagRegex = /[?&]tags=(.*)&?/g;
+    let tags;
+    if ((tags = tagRegex.exec(url)) !== null) {
+      suffix += "&tags=" + tags[1];
+    }
+
+    return new CancelablePromise((resolve) => {
+      wretch(thisHost + suffix)
+        .get()
+        .setTimeout(5000)
+        .badRequest((e) => resolve(null))
+        .notFound((e) => resolve(null))
+        .timeout((e) => resolve(null))
+        .internalError((e) => resolve(null))
+        .onAbort((e) => resolve(null))
+        .json((json: any) => {
+          if (json.length == 0) {
+            helpers.next = null;
+            resolve({data: [], helpers: helpers});
+          }
+
+          let list = json.posts;
+          const images = Array<string>();
+          for (let p of list) {
+            if (p.file.url) {
+              let fileURL = p.file.url;
+              if (!fileURL.startsWith("http")) {
+                fileURL = "https://" + fileURL;
+              }
+              images.push(fileURL);
+            }
+          }
+
+          helpers.next = helpers.next + 1;
+          helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+          resolve({
+            data: filterPathsToJustPlayable(filter, images, true),
+            helpers: helpers,
+          });
+        });
     });
   }
 }
