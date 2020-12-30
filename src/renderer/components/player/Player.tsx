@@ -365,7 +365,7 @@ export default class Player extends React.Component {
               removeChild
               />
           )}
-          {(this.props.config.displaySettings.audioAlert || this.props.tags) && (
+          {(this.props.config.displaySettings.audioAlert || this.props.tags) && this.props.scene.audioEnabled && (
             <AudioAlert
               audio={this.state.currentAudio}
             />
