@@ -36,6 +36,9 @@ export default class Player extends React.Component {
     systemMessage(message: string): void,
     preventSleep?: boolean,
     allTags?: Array<Tag>,
+    captionScript?: string,
+    captionScale?: number,
+    captionProgramJumpToHack?: ChildCallbackHack,
     gridView?: boolean,
     tags?: Array<Tag>,
     blacklistFile?(sourceURL: string, fileToBlacklist: string): void,
@@ -47,6 +50,7 @@ export default class Player extends React.Component {
     playTrack?(url: string): void,
     changeAudioRoute?(aID: number): void,
     toggleTag?(sourceID: number, tag: Tag): void,
+    onCaptionError?(e: string): void,
   };
 
   readonly state = {
@@ -80,8 +84,9 @@ export default class Player extends React.Component {
     const nextScene = this.getScene(this.props.scene.nextSceneID == -1 ? this.props.scene.nextSceneRandomID : this.props.scene.nextSceneID);
     const showCaptionProgram = (
       this.props.scene.textEnabled &&
-      this.props.scene.textSource &&
-      this.props.scene.textSource.length &&
+      ((this.props.scene.textSource &&
+      this.props.scene.textSource.length) ||
+      this.props.captionScript) &&
       this.state.isPlaying &&
       this.state.hasStarted);
     const showStrobe = this.props.scene.strobe && this.state.hasStarted && this.state.isPlaying &&
@@ -210,6 +215,8 @@ export default class Player extends React.Component {
         watermarkText = watermarkText.replace(/\s*\{audio_album\}\s*/g, "");
       }
     }
+
+    const captionScale = this.props.captionScale ? this.props.captionScale : 1;
 
     return (
       <div style={rootStyle}>
@@ -446,37 +453,40 @@ export default class Player extends React.Component {
         {showCaptionProgram && (
           <CaptionProgram
             blinkColor={this.props.scene.blinkColor}
-            blinkFontSize={this.props.scene.blinkFontSize}
+            blinkFontSize={this.props.scene.blinkFontSize * captionScale}
             blinkFontFamily={this.props.scene.blinkFontFamily}
             blinkBorder={this.props.scene.blinkBorder}
-            blinkBorderpx={this.props.scene.blinkBorderpx}
+            blinkBorderpx={this.props.scene.blinkBorderpx * captionScale}
             blinkBorderColor={this.props.scene.blinkBorderColor}
             captionColor={this.props.scene.captionColor}
-            captionFontSize={this.props.scene.captionFontSize}
+            captionFontSize={this.props.scene.captionFontSize * captionScale}
             captionFontFamily={this.props.scene.captionFontFamily}
             captionBorder={this.props.scene.captionBorder}
-            captionBorderpx={this.props.scene.captionBorderpx}
+            captionBorderpx={this.props.scene.captionBorderpx * captionScale}
             captionBorderColor={this.props.scene.captionBorderColor}
             captionBigColor={this.props.scene.captionBigColor}
-            captionBigFontSize={this.props.scene.captionBigFontSize}
+            captionBigFontSize={this.props.scene.captionBigFontSize * captionScale}
             captionBigFontFamily={this.props.scene.captionBigFontFamily}
             captionBigBorder={this.props.scene.captionBigBorder}
-            captionBigBorderpx={this.props.scene.captionBigBorderpx}
+            captionBigBorderpx={this.props.scene.captionBigBorderpx * captionScale}
             captionBigBorderColor={this.props.scene.captionBigBorderColor}
             countColor={this.props.scene.countColor}
-            countFontSize={this.props.scene.countFontSize}
+            countFontSize={this.props.scene.countFontSize * captionScale}
             countFontFamily={this.props.scene.countFontFamily}
             countBorder={this.props.scene.countBorder}
-            countBorderpx={this.props.scene.countBorderpx}
+            countBorderpx={this.props.scene.countBorderpx * captionScale}
             countBorderColor={this.props.scene.countBorderColor}
             url={this.props.scene.textSource}
+            script={this.props.captionScript}
             textEndStop={this.props.scene.textEndStop}
             textNextScene={this.props.scene.textNextScene}
             getTags={this.props.getTags.bind(this)}
             goBack={this.props.goBack.bind(this)}
             playNextScene={this.props.nextScene}
             currentSource={this.state.historyPaths.length > 0 ? this.state.historyPaths[0].getAttribute("source") : null}
-            currentClip={this.state.historyPaths.length > 0 ? this.state.historyPaths[0].getAttribute("clip") : null}/>
+            currentClip={this.state.historyPaths.length > 0 ? this.state.historyPaths[0].getAttribute("clip") : null}
+            jumpToHack={this.props.captionProgramJumpToHack}
+            onError={this.props.onCaptionError}/>
         )}
       </div>
     );
@@ -584,6 +594,8 @@ export default class Player extends React.Component {
   shouldComponentUpdate(props: any, state: any): boolean {
     return this.props.scene !== props.scene ||
       this.props.tags !== props.tags ||
+      this.props.captionScript !== props.captionScript ||
+      this.props.gridView !== props.gridView ||
       this.state.canStart !== state.canStart ||
       this.state.hasStarted !== state.hasStarted ||
       this.state.isMainLoaded !== state.isMainLoaded ||

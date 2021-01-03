@@ -14,6 +14,7 @@ import AddIcon from '@material-ui/icons/Add';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import CasinoIcon from '@material-ui/icons/Casino';
+import CodeIcon from '@material-ui/icons/Code';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import GridOnIcon from '@material-ui/icons/GridOn';
 import HelpIcon from '@material-ui/icons/Help';
@@ -344,6 +345,7 @@ class ScenePicker extends React.Component {
     onImportScene(addToLibrary: boolean): void,
     onOpenConfig(): void,
     onOpenAudioLibrary(): void,
+    onOpenCaptionScriptor(): void,
     onOpenLibrary(): void,
     onOpenScene(scene: Scene): void,
     onOpenGrid(grid: SceneGrid): void,
@@ -485,6 +487,19 @@ class ScenePicker extends React.Component {
                         size='small'
                         variant='outlined'/>
                     )}
+                  </ListItem>
+                </Tooltip>
+              </div>
+
+              <Divider />
+
+              <div>
+                <Tooltip title={this.state.drawerOpen ? "" : "Caption Scripter"}>
+                  <ListItem button onClick={this.props.onOpenCaptionScriptor.bind(this)}>
+                    <ListItemIcon>
+                      <CodeIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Caption Scripter" />
                   </ListItem>
                 </Tooltip>
               </div>

@@ -471,6 +471,10 @@ export async function convertURL(url: string): Promise<Array<string>> {
   }
 }
 
+export function htmlEntities(str: string): string {
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
 export function urlToPath(url: string): string {
   const path = new URL(url).pathname;
   if (process.platform === "win32") {

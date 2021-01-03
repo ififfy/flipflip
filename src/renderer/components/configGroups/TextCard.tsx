@@ -42,7 +42,8 @@ class TextCard extends React.Component {
   readonly props: {
     classes: any,
     scene: Scene | SceneSettings,
-    sidebar: boolean,
+    sidebar?: boolean,
+    onlyFontOptions?: boolean,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
   };
 
@@ -57,75 +58,79 @@ class TextCard extends React.Component {
 
     return(
       <Grid container spacing={2} alignItems="center">
-        <Grid item xs={12}>
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs>
-              <FormControlLabel
-                control={
-                  <Switch checked={this.props.scene.textEnabled}
-                          onChange={this.onToggleEnable.bind(this)}/>
-                }
-                label="Text Overlay"/>
-                <Collapse in={this.props.scene.textEnabled && !this.props.scene.textNextScene}>
+        {!this.props.onlyFontOptions && (
+          <React.Fragment>
+            <Grid item xs={12}>
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs>
                   <FormControlLabel
                     control={
-                      <Switch checked={this.props.scene.textEndStop}
-                              size="small"
-                              onChange={this.onToggleEndStop.bind(this)}/>
+                      <Switch checked={this.props.scene.textEnabled}
+                              onChange={this.onToggleEnable.bind(this)}/>
                     }
-                    label="Stop at End"/>
-                </Collapse>
-              <Collapse in={this.props.scene.textEnabled && !this.props.scene.textEndStop}>
-                <FormControlLabel
-                  control={
-                    <Switch checked={this.props.scene.textNextScene}
-                            size="small"
-                            onChange={this.onToggleNextScene.bind(this)}/>
-                  }
-                  label="Next Scene at End"/>
-              </Collapse>
-            </Grid>
-            <Grid item>
-              <Collapse in={this.props.scene.textEnabled}>
-                {this.state.loadingFonts && <CircularProgress size={46} className={classes.fontProgress} />}
-                <Tooltip title="Toggle Font Options">
-                  <IconButton
-                    onClick={this.onToggleFontVisiblity.bind(this)}>
-                    {this.state.showFonts ? <VisibilityIcon/> : <VisibilityOffIcon/>}
-                  </IconButton>
-                </Tooltip>
-              </Collapse>
-            </Grid>
-          </Grid>
-        </Grid>
-        <Grid item xs={12} className={clsx(!this.props.scene.textEnabled && classes.noPadding)}>
-          <Collapse in={this.props.scene.textEnabled} className={classes.fullWidth}>
-            <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12}>
-                <TextField
-                  label="Script URL"
-                  fullWidth
-                  placeholder="Paste URL Here"
-                  margin="dense"
-                  value={this.props.scene.textSource}
-                  InputProps={{
-                    endAdornment:
-                      <InputAdornment position="end">
-                        <Tooltip title="Open File">
-                          <IconButton
-                            onClick={this.onOpenFile.bind(this)}>
-                            <FolderIcon/>
-                          </IconButton>
-                        </Tooltip>
-                      </InputAdornment>,
-                  }}
-                  onChange={this.onInput.bind(this, 'textSource')}/>
+                    label="Text Overlay"/>
+                    <Collapse in={this.props.scene.textEnabled && !this.props.scene.textNextScene}>
+                      <FormControlLabel
+                        control={
+                          <Switch checked={this.props.scene.textEndStop}
+                                  size="small"
+                                  onChange={this.onToggleEndStop.bind(this)}/>
+                        }
+                        label="Stop at End"/>
+                    </Collapse>
+                  <Collapse in={this.props.scene.textEnabled && !this.props.scene.textEndStop}>
+                    <FormControlLabel
+                      control={
+                        <Switch checked={this.props.scene.textNextScene}
+                                size="small"
+                                onChange={this.onToggleNextScene.bind(this)}/>
+                      }
+                      label="Next Scene at End"/>
+                  </Collapse>
+                </Grid>
+                <Grid item>
+                  <Collapse in={this.props.scene.textEnabled}>
+                    {this.state.loadingFonts && <CircularProgress size={46} className={classes.fontProgress} />}
+                    <Tooltip title="Toggle Font Options">
+                      <IconButton
+                        onClick={this.onToggleFontVisiblity.bind(this)}>
+                        {this.state.showFonts ? <VisibilityIcon/> : <VisibilityOffIcon/>}
+                      </IconButton>
+                    </Tooltip>
+                  </Collapse>
+                </Grid>
               </Grid>
             </Grid>
-          </Collapse>
-        </Grid>
-        {this.props.scene.textEnabled && this.state.showFonts && (
-          <Grid item xs={12} className={clsx((!this.props.scene.textEnabled || !this.state.showFonts) && classes.noPadding)}>
+            <Grid item xs={12} className={clsx(!this.props.scene.textEnabled && classes.noPadding)}>
+              <Collapse in={this.props.scene.textEnabled} className={classes.fullWidth}>
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Script URL"
+                      fullWidth
+                      placeholder="Paste URL Here"
+                      margin="dense"
+                      value={this.props.scene.textSource}
+                      InputProps={{
+                        endAdornment:
+                          <InputAdornment position="end">
+                            <Tooltip title="Open File">
+                              <IconButton
+                                onClick={this.onOpenFile.bind(this)}>
+                                <FolderIcon/>
+                              </IconButton>
+                            </Tooltip>
+                          </InputAdornment>,
+                      }}
+                      onChange={this.onInput.bind(this, 'textSource')}/>
+                  </Grid>
+                </Grid>
+              </Collapse>
+            </Grid>
+          </React.Fragment>
+        )}
+        {this.props.scene.textEnabled && (this.state.showFonts || this.props.onlyFontOptions) && (
+          <Grid item xs={12} className={clsx((!this.props.scene.textEnabled || (!this.state.showFonts && !this.props.onlyFontOptions)) && classes.noPadding)}>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={9}>
                 <FormControl className={classes.fullWidth}>
@@ -483,6 +488,13 @@ class TextCard extends React.Component {
     if (this._promise != null) {
       this._promise.cancel();
     }
+  }
+
+  shouldComponentUpdate(props: any, state: any): boolean {
+    return this.state.showFonts !== state.showFonts ||
+      this.state.loadingFonts !== state.loadingFonts ||
+      this.state.systemFonts !== state.systemFonts ||
+      this.props.scene !== props.scene;
   }
 
   onToggleFontVisiblity() {

@@ -21,7 +21,7 @@ import HttpIcon from '@material-ui/icons/Http';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import MovieIcon from '@material-ui/icons/Movie';
 
-import {ALT, DONE, LT, PT, SDGT, SDT, SGT, SPT, TF, VCT} from "../data/const";
+import {ALT, CST, DONE, LT, PT, SDGT, SDT, SGT, SPT, TF, VCT} from "../data/const";
 import {Route} from "../data/Route";
 import Config from "../data/Config";
 import Scene from "../data/Scene";
@@ -1183,6 +1183,27 @@ class Tutorial extends React.Component {
         break;
 
 
+    case CST.welcome:
+      dialogBody =
+        <React.Fragment>
+          <DialogTitle id="tutorial-title">Caption Scriptor</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="tutorial-description">
+              This is the <b>Caption Scriptor</b>. Here, you can write, test, and modify captioning scripts.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.onSkip.bind(this)} color="secondary">
+              Skip Tutorial
+            </Button>
+            <Button onClick={this.onContinue.bind(this)} color="primary">
+              Continue
+            </Button>
+          </DialogActions>
+        </React.Fragment>;
+      break;
+
+
       case SDGT.welcome:
         dialogBody =
           <React.Fragment>
@@ -1753,6 +1774,19 @@ class Tutorial extends React.Component {
             return;
           case ALT.final:
           case ALT.done:
+            // We're done, don't show
+            this.setTutorial(null);
+            return;
+          default:
+            return;
+        }
+      case "scriptor":
+        switch (this.props.config.tutorials.scriptor) {
+          case CST.welcome:
+            this.setTutorial(CST.final);
+            return;
+          case CST.final:
+          case CST.done:
             // We're done, don't show
             this.setTutorial(null);
             return;

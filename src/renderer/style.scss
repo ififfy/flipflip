@@ -32,3 +32,11 @@ div.CreatableSelect {
 #force-webpack-to-load-logo {
   background: url("./icons/flipflip_logo.png") no-repeat;
 }
+
+.CodeMirror {
+  height: auto;
+}
+
+.CodeMirror-linenumber {
+  cursor: pointer;
+}

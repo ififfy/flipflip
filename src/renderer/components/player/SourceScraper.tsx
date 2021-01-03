@@ -1754,6 +1754,7 @@ export default class SourceScraper extends React.Component {
       props.opacity !== this.props.opacity ||
       props.strobeLayer !== this.props.strobeLayer ||
       props.hasStarted !== this.props.hasStarted ||
+      props.gridView !== this.props.gridView ||
       state.restart !== this.state.restart ||
       state.promise.source !== this.state.promise.source ||
       (state.allURLs.size > 0 && this.state.allURLs.size == 0);

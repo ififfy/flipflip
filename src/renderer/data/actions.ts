@@ -28,7 +28,7 @@ import {
   AF,
   ALT,
   ASF,
-  BT,
+  BT, CST,
   DONE,
   GT,
   HTF,
@@ -289,6 +289,13 @@ export function doneTutorial(state: State, tutorial: string): Object {
       state.config.tutorials.audios = DONE;
     } else {
       state.config.tutorials.audios = tutorial;
+    }
+  } else if (isRoute(state, 'scriptor')) {
+    if (tutorial == CST.final) {
+      newTutorial = null;
+      state.config.tutorials.scriptor = DONE;
+    } else {
+      state.config.tutorials.scriptor = tutorial;
     }
   } else if (isRoute(state, 'grid')) {
     if (tutorial == SGT.final) {
@@ -604,6 +611,10 @@ export function openLibrary(state: State): Object {
 
 export function openAudios(state: State): Object {
   return {route: [new Route({kind: 'audios', value: null})], tutorial: state.config.tutorials.audios == null ? ALT.welcome : null};
+}
+
+export function openScriptor(state: State): Object {
+  return {route: [new Route({kind: 'scriptor', value: null})], tutorial: state.config.tutorials.scriptor == null ? CST.welcome : null};
 }
 
 export function openLibraryImport(state: State): Object {

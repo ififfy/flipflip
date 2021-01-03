@@ -22,6 +22,7 @@ import SceneDetail from './sceneDetail/SceneDetail';
 import GridPlayer from "./player/GridPlayer";
 import Tutorial from "./Tutorial";
 import AudioLibrary from "./library/AudioLibrary";
+import CaptionScriptor from "./sceneDetail/CaptionScriptor";
 
 const appStorage = new AppStorage(remote.getCurrentWindow().id);
 
@@ -108,6 +109,7 @@ export default class Meta extends React.Component {
               onImportScene={a(actions.importScene)}
               onOpenConfig={a(actions.openConfig)}
               onOpenAudioLibrary={a(actions.openAudios)}
+              onOpenCaptionScriptor={a(actions.openScriptor)}
               onOpenLibrary={a(actions.openLibrary)}
               onOpenScene={a(actions.goToScene)}
               onOpenGrid={a(actions.goToGrid)}
@@ -334,6 +336,17 @@ export default class Meta extends React.Component {
               onResetTutorials={a(actions.resetTutorials)}
               onToggleDarkMode={a(actions.toggleDarkMode)}
               onUpdateConfig={a(actions.updateConfig)}
+            />
+          )}
+
+          {this.isRoute('scriptor') && (
+            <CaptionScriptor
+              config={this.state.config}
+              scenes={this.state.scenes}
+              theme={theme}
+              getTags={actions.getTags.bind(this, this.state.library)}
+              goBack={a(actions.goBack)}
+              onUpdateScene={a(actions.updateScene)}
             />
           )}
 

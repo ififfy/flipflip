@@ -324,10 +324,9 @@ class SceneOptionCard extends React.Component {
                     scene={this.props.scene}
                     allScenes={this.props.allScenes}
                     value={this.props.scene.nextSceneID}
+                    includeExtra
                     getSceneName={this.getSceneName.bind(this)}
                     onChange={this.changeIntKey.bind(this, 'nextSceneID')}
-                    includeExtra
-                    onRandomSceneDialog={this.onRandomSceneDialog.bind(this)}
                   />
                   <Dialog
                     classes={{paper: classes.randomSceneDialog}}

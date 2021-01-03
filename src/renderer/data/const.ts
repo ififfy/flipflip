@@ -181,6 +181,8 @@ const MO = { // Menu/Modal Constants
   restore: 'mo.restore',
   signIn: 'mo.signin',
   signOut: 'mo.signout',
+  open: 'mo.open',
+  load: 'mo.load',
 };
 
 const PR = { // Global progress functions
@@ -299,6 +301,12 @@ const ALT = { // Audio Library Tutorials
   done: DONE,
 };
 
+const CST = { // Caption Scriptor Tutorials
+  welcome: 'cst1',
+  final: 'cst2',
+  done: DONE,
+};
+
 const SDGT = { // Scene Generator Tutorials
   welcome: 'sdgt1',
   buttons: 'sdgt2',
@@ -369,5 +377,5 @@ const WC = { // Watermark corner
 }
 
 export {
-  AF, ALT, ASF, BT, DONE, EA, GO, GT, HTF, IF, IG, IPC, IT, LT, MO, OF, PR, PT, RF, RP, RT, SB, SC, SDGT, SDT, SF, SGT, SL, SOF,SP, SPT, ST, TF, TT, VCT, VO, VTF, WC, WF
+  AF, ALT, ASF, BT, CST, DONE, EA, GO, GT, HTF, IF, IG, IPC, IT, LT, MO, OF, PR, PT, RF, RP, RT, SB, SC, SDGT, SDT, SF, SGT, SL, SOF,SP, SPT, ST, TF, TT, VCT, VO, VTF, WC, WF
 };

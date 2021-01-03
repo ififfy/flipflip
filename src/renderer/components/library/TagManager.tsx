@@ -151,7 +151,7 @@ class TagManager extends React.Component {
             </div>
 
             <Typography component="h1" variant="h4" color="inherit" noWrap
-                        className={clsx(classes.title, classes.titleBar)}>
+                        className={classes.title}>
               Tag Manager
             </Typography>
 

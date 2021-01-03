@@ -1,8 +1,9 @@
 import * as React from "react";
 import wretch from "wretch";
 
-import {CancelablePromise, getRandomListItem} from "../../data/utils";
+import {CancelablePromise, getRandomListItem, htmlEntities} from "../../data/utils";
 import Tag from "../../data/Tag";
+import ChildCallbackHack from "./ChildCallbackHack";
 
 const splitFirstWord = function (s: string) {
   const firstSpaceIndex = s.indexOf(" ");
@@ -11,7 +12,7 @@ const splitFirstWord = function (s: string) {
     const rest = s.substring(firstSpaceIndex + 1);
     return [first, rest];
   } else {
-    return [null, null];
+    return [s, null];
   }
 };
 
@@ -52,6 +53,7 @@ export default class CaptionProgram extends React.Component {
     countBorderpx: number,
     countBorderColor: string,
     url: string,
+    script: string;
     currentSource: string,
     currentClip: string,
     textEndStop: boolean,
@@ -59,6 +61,8 @@ export default class CaptionProgram extends React.Component {
     getTags(source: string, clipID?: string): Array<Tag>
     goBack(): void,
     playNextScene(): void,
+    jumpToHack?: ChildCallbackHack,
+    onError?(e: string): void,
   };
 
   readonly state = {
@@ -100,6 +104,11 @@ export default class CaptionProgram extends React.Component {
 
   componentDidMount() {
     this.start();
+    if (this.props.jumpToHack) {
+      this.props.jumpToHack.listener = (args) => {
+        this.setState({programCounter: args[0]});
+      }
+    }
   }
 
   componentWillUnmount() {
@@ -108,11 +117,11 @@ export default class CaptionProgram extends React.Component {
   }
 
   shouldComponentUpdate(props: any, state: any): boolean {
-    return props.url !== this.props.url;
+    return props.url !== this.props.url || props.script !== this.props.script;
   }
 
   componentDidUpdate(props: any, state: any) {
-    if (!this.el.current || this.props.url == props.url) return;
+    if (!this.el.current || (this.props.url == props.url && this.props.script == props.script)) return;
     this.stop();
     this.reset();
     this.start();
@@ -148,19 +157,25 @@ export default class CaptionProgram extends React.Component {
   start() {
     const url = this.props.url;
     this._runningPromise = new CancelablePromise((resolve, reject) => {
-      wretch(url)
-        .get()
-        .error(503, error => {
-          console.warn("Unable to access " + url + " - Service is unavailable");
-        })
-        .text(data => {
-          resolve({data: [data], helpers: null});
-        });
+      if (this.props.script != null) {
+        resolve({data: [this.props.script], helpers: null});
+      } else {
+        wretch(url)
+          .get()
+          .error(503, error => {
+            console.warn("Unable to access " + url + " - Service is unavailable");
+          })
+          .text(data => {
+            resolve({data: [data], helpers: null});
+          });
+      }
     });
     this._runningPromise.then((data) => {
-      let hasError = false;
+      let error = null;
       let newProgram = new Array<Function>();
+      let index = 0;
       for (let line of data.data[0].split('\n')) {
+        index++;
         line = line.trim();
 
         if (line.length == 0 || line[0] == '#') continue;
@@ -170,17 +185,24 @@ export default class CaptionProgram extends React.Component {
         let fn, ms;
         switch (command.toLocaleLowerCase()) {
           case "count":
+            if (value == null) {
+              error = "Error: {" + index + "} '" + line + "' - missing parameters";
+              break;
+            }
             const split = value.split(" ");
-            if (split.length != 2) {
-              hasError = true;
-              console.error("Error: '" + line + "' - invalid count command");
+            if (split.length < 2) {
+              error = "Error: {" + index + "} '" + line + "' - missing second parameter";
+              break;
+            }
+            if (split.length > 2) {
+              error = "Error: {" + index + "} '" + line + "' - extra parameter(s)";
               break;
             }
             let start = parseInt(split[0]);
             const end = parseInt(split[1]);
-            if (isNaN(start) || isNaN(end) || start < 0 || end < 0) {
-              hasError = true;
-              console.error("Error: '" + line + "' - invalid count command");
+            if (/^\d+\s*$/.exec(split[0]) == null || /^\d+\s*$/.exec(split[1]) == null ||
+              isNaN(start) || isNaN(end) || start < 0 || end < 0) {
+              error = "Error: {" + index + "} '" + line + "' - invalid count command";
               break;
             }
             newProgram.push(this.count(start, end));
@@ -188,9 +210,21 @@ export default class CaptionProgram extends React.Component {
           case "blink":
           case "cap":
           case "bigcap":
+            if (value == null) {
+              error = "Error: {" + index + "} '" + line + "' - missing parameter";
+              break;
+            }
+            if (value.split(" ").includes("$RANDOM_PHRASE") && this.state.phrases.length == 0) {
+              error = "Error: {" + index + "} '" + line + "' - no phrases stored";
+              break;
+            }
             newProgram.push((this as any)[command](value));
             break;
           case "storephrase":
+            if (value == null) {
+              error = "Error: {" + index + "} '" + line + "' - missing parameter";
+              break;
+            }
             let newPhrases = this.state.phrases;
             newPhrases = newPhrases.concat([value]);
             this.setState({phrases: newPhrases});
@@ -204,27 +238,38 @@ export default class CaptionProgram extends React.Component {
           case "setcountdelay":
           case "setcountgroupdelay":
           case "wait":
+            if (value == null) {
+              error = "Error: {" + index + "} '" + line + "' - missing parameter";
+              break;
+            } else if (value.includes(" ")) {
+              error = "Error: {" + index + "} '" + line + "' - extra parameter(s)";
+              break;
+            } else if (/^\d+\s*$/.exec(value) == null) {
+              error = "Error: {" + index + "} '" + line + "' - invalid command";
+              break;
+            }
             ms = parseInt(value);
             if (isNaN(ms)) {
-              hasError = true;
-              console.error("Error: '" + line + "' - invalid command");
+              error = "Error: {" + index + "} '" + line + "' - invalid command";
               break;
             }
             fn = (this as any)[command](ms);
             newProgram.push(fn);
             break;
           default:
-            hasError = true;
-            console.error("Error: '" + line + "' - unknown command");
+            error = "Error: {" + index + "} '" + line + "' - unknown command";
         }
-        if (hasError) {
+        if (error != null) {
           break;
         }
       }
 
-      if (!hasError) {
+      if (error == null) {
         this.setState({program: newProgram});
         this.captionLoop();
+      } else if (this.props.onError) {
+        console.error(error);
+        this.props.onError(error);
       }
     })
   }
@@ -270,7 +315,7 @@ export default class CaptionProgram extends React.Component {
   showText(value: string, ms: number) {
     return (nextCommand: Function) => {
       this.el.current.style.opacity = '1';
-      this.el.current.innerHTML = value;
+      this.el.current.innerHTML = htmlEntities(value);
       const wait = this.wait(ms);
       wait(() => {
         this.el.current.style.opacity = '0';
@@ -312,6 +357,7 @@ export default class CaptionProgram extends React.Component {
       this.el.current.style.display = 'table-cell';
       this.el.current.style.textAlign = 'center';
       this.el.current.style.verticalAlign = 'middle';
+      this.el.current.style.paddingBottom = 'unset';
       this.el.current.style.transition = 'opacity 0.1s ease-out';
       if (this.props.captionBigBorder) {
         this.el.current.style.webkitTextStroke = this.props.captionBigBorderpx + 'px ' + this.props.captionBigBorderColor;
@@ -343,6 +389,7 @@ export default class CaptionProgram extends React.Component {
       this.el.current.style.display = 'table-cell';
       this.el.current.style.textAlign = 'center';
       this.el.current.style.verticalAlign = 'middle';
+      this.el.current.style.paddingBottom = 'unset';
       this.el.current.style.transition = 'opacity 0.1s ease-out';
       if (this.props.blinkBorder) {
         this.el.current.style.webkitTextStroke = this.props.blinkBorderpx + 'px ' + this.props.blinkBorderColor;
@@ -385,6 +432,7 @@ export default class CaptionProgram extends React.Component {
       this.el.current.style.display = 'table-cell';
       this.el.current.style.textAlign = 'center';
       this.el.current.style.verticalAlign = 'middle';
+      this.el.current.style.paddingBottom = 'unset';
       this.el.current.style.transition = 'opacity 0.1s ease-out';
       if (this.props.countBorder) {
         this.el.current.style.webkitTextStroke = this.props.countBorderpx + 'px ' + this.props.countBorderColor;

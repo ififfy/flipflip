@@ -189,6 +189,7 @@ export default class ImagePlayer extends React.Component {
             props.hasStarted !== this.props.hasStarted ||
             props.allURLs !== this.props.allURLs ||
             props.historyOffset !== this.props.historyOffset ||
+            props.gridView !== this.props.gridView ||
             props.strobeLayer !== this.props.strobeLayer);
   }
 
