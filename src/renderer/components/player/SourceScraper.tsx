@@ -554,7 +554,7 @@ function loadReddit(systemMessage: Function, config: Config, source: LibrarySour
             break;
         }
       } else if (url.includes("/saved")) {
-        reddit.getUser(getFileGroup(url)).getSavedContent()
+        reddit.getUser(getFileGroup(url)).getSavedContent({after: helpers.next})
           .then((submissionListing: any) => {
           if (submissionListing.length > 0) {
             let convertedListing = Array<string>();
@@ -564,7 +564,7 @@ function loadReddit(systemMessage: Function, config: Config, source: LibrarySour
                 convertedListing = convertedListing.concat(urls);
                 convertedCount++;
                 if (convertedCount == submissionListing.length) {
-                  helpers.next = null;
+                  helpers.next = submissionListing[submissionListing.length - 1].name;
                   helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
                   resolve({
                     data: filterPathsToJustPlayable(filter, convertedListing, true),
@@ -575,7 +575,7 @@ function loadReddit(systemMessage: Function, config: Config, source: LibrarySour
               .catch ((error: any) => {
                 convertedCount++;
                 if (convertedCount == submissionListing.length) {
-                  helpers.next = null;
+                  helpers.next = submissionListing[submissionListing.length - 1].name;
                   helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
                   resolve({
                     data: filterPathsToJustPlayable(filter, convertedListing, true),
