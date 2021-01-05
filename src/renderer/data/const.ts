@@ -138,6 +138,7 @@ const ST = { // source types
   gelbooru2: 'st.gelbooru2',
   ehentai: 'st.ehentai',
   bdsmlr: 'st.bdsmlr',
+  hydrus: 'st.hydrus',
   audio: 'st.audio'
 };
 

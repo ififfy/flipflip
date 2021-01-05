@@ -8,9 +8,9 @@ import wretch from "wretch";
 import {IgApiClient, IgCheckpointError, IgLoginTwoFactorRequiredError} from "instagram-private-api";
 
 import {
-  Avatar, Button, Collapse, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
-  Fab, FormControlLabel, Grid, Link, Radio, RadioGroup, Slide, Snackbar, SnackbarContent, Switch, TextField, Theme,
-  Tooltip, Typography, withStyles
+  Avatar, Button, Collapse, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Fab,
+  FormControl, FormControlLabel, Grid, InputLabel, Link, MenuItem, Radio, RadioGroup, Select, Slide, Snackbar,
+  SnackbarContent, Switch, TextField, Theme, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
@@ -59,6 +59,10 @@ const styles = (theme: Theme) => createStyles({
     display: 'flex',
     alignItems: 'center',
   },
+  middleInput: {
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+  },
 });
 
 class APICard extends React.Component {
@@ -79,6 +83,7 @@ class APICard extends React.Component {
     input1: "",
     input2: "",
     input3: "",
+    input4: "",
   };
 
   render() {
@@ -87,6 +92,7 @@ class APICard extends React.Component {
     const redditAuthorized = this.props.settings.redditRefreshToken != "";
     const twitterAuthorized = this.props.settings.twitterAccessTokenKey != "" && this.props.settings.twitterAccessTokenSecret != "";
     const instagramConfigured = this.props.settings.instagramUsername != "" && this.props.settings.instagramPassword != "";
+    const hydrusConfigured = this.props.settings.hydrusAPIKey != "";
     const indexOf = this.props.settings.tumblrKeys.indexOf(this.props.settings.tumblrKey);
     const menuType = this.state.menuType ? en.get(this.state.menuType)[0].toUpperCase() + en.get(this.state.menuType).slice(1) : "";
     let menuTypeSignOut = null;
@@ -103,6 +109,8 @@ class APICard extends React.Component {
       case ST.instagram:
         menuTypeSignOut = this.onFinishClearInstagram.bind(this);
         break;
+      case ST.hydrus:
+        menuTypeSignOut = this.onFinishClearHydrus.bind(this);
     }
     return(
       <React.Fragment>
@@ -146,6 +154,16 @@ class APICard extends React.Component {
                 onClick={instagramConfigured ? this.onClearInstagram.bind(this) : this.onAuthInstagram.bind(this)}
                 size="large">
                 <SourceIcon className={classes.icon} type={ST.instagram}/>
+              </Fab>
+            </Tooltip>
+          </Grid>
+          <Grid item>
+            <Tooltip title={hydrusConfigured ? "Configured: Click to Remove Hydrus Configuration" : "Unauthorized: Click to Configure Hydrus"}  placement="top-end">
+              <Fab
+                className={clsx(classes.fab, hydrusConfigured ? classes.authorized : classes.noAuth)}
+                onClick={hydrusConfigured ? this.onClearHydrus.bind(this) : this.onAuthHydrus.bind(this)}
+                size="large">
+                <SourceIcon className={classes.icon} type={ST.hydrus}/>
               </Fab>
             </Tooltip>
           </Grid>
@@ -411,6 +429,61 @@ class APICard extends React.Component {
           </DialogActions>
         </Dialog>
 
+        <Dialog
+          open={this.state.openMenu == MO.signIn && this.state.menuType == ST.hydrus}
+          onClose={this.onCloseDialog.bind(this)}
+          aria-labelledby="hydrus-title"
+          aria-describedby="hydrus-description">
+          <DialogTitle id="hydrus-title">
+            Hyrdus Configuration
+            <Avatar className={classes.iconAvatar}>
+              <SourceIcon className={classes.icon} type={ST.hydrus}/>
+            </Avatar>
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="hydrus-description">
+              FlipFlip does not store any user information or make changes to the Hydrus server. Your configured information is
+              stored locally on your computer and is never shared with anyone or sent to any server (besides Hydrus, obviously).
+            </DialogContentText>
+            <FormControl margin="dense">
+              <InputLabel>Protocol</InputLabel>
+              <Select
+                value={this.state.input1}
+                onChange={this.onInput1.bind(this)}>
+                <MenuItem key={"http"} value={"http"}>http</MenuItem>
+                <MenuItem key={"https"} value={"https"}>https</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              className={classes.middleInput}
+              margin="dense"
+              label="Hydrus Domain"
+              value={this.state.input2}
+              onChange={this.onInput2.bind(this)}/>
+            <TextField
+              margin="dense"
+              label="Hydrus Port"
+              value={this.state.input3}
+              onChange={this.onInput3.bind(this)}/>
+            <TextField
+              fullWidth
+              margin="dense"
+              label="Hydrus API Key"
+              value={this.state.input4}
+              onChange={this.onInput4.bind(this)}/>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+              Cancel
+            </Button>
+            <Button
+              disabled={this.state.input1.length == 0 || this.state.input2.length == 0 || this.state.input3.length == 0 || this.state.input4.length == 0}
+              onClick={this.onFinishAuthHydrus.bind(this)} color="primary">
+              Configure Hydrus
+            </Button>
+          </DialogActions>
+        </Dialog>
+
         <Snackbar
           open={!!this.state.successSnack}
           autoHideDuration={20000}
@@ -512,6 +585,28 @@ class APICard extends React.Component {
     this.onCloseDialog();
   }
 
+  onClearHydrus() {
+    this.setState({openMenu: MO.signOut, menuType: ST.hydrus});
+  }
+
+  onFinishClearHydrus() {
+    // Update props
+    this.props.onUpdateConfig((c) => {
+      c.remoteSettings.hydrusProtocol = "http";
+      c.remoteSettings.hydrusDomain = "localhost";
+      c.remoteSettings.hydrusPort = "45869";
+      c.remoteSettings.hydrusAPIKey = "";
+    });
+    // Update state
+    this.props.onUpdateSettings((s) => {
+      s.hydrusProtocol = "http";
+      s.hydrusDomain = "localhost";
+      s.hydrusPort = "45869";
+      s.hydrusAPIKey = "";
+    });
+    this.onCloseDialog();
+  }
+
   onAuthTumblr() {
     this.setState({
       openMenu: MO.new,
@@ -557,8 +652,12 @@ class APICard extends React.Component {
     this.setState({openMenu: MO.signIn, menuType: ST.instagram, input1: this.props.settings.instagramUsername, input2: this.props.settings.instagramPassword});
   }
 
+  onAuthHydrus() {
+    this.setState({openMenu: MO.signIn, menuType: ST.hydrus, input1: this.props.settings.hydrusProtocol, input2: this.props.settings.hydrusDomain, input3: this.props.settings.hydrusPort, input4: this.props.settings.hydrusAPIKey});
+  }
+
   onCloseDialog() {
-    this.setState({openMenu: null, menuType: null, input1: "", input2: "", input3: "", instagramMode: null});
+    this.setState({openMenu: null, menuType: null, input1: "", input2: "", input3: "", input4: "", instagramMode: null});
   }
 
   openLink(url: string) {
@@ -594,6 +693,11 @@ class APICard extends React.Component {
   onInput3(e: MouseEvent) {
     const input = (e.target as HTMLInputElement);
     this.setState({input3: input.value});
+  }
+
+  onInput4(e: MouseEvent) {
+    const input = (e.target as HTMLInputElement);
+    this.setState({input4: input.value});
   }
 
   onBoolInput(key: string, e: MouseEvent) {
@@ -976,6 +1080,48 @@ class APICard extends React.Component {
       this.setState({errorSnack: e.message});
       this._ig = null;
     });
+  }
+
+  onFinishAuthHydrus() {
+    wretch(this.state.input1 + "://" + this.state.input2 + ":" + this.state.input3 + "/session_key")
+      .headers({"Hydrus-Client-API-Access-Key": this.state.input4})
+      .get()
+      .setTimeout(5000)
+      .notFound((e) => {
+        console.error(e);
+        this.setState({errorSnack: e.message});
+      })
+      .internalError((e) => {
+        console.error(e);
+        this.setState({errorSnack: e.message});
+      })
+      .json((json) => {
+        if (json.session_key) {
+          // Update props
+          this.props.onUpdateConfig((c) => {
+            c.remoteSettings.hydrusProtocol = this.state.input1;
+            c.remoteSettings.hydrusDomain = this.state.input2;
+            c.remoteSettings.hydrusPort = this.state.input3;
+            c.remoteSettings.hydrusAPIKey = this.state.input4;
+          });
+          // Update state
+          this.props.onUpdateSettings((s) => {
+            s.hydrusProtocol = this.state.input1;
+            s.hydrusDomain = this.state.input2;
+            s.hydrusPort = this.state.input3;
+            s.hydrusAPIKey = this.state.input4;
+          });
+          this.setState({successSnack: "Hydrus is configured"});
+          this.onCloseDialog();
+        } else {
+          console.error("Invalid response from Hydrus server");
+          this.setState({errorSnack: "Invalid response from Hydrus server"});
+        }
+      })
+      .catch((e) => {
+        console.error(e);
+        this.setState({errorSnack: e.message});
+      });
   }
 }
 

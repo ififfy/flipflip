@@ -234,6 +234,11 @@ interface RemoteSettingsI {
 
   instagramUsername: string;
   instagramPassword: string;
+
+  hydrusProtocol: string;
+  hydrusDomain: string;
+  hydrusPort: string;
+  hydrusAPIKey: string;
 }
 
 interface CacheSettingsI {
@@ -530,6 +535,11 @@ export class RemoteSettings implements RemoteSettingsI {
 
   instagramUsername = "";
   instagramPassword = "";
+
+  hydrusProtocol = "http";
+  hydrusDomain = "localhost";
+  hydrusPort = "45869";
+  hydrusAPIKey = "";
 }
 
 export class CacheSettings implements CacheSettingsI {

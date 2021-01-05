@@ -36,6 +36,7 @@ let tumblrAlerted = false;
 let tumblr429Alerted = false;
 let twitterAlerted = false;
 let instagramAlerted = false;
+let hydrusAlerted = false;
 
 // Returns true if array is empty, or only contains empty arrays
 function isEmpty(allURLs: any[]): boolean {
@@ -134,6 +135,9 @@ function getPromise(systemMessage: Function, config: Config, source: LibrarySour
       timeout = 8000;
     } else if (sourceType == ST.bdsmlr) {
       promiseFunction = loadBDSMlr;
+      timeout = 8000;
+    } else if (sourceType == ST.hydrus) {
+      promiseFunction = loadHydrus;
       timeout = 8000;
     }
     if (helpers.next == -1) {
@@ -1436,6 +1440,114 @@ function loadBDSMlr(systemMessage: Function, config: Config, source: LibrarySour
         }
       });
   });
+}
+
+let sessionKey: string = null;
+function loadHydrus(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
+  const apiKey = config.remoteSettings.hydrusAPIKey
+  const configured = apiKey != "";
+  if (configured) {
+    const protocol = config.remoteSettings.hydrusProtocol;
+    const domain = config.remoteSettings.hydrusDomain;
+    const port = config.remoteSettings.hydrusPort;
+    const hydrusURL = protocol + "://" + domain + ":" + port;
+
+    if (!source.url.startsWith(hydrusURL)) {
+      if (!hydrusAlerted) {
+        systemMessage("Source url '" + source.url + "' does not match configured Hydrus server '" + hydrusURL);
+        hydrusAlerted = true;
+      }
+      return new CancelablePromise((resolve) => {
+        resolve(null);
+      });
+    }
+
+    const tagsRegex = /tags=([^&]*)&?.*$/.exec(source.url);
+    if (tagsRegex == null || tagsRegex.length <= 1) {
+      console.error("No tags found for url '" + source.url + "'");
+      return new CancelablePromise((resolve) => {
+        resolve(null);
+      });
+    }
+
+    return new CancelablePromise((resolve) => {
+      const getSessionKey = () => {
+        wretch(hydrusURL + "/session_key")
+          .headers({"Hydrus-Client-API-Access-Key": apiKey})
+          .get()
+          .setTimeout(5000)
+          .notFound((e) => {
+            resolve(null);
+          })
+          .internalError((e) => {
+            resolve(null);
+          })
+          .json((json) => {
+            sessionKey = json.session_key;
+            search();
+          });
+      }
+
+      const search = () => {
+        wretch(hydrusURL + "/get_files/search_files?tags=" + tagsRegex[1])
+          .headers({"Hydrus-Client-API-Session-Key": sessionKey})
+          .get()
+          .setTimeout(5000)
+          .notFound((e) => {
+            resolve(null);
+          })
+          .internalError((e) => {
+            resolve(null);
+          })
+          .json((json) => {
+            getFileMetadata(json.file_ids);
+          });
+      }
+
+      const getFileMetadata = (fileIDs: Array<number>) => {
+        wretch(hydrusURL + "/get_files/file_metadata?file_ids=[" + fileIDs.toString() + "]")
+          .headers({"Hydrus-Client-API-Session-Key": sessionKey})
+          .get()
+          .setTimeout(5000)
+          .notFound((e) => {
+            resolve(null);
+          })
+          .internalError((e) => {
+            resolve(null);
+          })
+          .json((json) => {
+            let images = Array<string>();
+            for (let metadata of json.metadata) {
+              if ((filter == IF.any && isImageOrVideo(metadata.ext, true)) ||
+                (filter == IF.stills || filter == IF.images) && isImage(metadata.ext, true) ||
+                (filter == IF.gifs && metadata.ext.toLowerCase().endsWith('.gif') || isVideo(metadata.ext, true)) ||
+                (filter == IF.videos && isVideo(metadata.ext, true))) {
+                images.push(hydrusURL + "/get_files/file?file_id=" + metadata.file_id + "&Hydrus-Client-API-Access-Key=" + apiKey);
+              }
+            }
+
+            resolve({
+              data: images,
+              helpers: helpers,
+            });
+          });
+      }
+
+      if (sessionKey == null) {
+        getSessionKey();
+      } else {
+        search();
+      }
+    });
+  } else {
+    if (!hydrusAlerted) {
+      systemMessage("You haven't configured FlipFlip to work with Hydrus yet.\nVisit Settings to configure Hydrus.");
+      hydrusAlerted = true;
+    }
+    return new CancelablePromise((resolve) => {
+      resolve(null);
+    });
+  }
 }
 
 export default class SourceScraper extends React.Component {

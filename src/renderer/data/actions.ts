@@ -339,6 +339,8 @@ export function cleanBackups() {
 export function cacheImage(state: State, i: HTMLImageElement | HTMLVideoElement) {
   if (state.config.caching.enabled) {
     const fileType = getSourceType(i.src);
+    if (fileType == ST.hydrus) return;
+
     if (fileType != ST.local && i.src.startsWith("http")) {
       const cachePath = getCachePath(null, state.config);
       if (!fs.existsSync(cachePath)) {

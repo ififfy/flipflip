@@ -95,6 +95,7 @@ export default new Map<string, string>([
   ['st.gelbooru2', 'Gelbooru'],
   ['st.ehentai', 'EHentai'],
   ['st.bdsmlr', 'BDSMlr'],
+  ['st.hydrus', 'Hydrus'],
   ['st.video', 'Video'],
   ['st.playlist', 'Playlist'],
   ['st.list', 'List'],
