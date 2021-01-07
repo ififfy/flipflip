@@ -1488,6 +1488,7 @@ function loadHydrus(systemMessage: Function, config: Config, source: LibrarySour
           });
       }
 
+      let pages = 0;
       const search = () => {
         wretch(hydrusURL + "/get_files/search_files?tags=" + tagsRegex[1])
           .headers({"Hydrus-Client-API-Session-Key": sessionKey})
@@ -1500,11 +1501,19 @@ function loadHydrus(systemMessage: Function, config: Config, source: LibrarySour
             resolve(null);
           })
           .json((json) => {
-            getFileMetadata(json.file_ids);
+            const fileIDs = json.file_ids;
+            const chunk = 1000;
+            pages = Math.ceil(fileIDs.length / chunk);
+            let page = 0;
+            for (let i=0; i<fileIDs.length; i+=chunk) {
+              const pageIDs = fileIDs.slice(i,i+chunk);
+              getFileMetadata(pageIDs, ++page);
+            }
           });
       }
 
-      const getFileMetadata = (fileIDs: Array<number>) => {
+      let images = Array<string>();
+      const getFileMetadata = (fileIDs: Array<number>, page: number) => {
         wretch(hydrusURL + "/get_files/file_metadata?file_ids=[" + fileIDs.toString() + "]")
           .headers({"Hydrus-Client-API-Session-Key": sessionKey})
           .get()
@@ -1516,7 +1525,6 @@ function loadHydrus(systemMessage: Function, config: Config, source: LibrarySour
             resolve(null);
           })
           .json((json) => {
-            let images = Array<string>();
             for (let metadata of json.metadata) {
               if ((filter == IF.any && isImageOrVideo(metadata.ext, true)) ||
                 (filter == IF.stills || filter == IF.images) && isImage(metadata.ext, true) ||
@@ -1526,10 +1534,12 @@ function loadHydrus(systemMessage: Function, config: Config, source: LibrarySour
               }
             }
 
-            resolve({
-              data: images,
-              helpers: helpers,
-            });
+            if (page == pages) {
+              resolve({
+                data: images,
+                helpers: helpers,
+              });
+            }
           });
       }
 
