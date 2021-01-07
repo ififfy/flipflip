@@ -4,6 +4,7 @@ const {getCurrentWindow, Menu, MenuItem, app} = remote;
 import clsx from "clsx";
 import fileURL from "file-url";
 import fs from "fs";
+import wretch from "wretch";
 
 import {
   AppBar, Button, Card, CardActionArea, CardContent, createStyles, Dialog, DialogActions, DialogContent,
@@ -1050,7 +1051,32 @@ class PlayerBars extends React.Component {
     const path = urlToPath(url);
     const imagePath = isFile ? path : url;
     if (imagePath.toLocaleLowerCase().endsWith(".png") || imagePath.toLocaleLowerCase().endsWith(".jpg") || imagePath.toLocaleLowerCase().endsWith(".jpeg")) {
-      clipboard.writeImage(nativeImage.createFromPath(imagePath));
+      if (isFile) {
+        clipboard.writeImage(nativeImage.createFromPath(imagePath));
+      } else {
+        wretch(imagePath)
+          .get()
+          .blob(blob => {
+            const reader = new FileReader();
+            reader.onload = function () {
+              if (reader.readyState == 2) {
+                const arrayBuffer = reader.result as ArrayBuffer;
+                const buffer = Buffer.alloc(arrayBuffer.byteLength);
+                const view = new Uint8Array(arrayBuffer);
+                for (let i = 0; i < arrayBuffer.byteLength; ++i) {
+                  buffer[i] = view[i];
+                }
+                const bufferImage = nativeImage.createFromBuffer(buffer);
+                if (bufferImage.isEmpty()) {
+                  clipboard.writeText(imagePath);
+                } else {
+                  clipboard.writeImage(bufferImage);
+                }
+              }
+            };
+            reader.readAsArrayBuffer(blob);
+          });
+      }
     } else {
       clipboard.writeText(imagePath);
     }
