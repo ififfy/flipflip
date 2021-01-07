@@ -1051,6 +1051,8 @@ class PlayerBars extends React.Component {
     const imagePath = isFile ? path : url;
     if (imagePath.toLocaleLowerCase().endsWith(".png") || imagePath.toLocaleLowerCase().endsWith(".jpg") || imagePath.toLocaleLowerCase().endsWith(".jpeg")) {
       clipboard.writeImage(nativeImage.createFromPath(imagePath));
+    } else {
+      clipboard.writeText(imagePath);
     }
   }
 
