@@ -7,7 +7,7 @@ import * as easings from 'd3-ease';
 import crypto from "crypto";
 import {readFileSync} from "fs";
 
-import {EA, ST} from "./const";
+import {EA, ST, TF} from "./const";
 import en from "./en";
 import Config from "./Config";
 import LibrarySource from "./LibrarySource";
@@ -88,6 +88,59 @@ export function getBackups(): Array<{url: string, size: number}> {
     }
   });
   return backups;
+}
+
+export function getTimingFromString(tf: string): string {
+  switch(tf) {
+    case "constant":
+    case "const":
+      return TF.constant;
+    case "random":
+    case "rand":
+      return  TF.random;
+    case "wave":
+    case "sin":
+      return  TF.sin;
+    case "bpm":
+    case "audio":
+      return  TF.bpm;
+    case "scene":
+      return  TF.scene;
+    default:
+      return null;
+  }
+}
+
+export function getTimeout(tf: string, c: number, min: number, max: number, sinRate: number,
+                           audio: Audio, bpmMulti: number, timeToNextFrame: number): number {
+  let timeout = null;
+  switch (tf) {
+    case TF.random:
+      timeout = Math.floor(Math.random() * (max - min + 1)) + min;
+      break;
+    case TF.sin:
+      sinRate = (Math.abs(sinRate - 100) + 2) * 1000;
+      timeout = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (max - min + 1)) + min;
+      break;
+    case TF.constant:
+      timeout = c;
+      break;
+    case TF.bpm:
+      if (!audio) {
+        timeout = 1000;
+      } else {
+        timeout = 60000 / (audio.bpm * bpmMulti);
+        // If we cannot parse this, default to 1s
+        if (!timeout) {
+          timeout = 1000;
+        }
+      }
+      break;
+    case TF.scene:
+      timeout = timeToNextFrame ? timeToNextFrame : 1000;
+      break;
+  }
+  return timeout;
 }
 
 export function getTimestamp(secs: number): string {

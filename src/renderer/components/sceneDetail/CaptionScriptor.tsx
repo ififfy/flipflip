@@ -26,6 +26,7 @@ import SaveIcon from '@material-ui/icons/Save';
 import SaveOutlinedIcon from '@material-ui/icons/SaveOutlined';
 
 import {MO} from "../../data/const";
+import {getTimingFromString} from "../../data/utils";
 import Scene from "../../data/Scene";
 import Tag from "../../data/Tag";
 import Player from "../player/Player";
@@ -180,9 +181,15 @@ const styles = (theme: Theme) => createStyles({
 })(function(CodeMirror: any) {
   CodeMirror.defineMode('flipflip', function() {
     const actions = ["blink", "cap", "bigcap", "count", "wait"];
-    const setters = ["setblinkduration", "setblinkdelay", "setblinkgroupdelay", "setcaptionduration", "setcaptiondelay",
-                    "setcountduration", "setcountdelay", "setcountgroupdelay"];
-    const storers = ["storephrase"]
+    const tupleSetters = ["setBlinkDuration", "setBlinkDelay", "setBlinkGroupDelay", "setCaptionDuration", "setCaptionDelay",
+                    "setCountDuration", "setCountDelay", "setCountGroupDelay"];
+    const singleSetters = ["setBlinkSinRate", "setBlinkBPMMulti", "setBlinkDelaySinRate", "setBlinkDelayBPMMulti",
+      "setBlinkGroupDelaySinRate", "setBlinkGroupDelayBPMMulti", "setCaptionSinRate", "setCaptionBPMMulti",
+      "setCaptionDelaySinRate", "setCaptionDelayBPMMulti", "setCountSinRate", "setCountBPMMulti", "setCountDelaySinRate",
+      "setCountDelayBPMMulti", "setCountGroupDelaySinRate", "setCountGroupDelayBPMMulti"];
+    const stringSetters = ["setBlinkTF", "setBlinkDelayTF", "setBlinkGroupDelayTF", "setCaptionTF", "setCaptionDelayTF",
+                    "setCountTF", "setCountDelayTF", "setCountGroupDelayTF"];
+    const storers = ["storephrase", "storePhrase"];
     const keywords = ["$RANDOM_PHRASE", "$TAG_PHRASE"];
 
     let words: any = {};
@@ -192,9 +199,11 @@ const styles = (theme: Theme) => createStyles({
       }
     }
 
-    CodeMirror.registerHelper("hintWords", "flipflip", actions.concat(setters, keywords, storers));
+    CodeMirror.registerHelper("hintWords", "flipflip", actions.concat(tupleSetters, singleSetters, stringSetters, keywords, storers));
 
-    define('atom', setters);
+    define('atom', tupleSetters);
+    define('atom', singleSetters);
+    define('atom', stringSetters);
     define('variable', keywords);
     define('variable-3', storers);
     define('builtin', actions);
@@ -217,12 +226,14 @@ const styles = (theme: Theme) => createStyles({
         return rt("operator", state, stream);
       }
 
-      if (/\d/.test(ch) && (command == "count" || command == "wait" || setters.includes(command))) {
+      if (/\d/.test(ch) && (command == "count" || command == "wait" ||
+        // Number parameter
+        tupleSetters.includes(command) || singleSetters.includes(command))) {
         stream.eatWhile(/\d/);
         if(stream.eol() || !/\w/.test(stream.peek())) {
           state.tokens.push(stream.current());
-          if ((command == "count" && state.tokens.length > 3) ||
-            ((command == "wait" || setters.includes(command)) && state.tokens.length > 2)) {
+          if (((command == "count" || tupleSetters.includes(command)) && state.tokens.length > 3) ||
+            ((command == "wait" || singleSetters.includes(command)) && state.tokens.length > 2)) {
             return rt("error", state, stream);
           }
           return rt("number", state, stream);
@@ -231,10 +242,12 @@ const styles = (theme: Theme) => createStyles({
       stream.eatWhile(/[\d\w-]/);
       const cur = stream.current();
       stream.eatSpace();
-      if (sol && words.hasOwnProperty(cur.toLowerCase())) {
-        state.tokens.push(cur.toLowerCase());
-        return rt(words[cur.toLowerCase()], state, stream);
+      if (sol && words.hasOwnProperty(cur) && !keywords.includes(cur)) {
+        // Command at start of line
+        state.tokens.push(cur);
+        return rt(words[cur], state, stream);
       } else if (!sol && command == "blink" && keywords.includes(cur)) {
+        // Keyword in blink command
         state.tokens.push(cur);
         if ((state.tokens.length == 2 || state.tokens[state.tokens.length - 2] == "/") && (stream.eol() || /\//.test(stream.peek()))) {
           if (cur == "$RANDOM_PHRASE" && !state.storedPhrases) {
@@ -245,6 +258,7 @@ const styles = (theme: Theme) => createStyles({
           return rt("string", state, stream);
         }
       } else if (!sol && (command == "cap" || command == "bigcap") && keywords.includes(cur)) {
+        // Keyword in a cap or bigcap command
         state.tokens.push(cur);
         if (state.tokens.length == 2 && stream.eol()) {
           if (cur == "$RANDOM_PHRASE" && !state.storedPhrases) {
@@ -255,11 +269,16 @@ const styles = (theme: Theme) => createStyles({
           return rt("string", state, stream);
         }
       } else if (!sol && state.tokens.length > 0) {
+        // String Parameter
         state.tokens.push(cur);
         if (command == "blink" && cur == "/") {
           return rt("operator", state, stream);
-        } else if (command == "count" || command == "wait" || setters.includes(command)) {
+        } else if (command == "count" || command == "wait"
+          || tupleSetters.includes(command) || singleSetters.includes(command)) {
           return rt("error", state, stream);
+        } else if (stringSetters.includes(command)) {
+          const tf = getTimingFromString(cur);
+          return rt(tf == null ? "error" : "variable", state, stream);
         }
         return rt("string", state, stream);
       } else {
@@ -499,8 +518,9 @@ class CaptionScriptor extends React.Component {
                     getTags={this.props.getTags.bind(this)}
                     goBack={this.props.goBack.bind(this)}
                     playNextScene={() => {}}
-                    currentSource={null}
-                    currentClip={null}
+                    timeToNextFrame={null}
+                    currentAudio={null}
+                    currentImage={null}
                     jumpToHack={this.state.captionProgramJumpToHack}
                     onError={this.onError.bind(this)}/>
                 )}

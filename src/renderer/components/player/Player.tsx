@@ -483,8 +483,9 @@ export default class Player extends React.Component {
             getTags={this.props.getTags.bind(this)}
             goBack={this.props.goBack.bind(this)}
             playNextScene={this.props.nextScene}
-            currentSource={this.state.historyPaths.length > 0 ? this.state.historyPaths[0].getAttribute("source") : null}
-            currentClip={this.state.historyPaths.length > 0 ? this.state.historyPaths[0].getAttribute("clip") : null}
+            currentAudio={this.state.currentAudio}
+            timeToNextFrame={this.state.timeToNextFrame}
+            currentImage={this.state.historyPaths.length > 0 ? this.state.historyPaths[this.state.historyPaths.length - 1] : null}
             jumpToHack={this.props.captionProgramJumpToHack}
             onError={this.props.onCaptionError}/>
         )}
