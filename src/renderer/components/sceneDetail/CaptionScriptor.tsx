@@ -225,6 +225,11 @@ const styles = (theme: Theme) => createStyles({
         state.tokens.push(ch);
         return rt("operator", state, stream);
       }
+      if (ch === "\\" && !stream.eol() && /n/.test(stream.peek()) && !sol && (command == "blink" || command == "cap" || command == "bigcap")) {
+        stream.next();
+        state.tokens.push(ch);
+        return rt("operator", state, stream);
+      }
 
       if (/\d/.test(ch) && (command == "count" || command == "wait" ||
         // Number parameter
