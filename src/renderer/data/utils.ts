@@ -734,7 +734,7 @@ let captionProgramDefaults = {
   timestamps: Array<number>(),
   timestampFn: new Map<number, Function>(),
   timestampCounter: 0,
-  phrases: Array<string>(),
+  phrases: new Map<number, Array<string>>(),
 
   blinkDuration: [200, 500],
   blinkWaveRate: 100,

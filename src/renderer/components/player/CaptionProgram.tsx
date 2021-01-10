@@ -75,7 +75,7 @@ export default class CaptionProgram extends React.Component {
     onError?(e: string): void,
   };
 
-  readonly state = captionProgramDefaults;
+  readonly state = {...captionProgramDefaults};
 
   _runningPromise: CancelablePromise = null;
   _timeout: any = null;
@@ -132,7 +132,7 @@ export default class CaptionProgram extends React.Component {
   }
 
   reset() {
-    this.setState(captionProgramDefaults);
+    this.setState({...captionProgramDefaults, phrases: new Map<number, Array<string>>()});
   }
 
   stop() {
@@ -237,10 +237,26 @@ export default class CaptionProgram extends React.Component {
               error = "Error: {" + index + "} '" + line + "' - missing parameter";
               break;
             }
-            if (value.split(" ").includes("$RANDOM_PHRASE") && this.state.phrases.length == 0) {
-              error = "Error: {" + index + "} '" + line + "' - no phrases stored";
-              break;
+            let rr;
+            if (command == "blink") {
+              rr = /(?:^|[\/\s])(\$RANDOM_PHRASE|\$\d)(?:[\/\s]|$)/g;
+            } else {
+              rr = /(?:^|\s)(\$RANDOM_PHRASE|\$\d)(?:\s|$)/g;
             }
+            let rrE;
+            while ( (rrE = rr.exec(value)) ) {
+              let register;
+              if (rrE[1] == "$RANDOM_PHRASE") {
+                register = 0;
+              } else {
+                register = parseInt(rrE[1].substring(1, 2));
+              }
+              if (!this.state.phrases.has(register)) {
+                error = "Error: {" + index + "} '" + line + "' - no phrases stored" + (register == 0 ? "" : " in group " + register);
+                break;
+              }
+            }
+            if (error != null) break;
             if (timestamp != null) {
               if (newTimestamps.has(timestamp)) {
                 error = "Error: {" + index + "} '" + line + "' - duplicate timestamps";
@@ -259,8 +275,22 @@ export default class CaptionProgram extends React.Component {
               error = "Error: {" + index + "} '" + line + "' - missing parameter";
               break;
             }
-            let newPhrases = this.state.phrases;
-            newPhrases = newPhrases.concat([value]);
+            const newPhrases = this.state.phrases;
+            const registerRegex = /^\$(\d)\s.*$/.exec(value);
+            if (registerRegex != null) {
+              const register = parseInt(registerRegex[1]);
+              if (register != 0) {
+                value = value.replace("$" + register + " ", "");
+                if (!newPhrases.has(register)) {
+                  newPhrases.set(register, []);
+                }
+                newPhrases.set(register, newPhrases.get(register).concat([value]));
+              }
+            }
+            if (!newPhrases.has(0)) {
+              newPhrases.set(0, []);
+            }
+            newPhrases.set(0, newPhrases.get(0).concat([value]));
             this.setState({phrases: newPhrases});
             break;
           case "setBlinkDuration":
@@ -488,8 +518,12 @@ export default class CaptionProgram extends React.Component {
   }
 
   getPhrase(value: string) {
+    const registerRegex = /^\$(\d)$/.exec(value);
     if (value == "$RANDOM_PHRASE") {
-      return getRandomListItem(this.state.phrases);
+      return getRandomListItem(this.state.phrases.get(0));
+    } else if (registerRegex != null) {
+      const register = parseInt(registerRegex[1]);
+      return getRandomListItem(this.state.phrases.get(register));
     } else if (value == "$TAG_PHRASE") {
       if (this.props.currentImage) {
         const tag = getRandomListItem(this.props.getTags(this.props.currentImage.getAttribute("source"), this.props.currentImage.getAttribute("clip")).filter((t) => t.phraseString && t.phraseString != ""));
@@ -583,8 +617,9 @@ export default class CaptionProgram extends React.Component {
     return (nextCommand: Function) => {
       let fns = new Array<Function>();
       let i = 0;
-      const length = this.getPhrase(value).split('/').length;
-      for (let word of this.getPhrase(value).split('/')) {
+      const phrase = this.getPhrase(value).split('/')
+      const length = phrase.length;
+      for (let word of phrase) {
         word = this.getPhrase(word.trim());
         let j = i;
         i += 1;

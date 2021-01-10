@@ -225,6 +225,7 @@ const keywords = ["$RANDOM_PHRASE", "$TAG_PHRASE"];
 
       let command = null;
       let timestamp = false;
+
       if (state.tokens.length > 0) {
         if (timestampRegex.exec(state.tokens[0]) != null) {
           timestamp = true;
@@ -248,7 +249,15 @@ const keywords = ["$RANDOM_PHRASE", "$TAG_PHRASE"];
         return rt("operator", state, stream);
       }
 
-      if (/\d/.test(ch) && sol) {
+      if (ch === "$" && command != null && command.toLowerCase() == "storephrase") {
+        stream.next();
+        if(stream.eol() || /\s/.test(stream.peek())) {
+          state.tokens.push(stream.current());
+          return rt("number", state, stream);
+        }
+      }
+
+      if (/\d/.test(ch) && sol && !timestamp) {
         // Timestamp
         stream.eatWhile(/[\d:.]/);
         if(stream.eol() || !/\w/.test(stream.peek())) {
@@ -284,23 +293,41 @@ const keywords = ["$RANDOM_PHRASE", "$TAG_PHRASE"];
         // Command at start of line
         state.tokens.push(cur);
         return rt(words[cur], state, stream);
-      } else if (!sol && command == "blink" && keywords.includes(cur)) {
+      } else if (!sol && command == "blink" && (keywords.includes(cur) || /^\$\d$/.exec(cur) != null)) {
         // Keyword in blink command
         state.tokens.push(cur);
         if ((state.tokens.length == (timestamp ? 3 : 2) || state.tokens[state.tokens.length - 2] == "/") && (stream.eol() || /\//.test(stream.peek()))) {
-          if (cur == "$RANDOM_PHRASE" && !state.storedPhrases) {
+          if (cur == "$RANDOM_PHRASE" && !state.storedPhrases.has(0)) {
             return rt("error", state, stream);
+          } else {
+            const registerRegex = /^\$(\d)$/.exec(cur);
+            if (registerRegex != null) {
+              if (!state.storedPhrases.has(parseInt(registerRegex[1]))) {
+                return rt("error", state, stream);
+              } else {
+                return rt("variable", state, stream);
+              }
+            }
           }
           return rt(words[cur], state, stream);
         } else {
           return rt("string", state, stream);
         }
-      } else if (!sol && (command == "cap" || command == "bigcap") && keywords.includes(cur)) {
+      } else if (!sol && (command == "cap" || command == "bigcap") && (keywords.includes(cur) || /^\$\d$/.exec(cur) != null)) {
         // Keyword in a cap or bigcap command
         state.tokens.push(cur);
         if (state.tokens.length == (timestamp ? 3 : 2) && stream.eol()) {
-          if (cur == "$RANDOM_PHRASE" && !state.storedPhrases) {
+          if (cur == "$RANDOM_PHRASE" && !state.storedPhrases.has(0)) {
             return rt("error", state, stream);
+          } else {
+            const registerRegex = /^\$(\d)$/.exec(cur);
+            if (registerRegex != null) {
+              if (!state.storedPhrases.has(parseInt(registerRegex[1]))) {
+                return rt("error", state, stream);
+              } else {
+                return rt("variable", state, stream);
+              }
+            }
           }
           return rt(words[cur], state, stream);
         } else {
@@ -327,7 +354,15 @@ const keywords = ["$RANDOM_PHRASE", "$TAG_PHRASE"];
     function rt(type: string, state: any, stream: any) {
       if (stream.eol()) {
         if (state.tokens.length > 0 && state.tokens[0].toLowerCase() == "storephrase") {
-          state.storedPhrases = true;
+          const registerRegex = /^\$(\d)$/.exec(state.tokens[1]);
+          if (registerRegex != null) {
+            if (state.tokens.length > 1) {
+              state.storedPhrases.set(parseInt(registerRegex[1]), true);
+              state.storedPhrases.set(0, true);
+            }
+          } else {
+            state.storedPhrases.set(0, true);
+          }
         }
         state.tokens = new Array<string>();
       }
@@ -335,7 +370,7 @@ const keywords = ["$RANDOM_PHRASE", "$TAG_PHRASE"];
     }
 
     return {
-      startState: function() {return {tokens: new Array<string>(), storedPhrases: false, timestamps: new Array<number>()};},
+      startState: function() {return {tokens: new Array<string>(), storedPhrases: new Map<number, boolean>(), timestamps: new Array<number>()};},
       token: function(stream: any, state: any) {
         return parse(stream, state);
       },
