@@ -728,6 +728,56 @@ export function isImage(path: string, strict: boolean): boolean {
   return false;
 }
 
+let captionProgramDefaults = {
+  program: Array<Function>(),
+  programCounter: 0,
+  timestamps: Array<number>(),
+  timestampFn: new Map<number, Function>(),
+  timestampCounter: 0,
+  phrases: Array<string>(),
+
+  blinkDuration: [200, 500],
+  blinkWaveRate: 100,
+  blinkBPMMulti: 1,
+  blinkTF: TF.constant,
+
+  blinkDelay: [80, 200],
+  blinkDelayWaveRate: 100,
+  blinkDelayBPMMulti: 1,
+  blinkDelayTF: TF.constant,
+
+  blinkGroupDelay: [1200, 2000],
+  blinkGroupDelayWaveRate: 100,
+  blinkGroupDelayBPMMulti: 1,
+  blinkGroupDelayTF: TF.constant,
+
+  captionDuration: [2000, 4000],
+  captionWaveRate: 100,
+  captionBPMMulti: 1,
+  captionTF: TF.constant,
+
+  captionDelay: [1200, 2000],
+  captionDelayWaveRate: 100,
+  captionDelayBPMMulti: 1,
+  captionDelayTF: TF.constant,
+
+  countDuration: [600, 1000],
+  countWaveRate: 100,
+  countBPMMulti: 1,
+  countTF: TF.constant,
+
+  countDelay: [400, 1000],
+  countDelayWaveRate: 100,
+  countDelayBPMMulti: 1,
+  countDelayTF: TF.constant,
+
+  countGroupDelay: [1200, 2000],
+  countGroupDelayWaveRate: 100,
+  countGroupDelayBPMMulti: 1,
+  countGroupDelayTF: TF.constant,
+}
+export default captionProgramDefaults;
+
 // Inspired by https://reactjs.org/blog/2015/12/16/ismounted-antipattern.html
 /**
  * This object is a custom Promise wrapper which enables the ability to cancel the promise.

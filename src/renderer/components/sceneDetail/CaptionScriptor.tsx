@@ -10,7 +10,7 @@ require('codemirror/theme/material.css');
 
 import {
   AppBar, Button, Card, CardContent, Container, createStyles, Dialog, DialogActions, DialogContent, DialogContentText,
-  DialogTitle, Divider, Grid, IconButton, Theme, Toolbar, Tooltip, Typography, withStyles
+  DialogTitle, Divider, Grid, IconButton, MenuItem, Select, Theme, Toolbar, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -26,7 +26,7 @@ import SaveIcon from '@material-ui/icons/Save';
 import SaveOutlinedIcon from '@material-ui/icons/SaveOutlined';
 
 import {MO} from "../../data/const";
-import {getMsTimestampValue, getTimingFromString} from "../../data/utils";
+import captionProgramDefaults, {getMsTimestampValue, getTimingFromString} from "../../data/utils";
 import Scene from "../../data/Scene";
 import Tag from "../../data/Tag";
 import Player from "../player/Player";
@@ -88,31 +88,33 @@ const styles = (theme: Theme) => createStyles({
   scriptArea: {
     alignItems: 'start',
   },
-  sceneGrid: {
+  menuGrid: {
     gridRowStart: 1,
     gridRowEnd: 3,
     display: 'flex',
     flexDirection: 'column',
-    borderWidth: 1,
-    borderColor: theme.palette.secondary.main,
-    borderStyle: 'none solid none solid',
   },
-  sceneCard: {
+  menuCard: {
+    height: '100%',
     overflowY: 'auto',
   },
   playerGrid: {
     overflow: 'hidden',
     position: 'relative',
   },
-  optionGrid: {
+  fontGrid: {
+    borderWidth: 1,
+    borderColor: theme.palette.secondary.main,
+    borderStyle: 'none none none solid',
   },
-  optionCard: {
+  fontCard: {
     height: '100%',
+    overflowY: 'auto',
   },
-  optionCardContent: {
+  menuCardContent: {
     paddingTop: 0,
   },
-  optionGridButtons: {
+  menuGridButtons: {
     display: 'flex',
     padding: '0 !important',
     marginTop: theme.spacing(1),
@@ -176,22 +178,22 @@ const styles = (theme: Theme) => createStyles({
   },
 });
 
+const actions = ["blink", "cap", "bigcap", "count", "wait"];
+const tupleSetters = ["setBlinkDuration", "setBlinkDelay", "setBlinkGroupDelay", "setCaptionDuration", "setCaptionDelay",
+  "setCountDuration", "setCountDelay", "setCountGroupDelay"];
+const singleSetters = ["setBlinkWaveRate", "setBlinkBPMMulti", "setBlinkDelayWaveRate", "setBlinkDelayBPMMulti",
+  "setBlinkGroupDelayWaveRate", "setBlinkGroupDelayBPMMulti", "setCaptionWaveRate", "setCaptionBPMMulti",
+  "setCaptionDelayWaveRate", "setCaptionDelayBPMMulti", "setCountWaveRate", "setCountBPMMulti", "setCountDelayWaveRate",
+  "setCountDelayBPMMulti", "setCountGroupDelayWaveRate", "setCountGroupDelayBPMMulti"];
+const stringSetters = ["setBlinkTF", "setBlinkDelayTF", "setBlinkGroupDelayTF", "setCaptionTF", "setCaptionDelayTF",
+  "setCountTF", "setCountDelayTF", "setCountGroupDelayTF"];
+const storers = ["storephrase", "storePhrase"];
+const keywords = ["$RANDOM_PHRASE", "$TAG_PHRASE"];
+
 (function(mod) {
   mod(require("codemirror/lib/codemirror"));
 })(function(CodeMirror: any) {
   CodeMirror.defineMode('flipflip', function() {
-    const actions = ["blink", "cap", "bigcap", "count", "wait"];
-    const tupleSetters = ["setBlinkDuration", "setBlinkDelay", "setBlinkGroupDelay", "setCaptionDuration", "setCaptionDelay",
-                    "setCountDuration", "setCountDelay", "setCountGroupDelay"];
-    const singleSetters = ["setBlinkSinRate", "setBlinkBPMMulti", "setBlinkDelaySinRate", "setBlinkDelayBPMMulti",
-      "setBlinkGroupDelaySinRate", "setBlinkGroupDelayBPMMulti", "setCaptionSinRate", "setCaptionBPMMulti",
-      "setCaptionDelaySinRate", "setCaptionDelayBPMMulti", "setCountSinRate", "setCountBPMMulti", "setCountDelaySinRate",
-      "setCountDelayBPMMulti", "setCountGroupDelaySinRate", "setCountGroupDelayBPMMulti"];
-    const stringSetters = ["setBlinkTF", "setBlinkDelayTF", "setBlinkGroupDelayTF", "setCaptionTF", "setCaptionDelayTF",
-                    "setCountTF", "setCountDelayTF", "setCountGroupDelayTF"];
-    const storers = ["storephrase", "storePhrase"];
-    const keywords = ["$RANDOM_PHRASE", "$TAG_PHRASE"];
-
     const timestampRegex = /^((\d?\d:)?\d?\d:\d\d(\.\d\d?\d?)?|\d?\d(\.\d\d?\d?)?)$/;
 
     let words: any = {};
@@ -285,7 +287,7 @@ const styles = (theme: Theme) => createStyles({
       } else if (!sol && command == "blink" && keywords.includes(cur)) {
         // Keyword in blink command
         state.tokens.push(cur);
-        if ((state.tokens.length == timestamp ? 3 : 2 || state.tokens[state.tokens.length - 2] == "/") && (stream.eol() || /\//.test(stream.peek()))) {
+        if ((state.tokens.length == (timestamp ? 3 : 2) || state.tokens[state.tokens.length - 2] == "/") && (stream.eol() || /\//.test(stream.peek()))) {
           if (cur == "$RANDOM_PHRASE" && !state.storedPhrases) {
             return rt("error", state, stream);
           }
@@ -296,7 +298,7 @@ const styles = (theme: Theme) => createStyles({
       } else if (!sol && (command == "cap" || command == "bigcap") && keywords.includes(cur)) {
         // Keyword in a cap or bigcap command
         state.tokens.push(cur);
-        if (state.tokens.length == timestamp ? 3 : 2 && stream.eol()) {
+        if (state.tokens.length == (timestamp ? 3 : 2) && stream.eol()) {
           if (cur == "$RANDOM_PHRASE" && !state.storedPhrases) {
             return rt("error", state, stream);
           }
@@ -324,7 +326,7 @@ const styles = (theme: Theme) => createStyles({
 
     function rt(type: string, state: any, stream: any) {
       if (stream.eol()) {
-        if (state.tokens.length > 0 && state.tokens[0] == "storephrase") {
+        if (state.tokens.length > 0 && state.tokens[0].toLowerCase() == "storephrase") {
           state.storedPhrases = true;
         }
         state.tokens = new Array<string>();
@@ -370,7 +372,7 @@ class CaptionScriptor extends React.Component {
 
     const loadFromScene = this.state.scene != null && this.state.scene.textSource != null &&
       this.state.scene.textSource != "" && this.state.scene.textSource != this.state.openFile;
-    const saveToScene = this.state.scene != null && 
+    const saveToScene = this.state.scene != null &&
       (this.state.sceneChanged || (this.state.openFile != null && this.state.openFile != this.state.scene.textSource));
 
     let menuName, menuThen;
@@ -413,7 +415,7 @@ class CaptionScriptor extends React.Component {
 
             <Typography component="h1" variant="h4" color="inherit" noWrap
                         className={classes.title}>
-              Caption Scriptor
+              {this.state.openFile == null ? "Caption Scriptor" : this.state.openFile}
             </Typography>
 
             <Tooltip title={this.state.fullscreen ? "Exit Fullscreen" : "Fullscreen"}>
@@ -473,29 +475,156 @@ class CaptionScriptor extends React.Component {
                   onGutterClick={this.onGutterClick.bind(this)}
                 />
               </div>
-              <div className={clsx(classes.sceneGrid, this.state.fullscreen && classes.hidden)}>
-                {this.state.scene == null && (
-                  <Typography component="div" variant="subtitle1" color="textPrimary">
-                    Select a Scene to start testing
-                  </Typography>
-                )}
-                <SceneSelect
-                  scene={null}
-                  allScenes={this.props.scenes}
-                  value={this.state.scene ? this.state.scene.id : 0}
-                  getSceneName={this.getSceneName.bind(this)}
-                  onChange={this.onChangeScene.bind(this)}
-                />
-                {this.state.scene != null && (
-                  <Card className={classes.sceneCard}>
-                    <CardContent>
-                      <TextCard
-                        onlyFontOptions
-                        scene={this.state.scene}
-                        onUpdateScene={this.onUpdateScene.bind(this)}/>
-                    </CardContent>
-                  </Card>
-                )}
+              <div className={clsx(classes.menuGrid, this.state.fullscreen && classes.hidden)}>
+                <Card className={classes.menuCard}>
+                  <CardContent className={classes.menuCardContent}>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} className={classes.menuGridButtons}>
+                        <Tooltip title="New">
+                          <IconButton onClick={this.onNew.bind(this)}>
+                            <InsertDriveFileIcon/>
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Open">
+                          <IconButton onClick={this.onOpen.bind(this)}>
+                            <FolderIcon/>
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Save">
+                          <span style={!this.state.scriptChanged ? { pointerEvents: "none" } : {}}>
+                            <IconButton disabled={!this.state.scriptChanged} onClick={this.onSave.bind(this)}>
+                              <SaveIcon/>
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                        <Tooltip title="Save As">
+                          <IconButton onClick={this.onSaveAs.bind(this)}>
+                            <SaveOutlinedIcon/>
+                          </IconButton>
+                        </Tooltip>
+                        <Divider orientation="vertical" flexItem />
+                        <Tooltip title="Load From Scene">
+                          <span style={!loadFromScene ? { pointerEvents: "none" } : {}}>
+                            <IconButton disabled={!loadFromScene} onClick={this.onLoadFromScene.bind(this)}>
+                              {this.state.loadFromSceneError ? <ErrorOutlineIcon color={"error"}/> : <GetAppIcon/>}
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                        <Tooltip title="Save To Scene">
+                          <span style={!saveToScene ? { pointerEvents: "none" } : {}}>
+                            <IconButton disabled={!saveToScene} onClick={this.onSaveToScene.bind(this)}>
+                              <PublishIcon/>
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                      </Grid>
+                      <Grid item xs={12} className={classes.noPaddingTop}>
+                        <Divider variant={"fullWidth"}/>
+                      </Grid>
+                      <Grid item xs={12}>
+                        {this.state.scene == null && (
+                          <Typography component="div" variant="subtitle1" color="textPrimary">
+                            Select a Scene to start testing
+                          </Typography>
+                        )}
+                        <SceneSelect
+                          scene={null}
+                          allScenes={this.props.scenes}
+                          value={this.state.scene ? this.state.scene.id : 0}
+                          getSceneName={this.getSceneName.bind(this)}
+                          onChange={this.onChangeScene.bind(this)}
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Grid container spacing={1}>
+                          <Grid item xs={12}>
+                            <Typography variant={"h5"}>Actions</Typography>
+                          </Grid>
+                          <Grid item>
+                            <Tooltip title={"For each <TEXT> between slashes, show text for blinkDuration ms, then wait blinkDelay ms. When they are all done, wait blinkGroupDelay ms."}>
+                              <Button className={classes.actionButton} onClick={this.onAddBlink.bind(this)} variant="outlined">blink</Button>
+                            </Tooltip>
+                          </Grid>
+                          <Grid item>
+                            <Tooltip title={"Show smaller <TEXT> for captionDuration ms, then wait captionDelay ms."}>
+                              <Button className={classes.actionButton} onClick={this.onAddCap.bind(this)} variant="outlined">cap</Button>
+                            </Tooltip>
+                          </Grid>
+                          <Grid item>
+                            <Tooltip title={"Show bigger <TEXT> for captionDuration ms, then wait captionDelay ms."}>
+                              <Button className={classes.actionButton} onClick={this.onAddBigCap.bind(this)} variant="outlined">bigcap</Button>
+                            </Tooltip>
+                          </Grid>
+                          <Grid item>
+                            <Tooltip title={"Count from <START> to <END> (<START> and <END> are whole numbers). Display each number for countDuration ms, then wait countDelay ms. When they are all done, wait countGroupDelay ms."}>
+                              <Button className={classes.actionButton} onClick={this.onAddCount.bind(this)} variant="outlined">count</Button>
+                            </Tooltip>
+                          </Grid>
+                          <Grid item>
+                            <Tooltip title={"Wait <MILLISECONDS> ms"}>
+                              <Button className={classes.actionButton} onClick={this.onAddWait.bind(this)} variant="outlined">wait</Button>
+                            </Tooltip>
+                          </Grid>
+                        </Grid>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Divider variant={"fullWidth"}/>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Grid container spacing={1}>
+                          <Grid item xs={12}>
+                            <Typography variant={"h5"}>Setters</Typography>
+                          </Grid>
+                          <Grid item xs={12}>
+                            <Select
+                              fullWidth
+                              value={""}
+                              onChange={this.onAddSetter.bind(this)}>>
+                              <MenuItem key={"all"} value={"all"}>Insert All</MenuItem>
+                              <Divider/>
+                              {tupleSetters.map((s) =>
+                                <MenuItem className={classes.setterButton} key={s} value={s}>{s}</MenuItem>
+                              )}
+                              <Divider/>
+                              {stringSetters.map((s) =>
+                                <MenuItem className={classes.setterButton} key={s} value={s}>{s}</MenuItem>
+                              )}
+                              <Divider/>
+                              {singleSetters.map((s) =>
+                                <MenuItem className={classes.setterButton} key={s} value={s}>{s}</MenuItem>
+                              )}
+                            </Select>
+                          </Grid>
+                        </Grid>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Divider variant={"fullWidth"}/>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Grid container spacing={1}>
+                          <Grid item xs={12}>
+                            <Typography variant={"h5"}>Special</Typography>
+                          </Grid>
+                          <Grid item>
+                            <Tooltip title={"Stores a phrase to be used with $RANDOM_PHRASE"}>
+                              <Button className={classes.storeButton} onClick={this.onAddStorePhrase.bind(this)} variant="outlined">storePhrase</Button>
+                            </Tooltip>
+                          </Grid>
+                          <Grid item>
+                            <Tooltip title={"When running, is replaced with a random stored phrase"}>
+                              <Button className={classes.keywordButton} onClick={this.onAddString.bind(this, "$RANDOM_PHRASE")} variant="outlined">$RANDOM_PHRASE</Button>
+                            </Tooltip>
+                          </Grid>
+                          <Grid item>
+                            <Tooltip title={"When running, is replaced with a random tag phrase based on the current source"}>
+                              <Button className={classes.keywordButton} onClick={this.onAddString.bind(this, "$TAG_PHRASE")} variant="outlined">$TAG_PHRASE</Button>
+                            </Tooltip>
+                          </Grid>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </Card>
               </div>
               <div className={classes.playerGrid}>
                 {this.state.scene && (
@@ -561,167 +690,17 @@ class CaptionScriptor extends React.Component {
                     onError={this.onError.bind(this)}/>
                 )}
               </div>
-              <div className={clsx(classes.optionGrid, this.state.fullscreen && classes.hidden)}>
-                <Card className={classes.optionCard}>
-                  <CardContent className={classes.optionCardContent}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} className={classes.optionGridButtons}>
-                        <Tooltip title="New">
-                          <IconButton onClick={this.onNew.bind(this)}>
-                            <InsertDriveFileIcon/>
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Open">
-                          <IconButton onClick={this.onOpen.bind(this)}>
-                            <FolderIcon/>
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Save">
-                          <span style={!this.state.scriptChanged ? { pointerEvents: "none" } : {}}>
-                            <IconButton disabled={!this.state.scriptChanged} onClick={this.onSave.bind(this)}>
-                              <SaveIcon/>
-                            </IconButton>
-                          </span>
-                        </Tooltip>
-                        <Tooltip title="Save As">
-                          <IconButton onClick={this.onSaveAs.bind(this)}>
-                            <SaveOutlinedIcon/>
-                          </IconButton>
-                        </Tooltip>
-                        <Divider orientation="vertical" flexItem />
-                        <Tooltip title="Load From Scene">
-                          <span style={!loadFromScene ? { pointerEvents: "none" } : {}}>
-                            <IconButton disabled={!loadFromScene} onClick={this.onLoadFromScene.bind(this)}>
-                              {this.state.loadFromSceneError ? <ErrorOutlineIcon color={"error"}/> : <GetAppIcon/>}
-                            </IconButton>
-                          </span>
-                        </Tooltip>
-                        <Tooltip title="Save To Scene">
-                          <span style={!saveToScene ? { pointerEvents: "none" } : {}}>
-                            <IconButton disabled={!saveToScene} onClick={this.onSaveToScene.bind(this)}>
-                              <PublishIcon/>
-                            </IconButton>
-                          </span>
-                        </Tooltip>
-                        {this.state.openFile != null && (
-                          <Typography variant={"subtitle2"} className={classes.openFileName}>
-                            {this.state.openFile}
-                          </Typography>
-                        )}
-                      </Grid>
-                      <Grid item xs={12} className={classes.noPaddingTop}>
-                        <Divider variant={"fullWidth"}/>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Grid container spacing={1}>
-                          <Grid item xs={12}>
-                            <Typography variant={"h5"}>Actions</Typography>
-                          </Grid>
-                          <Grid item>
-                            <Tooltip title={"For each <TEXT> between slashes, show text for blinkDuration ms, then wait blinkDelay ms. When they are all done, wait blinkGroupDelay ms."}>
-                              <Button className={classes.actionButton} onClick={this.onAddBlink.bind(this)} variant="outlined">blink</Button>
-                            </Tooltip>
-                          </Grid>
-                          <Grid item>
-                            <Tooltip title={"Show smaller <TEXT> for captionDuration ms, then wait captionDelay ms."}>
-                              <Button className={classes.actionButton} onClick={this.onAddCap.bind(this)} variant="outlined">cap</Button>
-                            </Tooltip>
-                          </Grid>
-                          <Grid item>
-                            <Tooltip title={"Show bigger <TEXT> for captionDuration ms, then wait captionDelay ms."}>
-                              <Button className={classes.actionButton} onClick={this.onAddBigCap.bind(this)} variant="outlined">bigcap</Button>
-                            </Tooltip>
-                          </Grid>
-                          <Grid item>
-                            <Tooltip title={"Count from <START> to <END> (<START> and <END> are whole numbers). Display each number for countDuration ms, then wait countDelay ms. When they are all done, wait countGroupDelay ms."}>
-                              <Button className={classes.actionButton} onClick={this.onAddCount.bind(this)} variant="outlined">count</Button>
-                            </Tooltip>
-                          </Grid>
-                          <Grid item>
-                            <Tooltip title={"Wait <MILLISECONDS> ms"}>
-                              <Button className={classes.actionButton} onClick={this.onAddSetter.bind(this, 'wait')} variant="outlined">wait</Button>
-                            </Tooltip>
-                          </Grid>
-                        </Grid>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Divider variant={"fullWidth"}/>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Grid container spacing={1}>
-                          <Grid item xs={12}>
-                            <Typography variant={"h5"}>Setters</Typography>
-                          </Grid>
-                          <Grid item>
-                            <Tooltip title={"Sets the length of time (ms) that blink text appears for -- Default 200"}>
-                              <Button className={classes.setterButton} onClick={this.onAddSetter.bind(this, 'setBlinkDuration')} variant="outlined">setBlinkDuration</Button>
-                            </Tooltip>
-                          </Grid>
-                          <Grid item>
-                            <Tooltip title={"Sets the length of time (ms) between blinks -- Default 80"}>
-                              <Button className={classes.setterButton} onClick={this.onAddSetter.bind(this, 'setBlinkDelay')} variant="outlined">setBlinkDelay</Button>
-                            </Tooltip>
-                          </Grid>
-                          <Grid item>
-                            <Tooltip title={"Sets the length of time (ms) between blink and next command -- Default 1200"}>
-                              <Button className={classes.setterButton} onClick={this.onAddSetter.bind(this, 'setBlinkGroupDelay')} variant="outlined">setBlinkGroupDelay</Button>
-                            </Tooltip>
-                          </Grid>
-                          <Grid item>
-                            <Tooltip title={"Sets the length of time (ms) that cap/bigcap text appears for -- Default 2000"}>
-                              <Button className={classes.setterButton} onClick={this.onAddSetter.bind(this, 'setCaptionDuration')} variant="outlined">setCaptionDuration</Button>
-                            </Tooltip>
-                          </Grid>
-                          <Grid item>
-                            <Tooltip title={"Sets the length of time (ms) between cap/bigcap and next command -- Default 1200"}>
-                              <Button className={classes.setterButton} onClick={this.onAddSetter.bind(this, 'setCaptionDelay')} variant="outlined">setCaptionDelay</Button>
-                            </Tooltip>
-                          </Grid>
-                          <Grid item>
-                            <Tooltip title={"Sets the length of time (ms) that count numbers appear for -- Default 600"}>
-                              <Button className={classes.setterButton} onClick={this.onAddSetter.bind(this, 'setCountDuration')} variant="outlined">setCountDuration</Button>
-                            </Tooltip>
-                          </Grid>
-                          <Grid item>
-                            <Tooltip title={"Sets the length of time (ms) between count numbers -- Default 400"}>
-                              <Button className={classes.setterButton} onClick={this.onAddSetter.bind(this, 'setCountDelay')} variant="outlined">setCountDelay</Button>
-                            </Tooltip>
-                          </Grid>
-                          <Grid item>
-                            <Tooltip title={"Sets the length of time (ms) between count and next command -- Default 1200"}>
-                              <Button className={classes.setterButton} onClick={this.onAddSetter.bind(this, 'setCountGroupDelay')} variant="outlined">setCountGroupDelay</Button>
-                            </Tooltip>
-                          </Grid>
-                        </Grid>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Divider variant={"fullWidth"}/>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Grid container spacing={1}>
-                          <Grid item xs={12}>
-                            <Typography variant={"h5"}>Special</Typography>
-                          </Grid>
-                          <Grid item>
-                            <Tooltip title={"Stores a phrase to be used with $RANDOM_PHRASE"}>
-                              <Button className={classes.storeButton} onClick={this.onAddStorePhrase.bind(this)} variant="outlined">storePhrase</Button>
-                            </Tooltip>
-                          </Grid>
-                          <Grid item>
-                            <Tooltip title={"When running, is replaced with a random stored phrase"}>
-                              <Button className={classes.keywordButton} onClick={this.onAddString.bind(this, "$RANDOM_PHRASE")} variant="outlined">$RANDOM_PHRASE</Button>
-                            </Tooltip>
-                          </Grid>
-                          <Grid item>
-                            <Tooltip title={"When running, is replaced with a random tag phrase based on the current source"}>
-                              <Button className={classes.keywordButton} onClick={this.onAddString.bind(this, "$TAG_PHRASE")} variant="outlined">$TAG_PHRASE</Button>
-                            </Tooltip>
-                          </Grid>
-                        </Grid>
-                      </Grid>
-                    </Grid>
-                  </CardContent>
-                </Card>
+              <div className={clsx(classes.fontGrid, this.state.fullscreen && classes.hidden)}>
+                  <Card className={classes.fontCard}>
+                    <CardContent>
+                      {this.state.scene != null && (
+                      <TextCard
+                        onlyFontOptions
+                        scene={this.state.scene}
+                        onUpdateScene={this.onUpdateScene.bind(this)}/>
+                      )}
+                    </CardContent>
+                  </Card>
               </div>
             </Container>
           </div>
@@ -993,12 +972,74 @@ class CaptionScriptor extends React.Component {
     this.onAddString("count <START> <END>", true);
   }
 
-  onAddSetter(setter: string) {
-    this.onAddString(setter + " <MILLISECONDS>", true);
+  onAddWait() {
+    this.onAddString("wait <MILLISECONDS>", true);
   }
+
 
   onAddStorePhrase() {
     this.onAddString("storePhrase <TEXT>", true);
+  }
+
+
+  addAllSetters() {
+    let newScript = this.state.captionScript;
+    const lines = newScript.split('\n');
+    if (lines.length == 0 || lines[lines.length - 1].length > 0) {
+      newScript += "\n";
+    }
+    for (let setter of tupleSetters) {
+      let property = setter.replace("set", "");
+      property = property.charAt(0).toLowerCase() + property.slice(1);
+      const defaultVal = (captionProgramDefaults as any)[property];
+      newScript += setter + " " + defaultVal[0] + " " + defaultVal[1] + "\n";
+    }
+    newScript += "\n";
+    for (let setter of stringSetters) {
+      newScript += setter + " constant\n";
+    }
+    newScript += "\n";
+    for (let setter of singleSetters) {
+      let property = setter.replace("set", "");
+      property = property.charAt(0).toLowerCase() + property.slice(1);
+      const defaultVal = (captionProgramDefaults as any)[property];
+      newScript += setter + " " + defaultVal + "\n";
+    }
+    this.setState({captionScript: newScript});
+  }
+
+  onAddSetter(e: MouseEvent) {
+    const input = (e.target as HTMLInputElement);
+    if (input.value == "all") {
+      this.addAllSetters();
+    } else {
+      const setter = input.value;
+      if (tupleSetters.includes(setter)) {
+        this.onAddTupleSetter(setter);
+      } else if (singleSetters.includes(setter)) {
+        this.onAddSingleSetter(setter);
+      } else if (stringSetters.includes(setter)) {
+        this.onAddStringSetter(setter);
+      }
+    }
+  }
+
+  onAddSingleSetter(setter: string) {
+    let property = setter.replace("set", "");
+    property = property.charAt(0).toLowerCase() + property.slice(1);
+    const defaultVal = (captionProgramDefaults as any)[property];
+    this.onAddString(setter + " " + defaultVal, true);
+  }
+
+  onAddTupleSetter(setter: string) {
+    let property = setter.replace("set", "");
+    property = property.charAt(0).toLowerCase() + property.slice(1);
+    const defaultVal = (captionProgramDefaults as any)[property];
+    this.onAddString(setter + " " + defaultVal[0] + " " + defaultVal[1], true);
+  }
+
+  onAddStringSetter(setter: string) {
+    this.onAddString(setter + " constant", true);
   }
 
   onAddString(string: string, newLine = false) {

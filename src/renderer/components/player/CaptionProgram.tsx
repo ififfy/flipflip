@@ -1,7 +1,7 @@
 import * as React from "react";
 import wretch from "wretch";
 
-import {
+import captionProgramDefaults, {
   CancelablePromise,
   getMsTimestampValue,
   getRandomListItem,
@@ -75,54 +75,7 @@ export default class CaptionProgram extends React.Component {
     onError?(e: string): void,
   };
 
-  readonly state = {
-    program: Array<Function>(),
-    programCounter: 0,
-    timestamps: Array<number>(),
-    timestampFn: new Map<number, Function>(),
-    timestampCounter: 0,
-    phrases: Array<string>(),
-
-    blinkDuration: [200, 500],
-    blinkSinRate: 100,
-    blinkBPMMulti: 1,
-    blinkTF: TF.constant,
-
-    blinkDelay: [80, 200],
-    blinkDelaySinRate: 100,
-    blinkDelayBPMMulti: 1,
-    blinkDelayTF: TF.constant,
-
-    blinkGroupDelay: [1200, 2000],
-    blinkGroupDelaySinRate: 100,
-    blinkGroupDelayBPMMulti: 1,
-    blinkGroupDelayTF: TF.constant,
-
-    captionDuration: [2000, 4000],
-    captionSinRate: 100,
-    captionBPMMulti: 1,
-    captionTF: TF.constant,
-
-    captionDelay: [1200, 2000],
-    captionDelaySinRate: 100,
-    captionDelayBPMMulti: 1,
-    captionDelayTF: TF.constant,
-
-    countDuration: [600, 1000],
-    countSinRate: 100,
-    countBPMMulti: 1,
-    countTF: TF.constant,
-
-    countDelay: [400, 1000],
-    countDelaySinRate: 100,
-    countDelayBPMMulti: 1,
-    countDelayTF: TF.constant,
-
-    countGroupDelay: [1200, 2000],
-    countGroupDelaySinRate: 100,
-    countGroupDelayBPMMulti: 1,
-    countGroupDelayTF: TF.constant,
-  };
+  readonly state = captionProgramDefaults;
 
   _runningPromise: CancelablePromise = null;
   _timeout: any = null;
@@ -179,54 +132,7 @@ export default class CaptionProgram extends React.Component {
   }
 
   reset() {
-    this.setState({
-      program: [],
-      programCounter: 0,
-      timestamps: [],
-      timestampFn: new Map<number, Function>(),
-      timestampCounter: 0,
-      phrases: [],
-
-      blinkDuration: [200, 500],
-      blinkSinRate: 100,
-      blinkBPMMulti: 1,
-      blinkTF: TF.constant,
-
-      blinkDelay: [80, 200],
-      blinkDelaySinRate: 100,
-      blinkDelayBPMMulti: 1,
-      blinkDelayTF: TF.constant,
-
-      blinkGroupDelay: [1200, 2000],
-      blinkGroupDelaySinRate: 100,
-      blinkGroupDelayBPMMulti: 1,
-      blinkGroupDelayTF: TF.constant,
-
-      captionDuration: [2000, 4000],
-      captionSinRate: 100,
-      captionBPMMulti: 1,
-      captionTF: TF.constant,
-
-      captionDelay: [1200, 2000],
-      captionDelaySinRate: 100,
-      captionDelayBPMMulti: 1,
-      captionDelayTF: TF.constant,
-
-      countDuration: [600, 1000],
-      countSinRate: 100,
-      countBPMMulti: 1,
-      countTF: TF.constant,
-
-      countDelay: [400, 1000],
-      countDelaySinRate: 100,
-      countDelayBPMMulti: 1,
-      countDelayTF: TF.constant,
-
-      countGroupDelay: [1200, 2000],
-      countGroupDelaySinRate: 100,
-      countGroupDelayBPMMulti: 1,
-      countGroupDelayTF: TF.constant,
-    });
+    this.setState(captionProgramDefaults);
   }
 
   stop() {
@@ -271,6 +177,7 @@ export default class CaptionProgram extends React.Component {
       let newProgram = new Array<Function>();
       let newTimestamps = new Map<number, Function>();
       let index = 0;
+      let containsTimestampAction = false;
       let containsAction = false;
 
       for (let line of data.data[0].split('\n')) {
@@ -311,14 +218,15 @@ export default class CaptionProgram extends React.Component {
               error = "Error: {" + index + "} '" + line + "' - invalid count command";
               break;
             }
-            containsAction = true;
             if (timestamp != null) {
               if (newTimestamps.has(timestamp)) {
                 error = "Error: {" + index + "} '" + line + "' - duplicate timestamps";
                 break;
               }
-              newTimestamps.set(timestamp, this.count(start, end));
+              containsTimestampAction = true;
+              newTimestamps.set(timestamp, this.count(start, end, true));
             } else {
+              containsAction = true;
               newProgram.push(this.count(start, end));
             }
             break;
@@ -333,14 +241,15 @@ export default class CaptionProgram extends React.Component {
               error = "Error: {" + index + "} '" + line + "' - no phrases stored";
               break;
             }
-            containsAction = true;
             if (timestamp != null) {
               if (newTimestamps.has(timestamp)) {
                 error = "Error: {" + index + "} '" + line + "' - duplicate timestamps";
                 break;
               }
-              newTimestamps.set(timestamp, (this as any)[command](value));
+              containsTimestampAction = true;
+              newTimestamps.set(timestamp, (this as any)[command](value, true));
             } else {
+              containsAction = true;
               newProgram.push((this as any)[command](value));
             }
             break;
@@ -395,21 +304,21 @@ export default class CaptionProgram extends React.Component {
               newProgram.push(fn);
             }
             break;
-          case "setBlinkSinRate":
+          case "setBlinkWaveRate":
           case "setBlinkBPMMulti":
-          case "setBlinkDelaySinRate":
+          case "setBlinkDelayWaveRate":
           case "setBlinkDelayBPMMulti":
-          case "setBlinkGroupDelaySinRate":
+          case "setBlinkGroupDelayWaveRate":
           case "setBlinkGroupDelayBPMMulti":
-          case "setCaptionSinRate":
+          case "setCaptionWaveRate":
           case "setCaptionBPMMulti":
-          case "setCaptionDelaySinRate":
+          case "setCaptionDelayWaveRate":
           case "setCaptionDelayBPMMulti":
-          case "setCountSinRate":
+          case "setCountWaveRate":
           case "setCountBPMMulti":
-          case "setCountDelaySinRate":
+          case "setCountDelayWaveRate":
           case "setCountDelayBPMMulti":
-          case "setCountGroupDelaySinRate":
+          case "setCountGroupDelayWaveRate":
           case "setCountGroupDelayBPMMulti":
           case "wait":
             if (value == null) {
@@ -474,8 +383,8 @@ export default class CaptionProgram extends React.Component {
         }
       }
 
-      if (error == null && containsAction) {
-        if (newTimestamps.size > 0) {
+      if (error == null && (containsAction || containsTimestampAction)) {
+        if (newTimestamps.size > 0 && containsAction && containsTimestampAction) {
           this.setState({program: newProgram, timestampFn: newTimestamps, timestamps: Array.from(newTimestamps.keys()).sort((a, b) => {
               if (a > b) {
                 return 1;
@@ -488,7 +397,19 @@ export default class CaptionProgram extends React.Component {
           this._timeStarted = new Date();
           this.timestampLoop();
           this.captionLoop();
-        } else {
+        } else if (newTimestamps.size > 0 && containsTimestampAction) {
+          this.setState({timestampFn: newTimestamps, timestamps: Array.from(newTimestamps.keys()).sort((a, b) => {
+              if (a > b) {
+                return 1;
+              } else if (a < b) {
+                return -1;
+              } else {
+                return 0;
+              }
+            })});
+          this._timeStarted = new Date();
+          this.timestampLoop();
+        } else if (containsAction) {
           this.setState({program: newProgram});
           this.captionLoop();
         }
@@ -599,14 +520,14 @@ export default class CaptionProgram extends React.Component {
     return (nextCommand: Function) => { this._timeout = setTimeout(nextCommand, ms)};
   }
 
-  cap(value: string) {
+  cap(value: string, timestamp = false) {
     return (nextCommand: Function) => {
       let duration = getTimeout(this.state.captionTF, this.state.captionDuration[0], this.state.captionDuration[0],
-        this.state.captionDuration[1], this.state.captionSinRate, this.props.currentAudio,
+        this.state.captionDuration[1], this.state.captionWaveRate, this.props.currentAudio,
         this.state.captionBPMMulti, this.props.timeToNextFrame);
       const showText = this.showText(this.getPhrase(value), duration);
-      let delay = getTimeout(this.state.captionDelayTF, this.state.captionDelay[0], this.state.captionDelay[0],
-        this.state.captionDelay[1], this.state.captionDelaySinRate, this.props.currentAudio,
+      let delay = timestamp ? 0 : getTimeout(this.state.captionDelayTF, this.state.captionDelay[0], this.state.captionDelay[0],
+        this.state.captionDelay[1], this.state.captionDelayWaveRate, this.props.currentAudio,
         this.state.captionDelayBPMMulti, this.props.timeToNextFrame);
       const wait = this.wait(delay);
       this.el.current.style.color = this.props.captionColor;
@@ -620,7 +541,7 @@ export default class CaptionProgram extends React.Component {
       if (this.props.captionBorder) {
         this.el.current.style.webkitTextStroke = this.props.captionBorderpx + 'px ' + this.props.captionBorderColor;
       }
-      if (this.state.captionDelayTF == TF.scene) {
+      if (this.state.captionDelayTF == TF.scene && !timestamp) {
         this._sceneCommand = () => {showText(() => nextCommand())};
       } else {
         showText(function() { wait(nextCommand); });
@@ -628,14 +549,14 @@ export default class CaptionProgram extends React.Component {
     }
   }
 
-  bigcap(value: string) {
+  bigcap(value: string, timestamp = false) {
     return (nextCommand: Function) => {
       let duration = getTimeout(this.state.captionTF, this.state.captionDuration[0], this.state.captionDuration[0],
-        this.state.captionDuration[1], this.state.captionSinRate, this.props.currentAudio,
+        this.state.captionDuration[1], this.state.captionWaveRate, this.props.currentAudio,
         this.state.captionBPMMulti, this.props.timeToNextFrame);
       const showText = this.showText(this.getPhrase(value), duration);
-      let delay = getTimeout(this.state.captionDelayTF, this.state.captionDelay[0], this.state.captionDelay[0],
-        this.state.captionDelay[1], this.state.captionDelaySinRate, this.props.currentAudio,
+      let delay = timestamp ? 0 : getTimeout(this.state.captionDelayTF, this.state.captionDelay[0], this.state.captionDelay[0],
+        this.state.captionDelay[1], this.state.captionDelayWaveRate, this.props.currentAudio,
         this.state.captionDelayBPMMulti, this.props.timeToNextFrame);
       const wait = this.wait(delay);
       this.el.current.style.color = this.props.captionBigColor;
@@ -649,7 +570,7 @@ export default class CaptionProgram extends React.Component {
       if (this.props.captionBigBorder) {
         this.el.current.style.webkitTextStroke = this.props.captionBigBorderpx + 'px ' + this.props.captionBigBorderColor;
       }
-      if (this.state.captionDelayTF == TF.scene) {
+      if (this.state.captionDelayTF == TF.scene && !timestamp) {
         this._sceneCommand = () => {showText(() => nextCommand())};
       } else {
         showText(function() { wait(nextCommand); });
@@ -658,7 +579,7 @@ export default class CaptionProgram extends React.Component {
     }
   }
 
-  blink(value: string) {
+  blink(value: string, timestamp = false) {
     return (nextCommand: Function) => {
       let fns = new Array<Function>();
       let i = 0;
@@ -669,16 +590,16 @@ export default class CaptionProgram extends React.Component {
         i += 1;
         fns.push(() => {
           let duration = getTimeout(this.state.blinkTF, this.state.blinkDuration[0], this.state.blinkDuration[0],
-              this.state.blinkDuration[1], this.state.blinkSinRate, this.props.currentAudio,
+              this.state.blinkDuration[1], this.state.blinkWaveRate, this.props.currentAudio,
               this.state.blinkBPMMulti, this.props.timeToNextFrame);
           const showText = this.showText(word, duration);
-          if (j == length - 1 && (this.state.blinkDelayTF == TF.scene || this.state.blinkGroupDelayTF == TF.scene)) {
+          if (j == length - 1 && (this.state.blinkDelayTF == TF.scene || this.state.blinkGroupDelayTF == TF.scene || timestamp)) {
             showText(() => nextCommand());
           } else if (this.state.blinkDelayTF == TF.scene) {
             showText(() => this._sceneCommand = fns[j + 1]);
           } else {
             let delay = getTimeout(this.state.blinkDelayTF, this.state.blinkDelay[0], this.state.blinkDelay[0],
-              this.state.blinkDelay[1], this.state.blinkDelaySinRate, this.props.currentAudio,
+              this.state.blinkDelay[1], this.state.blinkDelayWaveRate, this.props.currentAudio,
               this.state.blinkDelayBPMMulti, this.props.timeToNextFrame);
             const wait = this.wait(delay);
             showText(() => wait(fns[j + 1]));
@@ -686,9 +607,9 @@ export default class CaptionProgram extends React.Component {
         })
       }
 
-      if (this.state.blinkGroupDelayTF != TF.scene && this.state.blinkDelayTF != TF.scene) {
+      if (this.state.blinkGroupDelayTF != TF.scene && this.state.blinkDelayTF != TF.scene && !timestamp) {
         let delay = getTimeout(this.state.blinkGroupDelayTF, this.state.blinkGroupDelay[0], this.state.blinkGroupDelay[0],
-          this.state.blinkGroupDelay[1], this.state.blinkGroupDelaySinRate, this.props.currentAudio,
+          this.state.blinkGroupDelay[1], this.state.blinkGroupDelayWaveRate, this.props.currentAudio,
           this.state.blinkGroupDelayBPMMulti, this.props.timeToNextFrame);
         const lastWait = this.wait(delay);
         fns.push(() => lastWait(nextCommand));
@@ -705,7 +626,7 @@ export default class CaptionProgram extends React.Component {
       if (this.props.blinkBorder) {
         this.el.current.style.webkitTextStroke = this.props.blinkBorderpx + 'px ' + this.props.blinkBorderColor;
       }
-      if (this.state.blinkGroupDelayTF == TF.scene || this.state.blinkDelayTF == TF.scene) {
+      if ((this.state.blinkGroupDelayTF == TF.scene || this.state.blinkDelayTF == TF.scene) && !timestamp) {
         this._sceneCommand = fns[0];
       } else {
         fns[0]();
@@ -713,7 +634,7 @@ export default class CaptionProgram extends React.Component {
     }
   }
 
-  count(start: number, end: number) {
+  count(start: number, end: number, timestamp = false) {
     let values = Array<number>();
     do {
       values.push(start);
@@ -735,16 +656,16 @@ export default class CaptionProgram extends React.Component {
         i += 1;
         fns.push(() => {
           let duration = getTimeout(this.state.countTF, this.state.countDuration[0], this.state.countDuration[0],
-            this.state.countDuration[1], this.state.countSinRate, this.props.currentAudio,
+            this.state.countDuration[1], this.state.countWaveRate, this.props.currentAudio,
             this.state.countBPMMulti, this.props.timeToNextFrame);
           const showText = this.showText(val.toString(), duration);
-          if (j == length - 1 && (this.state.countDelayTF == TF.scene || this.state.countGroupDelayTF == TF.scene)) {
+          if (j == length - 1 && (this.state.countDelayTF == TF.scene || this.state.countGroupDelayTF == TF.scene || timestamp)) {
             showText(() => nextCommand());
           } else if (this.state.countDelayTF == TF.scene) {
             showText(() => this._sceneCommand = fns[j + 1]);
           } else {
             let delay = getTimeout(this.state.countDelayTF, this.state.countDelay[0], this.state.countDelay[0],
-              this.state.countDelay[1], this.state.countDelaySinRate, this.props.currentAudio,
+              this.state.countDelay[1], this.state.countDelayWaveRate, this.props.currentAudio,
               this.state.countDelayBPMMulti, this.props.timeToNextFrame);
             const wait = this.wait(delay);
             showText(() => wait(fns[j + 1]));
@@ -752,9 +673,9 @@ export default class CaptionProgram extends React.Component {
         })
       }
       
-      if (this.state.countGroupDelayTF != TF.scene && this.state.countDelayTF != TF.scene) {
+      if (this.state.countGroupDelayTF != TF.scene && this.state.countDelayTF != TF.scene && !timestamp) {
         let delay = getTimeout(this.state.countGroupDelayTF, this.state.countGroupDelay[0], this.state.countGroupDelay[0],
-          this.state.countGroupDelay[1], this.state.countGroupDelaySinRate, this.props.currentAudio,
+          this.state.countGroupDelay[1], this.state.countGroupDelayWaveRate, this.props.currentAudio,
           this.state.countGroupDelayBPMMulti, this.props.timeToNextFrame);
         const lastWait = this.wait(delay);
         fns.push(() => lastWait(nextCommand));
@@ -771,7 +692,7 @@ export default class CaptionProgram extends React.Component {
       if (this.props.countBorder) {
         this.el.current.style.webkitTextStroke = this.props.countBorderpx + 'px ' + this.props.countBorderColor;
       }
-      if (this.state.countGroupDelayTF == TF.scene || this.state.countDelayTF == TF.scene) {
+      if ((this.state.countGroupDelayTF == TF.scene || this.state.countDelayTF == TF.scene) && !timestamp) {
         this._sceneCommand = fns[0];
       } else {
         fns[0]();
@@ -790,9 +711,9 @@ export default class CaptionProgram extends React.Component {
     }
   }
 
-  setBlinkSinRate(sinRate: number) {
+  setBlinkWaveRate(waveRate: number) {
     return (nextCommand: Function) => {
-      this.setState({blinkSinRate: sinRate});
+      this.setState({blinkWaveRate: waveRate});
       nextCommand();
     }
   }
@@ -822,9 +743,9 @@ export default class CaptionProgram extends React.Component {
     }
   }
 
-  setBlinkDelaySinRate(sinRate: number) {
+  setBlinkDelayWaveRate(waveRate: number) {
     return (nextCommand: Function) => {
-      this.setState({blinkDelaySinRate: sinRate});
+      this.setState({blinkDelayWaveRate: waveRate});
       nextCommand();
     }
   }
@@ -854,9 +775,9 @@ export default class CaptionProgram extends React.Component {
     }
   }
 
-  setBlinkGroupDelaySinRate(sinRate: number) {
+  setBlinkGroupDelayWaveRate(waveRate: number) {
     return (nextCommand: Function) => {
-      this.setState({blinkGroupDelaySinRate: sinRate});
+      this.setState({blinkGroupDelayWaveRate: waveRate});
       nextCommand();
     }
   }
@@ -886,9 +807,9 @@ export default class CaptionProgram extends React.Component {
     }
   }
 
-  setCaptionSinRate(sinRate: number) {
+  setCaptionWaveRate(waveRate: number) {
     return (nextCommand: Function) => {
-      this.setState({captionSinRate: sinRate});
+      this.setState({captionWaveRate: waveRate});
       nextCommand();
     }
   }
@@ -918,9 +839,9 @@ export default class CaptionProgram extends React.Component {
     }
   }
 
-  setCaptionDelaySinRate(sinRate: number) {
+  setCaptionDelayWaveRate(waveRate: number) {
     return (nextCommand: Function) => {
-      this.setState({captionDelaySinRate: sinRate});
+      this.setState({captionDelayWaveRate: waveRate});
       nextCommand();
     }
   }
@@ -950,9 +871,9 @@ export default class CaptionProgram extends React.Component {
     }
   }
 
-  setCountSinRate(sinRate: number) {
+  setCountWaveRate(waveRate: number) {
     return (nextCommand: Function) => {
-      this.setState({countSinRate: sinRate});
+      this.setState({countWaveRate: waveRate});
       nextCommand();
     }
   }
@@ -982,9 +903,9 @@ export default class CaptionProgram extends React.Component {
     }
   }
 
-  setCountDelaySinRate(sinRate: number) {
+  setCountDelayWaveRate(waveRate: number) {
     return (nextCommand: Function) => {
-      this.setState({countDelaySinRate: sinRate});
+      this.setState({countDelayWaveRate: waveRate});
       nextCommand();
     }
   }
@@ -1014,9 +935,9 @@ export default class CaptionProgram extends React.Component {
     }
   }
 
-  setCountGroupDelaySinRate(sinRate: number) {
+  setCountGroupDelayWaveRate(waveRate: number) {
     return (nextCommand: Function) => {
-      this.setState({countGroupDelaySinRate: sinRate});
+      this.setState({countGroupDelayWaveRate: waveRate});
       nextCommand();
     }
   }
