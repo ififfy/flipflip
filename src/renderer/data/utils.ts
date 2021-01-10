@@ -154,6 +154,47 @@ export function getTimestamp(secs: number): string {
   }
 }
 
+export function getMsTimestampValue(value: string): number {
+  const split = value.split(":");
+  const splitInt = [];
+  let ms = null;
+  if (split.length > 3 || split.length == 0) return null;
+  if (split[split.length - 1].includes(".")) {
+    const splitMili = split[split.length - 1].split("\.");
+    if (splitMili.length > 2) return null;
+    split[split.length - 1] = splitMili[0];
+    ms = splitMili[1];
+    if (ms.length > 3) return null;
+    while (ms.length < 3) {
+      ms += "0";
+    }
+    ms = parseInt(ms);
+    if (isNaN(ms)) return null;
+  }
+  for (let n = 0; n < split.length; n++) {
+    if (n != 0) {
+      if (split[n].length != 2) return null;
+    }
+    const int = parseInt(split[n]);
+    if (isNaN(int)) return null;
+    splitInt.push(int);
+  }
+
+  let int;
+  if (split.length == 3) {
+    int = (splitInt[0] * 60 * 60) + (splitInt[1] * 60) + splitInt[2];
+  } else if (split.length == 2) {
+    int = (splitInt[0] * 60) + splitInt[1];
+  } else if (split.length == 1) {
+    int = splitInt[0];
+  }
+  int *= 1000;
+  if (ms != null) {
+    int += ms;
+  }
+  return int;
+}
+
 export function getTimestampValue(value: string): number {
   const split = value.split(":");
   const splitInt = [];

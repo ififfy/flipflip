@@ -26,7 +26,7 @@ import SaveIcon from '@material-ui/icons/Save';
 import SaveOutlinedIcon from '@material-ui/icons/SaveOutlined';
 
 import {MO} from "../../data/const";
-import {getTimingFromString} from "../../data/utils";
+import {getMsTimestampValue, getTimingFromString} from "../../data/utils";
 import Scene from "../../data/Scene";
 import Tag from "../../data/Tag";
 import Player from "../player/Player";
@@ -192,6 +192,8 @@ const styles = (theme: Theme) => createStyles({
     const storers = ["storephrase", "storePhrase"];
     const keywords = ["$RANDOM_PHRASE", "$TAG_PHRASE"];
 
+    const timestampRegex = /^((\d?\d:)?\d?\d:\d\d(\.\d\d?\d?)?|\d?\d(\.\d\d?\d?)?)$/;
+
     let words: any = {};
     function define(style: any, dict: any) {
       for(let i = 0; i < dict.length; i++) {
@@ -211,7 +213,7 @@ const styles = (theme: Theme) => createStyles({
     function parse(stream: any, state: any) {
       if (stream.eatSpace()) return rt(null, state, stream);
 
-      const sol = stream.sol();
+      let sol = stream.sol();
       const ch = stream.next();
 
       if (ch === '#' && sol) {
@@ -219,7 +221,20 @@ const styles = (theme: Theme) => createStyles({
         return "comment";
       }
 
-      const command = state.tokens.length > 0 ? state.tokens[0] : null
+      let command = null;
+      let timestamp = false;
+      if (state.tokens.length > 0) {
+        if (timestampRegex.exec(state.tokens[0]) != null) {
+          timestamp = true;
+          if (state.tokens.length > 1) {
+            command = state.tokens[1];
+          } else {
+            sol = true;
+          }
+        } else {
+          command = state.tokens[0];
+        }
+      }
 
       if (ch === "/" && command == "blink") {
         state.tokens.push(ch);
@@ -231,9 +246,25 @@ const styles = (theme: Theme) => createStyles({
         return rt("operator", state, stream);
       }
 
+      if (/\d/.test(ch) && sol) {
+        // Timestamp
+        stream.eatWhile(/[\d:.]/);
+        if(stream.eol() || !/\w/.test(stream.peek())) {
+          const timestamp = stream.current();
+          const ms = getMsTimestampValue(timestamp);
+          state.tokens.push(timestamp);
+          if (timestampRegex.exec(timestamp) != null && !state.timestamps.includes(ms)) {
+            state.timestamps.push(ms);
+            return rt("number", state, stream);
+          } else {
+            return rt("error", state, stream);
+          }
+        }
+      }
+
       if (/\d/.test(ch) && (command == "count" || command == "wait" ||
-        // Number parameter
         tupleSetters.includes(command) || singleSetters.includes(command))) {
+        // Number parameter
         stream.eatWhile(/\d/);
         if(stream.eol() || !/\w/.test(stream.peek())) {
           state.tokens.push(stream.current());
@@ -254,7 +285,7 @@ const styles = (theme: Theme) => createStyles({
       } else if (!sol && command == "blink" && keywords.includes(cur)) {
         // Keyword in blink command
         state.tokens.push(cur);
-        if ((state.tokens.length == 2 || state.tokens[state.tokens.length - 2] == "/") && (stream.eol() || /\//.test(stream.peek()))) {
+        if ((state.tokens.length == timestamp ? 3 : 2 || state.tokens[state.tokens.length - 2] == "/") && (stream.eol() || /\//.test(stream.peek()))) {
           if (cur == "$RANDOM_PHRASE" && !state.storedPhrases) {
             return rt("error", state, stream);
           }
@@ -265,7 +296,7 @@ const styles = (theme: Theme) => createStyles({
       } else if (!sol && (command == "cap" || command == "bigcap") && keywords.includes(cur)) {
         // Keyword in a cap or bigcap command
         state.tokens.push(cur);
-        if (state.tokens.length == 2 && stream.eol()) {
+        if (state.tokens.length == timestamp ? 3 : 2 && stream.eol()) {
           if (cur == "$RANDOM_PHRASE" && !state.storedPhrases) {
             return rt("error", state, stream);
           }
@@ -302,7 +333,7 @@ const styles = (theme: Theme) => createStyles({
     }
 
     return {
-      startState: function() {return {tokens: new Array<string>(), storedPhrases: false};},
+      startState: function() {return {tokens: new Array<string>(), storedPhrases: false, timestamps: new Array<number>()};},
       token: function(stream: any, state: any) {
         return parse(stream, state);
       },

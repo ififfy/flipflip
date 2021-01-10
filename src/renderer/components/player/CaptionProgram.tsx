@@ -1,7 +1,14 @@
 import * as React from "react";
 import wretch from "wretch";
 
-import {CancelablePromise, getRandomListItem, getTimeout, getTimingFromString, htmlEntities} from "../../data/utils";
+import {
+  CancelablePromise,
+  getMsTimestampValue,
+  getRandomListItem,
+  getTimeout,
+  getTimingFromString,
+  htmlEntities
+} from "../../data/utils";
 import {TF} from "../../data/const";
 import Tag from "../../data/Tag";
 import ChildCallbackHack from "./ChildCallbackHack";
@@ -71,6 +78,9 @@ export default class CaptionProgram extends React.Component {
   readonly state = {
     program: Array<Function>(),
     programCounter: 0,
+    timestamps: Array<number>(),
+    timestampFn: new Map<number, Function>(),
+    timestampCounter: 0,
     phrases: Array<string>(),
 
     blinkDuration: [200, 500],
@@ -172,6 +182,9 @@ export default class CaptionProgram extends React.Component {
     this.setState({
       program: [],
       programCounter: 0,
+      timestamps: [],
+      timestampFn: new Map<number, Function>(),
+      timestampCounter: 0,
       phrases: [],
 
       blinkDuration: [200, 500],
@@ -217,6 +230,9 @@ export default class CaptionProgram extends React.Component {
   }
 
   stop() {
+    if (this.el) {
+      this.el.current.style.opacity = '0';
+    }
     if (this._runningPromise) {
       this._runningPromise.cancel();
       this._runningPromise = null;
@@ -226,6 +242,12 @@ export default class CaptionProgram extends React.Component {
       this._timeout = null;
     }
     this._sceneCommand = null;
+    this._timeStarted = null;
+    this._nextTimestamp = null;
+    if (this._timestampTimeout) {
+      clearTimeout(this._timestampTimeout);
+      this._timestampTimeout = null;
+    }
   }
 
   start() {
@@ -247,16 +269,25 @@ export default class CaptionProgram extends React.Component {
     this._runningPromise.then((data) => {
       let error = null;
       let newProgram = new Array<Function>();
+      let newTimestamps = new Map<number, Function>();
       let index = 0;
       let containsAction = false;
+
       for (let line of data.data[0].split('\n')) {
         index++;
         line = line.trim();
 
         if (line.length == 0 || line[0] == '#') continue;
+        let command = getFirstWord(line);
+        let value = getRest(line);
 
-        const command = getFirstWord(line);
-        const value = getRest(line);
+        let timestamp = getMsTimestampValue(command);
+        if (timestamp != null && value != null && value.length > 0) {
+          line = value;
+          command = getFirstWord(line);
+          value = getRest(line);
+        }
+
         let fn, ms;
         switch (command) {
           case "count":
@@ -281,7 +312,15 @@ export default class CaptionProgram extends React.Component {
               break;
             }
             containsAction = true;
-            newProgram.push(this.count(start, end));
+            if (timestamp != null) {
+              if (newTimestamps.has(timestamp)) {
+                error = "Error: {" + index + "} '" + line + "' - duplicate timestamps";
+                break;
+              }
+              newTimestamps.set(timestamp, this.count(start, end));
+            } else {
+              newProgram.push(this.count(start, end));
+            }
             break;
           case "blink":
           case "cap":
@@ -295,7 +334,15 @@ export default class CaptionProgram extends React.Component {
               break;
             }
             containsAction = true;
-            newProgram.push((this as any)[command](value));
+            if (timestamp != null) {
+              if (newTimestamps.has(timestamp)) {
+                error = "Error: {" + index + "} '" + line + "' - duplicate timestamps";
+                break;
+              }
+              newTimestamps.set(timestamp, (this as any)[command](value));
+            } else {
+              newProgram.push((this as any)[command](value));
+            }
             break;
           case "storephrase":
           case "storePhrase":
@@ -338,7 +385,15 @@ export default class CaptionProgram extends React.Component {
             }
             if (invalid) break;
             fn = (this as any)[command](numbers);
-            newProgram.push(fn);
+            if (timestamp != null) {
+              if (newTimestamps.has(timestamp)) {
+                error = "Error: {" + index + "} '" + line + "' - duplicate timestamps";
+                break;
+              }
+              newTimestamps.set(timestamp, fn);
+            } else {
+              newProgram.push(fn);
+            }
             break;
           case "setBlinkSinRate":
           case "setBlinkBPMMulti":
@@ -373,7 +428,15 @@ export default class CaptionProgram extends React.Component {
               break;
             }
             fn = (this as any)[command](ms);
-            newProgram.push(fn);
+            if (timestamp != null) {
+              if (newTimestamps.has(timestamp)) {
+                error = "Error: {" + index + "} '" + line + "' - duplicate timestamps";
+                break;
+              }
+              newTimestamps.set(timestamp, fn);
+            } else {
+              newProgram.push(fn);
+            }
             break;
           case "setBlinkTF":
           case "setBlinkDelayTF":
@@ -393,7 +456,15 @@ export default class CaptionProgram extends React.Component {
               break;
             }
             fn = (this as any)[command](tf);
-            newProgram.push(fn);
+            if (timestamp != null) {
+              if (newTimestamps.has(timestamp)) {
+                error = "Error: {" + index + "} '" + line + "' - duplicate timestamps";
+                break;
+              }
+              newTimestamps.set(timestamp, fn);
+            } else {
+              newProgram.push(fn);
+            }
             break;
           default:
             error = "Error: {" + index + "} '" + line + "' - unknown command";
@@ -404,13 +475,74 @@ export default class CaptionProgram extends React.Component {
       }
 
       if (error == null && containsAction) {
-        this.setState({program: newProgram});
-        this.captionLoop();
+        if (newTimestamps.size > 0) {
+          this.setState({program: newProgram, timestampFn: newTimestamps, timestamps: Array.from(newTimestamps.keys()).sort((a, b) => {
+              if (a > b) {
+                return 1;
+              } else if (a < b) {
+                return -1;
+              } else {
+                return 0;
+              }
+            })});
+          this._timeStarted = new Date();
+          this.timestampLoop();
+          this.captionLoop();
+        } else {
+          this.setState({program: newProgram});
+          this.captionLoop();
+        }
       } else if (this.props.onError) {
-        console.error(error);
-        this.props.onError(error);
+        if (this.props.onError) {
+          this.props.onError(error);
+        } else {
+          console.error(error);
+        }
       }
     })
+  }
+
+  _timeStarted: Date = null;
+  _nextTimestamp: number = null;
+  _timestampTimeout: NodeJS.Timeout = null;
+  timestampLoop() {
+    if (this._nextTimestamp == null) {
+      this._nextTimestamp = this.state.timestamps[this.state.timestampCounter];
+    }
+    const passed = (new Date().getTime() - this._timeStarted.getTime());
+    if (passed >  this._nextTimestamp) {
+      let index = this.state.timestampCounter;
+      let fn;
+      do {
+        if (this.state.timestamps.length >= index &&
+          passed > this.state.timestamps[index + 1]) {
+          index++;
+        } else {
+          fn = this.state.timestampFn.get(this.state.timestamps[index]);
+          this._nextTimestamp = this.state.timestamps[index + 1];
+          break;
+        }
+      } while (true)
+
+      fn(() => {
+        let newCounter = index
+        if (newCounter >= this.state.timestamps.length) {
+          if (this.props.textEndStop) {
+            this.props.goBack();
+            return;
+          }
+          if (this.props.textNextScene && this.props.playNextScene) {
+            this.props.playNextScene();
+            return;
+          }
+        }
+        this.setState({timestampCounter: newCounter});
+      });
+      if (index >= this.state.timestamps.length - 1) {
+        return;
+      }
+    }
+    this._timestampTimeout = setTimeout(this.timestampLoop.bind(this), 100);
   }
 
   captionLoop() {
