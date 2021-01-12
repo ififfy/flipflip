@@ -188,7 +188,8 @@ const tupleSetters = ["setBlinkDuration", "setBlinkDelay", "setBlinkGroupDelay",
 const singleSetters = ["setBlinkWaveRate", "setBlinkBPMMulti", "setBlinkDelayWaveRate", "setBlinkDelayBPMMulti",
   "setBlinkGroupDelayWaveRate", "setBlinkGroupDelayBPMMulti", "setCaptionWaveRate", "setCaptionBPMMulti",
   "setCaptionDelayWaveRate", "setCaptionDelayBPMMulti", "setCountWaveRate", "setCountBPMMulti", "setCountDelayWaveRate",
-  "setCountDelayBPMMulti", "setCountGroupDelayWaveRate", "setCountGroupDelayBPMMulti"];
+  "setCountDelayBPMMulti", "setCountGroupDelayWaveRate", "setCountGroupDelayBPMMulti", "setBlinkY", "setCaptionY",
+  "setBigCaptionY", "setCountY"];
 const stringSetters = ["setBlinkTF", "setBlinkDelayTF", "setBlinkGroupDelayTF", "setCaptionTF", "setCaptionDelayTF",
   "setCountTF", "setCountDelayTF", "setCountGroupDelayTF"];
 const storers = ["storephrase", "storePhrase"];
@@ -275,7 +276,7 @@ const keywords = ["$RANDOM_PHRASE", "$TAG_PHRASE"];
         }
       }
 
-      if (/\d/.test(ch) && (command == "count" || command == "wait" ||
+      if (/[-\d]/.test(ch) && (command == "count" || command == "wait" ||
         tupleSetters.includes(command) || singleSetters.includes(command))) {
         // Number parameter
         stream.eatWhile(/\d/);

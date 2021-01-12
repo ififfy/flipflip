@@ -775,6 +775,11 @@ let captionProgramDefaults = {
   countGroupDelayWaveRate: 100,
   countGroupDelayBPMMulti: 1,
   countGroupDelayTF: TF.constant,
+
+  blinkY: 0,
+  capY: 0,
+  bigcapY: 0,
+  countY: 0,
 }
 export default captionProgramDefaults;
 

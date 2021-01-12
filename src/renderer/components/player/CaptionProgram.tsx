@@ -355,6 +355,10 @@ export default class CaptionProgram extends React.Component {
           case "setCountDelayBPMMulti":
           case "setCountGroupDelayWaveRate":
           case "setCountGroupDelayBPMMulti":
+          case "setBlinkY":
+          case "setCaptionY":
+          case "setBigCaptionY":
+          case "setCountY":
           case "wait":
             if (value == null) {
               error = "Error: {" + index + "} '" + line + "' - missing parameter";
@@ -362,7 +366,7 @@ export default class CaptionProgram extends React.Component {
             } else if (value.includes(" ")) {
               error = "Error: {" + index + "} '" + line + "' - extra parameter(s)";
               break;
-            } else if (/^\d+\s*$/.exec(value) == null) {
+            } else if (/^-?\d+\s*$/.exec(value) == null) {
               error = "Error: {" + index + "} '" + line + "' - invalid command";
               break;
             }
@@ -604,7 +608,13 @@ export default class CaptionProgram extends React.Component {
       this.el.current.style.display = 'table-cell';
       this.el.current.style.textAlign = 'center';
       this.el.current.style.verticalAlign = 'bottom';
-      this.el.current.style.paddingBottom = '20vmin';
+      this.el.current.style.paddingBottom = (20 + this.state.capY) + 'vmin';
+      const yPos = 20 + this.state.capY;
+      if (yPos > 0) {
+        this.el.current.style.paddingBottom = (yPos) + 'vmin';
+      } else {
+        this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
+      }
       this.el.current.style.transition = 'opacity 0.5s ease-in-out';
       if (this.props.captionBorder) {
         this.el.current.style.webkitTextStroke = this.props.captionBorderpx + 'px ' + this.props.captionBorderColor;
@@ -633,7 +643,12 @@ export default class CaptionProgram extends React.Component {
       this.el.current.style.display = 'table-cell';
       this.el.current.style.textAlign = 'center';
       this.el.current.style.verticalAlign = 'middle';
-      this.el.current.style.paddingBottom = 'unset';
+      const yPos = this.state.bigcapY;
+      if (yPos > 0) {
+        this.el.current.style.paddingBottom = (yPos) + 'vmin';
+      } else {
+        this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
+      }
       this.el.current.style.transition = 'opacity 0.1s ease-out';
       if (this.props.captionBigBorder) {
         this.el.current.style.webkitTextStroke = this.props.captionBigBorderpx + 'px ' + this.props.captionBigBorderColor;
@@ -690,7 +705,12 @@ export default class CaptionProgram extends React.Component {
       this.el.current.style.display = 'table-cell';
       this.el.current.style.textAlign = 'center';
       this.el.current.style.verticalAlign = 'middle';
-      this.el.current.style.paddingBottom = 'unset';
+      const yPos = this.state.blinkY;
+      if (yPos > 0) {
+        this.el.current.style.paddingBottom = (yPos) + 'vmin';
+      } else {
+        this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
+      }
       this.el.current.style.transition = 'opacity 0.1s ease-out';
       if (this.props.blinkBorder) {
         this.el.current.style.webkitTextStroke = this.props.blinkBorderpx + 'px ' + this.props.blinkBorderColor;
@@ -756,7 +776,12 @@ export default class CaptionProgram extends React.Component {
       this.el.current.style.display = 'table-cell';
       this.el.current.style.textAlign = 'center';
       this.el.current.style.verticalAlign = 'middle';
-      this.el.current.style.paddingBottom = 'unset';
+      const yPos = this.state.countY;
+      if (yPos > 0) {
+        this.el.current.style.paddingBottom = (yPos) + 'vmin';
+      } else {
+        this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
+      }
       this.el.current.style.transition = 'opacity 0.1s ease-out';
       if (this.props.countBorder) {
         this.el.current.style.webkitTextStroke = this.props.countBorderpx + 'px ' + this.props.countBorderColor;
@@ -766,6 +791,34 @@ export default class CaptionProgram extends React.Component {
       } else {
         fns[0]();
       }
+    }
+  }
+
+  setBlinkY(relYPos: number) {
+    return (nextCommand: Function) => {
+      this.setState({blinkY: relYPos});
+      nextCommand();
+    }
+  }
+
+  setCaptionY(relYPos: number) {
+    return (nextCommand: Function) => {
+      this.setState({capY: relYPos});
+      nextCommand();
+    }
+  }
+
+  setBigCaptionY(relYPos: number) {
+    return (nextCommand: Function) => {
+      this.setState({bigcapY: relYPos});
+      nextCommand();
+    }
+  }
+
+  setCountY(relYPos: number) {
+    return (nextCommand: Function) => {
+      this.setState({countY: relYPos});
+      nextCommand();
     }
   }
 
