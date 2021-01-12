@@ -608,11 +608,12 @@ export default class CaptionProgram extends React.Component {
       this.el.current.style.display = 'table-cell';
       this.el.current.style.textAlign = 'center';
       this.el.current.style.verticalAlign = 'bottom';
-      this.el.current.style.paddingBottom = (20 + this.state.capY) + 'vmin';
-      const yPos = 20 + this.state.capY;
+      const yPos = 14 + this.state.capY;
       if (yPos > 0) {
         this.el.current.style.paddingBottom = (yPos) + 'vmin';
+        this.el.current.style.paddingTop = 'unset';
       } else {
+        this.el.current.style.paddingBottom = 'unset';
         this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
       }
       this.el.current.style.transition = 'opacity 0.5s ease-in-out';
@@ -646,7 +647,9 @@ export default class CaptionProgram extends React.Component {
       const yPos = this.state.bigcapY;
       if (yPos > 0) {
         this.el.current.style.paddingBottom = (yPos) + 'vmin';
+        this.el.current.style.paddingTop = 'unset';
       } else {
+        this.el.current.style.paddingBottom = 'unset';
         this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
       }
       this.el.current.style.transition = 'opacity 0.1s ease-out';
@@ -708,7 +711,9 @@ export default class CaptionProgram extends React.Component {
       const yPos = this.state.blinkY;
       if (yPos > 0) {
         this.el.current.style.paddingBottom = (yPos) + 'vmin';
+        this.el.current.style.paddingTop = 'unset';
       } else {
+        this.el.current.style.paddingBottom = 'unset';
         this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
       }
       this.el.current.style.transition = 'opacity 0.1s ease-out';
@@ -779,7 +784,9 @@ export default class CaptionProgram extends React.Component {
       const yPos = this.state.countY;
       if (yPos > 0) {
         this.el.current.style.paddingBottom = (yPos) + 'vmin';
+        this.el.current.style.paddingTop = 'unset';
       } else {
+        this.el.current.style.paddingBottom = 'unset';
         this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
       }
       this.el.current.style.transition = 'opacity 0.1s ease-out';

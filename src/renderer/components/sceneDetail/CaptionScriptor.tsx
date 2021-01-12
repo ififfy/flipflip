@@ -684,7 +684,7 @@ class CaptionScriptor extends React.Component {
                     scene={this.state.scene}
                     gridView={!this.state.fullscreen}
                     captionScript={this.state.captionScript}
-                    captionScale={this.state.fullscreen ? 1 : 0.25}
+                    captionScale={this.state.fullscreen ? 1 : 0.35}
                     scenes={this.props.scenes}
                     theme={this.props.theme}
                     getTags={this.props.getTags.bind(this)}

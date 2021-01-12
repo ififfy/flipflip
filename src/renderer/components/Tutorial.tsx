@@ -1203,6 +1203,23 @@ class Tutorial extends React.Component {
         </React.Fragment>;
       break;
 
+      case CST.final:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Caption Scriptor</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                ~~~Some stuff will be here~~~
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Back to Caption Scriptor
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+
 
       case SDGT.welcome:
         dialogBody =
