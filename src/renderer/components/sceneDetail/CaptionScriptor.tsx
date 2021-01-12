@@ -266,10 +266,8 @@ const keywords = ["$RANDOM_PHRASE", "$TAG_PHRASE"];
         stream.eatWhile(/[\d:.]/);
         if(stream.eol() || !/\w/.test(stream.peek())) {
           const timestamp = stream.current();
-          const ms = getMsTimestampValue(timestamp);
           state.tokens.push(timestamp);
-          if (timestampRegex.exec(timestamp) != null && !state.timestamps.includes(ms)) {
-            state.timestamps.push(ms);
+          if (timestampRegex.exec(timestamp) != null) {
             return rt("number", state, stream);
           } else {
             return rt("error", state, stream);
@@ -374,7 +372,7 @@ const keywords = ["$RANDOM_PHRASE", "$TAG_PHRASE"];
     }
 
     return {
-      startState: function() {return {tokens: new Array<string>(), storedPhrases: new Map<number, boolean>(), timestamps: new Array<number>()};},
+      startState: function() {return {tokens: new Array<string>(), storedPhrases: new Map<number, boolean>()};},
       token: function(stream: any, state: any) {
         return parse(stream, state);
       },

@@ -127,11 +127,12 @@ export default class CaptionProgram extends React.Component {
       this._sceneCommand = null;
       command();
     }
-    if (!this.el.current || (this.props.url == props.url && this.props.script == props.script
-      && this.props.getCurrentTimestamp === props.getCurrentTimestamp)) return;
-    this.stop();
-    this.reset();
-    this.start();
+    if (this.el.current && (this.props.url != props.url || this.props.script != props.script) ||
+      (this.props.getCurrentTimestamp != null && props.getCurrentTimestamp == null)) {
+      this.stop();
+      this.reset();
+      this.start();
+    }
   }
 
   reset() {
@@ -179,7 +180,7 @@ export default class CaptionProgram extends React.Component {
     this._runningPromise.then((data) => {
       let error = null;
       let newProgram = new Array<Function>();
-      let newTimestamps = new Map<number, Function>();
+      let newTimestamps = new Map<number, Array<Function>>();
       let index = 0;
       let containsTimestampAction = false;
       let containsAction = false;
@@ -223,12 +224,12 @@ export default class CaptionProgram extends React.Component {
               break;
             }
             if (timestamp != null) {
-              if (newTimestamps.has(timestamp)) {
-                error = "Error: {" + index + "} '" + line + "' - duplicate timestamps";
-                break;
-              }
               containsTimestampAction = true;
-              newTimestamps.set(timestamp, this.count(start, end, true));
+              if (newTimestamps.has(timestamp)) {
+                newTimestamps.get(timestamp).push(this.count(start, end, true));
+              } else {
+                newTimestamps.set(timestamp, [this.count(start, end, true)]);
+              }
             } else {
               containsAction = true;
               newProgram.push(this.count(start, end));
@@ -262,12 +263,12 @@ export default class CaptionProgram extends React.Component {
             }
             if (error != null) break;
             if (timestamp != null) {
-              if (newTimestamps.has(timestamp)) {
-                error = "Error: {" + index + "} '" + line + "' - duplicate timestamps";
-                break;
-              }
               containsTimestampAction = true;
-              newTimestamps.set(timestamp, (this as any)[command](value, true));
+              if (newTimestamps.has(timestamp)) {
+                newTimestamps.get(timestamp).push((this as any)[command](value, true));
+              } else {
+                newTimestamps.set(timestamp, [(this as any)[command](value, true)]);
+              }
             } else {
               containsAction = true;
               newProgram.push((this as any)[command](value));
@@ -330,10 +331,10 @@ export default class CaptionProgram extends React.Component {
             fn = (this as any)[command](numbers);
             if (timestamp != null) {
               if (newTimestamps.has(timestamp)) {
-                error = "Error: {" + index + "} '" + line + "' - duplicate timestamps";
-                break;
+                newTimestamps.get(timestamp).push(fn);
+              } else {
+                newTimestamps.set(timestamp, [fn]);
               }
-              newTimestamps.set(timestamp, fn);
             } else {
               newProgram.push(fn);
             }
@@ -373,10 +374,10 @@ export default class CaptionProgram extends React.Component {
             fn = (this as any)[command](ms);
             if (timestamp != null) {
               if (newTimestamps.has(timestamp)) {
-                error = "Error: {" + index + "} '" + line + "' - duplicate timestamps";
-                break;
+                newTimestamps.get(timestamp).push(fn);
+              } else {
+                newTimestamps.set(timestamp, fn);
               }
-              newTimestamps.set(timestamp, fn);
             } else {
               newProgram.push(fn);
             }
@@ -401,10 +402,10 @@ export default class CaptionProgram extends React.Component {
             fn = (this as any)[command](tf);
             if (timestamp != null) {
               if (newTimestamps.has(timestamp)) {
-                error = "Error: {" + index + "} '" + line + "' - duplicate timestamps";
-                break;
+                newTimestamps.get(timestamp).push(fn);
+              } else {
+                newTimestamps.set(timestamp, fn);
               }
-              newTimestamps.set(timestamp, fn);
             } else {
               newProgram.push(fn);
             }
@@ -462,35 +463,17 @@ export default class CaptionProgram extends React.Component {
   _lastTimestamp: number = null;
   _timestampTimeout: NodeJS.Timeout = null;
   timestampLoop() {
-    if (this.props.getCurrentTimestamp) {
-      const passed = this.props.getCurrentTimestamp();
-      if (this._lastTimestamp == null || Math.abs(this._lastTimestamp - passed) > 1000) {
-        // Timestamp has changed, reset
-        let index = 0;
-        do {
-          if (this.state.timestamps.length >= index &&
-            passed > this.state.timestamps[index + 1]) {
-            index++;
-          } else {
-            this._nextTimestamp = this.state.timestamps[index];
-            break;
-          }
-        } while (true)
-        this.setState({timestampCounter: index});
-      } else if (passed >  this._nextTimestamp) {
-        let index = this.state.timestampCounter;
-        let fn;
-        do {
-          if (this.state.timestamps.length >= index &&
-            passed > this.state.timestamps[index + 1]) {
-            index++;
-          } else {
-            fn = this.state.timestampFn.get(this.state.timestamps[index]);
-            this._nextTimestamp = this.state.timestamps[index + 1];
-            break;
-          }
-        } while (true)
+    const doLoop = (passed: number): number => {
+      let index = this.state.timestampCounter;
+      let fns;
+      while (this.state.timestamps.length >= index &&
+      passed > this.state.timestamps[index + 1]) {
+        index++;
+      }
+      fns = this.state.timestampFn.get(this.state.timestamps[index]);
+      this._nextTimestamp = this.state.timestamps[index + 1];
 
+      for (let fn of fns) {
         fn(() => {
           let newCounter = index
           if (newCounter >= this.state.timestamps.length) {
@@ -505,8 +488,29 @@ export default class CaptionProgram extends React.Component {
           }
           this.setState({timestampCounter: newCounter});
         });
+      }
+      return index;
+    }
+
+    if (this.props.getCurrentTimestamp) {
+      const passed = this.props.getCurrentTimestamp();
+      if (this._lastTimestamp == null || Math.abs(this._lastTimestamp - passed) > 1000) {
+        // Timestamp has changed, reset
+        let index = 0;
+        if (passed > this.state.timestamps[0]) {
+          while (this.state.timestamps.length >= index &&
+          passed > this.state.timestamps[index + 1]) {
+            index++;
+          }
+          this._nextTimestamp = this.state.timestamps[index + 1];
+        } else {
+          this._nextTimestamp = this.state.timestamps[index];
+        }
+        this.setState({timestampCounter: index});
+      } else if (passed >  this._nextTimestamp) {
+        const index = doLoop(passed);
         if (index >= this.state.timestamps.length - 1) {
-          this._nextTimestamp = 9999999;
+          this._nextTimestamp = 99999999;
         }
       }
       this._lastTimestamp = passed;
@@ -517,33 +521,7 @@ export default class CaptionProgram extends React.Component {
       }
       const passed = (new Date().getTime() - this._timeStarted.getTime());
       if (passed > this._nextTimestamp) {
-        let index = this.state.timestampCounter;
-        let fn;
-        do {
-          if (this.state.timestamps.length >= index &&
-            passed > this.state.timestamps[index + 1]) {
-            index++;
-          } else {
-            fn = this.state.timestampFn.get(this.state.timestamps[index]);
-            this._nextTimestamp = this.state.timestamps[index + 1];
-            break;
-          }
-        } while (true)
-
-        fn(() => {
-          let newCounter = index
-          if (newCounter >= this.state.timestamps.length) {
-            if (this.props.textEndStop) {
-              this.props.goBack();
-              return;
-            }
-            if (this.props.textNextScene && this.props.playNextScene) {
-              this.props.playNextScene();
-              return;
-            }
-          }
-          this.setState({timestampCounter: newCounter});
-        });
+        const index = doLoop(passed);
         if (index >= this.state.timestamps.length - 1) {
           return;
         }

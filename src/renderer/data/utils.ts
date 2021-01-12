@@ -732,7 +732,7 @@ let captionProgramDefaults = {
   program: Array<Function>(),
   programCounter: 0,
   timestamps: Array<number>(),
-  timestampFn: new Map<number, Function>(),
+  timestampFn: new Map<number, Array<Function>>(),
   timestampCounter: 0,
   phrases: new Map<number, Array<string>>(),
 
