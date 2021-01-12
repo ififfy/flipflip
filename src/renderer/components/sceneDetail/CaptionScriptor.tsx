@@ -35,6 +35,7 @@ import SceneSelect from "../configGroups/SceneSelect";
 import TextCard from "../configGroups/TextCard";
 import CaptionProgram from "../player/CaptionProgram";
 import ChildCallbackHack from "../player/ChildCallbackHack";
+import AudioCard from "../configGroups/AudioCard";
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -113,6 +114,9 @@ const styles = (theme: Theme) => createStyles({
   },
   menuCardContent: {
     paddingTop: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
   },
   menuGridButtons: {
     display: 'flex',
@@ -430,6 +434,10 @@ class CaptionScriptor extends React.Component {
         break;
     }
 
+    let getTimestamp = undefined;
+    if (this.state.scene && this.state.scene.audioEnabled) {
+      getTimestamp = this.getTimestamp.bind(this);
+    }
 
     return(
       <div className={classes.root}>
@@ -658,6 +666,15 @@ class CaptionScriptor extends React.Component {
                         </Grid>
                       </Grid>
                     </Grid>
+                    <div className={classes.fill}/>
+                    {this.state.scene && (
+                      <AudioCard
+                        sidebar
+                        startPlaying
+                        scene={this.state.scene}
+                        onPlaying={this.onPlaying.bind(this)}
+                        onUpdateScene={this.onUpdateScene.bind(this)}/>
+                    )}
                   </CardContent>
                 </Card>
               </div>
@@ -677,6 +694,7 @@ class CaptionScriptor extends React.Component {
                     onUpdateScene={this.onUpdateScene.bind(this)}
                     captionProgramJumpToHack={this.state.captionProgramJumpToHack}
                     tutorial={null}
+                    getCurrentTimestamp={getTimestamp}
                     cache={() => {}}
                     setCount={() => {}}
                     systemMessage={() => {}}
@@ -768,15 +786,27 @@ class CaptionScriptor extends React.Component {
     );
   }
 
+  nop() {}
+
+  _currentTimestamp: number = null;
+  onPlaying(position: number, duration: number) {
+    this._currentTimestamp = position;
+  }
+  getTimestamp() {
+    return this._currentTimestamp;
+  }
+
   onCloseDialog() {
     this.setState({openMenu: null, drawerOpen: false});
   }
 
   componentDidMount() {
+    this._currentTimestamp = 0;
     window.addEventListener('keydown', this.onKeyDown, false);
   }
 
   componentWillUnmount() {
+    this._currentTimestamp = null;
     window.removeEventListener('keydown', this.onKeyDown);
   }
 
@@ -1011,11 +1041,9 @@ class CaptionScriptor extends React.Component {
     this.onAddString("wait <MILLISECONDS>", true);
   }
 
-
   onAddStorePhrase() {
     this.onAddString("storePhrase <TEXT>", true);
   }
-
 
   addAllSetters() {
     let newScript = this.state.captionScript;

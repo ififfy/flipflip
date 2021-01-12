@@ -62,16 +62,17 @@ export default class CaptionProgram extends React.Component {
     countBorderpx: number,
     countBorderColor: string,
     url: string,
-    script: string;
-    timeToNextFrame: number;
+    script: string,
+    timeToNextFrame: number,
     currentAudio: Audio
     currentImage: HTMLImageElement | HTMLVideoElement,
     textEndStop: boolean,
     textNextScene: boolean,
-    getTags(source: string, clipID?: string): Array<Tag>
+    getTags(source: string, clipID?: string): Array<Tag>,
     goBack(): void,
     playNextScene(): void,
     jumpToHack?: ChildCallbackHack,
+    getCurrentTimestamp?(): number,
     onError?(e: string): void,
   };
 
@@ -115,7 +116,8 @@ export default class CaptionProgram extends React.Component {
   }
 
   shouldComponentUpdate(props: any, state: any): boolean {
-    return props.url !== this.props.url || props.script !== this.props.script || props.currentImage !== this.props.currentImage;
+    return props.url !== this.props.url || props.script !== this.props.script ||
+      props.currentImage !== this.props.currentImage || props.getCurrentTimestamp !== this.props.getCurrentTimestamp;
   }
 
   _sceneCommand: Function = null;
@@ -125,7 +127,8 @@ export default class CaptionProgram extends React.Component {
       this._sceneCommand = null;
       command();
     }
-    if (!this.el.current || (this.props.url == props.url && this.props.script == props.script)) return;
+    if (!this.el.current || (this.props.url == props.url && this.props.script == props.script
+      && this.props.getCurrentTimestamp === props.getCurrentTimestamp)) return;
     this.stop();
     this.reset();
     this.start();
@@ -149,6 +152,7 @@ export default class CaptionProgram extends React.Component {
     }
     this._sceneCommand = null;
     this._timeStarted = null;
+    this._lastTimestamp = null;
     this._nextTimestamp = null;
     if (this._timestampTimeout) {
       clearTimeout(this._timestampTimeout);
@@ -455,45 +459,97 @@ export default class CaptionProgram extends React.Component {
 
   _timeStarted: Date = null;
   _nextTimestamp: number = null;
+  _lastTimestamp: number = null;
   _timestampTimeout: NodeJS.Timeout = null;
   timestampLoop() {
-    if (this._nextTimestamp == null) {
-      this._nextTimestamp = this.state.timestamps[this.state.timestampCounter];
-    }
-    const passed = (new Date().getTime() - this._timeStarted.getTime());
-    if (passed >  this._nextTimestamp) {
-      let index = this.state.timestampCounter;
-      let fn;
-      do {
-        if (this.state.timestamps.length >= index &&
-          passed > this.state.timestamps[index + 1]) {
-          index++;
-        } else {
-          fn = this.state.timestampFn.get(this.state.timestamps[index]);
-          this._nextTimestamp = this.state.timestamps[index + 1];
-          break;
-        }
-      } while (true)
+    if (this.props.getCurrentTimestamp) {
+      const passed = this.props.getCurrentTimestamp();
+      if (this._lastTimestamp == null || Math.abs(this._lastTimestamp - passed) > 1000) {
+        // Timestamp has changed, reset
+        let index = 0;
+        do {
+          if (this.state.timestamps.length >= index &&
+            passed > this.state.timestamps[index + 1]) {
+            index++;
+          } else {
+            this._nextTimestamp = this.state.timestamps[index];
+            break;
+          }
+        } while (true)
+        this.setState({timestampCounter: index});
+      } else if (passed >  this._nextTimestamp) {
+        let index = this.state.timestampCounter;
+        let fn;
+        do {
+          if (this.state.timestamps.length >= index &&
+            passed > this.state.timestamps[index + 1]) {
+            index++;
+          } else {
+            fn = this.state.timestampFn.get(this.state.timestamps[index]);
+            this._nextTimestamp = this.state.timestamps[index + 1];
+            break;
+          }
+        } while (true)
 
-      fn(() => {
-        let newCounter = index
-        if (newCounter >= this.state.timestamps.length) {
-          if (this.props.textEndStop) {
-            this.props.goBack();
-            return;
+        fn(() => {
+          let newCounter = index
+          if (newCounter >= this.state.timestamps.length) {
+            if (this.props.textEndStop) {
+              this.props.goBack();
+              return;
+            }
+            if (this.props.textNextScene && this.props.playNextScene) {
+              this.props.playNextScene();
+              return;
+            }
           }
-          if (this.props.textNextScene && this.props.playNextScene) {
-            this.props.playNextScene();
-            return;
-          }
+          this.setState({timestampCounter: newCounter});
+        });
+        if (index >= this.state.timestamps.length - 1) {
+          this._nextTimestamp = 9999999;
         }
-        this.setState({timestampCounter: newCounter});
-      });
-      if (index >= this.state.timestamps.length - 1) {
-        return;
       }
+      this._lastTimestamp = passed;
+      this._timestampTimeout = setTimeout(this.timestampLoop.bind(this), 100);
+    } else {
+      if (this._nextTimestamp == null) {
+        this._nextTimestamp = this.state.timestamps[this.state.timestampCounter];
+      }
+      const passed = (new Date().getTime() - this._timeStarted.getTime());
+      if (passed > this._nextTimestamp) {
+        let index = this.state.timestampCounter;
+        let fn;
+        do {
+          if (this.state.timestamps.length >= index &&
+            passed > this.state.timestamps[index + 1]) {
+            index++;
+          } else {
+            fn = this.state.timestampFn.get(this.state.timestamps[index]);
+            this._nextTimestamp = this.state.timestamps[index + 1];
+            break;
+          }
+        } while (true)
+
+        fn(() => {
+          let newCounter = index
+          if (newCounter >= this.state.timestamps.length) {
+            if (this.props.textEndStop) {
+              this.props.goBack();
+              return;
+            }
+            if (this.props.textNextScene && this.props.playNextScene) {
+              this.props.playNextScene();
+              return;
+            }
+          }
+          this.setState({timestampCounter: newCounter});
+        });
+        if (index >= this.state.timestamps.length - 1) {
+          return;
+        }
+      }
+      this._timestampTimeout = setTimeout(this.timestampLoop.bind(this), 100);
     }
-    this._timestampTimeout = setTimeout(this.timestampLoop.bind(this), 100);
   }
 
   captionLoop() {

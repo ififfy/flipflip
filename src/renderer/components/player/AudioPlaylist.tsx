@@ -67,6 +67,7 @@ class AudioPlaylist extends React.Component {
     scenePaths?: Array<any>,
     goBack?(): void,
     orderAudioTags?(audio: Audio): void,
+    onPlaying?(position: number, duration: number): void,
     playTrack?(url: string): void,
     playNextScene?(): void,
     setCurrentAudio?(audio: Audio): void,
@@ -106,6 +107,7 @@ class AudioPlaylist extends React.Component {
             playTrack={this.props.playTrack}
             nextTrack={this.nextTrack.bind(this)}
             prevTrack={this.prevTrack.bind(this)}
+            onPlaying={this.props.onPlaying}
             onAudioSliderChange={this.onAudioSliderChange.bind(this)}
             goBack={this.props.goBack}
             playNextScene={this.props.playNextScene}/>

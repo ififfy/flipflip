@@ -50,6 +50,7 @@ export default class Player extends React.Component {
     playTrack?(url: string): void,
     changeAudioRoute?(aID: number): void,
     toggleTag?(sourceID: number, tag: Tag): void,
+    getCurrentTimestamp?(): number,
     onCaptionError?(e: string): void,
   };
 
@@ -484,6 +485,7 @@ export default class Player extends React.Component {
             goBack={this.props.goBack.bind(this)}
             playNextScene={this.props.nextScene}
             currentAudio={this.state.currentAudio}
+            getCurrentTimestamp={this.props.getCurrentTimestamp}
             timeToNextFrame={this.state.timeToNextFrame}
             currentImage={this.state.historyPaths.length > 0 ? this.state.historyPaths[this.state.historyPaths.length - 1] : null}
             jumpToHack={this.props.captionProgramJumpToHack}
@@ -627,6 +629,10 @@ export default class Player extends React.Component {
       newVolume = 100;
     }
     this.props.onUpdateScene(this.props.scene, (s) => s.videoVolume = newVolume);
+  }
+
+  getTimestamp() {
+    // TODO Implement this so you can sync with scene audio
   }
 
   setCurrentAudio(audio: Audio) {
