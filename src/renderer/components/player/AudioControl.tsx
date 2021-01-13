@@ -6,7 +6,9 @@ import Timeout = NodeJS.Timeout;
 import {Collapse, createStyles, Grid, IconButton, Slider, Theme, Tooltip, Typography, withStyles} from "@material-ui/core";
 
 import Forward10Icon from '@material-ui/icons/Forward10';
+import Forward5Icon from '@material-ui/icons/Forward5';
 import Replay10Icon from '@material-ui/icons/Replay10';
+import Replay5Icon from '@material-ui/icons/Replay5';
 import PauseIcon from '@material-ui/icons/Pause';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import SkipNextIcon from '@material-ui/icons/SkipNext';
@@ -14,7 +16,7 @@ import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
 import VolumeDownIcon from '@material-ui/icons/VolumeDown';
 import VolumeUpIcon from '@material-ui/icons/VolumeUp';
 
-import {getTimestamp} from "../../data/utils";
+import {getMsRemainder, getTimestamp} from "../../data/utils";
 import {RP, TF} from "../../data/const";
 import Audio from "../../data/Audio";
 import SoundTick from "./SoundTick";
@@ -43,6 +45,8 @@ class AudioControl extends React.Component {
     repeat: string,
     scenePaths: Array<any>,
     startPlaying: boolean,
+    shorterSeek?: boolean,
+    showMsTimestamp?: boolean,
     onAudioSliderChange(e: MouseEvent, value: number): void,
     nextTrack?(): void,
     prevTrack?(): void,
@@ -67,6 +71,13 @@ class AudioControl extends React.Component {
       : (Sound as any).status.PAUSED;
 
     const audioVolume = typeof audio.volume === 'number' ? audio.volume : 0;
+    let msRemainder = undefined;
+    if (this.props.showMsTimestamp) {
+      msRemainder = getMsRemainder(this.state.position);
+      if (msRemainder == ".000") {
+        msRemainder = undefined;
+      }
+    }
     return(
       <React.Fragment key={audio.id}>
         {this.props.audioEnabled && this.props.audio.tick && this.state.playing && (
@@ -107,6 +118,8 @@ class AudioControl extends React.Component {
                       </Grid>
                       <Grid item xs>
                         <Slider
+                          valueLabelDisplay={msRemainder ? "auto" : "off"}
+                          valueLabelFormat={msRemainder}
                           value={this.state.position}
                           max={this.state.duration}
                           onChange={this.onChangePosition.bind(this)}/>
@@ -130,7 +143,7 @@ class AudioControl extends React.Component {
                     <Tooltip title="Jump Back">
                       <IconButton
                         onClick={this.onBack.bind(this)}>
-                        <Replay10Icon />
+                        {this.props.shorterSeek ? <Replay5Icon /> : <Replay10Icon />}
                       </IconButton>
                     </Tooltip>
                     <Tooltip title={this.state.playing ? "Pause" : "Play"}>
@@ -142,7 +155,7 @@ class AudioControl extends React.Component {
                     <Tooltip title="Jump Forward">
                       <IconButton
                         onClick={this.onForward.bind(this)}>
-                        <Forward10Icon />
+                        {this.props.shorterSeek ? <Forward5Icon /> : <Forward10Icon />}
                       </IconButton>
                     </Tooltip>
                     {this.props.nextTrack && (
@@ -337,7 +350,8 @@ class AudioControl extends React.Component {
   }
 
   onBack() {
-    let position = this.state.position - 10000;
+    const amount = this.props.shorterSeek ? 5000 : 10000;
+    let position = this.state.position - amount;
     if (position < 0) {
       position = 0;
     }
@@ -345,7 +359,8 @@ class AudioControl extends React.Component {
   }
 
   onForward() {
-    let position = this.state.position + 10000;
+    const amount = this.props.shorterSeek ? 5000 : 10000;
+    let position = this.state.position + amount;
     if (position > this.state.duration) {
       position = this.state.duration;
     }

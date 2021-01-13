@@ -64,6 +64,8 @@ class AudioPlaylist extends React.Component {
     onAddTracks(playlistIndex: number): void,
     onSourceOptions(audio: Audio): void,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
+    shorterSeek?: boolean,
+    showMsTimestamp?: boolean,
     scenePaths?: Array<any>,
     goBack?(): void,
     orderAudioTags?(audio: Audio): void,
@@ -103,6 +105,8 @@ class AudioPlaylist extends React.Component {
             lastTrack={this.state.currentIndex == this.state.playingAudios.length - 1}
             repeat={this.props.playlist.repeat}
             scenePaths={this.props.scenePaths}
+            shorterSeek={this.props.shorterSeek}
+            showMsTimestamp={this.props.showMsTimestamp}
             startPlaying={this.props.startPlaying}
             playTrack={this.props.playTrack}
             nextTrack={this.nextTrack.bind(this)}

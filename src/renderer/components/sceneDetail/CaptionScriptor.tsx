@@ -26,7 +26,7 @@ import SaveIcon from '@material-ui/icons/Save';
 import SaveOutlinedIcon from '@material-ui/icons/SaveOutlined';
 
 import {MO} from "../../data/const";
-import captionProgramDefaults, {getMsTimestampValue, getTimingFromString} from "../../data/utils";
+import captionProgramDefaults, {getTimingFromString} from "../../data/utils";
 import Scene from "../../data/Scene";
 import Tag from "../../data/Tag";
 import Player from "../player/Player";
@@ -194,12 +194,12 @@ const stringSetters = ["setBlinkTF", "setBlinkDelayTF", "setBlinkGroupDelayTF", 
   "setCountTF", "setCountDelayTF", "setCountGroupDelayTF"];
 const storers = ["storephrase", "storePhrase"];
 const keywords = ["$RANDOM_PHRASE", "$TAG_PHRASE"];
+const timestampRegex = /^((\d?\d:)?\d?\d:\d\d(\.\d\d?\d?)?|\d?\d(\.\d\d?\d?)?)$/;
 
 (function(mod) {
   mod(require("codemirror/lib/codemirror"));
 })(function(CodeMirror: any) {
   CodeMirror.defineMode('flipflip', function() {
-    const timestampRegex = /^((\d?\d:)?\d?\d:\d\d(\.\d\d?\d?)?|\d?\d(\.\d\d?\d?)?)$/;
 
     let words: any = {};
     function define(style: any, dict: any) {
@@ -670,6 +670,8 @@ class CaptionScriptor extends React.Component {
                       <AudioCard
                         sidebar
                         startPlaying
+                        shorterSeek
+                        showMsTimestamp
                         scene={this.state.scene}
                         onPlaying={this.onPlaying.bind(this)}
                         onUpdateScene={this.onUpdateScene.bind(this)}/>
@@ -974,9 +976,10 @@ class CaptionScriptor extends React.Component {
   onGutterClick(editor: any, clickedLine: number) {
     let lineNum = clickedLine - 1;
     const lines = this.state.captionScript.split('\n');
-    for (let l=0; l < clickedLine; l++) {
+    for (let l = 0; l < clickedLine; l++) {
       const line = lines[l];
-      if (line.length == 0 || line[0] == '#' || line.toLowerCase().startsWith("storephrase ")) lineNum--;
+      if (line.trim().length == 0 || line[0] == '#' || line.toLowerCase().startsWith("storephrase ") ||
+        timestampRegex.exec(line.split(" ")[0]) != null) lineNum--;
     }
     lineNum = Math.max(lineNum, 0);
     this.state.captionProgramJumpToHack.args = [lineNum];

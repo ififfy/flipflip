@@ -154,22 +154,35 @@ export function getTimestamp(secs: number): string {
   }
 }
 
+export function getMsRemainder(sec: number): string {
+  if (isNaN(sec) || sec < 0) {
+    return null;
+  }
+
+  const ms = Math.round(sec * 1000);
+  let remainder = (Math.floor((ms % 1000) * 1000) / 1000).toString();
+  while (remainder.length < 3) {
+    remainder = "0" + remainder;
+  }
+  return "." + remainder;
+}
+
 export function getMsTimestampValue(value: string): number {
   const split = value.split(":");
   const splitInt = [];
-  let ms = null;
+  let milli = null;
   if (split.length > 3 || split.length == 0) return null;
   if (split[split.length - 1].includes(".")) {
     const splitMili = split[split.length - 1].split("\.");
     if (splitMili.length > 2) return null;
     split[split.length - 1] = splitMili[0];
-    ms = splitMili[1];
-    if (ms.length > 3) return null;
-    while (ms.length < 3) {
-      ms += "0";
+    milli = splitMili[1];
+    if (milli.length > 3) return null;
+    while (milli.length < 3) {
+      milli += "0";
     }
-    ms = parseInt(ms);
-    if (isNaN(ms)) return null;
+    milli = parseInt(milli);
+    if (isNaN(milli)) return null;
   }
   for (let n = 0; n < split.length; n++) {
     if (n != 0) {
@@ -180,19 +193,19 @@ export function getMsTimestampValue(value: string): number {
     splitInt.push(int);
   }
 
-  let int;
+  let ms;
   if (split.length == 3) {
-    int = (splitInt[0] * 60 * 60) + (splitInt[1] * 60) + splitInt[2];
+    ms = (splitInt[0] * 60 * 60) + (splitInt[1] * 60) + splitInt[2];
   } else if (split.length == 2) {
-    int = (splitInt[0] * 60) + splitInt[1];
+    ms = (splitInt[0] * 60) + splitInt[1];
   } else if (split.length == 1) {
-    int = splitInt[0];
+    ms = splitInt[0];
   }
-  int *= 1000;
-  if (ms != null) {
-    int += ms;
+  ms *= 1000;
+  if (milli != null) {
+    ms += milli;
   }
-  return int;
+  return ms;
 }
 
 export function getTimestampValue(value: string): number {

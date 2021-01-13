@@ -589,7 +589,10 @@ export default class CaptionProgram extends React.Component {
   }
 
   wait(ms: number) {
-    return (nextCommand: Function) => { this._timeout = setTimeout(nextCommand, ms)};
+    return (nextCommand: Function) => {
+      clearTimeout(this._timeout);
+      this._timeout = setTimeout(nextCommand, ms);
+    };
   }
 
   cap(value: string, timestamp = false) {

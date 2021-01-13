@@ -27,6 +27,8 @@ class AudioCard extends React.Component {
     startPlaying: boolean,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
     onAddTracks?(playlistIndex: number): void,
+    shorterSeek?: boolean,
+    showMsTimestamp?: boolean,
     scenePaths?: Array<any>,
     goBack?(): void,
     onPlaying?(position: number, duration: number): void,
@@ -78,6 +80,8 @@ class AudioCard extends React.Component {
                   playlist={playlist}
                   scene={this.props.scene}
                   scenePaths={this.props.scenePaths}
+                  shorterSeek={this.props.shorterSeek}
+                  showMsTimestamp={this.props.showMsTimestamp}
                   sidebar={this.props.sidebar}
                   startPlaying={this.props.startPlaying}
                   onAddTracks={this.props.onAddTracks}
