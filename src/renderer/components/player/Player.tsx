@@ -219,6 +219,13 @@ export default class Player extends React.Component {
 
     const captionScale = this.props.captionScale ? this.props.captionScale : 1;
 
+    let getCurrentTimestamp = undefined;
+    if (this.props.getCurrentTimestamp) {
+      getCurrentTimestamp = this.props.getCurrentTimestamp;
+    } else if (this.props.scene && this.props.scene.audioEnabled) {
+      getCurrentTimestamp = this.getTimestamp.bind(this);
+    }
+
     return (
       <div style={rootStyle}>
         {showStrobe && (
@@ -342,6 +349,7 @@ export default class Player extends React.Component {
             play={this.play.bind(this)}
             pause={this.pause.bind(this)}
             playTrack={this.props.playTrack}
+            onPlaying={!this.props.scene.textEnabled || !this.state.currentAudio || this.props.getCurrentTimestamp ? undefined : this.onPlaying.bind(this)}
             setCurrentAudio={this.setCurrentAudio.bind(this)}
             allTags={this.props.allTags}
             tags={this.props.tags}
@@ -485,7 +493,7 @@ export default class Player extends React.Component {
             goBack={this.props.goBack.bind(this)}
             playNextScene={this.props.nextScene}
             currentAudio={this.state.currentAudio}
-            getCurrentTimestamp={this.props.getCurrentTimestamp}
+            getCurrentTimestamp={getCurrentTimestamp}
             timeToNextFrame={this.state.timeToNextFrame}
             currentImage={this.state.historyPaths.length > 0 ? this.state.historyPaths[this.state.historyPaths.length - 1] : null}
             jumpToHack={this.props.captionProgramJumpToHack}
@@ -631,8 +639,12 @@ export default class Player extends React.Component {
     this.props.onUpdateScene(this.props.scene, (s) => s.videoVolume = newVolume);
   }
 
+  _currentTimestamp: number = null;
+  onPlaying(position: number, duration: number) {
+    this._currentTimestamp = position;
+  }
   getTimestamp() {
-    // TODO Implement this so you can sync with scene audio
+    return this._currentTimestamp;
   }
 
   setCurrentAudio(audio: Audio) {

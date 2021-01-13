@@ -248,6 +248,7 @@ class PlayerBars extends React.Component {
     goToTagSource?(source: LibrarySource): void,
     goToClipSource?(source: LibrarySource): void,
     playTrack?(url: string): void,
+    onPlaying?(position: number, duration: number): void,
     toggleTag?(sourceID: number, tag: Tag): void,
   };
 
@@ -517,6 +518,7 @@ class PlayerBars extends React.Component {
                     onUpdateScene={this.props.onUpdateScene.bind(this)}
                     goBack={this.props.goBack.bind(this)}
                     orderAudioTags={this.orderAudioTags.bind(this)}
+                    onPlaying={this.props.onPlaying}
                     playTrack={this.props.playTrack}
                     playNextScene={this.props.playNextScene}
                     setCurrentAudio={this.props.setCurrentAudio.bind(this)}/>
