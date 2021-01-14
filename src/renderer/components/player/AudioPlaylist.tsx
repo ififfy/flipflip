@@ -86,6 +86,7 @@ class AudioPlaylist extends React.Component {
     if (this.props.startPlaying) {
       let audio = this.state.playingAudios[this.state.currentIndex];
       if (!audio) audio = this.props.playlist.audios[this.state.currentIndex];
+      if (!audio) return <div/>;
       return (
         <React.Fragment>
           <ListItem disableGutters>

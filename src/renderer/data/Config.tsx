@@ -308,6 +308,7 @@ export class SceneSettings implements SceneSettingsI {
   forceAll = false;
   forceAllSource = false;
   fullSource = false;
+  regenerate = true;
 
   zoom = false;
   zoomStart = 1;

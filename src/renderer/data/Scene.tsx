@@ -207,6 +207,7 @@ export default class Scene {
   audioEnabled = false;
   audioPlaylists: Array<{audios: Array<Audio>, shuffle: boolean, repeat: string}> = [];
   audioStartIndex = 0;
+  regenerate = true;
   generatorWeights?: Array<WeightGroup> = null;
   openTab = 3;
 

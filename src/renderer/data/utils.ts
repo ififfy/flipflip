@@ -7,11 +7,13 @@ import * as easings from 'd3-ease';
 import crypto from "crypto";
 import {readFileSync} from "fs";
 
-import {EA, ST, TF} from "./const";
+import {EA, ST, TF, TT} from "./const";
 import en from "./en";
 import Config from "./Config";
 import LibrarySource from "./LibrarySource";
 import Audio from "./Audio";
+import WeightGroup from "./WeightGroup";
+import Scene from "./Scene";
 
 export const saveDir = path.join(remote.app.getPath('appData'), 'flipflip');
 export const savePath = path.join(saveDir, 'data.json');
@@ -739,6 +741,43 @@ export function isImage(path: string, strict: boolean): boolean {
     }
   }
   return false;
+}
+
+function areRulesValid(wg: WeightGroup) {
+  let rulesHasAll = false;
+  let rulesHasWeight = false;
+  let rulesRemaining = 100;
+  for (let rule of wg.rules) {
+    if (rule.type == TT.weight) {
+      rulesRemaining = rulesRemaining - rule.percent;
+      rulesHasWeight = true;
+    }
+    if (rule.type == TT.all) {
+      rulesHasAll = true;
+    }
+  }
+  return (rulesRemaining == 100 && rulesHasAll && !rulesHasWeight) || rulesRemaining == 0;
+}
+
+export function areWeightsValid(scene: Scene): boolean {
+  let remaining = 100;
+  let hasAll = false;
+  let hasWeight = false;
+  for (let wg of scene.generatorWeights) {
+    if (wg.rules) {
+      const rulesValid = areRulesValid(wg);
+      if (!rulesValid) return false;
+    }
+    if (wg.type == TT.weight) {
+      remaining = remaining - wg.percent;
+      hasWeight = true;
+    }
+    if (wg.type == TT.all) {
+      hasAll = true;
+    }
+  }
+
+  return (remaining == 100 && hasAll && !hasWeight) || remaining == 0;
 }
 
 let captionProgramDefaults = {

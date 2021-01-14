@@ -42,6 +42,7 @@ import Scene from "../../data/Scene";
 import ColorPicker from "../config/ColorPicker";
 import ColorSetPicker from "../config/ColorSetPicker";
 import MultiSceneSelect from "./MultiSceneSelect";
+import {areWeightsValid} from "../../data/utils";
 
 const styles = (theme: Theme) => createStyles({
   fullWidth: {
@@ -432,13 +433,16 @@ class SceneOptionCard extends React.Component {
             </Grid>
             {this.props.scene.overlays.map((o) => {
                 const overlayOpacity = typeof o.opacity === 'number' ? o.opacity : 0;
+                const oScene = this.props.allScenes.find((s) => s.id == o.sceneID);
+                const regenerate = oScene && oScene.generatorWeights && oScene.regenerate;
+                const invalid = regenerate && !areWeightsValid(oScene);
                 return (
                   <React.Fragment key={o.id}>
                     <Grid item xs={12} className={clsx(!this.props.scene.overlayEnabled && classes.noPadding)}>
                       <Collapse in={this.props.scene.overlayEnabled} className={classes.fullWidth}>
                         <Grid container spacing={2} alignItems="center">
                           <Grid item xs={12} sm={this.props.sidebar ? 12 : 5}>
-                            <Typography className={classes.selectText} variant="caption">Overlay</Typography>
+                            <Typography className={classes.selectText} variant="caption">Overlay{regenerate ? invalid ? " ✗" : " ⟳" : ""}</Typography>
                             <SceneSelect
                               scene={this.props.scene}
                               allScenes={this.props.allScenes}

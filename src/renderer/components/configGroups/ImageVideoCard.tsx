@@ -75,6 +75,18 @@ class ImageVideoCard extends React.Component {
       <Grid container alignItems="center">
         {!this.props.isPlayer && (
           <Grid container spacing={2} alignItems="center" className={clsx(classes.gutterBottom, this.props.tutorial == SDT.imageOptions && classes.highlight)}>
+            {this.props.scene.generatorWeights != null && (
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={
+                    <Tooltip title={"When enabled, this scene will be automatically regenerated with each playback (even if used as an overlay for another scene)"}>
+                      <Switch checked={this.props.scene.regenerate}
+                              onChange={this.onBoolInput.bind(this, 'regenerate')}/>
+                    </Tooltip>
+                  }
+                  label="Re-Generate on Playback"/>
+              </Grid>
+            )}
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
               <FormControl className={classes.fullWidth}>
                 <InputLabel>Image Filter</InputLabel>

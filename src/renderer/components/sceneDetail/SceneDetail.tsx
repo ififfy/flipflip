@@ -47,6 +47,7 @@ import URLDialog from "./URLDialog";
 import LibrarySearch from "../library/LibrarySearch";
 import SourceList from "../library/SourceList";
 import AudioTextEffects from "./AudioTextEffects";
+import {areWeightsValid} from "../../data/utils";
 
 const drawerWidth = 240;
 
@@ -843,16 +844,17 @@ class SceneDetail extends React.Component {
               </Fab>
             </Tooltip>
             <Tooltip title="Generate Sources" placement="top-end">
-              <span className={clsx(classes.generateTooltip, this.props.tutorial == SDGT.buttons && clsx(classes.backdropTop, classes.disable), this.props.tutorial == SDGT.generate && classes.backdropTop)} style={!this.areWeightsValid() ? { pointerEvents: "none" } : {}}>
+              <span className={clsx(classes.generateTooltip, this.props.tutorial == SDGT.buttons && clsx(classes.backdropTop, classes.disable), this.props.tutorial == SDGT.generate && classes.backdropTop)}
+                    style={!areWeightsValid(this.props.scene) ? { pointerEvents: "none" } : {}}>
                 <Fab
-                  disabled={!this.areWeightsValid()}
+                  disabled={!areWeightsValid(this.props.scene)}
                   className={clsx(classes.addMenuButton, this.props.tutorial == SDGT.generate && classes.highlight)}
                   onClick={this.onGenerate.bind(this)}
                   size="large">
                   <Badge
                     color="secondary"
                     max={100}
-                    invisible={this.areWeightsValid()}
+                    invisible={areWeightsValid(this.props.scene)}
                     badgeContent={this.getRemainingPercent()}>
                     <CachedIcon className={classes.icon} />
                   </Badge>
@@ -947,6 +949,20 @@ class SceneDetail extends React.Component {
     if (this.props.tutorial == SDT.play) {
       this.props.onTutorial(SDT.play);
     }
+
+    // Regenerate scene(s) before playback
+    if (this.props.scene.regenerate && areWeightsValid(this.props.scene)) {
+      this.props.onGenerate(this.props.scene);
+    }
+    if (this.props.scene.overlayEnabled) {
+      for (let overlay of this.props.scene.overlays) {
+        const oScene = this.props.allScenes.find((s) => s.id == overlay.sceneID);
+        if (oScene && oScene.generatorWeights && oScene.regenerate && areWeightsValid(oScene)) {
+          this.props.onGenerate(oScene);
+        }
+      }
+    }
+
     this.props.onPlayScene(this.props.scene);
   }
 
@@ -958,43 +974,6 @@ class SceneDetail extends React.Component {
       }
     }
     return remaining;
-  }
-
-  areRulesValid(wg: WeightGroup) {
-    let rulesHasAll = false;
-    let rulesHasWeight = false;
-    let rulesRemaining = 100;
-    for (let rule of wg.rules) {
-      if (rule.type == TT.weight) {
-        rulesRemaining = rulesRemaining - rule.percent;
-        rulesHasWeight = true;
-      }
-      if (rule.type == TT.all) {
-        rulesHasAll = true;
-      }
-    }
-    return (rulesRemaining == 100 && rulesHasAll && !rulesHasWeight) || rulesRemaining == 0;
-  }
-
-  areWeightsValid(): boolean {
-    let remaining = 100;
-    let hasAll = false;
-    let hasWeight = false;
-    for (let wg of this.props.scene.generatorWeights) {
-      if (wg.rules) {
-        const rulesValid = this.areRulesValid(wg);
-        if (!rulesValid) return false;
-      }
-      if (wg.type == TT.weight) {
-        remaining = remaining - wg.percent;
-        hasWeight = true;
-      }
-      if (wg.type == TT.all) {
-        hasAll = true;
-      }
-    }
-
-    return (remaining == 100 && hasAll && !hasWeight) || remaining == 0;
   }
 
   onGenerate() {
