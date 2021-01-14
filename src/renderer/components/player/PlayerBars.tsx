@@ -922,7 +922,7 @@ class PlayerBars extends React.Component {
       keyMap.set('onDelete', ['Delete Image', 'Delete']);
     }
 
-    if (!this.props.scene.audioScene && this.props.tags != null) {
+    if (!this.props.scene.audioScene && !this.props.scene.scriptScene && this.props.tags != null) {
       keyMap.set('prevSource', ['Previous Source', '[']);
       keyMap.set('nextSource', ['Next Source', ']']);
     }
@@ -988,19 +988,15 @@ class PlayerBars extends React.Component {
         }
         break;
       case '[':
-        if (!this.props.scene.audioScene && this.props.tags != null) {
+        if (!this.props.scene.audioScene && !this.props.scene.scriptScene && this.props.tags != null) {
           e.preventDefault();
-          if (!this.props.scene.audioScene) {
-            this.prevSource();
-          }
+          this.prevSource();
         }
         break;
       case ']':
-        if (!this.props.scene.audioScene && this.props.tags != null) {
+        if (!this.props.scene.audioScene && !this.props.scene.scriptScene && this.props.tags != null) {
           e.preventDefault();
-          if (!this.props.scene.audioScene) {
-            this.nextSource();
-          }
+          this.nextSource();
         }
         break;
     }

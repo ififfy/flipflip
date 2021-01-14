@@ -12,6 +12,7 @@ import Scene from './Scene';
 import SceneGrid from "./SceneGrid";
 import defaultTheme from "./theme";
 import Playlist from "./Playlist";
+import CaptionScript from "./CaptionScript";
 
 /**
  * A compile-time global variable defined in webpack.config' [plugins]
@@ -26,6 +27,7 @@ export const defaultInitialState = {
   grids: Array<SceneGrid>(),
   library: Array<LibrarySource>(),
   audios: Array<Audio>(),
+  scripts: Array<CaptionScript>(),
   playlists: Array<Playlist>(),
   tags: Array<Tag>(),
   route: Array<Route>(),
@@ -39,6 +41,9 @@ export const defaultInitialState = {
   audioYOffset: 0,
   audioFilters: Array<string>(),
   audioSelected: Array<string>(),
+  scriptsYOffset: 0,
+  scriptsFilters: Array<string>(),
+  scriptsSelected: Array<string>(),
   progressMode: null as string,
   progressTitle: null as string,
   progressCurrent: 0,
@@ -100,6 +105,7 @@ export default class AppStorage {
             scenes: Array<Scene>(),
             grids: Array<SceneGrid>(),
             audios: Array<Audio>(),
+            scripts: Array<CaptionScript>(),
             playlists: Array<Playlist>(),
             library: Array<LibrarySource>(),
             tags: Array<Tag>(),
@@ -111,6 +117,9 @@ export default class AppStorage {
             audioYOffset: 0,
             audioFilters: Array<string>(),
             audioSelected: Array<string>(),
+            scriptsYOffset: 0,
+            scriptsFilters: Array<string>(),
+            scriptsSelected: Array<string>(),
             progressMode: null as string,
             progressTitle: null as string,
             progressCurrent: 0,
@@ -171,6 +180,7 @@ export default class AppStorage {
             scenes: data.scenes.map((s: any) => new Scene(s)),
             grids: Array<SceneGrid>(),
             audios: Array<Audio>(),
+            scripts: Array<CaptionScript>(),
             playlists: Array<Playlist>(),
             library: data.library.map((s: any) => new LibrarySource(s)),
             tags: data.tags.map((t: any) => new Tag(t)),
@@ -182,6 +192,9 @@ export default class AppStorage {
             audioYOffset: 0,
             audioFilters: Array<string>(),
             audioSelected: Array<string>(),
+            scriptsYOffset: 0,
+            scriptsFilters: Array<string>(),
+            scriptsSelected: Array<string>(),
             progressMode: null as string,
             progressTitle: null as string,
             progressCurrent: 0,
@@ -332,6 +345,7 @@ export default class AppStorage {
             scenes: data.scenes.map((s: any) => new Scene(s)),
             grids: data.grids.map((g: any) => new SceneGrid(g)),
             audios: data.audios ? data.audios.map((a: any) => new Audio(a)) : [],
+            scripts: data.scripts ? data.scripts.map((s: any) => new CaptionScript(s)) : [],
             playlists: data.playlists ? data.playlists.map((p: any) => new Playlist(p)) : [],
             library: data.library.map((s: any) => new LibrarySource(s)),
             tags: data.tags.map((t: any) => new Tag(t)),
@@ -343,6 +357,9 @@ export default class AppStorage {
             audioYOffset: 0,
             audioFilters: Array<string>(),
             audioSelected: Array<string>(),
+            scriptsYOffset: 0,
+            scriptsFilters: Array<string>(),
+            scriptsSelected: Array<string>(),
             progressMode: null as string,
             progressTitle: null as string,
             progressCurrent: 0,

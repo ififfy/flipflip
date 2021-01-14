@@ -480,7 +480,7 @@ export default class CaptionProgram extends React.Component {
       for (let fn of fns) {
         fn(() => {
           let newCounter = index
-          if (newCounter >= this.state.timestamps.length) {
+          if (newCounter >= this.state.timestamps.length - 1) {
             if (this.props.textEndStop) {
               this.props.goBack();
               return;

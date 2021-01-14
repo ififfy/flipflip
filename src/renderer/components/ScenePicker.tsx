@@ -18,6 +18,7 @@ import CodeIcon from '@material-ui/icons/Code';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import GridOnIcon from '@material-ui/icons/GridOn';
 import HelpIcon from '@material-ui/icons/Help';
+import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import LibraryMusicIcon from '@material-ui/icons/LibraryMusic';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import MenuIcon from '@material-ui/icons/Menu';
@@ -333,6 +334,7 @@ class ScenePicker extends React.Component {
     config: Config,
     grids: Array<SceneGrid>,
     audioLibraryCount: number,
+    scriptLibraryCount: number,
     libraryCount: number,
     openTab: number,
     scenes: Array<Scene>,
@@ -345,6 +347,7 @@ class ScenePicker extends React.Component {
     onImportScene(addToLibrary: boolean): void,
     onOpenConfig(): void,
     onOpenAudioLibrary(): void,
+    onOpenScriptLibrary(): void,
     onOpenCaptionScriptor(): void,
     onOpenLibrary(): void,
     onOpenScene(scene: Scene): void,
@@ -483,6 +486,22 @@ class ScenePicker extends React.Component {
                       <Chip
                         className={clsx(classes.chip, !open && classes.chipClose)}
                         label={this.props.audioLibraryCount}
+                        color='primary'
+                        size='small'
+                        variant='outlined'/>
+                    )}
+                  </ListItem>
+                </Tooltip>
+                <Tooltip title={this.state.drawerOpen ? "" : "Script Library"}>
+                  <ListItem button onClick={this.props.onOpenScriptLibrary.bind(this)}>
+                    <ListItemIcon>
+                      <LibraryBooksIcon/>
+                    </ListItemIcon>
+                    <ListItemText primary="Script Library" />
+                    {this.props.scriptLibraryCount > 0 && (
+                      <Chip
+                        className={clsx(classes.chip, !open && classes.chipClose)}
+                        label={this.props.scriptLibraryCount}
                         color='primary'
                         size='small'
                         variant='outlined'/>

@@ -23,6 +23,7 @@ import GridPlayer from "./player/GridPlayer";
 import Tutorial from "./Tutorial";
 import AudioLibrary from "./library/AudioLibrary";
 import CaptionScriptor from "./sceneDetail/CaptionScriptor";
+import ScriptLibrary from "./library/ScriptLibrary";
 
 const appStorage = new AppStorage(remote.getCurrentWindow().id);
 
@@ -97,6 +98,7 @@ export default class Meta extends React.Component {
               config={this.state.config}
               grids={this.state.grids}
               audioLibraryCount={this.state.audios.length}
+              scriptLibraryCount={this.state.scripts.length}
               libraryCount={this.state.library.length}
               openTab={this.state.openTab}
               scenes={this.state.scenes}
@@ -109,6 +111,7 @@ export default class Meta extends React.Component {
               onImportScene={a(actions.importScene)}
               onOpenConfig={a(actions.openConfig)}
               onOpenAudioLibrary={a(actions.openAudios)}
+              onOpenScriptLibrary={a(actions.openScripts)}
               onOpenCaptionScriptor={a(actions.openScriptor)}
               onOpenLibrary={a(actions.openLibrary)}
               onOpenScene={a(actions.goToScene)}
@@ -223,6 +226,30 @@ export default class Meta extends React.Component {
             />
           )}
 
+          {this.isRoute('scripts') && (
+            <ScriptLibrary
+              allScenes={this.state.scenes}
+              filters={this.state.scriptsFilters}
+              library={this.state.scripts}
+              selected={this.state.scriptsSelected}
+              specialMode={this.state.specialMode}
+              tags={this.state.tags}
+              tutorial={this.state.tutorial}
+              yOffset={this.state.scriptsYOffset}
+              goBack={a(actions.goBack)}
+              onBatchTag={a(actions.batchTag)}
+              onImportFromLibrary={a(actions.importScriptFromLibrary)}
+              onManageTags={a(actions.manageTags)}
+              onPlay={a(actions.playScript)}
+              onSort={a(actions.sortScripts)}
+              onTutorial={a(actions.doneTutorial)}
+              onUpdateLibrary={a(actions.updateScriptLibrary)}
+              onUpdateMode={a(actions.setMode)}
+              savePosition={a(actions.saveAudioPosition)}
+              systemMessage={a(actions.systemMessage)}
+            />
+          )}
+
           {this.isRoute('tags') && (
             <TagManager
               tags={this.state.tags}
@@ -296,12 +323,12 @@ export default class Meta extends React.Component {
               onUpdateScene={a(actions.updateScene)}
               goBack={a(actions.endPlaySceneFromLibrary)}
               playTrack={a(actions.playTrack)}
-              tags={scene.audioScene ? actions.getAudioSource(this.state)?.tags : actions.getLibrarySource(this.state)?.tags}
+              tags={scene.audioScene ? actions.getAudioSource(this.state)?.tags : scene.scriptScene ? actions.getScriptSource(this.state)?.tags : actions.getLibrarySource(this.state)?.tags}
               allTags={this.state.tags}
-              toggleTag={scene.audioScene ? a(actions.toggleAudioTag) : a(actions.toggleTag)}
+              toggleTag={scene.audioScene ? a(actions.toggleAudioTag) : scene.scriptScene ? a(actions.toggleScriptTag) : a(actions.toggleTag)}
               navigateTagging={a(actions.navigateDisplayedLibrary)}
               getTags={actions.getTags.bind(this, this.state.library)}
-              changeAudioRoute={a(actions.changeAudioRoute)}
+              changeAudioRoute={scene.audioScene ? a(actions.changeAudioRoute) : undefined}
               setCount={a(actions.setCount)}
               cache={a(actions.cacheImage)}
               goToClipSource={a(actions.clipVideo)}

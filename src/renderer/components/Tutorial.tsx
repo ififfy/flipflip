@@ -21,7 +21,7 @@ import HttpIcon from '@material-ui/icons/Http';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import MovieIcon from '@material-ui/icons/Movie';
 
-import {ALT, CST, DONE, LT, PT, SDGT, SDT, SGT, SPT, TF, VCT} from "../data/const";
+import {ALT, CST, DONE, LT, PT, SDGT, SDT, SGT, SLT, SPT, TF, VCT} from "../data/const";
 import {Route} from "../data/Route";
 import Config from "../data/Config";
 import Scene from "../data/Scene";
@@ -1182,6 +1182,115 @@ class Tutorial extends React.Component {
           </React.Fragment>;
         break;
 
+      case SLT.welcome:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Script Library</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                This is your <b>Script Library</b>. Similar to the Source Library, here you can <b>organize</b> all
+                your different caption scripts and use them <b>with your Scenes</b>.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onSkip.bind(this)} color="secondary">
+                Skip Tutorial
+              </Button>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case SLT.library:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Script Library</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                To get started, click the + icon and <b>add scripts</b> from your computer or from an online URL.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                Just like the Source Library, click a track's <b>Avatar</b> to play it and apply tags.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case SLT.toolbar:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Script Library</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                Use the <b>search bar</b> in the top right to <b>filter the scripts</b> you are viewing. By default, a
+                text search will <b>return matches</b> from a track's <b>url</b>.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case SLT.sidebar1:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Script Library</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                The sidebar has some other helpful tools.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                <b>Click the Hamburger button to expand the sidebar</b>
+              </DialogContentText>
+            </DialogContent>
+          </React.Fragment>;
+        break;
+      case SLT.sidebar2:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Script Library</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                From here we can also <b>manage tags</b> and <b>batch tag tracks</b>.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case SLT.final:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Script Library</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                That's about it for the <b>Script Library</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                You can easily get your Library started by adding some <b>local scripts</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                After you've <b>added a few tags</b>, you can <b>tag scripts by clicking their Avatar</b>.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Back to Script Library
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+
 
     case CST.welcome:
       dialogBody =
@@ -1791,6 +1900,31 @@ class Tutorial extends React.Component {
             return;
           case ALT.final:
           case ALT.done:
+            // We're done, don't show
+            this.setTutorial(null);
+            return;
+          default:
+            return;
+        }
+      case "scripts":
+        switch (this.props.config.tutorials.scripts) {
+          case SLT.welcome:
+            this.setTutorial(SLT.library);
+            return;
+          case SLT.library:
+            this.setTutorial(SLT.toolbar);
+            return;
+          case SLT.toolbar:
+            this.setTutorial(SLT.sidebar1);
+            return;
+          case SLT.sidebar1:
+            this.setTutorial(SLT.sidebar2);
+            return;
+          case SLT.sidebar2:
+            this.setTutorial(SLT.final);
+            return;
+          case SLT.final:
+          case SLT.done:
             // We're done, don't show
             this.setTutorial(null);
             return;

@@ -161,6 +161,7 @@ export default class Scene {
   playVideoClips = true;
   skipVideoStart = 0;
   skipVideoEnd = 0;
+  scriptScene = false;
   textEnabled = false;
   textSource: string = "";
   textEndStop = false;

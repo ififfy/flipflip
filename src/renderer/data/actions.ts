@@ -44,6 +44,7 @@ import {
   SF,
   SGT,
   SL,
+  SLT,
   SOF,
   SP,
   SPT,
@@ -65,6 +66,7 @@ import Overlay from "../data/Overlay";
 import Tag from "../data/Tag";
 import SceneGrid from "./SceneGrid";
 import Playlist from "./Playlist";
+import CaptionScript from "./CaptionScript";
 
 type State = typeof defaultInitialState;
 
@@ -115,7 +117,14 @@ export function getLibrarySource(state: State): LibrarySource | null {
 export function getAudioSource(state: State): Audio | null {
   const activeScene = getActiveScene(state);
   if (activeScene == null) return null;
-  return state.audios.find((s) => s.id == activeScene.libraryID);
+  return state.audios.find((a) => a.id == activeScene.libraryID);
+}
+
+// Returns the active script source, or null if the current route isn't a script source
+export function getScriptSource(state: State): CaptionScript | null {
+  const activeScene = getActiveScene(state);
+  if (activeScene == null) return null;
+  return state.scripts.find((s) => s.id == activeScene.libraryID);
 }
 
 export function changeAudioRoute(state: State, aID: number): Object {
@@ -158,6 +167,7 @@ export function restoreFromBackup(state: State, backupFile: string): Object {
     scenes: data.scenes.map((s: any) => new Scene(s)),
     grids: data.grids ? data.grids.map((g: any) => new SceneGrid(g)) : Array<SceneGrid>(),
     audios: data.audios ? data.audios.map((a: any) => new Audio(a)) : Array <Audio>(),
+    scripts: data.scripts ? data.scripts.map((a: any) => new CaptionScript(a)) : Array <CaptionScript>(),
     playlists: data.playlists ? data.playlists.map((p: any) => new Playlist(p)) : Array <Playlist>(),
     library: data.library.map((s: any) => new LibrarySource(s)),
     tags: data.tags.map((t: any) => new Tag(t)),
@@ -169,6 +179,9 @@ export function restoreFromBackup(state: State, backupFile: string): Object {
     audioYOffset: 0,
     audioFilters: Array<string>(),
     audioSelected: Array<string>(),
+    scriptsYOffset: 0,
+    scriptsFilters: Array<string>(),
+    scriptsSelected: Array<string>(),
     progressMode: null as string,
     progressTitle: null as string,
     progressCurrent: 0,
@@ -289,6 +302,13 @@ export function doneTutorial(state: State, tutorial: string): Object {
       state.config.tutorials.audios = DONE;
     } else {
       state.config.tutorials.audios = tutorial;
+    }
+  } else if (isRoute(state, 'scripts')) {
+    if (tutorial == SLT.final) {
+      newTutorial = null;
+      state.config.tutorials.scripts = DONE;
+    } else {
+      state.config.tutorials.scripts = tutorial;
     }
   } else if (isRoute(state, 'scriptor')) {
     if (tutorial == CST.final) {
@@ -615,6 +635,10 @@ export function openAudios(state: State): Object {
   return {route: [new Route({kind: 'audios', value: null})], tutorial: state.config.tutorials.audios == null ? ALT.welcome : null};
 }
 
+export function openScripts(state: State): Object {
+  return {route: [new Route({kind: 'scripts', value: null})], tutorial: state.config.tutorials.scripts == null ? SLT.welcome : null};
+}
+
 export function openScriptor(state: State): Object {
   return {route: [new Route({kind: 'scriptor', value: null})], tutorial: state.config.tutorials.scriptor == null ? CST.welcome : null};
 }
@@ -626,6 +650,13 @@ export function openLibraryImport(state: State): Object {
 export function importAudioFromLibrary(state: State, sources: Array<Audio>): Object {
   const playlistIndex = state.route[state.route.length - 1].value;
   return {...updateScene(state, getActiveScene(state), (s: Scene) => {s.audioPlaylists[playlistIndex].audios = s.audioPlaylists[playlistIndex].audios.concat(sources)}), ...goBack(state)};
+}
+
+export function importScriptFromLibrary(state: State, sources: Array<CaptionScript>): Object {
+  // TODO
+  //const playlistIndex = state.route[state.route.length - 1].value;
+  //return {...updateScene(state, getActiveScene(state), (s: Scene) => {s.audioPlaylists[playlistIndex].audios = s.audioPlaylists[playlistIndex].audios.concat(sources)}), ...goBack(state)};
+  return {};
 }
 
 export function importFromLibrary(state: State, sources: Array<LibrarySource>): Object {
@@ -718,6 +749,28 @@ export function playAudio(state: State, source: Audio, displayed: Array<Audio>):
     panVertTransRandom: true,
     imageType: IT.centerNoClip,
   });
+  return {
+    scenes: state.scenes.concat([tempScene]),
+    route: state.route.concat([new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'libraryplay', value: tempScene.id})]),
+  };
+}
+
+export function playScript(state: State, source: CaptionScript, sceneID: number, displayed: Array<CaptionScript>): Object {
+  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, "\\");
+  let librarySource = state.scripts.find((s) => s.url == sourceURL);
+  if (librarySource == null) {
+    throw new Error("Script not found in Library");
+  }
+  let id = state.scenes.length + 1;
+  state.scenes.forEach((s: Scene) => {
+    id = Math.max(s.id + 1, id);
+  });
+  const tempScene = JSON.parse(JSON.stringify(state.scenes.find((s) => s.id == sceneID)));
+  tempScene.id = id;
+  tempScene.libraryID = librarySource.id;
+  tempScene.scriptScene = true;
+  tempScene.textEnabled = true;
+  tempScene.textSource = source.url;
   return {
     scenes: state.scenes.concat([tempScene]),
     route: state.route.concat([new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'libraryplay', value: tempScene.id})]),
@@ -1665,6 +1718,12 @@ export function updateAudioLibrary(state: State, fn: (audios: Array<Audio>) => v
   return {audios: audiosCopy};
 }
 
+export function updateScriptLibrary(state: State, fn: (scripts: Array<CaptionScript>) => void): Object {
+  const scriptsCopy = JSON.parse(JSON.stringify(state.scripts));
+  fn(scriptsCopy);
+  return {scripts: scriptsCopy};
+}
+
 export function updateLibrary(state: State, fn: (library: Array<LibrarySource>) => void): Object {
   const libraryCopy = JSON.parse(JSON.stringify(state.library));
   fn(libraryCopy);
@@ -1935,6 +1994,19 @@ export function toggleAudioTag(state: State, sourceID: number, tag: Tag): Object
     }
   }
   return {audios: newAudios};
+}
+
+export function toggleScriptTag(state: State, sourceID: number, tag: Tag): Object {
+  const newScripts = state.scripts;
+  const source = newScripts.find((s) => s.id == sourceID);
+  if (source) {
+    if (source.tags.find((t: Tag) => t.name == tag.name)) {
+      source.tags = source.tags.filter((t: Tag) => t.name != tag.name);
+    } else {
+      source.tags.push(tag);
+    }
+  }
+  return {scripts: newScripts};
 }
 
 export function toggleTag(state: State, sourceID: number, tag: Tag): Object {
@@ -2258,6 +2330,41 @@ function audioSortFunction(algorithm: string, ascending: boolean): (a: Audio, b:
       } else {
         return 0;
       }
+    }
+  }
+}
+
+export function sortScripts(state: State, algorithm: string, ascending: boolean): Object {
+  const newLibrary = state.scripts.concat().sort(scriptSortFunction(algorithm, ascending));
+  return {scripts: newLibrary};
+}
+
+function scriptSortFunction(algorithm: string, ascending: boolean): (a: CaptionScript, b: CaptionScript) => number {
+  return (a, b) => {
+    let aValue: any, bValue: any;
+    switch (algorithm) {
+      case SF.alpha:
+        aValue = getFileName(a.url).toLowerCase();
+        bValue = getFileName(b.url).toLowerCase();
+        break;
+      case SF.alphaFull:
+        aValue = a.url.toLowerCase();
+        bValue = b.url.toLowerCase();
+        break;
+      case SF.date:
+        aValue = a.id;
+        bValue = b.id;
+        break;
+      default:
+        aValue = "";
+        bValue = "";
+    }
+    if (aValue < bValue) {
+      return ascending ? -1 : 1;
+    } else if (aValue > bValue) {
+      return ascending ? 1 : -1;
+    } else {
+      return 0;
     }
   }
 }

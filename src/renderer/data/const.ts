@@ -156,6 +156,7 @@ const AF = { // add functions
   videos: 'af.videos',
   library: 'af.library',
   audios: 'af.audio',
+  script: 'af.script',
 };
 
 const IPC = {
@@ -302,6 +303,16 @@ const ALT = { // Audio Library Tutorials
   done: DONE,
 };
 
+const SLT = { // Script Library Tutorials
+  welcome: 'slt1',
+  library: 'slt2',
+  toolbar: 'slt3',
+  sidebar1: 'slt4',
+  sidebar2: 'slt5',
+  final: 'slt6',
+  done: DONE,
+};
+
 const CST = { // Caption Scriptor Tutorials
   welcome: 'cst1',
   final: 'cst2',
@@ -378,5 +389,5 @@ const WC = { // Watermark corner
 }
 
 export {
-  AF, ALT, ASF, BT, CST, DONE, EA, GO, GT, HTF, IF, IG, IPC, IT, LT, MO, OF, PR, PT, RF, RP, RT, SB, SC, SDGT, SDT, SF, SGT, SL, SOF,SP, SPT, ST, TF, TT, VCT, VO, VTF, WC, WF
+  AF, ALT, ASF, BT, CST, DONE, EA, GO, GT, HTF, IF, IG, IPC, IT, LT, MO, OF, PR, PT, RF, RP, RT, SB, SC, SDGT, SDT, SF, SGT, SL, SLT, SOF, SP, SPT, ST, TF, TT, VCT, VO, VTF, WC, WF
 };
