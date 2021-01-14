@@ -315,19 +315,6 @@ class AudioSourceListItem extends React.Component {
     }
   }
 
-  onEditSource(e: MouseEvent) {
-    const input = (e.target as HTMLInputElement);
-    this.setState({urlInput: input.value});
-  }
-
-  openDirectory(cachePath: string) {
-    if (process.platform === "win32") {
-      this.openExternalURL(cachePath);
-    } else {
-      this.openExternalURL(urlToPath(cachePath));
-    }
-  }
-
   openExternalURL(url: string) {
     remote.shell.openExternal(url);
   }

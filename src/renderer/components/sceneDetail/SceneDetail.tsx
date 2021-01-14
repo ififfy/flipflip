@@ -49,6 +49,7 @@ import SourceList from "../library/SourceList";
 import AudioTextEffects from "./AudioTextEffects";
 import {areWeightsValid} from "../../data/utils";
 import RestoreIcon from "@material-ui/icons/Restore";
+import Audio from "../../data/Audio";
 
 const drawerWidth = 240;
 
@@ -334,6 +335,7 @@ class SceneDetail extends React.Component {
     onGenerate(scene: Scene): void,
     onPlayScene(scene: Scene): void,
     onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void,
+    onPlayAudio(source: Audio, displayed: Array<Audio>): void,
     onResetScene(scene: Scene): void,
     onSaveAsScene(scene: Scene): void,
     onSort(scene: Scene, algorithm: string, ascending: boolean): void,
@@ -579,8 +581,10 @@ class SceneDetail extends React.Component {
                   <Box p={2} className={classes.fill}>
                     <AudioTextEffects
                       scene={this.props.scene}
+                      onPlayAudio={this.props.onPlayAudio.bind(this)}
                       onAddTracks={this.props.onAddTracks.bind(this)}
-                      onUpdateScene={this.props.onUpdateScene.bind(this)} />
+                      onUpdateScene={this.props.onUpdateScene.bind(this)}
+                      systemMessage={this.props.systemMessage.bind(this)}/>
                   </Box>
                 </div>
               </Typography>

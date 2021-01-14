@@ -26,16 +26,18 @@ class AudioCard extends React.Component {
     sidebar: boolean,
     startPlaying: boolean,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
-    onAddTracks?(playlistIndex: number): void,
     shorterSeek?: boolean,
     showMsTimestamp?: boolean,
     scenePaths?: Array<any>,
     goBack?(): void,
+    onAddTracks?(playlistIndex: number): void,
+    onPlay?(source: Audio, displayed: Array<Audio>): void,
     onPlaying?(position: number, duration: number): void,
     orderAudioTags?(audio: Audio): void,
     playTrack?(url: string): void,
     playNextScene?(): void,
     setCurrentAudio?(audio: Audio): void,
+    systemMessage?(message: string): void,
   };
 
   readonly state = {
@@ -89,10 +91,12 @@ class AudioCard extends React.Component {
                   onUpdateScene={this.props.onUpdateScene.bind(this)}
                   setCurrentAudio={i==0 && this.props.setCurrentAudio ? this.props.setCurrentAudio.bind(this) : this.nop}
                   goBack={this.props.goBack}
+                  onPlay={this.props.onPlay}
                   onPlaying={this.props.onPlaying}
                   orderAudioTags={this.props.orderAudioTags}
                   playTrack={this.props.playTrack}
-                  playNextScene={this.props.playNextScene}/>
+                  playNextScene={this.props.playNextScene}
+                  systemMessage={this.props.systemMessage}/>
               </Collapse>
             </Grid>
             {i != this.props.scene.audioPlaylists.length-1 && (

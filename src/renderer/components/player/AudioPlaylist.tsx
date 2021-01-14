@@ -1,12 +1,14 @@
 import * as React from "react";
 import Sortable from "react-sortablejs";
+import {existsSync} from "fs";
+import {remote} from "electron";
 
 import {
-  Avatar, Chip,
-  createStyles,
+  Avatar, Badge, Chip,
+  createStyles, Fab,
   IconButton,
   List,
-  ListItem,
+  ListItem, ListItemAvatar,
   ListItemIcon, ListItemSecondaryAction,
   ListItemText,
   Theme, Tooltip,
@@ -27,6 +29,8 @@ import {RP} from "../../data/const";
 import AudioControl from "./AudioControl";
 import Audio from "../../data/Audio";
 import Scene from "../../data/Scene";
+import Tag from "../../data/Tag";
+import SourceIcon from "../library/SourceIcon";
 
 const styles = (theme: Theme) => createStyles({
   audioList: {
@@ -51,6 +55,38 @@ const styles = (theme: Theme) => createStyles({
     float: 'right',
     paddingRight: theme.spacing(2),
   },
+  trackThumb: {
+    height: 40,
+    width: 40,
+    overflow: 'hidden',
+    display: 'flex',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    userSelect: 'none',
+  },
+  thumbImage: {
+    height: '100%',
+  },
+  listAvatar: {
+    width: 56,
+  },
+  trackNum: {
+    top: 17,
+  },
+  bigTooltip: {
+    fontSize: "medium",
+    maxWidth: 500,
+  },
+  tagChips: {
+    textAlign: 'center',
+  },
+  avatar: {
+    backgroundColor: theme.palette.primary.main,
+    boxShadow: 'none',
+  },
+  sourceIcon: {
+    color: theme.palette.primary.contrastText,
+  },
 });
 
 class AudioPlaylist extends React.Component {
@@ -69,10 +105,12 @@ class AudioPlaylist extends React.Component {
     scenePaths?: Array<any>,
     goBack?(): void,
     orderAudioTags?(audio: Audio): void,
+    onPlay?(source: Audio, displaySources: Array<Audio>): void,
     onPlaying?(position: number, duration: number): void,
     playTrack?(url: string): void,
     playNextScene?(): void,
     setCurrentAudio?(audio: Audio): void,
+    systemMessage?(message: string): void,
   };
 
   readonly state = {
@@ -156,13 +194,62 @@ class AudioPlaylist extends React.Component {
             }}>
             {this.props.playlist.audios.map((a, i) =>
               <ListItem key={i}>
-                <ListItemIcon>
-                  <Avatar alt={a.name} src={a.thumb} className={classes.thumb}>
-                    {a.thumb == null && (
-                      <AudiotrackIcon className={classes.mediaIcon}/>
-                    )}
-                  </Avatar>
-                </ListItemIcon>
+                <ListItemAvatar className={classes.listAvatar}>
+                  <Badge
+                    classes={{anchorOriginTopRightRectangle: classes.trackNum}}
+                    invisible={!a.trackNum}
+                    max={999}
+                    color="primary"
+                    badgeContent={a.trackNum}>
+                    <Tooltip placement={a.comment ? 'right' : 'bottom'}
+                             PopperProps={a.comment || a.tags.length > 0 ? {modifiers:{
+                                 preventOverflow: {
+                                   enabled: true,
+                                   boundariesElement: 'viewport',
+                                 }
+                               }} : {}}
+                             classes={a.comment ? {tooltip: classes.bigTooltip} : null}
+                             arrow={!!a.comment || a.tags.length > 0}
+                             title={
+                               a.comment || a.tags.length > 0 ?
+                                 <div>
+                                   {a.comment}
+                                   {a.comment && a.tags.length > 0 && (<br/>)}
+                                   <div className={classes.tagChips}>
+                                     {a.tags && a.tags.map((tag: Tag) =>
+                                       <React.Fragment key={tag.id}>
+                                         <Chip
+                                           label={tag.name}
+                                           color="primary"
+                                           size="small"/>
+                                       </React.Fragment>
+                                     )}
+                                   </div>
+                                 </div>
+                                 :
+                                 <div>
+                                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Click: Library Tagging
+                                   <br/>
+                                   Shift+Click: Open Source
+                                   <br/>
+                                   &nbsp;&nbsp;Ctrl+Click: Reveal File}
+                                 </div>
+                             }>
+                      <div onClick={this.onSourceIconClick.bind(this, a)} className={classes.trackThumb}>
+                        {a.thumb != null && (
+                          <img className={classes.thumbImage} src={a.thumb}/>
+                        )}
+                        {a.thumb == null && (
+                          <Fab
+                            size="small"
+                            className={classes.avatar}>
+                            <SourceIcon url={a.url} className={classes.sourceIcon}/>
+                          </Fab>
+                        )}
+                      </div>
+                    </Tooltip>
+                  </Badge>
+                </ListItemAvatar>
                 <ListItemText primary={a.name} />
                 <ListItemSecondaryAction>
                   <Chip
@@ -259,6 +346,27 @@ class AudioPlaylist extends React.Component {
         this.nextTrack();
         break;
     }
+  }
+
+  onSourceIconClick(audio: Audio, e: MouseEvent) {
+    const sourceURL = audio.url;
+    if (e.shiftKey && !e.ctrlKey) {
+      this.openExternalURL(sourceURL);
+    } else if (!e.shiftKey && e.ctrlKey) {
+      if (existsSync(sourceURL)) {
+        remote.shell.showItemInFolder(sourceURL);
+      }
+    } else if (!e.shiftKey && !e.ctrlKey && this.props.onPlay && this.props.systemMessage) {
+      try {
+        this.props.onPlay(audio, this.props.playlist.audios);
+      } catch (e) {
+        this.props.systemMessage("The source " + sourceURL + " isn't in your Library");
+      }
+    }
+  }
+
+  openExternalURL(url: string) {
+    remote.shell.openExternal(url);
   }
 
   prevTrack() {
