@@ -48,6 +48,7 @@ import LibrarySearch from "../library/LibrarySearch";
 import SourceList from "../library/SourceList";
 import AudioTextEffects from "./AudioTextEffects";
 import {areWeightsValid} from "../../data/utils";
+import RestoreIcon from "@material-ui/icons/Restore";
 
 const drawerWidth = 240;
 
@@ -333,6 +334,7 @@ class SceneDetail extends React.Component {
     onGenerate(scene: Scene): void,
     onPlayScene(scene: Scene): void,
     onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void,
+    onResetScene(scene: Scene): void,
     onSaveAsScene(scene: Scene): void,
     onSort(scene: Scene, algorithm: string, ascending: boolean): void,
     onTutorial(tutorial: string): void,
@@ -478,6 +480,14 @@ class SceneDetail extends React.Component {
                   <PublishIcon />
                 </ListItemIcon>
                 <ListItemText primary="Export Scene" />
+              </ListItem>
+            </Tooltip>
+            <Tooltip title={this.state.drawerOpen ? "" : "Restore Defaults"}>
+              <ListItem button onClick={this.props.onResetScene.bind(this, this.props.scene)} className={clsx((this.props.tutorial == SDT.options1 || this.props.tutorial == SDT.effects1) && classes.disable)}>
+                <ListItemIcon>
+                  <RestoreIcon/>
+                </ListItemIcon>
+                <ListItemText primary={"Restore Defaults"} />
               </ListItem>
             </Tooltip>
             <Tooltip title={this.state.drawerOpen ? "" : "Delete Scene"}>

@@ -75,7 +75,7 @@ class ImageVideoCard extends React.Component {
       <Grid container alignItems="center">
         {!this.props.isPlayer && (
           <Grid container spacing={2} alignItems="center" className={clsx(classes.gutterBottom, this.props.tutorial == SDT.imageOptions && classes.highlight)}>
-            {this.props.scene.generatorWeights != null && (
+            {(this.props.scene.generatorWeights != null || this.props.isConfig) && (
               <Grid item xs={12}>
                 <FormControlLabel
                   control={

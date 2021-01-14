@@ -494,7 +494,6 @@ export class SceneSettings implements SceneSettingsI {
 
   audioScene = false;
   audioEnabled = false;
-  audios: Array<Audio> = [];
   audioPlaylists: Array<{audios: Array<Audio>, shuffle: boolean, repeat: string}> = [];
 
   // migration only
@@ -502,6 +501,7 @@ export class SceneSettings implements SceneSettingsI {
   overlaySceneOpacity = 0.5;
   gridView = false;
   grid: Array<Array<number>> = [[]];
+  audios: Array<Audio> = [];
 }
 
 export class RemoteSettings implements RemoteSettingsI {

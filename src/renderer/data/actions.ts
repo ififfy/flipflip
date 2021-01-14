@@ -650,6 +650,21 @@ export function saveAudioPosition(state: State, yOffset: number, filters: Array<
   };
 }
 
+export function resetScene(state: State, scene: Scene): Object {
+  return updateScene(state, scene, (scene) => {
+    const ignoreProps = ["sources", "blinkColor", "blinkFontSize", "blinkFontFamily", "blinkBorder", "blinkBorderpx",
+      "blinkBorderColor", "captionColor", "captionFontSize", "captionFontFamily", "captionBorder", "captionBorderpx",
+      "captionBorderColor", "captionBigColor", "captionBigFontSize", "captionBigFontFamily", "captionBigBorder",
+      "captionBigBorderpx", "captionBigBorderColor", "countColor", "countFontSize", "countFontFamily", "countBorder",
+      "countBorderpx", "countBorderColor", "audioEnabled", "audioPlaylists", "textEnabled", "textSource", "textEndStop",
+      "textNextScene"];
+    for (let property in state.config.defaultScene) {
+      if (ignoreProps.includes(property)) continue;
+      (scene as any)[property] = (state.config.defaultScene as any)[property];
+    }
+  });
+}
+
 export function playGrid(state: State, grid: SceneGrid): Object {
   return {route: state.route.concat(new Route({kind: 'gridplay', value: grid.id}))};
 }

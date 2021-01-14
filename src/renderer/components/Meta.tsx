@@ -143,6 +143,7 @@ export default class Meta extends React.Component {
               onGenerate={a(actions.generateScene)}
               onPlayScene={a(actions.playScene)}
               onPlay={a(actions.playSceneFromLibrary)}
+              onResetScene={a(actions.resetScene)}
               onSaveAsScene={a(actions.saveScene)}
               onSort={a(actions.sortSources)}
               onTutorial={a(actions.doneTutorial)}
