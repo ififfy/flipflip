@@ -569,12 +569,24 @@ export async function convertURL(url: string): Promise<Array<string>> {
   // If this is redgif page, return redgif image
   let redgifMatch = url.match("^https?://(?:www\.)?redgifs\.com/watch/(\\w*)$");
   if (redgifMatch != null) {
-    let html = await wretch(url).get().notFound(() => {return [url]}).text();
-    let redgif = new DOMParser().parseFromString(html, "text/html").querySelectorAll("#video-" + redgifMatch[1] + " > source");
-    if (redgif.length > 0) {
-      for (let source of redgif) {
-        if ((source as any).type == "video/webm") {
-          return [(source as any).src];
+    let fourOFour = false
+    let html = await wretch(url).get().notFound(() => {fourOFour = true}).text();
+    if (fourOFour) {
+      return [url];
+    } else if (html) {
+      let redgif = new DOMParser().parseFromString(html, "text/html").querySelectorAll("#video-" + redgifMatch[1] + " > source");
+      if (redgif.length > 0) {
+        for (let source of redgif) {
+          if ((source as any).type == "video/webm") {
+            return [(source as any).src];
+          }
+        }
+      } else {
+        const fallbackRegex = /"webm":\s*\{[^}]*"url":\s*"([^,}]*)",?/.exec(html);
+        if (fallbackRegex != null) {
+          return [fallbackRegex[1].replace(/\\u002F/g,"/")];
+        } else {
+          redgifMatch = null;
         }
       }
     } else {
