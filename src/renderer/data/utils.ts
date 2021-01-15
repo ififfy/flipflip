@@ -841,8 +841,8 @@ let captionProgramDefaults = {
   countGroupDelayTF: TF.constant,
 
   blinkY: 0,
-  capY: 0,
-  bigcapY: 0,
+  captionY: 0,
+  bigCaptionY: 0,
   countY: 0,
 }
 export default captionProgramDefaults;

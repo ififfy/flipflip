@@ -12,7 +12,6 @@ import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
 import Scene from '../../data/Scene';
 import Tag from "../../data/Tag";
-import CaptionProgram from "./CaptionProgram";
 import ChildCallbackHack from './ChildCallbackHack';
 import SourceScraper from './SourceScraper';
 import Strobe from "./Strobe";
@@ -21,6 +20,8 @@ import PictureGrid from "./PictureGrid";
 import Audio from "../../data/Audio";
 import ImageView from "./ImageView";
 import AudioAlert from "./AudioAlert";
+import CaptionProgramPlaylist from "./CaptionProgramPlaylist";
+import CaptionScript from "../../data/CaptionScript";
 
 export default class Player extends React.Component {
   readonly props: {
@@ -36,7 +37,6 @@ export default class Player extends React.Component {
     systemMessage(message: string): void,
     preventSleep?: boolean,
     allTags?: Array<Tag>,
-    captionScript?: string,
     captionScale?: number,
     captionProgramJumpToHack?: ChildCallbackHack,
     gridView?: boolean,
@@ -84,12 +84,10 @@ export default class Player extends React.Component {
   render() {
     const nextScene = this.getScene(this.props.scene.nextSceneID == -1 ? this.props.scene.nextSceneRandomID : this.props.scene.nextSceneID);
     const showCaptionProgram = (
-      this.props.scene.textEnabled &&
-      ((this.props.scene.textSource &&
-      this.props.scene.textSource.length) ||
-      this.props.captionScript) &&
       this.state.isPlaying &&
-      this.state.hasStarted);
+      this.state.hasStarted &&
+      this.props.scene.textEnabled &&
+      this.props.scene.scriptPlaylists.length);
     const showStrobe = this.props.scene.strobe && this.state.hasStarted && this.state.isPlaying &&
       (this.props.scene.strobeLayer == SL.top || this.props.scene.strobeLayer == SL.bottom);
 
@@ -219,7 +217,7 @@ export default class Player extends React.Component {
 
     const captionScale = this.props.captionScale ? this.props.captionScale : 1;
 
-    let getCurrentTimestamp = undefined;
+    let getCurrentTimestamp: any = undefined;
     if (this.props.getCurrentTimestamp) {
       getCurrentTimestamp = this.props.getCurrentTimestamp;
     } else if (this.props.scene && this.props.scene.audioEnabled) {
@@ -459,45 +457,24 @@ export default class Player extends React.Component {
           )}
         </div>
 
-        {showCaptionProgram && (
-          <CaptionProgram
-            blinkColor={this.props.scene.blinkColor}
-            blinkFontSize={this.props.scene.blinkFontSize * captionScale}
-            blinkFontFamily={this.props.scene.blinkFontFamily}
-            blinkBorder={this.props.scene.blinkBorder}
-            blinkBorderpx={this.props.scene.blinkBorderpx * captionScale}
-            blinkBorderColor={this.props.scene.blinkBorderColor}
-            captionColor={this.props.scene.captionColor}
-            captionFontSize={this.props.scene.captionFontSize * captionScale}
-            captionFontFamily={this.props.scene.captionFontFamily}
-            captionBorder={this.props.scene.captionBorder}
-            captionBorderpx={this.props.scene.captionBorderpx * captionScale}
-            captionBorderColor={this.props.scene.captionBorderColor}
-            captionBigColor={this.props.scene.captionBigColor}
-            captionBigFontSize={this.props.scene.captionBigFontSize * captionScale}
-            captionBigFontFamily={this.props.scene.captionBigFontFamily}
-            captionBigBorder={this.props.scene.captionBigBorder}
-            captionBigBorderpx={this.props.scene.captionBigBorderpx * captionScale}
-            captionBigBorderColor={this.props.scene.captionBigBorderColor}
-            countColor={this.props.scene.countColor}
-            countFontSize={this.props.scene.countFontSize * captionScale}
-            countFontFamily={this.props.scene.countFontFamily}
-            countBorder={this.props.scene.countBorder}
-            countBorderpx={this.props.scene.countBorderpx * captionScale}
-            countBorderColor={this.props.scene.countBorderColor}
-            url={this.props.scene.textSource}
-            script={this.props.captionScript}
-            textEndStop={this.props.scene.textEndStop}
-            textNextScene={this.props.scene.textNextScene}
+        {showCaptionProgram && this.props.scene.scriptPlaylists.map((playlist, i) =>
+          <CaptionProgramPlaylist
+            key={i}
+            playlistIndex={i}
+            playlist={playlist}
+            currentAudio={this.state.currentAudio}
+            currentImage={this.state.historyPaths.length > 0 ? this.state.historyPaths[this.state.historyPaths.length - 1] : null}
+            scale={captionScale}
+            scene={this.props.scene}
+            timeToNextFrame={this.state.timeToNextFrame}
             getTags={this.props.getTags.bind(this)}
             goBack={this.props.goBack.bind(this)}
+            orderScriptTags={this.orderScriptTags.bind(this)}
             playNextScene={this.props.nextScene}
-            currentAudio={this.state.currentAudio}
-            getCurrentTimestamp={getCurrentTimestamp}
-            timeToNextFrame={this.state.timeToNextFrame}
-            currentImage={this.state.historyPaths.length > 0 ? this.state.historyPaths[this.state.historyPaths.length - 1] : null}
             jumpToHack={this.props.captionProgramJumpToHack}
-            onError={this.props.onCaptionError}/>
+            getCurrentTimestamp={getCurrentTimestamp}
+            onError={this.props.onCaptionError}
+            systemMessage={this.props.systemMessage}/>
         )}
       </div>
     );
@@ -605,7 +582,6 @@ export default class Player extends React.Component {
   shouldComponentUpdate(props: any, state: any): boolean {
     return this.props.scene !== props.scene ||
       this.props.tags !== props.tags ||
-      this.props.captionScript !== props.captionScript ||
       this.props.gridView !== props.gridView ||
       this.state.canStart !== state.canStart ||
       this.state.hasStarted !== state.hasStarted ||
@@ -762,6 +738,22 @@ export default class Player extends React.Component {
       progressMessage: this.props.scene.sources.length > 0 ? [this.props.scene.sources[0].url] : [""],
     });
     this.props.navigateTagging(offset);
+  }
+
+  orderScriptTags(script: CaptionScript) {
+    const tagNames = this.props.allTags.map((t: Tag) => t.name);
+    // Re-order the tags of the audio we were playing
+    script.tags = script.tags.sort((a: Tag, b: Tag) => {
+      const aIndex = tagNames.indexOf(a.name);
+      const bIndex = tagNames.indexOf(b.name);
+      if (aIndex < bIndex) {
+        return -1;
+      } else if (aIndex > bIndex) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
   }
 
   onRecentPictureGrid() {

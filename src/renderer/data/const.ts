@@ -184,7 +184,11 @@ const MO = { // Menu/Modal Constants
   signIn: 'mo.signin',
   signOut: 'mo.signout',
   open: 'mo.open',
+  openLocal: 'mo.openlocal',
+  openLibrary: 'mo.openlibrary',
+  save: 'mo.save',
   load: 'mo.load',
+  select: 'mo.select',
 };
 
 const PR = { // Global progress functions
@@ -379,6 +383,7 @@ const SP = { // Special modes
   batchTag: 'sp.batchTag',
   batchEdit: 'sp.batchEdit',
   select: 'sp.select',
+  selectSingle: 'sp.selectSingle',
 }
 
 const WC = { // Watermark corner

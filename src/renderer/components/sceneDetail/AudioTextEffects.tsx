@@ -7,13 +7,16 @@ import AudioCard from "../configGroups/AudioCard";
 import TextCard from "../configGroups/TextCard";
 import {SceneSettings} from "../../data/Config";
 import Audio from "../../data/Audio";
+import CaptionScript from "../../data/CaptionScript";
 
 export default class AudioTextEffects extends React.Component {
   readonly props: {
     scene: Scene | SceneSettings,
+    onAddScript(playlistIndex: number): void,
     onAddTracks(playlistIndex: number): void,
     onPlayAudio(source: Audio, displayed: Array<Audio>): void,
-    onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
+    onPlayScript(source: CaptionScript, sceneID: number, displayed: Array<CaptionScript>): void,
+    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
     systemMessage(message: string): void,
   };
 
@@ -39,7 +42,10 @@ export default class AudioTextEffects extends React.Component {
             <CardContent>
               <TextCard
                 scene={this.props.scene}
-                onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+                onAddScript={this.props.onAddScript.bind(this)}
+                onPlay={this.props.onPlayScript}
+                onUpdateScene={this.props.onUpdateScene.bind(this)}
+                systemMessage={this.props.systemMessage}/>
             </CardContent>
           </Card>
         </Grid>

@@ -127,6 +127,10 @@ export function getScriptSource(state: State): CaptionScript | null {
   return state.scripts.find((s) => s.id == activeScene.libraryID);
 }
 
+export function getSelectScript(state: State): CaptionScript | null {
+  return state.route[state.route.length - 1].value;
+}
+
 export function changeAudioRoute(state: State, aID: number): Object {
   const activeScene = getActiveScene(state);
   if (activeScene) {
@@ -179,9 +183,9 @@ export function restoreFromBackup(state: State, backupFile: string): Object {
     audioYOffset: 0,
     audioFilters: Array<string>(),
     audioSelected: Array<string>(),
-    scriptsYOffset: 0,
-    scriptsFilters: Array<string>(),
-    scriptsSelected: Array<string>(),
+    scriptYOffset: 0,
+    scriptFilters: Array<string>(),
+    scriptSelected: Array<string>(),
     progressMode: null as string,
     progressTitle: null as string,
     progressCurrent: 0,
@@ -653,10 +657,14 @@ export function importAudioFromLibrary(state: State, sources: Array<Audio>): Obj
 }
 
 export function importScriptFromLibrary(state: State, sources: Array<CaptionScript>): Object {
-  // TODO
-  //const playlistIndex = state.route[state.route.length - 1].value;
-  //return {...updateScene(state, getActiveScene(state), (s: Scene) => {s.audioPlaylists[playlistIndex].audios = s.audioPlaylists[playlistIndex].audios.concat(sources)}), ...goBack(state)};
-  return {};
+  const playlistIndex = state.route[state.route.length - 1].value;
+  return {...updateScene(state, getActiveScene(state), (s: Scene) => {s.scriptPlaylists[playlistIndex].scripts = s.scriptPlaylists[playlistIndex].scripts.concat(sources)}), ...goBack(state)};
+}
+
+export function importScriptToScriptor(state: State, source: CaptionScript): Object {
+  const newRoute = state.route.slice(0, state.route.length - 1);
+  newRoute[newRoute.length - 1].value = source;
+  return {route: newRoute, specialMode: null};
 }
 
 export function importFromLibrary(state: State, sources: Array<LibrarySource>): Object {
@@ -681,14 +689,17 @@ export function saveAudioPosition(state: State, yOffset: number, filters: Array<
   };
 }
 
+export function saveScriptPosition(state: State, yOffset: number, filters: Array<string>, selected: Array<string>): Object {
+  return {
+    scriptYOffset: yOffset,
+    scriptFilters: filters,
+    scriptSelected: selected,
+  };
+}
+
 export function resetScene(state: State, scene: Scene): Object {
   return updateScene(state, scene, (scene) => {
-    const ignoreProps = ["sources", "blinkColor", "blinkFontSize", "blinkFontFamily", "blinkBorder", "blinkBorderpx",
-      "blinkBorderColor", "captionColor", "captionFontSize", "captionFontFamily", "captionBorder", "captionBorderpx",
-      "captionBorderColor", "captionBigColor", "captionBigFontSize", "captionBigFontFamily", "captionBigBorder",
-      "captionBigBorderpx", "captionBigBorderColor", "countColor", "countFontSize", "countFontFamily", "countBorder",
-      "countBorderpx", "countBorderColor", "audioEnabled", "audioPlaylists", "textEnabled", "textSource", "textEndStop",
-      "textNextScene"];
+    const ignoreProps = ["sources"];
     for (let property in state.config.defaultScene) {
       if (ignoreProps.includes(property)) continue;
       (scene as any)[property] = (state.config.defaultScene as any)[property];
@@ -725,8 +736,8 @@ export function playAudio(state: State, source: Audio, displayed: Array<Audio>):
   state.scenes.forEach((s: Scene) => {
     id = Math.max(s.id + 1, id);
   });
-  const startIndex = displayed.indexOf(displayed.find((a) => a.url == source.url));;
-  let tempScene = new Scene({
+  const startIndex = displayed.indexOf(displayed.find((a) => a.url == source.url));
+  const tempScene = new Scene({
     id: id,
     name: "audio_scene_temp",
     libraryID: librarySource.id,
@@ -765,12 +776,14 @@ export function playScript(state: State, source: CaptionScript, sceneID: number,
   state.scenes.forEach((s: Scene) => {
     id = Math.max(s.id + 1, id);
   });
+  const startIndex = displayed.indexOf(displayed.find((s) => s.url == source.url));
   const tempScene = JSON.parse(JSON.stringify(state.scenes.find((s) => s.id == sceneID)));
   tempScene.id = id;
   tempScene.libraryID = librarySource.id;
   tempScene.scriptScene = true;
   tempScene.textEnabled = true;
-  tempScene.textSource = source.url;
+  tempScene.scriptPlaylists = [{scripts: displayed, shuffle: false, repeat: RP.all}];
+  tempScene.scriptStartIndex = startIndex;
   return {
     scenes: state.scenes.concat([tempScene]),
     route: state.route.concat([new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'libraryplay', value: tempScene.id})]),
@@ -907,6 +920,8 @@ export function endPlaySceneFromLibrary(state: State): Object {
   let librarySource;
   if (getActiveScene(state).audioScene) {
     librarySource = getAudioSource(state);
+  } else if (getActiveScene(state).scriptScene) {
+    librarySource = getScriptSource(state);
   } else {
     librarySource = getLibrarySource(state);
   }
@@ -1819,6 +1834,7 @@ export function updateTags(state: State, tags: Array<Tag>): Object {
   // Go through each scene in the library
   let newLibrary = state.library;
   let newAudios = state.audios;
+  let newScripts = state.scripts;
   let newScenes = state.scenes;
   const tagIDs = tags.map((t) => t.id);
   for (let source of newLibrary) {
@@ -1876,6 +1892,30 @@ export function updateTags(state: State, tags: Array<Tag>): Object {
     }
   }
   for (let source of newAudios) {
+    // Remove deleted tags, update any edited tags, and order the same as tags
+    source.tags = source.tags.filter((t: Tag) => tagIDs.includes(t.id));
+    source.tags = source.tags.map((t: Tag) => {
+      for (let tag of tags) {
+        if (t.id == tag.id) {
+          t.name = tag.name;
+          t.phraseString = tag.phraseString;
+          return t;
+        }
+      }
+    });
+    source.tags = source.tags.sort((a: Tag, b: Tag) => {
+      const aIndex = tagIDs.indexOf(a.id);
+      const bIndex = tagIDs.indexOf(b.id);
+      if (aIndex < bIndex) {
+        return -1;
+      } else if (aIndex > bIndex) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+  }
+  for (let source of newScripts) {
     // Remove deleted tags, update any edited tags, and order the same as tags
     source.tags = source.tags.filter((t: Tag) => tagIDs.includes(t.id));
     source.tags = source.tags.map((t: Tag) => {
@@ -2033,6 +2073,14 @@ export function addTracks(state: State, playlistIndex: number) {
   return {route: state.route.concat(new Route({kind: 'audios', value: playlistIndex})), specialMode: SP.select, audioSelected: new Array<string>(), audioOpenTab: 3};
 }
 
+export function addScript(state: State, playlistIndex: number) {
+  return {route: state.route.concat(new Route({kind: 'scripts', value: playlistIndex})), specialMode: SP.select, scriptSelected: new Array<string>()};
+}
+
+export function addScriptSingle(state: State) {
+  return {route: state.route.concat(new Route({kind: 'scripts', value: null})), specialMode: SP.selectSingle, scriptSelected: new Array<string>()};
+}
+
 export function addSource(state: State, scene: Scene, type: string, ...args: any[]): Object {
   const handleArgs = (s: Scene) => {
     if (args.length > 0) {
@@ -2045,7 +2093,7 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
         }
 
         // Update hastebin URL (if present)
-        s.textSource = "https://hastebin.com/raw/" + importURL;
+        s.scriptPlaylists.push({scripts: [new CaptionScript({url: "https://hastebin.com/raw/" + importURL})], shuffle: false, repeat: RP.none});
       }
     }
   }

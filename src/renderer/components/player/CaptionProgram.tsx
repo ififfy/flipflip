@@ -9,10 +9,11 @@ import captionProgramDefaults, {
   getTimingFromString,
   htmlEntities
 } from "../../data/utils";
-import {TF} from "../../data/const";
+import {RP, TF} from "../../data/const";
 import Tag from "../../data/Tag";
 import ChildCallbackHack from "./ChildCallbackHack";
 import Audio from "../../data/Audio";
+import CaptionScript from "../../data/CaptionScript";
 
 const splitFirstWord = function (s: string) {
   const firstSpaceIndex = s.indexOf(" ");
@@ -37,42 +38,18 @@ export default class CaptionProgram extends React.Component {
   readonly el = React.createRef<HTMLDivElement>();
 
   readonly props: {
-    blinkColor: string,
-    blinkFontSize: number,
-    blinkFontFamily: string,
-    blinkBorder: boolean,
-    blinkBorderpx: number,
-    blinkBorderColor: string,
-    captionColor: string,
-    captionFontSize: number,
-    captionFontFamily: string,
-    captionBorder: boolean,
-    captionBorderpx: number,
-    captionBorderColor: string,
-    captionBigColor: string,
-    captionBigFontSize: number,
-    captionBigFontFamily: string,
-    captionBigBorder: boolean,
-    captionBigBorderpx: number,
-    captionBigBorderColor: string,
-    countColor: string,
-    countFontSize: number,
-    countFontFamily: string,
-    countBorder: boolean,
-    countBorderpx: number,
-    countBorderColor: string,
-    url: string,
-    script: string,
-    timeToNextFrame: number,
+    captionScript: CaptionScript,
     currentAudio: Audio
     currentImage: HTMLImageElement | HTMLVideoElement,
-    textEndStop: boolean,
-    textNextScene: boolean,
+    repeat: string,
+    scale: number,
+    timeToNextFrame: number,
     getTags(source: string, clipID?: string): Array<Tag>,
     goBack(): void,
     playNextScene(): void,
     jumpToHack?: ChildCallbackHack,
     getCurrentTimestamp?(): number,
+    nextTrack?(): void,
     onError?(e: string): void,
   };
 
@@ -116,8 +93,7 @@ export default class CaptionProgram extends React.Component {
   }
 
   shouldComponentUpdate(props: any, state: any): boolean {
-    return props.url !== this.props.url || props.script !== this.props.script ||
-      props.currentImage !== this.props.currentImage || props.getCurrentTimestamp !== this.props.getCurrentTimestamp;
+    return props.captionScript !== this.props.captionScript || props.currentImage !== this.props.currentImage || props.getCurrentTimestamp !== this.props.getCurrentTimestamp;
   }
 
   _sceneCommand: Function = null;
@@ -127,7 +103,7 @@ export default class CaptionProgram extends React.Component {
       this._sceneCommand = null;
       command();
     }
-    if (this.el.current && (this.props.url != props.url || this.props.script != props.script) ||
+    if (this.el.current && (this.props.captionScript.url != props.captionScript.url || this.props.captionScript.script != props.captionScript.script) ||
       (this.props.getCurrentTimestamp != null && props.getCurrentTimestamp == null)) {
       this.stop();
       this.reset();
@@ -162,10 +138,10 @@ export default class CaptionProgram extends React.Component {
   }
 
   start() {
-    const url = this.props.url;
+    const url = this.props.captionScript.url;
     this._runningPromise = new CancelablePromise((resolve, reject) => {
-      if (this.props.script != null) {
-        resolve({data: [this.props.script], helpers: null});
+      if (this.props.captionScript.script != null) {
+        resolve({data: [this.props.captionScript.script], helpers: null});
       } else {
         wretch(url)
           .get()
@@ -481,12 +457,16 @@ export default class CaptionProgram extends React.Component {
         fn(() => {
           let newCounter = index
           if (newCounter >= this.state.timestamps.length - 1) {
-            if (this.props.textEndStop) {
+            if (this.props.captionScript.stopAtEnd) {
               this.props.goBack();
               return;
             }
-            if (this.props.textNextScene && this.props.playNextScene) {
+            if (this.props.captionScript.nextSceneAtEnd && this.props.playNextScene) {
               this.props.playNextScene();
+              return;
+            }
+            if ((this.props.repeat == RP.all || this.props.repeat == RP.none) && this.props.nextTrack) {
+              this.props.nextTrack();
               return;
             }
           }
@@ -530,7 +510,7 @@ export default class CaptionProgram extends React.Component {
           return;
         }
       }
-      this._timestampTimeout = setTimeout(this.timestampLoop.bind(this), 100);
+      this._timestampTimeout = setTimeout(this.timestampLoop.bind(this),   100);
     }
   }
 
@@ -539,12 +519,16 @@ export default class CaptionProgram extends React.Component {
       this.state.program[this.state.programCounter](() => {
         let newCounter = this.state.programCounter + 1;
         if (newCounter >= this.state.program.length) {
-          if (this.props.textEndStop) {
+          if (this.props.captionScript.stopAtEnd) {
             this.props.goBack();
             return;
           }
-          if (this.props.textNextScene && this.props.playNextScene) {
+          if (this.props.captionScript.nextSceneAtEnd && this.props.playNextScene) {
             this.props.playNextScene();
+            return;
+          }
+          if ((this.props.repeat == RP.all || this.props.repeat == RP.none) && this.props.nextTrack) {
+            this.props.nextTrack();
             return;
           }
           newCounter = 0;
@@ -605,13 +589,13 @@ export default class CaptionProgram extends React.Component {
         this.state.captionDelay[1], this.state.captionDelayWaveRate, this.props.currentAudio,
         this.state.captionDelayBPMMulti, this.props.timeToNextFrame);
       const wait = this.wait(delay);
-      this.el.current.style.color = this.props.captionColor;
-      this.el.current.style.fontSize = this.props.captionFontSize + "vmin";
-      this.el.current.style.fontFamily = this.props.captionFontFamily;
+      this.el.current.style.color = this.props.captionScript.caption.color;
+      this.el.current.style.fontSize = (this.props.captionScript.caption.fontSize * this.props.scale) + "vmin";
+      this.el.current.style.fontFamily = this.props.captionScript.caption.fontFamily;
       this.el.current.style.display = 'table-cell';
       this.el.current.style.textAlign = 'center';
       this.el.current.style.verticalAlign = 'bottom';
-      const yPos = 14 + this.state.capY;
+      const yPos = 14 + this.state.captionY;
       if (yPos > 0) {
         this.el.current.style.paddingBottom = (yPos) + 'vmin';
         this.el.current.style.paddingTop = 'unset';
@@ -620,8 +604,10 @@ export default class CaptionProgram extends React.Component {
         this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
       }
       this.el.current.style.transition = 'opacity 0.5s ease-in-out';
-      if (this.props.captionBorder) {
-        this.el.current.style.webkitTextStroke = this.props.captionBorderpx + 'px ' + this.props.captionBorderColor;
+      if (this.props.captionScript.caption.border) {
+        this.el.current.style.webkitTextStroke = (this.props.captionScript.caption.borderpx * this.props.scale) + 'px ' + this.props.captionScript.caption.borderColor;
+      } else {
+        this.el.current.style.webkitTextStroke = 'unset';
       }
       if (this.state.captionDelayTF == TF.scene && !timestamp) {
         this._sceneCommand = () => {showText(() => nextCommand())};
@@ -641,13 +627,13 @@ export default class CaptionProgram extends React.Component {
         this.state.captionDelay[1], this.state.captionDelayWaveRate, this.props.currentAudio,
         this.state.captionDelayBPMMulti, this.props.timeToNextFrame);
       const wait = this.wait(delay);
-      this.el.current.style.color = this.props.captionBigColor;
-      this.el.current.style.fontSize = this.props.captionBigFontSize + "vmin";
-      this.el.current.style.fontFamily = this.props.captionBigFontFamily;
+      this.el.current.style.color = this.props.captionScript.captionBig.color;
+      this.el.current.style.fontSize = (this.props.captionScript.captionBig.fontSize * this.props.scale) + "vmin";
+      this.el.current.style.fontFamily = this.props.captionScript.captionBig.fontFamily;
       this.el.current.style.display = 'table-cell';
       this.el.current.style.textAlign = 'center';
       this.el.current.style.verticalAlign = 'middle';
-      const yPos = this.state.bigcapY;
+      const yPos = this.state.bigCaptionY;
       if (yPos > 0) {
         this.el.current.style.paddingBottom = (yPos) + 'vmin';
         this.el.current.style.paddingTop = 'unset';
@@ -656,8 +642,10 @@ export default class CaptionProgram extends React.Component {
         this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
       }
       this.el.current.style.transition = 'opacity 0.1s ease-out';
-      if (this.props.captionBigBorder) {
-        this.el.current.style.webkitTextStroke = this.props.captionBigBorderpx + 'px ' + this.props.captionBigBorderColor;
+      if (this.props.captionScript.captionBig.border) {
+        this.el.current.style.webkitTextStroke = (this.props.captionScript.captionBig.borderpx * this.props.scale) + 'px ' + this.props.captionScript.captionBig.borderColor;
+      } else {
+        this.el.current.style.webkitTextStroke = 'unset';
       }
       if (this.state.captionDelayTF == TF.scene && !timestamp) {
         this._sceneCommand = () => {showText(() => nextCommand())};
@@ -705,9 +693,9 @@ export default class CaptionProgram extends React.Component {
         fns.push(() => lastWait(nextCommand));
       }
 
-      this.el.current.style.color = this.props.blinkColor;
-      this.el.current.style.fontSize = this.props.blinkFontSize + "vmin";
-      this.el.current.style.fontFamily = this.props.blinkFontFamily;
+      this.el.current.style.color = this.props.captionScript.blink.color;
+      this.el.current.style.fontSize = (this.props.captionScript.blink.fontSize * this.props.scale) + "vmin";
+      this.el.current.style.fontFamily = this.props.captionScript.blink.fontFamily;
       this.el.current.style.display = 'table-cell';
       this.el.current.style.textAlign = 'center';
       this.el.current.style.verticalAlign = 'middle';
@@ -720,8 +708,10 @@ export default class CaptionProgram extends React.Component {
         this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
       }
       this.el.current.style.transition = 'opacity 0.1s ease-out';
-      if (this.props.blinkBorder) {
-        this.el.current.style.webkitTextStroke = this.props.blinkBorderpx + 'px ' + this.props.blinkBorderColor;
+      if (this.props.captionScript.blink.border) {
+        this.el.current.style.webkitTextStroke = (this.props.captionScript.blink.borderpx * this.props.scale) + 'px ' + this.props.captionScript.blink.borderColor;
+      } else {
+        this.el.current.style.webkitTextStroke = 'unset';
       }
       if ((this.state.blinkGroupDelayTF == TF.scene || this.state.blinkDelayTF == TF.scene) && !timestamp) {
         this._sceneCommand = fns[0];
@@ -778,9 +768,9 @@ export default class CaptionProgram extends React.Component {
         fns.push(() => lastWait(nextCommand));
       }
 
-      this.el.current.style.color = this.props.countColor;
-      this.el.current.style.fontSize = this.props.countFontSize + "vmin";
-      this.el.current.style.fontFamily = this.props.countFontFamily;
+      this.el.current.style.color = this.props.captionScript.count.color;
+      this.el.current.style.fontSize = (this.props.captionScript.count.fontSize * this.props.scale) + "vmin";
+      this.el.current.style.fontFamily = this.props.captionScript.count.fontFamily;
       this.el.current.style.display = 'table-cell';
       this.el.current.style.textAlign = 'center';
       this.el.current.style.verticalAlign = 'middle';
@@ -793,8 +783,10 @@ export default class CaptionProgram extends React.Component {
         this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
       }
       this.el.current.style.transition = 'opacity 0.1s ease-out';
-      if (this.props.countBorder) {
-        this.el.current.style.webkitTextStroke = this.props.countBorderpx + 'px ' + this.props.countBorderColor;
+      if (this.props.captionScript.count.border) {
+        this.el.current.style.webkitTextStroke = (this.props.captionScript.count.borderpx * this.props.scale) + 'px ' + this.props.captionScript.count.borderColor;
+      } else {
+        this.el.current.style.webkitTextStroke = 'unset';
       }
       if ((this.state.countGroupDelayTF == TF.scene || this.state.countDelayTF == TF.scene) && !timestamp) {
         this._sceneCommand = fns[0];
@@ -813,14 +805,14 @@ export default class CaptionProgram extends React.Component {
 
   setCaptionY(relYPos: number) {
     return (nextCommand: Function) => {
-      this.setState({capY: relYPos});
+      this.setState({captionY: relYPos});
       nextCommand();
     }
   }
 
   setBigCaptionY(relYPos: number) {
     return (nextCommand: Function) => {
-      this.setState({bigcapY: relYPos});
+      this.setState({bigCaptionY: relYPos});
       nextCommand();
     }
   }

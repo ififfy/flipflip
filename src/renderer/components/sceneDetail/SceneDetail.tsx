@@ -50,6 +50,7 @@ import AudioTextEffects from "./AudioTextEffects";
 import {areWeightsValid} from "../../data/utils";
 import RestoreIcon from "@material-ui/icons/Restore";
 import Audio from "../../data/Audio";
+import CaptionScript from "../../data/CaptionScript";
 
 const drawerWidth = 240;
 
@@ -325,6 +326,7 @@ class SceneDetail extends React.Component {
     tutorial: string,
     goBack(): void,
     onAddSource(scene: Scene, type: string, ...args: any[]): void,
+    onAddScript(playlistIndex: number): void,
     onAddTracks(playlistIndex: number): void,
     onClearBlacklist(sourceURL: string): void,
     onClip(source: LibrarySource, displayed: Array<LibrarySource>): void,
@@ -336,6 +338,7 @@ class SceneDetail extends React.Component {
     onPlayScene(scene: Scene): void,
     onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void,
     onPlayAudio(source: Audio, displayed: Array<Audio>): void,
+    onPlayScript(source: CaptionScript, sceneID: number, displayed: Array<CaptionScript>): void,
     onResetScene(scene: Scene): void,
     onSaveAsScene(scene: Scene): void,
     onSort(scene: Scene, algorithm: string, ascending: boolean): void,
@@ -582,7 +585,9 @@ class SceneDetail extends React.Component {
                     <AudioTextEffects
                       scene={this.props.scene}
                       onPlayAudio={this.props.onPlayAudio.bind(this)}
+                      onPlayScript={this.props.onPlayScript.bind(this)}
                       onAddTracks={this.props.onAddTracks.bind(this)}
+                      onAddScript={this.props.onAddScript.bind(this)}
                       onUpdateScene={this.props.onUpdateScene.bind(this)}
                       systemMessage={this.props.systemMessage.bind(this)}/>
                   </Box>

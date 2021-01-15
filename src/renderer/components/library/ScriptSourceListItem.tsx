@@ -4,10 +4,11 @@ import {existsSync} from "fs";
 import {remote} from "electron";
 
 import {
-  Checkbox, Chip, createStyles, Fab, IconButton, ListItem, ListItemAvatar, ListItemSecondaryAction, ListItemText,
+  Checkbox, Chip, createStyles, Fab, IconButton, ListItem, ListItemAvatar, ListItemSecondaryAction, ListItemText, Radio,
   TextField, Theme, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
+import BuildIcon from '@material-ui/icons/Build';
 import DeleteIcon from '@material-ui/icons/Delete';
 
 import {urlToPath} from "../../data/utils";
@@ -15,6 +16,7 @@ import Tag from "../../data/Tag";
 import SourceIcon from "./SourceIcon";
 import CaptionScript from "../../data/CaptionScript";
 import {grey} from "@material-ui/core/colors";
+import {SP} from "../../data/const";
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -31,6 +33,9 @@ const styles = (theme: Theme) => createStyles({
     '&:hover': {
       backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["200"] : '#080808',
     },
+  },
+  lastSelected: {
+    backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["200"] : '#0F0F0F',
   },
   avatar: {
     backgroundColor: theme.palette.primary.main,
@@ -82,7 +87,8 @@ class ScriptSourceListItem extends React.Component {
     checked: boolean,
     index: number,
     isEditing: number,
-    isSelect: boolean,
+    specialMode: string,
+    lastSelected: boolean,
     source: CaptionScript,
     style: any,
     tutorial: string,
@@ -90,6 +96,7 @@ class ScriptSourceListItem extends React.Component {
     onEndEdit(newURL: string): void,
     onPlay(source: CaptionScript): void,
     onRemove(source: CaptionScript): void,
+    onSourceOptions(source: CaptionScript): void,
     onStartEdit(id: number): void,
     onToggleSelect(): void,
     savePosition(): void,
@@ -104,10 +111,14 @@ class ScriptSourceListItem extends React.Component {
     const classes = this.props.classes;
     return(
       <div style={this.props.style}
-           className={clsx(this.props.index % 2 == 0 ? classes.evenChild : classes.oddChild)}>
+           className={clsx(this.props.index % 2 == 0 ? classes.evenChild : classes.oddChild, this.props.lastSelected && classes.lastSelected)}>
         <ListItem>
-          {this.props.isSelect && (
+          {(this.props.specialMode == SP.batchTag || this.props.specialMode == SP.select) && (
             <Checkbox value={this.props.source.url} onChange={this.props.onToggleSelect.bind(this)}
+                      checked={this.props.checked}/>
+          )}
+          {this.props.specialMode == SP.selectSingle && (
+            <Radio value={this.props.source.url} onChange={this.props.onToggleSelect.bind(this)}
                       checked={this.props.checked}/>
           )}
           <ListItemAvatar>
@@ -172,14 +183,14 @@ class ScriptSourceListItem extends React.Component {
 
           {this.props.isEditing != this.props.source.id && (
             <ListItemSecondaryAction className={classes.source}>
-              {/*<IconButton
+              <IconButton
                 onClick={this.props.onSourceOptions.bind(this, this.props.source)}
                 className={classes.actionButton}
                 edge="end"
                 size="small"
                 aria-label="options">
                 <BuildIcon/>
-              </IconButton>*/}
+              </IconButton>
               <IconButton
                 onClick={this.props.onRemove.bind(this, this.props.source)}
                 className={clsx(classes.deleteButton, classes.actionButton)}

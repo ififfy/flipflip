@@ -1,10 +1,12 @@
 import path from "path";
+
+import {urlToPath} from "./utils";
 import {BT, EA, GO, HTF, IF, IT, OF, RP, SC, SL, SOF, TF, VO, VTF, WF} from './const';
 import LibrarySource from "./LibrarySource";
 import Audio from "./Audio";
 import Overlay from "./Overlay";
 import WeightGroup from "./WeightGroup";
-import {urlToPath} from "./utils";
+import CaptionScript from "./CaptionScript";
 
 export default class Scene {
   id: number = 0;
@@ -162,34 +164,6 @@ export default class Scene {
   skipVideoStart = 0;
   skipVideoEnd = 0;
   scriptScene = false;
-  textEnabled = false;
-  textSource: string = "";
-  textEndStop = false;
-  textNextScene = false;
-  blinkColor = "#FFFFFF";
-  blinkFontSize = 20;
-  blinkFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
-  blinkBorder = false;
-  blinkBorderpx = 5;
-  blinkBorderColor = "#000000";
-  captionColor = "#FFFFFF";
-  captionFontSize = 8;
-  captionFontFamily = "Helvetica Neue,Helvetica,Arial,sans-serif";
-  captionBorder = false;
-  captionBorderpx = 3;
-  captionBorderColor = "#000000";
-  captionBigColor = "#FFFFFF";
-  captionBigFontSize = 12;
-  captionBigFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
-  captionBigBorder = false;
-  captionBigBorderpx = 4;
-  captionBigBorderColor = "#000000";
-  countColor = "#FFFFFF";
-  countFontSize = 20;
-  countFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
-  countBorder = false;
-  countBorderpx = 5;
-  countBorderColor = "#000000";
   generatorMax = 100;
   overlayEnabled: false;
   overlays: Array<Overlay> = [];
@@ -208,25 +182,55 @@ export default class Scene {
   audioEnabled = false;
   audioPlaylists: Array<{audios: Array<Audio>, shuffle: boolean, repeat: string}> = [];
   audioStartIndex = 0;
+  textEnabled = false;
+  scriptPlaylists: Array<{scripts: Array<CaptionScript>, shuffle: boolean, repeat: string}> = [];
+  scriptStartIndex = 0;
   regenerate = true;
   generatorWeights?: Array<WeightGroup> = null;
   openTab = 3;
 
   // unused; migration only
-  effectLevel = 0;
-  textKind: string = "";
-  audioURL?: string = "";
-  overlaySceneID: number = 0;
-  overlaySceneOpacity: number = 0.5;
-  transFull = false;
-  fadeFull = false;
-  playFullGif = false;
-  playFullVideo = false;
-  gridView = false;
-  grid: Array<Array<number>> = null;
+  effectLevel: number;
+  textKind: string;
+  audioURL?: string;
+  overlaySceneID: number;
+  overlaySceneOpacity: number;
+  transFull: boolean;
+  fadeFull: boolean;
+  playFullGif: boolean;
+  playFullVideo: boolean;
+  gridView: boolean;
+  grid: Array<Array<number>>;
   tagWeights?: string;
   sceneWeights?: string;
   audios: Array<Audio>;
+  textSource: string;
+  textEndStop: boolean;
+  textNextScene: boolean;
+  blinkColor: string;
+  blinkFontSize: number;
+  blinkFontFamily: string;
+  blinkBorder: boolean;
+  blinkBorderpx: number;
+  blinkBorderColor: string;
+  captionColor: string;
+  captionFontSize: number;
+  captionFontFamily: string;
+  captionBorder: boolean;
+  captionBorderpx: number;
+  captionBorderColor: string;
+  captionBigColor: string;
+  captionBigFontSize: number;
+  captionBigFontFamily: string;
+  captionBigBorder: boolean;
+  captionBigBorderpx: number;
+  captionBigBorderColor: string;
+  countColor: string;
+  countFontSize: number;
+  countFontFamily: string;
+  countBorder: boolean;
+  countBorderpx: number;
+  countBorderColor: string;
 
   constructor(init?: Partial<Scene>) {
     Object.assign(this, init);
@@ -343,6 +347,73 @@ export default class Scene {
         return {audios: [a], shuffle: false, repeat: RP.all};
       });
       this.audios = null;
+    }
+    if (this.textSource && this.textSource.length > 0) {
+      const newScripts = [new CaptionScript({
+        url: this.textSource,
+        stopAtEnd: this.textEndStop,
+        nextSceneAtEnd: this.textNextScene,
+        blink: {
+          color: this.blinkColor,
+          fontSize: this.blinkFontSize,
+          fontFamily: this.blinkFontFamily,
+          border: this.blinkBorder,
+          borderpx: this.blinkBorderpx,
+          borderColor: this.blinkBorderColor
+        },
+        caption: {
+          color: this.captionColor,
+          fontSize: this.captionFontSize,
+          fontFamily: this.captionFontFamily,
+          border: this.captionBorder,
+          borderpx: this.captionBorderpx,
+          borderColor: this.captionBorderColor
+        },
+        captionBig: {
+          color: this.captionBigColor,
+          fontSize: this.captionBigFontSize,
+          fontFamily: this.captionBigFontFamily,
+          border: this.captionBigBorder,
+          borderpx: this.captionBigBorderpx,
+          borderColor: this.captionBigBorderColor
+        },
+        count: {
+          color: this.countColor,
+          fontSize: this.countFontSize,
+          fontFamily: this.countFontFamily,
+          border: this.countBorder,
+          borderpx: this.countBorderpx,
+          borderColor: this.countBorderColor
+        },
+      })];
+      this.scriptPlaylists = [{scripts: newScripts, shuffle: false, repeat: RP.all}]
+      this.textSource = null;
+      this.textEndStop = null;
+      this.textNextScene = null;
+      this.blinkColor = null;
+      this.blinkFontSize = null;
+      this.blinkFontFamily = null;
+      this.blinkBorder = null;
+      this.blinkBorderpx = null;
+      this.blinkBorderColor = null;
+      this.captionColor = null;
+      this.captionFontSize = null;
+      this.captionFontFamily = null;
+      this.captionBorder = null;
+      this.captionBorderpx = null;
+      this.captionBorderColor = null;
+      this.captionBigColor = null;
+      this.captionBigFontSize = null;
+      this.captionBigFontFamily = null;
+      this.captionBigBorder = null;
+      this.captionBigBorderpx = null;
+      this.captionBigBorderColor = null;
+      this.countColor = null;
+      this.countFontSize = null;
+      this.countFontFamily = null;
+      this.countBorder = null;
+      this.countBorderpx = null;
+      this.countBorderColor = null;
     }
   }
 }

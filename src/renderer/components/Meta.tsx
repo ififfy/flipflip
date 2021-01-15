@@ -137,6 +137,7 @@ export default class Meta extends React.Component {
               goBack={a(actions.goBack)}
               onAddSource={a(actions.addSource)}
               onAddTracks={a(actions.addTracks)}
+              onAddScript={a(actions.addScript)}
               onClearBlacklist={a(actions.clearBlacklist)}
               onClip={a(actions.clipVideo)}
               onCloneScene={a(actions.cloneScene)}
@@ -147,6 +148,7 @@ export default class Meta extends React.Component {
               onPlayScene={a(actions.playScene)}
               onPlay={a(actions.playSceneFromLibrary)}
               onPlayAudio={a(actions.playAudio)}
+              onPlayScript={a(actions.playScript)}
               onResetScene={a(actions.resetScene)}
               onSaveAsScene={a(actions.saveScene)}
               onSort={a(actions.sortSources)}
@@ -229,23 +231,24 @@ export default class Meta extends React.Component {
           {this.isRoute('scripts') && (
             <ScriptLibrary
               allScenes={this.state.scenes}
-              filters={this.state.scriptsFilters}
+              filters={this.state.scriptFilters}
               library={this.state.scripts}
-              selected={this.state.scriptsSelected}
+              selected={this.state.scriptSelected}
               specialMode={this.state.specialMode}
               tags={this.state.tags}
               tutorial={this.state.tutorial}
-              yOffset={this.state.scriptsYOffset}
+              yOffset={this.state.scriptYOffset}
               goBack={a(actions.goBack)}
               onBatchTag={a(actions.batchTag)}
               onImportFromLibrary={a(actions.importScriptFromLibrary)}
+              onImportToScriptor={a(actions.importScriptToScriptor)}
               onManageTags={a(actions.manageTags)}
               onPlay={a(actions.playScript)}
               onSort={a(actions.sortScripts)}
               onTutorial={a(actions.doneTutorial)}
               onUpdateLibrary={a(actions.updateScriptLibrary)}
               onUpdateMode={a(actions.setMode)}
-              savePosition={a(actions.saveAudioPosition)}
+              savePosition={a(actions.saveScriptPosition)}
               systemMessage={a(actions.systemMessage)}
             />
           )}
@@ -372,10 +375,13 @@ export default class Meta extends React.Component {
             <CaptionScriptor
               config={this.state.config}
               scenes={this.state.scenes}
+              openScript={actions.getSelectScript(this.state)}
               theme={theme}
+              onAddFromLibrary={a(actions.addScriptSingle)}
               getTags={actions.getTags.bind(this, this.state.library)}
               goBack={a(actions.goBack)}
               onUpdateScene={a(actions.updateScene)}
+              onUpdateLibrary={a(actions.updateScriptLibrary)}
             />
           )}
 

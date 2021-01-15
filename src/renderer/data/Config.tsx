@@ -144,10 +144,6 @@ interface SceneSettingsI {
   generatorMax: number;
   overlayEnabled: boolean;
   overlays: Array<Overlay>;
-  textEnabled: boolean;
-  textSource: string;
-  textEndStop: boolean;
-  textNextScene: boolean;
 
   strobe: boolean;
   strobePulse: boolean;
@@ -173,36 +169,6 @@ interface SceneSettingsI {
   strobeAmp: number;
   strobePer: number;
   strobeOv: number;
-
-  blinkColor: string;
-  blinkFontSize: number;
-  blinkFontFamily: string;
-  blinkBorder: boolean;
-  blinkBorderpx: number;
-  blinkBorderColor: string;
-  captionColor: string;
-  captionFontSize: number;
-  captionFontFamily: string;
-  captionBorder: boolean;
-  captionBorderpx: number;
-  captionBorderColor: string;
-  captionBigColor: string;
-  captionBigFontSize: number;
-  captionBigFontFamily: string;
-  captionBigBorder: boolean;
-  captionBigBorderpx: number;
-  captionBigBorderColor: string;
-  countColor: string;
-  countFontSize: number;
-  countFontFamily: string;
-  countBorder: boolean;
-  countBorderpx: number;
-  countBorderColor: string;
-
-  audioScene: boolean;
-  audioEnabled: boolean;
-  audios: Array<Audio>;
-  audioPlaylists: Array<{audios: Array<Audio>, shuffle: boolean, repeat: string}>;
 
   // migration only
   overlaySceneID: number;
@@ -438,10 +404,6 @@ export class SceneSettings implements SceneSettingsI {
   nextSceneTime = 900;
   nextSceneAllImages = false;
   nextSceneRandoms: Array<number> = [];
-  textEnabled = false;
-  textSource = "";
-  textEndStop = false;
-  textNextScene = false;
 
   strobe = false;
   strobePulse = false;
@@ -467,35 +429,6 @@ export class SceneSettings implements SceneSettingsI {
   strobeAmp = 20;
   strobePer = 6;
   strobeOv = 3;
-
-  blinkColor = "#FFFFFF";
-  blinkFontSize = 20;
-  blinkFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
-  blinkBorder = false;
-  blinkBorderpx = 5;
-  blinkBorderColor = "#000000";
-  captionColor = "#FFFFFF";
-  captionFontSize = 8;
-  captionFontFamily = "Helvetica Neue,Helvetica,Arial,sans-serif";
-  captionBorder = false;
-  captionBorderpx = 3;
-  captionBorderColor = "#000000";
-  captionBigColor = "#FFFFFF";
-  captionBigFontSize = 12;
-  captionBigFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
-  captionBigBorder = false;
-  captionBigBorderpx = 4;
-  captionBigBorderColor = "#000000";
-  countColor = "#FFFFFF";
-  countFontSize = 20;
-  countFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
-  countBorder = false;
-  countBorderpx = 5;
-  countBorderColor = "#000000";
-
-  audioScene = false;
-  audioEnabled = false;
-  audioPlaylists: Array<{audios: Array<Audio>, shuffle: boolean, repeat: string}> = [];
 
   // migration only
   overlaySceneID = 0;

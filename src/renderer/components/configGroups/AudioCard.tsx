@@ -6,7 +6,6 @@ import {
 
 import AddIcon from '@material-ui/icons/Add';
 
-import {SceneSettings} from "../../data/Config";
 import {RP} from "../../data/const";
 import Scene from "../../data/Scene";
 import Audio from "../../data/Audio";
@@ -22,10 +21,10 @@ const styles = (theme: Theme) => createStyles({
 class AudioCard extends React.Component {
   readonly props: {
     classes: any,
-    scene: Scene | SceneSettings,
+    scene: Scene,
     sidebar: boolean,
     startPlaying: boolean,
-    onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
+    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
     shorterSeek?: boolean,
     showMsTimestamp?: boolean,
     scenePaths?: Array<any>,

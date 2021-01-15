@@ -313,6 +313,7 @@ class ScriptLibrary extends React.Component {
     goBack(): void,
     onBatchTag(): void,
     onImportFromLibrary(sources: Array<CaptionScript>): void,
+    onImportToScriptor(source: CaptionScript): void,
     onManageTags(): void,
     onPlay(source: CaptionScript, sceneID: string, displayed: Array<CaptionScript>): void,
     onSort(algorithm: string, ascending: boolean): void,
@@ -342,7 +343,8 @@ class ScriptLibrary extends React.Component {
         <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift, this.props.tutorial == SLT.toolbar && clsx(classes.backdropTop, classes.disable))}>
           <Toolbar className={classes.headerBar}>
             <div className={classes.headerLeft}>
-              <Tooltip title={this.props.specialMode == SP.select ? "Cancel Import" : "Back"} placement="right-end">
+              <Tooltip title={this.props.specialMode == SP.select || this.props.specialMode == SP.selectSingle ?
+                "Cancel Import" : "Back"} placement="right-end">
                 <IconButton
                   edge="start"
                   color="inherit"
@@ -445,7 +447,7 @@ class ScriptLibrary extends React.Component {
             )}
             <Container maxWidth={false} className={clsx(classes.container, this.state.displaySources.length > 0 && classes.containerNotEmpty)}>
               <ScriptSourceList
-                isSelect={!!this.props.specialMode}
+                specialMode={this.props.specialMode}
                 library={this.props.library}
                 scenes={this.props.allScenes}
                 selected={this.state.selected}
@@ -493,9 +495,10 @@ class ScriptLibrary extends React.Component {
                 <Fab
                   className={classes.addMenuButton}
                   disabled={this.state.selected.length == 0}
-                  onClick={this.props.specialMode == SP.batchTag ? this.onToggleBatchTagModal.bind(this) : this.onImportFromLibrary.bind(this)}
+                  onClick={this.props.specialMode == SP.batchTag ? this.onToggleBatchTagModal.bind(this) :
+                    this.props.specialMode == SP.select ? this.onImportFromLibrary.bind(this) : this.onImportSingleFromLibrary.bind(this)}
                   size="large">
-                  {this.props.specialMode == SP.select && (
+                  {(this.props.specialMode == SP.select || this.props.specialMode == SP.selectSingle) && (
                     <GetAppIcon className={classes.icon} />
                   )}
                   {this.props.specialMode == SP.batchTag && (
@@ -841,6 +844,17 @@ class ScriptLibrary extends React.Component {
       }
     }
     this.props.onImportFromLibrary(sources);
+  }
+
+  onImportSingleFromLibrary() {
+    for (let url of this.state.selected) {
+      const source = this.props.library.find((s) => s.url == url);
+      if (source) {
+        this.props.onImportToScriptor(source);
+        break;
+      }
+    }
+
   }
 
   onUpdateSelected(selected: Array<string>) {
