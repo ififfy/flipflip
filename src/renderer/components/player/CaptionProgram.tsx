@@ -479,7 +479,7 @@ export default class CaptionProgram extends React.Component {
       return index;
     }
 
-    if (this.props.getCurrentTimestamp) {
+    if (this.props.getCurrentTimestamp && this.props.captionScript.syncWithAudio) {
       const passed = this.props.getCurrentTimestamp();
       if (this._lastTimestamp == null || Math.abs(this._lastTimestamp - passed) > 1000) {
         // Timestamp has changed, reset

@@ -9,6 +9,7 @@ export default class CaptionScript {
 
   stopAtEnd = false;
   nextSceneAtEnd = false;
+  syncWithAudio = true;
 
   blink: FontSettingsI = {
     color: "#FFFFFF",

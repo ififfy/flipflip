@@ -115,6 +115,14 @@ class ScriptOptions extends React.Component {
                       }
                       label="Next Scene at End"/>
                   </Collapse>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        size="small"
+                        checked={this.state.script.syncWithAudio}
+                        onChange={this.onSourceBoolInput.bind(this, 'syncWithAudio')}/>
+                    }
+                    label="Sync Timestamp with Audio"/>
                 </Grid>
               </Grid>
             </Grid>
@@ -220,6 +228,9 @@ class ScriptOptions extends React.Component {
         } else {
           this.changeKey(key, false);
         }
+        break;
+      default:
+        this.changeKey(key, input.checked);
     }
   }
 
