@@ -376,6 +376,7 @@ export default class Meta extends React.Component {
             <CaptionScriptor
               config={this.state.config}
               scenes={this.state.scenes}
+              tutorial={this.state.tutorial}
               openScript={actions.getSelectScript(this.state)}
               theme={theme}
               onAddFromLibrary={a(actions.addScriptSingle)}

@@ -772,6 +772,7 @@ function areRulesValid(wg: WeightGroup) {
 }
 
 export function areWeightsValid(scene: Scene): boolean {
+  if (!scene.generatorWeights) return false;
   let remaining = 100;
   let hasAll = false;
   let hasWeight = false;
@@ -844,6 +845,11 @@ let captionProgramDefaults = {
   captionY: 0,
   bigCaptionY: 0,
   countY: 0,
+
+  blinkX: 0,
+  captionX: 0,
+  bigCaptionX: 0,
+  countX: 0,
 }
 export default captionProgramDefaults;
 

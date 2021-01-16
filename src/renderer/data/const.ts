@@ -320,7 +320,12 @@ const SLT = { // Script Library Tutorials
 
 const CST = { // Caption Scriptor Tutorials
   welcome: 'cst1',
-  final: 'cst2',
+  code: 'cst2',
+  player: 'cst3',
+  fonts: 'cst4',
+  menu: 'cst5',
+  actions: 'cst6',
+  final: 'cst7',
   done: DONE,
 };
 

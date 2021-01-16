@@ -1,16 +1,8 @@
 import * as React from "react";
 import * as CodeMirrorComp from 'react-codemirror2'
-import {createStyles, Theme, withStyles} from "@material-ui/core";
 
-import ChildCallbackHack from "../player/ChildCallbackHack";
 import {getTimingFromString} from "../../data/utils";
-
-const styles = (theme: Theme) => createStyles({
-  codeMirrorWrapper: {
-    overflowY: 'auto',
-    height: '100%',
-  },
-});
+import ChildCallbackHack from "../player/ChildCallbackHack";
 
 const actions = ["blink", "cap", "bigcap", "count", "wait"];
 export const tupleSetters = ["setBlinkDuration", "setBlinkDelay", "setBlinkGroupDelay", "setCaptionDuration", "setCaptionDelay",
@@ -211,12 +203,12 @@ export const timestampRegex = /^((\d?\d:)?\d?\d:\d\d(\.\d\d?\d?)?|\d?\d(\.\d\d?\
   });
 });
 
-class CodeMirror extends React.Component {
+export default class CodeMirror extends React.Component {
   readonly props: {
-    classes: any,
     onGutterClick(editor: any, clickedLine: number): void
-    onUpdateScript(text: string): void,
+    onUpdateScript(text: string, changed?: boolean): void,
     addHack?: ChildCallbackHack,
+    className?: string,
     overwriteHack?: ChildCallbackHack,
   }
 
@@ -225,13 +217,10 @@ class CodeMirror extends React.Component {
     cursor: {line: 0, ch: 0},
   }
 
-
   render() {
-    const classes = this.props.classes;
-
     return (
       <CodeMirrorComp.Controlled
-        className={classes.codeMirrorWrapper}
+        className={this.props.className}
         value={this.state.scriptText}
         autoScroll={false}
         options={{
@@ -304,7 +293,7 @@ class CodeMirror extends React.Component {
   _sendUpdate: NodeJS.Timeout = null;
   onBeforeChangeScript(editor: any, data: any, value: any)  {
     if (this.state.scriptText != value) {
-      this.onUpdateScript(value, editor);
+      this.onUpdateScript(value, editor, true);
     }
   }
 
@@ -312,15 +301,13 @@ class CodeMirror extends React.Component {
     this.setState({cursor: editor.getDoc().getCursor()});
   }
 
-  onUpdateScript(scriptText: any, editor?: any) {
+  onUpdateScript(scriptText: any, editor?: any, changed = false) {
     if (editor) {
       this.setState({scriptText: scriptText, cursor: editor.getDoc().getCursor()});
     } else {
       this.setState({scriptText: scriptText});
     }
     clearTimeout(this._sendUpdate);
-    this._sendUpdate = setTimeout(this.props.onUpdateScript.bind(this, this.state.scriptText), 500);
+    this._sendUpdate = setTimeout(this.props.onUpdateScript.bind(this, scriptText, changed), 500);
   }
 }
-
-export default withStyles(styles)(CodeMirror as any);

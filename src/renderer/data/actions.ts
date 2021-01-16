@@ -241,6 +241,8 @@ export function skipTutorials(state: State): Object {
   newConfig.tutorials.player = DONE;
   newConfig.tutorials.library = DONE;
   newConfig.tutorials.audios = DONE;
+  newConfig.tutorials.scripts = DONE;
+  newConfig.tutorials.scriptor = DONE;
   newConfig.tutorials.sceneGenerator = DONE;
   newConfig.tutorials.sceneGrid = DONE;
   newConfig.tutorials.videoClipper = DONE;
@@ -254,6 +256,8 @@ export function resetTutorials(state: State): Object {
   newConfig.tutorials.player = null;
   newConfig.tutorials.library = null;
   newConfig.tutorials.audios = null;
+  newConfig.tutorials.scripts = null;
+  newConfig.tutorials.scriptor = null;
   newConfig.tutorials.sceneGenerator = null;
   newConfig.tutorials.sceneGrid = null;
   newConfig.tutorials.videoClipper = null;
@@ -644,7 +648,17 @@ export function openScripts(state: State): Object {
 }
 
 export function openScriptor(state: State): Object {
-  return {route: [new Route({kind: 'scriptor', value: null})], tutorial: state.config.tutorials.scriptor == null ? CST.welcome : null};
+  const testScript = "setBlinkDuration 300\n" +
+    "setBlinkDelay 100\n" +
+    "setBlinkGroupDelay 1200\n" +
+    "setCaptionDuration 2000\n" +
+    "setCaptionDelay 1200\n" +
+    "\n" +
+    "bigcap YOU LOVE FLUFFY KITTENS\n" +
+    "blink KITTENS / ARE / YOUR / LIFE\n" +
+    "cap Cuddle all the kittens forever because you love them."
+  const tutorial = state.config.tutorials.scriptor == null;
+  return {route: [new Route({kind: 'scriptor', value: tutorial ? new CaptionScript({script:testScript}) : null})], tutorial: tutorial ? CST.welcome : null};
 }
 
 export function openScriptInScriptor(state: State, source: CaptionScript) {

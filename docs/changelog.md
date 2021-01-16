@@ -1,5 +1,36 @@
 # Changelog
 
+#### 3.1.0-beta2 <small>(01/XX/2020)</small>
+- Caption Scriptor
+- Caption Script Library
+- Timing functions for caption scripts
+- Timestamps in caption script
+- Sync audio with caption script timestamps
+- Newlines in caption scripts
+- Store caption phrases in separte groups
+- Change command positiong in caption scripts
+- Multiple concurrent Caption Script playlists
+- Allow generators to auto-generate on playback
+- Add Hydrus as source
+- Add dynamic watermark
+- Allow scenes to restore from configured defaults
+- Allow saved Reddit posts as source
+- Allow Tumblr throttle alert to be disabled
+- Make tag background translucent
+- Add scraper for E621
+- Improve RedGif parsing
+- Add Random sort function
+- Fix bug with GoTo Clip Source
+- Fix bug with source timeouts
+- Fix bug with audio tag ordering
+- Fix bug with backslash in search
+- Fix bug with Centered images
+- Fix bug BDSMlr sources
+- Fix bug with loading system fonts
+- Fix bug with audio repeat functions
+- Fix bug with scene generator using weighted types
+- Fix bug with copying remote images to clipboard
+
 #### 3.1.0-beta1 <small>(09/25/2020)</small>
 - Easing Controls
 - Audio Library

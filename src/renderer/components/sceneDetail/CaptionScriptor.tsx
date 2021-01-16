@@ -10,7 +10,7 @@ require('codemirror/theme/material.css');
 
 import {
   AppBar, Button, Card, CardContent, Container, createStyles, Dialog, DialogActions, DialogContent, DialogContentText,
-  DialogTitle, Divider, Grid, IconButton, Menu, MenuItem, Select, Theme, Toolbar, Tooltip, Typography, withStyles
+  DialogTitle, Divider, Grid, IconButton, Link, Menu, MenuItem, Select, Theme, Toolbar, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -23,7 +23,7 @@ import GetAppIcon from '@material-ui/icons/GetApp';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import SaveIcon from '@material-ui/icons/Save';
 
-import {MO, RP} from "../../data/const";
+import {CST, MO, RP} from "../../data/const";
 import captionProgramDefaults, {CancelablePromise} from "../../data/utils";
 import Scene from "../../data/Scene";
 import Tag from "../../data/Tag";
@@ -179,6 +179,22 @@ const styles = (theme: Theme) => createStyles({
   keywordButton: {
     color: '#F07178',
   },
+  codeMirrorWrapper: {
+    overflowY: 'auto',
+    height: '100%',
+  },
+  backdropTop: {
+    zIndex: theme.zIndex.modal + 1,
+  },
+  backdropTopHighlight: {
+    zIndex: theme.zIndex.modal + 1,
+    borderWidth: 2,
+    borderColor: theme.palette.secondary.main,
+    borderStyle: 'solid',
+  },
+  disable: {
+    pointerEvents: 'none',
+  },
 });
 
 
@@ -189,6 +205,7 @@ class CaptionScriptor extends React.Component {
     openScript: CaptionScript,
     scenes: Array<Scene>,
     theme: Theme,
+    tutorial: string,
     onAddFromLibrary(): void,
     getTags(source: string): Array<Tag>,
     goBack(): void,
@@ -310,18 +327,21 @@ class CaptionScriptor extends React.Component {
                     </Typography>
                   </div>
                 )}
-              <CodeMirror
-                onGutterClick={this.onGutterClick.bind(this)}
-                onUpdateScript={this.onUpdateScript.bind(this)}
-                addHack={this.state.codeMirrorAddHack}
-                overwriteHack={this.state.codeMirrorOverwriteHack}
-              />
+                <CodeMirror
+                  className={this.props.tutorial == CST.code ? classes.backdropTopHighlight : classes.codeMirrorWrapper}
+                  onGutterClick={this.onGutterClick.bind(this)}
+                  onUpdateScript={this.onUpdateScript.bind(this)}
+                  addHack={this.state.codeMirrorAddHack}
+                  overwriteHack={this.state.codeMirrorOverwriteHack}
+                />
               </div>
               <div className={clsx(classes.menuGrid, this.state.fullscreen && classes.hidden)}>
                 <Card className={classes.menuCard}>
                   <CardContent className={classes.menuCardContent}>
                     <Grid container spacing={2}>
-                      <Grid item xs={12} className={classes.menuGridButtons}>
+                      <Grid item xs={12} className={clsx(classes.menuGridButtons,
+                        this.props.tutorial == CST.menu && classes.backdropTopHighlight,
+                        this.props.tutorial == CST.menu && classes.disable)}>
                         <Tooltip title="New">
                           <IconButton onClick={this.onNew.bind(this)}>
                             <InsertDriveFileIcon/>
@@ -385,10 +405,11 @@ class CaptionScriptor extends React.Component {
                           </span>
                         </Tooltip>
                       </Grid>
-                      <Grid item xs={12} className={classes.noPaddingTop}>
+                      <Grid item xs={12} className={clsx(classes.noPaddingTop, this.props.tutorial == CST.menu && classes.backdropTop)}>
                         <Divider variant={"fullWidth"}/>
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid item xs={12} className={clsx(this.props.tutorial == CST.menu && classes.backdropTopHighlight,
+                        this.props.tutorial == CST.menu && classes.disable)}>
                         {this.state.scene == null && (
                           <Typography component="div" variant="subtitle1" color="textPrimary">
                             Select a Scene to start testing
@@ -402,7 +423,8 @@ class CaptionScriptor extends React.Component {
                           onChange={this.onChangeScene.bind(this)}
                         />
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid item xs={12} className={clsx(this.props.tutorial == CST.actions && classes.backdropTopHighlight
+                        , this.props.tutorial == CST.actions && classes.disable)}>
                         <Grid container spacing={1}>
                           <Grid item xs={12}>
                             <Typography variant={"h5"}>Actions</Typography>
@@ -434,10 +456,10 @@ class CaptionScriptor extends React.Component {
                           </Grid>
                         </Grid>
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid item xs={12} className={clsx(this.props.tutorial == CST.actions && classes.backdropTop)}>
                         <Divider variant={"fullWidth"}/>
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid item xs={12} className={clsx(this.props.tutorial == CST.actions && classes.backdropTopHighlight, this.props.tutorial == CST.actions && classes.disable)}>
                         <Grid container spacing={1}>
                           <Grid item xs={12}>
                             <Typography variant={"h5"}>Setters</Typography>
@@ -464,10 +486,10 @@ class CaptionScriptor extends React.Component {
                           </Grid>
                         </Grid>
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid item xs={12} className={clsx(this.props.tutorial == CST.actions && classes.backdropTop)}>
                         <Divider variant={"fullWidth"}/>
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid item xs={12} className={clsx(this.props.tutorial == CST.actions && classes.backdropTopHighlight, this.props.tutorial == CST.actions && classes.disable)}>
                         <Grid container spacing={1}>
                           <Grid item xs={12}>
                             <Typography variant={"h5"}>Special</Typography>
@@ -489,6 +511,14 @@ class CaptionScriptor extends React.Component {
                           </Grid>
                         </Grid>
                       </Grid>
+                      <Grid item xs={12}>
+                        <Divider variant={"fullWidth"}/>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Typography variant="body2" color="inherit">
+                          See <Link href="#" onClick={this.openLink.bind(this, "https://ififfy.github.io/flipflip/#/caption_script")}>documentation</Link> for help.
+                        </Typography>
+                      </Grid>
                     </Grid>
                     <div className={classes.fill}/>
                     {this.state.scene && (
@@ -504,7 +534,7 @@ class CaptionScriptor extends React.Component {
                   </CardContent>
                 </Card>
               </div>
-              <div className={classes.playerGrid}>
+              <div className={clsx(classes.playerGrid, this.props.tutorial == CST.player && classes.backdropTopHighlight)}>
                 {this.state.scene && (
                   <Player
                     config={this.props.config}
@@ -543,7 +573,7 @@ class CaptionScriptor extends React.Component {
                     onError={this.onError.bind(this)}/>
                 )}
               </div>
-              <div className={clsx(classes.fontGrid, this.state.fullscreen && classes.hidden)}>
+              <div className={clsx(classes.fontGrid, this.state.fullscreen && classes.hidden, this.props.tutorial == CST.fonts && classes.backdropTopHighlight)}>
                 <Card className={classes.fontCard}>
                   <CardContent>
                     <Grid item xs={12}>
@@ -674,13 +704,18 @@ class CaptionScriptor extends React.Component {
       );
     });
     if (this.props.openScript) {
-      wretch(this.props.openScript.url)
-        .get()
-        .text(data => {
-          this.state.codeMirrorOverwriteHack.args = [data];
-          this.state.codeMirrorOverwriteHack.fire();
-          this.setState({captionScript: this.props.openScript, scriptChanged: false});
-        });
+      if (this.props.openScript.script) {
+        this.state.codeMirrorOverwriteHack.args = [this.props.openScript.script];
+        this.state.codeMirrorOverwriteHack.fire();
+      } else {
+        wretch(this.props.openScript.url)
+          .get()
+          .text(data => {
+            this.state.codeMirrorOverwriteHack.args = [data];
+            this.state.codeMirrorOverwriteHack.fire();
+            this.setState({captionScript: this.props.openScript, scriptChanged: false});
+          });
+      }
     }
   }
 
@@ -870,7 +905,7 @@ class CaptionScriptor extends React.Component {
     this.setState({error: e});
   }
 
-  onUpdateScript(script: string) {
+  onUpdateScript(script: string, changed = false) {
     const newScript = JSON.parse(JSON.stringify(this.state.captionScript));
     newScript.blink = this.state.captionScript.blink;
     newScript.caption = this.state.captionScript.caption;
@@ -880,9 +915,9 @@ class CaptionScriptor extends React.Component {
     if (this.state.scene) {
       const newScene = JSON.parse(JSON.stringify(this.state.scene));
       newScene.scriptPlaylists = [{scripts: [newScript], shuffle: false, repeat: RP.one}];
-      this.setState({scene: newScene, captionScript: newScript, error: null, scriptChanged: this.state.captionScript.script != newScript.script});
+      this.setState({scene: newScene, captionScript: newScript, error: null, scriptChanged: changed ? true : this.state.scriptChanged});
     } else {
-      this.setState({captionScript: newScript, error: null, scriptChanged: this.state.captionScript.script != newScript.script});
+      this.setState({captionScript: newScript, error: null, scriptChanged: changed ? true : this.state.scriptChanged});
     }
   }
 
@@ -1028,7 +1063,17 @@ class CaptionScriptor extends React.Component {
     const newOptions = JSON.parse(JSON.stringify((script as any)[property]));
     fn(newOptions);
     (script as any)[property] = newOptions;
-    this.setState({captionScript: script});
+    if (this.state.scene) {
+      const newScene = JSON.parse(JSON.stringify(this.state.scene));
+      newScene.scriptPlaylists = [{scripts: [script], shuffle: false, repeat: RP.one}];
+      this.setState({scene: newScene, captionScript: script, error: null, scriptChanged: true});
+    } else {
+      this.setState({captionScript: script, error: null, scriptChanged: true});
+    }
+  }
+
+  openLink(url: string) {
+    remote.shell.openExternal(url);
   }
 }
 
