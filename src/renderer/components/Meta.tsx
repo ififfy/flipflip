@@ -240,6 +240,7 @@ export default class Meta extends React.Component {
               yOffset={this.state.scriptYOffset}
               goBack={a(actions.goBack)}
               onBatchTag={a(actions.batchTag)}
+              onEditScript={a(actions.openScriptInScriptor)}
               onImportFromLibrary={a(actions.importScriptFromLibrary)}
               onImportToScriptor={a(actions.importScriptToScriptor)}
               onManageTags={a(actions.manageTags)}

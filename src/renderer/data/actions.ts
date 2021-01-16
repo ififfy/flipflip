@@ -647,6 +647,10 @@ export function openScriptor(state: State): Object {
   return {route: [new Route({kind: 'scriptor', value: null})], tutorial: state.config.tutorials.scriptor == null ? CST.welcome : null};
 }
 
+export function openScriptInScriptor(state: State, source: CaptionScript) {
+  return {route: state.route.concat(new Route({kind: 'scriptor', value: source}))};
+}
+
 export function openLibraryImport(state: State): Object {
   return {route: state.route.concat(new Route({kind: 'library', value: null})), specialMode: SP.select, librarySelected: []};
 }

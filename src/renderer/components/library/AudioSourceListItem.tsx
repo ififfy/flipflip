@@ -11,9 +11,8 @@ import {
 import BuildIcon from '@material-ui/icons/Build';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
-import OfflineBoltIcon from '@material-ui/icons/OfflineBolt';
 
-import {getTimestamp, urlToPath} from "../../data/utils";
+import {getTimestamp} from "../../data/utils";
 import Tag from "../../data/Tag";
 import {grey} from "@material-ui/core/colors";
 import Audio from "../../data/Audio";

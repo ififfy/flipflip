@@ -708,7 +708,7 @@ class CaptionScriptor extends React.Component {
 
   onConfirmNew() {
     this.onCloseDialog();
-    this.setState({openFile: new CaptionScript({script: ""}), error: null, scriptChanged: false});
+    this.setState({captionScript: new CaptionScript({script: ""}), error: null, scriptChanged: false});
     this.state.codeMirrorOverwriteHack.args = [""];
     this.state.codeMirrorOverwriteHack.fire();
   }
@@ -789,7 +789,11 @@ class CaptionScriptor extends React.Component {
       {filters: [{name: 'Text Document', extensions: ['txt']}], defaultPath: this.state.captionScript.url}, (filePath) => {
         if (filePath != null) {
           fs.writeFileSync(filePath, this.state.captionScript.script);
-          this.setState({openFile: filePath, scriptChanged: false});
+          const setURL = (script: CaptionScript) => {
+            script.url = filePath;
+            return script;
+          }
+          this.setState({captionScript: setURL(this.state.captionScript), scriptChanged: false});
           return true;
         } else {
           return false;

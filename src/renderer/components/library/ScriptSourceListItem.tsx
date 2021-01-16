@@ -17,6 +17,7 @@ import SourceIcon from "./SourceIcon";
 import CaptionScript from "../../data/CaptionScript";
 import {grey} from "@material-ui/core/colors";
 import {SP} from "../../data/const";
+import EditIcon from "@material-ui/icons/Edit";
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -93,6 +94,7 @@ class ScriptSourceListItem extends React.Component {
     style: any,
     tutorial: string,
     onDelete(source: CaptionScript): void;
+    onEditScript(source: CaptionScript): void,
     onEndEdit(newURL: string): void,
     onPlay(source: CaptionScript): void,
     onRemove(source: CaptionScript): void,
@@ -183,6 +185,16 @@ class ScriptSourceListItem extends React.Component {
 
           {this.props.isEditing != this.props.source.id && (
             <ListItemSecondaryAction className={classes.source}>
+              {!this.props.specialMode && (
+                <IconButton
+                  onClick={this.props.onEditScript.bind(this, this.props.source)}
+                  className={classes.actionButton}
+                  edge="end"
+                  size="small"
+                  aria-label="edit">
+                  <EditIcon/>
+                </IconButton>
+              )}
               <IconButton
                 onClick={this.props.onSourceOptions.bind(this, this.props.source)}
                 className={classes.actionButton}

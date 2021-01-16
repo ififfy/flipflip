@@ -53,6 +53,7 @@ class ScriptSourceList extends React.Component {
     showHelp: boolean,
     sources: Array<CaptionScript>,
     tutorial: string,
+    onEditScript(source: CaptionScript): void,
     onPlay(source: CaptionScript, sceneID: number, displayed: Array<CaptionScript>): void,
     onUpdateLibrary(fn: (library: Array<CaptionScript>) => void): void,
     systemMessage(message: string): void,
@@ -401,6 +402,7 @@ class ScriptSourceList extends React.Component {
         style={value.style}
         tutorial={this.props.tutorial}
         onDelete={this.onDelete.bind(this)}
+        onEditScript={this.props.onEditScript}
         onEndEdit={this.onEndEdit.bind(this)}
         onPlay={this.onPlay.bind(this)}
         onRemove={this.onRemove.bind(this)}

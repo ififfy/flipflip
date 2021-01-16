@@ -313,6 +313,7 @@ class ScriptLibrary extends React.Component {
     yOffset: number,
     goBack(): void,
     onBatchTag(): void,
+    onEditScript(source: CaptionScript): void,
     onImportFromLibrary(sources: Array<CaptionScript>): void,
     onImportToScriptor(source: CaptionScript): void,
     onManageTags(): void,
@@ -455,6 +456,7 @@ class ScriptLibrary extends React.Component {
                 showHelp={!this.props.specialMode && this.state.filters.length == 0}
                 sources={this.state.displaySources}
                 yOffset={this.props.yOffset}
+                onEditScript={this.props.onEditScript}
                 onPlay={this.props.onPlay.bind(this)}
                 onUpdateSelected={this.onUpdateSelected.bind(this)}
                 onUpdateLibrary={this.props.onUpdateLibrary.bind(this)}
