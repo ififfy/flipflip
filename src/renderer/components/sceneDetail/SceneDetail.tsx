@@ -29,7 +29,9 @@ import MovieIcon from '@material-ui/icons/Movie';
 import PhotoFilterIcon from '@material-ui/icons/PhotoFilter';
 import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import PublishIcon from '@material-ui/icons/Publish';
+import RestoreIcon from "@material-ui/icons/Restore";
 import SaveIcon from '@material-ui/icons/Save';
+import ShuffleIcon from "@material-ui/icons/Shuffle";
 import SortIcon from '@material-ui/icons/Sort';
 import WarningIcon from '@material-ui/icons/Warning';
 
@@ -48,7 +50,6 @@ import LibrarySearch from "../library/LibrarySearch";
 import SourceList from "../library/SourceList";
 import AudioTextEffects from "./AudioTextEffects";
 import {areWeightsValid} from "../../data/utils";
-import RestoreIcon from "@material-ui/icons/Restore";
 import Audio from "../../data/Audio";
 import CaptionScript from "../../data/CaptionScript";
 
@@ -757,7 +758,7 @@ class SceneDetail extends React.Component {
                   classes={{paper: classes.sortMenu}}
                   open={this.state.openMenu == MO.sort}
                   onClose={this.onCloseDialog.bind(this)}>
-                  {Object.values(SF).map((sf) =>
+                  {Object.values(SF).filter((sf) => sf != SF.random).map((sf) =>
                     <MenuItem key={sf}>
                       <ListItemText primary={en.get(sf)}/>
                       <ListItemSecondaryAction>
@@ -770,6 +771,14 @@ class SceneDetail extends React.Component {
                       </ListItemSecondaryAction>
                     </MenuItem>
                   )}
+                  <MenuItem key={SF.random}>
+                    <ListItemText primary={en.get(SF.random)}/>
+                    <ListItemSecondaryAction>
+                      <IconButton edge="end" onClick={this.props.onSort.bind(this, this.props.scene, SF.random, true)}>
+                        <ShuffleIcon/>
+                      </IconButton>
+                    </ListItemSecondaryAction>
+                  </MenuItem>
                 </Menu>
               </React.Fragment>
             )}

@@ -2283,6 +2283,9 @@ function addSources(originalSources: Array<LibrarySource>, newSources: Array<str
 }
 
 export function sortScene(state: State, algorithm: string, ascending: boolean): Object {
+  if (algorithm == SF.random) {
+    return {scenes: randomizeList(state.scenes.concat())}
+  }
   const getName = (a: Scene) => {
     return a.name.toLowerCase();
   };
@@ -2383,6 +2386,9 @@ function audioSortFunction(algorithm: string, ascending: boolean): (a: Audio, b:
 }
 
 export function sortScripts(state: State, algorithm: string, ascending: boolean): Object {
+  if (algorithm == SF.random) {
+    return {scripts: randomizeList(state.scripts.concat())};
+  }
   const newLibrary = state.scripts.concat().sort(scriptSortFunction(algorithm, ascending));
   return {scripts: newLibrary};
 }
@@ -2418,6 +2424,14 @@ function scriptSortFunction(algorithm: string, ascending: boolean): (a: CaptionS
 }
 
 export function sortSources(state: State, scene: Scene, algorithm: string, ascending: boolean): Object {
+  if (algorithm == SF.random) {
+    if (scene != null) {
+      return updateScene(state, scene, (s) => s.sources = randomizeList(s.sources.concat()));
+    } else {
+      const newLibrary = randomizeList(state.library.concat());
+      return {library: newLibrary};
+    }
+  }
   const getName = (a: LibrarySource) => {
     const sourceType = getSourceType(a.url);
     return sourceType == ST.video || sourceType == ST.playlist ? getFileName(a.url).toLowerCase() : getFileGroup(a.url).toLowerCase();

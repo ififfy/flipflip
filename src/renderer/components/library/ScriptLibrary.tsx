@@ -47,6 +47,7 @@ import HttpIcon from '@material-ui/icons/Http';
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import MenuIcon from'@material-ui/icons/Menu';
 import SelectAllIcon from '@material-ui/icons/SelectAll';
+import ShuffleIcon from "@material-ui/icons/Shuffle";
 import SortIcon from '@material-ui/icons/Sort';
 
 import {AF, MO, SF, SP, SLT} from "../../data/const";
@@ -617,7 +618,7 @@ class ScriptLibrary extends React.Component {
               classes={{paper: classes.sortMenu}}
               open={this.state.openMenu == MO.sort}
               onClose={this.onCloseDialog.bind(this)}>
-              {Object.values(SF).filter((f) => f != SF.count && f != SF.type).map((sf) =>
+              {Object.values(SF).filter((sf) => sf != SF.count && sf != SF.type && sf != SF.random).map((sf) =>
                 <MenuItem key={sf}>
                   <ListItemText primary={en.get(sf)}/>
                   <ListItemSecondaryAction>
@@ -630,6 +631,14 @@ class ScriptLibrary extends React.Component {
                   </ListItemSecondaryAction>
                 </MenuItem>
               )}
+              <MenuItem key={SF.random}>
+                <ListItemText primary={en.get(SF.random)}/>
+                <ListItemSecondaryAction>
+                  <IconButton edge="end" onClick={this.props.onSort.bind(this, SF.random, true)}>
+                    <ShuffleIcon/>
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </MenuItem>
             </Menu>
           </React.Fragment>
         )}

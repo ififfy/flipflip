@@ -71,6 +71,7 @@ export default new Map<string, string>([
   ['sf.date', 'By Date'],
   ['sf.count', 'By Count'],
   ['sf.type', 'By Type'],
+  ['sf.random', 'Randomize Order'],
 
   ['asf.url', 'By URL'],
   ['asf.name', 'By Name'],

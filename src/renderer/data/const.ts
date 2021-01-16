@@ -105,6 +105,7 @@ const SF = { // sort function
   date: 'sf.date',
   count: 'sf.count',
   type: 'sf.type',
+  random: 'sf.random',
 };
 
 const ASF = { // audio sort function

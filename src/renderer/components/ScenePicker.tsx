@@ -26,6 +26,7 @@ import MovieIcon from '@material-ui/icons/Movie';
 import MovieFilterIcon from '@material-ui/icons/MovieFilter';
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import SettingsIcon from '@material-ui/icons/Settings';
+import ShuffleIcon from '@material-ui/icons/Shuffle';
 import SortIcon from '@material-ui/icons/Sort';
 import SystemUpdateIcon from '@material-ui/icons/SystemUpdate';
 
@@ -799,6 +800,14 @@ class ScenePicker extends React.Component {
                       </ListItemSecondaryAction>
                     </MenuItem>
                   )}
+                  <MenuItem key={SF.random}>
+                    <ListItemText primary={en.get(SF.random)}/>
+                    <ListItemSecondaryAction>
+                      <IconButton edge="end" onClick={this.props.onSort.bind(this, SF.random, true)}>
+                        <ShuffleIcon/>
+                      </IconButton>
+                    </ListItemSecondaryAction>
+                  </MenuItem>
                 </Menu>
               </React.Fragment>
             )}
