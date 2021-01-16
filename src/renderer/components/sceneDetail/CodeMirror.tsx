@@ -19,7 +19,7 @@ export const singleSetters = ["setBlinkWaveRate", "setBlinkBPMMulti", "setBlinkD
   "setBlinkGroupDelayWaveRate", "setBlinkGroupDelayBPMMulti", "setCaptionWaveRate", "setCaptionBPMMulti",
   "setCaptionDelayWaveRate", "setCaptionDelayBPMMulti", "setCountWaveRate", "setCountBPMMulti", "setCountDelayWaveRate",
   "setCountDelayBPMMulti", "setCountGroupDelayWaveRate", "setCountGroupDelayBPMMulti", "setBlinkY", "setCaptionY",
-  "setBigCaptionY", "setCountY"];
+  "setBigCaptionY", "setCountY", "setBlinkX", "setCaptionX", "setBigCaptionX", "setCountX"];
 export const stringSetters = ["setBlinkTF", "setBlinkDelayTF", "setBlinkGroupDelayTF", "setCaptionTF", "setCaptionDelayTF",
   "setCountTF", "setCountDelayTF", "setCountGroupDelayTF"];
 const storers = ["storephrase", "storePhrase"];

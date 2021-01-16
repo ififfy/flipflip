@@ -338,6 +338,10 @@ export default class CaptionProgram extends React.Component {
           case "setCaptionY":
           case "setBigCaptionY":
           case "setCountY":
+          case "setBlinkX":
+          case "setCaptionX":
+          case "setBigCaptionX":
+          case "setCountX":
           case "wait":
             if (value == null) {
               error = "Error: {" + index + "} '" + line + "' - missing parameter";
@@ -606,6 +610,14 @@ export default class CaptionProgram extends React.Component {
         this.el.current.style.paddingBottom = 'unset';
         this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
       }
+      const xPos = this.state.captionX;
+      if (xPos > 0) {
+        this.el.current.style.paddingLeft = (xPos) + 'vmin';
+        this.el.current.style.paddingRight = 'unset';
+      } else {
+        this.el.current.style.paddingLeft = 'unset';
+        this.el.current.style.paddingRight = (xPos * -1) + 'vmin';
+      }
       this.el.current.style.transition = 'opacity 0.5s ease-in-out';
       if (this.props.captionScript.caption.border) {
         this.el.current.style.webkitTextStroke = (this.props.captionScript.caption.borderpx * this.props.scale) + 'px ' + this.props.captionScript.caption.borderColor;
@@ -643,6 +655,14 @@ export default class CaptionProgram extends React.Component {
       } else {
         this.el.current.style.paddingBottom = 'unset';
         this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
+      }
+      const xPos = this.state.bigCaptionX;
+      if (xPos > 0) {
+        this.el.current.style.paddingLeft = (xPos) + 'vmin';
+        this.el.current.style.paddingRight = 'unset';
+      } else {
+        this.el.current.style.paddingLeft = 'unset';
+        this.el.current.style.paddingRight = (xPos * -1) + 'vmin';
       }
       this.el.current.style.transition = 'opacity 0.1s ease-out';
       if (this.props.captionScript.captionBig.border) {
@@ -709,6 +729,14 @@ export default class CaptionProgram extends React.Component {
       } else {
         this.el.current.style.paddingBottom = 'unset';
         this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
+      }
+      const xPos = this.state.blinkX;
+      if (xPos > 0) {
+        this.el.current.style.paddingLeft = (xPos) + 'vmin';
+        this.el.current.style.paddingRight = 'unset';
+      } else {
+        this.el.current.style.paddingLeft = 'unset';
+        this.el.current.style.paddingRight = (xPos * -1) + 'vmin';
       }
       this.el.current.style.transition = 'opacity 0.1s ease-out';
       if (this.props.captionScript.blink.border) {
@@ -785,6 +813,14 @@ export default class CaptionProgram extends React.Component {
         this.el.current.style.paddingBottom = 'unset';
         this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
       }
+      const xPos = this.state.countX;
+      if (xPos > 0) {
+        this.el.current.style.paddingLeft = (xPos) + 'vmin';
+        this.el.current.style.paddingRight = 'unset';
+      } else {
+        this.el.current.style.paddingLeft = 'unset';
+        this.el.current.style.paddingRight = (xPos * -1) + 'vmin';
+      }
       this.el.current.style.transition = 'opacity 0.1s ease-out';
       if (this.props.captionScript.count.border) {
         this.el.current.style.webkitTextStroke = (this.props.captionScript.count.borderpx * this.props.scale) + 'px ' + this.props.captionScript.count.borderColor;
@@ -823,6 +859,34 @@ export default class CaptionProgram extends React.Component {
   setCountY(relYPos: number) {
     return (nextCommand: Function) => {
       this.setState({countY: relYPos});
+      nextCommand();
+    }
+  }
+
+  setBlinkX(relXPos: number) {
+    return (nextCommand: Function) => {
+      this.setState({blinkX: relXPos});
+      nextCommand();
+    }
+  }
+
+  setCaptionX(relXPos: number) {
+    return (nextCommand: Function) => {
+      this.setState({captionX: relXPos});
+      nextCommand();
+    }
+  }
+
+  setBigCaptionX(relXPos: number) {
+    return (nextCommand: Function) => {
+      this.setState({bigCaptionX: relXPos});
+      nextCommand();
+    }
+  }
+
+  setCountX(relXPos: number) {
+    return (nextCommand: Function) => {
+      this.setState({countX: relXPos});
       nextCommand();
     }
   }
