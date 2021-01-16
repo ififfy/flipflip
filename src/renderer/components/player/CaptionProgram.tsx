@@ -90,6 +90,9 @@ export default class CaptionProgram extends React.Component {
   componentWillUnmount() {
     this.reset();
     this.stop();
+    if (this.props.jumpToHack) {
+      this.props.jumpToHack.listener = null;
+    }
   }
 
   shouldComponentUpdate(props: any, state: any): boolean {

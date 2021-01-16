@@ -3,7 +3,6 @@ import {remote} from "electron";
 import wretch from "wretch";
 import clsx from "clsx";
 import fs from "fs";
-import * as CodeMirror from 'react-codemirror2'
 import fontList from "font-list";
 
 require('codemirror/lib/codemirror.css');
@@ -24,8 +23,8 @@ import GetAppIcon from '@material-ui/icons/GetApp';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import SaveIcon from '@material-ui/icons/Save';
 
-import {MO, RF, RP} from "../../data/const";
-import captionProgramDefaults, {CancelablePromise, getTimingFromString} from "../../data/utils";
+import {MO, RP} from "../../data/const";
+import captionProgramDefaults, {CancelablePromise} from "../../data/utils";
 import Scene from "../../data/Scene";
 import Tag from "../../data/Tag";
 import Player from "../player/Player";
@@ -36,7 +35,7 @@ import ChildCallbackHack from "../player/ChildCallbackHack";
 import AudioCard from "../configGroups/AudioCard";
 import FontOptions from "../library/FontOptions";
 import CaptionScript, {FontSettingsI} from "../../data/CaptionScript";
-import en from "../../data/en";
+import CodeMirror, {singleSetters, stringSetters, timestampRegex, tupleSetters} from "./CodeMirror";
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -157,10 +156,6 @@ const styles = (theme: Theme) => createStyles({
     marginTop: 3,
     color: theme.palette.success.main,
   },
-  codeMirrorWrapper: {
-    overflowY: 'auto',
-    height: '100%',
-  },
   hidden: {
     opacity: 0,
   },
@@ -186,204 +181,6 @@ const styles = (theme: Theme) => createStyles({
   },
 });
 
-const actions = ["blink", "cap", "bigcap", "count", "wait"];
-const tupleSetters = ["setBlinkDuration", "setBlinkDelay", "setBlinkGroupDelay", "setCaptionDuration", "setCaptionDelay",
-  "setCountDuration", "setCountDelay", "setCountGroupDelay"];
-const singleSetters = ["setBlinkWaveRate", "setBlinkBPMMulti", "setBlinkDelayWaveRate", "setBlinkDelayBPMMulti",
-  "setBlinkGroupDelayWaveRate", "setBlinkGroupDelayBPMMulti", "setCaptionWaveRate", "setCaptionBPMMulti",
-  "setCaptionDelayWaveRate", "setCaptionDelayBPMMulti", "setCountWaveRate", "setCountBPMMulti", "setCountDelayWaveRate",
-  "setCountDelayBPMMulti", "setCountGroupDelayWaveRate", "setCountGroupDelayBPMMulti", "setBlinkY", "setCaptionY",
-  "setBigCaptionY", "setCountY"];
-const stringSetters = ["setBlinkTF", "setBlinkDelayTF", "setBlinkGroupDelayTF", "setCaptionTF", "setCaptionDelayTF",
-  "setCountTF", "setCountDelayTF", "setCountGroupDelayTF"];
-const storers = ["storephrase", "storePhrase"];
-const keywords = ["$RANDOM_PHRASE", "$TAG_PHRASE"];
-const timestampRegex = /^((\d?\d:)?\d?\d:\d\d(\.\d\d?\d?)?|\d?\d(\.\d\d?\d?)?)$/;
-
-(function(mod) {
-  mod(require("codemirror/lib/codemirror"));
-})(function(CodeMirror: any) {
-  CodeMirror.defineMode('flipflip', function() {
-
-    let words: any = {};
-    function define(style: any, dict: any) {
-      for(let i = 0; i < dict.length; i++) {
-        words[dict[i]] = style;
-      }
-    }
-
-    CodeMirror.registerHelper("hintWords", "flipflip", actions.concat(tupleSetters, singleSetters, stringSetters, keywords, storers));
-
-    define('atom', tupleSetters);
-    define('atom', singleSetters);
-    define('atom', stringSetters);
-    define('variable', keywords);
-    define('variable-3', storers);
-    define('builtin', actions);
-
-    function parse(stream: any, state: any) {
-      if (stream.eatSpace()) return rt(null, state, stream);
-
-      let sol = stream.sol();
-      const ch = stream.next();
-
-      if (ch === '#' && sol) {
-        stream.skipToEnd();
-        return "comment";
-      }
-
-      let command = null;
-      let timestamp = false;
-
-      if (state.tokens.length > 0) {
-        if (timestampRegex.exec(state.tokens[0]) != null) {
-          timestamp = true;
-          if (state.tokens.length > 1) {
-            command = state.tokens[1];
-          } else {
-            sol = true;
-          }
-        } else {
-          command = state.tokens[0];
-        }
-      }
-
-      if (ch === "/" && command == "blink") {
-        state.tokens.push(ch);
-        return rt("operator", state, stream);
-      }
-      if (ch === "\\" && !stream.eol() && /n/.test(stream.peek()) && !sol && (command == "blink" || command == "cap" || command == "bigcap")) {
-        stream.next();
-        state.tokens.push(ch);
-        return rt("operator", state, stream);
-      }
-
-      if (ch === "$" && command != null && command.toLowerCase() == "storephrase") {
-        stream.next();
-        if(stream.eol() || /\s/.test(stream.peek())) {
-          state.tokens.push(stream.current());
-          return rt("number", state, stream);
-        }
-      }
-
-      if (/\d/.test(ch) && sol && !timestamp) {
-        // Timestamp
-        stream.eatWhile(/[\d:.]/);
-        if(stream.eol() || !/\w/.test(stream.peek())) {
-          const timestamp = stream.current();
-          state.tokens.push(timestamp);
-          if (timestampRegex.exec(timestamp) != null) {
-            return rt("number", state, stream);
-          } else {
-            return rt("error", state, stream);
-          }
-        }
-      }
-
-      if (/[-\d]/.test(ch) && (command == "count" || command == "wait" ||
-        tupleSetters.includes(command) || singleSetters.includes(command))) {
-        // Number parameter
-        stream.eatWhile(/\d/);
-        if(stream.eol() || !/\w/.test(stream.peek())) {
-          state.tokens.push(stream.current());
-          if (((command == "count" || tupleSetters.includes(command)) && state.tokens.length > 3) ||
-            ((command == "wait" || singleSetters.includes(command)) && state.tokens.length > 2)) {
-            return rt("error", state, stream);
-          }
-          return rt("number", state, stream);
-        }
-      }
-      stream.eatWhile(/[\d\w-]/);
-      const cur = stream.current();
-      stream.eatSpace();
-      if (sol && words.hasOwnProperty(cur) && !keywords.includes(cur)) {
-        // Command at start of line
-        state.tokens.push(cur);
-        return rt(words[cur], state, stream);
-      } else if (!sol && command == "blink" && (keywords.includes(cur) || /^\$\d$/.exec(cur) != null)) {
-        // Keyword in blink command
-        state.tokens.push(cur);
-        if ((state.tokens.length == (timestamp ? 3 : 2) || state.tokens[state.tokens.length - 2] == "/") && (stream.eol() || /\//.test(stream.peek()))) {
-          if (cur == "$RANDOM_PHRASE" && !state.storedPhrases.has(0)) {
-            return rt("error", state, stream);
-          } else {
-            const registerRegex = /^\$(\d)$/.exec(cur);
-            if (registerRegex != null) {
-              if (!state.storedPhrases.has(parseInt(registerRegex[1]))) {
-                return rt("error", state, stream);
-              } else {
-                return rt("variable", state, stream);
-              }
-            }
-          }
-          return rt(words[cur], state, stream);
-        } else {
-          return rt("string", state, stream);
-        }
-      } else if (!sol && (command == "cap" || command == "bigcap") && (keywords.includes(cur) || /^\$\d$/.exec(cur) != null)) {
-        // Keyword in a cap or bigcap command
-        state.tokens.push(cur);
-        if (state.tokens.length == (timestamp ? 3 : 2) && stream.eol()) {
-          if (cur == "$RANDOM_PHRASE" && !state.storedPhrases.has(0)) {
-            return rt("error", state, stream);
-          } else {
-            const registerRegex = /^\$(\d)$/.exec(cur);
-            if (registerRegex != null) {
-              if (!state.storedPhrases.has(parseInt(registerRegex[1]))) {
-                return rt("error", state, stream);
-              } else {
-                return rt("variable", state, stream);
-              }
-            }
-          }
-          return rt(words[cur], state, stream);
-        } else {
-          return rt("string", state, stream);
-        }
-      } else if (!sol && state.tokens.length > 0) {
-        // String Parameter
-        state.tokens.push(cur);
-        if (command == "blink" && cur == "/") {
-          return rt("operator", state, stream);
-        } else if (command == "count" || command == "wait"
-          || tupleSetters.includes(command) || singleSetters.includes(command)) {
-          return rt("error", state, stream);
-        } else if (stringSetters.includes(command)) {
-          const tf = getTimingFromString(cur);
-          return rt(tf == null ? "error" : "variable", state, stream);
-        }
-        return rt("string", state, stream);
-      } else {
-        return rt("error", state, stream);
-      }
-    }
-
-    function rt(type: string, state: any, stream: any) {
-      if (stream.eol()) {
-        if (state.tokens.length > 0 && state.tokens[0].toLowerCase() == "storephrase") {
-          const registerRegex = /^\$(\d)$/.exec(state.tokens[1]);
-          if (registerRegex != null) {
-            if (state.tokens.length > 1) {
-              state.storedPhrases.set(parseInt(registerRegex[1]), true);
-              state.storedPhrases.set(0, true);
-            }
-          } else {
-            state.storedPhrases.set(0, true);
-          }
-        }
-        state.tokens = new Array<string>();
-      }
-      return type;
-    }
-
-    return {
-      startState: function() {return {tokens: new Array<string>(), storedPhrases: new Map<number, boolean>()};},
-      token: function(stream: any, state: any) {
-        return parse(stream, state);
-      },
-    };
-  });
-});
 
 class CaptionScriptor extends React.Component {
   readonly props: {
@@ -412,6 +209,8 @@ class CaptionScriptor extends React.Component {
     openMenu: null as string,
     menuAnchorEl: null as any,
     captionProgramJumpToHack: new ChildCallbackHack(),
+    codeMirrorAddHack: new ChildCallbackHack(),
+    codeMirrorOverwriteHack: new ChildCallbackHack(),
     systemFonts: Array<string>(),
   };
 
@@ -499,32 +298,24 @@ class CaptionScriptor extends React.Component {
                     </Typography>
                   </div>
                 )}
-                {this.state.error == null && this.state.captionScript.script.length > 0 && (
+                {this.state.error == null && this.state.captionScript.script && this.state.captionScript.script.length > 0 && (
                   <div className={classes.statusMessage}>
                     <CheckCircleOutlineIcon className={classes.okIcon}/>
                   </div>
                 )}
-                {this.state.captionScript.script.length == 0 && (
+                {(!this.state.captionScript.script || this.state.captionScript.script.length == 0) && (
                   <div className={classes.statusMessage}>
                     <Typography component="div" variant="subtitle1" color="textPrimary">
                       Paste or type your script here.
                     </Typography>
                   </div>
                 )}
-                <CodeMirror.Controlled
-                  className={classes.codeMirrorWrapper}
-                  value={this.state.captionScript.script}
-                  autoScroll={false}
-                  options={{
-                    mode: 'flipflip',
-                    theme: 'material',
-                    lineNumbers: true,
-                    lineWrapping: true,
-                    viewportMargin: Infinity,
-                  }}
-                  onBeforeChange={this.onBeforeChangeScript.bind(this)}
-                  onGutterClick={this.onGutterClick.bind(this)}
-                />
+              <CodeMirror
+                onGutterClick={this.onGutterClick.bind(this)}
+                onUpdateScript={this.onUpdateScript.bind(this)}
+                addHack={this.state.codeMirrorAddHack}
+                overwriteHack={this.state.codeMirrorOverwriteHack}
+              />
               </div>
               <div className={clsx(classes.menuGrid, this.state.fullscreen && classes.hidden)}>
                 <Card className={classes.menuCard}>
@@ -737,7 +528,7 @@ class CaptionScriptor extends React.Component {
                 {this.state.error != null && (
                   <ErrorOutlineIcon className={classes.errorIcon} color="error" />
                 )}
-                {!this.state.scene && this.state.captionScript.script.length > 0 && (
+                {!this.state.scene && this.state.captionScript.script && this.state.captionScript.script.length > 0 && (
                   <CaptionProgram
                     captionScript={this.state.captionScript}
                     repeat={RP.one}
@@ -886,18 +677,10 @@ class CaptionScriptor extends React.Component {
       wretch(this.props.openScript.url)
         .get()
         .text(data => {
-          const newScript = this.props.openScript;
-          newScript.script = data;
-          this.setState({captionScript: newScript, scriptChanged: false});
+          this.state.codeMirrorOverwriteHack.args = [data];
+          this.state.codeMirrorOverwriteHack.fire();
+          this.setState({captionScript: this.props.openScript, scriptChanged: false});
         });
-    }
-  }
-
-  componentDidUpdate(props: any, state: any) {
-    if (state.captionScript !== this.state.captionScript) {
-      const newScene = JSON.parse(JSON.stringify(this.state.scene));
-      newScene.scriptPlaylists = [{scripts: [this.state.captionScript], shuffle: false, repeat: RP.one}];
-      this.setState({scene: newScene});
     }
   }
 
@@ -925,7 +708,9 @@ class CaptionScriptor extends React.Component {
 
   onConfirmNew() {
     this.onCloseDialog();
-    this.setState({openFile: null, captionScript: new CaptionScript({script: ""}), error: null, scriptChanged: false,});
+    this.setState({openFile: new CaptionScript({script: ""}), error: null, scriptChanged: false});
+    this.state.codeMirrorOverwriteHack.args = [""];
+    this.state.codeMirrorOverwriteHack.fire();
   }
 
   onOpenMenu(e: MouseEvent) {
@@ -953,7 +738,9 @@ class CaptionScriptor extends React.Component {
     wretch(url)
       .get()
       .text(data => {
-        this.setState({captionScript: new CaptionScript({script: data, url: url}), scriptChanged: false});
+        this.state.codeMirrorOverwriteHack.args = [data];
+        this.state.codeMirrorOverwriteHack.fire();
+        this.setState({captionScript: new CaptionScript({url: url}), scriptChanged: false});
       });
   }
 
@@ -1061,8 +848,9 @@ class CaptionScriptor extends React.Component {
       .fetchError(error)
       .error(503, error)
       .text(data => {
-        script.script = data;
-        this.setState({captionScript: script, scriptChanged: false,});
+        this.state.codeMirrorOverwriteHack.args = [data];
+        this.state.codeMirrorOverwriteHack.fire();
+        this.setState({captionScript: script, scriptChanged: false});
       });
   }
 
@@ -1078,12 +866,19 @@ class CaptionScriptor extends React.Component {
     this.setState({error: e});
   }
 
-  onBeforeChangeScript(editor: any, data: any, value: any)  {
-    const newValue = value;
-    if (this.state.captionScript.script != newValue) {
-      const newScript = JSON.parse(JSON.stringify(this.state.captionScript));
-      newScript.script = newValue;
-      this.setState({captionScript: newScript, error: null, scriptChanged: true});
+  onUpdateScript(script: string) {
+    const newScript = JSON.parse(JSON.stringify(this.state.captionScript));
+    newScript.blink = this.state.captionScript.blink;
+    newScript.caption = this.state.captionScript.caption;
+    newScript.captionBig = this.state.captionScript.captionBig;
+    newScript.count = this.state.captionScript.count;
+    newScript.script = script;
+    if (this.state.scene) {
+      const newScene = JSON.parse(JSON.stringify(this.state.scene));
+      newScene.scriptPlaylists = [{scripts: [newScript], shuffle: false, repeat: RP.one}];
+      this.setState({scene: newScene, captionScript: newScript, error: null, scriptChanged: this.state.captionScript.script != newScript.script});
+    } else {
+      this.setState({captionScript: newScript, error: null, scriptChanged: this.state.captionScript.script != newScript.script});
     }
   }
 
@@ -1164,31 +959,25 @@ class CaptionScriptor extends React.Component {
   }
 
   addAllSetters() {
-    let newValue = this.state.captionScript.script;
-    const lines = newValue.split('\n');
-    if (lines.length == 0 || lines[lines.length - 1].length > 0) {
-      newValue += "\n";
-    }
+    let addString = "";
     for (let setter of tupleSetters) {
       let property = setter.replace("set", "");
       property = property.charAt(0).toLowerCase() + property.slice(1);
       const defaultVal = (captionProgramDefaults as any)[property];
-      newValue += setter + " " + defaultVal[0] + " " + defaultVal[1] + "\n";
+      addString += setter + " " + defaultVal[0] + " " + defaultVal[1] + "\n";
     }
-    newValue += "\n";
+    addString += "\n";
     for (let setter of stringSetters) {
-      newValue += setter + " constant\n";
+      addString += setter + " constant\n";
     }
-    newValue += "\n";
+    addString += "\n";
     for (let setter of singleSetters) {
       let property = setter.replace("set", "");
       property = property.charAt(0).toLowerCase() + property.slice(1);
       const defaultVal = (captionProgramDefaults as any)[property];
-      newValue += setter + " " + defaultVal + "\n";
+      addString += setter + " " + defaultVal + "\n";
     }
-    const newScript = JSON.parse(JSON.stringify(this.state.captionScript));
-    newScript.script = newValue;
-    this.setState({captionScript: newScript});
+    this.onAddString(addString, true);
   }
 
   onAddSetter(e: MouseEvent) {
@@ -1226,17 +1015,8 @@ class CaptionScriptor extends React.Component {
   }
 
   onAddString(string: string, newLine = false) {
-    let newValue = this.state.captionScript.script;
-    if (newLine == true) {
-      const lines = newValue.split('\n');
-      if (lines.length == 0 || lines[lines.length - 1].length > 0) {
-        newValue += "\n";
-      }
-    }
-    newValue += string;
-    const newScript = JSON.parse(JSON.stringify(this.state.captionScript));
-    newScript.script = newValue;
-    this.setState({captionScript: newScript});
+    this.state.codeMirrorAddHack.args = [string, newLine];
+    this.state.codeMirrorAddHack.fire();
   }
 
   onUpdateOptions(property: string, fn: (options: FontSettingsI) => void) {
