@@ -602,7 +602,7 @@ export default class CaptionProgram extends React.Component {
       this.el.current.style.display = 'table-cell';
       this.el.current.style.textAlign = 'center';
       this.el.current.style.verticalAlign = 'bottom';
-      const yPos = 14 + this.state.captionY;
+      const yPos = (14 + this.state.captionY) * this.props.scale;
       if (yPos > 0) {
         this.el.current.style.paddingBottom = (yPos) + 'vmin';
         this.el.current.style.paddingTop = 'unset';
@@ -610,7 +610,7 @@ export default class CaptionProgram extends React.Component {
         this.el.current.style.paddingBottom = 'unset';
         this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
       }
-      const xPos = this.state.captionX;
+      const xPos = this.state.captionX * this.props.scale;
       if (xPos > 0) {
         this.el.current.style.paddingLeft = (xPos) + 'vmin';
         this.el.current.style.paddingRight = 'unset';
@@ -648,7 +648,7 @@ export default class CaptionProgram extends React.Component {
       this.el.current.style.display = 'table-cell';
       this.el.current.style.textAlign = 'center';
       this.el.current.style.verticalAlign = 'middle';
-      const yPos = this.state.bigCaptionY;
+      const yPos = this.state.bigCaptionY * this.props.scale;
       if (yPos > 0) {
         this.el.current.style.paddingBottom = (yPos) + 'vmin';
         this.el.current.style.paddingTop = 'unset';
@@ -656,7 +656,7 @@ export default class CaptionProgram extends React.Component {
         this.el.current.style.paddingBottom = 'unset';
         this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
       }
-      const xPos = this.state.bigCaptionX;
+      const xPos = this.state.bigCaptionX * this.props.scale;
       if (xPos > 0) {
         this.el.current.style.paddingLeft = (xPos) + 'vmin';
         this.el.current.style.paddingRight = 'unset';
@@ -722,7 +722,7 @@ export default class CaptionProgram extends React.Component {
       this.el.current.style.display = 'table-cell';
       this.el.current.style.textAlign = 'center';
       this.el.current.style.verticalAlign = 'middle';
-      const yPos = this.state.blinkY;
+      const yPos = this.state.blinkY * this.props.scale;
       if (yPos > 0) {
         this.el.current.style.paddingBottom = (yPos) + 'vmin';
         this.el.current.style.paddingTop = 'unset';
@@ -730,7 +730,7 @@ export default class CaptionProgram extends React.Component {
         this.el.current.style.paddingBottom = 'unset';
         this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
       }
-      const xPos = this.state.blinkX;
+      const xPos = this.state.blinkX * this.props.scale;
       if (xPos > 0) {
         this.el.current.style.paddingLeft = (xPos) + 'vmin';
         this.el.current.style.paddingRight = 'unset';
@@ -805,7 +805,7 @@ export default class CaptionProgram extends React.Component {
       this.el.current.style.display = 'table-cell';
       this.el.current.style.textAlign = 'center';
       this.el.current.style.verticalAlign = 'middle';
-      const yPos = this.state.countY;
+      const yPos = this.state.countY * this.props.scale;
       if (yPos > 0) {
         this.el.current.style.paddingBottom = (yPos) + 'vmin';
         this.el.current.style.paddingTop = 'unset';
@@ -813,7 +813,7 @@ export default class CaptionProgram extends React.Component {
         this.el.current.style.paddingBottom = 'unset';
         this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
       }
-      const xPos = this.state.countX;
+      const xPos = this.state.countX * this.props.scale;
       if (xPos > 0) {
         this.el.current.style.paddingLeft = (xPos) + 'vmin';
         this.el.current.style.paddingRight = 'unset';

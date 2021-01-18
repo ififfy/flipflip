@@ -817,6 +817,8 @@ function loadSexCom(systemMessage: Function, config: Config, source: LibrarySour
               helpers: helpers,
             })
           } else {
+            const validImages = filterPathsToJustPlayable(filter, images, false);
+            images = [];
             let count = 0;
             for (let videoURL of videos) {
               wretch("https://www.sex.com" + videoURL)
@@ -845,10 +847,12 @@ function loadSexCom(systemMessage: Function, config: Config, source: LibrarySour
                     images.push("https://videos1.sex.com/stream/" + date + "/" + vidID +".mp4");
                   }
                   if (count == videos.length) {
+                    const validVideos = filterPathsToJustPlayable(IF.any, images, true);
+                    const filePaths = validImages.concat(validVideos);
                     helpers.next = helpers.next + 1;
-                    helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+                    helpers.count = helpers.count + filePaths.length;
                     resolve({
-                      data: filterPathsToJustPlayable(filter, images, true),
+                      data: filePaths,
                       helpers: helpers,
                     })
                   }

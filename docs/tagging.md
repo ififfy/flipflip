@@ -4,7 +4,7 @@ The main power behind the Library (and driving force of [Scene Generators](scene
 The first step is to add some tags. Click the `Manage Tags` button ( <img style="vertical-align: -5px" 
 src="doc_icons/tag.svg" alt="Manage Tags" width="20" height="20"> ) in the sidebar.
 
-?> **Note**: Tags are shared between regular sources and audio tracks
+?> **Note**: Tags are shared between regular sources, audio tracks, and caption scripts
 
 ## Manage tags
 From this screen, we can add, remove, and re-order our tags as well as manage "tag phrases" (for use in captioning scripts).
@@ -23,7 +23,7 @@ desired by clicking on them. When you're done, click "Back" to return to the Lib
 
 While Tagging, use `[` and `]` to jump to Tagging the previous/next visible source in the Library. 
 
-![](doc_images/tagging.png)
+<img src="doc_images/tagging.png" alt="Options" width="50%" style="min-width: 483px">
 
 ## Batch Tagging
 To begin batch tagging, click the `Batch Tag` button ( <img style="vertical-align: -5px" 

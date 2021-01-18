@@ -59,7 +59,7 @@ class WatermarkCard extends React.Component {
                            <br/>
                            {"{audio_artist}"} - Artist of the currently playing audio file
                            <br/>
-                           {"{audio_name}"} - Album of the currently playing audio file
+                           {"{audio_album}"} - Album of the currently playing audio file
                          </div>
                        }>
                 <FormControlLabel

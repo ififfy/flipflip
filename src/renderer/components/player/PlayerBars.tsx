@@ -186,6 +186,7 @@ const styles = (theme: Theme) => createStyles({
     display: 'flex',
     flexWrap: 'wrap',
     justifyContent: 'center',
+    width: '100%',
   },
   tag: {
     marginRight: theme.spacing(1),

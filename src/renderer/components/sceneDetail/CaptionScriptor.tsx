@@ -181,6 +181,7 @@ const styles = (theme: Theme) => createStyles({
   },
   codeMirrorWrapper: {
     overflowY: 'auto',
+    overflowX: 'hidden',
     height: '100%',
   },
   backdropTop: {
@@ -562,7 +563,7 @@ class CaptionScriptor extends React.Component {
                   <CaptionProgram
                     captionScript={this.state.captionScript}
                     repeat={RP.one}
-                    scale={0.3}
+                    scale={0.35}
                     getTags={this.props.getTags.bind(this)}
                     goBack={this.props.goBack.bind(this)}
                     playNextScene={() => {}}
@@ -836,15 +837,19 @@ class CaptionScriptor extends React.Component {
       });
   }
 
-  onSaveToLibrary() {
+    onSaveToLibrary() {
     this.onCloseDialog();
     this.onSave();
     this.props.onUpdateLibrary((library) => {
       const script = library.find((s) => s.url == this.state.captionScript.url);
-      script.blink = this.state.captionScript.blink;
-      script.caption = this.state.captionScript.caption;
-      script.captionBig = this.state.captionScript.captionBig;
-      script.count = this.state.captionScript.count;
+      if (script) {
+        script.blink = this.state.captionScript.blink;
+        script.caption = this.state.captionScript.caption;
+        script.captionBig = this.state.captionScript.captionBig;
+        script.count = this.state.captionScript.count;
+      } else {
+        library.push(this.state.captionScript);
+      }
     })
   }
 
@@ -966,7 +971,9 @@ class CaptionScriptor extends React.Component {
   }
 
   goBack() {
-    if (this.state.scriptChanged) {
+    if (this.state.fullscreen) {
+      this.onFullscreen();
+    } else if (this.state.scriptChanged) {
       this.setState({openMenu: MO.error});
     } else {
       this.props.goBack();

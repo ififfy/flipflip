@@ -192,7 +192,7 @@ class AudioPlaylist extends React.Component {
                 s.audioPlaylists[this.props.playlistIndex].audios = newAudios;
               });
             }}>
-            {this.props.playlist.audios.map((a, i) =>
+            {this.props.playlist && this.props.playlist.audios && this.props.playlist.audios.map((a, i) =>
               <ListItem key={i}>
                 <ListItemAvatar className={classes.listAvatar}>
                   <Badge
@@ -202,19 +202,19 @@ class AudioPlaylist extends React.Component {
                     color="primary"
                     badgeContent={a.trackNum}>
                     <Tooltip placement={a.comment ? 'right' : 'bottom'}
-                             PopperProps={a.comment || a.tags.length > 0 ? {modifiers:{
+                             PopperProps={a.comment || (a.tags && a.tags.length > 0) ? {modifiers:{
                                  preventOverflow: {
                                    enabled: true,
                                    boundariesElement: 'viewport',
                                  }
                                }} : {}}
                              classes={a.comment ? {tooltip: classes.bigTooltip} : null}
-                             arrow={!!a.comment || a.tags.length > 0}
+                             arrow={!!a.comment || (a.tags && a.tags.length > 0)}
                              title={
-                               a.comment || a.tags.length > 0 ?
+                               a.comment || (a.tags && a.tags.length > 0) ?
                                  <div>
                                    {a.comment}
-                                   {a.comment && a.tags.length > 0 && (<br/>)}
+                                   {a.comment && a.tags && a.tags.length > 0 && (<br/>)}
                                    <div className={classes.tagChips}>
                                      {a.tags && a.tags.map((tag: Tag) =>
                                        <React.Fragment key={tag.id}>

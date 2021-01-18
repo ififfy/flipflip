@@ -1,5 +1,5 @@
 # Library
-The **Library** is a place for you to collect and manage all your sources. To access the Library just click `Library`
+The **Library** is a place for you to collect and manage all your sources. To access the Library, just click the `Library`
 icon in the Scene Picker (Home) sidebar ( <img style="vertical-align: -5px" src="doc_icons/library.svg" alt="Library" width="20" height="20"> )
 
 ![](doc_images/library.png)

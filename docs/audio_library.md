@@ -1,12 +1,12 @@
 # Audio Library
 The **Audio Library**, like the regular Source [Library](library.md), is a place for you to collect and manage all your 
-audio tracks. To access the Audio Library just click `Audio Library` icon in the Scene Picker (Home) sidebar 
+audio tracks. To access the Audio Library, just click the `Audio Library` icon in the Scene Picker (Home) sidebar 
 ( <img style="vertical-align: -5px" src="doc_icons/audio_library.svg" alt="Audio Library" width="20" height="20"> )
 
 ![](doc_images/audio_library.png)
 
 ## Adding Tracks
-Add new tracks by going to the **Songs** tab and clicking the arrow in the bottom right. You can add tracks locally
+Add new tracks by going to the **Songs** tab and clicking the plus-sign in the bottom right. You can add tracks locally
 from your computer, or by entering a URL of an audio track.
 
 ## Search/Filter

@@ -98,7 +98,7 @@ local video/playlist file, add a `Local video/playlsit` and choose the video(s) 
 #### Currently Supported Remote Sources
 
 * <img style="vertical-align: -2px" src="doc_icons/tumblr.svg" alt="Tumblr" width="15" height="15"> Tumblr Blog
-* <img style="vertical-align: -2px" src="doc_icons/reddit.svg" alt="Reddit" width="15" height="15"> Reddit Subreddits/Users
+* <img style="vertical-align: -2px" src="doc_icons/reddit.svg" alt="Reddit" width="15" height="15"> Reddit Subreddits/Users/Saved
 * <img style="vertical-align: -2px" src="doc_icons/twitter.svg" alt="Twitter" width="15" height="15"> Twitter Profile
 * <img style="vertical-align: -2px" src="doc_icons/instagram.svg" alt="Instagram" width="15" height="15"> Instagram Profile
 * <img style="vertical-align: -2px" src="doc_icons/imgur.svg" alt="Imgur" width="15" height="15"> Imgur Album
@@ -107,6 +107,7 @@ local video/playlist file, add a `Local video/playlsit` and choose the video(s) 
 * <img style="vertical-align: -2px; margin-right: 5px" src="doc_icons/danbooru.png" alt="Danbooru" width="15" height="15">Danbooru Tag/User/Pool
 * <img style="vertical-align: -2px; margin-right: 5px" src="doc_icons/gelbooru.png" alt="Gelbooru" width="15" height="15">Gelbooru Tag
 * <img style="vertical-align: -2px; margin-right: 5px" src="doc_icons/ehentai.png" alt="E-Hentai" width="15" height="15">E-Hentai Gallery
+* <img style="vertical-align: -2px; margin-right: 5px" src="doc_icons/hydrus.svg" alt="Hydrus" width="15" height="15">Hydrus Tag
 * <img style="vertical-align: -2px; margin-right: 5px" src="doc_icons/b.svg" alt="BDSMlr" width="15" height="15">BDSMlr Blog (Only works for blogs with images in RSS feed)
 * ~~<img style="vertical-align: -2px" src="doc_icons/sexcom.svg" alt="Sex.com" width="15" height="15"> Sex.com Gallery/User~~ _Currently broken_
 

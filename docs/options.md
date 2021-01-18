@@ -2,7 +2,7 @@
 The **OPTIONS** tab provides a number of ways to control the Scene playback and what images will display. This tab
 has two cards: `Scene Options` and `ImageOptions` 
 
-![](doc_images/scene_detail_options.png)
+<img src="doc_images/scene_detail_options.png" alt="Options" width="50%" style="min-width: 483px">
 
 ## Scene Options
 
@@ -45,7 +45,7 @@ Scene should play after all images from the current Scene have played.
 Rather than picking a single scene, you can select "Random". Click <img style="vertical-align: -5px" src="doc_icons/list.svg" alt="List" width="20" height="20">
 to select the scenes you'd like to be randomly picked from.
 
-You can also choose to move to the next scene after an audio clip has ended or after the captioning script has completed.
+You can also choose to move to the next scene after an audio clip has ended or after a captioning script has completed.
 You will find these options in the audio and text settings, respectively.
 
 ?> The "Next Scene" will pre-load in the background and start when a configured end condition is met (time, images, audio, text). 
@@ -66,6 +66,10 @@ This setting controls which images will display:
 * **Only Animated** - Videos _and_ Animated GIFs
 * **Only Image Files**
 * **Only Stills**
+
+#### Re-Generate On Playback
+This option is only available for Scene Generators. When enabled, the scene will be automatically regenerated whenever
+playback is started (either directly, or through an overlay/grid).
 
 #### Play Full Sources
 By default, FlipFlip will play 1 image from a source before moving to the next. If you would rather play all images of
