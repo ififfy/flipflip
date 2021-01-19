@@ -1,4 +1,6 @@
 import * as React from "react";
+import fontList from "font-list";
+import SystemFonts from "system-font-families";
 
 import {
   Collapse, createStyles, Divider, FormControl, FormControlLabel, Grid, InputAdornment, InputLabel, MenuItem, Select,
@@ -10,7 +12,6 @@ import {WC} from "../../data/const";
 import en from "../../data/en";
 import ColorPicker from "../config/ColorPicker";
 import {CancelablePromise} from "../../data/utils";
-import fontList from "font-list";
 
 const styles = (theme: Theme) => createStyles({
   fullWidth: {
@@ -156,24 +157,38 @@ class WatermarkCard extends React.Component {
   _promise: CancelablePromise = null;
   componentDidMount() {
     // Define system fonts
-    this._promise = new CancelablePromise((resolve, reject) => {
-      fontList.getFonts().then((res: Array<string>) => {
-          res = res.map((r) => {
-            if (r.startsWith("\"") && r.endsWith("\"")) {
-              return r.substring(1, r.length - 1);
-            } else {
-              return r;
+    if (process.platform == "darwin") {
+      this._promise = new CancelablePromise((resolve, reject) => {
+        new SystemFonts().getFonts().then((res: Array<string>) => {
+            if (!this._promise.hasCanceled) {
+              this.setState({systemFonts: res});
             }
-          })
-          if (!this._promise.hasCanceled) {
-            this.setState({systemFonts: res});
+          },
+          (err: string) => {
+            console.error(err);
           }
-        },
-        (err: string) => {
-          console.error(err);
-        }
-      );
-    });
+        );
+      });
+    } else {
+      this._promise = new CancelablePromise((resolve, reject) => {
+        fontList.getFonts().then((res: Array<string>) => {
+            res = res.map((r) => {
+              if (r.startsWith("\"") && r.endsWith("\"")) {
+                return r.substring(1, r.length - 1);
+              } else {
+                return r;
+              }
+            })
+            if (!this._promise.hasCanceled) {
+              this.setState({systemFonts: res});
+            }
+          },
+          (err: string) => {
+            console.error(err);
+          }
+        );
+      });
+    }
   }
 
   componentWillUnmount() {

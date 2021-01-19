@@ -4,6 +4,7 @@ import wretch from "wretch";
 import clsx from "clsx";
 import fs from "fs";
 import fontList from "font-list";
+import SystemFonts from "system-font-families";
 
 require('codemirror/lib/codemirror.css');
 require('codemirror/theme/material.css');
@@ -686,24 +687,38 @@ class CaptionScriptor extends React.Component {
     this._currentTimestamp = 0;
     window.addEventListener('keydown', this.onKeyDown, false);
     // Define system fonts
-    this._promise = new CancelablePromise((resolve, reject) => {
-      fontList.getFonts().then((res: Array<string>) => {
-          res = res.map((r) => {
-            if (r.startsWith("\"") && r.endsWith("\"")) {
-              return r.substring(1, r.length - 1);
-            } else {
-              return r;
+    if (process.platform == "darwin") {
+      this._promise = new CancelablePromise((resolve, reject) => {
+        new SystemFonts().getFonts().then((res: Array<string>) => {
+            if (!this._promise.hasCanceled) {
+              this.setState({systemFonts: res});
             }
-          })
-          if (!this._promise.hasCanceled) {
-            this.setState({systemFonts: res});
+          },
+          (err: string) => {
+            console.error(err);
           }
-        },
-        (err: string) => {
-          console.error(err);
-        }
-      );
-    });
+        );
+      });
+    } else {
+      this._promise = new CancelablePromise((resolve, reject) => {
+        fontList.getFonts().then((res: Array<string>) => {
+            res = res.map((r) => {
+              if (r.startsWith("\"") && r.endsWith("\"")) {
+                return r.substring(1, r.length - 1);
+              } else {
+                return r;
+              }
+            })
+            if (!this._promise.hasCanceled) {
+              this.setState({systemFonts: res});
+            }
+          },
+          (err: string) => {
+            console.error(err);
+          }
+        );
+      });
+    }
     if (this.props.openScript) {
       if (this.props.openScript.script) {
         this.state.codeMirrorOverwriteHack.args = [this.props.openScript.script];

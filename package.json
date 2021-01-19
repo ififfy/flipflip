@@ -64,6 +64,7 @@
     "request": "^2.88.2",
     "snoowrap": "^1.21.0",
     "sortablejs": "^1.10.2",
+    "system-font-families": "^0.4.1",
     "tumblr.js": "^2.0.2",
     "twitter": "^1.7.1",
     "web-audio-beat-detector": "^8.0.10",

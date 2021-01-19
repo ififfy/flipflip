@@ -43,6 +43,7 @@ declare module 'recursive-readdir';
 declare module 'request';
 declare module 'rimraf';
 declare module 'snoowrap';
+declare module 'system-font-families';
 declare module 'twitter';
 declare module 'uuid/v4';
 declare module 'web-audio-beat-detector';

@@ -586,6 +586,7 @@ export async function convertURL(url: string): Promise<Array<string>> {
         if (fallbackRegex != null) {
           return [fallbackRegex[1].replace(/\\u002F/g,"/")];
         } else {
+          console.log(html);
           redgifMatch = null;
         }
       }
