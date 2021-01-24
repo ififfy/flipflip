@@ -1200,13 +1200,18 @@ class AudioLibrary extends React.Component {
     });
     id += 1;
     this.setState({loadingMetadata: true});
+
+    const error = (err: any) => {
+      console.error("File is not available:", err.message);
+      this.setState({loadingMetadata: false, error: true});
+      setTimeout(() => {this.setState({error: false})}, 3000);
+    }
     wretch(url)
       .get()
-      .notFound((err) => {
-        console.error("File is not available:", err.message);
-        this.setState({loadingMetadata: false, error: true});
-        setTimeout(() => {this.setState({error: false})}, 3000);
-      })
+      .unauthorized(error)
+      .notFound(error)
+      .timeout(error)
+      .internalError(error)
       .arrayBuffer((buffer) => {
         mm.parseBuffer(Buffer.from(buffer))
           .then((metadata: any) => {
@@ -1230,6 +1235,7 @@ class AudioLibrary extends React.Component {
             setTimeout(() => {this.setState({error: false})}, 3000);
           });
       })
+      .catch(error);
 
 
   }
@@ -1259,7 +1265,7 @@ class AudioLibrary extends React.Component {
       const url = newSources[index];
       index++;
 
-      if (existsSync(url)) {
+      if (url.startsWith("http") || existsSync(url)) {
         const newAudio = new Audio({
           url: url,
           id: id,
