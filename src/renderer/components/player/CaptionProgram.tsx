@@ -14,6 +14,7 @@ import Tag from "../../data/Tag";
 import ChildCallbackHack from "./ChildCallbackHack";
 import Audio from "../../data/Audio";
 import CaptionScript from "../../data/CaptionScript";
+import {CircularProgress} from "@material-ui/core";
 
 const splitFirstWord = function (s: string) {
   const firstSpaceIndex = s.indexOf(" ");
@@ -53,7 +54,14 @@ export default class CaptionProgram extends React.Component {
     onError?(e: string): void,
   };
 
-  readonly state = {...captionProgramDefaults};
+  readonly state = {
+    ...captionProgramDefaults,
+    countColors: new Map<number, String>(),
+    countColor: "#FFFFFF",
+    countProgress: false,
+    countCurrent: 0,
+    countTotal: 0
+  };
 
   _runningPromise: CancelablePromise = null;
   _timeout: any = null;
@@ -73,6 +81,21 @@ export default class CaptionProgram extends React.Component {
         left: 0,
         overflow: 'hidden',
       }}>
+        {this.state.countProgress && (
+            <CircularProgress
+                style={{
+                  position: 'absolute',
+                  margin: 'auto',
+                  top: 0,
+                  right: 0,
+                  bottom: 0,
+                  left: 0,
+                  color: this.state.countColor,
+                }}
+                size={this.state.countProgressScale * this.props.scale}
+                value={Math.round((this.state.countCurrent / this.state.countTotal) * 100)}
+                variant="static"/>
+        )}
         <div ref={this.el}/>
       </div>
     );
@@ -96,7 +119,13 @@ export default class CaptionProgram extends React.Component {
   }
 
   shouldComponentUpdate(props: any, state: any): boolean {
-    return props.captionScript !== this.props.captionScript || props.currentImage !== this.props.currentImage || props.getCurrentTimestamp !== this.props.getCurrentTimestamp;
+    return props.captionScript !== this.props.captionScript ||
+        props.currentImage !== this.props.currentImage ||
+        props.getCurrentTimestamp !== this.props.getCurrentTimestamp ||
+        state.countProgress !== this.state.countProgress ||
+        state.countCurrent !== this.state.countCurrent ||
+        state.countTotal !== this.state.countTotal ||
+        state.countColor !== this.state.countColor;
   }
 
   _sceneCommand: Function = null;
@@ -115,10 +144,19 @@ export default class CaptionProgram extends React.Component {
   }
 
   reset() {
-    this.setState({...captionProgramDefaults, phrases: new Map<number, Array<string>>()});
+    this.setState({
+      ...captionProgramDefaults,
+      phrases: new Map<number, Array<string>>(),
+      countColors: new Map<number, string>(),
+      countColor: "#FFFFFF",
+      countProgress: false,
+      countCurrent: 0,
+      countTotal: 0,
+    });
   }
 
   stop() {
+    this.setState({countProgress: false});
     if (this.el) {
       this.el.current.style.opacity = '0';
     }
@@ -342,6 +380,7 @@ export default class CaptionProgram extends React.Component {
           case "setCaptionX":
           case "setBigCaptionX":
           case "setCountX":
+          case "setCountProgressScale":
           case "wait":
             if (value == null) {
               error = "Error: {" + index + "} '" + line + "' - missing parameter";
@@ -392,6 +431,56 @@ export default class CaptionProgram extends React.Component {
                 newTimestamps.get(timestamp).push(fn);
               } else {
                 newTimestamps.set(timestamp, fn);
+              }
+            } else {
+              newProgram.push(fn);
+            }
+            break;
+          case "setShowCountProgress":
+            if (value == null) {
+              error = "Error: {" + index + "} '" + line + "' - missing parameter";
+              break;
+            }
+            value = value.toLowerCase();
+            if (value != "true" && value != "false" && value != "t" && value != "f") {
+              error = "Error: {" + index + "} '" + line + "' - invalid parameter";
+              break;
+            }
+            fn = (this as any)[command](value == "true" || value == "t");
+            if (timestamp != null) {
+              if (newTimestamps.has(timestamp)) {
+                newTimestamps.get(timestamp).push(fn);
+              } else {
+                newTimestamps.set(timestamp, fn);
+              }
+            } else {
+              newProgram.push(fn);
+            }
+            break;
+          case "setCountProgressColor":
+            if (value == null) {
+              error = "Error: {" + index + "} '" + line + "' - missing parameters";
+              break;
+            } else if (value.split(" ").length > 2) {
+              error = "Error: {" + index + "} '" + line + "' - extra parameter(s)";
+              break;
+            } else if (/^\d+\s*#([a-f0-9]{3}){1,2}\s*$/i.exec(value) == null) {
+              error = "Error: {" + index + "} '" + line + "' - invalid command";
+              break;
+            }
+            const args: Array<any> = value.split(" ");
+            ms = parseInt(args[0]);
+            if (isNaN(ms)) {
+              error = "Error: {" + index + "} '" + line + "' - invalid command";
+              break;
+            }
+            args[0] = ms;
+            fn = (this as any)[command](args);
+            if (timestamp != null) {
+              if (newTimestamps.has(timestamp)) {
+                newTimestamps.get(timestamp).push(fn);
+              } else {
+                newTimestamps.set(timestamp, [fn]);
               }
             } else {
               newProgram.push(fn);
@@ -589,6 +678,9 @@ export default class CaptionProgram extends React.Component {
   cap(value: string, timestamp = false) {
     return (nextCommand: Function) => {
       const command = () => {
+        if (this.state.countProgress) {
+          this.setState({countProgress: false});
+        }
         let duration = getTimeout(this.state.captionTF, this.state.captionDuration[0], this.state.captionDuration[0],
             this.state.captionDuration[1], this.state.captionWaveRate, this.props.currentAudio,
             this.state.captionBPMMulti, this.props.timeToNextFrame);
@@ -647,6 +739,9 @@ export default class CaptionProgram extends React.Component {
   bigcap(value: string, timestamp = false) {
     return (nextCommand: Function) => {
       const command = () => {
+        if (this.state.countProgress) {
+          this.setState({countProgress: false});
+        }
         let duration = getTimeout(this.state.captionTF, this.state.captionDuration[0], this.state.captionDuration[0],
             this.state.captionDuration[1], this.state.captionWaveRate, this.props.currentAudio,
             this.state.captionBPMMulti, this.props.timeToNextFrame);
@@ -705,6 +800,9 @@ export default class CaptionProgram extends React.Component {
   blink(value: string, timestamp = false) {
     return (nextCommand: Function) => {
       const command = () => {
+        if (this.state.countProgress) {
+          this.setState({countProgress: false});
+        }
         let fns = new Array<Function>();
         let i = 0;
         const phrase = this.getPhrase(value).split('/')
@@ -780,6 +878,8 @@ export default class CaptionProgram extends React.Component {
 
   count(start: number, end: number, timestamp = false) {
     let values = Array<number>();
+    const origStart = start;
+    const origEnd = end;
     do {
       values.push(start);
       if (start == end) {
@@ -793,6 +893,11 @@ export default class CaptionProgram extends React.Component {
 
     return (nextCommand: Function) => {
       const command = () => {
+        if (this.state.showCountProgress) {
+          this.setState({countProgress: true, countCurrent: origStart, countTotal: Math.max(origStart, origEnd), countColor: this.props.captionScript.count.color});
+        } else if (this.state.countProgress) {
+          this.setState({countProgress: false});
+        }
         let fns = new Array<Function>();
         let i = 0;
         const length = values.length;
@@ -803,6 +908,11 @@ export default class CaptionProgram extends React.Component {
             let duration = getTimeout(this.state.countTF, this.state.countDuration[0], this.state.countDuration[0],
                 this.state.countDuration[1], this.state.countWaveRate, this.props.currentAudio,
                 this.state.countBPMMulti, this.props.timeToNextFrame);
+            if (this.state.countColors.has(val)) {
+              this.setState({countCurrent: val, countColor: this.state.countColors.get(val)});
+            } else {
+              this.setState({countCurrent: val});
+            }
             const showText = this.showText(val.toString(), duration);
             if (j == length - 1 && (this.state.countDelayTF == TF.scene || this.state.countGroupDelayTF == TF.scene || timestamp)) {
               showText(() => nextCommand());
@@ -1172,6 +1282,29 @@ export default class CaptionProgram extends React.Component {
   setCountGroupDelayTF(tf: string) {
     return (nextCommand: Function) => {
       this.setState({countGroupDelayTF: tf});
+      nextCommand();
+    }
+  }
+
+  setShowCountProgress(show: boolean) {
+    return (nextCommand: Function) => {
+      this.setState({showCountProgress: show});
+      nextCommand();
+    }
+  }
+
+  setCountProgressScale(scale: number) {
+    return (nextCommand: Function) => {
+      this.setState({countProgressScale: scale});
+      nextCommand();
+    }
+  }
+
+  setCountProgressColor(args: Array<any>) {
+    return (nextCommand: Function) => {
+      const newColors = this.state.countColors;
+      newColors.set(args[0], args[1]);
+      this.setState({countColors: newColors});
       nextCommand();
     }
   }

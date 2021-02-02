@@ -11,9 +11,11 @@ export const singleSetters = ["setBlinkWaveRate", "setBlinkBPMMulti", "setBlinkD
   "setBlinkGroupDelayWaveRate", "setBlinkGroupDelayBPMMulti", "setCaptionWaveRate", "setCaptionBPMMulti",
   "setCaptionDelayWaveRate", "setCaptionDelayBPMMulti", "setCountWaveRate", "setCountBPMMulti", "setCountDelayWaveRate",
   "setCountDelayBPMMulti", "setCountGroupDelayWaveRate", "setCountGroupDelayBPMMulti", "setBlinkY", "setCaptionY",
-  "setBigCaptionY", "setCountY", "setBlinkX", "setCaptionX", "setBigCaptionX", "setCountX"];
+  "setBigCaptionY", "setCountY", "setBlinkX", "setCaptionX", "setBigCaptionX", "setCountX", "setCountProgressScale"];
 export const stringSetters = ["setBlinkTF", "setBlinkDelayTF", "setBlinkGroupDelayTF", "setCaptionTF", "setCaptionDelayTF",
   "setCountTF", "setCountDelayTF", "setCountGroupDelayTF"];
+export const booleanSetters = ["setShowCountProgress"];
+export const colorSetters = ["setCountProgressColor"]
 const storers = ["storephrase", "storePhrase"];
 const keywords = ["$RANDOM_PHRASE", "$TAG_PHRASE"];
 export const timestampRegex = /^((\d?\d:)?\d?\d:\d\d(\.\d\d?\d?)?|\d?\d(\.\d\d?\d?)?)$/;
@@ -30,11 +32,13 @@ export const timestampRegex = /^((\d?\d:)?\d?\d:\d\d(\.\d\d?\d?)?|\d?\d(\.\d\d?\
       }
     }
 
-    CodeMirror.registerHelper("hintWords", "flipflip", actions.concat(tupleSetters, singleSetters, stringSetters, keywords, storers));
+    CodeMirror.registerHelper("hintWords", "flipflip", actions.concat(tupleSetters, singleSetters, stringSetters, booleanSetters, colorSetters, keywords, storers));
 
     define('atom', tupleSetters);
     define('atom', singleSetters);
     define('atom', stringSetters);
+    define('atom', booleanSetters);
+    define('atom', colorSetters);
     define('variable', keywords);
     define('variable-3', storers);
     define('builtin', actions);
@@ -99,7 +103,7 @@ export const timestampRegex = /^((\d?\d:)?\d?\d:\d\d(\.\d\d?\d?)?|\d?\d(\.\d\d?\
       }
 
       if (/[-\d]/.test(ch) && (command == "count" || command == "wait" ||
-        tupleSetters.includes(command) || singleSetters.includes(command))) {
+        tupleSetters.includes(command) || singleSetters.includes(command)) || colorSetters.includes(command)) {
         // Number parameter
         stream.eatWhile(/\d/);
         if(stream.eol() || !/\w/.test(stream.peek())) {
@@ -169,6 +173,22 @@ export const timestampRegex = /^((\d?\d:)?\d?\d:\d\d(\.\d\d?\d?)?|\d?\d(\.\d\d?\
         } else if (stringSetters.includes(command)) {
           const tf = getTimingFromString(cur);
           return rt(tf == null ? "error" : "variable", state, stream);
+        } else if (booleanSetters.includes(command)) {
+          if (cur.toLowerCase() == "true" ||
+              cur.toLowerCase() == "t" ||
+              cur.toLowerCase() == "false" ||
+              cur.toLowerCase() == "f") {
+            return rt("number", state, stream);
+          } else {
+            return rt("error", state, stream);
+          }
+        } else if (colorSetters.includes(command)) {
+          const colorRegex = /^#([a-f0-9]{3}){1,2}$/i.exec(cur);
+          if (colorRegex != null) {
+            return rt("variable-3", state, stream);
+          } else {
+            return rt("error", state, stream);
+          }
         }
         return rt("string", state, stream);
       } else {

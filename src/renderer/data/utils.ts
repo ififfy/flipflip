@@ -837,6 +837,9 @@ let captionProgramDefaults = {
   countDelayBPMMulti: 1,
   countDelayTF: TF.constant,
 
+  showCountProgress: false,
+  countProgressScale: 500,
+
   countGroupDelay: [1200, 2000],
   countGroupDelayWaveRate: 100,
   countGroupDelayBPMMulti: 1,

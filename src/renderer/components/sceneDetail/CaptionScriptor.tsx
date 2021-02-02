@@ -36,7 +36,14 @@ import ChildCallbackHack from "../player/ChildCallbackHack";
 import AudioCard from "../configGroups/AudioCard";
 import FontOptions from "../library/FontOptions";
 import CaptionScript, {FontSettingsI} from "../../data/CaptionScript";
-import CodeMirror, {singleSetters, stringSetters, timestampRegex, tupleSetters} from "./CodeMirror";
+import CodeMirror, {
+  booleanSetters,
+  colorSetters,
+  singleSetters,
+  stringSetters,
+  timestampRegex,
+  tupleSetters
+} from "./CodeMirror";
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -483,6 +490,13 @@ class CaptionScriptor extends React.Component {
                               <Divider/>
                               {singleSetters.map((s) =>
                                 <MenuItem className={classes.setterButton} key={s} value={s}>{s}</MenuItem>
+                              )}
+                              <Divider/>
+                              {booleanSetters.map((s) =>
+                                <MenuItem className={classes.setterButton} key={s} value={s}>{s}</MenuItem>
+                              )}
+                              {colorSetters.map((s) =>
+                                  <MenuItem className={classes.setterButton} key={s} value={s}>{s}</MenuItem>
                               )}
                             </Select>
                           </Grid>
@@ -1038,6 +1052,13 @@ class CaptionScriptor extends React.Component {
       const defaultVal = (captionProgramDefaults as any)[property];
       addString += setter + " " + defaultVal + "\n";
     }
+    addString += "\n";
+    for (let setter of booleanSetters) {
+      addString += setter + " false\n";
+    }
+    for (let setter of colorSetters) {
+      addString += setter + " 0 #FFFFFF\n";
+    }
     this.onAddString(addString, true);
   }
 
@@ -1053,6 +1074,10 @@ class CaptionScriptor extends React.Component {
         this.onAddSingleSetter(setter);
       } else if (stringSetters.includes(setter)) {
         this.onAddStringSetter(setter);
+      } else if (booleanSetters.includes(setter)) {
+        this.onAddBooleanSetter(setter);
+      } else if (colorSetters.includes(setter)) {
+        this.onAddColorSetter(setter);
       }
     }
   }
@@ -1073,6 +1098,14 @@ class CaptionScriptor extends React.Component {
 
   onAddStringSetter(setter: string) {
     this.onAddString(setter + " constant", true);
+  }
+
+  onAddBooleanSetter(setter: string) {
+    this.onAddString(setter + " false", true);
+  }
+
+  onAddColorSetter(setter: string) {
+    this.onAddString(setter + " 0 #FFFFFF", true);
   }
 
   onAddString(string: string, newLine = false) {
