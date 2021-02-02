@@ -588,166 +588,192 @@ export default class CaptionProgram extends React.Component {
 
   cap(value: string, timestamp = false) {
     return (nextCommand: Function) => {
-      let duration = getTimeout(this.state.captionTF, this.state.captionDuration[0], this.state.captionDuration[0],
-        this.state.captionDuration[1], this.state.captionWaveRate, this.props.currentAudio,
-        this.state.captionBPMMulti, this.props.timeToNextFrame);
-      const showText = this.showText(this.getPhrase(value), duration);
-      let delay = timestamp ? 0 : getTimeout(this.state.captionDelayTF, this.state.captionDelay[0], this.state.captionDelay[0],
-        this.state.captionDelay[1], this.state.captionDelayWaveRate, this.props.currentAudio,
-        this.state.captionDelayBPMMulti, this.props.timeToNextFrame);
-      const wait = this.wait(delay);
-      this.el.current.style.color = this.props.captionScript.caption.color;
-      this.el.current.style.fontSize = (this.props.captionScript.caption.fontSize * this.props.scale) + "vmin";
-      this.el.current.style.fontFamily = this.props.captionScript.caption.fontFamily;
-      this.el.current.style.display = 'table-cell';
-      this.el.current.style.textAlign = 'center';
-      this.el.current.style.verticalAlign = 'bottom';
-      const yPos = (14 + this.state.captionY) * this.props.scale;
-      if (yPos > 0) {
-        this.el.current.style.paddingBottom = (yPos) + 'vmin';
-        this.el.current.style.paddingTop = 'unset';
-      } else {
-        this.el.current.style.paddingBottom = 'unset';
-        this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
-      }
-      const xPos = this.state.captionX * this.props.scale;
-      if (xPos > 0) {
-        this.el.current.style.paddingLeft = (xPos) + 'vmin';
-        this.el.current.style.paddingRight = 'unset';
-      } else {
-        this.el.current.style.paddingLeft = 'unset';
-        this.el.current.style.paddingRight = (xPos * -1) + 'vmin';
-      }
-      this.el.current.style.transition = 'opacity 0.5s ease-in-out';
-      if (this.props.captionScript.caption.border) {
-        this.el.current.style.webkitTextStroke = (this.props.captionScript.caption.borderpx * this.props.scale) + 'px ' + this.props.captionScript.caption.borderColor;
-      } else {
-        this.el.current.style.webkitTextStroke = 'unset';
+      const command = () => {
+        let duration = getTimeout(this.state.captionTF, this.state.captionDuration[0], this.state.captionDuration[0],
+            this.state.captionDuration[1], this.state.captionWaveRate, this.props.currentAudio,
+            this.state.captionBPMMulti, this.props.timeToNextFrame);
+        const showText = this.showText(this.getPhrase(value), duration);
+        let delay = timestamp ? 0 : getTimeout(this.state.captionDelayTF, this.state.captionDelay[0], this.state.captionDelay[0],
+            this.state.captionDelay[1], this.state.captionDelayWaveRate, this.props.currentAudio,
+            this.state.captionDelayBPMMulti, this.props.timeToNextFrame);
+        const wait = this.wait(delay);
+        this.el.current.style.color = this.props.captionScript.caption.color;
+        this.el.current.style.fontSize = (this.props.captionScript.caption.fontSize * this.props.scale) + "vmin";
+        this.el.current.style.fontFamily = this.props.captionScript.caption.fontFamily;
+        this.el.current.style.display = 'table-cell';
+        this.el.current.style.textAlign = 'center';
+        this.el.current.style.verticalAlign = 'bottom';
+        const yPos = (14 + this.state.captionY) * this.props.scale;
+        if (yPos > 0) {
+          this.el.current.style.paddingBottom = (yPos) + 'vmin';
+          this.el.current.style.paddingTop = 'unset';
+        } else {
+          this.el.current.style.paddingBottom = 'unset';
+          this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
+        }
+        const xPos = this.state.captionX * this.props.scale;
+        if (xPos > 0) {
+          this.el.current.style.paddingLeft = (xPos) + 'vmin';
+          this.el.current.style.paddingRight = 'unset';
+        } else {
+          this.el.current.style.paddingLeft = 'unset';
+          this.el.current.style.paddingRight = (xPos * -1) + 'vmin';
+        }
+        //this.el.current.style.transition = 'opacity 0.5s ease-in-out';
+        if (this.props.captionScript.caption.border) {
+          this.el.current.style.webkitTextStroke = (this.props.captionScript.caption.borderpx * this.props.scale) + 'px ' + this.props.captionScript.caption.borderColor;
+        } else {
+          this.el.current.style.webkitTextStroke = 'unset';
+        }
+        if (this.state.captionDelayTF == TF.scene && !timestamp) {
+          showText(function () {
+            nextCommand();
+          });
+        } else {
+          showText(function () {
+            wait(nextCommand);
+          });
+        }
       }
       if (this.state.captionDelayTF == TF.scene && !timestamp) {
-        this._sceneCommand = () => {showText(() => nextCommand())};
+        this._sceneCommand = command;
       } else {
-        showText(function() { wait(nextCommand); });
+        command();
       }
     }
+
   }
 
   bigcap(value: string, timestamp = false) {
     return (nextCommand: Function) => {
-      let duration = getTimeout(this.state.captionTF, this.state.captionDuration[0], this.state.captionDuration[0],
-        this.state.captionDuration[1], this.state.captionWaveRate, this.props.currentAudio,
-        this.state.captionBPMMulti, this.props.timeToNextFrame);
-      const showText = this.showText(this.getPhrase(value), duration);
-      let delay = timestamp ? 0 : getTimeout(this.state.captionDelayTF, this.state.captionDelay[0], this.state.captionDelay[0],
-        this.state.captionDelay[1], this.state.captionDelayWaveRate, this.props.currentAudio,
-        this.state.captionDelayBPMMulti, this.props.timeToNextFrame);
-      const wait = this.wait(delay);
-      this.el.current.style.color = this.props.captionScript.captionBig.color;
-      this.el.current.style.fontSize = (this.props.captionScript.captionBig.fontSize * this.props.scale) + "vmin";
-      this.el.current.style.fontFamily = this.props.captionScript.captionBig.fontFamily;
-      this.el.current.style.display = 'table-cell';
-      this.el.current.style.textAlign = 'center';
-      this.el.current.style.verticalAlign = 'middle';
-      const yPos = this.state.bigCaptionY * this.props.scale;
-      if (yPos > 0) {
-        this.el.current.style.paddingBottom = (yPos) + 'vmin';
-        this.el.current.style.paddingTop = 'unset';
-      } else {
-        this.el.current.style.paddingBottom = 'unset';
-        this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
-      }
-      const xPos = this.state.bigCaptionX * this.props.scale;
-      if (xPos > 0) {
-        this.el.current.style.paddingLeft = (xPos) + 'vmin';
-        this.el.current.style.paddingRight = 'unset';
-      } else {
-        this.el.current.style.paddingLeft = 'unset';
-        this.el.current.style.paddingRight = (xPos * -1) + 'vmin';
-      }
-      this.el.current.style.transition = 'opacity 0.1s ease-out';
-      if (this.props.captionScript.captionBig.border) {
-        this.el.current.style.webkitTextStroke = (this.props.captionScript.captionBig.borderpx * this.props.scale) + 'px ' + this.props.captionScript.captionBig.borderColor;
-      } else {
-        this.el.current.style.webkitTextStroke = 'unset';
+      const command = () => {
+        let duration = getTimeout(this.state.captionTF, this.state.captionDuration[0], this.state.captionDuration[0],
+            this.state.captionDuration[1], this.state.captionWaveRate, this.props.currentAudio,
+            this.state.captionBPMMulti, this.props.timeToNextFrame);
+        const showText = this.showText(this.getPhrase(value), duration);
+        let delay = timestamp ? 0 : getTimeout(this.state.captionDelayTF, this.state.captionDelay[0], this.state.captionDelay[0],
+            this.state.captionDelay[1], this.state.captionDelayWaveRate, this.props.currentAudio,
+            this.state.captionDelayBPMMulti, this.props.timeToNextFrame);
+        const wait = this.wait(delay);
+        this.el.current.style.color = this.props.captionScript.captionBig.color;
+        this.el.current.style.fontSize = (this.props.captionScript.captionBig.fontSize * this.props.scale) + "vmin";
+        this.el.current.style.fontFamily = this.props.captionScript.captionBig.fontFamily;
+        this.el.current.style.display = 'table-cell';
+        this.el.current.style.textAlign = 'center';
+        this.el.current.style.verticalAlign = 'middle';
+        const yPos = this.state.bigCaptionY * this.props.scale;
+        if (yPos > 0) {
+          this.el.current.style.paddingBottom = (yPos) + 'vmin';
+          this.el.current.style.paddingTop = 'unset';
+        } else {
+          this.el.current.style.paddingBottom = 'unset';
+          this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
+        }
+        const xPos = this.state.bigCaptionX * this.props.scale;
+        if (xPos > 0) {
+          this.el.current.style.paddingLeft = (xPos) + 'vmin';
+          this.el.current.style.paddingRight = 'unset';
+        } else {
+          this.el.current.style.paddingLeft = 'unset';
+          this.el.current.style.paddingRight = (xPos * -1) + 'vmin';
+        }
+        this.el.current.style.transition = 'opacity 0.1s ease-out';
+        if (this.props.captionScript.captionBig.border) {
+          this.el.current.style.webkitTextStroke = (this.props.captionScript.captionBig.borderpx * this.props.scale) + 'px ' + this.props.captionScript.captionBig.borderColor;
+        } else {
+          this.el.current.style.webkitTextStroke = 'unset';
+        }
+        if (this.state.captionDelayTF == TF.scene && !timestamp) {
+          showText(function () {
+            nextCommand();
+          });
+        } else {
+          showText(function () {
+            wait(nextCommand);
+          });
+        }
       }
       if (this.state.captionDelayTF == TF.scene && !timestamp) {
-        this._sceneCommand = () => {showText(() => nextCommand())};
+       this._sceneCommand = command;
       } else {
-        showText(function() { wait(nextCommand); });
+        command();
       }
-
     }
+
   }
 
   blink(value: string, timestamp = false) {
     return (nextCommand: Function) => {
-      let fns = new Array<Function>();
-      let i = 0;
-      const phrase = this.getPhrase(value).split('/')
-      const length = phrase.length;
-      for (let word of phrase) {
-        word = this.getPhrase(word.trim());
-        let j = i;
-        i += 1;
-        fns.push(() => {
-          let duration = getTimeout(this.state.blinkTF, this.state.blinkDuration[0], this.state.blinkDuration[0],
-              this.state.blinkDuration[1], this.state.blinkWaveRate, this.props.currentAudio,
-              this.state.blinkBPMMulti, this.props.timeToNextFrame);
-          const showText = this.showText(word, duration);
-          if (j == length - 1 && (this.state.blinkDelayTF == TF.scene || this.state.blinkGroupDelayTF == TF.scene || timestamp)) {
-            showText(() => nextCommand());
-          } else if (this.state.blinkDelayTF == TF.scene) {
-            showText(() => this._sceneCommand = fns[j + 1]);
-          } else {
-            let delay = getTimeout(this.state.blinkDelayTF, this.state.blinkDelay[0], this.state.blinkDelay[0],
-              this.state.blinkDelay[1], this.state.blinkDelayWaveRate, this.props.currentAudio,
-              this.state.blinkDelayBPMMulti, this.props.timeToNextFrame);
-            const wait = this.wait(delay);
-            showText(() => wait(fns[j + 1]));
-          }
-        })
-      }
+      const command = () => {
+        let fns = new Array<Function>();
+        let i = 0;
+        const phrase = this.getPhrase(value).split('/')
+        const length = phrase.length;
+        for (let word of phrase) {
+          word = this.getPhrase(word.trim());
+          let j = i;
+          i += 1;
+          fns.push(() => {
+            let duration = getTimeout(this.state.blinkTF, this.state.blinkDuration[0], this.state.blinkDuration[0],
+                this.state.blinkDuration[1], this.state.blinkWaveRate, this.props.currentAudio,
+                this.state.blinkBPMMulti, this.props.timeToNextFrame);
+            const showText = this.showText(word, duration);
+            if (j == length - 1 && (this.state.blinkDelayTF == TF.scene || this.state.blinkGroupDelayTF == TF.scene || timestamp)) {
+              showText(() => nextCommand());
+            } else if (this.state.blinkDelayTF == TF.scene) {
+              showText(() => this._sceneCommand = fns[j + 1]);
+            } else {
+              let delay = getTimeout(this.state.blinkDelayTF, this.state.blinkDelay[0], this.state.blinkDelay[0],
+                  this.state.blinkDelay[1], this.state.blinkDelayWaveRate, this.props.currentAudio,
+                  this.state.blinkDelayBPMMulti, this.props.timeToNextFrame);
+              const wait = this.wait(delay);
+              showText(() => wait(fns[j + 1]));
+            }
+          })
+        }
 
-      if (this.state.blinkGroupDelayTF != TF.scene && this.state.blinkDelayTF != TF.scene && !timestamp) {
-        let delay = getTimeout(this.state.blinkGroupDelayTF, this.state.blinkGroupDelay[0], this.state.blinkGroupDelay[0],
-          this.state.blinkGroupDelay[1], this.state.blinkGroupDelayWaveRate, this.props.currentAudio,
-          this.state.blinkGroupDelayBPMMulti, this.props.timeToNextFrame);
-        const lastWait = this.wait(delay);
-        fns.push(() => lastWait(nextCommand));
-      }
+        if (this.state.blinkGroupDelayTF != TF.scene && this.state.blinkDelayTF != TF.scene && !timestamp) {
+          let delay = getTimeout(this.state.blinkGroupDelayTF, this.state.blinkGroupDelay[0], this.state.blinkGroupDelay[0],
+              this.state.blinkGroupDelay[1], this.state.blinkGroupDelayWaveRate, this.props.currentAudio,
+              this.state.blinkGroupDelayBPMMulti, this.props.timeToNextFrame);
+          const lastWait = this.wait(delay);
+          fns.push(() => lastWait(nextCommand));
+        }
 
-      this.el.current.style.color = this.props.captionScript.blink.color;
-      this.el.current.style.fontSize = (this.props.captionScript.blink.fontSize * this.props.scale) + "vmin";
-      this.el.current.style.fontFamily = this.props.captionScript.blink.fontFamily;
-      this.el.current.style.display = 'table-cell';
-      this.el.current.style.textAlign = 'center';
-      this.el.current.style.verticalAlign = 'middle';
-      const yPos = this.state.blinkY * this.props.scale;
-      if (yPos > 0) {
-        this.el.current.style.paddingBottom = (yPos) + 'vmin';
-        this.el.current.style.paddingTop = 'unset';
-      } else {
-        this.el.current.style.paddingBottom = 'unset';
-        this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
-      }
-      const xPos = this.state.blinkX * this.props.scale;
-      if (xPos > 0) {
-        this.el.current.style.paddingLeft = (xPos) + 'vmin';
-        this.el.current.style.paddingRight = 'unset';
-      } else {
-        this.el.current.style.paddingLeft = 'unset';
-        this.el.current.style.paddingRight = (xPos * -1) + 'vmin';
-      }
-      this.el.current.style.transition = 'opacity 0.1s ease-out';
-      if (this.props.captionScript.blink.border) {
-        this.el.current.style.webkitTextStroke = (this.props.captionScript.blink.borderpx * this.props.scale) + 'px ' + this.props.captionScript.blink.borderColor;
-      } else {
-        this.el.current.style.webkitTextStroke = 'unset';
+        this.el.current.style.color = this.props.captionScript.blink.color;
+        this.el.current.style.fontSize = (this.props.captionScript.blink.fontSize * this.props.scale) + "vmin";
+        this.el.current.style.fontFamily = this.props.captionScript.blink.fontFamily;
+        this.el.current.style.display = 'table-cell';
+        this.el.current.style.textAlign = 'center';
+        this.el.current.style.verticalAlign = 'middle';
+        const yPos = this.state.blinkY * this.props.scale;
+        if (yPos > 0) {
+          this.el.current.style.paddingBottom = (yPos) + 'vmin';
+          this.el.current.style.paddingTop = 'unset';
+        } else {
+          this.el.current.style.paddingBottom = 'unset';
+          this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
+        }
+        const xPos = this.state.blinkX * this.props.scale;
+        if (xPos > 0) {
+          this.el.current.style.paddingLeft = (xPos) + 'vmin';
+          this.el.current.style.paddingRight = 'unset';
+        } else {
+          this.el.current.style.paddingLeft = 'unset';
+          this.el.current.style.paddingRight = (xPos * -1) + 'vmin';
+        }
+        this.el.current.style.transition = 'opacity 0.1s ease-out';
+        if (this.props.captionScript.blink.border) {
+          this.el.current.style.webkitTextStroke = (this.props.captionScript.blink.borderpx * this.props.scale) + 'px ' + this.props.captionScript.blink.borderColor;
+        } else {
+          this.el.current.style.webkitTextStroke = 'unset';
+        }
+        fns[0]();
       }
       if ((this.state.blinkGroupDelayTF == TF.scene || this.state.blinkDelayTF == TF.scene) && !timestamp) {
-        this._sceneCommand = fns[0];
+        this._sceneCommand = command;
       } else {
-        fns[0]();
+        command();
       }
     }
   }
@@ -766,71 +792,74 @@ export default class CaptionProgram extends React.Component {
     } while (true);
 
     return (nextCommand: Function) => {
-      let fns = new Array<Function>();
-      let i = 0;
-      const length = values.length;
-      for (let val of values) {
-        let j = i;
-        i += 1;
-        fns.push(() => {
-          let duration = getTimeout(this.state.countTF, this.state.countDuration[0], this.state.countDuration[0],
-            this.state.countDuration[1], this.state.countWaveRate, this.props.currentAudio,
-            this.state.countBPMMulti, this.props.timeToNextFrame);
-          const showText = this.showText(val.toString(), duration);
-          if (j == length - 1 && (this.state.countDelayTF == TF.scene || this.state.countGroupDelayTF == TF.scene || timestamp)) {
-            showText(() => nextCommand());
-          } else if (this.state.countDelayTF == TF.scene) {
-            showText(() => this._sceneCommand = fns[j + 1]);
-          } else {
-            let delay = getTimeout(this.state.countDelayTF, this.state.countDelay[0], this.state.countDelay[0],
-              this.state.countDelay[1], this.state.countDelayWaveRate, this.props.currentAudio,
-              this.state.countDelayBPMMulti, this.props.timeToNextFrame);
-            const wait = this.wait(delay);
-            showText(() => wait(fns[j + 1]));
-          }
-        })
-      }
-      
-      if (this.state.countGroupDelayTF != TF.scene && this.state.countDelayTF != TF.scene && !timestamp) {
-        let delay = getTimeout(this.state.countGroupDelayTF, this.state.countGroupDelay[0], this.state.countGroupDelay[0],
-          this.state.countGroupDelay[1], this.state.countGroupDelayWaveRate, this.props.currentAudio,
-          this.state.countGroupDelayBPMMulti, this.props.timeToNextFrame);
-        const lastWait = this.wait(delay);
-        fns.push(() => lastWait(nextCommand));
-      }
+      const command = () => {
+        let fns = new Array<Function>();
+        let i = 0;
+        const length = values.length;
+        for (let val of values) {
+          let j = i;
+          i += 1;
+          fns.push(() => {
+            let duration = getTimeout(this.state.countTF, this.state.countDuration[0], this.state.countDuration[0],
+                this.state.countDuration[1], this.state.countWaveRate, this.props.currentAudio,
+                this.state.countBPMMulti, this.props.timeToNextFrame);
+            const showText = this.showText(val.toString(), duration);
+            if (j == length - 1 && (this.state.countDelayTF == TF.scene || this.state.countGroupDelayTF == TF.scene || timestamp)) {
+              showText(() => nextCommand());
+            } else if (this.state.countDelayTF == TF.scene) {
+              showText(() => this._sceneCommand = fns[j + 1]);
+            } else {
+              let delay = getTimeout(this.state.countDelayTF, this.state.countDelay[0], this.state.countDelay[0],
+                  this.state.countDelay[1], this.state.countDelayWaveRate, this.props.currentAudio,
+                  this.state.countDelayBPMMulti, this.props.timeToNextFrame);
+              const wait = this.wait(delay);
+              showText(() => wait(fns[j + 1]));
+            }
+          })
+        }
 
-      this.el.current.style.color = this.props.captionScript.count.color;
-      this.el.current.style.fontSize = (this.props.captionScript.count.fontSize * this.props.scale) + "vmin";
-      this.el.current.style.fontFamily = this.props.captionScript.count.fontFamily;
-      this.el.current.style.display = 'table-cell';
-      this.el.current.style.textAlign = 'center';
-      this.el.current.style.verticalAlign = 'middle';
-      const yPos = this.state.countY * this.props.scale;
-      if (yPos > 0) {
-        this.el.current.style.paddingBottom = (yPos) + 'vmin';
-        this.el.current.style.paddingTop = 'unset';
-      } else {
-        this.el.current.style.paddingBottom = 'unset';
-        this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
-      }
-      const xPos = this.state.countX * this.props.scale;
-      if (xPos > 0) {
-        this.el.current.style.paddingLeft = (xPos) + 'vmin';
-        this.el.current.style.paddingRight = 'unset';
-      } else {
-        this.el.current.style.paddingLeft = 'unset';
-        this.el.current.style.paddingRight = (xPos * -1) + 'vmin';
-      }
-      this.el.current.style.transition = 'opacity 0.1s ease-out';
-      if (this.props.captionScript.count.border) {
-        this.el.current.style.webkitTextStroke = (this.props.captionScript.count.borderpx * this.props.scale) + 'px ' + this.props.captionScript.count.borderColor;
-      } else {
-        this.el.current.style.webkitTextStroke = 'unset';
+        if (this.state.countGroupDelayTF != TF.scene && this.state.countDelayTF != TF.scene && !timestamp) {
+          let delay = getTimeout(this.state.countGroupDelayTF, this.state.countGroupDelay[0], this.state.countGroupDelay[0],
+              this.state.countGroupDelay[1], this.state.countGroupDelayWaveRate, this.props.currentAudio,
+              this.state.countGroupDelayBPMMulti, this.props.timeToNextFrame);
+          const lastWait = this.wait(delay);
+          fns.push(() => lastWait(nextCommand));
+        }
+
+        this.el.current.style.color = this.props.captionScript.count.color;
+        this.el.current.style.fontSize = (this.props.captionScript.count.fontSize * this.props.scale) + "vmin";
+        this.el.current.style.fontFamily = this.props.captionScript.count.fontFamily;
+        this.el.current.style.display = 'table-cell';
+        this.el.current.style.textAlign = 'center';
+        this.el.current.style.verticalAlign = 'middle';
+        const yPos = this.state.countY * this.props.scale;
+        if (yPos > 0) {
+          this.el.current.style.paddingBottom = (yPos) + 'vmin';
+          this.el.current.style.paddingTop = 'unset';
+        } else {
+          this.el.current.style.paddingBottom = 'unset';
+          this.el.current.style.paddingTop = (yPos * -1) + 'vmin';
+        }
+        const xPos = this.state.countX * this.props.scale;
+        if (xPos > 0) {
+          this.el.current.style.paddingLeft = (xPos) + 'vmin';
+          this.el.current.style.paddingRight = 'unset';
+        } else {
+          this.el.current.style.paddingLeft = 'unset';
+          this.el.current.style.paddingRight = (xPos * -1) + 'vmin';
+        }
+        this.el.current.style.transition = 'opacity 0.1s ease-out';
+        if (this.props.captionScript.count.border) {
+          this.el.current.style.webkitTextStroke = (this.props.captionScript.count.borderpx * this.props.scale) + 'px ' + this.props.captionScript.count.borderColor;
+        } else {
+          this.el.current.style.webkitTextStroke = 'unset';
+        }
+        fns[0]();
       }
       if ((this.state.countGroupDelayTF == TF.scene || this.state.countDelayTF == TF.scene) && !timestamp) {
-        this._sceneCommand = fns[0];
+        this._sceneCommand = command;
       } else {
-        fns[0]();
+        command();
       }
     }
   }
