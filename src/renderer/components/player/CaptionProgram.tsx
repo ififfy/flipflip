@@ -80,6 +80,7 @@ export default class CaptionProgram extends React.Component {
         bottom: 0,
         left: 0,
         overflow: 'hidden',
+        opacity: this.props.captionScript.opacity / 100,
       }}>
         {this.state.countProgress && (
             <CircularProgress

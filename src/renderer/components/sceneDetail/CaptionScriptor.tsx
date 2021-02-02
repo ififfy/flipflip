@@ -11,7 +11,8 @@ require('codemirror/theme/material.css');
 
 import {
   AppBar, Button, Card, CardContent, Container, createStyles, Dialog, DialogActions, DialogContent, DialogContentText,
-  DialogTitle, Divider, Grid, IconButton, Link, Menu, MenuItem, Select, Theme, Toolbar, Tooltip, Typography, withStyles
+  DialogTitle, Divider, Grid, IconButton, Link, Menu, MenuItem, Select, Slider, Theme, Toolbar, Tooltip, Typography,
+  withStyles
 } from "@material-ui/core";
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -547,6 +548,17 @@ class CaptionScriptor extends React.Component {
                         onPlaying={this.onPlaying.bind(this)}
                         onUpdateScene={this.onUpdateScene.bind(this)}/>
                     )}
+                    <Typography id="opacity-slider" variant="caption" component="div" color="textSecondary">
+                      Script Opacity: {this.state.captionScript.opacity}%
+                    </Typography>
+                    <Slider
+                        min={0}
+                        max={100}
+                        defaultValue={this.state.captionScript.opacity}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'opacity')}
+                        valueLabelDisplay={'auto'}
+                        valueLabelFormat={(v) => v + "%"}
+                        aria-labelledby="opacity-slider"/>
                   </CardContent>
                 </Card>
               </div>
@@ -1125,6 +1137,16 @@ class CaptionScriptor extends React.Component {
     } else {
       this.setState({captionScript: script, error: null, scriptChanged: true});
     }
+  }
+
+  onSliderChange(key: string, e: MouseEvent, value: number) {
+    this.changeKey(key, value);
+  }
+
+  changeKey(key: string, value: any) {
+    const script = new CaptionScript(this.state.captionScript);
+    (script as any)[key] = value;
+    this.setState({captionScript: script});
   }
 
   openLink(url: string) {

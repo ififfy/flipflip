@@ -7,7 +7,7 @@ import {
   Collapse,
   createStyles, Dialog, DialogActions,
   DialogContent, Divider, FormControlLabel,
-  Grid, Switch,
+  Grid, Slider, Switch,
   Theme,
   Typography,
   withStyles
@@ -126,6 +126,19 @@ class ScriptOptions extends React.Component {
                     label="Sync Timestamp with Audio"/>
                 </Grid>
               </Grid>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography id="opacity-slider" variant="caption" component="div" color="textSecondary">
+                Script Opacity: {this.state.script.opacity}%
+              </Typography>
+              <Slider
+                  min={0}
+                  max={100}
+                  defaultValue={this.state.script.opacity}
+                  onChangeCommitted={this.onSliderChange.bind(this, 'opacity')}
+                  valueLabelDisplay={'auto'}
+                  valueLabelFormat={(v) => v + "%"}
+                  aria-labelledby="opacity-slider"/>
             </Grid>
             <Grid item xs={12}>
               <FontOptions
@@ -247,6 +260,10 @@ class ScriptOptions extends React.Component {
       default:
         this.changeKey(key, input.checked);
     }
+  }
+
+  onSliderChange(key: string, e: MouseEvent, value: number) {
+    this.changeKey(key, value);
   }
 
   changeKey(key: string, value: any) {

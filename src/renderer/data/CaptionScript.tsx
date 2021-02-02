@@ -7,6 +7,8 @@ export default class CaptionScript {
   marked: boolean = false;
   tags: Array<Tag> = [];
 
+  opacity = 100;
+
   stopAtEnd = false;
   nextSceneAtEnd = false;
   syncWithAudio = true;
