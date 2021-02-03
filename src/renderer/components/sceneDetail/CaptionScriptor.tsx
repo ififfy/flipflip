@@ -591,6 +591,7 @@ class CaptionScriptor extends React.Component {
                     captionScript={this.state.captionScript}
                     repeat={RP.one}
                     scale={0.35}
+                    singleTrack={true}
                     getTags={this.props.getTags.bind(this)}
                     goBack={this.props.goBack.bind(this)}
                     playNextScene={() => {}}
@@ -749,6 +750,7 @@ class CaptionScriptor extends React.Component {
       if (this.props.openScript.script) {
         this.state.codeMirrorOverwriteHack.args = [this.props.openScript.script];
         this.state.codeMirrorOverwriteHack.fire();
+        this.setState({captionScript: this.props.openScript, scriptChanged: false});
       } else {
         wretch(this.props.openScript.url)
           .get()
@@ -889,7 +891,14 @@ class CaptionScriptor extends React.Component {
         script.captionBig = this.state.captionScript.captionBig;
         script.count = this.state.captionScript.count;
       } else {
-        library.push(this.state.captionScript);
+        let id = library.length + 1;
+        library.forEach((s) => {
+          id = Math.max(s.id + 1, id);
+        });
+        const newScript = JSON.parse(JSON.stringify(this.state.captionScript));
+        newScript.id = id;
+        newScript.script = null;
+        library.push(newScript);
       }
     })
   }

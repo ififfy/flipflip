@@ -44,6 +44,7 @@ export default class CaptionProgram extends React.Component {
     currentImage: HTMLImageElement | HTMLVideoElement,
     repeat: string,
     scale: number,
+    singleTrack: boolean,
     timeToNextFrame: number,
     getTags(source: string, clipID?: string): Array<Tag>,
     goBack(): void,
@@ -610,7 +611,7 @@ export default class CaptionProgram extends React.Component {
               this.props.playNextScene();
               return;
             }
-            if ((this.props.repeat == RP.all || this.props.repeat == RP.none) && this.props.nextTrack) {
+            if (((this.props.repeat == RP.all && !this.props.singleTrack) || this.props.repeat == RP.none) && this.props.nextTrack) {
               this.props.nextTrack();
               return;
             }
@@ -672,7 +673,7 @@ export default class CaptionProgram extends React.Component {
             this.props.playNextScene();
             return;
           }
-          if ((this.props.repeat == RP.all || this.props.repeat == RP.none) && this.props.nextTrack) {
+          if (((this.props.repeat == RP.all && !this.props.singleTrack) || this.props.repeat == RP.none) && this.props.nextTrack) {
             this.props.nextTrack();
             return;
           }
