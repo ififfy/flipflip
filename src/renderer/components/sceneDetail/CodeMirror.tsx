@@ -8,10 +8,11 @@ const actions = ["blink", "cap", "bigcap", "count", "wait"];
 export const tupleSetters = ["setBlinkDuration", "setBlinkDelay", "setBlinkGroupDelay", "setCaptionDuration", "setCaptionDelay",
   "setCountDuration", "setCountDelay", "setCountGroupDelay"];
 export const singleSetters = ["setBlinkWaveRate", "setBlinkBPMMulti", "setBlinkDelayWaveRate", "setBlinkDelayBPMMulti",
-  "setBlinkGroupDelayWaveRate", "setBlinkGroupDelayBPMMulti", "setCaptionWaveRate", "setCaptionBPMMulti",
-  "setCaptionDelayWaveRate", "setCaptionDelayBPMMulti", "setCountWaveRate", "setCountBPMMulti", "setCountDelayWaveRate",
-  "setCountDelayBPMMulti", "setCountGroupDelayWaveRate", "setCountGroupDelayBPMMulti", "setBlinkY", "setCaptionY",
-  "setBigCaptionY", "setCountY", "setBlinkX", "setCaptionX", "setBigCaptionX", "setCountX", "setCountProgressScale"];
+  "setBlinkGroupDelayWaveRate", "setBlinkGroupDelayBPMMulti", "setBlinkOpacity", "setBlinkX", "setBlinkY",
+  "setCaptionWaveRate", "setCaptionBPMMulti", "setCaptionDelayWaveRate", "setCaptionDelayBPMMulti", "setCaptionOpacity",
+  "setCaptionX", "setCaptionY", "setBigCaptionX", "setBigCaptionY", "setCountWaveRate", "setCountBPMMulti",
+  "setCountDelayWaveRate", "setCountDelayBPMMulti", "setCountGroupDelayWaveRate", "setCountGroupDelayBPMMulti",
+  "setCountOpacity", "setCountX", "setCountY", "setCountProgressScale"];
 export const stringSetters = ["setBlinkTF", "setBlinkDelayTF", "setBlinkGroupDelayTF", "setCaptionTF", "setCaptionDelayTF",
   "setCountTF", "setCountDelayTF", "setCountGroupDelayTF"];
 export const booleanSetters = ["setShowCountProgress", "setCountProgressOffset", "setCountColorMatch"];

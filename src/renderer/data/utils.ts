@@ -856,6 +856,10 @@ let captionProgramDefaults = {
   captionX: 0,
   bigCaptionX: 0,
   countX: 0,
+
+  blinkOpacity: 100,
+  captionOpacity: 100,
+  countOpacity: 100,
 }
 export default captionProgramDefaults;
 
