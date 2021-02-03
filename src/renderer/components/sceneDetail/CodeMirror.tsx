@@ -14,7 +14,7 @@ export const singleSetters = ["setBlinkWaveRate", "setBlinkBPMMulti", "setBlinkD
   "setBigCaptionY", "setCountY", "setBlinkX", "setCaptionX", "setBigCaptionX", "setCountX", "setCountProgressScale"];
 export const stringSetters = ["setBlinkTF", "setBlinkDelayTF", "setBlinkGroupDelayTF", "setCaptionTF", "setCaptionDelayTF",
   "setCountTF", "setCountDelayTF", "setCountGroupDelayTF"];
-export const booleanSetters = ["setShowCountProgress"];
+export const booleanSetters = ["setShowCountProgress", "setCountProgressOffset", "setCountColorMatch"];
 export const colorSetters = ["setCountProgressColor"]
 const storers = ["storephrase", "storePhrase"];
 const keywords = ["$RANDOM_PHRASE", "$TAG_PHRASE"];

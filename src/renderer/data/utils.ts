@@ -838,6 +838,8 @@ let captionProgramDefaults = {
   countDelayTF: TF.constant,
 
   showCountProgress: false,
+  countProgressOffset: false,
+  countColorMatch: false,
   countProgressScale: 500,
 
   countGroupDelay: [1200, 2000],

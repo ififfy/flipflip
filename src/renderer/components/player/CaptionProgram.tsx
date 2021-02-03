@@ -56,7 +56,7 @@ export default class CaptionProgram extends React.Component {
 
   readonly state = {
     ...captionProgramDefaults,
-    countColors: new Map<number, String>(),
+    countColors: new Map<number, string>(),
     countColor: "#FFFFFF",
     countProgress: false,
     countCurrent: 0,
@@ -438,6 +438,8 @@ export default class CaptionProgram extends React.Component {
             }
             break;
           case "setShowCountProgress":
+          case "setCountProgressOffset":
+          case "setCountColorMatch":
             if (value == null) {
               error = "Error: {" + index + "} '" + line + "' - missing parameter";
               break;
@@ -894,8 +896,10 @@ export default class CaptionProgram extends React.Component {
 
     return (nextCommand: Function) => {
       const command = () => {
+        let offset = 0;
         if (this.state.showCountProgress) {
-          this.setState({countProgress: true, countCurrent: origStart, countTotal: Math.max(origStart, origEnd), countColor: this.props.captionScript.count.color});
+          offset = this.state.countProgressOffset ? Math.min(origStart,origEnd) : 0;
+          this.setState({countProgress: true, countCurrent: origStart-offset, countTotal: Math.max(origStart, origEnd)-offset, countColor: this.props.captionScript.count.color});
         } else if (this.state.countProgress) {
           this.setState({countProgress: false});
         }
@@ -909,10 +913,19 @@ export default class CaptionProgram extends React.Component {
             let duration = getTimeout(this.state.countTF, this.state.countDuration[0], this.state.countDuration[0],
                 this.state.countDuration[1], this.state.countWaveRate, this.props.currentAudio,
                 this.state.countBPMMulti, this.props.timeToNextFrame);
-            if (this.state.countColors.has(val)) {
-              this.setState({countCurrent: val, countColor: this.state.countColors.get(val)});
+            if (this.state.showCountProgress) {
+              if (this.state.countColors.has(val)) {
+                this.setState({countCurrent: val - offset, countColor: this.state.countColors.get(val)});
+                if (this.state.countColorMatch) {
+                  this.el.current.style.color = this.state.countColors.get(val);
+                }
+              } else {
+                this.setState({countCurrent: val - offset});
+              }
             } else {
-              this.setState({countCurrent: val});
+              if (this.state.countColorMatch) {
+                this.el.current.style.color = this.state.countColors.get(val);
+              }
             }
             const showText = this.showText(val.toString(), duration);
             if (j == length - 1 && (this.state.countDelayTF == TF.scene || this.state.countGroupDelayTF == TF.scene || timestamp)) {
@@ -1215,7 +1228,7 @@ export default class CaptionProgram extends React.Component {
       nextCommand();
     }
   }
-  
+
   setCountTF(tf: string) {
     return (nextCommand: Function) => {
       this.setState({countTF: tf});
@@ -1306,6 +1319,20 @@ export default class CaptionProgram extends React.Component {
       const newColors = this.state.countColors;
       newColors.set(args[0], args[1]);
       this.setState({countColors: newColors});
+      nextCommand();
+    }
+  }
+
+  setCountProgressOffset(offset: boolean) {
+    return (nextCommand: Function) => {
+      this.setState({countProgressOffset: offset});
+      nextCommand();
+    }
+  }
+
+  setCountColorMatch(match: boolean) {
+    return (nextCommand: Function) => {
+      this.setState({countColorMatch: match});
       nextCommand();
     }
   }
