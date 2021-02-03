@@ -105,6 +105,8 @@ const SF = { // sort function
   date: 'sf.date',
   count: 'sf.count',
   type: 'sf.type',
+  duration: 'sf.duration',
+  resolution: 'sf.resolution',
   random: 'sf.random',
 };
 
@@ -197,6 +199,7 @@ const PR = { // Global progress functions
   complete: 'pr.complete',
   audioOffline: 'pr.audioOffline',
   offline: 'pr.offline',
+  videoMetadata: 'pr.video',
   tumblr: 'pr.tumblr',
   reddit: 'pr.reddit',
   twitter: 'pr.twitter',

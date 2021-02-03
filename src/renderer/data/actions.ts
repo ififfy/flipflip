@@ -2520,9 +2520,27 @@ function sortFunction(algorithm: string, ascending: boolean, getName: (a: any) =
         aValue = getType(a);
         bValue = getType(b);
         break;
+      case SF.duration:
+        aValue = a.duration;
+        bValue = b.duration;
+        break;
+      case SF.resolution:
+        aValue = a.resolution;
+        bValue = b.resolution;
+        break;
       default:
         aValue = "";
         bValue = "";
+    }
+
+    if (algorithm == SF.duration || algorithm == SF.resolution) {
+      if (aValue == null && bValue != null) {
+        return 1;
+      } else if (bValue == null && aValue != null) {
+        return -1;
+      } else if (bValue == null && aValue == null) {
+        return 0;
+      }
     }
     if (aValue < bValue) {
       return ascending ? -1 : 1;
@@ -2833,6 +2851,81 @@ export function markOffline(getState: () => State, setState: Function) {
     });
     win.setProgressBar(state.progressCurrent / state.progressTotal);
     offlineLoop();
+  }
+}
+
+export function updateVideoMetadata(getState: () => State, setState: Function) {
+  const win = remote.getCurrentWindow();
+  const state = getState();
+  const actionableLibrary = state.library.filter((ls) => getSourceType(ls.url) == ST.video && (ls.duration == null || ls.resolution == null));
+
+  const videoMetadataLoop = () => {
+    const state = getState();
+    const offset = state.progressCurrent;
+    if (state.progressMode == PR.cancel) {
+      win.setProgressBar(-1);
+      setState({progressMode: null, progressCurrent: 0, progressTotal: 0, progressTitle: ""});
+    } else if (actionableLibrary.length == offset) {
+      win.setProgressBar(-1);
+      setState({
+        systemSnack: "Video Metadata update has completed.",
+        progressMode: null,
+        progressCurrent: 0,
+        progressTotal: 0,
+        progressTitle: ""
+      });
+    } else {
+      const actionSource = actionableLibrary[offset];
+      state.progressTitle = actionSource.url;
+      setState({progressTitle: state.progressTitle});
+
+      const librarySource = state.library.find((s) => s.url == actionSource.url);
+      if (librarySource) {
+        let video = document.createElement('video');
+        video.preload = 'metadata';
+
+        video.onloadedmetadata = () => {
+          const height = video.videoHeight;
+          const width = video.videoWidth;
+          librarySource.resolution = Math.min(height, width);
+          librarySource.duration = video.duration;
+          video.remove();
+          state.progressCurrent = offset + 1;
+          setState({progressCurrent: state.progressCurrent});
+          win.setProgressBar(state.progressCurrent / state.progressTotal);
+          setTimeout(videoMetadataLoop, 100);
+        }
+        video.onerror = () => {
+          video.remove();
+          state.progressCurrent = offset + 1;
+          setState({progressCurrent: state.progressCurrent});
+          win.setProgressBar(state.progressCurrent / state.progressTotal);
+          setTimeout(videoMetadataLoop, 100);
+        }
+
+        video.src = librarySource.url;
+      } else {
+        // Skip if removed from library during check
+        state.progressCurrent = offset + 1;
+        setState({progressCurrent: state.progressCurrent});
+        win.setProgressBar(state.progressCurrent / state.progressTotal);
+        videoMetadataLoop();
+      }
+    }
+  }
+
+  // If we don't have an import running
+  if (!state.progressMode) {
+    state.progressMode = PR.videoMetadata;
+    state.progressCurrent = 0;
+    state.progressTotal = actionableLibrary.length;
+    setState({
+      progressMode: state.progressMode,
+      progressCurrent: state.progressCurrent,
+      progressTotal: state.progressTotal,
+    });
+    win.setProgressBar(state.progressCurrent / state.progressTotal);
+    videoMetadataLoop();
   }
 }
 

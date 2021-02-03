@@ -13,7 +13,7 @@ import BuildIcon from '@material-ui/icons/Build';
 import DeleteIcon from '@material-ui/icons/Delete';
 import OfflineBoltIcon from '@material-ui/icons/OfflineBolt';
 
-import {getCachePath, getFileName, getSourceType, urlToPath} from "../../data/utils";
+import {getCachePath, getFileName, getSourceType, getTimestamp, urlToPath} from "../../data/utils";
 import {SDT, ST} from "../../data/const";
 import Tag from "../../data/Tag";
 import SourceIcon from "./SourceIcon";
@@ -218,6 +218,20 @@ class SourceListItem extends React.Component {
 
           {this.props.isEditing != this.props.source.id && (
             <ListItemSecondaryAction className={clsx(classes.source, this.props.tutorial == SDT.sourceButtons && classes.highlight)}>
+              {(sourceType == ST.video && this.props.source.duration) && (
+                <Chip
+                  className={classes.countChip}
+                  label={getTimestamp(this.props.source.duration)}
+                  color="secondary"
+                  size="small"/>
+              )}
+              {(sourceType == ST.video && this.props.source.resolution) && (
+                <Chip
+                  className={classes.countChip}
+                  label={`${this.props.source.resolution}p`}
+                  color="secondary"
+                  size="small"/>
+              )}
               {(this.props.source.count > 0 && sourceType != ST.video) && (
                 <Chip
                   className={clsx(classes.countChip, this.props.tutorial == SDT.sourceCount && classes.highlight)}

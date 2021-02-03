@@ -620,7 +620,7 @@ class ScriptLibrary extends React.Component {
               classes={{paper: classes.sortMenu}}
               open={this.state.openMenu == MO.sort}
               onClose={this.onCloseDialog.bind(this)}>
-              {Object.values(SF).filter((sf) => sf != SF.count && sf != SF.type && sf != SF.random).map((sf) =>
+              {[SF.alpha, SF.alphaFull, SF.date].map((sf) =>
                 <MenuItem key={sf}>
                   <ListItemText primary={en.get(sf)}/>
                   <ListItemSecondaryAction>

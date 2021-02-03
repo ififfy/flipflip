@@ -509,6 +509,8 @@ class SourceList extends React.Component {
         editSource.blacklist = librarySource && librarySource.blacklist ? librarySource.blacklist : editSource.blacklist;
         editSource.count = librarySource ? librarySource.count : sourceChanged ? 0 : editSource.count;
         editSource.countComplete = librarySource ? librarySource.countComplete : sourceChanged ? false : editSource.countComplete;
+        editSource.duration = librarySource ? librarySource.duration : sourceChanged ? null : editSource.duration;
+        editSource.resolution = librarySource ? librarySource.resolution : sourceChanged ? null : editSource.resolution;
 
         const newSources = Array<LibrarySource>();
         for (let source of s.sources) {
@@ -538,6 +540,8 @@ class SourceList extends React.Component {
         editSource.url = newURL;
         editSource.count = sourceChanged ? 0 : editSource.count;
         editSource.countComplete = sourceChanged ? false : editSource.countComplete;
+        editSource.duration = sourceChanged ? null : editSource.duration;
+        editSource.resolution = sourceChanged ? null : editSource.resolution;
 
         const newSources = Array<LibrarySource>();
         for (let source of l) {

@@ -24,6 +24,7 @@ import HttpIcon from '@material-ui/icons/Http';
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import MenuIcon from'@material-ui/icons/Menu';
 import MergeTypeIcon from '@material-ui/icons/MergeType';
+import MovieFilterIcon from '@material-ui/icons/MovieFilter';
 import MovieIcon from '@material-ui/icons/Movie';
 import OfflineBoltIcon from '@material-ui/icons/OfflineBolt';
 import PublishIcon from '@material-ui/icons/Publish';
@@ -32,7 +33,7 @@ import ShuffleIcon from "@material-ui/icons/Shuffle";
 import SortIcon from '@material-ui/icons/Sort';
 
 import {AF, LT, MO, PR, SF, SP, ST} from "../../data/const";
-import {getCachePath, getLocalPath, getSourceType} from "../../data/utils";
+import {getCachePath, getLocalPath, getSourceType, getTimestampValue} from "../../data/utils";
 import en from "../../data/en";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
@@ -323,6 +324,7 @@ class Library extends React.Component {
     onTutorial(tutorial: string): void,
     onUpdateLibrary(fn: (library: Array<LibrarySource>) => void): void,
     onUpdateMode(mode: string): void,
+    onUpdateVideoMetadata(): void,
     savePosition(yOffset: number, filters:Array<string>, selected: Array<string>): void,
     systemMessage(message: string): void,
   };
@@ -355,6 +357,9 @@ class Library extends React.Component {
     switch (this.props.progressMode) {
       case PR.offline:
         cancelProgressMessage = "Cancel Offline Check";
+        break;
+      case PR.videoMetadata:
+        cancelProgressMessage = "End Video MD Check";
         break;
       case PR.tumblr:
       case PR.reddit:
@@ -536,6 +541,14 @@ class Library extends React.Component {
                 <ListItemText primary="Mark Offline" />
               </ListItem>
             </Tooltip>
+            <Tooltip title={"Detect duration and resolution of video sources"}>
+              <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onUpdateVideoMetadata.bind(this)}>
+                <ListItemIcon>
+                  <MovieFilterIcon />
+                </ListItemIcon>
+                <ListItemText primary="Video Metadata" />
+              </ListItem>
+            </Tooltip>
           </div>
 
           {this.props.progressMode != null && (
@@ -551,10 +564,10 @@ class Library extends React.Component {
                     <ListItemText primary={cancelProgressMessage} />
                   </ListItem>
                 </Tooltip>
-                {(this.props.progressMode === PR.offline || this.props.progressMode === PR.tumblr) && (
+                {(this.props.progressMode === PR.offline || this.props.progressMode === PR.tumblr || this.props.progressMode === PR.videoMetadata) && (
                   <LinearProgress variant="determinate" value={Math.round((this.props.progressCurrent / this.props.progressTotal) * 100)}/>
                 )}
-                {this.props.progressMode !== PR.offline && this.props.progressMode !== PR.tumblr && (
+                {this.props.progressMode !== PR.offline && this.props.progressMode !== PR.tumblr && this.props.progressMode !== PR.videoMetadata && (
                   <LinearProgress variant={this.props.progressMode === PR.cancel ? "query" : "indeterminate"}/>
                 )}
               </div>
@@ -1246,6 +1259,58 @@ class Library extends React.Component {
               case "<":
                 matchesFilter = (all || countComplete) && count < value;
                 break;
+            }
+          } else if ((countRegex = /^duration([>=<])([\d:]*)$/.exec(filter)) != null) {
+            const symbol = countRegex[1];
+            let value;
+            if (countRegex[2].includes(":")) {
+              value = getTimestampValue(countRegex[2]);
+            } else {
+              value = parseInt(countRegex[2]);
+            }
+            const type = getSourceType(source.url);
+            if (type == ST.video) {
+              if (source.duration == null) {
+                matchesFilter = false;
+              } else {
+                switch (symbol) {
+                  case "=":
+                    matchesFilter = Math.floor(source.duration) == value;
+                    break;
+                  case ">":
+                    matchesFilter = Math.floor(source.duration) > value;
+                    break;
+                  case "<":
+                    matchesFilter = Math.floor(source.duration) < value;
+                    break;
+                }
+              }
+            } else {
+              matchesFilter = false;
+            }
+          } else if ((countRegex = /^resolution([>=<])(\d*)p?$/.exec(filter)) != null) {
+            const symbol = countRegex[1];
+            const value = parseInt(countRegex[2]);
+
+            const type = getSourceType(source.url);
+            if (type == ST.video) {
+              if (source.resolution == null) {
+                matchesFilter = false;
+              } else {
+                switch (symbol) {
+                  case "=":
+                    matchesFilter = source.resolution == value;
+                    break;
+                  case ">":
+                    matchesFilter = source.resolution > value;
+                    break;
+                  case "<":
+                    matchesFilter = source.resolution < value;
+                    break;
+                }
+              }
+            } else {
+              matchesFilter = false;
             }
           } else if (((filter.startsWith('"') || filter.startsWith('-"')) && filter.endsWith('"')) ||
             ((filter.startsWith('\'') || filter.startsWith('-\'')) && filter.endsWith('\''))) {

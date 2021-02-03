@@ -192,6 +192,7 @@ export default class Meta extends React.Component {
               onTutorial={a(actions.doneTutorial)}
               onUpdateLibrary={a(actions.updateLibrary)}
               onUpdateMode={a(actions.setMode)}
+              onUpdateVideoMetadata={p(actions.updateVideoMetadata)}
               savePosition={a(actions.saveLibraryPosition)}
               systemMessage={a(actions.systemMessage)}
             />
