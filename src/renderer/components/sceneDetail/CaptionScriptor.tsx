@@ -1140,13 +1140,15 @@ class CaptionScriptor extends React.Component {
   }
 
   onSliderChange(key: string, e: MouseEvent, value: number) {
-    this.changeKey(key, value);
-  }
-
-  changeKey(key: string, value: any) {
-    const script = new CaptionScript(this.state.captionScript);
+    const script = JSON.parse(JSON.stringify(this.state.captionScript));
     (script as any)[key] = value;
-    this.setState({captionScript: script});
+    if (this.state.scene) {
+      const newScene = JSON.parse(JSON.stringify(this.state.scene));
+      newScene.scriptPlaylists = [{scripts: [script], shuffle: false, repeat: RP.one}];
+      this.setState({scene: newScene, captionScript: script, error: null, scriptChanged: true});
+    } else {
+      this.setState({captionScript: script});
+    }
   }
 
   openLink(url: string) {
