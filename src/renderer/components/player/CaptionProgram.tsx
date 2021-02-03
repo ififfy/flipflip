@@ -67,38 +67,81 @@ export default class CaptionProgram extends React.Component {
   _timeout: any = null;
 
   render() {
+    const countXPos = this.state.countX * this.props.scale;
+    const countYPos = this.state.countY * this.props.scale;
+    let countXStyle = {}
+    let countYStyle = {}
+    if (this.state.showCountProgress) {
+      if (countXPos > 0) {
+        countXStyle = {
+          marginLeft: (countXPos) + 'vmin',
+          marginRight: 'unset',
+        }
+      } else {
+        countXStyle = {
+          marginLeft: 'unset',
+          marginRight: (countXPos * -1) + 'vmin',
+        }
+      }
+      if (countYPos > 0) {
+        countYStyle = {
+          marginBottom: (countYPos) + 'vmin',
+          marginTop: 'unset',
+        }
+      } else {
+        countYStyle = {
+          marginBottom: 'unset',
+          marginTop: (countYPos * -1) + 'vmin',
+        }
+      }
+    }
     return (
-      <div style={{
-        zIndex: 6,
-        pointerEvents: 'none',
-        display: 'table',
-        width: '100%',
-        height: '100%',
-        position: 'absolute',
-        top: 0,
-        right: 0,
-        bottom: 0,
-        left: 0,
-        overflow: 'hidden',
-        opacity: this.props.captionScript.opacity / 100,
-      }}>
+      <React.Fragment>
+        <div style={{
+          zIndex: 6,
+          pointerEvents: 'none',
+          display: 'table',
+          width: '100%',
+          height: '100%',
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          overflow: 'hidden',
+          opacity: this.props.captionScript.opacity / 100,
+        }}>
+          <div ref={this.el}/>
+        </div>
         {this.state.countProgress && (
+          <div style={{
+            zIndex: 6,
+            pointerEvents: 'none',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            height: '100%',
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
+            overflow: 'hidden',
+            opacity: this.props.captionScript.opacity / 100,
+          }}>
             <CircularProgress
-                style={{
-                  position: 'absolute',
-                  margin: 'auto',
-                  top: 0,
-                  right: 0,
-                  bottom: 0,
-                  left: 0,
-                  color: this.state.countColor,
-                }}
-                size={this.state.countProgressScale * this.props.scale}
-                value={Math.round((this.state.countCurrent / this.state.countTotal) * 100)}
-                variant="static"/>
+              style={{
+                ...countXStyle,
+                ...countYStyle,
+                color: this.state.countColor,
+              }}
+              size={this.state.countProgressScale * this.props.scale}
+              value={Math.round((this.state.countCurrent / this.state.countTotal) * 100)}
+              variant="static"/>
+          </div>
         )}
-        <div ref={this.el}/>
-      </div>
+      </React.Fragment>
     );
   }
 
