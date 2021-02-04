@@ -192,6 +192,7 @@ export default class CaptionProgram extends React.Component {
     this.setState({
       ...captionProgramDefaults,
       phrases: new Map<number, Array<string>>(),
+      timestampFn: new Map<number, Array<Function>>(),
       countColors: new Map<number, string>(),
       countColor: "#FFFFFF",
       countProgress: false,
@@ -201,6 +202,8 @@ export default class CaptionProgram extends React.Component {
   }
 
   stop() {
+    captionProgramDefaults.phrases = new Map<number, Array<string>>();
+    captionProgramDefaults.timestampFn = new Map<number, Array<Function>>();
     this.setState({countProgress: false});
     if (this.el) {
       this.el.current.style.opacity = '0';
