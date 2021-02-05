@@ -134,7 +134,7 @@ class LibrarySearch extends React.Component {
     const options = Array<{ label: string, value: string }>();
     const defaultValues = Array<{ label: string, value: string }>();
     for (let source of this.props.displaySources) {
-      if (source instanceof LibrarySource && source.offline) {
+      if (!!(source as any).offline) {
         offlineCount++;
       }
       if (source.marked) {

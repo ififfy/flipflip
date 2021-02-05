@@ -2761,11 +2761,8 @@ export function markOffline(getState: () => State, setState: Function) {
   const win = remote.getCurrentWindow();
   const state = getState();
   const actionableLibrary = state.library.filter((ls) => {
-    if (ls.url.startsWith("http://") || ls.url.startsWith("https://")) {
-      // If this link was checked within the last week, skip
-      return new Date().getTime() - new Date(ls.lastCheck).getTime() >= 604800000;
-    }
-    return true;
+    // If this link was checked within the last week, skip
+    return new Date().getTime() - new Date(ls.lastCheck).getTime() >= 604800000;
   });
 
   const offlineLoop = () => {
