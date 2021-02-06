@@ -745,7 +745,7 @@ export function playTrack(state: State, url: string) {
 }
 
 export function playAudio(state: State, source: Audio, displayed: Array<Audio>): Object {
-  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, "\\");
+  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path.sep);
   let librarySource = state.audios.find((s) => s.url == sourceURL);
   if (librarySource == null) {
     throw new Error("Source not found in Library");
@@ -785,7 +785,7 @@ export function playAudio(state: State, source: Audio, displayed: Array<Audio>):
 }
 
 export function playScript(state: State, source: CaptionScript, sceneID: number, displayed: Array<CaptionScript>): Object {
-  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, "\\");
+  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path.sep);
   let librarySource = state.scripts.find((s) => s.url == sourceURL);
   if (librarySource == null) {
     throw new Error("Script not found in Library");
@@ -809,7 +809,7 @@ export function playScript(state: State, source: CaptionScript, sceneID: number,
 }
 
 export function playSceneFromLibrary(state: State, source: LibrarySource, displayed: Array<LibrarySource>): Object {
-  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, "\\");
+  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path.sep);
   let librarySource = state.library.find((s) => s.url == sourceURL);
   if (librarySource == null) {
     throw new Error("Source not found in Library");
@@ -865,7 +865,7 @@ export function onUpdateClips(state: State, sourceURL: string, clips: Array<Clip
 }
 
 export function clipVideo(state: State, source: LibrarySource, displayed: Array<LibrarySource>) {
-  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, "\\");
+  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path.sep);
   let librarySource = state.library.find((s) => s.url == sourceURL);
   if (getActiveSource(state) != null) {
     state.route.pop();
