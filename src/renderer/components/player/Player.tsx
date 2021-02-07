@@ -433,6 +433,7 @@ export default class Player extends React.Component {
                     currentAudio={this.state.currentAudio}
                     opacity={overlay.opacity / 100}
                     gridView={this.props.gridView}
+                    isOverlay
                     isPlaying={this.state.isPlaying && !this.state.isEmpty}
                     hasStarted={this.state.hasStarted}
                     historyOffset={0}

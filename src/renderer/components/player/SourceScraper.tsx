@@ -1579,6 +1579,7 @@ export default class SourceScraper extends React.Component {
     historyOffset: number,
     advanceHack?: ChildCallbackHack,
     deleteHack?: ChildCallbackHack,
+    isOverlay?: boolean,
     setHistoryOffset(historyOffset: number): void,
     setHistoryPaths(historyPaths: Array<any>): void,
     firstImageLoaded(): void,
@@ -1614,7 +1615,7 @@ export default class SourceScraper extends React.Component {
             config={this.props.config}
             scene={this.props.scene}
             currentAudio={this.props.currentAudio}
-            isOverlay={this.props.opacity != 1}
+            isOverlay={this.props.isOverlay}
             isPlaying={this.props.isPlaying}
             gridView={this.props.gridView}
             historyOffset={this.props.historyOffset}
@@ -1706,7 +1707,7 @@ export default class SourceScraper extends React.Component {
       const d = sources[n];
 
       let message = d ? [d.url] : [""];
-      if (this.props.opacity != 1) {
+      if (this.props.isOverlay) {
         message = ["Loading '" + this.props.scene.name + "'...", message];
       }
       this.props.setProgress(sceneSources.length, n+1, message);

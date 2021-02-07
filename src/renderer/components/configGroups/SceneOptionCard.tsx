@@ -460,7 +460,7 @@ class SceneOptionCard extends React.Component {
                               <Grid item xs>
                                 <Slider
                                   min={0}
-                                  max={99}
+                                  max={100}
                                   defaultValue={overlayOpacity}
                                   onChangeCommitted={this.onOverlaySliderChange.bind(this, o.id, 'opacity')}
                                   valueLabelDisplay={'auto'}
