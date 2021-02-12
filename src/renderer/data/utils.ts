@@ -284,7 +284,7 @@ export function getSourceType(url: string): string {
     return ST.ehentai;
   } else if (/^https?:\/\/[^.]*\.bdsmlr\.com/.exec(url) != null) {
     return ST.bdsmlr;
-  } else if (/^https?:\/\/[\w\\.]+:\d+\/get_files/.exec(url) != null) {
+  } else if (/^https?:\/\/[\w\\.]+:\d+\/get_files\/search_files\?tags=([^&]*)&?.*$/.exec(url) != null) {
     return ST.hydrus;
   } else if (/(^https?:\/\/)|(\.txt$)/.exec(url) != null) { // Arbitrary URL, assume image list
     return ST.list;

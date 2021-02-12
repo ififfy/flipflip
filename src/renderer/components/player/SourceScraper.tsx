@@ -1490,6 +1490,9 @@ function loadHydrus(systemMessage: Function, config: Config, source: LibrarySour
           .json((json) => {
             sessionKey = json.session_key;
             search();
+          })
+          .catch((e) => {
+            resolve(null);
           });
       }
 
@@ -1514,6 +1517,9 @@ function loadHydrus(systemMessage: Function, config: Config, source: LibrarySour
               const pageIDs = fileIDs.slice(i,i+chunk);
               getFileMetadata(pageIDs, ++page);
             }
+          })
+          .catch((e) => {
+            resolve(null);
           });
       }
 
@@ -1545,6 +1551,9 @@ function loadHydrus(systemMessage: Function, config: Config, source: LibrarySour
                 helpers: helpers,
               });
             }
+          })
+          .catch((e) => {
+            resolve(null);
           });
       }
 
