@@ -15,6 +15,7 @@ import {
   getCachePath,
   getFileGroup,
   getFileName,
+  getFilesRecursively,
   getRandomIndex,
   getSourceType,
   isVideo,
@@ -2188,6 +2189,28 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
         })
       } else {
         return updateLibrary(state, (l) =>  addSources(l, vResult, state.library));
+      }
+
+    case AF.videoDir:
+      let vdResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+        {filters: [{name:'All Files (*.*)', extensions: ['*']}], properties: ['openDirectory', 'multiSelections']});
+      if (!vdResult) return;
+      let rvResult = new Array<string>();
+      for (let path of vdResult) {
+        if (fs.existsSync(path) && fs.lstatSync(path).isDirectory()) {
+          rvResult = rvResult.concat(getFilesRecursively(path));
+        } else {
+          rvResult.push(path);
+        }
+      }
+      rvResult = rvResult.filter((r) => isVideo(r, true) || isVideoPlaylist(r, true));
+      if (scene != null) {
+        return updateScene(state, scene, (s) => {
+          addSources(s.sources, rvResult, state.library);
+          handleArgs(s);
+        })
+      } else {
+        return updateLibrary(state, (l) =>  addSources(l, rvResult, state.library));
       }
 
     case GT.local:

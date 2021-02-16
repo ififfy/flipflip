@@ -1071,6 +1071,8 @@ class SceneDetail extends React.Component {
     if (this.props.tutorial == SDT.add2) {
       this.props.onTutorial(SDT.add2);
       this.props.onAddSource(this.props.scene, "tutorial");
+    } else if (addFunction == AF.videos && e.shiftKey) {
+        this.props.onAddSource(this.props.scene, AF.videoDir, ...args);
     } else {
       this.props.onAddSource(this.props.scene, addFunction, ...args);
     }

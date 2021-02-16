@@ -2,10 +2,10 @@ import {remote} from "electron";
 import {URL} from "url";
 import path from 'path';
 import * as fs from "fs";
+import * as Path from "path";
 import wretch from "wretch";
 import * as easings from 'd3-ease';
 import crypto from "crypto";
-import {readFileSync} from "fs";
 
 import {EA, ST, TF, TT} from "./const";
 import en from "./en";
@@ -65,7 +65,7 @@ export function getEaseFunction(ea: string, exp: number, amp: number, per: numbe
       return easings.easeBackOut.overshoot(ov);
     case EA.backInOut:
       return easings.easeBackInOut.overshoot(ov);
-      
+
   }
 }
 
@@ -475,7 +475,7 @@ export function extractMusicMetadata(audio: Audio, metadata: any, cachePath: str
   if (metadata.format && metadata.format.duration) {
     audio.duration = metadata.format.duration;
   } else {
-    const data = toArrayBuffer(readFileSync(audio.url));
+    const data = toArrayBuffer(fs.readFileSync(audio.url));
     let context = new AudioContext();
     context.decodeAudioData(data, (buffer) => {
       audio.duration = buffer.duration;
@@ -695,6 +695,22 @@ export function getRandomListItem(list: any[], count: number = 1) {
     }
     return newList;
   }
+}
+
+export function getFilesRecursively(path: string): string[] {
+  const isDirectory = (path: string) => fs.statSync(path).isDirectory();
+  const getDirectories = (path: string) =>
+    fs.readdirSync(path).map(name => Path.join(path, name)).filter(isDirectory);
+
+  const isFile = (path: string) => fs.statSync(path).isFile();
+  const getFiles = (path: string) =>
+    fs.readdirSync(path).map(name => Path.join(path, name)).filter(isFile);
+
+  let dirs = getDirectories(path);
+  let files = dirs
+    .map(dir => getFilesRecursively(dir)) // go through each directory
+    .reduce((a,b) => a.concat(b), []);    // map returns a 2d array (array of file arrays) so flatten
+  return files.concat(getFiles(path));
 }
 
 export function isImageOrVideo(path: string, strict: boolean): boolean {

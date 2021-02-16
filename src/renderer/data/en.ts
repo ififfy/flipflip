@@ -115,6 +115,7 @@ export default new Map<string, string>([
   ['af.audios', '+ Local audio'],
   ['af.directory', '+ Local directory'],
   ['af.videos', '+ Local video/playlist'],
+  ['af.videodir', '+ Local directory of videos'],
   ['af.library', '+ From Library'],
 
   ['rf.hot', 'Hot'],

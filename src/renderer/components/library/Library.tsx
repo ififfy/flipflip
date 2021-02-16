@@ -1019,7 +1019,11 @@ class Library extends React.Component {
 
   onAddSource(addFunction: string, e: MouseEvent, ...args: any[]) {
     this.onCloseDialog();
-    this.props.onAddSource(null, addFunction, ...args);
+    if (addFunction == AF.videos && e.shiftKey) {
+      this.props.onAddSource(null, AF.videoDir, ...args);
+    } else {
+      this.props.onAddSource(null, addFunction, ...args);
+    }
   }
 
   onToggleBatchTagModal() {

@@ -157,6 +157,7 @@ const AF = { // add functions
   url: 'af.url',
   directory: 'af.directory',
   videos: 'af.videos',
+  videoDir: 'af.videodir',
   library: 'af.library',
   audios: 'af.audio',
   script: 'af.script',
