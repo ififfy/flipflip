@@ -356,12 +356,14 @@ class Library extends React.Component {
     let cancelProgressMessage;
     switch (this.props.progressMode) {
       case PR.offline:
-        cancelProgressMessage = "Cancel Offline Check";
+        cancelProgressMessage = "Cancel Offline Check ( " + this.props.progressCurrent + " / " + this.props.progressTotal + " )";
         break;
       case PR.videoMetadata:
-        cancelProgressMessage = "End Video MD Check";
+        cancelProgressMessage = "End Video MD Check ( " + this.props.progressCurrent + " / " + this.props.progressTotal + " )";
         break;
       case PR.tumblr:
+        cancelProgressMessage = "Cancel Import ( " + this.props.progressCurrent + " / " + this.props.progressTotal + " )";
+        break;
       case PR.reddit:
       case PR.twitter:
       case PR.instagram:
