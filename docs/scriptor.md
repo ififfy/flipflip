@@ -39,6 +39,9 @@ The middle column is also where you'll find buttons for all of the possible comm
 Click a button to insert that command at the code panel's cursor position. See [caption script formatting](caption_script.md)
 for help with each command.
 
+At the bottom of this column is a slider you can use to adjust the caption script opacity. This is opacity setting is
+global and is additive with any opacity commands in the script.
+
 ### Audio
 
 If you have selected a scene which has an audio track, you can click enable "Audio Tracks" to use it while testing your

@@ -43,6 +43,28 @@ When they are all done, wait `blinkGroupDelay` ms.
 Count from START to END (START and END are whole numbers). Display each number for `countDuration` ms, then wait 
 `countDelay` ms. When they are all done, wait `countGroupDelay` ms.
 
+You can also show a circular progress bar around the count by using these commands:
+```
+# Enables progress bar (default false)
+setShowCountProgress true
+
+# Sets progress bar scale (default 500)
+setCountProgressScale 1000
+
+# Sets the color of progress bar at the designated number
+setCountProgressColor 2 #f44336
+setCountProgressColor 5 #ffeb3b
+setCountProgressColor 10 #4caf50
+
+# Setting this as true will offset the total, so that --in this example-- 1 is the end (0)
+setCountProgressOffset true
+
+# Setting this to true will make the count color match the progress color (this works even without the progress enabled)
+setCountColorMatch true
+
+count 10 1
+```
+
 #### `wait <MILLISECONDS>`
 
 Wait `<MILLISECONDS>` ms.
@@ -150,6 +172,19 @@ setCountY <POS>
 ```
 
 ?> This value is relative to each command's default position.
+
+#### Opacity
+
+In addition to the global opacity slider, you can also set the opacity within a script on a per-command basis:
+
+```
+# OPACITY is a number between 0 and 100 (default is 100)
+
+setBlinkOpacity <OPACITY>
+setCaptionOpacity <OPACITY>
+setCountOpacity <OPACITY>
+setBlinkOpacity <OPACITY>
+```
 
 ### Timestamps
 

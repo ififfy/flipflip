@@ -1,13 +1,25 @@
 # Changelog
 
-#### 3.1.0-beta2 <small>(01/XX/2020)</small>
+## 3.1.0 <small>(02/16/2020)</small>
+- Add ability to detect and use video duration/resolution
+- Add ability to set caption opacity globally and within script
+- Add progress bar capability with caption count command
+- Allow overlays to use 100% opacity
+- Fix bug with caption timing
+- Fix bug with single caption script not properly repeating
+- Fix bug with stored phrases not resetting
+- Fix bug with adding unavailable audio track
+- Fix bug with Mac filepaths
+- Fix bug with Hydrus
+
+#### 3.1.0-beta2 <small>(01/19/2020)</small>
 - Caption Scriptor
 - Caption Script Library
 - Timing functions for caption scripts
 - Timestamps in caption script
 - Sync audio with caption script timestamps
 - Newlines in caption scripts
-- Store caption phrases in separte groups
+- Store caption phrases in separate groups
 - Change command position in caption scripts
 - Multiple concurrent Caption Script playlists
 - Allow generators to auto-generate on playback

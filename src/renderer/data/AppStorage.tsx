@@ -370,10 +370,6 @@ export default class AppStorage {
             tutorial: data.tutorial,
             theme: data.theme,
           };
-          // TODO Just test this (is there a negative effect, why are we throwing away date information?)
-          /*for (let i = 0; i < this.initialState.library.length; i++) {
-            this.initialState.library[i].id = i;
-          }*/
           break;
       }
     }

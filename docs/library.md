@@ -2,7 +2,7 @@
 The **Library** is a place for you to collect and manage all your sources. To access the Library, just click the `Library`
 icon in the Scene Picker (Home) sidebar ( <img style="vertical-align: -5px" src="doc_icons/library.svg" alt="Library" width="20" height="20"> )
 
-![](doc_images/library.png)
+<img src="doc_images/library.png" alt="Options" width="50%" style="min-width: 483px">
 
 ## Adding Sources
 Sources are added to the Library and sorted just like in a [Scene](sources.md#modifying-sources).
@@ -25,6 +25,12 @@ the displayed sources have that tag/type.
 * Type `count>NUM`, `count<NUM`, or `count=NUM` to query based on source counts. (Replace `NUM` with a number).
   * This _**excludes**_ counts that are incomplete (still showing "+").
   * To _**include**_ incomplete counts, type `count+>NUM`, `count+<NUM`, or `count+=NUM`.
+* Type `duration>TIMESTAMP`, `duration>TIMESTAMP` or `duration=TIMESTAMP` to query based on video durations. (Replace
+  `TIMESTAMP` with a valid timestamp or simply the number of seconds).
+  * This only applies to video sources which have had their metadata detected.
+* Type `resolution>RESOLUTION`, `resolution>RESOLUTION` or `resolution=RESOLUTION` to query based on video resolutions. 
+  (Replace `RESOLUTION` with a number).
+  * This only applies to video sources which have had their metadata detected.
   
 ## Marking Sources
 Users may wish to visually highlight certain items. To do this, search/filter the displayed sources until they are 
@@ -32,7 +38,7 @@ the ones you wish to highlight, and then press **Alt+M**. These sources will be 
 way after the search/filter is cleared. This may be useful for keeping track of a set of sources you are working on 
 (for instance new sources you are tagging). 
 
-![](doc_images/library_marked.png)
+<img src="doc_images/library_marked.png" alt="Options" width="50%" style="min-width: 483px">
 
 ## Find Mergeables
 When you have a large number of local directories, it may be helpful to find those which share the tags so that you can
@@ -56,7 +62,12 @@ As your Library grows, it's possible some sources will become unavailable. To ai
 width="20" height="20"> ) to check your sources. When this process completes, unavailable sources will be marked with 
 an offline icon.
 
-![](doc_images/library_offline.png)
+<img src="doc_images/library_offline.png" alt="Options" width="50%" style="min-width: 483px">
+
+## Detect Video Metadata
+It may be useful to sort or search through your videos by duration or resolution. Click the `Video Metadata` button
+( <img style="vertical-align: -5px" src="doc_icons/video-metadata.svg" alt="Video Metadata" width="20" height="20"> )
+to detect the metadata of your videos. 
 
 ### Localize Offline Content
 When a source goes offline, you may want to retain the cached images in their own source. After marking sources offline, 
