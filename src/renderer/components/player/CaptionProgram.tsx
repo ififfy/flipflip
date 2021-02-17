@@ -453,7 +453,7 @@ export default class CaptionProgram extends React.Component {
               if (newTimestamps.has(timestamp)) {
                 newTimestamps.get(timestamp).push(fn);
               } else {
-                newTimestamps.set(timestamp, fn);
+                newTimestamps.set(timestamp, [fn]);
               }
             } else {
               newProgram.push(fn);
@@ -481,7 +481,7 @@ export default class CaptionProgram extends React.Component {
               if (newTimestamps.has(timestamp)) {
                 newTimestamps.get(timestamp).push(fn);
               } else {
-                newTimestamps.set(timestamp, fn);
+                newTimestamps.set(timestamp, [fn]);
               }
             } else {
               newProgram.push(fn);
@@ -504,7 +504,7 @@ export default class CaptionProgram extends React.Component {
               if (newTimestamps.has(timestamp)) {
                 newTimestamps.get(timestamp).push(fn);
               } else {
-                newTimestamps.set(timestamp, fn);
+                newTimestamps.set(timestamp, [fn]);
               }
             } else {
               newProgram.push(fn);
@@ -633,6 +633,11 @@ export default class CaptionProgram extends React.Component {
         if (passed > this.state.timestamps[0]) {
           while (this.state.timestamps.length >= index &&
           passed > this.state.timestamps[index + 1]) {
+            for (let fn of this.state.timestampFn.get(this.state.timestamps[index])) {
+              if (/const command = \(\)/g.exec(fn.toString()) == null) {
+                fn(() => {});
+              }
+            }
             index++;
           }
           this._nextTimestamp = this.state.timestamps[index + 1];

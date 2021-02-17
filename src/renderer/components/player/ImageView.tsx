@@ -42,7 +42,7 @@ export default class ImageView extends React.Component {
     if (!this.props.pictureGrid && this.props.scene.backgroundType !== props.scene.backgroundType) {
       if (this.props.scene.backgroundType === BT.blur) {
         force = true;
-      } else if (props.scene.backgroundType === BT.blur) {
+      } else if (props.scene.backgroundType === BT.blur && this.backgroundRef.current.firstChild) {
         this.backgroundRef.current.removeChild(this.backgroundRef.current.firstChild);
       }
     }

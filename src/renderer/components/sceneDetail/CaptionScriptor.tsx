@@ -538,7 +538,7 @@ class CaptionScriptor extends React.Component {
                       </Grid>
                     </Grid>
                     <div className={classes.fill}/>
-                    {this.state.scene && (
+                    {this.state.scene && !this.state.fullscreen && (
                       <AudioCard
                         sidebar
                         startPlaying
@@ -577,7 +577,7 @@ class CaptionScriptor extends React.Component {
                     onUpdateScene={this.onUpdateScene.bind(this)}
                     captionProgramJumpToHack={this.state.captionProgramJumpToHack}
                     tutorial={null}
-                    getCurrentTimestamp={getTimestamp}
+                    getCurrentTimestamp={this.state.fullscreen ? undefined : getTimestamp}
                     cache={() => {}}
                     setCount={() => {}}
                     systemMessage={() => {}}

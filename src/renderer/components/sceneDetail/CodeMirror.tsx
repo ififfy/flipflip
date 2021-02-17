@@ -109,8 +109,8 @@ export const timestampRegex = /^((\d?\d:)?\d?\d:\d\d(\.\d\d?\d?)?|\d?\d(\.\d\d?\
         stream.eatWhile(/\d/);
         if(stream.eol() || !/\w/.test(stream.peek())) {
           state.tokens.push(stream.current());
-          if (((command == "count" || tupleSetters.includes(command)) && state.tokens.length > 3) ||
-            ((command == "wait" || singleSetters.includes(command)) && state.tokens.length > 2)) {
+          if (((command == "count" || tupleSetters.includes(command)) && state.tokens.length > (timestamp ? 4 : 3)) ||
+            ((command == "wait" || singleSetters.includes(command)) && state.tokens.length > (timestamp ? 3 : 2))) {
             return rt("error", state, stream);
           }
           return rt("number", state, stream);

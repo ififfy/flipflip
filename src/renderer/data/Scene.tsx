@@ -415,5 +415,12 @@ export default class Scene {
       this.countBorderpx = null;
       this.countBorderColor = null;
     }
+    for (let playlist of this.scriptPlaylists) {
+      for (let script of playlist.scripts) {
+        if (isNaN(script.opacity)) {
+          script.opacity = 100;
+        }
+      }
+    }
   }
 }

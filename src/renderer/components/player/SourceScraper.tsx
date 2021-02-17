@@ -1410,7 +1410,6 @@ function loadBDSMlr(systemMessage: Function, config: Config, source: LibrarySour
         resolve(null);
       }
     }
-    console.log("Querying: " + (url + "/rss?page=" + (helpers.next + 1)));
     wretch(url + "/rss?page=" + (helpers.next + 1))
       .get()
       .setTimeout(5000)
@@ -1434,7 +1433,6 @@ function loadBDSMlr(systemMessage: Function, config: Config, source: LibrarySour
           }
           helpers.next = helpers.next + 1;
           helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
-          console.log("Found: "  +filterPathsToJustPlayable(IF.any, images, true).length);
           resolve({
             data: filterPathsToJustPlayable(filter, images, true),
             helpers: helpers,

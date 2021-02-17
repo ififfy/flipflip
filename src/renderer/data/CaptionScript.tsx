@@ -51,6 +51,10 @@ export default class CaptionScript {
 
   constructor(init?: Partial<CaptionScript>) {
     Object.assign(this, init);
+
+    if (this.opacity == null || isNaN(this.opacity)) {
+      this.opacity = 100;
+    }
   }
 }
 
