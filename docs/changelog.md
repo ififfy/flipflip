@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.1.0 <small>(02/16/2020)</small>
+## 3.1.0 <small>(02/17/2020)</small>
 - Add ability to detect and use video duration/resolution
 - Add ability to set caption opacity globally and within script
 - Add progress bar capability with caption count command
