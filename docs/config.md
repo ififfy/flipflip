@@ -100,7 +100,7 @@ on your computer and is never shared with anyone or sent to any server (besides 
 * Click `Authorize FlipFlip on Instagram`
 * You should see a Success! message
 
-### Instagram
+### Hydrus
 In order to use a Hydrus server for sources, you'll need to provide the serve details. This includes protocol 
 (`http` vs `https`), domain, port, and API Key.
 
