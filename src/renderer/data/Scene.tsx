@@ -334,7 +334,7 @@ export default class Scene {
     }
 
     if (this.audios) {
-      this.audioPlaylists = this.audios.map((a) => {
+      this.audioPlaylists = this.audios.filter((a) => !!a.url && a.url.length).map((a) => {
         if (!a.name) {
           if (a.url.startsWith("http")) {
             a.name = a.url.substring(a.url.lastIndexOf("\/") + 1, a.url.lastIndexOf("."))
