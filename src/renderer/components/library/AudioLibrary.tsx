@@ -3,7 +3,7 @@ import {remote} from "electron";
 import path from 'path';
 import clsx from "clsx";
 import * as mm from "music-metadata";
-import {existsSync} from "fs";
+import * as fs from "fs";
 import wretch from "wretch";
 
 import {
@@ -36,7 +36,7 @@ import SortIcon from '@material-ui/icons/Sort';
 
 import {red} from "@material-ui/core/colors";
 
-import {extractMusicMetadata, isAudio} from "../../data/utils";
+import {extractMusicMetadata, getFilesRecursively, isAudio} from "../../data/utils";
 import {AF, ASF, ALT, MO, SP} from "../../data/const";
 import en from "../../data/en";
 import Audio from "../../data/Audio";
@@ -1159,16 +1159,30 @@ class AudioLibrary extends React.Component {
     this.setState({importURL: type});
   }
 
-  onAddSource(type: string) {
+  onAddSource(type: string, e: MouseEvent) {
     this.onCloseDialog();
     switch (type) {
       case AF.url:
         this.setState({openMenu: MO.urlImport, importURL: ""});
         break;
       case AF.audios:
-        let aResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
-          {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'Audio files', extensions: ['mp3', 'm4a', 'wav', 'ogg']}], properties: ['openFile', 'multiSelections']});
-        if (!aResult) return;
+        let aResult = new Array<string>();
+        if (e.shiftKey) {
+          let adResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+            {filters: [{name:'All Files (*.*)', extensions: ['*']}], properties: ['openDirectory', 'multiSelections']});
+          if (!adResult) return;
+          for (let path of adResult) {
+            if (fs.existsSync(path) && fs.lstatSync(path).isDirectory()) {
+              aResult = adResult.concat(getFilesRecursively(path));
+            } else {
+              aResult.push(path);
+            }
+          }
+        } else {
+          aResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+            {filters: [{name: 'All Files (*.*)', extensions: ['*']}, {name: 'Audio files', extensions: ['mp3', 'm4a', 'wav', 'ogg']}], properties: ['openFile', 'multiSelections']});
+          if (!aResult) return;
+        }
         aResult = aResult.filter((r) => isAudio(r, true));
         this.setState({loadingSources: true});
         this.addAudioSources(aResult);
@@ -1263,7 +1277,7 @@ class AudioLibrary extends React.Component {
       const url = newSources[index];
       index++;
 
-      if (url.startsWith("http") || existsSync(url)) {
+      if (url.startsWith("http") || fs.existsSync(url)) {
         const newAudio = new Audio({
           url: url,
           id: id,

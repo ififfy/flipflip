@@ -1,37 +1,12 @@
 import * as React from "react";
 import clsx from "clsx";
-import {existsSync} from "fs";
+import * as fs from "fs";
 import {remote} from "electron";
 
 import {
-  AppBar,
-  Backdrop,
-  Badge,
-  Button,
-  Chip,
-  Collapse,
-  Container,
-  createStyles,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Divider,
-  Drawer,
-  Fab,
-  IconButton,
-  ListItem,
-  ListItemIcon,
-  ListItemSecondaryAction,
-  ListItemText,
-  Menu,
-  MenuItem,
-  Theme,
-  Toolbar,
-  Tooltip,
-  Typography,
-  withStyles
+  AppBar, Backdrop, Badge, Button, Chip, Collapse, Container, createStyles, Dialog, DialogActions, DialogContent,
+  DialogContentText, DialogTitle, Divider, Drawer, Fab, IconButton, ListItem, ListItemIcon, ListItemSecondaryAction,
+  ListItemText, Menu, MenuItem, Theme, Toolbar, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
 import AddIcon from '@material-ui/icons/Add';
@@ -51,6 +26,7 @@ import ShuffleIcon from "@material-ui/icons/Shuffle";
 import SortIcon from '@material-ui/icons/Sort';
 
 import {AF, MO, SF, SP, SLT} from "../../data/const";
+import {getFilesRecursively, isText} from "../../data/utils";
 import en from "../../data/en";
 import Tag from "../../data/Tag";
 import LibrarySearch from "./LibrarySearch";
@@ -732,7 +708,7 @@ class ScriptLibrary extends React.Component {
     this.setState({filters: filters, displaySources: this.getDisplaySources()});
   }
 
-  onAddSource(type: string) {
+  onAddSource(type: string, e: MouseEvent) {
     this.onCloseDialog();
     switch (type) {
       case AF.url:
@@ -752,9 +728,24 @@ class ScriptLibrary extends React.Component {
         });
         break;
       case AF.script:
-        let aResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
-          {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'Text files', extensions: ['txt']}], properties: ['openFile', 'multiSelections']});
-        if (!aResult) return;
+        let aResult = new Array<string>();
+        if (e.shiftKey) {
+          let adResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+            {filters: [{name:'All Files (*.*)', extensions: ['*']}], properties: ['openDirectory', 'multiSelections']});
+          if (!adResult) return;
+          for (let path of adResult) {
+            if (fs.existsSync(path) && fs.lstatSync(path).isDirectory()) {
+              aResult = adResult.concat(getFilesRecursively(path));
+            } else {
+              aResult.push(path);
+            }
+          }
+        } else {
+          let aResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+            {filters: [{name: 'All Files (*.*)', extensions: ['*']}, {name: 'Text files', extensions: ['txt']}], properties: ['openFile', 'multiSelections']});
+          if (!aResult) return;
+        }
+        aResult = aResult.filter((r) => isText(r, true));
         this.setState({loadingSources: true});
         this.addScriptSources(aResult);
         break;
@@ -773,7 +764,7 @@ class ScriptLibrary extends React.Component {
     });
 
     for (let url of newSources) {
-      if (existsSync(url)) {
+      if (fs.existsSync(url)) {
         const newText = new CaptionScript({
           url: url,
           id: id,
