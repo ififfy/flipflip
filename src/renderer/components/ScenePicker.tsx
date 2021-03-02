@@ -205,7 +205,7 @@ const styles = (theme: Theme) => createStyles({
     backgroundColor: theme.palette.secondary.light,
     margin: 0,
     top: 'auto',
-    right: 135,
+    right: 130,
     bottom: 20,
     left: 'auto',
     position: 'fixed',

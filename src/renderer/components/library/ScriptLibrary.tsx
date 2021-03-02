@@ -183,7 +183,7 @@ const styles = (theme: Theme) => createStyles({
     backgroundColor: theme.palette.secondary.dark,
     margin: 0,
     top: 'auto',
-    right: 80,
+    right: 130,
     bottom: 20,
     left: 'auto',
     position: 'fixed',
@@ -192,7 +192,7 @@ const styles = (theme: Theme) => createStyles({
     backgroundColor: theme.palette.secondary.light,
     margin: 0,
     top: 'auto',
-    right: 130,
+    right: 180,
     bottom: 20,
     left: 'auto',
     position: 'fixed',
@@ -568,58 +568,58 @@ class ScriptLibrary extends React.Component {
               size="large">
               <AddIcon className={classes.icon} />
             </Fab>
-
-            <Fab
-              disabled={this.props.library.length < 2}
-              className={classes.sortMenuButton}
-              aria-haspopup="true"
-              aria-controls="sort-menu"
-              aria-label="Sort Sources"
-              onClick={this.onOpenSortMenu.bind(this)}
-              size="medium">
-              <SortIcon className={classes.icon} />
-            </Fab>
-            <Menu
-              id="sort-menu"
-              elevation={1}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'center',
-              }}
-              transformOrigin={{
-                vertical: 'bottom',
-                horizontal: 'right',
-              }}
-              getContentAnchorEl={null}
-              anchorEl={this.state.menuAnchorEl}
-              keepMounted
-              classes={{paper: classes.sortMenu}}
-              open={this.state.openMenu == MO.sort}
-              onClose={this.onCloseDialog.bind(this)}>
-              {[SF.alpha, SF.alphaFull, SF.date].map((sf) =>
-                <MenuItem key={sf}>
-                  <ListItemText primary={en.get(sf)}/>
-                  <ListItemSecondaryAction>
-                    <IconButton edge="end" onClick={this.props.onSort.bind(this, sf, true)}>
-                      <ArrowUpwardIcon/>
-                    </IconButton>
-                    <IconButton edge="end" onClick={this.props.onSort.bind(this, sf, false)}>
-                      <ArrowDownwardIcon/>
-                    </IconButton>
-                  </ListItemSecondaryAction>
-                </MenuItem>
-              )}
-              <MenuItem key={SF.random}>
-                <ListItemText primary={en.get(SF.random)}/>
-                <ListItemSecondaryAction>
-                  <IconButton edge="end" onClick={this.props.onSort.bind(this, SF.random, true)}>
-                    <ShuffleIcon/>
-                  </IconButton>
-                </ListItemSecondaryAction>
-              </MenuItem>
-            </Menu>
           </React.Fragment>
         )}
+
+        <Fab
+          disabled={this.props.library.length < 2}
+          className={classes.sortMenuButton}
+          aria-haspopup="true"
+          aria-controls="sort-menu"
+          aria-label="Sort Sources"
+          onClick={this.onOpenSortMenu.bind(this)}
+          size="medium">
+          <SortIcon className={classes.icon} />
+        </Fab>
+        <Menu
+          id="sort-menu"
+          elevation={1}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'center',
+          }}
+          transformOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}
+          getContentAnchorEl={null}
+          anchorEl={this.state.menuAnchorEl}
+          keepMounted
+          classes={{paper: classes.sortMenu}}
+          open={this.state.openMenu == MO.sort}
+          onClose={this.onCloseDialog.bind(this)}>
+          {[SF.alpha, SF.alphaFull, SF.date].map((sf) =>
+            <MenuItem key={sf}>
+              <ListItemText primary={en.get(sf)}/>
+              <ListItemSecondaryAction>
+                <IconButton edge="end" onClick={this.props.onSort.bind(this, sf, true)}>
+                  <ArrowUpwardIcon/>
+                </IconButton>
+                <IconButton edge="end" onClick={this.props.onSort.bind(this, sf, false)}>
+                  <ArrowDownwardIcon/>
+                </IconButton>
+              </ListItemSecondaryAction>
+            </MenuItem>
+          )}
+          <MenuItem key={SF.random}>
+            <ListItemText primary={en.get(SF.random)}/>
+            <ListItemSecondaryAction>
+              <IconButton edge="end" onClick={this.props.onSort.bind(this, SF.random, true)}>
+                <ShuffleIcon/>
+              </IconButton>
+            </ListItemSecondaryAction>
+          </MenuItem>
+        </Menu>
 
         <Dialog
           classes={{paper: classes.noScroll}}
