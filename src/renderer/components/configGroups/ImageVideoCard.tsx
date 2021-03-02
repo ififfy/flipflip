@@ -126,7 +126,7 @@ class ImageVideoCard extends React.Component {
               </Collapse>
             </Grid>
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.videos || this.props.scene.gifOption == GO.none || this.props.scene.gifOption == GO.full) && classes.noPadding)}>
-              <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.videos && this.props.scene.gifOption == GO.part}>
+              <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.videos && (this.props.scene.gifOption == GO.part || this.props.scene.gifOption == GO.atLeast)}>
                 <TextField
                   variant="outlined"
                   label="For"
@@ -194,7 +194,7 @@ class ImageVideoCard extends React.Component {
             </Collapse>
           </Grid>
           <Grid item xs={12} sm={this.props.sidebar ? 12 : 6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.images || this.props.scene.videoOption == VO.none || this.props.scene.videoOption == VO.full) && classes.noPadding)}>
-            <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.images && this.props.scene.videoOption == VO.part}>
+            <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.images && (this.props.scene.videoOption == VO.part || this.props.scene.videoOption == VO.atLeast)}>
               <TextField
                 variant="outlined"
                 label="For"

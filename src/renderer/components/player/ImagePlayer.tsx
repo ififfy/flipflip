@@ -17,7 +17,8 @@ import Audio from "../../data/Audio";
 
 class GifInfo {
   animated: boolean;
-  duration: string;
+  duration: number;
+  durationChrome: number;
 }
 
 export default class ImagePlayer extends React.Component {
@@ -477,20 +478,48 @@ export default class ImagePlayer extends React.Component {
         }
         video.setAttribute("speed", speed.toString());
 
+        switch(this.props.scene.videoOption) {
+          case VO.full:
+            let duration;
+            if (video.hasAttribute("start") && video.hasAttribute("end")) {
+              const start = parseInt(video.getAttribute("start"));
+              const end = parseInt(video.getAttribute("end"));
+              duration = end - start;
+            } else {
+              duration = video.duration;
+            }
+            duration = duration * 1000 / (speed / 10);
+            video.setAttribute("duration", duration.toString());
+            break;
+          case VO.part:
+            video.setAttribute("duration", this.props.scene.videoTimingConstant.toString());
+            break;
+          case VO.partr:
+            video.setAttribute("duration", getRandomNumber(this.props.scene.videoTimingMin, this.props.scene.videoTimingMax).toString());
+            break;
+          case VO.atLeast:
+            let partDuration;
+            if (video.hasAttribute("start") && video.hasAttribute("end")) {
+              const start = parseInt(video.getAttribute("start"));
+              const end = parseInt(video.getAttribute("end"));
+              partDuration = end - start;
+            } else {
+              partDuration = video.duration;
+            }
+            partDuration = partDuration * 1000 / (speed / 10);
+            let atLeastDuration = 0;
+            do {
+              atLeastDuration += partDuration;
+            } while (atLeastDuration < this.props.scene.videoTimingConstant);
+            video.setAttribute("duration", atLeastDuration.toString())
+            break;
+        }
+
         if (this.props.scene.videoOption == VO.full) {
-          let duration;
-          if (video.hasAttribute("start") && video.hasAttribute("end")) {
-            const start = parseInt(video.getAttribute("start"));
-            const end = parseInt(video.getAttribute("end"));
-            duration = end - start;
-          } else {
-            duration = video.duration;
-          }
-          video.setAttribute("duration", (duration * 1000 / (speed / 10)).toString());
         } else if (this.props.scene.videoOption == VO.part) {
-          video.setAttribute("duration", this.props.scene.videoTimingConstant.toString());
+
         } else if (this.props.scene.videoOption == VO.partr) {
-          video.setAttribute("duration", getRandomNumber(this.props.scene.videoTimingMin, this.props.scene.videoTimingMax).toString());
+
         }
 
         if (video.hasAttribute("start") && video.hasAttribute("end")) {
@@ -608,12 +637,26 @@ export default class ImagePlayer extends React.Component {
 
         // If gif is animated and we want to play entire length, store its duration
         if (info && info.animated) {
-          if (this.props.scene.gifOption == GO.full) {
-            img.setAttribute("duration", info.duration);
-          } else if (this.props.scene.gifOption == GO.part) {
-            img.setAttribute("duration", this.props.scene.gifTimingConstant.toString());
-          } else if (this.props.scene.gifOption == GO.partr) {
-            img.setAttribute("duration", getRandomNumber(this.props.scene.gifTimingMin, this.props.scene.gifTimingMax).toString());
+          switch (this.props.scene.gifOption) {
+            case GO.full:
+              img.setAttribute("duration", (!!info.durationChrome ? info.durationChrome : info.duration).toString());
+              break;
+            case GO.part:
+              img.setAttribute("duration", this.props.scene.gifTimingConstant.toString());
+              break;
+            case GO.partr:
+              img.setAttribute("duration", getRandomNumber(this.props.scene.gifTimingMin, this.props.scene.gifTimingMax).toString());
+              break;
+            case GO.atLeast:
+              let duration = 0;
+              do {
+                duration += (!!info.durationChrome ? info.durationChrome : info.duration);
+                if (duration == 0) {
+                  break;
+                }
+              } while (duration < this.props.scene.gifTimingConstant);
+              img.setAttribute("duration", duration.toString());
+              break;
           }
         }
 

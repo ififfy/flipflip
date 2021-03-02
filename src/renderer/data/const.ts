@@ -34,6 +34,7 @@ const GO = { // GIF Options
   none: 'go.none',
   part: 'go.part',
   partr: 'go.partr',
+  atLeast: 'go.atleast',
   full: 'go.full',
 };
 
@@ -41,6 +42,7 @@ const VO = { // Video Options
   none: 'vo.none',
   part: 'vo.part',
   partr: 'vo.partr',
+  atLeast: 'vo.atleast',
   full: 'vo.full',
 };
 
