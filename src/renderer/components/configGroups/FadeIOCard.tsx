@@ -3,13 +3,16 @@ import clsx from "clsx";
 
 import {
   Collapse, createStyles, Divider, FormControl, FormControlLabel, Grid, InputAdornment, InputLabel,
-  MenuItem, Select, Slider, Switch, TextField, Theme, Typography, withStyles
+  MenuItem, Select, Slider, Switch, TextField, Theme, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
-import {EA, SDT, TF} from "../../data/const";
+import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
+
+import {EA, TF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
 import en from "../../data/en";
 import Scene from "../../data/Scene";
+import Audio from "../../data/Audio";
 
 const styles = (theme: Theme) => createStyles({
   fullWidth: {
@@ -60,6 +63,9 @@ class FadeIOCard extends React.Component {
     const fadeDuration = typeof this.props.scene.fadeIODuration === 'number' ? this.props.scene.fadeIODuration : 0;
     const fadeDurationMin = typeof this.props.scene.fadeIODurationMin === 'number' ? this.props.scene.fadeIODurationMin : 0;
     const fadeDurationMax = typeof this.props.scene.fadeIODurationMax === 'number' ? this.props.scene.fadeIODurationMax : 0;
+
+    const playlists = (this.props.scene.audioPlaylists as {audios: Audio[], shuffle: boolean, repeat: string}[]);
+    const hasBPM = playlists.length && playlists[0].audios.length && playlists[0].audios[0].bpm;
     return(
       <Grid container spacing={this.props.scene.fadeInOut ? 2 : 0} alignItems="center" className={clsx(this.props.tutorial != null && classes.disable)}>
         <Grid item xs={12}>
@@ -93,9 +99,15 @@ class FadeIOCard extends React.Component {
                   <Select
                     value={this.props.scene.fadeIOTF}
                     onChange={this.onInput.bind(this, 'fadeIOTF')}>
-                    {Object.values(TF).map((tf) =>
-                      <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
-                    )}
+                    {Object.values(TF).map((tf) => {
+                      if (tf == TF.bpm) {
+                        return <MenuItem key={tf} value={tf}>
+                          {en.get(tf)} {!hasBPM && <Tooltip title={"Missing audio with BPM"}><ErrorOutlineIcon color={'error'} className={classes.noBPM}/></Tooltip>}
+                        </MenuItem>
+                      } else {
+                        return <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
+                      }
+                    })}
                   </Select>
                 </FormControl>
               </Grid>

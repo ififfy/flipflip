@@ -3,13 +3,16 @@ import clsx from "clsx";
 
 import {
   Collapse, createStyles, Divider, FormControl, FormControlLabel, Grid, InputAdornment, InputLabel,
-  MenuItem, Select, Slider, Switch, TextField, Theme, Typography, withStyles
+  MenuItem, Select, Slider, Switch, TextField, Theme, Tooltip, Typography, withStyles
 } from "@material-ui/core";
+
+import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 
 import {EA, SC, SL, TF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
 import en from "../../data/en";
 import Scene from "../../data/Scene";
+import Audio from "../../data/Audio";
 import ColorPicker from "../config/ColorPicker";
 import ColorSetPicker from "../config/ColorSetPicker";
 
@@ -60,6 +63,9 @@ class StrobeCard extends React.Component {
     const strobeDelay = typeof this.props.scene.strobeDelay === 'number' ? this.props.scene.strobeDelay : 0;
     const strobeDelayMin = typeof this.props.scene.strobeDelayMin === 'number' ? this.props.scene.strobeDelayMin : 0;
     const strobeDelayMax = typeof this.props.scene.strobeDelayMax === 'number' ? this.props.scene.strobeDelayMax : 0;
+
+    const playlists = (this.props.scene.audioPlaylists as {audios: Audio[], shuffle: boolean, repeat: string}[]);
+    const hasBPM = playlists.length && playlists[0].audios.length && playlists[0].audios[0].bpm;
     return(
       <Grid container spacing={2} alignItems="center">
         <Grid item xs={12}>
@@ -185,9 +191,15 @@ class StrobeCard extends React.Component {
                   <Select
                     value={this.props.scene.strobeTF}
                     onChange={this.onInput.bind(this, 'strobeTF')}>
-                    {Object.values(TF).map((tf) =>
-                      <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
-                    )}
+                    {Object.values(TF).map((tf) => {
+                      if (tf == TF.bpm) {
+                        return <MenuItem key={tf} value={tf}>
+                          {en.get(tf)} {!hasBPM && <Tooltip title={"Missing audio with BPM"}><ErrorOutlineIcon color={'error'} className={classes.noBPM}/></Tooltip>}
+                        </MenuItem>
+                      } else {
+                        return <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
+                      }
+                    })}
                   </Select>
                 </FormControl>
               </Grid>

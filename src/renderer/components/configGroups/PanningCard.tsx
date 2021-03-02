@@ -3,13 +3,16 @@ import clsx from "clsx";
 
 import {
   Collapse, createStyles, Divider, FormControl, FormControlLabel, Grid, InputAdornment, InputLabel,
-  MenuItem, Select, Slider, Switch, TextField, Theme, Typography, withStyles
+  MenuItem, Select, Slider, Switch, TextField, Theme, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
-import {EA, HTF, RF, SDT, TF, VTF} from "../../data/const";
+import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
+
+import {EA, HTF, TF, VTF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
 import en from "../../data/en";
 import Scene from "../../data/Scene";
+import Audio from "../../data/Audio";
 
 const styles = (theme: Theme) => createStyles({
   fullWidth: {
@@ -71,6 +74,9 @@ class PanningCard extends React.Component {
     const vertTransLevel = typeof this.props.scene.panVertTransLevel === 'number' ? this.props.scene.panVertTransLevel : 0;
     const vertTransLevelMax = typeof this.props.scene.panVertTransLevelMax === 'number' ? this.props.scene.panVertTransLevelMax : 0;
     const vertTransLevelMin = typeof this.props.scene.panVertTransLevelMin === 'number' ? this.props.scene.panVertTransLevelMin : 0;
+
+    const playlists = (this.props.scene.audioPlaylists as {audios: Audio[], shuffle: boolean, repeat: string}[]);
+    const hasBPM = playlists.length && playlists[0].audios.length && playlists[0].audios[0].bpm;
     return(
       <Grid container spacing={this.props.scene.panning ? 2 : 0} alignItems="center" className={clsx(this.props.tutorial != null && classes.disable)}>
         <Grid item xs={12}>
@@ -330,9 +336,15 @@ class PanningCard extends React.Component {
                   <Select
                     value={this.props.scene.panTF}
                     onChange={this.onInput.bind(this, 'panTF')}>
-                    {Object.values(TF).map((tf) =>
-                      <MenuItem key={tf} value={tf} disabled={tf == TF.scene}>{en.get(tf)}</MenuItem>
-                    )}
+                    {Object.values(TF).map((tf) => {
+                      if (tf == TF.bpm) {
+                        return <MenuItem key={tf} value={tf}>
+                          {en.get(tf)} {!hasBPM && <Tooltip title={"Missing audio with BPM"}><ErrorOutlineIcon color={'error'} className={classes.noBPM}/></Tooltip>}
+                        </MenuItem>
+                      } else {
+                        return <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
+                      }
+                    })}
                   </Select>
                 </FormControl>
               </Grid>

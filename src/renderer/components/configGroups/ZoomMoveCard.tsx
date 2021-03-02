@@ -3,13 +3,16 @@ import clsx from "clsx";
 
 import {
   Collapse, createStyles, Divider, FormControl, FormControlLabel, Grid, InputAdornment, InputLabel,
-  MenuItem, Select, Slider, Switch, TextField, Theme, Typography, withStyles
+  MenuItem, Select, Slider, Switch, TextField, Theme, Tooltip, Typography, withStyles
 } from "@material-ui/core";
+
+import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 
 import {EA, HTF, SDT, TF, VTF} from "../../data/const";
 import { SceneSettings } from "../../data/Config";
 import en from "../../data/en";
 import Scene from "../../data/Scene";
+import Audio from "../../data/Audio";
 
 const styles = (theme: Theme) => createStyles({
   fullWidth: {
@@ -79,6 +82,8 @@ class ZoomMoveCard extends React.Component {
     const transDurationMin = typeof this.props.scene.transDurationMin === 'number' ? this.props.scene.transDurationMin : 0;
     const transDurationMax = typeof this.props.scene.transDurationMax === 'number' ? this.props.scene.transDurationMax : 0;
 
+    const playlists = (this.props.scene.audioPlaylists as {audios: Audio[], shuffle: boolean, repeat: string}[]);
+    const hasBPM = playlists.length && playlists[0].audios.length && playlists[0].audios[0].bpm;
     return (
       <Grid container spacing={2} alignItems="center">
         <Grid item xs={12} className={clsx(this.props.tutorial != null && this.props.tutorial != SDT.zoom1 && this.props.tutorial != SDT.zoom2 && classes.disable)}>
@@ -393,9 +398,15 @@ class ZoomMoveCard extends React.Component {
                     value={this.props.scene.transTF}
                     MenuProps={this.props.tutorial == SDT.zoom3 ? { className: classes.backdropTop } : {}}
                     onChange={this.onInput.bind(this, 'transTF')}>
-                    {Object.values(TF).map((tf) =>
-                      <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
-                    )}
+                    {Object.values(TF).map((tf) => {
+                      if (tf == TF.bpm) {
+                        return <MenuItem key={tf} value={tf}>
+                          {en.get(tf)} {!hasBPM && <Tooltip title={"Missing audio with BPM"}><ErrorOutlineIcon color={'error'} className={classes.noBPM}/></Tooltip>}
+                        </MenuItem>
+                      } else {
+                        return <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
+                      }
+                    })}
                   </Select>
                 </FormControl>
               </Grid>

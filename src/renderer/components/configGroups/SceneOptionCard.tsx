@@ -1,36 +1,15 @@
 import * as React from "react";
 import clsx from "clsx";
-import Select from "react-select";
 
 import {
-  Button,
-  Collapse,
-  createStyles,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  Divider,
-  Fab,
-  FormControl,
-  FormControlLabel,
-  Grid,
-  IconButton,
-  InputAdornment,
-  InputLabel,
-  MenuItem,
-  Select as MSelect,
-  Slider,
-  Switch,
-  TextField,
-  Theme,
-  Tooltip,
-  Typography,
-  withStyles
+  Button, Collapse, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, Divider, Fab, FormControl,
+  FormControlLabel, Grid, IconButton, InputAdornment, InputLabel, MenuItem, Select, Slider, Switch, TextField, Theme,
+  Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
+import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 import ListIcon from '@material-ui/icons/List';
 
 import {BT, IT, SDT, TF} from "../../data/const";
@@ -43,6 +22,7 @@ import ColorPicker from "../config/ColorPicker";
 import ColorSetPicker from "../config/ColorSetPicker";
 import MultiSceneSelect from "./MultiSceneSelect";
 import {areWeightsValid} from "../../data/utils";
+import Audio from "../../data/Audio";
 
 const styles = (theme: Theme) => createStyles({
   fullWidth: {
@@ -100,6 +80,9 @@ const styles = (theme: Theme) => createStyles({
     minWidth: 400,
     overflow: 'visible',
   },
+  noBPM: {
+    float: 'right',
+  }
 });
 
 class SceneOptionCard extends React.Component {
@@ -129,6 +112,9 @@ class SceneOptionCard extends React.Component {
     const timingMax = typeof this.props.scene.timingMax === 'number' ? this.props.scene.timingMax : 0;
     const backgroundBlur = typeof this.props.scene.backgroundBlur === 'number' ? this.props.scene.backgroundBlur : 0;
     const nextSceneTime = typeof this.props.scene.nextSceneTime === 'number' ? this.props.scene.nextSceneTime : 0;
+
+    const playlists = (this.props.scene.audioPlaylists as {audios: Audio[], shuffle: boolean, repeat: string}[]);
+    const hasBPM = playlists.length && playlists[0].audios.length && playlists[0].audios[0].bpm;
     return (
       <Grid container spacing={2} alignItems="center">
         <Grid item xs={12} className={clsx(this.props.tutorial == SDT.timing && classes.highlight)}>
@@ -136,13 +122,19 @@ class SceneOptionCard extends React.Component {
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} style={{paddingTop: 10}}>
               <FormControl className={classes.fullWidth}>
                 <InputLabel>Timing</InputLabel>
-                <MSelect
+                <Select
                   value={this.props.scene.timingFunction}
                   onChange={this.onInput.bind(this, 'timingFunction')}>
-                  {[TF.constant, TF.random, TF.sin, TF.bpm].map((tf) =>
-                    <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
-                  )}
-                </MSelect>
+                  {[TF.constant, TF.random, TF.sin, TF.bpm].map((tf) => {
+                    if (tf == TF.bpm) {
+                      return <MenuItem key={tf} value={tf}>
+                        {en.get(tf)} {!hasBPM && <Tooltip title={"Missing audio with BPM"}><ErrorOutlineIcon color={'error'} className={classes.noBPM}/></Tooltip>}
+                      </MenuItem>
+                    } else {
+                      return <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
+                    }
+                  })}
+                </Select>
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 8}>
@@ -258,26 +250,26 @@ class SceneOptionCard extends React.Component {
             <Grid item xs={this.props.sidebar ? 8 : 12} sm={this.props.sidebar ? 8 : 6}>
               <FormControl className={classes.fullWidth}>
                 <InputLabel>Image Sizing</InputLabel>
-                <MSelect
+                <Select
                   value={this.props.scene.imageType}
                   onChange={this.onInput.bind(this, 'imageType')}>
                   {Object.values(IT).map((it) =>
                     <MenuItem key={it} value={it}>{en.get(it)}</MenuItem>
                   )}
-                </MSelect>
+                </Select>
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}/>
             <Grid item xs={this.props.sidebar ? 8 : 12} sm={this.props.sidebar ? 8 : 4}>
               <FormControl className={classes.fullWidth}>
                 <InputLabel>Background</InputLabel>
-                <MSelect
+                <Select
                   value={this.props.scene.backgroundType}
                   onChange={this.onInput.bind(this, 'backgroundType')}>
                   {Object.values(BT).map((bt) =>
                     <MenuItem key={bt} value={bt}>{en.get(bt)}</MenuItem>
                   )}
-                </MSelect>
+                </Select>
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 8}>
