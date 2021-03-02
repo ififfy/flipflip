@@ -233,6 +233,7 @@ interface GeneralSettingsI {
   [key: string]: number | boolean | string;
 
   portableMode: boolean;
+  disableLocalSave: boolean;
   autoBackup: boolean;
   autoBackupDays: number;
   watermark: boolean;
@@ -505,6 +506,7 @@ export class GeneralSettings  implements GeneralSettingsI {
   [key: string]: number | boolean | string;
 
   portableMode = false;
+  disableLocalSave = false;
   autoBackup = false;
   autoBackupDays = 1;
   watermark = false;

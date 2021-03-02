@@ -79,7 +79,7 @@ export default class AppStorage {
     }
     try {
       let data = JSON.parse(readFileSync(savePath, 'utf-8'));
-      const portableMode = data.config.displaySettings.portableMode;
+      const portableMode = data.config.generalSettings.portableMode;
       if (portableMode) {
         data = JSON.parse(readFileSync(portablePath, 'utf-8'));
       }
@@ -390,9 +390,13 @@ export default class AppStorage {
 
   save(state: any) {
     if (this.savePath) {
-      writeFileSync(this.savePath, JSON.stringify(state), 'utf-8');
-      if (state.config.displaySettings.portableMode) {
+      if (state.config.generalSettings.portableMode) {
         writeFileSync(portablePath, JSON.stringify(state), 'utf-8');
+        if (!state.config.generalSettings.disableLocalSave) {
+          writeFileSync(this.savePath, JSON.stringify(state), 'utf-8');
+        }
+      } else {
+        writeFileSync(this.savePath, JSON.stringify(state), 'utf-8');
       }
     }
 
