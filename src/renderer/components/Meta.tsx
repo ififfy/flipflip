@@ -203,6 +203,10 @@ export default class Meta extends React.Component {
               cachePath={getCachePath(null, this.state.config)}
               filters={this.state.audioFilters}
               library={this.state.audios}
+              progressCurrent={this.state.progressCurrent}
+              progressMode={this.state.progressMode}
+              progressTitle={this.state.progressTitle}
+              progressTotal={this.state.progressTotal}
               openTab={this.state.audioOpenTab}
               playlists={this.state.playlists}
               selected={this.state.audioSelected}
@@ -214,6 +218,7 @@ export default class Meta extends React.Component {
               onAddToPlaylist={a(actions.addToPlaylist)}
               onBatchTag={a(actions.batchTag)}
               onBatchEdit={a(actions.batchEdit)}
+              onBatchDetectBPM={p(actions.detectBPMs)}
               onChangeTab={a(actions.changeAudioLibraryTab)}
               onImportFromLibrary={a(actions.importAudioFromLibrary)}
               onManageTags={a(actions.manageTags)}

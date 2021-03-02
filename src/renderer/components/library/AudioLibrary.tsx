@@ -8,9 +8,9 @@ import wretch from "wretch";
 
 import {
   AppBar, Backdrop, Badge, Box, Button, Chip, CircularProgress, Collapse, Container, createStyles, Dialog,
-  DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Drawer, Fab, IconButton, ListItem,
-  ListItemIcon, ListItemSecondaryAction, ListItemText, Menu, MenuItem, Tab, Tabs, TextField, Theme, Toolbar,
-  Tooltip, Typography, withStyles
+  DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Drawer, Fab, IconButton, LinearProgress,
+  ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Menu, MenuItem, SvgIcon, Tab, Tabs, TextField,
+  Theme, Toolbar, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
 import AddIcon from '@material-ui/icons/Add';
@@ -19,6 +19,7 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import AudiotrackIcon from '@material-ui/icons/Audiotrack';
+import CancelIcon from "@material-ui/icons/Cancel";
 import ClearIcon from '@material-ui/icons/Clear';
 import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
 import EditIcon from '@material-ui/icons/Edit';
@@ -37,7 +38,7 @@ import SortIcon from '@material-ui/icons/Sort';
 import {red} from "@material-ui/core/colors";
 
 import {extractMusicMetadata, getFilesRecursively, isAudio} from "../../data/utils";
-import {AF, ASF, ALT, MO, SP} from "../../data/const";
+import {AF, ASF, ALT, MO, SP, PR} from "../../data/const";
 import en from "../../data/en";
 import Audio from "../../data/Audio";
 import Playlist from "../../data/Playlist";
@@ -369,6 +370,10 @@ class AudioLibrary extends React.Component {
     cachePath: string,
     filters: Array<string>,
     library: Array<Audio>,
+    progressCurrent: number,
+    progressMode: string,
+    progressTitle: string,
+    progressTotal: number,
     openTab: number,
     playlists: Array<Playlist>,
     selected: Array<string>,
@@ -380,6 +385,7 @@ class AudioLibrary extends React.Component {
     onAddToPlaylist(): void,
     onBatchTag(): void,
     onBatchEdit(): void,
+    onBatchDetectBPM(): void,
     onChangeTab(newTab: number): void,
     onImportFromLibrary(sources: Array<Audio>): void,
     onManageTags(): void,
@@ -555,6 +561,40 @@ class AudioLibrary extends React.Component {
               </ListItem>
             </Tooltip>
           </div>
+
+          <Divider />
+
+          <div className={clsx(this.props.tutorial != null && classes.disable)}>
+            <Tooltip title={"BPM Detection"}>
+              <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onBatchDetectBPM.bind(this)}>
+                <ListItemIcon>
+                  <SvgIcon viewBox="0 0 24 24" fontSize="small">
+                    <path
+                      d="M12,1.75L8.57,2.67L4.07,19.5C4.06,19.5 4,19.84 4,20C4,21.11 4.89,22 6,22H18C19.11,22 20,21.11 20,20C20,19.84 19.94,19.5 19.93,19.5L15.43,2.67L12,1.75M10.29,4H13.71L17.2,17H13V12H11V17H6.8L10.29,4M11,5V9H10V11H14V9H13V5H11Z"/>
+                  </SvgIcon>
+                </ListItemIcon>
+                <ListItemText primary="BPM Detection" />
+              </ListItem>
+            </Tooltip>
+          </div>
+
+          {this.props.progressMode != null && (
+            <React.Fragment>
+              <Divider />
+
+              <div>
+                <Tooltip title={this.state.drawerOpen ? "" : "Cancel BPM Detection"}>
+                  <ListItem button onClick={this.props.onUpdateMode.bind(this, PR.cancel)}>
+                    <ListItemIcon>
+                      <CancelIcon color="error"/>
+                    </ListItemIcon>
+                    <ListItemText primary={"Cancel BPM Detection"} />
+                  </ListItem>
+                </Tooltip>
+                <LinearProgress variant="determinate" value={Math.round((this.props.progressCurrent / this.props.progressTotal) * 100)}/>
+              </div>
+            </React.Fragment>
+          )}
 
           <div className={classes.fill}/>
         </Drawer>

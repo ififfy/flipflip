@@ -496,7 +496,6 @@ class AudioOptions extends React.Component {
         bpmError();
       }
     }
-
   }
 }
 

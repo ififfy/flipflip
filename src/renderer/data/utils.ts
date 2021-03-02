@@ -483,7 +483,6 @@ export function extractMusicMetadata(audio: Audio, metadata: any, cachePath: str
   }
 }
 
-
 export function getLocalPath(source: string, config: Config) {
   return cachePath(source, "local", config);
 }

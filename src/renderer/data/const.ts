@@ -201,6 +201,7 @@ const PR = { // Global progress functions
   audioOffline: 'pr.audioOffline',
   offline: 'pr.offline',
   videoMetadata: 'pr.video',
+  bpm: 'pr.bpm',
   tumblr: 'pr.tumblr',
   reddit: 'pr.reddit',
   twitter: 'pr.twitter',
