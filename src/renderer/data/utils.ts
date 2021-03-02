@@ -581,6 +581,18 @@ export async function convertURL(url: string): Promise<Array<string>> {
             return [(source as any).src];
           }
         }
+        // Fallback to MP4
+        for (let source of redgif) {
+          if ((source as any).type == "video/mp4" && !(source as any).src.endsWith("-mobile.mp4")) {
+            return [(source as any).src];
+          }
+        }
+        // Fallback to MP4-mobile
+        for (let source of redgif) {
+          if ((source as any).type == "video/mp4") {
+            return [(source as any).src];
+          }
+        }
       } else {
         const fallbackRegex = /"webm":\s*\{[^}]*"url":\s*"([^,}]*)",?/.exec(html);
         if (fallbackRegex != null) {
