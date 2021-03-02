@@ -2291,7 +2291,8 @@ function mergeSources(originalSources: Array<LibrarySource>, newSources: Array<L
   });
 
   let combinedSources = Array.from(originalSources);
-  for (let newSource of newSources) {
+  for (let source of newSources) {
+    const newSource = new LibrarySource(source);
     newSource.id = id;
     combinedSources.unshift(newSource);
     id += 1;
