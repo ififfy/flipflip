@@ -7,16 +7,18 @@ import {ST} from "../../data/const";
 import Clip from "../../data/Clip";
 import Scene from "../../data/Scene";
 import VideoControl from "../player/VideoControl";
+import ChildCallbackHack from "../player/ChildCallbackHack";
 
 export default class VideoCard extends React.Component {
   readonly props: {
     scene: Scene,
-    otherScenes?: Array<Scene>,
-    isPlaying?: boolean,
-    mainVideo?: HTMLVideoElement,
-    mainClip?: Clip,
-    mainClipValue?: Array<number>,
-    otherVideos?: Array<HTMLVideoElement>,
+    otherScenes: Array<Scene>,
+    isPlaying: boolean,
+    mainVideo: HTMLVideoElement,
+    mainClip: Clip,
+    mainClipValue: Array<number>,
+    otherVideos: Array<HTMLVideoElement>,
+    imagePlayerAdvanceHacks: Array<ChildCallbackHack>,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
   };
 
@@ -53,6 +55,7 @@ export default class VideoCard extends React.Component {
                 volume={this.props.scene.videoVolume}
                 clip={this.props.mainClip}
                 clipValue={this.props.mainClipValue}
+                nextTrack={() => {this.props.imagePlayerAdvanceHacks[0].fire()}}
                 onChangeVolume={this.changeKey.bind(this, 'videoVolume', this.props.scene).bind(this)}/>
             </React.Fragment>
           )}
@@ -97,6 +100,7 @@ export default class VideoCard extends React.Component {
                   clip={source ? source.clips.find((c) => c.id == clipID) : null}
                   clipValue={clipValue ? clipValue : null}
                   player
+                  nextTrack={() => {this.props.imagePlayerAdvanceHacks[index + 1].fire()}}
                   onChangeVolume={this.props.mainVideo ? this.changeKey.bind(this, 'videoVolume', this.props.otherScenes[indexOf]).bind(this) : this.nop}/>
             </Grid>
           );}

@@ -27,7 +27,7 @@ export default class ImagePlayer extends React.Component {
     scene: Scene,
     currentAudio: Audio,
     gridView: boolean,
-    advanceHack?: ChildCallbackHack,
+    advanceHack: ChildCallbackHack,
     deleteHack?: ChildCallbackHack,
     maxInMemory: number,
     maxLoadingAtOnce: number,
@@ -137,11 +137,9 @@ export default class ImagePlayer extends React.Component {
     this._waitTimeouts = new Array<NodeJS.Timeout>(this.props.config.displaySettings.maxLoadingAtOnce).fill(null);
     this._imgLoadTimeouts = new Array<NodeJS.Timeout>(this.props.config.displaySettings.maxLoadingAtOnce).fill(null);
     this._toggleStrobe = false;
-    if (this.props.advanceHack) {
-      this.props.advanceHack.listener = () => {
-        clearTimeout(this._timeout);
-        this.advance(true, true);
-      }
+    this.props.advanceHack.listener = () => {
+      clearTimeout(this._timeout);
+      this.advance(true, true);
     }
     if (this.props.deleteHack) {
       this.props.deleteHack.listener = () => {
@@ -174,9 +172,7 @@ export default class ImagePlayer extends React.Component {
     }
     this._timeout = null;
     this._waitTimeouts = null;
-    if (this.props.advanceHack) {
-      this.props.advanceHack.listener = null;
-    }
+    this.props.advanceHack.listener = null;
     if (this.props.deleteHack) {
       this.props.deleteHack.listener = null;
     }

@@ -67,7 +67,7 @@ export default class Player extends React.Component {
     startTime: null as Date,
     historyOffset: 0,
     historyPaths: Array<any>(),
-    imagePlayerAdvanceHack: new ChildCallbackHack(),
+    imagePlayerAdvanceHacks: new Array<ChildCallbackHack>(this.props.scene.overlays.length + 1).fill(null).map((c) => new ChildCallbackHack()),
     imagePlayerDeleteHack: new ChildCallbackHack(),
     mainVideo: null as HTMLVideoElement,
     overlayVideos: Array<HTMLVideoElement>(this.props.scene.overlays.length).fill(null),
@@ -326,7 +326,7 @@ export default class Player extends React.Component {
             hasStarted={this.state.hasStarted}
             historyPaths={this.state.historyPaths}
             historyOffset={this.state.historyOffset}
-            imagePlayerAdvanceHack={this.state.imagePlayerAdvanceHack}
+            imagePlayerAdvanceHacks={this.state.imagePlayerAdvanceHacks}
             imagePlayerDeleteHack={this.state.imagePlayerDeleteHack}
             isEmpty={this.state.isEmpty}
             isPlaying={this.state.isPlaying}
@@ -396,7 +396,7 @@ export default class Player extends React.Component {
               hasStarted={this.state.hasStarted}
               strobeLayer={this.props.scene.strobe ? this.props.scene.strobeLayer : null}
               historyOffset={this.state.historyOffset}
-              advanceHack={this.state.imagePlayerAdvanceHack}
+              advanceHack={this.state.imagePlayerAdvanceHacks[0]}
               deleteHack={this.state.imagePlayerDeleteHack}
               setHistoryOffset={this.setHistoryOffset.bind(this)}
               setHistoryPaths={this.setHistoryPaths.bind(this)}
@@ -437,6 +437,7 @@ export default class Player extends React.Component {
                     isPlaying={this.state.isPlaying && !this.state.isEmpty}
                     hasStarted={this.state.hasStarted}
                     historyOffset={0}
+                    advanceHack={this.state.imagePlayerAdvanceHacks[index + 1]}
                     setHistoryOffset={this.nop}
                     setHistoryPaths={this.nop}
                     finishedLoading={this.setOverlayLoaded.bind(this, index)}
@@ -668,9 +669,11 @@ export default class Player extends React.Component {
   }
 
   setOverlayVideo(index: number, video: HTMLVideoElement) {
-    const newOV = this.state.overlayVideos;
-    newOV[index] = video;
-    this.setState({overlayVideos: newOV});
+    const newOV = Array.from(this.state.overlayVideos);
+    if (newOV[index] != video) {
+      newOV[index] = video;
+      this.setState({overlayVideos: newOV});
+    }
   }
 
   start(canStart: boolean, force = false) {

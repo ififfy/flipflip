@@ -1580,7 +1580,7 @@ export default class SourceScraper extends React.Component {
     hasStarted: boolean,
     strobeLayer?: string,
     historyOffset: number,
-    advanceHack?: ChildCallbackHack,
+    advanceHack: ChildCallbackHack,
     deleteHack?: ChildCallbackHack,
     isOverlay?: boolean,
     setHistoryOffset(historyOffset: number): void,

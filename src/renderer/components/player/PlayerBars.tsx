@@ -222,7 +222,7 @@ class PlayerBars extends React.Component {
     hasStarted: boolean,
     historyPaths: Array<any>,
     historyOffset: number,
-    imagePlayerAdvanceHack: ChildCallbackHack,
+    imagePlayerAdvanceHacks: Array<ChildCallbackHack>,
     imagePlayerDeleteHack: ChildCallbackHack,
     isEmpty: boolean,
     isPlaying: boolean,
@@ -390,6 +390,7 @@ class PlayerBars extends React.Component {
                           mainClip={source ? source.clips.find((c) => c.id == clipID) : null}
                           mainClipValue={clipValue ? clipValue : null}
                           otherVideos={this.props.overlayVideos}
+                          imagePlayerAdvanceHacks={this.props.imagePlayerAdvanceHacks}
                           onUpdateScene={this.props.onUpdateScene.bind(this)}/>
                       </AccordionDetails>
                     </Accordion>
@@ -771,7 +772,7 @@ class PlayerBars extends React.Component {
   historyForward() {
     if (!this.state.drawerHover || document.activeElement.tagName.toLocaleLowerCase() != "input") {
       if (this.props.historyOffset >= 0) {
-        this.props.imagePlayerAdvanceHack.fire();
+        this.props.imagePlayerAdvanceHacks[0].fire();
       } else {
         this.props.historyForward();
       }

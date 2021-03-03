@@ -7,6 +7,8 @@ import Forward10Icon from '@material-ui/icons/Forward10';
 import Replay10Icon from '@material-ui/icons/Replay10';
 import PauseIcon from '@material-ui/icons/Pause';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import SkipPreviousIcon from "@material-ui/icons/SkipPrevious";
+import SkipNextIcon from "@material-ui/icons/SkipNext";
 import VolumeDownIcon from '@material-ui/icons/VolumeDown';
 import VolumeUpIcon from '@material-ui/icons/VolumeUp';
 
@@ -52,6 +54,7 @@ class VideoControl extends React.Component {
     clipValue?: Array<number>,
     clips?: Array<Clip>,
     onChangeVolume(volume: number): void,
+    nextTrack?(): void,
   };
 
   readonly state = {
@@ -79,6 +82,11 @@ class VideoControl extends React.Component {
         <Grid item>
           <Grid container alignItems="center">
             <Grid item xs={12} style={{textAlign: 'center'}}>
+              {this.props.nextTrack && (
+                <IconButton disabled style={{opacity: 0}}>
+                  <SkipPreviousIcon />
+                </IconButton>
+              )}
               <Tooltip title="Jump Back">
                 <IconButton
                   onClick={this.onBack.bind(this)}>
@@ -97,6 +105,14 @@ class VideoControl extends React.Component {
                   <Forward10Icon/>
                 </IconButton>
               </Tooltip>
+              {this.props.nextTrack && (
+                <Tooltip title="Next Track">
+                  <IconButton
+                    onClick={this.props.nextTrack.bind(this)}>
+                    <SkipNextIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
             </Grid>
             <Grid item xs={12}>
               <Grid container spacing={1}>
