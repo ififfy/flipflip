@@ -280,7 +280,6 @@ class GridSetup extends React.Component {
               onClose={this.onCloseMenu.bind(this)}>
               {!!this.state.isEditing &&
                 <SceneSelect
-                  scene={null}
                   allScenes={this.props.allScenes}
                   value={this.props.grid.grid[this.state.isEditing[0]][this.state.isEditing[1]]}
                   menuIsOpen

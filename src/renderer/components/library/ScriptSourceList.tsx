@@ -166,7 +166,6 @@ class ScriptSourceList extends React.Component {
               <SceneSelect
                 autoFocus
                 menuIsOpen
-                scene={null}
                 allScenes={this.props.scenes}
                 value={this.state.playWithScene}
                 getSceneName={this.getSceneName.bind(this)}

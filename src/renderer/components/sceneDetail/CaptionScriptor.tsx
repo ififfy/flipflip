@@ -426,7 +426,6 @@ class CaptionScriptor extends React.Component {
                           </Typography>
                         )}
                         <SceneSelect
-                          scene={null}
                           allScenes={this.props.scenes}
                           value={this.state.scene ? this.state.scene.id : 0}
                           getSceneName={this.getSceneName.bind(this)}

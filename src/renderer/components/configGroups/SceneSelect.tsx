@@ -22,9 +22,9 @@ const styles = (theme: Theme) => createStyles({
 class SceneSelect extends React.Component {
   readonly props: {
     classes: any,
-    scene: Scene,
     allScenes: Array<Scene>,
     value: number,
+    scene?: Scene,
     menuIsOpen?: boolean,
     autoFocus?: boolean,
     includeExtra?: boolean
@@ -43,7 +43,7 @@ class SceneSelect extends React.Component {
       <Select
         className={classes.select}
         value={{label: this.props.getSceneName(this.props.value.toString()), value: this.props.value}}
-        options={defaults.concat(this.props.allScenes.filter((s) => (this.props.scene == null || s.id !== this.props.scene.id) && s.sources.length > 0).map((s) => s.id.toString())).map((id) => {return {label: this.props.getSceneName(id), value: id}})}
+        options={defaults.concat(this.props.allScenes.filter((s) => (!this.props.scene || s.id !== this.props.scene.id) && s.sources.length > 0).map((s) => s.id.toString())).map((id) => {return {label: this.props.getSceneName(id), value: id}})}
         backspaceRemovesValue={false}
         menuIsOpen={this.props.menuIsOpen}
         autoFocus={this.props.autoFocus}

@@ -436,7 +436,6 @@ class SceneOptionCard extends React.Component {
                           <Grid item xs={12} sm={this.props.sidebar ? 12 : 5}>
                             <Typography className={classes.selectText} variant="caption">Overlay{regenerate ? invalid ? " ✗" : " ⟳" : ""}</Typography>
                             <SceneSelect
-                              scene={this.props.scene}
                               allScenes={this.props.allScenes}
                               value={o.sceneID}
                               getSceneName={this.getSceneName.bind(this)}
