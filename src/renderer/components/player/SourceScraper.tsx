@@ -1278,15 +1278,29 @@ function loadGelbooru1(systemMessage: Function, config: Config, source: LibraryS
               .error(503, (e) => resolve(null))
               .text((html) => {
                 imageCount++;
-                let contentURL = html.match("<img alt=\"img\" src=\"(.*?)\"");
+                let contentURL = html.match("<img[^>]*id=\"?image\"?[^>]*src=\"([^\"]*)\"");
                 if (contentURL != null) {
-                  images.push(contentURL[1]);
+                  let url = contentURL[1];
+                  if (url.startsWith("//")) url = "http:" + url;
+                  images.push(url);
+                }
+                contentURL = html.match("<img[^>]*src=\"([^\"]*)\"[^>]*id=\"?image\"?");
+                if (contentURL != null) {
+                  let url = contentURL[1];
+                  if (url.startsWith("//")) url = "http:" + url;
+                  images.push(url);
+                }
+                contentURL = html.match("<video[^>]*src=\"([^\"]*)\"");
+                if (contentURL != null) {
+                  let url = contentURL[1];
+                  if (url.startsWith("//")) url = "http:" + url;
+                  images.push(url);
                 }
                 if (imageCount == imageEls.length || imageCount == 10) {
                   helpers.next = helpers.next + 1;
-                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
                   resolve({
-                    data: filterPathsToJustPlayable(filter, images, true),
+                    data: filterPathsToJustPlayable(filter, images, false),
                     helpers: helpers,
                   });
                 }
