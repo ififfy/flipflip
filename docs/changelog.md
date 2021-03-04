@@ -1,6 +1,20 @@
 # Changelog
 
-## 3.1.0 <small>(02/17/2020)</small>
+## 3.1.1 <small>(03/08/2021)</small>
+- Add BPM Detection to Audio Library
+- Add warning when using 'Audio BPM' timing, but with no BPM metadata 
+- Add ability to recursively import directories of videos/audio/scripts
+- Add option to prevent Portable Mode from saving locally
+- Show sort button while importing from library
+- Allow video controls to skip to the next source during Scene playback
+- Improve some booru scraping
+- Fix bug preventing scene from overlaying itself 
+- Fix bug when migrating to 3.1.x with an empty audio track
+- Fix bug with Portable Mode
+- Fix bug with library source IDs
+- Fix bug with RedGif parsing
+
+## 3.1.0 <small>(02/17/2021)</small>
 - Add ability to detect and use video duration/resolution
 - Add ability to set caption opacity globally and within script
 - Add progress bar capability with caption count command
@@ -12,7 +26,7 @@
 - Fix bug with Mac filepaths
 - Fix bug with Hydrus
 
-#### 3.1.0-beta2 <small>(01/19/2020)</small>
+#### 3.1.0-beta2 <small>(01/19/2021)</small>
 - Caption Scriptor
 - Caption Script Library
 - Timing functions for caption scripts

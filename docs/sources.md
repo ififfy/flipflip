@@ -47,7 +47,8 @@ which can easily convert more common formats (e.g. SRT, SSA/ASS, SBV, etc.) to W
 Click `+` and choose one of the following options:
 * Click `URL` to input the URL of a remote source or video/playlist file.
 * Click `Local directory` to lookup local directories.
-* Click `Local video/playlist` to look up local video files and playlist files.
+* Click `Local video/playlist` to look up local video files and playlist files
+  * **Shift+Click** to recursively import directories of videos
 * Click `From Library` to import sources from the Library.
   * For more information about this process see the [Import from Library](import_from_library.md) section.
 

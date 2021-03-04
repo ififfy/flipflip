@@ -28,6 +28,8 @@ These settings control various player options.
   * _This only ever applies to the first playlist_
 * `Portable Mode` - Portable Mode will save a copy of your data in the same directory as the FlipFlip executable, 
 as well as the default save path. This needs to be enabled on each machine.
+  * `Disable Local Saves` - When this is on, FlipFlip will _only_ save its data to the folder with the FlipFlip 
+    executable and _will not_ save to the default save path.
 ---
 * `Min Image/Video Size` - the minimum number of pixels each dimension of an image/video must be 
 (default: 200 - image's width _and_ height must be larger than 200px).

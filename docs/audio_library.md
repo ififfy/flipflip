@@ -62,6 +62,12 @@ playlist and select `Create Playlist`.
 
 ?> **Note:** Playlists must have unique names
 
+## BPM Detection
+You can have FlipFlip automatically detect the BPM of your library tracks, rather than having to do it for each 
+individual track. To start this process, click the `BPM Detection` button in the sidebar
+( <img style="vertical-align: -5px" src="doc_icons/bpm.svg" alt="BPM Detection" width="20" height="20"> ). While 
+this process is running, a progress bar will appear in the sidebar.
+
 ## Delete Source Content
 Sometimes, you may want to be able to totally delete a track from your file system. To do this, **Shift+Ctrl+Alt+Click**
 the track's avatar icon. You will be prompted to confirm this choice, after which the track in FlipFlip and the file

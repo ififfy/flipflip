@@ -120,7 +120,7 @@ class Tutorial extends React.Component {
                 Your Scenes are divided into 3 different tabs: <b>Scenes</b>, <b>Scene Generators</b>, and <b>Scene Grids</b>.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
-                From the sidebar, you can also access your Library, open another window, or access Settings.
+                From the sidebar, you can also access your Libraries, the Caption Scriptor, and Settings, or open an additional window.
               </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -169,7 +169,7 @@ class Tutorial extends React.Component {
             <DialogTitle id="tutorial-title">Scene Detail</DialogTitle>
             <DialogContent>
               <DialogContentText id="tutorial-description">
-                You've started your first Scene! A Scene is the main component of FlipFlip, where you can specify all your effects and options.
+                You've started your first Scene! A Scene is the main component of FlipFlip, where you can specify all your media sources, effects, and options.
               </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -1032,8 +1032,16 @@ class Tutorial extends React.Component {
           <React.Fragment>
             <DialogTitle id="tutorial-title">Library</DialogTitle>
             <DialogContent>
-              <DialogContentText id="tutorial-description">
-                From here we can <b>manage tags</b>, <b>batch tag sources</b>, <b>import remote sources</b>, and <b>mark offline sources</b>.
+              <DialogContentText id="tutorial-description" component="div">
+                From here, we can
+                <ul>
+                  <li><b>manage tags</b></li>
+                  <li><b>batch tag sources</b></li>
+                  <li><b>find mergeable sources</b> (local directories with the same tags)</li>
+                  <li><b>import remote sources</b></li>
+                  <li><b>mark offline sources</b></li>
+                  <li><b>detect video resolution/duration</b></li>
+                </ul>
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 <b>Remote source imports</b> (<i>Tumblr</i>, <i>Reddit</i>, <i>Twitter</i>, <i>Instagram</i>) will appear after you have logged into the relevant service in <b>Settings</b>.
@@ -1153,9 +1161,15 @@ class Tutorial extends React.Component {
           <React.Fragment>
             <DialogTitle id="tutorial-title">Audio Library</DialogTitle>
             <DialogContent>
-              <DialogContentText id="tutorial-description">
-                From here we can also <b>manage tags</b>, <b>add tracks to playlists</b>, <b>batch tag tracks</b>,
-                and <b>batch edit tracks</b>.
+              <DialogContentText id="tutorial-description" component="div">>
+                From here we can
+                <ul>
+                  <li><b>manage tags</b></li>
+                  <li><b>add tracks to playlists</b></li>
+                  <li><b>batch tag tracks</b></li>
+                  <li><b>batch edit tracks</b></li>
+                  <li><b>detect BPM of tracks</b></li>
+                </ul>
               </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -1263,7 +1277,7 @@ class Tutorial extends React.Component {
             <DialogTitle id="tutorial-title">Script Library</DialogTitle>
             <DialogContent>
               <DialogContentText id="tutorial-description">
-                From here we can also <b>manage tags</b> and <b>batch tag tracks</b>.
+                From here we can also <b>manage tags</b> and <b>batch tag scripts</b>.
               </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -1697,8 +1711,8 @@ class Tutorial extends React.Component {
                 At the <b>bottom of the screen</b> are the typical <b>video controls</b>.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
-                You can <b>seek</b> through the video, <b>play/pause</b>, and change the <b>volume</b>. You
-                will also see the <b>start time</b> of the clips you make <b>show up</b> on the seek bar.
+                You can <b>seek</b> through the video, <b>play/pause</b>, and change the <b>volume</b>. As you are
+                making your clip, the seek bar will adjust to your given <b>start/end times</b>.
               </DialogContentText>
             </DialogContent>
             <DialogActions>

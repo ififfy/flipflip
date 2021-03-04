@@ -51,7 +51,7 @@ merge these folders (they must be merged manually, and the extra sources deleted
 ## Import Remote Sources
 The Library provides the ability to import sources from **Tumblr**, **Reddit**, **Instagram**, and **Twitter**. These
 import options will appear in the sidebar after you have authorized the releveant service in [Settings](config.md).
-You can only run one import at a time. While a import is running, a progress bar will appear in the sidebar.
+You can only run one import at a time. While an import is running, a progress bar will appear in the sidebar.
 
 ?> FlipFlip may become slow while importing sources, but you can feel free to navigate away from the Library. You will
 be alerted when your import has completed. 
