@@ -170,6 +170,8 @@ export default class Scene {
   nextSceneID: number = 0;
   nextSceneTime: number = 900;
   nextSceneAllImages = false;
+  persistAudio = false;
+  persistText = false;
   nextSceneRandomID: number = 0;
   nextSceneRandoms: Array<number> = [];
   libraryID: number = -1;

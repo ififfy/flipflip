@@ -228,11 +228,13 @@ class PlayerBars extends React.Component {
     isPlaying: boolean,
     mainVideo: HTMLVideoElement,
     overlayVideos: Array<HTMLVideoElement>,
+    persistAudio: boolean,
+    persistText: boolean,
+    recentPictureGrid: boolean,
     scene: Scene,
     scenes: Array<Scene>,
     title: string,
     tutorial: string,
-    recentPictureGrid: boolean,
     goBack(): void,
     historyBack(): void,
     historyForward(): void,
@@ -517,6 +519,7 @@ class PlayerBars extends React.Component {
                     scene={this.props.scene}
                     scenePaths={this.props.historyPaths}
                     startPlaying
+                    persist={this.props.persistAudio}
                     onUpdateScene={this.props.onUpdateScene.bind(this)}
                     goBack={this.props.goBack.bind(this)}
                     orderAudioTags={this.orderAudioTags.bind(this)}
@@ -527,7 +530,7 @@ class PlayerBars extends React.Component {
                 </AccordionDetails>
               </Accordion>
 
-              {!this.props.scene.audioScene && (
+              {!this.props.scene.audioScene && !this.props.persistText && (
                 <Accordion TransitionProps={{ unmountOnExit: true }}>
                   <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}

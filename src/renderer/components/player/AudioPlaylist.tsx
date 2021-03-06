@@ -100,6 +100,7 @@ class AudioPlaylist extends React.Component {
     onAddTracks(playlistIndex: number): void,
     onSourceOptions(audio: Audio): void,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
+    persist?: boolean,
     shorterSeek?: boolean,
     showMsTimestamp?: boolean,
     scenePaths?: Array<any>,
@@ -139,7 +140,7 @@ class AudioPlaylist extends React.Component {
           </ListItem>
           <AudioControl
             audio={audio}
-            audioEnabled={this.props.scene.audioEnabled}
+            audioEnabled={this.props.scene.audioEnabled || this.props.persist}
             singleTrack={this.state.playingAudios.length == 1}
             lastTrack={this.state.currentIndex == this.state.playingAudios.length - 1}
             repeat={this.props.playlist.repeat}
@@ -311,12 +312,22 @@ class AudioPlaylist extends React.Component {
     }
   }
 
-  componentDidMount() {
-    if (this.props.setCurrentAudio) {
-      this.props.setCurrentAudio(this.props.playlist.audios[this.state.currentIndex]);
+  componentDidUpdate(props: any, state: any) {
+    if (!this.props.persist && this.props.scene !== props.scene) {
+      this.restart();
     }
+  }
+
+  componentDidMount() {
     if (this.props.playlistIndex == 0 && this.props.scene.audioScene) {
       window.addEventListener('keydown', this.onKeyDown, false);
+    }
+    this.restart();
+  }
+
+  restart() {
+    if (this.props.setCurrentAudio) {
+      this.props.setCurrentAudio(this.props.playlist.audios[this.state.currentIndex]);
     }
     if (this.props.startPlaying) {
       let audios = this.props.playlist.audios;

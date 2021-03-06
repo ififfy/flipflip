@@ -396,6 +396,30 @@ class SceneOptionCard extends React.Component {
                       label="Play After All Images"/>
                   </Collapse>
                 </Grid>
+                {!this.props.sidebar && (
+                  <React.Fragment>
+                    <Grid item xs>
+                      <Collapse in={this.props.scene.nextSceneID != 0}>
+                        <FormControlLabel
+                          control={
+                            <Switch checked={this.props.scene.persistAudio}
+                                    onChange={this.onBoolInput.bind(this, 'persistAudio')}/>
+                          }
+                          label="Persist Audio"/>
+                      </Collapse>
+                    </Grid>
+                    <Grid item xs>
+                      <Collapse in={this.props.scene.nextSceneID != 0}>
+                        <FormControlLabel
+                          control={
+                            <Switch checked={this.props.scene.persistText}
+                                    onChange={this.onBoolInput.bind(this, 'persistText')}/>
+                          }
+                          label="Persist Text Overlay"/>
+                      </Collapse>
+                    </Grid>
+                  </React.Fragment>
+                )}
               </Grid>
             </Grid>
             <Grid item xs={12}>

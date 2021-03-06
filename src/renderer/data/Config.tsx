@@ -404,6 +404,8 @@ export class SceneSettings implements SceneSettingsI {
   nextSceneID = 0;
   nextSceneTime = 900;
   nextSceneAllImages = false;
+  persistAudio = false;
+  persistText = false;
   nextSceneRandoms: Array<number> = [];
 
   strobe = false;

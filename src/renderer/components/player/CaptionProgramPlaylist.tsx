@@ -23,6 +23,7 @@ export default class CaptionProgramPlaylist extends React.Component {
     orderScriptTags(script: CaptionScript): void,
     playNextScene(): void,
     jumpToHack?: ChildCallbackHack,
+    persist?: boolean,
     getCurrentTimestamp?(): number,
     onError?(e: string): void,
     systemMessage?(message: string): void,
@@ -56,25 +57,25 @@ export default class CaptionProgramPlaylist extends React.Component {
     );
   }
 
-  initPlaying() {
-    let scripts = this.props.playlist.scripts;
-    if (this.props.playlist.shuffle) {
-      scripts = randomizeList(Array.from(scripts));
+  componentDidUpdate(props: any) {
+    if (!this.props.persist && this.props.playlist !== props.playlist) {
+      this.restart();
     }
-    this.setState({playingScripts: scripts});
   }
 
   componentDidMount() {
     if (this.props.playlistIndex == 0 && this.props.scene.scriptScene) {
       window.addEventListener('keydown', this.onKeyDown, false);
     }
-    this.initPlaying();
+    this.restart();
   }
 
-  componentDidUpdate(props: any) {
-    if (this.props.playlist !== props.playlist) {
-      this.initPlaying();
+  restart() {
+    let scripts = this.props.playlist.scripts;
+    if (this.props.playlist.shuffle) {
+      scripts = randomizeList(Array.from(scripts));
     }
+    this.setState({playingScripts: scripts});
   }
 
   componentWillUnmount() {

@@ -75,6 +75,8 @@ export default class Player extends React.Component {
     timeToNextFrame: null as number,
     recentPictureGrid: false,
     thumbImage: null as HTMLImageElement,
+    persistAudio: false,
+    persistText: false,
   };
 
   _interval: NodeJS.Timer = null;
@@ -86,8 +88,8 @@ export default class Player extends React.Component {
     const showCaptionProgram = (
       this.state.isPlaying &&
       this.state.hasStarted &&
-      this.props.scene.textEnabled &&
-      this.props.scene.scriptPlaylists.length);
+      ((this.props.scene.textEnabled &&
+      this.props.scene.scriptPlaylists.length) || this.state.persistText));
     const showStrobe = this.props.scene.strobe && this.state.hasStarted && this.state.isPlaying &&
       (this.props.scene.strobeLayer == SL.top || this.props.scene.strobeLayer == SL.bottom);
 
@@ -337,6 +339,8 @@ export default class Player extends React.Component {
             title={this.props.tags ? (this.props.scene.audioScene ? this.state.currentAudio ? this.state.currentAudio.name : "Loading..." : this.props.scene.sources[0].url) : this.props.scene.name}
             tutorial={this.props.tutorial}
             recentPictureGrid={this.state.recentPictureGrid}
+            persistAudio={this.state.persistAudio}
+            persistText={this.state.persistText}
             goBack={this.goBack.bind(this)}
             historyBack={this.historyBack.bind(this)}
             historyForward={this.historyForward.bind(this)}
@@ -379,7 +383,8 @@ export default class Player extends React.Component {
               removeChild
               />
           )}
-          {(this.props.config.displaySettings.audioAlert || this.props.tags) && this.props.scene.audioEnabled && (
+          {(this.props.config.displaySettings.audioAlert || this.props.tags) &&
+          (this.props.scene.audioEnabled || this.state.persistAudio) && (
             <AudioAlert
               audio={this.state.currentAudio}
             />
@@ -469,6 +474,7 @@ export default class Player extends React.Component {
             scale={captionScale}
             scene={this.props.scene}
             timeToNextFrame={this.state.timeToNextFrame}
+            persist={this.state.persistText}
             getTags={this.props.getTags.bind(this)}
             goBack={this.props.goBack.bind(this)}
             orderScriptTags={this.orderScriptTags.bind(this)}
@@ -560,6 +566,12 @@ export default class Player extends React.Component {
       thumbImage.onload = () => {
         this.setState({thumbImage: thumbImage});
       };
+    }
+    if (this.props.scene.persistAudio && this.props.scene.audioEnabled) {
+      this.setState({persistAudio: true});
+    }
+    if (this.props.scene.persistText && this.props.scene.textEnabled) {
+      this.setState({persistText: true});
     }
   }
 

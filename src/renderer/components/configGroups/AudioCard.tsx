@@ -25,6 +25,7 @@ class AudioCard extends React.Component {
     sidebar: boolean,
     startPlaying: boolean,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
+    persist?: boolean,
     shorterSeek?: boolean,
     showMsTimestamp?: boolean,
     scenePaths?: Array<any>,
@@ -51,12 +52,14 @@ class AudioCard extends React.Component {
         <Grid item xs={12}>
           <Grid container spacing={2} alignItems="center">
             <Grid item xs>
-              <FormControlLabel
-                control={
-                  <Switch checked={this.props.scene.audioEnabled}
-                          onChange={this.onBoolInput.bind(this, 'audioEnabled')}/>
-                }
-                label="Audio Tracks"/>
+              <Collapse in={!this.props.persist}>
+                <FormControlLabel
+                  control={
+                    <Switch checked={this.props.scene.audioEnabled}
+                            onChange={this.onBoolInput.bind(this, 'audioEnabled')}/>
+                  }
+                  label="Audio Tracks"/>
+              </Collapse>
             </Grid>
             <Grid item>
               <Collapse in={this.props.scene.audioEnabled && !this.props.startPlaying}>
@@ -75,7 +78,7 @@ class AudioCard extends React.Component {
         {this.props.scene.audioPlaylists.map((playlist, i) =>
           <React.Fragment key={i}>
             <Grid item xs={12}>
-              <Collapse in={this.props.scene.audioEnabled}>
+              <Collapse in={this.props.scene.audioEnabled || this.props.persist}>
                 <AudioPlaylist
                   playlistIndex={i}
                   playlist={playlist}
@@ -85,6 +88,7 @@ class AudioCard extends React.Component {
                   showMsTimestamp={this.props.showMsTimestamp}
                   sidebar={this.props.sidebar}
                   startPlaying={this.props.startPlaying}
+                  persist={this.props.persist}
                   onAddTracks={this.props.onAddTracks}
                   onSourceOptions={this.onSourceOptions.bind(this)}
                   onUpdateScene={this.props.onUpdateScene.bind(this)}
