@@ -454,25 +454,31 @@ class AudioOptions extends React.Component {
     }
 
     const detectBPM = (data: ArrayBuffer) => {
-      let context = new AudioContext();
-      context.decodeAudioData(data, (buffer) => {
-        analyze(buffer)
-          .then((tempo: number) => {
-            this.changeKey('bpm', tempo.toFixed(2));
-            this.setState({loadingBPM: false, successBPM: true});
-            setTimeout(() => {
-              this.setState({successBPM: false})
-            }, 3000);
-          })
-          .catch((err: any) => {
-            console.error("Error analyzing");
-            console.error(err);
-            bpmError();
-          });
-      }, (err) => {
-        console.error(err);
+      const maxByteSize = 200000000;
+      if (data.byteLength < maxByteSize) {
+        let context = new AudioContext();
+        context.decodeAudioData(data, (buffer) => {
+          analyze(buffer)
+            .then((tempo: number) => {
+              this.changeKey('bpm', tempo.toFixed(2));
+              this.setState({loadingBPM: false, successBPM: true});
+              setTimeout(() => {
+                this.setState({successBPM: false})
+              }, 3000);
+            })
+            .catch((err: any) => {
+              console.error("Error analyzing");
+              console.error(err);
+              bpmError();
+            });
+        }, (err) => {
+          console.error(err);
+          bpmError();
+        });
+      } else {
+        console.error("'" + this.props.audio.url + "' is too large to decode");
         bpmError();
-      });
+      }
     }
 
     if (this.state.audio.url && !this.state.loadingBPM) {

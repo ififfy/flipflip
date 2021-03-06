@@ -2914,24 +2914,29 @@ export function detectBPMs(getState: () => State, setState: Function) {
     }
 
     const detectBPM = (data: ArrayBuffer) => {
-      const win = remote.getCurrentWindow();
-      const state = getState();
-      let context = new AudioContext();
-      context.decodeAudioData(data, (buffer) => {
-        analyze(buffer)
-          .then((tempo: number) => {
-            audio.bpm = Number.parseFloat(tempo.toFixed(2));
-            state.progressCurrent = offset + 1;
-            setState({progressCurrent: state.progressCurrent});
-            win.setProgressBar(state.progressCurrent / state.progressTotal);
-            setTimeout(detectBPMLoop, 100);
-          })
-          .catch((e: any) => {
-            bpmError(e);
-          });
-      }, (e) => {
-        bpmError(e);
-      });
+      const maxByteSize = 200000000;
+      if (data.byteLength < maxByteSize) {
+        const win = remote.getCurrentWindow();
+        const state = getState();
+        let context = new AudioContext();
+        context.decodeAudioData(data, (buffer) => {
+          analyze(buffer)
+            .then((tempo: number) => {
+              audio.bpm = Number.parseFloat(tempo.toFixed(2));
+              state.progressCurrent = offset + 1;
+              setState({progressCurrent: state.progressCurrent});
+              win.setProgressBar(state.progressCurrent / state.progressTotal);
+              setTimeout(detectBPMLoop, 100);
+            })
+            .catch((e: any) => {
+              bpmError(e);
+            });
+        }, (e) => {
+          bpmError(e);
+        });
+      } else {
+        console.error("'" + audio.url + "' is too large to decode");
+      }
     }
 
     try {

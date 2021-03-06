@@ -16,6 +16,13 @@
   dependencies:
     regenerator-runtime "^0.13.2"
 
+"@babel/runtime@^7.12.13", "@babel/runtime@^7.12.5", "@babel/runtime@^7.13.9":
+  version "7.13.9"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.13.9.tgz#97dbe2116e2630c489f22e0656decd60aaa1fcee"
+  integrity sha512-aY2kU+xgJ3dJ1eU6FMB9EH8dIe8dmusF1xEku52joLvw6eAFN0AI+WxCLDnpev2LEejWBAy2sBvBOBAjI3zmvA==
+  dependencies:
+    regenerator-runtime "^0.13.4"
+
 "@babel/runtime@^7.3.1", "@babel/runtime@^7.4.4":
   version "7.4.5"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.4.5.tgz#582bb531f5f9dc67d2fcb682979894f75e253f12"
@@ -27,13 +34,6 @@
   version "7.11.2"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.11.2.tgz#f549c13c754cc40b87644b9fa9f09a6a95fe0736"
   integrity sha512-TeWkU52so0mPtDcaCTxNBI/IHiz0pZgr8VEFqXFtZWpYD08ZB6FaSwVAS8MKRQAP3bYKiVjwysOJgMFY28o6Tw==
-  dependencies:
-    regenerator-runtime "^0.13.4"
-
-"@babel/runtime@^7.9.2":
-  version "7.9.2"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.9.2.tgz#d90df0583a3a252f09aaa619665367bae518db06"
-  integrity sha512-NE2DtOdufG7R5vnfQUTehdTfNycfUANEtCa9PssN9O/xmTzP4E08UI797ixaei6hBEVL9BI/PsdJS5x7mWoB9Q==
   dependencies:
     regenerator-runtime "^0.13.4"
 
@@ -782,13 +782,13 @@ author-regex@^1.0.0:
   resolved "https://registry.yarnpkg.com/author-regex/-/author-regex-1.0.0.tgz#d08885be6b9bbf9439fe087c76287245f0a81450"
   integrity sha1-0IiFvmubv5Q5/gh8dihyRfCoFFA=
 
-automation-events@^2.0.5:
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/automation-events/-/automation-events-2.0.5.tgz#4e927bcfa4320b18c96fd7736b4eb0fde413bd20"
-  integrity sha512-z8xGgGJd9LyYj0qw78B03cOijK2vnsUIndGg+1TdgRqYLDVCbVYUQXNz/HojihXMwmvCdokZBjAZoEDFkpU5+g==
+automation-events@^3.0.4:
+  version "3.0.7"
+  resolved "https://registry.yarnpkg.com/automation-events/-/automation-events-3.0.7.tgz#5c08b78a16b84bc5eca57fd78476df029c9a8af7"
+  integrity sha512-Vf6MlM59AB/JesRlfnvSyuOVznFFCVaygBwuKiXUYXHxuJ2kxFL3X2Ym3wgl5FQsRhAuj6DhTdvQDtNokkL7xQ==
   dependencies:
-    "@babel/runtime" "^7.9.2"
-    tslib "^1.11.1"
+    "@babel/runtime" "^7.13.9"
+    tslib "^2.1.0"
 
 aws-sign2@~0.7.0:
   version "0.7.0"
@@ -2224,13 +2224,13 @@ fast-json-stable-stringify@^2.0.0:
   resolved "https://registry.yarnpkg.com/fast-json-stable-stringify/-/fast-json-stable-stringify-2.0.0.tgz#d5142c0caee6b1189f87d3a76111064f86c8bbf2"
   integrity sha1-1RQsDK7msRifh9OnYREGT4bIu/I=
 
-fast-unique-numbers@^5.0.4:
-  version "5.0.4"
-  resolved "https://registry.yarnpkg.com/fast-unique-numbers/-/fast-unique-numbers-5.0.4.tgz#6e3f32bb98eac77952d5eb3cf549ff94e16d94f9"
-  integrity sha512-Gi36sEqEbVxkqEU9jq7Nq+2EUlvfjtPLndT4VboptP2uOyHTPSpABvrBlD0uvU2OzRn40YgGD7mIGYp4LTP68g==
+fast-unique-numbers@^5.0.23:
+  version "5.0.29"
+  resolved "https://registry.yarnpkg.com/fast-unique-numbers/-/fast-unique-numbers-5.0.29.tgz#a24177468520b3f5c285f38a6500a90709470be6"
+  integrity sha512-9nMvwT1c08QKcxlgAwA9oECN87xn9POlSynr9dYcOYi0LNbxc0Wz2O0swniMGSFMhubhL44kcUTVNNbXYdo/vA==
   dependencies:
-    "@babel/runtime" "^7.9.2"
-    tslib "^1.11.1"
+    "@babel/runtime" "^7.13.9"
+    tslib "^2.1.0"
 
 fd-slicer@~1.0.1:
   version "1.0.1"
@@ -5669,14 +5669,14 @@ ssri@^6.0.1:
   dependencies:
     figgy-pudding "^3.5.1"
 
-standardized-audio-context@^24.1.4:
-  version "24.1.5"
-  resolved "https://registry.yarnpkg.com/standardized-audio-context/-/standardized-audio-context-24.1.5.tgz#6ab8413200b6121fae94f56356b9d9a38716a164"
-  integrity sha512-um6Yvn2HWJJL0yiPzeDOy3i5wcahSp6U39oauhbssbfzr+dVXuDxAJfRhofhCrRpN3q+vDnDSjYjN5mJ7ANsog==
+standardized-audio-context@^25.1.9:
+  version "25.1.9"
+  resolved "https://registry.yarnpkg.com/standardized-audio-context/-/standardized-audio-context-25.1.9.tgz#110d3e8adc2b142b5e0553cdd0685f11bf62460b"
+  integrity sha512-mSbAJL/WrkLt/R41v3RSXeL33iVWo1HR9D8/7KKPrQipNBgNrHVpx+N/KkBA7RXwPS69wMi7zl+TRhkCHI7oMg==
   dependencies:
-    "@babel/runtime" "^7.9.2"
-    automation-events "^2.0.5"
-    tslib "^1.11.1"
+    "@babel/runtime" "^7.12.5"
+    automation-events "^3.0.4"
+    tslib "^2.1.0"
 
 static-extend@^0.1.1:
   version "0.1.2"
@@ -6129,15 +6129,15 @@ tslib@^1.10.0:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.10.0.tgz#c3c19f95973fb0a62973fb09d90d961ee43e5c8a"
   integrity sha512-qOebF53frne81cf0S9B41ByenJ3/IuH8yJKngAX35CmiZySA0khhkovshKK+jGCaMnVomla7gVlIcc3EvKPbTQ==
 
-tslib@^1.11.1:
-  version "1.11.1"
-  resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.11.1.tgz#eb15d128827fbee2841549e171f45ed338ac7e35"
-  integrity sha512-aZW88SY8kQbU7gpV19lN24LtXh/yD4ZZg6qieAJDDg+YBsJcSmLGK9QpnUjAKVG/xefmvJGd1WUmfpT/g6AJGA==
-
 tslib@^1.9.0:
   version "1.9.3"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.9.3.tgz#d7e4dd79245d85428c4d7e4822a79917954ca286"
   integrity sha512-4krF8scpejhaOgqzBEcGM7yDIEfi0/8+8zDRZhNZZ2kjmHJ4hv3zCbQWxoJGz1iw5U0Jl0nma13xzHXcncMavQ==
+
+tslib@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.1.0.tgz#da60860f1c2ecaa5703ab7d39bc05b6bf988b97a"
+  integrity sha512-hcVC3wYEziELGGmEEXue7D75zbwIIVUMWAVbHItGPx0ziyXxrOMQx4rQEVEV45Ut/1IotuEvwqPopzIOkDMf0A==
 
 "ttfinfo@https://github.com/rBurgett/ttfinfo.git":
   version "0.2.0"
@@ -6389,34 +6389,34 @@ watchpack@^1.6.0:
     graceful-fs "^4.1.2"
     neo-async "^2.5.0"
 
-web-audio-beat-detector-broker@^4.0.10:
-  version "4.0.10"
-  resolved "https://registry.yarnpkg.com/web-audio-beat-detector-broker/-/web-audio-beat-detector-broker-4.0.10.tgz#d328c29f8ceb39aed013919c07d53dd265a263ec"
-  integrity sha512-QlGa0WsEt7IiaYKKAbSQKzH7TXLWjQReCKc5gm3wNkUuPQPEZHGsThko+jSUwfEALiWHw+Rh84WBVmTRn8MYvw==
+web-audio-beat-detector-broker@^4.0.40:
+  version "4.0.40"
+  resolved "https://registry.yarnpkg.com/web-audio-beat-detector-broker/-/web-audio-beat-detector-broker-4.0.40.tgz#14432e68c59ab3d200264b20648553ad8af5c870"
+  integrity sha512-XwY4HZajcK8absKUjvzr1QwImvn+yP9jwKR7MZqjUS6TVdm6Pazs2Be+Yenin+lyH9eK3OIGmdCLHcv82Q61lA==
   dependencies:
-    "@babel/runtime" "^7.9.2"
-    fast-unique-numbers "^5.0.4"
-    standardized-audio-context "^24.1.4"
-    tslib "^1.11.1"
-    web-audio-beat-detector-worker "^5.0.4"
+    "@babel/runtime" "^7.12.13"
+    fast-unique-numbers "^5.0.23"
+    standardized-audio-context "^25.1.9"
+    tslib "^2.1.0"
+    web-audio-beat-detector-worker "^5.2.1"
 
-web-audio-beat-detector-worker@^5.0.4:
-  version "5.0.4"
-  resolved "https://registry.yarnpkg.com/web-audio-beat-detector-worker/-/web-audio-beat-detector-worker-5.0.4.tgz#366dae2395cc05a76d9f409465f1d49340b72451"
-  integrity sha512-Smm/3rSKJjZ3iKo6x/gkD0TkmxHU+0Utxibab5+gWH8z5jMQ1YAKCGoECjmZyFA/gdip7PD5h8bD2+d5m35pAw==
+web-audio-beat-detector-worker@^5.2.1:
+  version "5.2.1"
+  resolved "https://registry.yarnpkg.com/web-audio-beat-detector-worker/-/web-audio-beat-detector-worker-5.2.1.tgz#1f7ebd88d7c986bdeb9b892cbb3e778dbd6f31b4"
+  integrity sha512-ERCfsdV1S0HGZEwUSqgQKOX++8ye7ZhTfrXG8Mv1cf/0+DAhCNCc0SmLSLnM3rtRdIh/ra1W+SJlb8ublybrqA==
   dependencies:
-    "@babel/runtime" "^7.9.2"
-    tslib "^1.11.1"
+    "@babel/runtime" "^7.12.13"
+    tslib "^2.1.0"
 
-web-audio-beat-detector@^8.0.10:
-  version "8.0.10"
-  resolved "https://registry.yarnpkg.com/web-audio-beat-detector/-/web-audio-beat-detector-8.0.10.tgz#4c941200c6348a835eb71a6b20e00c7c7f5363fc"
-  integrity sha512-VNibW8op4oN1y/nC0yneJn8H5TwzmLwPfhVlgD+AiWIYj5A6uJxj1hsJGfWJmbRdteQJdzeGJwpXEEtcqEypFQ==
+web-audio-beat-detector@^8.1.1:
+  version "8.1.1"
+  resolved "https://registry.yarnpkg.com/web-audio-beat-detector/-/web-audio-beat-detector-8.1.1.tgz#b52b6ad8f6c08a2a9eacb585dfeb719278cf2b3f"
+  integrity sha512-4dS/7ZUvQOjUhtKWmfMYjwT+WZfxvsvPt7D3fksENWhMBsOolilvQb+WvC9WqfOy5DkW9qY9HFgKWW5n1VBkxA==
   dependencies:
-    "@babel/runtime" "^7.9.2"
-    tslib "^1.11.1"
-    web-audio-beat-detector-broker "^4.0.10"
-    web-audio-beat-detector-worker "^5.0.4"
+    "@babel/runtime" "^7.12.13"
+    tslib "^2.1.0"
+    web-audio-beat-detector-broker "^4.0.40"
+    web-audio-beat-detector-worker "^5.2.1"
 
 webpack-cli@^3.3.11:
   version "3.3.11"
