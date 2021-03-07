@@ -52,6 +52,7 @@ import AudioTextEffects from "./AudioTextEffects";
 import {areWeightsValid} from "../../data/utils";
 import Audio from "../../data/Audio";
 import CaptionScript from "../../data/CaptionScript";
+import SceneGrid from "../../data/SceneGrid";
 
 const drawerWidth = 240;
 
@@ -319,6 +320,7 @@ class SceneDetail extends React.Component {
   readonly props: {
     classes: any,
     allScenes: Array<Scene>,
+    allSceneGrids: Array<SceneGrid>,
     autoEdit: boolean,
     config: Config,
     library: Array<LibrarySource>,
@@ -545,6 +547,7 @@ class SceneDetail extends React.Component {
                   <Box p={2} className={classes.fill}>
                     <SceneOptions
                       allScenes={this.props.allScenes}
+                      allSceneGrids={this.props.allSceneGrids}
                       scene={this.props.scene}
                       tutorial={this.props.tutorial}
                       onUpdateScene={this.props.onUpdateScene.bind(this)} />
@@ -984,9 +987,22 @@ class SceneDetail extends React.Component {
     }
     if (this.props.scene.overlayEnabled) {
       for (let overlay of this.props.scene.overlays) {
-        const oScene = this.props.allScenes.find((s) => s.id == overlay.sceneID);
-        if (oScene && oScene.generatorWeights && oScene.regenerate && areWeightsValid(oScene)) {
-          this.props.onGenerate(oScene);
+        if (overlay.sceneID.toString().startsWith('999')) {
+          const id = overlay.sceneID.toString().replace('999', '');
+          const oScene = this.props.allSceneGrids.find((s) => s.id.toString() == id);
+          for (let row of oScene.grid) {
+            for (let sceneID of row) {
+              const gScene = this.props.allScenes.find((s) => s.id == sceneID);
+              if (gScene && gScene.generatorWeights && gScene.regenerate && areWeightsValid(gScene)) {
+                this.props.onGenerate(gScene);
+              }
+            }
+          }
+        } else {
+          const oScene = this.props.allScenes.find((s) => s.id == overlay.sceneID);
+          if (oScene && oScene.generatorWeights && oScene.regenerate && areWeightsValid(oScene)) {
+            this.props.onGenerate(oScene);
+          }
         }
       }
     }

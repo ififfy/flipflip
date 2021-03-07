@@ -45,6 +45,7 @@ import CodeMirror, {
   timestampRegex,
   tupleSetters
 } from "./CodeMirror";
+import SceneGrid from "../../data/SceneGrid";
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -214,6 +215,7 @@ class CaptionScriptor extends React.Component {
     config: Config,
     openScript: CaptionScript,
     scenes: Array<Scene>,
+    sceneGrids: Array<SceneGrid>,
     theme: Theme,
     tutorial: string,
     onAddFromLibrary(): void,
@@ -569,6 +571,7 @@ class CaptionScriptor extends React.Component {
                     gridView={!this.state.fullscreen}
                     captionScale={this.state.fullscreen ? 1 : 0.35}
                     scenes={this.props.scenes}
+                    sceneGrids={this.props.sceneGrids}
                     theme={this.props.theme}
                     getTags={this.props.getTags.bind(this)}
                     goBack={this.props.goBack.bind(this)}

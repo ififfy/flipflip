@@ -8,6 +8,7 @@ import {SceneSettings} from "../../data/Config";
 import Scene from "../../data/Scene";
 import ImageVideoCard from "../configGroups/ImageVideoCard";
 import SceneOptionCard from "../configGroups/SceneOptionCard";
+import SceneGrid from "../../data/SceneGrid";
 
 const styles = (theme: Theme) => createStyles({
   backdropTop: {
@@ -30,6 +31,7 @@ class SceneOptions extends React.Component {
   readonly props: {
     classes: any,
     allScenes: Array<Scene>,
+    allSceneGrids: Array<SceneGrid>,
     scene: Scene | SceneSettings,
     tutorial: string,
     isConfig: boolean,
@@ -56,6 +58,7 @@ class SceneOptions extends React.Component {
             <CardContent>
               <SceneOptionCard
                 allScenes={this.props.allScenes}
+                allSceneGrids={this.props.allSceneGrids}
                 scene={this.props.scene}
                 tutorial={this.props.tutorial}
                 onUpdateScene={this.props.onUpdateScene.bind(this)}/>

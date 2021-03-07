@@ -129,6 +129,7 @@ export default class Meta extends React.Component {
             <SceneDetail
               autoEdit={this.state.specialMode == SP.autoEdit}
               allScenes={this.state.scenes}
+              allSceneGrids={this.state.grids}
               config={this.state.config}
               library={this.state.library}
               scene={scene}
@@ -306,6 +307,7 @@ export default class Meta extends React.Component {
               config={this.state.config}
               scene={scene}
               scenes={this.state.scenes}
+              sceneGrids={this.state.grids}
               theme={theme}
               tutorial={this.state.tutorial}
               onUpdateScene={a(actions.updateScene)}
@@ -328,6 +330,7 @@ export default class Meta extends React.Component {
               config={this.state.config}
               scene={scene}
               scenes={this.state.scenes}
+              sceneGrids={this.state.grids}
               theme={theme}
               tutorial={this.state.tutorial}
               onUpdateScene={a(actions.updateScene)}
@@ -352,6 +355,7 @@ export default class Meta extends React.Component {
               config={this.state.config}
               grid={grid}
               scenes={this.state.scenes}
+              sceneGrids={this.state.grids}
               theme={theme}
               cache={a(actions.cacheImage)}
               getTags={actions.getTags.bind(this, this.state.library)}
@@ -365,6 +369,7 @@ export default class Meta extends React.Component {
             <ConfigForm
               config={this.state.config}
               scenes={this.state.scenes}
+              sceneGrids={this.state.grids}
               theme={this.state.theme}
               goBack={a(actions.goBack)}
               onBackup={appStorage.backup.bind(appStorage)}
@@ -382,6 +387,7 @@ export default class Meta extends React.Component {
             <CaptionScriptor
               config={this.state.config}
               scenes={this.state.scenes}
+              sceneGrids={this.state.grids}
               tutorial={this.state.tutorial}
               openScript={actions.getSelectScript(this.state)}
               theme={theme}

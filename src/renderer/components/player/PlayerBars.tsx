@@ -39,6 +39,7 @@ import VideoControl from "./VideoControl";
 import FadeIOCard from "../configGroups/FadeIOCard";
 import PanningCard from "../configGroups/PanningCard";
 import Audio from "../../data/Audio";
+import SceneGrid from "../../data/SceneGrid";
 
 const drawerWidth = 340;
 
@@ -222,17 +223,18 @@ class PlayerBars extends React.Component {
     hasStarted: boolean,
     historyPaths: Array<any>,
     historyOffset: number,
-    imagePlayerAdvanceHacks: Array<ChildCallbackHack>,
+    imagePlayerAdvanceHacks: Array<Array<ChildCallbackHack>>,
     imagePlayerDeleteHack: ChildCallbackHack,
     isEmpty: boolean,
     isPlaying: boolean,
     mainVideo: HTMLVideoElement,
-    overlayVideos: Array<HTMLVideoElement>,
+    overlayVideos: Array<Array<HTMLVideoElement>>,
     persistAudio: boolean,
     persistText: boolean,
     recentPictureGrid: boolean,
     scene: Scene,
     scenes: Array<Scene>,
+    sceneGrids: Array<SceneGrid>,
     title: string,
     tutorial: string,
     goBack(): void,
@@ -408,6 +410,7 @@ class PlayerBars extends React.Component {
                       <SceneOptionCard
                         sidebar
                         allScenes={this.props.scenes}
+                        allSceneGrids={this.props.sceneGrids}
                         isTagging={this.props.tags != null}
                         scene={this.props.scene}
                         onUpdateScene={this.props.onUpdateScene.bind(this)}/>
@@ -676,8 +679,12 @@ class PlayerBars extends React.Component {
     window.removeEventListener('keydown', this.onKeyDown);
   }
 
-  getScene(id: number): Scene {
-    return this.props.scenes.find((s) => s.id == id);
+  getScene(id: number): Scene | SceneGrid {
+    if (id.toString().startsWith('999')) {
+      return this.props.sceneGrids.find((s) => s.id.toString() == id.toString().replace('999',''));
+    } else {
+      return this.props.scenes.find((s) => s.id == id);
+    }
   }
 
   openLink(url: string) {
@@ -775,7 +782,7 @@ class PlayerBars extends React.Component {
   historyForward() {
     if (!this.state.drawerHover || document.activeElement.tagName.toLocaleLowerCase() != "input") {
       if (this.props.historyOffset >= 0) {
-        this.props.imagePlayerAdvanceHacks[0].fire();
+        this.props.imagePlayerAdvanceHacks[0][0].fire();
       } else {
         this.props.historyForward();
       }

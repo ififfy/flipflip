@@ -16,6 +16,7 @@ import Config from "../../data/Config";
 import Scene from "../../data/Scene";
 import Tag from "../../data/Tag";
 import Player from "./Player";
+import ChildCallbackHack from "./ChildCallbackHack";
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -58,7 +59,6 @@ const styles = (theme: Theme) => createStyles({
     flexGrow: 1,
     flexDirection: 'column',
     height: '100vh',
-    backgroundColor: theme.palette.background.default,
   },
   container: {
     height: '100%',
@@ -77,6 +77,9 @@ const styles = (theme: Theme) => createStyles({
   fill: {
     flexGrow: 1,
   },
+  hidden: {
+    opacity: 0,
+  }
 });
 
 class GridPlayer extends React.Component {
@@ -85,12 +88,16 @@ class GridPlayer extends React.Component {
     config: Config,
     grid: SceneGrid,
     scenes: Array<Scene>,
+    sceneGrids: Array<SceneGrid>,
     theme: Theme,
+    advanceHacks?: Array<ChildCallbackHack>,
+    hideBars?: boolean,
     cache(i: HTMLImageElement | HTMLVideoElement): void,
     getTags(source: string): Array<Tag>,
     goBack(): void,
     setCount(sourceURL: string, count: number, countComplete: boolean): void,
     systemMessage(message: string): void,
+    setVideo?(index: number, video: HTMLVideoElement): void,
   };
 
   readonly state = {
@@ -119,44 +126,48 @@ class GridPlayer extends React.Component {
 
     return(
       <div className={classes.root}>
-        <div
-          className={classes.hoverBar}
-          onMouseEnter={this.onMouseEnterAppBar.bind(this)}
-          onMouseLeave={this.onMouseLeaveAppBar.bind(this)}/>
+        {!this.props.hideBars && (
+          <React.Fragment>
+            <div
+              className={classes.hoverBar}
+              onMouseEnter={this.onMouseEnterAppBar.bind(this)}
+              onMouseLeave={this.onMouseLeaveAppBar.bind(this)}/>
 
-        <AppBar
-          position="absolute"
-          onMouseEnter={this.onMouseEnterAppBar.bind(this)}
-          onMouseLeave={this.onMouseLeaveAppBar.bind(this)}
-          className={clsx(classes.appBar, this.state.appBarHover && classes.appBarHover)}>
-          <Toolbar>
-            <Tooltip title="Back" placement="right-end">
-              <IconButton
-                edge="start"
-                color="inherit"
-                aria-label="Back"
-                onClick={this.props.goBack.bind(this)}>
-                <ArrowBackIcon />
-              </IconButton>
-            </Tooltip>
+            <AppBar
+              position="absolute"
+              onMouseEnter={this.onMouseEnterAppBar.bind(this)}
+              onMouseLeave={this.onMouseLeaveAppBar.bind(this)}
+              className={clsx(classes.appBar, this.state.appBarHover && classes.appBarHover)}>
+              <Toolbar>
+                <Tooltip title="Back" placement="right-end">
+                  <IconButton
+                    edge="start"
+                    color="inherit"
+                    aria-label="Back"
+                    onClick={this.props.goBack.bind(this)}>
+                    <ArrowBackIcon />
+                  </IconButton>
+                </Tooltip>
 
-            <div className={classes.fill}/>
-            <Typography component="h1" variant="h4" color="inherit" noWrap className={classes.title}>
-              {this.props.grid.name}
-            </Typography>
-            <div className={classes.fill}/>
+                <div className={classes.fill}/>
+                <Typography component="h1" variant="h4" color="inherit" noWrap className={classes.title}>
+                  {this.props.grid.name}
+                </Typography>
+                <div className={classes.fill}/>
 
-            <Tooltip title="Toggle Fullscreen">
-              <IconButton
-                edge="start"
-                color="inherit"
-                aria-label="FullScreen"
-                onClick={this.toggleFull.bind(this)}>
-                <FullscreenIcon fontSize="large"/>
-              </IconButton>
-            </Tooltip>
-          </Toolbar>
-        </AppBar>
+                <Tooltip title="Toggle Fullscreen">
+                  <IconButton
+                    edge="start"
+                    color="inherit"
+                    aria-label="FullScreen"
+                    onClick={this.toggleFull.bind(this)}>
+                    <FullscreenIcon fontSize="large"/>
+                  </IconButton>
+                </Tooltip>
+              </Toolbar>
+            </AppBar>
+          </React.Fragment>
+        )}
 
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
@@ -168,20 +179,23 @@ class GridPlayer extends React.Component {
                   {row.map((sceneID, colIndex) => {
                     const scene = this.props.scenes.find((s) => s.id == sceneID);
                     return (
-                      <div className={classes.gridCell} key={colIndex}>
+                      <div className={clsx(classes.gridCell, !scene && classes.hidden)} key={colIndex}>
                         {scene && (
                           <Player
                             preventSleep={rowIndex == 0 && colIndex == 0}
+                            advanceHack={this.props.advanceHacks ? this.props.advanceHacks[(rowIndex * row.length) + colIndex] : undefined}
                             config={this.props.config}
                             scene={scene}
                             gridView
                             scenes={this.props.scenes}
+                            sceneGrids={this.props.sceneGrids}
                             theme={this.props.theme}
                             tutorial={null}
                             cache={this.props.cache.bind(this)}
                             getTags={this.props.getTags.bind(this)}
                             goBack={this.props.goBack.bind(this)}
                             setCount={this.props.setCount.bind(this)}
+                            setVideo={this.props.setVideo ? this.props.setVideo.bind(this, (rowIndex * row.length) + colIndex) : undefined}
                             systemMessage={this.props.systemMessage.bind(this)}
                           />
                         )}

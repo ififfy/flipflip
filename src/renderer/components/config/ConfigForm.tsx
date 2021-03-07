@@ -25,6 +25,7 @@ import GeneralConfig from "./GeneralConfig";
 import SceneOptions from "../sceneDetail/SceneOptions";
 import SceneEffects from "../sceneDetail/SceneEffects";
 import {portablePath} from "../../data/utils";
+import SceneGrid from "../../data/SceneGrid";
 
 const drawerWidth = 240;
 
@@ -156,6 +157,7 @@ class ConfigForm extends React.Component {
     classes: any,
     config: Config,
     scenes: Array<Scene>,
+    sceneGrids: Array<SceneGrid>,
     theme: Theme,
     goBack(): void,
     onBackup(): void,
@@ -329,6 +331,7 @@ class ConfigForm extends React.Component {
                   <Box p={2} className={classes.fill}>
                     <SceneOptions
                       allScenes={this.props.scenes}
+                      allSceneGrids={this.props.sceneGrids}
                       scene={this.state.config.defaultScene}
                       isConfig
                       onUpdateScene={this.onUpdateDefaultScene.bind(this)} />

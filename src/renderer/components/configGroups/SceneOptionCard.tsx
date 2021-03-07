@@ -23,6 +23,7 @@ import ColorSetPicker from "../config/ColorSetPicker";
 import MultiSceneSelect from "./MultiSceneSelect";
 import {areWeightsValid} from "../../data/utils";
 import Audio from "../../data/Audio";
+import SceneGrid from "../../data/SceneGrid";
 
 const styles = (theme: Theme) => createStyles({
   fullWidth: {
@@ -89,6 +90,7 @@ class SceneOptionCard extends React.Component {
   readonly props: {
     classes: any,
     allScenes: Array<Scene>,
+    allSceneGrids: Array<SceneGrid>,
     scene: Scene | SceneSettings,
     sidebar: boolean,
     tutorial: string,
@@ -461,6 +463,7 @@ class SceneOptionCard extends React.Component {
                             <Typography className={classes.selectText} variant="caption">Overlay{regenerate ? invalid ? " ✗" : " ⟳" : ""}</Typography>
                             <SceneSelect
                               allScenes={this.props.allScenes}
+                              allSceneGrids={this.props.allSceneGrids}
                               value={o.sceneID}
                               getSceneName={this.getSceneName.bind(this)}
                               onChange={this.changeOverlayIntKey.bind(this, o.id, 'sceneID')}
@@ -532,16 +535,14 @@ class SceneOptionCard extends React.Component {
   getSceneName(id: string): string {
     if (id === "0") return "None";
     if (id === "-1") return "Random";
+    if (id.startsWith('999')) {
+      return this.props.allSceneGrids.find((s) => s.id.toString() == id.replace('999', '')).name;
+    }
     return this.props.allScenes.find((s) => s.id.toString() === id).name;
   }
 
   onOverlaySliderChange(id: number, key: string, e: MouseEvent, value: number) {
     this.changeOverlayKey(id, key, value);
-  }
-
-  onOverlayInput(id: number, key: string, e: MouseEvent) {
-    const input = (e.target as HTMLInputElement);
-    this.changeOverlayKey(id, key, input.value);
   }
 
   changeOverlayKey(id: number, key: string, value: any) {
