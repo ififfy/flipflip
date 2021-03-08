@@ -4,7 +4,7 @@ import * as CodeMirrorComp from 'react-codemirror2'
 import {getTimingFromString} from "../../data/utils";
 import ChildCallbackHack from "../player/ChildCallbackHack";
 
-const actions = ["blink", "cap", "bigcap", "count", "wait"];
+const actions = ["blink", "cap", "bigcap", "count", "wait", "playAudio"];
 export const tupleSetters = ["setBlinkDuration", "setBlinkDelay", "setBlinkGroupDelay", "setCaptionDuration", "setCaptionDelay",
   "setCountDuration", "setCountDelay", "setCountGroupDelay"];
 export const singleSetters = ["setBlinkWaveRate", "setBlinkBPMMulti", "setBlinkDelayWaveRate", "setBlinkDelayBPMMulti",
@@ -17,7 +17,7 @@ export const stringSetters = ["setBlinkTF", "setBlinkDelayTF", "setBlinkGroupDel
   "setCountTF", "setCountDelayTF", "setCountGroupDelayTF"];
 export const booleanSetters = ["setShowCountProgress", "setCountProgressOffset", "setCountColorMatch"];
 export const colorSetters = ["setCountProgressColor"]
-const storers = ["storephrase", "storePhrase"];
+const storers = ["storephrase", "storePhrase", "storeAudio"];
 const keywords = ["$RANDOM_PHRASE", "$TAG_PHRASE"];
 export const timestampRegex = /^((\d?\d:)?\d?\d:\d\d(\.\d\d?\d?)?|\d?\d(\.\d\d?\d?)?)$/;
 
@@ -103,7 +103,7 @@ export const timestampRegex = /^((\d?\d:)?\d?\d:\d\d(\.\d\d?\d?)?|\d?\d(\.\d\d?\
         }
       }
 
-      if (/[-\d]/.test(ch) && (command == "count" || command == "wait" ||
+      if (/[-\d]/.test(ch) && (command == "count" || command == "wait" || command == "playAudio" ||
         tupleSetters.includes(command) || singleSetters.includes(command)) || colorSetters.includes(command)) {
         // Number parameter
         stream.eatWhile(/\d/);

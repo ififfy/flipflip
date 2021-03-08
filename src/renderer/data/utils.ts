@@ -842,6 +842,7 @@ let captionProgramDefaults = {
   timestamps: Array<number>(),
   timestampFn: new Map<number, Array<Function>>(),
   timestampCounter: 0,
+  audios: new Array<{alias: string, file: string, playing: boolean, volume: number}>(),
   phrases: new Map<number, Array<string>>(),
 
   blinkDuration: [200, 500],

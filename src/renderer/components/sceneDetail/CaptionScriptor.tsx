@@ -465,6 +465,11 @@ class CaptionScriptor extends React.Component {
                               <Button className={classes.actionButton} onClick={this.onAddWait.bind(this)} variant="outlined">wait</Button>
                             </Tooltip>
                           </Grid>
+                          <Grid item>
+                            <Tooltip title={"Play audio <ALIAS> at volume <VOLUME>"}>
+                              <Button className={classes.actionButton} onClick={this.onAddPlayAudio.bind(this)} variant="outlined">playAudio</Button>
+                            </Tooltip>
+                          </Grid>
                         </Grid>
                       </Grid>
                       <Grid item xs={12} className={clsx(this.props.tutorial == CST.actions && classes.backdropTop)}>
@@ -511,6 +516,11 @@ class CaptionScriptor extends React.Component {
                         <Grid container spacing={1}>
                           <Grid item xs={12}>
                             <Typography variant={"h5"}>Special</Typography>
+                          </Grid>
+                          <Grid item>
+                            <Tooltip title={"Stores an audio file to be used with playAudio"}>
+                              <Button className={classes.storeButton} onClick={this.onAddStoreAudio.bind(this)} variant="outlined">storeAudio</Button>
+                            </Tooltip>
                           </Grid>
                           <Grid item>
                             <Tooltip title={"Stores a phrase to be used with $RANDOM_PHRASE"}>
@@ -984,6 +994,7 @@ class CaptionScriptor extends React.Component {
     for (let l = 0; l < clickedLine; l++) {
       const line = lines[l];
       if (line.trim().length == 0 || line[0] == '#' || line.toLowerCase().startsWith("storephrase ") ||
+        line.toLowerCase().startsWith("storeaudio ") ||
         timestampRegex.exec(line.split(" ")[0]) != null) lineNum--;
     }
     lineNum = Math.max(lineNum, 0);
@@ -1052,8 +1063,16 @@ class CaptionScriptor extends React.Component {
     this.onAddString("wait <MILLISECONDS>", true);
   }
 
+  onAddPlayAudio() {
+    this.onAddString("playAudio <ALIAS> <VOLUME>", true);
+  }
+
   onAddStorePhrase() {
     this.onAddString("storePhrase <TEXT>", true);
+  }
+
+  onAddStoreAudio() {
+    this.onAddString("storeAudio <PATH> <ALIAS>", true);
   }
 
   addAllSetters() {

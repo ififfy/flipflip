@@ -1,5 +1,7 @@
 import * as React from "react";
 import wretch from "wretch";
+import * as fs from "fs";
+import Sound from "react-sound";
 
 import captionProgramDefaults, {
   CancelablePromise,
@@ -114,6 +116,23 @@ export default class CaptionProgram extends React.Component {
         }}>
           <div ref={this.el}/>
         </div>
+        {this.state.audios.map((a) => {
+            return <Sound
+              key={a.alias}
+              url={a.file}
+              playStatus={a.playing
+                ? (Sound as any).status.PLAYING
+                : (Sound as any).status.PAUSED}
+              volume={a.volume}
+              onFinishedPlaying={() => {
+                const newAudios = Array.from(this.state.audios);
+                const audio = newAudios.find((au) => a.alias == au.alias);
+                audio.playing = false;
+                this.setState({audios: newAudios});
+              }}
+            />
+          }
+        )}
         {this.state.countProgress && (
           <div style={{
             zIndex: 6,
@@ -170,7 +189,8 @@ export default class CaptionProgram extends React.Component {
         state.countProgress !== this.state.countProgress ||
         state.countCurrent !== this.state.countCurrent ||
         state.countTotal !== this.state.countTotal ||
-        state.countColor !== this.state.countColor;
+        state.countColor !== this.state.countColor ||
+        state.audios !== this.state.audios;
   }
 
   _sceneCommand: Function = null;
@@ -192,6 +212,7 @@ export default class CaptionProgram extends React.Component {
     this.setState({
       ...captionProgramDefaults,
       phrases: new Map<number, Array<string>>(),
+      audios: new Array<{alias: string, file: string, playing: boolean, volume: number}>(),
       timestampFn: new Map<number, Array<Function>>(),
       countColors: new Map<number, string>(),
       countColor: "#FFFFFF",
@@ -203,6 +224,7 @@ export default class CaptionProgram extends React.Component {
 
   stop() {
     captionProgramDefaults.phrases = new Map<number, Array<string>>();
+    captionProgramDefaults.audios = new Array<{alias: string, file: string, playing: boolean, volume: number}>();
     captionProgramDefaults.timestampFn = new Map<number, Array<Function>>();
     this.setState({countProgress: false});
     if (this.el) {
@@ -362,6 +384,103 @@ export default class CaptionProgram extends React.Component {
             }
             newPhrases.set(0, newPhrases.get(0).concat([value]));
             this.setState({phrases: newPhrases});
+            break;
+          case "storeAudio":
+            if (value == null) {
+              error = "Error: {" + index + "} '" + line + "' - missing parameters";
+              break;
+            }
+            let audioSplit = value.split(' ');
+            if (audioSplit.length < 2) {
+              error = "Error: {" + index + "} '" + line + "' - missing parameter";
+              break;
+            }
+            let file: string, alias: string;
+            if (audioSplit[0].startsWith('\'')) {
+              file = audioSplit[0].substring(1);
+              for (let s = 1; s < audioSplit.length; s++) {
+                if (audioSplit[s].endsWith('\'')) {
+                  file += " " + audioSplit[s].substring(0, audioSplit[s].length - 1);
+                  if (s < audioSplit.length - 2) {
+                    error = "Error: {" + index + "} '" + line + "' - missing parameter";
+                  } else {
+                    alias = audioSplit[audioSplit.length - 1];
+                  }
+                  break;
+                } else if (s == audioSplit.length - 1) {
+                  error = "Error: {" + index + "} '" + line + "' - invalid command";
+                  break;
+                } else {
+                  file += " " + audioSplit[s];
+                }
+              }
+              if (error != null) break;
+              alias = audioSplit[audioSplit.length - 1];
+            } else if (audioSplit[0].startsWith('\"')) {
+              file = audioSplit[0].substring(1);
+              for (let s = 1; s < audioSplit.length; s++) {
+                if (audioSplit[s].endsWith('\"')) {
+                  file += " " + audioSplit[s].substring(0, audioSplit[s].length - 1);
+                  if (s < audioSplit.length - 2) {
+                    error = "Error: {" + index + "} '" + line + "' - missing parameter";
+                  } else {
+                    alias = audioSplit[audioSplit.length - 1];
+                  }
+                  break;
+                } else if (s == audioSplit.length - 1) {
+                  error = "Error: {" + index + "} '" + line + "' - invalid command";
+                  break;
+                } else {
+                  file += " " + audioSplit[s];
+                }
+              }
+              if (error != null) break;
+            } else {
+              file = audioSplit[0];
+              alias = audioSplit[1];
+            }
+            if (!file.startsWith("http") && !fs.existsSync(file)) {
+              error = "Error: {" + index + "} '" + line + "' - file does not exist";
+              break;
+            }
+            if (this.state.audios.find((a) => a.alias == alias) != null) {
+              error = "Error: {" + index + "} '" + line + "' - alias already used";
+              break;
+            }
+            this.setState({audios: this.state.audios.concat([{alias: alias, file: file, playing: false, volume: 100}])});
+            break;
+          case "playAudio":
+            if (value == null) {
+              error = "Error: {" + index + "} '" + line + "' - missing parameters";
+              break;
+            }
+            const pSplit = value.split(" ");
+            if (pSplit.length > 2) {
+              error = "Error: {" + index + "} '" + line + "' - extra parameter(s)";
+              break;
+            }
+            if (this.state.audios.find((a) => a.alias == pSplit[0]) == null) {
+              error = "Error: {" + index + "} '" + line + "' - no audio not stored for '" + value + "'";
+              break;
+            }
+            let volume = 100;
+            if (pSplit.length > 1) {
+              volume = parseInt(pSplit[1]);
+              if (/^\d+$/.exec(pSplit[1]) == null || volume < 0 || volume > 100) {
+                error = "Error: {" + index + "} '" + line + "' - invalid volume (0 - 100)";
+                break;
+              }
+            }
+            fn = (this as any)[command](pSplit[0], volume);
+            if (timestamp != null) {
+              if (newTimestamps.has(timestamp)) {
+                newTimestamps.get(timestamp).push(fn);
+              } else {
+                newTimestamps.set(timestamp, [fn]);
+              }
+            } else {
+              newProgram.push(fn);
+            }
             break;
           case "setBlinkDuration":
           case "setBlinkDelay":
@@ -1040,6 +1159,17 @@ export default class CaptionProgram extends React.Component {
       } else {
         command();
       }
+    }
+  }
+
+  playAudio(alias: string, volume: number) {
+    return (nextCommand: Function) => {
+      const newAudios = Array.from(this.state.audios);
+      const audio = newAudios.find((a) => a.alias == alias);
+      audio.playing = true;
+      audio.volume = volume;
+      this.setState({audios: newAudios});
+      nextCommand();
     }
   }
 
