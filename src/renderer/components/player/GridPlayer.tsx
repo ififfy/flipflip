@@ -73,6 +73,7 @@ const styles = (theme: Theme) => createStyles({
     height: '100%',
     width: '100%',
     display: 'grid',
+    overflow: 'hidden',
   },
   fill: {
     flexGrow: 1,
@@ -191,12 +192,14 @@ class GridPlayer extends React.Component {
                       newLoaded[rowIndex].push(false);
                       changed = true
                     }
-                    if (!scene && !newLoaded[rowIndex][colIndex]) {
-                      newLoaded[rowIndex][colIndex] = true;
-                      setTimeout(() => this.setState({isLoaded: newLoaded}), 200);
-                    } else if (changed) {
+                    if (changed) {
                       setTimeout(() => this.setState({isLoaded: newLoaded}), 200);
                     }
+                    if (!scene && !newLoaded[rowIndex][colIndex]) {
+                      setTimeout(() => this.setCellLoaded(rowIndex, colIndex), 200);
+                    }
+                    const loadingIndex = [].concat.apply([], newLoaded).indexOf(false);
+                    const showProgress = loadingIndex >= 0 && loadingIndex == (rowIndex * row.length) + colIndex;
                     return (
                       <div className={clsx(classes.gridCell, !scene && classes.hidden)} key={colIndex}>
                         {scene && (
@@ -216,7 +219,7 @@ class GridPlayer extends React.Component {
                             goBack={this.props.goBack.bind(this)}
                             onLoaded={this.setCellLoaded.bind(this, rowIndex, colIndex)}
                             setCount={this.props.setCount.bind(this)}
-                            setProgress={this.props.setProgress}
+                            setProgress={showProgress ? this.props.setProgress : this.nop}
                             setVideo={this.props.setVideo ? this.props.setVideo.bind(this, (rowIndex * row.length) + colIndex) : undefined}
                             systemMessage={this.props.systemMessage.bind(this)}
                           />
@@ -232,6 +235,8 @@ class GridPlayer extends React.Component {
       </div>
     );
   }
+
+  nop() {}
 
   setCellLoaded(rowIndex: number, colIndex: number) {
     const newLoaded = this.state.isLoaded;

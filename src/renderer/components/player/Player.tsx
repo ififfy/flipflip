@@ -719,9 +719,8 @@ export default class Player extends React.Component {
   setProgress(total: number, current: number, message: string[]) {
     if (this.props.setProgress) {
       this.props.setProgress(total, current, message);
-    } else {
-      this.setState({total: total, progress: current, progressMessage: message});
     }
+    this.setState({total: total, progress: current, progressMessage: message});
   }
 
   setMainCanStart() {
