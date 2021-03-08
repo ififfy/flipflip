@@ -337,7 +337,7 @@ class SceneDetail extends React.Component {
     onDelete(scene: Scene): void,
     onEditBlacklist(sourceURL: string, blacklist: string): void,
     onExport(scene: Scene): void,
-    onGenerate(scene: Scene): void,
+    onGenerate(scenes: Array<Scene>): void,
     onPlayScene(scene: Scene): void,
     onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void,
     onPlayAudio(source: Audio, displayed: Array<Audio>): void,
@@ -982,8 +982,9 @@ class SceneDetail extends React.Component {
     }
 
     // Regenerate scene(s) before playback
+    const generateScenes: Array<Scene> = []
     if (this.props.scene.regenerate && areWeightsValid(this.props.scene)) {
-      this.props.onGenerate(this.props.scene);
+      generateScenes.push(this.props.scene);
     }
     if (this.props.scene.overlayEnabled) {
       for (let overlay of this.props.scene.overlays) {
@@ -994,17 +995,20 @@ class SceneDetail extends React.Component {
             for (let sceneID of row) {
               const gScene = this.props.allScenes.find((s) => s.id == sceneID);
               if (gScene && gScene.generatorWeights && gScene.regenerate && areWeightsValid(gScene)) {
-                this.props.onGenerate(gScene);
+                generateScenes.push(gScene);
               }
             }
           }
         } else {
           const oScene = this.props.allScenes.find((s) => s.id == overlay.sceneID);
           if (oScene && oScene.generatorWeights && oScene.regenerate && areWeightsValid(oScene)) {
-            this.props.onGenerate(oScene);
+            generateScenes.push(oScene);
           }
         }
       }
+    }
+    if (generateScenes.length > 0) {
+      this.props.onGenerate(generateScenes);
     }
 
     this.props.onPlayScene(this.props.scene);
@@ -1021,8 +1025,8 @@ class SceneDetail extends React.Component {
   }
 
   onGenerate() {
-    this.props.onGenerate(this.props.scene);
-    setTimeout(this.generateCallback.bind(this), 250);
+    this.props.onGenerate([this.props.scene]);
+    this.generateCallback();
   }
 
   generateCallback() {

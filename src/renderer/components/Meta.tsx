@@ -145,7 +145,7 @@ export default class Meta extends React.Component {
               onDelete={a(actions.deleteScene)}
               onEditBlacklist={a(actions.editBlacklist)}
               onExport={a(actions.exportScene)}
-              onGenerate={a(actions.generateScene)}
+              onGenerate={a(actions.generateScenes)}
               onPlayScene={a(actions.playScene)}
               onPlay={a(actions.playSceneFromLibrary)}
               onPlayAudio={a(actions.playAudio)}
@@ -295,6 +295,7 @@ export default class Meta extends React.Component {
               tutorial={this.state.tutorial}
               goBack={a(actions.goBack)}
               onDelete={a(actions.deleteGrid)}
+              onGenerate={a(actions.generateScenes)}
               onPlayGrid={a(actions.playGrid)}
               onTutorial={a(actions.doneTutorial)}
               onUpdateGrid={a(actions.updateGrid)}

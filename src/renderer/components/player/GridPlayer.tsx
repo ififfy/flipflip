@@ -97,6 +97,8 @@ class GridPlayer extends React.Component {
     goBack(): void,
     setCount(sourceURL: string, count: number, countComplete: boolean): void,
     systemMessage(message: string): void,
+    finishedLoading?(empty: boolean): void,
+    setProgress?(total: number, current: number, message: string[]): void,
     setVideo?(index: number, video: HTMLVideoElement): void,
   };
 
@@ -106,6 +108,7 @@ class GridPlayer extends React.Component {
     this.props.grid.grid[0].length ? this.props.grid.grid.length : 1,
     width: this.props.grid.grid && this.props.grid.grid.length > 0 &&
     this.props.grid.grid[0].length > 0 ? this.props.grid.grid[0].length : 1,
+    isLoaded: new Array<Array<boolean>>(),
   };
 
   _appBarTimeout: any = null;
@@ -178,6 +181,22 @@ class GridPlayer extends React.Component {
                 <React.Fragment key={rowIndex}>
                   {row.map((sceneID, colIndex) => {
                     const scene = this.props.scenes.find((s) => s.id == sceneID);
+                    const newLoaded = this.state.isLoaded;
+                    let changed = false;
+                    while (newLoaded.length <= rowIndex) {
+                      newLoaded.push([]);
+                      changed = true
+                    }
+                    while (newLoaded[rowIndex].length <= colIndex) {
+                      newLoaded[rowIndex].push(false);
+                      changed = true
+                    }
+                    if (!scene && !newLoaded[rowIndex][colIndex]) {
+                      newLoaded[rowIndex][colIndex] = true;
+                      setTimeout(() => this.setState({isLoaded: newLoaded}), 200);
+                    } else if (changed) {
+                      setTimeout(() => this.setState({isLoaded: newLoaded}), 200);
+                    }
                     return (
                       <div className={clsx(classes.gridCell, !scene && classes.hidden)} key={colIndex}>
                         {scene && (
@@ -191,10 +210,13 @@ class GridPlayer extends React.Component {
                             sceneGrids={this.props.sceneGrids}
                             theme={this.props.theme}
                             tutorial={null}
+                            allLoaded={[].concat.apply([], this.state.isLoaded).find((l: boolean) => !l) == null}
                             cache={this.props.cache.bind(this)}
                             getTags={this.props.getTags.bind(this)}
                             goBack={this.props.goBack.bind(this)}
+                            onLoaded={this.setCellLoaded.bind(this, rowIndex, colIndex)}
                             setCount={this.props.setCount.bind(this)}
+                            setProgress={this.props.setProgress}
                             setVideo={this.props.setVideo ? this.props.setVideo.bind(this, (rowIndex * row.length) + colIndex) : undefined}
                             systemMessage={this.props.systemMessage.bind(this)}
                           />
@@ -209,6 +231,15 @@ class GridPlayer extends React.Component {
         </main>
       </div>
     );
+  }
+
+  setCellLoaded(rowIndex: number, colIndex: number) {
+    const newLoaded = this.state.isLoaded;
+    newLoaded[rowIndex][colIndex] = true;
+    if (this.props.finishedLoading && [].concat.apply([], newLoaded).find((l: boolean) => !l) == null) {
+      this.props.finishedLoading(false);
+    }
+    this.setState({isLoaded: newLoaded});
   }
 
   onMouseEnterAppBar() {

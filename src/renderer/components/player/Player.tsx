@@ -39,6 +39,7 @@ export default class Player extends React.Component {
     setCount(sourceURL: string, count: number, countComplete: boolean): void,
     systemMessage(message: string): void,
     preventSleep?: boolean,
+    allLoaded?: boolean,
     advanceHack?: ChildCallbackHack,
     allTags?: Array<Tag>,
     captionScale?: number,
@@ -56,6 +57,8 @@ export default class Player extends React.Component {
     toggleTag?(sourceID: number, tag: Tag): void,
     getCurrentTimestamp?(): number,
     onCaptionError?(e: string): void,
+    onLoaded?(): void,
+    setProgress?(total: number, current: number, message: string[]): void,
     setVideo?(video: HTMLVideoElement): void,
   };
 
@@ -475,11 +478,7 @@ export default class Player extends React.Component {
                     systemMessage={this.props.systemMessage.bind(this)}
                   />
                 );
-              } else if (overlayGrid) {
-                if (!this.state.areOverlaysLoaded[index]) {
-                  // TODO Properly detect when whole grid has loaded
-                  setTimeout(() => this.setOverlayLoaded(index, true), 200);
-                }
+              } else if (overlayGrid && !this.props.gridView) {
                 const gridSize = overlayGrid.grid[0].length * overlayGrid.grid.length;
                 let advanceHacks = this.state.imagePlayerAdvanceHacks;
                 let changed = false;
@@ -513,9 +512,11 @@ export default class Player extends React.Component {
                       sceneGrids={this.props.sceneGrids}
                       theme={this.props.theme}
                       cache={this.props.cache}
+                      finishedLoading={this.setOverlayLoaded.bind(this, index)}
                       getTags={this.props.getTags}
                       goBack={this.props.goBack}
                       setCount={this.props.setCount}
+                      setProgress={showProgress ? this.setProgress.bind(this) : undefined}
                       setVideo={this.setGridOverlayVideo.bind(this, index)}
                       systemMessage={this.props.systemMessage}
                     />
@@ -600,6 +601,9 @@ export default class Player extends React.Component {
         })
       }
     }
+    if (this.props.allLoaded == true && props.allLoaded == false) {
+      this.start(true);
+    }
   }
 
   componentDidMount() {
@@ -664,6 +668,7 @@ export default class Player extends React.Component {
     return this.props.scene !== props.scene ||
       this.props.tags !== props.tags ||
       this.props.gridView !== props.gridView ||
+      this.props.allLoaded !== props.allLoaded ||
       this.state.canStart !== state.canStart ||
       this.state.hasStarted !== state.hasStarted ||
       this.state.isMainLoaded !== state.isMainLoaded ||
@@ -712,7 +717,11 @@ export default class Player extends React.Component {
   }
 
   setProgress(total: number, current: number, message: string[]) {
-    this.setState({total: total, progress: current, progressMessage: message});
+    if (this.props.setProgress) {
+      this.props.setProgress(total, current, message);
+    } else {
+      this.setState({total: total, progress: current, progressMessage: message});
+    }
   }
 
   setMainCanStart() {
@@ -774,7 +783,10 @@ export default class Player extends React.Component {
 
   start(canStart: boolean, force = false) {
     const isLoaded = !force && (this.state.isMainLoaded && (!this.props.scene.overlayEnabled || this.props.scene.overlays.length == 0 || this.state.areOverlaysLoaded.find((b) => !b) == null));
-    if (force || (canStart && (isLoaded || this.props.config.displaySettings.startImmediately))) {
+    if (this.props.onLoaded && isLoaded) {
+      this.props.onLoaded();
+    }
+    if (force || (canStart && ((isLoaded && (this.props.allLoaded == undefined || this.props.allLoaded)) || this.props.config.displaySettings.startImmediately))) {
       this.setState({hasStarted: true, isLoaded: true, startTime: this.state.startTime ?  this.state.startTime : new Date()});
     } else {
       this.setState({isLoaded: isLoaded});
