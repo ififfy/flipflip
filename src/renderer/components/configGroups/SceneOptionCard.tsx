@@ -112,6 +112,11 @@ class SceneOptionCard extends React.Component {
     const timingConstant = typeof this.props.scene.timingConstant === 'number' ? this.props.scene.timingConstant : 0;
     const timingMin = typeof this.props.scene.timingMin === 'number' ? this.props.scene.timingMin : 0;
     const timingMax = typeof this.props.scene.timingMax === 'number' ? this.props.scene.timingMax : 0;
+    const backForthSinRate = typeof this.props.scene.backForthSinRate === 'number' ? this.props.scene.backForthSinRate : 0;
+    const backForthBPMMulti = typeof this.props.scene.backForthBPMMulti === 'number' ? this.props.scene.backForthBPMMulti : 0;
+    const backForthConstant = typeof this.props.scene.backForthConstant === 'number' ? this.props.scene.backForthConstant : 0;
+    const backForthMin = typeof this.props.scene.backForthMin === 'number' ? this.props.scene.backForthMin : 0;
+    const backForthMax = typeof this.props.scene.backForthMax === 'number' ? this.props.scene.backForthMax : 0;
     const backgroundBlur = typeof this.props.scene.backgroundBlur === 'number' ? this.props.scene.backgroundBlur : 0;
     const nextSceneTime = typeof this.props.scene.nextSceneTime === 'number' ? this.props.scene.nextSceneTime : 0;
 
@@ -232,6 +237,148 @@ class SceneOptionCard extends React.Component {
                   value={timingMax}
                   onChange={this.onIntInput.bind(this, 'timingMax')}
                   onBlur={this.blurIntKey.bind(this, 'timingMax')}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+                  }}
+                  inputProps={{
+                    step: 100,
+                    min: 0,
+                    type: 'number',
+                  }}/>
+              </Grid>
+            </Grid>
+          </Collapse>
+        </Grid>
+        <Grid item xs={12}>
+          <Divider/>
+        </Grid>
+        <Grid item xs={12} className={clsx(this.props.tutorial == SDT.timing && classes.highlight)}>
+          <Grid container alignItems="center">
+            <Grid item xs={12}>
+              <Tooltip title="Go back and forth between the last two images">
+                <FormControlLabel
+                  control={
+                    <Switch checked={this.props.scene.backForth}
+                            onChange={this.onBoolInput.bind(this, 'backForth')}/>
+                  }
+                  label="Back/Forth"/>
+              </Tooltip>
+            </Grid>
+          </Grid>
+          <Collapse in={this.props.scene.backForth}>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} style={{paddingTop: 10}}>
+                <FormControl className={classes.fullWidth}>
+                  <InputLabel>Back/Forth Timing</InputLabel>
+                  <Select
+                    value={this.props.scene.backForthTF}
+                    onChange={this.onInput.bind(this, 'backForthTF')}>
+                    {[TF.constant, TF.random, TF.sin, TF.bpm].map((tf) => {
+                      if (tf == TF.bpm) {
+                        return <MenuItem key={tf} value={tf}>
+                          {en.get(tf)} {!hasBPM && <Tooltip title={"Missing audio with BPM"}><ErrorOutlineIcon color={'error'} className={classes.noBPM}/></Tooltip>}
+                        </MenuItem>
+                      } else {
+                        return <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
+                      }
+                    })}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 8}>
+                <Collapse in={this.props.scene.backForthTF == TF.sin} className={classes.fullWidth}>
+                  <Typography id="bf-sin-rate-slider" variant="caption" component="div" color="textSecondary">
+                    Wave Rate
+                  </Typography>
+                  <Grid container alignItems="center">
+                    <Grid item xs>
+                      <Slider
+                        ref={this.sinInputRef}
+                        min={1}
+                        defaultValue={backForthSinRate}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'backForthSinRate')}
+                        valueLabelDisplay={'auto'}
+                        aria-labelledby="bf-sin-rate-slider"/>
+                    </Grid>
+                    <Grid item xs={3} className={classes.percentInput}>
+                      <TextField
+                        value={backForthSinRate}
+                        onChange={this.onIntInput.bind(this, 'backForthSinRate')}
+                        onBlur={this.blurIntKey.bind(this, 'backForthSinRate')}
+                        inputProps={{
+                          className: classes.endInput,
+                          step: 5,
+                          min: 0,
+                          max: 100,
+                          type: 'number',
+                          'aria-labelledby': 'bf-sin-rate-slider',
+                        }}/>
+                    </Grid>
+                  </Grid>
+                </Collapse>
+                <Collapse in={this.props.scene.backForthTF == TF.bpm} className={classes.fullWidth}>
+                  <Typography id="bf-bpm-multi-slider" variant="caption" component="div" color="textSecondary">
+                    BPM Multiplier {this.props.scene.backForthBPMMulti / 10}x
+                  </Typography>
+                  <Slider
+                    min={1}
+                    max={100}
+                    defaultValue={backForthBPMMulti}
+                    onChangeCommitted={this.onSliderChange.bind(this, 'backForthBPMMulti')}
+                    valueLabelDisplay={'auto'}
+                    valueLabelFormat={(v) => (v / 10) + "x"}
+                    aria-labelledby="bf-bpm-multi-slider"/>
+                </Collapse>
+                <Collapse in={this.props.scene.backForthTF == TF.constant} className={classes.fullWidth}>
+                  <TextField
+                    variant="outlined"
+                    label="Every"
+                    margin="dense"
+                    value={backForthConstant}
+                    onChange={this.onIntInput.bind(this, 'backForthConstant')}
+                    onBlur={this.blurIntKey.bind(this, 'backForthConstant')}
+                    InputProps={{
+                      endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+                    }}
+                    inputProps={{
+                      step: 100,
+                      min: 0,
+                      type: 'number',
+                    }}/>
+                </Collapse>
+              </Grid>
+            </Grid>
+          </Collapse>
+        </Grid>
+        <Grid item xs={12} className={clsx(!(this.props.scene.backForth && (this.props.scene.backForthTF == TF.random || this.props.scene.backForthTF == TF.sin)) && classes.noPadding)}>
+          <Collapse in={this.props.scene.backForth && (this.props.scene.backForthTF == TF.random || this.props.scene.backForthTF == TF.sin)}
+                    className={classes.fullWidth}>
+            <Grid container alignItems="center">
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                <TextField
+                  variant="outlined"
+                  label="Between"
+                  margin="dense"
+                  value={backForthMin}
+                  onChange={this.onIntInput.bind(this, 'backForthMin')}
+                  onBlur={this.blurIntKey.bind(this, 'backForthMin')}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+                  }}
+                  inputProps={{
+                    step: 100,
+                    min: 0,
+                    type: 'number',
+                  }}/>
+              </Grid>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                <TextField
+                  variant="outlined"
+                  label="and"
+                  margin="dense"
+                  value={backForthMax}
+                  onChange={this.onIntInput.bind(this, 'backForthMax')}
+                  onBlur={this.blurIntKey.bind(this, 'backForthMax')}
                   InputProps={{
                     endAdornment: <InputAdornment position="end">ms</InputAdornment>,
                   }}

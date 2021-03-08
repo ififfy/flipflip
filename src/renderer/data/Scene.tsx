@@ -18,6 +18,13 @@ export default class Scene {
   timingMax = 1200;
   timingSinRate = 100;
   timingBPMMulti = 10;
+  backForth = false;
+  backForthTF = TF.constant;
+  backForthConstant = 1000;
+  backForthMin = 200;
+  backForthMax = 1200;
+  backForthSinRate = 100;
+  backForthBPMMulti = 10;
   weightFunction = WF.sources;
   sourceOrderFunction = SOF.random;
   orderFunction = OF.random;

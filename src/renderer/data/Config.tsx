@@ -13,6 +13,13 @@ interface SceneSettingsI {
   timingMax: number;
   timingSinRate: number;
   timingBPMMulti: number;
+  backForth: boolean;
+  backForthTF: string;
+  backForthConstant: number;
+  backForthMin: number;
+  backForthMax: number;
+  backForthSinRate: number;
+  backForthBPMMulti: number;
   imageTypeFilter: string;
   weightFunction: string;
   sourceOrderFunction: string;
@@ -269,6 +276,13 @@ export class SceneSettings implements SceneSettingsI {
   timingMax = 1200;
   timingSinRate = 100;
   timingBPMMulti = 10;
+  backForth = false;
+  backForthTF = TF.constant;
+  backForthConstant = 1000;
+  backForthMin = 200;
+  backForthMax = 1200;
+  backForthSinRate = 100;
+  backForthBPMMulti = 10;
   imageTypeFilter = IF.any;
   weightFunction = WF.sources;
   sourceOrderFunction = SOF.random;
