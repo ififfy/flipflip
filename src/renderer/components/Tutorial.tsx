@@ -486,7 +486,10 @@ class Tutorial extends React.Component {
             <DialogTitle id="tutorial-title">Next Scene</DialogTitle>
             <DialogContent>
               <DialogContentText id="tutorial-description">
-                You can <b>link scenes together</b>! Just choose the <b>next scene</b> to play and <b>how many <u>seconds</u></b> it should start after. You can also choose to start the next scene after all images in this scene have been shown.
+                You can <b>link scenes together</b>! Just choose the <b>next scene</b> to play and <b>how many <u>seconds</u></b> it
+                should start after. You can also choose to start the next scene after all images in this scene have
+                been shown or after a particular audio track/caption script have finished. This section will also
+                allow you to persist this Scene's audio/text effects even after transitioning to the Next Scene.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 <i>We'll leave this disabled for this tutorial</i>

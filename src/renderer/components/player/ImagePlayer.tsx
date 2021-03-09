@@ -215,7 +215,7 @@ export default class ImagePlayer extends React.Component {
     if (this.props.scene.backForth && this._backForth == null && this.props.isPlaying && this.props.hasStarted) {
       clearTimeout(this._backForth);
       this._backForth = null;
-      setTimeout(() => this.advance(true, true), 200);
+      setTimeout(() => this.advance(true, false), 200);
       this._backForth = setTimeout(this.backForth.bind(this, -1), this.getBackForthTiming());
     }
 

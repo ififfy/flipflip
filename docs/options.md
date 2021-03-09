@@ -19,7 +19,14 @@ or based on **audio BPM**.
 <img src="doc_images/timing_ex.gif" alt="Timing Example">
 
 _An example of **Wave** timing_
-  
+
+#### Back/Forth
+The back/forth feature automatically toggles between the 2 most recent images in a Scene at a set interval. 
+
+<img src="doc_images/backforth_ex.gif" alt="Back Forth Example" style="width: 483px">
+
+_An example of **Back/Forth** every 200ms_
+
 #### Image Sizing
 This setting controls the aspect ratio and size of the displayed image:
 * **Fit Best (No Clipping)**
@@ -39,14 +46,17 @@ This setting controls the background for this Scene:
 * **None**
 
 #### Next Scene
-Choose a Scene to transition to after this one (or none). Control the timing of the Next Scene (sec) and if the Next 
-Scene should play after all images from the current Scene have played.
+Choose a Scene to transition to after this one (or none). Control the timing of the Next Scene (sec)
+
+* **Play After All Images** - Instead of using a fixed time, transition to the Next Scene after all images in this 
+  scene have played
+  * You can also choose to move to the next scene after an audio clip has ended or after a captioning script has completed.
+    You will find these options in the audio and text options, respectively.
+* **Persist Audio** - Persist the Audio tracks of this scene through all subsequent Next Scenes
+* **Persist Text Overlay** - Persist the Text Overlay scripts of this scene through all subsequent Next Scenes
 
 Rather than picking a single scene, you can select "Random". Click <img style="vertical-align: -5px" src="doc_icons/list.svg" alt="List" width="20" height="20">
 to select the scenes you'd like to be randomly picked from.
-
-You can also choose to move to the next scene after an audio clip has ended or after a captioning script has completed.
-You will find these options in the audio and text settings, respectively.
 
 ?> The "Next Scene" will pre-load in the background and start when a configured end condition is met (time, images, audio, text). 
 Scene options, effects, audio/text, etc. will also change as configured.
@@ -54,8 +64,7 @@ Scene options, effects, audio/text, etc. will also change as configured.
 #### Overlay
 Add Scene(s) to overlay over this one (or none). Control each overlay opacity.
 
-?> There is no limit to the number of scenes you can use with grid/overlay, 
-but you may experience poor performance if you use too many.
+?> There is no limit to the number of scenes you can overlay, but you may experience poor performance if you use too many.
 
 ## Image Options
 

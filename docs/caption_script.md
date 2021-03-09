@@ -221,6 +221,19 @@ Where `TIMESTAMP` is in one of these format:
 ?> **Setters need timestamps** as well to be used in the script. For this reason, we recommend you **separate 
 timestamp and non-timestamp scripts**, as using both in the same file can have unexpected effects.
 
+## Audio
+
+You can make audio tracks play during your script by first storing them, and then calling `playAudio <ALIAS> <VOLUME>`. 
+The audio track will start at the beginning and play until the end. 
+
+```
+# storeAudio <FILE> <ALIAS>
+storeAudio "C:\audio\finger_snap.wav" snap
+
+<other caption syntax>
+# playAudio <ALIAS> <VOLUME: Default 100>
+playAudio snap 25
+```
 
 ## Random phrases
 
