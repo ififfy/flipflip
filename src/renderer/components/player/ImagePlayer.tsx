@@ -53,9 +53,11 @@ export default class ImagePlayer extends React.Component {
     timeoutID: 0,
     nextImageID: 0,
     hideCursor: false,
+    historyOffset: 0,
   };
 
   readonly idleTimerRef: React.RefObject<HTMLDivElement> = React.createRef();
+  _backForth: NodeJS.Timeout = null;
   _isMounted: boolean;
   _isLooping: boolean;
   _loadedSources: Array<string>;
@@ -74,7 +76,7 @@ export default class ImagePlayer extends React.Component {
   _animationFrameHandle: number;
 
   render() {
-    let offset = this.props.historyOffset;
+    let offset = this.getHistoryOffset();
     if (offset <= -this.state.historyPaths.length) {
       offset = -this.state.historyPaths.length + 1;
     }
@@ -122,6 +124,10 @@ export default class ImagePlayer extends React.Component {
 
   nop() {}
 
+  getHistoryOffset() {
+    return this.props.historyOffset + this.state.historyOffset;
+  }
+
   componentDidMount() {
     this._runFetchLoopCallRequests = [];
     this._isMounted = true;
@@ -152,6 +158,18 @@ export default class ImagePlayer extends React.Component {
   }
 
   componentWillUnmount() {
+    clearTimeout(this._backForth);
+    clearTimeout(this._timeout);
+    for (let timeout of this._waitTimeouts) {
+      clearTimeout(timeout);
+    }
+    for (let timeout of this._imgLoadTimeouts) {
+      clearTimeout(timeout);
+    }
+    this._backForth = null;
+    this._timeout = null;
+    this._waitTimeouts = null;
+    this._imgLoadTimeouts= null;
     this._isMounted = null;
     this._isLooping = null;
     this._loadedSources = null;
@@ -163,15 +181,6 @@ export default class ImagePlayer extends React.Component {
     this._count = null;
     this._nextSourceIndex = null;
     this._toggleStrobe = null;
-    clearTimeout(this._timeout);
-    for (let timeout of this._waitTimeouts) {
-      clearTimeout(timeout);
-    }
-    for (let timeout of this._imgLoadTimeouts) {
-      clearTimeout(timeout);
-    }
-    this._timeout = null;
-    this._waitTimeouts = null;
     this.props.advanceHack.listener = null;
     if (this.props.deleteHack) {
       this.props.deleteHack.listener = null;
@@ -186,6 +195,7 @@ export default class ImagePlayer extends React.Component {
             props.hasStarted !== this.props.hasStarted ||
             props.allURLs !== this.props.allURLs ||
             props.historyOffset !== this.props.historyOffset ||
+            state.historyOffset !== this.state.historyOffset ||
             props.gridView !== this.props.gridView ||
             props.strobeLayer !== this.props.strobeLayer);
   }
@@ -202,11 +212,56 @@ export default class ImagePlayer extends React.Component {
     if (this.props.scene.orderFunction !== props.scene.orderFunction || this.props.scene.sourceOrderFunction !== props.scene.sourceOrderFunction) {
       this.setState({readyToDisplay: []});
     }
+    if (this.props.scene.backForth && this._backForth == null && this.props.isPlaying && this.props.hasStarted) {
+      clearTimeout(this._backForth);
+      this._backForth = null;
+      setTimeout(() => this.advance(true, true), 200);
+      this._backForth = setTimeout(this.backForth.bind(this, -1), this.getBackForthTiming());
+    }
 
     if (this._count % this.props.config.displaySettings.maxInMemory == 0) {
       //printMemoryReport();
       webFrame.clearCache();
       //setTimeout(printMemoryReport, 1000);
+    }
+  }
+
+  getBackForthTiming(): number {
+    let delay;
+    switch (this.props.scene.backForthTF) {
+      case TF.constant:
+        delay = this.props.scene.backForthConstant;
+        break;
+      case TF.random:
+        delay = Math.floor(Math.random() * (this.props.scene.backForthMax - this.props.scene.backForthMin + 1)) + this.props.scene.backForthMin;
+        break;
+      case TF.sin:
+        const sinRate = (Math.abs(this.props.scene.backForthSinRate - 100) + 2) * 1000;
+        delay = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (this.props.scene.backForthMax - this.props.scene.backForthMin + 1)) + this.props.scene.backForthMin;
+        break;
+      case TF.bpm:
+        const bpmMulti = this.props.scene.strobeDelayBPMMulti / 10;
+        const bpm = this.props.currentAudio ? this.props.currentAudio.bpm : 60;
+        delay = 60000 / (bpm * bpmMulti);
+        // If we cannot parse this, default to 1s
+        if (!delay) {
+          delay = 1000;
+        }
+        break;
+    }
+    return delay;
+  }
+
+  backForth(newOffset: number) {
+    if (this.props.isPlaying && this._isMounted) {
+      this.setState({historyOffset: newOffset});
+      this._backForth = setTimeout(this.backForth.bind(this, newOffset == 0 ? -1 : 0), this.getBackForthTiming());
+    } else {
+      if (this._isMounted && this.state.historyOffset != 0) {
+        this.setState({historyOffset: 0});
+      }
+      clearTimeout(this._backForth);
+      this._backForth = null;
     }
   }
 
@@ -219,7 +274,7 @@ export default class ImagePlayer extends React.Component {
   }
 
   delete() {
-    const img = this.state.historyPaths[(this.state.historyPaths.length - 1) + this.props.historyOffset];
+    const img = this.state.historyPaths[(this.state.historyPaths.length - 1) + this.getHistoryOffset()];
     const url = img.src;
     let newHistoryPaths = [];
     let newHistoryOffset = this.props.historyOffset;

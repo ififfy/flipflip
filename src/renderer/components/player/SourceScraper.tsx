@@ -1618,7 +1618,6 @@ export default class SourceScraper extends React.Component {
     restart: false,
     preload: false,
     videoVolume: this.props.scene.videoVolume,
-    historyOffset: 0,
   };
 
   _backForth: NodeJS.Timeout = null;
@@ -1637,7 +1636,7 @@ export default class SourceScraper extends React.Component {
             isOverlay={this.props.isOverlay}
             isPlaying={this.props.isPlaying}
             gridView={this.props.gridView}
-            historyOffset={this.props.historyOffset + this.state.historyOffset}
+            historyOffset={this.props.historyOffset}
             setHistoryOffset={this.props.setHistoryOffset}
             setHistoryPaths={this.props.setHistoryPaths}
             maxInMemory={this.props.config.displaySettings.maxInMemory}
@@ -1654,44 +1653,6 @@ export default class SourceScraper extends React.Component {
             setTimeToNextFrame={this.props.setTimeToNextFrame}/>)}
       </div>
     );
-  }
-
-  getBackForthTiming(): number {
-    let delay;
-    switch (this.props.scene.backForthTF) {
-      case TF.constant:
-        delay = this.props.scene.backForthConstant;
-        break;
-      case TF.random:
-        delay = Math.floor(Math.random() * (this.props.scene.backForthMax - this.props.scene.backForthMin + 1)) + this.props.scene.backForthMin;
-        break;
-      case TF.sin:
-        const sinRate = (Math.abs(this.props.scene.backForthSinRate - 100) + 2) * 1000;
-        delay = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (this.props.scene.backForthMax - this.props.scene.backForthMin + 1)) + this.props.scene.backForthMin;
-        break;
-      case TF.bpm:
-        const bpmMulti = this.props.scene.strobeDelayBPMMulti / 10;
-        const bpm = this.props.currentAudio ? this.props.currentAudio.bpm : 60;
-        delay = 60000 / (bpm * bpmMulti);
-        // If we cannot parse this, default to 1s
-        if (!delay) {
-          delay = 1000;
-        }
-        break;
-    }
-    return delay;
-  }
-
-  backForth(newOffset: number) {
-    if (this.props.isPlaying) {
-      this.setState({historyOffset: newOffset});
-      this._backForth = setTimeout(this.backForth.bind(this, newOffset == 0 ? -1 : 0), this.getBackForthTiming());
-    } else {
-      if (this.state.historyOffset != 0) {
-        this.setState({historyOffset: 0});
-      }
-      clearTimeout(this._backForth);
-    }
   }
 
   componentDidMount(restart = false) {
@@ -1935,7 +1896,6 @@ export default class SourceScraper extends React.Component {
       (props.nextScene && this.props.nextScene &&
       props.nextScene.id !== this.props.nextScene.id) ||
       props.historyOffset !== this.props.historyOffset ||
-      state.historyOffset !== this.state.historyOffset ||
       props.isPlaying !== this.props.isPlaying ||
       props.opacity !== this.props.opacity ||
       props.strobeLayer !== this.props.strobeLayer ||
@@ -1950,18 +1910,9 @@ export default class SourceScraper extends React.Component {
     if (this.props.scene.videoVolume !== this.state.videoVolume) {
       this.setState({videoVolume: this.props.scene.videoVolume});
     }
-    if (this.props.scene.backForth && ((this.props.isPlaying && !props.isPlaying) ||
-        (this.props.hasStarted && !props.hasStarted))) {
-      this._backForth = setTimeout(this.backForth.bind(this, -1), this.getBackForthTiming());
-    }
     if (props.scene.id !== this.props.scene.id) {
       state.nextPromise.cancel();
       state.promise.cancel();
-      clearTimeout(this._backForth);
-      this.setState({historyOffset: 0});
-      if (this.props.scene.backForth) {
-        this._backForth = setTimeout(this.backForth.bind(this, -1), this.getBackForthTiming());
-      }
       if (props.nextScene != null && this.props.scene.id === props.nextScene.id) { // If the next scene has been played
         if (this.props.nextScene && this.props.nextScene.id === props.scene.id) { // Just swap values if we're coming back to this scene again
           const newAllURLs = this._nextAllURLs;

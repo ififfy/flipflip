@@ -680,6 +680,7 @@ class PlayerBars extends React.Component {
   }
 
   getScene(id: number): Scene | SceneGrid {
+    if (id == null) return null;
     if (id.toString().startsWith('999')) {
       return this.props.sceneGrids.find((s) => s.id.toString() == id.toString().replace('999',''));
     } else {
