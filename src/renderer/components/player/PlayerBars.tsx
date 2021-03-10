@@ -379,7 +379,7 @@ class PlayerBars extends React.Component {
               {!this.props.scene.audioScene && (
                 <React.Fragment>
                   {this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.images && (
-                    <Accordion TransitionProps={{ unmountOnExit: true }}>
+                    <Accordion TransitionProps={{ unmountOnExit: false }}>
                       <AccordionSummary
                         expandIcon={<ExpandMoreIcon />}
                       >
@@ -662,6 +662,9 @@ class PlayerBars extends React.Component {
 
     window.addEventListener('contextmenu', this.showContextMenu, false);
     window.addEventListener('keydown', this.onKeyDown, false);
+    if (this.props.tags == null) {
+      window.addEventListener('wheel', this.onScroll, false);
+    }
     this.buildMenu();
   }
 
@@ -677,6 +680,24 @@ class PlayerBars extends React.Component {
     createMainMenu(Menu, createMenuTemplate(app));
     window.removeEventListener('contextmenu', this.showContextMenu);
     window.removeEventListener('keydown', this.onKeyDown);
+    if (this.props.tags == null) {
+      window.removeEventListener('wheel', this.onScroll);
+    }
+  }
+
+  onScroll = (e: WheelEvent) => {
+    if (this.props.recentPictureGrid || !this.props.onUpdateScene || this.state.drawerHover) return;
+    const volumeChange = (e.deltaY / 100) * -5;
+    let newVolume = parseInt(this.props.scene.videoVolume as any) + volumeChange;
+    if (newVolume < 0) {
+      newVolume = 0;
+    } else if (newVolume > 100) {
+      newVolume = 100;
+    }
+    if (this.props.mainVideo) {
+      this.props.mainVideo.volume = newVolume / 100;
+    }
+    this.props.onUpdateScene(this.props.scene, (s) => s.videoVolume = newVolume);
   }
 
   getScene(id: number): Scene | SceneGrid {
@@ -947,19 +968,19 @@ class PlayerBars extends React.Component {
     const focus = document.activeElement.tagName.toLocaleLowerCase();
     switch (e.key) {
       case ' ':
-        if (!this.state.drawerHover || focus != "input") {
+        if ((!this.state.drawerHover || focus != "input") && !e.shiftKey) {
           e.preventDefault();
           this.playPause();
         }
         break;
       case 'ArrowLeft':
-        if (!this.state.drawerHover || focus != "input") {
+        if ((!this.state.drawerHover || focus != "input") && !e.shiftKey) {
           e.preventDefault();
           this.historyBack();
         }
         break;
       case 'ArrowRight':
-        if (!this.state.drawerHover || focus != "input") {
+        if ((!this.state.drawerHover || focus != "input") && !e.shiftKey) {
           e.preventDefault();
           this.historyForward();
         }

@@ -53,15 +53,20 @@ These hotkeys only work for the window in focus.
 
 Use the arrow keys (← / →) to navigate through playback history. Use `Space` to pause/resume playback. 
 
-| Hotkey   | Function             |
-|:--------:|:--------------------:|
-| Space    | Play/Pause           |
-| ← →      | Navigate History     |
-| [ ]      | Navigate Tagging     |
-| Esc      | Exit Scene           |
-| Del      | Delete Image         |
-| Ctrl+C   | Copy Image/Path      |
-| Ctrl+F   | Toggle Fullscreen    |
-| Ctrl+T   | Toggle Always On Top |
-| Ctrl+G   | Toggle Menu Bar      |
+| Hotkey        | Function                    |
+|:-------------:|:---------------------------:|
+| Space         | Play/Pause                  |
+| ← →           | Navigate History            |
+| Shift + Space | Play/Pause Video            |
+| Shift + ← →   | Back/Forward 15sec of Video |
+| Mouse Wheel   | Volume Up/Down              |
+| [ ]           | Navigate Tagging            |
+| Esc           | Exit Scene                  |
+| Del           | Delete Image                |
+| Ctrl+C        | Copy Image/Path             |
+| Ctrl+F        | Toggle Fullscreen           |
+| Ctrl+T        | Toggle Always On Top        |
+| Ctrl+G        | Toggle Menu Bar             |
+
+?> Note: Video controls only work for main Scene (not Overlays). Scrolling volume control only works while the sidebar is hidden.
 

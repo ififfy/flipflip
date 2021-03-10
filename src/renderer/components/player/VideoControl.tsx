@@ -155,7 +155,11 @@ class VideoControl extends React.Component {
     }, 50);
     this.setState({marks: this.getMarks()});
     if (this.props.useHotkeys) {
-      window.addEventListener('keydown', this.onKeyDown, false);
+      if (this.props.player) {
+        window.addEventListener('keydown', this.onPlayerKeyDown, false);
+      } else {
+        window.addEventListener('keydown', this.onKeyDown, false);
+      }
     }
   }
 
@@ -171,7 +175,11 @@ class VideoControl extends React.Component {
   componentWillUnmount() {
     clearInterval(this._interval);
     if (this.props.useHotkeys) {
-      window.removeEventListener('keydown', this.onKeyDown);
+      if (this.props.player) {
+        window.removeEventListener('keydown', this.onPlayerKeyDown);
+      } else {
+        window.removeEventListener('keydown', this.onKeyDown);
+      }
     }
   }
 
@@ -251,6 +259,30 @@ class VideoControl extends React.Component {
           this.onForward();
         }
         break;
+    }
+  };
+
+  onPlayerKeyDown = (e: KeyboardEvent) => {
+    const focus = document.activeElement.tagName.toLocaleLowerCase();
+    if (e.shiftKey) {
+      switch (e.key) {
+        case ' ':
+          e.preventDefault();
+          this.state.playing ? this.onPause() : this.onPlay();
+          break;
+        case 'ArrowLeft':
+          if (focus != "input") {
+            e.preventDefault();
+            this.onBack();
+          }
+          break;
+        case 'ArrowRight':
+          if (focus != "input") {
+            e.preventDefault();
+            this.onForward();
+          }
+          break;
+      }
     }
   };
 }

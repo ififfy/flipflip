@@ -52,6 +52,7 @@ export default class VideoCard extends React.Component {
               </Typography>
               <VideoControl
                 player
+                useHotkeys
                 video={this.props.mainVideo}
                 volume={this.props.scene.videoVolume}
                 clip={this.props.mainClip}

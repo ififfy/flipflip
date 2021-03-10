@@ -624,9 +624,6 @@ export default class Player extends React.Component {
         s.nextSceneRandomID = sceneID;
       })
     }
-    if (this.props.tags == null) {
-      window.addEventListener('wheel', this.onScroll, false);
-    }
     if (this.state.currentAudio) {
       let thumbImage = new Image();
       if (this.state.currentAudio.thumb) {
@@ -649,9 +646,6 @@ export default class Player extends React.Component {
   componentWillUnmount() {
     clearInterval(this._interval);
     this._interval = null;
-    if (this.props.tags == null) {
-      window.removeEventListener('wheel', this.onScroll);
-    }
     getCurrentWindow().setAlwaysOnTop(false);
     getCurrentWindow().setFullScreen(false);
     // Clear ALL the available browser caches
@@ -688,18 +682,6 @@ export default class Player extends React.Component {
   }
 
   nop() {}
-
-  onScroll = (e: WheelEvent) => {
-    if (this.state.recentPictureGrid || !this.props.onUpdateScene) return;
-    const volumeChange = (e.deltaY / 100) * -5;
-    let newVolume = parseInt(this.props.scene.videoVolume as any) + volumeChange;
-    if (newVolume < 0) {
-      newVolume = 0;
-    } else if (newVolume > 100) {
-      newVolume = 100;
-    }
-    this.props.onUpdateScene(this.props.scene, (s) => s.videoVolume = newVolume);
-  }
 
   _currentTimestamp: number = null;
   onPlaying(position: number, duration: number) {
