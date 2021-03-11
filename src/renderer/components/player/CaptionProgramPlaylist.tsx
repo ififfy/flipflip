@@ -24,6 +24,7 @@ export default class CaptionProgramPlaylist extends React.Component {
     playNextScene(): void,
     jumpToHack?: ChildCallbackHack,
     persist?: boolean,
+    advance?(): void,
     getCurrentTimestamp?(): number,
     onError?(e: string): void,
     systemMessage?(message: string): void,
@@ -53,6 +54,7 @@ export default class CaptionProgramPlaylist extends React.Component {
         timeToNextFrame={this.props.timeToNextFrame}
         currentImage={this.props.currentImage}
         jumpToHack={this.props.jumpToHack}
+        advance={this.props.advance}
         onError={this.props.onError}/>
     );
   }

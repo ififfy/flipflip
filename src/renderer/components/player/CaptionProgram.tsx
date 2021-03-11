@@ -52,6 +52,7 @@ export default class CaptionProgram extends React.Component {
     goBack(): void,
     playNextScene(): void,
     jumpToHack?: ChildCallbackHack,
+    advance?(): void,
     getCurrentTimestamp?(): number,
     nextTrack?(): void,
     onError?(e: string): void,
@@ -289,6 +290,23 @@ export default class CaptionProgram extends React.Component {
 
         let fn, ms;
         switch (command) {
+          case "advance":
+            if (value != null) {
+              error = "Error: {" + index + "} '" + line + "' - extra parameter(s)";
+              break;
+            }
+            if (timestamp != null) {
+              containsTimestampAction = true;
+              if (newTimestamps.has(timestamp)) {
+                newTimestamps.get(timestamp).push(this.advance());
+              } else {
+                newTimestamps.set(timestamp, [this.advance()]);
+              }
+            } else {
+              containsAction = true;
+              newProgram.push(this.advance());
+            }
+            break;
           case "count":
             if (value == null) {
               error = "Error: {" + index + "} '" + line + "' - missing parameters";
@@ -401,8 +419,10 @@ export default class CaptionProgram extends React.Component {
               for (let s = 1; s < audioSplit.length; s++) {
                 if (audioSplit[s].endsWith('\'')) {
                   file += " " + audioSplit[s].substring(0, audioSplit[s].length - 1);
-                  if (s < audioSplit.length - 2) {
+                  if (audioSplit.length == s + 1 ) {
                     error = "Error: {" + index + "} '" + line + "' - missing parameter";
+                  } else if (audioSplit.length > s + 2) {
+                    error = "Error: {" + index + "} '" + line + "' - extra parameter";
                   } else {
                     alias = audioSplit[audioSplit.length - 1];
                   }
@@ -440,7 +460,7 @@ export default class CaptionProgram extends React.Component {
               alias = audioSplit[1];
             }
             if (!file.startsWith("http") && !fs.existsSync(file)) {
-              error = "Error: {" + index + "} '" + line + "' - file does not exist";
+              error = "Error: {" + index + "} '" + line + "' - file '" + file + "' does not exist";
               break;
             }
             if (this.state.audios.find((a) => a.alias == alias) != null) {
@@ -460,7 +480,7 @@ export default class CaptionProgram extends React.Component {
               break;
             }
             if (this.state.audios.find((a) => a.alias == pSplit[0]) == null) {
-              error = "Error: {" + index + "} '" + line + "' - no audio not stored for '" + value + "'";
+              error = "Error: {" + index + "} '" + line + "' - no audio not stored for '" + pSplit[0] + "'";
               break;
             }
             let volume = 100;
@@ -849,6 +869,18 @@ export default class CaptionProgram extends React.Component {
     return (nextCommand: Function) => {
       clearTimeout(this._timeout);
       this._timeout = setTimeout(nextCommand, ms);
+    };
+  }
+
+  advance() {
+    return (nextCommand: Function) => {
+      if (this.props.advance) {
+        this.props.advance();
+      }
+      const wait = this.wait(0);
+      wait(() => {
+        nextCommand();
+      })
     };
   }
 

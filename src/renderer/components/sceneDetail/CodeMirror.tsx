@@ -4,7 +4,7 @@ import * as CodeMirrorComp from 'react-codemirror2'
 import {getTimingFromString} from "../../data/utils";
 import ChildCallbackHack from "../player/ChildCallbackHack";
 
-const actions = ["blink", "cap", "bigcap", "count", "wait", "playAudio"];
+const actions = ["blink", "cap", "bigcap", "count", "wait", "playAudio", "advance"];
 export const tupleSetters = ["setBlinkDuration", "setBlinkDelay", "setBlinkGroupDelay", "setCaptionDuration", "setCaptionDelay",
   "setCountDuration", "setCountDelay", "setCountGroupDelay"];
 export const singleSetters = ["setBlinkWaveRate", "setBlinkBPMMulti", "setBlinkDelayWaveRate", "setBlinkDelayBPMMulti",
@@ -103,29 +103,54 @@ export const timestampRegex = /^((\d?\d:)?\d?\d:\d\d(\.\d\d?\d?)?|\d?\d(\.\d\d?\
         }
       }
 
-      if (/[-\d]/.test(ch) && (command == "count" || command == "wait" || command == "playAudio" ||
-        tupleSetters.includes(command) || singleSetters.includes(command)) || colorSetters.includes(command)) {
+      if (/[-\d]/.test(ch) && (command == "count" || command == "wait" ||
+        tupleSetters.includes(command) || singleSetters.includes(command) || colorSetters.includes(command) ||
+        (command == "playAudio" && state.tokens.length == (timestamp ? 3 : 2)))) {
         // Number parameter
         stream.eatWhile(/\d/);
         if(stream.eol() || !/\w/.test(stream.peek())) {
-          state.tokens.push(stream.current());
-          if (((command == "count" || tupleSetters.includes(command)) && state.tokens.length > (timestamp ? 4 : 3)) ||
+          const cur = stream.current();
+          state.tokens.push(cur);
+          if (command == "playAudio" && (cur > 100 || cur < 0)) {
+            return rt("error", state, stream);
+          } else if (((command == "count" || command == "playAudio" || tupleSetters.includes(command)) && state.tokens.length > (timestamp ? 4 : 3)) ||
             ((command == "wait" || singleSetters.includes(command)) && state.tokens.length > (timestamp ? 3 : 2))) {
             return rt("error", state, stream);
           }
           return rt("number", state, stream);
         }
       }
-      stream.eatWhile(/[\d\w-]/);
+
+      if (command == "storeAudio" && state.tokens.length == (timestamp ? 2 : 1)) {
+        if (ch == "'") {
+          stream.eatWhile(/[^']/);
+          if (stream.eol() || !/'/.test(stream.peek())) {
+            return rt("error", state, stream);
+          }
+          stream.next();
+        } else if (ch == "\"") {
+          stream.eatWhile(/[^"]/);
+          if (stream.eol() || !/"/.test(stream.peek())) {
+            return rt("error", state, stream);
+          }
+          stream.next();
+        } else {
+          stream.eatWhile(/[\d\w-]/);
+        }
+      } else {
+        stream.eatWhile(/[\d\w-]/);
+      }
       const cur = stream.current();
       stream.eatSpace();
-      if (sol && words.hasOwnProperty(cur) && !keywords.includes(cur)) {
+      state.tokens.push(cur);
+
+      if (command == "advance") {
+        return rt("error", state, stream);
+      } else if (sol && words.hasOwnProperty(cur) && !keywords.includes(cur)) {
         // Command at start of line
-        state.tokens.push(cur);
         return rt(words[cur], state, stream);
       } else if (!sol && command == "blink" && (keywords.includes(cur) || /^\$\d$/.exec(cur) != null)) {
         // Keyword in blink command
-        state.tokens.push(cur);
         if ((state.tokens.length == (timestamp ? 3 : 2) || state.tokens[state.tokens.length - 2] == "/") && (stream.eol() || /\//.test(stream.peek()))) {
           if (cur == "$RANDOM_PHRASE" && !state.storedPhrases.has(0)) {
             return rt("error", state, stream);
@@ -145,7 +170,6 @@ export const timestampRegex = /^((\d?\d:)?\d?\d:\d\d(\.\d\d?\d?)?|\d?\d(\.\d\d?\
         }
       } else if (!sol && (command == "cap" || command == "bigcap") && (keywords.includes(cur) || /^\$\d$/.exec(cur) != null)) {
         // Keyword in a cap or bigcap command
-        state.tokens.push(cur);
         if (state.tokens.length == (timestamp ? 3 : 2) && stream.eol()) {
           if (cur == "$RANDOM_PHRASE" && !state.storedPhrases.has(0)) {
             return rt("error", state, stream);
@@ -165,7 +189,6 @@ export const timestampRegex = /^((\d?\d:)?\d?\d:\d\d(\.\d\d?\d?)?|\d?\d(\.\d\d?\
         }
       } else if (!sol && state.tokens.length > 0) {
         // String Parameter
-        state.tokens.push(cur);
         if (command == "blink" && cur == "/") {
           return rt("operator", state, stream);
         } else if (command == "count" || command == "wait"
@@ -190,6 +213,10 @@ export const timestampRegex = /^((\d?\d:)?\d?\d:\d\d(\.\d\d?\d?)?|\d?\d(\.\d\d?\
           } else {
             return rt("error", state, stream);
           }
+        } else if (command == "playAudio" && state.tokens.length > (timestamp ? 3 : 2)) {
+          return rt("error", state, stream);
+        } else if (command == "storeAudio" && state.tokens.length > (timestamp ? 4 : 3)) {
+          return rt("error", state, stream);
         }
         return rt("string", state, stream);
       } else {

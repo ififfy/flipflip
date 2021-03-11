@@ -466,6 +466,11 @@ class CaptionScriptor extends React.Component {
                             </Tooltip>
                           </Grid>
                           <Grid item>
+                            <Tooltip title={"Advance to the next image"}>
+                              <Button className={classes.actionButton} onClick={this.onAddAdvance.bind(this)} variant="outlined">advance</Button>
+                            </Tooltip>
+                          </Grid>
+                          <Grid item>
                             <Tooltip title={"Play audio <ALIAS> at volume <VOLUME>"}>
                               <Button className={classes.actionButton} onClick={this.onAddPlayAudio.bind(this)} variant="outlined">playAudio</Button>
                             </Tooltip>
@@ -1061,6 +1066,10 @@ class CaptionScriptor extends React.Component {
 
   onAddWait() {
     this.onAddString("wait <MILLISECONDS>", true);
+  }
+
+  onAddAdvance() {
+    this.onAddString("advance", true);
   }
 
   onAddPlayAudio() {

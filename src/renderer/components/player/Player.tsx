@@ -93,9 +93,7 @@ export default class Player extends React.Component {
 
   render() {
     const nextScene = this.getScene(this.props.scene.nextSceneID == -1 ? this.props.scene.nextSceneRandomID : this.props.scene.nextSceneID);
-    const showCaptionProgram = (
-      this.state.isPlaying &&
-      this.state.hasStarted &&
+    const showCaptionProgram = (this.state.hasStarted &&
       ((this.props.scene.textEnabled &&
       this.props.scene.scriptPlaylists.length) || this.state.persistText));
     const showStrobe = this.props.scene.strobe && this.state.hasStarted && this.state.isPlaying &&
@@ -549,6 +547,10 @@ export default class Player extends React.Component {
             playNextScene={this.props.nextScene}
             jumpToHack={this.props.captionProgramJumpToHack}
             getCurrentTimestamp={getCurrentTimestamp}
+            advance={() => {
+              const advance = this.props.advanceHack ? this.props.advanceHack : this.state.imagePlayerAdvanceHacks[0][0];
+              advance.fire();
+            }}
             onError={this.props.onCaptionError}
             systemMessage={this.props.systemMessage}/>
         )}
