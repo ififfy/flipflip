@@ -458,6 +458,28 @@ class Tutorial extends React.Component {
             </DialogActions>
           </React.Fragment>;
         break;
+      case SDT.backForth:
+        right = true;
+        bottom = true;
+        maxWidth = "xs";
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Back/Forth</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                This option allows you to automatically rotate between the last 2 images played at a specified interval.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                <i>We don't worry about this for now</i>
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
       case SDT.imageSizing:
         right = true;
         bottom = true;
@@ -561,6 +583,10 @@ class Tutorial extends React.Component {
                 When <b>Play Full Sources</b> is enabled, FlipFlip will play all images in a source before proceeding to the next one.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
+                You can control the orientation of image files, either filtering <b>only landscape</b> or <b>only portrait</b>,
+                or you can <b>force landscape</b> or <b>force portrait</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
                 You can also <b>control how long GIFs will play</b> for. This takes priority over scene timing.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
@@ -583,10 +609,9 @@ class Tutorial extends React.Component {
             <DialogTitle id="tutorial-title">Video Options</DialogTitle>
             <DialogContent>
               <DialogContentText id="tutorial-description">
-                You can <b>control how long videos will play</b> for and <b>at what speed</b>. You can also choose to
-                <b> start videos at a random timestamp</b> and/or to <b>have videos continue</b> (rather than restart
-                each time they appear). You can also choose to <b>rotate portrait videos</b> so they appear in
-                landscape orientation.
+                You can <b>control how long videos will play</b> for, as well their <b>orientation</b> and <b>speed</b>.
+                You can also choose to <b>start videos at a random timestamp</b> and/or to <b>have videos continue</b>
+                (rather than restart each time they appear).
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 Lastly, you can <b>choose to use Clips or not</b>. Clips can only be created for individual videos and
@@ -1871,6 +1896,9 @@ class Tutorial extends React.Component {
               this.setTutorial(SDT.timing);
               return;
             case SDT.timing:
+              this.setTutorial(SDT.backForth);
+              return;
+            case SDT.backForth:
               this.setTutorial(SDT.imageSizing);
               return;
             case SDT.imageSizing:

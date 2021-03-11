@@ -69,6 +69,10 @@ count 10 1
 
 Wait `<MILLISECONDS>` ms.
 
+#### `advance`
+
+Advances the scene 1 image forward.
+
 ## Changing how things are shown
 
 ?> See [examples](#examples) for ideas.
@@ -186,6 +190,8 @@ setCountOpacity <OPACITY>
 setBlinkOpacity <OPACITY>
 ```
 
+## Advance Commands
+
 ### Timestamps
 
 Rather than use Delay values to time your script, you use timestamps to ensure your commands execute _exactly_ when you
@@ -221,7 +227,7 @@ Where `TIMESTAMP` is in one of these format:
 ?> **Setters need timestamps** as well to be used in the script. For this reason, we recommend you **separate 
 timestamp and non-timestamp scripts**, as using both in the same file can have unexpected effects.
 
-## Audio
+### Audio
 
 You can make audio tracks play during your script by first storing them, and then calling `playAudio <ALIAS> <VOLUME>`. 
 The audio track will start at the beginning and play until the end. 
@@ -235,7 +241,7 @@ storeAudio "C:\audio\finger_snap.wav" snap
 playAudio snap 25
 ```
 
-## Random phrases
+### Random phrases
 
 If you store some phrases like this:
 
@@ -272,7 +278,7 @@ storePhrase $2 Chocolate Cake
 blink $1 / IS SO MUCH BETTER THAN / $2
 ```
 
-## Tag phrases
+### Tag phrases
 
 Similar to Random phrases, "Tag phrases" are associated with the tag(s) of the currently visible source.
 

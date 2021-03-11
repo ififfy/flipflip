@@ -42,6 +42,7 @@ class SceneOptions extends React.Component {
     const classes = this.props.classes;
     const tutorial1 = this.props.tutorial == SDT.optionsLeft ||
       this.props.tutorial == SDT.timing ||
+      this.props.tutorial == SDT.backForth ||
       this.props.tutorial == SDT.imageSizing ||
       this.props.tutorial == SDT.nextScene ||
       this.props.tutorial == SDT.overlays;

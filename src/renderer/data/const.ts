@@ -273,6 +273,7 @@ const SDT = { // Scene Detail Tutorials
   options2: 'sdt12',
   optionsLeft: 'sdt13',
   timing: 'sdt14',
+  backForth: 'sdt.33',
   imageSizing: 'sdt15',
   nextScene: 'sdt16',
   overlays: 'sdt17',

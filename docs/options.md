@@ -62,7 +62,11 @@ to select the scenes you'd like to be randomly picked from.
 Scene options, effects, audio/text, etc. will also change as configured.
 
 #### Overlay
-Add Scene(s) to overlay over this one (or none). Control each overlay opacity.
+Add Scene(s)/SceneGrid(s) to overlay over this one (or none). Control each overlay opacity. Layers are rendered in the 
+order they are added.
+
+?> Overlaying with another Scene _will not_ show that Scene's Overlays. Overlaying a Scene Grid _will_ show each of 
+its Scene's Overlays, but not if they are also a Scene Grid. 
 
 ?> There is no limit to the number of scenes you can overlay, but you may experience poor performance if you use too many.
 

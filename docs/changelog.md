@@ -1,17 +1,20 @@
 # Changelog
 
-## 3.1.1 <small>(03/XX/2021)</small>
+## 3.1.1 <small>(03/12/2021)</small>
 - Allow Scenes to use Grids as overlays
 - Add Back/Forth option
+- Add options for image/video orientation
 - Add BPM Detection to Audio Library
 - Add warning when using 'Audio BPM' timing, but with no BPM metadata 
 - Add ability to recursively import directories of videos/audio/scripts
 - Add option to prevent Portable Mode from saving locally
 - Add options to persist audios/captions through Next Scenes
 - Allow caption script to trigger audio files
+- Allow caption script to advance scene 
 - Show sort button while importing from library
 - Allow video controls to skip to the next source during Scene playback
 - Improve some booru scraping
+- Add additional player hotkeys
 - Fix bug preventing scene from overlaying itself 
 - Fix bug when migrating to 3.1.x with an empty audio track
 - Fix bug with Portable Mode

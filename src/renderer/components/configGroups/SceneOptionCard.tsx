@@ -252,7 +252,7 @@ class SceneOptionCard extends React.Component {
         <Grid item xs={12}>
           <Divider/>
         </Grid>
-        <Grid item xs={12} className={clsx(this.props.tutorial == SDT.timing && classes.highlight)}>
+        <Grid item xs={12} className={clsx(this.props.tutorial == SDT.backForth && classes.highlight)}>
           <Grid container alignItems="center">
             <Grid item xs={12}>
               <Tooltip title="Go back and forth between the last two images">
