@@ -21,6 +21,12 @@ export default new Map<string, string>([
   ['if.images', 'Only image files'],
   ['if.stills', 'Only stills'],
 
+  ['ot.original', 'No Change'],
+  ['ot.onlylandscape', 'Only Landscape'],
+  ['ot.onlyportrait', 'Only Portrait'],
+  ['ot.forcelandscape', 'Force Landscape'],
+  ['ot.forceportrait', 'Force Portrait'],
+
   ['go.none', 'No Change'],
   ['go.part', 'Play Part (Constant)'],
   ['go.partr', 'Play Part (Random)'],

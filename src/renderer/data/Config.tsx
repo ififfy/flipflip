@@ -1,4 +1,4 @@
-import {BT, EA, GO, HTF, IF, IT, OF, SC, SL, SOF, TF, VO, VTF, WC, WF} from "./const";
+import {BT, EA, GO, HTF, IF, IT, OF, OT, SC, SL, SOF, TF, VO, VTF, WC, WF} from "./const";
 import Overlay from "./Overlay";
 import LibrarySource from "./LibrarySource";
 import Audio from "./Audio";
@@ -125,6 +125,8 @@ interface SceneSettingsI {
   panEndOv: number;
 
   imageType: string;
+  imageOrientation: string;
+  videoOrientation: string;
   backgroundType: string;
   backgroundColor: string;
   backgroundColorSet: Array<string>;
@@ -139,7 +141,6 @@ interface SceneSettingsI {
   videoTimingMax: number;
   randomVideoStart: boolean;
   continueVideo: boolean;
-  rotatePortrait: boolean;
   playVideoClips: boolean;
   skipVideoStart: number;
   skipVideoEnd: number;
@@ -182,6 +183,7 @@ interface SceneSettingsI {
   overlaySceneOpacity: number;
   gridView: boolean;
   grid: Array<Array<number>>;
+  rotatePortrait: boolean;
 }
 
 interface RemoteSettingsI {
@@ -284,6 +286,8 @@ export class SceneSettings implements SceneSettingsI {
   backForthSinRate = 100;
   backForthBPMMulti = 10;
   imageTypeFilter = IF.any;
+  imageOrientation = OT.original;
+  videoOrientation = OT.original;
   weightFunction = WF.sources;
   sourceOrderFunction = SOF.random;
   orderFunction = OF.random;
@@ -403,7 +407,6 @@ export class SceneSettings implements SceneSettingsI {
   videoTimingMax = 3000;
   randomVideoStart = false;
   continueVideo = false;
-  rotatePortrait = false;
   playVideoClips = true;
   skipVideoStart = 0;
   skipVideoEnd = 0;
@@ -453,6 +456,7 @@ export class SceneSettings implements SceneSettingsI {
   gridView = false;
   grid: Array<Array<number>> = [[]];
   audios: Array<Audio> = [];
+  rotatePortrait = false;
 }
 
 export class RemoteSettings implements RemoteSettingsI {
@@ -594,6 +598,10 @@ export default class Config {
     }
 
     if (this.defaultScene && this.defaultScene.overlaySceneID != 0) this.defaultScene.overlaySceneID = 0;
+    if (this.defaultScene && this.defaultScene.rotatePortrait) {
+      this.defaultScene.videoOrientation = OT.forceLandscape;
+      this.defaultScene.rotatePortrait = false;
+    }
     if (this.displaySettings && (this.displaySettings as any).portableMode == true) {
       (this.displaySettings as any).portableMode = undefined;
       this.generalSettings.portableMode = true;

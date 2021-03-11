@@ -30,6 +30,14 @@ const IF = { // image filters
   stills: 'if.stills',
 };
 
+const OT = { // orientation
+  original: 'ot.original',
+  onlyLandscape: 'ot.onlylandscape',
+  onlyPortrait: 'ot.onlyportrait',
+  forceLandscape: 'ot.forcelandscape',
+  forcePortrait: 'ot.forceportrait',
+}
+
 const GO = { // GIF Options
   none: 'go.none',
   part: 'go.part',
@@ -407,5 +415,5 @@ const WC = { // Watermark corner
 }
 
 export {
-  AF, ALT, ASF, BT, CST, DONE, EA, GO, GT, HTF, IF, IG, IPC, IT, LT, MO, OF, PR, PT, RF, RP, RT, SB, SC, SDGT, SDT, SF, SGT, SL, SLT, SOF, SP, SPT, ST, TF, TT, VCT, VO, VTF, WC, WF
+  AF, ALT, ASF, BT, CST, DONE, EA, GO, GT, HTF, IF, IG, IPC, IT, LT, MO, OF, OT, PR, PT, RF, RP, RT, SB, SC, SDGT, SDT, SF, SGT, SL, SLT, SOF, SP, SPT, ST, TF, TT, VCT, VO, VTF, WC, WF
 };

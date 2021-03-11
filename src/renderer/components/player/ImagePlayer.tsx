@@ -6,7 +6,7 @@ import fs from "fs";
 import gifInfo from 'gif-info';
 import IdleTimer from 'react-idle-timer';
 
-import {GO, IF, OF, SL, SOF, TF, VO, WF} from '../../data/const';
+import {GO, IF, OF, OT, SL, SOF, TF, VO, WF} from '../../data/const';
 import {getRandomListItem, getRandomNumber, isVideo, toArrayBuffer, urlToPath} from '../../data/utils';
 import Config from "../../data/Config";
 import Scene from "../../data/Scene";
@@ -516,6 +516,14 @@ export default class ImagePlayer extends React.Component {
         if (!this._isMounted) return;
         this.props.cache(video);
 
+        const width = video.videoWidth;
+        const height = video.videoHeight;
+        if ((this.props.scene.videoOrientation == OT.onlyLandscape && height > width) ||
+          (this.props.scene.videoOrientation == OT.onlyPortrait && height < width)) {
+          errorCallback();
+          return;
+        }
+
         if (!video.hasAttribute("start") && !video.hasAttribute("end") &&
           (this.props.scene.skipVideoStart > 0 || this.props.scene.skipVideoEnd > 0) &&
           (video.duration - (this.props.scene.skipVideoStart / 1000) - (this.props.scene.skipVideoEnd / 1000)) > 0) {
@@ -564,13 +572,6 @@ export default class ImagePlayer extends React.Component {
             } while (atLeastDuration < this.props.scene.videoTimingConstant);
             video.setAttribute("duration", atLeastDuration.toString())
             break;
-        }
-
-        if (this.props.scene.videoOption == VO.full) {
-        } else if (this.props.scene.videoOption == VO.part) {
-
-        } else if (this.props.scene.videoOption == VO.partr) {
-
         }
 
         if (video.hasAttribute("start") && video.hasAttribute("end")) {
@@ -644,6 +645,15 @@ export default class ImagePlayer extends React.Component {
         clearTimeout(this._imgLoadTimeouts[i]);
         if (!this._isMounted) return;
         this.props.cache(img);
+
+        const width = img.width;
+        const height = img.height;
+        if ((this.props.scene.imageOrientation == OT.onlyLandscape && height > width) ||
+          (this.props.scene.imageOrientation == OT.onlyPortrait && height < width)) {
+          errorCallback();
+          return;
+        }
+
         (img as any).key = this.state.nextImageID;
         this.setState({
           readyToDisplay: this.state.readyToDisplay.concat([img]),

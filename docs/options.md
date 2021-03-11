@@ -76,6 +76,15 @@ This setting controls which images will display:
 * **Only Image Files**
 * **Only Stills**
 
+#### Image/Video Orientation
+These settings allows you to control the orientation of images/videos (respectively).
+
+* **No Change**
+* **Only Landscape** - Only display landscape images/videos (width > height)
+* **Only Portrait** - Only display portrait images/videos (height > width)
+* **Force Landscape** - Force all images/videos to display in landscape (rotates portrait images/videos 90° counter-clockwise)
+* **Force Portrait**  - Force all images/videos to display in portrait (rotates landscape images/videos 90° counter-clockwise)
+
 #### Re-Generate On Playback
 This option is only available for Scene Generators. When enabled, the scene will be automatically regenerated whenever
 playback is started (either directly, or through an overlay/grid).
@@ -103,7 +112,6 @@ Videos also have a number of other settings:
 * **Random Speed** - Choose to play videos at random speeds and specify the range of speeds.
 * **Start at Random Time** - Starts videos at a random timestamp (videos start from beginning by default).
 * **Continue Videos** - Continue videos from last timestamp during this slideshow (videos restart by default).
-* **Rotate Portrait Videos** - Rotates any portrait videos 90° to the left (play landscape).
 * **Use Clips** - Choose to use only [video clips](clips.md) or the entire video.
   * If you are not using video clips, you can choose to skip the first and last parts of each video (ms)
 * Control **video volume** for this scene.

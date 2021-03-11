@@ -3,7 +3,7 @@ import {animated, useSpring, useTransition} from "react-spring";
 import Timeout = NodeJS.Timeout;
 
 import {getEaseFunction, getRandomColor, getRandomListItem} from "../../data/utils";
-import {BT, HTF, IT, SL, TF, VTF} from "../../data/const";
+import {BT, HTF, IT, OT, SL, TF, VTF} from "../../data/const";
 import Scene from "../../data/Scene";
 import Strobe from "./Strobe";
 import wretch from "wretch";
@@ -89,10 +89,12 @@ export default class ImageView extends React.Component {
     let parentAspect = parentWidth / parentHeight;
     let imgWidth;
     let imgHeight;
+    let isVideo = false;
     if (img instanceof HTMLImageElement) {
       imgWidth = img.width;
       imgHeight = img.height;
-    } else {
+    } else if (img instanceof HTMLVideoElement) {
+      isVideo = true;
       imgWidth = img.videoWidth;
       imgHeight = img.videoHeight;
     }
@@ -141,7 +143,13 @@ export default class ImageView extends React.Component {
       this._timeouts.push(setTimeout(drawLoop, 20, v, c, w, h));
     };
 
-    const rotateVideo = img instanceof HTMLVideoElement && !this.props.pictureGrid && this.props.scene.rotatePortrait && imgWidth < imgHeight;
+    const rotate = !this.props.pictureGrid &&
+      ((isVideo &&
+      ((this.props.scene.videoOrientation == OT.forceLandscape && imgWidth < imgHeight) ||
+        (this.props.scene.videoOrientation == OT.forcePortrait && imgWidth > imgHeight))) ||
+        (!isVideo &&
+          ((this.props.scene.imageOrientation == OT.forceLandscape && imgWidth < imgHeight) ||
+            (this.props.scene.imageOrientation == OT.forcePortrait && imgWidth > imgHeight))));
 
     const blur = !this.props.pictureGrid && this.props.scene.backgroundType == BT.blur;
     let bgImg: any;
@@ -150,9 +158,6 @@ export default class ImageView extends React.Component {
         bgImg = img.cloneNode();
       } else {
         bgImg = document.createElement('canvas');
-        if (rotateVideo) {
-          bgImg.style.transform = "rotate(270deg)";
-        }
 
         const context = bgImg.getContext('2d');
         bgImg.width = parentWidth;
@@ -161,7 +166,7 @@ export default class ImageView extends React.Component {
         if (!this.props.scene.crossFade) {
           this.clearTimeouts();
         }
-        if (img instanceof HTMLImageElement) {
+        if (!isVideo) {
           context.drawImage(img, 0, 0, parentWidth, parentHeight);
         } else {
           img.onplay = () => {
@@ -174,18 +179,52 @@ export default class ImageView extends React.Component {
         }
       }
 
-      if (imgAspect < parentAspect) {
-        const bgscale = (parentWidth + (0.04 * parentWidth)) / imgWidth;
-        bgImg.style.width = '100%';
-        bgImg.style.height = (imgHeight * bgscale) + 'px';
-        bgImg.style.marginTop = (parentHeight / 2 - imgHeight * bgscale / 2) + 'px';
-        bgImg.style.marginLeft = '0';
+      if (rotate) {
+        bgImg.style.transform = "rotate(270deg)";
+        if (imgAspect > parentAspect) {
+          if (imgWidth > imgHeight) {
+            const bgscale = (parentHeight + (0.04 * parentHeight)) / imgHeight;
+            bgImg.style.width = (imgWidth * bgscale) + 'px';
+            bgImg.style.height = parentWidth + "px";
+            bgImg.style.marginTop = ((parentHeight - parentWidth) / 2) + "px";
+            bgImg.style.marginLeft = ((parentWidth - (imgWidth * bgscale)) / 2) + "px";
+          } else {
+            const bgscale = (parentWidth + (0.04 * parentWidth)) / imgWidth;
+            bgImg.style.width = parentHeight + "px";
+            bgImg.style.height = (imgHeight * bgscale) + 'px';
+            bgImg.style.marginTop = ((parentHeight - (imgHeight * bgscale)) / 2) + "px";
+            bgImg.style.marinLeft = ((parentWidth - parentHeight) / 2) + "px";
+          }
+        } else {
+          if (imgWidth > imgHeight) {
+            const bgscale = (parentHeight + (0.04 * parentHeight)) / imgHeight;
+            bgImg.style.width = (imgWidth * bgscale) + 'px';
+            bgImg.style.height = parentWidth + "px";
+            bgImg.style.marginTop = ((parentHeight - parentWidth) / 2) + "px";
+            bgImg.style.marginLeft = ((parentWidth - (imgWidth * bgscale)) / 2) + "px";
+          } else {
+            const bgscale = (parentWidth + (0.04 * parentWidth)) / imgWidth;
+            bgImg.style.width = parentHeight + "px";
+            bgImg.style.height = (imgHeight * bgscale) + 'px';
+            bgImg.style.marginTop = (parentHeight / 2 - imgHeight * bgscale / 2) + 'px';
+            bgImg.style.marginLeft = ((parentWidth - parentHeight) / 2) + "px";;
+          }
+        }
+
       } else {
-        const bgscale = (parentHeight + (0.04 * parentHeight)) / imgHeight;
-        bgImg.style.width = (imgWidth * bgscale) + 'px';
-        bgImg.style.height = '100%';
-        bgImg.style.marginTop = '0';
-        bgImg.style.marginLeft = (parentWidth / 2 - imgWidth * bgscale / 2) + 'px';
+        if (imgAspect < parentAspect) {
+          const bgscale = (parentWidth + (0.04 * parentWidth)) / imgWidth;
+          bgImg.style.width = '100%';
+          bgImg.style.height = (imgHeight * bgscale) + 'px';
+          bgImg.style.marginTop = (parentHeight / 2 - imgHeight * bgscale / 2) + 'px';
+          bgImg.style.marginLeft = '0';
+        } else {
+          const bgscale = (parentHeight + (0.04 * parentHeight)) / imgHeight;
+          bgImg.style.width = (imgWidth * bgscale) + 'px';
+          bgImg.style.height = '100%';
+          bgImg.style.marginTop = '0';
+          bgImg.style.marginLeft = (parentWidth / 2 - imgWidth * bgscale / 2) + 'px';
+        }
       }
     }
 
@@ -208,23 +247,19 @@ export default class ImageView extends React.Component {
     if (!this.props.pictureGrid) {
       switch (this.props.scene.imageType) {
         case (IT.fitBestClip):
-          if (rotateVideo) {
+          if (rotate) {
             imgAspect = imgHeight / imgWidth;
+            img.style.transform = "rotate(270deg)";
+            img.style.transformOrigin = "top right";
             if (imgAspect < parentAspect) {
               const scale = parentWidth / imgHeight;
               img.style.height = parentWidth.toString() + "px";
               img.style.marginLeft = '-' + imgWidth * scale + 'px';
               img.style.marginTop = (parentHeight / 2 - imgWidth * scale / 2) + 'px';
-
-              img.style.transform = "rotate(270deg)";
-              img.style.transformOrigin = "top right";
             } else {
               const scale = parentHeight / imgWidth;
               img.style.width = parentHeight.toString() + "px";
               img.style.marginLeft = (-parentHeight + (parentWidth / 2 - imgHeight * scale / 2)) + 'px';
-
-              img.style.transform = "rotate(270deg)";
-              img.style.transformOrigin = "top right";
             }
           } else {
             if (imgAspect > parentAspect) {
@@ -243,7 +278,7 @@ export default class ImageView extends React.Component {
           }
           break;
         case (IT.centerNoClip):
-          if (rotateVideo) {
+          if (rotate) {
             img.style.transform = "rotate(270deg)";
             img.style.transformOrigin = "center";
           }
@@ -256,7 +291,7 @@ export default class ImageView extends React.Component {
           }
         default:
         case (IT.fitBestNoClip):
-          if (rotateVideo) {
+          if (rotate) {
             imgAspect = imgHeight / imgWidth;
             if (imgAspect < parentAspect) {
               const scale = parentHeight / imgWidth;
@@ -291,7 +326,7 @@ export default class ImageView extends React.Component {
           }
           break;
         case (IT.stretch):
-          if (rotateVideo) {
+          if (rotate) {
             const scale = parentWidth / imgHeight;
             img.style.height = parentWidth.toString() + "px";
             img.style.marginLeft = '-' + imgWidth * scale + 'px';
@@ -300,12 +335,13 @@ export default class ImageView extends React.Component {
             img.style.transform = "rotate(270deg)";
             img.style.transformOrigin = "top right";
           } else {
+            img.style.objectFit = 'fill';
             img.style.width = '100%';
             img.style.height = '100%';
           }
           break;
         case (IT.center):
-          if (rotateVideo) {
+          if (rotate) {
             img.style.transform = "rotate(270deg)";
             img.style.transformOrigin = "center";
           }
@@ -315,10 +351,11 @@ export default class ImageView extends React.Component {
           img.style.marginLeft = left / 2 + 'px';
           break;
         case (IT.fitWidth):
-          if (rotateVideo) {
-            const scale = parentHeight / imgWidth;
-            img.style.width = parentHeight.toString() + "px";
-            img.style.marginLeft = (-parentHeight + (parentWidth / 2 - imgHeight * scale / 2)) + 'px';
+          if (rotate) {
+            const scale = parentWidth / imgHeight;
+            img.style.height = parentWidth.toString() + "px";
+            img.style.marginLeft = '-' + imgWidth * scale + 'px';
+            img.style.marginTop = (parentHeight / 2 - imgWidth * scale / 2) + 'px';
 
             img.style.transform = "rotate(270deg)";
             img.style.transformOrigin = "top right";
@@ -331,11 +368,10 @@ export default class ImageView extends React.Component {
           }
           break;
         case (IT.fitHeight):
-          if (rotateVideo) {
-            const scale = parentWidth / imgHeight;
-            img.style.height = parentWidth.toString() + "px";
-            img.style.marginLeft = '-' + imgWidth * scale + 'px';
-            img.style.marginTop = (parentHeight / 2 - imgWidth * scale / 2) + 'px';
+          if (rotate) {
+            const scale = parentHeight / imgWidth;
+            img.style.width = parentHeight.toString() + "px";
+            img.style.marginLeft = (-parentHeight + (parentWidth / 2 - imgHeight * scale / 2)) + 'px';
 
             img.style.transform = "rotate(270deg)";
             img.style.transformOrigin = "top right";

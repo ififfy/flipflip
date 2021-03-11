@@ -10,7 +10,7 @@ import {
 import VolumeDownIcon from '@material-ui/icons/VolumeDown';
 import VolumeUpIcon from '@material-ui/icons/VolumeUp';
 
-import {GO, IF, OF, SDT, SOF, VO, WF} from "../../data/const";
+import {GO, IF, OF, OT, SDT, SOF, VO, WF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
 import en from "../../data/en";
 import Scene from "../../data/Scene";
@@ -110,6 +110,22 @@ class ImageVideoCard extends React.Component {
                   }
                   label="Play Full Sources"/>
               </Collapse>
+            </Grid>
+            <Grid item xs={12} sm={this.props.sidebar ? 12 : 6} className={clsx(this.props.scene.imageTypeFilter == IF.videos && classes.noPadding)}>
+              <Collapse in={this.props.scene.imageTypeFilter != IF.videos}>
+                <FormControl className={classes.fullWidth}>
+                  <InputLabel>Image Orientation</InputLabel>
+                  <Select
+                    value={this.props.scene.imageOrientation}
+                    onChange={this.onInput.bind(this, 'imageOrientation')}>
+                    {Object.values(OT).map((tf) =>
+                      <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
+                    )}
+                  </Select>
+                </FormControl>
+              </Collapse>
+            </Grid>
+            <Grid item xs={12} sm={6} className={classes.noPadding}>
             </Grid>
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.videos) && classes.noPadding)}>
               <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.videos}>
@@ -244,6 +260,26 @@ class ImageVideoCard extends React.Component {
                 }}/>
             </Collapse>
           </Grid>
+          {!this.props.isPlayer && (
+            <React.Fragment>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.images) && classes.noPadding)}>
+                <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.images}>
+                  <FormControl className={classes.fullWidth}>
+                    <InputLabel>Video Orientation</InputLabel>
+                    <Select
+                      value={this.props.scene.videoOrientation}
+                      onChange={this.onInput.bind(this, 'videoOrientation')}>
+                      {Object.values(OT).map((tf) =>
+                        <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
+                      )}
+                    </Select>
+                  </FormControl>
+                </Collapse>
+              </Grid>
+              <Grid item xs={12} sm={6} className={classes.noPadding}>
+              </Grid>
+            </React.Fragment>
+          )}
           <Grid item xs={12} sm={this.props.sidebar ? 12 : 8} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.images) && classes.noPadding)}>
             <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.images && !this.props.scene.videoRandomSpeed}>
               <Typography id="video-speed-slider" variant="caption" component="div"
@@ -327,18 +363,7 @@ class ImageVideoCard extends React.Component {
                 label="Continue Videos"/>
             </Collapse>
           </Grid>
-          <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} md={this.props.sidebar ? 12 : 6} lg={this.props.sidebar ? 12 : 4} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.images) && classes.noPadding)}>
-            <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.images}>
-              <FormControlLabel
-                control={
-                  <Tooltip title={"Play portrait videos in landscape mode"}>
-                    <Switch checked={this.props.scene.rotatePortrait}
-                            size="small"
-                            onChange={this.onBoolInput.bind(this, 'rotatePortrait')}/>
-                  </Tooltip>
-                }
-                label="Rotate Portrait Videos"/>
-            </Collapse>
+          <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} md={this.props.sidebar ? 12 : 6} lg={this.props.sidebar ? 12 : 4} className={classes.noPadding}>
           </Grid>
           <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.images) && classes.noPadding)}>
             <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.images}>

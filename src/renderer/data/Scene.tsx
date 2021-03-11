@@ -1,7 +1,7 @@
 import path from "path";
 
 import {urlToPath} from "./utils";
-import {BT, EA, GO, HTF, IF, IT, OF, RP, SC, SL, SOF, TF, VO, VTF, WF} from './const';
+import {BT, EA, GO, HTF, IF, IT, OF, OT, RP, SC, SL, SOF, TF, VO, VTF, WF} from './const';
 import LibrarySource from "./LibrarySource";
 import Audio from "./Audio";
 import Overlay from "./Overlay";
@@ -32,6 +32,8 @@ export default class Scene {
   forceAllSource = false;
   fullSource = false;
   imageTypeFilter = IF.any;
+  imageOrientation = OT.original;
+  videoOrientation = OT.original;
   zoom = false;
   zoomStart = 1;
   zoomStartMax = 1;
@@ -166,7 +168,6 @@ export default class Scene {
   videoTimingMax = 3000;
   randomVideoStart = false;
   continueVideo = false;
-  rotatePortrait = false;
   playVideoClips = true;
   skipVideoStart = 0;
   skipVideoEnd = 0;
@@ -240,6 +241,7 @@ export default class Scene {
   countBorder: boolean;
   countBorderpx: number;
   countBorderColor: string;
+  rotatePortrait: boolean;
 
   constructor(init?: Partial<Scene>) {
     Object.assign(this, init);
@@ -357,6 +359,7 @@ export default class Scene {
       });
       this.audios = null;
     }
+
     if (this.textSource && this.textSource.length > 0) {
       const newScripts = [new CaptionScript({
         url: this.textSource,
@@ -430,6 +433,11 @@ export default class Scene {
           script.opacity = 100;
         }
       }
+    }
+
+    if (this.rotatePortrait) {
+      this.videoOrientation = OT.forceLandscape;
+      this.rotatePortrait = false;
     }
   }
 }
