@@ -314,6 +314,30 @@ class GridSetup extends React.Component {
       newGrid[1][0] = sceneID;
       newGrid[1][1] = sceneID;
       this.changeKey('grid', newGrid);
+    } else if (this.props.tutorial == SGT.cells) {
+      let height = this.state.height;
+      let width = this.state.width;
+      let changed = false;
+      if (this.props.grid.grid.length != height) {
+        height = this.props.grid.grid.length;
+        this.setState({height: height});
+        changed = true;
+      }
+      if (this.props.grid.grid[0].length != width) {
+        width = this.props.grid.grid[0].length;
+        this.setState({width: width});
+        changed = true;
+      }
+      if (changed && width == 2 && height == 2) {
+        this.props.onTutorial(SGT.dimensions);
+        const sceneID = this.props.allScenes[0].id;
+        const newGrid = this.props.grid.grid;
+        newGrid[0][0] = sceneID;
+        newGrid[0][1] = sceneID;
+        newGrid[1][0] = sceneID;
+        newGrid[1][1] = sceneID;
+        this.changeKey('grid', newGrid);
+      }
     }
   }
 

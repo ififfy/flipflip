@@ -28,6 +28,7 @@ import {ALT, CST, DONE, LT, PT, SDGT, SDT, SGT, SLT, SPT, TF, VCT} from "../data
 import {Route} from "../data/Route";
 import Config from "../data/Config";
 import Scene from "../data/Scene";
+import SceneGrid from "../data/SceneGrid";
 
 const styles = (theme: Theme) => createStyles({
   deleteIcon: {
@@ -55,7 +56,7 @@ class Tutorial extends React.Component {
     classes: any,
     config: Config,
     route: Route[],
-    scene: Scene,
+    scene: Scene | SceneGrid,
     tutorial: string,
     onDoneTutorial(lastTutorial: string): void,
     onSetTutorial(nextTutorial: string): void,
@@ -1189,7 +1190,7 @@ class Tutorial extends React.Component {
           <React.Fragment>
             <DialogTitle id="tutorial-title">Audio Library</DialogTitle>
             <DialogContent>
-              <DialogContentText id="tutorial-description" component="div">>
+              <DialogContentText id="tutorial-description" component="div">
                 From here we can
                 <ul>
                   <li><b>manage tags</b></li>
@@ -1663,6 +1664,11 @@ class Tutorial extends React.Component {
                 <b>Make this grid <u>2x2</u></b>
               </DialogContentText>
             </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onSkipStep.bind(this)} color="secondary">
+                Skip
+              </Button>
+            </DialogActions>
           </React.Fragment>;
         break;
       case SGT.cells:
@@ -1854,7 +1860,7 @@ class Tutorial extends React.Component {
             return;
         }
       case "scene":
-        if (this.props.scene.generatorWeights == null) {
+        if ((this.props.scene as Scene).generatorWeights == null) {
           switch (this.props.config.tutorials.sceneDetail) {
             case SDT.welcome:
               this.setTutorial(SDT.title);
@@ -1932,21 +1938,21 @@ class Tutorial extends React.Component {
               this.setTutorial(SDT.effects2);
               return;
             case SDT.effects2:
-              if (this.props.scene.zoom == true) {
+              if ((this.props.scene as Scene).zoom == true) {
                 this.props.onDoneTutorial(SDT.zoom1);
               } else {
                 this.setTutorial(SDT.zoom1);
               }
               return;
             case SDT.zoom1:
-              if (this.props.scene.zoomStart == 0.8 && this.props.scene.zoomEnd == 1.2) {
+              if ((this.props.scene as Scene).zoomStart == 0.8 && (this.props.scene as Scene).zoomEnd == 1.2) {
                 this.props.onDoneTutorial(SDT.zoom2);
               } else {
                 this.setTutorial(SDT.zoom2);
               }
               return;
             case SDT.zoom2:
-              if (this.props.scene.transTF == TF.sin) {
+              if ((this.props.scene as Scene).transTF == TF.sin) {
                 this.props.onDoneTutorial(SDT.zoom3);
               } else {
                 this.setTutorial(SDT.zoom3);
@@ -1956,7 +1962,7 @@ class Tutorial extends React.Component {
               this.setTutorial(SDT.zoom4);
               return;
             case SDT.zoom4:
-              if (this.props.scene.crossFade) {
+              if ((this.props.scene as Scene).crossFade) {
                 this.props.onDoneTutorial(SDT.fade1);
               } else {
                 this.setTutorial(SDT.fade1);
@@ -2185,17 +2191,20 @@ class Tutorial extends React.Component {
   onSkipStep() {
     switch (this.props.tutorial) {
       case SDT.zoom1:
-        this.props.scene.zoom = true;
+        (this.props.scene as Scene).zoom = true;
         break;
       case SDT.zoom2:
-        this.props.scene.zoomStart = 0.8;
-        this.props.scene.zoomEnd = 1.2;
+        (this.props.scene as Scene).zoomStart = 0.8;
+        (this.props.scene as Scene).zoomEnd = 1.2;
         break;
       case SDT.zoom3:
-        this.props.scene.transTF = TF.sin;
+        (this.props.scene as Scene).transTF = TF.sin;
         break;
       case SDT.fade1:
-        this.props.scene.crossFade = true;
+        (this.props.scene as Scene).crossFade = true;
+        break;
+      case SGT.dimensions:
+        (this.props.scene as SceneGrid).grid = [[-1, -1], [-1, -1]];
         break;
     }
     this.onContinue();

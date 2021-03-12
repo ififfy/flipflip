@@ -430,7 +430,7 @@ export default class Meta extends React.Component {
             <Tutorial
               config={this.state.config}
               route={this.state.route}
-              scene={scene}
+              scene={!!scene ? scene : grid}
               tutorial={this.state.tutorial}
               onSetTutorial={a(actions.setTutorial)}
               onDoneTutorial={a(actions.doneTutorial)}
