@@ -213,6 +213,7 @@ class GridPlayer extends React.Component {
                             sceneGrids={this.props.sceneGrids}
                             theme={this.props.theme}
                             tutorial={null}
+                            captionScale={1 / Math.sqrt(row.length * this.props.grid.grid.length)}
                             allLoaded={[].concat.apply([], this.state.isLoaded).find((l: boolean) => !l) == null}
                             cache={this.props.cache.bind(this)}
                             getTags={this.props.getTags.bind(this)}
