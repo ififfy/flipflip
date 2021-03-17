@@ -404,7 +404,7 @@ class SceneDetail extends React.Component {
 
             <Fab
               className={clsx(classes.playButton, this.props.tutorial == SDT.play && classes.highlight)}
-              disabled={this.props.scene.sources.length == 0}
+              disabled={this.props.scene.sources.length == 0 && (!this.props.scene.regenerate || !areWeightsValid(this.props.scene))}
               color="secondary"
               aria-label="Play"
               onClick={this.onPlayScene.bind(this)}>
