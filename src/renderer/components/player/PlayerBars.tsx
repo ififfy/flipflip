@@ -378,7 +378,7 @@ class PlayerBars extends React.Component {
 
               {!this.props.scene.audioScene && (
                 <React.Fragment>
-                  {this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.images && (
+                  {(this.props.mainVideo != null || this.props.overlayVideos.find((a) => a != null) != null) && (
                     <Accordion TransitionProps={{ unmountOnExit: false }}>
                       <AccordionSummary
                         expandIcon={<ExpandMoreIcon />}

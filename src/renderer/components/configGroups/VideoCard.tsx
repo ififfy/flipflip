@@ -68,19 +68,17 @@ export default class VideoCard extends React.Component {
               if (otherVideo == null) return <React.Fragment key={index}/>;
               if (this.props.otherScenes[listIndex] == null) return <React.Fragment key={index}/>;
               const sourceURL = otherVideo.getAttribute("source");
-              let otherVideoTitle = ""
-              if (this.props.mainVideo) {
-                const sourceType = getSourceType(sourceURL);
-                if (sourceType == ST.video) {
-                  if (sourceURL.startsWith("http")) {
-                    otherVideoTitle = sourceURL.substring(sourceURL.lastIndexOf("/") + 1);
-                  } else {
-                    otherVideoTitle = sourceURL.substring(sourceURL.lastIndexOf("\\") + 1);
-                  }
+              let otherVideoTitle;
+              const sourceType = getSourceType(sourceURL);
+              if (sourceType == ST.video) {
+                if (sourceURL.startsWith("http")) {
+                  otherVideoTitle = sourceURL.substring(sourceURL.lastIndexOf("/") + 1);
                 } else {
-                  otherVideoTitle = otherVideo.src;
-                  otherVideoTitle = otherVideoTitle.substring(otherVideoTitle.lastIndexOf("/") + 1);
+                  otherVideoTitle = sourceURL.substring(sourceURL.lastIndexOf("\\") + 1);
                 }
+              } else {
+                otherVideoTitle = otherVideo.src;
+                otherVideoTitle = otherVideoTitle.substring(otherVideoTitle.lastIndexOf("/") + 1);
               }
               let clipValue = null;
               let clipID: number = null;
