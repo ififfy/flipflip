@@ -40,3 +40,10 @@ div.CreatableSelect {
 .CodeMirror-linenumber {
   cursor: pointer;
 }
+
+video::cue {
+  color: #fff15d;
+  text-shadow: 1px 1px 2px black;
+  background-color: rgba(0,0,0,0) !important;
+  margin-bottom: 10px;
+}
