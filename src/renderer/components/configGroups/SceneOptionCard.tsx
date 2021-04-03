@@ -121,7 +121,7 @@ class SceneOptionCard extends React.Component {
     const nextSceneTime = typeof this.props.scene.nextSceneTime === 'number' ? this.props.scene.nextSceneTime : 0;
 
     const playlists = (this.props.scene.audioPlaylists as {audios: Audio[], shuffle: boolean, repeat: string}[]);
-    const hasBPM = playlists.length && playlists[0].audios.length && playlists[0].audios[0].bpm;
+    const hasBPM = !!playlists && playlists.length && playlists[0].audios.length && playlists[0].audios[0].bpm;
     return (
       <Grid container spacing={2} alignItems="center">
         <Grid item xs={12} className={clsx(this.props.tutorial == SDT.timing && classes.highlight)}>
