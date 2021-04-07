@@ -6,4 +6,5 @@
 
 
 [GitHub](https://github.com/ififfy/flipflip/)
+[KoFi](https://ko-fi.com/flipflipapp)
 [Get Started](#flipflip)  

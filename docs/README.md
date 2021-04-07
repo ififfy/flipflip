@@ -21,3 +21,7 @@
 Having an issue with FlipFlip? Have a new feature recommendation? Just want to share how much you enjoy it?
 You can reach us on our [GitHub](https://github.com/ififfy/flipflip) or on Reddit at 
 [/r/flipflip](https://www.reddit.com/r/flipflip/).
+
+## Donate
+
+Enjoying FlipFlip? [Buy me a coffee](https://ko-fi.com/flipflipapp) and help support FlipFlip development!
