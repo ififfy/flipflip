@@ -92,7 +92,7 @@ class AudioCard extends React.Component {
                   onAddTracks={this.props.onAddTracks}
                   onSourceOptions={this.onSourceOptions.bind(this)}
                   onUpdateScene={this.props.onUpdateScene.bind(this)}
-                  setCurrentAudio={i==0 && this.props.setCurrentAudio ? this.props.setCurrentAudio.bind(this) : this.nop}
+                  setCurrentAudio={i==0 && this.props.setCurrentAudio ? this.props.setCurrentAudio.bind(this) : undefined}
                   goBack={this.props.goBack}
                   onPlay={this.props.onPlay}
                   onPlaying={this.props.onPlaying}
@@ -121,8 +121,6 @@ class AudioCard extends React.Component {
       </Grid>
     );
   }
-
-  nop() {}
 
   onFinishSourceOptions(newAudio: Audio) {
     this.props.onUpdateScene(this.props.scene, (s) => {

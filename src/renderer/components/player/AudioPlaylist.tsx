@@ -326,15 +326,17 @@ class AudioPlaylist extends React.Component {
   }
 
   restart() {
-    if (this.props.setCurrentAudio) {
-      this.props.setCurrentAudio(this.props.playlist.audios[this.state.currentIndex]);
-    }
+    let audios = this.props.playlist.audios;
     if (this.props.startPlaying) {
-      let audios = this.props.playlist.audios;
       if (this.props.playlist.shuffle) {
         audios = randomizeList(Array.from(audios));
       }
       this.setState({playingAudios: audios});
+    }
+    if (this.props.setCurrentAudio) {
+      let audio = audios[this.state.currentIndex];
+      if (!audio) audio = this.props.playlist.audios[this.state.currentIndex];
+      this.props.setCurrentAudio(audio);
     }
   }
 
@@ -383,21 +385,21 @@ class AudioPlaylist extends React.Component {
   prevTrack() {
     let prevTrack = this.state.currentIndex - 1;
     if (prevTrack < 0) {
-      prevTrack = this.props.playlist.audios.length - 1;
+      prevTrack = this.state.playingAudios.length - 1;
     }
     if (this.props.setCurrentAudio) {
-      this.props.setCurrentAudio(this.props.playlist.audios[prevTrack]);
+      this.props.setCurrentAudio(this.state.playingAudios[prevTrack]);
     }
     this.setState({currentIndex: prevTrack});
   }
 
   nextTrack() {
     let nextTrack = this.state.currentIndex + 1;
-    if (nextTrack >= this.props.playlist.audios.length) {
+    if (nextTrack >= this.state.playingAudios.length) {
       nextTrack = 0;
     }
     if (this.props.setCurrentAudio) {
-      this.props.setCurrentAudio(this.props.playlist.audios[nextTrack]);
+      this.props.setCurrentAudio(this.state.playingAudios[nextTrack]);
     }
     this.setState({currentIndex: nextTrack});
   }
