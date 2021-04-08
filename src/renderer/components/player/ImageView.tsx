@@ -38,15 +38,15 @@ export default class ImageView extends React.Component {
   }
 
   componentDidUpdate(props: any) {
-    let force = false;
+    let forceBG = false;
     if (!this.props.pictureGrid && this.props.scene.backgroundType !== props.scene.backgroundType) {
       if (this.props.scene.backgroundType === BT.blur) {
-        force = true;
+        forceBG = true;
       } else if (props.scene.backgroundType === BT.blur && this.backgroundRef.current.firstChild) {
         this.backgroundRef.current.removeChild(this.backgroundRef.current.firstChild);
       }
     }
-    this._applyImage(force);
+    this._applyImage(forceBG);
     if (!props.hasStarted && this.props.hasStarted) {
       const el = this.contentRef.current;
       if (el && el.firstChild && el.firstChild instanceof HTMLVideoElement) {
@@ -67,7 +67,7 @@ export default class ImageView extends React.Component {
     }
   }
 
-  _applyImage(forceBG: boolean = false) {
+  _applyImage(forceBG = false) {
     const el = this.contentRef.current;
     const bg = this.backgroundRef.current;
     const img = this.props.image;
@@ -75,6 +75,49 @@ export default class ImageView extends React.Component {
 
     const firstChild = el.firstChild;
     if (!forceBG && firstChild && (firstChild as HTMLImageElement | HTMLVideoElement).src == img.src) return;
+
+    if (!forceBG && img instanceof HTMLVideoElement && img.hasAttribute("subtitles")) {
+      try {
+        let subURL = img.getAttribute("subtitles");
+        wretch(subURL)
+          .get()
+          .blob((blob) => {
+            let track: any = document.createElement("track");
+            track.kind = "captions";
+            track.label = "English";
+            track.srclang = "en";
+            track.src = URL.createObjectURL(blob);
+            img.append(track);
+            track.mode = "showing";
+            img.textTracks[0].mode = "showing";
+          });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    const videoLoop = (v: any) => {
+      if (!el || !el.parentElement || parseFloat(el.parentElement.style.opacity) == 0.99 || v.ended || v.paused) return;
+      let crossFadeAudio = !this.props.pictureGrid && this.props.scene.crossFadeAudio;
+      if (!this.props.pictureGrid && this.props.hasStarted && this.props.scene.crossFade && crossFadeAudio && v instanceof HTMLVideoElement) {
+        const volume = v.hasAttribute("volume") ? parseInt(v.getAttribute("volume")) : this.props.scene.videoVolume;
+        v.volume = (volume / 100) * parseFloat(el.parentElement.parentElement.getAttribute("volume"));
+      }
+      if (v.hasAttribute("start") && v.hasAttribute("end")) {
+        const start = v.getAttribute("start");
+        const end = v.getAttribute("end");
+        if (v.currentTime > end) {
+          v.currentTime = start;
+        }
+      }
+      this._timeouts.push(setTimeout(videoLoop, 100, v));
+    };
+
+    const drawLoop = (v: any, c: CanvasRenderingContext2D, w: number, h: number) => {
+      if (!el || !el.parentElement || parseFloat(el.parentElement.style.opacity) == 0.99 || v.ended || v.paused) return;
+      c.drawImage(v, 0, 0, w, h);
+      this._timeouts.push(setTimeout(drawLoop, 20, v, c, w, h));
+    };
 
     let parentWidth = el.offsetWidth;
     let parentHeight = el.offsetHeight;
@@ -99,49 +142,6 @@ export default class ImageView extends React.Component {
       imgHeight = img.videoHeight;
     }
     let imgAspect = imgWidth / imgHeight;
-
-    if (img instanceof HTMLVideoElement && img.hasAttribute("subtitles")) {
-      try {
-        let subURL = img.getAttribute("subtitles");
-        wretch(subURL)
-          .get()
-          .blob((blob) => {
-            let track: any = document.createElement("track");
-            track.kind = "captions";
-            track.label = "English";
-            track.srclang = "en";
-            track.src = URL.createObjectURL(blob);
-            img.append(track);
-            track.mode = "showing";
-            img.textTracks[0].mode = "showing";
-          });
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
-    const videoLoop = (v: any) => {
-      if (!el || !el.parentElement || parseFloat(el.parentElement.style.opacity) == 0.99 || v.ended || v.paused) return;
-      let crossFadeAudio = !this.props.pictureGrid && this.props.scene.crossFadeAudio && !this.props.scene.gridView;
-      if (!this.props.pictureGrid && this.props.hasStarted && this.props.scene.crossFade && crossFadeAudio && v instanceof HTMLVideoElement) {
-        const volume = v.hasAttribute("volume") ? parseInt(v.getAttribute("volume")) : this.props.scene.videoVolume;
-        v.volume = (volume / 100) * parseFloat(el.parentElement.parentElement.getAttribute("volume"));
-      }
-      if (v.hasAttribute("start") && v.hasAttribute("end")) {
-        const start = v.getAttribute("start");
-        const end = v.getAttribute("end");
-        if (v.currentTime > end) {
-          v.currentTime = start;
-        }
-      }
-      this._timeouts.push(setTimeout(videoLoop, 100, v));
-    };
-
-    const drawLoop = (v: any, c: CanvasRenderingContext2D, w: number, h: number) => {
-      if (!el || !el.parentElement || parseFloat(el.parentElement.style.opacity) == 0.99 || v.ended || v.paused) return;
-      c.drawImage(v, 0, 0, w, h);
-      this._timeouts.push(setTimeout(drawLoop, 20, v, c, w, h));
-    };
 
     const rotate = !this.props.pictureGrid &&
       ((isVideo &&
@@ -207,7 +207,7 @@ export default class ImageView extends React.Component {
             bgImg.style.width = parentHeight + "px";
             bgImg.style.height = (imgHeight * bgscale) + 'px';
             bgImg.style.marginTop = (parentHeight / 2 - imgHeight * bgscale / 2) + 'px';
-            bgImg.style.marginLeft = ((parentWidth - parentHeight) / 2) + "px";;
+            bgImg.style.marginLeft = ((parentWidth - parentHeight) / 2) + "px";
           }
         }
 
@@ -228,7 +228,7 @@ export default class ImageView extends React.Component {
       }
     }
 
-    if (img instanceof HTMLVideoElement && !forceBG) {
+    if (!forceBG && img instanceof HTMLVideoElement) {
       if (!this.props.pictureGrid && this.props.hasStarted) {
         const volume = img.hasAttribute("volume") ? parseInt(img.getAttribute("volume")) : this.props.scene.videoVolume;
         img.volume = volume / 100;

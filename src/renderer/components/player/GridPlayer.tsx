@@ -96,6 +96,7 @@ class GridPlayer extends React.Component {
     sceneGrids: Array<SceneGrid>,
     theme: Theme,
     advanceHacks?: Array<ChildCallbackHack>,
+    hasStarted?: boolean,
     hideBars?: boolean,
     cache(i: HTMLImageElement | HTMLVideoElement): void,
     getTags(source: string): Array<Tag>,
@@ -219,6 +220,7 @@ class GridPlayer extends React.Component {
                             preventSleep={rowIndex == 0 && colIndex == 0}
                             advanceHack={this.props.advanceHacks ? this.props.advanceHacks[(rowIndex * row.length) + colIndex] : undefined}
                             config={this.props.config}
+                            hasStarted={this.props.hasStarted}
                             scene={scene}
                             gridView
                             scenes={this.props.scenes}

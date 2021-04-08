@@ -46,6 +46,7 @@ export default class Player extends React.Component {
     captionScale?: number,
     captionProgramJumpToHack?: ChildCallbackHack,
     gridView?: boolean,
+    hasStarted?: boolean,
     tags?: Array<Tag>,
     blacklistFile?(sourceURL: string, fileToBlacklist: string): void,
     goToTagSource?(source: LibrarySource): void,
@@ -65,7 +66,7 @@ export default class Player extends React.Component {
 
   readonly state = {
     canStart: this.props.scene.audioScene,
-    hasStarted: this.props.scene.audioScene,
+    hasStarted: this.props.hasStarted != null ? this.props.hasStarted : this.props.scene.audioScene,
     isMainLoaded: this.props.scene.audioScene,
     areOverlaysLoaded: Array<boolean>(this.props.scene.overlays.length).fill(false),
     isEmpty: false,
@@ -147,7 +148,7 @@ export default class Player extends React.Component {
     if (!this.state.hasStarted) {
       playerStyle = {
         ...playerStyle,
-        display: 'none',
+        opacity: 0,
       }
     }
 
@@ -524,6 +525,7 @@ export default class Player extends React.Component {
                       advanceHacks={this.state.imagePlayerAdvanceHacks[index + 1]}
                       config={this.props.config}
                       grid={overlayGrid}
+                      hasStarted={this.state.hasStarted}
                       scenes={this.props.scenes}
                       sceneGrids={this.props.sceneGrids}
                       theme={this.props.theme}
