@@ -97,7 +97,11 @@ export default class ImageView extends React.Component {
     }
 
     const videoLoop = (v: any) => {
-      if (!el || !el.parentElement || parseFloat(el.parentElement.style.opacity) == 0.99 || v.ended || v.paused) return;
+      if (!el || !el.parentElement || parseFloat(el.parentElement.style.opacity) == 0.99 || v.paused) return;
+      if (v.ended) {
+        v.onended(null);
+        return;
+      }
       let crossFadeAudio = !this.props.pictureGrid && this.props.scene.crossFadeAudio;
       if (!this.props.pictureGrid && this.props.hasStarted && this.props.scene.crossFade && crossFadeAudio && v instanceof HTMLVideoElement) {
         const volume = v.hasAttribute("volume") ? parseInt(v.getAttribute("volume")) : this.props.scene.videoVolume;
@@ -107,6 +111,7 @@ export default class ImageView extends React.Component {
         const start = v.getAttribute("start");
         const end = v.getAttribute("end");
         if (v.currentTime > end) {
+          v.onended(null);
           v.currentTime = start;
         }
       }

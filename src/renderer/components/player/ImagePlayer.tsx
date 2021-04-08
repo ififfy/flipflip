@@ -521,15 +521,27 @@ export default class ImagePlayer extends React.Component {
         }
         video.setAttribute("speed", speed.toString());
 
+        if (video.hasAttribute("start") && video.hasAttribute("end")) {
+          const start = parseInt(video.getAttribute("start"));
+          const end = parseInt(video.getAttribute("end"));
+          if (this.props.scene.randomVideoStart && (!this.props.scene.continueVideo || !video.currentTime)) {
+            video.currentTime = start + (Math.random() * (end - start));
+          } else if (video.currentTime < start || video.currentTime > end) {
+            video.currentTime = parseInt(video.getAttribute("start"));
+          }
+        } else if (this.props.scene.randomVideoStart && (!this.props.scene.continueVideo || !video.currentTime)) {
+          video.currentTime = Math.random() * video.duration;
+        }
+
         switch(this.props.scene.videoOption) {
           case VO.full:
             let duration;
             if (video.hasAttribute("start") && video.hasAttribute("end")) {
-              const start = parseInt(video.getAttribute("start"));
+              const start = video.currentTime ? video.currentTime : parseInt(video.getAttribute("start"));
               const end = parseInt(video.getAttribute("end"));
               duration = end - start;
             } else {
-              duration = video.duration;
+              duration = video.duration - video.currentTime;
             }
             duration = duration * 1000 / (speed / 10);
             video.setAttribute("duration", duration.toString());
@@ -556,18 +568,6 @@ export default class ImagePlayer extends React.Component {
             } while (atLeastDuration < this.props.scene.videoTimingConstant);
             video.setAttribute("duration", atLeastDuration.toString())
             break;
-        }
-
-        if (video.hasAttribute("start") && video.hasAttribute("end")) {
-          const start = parseInt(video.getAttribute("start"));
-          const end = parseInt(video.getAttribute("end"));
-          if (this.props.scene.videoOption != VO.full && this.props.scene.randomVideoStart && (!this.props.scene.continueVideo || !video.currentTime)) {
-            video.currentTime = start + (Math.random() * (end - start));
-          } else if (video.currentTime < start || video.currentTime > end) {
-            video.currentTime = parseInt(video.getAttribute("start"));
-          }
-        } else if (this.props.scene.videoOption != VO.full && this.props.scene.randomVideoStart && (!this.props.scene.continueVideo || !video.currentTime)) {
-          video.currentTime = Math.random() * video.duration;
         }
 
         (video as any).key = this.state.nextImageID;
@@ -608,9 +608,17 @@ export default class ImagePlayer extends React.Component {
         errorCallback();
       };
 
+      video.onended = () => {
+        if (this.props.scene.videoOption == VO.full) {
+          clearTimeout(this._timeout);
+          this.advance(true, true);
+        } else {
+          video.play();
+        }
+      }
+
       video.src = url;
       video.preload = "auto";
-      video.loop = true;
 
       clearTimeout(this._imgLoadTimeouts[i]);
       this._imgLoadTimeouts[i] = setTimeout(() => errorCallback, 15000);
