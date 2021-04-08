@@ -24,6 +24,7 @@ import CaptionProgramPlaylist from "./CaptionProgramPlaylist";
 import CaptionScript from "../../data/CaptionScript";
 import SceneGrid from "../../data/SceneGrid";
 import GridPlayer from "./GridPlayer";
+import IdleTimer from "react-idle-timer";
 
 export default class Player extends React.Component {
   readonly props: {
@@ -85,8 +86,10 @@ export default class Player extends React.Component {
     thumbImage: null as HTMLImageElement,
     persistAudio: false,
     persistText: false,
+    hideCursor: false,
   };
 
+  readonly idleTimerRef: React.RefObject<HTMLDivElement> = React.createRef();
   _interval: NodeJS.Timer = null;
   _toggleStrobe = false;
   _powerSaveID: number = null;
@@ -145,6 +148,13 @@ export default class Player extends React.Component {
       playerStyle = {
         ...playerStyle,
         display: 'none',
+      }
+    }
+
+    if (this.state.hideCursor) {
+      playerStyle = {
+        ...playerStyle,
+        cursor: 'none',
       }
     }
 
@@ -374,7 +384,15 @@ export default class Player extends React.Component {
             pictures={this.state.historyPaths} />
         )}
 
-        <div style={playerStyle}>
+        <div style={playerStyle}
+             ref={this.idleTimerRef}>
+          {!this.props.gridView && (
+            <IdleTimer
+              ref={ref => {return this.idleTimerRef}}
+              onActive={this.onActive.bind(this)}
+              onIdle={this.onIdle.bind(this)}
+              timeout={2000} />
+          )}
           {this.props.config.generalSettings.watermark && (
             <div style={watermarkStyle}>
               {watermarkText}
@@ -669,6 +687,7 @@ export default class Player extends React.Component {
       this.state.hasStarted !== state.hasStarted ||
       this.state.isMainLoaded !== state.isMainLoaded ||
       this.state.areOverlaysLoaded !== state.areOverlaysLoaded ||
+      this.state.hideCursor !== state.hideCursor ||
       this.state.isEmpty !== state.isEmpty ||
       this.state.isPlaying !== state.isPlaying ||
       this.state.total !== state.total ||
@@ -822,6 +841,14 @@ export default class Player extends React.Component {
 
   getScene(id: number): Scene {
     return this.props.scenes.find((s) => s.id == id);
+  }
+
+  onActive() {
+    this.setState({hideCursor: false})
+  }
+
+  onIdle() {
+    this.setState({hideCursor: true})
   }
 
   navigateTagging(offset: number) {

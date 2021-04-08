@@ -17,6 +17,7 @@ import Scene from "../../data/Scene";
 import Tag from "../../data/Tag";
 import Player from "./Player";
 import ChildCallbackHack from "./ChildCallbackHack";
+import IdleTimer from "react-idle-timer";
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -80,7 +81,10 @@ const styles = (theme: Theme) => createStyles({
   },
   hidden: {
     opacity: 0,
-  }
+  },
+  hideCursor: {
+    cursor: 'none',
+  },
 });
 
 class GridPlayer extends React.Component {
@@ -110,8 +114,10 @@ class GridPlayer extends React.Component {
     width: this.props.grid.grid && this.props.grid.grid.length > 0 &&
     this.props.grid.grid[0].length > 0 ? this.props.grid.grid[0].length : 1,
     isLoaded: new Array<Array<boolean>>(),
+    hideCursor: false,
   };
 
+  readonly idleTimerRef: React.RefObject<HTMLDivElement> = React.createRef();
   _appBarTimeout: any = null;
 
   render() {
@@ -173,8 +179,14 @@ class GridPlayer extends React.Component {
           </React.Fragment>
         )}
 
-        <main className={classes.content}>
+        <main className={clsx(classes.content, this.state.hideCursor && classes.hideCursor)}
+              ref={this.idleTimerRef}>
           <div className={classes.appBarSpacer} />
+          <IdleTimer
+            ref={ref => {return this.idleTimerRef}}
+            onActive={this.onActive.bind(this)}
+            onIdle={this.onIdle.bind(this)}
+            timeout={2000} />
           <Container maxWidth={false} className={classes.container}>
             <div className={classes.grid}
                  style={{gridTemplateColumns: gridTemplateColumns, gridTemplateRows: gridTemplateRows}}>
@@ -238,6 +250,14 @@ class GridPlayer extends React.Component {
   }
 
   nop() {}
+
+  onActive() {
+    this.setState({hideCursor: false})
+  }
+
+  onIdle() {
+    this.setState({hideCursor: true})
+  }
 
   setCellLoaded(rowIndex: number, colIndex: number) {
     const newLoaded = this.state.isLoaded;

@@ -52,7 +52,6 @@ export default class ImagePlayer extends React.Component {
     timeToNextFrame: 0,
     timeoutID: 0,
     nextImageID: 0,
-    hideCursor: false,
     historyOffset: 0,
   };
 
@@ -88,7 +87,6 @@ export default class ImagePlayer extends React.Component {
       left: 0,
       position: this.props.gridView ? 'static' : 'fixed',
       zIndex: this.props.isOverlay ? 4 : 'auto',
-      cursor: this.state.hideCursor ? 'none' : 'initial',
     };
 
     return (
@@ -102,11 +100,6 @@ export default class ImagePlayer extends React.Component {
             timeToNextFrame={this.state.timeToNextFrame}
             scene={this.props.scene}/>
         )}
-        <IdleTimer
-          ref={ref => {return this.idleTimerRef}}
-          onActive={this.onActive.bind(this)}
-          onIdle={this.onIdle.bind(this)}
-          timeout={2000} />
         <ImageView
           image={this.state.historyPaths.length > 0 ? this.state.historyPaths[(this.state.historyPaths.length - 1) + offset] : null}
           currentAudio={this.props.currentAudio}
@@ -116,13 +109,11 @@ export default class ImagePlayer extends React.Component {
           fitParent={this.props.gridView}
           hideOverflow={this.props.gridView}
           hasStarted={this.props.hasStarted}
-          onLoaded={this.state.historyPaths.length == 1 ? this.props.onLoaded : this.nop}
+          onLoaded={this.state.historyPaths.length == 1 ? this.props.onLoaded : undefined}
           setVideo={this.props.setVideo}/>
       </div>
     );
   }
-
-  nop() {}
 
   getHistoryOffset() {
     return this.props.historyOffset + this.state.historyOffset;
@@ -188,8 +179,7 @@ export default class ImagePlayer extends React.Component {
   }
 
   shouldComponentUpdate(props: any, state: any): boolean {
-    return (state.hideCursor !== this.state.hideCursor ||
-            state.historyPaths !== this.state.historyPaths ||
+    return (state.historyPaths !== this.state.historyPaths ||
             props.scene !== this.props.scene ||
             props.isPlaying !== this.props.isPlaying ||
             props.hasStarted !== this.props.hasStarted ||
@@ -263,14 +253,6 @@ export default class ImagePlayer extends React.Component {
       clearTimeout(this._backForth);
       this._backForth = null;
     }
-  }
-
-  onActive() {
-    this.setState({hideCursor: false})
-  }
-
-  onIdle() {
-    this.setState({hideCursor: true})
   }
 
   delete() {
@@ -512,7 +494,9 @@ export default class ImagePlayer extends React.Component {
       }
 
       const successCallback = () => {
-        clearTimeout(this._imgLoadTimeouts[i]);
+        if (this._imgLoadTimeouts) {
+          clearTimeout(this._imgLoadTimeouts[i]);
+        }
         if (!this._isMounted) return;
         this.props.cache(video);
 
@@ -598,7 +582,9 @@ export default class ImagePlayer extends React.Component {
       };
 
       const errorCallback = () => {
-        clearTimeout(this._imgLoadTimeouts[i]);
+        if (this._imgLoadTimeouts) {
+          clearTimeout(this._imgLoadTimeouts[i]);
+        }
         if (!this._isMounted) return;
         if (this.props.scene.nextSceneAllImages && this.props.scene.nextSceneID != 0 && this.props.playNextScene && video && video.src) {
           this._playedURLs.push(video.src);
@@ -642,7 +628,9 @@ export default class ImagePlayer extends React.Component {
       }
 
       const successCallback = () => {
-        clearTimeout(this._imgLoadTimeouts[i]);
+        if (this._imgLoadTimeouts) {
+          clearTimeout(this._imgLoadTimeouts[i]);
+        }
         if (!this._isMounted) return;
         this.props.cache(img);
 
@@ -666,7 +654,9 @@ export default class ImagePlayer extends React.Component {
       };
 
       const errorCallback = () => {
-        clearTimeout(this._imgLoadTimeouts[i]);
+        if (this._imgLoadTimeouts) {
+          clearTimeout(this._imgLoadTimeouts[i]);
+        }
         if (!this._isMounted) return;
         if (this.props.scene.nextSceneAllImages && this.props.scene.nextSceneID != 0 && this.props.playNextScene && img && img.src) {
           this._playedURLs.push(img.src);
