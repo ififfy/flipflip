@@ -68,7 +68,6 @@ function archiveFile(filePath: string): void {
 
 export default class AppStorage {
   initialState: any = defaultInitialState;
-  savePath: string;
 
   constructor(windowId: number) {
     try {
@@ -78,10 +77,25 @@ export default class AppStorage {
       // who cares
     }
     try {
-      let data = JSON.parse(readFileSync(savePath, 'utf-8'));
-      const portableMode = data.config.generalSettings.portableMode;
-      if (portableMode) {
+      let data;
+      let portableMode = false;
+      // If only a portable data file exists and portableMode AND disableLocalSave are enabled, use that data file
+      // Otherwise, fallback to the local file
+      if (!existsSync(savePath) && existsSync(portablePath)) {
         data = JSON.parse(readFileSync(portablePath, 'utf-8'));
+        if (!data.config.generalSettings.portableMode) {
+          data = JSON.parse(readFileSync(savePath, 'utf-8'));
+        } else {
+          portableMode = true;
+          console.log("Portable: " + portablePath);
+        }
+      } else {
+        data = JSON.parse(readFileSync(savePath, 'utf-8'));
+        if (data.config.generalSettings.portableMode) {
+          portableMode = true;
+          console.log("Portable: " + portablePath);
+          data = JSON.parse(readFileSync(portablePath, 'utf-8'));
+        }
       }
       switch (data.version) {
         // When no version number found in data.json -- assume pre-v2.0.0 format
@@ -383,39 +397,49 @@ export default class AppStorage {
     }
 
     if (windowId == 1) {
+      if (this.initialState.config.generalSettings.portableMode) {
+        console.log("Saving to", portablePath);
+        if (this.initialState.config.generalSettings.disableLocalSave) {
+          return;
+        }
+      }
       console.log("Saving to", savePath);
-      this.savePath = savePath;
     }
   }
 
   save(state: any) {
-    if (this.savePath) {
-      if (state.config.generalSettings.portableMode) {
-        writeFileSync(portablePath, JSON.stringify(state), 'utf-8');
-        if (!state.config.generalSettings.disableLocalSave) {
-          writeFileSync(this.savePath, JSON.stringify(state), 'utf-8');
-        }
-      } else {
-        writeFileSync(this.savePath, JSON.stringify(state), 'utf-8');
+    if (state.config.generalSettings.portableMode) {
+      writeFileSync(portablePath, JSON.stringify(state), 'utf-8');
+      if (!state.config.generalSettings.disableLocalSave) {
+        writeFileSync(savePath, JSON.stringify(state), 'utf-8');
       }
+    } else {
+      writeFileSync(savePath, JSON.stringify(state), 'utf-8');
     }
 
     if (state.config.generalSettings.autoBackup) {
       const backups = getBackups();
       if (backups.length == 0) {
-        this.backup();
+        this.backup(state);
       } else {
         const lastBackup = backups[0];
         const epoch = parseInt(lastBackup.url.substring(lastBackup.url.lastIndexOf(".") + 1));
         if (Date.now()  - epoch > (86400000 * state.config.generalSettings.autoBackupDays)) {
-          this.backup();
+          this.backup(state);
         }
       }
     }
 
   }
 
-  backup() {
-    archiveFile(savePath);
+  backup(state: any) {
+    if (state.config.generalSettings.portableMode) {
+      archiveFile(portablePath);
+      if (!state.config.generalSettings.disableLocalSave) {
+        archiveFile(savePath);
+      }
+    } else {
+      archiveFile(savePath);
+    }
   }
 }

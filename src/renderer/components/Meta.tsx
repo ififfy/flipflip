@@ -181,7 +181,7 @@ export default class Meta extends React.Component {
               onEditBlacklist={a(actions.editBlacklist)}
               onExportLibrary={a(actions.exportLibrary)}
               onImportFromLibrary={a(actions.importFromLibrary)}
-              onImportLibrary={a(actions.importLibrary, appStorage.backup.bind(appStorage))}
+              onImportLibrary={a(actions.importLibrary, appStorage.backup.bind(this.state))}
               onImportInstagram={p(actions.importInstagram)}
               onImportReddit={p(actions.importReddit)}
               onImportTumblr={p(actions.importTumblr)}
@@ -373,7 +373,7 @@ export default class Meta extends React.Component {
               sceneGrids={this.state.grids}
               theme={this.state.theme}
               goBack={a(actions.goBack)}
-              onBackup={appStorage.backup.bind(appStorage)}
+              onBackup={appStorage.backup.bind(this.state)}
               onChangeThemeColor={a(actions.changeThemeColor)}
               onClean={actions.cleanBackups}
               onDefault={a(actions.setDefaultConfig)}
