@@ -149,7 +149,9 @@ class VideoControl extends React.Component {
         }
         if (this.props.video.currentTime < this.props.clipValue[0] ||
           this.props.video.currentTime > this.props.clipValue[1]) {
-          this.props.video.onended(null);
+          if (this.props.video.onended) {
+            this.props.video.onended(null);
+          }
           this.props.video.currentTime = this.props.clipValue[0];
         }
       }
