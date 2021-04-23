@@ -141,6 +141,27 @@ function BDSMlrIcon(props: any) {
   )
 }
 
+function HydrusIcon(props: any) {
+  return (
+    <SvgIcon {...props} viewBox="0 0 338.000000 333.000000" fontSize="small">
+      <g transform="translate(0.000000,333.000000) scale(0.100000,-0.100000)">
+        <path d="M1574 3201 c-12 -5 -26 -16 -30 -23 -5 -7 -11 -503 -14 -1101 -5
+        -1074 -5 -1089 -25 -1104 -40 -29 -179 7 -272 71 -90 61 -145 156 -181 311
+        -13 58 -17 159 -21 572 l-6 502 -23 23 c-22 22 -28 23 -222 23 -190 0 -200 -1
+        -221 -21 -29 -30 -18 -58 36 -90 55 -32 91 -73 106 -122 7 -23 14 -179 19
+        -422 9 -441 19 -510 90 -658 32 -67 56 -101 113 -156 111 -108 241 -164 443
+        -191 61 -8 118 -17 126 -20 34 -13 38 -52 38 -359 0 -376 -10 -351 144 -351
+        88 0 108 3 123 18 16 16 18 48 23 337 6 379 -2 356 126 371 361 43 565 207
+        643 516 32 127 41 243 41 523 1 287 10 394 37 441 10 17 44 46 75 65 67 41 80
+        67 49 98 -20 20 -31 21 -204 21 -100 0 -194 -3 -209 -8 -53 -14 -53 -15 -59
+        -552 -5 -425 -9 -511 -23 -575 -40 -168 -110 -267 -230 -324 -82 -39 -166 -61
+        -200 -52 -15 4 -28 18 -35 37 -8 23 -11 348 -11 1094 0 1245 16 1109 -132
+        1112 -51 2 -103 -1 -114 -6z"/>
+      </g>
+    </SvgIcon>
+  )
+}
+
 
 export default class SourceIcon extends React.Component {
   readonly props: {
@@ -184,6 +205,7 @@ export default class SourceIcon extends React.Component {
       case ST.deviantart:
         return <DeviantArtIcon className={this.props.className}/>;
       case ST.danbooru:
+      case ST.e621:
         return <DanbooruIcon className={this.props.className}/>;
       case ST.gelbooru1:
       case ST.gelbooru2:
@@ -192,6 +214,8 @@ export default class SourceIcon extends React.Component {
         return <EHentaiIcon className={this.props.className}/>;
       case ST.bdsmlr:
         return <BDSMlrIcon className={this.props.className}/>;
+      case ST.hydrus:
+        return <HydrusIcon className={this.props.className}/>;
       default:
         return <div/>
     }

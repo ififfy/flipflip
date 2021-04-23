@@ -1,13 +1,13 @@
 # Audio/Text
 The **AUDIO/TEXT** tab controls audio and text overlays.
 
-![](doc_images/scene_detail_audio_text.png)
+<img src="doc_images/scene_detail_audio_text.png" alt="Options" width="50%" style="min-width: 483px">
 
 ## Audio
 This card allows you to layer multiple audio track playlists over your Scene. Each playlist, a sequence of 
 consecutive tracks, begins playing when the scene starts.
 
-In order to add tracks to your scene, you will first need to add them to your [Audio Library](library.md).
+In order to add tracks to your scene, you will first need to add them to your [Audio Library](audio_library.md).
 
 Once you have tracks in your library to import, you can add a playlist by clicking the + button in the top right corner. 
 Then, click the + in the middle of the new playlist to [import tracks from your library](audio_import_from_library.md) 
@@ -29,12 +29,24 @@ value manually, (2) try to detect the BPM of the entered audio file, or (3) read
 entered audio file.
 
 ## Text
-This card allows you to play a caption script over your Scene. Choose a text file that follows 
-the [caption script format](caption_script.md). This can be a local file or a remote URL.
+This card allows you to layer multiple caption playlists over your Scene. Each playlist, a sequence of
+consecutive scripts, begins playing when the scene starts.
 
+In order to add scripts to your scene, you will first need to add them to your [Script Library](script_library.md).
+This can be a local file or a remote URL.
+
+Once you have scripts in your library to import, you can add a playlist by clicking the + button in the top right corner.
+Then, click the + in the middle of the new playlist to [import tracks from your library](script_import_from_library.md)
+to this playlist.
+
+Scripts must follow the [caption script format](caption_script.md).
+
+
+Click the wrench to change the following options for a track:
 * **Stop at End** - The Scene will stop when the caption script ends.
 * **Next Scene at End** - The Next Scene will play when the audio track ends.
-
-?> By default, the font options are hidden. Click the **eye icon** to show/hide font options.
+* **Sync Timestamp with Audio** - When enabled, timestamps in this script will be synced with the currently playing 
+  audio (if there is any). Disable this to unsync your script's timestamps.
+* **Font Options** - You can select the font family, size, and color as well as border width and color for each of action command
   
 <img src="doc_images/caption_ex.gif" alt="Caption Example">

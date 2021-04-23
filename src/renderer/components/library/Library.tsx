@@ -2,15 +2,13 @@ import * as React from "react";
 import clsx from "clsx";
 import {readdir} from "fs";
 import {move} from "fs-extra";
-import Select, { components } from 'react-select';
 
 import {
-  AppBar, Backdrop, Badge, Button, Checkbox, Chip, Collapse, Container, createStyles, Dialog, DialogActions,
+  AppBar, Backdrop, Badge, Button, Chip, Collapse, Container, createStyles, Dialog, DialogActions,
   DialogContent, DialogContentText, DialogTitle, Divider, Drawer, Fab, IconButton, LinearProgress, ListItem,
   ListItemIcon, ListItemSecondaryAction, ListItemText, ListSubheader, Menu, MenuItem, Theme, Toolbar, Tooltip,
   Typography, withStyles
 } from "@material-ui/core";
-import {grey} from "@material-ui/core/colors";
 
 import AddIcon from '@material-ui/icons/Add';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -26,14 +24,16 @@ import HttpIcon from '@material-ui/icons/Http';
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import MenuIcon from'@material-ui/icons/Menu';
 import MergeTypeIcon from '@material-ui/icons/MergeType';
+import MovieFilterIcon from '@material-ui/icons/MovieFilter';
 import MovieIcon from '@material-ui/icons/Movie';
 import OfflineBoltIcon from '@material-ui/icons/OfflineBolt';
 import PublishIcon from '@material-ui/icons/Publish';
 import SelectAllIcon from '@material-ui/icons/SelectAll';
+import ShuffleIcon from "@material-ui/icons/Shuffle";
 import SortIcon from '@material-ui/icons/Sort';
 
 import {AF, LT, MO, PR, SF, SP, ST} from "../../data/const";
-import {getCachePath, getLocalPath, getSourceType} from "../../data/utils";
+import {getCachePath, getLocalPath, getSourceType, getTimestampValue} from "../../data/utils";
 import en from "../../data/en";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
@@ -193,7 +193,7 @@ const styles = (theme: Theme) => createStyles({
     backgroundColor: theme.palette.secondary.dark,
     margin: 0,
     top: 'auto',
-    right: 80,
+    right: 130,
     bottom: 20,
     left: 'auto',
     position: 'fixed',
@@ -202,7 +202,7 @@ const styles = (theme: Theme) => createStyles({
     backgroundColor: theme.palette.secondary.light,
     margin: 0,
     top: 'auto',
-    right: 130,
+    right: 180,
     bottom: 20,
     left: 'auto',
     position: 'fixed',
@@ -324,6 +324,7 @@ class Library extends React.Component {
     onTutorial(tutorial: string): void,
     onUpdateLibrary(fn: (library: Array<LibrarySource>) => void): void,
     onUpdateMode(mode: string): void,
+    onUpdateVideoMetadata(): void,
     savePosition(yOffset: number, filters:Array<string>, selected: Array<string>): void,
     systemMessage(message: string): void,
   };
@@ -355,9 +356,14 @@ class Library extends React.Component {
     let cancelProgressMessage;
     switch (this.props.progressMode) {
       case PR.offline:
-        cancelProgressMessage = "Cancel Offline Check";
+        cancelProgressMessage = "Cancel Offline Check ( " + this.props.progressCurrent + " / " + this.props.progressTotal + " )";
+        break;
+      case PR.videoMetadata:
+        cancelProgressMessage = "End Video MD Check ( " + this.props.progressCurrent + " / " + this.props.progressTotal + " )";
         break;
       case PR.tumblr:
+        cancelProgressMessage = "Cancel Import ( " + this.props.progressCurrent + " / " + this.props.progressTotal + " )";
+        break;
       case PR.reddit:
       case PR.twitter:
       case PR.instagram:
@@ -537,6 +543,14 @@ class Library extends React.Component {
                 <ListItemText primary="Mark Offline" />
               </ListItem>
             </Tooltip>
+            <Tooltip title={"Detect duration and resolution of video sources"}>
+              <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onUpdateVideoMetadata.bind(this)}>
+                <ListItemIcon>
+                  <MovieFilterIcon />
+                </ListItemIcon>
+                <ListItemText primary="Video Metadata" />
+              </ListItem>
+            </Tooltip>
           </div>
 
           {this.props.progressMode != null && (
@@ -552,10 +566,10 @@ class Library extends React.Component {
                     <ListItemText primary={cancelProgressMessage} />
                   </ListItem>
                 </Tooltip>
-                {(this.props.progressMode === PR.offline || this.props.progressMode === PR.tumblr) && (
+                {(this.props.progressMode === PR.offline || this.props.progressMode === PR.tumblr || this.props.progressMode === PR.videoMetadata) && (
                   <LinearProgress variant="determinate" value={Math.round((this.props.progressCurrent / this.props.progressTotal) * 100)}/>
                 )}
-                {this.props.progressMode !== PR.offline && this.props.progressMode !== PR.tumblr && (
+                {this.props.progressMode !== PR.offline && this.props.progressMode !== PR.tumblr && this.props.progressMode !== PR.videoMetadata && (
                   <LinearProgress variant={this.props.progressMode === PR.cancel ? "query" : "indeterminate"}/>
                 )}
               </div>
@@ -745,50 +759,58 @@ class Library extends React.Component {
               size="large">
               <AddIcon className={classes.icon} />
             </Fab>
-
-            <Fab
-              disabled={this.props.library.length < 2}
-              className={classes.sortMenuButton}
-              aria-haspopup="true"
-              aria-controls="sort-menu"
-              aria-label="Sort Sources"
-              onClick={this.onOpenSortMenu.bind(this)}
-              size="medium">
-              <SortIcon className={classes.icon} />
-            </Fab>
-            <Menu
-              id="sort-menu"
-              elevation={1}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'center',
-              }}
-              transformOrigin={{
-                vertical: 'bottom',
-                horizontal: 'right',
-              }}
-              getContentAnchorEl={null}
-              anchorEl={this.state.menuAnchorEl}
-              keepMounted
-              classes={{paper: classes.sortMenu}}
-              open={this.state.openMenu == MO.sort}
-              onClose={this.onCloseDialog.bind(this)}>
-              {Object.values(SF).map((sf) =>
-                <MenuItem key={sf}>
-                  <ListItemText primary={en.get(sf)}/>
-                  <ListItemSecondaryAction>
-                    <IconButton edge="end" onClick={this.props.onSort.bind(this, null, sf, true)}>
-                      <ArrowUpwardIcon/>
-                    </IconButton>
-                    <IconButton edge="end" onClick={this.props.onSort.bind(this, null, sf, false)}>
-                      <ArrowDownwardIcon/>
-                    </IconButton>
-                  </ListItemSecondaryAction>
-                </MenuItem>
-              )}
-            </Menu>
           </React.Fragment>
         )}
+
+        <Fab
+          disabled={this.props.library.length < 2}
+          className={classes.sortMenuButton}
+          aria-haspopup="true"
+          aria-controls="sort-menu"
+          aria-label="Sort Sources"
+          onClick={this.onOpenSortMenu.bind(this)}
+          size="medium">
+          <SortIcon className={classes.icon} />
+        </Fab>
+        <Menu
+          id="sort-menu"
+          elevation={1}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'center',
+          }}
+          transformOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}
+          getContentAnchorEl={null}
+          anchorEl={this.state.menuAnchorEl}
+          keepMounted
+          classes={{paper: classes.sortMenu}}
+          open={this.state.openMenu == MO.sort}
+          onClose={this.onCloseDialog.bind(this)}>
+          {Object.values(SF).filter((sf) => sf != SF.random).map((sf) =>
+            <MenuItem key={sf}>
+              <ListItemText primary={en.get(sf)}/>
+              <ListItemSecondaryAction>
+                <IconButton edge="end" onClick={this.props.onSort.bind(this, null, sf, true)}>
+                  <ArrowUpwardIcon/>
+                </IconButton>
+                <IconButton edge="end" onClick={this.props.onSort.bind(this, null, sf, false)}>
+                  <ArrowDownwardIcon/>
+                </IconButton>
+              </ListItemSecondaryAction>
+            </MenuItem>
+          )}
+          <MenuItem key={SF.random}>
+            <ListItemText primary={en.get(SF.random)}/>
+            <ListItemSecondaryAction>
+              <IconButton edge="end" onClick={this.props.onSort.bind(this, null, SF.random, true)}>
+                <ShuffleIcon/>
+              </IconButton>
+            </ListItemSecondaryAction>
+          </MenuItem>
+        </Menu>
 
         <URLDialog
           open={this.state.openMenu == MO.urlImport}
@@ -885,6 +907,8 @@ class Library extends React.Component {
       this.toggleMarked();
     } else if (!e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'l' || e.key == '¬')) {
       this.moveOffline();
+    } else if (e.key == 'Escape' && this.props.specialMode != null) {
+      this.goBack();
     }
   };
 
@@ -997,7 +1021,11 @@ class Library extends React.Component {
 
   onAddSource(addFunction: string, e: MouseEvent, ...args: any[]) {
     this.onCloseDialog();
-    this.props.onAddSource(null, addFunction, ...args);
+    if (addFunction == AF.videos && e.shiftKey) {
+      this.props.onAddSource(null, AF.videoDir, ...args);
+    } else {
+      this.props.onAddSource(null, addFunction, ...args);
+    }
   }
 
   onToggleBatchTagModal() {
@@ -1238,25 +1266,77 @@ class Library extends React.Component {
                 matchesFilter = (all || countComplete) && count < value;
                 break;
             }
+          } else if ((countRegex = /^duration([>=<])([\d:]*)$/.exec(filter)) != null) {
+            const symbol = countRegex[1];
+            let value;
+            if (countRegex[2].includes(":")) {
+              value = getTimestampValue(countRegex[2]);
+            } else {
+              value = parseInt(countRegex[2]);
+            }
+            const type = getSourceType(source.url);
+            if (type == ST.video) {
+              if (source.duration == null) {
+                matchesFilter = false;
+              } else {
+                switch (symbol) {
+                  case "=":
+                    matchesFilter = Math.floor(source.duration) == value;
+                    break;
+                  case ">":
+                    matchesFilter = Math.floor(source.duration) > value;
+                    break;
+                  case "<":
+                    matchesFilter = Math.floor(source.duration) < value;
+                    break;
+                }
+              }
+            } else {
+              matchesFilter = false;
+            }
+          } else if ((countRegex = /^resolution([>=<])(\d*)p?$/.exec(filter)) != null) {
+            const symbol = countRegex[1];
+            const value = parseInt(countRegex[2]);
+
+            const type = getSourceType(source.url);
+            if (type == ST.video) {
+              if (source.resolution == null) {
+                matchesFilter = false;
+              } else {
+                switch (symbol) {
+                  case "=":
+                    matchesFilter = source.resolution == value;
+                    break;
+                  case ">":
+                    matchesFilter = source.resolution > value;
+                    break;
+                  case "<":
+                    matchesFilter = source.resolution < value;
+                    break;
+                }
+              }
+            } else {
+              matchesFilter = false;
+            }
           } else if (((filter.startsWith('"') || filter.startsWith('-"')) && filter.endsWith('"')) ||
             ((filter.startsWith('\'') || filter.startsWith('-\'')) && filter.endsWith('\''))) {
             if (filter.startsWith("-")) {
               filter = filter.substring(2, filter.length - 1);
-              const regex = new RegExp(filter, "i");
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
               matchesFilter = !regex.test(source.url);
             } else {
               filter = filter.substring(1, filter.length - 1);
-              const regex = new RegExp(filter, "i");
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
               matchesFilter = regex.test(source.url);
             }
           } else { // This is a search filter
             filter = filter.replace("\\", "\\\\");
             if (filter.startsWith("-")) {
               filter = filter.substring(1, filter.length);
-              const regex = new RegExp(filter, "i");
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
               matchesFilter = !regex.test(source.url);
             } else {
-              const regex = new RegExp(filter, "i");
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
               matchesFilter = regex.test(source.url);
             }
           }

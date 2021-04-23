@@ -21,14 +21,22 @@ export default new Map<string, string>([
   ['if.images', 'Only image files'],
   ['if.stills', 'Only stills'],
 
+  ['ot.original', 'No Change'],
+  ['ot.onlylandscape', 'Only Landscape'],
+  ['ot.onlyportrait', 'Only Portrait'],
+  ['ot.forcelandscape', 'Force Landscape'],
+  ['ot.forceportrait', 'Force Portrait'],
+
   ['go.none', 'No Change'],
   ['go.part', 'Play Part (Constant)'],
   ['go.partr', 'Play Part (Random)'],
+  ['go.atleast', 'Play At Least'],
   ['go.full', 'Play Full'],
 
   ['vo.none', 'No Change'],
   ['vo.part', 'Play Part (Constant)'],
   ['vo.partr', 'Play Part (Random)'],
+  ['vo.atleast', 'Play At Least'],
   ['vo.full', 'Play Full'],
 
   ['bt.blur', 'Blurred'],
@@ -71,6 +79,9 @@ export default new Map<string, string>([
   ['sf.date', 'By Date'],
   ['sf.count', 'By Count'],
   ['sf.type', 'By Type'],
+  ['sf.duration', 'By Duration'],
+  ['sf.resolution', 'By Resolution'],
+  ['sf.random', 'Randomize Order'],
 
   ['asf.url', 'By URL'],
   ['asf.name', 'By Name'],
@@ -90,10 +101,12 @@ export default new Map<string, string>([
   ['st.deviantart', 'DeviantArt'],
   ['st.instagram', 'Instagram'],
   ['st.danbooru', 'Danbooru'],
+  ['st.e621', 'E621'],
   ['st.gelbooru1', 'Gelbooru'],
   ['st.gelbooru2', 'Gelbooru'],
   ['st.ehentai', 'EHentai'],
   ['st.bdsmlr', 'BDSMlr'],
+  ['st.hydrus', 'Hydrus'],
   ['st.video', 'Video'],
   ['st.playlist', 'Playlist'],
   ['st.list', 'List'],
@@ -110,6 +123,7 @@ export default new Map<string, string>([
   ['af.audios', '+ Local audio'],
   ['af.directory', '+ Local directory'],
   ['af.videos', '+ Local video/playlist'],
+  ['af.videodir', '+ Local directory of videos'],
   ['af.library', '+ From Library'],
 
   ['rf.hot', 'Hot'],
@@ -117,6 +131,11 @@ export default new Map<string, string>([
   ['rf.top', 'Top'],
   ['rf.cont', 'Controversial'],
   ['rf.rising', 'Rising'],
+
+  ['wc.bottomRight', 'Bottom Right'],
+  ['wc.bottomLeft', 'Bottom Left'],
+  ['wc.topRight', 'Top Right'],
+  ['wc.topLeft', 'Top Left'],
 
   ['hour', 'Last Hour'],
   ['day', 'Last Day'],

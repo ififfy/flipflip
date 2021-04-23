@@ -1,34 +1,38 @@
-import {remote, webFrame} from "electron";
+import {IncomingMessage, remote, webFrame} from "electron";
 import * as fs from "fs";
 import path, {sep} from 'path';
 import wretch from "wretch";
-import {existsSync} from "fs";
+import {existsSync, readFileSync} from "fs";
 import {outputFile} from "fs-extra";
 import getFolderSize from "get-folder-size";
 import tumblr, {TumblrClient} from "tumblr.js";
 import Snoowrap from "snoowrap";
 import Twitter from "twitter";
 import {IgApiClient} from "instagram-private-api";
+import {analyze} from "web-audio-beat-detector";
+import * as mm from "music-metadata";
+import request from "request";
 
 import {
   getBackups,
   getCachePath,
   getFileGroup,
   getFileName,
+  getFilesRecursively,
   getRandomIndex,
   getSourceType,
   isVideo,
   isVideoPlaylist,
   randomizeList,
   removeDuplicatesBy,
-  saveDir
+  saveDir, toArrayBuffer
 } from "./utils";
 import defaultTheme from "./theme";
 import {
   AF,
   ALT,
   ASF,
-  BT,
+  BT, CST,
   DONE,
   GT,
   HTF,
@@ -44,6 +48,7 @@ import {
   SF,
   SGT,
   SL,
+  SLT,
   SOF,
   SP,
   SPT,
@@ -65,6 +70,7 @@ import Overlay from "../data/Overlay";
 import Tag from "../data/Tag";
 import SceneGrid from "./SceneGrid";
 import Playlist from "./Playlist";
+import CaptionScript from "./CaptionScript";
 
 type State = typeof defaultInitialState;
 
@@ -115,7 +121,18 @@ export function getLibrarySource(state: State): LibrarySource | null {
 export function getAudioSource(state: State): Audio | null {
   const activeScene = getActiveScene(state);
   if (activeScene == null) return null;
-  return state.audios.find((s) => s.id == activeScene.libraryID);
+  return state.audios.find((a) => a.id == activeScene.libraryID);
+}
+
+// Returns the active script source, or null if the current route isn't a script source
+export function getScriptSource(state: State): CaptionScript | null {
+  const activeScene = getActiveScene(state);
+  if (activeScene == null) return null;
+  return state.scripts.find((s) => s.id == activeScene.libraryID);
+}
+
+export function getSelectScript(state: State): CaptionScript | null {
+  return state.route[state.route.length - 1].value;
 }
 
 export function changeAudioRoute(state: State, aID: number): Object {
@@ -158,6 +175,7 @@ export function restoreFromBackup(state: State, backupFile: string): Object {
     scenes: data.scenes.map((s: any) => new Scene(s)),
     grids: data.grids ? data.grids.map((g: any) => new SceneGrid(g)) : Array<SceneGrid>(),
     audios: data.audios ? data.audios.map((a: any) => new Audio(a)) : Array <Audio>(),
+    scripts: data.scripts ? data.scripts.map((a: any) => new CaptionScript(a)) : Array <CaptionScript>(),
     playlists: data.playlists ? data.playlists.map((p: any) => new Playlist(p)) : Array <Playlist>(),
     library: data.library.map((s: any) => new LibrarySource(s)),
     tags: data.tags.map((t: any) => new Tag(t)),
@@ -169,6 +187,9 @@ export function restoreFromBackup(state: State, backupFile: string): Object {
     audioYOffset: 0,
     audioFilters: Array<string>(),
     audioSelected: Array<string>(),
+    scriptYOffset: 0,
+    scriptFilters: Array<string>(),
+    scriptSelected: Array<string>(),
     progressMode: null as string,
     progressTitle: null as string,
     progressCurrent: 0,
@@ -224,6 +245,8 @@ export function skipTutorials(state: State): Object {
   newConfig.tutorials.player = DONE;
   newConfig.tutorials.library = DONE;
   newConfig.tutorials.audios = DONE;
+  newConfig.tutorials.scripts = DONE;
+  newConfig.tutorials.scriptor = DONE;
   newConfig.tutorials.sceneGenerator = DONE;
   newConfig.tutorials.sceneGrid = DONE;
   newConfig.tutorials.videoClipper = DONE;
@@ -237,6 +260,8 @@ export function resetTutorials(state: State): Object {
   newConfig.tutorials.player = null;
   newConfig.tutorials.library = null;
   newConfig.tutorials.audios = null;
+  newConfig.tutorials.scripts = null;
+  newConfig.tutorials.scriptor = null;
   newConfig.tutorials.sceneGenerator = null;
   newConfig.tutorials.sceneGrid = null;
   newConfig.tutorials.videoClipper = null;
@@ -290,6 +315,20 @@ export function doneTutorial(state: State, tutorial: string): Object {
     } else {
       state.config.tutorials.audios = tutorial;
     }
+  } else if (isRoute(state, 'scripts')) {
+    if (tutorial == SLT.final) {
+      newTutorial = null;
+      state.config.tutorials.scripts = DONE;
+    } else {
+      state.config.tutorials.scripts = tutorial;
+    }
+  } else if (isRoute(state, 'scriptor')) {
+    if (tutorial == CST.final) {
+      newTutorial = null;
+      state.config.tutorials.scriptor = DONE;
+    } else {
+      state.config.tutorials.scriptor = tutorial;
+    }
   } else if (isRoute(state, 'grid')) {
     if (tutorial == SGT.final) {
       newTutorial = null;
@@ -332,6 +371,8 @@ export function cleanBackups() {
 export function cacheImage(state: State, i: HTMLImageElement | HTMLVideoElement) {
   if (state.config.caching.enabled) {
     const fileType = getSourceType(i.src);
+    if (fileType == ST.hydrus) return;
+
     if (fileType != ST.local && i.src.startsWith("http")) {
       const cachePath = getCachePath(null, state.config);
       if (!fs.existsSync(cachePath)) {
@@ -606,6 +647,28 @@ export function openAudios(state: State): Object {
   return {route: [new Route({kind: 'audios', value: null})], tutorial: state.config.tutorials.audios == null ? ALT.welcome : null};
 }
 
+export function openScripts(state: State): Object {
+  return {route: [new Route({kind: 'scripts', value: null})], tutorial: state.config.tutorials.scripts == null ? SLT.welcome : null};
+}
+
+export function openScriptor(state: State): Object {
+  const testScript = "setBlinkDuration 300\n" +
+    "setBlinkDelay 100\n" +
+    "setBlinkGroupDelay 1200\n" +
+    "setCaptionDuration 2000\n" +
+    "setCaptionDelay 1200\n" +
+    "\n" +
+    "bigcap YOU LOVE FLUFFY KITTENS\n" +
+    "blink KITTENS / ARE / YOUR / LIFE\n" +
+    "cap Cuddle all the kittens forever because you love them."
+  const tutorial = state.config.tutorials.scriptor == null;
+  return {route: [new Route({kind: 'scriptor', value: tutorial ? new CaptionScript({script:testScript}) : null})], tutorial: tutorial ? CST.welcome : null};
+}
+
+export function openScriptInScriptor(state: State, source: CaptionScript) {
+  return {route: state.route.concat(new Route({kind: 'scriptor', value: source}))};
+}
+
 export function openLibraryImport(state: State): Object {
   return {route: state.route.concat(new Route({kind: 'library', value: null})), specialMode: SP.select, librarySelected: []};
 }
@@ -613,6 +676,17 @@ export function openLibraryImport(state: State): Object {
 export function importAudioFromLibrary(state: State, sources: Array<Audio>): Object {
   const playlistIndex = state.route[state.route.length - 1].value;
   return {...updateScene(state, getActiveScene(state), (s: Scene) => {s.audioPlaylists[playlistIndex].audios = s.audioPlaylists[playlistIndex].audios.concat(sources)}), ...goBack(state)};
+}
+
+export function importScriptFromLibrary(state: State, sources: Array<CaptionScript>): Object {
+  const playlistIndex = state.route[state.route.length - 1].value;
+  return {...updateScene(state, getActiveScene(state), (s: Scene) => {s.scriptPlaylists[playlistIndex].scripts = s.scriptPlaylists[playlistIndex].scripts.concat(sources)}), ...goBack(state)};
+}
+
+export function importScriptToScriptor(state: State, source: CaptionScript): Object {
+  const newRoute = state.route.slice(0, state.route.length - 1);
+  newRoute[newRoute.length - 1].value = source;
+  return {route: newRoute, specialMode: null};
 }
 
 export function importFromLibrary(state: State, sources: Array<LibrarySource>): Object {
@@ -637,6 +711,24 @@ export function saveAudioPosition(state: State, yOffset: number, filters: Array<
   };
 }
 
+export function saveScriptPosition(state: State, yOffset: number, filters: Array<string>, selected: Array<string>): Object {
+  return {
+    scriptYOffset: yOffset,
+    scriptFilters: filters,
+    scriptSelected: selected,
+  };
+}
+
+export function resetScene(state: State, scene: Scene): Object {
+  return updateScene(state, scene, (scene) => {
+    const ignoreProps = ["sources"];
+    for (let property in state.config.defaultScene) {
+      if (ignoreProps.includes(property)) continue;
+      (scene as any)[property] = (state.config.defaultScene as any)[property];
+    }
+  });
+}
+
 export function playGrid(state: State, grid: SceneGrid): Object {
   return {route: state.route.concat(new Route({kind: 'gridplay', value: grid.id}))};
 }
@@ -657,7 +749,7 @@ export function playTrack(state: State, url: string) {
 }
 
 export function playAudio(state: State, source: Audio, displayed: Array<Audio>): Object {
-  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, "\\");
+  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path.sep);
   let librarySource = state.audios.find((s) => s.url == sourceURL);
   if (librarySource == null) {
     throw new Error("Source not found in Library");
@@ -666,8 +758,8 @@ export function playAudio(state: State, source: Audio, displayed: Array<Audio>):
   state.scenes.forEach((s: Scene) => {
     id = Math.max(s.id + 1, id);
   });
-  const startIndex = displayed.indexOf(displayed.find((a) => a.url == source.url));;
-  let tempScene = new Scene({
+  const startIndex = displayed.indexOf(displayed.find((a) => a.url == source.url));
+  const tempScene = new Scene({
     id: id,
     name: "audio_scene_temp",
     libraryID: librarySource.id,
@@ -696,8 +788,32 @@ export function playAudio(state: State, source: Audio, displayed: Array<Audio>):
   };
 }
 
+export function playScript(state: State, source: CaptionScript, sceneID: number, displayed: Array<CaptionScript>): Object {
+  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path.sep);
+  let librarySource = state.scripts.find((s) => s.url == sourceURL);
+  if (librarySource == null) {
+    throw new Error("Script not found in Library");
+  }
+  let id = state.scenes.length + 1;
+  state.scenes.forEach((s: Scene) => {
+    id = Math.max(s.id + 1, id);
+  });
+  const startIndex = displayed.indexOf(displayed.find((s) => s.url == source.url));
+  const tempScene = JSON.parse(JSON.stringify(state.scenes.find((s) => s.id == sceneID)));
+  tempScene.id = id;
+  tempScene.libraryID = librarySource.id;
+  tempScene.scriptScene = true;
+  tempScene.textEnabled = true;
+  tempScene.scriptPlaylists = [{scripts: displayed, shuffle: false, repeat: RP.all}];
+  tempScene.scriptStartIndex = startIndex;
+  return {
+    scenes: state.scenes.concat([tempScene]),
+    route: state.route.concat([new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'libraryplay', value: tempScene.id})]),
+  };
+}
+
 export function playSceneFromLibrary(state: State, source: LibrarySource, displayed: Array<LibrarySource>): Object {
-  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, "\\");
+  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path.sep);
   let librarySource = state.library.find((s) => s.url == sourceURL);
   if (librarySource == null) {
     throw new Error("Source not found in Library");
@@ -722,9 +838,10 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
     backgroundColor: state.config.defaultScene.backgroundColor,
     backgroundColorSet: state.config.defaultScene.backgroundColorSet,
     backgroundBlur: state.config.defaultScene.backgroundBlur,
-    rotatePortrait: state.config.defaultScene.rotatePortrait,
+    imageOrientation: state.config.defaultScene.imageOrientation,
+    videoOrientation: state.config.defaultScene.videoOrientation,
     randomVideoStart: state.config.defaultScene.randomVideoStart,
-    continueVideo: state.config.defaultScene.continueVideo,
+    continueVideo:  getSourceType(source.url) == ST.video || state.config.defaultScene.continueVideo,
     playVideoClips: state.config.defaultScene.playVideoClips,
     videoVolume: state.config.defaultScene.videoVolume,
   });
@@ -753,12 +870,17 @@ export function onUpdateClips(state: State, sourceURL: string, clips: Array<Clip
 }
 
 export function clipVideo(state: State, source: LibrarySource, displayed: Array<LibrarySource>) {
+  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path.sep);
+  let librarySource = state.library.find((s) => s.url == sourceURL);
   if (getActiveSource(state) != null) {
     state.route.pop();
   }
+  if (!displayed) {
+    displayed = state.displayedSources;
+  }
   return {
     displayedSources: displayed,
-    route: state.route.concat([new Route({kind: 'clip', value: source})])
+    route: state.route.concat([new Route({kind: 'clip', value: librarySource})])
   };
 }
 
@@ -821,6 +943,8 @@ export function endPlaySceneFromLibrary(state: State): Object {
   let librarySource;
   if (getActiveScene(state).audioScene) {
     librarySource = getAudioSource(state);
+  } else if (getActiveScene(state).scriptScene) {
+    librarySource = getScriptSource(state);
   } else {
     librarySource = getLibrarySource(state);
   }
@@ -893,349 +1017,94 @@ function reduceList(sources: Array<LibrarySource>, limit: number): Array<Library
   return sources;
 }
 
-export function generateScene(state: State, scene: Scene): Object {
-  const newScene = state.scenes.find((s) => s.id == scene.id);
+export function generateScenes(state: State, scenes: Array<Scene>): Object {
+  const newScenes = Array.from(state.scenes);
+  for (let scene of scenes) {
+    const newScene = state.scenes.find((s) => s.id == scene.id);
 
-  // Record all the groups we're requiring/excluding
-  const allTags = newScene.generatorWeights.filter((wg) => wg.type == TT.all && !wg.rules && !wg.tag.typeTag).map((wg) => wg.tag);
-  const noneTags = newScene.generatorWeights.filter((wg) => wg.type == TT.none && !wg.rules && !wg.tag.typeTag).map((wg) => wg.tag);
-  const allTypes = newScene.generatorWeights.filter((wg) => wg.type == TT.all && !wg.rules && wg.tag.typeTag).map((wg) => wg.tag.name);
-  const noneTypes = newScene.generatorWeights.filter((wg) =>wg.type == TT.none && !wg.rules && wg.tag.typeTag).map((wg) => wg.tag.name);
+    // Record all the groups we're requiring/excluding
+    const allTags = newScene.generatorWeights.filter((wg) => wg.type == TT.all && !wg.rules && !wg.tag.typeTag).map((wg) => wg.tag);
+    const noneTags = newScene.generatorWeights.filter((wg) => wg.type == TT.none && !wg.rules && !wg.tag.typeTag).map((wg) => wg.tag);
+    const allTypes = newScene.generatorWeights.filter((wg) => wg.type == TT.all && !wg.rules && wg.tag.typeTag).map((wg) => wg.tag.name);
+    const noneTypes = newScene.generatorWeights.filter((wg) => wg.type == TT.none && !wg.rules && wg.tag.typeTag).map((wg) => wg.tag.name);
 
-  // Sources to require
-  let reqAdvSources: Array<LibrarySource> = null;
-  // Sources to exclude
-  let excAdvSources: Array<LibrarySource> = null;
+    // Sources to require
+    let reqAdvSources: Array<LibrarySource> = null;
+    // Sources to exclude
+    let excAdvSources: Array<LibrarySource> = null;
 
-  // Build generator's list of sources
-  let genSources = new Array<LibrarySource>();
+    // Build generator's list of sources
+    let genSources = new Array<LibrarySource>();
 
-  // First, build all our adv rules
-  for (let wg of newScene.generatorWeights.filter((wg) => !!wg.rules)) {
-    // Build each adv rule like a regular set of simple rules
-    // First get tags to require/exclude
-    const ruleAllTags = wg.rules.filter((wg) => !wg.tag.typeTag && wg.type == TT.all).map((wg) => wg.tag);
-    const ruleNoneTags = wg.rules.filter((wg) => !wg.tag.typeTag && wg.type == TT.none).map((wg) => wg.tag);
-    const ruleAllTypes = wg.rules.filter((wg) => wg.tag.typeTag && wg.type == TT.all).map((wg) => wg.tag.name);
-    const ruleNoneTypes = wg.rules.filter((wg) => wg.tag.typeTag && wg.type == TT.none).map((wg) => wg.tag.name);
+    // First, build all our adv rules
+    for (let wg of newScene.generatorWeights.filter((wg) => !!wg.rules)) {
+      // Build each adv rule like a regular set of simple rules
+      // First get tags to require/exclude
+      const ruleAllTags = wg.rules.filter((wg) => !wg.tag.typeTag && wg.type == TT.all).map((wg) => wg.tag);
+      const ruleNoneTags = wg.rules.filter((wg) => !wg.tag.typeTag && wg.type == TT.none).map((wg) => wg.tag);
+      const ruleAllTypes = wg.rules.filter((wg) => wg.tag.typeTag && wg.type == TT.all).map((wg) => wg.tag.name);
+      const ruleNoneTypes = wg.rules.filter((wg) => wg.tag.typeTag && wg.type == TT.none).map((wg) => wg.tag.name);
 
-    // Build this rule's list of sources
-    let rulesSources = new Array<LibrarySource>();
+      // Build this rule's list of sources
+      let rulesSources = new Array<LibrarySource>();
 
-    // If we don't have any weights, calculate by just require/exclude
-    if (ruleAllTags.length + ruleNoneTags.length + ruleAllTypes.length + ruleNoneTypes.length == wg.rules.length) {
-      let sources = [];
-      // For each source in the library
-      for (let s of state.library) {
-        let addedClip = false;
-        let invalidClips = [];
-        const sType = getSourceType(s.url);
-        const sTypeEn = en.get(sType);
-        // If this is a video with clips
-        if (sType == ST.video && s.clips && s.clips.length > 0) {
-          // Weight each clip first
-          for (let c of s.clips) {
-            // If clip is not tagged, default to source tags
-            let cTags = c.tags && c.tags.length > 0 ? c.tags : s.tags;
-            let b = false;
-
-            // Filter out clips which don't have ruleAllTags/allTags
-            for (let at of ruleAllTags) {
-              if (!cTags.find((t) => t.id == at.id)) {
-                invalidClips.push(c.id);
-                b = true;
-                break;
-              }
-            }
-            if (b) continue;
-            for (let at of allTags) {
-              if (!cTags.find((t) => t.id == at.id)) {
-                invalidClips.push(c.id);
-                b = true;
-                break;
-              }
-            }
-            if (b) continue;
-
-            // Filter out clips which have ruleNoneTags/noneTags
-            for (let nt of ruleNoneTags) {
-              if (cTags.find((t) => t.id == nt.id)) {
-                invalidClips.push(c.id);
-                b = true;
-                break;
-              }
-            }
-            if (b) continue
-            for (let nt of noneTags) {
-              if (cTags.find((t) => t.id == nt.id)) {
-                invalidClips.push(c.id);
-                b = true;
-                break;
-              }
-            }
-            if (b) continue;
-
-            // Filter out clips which don't have ruleAllTypes/allTypes
-            for (let at of ruleAllTypes) {
-              if (at != sTypeEn) {
-                invalidClips.push(c.id);
-                b = true;
-                break;
-              }
-            }
-            if (b) continue;
-            for (let at of allTypes) {
-              if (at != sTypeEn) {
-                invalidClips.push(c.id);
-                b = true;
-                break;
-              }
-            }
-            if (b) continue;
-
-            // Filter out clips which have ruleNoneTypes/noneTypes
-            for (let nt of ruleNoneTypes) {
-              if (nt == sTypeEn) {
-                invalidClips.push(c.id);
-                b = true;
-                break;
-              }
-            }
-            if (b) continue;
-            for (let nt of noneTypes) {
-              if (nt == sTypeEn) {
-                invalidClips.push(c.id);
-                b = true;
-                break;
-              }
-            }
-            if (b) continue;
-
-            // If this clip is valid, mark as added
-            addedClip = true;
-          }
-        }
-
-        // If we're not already adding a clip, check the source tags
-        if (!addedClip) {
-          let b = false;
-
-          // Filter out sources which don't have ruleAllTags/allTags
-          for (let at of ruleAllTags) {
-            if (!s.tags.find((t) => t.id == at.id)) {
-              b = true;
-              break;
-            }
-          }
-          if (b) continue;
-          for (let at of allTags) {
-            if (!s.tags.find((t) => t.id == at.id)) {
-              b = true;
-              break;
-            }
-          }
-          if (b) continue;
-
-          // Filter out sources which have ruleNoneTags/noneTags
-          for (let nt of ruleNoneTags) {
-            if (s.tags.find((t) => t.id == nt.id)) {
-              b = true;
-              break;
-            }
-          }
-          if (b) continue;
-          for (let nt of noneTags) {
-            if (s.tags.find((t) => t.id == nt.id)) {
-              b = true;
-              break;
-            }
-          }
-          if (b) continue;
-
-          // Filter out sources which don't have ruleAllTypes/allTypes
-          for (let at of ruleAllTypes) {
-            if (at != sTypeEn) {
-              b = true;
-              break;
-            }
-          }
-          if (b) continue;
-          for (let at of allTypes) {
-            if (at != sTypeEn) {
-              b = true;
-              break;
-            }
-          }
-          if (b) continue;
-
-          // Filter out sources which have ruleNonTypes/noneTypes
-          for (let nt of ruleNoneTypes) {
-            if (nt == sTypeEn) {
-              b = true;
-              break;
-            }
-          }
-          if (b) continue;
-          for (let nt of noneTypes) {
-            if (nt == sTypeEn) {
-              b = true;
-              break;
-            }
-          }
-          if (b) continue;
-        } else {
-          // If we're adding a clip, mark invalid ones
-          s.disabledClips = invalidClips;
-        }
-        sources.push(s);
-      }
-      rulesSources = sources;
-    } else {
-      // Otherwise, generate sources for each weighted rule
-      for (let rule of wg.rules) {
-        if (rule.type == TT.weight) {
-          let sources = [];
-          // For each source in the library
-          for (let s of state.library) {
-            let addedClip = false;
-            let invalidClips = [];
-            const sType = getSourceType(s.url);
-            const sTypeEn = en.get(sType);
-            // If this is a video with clips
-            if (sType == ST.video && s.clips && s.clips.length > 0) {
-              // Weight each clip first
-              for (let c of s.clips) {
-                // If clip is not tagged, default to source tags
-                let cTags = c.tags && c.tags.length > 0 ? c.tags : s.tags;
-                let b = false;
-
-                // Filter out clips which don't have this tag
-                if (!cTags.find((t) => t.id == rule.tag.id)) {
-                  invalidClips.push(c.id);
-                  continue;
-                }
-
-                // Filter out clips which don't have ruleAllTags/allTags
-                for (let at of ruleAllTags) {
-                  if (!cTags.find((t) => t.id == at.id)) {
-                    invalidClips.push(c.id);
-                    b = true;
-                    break;
-                  }
-                }
-                if (b) continue;
-                for (let at of allTags) {
-                  if (!cTags.find((t) => t.id == at.id)) {
-                    invalidClips.push(c.id);
-                    b = true;
-                    break;
-                  }
-                }
-                if (b) continue;
-
-                // Filter out clips which have ruleNonTags/noneTags
-                for (let nt of ruleNoneTags) {
-                  if (cTags.find((t) => t.id == nt.id)) {
-                    invalidClips.push(c.id);
-                    b = true;
-                    break;
-                  }
-                }
-                if (b) continue;
-                for (let nt of noneTags) {
-                  if (cTags.find((t) => t.id == nt.id)) {
-                    invalidClips.push(c.id);
-                    b = true;
-                    break;
-                  }
-                }
-                if (b) continue;
-
-                // Filter out clips which don't have ruleAllTypes/allTypes
-                for (let at of ruleAllTypes) {
-                  if (at != sTypeEn) {
-                    invalidClips.push(c.id);
-                    b = true;
-                    break;
-                  }
-                }
-                if (b) continue;
-                for (let at of allTypes) {
-                  if (at != sTypeEn) {
-                    invalidClips.push(c.id);
-                    b = true;
-                    break;
-                  }
-                }
-                if (b) continue;
-
-                // Filter out clips which have ruleNoneTypes/noneTypes
-                for (let nt of ruleNoneTypes) {
-                  if (nt == sTypeEn) {
-                    invalidClips.push(c.id);
-                    b = true;
-                    break;
-                  }
-                }
-                if (b) continue;
-                for (let nt of noneTypes) {
-                  if (nt == sTypeEn) {
-                    invalidClips.push(c.id);
-                    b = true;
-                    break;
-                  }
-                }
-                if (b) continue;
-
-                // If this clip is valid, mark as added
-                addedClip = true;
-              }
-            }
-
-            // If we've not already added a clip, check the source tags
-            if (!addedClip) {
+      // If we don't have any weights, calculate by just require/exclude
+      if (ruleAllTags.length + ruleNoneTags.length + ruleAllTypes.length + ruleNoneTypes.length == wg.rules.length) {
+        let sources = [];
+        // For each source in the library
+        for (let s of state.library) {
+          let addedClip = false;
+          let invalidClips = [];
+          const sType = getSourceType(s.url);
+          const sTypeEn = en.get(sType);
+          // If this is a video with clips
+          if (sType == ST.video && s.clips && s.clips.length > 0) {
+            // Weight each clip first
+            for (let c of s.clips) {
+              // If clip is not tagged, default to source tags
+              let cTags = c.tags && c.tags.length > 0 ? c.tags : s.tags;
               let b = false;
 
-              // Filter out sources which don't have this tag
-              if (!s.tags.find((t) => t.id == rule.tag.id)) {
-                continue
-              }
-
-              // Filter out sources which don't have ruleAllTags/allTags
+              // Filter out clips which don't have ruleAllTags/allTags
               for (let at of ruleAllTags) {
-                if (!s.tags.find((t) => t.id == at.id)) {
+                if (!cTags.find((t) => t.id == at.id)) {
+                  invalidClips.push(c.id);
                   b = true;
                   break;
                 }
               }
               if (b) continue;
               for (let at of allTags) {
-                if (!s.tags.find((t) => t.id == at.id)) {
+                if (!cTags.find((t) => t.id == at.id)) {
+                  invalidClips.push(c.id);
                   b = true;
                   break;
                 }
               }
               if (b) continue;
 
-              // Filter out sources which have ruleNoneTags/noneTags
+              // Filter out clips which have ruleNoneTags/noneTags
               for (let nt of ruleNoneTags) {
-                if (s.tags.find((t) => t.id == nt.id)) {
+                if (cTags.find((t) => t.id == nt.id)) {
+                  invalidClips.push(c.id);
                   b = true;
                   break;
                 }
               }
-              if (b) continue;
+              if (b) continue
               for (let nt of noneTags) {
-                if (s.tags.find((t) => t.id == nt.id)) {
+                if (cTags.find((t) => t.id == nt.id)) {
+                  invalidClips.push(c.id);
                   b = true;
                   break;
                 }
               }
               if (b) continue;
 
-              // Filter out sources which don't have ruleAllTypes/allTypes
+              // Filter out clips which don't have ruleAllTypes/allTypes
               for (let at of ruleAllTypes) {
                 if (at != sTypeEn) {
+                  invalidClips.push(c.id);
                   b = true;
                   break;
                 }
@@ -1243,15 +1112,17 @@ export function generateScene(state: State, scene: Scene): Object {
               if (b) continue;
               for (let at of allTypes) {
                 if (at != sTypeEn) {
+                  invalidClips.push(c.id);
                   b = true;
                   break;
                 }
               }
               if (b) continue;
 
-              // Filter out sources which have ruleNoneTypes/noneTypes
+              // Filter out clips which have ruleNoneTypes/noneTypes
               for (let nt of ruleNoneTypes) {
                 if (nt == sTypeEn) {
+                  invalidClips.push(c.id);
                   b = true;
                   break;
                 }
@@ -1259,171 +1130,320 @@ export function generateScene(state: State, scene: Scene): Object {
               if (b) continue;
               for (let nt of noneTypes) {
                 if (nt == sTypeEn) {
+                  invalidClips.push(c.id);
                   b = true;
                   break;
                 }
               }
               if (b) continue;
-            } else {
-              // If we're adding a clip, mark invalid ones
-              s.disabledClips = invalidClips;
-            }
-            sources.push(s);
-          }
-          // Randomize list and reduce
-          rulesSources = rulesSources.concat(reduceList(randomizeList(sources), Math.round(newScene.generatorMax * (rule.percent / 100))));
-        }
-      }
-    }
-    switch (wg.type) {
-      // If this adv rule is weighted, add the percentage of sources to the master list
-      case TT.weight:
-        wg.max = rulesSources.length;
-        let chosenSources = reduceList(randomizeList(rulesSources), Math.round(newScene.generatorMax * (wg.percent / 100)))
-        genSources = genSources.concat(chosenSources);
-        wg.chosen = chosenSources.length;
-        break;
-      // If this adv rule is all, add the sources to the require list
-      case TT.all:
-        if (!reqAdvSources) {
-          reqAdvSources = rulesSources;
-        } else {
-          reqAdvSources = reqAdvSources.filter((s) => !!rulesSources.find((source) => source.url == s.url));
-        }
-        break;
-      // If this adv rule is none, add the sources to the excl list
-      case TT.none:
-        if (!excAdvSources) {
-          excAdvSources = rulesSources;
-        } else {
-          excAdvSources = excAdvSources.concat(rulesSources);
-        }
-        break;
-    }
-  }
 
-  // Now, build our simple rules
-  // If we don't have any weights, calculate by just require/exclude
-  if (allTags.length + noneTags.length + allTypes.length + noneTypes.length == newScene.generatorWeights.length) {
-    let sources = [];
-    for (let s of state.library) {
-      // Filter out sources which are not in required list
-      if (reqAdvSources && !reqAdvSources.find((source) => source.id == s.id)) {
-        continue;
-      }
-      // Filter out sources which are in exclude list
-      if (excAdvSources && excAdvSources.find((source) => source.id == s.id)) {
-        continue;
-      }
-
-      let addedClip = false;
-      let invalidClips = [];
-      const sType = getSourceType(s.url);
-      const sTypeEn = en.get(sType);
-      // If this is a video with clips
-      if (sType == ST.video && s.clips && s.clips.length > 0) {
-        // Weight each clip first
-        for (let c of s.clips) {
-          // If clip is not tagged, default to source tags
-          let cTags = c.tags && c.tags.length > 0 ? c.tags : s.tags;
-          let b = false;
-
-          // Filter out clips which don't have allTags
-          for (let at of allTags) {
-            if (!cTags.find((t) => t.id == at.id)) {
-              invalidClips.push(c.id);
-              b = true;
-              break;
+              // If this clip is valid, mark as added
+              addedClip = true;
             }
           }
-          if (b) continue;
 
-          // Filter out clips which have noneTags
-          for (let nt of noneTags) {
-            if (cTags.find((t) => t.id == nt.id)) {
-              invalidClips.push(c.id);
-              b = true;
-              break;
+          // If we're not already adding a clip, check the source tags
+          if (!addedClip) {
+            let b = false;
+
+            // Filter out sources which don't have ruleAllTags/allTags
+            for (let at of ruleAllTags) {
+              if (!s.tags.find((t) => t.id == at.id)) {
+                b = true;
+                break;
+              }
             }
-          }
-          if (b) continue;
-
-          // Filter out clips which don't have allTypes
-          for (let at of allTypes) {
-            if (at != sTypeEn) {
-              invalidClips.push(c.id);
-              b = true;
-              break;
+            if (b) continue;
+            for (let at of allTags) {
+              if (!s.tags.find((t) => t.id == at.id)) {
+                b = true;
+                break;
+              }
             }
-          }
-          if (b) continue;
+            if (b) continue;
 
-          // Filter out clips which have noneTypes
-          for (let nt of noneTypes) {
-            if (nt == sTypeEn) {
-              invalidClips.push(c.id);
-              b = true;
-              break;
+            // Filter out sources which have ruleNoneTags/noneTags
+            for (let nt of ruleNoneTags) {
+              if (s.tags.find((t) => t.id == nt.id)) {
+                b = true;
+                break;
+              }
             }
+            if (b) continue;
+            for (let nt of noneTags) {
+              if (s.tags.find((t) => t.id == nt.id)) {
+                b = true;
+                break;
+              }
+            }
+            if (b) continue;
+
+            // Filter out sources which don't have ruleAllTypes/allTypes
+            for (let at of ruleAllTypes) {
+              if (at != sTypeEn) {
+                b = true;
+                break;
+              }
+            }
+            if (b) continue;
+            for (let at of allTypes) {
+              if (at != sTypeEn) {
+                b = true;
+                break;
+              }
+            }
+            if (b) continue;
+
+            // Filter out sources which have ruleNonTypes/noneTypes
+            for (let nt of ruleNoneTypes) {
+              if (nt == sTypeEn) {
+                b = true;
+                break;
+              }
+            }
+            if (b) continue;
+            for (let nt of noneTypes) {
+              if (nt == sTypeEn) {
+                b = true;
+                break;
+              }
+            }
+            if (b) continue;
+          } else {
+            // If we're adding a clip, mark invalid ones
+            s.disabledClips = invalidClips;
           }
-          if (b) continue;
-
-          // If this clip is valid, mark as added
-          addedClip = true;
+          sources.push(s);
         }
-      }
-
-      // If we're not already adding a clip, check the source tags
-      if (!addedClip) {
-        let b = false;
-
-        // Filter out sources which don't have allTags
-        for (let at of allTags) {
-          if (!s.tags.find((t) => t.id == at.id)) {
-            b = true;
-            break;
-          }
-        }
-        if (b) continue;
-
-        // Filter out sources which have noneTags
-        for (let nt of noneTags) {
-          if (s.tags.find((t) => t.id == nt.id)) {
-            b = true;
-            break;
-          }
-        }
-        if (b) continue;
-
-        // Filter out sources which don't have allTypes
-        for (let at of allTypes) {
-          if (at != sTypeEn) {
-            b = true;
-            break;
-          }
-        }
-        if (b) continue;
-
-        // Filter out sources which have noneTypes
-        for (let nt of noneTypes) {
-          if (nt == sTypeEn) {
-            b = true;
-            break;
-          }
-        }
-        if (b) continue;
+        rulesSources = sources;
       } else {
-        // If we're adding a clip, mark invalid ones
-        s.disabledClips = invalidClips;
+        // Otherwise, generate sources for each weighted rule
+        for (let rule of wg.rules) {
+          if (rule.type == TT.weight) {
+            let sources = [];
+            // For each source in the library
+            for (let s of state.library) {
+              let addedClip = false;
+              let invalidClips = [];
+              const sType = getSourceType(s.url);
+              const sTypeEn = en.get(sType);
+              // If this is a video with clips
+              if (sType == ST.video && s.clips && s.clips.length > 0) {
+                // Weight each clip first
+                for (let c of s.clips) {
+                  // If clip is not tagged, default to source tags
+                  let cTags = c.tags && c.tags.length > 0 ? c.tags : s.tags;
+                  let b = false;
+
+                  // Filter out clips which don't have this tag/type
+                  if (rule.tag.typeTag) {
+                    if (sTypeEn != rule.tag.name) {
+                      continue
+                    }
+                  } else {
+                    if (!cTags.find((t) => t.id == rule.tag.id)) {
+                      invalidClips.push(c.id);
+                      continue;
+                    }
+                  }
+
+                  // Filter out clips which don't have ruleAllTags/allTags
+                  for (let at of ruleAllTags) {
+                    if (!cTags.find((t) => t.id == at.id)) {
+                      invalidClips.push(c.id);
+                      b = true;
+                      break;
+                    }
+                  }
+                  if (b) continue;
+                  for (let at of allTags) {
+                    if (!cTags.find((t) => t.id == at.id)) {
+                      invalidClips.push(c.id);
+                      b = true;
+                      break;
+                    }
+                  }
+                  if (b) continue;
+
+                  // Filter out clips which have ruleNonTags/noneTags
+                  for (let nt of ruleNoneTags) {
+                    if (cTags.find((t) => t.id == nt.id)) {
+                      invalidClips.push(c.id);
+                      b = true;
+                      break;
+                    }
+                  }
+                  if (b) continue;
+                  for (let nt of noneTags) {
+                    if (cTags.find((t) => t.id == nt.id)) {
+                      invalidClips.push(c.id);
+                      b = true;
+                      break;
+                    }
+                  }
+                  if (b) continue;
+
+                  // Filter out clips which don't have ruleAllTypes/allTypes
+                  for (let at of ruleAllTypes) {
+                    if (at != sTypeEn) {
+                      invalidClips.push(c.id);
+                      b = true;
+                      break;
+                    }
+                  }
+                  if (b) continue;
+                  for (let at of allTypes) {
+                    if (at != sTypeEn) {
+                      invalidClips.push(c.id);
+                      b = true;
+                      break;
+                    }
+                  }
+                  if (b) continue;
+
+                  // Filter out clips which have ruleNoneTypes/noneTypes
+                  for (let nt of ruleNoneTypes) {
+                    if (nt == sTypeEn) {
+                      invalidClips.push(c.id);
+                      b = true;
+                      break;
+                    }
+                  }
+                  if (b) continue;
+                  for (let nt of noneTypes) {
+                    if (nt == sTypeEn) {
+                      invalidClips.push(c.id);
+                      b = true;
+                      break;
+                    }
+                  }
+                  if (b) continue;
+
+                  // If this clip is valid, mark as added
+                  addedClip = true;
+                }
+              }
+
+              // If we've not already added a clip, check the source tags
+              if (!addedClip) {
+                let b = false;
+
+                // Filter out sources which don't have this tag/type
+                if (rule.tag.typeTag) {
+                  if (sTypeEn != rule.tag.name) {
+                    continue
+                  }
+                } else {
+                  if (!s.tags.find((t) => t.id == rule.tag.id)) {
+                    continue
+                  }
+                }
+
+                // Filter out sources which don't have ruleAllTags/allTags
+                for (let at of ruleAllTags) {
+                  if (!s.tags.find((t) => t.id == at.id)) {
+                    b = true;
+                    break;
+                  }
+                }
+                if (b) continue;
+                for (let at of allTags) {
+                  if (!s.tags.find((t) => t.id == at.id)) {
+                    b = true;
+                    break;
+                  }
+                }
+                if (b) continue;
+
+                // Filter out sources which have ruleNoneTags/noneTags
+                for (let nt of ruleNoneTags) {
+                  if (s.tags.find((t) => t.id == nt.id)) {
+                    b = true;
+                    break;
+                  }
+                }
+                if (b) continue;
+                for (let nt of noneTags) {
+                  if (s.tags.find((t) => t.id == nt.id)) {
+                    b = true;
+                    break;
+                  }
+                }
+                if (b) continue;
+
+                // Filter out sources which don't have ruleAllTypes/allTypes
+                for (let at of ruleAllTypes) {
+                  if (at != sTypeEn) {
+                    b = true;
+                    break;
+                  }
+                }
+                if (b) continue;
+                for (let at of allTypes) {
+                  if (at != sTypeEn) {
+                    b = true;
+                    break;
+                  }
+                }
+                if (b) continue;
+
+                // Filter out sources which have ruleNoneTypes/noneTypes
+                for (let nt of ruleNoneTypes) {
+                  if (nt == sTypeEn) {
+                    b = true;
+                    break;
+                  }
+                }
+                if (b) continue;
+                for (let nt of noneTypes) {
+                  if (nt == sTypeEn) {
+                    b = true;
+                    break;
+                  }
+                }
+                if (b) continue;
+              } else {
+                // If we're adding a clip, mark invalid ones
+                s.disabledClips = invalidClips;
+              }
+              sources.push(s);
+            }
+            // Randomize list and reduce
+            rulesSources = rulesSources.concat(reduceList(randomizeList(sources), Math.round(newScene.generatorMax * (rule.percent / 100))));
+          }
+        }
       }
-      sources.push(s);
+      switch (wg.type) {
+        // If this adv rule is weighted, add the percentage of sources to the master list
+        case TT.weight:
+          wg.max = rulesSources.length;
+          let chosenSources = reduceList(randomizeList(rulesSources), Math.round(newScene.generatorMax * (wg.percent / 100)))
+          genSources = genSources.concat(chosenSources);
+          wg.chosen = chosenSources.length;
+          break;
+        // If this adv rule is all, add the sources to the require list
+        case TT.all:
+          if (!reqAdvSources) {
+            reqAdvSources = rulesSources;
+          } else {
+            reqAdvSources = reqAdvSources.filter((s) => !!rulesSources.find((source) => source.url == s.url));
+          }
+          break;
+        // If this adv rule is none, add the sources to the excl list
+        case TT.none:
+          if (!excAdvSources) {
+            excAdvSources = rulesSources;
+          } else {
+            excAdvSources = excAdvSources.concat(rulesSources);
+          }
+          break;
+      }
     }
-    genSources = sources;
-  } else {
-    // Otherwise, generate sources for each weight
-    for (let wg of newScene.generatorWeights.filter((wg) => !wg.rules && wg.type == TT.weight)) {
+
+    // Now, build our simple rules
+    // If we don't have any weights, calculate by just require/exclude
+    if (allTags.length + noneTags.length + allTypes.length + noneTypes.length == newScene.generatorWeights.length) {
       let sources = [];
-      // For each source in the library
       for (let s of state.library) {
         // Filter out sources which are not in required list
         if (reqAdvSources && !reqAdvSources.find((source) => source.id == s.id)) {
@@ -1445,19 +1465,6 @@ export function generateScene(state: State, scene: Scene): Object {
             // If clip is not tagged, default to source tags
             let cTags = c.tags && c.tags.length > 0 ? c.tags : s.tags;
             let b = false;
-
-            // Filter out clip which don't have this type/tag
-            if (wg.tag.typeTag) {
-              if (wg.tag.name != sTypeEn) {
-                invalidClips.push(c.id);
-                continue;
-              }
-            } else {
-              if (!cTags.find((t) => t.id == wg.tag.id)) {
-                invalidClips.push(c.id);
-                continue;
-              }
-            }
 
             // Filter out clips which don't have allTags
             for (let at of allTags) {
@@ -1508,17 +1515,6 @@ export function generateScene(state: State, scene: Scene): Object {
         if (!addedClip) {
           let b = false;
 
-          // Filter out sources which don't have this tag
-          if (wg.tag.typeTag) {
-            if (wg.tag.name != sTypeEn) {
-              continue;
-            }
-          } else {
-            if (!s.tags.find((t) => t.id == wg.tag.id)) {
-              continue;
-            }
-          }
-
           // Filter out sources which don't have allTags
           for (let at of allTags) {
             if (!s.tags.find((t) => t.id == at.id)) {
@@ -1560,16 +1556,160 @@ export function generateScene(state: State, scene: Scene): Object {
         }
         sources.push(s);
       }
-      wg.max = sources.length;
-      let chosenSources = reduceList(sources, Math.round(newScene.generatorMax * (wg.percent / 100)));
-      genSources = genSources.concat(chosenSources);
-      wg.chosen = chosenSources.length;
+      genSources = sources;
+    } else {
+      // Otherwise, generate sources for each weight
+      for (let wg of newScene.generatorWeights.filter((wg) => !wg.rules && wg.type == TT.weight)) {
+        let sources = [];
+        // For each source in the library
+        for (let s of state.library) {
+          // Filter out sources which are not in required list
+          if (reqAdvSources && !reqAdvSources.find((source) => source.id == s.id)) {
+            continue;
+          }
+          // Filter out sources which are in exclude list
+          if (excAdvSources && excAdvSources.find((source) => source.id == s.id)) {
+            continue;
+          }
+
+          let addedClip = false;
+          let invalidClips = [];
+          const sType = getSourceType(s.url);
+          const sTypeEn = en.get(sType);
+          // If this is a video with clips
+          if (sType == ST.video && s.clips && s.clips.length > 0) {
+            // Weight each clip first
+            for (let c of s.clips) {
+              // If clip is not tagged, default to source tags
+              let cTags = c.tags && c.tags.length > 0 ? c.tags : s.tags;
+              let b = false;
+
+              // Filter out clip which don't have this type/tag
+              if (wg.tag.typeTag) {
+                if (wg.tag.name != sTypeEn) {
+                  invalidClips.push(c.id);
+                  continue;
+                }
+              } else {
+                if (!cTags.find((t) => t.id == wg.tag.id)) {
+                  invalidClips.push(c.id);
+                  continue;
+                }
+              }
+
+              // Filter out clips which don't have allTags
+              for (let at of allTags) {
+                if (!cTags.find((t) => t.id == at.id)) {
+                  invalidClips.push(c.id);
+                  b = true;
+                  break;
+                }
+              }
+              if (b) continue;
+
+              // Filter out clips which have noneTags
+              for (let nt of noneTags) {
+                if (cTags.find((t) => t.id == nt.id)) {
+                  invalidClips.push(c.id);
+                  b = true;
+                  break;
+                }
+              }
+              if (b) continue;
+
+              // Filter out clips which don't have allTypes
+              for (let at of allTypes) {
+                if (at != sTypeEn) {
+                  invalidClips.push(c.id);
+                  b = true;
+                  break;
+                }
+              }
+              if (b) continue;
+
+              // Filter out clips which have noneTypes
+              for (let nt of noneTypes) {
+                if (nt == sTypeEn) {
+                  invalidClips.push(c.id);
+                  b = true;
+                  break;
+                }
+              }
+              if (b) continue;
+
+              // If this clip is valid, mark as added
+              addedClip = true;
+            }
+          }
+
+          // If we're not already adding a clip, check the source tags
+          if (!addedClip) {
+            let b = false;
+
+            // Filter out sources which don't have this tag
+            if (wg.tag.typeTag) {
+              if (wg.tag.name != sTypeEn) {
+                continue;
+              }
+            } else {
+              if (!s.tags.find((t) => t.id == wg.tag.id)) {
+                continue;
+              }
+            }
+
+            // Filter out sources which don't have allTags
+            for (let at of allTags) {
+              if (!s.tags.find((t) => t.id == at.id)) {
+                b = true;
+                break;
+              }
+            }
+            if (b) continue;
+
+            // Filter out sources which have noneTags
+            for (let nt of noneTags) {
+              if (s.tags.find((t) => t.id == nt.id)) {
+                b = true;
+                break;
+              }
+            }
+            if (b) continue;
+
+            // Filter out sources which don't have allTypes
+            for (let at of allTypes) {
+              if (at != sTypeEn) {
+                b = true;
+                break;
+              }
+            }
+            if (b) continue;
+
+            // Filter out sources which have noneTypes
+            for (let nt of noneTypes) {
+              if (nt == sTypeEn) {
+                b = true;
+                break;
+              }
+            }
+            if (b) continue;
+          } else {
+            // If we're adding a clip, mark invalid ones
+            s.disabledClips = invalidClips;
+          }
+          sources.push(s);
+        }
+        wg.max = sources.length;
+        let chosenSources = reduceList(sources, Math.round(newScene.generatorMax * (wg.percent / 100)));
+        genSources = genSources.concat(chosenSources);
+        wg.chosen = chosenSources.length;
+      }
     }
+    genSources = reduceList(randomizeList(removeDuplicatesBy((s: LibrarySource) => s.url, genSources)), newScene.generatorMax);
+    genSources = JSON.parse(JSON.stringify(genSources));
+    genSources.forEach((s, i) => s.id = i);
+    newScene.sources = genSources;
   }
-  genSources = reduceList(randomizeList(removeDuplicatesBy((s: LibrarySource) => s.url, genSources)), newScene.generatorMax);
-  genSources = JSON.parse(JSON.stringify(genSources));
-  genSources.forEach((s, i) => s.id = i);
-  return updateScene(state, scene, (s) => s.sources = genSources);
+  return {scenes: newScenes};
 }
 
 export function updateScene(state: State, scene: Scene, fn: (scene: Scene) => void): Object {
@@ -1618,6 +1758,12 @@ export function updateAudioLibrary(state: State, fn: (audios: Array<Audio>) => v
   const audiosCopy = JSON.parse(JSON.stringify(state.audios));
   fn(audiosCopy);
   return {audios: audiosCopy};
+}
+
+export function updateScriptLibrary(state: State, fn: (scripts: Array<CaptionScript>) => void): Object {
+  const scriptsCopy = JSON.parse(JSON.stringify(state.scripts));
+  fn(scriptsCopy);
+  return {scripts: scriptsCopy};
 }
 
 export function updateLibrary(state: State, fn: (library: Array<LibrarySource>) => void): Object {
@@ -1714,6 +1860,8 @@ export function setCount(state: State, sourceURL: string, count: number, countCo
 export function updateTags(state: State, tags: Array<Tag>): Object {
   // Go through each scene in the library
   let newLibrary = state.library;
+  let newAudios = state.audios;
+  let newScripts = state.scripts;
   let newScenes = state.scenes;
   const tagIDs = tags.map((t) => t.id);
   for (let source of newLibrary) {
@@ -1769,6 +1917,54 @@ export function updateTags(state: State, tags: Array<Tag>): Object {
         });
       }
     }
+  }
+  for (let source of newAudios) {
+    // Remove deleted tags, update any edited tags, and order the same as tags
+    source.tags = source.tags.filter((t: Tag) => tagIDs.includes(t.id));
+    source.tags = source.tags.map((t: Tag) => {
+      for (let tag of tags) {
+        if (t.id == tag.id) {
+          t.name = tag.name;
+          t.phraseString = tag.phraseString;
+          return t;
+        }
+      }
+    });
+    source.tags = source.tags.sort((a: Tag, b: Tag) => {
+      const aIndex = tagIDs.indexOf(a.id);
+      const bIndex = tagIDs.indexOf(b.id);
+      if (aIndex < bIndex) {
+        return -1;
+      } else if (aIndex > bIndex) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+  }
+  for (let source of newScripts) {
+    // Remove deleted tags, update any edited tags, and order the same as tags
+    source.tags = source.tags.filter((t: Tag) => tagIDs.includes(t.id));
+    source.tags = source.tags.map((t: Tag) => {
+      for (let tag of tags) {
+        if (t.id == tag.id) {
+          t.name = tag.name;
+          t.phraseString = tag.phraseString;
+          return t;
+        }
+      }
+    });
+    source.tags = source.tags.sort((a: Tag, b: Tag) => {
+      const aIndex = tagIDs.indexOf(a.id);
+      const bIndex = tagIDs.indexOf(b.id);
+      if (aIndex < bIndex) {
+        return -1;
+      } else if (aIndex > bIndex) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
   }
   for (let scene of newScenes) {
     for (let source of scene.sources) {
@@ -1867,6 +2063,19 @@ export function toggleAudioTag(state: State, sourceID: number, tag: Tag): Object
   return {audios: newAudios};
 }
 
+export function toggleScriptTag(state: State, sourceID: number, tag: Tag): Object {
+  const newScripts = state.scripts;
+  const source = newScripts.find((s) => s.id == sourceID);
+  if (source) {
+    if (source.tags.find((t: Tag) => t.name == tag.name)) {
+      source.tags = source.tags.filter((t: Tag) => t.name != tag.name);
+    } else {
+      source.tags.push(tag);
+    }
+  }
+  return {scripts: newScripts};
+}
+
 export function toggleTag(state: State, sourceID: number, tag: Tag): Object {
   const newLibrary = state.library;
   const newScenes = state.scenes;
@@ -1891,6 +2100,14 @@ export function addTracks(state: State, playlistIndex: number) {
   return {route: state.route.concat(new Route({kind: 'audios', value: playlistIndex})), specialMode: SP.select, audioSelected: new Array<string>(), audioOpenTab: 3};
 }
 
+export function addScript(state: State, playlistIndex: number) {
+  return {route: state.route.concat(new Route({kind: 'scripts', value: playlistIndex})), specialMode: SP.select, scriptSelected: new Array<string>()};
+}
+
+export function addScriptSingle(state: State) {
+  return {route: state.route.concat(new Route({kind: 'scripts', value: null})), specialMode: SP.selectSingle, scriptSelected: new Array<string>()};
+}
+
 export function addSource(state: State, scene: Scene, type: string, ...args: any[]): Object {
   const handleArgs = (s: Scene) => {
     if (args.length > 0) {
@@ -1903,7 +2120,7 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
         }
 
         // Update hastebin URL (if present)
-        s.textSource = "https://hastebin.com/raw/" + importURL;
+        s.scriptPlaylists.push({scripts: [new CaptionScript({url: "https://hastebin.com/raw/" + importURL})], shuffle: false, repeat: RP.none});
       }
     }
   }
@@ -1982,6 +2199,28 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
         return updateLibrary(state, (l) =>  addSources(l, vResult, state.library));
       }
 
+    case AF.videoDir:
+      let vdResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+        {filters: [{name:'All Files (*.*)', extensions: ['*']}], properties: ['openDirectory', 'multiSelections']});
+      if (!vdResult) return;
+      let rvResult = new Array<string>();
+      for (let path of vdResult) {
+        if (fs.existsSync(path) && fs.lstatSync(path).isDirectory()) {
+          rvResult = rvResult.concat(getFilesRecursively(path));
+        } else {
+          rvResult.push(path);
+        }
+      }
+      rvResult = rvResult.filter((r) => isVideo(r, true) || isVideoPlaylist(r, true));
+      if (scene != null) {
+        return updateScene(state, scene, (s) => {
+          addSources(s.sources, rvResult, state.library);
+          handleArgs(s);
+        })
+      } else {
+        return updateLibrary(state, (l) =>  addSources(l, rvResult, state.library));
+      }
+
     case GT.local:
       if (!args || args.length < 2) {
         return;
@@ -2057,7 +2296,8 @@ function mergeSources(originalSources: Array<LibrarySource>, newSources: Array<L
   });
 
   let combinedSources = Array.from(originalSources);
-  for (let newSource of newSources) {
+  for (let source of newSources) {
+    const newSource = new LibrarySource(source);
     newSource.id = id;
     combinedSources.unshift(newSource);
     id += 1;
@@ -2093,6 +2333,9 @@ function addSources(originalSources: Array<LibrarySource>, newSources: Array<str
 }
 
 export function sortScene(state: State, algorithm: string, ascending: boolean): Object {
+  if (algorithm == SF.random) {
+    return {scenes: randomizeList(state.scenes.concat())}
+  }
   const getName = (a: Scene) => {
     return a.name.toLowerCase();
   };
@@ -2192,7 +2435,53 @@ function audioSortFunction(algorithm: string, ascending: boolean): (a: Audio, b:
   }
 }
 
+export function sortScripts(state: State, algorithm: string, ascending: boolean): Object {
+  if (algorithm == SF.random) {
+    return {scripts: randomizeList(state.scripts.concat())};
+  }
+  const newLibrary = state.scripts.concat().sort(scriptSortFunction(algorithm, ascending));
+  return {scripts: newLibrary};
+}
+
+function scriptSortFunction(algorithm: string, ascending: boolean): (a: CaptionScript, b: CaptionScript) => number {
+  return (a, b) => {
+    let aValue: any, bValue: any;
+    switch (algorithm) {
+      case SF.alpha:
+        aValue = getFileName(a.url).toLowerCase();
+        bValue = getFileName(b.url).toLowerCase();
+        break;
+      case SF.alphaFull:
+        aValue = a.url.toLowerCase();
+        bValue = b.url.toLowerCase();
+        break;
+      case SF.date:
+        aValue = a.id;
+        bValue = b.id;
+        break;
+      default:
+        aValue = "";
+        bValue = "";
+    }
+    if (aValue < bValue) {
+      return ascending ? -1 : 1;
+    } else if (aValue > bValue) {
+      return ascending ? 1 : -1;
+    } else {
+      return 0;
+    }
+  }
+}
+
 export function sortSources(state: State, scene: Scene, algorithm: string, ascending: boolean): Object {
+  if (algorithm == SF.random) {
+    if (scene != null) {
+      return updateScene(state, scene, (s) => s.sources = randomizeList(s.sources.concat()));
+    } else {
+      const newLibrary = randomizeList(state.library.concat());
+      return {library: newLibrary};
+    }
+  }
   const getName = (a: LibrarySource) => {
     const sourceType = getSourceType(a.url);
     return sourceType == ST.video || sourceType == ST.playlist ? getFileName(a.url).toLowerCase() : getFileGroup(a.url).toLowerCase();
@@ -2263,9 +2552,27 @@ function sortFunction(algorithm: string, ascending: boolean, getName: (a: any) =
         aValue = getType(a);
         bValue = getType(b);
         break;
+      case SF.duration:
+        aValue = a.duration;
+        bValue = b.duration;
+        break;
+      case SF.resolution:
+        aValue = a.resolution;
+        bValue = b.resolution;
+        break;
       default:
         aValue = "";
         bValue = "";
+    }
+
+    if (algorithm == SF.duration || algorithm == SF.resolution) {
+      if (aValue == null && bValue != null) {
+        return 1;
+      } else if (bValue == null && aValue != null) {
+        return -1;
+      } else if (bValue == null && aValue == null) {
+        return 0;
+      }
     }
     if (aValue < bValue) {
       return ascending ? -1 : 1;
@@ -2486,11 +2793,8 @@ export function markOffline(getState: () => State, setState: Function) {
   const win = remote.getCurrentWindow();
   const state = getState();
   const actionableLibrary = state.library.filter((ls) => {
-    if (ls.url.startsWith("http://") || ls.url.startsWith("https://")) {
-      // If this link was checked within the last week, skip
-      return new Date().getTime() - new Date(ls.lastCheck).getTime() >= 604800000;
-    }
-    return true;
+    // If this link was checked within the last week, skip
+    return new Date().getTime() - new Date(ls.lastCheck).getTime() >= 604800000;
   });
 
   const offlineLoop = () => {
@@ -2576,6 +2880,212 @@ export function markOffline(getState: () => State, setState: Function) {
     });
     win.setProgressBar(state.progressCurrent / state.progressTotal);
     offlineLoop();
+  }
+}
+
+export function detectBPMs(getState: () => State, setState: Function) {
+  const readMetadata = (audio: Audio, offset: number) => {
+    const win = remote.getCurrentWindow();
+    const state = getState();
+    mm.parseFile(audio.url)
+      .then((metadata: any) => {
+        if (metadata && metadata.common && metadata.common.bpm) {
+          audio.bpm = metadata.common.bpm;
+          state.progressCurrent = offset + 1;
+          setState({progressCurrent: state.progressCurrent});
+          win.setProgressBar(state.progressCurrent / state.progressTotal);
+          setTimeout(detectBPMLoop, 100);
+        } else {
+          detectBPM(audio, offset);
+        }
+      })
+      .catch((e: any) => {
+        console.error("Error reading track metadata: " + audio.url);
+        console.error(e);
+        detectBPM(audio, offset);
+      });
+  }
+
+  const detectBPM = (audio: Audio, offset: number) => {
+    const bpmError = (e: any) => {
+      console.error("Error detecting track BPM: " + audio.url);
+      console.error(e);
+      const win = remote.getCurrentWindow();
+      const state = getState();
+      state.progressCurrent = offset + 1;
+      setState({progressCurrent: state.progressCurrent});
+      win.setProgressBar(state.progressCurrent / state.progressTotal);
+      setTimeout(detectBPMLoop, 100);
+    }
+
+    const detectBPM = (data: ArrayBuffer) => {
+      const maxByteSize = 200000000;
+      if (data.byteLength < maxByteSize) {
+        const win = remote.getCurrentWindow();
+        const state = getState();
+        let context = new AudioContext();
+        context.decodeAudioData(data, (buffer) => {
+          analyze(buffer)
+            .then((tempo: number) => {
+              audio.bpm = Number.parseFloat(tempo.toFixed(2));
+              state.progressCurrent = offset + 1;
+              setState({progressCurrent: state.progressCurrent});
+              win.setProgressBar(state.progressCurrent / state.progressTotal);
+              setTimeout(detectBPMLoop, 100);
+            })
+            .catch((e: any) => {
+              bpmError(e);
+            });
+        }, (e) => {
+          bpmError(e);
+        });
+      } else {
+        console.error("'" + audio.url + "' is too large to decode");
+      }
+    }
+
+    try {
+      const url = audio.url;
+      if (existsSync(url)) {
+        detectBPM(toArrayBuffer(readFileSync(url)));
+      } else {
+        request.get({url, encoding: null}, function (e: Error, res: IncomingMessage, body: Buffer) {
+          if (e) {
+            bpmError(e);
+            return;
+          }
+          detectBPM(toArrayBuffer(body));
+        });
+      }
+    } catch (e) {
+      bpmError(e);
+    }
+  }
+
+  const detectBPMLoop = () => {
+    const state = getState();
+    const offset = state.progressCurrent;
+    if (state.progressMode == PR.cancel) {
+      win.setProgressBar(-1);
+      setState({progressMode: null, progressCurrent: 0, progressTotal: 0, progressTitle: ""});
+    } else if (actionableLibrary.length == offset) {
+      win.setProgressBar(-1);
+      setState({
+        systemSnack: "BPM Detection has completed.",
+        progressMode: null,
+        progressCurrent: 0,
+        progressTotal: 0,
+        progressTitle: ""
+      });
+    } else {
+      const actionSource = actionableLibrary[offset];
+      state.progressTitle = actionSource.url;
+      setState({progressTitle: state.progressTitle});
+
+      const librarySource = state.audios.find((s) => s.url == actionSource.url);
+      if (librarySource) {
+        readMetadata(librarySource, offset)
+      } else {
+        // Skip if removed from library during check
+        state.progressCurrent = offset + 1;
+        setState({progressCurrent: state.progressCurrent});
+        win.setProgressBar(state.progressCurrent / state.progressTotal);
+        detectBPMLoop();
+      }
+    }
+  }
+
+  const win = remote.getCurrentWindow();
+  const state = getState();
+  const actionableLibrary = state.audios.filter((a) => a.bpm == 0);
+
+  // If we don't have an import running
+  if (!state.progressMode) {
+    state.progressMode = PR.bpm;
+    state.progressCurrent = 0;
+    state.progressTotal = actionableLibrary.length;
+    setState({
+      progressMode: state.progressMode,
+      progressCurrent: state.progressCurrent,
+      progressTotal: state.progressTotal,
+    });
+    win.setProgressBar(state.progressCurrent / state.progressTotal);
+    detectBPMLoop();
+  }
+}
+
+export function updateVideoMetadata(getState: () => State, setState: Function) {
+  const win = remote.getCurrentWindow();
+  const state = getState();
+  const actionableLibrary = state.library.filter((ls) => getSourceType(ls.url) == ST.video && (ls.duration == null || ls.resolution == null));
+
+  const videoMetadataLoop = () => {
+    const state = getState();
+    const offset = state.progressCurrent;
+    if (state.progressMode == PR.cancel) {
+      win.setProgressBar(-1);
+      setState({progressMode: null, progressCurrent: 0, progressTotal: 0, progressTitle: ""});
+    } else if (actionableLibrary.length == offset) {
+      win.setProgressBar(-1);
+      setState({
+        systemSnack: "Video Metadata update has completed.",
+        progressMode: null,
+        progressCurrent: 0,
+        progressTotal: 0,
+        progressTitle: ""
+      });
+    } else {
+      const actionSource = actionableLibrary[offset];
+      state.progressTitle = actionSource.url;
+      setState({progressTitle: state.progressTitle});
+
+      const librarySource = state.library.find((s) => s.url == actionSource.url);
+      if (librarySource) {
+        let video = document.createElement('video');
+        video.preload = 'metadata';
+
+        video.onloadedmetadata = () => {
+          const height = video.videoHeight;
+          const width = video.videoWidth;
+          librarySource.resolution = Math.min(height, width);
+          librarySource.duration = video.duration;
+          video.remove();
+          state.progressCurrent = offset + 1;
+          setState({progressCurrent: state.progressCurrent});
+          win.setProgressBar(state.progressCurrent / state.progressTotal);
+          setTimeout(videoMetadataLoop, 100);
+        }
+        video.onerror = () => {
+          video.remove();
+          state.progressCurrent = offset + 1;
+          setState({progressCurrent: state.progressCurrent});
+          win.setProgressBar(state.progressCurrent / state.progressTotal);
+          setTimeout(videoMetadataLoop, 100);
+        }
+
+        video.src = librarySource.url;
+      } else {
+        // Skip if removed from library during check
+        state.progressCurrent = offset + 1;
+        setState({progressCurrent: state.progressCurrent});
+        win.setProgressBar(state.progressCurrent / state.progressTotal);
+        videoMetadataLoop();
+      }
+    }
+  }
+
+  // If we don't have an import running
+  if (!state.progressMode) {
+    state.progressMode = PR.videoMetadata;
+    state.progressCurrent = 0;
+    state.progressTotal = actionableLibrary.length;
+    setState({
+      progressMode: state.progressMode,
+      progressCurrent: state.progressCurrent,
+      progressTotal: state.progressTotal,
+    });
+    win.setProgressBar(state.progressCurrent / state.progressTotal);
+    videoMetadataLoop();
   }
 }
 

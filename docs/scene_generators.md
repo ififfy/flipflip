@@ -42,3 +42,6 @@ specific rules.
 Any changes to Effects here will be persisted between generated Scenes (using this Generator). The only thing that 
 gets overridden when you click `Generate` is the list of sources. If you are particularly fond of a generated 
 Scene, you can click `Save as Scene` in the sidebar to save these sources as their own stand-alone Scene.
+
+?> In the options tab, select "Re-Generate on Playback" to automatically regenerate this scene when it is played. This 
+includes direct playback, as well as its use in overlays or grids. Scenes with invalid weights will not be re-generated.

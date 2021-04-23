@@ -7,6 +7,8 @@ import Forward10Icon from '@material-ui/icons/Forward10';
 import Replay10Icon from '@material-ui/icons/Replay10';
 import PauseIcon from '@material-ui/icons/Pause';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import SkipPreviousIcon from "@material-ui/icons/SkipPrevious";
+import SkipNextIcon from "@material-ui/icons/SkipNext";
 import VolumeDownIcon from '@material-ui/icons/VolumeDown';
 import VolumeUpIcon from '@material-ui/icons/VolumeUp';
 
@@ -52,6 +54,7 @@ class VideoControl extends React.Component {
     clipValue?: Array<number>,
     clips?: Array<Clip>,
     onChangeVolume(volume: number): void,
+    nextTrack?(): void,
   };
 
   readonly state = {
@@ -79,6 +82,11 @@ class VideoControl extends React.Component {
         <Grid item>
           <Grid container alignItems="center">
             <Grid item xs={12} style={{textAlign: 'center'}}>
+              {this.props.nextTrack && (
+                <IconButton disabled style={{opacity: 0}}>
+                  <SkipPreviousIcon />
+                </IconButton>
+              )}
               <Tooltip title="Jump Back">
                 <IconButton
                   onClick={this.onBack.bind(this)}>
@@ -97,6 +105,14 @@ class VideoControl extends React.Component {
                   <Forward10Icon/>
                 </IconButton>
               </Tooltip>
+              {this.props.nextTrack && (
+                <Tooltip title="Next Track">
+                  <IconButton
+                    onClick={this.props.nextTrack.bind(this)}>
+                    <SkipNextIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
             </Grid>
             <Grid item xs={12}>
               <Grid container spacing={1}>
@@ -133,13 +149,18 @@ class VideoControl extends React.Component {
         }
         if (this.props.video.currentTime < this.props.clipValue[0] ||
           this.props.video.currentTime > this.props.clipValue[1]) {
+          this.props.video.onended(null);
           this.props.video.currentTime = this.props.clipValue[0];
         }
       }
     }, 50);
     this.setState({marks: this.getMarks()});
     if (this.props.useHotkeys) {
-      window.addEventListener('keydown', this.onKeyDown, false);
+      if (this.props.player) {
+        window.addEventListener('keydown', this.onPlayerKeyDown, false);
+      } else {
+        window.addEventListener('keydown', this.onKeyDown, false);
+      }
     }
   }
 
@@ -155,7 +176,11 @@ class VideoControl extends React.Component {
   componentWillUnmount() {
     clearInterval(this._interval);
     if (this.props.useHotkeys) {
-      window.removeEventListener('keydown', this.onKeyDown);
+      if (this.props.player) {
+        window.removeEventListener('keydown', this.onPlayerKeyDown);
+      } else {
+        window.removeEventListener('keydown', this.onKeyDown);
+      }
     }
   }
 
@@ -235,6 +260,30 @@ class VideoControl extends React.Component {
           this.onForward();
         }
         break;
+    }
+  };
+
+  onPlayerKeyDown = (e: KeyboardEvent) => {
+    const focus = document.activeElement.tagName.toLocaleLowerCase();
+    if (e.shiftKey) {
+      switch (e.key) {
+        case ' ':
+          e.preventDefault();
+          this.state.playing ? this.onPause() : this.onPlay();
+          break;
+        case 'ArrowLeft':
+          if (focus != "input") {
+            e.preventDefault();
+            this.onBack();
+          }
+          break;
+        case 'ArrowRight':
+          if (focus != "input") {
+            e.preventDefault();
+            this.onForward();
+          }
+          break;
+      }
     }
   };
 }

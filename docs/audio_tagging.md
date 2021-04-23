@@ -3,26 +3,17 @@ While there is not yet a way to use tags to generate audio playlists, they are s
 and finding what you're looking for.
 
 The first step is to add some tags. Click the `Manage Tags` button ( <img style="vertical-align: -5px" 
-src="doc_icons/tag.svg" alt="Manage Tags" width="20" height="20"> ) in the sidebar.
+src="doc_icons/tag.svg" alt="Manage Tags" width="20" height="20"> ) in the sidebar. See [Manage Tags](tagging.md#manage-tags)
+for more information about adding tags.
 
-?> **Note**: Tags are shared between regular sources and audio tracks
-
-## Manage tags
-From this screen, we can add, remove, and re-order our tags. ("Tag phrases" do not apply to audio tracks).
-
-* To add a new tag click the `+` and then type the name of the tag and press OK
-* To edit a tag's name or "tag-phrases", click the tag.
-* To remove a tag, click the tag and then click the <img style="vertical-align: -5px" src="doc_icons/delete.svg" alt="Remove" width="20" height="20">. 
-* To manually re-order tags, simply drag'n'drop them. (This is the order which they will appear everywhere else).
-
-![](doc_images/manage_tags.png)
+?> **Note**: Tags are shared between regular sources, audio tracks, and caption scripts.
 
 ## Tagging a track
 To tag a track in the Library, click the track's Avatar. This will start a Scene with an audio playlist, starting at 
 the selected track. To modify the tags, hover towards the bottom of the screen, and you will see your tags appear. 
 Toggle tags on/off as desired by clicking on them. When you're done, click "Back" to return to the Library.
 
-While Tagging, use `←` and `→` to skip to the previous/next visible track in the Library. 
+While Tagging, use `[` and `]` to skip to the previous/next visible track in the Library. 
 
 ![](doc_images/audio_tagging.png)
 

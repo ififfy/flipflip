@@ -97,6 +97,18 @@ export default class PlayerBoolCard extends React.Component {
               label="Portable Mode"/>
           </Tooltip>
         </Grid>
+        {this.props.generalSettings.portableMode && (
+          <Grid item xs={12}>
+            <Tooltip title="If on, data will only be saved in the same directory as the FlipFlip executable, and not at the default save path.">
+              <FormControlLabel
+                control={
+                  <Switch checked={this.props.generalSettings.disableLocalSave}
+                          onChange={this.onGBoolInput.bind(this, 'disableLocalSave')}/>
+                }
+                label="Disable Local Saves"/>
+            </Tooltip>
+          </Grid>
+        )}
         <Dialog
           open={this.state.portableDialog}
           onClose={this.onToggleDialog.bind(this)}
@@ -126,7 +138,7 @@ export default class PlayerBoolCard extends React.Component {
       // Ask whether to keep local or keep portable
       this.onToggleDialog();
     }
-    this.props.onUpdateGeneralSettings((s) => s.portableMode = checked);
+    this.changeGKey('portableMode', checked);
   }
 
   onToggleDialog() {
@@ -150,5 +162,19 @@ export default class PlayerBoolCard extends React.Component {
 
   update(fn: (settings: any) => void) {
     this.props.onUpdateDisplaySettings(fn);
+  }
+
+  onGBoolInput(key: string, e: MouseEvent) {
+    const input = (e.target as HTMLInputElement);
+    const checked = input.checked;
+    this.changeGKey(key, checked);
+  }
+
+  changeGKey(key: string, value: any) {
+    this.gUpdate((s) => s[key] = value);
+  }
+
+  gUpdate(fn: (settings: any) => void) {
+    this.props.onUpdateGeneralSettings(fn);
   }
 }

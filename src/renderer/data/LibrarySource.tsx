@@ -19,6 +19,8 @@ export default class LibrarySource {
   dirOfSources: boolean = false;
   // Video
   subtitleFile: string;
+  duration: number;
+  resolution: number;
   // Reddit
   redditFunc: string;
   redditTime: string;

@@ -30,10 +30,19 @@ const IF = { // image filters
   stills: 'if.stills',
 };
 
+const OT = { // orientation
+  original: 'ot.original',
+  onlyLandscape: 'ot.onlylandscape',
+  onlyPortrait: 'ot.onlyportrait',
+  forceLandscape: 'ot.forcelandscape',
+  forcePortrait: 'ot.forceportrait',
+}
+
 const GO = { // GIF Options
   none: 'go.none',
   part: 'go.part',
   partr: 'go.partr',
+  atLeast: 'go.atleast',
   full: 'go.full',
 };
 
@@ -41,6 +50,7 @@ const VO = { // Video Options
   none: 'vo.none',
   part: 'vo.part',
   partr: 'vo.partr',
+  atLeast: 'vo.atleast',
   full: 'vo.full',
 };
 
@@ -105,6 +115,9 @@ const SF = { // sort function
   date: 'sf.date',
   count: 'sf.count',
   type: 'sf.type',
+  duration: 'sf.duration',
+  resolution: 'sf.resolution',
+  random: 'sf.random',
 };
 
 const ASF = { // audio sort function
@@ -133,10 +146,12 @@ const ST = { // source types
   deviantart: 'st.deviantart',
   instagram: 'st.instagram',
   danbooru: 'st.danbooru',
+  e621: 'st.e621',
   gelbooru1: 'st.gelbooru1',
   gelbooru2: 'st.gelbooru2',
   ehentai: 'st.ehentai',
   bdsmlr: 'st.bdsmlr',
+  hydrus: 'st.hydrus',
   audio: 'st.audio'
 };
 
@@ -152,8 +167,10 @@ const AF = { // add functions
   url: 'af.url',
   directory: 'af.directory',
   videos: 'af.videos',
+  videoDir: 'af.videodir',
   library: 'af.library',
   audios: 'af.audio',
+  script: 'af.script',
 };
 
 const IPC = {
@@ -180,6 +197,12 @@ const MO = { // Menu/Modal Constants
   restore: 'mo.restore',
   signIn: 'mo.signin',
   signOut: 'mo.signout',
+  open: 'mo.open',
+  openLocal: 'mo.openlocal',
+  openLibrary: 'mo.openlibrary',
+  save: 'mo.save',
+  load: 'mo.load',
+  select: 'mo.select',
 };
 
 const PR = { // Global progress functions
@@ -187,6 +210,8 @@ const PR = { // Global progress functions
   complete: 'pr.complete',
   audioOffline: 'pr.audioOffline',
   offline: 'pr.offline',
+  videoMetadata: 'pr.video',
+  bpm: 'pr.bpm',
   tumblr: 'pr.tumblr',
   reddit: 'pr.reddit',
   twitter: 'pr.twitter',
@@ -248,6 +273,7 @@ const SDT = { // Scene Detail Tutorials
   options2: 'sdt12',
   optionsLeft: 'sdt13',
   timing: 'sdt14',
+  backForth: 'sdt.33',
   imageSizing: 'sdt15',
   nextScene: 'sdt16',
   overlays: 'sdt17',
@@ -295,6 +321,27 @@ const ALT = { // Audio Library Tutorials
   sidebar1: 'alt4',
   sidebar2: 'alt5',
   final: 'alt6',
+  done: DONE,
+};
+
+const SLT = { // Script Library Tutorials
+  welcome: 'slt1',
+  library: 'slt2',
+  toolbar: 'slt3',
+  sidebar1: 'slt4',
+  sidebar2: 'slt5',
+  final: 'slt6',
+  done: DONE,
+};
+
+const CST = { // Caption Scriptor Tutorials
+  welcome: 'cst1',
+  code: 'cst2',
+  player: 'cst3',
+  fonts: 'cst4',
+  menu: 'cst5',
+  actions: 'cst6',
+  final: 'cst7',
   done: DONE,
 };
 
@@ -358,8 +405,16 @@ const SP = { // Special modes
   batchTag: 'sp.batchTag',
   batchEdit: 'sp.batchEdit',
   select: 'sp.select',
+  selectSingle: 'sp.selectSingle',
+}
+
+const WC = { // Watermark corner
+  bottomRight: 'wc.bottomRight',
+  bottomLeft: 'wc.bottomLeft',
+  topRight: 'wc.topRight',
+  topLeft: 'wc.topLeft',
 }
 
 export {
-  AF, ALT, ASF, BT, DONE, EA, GO, GT, HTF, IF, IG, IPC, IT, LT, MO, OF, PR, PT, RF, RP, RT, SB, SC, SDGT, SDT, SF, SGT, SL, SOF,SP, SPT, ST, TF, TT, VCT, VO, VTF, WF
+  AF, ALT, ASF, BT, CST, DONE, EA, GO, GT, HTF, IF, IG, IPC, IT, LT, MO, OF, OT, PR, PT, RF, RP, RT, SB, SC, SDGT, SDT, SF, SGT, SL, SLT, SOF, SP, SPT, ST, TF, TT, VCT, VO, VTF, WC, WF
 };

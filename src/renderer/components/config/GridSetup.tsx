@@ -14,6 +14,7 @@ import {SGT} from "../../data/const";
 import SceneSelect from "../configGroups/SceneSelect";
 import SceneGrid from "../../data/SceneGrid";
 import Scene from "../../data/Scene";
+import {areWeightsValid} from "../../data/utils";
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -125,6 +126,7 @@ class GridSetup extends React.Component {
     tutorial: string,
     goBack(): void,
     onDelete(grid: SceneGrid): void,
+    onGenerate(scenes: Array<Scene>): void,
     onPlayGrid(grid: SceneGrid): void,
     onTutorial(tutorial: string): void,
     onUpdateGrid(grid: SceneGrid, fn: (grid: SceneGrid) => void): void,
@@ -280,7 +282,6 @@ class GridSetup extends React.Component {
               onClose={this.onCloseMenu.bind(this)}>
               {!!this.state.isEditing &&
                 <SceneSelect
-                  scene={null}
                   allScenes={this.props.allScenes}
                   value={this.props.grid.grid[this.state.isEditing[0]][this.state.isEditing[1]]}
                   menuIsOpen
@@ -313,6 +314,30 @@ class GridSetup extends React.Component {
       newGrid[1][0] = sceneID;
       newGrid[1][1] = sceneID;
       this.changeKey('grid', newGrid);
+    } else if (this.props.tutorial == SGT.cells) {
+      let height = this.state.height;
+      let width = this.state.width;
+      let changed = false;
+      if (this.props.grid.grid.length != height) {
+        height = this.props.grid.grid.length;
+        this.setState({height: height});
+        changed = true;
+      }
+      if (this.props.grid.grid[0].length != width) {
+        width = this.props.grid.grid[0].length;
+        this.setState({width: width});
+        changed = true;
+      }
+      if (changed && width == 2 && height == 2) {
+        this.props.onTutorial(SGT.dimensions);
+        const sceneID = this.props.allScenes[0].id;
+        const newGrid = this.props.grid.grid;
+        newGrid[0][0] = sceneID;
+        newGrid[0][1] = sceneID;
+        newGrid[1][0] = sceneID;
+        newGrid[1][1] = sceneID;
+        this.changeKey('grid', newGrid);
+      }
     }
   }
 
@@ -433,6 +458,32 @@ class GridSetup extends React.Component {
   }
 
   onPlayGrid() {
+    // Regenerate scene(s) before playback
+    const generateScenes: Array<Scene> = []
+    for (let row of this.props.grid.grid) {
+      for (let sceneID of row) {
+        const gScene = this.props.allScenes.find((s) => s.id == sceneID);
+        if (gScene && gScene.generatorWeights && gScene.regenerate && areWeightsValid(gScene)) {
+          generateScenes.push(gScene);
+        }
+        if (gScene && gScene.overlayEnabled) {
+          for (let overlay of gScene.overlays) {
+            if (overlay.sceneID.toString().startsWith('999')) {
+              // No grid overlays within a grid
+            } else {
+              const oScene = this.props.allScenes.find((s) => s.id == overlay.sceneID);
+              if (oScene && oScene.generatorWeights && oScene.regenerate && areWeightsValid(oScene)) {
+                generateScenes.push(oScene);
+              }
+            }
+          }
+        }
+      }
+    }
+    if (generateScenes.length > 0) {
+      this.props.onGenerate(generateScenes);
+    }
+
     this.props.onPlayGrid(this.props.grid);
   }
 

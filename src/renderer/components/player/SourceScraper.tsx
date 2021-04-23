@@ -10,7 +10,7 @@ import imgur from "imgur";
 import Twitter from "twitter";
 import {IgApiClient} from "instagram-private-api";
 
-import {IF, RF, RT, SOF, ST, WF} from '../../data/const';
+import {IF, RF, RT, SOF, ST, TF, WF} from '../../data/const';
 import {
   CancelablePromise,
   convertURL,
@@ -36,6 +36,7 @@ let tumblrAlerted = false;
 let tumblr429Alerted = false;
 let twitterAlerted = false;
 let instagramAlerted = false;
+let hydrusAlerted = false;
 
 // Returns true if array is empty, or only contains empty arrays
 function isEmpty(allURLs: any[]): boolean {
@@ -58,7 +59,7 @@ function filterPathsToJustPlayable(imageTypeFilter: string, paths: Array<string>
 }
 
 // Determine what kind of source we have based on the URL and return associated Promise
-function getPromise(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function getPromise(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   let promise;
   const sourceType = getSourceType(source.url);
 
@@ -120,6 +121,9 @@ function getPromise(systemMessage: Function, config: Config, source: LibrarySour
     } else if (sourceType == ST.danbooru) {
       promiseFunction = loadDanbooru;
       timeout = 8000;
+    } else if (sourceType == ST.e621) {
+      promiseFunction = loadE621;
+      timeout = 8000;
     } else if (sourceType == ST.gelbooru1) {
       promiseFunction = loadGelbooru1;
       timeout = 8000;
@@ -131,6 +135,9 @@ function getPromise(systemMessage: Function, config: Config, source: LibrarySour
       timeout = 8000;
     } else if (sourceType == ST.bdsmlr) {
       promiseFunction = loadBDSMlr;
+      timeout = 8000;
+    } else if (sourceType == ST.hydrus) {
+      promiseFunction = loadHydrus;
       timeout = 8000;
     }
     if (helpers.next == -1) {
@@ -155,7 +162,7 @@ function getPromise(systemMessage: Function, config: Config, source: LibrarySour
   return promise;
 }
 
-function loadLocalDirectory(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadLocalDirectory(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   const blacklist = ['*.css', '*.html', 'avatar.png'];
   const url = source.url;
 
@@ -194,7 +201,7 @@ function loadLocalDirectory(systemMessage: Function, config: Config, source: Lib
   });
 }
 
-function loadVideo(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadVideo(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   const url = source.url;
   return new CancelablePromise((resolve) => {
     const missingVideo = () => {
@@ -257,7 +264,7 @@ function loadVideo(systemMessage: Function, config: Config, source: LibrarySourc
   });
 }
 
-function loadPlaylist(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadPlaylist(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   const url = source.url;
   return new CancelablePromise((resolve) => {
     wretch(url)
@@ -300,11 +307,11 @@ function loadPlaylist(systemMessage: Function, config: Config, source: LibrarySo
         console.warn("Fetch error on", url);
         console.warn(e);
         resolve(null);
-      });;
+      });
   });
 }
 
-function loadRemoteImageURLList(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadRemoteImageURLList(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   const url = source.url;
   return new CancelablePromise((resolve) => {
     wretch(url)
@@ -351,7 +358,7 @@ function loadRemoteImageURLList(systemMessage: Function, config: Config, source:
   });
 }
 
-function loadTumblr(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadTumblr(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   let configured = config.remoteSettings.tumblrOAuthToken != "" && config.remoteSettings.tumblrOAuthTokenSecret != "";
   if (configured) {
     const url = source.url;
@@ -374,7 +381,9 @@ function loadTumblr(systemMessage: Function, config: Config, source: LibrarySour
           console.error("Error retriving " + tumblrID + (helpers.next == 0 ? "" : "(Page " + helpers.next + " )"));
           console.error(err);
           if (err.message.includes("429 Limit Exceeded") && !tumblr429Alerted && helpers.next == 0) {
-            systemMessage("Tumblr has temporarily throttled your FlipFlip due to high traffic. Try again in a few minutes or visit Settings to try a different Tumblr API key.");
+            if (!config.remoteSettings.silenceTumblrAlert) {
+              systemMessage("Tumblr has temporarily throttled your FlipFlip due to high traffic. Try again in a few minutes or visit Settings to try a different Tumblr API key.");
+            }
             tumblr429Alerted = true;
           }
           resolve(null);
@@ -467,7 +476,7 @@ function loadTumblr(systemMessage: Function, config: Config, source: LibrarySour
   }
 }
 
-function loadReddit(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadReddit(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   let configured = config.remoteSettings.redditRefreshToken != "";
   if (configured) {
     const url = source.url;
@@ -548,6 +557,44 @@ function loadReddit(systemMessage: Function, config: Config, source: LibrarySour
               .catch(errorSubmission);
             break;
         }
+      } else if (url.includes("/saved")) {
+        reddit.getUser(getFileGroup(url)).getSavedContent({after: helpers.next})
+          .then((submissionListing: any) => {
+          if (submissionListing.length > 0) {
+            let convertedListing = Array<string>();
+            let convertedCount = 0;
+            for (let s of submissionListing) {
+              convertURL(s.url).then((urls: Array<string>) => {
+                convertedListing = convertedListing.concat(urls);
+                convertedCount++;
+                if (convertedCount == submissionListing.length) {
+                  helpers.next = submissionListing[submissionListing.length - 1].name;
+                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
+                  resolve({
+                    data: filterPathsToJustPlayable(filter, convertedListing, true),
+                    helpers: helpers,
+                  });
+                }
+              })
+              .catch ((error: any) => {
+                convertedCount++;
+                if (convertedCount == submissionListing.length) {
+                  helpers.next = submissionListing[submissionListing.length - 1].name;
+                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
+                  resolve({
+                    data: filterPathsToJustPlayable(filter, convertedListing, true),
+                    helpers: helpers,
+                  });
+                }
+              });
+            }
+          } else {
+            helpers.next = null;
+            resolve({data: [], helpers: helpers});
+          }
+        }).catch((err: any) => {
+          resolve(null);
+        });
       } else if (url.includes("/user/") || url.includes("/u/")) {
         reddit.getUser(getFileGroup(url)).getSubmissions({after: helpers.next})
           .then((submissionListing: any) => {
@@ -599,7 +646,7 @@ function loadReddit(systemMessage: Function, config: Config, source: LibrarySour
   }
 }
 
-function loadImageFap(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadImageFap(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   if (helpers.next == 0) {
     helpers.next = [0, 0];
   }
@@ -733,7 +780,7 @@ function loadImageFap(systemMessage: Function, config: Config, source: LibrarySo
   });
 }
 
-function loadSexCom(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadSexCom(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   const url = source.url;
   return new CancelablePromise((resolve) => {
     // This doesn't work anymore due to src url requiring referer
@@ -770,6 +817,8 @@ function loadSexCom(systemMessage: Function, config: Config, source: LibrarySour
               helpers: helpers,
             })
           } else {
+            const validImages = filterPathsToJustPlayable(filter, images, false);
+            images = [];
             let count = 0;
             for (let videoURL of videos) {
               wretch("https://www.sex.com" + videoURL)
@@ -798,10 +847,12 @@ function loadSexCom(systemMessage: Function, config: Config, source: LibrarySour
                     images.push("https://videos1.sex.com/stream/" + date + "/" + vidID +".mp4");
                   }
                   if (count == videos.length) {
+                    const validVideos = filterPathsToJustPlayable(IF.any, images, true);
+                    const filePaths = validImages.concat(validVideos);
                     helpers.next = helpers.next + 1;
-                    helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+                    helpers.count = helpers.count + filePaths.length;
                     resolve({
-                      data: filterPathsToJustPlayable(filter, images, true),
+                      data: filePaths,
                       helpers: helpers,
                     })
                   }
@@ -816,7 +867,7 @@ function loadSexCom(systemMessage: Function, config: Config, source: LibrarySour
   });
 }
 
-function loadImgur(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadImgur(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   const url = source.url;
   return new CancelablePromise((resolve) => {
     imgur.getAlbumInfo(getFileGroup(url))
@@ -836,7 +887,7 @@ function loadImgur(systemMessage: Function, config: Config, source: LibrarySourc
   });
 }
 
-function loadTwitter(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadTwitter(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   let configured = config.remoteSettings.twitterAccessTokenKey != "" && config.remoteSettings.twitterAccessTokenSecret != "";
   if (configured) {
     const includeRetweets = source.includeRetweets;
@@ -902,7 +953,7 @@ function loadTwitter(systemMessage: Function, config: Config, source: LibrarySou
   }
 }
 
-function loadDeviantArt(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadDeviantArt(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   const url = source.url;
   return new CancelablePromise((resolve) => {
     wretch("https://backend.deviantart.com/rss.xml?type=deviation&q=by%3A" + getFileGroup(url) + "+sort%3Atime+meta%3Aall" + (helpers.next != 0 ? "&offset=" + helpers.next : ""))
@@ -938,11 +989,11 @@ function loadDeviantArt(systemMessage: Function, config: Config, source: Library
 }
 let ig: IgApiClient = null;
 let session: any = null;
-function loadInstagram(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadInstagram(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   const configured = config.remoteSettings.instagramUsername != "" && config.remoteSettings.instagramPassword != "";
   if (configured) {
     const url = source.url;
-    const processItems = (items: any, resolve: any, helpers: {next: any, count: number}) => {
+    const processItems = (items: any, resolve: any, helpers: {next: any, count: number, retries: number}) => {
       let images = Array<string>();
       for (let item of items) {
         if (item.carousel_media) {
@@ -1026,7 +1077,110 @@ function loadInstagram(systemMessage: Function, config: Config, source: LibraryS
   }
 }
 
-function loadDanbooru(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadE621(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
+  const url = source.url;
+  const hostRegex = /^(https?:\/\/[^\/]*)\//g;
+  const thisHost = hostRegex.exec(url)[1];
+  let suffix = "";
+  if (url.includes("/pools/")) {
+    suffix = "/pools.json?search[id]=" + url.substring(url.lastIndexOf("/") + 1);
+
+    return new CancelablePromise((resolve) => {
+      wretch(thisHost + suffix)
+        .get()
+        .setTimeout(5000)
+        .badRequest((e) => resolve(null))
+        .notFound((e) => resolve(null))
+        .timeout((e) => resolve(null))
+        .internalError((e) => resolve(null))
+        .onAbort((e) => resolve(null))
+        .json((json: any) => {
+          if (json.length == 0) {
+            helpers.next = null;
+            resolve({data: [], helpers: helpers});
+            return;
+          }
+
+          const count = json[0].post_count;
+          const images = Array<string>();
+          for (let postID of json[0].post_ids) {
+            suffix = "/posts/" + postID + ".json";
+            wretch(thisHost + suffix)
+              .get()
+              .setTimeout(5000)
+              .badRequest((e) => resolve(null))
+              .notFound((e) => resolve(null))
+              .timeout((e) => resolve(null))
+              .internalError((e) => resolve(null))
+              .onAbort((e) => resolve(null))
+              .json((json: any) => {
+                if (json.post && json.post.file.url) {
+                  let fileURL = json.post.file.url;
+                  if (!fileURL.startsWith("http")) {
+                    fileURL = "https://" + fileURL;
+                  }
+                  images.push(fileURL);
+                }
+
+                if (images.length == count) {
+                  helpers.next = null;
+                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+                  resolve({
+                    data: filterPathsToJustPlayable(filter, images, true),
+                    helpers: helpers,
+                  });
+                }
+              });
+          }
+        });
+    });
+  } else {
+    suffix = "/posts.json?limit=20&page=" + (helpers.next + 1);
+    const tagRegex = /[?&]tags=(.*)&?/g;
+    let tags;
+    if ((tags = tagRegex.exec(url)) !== null) {
+      suffix += "&tags=" + tags[1];
+    }
+
+    return new CancelablePromise((resolve) => {
+      wretch(thisHost + suffix)
+        .get()
+        .setTimeout(5000)
+        .badRequest((e) => resolve(null))
+        .notFound((e) => resolve(null))
+        .timeout((e) => resolve(null))
+        .internalError((e) => resolve(null))
+        .onAbort((e) => resolve(null))
+        .json((json: any) => {
+          if (json.length == 0) {
+            helpers.next = null;
+            resolve({data: [], helpers: helpers});
+          }
+
+          let list = json.posts;
+          const images = Array<string>();
+          for (let p of list) {
+            if (p.file.url) {
+              let fileURL = p.file.url;
+              if (!fileURL.startsWith("http")) {
+                fileURL = "https://" + fileURL;
+              }
+              images.push(fileURL);
+            }
+          }
+
+          helpers.next = helpers.next + 1;
+          helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+          resolve({
+            data: filterPathsToJustPlayable(filter, images, true),
+            helpers: helpers,
+          });
+        });
+    });
+  }
+}
+
+function loadDanbooru(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
   const thisHost = hostRegex.exec(url)[1];
@@ -1094,7 +1248,7 @@ function loadDanbooru(systemMessage: Function, config: Config, source: LibrarySo
   });
 }
 
-function loadGelbooru1(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadGelbooru1(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
   const thisHost = hostRegex.exec(url)[1];
@@ -1124,15 +1278,29 @@ function loadGelbooru1(systemMessage: Function, config: Config, source: LibraryS
               .error(503, (e) => resolve(null))
               .text((html) => {
                 imageCount++;
-                let contentURL = html.match("<img alt=\"img\" src=\"(.*?)\"");
+                let contentURL = html.match("<img[^>]*id=\"?image\"?[^>]*src=\"([^\"]*)\"");
                 if (contentURL != null) {
-                  images.push(contentURL[1]);
+                  let url = contentURL[1];
+                  if (url.startsWith("//")) url = "http:" + url;
+                  images.push(url);
+                }
+                contentURL = html.match("<img[^>]*src=\"([^\"]*)\"[^>]*id=\"?image\"?");
+                if (contentURL != null) {
+                  let url = contentURL[1];
+                  if (url.startsWith("//")) url = "http:" + url;
+                  images.push(url);
+                }
+                contentURL = html.match("<video[^>]*src=\"([^\"]*)\"");
+                if (contentURL != null) {
+                  let url = contentURL[1];
+                  if (url.startsWith("//")) url = "http:" + url;
+                  images.push(url);
                 }
                 if (imageCount == imageEls.length || imageCount == 10) {
                   helpers.next = helpers.next + 1;
-                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
                   resolve({
-                    data: filterPathsToJustPlayable(filter, images, true),
+                    data: filterPathsToJustPlayable(filter, images, false),
                     helpers: helpers,
                   });
                 }
@@ -1152,7 +1320,7 @@ function loadGelbooru1(systemMessage: Function, config: Config, source: LibraryS
   });
 }
 
-function loadGelbooru2(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadGelbooru2(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
   const thisHost = hostRegex.exec(url)[1];
@@ -1196,7 +1364,7 @@ function loadGelbooru2(systemMessage: Function, config: Config, source: LibraryS
   });
 }
 
-function loadEHentai(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
+function loadEHentai(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   const url = source.url;
   return new CancelablePromise((resolve) => {
     wretch(url + "?p=" + (helpers.next + 1))
@@ -1239,15 +1407,31 @@ function loadEHentai(systemMessage: Function, config: Config, source: LibrarySou
   });
 }
 
-function loadBDSMlr(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number}): CancelablePromise {
-  const url = source.url;
+function loadBDSMlr(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
+  let url = source.url;
+  if (url.endsWith("/rss")) {
+    url = url.substring(0, url.indexOf("/rss"))
+  }
   return new CancelablePromise((resolve) => {
+    const retry = () => {
+      if (helpers.retries < 3) {
+        helpers.retries += 1;
+        resolve({
+          data: [],
+          helpers: helpers,
+        });
+      } else {
+        resolve(null);
+      }
+    }
     wretch(url + "/rss?page=" + (helpers.next + 1))
       .get()
       .setTimeout(5000)
-      .onAbort((e) => resolve(null))
+      .onAbort(retry)
       .notFound((e) => resolve(null))
+      .internalError(retry)
       .text((html) => {
+        helpers.retries = 0;
         let itemEls = new DOMParser().parseFromString(html, "text/xml").querySelectorAll("item");
         if (itemEls.length > 0) {
           let imageCount = 0;
@@ -1275,6 +1459,129 @@ function loadBDSMlr(systemMessage: Function, config: Config, source: LibrarySour
   });
 }
 
+let sessionKey: string = null;
+function loadHydrus(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
+  const apiKey = config.remoteSettings.hydrusAPIKey
+  const configured = apiKey != "";
+  if (configured) {
+    const protocol = config.remoteSettings.hydrusProtocol;
+    const domain = config.remoteSettings.hydrusDomain;
+    const port = config.remoteSettings.hydrusPort;
+    const hydrusURL = protocol + "://" + domain + ":" + port;
+
+    if (!source.url.startsWith(hydrusURL)) {
+      if (!hydrusAlerted) {
+        systemMessage("Source url '" + source.url + "' does not match configured Hydrus server '" + hydrusURL);
+        hydrusAlerted = true;
+      }
+      return new CancelablePromise((resolve) => {
+        resolve(null);
+      });
+    }
+
+    const tagsRegex = /tags=([^&]*)&?.*$/.exec(source.url);
+    let noTags = tagsRegex == null || tagsRegex.length <= 1;
+
+    return new CancelablePromise((resolve) => {
+      const getSessionKey = () => {
+        wretch(hydrusURL + "/session_key")
+          .headers({"Hydrus-Client-API-Access-Key": apiKey})
+          .get()
+          .setTimeout(5000)
+          .notFound((e) => {
+            resolve(null);
+          })
+          .internalError((e) => {
+            resolve(null);
+          })
+          .json((json) => {
+            sessionKey = json.session_key;
+            search();
+          })
+          .catch((e) => {
+            resolve(null);
+          });
+      }
+
+      let pages = 0;
+      const search = () => {
+        const url = noTags ? hydrusURL + "/get_files/search_files" : hydrusURL + "/get_files/search_files?tags=" + tagsRegex[1];
+        wretch(url)
+          .headers({"Hydrus-Client-API-Session-Key": sessionKey})
+          .get()
+          .setTimeout(5000)
+          .notFound((e) => {
+            resolve(null);
+          })
+          .internalError((e) => {
+            resolve(null);
+          })
+          .json((json) => {
+            const fileIDs = json.file_ids;
+            const chunk = 1000;
+            pages = Math.ceil(fileIDs.length / chunk);
+            let page = 0;
+            for (let i=0; i<fileIDs.length; i+=chunk) {
+              const pageIDs = fileIDs.slice(i,i+chunk);
+              getFileMetadata(pageIDs, ++page);
+            }
+          })
+          .catch((e) => {
+            resolve(null);
+          });
+      }
+
+      let images = Array<string>();
+      const getFileMetadata = (fileIDs: Array<number>, page: number) => {
+        wretch(hydrusURL + "/get_files/file_metadata?file_ids=[" + fileIDs.toString() + "]")
+          .headers({"Hydrus-Client-API-Session-Key": sessionKey})
+          .get()
+          .setTimeout(5000)
+          .notFound((e) => {
+            resolve(null);
+          })
+          .internalError((e) => {
+            resolve(null);
+          })
+          .json((json) => {
+            for (let metadata of json.metadata) {
+              if ((filter == IF.any && isImageOrVideo(metadata.ext, true)) ||
+                (filter == IF.stills || filter == IF.images) && isImage(metadata.ext, true) ||
+                (filter == IF.gifs && metadata.ext.toLowerCase().endsWith('.gif') || isVideo(metadata.ext, true)) ||
+                (filter == IF.videos && isVideo(metadata.ext, true))) {
+                images.push(hydrusURL + "/get_files/file?file_id=" + metadata.file_id + "&Hydrus-Client-API-Access-Key=" + apiKey);
+              }
+            }
+
+            if (page == pages) {
+              resolve({
+                data: images,
+                helpers: helpers,
+              });
+            }
+          })
+          .catch((e) => {
+            resolve(null);
+          });
+      }
+
+      if (sessionKey == null) {
+        getSessionKey();
+      } else {
+        search();
+      }
+    });
+  } else {
+    if (!hydrusAlerted) {
+      systemMessage("You haven't configured FlipFlip to work with Hydrus yet.\nVisit Settings to configure Hydrus.");
+      hydrusAlerted = true;
+    }
+    return new CancelablePromise((resolve) => {
+      resolve(null);
+    });
+  }
+}
+
 export default class SourceScraper extends React.Component {
   readonly props: {
     config: Config,
@@ -1287,8 +1594,9 @@ export default class SourceScraper extends React.Component {
     hasStarted: boolean,
     strobeLayer?: string,
     historyOffset: number,
-    advanceHack?: ChildCallbackHack,
+    advanceHack: ChildCallbackHack,
     deleteHack?: ChildCallbackHack,
+    isOverlay?: boolean,
     setHistoryOffset(historyOffset: number): void,
     setHistoryPaths(historyPaths: Array<any>): void,
     firstImageLoaded(): void,
@@ -1303,7 +1611,7 @@ export default class SourceScraper extends React.Component {
   };
 
   readonly state = {
-    promiseQueue: Array<{source: LibrarySource, helpers: {next: any, count: number}}>(),
+    promiseQueue: Array<{source: LibrarySource, helpers: {next: any, count: number, retries: number}}>(),
     promise: new CancelablePromise((resolve, reject) => {}),
     nextPromise: new CancelablePromise((resolve, reject) => {}),
     allURLs: new Map<string, Array<string>>(),
@@ -1312,7 +1620,8 @@ export default class SourceScraper extends React.Component {
     videoVolume: this.props.scene.videoVolume,
   };
 
-  _nextPromiseQueue: Array<{source: LibrarySource, helpers: {next: any, count: number}}> = null;
+  _backForth: NodeJS.Timeout = null;
+  _nextPromiseQueue: Array<{source: LibrarySource, helpers: {next: any, count: number, retries: number}}> = null;
   _nextAllURLs: Map<string, Array<string>> = null;
 
   render() {
@@ -1324,7 +1633,7 @@ export default class SourceScraper extends React.Component {
             config={this.props.config}
             scene={this.props.scene}
             currentAudio={this.props.currentAudio}
-            isOverlay={this.props.opacity != 1}
+            isOverlay={this.props.isOverlay}
             isPlaying={this.props.isPlaying}
             gridView={this.props.gridView}
             historyOffset={this.props.historyOffset}
@@ -1353,7 +1662,7 @@ export default class SourceScraper extends React.Component {
       tumblr429Alerted = false;
       instagramAlerted = false;
       twitterAlerted = false;
-      this._nextPromiseQueue = new Array<{ source: LibrarySource, helpers: {next: any, count: number} }>();
+      this._nextPromiseQueue = new Array<{ source: LibrarySource, helpers: {next: any, count: number, retries: number} }>();
       this._nextAllURLs = new Map<string, Array<string>>();
     }
     let n = 0;
@@ -1416,7 +1725,7 @@ export default class SourceScraper extends React.Component {
       const d = sources[n];
 
       let message = d ? [d.url] : [""];
-      if (this.props.opacity != 1) {
+      if (this.props.isOverlay) {
         message = ["Loading '" + this.props.scene.name + "'...", message];
       }
       this.props.setProgress(sceneSources.length, n+1, message);
@@ -1424,7 +1733,7 @@ export default class SourceScraper extends React.Component {
       if (!this.props.scene.playVideoClips && d.clips) {
         d.clips = [];
       }
-      const loadPromise = getPromise(this.props.systemMessage, this.props.config, d, this.props.scene.imageTypeFilter, {next: -1, count: 0});
+      const loadPromise = getPromise(this.props.systemMessage, this.props.config, d, this.props.scene.imageTypeFilter, {next: -1, count: 0, retries: 0});
       this.setState({promise: loadPromise});
 
       loadPromise
@@ -1479,7 +1788,7 @@ export default class SourceScraper extends React.Component {
       if (!this.props.scene.playVideoClips && d.clips) {
         d.clips = [];
       }
-      const loadPromise = getPromise(this.props.systemMessage, this.props.config, d, this.props.nextScene.imageTypeFilter, {next: -1, count: 0});
+      const loadPromise = getPromise(this.props.systemMessage, this.props.config, d, this.props.nextScene.imageTypeFilter, {next: -1, count: 0, retries: 0});
       this.setState({nextPromise: loadPromise});
 
       loadPromise
@@ -1591,6 +1900,7 @@ export default class SourceScraper extends React.Component {
       props.opacity !== this.props.opacity ||
       props.strobeLayer !== this.props.strobeLayer ||
       props.hasStarted !== this.props.hasStarted ||
+      props.gridView !== this.props.gridView ||
       state.restart !== this.state.restart ||
       state.promise.source !== this.state.promise.source ||
       (state.allURLs.size > 0 && this.state.allURLs.size == 0);
@@ -1626,12 +1936,12 @@ export default class SourceScraper extends React.Component {
             preload: true,
             restart: true
           });
-          this._nextPromiseQueue = Array<{source: LibrarySource, helpers: {next: any, count: number}}>();
+          this._nextPromiseQueue = Array<{source: LibrarySource, helpers: {next: any, count: number, retries: number}}>();
           this._nextAllURLs = new Map<string, Array<string>>();
         }
       } else {
         this.setState({
-          promiseQueue: Array<{ source: LibrarySource, helpers: {next: any, count: number}}>(),
+          promiseQueue: Array<{ source: LibrarySource, helpers: {next: any, count: number, retries: number}}>(),
           promise: new CancelablePromise((resolve, reject) => {}),
           nextPromise: new CancelablePromise((resolve, reject) => {}),
           allURLs: new Map<string, Array<string>>(),
@@ -1651,5 +1961,7 @@ export default class SourceScraper extends React.Component {
     this.state.promise.cancel();
     this._nextPromiseQueue = null;
     this._nextAllURLs = null;
+    clearTimeout(this._backForth);
+    this._backForth = null;
   }
 }

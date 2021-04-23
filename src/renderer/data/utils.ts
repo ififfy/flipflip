@@ -2,16 +2,18 @@ import {remote} from "electron";
 import {URL} from "url";
 import path from 'path';
 import * as fs from "fs";
+import * as Path from "path";
 import wretch from "wretch";
 import * as easings from 'd3-ease';
 import crypto from "crypto";
-import {readFileSync} from "fs";
 
-import {EA, ST} from "./const";
+import {EA, ST, TF, TT} from "./const";
 import en from "./en";
 import Config from "./Config";
 import LibrarySource from "./LibrarySource";
 import Audio from "./Audio";
+import WeightGroup from "./WeightGroup";
+import Scene from "./Scene";
 
 export const saveDir = path.join(remote.app.getPath('appData'), 'flipflip');
 export const savePath = path.join(saveDir, 'data.json');
@@ -63,7 +65,7 @@ export function getEaseFunction(ea: string, exp: number, amp: number, per: numbe
       return easings.easeBackOut.overshoot(ov);
     case EA.backInOut:
       return easings.easeBackInOut.overshoot(ov);
-      
+
   }
 }
 
@@ -90,6 +92,59 @@ export function getBackups(): Array<{url: string, size: number}> {
   return backups;
 }
 
+export function getTimingFromString(tf: string): string {
+  switch(tf) {
+    case "constant":
+    case "const":
+      return TF.constant;
+    case "random":
+    case "rand":
+      return  TF.random;
+    case "wave":
+    case "sin":
+      return  TF.sin;
+    case "bpm":
+    case "audio":
+      return  TF.bpm;
+    case "scene":
+      return  TF.scene;
+    default:
+      return null;
+  }
+}
+
+export function getTimeout(tf: string, c: number, min: number, max: number, sinRate: number,
+                           audio: Audio, bpmMulti: number, timeToNextFrame: number): number {
+  let timeout = null;
+  switch (tf) {
+    case TF.random:
+      timeout = Math.floor(Math.random() * (max - min + 1)) + min;
+      break;
+    case TF.sin:
+      sinRate = (Math.abs(sinRate - 100) + 2) * 1000;
+      timeout = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (max - min + 1)) + min;
+      break;
+    case TF.constant:
+      timeout = c;
+      break;
+    case TF.bpm:
+      if (!audio) {
+        timeout = 1000;
+      } else {
+        timeout = 60000 / (audio.bpm * bpmMulti);
+        // If we cannot parse this, default to 1s
+        if (!timeout) {
+          timeout = 1000;
+        }
+      }
+      break;
+    case TF.scene:
+      timeout = timeToNextFrame ? timeToNextFrame : 1000;
+      break;
+  }
+  return timeout;
+}
+
 export function getTimestamp(secs: number): string {
   const hours = Math.floor(secs / 3600);
   const minutes = Math.floor(secs % 3600 / 60);
@@ -99,6 +154,60 @@ export function getTimestamp(secs: number): string {
   } else {
     return minutes + ":" + (seconds >= 10 ? seconds : "0" + seconds);
   }
+}
+
+export function getMsRemainder(sec: number): string {
+  if (isNaN(sec) || sec < 0) {
+    return null;
+  }
+
+  const ms = Math.round(sec * 1000);
+  let remainder = (Math.floor((ms % 1000) * 1000) / 1000).toString();
+  while (remainder.length < 3) {
+    remainder = "0" + remainder;
+  }
+  return "." + remainder;
+}
+
+export function getMsTimestampValue(value: string): number {
+  const split = value.split(":");
+  const splitInt = [];
+  let milli = null;
+  if (split.length > 3 || split.length == 0) return null;
+  if (split[split.length - 1].includes(".")) {
+    const splitMili = split[split.length - 1].split("\.");
+    if (splitMili.length > 2) return null;
+    split[split.length - 1] = splitMili[0];
+    milli = splitMili[1];
+    if (milli.length > 3) return null;
+    while (milli.length < 3) {
+      milli += "0";
+    }
+    milli = parseInt(milli);
+    if (isNaN(milli)) return null;
+  }
+  for (let n = 0; n < split.length; n++) {
+    if (n != 0) {
+      if (split[n].length != 2) return null;
+    }
+    const int = parseInt(split[n]);
+    if (isNaN(int)) return null;
+    splitInt.push(int);
+  }
+
+  let ms;
+  if (split.length == 3) {
+    ms = (splitInt[0] * 60 * 60) + (splitInt[1] * 60) + splitInt[2];
+  } else if (split.length == 2) {
+    ms = (splitInt[0] * 60) + splitInt[1];
+  } else if (split.length == 1) {
+    ms = splitInt[0];
+  }
+  ms *= 1000;
+  if (milli != null) {
+    ms += milli;
+  }
+  return ms;
 }
 
 export function getTimestampValue(value: string): number {
@@ -163,16 +272,20 @@ export function getSourceType(url: string): string {
     return ST.deviantart;
   } else if (/^https?:\/\/(www\.)?instagram\.com\//.exec(url) != null) {
     return ST.instagram;
-  } else if (/^https?:\/\/(www\.)?(lolibooru\.moe|hypnohub\.net|danbooru\.donmai\.us|e621\.net)\//.exec(url) != null) {
+  } else if (/^https?:\/\/(www\.)?(lolibooru\.moe|hypnohub\.net|danbooru\.donmai\.us)\//.exec(url) != null) {
     return ST.danbooru;
   } else if (/^https?:\/\/(www\.)?(gelbooru\.com|furry\.booru\.org|rule34\.xxx|realbooru\.com)\//.exec(url) != null) {
     return ST.gelbooru2;
-  } else if (/^https?:\/\/(www\.)?(.*\.booru\.org)\//.exec(url) != null) {
+  } else if (/^https?:\/\/(www\.)?(e621\.net)\//.exec(url) != null) {
+    return ST.e621;
+  } else if (/^https?:\/\/(www\.)?(.*\.booru\.org|idol\.sankakucomplex\.com)\//.exec(url) != null) {
     return ST.gelbooru1;
   } else if (/^https?:\/\/(www\.)?e-hentai\.org\/g\//.exec(url) != null) {
     return ST.ehentai;
   } else if (/^https?:\/\/[^.]*\.bdsmlr\.com/.exec(url) != null) {
     return ST.bdsmlr;
+  } else if (/^https?:\/\/[\w\\.]+:\d+\/get_files\/search_files/.exec(url) != null) {
+    return ST.hydrus;
   } else if (/(^https?:\/\/)|(\.txt$)/.exec(url) != null) { // Arbitrary URL, assume image list
     return ST.list;
   } else { // Directory
@@ -189,7 +302,8 @@ export function getFileGroup(url: string) {
       return tumblrID;
     case ST.reddit:
       let redditID = url;
-      if (url.endsWith("/")) redditID = redditID.slice(0, url.lastIndexOf("/"));
+      if (redditID.endsWith("/")) redditID = redditID.slice(0, url.lastIndexOf("/"));
+      if (redditID.endsWith("/saved")) redditID = redditID.replace("/saved", "");
       redditID = redditID.substring(redditID.lastIndexOf("/") + 1);
       return redditID;
     case ST.imagefap:
@@ -229,6 +343,23 @@ export function getFileGroup(url: string) {
         instagramID = instagramID.substring(0, instagramID.indexOf("/"));
       }
       return instagramID;
+    case ST.e621:
+      const hostRegexE621 = /^https?:\/\/(?:www\.)?([^.]*)\./g;
+      const hostE621 =  hostRegexE621.exec(url)[1];
+      let E621ID = "";
+      if (url.includes("/pools/")) {
+        E621ID = "pool" + url.substring(url.lastIndexOf("/"));
+      } else {
+        const tagRegex = /[?&]tags=(.*)&?/g;
+        let tags;
+        if ((tags = tagRegex.exec(url)) !== null) {
+          E621ID = tags[1];
+        }
+        if (E621ID.endsWith("+")) {
+          E621ID = E621ID.substring(0, E621ID.length - 1);
+        }
+      }
+      return hostE621 + "/" + decodeURIComponent(E621ID);
     case ST.danbooru:
     case ST.gelbooru1:
     case ST.gelbooru2:
@@ -285,7 +416,21 @@ export function getFileGroup(url: string) {
       }
       let name = url.substring(0, url.lastIndexOf(sep));
       return name.substring(name.lastIndexOf(sep)+1);
-
+    case ST.bdsmlr:
+      let bdsmlrID = url.replace(/https?:\/\//, "");
+      bdsmlrID = bdsmlrID.replace(/\/rss/, "");
+      bdsmlrID = bdsmlrID.replace(/\.bdsmlr\.com\/?/, "");
+      return bdsmlrID;
+    case ST.hydrus:
+      const tagsRegex = /tags=([^&]*)&?.*$/.exec(url);
+      if (tagsRegex == null) return "hydrus";
+      let tags = tagsRegex[1];
+      if (!tags.startsWith("[")) {
+        tags = decodeURIComponent(tags);
+      }
+      tags = tags.substring(1, tags.length - 1);
+      tags = tags.replace(/"/g, "");
+      return tags;
   }
 }
 
@@ -310,7 +455,6 @@ export function extractMusicMetadata(audio: Audio, metadata: any, cachePath: str
   if (metadata.common) {
     if (metadata.common.title) {
       audio.name = metadata.common.title;
-      console.log(audio.name);
     }
     if (metadata.common.album) {
       audio.album = metadata.common.album;
@@ -331,14 +475,13 @@ export function extractMusicMetadata(audio: Audio, metadata: any, cachePath: str
   if (metadata.format && metadata.format.duration) {
     audio.duration = metadata.format.duration;
   } else {
-    const data = toArrayBuffer(readFileSync(audio.url));
+    const data = toArrayBuffer(fs.readFileSync(audio.url));
     let context = new AudioContext();
     context.decodeAudioData(data, (buffer) => {
       audio.duration = buffer.duration;
     });
   }
 }
-
 
 export function getLocalPath(source: string, config: Config) {
   return cachePath(source, "local", config);
@@ -426,12 +569,37 @@ export async function convertURL(url: string): Promise<Array<string>> {
   // If this is redgif page, return redgif image
   let redgifMatch = url.match("^https?://(?:www\.)?redgifs\.com/watch/(\\w*)$");
   if (redgifMatch != null) {
-    let html = await wretch(url).get().notFound(() => {return [url]}).text();
-    let redgif = new DOMParser().parseFromString(html, "text/html").querySelectorAll("#video-" + redgifMatch[1] + " > source");
-    if (redgif.length > 0) {
-      for (let source of redgif) {
-        if ((source as any).type == "video/webm") {
-          return [(source as any).src];
+    let fourOFour = false
+    let html = await wretch(url).get().notFound(() => {fourOFour = true}).text();
+    if (fourOFour) {
+      return [url];
+    } else if (html) {
+      let redgif = new DOMParser().parseFromString(html, "text/html").querySelectorAll("#video-" + redgifMatch[1] + " > source");
+      if (redgif.length > 0) {
+        for (let source of redgif) {
+          if ((source as any).type == "video/webm") {
+            return [(source as any).src];
+          }
+        }
+        // Fallback to MP4
+        for (let source of redgif) {
+          if ((source as any).type == "video/mp4" && !(source as any).src.endsWith("-mobile.mp4")) {
+            return [(source as any).src];
+          }
+        }
+        // Fallback to MP4-mobile
+        for (let source of redgif) {
+          if ((source as any).type == "video/mp4") {
+            return [(source as any).src];
+          }
+        }
+      } else {
+        const fallbackRegex = /"webm":\s*\{[^}]*"url":\s*"([^,}]*)",?/.exec(html);
+        if (fallbackRegex != null) {
+          return [fallbackRegex[1].replace(/\\u002F/g,"/")];
+        } else {
+          console.log(html);
+          redgifMatch = null;
         }
       }
     } else {
@@ -446,6 +614,10 @@ export async function convertURL(url: string): Promise<Array<string>> {
   if (!imgurMatch && !imgurAlbumMatch && !gfycatMatch && !redgifMatch) {
     return [url];
   }
+}
+
+export function htmlEntities(str: string): string {
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\\n/g,"<br/>");
 }
 
 export function urlToPath(url: string): string {
@@ -536,6 +708,36 @@ export function getRandomListItem(list: any[], count: number = 1) {
   }
 }
 
+export function getFilesRecursively(path: string): string[] {
+  const isDirectory = (path: string) => fs.statSync(path).isDirectory();
+  const getDirectories = (path: string) =>
+    fs.readdirSync(path).map(name => Path.join(path, name)).filter(isDirectory);
+
+  const isFile = (path: string) => fs.statSync(path).isFile();
+  const getFiles = (path: string) =>
+    fs.readdirSync(path).map(name => Path.join(path, name)).filter(isFile);
+
+  let dirs = getDirectories(path);
+  let files = dirs
+    .map(dir => getFilesRecursively(dir)) // go through each directory
+    .reduce((a,b) => a.concat(b), []);    // map returns a 2d array (array of file arrays) so flatten
+  return files.concat(getFiles(path));
+}
+
+export function isText(path: string, strict: boolean): boolean {
+  if (path == null) return false;
+  const p = path.toLowerCase();
+  const acceptableExtensions = [".txt"];
+  for (let ext of acceptableExtensions) {
+    if (strict) {
+      if (p.endsWith(ext)) return true;
+    } else {
+      if (p.includes(ext)) return true;
+    }
+  }
+  return false;
+}
+
 export function isImageOrVideo(path: string, strict: boolean): boolean {
   return (isImage(path, strict) || isVideo(path, strict));
 }
@@ -596,6 +798,114 @@ export function isImage(path: string, strict: boolean): boolean {
   return false;
 }
 
+function areRulesValid(wg: WeightGroup) {
+  let rulesHasAll = false;
+  let rulesHasWeight = false;
+  let rulesRemaining = 100;
+  for (let rule of wg.rules) {
+    if (rule.type == TT.weight) {
+      rulesRemaining = rulesRemaining - rule.percent;
+      rulesHasWeight = true;
+    }
+    if (rule.type == TT.all) {
+      rulesHasAll = true;
+    }
+  }
+  return (rulesRemaining == 100 && rulesHasAll && !rulesHasWeight) || rulesRemaining == 0;
+}
+
+export function areWeightsValid(scene: Scene): boolean {
+  if (!scene.generatorWeights) return false;
+  let remaining = 100;
+  let hasAll = false;
+  let hasWeight = false;
+  for (let wg of scene.generatorWeights) {
+    if (wg.rules) {
+      const rulesValid = areRulesValid(wg);
+      if (!rulesValid) return false;
+    }
+    if (wg.type == TT.weight) {
+      remaining = remaining - wg.percent;
+      hasWeight = true;
+    }
+    if (wg.type == TT.all) {
+      hasAll = true;
+    }
+  }
+
+  return (remaining == 100 && hasAll && !hasWeight) || remaining == 0;
+}
+
+let captionProgramDefaults = {
+  program: Array<Function>(),
+  programCounter: 0,
+  timestamps: Array<number>(),
+  timestampFn: new Map<number, Array<Function>>(),
+  timestampCounter: 0,
+  audios: new Array<{alias: string, file: string, playing: boolean, volume: number}>(),
+  phrases: new Map<number, Array<string>>(),
+
+  blinkDuration: [200, 500],
+  blinkWaveRate: 100,
+  blinkBPMMulti: 1,
+  blinkTF: TF.constant,
+
+  blinkDelay: [80, 200],
+  blinkDelayWaveRate: 100,
+  blinkDelayBPMMulti: 1,
+  blinkDelayTF: TF.constant,
+
+  blinkGroupDelay: [1200, 2000],
+  blinkGroupDelayWaveRate: 100,
+  blinkGroupDelayBPMMulti: 1,
+  blinkGroupDelayTF: TF.constant,
+
+  captionDuration: [2000, 4000],
+  captionWaveRate: 100,
+  captionBPMMulti: 1,
+  captionTF: TF.constant,
+
+  captionDelay: [1200, 2000],
+  captionDelayWaveRate: 100,
+  captionDelayBPMMulti: 1,
+  captionDelayTF: TF.constant,
+
+  countDuration: [600, 1000],
+  countWaveRate: 100,
+  countBPMMulti: 1,
+  countTF: TF.constant,
+
+  countDelay: [400, 1000],
+  countDelayWaveRate: 100,
+  countDelayBPMMulti: 1,
+  countDelayTF: TF.constant,
+
+  showCountProgress: false,
+  countProgressOffset: false,
+  countColorMatch: false,
+  countProgressScale: 500,
+
+  countGroupDelay: [1200, 2000],
+  countGroupDelayWaveRate: 100,
+  countGroupDelayBPMMulti: 1,
+  countGroupDelayTF: TF.constant,
+
+  blinkY: 0,
+  captionY: 0,
+  bigCaptionY: 0,
+  countY: 0,
+
+  blinkX: 0,
+  captionX: 0,
+  bigCaptionX: 0,
+  countX: 0,
+
+  blinkOpacity: 100,
+  captionOpacity: 100,
+  countOpacity: 100,
+}
+export default captionProgramDefaults;
+
 // Inspired by https://reactjs.org/blog/2015/12/16/ismounted-antipattern.html
 /**
  * This object is a custom Promise wrapper which enables the ability to cancel the promise.
@@ -606,15 +916,15 @@ export function isImage(path: string, strict: boolean): boolean {
  *   * count - current count
  */
 export class CancelablePromise extends Promise<{
-  data: Array<string>, helpers: {next: any, count: number}}> {
+  data: Array<string>, helpers: {next: any, count: number, retries: number}}> {
   hasCanceled: boolean;
   source: LibrarySource;
   timeout: number;
 
 
   constructor(executor: (resolve: (value?: (
-    PromiseLike<{data: Array<string>, helpers: {next: any, count: number}}> |
-    {data: Array<string>, helpers: {next: any, count: number}}
+    PromiseLike<{data: Array<string>, helpers: {next: any, count: number, retries: number}}> |
+    {data: Array<string>, helpers: {next: any, count: number, retries: number}}
     )) => void, reject: (reason?: any) => void) => void) {
     super(executor);
     this.hasCanceled = false;
@@ -622,7 +932,7 @@ export class CancelablePromise extends Promise<{
     this.timeout = 0;
   }
 
-  getPromise(): Promise<{data: Array<string>, helpers: {next: any, count: number}}> {
+  getPromise(): Promise<{data: Array<string>, helpers: {next: any, count: number, retries: number}}> {
     return new Promise((resolve, reject) => {
       this.then(
         val => this.hasCanceled ? null : resolve(val),

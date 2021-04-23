@@ -16,6 +16,8 @@ import Config from "../../data/Config";
 import Scene from "../../data/Scene";
 import Tag from "../../data/Tag";
 import Player from "./Player";
+import ChildCallbackHack from "./ChildCallbackHack";
+import IdleTimer from "react-idle-timer";
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -58,7 +60,6 @@ const styles = (theme: Theme) => createStyles({
     flexGrow: 1,
     flexDirection: 'column',
     height: '100vh',
-    backgroundColor: theme.palette.background.default,
   },
   container: {
     height: '100%',
@@ -73,9 +74,16 @@ const styles = (theme: Theme) => createStyles({
     height: '100%',
     width: '100%',
     display: 'grid',
+    overflow: 'hidden',
   },
   fill: {
     flexGrow: 1,
+  },
+  hidden: {
+    opacity: 0,
+  },
+  hideCursor: {
+    cursor: 'none',
   },
 });
 
@@ -85,12 +93,19 @@ class GridPlayer extends React.Component {
     config: Config,
     grid: SceneGrid,
     scenes: Array<Scene>,
+    sceneGrids: Array<SceneGrid>,
     theme: Theme,
+    advanceHacks?: Array<ChildCallbackHack>,
+    hasStarted?: boolean,
+    hideBars?: boolean,
     cache(i: HTMLImageElement | HTMLVideoElement): void,
     getTags(source: string): Array<Tag>,
     goBack(): void,
     setCount(sourceURL: string, count: number, countComplete: boolean): void,
     systemMessage(message: string): void,
+    finishedLoading?(empty: boolean): void,
+    setProgress?(total: number, current: number, message: string[]): void,
+    setVideo?(index: number, video: HTMLVideoElement): void,
   };
 
   readonly state = {
@@ -99,8 +114,11 @@ class GridPlayer extends React.Component {
     this.props.grid.grid[0].length ? this.props.grid.grid.length : 1,
     width: this.props.grid.grid && this.props.grid.grid.length > 0 &&
     this.props.grid.grid[0].length > 0 ? this.props.grid.grid[0].length : 1,
+    isLoaded: new Array<Array<boolean>>(),
+    hideCursor: false,
   };
 
+  readonly idleTimerRef: React.RefObject<HTMLDivElement> = React.createRef();
   _appBarTimeout: any = null;
 
   render() {
@@ -119,47 +137,57 @@ class GridPlayer extends React.Component {
 
     return(
       <div className={classes.root}>
-        <div
-          className={classes.hoverBar}
-          onMouseEnter={this.onMouseEnterAppBar.bind(this)}
-          onMouseLeave={this.onMouseLeaveAppBar.bind(this)}/>
+        {!this.props.hideBars && (
+          <React.Fragment>
+            <div
+              className={classes.hoverBar}
+              onMouseEnter={this.onMouseEnterAppBar.bind(this)}
+              onMouseLeave={this.onMouseLeaveAppBar.bind(this)}/>
 
-        <AppBar
-          position="absolute"
-          onMouseEnter={this.onMouseEnterAppBar.bind(this)}
-          onMouseLeave={this.onMouseLeaveAppBar.bind(this)}
-          className={clsx(classes.appBar, this.state.appBarHover && classes.appBarHover)}>
-          <Toolbar>
-            <Tooltip title="Back" placement="right-end">
-              <IconButton
-                edge="start"
-                color="inherit"
-                aria-label="Back"
-                onClick={this.props.goBack.bind(this)}>
-                <ArrowBackIcon />
-              </IconButton>
-            </Tooltip>
+            <AppBar
+              position="absolute"
+              onMouseEnter={this.onMouseEnterAppBar.bind(this)}
+              onMouseLeave={this.onMouseLeaveAppBar.bind(this)}
+              className={clsx(classes.appBar, this.state.appBarHover && classes.appBarHover)}>
+              <Toolbar>
+                <Tooltip title="Back" placement="right-end">
+                  <IconButton
+                    edge="start"
+                    color="inherit"
+                    aria-label="Back"
+                    onClick={this.props.goBack.bind(this)}>
+                    <ArrowBackIcon />
+                  </IconButton>
+                </Tooltip>
 
-            <div className={classes.fill}/>
-            <Typography component="h1" variant="h4" color="inherit" noWrap className={classes.title}>
-              {this.props.grid.name}
-            </Typography>
-            <div className={classes.fill}/>
+                <div className={classes.fill}/>
+                <Typography component="h1" variant="h4" color="inherit" noWrap className={classes.title}>
+                  {this.props.grid.name}
+                </Typography>
+                <div className={classes.fill}/>
 
-            <Tooltip title="Toggle Fullscreen">
-              <IconButton
-                edge="start"
-                color="inherit"
-                aria-label="FullScreen"
-                onClick={this.toggleFull.bind(this)}>
-                <FullscreenIcon fontSize="large"/>
-              </IconButton>
-            </Tooltip>
-          </Toolbar>
-        </AppBar>
+                <Tooltip title="Toggle Fullscreen">
+                  <IconButton
+                    edge="start"
+                    color="inherit"
+                    aria-label="FullScreen"
+                    onClick={this.toggleFull.bind(this)}>
+                    <FullscreenIcon fontSize="large"/>
+                  </IconButton>
+                </Tooltip>
+              </Toolbar>
+            </AppBar>
+          </React.Fragment>
+        )}
 
-        <main className={classes.content}>
+        <main className={clsx(classes.content, this.state.hideCursor && classes.hideCursor)}
+              ref={this.idleTimerRef}>
           <div className={classes.appBarSpacer} />
+          <IdleTimer
+            ref={ref => {return this.idleTimerRef}}
+            onActive={this.onActive.bind(this)}
+            onIdle={this.onIdle.bind(this)}
+            timeout={2000} />
           <Container maxWidth={false} className={classes.container}>
             <div className={classes.grid}
                  style={{gridTemplateColumns: gridTemplateColumns, gridTemplateRows: gridTemplateRows}}>
@@ -167,21 +195,47 @@ class GridPlayer extends React.Component {
                 <React.Fragment key={rowIndex}>
                   {row.map((sceneID, colIndex) => {
                     const scene = this.props.scenes.find((s) => s.id == sceneID);
+                    const newLoaded = this.state.isLoaded;
+                    let changed = false;
+                    while (newLoaded.length <= rowIndex) {
+                      newLoaded.push([]);
+                      changed = true
+                    }
+                    while (newLoaded[rowIndex].length <= colIndex) {
+                      newLoaded[rowIndex].push(false);
+                      changed = true
+                    }
+                    if (changed) {
+                      setTimeout(() => this.setState({isLoaded: newLoaded}), 200);
+                    }
+                    if (!scene && !newLoaded[rowIndex][colIndex]) {
+                      setTimeout(() => this.setCellLoaded(rowIndex, colIndex), 200);
+                    }
+                    const loadingIndex = [].concat.apply([], newLoaded).indexOf(false);
+                    const showProgress = loadingIndex >= 0 && loadingIndex == (rowIndex * row.length) + colIndex;
                     return (
-                      <div className={classes.gridCell} key={colIndex}>
+                      <div className={clsx(classes.gridCell, !scene && classes.hidden)} key={colIndex}>
                         {scene && (
                           <Player
                             preventSleep={rowIndex == 0 && colIndex == 0}
+                            advanceHack={this.props.advanceHacks ? this.props.advanceHacks[(rowIndex * row.length) + colIndex] : undefined}
                             config={this.props.config}
+                            hasStarted={this.props.hasStarted}
                             scene={scene}
                             gridView
                             scenes={this.props.scenes}
+                            sceneGrids={this.props.sceneGrids}
                             theme={this.props.theme}
                             tutorial={null}
+                            captionScale={1 / Math.sqrt(row.length * this.props.grid.grid.length)}
+                            allLoaded={[].concat.apply([], this.state.isLoaded).find((l: boolean) => !l) == null}
                             cache={this.props.cache.bind(this)}
                             getTags={this.props.getTags.bind(this)}
                             goBack={this.props.goBack.bind(this)}
+                            onLoaded={this.setCellLoaded.bind(this, rowIndex, colIndex)}
                             setCount={this.props.setCount.bind(this)}
+                            setProgress={showProgress ? this.props.setProgress : this.nop}
+                            setVideo={this.props.setVideo ? this.props.setVideo.bind(this, (rowIndex * row.length) + colIndex) : undefined}
                             systemMessage={this.props.systemMessage.bind(this)}
                           />
                         )}
@@ -195,6 +249,25 @@ class GridPlayer extends React.Component {
         </main>
       </div>
     );
+  }
+
+  nop() {}
+
+  onActive() {
+    this.setState({hideCursor: false})
+  }
+
+  onIdle() {
+    this.setState({hideCursor: true})
+  }
+
+  setCellLoaded(rowIndex: number, colIndex: number) {
+    const newLoaded = this.state.isLoaded;
+    newLoaded[rowIndex][colIndex] = true;
+    if (this.props.finishedLoading && [].concat.apply([], newLoaded).find((l: boolean) => !l) == null) {
+      this.props.finishedLoading(false);
+    }
+    this.setState({isLoaded: newLoaded});
   }
 
   onMouseEnterAppBar() {

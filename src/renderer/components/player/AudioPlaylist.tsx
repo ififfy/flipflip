@@ -1,12 +1,14 @@
 import * as React from "react";
 import Sortable from "react-sortablejs";
+import {existsSync} from "fs";
+import {remote} from "electron";
 
 import {
-  Avatar, Chip,
-  createStyles,
+  Avatar, Badge, Chip,
+  createStyles, Fab,
   IconButton,
   List,
-  ListItem,
+  ListItem, ListItemAvatar,
   ListItemIcon, ListItemSecondaryAction,
   ListItemText,
   Theme, Tooltip,
@@ -27,6 +29,8 @@ import {RP} from "../../data/const";
 import AudioControl from "./AudioControl";
 import Audio from "../../data/Audio";
 import Scene from "../../data/Scene";
+import Tag from "../../data/Tag";
+import SourceIcon from "../library/SourceIcon";
 
 const styles = (theme: Theme) => createStyles({
   audioList: {
@@ -51,6 +55,38 @@ const styles = (theme: Theme) => createStyles({
     float: 'right',
     paddingRight: theme.spacing(2),
   },
+  trackThumb: {
+    height: 40,
+    width: 40,
+    overflow: 'hidden',
+    display: 'flex',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    userSelect: 'none',
+  },
+  thumbImage: {
+    height: '100%',
+  },
+  listAvatar: {
+    width: 56,
+  },
+  trackNum: {
+    top: 17,
+  },
+  bigTooltip: {
+    fontSize: "medium",
+    maxWidth: 500,
+  },
+  tagChips: {
+    textAlign: 'center',
+  },
+  avatar: {
+    backgroundColor: theme.palette.primary.main,
+    boxShadow: 'none',
+  },
+  sourceIcon: {
+    color: theme.palette.primary.contrastText,
+  },
 });
 
 class AudioPlaylist extends React.Component {
@@ -64,11 +100,18 @@ class AudioPlaylist extends React.Component {
     onAddTracks(playlistIndex: number): void,
     onSourceOptions(audio: Audio): void,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
+    persist?: boolean,
+    shorterSeek?: boolean,
+    showMsTimestamp?: boolean,
     scenePaths?: Array<any>,
     goBack?(): void,
+    orderAudioTags?(audio: Audio): void,
+    onPlay?(source: Audio, displaySources: Array<Audio>): void,
+    onPlaying?(position: number, duration: number): void,
     playTrack?(url: string): void,
     playNextScene?(): void,
     setCurrentAudio?(audio: Audio): void,
+    systemMessage?(message: string): void,
   };
 
   readonly state = {
@@ -82,6 +125,7 @@ class AudioPlaylist extends React.Component {
     if (this.props.startPlaying) {
       let audio = this.state.playingAudios[this.state.currentIndex];
       if (!audio) audio = this.props.playlist.audios[this.state.currentIndex];
+      if (!audio) return <div/>;
       return (
         <React.Fragment>
           <ListItem disableGutters>
@@ -96,17 +140,41 @@ class AudioPlaylist extends React.Component {
           </ListItem>
           <AudioControl
             audio={audio}
-            audioEnabled={this.props.scene.audioEnabled}
+            audioEnabled={this.props.scene.audioEnabled || this.props.persist}
+            singleTrack={this.state.playingAudios.length == 1}
             lastTrack={this.state.currentIndex == this.state.playingAudios.length - 1}
             repeat={this.props.playlist.repeat}
             scenePaths={this.props.scenePaths}
+            shorterSeek={this.props.shorterSeek}
+            showMsTimestamp={this.props.showMsTimestamp}
             startPlaying={this.props.startPlaying}
             playTrack={this.props.playTrack}
             nextTrack={this.nextTrack.bind(this)}
             prevTrack={this.prevTrack.bind(this)}
+            onPlaying={this.props.onPlaying}
             onAudioSliderChange={this.onAudioSliderChange.bind(this)}
             goBack={this.props.goBack}
             playNextScene={this.props.playNextScene}/>
+          <div className={classes.playlistAction}>
+            <Tooltip title={"Shuffle " + (this.props.playlist.shuffle ? "(On)" : "(Off)")}>
+              <IconButton onClick={this.toggleShuffle.bind(this)}>
+                <ShuffleIcon color={this.props.playlist.shuffle ? "primary" : undefined}/>
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={"Repeat " + (this.props.playlist.repeat == RP.none ? "(Off)" : this.props.playlist.repeat == RP.all ? "(All)" : "(One)")}>
+              <IconButton onClick={this.changeRepeat.bind(this)}>
+                {this.props.playlist.repeat == RP.none && (
+                  <RepeatIcon />
+                )}
+                {this.props.playlist.repeat == RP.all && (
+                  <RepeatIcon color={"primary"}/>
+                )}
+                {this.props.playlist.repeat == RP.one && (
+                  <RepeatOneIcon color={"primary"} />
+                )}
+              </IconButton>
+            </Tooltip>
+          </div>
         </React.Fragment>
       );
     } else {
@@ -125,15 +193,64 @@ class AudioPlaylist extends React.Component {
                 s.audioPlaylists[this.props.playlistIndex].audios = newAudios;
               });
             }}>
-            {this.props.playlist.audios.map((a, i) =>
+            {this.props.playlist && this.props.playlist.audios && this.props.playlist.audios.map((a, i) =>
               <ListItem key={i}>
-                <ListItemIcon>
-                  <Avatar alt={a.name} src={a.thumb} className={classes.thumb}>
-                    {a.thumb == null && (
-                      <AudiotrackIcon className={classes.mediaIcon}/>
-                    )}
-                  </Avatar>
-                </ListItemIcon>
+                <ListItemAvatar className={classes.listAvatar}>
+                  <Badge
+                    classes={{anchorOriginTopRightRectangle: classes.trackNum}}
+                    invisible={!a.trackNum}
+                    max={999}
+                    color="primary"
+                    badgeContent={a.trackNum}>
+                    <Tooltip placement={a.comment ? 'right' : 'bottom'}
+                             PopperProps={a.comment || (a.tags && a.tags.length > 0) ? {modifiers:{
+                                 preventOverflow: {
+                                   enabled: true,
+                                   boundariesElement: 'viewport',
+                                 }
+                               }} : {}}
+                             classes={a.comment ? {tooltip: classes.bigTooltip} : null}
+                             arrow={!!a.comment || (a.tags && a.tags.length > 0)}
+                             title={
+                               a.comment || (a.tags && a.tags.length > 0) ?
+                                 <div>
+                                   {a.comment}
+                                   {a.comment && a.tags && a.tags.length > 0 && (<br/>)}
+                                   <div className={classes.tagChips}>
+                                     {a.tags && a.tags.map((tag: Tag) =>
+                                       <React.Fragment key={tag.id}>
+                                         <Chip
+                                           label={tag.name}
+                                           color="primary"
+                                           size="small"/>
+                                       </React.Fragment>
+                                     )}
+                                   </div>
+                                 </div>
+                                 :
+                                 <div>
+                                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Click: Library Tagging
+                                   <br/>
+                                   Shift+Click: Open Source
+                                   <br/>
+                                   &nbsp;&nbsp;Ctrl+Click: Reveal File}
+                                 </div>
+                             }>
+                      <div onClick={this.onSourceIconClick.bind(this, a)} className={classes.trackThumb}>
+                        {a.thumb != null && (
+                          <img className={classes.thumbImage} src={a.thumb}/>
+                        )}
+                        {a.thumb == null && (
+                          <Fab
+                            size="small"
+                            className={classes.avatar}>
+                            <SourceIcon url={a.url} className={classes.sourceIcon}/>
+                          </Fab>
+                        )}
+                      </div>
+                    </Tooltip>
+                  </Badge>
+                </ListItemAvatar>
                 <ListItemText primary={a.name} />
                 <ListItemSecondaryAction>
                   <Chip
@@ -195,19 +312,31 @@ class AudioPlaylist extends React.Component {
     }
   }
 
-  componentDidMount() {
-    if (this.props.setCurrentAudio) {
-      this.props.setCurrentAudio(this.props.playlist.audios[this.state.currentIndex]);
+  componentDidUpdate(props: any, state: any) {
+    if (!this.props.persist && this.props.scene !== props.scene) {
+      this.restart();
     }
+  }
+
+  componentDidMount() {
     if (this.props.playlistIndex == 0 && this.props.scene.audioScene) {
       window.addEventListener('keydown', this.onKeyDown, false);
     }
+    this.restart();
+  }
+
+  restart() {
+    let audios = this.props.playlist.audios;
     if (this.props.startPlaying) {
-      let audios = this.props.playlist.audios;
       if (this.props.playlist.shuffle) {
         audios = randomizeList(Array.from(audios));
       }
       this.setState({playingAudios: audios});
+    }
+    if (this.props.setCurrentAudio) {
+      let audio = audios[this.state.currentIndex];
+      if (!audio) audio = this.props.playlist.audios[this.state.currentIndex];
+      this.props.setCurrentAudio(audio);
     }
   }
 
@@ -219,35 +348,58 @@ class AudioPlaylist extends React.Component {
 
   onKeyDown = (e: KeyboardEvent) => {
     switch (e.key) {
-      case 'ArrowLeft':
+      case '[':
         e.preventDefault();
+        this.props.orderAudioTags(this.props.playlist.audios[this.state.currentIndex]);
         this.prevTrack();
         break;
-      case 'ArrowRight':
+      case ']':
         e.preventDefault();
+        this.props.orderAudioTags(this.props.playlist.audios[this.state.currentIndex]);
         this.nextTrack();
         break;
     }
   }
 
+  onSourceIconClick(audio: Audio, e: MouseEvent) {
+    const sourceURL = audio.url;
+    if (e.shiftKey && !e.ctrlKey) {
+      this.openExternalURL(sourceURL);
+    } else if (!e.shiftKey && e.ctrlKey) {
+      if (existsSync(sourceURL)) {
+        remote.shell.showItemInFolder(sourceURL);
+      }
+    } else if (!e.shiftKey && !e.ctrlKey && this.props.onPlay && this.props.systemMessage) {
+      try {
+        this.props.onPlay(audio, this.props.playlist.audios);
+      } catch (e) {
+        this.props.systemMessage("The source " + sourceURL + " isn't in your Library");
+      }
+    }
+  }
+
+  openExternalURL(url: string) {
+    remote.shell.openExternal(url);
+  }
+
   prevTrack() {
     let prevTrack = this.state.currentIndex - 1;
     if (prevTrack < 0) {
-      prevTrack = this.props.playlist.audios.length - 1;
+      prevTrack = this.state.playingAudios.length - 1;
     }
     if (this.props.setCurrentAudio) {
-      this.props.setCurrentAudio(this.props.playlist.audios[prevTrack]);
+      this.props.setCurrentAudio(this.state.playingAudios[prevTrack]);
     }
     this.setState({currentIndex: prevTrack});
   }
 
   nextTrack() {
     let nextTrack = this.state.currentIndex + 1;
-    if (nextTrack >= this.props.playlist.audios.length) {
+    if (nextTrack >= this.state.playingAudios.length) {
       nextTrack = 0;
     }
     if (this.props.setCurrentAudio) {
-      this.props.setCurrentAudio(this.props.playlist.audios[nextTrack]);
+      this.props.setCurrentAudio(this.state.playingAudios[nextTrack]);
     }
     this.setState({currentIndex: nextTrack});
   }

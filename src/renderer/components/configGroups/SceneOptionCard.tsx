@@ -1,36 +1,15 @@
 import * as React from "react";
 import clsx from "clsx";
-import Select from "react-select";
 
 import {
-  Button,
-  Collapse,
-  createStyles,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  Divider,
-  Fab,
-  FormControl,
-  FormControlLabel,
-  Grid,
-  IconButton,
-  InputAdornment,
-  InputLabel,
-  MenuItem,
-  Select as MSelect,
-  Slider,
-  Switch,
-  TextField,
-  Theme,
-  Tooltip,
-  Typography,
-  withStyles
+  Button, Collapse, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, Divider, Fab, FormControl,
+  FormControlLabel, Grid, IconButton, InputAdornment, InputLabel, MenuItem, Select, Slider, Switch, TextField, Theme,
+  Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
+import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 import ListIcon from '@material-ui/icons/List';
 
 import {BT, IT, SDT, TF} from "../../data/const";
@@ -42,6 +21,9 @@ import Scene from "../../data/Scene";
 import ColorPicker from "../config/ColorPicker";
 import ColorSetPicker from "../config/ColorSetPicker";
 import MultiSceneSelect from "./MultiSceneSelect";
+import {areWeightsValid} from "../../data/utils";
+import Audio from "../../data/Audio";
+import SceneGrid from "../../data/SceneGrid";
 
 const styles = (theme: Theme) => createStyles({
   fullWidth: {
@@ -99,12 +81,16 @@ const styles = (theme: Theme) => createStyles({
     minWidth: 400,
     overflow: 'visible',
   },
+  noBPM: {
+    float: 'right',
+  }
 });
 
 class SceneOptionCard extends React.Component {
   readonly props: {
     classes: any,
     allScenes: Array<Scene>,
+    allSceneGrids: Array<SceneGrid>,
     scene: Scene | SceneSettings,
     sidebar: boolean,
     tutorial: string,
@@ -126,8 +112,16 @@ class SceneOptionCard extends React.Component {
     const timingConstant = typeof this.props.scene.timingConstant === 'number' ? this.props.scene.timingConstant : 0;
     const timingMin = typeof this.props.scene.timingMin === 'number' ? this.props.scene.timingMin : 0;
     const timingMax = typeof this.props.scene.timingMax === 'number' ? this.props.scene.timingMax : 0;
+    const backForthSinRate = typeof this.props.scene.backForthSinRate === 'number' ? this.props.scene.backForthSinRate : 0;
+    const backForthBPMMulti = typeof this.props.scene.backForthBPMMulti === 'number' ? this.props.scene.backForthBPMMulti : 0;
+    const backForthConstant = typeof this.props.scene.backForthConstant === 'number' ? this.props.scene.backForthConstant : 0;
+    const backForthMin = typeof this.props.scene.backForthMin === 'number' ? this.props.scene.backForthMin : 0;
+    const backForthMax = typeof this.props.scene.backForthMax === 'number' ? this.props.scene.backForthMax : 0;
     const backgroundBlur = typeof this.props.scene.backgroundBlur === 'number' ? this.props.scene.backgroundBlur : 0;
     const nextSceneTime = typeof this.props.scene.nextSceneTime === 'number' ? this.props.scene.nextSceneTime : 0;
+
+    const playlists = (this.props.scene.audioPlaylists as {audios: Audio[], shuffle: boolean, repeat: string}[]);
+    const hasBPM = !!playlists && playlists.length && playlists[0].audios.length && playlists[0].audios[0].bpm;
     return (
       <Grid container spacing={2} alignItems="center">
         <Grid item xs={12} className={clsx(this.props.tutorial == SDT.timing && classes.highlight)}>
@@ -135,13 +129,19 @@ class SceneOptionCard extends React.Component {
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} style={{paddingTop: 10}}>
               <FormControl className={classes.fullWidth}>
                 <InputLabel>Timing</InputLabel>
-                <MSelect
+                <Select
                   value={this.props.scene.timingFunction}
                   onChange={this.onInput.bind(this, 'timingFunction')}>
-                  {[TF.constant, TF.random, TF.sin, TF.bpm].map((tf) =>
-                    <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
-                  )}
-                </MSelect>
+                  {[TF.constant, TF.random, TF.sin, TF.bpm].map((tf) => {
+                    if (tf == TF.bpm) {
+                      return <MenuItem key={tf} value={tf}>
+                        {en.get(tf)} {!hasBPM && <Tooltip title={"Missing audio with BPM"}><ErrorOutlineIcon color={'error'} className={classes.noBPM}/></Tooltip>}
+                      </MenuItem>
+                    } else {
+                      return <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
+                    }
+                  })}
+                </Select>
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 8}>
@@ -252,31 +252,173 @@ class SceneOptionCard extends React.Component {
         <Grid item xs={12}>
           <Divider/>
         </Grid>
+        <Grid item xs={12} className={clsx(this.props.tutorial == SDT.backForth && classes.highlight)}>
+          <Grid container alignItems="center">
+            <Grid item xs={12}>
+              <Tooltip title="Go back and forth between the last two images">
+                <FormControlLabel
+                  control={
+                    <Switch checked={this.props.scene.backForth}
+                            onChange={this.onBoolInput.bind(this, 'backForth')}/>
+                  }
+                  label="Back/Forth"/>
+              </Tooltip>
+            </Grid>
+          </Grid>
+          <Collapse in={this.props.scene.backForth}>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} style={{paddingTop: 10}}>
+                <FormControl className={classes.fullWidth}>
+                  <InputLabel>Back/Forth Timing</InputLabel>
+                  <Select
+                    value={this.props.scene.backForthTF}
+                    onChange={this.onInput.bind(this, 'backForthTF')}>
+                    {[TF.constant, TF.random, TF.sin, TF.bpm].map((tf) => {
+                      if (tf == TF.bpm) {
+                        return <MenuItem key={tf} value={tf}>
+                          {en.get(tf)} {!hasBPM && <Tooltip title={"Missing audio with BPM"}><ErrorOutlineIcon color={'error'} className={classes.noBPM}/></Tooltip>}
+                        </MenuItem>
+                      } else {
+                        return <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
+                      }
+                    })}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 8}>
+                <Collapse in={this.props.scene.backForthTF == TF.sin} className={classes.fullWidth}>
+                  <Typography id="bf-sin-rate-slider" variant="caption" component="div" color="textSecondary">
+                    Wave Rate
+                  </Typography>
+                  <Grid container alignItems="center">
+                    <Grid item xs>
+                      <Slider
+                        ref={this.sinInputRef}
+                        min={1}
+                        defaultValue={backForthSinRate}
+                        onChangeCommitted={this.onSliderChange.bind(this, 'backForthSinRate')}
+                        valueLabelDisplay={'auto'}
+                        aria-labelledby="bf-sin-rate-slider"/>
+                    </Grid>
+                    <Grid item xs={3} className={classes.percentInput}>
+                      <TextField
+                        value={backForthSinRate}
+                        onChange={this.onIntInput.bind(this, 'backForthSinRate')}
+                        onBlur={this.blurIntKey.bind(this, 'backForthSinRate')}
+                        inputProps={{
+                          className: classes.endInput,
+                          step: 5,
+                          min: 0,
+                          max: 100,
+                          type: 'number',
+                          'aria-labelledby': 'bf-sin-rate-slider',
+                        }}/>
+                    </Grid>
+                  </Grid>
+                </Collapse>
+                <Collapse in={this.props.scene.backForthTF == TF.bpm} className={classes.fullWidth}>
+                  <Typography id="bf-bpm-multi-slider" variant="caption" component="div" color="textSecondary">
+                    BPM Multiplier {this.props.scene.backForthBPMMulti / 10}x
+                  </Typography>
+                  <Slider
+                    min={1}
+                    max={100}
+                    defaultValue={backForthBPMMulti}
+                    onChangeCommitted={this.onSliderChange.bind(this, 'backForthBPMMulti')}
+                    valueLabelDisplay={'auto'}
+                    valueLabelFormat={(v) => (v / 10) + "x"}
+                    aria-labelledby="bf-bpm-multi-slider"/>
+                </Collapse>
+                <Collapse in={this.props.scene.backForthTF == TF.constant} className={classes.fullWidth}>
+                  <TextField
+                    variant="outlined"
+                    label="Every"
+                    margin="dense"
+                    value={backForthConstant}
+                    onChange={this.onIntInput.bind(this, 'backForthConstant')}
+                    onBlur={this.blurIntKey.bind(this, 'backForthConstant')}
+                    InputProps={{
+                      endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+                    }}
+                    inputProps={{
+                      step: 100,
+                      min: 0,
+                      type: 'number',
+                    }}/>
+                </Collapse>
+              </Grid>
+            </Grid>
+          </Collapse>
+        </Grid>
+        <Grid item xs={12} className={clsx(!(this.props.scene.backForth && (this.props.scene.backForthTF == TF.random || this.props.scene.backForthTF == TF.sin)) && classes.noPadding)}>
+          <Collapse in={this.props.scene.backForth && (this.props.scene.backForthTF == TF.random || this.props.scene.backForthTF == TF.sin)}
+                    className={classes.fullWidth}>
+            <Grid container alignItems="center">
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                <TextField
+                  variant="outlined"
+                  label="Between"
+                  margin="dense"
+                  value={backForthMin}
+                  onChange={this.onIntInput.bind(this, 'backForthMin')}
+                  onBlur={this.blurIntKey.bind(this, 'backForthMin')}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+                  }}
+                  inputProps={{
+                    step: 100,
+                    min: 0,
+                    type: 'number',
+                  }}/>
+              </Grid>
+              <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
+                <TextField
+                  variant="outlined"
+                  label="and"
+                  margin="dense"
+                  value={backForthMax}
+                  onChange={this.onIntInput.bind(this, 'backForthMax')}
+                  onBlur={this.blurIntKey.bind(this, 'backForthMax')}
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">ms</InputAdornment>,
+                  }}
+                  inputProps={{
+                    step: 100,
+                    min: 0,
+                    type: 'number',
+                  }}/>
+              </Grid>
+            </Grid>
+          </Collapse>
+        </Grid>
+        <Grid item xs={12}>
+          <Divider/>
+        </Grid>
         <Grid item xs={12} className={clsx(this.props.tutorial == SDT.imageSizing && classes.highlight)}>
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={this.props.sidebar ? 8 : 12} sm={this.props.sidebar ? 8 : 6}>
               <FormControl className={classes.fullWidth}>
                 <InputLabel>Image Sizing</InputLabel>
-                <MSelect
+                <Select
                   value={this.props.scene.imageType}
                   onChange={this.onInput.bind(this, 'imageType')}>
                   {Object.values(IT).map((it) =>
                     <MenuItem key={it} value={it}>{en.get(it)}</MenuItem>
                   )}
-                </MSelect>
+                </Select>
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}/>
             <Grid item xs={this.props.sidebar ? 8 : 12} sm={this.props.sidebar ? 8 : 4}>
               <FormControl className={classes.fullWidth}>
                 <InputLabel>Background</InputLabel>
-                <MSelect
+                <Select
                   value={this.props.scene.backgroundType}
                   onChange={this.onInput.bind(this, 'backgroundType')}>
                   {Object.values(BT).map((bt) =>
                     <MenuItem key={bt} value={bt}>{en.get(bt)}</MenuItem>
                   )}
-                </MSelect>
+                </Select>
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 8}>
@@ -324,10 +466,9 @@ class SceneOptionCard extends React.Component {
                     scene={this.props.scene}
                     allScenes={this.props.allScenes}
                     value={this.props.scene.nextSceneID}
+                    includeExtra
                     getSceneName={this.getSceneName.bind(this)}
                     onChange={this.changeIntKey.bind(this, 'nextSceneID')}
-                    includeExtra
-                    onRandomSceneDialog={this.onRandomSceneDialog.bind(this)}
                   />
                   <Dialog
                     classes={{paper: classes.randomSceneDialog}}
@@ -404,6 +545,30 @@ class SceneOptionCard extends React.Component {
                       label="Play After All Images"/>
                   </Collapse>
                 </Grid>
+                {!this.props.sidebar && (
+                  <React.Fragment>
+                    <Grid item xs>
+                      <Collapse in={this.props.scene.nextSceneID != 0}>
+                        <FormControlLabel
+                          control={
+                            <Switch checked={this.props.scene.persistAudio}
+                                    onChange={this.onBoolInput.bind(this, 'persistAudio')}/>
+                          }
+                          label="Persist Audio"/>
+                      </Collapse>
+                    </Grid>
+                    <Grid item xs>
+                      <Collapse in={this.props.scene.nextSceneID != 0}>
+                        <FormControlLabel
+                          control={
+                            <Switch checked={this.props.scene.persistText}
+                                    onChange={this.onBoolInput.bind(this, 'persistText')}/>
+                          }
+                          label="Persist Text Overlay"/>
+                      </Collapse>
+                    </Grid>
+                  </React.Fragment>
+                )}
               </Grid>
             </Grid>
             <Grid item xs={12}>
@@ -433,16 +598,19 @@ class SceneOptionCard extends React.Component {
             </Grid>
             {this.props.scene.overlays.map((o) => {
                 const overlayOpacity = typeof o.opacity === 'number' ? o.opacity : 0;
+                const oScene = this.props.allScenes.find((s) => s.id == o.sceneID);
+                const regenerate = oScene && oScene.generatorWeights && oScene.regenerate;
+                const invalid = regenerate && !areWeightsValid(oScene);
                 return (
                   <React.Fragment key={o.id}>
                     <Grid item xs={12} className={clsx(!this.props.scene.overlayEnabled && classes.noPadding)}>
                       <Collapse in={this.props.scene.overlayEnabled} className={classes.fullWidth}>
                         <Grid container spacing={2} alignItems="center">
                           <Grid item xs={12} sm={this.props.sidebar ? 12 : 5}>
-                            <Typography className={classes.selectText} variant="caption">Overlay</Typography>
+                            <Typography className={classes.selectText} variant="caption">Overlay{regenerate ? invalid ? " ✗" : " ⟳" : ""}</Typography>
                             <SceneSelect
-                              scene={this.props.scene}
                               allScenes={this.props.allScenes}
+                              allSceneGrids={this.props.allSceneGrids}
                               value={o.sceneID}
                               getSceneName={this.getSceneName.bind(this)}
                               onChange={this.changeOverlayIntKey.bind(this, o.id, 'sceneID')}
@@ -457,7 +625,7 @@ class SceneOptionCard extends React.Component {
                               <Grid item xs>
                                 <Slider
                                   min={0}
-                                  max={99}
+                                  max={100}
                                   defaultValue={overlayOpacity}
                                   onChangeCommitted={this.onOverlaySliderChange.bind(this, o.id, 'opacity')}
                                   valueLabelDisplay={'auto'}
@@ -514,16 +682,14 @@ class SceneOptionCard extends React.Component {
   getSceneName(id: string): string {
     if (id === "0") return "None";
     if (id === "-1") return "Random";
+    if (id.startsWith('999')) {
+      return this.props.allSceneGrids.find((s) => s.id.toString() == id.replace('999', '')).name;
+    }
     return this.props.allScenes.find((s) => s.id.toString() === id).name;
   }
 
   onOverlaySliderChange(id: number, key: string, e: MouseEvent, value: number) {
     this.changeOverlayKey(id, key, value);
-  }
-
-  onOverlayInput(id: number, key: string, e: MouseEvent) {
-    const input = (e.target as HTMLInputElement);
-    this.changeOverlayKey(id, key, input.value);
   }
 
   changeOverlayKey(id: number, key: string, value: any) {

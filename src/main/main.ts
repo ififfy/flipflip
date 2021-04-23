@@ -27,7 +27,7 @@ app.on('ready', () => {
   // This could be improved, but there are only two command line options currently
   const sceneName = process.argv.find((el, i, arr) => el != '--no-dev-tools' && !el.endsWith('electron.exe') && !el.endsWith('bundle.js'));
   if (sceneName) {
-    setTimeout(startScene.bind(null, sceneName), 1000);
+    setTimeout(startScene.bind(null, sceneName), 1500);
   }
 });
 
@@ -36,3 +36,5 @@ app.on('window-all-closed', () => {
   releaseIpcEvents();
   app.quit();
 });
+
+app.commandLine.appendSwitch('--autoplay-policy','no-user-gesture-required')

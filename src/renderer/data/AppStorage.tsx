@@ -12,6 +12,7 @@ import Scene from './Scene';
 import SceneGrid from "./SceneGrid";
 import defaultTheme from "./theme";
 import Playlist from "./Playlist";
+import CaptionScript from "./CaptionScript";
 
 /**
  * A compile-time global variable defined in webpack.config' [plugins]
@@ -26,6 +27,7 @@ export const defaultInitialState = {
   grids: Array<SceneGrid>(),
   library: Array<LibrarySource>(),
   audios: Array<Audio>(),
+  scripts: Array<CaptionScript>(),
   playlists: Array<Playlist>(),
   tags: Array<Tag>(),
   route: Array<Route>(),
@@ -39,6 +41,9 @@ export const defaultInitialState = {
   audioYOffset: 0,
   audioFilters: Array<string>(),
   audioSelected: Array<string>(),
+  scriptYOffset: 0,
+  scriptFilters: Array<string>(),
+  scriptSelected: Array<string>(),
   progressMode: null as string,
   progressTitle: null as string,
   progressCurrent: 0,
@@ -63,7 +68,6 @@ function archiveFile(filePath: string): void {
 
 export default class AppStorage {
   initialState: any = defaultInitialState;
-  savePath: string;
 
   constructor(windowId: number) {
     try {
@@ -73,10 +77,25 @@ export default class AppStorage {
       // who cares
     }
     try {
-      let data = JSON.parse(readFileSync(savePath, 'utf-8'));
-      const portableMode = data.config.displaySettings.portableMode;
-      if (portableMode) {
+      let data;
+      let portableMode = false;
+      // If only a portable data file exists and portableMode AND disableLocalSave are enabled, use that data file
+      // Otherwise, fallback to the local file
+      if (!existsSync(savePath) && existsSync(portablePath)) {
         data = JSON.parse(readFileSync(portablePath, 'utf-8'));
+        if (!data.config.generalSettings.portableMode) {
+          data = JSON.parse(readFileSync(savePath, 'utf-8'));
+        } else {
+          portableMode = true;
+          console.log("Portable: " + portablePath);
+        }
+      } else {
+        data = JSON.parse(readFileSync(savePath, 'utf-8'));
+        if (data.config.generalSettings.portableMode) {
+          portableMode = true;
+          console.log("Portable: " + portablePath);
+          data = JSON.parse(readFileSync(portablePath, 'utf-8'));
+        }
       }
       switch (data.version) {
         // When no version number found in data.json -- assume pre-v2.0.0 format
@@ -100,6 +119,7 @@ export default class AppStorage {
             scenes: Array<Scene>(),
             grids: Array<SceneGrid>(),
             audios: Array<Audio>(),
+            scripts: Array<CaptionScript>(),
             playlists: Array<Playlist>(),
             library: Array<LibrarySource>(),
             tags: Array<Tag>(),
@@ -111,6 +131,9 @@ export default class AppStorage {
             audioYOffset: 0,
             audioFilters: Array<string>(),
             audioSelected: Array<string>(),
+            scriptYOffset: 0,
+            scriptFilters: Array<string>(),
+            scriptSelected: Array<string>(),
             progressMode: null as string,
             progressTitle: null as string,
             progressCurrent: 0,
@@ -171,6 +194,7 @@ export default class AppStorage {
             scenes: data.scenes.map((s: any) => new Scene(s)),
             grids: Array<SceneGrid>(),
             audios: Array<Audio>(),
+            scripts: Array<CaptionScript>(),
             playlists: Array<Playlist>(),
             library: data.library.map((s: any) => new LibrarySource(s)),
             tags: data.tags.map((t: any) => new Tag(t)),
@@ -182,6 +206,9 @@ export default class AppStorage {
             audioYOffset: 0,
             audioFilters: Array<string>(),
             audioSelected: Array<string>(),
+            scriptYOffset: 0,
+            scriptFilters: Array<string>(),
+            scriptSelected: Array<string>(),
             progressMode: null as string,
             progressTitle: null as string,
             progressCurrent: 0,
@@ -332,6 +359,7 @@ export default class AppStorage {
             scenes: data.scenes.map((s: any) => new Scene(s)),
             grids: data.grids.map((g: any) => new SceneGrid(g)),
             audios: data.audios ? data.audios.map((a: any) => new Audio(a)) : [],
+            scripts: data.scripts ? data.scripts.map((s: any) => new CaptionScript(s)) : [],
             playlists: data.playlists ? data.playlists.map((p: any) => new Playlist(p)) : [],
             library: data.library.map((s: any) => new LibrarySource(s)),
             tags: data.tags.map((t: any) => new Tag(t)),
@@ -343,6 +371,9 @@ export default class AppStorage {
             audioYOffset: 0,
             audioFilters: Array<string>(),
             audioSelected: Array<string>(),
+            scriptYOffset: 0,
+            scriptFilters: Array<string>(),
+            scriptSelected: Array<string>(),
             progressMode: null as string,
             progressTitle: null as string,
             progressCurrent: 0,
@@ -353,9 +384,6 @@ export default class AppStorage {
             tutorial: data.tutorial,
             theme: data.theme,
           };
-          for (let i = 0; i < this.initialState.library.length; i++) {
-            this.initialState.library[i].id = i;
-          }
           break;
       }
     }
@@ -369,35 +397,49 @@ export default class AppStorage {
     }
 
     if (windowId == 1) {
+      if (this.initialState.config.generalSettings.portableMode) {
+        console.log("Saving to", portablePath);
+        if (this.initialState.config.generalSettings.disableLocalSave) {
+          return;
+        }
+      }
       console.log("Saving to", savePath);
-      this.savePath = savePath;
     }
   }
 
   save(state: any) {
-    if (this.savePath) {
-      writeFileSync(this.savePath, JSON.stringify(state), 'utf-8');
-      if (state.config.displaySettings.portableMode) {
-        writeFileSync(portablePath, JSON.stringify(state), 'utf-8');
+    if (state.config.generalSettings.portableMode) {
+      writeFileSync(portablePath, JSON.stringify(state), 'utf-8');
+      if (!state.config.generalSettings.disableLocalSave) {
+        writeFileSync(savePath, JSON.stringify(state), 'utf-8');
       }
+    } else {
+      writeFileSync(savePath, JSON.stringify(state), 'utf-8');
     }
 
     if (state.config.generalSettings.autoBackup) {
       const backups = getBackups();
       if (backups.length == 0) {
-        this.backup();
+        this.backup(state);
       } else {
         const lastBackup = backups[0];
         const epoch = parseInt(lastBackup.url.substring(lastBackup.url.lastIndexOf(".") + 1));
         if (Date.now()  - epoch > (86400000 * state.config.generalSettings.autoBackupDays)) {
-          this.backup();
+          this.backup(state);
         }
       }
     }
 
   }
 
-  backup() {
-    archiveFile(savePath);
+  backup(state: any) {
+    if (state.config.generalSettings.portableMode) {
+      archiveFile(portablePath);
+      if (!state.config.generalSettings.disableLocalSave) {
+        archiveFile(savePath);
+      }
+    } else {
+      archiveFile(savePath);
+    }
   }
 }

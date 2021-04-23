@@ -39,3 +39,7 @@ Check out our [quick start](https://ififfy.github.io/flipflip/#/quickstart) guid
 Create a new branch, make your changes, and open a pull request. The policy of the FlipFlip project is, 
 "patches are generally accepted." See the [developers](https://ififfy.github.io/flipflip/#/developers) 
 documentation to get started.
+
+## Donate
+
+Enjoying FlipFlip? [Buy me a coffee](https://ko-fi.com/flipflipapp) and help support FlipFlip development!

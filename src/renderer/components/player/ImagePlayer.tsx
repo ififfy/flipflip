@@ -6,7 +6,7 @@ import fs from "fs";
 import gifInfo from 'gif-info';
 import IdleTimer from 'react-idle-timer';
 
-import {GO, IF, OF, SL, SOF, TF, VO, WF} from '../../data/const';
+import {GO, IF, OF, OT, SL, SOF, TF, VO, WF} from '../../data/const';
 import {getRandomListItem, getRandomNumber, isVideo, toArrayBuffer, urlToPath} from '../../data/utils';
 import Config from "../../data/Config";
 import Scene from "../../data/Scene";
@@ -17,7 +17,8 @@ import Audio from "../../data/Audio";
 
 class GifInfo {
   animated: boolean;
-  duration: string;
+  duration: number;
+  durationChrome: number;
 }
 
 export default class ImagePlayer extends React.Component {
@@ -26,7 +27,7 @@ export default class ImagePlayer extends React.Component {
     scene: Scene,
     currentAudio: Audio,
     gridView: boolean,
-    advanceHack?: ChildCallbackHack,
+    advanceHack: ChildCallbackHack,
     deleteHack?: ChildCallbackHack,
     maxInMemory: number,
     maxLoadingAtOnce: number,
@@ -51,10 +52,11 @@ export default class ImagePlayer extends React.Component {
     timeToNextFrame: 0,
     timeoutID: 0,
     nextImageID: 0,
-    hideCursor: false,
+    historyOffset: 0,
   };
 
   readonly idleTimerRef: React.RefObject<HTMLDivElement> = React.createRef();
+  _backForth: NodeJS.Timeout = null;
   _isMounted: boolean;
   _isLooping: boolean;
   _loadedSources: Array<string>;
@@ -73,7 +75,7 @@ export default class ImagePlayer extends React.Component {
   _animationFrameHandle: number;
 
   render() {
-    let offset = this.props.historyOffset;
+    let offset = this.getHistoryOffset();
     if (offset <= -this.state.historyPaths.length) {
       offset = -this.state.historyPaths.length + 1;
     }
@@ -85,7 +87,6 @@ export default class ImagePlayer extends React.Component {
       left: 0,
       position: this.props.gridView ? 'static' : 'fixed',
       zIndex: this.props.isOverlay ? 4 : 'auto',
-      cursor: this.state.hideCursor ? 'none' : 'initial',
     };
 
     return (
@@ -99,11 +100,6 @@ export default class ImagePlayer extends React.Component {
             timeToNextFrame={this.state.timeToNextFrame}
             scene={this.props.scene}/>
         )}
-        <IdleTimer
-          ref={ref => {return this.idleTimerRef}}
-          onActive={this.onActive.bind(this)}
-          onIdle={this.onIdle.bind(this)}
-          timeout={2000} />
         <ImageView
           image={this.state.historyPaths.length > 0 ? this.state.historyPaths[(this.state.historyPaths.length - 1) + offset] : null}
           currentAudio={this.props.currentAudio}
@@ -113,13 +109,15 @@ export default class ImagePlayer extends React.Component {
           fitParent={this.props.gridView}
           hideOverflow={this.props.gridView}
           hasStarted={this.props.hasStarted}
-          onLoaded={this.state.historyPaths.length == 1 ? this.props.onLoaded : this.nop}
+          onLoaded={this.state.historyPaths.length == 1 ? this.props.onLoaded : undefined}
           setVideo={this.props.setVideo}/>
       </div>
     );
   }
 
-  nop() {}
+  getHistoryOffset() {
+    return this.props.historyOffset + this.state.historyOffset;
+  }
 
   componentDidMount() {
     this._runFetchLoopCallRequests = [];
@@ -136,11 +134,9 @@ export default class ImagePlayer extends React.Component {
     this._waitTimeouts = new Array<NodeJS.Timeout>(this.props.config.displaySettings.maxLoadingAtOnce).fill(null);
     this._imgLoadTimeouts = new Array<NodeJS.Timeout>(this.props.config.displaySettings.maxLoadingAtOnce).fill(null);
     this._toggleStrobe = false;
-    if (this.props.advanceHack) {
-      this.props.advanceHack.listener = () => {
-        clearTimeout(this._timeout);
-        this.advance(true, true);
-      }
+    this.props.advanceHack.listener = () => {
+      clearTimeout(this._timeout);
+      this.advance(true, true);
     }
     if (this.props.deleteHack) {
       this.props.deleteHack.listener = () => {
@@ -153,6 +149,18 @@ export default class ImagePlayer extends React.Component {
   }
 
   componentWillUnmount() {
+    clearTimeout(this._backForth);
+    clearTimeout(this._timeout);
+    for (let timeout of this._waitTimeouts) {
+      clearTimeout(timeout);
+    }
+    for (let timeout of this._imgLoadTimeouts) {
+      clearTimeout(timeout);
+    }
+    this._backForth = null;
+    this._timeout = null;
+    this._waitTimeouts = null;
+    this._imgLoadTimeouts= null;
     this._isMounted = null;
     this._isLooping = null;
     this._loadedSources = null;
@@ -164,31 +172,21 @@ export default class ImagePlayer extends React.Component {
     this._count = null;
     this._nextSourceIndex = null;
     this._toggleStrobe = null;
-    clearTimeout(this._timeout);
-    for (let timeout of this._waitTimeouts) {
-      clearTimeout(timeout);
-    }
-    for (let timeout of this._imgLoadTimeouts) {
-      clearTimeout(timeout);
-    }
-    this._timeout = null;
-    this._waitTimeouts = null;
-    if (this.props.advanceHack) {
-      this.props.advanceHack.listener = null;
-    }
+    this.props.advanceHack.listener = null;
     if (this.props.deleteHack) {
       this.props.deleteHack.listener = null;
     }
   }
 
   shouldComponentUpdate(props: any, state: any): boolean {
-    return (state.hideCursor !== this.state.hideCursor ||
-            state.historyPaths !== this.state.historyPaths ||
+    return (state.historyPaths !== this.state.historyPaths ||
             props.scene !== this.props.scene ||
             props.isPlaying !== this.props.isPlaying ||
             props.hasStarted !== this.props.hasStarted ||
             props.allURLs !== this.props.allURLs ||
             props.historyOffset !== this.props.historyOffset ||
+            state.historyOffset !== this.state.historyOffset ||
+            props.gridView !== this.props.gridView ||
             props.strobeLayer !== this.props.strobeLayer);
   }
 
@@ -204,6 +202,12 @@ export default class ImagePlayer extends React.Component {
     if (this.props.scene.orderFunction !== props.scene.orderFunction || this.props.scene.sourceOrderFunction !== props.scene.sourceOrderFunction) {
       this.setState({readyToDisplay: []});
     }
+    if (this.props.scene.backForth && this._backForth == null && this.props.isPlaying && this.props.hasStarted) {
+      clearTimeout(this._backForth);
+      this._backForth = null;
+      setTimeout(() => this.advance(true, false), 200);
+      this._backForth = setTimeout(this.backForth.bind(this, -1), this.getBackForthTiming());
+    }
 
     if (this._count % this.props.config.displaySettings.maxInMemory == 0) {
       //printMemoryReport();
@@ -212,16 +216,47 @@ export default class ImagePlayer extends React.Component {
     }
   }
 
-  onActive() {
-    this.setState({hideCursor: false})
+  getBackForthTiming(): number {
+    let delay;
+    switch (this.props.scene.backForthTF) {
+      case TF.constant:
+        delay = this.props.scene.backForthConstant;
+        break;
+      case TF.random:
+        delay = Math.floor(Math.random() * (this.props.scene.backForthMax - this.props.scene.backForthMin + 1)) + this.props.scene.backForthMin;
+        break;
+      case TF.sin:
+        const sinRate = (Math.abs(this.props.scene.backForthSinRate - 100) + 2) * 1000;
+        delay = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (this.props.scene.backForthMax - this.props.scene.backForthMin + 1)) + this.props.scene.backForthMin;
+        break;
+      case TF.bpm:
+        const bpmMulti = this.props.scene.strobeDelayBPMMulti / 10;
+        const bpm = this.props.currentAudio ? this.props.currentAudio.bpm : 60;
+        delay = 60000 / (bpm * bpmMulti);
+        // If we cannot parse this, default to 1s
+        if (!delay) {
+          delay = 1000;
+        }
+        break;
+    }
+    return delay;
   }
 
-  onIdle() {
-    this.setState({hideCursor: true})
+  backForth(newOffset: number) {
+    if (this.props.isPlaying && this._isMounted) {
+      this.setState({historyOffset: newOffset});
+      this._backForth = setTimeout(this.backForth.bind(this, newOffset == 0 ? -1 : 0), this.getBackForthTiming());
+    } else {
+      if (this._isMounted && this.state.historyOffset != 0) {
+        this.setState({historyOffset: 0});
+      }
+      clearTimeout(this._backForth);
+      this._backForth = null;
+    }
   }
 
   delete() {
-    const img = this.state.historyPaths[(this.state.historyPaths.length - 1) + this.props.historyOffset];
+    const img = this.state.historyPaths[(this.state.historyPaths.length - 1) + this.getHistoryOffset()];
     const url = img.src;
     let newHistoryPaths = [];
     let newHistoryOffset = this.props.historyOffset;
@@ -459,8 +494,19 @@ export default class ImagePlayer extends React.Component {
       }
 
       const successCallback = () => {
+        if (this._imgLoadTimeouts) {
+          clearTimeout(this._imgLoadTimeouts[i]);
+        }
         if (!this._isMounted) return;
         this.props.cache(video);
+
+        const width = video.videoWidth;
+        const height = video.videoHeight;
+        if ((this.props.scene.videoOrientation == OT.onlyLandscape && height > width) ||
+          (this.props.scene.videoOrientation == OT.onlyPortrait && height < width)) {
+          errorCallback();
+          return;
+        }
 
         if (!video.hasAttribute("start") && !video.hasAttribute("end") &&
           (this.props.scene.skipVideoStart > 0 || this.props.scene.skipVideoEnd > 0) &&
@@ -475,32 +521,53 @@ export default class ImagePlayer extends React.Component {
         }
         video.setAttribute("speed", speed.toString());
 
-        if (this.props.scene.videoOption == VO.full) {
-          let duration;
-          if (video.hasAttribute("start") && video.hasAttribute("end")) {
-            const start = parseInt(video.getAttribute("start"));
-            const end = parseInt(video.getAttribute("end"));
-            duration = end - start;
-          } else {
-            duration = video.duration;
-          }
-          video.setAttribute("duration", (duration * 1000 / (speed / 10)).toString());
-        } else if (this.props.scene.videoOption == VO.part) {
-          video.setAttribute("duration", this.props.scene.videoTimingConstant.toString());
-        } else if (this.props.scene.videoOption == VO.partr) {
-          video.setAttribute("duration", getRandomNumber(this.props.scene.videoTimingMin, this.props.scene.videoTimingMax).toString());
-        }
-
         if (video.hasAttribute("start") && video.hasAttribute("end")) {
           const start = parseInt(video.getAttribute("start"));
           const end = parseInt(video.getAttribute("end"));
-          if (this.props.scene.videoOption != VO.full && this.props.scene.randomVideoStart && (!this.props.scene.continueVideo || !video.currentTime)) {
+          if (this.props.scene.randomVideoStart && (!this.props.scene.continueVideo || !video.currentTime)) {
             video.currentTime = start + (Math.random() * (end - start));
           } else if (video.currentTime < start || video.currentTime > end) {
             video.currentTime = parseInt(video.getAttribute("start"));
           }
-        } else if (this.props.scene.videoOption != VO.full && this.props.scene.randomVideoStart && (!this.props.scene.continueVideo || !video.currentTime)) {
+        } else if (this.props.scene.randomVideoStart && (!this.props.scene.continueVideo || !video.currentTime)) {
           video.currentTime = Math.random() * video.duration;
+        }
+
+        switch(this.props.scene.videoOption) {
+          case VO.full:
+            let duration;
+            if (video.hasAttribute("start") && video.hasAttribute("end")) {
+              const start = video.currentTime ? video.currentTime : parseInt(video.getAttribute("start"));
+              const end = parseInt(video.getAttribute("end"));
+              duration = end - start;
+            } else {
+              duration = video.duration - video.currentTime;
+            }
+            duration = duration * 1000 / (speed / 10);
+            video.setAttribute("duration", duration.toString());
+            break;
+          case VO.part:
+            video.setAttribute("duration", this.props.scene.videoTimingConstant.toString());
+            break;
+          case VO.partr:
+            video.setAttribute("duration", getRandomNumber(this.props.scene.videoTimingMin, this.props.scene.videoTimingMax).toString());
+            break;
+          case VO.atLeast:
+            let partDuration;
+            if (video.hasAttribute("start") && video.hasAttribute("end")) {
+              const start = parseInt(video.getAttribute("start"));
+              const end = parseInt(video.getAttribute("end"));
+              partDuration = end - start;
+            } else {
+              partDuration = video.duration;
+            }
+            partDuration = partDuration * 1000 / (speed / 10);
+            let atLeastDuration = 0;
+            do {
+              atLeastDuration += partDuration;
+            } while (atLeastDuration < this.props.scene.videoTimingConstant);
+            video.setAttribute("duration", atLeastDuration.toString())
+            break;
         }
 
         (video as any).key = this.state.nextImageID;
@@ -515,6 +582,9 @@ export default class ImagePlayer extends React.Component {
       };
 
       const errorCallback = () => {
+        if (this._imgLoadTimeouts) {
+          clearTimeout(this._imgLoadTimeouts[i]);
+        }
         if (!this._isMounted) return;
         if (this.props.scene.nextSceneAllImages && this.props.scene.nextSceneID != 0 && this.props.playNextScene && video && video.src) {
           this._playedURLs.push(video.src);
@@ -534,13 +604,25 @@ export default class ImagePlayer extends React.Component {
         }
       };
 
-      video.onerror = () => {
+      video.onerror = video.onabort = () => {
         errorCallback();
       };
 
+      video.onended = () => {
+        if (this.props.scene.videoOption == VO.full) {
+          clearTimeout(this._timeout);
+          this.advance(true, true);
+        } else {
+          video.play();
+        }
+      }
+
       video.src = url;
       video.preload = "auto";
-      video.loop = true;
+
+      clearTimeout(this._imgLoadTimeouts[i]);
+      this._imgLoadTimeouts[i] = setTimeout(() => errorCallback, 15000);
+
       video.load();
     } else {
       const img = new Image();
@@ -554,9 +636,20 @@ export default class ImagePlayer extends React.Component {
       }
 
       const successCallback = () => {
-        clearTimeout(this._imgLoadTimeouts[i]);
+        if (this._imgLoadTimeouts) {
+          clearTimeout(this._imgLoadTimeouts[i]);
+        }
         if (!this._isMounted) return;
         this.props.cache(img);
+
+        const width = img.width;
+        const height = img.height;
+        if ((this.props.scene.imageOrientation == OT.onlyLandscape && height > width) ||
+          (this.props.scene.imageOrientation == OT.onlyPortrait && height < width)) {
+          errorCallback();
+          return;
+        }
+
         (img as any).key = this.state.nextImageID;
         this.setState({
           readyToDisplay: this.state.readyToDisplay.concat([img]),
@@ -569,7 +662,9 @@ export default class ImagePlayer extends React.Component {
       };
 
       const errorCallback = () => {
-        clearTimeout(this._imgLoadTimeouts[i]);
+        if (this._imgLoadTimeouts) {
+          clearTimeout(this._imgLoadTimeouts[i]);
+        }
         if (!this._isMounted) return;
         if (this.props.scene.nextSceneAllImages && this.props.scene.nextSceneID != 0 && this.props.playNextScene && img && img.src) {
           this._playedURLs.push(img.src);
@@ -601,12 +696,26 @@ export default class ImagePlayer extends React.Component {
 
         // If gif is animated and we want to play entire length, store its duration
         if (info && info.animated) {
-          if (this.props.scene.gifOption == GO.full) {
-            img.setAttribute("duration", info.duration);
-          } else if (this.props.scene.gifOption == GO.part) {
-            img.setAttribute("duration", this.props.scene.gifTimingConstant.toString());
-          } else if (this.props.scene.gifOption == GO.partr) {
-            img.setAttribute("duration", getRandomNumber(this.props.scene.gifTimingMin, this.props.scene.gifTimingMax).toString());
+          switch (this.props.scene.gifOption) {
+            case GO.full:
+              img.setAttribute("duration", (!!info.durationChrome ? info.durationChrome : info.duration).toString());
+              break;
+            case GO.part:
+              img.setAttribute("duration", this.props.scene.gifTimingConstant.toString());
+              break;
+            case GO.partr:
+              img.setAttribute("duration", getRandomNumber(this.props.scene.gifTimingMin, this.props.scene.gifTimingMax).toString());
+              break;
+            case GO.atLeast:
+              let duration = 0;
+              do {
+                duration += (!!info.durationChrome ? info.durationChrome : info.duration);
+                if (duration == 0) {
+                  break;
+                }
+              } while (duration < this.props.scene.gifTimingConstant);
+              img.setAttribute("duration", duration.toString());
+              break;
           }
         }
 

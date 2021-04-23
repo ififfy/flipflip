@@ -22,6 +22,8 @@ import SceneDetail from './sceneDetail/SceneDetail';
 import GridPlayer from "./player/GridPlayer";
 import Tutorial from "./Tutorial";
 import AudioLibrary from "./library/AudioLibrary";
+import CaptionScriptor from "./sceneDetail/CaptionScriptor";
+import ScriptLibrary from "./library/ScriptLibrary";
 
 const appStorage = new AppStorage(remote.getCurrentWindow().id);
 
@@ -96,6 +98,7 @@ export default class Meta extends React.Component {
               config={this.state.config}
               grids={this.state.grids}
               audioLibraryCount={this.state.audios.length}
+              scriptLibraryCount={this.state.scripts.length}
               libraryCount={this.state.library.length}
               openTab={this.state.openTab}
               scenes={this.state.scenes}
@@ -108,6 +111,8 @@ export default class Meta extends React.Component {
               onImportScene={a(actions.importScene)}
               onOpenConfig={a(actions.openConfig)}
               onOpenAudioLibrary={a(actions.openAudios)}
+              onOpenScriptLibrary={a(actions.openScripts)}
+              onOpenCaptionScriptor={a(actions.openScriptor)}
               onOpenLibrary={a(actions.openLibrary)}
               onOpenScene={a(actions.goToScene)}
               onOpenGrid={a(actions.goToGrid)}
@@ -124,6 +129,7 @@ export default class Meta extends React.Component {
             <SceneDetail
               autoEdit={this.state.specialMode == SP.autoEdit}
               allScenes={this.state.scenes}
+              allSceneGrids={this.state.grids}
               config={this.state.config}
               library={this.state.library}
               scene={scene}
@@ -132,15 +138,19 @@ export default class Meta extends React.Component {
               goBack={a(actions.goBack)}
               onAddSource={a(actions.addSource)}
               onAddTracks={a(actions.addTracks)}
+              onAddScript={a(actions.addScript)}
               onClearBlacklist={a(actions.clearBlacklist)}
               onClip={a(actions.clipVideo)}
               onCloneScene={a(actions.cloneScene)}
               onDelete={a(actions.deleteScene)}
               onEditBlacklist={a(actions.editBlacklist)}
               onExport={a(actions.exportScene)}
-              onGenerate={a(actions.generateScene)}
+              onGenerate={a(actions.generateScenes)}
               onPlayScene={a(actions.playScene)}
               onPlay={a(actions.playSceneFromLibrary)}
+              onPlayAudio={a(actions.playAudio)}
+              onPlayScript={a(actions.playScript)}
+              onResetScene={a(actions.resetScene)}
               onSaveAsScene={a(actions.saveScene)}
               onSort={a(actions.sortSources)}
               onTutorial={a(actions.doneTutorial)}
@@ -171,7 +181,7 @@ export default class Meta extends React.Component {
               onEditBlacklist={a(actions.editBlacklist)}
               onExportLibrary={a(actions.exportLibrary)}
               onImportFromLibrary={a(actions.importFromLibrary)}
-              onImportLibrary={a(actions.importLibrary, appStorage.backup.bind(appStorage))}
+              onImportLibrary={a(actions.importLibrary, appStorage.backup.bind(appStorage, this.state))}
               onImportInstagram={p(actions.importInstagram)}
               onImportReddit={p(actions.importReddit)}
               onImportTumblr={p(actions.importTumblr)}
@@ -183,6 +193,7 @@ export default class Meta extends React.Component {
               onTutorial={a(actions.doneTutorial)}
               onUpdateLibrary={a(actions.updateLibrary)}
               onUpdateMode={a(actions.setMode)}
+              onUpdateVideoMetadata={p(actions.updateVideoMetadata)}
               savePosition={a(actions.saveLibraryPosition)}
               systemMessage={a(actions.systemMessage)}
             />
@@ -193,6 +204,10 @@ export default class Meta extends React.Component {
               cachePath={getCachePath(null, this.state.config)}
               filters={this.state.audioFilters}
               library={this.state.audios}
+              progressCurrent={this.state.progressCurrent}
+              progressMode={this.state.progressMode}
+              progressTitle={this.state.progressTitle}
+              progressTotal={this.state.progressTotal}
               openTab={this.state.audioOpenTab}
               playlists={this.state.playlists}
               selected={this.state.audioSelected}
@@ -204,6 +219,7 @@ export default class Meta extends React.Component {
               onAddToPlaylist={a(actions.addToPlaylist)}
               onBatchTag={a(actions.batchTag)}
               onBatchEdit={a(actions.batchEdit)}
+              onBatchDetectBPM={p(actions.detectBPMs)}
               onChangeTab={a(actions.changeAudioLibraryTab)}
               onImportFromLibrary={a(actions.importAudioFromLibrary)}
               onManageTags={a(actions.manageTags)}
@@ -215,6 +231,32 @@ export default class Meta extends React.Component {
               onUpdatePlaylists={a(actions.updatePlaylists)}
               onUpdateMode={a(actions.setMode)}
               savePosition={a(actions.saveAudioPosition)}
+              systemMessage={a(actions.systemMessage)}
+            />
+          )}
+
+          {this.isRoute('scripts') && (
+            <ScriptLibrary
+              allScenes={this.state.scenes}
+              filters={this.state.scriptFilters}
+              library={this.state.scripts}
+              selected={this.state.scriptSelected}
+              specialMode={this.state.specialMode}
+              tags={this.state.tags}
+              tutorial={this.state.tutorial}
+              yOffset={this.state.scriptYOffset}
+              goBack={a(actions.goBack)}
+              onBatchTag={a(actions.batchTag)}
+              onEditScript={a(actions.openScriptInScriptor)}
+              onImportFromLibrary={a(actions.importScriptFromLibrary)}
+              onImportToScriptor={a(actions.importScriptToScriptor)}
+              onManageTags={a(actions.manageTags)}
+              onPlay={a(actions.playScript)}
+              onSort={a(actions.sortScripts)}
+              onTutorial={a(actions.doneTutorial)}
+              onUpdateLibrary={a(actions.updateScriptLibrary)}
+              onUpdateMode={a(actions.setMode)}
+              savePosition={a(actions.saveScriptPosition)}
               systemMessage={a(actions.systemMessage)}
             />
           )}
@@ -253,6 +295,7 @@ export default class Meta extends React.Component {
               tutorial={this.state.tutorial}
               goBack={a(actions.goBack)}
               onDelete={a(actions.deleteGrid)}
+              onGenerate={a(actions.generateScenes)}
               onPlayGrid={a(actions.playGrid)}
               onTutorial={a(actions.doneTutorial)}
               onUpdateGrid={a(actions.updateGrid)}
@@ -265,6 +308,7 @@ export default class Meta extends React.Component {
               config={this.state.config}
               scene={scene}
               scenes={this.state.scenes}
+              sceneGrids={this.state.grids}
               theme={theme}
               tutorial={this.state.tutorial}
               onUpdateScene={a(actions.updateScene)}
@@ -287,19 +331,21 @@ export default class Meta extends React.Component {
               config={this.state.config}
               scene={scene}
               scenes={this.state.scenes}
+              sceneGrids={this.state.grids}
               theme={theme}
               tutorial={this.state.tutorial}
               onUpdateScene={a(actions.updateScene)}
               goBack={a(actions.endPlaySceneFromLibrary)}
               playTrack={a(actions.playTrack)}
-              tags={scene.audioScene ? actions.getAudioSource(this.state)?.tags : actions.getLibrarySource(this.state)?.tags}
+              tags={scene.audioScene ? actions.getAudioSource(this.state)?.tags : scene.scriptScene ? actions.getScriptSource(this.state)?.tags : actions.getLibrarySource(this.state)?.tags}
               allTags={this.state.tags}
-              toggleTag={scene.audioScene ? a(actions.toggleAudioTag) : a(actions.toggleTag)}
+              toggleTag={scene.audioScene ? a(actions.toggleAudioTag) : scene.scriptScene ? a(actions.toggleScriptTag) : a(actions.toggleTag)}
               navigateTagging={a(actions.navigateDisplayedLibrary)}
               getTags={actions.getTags.bind(this, this.state.library)}
-              changeAudioRoute={a(actions.changeAudioRoute)}
+              changeAudioRoute={scene.audioScene ? a(actions.changeAudioRoute) : undefined}
               setCount={a(actions.setCount)}
               cache={a(actions.cacheImage)}
+              goToClipSource={a(actions.clipVideo)}
               blacklistFile={a(actions.blacklistFile)}
               systemMessage={a(actions.systemMessage)}
             />
@@ -310,6 +356,7 @@ export default class Meta extends React.Component {
               config={this.state.config}
               grid={grid}
               scenes={this.state.scenes}
+              sceneGrids={this.state.grids}
               theme={theme}
               cache={a(actions.cacheImage)}
               getTags={actions.getTags.bind(this, this.state.library)}
@@ -323,9 +370,10 @@ export default class Meta extends React.Component {
             <ConfigForm
               config={this.state.config}
               scenes={this.state.scenes}
+              sceneGrids={this.state.grids}
               theme={this.state.theme}
               goBack={a(actions.goBack)}
-              onBackup={appStorage.backup.bind(appStorage)}
+              onBackup={appStorage.backup.bind(appStorage, this.state)}
               onChangeThemeColor={a(actions.changeThemeColor)}
               onClean={actions.cleanBackups}
               onDefault={a(actions.setDefaultConfig)}
@@ -333,6 +381,22 @@ export default class Meta extends React.Component {
               onResetTutorials={a(actions.resetTutorials)}
               onToggleDarkMode={a(actions.toggleDarkMode)}
               onUpdateConfig={a(actions.updateConfig)}
+            />
+          )}
+
+          {this.isRoute('scriptor') && (
+            <CaptionScriptor
+              config={this.state.config}
+              scenes={this.state.scenes}
+              sceneGrids={this.state.grids}
+              tutorial={this.state.tutorial}
+              openScript={actions.getSelectScript(this.state)}
+              theme={theme}
+              onAddFromLibrary={a(actions.addScriptSingle)}
+              getTags={actions.getTags.bind(this, this.state.library)}
+              goBack={a(actions.goBack)}
+              onUpdateScene={a(actions.updateScene)}
+              onUpdateLibrary={a(actions.updateScriptLibrary)}
             />
           )}
 
@@ -366,7 +430,7 @@ export default class Meta extends React.Component {
             <Tutorial
               config={this.state.config}
               route={this.state.route}
-              scene={scene}
+              scene={!!scene ? scene : grid}
               tutorial={this.state.tutorial}
               onSetTutorial={a(actions.setTutorial)}
               onDoneTutorial={a(actions.doneTutorial)}

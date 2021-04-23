@@ -1,4 +1,4 @@
-import {BT, EA, GO, HTF, IF, IT, OF, SC, SL, SOF, TF, VO, VTF, WF} from "./const";
+import {BT, EA, GO, HTF, IF, IT, OF, OT, SC, SL, SOF, TF, VO, VTF, WC, WF} from "./const";
 import Overlay from "./Overlay";
 import LibrarySource from "./LibrarySource";
 import Audio from "./Audio";
@@ -13,6 +13,13 @@ interface SceneSettingsI {
   timingMax: number;
   timingSinRate: number;
   timingBPMMulti: number;
+  backForth: boolean;
+  backForthTF: string;
+  backForthConstant: number;
+  backForthMin: number;
+  backForthMax: number;
+  backForthSinRate: number;
+  backForthBPMMulti: number;
   imageTypeFilter: string;
   weightFunction: string;
   sourceOrderFunction: string;
@@ -118,6 +125,8 @@ interface SceneSettingsI {
   panEndOv: number;
 
   imageType: string;
+  imageOrientation: string;
+  videoOrientation: string;
   backgroundType: string;
   backgroundColor: string;
   backgroundColorSet: Array<string>;
@@ -132,7 +141,6 @@ interface SceneSettingsI {
   videoTimingMax: number;
   randomVideoStart: boolean;
   continueVideo: boolean;
-  rotatePortrait: boolean;
   playVideoClips: boolean;
   skipVideoStart: number;
   skipVideoEnd: number;
@@ -144,10 +152,6 @@ interface SceneSettingsI {
   generatorMax: number;
   overlayEnabled: boolean;
   overlays: Array<Overlay>;
-  textEnabled: boolean;
-  textSource: string;
-  textEndStop: boolean;
-  textNextScene: boolean;
 
   strobe: boolean;
   strobePulse: boolean;
@@ -174,45 +178,16 @@ interface SceneSettingsI {
   strobePer: number;
   strobeOv: number;
 
-  blinkColor: string;
-  blinkFontSize: number;
-  blinkFontFamily: string;
-  blinkBorder: boolean;
-  blinkBorderpx: number;
-  blinkBorderColor: string;
-  captionColor: string;
-  captionFontSize: number;
-  captionFontFamily: string;
-  captionBorder: boolean;
-  captionBorderpx: number;
-  captionBorderColor: string;
-  captionBigColor: string;
-  captionBigFontSize: number;
-  captionBigFontFamily: string;
-  captionBigBorder: boolean;
-  captionBigBorderpx: number;
-  captionBigBorderColor: string;
-  countColor: string;
-  countFontSize: number;
-  countFontFamily: string;
-  countBorder: boolean;
-  countBorderpx: number;
-  countBorderColor: string;
-
-  audioScene: boolean;
-  audioEnabled: boolean;
-  audios: Array<Audio>;
-  audioPlaylists: Array<{audios: Array<Audio>, shuffle: boolean, repeat: string}>;
-
   // migration only
   overlaySceneID: number;
   overlaySceneOpacity: number;
   gridView: boolean;
   grid: Array<Array<number>>;
+  rotatePortrait: boolean;
 }
 
 interface RemoteSettingsI {
-  [key: string]: string | Array<string>;
+  [key: string]: string | Array<string> | boolean;
   tumblrKeys: Array<string>;
   tumblrSecrets: Array<string>;
 
@@ -220,6 +195,7 @@ interface RemoteSettingsI {
   tumblrSecret: string;
   tumblrOAuthToken: string;
   tumblrOAuthTokenSecret: string;
+  silenceTumblrAlert: boolean;
 
   redditUserAgent: string;
   redditClientID: string;
@@ -233,6 +209,11 @@ interface RemoteSettingsI {
 
   instagramUsername: string;
   instagramPassword: string;
+
+  hydrusProtocol: string;
+  hydrusDomain: string;
+  hydrusPort: string;
+  hydrusAPIKey: string;
 }
 
 interface CacheSettingsI {
@@ -258,11 +239,18 @@ interface DisplaySettingsI {
 }
 
 interface GeneralSettingsI {
-  [key: string]: number | boolean;
+  [key: string]: number | boolean | string;
 
   portableMode: boolean;
+  disableLocalSave: boolean;
   autoBackup: boolean;
   autoBackupDays: number;
+  watermark: boolean;
+  watermarkCorner: string;
+  watermarkText: string;
+  watermarkFontFamily: string;
+  watermarkFontSize: number;
+  watermarkColor: string;
 }
 
 interface TutorialsI {
@@ -274,6 +262,10 @@ interface TutorialsI {
   sceneGrid: string;
   library: string;
   audios: string;
+  scripts: string;
+  player: string;
+  scriptor: string;
+  videoClipper: string;
 }
 
 export class SceneSettings implements SceneSettingsI {
@@ -286,13 +278,23 @@ export class SceneSettings implements SceneSettingsI {
   timingMax = 1200;
   timingSinRate = 100;
   timingBPMMulti = 10;
+  backForth = false;
+  backForthTF = TF.constant;
+  backForthConstant = 1000;
+  backForthMin = 200;
+  backForthMax = 1200;
+  backForthSinRate = 100;
+  backForthBPMMulti = 10;
   imageTypeFilter = IF.any;
+  imageOrientation = OT.original;
+  videoOrientation = OT.original;
   weightFunction = WF.sources;
   sourceOrderFunction = SOF.random;
   orderFunction = OF.random;
   forceAll = false;
   forceAllSource = false;
   fullSource = false;
+  regenerate = true;
 
   zoom = false;
   zoomStart = 1;
@@ -405,7 +407,6 @@ export class SceneSettings implements SceneSettingsI {
   videoTimingMax = 3000;
   randomVideoStart = false;
   continueVideo = false;
-  rotatePortrait = false;
   playVideoClips = true;
   skipVideoStart = 0;
   skipVideoEnd = 0;
@@ -420,11 +421,9 @@ export class SceneSettings implements SceneSettingsI {
   nextSceneID = 0;
   nextSceneTime = 900;
   nextSceneAllImages = false;
+  persistAudio = false;
+  persistText = false;
   nextSceneRandoms: Array<number> = [];
-  textEnabled = false;
-  textSource = "";
-  textEndStop = false;
-  textNextScene = false;
 
   strobe = false;
   strobePulse = false;
@@ -451,45 +450,17 @@ export class SceneSettings implements SceneSettingsI {
   strobePer = 6;
   strobeOv = 3;
 
-  blinkColor = "#FFFFFF";
-  blinkFontSize = 20;
-  blinkFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
-  blinkBorder = false;
-  blinkBorderpx = 5;
-  blinkBorderColor = "#000000";
-  captionColor = "#FFFFFF";
-  captionFontSize = 8;
-  captionFontFamily = "Helvetica Neue,Helvetica,Arial,sans-serif";
-  captionBorder = false;
-  captionBorderpx = 3;
-  captionBorderColor = "#000000";
-  captionBigColor = "#FFFFFF";
-  captionBigFontSize = 12;
-  captionBigFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
-  captionBigBorder = false;
-  captionBigBorderpx = 4;
-  captionBigBorderColor = "#000000";
-  countColor = "#FFFFFF";
-  countFontSize = 20;
-  countFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
-  countBorder = false;
-  countBorderpx = 5;
-  countBorderColor = "#000000";
-
-  audioScene = false;
-  audioEnabled = false;
-  audios: Array<Audio> = [];
-  audioPlaylists: Array<{audios: Array<Audio>, shuffle: boolean, repeat: string}> = [];
-
   // migration only
   overlaySceneID = 0;
   overlaySceneOpacity = 0.5;
   gridView = false;
   grid: Array<Array<number>> = [[]];
+  audios: Array<Audio> = [];
+  rotatePortrait = false;
 }
 
 export class RemoteSettings implements RemoteSettingsI {
-  [key: string]: string | Array<string>;
+  [key: string]: string | Array<string> | boolean;
 
   tumblrKeys = ["BaQquvlxQeRhKRyViknF98vseIdcBEyDrzJBpHxvAiMPHCKR2l",
     "G4iZd6FBiyDxHVUpNqtOTDu4woWzfp8WuH3tTrT3MC16GTmNzq",
@@ -506,6 +477,7 @@ export class RemoteSettings implements RemoteSettingsI {
   tumblrSecret = "";
   tumblrOAuthToken = "";
   tumblrOAuthTokenSecret = "";
+  silenceTumblrAlert = false;
 
   redditUserAgent = "desktop:flipflip:v2.0.0 (by /u/ififfy)";
   redditClientID = "2Iqe-1CsO4VQlA";
@@ -519,6 +491,11 @@ export class RemoteSettings implements RemoteSettingsI {
 
   instagramUsername = "";
   instagramPassword = "";
+
+  hydrusProtocol = "http";
+  hydrusDomain = "localhost";
+  hydrusPort = "45869";
+  hydrusAPIKey = "";
 }
 
 export class CacheSettings implements CacheSettingsI {
@@ -546,11 +523,18 @@ export class DisplaySettings  implements DisplaySettingsI {
 }
 
 export class GeneralSettings  implements GeneralSettingsI {
-  [key: string]: number | boolean;
+  [key: string]: number | boolean | string;
 
   portableMode = false;
+  disableLocalSave = false;
   autoBackup = false;
   autoBackupDays = 1;
+  watermark = false;
+  watermarkCorner = WC.bottomRight;
+  watermarkText = "";
+  watermarkFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";
+  watermarkFontSize = 14;
+  watermarkColor = "#FFFFFF";
 }
 
 export class Tutorials implements TutorialsI {
@@ -561,6 +545,8 @@ export class Tutorials implements TutorialsI {
   player = null as string;
   library = null as string;
   audios = null as string;
+  scripts = null as string;
+  scriptor = null as string;
   sceneGenerator = null as string;
   sceneGrid = null as string;
   videoClipper = null as string;
@@ -612,6 +598,10 @@ export default class Config {
     }
 
     if (this.defaultScene && this.defaultScene.overlaySceneID != 0) this.defaultScene.overlaySceneID = 0;
+    if (this.defaultScene && this.defaultScene.rotatePortrait) {
+      this.defaultScene.videoOrientation = OT.forceLandscape;
+      this.defaultScene.rotatePortrait = false;
+    }
     if (this.displaySettings && (this.displaySettings as any).portableMode == true) {
       (this.displaySettings as any).portableMode = undefined;
       this.generalSettings.portableMode = true;

@@ -6,7 +6,6 @@ import {
 
 import AddIcon from '@material-ui/icons/Add';
 
-import {SceneSettings} from "../../data/Config";
 import {RP} from "../../data/const";
 import Scene from "../../data/Scene";
 import Audio from "../../data/Audio";
@@ -22,16 +21,23 @@ const styles = (theme: Theme) => createStyles({
 class AudioCard extends React.Component {
   readonly props: {
     classes: any,
-    scene: Scene | SceneSettings,
+    scene: Scene,
     sidebar: boolean,
     startPlaying: boolean,
-    onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
-    onAddTracks?(playlistIndex: number): void,
+    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
+    persist?: boolean,
+    shorterSeek?: boolean,
+    showMsTimestamp?: boolean,
     scenePaths?: Array<any>,
     goBack?(): void,
+    onAddTracks?(playlistIndex: number): void,
+    onPlay?(source: Audio, displayed: Array<Audio>): void,
+    onPlaying?(position: number, duration: number): void,
+    orderAudioTags?(audio: Audio): void,
     playTrack?(url: string): void,
     playNextScene?(): void,
     setCurrentAudio?(audio: Audio): void,
+    systemMessage?(message: string): void,
   };
 
   readonly state = {
@@ -46,12 +52,14 @@ class AudioCard extends React.Component {
         <Grid item xs={12}>
           <Grid container spacing={2} alignItems="center">
             <Grid item xs>
-              <FormControlLabel
-                control={
-                  <Switch checked={this.props.scene.audioEnabled}
-                          onChange={this.onBoolInput.bind(this, 'audioEnabled')}/>
-                }
-                label="Audio Tracks"/>
+              <Collapse in={!this.props.persist}>
+                <FormControlLabel
+                  control={
+                    <Switch checked={this.props.scene.audioEnabled}
+                            onChange={this.onBoolInput.bind(this, 'audioEnabled')}/>
+                  }
+                  label="Audio Tracks"/>
+              </Collapse>
             </Grid>
             <Grid item>
               <Collapse in={this.props.scene.audioEnabled && !this.props.startPlaying}>
@@ -70,21 +78,28 @@ class AudioCard extends React.Component {
         {this.props.scene.audioPlaylists.map((playlist, i) =>
           <React.Fragment key={i}>
             <Grid item xs={12}>
-              <Collapse in={this.props.scene.audioEnabled}>
+              <Collapse in={this.props.scene.audioEnabled || this.props.persist}>
                 <AudioPlaylist
                   playlistIndex={i}
                   playlist={playlist}
                   scene={this.props.scene}
                   scenePaths={this.props.scenePaths}
+                  shorterSeek={this.props.shorterSeek}
+                  showMsTimestamp={this.props.showMsTimestamp}
                   sidebar={this.props.sidebar}
                   startPlaying={this.props.startPlaying}
+                  persist={this.props.persist}
                   onAddTracks={this.props.onAddTracks}
                   onSourceOptions={this.onSourceOptions.bind(this)}
                   onUpdateScene={this.props.onUpdateScene.bind(this)}
-                  setCurrentAudio={i==0 && this.props.setCurrentAudio ? this.props.setCurrentAudio.bind(this) : this.nop}
+                  setCurrentAudio={i==0 && this.props.setCurrentAudio ? this.props.setCurrentAudio.bind(this) : undefined}
                   goBack={this.props.goBack}
+                  onPlay={this.props.onPlay}
+                  onPlaying={this.props.onPlaying}
+                  orderAudioTags={this.props.orderAudioTags}
                   playTrack={this.props.playTrack}
-                  playNextScene={this.props.playNextScene}/>
+                  playNextScene={this.props.playNextScene}
+                  systemMessage={this.props.systemMessage}/>
               </Collapse>
             </Grid>
             {i != this.props.scene.audioPlaylists.length-1 && (
@@ -106,8 +121,6 @@ class AudioCard extends React.Component {
       </Grid>
     );
   }
-
-  nop() {}
 
   onFinishSourceOptions(newAudio: Audio) {
     this.props.onUpdateScene(this.props.scene, (s) => {

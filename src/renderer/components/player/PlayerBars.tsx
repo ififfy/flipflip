@@ -4,6 +4,7 @@ const {getCurrentWindow, Menu, MenuItem, app} = remote;
 import clsx from "clsx";
 import fileURL from "file-url";
 import fs from "fs";
+import wretch from "wretch";
 
 import {
   AppBar, Button, Card, CardActionArea, CardContent, createStyles, Dialog, DialogActions, DialogContent,
@@ -38,8 +39,28 @@ import VideoControl from "./VideoControl";
 import FadeIOCard from "../configGroups/FadeIOCard";
 import PanningCard from "../configGroups/PanningCard";
 import Audio from "../../data/Audio";
+import SceneGrid from "../../data/SceneGrid";
 
 const drawerWidth = 340;
+
+const hexToRGB = (h: string) => {
+  let r = "0", g = "0", b = "0";
+
+  // 3 digits
+  if (h.length == 4) {
+    r = "0x" + h[1] + h[1];
+    g = "0x" + h[2] + h[2];
+    b = "0x" + h[3] + h[3];
+
+    // 6 digits
+  } else if (h.length == 7) {
+    r = "0x" + h[1] + h[2];
+    g = "0x" + h[3] + h[4];
+    b = "0x" + h[5] + h[6];
+  }
+
+  return "rgb("+ +r + "," + +g + "," + +b + ", 0.6)";
+}
 
 const styles = (theme: Theme) => createStyles({
   hoverBar: {
@@ -140,7 +161,7 @@ const styles = (theme: Theme) => createStyles({
   tagDrawerPaper: {
     transform: 'scale(0)',
     transformOrigin: 'bottom left',
-    backgroundColor: theme.palette.background.default,
+    backgroundColor: hexToRGB(theme.palette.background.default),
     transition: theme.transitions.create('transform', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -166,6 +187,7 @@ const styles = (theme: Theme) => createStyles({
     display: 'flex',
     flexWrap: 'wrap',
     justifyContent: 'center',
+    width: '100%',
   },
   tag: {
     marginRight: theme.spacing(1),
@@ -201,17 +223,20 @@ class PlayerBars extends React.Component {
     hasStarted: boolean,
     historyPaths: Array<any>,
     historyOffset: number,
-    imagePlayerAdvanceHack: ChildCallbackHack,
+    imagePlayerAdvanceHacks: Array<Array<ChildCallbackHack>>,
     imagePlayerDeleteHack: ChildCallbackHack,
     isEmpty: boolean,
     isPlaying: boolean,
     mainVideo: HTMLVideoElement,
-    overlayVideos: Array<HTMLVideoElement>,
+    overlayVideos: Array<Array<HTMLVideoElement>>,
+    persistAudio: boolean,
+    persistText: boolean,
+    recentPictureGrid: boolean,
     scene: Scene,
     scenes: Array<Scene>,
+    sceneGrids: Array<SceneGrid>,
     title: string,
     tutorial: string,
-    recentPictureGrid: boolean,
     goBack(): void,
     historyBack(): void,
     historyForward(): void,
@@ -228,6 +253,7 @@ class PlayerBars extends React.Component {
     goToTagSource?(source: LibrarySource): void,
     goToClipSource?(source: LibrarySource): void,
     playTrack?(url: string): void,
+    onPlaying?(position: number, duration: number): void,
     toggleTag?(sourceID: number, tag: Tag): void,
   };
 
@@ -352,8 +378,8 @@ class PlayerBars extends React.Component {
 
               {!this.props.scene.audioScene && (
                 <React.Fragment>
-                  {this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.images && (
-                    <Accordion TransitionProps={{ unmountOnExit: true }}>
+                  {(this.props.mainVideo != null || this.props.overlayVideos.find((a) => a != null) != null) && (
+                    <Accordion TransitionProps={{ unmountOnExit: false }}>
                       <AccordionSummary
                         expandIcon={<ExpandMoreIcon />}
                       >
@@ -368,6 +394,7 @@ class PlayerBars extends React.Component {
                           mainClip={source ? source.clips.find((c) => c.id == clipID) : null}
                           mainClipValue={clipValue ? clipValue : null}
                           otherVideos={this.props.overlayVideos}
+                          imagePlayerAdvanceHacks={this.props.imagePlayerAdvanceHacks}
                           onUpdateScene={this.props.onUpdateScene.bind(this)}/>
                       </AccordionDetails>
                     </Accordion>
@@ -383,6 +410,7 @@ class PlayerBars extends React.Component {
                       <SceneOptionCard
                         sidebar
                         allScenes={this.props.scenes}
+                        allSceneGrids={this.props.sceneGrids}
                         isTagging={this.props.tags != null}
                         scene={this.props.scene}
                         onUpdateScene={this.props.onUpdateScene.bind(this)}/>
@@ -494,15 +522,18 @@ class PlayerBars extends React.Component {
                     scene={this.props.scene}
                     scenePaths={this.props.historyPaths}
                     startPlaying
+                    persist={this.props.persistAudio}
                     onUpdateScene={this.props.onUpdateScene.bind(this)}
                     goBack={this.props.goBack.bind(this)}
+                    orderAudioTags={this.orderAudioTags.bind(this)}
+                    onPlaying={this.props.onPlaying}
                     playTrack={this.props.playTrack}
                     playNextScene={this.props.playNextScene}
                     setCurrentAudio={this.props.setCurrentAudio.bind(this)}/>
                 </AccordionDetails>
               </Accordion>
 
-              {!this.props.scene.audioScene && (
+              {!this.props.scene.audioScene && !this.props.persistText && (
                 <Accordion TransitionProps={{ unmountOnExit: true }}>
                   <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}
@@ -631,6 +662,9 @@ class PlayerBars extends React.Component {
 
     window.addEventListener('contextmenu', this.showContextMenu, false);
     window.addEventListener('keydown', this.onKeyDown, false);
+    if (this.props.tags == null) {
+      window.addEventListener('wheel', this.onScroll, false);
+    }
     this.buildMenu();
   }
 
@@ -646,10 +680,33 @@ class PlayerBars extends React.Component {
     createMainMenu(Menu, createMenuTemplate(app));
     window.removeEventListener('contextmenu', this.showContextMenu);
     window.removeEventListener('keydown', this.onKeyDown);
+    if (this.props.tags == null) {
+      window.removeEventListener('wheel', this.onScroll);
+    }
   }
 
-  getScene(id: number): Scene {
-    return this.props.scenes.find((s) => s.id == id);
+  onScroll = (e: WheelEvent) => {
+    if (this.props.recentPictureGrid || !this.props.onUpdateScene || this.state.drawerHover) return;
+    const volumeChange = (e.deltaY / 100) * -5;
+    let newVolume = parseInt(this.props.scene.videoVolume as any) + volumeChange;
+    if (newVolume < 0) {
+      newVolume = 0;
+    } else if (newVolume > 100) {
+      newVolume = 100;
+    }
+    if (this.props.mainVideo) {
+      this.props.mainVideo.volume = newVolume / 100;
+    }
+    this.props.onUpdateScene(this.props.scene, (s) => s.videoVolume = newVolume);
+  }
+
+  getScene(id: number): Scene | SceneGrid {
+    if (id == null) return null;
+    if (id.toString().startsWith('999')) {
+      return this.props.sceneGrids.find((s) => s.id.toString() == id.toString().replace('999',''));
+    } else {
+      return this.props.scenes.find((s) => s.id == id);
+    }
   }
 
   openLink(url: string) {
@@ -747,7 +804,7 @@ class PlayerBars extends React.Component {
   historyForward() {
     if (!this.state.drawerHover || document.activeElement.tagName.toLocaleLowerCase() != "input") {
       if (this.props.historyOffset >= 0) {
-        this.props.imagePlayerAdvanceHack.fire();
+        this.props.imagePlayerAdvanceHacks[0][0].fire();
       } else {
         this.props.historyForward();
       }
@@ -899,7 +956,7 @@ class PlayerBars extends React.Component {
       keyMap.set('onDelete', ['Delete Image', 'Delete']);
     }
 
-    if (!this.props.scene.audioScene && this.props.tags != null) {
+    if (!this.props.scene.audioScene && !this.props.scene.scriptScene && this.props.tags != null) {
       keyMap.set('prevSource', ['Previous Source', '[']);
       keyMap.set('nextSource', ['Next Source', ']']);
     }
@@ -911,25 +968,21 @@ class PlayerBars extends React.Component {
     const focus = document.activeElement.tagName.toLocaleLowerCase();
     switch (e.key) {
       case ' ':
-        if (!this.state.drawerHover || focus != "input") {
+        if ((!this.state.drawerHover || focus != "input") && !e.shiftKey) {
           e.preventDefault();
           this.playPause();
         }
         break;
       case 'ArrowLeft':
-        if (!this.state.drawerHover || focus != "input") {
+        if ((!this.state.drawerHover || focus != "input") && !e.shiftKey) {
           e.preventDefault();
-          if (!this.props.scene.audioScene) {
-            this.historyBack();
-          }
+          this.historyBack();
         }
         break;
       case 'ArrowRight':
-        if (!this.state.drawerHover || focus != "input") {
+        if ((!this.state.drawerHover || focus != "input") && !e.shiftKey) {
           e.preventDefault();
-          if (!this.props.scene.audioScene) {
-            this.historyForward();
-          }
+          this.historyForward();
         }
         break;
       case 'Escape':
@@ -969,19 +1022,35 @@ class PlayerBars extends React.Component {
         }
         break;
       case '[':
-        if (!this.props.scene.audioScene && this.props.tags != null) {
+        if (!this.props.scene.audioScene && !this.props.scene.scriptScene && this.props.tags != null) {
           e.preventDefault();
           this.prevSource();
         }
         break;
       case ']':
-        if (!this.props.scene.audioScene && this.props.tags != null) {
+        if (!this.props.scene.audioScene && !this.props.scene.scriptScene && this.props.tags != null) {
           e.preventDefault();
           this.nextSource();
         }
         break;
     }
   };
+
+  orderAudioTags(audio: Audio) {
+    const tagNames = this.props.allTags.map((t: Tag) => t.name);
+    // Re-order the tags of the audio we were playing
+    audio.tags = audio.tags.sort((a: Tag, b: Tag) => {
+      const aIndex = tagNames.indexOf(a.name);
+      const bIndex = tagNames.indexOf(b.name);
+      if (aIndex < bIndex) {
+        return -1;
+      } else if (aIndex > bIndex) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+  }
 
   setPlayPause(play: boolean) {
     if (play) {
@@ -1014,7 +1083,34 @@ class PlayerBars extends React.Component {
     const path = urlToPath(url);
     const imagePath = isFile ? path : url;
     if (imagePath.toLocaleLowerCase().endsWith(".png") || imagePath.toLocaleLowerCase().endsWith(".jpg") || imagePath.toLocaleLowerCase().endsWith(".jpeg")) {
-      clipboard.writeImage(nativeImage.createFromPath(imagePath));
+      if (isFile) {
+        clipboard.writeImage(nativeImage.createFromPath(imagePath));
+      } else {
+        wretch(imagePath)
+          .get()
+          .blob(blob => {
+            const reader = new FileReader();
+            reader.onload = function () {
+              if (reader.readyState == 2) {
+                const arrayBuffer = reader.result as ArrayBuffer;
+                const buffer = Buffer.alloc(arrayBuffer.byteLength);
+                const view = new Uint8Array(arrayBuffer);
+                for (let i = 0; i < arrayBuffer.byteLength; ++i) {
+                  buffer[i] = view[i];
+                }
+                const bufferImage = nativeImage.createFromBuffer(buffer);
+                if (bufferImage.isEmpty()) {
+                  clipboard.writeText(imagePath);
+                } else {
+                  clipboard.writeImage(bufferImage);
+                }
+              }
+            };
+            reader.readAsArrayBuffer(blob);
+          });
+      }
+    } else {
+      clipboard.writeText(imagePath);
     }
   }
 

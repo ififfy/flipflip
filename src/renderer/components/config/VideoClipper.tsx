@@ -59,7 +59,7 @@ const styles = (theme: Theme) => createStyles({
     height: theme.spacing(8),
   },
   drawerSpacer: {
-    height: theme.spacing(17.5),
+    height: theme.spacing(21),
   },
   title: {
     textAlign: 'center',
@@ -76,7 +76,9 @@ const styles = (theme: Theme) => createStyles({
   },
   clipDrawerPaper: {
     backgroundColor: theme.palette.background.default,
+    height: theme.spacing(21),
     padding: theme.spacing(1),
+    justifyContent: 'flex-end',
   },
   tagList: {
     padding: theme.spacing(1),
@@ -523,6 +525,9 @@ class VideoClipper extends React.Component {
     video.src = this.props.source.url;
     video.preload = "auto";
     video.loop = true;
+    if (this.props.source.subtitleFile != null && this.props.source.subtitleFile.length > 0) {
+      video.setAttribute("subtitles", this.props.source.subtitleFile);
+    }
     video.load();
   }
 

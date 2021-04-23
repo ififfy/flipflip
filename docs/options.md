@@ -2,7 +2,7 @@
 The **OPTIONS** tab provides a number of ways to control the Scene playback and what images will display. This tab
 has two cards: `Scene Options` and `ImageOptions` 
 
-![](doc_images/scene_detail_options.png)
+<img src="doc_images/scene_detail_options.png" alt="Options" width="50%" style="min-width: 483px">
 
 ## Scene Options
 
@@ -19,7 +19,14 @@ or based on **audio BPM**.
 <img src="doc_images/timing_ex.gif" alt="Timing Example">
 
 _An example of **Wave** timing_
-  
+
+#### Back/Forth
+The back/forth feature automatically toggles between the 2 most recent images in a Scene at a set interval. 
+
+<img src="doc_images/backforth_ex.gif" alt="Back Forth Example" style="width: 483px">
+
+_An example of **Back/Forth** every 200ms_
+
 #### Image Sizing
 This setting controls the aspect ratio and size of the displayed image:
 * **Fit Best (No Clipping)**
@@ -39,23 +46,29 @@ This setting controls the background for this Scene:
 * **None**
 
 #### Next Scene
-Choose a Scene to transition to after this one (or none). Control the timing of the Next Scene (sec) and if the Next 
-Scene should play after all images from the current Scene have played.
+Choose a Scene to transition to after this one (or none). Control the timing of the Next Scene (sec)
+
+* **Play After All Images** - Instead of using a fixed time, transition to the Next Scene after all images in this 
+  scene have played
+  * You can also choose to move to the next scene after an audio clip has ended or after a captioning script has completed.
+    You will find these options in the audio and text options, respectively.
+* **Persist Audio** - Persist the Audio tracks of this scene through all subsequent Next Scenes
+* **Persist Text Overlay** - Persist the Text Overlay scripts of this scene through all subsequent Next Scenes
 
 Rather than picking a single scene, you can select "Random". Click <img style="vertical-align: -5px" src="doc_icons/list.svg" alt="List" width="20" height="20">
 to select the scenes you'd like to be randomly picked from.
-
-You can also choose to move to the next scene after an audio clip has ended or after the captioning script has completed.
-You will find these options in the audio and text settings, respectively.
 
 ?> The "Next Scene" will pre-load in the background and start when a configured end condition is met (time, images, audio, text). 
 Scene options, effects, audio/text, etc. will also change as configured.
 
 #### Overlay
-Add Scene(s) to overlay over this one (or none). Control each overlay opacity.
+Add Scene(s)/SceneGrid(s) to overlay over this one (or none). Control each overlay opacity. Layers are rendered in the 
+order they are added.
 
-?> There is no limit to the number of scenes you can use with grid/overlay, 
-but you may experience poor performance if you use too many.
+?> Overlaying with another Scene _will not_ show that Scene's Overlays. Overlaying a Scene Grid _will_ show each of 
+its Scene's Overlays, but not if they are also a Scene Grid. 
+
+?> There is no limit to the number of scenes you can overlay, but you may experience poor performance if you use too many.
 
 ## Image Options
 
@@ -66,6 +79,19 @@ This setting controls which images will display:
 * **Only Animated** - Videos _and_ Animated GIFs
 * **Only Image Files**
 * **Only Stills**
+
+#### Image/Video Orientation
+These settings allows you to control the orientation of images/videos (respectively).
+
+* **No Change**
+* **Only Landscape** - Only display landscape images/videos (width > height)
+* **Only Portrait** - Only display portrait images/videos (height > width)
+* **Force Landscape** - Force all images/videos to display in landscape (rotates portrait images/videos 90° counter-clockwise)
+* **Force Portrait**  - Force all images/videos to display in portrait (rotates landscape images/videos 90° counter-clockwise)
+
+#### Re-Generate On Playback
+This option is only available for Scene Generators. When enabled, the scene will be automatically regenerated whenever
+playback is started (either directly, or through an overlay/grid).
 
 #### Play Full Sources
 By default, FlipFlip will play 1 image from a source before moving to the next. If you would rather play all images of
@@ -90,7 +116,6 @@ Videos also have a number of other settings:
 * **Random Speed** - Choose to play videos at random speeds and specify the range of speeds.
 * **Start at Random Time** - Starts videos at a random timestamp (videos start from beginning by default).
 * **Continue Videos** - Continue videos from last timestamp during this slideshow (videos restart by default).
-* **Rotate Portrait Videos** - Rotates any portrait videos 90° to the left (play landscape).
 * **Use Clips** - Choose to use only [video clips](clips.md) or the entire video.
   * If you are not using video clips, you can choose to skip the first and last parts of each video (ms)
 * Control **video volume** for this scene.

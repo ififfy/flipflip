@@ -5,6 +5,8 @@ import {createStyles, Theme, withStyles} from "@material-ui/core";
 import {grey} from "@material-ui/core/colors";
 
 import Scene from "../../data/Scene";
+import SceneGrid from "../../data/SceneGrid";
+import {areWeightsValid} from "../../data/utils";
 
 const styles = (theme: Theme) => createStyles({
   searchSelect: {
@@ -22,9 +24,10 @@ const styles = (theme: Theme) => createStyles({
 class SceneSelect extends React.Component {
   readonly props: {
     classes: any,
-    scene: Scene,
     allScenes: Array<Scene>,
     value: number,
+    allSceneGrids?: Array<SceneGrid>,
+    scene?: Scene,
     menuIsOpen?: boolean,
     autoFocus?: boolean,
     includeExtra?: boolean
@@ -39,11 +42,17 @@ class SceneSelect extends React.Component {
     if (this.props.includeExtra) {
       defaults = ["0", "-1"];
     }
+    const scenes = this.props.allScenes.filter((s) => (!this.props.scene || s.id !== this.props.scene.id) && (s.sources.length > 0 || (s.regenerate && areWeightsValid(s)))).map((s) => s.id.toString());
+    let idList = defaults.concat(scenes);
+    if (this.props.allSceneGrids) {
+      idList = idList.concat(this.props.allSceneGrids.map((s) => "999" + s.id));
+    }
+    const options = idList.map((id) => {return {label: this.props.getSceneName(id), value: id}})
     return (
       <Select
         className={classes.select}
         value={{label: this.props.getSceneName(this.props.value.toString()), value: this.props.value}}
-        options={defaults.concat(this.props.allScenes.filter((s) => (this.props.scene == null || s.id !== this.props.scene.id) && s.sources.length > 0).map((s) => s.id.toString())).map((id) => {return {label: this.props.getSceneName(id), value: id}})}
+        options={options}
         backspaceRemovesValue={false}
         menuIsOpen={this.props.menuIsOpen}
         autoFocus={this.props.autoFocus}

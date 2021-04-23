@@ -11,9 +11,8 @@ import {
 import BuildIcon from '@material-ui/icons/Build';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
-import OfflineBoltIcon from '@material-ui/icons/OfflineBolt';
 
-import {getTimestamp, urlToPath} from "../../data/utils";
+import {getTimestamp} from "../../data/utils";
 import Tag from "../../data/Tag";
 import {grey} from "@material-ui/core/colors";
 import Audio from "../../data/Audio";
@@ -97,6 +96,7 @@ const styles = (theme: Theme) => createStyles({
   },
   trackName: {
     maxWidth: 500,
+    minWidth: 250,
     width: '100%',
     userSelect: 'none',
   },
@@ -108,7 +108,7 @@ const styles = (theme: Theme) => createStyles({
     userSelect: 'none',
   },
   artistContainer: {
-    minWidth: 250,
+    minWidth: 225,
   },
   trackArtist: {
     display: 'inline-block',
@@ -122,12 +122,14 @@ const styles = (theme: Theme) => createStyles({
     minWidth: 225,
   },
   trackAlbum: {
-    display: 'inline-block',
     userSelect: 'none',
     cursor: 'pointer',
     '&:hover': {
       textDecoration: 'underline',
     },
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
   bigTooltip: {
     fontSize: "medium",
@@ -136,6 +138,9 @@ const styles = (theme: Theme) => createStyles({
   tagChips: {
     textAlign: 'center',
   },
+  listItem: {
+    paddingRight: 110,
+  }
 });
 
 class AudioSourceListItem extends React.Component {
@@ -169,7 +174,7 @@ class AudioSourceListItem extends React.Component {
     return(
       <div style={this.props.style}
            className={clsx(this.props.index % 2 == 0 ? classes.evenChild : classes.oddChild, this.props.lastSelected && classes.lastSelected)}>
-        <ListItem>
+        <ListItem classes={{root: classes.listItem}}>
           {this.props.isSelect && (
             <Checkbox value={this.props.source.url} onChange={this.props.onToggleSelect.bind(this)}
                       checked={this.props.checked}/>
@@ -257,7 +262,7 @@ class AudioSourceListItem extends React.Component {
           </ListItemText>
 
           {this.props.source.id && (
-            <ListItemSecondaryAction className={clsx(classes.source)}>
+            <ListItemSecondaryAction>
               {this.props.source.playedCount > 0 && (
                 <Chip
                   label={this.props.source.playedCount}
@@ -312,19 +317,6 @@ class AudioSourceListItem extends React.Component {
       } catch (e) {
         this.props.systemMessage("The source " + sourceURL + " isn't in your Library");
       }
-    }
-  }
-
-  onEditSource(e: MouseEvent) {
-    const input = (e.target as HTMLInputElement);
-    this.setState({urlInput: input.value});
-  }
-
-  openDirectory(cachePath: string) {
-    if (process.platform === "win32") {
-      this.openExternalURL(cachePath);
-    } else {
-      this.openExternalURL(urlToPath(cachePath));
     }
   }
 

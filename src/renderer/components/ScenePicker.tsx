@@ -14,9 +14,11 @@ import AddIcon from '@material-ui/icons/Add';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import CasinoIcon from '@material-ui/icons/Casino';
+import CodeIcon from '@material-ui/icons/Code';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import GridOnIcon from '@material-ui/icons/GridOn';
 import HelpIcon from '@material-ui/icons/Help';
+import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import LibraryMusicIcon from '@material-ui/icons/LibraryMusic';
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import MenuIcon from '@material-ui/icons/Menu';
@@ -24,6 +26,7 @@ import MovieIcon from '@material-ui/icons/Movie';
 import MovieFilterIcon from '@material-ui/icons/MovieFilter';
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import SettingsIcon from '@material-ui/icons/Settings';
+import ShuffleIcon from '@material-ui/icons/Shuffle';
 import SortIcon from '@material-ui/icons/Sort';
 import SystemUpdateIcon from '@material-ui/icons/SystemUpdate';
 
@@ -202,7 +205,7 @@ const styles = (theme: Theme) => createStyles({
     backgroundColor: theme.palette.secondary.light,
     margin: 0,
     top: 'auto',
-    right: 135,
+    right: 130,
     bottom: 20,
     left: 'auto',
     position: 'fixed',
@@ -332,6 +335,7 @@ class ScenePicker extends React.Component {
     config: Config,
     grids: Array<SceneGrid>,
     audioLibraryCount: number,
+    scriptLibraryCount: number,
     libraryCount: number,
     openTab: number,
     scenes: Array<Scene>,
@@ -344,6 +348,8 @@ class ScenePicker extends React.Component {
     onImportScene(addToLibrary: boolean): void,
     onOpenConfig(): void,
     onOpenAudioLibrary(): void,
+    onOpenScriptLibrary(): void,
+    onOpenCaptionScriptor(): void,
     onOpenLibrary(): void,
     onOpenScene(scene: Scene): void,
     onOpenGrid(grid: SceneGrid): void,
@@ -485,6 +491,35 @@ class ScenePicker extends React.Component {
                         size='small'
                         variant='outlined'/>
                     )}
+                  </ListItem>
+                </Tooltip>
+                <Tooltip title={this.state.drawerOpen ? "" : "Script Library"}>
+                  <ListItem button onClick={this.props.onOpenScriptLibrary.bind(this)}>
+                    <ListItemIcon>
+                      <LibraryBooksIcon/>
+                    </ListItemIcon>
+                    <ListItemText primary="Script Library" />
+                    {this.props.scriptLibraryCount > 0 && (
+                      <Chip
+                        className={clsx(classes.chip, !open && classes.chipClose)}
+                        label={this.props.scriptLibraryCount}
+                        color='primary'
+                        size='small'
+                        variant='outlined'/>
+                    )}
+                  </ListItem>
+                </Tooltip>
+              </div>
+
+              <Divider />
+
+              <div>
+                <Tooltip title={this.state.drawerOpen ? "" : "Caption Scripter"}>
+                  <ListItem button onClick={this.props.onOpenCaptionScriptor.bind(this)}>
+                    <ListItemIcon>
+                      <CodeIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Caption Scripter" />
                   </ListItem>
                 </Tooltip>
               </div>
@@ -765,6 +800,14 @@ class ScenePicker extends React.Component {
                       </ListItemSecondaryAction>
                     </MenuItem>
                   )}
+                  <MenuItem key={SF.random}>
+                    <ListItemText primary={en.get(SF.random)}/>
+                    <ListItemSecondaryAction>
+                      <IconButton edge="end" onClick={this.props.onSort.bind(this, SF.random, true)}>
+                        <ShuffleIcon/>
+                      </IconButton>
+                    </ListItemSecondaryAction>
+                  </MenuItem>
                 </Menu>
               </React.Fragment>
             )}

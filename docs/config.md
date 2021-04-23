@@ -8,11 +8,12 @@ Some other General Settings exist to help customize your FlipFlip experience. To
 When you are done making changes to the Settings, click the `OK` button ( <img style="vertical-align: -5px" 
 src="doc_icons/ok.svg" alt="OK" width="20" height="20"> ). Settings will only be saved if they are valid.
 
-![](doc_images/config.png)
+<img src="doc_images/config.png" alt="Options" width="50%" style="min-width: 483px">
 
 ## Scene Default Option/Effects
 Configure default settings for each Scene just like you would in the Scene itself. These preferences will be applied 
-whenever you create a new Scene (or Generator).
+whenever you create a new Scene (or Generator). These defaults can also be applied to any existing Scene by clicking the 
+"Restore Defaults" button in the Scene's sidebar.
 
 ## Player Settings
 These settings control various player options.
@@ -27,6 +28,8 @@ These settings control various player options.
   * _This only ever applies to the first playlist_
 * `Portable Mode` - Portable Mode will save a copy of your data in the same directory as the FlipFlip executable, 
 as well as the default save path. This needs to be enabled on each machine.
+  * `Disable Local Saves` - When this is on, FlipFlip will _only_ save its data to the folder with the FlipFlip 
+    executable and _will not_ save to the default save path.
 ---
 * `Min Image/Video Size` - the minimum number of pixels each dimension of an image/video must be 
 (default: 200 - image's width _and_ height must be larger than 200px).
@@ -59,6 +62,8 @@ make any changes to your account.
 * Click `Allow` to give FlipFlip read permission
 * Go back to FlipFlip
 * You should see a Success! message
+
+?> Enable **Silence Tumblr Throttle Alert** to prevent FlipFlip from alerting you when Tumblr starts returning 429 responses.
 
 ### Reddit
 In order to use Reddit Subreddits/Users as sources or import your Subscriptions, you must first activate FlipFlip 
@@ -97,6 +102,21 @@ on your computer and is never shared with anyone or sent to any server (besides 
 * Click `Authorize FlipFlip on Instagram`
 * You should see a Success! message
 
+### Hydrus
+In order to use a Hydrus server for sources, you'll need to provide the serve details. This includes protocol 
+(`http` vs `https`), domain, port, and API Key.
+
+?> You can only have **one Hydrus server** configured at a time.
+
+FlipFlip does not store any user information or make changes to the server. Server information is stored locally
+on your computer and is never shared with anyone or sent to any server (besides Hydrus, obviously).
+
+* Click the `Hydrus` icon
+* Enter the server's protocol, domain, port, and API Key.
+* Click `Configure Hydrus`
+* You should see a Success! message
+  * If you see an error message, FlipFlip was not able to establish connection to the server.
+
 ## Backup
 Backup your FlipFlip data or restore from a previous backup.
 
@@ -116,4 +136,26 @@ Backups might build up over time. Click `Clean Backups` to delete all but the mo
 ## Theme
 The FlipFlip UI allows you to customize the **Primary** and **Secondary** colors. You can also toggle Dark Mode on/off here
 
-![](doc_images/flipflip_colors.png)
+<img src="doc_images/flipflip_colors.png" alt="Options" width="50%" style="min-width: 483px">
+
+## Watermark
+Enabling this will display a custom watermark during FlipFlip playback. In addition to the watermark text, you can also
+select which corner it appears in, as well as font family, size, and color.
+
+You can include the following special variables in your watermark text, and they will be automatically replaced 
+with the relevant information:
+
+| Variable Code    | Replaced By                                         |
+|:----------------:|:---------------------------------------------------:|
+| `{scene_name}`   | Name of the current **Scene**                       |
+| `{source_url}`   | URL of the current **Source**                       |
+| `{source_name}`  | Name of the current **Source**                      |
+| `{file_url}`     | URL of the currently displayed **File**             |
+| `{file_name}`    | Name of the currently displayed **File**            |
+| `{audio_url}`    | URL of the currently playing **Audio**              |
+| `{audio_name}`   | Name of the currently playing **Audio**             |
+| `{audio_title}`  | Title (metadata) of the currently playing **Audio** |
+| `{audio_artist}` | Arist (metadata) of the currently playing **Audio** |
+| `{audio_album}`  | Album (metadata) of the currently playing **Audio** |
+
+?> A source/file/audio "Name" is the shortened name parsed from the full "URL". (e.g. `https://www.reddit.com/r/AnimalsBeingDerps/` becomes `AnimalsBeingDerps`)

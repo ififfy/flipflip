@@ -340,19 +340,6 @@ class AudioSourceList extends React.Component {
     this.onCloseSourceOptions();
   }
 
-  openDirectory(cachePath: string) {
-    if (process.platform === "win32") {
-      this.openExternalURL(cachePath);
-    } else {
-      this.openExternalURL(urlToPath(cachePath));
-    }
-  }
-
-  openExternalURL(url: string) {
-    remote.shell.openExternal(url);
-  }
-
-
   SortableVirtualList = sortableContainer(this.VirtualList.bind(this));
 
   VirtualList(props: any) {

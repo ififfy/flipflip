@@ -8,7 +8,9 @@ No installation necessary, just run `FlipFlip`.
 ## FlipFlip Home
 
 When you first open FlipFlip, you should see a screen like this:
-![](doc_images/flipflip_home.png)
+
+<img src="doc_images/flipflip_home.png" alt="FlipFlip" width="50%" style="min-width: 483px">
+
 _Note: Some of these features will be disabled until they are relevant_
 
 ## Your first scene

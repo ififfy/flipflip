@@ -17,14 +17,18 @@ import {
 import DeleteIcon from '@material-ui/icons/Delete';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import FolderIcon from '@material-ui/icons/Folder';
+import GetAppIcon from '@material-ui/icons/GetApp';
 import HttpIcon from '@material-ui/icons/Http';
+import InsertDriveFileIcon from "@material-ui/icons/InsertDriveFile";
 import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
 import MovieIcon from '@material-ui/icons/Movie';
+import SaveIcon from "@material-ui/icons/Save";
 
-import {ALT, DONE, LT, PT, SDGT, SDT, SGT, SPT, TF, VCT} from "../data/const";
+import {ALT, CST, DONE, LT, PT, SDGT, SDT, SGT, SLT, SPT, TF, VCT} from "../data/const";
 import {Route} from "../data/Route";
 import Config from "../data/Config";
 import Scene from "../data/Scene";
+import SceneGrid from "../data/SceneGrid";
 
 const styles = (theme: Theme) => createStyles({
   deleteIcon: {
@@ -42,6 +46,9 @@ const styles = (theme: Theme) => createStyles({
   bottomDialog: {
     alignItems: 'flex-end',
   },
+  extraTop: {
+    zIndex: theme.zIndex.modal + 2,
+  },
 });
 
 class Tutorial extends React.Component {
@@ -49,7 +56,7 @@ class Tutorial extends React.Component {
     classes: any,
     config: Config,
     route: Route[],
-    scene: Scene,
+    scene: Scene | SceneGrid,
     tutorial: string,
     onDoneTutorial(lastTutorial: string): void,
     onSetTutorial(nextTutorial: string): void,
@@ -114,7 +121,7 @@ class Tutorial extends React.Component {
                 Your Scenes are divided into 3 different tabs: <b>Scenes</b>, <b>Scene Generators</b>, and <b>Scene Grids</b>.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
-                From the sidebar, you can also access your Library, open another window, or access Settings.
+                From the sidebar, you can also access your Libraries, the Caption Scriptor, and Settings, or open an additional window.
               </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -163,7 +170,7 @@ class Tutorial extends React.Component {
             <DialogTitle id="tutorial-title">Scene Detail</DialogTitle>
             <DialogContent>
               <DialogContentText id="tutorial-description">
-                You've started your first Scene! A Scene is the main component of FlipFlip, where you can specify all your effects and options.
+                You've started your first Scene! A Scene is the main component of FlipFlip, where you can specify all your media sources, effects, and options.
               </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -204,7 +211,7 @@ class Tutorial extends React.Component {
                 The most important part of any Scene is its <b>sources</b>. This is a list of places (local or remote) FlipFlip will pull from.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
-                To add our first source <b>Click the add button</b>.
+                To add our first source <b>Click the add button</b> in the bottom right.
               </DialogContentText>
             </DialogContent>
           </React.Fragment>;
@@ -452,6 +459,28 @@ class Tutorial extends React.Component {
             </DialogActions>
           </React.Fragment>;
         break;
+      case SDT.backForth:
+        right = true;
+        bottom = true;
+        maxWidth = "xs";
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Back/Forth</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                This option allows you to automatically rotate between the last 2 images played at a specified interval.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                <i>We don't worry about this for now</i>
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
       case SDT.imageSizing:
         right = true;
         bottom = true;
@@ -480,7 +509,10 @@ class Tutorial extends React.Component {
             <DialogTitle id="tutorial-title">Next Scene</DialogTitle>
             <DialogContent>
               <DialogContentText id="tutorial-description">
-                You can <b>link scenes together</b>! Just choose the <b>next scene</b> to play and <b>how many <u>seconds</u></b> it should start after. You can also choose to start the next scene after all images in this scene have been shown.
+                You can <b>link scenes together</b>! Just choose the <b>next scene</b> to play and <b>how many <u>seconds</u></b> it
+                should start after. You can also choose to start the next scene after all images in this scene have
+                been shown or after a particular audio track/caption script have finished. This section will also
+                allow you to persist this Scene's audio/text effects even after transitioning to the Next Scene.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 <i>We'll leave this disabled for this tutorial</i>
@@ -552,6 +584,10 @@ class Tutorial extends React.Component {
                 When <b>Play Full Sources</b> is enabled, FlipFlip will play all images in a source before proceeding to the next one.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
+                You can control the orientation of image files, either filtering <b>only landscape</b> or <b>only portrait</b>,
+                or you can <b>force landscape</b> or <b>force portrait</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
                 You can also <b>control how long GIFs will play</b> for. This takes priority over scene timing.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
@@ -574,10 +610,9 @@ class Tutorial extends React.Component {
             <DialogTitle id="tutorial-title">Video Options</DialogTitle>
             <DialogContent>
               <DialogContentText id="tutorial-description">
-                You can <b>control how long videos will play</b> for and <b>at what speed</b>. You can also choose to
-                <b> start videos at a random timestamp</b> and/or to <b>have videos continue</b> (rather than restart
-                each time they appear). You can also choose to <b>rotate portrait videos</b> so they appear in
-                landsacpe orientation.
+                You can <b>control how long videos will play</b> for, as well their <b>orientation</b> and <b>speed</b>.
+                You can also choose to <b>start videos at a random timestamp</b> and/or to <b>have videos continue</b>
+                (rather than restart each time they appear).
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 Lastly, you can <b>choose to use Clips or not</b>. Clips can only be created for individual videos and
@@ -1026,8 +1061,16 @@ class Tutorial extends React.Component {
           <React.Fragment>
             <DialogTitle id="tutorial-title">Library</DialogTitle>
             <DialogContent>
-              <DialogContentText id="tutorial-description">
-                From here we can <b>manage tags</b>, <b>batch tag sources</b>, <b>import remote sources</b>, and <b>mark offline sources</b>.
+              <DialogContentText id="tutorial-description" component="div">
+                From here, we can
+                <ul>
+                  <li><b>manage tags</b></li>
+                  <li><b>batch tag sources</b></li>
+                  <li><b>find mergeable sources</b> (local directories with the same tags)</li>
+                  <li><b>import remote sources</b></li>
+                  <li><b>mark offline sources</b></li>
+                  <li><b>detect video resolution/duration</b></li>
+                </ul>
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 <b>Remote source imports</b> (<i>Tumblr</i>, <i>Reddit</i>, <i>Twitter</i>, <i>Instagram</i>) will appear after you have logged into the relevant service in <b>Settings</b>.
@@ -1147,9 +1190,15 @@ class Tutorial extends React.Component {
           <React.Fragment>
             <DialogTitle id="tutorial-title">Audio Library</DialogTitle>
             <DialogContent>
-              <DialogContentText id="tutorial-description">
-                From here we can also <b>manage tags</b>, <b>add tracks to playlists</b>, <b>batch tag tracks</b>,
-                and <b>batch edit tracks</b>.
+              <DialogContentText id="tutorial-description" component="div">
+                From here we can
+                <ul>
+                  <li><b>manage tags</b></li>
+                  <li><b>add tracks to playlists</b></li>
+                  <li><b>batch tag tracks</b></li>
+                  <li><b>batch edit tracks</b></li>
+                  <li><b>detect BPM of tracks</b></li>
+                </ul>
               </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -1177,6 +1226,273 @@ class Tutorial extends React.Component {
             <DialogActions>
               <Button onClick={this.onContinue.bind(this)} color="primary">
                 Back to Audio Library
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+
+      case SLT.welcome:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Script Library</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                This is your <b>Script Library</b>. Similar to the Source Library, here you can <b>organize</b> all
+                your different caption scripts and use them <b>with your Scenes</b>.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onSkip.bind(this)} color="secondary">
+                Skip Tutorial
+              </Button>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case SLT.library:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Script Library</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                To get started, click the + icon and <b>add scripts</b> from your computer or from an online URL.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                Just like the Source Library, click a track's <b>Avatar</b> to play it and apply tags.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case SLT.toolbar:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Script Library</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                Use the <b>search bar</b> in the top right to <b>filter the scripts</b> you are viewing.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case SLT.sidebar1:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Script Library</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                The sidebar has some other helpful tools.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                <b>Click the Hamburger button to expand the sidebar</b>
+              </DialogContentText>
+            </DialogContent>
+          </React.Fragment>;
+        break;
+      case SLT.sidebar2:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Script Library</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                From here we can also <b>manage tags</b> and <b>batch tag scripts</b>.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case SLT.final:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Script Library</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                That's about it for the <b>Script Library</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                You can easily get your Library started by adding some <b>local scripts</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                After you've <b>added a few tags</b>, you can <b>tag scripts by clicking their Avatar</b>.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Back to Script Library
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+
+
+      case CST.welcome:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Caption Scriptor</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                This is the <b>Caption Scriptor</b>. Here, you can write, test, and modify caption scripts.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onSkip.bind(this)} color="secondary">
+                Skip Tutorial
+              </Button>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case CST.code:
+        left = true;
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Caption Scriptor</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                This is the <b>code section</b>, where you can <b>write</b> and <b>edit</b> caption scripts. As you type,
+                your <b>code syntax</b> will be highlighted, and any <b>errors</b> should appear <b>above</b> the code
+                block.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                We've input a very basic <b>test script</b> so you can see how it works.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                <b>TIP:</b> <i>Click the gutter numbers to jump to that spot in the script!</i>
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case CST.player:
+        right = true;
+        bottom = true;
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Caption Scriptor</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                In the top right, you can <b>test</b> your caption script <b>playback</b> in realtime! As you make changes to your
+                script, the playback will restart.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                <b>NOTE: </b> The sizing here is approximate to how it would look during Scene playback. For a better
+                test, select a scene from the dropdown and click the Fullscreen button in the top right to see exactly
+                how it will look.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case CST.fonts:
+        right = true;
+        top = true;
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Caption Scriptor</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                The bottom right section controls the <b>fonts</b> for each action <b>command</b>. You can control the <b>font family</b>, <b>font size</b>, and <b>font color</b>,
+                as well as <b>border width</b> and <b>border color</b> for each <b>command</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                You should be able to use <b>any system fonts</b>.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case CST.menu:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Caption Scriptor</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                The center column includes a number of <b>menu buttons</b>:
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                <InsertDriveFileIcon /> Create a <b>new</b> script
+                <br/>
+                <FolderIcon /> <b>Open</b> a script from your local drive or your library
+                <br/>
+                <SaveIcon /> <b>Save</b> a script to a local file or your library
+                <br/>
+                <GetAppIcon /> <b>Load</b> a script from the currently playing scene
+              </DialogContentText>
+              <hr/>
+              <DialogContentText id="tutorial-description">
+                Select a <b>Scene</b> from the dropdown to test with it. This will also allow you to test
+                in <b>fullcreen</b> and with <b>audio</b>.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case CST.actions:
+        bottom = true;
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Caption Scriptor</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                This is a list of all the <b>commands</b> that can be used in FlipFlip. Click one to insert it at the
+                current cursor position.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case CST.final:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Caption Scriptor</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                That should be all you need to start writing your <b>very own</b> scripts!
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                More information about each command can be found by following the <b>documentation</b> link.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Back to Caption Scriptor
               </Button>
             </DialogActions>
           </React.Fragment>;
@@ -1348,6 +1664,11 @@ class Tutorial extends React.Component {
                 <b>Make this grid <u>2x2</u></b>
               </DialogContentText>
             </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onSkipStep.bind(this)} color="secondary">
+                Skip
+              </Button>
+            </DialogActions>
           </React.Fragment>;
         break;
       case SGT.cells:
@@ -1424,8 +1745,8 @@ class Tutorial extends React.Component {
                 At the <b>bottom of the screen</b> are the typical <b>video controls</b>.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
-                You can <b>seek</b> through the video, <b>play/pause</b>, and change the <b>volume</b>. You
-                will also see the <b>start time</b> of the clips you make <b>show up</b> on the seek bar.
+                You can <b>seek</b> through the video, <b>play/pause</b>, and change the <b>volume</b>. As you are
+                making your clip, the seek bar will adjust to your given <b>start/end times</b>.
               </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -1539,7 +1860,7 @@ class Tutorial extends React.Component {
             return;
         }
       case "scene":
-        if (this.props.scene.generatorWeights == null) {
+        if ((this.props.scene as Scene).generatorWeights == null) {
           switch (this.props.config.tutorials.sceneDetail) {
             case SDT.welcome:
               this.setTutorial(SDT.title);
@@ -1581,6 +1902,9 @@ class Tutorial extends React.Component {
               this.setTutorial(SDT.timing);
               return;
             case SDT.timing:
+              this.setTutorial(SDT.backForth);
+              return;
+            case SDT.backForth:
               this.setTutorial(SDT.imageSizing);
               return;
             case SDT.imageSizing:
@@ -1614,21 +1938,21 @@ class Tutorial extends React.Component {
               this.setTutorial(SDT.effects2);
               return;
             case SDT.effects2:
-              if (this.props.scene.zoom == true) {
+              if ((this.props.scene as Scene).zoom == true) {
                 this.props.onDoneTutorial(SDT.zoom1);
               } else {
                 this.setTutorial(SDT.zoom1);
               }
               return;
             case SDT.zoom1:
-              if (this.props.scene.zoomStart == 0.8 && this.props.scene.zoomEnd == 1.2) {
+              if ((this.props.scene as Scene).zoomStart == 0.8 && (this.props.scene as Scene).zoomEnd == 1.2) {
                 this.props.onDoneTutorial(SDT.zoom2);
               } else {
                 this.setTutorial(SDT.zoom2);
               }
               return;
             case SDT.zoom2:
-              if (this.props.scene.transTF == TF.sin) {
+              if ((this.props.scene as Scene).transTF == TF.sin) {
                 this.props.onDoneTutorial(SDT.zoom3);
               } else {
                 this.setTutorial(SDT.zoom3);
@@ -1638,7 +1962,7 @@ class Tutorial extends React.Component {
               this.setTutorial(SDT.zoom4);
               return;
             case SDT.zoom4:
-              if (this.props.scene.crossFade) {
+              if ((this.props.scene as Scene).crossFade) {
                 this.props.onDoneTutorial(SDT.fade1);
               } else {
                 this.setTutorial(SDT.fade1);
@@ -1759,6 +2083,59 @@ class Tutorial extends React.Component {
           default:
             return;
         }
+      case "scripts":
+        switch (this.props.config.tutorials.scripts) {
+          case SLT.welcome:
+            this.setTutorial(SLT.library);
+            return;
+          case SLT.library:
+            this.setTutorial(SLT.toolbar);
+            return;
+          case SLT.toolbar:
+            this.setTutorial(SLT.sidebar1);
+            return;
+          case SLT.sidebar1:
+            this.setTutorial(SLT.sidebar2);
+            return;
+          case SLT.sidebar2:
+            this.setTutorial(SLT.final);
+            return;
+          case SLT.final:
+          case SLT.done:
+            // We're done, don't show
+            this.setTutorial(null);
+            return;
+          default:
+            return;
+        }
+      case "scriptor":
+        switch (this.props.config.tutorials.scriptor) {
+          case CST.welcome:
+            this.setTutorial(CST.code);
+            return;
+          case CST.code:
+            this.setTutorial(CST.player);
+            return;
+          case CST.player:
+            this.setTutorial(CST.fonts);
+            return;
+          case CST.fonts:
+            this.setTutorial(CST.menu);
+            return;
+          case CST.menu:
+            this.setTutorial(CST.actions);
+            return;
+          case CST.actions:
+            this.setTutorial(CST.final);
+            return;
+          case CST.final:
+          case CST.done:
+            // We're done, don't show
+            this.setTutorial(null);
+            return;
+          default:
+            return;
+        }
       case "grid":
         switch (this.props.config.tutorials.sceneGrid) {
           case SGT.welcome:
@@ -1814,17 +2191,20 @@ class Tutorial extends React.Component {
   onSkipStep() {
     switch (this.props.tutorial) {
       case SDT.zoom1:
-        this.props.scene.zoom = true;
+        (this.props.scene as Scene).zoom = true;
         break;
       case SDT.zoom2:
-        this.props.scene.zoomStart = 0.8;
-        this.props.scene.zoomEnd = 1.2;
+        (this.props.scene as Scene).zoomStart = 0.8;
+        (this.props.scene as Scene).zoomEnd = 1.2;
         break;
       case SDT.zoom3:
-        this.props.scene.transTF = TF.sin;
+        (this.props.scene as Scene).transTF = TF.sin;
         break;
       case SDT.fade1:
-        this.props.scene.crossFade = true;
+        (this.props.scene as Scene).crossFade = true;
+        break;
+      case SGT.dimensions:
+        (this.props.scene as SceneGrid).grid = [[-1, -1], [-1, -1]];
         break;
     }
     this.onContinue();

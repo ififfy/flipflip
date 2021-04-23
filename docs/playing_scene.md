@@ -23,7 +23,7 @@ While a Scene is playing, you can right click on an image to get more informatio
 
 * The image's source and individual URL are always shown (click to copy to the clipboard).
 * Press Ctrl+C or select "Copy Image" to attempt to copy the image itself to the clipboard. 
-  * _This does not work for .gif or video._ 
+  * _Image image cannot be copied to clipboard, path will be copied instead_ 
 * You can choose to open the source or image directly.
  * _Will use your system's default app for opening that type of link._
 * If this image is not from the cache, you can add it to the blacklist for its source. 
@@ -53,15 +53,20 @@ These hotkeys only work for the window in focus.
 
 Use the arrow keys (← / →) to navigate through playback history. Use `Space` to pause/resume playback. 
 
-| Hotkey   | Function             |
-|:--------:|:--------------------:|
-| Space    | Play/Pause           |
-| ← →      | Navigate History     |
-| [ ]      | Navigate Tagging     |
-| Esc      | Exit Scene           |
-| Del      | Delete Image         |
-| Ctrl+C   | Copy Image           |
-| Ctrl+F   | Toggle Fullscreen    |
-| Ctrl+T   | Toggle Always On Top |
-| Ctrl+G   | Toggle Menu Bar      |
+| Hotkey        | Function                    |
+|:-------------:|:---------------------------:|
+| Space         | Play/Pause                  |
+| ← →           | Navigate History            |
+| Shift + Space | Play/Pause Video            |
+| Shift + ← →   | Back/Forward 15sec of Video |
+| Mouse Wheel   | Volume Up/Down              |
+| [ ]           | Navigate Tagging            |
+| Esc           | Exit Scene                  |
+| Del           | Delete Image                |
+| Ctrl+C        | Copy Image/Path             |
+| Ctrl+F        | Toggle Fullscreen           |
+| Ctrl+T        | Toggle Always On Top        |
+| Ctrl+G        | Toggle Menu Bar             |
+
+?> Note: Video controls only work for main Scene (not Overlays). Scrolling volume control only works while the sidebar is hidden.
 

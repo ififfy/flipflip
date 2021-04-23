@@ -29,7 +29,9 @@ import MovieIcon from '@material-ui/icons/Movie';
 import PhotoFilterIcon from '@material-ui/icons/PhotoFilter';
 import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import PublishIcon from '@material-ui/icons/Publish';
+import RestoreIcon from "@material-ui/icons/Restore";
 import SaveIcon from '@material-ui/icons/Save';
+import ShuffleIcon from "@material-ui/icons/Shuffle";
 import SortIcon from '@material-ui/icons/Sort';
 import WarningIcon from '@material-ui/icons/Warning';
 
@@ -47,6 +49,10 @@ import URLDialog from "./URLDialog";
 import LibrarySearch from "../library/LibrarySearch";
 import SourceList from "../library/SourceList";
 import AudioTextEffects from "./AudioTextEffects";
+import {areWeightsValid} from "../../data/utils";
+import Audio from "../../data/Audio";
+import CaptionScript from "../../data/CaptionScript";
+import SceneGrid from "../../data/SceneGrid";
 
 const drawerWidth = 240;
 
@@ -314,6 +320,7 @@ class SceneDetail extends React.Component {
   readonly props: {
     classes: any,
     allScenes: Array<Scene>,
+    allSceneGrids: Array<SceneGrid>,
     autoEdit: boolean,
     config: Config,
     library: Array<LibrarySource>,
@@ -322,6 +329,7 @@ class SceneDetail extends React.Component {
     tutorial: string,
     goBack(): void,
     onAddSource(scene: Scene, type: string, ...args: any[]): void,
+    onAddScript(playlistIndex: number): void,
     onAddTracks(playlistIndex: number): void,
     onClearBlacklist(sourceURL: string): void,
     onClip(source: LibrarySource, displayed: Array<LibrarySource>): void,
@@ -329,9 +337,12 @@ class SceneDetail extends React.Component {
     onDelete(scene: Scene): void,
     onEditBlacklist(sourceURL: string, blacklist: string): void,
     onExport(scene: Scene): void,
-    onGenerate(scene: Scene): void,
+    onGenerate(scenes: Array<Scene>): void,
     onPlayScene(scene: Scene): void,
     onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void,
+    onPlayAudio(source: Audio, displayed: Array<Audio>): void,
+    onPlayScript(source: CaptionScript, sceneID: number, displayed: Array<CaptionScript>): void,
+    onResetScene(scene: Scene): void,
     onSaveAsScene(scene: Scene): void,
     onSort(scene: Scene, algorithm: string, ascending: boolean): void,
     onTutorial(tutorial: string): void,
@@ -393,7 +404,7 @@ class SceneDetail extends React.Component {
 
             <Fab
               className={clsx(classes.playButton, this.props.tutorial == SDT.play && classes.highlight)}
-              disabled={this.props.scene.sources.length == 0}
+              disabled={this.props.scene.sources.length == 0 && (!this.props.scene.regenerate || !areWeightsValid(this.props.scene))}
               color="secondary"
               aria-label="Play"
               onClick={this.onPlayScene.bind(this)}>
@@ -479,6 +490,14 @@ class SceneDetail extends React.Component {
                 <ListItemText primary="Export Scene" />
               </ListItem>
             </Tooltip>
+            <Tooltip title={this.state.drawerOpen ? "" : "Restore Defaults"}>
+              <ListItem button onClick={this.props.onResetScene.bind(this, this.props.scene)} className={clsx((this.props.tutorial == SDT.options1 || this.props.tutorial == SDT.effects1) && classes.disable)}>
+                <ListItemIcon>
+                  <RestoreIcon/>
+                </ListItemIcon>
+                <ListItemText primary={"Restore Defaults"} />
+              </ListItem>
+            </Tooltip>
             <Tooltip title={this.state.drawerOpen ? "" : "Delete Scene"}>
               <ListItem button onClick={this.onDeleteScene.bind(this, this.props.scene)}
                         className={clsx(classes.deleteItem, (this.props.tutorial == SDT.options1 || this.props.tutorial == SDT.effects1) && classes.disable)}>
@@ -528,6 +547,7 @@ class SceneDetail extends React.Component {
                   <Box p={2} className={classes.fill}>
                     <SceneOptions
                       allScenes={this.props.allScenes}
+                      allSceneGrids={this.props.allSceneGrids}
                       scene={this.props.scene}
                       tutorial={this.props.tutorial}
                       onUpdateScene={this.props.onUpdateScene.bind(this)} />
@@ -568,8 +588,12 @@ class SceneDetail extends React.Component {
                   <Box p={2} className={classes.fill}>
                     <AudioTextEffects
                       scene={this.props.scene}
+                      onPlayAudio={this.props.onPlayAudio.bind(this)}
+                      onPlayScript={this.props.onPlayScript.bind(this)}
                       onAddTracks={this.props.onAddTracks.bind(this)}
-                      onUpdateScene={this.props.onUpdateScene.bind(this)} />
+                      onAddScript={this.props.onAddScript.bind(this)}
+                      onUpdateScene={this.props.onUpdateScene.bind(this)}
+                      systemMessage={this.props.systemMessage.bind(this)}/>
                   </Box>
                 </div>
               </Typography>
@@ -737,7 +761,7 @@ class SceneDetail extends React.Component {
                   classes={{paper: classes.sortMenu}}
                   open={this.state.openMenu == MO.sort}
                   onClose={this.onCloseDialog.bind(this)}>
-                  {Object.values(SF).map((sf) =>
+                  {Object.values(SF).filter((sf) => sf != SF.random).map((sf) =>
                     <MenuItem key={sf}>
                       <ListItemText primary={en.get(sf)}/>
                       <ListItemSecondaryAction>
@@ -750,6 +774,14 @@ class SceneDetail extends React.Component {
                       </ListItemSecondaryAction>
                     </MenuItem>
                   )}
+                  <MenuItem key={SF.random}>
+                    <ListItemText primary={en.get(SF.random)}/>
+                    <ListItemSecondaryAction>
+                      <IconButton edge="end" onClick={this.props.onSort.bind(this, this.props.scene, SF.random, true)}>
+                        <ShuffleIcon/>
+                      </IconButton>
+                    </ListItemSecondaryAction>
+                  </MenuItem>
                 </Menu>
               </React.Fragment>
             )}
@@ -843,16 +875,17 @@ class SceneDetail extends React.Component {
               </Fab>
             </Tooltip>
             <Tooltip title="Generate Sources" placement="top-end">
-              <span className={clsx(classes.generateTooltip, this.props.tutorial == SDGT.buttons && clsx(classes.backdropTop, classes.disable), this.props.tutorial == SDGT.generate && classes.backdropTop)} style={!this.areWeightsValid() ? { pointerEvents: "none" } : {}}>
+              <span className={clsx(classes.generateTooltip, this.props.tutorial == SDGT.buttons && clsx(classes.backdropTop, classes.disable), this.props.tutorial == SDGT.generate && classes.backdropTop)}
+                    style={!areWeightsValid(this.props.scene) ? { pointerEvents: "none" } : {}}>
                 <Fab
-                  disabled={!this.areWeightsValid()}
+                  disabled={!areWeightsValid(this.props.scene)}
                   className={clsx(classes.addMenuButton, this.props.tutorial == SDGT.generate && classes.highlight)}
                   onClick={this.onGenerate.bind(this)}
                   size="large">
                   <Badge
                     color="secondary"
                     max={100}
-                    invisible={this.areWeightsValid()}
+                    invisible={areWeightsValid(this.props.scene)}
                     badgeContent={this.getRemainingPercent()}>
                     <CachedIcon className={classes.icon} />
                   </Badge>
@@ -947,6 +980,37 @@ class SceneDetail extends React.Component {
     if (this.props.tutorial == SDT.play) {
       this.props.onTutorial(SDT.play);
     }
+
+    // Regenerate scene(s) before playback
+    const generateScenes: Array<Scene> = []
+    if (this.props.scene.regenerate && areWeightsValid(this.props.scene)) {
+      generateScenes.push(this.props.scene);
+    }
+    if (this.props.scene.overlayEnabled) {
+      for (let overlay of this.props.scene.overlays) {
+        if (overlay.sceneID.toString().startsWith('999')) {
+          const id = overlay.sceneID.toString().replace('999', '');
+          const oScene = this.props.allSceneGrids.find((s) => s.id.toString() == id);
+          for (let row of oScene.grid) {
+            for (let sceneID of row) {
+              const gScene = this.props.allScenes.find((s) => s.id == sceneID);
+              if (gScene && gScene.generatorWeights && gScene.regenerate && areWeightsValid(gScene)) {
+                generateScenes.push(gScene);
+              }
+            }
+          }
+        } else {
+          const oScene = this.props.allScenes.find((s) => s.id == overlay.sceneID);
+          if (oScene && oScene.generatorWeights && oScene.regenerate && areWeightsValid(oScene)) {
+            generateScenes.push(oScene);
+          }
+        }
+      }
+    }
+    if (generateScenes.length > 0) {
+      this.props.onGenerate(generateScenes);
+    }
+
     this.props.onPlayScene(this.props.scene);
   }
 
@@ -960,46 +1024,9 @@ class SceneDetail extends React.Component {
     return remaining;
   }
 
-  areRulesValid(wg: WeightGroup) {
-    let rulesHasAll = false;
-    let rulesHasWeight = false;
-    let rulesRemaining = 100;
-    for (let rule of wg.rules) {
-      if (rule.type == TT.weight) {
-        rulesRemaining = rulesRemaining - rule.percent;
-        rulesHasWeight = true;
-      }
-      if (rule.type == TT.all) {
-        rulesHasAll = true;
-      }
-    }
-    return (rulesRemaining == 100 && rulesHasAll && !rulesHasWeight) || rulesRemaining == 0;
-  }
-
-  areWeightsValid(): boolean {
-    let remaining = 100;
-    let hasAll = false;
-    let hasWeight = false;
-    for (let wg of this.props.scene.generatorWeights) {
-      if (wg.rules) {
-        const rulesValid = this.areRulesValid(wg);
-        if (!rulesValid) return false;
-      }
-      if (wg.type == TT.weight) {
-        remaining = remaining - wg.percent;
-        hasWeight = true;
-      }
-      if (wg.type == TT.all) {
-        hasAll = true;
-      }
-    }
-
-    return (remaining == 100 && hasAll && !hasWeight) || remaining == 0;
-  }
-
   onGenerate() {
-    this.props.onGenerate(this.props.scene);
-    setTimeout(this.generateCallback.bind(this), 250);
+    this.props.onGenerate([this.props.scene]);
+    this.generateCallback();
   }
 
   generateCallback() {
@@ -1064,6 +1091,8 @@ class SceneDetail extends React.Component {
     if (this.props.tutorial == SDT.add2) {
       this.props.onTutorial(SDT.add2);
       this.props.onAddSource(this.props.scene, "tutorial");
+    } else if (addFunction == AF.videos && e.shiftKey) {
+        this.props.onAddSource(this.props.scene, AF.videoDir, ...args);
     } else {
       this.props.onAddSource(this.props.scene, addFunction, ...args);
     }

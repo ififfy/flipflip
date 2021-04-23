@@ -1,5 +1,71 @@
 # Changelog
 
+## 3.1.1 <small>(03/12/2021)</small>
+- Allow Scenes to use Grids as overlays
+- Add Back/Forth option
+- Add options for image/video orientation
+- Add BPM Detection to Audio Library
+- Add warning when using 'Audio BPM' timing, but with no BPM metadata 
+- Add ability to recursively import directories of videos/audio/scripts
+- Add option to prevent Portable Mode from saving locally
+- Add options to persist audios/captions through Next Scenes
+- Allow caption script to trigger audio files
+- Allow caption script to advance scene 
+- Show sort button while importing from library
+- Allow video controls to skip to the next source during Scene playback
+- Improve some booru scraping
+- Add additional player hotkeys
+- Fix bug preventing scene from overlaying itself 
+- Fix bug when migrating to 3.1.x with an empty audio track
+- Fix bug with Portable Mode
+- Fix bug with library source IDs
+- Fix bug with RedGif parsing
+- Fix bug with grid loading
+- Fix bug with auto-generation of overlays/grids
+
+## 3.1.0 <small>(02/17/2021)</small>
+- Add ability to detect and use video duration/resolution
+- Add ability to set caption opacity globally and within script
+- Add progress bar capability with caption count command
+- Allow overlays to use 100% opacity
+- Fix bug with caption timing
+- Fix bug with single caption script not properly repeating
+- Fix bug with stored phrases not resetting
+- Fix bug with adding unavailable audio track
+- Fix bug with Mac filepaths
+- Fix bug with Hydrus
+
+#### 3.1.0-beta2 <small>(01/19/2021)</small>
+- Caption Scriptor
+- Caption Script Library
+- Timing functions for caption scripts
+- Timestamps in caption script
+- Sync audio with caption script timestamps
+- Newlines in caption scripts
+- Store caption phrases in separate groups
+- Change command position in caption scripts
+- Multiple concurrent Caption Script playlists
+- Allow generators to auto-generate on playback
+- Add Hydrus as source
+- Add dynamic watermark
+- Allow scenes to restore from configured defaults
+- Allow saved Reddit posts as source
+- Allow Tumblr throttle alert to be disabled
+- Make tag background translucent
+- Add scraper for E621
+- Improve RedGif parsing
+- Add Random sort function
+- Fix bug with GoTo Clip Source
+- Fix bug where scraping threads would die
+- Fix bug with audio tag ordering
+- Fix bug with backslash in search
+- Fix bug with centered images
+- Fix bug with BDSMlr sources
+- Fix bug with loading system fonts
+- Fix bug with audio repeat functions
+- Fix bug with scene generator using weighted types
+- Fix bug with copying remote images to clipboard
+
 #### 3.1.0-beta1 <small>(09/25/2020)</small>
 - Easing Controls
 - Audio Library
