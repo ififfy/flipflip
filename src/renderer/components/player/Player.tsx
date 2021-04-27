@@ -623,7 +623,7 @@ export default class Player extends React.Component {
         })
       }
     }
-    if (this.props.allLoaded == true && props.allLoaded == false) {
+    if ((this.props.allLoaded == true && props.allLoaded == false) || (this.props.hasStarted && this.props.hasStarted != props.hasStarted)) {
       this.start(true);
     }
   }
@@ -685,6 +685,7 @@ export default class Player extends React.Component {
       this.props.tags !== props.tags ||
       this.props.gridView !== props.gridView ||
       this.props.allLoaded !== props.allLoaded ||
+      this.props.hasStarted !== props.hasStarted ||
       this.state.canStart !== state.canStart ||
       this.state.hasStarted !== state.hasStarted ||
       this.state.isMainLoaded !== state.isMainLoaded ||
@@ -791,7 +792,7 @@ export default class Player extends React.Component {
       this.props.onLoaded();
     }
     if (force || (canStart && ((isLoaded && (this.props.allLoaded == undefined || this.props.allLoaded)) || this.props.config.displaySettings.startImmediately))) {
-      this.setState({hasStarted: true, isLoaded: true, startTime: this.state.startTime ?  this.state.startTime : new Date()});
+      this.setState({hasStarted: this.props.hasStarted != null ? this.props.hasStarted : true, isLoaded: true, startTime: this.state.startTime ?  this.state.startTime : new Date()});
     } else {
       this.setState({isLoaded: isLoaded});
     }
