@@ -3075,7 +3075,7 @@ export function updateVideoMetadata(getState: () => State, setState: Function) {
   }
 
   // If we don't have an import running
-  if (!state.progressMode) {
+  if (!state.progressMode && actionableLibrary.length) {
     state.progressMode = PR.videoMetadata;
     state.progressCurrent = 0;
     state.progressTotal = actionableLibrary.length;
