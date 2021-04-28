@@ -623,6 +623,25 @@ export default class Player extends React.Component {
         })
       }
     }
+    if (this.props.scene.overlayEnabled != props.scene.overlayEnabled) {
+      this.setState({overlayVideos: Array<Array<HTMLVideoElement>>(this.props.scene.overlays.length).fill(null).map((n) => [null])});
+    } else if (this.props.scene.overlays != props.scene.overlays) {
+      if (this.props.scene.overlays.length == props.scene.overlays.length) {
+        for (let o = 0; o < this.props.scene.overlays.length; o++) {
+          if (this.props.scene.overlays[o].sceneID != props.scene.overlays[o].sceneID) {
+            this.clearOverlayVideo(o);
+            break;
+          }
+        }
+      } else if (this.props.scene.overlays.length < props.scene.overlays.length) {
+        for (let o = 0; o < this.props.scene.overlays.length; o++) {
+          if (this.props.scene.overlays[o].sceneID != props.scene.overlays[o].sceneID) {
+            this.spliceOverlayVideo(o);
+            break;
+          }
+        }
+      }
+    }
     if ((this.props.allLoaded == true && props.allLoaded == false) || (this.props.hasStarted && this.props.hasStarted != props.hasStarted)) {
       this.start(true);
     }
@@ -759,6 +778,24 @@ export default class Player extends React.Component {
 
   setMainVideo(video: HTMLVideoElement) {
     this.setState({mainVideo: video});
+  }
+
+  spliceOverlayVideo(index: number) {
+    const newOV = Array.from(this.state.overlayVideos);
+    while (newOV.length <= index) {
+      newOV.push([null]);
+    }
+    newOV.splice(index, 1);
+    this.setState({overlayVideos: newOV});
+  }
+
+  clearOverlayVideo(index: number) {
+    const newOV = Array.from(this.state.overlayVideos);
+    while (newOV.length <= index) {
+      newOV.push([null]);
+    }
+    newOV[index] = [null];
+    this.setState({overlayVideos: newOV});
   }
 
   setOverlayVideo(index: number, video: HTMLVideoElement) {
