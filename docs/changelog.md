@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.1.2 <small>(04/29/2021)</small>
+- Allow Play Full video to advance even when seeking
+- Fix subtitle styling and add to video clipper
+- Fix bugs with portable mode
+- Fix bugs with sidebar video controls
+- Fix bug with regenerating empty scene
+- Fix bug with grid loading in wrong size
+- Fix bug with incorrect audio alert/watermark when shuffling
+- Fix bug where cursor wasn't hidden when using grid overlay
+- Fix bug where configuring default scene resulted in white screen
+
 ## 3.1.1 <small>(03/12/2021)</small>
 - Allow Scenes to use Grids as overlays
 - Add Back/Forth option
