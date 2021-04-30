@@ -623,7 +623,26 @@ export default class Player extends React.Component {
         })
       }
     }
-    if (this.props.allLoaded == true && props.allLoaded == false) {
+    if (this.props.scene.overlayEnabled != props.scene.overlayEnabled) {
+      this.setState({overlayVideos: Array<Array<HTMLVideoElement>>(this.props.scene.overlays.length).fill(null).map((n) => [null])});
+    } else if (this.props.scene.overlays != props.scene.overlays) {
+      if (this.props.scene.overlays.length == props.scene.overlays.length) {
+        for (let o = 0; o < this.props.scene.overlays.length; o++) {
+          if (this.props.scene.overlays[o].sceneID != props.scene.overlays[o].sceneID) {
+            this.clearOverlayVideo(o);
+            break;
+          }
+        }
+      } else if (this.props.scene.overlays.length < props.scene.overlays.length) {
+        for (let o = 0; o < this.props.scene.overlays.length; o++) {
+          if (this.props.scene.overlays[o].sceneID != props.scene.overlays[o].sceneID) {
+            this.spliceOverlayVideo(o);
+            break;
+          }
+        }
+      }
+    }
+    if ((this.props.allLoaded == true && props.allLoaded == false) || (this.props.hasStarted && this.props.hasStarted != props.hasStarted)) {
       this.start(true);
     }
   }
@@ -685,6 +704,7 @@ export default class Player extends React.Component {
       this.props.tags !== props.tags ||
       this.props.gridView !== props.gridView ||
       this.props.allLoaded !== props.allLoaded ||
+      this.props.hasStarted !== props.hasStarted ||
       this.state.canStart !== state.canStart ||
       this.state.hasStarted !== state.hasStarted ||
       this.state.isMainLoaded !== state.isMainLoaded ||
@@ -760,6 +780,24 @@ export default class Player extends React.Component {
     this.setState({mainVideo: video});
   }
 
+  spliceOverlayVideo(index: number) {
+    const newOV = Array.from(this.state.overlayVideos);
+    while (newOV.length <= index) {
+      newOV.push([null]);
+    }
+    newOV.splice(index, 1);
+    this.setState({overlayVideos: newOV});
+  }
+
+  clearOverlayVideo(index: number) {
+    const newOV = Array.from(this.state.overlayVideos);
+    while (newOV.length <= index) {
+      newOV.push([null]);
+    }
+    newOV[index] = [null];
+    this.setState({overlayVideos: newOV});
+  }
+
   setOverlayVideo(index: number, video: HTMLVideoElement) {
     const newOV = Array.from(this.state.overlayVideos);
     while (newOV.length <= index) {
@@ -791,7 +829,7 @@ export default class Player extends React.Component {
       this.props.onLoaded();
     }
     if (force || (canStart && ((isLoaded && (this.props.allLoaded == undefined || this.props.allLoaded)) || this.props.config.displaySettings.startImmediately))) {
-      this.setState({hasStarted: true, isLoaded: true, startTime: this.state.startTime ?  this.state.startTime : new Date()});
+      this.setState({hasStarted: this.props.hasStarted != null ? this.props.hasStarted : true, isLoaded: true, startTime: this.state.startTime ?  this.state.startTime : new Date()});
     } else {
       this.setState({isLoaded: isLoaded});
     }

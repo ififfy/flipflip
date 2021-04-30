@@ -890,7 +890,9 @@ export default class ImagePlayer extends React.Component {
         timeToNextFrame,
       });
       this._count++;
-      this._timeout = setTimeout(this.advance.bind(this, false, true), timeToNextFrame);
+      if (!(nextImg instanceof HTMLVideoElement) || this.props.scene.videoOption != VO.full) {
+        this._timeout = setTimeout(this.advance.bind(this, false, true), timeToNextFrame);
+      }
     }
   }
 };

@@ -225,7 +225,7 @@ class SourceListItem extends React.Component {
                   color="secondary"
                   size="small"/>
               )}
-              {(sourceType == ST.video && this.props.source.resolution) && (
+              {(sourceType == ST.video && !!this.props.source.resolution) && (
                 <Chip
                   className={classes.countChip}
                   label={`${this.props.source.resolution}p`}
