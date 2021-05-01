@@ -1479,9 +1479,6 @@ function loadHydrus(systemMessage: Function, config: Config, source: LibrarySour
       });
     }
 
-    const tagsRegex = /tags=([^&]*)&?.*$/.exec(source.url);
-    let noTags = tagsRegex == null || tagsRegex.length <= 1;
-
     return new CancelablePromise((resolve) => {
       const getSessionKey = () => {
         wretch(hydrusURL + "/session_key")
@@ -1505,7 +1502,7 @@ function loadHydrus(systemMessage: Function, config: Config, source: LibrarySour
 
       let pages = 0;
       const search = () => {
-        const url = noTags ? hydrusURL + "/get_files/search_files" : hydrusURL + "/get_files/search_files?tags=" + tagsRegex[1];
+        const url = source.url;
         wretch(url)
           .headers({"Hydrus-Client-API-Session-Key": sessionKey})
           .get()
