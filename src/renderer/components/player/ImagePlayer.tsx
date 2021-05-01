@@ -735,7 +735,7 @@ export default class ImagePlayer extends React.Component {
       };
 
       // Get gifinfo if we need for imageFilter or playing full gif
-      if ((this.props.scene.imageTypeFilter == IF.gifs || this.props.scene.imageTypeFilter == IF.stills || this.props.scene.gifOption != GO.none) && url.toLocaleLowerCase().endsWith('.gif')) {
+      if (this.props.scene.imageTypeFilter == IF.gifs || this.props.scene.imageTypeFilter == IF.stills || this.props.scene.gifOption != GO.none) {
         // Get gif info. See https://github.com/Prinzhorn/gif-info
         try {
           if (url.includes("file://")) {
