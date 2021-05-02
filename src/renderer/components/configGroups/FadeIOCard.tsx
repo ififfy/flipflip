@@ -65,7 +65,7 @@ class FadeIOCard extends React.Component {
     const fadeDurationMax = typeof this.props.scene.fadeIODurationMax === 'number' ? this.props.scene.fadeIODurationMax : 0;
 
     const playlists = (this.props.scene.audioPlaylists as {audios: Audio[], shuffle: boolean, repeat: string}[]);
-    const hasBPM = playlists.length && playlists[0].audios.length && playlists[0].audios[0].bpm;
+    const hasBPM = !!playlists && playlists.length && playlists[0].audios.length && playlists[0].audios[0].bpm;
     return(
       <Grid container spacing={this.props.scene.fadeInOut ? 2 : 0} alignItems="center" className={clsx(this.props.tutorial != null && classes.disable)}>
         <Grid item xs={12}>

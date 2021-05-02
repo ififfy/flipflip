@@ -83,7 +83,7 @@ class ZoomMoveCard extends React.Component {
     const transDurationMax = typeof this.props.scene.transDurationMax === 'number' ? this.props.scene.transDurationMax : 0;
 
     const playlists = (this.props.scene.audioPlaylists as {audios: Audio[], shuffle: boolean, repeat: string}[]);
-    const hasBPM = playlists.length && playlists[0].audios.length && playlists[0].audios[0].bpm;
+    const hasBPM = !!playlists && playlists.length && playlists[0].audios.length && playlists[0].audios[0].bpm;
     return (
       <Grid container spacing={2} alignItems="center">
         <Grid item xs={12} className={clsx(this.props.tutorial != null && this.props.tutorial != SDT.zoom1 && this.props.tutorial != SDT.zoom2 && classes.disable)}>

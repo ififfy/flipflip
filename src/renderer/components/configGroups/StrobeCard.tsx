@@ -65,7 +65,7 @@ class StrobeCard extends React.Component {
     const strobeDelayMax = typeof this.props.scene.strobeDelayMax === 'number' ? this.props.scene.strobeDelayMax : 0;
 
     const playlists = (this.props.scene.audioPlaylists as {audios: Audio[], shuffle: boolean, repeat: string}[]);
-    const hasBPM = playlists.length && playlists[0].audios.length && playlists[0].audios[0].bpm;
+    const hasBPM = !!playlists && playlists.length && playlists[0].audios.length && playlists[0].audios[0].bpm;
     return(
       <Grid container spacing={2} alignItems="center">
         <Grid item xs={12}>

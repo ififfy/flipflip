@@ -76,7 +76,7 @@ class PanningCard extends React.Component {
     const vertTransLevelMin = typeof this.props.scene.panVertTransLevelMin === 'number' ? this.props.scene.panVertTransLevelMin : 0;
 
     const playlists = (this.props.scene.audioPlaylists as {audios: Audio[], shuffle: boolean, repeat: string}[]);
-    const hasBPM = playlists.length && playlists[0].audios.length && playlists[0].audios[0].bpm;
+    const hasBPM = !!playlists && playlists.length && playlists[0].audios.length && playlists[0].audios[0].bpm;
     return(
       <Grid container spacing={this.props.scene.panning ? 2 : 0} alignItems="center" className={clsx(this.props.tutorial != null && classes.disable)}>
         <Grid item xs={12}>

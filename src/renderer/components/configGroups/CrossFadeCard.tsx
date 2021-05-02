@@ -65,7 +65,7 @@ class CrossFadeCard extends React.Component {
     const fadeDurationMax = typeof this.props.scene.fadeDurationMax === 'number' ? this.props.scene.fadeDurationMax : 0;
 
     const playlists = (this.props.scene.audioPlaylists as {audios: Audio[], shuffle: boolean, repeat: string}[]);
-    const hasBPM = playlists.length && playlists[0].audios.length && playlists[0].audios[0].bpm;
+    const hasBPM = !!playlists && playlists.length && playlists[0].audios.length && playlists[0].audios[0].bpm;
     return(
       <Grid container spacing={this.props.scene.crossFade ? 2 : 0} alignItems="center">
         <Grid item xs={12}  className={clsx(this.props.tutorial != null && this.props.tutorial != SDT.fade1 && classes.disable)}>
