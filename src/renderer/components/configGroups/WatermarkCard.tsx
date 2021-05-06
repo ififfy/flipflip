@@ -236,4 +236,5 @@ class WatermarkCard extends React.Component {
   }
 }
 
+(WatermarkCard as any).displayName="WatermarkCard";
 export default withStyles(styles)(WatermarkCard as any);

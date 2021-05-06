@@ -197,3 +197,5 @@ export default class Strobe extends React.Component {
     return delay;
   }
 }
+
+(Strobe as any).displayName="Strobe";

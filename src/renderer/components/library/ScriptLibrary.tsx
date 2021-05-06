@@ -1034,4 +1034,5 @@ class ScriptLibrary extends React.Component {
   }
 }
 
+(ScriptLibrary as any).displayName="ScriptLibrary";
 export default withStyles(styles)(ScriptLibrary as any);

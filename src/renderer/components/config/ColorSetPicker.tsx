@@ -149,4 +149,5 @@ class ColorSetPicker extends React.Component {
   }
 }
 
+(ColorSetPicker as any).displayName="ColorSetPicker";
 export default withStyles(styles)(ColorSetPicker as any);

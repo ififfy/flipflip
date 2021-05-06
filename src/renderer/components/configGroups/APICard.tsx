@@ -1125,4 +1125,5 @@ class APICard extends React.Component {
   }
 }
 
+(APICard as any).displayName="APICard";
 export default withStyles(styles)(APICard as any);

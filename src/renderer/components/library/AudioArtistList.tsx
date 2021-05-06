@@ -155,4 +155,5 @@ class AudioArtistList extends React.Component {
   }
 }
 
+(AudioArtistList as any).displayName="AudioArtistList";
 export default withStyles(styles)(AudioArtistList as any);

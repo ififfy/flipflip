@@ -406,4 +406,5 @@ class SourceListItem extends React.Component {
   }
 }
 
+(SourceListItem as any).displayName="SourceListItem";
 export default withStyles(styles)(SourceListItem as any);

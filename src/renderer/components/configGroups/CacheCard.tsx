@@ -239,4 +239,5 @@ class CacheCard extends React.Component {
   }
 }
 
+(CacheCard as any).displayName="CacheCard";
 export default withStyles(styles)(CacheCard as any);

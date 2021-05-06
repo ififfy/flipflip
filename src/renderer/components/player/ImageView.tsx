@@ -806,3 +806,5 @@ export default class ImageView extends React.Component {
     );
   };
 }
+
+(ImageView as any).displayName="ImageView";

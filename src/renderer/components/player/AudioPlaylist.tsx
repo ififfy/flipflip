@@ -447,4 +447,5 @@ class AudioPlaylist extends React.Component {
   }
 }
 
+(AudioPlaylist as any).displayName="AudioPlaylist";
 export default withStyles(styles)(AudioPlaylist as any);

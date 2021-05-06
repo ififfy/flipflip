@@ -264,4 +264,5 @@ class ScriptSourceListItem extends React.Component {
   }
 }
 
+(ScriptSourceListItem as any).displayName="ScriptSourceListItem";
 export default withStyles(styles)(ScriptSourceListItem as any);

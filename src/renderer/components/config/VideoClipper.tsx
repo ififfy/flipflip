@@ -852,4 +852,5 @@ class VideoClipper extends React.Component {
   }
 }
 
+(VideoClipper as any).displayName="VideoClipper";
 export default withStyles(styles)(VideoClipper as any);

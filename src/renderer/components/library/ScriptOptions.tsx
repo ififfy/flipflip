@@ -273,4 +273,5 @@ class ScriptOptions extends React.Component {
   }
 }
 
+(ScriptOptions as any).displayName="ScriptOptions";
 export default withStyles(styles)(ScriptOptions as any);

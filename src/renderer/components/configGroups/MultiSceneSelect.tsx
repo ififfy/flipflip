@@ -61,4 +61,5 @@ class MultiSceneSelect extends React.Component {
   }
 }
 
+(MultiSceneSelect as any).displayName="MultiSceneSelect";
 export default withStyles(styles)(MultiSceneSelect as any);

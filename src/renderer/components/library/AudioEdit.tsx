@@ -214,4 +214,5 @@ class AudioEdit extends React.Component {
   }
 }
 
+(AudioEdit as any).displayName="AudioEdit";
 export default withStyles(styles)(AudioEdit as any);

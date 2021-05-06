@@ -559,4 +559,5 @@ class SceneGenerator extends React.Component {
 
 }
 
+(SceneGenerator as any).displayName="SceneGenerator";
 export default withStyles(styles)(SceneGenerator as any);

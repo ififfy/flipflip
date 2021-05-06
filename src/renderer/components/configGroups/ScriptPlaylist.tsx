@@ -231,4 +231,5 @@ class ScriptPlaylist extends React.Component {
   }
 }
 
+(ScriptPlaylist as any).displayName="ScriptPlaylist";
 export default withStyles(styles)(ScriptPlaylist as any);

@@ -1353,4 +1353,5 @@ class Library extends React.Component {
   }
 }
 
+(Library as any).displayName="Library";
 export default withStyles(styles)(Library as any);

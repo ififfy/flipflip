@@ -421,4 +421,5 @@ class ScriptSourceList extends React.Component {
   }
 }
 
+(ScriptSourceList as any).displayName="ScriptSourceList";
 export default withStyles(styles)(ScriptSourceList as any);

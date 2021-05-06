@@ -366,4 +366,5 @@ class CrossFadeCard extends React.Component {
   }
 }
 
+(CrossFadeCard as any).displayName="CrossFadeCard";
 export default withStyles(styles)(CrossFadeCard as any);

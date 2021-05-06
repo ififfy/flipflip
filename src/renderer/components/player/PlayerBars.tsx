@@ -1155,4 +1155,5 @@ class PlayerBars extends React.Component {
   }
 }
 
+(PlayerBars as any).displayName="PlayerBars";
 export default withStyles(styles)(PlayerBars as any);

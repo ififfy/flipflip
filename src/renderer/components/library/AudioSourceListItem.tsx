@@ -325,4 +325,5 @@ class AudioSourceListItem extends React.Component {
   }
 }
 
+(AudioSourceListItem as any).displayName="AudioSourceListItem";
 export default withStyles(styles)(AudioSourceListItem as any);

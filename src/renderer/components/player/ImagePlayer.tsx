@@ -896,3 +896,5 @@ export default class ImagePlayer extends React.Component {
     }
   }
 };
+
+(ImagePlayer as any).displayName="ImagePlayer";

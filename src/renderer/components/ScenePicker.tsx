@@ -999,4 +999,5 @@ class ScenePicker extends React.Component {
   }
 }
 
+(ScenePicker as any).displayName="ScenePicker";
 export default withStyles(styles)(ScenePicker as any);

@@ -494,4 +494,5 @@ class GridSetup extends React.Component {
   }
 }
 
+(GridSetup as any).displayName="GridSetup";
 export default withStyles(styles)(GridSetup as any);

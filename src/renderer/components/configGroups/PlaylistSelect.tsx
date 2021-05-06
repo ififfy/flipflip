@@ -47,4 +47,5 @@ class PlaylistSelect extends React.Component {
   }
 }
 
+(PlaylistSelect as any).displayName="PlaylistSelect";
 export default withStyles(styles)(PlaylistSelect as any);

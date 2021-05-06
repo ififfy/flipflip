@@ -112,3 +112,5 @@ export default class GeneralConfig extends React.Component {
     );
   }
 }
+
+(GeneralConfig as any).displayName="GeneralConfig";

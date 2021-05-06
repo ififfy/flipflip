@@ -126,3 +126,5 @@ export default class VideoCard extends React.Component {
     this.props.onUpdateScene(scene, fn);
   }
 }
+
+(VideoCard as any).displayName="VideoCard";

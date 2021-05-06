@@ -1195,4 +1195,5 @@ class CaptionScriptor extends React.Component {
   }
 }
 
+(CaptionScriptor as any).displayName="CaptionScriptor";
 export default withStyles(styles)(CaptionScriptor as any);

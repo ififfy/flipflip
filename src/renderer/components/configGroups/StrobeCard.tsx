@@ -598,4 +598,5 @@ class StrobeCard extends React.Component {
   }
 }
 
+(StrobeCard as any).displayName="StrobeCard";
 export default withStyles(styles)(StrobeCard as any);

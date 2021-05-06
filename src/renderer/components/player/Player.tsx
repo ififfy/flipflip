@@ -927,3 +927,5 @@ export default class Player extends React.Component {
     this.setState({recentPictureGrid: true});
   }
 }
+
+(Player as any).displayName="Player";

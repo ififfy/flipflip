@@ -44,3 +44,5 @@ export default class Spin extends React.Component {
 
   }
 }
+
+(Spin as any).displayName="Spin";

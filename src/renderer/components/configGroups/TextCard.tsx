@@ -175,4 +175,5 @@ class TextCard extends React.Component {
   }
 }
 
+(TextCard as any).displayName="TextCard";
 export default withStyles(styles)(TextCard as any);

@@ -1575,3 +1575,5 @@ export default class CaptionProgram extends React.Component {
     }
   }
 }
+
+(CaptionProgram as any).displayName="CaptionProgram";

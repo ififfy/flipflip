@@ -255,4 +255,5 @@ class LibrarySearch extends React.Component {
   };
 }
 
+(LibrarySearch as any).displayName="LibrarySearch";
 export default withStyles(styles)(LibrarySearch as any);

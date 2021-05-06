@@ -107,7 +107,7 @@ class SceneEffects extends React.Component {
     );
   }
 
-  nop() {}
 }
 
+(SceneEffects as any).displayName="SceneEffects";
 export default withStyles(styles)(SceneEffects as any);

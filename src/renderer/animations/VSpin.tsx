@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {Spring, animated} from "react-spring/renderprops";
 
-export default class Spin extends React.Component {
+export default class VSpin extends React.Component {
   readonly props: {
     className?: string,
     title?: string,
@@ -34,3 +34,5 @@ export default class Spin extends React.Component {
 
   }
 }
+
+(VSpin as any).displayName="VSpin";

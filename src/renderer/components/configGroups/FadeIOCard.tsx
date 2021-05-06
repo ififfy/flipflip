@@ -428,4 +428,5 @@ class FadeIOCard extends React.Component {
   }
 }
 
+(FadeIOCard as any).displayName="FadeIOCard";
 export default withStyles(styles)(FadeIOCard as any);

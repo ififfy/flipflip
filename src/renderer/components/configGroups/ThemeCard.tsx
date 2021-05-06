@@ -62,4 +62,5 @@ class ThemeCard extends React.Component {
   }
 }
 
+(ThemeCard as any).displayName="ThemeCard";
 export default withStyles(styles)(ThemeCard as any);

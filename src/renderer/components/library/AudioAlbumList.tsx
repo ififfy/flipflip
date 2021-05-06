@@ -194,4 +194,5 @@ class AudioAlbumList extends React.Component {
   }
 }
 
+(AudioAlbumList as any).displayName="AudioAlbumList";
 export default withStyles(styles)(AudioAlbumList as any);

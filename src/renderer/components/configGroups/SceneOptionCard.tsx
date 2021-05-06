@@ -778,4 +778,5 @@ class SceneOptionCard extends React.Component {
   }
 }
 
+(SceneOptionCard as any).displayName="SceneOptionCard";
 export default withStyles(styles)(SceneOptionCard as any);

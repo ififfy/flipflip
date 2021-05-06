@@ -83,4 +83,5 @@ class SceneOptions extends React.Component {
   }
 }
 
+(SceneOptions as any).displayName="SceneOptions";
 export default withStyles(styles)(SceneOptions as any);

@@ -544,4 +544,5 @@ class ConfigForm extends React.Component {
   }
 }
 
+(ConfigForm as any).displayName="ConfigForm";
 export default withStyles(styles)(ConfigForm as any);

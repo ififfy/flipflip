@@ -401,4 +401,5 @@ class TagManager extends React.Component {
   }
 }
 
+(TagManager as any).displayName="TagManager";
 export default withStyles(styles)(TagManager as any);

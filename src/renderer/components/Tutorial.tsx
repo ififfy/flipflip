@@ -2224,4 +2224,5 @@ class Tutorial extends React.Component {
   }
 }
 
+(Tutorial as any).displayName="Tutorial";
 export default withStyles(styles)(Tutorial as any);

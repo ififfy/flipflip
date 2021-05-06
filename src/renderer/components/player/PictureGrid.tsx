@@ -69,4 +69,5 @@ class PictureGrid extends React.Component {
   }
 }
 
+(PictureGrid as any).displayName="PictureGrid";
 export default withStyles(styles)(PictureGrid as any);

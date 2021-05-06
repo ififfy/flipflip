@@ -221,3 +221,5 @@ export default class SourceIcon extends React.Component {
     }
   }
 }
+
+(SourceIcon as any).displayName="SourceIcon";

@@ -235,3 +235,5 @@ export default class FadeInOut extends React.Component {
     return delay;
   }
 }
+
+(FadeInOut as any).displayName="FadeInOut";

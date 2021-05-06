@@ -1805,4 +1805,5 @@ class AudioLibrary extends React.Component {
   }
 }
 
+(AudioLibrary as any).displayName="AudioLibrary";
 export default withStyles(styles)(AudioLibrary as any);

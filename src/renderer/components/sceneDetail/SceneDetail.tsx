@@ -1188,4 +1188,5 @@ class SceneDetail extends React.Component {
   }
 }
 
+(SceneDetail as any).displayName="SceneDetail";
 export default withStyles(styles)(SceneDetail as any);

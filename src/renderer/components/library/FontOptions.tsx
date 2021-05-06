@@ -178,4 +178,5 @@ class FontOptions extends React.Component {
   }
 }
 
+(FontOptions as any).displayName="FontOptions";
 export default withStyles(styles)(FontOptions as any);

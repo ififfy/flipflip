@@ -14,7 +14,7 @@ import ErrorIcon from '@material-ui/icons/Error';
 import RestoreIcon from '@material-ui/icons/Restore';
 import SaveIcon from '@material-ui/icons/Save';
 
-import {getBackups, saveDir} from "../../data/utils";
+import {convertFromEpoch, getBackups, saveDir} from "../../data/utils";
 import {MO} from "../../data/const";
 import {GeneralSettings} from "../../data/Config";
 
@@ -148,13 +148,13 @@ class BackupCard extends React.Component {
           </Grid>
           <Grid item xs={"auto"} className={clsx(classes.buttonGrid, classes.hideXS)}>
             <Chip
-              label={`Latest: ${hasBackup ? this.convertFromEpoch(this.state.backups[0].url) + " (" + Math.round(this.state.backups[0].size / 1000) + " KB)" : "--"}`}
+              label={`Latest: ${hasBackup ? convertFromEpoch(this.state.backups[0].url) + " (" + Math.round(this.state.backups[0].size / 1000) + " KB)" : "--"}`}
               color="secondary"
               variant="outlined"/>
           </Grid>
           <Grid item xs={"auto"} className={clsx(classes.buttonGrid, classes.showXS)}>
             <Chip
-              label={`Latest: ${hasBackup ? this.convertFromEpoch(this.state.backups[0].url) : "--"}`}
+              label={`Latest: ${hasBackup ? convertFromEpoch(this.state.backups[0].url) : "--"}`}
               color="secondary"
               variant="outlined"/>
           </Grid>
@@ -203,7 +203,7 @@ class BackupCard extends React.Component {
                   }}
                   onChange={this.onChangeBackup.bind(this)}>
                   {this.state.backups.map((b) =>
-                    <MenuItem value={b.url} key={b.url}>{this.convertFromEpoch(b.url)} ({Math.round(b.size / 1000)} KB)</MenuItem>
+                    <MenuItem value={b.url} key={b.url}>{convertFromEpoch(b.url)} ({Math.round(b.size / 1000)} KB)</MenuItem>
                   )}
                 </Select>
               </FormControl>
@@ -289,12 +289,6 @@ class BackupCard extends React.Component {
   onChangeBackup(e: MouseEvent) {
     const input = (e.target as HTMLInputElement);
     this.setState({backup: this.state.backups.find((b) => b.url == input.value)});
-  }
-
-  convertFromEpoch(backupFile: string) {
-    const epochString = backupFile.substring(backupFile.lastIndexOf(".") + 1);
-    const date = new Date(Number.parseInt(epochString));
-    return date.toLocaleString();
   }
 
   onBackup() {
@@ -390,4 +384,5 @@ class BackupCard extends React.Component {
   }
 }
 
+(BackupCard as any).displayName="BackupCard";
 export default withStyles(styles)(BackupCard as any);

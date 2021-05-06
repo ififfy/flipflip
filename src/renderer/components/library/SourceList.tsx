@@ -729,4 +729,5 @@ class SourceList extends React.Component {
   }
 }
 
+(SourceList as any).displayName="SourceList";
 export default withStyles(styles)(SourceList as any);

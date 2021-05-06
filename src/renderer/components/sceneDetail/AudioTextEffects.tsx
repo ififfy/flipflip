@@ -53,3 +53,5 @@ export default class AudioTextEffects extends React.Component {
     );
   }
 }
+
+(AudioTextEffects as any).displayName="AudioTextEffects";

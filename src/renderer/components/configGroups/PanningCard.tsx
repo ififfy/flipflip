@@ -673,4 +673,5 @@ class PanningCard extends React.Component {
   }
 }
 
+(PanningCard as any).displayName="PanningCard";
 export default withStyles(styles)(PanningCard as any);

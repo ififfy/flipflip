@@ -359,3 +359,5 @@ export default class CodeMirror extends React.Component {
     this._sendUpdate = setTimeout(this.props.onUpdateScript.bind(this, scriptText, changed), 500);
   }
 }
+
+(CodeMirror as any).displayName="CodeMirror";

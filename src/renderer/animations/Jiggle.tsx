@@ -88,3 +88,5 @@ export default class Jiggle extends React.Component {
     )
   }
 }
+
+(Jiggle as any).displayName="Jiggle";

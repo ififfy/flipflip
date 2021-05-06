@@ -669,4 +669,5 @@ class ZoomMoveCard extends React.Component {
   }
 }
 
+(ZoomMoveCard as any).displayName="ZoomMoveCard";
 export default withStyles(styles)(ZoomMoveCard as any);

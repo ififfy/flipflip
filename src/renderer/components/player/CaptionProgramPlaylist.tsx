@@ -121,3 +121,5 @@ export default class CaptionProgramPlaylist extends React.Component {
     this.setState({currentIndex: nextTrack});
   }
 }
+
+(CaptionProgramPlaylist as any).displayName="CaptionProgramPlaylist";

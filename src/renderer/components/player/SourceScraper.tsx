@@ -1965,3 +1965,5 @@ export default class SourceScraper extends React.Component {
     this._backForth = null;
   }
 }
+
+(SourceScraper as any).displayName="SourceScraper";

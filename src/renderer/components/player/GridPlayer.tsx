@@ -350,4 +350,5 @@ class GridPlayer extends React.Component {
   }
 }
 
+(GridPlayer as any).displayName="GridPlayer";
 export default withStyles(styles)(GridPlayer as any);

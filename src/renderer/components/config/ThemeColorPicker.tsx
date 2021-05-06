@@ -33,7 +33,7 @@ const colors = [color.red, color.pink, color.purple, color.deepPurple, color.ind
                 color.cyan, color.teal, color.green, color.lightGreen, color.lime, color.yellow, color.amber, color.orange,
                 color.deepOrange, color.brown, color.grey, color.blueGrey];
 
-class ColorPicker extends React.Component {
+class ThemeColorPicker extends React.Component {
   readonly props: {
     classes: any,
     currentColor: string,
@@ -165,4 +165,5 @@ class ColorPicker extends React.Component {
   }
 }
 
-export default withStyles(styles)(ColorPicker as any);
+(ThemeColorPicker as any).displayName="ThemeColorPicker";
+export default withStyles(styles)(ThemeColorPicker as any);

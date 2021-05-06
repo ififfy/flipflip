@@ -290,4 +290,5 @@ class VideoControl extends React.Component {
   };
 }
 
+(VideoControl as any).displayName="VideoControl";
 export default withStyles(styles)(VideoControl as any);

@@ -33,3 +33,5 @@ export default class SoundTick extends React.Component {
     );
   }
 }
+
+(SoundTick as any).displayName="SoundTick";

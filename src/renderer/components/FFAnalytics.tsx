@@ -57,3 +57,4 @@ export default class FFAnalytics extends React.Component {
   }
 }
 
+(FFAnalytics as any).displayName="FFAnalytics";

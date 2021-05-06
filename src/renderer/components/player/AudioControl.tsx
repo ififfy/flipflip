@@ -368,4 +368,5 @@ class AudioControl extends React.Component {
   }
 }
 
+(AudioControl as any).displayName="AudioControl";
 export default withStyles(styles)(AudioControl as any);

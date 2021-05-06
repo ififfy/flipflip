@@ -92,6 +92,12 @@ export function getBackups(): Array<{url: string, size: number}> {
   return backups;
 }
 
+export function convertFromEpoch(backupFile: string) {
+  const epochString = backupFile.substring(backupFile.lastIndexOf(".") + 1);
+  const date = new Date(Number.parseInt(epochString));
+  return date.toLocaleString();
+}
+
 export function getTimingFromString(tf: string): string {
   switch(tf) {
     case "constant":

@@ -552,4 +552,5 @@ class ImageVideoCard extends React.Component {
   }
 }
 
+(ImageVideoCard as any).displayName="ImageVideoCard";
 export default withStyles(styles)(ImageVideoCard as any);

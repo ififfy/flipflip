@@ -158,4 +158,5 @@ class AudioCard extends React.Component {
   }
 }
 
+(AudioCard as any).displayName="AudioCard";
 export default withStyles(styles)(AudioCard as any);

@@ -62,7 +62,7 @@ export default class PlayerNumCard extends React.Component {
           </Tooltip>
         </Grid>
         <Grid item xs={12}>
-          <Tooltip title="The maximum number of simulatenous images/videos loading. Increase this number to load sources faster. Reduce this number to improve display performance.">
+          <Tooltip title="The maximum number of simultaneous images/videos loading. Increase this number to load sources faster. Reduce this number to improve display performance.">
             <TextField
               label="Max Loading at Once"
               margin="dense"
@@ -106,3 +106,5 @@ export default class PlayerNumCard extends React.Component {
     this.props.onUpdateSettings(fn);
   }
 }
+
+(PlayerNumCard as any).displayName="PlayerNumCard";

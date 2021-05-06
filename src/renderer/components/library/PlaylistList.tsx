@@ -162,4 +162,5 @@ class PlaylistList extends React.Component {
   }
 }
 
+(PlaylistList as any).displayName="PlaylistList";
 export default withStyles(styles)(PlaylistList as any);

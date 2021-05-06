@@ -109,4 +109,5 @@ class URLDialog extends React.Component {
   }
 }
 
+(URLDialog as any).displayName="URLDialog";
 export default withStyles(styles)(URLDialog as any);

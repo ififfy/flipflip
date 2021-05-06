@@ -303,3 +303,5 @@ export default class Panning extends React.Component {
     return duration;
   }
 }
+
+(Panning as any).displayName="Panning";

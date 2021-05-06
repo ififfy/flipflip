@@ -18,4 +18,5 @@ class Template extends React.Component {
   }
 }
 
+(Template as any).displayName="Template";
 export default withStyles(styles)(Template as any);

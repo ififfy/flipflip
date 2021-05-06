@@ -44,7 +44,7 @@ const styles = (theme: Theme) => createStyles({
   },
 });
 
-class Template extends React.Component {
+class AudioAlert extends React.Component {
   readonly props: {
     classes: any,
     audio: Audio,
@@ -156,4 +156,5 @@ class Template extends React.Component {
   }
 }
 
-export default withStyles(styles)(Template as any);
+(AudioAlert as any).displayName="AudioAlert";
+export default withStyles(styles)(AudioAlert as any);

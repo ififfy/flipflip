@@ -65,4 +65,5 @@ class SceneSelect extends React.Component {
   }
 }
 
+(SceneSelect as any).displayName="SceneSelect";
 export default withStyles(styles)(SceneSelect as any);

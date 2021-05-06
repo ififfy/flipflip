@@ -505,4 +505,5 @@ class AudioOptions extends React.Component {
   }
 }
 
+(AudioOptions as any).displayName="AudioOptions";
 export default withStyles(styles)(AudioOptions as any);

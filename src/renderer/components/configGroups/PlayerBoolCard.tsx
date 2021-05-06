@@ -178,3 +178,5 @@ export default class PlayerBoolCard extends React.Component {
     this.props.onUpdateGeneralSettings(fn);
   }
 }
+
+(PlayerBoolCard as any).displayName="PlayerBoolCard";
