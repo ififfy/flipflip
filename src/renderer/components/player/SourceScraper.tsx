@@ -22,7 +22,8 @@ import {
   isImage,
   isVideo,
   isImageOrVideo,
-  randomizeList
+  randomizeList,
+  filterPathsToJustPlayable
 } from "../../data/utils";
 import {IF, RF, RT, SOF, ST, WF} from '../../data/const';
 import Config from "../../data/Config";
@@ -46,33 +47,17 @@ function isEmpty(allURLs: any[]): boolean {
   return Array.isArray(allURLs) && allURLs.every(isEmpty);
 }
 
-function filterPathsToJustPlayable(imageTypeFilter: string, paths: Array<string>, strict: boolean): Array<string> {
-  switch (imageTypeFilter) {
-    default:
-    case IF.any:
-      return paths.filter((p) => isImageOrVideo(p, strict));
-    case IF.stills:
-    case IF.images:
-      return paths.filter((p) => isImage(p, strict));
-    case IF.gifs:
-      return paths.filter((p) => p.toLowerCase().endsWith('.gif') || isVideo(p, strict));
-    case IF.videos:
-      return paths.filter((p) => isVideo(p, strict));
-  }
-}
-
 // Determine what kind of source we have based on the URL and return associated Promise
-function getPromise(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
-  let promise;
+function scrapeFiles(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) {
   const sourceType = getSourceType(source.url);
 
   if (sourceType == ST.local) { // Local files
     helpers.next = null;
-    promise = loadLocalDirectory(systemMessage, config, source, filter, helpers);
+    workerInstance.loadLocalDirectory(config, source, filter, helpers);
   } else if (sourceType == ST.list) { // Image List
     helpers.next = null;
-    promise = loadRemoteImageURLList(systemMessage, config, source, filter, helpers);
-  } else if (sourceType == ST.video) {
+    workerInstance.loadRemoteImageURLList(config, source, filter, helpers);
+  } /*else if (sourceType == ST.video) {
     helpers.next = null;
     const cachePath = getCachePath(source.url, config) + getFileName(source.url);
     if (fs.existsSync(cachePath)) {
@@ -160,48 +145,7 @@ function getPromise(systemMessage: Function, config: Config, source: LibrarySour
       promise = promiseFunction(systemMessage, config, source, filter, helpers);
     }
     promise.timeout = timeout;
-  }
-  promise.source = source;
-  return promise;
-}
-
-function loadLocalDirectory(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
-  const blacklist = ['*.css', '*.html', 'avatar.png'];
-  const url = source.url;
-
-  return new CancelablePromise((resolve) => {
-    recursiveReaddir(url, blacklist, (err: any, rawFiles: Array<string>) => {
-      if (err) {
-        console.warn(err);
-        resolve(null);
-      } else {
-        // If this is a local source (not a cacheDir call)
-        if (helpers.next == null) {
-          helpers.count = filterPathsToJustPlayable(IF.any, rawFiles, true).length;
-        }
-        resolve({
-          data: filterPathsToJustPlayable(filter, rawFiles, true).map((p) => fileURL(p)).sort((a, b) => {
-            let aFile: any = getFileName(a, false);
-            if (parseInt(aFile)) {
-              aFile = parseInt(aFile);
-            }
-            let bFile: any = getFileName(b, false);
-            if (parseInt(aFile)) {
-              aFile = parseInt(aFile);
-            }
-            if (aFile > bFile) {
-              return 1;
-            } else if (aFile < bFile) {
-              return -1;
-            } else {
-              return 0;
-            }
-          }),
-          helpers: helpers,
-        });
-      }
-    });
-  });
+  }*/
 }
 
 function loadVideo(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
@@ -305,53 +249,6 @@ function loadPlaylist(systemMessage: Function, config: Config, source: LibrarySo
           data: filterPathsToJustPlayable(filter, urls, true),
           helpers: helpers,
         });
-      })
-      .catch((e) => {
-        console.warn("Fetch error on", url);
-        console.warn(e);
-        resolve(null);
-      });
-  });
-}
-
-function loadRemoteImageURLList(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
-  const url = source.url;
-  return new CancelablePromise((resolve) => {
-    wretch(url)
-      .get()
-      .text(data => {
-        const lines = data.match(/[^\r\n]+/g).filter((line) => line.startsWith("http://") || line.startsWith("https://") || line.startsWith("file:///"));
-        if (lines.length > 0) {
-          let convertedSource = Array<string>();
-          let convertedCount = 0;
-          for (let url of lines) {
-            convertURL(url).then((urls: Array<string>) => {
-              convertedSource = convertedSource.concat(urls);
-              convertedCount++;
-              if (convertedCount == lines.length) {
-                helpers.count = filterPathsToJustPlayable(IF.any, convertedSource, true).length;
-                resolve({
-                  data: filterPathsToJustPlayable(filter, convertedSource, true),
-                  helpers: helpers,
-                });
-              }
-            })
-            .catch ((error: any) => {
-              console.error(error);
-              convertedCount++;
-              if (convertedCount == lines.length) {
-                helpers.count = filterPathsToJustPlayable(IF.any, convertedSource, true).length;
-                resolve({
-                  data: filterPathsToJustPlayable(filter, convertedSource, true),
-                  helpers: helpers,
-                });
-              }
-            });
-          }
-        } else {
-          console.warn("No lines in", url, " are links or files");
-          resolve(null)
-        }
       })
       .catch((e) => {
         console.warn("Fetch error on", url);
@@ -1676,12 +1573,6 @@ export default class SourceScraper extends React.Component {
 
     // Create an instance of your worker
     workerInstance = worker();
-    // Attach an event listener to receive calculations from your worker
-    workerInstance.addEventListener('message', (message: any) => {
-      let object = message.data;
-      if (object?.type == "RPC") return;
-      console.log('New Message: ', object);
-    });
 
     let sceneSources = new Array<LibrarySource>();
     for (let source of this.props.scene.sources) {
@@ -1745,53 +1636,61 @@ export default class SourceScraper extends React.Component {
       if (!this.props.scene.playVideoClips && d.clips) {
         d.clips = [];
       }
-      const loadPromise = getPromise(this.props.systemMessage, this.props.config, d, this.props.scene.imageTypeFilter, {next: -1, count: 0, retries: 0});
-      this.setState({promise: loadPromise});
 
-      // Run your calculations
-      workerInstance.sendMessage(d.url);
-      loadPromise
-        .getPromise()
-        .then((object) => {
-          let newPromiseQueue = this.state.promiseQueue;
-          n += 1;
+      const receiveMessage = (message: any) => {
+        let object = message.data;
+        if (object?.type == "RPC") return;
 
-          // Just add the new urls to the end of the list
-          if (object != null) {
-            if (loadPromise.source.blacklist && loadPromise.source.blacklist.length > 0) {
-              object.data = object.data.filter((url) => !loadPromise.source.blacklist.includes(url));
-            }
-            if (this.props.scene.weightFunction == WF.sources) {
-              newAllURLs.set(loadPromise.source.url, object.data);
-            } else {
-              for (let d of object.data) {
-                newAllURLs.set(d, [loadPromise.source.url]);
-              }
-            }
+        // TODO Handle error, check for object.data
 
-            // If this is a remote URL, queue up the next promise
-            if (object.helpers.next != null) {
-              newPromiseQueue.push({source: d, helpers: object.helpers});
-            }
-            this.props.setCount(d.url, object.helpers.count, object.helpers.next == null);
+        let newPromiseQueue = this.state.promiseQueue;
+        n += 1;
+
+        // Just add the new urls to the end of the list
+        if (object != null) {
+          const source = object.source;
+          if (source.blacklist && source.blacklist.length > 0) {
+            object.data = object.data.filter((url: string) => !source.blacklist.includes(url));
           }
-
-          this.setState({allURLs: newAllURLs, promiseQueue: newPromiseQueue});
-          if (n < sceneSources.length) {
-            setTimeout(sourceLoop, loadPromise.timeout);
+          if (this.props.scene.weightFunction == WF.sources) {
+            newAllURLs.set(source.url, object.data);
           } else {
-            this.props.finishedLoading(isEmpty(Array.from(newAllURLs.values())));
-            promiseLoop();
-            if (this.props.nextScene && this.props.playNextScene) {
-              n = 0;
-              nextSourceLoop();
+            for (let d of object.data) {
+              newAllURLs.set(d, [source.url]);
             }
           }
-        });
+
+          // If this is a remote URL, queue up the next promise
+          if (object.helpers.next != null) {
+            newPromiseQueue.push({source: source, helpers: object.helpers});
+          }
+          this.props.setCount(source.url, object.helpers.count, object.helpers.next == null);
+        }
+
+        this.setState({allURLs: newAllURLs, promiseQueue: newPromiseQueue});
+        if (n < sceneSources.length) {
+          setTimeout(sourceLoop, 1000);
+          //setTimeout(sourceLoop, loadPromise.timeout);
+        } else {
+          console.log(newAllURLs);
+          console.log("DONE");
+          this.props.finishedLoading(isEmpty(Array.from(newAllURLs.values())));
+          //promiseLoop();
+          //if (this.props.nextScene && this.props.playNextScene) {
+          //  n = 0;
+          //  nextSourceLoop();
+         // }
+        }
+      }
+
+      // Attach an event listener to receive calculations from your worker
+      workerInstance.removeEventListener('message', receiveMessage);
+      workerInstance.addEventListener('message', receiveMessage.bind(this));
+      scrapeFiles(this.props.config, d, this.props.scene.imageTypeFilter, {next: -1, count: 0, retries: 0})
     };
 
     let nextSourceLoop = () => {
-      if (this.state.nextPromise.hasCanceled) return;
+      /*if (this.state.nextPromise.hasCanceled) return;
 
       if (!this.props.isPlaying) {
         setTimeout(nextSourceLoop, 500);
@@ -1802,7 +1701,7 @@ export default class SourceScraper extends React.Component {
       if (!this.props.scene.playVideoClips && d.clips) {
         d.clips = [];
       }
-      const loadPromise = getPromise(this.props.systemMessage, this.props.config, d, this.props.nextScene.imageTypeFilter, {next: -1, count: 0, retries: 0});
+      const loadPromise = scrapeFiles(this.props.systemMessage, this.props.config, d, this.props.nextScene.imageTypeFilter, {next: -1, count: 0, retries: 0});
       this.setState({nextPromise: loadPromise});
 
       loadPromise
@@ -1833,11 +1732,11 @@ export default class SourceScraper extends React.Component {
           if (n < nextSources.length) {
             setTimeout(nextSourceLoop, loadPromise.timeout);
           }
-        });
+        });*/
     };
 
     let promiseLoop = () => {
-      // Process until queue is empty or player has been stopped
+      /*// Process until queue is empty or player has been stopped
       if (this.state.promiseQueue.length > 0 && !this.state.promise.hasCanceled) {
         if (!this.props.isPlaying) {
           setTimeout(promiseLoop, 500);
@@ -1845,7 +1744,7 @@ export default class SourceScraper extends React.Component {
         }
 
         const promiseData = this.state.promiseQueue.shift();
-        const promise = getPromise(this.props.systemMessage, this.props.config, promiseData.source, this.props.scene.imageTypeFilter, promiseData.helpers);
+        const promise = scrapeFiles(this.props.systemMessage, this.props.config, promiseData.source, this.props.scene.imageTypeFilter, promiseData.helpers);
         this.setState({promise: promise});
 
         promise
@@ -1890,7 +1789,7 @@ export default class SourceScraper extends React.Component {
             // If there is an overlay, double the timeout
             setTimeout(promiseLoop, promise.timeout);
           });
-      }
+      }*/
     };
 
     if (this.state.preload) {

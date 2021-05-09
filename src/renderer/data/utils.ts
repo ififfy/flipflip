@@ -7,7 +7,7 @@ import wretch from "wretch";
 import * as easings from 'd3-ease';
 import crypto from "crypto";
 
-import {EA, ST, TF, TT} from "./const";
+import {EA, IF, ST, TF, TT} from "./const";
 import en from "./en";
 import Config from "./Config";
 import LibrarySource from "./LibrarySource";
@@ -526,6 +526,7 @@ function cachePath(source: string, typeDir: string, config: Config) {
   }
 }
 
+// TODO Remove this
 export async function convertURL(url: string): Promise<Array<string>> {
   // If this is a imgur image page, return image file
   let imgurMatch = url.match("^https?://(?:m\.)?imgur\.com/([\\w\\d]{7})$");
@@ -742,6 +743,21 @@ export function isText(path: string, strict: boolean): boolean {
     }
   }
   return false;
+}
+
+export function filterPathsToJustPlayable(imageTypeFilter: string, paths: Array<string>, strict: boolean): Array<string> {
+  switch (imageTypeFilter) {
+    default:
+    case IF.any:
+      return paths.filter((p) => isImageOrVideo(p, strict));
+    case IF.stills:
+    case IF.images:
+      return paths.filter((p) => isImage(p, strict));
+    case IF.gifs:
+      return paths.filter((p) => p.toLowerCase().endsWith('.gif') || isVideo(p, strict));
+    case IF.videos:
+      return paths.filter((p) => isVideo(p, strict));
+  }
 }
 
 export function isImageOrVideo(path: string, strict: boolean): boolean {
