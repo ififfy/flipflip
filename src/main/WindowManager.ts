@@ -33,7 +33,8 @@ export function createNewWindow() {
     'icon': path.join(__dirname, 'src/renderer/icons/flipflip_logo.png'),
     'title': 'FlipFlip',
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      nodeIntegrationInWorker: true,
     }
   });
 

@@ -9,8 +9,9 @@ import tumblr from "tumblr.js";
 import imgur from "imgur";
 import Twitter from "twitter";
 import {IgApiClient} from "instagram-private-api";
+import * as path from "path";
+import worker from 'workerize-loader!./Scrapers';
 
-import {IF, RF, RT, SOF, ST, TF, WF} from '../../data/const';
 import {
   CancelablePromise,
   convertURL,
@@ -23,13 +24,13 @@ import {
   isImageOrVideo,
   randomizeList
 } from "../../data/utils";
+import {IF, RF, RT, SOF, ST, WF} from '../../data/const';
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
 import Scene from '../../data/Scene';
+import Audio from "../../data/Audio";
 import ChildCallbackHack from './ChildCallbackHack';
 import ImagePlayer from './ImagePlayer';
-import * as path from "path";
-import Audio from "../../data/Audio";
 
 let redditAlerted = false;
 let tumblrAlerted = false;
@@ -37,6 +38,8 @@ let tumblr429Alerted = false;
 let twitterAlerted = false;
 let instagramAlerted = false;
 let hydrusAlerted = false;
+
+let workerInstance: any = null;
 
 // Returns true if array is empty, or only contains empty arrays
 function isEmpty(allURLs: any[]): boolean {
@@ -1671,6 +1674,15 @@ export default class SourceScraper extends React.Component {
       newAllURLs = this.state.allURLs;
     }
 
+    // Create an instance of your worker
+    workerInstance = worker();
+    // Attach an event listener to receive calculations from your worker
+    workerInstance.addEventListener('message', (message: any) => {
+      let object = message.data;
+      if (object?.type == "RPC") return;
+      console.log('New Message: ', object);
+    });
+
     let sceneSources = new Array<LibrarySource>();
     for (let source of this.props.scene.sources) {
       if (source.dirOfSources && getSourceType(source.url) == ST.local) {
@@ -1736,6 +1748,8 @@ export default class SourceScraper extends React.Component {
       const loadPromise = getPromise(this.props.systemMessage, this.props.config, d, this.props.scene.imageTypeFilter, {next: -1, count: 0, retries: 0});
       this.setState({promise: loadPromise});
 
+      // Run your calculations
+      workerInstance.sendMessage(d.url);
       loadPromise
         .getPromise()
         .then((object) => {

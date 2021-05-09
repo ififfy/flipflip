@@ -48,6 +48,8 @@ declare module 'twitter';
 declare module 'uuid/v4';
 declare module 'web-audio-beat-detector';
 
+declare module 'workerize-loader!./Scrapers';
+
 // Type declarations for Clipboard API
 // https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API
 interface Clipboard {
