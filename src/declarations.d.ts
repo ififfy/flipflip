@@ -47,6 +47,7 @@ declare module 'system-font-families';
 declare module 'twitter';
 declare module 'uuid/v4';
 declare module 'web-audio-beat-detector';
+declare module 'xmldom';
 
 declare module 'workerize-loader!./Scrapers';
 

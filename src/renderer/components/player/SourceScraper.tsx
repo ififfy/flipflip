@@ -57,16 +57,16 @@ function scrapeFiles(config: Config, source: LibrarySource, filter: string, help
   } else if (sourceType == ST.list) { // Image List
     helpers.next = null;
     workerInstance.loadRemoteImageURLList(config, source, filter, helpers);
-  } /*else if (sourceType == ST.video) {
+  } else if (sourceType == ST.video) {
     helpers.next = null;
     const cachePath = getCachePath(source.url, config) + getFileName(source.url);
     if (fs.existsSync(cachePath)) {
       const realURL = source.url;
       source.url = cachePath;
-      promise = loadVideo(systemMessage, config, source, filter, helpers);
+      workerInstance.loadVideo(config, source, filter, helpers);
       source.url = realURL;
     } else {
-      promise = loadVideo(systemMessage, config, source, filter, helpers);
+      workerInstance.loadVideo(config, source, filter, helpers);
     }
   } else if (sourceType == ST.playlist) {
     helpers.next = null;
@@ -74,12 +74,12 @@ function scrapeFiles(config: Config, source: LibrarySource, filter: string, help
     if (fs.existsSync(cachePath)) {
       const realURL = source.url;
       source.url = cachePath;
-      promise = loadPlaylist(systemMessage, config, source, filter, helpers);
+      workerInstance.loadPlaylist(config, source, filter, helpers);
       source.url = realURL;
     } else {
-      promise = loadPlaylist(systemMessage, config, source, filter, helpers);
+      workerInstance.loadPlaylist(config, source, filter, helpers);
     }
-  } else { // Paging sources
+  } /*else { // Paging sources
     let promiseFunction;
     let timeout;
     if (sourceType == ST.tumblr) {
@@ -146,116 +146,6 @@ function scrapeFiles(config: Config, source: LibrarySource, filter: string, help
     }
     promise.timeout = timeout;
   }*/
-}
-
-function loadVideo(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
-  const url = source.url;
-  return new CancelablePromise((resolve) => {
-    const missingVideo = () => {
-      resolve({
-        data: [],
-        helpers: helpers,
-      });
-    }
-    const ifExists = (url: string) => {
-      if (!url.startsWith("http")) {
-        url = fileURL(url);
-      }
-      helpers.count = 1;
-
-      let paths;
-      if (source.clips && source.clips.length > 0) {
-        const clipPaths = Array<string>();
-        for (let clip of source.clips) {
-          if (!source.disabledClips || !source.disabledClips.includes(clip.id)) {
-            let clipPath = url + ":::" + clip.id + ":" + (clip.volume != null ? clip.volume : "-") + ":::" + clip.start + ":" + clip.end;
-            if (source.subtitleFile != null && source.subtitleFile.length > 0) {
-              clipPath = clipPath + "|||" + source.subtitleFile;
-            }
-            clipPaths.push(clipPath);
-          }
-        }
-        paths = clipPaths;
-      } else {
-        if (source.subtitleFile != null && source.subtitleFile.length > 0) {
-          url = url + "|||" + source.subtitleFile;
-        }
-        paths = [url];
-      }
-      resolve({
-        data: paths,
-        helpers: helpers,
-      });
-    }
-
-    if (!isVideo(url, false)) {
-      missingVideo();
-    }
-    if (url.startsWith("http")) {
-      wretch(url)
-        .get()
-        .notFound((e) => {
-          missingVideo();
-        })
-        .res((r) => {
-          ifExists(url);
-        })
-    } else {
-      const exists = fs.existsSync(url);
-      if (exists) {
-        ifExists(url);
-      } else {
-        missingVideo();
-      }
-    }
-  });
-}
-
-function loadPlaylist(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
-  const url = source.url;
-  return new CancelablePromise((resolve) => {
-    wretch(url)
-      .get()
-      .text(data => {
-        const urls = [];
-        if (url.endsWith(".asx")) {
-          const refs = new DOMParser().parseFromString(data, "text/xml").getElementsByTagName("Ref");
-          for (let l of refs) {
-            urls.push(l.getAttribute("href"));
-          }
-        } else if (url.endsWith(".m3u8")) {
-          for (let l of data.split("\n")) {
-            if (l.length > 0 && !l.startsWith("#")) {
-              urls.push(l.trim());
-            }
-          }
-        } else if (url.endsWith(".pls")) {
-          for (let l of data.split("\n")) {
-            if (l.startsWith("File")) {
-              urls.push(l.split("=")[1].trim());
-            }
-          }
-        } else if (url.endsWith(".xspf")) {
-          const locations = new DOMParser().parseFromString(data, "text/xml").getElementsByTagName("location");
-          for (let l of locations) {
-            urls.push(l.innerHTML);
-          }
-        }
-
-        if (urls.length > 0) {
-          helpers.count = urls.length;
-        }
-        resolve({
-          data: filterPathsToJustPlayable(filter, urls, true),
-          helpers: helpers,
-        });
-      })
-      .catch((e) => {
-        console.warn("Fetch error on", url);
-        console.warn(e);
-        resolve(null);
-      });
-  });
 }
 
 function loadTumblr(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
@@ -1640,14 +1530,24 @@ export default class SourceScraper extends React.Component {
       const receiveMessage = (message: any) => {
         let object = message.data;
         if (object?.type == "RPC") return;
+        // TODO Remove this when done
+        console.log(object);
 
-        // TODO Handle error, check for object.data
+        if (object?.error) {
+          console.error(object.error);
+        }
+
+        if (object?.warning) {
+          console.warn(object.warning);
+        }
+
+        // TODO Handle system message
 
         let newPromiseQueue = this.state.promiseQueue;
         n += 1;
 
         // Just add the new urls to the end of the list
-        if (object != null) {
+        if (object?.data != null) {
           const source = object.source;
           if (source.blacklist && source.blacklist.length > 0) {
             object.data = object.data.filter((url: string) => !source.blacklist.includes(url));
@@ -1669,8 +1569,7 @@ export default class SourceScraper extends React.Component {
 
         this.setState({allURLs: newAllURLs, promiseQueue: newPromiseQueue});
         if (n < sceneSources.length) {
-          setTimeout(sourceLoop, 1000);
-          //setTimeout(sourceLoop, loadPromise.timeout);
+          setTimeout(sourceLoop, object?.timeout != null ? object.timeout : 1000);
         } else {
           console.log(newAllURLs);
           console.log("DONE");

@@ -2,6 +2,8 @@ import recursiveReaddir from 'recursive-readdir';
 import fileURL from 'file-url';
 import path from "path";
 import wretch from "wretch";
+import fs from "fs";
+import {DOMParser} from "xmldom";
 
 import {IF} from "../../data/const";
 import Config from "../../data/Config";
@@ -114,6 +116,123 @@ export const loadRemoteImageURLList = (config: Config, source: LibrarySource, fi
         source: source,
         timeout: 0,
       });
+    });
+}
+
+export const loadVideo = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+  const url = source.url;
+  const missingVideo = () => {
+    pm({
+      warning: "Could not find " + source.url,
+      data: [],
+      helpers: helpers,
+      source: source,
+      timeout: 0,
+    });
+  }
+  const ifExists = (url: string) => {
+    if (!url.startsWith("http")) {
+      url = fileURL(url);
+    }
+    helpers.count = 1;
+
+    let paths;
+    if (source.clips && source.clips.length > 0) {
+      const clipPaths = Array<string>();
+      for (let clip of source.clips) {
+        if (!source.disabledClips || !source.disabledClips.includes(clip.id)) {
+          let clipPath = url + ":::" + clip.id + ":" + (clip.volume != null ? clip.volume : "-") + ":::" + clip.start + ":" + clip.end;
+          if (source.subtitleFile != null && source.subtitleFile.length > 0) {
+            clipPath = clipPath + "|||" + source.subtitleFile;
+          }
+          clipPaths.push(clipPath);
+        }
+      }
+      paths = clipPaths;
+    } else {
+      if (source.subtitleFile != null && source.subtitleFile.length > 0) {
+        url = url + "|||" + source.subtitleFile;
+      }
+      paths = [url];
+    }
+    pm({
+      data: paths,
+      helpers: helpers,
+      source: source,
+      timeout: 0,
+    });
+  }
+
+  if (!isVideo(url, false)) {
+    missingVideo();
+  }
+  if (url.startsWith("http")) {
+    wretch(url)
+      .get()
+      .notFound((e) => {
+        missingVideo();
+      })
+      .res((r) => {
+        ifExists(url);
+      })
+  } else {
+    const exists = fs.existsSync(url);
+    if (exists) {
+      ifExists(url);
+    } else {
+      missingVideo();
+    }
+  }
+}
+
+export const loadPlaylist = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+  const url = source.url;
+  wretch(url)
+    .get()
+    .text(data => {
+      const urls = [];
+      if (url.endsWith(".asx")) {
+        const refs = new DOMParser().parseFromString(data, "text/xml").getElementsByTagName("Ref");
+        for (let r = 0; r < refs.length; r++) {
+          const l = refs[r];
+          urls.push(l.getAttribute("href"));
+        }
+      } else if (url.endsWith(".m3u8")) {
+        for (let l of data.split("\n")) {
+          if (l.length > 0 && !l.startsWith("#")) {
+            urls.push(l.trim());
+          }
+        }
+      } else if (url.endsWith(".pls")) {
+        for (let l of data.split("\n")) {
+          if (l.startsWith("File")) {
+            urls.push(l.split("=")[1].trim());
+          }
+        }
+      } else if (url.endsWith(".xspf")) {
+        const locations = new DOMParser().parseFromString(data, "text/xml").getElementsByTagName("location");
+        for (let r = 0; r < locations.length; r++) {
+          const l = locations[r];
+          urls.push(l.textContent);
+        }
+      }
+
+      if (urls.length > 0) {
+        helpers.count = urls.length;
+      }
+      pm({
+        data: filterPathsToJustPlayable(filter, urls, true),
+        helpers: helpers,
+        source: source,
+        timeout: 0,
+      });
+    })
+    .catch((e) => {
+      pm({
+        error: e,
+        source: source,
+        timeout: 0,
+      })
     });
 }
 
