@@ -6,7 +6,7 @@ import CreatableSelect from "react-select/creatable";
 import {Checkbox, createStyles, Theme, withStyles} from "@material-ui/core";
 import {grey} from "@material-ui/core/colors";
 
-import {getSourceType} from "../../data/utils";
+import {getSourceType} from "../player/Scrapers";
 import en from "../../data/en";
 import Audio from "../../data/Audio";
 import LibrarySource from "../../data/LibrarySource";

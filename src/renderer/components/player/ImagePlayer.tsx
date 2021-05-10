@@ -4,10 +4,10 @@ import * as React from 'react';
 import request from 'request';
 import fs from "fs";
 import gifInfo from 'gif-info';
-import IdleTimer from 'react-idle-timer';
 
 import {GO, IF, OF, OT, SL, SOF, TF, VO, WF} from '../../data/const';
-import {getRandomListItem, getRandomNumber, isVideo, toArrayBuffer, urlToPath} from '../../data/utils';
+import {getRandomListItem, getRandomNumber, toArrayBuffer, urlToPath} from '../../data/utils';
+import {isVideo} from "./Scrapers";
 import Config from "../../data/Config";
 import Scene from "../../data/Scene";
 import ChildCallbackHack from './ChildCallbackHack';

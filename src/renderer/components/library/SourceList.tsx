@@ -15,7 +15,8 @@ import {
 
 import FolderIcon from "@material-ui/icons/Folder";
 
-import {arrayMove, getCachePath, getFileName, getSourceType, getTimestamp, urlToPath} from "../../data/utils";
+import {arrayMove, getCachePath, getTimestamp, urlToPath} from "../../data/utils";
+import {getFileName, getSourceType} from "../player/Scrapers";
 import {RF, RT, SDT, ST} from "../../data/const";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";

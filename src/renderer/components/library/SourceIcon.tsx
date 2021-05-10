@@ -1,17 +1,17 @@
 import * as React from 'react';
 
 import {SvgIcon} from "@material-ui/core";
+import AudiotrackIcon from "@material-ui/icons/Audiotrack";
 import FolderIcon from '@material-ui/icons/Folder';
 import InstagramIcon from '@material-ui/icons/Instagram';
 import ListIcon from '@material-ui/icons/List';
 import MovieIcon from '@material-ui/icons/Movie';
 import RedditIcon from '@material-ui/icons/Reddit';
-import TwitterIcon from '@material-ui/icons/Twitter';
 import SubscriptionsIcon from '@material-ui/icons/Subscriptions';
+import TwitterIcon from '@material-ui/icons/Twitter';
 
-import {getSourceType} from "../../data/utils";
+import {getSourceType} from "../player/Scrapers";
 import {ST} from "../../data/const";
-import AudiotrackIcon from "@material-ui/icons/Audiotrack";
 
 function TumblrIcon(props: any) {
   return (

@@ -16,47 +16,17 @@ import request from "request";
 import {
   getBackups,
   getCachePath,
-  getFileGroup,
-  getFileName,
   getFilesRecursively,
   getRandomIndex,
-  getSourceType,
-  isVideo,
-  isVideoPlaylist,
   randomizeList,
   removeDuplicatesBy,
   saveDir, toArrayBuffer
 } from "./utils";
+import {getFileGroup, getFileName, getSourceType, isVideo, isVideoPlaylist} from "../components/player/Scrapers";
 import defaultTheme from "./theme";
 import {
-  AF,
-  ALT,
-  ASF,
-  BT, CST,
-  DONE,
-  GT,
-  HTF,
-  IF,
-  IT,
-  LT,
-  OF,
-  PR,
-  PT,
-  RP,
-  SDGT,
-  SDT,
-  SF,
-  SGT,
-  SL,
-  SLT,
-  SOF,
-  SP,
-  SPT,
-  ST,
-  TF,
-  TT,
-  VCT,
-  VTF
+  AF, ALT, ASF, BT, CST, DONE, GT, HTF, IF, IT, LT, OF, PR, PT, RP, SDGT, SDT, SF, SGT, SL, SLT, SOF, SP, SPT, ST, TF,
+  TT, VCT, VTF
 } from "./const";
 import { defaultInitialState } from './AppStorage';
 import { Route } from "./Route";

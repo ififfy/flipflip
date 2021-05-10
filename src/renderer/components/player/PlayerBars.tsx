@@ -20,8 +20,9 @@ import PauseIcon from '@material-ui/icons/Pause';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 
 import {createMainMenu, createMenuTemplate} from "../../../main/MainMenu";
-import {IF, PT, ST} from "../../data/const";
-import {getCachePath, getSourceType, urlToPath} from "../../data/utils";
+import {PT, ST} from "../../data/const";
+import {getCachePath, urlToPath} from "../../data/utils";
+import {getSourceType} from "./Scrapers";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
 import Scene from "../../data/Scene";

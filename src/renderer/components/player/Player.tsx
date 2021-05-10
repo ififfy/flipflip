@@ -7,7 +7,8 @@ import {
 } from "@material-ui/core";
 
 import {SL, WC} from "../../data/const";
-import {getFileGroup, getFileName, getRandomListItem, urlToPath} from "../../data/utils";
+import {getRandomListItem, urlToPath} from "../../data/utils";
+import {getFileGroup, getFileName} from "./Scrapers";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
 import Scene from '../../data/Scene';

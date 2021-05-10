@@ -19,7 +19,8 @@ import {
 import AudiotrackIcon from "@material-ui/icons/Audiotrack";
 import DeleteIcon from "@material-ui/icons/Delete";
 
-import {extractMusicMetadata, generateThumbnailFile, isImage} from "../../data/utils";
+import {extractMusicMetadata, generateThumbnailFile} from "../../data/utils";
+import {isImage} from "../player/Scrapers";
 import Audio from "../../data/Audio";
 
 const styles = (theme: Theme) => createStyles({

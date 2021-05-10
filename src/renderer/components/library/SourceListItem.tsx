@@ -13,7 +13,8 @@ import BuildIcon from '@material-ui/icons/Build';
 import DeleteIcon from '@material-ui/icons/Delete';
 import OfflineBoltIcon from '@material-ui/icons/OfflineBolt';
 
-import {getCachePath, getFileName, getSourceType, getTimestamp, urlToPath} from "../../data/utils";
+import {getCachePath, getTimestamp, urlToPath} from "../../data/utils";
+import {getFileName, getSourceType} from "../player/Scrapers";
 import {SDT, ST} from "../../data/const";
 import Tag from "../../data/Tag";
 import SourceIcon from "./SourceIcon";

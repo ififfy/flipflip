@@ -1,44 +1,21 @@
 import * as React from 'react';
 import * as fs from "fs";
-import recursiveReaddir from 'recursive-readdir';
-import fileURL from 'file-url';
-import wretch from 'wretch';
-import http from 'http';
-import Snoowrap from 'snoowrap';
-import tumblr from "tumblr.js";
-import imgur from "imgur";
-import Twitter from "twitter";
-import {IgApiClient} from "instagram-private-api";
 import * as path from "path";
 import worker from 'workerize-loader!./Scrapers';
 
 import {
   CancelablePromise,
-  convertURL,
   getCachePath,
-  getFileGroup,
-  getFileName,
-  getSourceType,
-  isImage,
-  isVideo,
-  isImageOrVideo,
   randomizeList,
-  filterPathsToJustPlayable
 } from "../../data/utils";
-import {IF, RF, RT, SOF, ST, WF} from '../../data/const';
+import {getFileName, getSourceType} from "./Scrapers";
+import {SOF, ST, WF} from '../../data/const';
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
 import Scene from '../../data/Scene';
 import Audio from "../../data/Audio";
 import ChildCallbackHack from './ChildCallbackHack';
 import ImagePlayer from './ImagePlayer';
-
-let redditAlerted = false;
-let tumblrAlerted = false;
-let tumblr429Alerted = false;
-let twitterAlerted = false;
-let instagramAlerted = false;
-let hydrusAlerted = false;
 
 let workerInstance: any = null;
 
@@ -79,16 +56,13 @@ function scrapeFiles(config: Config, source: LibrarySource, filter: string, help
     } else {
       workerInstance.loadPlaylist(config, source, filter, helpers);
     }
-  } /*else { // Paging sources
-    let promiseFunction;
-    let timeout;
+  } else { // Paging sources
+    let workerFunction;
     if (sourceType == ST.tumblr) {
-      promiseFunction = loadTumblr;
-      timeout = 3000;
+      workerFunction = workerInstance.loadTumblr;
     } else if (sourceType == ST.reddit) {
-      promiseFunction = loadReddit;
-      timeout = 3000;
-    } else if (sourceType == ST.imagefap) {
+      workerFunction = workerInstance.loadReddit;
+    } /*else if (sourceType == ST.imagefap) {
       promiseFunction = loadImageFap;
       timeout = 8000;
     } else if (sourceType == ST.sexcom) {
@@ -127,316 +101,26 @@ function scrapeFiles(config: Config, source: LibrarySource, filter: string, help
     } else if (sourceType == ST.hydrus) {
       promiseFunction = loadHydrus;
       timeout = 8000;
-    }
+    }*/
     if (helpers.next == -1) {
       helpers.next = 0;
       const cachePath = getCachePath(source.url, config);
-      if (fs.existsSync(cachePath) && config.caching.enabled) {
+      if (config.caching.enabled && fs.existsSync(cachePath) && fs.readdirSync(cachePath).length > 0) {
         // If the cache directory exists, use it
         const realURL = source.url;
         source.url = cachePath;
-        promise = loadLocalDirectory(systemMessage, config, source, filter, helpers);
+        workerInstance.loadLocalDirectory(config, source, filter, helpers);
         source.url = realURL;
-        timeout = 0;
       } else {
-        promise = promiseFunction(systemMessage, config, source, filter, helpers);
+        workerFunction(config, source, filter, helpers);
       }
     } else {
-      promise = promiseFunction(systemMessage, config, source, filter, helpers);
+      workerFunction(config, source, filter, helpers);
     }
-    promise.timeout = timeout;
-  }*/
-}
-
-function loadTumblr(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
-  let configured = config.remoteSettings.tumblrOAuthToken != "" && config.remoteSettings.tumblrOAuthTokenSecret != "";
-  if (configured) {
-    const url = source.url;
-    return new CancelablePromise((resolve) => {
-      const client = tumblr.createClient({
-        consumer_key: config.remoteSettings.tumblrKey,
-        consumer_secret: config.remoteSettings.tumblrSecret,
-        token: config.remoteSettings.tumblrOAuthToken,
-        token_secret: config.remoteSettings.tumblrOAuthTokenSecret,
-      });
-      // TumblrID takes the form of <blog_name>.tumblr.com
-      let tumblrID = url.replace(/https?:\/\//, "");
-      tumblrID = tumblrID.replace("/", "");
-      if (tumblr429Alerted) {
-        resolve(null);
-        return;
-      }
-      client.blogPosts(tumblrID, {offset: helpers.next*20}, (err, data) => {
-        if (err) {
-          console.error("Error retriving " + tumblrID + (helpers.next == 0 ? "" : "(Page " + helpers.next + " )"));
-          console.error(err);
-          if (err.message.includes("429 Limit Exceeded") && !tumblr429Alerted && helpers.next == 0) {
-            if (!config.remoteSettings.silenceTumblrAlert) {
-              systemMessage("Tumblr has temporarily throttled your FlipFlip due to high traffic. Try again in a few minutes or visit Settings to try a different Tumblr API key.");
-            }
-            tumblr429Alerted = true;
-          }
-          resolve(null);
-          return;
-        }
-
-        // End loop if we're at end of posts
-        if (data.posts.length == 0) {
-          helpers.next = null;
-          resolve({data: [], helpers: helpers});
-          return;
-        }
-
-        let images = [];
-        for (let post of data.posts) {
-          // Sometimes photos are listed separately
-          if (post.photos) {
-            for (let photo of post.photos) {
-              images.push(photo.original_size.url);
-            }
-          }
-          if (post.player) {
-            for (let embed of post.player) {
-              const regex = /<iframe[^(?:src|\/>)]*src=["']([^"']*)[^(?:\/>)]*\/?>/g;
-              let imageSource;
-              while ((imageSource = regex.exec(embed.embed_code)) !== null) {
-                images.push(imageSource[1]);
-              }
-            }
-          }
-          if (post.body) {
-            const regex = /<img[^(?:src|\/>)]*src=["']([^"']*)[^>]*>/g;
-            let imageSource;
-            while ((imageSource = regex.exec(post.body)) !== null) {
-              images.push(imageSource[1]);
-            }
-            const regex2 = /<source[^(?:src|\/>)]*src=["']([^"']*)[^>]*>/g;
-            while ((imageSource = regex2.exec(post.body)) !== null) {
-              images.push(imageSource[1]);
-            }
-          }
-          if (post.video_url) {
-            images.push(post.video_url);
-          }
-        }
-
-        if (images.length > 0) {
-          let convertedSource = Array<string>();
-          let convertedCount = 0;
-          for (let url of images) {
-            convertURL(url).then((urls: Array<string>) => {
-              convertedSource = convertedSource.concat(urls);
-              convertedCount++;
-              if (convertedCount == images.length) {
-                helpers.next = helpers.next + 1;
-                helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedSource, true).length;
-                resolve({
-                  data: filterPathsToJustPlayable(filter, convertedSource, true),
-                  helpers: helpers,
-                });
-              }
-            })
-            .catch ((error: any) => {
-              console.error(error);
-              convertedCount++;
-              if (convertedCount == images.length) {
-                helpers.next = helpers.next + 1;
-                helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedSource, true).length;
-                resolve({
-                  data: filterPathsToJustPlayable(filter, convertedSource, true),
-                  helpers: helpers,
-                });
-              }
-            });
-          }
-        } else {
-          helpers.next = null;
-          resolve({data: [], helpers: helpers});
-        }
-      });
-    });
-  } else {
-    if (!tumblrAlerted) {
-      systemMessage("You haven't authorized FlipFlip to work with Tumblr yet.\nVisit Settings to authorize Tumblr.");
-      tumblrAlerted = true;
-    }
-    return new CancelablePromise((resolve) => {
-      resolve(null);
-    });
   }
 }
 
-function loadReddit(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
-  let configured = config.remoteSettings.redditRefreshToken != "";
-  if (configured) {
-    const url = source.url;
-    return new CancelablePromise((resolve) => {
-      const reddit = new Snoowrap({
-        userAgent: config.remoteSettings.redditUserAgent,
-        clientId: config.remoteSettings.redditClientID,
-        clientSecret: "",
-        refreshToken: config.remoteSettings.redditRefreshToken,
-      });
-      if (url.includes("/r/")) {
-        const handleSubmissions = (submissionListing: any) => {
-          if (submissionListing.length > 0) {
-            let convertedListing = Array<string>();
-            let convertedCount = 0;
-            for (let s of submissionListing) {
-              convertURL(s.url).then((urls: Array<string>) => {
-                convertedListing = convertedListing.concat(urls);
-                convertedCount++;
-                if (convertedCount == submissionListing.length) {
-                  helpers.next = submissionListing[submissionListing.length - 1].name;
-                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
-                  resolve({
-                    data: filterPathsToJustPlayable(filter, convertedListing, true),
-                    helpers: helpers,
-                  });
-                }
-              })
-              .catch ((error: any) => {
-                console.error(error);
-                convertedCount++;
-                if (convertedCount == submissionListing.length) {
-                  helpers.next = submissionListing[submissionListing.length - 1].name;
-                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
-                  resolve({
-                    data: filterPathsToJustPlayable(filter, convertedListing, true),
-                    helpers: helpers,
-                  });
-                }
-              });
-            }
-          } else {
-            helpers.next = null;
-            resolve({data: [], helpers: helpers});
-          }
-        };
-        const errorSubmission = (error: any) => {
-          console.error(error);
-          resolve(null);
-        };
-
-        switch (source.redditFunc) {
-          default:
-          case RF.hot:
-            reddit.getSubreddit(getFileGroup(url)).getHot({after: helpers.next})
-              .then(handleSubmissions)
-              .catch(errorSubmission);
-            break;
-          case RF.new:
-            reddit.getSubreddit(getFileGroup(url)).getNew({after: helpers.next})
-              .then(handleSubmissions)
-              .catch(errorSubmission);
-            break;
-          case RF.top:
-            const time = source.redditTime == null ? RT.day : source.redditTime;
-            reddit.getSubreddit(getFileGroup(url)).getTop({time: time, after: helpers.next})
-              .then(handleSubmissions)
-              .catch(errorSubmission);
-            break;
-          case RF.controversial:
-            reddit.getSubreddit(getFileGroup(url)).getControversial({after: helpers.next})
-              .then(handleSubmissions)
-              .catch(errorSubmission);
-            break;
-          case RF.rising:
-            reddit.getSubreddit(getFileGroup(url)).getRising({after: helpers.next})
-              .then(handleSubmissions)
-              .catch(errorSubmission);
-            break;
-        }
-      } else if (url.includes("/saved")) {
-        reddit.getUser(getFileGroup(url)).getSavedContent({after: helpers.next})
-          .then((submissionListing: any) => {
-          if (submissionListing.length > 0) {
-            let convertedListing = Array<string>();
-            let convertedCount = 0;
-            for (let s of submissionListing) {
-              convertURL(s.url).then((urls: Array<string>) => {
-                convertedListing = convertedListing.concat(urls);
-                convertedCount++;
-                if (convertedCount == submissionListing.length) {
-                  helpers.next = submissionListing[submissionListing.length - 1].name;
-                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
-                  resolve({
-                    data: filterPathsToJustPlayable(filter, convertedListing, true),
-                    helpers: helpers,
-                  });
-                }
-              })
-              .catch ((error: any) => {
-                convertedCount++;
-                if (convertedCount == submissionListing.length) {
-                  helpers.next = submissionListing[submissionListing.length - 1].name;
-                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
-                  resolve({
-                    data: filterPathsToJustPlayable(filter, convertedListing, true),
-                    helpers: helpers,
-                  });
-                }
-              });
-            }
-          } else {
-            helpers.next = null;
-            resolve({data: [], helpers: helpers});
-          }
-        }).catch((err: any) => {
-          resolve(null);
-        });
-      } else if (url.includes("/user/") || url.includes("/u/")) {
-        reddit.getUser(getFileGroup(url)).getSubmissions({after: helpers.next})
-          .then((submissionListing: any) => {
-          if (submissionListing.length > 0) {
-            let convertedListing = Array<string>();
-            let convertedCount = 0;
-            for (let s of submissionListing) {
-              convertURL(s.url).then((urls: Array<string>) => {
-                convertedListing = convertedListing.concat(urls);
-                convertedCount++;
-                if (convertedCount == submissionListing.length) {
-                  helpers.next = submissionListing[submissionListing.length - 1].name;
-                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
-                  resolve({
-                    data: filterPathsToJustPlayable(filter, convertedListing, true),
-                    helpers: helpers,
-                  });
-                }
-              })
-              .catch ((error: any) => {
-                convertedCount++;
-                if (convertedCount == submissionListing.length) {
-                  helpers.next = submissionListing[submissionListing.length - 1].name;
-                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
-                  resolve({
-                    data: filterPathsToJustPlayable(filter, convertedListing, true),
-                    helpers: helpers,
-                  });
-                }
-              });
-            }
-          } else {
-            helpers.next = null;
-            resolve({data: [], helpers: helpers});
-          }
-        }).catch((err: any) => {
-          resolve(null);
-        });
-      }
-    });
-  } else {
-    if (!redditAlerted) {
-      systemMessage("You haven't authorized FlipFlip to work with Reddit yet.\nVisit Settings to authorize Reddit.");
-      redditAlerted = true;
-    }
-    return new CancelablePromise((resolve) => {
-      resolve(null);
-    });
-  }
-}
-
-function loadImageFap(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
+/*function loadImageFap(systemMessage: Function, config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}): CancelablePromise {
   if (helpers.next == 0) {
     helpers.next = [0, 0];
   }
@@ -539,7 +223,7 @@ function loadImageFap(systemMessage: Function, config: Config, source: LibrarySo
       helpers.next = null;
       resolve({data: [], helpers: helpers});
       // This doesn't work anymore due to src url requiring referer
-      /*wretch(url)
+      /!*wretch(url)
         .get()
         .setTimeout(10000)
         .onAbort((e) => resolve(null))
@@ -562,7 +246,7 @@ function loadImageFap(systemMessage: Function, config: Config, source: LibrarySo
             helpers.next = null;
             resolve({data: [], helpers: helpers});
           }
-        });*/
+        });*!/
     } else {
       helpers.next = null;
       resolve({data: [], helpers: helpers});
@@ -576,7 +260,7 @@ function loadSexCom(systemMessage: Function, config: Config, source: LibrarySour
     // This doesn't work anymore due to src url requiring referer
     helpers.next = null;
     resolve({data: [], helpers: helpers});
-    /*let requestURL;
+    /!*let requestURL;
     if (url.includes("/user/")) {
       requestURL = "https://www.sex.com/user/" + getFileGroup(url) + "?page=" + (helpers.next + 1);
     } else if (url.includes("/gifs/") || url.includes("/pics/") || url.includes("/videos/")) {
@@ -653,7 +337,7 @@ function loadSexCom(systemMessage: Function, config: Config, source: LibrarySour
           helpers.next = null;
           resolve({data: [], helpers: helpers});
         }
-      });*/
+      });*!/
   });
 }
 
@@ -1370,7 +1054,7 @@ function loadHydrus(systemMessage: Function, config: Config, source: LibrarySour
       resolve(null);
     });
   }
-}
+}*/
 
 export default class SourceScraper extends React.Component {
   readonly props: {
@@ -1446,12 +1130,10 @@ export default class SourceScraper extends React.Component {
   }
 
   componentDidMount(restart = false) {
+    // Create an instance of your worker
+    workerInstance = worker();
     if (!restart) {
-      redditAlerted = false;
-      tumblrAlerted = false;
-      tumblr429Alerted = false;
-      instagramAlerted = false;
-      twitterAlerted = false;
+      workerInstance.reset();
       this._nextPromiseQueue = new Array<{ source: LibrarySource, helpers: {next: any, count: number, retries: number} }>();
       this._nextAllURLs = new Map<string, Array<string>>();
     }
@@ -1460,9 +1142,6 @@ export default class SourceScraper extends React.Component {
     if (this.state.allURLs.size > 0) {
       newAllURLs = this.state.allURLs;
     }
-
-    // Create an instance of your worker
-    workerInstance = worker();
 
     let sceneSources = new Array<LibrarySource>();
     for (let source of this.props.scene.sources) {
@@ -1534,6 +1213,7 @@ export default class SourceScraper extends React.Component {
         console.log(object);
 
         if (object?.error) {
+          console.error("Error retrieving " + object?.source.url + (object?.helpers.next > 0 ? "Page " + object.helpers.next : ""));
           console.error(object.error);
         }
 
@@ -1541,44 +1221,48 @@ export default class SourceScraper extends React.Component {
           console.warn(object.warning);
         }
 
-        // TODO Handle system message
-
-        let newPromiseQueue = this.state.promiseQueue;
-        n += 1;
-
-        // Just add the new urls to the end of the list
-        if (object?.data != null) {
-          const source = object.source;
-          if (source.blacklist && source.blacklist.length > 0) {
-            object.data = object.data.filter((url: string) => !source.blacklist.includes(url));
-          }
-          if (this.props.scene.weightFunction == WF.sources) {
-            newAllURLs.set(source.url, object.data);
-          } else {
-            for (let d of object.data) {
-              newAllURLs.set(d, [source.url]);
-            }
-          }
-
-          // If this is a remote URL, queue up the next promise
-          if (object.helpers.next != null) {
-            newPromiseQueue.push({source: source, helpers: object.helpers});
-          }
-          this.props.setCount(source.url, object.helpers.count, object.helpers.next == null);
+        if (object?.systemMessage) {
+          this.props.systemMessage(object.systemMessage);
         }
 
-        this.setState({allURLs: newAllURLs, promiseQueue: newPromiseQueue});
-        if (n < sceneSources.length) {
-          setTimeout(sourceLoop, object?.timeout != null ? object.timeout : 1000);
-        } else {
-          console.log(newAllURLs);
-          console.log("DONE");
-          this.props.finishedLoading(isEmpty(Array.from(newAllURLs.values())));
-          //promiseLoop();
-          //if (this.props.nextScene && this.props.playNextScene) {
-          //  n = 0;
-          //  nextSourceLoop();
-         // }
+        if (object?.source) {
+          let newPromiseQueue = this.state.promiseQueue;
+          n += 1;
+
+          // Just add the new urls to the end of the list
+          if (object?.data != null) {
+            const source = object.source;
+            if (source.blacklist && source.blacklist.length > 0) {
+              object.data = object.data.filter((url: string) => !source.blacklist.includes(url));
+            }
+            if (this.props.scene.weightFunction == WF.sources) {
+              newAllURLs.set(source.url, object.data);
+            } else {
+              for (let d of object.data) {
+                newAllURLs.set(d, [source.url]);
+              }
+            }
+
+            // If this is a remote URL, queue up the next promise
+            if (object.helpers.next != null) {
+              newPromiseQueue.push({source: source, helpers: object.helpers});
+            }
+            this.props.setCount(source.url, object.helpers.count, object.helpers.next == null);
+          }
+
+          this.setState({allURLs: newAllURLs, promiseQueue: newPromiseQueue});
+          if (n < sceneSources.length) {
+            setTimeout(sourceLoop, object?.timeout != null ? object.timeout : 1000);
+          } else {
+            console.log(newAllURLs);
+            console.log("DONE");
+            this.props.finishedLoading(isEmpty(Array.from(newAllURLs.values())));
+            //promiseLoop();
+            //if (this.props.nextScene && this.props.playNextScene) {
+            //  n = 0;
+            //  nextSourceLoop();
+            // }
+          }
         }
       }
 

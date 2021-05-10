@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { Grid, Typography} from "@material-ui/core";
 
-import {getSourceType} from "../../data/utils";
+import {getSourceType} from "../player/Scrapers";
 import {ST} from "../../data/const";
 import Clip from "../../data/Clip";
 import Scene from "../../data/Scene";

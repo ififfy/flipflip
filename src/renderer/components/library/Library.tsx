@@ -33,7 +33,8 @@ import ShuffleIcon from "@material-ui/icons/Shuffle";
 import SortIcon from '@material-ui/icons/Sort';
 
 import {AF, LT, MO, PR, SF, SP, ST} from "../../data/const";
-import {getCachePath, getLocalPath, getSourceType, getTimestampValue} from "../../data/utils";
+import {getCachePath, getLocalPath, getTimestampValue} from "../../data/utils";
+import {getSourceType} from "../player/Scrapers";
 import en from "../../data/en";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";

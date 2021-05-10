@@ -37,7 +37,8 @@ import SortIcon from '@material-ui/icons/Sort';
 
 import {red} from "@material-ui/core/colors";
 
-import {extractMusicMetadata, getFilesRecursively, isAudio} from "../../data/utils";
+import {extractMusicMetadata, getFilesRecursively} from "../../data/utils";
+import {isAudio} from "../player/Scrapers";
 import {AF, ASF, ALT, MO, SP, PR} from "../../data/const";
 import en from "../../data/en";
 import Audio from "../../data/Audio";
