@@ -7,6 +7,9 @@ import {DOMParser} from "xmldom";
 import domino from "domino";
 import tumblr from "tumblr.js";
 import Snoowrap from "snoowrap";
+import * as imgur from "imgur";
+import * as Twitter from "twitter";
+import {IgApiClient} from "instagram-private-api";
 
 import {IF, RF, RT, ST} from "../../data/const";
 import Config from "../../data/Config";
@@ -44,7 +47,7 @@ export const loadLocalDirectory = (config: Config, source: LibrarySource, filter
   recursiveReaddir(url, blacklist, (err: any, rawFiles: Array<string>) => {
     if (err) {
       pm({
-        error: err,
+        error: err.message,
         helpers: helpers,
         source: source,
         timeout: 0,
@@ -83,7 +86,6 @@ export const loadLocalDirectory = (config: Config, source: LibrarySource, filter
 
 export const loadRemoteImageURLList = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
   const url = source.url;
-
   wretch(url)
     .get()
     .text(data => {
@@ -110,7 +112,7 @@ export const loadRemoteImageURLList = (config: Config, source: LibrarySource, fi
               if (convertedCount == lines.length) {
                 helpers.count = filterPathsToJustPlayable(IF.any, convertedSource, true).length;
                 pm({
-                  error: error,
+                  error: error.message,
                   data: filterPathsToJustPlayable(filter, convertedSource, true),
                   helpers: helpers,
                   source: source,
@@ -130,7 +132,7 @@ export const loadRemoteImageURLList = (config: Config, source: LibrarySource, fi
     })
     .catch((e) => {
       pm({
-        error: e,
+        error: e.message,
         helpers: helpers,
         source: source,
         timeout: 0,
@@ -142,7 +144,7 @@ export const loadVideo = (config: Config, source: LibrarySource, filter: string,
   const url = source.url;
   const missingVideo = () => {
     pm({
-      warning: "Could not find " + source.url,
+      error: "Could not find " + source.url,
       data: [],
       helpers: helpers,
       source: source,
@@ -248,7 +250,7 @@ export const loadPlaylist = (config: Config, source: LibrarySource, filter: stri
     })
     .catch((e) => {
       pm({
-        error: e,
+        error: e.message,
         helpers: helpers,
         source: source,
         timeout: 0,
@@ -288,7 +290,7 @@ export const loadTumblr = (config: Config, source: LibrarySource, filter: string
           tumblr429Alerted = true;
         }
         pm({
-          error: err,
+          error: err.message,
           systemMessage: systemMessage,
           helpers: helpers,
           source: source,
@@ -366,7 +368,7 @@ export const loadTumblr = (config: Config, source: LibrarySource, filter: string
                 helpers.next = helpers.next + 1;
                 helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedSource, true).length;
                 pm({
-                  error: error,
+                  error: error.message,
                   data: filterPathsToJustPlayable(filter, convertedSource, true),
                   helpers: helpers,
                   source: source,
@@ -437,7 +439,7 @@ export const loadReddit = (config: Config, source: LibrarySource, filter: string
                   helpers.next = submissionListing[submissionListing.length - 1].name;
                   helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
                   pm({
-                    error: error,
+                    error: error.message,
                     data: filterPathsToJustPlayable(filter, convertedListing, true),
                     helpers: helpers,
                     source: source,
@@ -458,7 +460,7 @@ export const loadReddit = (config: Config, source: LibrarySource, filter: string
       };
       const errorSubmission = (error: any) => {
         pm({
-          error: error,
+          error: error.message,
           helpers: helpers,
           source: source,
           timeout: timeout,
@@ -521,6 +523,7 @@ export const loadReddit = (config: Config, source: LibrarySource, filter: string
                     helpers.next = submissionListing[submissionListing.length - 1].name;
                     helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
                     pm({
+                      error: error.message,
                       data: filterPathsToJustPlayable(filter, convertedListing, true),
                       helpers: helpers,
                       source: source,
@@ -540,7 +543,7 @@ export const loadReddit = (config: Config, source: LibrarySource, filter: string
           }
         }).catch((err: any) => {
           pm({
-            error: err,
+            error: err.message,
             helpers: helpers,
             source: source,
             timeout: timeout,
@@ -573,6 +576,7 @@ export const loadReddit = (config: Config, source: LibrarySource, filter: string
                     helpers.next = submissionListing[submissionListing.length - 1].name;
                     helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
                     pm({
+                      error: error.message,
                       data: filterPathsToJustPlayable(filter, convertedListing, true),
                       helpers: helpers,
                       source: source,
@@ -592,7 +596,7 @@ export const loadReddit = (config: Config, source: LibrarySource, filter: string
           }
         }).catch((err: any) => {
           pm({
-            error: err,
+            error: err.message,
             helpers: helpers,
             source: source,
             timeout: timeout,
@@ -604,6 +608,1424 @@ export const loadReddit = (config: Config, source: LibrarySource, filter: string
     if (!redditAlerted) {
       systemMessage = "You haven't authorized FlipFlip to work with Reddit yet.\nVisit Settings to authorize Reddit.";
       redditAlerted = true;
+    }
+    pm({
+      systemMessage: systemMessage,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    });
+  }
+}
+
+// TODO Verify this works after site's cert issue is resolved
+export const loadImageFap = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+  const timeout = 8000;
+  if (helpers.next == 0) {
+    helpers.next = [0, 0];
+  }
+  const url = source.url;
+  if (url.includes("/pictures/")) {
+    wretch("https://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2")
+      .get()
+      .setTimeout(10000)
+      .onAbort((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }))
+      .text((html) => {
+        let imageEls = domino.createWindow(html).document.querySelectorAll(".expp-container > form > table > tbody > tr > td");
+        if (imageEls.length > 0) {
+          let imageCount = 0;
+          let images = Array<string>();
+          for (let i = 0; i < imageEls.length; i++) {
+            const image = imageEls.item(i);
+            wretch("https://www.imagefap.com/photo/" + image.id + "/")
+              .get()
+              .text((html) => {
+                imageCount++;
+                let contentURL = html.match("\"contentUrl\": \"(.*?)\",");
+                if (contentURL != null) {
+                  images.push(contentURL[1]);
+                }
+                if (imageCount == imageEls.length) {
+                  helpers.next = null;
+                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
+                  pm({
+                    data: filterPathsToJustPlayable(filter, images, false),
+                    helpers: helpers,
+                    source: source,
+                    timeout: timeout,
+                  });
+                }
+              })
+          }
+        } else {
+          helpers.next = null;
+          pm({
+            data: [],
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          });
+        }
+      });
+  } else if (url.includes("/organizer/")) {
+    wretch(url + "?page=" + helpers.next[0])
+      .get()
+      .setTimeout(10000)
+      .onAbort((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }))
+      .text((html) => {
+        let albumEls = domino.createWindow(html).document.querySelectorAll("td.blk_galleries > font > a.blk_galleries");
+        if (albumEls.length == 0) {
+          helpers.next = null;
+          pm({
+            data: [],
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          });
+        } else if (albumEls.length > helpers.next[1]) {
+          let albumEl = albumEls[helpers.next[1]];
+          let albumID = albumEl.getAttribute("href").substring(albumEl.getAttribute("href").lastIndexOf("/") + 1);
+          wretch("https://www.imagefap.com/gallery/" + albumID + "?view=2")
+            .get()
+            .text((html) => {
+              let imageEls = domino.createWindow(html).document.querySelectorAll(".expp-container > form > table > tbody > tr > td");
+              if (imageEls.length > 0) {
+                let images = Array<string>();
+                let imageCount = 0;
+                for (let i = 0; i < imageEls.length; i++) {
+                  const image = imageEls.item(i);
+                  wretch("https://www.imagefap.com/photo/" + image.id + "/")
+                    .get()
+                    .text((html) => {
+                      imageCount++;
+                      let contentURL = html.match("\"contentUrl\": \"(.*?)\",");
+                      if (contentURL != null) {
+                        images.push(contentURL[1]);
+                      }
+                      if (imageCount == imageEls.length) {
+                        helpers.next[1] += 1;
+                        helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
+                        pm({
+                          data: filterPathsToJustPlayable(filter, images, false),
+                          helpers: helpers,
+                          source: source,
+                          timeout: timeout,
+                        })
+                      }
+                    });
+                }
+              } else {
+                helpers.next[1] += 1;
+                pm({
+                  data: [],
+                  helpers: helpers,
+                  source: source,
+                  timeout: timeout,
+                })
+              }
+            });
+        } else {
+          helpers.next[0] += 1;
+          helpers.next[1] = 0;
+          pm({
+            data: [],
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          })
+        }
+      })
+      .catch((e) => {
+        pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        })
+      });
+  } else if (url.includes("/video.php?vid=")) {
+    helpers.next = null;
+    pm({
+      data: [],
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    });
+    // This doesn't work anymore due to src url requiring referer
+    /*wretch(url)
+      .get()
+      .setTimeout(10000)
+      .onAbort((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }))
+      .text((html) => {
+        const findVideoURLs = /url: '(https:\/\/cdn-fck\.moviefap\.com\/moviefap\/.*)',/g.exec(html);
+        if (findVideoURLs) {
+          let videoURLs = Array<string>();
+          for (let v of findVideoURLs) {
+            if (!v.startsWith('url:')) {
+              videoURLs.push(v);
+            }
+          }
+          helpers.next = null;
+          helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, videoURLs, false).length;
+          pm({
+            data: filterPathsToJustPlayable(filter, videoURLs, false),
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          });
+        } else {
+          helpers.next = null;
+          pm({
+            data: [],
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          });
+        }
+      });*/
+  } else {
+    helpers.next = null;
+    pm({
+      data: [],
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    });
+  }
+}
+
+export const loadSexCom = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+  const timeout = 8000;
+  const url = source.url;
+  // This doesn't work anymore due to src url requiring referer
+  helpers.next = null;
+  pm({
+    data: [],
+    helpers: helpers,
+    source: source,
+    timeout: timeout,
+  });
+  /*let requestURL;
+  if (url.includes("/user/")) {
+    requestURL = "https://www.sex.com/user/" + getFileGroup(url) + "?page=" + (helpers.next + 1);
+  } else if (url.includes("/gifs/") || url.includes("/pics/") || url.includes("/videos/")) {
+    requestURL = "https://www.sex.com/" + getFileGroup(url) + "?page=" + (helpers.next + 1);
+  }
+  wretch(requestURL)
+    .get()
+    .setTimeout(5000)
+    .onAbort((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }))
+    .notFound((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }))
+    .text((html) => {
+      let imageEls = domino.createWindow(html).document.querySelectorAll(".small_pin_box > .image_wrapper > img");
+      if (imageEls.length > 0) {
+        let videos = Array<string>();
+        let images = Array<string>();
+        for (let i = 0; i < imageEls.length; i++) {
+          const image = imageEls.item(i);
+          if (image.nextElementSibling || image.previousElementSibling) {
+            videos.push(image.parentElement.getAttribute("href"));
+          } else {
+            images.push(image.getAttribute("data-src"));
+          }
+        }
+        if (videos.length == 0) {
+          helpers.next = helpers.next + 1;
+          helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
+          pm({
+            data: filterPathsToJustPlayable(filter, images, false),
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          })
+        } else {
+          const validImages = filterPathsToJustPlayable(filter, images, false);
+          images = [];
+          let count = 0;
+          for (let videoURL of videos) {
+            wretch("https://www.sex.com" + videoURL)
+              .get()
+              .setTimeout(5000)
+              .onAbort((e) => pm({
+                error: e.message,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              }))
+              .notFound((e) => pm({
+                error: e.message,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              }))
+              .text((html) => {
+                count += 1;
+
+                let vidID = null;
+                const vidIDRegex = /\/video\/stream\/(\d+)/g;
+                let regexResult = vidIDRegex.exec(html);
+                if (regexResult != null) {
+                  vidID = regexResult[1];
+                }
+
+                let date = null;
+                const dateRegex = /\d{4}\/\d{2}\/\d{2}/g;
+                regexResult = dateRegex.exec(html);
+                if (regexResult != null) {
+                  date = regexResult[0];
+                }
+
+                if (vidID != null && date != null) {
+                  images.push("https://videos1.sex.com/stream/" + date + "/" + vidID +".mp4");
+                }
+                if (count == videos.length) {
+                  const validVideos = filterPathsToJustPlayable(IF.any, images, true);
+                  const filePaths = validImages.concat(validVideos);
+                  helpers.next = helpers.next + 1;
+                  helpers.count = helpers.count + filePaths.length;
+                  pm({
+                    data: filePaths,
+                    helpers: helpers,
+                    source: source,
+                    timeout: timeout,
+                  })
+                }
+              });
+          }
+        }
+      } else {
+        helpers.next = null;
+        pm({
+          data: [],
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        });
+      }
+    });*/
+}
+
+export const loadImgur = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+  const timeout = 3000;
+  const url = source.url;
+  imgur.getAlbumInfo(getFileGroup(url))
+    .then((json: any) => {
+      const images = json.data.images.map((i: any) => i.link);
+      helpers.next = null;
+      helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+      pm({
+        data: filterPathsToJustPlayable(filter, images, true),
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      })
+    })
+    .catch((err: any) => {
+      pm({
+        error: err.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      });
+    });
+}
+
+export const loadTwitter = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+  const timeout = 3000;
+  let configured = config.remoteSettings.twitterAccessTokenKey != "" && config.remoteSettings.twitterAccessTokenSecret != "";
+  if (configured) {
+    const includeRetweets = source.includeRetweets;
+    const includeReplies = source.includeReplies;
+    const url = source.url;
+    const twitter = new Twitter({
+      consumer_key: config.remoteSettings.twitterConsumerKey,
+      consumer_secret: config.remoteSettings.twitterConsumerSecret,
+      access_token_key: config.remoteSettings.twitterAccessTokenKey,
+      access_token_secret: config.remoteSettings.twitterAccessTokenSecret,
+    });
+    twitter.get('statuses/user_timeline',
+      helpers.next == 0 ? {screen_name: getFileGroup(url), count: 200, exclude_replies: !includeReplies, include_rts: includeRetweets, tweet_mode: 'extended'} : {screen_name: getFileGroup(url), count: 200, exclude_replies: !includeReplies, include_rts: includeRetweets, tweet_mode: 'extended', max_id: helpers.next},
+      (error: any, tweets: any) => {
+        if (error) {
+          pm({
+            error: error.message,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          });
+          return;
+        }
+        let images = Array<string>();
+        let lastID = "";
+        for (let t of tweets) {
+          // Skip FanCentro/OnlyFans/ClipTeez posts
+          if (/href="https?:\/\/(fancentro\.com|onlyfans\.com|mykink\.xxx)\/?"/.exec(t.source) != null) continue;
+          if (t.extended_entities && t.extended_entities.media) {
+            for (let m of t.extended_entities.media) {
+              let url;
+              if (m.video_info) {
+                url = m.video_info.variants[0].url;
+              } else {
+                url = m.media_url;
+              }
+              if (url.includes("?")) {
+                url = url.substring(0, url.lastIndexOf("?"));
+              }
+              images.push(url);
+            }
+          } else if (t.entities.media) {
+            for (let m of t.entities.media) {
+              images.push(m.media_url);
+            }
+          }
+          lastID = t.id;
+        }
+        if (lastID == helpers.next) {
+          helpers.next = null;
+          pm({
+            data: [],
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          });
+        } else {
+          helpers.next = lastID;
+          helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+          pm({
+            data: filterPathsToJustPlayable(filter, images, true),
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          });
+        }
+      })
+  } else {
+    let systemMessage = undefined;
+    if (!twitterAlerted) {
+      systemMessage = "You haven't authorized FlipFlip to work with Twitter yet.\nVisit Settings to authorize Twitter.";
+      twitterAlerted = true;
+    }
+    pm({
+      systemMessage: systemMessage,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    });
+  }
+}
+
+export const loadDeviantArt = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+  const timeout = 3000;
+  const url = source.url;
+  wretch("https://backend.deviantart.com/rss.xml?type=deviation&q=by%3A" + getFileGroup(url) + "+sort%3Atime+meta%3Aall" + (helpers.next != 0 ? "&offset=" + helpers.next : ""))
+    .get()
+    .setTimeout(5000)
+    .onAbort((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }))
+    .notFound((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }))
+    .text((text) => {
+      const xml = new DOMParser().parseFromString(text, "text/xml");
+      let hasNextPage = false;
+      const pages = xml.getElementsByTagName("atom:link");
+      for (let l = 0; l < pages.length; l++) {
+        if (pages[l].getAttribute("rel") == "next") hasNextPage = true;
+      }
+      let images = Array<string>();
+      const items = xml.getElementsByTagName("item");
+      for (let i = 0; i < items.length; i++) {
+        helpers.next+=1;
+        const contents = items[i].getElementsByTagName("media:content");
+        for (let c = 0; c < contents.length; c++) {
+          const content = contents[c];
+          if (content.getAttribute("medium") == "image") {
+            images.push(content.getAttribute("url"));
+          }
+        }
+      }
+      if (!hasNextPage) {
+        helpers.next = null;
+      }
+      helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
+      pm({
+        data: filterPathsToJustPlayable(filter, images, false),
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      });
+    });
+}
+
+let ig: IgApiClient = null;
+let session: any = null;
+export const loadInstagram = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+  const timeout = 3000;
+  const configured = config.remoteSettings.instagramUsername != "" && config.remoteSettings.instagramPassword != "";
+  if (configured) {
+    const url = source.url;
+    const processItems = (items: any, helpers: {next: any, count: number, retries: number}) => {
+      let images = Array<string>();
+      for (let item of items) {
+        if (item.carousel_media) {
+          for (let media of item.carousel_media) {
+            images.push(media.image_versions2.candidates[0].url);
+          }
+        }
+        if (item.video_versions) {
+          images.push(item.video_versions[0].url);
+        } else if (item.image_versions2) {
+          images.push(item.image_versions2.candidates[0].url);
+        }
+      }
+      // Strict filter won't work because instagram media needs the extra parameters on the end
+      helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
+      pm({
+        data: filterPathsToJustPlayable(filter, images, false),
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      });
+    };
+
+    if (ig == null) {
+      ig = new IgApiClient();
+      ig.state.generateDevice(config.remoteSettings.instagramUsername);
+      ig.account.login(config.remoteSettings.instagramUsername, config.remoteSettings.instagramPassword).then((loggedInUser) => {
+        ig.state.serializeCookieJar().then((cookies) => {
+          session = JSON.stringify(cookies);
+          ig.user.getIdByUsername(getFileGroup(url)).then((id) => {
+            const userFeed = ig.feed.user(id);
+            userFeed.items().then((items) => {
+              helpers.next = [id, userFeed.serialize()];
+              processItems(items, helpers);
+            }).catch((e) => pm({
+              error: e.message,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            }));
+          }).catch((e) => pm({
+            error: e.message,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          }));
+        }).catch((e) => pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }));
+      }).catch((e) => {
+        pm({
+          error: e.message,
+          systemMessage: e + "\n\nVisit Settings to authorize Instagram and attempt to resolve this issue.",
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        })
+        ig = null;
+      });
+    } else if (helpers.next == 0) {
+      ig.user.getIdByUsername(getFileGroup(url)).then((id) => {
+        const userFeed = ig.feed.user(id);
+        userFeed.items().then((items) => {
+          helpers.next = [id, userFeed.serialize()];
+          processItems(items, helpers);
+        }).catch((e) => pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }));
+      }).catch((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }));
+    } else {
+      ig.state.deserializeCookieJar(JSON.parse(session)).then((data) => {
+        const id = helpers.next[0];
+        const feedSession = helpers.next[1];
+        const userFeed = ig.feed.user(id);
+        userFeed.deserialize(feedSession);
+        if (!userFeed.isMoreAvailable()) {
+          helpers.next = null;
+          pm({
+            data: [],
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          });
+          return;
+        }
+        userFeed.items().then((items) => {
+          helpers.next = [id, userFeed.serialize()];
+          processItems(items, helpers);
+        }).catch((e) => pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }));
+      }).catch((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }));
+    }
+  } else {
+    let systemMessage = undefined;
+    if (!instagramAlerted) {
+      systemMessage = "You haven't authorized FlipFlip to work with Instagram yet.\nVisit Settings to authorize Instagram.";
+      instagramAlerted = true;
+    }
+    pm({
+      systemMessage: systemMessage,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    })
+  }
+}
+
+export const loadE621 = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+  const timeout = 8000;
+  const url = source.url;
+  const hostRegex = /^(https?:\/\/[^\/]*)\//g;
+  const thisHost = hostRegex.exec(url)[1];
+  let suffix = "";
+  if (url.includes("/pools/")) {
+    suffix = "/pools.json?search[id]=" + url.substring(url.lastIndexOf("/") + 1);
+
+    wretch(thisHost + suffix)
+      .get()
+      .setTimeout(5000)
+      .badRequest((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }))
+      .notFound((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }))
+      .timeout((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }))
+      .internalError((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }))
+      .onAbort((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }))
+      .json((json: any) => {
+        if (json.length == 0) {
+          helpers.next = null;
+          pm({
+            data: [],
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          });
+          return;
+        }
+
+        const count = json[0].post_count;
+        const images = Array<string>();
+        for (let postID of json[0].post_ids) {
+          suffix = "/posts/" + postID + ".json";
+          wretch(thisHost + suffix)
+            .get()
+            .setTimeout(5000)
+            .badRequest((e) => pm({
+              error: e.message,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            }))
+            .notFound((e) => pm({
+              error: e.message,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            }))
+            .timeout((e) => pm({
+              error: e.message,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            }))
+            .internalError((e) => pm({
+              error: e.message,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            }))
+            .onAbort((e) => pm({
+              error: e.message,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            }))
+            .json((json: any) => {
+              if (json.post && json.post.file.url) {
+                let fileURL = json.post.file.url;
+                if (!fileURL.startsWith("http")) {
+                  fileURL = "https://" + fileURL;
+                }
+                images.push(fileURL);
+              }
+
+              if (images.length == count) {
+                helpers.next = null;
+                helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+                pm({
+                  data: filterPathsToJustPlayable(filter, images, true),
+                  helpers: helpers,
+                  source: source,
+                  timeout: timeout,
+                });
+              }
+            })
+            .catch((e) => pm({
+              error: e.message,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            }));
+        }
+      })
+      .catch((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }));
+  } else {
+    suffix = "/posts.json?limit=20&page=" + (helpers.next + 1);
+    const tagRegex = /[?&]tags=(.*)&?/g;
+    let tags;
+    if ((tags = tagRegex.exec(url)) !== null) {
+      suffix += "&tags=" + tags[1];
+    }
+
+    wretch(thisHost + suffix)
+      .get()
+      .setTimeout(5000)
+      .badRequest((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }))
+      .notFound((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }))
+      .timeout((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }))
+      .internalError((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }))
+      .onAbort((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }))
+      .json((json: any) => {
+        if (json.length == 0) {
+          helpers.next = null;
+          pm({
+            data: [],
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          });
+        }
+
+        let list = json.posts;
+        const images = Array<string>();
+        for (let p of list) {
+          if (p.file.url) {
+            let fileURL = p.file.url;
+            if (!fileURL.startsWith("http")) {
+              fileURL = "https://" + fileURL;
+            }
+            images.push(fileURL);
+          }
+        }
+
+        helpers.next = helpers.next + 1;
+        helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+        pm({
+          data: filterPathsToJustPlayable(filter, images, true),
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        });
+      })
+      .catch((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }));
+  }
+}
+
+export const loadDanbooru = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+  const timeout = 8000;
+  const url = source.url;
+  const hostRegex = /^(https?:\/\/[^\/]*)\//g;
+  const thisHost = hostRegex.exec(url)[1];
+  let suffix = "";
+  if (url.includes("/pool/")) {
+    suffix = "/pool/show.json?page=" + (helpers.next + 1) + "&id=" + url.substring(url.lastIndexOf("/") + 1);
+  } else {
+    suffix = "/post/index.json?limit=20&page=" + (helpers.next + 1);
+    const tagRegex = /[?&]tags=(.*)&?/g;
+    let tags;
+    if ((tags = tagRegex.exec(url)) !== null) {
+      suffix += "&tags=" + tags[1];
+    }
+    const titleRegex = /[?&]title=(.*)&?/g;
+    let title;
+    if ((title = titleRegex.exec(url)) !== null) {
+      if (tags == null) {
+        suffix += "&tags=";
+      } else if (!suffix.endsWith("+")) {
+        suffix += "+";
+      }
+      suffix += title[1];
+    }
+  }
+  wretch(thisHost + suffix)
+    .get()
+    .setTimeout(5000)
+    .badRequest((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }))
+    .notFound((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }))
+    .timeout((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }))
+    .internalError((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }))
+    .onAbort((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }))
+    .json((json: any) => {
+      if (json.length == 0) {
+        helpers.next = null;
+        pm({
+          data: [],
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        });
+      }
+
+      let list;
+      if (json.posts) {
+        list = json.posts;
+      } else {
+        list = json;
+      }
+
+      const images = Array<string>();
+      for (let p of list) {
+        if (p.file_url) {
+          let fileURL = p.file_url;
+          if (!p.file_url.startsWith("http")) {
+            fileURL = "https://" + p.file_url;
+          }
+          images.push(fileURL);
+        }
+      }
+
+      helpers.next = url.includes("/pool/") ? null : helpers.next + 1;
+      helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+      pm({
+        data: filterPathsToJustPlayable(filter, images, true),
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      });
+    })
+    .catch((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }));
+}
+
+export const loadGelbooru1 = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+  const timeout = 8000;
+  const url = source.url;
+  const hostRegex = /^(https?:\/\/[^\/]*)\//g;
+  const thisHost = hostRegex.exec(url)[1];
+  wretch(url + "&pid=" + (helpers.next * 10))
+    .get()
+    .setTimeout(5000)
+    .onAbort((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }))
+    .notFound((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }))
+    .error(503, (e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }))
+    .text((html) => {
+      let imageEls = domino.createWindow(html).document.querySelectorAll("span.thumb > a");
+      if (imageEls.length > 0) {
+        let imageCount = 0;
+        let images = Array<string>();
+
+        const getImage = (index: number) => {
+          let link = imageEls.item(index).getAttribute("href");
+          if (!link.startsWith("http")) {
+            link = thisHost + "/" + link;
+          }
+          wretch(link)
+            .get()
+            .setTimeout(5000)
+            .onAbort((e) => pm({
+              error: e.message,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            }))
+            .notFound((e) => pm({
+              error: e.message,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            }))
+            .error(503, (e) => pm({
+              error: e.message,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            }))
+            .text((html) => {
+              imageCount++;
+              let contentURL = html.match("<img[^>]*id=\"?image\"?[^>]*src=\"([^\"]*)\"");
+              if (contentURL != null) {
+                let url = contentURL[1];
+                if (url.startsWith("//")) url = "http:" + url;
+                images.push(url);
+              }
+              contentURL = html.match("<img[^>]*src=\"([^\"]*)\"[^>]*id=\"?image\"?");
+              if (contentURL != null) {
+                let url = contentURL[1];
+                if (url.startsWith("//")) url = "http:" + url;
+                images.push(url);
+              }
+              contentURL = html.match("<video[^>]*src=\"([^\"]*)\"");
+              if (contentURL != null) {
+                let url = contentURL[1];
+                if (url.startsWith("//")) url = "http:" + url;
+                images.push(url);
+              }
+              if (imageCount == imageEls.length || imageCount == 10) {
+                helpers.next = helpers.next + 1;
+                helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
+                pm({
+                  data: filterPathsToJustPlayable(filter, images, false),
+                  helpers: helpers,
+                  source: source,
+                  timeout: timeout,
+                });
+              }
+            });
+
+          if (index < imageEls.length - 1 && index < 9) {
+            setTimeout(getImage.bind(null, index+1), 1000);
+          }
+        };
+
+        setTimeout(getImage.bind(null, 0), 1000);
+      } else {
+        helpers.next = null;
+        pm({
+          data: [],
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        });
+      }
+    });
+}
+
+export const loadGelbooru2 = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+  const timeout = 8000;
+  const url = source.url;
+  const hostRegex = /^(https?:\/\/[^\/]*)\//g;
+  const thisHost = hostRegex.exec(url)[1];
+  let suffix = "/index.php?page=dapi&s=post&q=index&limit=20&json=1&pid=" + (helpers.next + 1);
+  const tagRegex = /[?&]tags=(.*)&?/g;
+  let tags;
+  if ((tags = tagRegex.exec(url)) !== null) {
+    suffix += "&tags=" + tags[1];
+  }
+  wretch(thisHost + suffix)
+    .get()
+    .setTimeout(5000)
+    .badRequest((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }))
+    .notFound((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }))
+    .timeout((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }))
+    .internalError((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }))
+    .onAbort((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }))
+    .json((json: any) => {
+      if (json.length == 0) {
+        helpers.next = null;
+        pm({
+          data: [],
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        });
+      }
+
+      const images = Array<string>();
+      for (let p of json) {
+        if (p.file_url) {
+          images.push(p.file_url);
+        } else if (p.image) {
+          images.push(thisHost + "//images/" + p.directory + "/" + p.image);
+        }
+      }
+
+      helpers.next = helpers.next + 1;
+      helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+      pm({
+        data: filterPathsToJustPlayable(filter, images, true),
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      });
+    })
+    .catch((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }));
+}
+
+export const loadEHentai = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+  const timeout = 8000;
+  const url = source.url;
+  wretch(url + "?p=" + (helpers.next + 1))
+    .get()
+    .setTimeout(5000)
+    .onAbort((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }))
+    .notFound((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }))
+    .text((html) => {
+      let imageEls = domino.createWindow(html).document.querySelectorAll("#gdt > .gdtm > div > a");
+      if (imageEls.length > 0) {
+        let imageCount = 0;
+        let images = Array<string>();
+        for (let i = 0; i < imageEls.length; i++) {
+          const image = imageEls.item(i)
+          wretch(image.getAttribute("href"))
+            .get()
+            .setTimeout(5000)
+            .onAbort((e) => pm({
+              error: e.message,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            }))
+            .notFound((e) => pm({
+              error: e.message,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            }))
+            .text((html) => {
+              imageCount++;
+              let contentURL = html.match("<img id=\"img\" src=\"(.*?)\"");
+              if (contentURL != null) {
+                images.push(contentURL[1]);
+              }
+              if (imageCount == imageEls.length) {
+                helpers.next = helpers.next + 1;
+                helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+                pm({
+                  data: filterPathsToJustPlayable(filter, images, true),
+                  helpers: helpers,
+                  source: source,
+                  timeout: timeout,
+                })
+              }
+            })
+        }
+      } else {
+        helpers.next = null;
+        pm({
+          data: [],
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        });
+      }
+    });
+}
+
+export const loadBDSMlr = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+  const timeout = 8000;
+  let url = source.url;
+  if (url.endsWith("/rss")) {
+    url = url.substring(0, url.indexOf("/rss"))
+  }
+  const retry = () => {
+    if (helpers.retries < 3) {
+      helpers.retries += 1;
+      pm({
+        data: [],
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      });
+    } else {
+      pm({
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      });
+    }
+  }
+  wretch(url + "/rss?page=" + (helpers.next + 1))
+    .get()
+    .setTimeout(5000)
+    .onAbort(retry)
+    .notFound((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }))
+    .internalError(retry)
+    .text((html) => {
+      helpers.retries = 0;
+      let itemEls = domino.createWindow(html).document.querySelectorAll("item");
+      if (itemEls.length > 0) {
+        let imageCount = 0;
+        let images = Array<string>();
+        for (let i = 0; i < itemEls.length; i++) {
+          const item = itemEls.item(i);
+          const embeddedImages = item.querySelectorAll("description > img");
+          if (embeddedImages.length > 0) {
+            for (let image of embeddedImages) {
+              imageCount++;
+              images.push(image.getAttribute("src"));
+            }
+          }
+        }
+        helpers.next = helpers.next + 1;
+        helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+        pm({
+          data: filterPathsToJustPlayable(filter, images, true),
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        });
+      } else {
+        helpers.next = null;
+        pm({
+          data: [],
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        });
+      }
+    });
+}
+
+let sessionKey: string = null;
+export const loadHydrus = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+  const timeout = 8000;
+  const apiKey = config.remoteSettings.hydrusAPIKey
+  const configured = apiKey != "";
+  if (configured) {
+    const protocol = config.remoteSettings.hydrusProtocol;
+    const domain = config.remoteSettings.hydrusDomain;
+    const port = config.remoteSettings.hydrusPort;
+    const hydrusURL = protocol + "://" + domain + ":" + port;
+
+    if (!source.url.startsWith(hydrusURL)) {
+      let systemMessage = undefined;
+      if (!hydrusAlerted) {
+        systemMessage = "Source url '" + source.url + "' does not match configured Hydrus server '" + hydrusURL;
+        hydrusAlerted = true;
+      }
+      pm({
+        systemMessage: systemMessage,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      });
+    }
+
+    const tagsRegex = /tags=([^&]*)&?.*$/.exec(source.url);
+    let noTags = tagsRegex == null || tagsRegex.length <= 1;
+
+    const getSessionKey = () => {
+      wretch(hydrusURL + "/session_key")
+        .headers({"Hydrus-Client-API-Access-Key": apiKey})
+        .get()
+        .setTimeout(5000)
+        .notFound((e) => {
+          pm({
+            error: e.message,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          })
+        })
+        .internalError((e) => {
+          pm({
+            error: e.message,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          })
+        })
+        .json((json) => {
+          sessionKey = json.session_key;
+          search();
+        })
+        .catch((e) => pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }));
+    }
+
+    let pages = 0;
+    const search = () => {
+      const url = noTags ? hydrusURL + "/get_files/search_files" : hydrusURL + "/get_files/search_files?tags=" + tagsRegex[1];
+      wretch(url)
+        .headers({"Hydrus-Client-API-Session-Key": sessionKey})
+        .get()
+        .setTimeout(5000)
+        .notFound((e) => {
+          pm({
+            error: e.message,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          })
+        })
+        .internalError((e) => {
+          pm({
+            error: e.message,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          })
+        })
+        .json((json) => {
+          const fileIDs = json.file_ids;
+          const chunk = 1000;
+          pages = Math.ceil(fileIDs.length / chunk);
+          let page = 0;
+          for (let i=0; i<fileIDs.length; i+=chunk) {
+            const pageIDs = fileIDs.slice(i,i+chunk);
+            getFileMetadata(pageIDs, ++page);
+          }
+        })
+        .catch((e) => pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }));
+    }
+
+    let images = Array<string>();
+    const getFileMetadata = (fileIDs: Array<number>, page: number) => {
+      wretch(hydrusURL + "/get_files/file_metadata?file_ids=[" + fileIDs.toString() + "]")
+        .headers({"Hydrus-Client-API-Session-Key": sessionKey})
+        .get()
+        .setTimeout(5000)
+        .notFound((e) => {
+          pm({
+            error: e.message,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          })
+        })
+        .internalError((e) => {
+          pm({
+            error: e.message,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          })
+        })
+        .json((json) => {
+          for (let metadata of json.metadata) {
+            if ((filter == IF.any && isImageOrVideo(metadata.ext, true)) ||
+              (filter == IF.stills || filter == IF.images) && isImage(metadata.ext, true) ||
+              (filter == IF.gifs && metadata.ext.toLowerCase().endsWith('.gif') || isVideo(metadata.ext, true)) ||
+              (filter == IF.videos && isVideo(metadata.ext, true))) {
+              images.push(hydrusURL + "/get_files/file?file_id=" + metadata.file_id + "&Hydrus-Client-API-Access-Key=" + apiKey);
+            }
+          }
+
+          if (page == pages) {
+            pm({
+              data: images,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            });
+          }
+        })
+        .catch((e) => pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }));
+    }
+
+    if (sessionKey == null) {
+      getSessionKey();
+    } else {
+      search();
+    }
+  } else {
+    let systemMessage = undefined;
+    if (!hydrusAlerted) {
+      systemMessage = "You haven't configured FlipFlip to work with Hydrus yet.\nVisit Settings to configure Hydrus.";
+      hydrusAlerted = true;
     }
     pm({
       systemMessage: systemMessage,
@@ -764,7 +2186,6 @@ async function convertURL(url: string): Promise<Array<string>> {
       return [url];
     } else if (html) {
       let redgif = domino.createWindow(html).document.querySelectorAll("#video-" + redgifMatch[1] + " > source");
-      console.log(redgif);
       if (redgif.length > 0) {
         for (let source of redgif) {
           if ((source as any).type == "video/webm") {
@@ -788,7 +2209,6 @@ async function convertURL(url: string): Promise<Array<string>> {
         if (fallbackRegex != null) {
           return [fallbackRegex[1].replace(/\\u002F/g,"/")];
         } else {
-          console.log(html);
           redgifMatch = null;
         }
       }

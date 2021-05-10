@@ -317,7 +317,7 @@ export default class Player extends React.Component {
               backgroundColor: this.props.theme.palette.background.default,
               zIndex: 10,
             }} >
-            <div style={{...this.props.theme.mixins.toolbar as any}}/>
+            <div style={{height: 64}}/>
             <Container
               maxWidth={false}
               style={{

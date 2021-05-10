@@ -193,24 +193,26 @@ class SourceList extends React.Component {
             </MenuItem>
           )}
         </Menu>
-        <Dialog
-          open={this.state.cachePath != null}
-          onClose={this.onCloseClean.bind(this)}
-          aria-describedby="clean-cache-description">
-          <DialogContent>
-            <DialogContentText id="clean-cache-description">
-              Are you SURE you want to delete <Link className={classes.wordWrap} href="#" onClick={this.openDirectory.bind(this, this.state.cachePath)}>{this.state.cachePath}</Link> ?
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.onCloseClean.bind(this)} color="secondary">
-              Cancel
-            </Button>
-            <Button onClick={this.onFinishClean.bind(this)} color="primary">
-              OK
-            </Button>
-          </DialogActions>
-        </Dialog>
+        {this.state.cachePath != null && (
+          <Dialog
+            open={true}
+            onClose={this.onCloseClean.bind(this)}
+            aria-describedby="clean-cache-description">
+            <DialogContent>
+              <DialogContentText id="clean-cache-description">
+                Are you SURE you want to delete <Link className={classes.wordWrap} href="#" onClick={this.openDirectory.bind(this, this.state.cachePath)}>{this.state.cachePath}</Link> ?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onCloseClean.bind(this)} color="secondary">
+                Cancel
+              </Button>
+              <Button onClick={this.onFinishClean.bind(this)} color="primary">
+                OK
+              </Button>
+            </DialogActions>
+          </Dialog>
+        )}
         <Dialog
           open={this.state.blacklistSource != null}
           onClose={this.onCloseBlacklist.bind(this)}
@@ -355,7 +357,7 @@ class SourceList extends React.Component {
         )}
         {this.state.deleteDialog != null && (
           <Dialog
-            open={this.state.deleteDialog != null}
+            open={true}
             onClose={this.onCloseDeleteDialog.bind(this)}
             aria-describedby="delete-description">
             <DialogContent>
