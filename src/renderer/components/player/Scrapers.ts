@@ -40,9 +40,9 @@ export const reset = () => {
   hydrusAlerted = false;
 }
 
-export const loadLocalDirectory = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadLocalDirectory = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}, cachePath: string) => {
   const blacklist = ['*.css', '*.html', 'avatar.png'];
-  const url = source.url;
+  const url = cachePath ? cachePath : source.url;
 
   recursiveReaddir(url, blacklist, (err: any, rawFiles: Array<string>) => {
     if (err) {
@@ -140,8 +140,8 @@ export const loadRemoteImageURLList = (config: Config, source: LibrarySource, fi
     });
 }
 
-export const loadVideo = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
-  const url = source.url;
+export const loadVideo = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}, cachePath: string) => {
+  const url = cachePath ? cachePath : source.url;
   const missingVideo = () => {
     pm({
       error: "Could not find " + source.url,
@@ -206,8 +206,8 @@ export const loadVideo = (config: Config, source: LibrarySource, filter: string,
   }
 }
 
-export const loadPlaylist = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
-  const url = source.url;
+export const loadPlaylist = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}, cachePath: string) => {
+  const url = cachePath ? cachePath : source.url;
   wretch(url)
     .get()
     .text(data => {
