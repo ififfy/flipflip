@@ -25,7 +25,7 @@ const OF = {
 const IF = { // image filters
   any: 'if.any',
   videos: 'if.videos',
-  gifs: 'if.gifs',
+  animated: 'if.gifs',
   images: 'if.images',
   stills: 'if.stills',
 };

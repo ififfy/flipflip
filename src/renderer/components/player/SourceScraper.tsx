@@ -103,7 +103,7 @@ function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<strin
 }
 
 const loadLocalDirectory = (pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}, cachePath: string) => {
-  const blacklist = ['*.css', '*.html', 'avatar.png'];
+  const blacklist = ['*.css', '*.html', 'avatar.png', '*.txt'];
   const url = cachePath ? cachePath : source.url;
 
   recursiveReaddir(url, blacklist, (err: any, rawFiles: Array<string>) => {

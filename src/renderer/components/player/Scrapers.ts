@@ -1963,7 +1963,7 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, 
           for (let metadata of json.metadata) {
             if ((filter == IF.any && isImageOrVideo(metadata.ext, true)) ||
               (filter == IF.stills || filter == IF.images) && isImage(metadata.ext, true) ||
-              (filter == IF.gifs && metadata.ext.toLowerCase().endsWith('.gif') || isVideo(metadata.ext, true)) ||
+              (filter == IF.animated && metadata.ext.toLowerCase().endsWith('.gif') || isVideo(metadata.ext, true)) ||
               (filter == IF.videos && isVideo(metadata.ext, true))) {
               images.push(hydrusURL + "/get_files/file?file_id=" + metadata.file_id + "&Hydrus-Client-API-Access-Key=" + apiKey);
             }
@@ -2016,7 +2016,7 @@ export function filterPathsToJustPlayable(imageTypeFilter: string, paths: Array<
     case IF.stills:
     case IF.images:
       return paths.filter((p) => isImage(p, strict));
-    case IF.gifs:
+    case IF.animated:
       return paths.filter((p) => p.toLowerCase().endsWith('.gif') || isVideo(p, strict));
     case IF.videos:
       return paths.filter((p) => isVideo(p, strict));

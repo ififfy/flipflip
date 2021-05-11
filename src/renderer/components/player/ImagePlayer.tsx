@@ -730,7 +730,7 @@ export default class ImagePlayer extends React.Component {
         }
 
         // Exclude non-animated gifs from gifs
-        if (this.props.scene.imageTypeFilter == IF.gifs && info && !info.animated) {
+        if (this.props.scene.imageTypeFilter == IF.animated && info && !info.animated) {
           this.queueRunFetchLoop(i);
           return;
           // Exclude animated gifs from stills
@@ -745,7 +745,7 @@ export default class ImagePlayer extends React.Component {
       };
 
       // Get gifinfo if we need for imageFilter or playing full gif
-      if ((this.props.scene.imageTypeFilter == IF.gifs || this.props.scene.imageTypeFilter == IF.stills || this.props.scene.gifOption != GO.none) && url.toLocaleLowerCase().endsWith('.gif')) {
+      if ((this.props.scene.imageTypeFilter == IF.animated || this.props.scene.imageTypeFilter == IF.stills || this.props.scene.gifOption != GO.none) && url.includes('.gif')) {
         // Get gif info. See https://github.com/Prinzhorn/gif-info
         try {
           if (url.includes("file://")) {
