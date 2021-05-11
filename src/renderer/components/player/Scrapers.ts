@@ -1,8 +1,5 @@
-import recursiveReaddir from 'recursive-readdir';
-import fileURL from 'file-url';
 import path from "path";
 import wretch from "wretch";
-import fs from "fs";
 import {DOMParser} from "xmldom";
 import domino from "domino";
 import tumblr from "tumblr.js";
@@ -11,17 +8,52 @@ import * as imgur from "imgur";
 import * as Twitter from "twitter";
 import {IgApiClient} from "instagram-private-api";
 
-import {IF, RF, RT, ST} from "../../data/const";
+import {IF, RF, RT, ST, WF} from "../../data/const";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
 
 const pm = (object: any) => {
+  if (object?.source && object?.data && object?.allURLs && object?.weight && object?.helpers) {
+    const source = object.source;
+    if (source.blacklist && source.blacklist.length > 0) {
+      object.data = object.data.filter((url: string) => !source.blacklist.includes(url));
+    }
+    object.allURLs = processAllURLs(object.data, object.allURLs, object.source, object.weight, object.helpers);
+  }
   // @ts-ignore
   postMessage(object);
 }
 
-export const sendMessage = (message: string) => {
-  pm(message);
+export const processAllURLs = (data: string[], allURLs: Map<string, string[]>, source: LibrarySource, weight: string, helpers: {next: any, count: number, retries: number}): Map<string, string[]> => {
+  let newAllURLs = new Map(allURLs);
+  if (helpers.next == null || helpers.next <= 0) {
+    if (weight == WF.sources) {
+      newAllURLs.set(source.url, data);
+    } else {
+      for (let d of data) {
+        newAllURLs.set(d, [source.url]);
+      }
+    }
+  } else {
+    if (weight == WF.sources) {
+      let sourceURLs = newAllURLs.get(source.url);
+      if (!sourceURLs) sourceURLs = [];
+      newAllURLs.set(source.url, sourceURLs.concat(data.filter((u: string) => {
+        const fileName = getFileName(u);
+        const found = sourceURLs.map((u: string) => getFileName(u)).includes(fileName);
+        return !found;
+      })));
+    } else {
+      for (let d of data.filter((u: string) => {
+        const fileName = getFileName(u);
+        const found = Array.from(newAllURLs.keys()).map((u: string) => getFileName(u)).includes(fileName);
+        return !found;
+      })) {
+        newAllURLs.set(d, [source.url]);
+      }
+    }
+  }
+  return newAllURLs;
 }
 
 let redditAlerted = false;
@@ -40,51 +72,7 @@ export const reset = () => {
   hydrusAlerted = false;
 }
 
-export const loadLocalDirectory = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}, cachePath: string) => {
-  const blacklist = ['*.css', '*.html', 'avatar.png'];
-  const url = cachePath ? cachePath : source.url;
-
-  recursiveReaddir(url, blacklist, (err: any, rawFiles: Array<string>) => {
-    if (err) {
-      pm({
-        error: err.message,
-        helpers: helpers,
-        source: source,
-        timeout: 0,
-      });
-    } else {
-      // If this is a local source (not a cacheDir call)
-      if (helpers.next == null) {
-        helpers.count = filterPathsToJustPlayable(IF.any, rawFiles, true).length;
-      }
-
-      pm({
-        data: filterPathsToJustPlayable(filter, rawFiles, true).map((p) => fileURL(p)).sort((a, b) => {
-          let aFile: any = getFileName(a, false);
-          if (parseInt(aFile)) {
-            aFile = parseInt(aFile);
-          }
-          let bFile: any = getFileName(b, false);
-          if (parseInt(aFile)) {
-            aFile = parseInt(aFile);
-          }
-          if (aFile > bFile) {
-            return 1;
-          } else if (aFile < bFile) {
-            return -1;
-          } else {
-            return 0;
-          }
-        }),
-        helpers: helpers,
-        source: source,
-        timeout: 0,
-      });
-    }
-  });
-}
-
-export const loadRemoteImageURLList = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadRemoteImageURLList = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
   const url = source.url;
   wretch(url)
     .get()
@@ -101,6 +89,8 @@ export const loadRemoteImageURLList = (config: Config, source: LibrarySource, fi
               helpers.count = filterPathsToJustPlayable(IF.any, convertedSource, true).length;
               pm({
                 data: filterPathsToJustPlayable(filter, convertedSource, true),
+                allURLs: allURLs,
+                weight: weight,
                 helpers: helpers,
                 source: source,
                 timeout: 0,
@@ -114,6 +104,8 @@ export const loadRemoteImageURLList = (config: Config, source: LibrarySource, fi
                 pm({
                   error: error.message,
                   data: filterPathsToJustPlayable(filter, convertedSource, true),
+                  allURLs: allURLs,
+                  weight: weight,
                   helpers: helpers,
                   source: source,
                   timeout: 0,
@@ -140,125 +132,7 @@ export const loadRemoteImageURLList = (config: Config, source: LibrarySource, fi
     });
 }
 
-export const loadVideo = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}, cachePath: string) => {
-  const url = cachePath ? cachePath : source.url;
-  const missingVideo = () => {
-    pm({
-      error: "Could not find " + source.url,
-      data: [],
-      helpers: helpers,
-      source: source,
-      timeout: 0,
-    });
-  }
-  const ifExists = (url: string) => {
-    if (!url.startsWith("http")) {
-      url = fileURL(url);
-    }
-    helpers.count = 1;
-
-    let paths;
-    if (source.clips && source.clips.length > 0) {
-      const clipPaths = Array<string>();
-      for (let clip of source.clips) {
-        if (!source.disabledClips || !source.disabledClips.includes(clip.id)) {
-          let clipPath = url + ":::" + clip.id + ":" + (clip.volume != null ? clip.volume : "-") + ":::" + clip.start + ":" + clip.end;
-          if (source.subtitleFile != null && source.subtitleFile.length > 0) {
-            clipPath = clipPath + "|||" + source.subtitleFile;
-          }
-          clipPaths.push(clipPath);
-        }
-      }
-      paths = clipPaths;
-    } else {
-      if (source.subtitleFile != null && source.subtitleFile.length > 0) {
-        url = url + "|||" + source.subtitleFile;
-      }
-      paths = [url];
-    }
-    pm({
-      data: paths,
-      helpers: helpers,
-      source: source,
-      timeout: 0,
-    });
-  }
-
-  if (!isVideo(url, false)) {
-    missingVideo();
-  }
-  if (url.startsWith("http")) {
-    wretch(url)
-      .get()
-      .notFound((e) => {
-        missingVideo();
-      })
-      .res((r) => {
-        ifExists(url);
-      })
-  } else {
-    const exists = fs.existsSync(url);
-    if (exists) {
-      ifExists(url);
-    } else {
-      missingVideo();
-    }
-  }
-}
-
-export const loadPlaylist = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}, cachePath: string) => {
-  const url = cachePath ? cachePath : source.url;
-  wretch(url)
-    .get()
-    .text(data => {
-      const urls = [];
-      if (url.endsWith(".asx")) {
-        const refs = new DOMParser().parseFromString(data, "text/xml").getElementsByTagName("Ref");
-        for (let r = 0; r < refs.length; r++) {
-          const l = refs[r];
-          urls.push(l.getAttribute("href"));
-        }
-      } else if (url.endsWith(".m3u8")) {
-        for (let l of data.split("\n")) {
-          if (l.length > 0 && !l.startsWith("#")) {
-            urls.push(l.trim());
-          }
-        }
-      } else if (url.endsWith(".pls")) {
-        for (let l of data.split("\n")) {
-          if (l.startsWith("File")) {
-            urls.push(l.split("=")[1].trim());
-          }
-        }
-      } else if (url.endsWith(".xspf")) {
-        const locations = new DOMParser().parseFromString(data, "text/xml").getElementsByTagName("location");
-        for (let r = 0; r < locations.length; r++) {
-          const l = locations[r];
-          urls.push(l.textContent);
-        }
-      }
-
-      if (urls.length > 0) {
-        helpers.count = urls.length;
-      }
-      pm({
-        data: filterPathsToJustPlayable(filter, urls, true),
-        helpers: helpers,
-        source: source,
-        timeout: 0,
-      });
-    })
-    .catch((e) => {
-      pm({
-        error: e.message,
-        helpers: helpers,
-        source: source,
-        timeout: 0,
-      });
-    });
-}
-
-export const loadTumblr = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadTumblr = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
   const timeout = 3000;
   let configured = config.remoteSettings.tumblrOAuthToken != "" && config.remoteSettings.tumblrOAuthTokenSecret != "";
   if (configured) {
@@ -304,6 +178,8 @@ export const loadTumblr = (config: Config, source: LibrarySource, filter: string
         helpers.next = null;
         pm({
           data: [],
+          allURLs: allURLs,
+          weight: weight,
           helpers: helpers,
           source: source,
           timeout: timeout,
@@ -356,6 +232,8 @@ export const loadTumblr = (config: Config, source: LibrarySource, filter: string
               helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedSource, true).length;
               pm({
                 data: filterPathsToJustPlayable(filter, convertedSource, true),
+                allURLs: allURLs,
+                weight: weight,
                 helpers: helpers,
                 source: source,
                 timeout: timeout,
@@ -370,6 +248,8 @@ export const loadTumblr = (config: Config, source: LibrarySource, filter: string
                 pm({
                   error: error.message,
                   data: filterPathsToJustPlayable(filter, convertedSource, true),
+                  allURLs: allURLs,
+                  weight: weight,
                   helpers: helpers,
                   source: source,
                   timeout: timeout,
@@ -381,6 +261,8 @@ export const loadTumblr = (config: Config, source: LibrarySource, filter: string
         helpers.next = null;
         pm({
           data: [],
+          allURLs: allURLs,
+          weight: weight,
           helpers: helpers,
           source: source,
           timeout: timeout,
@@ -402,7 +284,7 @@ export const loadTumblr = (config: Config, source: LibrarySource, filter: string
   }
 }
 
-export const loadReddit = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
   const timeout = 3000;
   let configured = config.remoteSettings.redditRefreshToken != "";
   if (configured) {
@@ -427,6 +309,8 @@ export const loadReddit = (config: Config, source: LibrarySource, filter: string
                 helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
                 pm({
                   data: filterPathsToJustPlayable(filter, convertedListing, true),
+                  allURLs: allURLs,
+                  weight: weight,
                   helpers: helpers,
                   source: source,
                   timeout: timeout,
@@ -441,6 +325,8 @@ export const loadReddit = (config: Config, source: LibrarySource, filter: string
                   pm({
                     error: error.message,
                     data: filterPathsToJustPlayable(filter, convertedListing, true),
+                    allURLs: allURLs,
+                    weight: weight,
                     helpers: helpers,
                     source: source,
                     timeout: timeout,
@@ -452,6 +338,8 @@ export const loadReddit = (config: Config, source: LibrarySource, filter: string
           helpers.next = null;
           pm({
             data: [],
+            allURLs: allURLs,
+            weight: weight,
             helpers: helpers,
             source: source,
             timeout: timeout,
@@ -511,6 +399,8 @@ export const loadReddit = (config: Config, source: LibrarySource, filter: string
                   helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
                   pm({
                     data: filterPathsToJustPlayable(filter, convertedListing, true),
+                    allURLs: allURLs,
+                    weight: weight,
                     helpers: helpers,
                     source: source,
                     timeout: timeout,
@@ -525,6 +415,8 @@ export const loadReddit = (config: Config, source: LibrarySource, filter: string
                     pm({
                       error: error.message,
                       data: filterPathsToJustPlayable(filter, convertedListing, true),
+                      allURLs: allURLs,
+                      weight: weight,
                       helpers: helpers,
                       source: source,
                       timeout: timeout,
@@ -536,6 +428,8 @@ export const loadReddit = (config: Config, source: LibrarySource, filter: string
             helpers.next = null;
             pm({
               data: [],
+              allURLs: allURLs,
+              weight: weight,
               helpers: helpers,
               source: source,
               timeout: timeout,
@@ -564,6 +458,8 @@ export const loadReddit = (config: Config, source: LibrarySource, filter: string
                   helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
                   pm({
                     data: filterPathsToJustPlayable(filter, convertedListing, true),
+                    allURLs: allURLs,
+                    weight: weight,
                     helpers: helpers,
                     source: source,
                     timeout: timeout,
@@ -578,6 +474,8 @@ export const loadReddit = (config: Config, source: LibrarySource, filter: string
                     pm({
                       error: error.message,
                       data: filterPathsToJustPlayable(filter, convertedListing, true),
+                      allURLs: allURLs,
+                      weight: weight,
                       helpers: helpers,
                       source: source,
                       timeout: timeout,
@@ -589,6 +487,8 @@ export const loadReddit = (config: Config, source: LibrarySource, filter: string
             helpers.next = null;
             pm({
               data: [],
+              allURLs: allURLs,
+              weight: weight,
               helpers: helpers,
               source: source,
               timeout: timeout,
@@ -619,7 +519,7 @@ export const loadReddit = (config: Config, source: LibrarySource, filter: string
 }
 
 // TODO Verify this works after site's cert issue is resolved
-export const loadImageFap = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
   const timeout = 8000;
   if (helpers.next == 0) {
     helpers.next = [0, 0];
@@ -655,6 +555,8 @@ export const loadImageFap = (config: Config, source: LibrarySource, filter: stri
                   helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
                   pm({
                     data: filterPathsToJustPlayable(filter, images, false),
+                    allURLs: allURLs,
+                    weight: weight,
                     helpers: helpers,
                     source: source,
                     timeout: timeout,
@@ -666,6 +568,8 @@ export const loadImageFap = (config: Config, source: LibrarySource, filter: stri
           helpers.next = null;
           pm({
             data: [],
+            allURLs: allURLs,
+            weight: weight,
             helpers: helpers,
             source: source,
             timeout: timeout,
@@ -688,6 +592,8 @@ export const loadImageFap = (config: Config, source: LibrarySource, filter: stri
           helpers.next = null;
           pm({
             data: [],
+            allURLs: allURLs,
+            weight: weight,
             helpers: helpers,
             source: source,
             timeout: timeout,
@@ -717,6 +623,8 @@ export const loadImageFap = (config: Config, source: LibrarySource, filter: stri
                         helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
                         pm({
                           data: filterPathsToJustPlayable(filter, images, false),
+                          allURLs: allURLs,
+                          weight: weight,
                           helpers: helpers,
                           source: source,
                           timeout: timeout,
@@ -728,6 +636,8 @@ export const loadImageFap = (config: Config, source: LibrarySource, filter: stri
                 helpers.next[1] += 1;
                 pm({
                   data: [],
+                  allURLs: allURLs,
+                  weight: weight,
                   helpers: helpers,
                   source: source,
                   timeout: timeout,
@@ -739,6 +649,8 @@ export const loadImageFap = (config: Config, source: LibrarySource, filter: stri
           helpers.next[1] = 0;
           pm({
             data: [],
+            allURLs: allURLs,
+            weight: weight,
             helpers: helpers,
             source: source,
             timeout: timeout,
@@ -757,6 +669,8 @@ export const loadImageFap = (config: Config, source: LibrarySource, filter: stri
     helpers.next = null;
     pm({
       data: [],
+      allURLs: allURLs,
+      weight: weight,
       helpers: helpers,
       source: source,
       timeout: timeout,
@@ -784,6 +698,8 @@ export const loadImageFap = (config: Config, source: LibrarySource, filter: stri
           helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, videoURLs, false).length;
           pm({
             data: filterPathsToJustPlayable(filter, videoURLs, false),
+            allURLs: allURLs,
+            weight: weight,
             helpers: helpers,
             source: source,
             timeout: timeout,
@@ -792,6 +708,8 @@ export const loadImageFap = (config: Config, source: LibrarySource, filter: stri
           helpers.next = null;
           pm({
             data: [],
+            allURLs: allURLs,
+            weight: weight,
             helpers: helpers,
             source: source,
             timeout: timeout,
@@ -802,6 +720,8 @@ export const loadImageFap = (config: Config, source: LibrarySource, filter: stri
     helpers.next = null;
     pm({
       data: [],
+      allURLs: allURLs,
+      weight: weight,
       helpers: helpers,
       source: source,
       timeout: timeout,
@@ -809,13 +729,15 @@ export const loadImageFap = (config: Config, source: LibrarySource, filter: stri
   }
 }
 
-export const loadSexCom = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadSexCom = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
   const timeout = 8000;
   const url = source.url;
   // This doesn't work anymore due to src url requiring referer
   helpers.next = null;
   pm({
     data: [],
+    allURLs: allURLs,
+    weight: weight,
     helpers: helpers,
     source: source,
     timeout: timeout,
@@ -859,6 +781,8 @@ export const loadSexCom = (config: Config, source: LibrarySource, filter: string
           helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
           pm({
             data: filterPathsToJustPlayable(filter, images, false),
+            allURLs: allURLs,
+            weight: weight,
             helpers: helpers,
             source: source,
             timeout: timeout,
@@ -910,6 +834,8 @@ export const loadSexCom = (config: Config, source: LibrarySource, filter: string
                   helpers.count = helpers.count + filePaths.length;
                   pm({
                     data: filePaths,
+                    allURLs: allURLs,
+                    weight: weight,
                     helpers: helpers,
                     source: source,
                     timeout: timeout,
@@ -922,6 +848,8 @@ export const loadSexCom = (config: Config, source: LibrarySource, filter: string
         helpers.next = null;
         pm({
           data: [],
+          allURLs: allURLs,
+          weight: weight,
           helpers: helpers,
           source: source,
           timeout: timeout,
@@ -930,7 +858,7 @@ export const loadSexCom = (config: Config, source: LibrarySource, filter: string
     });*/
 }
 
-export const loadImgur = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadImgur = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
   const timeout = 3000;
   const url = source.url;
   imgur.getAlbumInfo(getFileGroup(url))
@@ -940,6 +868,8 @@ export const loadImgur = (config: Config, source: LibrarySource, filter: string,
       helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
       pm({
         data: filterPathsToJustPlayable(filter, images, true),
+        allURLs: allURLs,
+        weight: weight,
         helpers: helpers,
         source: source,
         timeout: timeout,
@@ -955,7 +885,7 @@ export const loadImgur = (config: Config, source: LibrarySource, filter: string,
     });
 }
 
-export const loadTwitter = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadTwitter = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
   const timeout = 3000;
   let configured = config.remoteSettings.twitterAccessTokenKey != "" && config.remoteSettings.twitterAccessTokenSecret != "";
   if (configured) {
@@ -1009,6 +939,8 @@ export const loadTwitter = (config: Config, source: LibrarySource, filter: strin
           helpers.next = null;
           pm({
             data: [],
+            allURLs: allURLs,
+            weight: weight,
             helpers: helpers,
             source: source,
             timeout: timeout,
@@ -1018,6 +950,8 @@ export const loadTwitter = (config: Config, source: LibrarySource, filter: strin
           helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
           pm({
             data: filterPathsToJustPlayable(filter, images, true),
+            allURLs: allURLs,
+            weight: weight,
             helpers: helpers,
             source: source,
             timeout: timeout,
@@ -1039,7 +973,7 @@ export const loadTwitter = (config: Config, source: LibrarySource, filter: strin
   }
 }
 
-export const loadDeviantArt = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadDeviantArt = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
   const timeout = 3000;
   const url = source.url;
   wretch("https://backend.deviantart.com/rss.xml?type=deviation&q=by%3A" + getFileGroup(url) + "+sort%3Atime+meta%3Aall" + (helpers.next != 0 ? "&offset=" + helpers.next : ""))
@@ -1082,6 +1016,8 @@ export const loadDeviantArt = (config: Config, source: LibrarySource, filter: st
       helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
       pm({
         data: filterPathsToJustPlayable(filter, images, false),
+        allURLs: allURLs,
+        weight: weight,
         helpers: helpers,
         source: source,
         timeout: timeout,
@@ -1091,7 +1027,7 @@ export const loadDeviantArt = (config: Config, source: LibrarySource, filter: st
 
 let ig: IgApiClient = null;
 let session: any = null;
-export const loadInstagram = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadInstagram = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
   const timeout = 3000;
   const configured = config.remoteSettings.instagramUsername != "" && config.remoteSettings.instagramPassword != "";
   if (configured) {
@@ -1114,6 +1050,8 @@ export const loadInstagram = (config: Config, source: LibrarySource, filter: str
       helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
       pm({
         data: filterPathsToJustPlayable(filter, images, false),
+        allURLs: allURLs,
+        weight: weight,
         helpers: helpers,
         source: source,
         timeout: timeout,
@@ -1187,6 +1125,8 @@ export const loadInstagram = (config: Config, source: LibrarySource, filter: str
           helpers.next = null;
           pm({
             data: [],
+            allURLs: allURLs,
+            weight: weight,
             helpers: helpers,
             source: source,
             timeout: timeout,
@@ -1224,7 +1164,7 @@ export const loadInstagram = (config: Config, source: LibrarySource, filter: str
   }
 }
 
-export const loadE621 = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadE621 = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
   const timeout = 8000;
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
@@ -1271,6 +1211,8 @@ export const loadE621 = (config: Config, source: LibrarySource, filter: string, 
           helpers.next = null;
           pm({
             data: [],
+            allURLs: allURLs,
+            weight: weight,
             helpers: helpers,
             source: source,
             timeout: timeout,
@@ -1329,6 +1271,8 @@ export const loadE621 = (config: Config, source: LibrarySource, filter: string, 
                 helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
                 pm({
                   data: filterPathsToJustPlayable(filter, images, true),
+                  allURLs: allURLs,
+                  weight: weight,
                   helpers: helpers,
                   source: source,
                   timeout: timeout,
@@ -1395,6 +1339,8 @@ export const loadE621 = (config: Config, source: LibrarySource, filter: string, 
           helpers.next = null;
           pm({
             data: [],
+            allURLs: allURLs,
+            weight: weight,
             helpers: helpers,
             source: source,
             timeout: timeout,
@@ -1417,6 +1363,8 @@ export const loadE621 = (config: Config, source: LibrarySource, filter: string, 
         helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
         pm({
           data: filterPathsToJustPlayable(filter, images, true),
+          allURLs: allURLs,
+          weight: weight,
           helpers: helpers,
           source: source,
           timeout: timeout,
@@ -1431,7 +1379,7 @@ export const loadE621 = (config: Config, source: LibrarySource, filter: string, 
   }
 }
 
-export const loadDanbooru = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadDanbooru = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
   const timeout = 8000;
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
@@ -1495,6 +1443,8 @@ export const loadDanbooru = (config: Config, source: LibrarySource, filter: stri
         helpers.next = null;
         pm({
           data: [],
+          allURLs: allURLs,
+          weight: weight,
           helpers: helpers,
           source: source,
           timeout: timeout,
@@ -1523,6 +1473,8 @@ export const loadDanbooru = (config: Config, source: LibrarySource, filter: stri
       helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
       pm({
         data: filterPathsToJustPlayable(filter, images, true),
+        allURLs: allURLs,
+        weight: weight,
         helpers: helpers,
         source: source,
         timeout: timeout,
@@ -1536,7 +1488,7 @@ export const loadDanbooru = (config: Config, source: LibrarySource, filter: stri
     }));
 }
 
-export const loadGelbooru1 = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadGelbooru1 = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
   const timeout = 8000;
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
@@ -1619,6 +1571,8 @@ export const loadGelbooru1 = (config: Config, source: LibrarySource, filter: str
                 helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
                 pm({
                   data: filterPathsToJustPlayable(filter, images, false),
+                  allURLs: allURLs,
+                  weight: weight,
                   helpers: helpers,
                   source: source,
                   timeout: timeout,
@@ -1636,6 +1590,8 @@ export const loadGelbooru1 = (config: Config, source: LibrarySource, filter: str
         helpers.next = null;
         pm({
           data: [],
+          allURLs: allURLs,
+          weight: weight,
           helpers: helpers,
           source: source,
           timeout: timeout,
@@ -1644,7 +1600,7 @@ export const loadGelbooru1 = (config: Config, source: LibrarySource, filter: str
     });
 }
 
-export const loadGelbooru2 = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadGelbooru2 = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
   const timeout = 8000;
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
@@ -1693,6 +1649,8 @@ export const loadGelbooru2 = (config: Config, source: LibrarySource, filter: str
         helpers.next = null;
         pm({
           data: [],
+          allURLs: allURLs,
+          weight: weight,
           helpers: helpers,
           source: source,
           timeout: timeout,
@@ -1712,6 +1670,8 @@ export const loadGelbooru2 = (config: Config, source: LibrarySource, filter: str
       helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
       pm({
         data: filterPathsToJustPlayable(filter, images, true),
+        allURLs: allURLs,
+        weight: weight,
         helpers: helpers,
         source: source,
         timeout: timeout,
@@ -1725,7 +1685,7 @@ export const loadGelbooru2 = (config: Config, source: LibrarySource, filter: str
     }));
 }
 
-export const loadEHentai = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadEHentai = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
   const timeout = 8000;
   const url = source.url;
   wretch(url + "?p=" + (helpers.next + 1))
@@ -1776,6 +1736,8 @@ export const loadEHentai = (config: Config, source: LibrarySource, filter: strin
                 helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
                 pm({
                   data: filterPathsToJustPlayable(filter, images, true),
+                  allURLs: allURLs,
+                  weight: weight,
                   helpers: helpers,
                   source: source,
                   timeout: timeout,
@@ -1787,6 +1749,8 @@ export const loadEHentai = (config: Config, source: LibrarySource, filter: strin
         helpers.next = null;
         pm({
           data: [],
+          allURLs: allURLs,
+          weight: weight,
           helpers: helpers,
           source: source,
           timeout: timeout,
@@ -1795,7 +1759,7 @@ export const loadEHentai = (config: Config, source: LibrarySource, filter: strin
     });
 }
 
-export const loadBDSMlr = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadBDSMlr = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
   const timeout = 8000;
   let url = source.url;
   if (url.endsWith("/rss")) {
@@ -1806,6 +1770,8 @@ export const loadBDSMlr = (config: Config, source: LibrarySource, filter: string
       helpers.retries += 1;
       pm({
         data: [],
+        allURLs: allURLs,
+        weight: weight,
         helpers: helpers,
         source: source,
         timeout: timeout,
@@ -1849,6 +1815,8 @@ export const loadBDSMlr = (config: Config, source: LibrarySource, filter: string
         helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
         pm({
           data: filterPathsToJustPlayable(filter, images, true),
+          allURLs: allURLs,
+          weight: weight,
           helpers: helpers,
           source: source,
           timeout: timeout,
@@ -1857,6 +1825,8 @@ export const loadBDSMlr = (config: Config, source: LibrarySource, filter: string
         helpers.next = null;
         pm({
           data: [],
+          allURLs: allURLs,
+          weight: weight,
           helpers: helpers,
           source: source,
           timeout: timeout,
@@ -1866,7 +1836,7 @@ export const loadBDSMlr = (config: Config, source: LibrarySource, filter: string
 }
 
 let sessionKey: string = null;
-export const loadHydrus = (config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
   const timeout = 8000;
   const apiKey = config.remoteSettings.hydrusAPIKey
   const configured = apiKey != "";
@@ -2002,6 +1972,8 @@ export const loadHydrus = (config: Config, source: LibrarySource, filter: string
           if (page == pages) {
             pm({
               data: images,
+              allURLs: allURLs,
+              weight: weight,
               helpers: helpers,
               source: source,
               timeout: timeout,
@@ -2036,7 +2008,7 @@ export const loadHydrus = (config: Config, source: LibrarySource, filter: string
   }
 }
 
-function filterPathsToJustPlayable(imageTypeFilter: string, paths: Array<string>, strict: boolean): Array<string> {
+export function filterPathsToJustPlayable(imageTypeFilter: string, paths: Array<string>, strict: boolean): Array<string> {
   switch (imageTypeFilter) {
     default:
     case IF.any:

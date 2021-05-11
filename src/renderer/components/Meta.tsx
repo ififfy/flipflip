@@ -72,7 +72,40 @@ export default class Meta extends React.Component {
   }
 
   componentDidUpdate(prevProps: any, prevState: any) {
-    this._queueSave = true;
+    if (prevState.version !== this.state.version ||
+      prevState.config !== this.state.config ||
+      prevState.scenes !== this.state.scenes ||
+      prevState.grids !== this.state.grids ||
+      prevState.library !== this.state.library ||
+      prevState.audios !== this.state.audios ||
+      prevState.scripts !== this.state.scripts ||
+      prevState.playlists !== this.state.playlists ||
+      prevState.tags !== this.state.tags ||
+      prevState.route !== this.state.route ||
+      prevState.specialMode !== this.state.specialMode ||
+      prevState.openTab !== this.state.openTab ||
+      prevState.displayedSources !== this.state.displayedSources ||
+      prevState.libraryYOffset !== this.state.libraryYOffset ||
+      prevState.libraryFilters !== this.state.libraryFilters ||
+      prevState.librarySelected !== this.state.librarySelected ||
+      prevState.audioOpenTab !== this.state.audioOpenTab ||
+      prevState.audioYOffset !== this.state.audioYOffset ||
+      prevState.audioFilters !== this.state.audioFilters ||
+      prevState.audioSelected !== this.state.audioSelected ||
+      prevState.scriptYOffset !== this.state.scriptYOffset ||
+      prevState.scriptFilters !== this.state.scriptFilters ||
+      prevState.scriptSelected !== this.state.scriptSelected ||
+      prevState.progressMode !== this.state.progressMode ||
+      prevState.progressTitle !== this.state.progressTitle ||
+      prevState.progressCurrent !== this.state.progressCurrent ||
+      prevState.progressTotal !== this.state.progressTotal ||
+      prevState.progressNext !== this.state.progressNext ||
+      prevState.systemMessage !== this.state.systemMessage ||
+      prevState.systemSnack !== this.state.systemSnack ||
+      prevState.tutorial !== this.state.tutorial ||
+      prevState.theme !== this.state.theme) {
+      this._queueSave = true;
+    }
   }
 
   startScene(ev: IpcMessageEvent, sceneName: string) {

@@ -2,14 +2,16 @@ import * as React from 'react';
 import * as fs from "fs";
 import * as path from "path";
 import worker from 'workerize-loader!./Scrapers';
+import recursiveReaddir from "recursive-readdir";
+import fileURL from "file-url";
+import wretch from "wretch";
 
 import {
-  CancelablePromise,
   getCachePath,
   randomizeList,
 } from "../../data/utils";
-import {getFileName, getSourceType} from "./Scrapers";
-import {SOF, ST, WF} from '../../data/const';
+import {filterPathsToJustPlayable, getFileName, getSourceType, isVideo, processAllURLs} from "./Scrapers";
+import {IF, SOF, ST} from '../../data/const';
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
 import Scene from '../../data/Scene';
@@ -19,6 +21,8 @@ import ImagePlayer from './ImagePlayer';
 
 let workerInstance: any = null;
 let workerListener: any = null;
+let nextWorkerInstance: any = null;
+let nextWorkerListener: any = null;
 
 // Returns true if array is empty, or only contains empty arrays
 function isEmpty(allURLs: any[]): boolean {
@@ -26,77 +30,267 @@ function isEmpty(allURLs: any[]): boolean {
 }
 
 // Determine what kind of source we have based on the URL and return associated Promise
-function scrapeFiles(config: Config, source: LibrarySource, filter: string, helpers: {next: any, count: number, retries: number}) {
+function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) {
   const sourceType = getSourceType(source.url);
-
   if (sourceType == ST.local) { // Local files
     helpers.next = null;
-    workerInstance.loadLocalDirectory(config, source, filter, helpers);
+    loadLocalDirectory(pm, allURLs, config, source, filter, weight, helpers, null);
   } else if (sourceType == ST.list) { // Image List
     helpers.next = null;
-    workerInstance.loadRemoteImageURLList(config, source, filter, helpers);
+    worker.loadRemoteImageURLList(allURLs, config, source, filter, weight, helpers);
   } else if (sourceType == ST.video) {
     helpers.next = null;
     const cachePath = getCachePath(source.url, config) + getFileName(source.url);
     if (config.caching.enabled && fs.existsSync(cachePath)) {
-      workerInstance.loadVideo(config, source, filter, helpers, cachePath);
+      loadVideo(pm, allURLs, config, source, filter, weight, helpers, cachePath);
     } else {
-      workerInstance.loadVideo(config, source, filter, helpers);
+      loadVideo(pm, allURLs, config, source, filter, weight, helpers, null);
     }
   } else if (sourceType == ST.playlist) {
     helpers.next = null;
     const cachePath = getCachePath(source.url, config) + getFileName(source.url);
     if (config.caching.enabled && fs.existsSync(cachePath)) {
-      workerInstance.loadPlaylist(config, source, filter, helpers, cachePath);
+      loadPlaylist(pm, allURLs, config, source, filter, weight, helpers, cachePath);
     } else {
-      workerInstance.loadPlaylist(config, source, filter, helpers);
+      loadPlaylist(pm, allURLs, config, source, filter, weight, helpers, null);
     }
   } else { // Paging sources
     let workerFunction;
     if (sourceType == ST.tumblr) {
-      workerFunction = workerInstance.loadTumblr;
+      workerFunction = worker.loadTumblr;
     } else if (sourceType == ST.reddit) {
-      workerFunction = workerInstance.loadReddit;
+      workerFunction = worker.loadReddit;
     } else if (sourceType == ST.imagefap) {
-      workerFunction = workerInstance.loadImageFap;
+      workerFunction = worker.loadImageFap;
     } else if (sourceType == ST.sexcom) {
-      workerFunction = workerInstance.loadSexCom;
+      workerFunction = worker.loadSexCom;
     } else if (sourceType == ST.imgur) {
-      workerFunction = workerInstance.loadImgur;
+      workerFunction = worker.loadImgur;
     } else if (sourceType == ST.twitter) {
-      workerFunction = workerInstance.loadTwitter;
+      workerFunction = worker.loadTwitter;
     } else if (sourceType == ST.deviantart) {
-      workerFunction = workerInstance.loadDeviantArt;
+      workerFunction = worker.loadDeviantArt;
     } else if (sourceType == ST.instagram) {
-      workerFunction = workerInstance.loadInstagram;
+      workerFunction = worker.loadInstagram;
     } else if (sourceType == ST.danbooru) {
-      workerFunction = workerInstance.loadDanbooru;
+      workerFunction = worker.loadDanbooru;
     } else if (sourceType == ST.e621) {
-      workerFunction = workerInstance.loadE621;
+      workerFunction = worker.loadE621;
     } else if (sourceType == ST.gelbooru1) {
-      workerFunction = workerInstance.loadGelbooru1;
+      workerFunction = worker.loadGelbooru1;
     } else if (sourceType == ST.gelbooru2) {
-      workerFunction = workerInstance.loadGelbooru2;
+      workerFunction = worker.loadGelbooru2;
     } else if (sourceType == ST.ehentai) {
-      workerFunction = workerInstance.loadEHentai;
+      workerFunction = worker.loadEHentai;
     } else if (sourceType == ST.bdsmlr) {
-      workerFunction = workerInstance.loadBDSMlr;
+      workerFunction = worker.loadBDSMlr;
     } else if (sourceType == ST.hydrus) {
-      workerFunction = workerInstance.loadHydrus;
+      workerFunction = worker.loadHydrus;
     }
     if (helpers.next == -1) {
       helpers.next = 0;
       const cachePath = getCachePath(source.url, config);
       if (config.caching.enabled && fs.existsSync(cachePath) && fs.readdirSync(cachePath).length > 0) {
         // If the cache directory exists, use it
-        workerInstance.loadLocalDirectory(config, source, filter, helpers, cachePath);
+        loadLocalDirectory(pm, allURLs, config, source, filter, weight, helpers, cachePath);
       } else {
-        workerFunction(config, source, filter, helpers);
+        workerFunction(allURLs, config, source, filter, weight, helpers);
       }
     } else {
-      workerFunction(config, source, filter, helpers);
+      workerFunction(allURLs, config, source, filter, weight, helpers);
     }
   }
+}
+
+const loadLocalDirectory = (pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}, cachePath: string) => {
+  const blacklist = ['*.css', '*.html', 'avatar.png'];
+  const url = cachePath ? cachePath : source.url;
+
+  recursiveReaddir(url, blacklist, (err: any, rawFiles: Array<string>) => {
+    if (err) {
+      pm({data: {
+        error: err.message,
+        helpers: helpers,
+        source: source,
+        timeout: 0,
+      }});
+    } else {
+      // If this is a local source (not a cacheDir call)
+      if (helpers.next == null) {
+        helpers.count = filterPathsToJustPlayable(IF.any, rawFiles, true).length;
+      }
+
+      let sources = filterPathsToJustPlayable(filter, rawFiles, true).map((p) => fileURL(p)).sort((a, b) => {
+        let aFile: any = getFileName(a, false);
+        if (parseInt(aFile)) {
+          aFile = parseInt(aFile);
+        }
+        let bFile: any = getFileName(b, false);
+        if (parseInt(aFile)) {
+          aFile = parseInt(aFile);
+        }
+        if (aFile > bFile) {
+          return 1;
+        } else if (aFile < bFile) {
+          return -1;
+        } else {
+          return 0;
+        }
+      });
+
+      if (source.blacklist && source.blacklist.length > 0) {
+        sources = sources.filter((url: string) => !source.blacklist.includes(url));
+      }
+      allURLs = processAllURLs(sources, allURLs, source, weight, helpers);
+
+      pm({data: {
+        data: sources,
+        allURLs: allURLs,
+        weight: weight,
+        helpers: helpers,
+        source: source,
+        timeout: 0,
+      }});
+    }
+  });
+}
+
+export const loadVideo = (pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}, cachePath: string) => {
+  const url = cachePath ? cachePath : source.url;
+  const missingVideo = () => {
+    pm({data: {
+      error: "Could not find " + source.url,
+      data: [],
+      allURLs: allURLs,
+      weight: weight,
+      helpers: helpers,
+      source: source,
+      timeout: 0,
+    }});
+  }
+  const ifExists = (url: string) => {
+    if (!url.startsWith("http")) {
+      url = fileURL(url);
+    }
+    helpers.count = 1;
+
+    let paths;
+    if (source.clips && source.clips.length > 0) {
+      const clipPaths = Array<string>();
+      for (let clip of source.clips) {
+        if (!source.disabledClips || !source.disabledClips.includes(clip.id)) {
+          let clipPath = url + ":::" + clip.id + ":" + (clip.volume != null ? clip.volume : "-") + ":::" + clip.start + ":" + clip.end;
+          if (source.subtitleFile != null && source.subtitleFile.length > 0) {
+            clipPath = clipPath + "|||" + source.subtitleFile;
+          }
+          clipPaths.push(clipPath);
+        }
+      }
+      paths = clipPaths;
+    } else {
+      if (source.subtitleFile != null && source.subtitleFile.length > 0) {
+        url = url + "|||" + source.subtitleFile;
+      }
+      paths = [url];
+    }
+
+    if (source.blacklist && source.blacklist.length > 0) {
+      paths = paths.filter((url: string) => !source.blacklist.includes(url));
+    }
+    allURLs = processAllURLs(paths, allURLs, source, weight, helpers);
+
+    pm({data: {
+      data: paths,
+      allURLs: allURLs,
+      weight: weight,
+      helpers: helpers,
+      source: source,
+      timeout: 0,
+    }});
+  }
+
+  if (!isVideo(url, false)) {
+    missingVideo();
+  }
+  if (url.startsWith("http")) {
+    wretch(url)
+      .get()
+      .notFound((e) => {
+        missingVideo();
+      })
+      .res((r) => {
+        ifExists(url);
+      })
+  } else {
+    const exists = fs.existsSync(url);
+    if (exists) {
+      ifExists(url);
+    } else {
+      missingVideo();
+    }
+  }
+}
+
+export const loadPlaylist = (pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}, cachePath: string) => {
+  const url = cachePath ? cachePath : source.url;
+  wretch(url)
+    .get()
+    .text(data => {
+      let urls = [];
+      if (url.endsWith(".asx")) {
+        const refs = new DOMParser().parseFromString(data, "text/xml").getElementsByTagName("Ref");
+        for (let r = 0; r < refs.length; r++) {
+          const l = refs[r];
+          urls.push(l.getAttribute("href"));
+        }
+      } else if (url.endsWith(".m3u8")) {
+        for (let l of data.split("\n")) {
+          if (l.length > 0 && !l.startsWith("#")) {
+            urls.push(l.trim());
+          }
+        }
+      } else if (url.endsWith(".pls")) {
+        for (let l of data.split("\n")) {
+          if (l.startsWith("File")) {
+            urls.push(l.split("=")[1].trim());
+          }
+        }
+      } else if (url.endsWith(".xspf")) {
+        const locations = new DOMParser().parseFromString(data, "text/xml").getElementsByTagName("location");
+        for (let r = 0; r < locations.length; r++) {
+          const l = locations[r];
+          urls.push(l.textContent);
+        }
+      }
+
+      if (urls.length > 0) {
+        helpers.count = urls.length;
+      }
+
+      urls = filterPathsToJustPlayable(filter, urls, true);
+
+      if (source.blacklist && source.blacklist.length > 0) {
+        urls = urls.filter((url: string) => !source.blacklist.includes(url));
+      }
+      allURLs = processAllURLs(urls, allURLs, source, weight, helpers);
+
+      pm({data: {
+        data: urls,
+        allURLs: allURLs,
+        weight: weight,
+        helpers: helpers,
+        source: source,
+        timeout: 0,
+      }});
+    })
+    .catch((e) => {
+      pm({data: {
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: 0,
+      }});
+    });
 }
 
 export default class SourceScraper extends React.Component {
@@ -135,6 +329,7 @@ export default class SourceScraper extends React.Component {
     videoVolume: this.props.scene.videoVolume,
   };
 
+  _isMounted = false;
   _backForth: NodeJS.Timeout = null;
   _promiseQueue: Array<{source: LibrarySource, helpers: {next: any, count: number, retries: number}}> = null;
   _nextPromiseQueue: Array<{source: LibrarySource, helpers: {next: any, count: number, retries: number}}> = null;
@@ -172,6 +367,7 @@ export default class SourceScraper extends React.Component {
   }
 
   componentDidMount(restart = false) {
+    this._isMounted = true;
     // Create an instance of your worker
     workerInstance = worker();
     if (!restart) {
@@ -235,7 +431,7 @@ export default class SourceScraper extends React.Component {
     }
 
     let sourceLoop = () => {
-      if (sceneSources.length == 0) return;
+      if (!this._isMounted || sceneSources.length == 0) return;
 
       const d = sources[n];
 
@@ -253,16 +449,16 @@ export default class SourceScraper extends React.Component {
         let object = message.data;
         if (object?.type == "RPC") return;
 
-        if (object?.error) {
+        if (object?.error != null) {
           console.error("Error retrieving " + object?.source.url + (object?.helpers.next > 0 ? "Page " + object.helpers.next : ""));
           console.error(object.error);
         }
 
-        if (object?.warning) {
+        if (object?.warning != null) {
           console.warn(object.warning);
         }
 
-        if (object?.systemMessage) {
+        if (object?.systemMessage != null) {
           this.props.systemMessage(object.systemMessage);
         }
 
@@ -270,18 +466,9 @@ export default class SourceScraper extends React.Component {
           n += 1;
 
           // Just add the new urls to the end of the list
-          if (object?.data) {
+          if (object?.data && object?.allURLs) {
             const source = object.source;
-            if (source.blacklist && source.blacklist.length > 0) {
-              object.data = object.data.filter((url: string) => !source.blacklist.includes(url));
-            }
-            if (this.props.scene.weightFunction == WF.sources) {
-              newAllURLs.set(source.url, object.data);
-            } else {
-              for (let d of object.data) {
-                newAllURLs.set(d, [source.url]);
-              }
-            }
+            newAllURLs = object.allURLs;
             this.setState({allURLs: newAllURLs});
 
             // If this is a remote URL, queue up the next promise
@@ -292,14 +479,20 @@ export default class SourceScraper extends React.Component {
           }
 
           if (n < sceneSources.length) {
-            setTimeout(sourceLoop, object?.timeout != null ? object.timeout : 1000);
+            const timeout = object?.timeout != null ? object.timeout : 1000;
+            if (timeout == 0) {
+              setImmediate(sourceLoop, timeout);
+            } else {
+              setTimeout(sourceLoop, timeout);
+            }
           } else {
             this.props.finishedLoading(isEmpty(Array.from(newAllURLs.values())));
             promiseLoop();
-            /*if (this.props.nextScene && this.props.playNextScene) {
+            if (this.props.nextScene && this.props.playNextScene) {
               n = 0;
+              nextWorkerInstance = worker();
               nextSourceLoop();
-            }*/
+            }
           }
         }
       }
@@ -310,11 +503,11 @@ export default class SourceScraper extends React.Component {
       }
       workerListener = receiveMessage.bind(this);
       workerInstance.addEventListener('message', workerListener);
-      scrapeFiles(this.props.config, d, this.props.scene.imageTypeFilter, {next: -1, count: 0, retries: 0})
+      scrapeFiles(workerInstance, workerListener, this.state.allURLs, this.props.config, d, this.props.scene.imageTypeFilter, this.props.scene.weightFunction, {next: -1, count: 0, retries: 0})
     };
 
     let nextSourceLoop = () => {
-      /*if (this.state.nextPromise.hasCanceled) return;
+      if (!this._isMounted) return;
 
       if (!this.props.isPlaying) {
         setTimeout(nextSourceLoop, 500);
@@ -325,43 +518,57 @@ export default class SourceScraper extends React.Component {
       if (!this.props.scene.playVideoClips && d.clips) {
         d.clips = [];
       }
-      const loadPromise = scrapeFiles(this.props.systemMessage, this.props.config, d, this.props.nextScene.imageTypeFilter, {next: -1, count: 0, retries: 0});
-      this.setState({nextPromise: loadPromise});
 
-      loadPromise
-        .getPromise()
-        .then((object) => {
+      const receiveMessage = (message: any) => {
+        let object = message.data;
+        if (object?.type == "RPC") return;
+
+        if (object?.error != null) {
+          console.error("Error retrieving " + object?.source.url + (object?.helpers.next > 0 ? "Page " + object.helpers.next : ""));
+          console.error(object.error);
+        }
+
+        if (object?.warning != null) {
+          console.warn(object.warning);
+        }
+
+        if (object?.systemMessage != null) {
+          this.props.systemMessage(object.systemMessage);
+        }
+
+        if (object?.source) {
           n += 1;
 
           // Just add the new urls to the end of the list
-          if (object != null) {
-            if (loadPromise.source.blacklist && loadPromise.source.blacklist.length > 0) {
-              object.data = object.data.filter((url) => !loadPromise.source.blacklist.includes(url));
-            }
-            if (this.props.nextScene.weightFunction == WF.sources) {
-              this._nextAllURLs.set(loadPromise.source.url, object.data);
-            } else {
-              for (let d of object.data) {
-                this._nextAllURLs.set(d, [loadPromise.source.url]);
-              }
-            }
+          if (object?.data != null) {
+            const source = object.source;
+            this._nextAllURLs = object.allURLs;
 
             // If this is a remote URL, queue up the next promise
             if (object.helpers.next != null) {
-              this._nextPromiseQueue.push({source: d, helpers: object.helpers});
+              this._nextPromiseQueue.push({source: source, helpers: object.helpers});
             }
-            this.props.setCount(d.url, object.helpers.count, object.helpers.next == null);
+            this.props.setCount(source.url, object.helpers.count, object.helpers.next == null);
           }
 
           if (n < nextSources.length) {
-            setTimeout(nextSourceLoop, loadPromise.timeout);
+            setTimeout(nextSourceLoop, object.timeout);
           }
-        });*/
+        }
+      }
+
+      // Attach an event listener to receive calculations from your worker
+      if (nextWorkerListener != null) {
+        nextWorkerInstance.removeEventListener('message', nextWorkerListener);
+      }
+      nextWorkerListener = receiveMessage.bind(this);
+      nextWorkerInstance.addEventListener('message', nextWorkerListener);
+      scrapeFiles(nextWorkerInstance, nextWorkerListener, this.state.allURLs, this.props.config, d, this.props.nextScene.imageTypeFilter, this.props.scene.weightFunction, {next: -1, count: 0, retries: 0});
     };
 
     let promiseLoop = () => {
       // Process until queue is empty or player has been stopped
-      if (this._promiseQueue.length == 0)  return;
+      if (!this._isMounted || this._promiseQueue.length == 0)  return;
 
       if (!this.props.isPlaying) {
         setTimeout(promiseLoop, 500);
@@ -372,16 +579,16 @@ export default class SourceScraper extends React.Component {
         let object = message.data;
         if (object?.type == "RPC") return;
 
-        if (object?.error) {
+        if (object?.error != null) {
           console.error("Error retrieving " + object?.source.url + (object?.helpers.next > 0 ? "Page " + object.helpers.next : ""));
           console.error(object.error);
         }
 
-        if (object?.warning) {
+        if (object?.warning != null) {
           console.warn(object.warning);
         }
 
-        if (object?.systemMessage) {
+        if (object?.systemMessage != null) {
           this.props.systemMessage(object.systemMessage);
         }
 
@@ -389,29 +596,7 @@ export default class SourceScraper extends React.Component {
         if (object?.source) {
           if (object?.data) {
             const source = object.source;
-            if (source.blacklist && source.blacklist.length > 0) {
-              object.data = object.data.filter((url: string) => !source.blacklist.includes(url));
-            }
-
-            // Update the correct index with our new images
-            let newAllURLs = this.state.allURLs;
-            if (this.props.scene.weightFunction == WF.sources) {
-              let sourceURLs = newAllURLs.get(source.url);
-              if (!sourceURLs) sourceURLs = [];
-              newAllURLs.set(source.url, sourceURLs.concat(object.data.filter((u: string) => {
-                const fileName = getFileName(u);
-                const found = sourceURLs.map((u) => getFileName(u)).includes(fileName);
-                return !found;
-              })));
-            } else {
-              for (let d of object.data.filter((u: string) => {
-                const fileName = getFileName(u);
-                const found = Array.from(newAllURLs.keys()).map((u) => getFileName(u)).includes(fileName);
-                return !found;
-              })) {
-                newAllURLs.set(d, [object.source.url]);
-              }
-            }
+            let newAllURLs = object.allURLs;
             this.setState({allURLs: newAllURLs});
 
             // Add the next promise to the queue
@@ -432,7 +617,7 @@ export default class SourceScraper extends React.Component {
       workerListener = receiveMessage.bind(this);
       workerInstance.addEventListener('message', workerListener);
       const promiseData = this._promiseQueue.shift();
-      scrapeFiles(this.props.config, promiseData.source, this.props.scene.imageTypeFilter, promiseData.helpers);
+      scrapeFiles(workerInstance, workerListener, this.state.allURLs, this.props.config, promiseData.source, this.props.scene.imageTypeFilter, this.props.scene.weightFunction, promiseData.helpers);
     };
 
     if (this.state.preload) {
@@ -466,27 +651,25 @@ export default class SourceScraper extends React.Component {
       this.setState({videoVolume: this.props.scene.videoVolume});
     }
     if (props.scene.id !== this.props.scene.id) {
-      state.nextPromise.cancel();
-      state.promise.cancel();
+      workerInstance.removeEventListener('message', workerListener);
+      nextWorkerInstance.removeEventListener('message', nextWorkerListener);
+      workerListener = null;
+      nextWorkerListener = null;
       if (props.nextScene != null && this.props.scene.id === props.nextScene.id) { // If the next scene has been played
         if (this.props.nextScene && this.props.nextScene.id === props.scene.id) { // Just swap values if we're coming back to this scene again
           const newAllURLs = this._nextAllURLs;
-          const newPromiseQueue = this._nextPromiseQueue;
+          const temp = this._nextPromiseQueue;
+          this._nextPromiseQueue = this._promiseQueue;
+          this._promiseQueue = temp;
           this._nextAllURLs = state.allURLs;
-          this._nextPromiseQueue = state.promiseQueue;
           this.setState({
-            promiseQueue: newPromiseQueue,
-            promise: new CancelablePromise((resolve, reject) => {}),
-            nextPromise: new CancelablePromise((resolve, reject) => {}),
             allURLs: newAllURLs,
             preload: true,
             restart: true
           });
         } else { // Replace values
+          this._promiseQueue = this._nextPromiseQueue;
           this.setState({
-            promiseQueue: this._nextPromiseQueue,
-            promise: new CancelablePromise((resolve, reject) => {}),
-            nextPromise: new CancelablePromise((resolve, reject) => {}),
             allURLs: this._nextAllURLs,
             preload: true,
             restart: true
@@ -495,10 +678,8 @@ export default class SourceScraper extends React.Component {
           this._nextAllURLs = new Map<string, Array<string>>();
         }
       } else {
+        this._promiseQueue = Array<{ source: LibrarySource, helpers: {next: any, count: number, retries: number}}>();
         this.setState({
-          promiseQueue: Array<{ source: LibrarySource, helpers: {next: any, count: number, retries: number}}>(),
-          promise: new CancelablePromise((resolve, reject) => {}),
-          nextPromise: new CancelablePromise((resolve, reject) => {}),
           allURLs: new Map<string, Array<string>>(),
           preload: false,
           restart: true
@@ -512,9 +693,13 @@ export default class SourceScraper extends React.Component {
   }
 
   componentWillUnmount() {
+    this._isMounted = false;
     workerInstance.removeEventListener('message', workerListener);
+    nextWorkerInstance?.removeEventListener('message', nextWorkerListener);
     workerListener = null;
+    nextWorkerListener = null;
     workerInstance = null;
+    nextWorkerInstance = null;
     this._promiseQueue = null;
     this._nextPromiseQueue = null;
     this._nextAllURLs = null;

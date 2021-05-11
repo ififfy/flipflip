@@ -144,11 +144,13 @@ export default class ImagePlayer extends React.Component {
         this.delete();
       }
     }
+    this._animationFrameHandle = requestAnimationFrame(this.animationFrame);
     this.startFetchLoops(this.props.maxLoadingAtOnce);
     this.start();
   }
 
   componentWillUnmount() {
+    cancelAnimationFrame(this._animationFrameHandle);
     clearTimeout(this._backForth);
     clearTimeout(this._timeout);
     for (let timeout of this._waitTimeouts) {
@@ -285,8 +287,6 @@ export default class ImagePlayer extends React.Component {
     }
 
     this.advance(true, true);
-
-    window.requestAnimationFrame(this.animationFrame);
   }
 
   startFetchLoops(max: number, loop = 0) {
@@ -298,10 +298,19 @@ export default class ImagePlayer extends React.Component {
   }
 
   animationFrame = () => {
-    while (this._runFetchLoopCallRequests.length > 0) {
-      this.runFetchLoop(this._runFetchLoopCallRequests.shift());
+    if (!this._isMounted) return;
+    let requestAnimation = false;
+    if (this.state.readyToDisplay.length < this.props.maxLoadingAtOnce && this.props.allURLs) {
+      while (this._runFetchLoopCallRequests.length > 0) {
+        requestAnimation = true;
+        this.runFetchLoop(this._runFetchLoopCallRequests.shift());
+      }
     }
-    this._animationFrameHandle = requestAnimationFrame(this.animationFrame);
+    if (requestAnimation) {
+      this._animationFrameHandle = requestAnimationFrame(this.animationFrame);
+    } else {
+      setTimeout(this.animationFrame, 100);
+    }
   }
 
   queueRunFetchLoop(i: number) {
@@ -430,7 +439,8 @@ export default class ImagePlayer extends React.Component {
     } else { // For image weighted
 
       // Concat all images together
-      collection = [].concat.apply([], Array.from(this.props.allURLs.keys()));
+      const urlKeys = Array.from(this.props.allURLs.keys());
+      collection = urlKeys;
       // If there are none, loop again1
       if (!(collection && collection.length)) {
         this.queueRunFetchLoop(i);
@@ -444,7 +454,7 @@ export default class ImagePlayer extends React.Component {
         // If there are no remaining urls, clear loadedURLs
         if (!(collection && collection.length)) {
           this._loadedURLs = new Array<string>();
-          collection = [].concat.apply([], Array.from(this.props.allURLs.keys()));
+          collection = urlKeys;
         }
       }
 
@@ -776,7 +786,7 @@ export default class ImagePlayer extends React.Component {
       if (this.props.scene.weightFunction == WF.sources) {
         remainingLibrary = [].concat.apply([], Array.from(this.props.allURLs.values())).filter((u: string) => !this._playedURLs.includes(u));
       } else {
-        remainingLibrary = [].concat.apply([], Array.from(this.props.allURLs.keys())).filter((u: string) => !this._playedURLs.includes(u));
+        remainingLibrary = Array.from(this.props.allURLs.keys()).filter((u: string) => !this._playedURLs.includes(u));
       }
       if (remainingLibrary.length === 0) {
         this._playedURLs = new Array<string>();
