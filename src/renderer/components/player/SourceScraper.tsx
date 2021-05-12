@@ -321,7 +321,6 @@ export default class SourceScraper extends React.Component {
     playNextScene?(): void,
   };
 
-  // TODO Remove Promise stuff
   readonly state = {
     allURLs: new Map<string, Array<string>>(),
     restart: false,
@@ -431,7 +430,7 @@ export default class SourceScraper extends React.Component {
     }
 
     let sourceLoop = () => {
-      if (!this._isMounted || sceneSources.length == 0) return;
+      if (!this._isMounted || sceneSources.length == 0 || n >= sources.length) return;
 
       const d = sources[n];
 
@@ -499,7 +498,7 @@ export default class SourceScraper extends React.Component {
 
       // Attach an event listener to receive calculations from your worker
       if (workerListener != null) {
-        workerInstance.removeEventListener('message', workerListener);
+        workerInstance?.removeEventListener('message', workerListener);
       }
       workerListener = receiveMessage.bind(this);
       workerInstance.addEventListener('message', workerListener);
@@ -515,7 +514,7 @@ export default class SourceScraper extends React.Component {
       }
 
       const d = nextSources[n];
-      if (!this.props.scene.playVideoClips && d.clips) {
+      if (!this.props.nextScene.playVideoClips && d.clips) {
         d.clips = [];
       }
 
@@ -559,11 +558,11 @@ export default class SourceScraper extends React.Component {
 
       // Attach an event listener to receive calculations from your worker
       if (nextWorkerListener != null) {
-        nextWorkerInstance.removeEventListener('message', nextWorkerListener);
+        nextWorkerInstance?.removeEventListener('message', nextWorkerListener);
       }
       nextWorkerListener = receiveMessage.bind(this);
       nextWorkerInstance.addEventListener('message', nextWorkerListener);
-      scrapeFiles(nextWorkerInstance, nextWorkerListener, this.state.allURLs, this.props.config, d, this.props.nextScene.imageTypeFilter, this.props.scene.weightFunction, {next: -1, count: 0, retries: 0});
+      scrapeFiles(nextWorkerInstance, nextWorkerListener, this._nextAllURLs, this.props.config, d, this.props.nextScene.imageTypeFilter, this.props.nextScene.weightFunction, {next: -1, count: 0, retries: 0});
     };
 
     let promiseLoop = () => {
@@ -612,7 +611,7 @@ export default class SourceScraper extends React.Component {
 
       // Attach an event listener to receive calculations from your worker
       if (workerListener != null) {
-        workerInstance.removeEventListener('message', workerListener);
+        workerInstance?.removeEventListener('message', workerListener);
       }
       workerListener = receiveMessage.bind(this);
       workerInstance.addEventListener('message', workerListener);
@@ -651,8 +650,8 @@ export default class SourceScraper extends React.Component {
       this.setState({videoVolume: this.props.scene.videoVolume});
     }
     if (props.scene.id !== this.props.scene.id) {
-      workerInstance.removeEventListener('message', workerListener);
-      nextWorkerInstance.removeEventListener('message', nextWorkerListener);
+      workerInstance?.removeEventListener('message', workerListener);
+      nextWorkerInstance?.removeEventListener('message', nextWorkerListener);
       workerListener = null;
       nextWorkerListener = null;
       if (props.nextScene != null && this.props.scene.id === props.nextScene.id) { // If the next scene has been played
@@ -694,7 +693,7 @@ export default class SourceScraper extends React.Component {
 
   componentWillUnmount() {
     this._isMounted = false;
-    workerInstance.removeEventListener('message', workerListener);
+    workerInstance?.removeEventListener('message', workerListener);
     nextWorkerInstance?.removeEventListener('message', nextWorkerListener);
     workerListener = null;
     nextWorkerListener = null;

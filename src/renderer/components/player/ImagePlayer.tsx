@@ -822,18 +822,23 @@ export default class ImagePlayer extends React.Component {
         }
       });
     }
-    if (this.state.readyToDisplay.length) {
-      // If there is an image ready, display the next image
-      nextImg = this.state.readyToDisplay.shift();
-    } else if (this.state.historyPaths.length && this.props.config.defaultScene.orderFunction == OF.random && !this.props.scene.forceAll) {
-      // If no image is ready, we have a history to choose from, ordering is random, and NOT forcing all
-      // Choose a random image from history to display
-      nextImg = getRandomListItem(this.state.historyPaths);
-    } else if (this.state.historyPaths.length) {
-      // If no image is ready, we have a history to choose from, and ordering is not random
-      // Show the next image from history
-      nextImg = this.state.historyPaths[this._nextAdvIndex++%this.state.historyPaths.length];
-    }
+
+    // Prevent playing same image again, if possible
+    do {
+      if (this.state.readyToDisplay.length) {
+        // If there is an image ready, display the next image
+        nextImg = this.state.readyToDisplay.shift();
+      } else if (this.state.historyPaths.length && this.props.config.defaultScene.orderFunction == OF.random && !this.props.scene.forceAll) {
+        // If no image is ready, we have a history to choose from, ordering is random, and NOT forcing all
+        // Choose a random image from history to display
+        nextImg = getRandomListItem(this.state.historyPaths);
+      } else if (this.state.historyPaths.length) {
+        // If no image is ready, we have a history to choose from, and ordering is not random
+        // Show the next image from history
+        nextImg = this.state.historyPaths[this._nextAdvIndex++ % this.state.historyPaths.length];
+      }
+    } while (this.state.historyPaths.length > 0 && nextImg?.src == this.state.historyPaths[this.state.historyPaths.length - 1].src &&
+    (this.state.readyToDisplay.length > 0 || this.state.historyPaths.filter((s) => s.src != this.state.historyPaths[this.state.historyPaths.length - 1]?.src).length > 0))
 
     if (nextImg) {
       if (this.props.scene.continueVideo && nextImg instanceof HTMLVideoElement) {
