@@ -30,10 +30,17 @@ let mainConfig = {
             },
             {
                 test: /\.(jpg|png|svg|ico|icns)$/,
-                loader: 'file-loader',
-                options: {
-                    name: '[path][name].[ext]',
-                },
+                use: [
+                    {
+                        loader: 'file-loader',
+                        options: {
+                            name: '[path][name].[ext]',
+                        },
+                    },
+                    {
+                        loader: 'webp-loader'
+                    }
+                ]
             },
             {
                 test: /\.(eot|ttf|woff|woff2)$/,
@@ -83,10 +90,17 @@ let rendererConfig = {
             },
             {
                 test: /\.(jpg|png|svg|ico|icns)$/,
-                loader: 'file-loader',
-                options: {
-                    name: '[path][name].[ext]',
-                },
+                use: [
+                    {
+                        loader: 'file-loader',
+                        options: {
+                            name: '[path][name].[ext]',
+                        },
+                    },
+                    {
+                        loader: 'webp-loader'
+                    }
+                ]
             },
             {
                 test: /\.(eot|ttf|woff|woff2)$/,

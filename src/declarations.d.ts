@@ -30,6 +30,7 @@ declare module 'file-url';
 declare module 'font-list';
 declare module 'imgur';
 declare module 'music-metadata';
+declare module 'node-webpmux';
 declare module 'oauth';
 declare module 'react-color';
 declare module 'react-select';

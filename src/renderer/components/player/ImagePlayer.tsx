@@ -4,6 +4,7 @@ import * as React from 'react';
 import request from 'request';
 import fs from "fs";
 import gifInfo from 'gif-info';
+import WebP from 'node-webpmux';
 
 import {GO, IF, OF, OT, SL, SOF, ST, TF, VO, WF} from '../../data/const';
 import {getCachePath, getRandomListItem, getRandomNumber, toArrayBuffer, urlToPath} from '../../data/utils';
@@ -795,28 +796,45 @@ export default class ImagePlayer extends React.Component {
       };
 
       // Get gifinfo if we need for imageFilter or playing full gif
-      if ((this.props.scene.imageTypeFilter == IF.animated || this.props.scene.imageTypeFilter == IF.stills || this.props.scene.gifOption != GO.none) && url.includes('.gif')) {
-        // Get gif info. See https://github.com/Prinzhorn/gif-info
-        try {
-          if (url.includes("file://")) {
-            processInfo(gifInfo(toArrayBuffer(fs.readFileSync(urlToPath(url)))));
-          } else {
-            request.get({url, encoding: null}, function (err: Error, res: IncomingMessage, body: Buffer) {
-              if (err) {
-                console.error(err);
-                processInfo(null);
-                return;
-              }
-              processInfo(gifInfo(toArrayBuffer(body)));
-            });
+      if (this.props.scene.imageTypeFilter == IF.animated || this.props.scene.imageTypeFilter == IF.stills || this.props.scene.gifOption != GO.none) {
+        if (url.includes('.gif')) {
+          // Get gif info. See https://github.com/Prinzhorn/gif-info
+          try {
+            if (url.includes("file://")) {
+              processInfo(gifInfo(toArrayBuffer(fs.readFileSync(urlToPath(url)))));
+            } else {
+              request.get({url, encoding: null}, function (err: Error, res: IncomingMessage, body: Buffer) {
+                if (err) {
+                  console.error(err);
+                  processInfo(null);
+                  return;
+                }
+                processInfo(gifInfo(toArrayBuffer(body)));
+              });
+            }
+          } catch (e) {
+            console.error(e);
           }
-        } catch (e) {
-          console.error(e);
+        } else {
+          img.src = url;
+          clearTimeout(this._imgLoadTimeouts[i]);
+          this._imgLoadTimeouts[i] = setTimeout(() => errorCallback, 5000);
         }
-      } else {
-        img.src = url;
-        clearTimeout(this._imgLoadTimeouts[i]);
-        this._imgLoadTimeouts[i] = setTimeout(errorCallback, 5000);
+      } else if (url.includes('.webp')) {
+        let img = new WebP.Image();
+        console.log("Loading webP");
+        img.load(url).then((image: any) => {
+          console.log("Got Image");
+          if (image.hasAnim()) {
+            console.log("Has Animation");
+            const frames = image.frames();
+            console.log(frames);
+            processInfo({animated: true, duration: 0} as any);
+          } else {
+            console.log("No Animation");
+            processInfo({animated: false} as any);
+          }
+        })
       }
     }
   }
