@@ -1867,7 +1867,7 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, 
       wretch(hydrusURL + "/session_key")
         .headers({"Hydrus-Client-API-Access-Key": apiKey})
         .get()
-        .setTimeout(5000)
+        .setTimeout(15000)
         .notFound((e) => {
           pm({
             error: e.message,
@@ -1902,7 +1902,7 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, 
       wretch(url)
         .headers({"Hydrus-Client-API-Session-Key": sessionKey})
         .get()
-        .setTimeout(5000)
+        .setTimeout(15000)
         .notFound((e) => {
           pm({
             error: e.message,
@@ -1926,7 +1926,8 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, 
           let page = 0;
           for (let i=0; i<fileIDs.length; i+=chunk) {
             const pageIDs = fileIDs.slice(i,i+chunk);
-            getFileMetadata(pageIDs, ++page);
+            // Stagger our getFileMetadata calls
+            setTimeout(() => getFileMetadata(pageIDs, ++page), page*1000);
           }
         })
         .catch((e) => pm({
@@ -1942,7 +1943,7 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, 
       wretch(hydrusURL + "/get_files/file_metadata?file_ids=[" + fileIDs.toString() + "]")
         .headers({"Hydrus-Client-API-Session-Key": sessionKey})
         .get()
-        .setTimeout(5000)
+        .setTimeout(15000)
         .notFound((e) => {
           pm({
             error: e.message,
