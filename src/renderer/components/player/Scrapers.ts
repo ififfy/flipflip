@@ -518,7 +518,6 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
   }
 }
 
-// TODO Verify this works after site's cert issue is resolved
 export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
   const timeout = 8000;
   if (helpers.next == 0) {
@@ -528,7 +527,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
   if (url.includes("/pictures/")) {
     wretch("https://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2")
       .get()
-      .setTimeout(10000)
+      .setTimeout(15000)
       .onAbort((e) => pm({
         error: e.message,
         helpers: helpers,
@@ -565,6 +564,9 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
               })
           }
         } else {
+          if (html.includes("Enter the captcha")) {
+            pm({warning: source.url + "blocked due to captcha"});
+          }
           helpers.next = null;
           pm({
             data: [],
@@ -645,6 +647,9 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
               }
             });
         } else {
+          if (html.includes("Enter the captcha")) {
+            pm({warning: source.url + "blocked due to captcha"});
+          }
           helpers.next[0] += 1;
           helpers.next[1] = 0;
           pm({

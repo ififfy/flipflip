@@ -449,7 +449,7 @@ export default class SourceScraper extends React.Component {
         if (object?.type == "RPC") return;
 
         if (object?.error != null) {
-          console.error("Error retrieving " + object?.source.url + (object?.helpers.next > 0 ? "Page " + object.helpers.next : ""));
+          console.error("Error retrieving " + object?.source?.url + (object?.helpers?.next > 0 ? "Page " + object.helpers.next : ""));
           console.error(object.error);
         }
 
@@ -523,7 +523,7 @@ export default class SourceScraper extends React.Component {
         if (object?.type == "RPC") return;
 
         if (object?.error != null) {
-          console.error("Error retrieving " + object?.source.url + (object?.helpers.next > 0 ? "Page " + object.helpers.next : ""));
+          console.error("Error retrieving " + object?.source?.url + (object?.helpers?.next > 0 ? "Page " + object.helpers.next : ""));
           console.error(object.error);
         }
 
@@ -579,7 +579,7 @@ export default class SourceScraper extends React.Component {
         if (object?.type == "RPC") return;
 
         if (object?.error != null) {
-          console.error("Error retrieving " + object?.source.url + (object?.helpers.next > 0 ? "Page " + object.helpers.next : ""));
+          console.error("Error retrieving " + object?.source?.url + (object?.helpers?.next > 0 ? "Page " + object.helpers.next : ""));
           console.error(object.error);
         }
 
