@@ -2236,6 +2236,8 @@ export function getSourceType(url: string): string {
     return ST.bdsmlr;
   } else if (/^https?:\/\/[\w\\.]+:\d+\/get_files\/search_files/.exec(url) != null) {
     return ST.hydrus;
+  } else if (/^https?:\/\/[^.]*\.[a-z0-9\.:]+\/ws.php/.exec(url) != null) {
+    return ST.piwigo;
   } else if (/(^https?:\/\/)|(\.txt$)/.exec(url) != null) { // Arbitrary URL, assume image list
     return ST.list;
   } else { // Directory
@@ -2381,5 +2383,15 @@ export function getFileGroup(url: string) {
       tags = tags.substring(1, tags.length - 1);
       tags = tags.replace(/"/g, "");
       return tags;
+    case ST.piwigo:
+      // const tagsRegex = /tags=([^&]*)&?.*$/.exec(url);
+      // if (tagsRegex == null) return "hydrus";
+      // let tags = tagsRegex[1];
+      // if (!tags.startsWith("[")) {
+      //   tags = decodeURIComponent(tags);
+      // }
+      // tags = tags.substring(1, tags.length - 1);
+      // tags = tags.replace(/"/g, "");
+      return "piwigo";//TODO: this
   }
 }

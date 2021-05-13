@@ -209,11 +209,16 @@ interface RemoteSettingsI {
 
   instagramUsername: string;
   instagramPassword: string;
-
+  
   hydrusProtocol: string;
   hydrusDomain: string;
   hydrusPort: string;
   hydrusAPIKey: string;
+
+  piwigoProtocol: string;
+  piwigoHost: string;
+  piwigoUsername: string;
+  piwigoPassword:string;
 }
 
 interface CacheSettingsI {
@@ -496,6 +501,11 @@ export class RemoteSettings implements RemoteSettingsI {
   hydrusDomain = "localhost";
   hydrusPort = "45869";
   hydrusAPIKey = "";
+
+  piwigoProtocol = "http";
+  piwigoHost = "localhost";
+  piwigoUsername = "";
+  piwigoPassword = "";
 }
 
 export class CacheSettings implements CacheSettingsI {

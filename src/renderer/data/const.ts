@@ -152,6 +152,7 @@ const ST = { // source types
   ehentai: 'st.ehentai',
   bdsmlr: 'st.bdsmlr',
   hydrus: 'st.hydrus',
+  piwigo: 'st.piwigo',
   audio: 'st.audio'
 };
 
