@@ -5,6 +5,7 @@ import worker from 'workerize-loader!./Scrapers';
 import recursiveReaddir from "recursive-readdir";
 import fileURL from "file-url";
 import wretch from "wretch";
+import uuidv4 from "uuid/v4";
 
 import {
   getCachePath,
@@ -30,7 +31,7 @@ function isEmpty(allURLs: any[]): boolean {
 }
 
 // Determine what kind of source we have based on the URL and return associated Promise
-function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) {
+function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) {
   const sourceType = getSourceType(source.url);
   if (sourceType == ST.local) { // Local files
     helpers.next = null;
@@ -102,7 +103,7 @@ function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<strin
   }
 }
 
-const loadLocalDirectory = (pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}, cachePath: string) => {
+const loadLocalDirectory = (pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, cachePath: string) => {
   const blacklist = ['*.css', '*.html', 'avatar.png', '*.txt'];
   const url = cachePath ? cachePath : source.url;
 
@@ -155,7 +156,7 @@ const loadLocalDirectory = (pm: Function, allURLs: Map<string, Array<string>>, c
   });
 }
 
-export const loadVideo = (pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}, cachePath: string) => {
+export const loadVideo = (pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, cachePath: string) => {
   const url = cachePath ? cachePath : source.url;
   const missingVideo = () => {
     pm({data: {
@@ -231,7 +232,7 @@ export const loadVideo = (pm: Function, allURLs: Map<string, Array<string>>, con
   }
 }
 
-export const loadPlaylist = (pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}, cachePath: string) => {
+export const loadPlaylist = (pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, cachePath: string) => {
   const url = cachePath ? cachePath : source.url;
   wretch(url)
     .get()
@@ -330,8 +331,8 @@ export default class SourceScraper extends React.Component {
 
   _isMounted = false;
   _backForth: NodeJS.Timeout = null;
-  _promiseQueue: Array<{source: LibrarySource, helpers: {next: any, count: number, retries: number}}> = null;
-  _nextPromiseQueue: Array<{source: LibrarySource, helpers: {next: any, count: number, retries: number}}> = null;
+  _promiseQueue: Array<{source: LibrarySource, helpers: {next: any, count: number, retries: number, uuid: string}}> = null;
+  _nextPromiseQueue: Array<{source: LibrarySource, helpers: {next: any, count: number, retries: number, uuid: string}}> = null;
   _nextAllURLs: Map<string, Array<string>> = null;
 
   render() {
@@ -380,11 +381,12 @@ export default class SourceScraper extends React.Component {
   componentDidMount(restart = false) {
     this._isMounted = true;
     // Create an instance of your worker
+    const uuid = uuidv4();
     workerInstance = worker();
     if (!restart) {
       workerInstance.reset();
-      this._promiseQueue = new Array<{ source: LibrarySource, helpers: {next: any, count: number, retries: number} }>();
-      this._nextPromiseQueue = new Array<{ source: LibrarySource, helpers: {next: any, count: number, retries: number} }>();
+      this._promiseQueue = new Array<{ source: LibrarySource, helpers: {next: any, count: number, retries: number, uuid: string} }>();
+      this._nextPromiseQueue = new Array<{ source: LibrarySource, helpers: {next: any, count: number, retries: number, uuid: string} }>();
       this._nextAllURLs = new Map<string, Array<string>>();
     }
     let n = 0;
@@ -474,6 +476,11 @@ export default class SourceScraper extends React.Component {
         }
 
         if (object?.source) {
+          if (object.helpers.uuid != uuid) {
+            console.error("WRONG UUID RECEIVED BY " + this.props.scene.name);
+            return;
+          }
+
           n += 1;
 
           // Just add the new urls to the end of the list
@@ -514,7 +521,7 @@ export default class SourceScraper extends React.Component {
       }
       workerListener = receiveMessage.bind(this);
       workerInstance.addEventListener('message', workerListener);
-      scrapeFiles(workerInstance, workerListener, this.state.allURLs, this.props.config, d, this.props.scene.imageTypeFilter, this.props.scene.weightFunction, {next: -1, count: 0, retries: 0})
+      scrapeFiles(workerInstance, workerListener, this.state.allURLs, this.props.config, d, this.props.scene.imageTypeFilter, this.props.scene.weightFunction, {next: -1, count: 0, retries: 0, uuid: uuid})
     };
 
     let nextSourceLoop = () => {
@@ -574,12 +581,17 @@ export default class SourceScraper extends React.Component {
       }
       nextWorkerListener = receiveMessage.bind(this);
       nextWorkerInstance.addEventListener('message', nextWorkerListener);
-      scrapeFiles(nextWorkerInstance, nextWorkerListener, this._nextAllURLs, this.props.config, d, this.props.nextScene.imageTypeFilter, this.props.nextScene.weightFunction, {next: -1, count: 0, retries: 0});
+      scrapeFiles(nextWorkerInstance, nextWorkerListener, this._nextAllURLs, this.props.config, d, this.props.nextScene.imageTypeFilter, this.props.nextScene.weightFunction, {next: -1, count: 0, retries: 0, uuid: uuid});
     };
 
     let promiseLoop = () => {
       // Process until queue is empty or player has been stopped
-      if (!this._isMounted || this._promiseQueue.length == 0)  return;
+      if (!this._isMounted || this._promiseQueue.length == 0)  {
+        if (workerListener != null) {
+          workerInstance?.removeEventListener('message', workerListener);
+        }
+        return;
+      }
 
       if (!this.props.isPlaying) {
         setTimeout(promiseLoop, 500);
@@ -685,11 +697,11 @@ export default class SourceScraper extends React.Component {
             preload: true,
             restart: true
           });
-          this._nextPromiseQueue = Array<{source: LibrarySource, helpers: {next: any, count: number, retries: number}}>();
+          this._nextPromiseQueue = Array<{source: LibrarySource, helpers: {next: any, count: number, retries: number, uuid: string}}>();
           this._nextAllURLs = new Map<string, Array<string>>();
         }
       } else {
-        this._promiseQueue = Array<{ source: LibrarySource, helpers: {next: any, count: number, retries: number}}>();
+        this._promiseQueue = Array<{ source: LibrarySource, helpers: {next: any, count: number, retries: number, uuid: string}}>();
         this.setState({
           allURLs: new Map<string, Array<string>>(),
           preload: false,

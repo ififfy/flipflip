@@ -24,7 +24,7 @@ const pm = (object: any) => {
   postMessage(object);
 }
 
-export const processAllURLs = (data: string[], allURLs: Map<string, string[]>, source: LibrarySource, weight: string, helpers: {next: any, count: number, retries: number}): Map<string, string[]> => {
+export const processAllURLs = (data: string[], allURLs: Map<string, string[]>, source: LibrarySource, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}): Map<string, string[]> => {
   let newAllURLs = new Map(allURLs);
   if (helpers.next == null || helpers.next <= 0) {
     if (weight == WF.sources) {
@@ -72,7 +72,7 @@ export const reset = () => {
   hydrusAlerted = false;
 }
 
-export const loadRemoteImageURLList = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadRemoteImageURLList = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const url = source.url;
   wretch(url)
     .get()
@@ -132,7 +132,7 @@ export const loadRemoteImageURLList = (allURLs: Map<string, Array<string>>, conf
     });
 }
 
-export const loadTumblr = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadTumblr = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 3000;
   let configured = config.remoteSettings.tumblrOAuthToken != "" && config.remoteSettings.tumblrOAuthTokenSecret != "";
   if (configured) {
@@ -284,7 +284,7 @@ export const loadTumblr = (allURLs: Map<string, Array<string>>, config: Config, 
   }
 }
 
-export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 3000;
   let configured = config.remoteSettings.redditRefreshToken != "";
   if (configured) {
@@ -518,7 +518,7 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
   }
 }
 
-export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 8000;
   if (helpers.next == 0) {
     helpers.next = [0, 0];
@@ -734,7 +734,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
   }
 }
 
-export const loadSexCom = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadSexCom = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 8000;
   const url = source.url;
   // This doesn't work anymore due to src url requiring referer
@@ -863,7 +863,7 @@ export const loadSexCom = (allURLs: Map<string, Array<string>>, config: Config, 
     });*/
 }
 
-export const loadImgur = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadImgur = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 3000;
   const url = source.url;
   imgur.getAlbumInfo(getFileGroup(url))
@@ -890,7 +890,7 @@ export const loadImgur = (allURLs: Map<string, Array<string>>, config: Config, s
     });
 }
 
-export const loadTwitter = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadTwitter = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 3000;
   let configured = config.remoteSettings.twitterAccessTokenKey != "" && config.remoteSettings.twitterAccessTokenSecret != "";
   if (configured) {
@@ -978,7 +978,7 @@ export const loadTwitter = (allURLs: Map<string, Array<string>>, config: Config,
   }
 }
 
-export const loadDeviantArt = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadDeviantArt = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 3000;
   const url = source.url;
   wretch("https://backend.deviantart.com/rss.xml?type=deviation&q=by%3A" + getFileGroup(url) + "+sort%3Atime+meta%3Aall" + (helpers.next != 0 ? "&offset=" + helpers.next : ""))
@@ -1032,12 +1032,12 @@ export const loadDeviantArt = (allURLs: Map<string, Array<string>>, config: Conf
 
 let ig: IgApiClient = null;
 let session: any = null;
-export const loadInstagram = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadInstagram = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 3000;
   const configured = config.remoteSettings.instagramUsername != "" && config.remoteSettings.instagramPassword != "";
   if (configured) {
     const url = source.url;
-    const processItems = (items: any, helpers: {next: any, count: number, retries: number}) => {
+    const processItems = (items: any, helpers: {next: any, count: number, retries: number, uuid: string}) => {
       let images = Array<string>();
       for (let item of items) {
         if (item.carousel_media) {
@@ -1169,7 +1169,7 @@ export const loadInstagram = (allURLs: Map<string, Array<string>>, config: Confi
   }
 }
 
-export const loadE621 = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadE621 = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 8000;
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
@@ -1384,7 +1384,7 @@ export const loadE621 = (allURLs: Map<string, Array<string>>, config: Config, so
   }
 }
 
-export const loadDanbooru = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadDanbooru = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 8000;
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
@@ -1493,7 +1493,7 @@ export const loadDanbooru = (allURLs: Map<string, Array<string>>, config: Config
     }));
 }
 
-export const loadGelbooru1 = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadGelbooru1 = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 8000;
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
@@ -1605,7 +1605,7 @@ export const loadGelbooru1 = (allURLs: Map<string, Array<string>>, config: Confi
     });
 }
 
-export const loadGelbooru2 = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadGelbooru2 = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 8000;
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
@@ -1690,7 +1690,7 @@ export const loadGelbooru2 = (allURLs: Map<string, Array<string>>, config: Confi
     }));
 }
 
-export const loadEHentai = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadEHentai = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 8000;
   const url = source.url;
   wretch(url + "?p=" + (helpers.next + 1))
@@ -1764,7 +1764,7 @@ export const loadEHentai = (allURLs: Map<string, Array<string>>, config: Config,
     });
 }
 
-export const loadBDSMlr = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadBDSMlr = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 8000;
   let url = source.url;
   if (url.endsWith("/rss")) {
@@ -1841,7 +1841,7 @@ export const loadBDSMlr = (allURLs: Map<string, Array<string>>, config: Config, 
 }
 
 let sessionKey: string = null;
-export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 8000;
   const apiKey = config.remoteSettings.hydrusAPIKey
   const configured = apiKey != "";

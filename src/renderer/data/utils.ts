@@ -564,15 +564,15 @@ export default captionProgramDefaults;
  *   * count - current count
  */
 export class CancelablePromise extends Promise<{
-  data: Array<string>, helpers: {next: any, count: number, retries: number}}> {
+  data: Array<string>, helpers: {next: any, count: number, retries: number, uuid: string}}> {
   hasCanceled: boolean;
   source: LibrarySource;
   timeout: number;
 
 
   constructor(executor: (resolve: (value?: (
-    PromiseLike<{data: Array<string>, helpers: {next: any, count: number, retries: number}}> |
-    {data: Array<string>, helpers: {next: any, count: number, retries: number}}
+    PromiseLike<{data: Array<string>, helpers: {next: any, count: number, retries: number, uuid: string}}> |
+    {data: Array<string>, helpers: {next: any, count: number, retries: number, uuid: string}}
     )) => void, reject: (reason?: any) => void) => void) {
     super(executor);
     this.hasCanceled = false;
@@ -580,7 +580,7 @@ export class CancelablePromise extends Promise<{
     this.timeout = 0;
   }
 
-  getPromise(): Promise<{data: Array<string>, helpers: {next: any, count: number, retries: number}}> {
+  getPromise(): Promise<{data: Array<string>, helpers: {next: any, count: number, retries: number, uuid: string}}> {
     return new Promise((resolve, reject) => {
       this.then(
         val => this.hasCanceled ? null : resolve(val),
