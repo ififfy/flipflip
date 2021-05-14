@@ -19,6 +19,7 @@ import Scene from '../../data/Scene';
 import Audio from "../../data/Audio";
 import ChildCallbackHack from './ChildCallbackHack';
 import ImagePlayer from './ImagePlayer';
+import {Dialog, DialogContent} from "@material-ui/core";
 
 let workerInstance: any = null;
 let workerListener: any = null;
@@ -327,6 +328,7 @@ export default class SourceScraper extends React.Component {
     restart: false,
     preload: false,
     videoVolume: this.props.scene.videoVolume,
+    captcha: null as string,
   };
 
   _isMounted = false;
@@ -374,8 +376,21 @@ export default class SourceScraper extends React.Component {
             cache={this.props.cache}
             playNextScene={this.props.playNextScene}
             setTimeToNextFrame={this.props.setTimeToNextFrame}/>)}
+        {this.state.captcha != null && (
+          <Dialog
+            open={true}
+            onClose={this.onCloseDialog.bind(this)}>
+            <DialogContent style={{height: 600}}>
+              <iframe src={this.state.captcha} height={"100%"}/>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     );
+  }
+
+  onCloseDialog() {
+    this.setState({captcha: null});
   }
 
   componentDidMount(restart = false) {
@@ -460,7 +475,11 @@ export default class SourceScraper extends React.Component {
 
       const receiveMessage = (message: any) => {
         let object = message.data;
-        if (object?.type == "RPC") return;
+        if (object?.type == "RPC" || (object?.helper != null && object.helpers.uuid != uuid)) return;
+
+        if (object?.captcha != null && this.state.captcha == null) {
+          this.setState({captcha: object.captcha});
+        }
 
         if (object?.error != null) {
           console.error("Error retrieving " + object?.source?.url + (object?.helpers?.next > 0 ? "Page " + object.helpers.next : ""));
@@ -476,11 +495,6 @@ export default class SourceScraper extends React.Component {
         }
 
         if (object?.source) {
-          if (object.helpers.uuid != uuid) {
-            console.error("WRONG UUID RECEIVED BY " + this.props.scene.name);
-            return;
-          }
-
           n += 1;
 
           // Just add the new urls to the end of the list
@@ -539,7 +553,7 @@ export default class SourceScraper extends React.Component {
 
       const receiveMessage = (message: any) => {
         let object = message.data;
-        if (object?.type == "RPC") return;
+        if (object?.type == "RPC" || (object?.helper != null && object.helpers.uuid != uuid)) return;
 
         if (object?.error != null) {
           console.error("Error retrieving " + object?.source?.url + (object?.helpers?.next > 0 ? "Page " + object.helpers.next : ""));
@@ -600,7 +614,11 @@ export default class SourceScraper extends React.Component {
 
       const receiveMessage = (message: any) => {
         let object = message.data;
-        if (object?.type == "RPC") return;
+        if (object?.type == "RPC" || (object?.helper != null && object.helpers.uuid != uuid)) return;
+
+        if (object?.captcha != null && this.state.captcha == null) {
+          this.setState({captcha: object.captcha});
+        }
 
         if (object?.error != null) {
           console.error("Error retrieving " + object?.source?.url + (object?.helpers?.next > 0 ? "Page " + object.helpers.next : ""));
@@ -665,8 +683,9 @@ export default class SourceScraper extends React.Component {
       props.strobeLayer !== this.props.strobeLayer ||
       props.hasStarted !== this.props.hasStarted ||
       props.gridView !== this.props.gridView ||
+      state.captcha !== this.state.captcha ||
       state.restart !== this.state.restart ||
-      (state.allURLs.size > 0 && this.state.allURLs.size == 0);
+      state.allURLs != this.state.allURLs;
   }
 
   componentDidUpdate(props: any, state: any) {
