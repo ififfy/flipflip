@@ -12,7 +12,6 @@ app.on('ready', () => {
     callback({
       responseHeaders: {
         ...details.responseHeaders,
-        'Content-Security-Policy': ['default-src \'none\'']
       }
     })
   });

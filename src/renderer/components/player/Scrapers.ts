@@ -537,6 +537,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
       .text((html) => {
         let imageEls = domino.createWindow(html).document.querySelectorAll(".expp-container > form > table > tbody > tr > td");
         if (imageEls.length > 0) {
+          helpers.count = imageEls.length;
           let imageCount = 0;
           let images = Array<string>();
           for (let i = 0; i < imageEls.length; i++) {
@@ -551,7 +552,6 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
                 }
                 if (imageCount == imageEls.length) {
                   helpers.next = null;
-                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
                   pm({
                     data: filterPathsToJustPlayable(filter, images, false),
                     allURLs: allURLs,
@@ -564,11 +564,15 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
               })
           }
         } else {
+          let captcha = undefined;
           if (html.includes("Enter the captcha")) {
-            pm({warning: source.url + "blocked due to captcha"});
+            helpers.count = null;
+            captcha = "https://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2";
+            pm({warning: source.url + " - blocked due to captcha"});
           }
           helpers.next = null;
           pm({
+            captcha: captcha,
             data: [],
             allURLs: allURLs,
             weight: weight,
@@ -609,6 +613,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
               let imageEls = domino.createWindow(html).document.querySelectorAll(".expp-container > form > table > tbody > tr > td");
               if (imageEls.length > 0) {
                 let images = Array<string>();
+                helpers.count = helpers.count + imageEls.length;
                 let imageCount = 0;
                 for (let i = 0; i < imageEls.length; i++) {
                   const image = imageEls.item(i);
@@ -622,7 +627,6 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
                       }
                       if (imageCount == imageEls.length) {
                         helpers.next[1] += 1;
-                        helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
                         pm({
                           data: filterPathsToJustPlayable(filter, images, false),
                           allURLs: allURLs,
@@ -647,12 +651,17 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
               }
             });
         } else {
+
+          let captcha = undefined;
           if (html.includes("Enter the captcha")) {
-            pm({warning: source.url + "blocked due to captcha"});
+            helpers.count = null;
+            captcha = "https://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2";
+            pm({warning: source.url + " - blocked due to captcha"});
           }
           helpers.next[0] += 1;
           helpers.next[1] = 0;
           pm({
+            captcha: captcha,
             data: [],
             allURLs: allURLs,
             weight: weight,
