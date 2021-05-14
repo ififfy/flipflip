@@ -5,9 +5,9 @@ import request from 'request';
 import fs from "fs";
 import gifInfo from 'gif-info';
 
-import {GO, IF, OF, OT, SL, SOF, TF, VO, WF} from '../../data/const';
-import {getRandomListItem, getRandomNumber, toArrayBuffer, urlToPath} from '../../data/utils';
-import {isVideo} from "./Scrapers";
+import {GO, IF, OF, OT, SL, SOF, ST, TF, VO, WF} from '../../data/const';
+import {getCachePath, getRandomListItem, getRandomNumber, toArrayBuffer, urlToPath} from '../../data/utils';
+import {getFileName, getSourceType, isVideo} from "./Scrapers";
 import Config from "../../data/Config";
 import Scene from "../../data/Scene";
 import ChildCallbackHack from './ChildCallbackHack';
@@ -475,6 +475,19 @@ export default class ImagePlayer extends React.Component {
 
     if (this.props.scene.orderFunction == OF.random && (this.props.scene.forceAll || (this.props.scene.weightFunction == WF.sources && this.props.scene.fullSource))) {
       this._loadedURLs.push(url);
+    }
+
+    // Don't bother loading files we've already cached locally
+    if (this.props.config.caching.enabled && url.startsWith("http")) {
+      const fileType = getSourceType(url);
+      if (fileType != ST.hydrus && fileType != ST.video && fileType != ST.local && fileType != ST.playlist) {
+        const sourceCachePath = getCachePath(source, this.props.config);
+        const filePath = sourceCachePath + getFileName(url);
+        const cachedAlready = fs.existsSync(filePath);
+        if (cachedAlready) {
+          url = filePath;
+        }
+      }
     }
 
     if (isVideo(url, false)) {
