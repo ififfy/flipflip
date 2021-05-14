@@ -69,21 +69,12 @@ class FadeIOCard extends React.Component {
     return(
       <Grid container spacing={this.props.scene.fadeInOut ? 2 : 0} alignItems="center" className={clsx(this.props.tutorial != null && classes.disable)}>
         <Grid item xs={12}>
-          <Grid container alignItems="center">
-            <Grid item xs={11}>
-              <FormControlLabel
-                control={
-                  <Switch checked={this.props.scene.fadeInOut}
-                          onChange={this.onBoolInput.bind(this, 'fadeInOut')}/>
-                }
-                label="Fade In/Out"/>
-            </Grid>
-            <Grid item xs={1}>
-              <Typography variant="button">
-                BETA
-              </Typography>
-            </Grid>
-          </Grid>
+          <FormControlLabel
+            control={
+              <Switch checked={this.props.scene.fadeInOut}
+                      onChange={this.onBoolInput.bind(this, 'fadeInOut')}/>
+            }
+            label="Fade In/Out"/>
         </Grid>
         <Grid item xs={12}>
           <Collapse in={this.props.scene.fadeInOut} className={classes.fullWidth}>
