@@ -335,8 +335,20 @@ export default class SourceScraper extends React.Component {
   _nextAllURLs: Map<string, Array<string>> = null;
 
   render() {
+    let style: any = {opacity: this.props.opacity};
+    if (this.props.gridView) {
+      style = {
+        ...style,
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: this.props.isOverlay ? 4 : 'auto',
+      }
+    }
     return (
-      <div style={{opacity: this.props.opacity}}>
+      <div style={style}>
 
         {this.state.allURLs.size > 0 && this.state.restart == false && (
           <ImagePlayer

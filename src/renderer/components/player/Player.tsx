@@ -145,6 +145,12 @@ export default class Player extends React.Component {
         left: 0,
         right: 0
       };
+    } else if (this.props.hasStarted ? this.props.hasStarted : this.state.hasStarted) {
+      playerStyle = {
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+      }
     }
     if (!this.state.hasStarted) {
       playerStyle = {
