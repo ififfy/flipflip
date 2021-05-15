@@ -2123,24 +2123,13 @@ async function convertURL(url: string): Promise<Array<string>> {
   }
 
   // If this is imgur album, return album images
-  // TODO Fix (replace with imgur library?
   let imgurAlbumMatch = url.match("^https?://imgur\.com/a/([\\w\\d]{7})$");
   if (imgurAlbumMatch != null) {
-    let html = await wretch(url).get().notFound(() => {return [url]}).text();
-    let imageEls = domino.createWindow(html).document.querySelectorAll(".post-images > div.post-image-container");
-    if (imageEls.length > 0) {
-      let images = Array<string>();
-      for (let image of imageEls) {
-        images.push("https://i.imgur.com/" + image.id + ".jpg");
-      }
-      return images;
-    } else {
-      imgurAlbumMatch = null;
-    }
+    // TODO Fix (replace with imgur library)
+    imgurAlbumMatch = null;
   }
 
   // If this is gfycat page, return gfycat image
-  // TODO Fix
   let gfycatMatch = url.match("^https?://gfycat\.com/(?:ifr/)?(\\w*)$");
   if (gfycatMatch != null) {
     // Only lookup CamelCase url if not already CamelCase
@@ -2149,22 +2138,31 @@ async function convertURL(url: string): Promise<Array<string>> {
     }
 
     let html = await wretch(url).get().notFound(() => {return [url]}).text();
-    let gfycat = domino.createWindow(html).document.querySelectorAll(".upnext-item.active > a");
+    let gfycat = domino.createWindow(html).document.querySelectorAll("#video-" + gfycatMatch[1].toLocaleLowerCase() + " > source");
     if (gfycat.length > 0) {
-      let gfycatID = (gfycat[0] as any).href;
-      gfycatID = gfycatID.substring(gfycatID.lastIndexOf("/") + 1);
-      return ["https://giant.gfycat.com/" + gfycatID + ".mp4"];
-    } else {
-      gfycat = domino.createWindow(html).document.querySelectorAll("#webmSource");
-      if (gfycat.length > 0) {
-        return [(gfycat[0] as any).src];
+      for (let source of gfycat) {
+        if ((source as any).type == "video/webm") {
+          return [(source as any).src];
+        }
       }
+      // Fallback to MP4
+      for (let source of gfycat) {
+        if ((source as any).type == "video/mp4" && !(source as any).src.endsWith("-mobile.mp4")) {
+          return [(source as any).src];
+        }
+      }
+      // Fallback to MP4-mobile
+      for (let source of gfycat) {
+        if ((source as any).type == "video/mp4") {
+          return [(source as any).src];
+        }
+      }
+    } else {
       gfycatMatch = null;
     }
   }
 
   // If this is redgif page, return redgif image
-  // TODO Fix
   let redgifMatch = url.match("^https?://(?:www\.)?redgifs\.com/watch/(\\w*)$");
   if (redgifMatch != null) {
     let fourOFour = false
@@ -2172,32 +2170,11 @@ async function convertURL(url: string): Promise<Array<string>> {
     if (fourOFour) {
       return [url];
     } else if (html) {
-      let redgif = domino.createWindow(html).document.querySelectorAll("#video-" + redgifMatch[1] + " > source");
-      if (redgif.length > 0) {
-        for (let source of redgif) {
-          if ((source as any).type == "video/webm") {
-            return [(source as any).src];
-          }
-        }
-        // Fallback to MP4
-        for (let source of redgif) {
-          if ((source as any).type == "video/mp4" && !(source as any).src.endsWith("-mobile.mp4")) {
-            return [(source as any).src];
-          }
-        }
-        // Fallback to MP4-mobile
-        for (let source of redgif) {
-          if ((source as any).type == "video/mp4") {
-            return [(source as any).src];
-          }
-        }
+      let redgif = /<meta property="og:video" content="([^"]*)">/g.exec(html);
+      if (redgif != null) {
+        return [redgif[1]];
       } else {
-        const fallbackRegex = /"webm":\s*\{[^}]*"url":\s*"([^,}]*)",?/.exec(html);
-        if (fallbackRegex != null) {
-          return [fallbackRegex[1].replace(/\\u002F/g,"/")];
-        } else {
-          redgifMatch = null;
-        }
+        redgifMatch = null;
       }
     } else {
       redgifMatch = null;
