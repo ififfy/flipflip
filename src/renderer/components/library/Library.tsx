@@ -352,7 +352,9 @@ class Library extends React.Component {
       this.props.config.remoteSettings.twitterAccessTokenSecret != "";
     const instagramAuthorized = this.props.config.remoteSettings.instagramUsername != "" &&
       this.props.config.remoteSettings.instagramPassword != "";
-    const remoteAuthorized = tumblrAuthorized || redditAuthorized || twitterAuthorized || instagramAuthorized;
+    const piwigoAuthorized = this.props.config.remoteSettings.piwigoUsername != "" &&
+      this.props.config.remoteSettings.piwigoPassword != "";
+    const remoteAuthorized = tumblrAuthorized || redditAuthorized || twitterAuthorized || instagramAuthorized || piwigoAuthorized;
 
     let cancelProgressMessage;
     switch (this.props.progressMode) {
@@ -526,6 +528,16 @@ class Library extends React.Component {
                         <SourceIcon type={ST.instagram}/>
                       </ListItemIcon>
                       <ListItemText primary="Instagram" />
+                    </ListItem>
+                  </Tooltip>
+                )}
+                {piwigoAuthorized && (
+                  <Tooltip title={this.state.drawerOpen ? "" : "Import from Piwigo"}>
+                    <ListItem button disabled={this.props.progressMode != null} onClick={console.log}>
+                      <ListItemIcon>
+                        <SourceIcon type={ST.piwigo}/>
+                      </ListItemIcon>
+                      <ListItemText primary="Piwigo" />
                     </ListItem>
                   </Tooltip>
                 )}

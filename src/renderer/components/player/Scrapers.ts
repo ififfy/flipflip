@@ -62,6 +62,7 @@ let tumblr429Alerted = false;
 let twitterAlerted = false;
 let instagramAlerted = false;
 let hydrusAlerted = false;
+let piwigoAlerted = false;
 
 export const reset = () => {
   redditAlerted = false;
@@ -70,6 +71,7 @@ export const reset = () => {
   twitterAlerted = false;
   instagramAlerted = false;
   hydrusAlerted = false;
+  piwigoAlerted = false;
 }
 
 export const loadRemoteImageURLList = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
@@ -1833,6 +1835,122 @@ export const loadBDSMlr = (allURLs: Map<string, Array<string>>, config: Config, 
         });
       }
     });
+}
+
+let piwigoLoggedIn: boolean = false;
+export const loadPiwigo = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+  const timeout = 8000;
+  let url = source.url;
+
+  const user = config.remoteSettings.piwigoUsername;
+  const pass = config.remoteSettings.piwigoPassword;
+  const host = config.remoteSettings.piwigoHost;
+  const protocal = config.remoteSettings.piwigoProtocol;
+  const configured = host != "" && protocal != "";
+
+  const login = () => {
+    return wretch(protocal + "://" + host + "/ws.php?format=json")
+      .formUrl({ method: "pwg.session.login", username: user, password: pass })
+      .post()
+      .setTimeout(5000)
+      .notFound((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }))
+      .internalError((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }))
+      .json((json) => {
+        if (json.stat == "ok") {
+          piwigoLoggedIn = true;
+        } else {
+          //
+        }
+      })
+      .catch((e) => {
+        //
+      });
+  }
+
+  const retry = () => {
+    if (helpers.retries < 3) {
+      helpers.retries += 1;
+      pm({
+        data: [],
+        allURLs: allURLs,
+        weight: weight,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      });
+    } else {
+      pm({
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      });
+    }
+  }
+
+  const search = () => {
+    return wretch(url)
+      .post({page: helpers.next})
+      .setTimeout(5000)
+      .onAbort(retry)
+      .notFound((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }))
+      .internalError(retry)
+      .json((json) => {
+  
+        if (json.stat != "ok") {
+          helpers.next = null;
+          pm({
+            data: [],
+            allURLs: allURLs,
+            weight: weight,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          });
+        }
+  
+        const images = Array<string>();
+        if (json?.result?.images) {
+          for (let o = 0; o < json.result.images.length; o++) {
+            const image = json.result.images[o];
+            if (image.element_url) {
+              images.push(image.element_url);
+            }
+          }
+        }
+  
+        helpers.next = helpers.next + 1;
+        helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+        pm({
+          data: filterPathsToJustPlayable(filter, images, true),
+          allURLs: allURLs,
+          weight: weight,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        });
+      });
+  };
+
+  if (!piwigoLoggedIn && user != "") {
+    login().then(search);
+  } else {
+    search();
+  }
 }
 
 let sessionKey: string = null;
