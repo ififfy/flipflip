@@ -1849,10 +1849,9 @@ export const loadBDSMlr = (allURLs: Map<string, Array<string>>, config: Config, 
     });
 }
 
-let sessionKey: string = null;
 export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 8000;
-  const apiKey = config.remoteSettings.hydrusAPIKey
+  const apiKey = config.remoteSettings.hydrusAPIKey;
   const configured = apiKey != "";
   if (configured) {
     const protocol = config.remoteSettings.hydrusProtocol;
@@ -1874,44 +1873,14 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, 
       });
     }
 
-    const getSessionKey = () => {
-      wretch(hydrusURL + "/session_key")
-        .headers({"Hydrus-Client-API-Access-Key": apiKey})
-        .get()
-        .setTimeout(15000)
-        .notFound((e) => {
-          pm({
-            error: e.message,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          })
-        })
-        .internalError((e) => {
-          pm({
-            error: e.message,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          })
-        })
-        .json((json) => {
-          sessionKey = json.session_key;
-          search();
-        })
-        .catch((e) => pm({
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        }));
-    }
+    const tagsRegex = /tags=([^&]*)&?.*$/.exec(source.url);
+    let noTags = tagsRegex == null || tagsRegex.length <= 1;
 
     let pages = 0;
     const search = () => {
-      const url = source.url;
+      const url = noTags ? hydrusURL + "/get_files/search_files" : hydrusURL + "/get_files/search_files?tags=" + tagsRegex[1];
       wretch(url)
-        .headers({"Hydrus-Client-API-Session-Key": sessionKey})
+        .headers({"Hydrus-Client-API-Access-Key": apiKey})
         .get()
         .setTimeout(15000)
         .notFound((e) => {
@@ -1952,7 +1921,7 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, 
     let images = Array<string>();
     const getFileMetadata = (fileIDs: Array<number>, page: number) => {
       wretch(hydrusURL + "/get_files/file_metadata?file_ids=[" + fileIDs.toString() + "]")
-        .headers({"Hydrus-Client-API-Session-Key": sessionKey})
+        .headers({"Hydrus-Client-API-Access-Key": apiKey})
         .get()
         .setTimeout(15000)
         .notFound((e) => {
@@ -2000,11 +1969,7 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, 
         }));
     }
 
-    if (sessionKey == null) {
-      getSessionKey();
-    } else {
-      search();
-    }
+    search();
   } else {
     let systemMessage = undefined;
     if (!hydrusAlerted) {
