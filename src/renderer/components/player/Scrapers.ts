@@ -1980,7 +1980,7 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, 
               (filter == IF.stills || filter == IF.images) && isImage(metadata.ext, true) ||
               (filter == IF.animated && metadata.ext.toLowerCase().endsWith('.gif') || isVideo(metadata.ext, true)) ||
               (filter == IF.videos && isVideo(metadata.ext, true))) {
-              images.push(hydrusURL + "/get_files/file?file_id=" + metadata.file_id + "&Hydrus-Client-API-Access-Key=" + apiKey);
+              images.push(hydrusURL + "/get_files/file?file_id=" + metadata.file_id + "&Hydrus-Client-API-Access-Key=" + apiKey + "&ext=" + metadata.ext);
             }
           }
 
