@@ -1874,9 +1874,6 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, 
       });
     }
 
-    const tagsRegex = /tags=([^&]*)&?.*$/.exec(source.url);
-    let noTags = tagsRegex == null || tagsRegex.length <= 1;
-
     const getSessionKey = () => {
       wretch(hydrusURL + "/session_key")
         .headers({"Hydrus-Client-API-Access-Key": apiKey})
@@ -1912,7 +1909,7 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, 
 
     let pages = 0;
     const search = () => {
-      const url = noTags ? hydrusURL + "/get_files/search_files" : hydrusURL + "/get_files/search_files?tags=" + tagsRegex[1];
+      const url = source.url;
       wretch(url)
         .headers({"Hydrus-Client-API-Session-Key": sessionKey})
         .get()
