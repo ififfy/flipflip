@@ -595,7 +595,12 @@ export function deleteScene(state: State, scene: Scene): Object {
 
 export function deleteGrid(state: State, grid: SceneGrid): Object {
   const newGrids = state.grids.filter((g: SceneGrid) => g.id != grid.id);
+  const newScenes = state.scenes;
+  for (let s of newScenes) {
+    s.overlays = s.overlays.filter((o) => o.sceneID != parseInt("999" + grid.id.toString()));
+  }
   return {
+    scenes: newScenes,
     grids: newGrids,
     route: Array<Route>(),
     specialMode: null,
