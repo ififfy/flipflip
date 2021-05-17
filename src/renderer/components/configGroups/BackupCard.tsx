@@ -5,7 +5,7 @@ import clsx from "clsx";
 import {
   Button, Chip, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl,
   FormControlLabel, Grid, InputAdornment, InputLabel, MenuItem, Select, Slide, Snackbar, SnackbarContent, Switch,
-  TextField, Theme, withStyles
+  TextField, Theme, Tooltip, withStyles
 } from "@material-ui/core";
 
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
@@ -102,6 +102,73 @@ class BackupCard extends React.Component {
               }}/>
           </Grid>
         </Grid>
+        <Grid container spacing={2} alignItems="center" justify="center" className={classes.chipGrid}>
+          <Tooltip title="If enabled, backups will be automatically cleaned up. This algorithm will keep 1 backup for
+           each of the configured periods.">
+            <Grid item xs={"auto"} className={classes.buttonGrid}>
+              <FormControlLabel
+                control={
+                  <Switch checked={this.props.settings.autoCleanBackup}
+                          onChange={this.onBoolInput.bind(this, 'autoCleanBackup')}/>
+                }
+                label="Auto Clean"/>
+            </Grid>
+          </Tooltip>
+          <Grid item xs={"auto"} className={classes.buttonGrid}>
+            <TextField
+              className={classes.backupDays}
+              disabled={!this.props.settings.autoCleanBackup}
+              variant="outlined"
+              label="Keep Last"
+              margin="dense"
+              value={this.props.settings.autoCleanBackupDays}
+              onChange={this.onIntInput.bind(this, 'autoCleanBackupDays')}
+              onBlur={this.blurIntKey.bind(this, 'autoCleanBackupDays')}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">Days</InputAdornment>,
+              }}
+              inputProps={{
+                min: 1,
+                type: 'number',
+              }}/>
+          </Grid>
+          <Grid item xs={"auto"} className={classes.buttonGrid}>
+            <TextField
+              className={classes.backupDays}
+              disabled={!this.props.settings.autoCleanBackup}
+              variant="outlined"
+              label="Keep Last"
+              margin="dense"
+              value={this.props.settings.autoCleanBackupWeeks}
+              onChange={this.onIntInput.bind(this, 'autoCleanBackupWeeks')}
+              onBlur={this.blurIntKey.bind(this, 'autoCleanBackupWeeks')}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">Weeks</InputAdornment>,
+              }}
+              inputProps={{
+                min: 1,
+                type: 'number',
+              }}/>
+          </Grid>
+          <Grid item xs={"auto"} className={classes.buttonGrid}>
+            <TextField
+              className={classes.backupDays}
+              disabled={!this.props.settings.autoCleanBackup}
+              variant="outlined"
+              label="Keep Last"
+              margin="dense"
+              value={this.props.settings.autoCleanBackupMonths}
+              onChange={this.onIntInput.bind(this, 'autoCleanBackupMonths')}
+              onBlur={this.blurIntKey.bind(this, 'autoCleanBackupMonths')}
+              InputProps={{
+                endAdornment: <InputAdornment position="end">Months</InputAdornment>,
+              }}
+              inputProps={{
+                min: 1,
+                type: 'number',
+              }}/>
+          </Grid>
+        </Grid>
         <Grid container spacing={2} alignItems="center" justify="center">
           <Grid item xs={"auto"} className={classes.buttonGrid}>
             <Button
@@ -166,9 +233,33 @@ class BackupCard extends React.Component {
           aria-describedby="remove-all-description">
           <DialogTitle id="remove-all-title">Clean backups</DialogTitle>
           <DialogContent>
-            <DialogContentText id="remove-all-description">
-              You are about to clean your backups. This will leave only the latest backup.
-            </DialogContentText>
+            {this.props.settings.autoCleanBackup && (
+              <DialogContentText id="remove-all-description">
+                You are about to clean your backups. Backups will be retained according to your Auto Clean
+                configuration. A record will be kept for each of the
+                last: {this.props.settings.autoCleanBackupDays} Days, {this.props.settings.autoCleanBackupWeeks} Weeks, {this.props.settings.autoCleanBackupMonths} Months.
+              </DialogContentText>
+            )}
+            {!this.props.settings.autoCleanBackup && (
+              <React.Fragment>
+                <DialogContentText id="remove-all-description">
+                  You are about to clean your backups. How many of the most recent backups would you like to retain?
+                </DialogContentText>
+                {this.props.settings.cleanRetain != null && (
+                  <TextField
+                    variant="outlined"
+                    label="Keep Last"
+                    margin="dense"
+                    value={this.props.settings.cleanRetain}
+                    onChange={this.onIntInput.bind(this, 'cleanRetain')}
+                    onBlur={this.blurIntKey.bind(this, 'cleanRetain')}
+                    inputProps={{
+                      min: 1,
+                      type: 'number',
+                    }}/>
+                )}
+              </React.Fragment>
+            )}
           </DialogContent>
           <DialogActions>
             <Button onClick={this.onCloseDialog.bind(this)} color="secondary">

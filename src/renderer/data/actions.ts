@@ -12,6 +12,7 @@ import {IgApiClient} from "instagram-private-api";
 import {analyze} from "web-audio-beat-detector";
 import * as mm from "music-metadata";
 import request from "request";
+import moment from "moment";
 
 import {
   getBackups,
@@ -330,9 +331,53 @@ export function toggleDarkMode(state: State): Object {
   return {theme: newTheme};
 }
 
-export function cleanBackups() {
-  const backups = getBackups();
-  backups.shift(); // Keep the newest backup
+export function cleanBackups(config: Config) {
+  let backups = getBackups();
+  if (backups.length <= 1) return;
+  if (config.generalSettings.autoCleanBackup) {
+    let keepDays = [backups[0]], keepWeeks = [backups[0]], keepMonths = [backups[0]];
+
+    const convertFromEpoch = (backupFile: string) => {
+      const epochString = backupFile.substring(backupFile.lastIndexOf(".") + 1);
+      return new Date(Number.parseInt(epochString));
+    }
+
+    for (let backup of backups) {
+      let backupDate = convertFromEpoch(backup.url);
+      let lastDay = convertFromEpoch(keepDays[keepDays.length - 1].url);
+      let lastWeek = convertFromEpoch(keepWeeks[keepWeeks.length - 1].url);
+      let lastMonth = convertFromEpoch(keepMonths[keepMonths.length - 1].url);
+
+      if (moment(backupDate).isSame(lastDay, 'day')) {
+        if (backupDate < lastDay) {
+          keepDays[keepDays.length - 1]  = backup;
+        }
+      } else if (keepDays.length < config.generalSettings.autoCleanBackupDays) {
+        keepDays.push(backup);
+      }
+
+      if (moment(backupDate).isSame(lastWeek, 'week')) {
+        if (backupDate < lastWeek) {
+          keepWeeks[keepWeeks.length - 1]  = backup;
+        }
+      } else if (keepWeeks.length < config.generalSettings.autoCleanBackupWeeks) {
+        keepWeeks.push(backup);
+      }
+
+      if (moment(backupDate).isSame(lastMonth, 'month')) {
+        if (backupDate < lastWeek) {
+          keepMonths[keepMonths.length - 1]  = backup;
+        }
+      } else if (keepMonths.length < config.generalSettings.autoCleanBackupMonths) {
+        keepMonths.push(backup);
+      }
+    }
+    backups = backups.filter((b) => !keepDays.includes(b) && !keepWeeks.includes(b) && !keepMonths.includes(b));
+  } else {
+    for (let k = 0; k < config.generalSettings.cleanRetain; k++) {
+      backups.shift(); // Keep the K newest backups
+    }
+  }
   for (let backup of backups) {
     fs.unlinkSync(saveDir + path.sep + backup.url);
   }

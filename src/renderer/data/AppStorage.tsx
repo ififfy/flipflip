@@ -1,6 +1,7 @@
 import { mkdirSync, existsSync, readFileSync, renameSync, writeFileSync } from 'fs';
 
 import {getBackups, portablePath, removeDuplicatesBy, saveDir, savePath} from "./utils";
+import {cleanBackups} from "./actions";
 import { Route } from './Route';
 import {TT} from "./const";
 import Audio from "./Audio";
@@ -427,6 +428,15 @@ export default class AppStorage {
         if (Date.now()  - epoch > (86400000 * state.config.generalSettings.autoBackupDays)) {
           this.backup(state);
         }
+      }
+    }
+
+    if (state.config.generalSettings.autoCleanBackup) {
+      const backups = getBackups();
+      const lastBackup = backups[0];
+      const epoch = parseInt(lastBackup.url.substring(lastBackup.url.lastIndexOf(".") + 1));
+      if (Date.now()  - epoch > (86400000 * state.config.generalSettings.autoBackupDays)) {
+        cleanBackups(state.config);
       }
     }
 
