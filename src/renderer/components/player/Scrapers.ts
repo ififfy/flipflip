@@ -2087,8 +2087,10 @@ async function convertURL(url: string): Promise<Array<string>> {
   // If this is imgur album, return album images
   let imgurAlbumMatch = url.match("^https?://imgur\.com/a/([\\w\\d]{7})$");
   if (imgurAlbumMatch != null) {
-    // TODO Fix (replace with imgur library)
-    imgurAlbumMatch = null;
+    let json = await imgur.getAlbumInfo(getFileGroup(url));
+    if (json) {
+      return json.data.images.map((i: any) => i.link);
+    }
   }
 
   // If this is gfycat page, return gfycat image
@@ -2119,8 +2121,6 @@ async function convertURL(url: string): Promise<Array<string>> {
           return [(source as any).src];
         }
       }
-    } else {
-      gfycatMatch = null;
     }
   }
 
@@ -2135,11 +2135,7 @@ async function convertURL(url: string): Promise<Array<string>> {
       let redgif = /<meta property="og:video" content="([^"]*)">/g.exec(html);
       if (redgif != null) {
         return [redgif[1]];
-      } else {
-        redgifMatch = null;
       }
-    } else {
-      redgifMatch = null;
     }
   }
 
@@ -2147,9 +2143,7 @@ async function convertURL(url: string): Promise<Array<string>> {
     pm({warning: "Possible missed file: " + url});
   }
 
-  if (!imgurMatch && !imgurAlbumMatch && !gfycatMatch && !redgifMatch) {
-    return [url];
-  }
+  return [url];
 }
 
 export function getSourceType(url: string): string {
