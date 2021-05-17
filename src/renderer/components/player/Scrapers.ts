@@ -566,7 +566,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
         } else {
           let captcha = undefined;
           if (html.includes("Enter the captcha")) {
-            helpers.count = null;
+            helpers.count = source.count;
             captcha = "https://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2";
             pm({warning: source.url + " - blocked due to captcha"});
           }
@@ -654,7 +654,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
 
           let captcha = undefined;
           if (html.includes("Enter the captcha")) {
-            helpers.count = null;
+            helpers.count = source.count;
             captcha = "https://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2";
             pm({warning: source.url + " - blocked due to captcha"});
           }

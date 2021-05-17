@@ -381,7 +381,7 @@ export default class SourceScraper extends React.Component {
             open={true}
             onClose={this.onCloseDialog.bind(this)}>
             <DialogContent style={{height: 600}}>
-              <iframe src={this.state.captcha} height={"100%"}/>
+              <iframe sandbox="allow-forms" src={this.state.captcha} height={"100%"}/>
             </DialogContent>
           </Dialog>
         )}
