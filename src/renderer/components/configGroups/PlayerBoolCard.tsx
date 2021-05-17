@@ -85,7 +85,19 @@ export default class PlayerBoolCard extends React.Component {
               }
               label="Show Audio Info"/>
           </Tooltip>
-          <Divider />
+        </Grid>
+        <Grid item xs={12}>
+          <Divider/>
+        </Grid>
+        <Grid item xs={12}>
+          <Tooltip title="If disabled, no prompt will appear to confirm Scene deletion">
+            <FormControlLabel
+              control={
+                <Switch checked={this.props.generalSettings.confirmSceneDeletion}
+                        onChange={this.onGBoolInput.bind(this, 'confirmSceneDeletion')}/>
+              }
+              label="Confirm Scene Deletion"/>
+          </Tooltip>
         </Grid>
         <Grid item xs={12}>
           <Tooltip title="Portable Mode will save a copy of your data in the same directory as the FlipFlip executable, as well as the default save path. This needs to be enabled on each machine.">

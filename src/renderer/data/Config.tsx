@@ -243,6 +243,7 @@ interface GeneralSettingsI {
 
   portableMode: boolean;
   disableLocalSave: boolean;
+  confirmSceneDeletion: boolean;
   autoBackup: boolean;
   autoBackupDays: number;
   watermark: boolean;
@@ -527,6 +528,7 @@ export class GeneralSettings  implements GeneralSettingsI {
 
   portableMode = false;
   disableLocalSave = false;
+  confirmSceneDeletion = true;
   autoBackup = false;
   autoBackupDays = 1;
   watermark = false;
