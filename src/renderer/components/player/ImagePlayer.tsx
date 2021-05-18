@@ -326,7 +326,7 @@ export default class ImagePlayer extends React.Component {
       return;
     }
 
-    let source;
+    let source: string;
     let collection: string[];
     let url: string;
     let urlIndex: number;
@@ -644,7 +644,7 @@ export default class ImagePlayer extends React.Component {
       video.preload = "auto";
 
       clearTimeout(this._imgLoadTimeouts[i]);
-      this._imgLoadTimeouts[i] = setTimeout(() => errorCallback, 15000);
+      this._imgLoadTimeouts[i] = setTimeout(errorCallback, 15000);
 
       video.load();
     } else {
@@ -754,7 +754,7 @@ export default class ImagePlayer extends React.Component {
 
         img.src = url;
         clearTimeout(this._imgLoadTimeouts[i]);
-        this._imgLoadTimeouts[i] = setTimeout(() => errorCallback, 5000);
+        this._imgLoadTimeouts[i] = setTimeout(errorCallback, 5000);
       };
 
       // Get gifinfo if we need for imageFilter or playing full gif
@@ -779,7 +779,7 @@ export default class ImagePlayer extends React.Component {
       } else {
         img.src = url;
         clearTimeout(this._imgLoadTimeouts[i]);
-        this._imgLoadTimeouts[i] = setTimeout(() => errorCallback, 5000);
+        this._imgLoadTimeouts[i] = setTimeout(errorCallback, 5000);
       }
     }
   }

@@ -7,10 +7,7 @@ import fileURL from "file-url";
 import wretch from "wretch";
 import uuidv4 from "uuid/v4";
 
-import {
-  getCachePath,
-  randomizeList,
-} from "../../data/utils";
+import {getCachePath, randomizeList} from "../../data/utils";
 import {filterPathsToJustPlayable, getFileName, getSourceType, isVideo, processAllURLs} from "./Scrapers";
 import {IF, SOF, ST} from '../../data/const';
 import Config from "../../data/Config";
@@ -394,7 +391,6 @@ export default class SourceScraper extends React.Component {
     if (!this.state.load) {
       this.setState({load: true});
     } else {
-      this._promiseQueue.push({source: this.state.captcha.source, helpers: this.state.captcha.helpers});
       this.onCloseDialog();
     }
   }
