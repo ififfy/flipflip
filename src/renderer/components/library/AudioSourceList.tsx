@@ -1,24 +1,16 @@
 import * as React from "react";
-import {remote} from "electron";
 import {unlinkSync} from "fs";
+import trash from "trash";
 import {sortableContainer, sortableElement} from 'react-sortable-hoc';
 import AutoSizer from "react-virtualized-auto-sizer";
 import {FixedSizeList} from "react-window";
 
 import {
-  Button,
-  createStyles,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  List,
-  Theme,
-  Typography,
-  withStyles
+  Button, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, List, Theme, Typography, withStyles
 } from "@material-ui/core";
 
-import {arrayMove, urlToPath} from "../../data/utils";
+import {arrayMove, getCachePath} from "../../data/utils";
+import Config from "../../data/Config";
 import Audio from "../../data/Audio";
 import Playlist from "../../data/Playlist";
 import AudioSourceListItem from "./AudioSourceListItem";
@@ -53,7 +45,7 @@ const styles = (theme: Theme) => createStyles({
 class AudioSourceList extends React.Component {
   readonly props: {
     classes: any,
-    cachePath: string,
+    config: Config,
     isSelect: boolean,
     selected: Array<string>,
     showHelp: boolean,
@@ -171,7 +163,7 @@ class AudioSourceList extends React.Component {
         {this.state.sourceEdit != null && (
           <AudioEdit
             audio={this.state.sourceEdit}
-            cachePath={this.props.cachePath}
+            cachePath={getCachePath(null, this.props.config)}
             title={"Edit song info"}
             allowSuggestion
             onCancel={this.onCloseSourceEditDialog.bind(this)}
@@ -231,7 +223,11 @@ class AudioSourceList extends React.Component {
   }
 
   onFinishDelete() {
-    unlinkSync(this.state.deleteDialog.url);
+    if (this.props.config.generalSettings.enableTrash) {
+      trash(this.state.deleteDialog.url).then(() => {}).catch((e) => console.error(e));
+    } else {
+      unlinkSync(this.state.deleteDialog.url);
+    }
     this.onRemove(this.state.deleteDialog);
     this.onCloseDeleteDialog();
   }

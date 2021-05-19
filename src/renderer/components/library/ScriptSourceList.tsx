@@ -1,5 +1,6 @@
 import * as React from "react";
 import {unlinkSync} from "fs";
+import trash from "trash";
 import {sortableContainer, sortableElement} from 'react-sortable-hoc';
 import AutoSizer from "react-virtualized-auto-sizer";
 import {FixedSizeList} from "react-window";
@@ -10,6 +11,7 @@ import {
 
 
 import {arrayMove} from "../../data/utils";
+import Config from "../../data/Config";
 import CaptionScript from "../../data/CaptionScript";
 import ScriptSourceListItem from "./ScriptSourceListItem";
 import SceneSelect from "../configGroups/SceneSelect";
@@ -48,6 +50,7 @@ const styles = (theme: Theme) => createStyles({
 class ScriptSourceList extends React.Component {
   readonly props: {
     classes: any,
+    config: Config,
     library: Array<CaptionScript>,
     scenes: Array<Scene>,
     showHelp: boolean,
@@ -256,7 +259,11 @@ class ScriptSourceList extends React.Component {
   }
 
   onFinishDelete() {
-    unlinkSync(this.state.deleteDialog.url);
+    if (this.props.config.generalSettings.enableTrash) {
+      trash(this.state.deleteDialog.url).then(() => {}).catch((e) => console.error(e));
+    } else {
+      unlinkSync(this.state.deleteDialog.url);
+    }
     this.onRemove(this.state.deleteDialog);
     this.onCloseDeleteDialog();
   }

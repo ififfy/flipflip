@@ -5,6 +5,7 @@ import clsx from "clsx";
 import fileURL from "file-url";
 import fs from "fs";
 import wretch from "wretch";
+import trash from "trash";
 
 import {
   AppBar, Button, Card, CardActionArea, CardContent, createStyles, Dialog, DialogActions, DialogContent,
@@ -778,15 +779,27 @@ class PlayerBars extends React.Component {
   }
 
   onFinishDeletePath() {
-    fs.unlink(this.state.deletePath, (err) => {
-      if (err) {
-        this.setState({deletePath: null, deleteError: "An error ocurred while deleting the file: " + err.message});
-        console.error(err);
-      } else {
-        this.props.imagePlayerDeleteHack.fire();
-        this.onCloseDialog();
-      }
-    });
+    if (this.props.config.generalSettings.enableTrash) {
+      trash(this.state.deletePath)
+        .then(() => {
+          this.props.imagePlayerDeleteHack.fire();
+          this.onCloseDialog();
+        })
+        .catch((err) => {
+          this.setState({deletePath: null, deleteError: "An error occurred while deleting the file: " + err.message});
+          console.error(err);
+        });
+    } else {
+      fs.unlink(this.state.deletePath, (err) => {
+        if (err) {
+          this.setState({deletePath: null, deleteError: "An error occurred while deleting the file: " + err.message});
+          console.error(err);
+        } else {
+          this.props.imagePlayerDeleteHack.fire();
+          this.onCloseDialog();
+        }
+      });
+    }
   }
 
   toggleFull() {

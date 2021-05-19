@@ -239,7 +239,7 @@ export default class Meta extends React.Component {
 
             {this.isRoute('audios') && (
               <AudioLibrary
-                cachePath={getCachePath(null, this.state.config)}
+                config={this.state.config}
                 filters={this.state.audioFilters}
                 library={this.state.audios}
                 progressCurrent={this.state.progressCurrent}
@@ -275,6 +275,7 @@ export default class Meta extends React.Component {
 
             {this.isRoute('scripts') && (
               <ScriptLibrary
+                config={this.state.config}
                 allScenes={this.state.scenes}
                 filters={this.state.scriptFilters}
                 library={this.state.scripts}

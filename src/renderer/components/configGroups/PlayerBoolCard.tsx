@@ -100,6 +100,16 @@ export default class PlayerBoolCard extends React.Component {
           </Tooltip>
         </Grid>
         <Grid item xs={12}>
+          <Tooltip title="If enabled, deleting files will send them to the system trash instead of immediately deleting them">
+            <FormControlLabel
+              control={
+                <Switch checked={this.props.generalSettings.enableTrash}
+                        onChange={this.onGBoolInput.bind(this, 'enableTrash')}/>
+              }
+              label="Trash instead of Delete"/>
+          </Tooltip>
+        </Grid>
+        <Grid item xs={12}>
           <Tooltip title="Portable Mode will save a copy of your data in the same directory as the FlipFlip executable, as well as the default save path. This needs to be enabled on each machine.">
             <FormControlLabel
               control={
