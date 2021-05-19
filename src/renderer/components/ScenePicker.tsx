@@ -38,6 +38,7 @@ import Scene from "../data/Scene";
 import Jiggle from "../animations/Jiggle";
 import VSpin from "../animations/VSpin";
 import SceneGrid from "../data/SceneGrid";
+import SceneSearch from "../SceneSearch";
 
 const drawerWidth = 240;
 
@@ -368,6 +369,9 @@ class ScenePicker extends React.Component {
     isFirstWindow: false,
     menuAnchorEl: null as any,
     openMenu: null as string,
+    displayScenes: Array<Scene>(),
+    displayGrids: Array<SceneGrid>(),
+    filters: Array<string>(),
   };
 
   render() {
@@ -398,6 +402,11 @@ class ScenePicker extends React.Component {
               v{this.props.version}
             </Typography>
             <div className={classes.fill}/>
+            <SceneSearch
+              displaySources={this.state.displayScenes}
+              filters={this.state.filters}
+              placeholder={"Search ..."}
+              onUpdateFilters={this.onUpdateFilters.bind(this)}/>
             {this.state.newVersion != "" && (
               <Tooltip title={`Download ${this.state.newVersion}`}>
                 <IconButton color="inherit" className={classes.updateIcon} onClick={this.openGitRelease.bind(this)}>
@@ -613,7 +622,7 @@ class ScenePicker extends React.Component {
                     this.props.onUpdateScenes(newScenes);
                   }}>
                   {this.props.scenes.map((scene) => {
-                    if (scene.generatorWeights) return <div key={scene.id}/>;
+                    if (scene.generatorWeights || !this.state.displayScenes.includes(scene)) return <div key={scene.id}/>;
                     else {
                       return (
                         <Jiggle key={scene.id} bounce className={classes.scene}>
@@ -653,7 +662,7 @@ class ScenePicker extends React.Component {
                     this.props.onUpdateScenes(newScenes);
                   }}>
                   {this.props.scenes.map((scene) => {
-                    if (!scene.generatorWeights) return <div key={scene.id}/>;
+                    if (!scene.generatorWeights || !this.state.displayScenes.includes(scene)) return <div key={scene.id}/>;
                     else {
                       return (
                         <Jiggle key={scene.id} bounce className={classes.scene}>
@@ -692,7 +701,7 @@ class ScenePicker extends React.Component {
                     arrayMove(newGrids, evt.oldIndex, evt.newIndex);
                     this.props.onUpdateGrids(newGrids);
                   }}>
-                  {this.props.grids.map((grid) =>
+                  {this.state.displayGrids.map((grid) =>
                     <Jiggle key={grid.id} bounce className={classes.scene}>
                       <Card>
                         <CardActionArea onClick={this.props.onOpenGrid.bind(this, grid)}>
@@ -851,6 +860,7 @@ class ScenePicker extends React.Component {
 
   componentDidMount() {
     this.props.startTutorial();
+    this.setState({displayScenes: this.getDisplayScenes(), displayGrids: this.getDisplayGrids()});
     if (remote.getCurrentWindow().id == 1) {
       this.setState({isFirstWindow: true});
       wretch("https://api.github.com/repos/ififfy/flipflip/releases")
@@ -901,6 +911,16 @@ class ScenePicker extends React.Component {
         })
         .catch((e) => console.error(e));
     }
+  }
+
+  componentDidUpdate(props: any, state: any) {
+    if (state.filters != this.state.filters || props.scenes != this.props.scenes) {
+      this.setState({displayScenes: this.getDisplayScenes(), displayGrids: this.getDisplayGrids()});
+    }
+  }
+
+  onUpdateFilters(filters: Array<string>) {
+    this.setState({filters: filters, displayScenes: this.getDisplayScenes(), displayGrids: this.getDisplayGrids()});
   }
 
   onImportScene() {
@@ -996,6 +1016,88 @@ class ScenePicker extends React.Component {
 
   openLink(url: string) {
     remote.shell.openExternal(url);
+  }
+
+  getDisplayScenes() {
+    let displayScenes = [];
+    const filtering = this.state.filters.length > 0;
+    if (filtering) {
+      for (let scene of this.props.scenes) {
+        let matchesFilter = true;
+        for (let filter of this.state.filters) {
+          if (((filter.startsWith('"') || filter.startsWith('-"')) && filter.endsWith('"')) ||
+            ((filter.startsWith('\'') || filter.startsWith('-\'')) && filter.endsWith('\''))) {
+            if (filter.startsWith("-")) {
+              filter = filter.substring(2, filter.length - 1);
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              matchesFilter = !regex.test(scene.name);
+            } else {
+              filter = filter.substring(1, filter.length - 1);
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              matchesFilter = regex.test(scene.name);
+            }
+          } else { // This is a search filter
+            filter = filter.replace("\\", "\\\\");
+            if (filter.startsWith("-")) {
+              filter = filter.substring(1, filter.length);
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              matchesFilter = !regex.test(scene.name);
+            } else {
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              matchesFilter = regex.test(scene.name);
+            }
+          }
+          if (!matchesFilter) break;
+        }
+        if (matchesFilter) {
+          displayScenes.push(scene);
+        }
+      }
+    } else {
+      displayScenes = this.props.scenes;
+    }
+    return displayScenes;
+  }
+
+  getDisplayGrids() {
+    let displayGrids = [];
+    const filtering = this.state.filters.length > 0;
+    if (filtering) {
+      for (let grid of this.props.grids) {
+        let matchesFilter = true;
+        for (let filter of this.state.filters) {
+          if (((filter.startsWith('"') || filter.startsWith('-"')) && filter.endsWith('"')) ||
+            ((filter.startsWith('\'') || filter.startsWith('-\'')) && filter.endsWith('\''))) {
+            if (filter.startsWith("-")) {
+              filter = filter.substring(2, filter.length - 1);
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              matchesFilter = !regex.test(grid.name);
+            } else {
+              filter = filter.substring(1, filter.length - 1);
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              matchesFilter = regex.test(grid.name);
+            }
+          } else { // This is a search filter
+            filter = filter.replace("\\", "\\\\");
+            if (filter.startsWith("-")) {
+              filter = filter.substring(1, filter.length);
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              matchesFilter = !regex.test(grid.name);
+            } else {
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              matchesFilter = regex.test(grid.name);
+            }
+          }
+          if (!matchesFilter) break;
+        }
+        if (matchesFilter) {
+          displayGrids.push(grid);
+        }
+      }
+    } else {
+      displayGrids = this.props.grids;
+    }
+    return displayGrids;
   }
 }
 
