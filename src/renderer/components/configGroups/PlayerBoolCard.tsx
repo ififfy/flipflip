@@ -106,7 +106,7 @@ export default class PlayerBoolCard extends React.Component {
                 <Switch checked={this.props.generalSettings.enableTrash}
                         onChange={this.onGBoolInput.bind(this, 'enableTrash')}/>
               }
-              label="Trash instead of Delete"/>
+              label="Trash Instead of Delete"/>
           </Tooltip>
         </Grid>
         <Grid item xs={12}>

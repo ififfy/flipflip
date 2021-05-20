@@ -314,7 +314,7 @@ function cachePath(source: string, typeDir: string, config: Config) {
   } else {
     if (source) {
       if (source != ST.video && source != ST.playlist) {
-        return saveDir + path.sep + "ImageCache" + path.sep + typeDir + path.sep + getFileGroup(source);
+        return saveDir + path.sep + "ImageCache" + path.sep + typeDir + path.sep + getFileGroup(source) + path.sep;
       } else {
         return saveDir + path.sep + "ImageCache" + path.sep + typeDir + path.sep;
       }

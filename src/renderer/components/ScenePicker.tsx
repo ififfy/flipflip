@@ -422,11 +422,6 @@ class ScenePicker extends React.Component {
               v{this.props.version}
             </Typography>
             <div className={classes.fill}/>
-            <SceneSearch
-              displaySources={this.state.displayScenes}
-              filters={this.state.filters}
-              placeholder={"Search ..."}
-              onUpdateFilters={this.onUpdateFilters.bind(this)}/>
             {this.state.newVersion != "" && (
               <Tooltip title={`Download ${this.state.newVersion}`}>
                 <IconButton color="inherit" className={classes.updateIcon} onClick={this.openGitRelease.bind(this)}>
@@ -436,6 +431,11 @@ class ScenePicker extends React.Component {
                 </IconButton>
               </Tooltip>
             )}
+            <SceneSearch
+              displaySources={this.state.displayScenes}
+              filters={this.state.filters}
+              placeholder={"Search ..."}
+              onUpdateFilters={this.onUpdateFilters.bind(this)}/>
           </Toolbar>
         </AppBar>
 

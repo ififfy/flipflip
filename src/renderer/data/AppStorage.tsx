@@ -1,4 +1,4 @@
-import { mkdirSync, existsSync, readFileSync, renameSync, writeFile } from 'fs';
+import { copyFileSync, mkdirSync, existsSync, readFileSync, renameSync, writeFile } from 'fs';
 
 import {getBackups, portablePath, removeDuplicatesBy, saveDir, savePath} from "./utils";
 import {cleanBackups} from "./actions";
@@ -63,7 +63,7 @@ export const defaultInitialState = {
  */
 function archiveFile(filePath: string): void {
   if (existsSync(filePath)) {
-    renameSync(filePath, (filePath + '.' + Date.now()));
+    copyFileSync(filePath, (filePath + '.' + Date.now()));
   }
 }
 
