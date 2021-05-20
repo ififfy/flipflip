@@ -570,6 +570,46 @@ export function addScene(state: State): Object {
   };
 }
 
+export function deleteScenes(state: State, sceneIDs: Array<number>): Object {
+  const deleteScenes = Array<number>();
+  const deleteGrids = Array<number>();
+  for (let sceneID of sceneIDs) {
+    if (sceneID.toString().startsWith("999")) {
+      const gridID = parseInt(sceneID.toString().replace("999", ""));
+      deleteGrids.push(gridID);
+    } else {
+      deleteScenes.push(sceneID);
+    }
+  }
+
+  const newScenes = state.scenes.filter((s: Scene) => !deleteScenes.includes(s.id));
+  for (let s of newScenes) {
+    if (deleteScenes.includes(s.nextSceneID)) {
+      s.nextSceneID = 0;
+    }
+    s.nextSceneRandoms = s.nextSceneRandoms.filter((s) => !deleteScenes.includes(s));
+    s.overlays = s.overlays.filter((o) => !deleteScenes.includes(o.sceneID) && (!o.sceneID.toString().startsWith("999") || !deleteGrids.includes(parseInt(o.sceneID.toString().replace("999", "")))));
+  }
+  const newGrids = state.grids.filter((g: SceneGrid) => !deleteGrids.includes(g.id));
+  for (let g of newGrids) {
+    for (let row of g.grid) {
+      row = row.map((sceneID) => {
+        if (deleteScenes.includes(sceneID)) {
+          return -1;
+        } else {
+          return sceneID;
+        }
+      });
+    }
+  }
+  return {
+    scenes: newScenes,
+    grids: newGrids,
+    route: Array<Route>(),
+    specialMode: null,
+  };
+}
+
 export function deleteScene(state: State, scene: Scene): Object {
   const newScenes = state.scenes.filter((s: Scene) => s.id != scene.id);
   for (let s of newScenes) {
