@@ -852,7 +852,7 @@ export default class Player extends React.Component {
   }
 
   play() {
-    this.setState({isPlaying: true, historyOffset: 0});
+    this.setState({isPlaying: true});
     this.start(this.state.canStart);
   }
 
