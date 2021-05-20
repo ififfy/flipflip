@@ -28,7 +28,6 @@ These settings control various player options.
   * _This only ever applies to the first playlist_
 ---
 * `Confirm Scene Delete` - Disabling this will hide the confirmation dialog when deleting a Scene.
-* `Trash Instead of Delete` - If enabled, deleted files will be moved to the trash instead of immediately deleted.
 * `Portable Mode` - Portable Mode will save a copy of your data in the same directory as the FlipFlip executable, 
 as well as the default save path. This needs to be enabled on each machine.
   * `Disable Local Saves` - When this is on, FlipFlip will _only_ save its data to the folder with the FlipFlip 

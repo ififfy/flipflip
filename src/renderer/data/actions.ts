@@ -13,7 +13,6 @@ import {analyze} from "web-audio-beat-detector";
 import * as mm from "music-metadata";
 import request from "request";
 import moment from "moment";
-import trash from "trash";
 
 import {
   getBackups,
@@ -380,12 +379,7 @@ export function cleanBackups(config: Config) {
     }
   }
   for (let backup of backups) {
-    const bPath = saveDir + path.sep + backup.url;
-    if (config.generalSettings.enableTrash) {
-      trash(bPath).then(() => {}).catch((e) => console.error(e));
-    } else {
-      fs.unlinkSync(bPath);
-    }
+    fs.unlinkSync(saveDir + path.sep + backup.url);
   }
 }
 
@@ -1883,15 +1877,11 @@ export function blacklistFile(state: State, sourceURL: string, fileToBlacklist: 
   if (fileToBlacklist != null) {
     const cachePath = getCachePath(sourceURL, state.config) + getFileName(fileToBlacklist);
     if (fs.existsSync(cachePath)) {
-      if (state.config.generalSettings.enableTrash) {
-        trash(cachePath).then(() => {}).catch((e) => console.error(e));
-      } else {
-        fs.unlink(cachePath, (err) => {
-          if (err) {
-            console.error(err);
-          }
-        });
-      }
+      fs.unlink(cachePath, (err) => {
+        if (err) {
+          console.error(err);
+        }
+      });
     }
   }
   return {library: newLibrary, scenes: newScenes};

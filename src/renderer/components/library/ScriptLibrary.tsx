@@ -28,7 +28,6 @@ import SortIcon from '@material-ui/icons/Sort';
 import {AF, MO, SF, SP, SLT} from "../../data/const";
 import {getFilesRecursively, isText} from "../../data/utils";
 import en from "../../data/en";
-import Config from "../../data/Config";
 import Tag from "../../data/Tag";
 import LibrarySearch from "./LibrarySearch";
 import CaptionScript from "../../data/CaptionScript";
@@ -280,7 +279,6 @@ const styles = (theme: Theme) => createStyles({
 class ScriptLibrary extends React.Component {
   readonly props: {
     classes: any,
-    config: Config,
     allScenes: Array<Scene>,
     filters: Array<string>,
     library: Array<CaptionScript>,
@@ -427,7 +425,6 @@ class ScriptLibrary extends React.Component {
             )}
             <Container maxWidth={false} className={clsx(classes.container, this.state.displaySources.length > 0 && classes.containerNotEmpty)}>
               <ScriptSourceList
-                config={this.props.config}
                 specialMode={this.props.specialMode}
                 library={this.props.library}
                 scenes={this.props.allScenes}

@@ -1,7 +1,6 @@
 import * as React from "react";
 import clsx from "clsx";
 import rimraf from "rimraf";
-import trash from "trash";
 import {remote} from "electron";
 import {existsSync} from "fs";
 import getFolderSize from "get-folder-size";
@@ -178,11 +177,7 @@ class CacheCard extends React.Component {
 
   onFinishClearCache() {
     const cachePath = getCachePath(null, this.props.config);
-    if (this.props.config.generalSettings.enableTrash) {
-      trash(cachePath).then(() => {}).catch((e) => console.error(e));
-    } else {
-      rimraf.sync(cachePath);
-    }
+    rimraf.sync(cachePath);
     this.setState({cacheSize: "--"});
     this.calculateCacheSize();
   }

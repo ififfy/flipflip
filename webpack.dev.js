@@ -17,7 +17,7 @@ let mainConfig = {
     resolve: {
         extensions: ['.js', '.json', '.ts'],
     },
-    externals: { 'react-native-fs': 'reactNativeFs', 'trash': 'commonjs trash' },
+    externals: { 'react-native-fs': 'reactNativeFs' },
     module: {
         rules: [
             {
@@ -62,7 +62,7 @@ let rendererConfig = {
     resolve: {
         extensions: ['.js', '.json', '.ts', '.tsx'],
     },
-    externals: { 'react-native-fs': 'reactNativeFs', 'trash': 'commonjs trash' },
+    externals: { 'react-native-fs': 'reactNativeFs' },
     module: {
         rules: [
             {

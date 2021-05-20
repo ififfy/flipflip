@@ -5,7 +5,6 @@
 - Add top level error-page
 - Add ability to search for Scenes
 - Add new options for cleaning backups
-- Add ability to send to trash instead of delete
 - Add ability to disable scene-delete confirmation
 - Add ability to batch delete scenes
 - Prevent playing same image consecutively, if possible

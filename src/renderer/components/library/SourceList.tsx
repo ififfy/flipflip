@@ -1,6 +1,5 @@
 import * as React from "react";
 import rimraf from "rimraf";
-import trash from "trash";
 import {existsSync, unlinkSync} from "fs";
 import {remote} from "electron";
 import {sortableContainer, sortableElement} from 'react-sortable-hoc';
@@ -430,9 +429,7 @@ class SourceList extends React.Component {
 
   onFinishDelete() {
     const fileType = getSourceType(this.state.deleteDialog.url);
-    if (this.props.config.generalSettings.enableTrash) {
-      trash(this.state.deleteDialog.url).then(() => {}).catch((e) => console.error(e));
-    } else if (fileType == ST.local) {
+    if (fileType == ST.local) {
       rimraf.sync(this.state.deleteDialog.url);
     } else if (fileType == ST.video || fileType == ST.playlist || fileType == ST.list) {
       unlinkSync(this.state.deleteDialog.url);
@@ -588,11 +585,7 @@ class SourceList extends React.Component {
   }
 
   onFinishClean() {
-    if (this.props.config.generalSettings.enableTrash) {
-      trash(this.state.cachePath).then(() => {}).catch((e) => console.error(e));
-    } else {
-      rimraf.sync(this.state.cachePath);
-    }
+    rimraf.sync(this.state.cachePath);
     this.onCloseClean();
   }
 

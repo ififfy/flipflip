@@ -7,6 +7,7 @@ import {
 import {ThemeProvider} from "@material-ui/styles";
 
 import {IPC, SP} from "../data/const";
+import {getCachePath} from "../data/utils";
 import * as actions from '../data/actions';
 import ErrorBoundary from "../../main/ErrorBoundary";
 import AppStorage from '../data/AppStorage';
@@ -24,7 +25,6 @@ import Tutorial from "./Tutorial";
 import AudioLibrary from "./library/AudioLibrary";
 import CaptionScriptor from "./sceneDetail/CaptionScriptor";
 import ScriptLibrary from "./library/ScriptLibrary";
-
 const appStorage = new AppStorage(remote.getCurrentWindow().id);
 
 export default class Meta extends React.Component {
@@ -239,7 +239,7 @@ export default class Meta extends React.Component {
 
             {this.isRoute('audios') && (
               <AudioLibrary
-                config={this.state.config}
+                cachePath={getCachePath(null, this.state.config)}
                 filters={this.state.audioFilters}
                 library={this.state.audios}
                 progressCurrent={this.state.progressCurrent}
@@ -275,7 +275,6 @@ export default class Meta extends React.Component {
 
             {this.isRoute('scripts') && (
               <ScriptLibrary
-                config={this.state.config}
                 allScenes={this.state.scenes}
                 filters={this.state.scriptFilters}
                 library={this.state.scripts}

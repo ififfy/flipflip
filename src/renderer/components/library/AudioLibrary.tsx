@@ -37,11 +37,10 @@ import SortIcon from '@material-ui/icons/Sort';
 
 import {red} from "@material-ui/core/colors";
 
-import {extractMusicMetadata, getCachePath, getFilesRecursively} from "../../data/utils";
+import {extractMusicMetadata, getFilesRecursively} from "../../data/utils";
 import {isAudio} from "../player/Scrapers";
 import {AF, ASF, ALT, MO, SP, PR} from "../../data/const";
 import en from "../../data/en";
-import Config from "../../data/Config";
 import Audio from "../../data/Audio";
 import Playlist from "../../data/Playlist";
 import Tag from "../../data/Tag";
@@ -369,7 +368,7 @@ const styles = (theme: Theme) => createStyles({
 class AudioLibrary extends React.Component {
   readonly props: {
     classes: any,
-    config: Config,
+    cachePath: string,
     filters: Array<string>,
     library: Array<Audio>,
     progressCurrent: number,
@@ -678,7 +677,7 @@ class AudioLibrary extends React.Component {
                   <div className={classes.drawerSpacer}/>
                   <Box className={classes.fill}>
                     <AudioSourceList
-                      config={this.props.config}
+                      cachePath={this.props.cachePath}
                       isSelect={!!this.props.specialMode}
                       selected={this.state.selected}
                       showHelp={!this.props.specialMode && this.state.filters.length == 0}
@@ -1060,7 +1059,7 @@ class AudioLibrary extends React.Component {
         {this.state.openMenu == MO.batchEdit && (
           <AudioEdit
             audio={this.getCommonAudio()}
-            cachePath={getCachePath(null, this.props.config)}
+            cachePath={this.props.cachePath}
             title={"Batch Edit song info"}
             onCancel={this.onCloseDialog.bind(this)}
             onFinishEdit={this.onFinishBatchEdit.bind(this)}
@@ -1272,7 +1271,7 @@ class AudioLibrary extends React.Component {
         mm.parseBuffer(Buffer.from(buffer))
           .then((metadata: any) => {
             if (metadata) {
-              extractMusicMetadata(newAudio, metadata, getCachePath(null, this.props.config));
+              extractMusicMetadata(newAudio, metadata, this.props.cachePath);
             }
             if (!newAudio.name) {
               newAudio.name = url.substring(url.lastIndexOf(path.sep) + 1, url.lastIndexOf("."));
@@ -1329,7 +1328,7 @@ class AudioLibrary extends React.Component {
         mm.parseFile(url)
           .then((metadata: any) => {
             if (metadata) {
-              extractMusicMetadata(newAudio, metadata, getCachePath(null, this.props.config));
+              extractMusicMetadata(newAudio, metadata, this.props.cachePath);
             }
             if (!newAudio.name) {
               newAudio.name = url.substring(url.lastIndexOf(path.sep) + 1, url.lastIndexOf("."));
