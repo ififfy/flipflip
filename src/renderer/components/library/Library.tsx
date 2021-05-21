@@ -44,6 +44,7 @@ import LibrarySearch from "./LibrarySearch";
 import SourceIcon from "./SourceIcon";
 import SourceList from "./SourceList";
 import URLDialog from "../sceneDetail/URLDialog";
+import PiwigoDialog from "../sceneDetail/PiwigoDialog";
 
 const drawerWidth = 240;
 
@@ -237,6 +238,9 @@ const styles = (theme: Theme) => createStyles({
   addVideoButton: {
     marginBottom: 170
   },
+  addPiwigoButton: {
+    marginBottom: 225
+  },
   removeAllButton: {
     backgroundColor: theme.palette.error.main,
     margin: 0,
@@ -339,6 +343,7 @@ class Library extends React.Component {
     menuAnchorEl: null as any,
     openMenu: null as string,
     moveDialog: false,
+    piwigoDialog: false,
   };
 
   render() {
@@ -533,7 +538,7 @@ class Library extends React.Component {
                 )}
                 {piwigoAuthorized && (
                   <Tooltip title={this.state.drawerOpen ? "" : "Import from Piwigo"}>
-                    <ListItem button disabled={this.props.progressMode != null} onClick={console.log}>
+                    <ListItem button onClick={this.openPiwigoDialog.bind(this)}>
                       <ListItemIcon>
                         <SourceIcon type={ST.piwigo}/>
                       </ListItemIcon>
@@ -738,6 +743,17 @@ class Library extends React.Component {
                 </React.Fragment>
               )}
             </Dialog>
+            {piwigoAuthorized &&
+              <Tooltip title={this.state.filters.length > 0 ? "" : "Piwigo"}  placement="left">
+                <Fab
+                  className={clsx(classes.addButton, classes.addPiwigoButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
+                  disabled={this.state.filters.length > 0}
+                  onClick={this.openPiwigoDialog.bind(this)}
+                  size="small">
+                    <SourceIcon className={classes.icon} type={ST.piwigo}/>
+                </Fab>
+              </Tooltip>
+            }
             <Tooltip title={this.state.filters.length > 0 ? "" : "Local Video/Playlist"}  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addVideoButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
@@ -774,6 +790,13 @@ class Library extends React.Component {
             </Fab>
           </React.Fragment>
         )}
+
+        <PiwigoDialog 
+          config={this.props.config}
+          open={this.state.piwigoDialog}
+          onClose={this.onClosePiwigoDialog.bind(this)}
+          onImportURL={this.onAddSource.bind(this)}
+        />
 
         <Fab
           disabled={this.props.library.length < 2}
@@ -929,6 +952,10 @@ class Library extends React.Component {
     this.setState({moveDialog: true});
   }
 
+  openPiwigoDialog() {
+    this.setState({piwigoDialog: true, openMenu: false});
+  }
+
   onFinishMove() {
     for (let source of this.props.library) {
       if (source.offline) {
@@ -967,6 +994,10 @@ class Library extends React.Component {
 
   onCloseMoveDialog() {
     this.setState({moveDialog: false});
+  }
+
+  onClosePiwigoDialog() {
+    this.setState({piwigoDialog: false});
   }
 
   onBatchTag() {
@@ -1069,7 +1100,7 @@ class Library extends React.Component {
   }
 
   onCloseDialog() {
-    this.setState({menuAnchorEl: null, openMenu: null, drawerOpen: false});
+    this.setState({menuAnchorEl: null, openMenu: null, drawerOpen: false, piwigoDialog: false});
   }
 
   onRemoveAll() {

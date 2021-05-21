@@ -1,0 +1,464 @@
+import * as React from "react";
+import wretch from "wretch";
+import {
+  Button, Collapse, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl,
+  InputLabel, MenuItem, Select, TextField, Theme, withStyles, List, ListItem, ListItemAvatar, Avatar, ListItemText,
+  Container, Card, CardActionArea, CardContent, Typography, Checkbox, FormControlLabel, Tooltip, Divider, Chip
+} from "@material-ui/core";
+import Sortable from "react-sortablejs";
+// import SortIcon from '@material-ui/icons/Sort';
+import {arrayMove, removeDuplicatesBy} from "../../data/utils";
+import {AF, PW} from "../../data/const";
+import Jiggle from "../../animations/Jiggle";
+import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
+import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
+
+const styles = (theme: Theme) => createStyles({
+  list: {},
+  rootInput: {
+    marginLeft: theme.spacing(2),
+    flexGrow: 1,
+  },
+  sortListDisabled: {
+    pointerEvents: 'none',
+    opacity: 0.6
+  },
+  sortCol: {
+    marginBottom: 5,
+  },
+  sortColContent: {
+    display: 'flex',
+    padding: '5 !important'
+  },
+  sortColLabel: {
+    lineHeight: 2,
+    marginRight: 'auto'
+  },
+  sortColDir: {
+    marginTop: 8
+  },
+  tagChip: {
+    marginTop: 0,
+    marginRight: 5,
+    marginBottom: 5,
+    marginLeft: 0,
+  }
+});
+
+interface Album {
+    id: number, 
+    tn_url: string,
+    name: string,
+    comment: string,
+}
+
+interface Tag {
+    id: number, 
+    name: string,
+    counter: number,
+}
+
+interface Column {
+    label: string,
+    name: string,
+    direction: string,
+    enabled: boolean,
+}
+
+class PiwigoDialog extends React.Component {
+  readonly props: {
+    config: any,
+    classes: any,
+    open: boolean,
+    onClose(): void,
+    onImportURL(type: string, e: MouseEvent, ...args: any[]): void,
+  };
+
+  readonly state = {
+    listType: PW.apiTypeCategory,
+    albums: [] as Album[],
+    tags: [] as Tag[],
+    loggedIn: false,
+    selectedAlbums: [] as number[],
+    selectedTags: [] as number[],
+    tagModeAnd: false,
+    sortRandom: false,
+    recursiveMode: false,
+    sortOrder: [
+      {label: "Date Availabe", name: PW.sortOptionAvailable, direction: "DESC", enabled: true } as Column,
+      {label: "Date Created", name: PW.sortOptionCreated, direction: "DESC", enabled: false } as Column,
+      {label: "Name", name: PW.sortOptionName, direction: "DESC", enabled: false } as Column,
+      {label: "Filename", name: PW.sortOptionFile, direction: "DESC", enabled: false } as Column,
+      {label: "Hits", name: PW.sortOptionHit, direction: "DESC", enabled: false } as Column,
+      {label: "Rating", name: PW.sortOptionRating, direction: "DESC", enabled: false } as Column,
+      {label: "ID", name: PW.sortOptionID, direction: "DESC", enabled: false } as Column,
+    ]
+  };
+
+  render() {
+    const { selectedAlbums, selectedTags, listType, albums, tags, sortOrder, sortRandom, tagModeAnd, recursiveMode } = this.state;
+    const { piwigoUsername } = this.props.config.remoteSettings;
+    const classes = this.props.classes;
+
+
+    return (
+      <Dialog
+        open={this.props.open}
+        onClose={this.props.onClose.bind(this)}
+        onEntered={this.onDialogEntered.bind(this)}
+        aria-labelledby="url-import-title"
+        aria-describedby="url-import-description">
+        <DialogTitle id="url-import-title">Create Piwigo List</DialogTitle>
+        <DialogContent>
+          <FormControl>
+            <InputLabel>Piwigo List Type</InputLabel>
+            <Select
+              value={listType}
+              onChange={this.onListTypeChange.bind(this)}>
+              <MenuItem value={PW.apiTypeCategory}>Album Images</MenuItem>
+              <MenuItem value={PW.apiTypeTag}>Tagged Images</MenuItem>
+              <MenuItem disabled={!piwigoUsername} value={PW.apiTypeFavorites}>Your Favorites</MenuItem>
+            </Select>
+          </FormControl>
+          {listType === PW.apiTypeCategory &&
+            <React.Fragment>
+              <DialogContentText>
+                Select the album to load media from
+              </DialogContentText>
+              <List className={classes.list}>
+                {albums.map((album: Album) => {
+                  const isSelected = selectedAlbums.includes(album.id);
+                  return (
+                    <ListItem 
+                      key={album.id} 
+                      selected={isSelected} 
+                      onClick={this[isSelected ? 'removeSelectedAlbum' : 'addSelectedAlbum'].bind(this, album.id)}
+                      button
+                    >
+                      <ListItemAvatar>
+                        <Avatar
+                          alt={album.name}
+                          src={album.tn_url}
+                        />
+                      </ListItemAvatar>
+                      <ListItemText primary={album.name} secondary={album.comment} />
+                    </ListItem>
+                  );
+                })}
+              </List>
+              <FormControlLabel
+              control={
+                <Checkbox
+                  onChange={this.setRecursive.bind(this, !recursiveMode)}
+                  checked={recursiveMode}
+                />
+              }
+              label="Recursive"
+            />
+            </React.Fragment>
+          }
+          {listType === PW.apiTypeTag &&
+          <React.Fragment>
+            <DialogContentText>
+              Select the tags used to retrieve media with
+            </DialogContentText>
+            {tags.map((tag: Tag) => {
+              const isSelected = selectedTags.includes(tag.id);
+              return (
+                <Chip  
+                  className={classes.tagChip}
+                  key={tag.name}
+                  color={isSelected ? "secondary" : "primary"} 
+                  onClick={this[isSelected ? "removeSelectedTag" : "addSelectedTag"].bind(this, tag.id)}
+                  label={tag.name}
+                />
+              );
+            })}
+            <Divider orientation="horizontal" flexItem />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  onChange={this.setTagMode.bind(this, !tagModeAnd)}
+                  checked={tagModeAnd}
+                />
+              }
+              label="Must Match All Tags"
+            /> 
+          </React.Fragment>
+          }
+          <Divider orientation="horizontal" flexItem />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  onChange={this.setRandomSortOrder.bind(this, !sortRandom)}
+                  checked={sortRandom}
+                />
+              }
+              label="Randomize"
+            />
+            <Sortable
+              className={sortRandom ? classes.sortListDisabled : null}
+              options={{
+                animation: 150,
+                easing: "cubic-bezier(1, 0, 0, 1)",
+              }}
+              onChange={(order: any, sortable: any, evt: any) => {
+                let newSortOrder = Array.from(this.state.sortOrder);
+                arrayMove(newSortOrder, evt.oldIndex, evt.newIndex);
+                this.setState({sortOrder: newSortOrder});
+              }}>
+              {sortOrder.map((column) =>
+                <Card className={classes.sortCol} key={column.name}>
+                  <CardContent className={classes.sortColContent} onClick={this.setColumnDirection.bind(this, column.name, column.direction === "ASC" ? "DESC" : "ASC")}>
+                    <Checkbox checked={column.enabled} onChange={this.toggleSortColumn.bind(this, column.name, !column.enabled)} />
+                    <Typography component="h2" variant="h6" className={classes.sortColLabel}>
+                      {column.label}
+                    </Typography>
+                    {column.direction === "ASC" &&
+                      <Tooltip title="Sort Ascending">
+                          <ArrowUpwardIcon className={classes.sortColDir} />
+                      </Tooltip>
+                    }
+                    {column.direction === "DESC" &&
+                      <Tooltip title="Sort Descending">
+                          <ArrowDownwardIcon className={classes.sortColDir} />
+                      </Tooltip>
+                    }
+                  </CardContent>
+                </Card>
+              )}
+            </Sortable>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={this.props.onClose.bind(this)} color="secondary">
+            Cancel
+          </Button>
+          <Button
+            // disabled={!this.state.importURL.match("^https?://") || (this.state.importType == GT.local && this.state.rootDir.length == 0)}
+            onClick={this.createAPICall.bind(this)}
+            color="primary"
+          >
+            Create List
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  }
+
+  onDialogEntered () {
+    const { listType } = this.state;
+    if (listType === PW.apiTypeCategory) {
+      this.getAlbums();
+    } else if (listType === PW.apiTypeTag) {
+      this.getTags();
+    }
+  }
+
+  onListTypeChange(e: MouseEvent) {
+    const type = (e.target as HTMLInputElement).value;
+    this.setState({listType: type});
+    if (type === PW.apiTypeCategory) {
+      this.getAlbums();
+    } else if (type === PW.apiTypeTag) {
+      this.getTags();
+    } 
+  }
+
+  login () {
+    const { piwigoPassword, piwigoUsername } = this.props.config.remoteSettings;
+    return wretch(this.makeURL())
+      .formUrl({ method: "pwg.session.login", username: piwigoUsername, password: piwigoPassword })
+      .post()
+      .setTimeout(5000)
+      // .notFound((e) => pm({
+      //   error: e.message,
+      //   helpers: helpers,
+      //   source: source,
+      //   timeout: timeout,
+      // }))
+      // .internalError((e) => pm({
+      //   error: e.message,
+      //   helpers: helpers,
+      //   source: source,
+      //   timeout: timeout,
+      // }))
+      .json((json) => {
+        if (json.stat == "ok") {
+          this.setState({loggedIn: true});
+        } else {
+          //
+        }
+      })
+      .catch((e) => {
+        //
+      });
+  }
+
+  getAlbums () {
+    const { piwigoUsername } = this.props.config.remoteSettings;
+    const { loggedIn = false } = this.state;
+
+    const getAlbums = () => {
+      return wretch(this.makeURL())
+        .formUrl({ method: "pwg.categories.getList", recursive: true, tree_output: true })
+        .post()
+        .setTimeout(5000)
+        // .notFound((e) => pm({
+        //   error: e.message,
+        //   helpers: helpers,
+        //   source: source,
+        //   timeout: timeout,
+        // }))
+        // .internalError((e) => pm({
+        //   error: e.message,
+        //   helpers: helpers,
+        //   source: source,
+        //   timeout: timeout,
+        // }))
+        .json((json) => {
+          if (json.stat == "ok") {
+            this.setState({albums: json.result.map((a: Album) => a)});
+          } else {
+            //
+          }
+        })
+        .catch((e) => {
+          //
+        });
+    };
+
+    if (!loggedIn && !!piwigoUsername) {
+      this.login().then(getAlbums);
+    } else {
+      getAlbums();
+    }
+  }
+
+  getTags () {
+    const { piwigoUsername } = this.props.config.remoteSettings;
+    const { loggedIn = false } = this.state;
+
+    const getTags = () => {
+      return wretch(this.makeURL())
+        .formUrl({ method: "pwg.tags.getList" })
+        .post()
+        .setTimeout(5000)
+        // .notFound((e) => pm({
+        //   error: e.message,
+        //   helpers: helpers,
+        //   source: source,
+        //   timeout: timeout,
+        // }))
+        // .internalError((e) => pm({
+        //   error: e.message,
+        //   helpers: helpers,
+        //   source: source,
+        //   timeout: timeout,
+        // }))
+        .json((json) => {
+          if (json.stat == "ok") {
+            this.setState({tags: json.result.tags.map((t: Tag) => t)});
+          } else {
+            //
+          }
+        })
+        .catch((e) => {
+          //
+        });
+    };
+
+    if (!loggedIn && !!piwigoUsername) {
+      this.login().then(getTags);
+    } else {
+      getTags();
+    }
+  }
+
+  createAPICall (e: MouseEvent) {
+    const { listType, sortRandom, sortOrder, selectedAlbums, selectedTags, tagModeAnd, recursiveMode } = this.state;
+    let url = `${this.makeURL()}&method=${listType}`;
+
+    if (listType === PW.apiTypeCategory) {
+      url += "&" + selectedAlbums.map(catID => `cat_id[]=${catID}`).join("&");
+      if (recursiveMode) {
+        url += "recursive=true"
+      }
+    } else if (listType === PW.apiTypeTag) {
+      url += "&" + selectedTags.map(tagID => `tag_id[]=${tagID}`).join("&");
+      if (tagModeAnd) {
+        url += "tag_mode_and=true"
+      }
+    }
+
+    if (sortRandom) {
+      url += "&order=random";
+    } else {
+      const sortLines = sortOrder.filter(col => col.enabled).map(col => `${col.name} ${col.direction}`).join(',');
+      if (sortLines) {
+        url += `&order=${encodeURIComponent(sortLines)}`;
+      }
+    }
+
+    this.props.onImportURL(AF.url, null, [url]);
+  }
+  
+  makeURL () {
+    const { piwigoProtocol, piwigoHost } = this.props.config.remoteSettings;
+    return piwigoProtocol + "://" + piwigoHost + "/ws.php?format=json";
+  }
+
+  addSelectedAlbum (albumID: number) {
+    const { selectedAlbums } = this.state;
+    this.setState({ selectedAlbums: [...selectedAlbums, albumID] } );
+  }
+
+  removeSelectedAlbum (albumID: number) {
+    const { selectedAlbums } = this.state;
+    this.setState({ selectedAlbums: selectedAlbums.filter((t: number) => t !== albumID) } );
+  }
+
+  addSelectedTag (tagID: number) {
+    const { selectedTags } = this.state;
+    this.setState({ selectedTags: [...selectedTags, tagID] } );
+  }
+
+  removeSelectedTag (tagID: number) {
+    const { selectedTags } = this.state;
+    this.setState({ selectedTags: selectedTags.filter((t: number) => t !== tagID) } );
+  }
+
+  setRandomSortOrder (sortRandom: boolean) {
+    this.setState({sortRandom});
+  }
+
+  setRecursive (recursiveMode: boolean) {
+    this.setState({recursiveMode});
+  }
+
+  setTagMode (tagModeAnd: boolean) {
+    this.setState({tagModeAnd});
+  }
+
+  toggleSortColumn (columnName: string, enabled: boolean) {
+    const sortOrder = Array.from(this.state.sortOrder).map((col: Column) => {
+      if (col.name === columnName) {
+        return { ...col, enabled };
+      }
+      return col;
+    });
+    this.setState({sortOrder});
+  }
+
+  setColumnDirection (columnName: string, direction: string) {
+    const sortOrder = Array.from(this.state.sortOrder).map((col: Column) => {
+      if (col.name === columnName) {
+        return { ...col, enabled: true, direction };
+      }
+      return col;
+    });
+    this.setState({sortOrder});
+  }
+}
+
+(PiwigoDialog as any).displayName="PiwigoDialog";
+export default withStyles(styles)(PiwigoDialog as any);
