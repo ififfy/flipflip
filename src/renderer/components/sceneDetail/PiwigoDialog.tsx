@@ -12,9 +12,14 @@ import {AF, PW} from "../../data/const";
 import Jiggle from "../../animations/Jiggle";
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 
 const styles = (theme: Theme) => createStyles({
   list: {},
+  subList: {
+    paddingLeft: 10 
+  },
   rootInput: {
     marginLeft: theme.spacing(2),
     flexGrow: 1,
@@ -28,7 +33,7 @@ const styles = (theme: Theme) => createStyles({
   },
   sortColContent: {
     display: 'flex',
-    padding: '5 !important'
+    padding: '5px !important'
   },
   sortColLabel: {
     lineHeight: 2,
@@ -42,6 +47,9 @@ const styles = (theme: Theme) => createStyles({
     marginRight: 5,
     marginBottom: 5,
     marginLeft: 0,
+  },
+  areaHeader: {
+    marginTop: 15
   }
 });
 
@@ -50,6 +58,7 @@ interface Album {
     tn_url: string,
     name: string,
     comment: string,
+    sub_categories: Album[],
 }
 
 interface Tag {
@@ -65,6 +74,72 @@ interface Column {
     enabled: boolean,
 }
 
+
+class AlbumListItem extends React.Component {
+  readonly props: {
+    album: Album,
+    classes: any,
+    selectedAlbums: number[],
+    onSelect(albumID: number, selected: boolean): void,
+  };
+
+  readonly state = {
+    foldersOpen: false
+  };
+
+  setOpen (foldersOpen = false, e: MouseEvent) {
+    e.stopPropagation();
+    this.setState({foldersOpen});
+  }
+
+  render() {
+    const { foldersOpen } = this.state;
+    const { album, selectedAlbums, onSelect, classes } = this.props;
+    const isSelected = selectedAlbums.includes(album.id);
+
+    return (
+      <React.Fragment>
+        <ListItem 
+          key={album.id} 
+          selected={isSelected} 
+          onClick={onSelect.bind(null, album.id, !isSelected)}
+          button
+        >
+          <ListItemAvatar>
+            <Avatar
+              alt={album.name}
+              src={album.tn_url}
+            />
+          </ListItemAvatar>
+          <ListItemText primary={album.name} secondary={album.comment} />
+          {(album.sub_categories?.length && !foldersOpen) &&
+            <Tooltip title="Show Sub-Albums">
+              <ExpandMoreIcon onClick={this.setOpen.bind(this, true)} /> 
+            </Tooltip>
+          }
+          {(album.sub_categories?.length && foldersOpen) &&
+            <Tooltip title="Hide Sub-Albums">
+              <ExpandLessIcon onClick={this.setOpen.bind(this, false)} /> 
+            </Tooltip>
+          }
+        </ListItem>
+        {foldersOpen &&
+          <List className={classes.subList}>
+            {album.sub_categories.map((album: Album) => (
+                <AlbumListItem
+                  classes={classes}
+                  key={album.id} 
+                  album={album}
+                  selectedAlbums={selectedAlbums}
+                  onSelect={onSelect}
+                />
+            ))}
+          </List>
+        }
+      </React.Fragment>
+    );
+  }
+}
 class PiwigoDialog extends React.Component {
   readonly props: {
     config: any,
@@ -100,12 +175,12 @@ class PiwigoDialog extends React.Component {
     const { piwigoUsername } = this.props.config.remoteSettings;
     const classes = this.props.classes;
 
-
     return (
       <Dialog
         open={this.props.open}
         onClose={this.props.onClose.bind(this)}
         onEntered={this.onDialogEntered.bind(this)}
+        fullWidth={true}
         aria-labelledby="url-import-title"
         aria-describedby="url-import-description">
         <DialogTitle id="url-import-title">Create Piwigo List</DialogTitle>
@@ -122,29 +197,22 @@ class PiwigoDialog extends React.Component {
           </FormControl>
           {listType === PW.apiTypeCategory &&
             <React.Fragment>
+              <Typography component="h2" variant="h6" className={classes.areaHeader}>
+                Select an Album
+              </Typography>
               <DialogContentText>
                 Select the album to load media from
               </DialogContentText>
               <List className={classes.list}>
-                {albums.map((album: Album) => {
-                  const isSelected = selectedAlbums.includes(album.id);
-                  return (
-                    <ListItem 
+                {albums.map((album: Album) => (
+                    <AlbumListItem
+                      classes={classes}
                       key={album.id} 
-                      selected={isSelected} 
-                      onClick={this[isSelected ? 'removeSelectedAlbum' : 'addSelectedAlbum'].bind(this, album.id)}
-                      button
-                    >
-                      <ListItemAvatar>
-                        <Avatar
-                          alt={album.name}
-                          src={album.tn_url}
-                        />
-                      </ListItemAvatar>
-                      <ListItemText primary={album.name} secondary={album.comment} />
-                    </ListItem>
-                  );
-                })}
+                      album={album}
+                      selectedAlbums={selectedAlbums}
+                      onSelect={(albumID, isSelected) => this[isSelected ? 'addSelectedAlbum' : 'removeSelectedAlbum'](albumID)}
+                    />
+                ))}
               </List>
               <FormControlLabel
               control={
@@ -159,6 +227,9 @@ class PiwigoDialog extends React.Component {
           }
           {listType === PW.apiTypeTag &&
           <React.Fragment>
+            <Typography component="h2" variant="h6" className={classes.areaHeader}>
+              Select Tags
+            </Typography>
             <DialogContentText>
               Select the tags used to retrieve media with
             </DialogContentText>
@@ -187,6 +258,13 @@ class PiwigoDialog extends React.Component {
           </React.Fragment>
           }
           <Divider orientation="horizontal" flexItem />
+          <React.Fragment>
+            <Typography component="h2" variant="h6" className={classes.areaHeader}>
+              Sort Order
+            </Typography>
+            <DialogContentText>
+              Indicate the media sort order
+            </DialogContentText>
             <FormControlLabel
               control={
                 <Checkbox
@@ -211,7 +289,7 @@ class PiwigoDialog extends React.Component {
                 <Card className={classes.sortCol} key={column.name}>
                   <CardContent className={classes.sortColContent} onClick={this.setColumnDirection.bind(this, column.name, column.direction === "ASC" ? "DESC" : "ASC")}>
                     <Checkbox checked={column.enabled} onChange={this.toggleSortColumn.bind(this, column.name, !column.enabled)} />
-                    <Typography component="h2" variant="h6" className={classes.sortColLabel}>
+                    <Typography component="h3" variant="h6" className={classes.sortColLabel}>
                       {column.label}
                     </Typography>
                     {column.direction === "ASC" &&
@@ -228,6 +306,7 @@ class PiwigoDialog extends React.Component {
                 </Card>
               )}
             </Sortable>
+          </React.Fragment>
         </DialogContent>
         <DialogActions>
           <Button onClick={this.props.onClose.bind(this)} color="secondary">
