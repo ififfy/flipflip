@@ -113,10 +113,6 @@ export default class Player extends React.Component {
         right: 0,
         bottom: 0,
         left: 0,
-        width: '104%',
-        height: '104%',
-        marginLeft: '-2%',
-        marginTop: '-2%',
         overflow: 'hidden',
       }
     } else {
