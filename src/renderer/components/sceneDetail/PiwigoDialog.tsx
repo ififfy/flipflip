@@ -14,6 +14,7 @@ import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
+import { Rating } from '@material-ui/lab';
 
 const styles = (theme: Theme) => createStyles({
   list: {},
@@ -48,8 +49,17 @@ const styles = (theme: Theme) => createStyles({
     marginBottom: 5,
     marginLeft: 0,
   },
+  areaHeaderFirst: {
+    marginTop: 0
+  },
   areaHeader: {
     marginTop: 15
+  },
+  ratingArea: {
+    display: 'flex'
+  },
+  typeSelect: {
+    marginLeft: 10
   }
 });
 
@@ -183,18 +193,26 @@ class PiwigoDialog extends React.Component {
         fullWidth={true}
         aria-labelledby="url-import-title"
         aria-describedby="url-import-description">
-        <DialogTitle id="url-import-title">Create Piwigo List</DialogTitle>
+        <DialogTitle id="url-import-title">Create a New Piwigo List</DialogTitle>
         <DialogContent>
+
           <FormControl>
-            <InputLabel>Piwigo List Type</InputLabel>
+            <Typography component="h2" variant="h6" className={classes.areaHeaderFirst}>
+              Piwigo List Type
+            </Typography>
+            <DialogContentText>
+              Select the type of image list to create
+            </DialogContentText>
             <Select
               value={listType}
+              className={classes.typeSelect}
               onChange={this.onListTypeChange.bind(this)}>
               <MenuItem value={PW.apiTypeCategory}>Album Images</MenuItem>
               <MenuItem value={PW.apiTypeTag}>Tagged Images</MenuItem>
               <MenuItem disabled={!piwigoUsername} value={PW.apiTypeFavorites}>Your Favorites</MenuItem>
             </Select>
           </FormControl>
+
           {listType === PW.apiTypeCategory &&
             <React.Fragment>
               <Typography component="h2" variant="h6" className={classes.areaHeader}>
@@ -263,7 +281,7 @@ class PiwigoDialog extends React.Component {
               Sort Order
             </Typography>
             <DialogContentText>
-              Indicate the media sort order
+              Indicate the media sort order (optional)
             </DialogContentText>
             <FormControlLabel
               control={
@@ -307,6 +325,100 @@ class PiwigoDialog extends React.Component {
               )}
             </Sortable>
           </React.Fragment>
+
+          {(listType === PW.apiTypeTag || listType === PW.apiTypeCategory) && 
+
+          <React.Fragment>
+            <Typography component="h2" variant="h6" className={classes.areaHeader}>
+              Rating
+            </Typography>
+            <DialogContentText>
+              Indicate the media sort order (optional)
+            </DialogContentText>
+            <Container className={classes.ratingArea}>
+              <Container>
+                <Typography component="legend">Minimum Rating</Typography>
+                <Rating name="pwg-image-min" precision={0.5} />
+              </Container>
+              <Container>
+                <Typography component="legend">Maximum Rating</Typography>
+                <Rating name="pwg-image-max" precision={0.5} />
+              </Container>
+            </Container>
+            <Typography component="h2" variant="h6" className={classes.areaHeader}>
+              Dates
+            </Typography>
+            <DialogContentText>
+              Indicate the created/available date range (optional)
+            </DialogContentText>
+            <Container>
+              <FormControlLabel
+                control={
+                  <TextField
+                    type="datetime-local"
+                    // onChange={this.setRecursive.bind(this, !recursiveMode)}
+                    // checked={recursiveMode}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                }
+                label="Earliest Available"
+              />
+              <FormControlLabel
+                control={
+                  <TextField
+                    type="datetime-local"
+                    // onChange={this.setRecursive.bind(this, !recursiveMode)}
+                    // checked={recursiveMode}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                }
+                label="Latest Available"
+              />
+            </Container>
+            <Container>
+              <FormControlLabel
+                control={
+                  <TextField
+                    type="datetime-local"
+                    // onChange={this.setRecursive.bind(this, !recursiveMode)}
+                    // checked={recursiveMode}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                }
+                label="Earliest Created"
+              />
+              <FormControlLabel
+                control={
+                  <TextField
+                    type="datetime-local"
+                    // onChange={this.setRecursive.bind(this, !recursiveMode)}
+                    // checked={recursiveMode}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                }
+                label="Latest Created"
+              />
+            </Container>
+          </React.Fragment>
+          
+          }
+
+
+
+
+
+
+
+
+          
         </DialogContent>
         <DialogActions>
           <Button onClick={this.props.onClose.bind(this)} color="secondary">
