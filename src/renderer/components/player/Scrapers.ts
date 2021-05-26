@@ -24,9 +24,9 @@ const pm = (object: any) => {
   postMessage(object);
 }
 
-export const processAllURLs = (data: string[], allURLs: Map<string, string[]>, source: LibrarySource, weight: string, helpers: {next: any, count: number, retries: number}): Map<string, string[]> => {
+export const processAllURLs = (data: string[], allURLs: Map<string, string[]>, source: LibrarySource, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}): Map<string, string[]> => {
   let newAllURLs = new Map(allURLs);
-  if (helpers.next == null || helpers.next <= 0) {
+  if (helpers.next != null && helpers.next <= 0) {
     if (weight == WF.sources) {
       newAllURLs.set(source.url, data);
     } else {
@@ -74,7 +74,7 @@ export const reset = () => {
   piwigoAlerted = false;
 }
 
-export const loadRemoteImageURLList = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadRemoteImageURLList = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const url = source.url;
   wretch(url)
     .get()
@@ -134,7 +134,7 @@ export const loadRemoteImageURLList = (allURLs: Map<string, Array<string>>, conf
     });
 }
 
-export const loadTumblr = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadTumblr = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 3000;
   let configured = config.remoteSettings.tumblrOAuthToken != "" && config.remoteSettings.tumblrOAuthTokenSecret != "";
   if (configured) {
@@ -286,7 +286,7 @@ export const loadTumblr = (allURLs: Map<string, Array<string>>, config: Config, 
   }
 }
 
-export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 3000;
   let configured = config.remoteSettings.redditRefreshToken != "";
   if (configured) {
@@ -520,17 +520,13 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
   }
 }
 
-// TODO Verify this works after site's cert issue is resolved
-export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 8000;
-  if (helpers.next == 0) {
-    helpers.next = [0, 0];
-  }
   const url = source.url;
   if (url.includes("/pictures/")) {
     wretch("https://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2")
       .get()
-      .setTimeout(10000)
+      .setTimeout(15000)
       .onAbort((e) => pm({
         error: e.message,
         helpers: helpers,
@@ -539,23 +535,26 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
       }))
       .text((html) => {
         let imageEls = domino.createWindow(html).document.querySelectorAll(".expp-container > form > table > tbody > tr > td");
+        let images = Array<string>();
         if (imageEls.length > 0) {
-          let imageCount = 0;
-          let images = Array<string>();
-          for (let i = 0; i < imageEls.length; i++) {
-            const image = imageEls.item(i);
+          helpers.count = imageEls.length;
+          let imageCount = helpers.next > 0 ? helpers.next : 0;
+          const imageLoop = () => {
+            const image = imageEls.item(imageCount++);
             wretch("https://www.imagefap.com/photo/" + image.id + "/")
               .get()
               .text((html) => {
-                imageCount++;
+                let captcha = undefined;
                 let contentURL = html.match("\"contentUrl\": \"(.*?)\",");
                 if (contentURL != null) {
                   images.push(contentURL[1]);
+                } else {
+                  captcha = "https://www.imagefap.com/photo/" + image.id + "/";
                 }
-                if (imageCount == imageEls.length) {
-                  helpers.next = null;
-                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
+                if (imageCount == imageEls.length || captcha != null) {
+                  helpers.next = imageCount == imageEls.length ? null : imageCount;
                   pm({
+                    captcha: captcha,
                     data: filterPathsToJustPlayable(filter, images, false),
                     allURLs: allURLs,
                     weight: weight,
@@ -563,13 +562,25 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
                     source: source,
                     timeout: timeout,
                   });
+                } else {
+                  setTimeout(imageLoop, 200);
                 }
-              })
+              });
           }
+          imageLoop();
         } else {
-          helpers.next = null;
+          let captcha = undefined;
+          if (html.includes("Enter the captcha")) {
+            helpers.count = source.count;
+            captcha = "https://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2";
+            images = allURLs.get(url);
+            pm({warning: source.url + " - blocked due to captcha"});
+          } else {
+            helpers.next = null;
+          }
           pm({
-            data: [],
+            captcha: captcha,
+            data: images,
             allURLs: allURLs,
             weight: weight,
             helpers: helpers,
@@ -579,6 +590,9 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
         }
       });
   } else if (url.includes("/organizer/")) {
+    if (helpers.next == 0) {
+      helpers.next = [0, 0, 0];
+    }
     wretch(url + "?page=" + helpers.next[0])
       .get()
       .setTimeout(10000)
@@ -591,8 +605,15 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
       .text((html) => {
         let albumEls = domino.createWindow(html).document.querySelectorAll("td.blk_galleries > font > a.blk_galleries");
         if (albumEls.length == 0) {
+          let captcha = undefined;
+          if (html.includes("Enter the captcha")) {
+            helpers.count = source.count;
+            captcha = "https://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2";
+            pm({warning: source.url + " - blocked due to captcha"});
+          }
           helpers.next = null;
           pm({
+            captcha: captcha,
             data: [],
             allURLs: allURLs,
             weight: weight,
@@ -605,58 +626,94 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
           let albumID = albumEl.getAttribute("href").substring(albumEl.getAttribute("href").lastIndexOf("/") + 1);
           wretch("https://www.imagefap.com/gallery/" + albumID + "?view=2")
             .get()
+            .setTimeout(15000)
+            .onAbort((e) => pm({
+              error: e.message,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            }))
             .text((html) => {
               let imageEls = domino.createWindow(html).document.querySelectorAll(".expp-container > form > table > tbody > tr > td");
+              let images = Array<string>();
               if (imageEls.length > 0) {
-                let images = Array<string>();
-                let imageCount = 0;
-                for (let i = 0; i < imageEls.length; i++) {
-                  const image = imageEls.item(i);
+                let imageCount = helpers.next[2];
+                const imageLoop = () => {
+                  const image = imageEls.item(imageCount++);
                   wretch("https://www.imagefap.com/photo/" + image.id + "/")
                     .get()
                     .text((html) => {
-                      imageCount++;
+                      let captcha = undefined;
                       let contentURL = html.match("\"contentUrl\": \"(.*?)\",");
                       if (contentURL != null) {
                         images.push(contentURL[1]);
+                      } else {
+                        captcha = "https://www.imagefap.com/photo/" + image.id + "/";
                       }
-                      if (imageCount == imageEls.length) {
-                        helpers.next[1] += 1;
-                        helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
+                      if (imageCount == imageEls.length || captcha != null) {
+                        if (imageCount == imageEls.length) {
+                            helpers.next[2] = 0;
+                            helpers.next[1] += 1;
+                            helpers.count += imageEls.length;
+                        } else {
+                            helpers.next = imageCount;
+                        }
                         pm({
+                          captcha: captcha,
                           data: filterPathsToJustPlayable(filter, images, false),
                           allURLs: allURLs,
                           weight: weight,
                           helpers: helpers,
                           source: source,
                           timeout: timeout,
-                        })
+                        });
+                      } else {
+                        setTimeout(imageLoop, 200);
                       }
                     });
                 }
+                imageLoop();
               } else {
-                helpers.next[1] += 1;
+                let captcha = undefined;
+                if (html.includes("Enter the captcha")) {
+                  helpers.count = source.count;
+                  captcha = "https://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2";
+                  pm({warning: source.url + " - blocked due to captcha"});
+                } else {
+                  helpers.next[1] += 1;
+                }
                 pm({
+                  captcha: captcha,
                   data: [],
                   allURLs: allURLs,
                   weight: weight,
                   helpers: helpers,
                   source: source,
                   timeout: timeout,
-                })
+                });
               }
             });
         } else {
-          helpers.next[0] += 1;
-          helpers.next[1] = 0;
+          let images = Array<string>();
+          let captcha = undefined;
+          if (html.includes("Enter the captcha")) {
+            helpers.count = source.count;
+            captcha = "https://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2";
+            images = allURLs.get(url);
+            pm({warning: source.url + " - blocked due to captcha"});
+          } else {
+            helpers.next[0] += 1;
+            helpers.next[1] = 0;
+          }
           pm({
-            data: [],
+            captcha: captcha,
+            data: images,
             allURLs: allURLs,
             weight: weight,
             helpers: helpers,
             source: source,
             timeout: timeout,
-          })
+          });
         }
       })
       .catch((e) => {
@@ -731,7 +788,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
   }
 }
 
-export const loadSexCom = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadSexCom = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 8000;
   const url = source.url;
   // This doesn't work anymore due to src url requiring referer
@@ -860,7 +917,7 @@ export const loadSexCom = (allURLs: Map<string, Array<string>>, config: Config, 
     });*/
 }
 
-export const loadImgur = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadImgur = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 3000;
   const url = source.url;
   imgur.getAlbumInfo(getFileGroup(url))
@@ -887,7 +944,7 @@ export const loadImgur = (allURLs: Map<string, Array<string>>, config: Config, s
     });
 }
 
-export const loadTwitter = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadTwitter = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 3000;
   let configured = config.remoteSettings.twitterAccessTokenKey != "" && config.remoteSettings.twitterAccessTokenSecret != "";
   if (configured) {
@@ -975,7 +1032,7 @@ export const loadTwitter = (allURLs: Map<string, Array<string>>, config: Config,
   }
 }
 
-export const loadDeviantArt = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadDeviantArt = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 3000;
   const url = source.url;
   wretch("https://backend.deviantart.com/rss.xml?type=deviation&q=by%3A" + getFileGroup(url) + "+sort%3Atime+meta%3Aall" + (helpers.next != 0 ? "&offset=" + helpers.next : ""))
@@ -1029,12 +1086,12 @@ export const loadDeviantArt = (allURLs: Map<string, Array<string>>, config: Conf
 
 let ig: IgApiClient = null;
 let session: any = null;
-export const loadInstagram = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadInstagram = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 3000;
   const configured = config.remoteSettings.instagramUsername != "" && config.remoteSettings.instagramPassword != "";
   if (configured) {
     const url = source.url;
-    const processItems = (items: any, helpers: {next: any, count: number, retries: number}) => {
+    const processItems = (items: any, helpers: {next: any, count: number, retries: number, uuid: string}) => {
       let images = Array<string>();
       for (let item of items) {
         if (item.carousel_media) {
@@ -1166,7 +1223,7 @@ export const loadInstagram = (allURLs: Map<string, Array<string>>, config: Confi
   }
 }
 
-export const loadE621 = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadE621 = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 8000;
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
@@ -1381,7 +1438,7 @@ export const loadE621 = (allURLs: Map<string, Array<string>>, config: Config, so
   }
 }
 
-export const loadDanbooru = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadDanbooru = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 8000;
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
@@ -1490,7 +1547,7 @@ export const loadDanbooru = (allURLs: Map<string, Array<string>>, config: Config
     }));
 }
 
-export const loadGelbooru1 = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadGelbooru1 = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 8000;
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
@@ -1602,7 +1659,7 @@ export const loadGelbooru1 = (allURLs: Map<string, Array<string>>, config: Confi
     });
 }
 
-export const loadGelbooru2 = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadGelbooru2 = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 8000;
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
@@ -1687,7 +1744,7 @@ export const loadGelbooru2 = (allURLs: Map<string, Array<string>>, config: Confi
     }));
 }
 
-export const loadEHentai = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadEHentai = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 8000;
   const url = source.url;
   wretch(url + "?p=" + (helpers.next + 1))
@@ -1761,7 +1818,7 @@ export const loadEHentai = (allURLs: Map<string, Array<string>>, config: Config,
     });
 }
 
-export const loadBDSMlr = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadBDSMlr = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 8000;
   let url = source.url;
   if (url.endsWith("/rss")) {
@@ -1954,9 +2011,9 @@ export const loadPiwigo = (allURLs: Map<string, Array<string>>, config: Config, 
 }
 
 let sessionKey: string = null;
-export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) => {
+export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 8000;
-  const apiKey = config.remoteSettings.hydrusAPIKey
+  const apiKey = config.remoteSettings.hydrusAPIKey;
   const configured = apiKey != "";
   if (configured) {
     const protocol = config.remoteSettings.hydrusProtocol;
@@ -1981,44 +2038,11 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, 
     const tagsRegex = /tags=([^&]*)&?.*$/.exec(source.url);
     let noTags = tagsRegex == null || tagsRegex.length <= 1;
 
-    const getSessionKey = () => {
-      wretch(hydrusURL + "/session_key")
-        .headers({"Hydrus-Client-API-Access-Key": apiKey})
-        .get()
-        .setTimeout(15000)
-        .notFound((e) => {
-          pm({
-            error: e.message,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          })
-        })
-        .internalError((e) => {
-          pm({
-            error: e.message,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          })
-        })
-        .json((json) => {
-          sessionKey = json.session_key;
-          search();
-        })
-        .catch((e) => pm({
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        }));
-    }
-
     let pages = 0;
     const search = () => {
       const url = noTags ? hydrusURL + "/get_files/search_files" : hydrusURL + "/get_files/search_files?tags=" + tagsRegex[1];
       wretch(url)
-        .headers({"Hydrus-Client-API-Session-Key": sessionKey})
+        .headers({"Hydrus-Client-API-Access-Key": apiKey})
         .get()
         .setTimeout(15000)
         .notFound((e) => {
@@ -2059,7 +2083,7 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, 
     let images = Array<string>();
     const getFileMetadata = (fileIDs: Array<number>, page: number) => {
       wretch(hydrusURL + "/get_files/file_metadata?file_ids=[" + fileIDs.toString() + "]")
-        .headers({"Hydrus-Client-API-Session-Key": sessionKey})
+        .headers({"Hydrus-Client-API-Access-Key": apiKey})
         .get()
         .setTimeout(15000)
         .notFound((e) => {
@@ -2084,7 +2108,7 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, 
               (filter == IF.stills || filter == IF.images) && isImage(metadata.ext, true) ||
               (filter == IF.animated && metadata.ext.toLowerCase().endsWith('.gif') || isVideo(metadata.ext, true)) ||
               (filter == IF.videos && isVideo(metadata.ext, true))) {
-              images.push(hydrusURL + "/get_files/file?file_id=" + metadata.file_id + "&Hydrus-Client-API-Access-Key=" + apiKey);
+              images.push(hydrusURL + "/get_files/file?file_id=" + metadata.file_id + "&Hydrus-Client-API-Access-Key=" + apiKey + "&ext=" + metadata.ext);
             }
           }
 
@@ -2107,11 +2131,7 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, 
         }));
     }
 
-    if (sessionKey == null) {
-      getSessionKey();
-    } else {
-      search();
-    }
+    search();
   } else {
     let systemMessage = undefined;
     if (!hydrusAlerted) {
@@ -2227,24 +2247,15 @@ async function convertURL(url: string): Promise<Array<string>> {
   }
 
   // If this is imgur album, return album images
-  // TODO Fix (replace with imgur library?
   let imgurAlbumMatch = url.match("^https?://imgur\.com/a/([\\w\\d]{7})$");
   if (imgurAlbumMatch != null) {
-    let html = await wretch(url).get().notFound(() => {return [url]}).text();
-    let imageEls = domino.createWindow(html).document.querySelectorAll(".post-images > div.post-image-container");
-    if (imageEls.length > 0) {
-      let images = Array<string>();
-      for (let image of imageEls) {
-        images.push("https://i.imgur.com/" + image.id + ".jpg");
-      }
-      return images;
-    } else {
-      imgurAlbumMatch = null;
+    let json = await imgur.getAlbumInfo(getFileGroup(url));
+    if (json) {
+      return json.data.images.map((i: any) => i.link);
     }
   }
 
   // If this is gfycat page, return gfycat image
-  // TODO Fix
   let gfycatMatch = url.match("^https?://gfycat\.com/(?:ifr/)?(\\w*)$");
   if (gfycatMatch != null) {
     // Only lookup CamelCase url if not already CamelCase
@@ -2253,22 +2264,29 @@ async function convertURL(url: string): Promise<Array<string>> {
     }
 
     let html = await wretch(url).get().notFound(() => {return [url]}).text();
-    let gfycat = domino.createWindow(html).document.querySelectorAll(".upnext-item.active > a");
+    let gfycat = domino.createWindow(html).document.querySelectorAll("#video-" + gfycatMatch[1].toLocaleLowerCase() + " > source");
     if (gfycat.length > 0) {
-      let gfycatID = (gfycat[0] as any).href;
-      gfycatID = gfycatID.substring(gfycatID.lastIndexOf("/") + 1);
-      return ["https://giant.gfycat.com/" + gfycatID + ".mp4"];
-    } else {
-      gfycat = domino.createWindow(html).document.querySelectorAll("#webmSource");
-      if (gfycat.length > 0) {
-        return [(gfycat[0] as any).src];
+      for (let source of gfycat) {
+        if ((source as any).type == "video/webm") {
+          return [(source as any).src];
+        }
       }
-      gfycatMatch = null;
+      // Fallback to MP4
+      for (let source of gfycat) {
+        if ((source as any).type == "video/mp4" && !(source as any).src.endsWith("-mobile.mp4")) {
+          return [(source as any).src];
+        }
+      }
+      // Fallback to MP4-mobile
+      for (let source of gfycat) {
+        if ((source as any).type == "video/mp4") {
+          return [(source as any).src];
+        }
+      }
     }
   }
 
   // If this is redgif page, return redgif image
-  // TODO Fix
   let redgifMatch = url.match("^https?://(?:www\.)?redgifs\.com/watch/(\\w*)$");
   if (redgifMatch != null) {
     let fourOFour = false
@@ -2276,35 +2294,10 @@ async function convertURL(url: string): Promise<Array<string>> {
     if (fourOFour) {
       return [url];
     } else if (html) {
-      let redgif = domino.createWindow(html).document.querySelectorAll("#video-" + redgifMatch[1] + " > source");
-      if (redgif.length > 0) {
-        for (let source of redgif) {
-          if ((source as any).type == "video/webm") {
-            return [(source as any).src];
-          }
-        }
-        // Fallback to MP4
-        for (let source of redgif) {
-          if ((source as any).type == "video/mp4" && !(source as any).src.endsWith("-mobile.mp4")) {
-            return [(source as any).src];
-          }
-        }
-        // Fallback to MP4-mobile
-        for (let source of redgif) {
-          if ((source as any).type == "video/mp4") {
-            return [(source as any).src];
-          }
-        }
-      } else {
-        const fallbackRegex = /"webm":\s*\{[^}]*"url":\s*"([^,}]*)",?/.exec(html);
-        if (fallbackRegex != null) {
-          return [fallbackRegex[1].replace(/\\u002F/g,"/")];
-        } else {
-          redgifMatch = null;
-        }
+      let redgif = /<meta property="og:video" content="([^"]*)">/g.exec(html);
+      if (redgif != null) {
+        return [redgif[1]];
       }
-    } else {
-      redgifMatch = null;
     }
   }
 
@@ -2312,9 +2305,7 @@ async function convertURL(url: string): Promise<Array<string>> {
     pm({warning: "Possible missed file: " + url});
   }
 
-  if (!imgurMatch && !imgurAlbumMatch && !gfycatMatch && !redgifMatch) {
-    return [url];
-  }
+  return [url];
 }
 
 export function getSourceType(url: string): string {

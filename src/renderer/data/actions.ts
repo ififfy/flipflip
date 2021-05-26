@@ -12,6 +12,7 @@ import {IgApiClient} from "instagram-private-api";
 import {analyze} from "web-audio-beat-detector";
 import * as mm from "music-metadata";
 import request from "request";
+import moment from "moment";
 
 import {
   getBackups,
@@ -330,9 +331,53 @@ export function toggleDarkMode(state: State): Object {
   return {theme: newTheme};
 }
 
-export function cleanBackups() {
-  const backups = getBackups();
-  backups.shift(); // Keep the newest backup
+export function cleanBackups(config: Config) {
+  let backups = getBackups();
+  if (backups.length <= 1) return;
+  if (config.generalSettings.autoCleanBackup) {
+    let keepDays = [backups[0]], keepWeeks = [backups[0]], keepMonths = [backups[0]];
+
+    const convertFromEpoch = (backupFile: string) => {
+      const epochString = backupFile.substring(backupFile.lastIndexOf(".") + 1);
+      return new Date(Number.parseInt(epochString));
+    }
+
+    for (let backup of backups) {
+      let backupDate = convertFromEpoch(backup.url);
+      let lastDay = convertFromEpoch(keepDays[keepDays.length - 1].url);
+      let lastWeek = convertFromEpoch(keepWeeks[keepWeeks.length - 1].url);
+      let lastMonth = convertFromEpoch(keepMonths[keepMonths.length - 1].url);
+
+      if (moment(backupDate).isSame(lastDay, 'day')) {
+        if (backupDate < lastDay) {
+          keepDays[keepDays.length - 1]  = backup;
+        }
+      } else if (keepDays.length < config.generalSettings.autoCleanBackupDays) {
+        keepDays.push(backup);
+      }
+
+      if (moment(backupDate).isSame(lastWeek, 'week')) {
+        if (backupDate < lastWeek) {
+          keepWeeks[keepWeeks.length - 1]  = backup;
+        }
+      } else if (keepWeeks.length < config.generalSettings.autoCleanBackupWeeks) {
+        keepWeeks.push(backup);
+      }
+
+      if (moment(backupDate).isSame(lastMonth, 'month')) {
+        if (backupDate < lastWeek) {
+          keepMonths[keepMonths.length - 1]  = backup;
+        }
+      } else if (keepMonths.length < config.generalSettings.autoCleanBackupMonths) {
+        keepMonths.push(backup);
+      }
+    }
+    backups = backups.filter((b) => !keepDays.includes(b) && !keepWeeks.includes(b) && !keepMonths.includes(b));
+  } else {
+    for (let k = 0; k < config.generalSettings.cleanRetain; k++) {
+      backups.shift(); // Keep the K newest backups
+    }
+  }
   for (let backup of backups) {
     fs.unlinkSync(saveDir + path.sep + backup.url);
   }
@@ -519,6 +564,46 @@ export function addScene(state: State): Object {
   };
 }
 
+export function deleteScenes(state: State, sceneIDs: Array<number>): Object {
+  const deleteScenes = Array<number>();
+  const deleteGrids = Array<number>();
+  for (let sceneID of sceneIDs) {
+    if (sceneID.toString().startsWith("999")) {
+      const gridID = parseInt(sceneID.toString().replace("999", ""));
+      deleteGrids.push(gridID);
+    } else {
+      deleteScenes.push(sceneID);
+    }
+  }
+
+  const newScenes = state.scenes.filter((s: Scene) => !deleteScenes.includes(s.id));
+  for (let s of newScenes) {
+    if (deleteScenes.includes(s.nextSceneID)) {
+      s.nextSceneID = 0;
+    }
+    s.nextSceneRandoms = s.nextSceneRandoms.filter((s) => !deleteScenes.includes(s));
+    s.overlays = s.overlays.filter((o) => !deleteScenes.includes(o.sceneID) && (!o.sceneID.toString().startsWith("999") || !deleteGrids.includes(parseInt(o.sceneID.toString().replace("999", "")))));
+  }
+  const newGrids = state.grids.filter((g: SceneGrid) => !deleteGrids.includes(g.id));
+  for (let g of newGrids) {
+    for (let row of g.grid) {
+      row = row.map((sceneID) => {
+        if (deleteScenes.includes(sceneID)) {
+          return -1;
+        } else {
+          return sceneID;
+        }
+      });
+    }
+  }
+  return {
+    scenes: newScenes,
+    grids: newGrids,
+    route: Array<Route>(),
+    specialMode: null,
+  };
+}
+
 export function deleteScene(state: State, scene: Scene): Object {
   const newScenes = state.scenes.filter((s: Scene) => s.id != scene.id);
   for (let s of newScenes) {
@@ -550,7 +635,12 @@ export function deleteScene(state: State, scene: Scene): Object {
 
 export function deleteGrid(state: State, grid: SceneGrid): Object {
   const newGrids = state.grids.filter((g: SceneGrid) => g.id != grid.id);
+  const newScenes = state.scenes;
+  for (let s of newScenes) {
+    s.overlays = s.overlays.filter((o) => o.sceneID != parseInt("999" + grid.id.toString()));
+  }
   return {
+    scenes: newScenes,
     grids: newGrids,
     route: Array<Route>(),
     specialMode: null,

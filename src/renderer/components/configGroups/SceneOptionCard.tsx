@@ -683,7 +683,7 @@ class SceneOptionCard extends React.Component {
     if (id === "0") return "None";
     if (id === "-1") return "Random";
     if (id.startsWith('999')) {
-      return this.props.allSceneGrids.find((s) => s.id.toString() == id.replace('999', '')).name;
+      return this.props.allSceneGrids.find((s) => s.id.toString() == id.replace('999', ''))?.name;
     }
     return this.props.allScenes.find((s) => s.id.toString() === id).name;
   }

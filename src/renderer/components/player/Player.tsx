@@ -113,10 +113,6 @@ export default class Player extends React.Component {
         right: 0,
         bottom: 0,
         left: 0,
-        width: '104%',
-        height: '104%',
-        marginLeft: '-2%',
-        marginTop: '-2%',
         overflow: 'hidden',
       }
     } else {
@@ -145,6 +141,12 @@ export default class Player extends React.Component {
         left: 0,
         right: 0
       };
+    } else if (this.props.hasStarted ? this.props.hasStarted : this.state.hasStarted) {
+      playerStyle = {
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+      }
     }
     if (!this.state.hasStarted) {
       playerStyle = {
@@ -846,7 +848,7 @@ export default class Player extends React.Component {
   }
 
   play() {
-    this.setState({isPlaying: true, historyOffset: 0});
+    this.setState({isPlaying: true});
     this.start(this.state.canStart);
   }
 

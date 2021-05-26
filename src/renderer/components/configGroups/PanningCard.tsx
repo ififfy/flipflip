@@ -80,21 +80,12 @@ class PanningCard extends React.Component {
     return(
       <Grid container spacing={this.props.scene.panning ? 2 : 0} alignItems="center" className={clsx(this.props.tutorial != null && classes.disable)}>
         <Grid item xs={12}>
-          <Grid container alignItems="center">
-            <Grid item xs={11}>
-              <FormControlLabel
-                control={
-                  <Switch checked={this.props.scene.panning}
-                          onChange={this.onBoolInput.bind(this, 'panning')}/>
-                }
-                label="Panning"/>
-            </Grid>
-            <Grid item xs={1}>
-              <Typography variant="button">
-                BETA
-              </Typography>
-            </Grid>
-          </Grid>
+          <FormControlLabel
+            control={
+              <Switch checked={this.props.scene.panning}
+                      onChange={this.onBoolInput.bind(this, 'panning')}/>
+            }
+            label="Panning"/>
         </Grid>
         <Grid item xs={12}>
           <Collapse in={this.props.scene.panning} className={classes.fullWidth}>

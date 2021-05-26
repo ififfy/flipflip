@@ -883,7 +883,7 @@ class PlayerBars extends React.Component {
           if (process.platform === "win32") {
             remote.shell.openExternal(getCachePath(source, this.props.config));
           } else {
-            remote.shell.openExternal(urlToPath(getCachePath(source, this.props.config)));
+            remote.shell.openItem(getCachePath(source, this.props.config));
           }
         }
       }));

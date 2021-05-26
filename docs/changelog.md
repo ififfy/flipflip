@@ -1,5 +1,26 @@
 # Changelog
 
+## 3.1.3 <small>(05/21/2021)</small>
+- Scrape images in separate thread
+- Add top level error-page
+- Add ability to search for Scenes
+- Add new options for cleaning backups
+- Add ability to disable scene-delete confirmation
+- Add ability to batch delete scenes
+- Prevent playing same image consecutively, if possible
+- Prevent re-downloading of cached images
+- Improve core data.json saving, prevent leaving empty file
+- Improve ImageFap scraping and add captcha display
+- When restarting, continue playing from offset image
+- Fix bug with Imgur, GfyCat, and RedGifs URL resolution
+- Fix bug with Default Scene config
+- Fix bug with deleted grids being left in overlays
+- Fix bug with default cache path
+- Fix bug with concurrent Hydrus metadata requests
+- Fix bug with gif options not working for Hydrus
+- Fix bug with extra Hydrus arguments not be respected
+- Fix bug with Hydrus Session/API key
+
 ## 3.1.2 <small>(04/29/2021)</small>
 - Allow Play Full video to advance even when seeking
 - Fix subtitle styling and add to video clipper

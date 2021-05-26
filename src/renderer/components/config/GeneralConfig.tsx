@@ -82,7 +82,7 @@ export default class GeneralConfig extends React.Component {
                 settings={this.props.config.generalSettings}
                 onBackup={this.props.onBackup.bind(this)}
                 onRestore={this.props.onRestore.bind(this)}
-                onClean={this.props.onClean.bind(this)}
+                onClean={this.props.onClean.bind(this, this.props.config)}
                 onUpdateSettings={this.props.onUpdateGeneralSettings.bind(this)}/>
             </CardContent>
           </Card>

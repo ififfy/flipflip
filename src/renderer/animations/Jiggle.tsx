@@ -38,8 +38,8 @@ export default class Jiggle extends React.Component {
   readonly props: {
     bounce?: boolean,
     className?: string,
-    title?: string,
     style?: any,
+    disable?: boolean
     onClick?(): void,
     children?: React.ReactNode,
   };
@@ -61,31 +61,42 @@ export default class Jiggle extends React.Component {
   };
 
   shouldComponentUpdate(props: any, state: any): boolean {
-    return ((this.state.hasStarted !== state.hasStarted) ||
-      (this.state.jiggling !== state.jiggling) ||
-      (this.props.className !== props.className));
+    return this.state.hasStarted !== state.hasStarted ||
+      this.state.jiggling !== state.jiggling ||
+      this.props.disable !== props.disable ||
+      this.props.className !== props.className;
   }
 
   render() {
-    return (
-      <JiggleAnimation
-        reset
-        native
-        started={this.state.hasStarted}
-        bounce={this.props.bounce ? this.props.bounce : false}
-        onRest={this.stopJiggle.bind(this)}>
-        {(props: any) => (
-          <animated.div
-            className={this.props.className}
-            style={this.props.style ? {...props,...this.props.style} : props}
-            title={this.props.title}
-            onMouseEnter={this.jiggle.bind(this)}
-            onClick={this.props.onClick}>
-            {this.props.children}
-          </animated.div>
-        )}
-      </JiggleAnimation>
-    )
+    if (this.props.disable) {
+      return (
+        <div
+          className={this.props.className}
+          style={this.props.style}
+          onClick={this.props.onClick}>
+          {this.props.children}
+        </div>
+      );
+    } else {
+      return (
+        <JiggleAnimation
+          reset
+          native
+          started={this.state.hasStarted}
+          bounce={this.props.bounce ? this.props.bounce : false}
+          onRest={this.stopJiggle.bind(this)}>
+          {(props: any) => (
+            <animated.div
+              className={this.props.className}
+              style={this.props.style ? {...props, ...this.props.style} : props}
+              onMouseEnter={this.jiggle.bind(this)}
+              onClick={this.props.onClick}>
+              {this.props.children}
+            </animated.div>
+          )}
+        </JiggleAnimation>
+      );
+    }
   }
 }
 

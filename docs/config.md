@@ -26,6 +26,8 @@ These settings control various player options.
 * `Show Adv Easing Controls` - enables controls for advanced [easings](effects.md) in effects
 * `Show Audio Info` - when enabled, [audio information](audio_tagging#tagging-a-track) will appear during playback when a track changes.
   * _This only ever applies to the first playlist_
+---
+* `Confirm Scene Delete` - Disabling this will hide the confirmation dialog when deleting a Scene.
 * `Portable Mode` - Portable Mode will save a copy of your data in the same directory as the FlipFlip executable, 
 as well as the default save path. This needs to be enabled on each machine.
   * `Disable Local Saves` - When this is on, FlipFlip will _only_ save its data to the folder with the FlipFlip 
@@ -123,6 +125,10 @@ Backup your FlipFlip data or restore from a previous backup.
 #### Auto Backup
 Turn this on to automatically create a backup every time the number of configured days passes.
 
+#### Auto Clean
+Turn this on to automatically clean backups according to the configured settings. Will keep 1 backups from each of the
+configured time-periods.
+
 #### Backup Data
 This creates a backup with all your current FlipFlip data (preferences, library, scenes, etc.)
 
@@ -131,7 +137,8 @@ A dialog will appear with a list the your FlipFlip backups (by date/time). Selec
 restore and click `Restore`
 
 #### Clean Backups
-Backups might build up over time. Click `Clean Backups` to delete all but the most recent backup.
+Backups might build up over time. Click `Clean Backups` to clean your backups. If you have Auto-Clean enabled, this will
+use your configured rules. If Auto-Clean is off, you can choose how many of the most recent backups you'd like to keep.
 
 ## Theme
 The FlipFlip UI allows you to customize the **Primary** and **Secondary** colors. You can also toggle Dark Mode on/off here

@@ -6,8 +6,8 @@ import {
 } from "@material-ui/core";
 import {ThemeProvider} from "@material-ui/styles";
 
-import {getCachePath} from "../data/utils";
 import {IPC, SP} from "../data/const";
+import {getCachePath} from "../data/utils";
 import * as actions from '../data/actions';
 import ErrorBoundary from "../../main/ErrorBoundary";
 import AppStorage from '../data/AppStorage';
@@ -25,7 +25,6 @@ import Tutorial from "./Tutorial";
 import AudioLibrary from "./library/AudioLibrary";
 import CaptionScriptor from "./sceneDetail/CaptionScriptor";
 import ScriptLibrary from "./library/ScriptLibrary";
-
 const appStorage = new AppStorage(remote.getCurrentWindow().id);
 
 export default class Meta extends React.Component {
@@ -146,6 +145,7 @@ export default class Meta extends React.Component {
                 onAddGrid={a(actions.addGrid)}
                 onAddScene={a(actions.addScene)}
                 onChangeTab={a(actions.changeScenePickerTab)}
+                onDeleteScenes={a(actions.deleteScenes)}
                 onImportScene={a(actions.importScene)}
                 onOpenConfig={a(actions.openConfig)}
                 onOpenAudioLibrary={a(actions.openAudios)}
