@@ -5,11 +5,9 @@ import worker from 'workerize-loader!./Scrapers';
 import recursiveReaddir from "recursive-readdir";
 import fileURL from "file-url";
 import wretch from "wretch";
+import uuidv4 from "uuid/v4";
 
-import {
-  getCachePath,
-  randomizeList,
-} from "../../data/utils";
+import {getCachePath, randomizeList} from "../../data/utils";
 import {filterPathsToJustPlayable, getFileName, getSourceType, isVideo, processAllURLs} from "./Scrapers";
 import {IF, SOF, ST} from '../../data/const';
 import Config from "../../data/Config";
@@ -18,6 +16,7 @@ import Scene from '../../data/Scene';
 import Audio from "../../data/Audio";
 import ChildCallbackHack from './ChildCallbackHack';
 import ImagePlayer from './ImagePlayer';
+import {Dialog, DialogContent} from "@material-ui/core";
 
 let workerInstance: any = null;
 let workerListener: any = null;
@@ -30,16 +29,14 @@ function isEmpty(allURLs: any[]): boolean {
 }
 
 // Determine what kind of source we have based on the URL and return associated Promise
-function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}) {
+function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) {
   const sourceType = getSourceType(source.url);
   if (sourceType == ST.local) { // Local files
-    helpers.next = null;
     loadLocalDirectory(pm, allURLs, config, source, filter, weight, helpers, null);
   } else if (sourceType == ST.list) { // Image List
     helpers.next = null;
     worker.loadRemoteImageURLList(allURLs, config, source, filter, weight, helpers);
   } else if (sourceType == ST.video) {
-    helpers.next = null;
     const cachePath = getCachePath(source.url, config) + getFileName(source.url);
     if (config.caching.enabled && fs.existsSync(cachePath)) {
       loadVideo(pm, allURLs, config, source, filter, weight, helpers, cachePath);
@@ -47,7 +44,6 @@ function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<strin
       loadVideo(pm, allURLs, config, source, filter, weight, helpers, null);
     }
   } else if (sourceType == ST.playlist) {
-    helpers.next = null;
     const cachePath = getCachePath(source.url, config) + getFileName(source.url);
     if (config.caching.enabled && fs.existsSync(cachePath)) {
       loadPlaylist(pm, allURLs, config, source, filter, weight, helpers, cachePath);
@@ -104,7 +100,7 @@ function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<strin
   }
 }
 
-const loadLocalDirectory = (pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}, cachePath: string) => {
+const loadLocalDirectory = (pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, cachePath: string) => {
   const blacklist = ['*.css', '*.html', 'avatar.png', '*.txt'];
   const url = cachePath ? cachePath : source.url;
 
@@ -117,11 +113,6 @@ const loadLocalDirectory = (pm: Function, allURLs: Map<string, Array<string>>, c
         timeout: 0,
       }});
     } else {
-      // If this is a local source (not a cacheDir call)
-      if (helpers.next == null) {
-        helpers.count = filterPathsToJustPlayable(IF.any, rawFiles, true).length;
-      }
-
       let sources = filterPathsToJustPlayable(filter, rawFiles, true).map((p) => fileURL(p)).sort((a, b) => {
         let aFile: any = getFileName(a, false);
         if (parseInt(aFile)) {
@@ -144,6 +135,11 @@ const loadLocalDirectory = (pm: Function, allURLs: Map<string, Array<string>>, c
         sources = sources.filter((url: string) => !source.blacklist.includes(url));
       }
       allURLs = processAllURLs(sources, allURLs, source, weight, helpers);
+      // If this is a local source (not a cacheDir call)
+      if (helpers.next == -1) {
+        helpers.count = filterPathsToJustPlayable(IF.any, rawFiles, true).length;
+        helpers.next = null;
+      }
 
       pm({data: {
         data: sources,
@@ -157,7 +153,7 @@ const loadLocalDirectory = (pm: Function, allURLs: Map<string, Array<string>>, c
   });
 }
 
-export const loadVideo = (pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}, cachePath: string) => {
+export const loadVideo = (pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, cachePath: string) => {
   const url = cachePath ? cachePath : source.url;
   const missingVideo = () => {
     pm({data: {
@@ -200,6 +196,7 @@ export const loadVideo = (pm: Function, allURLs: Map<string, Array<string>>, con
       paths = paths.filter((url: string) => !source.blacklist.includes(url));
     }
     allURLs = processAllURLs(paths, allURLs, source, weight, helpers);
+    helpers.next = null;
 
     pm({data: {
       data: paths,
@@ -233,7 +230,7 @@ export const loadVideo = (pm: Function, allURLs: Map<string, Array<string>>, con
   }
 }
 
-export const loadPlaylist = (pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number}, cachePath: string) => {
+export const loadPlaylist = (pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, cachePath: string) => {
   const url = cachePath ? cachePath : source.url;
   wretch(url)
     .get()
@@ -275,6 +272,7 @@ export const loadPlaylist = (pm: Function, allURLs: Map<string, Array<string>>, 
         urls = urls.filter((url: string) => !source.blacklist.includes(url));
       }
       allURLs = processAllURLs(urls, allURLs, source, weight, helpers);
+      helpers.next = null;
 
       pm({data: {
         data: urls,
@@ -328,17 +326,31 @@ export default class SourceScraper extends React.Component {
     restart: false,
     preload: false,
     videoVolume: this.props.scene.videoVolume,
+    captcha: null as any,
+    load: false,
   };
 
   _isMounted = false;
   _backForth: NodeJS.Timeout = null;
-  _promiseQueue: Array<{source: LibrarySource, helpers: {next: any, count: number, retries: number}}> = null;
-  _nextPromiseQueue: Array<{source: LibrarySource, helpers: {next: any, count: number, retries: number}}> = null;
+  _promiseQueue: Array<{source: LibrarySource, helpers: {next: any, count: number, retries: number, uuid: string}}> = null;
+  _nextPromiseQueue: Array<{source: LibrarySource, helpers: {next: any, count: number, retries: number, uuid: string}}> = null;
   _nextAllURLs: Map<string, Array<string>> = null;
 
   render() {
+    let style: any = {opacity: this.props.opacity};
+    if (this.props.gridView) {
+      style = {
+        ...style,
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: this.props.isOverlay ? 4 : 'auto',
+      }
+    }
     return (
-      <div style={{opacity: this.props.opacity}}>
+      <div style={style}>
 
         {this.state.allURLs.size > 0 && this.state.restart == false && (
           <ImagePlayer
@@ -363,18 +375,40 @@ export default class SourceScraper extends React.Component {
             cache={this.props.cache}
             playNextScene={this.props.playNextScene}
             setTimeToNextFrame={this.props.setTimeToNextFrame}/>)}
+        {this.state.captcha != null && (
+          <Dialog
+            open={true}
+            onClose={this.onCloseDialog.bind(this)}>
+            <DialogContent style={{height: 600}}>
+              <iframe sandbox="allow-forms" src={this.state.captcha.captcha} height={"100%"} onLoad={this.onIFrameLoad.bind(this)}/>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     );
+  }
+
+  onIFrameLoad() {
+    if (!this.state.load) {
+      this.setState({load: true});
+    } else {
+      this.onCloseDialog();
+    }
+  }
+
+  onCloseDialog() {
+    this.setState({captcha: null, load: false});
   }
 
   componentDidMount(restart = false) {
     this._isMounted = true;
     // Create an instance of your worker
+    const uuid = uuidv4();
     workerInstance = worker();
     if (!restart) {
       workerInstance.reset();
-      this._promiseQueue = new Array<{ source: LibrarySource, helpers: {next: any, count: number, retries: number} }>();
-      this._nextPromiseQueue = new Array<{ source: LibrarySource, helpers: {next: any, count: number, retries: number} }>();
+      this._promiseQueue = new Array<{ source: LibrarySource, helpers: {next: any, count: number, retries: number, uuid: string} }>();
+      this._nextPromiseQueue = new Array<{ source: LibrarySource, helpers: {next: any, count: number, retries: number, uuid: string} }>();
       this._nextAllURLs = new Map<string, Array<string>>();
     }
     let n = 0;
@@ -448,10 +482,14 @@ export default class SourceScraper extends React.Component {
 
       const receiveMessage = (message: any) => {
         let object = message.data;
-        if (object?.type == "RPC") return;
+        if (object?.type == "RPC" || (object?.helper != null && object.helpers.uuid != uuid)) return;
+
+        if (object?.captcha != null && this.state.captcha == null) {
+          this.setState({captcha: {captcha: object.captcha, source: object?.source, helpers: object?.helpers}});
+        }
 
         if (object?.error != null) {
-          console.error("Error retrieving " + object?.source.url + (object?.helpers.next > 0 ? "Page " + object.helpers.next : ""));
+          console.error("Error retrieving " + object?.source?.url + (object?.helpers?.next > 0 ? "Page " + object.helpers.next : ""));
           console.error(object.error);
         }
 
@@ -482,7 +520,7 @@ export default class SourceScraper extends React.Component {
           if (n < sceneSources.length) {
             const timeout = object?.timeout != null ? object.timeout : 1000;
             if (timeout == 0) {
-              setImmediate(sourceLoop, timeout);
+              setImmediate(sourceLoop);
             } else {
               setTimeout(sourceLoop, timeout);
             }
@@ -504,7 +542,7 @@ export default class SourceScraper extends React.Component {
       }
       workerListener = receiveMessage.bind(this);
       workerInstance.addEventListener('message', workerListener);
-      scrapeFiles(workerInstance, workerListener, this.state.allURLs, this.props.config, d, this.props.scene.imageTypeFilter, this.props.scene.weightFunction, {next: -1, count: 0, retries: 0})
+      scrapeFiles(workerInstance, workerListener, this.state.allURLs, this.props.config, d, this.props.scene.imageTypeFilter, this.props.scene.weightFunction, {next: -1, count: 0, retries: 0, uuid: uuid})
     };
 
     let nextSourceLoop = () => {
@@ -522,10 +560,10 @@ export default class SourceScraper extends React.Component {
 
       const receiveMessage = (message: any) => {
         let object = message.data;
-        if (object?.type == "RPC") return;
+        if (object?.type == "RPC" || (object?.helper != null && object.helpers.uuid != uuid)) return;
 
         if (object?.error != null) {
-          console.error("Error retrieving " + object?.source.url + (object?.helpers.next > 0 ? "Page " + object.helpers.next : ""));
+          console.error("Error retrieving " + object?.source?.url + (object?.helpers?.next > 0 ? "Page " + object.helpers.next : ""));
           console.error(object.error);
         }
 
@@ -553,7 +591,7 @@ export default class SourceScraper extends React.Component {
           }
 
           if (n < nextSources.length) {
-            setTimeout(nextSourceLoop, object.timeout);
+            setTimeout(nextSourceLoop, object.timeout != null ? object.timeout : 1000);
           }
         }
       }
@@ -564,12 +602,20 @@ export default class SourceScraper extends React.Component {
       }
       nextWorkerListener = receiveMessage.bind(this);
       nextWorkerInstance.addEventListener('message', nextWorkerListener);
-      scrapeFiles(nextWorkerInstance, nextWorkerListener, this._nextAllURLs, this.props.config, d, this.props.nextScene.imageTypeFilter, this.props.nextScene.weightFunction, {next: -1, count: 0, retries: 0});
+      scrapeFiles(nextWorkerInstance, nextWorkerListener, this._nextAllURLs, this.props.config, d, this.props.nextScene.imageTypeFilter, this.props.nextScene.weightFunction, {next: -1, count: 0, retries: 0, uuid: uuid});
     };
 
     let promiseLoop = () => {
+      if (this.state.captcha != null && this._promiseQueue.length == 0) {
+        setTimeout(promiseLoop, 2000);
+      }
       // Process until queue is empty or player has been stopped
-      if (!this._isMounted || this._promiseQueue.length == 0)  return;
+      if (!this._isMounted || this._promiseQueue.length == 0)  {
+        if (workerListener != null) {
+          workerInstance?.removeEventListener('message', workerListener);
+        }
+        return;
+      }
 
       if (!this.props.isPlaying) {
         setTimeout(promiseLoop, 500);
@@ -578,10 +624,14 @@ export default class SourceScraper extends React.Component {
 
       const receiveMessage = (message: any) => {
         let object = message.data;
-        if (object?.type == "RPC") return;
+        if (object?.type == "RPC" || (object?.helper != null && object.helpers.uuid != uuid)) return;
+
+        if (object?.captcha != null && this.state.captcha == null) {
+          this.setState({captcha: {captcha: object.captcha, source: object?.source, helpers: object?.helpers}});
+        }
 
         if (object?.error != null) {
-          console.error("Error retrieving " + object?.source.url + (object?.helpers.next > 0 ? "Page " + object.helpers.next : ""));
+          console.error("Error retrieving " + object?.source?.url + (object?.helpers?.next > 0 ? "Page " + object.helpers.next : ""));
           console.error(object.error);
         }
 
@@ -643,8 +693,9 @@ export default class SourceScraper extends React.Component {
       props.strobeLayer !== this.props.strobeLayer ||
       props.hasStarted !== this.props.hasStarted ||
       props.gridView !== this.props.gridView ||
+      state.captcha !== this.state.captcha ||
       state.restart !== this.state.restart ||
-      (state.allURLs.size > 0 && this.state.allURLs.size == 0);
+      state.allURLs != this.state.allURLs;
   }
 
   componentDidUpdate(props: any, state: any) {
@@ -675,11 +726,11 @@ export default class SourceScraper extends React.Component {
             preload: true,
             restart: true
           });
-          this._nextPromiseQueue = Array<{source: LibrarySource, helpers: {next: any, count: number, retries: number}}>();
+          this._nextPromiseQueue = Array<{source: LibrarySource, helpers: {next: any, count: number, retries: number, uuid: string}}>();
           this._nextAllURLs = new Map<string, Array<string>>();
         }
       } else {
-        this._promiseQueue = Array<{ source: LibrarySource, helpers: {next: any, count: number, retries: number}}>();
+        this._promiseQueue = Array<{ source: LibrarySource, helpers: {next: any, count: number, retries: number, uuid: string}}>();
         this.setState({
           allURLs: new Map<string, Array<string>>(),
           preload: false,

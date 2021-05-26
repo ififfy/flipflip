@@ -1,6 +1,7 @@
-import { mkdirSync, existsSync, readFileSync, renameSync, writeFileSync } from 'fs';
+import { copyFileSync, mkdirSync, existsSync, readFileSync, renameSync, writeFile } from 'fs';
 
 import {getBackups, portablePath, removeDuplicatesBy, saveDir, savePath} from "./utils";
+import {cleanBackups} from "./actions";
 import { Route } from './Route';
 import {TT} from "./const";
 import Audio from "./Audio";
@@ -62,7 +63,7 @@ export const defaultInitialState = {
  */
 function archiveFile(filePath: string): void {
   if (existsSync(filePath)) {
-    renameSync(filePath, (filePath + '.' + Date.now()));
+    copyFileSync(filePath, (filePath + '.' + Date.now()));
   }
 }
 
@@ -79,8 +80,6 @@ export default class AppStorage {
     try {
       let data;
       let portableMode = false;
-      // If only a portable data file exists and portableMode AND disableLocalSave are enabled, use that data file
-      // Otherwise, fallback to the local file
       if (!existsSync(savePath) && existsSync(portablePath)) {
         data = JSON.parse(readFileSync(portablePath, 'utf-8'));
         if (!data.config.generalSettings.portableMode) {
@@ -97,12 +96,22 @@ export default class AppStorage {
           data = JSON.parse(readFileSync(portablePath, 'utf-8'));
         }
       }
+
+      if (portableMode) {
+        if (existsSync(`${portablePath}.new`)) console.warn("FOUND OLD SAVE");
+      } else {
+        if (existsSync(`${savePath}.new`)) console.warn("FOUND OLD SAVE");
+      }
+
+      if (data.version != __VERSION__) {
+        // Preserve the existing file - so as not to destroy user's data
+        archiveFile(portableMode ? portablePath : savePath);
+      }
+
       switch (data.version) {
         // When no version number found in data.json -- assume pre-v2.0.0 format
         // This should fail safe and self heal.
         case undefined:
-          // Preserve the existing file - so as not to destroy user's data
-          archiveFile(portableMode ? portablePath : savePath);
           // Create Library from aggregate of previous scenes' directories
           let sources = Array<string>();
           for (let scene of data.scenes) {
@@ -407,14 +416,25 @@ export default class AppStorage {
     }
   }
 
+  writeFileTransactional (path: any, content: any) {
+    let temporaryPath = `${path}.new`;
+    writeFile(temporaryPath, content, function (err) {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      renameSync(temporaryPath, path);
+    });
+  };
+
   save(state: any) {
     if (state.config.generalSettings.portableMode) {
-      writeFileSync(portablePath, JSON.stringify(state), 'utf-8');
+      this.writeFileTransactional(portablePath, JSON.stringify(state));
       if (!state.config.generalSettings.disableLocalSave) {
-        writeFileSync(savePath, JSON.stringify(state), 'utf-8');
+        this.writeFileTransactional(savePath, JSON.stringify(state));
       }
     } else {
-      writeFileSync(savePath, JSON.stringify(state), 'utf-8');
+      this.writeFileTransactional(savePath, JSON.stringify(state));
     }
 
     if (state.config.generalSettings.autoBackup) {
@@ -427,6 +447,15 @@ export default class AppStorage {
         if (Date.now()  - epoch > (86400000 * state.config.generalSettings.autoBackupDays)) {
           this.backup(state);
         }
+      }
+    }
+
+    if (state.config.generalSettings.autoCleanBackup) {
+      const backups = getBackups();
+      const lastBackup = backups[0];
+      const epoch = parseInt(lastBackup.url.substring(lastBackup.url.lastIndexOf(".") + 1));
+      if (Date.now()  - epoch > (86400000 * state.config.generalSettings.autoBackupDays)) {
+        cleanBackups(state.config);
       }
     }
 

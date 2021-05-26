@@ -72,7 +72,7 @@ This section controls the strobe effect.  This effect restarts when the displaye
     </div>
 </div>
 
-## Fade In/Out BETA
+## Fade In/Out
 This section controls the fade in/out effect. This effect is continuous and will continue even if the displayed image 
 changes.
 * Choose fade in/out on/off. Control fade in/out time (ms).
@@ -89,10 +89,7 @@ changes.
     </div>
 </div>
 
-?> This is a BETA effect and may produce unexpected results when used with more complex timing functions or in 
-combination with other effects.
-
-## Panning BETA
+## Panning
 This section controls the panning effect. This effect is continuous and will continue even if the displayed image 
 changes.
 * Choose panning on/off.
@@ -112,6 +109,3 @@ changes.
         <div>Using the <b>Linear</b> easing for start and the <b>Bounce Out</b> easing for end</div>
     </div>
 </div>
-
-?> This is a BETA effect and may produce unexpected results when used with more complex timing functions or in 
-combination with other effects.

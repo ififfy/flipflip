@@ -248,8 +248,14 @@ interface GeneralSettingsI {
 
   portableMode: boolean;
   disableLocalSave: boolean;
+  confirmSceneDeletion: boolean;
   autoBackup: boolean;
   autoBackupDays: number;
+  autoCleanBackup: boolean;
+  autoCleanBackupDays: number;
+  autoCleanBackupWeeks: number;
+  autoCleanBackupMonths: number;
+  cleanRetain: number;
   watermark: boolean;
   watermarkCorner: string;
   watermarkText: string;
@@ -537,8 +543,14 @@ export class GeneralSettings  implements GeneralSettingsI {
 
   portableMode = false;
   disableLocalSave = false;
+  confirmSceneDeletion = true;
   autoBackup = false;
   autoBackupDays = 1;
+  autoCleanBackup = false;
+  autoCleanBackupDays = 14;
+  autoCleanBackupWeeks = 8;
+  autoCleanBackupMonths = 6;
+  cleanRetain = 1;
   watermark = false;
   watermarkCorner = WC.bottomRight;
   watermarkText = "";

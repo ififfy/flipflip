@@ -1171,7 +1171,11 @@ class SceneDetail extends React.Component {
   }
 
   onDeleteScene() {
-    this.setState({openMenu: MO.deleteAlert});
+    if (this.props.config.generalSettings.confirmSceneDeletion) {
+      this.setState({openMenu: MO.deleteAlert});
+    } else {
+      this.props.onDelete(this.props.scene);
+    }
   }
 
   onFinishDeleteScene() {

@@ -14,7 +14,9 @@ import AddIcon from '@material-ui/icons/Add';
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import CasinoIcon from '@material-ui/icons/Casino';
+import CloseIcon from '@material-ui/icons/Close';
 import CodeIcon from '@material-ui/icons/Code';
+import DeleteIcon from '@material-ui/icons/Delete';
 import GetAppIcon from '@material-ui/icons/GetApp';
 import GridOnIcon from '@material-ui/icons/GridOn';
 import HelpIcon from '@material-ui/icons/Help';
@@ -38,6 +40,7 @@ import Scene from "../data/Scene";
 import Jiggle from "../animations/Jiggle";
 import VSpin from "../animations/VSpin";
 import SceneGrid from "../data/SceneGrid";
+import SceneSearch from "../SceneSearch";
 
 const drawerWidth = 240;
 
@@ -183,6 +186,18 @@ const styles = (theme: Theme) => createStyles({
     marginRight: theme.spacing(1),
     marginBottom: theme.spacing(1),
   },
+  deleteScene: {
+    backgroundColor: theme.palette.error.main,
+  },
+  deleteButton: {
+    backgroundColor: theme.palette.error.main,
+    margin: 0,
+    top: 'auto',
+    right: 20,
+    bottom: 20,
+    left: 'auto',
+    position: 'fixed',
+  },
   addMenuButton: {
     backgroundColor: theme.palette.primary.dark,
     margin: 0,
@@ -258,6 +273,10 @@ const styles = (theme: Theme) => createStyles({
   },
   importSceneButton: {
     marginBottom: 225,
+  },
+  deleteScenesButton: {
+    marginBottom: 280,
+    backgroundColor: theme.palette.error.main,
   },
   addButtonClose: {
     marginBottom: 0,
@@ -345,6 +364,7 @@ class ScenePicker extends React.Component {
     onAddGrid(): void,
     onAddScene(): void,
     onChangeTab(newTab: number): void,
+    onDeleteScenes(sceneIDs: Array<number>): void,
     onImportScene(addToLibrary: boolean): void,
     onOpenConfig(): void,
     onOpenAudioLibrary(): void,
@@ -368,6 +388,10 @@ class ScenePicker extends React.Component {
     isFirstWindow: false,
     menuAnchorEl: null as any,
     openMenu: null as string,
+    displayScenes: Array<Scene>(),
+    displayGrids: Array<SceneGrid>(),
+    filters: Array<string>(),
+    deleteScenes: null as Array<number>,
   };
 
   render() {
@@ -407,6 +431,11 @@ class ScenePicker extends React.Component {
                 </IconButton>
               </Tooltip>
             )}
+            <SceneSearch
+              displaySources={this.state.displayScenes}
+              filters={this.state.filters}
+              placeholder={"Search ..."}
+              onUpdateFilters={this.onUpdateFilters.bind(this)}/>
           </Toolbar>
         </AppBar>
 
@@ -613,12 +642,12 @@ class ScenePicker extends React.Component {
                     this.props.onUpdateScenes(newScenes);
                   }}>
                   {this.props.scenes.map((scene) => {
-                    if (scene.generatorWeights) return <div key={scene.id}/>;
+                    if (scene.generatorWeights || !this.state.displayScenes.includes(scene)) return <div key={scene.id}/>;
                     else {
                       return (
-                        <Jiggle key={scene.id} bounce className={classes.scene}>
-                          <Card>
-                            <CardActionArea onClick={this.props.onOpenScene.bind(this, scene)}>
+                        <Jiggle key={scene.id} bounce disable={this.state.deleteScenes?.includes(scene.id)} className={classes.scene}>
+                          <Card className={clsx(this.state.deleteScenes?.includes(scene.id) && classes.deleteScene)}>
+                            <CardActionArea onClick={this.state.deleteScenes == null ? this.props.onOpenScene.bind(this, scene) : this.onToggleDelete.bind(this, scene.id)}>
                               <CardContent>
                                 <Typography component="h2" variant="h6">
                                   {scene.name}
@@ -653,12 +682,12 @@ class ScenePicker extends React.Component {
                     this.props.onUpdateScenes(newScenes);
                   }}>
                   {this.props.scenes.map((scene) => {
-                    if (!scene.generatorWeights) return <div key={scene.id}/>;
+                    if (!scene.generatorWeights || !this.state.displayScenes.includes(scene)) return <div key={scene.id}/>;
                     else {
                       return (
-                        <Jiggle key={scene.id} bounce className={classes.scene}>
-                          <Card>
-                            <CardActionArea onClick={this.props.onOpenScene.bind(this, scene)}>
+                        <Jiggle key={scene.id} bounce disable={this.state.deleteScenes?.includes(scene.id)} className={classes.scene}>
+                          <Card className={clsx(this.state.deleteScenes?.includes(scene.id) && classes.deleteScene)}>
+                            <CardActionArea onClick={this.state.deleteScenes == null ? this.props.onOpenScene.bind(this, scene) : this.onToggleDelete.bind(this, scene.id)}>
                               <CardContent>
                                 <Typography component="h2" variant="h6">
                                   {scene.name}
@@ -692,10 +721,10 @@ class ScenePicker extends React.Component {
                     arrayMove(newGrids, evt.oldIndex, evt.newIndex);
                     this.props.onUpdateGrids(newGrids);
                   }}>
-                  {this.props.grids.map((grid) =>
-                    <Jiggle key={grid.id} bounce className={classes.scene}>
-                      <Card>
-                        <CardActionArea onClick={this.props.onOpenGrid.bind(this, grid)}>
+                  {this.state.displayGrids.map((grid) =>
+                    <Jiggle key={grid.id} bounce disable={this.state.deleteScenes?.includes(parseInt("999" + grid.id))} className={classes.scene}>
+                      <Card className={clsx(this.state.deleteScenes?.includes(parseInt("999" + grid.id)) && classes.deleteScene)}>
+                        <CardActionArea onClick={this.state.deleteScenes == null ? this.props.onOpenGrid.bind(this, grid) : this.onToggleDelete.bind(this, parseInt("999" + grid.id))}>
                           <CardContent>
                             <Typography component="h2" variant="h6">
                               {grid.name}
@@ -712,115 +741,150 @@ class ScenePicker extends React.Component {
           </Container>
         </main>
 
-        {this.state.isFirstWindow &&  (
+        {this.state.deleteScenes != null && (
           <React.Fragment>
-            <Tooltip title="Import Scene"  placement="left">
+            <Tooltip title={"Delete Selected Scenes"}>
               <Fab
-                className={clsx(classes.addButton, classes.importSceneButton, this.state.openMenu != MO.new && classes.addButtonClose)}
-                onClick={this.onImportScene.bind(this)}
-                size="small">
-                <GetAppIcon className={classes.icon} />
+                className={classes.deleteButton}
+                onClick={this.onFinishDelete.bind(this)}
+                size="large">
+                <DeleteIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip title="Add Scene Grid"  placement="left">
-              <span className={classes.gridTooltip} style={!this.props.canGrid ? { pointerEvents: "none" } : {}}>
-                <Fab
-                  className={clsx(classes.addButton, classes.addGridButton, this.state.openMenu != MO.new && classes.addButtonClose)}
-                  onClick={this.props.onAddGrid.bind(this)}
-                  disabled={!this.props.canGrid}
-                  size="small">
-                  <GridOnIcon className={classes.icon} />
-                </Fab>
-              </span>
-            </Tooltip>
-            <Tooltip title="Add Scene Generator"  placement="left">
-              <span className={classes.generateTooltip} style={!this.props.canGenerate ? { pointerEvents: "none" } : {}}>
-                <Fab
-                  className={clsx(classes.addButton, classes.addGeneratorButton, this.state.openMenu != MO.new && classes.addButtonClose)}
-                  onClick={this.props.onAddGenerator.bind(this)}
-                  disabled={!this.props.canGenerate}
-                  size="small">
-                  <MovieFilterIcon className={classes.icon} />
-                </Fab>
-              </span>
-            </Tooltip>
-            <Tooltip title="Add Scene"  placement="left">
+            <Tooltip title={"Cancel Delete"}>
               <Fab
-                className={clsx(classes.addButton, classes.addSceneButton, this.state.openMenu != MO.new && classes.addButtonClose, this.props.tutorial == SPT.add2 && clsx(classes.backdropTop, classes.highlight))}
-                onClick={this.onAddScene.bind(this)}
-                size="small">
-                <MovieIcon className={classes.icon} />
+                className={classes.sortMenuButton}
+                onClick={this.onCancelDelete.bind(this)}
+                size="medium">
+                <CloseIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Fab
-              className={clsx(classes.addMenuButton, (this.props.tutorial == SPT.add1 || this.props.tutorial == SPT.add2) && classes.backdropTop, this.props.tutorial == SPT.add1 && classes.highlight)}
-              onClick={this.onToggleNewMenu.bind(this)}
-              size="large">
-              <AddIcon className={classes.icon} />
-            </Fab>
-
-            {this.props.scenes.length >= 2 && (
-              <React.Fragment>
-                <Fab
-                  className={classes.sortMenuButton}
-                  aria-haspopup="true"
-                  aria-controls="sort-menu"
-                  aria-label="Sort Scenes"
-                  onClick={this.onOpenSortMenu.bind(this)}
-                  size="medium">
-                  <SortIcon className={classes.icon} />
-                </Fab>
-                <Menu
-                  id="sort-menu"
-                  elevation={1}
-                  anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'center',
-                  }}
-                  transformOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'right',
-                  }}
-                  getContentAnchorEl={null}
-                  anchorEl={this.state.menuAnchorEl}
-                  keepMounted
-                  classes={{paper: classes.sortMenu}}
-                  open={this.state.openMenu == MO.sort}
-                  onClose={this.onCloseDialog.bind(this)}>
-                  {[SF.alpha, SF.date, SF.count].map((sf) =>
-                    <MenuItem key={sf}>
-                      <ListItemText primary={en.get(sf)}/>
-                      <ListItemSecondaryAction>
-                        <IconButton edge="end" onClick={this.props.onSort.bind(this, sf, true)}>
-                          <ArrowUpwardIcon/>
-                        </IconButton>
-                        <IconButton edge="end" onClick={this.props.onSort.bind(this, sf, false)}>
-                          <ArrowDownwardIcon/>
-                        </IconButton>
-                      </ListItemSecondaryAction>
-                    </MenuItem>
-                  )}
-                  <MenuItem key={SF.random}>
-                    <ListItemText primary={en.get(SF.random)}/>
-                    <ListItemSecondaryAction>
-                      <IconButton edge="end" onClick={this.props.onSort.bind(this, SF.random, true)}>
-                        <ShuffleIcon/>
-                      </IconButton>
-                    </ListItemSecondaryAction>
-                  </MenuItem>
-                </Menu>
-              </React.Fragment>
-            )}
           </React.Fragment>
         )}
-        <Tooltip title="Random Scene">
-          <Fab
-            className={clsx(classes.randomButton, !this.state.isFirstWindow && classes.extraWindowRandomButton)}
-            onClick={this.onRandomScene.bind(this)}
-            size="small">
-            <CasinoIcon className={classes.icon} />
-          </Fab>
-        </Tooltip>
+
+        {this.state.deleteScenes == null && (
+          <React.Fragment>
+            {this.state.isFirstWindow &&  (
+              <React.Fragment>
+                {this.props.scenes.length > 0 && (
+                  <Tooltip title="Delete Scenes"  placement="left">
+                    <Fab
+                      className={clsx(classes.addButton, classes.deleteScenesButton, this.state.openMenu != MO.new && classes.addButtonClose)}
+                      onClick={this.onDeleteScenes.bind(this)}
+                      size="small">
+                      <DeleteIcon className={classes.icon} />
+                    </Fab>
+                  </Tooltip>
+                )}
+                <Tooltip title="Import Scene"  placement="left">
+                  <Fab
+                    className={clsx(classes.addButton, classes.importSceneButton, this.state.openMenu != MO.new && classes.addButtonClose)}
+                    onClick={this.onImportScene.bind(this)}
+                    size="small">
+                    <GetAppIcon className={classes.icon} />
+                  </Fab>
+                </Tooltip>
+                <Tooltip title="Add Scene Grid"  placement="left">
+                  <span className={classes.gridTooltip} style={!this.props.canGrid ? { pointerEvents: "none" } : {}}>
+                    <Fab
+                      className={clsx(classes.addButton, classes.addGridButton, this.state.openMenu != MO.new && classes.addButtonClose)}
+                      onClick={this.props.onAddGrid.bind(this)}
+                      disabled={!this.props.canGrid}
+                      size="small">
+                      <GridOnIcon className={classes.icon} />
+                    </Fab>
+                  </span>
+                </Tooltip>
+                <Tooltip title="Add Scene Generator"  placement="left">
+                  <span className={classes.generateTooltip} style={!this.props.canGenerate ? { pointerEvents: "none" } : {}}>
+                    <Fab
+                      className={clsx(classes.addButton, classes.addGeneratorButton, this.state.openMenu != MO.new && classes.addButtonClose)}
+                      onClick={this.props.onAddGenerator.bind(this)}
+                      disabled={!this.props.canGenerate}
+                      size="small">
+                      <MovieFilterIcon className={classes.icon} />
+                    </Fab>
+                  </span>
+                </Tooltip>
+                <Tooltip title="Add Scene"  placement="left">
+                  <Fab
+                    className={clsx(classes.addButton, classes.addSceneButton, this.state.openMenu != MO.new && classes.addButtonClose, this.props.tutorial == SPT.add2 && clsx(classes.backdropTop, classes.highlight))}
+                    onClick={this.onAddScene.bind(this)}
+                    size="small">
+                    <MovieIcon className={classes.icon} />
+                  </Fab>
+                </Tooltip>
+                <Fab
+                  className={clsx(classes.addMenuButton, (this.props.tutorial == SPT.add1 || this.props.tutorial == SPT.add2) && classes.backdropTop, this.props.tutorial == SPT.add1 && classes.highlight)}
+                  onClick={this.onToggleNewMenu.bind(this)}
+                  size="large">
+                  <AddIcon className={classes.icon} />
+                </Fab>
+
+                {this.props.scenes.length >= 2 && (
+                  <React.Fragment>
+                    <Fab
+                      className={classes.sortMenuButton}
+                      aria-haspopup="true"
+                      aria-controls="sort-menu"
+                      aria-label="Sort Scenes"
+                      onClick={this.onOpenSortMenu.bind(this)}
+                      size="medium">
+                      <SortIcon className={classes.icon} />
+                    </Fab>
+                    <Menu
+                      id="sort-menu"
+                      elevation={1}
+                      anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center',
+                      }}
+                      transformOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'right',
+                      }}
+                      getContentAnchorEl={null}
+                      anchorEl={this.state.menuAnchorEl}
+                      keepMounted
+                      classes={{paper: classes.sortMenu}}
+                      open={this.state.openMenu == MO.sort}
+                      onClose={this.onCloseDialog.bind(this)}>
+                      {[SF.alpha, SF.date, SF.count].map((sf) =>
+                        <MenuItem key={sf}>
+                          <ListItemText primary={en.get(sf)}/>
+                          <ListItemSecondaryAction>
+                            <IconButton edge="end" onClick={this.props.onSort.bind(this, sf, true)}>
+                              <ArrowUpwardIcon/>
+                            </IconButton>
+                            <IconButton edge="end" onClick={this.props.onSort.bind(this, sf, false)}>
+                              <ArrowDownwardIcon/>
+                            </IconButton>
+                          </ListItemSecondaryAction>
+                        </MenuItem>
+                      )}
+                      <MenuItem key={SF.random}>
+                        <ListItemText primary={en.get(SF.random)}/>
+                        <ListItemSecondaryAction>
+                          <IconButton edge="end" onClick={this.props.onSort.bind(this, SF.random, true)}>
+                            <ShuffleIcon/>
+                          </IconButton>
+                        </ListItemSecondaryAction>
+                      </MenuItem>
+                    </Menu>
+                  </React.Fragment>
+                )}
+              </React.Fragment>
+            )}
+            <Tooltip title="Random Scene">
+              <Fab
+                className={clsx(classes.randomButton, !this.state.isFirstWindow && classes.extraWindowRandomButton)}
+                onClick={this.onRandomScene.bind(this)}
+                size="small">
+                <CasinoIcon className={classes.icon} />
+              </Fab>
+            </Tooltip>
+          </React.Fragment>
+        )}
 
         <Dialog
           open={this.state.openMenu == MO.urlImport}
@@ -851,6 +915,7 @@ class ScenePicker extends React.Component {
 
   componentDidMount() {
     this.props.startTutorial();
+    this.setState({displayScenes: this.getDisplayScenes(), displayGrids: this.getDisplayGrids()});
     if (remote.getCurrentWindow().id == 1) {
       this.setState({isFirstWindow: true});
       wretch("https://api.github.com/repos/ififfy/flipflip/releases")
@@ -903,8 +968,41 @@ class ScenePicker extends React.Component {
     }
   }
 
+  componentDidUpdate(props: any, state: any) {
+    if (state.filters != this.state.filters || props.scenes != this.props.scenes) {
+      this.setState({displayScenes: this.getDisplayScenes(), displayGrids: this.getDisplayGrids()});
+    }
+  }
+
+  onUpdateFilters(filters: Array<string>) {
+    this.setState({filters: filters, displayScenes: this.getDisplayScenes(), displayGrids: this.getDisplayGrids()});
+  }
+
   onImportScene() {
     this.setState({openMenu: MO.urlImport});
+  }
+
+  onDeleteScenes() {
+    this.setState({openMenu: null, deleteScenes: Array<number>()});
+  }
+
+  onCancelDelete() {
+    this.setState({deleteScenes: null});
+  }
+
+  onFinishDelete() {
+    this.props.onDeleteScenes(this.state.deleteScenes);
+    this.setState({deleteScenes: null});
+  }
+
+  onToggleDelete(sceneID: number) {
+    const newDeleteScenes = Array.from(this.state.deleteScenes);
+    if (newDeleteScenes.includes(sceneID)) {
+      newDeleteScenes.splice(newDeleteScenes.indexOf(sceneID), 1);
+    } else {
+      newDeleteScenes.push(sceneID);
+    }
+    this.setState({deleteScenes: newDeleteScenes});
   }
 
   onFinishImportScene(addToLibrary: boolean) {
@@ -996,6 +1094,88 @@ class ScenePicker extends React.Component {
 
   openLink(url: string) {
     remote.shell.openExternal(url);
+  }
+
+  getDisplayScenes() {
+    let displayScenes = [];
+    const filtering = this.state.filters.length > 0;
+    if (filtering) {
+      for (let scene of this.props.scenes) {
+        let matchesFilter = true;
+        for (let filter of this.state.filters) {
+          if (((filter.startsWith('"') || filter.startsWith('-"')) && filter.endsWith('"')) ||
+            ((filter.startsWith('\'') || filter.startsWith('-\'')) && filter.endsWith('\''))) {
+            if (filter.startsWith("-")) {
+              filter = filter.substring(2, filter.length - 1);
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              matchesFilter = !regex.test(scene.name);
+            } else {
+              filter = filter.substring(1, filter.length - 1);
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              matchesFilter = regex.test(scene.name);
+            }
+          } else { // This is a search filter
+            filter = filter.replace("\\", "\\\\");
+            if (filter.startsWith("-")) {
+              filter = filter.substring(1, filter.length);
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              matchesFilter = !regex.test(scene.name);
+            } else {
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              matchesFilter = regex.test(scene.name);
+            }
+          }
+          if (!matchesFilter) break;
+        }
+        if (matchesFilter) {
+          displayScenes.push(scene);
+        }
+      }
+    } else {
+      displayScenes = this.props.scenes;
+    }
+    return displayScenes;
+  }
+
+  getDisplayGrids() {
+    let displayGrids = [];
+    const filtering = this.state.filters.length > 0;
+    if (filtering) {
+      for (let grid of this.props.grids) {
+        let matchesFilter = true;
+        for (let filter of this.state.filters) {
+          if (((filter.startsWith('"') || filter.startsWith('-"')) && filter.endsWith('"')) ||
+            ((filter.startsWith('\'') || filter.startsWith('-\'')) && filter.endsWith('\''))) {
+            if (filter.startsWith("-")) {
+              filter = filter.substring(2, filter.length - 1);
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              matchesFilter = !regex.test(grid.name);
+            } else {
+              filter = filter.substring(1, filter.length - 1);
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              matchesFilter = regex.test(grid.name);
+            }
+          } else { // This is a search filter
+            filter = filter.replace("\\", "\\\\");
+            if (filter.startsWith("-")) {
+              filter = filter.substring(1, filter.length);
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              matchesFilter = !regex.test(grid.name);
+            } else {
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              matchesFilter = regex.test(grid.name);
+            }
+          }
+          if (!matchesFilter) break;
+        }
+        if (matchesFilter) {
+          displayGrids.push(grid);
+        }
+      }
+    } else {
+      displayGrids = this.props.grids;
+    }
+    return displayGrids;
   }
 }
 
