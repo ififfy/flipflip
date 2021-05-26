@@ -32,13 +32,11 @@ function isEmpty(allURLs: any[]): boolean {
 function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) {
   const sourceType = getSourceType(source.url);
   if (sourceType == ST.local) { // Local files
-    helpers.next = null;
     loadLocalDirectory(pm, allURLs, config, source, filter, weight, helpers, null);
   } else if (sourceType == ST.list) { // Image List
     helpers.next = null;
     worker.loadRemoteImageURLList(allURLs, config, source, filter, weight, helpers);
   } else if (sourceType == ST.video) {
-    helpers.next = null;
     const cachePath = getCachePath(source.url, config) + getFileName(source.url);
     if (config.caching.enabled && fs.existsSync(cachePath)) {
       loadVideo(pm, allURLs, config, source, filter, weight, helpers, cachePath);
@@ -46,7 +44,6 @@ function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<strin
       loadVideo(pm, allURLs, config, source, filter, weight, helpers, null);
     }
   } else if (sourceType == ST.playlist) {
-    helpers.next = null;
     const cachePath = getCachePath(source.url, config) + getFileName(source.url);
     if (config.caching.enabled && fs.existsSync(cachePath)) {
       loadPlaylist(pm, allURLs, config, source, filter, weight, helpers, cachePath);
@@ -114,11 +111,6 @@ const loadLocalDirectory = (pm: Function, allURLs: Map<string, Array<string>>, c
         timeout: 0,
       }});
     } else {
-      // If this is a local source (not a cacheDir call)
-      if (helpers.next == null) {
-        helpers.count = filterPathsToJustPlayable(IF.any, rawFiles, true).length;
-      }
-
       let sources = filterPathsToJustPlayable(filter, rawFiles, true).map((p) => fileURL(p)).sort((a, b) => {
         let aFile: any = getFileName(a, false);
         if (parseInt(aFile)) {
@@ -141,6 +133,11 @@ const loadLocalDirectory = (pm: Function, allURLs: Map<string, Array<string>>, c
         sources = sources.filter((url: string) => !source.blacklist.includes(url));
       }
       allURLs = processAllURLs(sources, allURLs, source, weight, helpers);
+      // If this is a local source (not a cacheDir call)
+      if (helpers.next == -1) {
+        helpers.count = filterPathsToJustPlayable(IF.any, rawFiles, true).length;
+        helpers.next = null;
+      }
 
       pm({data: {
         data: sources,
@@ -197,6 +194,7 @@ export const loadVideo = (pm: Function, allURLs: Map<string, Array<string>>, con
       paths = paths.filter((url: string) => !source.blacklist.includes(url));
     }
     allURLs = processAllURLs(paths, allURLs, source, weight, helpers);
+    helpers.next = null;
 
     pm({data: {
       data: paths,
@@ -272,6 +270,7 @@ export const loadPlaylist = (pm: Function, allURLs: Map<string, Array<string>>, 
         urls = urls.filter((url: string) => !source.blacklist.includes(url));
       }
       allURLs = processAllURLs(urls, allURLs, source, weight, helpers);
+      helpers.next = null;
 
       pm({data: {
         data: urls,
@@ -519,7 +518,7 @@ export default class SourceScraper extends React.Component {
           if (n < sceneSources.length) {
             const timeout = object?.timeout != null ? object.timeout : 1000;
             if (timeout == 0) {
-              setImmediate(sourceLoop, timeout);
+              setImmediate(sourceLoop);
             } else {
               setTimeout(sourceLoop, timeout);
             }
@@ -590,7 +589,7 @@ export default class SourceScraper extends React.Component {
           }
 
           if (n < nextSources.length) {
-            setTimeout(nextSourceLoop, object.timeout);
+            setTimeout(nextSourceLoop, object.timeout != null ? object.timeout : 1000);
           }
         }
       }
