@@ -204,6 +204,7 @@ const MO = { // Menu/Modal Constants
   save: 'mo.save',
   load: 'mo.load',
   select: 'mo.select',
+  piwigo: 'mo.piwigo',
 };
 
 const PR = { // Global progress functions
