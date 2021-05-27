@@ -357,9 +357,8 @@ class Library extends React.Component {
       this.props.config.remoteSettings.twitterAccessTokenSecret != "";
     const instagramAuthorized = this.props.config.remoteSettings.instagramUsername != "" &&
       this.props.config.remoteSettings.instagramPassword != "";
-    const piwigoAuthorized = this.props.config.remoteSettings.piwigoUsername != "" &&
-      this.props.config.remoteSettings.piwigoPassword != "";
-    const remoteAuthorized = tumblrAuthorized || redditAuthorized || twitterAuthorized || instagramAuthorized || piwigoAuthorized;
+    const piwigoEnabled = this.props.config.remoteSettings.piwigoHost != "";
+    const remoteAuthorized = tumblrAuthorized || redditAuthorized || twitterAuthorized || instagramAuthorized;
 
     let cancelProgressMessage;
     switch (this.props.progressMode) {
@@ -533,16 +532,6 @@ class Library extends React.Component {
                         <SourceIcon type={ST.instagram}/>
                       </ListItemIcon>
                       <ListItemText primary="Instagram" />
-                    </ListItem>
-                  </Tooltip>
-                )}
-                {piwigoAuthorized && (
-                  <Tooltip title={this.state.drawerOpen ? "" : "Import from Piwigo"}>
-                    <ListItem button onClick={this.openPiwigoDialog.bind(this)}>
-                      <ListItemIcon>
-                        <SourceIcon type={ST.piwigo}/>
-                      </ListItemIcon>
-                      <ListItemText primary="Piwigo" />
                     </ListItem>
                   </Tooltip>
                 )}
@@ -743,7 +732,7 @@ class Library extends React.Component {
                 </React.Fragment>
               )}
             </Dialog>
-            {piwigoAuthorized &&
+            {piwigoEnabled &&
               <Tooltip title={this.state.filters.length > 0 ? "" : "Piwigo"}  placement="left">
                 <Fab
                   className={clsx(classes.addButton, classes.addPiwigoButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
