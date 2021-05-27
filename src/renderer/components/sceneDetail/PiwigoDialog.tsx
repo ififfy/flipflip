@@ -1,15 +1,13 @@
 import * as React from "react";
 import wretch from "wretch";
 import {
-  Button, Collapse, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl,
-  InputLabel, MenuItem, Select, TextField, Theme, withStyles, List, ListItem, ListItemAvatar, Avatar, ListItemText,
-  Container, Card, CardActionArea, CardContent, Typography, Checkbox, FormControlLabel, Tooltip, Divider, Chip
+  Button, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl,
+  MenuItem, Select, Theme, withStyles, List, ListItem, ListItemAvatar, Avatar, ListItemText,
+  Container, Card, CardContent, Typography, Checkbox, FormControlLabel, Tooltip, Divider, Chip
 } from "@material-ui/core";
 import Sortable from "react-sortablejs";
-// import SortIcon from '@material-ui/icons/Sort';
 import {arrayMove, removeDuplicatesBy} from "../../data/utils";
 import {AF, PW} from "../../data/const";
-import Jiggle from "../../animations/Jiggle";
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -195,7 +193,6 @@ class PiwigoDialog extends React.Component {
         aria-describedby="url-import-description">
         <DialogTitle id="url-import-title">Create a New Piwigo List</DialogTitle>
         <DialogContent>
-
           <FormControl>
             <Typography component="h2" variant="h6" className={classes.areaHeaderFirst}>
               Piwigo List Type
@@ -212,7 +209,6 @@ class PiwigoDialog extends React.Component {
               <MenuItem disabled={!piwigoUsername} value={PW.apiTypeFavorites}>Your Favorites</MenuItem>
             </Select>
           </FormControl>
-
           {listType === PW.apiTypeCategory &&
             <React.Fragment>
               <Typography component="h2" variant="h6" className={classes.areaHeader}>
@@ -325,9 +321,7 @@ class PiwigoDialog extends React.Component {
               )}
             </Sortable>
           </React.Fragment>
-
-          {(listType === PW.apiTypeTag || listType === PW.apiTypeCategory) && 
-
+        {(listType === PW.apiTypeTag || listType === PW.apiTypeCategory) && 
           <React.Fragment>
             <Typography component="h2" variant="h6" className={classes.areaHeader}>
               Rating
@@ -345,80 +339,8 @@ class PiwigoDialog extends React.Component {
                 <Rating name="pwg-image-max" precision={0.5} />
               </Container>
             </Container>
-            <Typography component="h2" variant="h6" className={classes.areaHeader}>
-              Dates
-            </Typography>
-            <DialogContentText>
-              Indicate the created/available date range (optional)
-            </DialogContentText>
-            <Container>
-              <FormControlLabel
-                control={
-                  <TextField
-                    type="datetime-local"
-                    // onChange={this.setRecursive.bind(this, !recursiveMode)}
-                    // checked={recursiveMode}
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                  />
-                }
-                label="Earliest Available"
-              />
-              <FormControlLabel
-                control={
-                  <TextField
-                    type="datetime-local"
-                    // onChange={this.setRecursive.bind(this, !recursiveMode)}
-                    // checked={recursiveMode}
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                  />
-                }
-                label="Latest Available"
-              />
-            </Container>
-            <Container>
-              <FormControlLabel
-                control={
-                  <TextField
-                    type="datetime-local"
-                    // onChange={this.setRecursive.bind(this, !recursiveMode)}
-                    // checked={recursiveMode}
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                  />
-                }
-                label="Earliest Created"
-              />
-              <FormControlLabel
-                control={
-                  <TextField
-                    type="datetime-local"
-                    // onChange={this.setRecursive.bind(this, !recursiveMode)}
-                    // checked={recursiveMode}
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-                  />
-                }
-                label="Latest Created"
-              />
-            </Container>
           </React.Fragment>
-          
-          }
-
-
-
-
-
-
-
-
-          
+        }
         </DialogContent>
         <DialogActions>
           <Button onClick={this.props.onClose.bind(this)} color="secondary">
