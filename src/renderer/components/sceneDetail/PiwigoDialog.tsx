@@ -204,8 +204,8 @@ class PiwigoDialog extends React.Component {
               value={listType}
               className={classes.typeSelect}
               onChange={this.onListTypeChange.bind(this)}>
-              <MenuItem value={PW.apiTypeCategory}>Album Images</MenuItem>
-              <MenuItem value={PW.apiTypeTag}>Tagged Images</MenuItem>
+              <MenuItem value={PW.apiTypeCategory}>Album Media</MenuItem>
+              <MenuItem value={PW.apiTypeTag}>Tagged Media</MenuItem>
               <MenuItem disabled={!piwigoUsername} value={PW.apiTypeFavorites}>Your Favorites</MenuItem>
             </Select>
           </FormControl>
