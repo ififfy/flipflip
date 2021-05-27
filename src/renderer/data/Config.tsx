@@ -509,7 +509,7 @@ export class RemoteSettings implements RemoteSettingsI {
   hydrusAPIKey = "";
 
   piwigoProtocol = "http";
-  piwigoHost = "localhost";
+  piwigoHost = "";
   piwigoUsername = "";
   piwigoPassword = "";
 }

@@ -93,7 +93,7 @@ class APICard extends React.Component {
     const twitterAuthorized = this.props.settings.twitterAccessTokenKey != "" && this.props.settings.twitterAccessTokenSecret != "";
     const instagramConfigured = this.props.settings.instagramUsername != "" && this.props.settings.instagramPassword != "";
     const hydrusConfigured = this.props.settings.hydrusAPIKey != "";
-    const piwigoConfigured = this.props.settings.piwigoUsername != "" && this.props.settings.piwigoPassword != "";
+    const piwigoConfigured = this.props.settings.piwigoHost != "";
     const indexOf = this.props.settings.tumblrKeys.indexOf(this.props.settings.tumblrKey);
     const menuType = this.state.menuType ? en.get(this.state.menuType)[0].toUpperCase() + en.get(this.state.menuType).slice(1) : "";
     let menuTypeSignOut = null;
@@ -172,10 +172,10 @@ class APICard extends React.Component {
             </Tooltip>
           </Grid>
           <Grid item>
-            <Tooltip title={piwigoConfigured ? "Configured: Click to Remove Piwigo Configuration" : "Unauthorized: Click to Configure Piwigo"}  placement="top-end">
+            <Tooltip title={"Click to Configure Piwigo"}  placement="top-end">
               <Fab
                 className={clsx(classes.fab, piwigoConfigured ? classes.authorized : classes.noAuth)}
-                onClick={piwigoConfigured ? this.onClearPiwigo.bind(this) : this.onAuthPiwigo.bind(this)}
+                onClick={this.onAuthPiwigo.bind(this)}
                 size="large">
                 <SourceIcon className={classes.icon} type={ST.piwigo}/>
               </Fab>
@@ -506,12 +506,12 @@ class APICard extends React.Component {
           <DialogTitle id="piwigo-title">
             Piwigo Configuration
             <Avatar className={classes.iconAvatar}>
-              <SourceIcon className={classes.icon} type={ST.hydrus}/>
+              <SourceIcon className={classes.icon} type={ST.piwigo}/>
             </Avatar>
           </DialogTitle>
           <DialogContent>
             <DialogContentText id="piwigo-description">
-              WuTangForever
+              Indicate the Piwigo host details below (user credentials optional)
             </DialogContentText>
             <FormControl margin="dense">
               <InputLabel>Protocol</InputLabel>
@@ -547,7 +547,7 @@ class APICard extends React.Component {
               Cancel
             </Button>
             <Button
-              disabled={this.state.input1.length == 0 || this.state.input2.length == 0 || this.state.input3.length == 0 || this.state.input4.length == 0}
+              disabled={this.state.input1.length == 0 || this.state.input2.length == 0}
               onClick={this.onFinishAuthPiwigo.bind(this)} color="primary">
               Configure Piwigo
             </Button>
@@ -685,14 +685,14 @@ class APICard extends React.Component {
     // Update props
     this.props.onUpdateConfig((c) => {
       c.remoteSettings.piwigoProtocol = "http";
-      c.remoteSettings.piwigoHost = "localhost";
+      c.remoteSettings.piwigoHost = "";
       c.remoteSettings.piwigoUsername = "";
       c.remoteSettings.piwigoPassword = "";
     });
     // Update state
     this.props.onUpdateSettings((s) => {
       s.piwigoProtocol = "http";
-      s.piwigoHost = "localhost";
+      s.piwigoHost = "";
       s.piwigoUsername = "";
       s.piwigoPassword = "";
     });
@@ -1221,8 +1221,18 @@ class APICard extends React.Component {
   }
 
   onFinishAuthPiwigo() {
-    wretch(this.state.input1 + "://" + this.state.input2 + "/ws.php?format=json")
-      .formUrl({ method: "pwg.session.login", username: this.state.input3, password: this.state.input4 })
+    let reqURL = this.state.input1 + "://" + this.state.input2 + "/ws.php?format=json";
+    
+    if (!this.state.input3) {
+      reqURL += "&method=reflection.getMethodList";
+    }
+
+    let req = wretch(reqURL);
+    if (this.state.input3) {
+      req = req.formUrl({ method: "pwg.session.login", username: this.state.input3, password: this.state.input4 })
+    }
+  
+    req
       .post()
       .setTimeout(5000)
       .notFound((e) => {
@@ -1235,7 +1245,6 @@ class APICard extends React.Component {
       })
       .json((json) => {
         if (json.stat == "ok") {
-          // Update props
           this.props.onUpdateConfig((c) => {
             c.remoteSettings.piwigoProtocol = this.state.input1;
             c.remoteSettings.piwigoHost = this.state.input2;
