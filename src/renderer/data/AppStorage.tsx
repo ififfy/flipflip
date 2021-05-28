@@ -416,7 +416,7 @@ export default class AppStorage {
     }
   }
 
-  writeFileTransactional (path: any, content: any) {
+  writeFileTransactional (path: any, content: any, callback?: Function) {
     let temporaryPath = `${path}.new`;
     writeFile(temporaryPath, content, function (err) {
       if (err) {
@@ -424,18 +424,23 @@ export default class AppStorage {
         return;
       }
       renameSync(temporaryPath, path);
+      if (callback) {
+        callback();
+      }
     });
   };
 
-  save(state: any) {
+  save(state: any, callback?: Function) {
     if (state.config.generalSettings.portableMode) {
-      this.writeFileTransactional(portablePath, JSON.stringify(state));
+      this.writeFileTransactional(portablePath, JSON.stringify(state), callback);
       if (!state.config.generalSettings.disableLocalSave) {
-        this.writeFileTransactional(savePath, JSON.stringify(state));
+        this.writeFileTransactional(savePath, JSON.stringify(state), callback);
       }
     } else {
-      this.writeFileTransactional(savePath, JSON.stringify(state));
+      this.writeFileTransactional(savePath, JSON.stringify(state), callback);
     }
+
+    if (callback) return;
 
     if (state.config.generalSettings.autoBackup) {
       const backups = getBackups();
