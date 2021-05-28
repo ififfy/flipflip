@@ -1231,8 +1231,10 @@ class Library extends React.Component {
             matchesFilter = source.offline;
           } else if (filter == "<Marked>") { // This is a marked filter
             matchesFilter = source.marked;
-          }else if (filter == "<Untagged>") { // This is untagged filter
+          } else if (filter == "<Untagged>") { // This is untagged filter
             matchesFilter = source.tags.length === 0;
+          } else if (filter == "<Unclipped>") {
+            matchesFilter = getSourceType(source.url) == ST.video && source.clips.length === 0;
           } else if ((filter.startsWith("[") || filter.startsWith("-[")) && filter.endsWith("]")) { // This is a tag filter
             if (filter.startsWith("-")) {
               let tag = filter.substring(2, filter.length-1);
