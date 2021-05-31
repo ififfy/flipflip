@@ -80,6 +80,11 @@ const styles = (theme: Theme) => createStyles({
     padding: theme.spacing(1),
     justifyContent: 'flex-end',
   },
+  clipTagDrawerPaper: {
+    backgroundColor: theme.palette.background.default,
+    padding: theme.spacing(1),
+    justifyContent: 'flex-end',
+  },
   tagList: {
     padding: theme.spacing(1),
     display: 'flex',
@@ -258,13 +263,68 @@ class VideoClipper extends React.Component {
             <main className={classes.videoContent}>
               <div className={classes.appBar}/>
               <Container maxWidth={false} className={classes.container}>
-                <ImageView
-                  image={this.state.video}
-                  scene={this.state.scene}
-                  fitParent
-                  hasStarted/>
+                {this.state.isTagging && (
+                  <ImageView
+                    image={this.state.video}
+                    scene={this.state.scene}
+                    fitParent
+                    hasStarted/>
+                )}
+                {!this.state.isTagging && (
+                  <ImageView
+                    image={this.state.video}
+                    scene={this.state.scene}
+                    fitParent
+                    hasStarted/>
+                )}
               </Container>
-              <div className={classes.drawerSpacer}/>
+              {!this.state.isTagging && (
+                <div className={classes.drawerSpacer}/>
+              )}
+              {this.state.isTagging && (
+                <Grid container alignItems="center" className={classes.clipTagDrawerPaper}>
+                  <Grid item xs>
+                    <div className={classes.tagList}>
+                      {this.props.allTags.map((tag) =>
+                        <Card className={clsx(classes.tag, tagNames && tagNames.includes(tag.name) && classes.selectedTag)} key={tag.id}>
+                          <CardActionArea onClick={this.toggleTag.bind(this, tag)}>
+                            <CardContent className={classes.tagContent}>
+                              <Typography component="h6" variant="body2">
+                                {tag.name}
+                              </Typography>
+                            </CardContent>
+                          </CardActionArea>
+                        </Card>
+                      )}
+                    </div>
+                  </Grid>
+                  <Grid item className={classes.tagButtons}>
+                    <Tooltip title="Inherit Source Tags">
+                      <Fab
+                        color="primary"
+                        size="small"
+                        onClick={this.onInherit.bind(this)}>
+                        <SystemUpdateAltIcon/>
+                      </Fab>
+                    </Tooltip>
+                    <Tooltip title="End Tagging" placement="top">
+                      <IconButton
+                        onClick={this.onTag.bind(this)}>
+                        <KeyboardReturnIcon/>
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
+                  <Grid item xs={12} className={clsx(this.props.tutorial == VCT.controls && classes.highlight)}>
+                    <VideoControl
+                      video={this.state.video}
+                      volume={this.state.scene.videoVolume}
+                      clip={!this.state.isEditing ? null : this.state.isEditing}
+                      clipValue={!this.state.isEditing ? null : this.state.isEditingValue}
+                      useHotkeys
+                      onChangeVolume={this.onChangeVolume.bind(this)}/>
+                  </Grid>
+                </Grid>
+              )}
             </main>
 
             {!this.state.isTagging &&  (
@@ -415,56 +475,6 @@ class VideoClipper extends React.Component {
                       clip={!this.state.isEditing ? null : this.state.isEditing}
                       clipValue={!this.state.isEditing ? null : this.state.isEditingValue}
                       clips={this.props.source.clips}
-                      useHotkeys
-                      onChangeVolume={this.onChangeVolume.bind(this)}/>
-                  </Grid>
-                </Grid>
-              </Drawer>
-            )}
-            {this.state.isTagging && (
-              <Drawer
-                variant="permanent"
-                anchor="bottom"
-                classes={{paper: classes.clipDrawerPaper}}
-                open>
-                <Grid container alignItems="center">
-                  <Grid item xs>
-                    <div className={classes.tagList}>
-                      {this.props.allTags.map((tag) =>
-                        <Card className={clsx(classes.tag, tagNames && tagNames.includes(tag.name) && classes.selectedTag)} key={tag.id}>
-                          <CardActionArea onClick={this.toggleTag.bind(this, tag)}>
-                            <CardContent className={classes.tagContent}>
-                              <Typography component="h6" variant="body2">
-                                {tag.name}
-                              </Typography>
-                            </CardContent>
-                          </CardActionArea>
-                        </Card>
-                      )}
-                    </div>
-                  </Grid>
-                  <Grid item className={classes.tagButtons}>
-                    <Tooltip title="Inherit Source Tags">
-                      <Fab
-                        color="primary"
-                        size="small"
-                        onClick={this.onInherit.bind(this)}>
-                        <SystemUpdateAltIcon/>
-                      </Fab>
-                    </Tooltip>
-                    <Tooltip title="End Tagging" placement="top">
-                      <IconButton
-                        onClick={this.onTag.bind(this)}>
-                        <KeyboardReturnIcon/>
-                      </IconButton>
-                    </Tooltip>
-                  </Grid>
-                  <Grid item xs={12} className={clsx(this.props.tutorial == VCT.controls && classes.highlight)}>
-                    <VideoControl
-                      video={this.state.video}
-                      volume={this.state.scene.videoVolume}
-                      clip={!this.state.isEditing ? null : this.state.isEditing}
-                      clipValue={!this.state.isEditing ? null : this.state.isEditingValue}
                       useHotkeys
                       onChangeVolume={this.onChangeVolume.bind(this)}/>
                   </Grid>

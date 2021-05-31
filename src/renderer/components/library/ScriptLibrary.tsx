@@ -763,7 +763,6 @@ class ScriptLibrary extends React.Component {
       id = Math.max(s.id + 1, id);
     });
 
-    console.log(newSources);
     for (let url of newSources) {
       if (fs.existsSync(url)) {
         const newText = new CaptionScript({
