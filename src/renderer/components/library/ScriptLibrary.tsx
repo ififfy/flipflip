@@ -741,7 +741,7 @@ class ScriptLibrary extends React.Component {
             }
           }
         } else {
-          let aResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+          aResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
             {filters: [{name: 'All Files (*.*)', extensions: ['*']}, {name: 'Text files', extensions: ['txt']}], properties: ['openFile', 'multiSelections']});
           if (!aResult) return;
         }
@@ -763,6 +763,7 @@ class ScriptLibrary extends React.Component {
       id = Math.max(s.id + 1, id);
     });
 
+    console.log(newSources);
     for (let url of newSources) {
       if (fs.existsSync(url)) {
         const newText = new CaptionScript({
