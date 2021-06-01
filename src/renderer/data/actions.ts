@@ -1,8 +1,8 @@
 import {IncomingMessage, remote, webFrame} from "electron";
 import * as fs from "fs";
+import {existsSync, readFileSync} from "fs";
 import path, {sep} from 'path';
 import wretch from "wretch";
-import {existsSync, readFileSync} from "fs";
 import {outputFile} from "fs-extra";
 import getFolderSize from "get-folder-size";
 import tumblr, {TumblrClient} from "tumblr.js";
@@ -21,16 +21,44 @@ import {
   getRandomIndex,
   randomizeList,
   removeDuplicatesBy,
-  saveDir, toArrayBuffer
+  saveDir,
+  toArrayBuffer
 } from "./utils";
 import {getFileGroup, getFileName, getSourceType, isVideo, isVideoPlaylist} from "../components/player/Scrapers";
 import defaultTheme from "./theme";
 import {
-  AF, ALT, ASF, BT, CST, DONE, GT, HTF, IF, IT, LT, OF, PR, PT, RP, SDGT, SDT, SF, SGT, SL, SLT, SOF, SP, SPT, ST, TF,
-  TT, VCT, VTF
+  AF,
+  ALT,
+  ASF,
+  BT,
+  CST,
+  DONE,
+  GT,
+  HTF,
+  IF,
+  IT,
+  LT,
+  OF,
+  PR,
+  PT,
+  RP,
+  SDGT,
+  SDT,
+  SF,
+  SGT,
+  SL,
+  SLT,
+  SOF,
+  SP,
+  SPT,
+  ST,
+  TF,
+  TT,
+  VCT,
+  VTF
 } from "./const";
-import { defaultInitialState } from './AppStorage';
-import { Route } from "./Route";
+import {defaultInitialState} from './AppStorage';
+import {Route} from "./Route";
 import en from "./en";
 import Audio from "./Audio";
 import Scene from "./Scene";
@@ -2146,6 +2174,30 @@ export function toggleTag(state: State, sourceID: number, tag: Tag): Object {
     } else {
       source.tags.push(tag);
     }
+    for (let scene of newScenes) {
+      const sceneSource = scene.sources.find((s) => s.url == source.url);
+      if (sceneSource) {
+        sceneSource.tags = source.tags;
+      }
+    }
+  }
+  return {library: newLibrary, scenes: newScenes};
+}
+
+export function inheritTags(state: State, sourceID: number): Object {
+  const newLibrary = state.library;
+  const newScenes = state.scenes;
+  const source = newLibrary.find((s) => s.id == sourceID);
+  if (source) {
+    const clipTags = new Array<Tag>();
+    for (let clip of source.clips) {
+      for (let tag of clip.tags) {
+        if (!clipTags.map((c) => c.id).includes(tag.id)) {
+          clipTags.push(tag);
+        }
+      }
+    }
+    source.tags = clipTags;
     for (let scene of newScenes) {
       const sceneSource = scene.sources.find((s) => s.url == source.url);
       if (sceneSource) {
