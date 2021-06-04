@@ -421,16 +421,19 @@ const PW = { // Piwigo types
   apiTypeFavorites: 'pwg.users.favorites.getList',
   apiTypeCategory: 'pwg.categories.getImages',
   apiTypeTag: 'pwg.tags.getImages',
-  sortOptionID: 'id',
-  sortOptionFile: 'file',
-  sortOptionName: 'name',
-  sortOptionHit: 'hit',
-  sortOptionRating: 'rating_score',
-  sortOptionCreated: 'date_creation',
+}
+
+const PWS = { // Piwigo sort types
   sortOptionAvailable: 'date_available',
+  sortOptionCreated: 'date_creation',
+  sortOptionName: 'name',
+  sortOptionFile: 'file',
+  sortOptionHit: 'hit',
+  sortOptionID: 'id',
+  sortOptionRating: 'rating_score',
   sortOptionRandom: 'random',
 }
 
 export {
-  AF, ALT, ASF, BT, CST, DONE, EA, GO, GT, HTF, IF, IG, IPC, IT, LT, MO, OF, OT, PR, PT, RF, RP, RT, SB, SC, SDGT, SDT, SF, SGT, SL, SLT, SOF, SP, SPT, ST, TF, TT, VCT, VO, VTF, WC, WF, PW
+  AF, ALT, ASF, BT, CST, DONE, EA, GO, GT, HTF, IF, IG, IPC, IT, LT, MO, OF, OT, PR, PT, PW, PWS, RF, RP, RT, SB, SC, SDGT, SDT, SF, SGT, SL, SLT, SOF, SP, SPT, ST, TF, TT, VCT, VO, VTF, WC, WF
 };

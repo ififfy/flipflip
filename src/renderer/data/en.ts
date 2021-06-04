@@ -133,6 +133,14 @@ export default new Map<string, string>([
   ['rf.cont', 'Controversial'],
   ['rf.rising', 'Rising'],
 
+  ['date_available', "Date Available"],
+  ['date_creation', "Date Created"],
+  ['name', "Name"],
+  ['file', "Filename"],
+  ['hit', "Hits"],
+  ['rating_score', "Rating"],
+  ['id', "ID"],
+
   ['wc.bottomRight', 'Bottom Right'],
   ['wc.bottomLeft', 'Bottom Left'],
   ['wc.topRight', 'Top Right'],

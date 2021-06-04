@@ -413,8 +413,8 @@ export function cleanBackups(config: Config) {
 
 export function cacheImage(state: State, i: HTMLImageElement | HTMLVideoElement) {
   if (state.config.caching.enabled) {
-    const fileType = getSourceType(i.src);
-    if (fileType == ST.hydrus) return;
+    const fileType = getSourceType(i.getAttribute("source"));
+    if (fileType == ST.hydrus || fileType == ST.piwigo) return;
 
     if (fileType != ST.local && i.src.startsWith("http")) {
       const cachePath = getCachePath(null, state.config);

@@ -343,7 +343,6 @@ class Library extends React.Component {
     menuAnchorEl: null as any,
     openMenu: null as string,
     moveDialog: false,
-    piwigoDialog: false,
   };
 
   render() {
@@ -357,7 +356,9 @@ class Library extends React.Component {
       this.props.config.remoteSettings.twitterAccessTokenSecret != "";
     const instagramAuthorized = this.props.config.remoteSettings.instagramUsername != "" &&
       this.props.config.remoteSettings.instagramPassword != "";
-    const piwigoEnabled = this.props.config.remoteSettings.piwigoHost != "";
+    const piwigoAuthorized = this.props.config.remoteSettings.piwigoProtocol != "" &&
+      this.props.config.remoteSettings.piwigoHost != "" && this.props.config.remoteSettings.piwigoUsername != "" &&
+      this.props.config.remoteSettings.piwigoPassword != "";
     const remoteAuthorized = tumblrAuthorized || redditAuthorized || twitterAuthorized || instagramAuthorized;
 
     let cancelProgressMessage;
@@ -732,14 +733,14 @@ class Library extends React.Component {
                 </React.Fragment>
               )}
             </Dialog>
-            {piwigoEnabled &&
+            {piwigoAuthorized &&
               <Tooltip title={this.state.filters.length > 0 ? "" : "Piwigo"}  placement="left">
                 <Fab
                   className={clsx(classes.addButton, classes.addPiwigoButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
                   disabled={this.state.filters.length > 0}
                   onClick={this.openPiwigoDialog.bind(this)}
                   size="small">
-                    <SourceIcon className={classes.icon} type={ST.piwigo}/>
+                  <SourceIcon className={classes.icon} type={ST.piwigo}/>
                 </Fab>
               </Tooltip>
             }
@@ -782,8 +783,8 @@ class Library extends React.Component {
 
         <PiwigoDialog 
           config={this.props.config}
-          open={this.state.piwigoDialog}
-          onClose={this.onClosePiwigoDialog.bind(this)}
+          open={this.state.openMenu == MO.piwigo}
+          onClose={this.onCloseDialog.bind(this)}
           onImportURL={this.onAddSource.bind(this)}
         />
 
@@ -942,7 +943,7 @@ class Library extends React.Component {
   }
 
   openPiwigoDialog() {
-    this.setState({piwigoDialog: true, openMenu: false});
+    this.setState({openMenu: MO.piwigo});
   }
 
   onFinishMove() {
@@ -983,10 +984,6 @@ class Library extends React.Component {
 
   onCloseMoveDialog() {
     this.setState({moveDialog: false});
-  }
-
-  onClosePiwigoDialog() {
-    this.setState({piwigoDialog: false});
   }
 
   onBatchTag() {
@@ -1089,7 +1086,7 @@ class Library extends React.Component {
   }
 
   onCloseDialog() {
-    this.setState({menuAnchorEl: null, openMenu: null, drawerOpen: false, piwigoDialog: false});
+    this.setState({menuAnchorEl: null, openMenu: null, drawerOpen: false});
   }
 
   onRemoveAll() {
