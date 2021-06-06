@@ -82,7 +82,7 @@ function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<strin
       workerFunction = worker.loadBDSMlr;
     } else if (sourceType == ST.hydrus) {
       workerFunction = worker.loadHydrus;
-    } else if (sourceType == ST.piwigo) {// TODO: this
+    } else if (sourceType == ST.piwigo) {
       workerFunction = worker.loadPiwigo;
     }
     if (helpers.next == -1) {

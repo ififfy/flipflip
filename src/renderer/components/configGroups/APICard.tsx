@@ -93,7 +93,7 @@ class APICard extends React.Component {
     const twitterAuthorized = this.props.settings.twitterAccessTokenKey != "" && this.props.settings.twitterAccessTokenSecret != "";
     const instagramConfigured = this.props.settings.instagramUsername != "" && this.props.settings.instagramPassword != "";
     const hydrusConfigured = this.props.settings.hydrusAPIKey != "";
-    const piwigoConfigured = this.props.settings.piwigoHost != "";
+    const piwigoConfigured = this.props.settings.piwigoProtocol != "" && this.props.settings.piwigoHost != "" && this.props.settings.piwigoUsername != "" && this.props.settings.piwigoPassword != "";
     const indexOf = this.props.settings.tumblrKeys.indexOf(this.props.settings.tumblrKey);
     const menuType = this.state.menuType ? en.get(this.state.menuType)[0].toUpperCase() + en.get(this.state.menuType).slice(1) : "";
     let menuTypeSignOut = null;
@@ -115,6 +115,7 @@ class APICard extends React.Component {
         break;
       case ST.piwigo:
         menuTypeSignOut = this.onFinishClearPiwigo.bind(this);
+        break;
     }
     return(
       <React.Fragment>
@@ -172,10 +173,10 @@ class APICard extends React.Component {
             </Tooltip>
           </Grid>
           <Grid item>
-            <Tooltip title={"Click to Configure Piwigo"}  placement="top-end">
+            <Tooltip title={piwigoConfigured ? "Configured: Click to Remove Piwigo Configuration" : "Unauthorized: Click to Configure Piwigo"}  placement="top-end">
               <Fab
                 className={clsx(classes.fab, piwigoConfigured ? classes.authorized : classes.noAuth)}
-                onClick={this.onAuthPiwigo.bind(this)}
+                onClick={piwigoConfigured ? this.onClearPiwigo.bind(this) : this.onAuthPiwigo.bind(this)}
                 size="large">
                 <SourceIcon className={classes.icon} type={ST.piwigo}/>
               </Fab>
@@ -511,7 +512,8 @@ class APICard extends React.Component {
           </DialogTitle>
           <DialogContent>
             <DialogContentText id="piwigo-description">
-              Indicate the Piwigo host details below (user credentials optional)
+              FlipFlip does not store any user information or make changes to the Piwigo server. Your configured information is
+              stored locally on your computer and is never shared with anyone or sent to any server (besides Piwigo, obviously).
             </DialogContentText>
             <FormControl margin="dense">
               <InputLabel>Protocol</InputLabel>
@@ -547,7 +549,7 @@ class APICard extends React.Component {
               Cancel
             </Button>
             <Button
-              disabled={this.state.input1.length == 0 || this.state.input2.length == 0}
+              disabled={this.state.input1.length == 0 || this.state.input2.length == 0 || this.state.input3.length == 0 || this.state.input4.length == 0}
               onClick={this.onFinishAuthPiwigo.bind(this)} color="primary">
               Configure Piwigo
             </Button>

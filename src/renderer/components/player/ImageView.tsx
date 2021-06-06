@@ -87,7 +87,11 @@ export default class ImageView extends React.Component {
             track.label = "English";
             track.srclang = "en";
             track.src = URL.createObjectURL(blob);
-            img.append(track);
+            if (img.textTracks.length == 0) {
+              img.append(track);
+            } else {
+              img.textTracks[0] = track;
+            }
             track.mode = "showing";
             img.textTracks[0].mode = "showing";
           });

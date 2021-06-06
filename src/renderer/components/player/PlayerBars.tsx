@@ -9,7 +9,7 @@ import wretch from "wretch";
 import {
   AppBar, Button, Card, CardActionArea, CardContent, createStyles, Dialog, DialogActions, DialogContent,
   DialogContentText, DialogTitle, Divider, Drawer, Accordion, AccordionDetails, AccordionSummary, Grid,
-  IconButton, Link, Theme, Toolbar, Tooltip, Typography, withStyles
+  IconButton, Link, Theme, Toolbar, Tooltip, Typography, withStyles, Fab
 } from "@material-ui/core";
 
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -18,6 +18,7 @@ import ForwardIcon from '@material-ui/icons/Forward';
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import PauseIcon from '@material-ui/icons/Pause';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
+import SystemUpdateAltIcon from "@material-ui/icons/SystemUpdateAlt";
 
 import {createMainMenu, createMenuTemplate} from "../../../main/MainMenu";
 import {PT, ST} from "../../data/const";
@@ -256,6 +257,7 @@ class PlayerBars extends React.Component {
     playTrack?(url: string): void,
     onPlaying?(position: number, duration: number): void,
     toggleTag?(sourceID: number, tag: Tag): void,
+    inheritTags?(sourceID: number): void,
   };
 
   readonly state = {
@@ -568,20 +570,34 @@ class PlayerBars extends React.Component {
               open={this.state.tagDrawerHover}
               onMouseEnter={this.onMouseEnterTagDrawer.bind(this)}
               onMouseLeave={this.onMouseLeaveTagDrawer.bind(this)}>
-              <Grid container>
-                <div className={classes.tagList}>
-                  {this.props.allTags.map((tag) =>
-                    <Card className={clsx(classes.tag, tagNames && tagNames.includes(tag.name) && classes.selectedTag)} key={tag.id}>
-                      <CardActionArea onClick={this.props.toggleTag.bind(this, this.props.scene.libraryID, tag)}>
-                        <CardContent className={classes.tagContent}>
-                          <Typography component="h6" variant="body2">
-                            {tag.name}
-                          </Typography>
-                        </CardContent>
-                      </CardActionArea>
-                    </Card>
-                  )}
-                </div>
+              <Grid container alignItems="center">
+                <Grid item xs>
+                  <div className={classes.tagList}>
+                    {this.props.allTags.map((tag) =>
+                      <Card className={clsx(classes.tag, tagNames && tagNames.includes(tag.name) && classes.selectedTag)} key={tag.id}>
+                        <CardActionArea onClick={this.props.toggleTag.bind(this, this.props.scene.libraryID, tag)}>
+                          <CardContent className={classes.tagContent}>
+                            <Typography component="h6" variant="body2">
+                              {tag.name}
+                            </Typography>
+                          </CardContent>
+                        </CardActionArea>
+                      </Card>
+                    )}
+                  </div>
+                </Grid>
+                {(this.props.inheritTags && (!tagNames || tagNames.length == 0) && this.props.scene.sources[0].clips && this.props.scene.sources[0].clips.find((c) => c.tags && c.tags.length > 0) != null) && (
+                  <Grid item className={classes.tagButtons}>
+                    <Tooltip title="Inherit Clip Tags">
+                      <Fab
+                        color="primary"
+                        size="small"
+                        onClick={this.props.inheritTags.bind(this, this.props.scene.libraryID)}>
+                        <SystemUpdateAltIcon/>
+                      </Fab>
+                    </Tooltip>
+                  </Grid>
+                )}
                 <Grid item xs={12}>
                   {this.props.scene.sources.length == 1 && getSourceType(this.props.scene.sources[0].url) == ST.video && (
                     <VideoControl

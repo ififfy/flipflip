@@ -741,7 +741,7 @@ class ScriptLibrary extends React.Component {
             }
           }
         } else {
-          let aResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+          aResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
             {filters: [{name: 'All Files (*.*)', extensions: ['*']}, {name: 'Text files', extensions: ['txt']}], properties: ['openFile', 'multiSelections']});
           if (!aResult) return;
         }

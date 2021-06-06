@@ -55,9 +55,19 @@ export default class Meta extends React.Component {
     // We never bother cleaning this up, but that's OK because this is the top level
     // component of the whole app.
     ipcRenderer.on(IPC.startScene, this.startScene.bind(this));
-    setInterval(this.queueSave.bind(this), 500);
+
     // Disable react-sound's verbose console output
     (window as any).soundManager.setup({debugMode: false});
+
+    if (remote.getCurrentWindow().id == 1) {
+      setInterval(this.queueSave.bind(this), 500);
+      if (this.state.is)
+        (window as any).onbeforeunload = (e: any) => {
+          window.onbeforeunload = null;
+          e.returnValue = false;
+          appStorage.save(this.state, () => {window.close()});
+        }
+    }
   }
 
   _queueSave = false;
@@ -378,6 +388,7 @@ export default class Meta extends React.Component {
                 tags={scene.audioScene ? actions.getAudioSource(this.state)?.tags : scene.scriptScene ? actions.getScriptSource(this.state)?.tags : actions.getLibrarySource(this.state)?.tags}
                 allTags={this.state.tags}
                 toggleTag={scene.audioScene ? a(actions.toggleAudioTag) : scene.scriptScene ? a(actions.toggleScriptTag) : a(actions.toggleTag)}
+                inheritTags={scene.audioScene || scene.scriptScene ? undefined : a(actions.inheritTags)}
                 navigateTagging={a(actions.navigateDisplayedLibrary)}
                 getTags={actions.getTags.bind(this, this.state.library)}
                 changeAudioRoute={scene.audioScene ? a(actions.changeAudioRoute) : undefined}

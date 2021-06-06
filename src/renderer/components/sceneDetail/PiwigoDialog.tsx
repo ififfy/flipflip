@@ -1,18 +1,22 @@
 import * as React from "react";
 import wretch from "wretch";
+import Sortable from "react-sortablejs";
+
 import {
   Button, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl,
   MenuItem, Select, Theme, withStyles, List, ListItem, ListItemAvatar, Avatar, ListItemText,
   Container, Card, CardContent, Typography, Checkbox, FormControlLabel, Tooltip, Divider, Chip
 } from "@material-ui/core";
-import Sortable from "react-sortablejs";
-import {arrayMove, removeDuplicatesBy} from "../../data/utils";
-import {AF, PW} from "../../data/const";
+import { Rating } from '@material-ui/lab';
+
 import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
 import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
-import { Rating } from '@material-ui/lab';
+
+import {AF, PW, PWS} from "../../data/const";
+import {arrayMove} from "../../data/utils";
+import en from "../../data/en";
 
 const styles = (theme: Theme) => createStyles({
   list: {},
@@ -82,7 +86,6 @@ interface Column {
     enabled: boolean,
 }
 
-
 class AlbumListItem extends React.Component {
   readonly props: {
     album: Album,
@@ -148,6 +151,7 @@ class AlbumListItem extends React.Component {
     );
   }
 }
+
 class PiwigoDialog extends React.Component {
   readonly props: {
     config: any,
@@ -167,15 +171,7 @@ class PiwigoDialog extends React.Component {
     tagModeAnd: false,
     sortRandom: false,
     recursiveMode: false,
-    sortOrder: [
-      {label: "Date Availabe", name: PW.sortOptionAvailable, direction: "DESC", enabled: true } as Column,
-      {label: "Date Created", name: PW.sortOptionCreated, direction: "DESC", enabled: false } as Column,
-      {label: "Name", name: PW.sortOptionName, direction: "DESC", enabled: false } as Column,
-      {label: "Filename", name: PW.sortOptionFile, direction: "DESC", enabled: false } as Column,
-      {label: "Hits", name: PW.sortOptionHit, direction: "DESC", enabled: false } as Column,
-      {label: "Rating", name: PW.sortOptionRating, direction: "DESC", enabled: false } as Column,
-      {label: "ID", name: PW.sortOptionID, direction: "DESC", enabled: false } as Column,
-    ]
+    sortOrder: Object.values(PWS).filter((pw) => pw != PWS.sortOptionRandom).map((pw) => {return {label: en.get(pw), name: pw, direction: "DESC", enabled: false} as Column}),
   };
 
   render() {
@@ -191,11 +187,11 @@ class PiwigoDialog extends React.Component {
         fullWidth={true}
         aria-labelledby="url-import-title"
         aria-describedby="url-import-description">
-        <DialogTitle id="url-import-title">Create a New Piwigo List</DialogTitle>
+        <DialogTitle id="url-import-title">Create a New Piwigo Source</DialogTitle>
         <DialogContent>
           <FormControl>
             <Typography component="h2" variant="h6" className={classes.areaHeaderFirst}>
-              Piwigo List Type
+              Piwigo Source Type
             </Typography>
             <DialogContentText>
               Select the type of image list to create
@@ -494,12 +490,12 @@ class PiwigoDialog extends React.Component {
     if (listType === PW.apiTypeCategory) {
       url += "&" + selectedAlbums.map(catID => `cat_id[]=${catID}`).join("&");
       if (recursiveMode) {
-        url += "recursive=true"
+        url += "&recursive=true"
       }
     } else if (listType === PW.apiTypeTag) {
       url += "&" + selectedTags.map(tagID => `tag_id[]=${tagID}`).join("&");
       if (tagModeAnd) {
-        url += "tag_mode_and=true"
+        url += "&tag_mode_and=true"
       }
     }
 
