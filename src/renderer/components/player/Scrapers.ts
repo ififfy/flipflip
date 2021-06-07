@@ -1967,9 +1967,8 @@ export const loadPiwigo = (allURLs: Map<string, Array<string>>, config: Config, 
     }
 
     const search = () => {
-      return wretch(url)
-        .formUrl({page: helpers.next})
-        .post()
+      return wretch(url + "&page=" + helpers.next)
+        .get()
         .setTimeout(5000)
         .onAbort(retry)
         .notFound((e) => pm({
