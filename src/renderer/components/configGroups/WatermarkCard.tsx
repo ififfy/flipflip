@@ -37,7 +37,7 @@ class WatermarkCard extends React.Component {
       <Grid container spacing={this.props.settings.watermark ? 2 : 0} alignItems="center">
         <Grid item xs={12}>
           <Grid container alignItems="center">
-            <Grid item xs>
+            <Grid item xs={12} sm={6}>
               <Tooltip title={
                          <div>
                            When enabled, FlipFlip will display a watermark over each Scene. You may use the following variables:
@@ -70,6 +70,18 @@ class WatermarkCard extends React.Component {
                   }
                   label="Enable Watermark"/>
               </Tooltip>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              {this.props.settings.watermark && (
+                <Tooltip title={"When enabled, watermark will display on Grid Scenes"}>
+                  <FormControlLabel
+                    control={
+                      <Switch checked={this.props.settings.watermarkGrid}
+                              onChange={this.onBoolInput.bind(this, 'watermarkGrid')}/>
+                    }
+                    label="Show on Grids"/>
+                </Tooltip>
+              )}
             </Grid>
           </Grid>
         </Grid>

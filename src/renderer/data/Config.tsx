@@ -252,6 +252,7 @@ interface GeneralSettingsI {
   autoCleanBackupMonths: number;
   cleanRetain: number;
   watermark: boolean;
+  watermarkGrid: boolean;
   watermarkCorner: string;
   watermarkText: string;
   watermarkFontFamily: string;
@@ -542,6 +543,7 @@ export class GeneralSettings  implements GeneralSettingsI {
   autoCleanBackupMonths = 6;
   cleanRetain = 1;
   watermark = false;
+  watermarkGrid = false;
   watermarkCorner = WC.bottomRight;
   watermarkText = "";
   watermarkFontFamily = "Arial Black,Arial Bold,Gadget,sans-serif";

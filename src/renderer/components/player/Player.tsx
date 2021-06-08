@@ -165,7 +165,7 @@ export default class Player extends React.Component {
 
     let watermarkStyle: any = {}
     let watermarkText = "";
-    if (this.props.config.generalSettings.watermark) {
+    if (this.props.config.generalSettings.watermark && (!this.props.gridView || this.props.config.generalSettings.watermarkGrid)) {
       watermarkStyle = {
         position: 'absolute',
         zIndex: 11,
