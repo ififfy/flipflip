@@ -549,7 +549,7 @@ class APICard extends React.Component {
               Cancel
             </Button>
             <Button
-              disabled={this.state.input1.length == 0 || this.state.input2.length == 0 || this.state.input3.length == 0 || this.state.input4.length == 0}
+              disabled={this.state.input1.length == 0 || this.state.input2.length == 0}
               onClick={this.onFinishAuthPiwigo.bind(this)} color="primary">
               Configure Piwigo
             </Button>
