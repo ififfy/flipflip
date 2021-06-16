@@ -442,26 +442,12 @@ export default class AppStorage {
 
     if (callback) return;
 
-    if (state.config.generalSettings.autoBackup) {
-      const backups = getBackups();
-      if (backups.length == 0) {
-        this.backup(state);
-      } else {
-        const lastBackup = backups[0];
-        const epoch = parseInt(lastBackup.url.substring(lastBackup.url.lastIndexOf(".") + 1));
-        if (Date.now()  - epoch > (86400000 * state.config.generalSettings.autoBackupDays)) {
-          this.backup(state);
-        }
-      }
+    if (state.config.generalSettings.autoCleanBackup) {
+      checkAutoClean(state).then((r) => {if (r) console.log("Performed Auto Clean")}).catch((e) => console.error(e));
     }
 
-    if (state.config.generalSettings.autoCleanBackup) {
-      const backups = getBackups();
-      const lastBackup = backups[0];
-      const epoch = parseInt(lastBackup.url.substring(lastBackup.url.lastIndexOf(".") + 1));
-      if (Date.now()  - epoch > (86400000 * state.config.generalSettings.autoBackupDays)) {
-        cleanBackups(state.config);
-      }
+    if (state.config.generalSettings.autoBackup) {
+      checkAutoBackup(state, this.backup).then((r) => {if (r) console.log("Performed Auto Backup")}).catch((e) => console.error(e));
     }
 
   }
@@ -476,4 +462,41 @@ export default class AppStorage {
       archiveFile(savePath);
     }
   }
+}
+
+async function checkAutoClean(state: any): Promise<boolean> {
+  const backups = getBackups();
+  let lastBackup;
+  let epoch;
+  do {
+    lastBackup = backups.shift();
+    epoch = parseInt(lastBackup.url.substring(lastBackup.url.lastIndexOf(".") + 1));
+  } while (isNaN(epoch))
+  // If it's been longer than N days since our last backup
+  if (Date.now() - epoch > (86400000 * state.config.generalSettings.autoBackupDays)) {
+    cleanBackups(state.config);
+    return true;
+  }
+  return false;
+}
+
+async function checkAutoBackup(state: any, backup: Function): Promise<boolean> {
+  const backups = getBackups();
+  if (backups.length == 0) {
+    backup(state);
+    return true;
+  } else {
+    let lastBackup;
+    let epoch;
+    do {
+      lastBackup = backups.shift();
+      epoch = parseInt(lastBackup.url.substring(lastBackup.url.lastIndexOf(".") + 1));
+    } while (isNaN(epoch))
+    // If it's been longer than N days since our last backup
+    if (Date.now() - epoch > (86400000 * state.config.generalSettings.autoBackupDays)) {
+      backup(state);
+      return true;
+    }
+  }
+  return false;
 }
