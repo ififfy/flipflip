@@ -198,7 +198,7 @@ class SceneGenerator extends React.Component {
                             <ArrowRightIcon />
                           </IconButton>
                           <IconButton size="small"
-                                      className={clsx(this.props.tutorial == SDGT.edit1 && classes.disable)}
+                                      className={clsx((this.props.tutorial == SDGT.edit1 || this.props.tutorial == SDGT.edit2) && classes.disable)}
                                       onClick={this.onDeleteGroup.bind(this, (y*4)+x)}>
                             <DeleteIcon color="error" />
                           </IconButton>
