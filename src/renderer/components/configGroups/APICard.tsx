@@ -1223,7 +1223,7 @@ class APICard extends React.Component {
   }
 
   onFinishAuthPiwigo() {
-    let reqURL = this.state.input1 + "://" + this.state.input2 + "/ws.php?format=json";
+    let reqURL = this.state.input1 + "://" + this.state.input2 + (this.state.input2.endsWith('/') ? "" : "/") + "ws.php?format=json";
     
     if (!this.state.input3) {
       reqURL += "&method=reflection.getMethodList";
