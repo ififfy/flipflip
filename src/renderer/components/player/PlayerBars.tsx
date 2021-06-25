@@ -310,7 +310,7 @@ class PlayerBars extends React.Component {
                   edge="start"
                   color="inherit"
                   aria-label="Back"
-                  onClick={this.props.goBack.bind(this)}>
+                  onClick={this.navigateBack.bind(this)}>
                   <ArrowBackIcon />
                 </IconButton>
               </Tooltip>
@@ -527,7 +527,7 @@ class PlayerBars extends React.Component {
                     startPlaying
                     persist={this.props.persistAudio}
                     onUpdateScene={this.props.onUpdateScene.bind(this)}
-                    goBack={this.props.goBack.bind(this)}
+                    goBack={this.navigateBack.bind(this)}
                     orderAudioTags={this.orderAudioTags.bind(this)}
                     onPlaying={this.props.onPlaying}
                     playTrack={this.props.playTrack}
