@@ -93,6 +93,7 @@ class APICard extends React.Component {
     const twitterAuthorized = this.props.settings.twitterAccessTokenKey != "" && this.props.settings.twitterAccessTokenSecret != "";
     const instagramConfigured = this.props.settings.instagramUsername != "" && this.props.settings.instagramPassword != "";
     const hydrusConfigured = this.props.settings.hydrusAPIKey != "";
+    const piwigoConfigured = this.props.settings.piwigoProtocol != "" && this.props.settings.piwigoHost != "" && this.props.settings.piwigoUsername != "" && this.props.settings.piwigoPassword != "";
     const indexOf = this.props.settings.tumblrKeys.indexOf(this.props.settings.tumblrKey);
     const menuType = this.state.menuType ? en.get(this.state.menuType)[0].toUpperCase() + en.get(this.state.menuType).slice(1) : "";
     let menuTypeSignOut = null;
@@ -111,6 +112,10 @@ class APICard extends React.Component {
         break;
       case ST.hydrus:
         menuTypeSignOut = this.onFinishClearHydrus.bind(this);
+        break;
+      case ST.piwigo:
+        menuTypeSignOut = this.onFinishClearPiwigo.bind(this);
+        break;
     }
     return(
       <React.Fragment>
@@ -164,6 +169,16 @@ class APICard extends React.Component {
                 onClick={hydrusConfigured ? this.onClearHydrus.bind(this) : this.onAuthHydrus.bind(this)}
                 size="large">
                 <SourceIcon className={classes.icon} type={ST.hydrus}/>
+              </Fab>
+            </Tooltip>
+          </Grid>
+          <Grid item>
+            <Tooltip title={piwigoConfigured ? "Configured: Click to Remove Piwigo Configuration" : "Unauthorized: Click to Configure Piwigo"}  placement="top-end">
+              <Fab
+                className={clsx(classes.fab, piwigoConfigured ? classes.authorized : classes.noAuth)}
+                onClick={piwigoConfigured ? this.onClearPiwigo.bind(this) : this.onAuthPiwigo.bind(this)}
+                size="large">
+                <SourceIcon className={classes.icon} type={ST.piwigo}/>
               </Fab>
             </Tooltip>
           </Grid>
@@ -484,6 +499,63 @@ class APICard extends React.Component {
           </DialogActions>
         </Dialog>
 
+        <Dialog
+          open={this.state.openMenu == MO.signIn && this.state.menuType == ST.piwigo}
+          onClose={this.onCloseDialog.bind(this)}
+          aria-labelledby="piwigo-title"
+          aria-describedby="piwigo-description">
+          <DialogTitle id="piwigo-title">
+            Piwigo Configuration
+            <Avatar className={classes.iconAvatar}>
+              <SourceIcon className={classes.icon} type={ST.piwigo}/>
+            </Avatar>
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="piwigo-description">
+              FlipFlip does not store any user information or make changes to the Piwigo server. Your configured information is
+              stored locally on your computer and is never shared with anyone or sent to any server (besides Piwigo, obviously).
+            </DialogContentText>
+            <FormControl margin="dense">
+              <InputLabel>Protocol</InputLabel>
+              <Select
+                value={this.state.input1}
+                onChange={this.onInput1.bind(this)}>
+                <MenuItem key={"http"} value={"http"}>http</MenuItem>
+                <MenuItem key={"https"} value={"https"}>https</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              className={classes.middleInput}
+              margin="dense"
+              label="Piwigo Host"
+              value={this.state.input2}
+              onChange={this.onInput2.bind(this)}/>
+            <TextField
+              fullWidth
+              margin="dense"
+              label="Username"
+              value={this.state.input3}
+              onChange={this.onInput3.bind(this)}/>
+            <TextField
+              fullWidth
+              margin="dense"
+              label="Password"
+              type="password"
+              value={this.state.input4}
+              onChange={this.onInput4.bind(this)}/>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+              Cancel
+            </Button>
+            <Button
+              disabled={this.state.input1.length == 0 || this.state.input2.length == 0}
+              onClick={this.onFinishAuthPiwigo.bind(this)} color="primary">
+              Configure Piwigo
+            </Button>
+          </DialogActions>
+        </Dialog>
+
         <Snackbar
           open={!!this.state.successSnack}
           autoHideDuration={20000}
@@ -607,6 +679,28 @@ class APICard extends React.Component {
     this.onCloseDialog();
   }
 
+  onClearPiwigo() {
+    this.setState({openMenu: MO.signOut, menuType: ST.piwigo});
+  }
+
+  onFinishClearPiwigo() {
+    // Update props
+    this.props.onUpdateConfig((c) => {
+      c.remoteSettings.piwigoProtocol = "http";
+      c.remoteSettings.piwigoHost = "";
+      c.remoteSettings.piwigoUsername = "";
+      c.remoteSettings.piwigoPassword = "";
+    });
+    // Update state
+    this.props.onUpdateSettings((s) => {
+      s.piwigoProtocol = "http";
+      s.piwigoHost = "";
+      s.piwigoUsername = "";
+      s.piwigoPassword = "";
+    });
+    this.onCloseDialog();
+  }
+
   onAuthTumblr() {
     this.setState({
       openMenu: MO.new,
@@ -654,6 +748,10 @@ class APICard extends React.Component {
 
   onAuthHydrus() {
     this.setState({openMenu: MO.signIn, menuType: ST.hydrus, input1: this.props.settings.hydrusProtocol, input2: this.props.settings.hydrusDomain, input3: this.props.settings.hydrusPort, input4: this.props.settings.hydrusAPIKey});
+  }
+
+  onAuthPiwigo() {
+    this.setState({openMenu: MO.signIn, menuType: ST.piwigo, input1: this.props.settings.piwigoProtocol, input2: this.props.settings.piwigoHost, input3: this.props.settings.piwigoUsername, input4: this.props.settings.piwigoPassword});
   }
 
   onCloseDialog() {
@@ -1116,6 +1214,57 @@ class APICard extends React.Component {
         } else {
           console.error("Invalid response from Hydrus server");
           this.setState({errorSnack: "Invalid response from Hydrus server"});
+        }
+      })
+      .catch((e) => {
+        console.error(e);
+        this.setState({errorSnack: e.message});
+      });
+  }
+
+  onFinishAuthPiwigo() {
+    let reqURL = this.state.input1 + "://" + this.state.input2 + "/ws.php?format=json";
+    
+    if (!this.state.input3) {
+      reqURL += "&method=reflection.getMethodList";
+    }
+
+    let req = wretch(reqURL);
+    if (this.state.input3) {
+      req = req.formUrl({ method: "pwg.session.login", username: this.state.input3, password: this.state.input4 })
+    }
+  
+    req
+      .post()
+      .setTimeout(5000)
+      .notFound((e) => {
+        console.error(e);
+        this.setState({errorSnack: e.message});
+      })
+      .internalError((e) => {
+        console.error(e);
+        this.setState({errorSnack: e.message});
+      })
+      .json((json) => {
+        if (json.stat == "ok") {
+          this.props.onUpdateConfig((c) => {
+            c.remoteSettings.piwigoProtocol = this.state.input1;
+            c.remoteSettings.piwigoHost = this.state.input2;
+            c.remoteSettings.piwigoUsername = this.state.input3;
+            c.remoteSettings.piwigoPassword = this.state.input4;
+          });
+          // Update state
+          this.props.onUpdateSettings((s) => {
+            s.piwigoProtocol = this.state.input1;
+            s.piwigoHost = this.state.input2;
+            s.piwigoUsername = this.state.input3;
+            s.piwigoPassword = this.state.input4;
+          });
+          this.setState({successSnack: "Piwigo is configured"});
+          this.onCloseDialog();
+        } else {
+          console.error("Invalid response from Piwigo server");
+          this.setState({errorSnack: "Invalid response from Piwigo server"});
         }
       })
       .catch((e) => {

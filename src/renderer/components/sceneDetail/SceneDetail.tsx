@@ -53,6 +53,8 @@ import {areWeightsValid} from "../../data/utils";
 import Audio from "../../data/Audio";
 import CaptionScript from "../../data/CaptionScript";
 import SceneGrid from "../../data/SceneGrid";
+import PiwigoDialog from "./PiwigoDialog";
+import SourceIcon from "../library/SourceIcon";
 
 const drawerWidth = 240;
 
@@ -257,9 +259,15 @@ const styles = (theme: Theme) => createStyles({
   libraryImportButton: {
     marginBottom: 225,
   },
+  piwigoImportButton: {
+    marginBottom: 280,
+  },
   removeAllButton: {
     backgroundColor: theme.palette.error.main,
     marginBottom: 280,
+  },
+  removeAllButtonAlt: {
+    marginBottom: 335,
   },
   addButtonClose: {
     marginBottom: 0,
@@ -362,6 +370,8 @@ class SceneDetail extends React.Component {
   render() {
     const classes = this.props.classes;
     const open = this.state.drawerOpen;
+    const piwigoConfigured = this.props.config.remoteSettings.piwigoProtocol != "" &&
+      this.props.config.remoteSettings.piwigoHost != "";
     return (
       <div className={classes.root}>
 
@@ -662,7 +672,7 @@ class SceneDetail extends React.Component {
             {this.props.scene.sources.length > 0 && (
               <Tooltip title="Remove All Sources"  placement="left">
                 <Fab
-                  className={clsx(classes.addButton, classes.removeAllButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.props.tutorial && classes.disable)}
+                  className={clsx(classes.addButton, !piwigoConfigured && classes.removeAllButton, piwigoConfigured && classes.removeAllButtonAlt, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.props.tutorial && classes.disable)}
                   onClick={this.onRemoveAll.bind(this)}
                   size="small">
                   <DeleteSweepIcon className={classes.icon} />
@@ -689,6 +699,16 @@ class SceneDetail extends React.Component {
                 </Button>
               </DialogActions>
             </Dialog>
+            {piwigoConfigured &&
+              <Tooltip title="From Piwigo"  placement="left">
+                <Fab
+                  className={clsx(classes.addButton, classes.piwigoImportButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.props.tutorial && classes.disable)}
+                  onClick={this.onOpenPiwigoMenu.bind(this)}
+                  size="small">
+                  <SourceIcon type={ST.piwigo} className={classes.icon} />
+                </Fab>
+              </Tooltip>
+            }
             <Tooltip title="From Library"  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.libraryImportButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.props.tutorial && classes.disable)}
@@ -733,6 +753,14 @@ class SceneDetail extends React.Component {
               onImportURL={this.onAddSource.bind(this)}
               onClose={this.onCloseDialog.bind(this)}
             />
+
+            <PiwigoDialog 
+              config={this.props.config}
+              open={this.state.openMenu == MO.piwigo}
+              onClose={this.onCloseDialog.bind(this)}
+              onImportURL={this.onAddSource.bind(this)}
+            />
+
             {this.props.scene.sources.length >= 2 && (
               <React.Fragment>
                 <Fab
@@ -1111,6 +1139,10 @@ class SceneDetail extends React.Component {
 
   onOpenSortMenu(e: MouseEvent) {
     this.setState({menuAnchorEl: e.currentTarget, openMenu: MO.sort});
+  }
+
+  onOpenPiwigoMenu() {
+    this.setState({openMenu: MO.piwigo});
   }
 
   onCloseDialog() {

@@ -107,6 +107,7 @@ export default new Map<string, string>([
   ['st.ehentai', 'EHentai'],
   ['st.bdsmlr', 'BDSMlr'],
   ['st.hydrus', 'Hydrus'],
+  ['st.piwigo', 'Piwigo'],
   ['st.video', 'Video'],
   ['st.playlist', 'Playlist'],
   ['st.list', 'List'],
@@ -131,6 +132,14 @@ export default new Map<string, string>([
   ['rf.top', 'Top'],
   ['rf.cont', 'Controversial'],
   ['rf.rising', 'Rising'],
+
+  ['date_available', "Date Available"],
+  ['date_creation', "Date Created"],
+  ['name', "Name"],
+  ['file', "Filename"],
+  ['hit', "Hits"],
+  ['rating_score', "Rating"],
+  ['id', "ID"],
 
   ['wc.bottomRight', 'Bottom Right'],
   ['wc.bottomLeft', 'Bottom Left'],

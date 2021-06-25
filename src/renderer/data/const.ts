@@ -152,6 +152,7 @@ const ST = { // source types
   ehentai: 'st.ehentai',
   bdsmlr: 'st.bdsmlr',
   hydrus: 'st.hydrus',
+  piwigo: 'st.piwigo',
   audio: 'st.audio'
 };
 
@@ -203,6 +204,7 @@ const MO = { // Menu/Modal Constants
   save: 'mo.save',
   load: 'mo.load',
   select: 'mo.select',
+  piwigo: 'mo.piwigo',
 };
 
 const PR = { // Global progress functions
@@ -415,6 +417,23 @@ const WC = { // Watermark corner
   topLeft: 'wc.topLeft',
 }
 
+const PW = { // Piwigo types
+  apiTypeFavorites: 'pwg.users.favorites.getList',
+  apiTypeCategory: 'pwg.categories.getImages',
+  apiTypeTag: 'pwg.tags.getImages',
+}
+
+const PWS = { // Piwigo sort types
+  sortOptionAvailable: 'date_available',
+  sortOptionCreated: 'date_creation',
+  sortOptionName: 'name',
+  sortOptionFile: 'file',
+  sortOptionHit: 'hit',
+  sortOptionID: 'id',
+  sortOptionRating: 'rating_score',
+  sortOptionRandom: 'random',
+}
+
 export {
-  AF, ALT, ASF, BT, CST, DONE, EA, GO, GT, HTF, IF, IG, IPC, IT, LT, MO, OF, OT, PR, PT, RF, RP, RT, SB, SC, SDGT, SDT, SF, SGT, SL, SLT, SOF, SP, SPT, ST, TF, TT, VCT, VO, VTF, WC, WF
+  AF, ALT, ASF, BT, CST, DONE, EA, GO, GT, HTF, IF, IG, IPC, IT, LT, MO, OF, OT, PR, PT, PW, PWS, RF, RP, RT, SB, SC, SDGT, SDT, SF, SGT, SL, SLT, SOF, SP, SPT, ST, TF, TT, VCT, VO, VTF, WC, WF
 };

@@ -62,6 +62,7 @@ let tumblr429Alerted = false;
 let twitterAlerted = false;
 let instagramAlerted = false;
 let hydrusAlerted = false;
+let piwigoAlerted = false;
 
 export const reset = () => {
   redditAlerted = false;
@@ -70,6 +71,7 @@ export const reset = () => {
   twitterAlerted = false;
   instagramAlerted = false;
   hydrusAlerted = false;
+  piwigoAlerted = false;
 }
 
 export const loadRemoteImageURLList = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
@@ -1892,6 +1894,152 @@ export const loadBDSMlr = (allURLs: Map<string, Array<string>>, config: Config, 
     });
 }
 
+let piwigoLoggedIn: boolean = false;
+export const loadPiwigo = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
+  const timeout = 8000;
+  let url = source.url;
+
+  const user = config.remoteSettings.piwigoUsername;
+  const pass = config.remoteSettings.piwigoPassword;
+  const host = config.remoteSettings.piwigoHost;
+  const protocol = config.remoteSettings.piwigoProtocol;
+  const configured = host != "" && protocol != "" && user != "" && pass != "";
+
+  if (configured) {
+    const login = () => {
+      return wretch(protocol + "://" + host + "/ws.php?format=json")
+        .formUrl({method: "pwg.session.login", username: user, password: pass})
+        .post()
+        .setTimeout(5000)
+        .notFound((e) => pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }))
+        .internalError((e) => pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }))
+        .json((json) => {
+          if (json.stat == "ok") {
+            piwigoLoggedIn = true;
+            search();
+          } else {
+            pm({
+              error: "Piwigo login failed.",
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            });
+          }
+        })
+        .catch((e) => {
+          pm({
+            error: e.message,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          })
+        });
+    }
+
+    const retry = () => {
+      if (helpers.retries < 3) {
+        helpers.retries += 1;
+        pm({
+          data: [],
+          allURLs: allURLs,
+          weight: weight,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        });
+      } else {
+        pm({
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        });
+      }
+    }
+
+    const search = () => {
+      return wretch(url + "&page=" + helpers.next)
+        .get()
+        .setTimeout(5000)
+        .onAbort(retry)
+        .notFound((e) => pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }))
+        .internalError(retry)
+        .json((json) => {
+          if (json.stat != "ok") {
+            helpers.next = null;
+            pm({
+              data: [],
+              allURLs: allURLs,
+              weight: weight,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            });
+            return;
+          }
+
+          const images = Array<string>();
+          if (json?.result?.images) {
+            for (let o = 0; o < json.result.images.length; o++) {
+              const image = json.result.images[o];
+              if (image.element_url) {
+                images.push(image.element_url);
+              }
+            }
+          }
+
+          if (images.length > 0) {
+            helpers.next = helpers.next + 1;
+            helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+          } else {
+            helpers.next = null;
+          }
+
+          pm({
+            data: filterPathsToJustPlayable(filter, images, true),
+            allURLs: allURLs,
+            weight: weight,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          });
+        });
+    };
+
+    if (!piwigoLoggedIn) {
+      login()
+    } else {
+      search();
+    }
+  } else {
+    let systemMessage = undefined;
+    if (!piwigoAlerted) {
+      systemMessage = "You haven't configured FlipFlip to work with Piwigo yet.\nVisit Settings to configure Piwigo.";
+      hydrusAlerted = true;
+    }
+    pm({
+      systemMessage: systemMessage,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    });
+  }
+}
+
 export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
   const timeout = 8000;
   const apiKey = config.remoteSettings.hydrusAPIKey;
@@ -2226,6 +2374,8 @@ export function getSourceType(url: string): string {
     return ST.bdsmlr;
   } else if (/^https?:\/\/[\w\\.]+:\d+\/get_files\/search_files/.exec(url) != null) {
     return ST.hydrus;
+  } else if (/^https?:\/\/[^.]*\.[a-z0-9\.:]+\/ws.php/.exec(url) != null) {
+    return ST.piwigo;
   } else if (/(^https?:\/\/)|(\.txt$)/.exec(url) != null) { // Arbitrary URL, assume image list
     return ST.list;
   } else { // Directory
@@ -2371,5 +2521,13 @@ export function getFileGroup(url: string) {
       tags = tags.substring(1, tags.length - 1);
       tags = tags.replace(/"/g, "");
       return tags;
+    case ST.piwigo:
+      const catRegex = /cat_id\[]=(\d*)/.exec(url);
+      if (catRegex != null) return catRegex[1];
+
+      const tagRegex = /tag_id\[]=(\d*)/.exec(url);
+      if (tagRegex != null) return tagRegex[1];
+
+      return "piwigo";
   }
 }

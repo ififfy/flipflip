@@ -480,7 +480,7 @@ export default class ImagePlayer extends React.Component {
     // Don't bother loading files we've already cached locally
     if (this.props.config.caching.enabled && url.startsWith("http")) {
       const fileType = getSourceType(url);
-      if (fileType != ST.hydrus && fileType != ST.video && fileType != ST.local && fileType != ST.playlist) {
+      if (fileType != ST.hydrus && fileType != ST.piwigo && fileType != ST.video && fileType != ST.local && fileType != ST.playlist) {
         const sourceCachePath = getCachePath(source, this.props.config);
         const filePath = sourceCachePath + getFileName(url);
         const cachedAlready = fs.existsSync(filePath);
