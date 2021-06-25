@@ -370,9 +370,8 @@ class SceneDetail extends React.Component {
   render() {
     const classes = this.props.classes;
     const open = this.state.drawerOpen;
-    const piwigoAuthorized = this.props.config.remoteSettings.piwigoProtocol != "" &&
-      this.props.config.remoteSettings.piwigoHost != "" && this.props.config.remoteSettings.piwigoUsername != "" &&
-      this.props.config.remoteSettings.piwigoPassword != "";
+    const piwigoConfigured = this.props.config.remoteSettings.piwigoProtocol != "" &&
+      this.props.config.remoteSettings.piwigoHost != "";
     return (
       <div className={classes.root}>
 
@@ -673,7 +672,7 @@ class SceneDetail extends React.Component {
             {this.props.scene.sources.length > 0 && (
               <Tooltip title="Remove All Sources"  placement="left">
                 <Fab
-                  className={clsx(classes.addButton, !piwigoAuthorized && classes.removeAllButton, piwigoAuthorized && classes.removeAllButtonAlt, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.props.tutorial && classes.disable)}
+                  className={clsx(classes.addButton, !piwigoConfigured && classes.removeAllButton, piwigoConfigured && classes.removeAllButtonAlt, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.props.tutorial && classes.disable)}
                   onClick={this.onRemoveAll.bind(this)}
                   size="small">
                   <DeleteSweepIcon className={classes.icon} />
@@ -700,7 +699,7 @@ class SceneDetail extends React.Component {
                 </Button>
               </DialogActions>
             </Dialog>
-            {piwigoAuthorized &&
+            {piwigoConfigured &&
               <Tooltip title="From Piwigo"  placement="left">
                 <Fab
                   className={clsx(classes.addButton, classes.piwigoImportButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.props.tutorial && classes.disable)}

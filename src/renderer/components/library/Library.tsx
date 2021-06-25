@@ -356,9 +356,8 @@ class Library extends React.Component {
       this.props.config.remoteSettings.twitterAccessTokenSecret != "";
     const instagramAuthorized = this.props.config.remoteSettings.instagramUsername != "" &&
       this.props.config.remoteSettings.instagramPassword != "";
-    const piwigoAuthorized = this.props.config.remoteSettings.piwigoProtocol != "" &&
-      this.props.config.remoteSettings.piwigoHost != "" && this.props.config.remoteSettings.piwigoUsername != "" &&
-      this.props.config.remoteSettings.piwigoPassword != "";
+    const piwigoConfigured = this.props.config.remoteSettings.piwigoProtocol != "" &&
+      this.props.config.remoteSettings.piwigoHost != "";
     const remoteAuthorized = tumblrAuthorized || redditAuthorized || twitterAuthorized || instagramAuthorized;
 
     let cancelProgressMessage;
@@ -733,7 +732,7 @@ class Library extends React.Component {
                 </React.Fragment>
               )}
             </Dialog>
-            {piwigoAuthorized &&
+            {piwigoConfigured &&
               <Tooltip title={this.state.filters.length > 0 ? "" : "Piwigo"}  placement="left">
                 <Fab
                   className={clsx(classes.addButton, classes.addPiwigoButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
