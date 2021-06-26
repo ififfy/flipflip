@@ -73,7 +73,7 @@ export function getBackups(): Array<{url: string, size: number}> {
   const files = fs.readdirSync(saveDir);
   const backups = Array<any>();
   for (let file of files) {
-    if (file.startsWith("data.json.")) {
+    if (file.startsWith("data.json.") && file != "data.json.new") {
       const stats = fs.statSync(saveDir + "/" + file);
       backups.push({url: file, size: stats.size});
     }

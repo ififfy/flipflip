@@ -377,8 +377,10 @@ export function cleanBackups(config: Config) {
       let lastMonth = convertFromEpoch(keepMonths[keepMonths.length - 1].url);
 
       if (moment(backupDate).isSame(lastDay, 'day')) {
-        if (backupDate < lastDay) {
-          keepDays[keepDays.length - 1]  = backup;
+        if (moment(backupDate).isSame(new Date(), 'day') && backupDate > lastDay) {
+          keepDays[keepDays.length - 1] = backup;
+        } else if (!moment(backupDate).isSame(new Date(), 'day') && backupDate < lastDay) {
+          keepDays[keepDays.length - 1] = backup;
         }
       } else if (keepDays.length < config.generalSettings.autoCleanBackupDays) {
         keepDays.push(backup);
@@ -386,7 +388,7 @@ export function cleanBackups(config: Config) {
 
       if (moment(backupDate).isSame(lastWeek, 'week')) {
         if (backupDate < lastWeek) {
-          keepWeeks[keepWeeks.length - 1]  = backup;
+          keepWeeks[keepWeeks.length - 1] = backup;
         }
       } else if (keepWeeks.length < config.generalSettings.autoCleanBackupWeeks) {
         keepWeeks.push(backup);
@@ -394,7 +396,7 @@ export function cleanBackups(config: Config) {
 
       if (moment(backupDate).isSame(lastMonth, 'month')) {
         if (backupDate < lastWeek) {
-          keepMonths[keepMonths.length - 1]  = backup;
+          keepMonths[keepMonths.length - 1] = backup;
         }
       } else if (keepMonths.length < config.generalSettings.autoCleanBackupMonths) {
         keepMonths.push(backup);

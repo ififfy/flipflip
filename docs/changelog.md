@@ -1,4 +1,16 @@
 # Changelog
+## 3.1.4 <small>(06/26/2021)</small>
+- Add Piwigo support (abrenoch)
+- Add <Unclipped> filter
+- Add option to toggle grid cell watermarks
+- Fix bug with saving data.json
+- Fix bug with auto clean algorithm
+- Fix bug with grid cells being cut-off
+- Fix bug with adding script to library
+- Fix tagging UI in Video Clipper
+- Fix bug with duplicate caption tracks appearing on videos
+- Fix bug with Scene Generator tutorial
+- Fix bug with menu settings not resetting when ending playback
 
 ## 3.1.3 <small>(05/21/2021)</small>
 - Scrape images in separate thread

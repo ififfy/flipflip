@@ -109,6 +109,7 @@ local video/playlist file, add a `Local video/playlsit` and choose the video(s) 
 * <img style="vertical-align: -2px; margin-right: 5px" src="doc_icons/gelbooru.png" alt="Gelbooru" width="15" height="15">Gelbooru Tag
 * <img style="vertical-align: -2px; margin-right: 5px" src="doc_icons/ehentai.png" alt="E-Hentai" width="15" height="15">E-Hentai Gallery
 * <img style="vertical-align: -2px; margin-right: 5px" src="doc_icons/hydrus.svg" alt="Hydrus" width="15" height="15">Hydrus Tag
+* <img style="vertical-align: -2px; margin-right: 5px" src="doc_icons/piwigo.svg" alt="Piwigo" width="15" height="15">Piwigo Album
 * <img style="vertical-align: -2px; margin-right: 5px" src="doc_icons/b.svg" alt="BDSMlr" width="15" height="15">BDSMlr Blog (Only works for blogs with images in RSS feed)
 * ~~<img style="vertical-align: -2px" src="doc_icons/sexcom.svg" alt="Sex.com" width="15" height="15"> Sex.com Gallery/User~~ _Currently broken_
 
