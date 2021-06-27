@@ -1,5 +1,4 @@
 import * as React from "react";
-import {remote} from "electron";
 import {unlinkSync} from "fs";
 import {sortableContainer, sortableElement} from 'react-sortable-hoc';
 import AutoSizer from "react-virtualized-auto-sizer";
@@ -18,7 +17,7 @@ import {
   withStyles
 } from "@material-ui/core";
 
-import {arrayMove, urlToPath} from "../../data/utils";
+import {arrayMove} from "../../data/utils";
 import Audio from "../../data/Audio";
 import Playlist from "../../data/Playlist";
 import AudioSourceListItem from "./AudioSourceListItem";
@@ -79,6 +78,7 @@ class AudioSourceList extends React.Component {
   };
 
   onSortEnd = ({oldIndex, newIndex}: {oldIndex: number, newIndex: number}) => {
+    // TODO Also update selected
     if (this.props.playlist) {
       this.props.onUpdatePlaylists((pl) => {
         const playlist = pl.find((p) => p.name == this.props.playlist);
