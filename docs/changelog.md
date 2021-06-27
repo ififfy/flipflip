@@ -11,6 +11,7 @@
 - Fix bug with duplicate caption tracks appearing on videos
 - Fix bug with Scene Generator tutorial
 - Fix bug with menu settings not resetting when ending playback
+- Fix bug with certain sources not working with release version
 
 ## 3.1.3 <small>(05/21/2021)</small>
 - Scrape images in separate thread

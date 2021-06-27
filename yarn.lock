@@ -1791,10 +1791,10 @@ domhandler@2.1:
   dependencies:
     domelementtype "1"
 
-domino@^2.1.6:
-  version "2.1.6"
-  resolved "https://registry.yarnpkg.com/domino/-/domino-2.1.6.tgz#fe4ace4310526e5e7b9d12c7de01b7f485a57ffe"
-  integrity sha512-3VdM/SXBZX2omc9JF9nOPCtDaYQ67BGp5CoLpIQlO2KCAPETs8TcDHacF26jXadGbvUteZzRTeos2fhID5+ucQ==
+domino-ext@^2.1.4:
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/domino-ext/-/domino-ext-2.1.4.tgz#e9ffc1d89a63dc9d0f56c180b7a9b9cc8179d24b"
+  integrity sha512-t8piRI9Qahd4V/NqnCcqdBWsQ4OYeOvcTuoHl38Pzk9OJJ/UiCYHA2jX2fACmBtDlSMiWa0uR524KuLEAMc/3Q==
 
 domutils@1.1:
   version "1.1.6"

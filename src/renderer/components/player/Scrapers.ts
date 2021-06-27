@@ -1,7 +1,8 @@
 import path from "path";
 import wretch from "wretch";
 import {DOMParser} from "xmldom";
-import domino from "domino";
+// @ts-ignore
+import domino from "domino-ext";
 import tumblr from "tumblr.js";
 import Snoowrap from "snoowrap";
 import * as imgur from "imgur";
