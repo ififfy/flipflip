@@ -1,6 +1,7 @@
 import * as React from "react";
 import clsx from "clsx";
-import {readdir} from "fs";
+import {readdir, unlinkSync} from "fs";
+import rimraf from "rimraf";
 import {move} from "fs-extra";
 
 import {
@@ -732,6 +733,54 @@ class Library extends React.Component {
                 </React.Fragment>
               )}
             </Dialog>
+            <Dialog
+              open={this.state.openMenu == MO.deleteAlert}
+              onClose={this.onCloseDialog.bind(this)}
+              aria-labelledby="delete-all-title"
+              aria-describedby="delete-all-description">
+              {this.state.filters.length == 0 && (
+                <React.Fragment>
+                  <DialogTitle id="delete-all-title">PERMANENTLY Delete Library</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText id="delete-all-description">
+                      Are you sure you really wanna delete your entire library...? ಠ_ಠ
+                    </DialogContentText>
+                    <DialogContentText id="delete-all-description">
+                      WARNING: THIS WILL DELETE ANY LOCAL FILES FROM DISK
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+                      Cancel
+                    </Button>
+                    <Button onClick={this.onFinishDeleteAll.bind(this)} color="primary">
+                      PERMANENTLY DELETE FROM DISK
+                    </Button>
+                  </DialogActions>
+                </React.Fragment>
+              )}
+              {this.state.filters.length > 0 && (
+                <React.Fragment>
+                  <DialogTitle id="delete-all-title">PERMANENTLY Delete Sources</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText id="delete-all-description">
+                      Are you sure you want to remove these sources from your library?
+                    </DialogContentText>
+                    <DialogContentText id="delete-all-description">
+                      WARNING: THIS WILL DELETE ANY LOCAL FILES FROM DISK
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+                      Cancel
+                    </Button>
+                    <Button onClick={this.onFinishDeleteVisible.bind(this)} color="primary">
+                      PERMANENTLY DELETE FROM DISK
+                    </Button>
+                  </DialogActions>
+                </React.Fragment>
+              )}
+            </Dialog>
             {piwigoConfigured &&
               <Tooltip title={this.state.filters.length > 0 ? "" : "Piwigo"}  placement="left">
                 <Fab
@@ -1088,8 +1137,12 @@ class Library extends React.Component {
     this.setState({menuAnchorEl: null, openMenu: null, drawerOpen: false});
   }
 
-  onRemoveAll() {
-    this.setState({openMenu: MO.removeAllAlert});
+  onRemoveAll(e: MouseEvent) {
+    if (e.shiftKey && e.altKey && e.ctrlKey) {
+      this.setState({openMenu: MO.deleteAlert});
+    } else {
+      this.setState({openMenu: MO.removeAllAlert});
+    }
   }
 
   onFinishRemoveAll() {
@@ -1104,6 +1157,40 @@ class Library extends React.Component {
       const displayIDs = this.state.displaySources.map((s) => s.id);
       for (let i = l.length -1; i >= 0 ; i--) {
         if (displayIDs.includes(l[i].id)) {
+          l.splice(i, 1);
+        }
+      }
+    });
+    this.onCloseDialog();
+    this.setState({filters: []});
+  }
+
+  onFinishDeleteAll() {
+    for (let l of this.props.library) {
+      const fileType = getSourceType(l.url);
+      if (fileType == ST.local) {
+        rimraf.sync(l.url);
+      } else if (fileType == ST.video || fileType == ST.playlist || fileType == ST.list) {
+        unlinkSync(l.url);
+      }
+    }
+    this.props.onUpdateLibrary((l) => {
+      l.splice(0, l.length);
+    });
+    this.onCloseDialog();
+  }
+
+  onFinishDeleteVisible() {
+    this.props.onUpdateLibrary((l) => {
+      const displayIDs = this.state.displaySources.map((s) => s.id);
+      for (let i = l.length -1; i >= 0 ; i--) {
+        if (displayIDs.includes(l[i].id)) {
+          const fileType = getSourceType(l[i].url);
+          if (fileType == ST.local) {
+            rimraf.sync(l[i].url);
+          } else if (fileType == ST.video || fileType == ST.playlist || fileType == ST.list) {
+            unlinkSync(l[i].url);
+          }
           l.splice(i, 1);
         }
       }
