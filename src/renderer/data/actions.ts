@@ -2123,6 +2123,14 @@ export function addToPlaylist(state: State): Object {
   }
 }
 
+export function batchClip(state: State): Object {
+  if (state.specialMode == SP.batchClip) {
+    return {specialMode: null, audioOpenTab: 3};
+  } else {
+    return {specialMode: SP.batchClip, audioOpenTab: 3};
+  }
+}
+
 export function batchTag(state: State): Object {
   if (state.specialMode == SP.batchTag) {
     return {specialMode: null, audioOpenTab: 3};

@@ -3,12 +3,13 @@ import clsx from "clsx";
 import {readdir, unlinkSync} from "fs";
 import rimraf from "rimraf";
 import {move} from "fs-extra";
+import path from "path";
 
 import {
-  AppBar, Backdrop, Badge, Button, Chip, Collapse, Container, createStyles, Dialog, DialogActions,
-  DialogContent, DialogContentText, DialogTitle, Divider, Drawer, Fab, IconButton, LinearProgress, ListItem,
-  ListItemIcon, ListItemSecondaryAction, ListItemText, ListSubheader, Menu, MenuItem, Theme, Toolbar, Tooltip,
-  Typography, withStyles
+  AppBar, Backdrop, Badge, Button, Chip, Collapse, Container, createStyles, Dialog, DialogActions, DialogContent,
+  DialogContentText, DialogTitle, Divider, Drawer, Fab, IconButton, LinearProgress, ListItem, ListItemIcon,
+  ListItemSecondaryAction, ListItemText, ListSubheader, Menu, MenuItem, SvgIcon, Theme, Toolbar, Tooltip, Typography,
+  withStyles
 } from "@material-ui/core";
 
 import AddIcon from '@material-ui/icons/Add';
@@ -41,6 +42,7 @@ import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
 import Scene from "../../data/Scene";
 import Tag from "../../data/Tag";
+import BatchClipDialog from "./BatchClipDialog";
 import LibrarySearch from "./LibrarySearch";
 import SourceIcon from "./SourceIcon";
 import SourceList from "./SourceList";
@@ -312,6 +314,7 @@ class Library extends React.Component {
     yOffset: number,
     goBack(): void,
     onAddSource(scene: Scene, type: string, ...args: any[]): void,
+    onBatchClip(): void,
     onBatchTag(): void,
     onClearBlacklist(sourceURL: string): void,
     onClip(source: LibrarySource, displayed: Array<LibrarySource>): void,
@@ -474,6 +477,24 @@ class Library extends React.Component {
                   <FormatListBulletedIcon />
                 </ListItemIcon>
                 <ListItemText primary="Batch Tag" />
+              </ListItem>
+            </Tooltip>
+            <Tooltip title={this.state.drawerOpen ? "" : "Batch Clip"}>
+              <ListItem button onClick={this.onBatchClip.bind(this)}>
+                <ListItemIcon>
+                  <SvgIcon>
+                    <path d="M11 21H7V19H11V21M15.5 19H17V21H13V19H13.2L11.8 12.9L9.3 13.5C9.2 14 9 14.4 8.8
+                          14.8C7.9 16.3 6 16.7 4.5 15.8C3 14.9 2.6 13 3.5 11.5C4.4 10 6.3 9.6 7.8 10.5C8.2 10.7 8.5
+                          11.1 8.7 11.4L11.2 10.8L10.6 8.3C10.2 8.2 9.8 8 9.4 7.8C8 6.9 7.5 5 8.4 3.5C9.3 2 11.2
+                          1.6 12.7 2.5C14.2 3.4 14.6 5.3 13.7 6.8C13.5 7.2 13.1 7.5 12.8 7.7L15.5 19M7 11.8C6.3
+                          11.3 5.3 11.6 4.8 12.3C4.3 13 4.6 14 5.3 14.4C6 14.9 7 14.7 7.5 13.9C7.9 13.2 7.7 12.2 7
+                          11.8M12.4 6C12.9 5.3 12.6 4.3 11.9 3.8C11.2 3.3 10.2 3.6 9.7 4.3C9.3 5 9.5 6 10.3 6.5C11
+                          6.9 12 6.7 12.4 6M12.8 11.3C12.6 11.2 12.4 11.2 12.3 11.4C12.2 11.6 12.2 11.8 12.4
+                          11.9C12.6 12 12.8 12 12.9 11.8C13.1 11.6 13 11.4 12.8 11.3M21 8.5L14.5 10L15 12.2L22.5
+                          10.4L23 9.7L21 8.5M23 19H19V21H23V19M5 19H1V21H5V19Z" />
+                  </SvgIcon>
+                </ListItemIcon>
+                <ListItemText primary="Batch Clip" />
               </ListItem>
             </Tooltip>
             <Tooltip title={"Identify local sources which have identical tags"}>
@@ -656,7 +677,7 @@ class Library extends React.Component {
                 <SelectAllIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip title={this.props.specialMode == SP.batchTag ? "Batch Tag" : "Import"}  placement="top-end">
+            <Tooltip title={this.props.specialMode == SP.batchTag ? "Batch Tag" : this.props.specialMode == SP.batchClip ? "Batch Clip" : "Import"}  placement="top-end">
               <Badge
                 className={classes.importBadge}
                 color="secondary"
@@ -665,13 +686,26 @@ class Library extends React.Component {
                 <Fab
                   className={classes.addMenuButton}
                   disabled={this.state.selected.length == 0}
-                  onClick={this.props.specialMode == SP.batchTag ? this.onToggleBatchTagModal.bind(this) : this.onImportFromLibrary.bind(this)}
+                  onClick={this.props.specialMode == SP.batchTag ? this.onToggleBatchTagModal.bind(this) : this.props.specialMode == SP.batchClip ? this.onToggleBatchClipModal.bind(this) : this.onImportFromLibrary.bind(this)}
                   size="large">
                   {this.props.specialMode == SP.select && (
                     <GetAppIcon className={classes.icon} />
                   )}
                   {this.props.specialMode == SP.batchTag && (
                     <LocalOfferIcon className={classes.icon} />
+                  )}
+                  {this.props.specialMode == SP.batchClip && (
+                    <SvgIcon className={classes.icon} >
+                      <path d="M11 21H7V19H11V21M15.5 19H17V21H13V19H13.2L11.8 12.9L9.3 13.5C9.2 14 9 14.4 8.8
+                          14.8C7.9 16.3 6 16.7 4.5 15.8C3 14.9 2.6 13 3.5 11.5C4.4 10 6.3 9.6 7.8 10.5C8.2 10.7 8.5
+                          11.1 8.7 11.4L11.2 10.8L10.6 8.3C10.2 8.2 9.8 8 9.4 7.8C8 6.9 7.5 5 8.4 3.5C9.3 2 11.2
+                          1.6 12.7 2.5C14.2 3.4 14.6 5.3 13.7 6.8C13.5 7.2 13.1 7.5 12.8 7.7L15.5 19M7 11.8C6.3
+                          11.3 5.3 11.6 4.8 12.3C4.3 13 4.6 14 5.3 14.4C6 14.9 7 14.7 7.5 13.9C7.9 13.2 7.7 12.2 7
+                          11.8M12.4 6C12.9 5.3 12.6 4.3 11.9 3.8C11.2 3.3 10.2 3.6 9.7 4.3C9.3 5 9.5 6 10.3 6.5C11
+                          6.9 12 6.7 12.4 6M12.8 11.3C12.6 11.2 12.4 11.2 12.3 11.4C12.2 11.6 12.2 11.8 12.4
+                          11.9C12.6 12 12.8 12 12.9 11.8C13.1 11.6 13 11.4 12.8 11.3M21 8.5L14.5 10L15 12.2L22.5
+                          10.4L23 9.7L21 8.5M23 19H19V21H23V19M5 19H1V21H5V19Z" />
+                    </SvgIcon>
                   )}
                 </Fab>
               </Badge>
@@ -929,6 +963,13 @@ class Library extends React.Component {
             </Button>
           </DialogActions>
         </Dialog>
+        <BatchClipDialog
+          open={this.state.openMenu == MO.batchClip}
+          library={this.props.library}
+          selected={this.state.selected}
+          onCloseDialog={this.onCloseDialog.bind(this)}
+          onUpdateLibrary={this.props.onUpdateLibrary.bind(this)}
+        />
         <Dialog
           open={this.state.moveDialog}
           onClose={this.onCloseMoveDialog.bind(this)}
@@ -1034,6 +1075,11 @@ class Library extends React.Component {
     this.setState({moveDialog: false});
   }
 
+  onBatchClip() {
+    this.onCloseDialog();
+    this.props.onBatchClip();
+  }
+
   onBatchTag() {
     this.onCloseDialog();
     this.props.onBatchTag();
@@ -1088,6 +1134,9 @@ class Library extends React.Component {
     if (this.props.specialMode == SP.batchTag) {
       this.setState({selected: [], selectedTags: []});
       this.props.onBatchTag();
+    } else if (this.props.specialMode == SP.batchClip) {
+      this.setState({selected: [], clipOffset: [0, 0]});
+      this.props.onBatchClip();
     } else {
       this.props.goBack();
     }
@@ -1103,6 +1152,14 @@ class Library extends React.Component {
       this.props.onAddSource(null, AF.videoDir, ...args);
     } else {
       this.props.onAddSource(null, addFunction, ...args);
+    }
+  }
+
+  onToggleBatchClipModal() {
+    if (this.state.openMenu == MO.batchClip) {
+      this.setState({openMenu: null, clipOffset: [0, 0]});
+    } else {
+      this.setState({openMenu: MO.batchClip, clipOffset: [0, 0]});
     }
   }
 
@@ -1262,6 +1319,8 @@ class Library extends React.Component {
       });
     }
   }
+
+
 
   batchTagOverwrite() {
     this.props.onUpdateLibrary((l) => {

@@ -182,6 +182,7 @@ const IPC = {
 const MO = { // Menu/Modal Constants
   new: 'mo.new',
   sort: 'mo.sort',
+  batchClip: 'mo.batchclip',
   batchTag: 'mo.batchtag',
   batchEdit: 'mo.batchedit',
   playlist: 'mo.playlist',
@@ -404,6 +405,7 @@ const EA = { // Easings
 const SP = { // Special modes
   addToPlaylist: 'sp.addToPlaylist',
   autoEdit: 'sp.autoEdit',
+  batchClip: 'sp.batchClip',
   batchTag: 'sp.batchTag',
   batchEdit: 'sp.batchEdit',
   select: 'sp.select',

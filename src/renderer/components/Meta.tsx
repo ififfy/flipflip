@@ -223,6 +223,7 @@ export default class Meta extends React.Component {
                 yOffset={this.state.libraryYOffset}
                 goBack={a(actions.goBack)}
                 onAddSource={a(actions.addSource)}
+                onBatchClip={a(actions.batchClip)}
                 onBatchTag={a(actions.batchTag)}
                 onClearBlacklist={a(actions.clearBlacklist)}
                 onClip={a(actions.clipVideo)}
