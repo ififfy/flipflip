@@ -7,6 +7,7 @@ import {SDT} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
 import Scene from "../../data/Scene";
 import CrossFadeCard from "../configGroups/CrossFadeCard";
+import SlideCard from "../configGroups/SlideCard";
 import StrobeCard from "../configGroups/StrobeCard";
 import ZoomMoveCard from "../configGroups/ZoomMoveCard";
 import FadeIOCard from "../configGroups/FadeIOCard";
@@ -61,6 +62,18 @@ class SceneEffects extends React.Component {
           <Card>
             <CardContent>
               <CrossFadeCard
+                scene={this.props.scene}
+                easingControls={this.props.easingControls}
+                tutorial={this.props.tutorial}
+                onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} md={6} lg={4}>
+          <Card>
+            <CardContent>
+              <SlideCard
                 scene={this.props.scene}
                 easingControls={this.props.easingControls}
                 tutorial={this.props.tutorial}

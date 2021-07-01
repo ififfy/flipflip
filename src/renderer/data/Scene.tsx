@@ -1,7 +1,7 @@
 import path from "path";
 
 import {urlToPath} from "./utils";
-import {BT, EA, GO, HTF, IF, IT, OF, OT, RP, SC, SL, SOF, TF, VO, VTF, WF} from './const';
+import {BT, EA, GO, HTF, IF, IT, OF, OT, RP, SC, SL, SOF, STF, TF, VO, VTF, WF} from './const';
 import LibrarySource from "./LibrarySource";
 import Audio from "./Audio";
 import Overlay from "./Overlay";
@@ -76,6 +76,20 @@ export default class Scene {
   fadeAmp = 20;
   fadePer = 6;
   fadeOv = 3;
+  slide = false;
+  slideTF = TF.constant;
+  slideType = STF.left;
+  slideDistance = 100;
+  slideDuration = 500;
+  slideDurationMin = 100;
+  slideDurationMax = 700;
+  slideSinRate = 100;
+  slideBPMMulti = 10;
+  slideEase = EA.linear;
+  slideExp = 6;
+  slideAmp = 20;
+  slidePer = 6;
+  slideOv = 3;
   fadeInOut = false;
   fadeIOPulse = false;
   fadeIOTF = TF.constant;

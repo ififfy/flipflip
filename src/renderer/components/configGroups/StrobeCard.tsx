@@ -440,7 +440,7 @@ class StrobeCard extends React.Component {
                 <Divider />
               </Collapse>
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12}  className={clsx(!this.props.scene.strobe && classes.noPadding)}>
               <Collapse in={this.props.scene.strobe} className={classes.fullWidth}>
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>

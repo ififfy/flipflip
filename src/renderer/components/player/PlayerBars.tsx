@@ -33,6 +33,7 @@ import SceneOptionCard from "../configGroups/SceneOptionCard";
 import ImageVideoCard from "../configGroups/ImageVideoCard";
 import ZoomMoveCard from "../configGroups/ZoomMoveCard";
 import CrossFadeCard from "../configGroups/CrossFadeCard";
+import SlideCard from "../configGroups/SlideCard";
 import StrobeCard from "../configGroups/StrobeCard";
 import AudioCard from "../configGroups/AudioCard";
 import TextCard from "../configGroups/TextCard";
@@ -459,6 +460,21 @@ class PlayerBars extends React.Component {
                     </AccordionSummary>
                     <AccordionDetails>
                       <CrossFadeCard
+                        sidebar
+                        scene={this.props.scene}
+                        easingControls={this.props.config.displaySettings.easingControls}
+                        onUpdateScene={this.props.onUpdateScene.bind(this)} />
+                    </AccordionDetails>
+                  </Accordion>
+
+                  <Accordion TransitionProps={{ unmountOnExit: true }}>
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                    >
+                      <Typography>Slide</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <SlideCard
                         sidebar
                         scene={this.props.scene}
                         easingControls={this.props.config.displaySettings.easingControls}

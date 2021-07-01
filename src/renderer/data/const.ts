@@ -98,6 +98,16 @@ const VTF = { // vertical translate functions
   random: 'vtf.random',
 };
 
+const STF = { // Slide type function
+  left: 'stf.left',
+  right: 'stf.right',
+  leftright: 'stf.leftright',
+  up: 'stf.up',
+  down: 'stf.down',
+  updown: 'stf.updown',
+  random: 'stf.random',
+};
+
 const GT = { // gooninator import type
   tumblr: 'gt.tumblr',
   local: 'gt.local',
@@ -437,5 +447,5 @@ const PWS = { // Piwigo sort types
 }
 
 export {
-  AF, ALT, ASF, BT, CST, DONE, EA, GO, GT, HTF, IF, IG, IPC, IT, LT, MO, OF, OT, PR, PT, PW, PWS, RF, RP, RT, SB, SC, SDGT, SDT, SF, SGT, SL, SLT, SOF, SP, SPT, ST, TF, TT, VCT, VO, VTF, WC, WF
+  AF, ALT, ASF, BT, CST, DONE, EA, GO, GT, HTF, IF, IG, IPC, IT, LT, MO, OF, OT, PR, PT, PW, PWS, RF, RP, RT, SB, SC, SDGT, SDT, SF, SGT, SL, SLT, STF, SOF, SP, SPT, ST, TF, TT, VCT, VO, VTF, WC, WF
 };

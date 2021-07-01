@@ -12,6 +12,7 @@ import FadeInOut from "./FadeInOut";
 import Panning from "./Panning";
 import CrossFade from "./CrossFade";
 import ZoomMove from "./ZoomMove";
+import Slide from "./Slide";
 
 export default class ImageView extends React.Component {
   readonly props: {
@@ -526,27 +527,48 @@ export default class ImageView extends React.Component {
             hideOverflow={this.props.hideOverflow}
             scene={this.props.scene}
             fadeFunction={this.strobeImage.bind(this)}>
-            <CrossFade
+            <Slide
               image={this.props.image}
               scene={this.props.scene}
               timeToNextFrame={this.props.timeToNextFrame}
               currentAudio={this.props.currentAudio}
               hideOverflow={this.props.hideOverflow}>
-              <ZoomMove
+              <CrossFade
                 image={this.props.image}
                 scene={this.props.scene}
                 timeToNextFrame={this.props.timeToNextFrame}
                 currentAudio={this.props.currentAudio}
                 hideOverflow={this.props.hideOverflow}>
-                {(this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.image) && (
-                  <Strobe
-                    currentAudio={this.props.currentAudio}
-                    zIndex={2}
-                    toggleStrobe={this.props.toggleStrobe}
-                    hideOverflow={this.props.hideOverflow}
-                    timeToNextFrame={this.props.timeToNextFrame}
-                    scene={this.props.scene}
-                    strobeFunction={this.strobeImage.bind(this)}>
+                <ZoomMove
+                  image={this.props.image}
+                  scene={this.props.scene}
+                  timeToNextFrame={this.props.timeToNextFrame}
+                  currentAudio={this.props.currentAudio}
+                  hideOverflow={this.props.hideOverflow}>
+                  {(this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.image) && (
+                    <Strobe
+                      currentAudio={this.props.currentAudio}
+                      zIndex={2}
+                      toggleStrobe={this.props.toggleStrobe}
+                      hideOverflow={this.props.hideOverflow}
+                      timeToNextFrame={this.props.timeToNextFrame}
+                      scene={this.props.scene}
+                      strobeFunction={this.strobeImage.bind(this)}>
+                      <animated.div
+                        id="image"
+                        ref={this.contentRef}
+                        style={{
+                          height: '100%',
+                          width: '100%',
+                          zIndex: 2,
+                          backgroundPosition: 'center',
+                          backgroundSize: 'contain',
+                          backgroundRepeat: 'no-repeat',
+                          position: 'absolute',
+                        }}/>
+                    </Strobe>
+                  )}
+                  {(!this.props.scene || !this.props.scene.strobe || this.props.scene.strobeLayer != SL.image) && (
                     <animated.div
                       id="image"
                       ref={this.contentRef}
@@ -559,63 +581,57 @@ export default class ImageView extends React.Component {
                         backgroundRepeat: 'no-repeat',
                         position: 'absolute',
                       }}/>
-                  </Strobe>
+                  )}
+                </ZoomMove>
+                {this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.background && (
+                  <Strobe
+                    currentAudio={this.props.currentAudio}
+                    zIndex={1}
+                    toggleStrobe={this.props.toggleStrobe}
+                    hideOverflow
+                    timeToNextFrame={this.props.timeToNextFrame}
+                    scene={this.props.scene}/>
                 )}
-                {(!this.props.scene || !this.props.scene.strobe || this.props.scene.strobeLayer != SL.image) && (
+                {!this.props.scene.panning && (
                   <animated.div
-                    id="image"
-                    ref={this.contentRef}
+                    ref={this.backgroundRef}
                     style={{
                       height: '100%',
                       width: '100%',
-                      zIndex: 2,
-                      backgroundPosition: 'center',
-                      backgroundSize: 'contain',
-                      backgroundRepeat: 'no-repeat',
-                      position: 'absolute',
+                      zIndex: 1,
+                      backgroundSize: 'cover',
+                      overflow: 'hidden',
+                      ...backgroundStyle
                     }}/>
                 )}
-              </ZoomMove>
-              {this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.background && (
-                <Strobe
-                  currentAudio={this.props.currentAudio}
-                  zIndex={1}
-                  toggleStrobe={this.props.toggleStrobe}
-                  hideOverflow
-                  timeToNextFrame={this.props.timeToNextFrame}
-                  scene={this.props.scene}/>
-              )}
-              {!this.props.scene.panning && (
-                <animated.div
-                  ref={this.backgroundRef}
-                  style={{
-                    height: '100%',
-                    width: '100%',
-                    zIndex: 1,
-                    backgroundSize: 'cover',
-                    ...backgroundStyle
-                  }}/>
-              )}
-            </CrossFade>
+              </CrossFade>
+            </Slide>
           </FadeInOut>
         </Panning>
         {this.props.scene.panning && (
-          <CrossFade
+          <Slide
             image={this.props.image}
             scene={this.props.scene}
             timeToNextFrame={this.props.timeToNextFrame}
             currentAudio={this.props.currentAudio}
             hideOverflow={this.props.hideOverflow}>
-            <animated.div
-              ref={this.backgroundRef}
-              style={{
-                height: '100%',
-                width: '100%',
-                zIndex: 1,
-                backgroundSize: 'cover',
-                ...backgroundStyle
-              }}/>
-          </CrossFade>
+            <CrossFade
+              image={this.props.image}
+              scene={this.props.scene}
+              timeToNextFrame={this.props.timeToNextFrame}
+              currentAudio={this.props.currentAudio}
+              hideOverflow={this.props.hideOverflow}>
+              <animated.div
+                ref={this.backgroundRef}
+                style={{
+                  height: '100%',
+                  width: '100%',
+                  zIndex: 1,
+                  backgroundSize: 'cover',
+                  ...backgroundStyle
+                }}/>
+            </CrossFade>
+          </Slide>
         )}
       </animated.div>
     );

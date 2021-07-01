@@ -67,6 +67,14 @@ export default new Map<string, string>([
   ['vtf.down', 'Down'],
   ['vtf.random', 'Up/Down'],
 
+  ['stf.left', 'Left'],
+  ['stf.right', 'Right'],
+  ['stf.leftright', 'Left/Right'],
+  ['stf.up', 'Up'],
+  ['stf.down', 'Down'],
+  ['stf.updown', 'Up/Down'],
+  ['stf.random', 'Random'],
+
   ['gt.tumblr', 'Tumblr'],
   ['gt.local', 'Local'],
 
