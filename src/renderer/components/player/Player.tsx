@@ -279,7 +279,7 @@ export default class Player extends React.Component {
               <CircularProgress
                 size={300}
                 value={Math.round((this.state.progress / this.state.total) * 100)}
-                variant="static"/>
+                variant="determinate"/>
                 <div
                   style={{
                     alignItems: 'center',
