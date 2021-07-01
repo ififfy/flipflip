@@ -101,6 +101,7 @@ export default class ImagePlayer extends React.Component {
             scene={this.props.scene}/>
         )}
         <ImageView
+          removeChild
           image={this.state.historyPaths.length > 0 ? this.state.historyPaths[(this.state.historyPaths.length - 1) + offset] : null}
           currentAudio={this.props.currentAudio}
           scene={this.props.scene}

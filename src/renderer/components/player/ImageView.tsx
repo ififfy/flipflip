@@ -1,15 +1,17 @@
 import * as React from 'react';
-import {animated, useSpring, useTransition} from "react-spring";
+import {animated} from "react-spring";
 import Timeout = NodeJS.Timeout;
 
-import {getEaseFunction, getRandomColor, getRandomListItem} from "../../data/utils";
-import {BT, HTF, IT, OT, SL, TF, VTF} from "../../data/const";
+import {getRandomColor, getRandomListItem} from "../../data/utils";
+import {BT, IT, OT, SL} from "../../data/const";
 import Scene from "../../data/Scene";
+import Audio from "../../data/Audio";
 import Strobe from "./Strobe";
 import wretch from "wretch";
 import FadeInOut from "./FadeInOut";
 import Panning from "./Panning";
-import Audio from "../../data/Audio";
+import CrossFade from "./CrossFade";
+import ZoomMove from "./ZoomMove";
 
 export default class ImageView extends React.Component {
   readonly props: {
@@ -524,8 +526,18 @@ export default class ImageView extends React.Component {
             hideOverflow={this.props.hideOverflow}
             scene={this.props.scene}
             fadeFunction={this.strobeImage.bind(this)}>
-            <this.FadeLayer>
-              <this.ZoomMoveLayer>
+            <CrossFade
+              image={this.props.image}
+              scene={this.props.scene}
+              timeToNextFrame={this.props.timeToNextFrame}
+              currentAudio={this.props.currentAudio}
+              hideOverflow={this.props.hideOverflow}>
+              <ZoomMove
+                image={this.props.image}
+                scene={this.props.scene}
+                timeToNextFrame={this.props.timeToNextFrame}
+                currentAudio={this.props.currentAudio}
+                hideOverflow={this.props.hideOverflow}>
                 {(this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.image) && (
                   <Strobe
                     currentAudio={this.props.currentAudio}
@@ -563,7 +575,7 @@ export default class ImageView extends React.Component {
                       position: 'absolute',
                     }}/>
                 )}
-              </this.ZoomMoveLayer>
+              </ZoomMove>
               {this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.background && (
                 <Strobe
                   currentAudio={this.props.currentAudio}
@@ -584,11 +596,16 @@ export default class ImageView extends React.Component {
                     ...backgroundStyle
                   }}/>
               )}
-            </this.FadeLayer>
+            </CrossFade>
           </FadeInOut>
         </Panning>
         {this.props.scene.panning && (
-          <this.FadeLayer>
+          <CrossFade
+            image={this.props.image}
+            scene={this.props.scene}
+            timeToNextFrame={this.props.timeToNextFrame}
+            currentAudio={this.props.currentAudio}
+            hideOverflow={this.props.hideOverflow}>
             <animated.div
               ref={this.backgroundRef}
               style={{
@@ -598,7 +615,7 @@ export default class ImageView extends React.Component {
                 backgroundSize: 'cover',
                 ...backgroundStyle
               }}/>
-          </this.FadeLayer>
+          </CrossFade>
         )}
       </animated.div>
     );
@@ -613,202 +630,6 @@ export default class ImageView extends React.Component {
       }
     }
   }
-
-  FadeLayer = (data: {children: React.ReactNode}) => {
-    let fadeDuration = 0;
-    if (this.props.scene.crossFade) {
-      switch (this.props.scene.fadeTF) {
-        case TF.scene:
-          fadeDuration = this.props.timeToNextFrame;
-          break;
-        case TF.constant:
-          fadeDuration = this.props.scene.fadeDuration;
-          break;
-        case TF.random:
-          fadeDuration = Math.floor(Math.random() * (this.props.scene.fadeDurationMax - this.props.scene.fadeDurationMin + 1)) + this.props.scene.fadeDurationMin;
-          break;
-        case TF.sin:
-          const sinRate = (Math.abs(this.props.scene.fadeSinRate - 100) + 2) * 1000;
-          fadeDuration = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (this.props.scene.fadeDurationMax - this.props.scene.fadeDurationMin + 1)) + this.props.scene.fadeDurationMin;
-          break;
-        case TF.bpm:
-          const bpmMulti = this.props.scene.fadeBPMMulti / 10;
-          const bpm = this.props.currentAudio ? this.props.currentAudio.bpm : 60;
-          fadeDuration = 60000 / (bpm * bpmMulti);
-          // If we cannot parse this, default to 1s
-          if (!fadeDuration) {
-            fadeDuration = 1000;
-          }
-          break;
-      }
-    }
-
-    const fadeTransitions: [{item: any, props: any, key: any}] = useTransition(
-      this.props.image,
-      (image: any) => {
-        return image.key
-      },
-      {
-        initial: { // Initial (first time) base values, optional (can be null)
-          opacity: 1,
-          volume: 1,
-        },
-        from: { // Base values, optional
-          opacity: this.props.scene.crossFade ? 0 : 1,
-          volume: this.props.scene.crossFade ? 0 : 1,
-        },
-        enter: { // Styles apply for entering elements
-          opacity: 1,
-          volume: 1,
-        },
-        leave: { // Styles apply for leaving elements
-          opacity: this.props.scene.crossFade ? 0.99 : 1,
-          volume: this.props.scene.crossFade ? 0 : 1,
-        },
-        unique: true, // If this is true, items going in and out with the same key will be re-used
-        config: {
-          duration: fadeDuration,
-          easing : getEaseFunction(this.props.scene.fadeEase, this.props.scene.fadeExp, this.props.scene.fadeAmp, this.props.scene.fadePer, this.props.scene.fadeOv)
-        },
-      }
-    );
-
-    return (
-      <React.Fragment>
-        {fadeTransitions.map(({item, props, key}) => {
-          return (
-            <animated.div
-              key={key}
-              volume={props.volume}
-              style={{
-                position: 'absolute',
-                top: 0,
-                right: 0,
-                bottom: 0,
-                left: 0,
-                overflow: this.props.hideOverflow ? 'hidden' : 'visible',
-                ...props
-              }}>
-              {data.children}
-            </animated.div>
-          );
-        })}
-      </React.Fragment>
-    );
-  };
-
-  ZoomMoveLayer = (data: {children: React.ReactNode}) => {
-    let horizTransLevel = 0;
-    if (this.props.scene.horizTransType != HTF.none) {
-      horizTransLevel = this.props.scene.horizTransLevel;
-      if (this.props.scene.horizTransRandom) {
-        horizTransLevel = Math.floor(Math.random() * (this.props.scene.horizTransLevelMax - this.props.scene.horizTransLevelMin + 1)) + this.props.scene.horizTransLevelMin;
-      }
-      if (this.props.scene.horizTransType == HTF.left) {
-        horizTransLevel = -horizTransLevel;
-      } else if (this.props.scene.horizTransType == HTF.right) {
-        // Already set
-      } else if (this.props.scene.horizTransType == HTF.random) {
-        const type = Math.floor(Math.random() * 2);
-        if (type) {
-          horizTransLevel = -horizTransLevel;
-        } else {
-          // Already set
-        }
-      }
-    }
-
-    let vertTransLevel = 0;
-    if (this.props.scene.vertTransType != VTF.none) {
-      vertTransLevel = this.props.scene.vertTransLevel;
-      if (this.props.scene.vertTransRandom) {
-        vertTransLevel = Math.floor(Math.random() * (this.props.scene.vertTransLevelMax - this.props.scene.vertTransLevelMin + 1)) + this.props.scene.vertTransLevelMin;
-      }
-      if (this.props.scene.vertTransType == VTF.up) {
-        vertTransLevel = -vertTransLevel;
-      } else if (this.props.scene.vertTransType == VTF.down) {
-        // Already set
-      } else if (this.props.scene.vertTransType == VTF.random) {
-        const type = Math.floor(Math.random() * 2);
-        if (type) {
-          vertTransLevel = -vertTransLevel;
-        } else {
-          // Already set
-        }
-      }
-    }
-
-    let zoomStart = 1;
-    let zoomEnd = 1;
-    if (this.props.scene.zoom) {
-      if (this.props.scene.zoomRandom) {
-        zoomStart = (Math.floor(Math.random() * (this.props.scene.zoomStartMax*10 - this.props.scene.zoomStartMin*10 + 1)) + this.props.scene.zoomStartMin*10) / 10;
-        zoomEnd = (Math.floor(Math.random() * (this.props.scene.zoomEndMax*10 - this.props.scene.zoomEndMin*10 + 1)) + this.props.scene.zoomEndMin*10) / 10;
-      } else {
-        zoomStart = this.props.scene.zoomStart;
-        zoomEnd = this.props.scene.zoomEnd;
-      }
-    }
-
-    let transDuration = 0;
-    if (this.props.scene.zoom || this.props.scene.horizTransType != HTF.none || this.props.scene.vertTransType != VTF.none) {
-      switch (this.props.scene.transTF) {
-        case TF.scene:
-          transDuration = this.props.timeToNextFrame;
-          break;
-        case TF.constant:
-          transDuration = this.props.scene.transDuration;
-          break;
-        case TF.random:
-          transDuration = Math.floor(Math.random() * (this.props.scene.transDurationMax - this.props.scene.transDurationMin + 1)) + this.props.scene.transDurationMin;
-          break;
-        case TF.sin:
-          const sinRate = (Math.abs(this.props.scene.transSinRate - 100) + 2) * 1000;
-          transDuration = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (this.props.scene.transDurationMax - this.props.scene.transDurationMin + 1)) + this.props.scene.transDurationMin;
-          break;
-        case TF.bpm:
-          const bpmMulti = this.props.scene.transBPMMulti / 10;
-          const bpm = this.props.currentAudio ? this.props.currentAudio.bpm : 60;
-          transDuration = 60000 / (bpm * bpmMulti);
-          // If we cannot parse this, default to 1s
-          if (!transDuration) {
-            transDuration = 1000;
-          }
-          break;
-      }
-    }
-
-    const imageProps = useSpring(
-      {
-        from: {
-          transform: 'translate(0%, 0%) scale(' + zoomStart + ')',
-        },
-        to: {
-          transform: 'translate(' + horizTransLevel + '%, ' + vertTransLevel + '%) scale(' + zoomEnd + ')',
-        },
-        config: {
-          duration: transDuration,
-          easing : getEaseFunction(this.props.scene.transEase, this.props.scene.transExp, this.props.scene.transAmp, this.props.scene.transPer, this.props.scene.transOv)
-        },
-      }
-    );
-
-    return (
-      <animated.div
-        style={{
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          bottom: 0,
-          left: 0,
-          overflow: this.props.hideOverflow ? 'hidden' : 'visible',
-          zIndex: 2,
-          ...imageProps
-        }}>
-        {data.children}
-      </animated.div>
-    );
-  };
 }
 
 (ImageView as any).displayName="ImageView";
