@@ -546,12 +546,12 @@ export default class ImagePlayer extends React.Component {
         video.setAttribute("speed", speed.toString());
 
         if (video.hasAttribute("start") && video.hasAttribute("end")) {
-          const start = parseInt(video.getAttribute("start"));
-          const end = parseInt(video.getAttribute("end"));
+          const start = parseFloat(video.getAttribute("start"));
+          const end = parseFloat(video.getAttribute("end"));
           if (this.props.scene.randomVideoStart && (!this.props.scene.continueVideo || !video.currentTime)) {
             video.currentTime = start + (Math.random() * (end - start));
           } else if (video.currentTime < start || video.currentTime > end) {
-            video.currentTime = parseInt(video.getAttribute("start"));
+            video.currentTime = start;
           }
         } else if (this.props.scene.randomVideoStart && (!this.props.scene.continueVideo || !video.currentTime)) {
           video.currentTime = Math.random() * video.duration;
@@ -561,8 +561,8 @@ export default class ImagePlayer extends React.Component {
           case VO.full:
             let duration;
             if (video.hasAttribute("start") && video.hasAttribute("end")) {
-              const start = video.currentTime ? video.currentTime : parseInt(video.getAttribute("start"));
-              const end = parseInt(video.getAttribute("end"));
+              const start = video.currentTime ? video.currentTime : parseFloat(video.getAttribute("start"));
+              const end = parseFloat(video.getAttribute("end"));
               duration = end - start;
             } else {
               duration = video.duration - video.currentTime;
@@ -579,8 +579,8 @@ export default class ImagePlayer extends React.Component {
           case VO.atLeast:
             let partDuration;
             if (video.hasAttribute("start") && video.hasAttribute("end")) {
-              const start = parseInt(video.getAttribute("start"));
-              const end = parseInt(video.getAttribute("end"));
+              const start = parseFloat(video.getAttribute("start"));
+              const end = parseFloat(video.getAttribute("end"));
               partDuration = end - start;
             } else {
               partDuration = video.duration;
@@ -912,8 +912,8 @@ export default class ImagePlayer extends React.Component {
           }
           break;
       }
-      if (nextImg && nextImg.getAttribute("duration") && timeToNextFrame < parseInt(nextImg.getAttribute("duration"))) {
-        timeToNextFrame = parseInt(nextImg.getAttribute("duration"));
+      if (nextImg && nextImg.getAttribute("duration") && timeToNextFrame < parseFloat(nextImg.getAttribute("duration"))) {
+        timeToNextFrame = parseFloat(nextImg.getAttribute("duration"));
       }
       if (this.props.setTimeToNextFrame) {
         this.props.setTimeToNextFrame(timeToNextFrame);

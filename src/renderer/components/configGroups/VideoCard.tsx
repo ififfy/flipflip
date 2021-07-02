@@ -85,7 +85,7 @@ export default class VideoCard extends React.Component {
               let clipID: number = null;
               let source = null;
               if (otherVideo.hasAttribute("start") && otherVideo.hasAttribute("end")) {
-                clipValue = [parseInt(otherVideo.getAttribute("start")), parseInt(otherVideo.getAttribute("end"))]
+                clipValue = [parseFloat(otherVideo.getAttribute("start")), parseFloat(otherVideo.getAttribute("end"))]
                 clipID = parseInt(otherVideo.getAttribute("clip"));
                 if (this.props.otherScenes[listIndex] instanceof Scene) {
                   source = (this.props.otherScenes[listIndex] as Scene).sources.find((s) => s.url == sourceURL);
