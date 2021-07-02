@@ -584,7 +584,7 @@ export default class Player extends React.Component {
   }
 
   nextSceneLoop() {
-    if (this.props.scene.nextSceneID === 0) {
+    if (this.props.scene.nextSceneID == 0) {
       clearInterval(this._interval);
     }
     if (!this.props.scene.scriptScene && this.state.isPlaying && this.state.startTime != null && !this.props.scene.nextSceneAllImages &&
@@ -653,7 +653,7 @@ export default class Player extends React.Component {
   }
 
   componentDidMount() {
-    if (!this.props.gridView) {
+    if (!!this.props.nextScene) {
       this._interval = setInterval(() => this.nextSceneLoop(), 1000);
     }
     if (this.props.preventSleep) {

@@ -110,6 +110,7 @@ class GridPlayer extends React.Component {
 
   readonly state = {
     appBarHover: false,
+    grid: JSON.parse(JSON.stringify(this.props.grid)) as SceneGrid,
     height: this.props.grid.grid && this.props.grid.grid.length > 0 &&
     this.props.grid.grid[0].length ? this.props.grid.grid.length : 1,
     width: this.props.grid.grid && this.props.grid.grid.length > 0 &&
@@ -191,7 +192,7 @@ class GridPlayer extends React.Component {
           <Container maxWidth={false} className={classes.container}>
             <div className={classes.grid}
                  style={{gridTemplateColumns: gridTemplateColumns, gridTemplateRows: gridTemplateRows}}>
-              {this.props.grid.grid.map((row, rowIndex) =>
+              {this.state.grid.grid.map((row, rowIndex) =>
                 <React.Fragment key={rowIndex}>
                   {row.map((sceneID, colIndex) => {
                     const scene = this.props.scenes.find((s) => s.id == sceneID);
@@ -222,6 +223,7 @@ class GridPlayer extends React.Component {
                             config={this.props.config}
                             hasStarted={this.props.hasStarted}
                             scene={scene}
+                            nextScene={this.nextScene.bind(this, rowIndex, colIndex)}
                             gridView
                             scenes={this.props.scenes}
                             sceneGrids={this.props.sceneGrids}
@@ -252,6 +254,18 @@ class GridPlayer extends React.Component {
   }
 
   nop() {}
+
+  nextScene(rowIndex: number, colIndex: number) {
+    const sceneID = this.state.grid.grid[rowIndex][colIndex];
+    const scene = this.props.scenes.find((s) => s.id == sceneID);
+    const newGrid = this.state.grid;
+    if (scene.nextSceneID == -1) {
+      newGrid.grid[rowIndex][colIndex] = scene.nextSceneRandomID;
+    } else {
+      newGrid.grid[rowIndex][colIndex] = scene.nextSceneID;
+    }
+    this.setState({grid: newGrid});
+  }
 
   onActive() {
     this.setState({hideCursor: false})
