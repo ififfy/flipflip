@@ -1,14 +1,14 @@
 import * as React from "react";
 
-import {createStyles, Grid, IconButton, Slider, Theme, Tooltip, withStyles} from "@material-ui/core";
+import {createStyles, Grid, IconButton, Slider, Theme, Tooltip, Typography, withStyles} from "@material-ui/core";
 import ValueLabel from "@material-ui/core/Slider/ValueLabel";
 
 import Forward10Icon from '@material-ui/icons/Forward10';
 import Replay10Icon from '@material-ui/icons/Replay10';
 import PauseIcon from '@material-ui/icons/Pause';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import SkipPreviousIcon from "@material-ui/icons/SkipPrevious";
 import SkipNextIcon from "@material-ui/icons/SkipNext";
+import SpeedIcon from '@material-ui/icons/Speed';
 import VolumeDownIcon from '@material-ui/icons/VolumeDown';
 import VolumeUpIcon from '@material-ui/icons/VolumeUp';
 
@@ -54,6 +54,7 @@ class VideoControl extends React.Component {
     clipValue?: Array<number>,
     clips?: Array<Clip>,
     onChangeVolume(volume: number): void,
+    onChangeSpeed?(speed: number): void,
     nextTrack?(): void,
   };
 
@@ -61,6 +62,7 @@ class VideoControl extends React.Component {
     playing: true,
     update: true,
     marks: Array<{value: number, label: string}>(),
+    showSpeed: false,
   };
 
   render() {
@@ -82,10 +84,21 @@ class VideoControl extends React.Component {
         <Grid item>
           <Grid container alignItems="center">
             <Grid item xs={12} style={{textAlign: 'center'}}>
-              {this.props.nextTrack && (
-                <IconButton disabled style={{opacity: 0}}>
-                  <SkipPreviousIcon />
-                </IconButton>
+              {this.props.nextTrack && this.state.showSpeed && (
+                <Tooltip title="Show Volume Controls">
+                  <IconButton
+                    onClick={this.onSwapSlider.bind(this)}>
+                    <VolumeUpIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+              {this.props.nextTrack && !this.state.showSpeed && (
+                <Tooltip title="Show Speed Controls">
+                  <IconButton
+                    onClick={this.onSwapSlider.bind(this)}>
+                    <SpeedIcon />
+                  </IconButton>
+                </Tooltip>
               )}
               <Tooltip title="Jump Back">
                 <IconButton
@@ -115,19 +128,37 @@ class VideoControl extends React.Component {
               )}
             </Grid>
             <Grid item xs={12}>
-              <Grid container spacing={1}>
-                <Grid item>
-                  <VolumeDownIcon/>
+              {this.state.showSpeed && (
+                <React.Fragment>
+                  <Typography id="video-speed-slider" variant="caption" component="div"
+                              color="textSecondary">
+                    Video Speed {this.props.video.playbackRate}x
+                  </Typography>
+                  <Slider
+                    min={1}
+                    max={40}
+                    defaultValue={this.props.video.playbackRate * 10}
+                    onChangeCommitted={this.onChangeSpeed.bind(this)}
+                    valueLabelDisplay={'auto'}
+                    valueLabelFormat={(v) => v/10 + "x"}
+                    aria-labelledby="video-speed-slider"/>
+                </React.Fragment>
+              )}
+              {!this.state.showSpeed && (
+                <Grid container spacing={1}>
+                  <Grid item>
+                    <VolumeDownIcon/>
+                  </Grid>
+                  <Grid item xs>
+                    <Slider value={this.props.volume ? parseInt(this.props.volume) : this.props.video.volume * 100}
+                            onChange={this.onChangeVolume.bind(this)}
+                            marks={this.props.clip && this.props.clip.volume != null ? [{value: this.props.clip.volume, label: "↑"}] : []}/>
+                  </Grid>
+                  <Grid item>
+                    <VolumeUpIcon/>
+                  </Grid>
                 </Grid>
-                <Grid item xs>
-                  <Slider value={this.props.volume ? parseInt(this.props.volume) : this.props.video.volume * 100}
-                          onChange={this.onChangeVolume.bind(this)}
-                          marks={this.props.clip && this.props.clip.volume != null ? [{value: this.props.clip.volume, label: "↑"}] : []}/>
-                </Grid>
-                <Grid item>
-                  <VolumeUpIcon/>
-                </Grid>
-              </Grid>
+              )}
             </Grid>
           </Grid>
         </Grid>
@@ -186,6 +217,10 @@ class VideoControl extends React.Component {
     }
   }
 
+  onSwapSlider() {
+    this.setState({showSpeed: !this.state.showSpeed});
+  }
+
   triggerUpdate() {
     this.setState({update: !this.state.update});
   }
@@ -201,6 +236,14 @@ class VideoControl extends React.Component {
     this.props.onChangeVolume(volume);
     if (this.props.video) {
       this.props.video.volume = volume / 100;
+      this.triggerUpdate();
+    }
+  }
+
+  onChangeSpeed(e: MouseEvent, speed: number) {
+    this.props.onChangeSpeed(speed);
+    if (this.props.video) {
+      this.props.video.playbackRate = speed / 10;
       this.triggerUpdate();
     }
   }

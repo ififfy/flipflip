@@ -58,6 +58,7 @@ export default class VideoCard extends React.Component {
                 clip={this.props.mainClip}
                 clipValue={this.props.mainClipValue}
                 nextTrack={() => {this.props.imagePlayerAdvanceHacks[0][0].fire()}}
+                onChangeSpeed={this.changeKey.bind(this, 'videoSpeed', this.props.scene).bind(this)}
                 onChangeVolume={this.changeKey.bind(this, 'videoVolume', this.props.scene).bind(this)}/>
             </React.Fragment>
           )}
@@ -106,6 +107,7 @@ export default class VideoCard extends React.Component {
                     nextTrack={() => {
                       this.props.imagePlayerAdvanceHacks[listIndex + 1][index].fire()
                     }}
+                    onChangeSpeed={this.props.mainVideo ? this.changeKey.bind(this, 'videoSpeed', this.props.otherScenes[listIndex]).bind(this) : this.nop}
                     onChangeVolume={this.props.mainVideo ? this.changeKey.bind(this, 'videoVolume', this.props.otherScenes[listIndex]).bind(this) : this.nop}/>
                 </Grid>
               );
