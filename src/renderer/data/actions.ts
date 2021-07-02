@@ -27,35 +27,8 @@ import {
 import {getFileGroup, getFileName, getSourceType, isVideo, isVideoPlaylist} from "../components/player/Scrapers";
 import defaultTheme from "./theme";
 import {
-  AF,
-  ALT,
-  ASF,
-  BT,
-  CST,
-  DONE,
-  GT,
-  HTF,
-  IF,
-  IT,
-  LT,
-  OF,
-  PR,
-  PT,
-  RP,
-  SDGT,
-  SDT,
-  SF,
-  SGT,
-  SL,
-  SLT,
-  SOF,
-  SP,
-  SPT,
-  ST,
-  TF,
-  TT,
-  VCT,
-  VTF
+  AF, ALT, ASF, BT, CST, DONE, GT, HTF, IF, IT, LT, OF, PR, PT, RP, SDGT, SDT, SF, SGT, SL, SLT, SOF, SP, SPT, ST, TF,
+  TT, VCT, VO, VTF
 } from "./const";
 import {defaultInitialState} from './AppStorage';
 import {Route} from "./Route";
@@ -918,6 +891,7 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
     state.route.pop();
     state.scenes.pop();
   }
+  const sourceType = getSourceType(source.url);
   let tempScene = new Scene({
     id: id,
     name: "library_scene_temp",
@@ -931,7 +905,8 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
     imageOrientation: state.config.defaultScene.imageOrientation,
     videoOrientation: state.config.defaultScene.videoOrientation,
     randomVideoStart: state.config.defaultScene.randomVideoStart,
-    continueVideo:  getSourceType(source.url) == ST.video || state.config.defaultScene.continueVideo,
+    videoOption: sourceType == ST.video ? VO.full : state.config.defaultScene.videoOption,
+    continueVideo:  sourceType == ST.video || state.config.defaultScene.continueVideo,
     playVideoClips: state.config.defaultScene.playVideoClips,
     videoVolume: state.config.defaultScene.videoVolume,
   });
