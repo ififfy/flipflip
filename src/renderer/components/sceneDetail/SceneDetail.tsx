@@ -4,8 +4,8 @@ import clsx from "clsx";
 import {
   AppBar, Backdrop, Badge, Box, Button, Collapse, Container, createStyles, Dialog, DialogActions, DialogContent,
   DialogContentText, DialogTitle, Divider, Drawer, Fab, IconButton, ListItem, ListItemIcon, ListItemSecondaryAction,
-  ListItemText, Menu, MenuItem, Slide, Snackbar, SnackbarContent, Tab, Tabs, TextField, Theme, Toolbar, Tooltip,
-  Typography, withStyles
+  ListItemText, Menu, MenuItem, Slide, Snackbar, SnackbarContent, SvgIcon, Tab, Tabs, TextField, Theme, Toolbar,
+  Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
 import AddIcon from '@material-ui/icons/Add';
@@ -16,6 +16,7 @@ import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import AudiotrackIcon from '@material-ui/icons/Audiotrack';
 import BuildIcon from '@material-ui/icons/Build';
 import CachedIcon from '@material-ui/icons/Cached';
+import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import CollectionsIcon from '@material-ui/icons/Collections';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
@@ -49,7 +50,7 @@ import URLDialog from "./URLDialog";
 import LibrarySearch from "../library/LibrarySearch";
 import SourceList from "../library/SourceList";
 import AudioTextEffects from "./AudioTextEffects";
-import {areWeightsValid} from "../../data/utils";
+import {applyEffects, areWeightsValid, getEffects} from "../../data/utils";
 import Audio from "../../data/Audio";
 import CaptionScript from "../../data/CaptionScript";
 import SceneGrid from "../../data/SceneGrid";
@@ -321,6 +322,14 @@ const styles = (theme: Theme) => createStyles({
   },
   disable: {
     pointerEvents: 'none',
+  },
+  phraseInput: {
+    minWidth: 550,
+    minHeight: 100,
+  },
+  confirmCopy: {
+    color: theme.palette.success.main,
+    position: 'absolute',
   }
 });
 
@@ -365,6 +374,8 @@ class SceneDetail extends React.Component {
     openMenu: null as string,
     snackbar: null as string,
     snackbarType: null as string,
+    sceneEffects: "",
+    confirmCopy: false,
   };
 
   render() {
@@ -490,6 +501,19 @@ class SceneDetail extends React.Component {
                   <FileCopyIcon />
                 </ListItemIcon>
                 <ListItemText primary={`Clone ${this.props.scene.generatorWeights ? 'Generator' : 'Scene'}`} />
+              </ListItem>
+            </Tooltip>
+            <Tooltip title={this.state.drawerOpen ? "" : "Scene Effects Import/Export"}>
+              <ListItem button onClick={this.onOpenSceneEffectsMenu.bind(this)} className={clsx((this.props.tutorial == SDT.options1 || this.props.tutorial == SDT.effects1) && classes.disable)}>
+                <ListItemIcon>
+                  <SvgIcon viewBox="0 0 488.472 488.472">
+                    <path d="m331.351 96.061c-5.963-5.963-15.622-5.963-21.585 0l-305.294 305.294c-5.963 5.963-5.963 15.622 0 21.585l61.059 61.059c2.981 2.981 6.887 4.472 10.793 4.472s7.811-1.491 10.793-4.472l305.293-305.294c5.963-5.963 5.963-15.622 0-21.585 0 0-61.059-61.059-61.059-61.059zm-255.028 355.561-39.473-39.474 207.385-207.385 39.474 39.474c0-.001-207.386 207.385-207.386 207.385zm228.971-228.971-39.474-39.474 54.738-54.738 39.474 39.474z"/>
+                    <path d="m213.707 122.118c15.265-30.529 30.529-45.794 61.059-61.059-30.529-15.265-45.794-30.529-61.059-61.059-15.265 30.529-30.531 45.794-61.059 61.059 30.53 15.265 45.794 30.53 61.059 61.059z"/>
+                    <path d="m457.942 213.707c-7.632 15.265-15.267 22.897-30.529 30.529 15.265 7.632 22.897 15.265 30.529 30.529 7.632-15.265 15.265-22.897 30.529-30.529-15.264-7.632-22.896-15.265-30.529-30.529z"/>
+                    <path d="m457.942 45.795c-22.897-11.449-34.346-22.897-45.794-45.794-11.449 22.897-22.899 34.346-45.794 45.794 22.897 11.449 34.346 22.897 45.794 45.794 11.449-22.897 22.897-34.346 45.794-45.794z"/>
+                  </SvgIcon>
+                </ListItemIcon>
+                <ListItemText primary="Export Scene Effects" />
               </ListItem>
             </Tooltip>
             <Tooltip title={this.state.drawerOpen ? "" : "Export Scene"}>
@@ -666,6 +690,36 @@ class SceneDetail extends React.Component {
           className={classes.backdrop}
           onClick={this.onCloseDialog.bind(this)}
           open={!this.props.tutorial && (this.state.openMenu == MO.new || this.state.drawerOpen)} />
+
+        <Dialog
+          open={this.state.openMenu == MO.effects}
+          onClose={this.onCloseDialog.bind(this)}
+          aria-labelledby="effects-all-title"
+          aria-describedby="effects-all-description">
+          <DialogTitle id="effects-all-title">Scene Effects Import/Export</DialogTitle>
+          <DialogContent>
+            <TextField
+              fullWidth
+              multiline
+              label="Scene Effects Hash"
+              helperText="Copy this hash to share with others, or paste a hash here to import."
+              id="phrase"
+              value={this.state.sceneEffects}
+              margin="dense"
+              inputProps={{className: classes.phraseInput}}
+              onChange={this.onChangeSceneEffects.bind(this)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.onCopySceneEffects.bind(this)} color="secondary">
+              {this.state.confirmCopy && <CheckCircleIcon className={classes.confirmCopy}/>}
+              Copy to Clipboard
+            </Button>
+            <Button onClick={this.onApplySceneEffects.bind(this)} color="primary">
+              Apply
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         {this.props.scene.openTab == 3 && (
           <React.Fragment>
@@ -1145,8 +1199,30 @@ class SceneDetail extends React.Component {
     this.setState({openMenu: MO.piwigo});
   }
 
+  onOpenSceneEffectsMenu() {
+    this.setState({openMenu: MO.effects, sceneEffects: getEffects(this.props.scene)});
+  }
+
+  onCopySceneEffects() {
+    navigator.clipboard.writeText(this.state.sceneEffects);
+    this.setState({confirmCopy: true});
+    setTimeout(() => {this.setState({confirmCopy: false})}, 1000);
+  }
+
+  onChangeSceneEffects(e: MouseEvent) {
+    const input = (e.target as HTMLInputElement);
+    this.setState({sceneEffects: input.value});
+  }
+
+  onApplySceneEffects() {
+    this.props.onUpdateScene(this.props.scene,(s) => {
+      applyEffects(s, this.state.sceneEffects);
+    })
+    this.onCloseDialog();
+  }
+
   onCloseDialog() {
-    this.setState({menuAnchorEl: null, openMenu: null, drawerOpen: false});
+    this.setState({menuAnchorEl: null, openMenu: null, drawerOpen: false, sceneEffects: ""});
   }
 
   onChangeTab(e: any, newTab: number) {

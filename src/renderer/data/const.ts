@@ -216,6 +216,7 @@ const MO = { // Menu/Modal Constants
   load: 'mo.load',
   select: 'mo.select',
   piwigo: 'mo.piwigo',
+  effects: 'mo.effects',
 };
 
 const PR = { // Global progress functions
