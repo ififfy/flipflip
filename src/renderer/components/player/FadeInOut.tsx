@@ -13,7 +13,6 @@ export default class FadeInOut extends React.Component {
     timeToNextFrame: number,
     scene: Scene,
     fadeFunction: Function,
-    hideOverflow?: boolean,
     children?: React.ReactNode,
   };
 
@@ -27,15 +26,12 @@ export default class FadeInOut extends React.Component {
   _fadeOut = false;
 
   render() {
-    if (this.props.scene.fadeInOut) {
-      return (
-        <this.FadeInOutLayer>
-          {this.props.children}
-        </this.FadeInOutLayer>
-      );
-    } else {
-      return this.props.children;
-    }
+    // TODO Fix with TF.scene
+    return (
+      <this.FadeInOutLayer>
+        {this.props.children}
+      </this.FadeInOutLayer>
+    );
   }
 
 
@@ -121,7 +117,7 @@ export default class FadeInOut extends React.Component {
                 right: 0,
                 bottom: 0,
                 left: 0,
-                overflow: this.props.hideOverflow ? 'hidden' : 'visible',
+                overflow: 'hidden',
                 zIndex: 2,
                 ...props
               }}>

@@ -12,7 +12,6 @@ export default class CrossFade extends React.Component {
     scene: Scene,
     timeToNextFrame: number,
     currentAudio: Audio,
-    hideOverflow: boolean,
     children?: React.ReactNode,
   };
 
@@ -74,7 +73,7 @@ export default class CrossFade extends React.Component {
           volume: 1,
         },
         leave: { // Styles apply for leaving elements
-          opacity: 0.99,
+          opacity: 0,
           volume: 0,
         },
         unique: true, // If this is true, items going in and out with the same key will be re-used
@@ -98,7 +97,7 @@ export default class CrossFade extends React.Component {
                 right: 0,
                 bottom: 0,
                 left: 0,
-                overflow: this.props.hideOverflow ? 'hidden' : 'visible',
+                overflow: 'hidden',
                 ...props
               }}>
               {data.children}

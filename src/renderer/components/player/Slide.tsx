@@ -12,20 +12,15 @@ export default class Slide extends React.Component {
     scene: Scene,
     timeToNextFrame: number,
     currentAudio: Audio,
-    hideOverflow: boolean,
     children?: React.ReactNode,
   };
 
   render() {
-    if (this.props.scene.slide) {
-      return (
-        <this.SlideLayer>
-          {this.props.children}
-        </this.SlideLayer>
-      );
-    } else {
-      return this.props.children;
-    }
+    return (
+      <this.SlideLayer>
+        {this.props.children}
+      </this.SlideLayer>
+    );
   }
 
   SlideLayer = (data: {children: React.ReactNode}) => {
@@ -142,7 +137,8 @@ export default class Slide extends React.Component {
                 right: 0,
                 bottom: 0,
                 left: 0,
-                overflow: this.props.hideOverflow ? 'hidden' : 'visible',
+                overflow: 'hidden',
+                zIndex: 2,
                 ...props
               }}>
               {data.children}

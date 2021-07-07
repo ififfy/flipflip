@@ -8,12 +8,11 @@ import Audio from "../../data/Audio";
 
 export default class Strobe extends React.Component {
   readonly props: {
+    toggleStrobe: boolean,
+    scene: Scene,
+    timeToNextFrame: number,
     currentAudio: Audio
     zIndex: number,
-    toggleStrobe: boolean,
-    timeToNextFrame: number,
-    scene: Scene,
-    hideOverflow?: boolean,
     strobeFunction?: Function,
     children?: React.ReactNode,
   };
@@ -130,10 +129,6 @@ export default class Strobe extends React.Component {
     if ((this.props.scene.strobePulse ? this.props.scene.strobeDelayTF == TF.scene : this.props.scene.strobeTF == TF.scene) && this.props.toggleStrobe != props.toggleStrobe) {
       this.strobe();
     }
-  }
-
-  shouldComponentUpdate(props: any, state: any) {
-    return true;
   }
 
   componentWillUnmount() {

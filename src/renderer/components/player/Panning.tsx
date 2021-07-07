@@ -14,7 +14,6 @@ export default class Panning extends React.Component {
     scene: Scene,
     panFunction: Function,
     image?: HTMLImageElement | HTMLVideoElement,
-    hideOverflow?: boolean,
     children?: React.ReactNode,
   };
 
@@ -27,15 +26,12 @@ export default class Panning extends React.Component {
   _panOut = false;
 
   render() {
-    if (this.props.scene.panning) {
-      return (
-        <this.PanningLayer>
-          {this.props.children}
-        </this.PanningLayer>
-      );
-    } else {
-      return this.props.children;
-    }
+    // TODO Fix with TF.scene
+    return (
+      <this.PanningLayer>
+        {this.props.children}
+      </this.PanningLayer>
+    );
   }
 
 
@@ -210,7 +206,7 @@ export default class Panning extends React.Component {
                 right: 0,
                 bottom: 0,
                 left: 0,
-                overflow: this.props.hideOverflow ? 'hidden' : 'visible',
+                overflow: 'hidden',
                 zIndex: 2,
                 ...props
               }}>

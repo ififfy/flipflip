@@ -10,22 +10,18 @@ export default class ZoomMove extends React.Component {
   readonly props: {
     image: HTMLImageElement | HTMLVideoElement,
     scene: Scene,
+    reset: boolean
     timeToNextFrame: number,
     currentAudio: Audio,
-    hideOverflow: boolean,
     children?: React.ReactNode,
   };
 
   render() {
-    if (this.props.scene.zoom || this.props.scene.horizTransType != HTF.none || this.props.scene.vertTransType != VTF.none) {
-      return (
-        <this.ZoomMoveLayer>
-          {this.props.children}
-        </this.ZoomMoveLayer>
-      );
-    } else {
-      return this.props.children;
-    }
+    return (
+      <this.ZoomMoveLayer>
+        {this.props.children}
+      </this.ZoomMoveLayer>
+    );
   }
 
   ZoomMoveLayer = (data: {children: React.ReactNode}) => {
@@ -109,7 +105,7 @@ export default class ZoomMove extends React.Component {
 
     const imageProps = useSpring(
       {
-        reset: true,
+        reset: this.props.reset,
         from: {
           transform: 'translate(0%, 0%) scale(' + zoomStart + ')',
         },
@@ -131,7 +127,7 @@ export default class ZoomMove extends React.Component {
           right: 0,
           bottom: 0,
           left: 0,
-          overflow: this.props.hideOverflow ? 'hidden' : 'visible',
+          overflow: 'hidden',
           zIndex: 2,
           ...imageProps
         }}>

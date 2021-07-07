@@ -92,7 +92,7 @@ export default class ImagePlayer extends React.Component {
     return (
       <div style={style}
            ref={this.idleTimerRef}>
-        {(this.props.strobeLayer == SL.middle) && (
+        {(this.props.scene && this.props.scene.strobe && this.props.strobeLayer == SL.middle) && (
           <Strobe
             currentAudio={this.props.currentAudio}
             zIndex={3}
@@ -108,7 +108,6 @@ export default class ImagePlayer extends React.Component {
           timeToNextFrame={this.state.timeToNextFrame}
           toggleStrobe={this._toggleStrobe}
           fitParent={this.props.gridView}
-          hideOverflow={this.props.gridView}
           hasStarted={this.props.hasStarted}
           onLoaded={this.state.historyPaths.length == 1 ? this.props.onLoaded : undefined}
           setVideo={this.props.setVideo}/>

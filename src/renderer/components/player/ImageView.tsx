@@ -3,7 +3,7 @@ import {animated} from "react-spring";
 import Timeout = NodeJS.Timeout;
 
 import {getRandomColor, getRandomListItem} from "../../data/utils";
-import {BT, IT, OT, SL} from "../../data/const";
+import {BT, HTF, IT, OT, SL, TF, VTF} from "../../data/const";
 import Scene from "../../data/Scene";
 import Audio from "../../data/Audio";
 import Strobe from "./Strobe";
@@ -13,6 +13,7 @@ import Panning from "./Panning";
 import CrossFade from "./CrossFade";
 import ZoomMove from "./ZoomMove";
 import Slide from "./Slide";
+import StrobeImage from "./StrobeImage";
 
 export default class ImageView extends React.Component {
   readonly props: {
@@ -20,7 +21,6 @@ export default class ImageView extends React.Component {
     fitParent: boolean,
     hasStarted: boolean,
     scene: Scene,
-    hideOverflow?: boolean,
     currentAudio?: Audio,
     timeToNextFrame?: number,
     toggleStrobe?: boolean,
@@ -157,8 +157,8 @@ export default class ImageView extends React.Component {
 
     const rotate = !this.props.pictureGrid &&
       ((isVideo &&
-      ((this.props.scene.videoOrientation == OT.forceLandscape && imgWidth < imgHeight) ||
-        (this.props.scene.videoOrientation == OT.forcePortrait && imgWidth > imgHeight))) ||
+        ((this.props.scene.videoOrientation == OT.forceLandscape && imgWidth < imgHeight) ||
+          (this.props.scene.videoOrientation == OT.forcePortrait && imgWidth > imgHeight))) ||
         (!isVideo &&
           ((this.props.scene.imageOrientation == OT.forceLandscape && imgWidth < imgHeight) ||
             (this.props.scene.imageOrientation == OT.forcePortrait && imgWidth > imgHeight))));
@@ -432,9 +432,9 @@ export default class ImageView extends React.Component {
   shouldComponentUpdate(props: any): boolean {
     return (!this.props.image && props.image) ||
       (props.image && this.props.image &&
-      (props.image.src !== this.props.image.src ||
-      props.image.getAttribute("start") !== this.props.image.getAttribute("start") ||
-      props.image.getAttribute("end") !== this.props.image.getAttribute("end"))) ||
+        (props.image.src !== this.props.image.src ||
+          props.image.getAttribute("start") !== this.props.image.getAttribute("start") ||
+          props.image.getAttribute("end") !== this.props.image.getAttribute("end"))) ||
       (props.scene && (props.scene.strobe || props.scene.fadeInOut) && props.toggleStrobe !== this.props.toggleStrobe) ||
       props.scene !== this.props.scene ||
       props.hasStarted !== this.props.hasStarted;
@@ -452,7 +452,7 @@ export default class ImageView extends React.Component {
             right: 0,
             bottom: 0,
             left: 0,
-            overflow: this.props.hideOverflow ? 'hidden' : 'visible',
+            overflow: 'hidden',
           }}>
           <div
             ref={this.contentRef}
@@ -460,6 +460,7 @@ export default class ImageView extends React.Component {
               height: '100%',
               width: '100%',
               zIndex: 2,
+              overflow: 'hidden',
               backgroundPosition: 'center',
               backgroundSize: 'contain',
               backgroundRepeat: 'no-repeat',
@@ -472,6 +473,7 @@ export default class ImageView extends React.Component {
               width: '100%',
               zIndex: 1,
               backgroundSize: 'cover',
+              overflow: 'hidden'
             }}/>
         </div>
       );
@@ -500,6 +502,122 @@ export default class ImageView extends React.Component {
         filter: 'blur(' + this.props.scene.backgroundBlur + 'px)',
       };
     }
+    let viewDiv;
+    let imageDiv =
+      <animated.div
+        id="image"
+        ref={this.contentRef}
+        style={{
+          height: '100%',
+          width: '100%',
+          zIndex: 2,
+          overflow: 'hidden',
+          backgroundPosition: 'center',
+          backgroundSize: 'contain',
+          backgroundRepeat: 'no-repeat',
+          position: 'absolute',
+        }}/>;
+    let backgroundDiv =
+      <animated.div
+        ref={this.backgroundRef}
+        style={{
+          height: '100%',
+          width: '100%',
+          zIndex: 1,
+          backgroundSize: 'cover',
+          overflow: 'hidden',
+          ...backgroundStyle
+        }}/>;
+    if (this.props.scene.strobe && this.props.scene.strobeLayer == SL.image) {
+      if (this.props.scene.strobePulse ? this.props.scene.strobeDelayTF == TF.scene : this.props.scene.strobeTF == TF.scene) {
+        imageDiv =
+          <StrobeImage
+            scene={this.props.scene}
+            timeToNextFrame={this.props.timeToNextFrame}
+            currentAudio={this.props.currentAudio}>
+            {imageDiv}
+          </StrobeImage>
+      } else {
+        imageDiv =
+          <Strobe
+            currentAudio={this.props.currentAudio}
+            zIndex={2}
+            toggleStrobe={this.props.toggleStrobe}
+            timeToNextFrame={this.props.timeToNextFrame}
+            scene={this.props.scene}
+            strobeFunction={this.strobeImage.bind(this)}>
+            {imageDiv}
+          </Strobe>
+      }
+    }
+    if (this.props.scene.zoom || this.props.scene.horizTransType != HTF.none || this.props.scene.vertTransType != VTF.none) {
+      imageDiv =
+        <ZoomMove
+          image={this.props.image}
+          scene={this.props.scene}
+          reset={!this.props.scene.panning && !this.props.scene.fadeInOut && !this.props.scene.slide && !this.props.scene.crossFade}
+          timeToNextFrame={this.props.timeToNextFrame}
+          currentAudio={this.props.currentAudio}>
+          {imageDiv}
+        </ZoomMove>
+    }
+    if (this.props.scene.fadeInOut) {
+      imageDiv =
+        <FadeInOut
+          toggleFade={this.props.toggleStrobe}
+          currentAudio={this.props.currentAudio}
+          timeToNextFrame={this.props.timeToNextFrame}
+          scene={this.props.scene}
+          fadeFunction={this.strobeImage.bind(this)}>
+          {imageDiv}
+        </FadeInOut>
+    }
+    if (this.props.scene.panning) {
+      imageDiv =
+        <Panning
+          image={this.props.image}
+          togglePan={this.props.toggleStrobe}
+          currentAudio={this.props.currentAudio}
+          timeToNextFrame={this.props.timeToNextFrame}
+          scene={this.props.scene}
+          panFunction={this.strobeImage.bind(this)}>
+          {imageDiv}
+        </Panning>
+    }
+    viewDiv =
+      <React.Fragment>
+        {imageDiv}
+        {this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.background && (
+          <Strobe
+            currentAudio={this.props.currentAudio}
+            zIndex={1}
+            toggleStrobe={this.props.toggleStrobe}
+            timeToNextFrame={this.props.timeToNextFrame}
+            scene={this.props.scene}/>
+        )}
+        {backgroundDiv}
+      </React.Fragment>
+    if (this.props.scene.crossFade) {
+      viewDiv =
+        <CrossFade
+          image={this.props.image}
+          scene={this.props.scene}
+          timeToNextFrame={this.props.timeToNextFrame}
+          currentAudio={this.props.currentAudio}>
+          {viewDiv}
+        </CrossFade>
+    }
+    if (this.props.scene.slide) {
+      viewDiv =
+        <Slide
+          image={this.props.image}
+          scene={this.props.scene}
+          timeToNextFrame={this.props.timeToNextFrame}
+          currentAudio={this.props.currentAudio}>
+          {viewDiv}
+        </Slide>
+    }
+
     return (
       <animated.div
         style={{
@@ -512,127 +630,7 @@ export default class ImageView extends React.Component {
           left: 0,
           overflow: 'hidden',
         }}>
-        <Panning
-          image={this.props.image}
-          togglePan={this.props.toggleStrobe}
-          currentAudio={this.props.currentAudio}
-          timeToNextFrame={this.props.timeToNextFrame}
-          hideOverflow={this.props.hideOverflow}
-          scene={this.props.scene}
-          panFunction={this.strobeImage.bind(this)}>
-          <FadeInOut
-            toggleFade={this.props.toggleStrobe}
-            currentAudio={this.props.currentAudio}
-            timeToNextFrame={this.props.timeToNextFrame}
-            hideOverflow={this.props.hideOverflow}
-            scene={this.props.scene}
-            fadeFunction={this.strobeImage.bind(this)}>
-            <Slide
-              image={this.props.image}
-              scene={this.props.scene}
-              timeToNextFrame={this.props.timeToNextFrame}
-              currentAudio={this.props.currentAudio}
-              hideOverflow={this.props.hideOverflow}>
-              <CrossFade
-                image={this.props.image}
-                scene={this.props.scene}
-                timeToNextFrame={this.props.timeToNextFrame}
-                currentAudio={this.props.currentAudio}
-                hideOverflow={this.props.hideOverflow}>
-                <ZoomMove
-                  image={this.props.image}
-                  scene={this.props.scene}
-                  timeToNextFrame={this.props.timeToNextFrame}
-                  currentAudio={this.props.currentAudio}
-                  hideOverflow={this.props.hideOverflow}>
-                  {(this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.image) && (
-                    <Strobe
-                      currentAudio={this.props.currentAudio}
-                      zIndex={2}
-                      toggleStrobe={this.props.toggleStrobe}
-                      hideOverflow={this.props.hideOverflow}
-                      timeToNextFrame={this.props.timeToNextFrame}
-                      scene={this.props.scene}
-                      strobeFunction={this.strobeImage.bind(this)}>
-                      <animated.div
-                        id="image"
-                        ref={this.contentRef}
-                        style={{
-                          height: '100%',
-                          width: '100%',
-                          zIndex: 2,
-                          backgroundPosition: 'center',
-                          backgroundSize: 'contain',
-                          backgroundRepeat: 'no-repeat',
-                          position: 'absolute',
-                        }}/>
-                    </Strobe>
-                  )}
-                  {(!this.props.scene || !this.props.scene.strobe || this.props.scene.strobeLayer != SL.image) && (
-                    <animated.div
-                      id="image"
-                      ref={this.contentRef}
-                      style={{
-                        height: '100%',
-                        width: '100%',
-                        zIndex: 2,
-                        backgroundPosition: 'center',
-                        backgroundSize: 'contain',
-                        backgroundRepeat: 'no-repeat',
-                        position: 'absolute',
-                      }}/>
-                  )}
-                </ZoomMove>
-                {this.props.scene && this.props.scene.strobe && this.props.scene.strobeLayer == SL.background && (
-                  <Strobe
-                    currentAudio={this.props.currentAudio}
-                    zIndex={1}
-                    toggleStrobe={this.props.toggleStrobe}
-                    hideOverflow
-                    timeToNextFrame={this.props.timeToNextFrame}
-                    scene={this.props.scene}/>
-                )}
-                {!this.props.scene.panning && (
-                  <animated.div
-                    ref={this.backgroundRef}
-                    style={{
-                      height: '100%',
-                      width: '100%',
-                      zIndex: 1,
-                      backgroundSize: 'cover',
-                      overflow: 'hidden',
-                      ...backgroundStyle
-                    }}/>
-                )}
-              </CrossFade>
-            </Slide>
-          </FadeInOut>
-        </Panning>
-        {this.props.scene.panning && (
-          <Slide
-            image={this.props.image}
-            scene={this.props.scene}
-            timeToNextFrame={this.props.timeToNextFrame}
-            currentAudio={this.props.currentAudio}
-            hideOverflow={this.props.hideOverflow}>
-            <CrossFade
-              image={this.props.image}
-              scene={this.props.scene}
-              timeToNextFrame={this.props.timeToNextFrame}
-              currentAudio={this.props.currentAudio}
-              hideOverflow={this.props.hideOverflow}>
-              <animated.div
-                ref={this.backgroundRef}
-                style={{
-                  height: '100%',
-                  width: '100%',
-                  zIndex: 1,
-                  backgroundSize: 'cover',
-                  ...backgroundStyle
-                }}/>
-            </CrossFade>
-          </Slide>
-        )}
+        {viewDiv}
       </animated.div>
     );
   }
