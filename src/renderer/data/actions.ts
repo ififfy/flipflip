@@ -1092,6 +1092,8 @@ export function generateScenes(state: State, scenes: Array<Scene>): Object {
     const noneTags = newScene.generatorWeights.filter((wg) => wg.type == TT.none && !wg.rules && !wg.tag.typeTag).map((wg) => wg.tag);
     const allTypes = newScene.generatorWeights.filter((wg) => wg.type == TT.all && !wg.rules && wg.tag.typeTag).map((wg) => wg.tag.name);
     const noneTypes = newScene.generatorWeights.filter((wg) => wg.type == TT.none && !wg.rules && wg.tag.typeTag).map((wg) => wg.tag.name);
+    const allAdvRules = newScene.generatorWeights.filter((wg) => wg.type == TT.all && wg.rules).map((wg) => wg.tag);
+    const noneAdvRules = newScene.generatorWeights.filter((wg) => wg.type == TT.none && wg.rules).map((wg) => wg.tag);
 
     // Sources to require
     let reqAdvSources: Array<LibrarySource> = null;
@@ -1106,15 +1108,17 @@ export function generateScenes(state: State, scenes: Array<Scene>): Object {
       // Build each adv rule like a regular set of simple rules
       // First get tags to require/exclude
       const ruleAllTags = wg.rules.filter((wg) => !wg.tag.typeTag && wg.type == TT.all).map((wg) => wg.tag);
+      const ruleOrTags = wg.rules.filter((wg) => !wg.tag.typeTag && wg.type == TT.or).map((wg) => wg.tag);
       const ruleNoneTags = wg.rules.filter((wg) => !wg.tag.typeTag && wg.type == TT.none).map((wg) => wg.tag);
       const ruleAllTypes = wg.rules.filter((wg) => wg.tag.typeTag && wg.type == TT.all).map((wg) => wg.tag.name);
+      const ruleOrTypes = wg.rules.filter((wg) => wg.tag.typeTag && wg.type == TT.or).map((wg) => wg.tag.name);
       const ruleNoneTypes = wg.rules.filter((wg) => wg.tag.typeTag && wg.type == TT.none).map((wg) => wg.tag.name);
 
       // Build this rule's list of sources
       let rulesSources = new Array<LibrarySource>();
 
       // If we don't have any weights, calculate by just require/exclude
-      if (ruleAllTags.length + ruleNoneTags.length + ruleAllTypes.length + ruleNoneTypes.length == wg.rules.length) {
+      if (ruleAllTags.length + ruleOrTags.length + ruleNoneTags.length + ruleAllTypes.length + ruleOrTypes.length + ruleNoneTypes.length == wg.rules.length) {
         let sources = [];
         // For each source in the library
         for (let s of state.library) {
@@ -1147,6 +1151,13 @@ export function generateScenes(state: State, scenes: Array<Scene>): Object {
                 }
               }
               if (b) continue;
+
+              // Filter out clips which don't have any ruleOrTags
+              const ruleOrTagIDs = ruleOrTags.map((t) => t.id);
+              if (ruleOrTags.length > 0 && !cTags.find((t) => ruleOrTagIDs.includes(t.id))) {
+                invalidClips.push(c.id);
+                continue;
+              }
 
               // Filter out clips which have ruleNoneTags/noneTags
               for (let nt of ruleNoneTags) {
@@ -1183,6 +1194,12 @@ export function generateScenes(state: State, scenes: Array<Scene>): Object {
                 }
               }
               if (b) continue;
+
+              // Filter out clips which don't have any ruleOrTypes
+              if (ruleOrTypes.length > 0 && ruleOrTypes.includes(sTypeEn)) {
+                invalidClips.push(c.id);
+                continue;
+              }
 
               // Filter out clips which have ruleNoneTypes/noneTypes
               for (let nt of ruleNoneTypes) {
@@ -1227,6 +1244,12 @@ export function generateScenes(state: State, scenes: Array<Scene>): Object {
             }
             if (b) continue;
 
+            // Filter out sources which don't have any ruleOrTags
+            const ruleOrTagIDs = ruleOrTags.map((t) => t.id);
+            if (ruleOrTags.length > 0 && !s.tags.find((t) => ruleOrTagIDs.includes(t.id))) {
+              continue;
+            }
+
             // Filter out sources which have ruleNoneTags/noneTags
             for (let nt of ruleNoneTags) {
               if (s.tags.find((t) => t.id == nt.id)) {
@@ -1258,6 +1281,11 @@ export function generateScenes(state: State, scenes: Array<Scene>): Object {
               }
             }
             if (b) continue;
+
+            // Filter out sources which don't have any ruleOrTypes
+            if (ruleOrTypes.length > 0 && ruleOrTypes.includes(sTypeEn)) {
+              continue;
+            }
 
             // Filter out sources which have ruleNonTypes/noneTypes
             for (let nt of ruleNoneTypes) {
@@ -1330,6 +1358,13 @@ export function generateScenes(state: State, scenes: Array<Scene>): Object {
                   }
                   if (b) continue;
 
+                  // Filter out clips which don't have any ruleOrTags
+                  const ruleOrTagIDs = ruleOrTags.map((t) => t.id);
+                  if (ruleOrTags.length > 0 && !cTags.find((t) => ruleOrTagIDs.includes(t.id))) {
+                    invalidClips.push(c.id);
+                    continue;
+                  }
+
                   // Filter out clips which have ruleNonTags/noneTags
                   for (let nt of ruleNoneTags) {
                     if (cTags.find((t) => t.id == nt.id)) {
@@ -1365,6 +1400,12 @@ export function generateScenes(state: State, scenes: Array<Scene>): Object {
                     }
                   }
                   if (b) continue;
+
+                  // Filter out clips which don't have any ruleOrTypes
+                  if (ruleOrTypes.length > 0 && ruleOrTypes.includes(sTypeEn)) {
+                    invalidClips.push(c.id);
+                    continue;
+                  }
 
                   // Filter out clips which have ruleNoneTypes/noneTypes
                   for (let nt of ruleNoneTypes) {
@@ -1420,6 +1461,12 @@ export function generateScenes(state: State, scenes: Array<Scene>): Object {
                 }
                 if (b) continue;
 
+                // Filter out sources which don't have any ruleOrTags
+                const ruleOrTagIDs = ruleOrTags.map((t) => t.id);
+                if (ruleOrTags.length > 0 && !s.tags.find((t) => ruleOrTagIDs.includes(t.id))) {
+                  continue;
+                }
+
                 // Filter out sources which have ruleNoneTags/noneTags
                 for (let nt of ruleNoneTags) {
                   if (s.tags.find((t) => t.id == nt.id)) {
@@ -1452,6 +1499,11 @@ export function generateScenes(state: State, scenes: Array<Scene>): Object {
                 }
                 if (b) continue;
 
+                // Filter out sources which don't have any ruleOrTypes
+                if (ruleOrTypes.length > 0 && ruleOrTypes.includes(sTypeEn)) {
+                  continue;
+                }
+
                 // Filter out sources which have ruleNoneTypes/noneTypes
                 for (let nt of ruleNoneTypes) {
                   if (nt == sTypeEn) {
@@ -1474,7 +1526,7 @@ export function generateScenes(state: State, scenes: Array<Scene>): Object {
               sources.push(s);
             }
             // Randomize list and reduce
-            rulesSources = rulesSources.concat(reduceList(randomizeList(sources), Math.round(newScene.generatorMax * (rule.percent / 100))));
+            rulesSources = rulesSources.concat(randomizeList(sources));
           }
         }
       }
@@ -1507,7 +1559,7 @@ export function generateScenes(state: State, scenes: Array<Scene>): Object {
 
     // Now, build our simple rules
     // If we don't have any weights, calculate by just require/exclude
-    if (allTags.length + noneTags.length + allTypes.length + noneTypes.length == newScene.generatorWeights.length) {
+    if (allTags.length + noneTags.length + allTypes.length + noneTypes.length + allAdvRules.length + noneAdvRules.length == newScene.generatorWeights.length) {
       let sources = [];
       for (let s of state.library) {
         // Filter out sources which are not in required list

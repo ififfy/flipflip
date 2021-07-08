@@ -258,7 +258,6 @@ export default class AppStorage {
                   }
                   wg.type = weight.type;
                   wg.tag = tag;
-                  wg.name = tag.name;
 
                   scene.generatorWeights.push(wg);
                 }
@@ -280,7 +279,6 @@ export default class AppStorage {
                     const weights = Array.from(tagWeights.values());
                     const swSum = weights.length > 0 ? weights.map((w) => w.value).reduce((total, value) => Number(total) + Number(value)) : 0;
                     const rules = new Array<WeightGroup>();
-                    let name = "";
 
                     // For each tag weight
                     for (let tag of tagWeights.keys()) {
@@ -296,21 +294,7 @@ export default class AppStorage {
                         }
                         rule.type = weight.type;
                         rule.tag = tag;
-                        rule.name = tag.name;
                         rules.push(rule);
-                        const comma = name != "";
-                        if (comma) name = name + ", ";
-                        switch (weight.type) {
-                          case TT.weight:
-                            name = name + rule.percent + "% " + rule.name;
-                            break;
-                          case TT.all:
-                            name = name + "Y " + rule.name;
-                            break;
-                          case TT.none:
-                            name = name + "N " + rule.name;
-                            break;
-                        }
                       }
                     }
 
@@ -327,7 +311,6 @@ export default class AppStorage {
 
                     // Add rules
                     wg.rules = rules;
-                    wg.name = name;
                     scene.generatorWeights.push(wg);
                   }
                 }

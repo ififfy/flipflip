@@ -81,6 +81,7 @@ export default new Map<string, string>([
   ['tt.weight', 'Percent'],
   ['tt.all', 'Require'],
   ['tt.none', 'Exclude'],
+  ['tt.or', 'Any'],
 
   ['sf.alpha', 'By Title'],
   ['sf.alphaFull', 'By Full Title'],

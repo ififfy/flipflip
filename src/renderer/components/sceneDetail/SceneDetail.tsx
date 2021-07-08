@@ -994,7 +994,7 @@ class SceneDetail extends React.Component {
               {this.state.openMenu == MO.simpleRule &&
                 <LibrarySearch
                   displaySources={this.props.library}
-                  filters={this.props.scene.generatorWeights.filter((wg) => !wg.rules).map((wg) => wg.name)}
+                  filters={this.props.scene.generatorWeights.filter((wg) => !wg.rules).map((wg) => wg.tag.name)}
                   tags={this.props.tags}
                   placeholder={"Search ..."}
                   autoFocus
@@ -1127,7 +1127,6 @@ class SceneDetail extends React.Component {
 
   onAddAdvWG() {
     const wg = new WeightGroup();
-    wg.name = "Empty Adv Rule";
     wg.percent = 0;
     wg.type = TT.weight;
     wg.rules = [];
@@ -1151,7 +1150,6 @@ class SceneDetail extends React.Component {
     }
     if (tag) {
       const wg = new WeightGroup();
-      wg.name = tag.name;
       wg.percent = 0;
       wg.type = TT.weight;
       wg.tag = tag;

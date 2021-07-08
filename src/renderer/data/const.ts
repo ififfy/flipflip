@@ -117,6 +117,7 @@ const TT = { // tag type
   weight: 'tt.weight',
   all: 'tt.all',
   none: 'tt.none',
+  or: 'tt.or'
 };
 
 const SF = { // sort function

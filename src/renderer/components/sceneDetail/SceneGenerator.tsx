@@ -4,11 +4,12 @@ import clsx from "clsx";
 import {
   Avatar, Card, CardContent, CardHeader, Chip, createStyles, Dialog, DialogContent, DialogTitle, Divider,
   FormControlLabel, Grid, IconButton, List, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Menu,
-  MenuItem, Radio, RadioGroup, Slider, TextField, Theme, withStyles
+  Radio, RadioGroup, Slider, Theme, Typography, withStyles
 } from "@material-ui/core";
 import ValueLabel from "@material-ui/core/Slider/ValueLabel";
 
 import AddIcon from '@material-ui/icons/Add';
+import AdjustIcon from '@material-ui/icons/Adjust';
 import ArrowLeftIcon from '@material-ui/icons/ArrowLeft';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import CheckIcon from '@material-ui/icons/Check';
@@ -130,6 +131,7 @@ class SceneGenerator extends React.Component {
     isWeighing: -1,
     isEditing: -1,
     addRule: false,
+    advRule: false,
     menuAnchorEl: null as any,
   };
 
@@ -204,7 +206,7 @@ class SceneGenerator extends React.Component {
                           </IconButton>
                         </React.Fragment>
                       }
-                      title={wg.name}/>
+                      title={this.getRuleName(wg)}/>
                     {wg.rules && (
                       <React.Fragment>
                         <Divider/>
@@ -227,6 +229,11 @@ class SceneGenerator extends React.Component {
                                     {wg.type == TT.none && (
                                       <Avatar>
                                         <NotInterestedIcon/>
+                                      </Avatar>
+                                    )}
+                                    {wg.type == TT.or && (
+                                      <Avatar>
+                                        <AdjustIcon/>
                                       </Avatar>
                                     )}
                                   </React.Fragment>
@@ -280,7 +287,7 @@ class SceneGenerator extends React.Component {
               className={classes.editRadios}
               value={isWeighing.type}
               onChange={this.onGroupInput.bind(this, this.state.isWeighing, 'type')}>
-              {Object.values(TT).map((tt) =>
+              {Object.values(TT).filter((tt) => this.state.advRule || tt != TT.or).map((tt) =>
                 <FormControlLabel key={tt} value={tt}
                                   control={<Radio className={clsx(this.props.tutorial == SDGT.edit2 && tt == TT.all && classes.highlight)}/>}
                                   label={en.get(tt)} />
@@ -294,16 +301,14 @@ class SceneGenerator extends React.Component {
           onClose={this.onCloseDialog.bind(this)}
           aria-labelledby="adv-rule-title"
           aria-describedby="adv-rule-description">
-          <DialogTitle id="adv-rule-title">Advanced Rule</DialogTitle>
+          <DialogTitle id="adv-rule-title">{this.getRuleName(this.props.scene.generatorWeights[this.state.isEditing])}</DialogTitle>
           <DialogContent className={classes.noScroll}>
             {this.state.isEditing != -1 && (
               <div>
                 <div style={{display: 'flex'}}>
-                  <TextField
-                    style={{flexGrow: 1}}
-                    label="Rule Name"
-                    value={this.props.scene.generatorWeights[this.state.isEditing].name}
-                    onChange={this.onGroupNameChange.bind(this)}/>
+                  <Typography variant={"overline"} style={{flexGrow: 1}}>
+                    Create advanced rule:
+                  </Typography>
                     <IconButton onClick={this.onClickAddRule.bind(this)}>
                       <AddIcon />
                     </IconButton>
@@ -326,6 +331,11 @@ class SceneGenerator extends React.Component {
                           {wg.type == TT.none && (
                             <Avatar className={classes.cardAvatar}>
                               <NotInterestedIcon/>
+                            </Avatar>
+                          )}
+                          {wg.type == TT.or && (
+                            <Avatar className={classes.cardAvatar}>
+                              <AdjustIcon/>
                             </Avatar>
                           )}
                         </IconButton>
@@ -357,7 +367,7 @@ class SceneGenerator extends React.Component {
                   onClose={this.onCloseAddRule.bind(this)}>
                   <LibrarySearch
                     displaySources={this.props.library}
-                    filters={this.props.scene.generatorWeights[this.state.isEditing].rules.filter((wg) => !wg.rules).map((wg) => wg.name)}
+                    filters={this.props.scene.generatorWeights[this.state.isEditing].rules.filter((wg) => !wg.rules).map((wg) => wg.tag.name)}
                     tags={this.props.tags}
                     placeholder={"Search ..."}
                     autoFocus
@@ -387,19 +397,13 @@ class SceneGenerator extends React.Component {
   }
 
   areRulesValid(wg: WeightGroup) {
-    let rulesHasAll = false;
-    let rulesHasWeight = false;
+    const orRules = wg.rules.filter((r) => r.type == TT.or);
+    const weightRules = wg.rules.filter((r) => r.type == TT.weight);
     let rulesRemaining = 100;
-    for (let rule of wg.rules) {
-      if (rule.type == TT.weight) {
-        rulesRemaining = rulesRemaining - rule.percent;
-        rulesHasWeight = true;
-      }
-      if (rule.type == TT.all) {
-        rulesHasAll = true;
-      }
+    for (let rule of weightRules) {
+      rulesRemaining = rulesRemaining - rule.percent;
     }
-    return (rulesRemaining == 100 && rulesHasAll && !rulesHasWeight) || rulesRemaining == 0;
+    return wg.rules.length > 0 && (orRules.length == 0 || (orRules.length + weightRules.length == wg.rules.length && rulesRemaining == 0) || orRules.length == wg.rules.length) && (rulesRemaining == 0 || (rulesRemaining == 100 && weightRules.length == 0));
   }
 
   getRemainingPercent(): number {
@@ -421,7 +425,7 @@ class SceneGenerator extends React.Component {
   }
 
   onCloseDialog() {
-    this.setState({isWeighing: -1, isEditing: -1, addRule: false, menuAnchorEl: null});
+    this.setState({isWeighing: -1, isEditing: -1, addRule: false, menuAnchorEl: null, advRule: false});
   }
 
   onCloseMenu() {
@@ -444,7 +448,6 @@ class SceneGenerator extends React.Component {
     }
     if (tag) {
       const newWG = new WeightGroup();
-      newWG.name = tag.name;
       newWG.percent = 0;
       newWG.type = TT.weight;
       newWG.tag = tag;
@@ -464,7 +467,7 @@ class SceneGenerator extends React.Component {
   }
 
   onWeighRule(index: number, e: MouseEvent) {
-    this.setState({menuAnchorEl: e.currentTarget, isWeighing: index});
+    this.setState({menuAnchorEl: e.currentTarget, isWeighing: index, advRule: true});
   }
 
   onDeleteRule(index: number) {
@@ -474,18 +477,52 @@ class SceneGenerator extends React.Component {
     this.changeGeneratorWeights(generatorWeights);
   }
 
-  onGroupNameChange(e: MouseEvent) {
-    const generatorWeights = this.props.scene.generatorWeights;
-    const wg = generatorWeights[this.state.isEditing];
-    wg.name = (e.target as HTMLInputElement).value;
-    this.changeGeneratorWeights(generatorWeights);
+  getRuleName(wg: WeightGroup) {
+    if (!wg) return "ERROR";
+    if (!!wg.rules) {
+      if (wg.rules.length == 0) return "New Adv Rule";
+      if (!this.areRulesValid(wg)) return "ERROR";
+
+      let title = "";
+      const allRules = wg.rules.filter((r) => r.type == TT.all).map((r) => r.tag.name);
+      if (allRules.length > 0) {
+        title += allRules.join(" ");
+      }
+      const orRules = wg.rules.filter((r) => r.type == TT.or).map((r) => r.tag.name);
+      if (orRules.length > 0) {
+        if (title != "") {
+          title += ", ";
+        }
+        title += orRules.join(" OR ");
+      }
+      const noRules = wg.rules.filter((r) => r.type == TT.none).map((r) => r.tag.name);
+      if (noRules.length > 0) {
+        if (title != "") {
+          title += ", ";
+        }
+        title += "NO " + noRules.join(" ");
+      }
+      const weightRules = wg.rules.filter((r) => r.type == TT.weight);
+      if (weightRules.length > 0) {
+        for (let r of weightRules) {
+          if (title != "") {
+            title += ", ";
+          }
+          title += r.percent + "% " + r.tag.name;
+        }
+      }
+
+      return title
+    } else {
+      return wg.tag.name;
+    }
   }
 
   onWeighGroup(index: number, e: MouseEvent) {
     if (this.props.tutorial == SDGT.edit1) {
       this.props.onTutorial(SDGT.edit1);
     }
-    this.setState({menuAnchorEl: e.currentTarget, isWeighing: index});
+    this.setState({menuAnchorEl: e.currentTarget, isWeighing: index, advRule: false});
   }
 
   onEditGroup(index: number) {

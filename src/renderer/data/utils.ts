@@ -447,26 +447,20 @@ export function isText(path: string, strict: boolean): boolean {
 }
 
 function areRulesValid(wg: WeightGroup) {
-  let rulesHasAll = false;
-  let rulesHasWeight = false;
+  const orRules = wg.rules.filter((r) => r.type == TT.or);
+  const weightRules = wg.rules.filter((r) => r.type == TT.weight);
   let rulesRemaining = 100;
-  for (let rule of wg.rules) {
-    if (rule.type == TT.weight) {
-      rulesRemaining = rulesRemaining - rule.percent;
-      rulesHasWeight = true;
-    }
-    if (rule.type == TT.all) {
-      rulesHasAll = true;
-    }
+  for (let rule of weightRules) {
+    rulesRemaining = rulesRemaining - rule.percent;
   }
-  return (rulesRemaining == 100 && rulesHasAll && !rulesHasWeight) || rulesRemaining == 0;
+  return wg.rules.length > 0 && (orRules.length == 0 || (orRules.length + weightRules.length == wg.rules.length && rulesRemaining == 0) || orRules.length == wg.rules.length) && (rulesRemaining == 0 || (rulesRemaining == 100 && weightRules.length == 0));
 }
 
 export function areWeightsValid(scene: Scene): boolean {
   if (!scene.generatorWeights) return false;
   let remaining = 100;
-  let hasAll = false;
-  let hasWeight = false;
+  const orRules = scene.generatorWeights.filter((r) => r.type == TT.or);
+  const weightRules = scene.generatorWeights.filter((r) => r.type == TT.weight);
   for (let wg of scene.generatorWeights) {
     if (wg.rules) {
       const rulesValid = areRulesValid(wg);
@@ -474,14 +468,9 @@ export function areWeightsValid(scene: Scene): boolean {
     }
     if (wg.type == TT.weight) {
       remaining = remaining - wg.percent;
-      hasWeight = true;
-    }
-    if (wg.type == TT.all) {
-      hasAll = true;
     }
   }
-
-  return (remaining == 100 && hasAll && !hasWeight) || remaining == 0;
+  return scene.generatorWeights.length > 0 && (orRules.length == 0 || (orRules.length + weightRules.length == scene.generatorWeights.length && remaining == 0) || orRules.length == scene.generatorWeights.length) && (remaining == 0 || (remaining == 100 && weightRules.length == 0));
 }
 
 export function getEffects(scene: Scene) {
