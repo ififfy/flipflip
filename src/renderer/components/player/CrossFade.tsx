@@ -8,7 +8,7 @@ import Audio from "../../data/Audio";
 
 export default class CrossFade extends React.Component {
   readonly props: {
-    image: HTMLImageElement | HTMLVideoElement,
+    image: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement,
     scene: Scene,
     timeToNextFrame: number,
     currentAudio: Audio,

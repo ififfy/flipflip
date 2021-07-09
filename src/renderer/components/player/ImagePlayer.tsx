@@ -47,8 +47,8 @@ export default class ImagePlayer extends React.Component {
   };
 
   readonly state = {
-    readyToDisplay: Array<HTMLImageElement | HTMLVideoElement>(),
-    historyPaths: Array<HTMLImageElement | HTMLVideoElement>(),
+    readyToDisplay: Array<HTMLImageElement | HTMLVideoElement | HTMLIFrameElement>(),
+    historyPaths: Array<HTMLImageElement | HTMLVideoElement | HTMLIFrameElement>(),
     timeToNextFrame: 0,
     timeoutID: 0,
     nextImageID: 0,
@@ -300,6 +300,8 @@ export default class ImagePlayer extends React.Component {
   animationFrame = () => {
     if (!this._isMounted) return;
     let requestAnimation = false;
+    // TODO Ensure this logic is sound
+    //if (this.state.readyToDisplay.length < this.props.maxLoadingAtOnce && this.props.allURLs && this.props.allURLs.size != 1) {
     if (this.state.readyToDisplay.length < this.props.maxLoadingAtOnce && this.props.allURLs) {
       while (this._runFetchLoopCallRequests.length > 0) {
         requestAnimation = true;
@@ -478,9 +480,9 @@ export default class ImagePlayer extends React.Component {
     }
 
     // Don't bother loading files we've already cached locally
+    const fileType = getSourceType(url);
     if (this.props.config.caching.enabled && url.startsWith("http")) {
-      const fileType = getSourceType(url);
-      if (fileType != ST.hydrus && fileType != ST.piwigo && fileType != ST.video && fileType != ST.local && fileType != ST.playlist) {
+      if (fileType != ST.nimja && fileType != ST.hydrus && fileType != ST.piwigo && fileType != ST.video && fileType != ST.local && fileType != ST.playlist) {
         const sourceCachePath = getCachePath(source, this.props.config);
         const filePath = sourceCachePath + getFileName(url);
         const cachedAlready = fs.existsSync(filePath);
@@ -490,7 +492,42 @@ export default class ImagePlayer extends React.Component {
       }
     }
 
-    if (isVideo(url, false)) {
+    if (fileType == ST.nimja) {
+      let iframe = document.createElement('iframe');
+      iframe.setAttribute("source", source);
+      if (this.props.scene.orderFunction == OF.strict) {
+        iframe.setAttribute("index", urlIndex.toString());
+        iframe.setAttribute("length", sourceLength.toString());
+        if (sourceIndex != null) {
+          iframe.setAttribute("sindex", sourceIndex.toString());
+        }
+      }
+
+      const successCallback = () => {
+        if (this._imgLoadTimeouts) {
+          clearTimeout(this._imgLoadTimeouts[i]);
+        }
+        if (!this._isMounted) return;
+
+        (iframe as any).key = this.state.nextImageID;
+        this.setState({
+          readyToDisplay: this.state.readyToDisplay.concat([iframe]),
+          nextImageID: this.state.nextImageID + 1,
+        });
+        if (this.state.historyPaths.length === 0) {
+          this.advance(false, false);
+        }
+        this.queueRunFetchLoop(i);
+      };
+
+      iframe.oncontextmenu = () => {return false}
+
+      iframe.setAttribute("sandbox", "allow-scripts allow-same-origin");
+      iframe.src = url;
+
+      clearTimeout(this._imgLoadTimeouts[i]);
+      successCallback();
+    } else if (isVideo(url, false)) {
       let video = document.createElement('video');
       video.setAttribute("source", source);
       if (this.props.scene.orderFunction == OF.strict) {
@@ -793,7 +830,7 @@ export default class ImagePlayer extends React.Component {
     this._isLooping = true;
 
     let nextHistoryPaths = this.state.historyPaths;
-    let nextImg: HTMLImageElement | HTMLVideoElement;
+    let nextImg: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement;
     if (this.props.historyOffset == 0) {
       if (this.props.scene.nextSceneAllImages && this.props.scene.nextSceneID != 0 && this.props.playNextScene) {
         let remainingLibrary;

@@ -43,7 +43,7 @@ export default class CaptionProgram extends React.Component {
   readonly props: {
     captionScript: CaptionScript,
     currentAudio: Audio
-    currentImage: HTMLImageElement | HTMLVideoElement,
+    currentImage: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement,
     repeat: string,
     scale: number,
     singleTrack: boolean,

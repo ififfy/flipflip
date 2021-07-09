@@ -50,6 +50,8 @@ function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<strin
     } else {
       loadPlaylist(pm, allURLs, config, source, filter, weight, helpers, null);
     }
+  } else if (sourceType == ST.nimja) {
+    loadNimja(pm, allURLs, config, source, filter, weight, helpers, null);
   } else { // Paging sources
     let workerFunction;
     if (sourceType == ST.tumblr) {
@@ -98,6 +100,20 @@ function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<strin
       workerFunction(allURLs, config, source, filter, weight, helpers);
     }
   }
+}
+
+const loadNimja = (pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, cachePath: string) => {
+  let sources = [source.url];
+  allURLs = processAllURLs(sources, allURLs, source, weight, helpers);
+  helpers.next = null;
+  pm({data: {
+      data: sources,
+      allURLs: allURLs,
+      weight: weight,
+      helpers: helpers,
+      source: source,
+      timeout: 0,
+    }});
 }
 
 const loadLocalDirectory = (pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, cachePath: string) => {

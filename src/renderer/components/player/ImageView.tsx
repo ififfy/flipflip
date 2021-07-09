@@ -3,7 +3,7 @@ import {animated} from "react-spring";
 import Timeout = NodeJS.Timeout;
 
 import {getRandomColor, getRandomListItem} from "../../data/utils";
-import {BT, HTF, IT, OT, SL, TF, VTF} from "../../data/const";
+import {BT, HTF, IT, OT, SL, ST, TF, VTF} from "../../data/const";
 import Scene from "../../data/Scene";
 import Audio from "../../data/Audio";
 import Strobe from "./Strobe";
@@ -17,7 +17,7 @@ import StrobeImage from "./StrobeImage";
 
 export default class ImageView extends React.Component {
   readonly props: {
-    image: HTMLImageElement | HTMLVideoElement,
+    image: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement,
     fitParent: boolean,
     hasStarted: boolean,
     scene: Scene,
@@ -32,7 +32,7 @@ export default class ImageView extends React.Component {
 
   readonly backgroundRef: React.RefObject<HTMLDivElement> = React.createRef();
   readonly contentRef: React.RefObject<HTMLDivElement> = React.createRef();
-  _image: HTMLImageElement | HTMLVideoElement = null;
+  _image: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement = null;
   _timeouts: Array<Timeout>;
 
   componentDidMount() {
@@ -77,7 +77,7 @@ export default class ImageView extends React.Component {
     if (!el || !img) return;
 
     const firstChild = el.firstChild;
-    if (!forceBG && firstChild && (firstChild as HTMLImageElement | HTMLVideoElement).src == img.src) return;
+    if (!forceBG && firstChild && (firstChild as HTMLImageElement | HTMLVideoElement | HTMLIFrameElement).src == img.src) return;
 
     if (!forceBG && img instanceof HTMLVideoElement && img.hasAttribute("subtitles")) {
       try {
@@ -144,26 +144,28 @@ export default class ImageView extends React.Component {
     let parentAspect = parentWidth / parentHeight;
     let imgWidth;
     let imgHeight;
-    let isVideo = false;
+    let type = null;
     if (img instanceof HTMLImageElement) {
       imgWidth = img.width;
       imgHeight = img.height;
     } else if (img instanceof HTMLVideoElement) {
-      isVideo = true;
+      type = ST.video;
       imgWidth = img.videoWidth;
       imgHeight = img.videoHeight;
+    } else if (img instanceof HTMLIFrameElement) {
+      type = ST.nimja;
     }
     let imgAspect = imgWidth / imgHeight;
 
     const rotate = !this.props.pictureGrid &&
-      ((isVideo &&
+      ((type == ST.video &&
         ((this.props.scene.videoOrientation == OT.forceLandscape && imgWidth < imgHeight) ||
           (this.props.scene.videoOrientation == OT.forcePortrait && imgWidth > imgHeight))) ||
-        (!isVideo &&
+        (type == null &&
           ((this.props.scene.imageOrientation == OT.forceLandscape && imgWidth < imgHeight) ||
             (this.props.scene.imageOrientation == OT.forcePortrait && imgWidth > imgHeight))));
 
-    const blur = !this.props.pictureGrid && this.props.scene.backgroundType == BT.blur;
+    const blur = !this.props.pictureGrid && this.props.scene.backgroundType == BT.blur && type != ST.nimja;
     let bgImg: any;
     if (blur) {
       if (img.src.endsWith(".gif")) {
@@ -178,9 +180,9 @@ export default class ImageView extends React.Component {
         if (!this.props.scene.crossFade) {
           this.clearTimeouts();
         }
-        if (!isVideo) {
+        if (type == null) {
           context.drawImage(img, 0, 0, parentWidth, parentHeight);
-        } else {
+        } else if (type == ST.video) {
           img.onplay = () => {
             videoLoop(img);
             drawLoop(img, context, parentWidth, parentHeight);
@@ -256,7 +258,7 @@ export default class ImageView extends React.Component {
       }
     }
 
-    if (!this.props.pictureGrid) {
+    if (!this.props.pictureGrid && type != ST.nimja) {
       switch (this.props.scene.imageType) {
         case (IT.fitBestClip):
           if (rotate) {
@@ -415,6 +417,12 @@ export default class ImageView extends React.Component {
       el.appendChild(img);
       if (img instanceof HTMLVideoElement && this.props.pictureGrid && img.paused) {
         img.play();
+      }
+      if (img instanceof HTMLIFrameElement) {
+        img.onload = () => {
+          img.contentWindow.document.getElementsByClassName("copyright")[0].remove();
+          img.contentWindow.document.getElementById("intro-start").click();
+        }
       }
     }
     if (blur) {

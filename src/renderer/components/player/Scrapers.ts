@@ -2377,6 +2377,8 @@ export function getSourceType(url: string): string {
     return ST.hydrus;
   } else if (/^https?:\/\/[^.]*\.[a-z0-9\.:]+\/ws.php/.exec(url) != null) {
     return ST.piwigo;
+  } else if (/^https?:\/\/hypno\.nimja\.com\/visual\/\d+/.exec(url) != null) {
+    return ST.nimja;
   } else if (/(^https?:\/\/)|(\.txt$)/.exec(url) != null) { // Arbitrary URL, assume image list
     return ST.list;
   } else { // Directory
@@ -2500,6 +2502,7 @@ export function getFileGroup(url: string) {
       }
     case ST.video:
     case ST.playlist:
+    case ST.nimja:
       if (/^https?:\/\//g.exec(url) != null) {
         sep = "/"
       } else {

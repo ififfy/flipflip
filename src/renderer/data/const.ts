@@ -164,6 +164,7 @@ const ST = { // source types
   bdsmlr: 'st.bdsmlr',
   hydrus: 'st.hydrus',
   piwigo: 'st.piwigo',
+  nimja: 'st.nimja',
   audio: 'st.audio'
 };
 

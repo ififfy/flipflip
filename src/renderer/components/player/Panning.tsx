@@ -13,7 +13,7 @@ export default class Panning extends React.Component {
     timeToNextFrame: number,
     scene: Scene,
     panFunction: Function,
-    image?: HTMLImageElement | HTMLVideoElement,
+    image?: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement,
     children?: React.ReactNode,
   };
 

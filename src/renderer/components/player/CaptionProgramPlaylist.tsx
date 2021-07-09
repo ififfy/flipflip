@@ -14,7 +14,7 @@ export default class CaptionProgramPlaylist extends React.Component {
     playlistIndex: number,
     playlist: { scripts: Array<CaptionScript>, shuffle: boolean, repeat: string },
     currentAudio: Audio
-    currentImage: HTMLImageElement | HTMLVideoElement,
+    currentImage: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement,
     scale: number,
     scene: Scene,
     timeToNextFrame: number,
