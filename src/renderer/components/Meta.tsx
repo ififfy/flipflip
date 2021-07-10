@@ -170,6 +170,7 @@ export default class Meta extends React.Component {
                 onUpdateScenes={a(actions.replaceScenes)}
                 onUpdateGrids={a(actions.replaceGrids)}
                 startTutorial={a(actions.startTutorial)}
+                systemMessage={a(actions.systemMessage)}
               />
             )}
 

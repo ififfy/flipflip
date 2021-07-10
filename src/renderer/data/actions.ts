@@ -2814,11 +2814,7 @@ export function exportScene(state: State, scene: Scene): Object {
   return {};
 }
 
-export function importScene(state: State, addToLibrary: boolean): Object {
-  const filePath = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
-    {filters: [{name:'All Files (*.*)', extensions: ['*']},{name: 'JSON Document', extensions: ['json']}], properties: ['openFile']});
-  if (!filePath || !filePath.length) return;
-  const importScenes = JSON.parse(fs.readFileSync(filePath[0], 'utf-8'));
+export function importScene(state: State, importScenes: any, addToLibrary: boolean): Object {
   if (!importScenes[0].id || !importScenes[0].name || !importScenes[0].sources) {
     return {systemMessage: "Not a valid scene file"};
   }

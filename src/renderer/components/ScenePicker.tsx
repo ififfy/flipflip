@@ -3,11 +3,13 @@ import {ipcRenderer, remote} from "electron";
 import wretch from "wretch";
 import clsx from 'clsx';
 import Sortable from "react-sortablejs";
+import fs from "fs";
 
 import {
-  AppBar, Badge, Button, Card, CardActionArea, CardContent, Chip, Container, createStyles, Dialog, DialogActions,
-  DialogContent, DialogContentText, DialogTitle, Divider, Drawer, Fab, IconButton, Link, ListItem, ListItemIcon,
-  ListItemSecondaryAction, ListItemText, Menu, MenuItem, Tab, Tabs, Theme, Toolbar, Tooltip, Typography, withStyles
+  AppBar, Badge, Button, Card, CardActionArea, CardContent, Checkbox, Chip, Container, createStyles, Dialog,
+  DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Drawer, Fab, IconButton,
+  InputAdornment, Link, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Menu, MenuItem, Tab, Tabs,
+  TextField, Theme, Toolbar, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
 import AddIcon from '@material-ui/icons/Add';
@@ -17,6 +19,7 @@ import CasinoIcon from '@material-ui/icons/Casino';
 import CloseIcon from '@material-ui/icons/Close';
 import CodeIcon from '@material-ui/icons/Code';
 import DeleteIcon from '@material-ui/icons/Delete';
+import FolderIcon from "@material-ui/icons/Folder";
 import GetAppIcon from '@material-ui/icons/GetApp';
 import GridOnIcon from '@material-ui/icons/GridOn';
 import HelpIcon from '@material-ui/icons/Help';
@@ -365,7 +368,7 @@ class ScenePicker extends React.Component {
     onAddScene(): void,
     onChangeTab(newTab: number): void,
     onDeleteScenes(sceneIDs: Array<number>): void,
-    onImportScene(addToLibrary: boolean): void,
+    onImportScene(importScenes: any, addToLibrary: boolean): void,
     onOpenConfig(): void,
     onOpenAudioLibrary(): void,
     onOpenScriptLibrary(): void,
@@ -379,6 +382,7 @@ class ScenePicker extends React.Component {
     onUpdateScenes(scenes: Array<Scene>): void,
     onUpdateGrids(grids: Array<SceneGrid>): void,
     startTutorial(): void,
+    systemMessage(message: string): void,
   };
 
   readonly state = {
@@ -392,6 +396,8 @@ class ScenePicker extends React.Component {
     displayGrids: Array<SceneGrid>(),
     filters: Array<string>(),
     deleteScenes: null as Array<number>,
+    importFile: "",
+    importSources: false,
   };
 
   render() {
@@ -894,18 +900,40 @@ class ScenePicker extends React.Component {
           <DialogTitle id="import-title">Import Scene</DialogTitle>
           <DialogContent>
             <DialogContentText id="import-description">
-              You are about to import a Scene. Would you also like to import this Scene's sources into your Library?
+              To import a scene, enter the URL or open a local file. You can also choose whether or not to import sources into your Library.
             </DialogContentText>
+            <TextField
+              label="Import File"
+              fullWidth
+              placeholder="Paste URL Here"
+              margin="dense"
+              value={this.state.importFile}
+              InputProps={{
+                endAdornment:
+                  <InputAdornment position="end">
+                    <Tooltip title="Open File">
+                      <IconButton
+                        onClick={this.onOpenImportFile.bind(this)}>
+                        <FolderIcon/>
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Import Sources into Library">
+                      <Checkbox value={this.state.importSources} onChange={this.onChangeImportSources.bind(this)}
+                                checked={this.state.importSources}/>
+                    </Tooltip>
+                  </InputAdornment>,
+              }}
+              onChange={this.onChangeImportFile.bind(this)}
+            />
           </DialogContent>
           <DialogActions>
             <Button onClick={this.onCloseDialog.bind(this)} color="default">
               Cancel
             </Button>
-            <Button onClick={this.onFinishImportScene.bind(this, false)} color="secondary">
-              Just Import Scene
-            </Button>
-            <Button onClick={this.onFinishImportScene.bind(this, true)} color="primary">
-              Import Sources into Library
+            <Button color="primary"
+                    disabled={this.state.importFile.length == 0}
+                    onClick={this.onFinishImportScene.bind(this, this.state.importFile, this.state.importSources)}>
+              Import
             </Button>
           </DialogActions>
         </Dialog>
@@ -1005,9 +1033,27 @@ class ScenePicker extends React.Component {
     this.setState({deleteScenes: newDeleteScenes});
   }
 
-  onFinishImportScene(addToLibrary: boolean) {
-    this.props.onImportScene(addToLibrary);
-    this.onCloseDialog();
+  onFinishImportScene() {
+    if (this.state.importFile.startsWith("http")) {
+      wretch(this.state.importFile)
+        .get()
+        .text((text) => {
+          let json;
+          try {
+            json = JSON.parse(text);
+            this.props.onImportScene(json, this.state.importSources);
+            this.onCloseDialog();
+          } catch (e) {
+            this.props.systemMessage("This is not a valid JSON file");
+          }
+        })
+        .catch((e) => {
+          this.props.systemMessage("Error accessing URL");
+        });
+    } else {
+      this.props.onImportScene(JSON.parse(fs.readFileSync(this.state.importFile, 'utf-8')), this.state.importSources);
+      this.onCloseDialog();
+    }
   }
 
   onNewWindow() {
@@ -1080,8 +1126,25 @@ class ScenePicker extends React.Component {
     }
   }
 
+  onOpenImportFile() {
+    const filePath = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+      {filters: [{name:'All Files (*.*)', extensions: ['*']},{name: 'JSON Document', extensions: ['json']}], properties: ['openFile']});
+    if (!filePath || !filePath.length) return;
+    this.setState({importFile: filePath[0]});
+  }
+
+  onChangeImportFile(e: MouseEvent) {
+    const input = (e.target as HTMLInputElement);
+    this.setState({importFile: input.value});
+  }
+
+  onChangeImportSources(e: MouseEvent) {
+    const input = (e.target as HTMLInputElement);
+    this.setState({importSources: input.checked});
+  }
+
   onCloseDialog() {
-    this.setState({menuAnchorEl: null, openMenu: null});
+    this.setState({menuAnchorEl: null, openMenu: null, importFile: "", importSources: false});
   }
 
   onRandomScene() {
