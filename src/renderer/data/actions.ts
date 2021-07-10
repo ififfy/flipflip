@@ -2739,38 +2739,71 @@ function sortFunction(algorithm: string, ascending: boolean, getName: (a: any) =
 
 export function exportScene(state: State, scene: Scene): Object {
   const scenesToExport = Array<Scene>();
+  const gridsToExport = Array<SceneGrid>();
   const sceneCopy = JSON.parse(JSON.stringify(scene)); // Make a copy
   sceneCopy.generatorWeights = null;
+  sceneCopy.openTab = 3;
   sceneCopy.overlays = sceneCopy.overlays.filter((o: Overlay) => o.sceneID != 0);
   scenesToExport.push(sceneCopy);
 
-  if (sceneCopy.gridView) {
-    // Add grid
-    for (let row of sceneCopy.grid) {
-      for (let g of row) {
-        const grid = state.scenes.find((s) => s.id == g);
-        if (grid && !scenesToExport.find((s) => s.id == g)) {
+  // Add overlays
+  if (sceneCopy.overlayEnabled) {
+    for (let o of sceneCopy.overlays) {
+      // If overlay is a grid, add grid scenes and their immediate overlays
+      if (o.sceneID.toString().startsWith("999")) {
+        const gridID = parseInt(o.sceneID.toString().replace("999", ""));
+        const grid = state.grids.find((s) => s.id == gridID);
+        if (grid && !gridsToExport.find((s) => s.id == gridID)) {
           const gridCopy = JSON.parse(JSON.stringify(grid)); // Make a copy
-          gridCopy.generatorWeights = null;
-          gridCopy.overlays = [];
-          scenesToExport.push(gridCopy);
+          gridsToExport.push(gridCopy);
+          for (let r of grid.grid) {
+            for (let c of r) {
+              if (c != -1) {
+                const cell = state.scenes.find((s) => s.id == c);
+                if (cell && !scenesToExport.find((s) => s.id == c)) {
+                  const cellCopy = JSON.parse(JSON.stringify(cell)); // Make a copy
+                  cellCopy.generatorWeights = null;
+                  cellCopy.openTab = 3;
+                  scenesToExport.push(cellCopy);
+                  if (cell.overlayEnabled) {
+                    for (let co of cell.overlays) {
+                      if (!co.sceneID.toString().startsWith("999")) {
+                        const overlay = state.scenes.find((s) => s.id == co.sceneID);
+                        if (overlay && !scenesToExport.find((s) => s.id == co.sceneID)) {
+                          const overlayCopy = JSON.parse(JSON.stringify(overlay)); // Make a copy
+                          overlayCopy.generatorWeights = null;
+                          overlayCopy.openTab = 3;
+                          overlayCopy.overlays = [];
+                          scenesToExport.push(overlayCopy);
+                        }
+                      }
+                    }
+                  } else {
+                    cell.overlays = [];
+                  }
+                }
+              }
+            }
+          }
+        }
+      } else {
+        // Otherwise, just add the overlay
+        const overlay = state.scenes.find((s) => s.id == o.sceneID);
+        if (overlay && !scenesToExport.find((s) => s.id == o.sceneID)) {
+          const overlayCopy = JSON.parse(JSON.stringify(overlay)); // Make a copy
+          overlayCopy.generatorWeights = null;
+          overlayCopy.openTab = 3;
+          overlayCopy.overlays = [];
+          scenesToExport.push(overlayCopy);
         }
       }
     }
   } else {
-    // Add overlays
-    for (let o of sceneCopy.overlays) {
-      const overlay = state.scenes.find((s) => s.id == o.sceneID);
-      if (overlay && !scenesToExport.find((s) => s.id == o.sceneID)) {
-        const overlayCopy = JSON.parse(JSON.stringify(overlay)); // Make a copy
-        overlayCopy.generatorWeights = null;
-        overlayCopy.overlays = [];
-        scenesToExport.push(overlayCopy);
-      }
-    }
+    sceneCopy.overlays = [];
   }
 
-  const sceneExport = JSON.stringify(scenesToExport);
+  const allExports = (scenesToExport as Array<any>).concat(gridsToExport);
+  const sceneExport = JSON.stringify(allExports);
   const fileName = sceneCopy.name + "_export.json";
   remote.dialog.showSaveDialog(remote.getCurrentWindow(),
     {filters: [{name: 'JSON Document', extensions: ['json']}], defaultPath: fileName}, (filePath) => {
@@ -2790,6 +2823,7 @@ export function importScene(state: State, addToLibrary: boolean): Object {
     return {systemMessage: "Not a valid scene file"};
   }
   let newScenes = state.scenes;
+  let newGrids = state.grids;
   let sources = Array<LibrarySource>();
 
   const scene = new Scene(importScenes[0]);
@@ -2799,39 +2833,97 @@ export function importScene(state: State, addToLibrary: boolean): Object {
   });
   const newSceneMap = new Map<number, number>();
   newSceneMap.set(scene.id, id);
-  scene.id = id;
+  scene.id = id++;
+
+  const newGridMap = new Map<number, number>();
+  let gid = state.grids.length + 1;
+  state.grids.forEach((s: SceneGrid) => {
+    gid = Math.max(s.id + 1, gid);
+  });
 
   newScenes = newScenes.concat([scene]);
   if (addToLibrary) {
     sources = sources.concat(scene.sources);
   }
+
   if (scene.overlays) {
     for (let o of scene.overlays) {
-      const sID = parseInt(o.sceneID as any);
-      if (newSceneMap.has(sID)) {
-        o.sceneID = newSceneMap.get(sID);
+      if (o.sceneID.toString().startsWith("999")) {
+        const sID = parseInt(o.sceneID.toString().replace("999",""));
+        if (newGridMap.has(sID)) {
+          o.sceneID = parseInt("999" + newGridMap.get(sID));
+        } else {
+          o.sceneID = parseInt("999" + (gid));
+          newGridMap.set(sID, gid++);
+        }
       } else {
-        o.sceneID = ++id;
-        newSceneMap.set(sID, o.sceneID);
-      }
-    }
-  }
-  if (newSceneMap.size > 0) {
-    for (let i=1; i < importScenes.length; i++) {
-      const scene = new Scene(importScenes[i]);
-      scene.id = newSceneMap.get(scene.id);
-      newScenes = newScenes.concat([scene]);
-      if (addToLibrary) {
-        sources = sources.concat(scene.sources);
+        const sID = parseInt(o.sceneID as any);
+        if (newSceneMap.has(sID)) {
+          o.sceneID = newSceneMap.get(sID);
+        } else {
+          o.sceneID = id++;
+          newSceneMap.set(sID, o.sceneID);
+        }
       }
     }
   }
 
+  if (newSceneMap.size > 0) {
+    for (let i=1; i < importScenes.length; i++) {
+      if (importScenes[i].grid) {
+        const grid = new SceneGrid(importScenes[i]);
+        grid.id = newGridMap.get(grid.id);
+        for (let r = 0; r < grid.grid.length; r++) {
+          for (let c = 0; c < grid.grid[r].length; c++) {
+            const cellID = parseInt(grid.grid[r][c] as any);
+            if (cellID != -1) {
+              if (!newSceneMap.has(cellID)) {
+                newSceneMap.set(cellID, id++);
+              }
+              grid.grid[r][c] = newSceneMap.get(cellID);
+            }
+          }
+        }
+        newGrids = newGrids.concat([grid]);
+      } else {
+        const scene = new Scene(importScenes[i]);
+        if (!newSceneMap.has(scene.id)) {
+          newSceneMap.set(scene.id, id++);
+        }
+        scene.id = newSceneMap.get(scene.id);
+        for (let o of scene.overlays) {
+          if (o.sceneID.toString().startsWith("999")) {
+            const sID = parseInt(o.sceneID.toString().replace("999",""));
+            if (newGridMap.has(sID)) {
+              o.sceneID = parseInt("999" + newGridMap.get(sID));
+            } else {
+              o.sceneID = parseInt("999" + (gid));
+              newGridMap.set(sID, gid++);
+            }
+          } else {
+            const sID = parseInt(o.sceneID as any);
+            if (newSceneMap.has(sID)) {
+              o.sceneID = newSceneMap.get(sID);
+            } else {
+              o.sceneID = id++;
+              newSceneMap.set(sID, o.sceneID);
+            }
+          }
+        }
+        newScenes = newScenes.concat([scene]);
+        if (addToLibrary) {
+          sources = sources.concat(scene.sources);
+        }
+      }
+    }
+  }
+
+  let lid = state.library.length + 1;
   if (addToLibrary) {
     const sourceURLs = sources.map((s) => s.url);
-    id = state.library.length + 1;
+    // Don't add sources which are already in the library
     for (let source of state.library) {
-      id = Math.max(source.id+1, id);
+      lid = Math.max(source.id + 1, lid);
       let indexOf = sourceURLs.indexOf(source.url);
       if (indexOf >= 0) {
         while (indexOf >= 0) {
@@ -2841,18 +2933,27 @@ export function importScene(state: State, addToLibrary: boolean): Object {
         }
       }
     }
+
     if (sources.length > 0) {
+      for (let source of sources) {
+        source.id = lid++;
+      }
       return {
         systemSnack: "Added " + sources.length + " new sources to the Library",
         scenes: newScenes,
+        grids: newGrids,
         library: state.library.concat(sources),
         route: [new Route({kind: 'scene', value: scene.id})]
       };
     } else {
-      return {systemSnack: "No new sources detected"};
+      return {
+        systemSnack: "No new sources detected",
+        scenes: newScenes,
+        grids: newGrids,
+        route: [new Route({kind: 'scene', value: scene.id})]};
     }
   }
-  return {scenes: newScenes, route: [new Route({kind: 'scene', value: scene.id})]};
+  return {scenes: newScenes, grids: newGrids, route: [new Route({kind: 'scene', value: scene.id})]};
 }
 
 export function exportLibrary(state: State): Object {
