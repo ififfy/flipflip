@@ -519,7 +519,6 @@ export default class ImageView extends React.Component {
           height: '100%',
           width: '100%',
           zIndex: 2,
-          overflow: 'hidden',
           backgroundPosition: 'center',
           backgroundSize: 'contain',
           backgroundRepeat: 'no-repeat',
@@ -533,7 +532,6 @@ export default class ImageView extends React.Component {
           width: '100%',
           zIndex: 1,
           backgroundSize: 'cover',
-          overflow: 'hidden',
           ...backgroundStyle
         }}/>;
     if (this.props.scene.strobe && this.props.scene.strobeLayer == SL.image) {

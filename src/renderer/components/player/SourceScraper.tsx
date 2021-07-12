@@ -498,7 +498,7 @@ export default class SourceScraper extends React.Component {
 
       const receiveMessage = (message: any) => {
         let object = message.data;
-        if (object?.type == "RPC" || (object?.helper != null && object.helpers.uuid != uuid)) return;
+        if (object?.type == "RPC" || (object?.helpers != null && object.helpers.uuid != uuid)) return;
 
         if (object?.captcha != null && this.state.captcha == null) {
           this.setState({captcha: {captcha: object.captcha, source: object?.source, helpers: object?.helpers}});
@@ -576,7 +576,7 @@ export default class SourceScraper extends React.Component {
 
       const receiveMessage = (message: any) => {
         let object = message.data;
-        if (object?.type == "RPC" || (object?.helper != null && object.helpers.uuid != uuid)) return;
+        if (object?.type == "RPC" || (object?.helpers != null && object.helpers.uuid != uuid)) return;
 
         if (object?.error != null) {
           console.error("Error retrieving " + object?.source?.url + (object?.helpers?.next > 0 ? "Page " + object.helpers.next : ""));
@@ -640,7 +640,7 @@ export default class SourceScraper extends React.Component {
 
       const receiveMessage = (message: any) => {
         let object = message.data;
-        if (object?.type == "RPC" || (object?.helper != null && object.helpers.uuid != uuid)) return;
+        if (object?.type == "RPC" || (object?.helpers != null && object.helpers.uuid != uuid)) return;
 
         if (object?.captcha != null && this.state.captcha == null) {
           this.setState({captcha: {captcha: object.captcha, source: object?.source, helpers: object?.helpers}});
