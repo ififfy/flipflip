@@ -20,6 +20,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import CodeIcon from '@material-ui/icons/Code';
 import CreateNewFolderIcon from '@material-ui/icons/CreateNewFolder';
 import DeleteIcon from '@material-ui/icons/Delete';
+import DragHandleIcon from '@material-ui/icons/DragHandle';
 import FolderIcon from "@material-ui/icons/Folder";
 import GetAppIcon from '@material-ui/icons/GetApp';
 import GridOnIcon from '@material-ui/icons/GridOn';
@@ -350,7 +351,6 @@ const styles = (theme: Theme) => createStyles({
     pointerEvents: 'none',
   },
   groupTitle: {
-    marginLeft: theme.spacing(2),
     lineHeight: '45px',
     minWidth: '20px',
   },
@@ -358,6 +358,10 @@ const styles = (theme: Theme) => createStyles({
     color: theme.palette.primary.contrastText,
     fontSize: theme.typography.h6.fontSize,
   },
+  groupHandle: {
+    margin: theme.spacing(1),
+    cursor: 'move',
+  }
 });
 
 class ScenePicker extends React.Component {
@@ -706,96 +710,117 @@ class ScenePicker extends React.Component {
                     </Jiggle>
                   )}
                 </Sortable>
-                {this.props.sceneGroups.filter((g) => g.type == SG.scene).map((g) =>
-                  <React.Fragment key={g.id}>
-                    <div className={classes.root}>
-                      {this.state.isEditing == g.id && (
-                        <form onSubmit={this.endEditingName.bind(this)} className={clsx(classes.titleField, classes.groupTitle)}>
-                          <TextField
-                            autoFocus
-                            id="title"
-                            value={this.state.isEditingName}
-                            margin="none"
-                            inputProps={{className: classes.titleInput}}
-                            onBlur={this.endEditingName.bind(this)}
-                            onChange={this.onChangeName.bind(this)}
-                          />
-                        </form>
-                      )}
-                      {this.state.isEditing != g.id && (
-                        <Typography variant={"h6"}
-                                    onClick={this.beginEditingName.bind(this, g)}
-                                    className={classes.groupTitle}>{g.name}</Typography>
-                      )}
-                      <div className={classes.fill}/>
-                      <IconButton
-                        color="inherit"
-                        aria-label="Delete"
-                        onClick={this.props.onDeleteGroup.bind(this, g)}>
-                        <CloseIcon />
-                      </IconButton>
-                    </div>
-                    <Sortable
-                      className={classes.sceneList}
-                      options={{
-                        group: {
-                          name: SG.scene,
-                          pull: true,
-                          put: true,
-                        },
-                        animation: 150,
-                        easing: "cubic-bezier(1, 0, 0, 1)",
-                      }}
-                      onChange={(order: any, sortable: any, evt: any) => {
-                        let filteredList = this.props.scenes.filter((s) => !s.generatorWeights && this.state.displayScenes.includes(s) && g.scenes.includes(s.id));
-                        let newScenes = Array.from(this.props.scenes);
-                        let oldIndex = null, newIndex = null;
-                        if (evt.type == "update") {
-                          oldIndex = newScenes.indexOf(filteredList[evt.oldIndex]);
-                          newIndex = newScenes.indexOf(filteredList[evt.newIndex]);
-                        } else if (order.length > filteredList.length) {
-                          oldIndex = newScenes.indexOf(newScenes.find((s) => s.id == evt.item.id));
-                          if (evt.newIndex == 0) {
-                            newIndex = 0;
-                          } else if (evt.newIndex == filteredList.length) {
-                            newIndex = newScenes.indexOf(filteredList[evt.newIndex-1]) + 1;
-                          } else {
+                <Sortable
+                  options={{
+                    group: {
+                      name: 'group',
+                      pull: false,
+                      put: false,
+                    },
+                    animation: 150,
+                    handle: ".group-handle",
+                    easing: "cubic-bezier(1, 0, 0, 1)",
+                  }}
+                  onChange={(order: any, sortable: any, evt: any) => {
+                    let filteredList = this.props.sceneGroups.filter((g) => g.type == SG.scene);
+                    let newGroups = Array.from(this.props.sceneGroups);
+                    let oldIndex = newGroups.indexOf(filteredList[evt.oldIndex]);
+                    let newIndex = newGroups.indexOf(filteredList[evt.newIndex]);
+                    arrayMove(newGroups, oldIndex, newIndex);
+                    this.props.onUpdateGroups(newGroups);
+                  }}>
+                  {this.props.sceneGroups.filter((g) => g.type == SG.scene).map((g) =>
+                    <div key={g.id}>
+                      <div className={classes.root}>
+                        <DragHandleIcon className={clsx("group-handle", classes.groupHandle)}/>
+                        {this.state.isEditing == g.id && (
+                          <form onSubmit={this.endEditingName.bind(this)} className={clsx(classes.titleField, classes.groupTitle)}>
+                            <TextField
+                              autoFocus
+                              id="title"
+                              value={this.state.isEditingName}
+                              margin="none"
+                              inputProps={{className: classes.titleInput}}
+                              onBlur={this.endEditingName.bind(this)}
+                              onChange={this.onChangeName.bind(this)}
+                            />
+                          </form>
+                        )}
+                        {this.state.isEditing != g.id && (
+                          <Typography variant={"h6"}
+                                      onClick={this.beginEditingName.bind(this, g)}
+                                      className={classes.groupTitle}>{g.name}</Typography>
+                        )}
+                        <div className={classes.fill}/>
+                        <IconButton
+                          color="inherit"
+                          aria-label="Delete"
+                          onClick={this.props.onDeleteGroup.bind(this, g)}>
+                          <CloseIcon />
+                        </IconButton>
+                      </div>
+                      <Sortable
+                        className={classes.sceneList}
+                        options={{
+                          group: {
+                            name: SG.scene,
+                            pull: true,
+                            put: true,
+                          },
+                          animation: 150,
+                          easing: "cubic-bezier(1, 0, 0, 1)",
+                        }}
+                        onChange={(order: any, sortable: any, evt: any) => {
+                          let filteredList = this.props.scenes.filter((s) => !s.generatorWeights && this.state.displayScenes.includes(s) && g.scenes.includes(s.id));
+                          let newScenes = Array.from(this.props.scenes);
+                          let oldIndex = null, newIndex = null;
+                          if (evt.type == "update") {
+                            oldIndex = newScenes.indexOf(filteredList[evt.oldIndex]);
                             newIndex = newScenes.indexOf(filteredList[evt.newIndex]);
-                            if (oldIndex < newIndex) newIndex--;
-                          }
-                          if (!!evt.item.id) {
+                          } else if (order.length > filteredList.length) {
+                            oldIndex = newScenes.indexOf(newScenes.find((s) => s.id == evt.item.id));
+                            if (evt.newIndex == 0) {
+                              newIndex = 0;
+                            } else if (evt.newIndex == filteredList.length) {
+                              newIndex = newScenes.indexOf(filteredList[evt.newIndex-1]) + 1;
+                            } else {
+                              newIndex = newScenes.indexOf(filteredList[evt.newIndex]);
+                              if (oldIndex < newIndex) newIndex--;
+                            }
+                            if (!!evt.item.id) {
+                              let newGroups = Array.from(this.props.sceneGroups);
+                              let group = newGroups.find((gr) => gr.id == g.id);
+                              group.scenes = group.scenes.concat([parseInt(evt.item.id)]);
+                              this.props.onUpdateGroups(newGroups);
+                            }
+                          } else if (order.length < filteredList.length) {
                             let newGroups = Array.from(this.props.sceneGroups);
                             let group = newGroups.find((gr) => gr.id == g.id);
-                            group.scenes = group.scenes.concat([parseInt(evt.item.id)]);
+                            group.scenes = group.scenes.filter((id) => id.toString() != evt.item.id);
                             this.props.onUpdateGroups(newGroups);
                           }
-                        } else if (order.length < filteredList.length) {
-                          let newGroups = Array.from(this.props.sceneGroups);
-                          let group = newGroups.find((gr) => gr.id == g.id);
-                          group.scenes = group.scenes.filter((id) => id.toString() != evt.item.id);
-                          this.props.onUpdateGroups(newGroups);
-                        }
-                        if (oldIndex != null && newIndex != null) {
-                          arrayMove(newScenes, oldIndex, newIndex);
-                          this.props.onUpdateScenes(newScenes);
-                        }
-                      }}>
-                      {this.props.scenes.filter((s) => !s.generatorWeights && this.state.displayScenes.includes(s) && g.scenes.includes(s.id)).map((scene) =>
-                        <Jiggle id={scene.id.toString()} key={scene.id} bounce disable={this.state.deleteScenes?.includes(scene.id)} className={classes.scene}>
-                          <Card className={clsx(this.state.deleteScenes?.includes(scene.id) && classes.deleteScene)}>
-                            <CardActionArea onClick={this.state.deleteScenes == null ? this.props.onOpenScene.bind(this, scene) : this.onToggleDelete.bind(this, scene.id)}>
-                              <CardContent>
-                                <Typography component="h2" variant="h6">
-                                  {scene.name}
-                                </Typography>
-                              </CardContent>
-                            </CardActionArea>
-                          </Card>
-                        </Jiggle>
-                      )}
-                    </Sortable>
-                  </React.Fragment>
-                )}
+                          if (oldIndex != null && newIndex != null) {
+                            arrayMove(newScenes, oldIndex, newIndex);
+                            this.props.onUpdateScenes(newScenes);
+                          }
+                        }}>
+                        {this.props.scenes.filter((s) => !s.generatorWeights && this.state.displayScenes.includes(s) && g.scenes.includes(s.id)).map((scene) =>
+                          <Jiggle id={scene.id.toString()} key={scene.id} bounce disable={this.state.deleteScenes?.includes(scene.id)} className={classes.scene}>
+                            <Card className={clsx(this.state.deleteScenes?.includes(scene.id) && classes.deleteScene)}>
+                              <CardActionArea onClick={this.state.deleteScenes == null ? this.props.onOpenScene.bind(this, scene) : this.onToggleDelete.bind(this, scene.id)}>
+                                <CardContent>
+                                  <Typography component="h2" variant="h6">
+                                    {scene.name}
+                                  </Typography>
+                                </CardContent>
+                              </CardActionArea>
+                            </Card>
+                          </Jiggle>
+                        )}
+                      </Sortable>
+                    </div>
+                  )}
+                </Sortable>
               </Typography>
             )}
 
@@ -847,96 +872,117 @@ class ScenePicker extends React.Component {
                     </Jiggle>
                   )}
                 </Sortable>
-                {this.props.sceneGroups.filter((g) => g.type == SG.generator).map((g) =>
-                  <React.Fragment key={g.id}>
-                    <div className={classes.root}>
-                      {this.state.isEditing == g.id && (
-                        <form onSubmit={this.endEditingName.bind(this)} className={clsx(classes.titleField, classes.groupTitle)}>
-                          <TextField
-                            autoFocus
-                            id="title"
-                            value={this.state.isEditingName}
-                            margin="none"
-                            inputProps={{className: classes.titleInput}}
-                            onBlur={this.endEditingName.bind(this)}
-                            onChange={this.onChangeName.bind(this)}
-                          />
-                        </form>
-                      )}
-                      {this.state.isEditing != g.id && (
-                        <Typography variant={"h6"}
-                                    onClick={this.beginEditingName.bind(this, g)}
-                                    className={classes.groupTitle}>{g.name}</Typography>
-                      )}
-                      <div className={classes.fill}/>
-                      <IconButton
-                        color="inherit"
-                        aria-label="Delete"
-                        onClick={this.props.onDeleteGroup.bind(this, g)}>
-                        <CloseIcon />
-                      </IconButton>
-                    </div>
-                    <Sortable
-                      className={classes.sceneList}
-                      options={{
-                        group: {
-                          name: SG.generator,
-                          pull: true,
-                          put: true,
-                        },
-                        animation: 150,
-                        easing: "cubic-bezier(1, 0, 0, 1)",
-                      }}
-                      onChange={(order: any, sortable: any, evt: any) => {
-                        let filteredList = this.props.scenes.filter((s) => s.generatorWeights && this.state.displayScenes.includes(s) && g.scenes.includes(s.id));
-                        let newScenes = Array.from(this.props.scenes);
-                        let oldIndex = null, newIndex = null;
-                        if (evt.type == "update") {
-                          oldIndex = newScenes.indexOf(filteredList[evt.oldIndex]);
-                          newIndex = newScenes.indexOf(filteredList[evt.newIndex]);
-                        } else if (order.length > filteredList.length) {
-                          oldIndex = newScenes.indexOf(newScenes.find((s) => s.id == evt.item.id));
-                          if (evt.newIndex == 0) {
-                            newIndex = 0;
-                          } else if (evt.newIndex == filteredList.length) {
-                            newIndex = newScenes.indexOf(filteredList[evt.newIndex-1]) + 1;
-                          } else {
+                <Sortable
+                  options={{
+                    group: {
+                      name: 'group',
+                      pull: false,
+                      put: false,
+                    },
+                    animation: 150,
+                    handle: ".group-handle",
+                    easing: "cubic-bezier(1, 0, 0, 1)",
+                  }}
+                  onChange={(order: any, sortable: any, evt: any) => {
+                    let filteredList = this.props.sceneGroups.filter((g) => g.type == SG.generator);
+                    let newGroups = Array.from(this.props.sceneGroups);
+                    let oldIndex = newGroups.indexOf(filteredList[evt.oldIndex]);
+                    let newIndex = newGroups.indexOf(filteredList[evt.newIndex]);
+                    arrayMove(newGroups, oldIndex, newIndex);
+                    this.props.onUpdateGroups(newGroups);
+                  }}>
+                  {this.props.sceneGroups.filter((g) => g.type == SG.generator).map((g) =>
+                    <div key={g.id}>
+                      <div className={classes.root}>
+                        <DragHandleIcon className={clsx("group-handle", classes.groupHandle)}/>
+                        {this.state.isEditing == g.id && (
+                          <form onSubmit={this.endEditingName.bind(this)} className={clsx(classes.titleField, classes.groupTitle)}>
+                            <TextField
+                              autoFocus
+                              id="title"
+                              value={this.state.isEditingName}
+                              margin="none"
+                              inputProps={{className: classes.titleInput}}
+                              onBlur={this.endEditingName.bind(this)}
+                              onChange={this.onChangeName.bind(this)}
+                            />
+                          </form>
+                        )}
+                        {this.state.isEditing != g.id && (
+                          <Typography variant={"h6"}
+                                      onClick={this.beginEditingName.bind(this, g)}
+                                      className={classes.groupTitle}>{g.name}</Typography>
+                        )}
+                        <div className={classes.fill}/>
+                        <IconButton
+                          color="inherit"
+                          aria-label="Delete"
+                          onClick={this.props.onDeleteGroup.bind(this, g)}>
+                          <CloseIcon />
+                        </IconButton>
+                      </div>
+                      <Sortable
+                        className={classes.sceneList}
+                        options={{
+                          group: {
+                            name: SG.generator,
+                            pull: true,
+                            put: true,
+                          },
+                          animation: 150,
+                          easing: "cubic-bezier(1, 0, 0, 1)",
+                        }}
+                        onChange={(order: any, sortable: any, evt: any) => {
+                          let filteredList = this.props.scenes.filter((s) => s.generatorWeights && this.state.displayScenes.includes(s) && g.scenes.includes(s.id));
+                          let newScenes = Array.from(this.props.scenes);
+                          let oldIndex = null, newIndex = null;
+                          if (evt.type == "update") {
+                            oldIndex = newScenes.indexOf(filteredList[evt.oldIndex]);
                             newIndex = newScenes.indexOf(filteredList[evt.newIndex]);
-                            if (oldIndex < newIndex) newIndex--;
-                          }
-                          if (!!evt.item.id) {
+                          } else if (order.length > filteredList.length) {
+                            oldIndex = newScenes.indexOf(newScenes.find((s) => s.id == evt.item.id));
+                            if (evt.newIndex == 0) {
+                              newIndex = 0;
+                            } else if (evt.newIndex == filteredList.length) {
+                              newIndex = newScenes.indexOf(filteredList[evt.newIndex-1]) + 1;
+                            } else {
+                              newIndex = newScenes.indexOf(filteredList[evt.newIndex]);
+                              if (oldIndex < newIndex) newIndex--;
+                            }
+                            if (!!evt.item.id) {
+                              let newGroups = Array.from(this.props.sceneGroups);
+                              let group = newGroups.find((gr) => gr.id == g.id);
+                              group.scenes = group.scenes.concat([parseInt(evt.item.id)]);
+                              this.props.onUpdateGroups(newGroups);
+                            }
+                          } else if (order.length < filteredList.length) {
                             let newGroups = Array.from(this.props.sceneGroups);
                             let group = newGroups.find((gr) => gr.id == g.id);
-                            group.scenes = group.scenes.concat([parseInt(evt.item.id)]);
+                            group.scenes = group.scenes.filter((id) => id.toString() != evt.item.id);
                             this.props.onUpdateGroups(newGroups);
                           }
-                        } else if (order.length < filteredList.length) {
-                          let newGroups = Array.from(this.props.sceneGroups);
-                          let group = newGroups.find((gr) => gr.id == g.id);
-                          group.scenes = group.scenes.filter((id) => id.toString() != evt.item.id);
-                          this.props.onUpdateGroups(newGroups);
-                        }
-                        if (oldIndex != null && newIndex != null) {
-                          arrayMove(newScenes, oldIndex, newIndex);
-                          this.props.onUpdateScenes(newScenes);
-                        }
-                      }}>
-                      {this.props.scenes.filter((s) => s.generatorWeights && this.state.displayScenes.includes(s) && g.scenes.includes(s.id)).map((scene) =>
-                        <Jiggle id={scene.id.toString()} key={scene.id} bounce disable={this.state.deleteScenes?.includes(scene.id)} className={classes.scene}>
-                          <Card className={clsx(this.state.deleteScenes?.includes(scene.id) && classes.deleteScene)}>
-                            <CardActionArea onClick={this.state.deleteScenes == null ? this.props.onOpenScene.bind(this, scene) : this.onToggleDelete.bind(this, scene.id)}>
-                              <CardContent>
-                                <Typography component="h2" variant="h6">
-                                  {scene.name}
-                                </Typography>
-                              </CardContent>
-                            </CardActionArea>
-                          </Card>
-                        </Jiggle>
-                      )}
-                    </Sortable>
-                  </React.Fragment>
-                )}
+                          if (oldIndex != null && newIndex != null) {
+                            arrayMove(newScenes, oldIndex, newIndex);
+                            this.props.onUpdateScenes(newScenes);
+                          }
+                        }}>
+                        {this.props.scenes.filter((s) => s.generatorWeights && this.state.displayScenes.includes(s) && g.scenes.includes(s.id)).map((scene) =>
+                          <Jiggle id={scene.id.toString()} key={scene.id} bounce disable={this.state.deleteScenes?.includes(scene.id)} className={classes.scene}>
+                            <Card className={clsx(this.state.deleteScenes?.includes(scene.id) && classes.deleteScene)}>
+                              <CardActionArea onClick={this.state.deleteScenes == null ? this.props.onOpenScene.bind(this, scene) : this.onToggleDelete.bind(this, scene.id)}>
+                                <CardContent>
+                                  <Typography component="h2" variant="h6">
+                                    {scene.name}
+                                  </Typography>
+                                </CardContent>
+                              </CardActionArea>
+                            </Card>
+                          </Jiggle>
+                        )}
+                      </Sortable>
+                    </div>
+                  )}
+                </Sortable>
               </Typography>
             )}
 
@@ -988,98 +1034,119 @@ class ScenePicker extends React.Component {
                     </Jiggle>
                   )}
                 </Sortable>
-                {this.props.sceneGroups.filter((g) => g.type == SG.grid).map((g) =>
-                  <React.Fragment key={g.id}>
-                    <div className={classes.root}>
-                      {this.state.isEditing == g.id && (
-                        <form onSubmit={this.endEditingName.bind(this)} className={clsx(classes.titleField, classes.groupTitle)}>
-                          <TextField
-                            autoFocus
-                            id="title"
-                            value={this.state.isEditingName}
-                            margin="none"
-                            inputProps={{className: classes.titleInput}}
-                            onBlur={this.endEditingName.bind(this)}
-                            onChange={this.onChangeName.bind(this)}
-                          />
-                        </form>
-                      )}
-                      {this.state.isEditing != g.id && (
-                        <Typography variant={"h6"}
-                                    onClick={this.beginEditingName.bind(this, g)}
-                                    className={classes.groupTitle}>
-                          {g.name}
-                        </Typography>
-                      )}
-                      <div className={classes.fill}/>
-                      <IconButton
-                        color="inherit"
-                        aria-label="Delete"
-                        onClick={this.props.onDeleteGroup.bind(this, g)}>
-                        <CloseIcon />
-                      </IconButton>
-                    </div>
-                    <Sortable
-                      className={classes.sceneList}
-                      options={{
-                        group: {
-                          name: SG.grid,
-                          pull: true,
-                          put: true,
-                        },
-                        animation: 150,
-                        easing: "cubic-bezier(1, 0, 0, 1)",
-                      }}
-                      onChange={(order: any, sortable: any, evt: any) => {
-                        let filteredList = this.props.grids.filter((gr) => this.state.displayGrids.includes(gr) && g.scenes.includes(gr.id));
-                        let newGrids = Array.from(this.props.grids);
-                        let oldIndex = null, newIndex = null;
-                        if (evt.type == "update") {
-                          oldIndex = newGrids.indexOf(filteredList[evt.oldIndex]);
-                          newIndex = newGrids.indexOf(filteredList[evt.newIndex]);
-                        } else if (order.length > filteredList.length) {
-                          oldIndex = newGrids.indexOf(newGrids.find((s) => s.id == evt.item.id));
-                          if (evt.newIndex == 0) {
-                            newIndex = 0;
-                          } else if (evt.newIndex == filteredList.length) {
-                            newIndex = newGrids.indexOf(filteredList[evt.newIndex-1]) + 1;
-                          } else {
+                <Sortable
+                  options={{
+                    group: {
+                      name: 'group',
+                      pull: false,
+                      put: false,
+                    },
+                    animation: 150,
+                    handle: ".group-handle",
+                    easing: "cubic-bezier(1, 0, 0, 1)",
+                  }}
+                  onChange={(order: any, sortable: any, evt: any) => {
+                    let filteredList = this.props.sceneGroups.filter((g) => g.type == SG.grid);
+                    let newGroups = Array.from(this.props.sceneGroups);
+                    let oldIndex = newGroups.indexOf(filteredList[evt.oldIndex]);
+                    let newIndex = newGroups.indexOf(filteredList[evt.newIndex]);
+                    arrayMove(newGroups, oldIndex, newIndex);
+                    this.props.onUpdateGroups(newGroups);
+                  }}>
+                  {this.props.sceneGroups.filter((g) => g.type == SG.grid).map((g) =>
+                    <div key={g.id}>
+                      <div className={classes.root}>
+                        <DragHandleIcon className={clsx("group-handle", classes.groupHandle)}/>
+                        {this.state.isEditing == g.id && (
+                          <form onSubmit={this.endEditingName.bind(this)} className={clsx(classes.titleField, classes.groupTitle)}>
+                            <TextField
+                              autoFocus
+                              id="title"
+                              value={this.state.isEditingName}
+                              margin="none"
+                              inputProps={{className: classes.titleInput}}
+                              onBlur={this.endEditingName.bind(this)}
+                              onChange={this.onChangeName.bind(this)}
+                            />
+                          </form>
+                        )}
+                        {this.state.isEditing != g.id && (
+                          <Typography variant={"h6"}
+                                      onClick={this.beginEditingName.bind(this, g)}
+                                      className={classes.groupTitle}>
+                            {g.name}
+                          </Typography>
+                        )}
+                        <div className={classes.fill}/>
+                        <IconButton
+                          color="inherit"
+                          aria-label="Delete"
+                          onClick={this.props.onDeleteGroup.bind(this, g)}>
+                          <CloseIcon />
+                        </IconButton>
+                      </div>
+                      <Sortable
+                        className={classes.sceneList}
+                        options={{
+                          group: {
+                            name: SG.grid,
+                            pull: true,
+                            put: true,
+                          },
+                          animation: 150,
+                          easing: "cubic-bezier(1, 0, 0, 1)",
+                        }}
+                        onChange={(order: any, sortable: any, evt: any) => {
+                          let filteredList = this.props.grids.filter((gr) => this.state.displayGrids.includes(gr) && g.scenes.includes(gr.id));
+                          let newGrids = Array.from(this.props.grids);
+                          let oldIndex = null, newIndex = null;
+                          if (evt.type == "update") {
+                            oldIndex = newGrids.indexOf(filteredList[evt.oldIndex]);
                             newIndex = newGrids.indexOf(filteredList[evt.newIndex]);
-                            if (oldIndex < newIndex) newIndex--;
-                          }
-                          if (!!evt.item.id) {
+                          } else if (order.length > filteredList.length) {
+                            oldIndex = newGrids.indexOf(newGrids.find((s) => s.id == evt.item.id));
+                            if (evt.newIndex == 0) {
+                              newIndex = 0;
+                            } else if (evt.newIndex == filteredList.length) {
+                              newIndex = newGrids.indexOf(filteredList[evt.newIndex-1]) + 1;
+                            } else {
+                              newIndex = newGrids.indexOf(filteredList[evt.newIndex]);
+                              if (oldIndex < newIndex) newIndex--;
+                            }
+                            if (!!evt.item.id) {
+                              let newGroups = Array.from(this.props.sceneGroups);
+                              let group = newGroups.find((gr) => gr.id == g.id);
+                              group.scenes = group.scenes.concat([parseInt(evt.item.id)]);
+                              this.props.onUpdateGroups(newGroups);
+                            }
+                          } else if (order.length < filteredList.length) {
                             let newGroups = Array.from(this.props.sceneGroups);
                             let group = newGroups.find((gr) => gr.id == g.id);
-                            group.scenes = group.scenes.concat([parseInt(evt.item.id)]);
+                            group.scenes = group.scenes.filter((id) => id.toString() != evt.item.id);
                             this.props.onUpdateGroups(newGroups);
                           }
-                        } else if (order.length < filteredList.length) {
-                          let newGroups = Array.from(this.props.sceneGroups);
-                          let group = newGroups.find((gr) => gr.id == g.id);
-                          group.scenes = group.scenes.filter((id) => id.toString() != evt.item.id);
-                          this.props.onUpdateGroups(newGroups);
-                        }
-                        if (oldIndex != null && newIndex != null) {
-                          arrayMove(newGrids, oldIndex, newIndex);
-                          this.props.onUpdateGrids(newGrids);
-                        }
-                      }}>
-                      {this.props.grids.filter((gr) => this.state.displayGrids.includes(gr) && g.scenes.includes(gr.id)).map((grid) =>
-                        <Jiggle id={grid.id.toString()} key={grid.id} bounce disable={this.state.deleteScenes?.includes(parseInt("999" + grid.id))} className={classes.scene}>
-                          <Card className={clsx(this.state.deleteScenes?.includes(parseInt("999" + grid.id)) && classes.deleteScene)}>
-                            <CardActionArea onClick={this.state.deleteScenes == null ? this.props.onOpenGrid.bind(this, grid) : this.onToggleDelete.bind(this, parseInt("999" + grid.id))}>
-                              <CardContent>
-                                <Typography component="h2" variant="h6">
-                                  {grid.name}
-                                </Typography>
-                              </CardContent>
-                            </CardActionArea>
-                          </Card>
-                        </Jiggle>
-                      )}
-                    </Sortable>
-                  </React.Fragment>
-                )}
+                          if (oldIndex != null && newIndex != null) {
+                            arrayMove(newGrids, oldIndex, newIndex);
+                            this.props.onUpdateGrids(newGrids);
+                          }
+                        }}>
+                        {this.props.grids.filter((gr) => this.state.displayGrids.includes(gr) && g.scenes.includes(gr.id)).map((grid) =>
+                          <Jiggle id={grid.id.toString()} key={grid.id} bounce disable={this.state.deleteScenes?.includes(parseInt("999" + grid.id))} className={classes.scene}>
+                            <Card className={clsx(this.state.deleteScenes?.includes(parseInt("999" + grid.id)) && classes.deleteScene)}>
+                              <CardActionArea onClick={this.state.deleteScenes == null ? this.props.onOpenGrid.bind(this, grid) : this.onToggleDelete.bind(this, parseInt("999" + grid.id))}>
+                                <CardContent>
+                                  <Typography component="h2" variant="h6">
+                                    {grid.name}
+                                  </Typography>
+                                </CardContent>
+                              </CardActionArea>
+                            </Card>
+                          </Jiggle>
+                        )}
+                      </Sortable>
+                    </div>
+                  )}
+                </Sortable>
               </Typography>
             )}
 
