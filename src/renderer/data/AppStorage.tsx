@@ -14,6 +14,7 @@ import SceneGrid from "./SceneGrid";
 import defaultTheme from "./theme";
 import Playlist from "./Playlist";
 import CaptionScript from "./CaptionScript";
+import SceneGroup from "./SceneGroup";
 
 /**
  * A compile-time global variable defined in webpack.config' [plugins]
@@ -24,6 +25,7 @@ export declare var __VERSION__: string;
 export const defaultInitialState = {
   version: __VERSION__,
   config: new Config(),
+  sceneGroups: Array<SceneGroup>(),
   scenes: Array<Scene>(),
   grids: Array<SceneGrid>(),
   library: Array<LibrarySource>(),
@@ -126,6 +128,7 @@ export default class AppStorage {
             displayedSources: Array<LibrarySource>(),
             config: data.config ? new Config(data.config) : new Config(),
             scenes: Array<Scene>(),
+            sceneGroups: Array<SceneGroup>(),
             grids: Array<SceneGrid>(),
             audios: Array<Audio>(),
             scripts: Array<CaptionScript>(),
@@ -201,6 +204,7 @@ export default class AppStorage {
             displayedSources: Array<LibrarySource>(),
             config: new Config(data.config),
             scenes: data.scenes.map((s: any) => new Scene(s)),
+            sceneGroups: Array<SceneGroup>(),
             grids: Array<SceneGrid>(),
             audios: Array<Audio>(),
             scripts: Array<CaptionScript>(),
@@ -349,6 +353,7 @@ export default class AppStorage {
             displayedSources: Array<LibrarySource>(),
             config: new Config(data.config),
             scenes: data.scenes.map((s: any) => new Scene(s)),
+            sceneGroups: data.sceneGroups ? data.sceneGroups.map((g: any) => new SceneGroup(g)) : [],
             grids: data.grids.map((g: any) => new SceneGrid(g)),
             audios: data.audios ? data.audios.map((a: any) => new Audio(a)) : [],
             scripts: data.scripts ? data.scripts.map((s: any) => new CaptionScript(s)) : [],

@@ -43,6 +43,7 @@ import Tag from "../data/Tag";
 import SceneGrid from "./SceneGrid";
 import Playlist from "./Playlist";
 import CaptionScript from "./CaptionScript";
+import SceneGroup from "./SceneGroup";
 
 type State = typeof defaultInitialState;
 
@@ -145,6 +146,7 @@ export function restoreFromBackup(state: State, backupFile: string): Object {
     displayedSources: Array<LibrarySource>(),
     config: new Config(data.config),
     scenes: data.scenes.map((s: any) => new Scene(s)),
+    sceneGroups: data.sceneGroups ? data.sceneGroups.map((g: any) => new SceneGroup(g)) : Array<SceneGroup>(),
     grids: data.grids ? data.grids.map((g: any) => new SceneGrid(g)) : Array<SceneGrid>(),
     audios: data.audios ? data.audios.map((a: any) => new Audio(a)) : Array <Audio>(),
     scripts: data.scripts ? data.scripts.map((a: any) => new CaptionScript(a)) : Array <CaptionScript>(),
@@ -523,6 +525,20 @@ export function changeAudioLibraryTab(state: State, newTab: number): Object {
   return {audioOpenTab: newTab};
 }
 
+export function addSceneGroup(state: State, type: string): Object {
+  let id = state.sceneGroups.length + 1;
+  state.sceneGroups.forEach((s: SceneGroup) => {
+    id = Math.max(s.id + 1, id);
+  });
+  let sceneGroup = new SceneGroup( {
+    id: id,
+    type: type,
+  })
+  return {
+    sceneGroups: state.sceneGroups.concat(sceneGroup),
+  }
+}
+
 export function addScene(state: State): Object {
   const tutorial = state.config.tutorials.sceneDetail == null;
   let newTutorial = null;
@@ -565,6 +581,12 @@ export function addScene(state: State): Object {
     route: [new Route({kind: 'scene', value: scene.id})],
     specialMode: !tutorial ? SP.autoEdit : null,
   };
+}
+
+export function deleteSceneGroup(state: State, group: SceneGroup): Object {
+  return {
+    sceneGroups: state.sceneGroups.filter((g) => g.id != group.id),
+  }
 }
 
 export function deleteScenes(state: State, sceneIDs: Array<number>): Object {
@@ -1855,6 +1877,10 @@ export function updateGrid(state: State, grid: SceneGrid, fn: (grid: SceneGrid) 
     }
   }
   return {grids: newGrids};
+}
+
+export function replaceSceneGroups(state: State, groups: Array<SceneGroup>): Object {
+  return {sceneGroups: groups};
 }
 
 export function replaceScenes(state: State, scenes: Array<Scene>): Object {

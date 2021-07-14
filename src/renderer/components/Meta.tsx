@@ -61,12 +61,12 @@ export default class Meta extends React.Component {
 
     if (remote.getCurrentWindow().id == 1) {
       setInterval(this.queueSave.bind(this), 500);
-      if (this.state.is)
-        (window as any).onbeforeunload = (e: any) => {
-          window.onbeforeunload = null;
-          e.returnValue = false;
-          appStorage.save(this.state, () => {window.close()});
-        }
+      // TODO Find a way to differentiate between exit and reload
+      /*(window as any).onbeforeunload = (e: any) => {
+        window.onbeforeunload = null;
+        e.returnValue = false;
+        appStorage.save(this.state, () => {window.close()});
+      }*/
     }
   }
 
@@ -84,6 +84,7 @@ export default class Meta extends React.Component {
     if (prevState.version !== this.state.version ||
       prevState.config !== this.state.config ||
       prevState.scenes !== this.state.scenes ||
+      prevState.sceneGroups !== this.state.sceneGroups ||
       prevState.grids !== this.state.grids ||
       prevState.library !== this.state.library ||
       prevState.audios !== this.state.audios ||
@@ -149,12 +150,15 @@ export default class Meta extends React.Component {
                 libraryCount={this.state.library.length}
                 openTab={this.state.openTab}
                 scenes={this.state.scenes}
+                sceneGroups={this.state.sceneGroups}
                 tutorial={this.state.tutorial}
                 version={this.state.version}
                 onAddGenerator={a(actions.addGenerator)}
                 onAddGrid={a(actions.addGrid)}
+                onAddGroup={a(actions.addSceneGroup)}
                 onAddScene={a(actions.addScene)}
                 onChangeTab={a(actions.changeScenePickerTab)}
+                onDeleteGroup={a(actions.deleteSceneGroup)}
                 onDeleteScenes={a(actions.deleteScenes)}
                 onImportScene={a(actions.importScene)}
                 onOpenConfig={a(actions.openConfig)}
@@ -167,6 +171,7 @@ export default class Meta extends React.Component {
                 onTutorial={a(actions.doneTutorial)}
                 onSort={a(actions.sortScene)}
                 onUpdateConfig={a(actions.updateConfig)}
+                onUpdateGroups={a(actions.replaceSceneGroups)}
                 onUpdateScenes={a(actions.replaceScenes)}
                 onUpdateGrids={a(actions.replaceGrids)}
                 startTutorial={a(actions.startTutorial)}

@@ -263,6 +263,12 @@ const RT = { // Reddit timespan
   all: 'all',
 };
 
+const SG = { // Scene group types
+  scene: 'sg.scene',
+  generator: 'sg.generator',
+  grid: 'sg.grid',
+}
+
 const DONE = 'done';
 
 const SPT = { // Scene Picker Tutorials
@@ -450,5 +456,5 @@ const PWS = { // Piwigo sort types
 }
 
 export {
-  AF, ALT, ASF, BT, CST, DONE, EA, GO, GT, HTF, IF, IG, IPC, IT, LT, MO, OF, OT, PR, PT, PW, PWS, RF, RP, RT, SB, SC, SDGT, SDT, SF, SGT, SL, SLT, STF, SOF, SP, SPT, ST, TF, TT, VCT, VO, VTF, WC, WF
+  AF, ALT, ASF, BT, CST, DONE, EA, GO, GT, HTF, IF, IG, IPC, IT, LT, MO, OF, OT, PR, PT, PW, PWS, RF, RP, RT, SB, SC, SDGT, SDT, SF, SG, SGT, SL, SLT, STF, SOF, SP, SPT, ST, TF, TT, VCT, VO, VTF, WC, WF
 };
