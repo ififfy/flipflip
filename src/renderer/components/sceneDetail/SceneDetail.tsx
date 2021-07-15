@@ -16,6 +16,7 @@ import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 import AudiotrackIcon from '@material-ui/icons/Audiotrack';
 import BuildIcon from '@material-ui/icons/Build';
 import CachedIcon from '@material-ui/icons/Cached';
+import CheckIcon from "@material-ui/icons/CheckCircle";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import CollectionsIcon from '@material-ui/icons/Collections';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
@@ -1061,6 +1062,9 @@ class SceneDetail extends React.Component {
                 {this.state.snackbarType == SB.warning && (
                   <WarningIcon color="inherit" className={classes.snackbarIcon}/>
                 )}
+                {this.state.snackbarType == SB.success && (
+                  <CheckIcon color="inherit" className={classes.snackbarIcon}/>
+                )}
                 {this.state.snackbar}
               </span>
             }
@@ -1168,7 +1172,7 @@ class SceneDetail extends React.Component {
         this.props.onTutorial(SDGT.generateError);
       }
     } else {
-      this.onChangeTab(null, 3);
+      this.setState({snackbar: "Generated scene with " + this.props.scene.sources.length + " sources", snackbarType: SB.success});
       if (this.props.tutorial == SDGT.generate) {
         this.props.onTutorial(SDGT.generate);
       }
