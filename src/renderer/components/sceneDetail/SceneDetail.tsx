@@ -50,7 +50,8 @@ import URLDialog from "./URLDialog";
 import LibrarySearch from "../library/LibrarySearch";
 import SourceList from "../library/SourceList";
 import AudioTextEffects from "./AudioTextEffects";
-import {applyEffects, areWeightsValid, getEffects} from "../../data/utils";
+import {applyEffects, areWeightsValid, getEffects, getTimestampValue} from "../../data/utils";
+import {getSourceType} from "../player/Scrapers";
 import Audio from "../../data/Audio";
 import CaptionScript from "../../data/CaptionScript";
 import SceneGrid from "../../data/SceneGrid";
@@ -330,6 +331,10 @@ const styles = (theme: Theme) => createStyles({
   confirmCopy: {
     color: theme.palette.success.main,
     position: 'absolute',
+  },
+  librarySearch: {
+    position: 'absolute',
+    right: 95,
   }
 });
 
@@ -376,6 +381,8 @@ class SceneDetail extends React.Component {
     snackbarType: null as string,
     sceneEffects: "",
     confirmCopy: false,
+    displaySources: Array<LibrarySource>(),
+    filters: Array<string>(),
   };
 
   render() {
@@ -421,6 +428,19 @@ class SceneDetail extends React.Component {
                 </Typography>
                 <div className={classes.fill}/>
               </React.Fragment>
+            )}
+
+            {this.props.scene.openTab == 3 && (
+              <div className={classes.librarySearch}>
+                <LibrarySearch
+                  displaySources={this.state.displaySources}
+                  filters={this.state.filters}
+                  tags={this.props.tags}
+                  placeholder={"Search ..."}
+                  isCreatable
+                  onlyUsed
+                  onUpdateFilters={this.onUpdateFilters.bind(this)}/>
+              </div>
             )}
 
             <Fab
@@ -647,7 +667,7 @@ class SceneDetail extends React.Component {
                     <SourceList
                       config={this.props.config}
                       library={this.props.library}
-                      sources={this.props.scene.sources}
+                      sources={this.state.displaySources}
                       tutorial={this.props.tutorial == SDGT.final ? null : this.props.tutorial}
                       onClearBlacklist={this.props.onClearBlacklist.bind(this)}
                       onClip={this.props.onClip.bind(this)}
@@ -724,7 +744,7 @@ class SceneDetail extends React.Component {
         {this.props.scene.openTab == 3 && (
           <React.Fragment>
             {this.props.scene.sources.length > 0 && (
-              <Tooltip title="Remove All Sources"  placement="left">
+              <Tooltip title={this.state.filters.length == 0 ? "Remove All Sources" : "Remove These Sources"}  placement="left">
                 <Fab
                   className={clsx(classes.addButton, !piwigoConfigured && classes.removeAllButton, piwigoConfigured && classes.removeAllButtonAlt, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.props.tutorial && classes.disable)}
                   onClick={this.onRemoveAll.bind(this)}
@@ -738,20 +758,42 @@ class SceneDetail extends React.Component {
               onClose={this.onCloseDialog.bind(this)}
               aria-labelledby="remove-all-title"
               aria-describedby="remove-all-description">
-              <DialogTitle id="remove-all-title">Remove All Sources</DialogTitle>
-              <DialogContent>
-                <DialogContentText id="remove-all-description">
-                  Are you sure you want to remove all sources from this scene?
-                </DialogContentText>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
-                  Cancel
-                </Button>
-                <Button onClick={this.onFinishRemoveAll.bind(this)} color="primary">
-                  OK
-                </Button>
-              </DialogActions>
+              {this.state.filters.length == 0 && (
+                <React.Fragment>
+                  <DialogTitle id="remove-all-title">Remove All Sources</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText id="remove-all-description">
+                      Are you sure you want to remove all sources from this scene?
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+                      Cancel
+                    </Button>
+                    <Button onClick={this.onFinishRemoveAll.bind(this)} color="primary">
+                      OK
+                    </Button>
+                  </DialogActions>
+                </React.Fragment>
+              )}
+              {this.state.filters.length > 0 && (
+                <React.Fragment>
+                  <DialogTitle id="remove-all-title">Remove Sources</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText id="remove-all-description">
+                      Are you sure you want to remove these sources from this scene?
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+                      Cancel
+                    </Button>
+                    <Button onClick={this.onFinishRemoveVisible.bind(this)} color="primary">
+                      OK
+                    </Button>
+                  </DialogActions>
+                </React.Fragment>
+              )}
             </Dialog>
             {piwigoConfigured &&
               <Tooltip title="From Piwigo"  placement="left">
@@ -1029,6 +1071,7 @@ class SceneDetail extends React.Component {
   }
 
   componentDidMount() {
+    this.setState({displaySources: this.getDisplaySources()});
     window.addEventListener('keydown', this.onKeyDown, false);
   }
 
@@ -1036,10 +1079,17 @@ class SceneDetail extends React.Component {
     window.removeEventListener('keydown', this.onKeyDown);
   }
 
-  componentDidUpdate(props: any) {
+  componentDidUpdate(props: any, state:any) {
+    if (state.filters != this.state.filters || props.scene.sources != this.props.scene.sources) {
+      this.setState({displaySources: this.getDisplaySources()});
+    }
     if (!props.autoEdit && this.props.autoEdit) {
       this.setState({isEditingName: this.props.scene.name});
     }
+  }
+
+  onUpdateFilters(filters: Array<string>) {
+    this.setState({filters: filters, displaySources: this.getDisplaySources()});
   }
 
   // Use alt+P to access import modal
@@ -1295,6 +1345,148 @@ class SceneDetail extends React.Component {
   onFinishRemoveAll() {
     this.update((s) => s.sources = []);
     this.onCloseDialog();
+  }
+
+  onFinishRemoveVisible() {
+    const displayIDs = this.state.displaySources.map((s) => s.id);
+    this.update((s) => s.sources = s.sources.filter((s: LibrarySource) => !displayIDs.includes(s.id)));
+    this.onCloseDialog();
+  }
+
+  getDisplaySources() {
+    let displaySources = [];
+    const filtering = this.state.filters.length > 0;
+    if (filtering) {
+      for (let source of this.props.scene.sources) {
+        let matchesFilter = true;
+        let countRegex;
+        for (let filter of this.state.filters) {
+          if (filter == "<Offline>") { // This is offline filter
+            matchesFilter = source.offline;
+          } else if (filter == "<Marked>") { // This is a marked filter
+            matchesFilter = source.marked;
+          } else if (filter == "<Untagged>") { // This is untagged filter
+            matchesFilter = source.tags.length === 0;
+          } else if (filter == "<Unclipped>") {
+            matchesFilter = getSourceType(source.url) == ST.video && source.clips.length === 0;
+          } else if ((filter.startsWith("[") || filter.startsWith("-[")) && filter.endsWith("]")) { // This is a tag filter
+            if (filter.startsWith("-")) {
+              let tag = filter.substring(2, filter.length-1);
+              matchesFilter = source.tags.find((t) => t.name == tag) == null;
+            } else {
+              let tag = filter.substring(1, filter.length-1);
+              matchesFilter = source.tags.find((t) => t.name == tag) != null;
+            }
+          } else if ((filter.startsWith("{") || filter.startsWith("-{")) && filter.endsWith("}")) { // This is a type filter
+            if (filter.startsWith("-")) {
+              let type = filter.substring(2, filter.length-1);
+              matchesFilter = en.get(getSourceType(source.url)) != type;
+            } else {
+              let type = filter.substring(1, filter.length-1);
+              matchesFilter = en.get(getSourceType(source.url)) == type;
+            }
+          } else if ((countRegex = /^count(\+?)([>=<])(\d*)$/.exec(filter)) != null) {
+            const all = countRegex[1] == "+";
+            const symbol = countRegex[2];
+            const value = parseInt(countRegex[3]);
+            const type = getSourceType(source.url);
+            const count = type == ST.video ? source.clips.length : source.count;
+            const countComplete = type == ST.video ? true : source.countComplete;
+            switch (symbol) {
+              case "=":
+                matchesFilter = (all || countComplete) && count == value;
+                break;
+              case ">":
+                matchesFilter = (all || countComplete) && count > value;
+                break;
+              case "<":
+                matchesFilter = (all || countComplete) && count < value;
+                break;
+            }
+          } else if ((countRegex = /^duration([>=<])([\d:]*)$/.exec(filter)) != null) {
+            const symbol = countRegex[1];
+            let value;
+            if (countRegex[2].includes(":")) {
+              value = getTimestampValue(countRegex[2]);
+            } else {
+              value = parseInt(countRegex[2]);
+            }
+            const type = getSourceType(source.url);
+            if (type == ST.video) {
+              if (source.duration == null) {
+                matchesFilter = false;
+              } else {
+                switch (symbol) {
+                  case "=":
+                    matchesFilter = Math.floor(source.duration) == value;
+                    break;
+                  case ">":
+                    matchesFilter = Math.floor(source.duration) > value;
+                    break;
+                  case "<":
+                    matchesFilter = Math.floor(source.duration) < value;
+                    break;
+                }
+              }
+            } else {
+              matchesFilter = false;
+            }
+          } else if ((countRegex = /^resolution([>=<])(\d*)p?$/.exec(filter)) != null) {
+            const symbol = countRegex[1];
+            const value = parseInt(countRegex[2]);
+
+            const type = getSourceType(source.url);
+            if (type == ST.video) {
+              if (source.resolution == null) {
+                matchesFilter = false;
+              } else {
+                switch (symbol) {
+                  case "=":
+                    matchesFilter = source.resolution == value;
+                    break;
+                  case ">":
+                    matchesFilter = source.resolution > value;
+                    break;
+                  case "<":
+                    matchesFilter = source.resolution < value;
+                    break;
+                }
+              }
+            } else {
+              matchesFilter = false;
+            }
+          } else if (((filter.startsWith('"') || filter.startsWith('-"')) && filter.endsWith('"')) ||
+            ((filter.startsWith('\'') || filter.startsWith('-\'')) && filter.endsWith('\''))) {
+            if (filter.startsWith("-")) {
+              filter = filter.substring(2, filter.length - 1);
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              matchesFilter = !regex.test(source.url);
+            } else {
+              filter = filter.substring(1, filter.length - 1);
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              matchesFilter = regex.test(source.url);
+            }
+          } else { // This is a search filter
+            filter = filter.replace("\\", "\\\\");
+            if (filter.startsWith("-")) {
+              filter = filter.substring(1, filter.length);
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              matchesFilter = !regex.test(source.url);
+            } else {
+              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
+              matchesFilter = regex.test(source.url);
+            }
+          }
+          if (!matchesFilter) break;
+        }
+        if (matchesFilter) {
+          displaySources.push(source);
+        }
+      }
+    } else {
+      displaySources = this.props.scene.sources;
+    }
+    return displaySources;
   }
 }
 
