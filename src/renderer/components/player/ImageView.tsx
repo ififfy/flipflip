@@ -22,11 +22,13 @@ export default class ImageView extends React.Component {
     hasStarted: boolean,
     scene: Scene,
     currentAudio?: Audio,
+    gridCoordinates?: Array<number>,
     timeToNextFrame?: number,
     toggleStrobe?: boolean,
     pictureGrid?: boolean,
     removeChild?: boolean
     onLoaded?(): void,
+    setSceneCopy?(children: React.ReactNode): void,
     setVideo?(video: HTMLVideoElement): void,
   };
 
@@ -131,6 +133,24 @@ export default class ImageView extends React.Component {
       this._timeouts.push(setTimeout(drawLoop, 20, v, c, w, h));
     };
 
+    const extraDrawLoop = (v: any, w: number, h: number) => {
+      if (!el || !el.parentElement || parseFloat(el.parentElement.style.opacity) == 0.99 || v.ended || v.paused || this._timeouts == null) return;
+      for (let canvas of document.getElementsByClassName("canvas-" + this.props.gridCoordinates[0] + "-" + this.props.gridCoordinates[1])) {
+        const context = (canvas as HTMLCanvasElement).getContext('2d');
+        context.drawImage(v, 0, 0, w, h);
+      }
+      this._timeouts.push(setTimeout(extraDrawLoop, 20, v, w, h));
+    };
+
+    const extraBGDrawLoop = (v: any, w: number, h: number) => {
+      if (!el || !el.parentElement || parseFloat(el.parentElement.style.opacity) == 0.99 || v.ended || v.paused || this._timeouts == null) return;
+      for (let canvas of document.getElementsByClassName("canvas-bg-" + this.props.gridCoordinates[0] + "-" + this.props.gridCoordinates[1])) {
+        const context = (canvas as HTMLCanvasElement).getContext('2d');
+        context.drawImage(v, 0, 0, w, h);
+      }
+      this._timeouts.push(setTimeout(extraBGDrawLoop, 20, v, w, h));
+    };
+
     let parentWidth = el.offsetWidth;
     let parentHeight = el.offsetHeight;
     if (this.props.fitParent) {
@@ -142,8 +162,10 @@ export default class ImageView extends React.Component {
       parentHeight = window.innerHeight;
     }
     let parentAspect = parentWidth / parentHeight;
-    let imgWidth;
-    let imgHeight;
+    let imgWidth: number;
+    let imgHeight: number;
+    let scale = 1;
+    let bgscale = 1;
     let type = null;
     if (img instanceof HTMLImageElement) {
       imgWidth = img.width;
@@ -186,9 +208,17 @@ export default class ImageView extends React.Component {
           img.onplay = () => {
             videoLoop(img);
             drawLoop(img, context, parentWidth, parentHeight);
+            if (this.props.gridCoordinates) {
+              extraDrawLoop(img, imgWidth * scale, imgHeight * scale);
+              extraBGDrawLoop(img, parentWidth, parentHeight);
+            }
           };
           if (forceBG) {
             drawLoop(img, context, parentWidth, parentHeight);
+            if (this.props.gridCoordinates) {
+              extraDrawLoop(img, imgWidth * scale, imgHeight * scale);
+              extraBGDrawLoop(img, parentWidth, parentHeight);
+            }
           }
         }
       }
@@ -197,13 +227,13 @@ export default class ImageView extends React.Component {
         bgImg.style.transform = "rotate(270deg)";
         if (imgAspect > parentAspect) {
           if (imgWidth > imgHeight) {
-            const bgscale = (parentHeight + (0.04 * parentHeight)) / imgHeight;
+            bgscale = (parentHeight + (0.04 * parentHeight)) / imgHeight;
             bgImg.style.width = (imgWidth * bgscale) + 'px';
             bgImg.style.height = parentWidth + "px";
             bgImg.style.marginTop = ((parentHeight - parentWidth) / 2) + "px";
             bgImg.style.marginLeft = ((parentWidth - (imgWidth * bgscale)) / 2) + "px";
           } else {
-            const bgscale = (parentWidth + (0.04 * parentWidth)) / imgWidth;
+            bgscale = (parentWidth + (0.04 * parentWidth)) / imgWidth;
             bgImg.style.width = parentHeight + "px";
             bgImg.style.height = (imgHeight * bgscale) + 'px';
             bgImg.style.marginTop = ((parentHeight - (imgHeight * bgscale)) / 2) + "px";
@@ -211,13 +241,13 @@ export default class ImageView extends React.Component {
           }
         } else {
           if (imgWidth > imgHeight) {
-            const bgscale = (parentHeight + (0.04 * parentHeight)) / imgHeight;
+            bgscale = (parentHeight + (0.04 * parentHeight)) / imgHeight;
             bgImg.style.width = (imgWidth * bgscale) + 'px';
             bgImg.style.height = parentWidth + "px";
             bgImg.style.marginTop = ((parentHeight - parentWidth) / 2) + "px";
             bgImg.style.marginLeft = ((parentWidth - (imgWidth * bgscale)) / 2) + "px";
           } else {
-            const bgscale = (parentWidth + (0.04 * parentWidth)) / imgWidth;
+            bgscale = (parentWidth + (0.04 * parentWidth)) / imgWidth;
             bgImg.style.width = parentHeight + "px";
             bgImg.style.height = (imgHeight * bgscale) + 'px';
             bgImg.style.marginTop = (parentHeight / 2 - imgHeight * bgscale / 2) + 'px';
@@ -227,13 +257,13 @@ export default class ImageView extends React.Component {
 
       } else {
         if (imgAspect < parentAspect) {
-          const bgscale = (parentWidth + (0.04 * parentWidth)) / imgWidth;
+          bgscale = (parentWidth + (0.04 * parentWidth)) / imgWidth;
           bgImg.style.width = '100%';
           bgImg.style.height = (imgHeight * bgscale) + 'px';
           bgImg.style.marginTop = (parentHeight / 2 - imgHeight * bgscale / 2) + 'px';
           bgImg.style.marginLeft = '0';
         } else {
-          const bgscale = (parentHeight + (0.04 * parentHeight)) / imgHeight;
+          bgscale = (parentHeight + (0.04 * parentHeight)) / imgHeight;
           bgImg.style.width = (imgWidth * bgscale) + 'px';
           bgImg.style.height = '100%';
           bgImg.style.marginTop = '0';
@@ -251,7 +281,12 @@ export default class ImageView extends React.Component {
       }
       img.playbackRate = img.hasAttribute("speed") ? parseInt(img.getAttribute("speed")) / 10 : 1;
       if (!blur) {
-        img.onplay = () => videoLoop(img);
+        img.onplay = () => {
+          videoLoop(img)
+          if (this.props.gridCoordinates) {
+            extraDrawLoop(img, imgWidth * scale, imgHeight * scale);
+          }
+        }
       }
       if (img.paused) {
         img.play();
@@ -266,24 +301,24 @@ export default class ImageView extends React.Component {
             img.style.transform = "rotate(270deg)";
             img.style.transformOrigin = "top right";
             if (imgAspect < parentAspect) {
-              const scale = parentWidth / imgHeight;
+              scale = parentWidth / imgHeight;
               img.style.height = parentWidth.toString() + "px";
               img.style.marginLeft = '-' + imgWidth * scale + 'px';
               img.style.marginTop = (parentHeight / 2 - imgWidth * scale / 2) + 'px';
             } else {
-              const scale = parentHeight / imgWidth;
+              scale = parentHeight / imgWidth;
               img.style.width = parentHeight.toString() + "px";
               img.style.marginLeft = (-parentHeight + (parentWidth / 2 - imgHeight * scale / 2)) + 'px';
             }
           } else {
             if (imgAspect > parentAspect) {
-              const scale = parentHeight / imgHeight;
+              scale = parentHeight / imgHeight;
               img.style.width = 'auto';
               img.style.height = '100%';
               img.style.marginTop = '0';
               img.style.marginLeft = (parentWidth / 2 - imgWidth * scale / 2) + 'px';
             } else {
-              const scale = parentWidth / imgWidth;
+              scale = parentWidth / imgWidth;
               img.style.width = '100%';
               img.style.height = 'auto';
               img.style.marginTop = (parentHeight / 2 - imgHeight * scale / 2) + 'px';
@@ -308,14 +343,14 @@ export default class ImageView extends React.Component {
           if (rotate) {
             imgAspect = imgHeight / imgWidth;
             if (imgAspect < parentAspect) {
-              const scale = parentHeight / imgWidth;
+              scale = parentHeight / imgWidth;
               img.style.width = parentHeight.toString() + "px";
               img.style.marginLeft = (-parentHeight + (parentWidth / 2 - imgHeight * scale / 2)) + 'px';
 
               img.style.transform = "rotate(270deg)";
               img.style.transformOrigin = "top right";
             } else {
-              const scale = parentWidth / imgHeight;
+              scale = parentWidth / imgHeight;
               img.style.height = parentWidth.toString() + "px";
               img.style.marginLeft = '-' + imgWidth * scale + 'px';
               img.style.marginTop = (parentHeight / 2 - imgWidth * scale / 2) + 'px';
@@ -325,13 +360,13 @@ export default class ImageView extends React.Component {
             }
           } else {
             if (imgAspect < parentAspect) {
-              const scale = parentHeight / imgHeight;
+              scale = parentHeight / imgHeight;
               img.style.width = 'auto';
               img.style.height = '100%';
               img.style.marginTop = '0';
               img.style.marginLeft = (parentWidth / 2 - imgWidth * scale / 2) + 'px';
             } else {
-              const scale = parentWidth / imgWidth;
+              scale = parentWidth / imgWidth;
               img.style.width = '100%';
               img.style.height = 'auto';
               img.style.marginTop = (parentHeight / 2 - imgHeight * scale / 2) + 'px';
@@ -341,7 +376,7 @@ export default class ImageView extends React.Component {
           break;
         case (IT.stretch):
           if (rotate) {
-            const scale = parentWidth / imgHeight;
+            scale = parentWidth / imgHeight;
             img.style.height = parentWidth.toString() + "px";
             img.style.marginLeft = '-' + imgWidth * scale + 'px';
             img.style.marginTop = (parentHeight / 2 - imgWidth * scale / 2) + 'px';
@@ -366,7 +401,7 @@ export default class ImageView extends React.Component {
           break;
         case (IT.fitWidth):
           if (rotate) {
-            const scale = parentWidth / imgHeight;
+            scale = parentWidth / imgHeight;
             img.style.height = parentWidth.toString() + "px";
             img.style.marginLeft = '-' + imgWidth * scale + 'px';
             img.style.marginTop = (parentHeight / 2 - imgWidth * scale / 2) + 'px';
@@ -374,27 +409,27 @@ export default class ImageView extends React.Component {
             img.style.transform = "rotate(270deg)";
             img.style.transformOrigin = "top right";
           } else {
-            const hScale = parentWidth / imgWidth;
+            scale = parentWidth / imgWidth;
             img.style.width = '100%';
             img.style.height = 'auto';
-            img.style.marginTop = (parentHeight / 2 - imgHeight * hScale / 2) + 'px';
+            img.style.marginTop = (parentHeight / 2 - imgHeight * scale / 2) + 'px';
             img.style.marginLeft = '0';
           }
           break;
         case (IT.fitHeight):
           if (rotate) {
-            const scale = parentHeight / imgWidth;
+            scale = parentHeight / imgWidth;
             img.style.width = parentHeight.toString() + "px";
             img.style.marginLeft = (-parentHeight + (parentWidth / 2 - imgHeight * scale / 2)) + 'px';
 
             img.style.transform = "rotate(270deg)";
             img.style.transformOrigin = "top right";
           } else {
-            const wScale = parentHeight / imgHeight;
+            scale = parentHeight / imgHeight;
             img.style.width = 'auto';
             img.style.height = '100%';
             img.style.marginTop = '0';
-            img.style.marginLeft = (parentWidth / 2 - imgWidth * wScale / 2) + 'px';
+            img.style.marginLeft = (parentWidth / 2 - imgWidth * scale / 2) + 'px';
           }
           break;
       }
@@ -411,25 +446,80 @@ export default class ImageView extends React.Component {
       }
 
       this._image = img;
-      if (this.props.removeChild && el.hasChildNodes()) {
-        el.removeChild(el.children.item(0));
-      }
-      el.appendChild(img);
-      if (img instanceof HTMLVideoElement && this.props.pictureGrid && img.paused) {
-        img.play();
-      }
-      if (img instanceof HTMLIFrameElement) {
-        img.onload = () => {
-          img.contentWindow.document.getElementsByClassName("copyright")[0].remove();
-          img.contentWindow.document.getElementById("intro-start").click();
+
+      const  appendOriginal = () => {
+        if (this.props.removeChild && el.hasChildNodes()) {
+          el.removeChild(el.children.item(0));
         }
+        if (img instanceof HTMLVideoElement && this.props.pictureGrid && img.paused) {
+          img.play();
+        }
+        if (img instanceof HTMLIFrameElement) {
+          img.onload = () => {
+            img.contentWindow.document.getElementsByClassName("copyright")[0].remove();
+            img.contentWindow.document.getElementById("intro-start").click();
+          }
+        }
+        el.appendChild(img);
+      }
+      if (this.props.gridCoordinates) {
+        for (let element of document.getElementsByClassName("copy-" + this.props.gridCoordinates[0] + "-" + this.props.gridCoordinates[1])) {
+          if (element == el) {
+            appendOriginal();
+          } else {
+            if (this.props.removeChild && element.hasChildNodes() && el.hasChildNodes()) {
+              element.removeChild(element.children.item(0));
+            }
+            if (img instanceof HTMLVideoElement) {
+              const canvas = document.createElement("canvas");
+              canvas.className = "canvas-" + this.props.gridCoordinates[0] + "-" + this.props.gridCoordinates[1];
+              canvas.width = img.videoWidth * scale;
+              canvas.height = img.videoHeight * scale;
+              canvas.style.marginTop = img.style.marginTop;
+              canvas.style.marginLeft = img.style.marginLeft;
+              element.appendChild(canvas);
+            } else {
+              element.appendChild(img.cloneNode());
+            }
+          }
+        }
+      } else {
+        appendOriginal();
       }
     }
     if (blur) {
-      if (this.props.removeChild && bg.hasChildNodes()) {
-        bg.removeChild(bg.children.item(0));
+      const appendOriginalBG = () => {
+        if (this.props.removeChild && bg.hasChildNodes()) {
+          bg.removeChild(bg.children.item(0));
+        }
+        bg.appendChild(bgImg);
       }
-      bg.appendChild(bgImg);
+      if (this.props.gridCoordinates) {
+        for (let element of document.getElementsByClassName("copy-bg-" + this.props.gridCoordinates[0] + "-" + this.props.gridCoordinates[1])) {
+          if (element == bg) {
+            appendOriginalBG();
+          } else {
+            if (this.props.removeChild && element.hasChildNodes() && bg.hasChildNodes()) {
+              element.removeChild(element.children.item(0));
+            }
+            if (img instanceof HTMLVideoElement) {
+              const canvas = document.createElement("canvas");
+              canvas.className = "canvas-bg-" + this.props.gridCoordinates[0] + "-" + this.props.gridCoordinates[1];
+              canvas.width = bgImg.width;
+              canvas.height = bgImg.height;
+              canvas.style.width = bgImg.style.width;
+              canvas.style.height = bgImg.style.height;
+              canvas.style.marginTop = bgImg.style.marginTop;
+              canvas.style.marginLeft = bgImg.style.marginLeft;
+              element.appendChild(canvas);
+            } else {
+              element.appendChild(bgImg.cloneNode());
+            }
+          }
+        }
+      } else {
+        appendOriginalBG();
+      }
     }
 
     if (this.props.onLoaded) {
@@ -511,9 +601,12 @@ export default class ImageView extends React.Component {
       };
     }
     let viewDiv;
+    const imageClassName = this.props.gridCoordinates ? "copy-" + this.props.gridCoordinates[0] + "-" + this.props.gridCoordinates[1]: undefined;
+    const backgroundClassName = !this.props.pictureGrid && this.props.scene.backgroundType == BT.blur && this.props.gridCoordinates ? "copy-bg-" + this.props.gridCoordinates[0] + "-" + this.props.gridCoordinates[1]: undefined;
     let imageDiv =
       <animated.div
         id="image"
+        className={imageClassName}
         ref={this.contentRef}
         style={{
           height: '100%',
@@ -527,6 +620,7 @@ export default class ImageView extends React.Component {
     let backgroundDiv =
       <animated.div
         ref={this.backgroundRef}
+        className={backgroundClassName}
         style={{
           height: '100%',
           width: '100%',
@@ -559,7 +653,6 @@ export default class ImageView extends React.Component {
     if (this.props.scene.zoom || this.props.scene.horizTransType != HTF.none || this.props.scene.vertTransType != VTF.none) {
       imageDiv =
         <ZoomMove
-          image={this.props.image}
           scene={this.props.scene}
           reset={!this.props.scene.panning && !this.props.scene.fadeInOut && !this.props.scene.slide && !this.props.scene.crossFade}
           timeToNextFrame={this.props.timeToNextFrame}
@@ -624,7 +717,7 @@ export default class ImageView extends React.Component {
         </Slide>
     }
 
-    return (
+    const renderDiv =
       <animated.div
         style={{
           zIndex: 2,
@@ -638,6 +731,13 @@ export default class ImageView extends React.Component {
         }}>
         {viewDiv}
       </animated.div>
+
+    if (this.props.setSceneCopy) {
+      setImmediate(() => this.props.setSceneCopy(renderDiv));
+    }
+
+    return (
+      renderDiv
     );
   }
 

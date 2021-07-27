@@ -85,6 +85,9 @@ const styles = (theme: Theme) => createStyles({
   hideCursor: {
     cursor: 'none',
   },
+  mirror: {
+    transform: 'scaleX(-1)',
+  }
 });
 
 class GridPlayer extends React.Component {
@@ -110,11 +113,12 @@ class GridPlayer extends React.Component {
 
   readonly state = {
     appBarHover: false,
-    grid: JSON.parse(JSON.stringify(this.props.scene)) as SceneGrid,
+    scene: JSON.parse(JSON.stringify(this.props.scene)) as SceneGrid,
     height: this.props.scene.grid && this.props.scene.grid.length > 0 &&
     this.props.scene.grid[0].length ? this.props.scene.grid.length : 1,
     width: this.props.scene.grid && this.props.scene.grid.length > 0 &&
     this.props.scene.grid[0].length > 0 ? this.props.scene.grid[0].length : 1,
+    sceneCopyGrid: this.props.scene.grid.map((r) => r.map((c) => null)) as Array<Array<React.ReactNode>>,
     isLoaded: new Array<Array<boolean>>(),
     hideCursor: false,
   };
@@ -192,27 +196,64 @@ class GridPlayer extends React.Component {
           <Container maxWidth={false} className={classes.container}>
             <div className={classes.grid}
                  style={{gridTemplateColumns: gridTemplateColumns, gridTemplateRows: gridTemplateRows}}>
-              {this.state.grid.grid.map((row, rowIndex) =>
+              {this.state.scene.grid.map((row, rowIndex) =>
                 <React.Fragment key={rowIndex}>
                   {row.map((cell, colIndex) => {
-                    if (cell.sceneID) {
-                      const scene = this.props.allScenes.find((s) => s.id == cell.sceneID);
-                      const newLoaded = this.state.isLoaded;
-                      let changed = false;
-                      while (newLoaded.length <= rowIndex) {
-                        newLoaded.push([]);
-                        changed = true
-                      }
-                      while (newLoaded[rowIndex].length <= colIndex) {
-                        newLoaded[rowIndex].push(false);
-                        changed = true
-                      }
-                      if (changed) {
-                        setTimeout(() => this.setState({isLoaded: newLoaded}), 200);
-                      }
-                      if (!scene && !newLoaded[rowIndex][colIndex]) {
-                        setTimeout(() => this.setCellLoaded(rowIndex, colIndex), 200);
-                      }
+                    const scene = this.props.allScenes.find((s) => s.id == cell.sceneID);
+                    const newLoaded = this.state.isLoaded;
+                    let changed = false;
+                    while (newLoaded.length <= rowIndex) {
+                      newLoaded.push([]);
+                      changed = true
+                    }
+                    while (newLoaded[rowIndex].length <= colIndex) {
+                      newLoaded[rowIndex].push(false);
+                      changed = true
+                    }
+                    if (changed) {
+                      setTimeout(() => this.setState({isLoaded: newLoaded}), 200);
+                    }
+                    if (!scene && !newLoaded[rowIndex][colIndex]) {
+                      setTimeout(() => this.setCellLoaded(rowIndex, colIndex), 200);
+                    }
+                    const allLoaded = [].concat.apply([], this.state.isLoaded).find((l: boolean) => !l) == null;
+                    if (cell.sceneCopy.length > 0) {
+                      const sceneCopyGridCell = this.state.sceneCopyGrid[cell.sceneCopy[0]][cell.sceneCopy[1]];
+                      // TODO There's something that used to be in the "false" spot below
+                      return (
+                        <div className={clsx(classes.gridCell, (!sceneCopyGridCell || false) && classes.hidden, cell.mirror && classes.mirror)} key={colIndex}>
+                          <div style={{
+                            left: 0,
+                            right: 0,
+                            top: 0,
+                            bottom: 0,
+                            display: 'flex',
+                            overflow: 'hidden',
+                            position: 'relative',
+                          }}>
+                            <div>
+                              <div style={{
+                                position: 'absolute',
+                                top: 0,
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                              }}>
+                                <div style={{
+                                  top: 0,
+                                  right: 0,
+                                  bottom: 0,
+                                  left: 0,
+                                  position: 'static',
+                                }}>
+                                  {sceneCopyGridCell}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    } else {
                       const loadingIndex = [].concat.apply([], newLoaded).indexOf(false);
                       const showProgress = loadingIndex >= 0 && loadingIndex == (rowIndex * row.length) + colIndex;
                       return (
@@ -226,29 +267,26 @@ class GridPlayer extends React.Component {
                               scene={scene}
                               nextScene={this.nextScene.bind(this, rowIndex, colIndex)}
                               gridView
+                              gridCoordinates={this.state.scene.grid.find((r) => r.find((c) => JSON.stringify(c.sceneCopy) == JSON.stringify([rowIndex,colIndex]))) ? [rowIndex,colIndex] : undefined}
                               scenes={this.props.allScenes}
                               sceneGrids={this.props.sceneGrids}
                               theme={this.props.theme}
                               tutorial={null}
                               captionScale={1 / Math.sqrt(row.length * this.props.scene.grid.length)}
-                              allLoaded={[].concat.apply([], this.state.isLoaded).find((l: boolean) => !l) == null}
+                              allLoaded={allLoaded}
                               cache={this.props.cache.bind(this)}
                               getTags={this.props.getTags.bind(this)}
                               goBack={this.props.goBack.bind(this)}
                               onLoaded={this.setCellLoaded.bind(this, rowIndex, colIndex)}
                               setCount={this.props.setCount.bind(this)}
                               setProgress={showProgress ? this.props.setProgress : this.nop}
+                              setSceneCopy={this.setSceneCopy.bind(this, rowIndex, colIndex)}
                               setVideo={this.props.setVideo ? this.props.setVideo.bind(this, (rowIndex * row.length) + colIndex) : undefined}
                               systemMessage={this.props.systemMessage.bind(this)}
                             />
                           )}
                         </div>
                       );
-                    } else if (cell.sceneCopy) {
-                      // TODO
-                      return <div/>
-                    } else {
-                      return <div/>
                     }
                   })}
                 </React.Fragment>
@@ -262,10 +300,16 @@ class GridPlayer extends React.Component {
 
   nop() {}
 
+  setSceneCopy(rowIndex: number, colIndex: number, children: React.ReactNode) {
+    const newSceneCopyGrid = this.state.sceneCopyGrid;
+    newSceneCopyGrid[rowIndex][colIndex] = children;
+    this.setState({sceneCopyGrid: newSceneCopyGrid});
+  }
+
   nextScene(rowIndex: number, colIndex: number) {
-    const cell = this.state.grid.grid[rowIndex][colIndex];
+    const cell = this.state.scene.grid[rowIndex][colIndex];
     const scene = this.props.allScenes.find((s) => s.id == cell.sceneID);
-    const newGrid = this.state.grid;
+    const newGrid = this.state.scene;
     if (scene.nextSceneID == -1) {
       newGrid.grid[rowIndex][colIndex].sceneID = scene.nextSceneRandomID;
     } else {

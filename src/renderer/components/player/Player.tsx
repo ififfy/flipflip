@@ -1,6 +1,7 @@
 import {remote, webFrame} from 'electron';
 const {getCurrentWindow} = remote;
 import * as React from 'react';
+import IdleTimer from "react-idle-timer";
 
 import {
   Button, CircularProgress, Container, Theme, Typography
@@ -9,23 +10,22 @@ import {
 import {SL, WC} from "../../data/const";
 import {getRandomListItem, urlToPath} from "../../data/utils";
 import {getFileGroup, getFileName} from "./Scrapers";
+import Audio from "../../data/Audio";
+import CaptionScript from "../../data/CaptionScript";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
 import Scene from '../../data/Scene';
+import SceneGrid from "../../data/SceneGrid";
 import Tag from "../../data/Tag";
-import ChildCallbackHack from './ChildCallbackHack';
-import SourceScraper from './SourceScraper';
-import Strobe from "./Strobe";
-import PlayerBars from "./PlayerBars";
-import PictureGrid from "./PictureGrid";
-import Audio from "../../data/Audio";
-import ImageView from "./ImageView";
 import AudioAlert from "./AudioAlert";
 import CaptionProgramPlaylist from "./CaptionProgramPlaylist";
-import CaptionScript from "../../data/CaptionScript";
-import SceneGrid from "../../data/SceneGrid";
+import ChildCallbackHack from './ChildCallbackHack';
 import GridPlayer from "./GridPlayer";
-import IdleTimer from "react-idle-timer";
+import ImageView from "./ImageView";
+import PictureGrid from "./PictureGrid";
+import PlayerBars from "./PlayerBars";
+import SourceScraper from './SourceScraper';
+import Strobe from "./Strobe";
 
 export default class Player extends React.Component {
   readonly props: {
@@ -35,20 +35,21 @@ export default class Player extends React.Component {
     sceneGrids: Array<SceneGrid>,
     theme: Theme,
     tutorial: string,
+    advanceHack?: ChildCallbackHack,
+    allLoaded?: boolean,
+    allTags?: Array<Tag>,
+    captionProgramJumpToHack?: ChildCallbackHack,
+    captionScale?: number,
+    gridCoordinates?: Array<number>,
+    gridView?: boolean,
+    hasStarted?: boolean,
+    preventSleep?: boolean,
+    tags?: Array<Tag>,
     cache(i: HTMLImageElement | HTMLVideoElement): void,
     getTags(source: string): Array<Tag>,
     goBack(): void,
     setCount(sourceURL: string, count: number, countComplete: boolean): void,
     systemMessage(message: string): void,
-    preventSleep?: boolean,
-    allLoaded?: boolean,
-    advanceHack?: ChildCallbackHack,
-    allTags?: Array<Tag>,
-    captionScale?: number,
-    captionProgramJumpToHack?: ChildCallbackHack,
-    gridView?: boolean,
-    hasStarted?: boolean,
-    tags?: Array<Tag>,
     blacklistFile?(sourceURL: string, fileToBlacklist: string): void,
     goToTagSource?(source: LibrarySource): void,
     goToClipSource?(source: LibrarySource): void,
@@ -63,6 +64,7 @@ export default class Player extends React.Component {
     onCaptionError?(e: string): void,
     onLoaded?(): void,
     setProgress?(total: number, current: number, message: string[]): void,
+    setSceneCopy?(children: React.ReactNode): void,
     setVideo?(video: HTMLVideoElement): void,
   };
 
@@ -427,6 +429,7 @@ export default class Player extends React.Component {
               nextScene={nextScene}
               currentAudio={this.state.currentAudio}
               opacity={1}
+              gridCoordinates={this.props.gridCoordinates}
               gridView={this.props.gridView}
               isPlaying={this.state.isPlaying}
               hasStarted={this.state.hasStarted}
@@ -439,6 +442,7 @@ export default class Player extends React.Component {
               finishedLoading={this.setMainLoaded.bind(this)}
               firstImageLoaded={this.setMainCanStart.bind(this)}
               setProgress={this.setProgress.bind(this)}
+              setSceneCopy={this.props.setSceneCopy}
               setVideo={this.props.setVideo ? this.props.setVideo : this.setMainVideo.bind(this)}
               setCount={this.props.setCount.bind(this)}
               cache={this.props.cache.bind(this)}
@@ -529,9 +533,9 @@ export default class Player extends React.Component {
                       hideBars
                       advanceHacks={this.state.imagePlayerAdvanceHacks[index + 1]}
                       config={this.props.config}
-                      grid={overlayGrid}
+                      scene={overlayGrid}
                       hasStarted={this.state.hasStarted}
-                      scenes={this.props.scenes}
+                      allScenes={this.props.scenes}
                       sceneGrids={this.props.sceneGrids}
                       theme={this.props.theme}
                       cache={this.props.cache}
@@ -648,6 +652,11 @@ export default class Player extends React.Component {
       }
     }
     if ((this.props.allLoaded == true && props.allLoaded == false) || (this.props.hasStarted && this.props.hasStarted != props.hasStarted)) {
+      for (let r of this.state.imagePlayerAdvanceHacks) {
+        for (let hack of r) {
+          hack.fire();
+        }
+      }
       this.start(true);
     }
   }

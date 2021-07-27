@@ -28,20 +28,22 @@ export default class ImagePlayer extends React.Component {
     currentAudio: Audio,
     gridView: boolean,
     advanceHack: ChildCallbackHack,
-    deleteHack?: ChildCallbackHack,
     maxInMemory: number,
     maxLoadingAtOnce: number,
     allURLs: Map<string, Array<string>>,
-    strobeLayer?: string,
-    isOverlay: boolean,
     isPlaying: boolean,
     historyOffset: number,
     hasStarted: boolean,
+    deleteHack?: ChildCallbackHack,
+    gridCoordinates?: Array<number>,
+    isOverlay?: boolean,
+    strobeLayer?: string,
     setHistoryPaths(historyPaths: Array<any>): void,
     setHistoryOffset(historyOffset: number): void,
     onLoaded(): void,
     setVideo(video: HTMLVideoElement): void,
     cache(i: HTMLImageElement | HTMLVideoElement): void,
+    setSceneCopy?(children: React.ReactNode): void,
     setTimeToNextFrame?(timeToNextFrame: number): void,
     playNextScene?(): void,
   };
@@ -102,6 +104,7 @@ export default class ImagePlayer extends React.Component {
         )}
         <ImageView
           removeChild
+          gridCoordinates={this.props.gridCoordinates}
           image={this.state.historyPaths.length > 0 ? this.state.historyPaths[(this.state.historyPaths.length - 1) + offset] : null}
           currentAudio={this.props.currentAudio}
           scene={this.props.scene}
@@ -110,6 +113,7 @@ export default class ImagePlayer extends React.Component {
           fitParent={this.props.gridView}
           hasStarted={this.props.hasStarted}
           onLoaded={this.state.historyPaths.length == 1 ? this.props.onLoaded : undefined}
+          setSceneCopy={this.props.setSceneCopy}
           setVideo={this.props.setVideo}/>
       </div>
     );

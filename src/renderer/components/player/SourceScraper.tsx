@@ -313,17 +313,18 @@ export default class SourceScraper extends React.Component {
   readonly props: {
     config: Config,
     scene: Scene,
-    nextScene?: Scene,
     currentAudio: Audio,
     opacity: number,
     isPlaying: boolean,
     gridView: boolean,
     hasStarted: boolean,
-    strobeLayer?: string,
     historyOffset: number,
     advanceHack: ChildCallbackHack,
     deleteHack?: ChildCallbackHack,
+    gridCoordinates?: Array<number>,
     isOverlay?: boolean,
+    nextScene?: Scene,
+    strobeLayer?: string,
     setHistoryOffset(historyOffset: number): void,
     setHistoryPaths(historyPaths: Array<any>): void,
     firstImageLoaded(): void,
@@ -334,6 +335,7 @@ export default class SourceScraper extends React.Component {
     cache(i: HTMLImageElement | HTMLVideoElement): void,
     systemMessage(message: string): void,
     setTimeToNextFrame?(timeToNextFrame: number): void,
+    setSceneCopy?(children: React.ReactNode): void,
     playNextScene?(): void,
   };
 
@@ -390,6 +392,8 @@ export default class SourceScraper extends React.Component {
             setVideo={this.props.setVideo}
             cache={this.props.cache}
             playNextScene={this.props.playNextScene}
+            gridCoordinates={this.props.gridCoordinates}
+            setSceneCopy={this.props.setSceneCopy}
             setTimeToNextFrame={this.props.setTimeToNextFrame}/>)}
         {this.state.captcha != null && (
           <Dialog

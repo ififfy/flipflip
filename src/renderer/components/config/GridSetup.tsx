@@ -401,9 +401,19 @@ class GridSetup extends React.Component {
   onChooseScene(sceneID: number) {
     const row = this.state.isEditing[0];
     const col = this.state.isEditing[1];
-    const newGrid = this.props.scene.grid;
+    let newGrid = this.props.scene.grid;
     newGrid[row][col].sceneID = sceneID;
     newGrid[row][col].sceneCopy = [];
+    newGrid[row][col].mirror = false;
+    if (sceneID == -1) {
+      newGrid = newGrid.map((r) => r.map((c) => {
+        if (JSON.stringify(c.sceneCopy) == JSON.stringify([row, col])) {
+          c.sceneCopy = []
+          c.mirror = false;
+        }
+        return c;
+      }));
+    }
     this.changeKey('grid', newGrid);
     this.onCloseMenu();
   }
@@ -432,6 +442,15 @@ class GridSetup extends React.Component {
       } else if (row.length < width) {
         while (row.length < width) {
           row.push(new SceneGridCell());
+        }
+      }
+    }
+
+    for (let row of grid) {
+      for (let cell of row) {
+        if (cell.sceneCopy.length > 0 && (cell.sceneCopy[0] > height - 1 || cell.sceneCopy[1] > width - 1)) {
+          cell.sceneCopy = [];
+          cell.mirror = false;
         }
       }
     }
