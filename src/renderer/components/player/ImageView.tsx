@@ -475,6 +475,11 @@ export default class ImageView extends React.Component {
             if (img instanceof HTMLVideoElement) {
               if (this.props.config?.displaySettings.cloneGridVideoElements) {
                 const clone = img.cloneNode() as HTMLVideoElement;
+                clone.volume = img.volume;
+                clone.currentTime = img.currentTime;
+                for (let attr of img.getAttributeNames()) {
+                  clone.setAttribute(attr, img.getAttribute(attr));
+                }
                 clone.play();
                 element.appendChild(clone);
               } else {
@@ -484,6 +489,8 @@ export default class ImageView extends React.Component {
                 canvas.height = img.videoHeight * scale;
                 canvas.style.marginTop = img.style.marginTop;
                 canvas.style.marginLeft = img.style.marginLeft;
+                canvas.style.transform = img.style.transform;
+                canvas.style.transformOrigin = img.style.transformOrigin;
                 element.appendChild(canvas);
               }
             } else {
@@ -519,6 +526,7 @@ export default class ImageView extends React.Component {
               canvas.style.height = bgImg.style.height;
               canvas.style.marginTop = bgImg.style.marginTop;
               canvas.style.marginLeft = bgImg.style.marginLeft;
+              canvas.style.transform = bgImg.style.transform;
               element.appendChild(canvas);
             } else {
               element.appendChild(bgImg.cloneNode());

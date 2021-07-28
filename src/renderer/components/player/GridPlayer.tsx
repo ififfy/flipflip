@@ -219,9 +219,8 @@ class GridPlayer extends React.Component {
                     const allLoaded = [].concat.apply([], this.state.isLoaded).find((l: boolean) => !l) == null;
                     if (cell.sceneCopy.length > 0) {
                       const sceneCopyGridCell = this.state.sceneCopyGrid[cell.sceneCopy[0]][cell.sceneCopy[1]];
-                      // TODO There's something that used to be in the "false" spot below
                       return (
-                        <div className={clsx(classes.gridCell, (!sceneCopyGridCell || false) && classes.hidden, cell.mirror && classes.mirror)} key={colIndex}>
+                        <div className={clsx(classes.gridCell, !sceneCopyGridCell && classes.hidden, cell.mirror && classes.mirror)} key={colIndex}>
                           <div style={{
                             left: 0,
                             right: 0,
