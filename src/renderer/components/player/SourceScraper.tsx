@@ -346,6 +346,7 @@ export default class SourceScraper extends React.Component {
     videoVolume: this.props.scene.videoVolume,
     captcha: null as any,
     load: false,
+    finishedLoading: false,
   };
 
   _isMounted = false;
@@ -387,6 +388,7 @@ export default class SourceScraper extends React.Component {
             deleteHack={this.props.deleteHack}
             strobeLayer={this.props.strobeLayer}
             hasStarted={this.props.hasStarted}
+            finishedLoading={this.state.finishedLoading}
             allURLs={isEmpty(Array.from(this.state.allURLs.values())) ? null : this.state.allURLs}
             onLoaded={this.props.firstImageLoaded.bind(this)}
             setVideo={this.props.setVideo}
@@ -545,6 +547,7 @@ export default class SourceScraper extends React.Component {
               setTimeout(sourceLoop, timeout);
             }
           } else {
+            this.setState({finishedLoading: true})
             this.props.finishedLoading(isEmpty(Array.from(newAllURLs.values())));
             promiseLoop();
             if (this.props.nextScene && this.props.playNextScene) {
@@ -737,14 +740,16 @@ export default class SourceScraper extends React.Component {
           this.setState({
             allURLs: newAllURLs,
             preload: true,
-            restart: true
+            restart: true,
+            finishedLoading: false,
           });
         } else { // Replace values
           this._promiseQueue = this._nextPromiseQueue;
           this.setState({
             allURLs: this._nextAllURLs,
             preload: true,
-            restart: true
+            restart: true,
+            finishedLoading: false,
           });
           this._nextPromiseQueue = Array<{source: LibrarySource, helpers: {next: any, count: number, retries: number, uuid: string}}>();
           this._nextAllURLs = new Map<string, Array<string>>();
@@ -754,7 +759,8 @@ export default class SourceScraper extends React.Component {
         this.setState({
           allURLs: new Map<string, Array<string>>(),
           preload: false,
-          restart: true
+          restart: true,
+          finishedLoading: false,
         });
       }
     }
