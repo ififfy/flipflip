@@ -69,9 +69,9 @@ export default class Player extends React.Component {
   };
 
   readonly state = {
-    canStart: this.props.scene.audioScene,
+    canStart: this.props.scene.gridScene || this.props.scene.audioScene,
     hasStarted: this.props.hasStarted != null ? this.props.hasStarted : this.props.scene.audioScene,
-    isMainLoaded: this.props.scene.audioScene,
+    isMainLoaded: this.props.scene.gridScene || this.props.scene.audioScene,
     areOverlaysLoaded: Array<boolean>(this.props.scene.overlays.length).fill(false),
     isEmpty: false,
     isPlaying: true,
@@ -422,7 +422,7 @@ export default class Player extends React.Component {
               audio={this.state.currentAudio}
             />
           )}
-          {!this.props.scene.audioScene && (
+          {!this.props.scene.gridScene && !this.props.scene.audioScene && (
             <SourceScraper
               config={this.props.config}
               scene={this.props.scene}
@@ -652,11 +652,6 @@ export default class Player extends React.Component {
       }
     }
     if ((this.props.allLoaded == true && props.allLoaded == false) || (this.props.hasStarted && this.props.hasStarted != props.hasStarted)) {
-      for (let r of this.state.imagePlayerAdvanceHacks) {
-        for (let hack of r) {
-          hack.fire();
-        }
-      }
       this.start(true);
     }
   }
@@ -843,6 +838,13 @@ export default class Player extends React.Component {
       this.props.onLoaded();
     }
     if (force || (canStart && ((isLoaded && (this.props.allLoaded == undefined || this.props.allLoaded)) || this.props.config.displaySettings.startImmediately))) {
+      if (this.props.scene.gridScene) {
+        for (let r of this.state.imagePlayerAdvanceHacks) {
+          for (let hack of r) {
+            hack.fire();
+          }
+        }
+      }
       this.setState({hasStarted: this.props.hasStarted != null ? this.props.hasStarted : true, isLoaded: true, startTime: this.state.startTime ?  this.state.startTime : new Date()});
     } else {
       this.setState({isLoaded: isLoaded});

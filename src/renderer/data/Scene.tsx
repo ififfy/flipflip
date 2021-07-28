@@ -198,10 +198,11 @@ export default class Scene {
   panEndAmp = 20;
   panEndPer = 6;
   panEndOv = 3;
-  
+
+  gridScene = false;
   scriptScene = false;
   generatorMax = 100;
-  overlayEnabled: false;
+  overlayEnabled = false;
   overlays: Array<Overlay> = [];
   nextSceneID: number = 0;
   nextSceneTime: number = 900;

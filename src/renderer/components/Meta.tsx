@@ -20,7 +20,6 @@ import GridSetup from "./config/GridSetup";
 import VideoClipper from "./config/VideoClipper";
 import Player from './player/Player';
 import SceneDetail from './sceneDetail/SceneDetail';
-import GridPlayer from "./player/GridPlayer";
 import Tutorial from "./Tutorial";
 import AudioLibrary from "./library/AudioLibrary";
 import CaptionScriptor from "./sceneDetail/CaptionScriptor";
@@ -408,16 +407,24 @@ export default class Meta extends React.Component {
             )}
 
             {this.isRoute('gridplay') && (
-              <GridPlayer
+              <Player
+                preventSleep
                 config={this.state.config}
-                scene={grid}
-                allScenes={this.state.scenes}
+                scene={scene}
+                scenes={this.state.scenes}
                 sceneGrids={this.state.grids}
                 theme={theme}
-                cache={a(actions.cacheImage)}
+                tutorial={this.state.tutorial}
+                onUpdateScene={a(actions.updateScene)}
+                nextScene={a(actions.nextScene)}
+                goBack={a(actions.endPlaySceneGrid)}
+                playTrack={a(actions.playTrack)}
+                goToTagSource={a(actions.playSceneFromLibrary)}
+                goToClipSource={a(actions.clipVideo)}
                 getTags={actions.getTags.bind(this, this.state.library)}
-                goBack={a(actions.goBack)}
                 setCount={a(actions.setCount)}
+                cache={a(actions.cacheImage)}
+                blacklistFile={a(actions.blacklistFile)}
                 systemMessage={a(actions.systemMessage)}
               />
             )}

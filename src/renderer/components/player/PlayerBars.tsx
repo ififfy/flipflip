@@ -333,29 +333,33 @@ class PlayerBars extends React.Component {
                   <FullscreenIcon fontSize="large"/>
                 </IconButton>
               </Tooltip>
-              <Divider component="div" orientation="vertical" style={{height: 48, margin: '0 14px 0 3px'}}/>
-              <IconButton
-                disabled={!canGoBack}
-                edge="start"
-                color="inherit"
-                aria-label="Backward"
-                onClick={this.historyBack.bind(this)}>
-                <ForwardIcon fontSize="large" style={{transform: 'rotate(180deg)'}}/>
-              </IconButton>
-              <IconButton
-                edge="start"
-                color="inherit"
-                aria-label={this.props.isPlaying ? "Pause" : "Play"}
-                onClick={this.setPlayPause.bind(this, !this.props.isPlaying)}>
-                {this.props.isPlaying ? <PauseIcon fontSize="large"/> : <PlayArrowIcon fontSize="large"/>}
-              </IconButton>
-              <IconButton
-                edge="start"
-                color="inherit"
-                aria-label="Forward"
-                onClick={this.historyForward.bind(this)}>
-                <ForwardIcon fontSize="large" style={canGoForward ? {} : {color: 'rgba(255, 255, 255, 0.3)', backgroundColor: 'transparent'}}/>
-              </IconButton>
+              {!this.props.scene.gridScene && (
+                <React.Fragment>
+                  <Divider component="div" orientation="vertical" style={{height: 48, margin: '0 14px 0 3px'}}/>
+                  <IconButton
+                    disabled={!canGoBack}
+                    edge="start"
+                    color="inherit"
+                    aria-label="Backward"
+                    onClick={this.historyBack.bind(this)}>
+                    <ForwardIcon fontSize="large" style={{transform: 'rotate(180deg)'}}/>
+                  </IconButton>
+                  <IconButton
+                    edge="start"
+                    color="inherit"
+                    aria-label={this.props.isPlaying ? "Pause" : "Play"}
+                    onClick={this.setPlayPause.bind(this, !this.props.isPlaying)}>
+                    {this.props.isPlaying ? <PauseIcon fontSize="large"/> : <PlayArrowIcon fontSize="large"/>}
+                  </IconButton>
+                  <IconButton
+                    edge="start"
+                    color="inherit"
+                    aria-label="Forward"
+                    onClick={this.historyForward.bind(this)}>
+                    <ForwardIcon fontSize="large" style={canGoForward ? {} : {color: 'rgba(255, 255, 255, 0.3)', backgroundColor: 'transparent'}}/>
+                  </IconButton>
+                </React.Fragment>
+              )}
             </div>
           </Toolbar>
         </AppBar>
@@ -380,30 +384,30 @@ class PlayerBars extends React.Component {
                 </Typography>
               </div>
 
-              {!this.props.scene.audioScene && (
-                <React.Fragment>
-                  {(this.props.mainVideo != null || this.props.overlayVideos.find((a) => a != null) != null) && (
-                    <Accordion TransitionProps={{ unmountOnExit: false }}>
-                      <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
-                      >
-                        <Typography>Video Controls</Typography>
-                      </AccordionSummary>
-                      <AccordionDetails>
-                        <VideoCard
-                          scene={this.props.scene}
-                          otherScenes={this.props.scene.overlays.map((o) => this.getScene(o.sceneID))}
-                          isPlaying={this.props.isPlaying}
-                          mainVideo={this.props.mainVideo}
-                          mainClip={source ? source.clips.find((c) => c.id == clipID) : null}
-                          mainClipValue={clipValue ? clipValue : null}
-                          otherVideos={this.props.overlayVideos}
-                          imagePlayerAdvanceHacks={this.props.imagePlayerAdvanceHacks}
-                          onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-                      </AccordionDetails>
-                    </Accordion>
-                  )}
+              {!this.props.scene.audioScene && (this.props.mainVideo != null || this.props.overlayVideos.find((a) => a != null) != null) && (
+                <Accordion TransitionProps={{ unmountOnExit: false }}>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                  >
+                    <Typography>Video Controls</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <VideoCard
+                      scene={this.props.scene}
+                      otherScenes={this.props.scene.overlays.map((o) => this.getScene(o.sceneID))}
+                      isPlaying={this.props.isPlaying}
+                      mainVideo={this.props.mainVideo}
+                      mainClip={source ? source.clips.find((c) => c.id == clipID) : null}
+                      mainClipValue={clipValue ? clipValue : null}
+                      otherVideos={this.props.overlayVideos}
+                      imagePlayerAdvanceHacks={this.props.imagePlayerAdvanceHacks}
+                      onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+                  </AccordionDetails>
+                </Accordion>
+              )}
 
+              {!this.props.scene.audioScene && !this.props.scene.gridScene && (
+                <React.Fragment>
                   <Accordion TransitionProps={{ unmountOnExit: true }}>
                     <AccordionSummary
                       expandIcon={<ExpandMoreIcon />}
@@ -529,30 +533,32 @@ class PlayerBars extends React.Component {
                 </React.Fragment>
               )}
 
-              <Accordion defaultExpanded={this.props.scene.audioScene} TransitionProps={{ unmountOnExit: !this.props.scene.audioEnabled && this.props.scene.nextSceneID === 0 }}>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                >
-                  <Typography>Audio Tracks</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <AudioCard
-                    sidebar
-                    scene={this.props.scene}
-                    scenePaths={this.props.historyPaths}
-                    startPlaying
-                    persist={this.props.persistAudio}
-                    onUpdateScene={this.props.onUpdateScene.bind(this)}
-                    goBack={this.navigateBack.bind(this)}
-                    orderAudioTags={this.orderAudioTags.bind(this)}
-                    onPlaying={this.props.onPlaying}
-                    playTrack={this.props.playTrack}
-                    playNextScene={this.props.playNextScene}
-                    setCurrentAudio={this.props.setCurrentAudio.bind(this)}/>
-                </AccordionDetails>
-              </Accordion>
+              {!this.props.scene.gridScene && (
+                <Accordion defaultExpanded={this.props.scene.audioScene} TransitionProps={{ unmountOnExit: !this.props.scene.audioEnabled && this.props.scene.nextSceneID === 0 }}>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                  >
+                    <Typography>Audio Tracks</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <AudioCard
+                      sidebar
+                      scene={this.props.scene}
+                      scenePaths={this.props.historyPaths}
+                      startPlaying
+                      persist={this.props.persistAudio}
+                      onUpdateScene={this.props.onUpdateScene.bind(this)}
+                      goBack={this.navigateBack.bind(this)}
+                      orderAudioTags={this.orderAudioTags.bind(this)}
+                      onPlaying={this.props.onPlaying}
+                      playTrack={this.props.playTrack}
+                      playNextScene={this.props.playNextScene}
+                      setCurrentAudio={this.props.setCurrentAudio.bind(this)}/>
+                  </AccordionDetails>
+                </Accordion>
+              )}
 
-              {!this.props.scene.audioScene && !this.props.persistText && (
+              {!this.props.scene.audioScene && !this.props.scene.gridScene && !this.props.persistText && (
                 <Accordion TransitionProps={{ unmountOnExit: true }}>
                   <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}

@@ -814,7 +814,21 @@ export function resetScene(state: State, scene: Scene): Object {
 }
 
 export function playGrid(state: State, grid: SceneGrid): Object {
-  return {route: state.route.concat(new Route({kind: 'gridplay', value: grid.id}))};
+  let id = state.scenes.length + 1;
+  state.scenes.forEach((s: Scene) => {
+    id = Math.max(s.id + 1, id);
+  });
+  const tempScene = new Scene({
+    id: id,
+    name: grid.name,
+    overlayEnabled: true,
+    gridScene: true,
+  });
+  tempScene.overlays = [new Overlay({id: 1, sceneID: parseInt("999" + grid.id), opacity: 100})];
+  return {
+    scenes: state.scenes.concat([tempScene]),
+    route: state.route.concat([new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'gridplay', value: tempScene.id})]),
+  };
 }
 
 export function playScene(state: State, scene: Scene): Object {
@@ -1048,6 +1062,13 @@ export function endPlaySceneFromLibrary(state: State): Object {
       return 0;
     }
   });
+  state.route.pop();
+  state.route.pop();
+  return {route: state.route.slice(0), scenes: state.scenes.slice(0)};
+}
+
+export function endPlaySceneGrid(state: State): Object {
+  state.scenes.pop();
   state.route.pop();
   state.route.pop();
   return {route: state.route.slice(0), scenes: state.scenes.slice(0)};
