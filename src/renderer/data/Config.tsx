@@ -250,6 +250,7 @@ interface DisplaySettingsI {
   startImmediately: boolean;
   easingControls: boolean;
   audioAlert: boolean;
+  cloneGridVideoElements: boolean;
 
   minImageSize: number;
   minVideoSize: number;
@@ -560,6 +561,7 @@ export class DisplaySettings  implements DisplaySettingsI {
   startImmediately = false;
   easingControls = false;
   audioAlert = true;
+  cloneGridVideoElements = false;
 
   minVideoSize = 200;
   minImageSize = 200;

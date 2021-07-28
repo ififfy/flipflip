@@ -4,6 +4,7 @@ import Timeout = NodeJS.Timeout;
 
 import {getRandomColor, getRandomListItem} from "../../data/utils";
 import {BT, HTF, IT, OT, SL, ST, TF, VTF} from "../../data/const";
+import Config from "../../data/Config";
 import Scene from "../../data/Scene";
 import Audio from "../../data/Audio";
 import Strobe from "./Strobe";
@@ -21,6 +22,7 @@ export default class ImageView extends React.Component {
     fitParent: boolean,
     hasStarted: boolean,
     scene: Scene,
+    config?: Config,
     currentAudio?: Audio,
     gridCoordinates?: Array<number>,
     timeToNextFrame?: number,
@@ -471,13 +473,19 @@ export default class ImageView extends React.Component {
               element.removeChild(element.children.item(0));
             }
             if (img instanceof HTMLVideoElement) {
-              const canvas = document.createElement("canvas");
-              canvas.className = "canvas-" + this.props.gridCoordinates[0] + "-" + this.props.gridCoordinates[1];
-              canvas.width = img.videoWidth * scale;
-              canvas.height = img.videoHeight * scale;
-              canvas.style.marginTop = img.style.marginTop;
-              canvas.style.marginLeft = img.style.marginLeft;
-              element.appendChild(canvas);
+              if (this.props.config?.displaySettings.cloneGridVideoElements) {
+                const clone = img.cloneNode() as HTMLVideoElement;
+                clone.play();
+                element.appendChild(clone);
+              } else {
+                const canvas = document.createElement("canvas");
+                canvas.className = "canvas-" + this.props.gridCoordinates[0] + "-" + this.props.gridCoordinates[1];
+                canvas.width = img.videoWidth * scale;
+                canvas.height = img.videoHeight * scale;
+                canvas.style.marginTop = img.style.marginTop;
+                canvas.style.marginLeft = img.style.marginLeft;
+                element.appendChild(canvas);
+              }
             } else {
               element.appendChild(img.cloneNode());
             }

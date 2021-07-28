@@ -108,6 +108,7 @@ export default class ImagePlayer extends React.Component {
           image={this.state.historyPaths.length > 0 ? this.state.historyPaths[(this.state.historyPaths.length - 1) + offset] : null}
           currentAudio={this.props.currentAudio}
           scene={this.props.scene}
+          config={this.props.config}
           timeToNextFrame={this.state.timeToNextFrame}
           toggleStrobe={this._toggleStrobe}
           fitParent={this.props.gridView}

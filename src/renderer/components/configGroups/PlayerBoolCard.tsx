@@ -87,6 +87,16 @@ export default class PlayerBoolCard extends React.Component {
           </Tooltip>
         </Grid>
         <Grid item xs={12}>
+          <Tooltip title="If enabled, cloned/mirrored grid cells will use a copy of the actual video file, instead of a canvas. This may improve video framerate, but will remove absolute synchronization">
+            <FormControlLabel
+              control={
+                <Switch checked={this.props.displaySettings.cloneGridVideoElements}
+                        onChange={this.onBoolInput.bind(this, 'cloneGridVideoElements')}/>
+              }
+              label="Clone Grid Videos Directly"/>
+          </Tooltip>
+        </Grid>
+        <Grid item xs={12}>
           <Divider/>
         </Grid>
         <Grid item xs={12}>
