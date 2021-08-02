@@ -80,8 +80,10 @@ export default class ImageView extends React.Component {
     const img = this.props.image;
     if (!el || !img) return;
 
-    const firstChild = el.firstChild;
-    if (!forceBG && firstChild && (firstChild as HTMLImageElement | HTMLVideoElement | HTMLIFrameElement).src == img.src) return;
+    const firstChild = el.firstChild as HTMLImageElement | HTMLVideoElement | HTMLIFrameElement;
+    if (!forceBG && firstChild && firstChild.src == img.src &&
+      firstChild.getAttribute("start") == img.getAttribute("start") &&
+      firstChild.getAttribute("end") == img.getAttribute("end")) return;
 
     if (!forceBG && img instanceof HTMLVideoElement && img.hasAttribute("subtitles")) {
       try {
@@ -176,6 +178,7 @@ export default class ImageView extends React.Component {
       type = ST.video;
       imgWidth = img.videoWidth;
       imgHeight = img.videoHeight;
+      if (img.paused) img.play()
     } else if (img instanceof HTMLIFrameElement) {
       type = ST.nimja;
     }
@@ -691,6 +694,8 @@ export default class ImageView extends React.Component {
       imageDiv =
         <Panning
           image={this.props.image}
+          parentHeight={this.contentRef.current.parentElement.offsetHeight}
+          parentWidth={this.contentRef.current.parentElement.offsetWidth}
           togglePan={this.props.toggleStrobe}
           currentAudio={this.props.currentAudio}
           timeToNextFrame={this.props.timeToNextFrame}

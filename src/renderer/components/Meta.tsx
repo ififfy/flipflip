@@ -60,12 +60,6 @@ export default class Meta extends React.Component {
 
     if (remote.getCurrentWindow().id == 1) {
       setInterval(this.queueSave.bind(this), 500);
-      // TODO Find a way to differentiate between exit and reload
-      /*(window as any).onbeforeunload = (e: any) => {
-        window.onbeforeunload = null;
-        e.returnValue = false;
-        appStorage.save(this.state, () => {window.close()});
-      }*/
     }
   }
 

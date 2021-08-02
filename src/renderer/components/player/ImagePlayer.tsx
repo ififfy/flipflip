@@ -34,7 +34,7 @@ export default class ImagePlayer extends React.Component {
     isPlaying: boolean,
     historyOffset: number,
     hasStarted: boolean,
-    finishedLoading: boolean,
+    finishedLoading: number,
     deleteHack?: ChildCallbackHack,
     gridCoordinates?: Array<number>,
     isOverlay?: boolean,
@@ -304,7 +304,7 @@ export default class ImagePlayer extends React.Component {
   }
 
   animationFrame = () => {
-    if (!this._isMounted || (this.props.finishedLoading && this.props.allURLs.size == 1)) return;
+    if (!this._isMounted || (this.props.finishedLoading == 1)) return;
     let requestAnimation = false;
     if (this.state.readyToDisplay.length < this.props.maxLoadingAtOnce && this.props.allURLs) {
       while (this._runFetchLoopCallRequests.length > 0) {

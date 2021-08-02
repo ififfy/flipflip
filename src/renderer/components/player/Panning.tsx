@@ -14,6 +14,8 @@ export default class Panning extends React.Component {
     scene: Scene,
     panFunction: Function,
     image?: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement,
+    parentHeight?: number,
+    parentWidth?: number,
     children?: React.ReactNode,
   };
 
@@ -27,6 +29,8 @@ export default class Panning extends React.Component {
 
   render() {
     // TODO Fix with TF.scene
+    //      Fix with grid clone/mirror
+    //      Fix useImgWidth calculation (slightly off?)
     return (
       <this.PanningLayer>
         {this.props.children}
@@ -53,8 +57,8 @@ export default class Panning extends React.Component {
       if (image && this.props.scene.panHorizTransImg) {
         const height = image.offsetHeight;
         const width = image.offsetWidth;
-        const parentHeight = window.innerHeight;
-        const parentWidth = window.innerWidth;
+        const parentHeight = this.props.parentHeight ? this.props.parentHeight : window.innerHeight;
+        const parentWidth = this.props.parentWidth ? this.props.parentWidth : window.innerWidth;
         const heightDiff = Math.max(height - parentHeight, 0);
         const widthDiff = Math.max(width - parentWidth - heightDiff, 0);
         horizTransLevel = widthDiff / 2;
@@ -95,8 +99,8 @@ export default class Panning extends React.Component {
       if (image && this.props.scene.panVertTransImg) {
         const height = image.offsetHeight;
         const width = image.offsetWidth;
-        const parentHeight = window.innerHeight;
-        const parentWidth = window.innerWidth;
+        const parentHeight = this.props.parentHeight ? this.props.parentHeight : window.innerHeight;
+        const parentWidth = this.props.parentWidth ? this.props.parentWidth : window.innerWidth;
         const widthDiff = Math.max(width - parentWidth, 0);
         const heightDiff = Math.max(height - parentHeight - widthDiff, 0);
         vertTransLevel = heightDiff / 2;

@@ -346,7 +346,7 @@ export default class SourceScraper extends React.Component {
     videoVolume: this.props.scene.videoVolume,
     captcha: null as any,
     load: false,
-    finishedLoading: false,
+    finishedLoading: null as number,
   };
 
   _isMounted = false;
@@ -547,8 +547,9 @@ export default class SourceScraper extends React.Component {
               setTimeout(sourceLoop, timeout);
             }
           } else {
-            this.setState({finishedLoading: true})
-            this.props.finishedLoading(isEmpty(Array.from(newAllURLs.values())));
+            const values = [].concat.apply([], Array.from(newAllURLs.values()));
+            this.setState({finishedLoading: values.length});
+            this.props.finishedLoading(isEmpty(values));
             promiseLoop();
             if (this.props.nextScene && this.props.playNextScene) {
               n = 0;
@@ -741,7 +742,7 @@ export default class SourceScraper extends React.Component {
             allURLs: newAllURLs,
             preload: true,
             restart: true,
-            finishedLoading: false,
+            finishedLoading: null,
           });
         } else { // Replace values
           this._promiseQueue = this._nextPromiseQueue;
@@ -749,7 +750,7 @@ export default class SourceScraper extends React.Component {
             allURLs: this._nextAllURLs,
             preload: true,
             restart: true,
-            finishedLoading: false,
+            finishedLoading: null,
           });
           this._nextPromiseQueue = Array<{source: LibrarySource, helpers: {next: any, count: number, retries: number, uuid: string}}>();
           this._nextAllURLs = new Map<string, Array<string>>();
@@ -760,7 +761,7 @@ export default class SourceScraper extends React.Component {
           allURLs: new Map<string, Array<string>>(),
           preload: false,
           restart: true,
-          finishedLoading: false,
+          finishedLoading: null,
         });
       }
     }
