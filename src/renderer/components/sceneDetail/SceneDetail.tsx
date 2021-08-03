@@ -1037,11 +1037,12 @@ class SceneDetail extends React.Component {
               {this.state.openMenu == MO.simpleRule &&
                 <LibrarySearch
                   displaySources={this.props.library}
-                  filters={this.props.scene.generatorWeights.filter((wg) => !wg.rules).map((wg) => wg.tag.name)}
+                  filters={this.props.scene.generatorWeights.filter((wg) => !wg.rules).map((wg) => wg.search)}
                   tags={this.props.tags}
                   placeholder={"Search ..."}
                   autoFocus
-                  onlyTagsAndTypes
+                  isCreatable
+                  fullWidth
                   onlyUsed
                   menuIsOpen
                   controlShouldRenderValue={false}
@@ -1193,23 +1194,13 @@ class SceneDetail extends React.Component {
       this.props.onTutorial(SDGT.buttons);
       this.onCloseDialog();
     }
-    const tagName = filters[filters.length - 1];
-    let tag = this.props.tags.find((t) => t.name == tagName)
-    if (tag == null) {
-      const maxID = this.props.tags.reduce(
-        (max, t) => (t.id > max ? t.id : max),
-        this.props.tags[0] ? this.props.tags[0].id : 1
-      );
-      tag = new Tag({id: maxID+1, name: tagName, typeTag: true});
-    }
-    if (tag) {
-      const wg = new WeightGroup();
-      wg.percent = 0;
-      wg.type = TT.weight;
-      wg.tag = tag;
-      const generatorWeights = this.props.scene.generatorWeights.concat([wg]);
-      this.changeKey('generatorWeights', generatorWeights);
-    }
+    const search = filters[filters.length - 1];
+    const wg = new WeightGroup();
+    wg.percent = 0;
+    wg.type = TT.weight;
+    wg.search = search;
+    const generatorWeights = this.props.scene.generatorWeights.concat([wg]);
+    this.changeKey('generatorWeights', generatorWeights);
   }
 
   onFinishRemoveAllRules() {

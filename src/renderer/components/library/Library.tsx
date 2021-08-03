@@ -35,7 +35,7 @@ import ShuffleIcon from "@material-ui/icons/Shuffle";
 import SortIcon from '@material-ui/icons/Sort';
 
 import {AF, LT, MO, PR, SF, SP, ST} from "../../data/const";
-import {getCachePath, getLocalPath, getTimestampValue} from "../../data/utils";
+import {filterSource, getCachePath, getLocalPath} from "../../data/utils";
 import {getSourceType} from "../player/Scrapers";
 import en from "../../data/en";
 import Config from "../../data/Config";
@@ -1397,126 +1397,8 @@ class Library extends React.Component {
       const mergeSources = this.state.filters.includes("<Mergeable>") ? this.getMerges() : null;
       for (let source of mergeSources ? mergeSources : this.props.library) {
         let matchesFilter = true;
-        let countRegex;
         for (let filter of this.state.filters) {
-          if (filter == "<Mergeable>") {
-            matchesFilter = mergeSources.includes(source);
-          } else if (filter == "<Offline>") { // This is offline filter
-            matchesFilter = source.offline;
-          } else if (filter == "<Marked>") { // This is a marked filter
-            matchesFilter = source.marked;
-          } else if (filter == "<Untagged>") { // This is untagged filter
-            matchesFilter = source.tags.length === 0;
-          } else if (filter == "<Unclipped>") {
-            matchesFilter = getSourceType(source.url) == ST.video && source.clips.length === 0;
-          } else if ((filter.startsWith("[") || filter.startsWith("-[")) && filter.endsWith("]")) { // This is a tag filter
-            if (filter.startsWith("-")) {
-              let tag = filter.substring(2, filter.length-1);
-              matchesFilter = source.tags.find((t) => t.name == tag) == null;
-            } else {
-              let tag = filter.substring(1, filter.length-1);
-              matchesFilter = source.tags.find((t) => t.name == tag) != null;
-            }
-          } else if ((filter.startsWith("{") || filter.startsWith("-{")) && filter.endsWith("}")) { // This is a type filter
-            if (filter.startsWith("-")) {
-              let type = filter.substring(2, filter.length-1);
-              matchesFilter = en.get(getSourceType(source.url)) != type;
-            } else {
-              let type = filter.substring(1, filter.length-1);
-              matchesFilter = en.get(getSourceType(source.url)) == type;
-            }
-          } else if ((countRegex = /^count(\+?)([>=<])(\d*)$/.exec(filter)) != null) {
-            const all = countRegex[1] == "+";
-            const symbol = countRegex[2];
-            const value = parseInt(countRegex[3]);
-            const type = getSourceType(source.url);
-            const count = type == ST.video ? source.clips.length : source.count;
-            const countComplete = type == ST.video ? true : source.countComplete;
-            switch (symbol) {
-              case "=":
-                matchesFilter = (all || countComplete) && count == value;
-                break;
-              case ">":
-                matchesFilter = (all || countComplete) && count > value;
-                break;
-              case "<":
-                matchesFilter = (all || countComplete) && count < value;
-                break;
-            }
-          } else if ((countRegex = /^duration([>=<])([\d:]*)$/.exec(filter)) != null) {
-            const symbol = countRegex[1];
-            let value;
-            if (countRegex[2].includes(":")) {
-              value = getTimestampValue(countRegex[2]);
-            } else {
-              value = parseInt(countRegex[2]);
-            }
-            const type = getSourceType(source.url);
-            if (type == ST.video) {
-              if (source.duration == null) {
-                matchesFilter = false;
-              } else {
-                switch (symbol) {
-                  case "=":
-                    matchesFilter = Math.floor(source.duration) == value;
-                    break;
-                  case ">":
-                    matchesFilter = Math.floor(source.duration) > value;
-                    break;
-                  case "<":
-                    matchesFilter = Math.floor(source.duration) < value;
-                    break;
-                }
-              }
-            } else {
-              matchesFilter = false;
-            }
-          } else if ((countRegex = /^resolution([>=<])(\d*)p?$/.exec(filter)) != null) {
-            const symbol = countRegex[1];
-            const value = parseInt(countRegex[2]);
-
-            const type = getSourceType(source.url);
-            if (type == ST.video) {
-              if (source.resolution == null) {
-                matchesFilter = false;
-              } else {
-                switch (symbol) {
-                  case "=":
-                    matchesFilter = source.resolution == value;
-                    break;
-                  case ">":
-                    matchesFilter = source.resolution > value;
-                    break;
-                  case "<":
-                    matchesFilter = source.resolution < value;
-                    break;
-                }
-              }
-            } else {
-              matchesFilter = false;
-            }
-          } else if (((filter.startsWith('"') || filter.startsWith('-"')) && filter.endsWith('"')) ||
-            ((filter.startsWith('\'') || filter.startsWith('-\'')) && filter.endsWith('\''))) {
-            if (filter.startsWith("-")) {
-              filter = filter.substring(2, filter.length - 1);
-              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
-              matchesFilter = !regex.test(source.url);
-            } else {
-              filter = filter.substring(1, filter.length - 1);
-              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
-              matchesFilter = regex.test(source.url);
-            }
-          } else { // This is a search filter
-            filter = filter.replace("\\", "\\\\");
-            if (filter.startsWith("-")) {
-              filter = filter.substring(1, filter.length);
-              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
-              matchesFilter = !regex.test(source.url);
-            } else {
-              const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
-              matchesFilter = regex.test(source.url);
-            }
-          }
+          matchesFilter = filterSource(filter, source, null, mergeSources);
           if (!matchesFilter) break;
         }
         if (matchesFilter) {

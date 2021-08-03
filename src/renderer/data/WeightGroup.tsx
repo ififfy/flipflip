@@ -1,14 +1,12 @@
-import Tag from "./Tag";
-
 export default class WeightGroup {
   percent: number;
   type: string;
-  tag: Tag;
+  search: string;
   max: number;
   chosen: number;
   rules: Array<WeightGroup>;
 
-  constructor(init?: Partial<Tag>) {
+  constructor(init?: Partial<WeightGroup>) {
     Object.assign(this, init);
   }
 }

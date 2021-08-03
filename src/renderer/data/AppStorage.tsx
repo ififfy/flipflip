@@ -261,7 +261,7 @@ export default class AppStorage {
                     wg.percent = 0;
                   }
                   wg.type = weight.type;
-                  wg.tag = tag;
+                  wg.search = "[" + tag.name + "]";
 
                   scene.generatorWeights.push(wg);
                 }
@@ -297,7 +297,7 @@ export default class AppStorage {
                           rule.percent = 0;
                         }
                         rule.type = weight.type;
-                        rule.tag = tag;
+                        rule.search = "[" + tag.name + "]";
                         rules.push(rule);
                       }
                     }

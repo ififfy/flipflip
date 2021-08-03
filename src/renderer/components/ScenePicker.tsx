@@ -248,7 +248,7 @@ const styles = (theme: Theme) => createStyles({
   gridTooltip: {
     top: 'auto',
     right: 28,
-    bottom: 195,
+    bottom: 85,
     left: 'auto',
     position: 'fixed',
     borderRadius: '50%',
@@ -269,13 +269,13 @@ const styles = (theme: Theme) => createStyles({
     }),
   },
   addSceneButton: {
-    marginBottom: 60,
+    marginBottom: 170,
   },
   addGeneratorButton: {
     marginBottom: 115,
   },
   addGridButton: {
-    marginBottom: 170,
+    marginBottom: 60,
   },
   importSceneButton: {
     marginBottom: 225,
@@ -1196,16 +1196,13 @@ class ScenePicker extends React.Component {
                     <GetAppIcon className={classes.icon} />
                   </Fab>
                 </Tooltip>
-                <Tooltip title="Add Scene Grid"  placement="left">
-                  <span className={classes.gridTooltip} style={!this.props.canGrid ? { pointerEvents: "none" } : {}}>
-                    <Fab
-                      className={clsx(classes.addButton, classes.addGridButton, this.state.openMenu != MO.new && classes.addButtonClose)}
-                      onClick={this.props.onAddGrid.bind(this)}
-                      disabled={!this.props.canGrid}
-                      size="small">
-                      <GridOnIcon className={classes.icon} />
-                    </Fab>
-                  </span>
+                <Tooltip title="Add Scene"  placement="left">
+                  <Fab
+                    className={clsx(classes.addButton, classes.addSceneButton, this.state.openMenu != MO.new && classes.addButtonClose, this.props.tutorial == SPT.add2 && clsx(classes.backdropTop, classes.highlight))}
+                    onClick={this.onAddScene.bind(this)}
+                    size="small">
+                    <MovieIcon className={classes.icon} />
+                  </Fab>
                 </Tooltip>
                 <Tooltip title="Add Scene Generator"  placement="left">
                   <span className={classes.generateTooltip} style={!this.props.canGenerate ? { pointerEvents: "none" } : {}}>
@@ -1218,17 +1215,20 @@ class ScenePicker extends React.Component {
                     </Fab>
                   </span>
                 </Tooltip>
-                <Tooltip title="Add Scene"  placement="left">
-                  <Fab
-                    className={clsx(classes.addButton, classes.addSceneButton, this.state.openMenu != MO.new && classes.addButtonClose, this.props.tutorial == SPT.add2 && clsx(classes.backdropTop, classes.highlight))}
-                    onClick={this.onAddScene.bind(this)}
-                    size="small">
-                    <MovieIcon className={classes.icon} />
-                  </Fab>
+                <Tooltip title="Add Scene Grid"  placement="left">
+                  <span className={classes.gridTooltip} style={!this.props.canGrid ? { pointerEvents: "none" } : {}}>
+                    <Fab
+                      className={clsx(classes.addButton, classes.addGridButton, this.state.openMenu != MO.new && classes.addButtonClose)}
+                      onClick={this.props.onAddGrid.bind(this)}
+                      disabled={!this.props.canGrid}
+                      size="small">
+                      <GridOnIcon className={classes.icon} />
+                    </Fab>
+                  </span>
                 </Tooltip>
                 <Tooltip title="Add Group"  placement="left">
                   <Fab
-                    className={clsx(classes.addButton, classes.addSceneButton, this.state.openMenu == MO.new && classes.addButtonClose)}
+                    className={clsx(classes.addButton, classes.addGridButton, this.state.openMenu == MO.new && classes.addButtonClose)}
                     onClick={this.onAddGroup.bind(this)}
                     size="small">
                     <CreateNewFolderIcon className={classes.icon} />

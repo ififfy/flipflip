@@ -238,7 +238,7 @@ class SceneGenerator extends React.Component {
                                     )}
                                   </React.Fragment>
                                 </ListItemIcon>
-                                <ListItemText primary={wg.tag.name} />
+                                <ListItemText primary={this.getSearchText(wg.search)} />
                               </ListItem>
                             )}
                           </List>
@@ -340,7 +340,7 @@ class SceneGenerator extends React.Component {
                           )}
                         </IconButton>
                       </ListItemIcon>
-                      <ListItemText primary={wg.tag.name} />
+                      <ListItemText primary={this.getSearchText(wg.search)} />
                       <ListItemSecondaryAction>
                         <IconButton size="small" onClick={this.onDeleteRule.bind(this, i)}>
                           <DeleteIcon color="error" />
@@ -365,17 +365,20 @@ class SceneGenerator extends React.Component {
                   classes={{paper: classes.tagMenu}}
                   open={this.state.addRule}
                   onClose={this.onCloseAddRule.bind(this)}>
-                  <LibrarySearch
-                    displaySources={this.props.library}
-                    filters={this.props.scene.generatorWeights[this.state.isEditing].rules.filter((wg) => !wg.rules).map((wg) => wg.tag.name)}
-                    tags={this.props.tags}
-                    placeholder={"Search ..."}
-                    autoFocus
-                    onlyTagsAndTypes
-                    onlyUsed
-                    menuIsOpen
-                    controlShouldRenderValue={false}
-                    onUpdateFilters={this.onAddRule.bind(this)}/>
+                  {this.state.addRule && (
+                    <LibrarySearch
+                      displaySources={this.props.library}
+                      filters={this.props.scene.generatorWeights[this.state.isEditing].rules.filter((wg) => !wg.rules).map((wg) => wg.search)}
+                      tags={this.props.tags}
+                      placeholder={"Search ..."}
+                      autoFocus
+                      isCreatable
+                      fullWidth
+                      onlyUsed
+                      menuIsOpen
+                      controlShouldRenderValue={false}
+                      onUpdateFilters={this.onAddRule.bind(this)}/>
+                  )}
                 </Menu>
               </div>
             )}
@@ -437,25 +440,15 @@ class SceneGenerator extends React.Component {
   }
 
   onAddRule(filters: Array<string>) {
-    const tagName = filters[filters.length - 1];
-    let tag = this.props.tags.find((t) => t.name == tagName)
-    if (tag == null) {
-      const maxID = this.props.tags.reduce(
-        (max, t) => (t.id > max ? t.id : max),
-        this.props.tags[0] ? this.props.tags[0].id : 1
-      );
-      tag = new Tag({id: maxID+1, name: tagName, typeTag: true});
-    }
-    if (tag) {
-      const newWG = new WeightGroup();
-      newWG.percent = 0;
-      newWG.type = TT.weight;
-      newWG.tag = tag;
-      const generatorWeights = this.props.scene.generatorWeights;
-      const wg = generatorWeights[this.state.isEditing];
-      wg.rules = wg.rules.concat([newWG]);
-      this.changeGeneratorWeights(generatorWeights);
-    }
+    const search = filters[filters.length - 1];
+    const newWG = new WeightGroup();
+    newWG.percent = 0;
+    newWG.type = TT.weight;
+    newWG.search = search;
+    const generatorWeights = this.props.scene.generatorWeights;
+    const wg = generatorWeights[this.state.isEditing];
+    wg.rules = wg.rules.concat([newWG]);
+    this.changeGeneratorWeights(generatorWeights);
   }
 
   onClickAddRule(e: MouseEvent) {
@@ -477,6 +470,14 @@ class SceneGenerator extends React.Component {
     this.changeGeneratorWeights(generatorWeights);
   }
 
+  getSearchText(search: string) {
+    if ((search.startsWith("[") && search.endsWith("]")) ||
+      ((search.startsWith("{") && search.endsWith("}")))){
+      search = search.substring(1, search.length-1);
+    }
+    return search;
+  }
+
   getRuleName(wg: WeightGroup) {
     if (!wg) return "ERROR";
     if (!!wg.rules) {
@@ -484,18 +485,18 @@ class SceneGenerator extends React.Component {
       if (!this.areRulesValid(wg)) return "ERROR";
 
       let title = "";
-      const allRules = wg.rules.filter((r) => r.type == TT.all).map((r) => r.tag.name);
+      const allRules = wg.rules.filter((r) => r.type == TT.all).map((r) => this.getSearchText(r.search));
       if (allRules.length > 0) {
         title += allRules.join(" ");
       }
-      const orRules = wg.rules.filter((r) => r.type == TT.or).map((r) => r.tag.name);
+      const orRules = wg.rules.filter((r) => r.type == TT.or).map((r) => this.getSearchText(r.search));
       if (orRules.length > 0) {
         if (title != "") {
           title += ", ";
         }
         title += orRules.join(" OR ");
       }
-      const noRules = wg.rules.filter((r) => r.type == TT.none).map((r) => r.tag.name);
+      const noRules = wg.rules.filter((r) => r.type == TT.none).map((r) => this.getSearchText(r.search));
       if (noRules.length > 0) {
         if (title != "") {
           title += ", ";
@@ -508,13 +509,13 @@ class SceneGenerator extends React.Component {
           if (title != "") {
             title += ", ";
           }
-          title += r.percent + "% " + r.tag.name;
+          title += r.percent + "% " + this.getSearchText(r.search);
         }
       }
 
       return title
     } else {
-      return wg.tag.name;
+      return this.getSearchText(wg.search);
     }
   }
 

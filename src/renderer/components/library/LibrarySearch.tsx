@@ -15,9 +15,11 @@ import Tag from "../../data/Tag";
 const styles = (theme: Theme) => createStyles({
   searchSelect: {
     minWidth: 200,
-    maxWidth: `calc(100% - ${theme.spacing(7)}px)`,
     maxHeight: theme.mixins.toolbar.minHeight,
     color: grey[900],
+  },
+  limitWidth: {
+    maxWidth: `calc(100% - ${theme.spacing(7)}px)`,
   },
   select: {
     color: grey[900],
@@ -42,6 +44,7 @@ class LibrarySearch extends React.Component {
     onlyTagsAndTypes?: boolean,
     onlyUsed?: boolean
     showCheckboxes?: boolean,
+    fullWidth?: boolean,
     onUpdateFilters(filter: Array<string>): void,
   };
 
@@ -74,14 +77,17 @@ class LibrarySearch extends React.Component {
     if (this.props.isCreatable) {
       return (
         <CreatableSelect
-          className={clsx(classes.searchSelect, "CreatableSelect")}
-          components={{DropdownIndicator: null,}}
+          className={clsx(classes.searchSelect, "CreatableSelect", !this.props.fullWidth && classes.limitWidth)}
           value={this.state.defaultValues}
           options={this.state.options}
+          components={{DropdownIndicator: null,}}
+          menuIsOpen={this.props.menuIsOpen}
+          autoFocus={this.props.autoFocus}
           inputValue={this.state.searchInput}
           isClearable
           isMulti
           rightAligned
+          controlShouldRenderValue={this.props.controlShouldRenderValue}
           placeholder={this.props.placeholder}
           formatCreateLabel={(input: string) => "Search for " + input}
           onChange={this.handleChange}

@@ -463,5 +463,30 @@ export default class Scene {
       this.videoOrientation = OT.forceLandscape;
       this.rotatePortrait = false;
     }
+
+    if (!!this.generatorWeights) {
+      for (let wg of this.generatorWeights as Array<any>) {
+        if (wg.tag != null) {
+          if (wg.tag.typeTag) {
+            wg.search = "{" + wg.tag.name + "}";
+          } else {
+            wg.search = "[" + wg.tag.name + "]";
+          }
+          wg.tag = null;
+        }
+        if (!!wg.rules) {
+          for (let wgr of wg.rules) {
+            if (wgr.tag != null) {
+              if (wgr.tag.typeTag) {
+                wgr.search = "{" + wgr.tag.name + "}";
+              } else {
+                wgr.search = "[" + wgr.tag.name + "]";
+              }
+              wgr.tag = null;
+            }
+          }
+        }
+      }
+    }
   }
 }
