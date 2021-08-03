@@ -34,9 +34,12 @@ export default class ImageView extends React.Component {
     setVideo?(video: HTMLVideoElement): void,
   };
 
+  _parentHeight: number;
+  _parentWidth: number;
   readonly backgroundRef: React.RefObject<HTMLDivElement> = React.createRef();
   readonly contentRef: React.RefObject<HTMLDivElement> = React.createRef();
   _image: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement = null;
+  _scale: number = null;
   _timeouts: Array<Timeout>;
 
   componentDidMount() {
@@ -164,6 +167,10 @@ export default class ImageView extends React.Component {
     if (parentWidth == 0 || parentHeight == 0) {
       parentWidth = window.innerWidth;
       parentHeight = window.innerHeight;
+    }
+    if (parentHeight != this._parentHeight || parentWidth != this._parentWidth) {
+      this._parentHeight = parentHeight;
+      this._parentWidth = parentWidth;
     }
     let parentAspect = parentWidth / parentHeight;
     let imgWidth: number;
@@ -451,6 +458,7 @@ export default class ImageView extends React.Component {
       }
 
       this._image = img;
+      this._scale = scale;
 
       const  appendOriginal = () => {
         if (this.props.removeChild && el.hasChildNodes()) {
@@ -694,8 +702,8 @@ export default class ImageView extends React.Component {
       imageDiv =
         <Panning
           image={this.props.image}
-          parentHeight={this.contentRef.current.parentElement.offsetHeight}
-          parentWidth={this.contentRef.current.parentElement.offsetWidth}
+          parentHeight={!!this._parentHeight ? this._parentHeight : this.contentRef.current?.parentElement.offsetHeight}
+          parentWidth={!!this._parentWidth ? this._parentWidth : this.contentRef.current.parentElement.offsetWidth}
           togglePan={this.props.toggleStrobe}
           currentAudio={this.props.currentAudio}
           timeToNextFrame={this.props.timeToNextFrame}
@@ -764,10 +772,53 @@ export default class ImageView extends React.Component {
 
   strobeImage() {
     const el = this.contentRef.current;
-    if (el && this._image && this._image.src == this.props.image.src) {
-      el.appendChild(this._image);
-      if (this._image instanceof HTMLVideoElement && this._image.paused) {
-        this._image.play();
+    const img = this._image;
+    const scale = this._scale;
+    const  appendOriginal = () => {
+        el.appendChild(img);
+        if (img instanceof HTMLVideoElement && img.paused) {
+          img.play();
+        }
+    }
+    if (this.props.gridCoordinates) {
+      for (let element of document.getElementsByClassName("copy-" + this.props.gridCoordinates[0] + "-" + this.props.gridCoordinates[1])) {
+        if (el && img && img.src == this.props.image.src) {
+          if (element == el) {
+            appendOriginal();
+          } else {
+            if (this.props.removeChild && element.hasChildNodes() && el.hasChildNodes()) {
+              element.removeChild(element.children.item(0));
+            }
+            if (img instanceof HTMLVideoElement) {
+              if (this.props.config?.displaySettings.cloneGridVideoElements) {
+                const clone = img.cloneNode() as HTMLVideoElement;
+                clone.volume = img.volume;
+                clone.currentTime = img.currentTime;
+                for (let attr of img.getAttributeNames()) {
+                  clone.setAttribute(attr, img.getAttribute(attr));
+                }
+                clone.play();
+                element.appendChild(clone);
+              } else {
+                const canvas = document.createElement("canvas");
+                canvas.className = "canvas-" + this.props.gridCoordinates[0] + "-" + this.props.gridCoordinates[1];
+                canvas.width = img.videoWidth * scale;
+                canvas.height = img.videoHeight * scale;
+                canvas.style.marginTop = img.style.marginTop;
+                canvas.style.marginLeft = img.style.marginLeft;
+                canvas.style.transform = img.style.transform;
+                canvas.style.transformOrigin = img.style.transformOrigin;
+                element.appendChild(canvas);
+              }
+            } else {
+              element.appendChild(img.cloneNode());
+            }
+          }
+        }
+      }
+    } else {
+      if (el && img && img.src == this.props.image.src) {
+        appendOriginal();
       }
     }
   }

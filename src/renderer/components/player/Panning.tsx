@@ -29,8 +29,6 @@ export default class Panning extends React.Component {
 
   render() {
     // TODO Fix with TF.scene
-    //      Fix with grid clone/mirror
-    //      Fix useImgWidth calculation (slightly off?)
     return (
       <this.PanningLayer>
         {this.props.children}
@@ -261,7 +259,9 @@ export default class Panning extends React.Component {
   shouldComponentUpdate(props: any, state: any) {
     return !props.panning ||
       this.props.togglePan != props.togglePan ||
-      this.state.togglePan != state.togglePan;
+      this.state.togglePan != state.togglePan ||
+      this.props.parentHeight != props.parentHeight ||
+      this.props.parentWidth != props.parentWidth;
   }
 
   componentWillUnmount() {

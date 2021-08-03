@@ -838,14 +838,16 @@ export default class Player extends React.Component {
       this.props.onLoaded();
     }
     if (force || (canStart && ((isLoaded && (this.props.allLoaded == undefined || this.props.allLoaded)) || this.props.config.displaySettings.startImmediately))) {
-      if (this.props.scene.gridScene) {
-        for (let r of this.state.imagePlayerAdvanceHacks) {
-          for (let hack of r) {
-            hack.fire();
+      this.setState({hasStarted: this.props.hasStarted != null ? this.props.hasStarted : true, isLoaded: true, startTime: this.state.startTime ?  this.state.startTime : new Date()});
+      setTimeout(() => {
+        if (this.props.scene.gridScene) {
+          for (let r of this.state.imagePlayerAdvanceHacks) {
+            for (let hack of r) {
+              hack.fire();
+            }
           }
         }
-      }
-      this.setState({hasStarted: this.props.hasStarted != null ? this.props.hasStarted : true, isLoaded: true, startTime: this.state.startTime ?  this.state.startTime : new Date()});
+      }, 200);
     } else {
       this.setState({isLoaded: isLoaded});
     }
