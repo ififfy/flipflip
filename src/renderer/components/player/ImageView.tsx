@@ -135,7 +135,7 @@ export default class ImageView extends React.Component {
     };
 
     const drawLoop = (v: any, c: CanvasRenderingContext2D, w: number, h: number) => {
-      if (!el || !el.parentElement || parseFloat(el.parentElement.style.opacity) == 0.99 || v.ended || v.paused || this._timeouts == null) return;
+      if (!el || !el.parentElement || parseFloat(el.parentElement.style.opacity) == 0.99 || this._timeouts == null) return;
       c.drawImage(v, 0, 0, w, h);
       this._timeouts.push(setTimeout(drawLoop, 20, v, c, w, h));
     };
@@ -150,7 +150,7 @@ export default class ImageView extends React.Component {
     };
 
     const extraBGDrawLoop = (v: any, w: number, h: number) => {
-      if (!el || !el.parentElement || parseFloat(el.parentElement.style.opacity) == 0.99 || v.ended || v.paused || this._timeouts == null) return;
+      if (!el || !el.parentElement || parseFloat(el.parentElement.style.opacity) == 0.99 || this._timeouts == null) return;
       for (let canvas of document.getElementsByClassName("canvas-bg-" + this.props.gridCoordinates[0] + "-" + this.props.gridCoordinates[1])) {
         const context = (canvas as HTMLCanvasElement).getContext('2d');
         context.drawImage(v, 0, 0, w, h);
@@ -217,18 +217,21 @@ export default class ImageView extends React.Component {
         if (type == null) {
           context.drawImage(img, 0, 0, parentWidth, parentHeight);
         } else if (type == ST.video) {
-          img.onplay = () => {
-            videoLoop(img);
+          if (forceBG) {
             drawLoop(img, context, parentWidth, parentHeight);
             if (this.props.gridCoordinates) {
               extraDrawLoop(img, imgWidth * scale, imgHeight * scale);
               extraBGDrawLoop(img, parentWidth, parentHeight);
             }
-          };
-          if (forceBG) {
+          } else {
+            img.onplay = () => {
+              videoLoop(img);
+              if (this.props.gridCoordinates) {
+                extraDrawLoop(img, imgWidth * scale, imgHeight * scale);
+              }
+            };
             drawLoop(img, context, parentWidth, parentHeight);
             if (this.props.gridCoordinates) {
-              extraDrawLoop(img, imgWidth * scale, imgHeight * scale);
               extraBGDrawLoop(img, parentWidth, parentHeight);
             }
           }
