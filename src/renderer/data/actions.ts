@@ -1665,19 +1665,37 @@ export function updatePlaylists(state: State, fn: (playlists: Array<Playlist>) =
 export function updateAudioLibrary(state: State, fn: (audios: Array<Audio>) => void): Object {
   const audiosCopy = JSON.parse(JSON.stringify(state.audios));
   fn(audiosCopy);
-  return {audios: audiosCopy};
+  let audioSelected = JSON.parse(JSON.stringify(state.audioSelected));
+  for (let url of audioSelected) {
+    if (audiosCopy.find((s: LibrarySource) => s.url == url) == null) {
+      audioSelected = audioSelected.filter((s: LibrarySource) => s.url != url);
+    }
+  }
+  return {audios: audiosCopy, audioSelected: audioSelected};
 }
 
 export function updateScriptLibrary(state: State, fn: (scripts: Array<CaptionScript>) => void): Object {
   const scriptsCopy = JSON.parse(JSON.stringify(state.scripts));
   fn(scriptsCopy);
-  return {scripts: scriptsCopy};
+  let scriptSelected = JSON.parse(JSON.stringify(state.scriptSelected));
+  for (let url of scriptSelected) {
+    if (scriptsCopy.find((s: LibrarySource) => s.url == url) == null) {
+      scriptSelected = scriptSelected.filter((s: LibrarySource) => s.url != url);
+    }
+  }
+  return {scripts: scriptsCopy, scriptSelected: scriptSelected};
 }
 
 export function updateLibrary(state: State, fn: (library: Array<LibrarySource>) => void): Object {
   const libraryCopy = JSON.parse(JSON.stringify(state.library));
   fn(libraryCopy);
-  return {library: libraryCopy};
+  let librarySelected = JSON.parse(JSON.stringify(state.librarySelected));
+  for (let url of librarySelected) {
+    if (libraryCopy.find((s: LibrarySource) => s.url == url) == null) {
+      librarySelected = librarySelected.filter((s: LibrarySource) => s.url != url);
+    }
+  }
+  return {library: libraryCopy, librarySelected: librarySelected};
 }
 
 export function clearBlacklist(state: State, sourceURL: string): Object {

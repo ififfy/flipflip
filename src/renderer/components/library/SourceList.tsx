@@ -442,6 +442,7 @@ class SourceList extends React.Component {
     if (this.props.onUpdateScene) {
       this.props.onUpdateScene((s) => s.sources = s.sources.filter((s) => s.id != source.id));
     } else if (this.props.onUpdateLibrary) {
+      this.props.onUpdateSelected(this.props.selected.filter((url) => url != source.url));
       this.props.onUpdateLibrary((l) => {
         l.forEach((s, index) => {
           if (s.id == source.id) {

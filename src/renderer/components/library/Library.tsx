@@ -1202,8 +1202,6 @@ class Library extends React.Component {
     }
   }
 
-  // TODO On delete source, also remove from "selected" state element
-
   onFinishRemoveAll() {
     this.props.onUpdateLibrary((l) => {
       l.splice(0, l.length);
