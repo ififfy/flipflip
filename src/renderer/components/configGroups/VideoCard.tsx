@@ -107,8 +107,8 @@ export default class VideoCard extends React.Component {
                     nextTrack={() => {
                       this.props.imagePlayerAdvanceHacks[listIndex + 1][index].fire()
                     }}
-                    onChangeSpeed={this.props.mainVideo ? this.changeKey.bind(this, 'videoSpeed', this.props.otherScenes[listIndex]).bind(this) : this.nop}
-                    onChangeVolume={this.props.mainVideo ? this.changeKey.bind(this, 'videoVolume', this.props.otherScenes[listIndex]).bind(this) : this.nop}/>
+                    onChangeSpeed={this.nop}
+                    onChangeVolume={this.nop}/>
                 </Grid>
               );
             })}

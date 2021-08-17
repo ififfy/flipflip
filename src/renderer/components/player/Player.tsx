@@ -452,8 +452,6 @@ export default class Player extends React.Component {
             />
           )}
 
-          {/*TODO Don't update overlay audio level based on scene (prevent duplicate scene overlay from changing volume with main)*/}
-
           {!this.props.scene.audioScene && this.props.scene.overlayEnabled && this.props.scene.overlays.length > 0 &&
            !this.state.isEmpty && this.props.scene.overlays.map((overlay, index) => {
               let showProgress = this.state.isMainLoaded && !this.state.hasStarted;
