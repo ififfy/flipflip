@@ -125,6 +125,7 @@ export default class ImagePlayer extends React.Component {
     return this.props.historyOffset + this.state.historyOffset;
   }
 
+  _lastAdvance: number = null;
   componentDidMount() {
     this._runFetchLoopCallRequests = [];
     this._isMounted = true;
@@ -141,8 +142,18 @@ export default class ImagePlayer extends React.Component {
     this._imgLoadTimeouts = new Array<NodeJS.Timeout>(this.props.config.displaySettings.maxLoadingAtOnce).fill(null);
     this._toggleStrobe = false;
     this.props.advanceHack.listener = () => {
-      clearTimeout(this._timeout);
-      this.advance(true, true);
+      let delay = 100;
+      if (this.state.historyPaths.length > 0) {
+        const source = this.state.historyPaths[this.state.historyPaths.length - 1].getAttribute("source");
+        if (source && getSourceType(source) == ST.video) {
+          delay = 200;
+        }
+      }
+      if (this._lastAdvance == null || new Date().getTime() - this._lastAdvance > delay) {
+        this._lastAdvance = new Date().getTime();
+        clearTimeout(this._timeout);
+        this.advance(true, true);
+      }
     }
     if (this.props.deleteHack) {
       this.props.deleteHack.listener = () => {
