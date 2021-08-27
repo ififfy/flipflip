@@ -100,6 +100,16 @@ export default class PlayerBoolCard extends React.Component {
           <Divider/>
         </Grid>
         <Grid item xs={12}>
+          <Tooltip title={<div>Prioritizing performance will smooth image effects, but may dramatically increase load times.<br/>Prioritizing loading will decrease load times, but may result in jittery effects during playback</div>}>
+            <FormControlLabel
+              control={
+                <Switch checked={this.props.generalSettings.prioritizePerformance}
+                        onChange={this.onGBoolInput.bind(this, 'prioritizePerformance')}/>
+              }
+              label={this.props.generalSettings.prioritizePerformance ? "Prioritize Performance" : "Prioritize Loading"}/>
+          </Tooltip>
+        </Grid>
+        <Grid item xs={12}>
           <Tooltip title="If disabled, no prompt will appear to confirm Scene deletion">
             <FormControlLabel
               control={

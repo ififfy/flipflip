@@ -7,8 +7,14 @@ import fileURL from "file-url";
 import wretch from "wretch";
 import uuidv4 from "uuid/v4";
 
-import {flatten, getCachePath, randomizeList} from "../../data/utils";
-import {filterPathsToJustPlayable, getFileName, getSourceType, isVideo, processAllURLs} from "./Scrapers";
+import {Dialog, DialogContent} from "@material-ui/core";
+
+import {CancelablePromise, flatten, getCachePath, randomizeList} from "../../data/utils";
+import {
+  filterPathsToJustPlayable, getFileName, getSourceType, isVideo, loadBDSMlr, loadDanbooru, loadDeviantArt, loadE621,
+  loadEHentai, loadGelbooru1, loadGelbooru2, loadHydrus, loadImageFap, loadImgur, loadInstagram, loadPiwigo, loadReddit,
+  loadRemoteImageURLList, loadSexCom, loadTumblr, loadTwitter, processAllURLs
+} from "./Scrapers";
 import {IF, SOF, ST} from '../../data/const';
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
@@ -16,7 +22,6 @@ import Scene from '../../data/Scene';
 import Audio from "../../data/Audio";
 import ChildCallbackHack from './ChildCallbackHack';
 import ImagePlayer from './ImagePlayer';
-import {Dialog, DialogContent} from "@material-ui/core";
 
 let workerInstance: any = null;
 let workerListener: any = null;
@@ -29,75 +34,115 @@ function isEmpty(allURLs: any[]): boolean {
 }
 
 // Determine what kind of source we have based on the URL and return associated Promise
-function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) {
+function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, returnPromise = false) {
   const sourceType = getSourceType(source.url);
   if (sourceType == ST.local) { // Local files
-    loadLocalDirectory(pm, allURLs, config, source, filter, weight, helpers, null);
+    if (returnPromise) {
+      return new CancelablePromise((resolve) => {
+        loadLocalDirectory(resolve, allURLs, config, source, filter, weight, helpers, null);
+      });
+    } else {
+      loadLocalDirectory(pm, allURLs, config, source, filter, weight, helpers, null);
+    }
   } else if (sourceType == ST.list) { // Image List
     helpers.next = null;
-    worker.loadRemoteImageURLList(allURLs, config, source, filter, weight, helpers);
+    if (returnPromise) {
+      return new CancelablePromise((resolve) => {
+        loadRemoteImageURLListPromise(allURLs, config, source, filter, weight, helpers, resolve);
+      });
+    } else {
+      worker.loadRemoteImageURLList(allURLs, config, source, filter, weight, helpers);
+    }
   } else if (sourceType == ST.video) {
     const cachePath = getCachePath(source.url, config) + getFileName(source.url);
-    if (config.caching.enabled && fs.existsSync(cachePath)) {
-      loadVideo(pm, allURLs, config, source, filter, weight, helpers, cachePath);
+    if (returnPromise) {
+      return new CancelablePromise((resolve) => {
+        loadVideo(resolve, allURLs, config, source, filter, weight, helpers, config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null);
+      });
     } else {
-      loadVideo(pm, allURLs, config, source, filter, weight, helpers, null);
+      loadVideo(pm, allURLs, config, source, filter, weight, helpers, config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null);
     }
   } else if (sourceType == ST.playlist) {
     const cachePath = getCachePath(source.url, config) + getFileName(source.url);
-    if (config.caching.enabled && fs.existsSync(cachePath)) {
-      loadPlaylist(pm, allURLs, config, source, filter, weight, helpers, cachePath);
+    if (returnPromise) {
+      return new CancelablePromise((resolve) => {
+        loadPlaylist(resolve, allURLs, config, source, filter, weight, helpers, config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null);
+      });
     } else {
-      loadPlaylist(pm, allURLs, config, source, filter, weight, helpers, null);
+      loadPlaylist(pm, allURLs, config, source, filter, weight, helpers, config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null);
     }
   } else if (sourceType == ST.nimja) {
-    loadNimja(pm, allURLs, config, source, filter, weight, helpers, null);
+    if (returnPromise) {
+      return new CancelablePromise((resolve) => {
+        loadNimja(resolve, allURLs, config, source, filter, weight, helpers, null);
+      });
+    } else {
+      loadNimja(pm, allURLs, config, source, filter, weight, helpers, null);
+    }
   } else { // Paging sources
-    let workerFunction;
+    let workerFunction: any;
     if (sourceType == ST.tumblr) {
-      workerFunction = worker.loadTumblr;
+      workerFunction = returnPromise ? loadTumblrPromise : worker.loadTumblr;
     } else if (sourceType == ST.reddit) {
-      workerFunction = worker.loadReddit;
+      workerFunction = returnPromise ? loadRedditPromise : worker.loadReddit;
     } else if (sourceType == ST.imagefap) {
-      workerFunction = worker.loadImageFap;
+      workerFunction = returnPromise ? loadImageFapPromise : worker.loadImageFap;
     } else if (sourceType == ST.sexcom) {
-      workerFunction = worker.loadSexCom;
+      workerFunction = returnPromise ? loadSexComPromise : worker.loadSexCom;
     } else if (sourceType == ST.imgur) {
-      workerFunction = worker.loadImgur;
+      workerFunction = returnPromise ? loadImgurPromise : worker.loadImgur;
     } else if (sourceType == ST.twitter) {
-      workerFunction = worker.loadTwitter;
+      workerFunction = returnPromise ? loadTwitterPromise : worker.loadTwitter;
     } else if (sourceType == ST.deviantart) {
-      workerFunction = worker.loadDeviantArt;
+      workerFunction = returnPromise ? loadDeviantArtPromise : worker.loadDeviantArt;
     } else if (sourceType == ST.instagram) {
-      workerFunction = worker.loadInstagram;
+      workerFunction = returnPromise ? loadInstagramPromise : worker.loadInstagram;
     } else if (sourceType == ST.danbooru) {
-      workerFunction = worker.loadDanbooru;
+      workerFunction = returnPromise ? loadDanbooruPromise : worker.loadDanbooru;
     } else if (sourceType == ST.e621) {
-      workerFunction = worker.loadE621;
+      workerFunction = returnPromise ? loadE621Promise : worker.loadE621;
     } else if (sourceType == ST.gelbooru1) {
-      workerFunction = worker.loadGelbooru1;
+      workerFunction = returnPromise ? loadGelbooru1Promise : worker.loadGelbooru1;
     } else if (sourceType == ST.gelbooru2) {
-      workerFunction = worker.loadGelbooru2;
+      workerFunction = returnPromise ? loadGelbooru2Promise : worker.loadGelbooru2;
     } else if (sourceType == ST.ehentai) {
-      workerFunction = worker.loadEHentai;
+      workerFunction = returnPromise ? loadEHentaiPromise : worker.loadEHentai;
     } else if (sourceType == ST.bdsmlr) {
-      workerFunction = worker.loadBDSMlr;
+      workerFunction = returnPromise ? loadBDSMlrPromise : worker.loadBDSMlr;
     } else if (sourceType == ST.hydrus) {
-      workerFunction = worker.loadHydrus;
+      workerFunction = returnPromise ? loadHydrusPromise : worker.loadHydrus;
     } else if (sourceType == ST.piwigo) {
-      workerFunction = worker.loadPiwigo;
+      workerFunction = returnPromise ? loadPiwigoPromise : worker.loadPiwigo;
     }
     if (helpers.next == -1) {
       helpers.next = 0;
       const cachePath = getCachePath(source.url, config);
       if (config.caching.enabled && fs.existsSync(cachePath) && fs.readdirSync(cachePath).length > 0) {
         // If the cache directory exists, use it
-        loadLocalDirectory(pm, allURLs, config, source, filter, weight, helpers, cachePath);
+        if (returnPromise) {
+          return new CancelablePromise((resolve) => {
+            loadLocalDirectory(resolve, allURLs, config, source, filter, weight, helpers, cachePath);
+          });
+        } else {
+          loadLocalDirectory(pm, allURLs, config, source, filter, weight, helpers, cachePath);
+        }
+      } else {
+        if (returnPromise) {
+          return new CancelablePromise((resolve) => {
+            workerFunction(allURLs, config, source, filter, weight, helpers, resolve);
+          });
+        } else {
+          workerFunction(allURLs, config, source, filter, weight, helpers);
+        }
+      }
+    } else {
+      if (returnPromise) {
+        return new CancelablePromise((resolve) => {
+          workerFunction(allURLs, config, source, filter, weight, helpers, resolve);
+        });
       } else {
         workerFunction(allURLs, config, source, filter, weight, helpers);
       }
-    } else {
-      workerFunction(allURLs, config, source, filter, weight, helpers);
     }
   }
 }
@@ -307,6 +352,74 @@ export const loadPlaylist = (pm: Function, allURLs: Map<string, Array<string>>, 
         timeout: 0,
       }});
     });
+}
+
+const loadRemoteImageURLListPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadRemoteImageURLList(allURLs, config, source, filter, weight, helpers, resolve);
+}
+
+const loadTumblrPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadTumblr(allURLs, config, source, filter, weight, helpers, resolve);
+}
+
+const loadRedditPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadReddit(allURLs, config, source, filter, weight, helpers, resolve);
+}
+
+const loadImageFapPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadImageFap(allURLs, config, source, filter, weight, helpers, resolve);
+}
+
+const loadSexComPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadSexCom(allURLs, config, source, filter, weight, helpers, resolve);
+}
+
+const loadImgurPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadImgur(allURLs, config, source, filter, weight, helpers, resolve);
+}
+
+const loadTwitterPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadTwitter(allURLs, config, source, filter, weight, helpers, resolve);
+}
+
+const loadDeviantArtPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadDeviantArt(allURLs, config, source, filter, weight, helpers, resolve);
+}
+
+const loadInstagramPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadInstagram(allURLs, config, source, filter, weight, helpers, resolve);
+}
+
+const loadDanbooruPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadDanbooru(allURLs, config, source, filter, weight, helpers, resolve);
+}
+
+const loadE621Promise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadE621(allURLs, config, source, filter, weight, helpers, resolve);
+}
+
+const loadGelbooru1Promise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadGelbooru1(allURLs, config, source, filter, weight, helpers, resolve);
+}
+
+const loadGelbooru2Promise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadGelbooru2(allURLs, config, source, filter, weight, helpers, resolve);
+}
+
+const loadEHentaiPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadEHentai(allURLs, config, source, filter, weight, helpers, resolve);
+}
+
+const loadBDSMlrPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadBDSMlr(allURLs, config, source, filter, weight, helpers, resolve);
+}
+
+const loadHydrusPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadHydrus(allURLs, config, source, filter, weight, helpers, resolve);
+}
+
+const loadPiwigoPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadPiwigo(allURLs, config, source, filter, weight, helpers, resolve);
 }
 
 export default class SourceScraper extends React.Component {
@@ -558,13 +671,20 @@ export default class SourceScraper extends React.Component {
         }
       }
 
-      // Attach an event listener to receive calculations from your worker
-      if (workerListener != null) {
-        workerInstance?.removeEventListener('message', workerListener);
+      if (this.props.config.generalSettings.prioritizePerformance) {
+        // Attach an event listener to receive calculations from your worker
+        if (workerListener != null) {
+          workerInstance?.removeEventListener('message', workerListener);
+        }
+        workerListener = receiveMessage.bind(this);
+        workerInstance.addEventListener('message', workerListener);
+        scrapeFiles(workerInstance, workerListener, this.state.allURLs, this.props.config, d, this.props.scene.imageTypeFilter, this.props.scene.weightFunction, {next: -1, count: 0, retries: 0, uuid: uuid})
+      } else {
+        scrapeFiles(workerInstance, workerListener, this.state.allURLs, this.props.config, d, this.props.scene.imageTypeFilter, this.props.scene.weightFunction, {next: -1, count: 0, retries: 0, uuid: uuid}, true).then((data) => {
+          receiveMessage(data);
+        })
       }
-      workerListener = receiveMessage.bind(this);
-      workerInstance.addEventListener('message', workerListener);
-      scrapeFiles(workerInstance, workerListener, this.state.allURLs, this.props.config, d, this.props.scene.imageTypeFilter, this.props.scene.weightFunction, {next: -1, count: 0, retries: 0, uuid: uuid})
+
     };
 
     let nextSourceLoop = () => {
@@ -618,13 +738,19 @@ export default class SourceScraper extends React.Component {
         }
       }
 
-      // Attach an event listener to receive calculations from your worker
-      if (nextWorkerListener != null) {
-        nextWorkerInstance?.removeEventListener('message', nextWorkerListener);
+      if (this.props.config.generalSettings.prioritizePerformance) {
+        // Attach an event listener to receive calculations from your worker
+        if (nextWorkerListener != null) {
+          nextWorkerInstance?.removeEventListener('message', nextWorkerListener);
+        }
+        nextWorkerListener = receiveMessage.bind(this);
+        nextWorkerInstance.addEventListener('message', nextWorkerListener);
+        scrapeFiles(nextWorkerInstance, nextWorkerListener, this._nextAllURLs, this.props.config, d, this.props.nextScene.imageTypeFilter, this.props.nextScene.weightFunction, {next: -1, count: 0, retries: 0, uuid: uuid});
+      } else {
+        scrapeFiles(nextWorkerInstance, nextWorkerListener, this._nextAllURLs, this.props.config, d, this.props.nextScene.imageTypeFilter, this.props.nextScene.weightFunction, {next: -1, count: 0, retries: 0, uuid: uuid}, true).then((data) => {
+          receiveMessage(data);
+        });
       }
-      nextWorkerListener = receiveMessage.bind(this);
-      nextWorkerInstance.addEventListener('message', nextWorkerListener);
-      scrapeFiles(nextWorkerInstance, nextWorkerListener, this._nextAllURLs, this.props.config, d, this.props.nextScene.imageTypeFilter, this.props.nextScene.weightFunction, {next: -1, count: 0, retries: 0, uuid: uuid});
     };
 
     let promiseLoop = () => {
@@ -683,14 +809,20 @@ export default class SourceScraper extends React.Component {
         }
       }
 
-      // Attach an event listener to receive calculations from your worker
-      if (workerListener != null) {
-        workerInstance?.removeEventListener('message', workerListener);
-      }
-      workerListener = receiveMessage.bind(this);
-      workerInstance.addEventListener('message', workerListener);
       const promiseData = this._promiseQueue.shift();
-      scrapeFiles(workerInstance, workerListener, this.state.allURLs, this.props.config, promiseData.source, this.props.scene.imageTypeFilter, this.props.scene.weightFunction, promiseData.helpers);
+      if (this.props.config.generalSettings.prioritizePerformance) {
+        // Attach an event listener to receive calculations from your worker
+        if (workerListener != null) {
+          workerInstance?.removeEventListener('message', workerListener);
+        }
+        workerListener = receiveMessage.bind(this);
+        workerInstance.addEventListener('message', workerListener);
+        scrapeFiles(workerInstance, workerListener, this.state.allURLs, this.props.config, promiseData.source, this.props.scene.imageTypeFilter, this.props.scene.weightFunction, promiseData.helpers);
+      } else {
+        scrapeFiles(workerInstance, workerListener, this.state.allURLs, this.props.config, promiseData.source, this.props.scene.imageTypeFilter, this.props.scene.weightFunction, promiseData.helpers, true).then((data) => {
+          receiveMessage(data);
+        });
+      }
     };
 
     if (this.state.preload) {

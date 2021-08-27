@@ -13,7 +13,7 @@ import {IF, RF, RT, ST, WF} from "../../data/const";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
 
-const pm = (object: any) => {
+const pm = (object: any, resolve?: Function) => {
   if (object?.source && object?.data && object?.allURLs && object?.weight && object?.helpers) {
     const source = object.source;
     if (source.blacklist && source.blacklist.length > 0) {
@@ -21,8 +21,12 @@ const pm = (object: any) => {
     }
     object.allURLs = processAllURLs(object.data, object.allURLs, object.source, object.weight, object.helpers);
   }
-  // @ts-ignore
-  postMessage(object);
+  if (!!resolve) {
+    resolve({data: object});
+  } else {
+    // @ts-ignore
+    postMessage(object);
+  }
 }
 
 export const processAllURLs = (data: string[], allURLs: Map<string, string[]>, source: LibrarySource, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}): Map<string, string[]> => {
@@ -75,7 +79,7 @@ export const reset = () => {
   piwigoAlerted = false;
 }
 
-export const loadRemoteImageURLList = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
+export const loadRemoteImageURLList = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const url = source.url;
   wretch(url)
     .get()
@@ -97,7 +101,7 @@ export const loadRemoteImageURLList = (allURLs: Map<string, Array<string>>, conf
                 helpers: helpers,
                 source: source,
                 timeout: 0,
-              });
+              }, resolve);
             }
           })
             .catch ((error: any) => {
@@ -112,7 +116,7 @@ export const loadRemoteImageURLList = (allURLs: Map<string, Array<string>>, conf
                   helpers: helpers,
                   source: source,
                   timeout: 0,
-                });
+                }, resolve);
               }
             });
         }
@@ -122,7 +126,7 @@ export const loadRemoteImageURLList = (allURLs: Map<string, Array<string>>, conf
           helpers: helpers,
           source: source,
           timeout: 0,
-        });
+        }, resolve);
       }
     })
     .catch((e) => {
@@ -131,11 +135,11 @@ export const loadRemoteImageURLList = (allURLs: Map<string, Array<string>>, conf
         helpers: helpers,
         source: source,
         timeout: 0,
-      });
+      }, resolve);
     });
 }
 
-export const loadTumblr = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
+export const loadTumblr = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 3000;
   let configured = config.remoteSettings.tumblrOAuthToken != "" && config.remoteSettings.tumblrOAuthTokenSecret != "";
   if (configured) {
@@ -154,7 +158,7 @@ export const loadTumblr = (allURLs: Map<string, Array<string>>, config: Config, 
         helpers: helpers,
         source: source,
         timeout: timeout,
-      })
+      }, resolve);
       return;
     }
     client.blogPosts(tumblrID, {offset: helpers.next*20}, (err, data) => {
@@ -172,7 +176,7 @@ export const loadTumblr = (allURLs: Map<string, Array<string>>, config: Config, 
           helpers: helpers,
           source: source,
           timeout: timeout,
-        })
+        }, resolve);
         return;
       }
 
@@ -186,7 +190,7 @@ export const loadTumblr = (allURLs: Map<string, Array<string>>, config: Config, 
           helpers: helpers,
           source: source,
           timeout: timeout,
-        });
+        }, resolve);
         return;
       }
 
@@ -240,7 +244,7 @@ export const loadTumblr = (allURLs: Map<string, Array<string>>, config: Config, 
                 helpers: helpers,
                 source: source,
                 timeout: timeout,
-              });
+              }, resolve);
             }
           })
             .catch ((error: any) => {
@@ -256,7 +260,7 @@ export const loadTumblr = (allURLs: Map<string, Array<string>>, config: Config, 
                   helpers: helpers,
                   source: source,
                   timeout: timeout,
-                });
+                }, resolve);
               }
             });
         }
@@ -269,7 +273,7 @@ export const loadTumblr = (allURLs: Map<string, Array<string>>, config: Config, 
           helpers: helpers,
           source: source,
           timeout: timeout,
-        });
+        }, resolve);
       }
     });
   } else {
@@ -283,11 +287,11 @@ export const loadTumblr = (allURLs: Map<string, Array<string>>, config: Config, 
       helpers: helpers,
       source: source,
       timeout: timeout,
-    })
+    }, resolve);
   }
 }
 
-export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
+export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 3000;
   let configured = config.remoteSettings.redditRefreshToken != "";
   if (configured) {
@@ -317,7 +321,7 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
                   helpers: helpers,
                   source: source,
                   timeout: timeout,
-                });
+                }, resolve);
               }
             })
               .catch ((error: any) => {
@@ -333,7 +337,7 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
                     helpers: helpers,
                     source: source,
                     timeout: timeout,
-                  });
+                  }, resolve);
                 }
               });
           }
@@ -346,7 +350,7 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
             helpers: helpers,
             source: source,
             timeout: timeout,
-          });
+          }, resolve);
         }
       };
       const errorSubmission = (error: any) => {
@@ -355,7 +359,7 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
           helpers: helpers,
           source: source,
           timeout: timeout,
-        });
+        }, resolve);
       };
 
       switch (source.redditFunc) {
@@ -407,7 +411,7 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
                     helpers: helpers,
                     source: source,
                     timeout: timeout,
-                  });
+                  }, resolve);
                 }
               })
                 .catch ((error: any) => {
@@ -423,7 +427,7 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
                       helpers: helpers,
                       source: source,
                       timeout: timeout,
-                    });
+                    }, resolve);
                   }
                 });
             }
@@ -436,7 +440,7 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
               helpers: helpers,
               source: source,
               timeout: timeout,
-            });
+            }, resolve);
           }
         }).catch((err: any) => {
           pm({
@@ -444,7 +448,7 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
             helpers: helpers,
             source: source,
             timeout: timeout,
-          });
+          }, resolve);
         });
     } else if (url.includes("/user/") || url.includes("/u/")) {
       reddit.getUser(getFileGroup(url)).getSubmissions({after: helpers.next})
@@ -466,7 +470,7 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
                     helpers: helpers,
                     source: source,
                     timeout: timeout,
-                  });
+                  }, resolve);
                 }
               })
                 .catch ((error: any) => {
@@ -482,7 +486,7 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
                       helpers: helpers,
                       source: source,
                       timeout: timeout,
-                    });
+                    }, resolve);
                   }
                 });
             }
@@ -495,7 +499,7 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
               helpers: helpers,
               source: source,
               timeout: timeout,
-            });
+            }, resolve);
           }
         }).catch((err: any) => {
           pm({
@@ -503,7 +507,7 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
             helpers: helpers,
             source: source,
             timeout: timeout,
-          });
+          }, resolve);
         });
     }
   } else {
@@ -517,11 +521,11 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
       helpers: helpers,
       source: source,
       timeout: timeout,
-    });
+    }, resolve);
   }
 }
 
-export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
+export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 8000;
   const url = source.url;
   if (url.includes("/pictures/")) {
@@ -533,7 +537,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
         helpers: helpers,
         source: source,
         timeout: timeout,
-      }))
+      }, resolve))
       .text((html) => {
         let imageEls = domino.createWindow(html).document.querySelectorAll(".expp-container > form > table > tbody > tr > td");
         let images = Array<string>();
@@ -562,7 +566,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
                     helpers: helpers,
                     source: source,
                     timeout: timeout,
-                  });
+                  }, resolve);
                 } else {
                   setTimeout(imageLoop, 200);
                 }
@@ -575,7 +579,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
             helpers.count = source.count;
             captcha = "https://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2";
             images = allURLs.get(url);
-            pm({warning: source.url + " - blocked due to captcha"});
+            pm({warning: source.url + " - blocked due to captcha"}, resolve);
           } else {
             helpers.next = null;
           }
@@ -587,7 +591,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
             helpers: helpers,
             source: source,
             timeout: timeout,
-          });
+          }, resolve);
         }
       });
   } else if (url.includes("/organizer/")) {
@@ -602,7 +606,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
         helpers: helpers,
         source: source,
         timeout: timeout,
-      }))
+      }, resolve))
       .text((html) => {
         let albumEls = domino.createWindow(html).document.querySelectorAll("td.blk_galleries > font > a.blk_galleries");
         if (albumEls.length == 0) {
@@ -610,7 +614,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
           if (html.includes("Enter the captcha")) {
             helpers.count = source.count;
             captcha = "https://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2";
-            pm({warning: source.url + " - blocked due to captcha"});
+            pm({warning: source.url + " - blocked due to captcha"}, resolve);
           }
           helpers.next = null;
           pm({
@@ -621,7 +625,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
             helpers: helpers,
             source: source,
             timeout: timeout,
-          });
+          }, resolve);
         } else if (albumEls.length > helpers.next[1]) {
           let albumEl = albumEls[helpers.next[1]];
           let albumID = albumEl.getAttribute("href").substring(albumEl.getAttribute("href").lastIndexOf("/") + 1);
@@ -633,7 +637,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
               helpers: helpers,
               source: source,
               timeout: timeout,
-            }))
+            }, resolve))
             .text((html) => {
               let imageEls = domino.createWindow(html).document.querySelectorAll(".expp-container > form > table > tbody > tr > td");
               let images = Array<string>();
@@ -667,7 +671,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
                           helpers: helpers,
                           source: source,
                           timeout: timeout,
-                        });
+                        }, resolve);
                       } else {
                         setTimeout(imageLoop, 200);
                       }
@@ -679,7 +683,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
                 if (html.includes("Enter the captcha")) {
                   helpers.count = source.count;
                   captcha = "https://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2";
-                  pm({warning: source.url + " - blocked due to captcha"});
+                  pm({warning: source.url + " - blocked due to captcha"}, resolve);
                 } else {
                   helpers.next[1] += 1;
                 }
@@ -691,7 +695,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
                   helpers: helpers,
                   source: source,
                   timeout: timeout,
-                });
+                }, resolve);
               }
             });
         } else {
@@ -701,7 +705,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
             helpers.count = source.count;
             captcha = "https://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2";
             images = allURLs.get(url);
-            pm({warning: source.url + " - blocked due to captcha"});
+            pm({warning: source.url + " - blocked due to captcha"}, resolve);
           } else {
             helpers.next[0] += 1;
             helpers.next[1] = 0;
@@ -714,7 +718,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
             helpers: helpers,
             source: source,
             timeout: timeout,
-          });
+          }, resolve);
         }
       })
       .catch((e) => {
@@ -723,7 +727,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
           helpers: helpers,
           source: source,
           timeout: timeout,
-        })
+        }, resolve);
       });
   } else if (url.includes("/video.php?vid=")) {
     helpers.next = null;
@@ -734,7 +738,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
       helpers: helpers,
       source: source,
       timeout: timeout,
-    });
+    }, resolve);
     // This doesn't work anymore due to src url requiring referer
     /*wretch(url)
       .get()
@@ -744,7 +748,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
         helpers: helpers,
         source: source,
         timeout: timeout,
-      }))
+      }, resolve))
       .text((html) => {
         const findVideoURLs = /url: '(https:\/\/cdn-fck\.moviefap\.com\/moviefap\/.*)',/g.exec(html);
         if (findVideoURLs) {
@@ -763,7 +767,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
             helpers: helpers,
             source: source,
             timeout: timeout,
-          });
+          }, resolve);
         } else {
           helpers.next = null;
           pm({
@@ -773,7 +777,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
             helpers: helpers,
             source: source,
             timeout: timeout,
-          });
+          }, resolve);
         }
       });*/
   } else {
@@ -785,11 +789,11 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
       helpers: helpers,
       source: source,
       timeout: timeout,
-    });
+    }, resolve);
   }
 }
 
-export const loadSexCom = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
+export const loadSexCom = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 8000;
   const url = source.url;
   // This doesn't work anymore due to src url requiring referer
@@ -801,7 +805,7 @@ export const loadSexCom = (allURLs: Map<string, Array<string>>, config: Config, 
     helpers: helpers,
     source: source,
     timeout: timeout,
-  });
+  }, resolve);
   /*let requestURL;
   if (url.includes("/user/")) {
     requestURL = "https://www.sex.com/user/" + getFileGroup(url) + "?page=" + (helpers.next + 1);
@@ -816,13 +820,13 @@ export const loadSexCom = (allURLs: Map<string, Array<string>>, config: Config, 
       helpers: helpers,
       source: source,
       timeout: timeout,
-    }))
+    }, resolve))
     .notFound((e) => pm({
       error: e.message,
       helpers: helpers,
       source: source,
       timeout: timeout,
-    }))
+    }, resolve))
     .text((html) => {
       let imageEls = domino.createWindow(html).document.querySelectorAll(".small_pin_box > .image_wrapper > img");
       if (imageEls.length > 0) {
@@ -846,7 +850,7 @@ export const loadSexCom = (allURLs: Map<string, Array<string>>, config: Config, 
             helpers: helpers,
             source: source,
             timeout: timeout,
-          })
+          }, resolve);
         } else {
           const validImages = filterPathsToJustPlayable(filter, images, false);
           images = [];
@@ -860,13 +864,13 @@ export const loadSexCom = (allURLs: Map<string, Array<string>>, config: Config, 
                 helpers: helpers,
                 source: source,
                 timeout: timeout,
-              }))
+              }, resolve))
               .notFound((e) => pm({
                 error: e.message,
                 helpers: helpers,
                 source: source,
                 timeout: timeout,
-              }))
+              }, resolve))
               .text((html) => {
                 count += 1;
 
@@ -899,7 +903,7 @@ export const loadSexCom = (allURLs: Map<string, Array<string>>, config: Config, 
                     helpers: helpers,
                     source: source,
                     timeout: timeout,
-                  })
+                  }, resolve);
                 }
               });
           }
@@ -913,12 +917,12 @@ export const loadSexCom = (allURLs: Map<string, Array<string>>, config: Config, 
           helpers: helpers,
           source: source,
           timeout: timeout,
-        });
+        }, resolve);
       }
     });*/
 }
 
-export const loadImgur = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
+export const loadImgur = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 3000;
   const url = source.url;
   imgur.getAlbumInfo(getFileGroup(url))
@@ -933,7 +937,7 @@ export const loadImgur = (allURLs: Map<string, Array<string>>, config: Config, s
         helpers: helpers,
         source: source,
         timeout: timeout,
-      })
+      }, resolve);
     })
     .catch((err: any) => {
       pm({
@@ -941,11 +945,11 @@ export const loadImgur = (allURLs: Map<string, Array<string>>, config: Config, s
         helpers: helpers,
         source: source,
         timeout: timeout,
-      });
+      }, resolve);
     });
 }
 
-export const loadTwitter = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
+export const loadTwitter = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 3000;
   let configured = config.remoteSettings.twitterAccessTokenKey != "" && config.remoteSettings.twitterAccessTokenSecret != "";
   if (configured) {
@@ -967,7 +971,7 @@ export const loadTwitter = (allURLs: Map<string, Array<string>>, config: Config,
             helpers: helpers,
             source: source,
             timeout: timeout,
-          });
+          }, resolve);
           return;
         }
         let images = Array<string>();
@@ -1004,7 +1008,7 @@ export const loadTwitter = (allURLs: Map<string, Array<string>>, config: Config,
             helpers: helpers,
             source: source,
             timeout: timeout,
-          });
+          }, resolve);
         } else {
           helpers.next = lastID;
           helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
@@ -1015,7 +1019,7 @@ export const loadTwitter = (allURLs: Map<string, Array<string>>, config: Config,
             helpers: helpers,
             source: source,
             timeout: timeout,
-          });
+          }, resolve);
         }
       })
   } else {
@@ -1029,11 +1033,11 @@ export const loadTwitter = (allURLs: Map<string, Array<string>>, config: Config,
       helpers: helpers,
       source: source,
       timeout: timeout,
-    });
+    }, resolve);
   }
 }
 
-export const loadDeviantArt = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
+export const loadDeviantArt = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 3000;
   const url = source.url;
   wretch("https://backend.deviantart.com/rss.xml?type=deviation&q=by%3A" + getFileGroup(url) + "+sort%3Atime+meta%3Aall" + (helpers.next != 0 ? "&offset=" + helpers.next : ""))
@@ -1044,13 +1048,13 @@ export const loadDeviantArt = (allURLs: Map<string, Array<string>>, config: Conf
       helpers: helpers,
       source: source,
       timeout: timeout,
-    }))
+    }, resolve))
     .notFound((e) => pm({
       error: e.message,
       helpers: helpers,
       source: source,
       timeout: timeout,
-    }))
+    }, resolve))
     .text((text) => {
       const xml = new DOMParser().parseFromString(text, "text/xml");
       let hasNextPage = false;
@@ -1081,13 +1085,13 @@ export const loadDeviantArt = (allURLs: Map<string, Array<string>>, config: Conf
         helpers: helpers,
         source: source,
         timeout: timeout,
-      });
+      }, resolve);
     });
 }
 
 let ig: IgApiClient = null;
 let session: any = null;
-export const loadInstagram = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
+export const loadInstagram = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 3000;
   const configured = config.remoteSettings.instagramUsername != "" && config.remoteSettings.instagramPassword != "";
   if (configured) {
@@ -1115,7 +1119,7 @@ export const loadInstagram = (allURLs: Map<string, Array<string>>, config: Confi
         helpers: helpers,
         source: source,
         timeout: timeout,
-      });
+      }, resolve);
     };
 
     if (ig == null) {
@@ -1134,19 +1138,19 @@ export const loadInstagram = (allURLs: Map<string, Array<string>>, config: Confi
               helpers: helpers,
               source: source,
               timeout: timeout,
-            }));
+            }, resolve));
           }).catch((e) => pm({
             error: e.message,
             helpers: helpers,
             source: source,
             timeout: timeout,
-          }));
+          }, resolve));
         }).catch((e) => pm({
           error: e.message,
           helpers: helpers,
           source: source,
           timeout: timeout,
-        }));
+        }, resolve));
       }).catch((e) => {
         pm({
           error: e.message,
@@ -1154,7 +1158,7 @@ export const loadInstagram = (allURLs: Map<string, Array<string>>, config: Confi
           helpers: helpers,
           source: source,
           timeout: timeout,
-        })
+        }, resolve);
         ig = null;
       });
     } else if (helpers.next == 0) {
@@ -1168,13 +1172,13 @@ export const loadInstagram = (allURLs: Map<string, Array<string>>, config: Confi
           helpers: helpers,
           source: source,
           timeout: timeout,
-        }));
+        }, resolve));
       }).catch((e) => pm({
         error: e.message,
         helpers: helpers,
         source: source,
         timeout: timeout,
-      }));
+      }, resolve));
     } else {
       ig.state.deserializeCookieJar(JSON.parse(session)).then((data) => {
         const id = helpers.next[0];
@@ -1190,7 +1194,7 @@ export const loadInstagram = (allURLs: Map<string, Array<string>>, config: Confi
             helpers: helpers,
             source: source,
             timeout: timeout,
-          });
+          }, resolve);
           return;
         }
         userFeed.items().then((items) => {
@@ -1201,13 +1205,13 @@ export const loadInstagram = (allURLs: Map<string, Array<string>>, config: Confi
           helpers: helpers,
           source: source,
           timeout: timeout,
-        }));
+        }, resolve));
       }).catch((e) => pm({
         error: e.message,
         helpers: helpers,
         source: source,
         timeout: timeout,
-      }));
+      }, resolve));
     }
   } else {
     let systemMessage = undefined;
@@ -1220,11 +1224,11 @@ export const loadInstagram = (allURLs: Map<string, Array<string>>, config: Confi
       helpers: helpers,
       source: source,
       timeout: timeout,
-    })
+    }, resolve);
   }
 }
 
-export const loadE621 = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
+export const loadE621 = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 8000;
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
@@ -1241,31 +1245,31 @@ export const loadE621 = (allURLs: Map<string, Array<string>>, config: Config, so
         helpers: helpers,
         source: source,
         timeout: timeout,
-      }))
+      }, resolve))
       .notFound((e) => pm({
         error: e.message,
         helpers: helpers,
         source: source,
         timeout: timeout,
-      }))
+      }, resolve))
       .timeout((e) => pm({
         error: e.message,
         helpers: helpers,
         source: source,
         timeout: timeout,
-      }))
+      }, resolve))
       .internalError((e) => pm({
         error: e.message,
         helpers: helpers,
         source: source,
         timeout: timeout,
-      }))
+      }, resolve))
       .onAbort((e) => pm({
         error: e.message,
         helpers: helpers,
         source: source,
         timeout: timeout,
-      }))
+      }, resolve))
       .json((json: any) => {
         if (json.length == 0) {
           helpers.next = null;
@@ -1276,7 +1280,7 @@ export const loadE621 = (allURLs: Map<string, Array<string>>, config: Config, so
             helpers: helpers,
             source: source,
             timeout: timeout,
-          });
+          }, resolve);
           return;
         }
 
@@ -1292,31 +1296,31 @@ export const loadE621 = (allURLs: Map<string, Array<string>>, config: Config, so
               helpers: helpers,
               source: source,
               timeout: timeout,
-            }))
+            }, resolve))
             .notFound((e) => pm({
               error: e.message,
               helpers: helpers,
               source: source,
               timeout: timeout,
-            }))
+            }, resolve))
             .timeout((e) => pm({
               error: e.message,
               helpers: helpers,
               source: source,
               timeout: timeout,
-            }))
+            }, resolve))
             .internalError((e) => pm({
               error: e.message,
               helpers: helpers,
               source: source,
               timeout: timeout,
-            }))
+            }, resolve))
             .onAbort((e) => pm({
               error: e.message,
               helpers: helpers,
               source: source,
               timeout: timeout,
-            }))
+            }, resolve))
             .json((json: any) => {
               if (json.post && json.post.file.url) {
                 let fileURL = json.post.file.url;
@@ -1336,7 +1340,7 @@ export const loadE621 = (allURLs: Map<string, Array<string>>, config: Config, so
                   helpers: helpers,
                   source: source,
                   timeout: timeout,
-                });
+                }, resolve);
               }
             })
             .catch((e) => pm({
@@ -1344,7 +1348,7 @@ export const loadE621 = (allURLs: Map<string, Array<string>>, config: Config, so
               helpers: helpers,
               source: source,
               timeout: timeout,
-            }));
+            }, resolve));
         }
       })
       .catch((e) => pm({
@@ -1352,7 +1356,7 @@ export const loadE621 = (allURLs: Map<string, Array<string>>, config: Config, so
         helpers: helpers,
         source: source,
         timeout: timeout,
-      }));
+      }, resolve));
   } else {
     suffix = "/posts.json?limit=20&page=" + (helpers.next + 1);
     const tagRegex = /[?&]tags=(.*)&?/g;
@@ -1369,31 +1373,31 @@ export const loadE621 = (allURLs: Map<string, Array<string>>, config: Config, so
         helpers: helpers,
         source: source,
         timeout: timeout,
-      }))
+      }, resolve))
       .notFound((e) => pm({
         error: e.message,
         helpers: helpers,
         source: source,
         timeout: timeout,
-      }))
+      }, resolve))
       .timeout((e) => pm({
         error: e.message,
         helpers: helpers,
         source: source,
         timeout: timeout,
-      }))
+      }, resolve))
       .internalError((e) => pm({
         error: e.message,
         helpers: helpers,
         source: source,
         timeout: timeout,
-      }))
+      }, resolve))
       .onAbort((e) => pm({
         error: e.message,
         helpers: helpers,
         source: source,
         timeout: timeout,
-      }))
+      }, resolve))
       .json((json: any) => {
         if (json.length == 0) {
           helpers.next = null;
@@ -1404,7 +1408,7 @@ export const loadE621 = (allURLs: Map<string, Array<string>>, config: Config, so
             helpers: helpers,
             source: source,
             timeout: timeout,
-          });
+          }, resolve);
         }
 
         let list = json.posts;
@@ -1428,18 +1432,18 @@ export const loadE621 = (allURLs: Map<string, Array<string>>, config: Config, so
           helpers: helpers,
           source: source,
           timeout: timeout,
-        });
+        }, resolve);
       })
       .catch((e) => pm({
         error: e.message,
         helpers: helpers,
         source: source,
         timeout: timeout,
-      }));
+      }, resolve));
   }
 }
 
-export const loadDanbooru = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
+export const loadDanbooru = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 8000;
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
@@ -1473,31 +1477,31 @@ export const loadDanbooru = (allURLs: Map<string, Array<string>>, config: Config
       helpers: helpers,
       source: source,
       timeout: timeout,
-    }))
+    }, resolve))
     .notFound((e) => pm({
       error: e.message,
       helpers: helpers,
       source: source,
       timeout: timeout,
-    }))
+    }, resolve))
     .timeout((e) => pm({
       error: e.message,
       helpers: helpers,
       source: source,
       timeout: timeout,
-    }))
+    }, resolve))
     .internalError((e) => pm({
       error: e.message,
       helpers: helpers,
       source: source,
       timeout: timeout,
-    }))
+    }, resolve))
     .onAbort((e) => pm({
       error: e.message,
       helpers: helpers,
       source: source,
       timeout: timeout,
-    }))
+    }, resolve))
     .json((json: any) => {
       if (json.length == 0) {
         helpers.next = null;
@@ -1508,7 +1512,7 @@ export const loadDanbooru = (allURLs: Map<string, Array<string>>, config: Config
           helpers: helpers,
           source: source,
           timeout: timeout,
-        });
+        }, resolve);
       }
 
       let list;
@@ -1538,17 +1542,17 @@ export const loadDanbooru = (allURLs: Map<string, Array<string>>, config: Config
         helpers: helpers,
         source: source,
         timeout: timeout,
-      });
+      }, resolve);
     })
     .catch((e) => pm({
       error: e.message,
       helpers: helpers,
       source: source,
       timeout: timeout,
-    }));
+    }, resolve));
 }
 
-export const loadGelbooru1 = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
+export const loadGelbooru1 = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 8000;
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
@@ -1561,19 +1565,19 @@ export const loadGelbooru1 = (allURLs: Map<string, Array<string>>, config: Confi
       helpers: helpers,
       source: source,
       timeout: timeout,
-    }))
+    }, resolve))
     .notFound((e) => pm({
       error: e.message,
       helpers: helpers,
       source: source,
       timeout: timeout,
-    }))
+    }, resolve))
     .error(503, (e) => pm({
       error: e.message,
       helpers: helpers,
       source: source,
       timeout: timeout,
-    }))
+    }, resolve))
     .text((html) => {
       let imageEls = domino.createWindow(html).document.querySelectorAll("span.thumb > a");
       if (imageEls.length > 0) {
@@ -1593,19 +1597,19 @@ export const loadGelbooru1 = (allURLs: Map<string, Array<string>>, config: Confi
               helpers: helpers,
               source: source,
               timeout: timeout,
-            }))
+            }, resolve))
             .notFound((e) => pm({
               error: e.message,
               helpers: helpers,
               source: source,
               timeout: timeout,
-            }))
+            }, resolve))
             .error(503, (e) => pm({
               error: e.message,
               helpers: helpers,
               source: source,
               timeout: timeout,
-            }))
+            }, resolve))
             .text((html) => {
               imageCount++;
               let contentURL = html.match("<img[^>]*id=\"?image\"?[^>]*src=\"([^\"]*)\"");
@@ -1636,7 +1640,7 @@ export const loadGelbooru1 = (allURLs: Map<string, Array<string>>, config: Confi
                   helpers: helpers,
                   source: source,
                   timeout: timeout,
-                });
+                }, resolve);
               }
             });
 
@@ -1655,12 +1659,12 @@ export const loadGelbooru1 = (allURLs: Map<string, Array<string>>, config: Confi
           helpers: helpers,
           source: source,
           timeout: timeout,
-        });
+        }, resolve);
       }
     });
 }
 
-export const loadGelbooru2 = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
+export const loadGelbooru2 = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 8000;
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
@@ -1679,31 +1683,31 @@ export const loadGelbooru2 = (allURLs: Map<string, Array<string>>, config: Confi
       helpers: helpers,
       source: source,
       timeout: timeout,
-    }))
+    }, resolve))
     .notFound((e) => pm({
       error: e.message,
       helpers: helpers,
       source: source,
       timeout: timeout,
-    }))
+    }, resolve))
     .timeout((e) => pm({
       error: e.message,
       helpers: helpers,
       source: source,
       timeout: timeout,
-    }))
+    }, resolve))
     .internalError((e) => pm({
       error: e.message,
       helpers: helpers,
       source: source,
       timeout: timeout,
-    }))
+    }, resolve))
     .onAbort((e) => pm({
       error: e.message,
       helpers: helpers,
       source: source,
       timeout: timeout,
-    }))
+    }, resolve))
     .json((json: any) => {
       if (json.length == 0) {
         helpers.next = null;
@@ -1714,7 +1718,7 @@ export const loadGelbooru2 = (allURLs: Map<string, Array<string>>, config: Confi
           helpers: helpers,
           source: source,
           timeout: timeout,
-        });
+        }, resolve);
       }
 
       const images = Array<string>();
@@ -1735,17 +1739,17 @@ export const loadGelbooru2 = (allURLs: Map<string, Array<string>>, config: Confi
         helpers: helpers,
         source: source,
         timeout: timeout,
-      });
+      }, resolve);
     })
     .catch((e) => pm({
       error: e.message,
       helpers: helpers,
       source: source,
       timeout: timeout,
-    }));
+    }, resolve));
 }
 
-export const loadEHentai = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
+export const loadEHentai = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 8000;
   const url = source.url;
   wretch(url + "?p=" + (helpers.next + 1))
@@ -1756,13 +1760,13 @@ export const loadEHentai = (allURLs: Map<string, Array<string>>, config: Config,
       helpers: helpers,
       source: source,
       timeout: timeout,
-    }))
+    }, resolve))
     .notFound((e) => pm({
       error: e.message,
       helpers: helpers,
       source: source,
       timeout: timeout,
-    }))
+    }, resolve))
     .text((html) => {
       let imageEls = domino.createWindow(html).document.querySelectorAll("#gdt > .gdtm > div > a");
       if (imageEls.length > 0) {
@@ -1778,13 +1782,13 @@ export const loadEHentai = (allURLs: Map<string, Array<string>>, config: Config,
               helpers: helpers,
               source: source,
               timeout: timeout,
-            }))
+            }, resolve))
             .notFound((e) => pm({
               error: e.message,
               helpers: helpers,
               source: source,
               timeout: timeout,
-            }))
+            }, resolve))
             .text((html) => {
               imageCount++;
               let contentURL = html.match("<img id=\"img\" src=\"(.*?)\"");
@@ -1801,7 +1805,7 @@ export const loadEHentai = (allURLs: Map<string, Array<string>>, config: Config,
                   helpers: helpers,
                   source: source,
                   timeout: timeout,
-                })
+                }, resolve);
               }
             })
         }
@@ -1814,12 +1818,12 @@ export const loadEHentai = (allURLs: Map<string, Array<string>>, config: Config,
           helpers: helpers,
           source: source,
           timeout: timeout,
-        });
+        }, resolve);
       }
     });
 }
 
-export const loadBDSMlr = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
+export const loadBDSMlr = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 8000;
   let url = source.url;
   if (url.endsWith("/rss")) {
@@ -1835,13 +1839,13 @@ export const loadBDSMlr = (allURLs: Map<string, Array<string>>, config: Config, 
         helpers: helpers,
         source: source,
         timeout: timeout,
-      });
+      }, resolve);
     } else {
       pm({
         helpers: helpers,
         source: source,
         timeout: timeout,
-      });
+      }, resolve);
     }
   }
   wretch(url + "/rss?page=" + (helpers.next + 1))
@@ -1853,7 +1857,7 @@ export const loadBDSMlr = (allURLs: Map<string, Array<string>>, config: Config, 
       helpers: helpers,
       source: source,
       timeout: timeout,
-    }))
+    }, resolve))
     .internalError(retry)
     .text((html) => {
       helpers.retries = 0;
@@ -1880,7 +1884,7 @@ export const loadBDSMlr = (allURLs: Map<string, Array<string>>, config: Config, 
           helpers: helpers,
           source: source,
           timeout: timeout,
-        });
+        }, resolve);
       } else {
         helpers.next = null;
         pm({
@@ -1890,13 +1894,13 @@ export const loadBDSMlr = (allURLs: Map<string, Array<string>>, config: Config, 
           helpers: helpers,
           source: source,
           timeout: timeout,
-        });
+        }, resolve);
       }
     });
 }
 
 let piwigoLoggedIn: boolean = false;
-export const loadPiwigo = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
+export const loadPiwigo = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 8000;
   let url = source.url;
 
@@ -1917,13 +1921,13 @@ export const loadPiwigo = (allURLs: Map<string, Array<string>>, config: Config, 
           helpers: helpers,
           source: source,
           timeout: timeout,
-        }))
+        }, resolve))
         .internalError((e) => pm({
           error: e.message,
           helpers: helpers,
           source: source,
           timeout: timeout,
-        }))
+        }, resolve))
         .json((json) => {
           if (json.stat == "ok") {
             piwigoLoggedIn = true;
@@ -1934,7 +1938,7 @@ export const loadPiwigo = (allURLs: Map<string, Array<string>>, config: Config, 
               helpers: helpers,
               source: source,
               timeout: timeout,
-            });
+            }, resolve);
           }
         })
         .catch((e) => {
@@ -1943,7 +1947,7 @@ export const loadPiwigo = (allURLs: Map<string, Array<string>>, config: Config, 
             helpers: helpers,
             source: source,
             timeout: timeout,
-          })
+          }, resolve);
         });
     }
 
@@ -1957,13 +1961,13 @@ export const loadPiwigo = (allURLs: Map<string, Array<string>>, config: Config, 
           helpers: helpers,
           source: source,
           timeout: timeout,
-        });
+        }, resolve);
       } else {
         pm({
           helpers: helpers,
           source: source,
           timeout: timeout,
-        });
+        }, resolve);
       }
     }
 
@@ -1977,7 +1981,7 @@ export const loadPiwigo = (allURLs: Map<string, Array<string>>, config: Config, 
           helpers: helpers,
           source: source,
           timeout: timeout,
-        }))
+        }, resolve))
         .internalError(retry)
         .json((json) => {
           if (json.stat != "ok") {
@@ -1989,7 +1993,7 @@ export const loadPiwigo = (allURLs: Map<string, Array<string>>, config: Config, 
               helpers: helpers,
               source: source,
               timeout: timeout,
-            });
+            }, resolve);
             return;
           }
 
@@ -2017,7 +2021,7 @@ export const loadPiwigo = (allURLs: Map<string, Array<string>>, config: Config, 
             helpers: helpers,
             source: source,
             timeout: timeout,
-          });
+          }, resolve);
         });
     };
 
@@ -2037,11 +2041,11 @@ export const loadPiwigo = (allURLs: Map<string, Array<string>>, config: Config, 
       helpers: helpers,
       source: source,
       timeout: timeout,
-    });
+    }, resolve);
   }
 }
 
-export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}) => {
+export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 8000;
   const apiKey = config.remoteSettings.hydrusAPIKey;
   const configured = apiKey != "";
@@ -2062,7 +2066,7 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, 
         helpers: helpers,
         source: source,
         timeout: timeout,
-      });
+      }, resolve);
     }
 
     const tagsRegex = /tags=([^&]*)&?.*$/.exec(source.url);
@@ -2081,7 +2085,7 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, 
             helpers: helpers,
             source: source,
             timeout: timeout,
-          })
+          }, resolve);
         })
         .internalError((e) => {
           pm({
@@ -2089,7 +2093,7 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, 
             helpers: helpers,
             source: source,
             timeout: timeout,
-          })
+          }, resolve);
         })
         .json((json) => {
           const fileIDs = json.file_ids;
@@ -2107,7 +2111,7 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, 
           helpers: helpers,
           source: source,
           timeout: timeout,
-        }));
+        }, resolve));
     }
 
     let images = Array<string>();
@@ -2122,7 +2126,7 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, 
             helpers: helpers,
             source: source,
             timeout: timeout,
-          })
+          }, resolve);
         })
         .internalError((e) => {
           pm({
@@ -2130,7 +2134,7 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, 
             helpers: helpers,
             source: source,
             timeout: timeout,
-          })
+          }, resolve);
         })
         .json((json) => {
           for (let metadata of json.metadata) {
@@ -2150,7 +2154,7 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, 
               helpers: helpers,
               source: source,
               timeout: timeout,
-            });
+            }, resolve);
           }
         })
         .catch((e) => pm({
@@ -2158,7 +2162,7 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, 
           helpers: helpers,
           source: source,
           timeout: timeout,
-        }));
+        }, resolve));
     }
 
     search();
@@ -2173,7 +2177,7 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, 
       helpers: helpers,
       source: source,
       timeout: timeout,
-    });
+    }, resolve);
   }
 }
 

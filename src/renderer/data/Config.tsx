@@ -262,6 +262,7 @@ interface DisplaySettingsI {
 interface GeneralSettingsI {
   [key: string]: number | boolean | string;
 
+  prioritizePerformance: boolean;
   portableMode: boolean;
   disableLocalSave: boolean;
   confirmSceneDeletion: boolean;
@@ -574,6 +575,7 @@ export class DisplaySettings  implements DisplaySettingsI {
 export class GeneralSettings  implements GeneralSettingsI {
   [key: string]: number | boolean | string;
 
+  prioritizePerformance = true;
   portableMode = false;
   disableLocalSave = false;
   confirmSceneDeletion = true;
