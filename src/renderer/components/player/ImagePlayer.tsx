@@ -6,7 +6,7 @@ import fs from "fs";
 import gifInfo from 'gif-info';
 
 import {GO, IF, OF, OT, SL, SOF, ST, TF, VO, WF} from '../../data/const';
-import {getCachePath, getRandomListItem, getRandomNumber, toArrayBuffer, urlToPath} from '../../data/utils';
+import {flatten, getCachePath, getRandomListItem, getRandomNumber, toArrayBuffer, urlToPath} from '../../data/utils';
 import {getFileName, getSourceType, isVideo} from "./Scrapers";
 import Config from "../../data/Config";
 import Scene from "../../data/Scene";
@@ -28,8 +28,6 @@ export default class ImagePlayer extends React.Component {
     currentAudio: Audio,
     gridView: boolean,
     advanceHack: ChildCallbackHack,
-    maxInMemory: number,
-    maxLoadingAtOnce: number,
     allURLs: Map<string, Array<string>>,
     isPlaying: boolean,
     historyOffset: number,
@@ -162,7 +160,7 @@ export default class ImagePlayer extends React.Component {
       }
     }
     this._animationFrameHandle = requestAnimationFrame(this.animationFrame);
-    this.startFetchLoops(this.props.maxLoadingAtOnce);
+    this.startFetchLoops(this.props.config.displaySettings.maxLoadingAtOnce);
     this.start();
   }
 
@@ -228,7 +226,7 @@ export default class ImagePlayer extends React.Component {
       this._backForth = setTimeout(this.backForth.bind(this, -1), this.getBackForthTiming());
     }
 
-    if (this._count % this.props.config.displaySettings.maxInMemory == 0) {
+    if (this._count % this.props.config.displaySettings.maxInHistory == 0) {
       //printMemoryReport();
       webFrame.clearCache();
       //setTimeout(printMemoryReport, 1000);
@@ -315,9 +313,12 @@ export default class ImagePlayer extends React.Component {
   }
 
   animationFrame = () => {
-    if (!this._isMounted || (this.props.finishedLoading == 1)) return;
+    if (!this._isMounted || (this.props.finishedLoading == 1)) {
+      cancelAnimationFrame(this._animationFrameHandle);
+      return;
+    }
     let requestAnimation = false;
-    if (this.state.readyToDisplay.length < this.props.maxLoadingAtOnce && this.props.allURLs) {
+    if (this.state.readyToDisplay.length < this.props.config.displaySettings.maxLoadingAtOnce && this.props.allURLs) {
       while (this._runFetchLoopCallRequests.length > 0) {
         requestAnimation = true;
         this.runFetchLoop(this._runFetchLoopCallRequests.shift());
@@ -337,7 +338,7 @@ export default class ImagePlayer extends React.Component {
   runFetchLoop(i: number) {
     if (!this._isMounted) return;
 
-    if (this.state.readyToDisplay.length >= this.props.maxLoadingAtOnce || !this.props.allURLs) {
+    if (this.state.readyToDisplay.length >= this.props.config.displaySettings.maxInMemory || !this.props.allURLs) {
       // Wait for the display loop to use an image
       this._waitTimeouts[i] = setTimeout(() => this.queueRunFetchLoop(i), 100);
       return;
@@ -418,7 +419,7 @@ export default class ImagePlayer extends React.Component {
             return;
           } else {
             // Make sure all the other sources are also extinguished
-            const remainingLibrary = [].concat.apply([], Array.from(this.props.allURLs.values())).filter((u: string) => !this._loadedURLs.includes(u));
+            const remainingLibrary = flatten(Array.from(this.props.allURLs.values())).filter((u: string) => !this._loadedURLs.includes(u));
             // If they are, clear loadedURLs
             if (remainingLibrary.length === 0) {
               this._loadedURLs = new Array<string>();
@@ -456,9 +457,9 @@ export default class ImagePlayer extends React.Component {
     } else { // For image weighted
 
       // Concat all images together
-      const urlKeys = Array.from(this.props.allURLs.keys());
+      const urlKeys = flatten(Array.from(this.props.allURLs.keys()));
       collection = urlKeys;
-      // If there are none, loop again1
+      // If there are none, loop again
       if (!(collection && collection.length)) {
         this.queueRunFetchLoop(i);
         return;
@@ -850,9 +851,9 @@ export default class ImagePlayer extends React.Component {
       if (this.props.scene.nextSceneAllImages && this.props.scene.nextSceneID != 0 && this.props.playNextScene) {
         let remainingLibrary;
         if (this.props.scene.weightFunction == WF.sources) {
-          remainingLibrary = [].concat.apply([], Array.from(this.props.allURLs.values())).filter((u: string) => !this._playedURLs.includes(u));
+          remainingLibrary = flatten(Array.from(this.props.allURLs.values())).filter((u: string) => !this._playedURLs.includes(u));
         } else {
-          remainingLibrary = Array.from(this.props.allURLs.keys()).filter((u: string) => !this._playedURLs.includes(u));
+          remainingLibrary = flatten(Array.from(this.props.allURLs.keys())).filter((u: string) => !this._playedURLs.includes(u));
         }
         if (remainingLibrary.length === 0) {
           this._playedURLs = new Array<string>();
@@ -918,7 +919,7 @@ export default class ImagePlayer extends React.Component {
         nextHistoryPaths = nextHistoryPaths.concat([nextImg]);
       }
 
-      while (nextHistoryPaths.length > this.props.maxInMemory) {
+      while (nextHistoryPaths.length > this.props.config.displaySettings.maxInHistory) {
         nextHistoryPaths.shift();
       }
 
@@ -976,7 +977,7 @@ export default class ImagePlayer extends React.Component {
         timeToNextFrame,
       });
       this._count++;
-      if (!(nextImg instanceof HTMLVideoElement) || this.props.scene.videoOption != VO.full) {
+      if (!(nextImg instanceof HTMLVideoElement && this.props.scene.videoOption == VO.full) && !(this.props.finishedLoading == 1 && this.state.historyPaths.length > 0 && getSourceType(this.state.historyPaths[this.state.historyPaths.length - 1]?.getAttribute("source")) == ST.nimja)) {
         this._timeout = setTimeout(this.advance.bind(this, false, true), timeToNextFrame);
       }
     }

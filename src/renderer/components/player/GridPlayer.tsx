@@ -18,6 +18,7 @@ import Tag from "../../data/Tag";
 import Player from "./Player";
 import ChildCallbackHack from "./ChildCallbackHack";
 import IdleTimer from "react-idle-timer";
+import {flatten} from "../../data/utils";
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -216,7 +217,7 @@ class GridPlayer extends React.Component {
                     if (!scene && !newLoaded[rowIndex][colIndex]) {
                       setTimeout(() => this.setCellLoaded(rowIndex, colIndex), 200);
                     }
-                    const allLoaded = [].concat.apply([], this.state.isLoaded).find((l: boolean) => !l) == null;
+                    const allLoaded = flatten(this.state.isLoaded).find((l: boolean) => !l) == null
                     if (cell.sceneCopy.length > 0) {
                       const sceneCopyGridCell = this.state.sceneCopyGrid[cell.sceneCopy[0]][cell.sceneCopy[1]];
                       return (
@@ -253,7 +254,7 @@ class GridPlayer extends React.Component {
                         </div>
                       );
                     } else {
-                      const loadingIndex = [].concat.apply([], newLoaded).indexOf(false);
+                      const loadingIndex = flatten(newLoaded).indexOf(false);
                       const showProgress = loadingIndex >= 0 && loadingIndex == (rowIndex * row.length) + colIndex;
                       return (
                         <div className={clsx(classes.gridCell, !scene && classes.hidden)} key={colIndex}>
@@ -328,7 +329,7 @@ class GridPlayer extends React.Component {
   setCellLoaded(rowIndex: number, colIndex: number) {
     const newLoaded = this.state.isLoaded;
     newLoaded[rowIndex][colIndex] = true;
-    if (this.props.finishedLoading && [].concat.apply([], newLoaded).find((l: boolean) => !l) == null) {
+    if (this.props.finishedLoading && flatten(newLoaded).find((l: boolean) => !l) == null) {
       this.props.finishedLoading(false);
     }
     this.setState({isLoaded: newLoaded});

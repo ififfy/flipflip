@@ -255,6 +255,7 @@ interface DisplaySettingsI {
   minImageSize: number;
   minVideoSize: number;
   maxInMemory: number;
+  maxInHistory: number;
   maxLoadingAtOnce: number;
 }
 
@@ -565,7 +566,8 @@ export class DisplaySettings  implements DisplaySettingsI {
 
   minVideoSize = 200;
   minImageSize = 200;
-  maxInMemory = 120;
+  maxInMemory = 40;
+  maxInHistory = 120;
   maxLoadingAtOnce = 5;
 }
 

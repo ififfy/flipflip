@@ -7,7 +7,7 @@ import fileURL from "file-url";
 import wretch from "wretch";
 import uuidv4 from "uuid/v4";
 
-import {getCachePath, randomizeList} from "../../data/utils";
+import {flatten, getCachePath, randomizeList} from "../../data/utils";
 import {filterPathsToJustPlayable, getFileName, getSourceType, isVideo, processAllURLs} from "./Scrapers";
 import {IF, SOF, ST} from '../../data/const';
 import Config from "../../data/Config";
@@ -382,8 +382,6 @@ export default class SourceScraper extends React.Component {
             historyOffset={this.props.historyOffset}
             setHistoryOffset={this.props.setHistoryOffset}
             setHistoryPaths={this.props.setHistoryPaths}
-            maxInMemory={this.props.config.displaySettings.maxInMemory}
-            maxLoadingAtOnce={this.props.config.displaySettings.maxLoadingAtOnce}
             advanceHack={this.props.advanceHack}
             deleteHack={this.props.deleteHack}
             strobeLayer={this.props.strobeLayer}
@@ -547,7 +545,7 @@ export default class SourceScraper extends React.Component {
               setTimeout(sourceLoop, timeout);
             }
           } else {
-            const values = [].concat.apply([], Array.from(newAllURLs.values()));
+            const values = flatten(Array.from(newAllURLs.values()));
             this.setState({finishedLoading: values.length});
             this.props.finishedLoading(isEmpty(values));
             promiseLoop();

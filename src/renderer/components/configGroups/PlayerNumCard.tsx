@@ -48,6 +48,20 @@ export default class PlayerNumCard extends React.Component {
           </Tooltip>
         </Grid>
         <Grid item xs={12}>
+          <Tooltip title="The maximum number of images/videos to keep in player history. Reduce this number to reduce memory usage and improve performance.">
+            <TextField
+              label="Max in History"
+              margin="dense"
+              value={this.props.settings.maxInHistory}
+              onChange={this.onIntInput.bind(this, 'maxInHistory')}
+              onBlur={this.blurIntKey.bind(this, 'maxInHistory')}
+              inputProps={{
+                min: 0,
+                type: 'number',
+              }}/>
+          </Tooltip>
+        </Grid>
+        <Grid item xs={12}>
           <Tooltip title="The maximum number of images/videos to queue up for rendering. Reduce this number to reduce memory usage and improve performance.">
             <TextField
               label="Max in Memory"

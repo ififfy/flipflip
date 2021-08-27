@@ -5,6 +5,7 @@ import * as fs from "fs";
 import * as Path from "path";
 import * as easings from 'd3-ease';
 import crypto from "crypto";
+import "core-js/features/array/flat";
 
 import {getFileGroup, getSourceType} from "../components/player/Scrapers";
 import {BT, EA, GO, HTF, IF, IT, OF, OT, SC, SL, SOF, ST, STF, TF, TT, VO, VTF, WF} from "./const";
@@ -19,6 +20,16 @@ import Clip from "./Clip";
 export const saveDir = path.join(remote.app.getPath('appData'), 'flipflip');
 export const savePath = path.join(saveDir, 'data.json');
 export const portablePath = path.join(path.dirname(remote.app.getAppPath()), 'data.json');
+
+export function flatten(array: Array<any>) {
+  let values;
+  try {
+    values = values = [].concat.apply([], array);
+  } catch (e) {
+    values = (array as any).flat(1);
+  }
+  return values;
+}
 
 export function getEaseFunction(ea: string, exp: number, amp: number, per: number, ov: number) {
   switch(ea) {

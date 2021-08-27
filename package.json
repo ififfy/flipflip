@@ -40,6 +40,7 @@
     "@material-ui/styles": "^4.10.0",
     "clsx": "^1.1.0",
     "codemirror": "^5.59.0",
+    "core-js": "^3.16.3",
     "d3-ease": "^2.0.0",
     "electron-default-menu": "^1.0.1",
     "electron-google-analytics": "^0.1.0",
