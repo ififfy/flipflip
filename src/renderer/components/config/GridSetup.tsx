@@ -152,7 +152,18 @@ class GridSetup extends React.Component {
 
   readonly nameInputRef: React.RefObject<HTMLInputElement> = React.createRef();
 
-  _colors = ["#FF0000", "#FFA500", "#FFFF00", "#008000", "#0000FF", "#EE82EE", "#4B0082"]
+  _colors = ["#FF0000",
+    "#FF4500",
+    "#FFA500",
+    "#FFFF00",
+    "#7FFF00",
+    "#008000",
+    "#7FFFD4",
+    "#0000FF",
+    "#EE82EE",
+    "#4B0082",
+    "#800000",
+    "#8B4513"]
 
   render() {
     const classes = this.props.classes;
