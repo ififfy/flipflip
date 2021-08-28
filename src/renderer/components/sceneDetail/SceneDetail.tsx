@@ -986,7 +986,7 @@ class SceneDetail extends React.Component {
             <Tooltip title="Adv Rule"  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addDirectoryButton, this.props.tutorial == SDGT.buttons && clsx(classes.backdropTop, classes.disable))}
-                onClick={this.onAddAdvWG.bind(this)}
+                onClick={this.onAddAdvRule.bind(this)}
                 size="small">
                 <AddCircleOutlineIcon className={classes.icon} />
               </Fab>
@@ -1046,7 +1046,7 @@ class SceneDetail extends React.Component {
                   onlyUsed
                   menuIsOpen
                   controlShouldRenderValue={false}
-                  onUpdateFilters={this.onAddSimpleWG.bind(this)}/>
+                  onUpdateFilters={this.onAddRule.bind(this)}/>
               }
             </Menu>
           </React.Fragment>
@@ -1180,7 +1180,7 @@ class SceneDetail extends React.Component {
     }
   }
 
-  onAddAdvWG() {
+  onAddAdvRule() {
     const wg = new WeightGroup();
     wg.percent = 0;
     wg.type = TT.weight;
@@ -1189,17 +1189,21 @@ class SceneDetail extends React.Component {
     this.changeKey('generatorWeights', generatorWeights);
   }
 
-  onAddSimpleWG(filters: Array<string>) {
+  onAddRule(filters: Array<string>) {
     if (this.props.tutorial == SDGT.buttons) {
       this.props.onTutorial(SDGT.buttons);
       this.onCloseDialog();
     }
-    const search = filters[filters.length - 1];
-    const wg = new WeightGroup();
-    wg.percent = 0;
-    wg.type = TT.weight;
-    wg.search = search;
-    const generatorWeights = this.props.scene.generatorWeights.concat([wg]);
+    let generatorWeights = this.props.scene.generatorWeights
+    for (let search of filters) {
+      if (search.length > 0 && generatorWeights.find((wg) => wg.search == search) == null) {
+        const wg = new WeightGroup();
+        wg.percent = 0;
+        wg.type = TT.weight;
+        wg.search = search;
+        generatorWeights = generatorWeights.concat([wg]);
+      }
+    }
     this.changeKey('generatorWeights', generatorWeights);
   }
 

@@ -302,7 +302,7 @@ class GridSetup extends React.Component {
                           classes={{
                             label: classes.gridCellLabel
                           }}
-                          style={colors[rowIndex][colIndex] == "" ? {} : {borderStyle: 'solid', borderWidth: 10, borderColor: colors[rowIndex][colIndex]}}
+                          style={(colors[rowIndex] == undefined || colors[rowIndex][colIndex] == undefined || colors[rowIndex][colIndex] == "") ? {} : {borderStyle: 'solid', borderWidth: 10, borderColor: colors[rowIndex][colIndex]}}
                           variant="outlined">
                           {scene ? scene.name : sceneCopy ? "*" + sceneCopy.name + "*" : ""}
                           {sceneCopy && (
@@ -361,7 +361,6 @@ class GridSetup extends React.Component {
   }
 
   componentDidUpdate() {
-    // TODO Make sure Grid tutorial works
     if (this.props.tutorial == SGT.dimensions && this.state.width ==2 && this.state.height == 2) {
       this.props.onTutorial(SGT.dimensions);
       const sceneID = this.props.allScenes[0].id;

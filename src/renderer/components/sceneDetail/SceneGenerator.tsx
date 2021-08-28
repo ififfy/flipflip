@@ -440,14 +440,17 @@ class SceneGenerator extends React.Component {
   }
 
   onAddRule(filters: Array<string>) {
-    const search = filters[filters.length - 1];
-    const newWG = new WeightGroup();
-    newWG.percent = 0;
-    newWG.type = TT.weight;
-    newWG.search = search;
-    const generatorWeights = this.props.scene.generatorWeights;
-    const wg = generatorWeights[this.state.isEditing];
-    wg.rules = wg.rules.concat([newWG]);
+    let generatorWeights = this.props.scene.generatorWeights;
+    let wg = generatorWeights[this.state.isEditing];
+    for (let search of filters) {
+      if (search.length > 0 && wg.rules.find((wg) => wg.search == search) == null) {
+        const newWG = new WeightGroup();
+        newWG.percent = 0;
+        newWG.type = TT.weight;
+        newWG.search = search;
+        wg.rules = wg.rules.concat([newWG]);
+      }
+    }
     this.changeGeneratorWeights(generatorWeights);
   }
 
@@ -561,7 +564,7 @@ class SceneGenerator extends React.Component {
       (rule as any)[key] = input.value;
     }
     if (this.props.tutorial == SDGT.edit2) {
-      if (generatorWeights.length == 1 && generatorWeights[0].type == TT.all) {
+      if (generatorWeights.find((wg) => wg.type != TT.all) == null) {
         this.props.onTutorial(SDGT.edit2);
         this.onCloseDialog();
       }

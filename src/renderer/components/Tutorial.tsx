@@ -122,7 +122,7 @@ class Tutorial extends React.Component {
                 Your Scenes are divided into 3 different tabs: <b>Scenes</b>, <b>Scene Generators</b>, and <b>Scene Grids</b>.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
-                From the sidebar, you can also access your Libraries, the Caption Scriptor, and Settings, or open an additional window.
+                From the sidebar, you can also access your Libraries, the Caption Scriptor, and Settings, or open additional windows.
               </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -349,7 +349,7 @@ class Tutorial extends React.Component {
                 <SvgIcon>
                   <path fill="none" d="M0 0h24v24H0z"/>
                   <path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/>
-                </SvgIcon> Source Options (Displays for video/Reddit/Twitter sources)
+                </SvgIcon> Source Options (Displays for Local/Video/Reddit/Twitter sources)
                 <br/>
                 <SvgIcon>
                   <path d="M11 21H7V19H11V21M15.5 19H17V21H13V19H13.2L11.8 12.9L9.3 13.5C9.2 14 9 14.4 8.8
@@ -472,7 +472,7 @@ class Tutorial extends React.Component {
                 This option allows you to automatically rotate between the last 2 images played at a specified interval.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
-                <i>We don't worry about this for now</i>
+                <i>We'll leave this disabled for this tutorial</i>
               </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -736,10 +736,7 @@ class Tutorial extends React.Component {
             <DialogTitle id="tutorial-title">Effects</DialogTitle>
             <DialogContent>
               <DialogContentText id="tutorial-description">
-                This is the effects tab. Here you can toggle and customize effects: <b>zoom/move</b>, <b>cross fade</b> and <b>strobe</b>.
-              </DialogContentText>
-              <DialogContentText id="tutorial-description">
-                There are also two new effects: <b>fade in/out</b> and <b>panning</b>. These effects are still being improved and may produce unexpected results.
+                This is the effects tab. Here you can toggle and customize effects: <b>zoom/move</b>, <b>cross fade</b>, <b>slide</b>, <b>strobe</b>, <b>fade in/out</b>, and <b>panning</b>.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 <i><b>Audio tracks</b> and <b>text overlays</b> are located in the Audio/Text tab.</i>
@@ -1067,10 +1064,11 @@ class Tutorial extends React.Component {
                 <ul>
                   <li><b>manage tags</b></li>
                   <li><b>batch tag sources</b></li>
+                  <li><b>batch clip sources</b></li>
                   <li><b>find mergeable sources</b> (local directories with the same tags)</li>
                   <li><b>import remote sources</b></li>
                   <li><b>mark offline sources</b></li>
-                  <li><b>detect video resolution/duration</b></li>
+                  <li><b>detect video resolution/duration metadata</b></li>
                 </ul>
               </DialogContentText>
               <DialogContentText id="tutorial-description">
@@ -1509,7 +1507,7 @@ class Tutorial extends React.Component {
                 You've made your first <b>Scene Generator</b>!
               </DialogContentText>
               <DialogContentText id="tutorial-description">
-                Here, you can use your <b>tagged sources</b> or <b>types</b> to generate <b>random scenes</b>.
+                Here, you can use your sources' <b>tags</b>, <b>types</b>, or even <b>search terms</b> to generate <b>curated scenes</b>.
               </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -1528,14 +1526,16 @@ class Tutorial extends React.Component {
             <DialogTitle id="tutorial-title">Scene Generator</DialogTitle>
             <DialogContent>
               <DialogContentText id="tutorial-description">
-                In the bottom right, you can change the <b>max number of sources</b> to generate and <b>make new rules</b>.
+                In the bottom right, you can change the <b>max number of sources</b> to generate (default: 100)
+                and <b>make new rules</b>.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 In order to <b>generate a scene</b>, your rules need to <b>add up to <u>100%</u></b>. You'll see
                 the <b>remaining percent</b> above the <b>Generate button</b>
               </DialogContentText>
               <DialogContentText id="tutorial-description">
-                To begin, <b>make a Simple Rule</b>
+                To begin, <b>make a Simple Rule</b>. Click the <b>+</b> button and
+                then <b>enter a search</b> or <b>select a tag/type</b> just like you would in the <b>Library</b>
               </DialogContentText>
             </DialogContent>
           </React.Fragment>;
@@ -1560,14 +1560,14 @@ class Tutorial extends React.Component {
                 Each Simple Rule has 3 options:
               </DialogContentText>
               <DialogContentText id="tutorial-description">
-                <b>Percent</b>: This tag/type should make up N% of the sources
+                <b>Percent</b>: This tag/type/search should make up N% of the sources
                 <br/>
-                <b>Require</b>: All sources need this tag/type
+                <b>Require</b>: All sources need this tag/type/search
                 <br/>
-                <b>Exclude</b>: No source can have this tag/type
+                <b>Exclude</b>: No source can have this tag/type/search
               </DialogContentText>
               <DialogContentText id="tutorial-description">
-                <b>Set this Rule to <u>Require</u></b>
+                <b>Set each Rule to <u>Require</u></b>
               </DialogContentText>
             </DialogContent>
           </React.Fragment>;
@@ -1578,7 +1578,7 @@ class Tutorial extends React.Component {
             <DialogTitle id="tutorial-title">Scene Generator</DialogTitle>
             <DialogContent>
               <DialogContentText id="tutorial-description">
-                Great! Now <b>every source</b> in this Generator will <b>require this tag/type</b>.
+                Great! Now <b>every source</b> in this Generator will <b>require these tags/types/search terms</b>.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 <b>Click the Generate Button!</b>
@@ -1612,14 +1612,14 @@ class Tutorial extends React.Component {
             <DialogTitle id="tutorial-title">Scene Generator (Error)</DialogTitle>
             <DialogContent>
               <DialogContentText id="tutorial-description">
-                <b>Whoops!</b> Looks like you <b>don't have any sources</b> with that <b>tag</b>...You'll need to <b>tag some sources</b> for generators to work.
+                <b>Whoops!</b> Looks like you <b>don't have any sources</b> that fit these <b>rules</b>... You'll need to enter <b>valid rules</b> for generators to work.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
-                In any case, <b>that's it!</b> That's all you need to <b>generate scenes</b>.
-              </DialogContentText>
-              <DialogContentText id="tutorial-description">
-                The more <b>tagged scenes</b> you have in your <b>Library</b>, the better generators will work. If you
+                In any case, <b>that's it!</b> That's all you need to <b>generate scenes</b>. If you
                 need to <b>combine</b> tag rules, you can make an <b>Advanced Rule</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                The more <b>tagged scenes</b> you have in your <b>Library</b>, the better generators will work.
               </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -1685,6 +1685,31 @@ class Tutorial extends React.Component {
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 <i>For the purpose of this tutorial, we've <b>filled the grid</b> already</i>.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.onContinue.bind(this)} color="primary">
+                Continue
+              </Button>
+            </DialogActions>
+          </React.Fragment>;
+        break;
+      case SGT.mirror:
+        dialogBody =
+          <React.Fragment>
+            <DialogTitle id="tutorial-title">Scene Grid</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="tutorial-description">
+                You can also <b>clone</b> your grid cells in <b>other grid cells</b>.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                To clone a grid cell, add the scene, and then <b>drag-n-drop it</b> onto where you want it cloned.
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                Cloned cells will be <b>color coded</b> and will allow you to <b>toggle the mirror effect</b> (horizontal flip).
+              </DialogContentText>
+              <DialogContentText id="tutorial-description">
+                <i>We'll keep things as they are for this tutorial</i>.
               </DialogContentText>
             </DialogContent>
             <DialogActions>
@@ -2146,6 +2171,9 @@ class Tutorial extends React.Component {
             this.setTutorial(SGT.cells);
             return;
           case SGT.cells:
+            this.setTutorial(SGT.mirror);
+            return;
+          case SGT.mirror:
             this.setTutorial(SGT.final);
             return;
           case SGT.final:

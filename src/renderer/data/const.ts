@@ -383,7 +383,8 @@ const SGT = { // Scene Grid Tutorials
   welcome: 'sgt1',
   dimensions: 'sgt2',
   cells: 'sgt3',
-  final: 'sgdt4',
+  mirror: 'sgt4',
+  final: 'sgdt5',
   done: DONE,
 };
 
