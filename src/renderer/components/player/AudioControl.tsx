@@ -108,7 +108,7 @@ class AudioControl extends React.Component {
           <Collapse in={this.props.audioEnabled} className={classes.fullWidth}>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12}>
-                <Grid container spacing={1} alignItems="center" justify="center">
+                <Grid container spacing={1} alignItems="center" justifyContent="center">
                   <Grid item xs={12} sm={12}>
                     <Grid container spacing={1} alignItems="center">
                       <Grid item>

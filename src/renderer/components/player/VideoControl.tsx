@@ -68,7 +68,7 @@ class VideoControl extends React.Component {
   render() {
     const classes = this.props.classes;
     return (
-      <Grid container spacing={1} alignItems="center" justify={this.props.player ? "center" : "flex-start"}>
+      <Grid container spacing={1} alignItems="center" justifyContent={this.props.player ? "center" : "flex-start"}>
         <Grid item xs={this.props.player ? 12 : true} className={classes.timeSlider}>
           <Slider
             min={this.props.clipValue ? this.props.clipValue[0] : 0}

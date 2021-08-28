@@ -74,7 +74,7 @@ class BackupCard extends React.Component {
     const hasBackup = this.state.backups.length > 0;
     return(
       <React.Fragment>
-        <Grid container spacing={2} alignItems="center" justify="center" className={classes.chipGrid}>
+        <Grid container spacing={2} alignItems="center" justifyContent="center" className={classes.chipGrid}>
           <Grid item xs={"auto"} className={classes.buttonGrid}>
             <FormControlLabel
               control={
@@ -102,7 +102,7 @@ class BackupCard extends React.Component {
               }}/>
           </Grid>
         </Grid>
-        <Grid container spacing={2} alignItems="center" justify="center" className={classes.chipGrid}>
+        <Grid container spacing={2} alignItems="center" justifyContent="center" className={classes.chipGrid}>
           <Tooltip title="If enabled, backups will be automatically cleaned up. This algorithm will keep 1 backup for
            each of the configured periods.">
             <Grid item xs={"auto"} className={classes.buttonGrid}>
@@ -169,7 +169,7 @@ class BackupCard extends React.Component {
               }}/>
           </Grid>
         </Grid>
-        <Grid container spacing={2} alignItems="center" justify="center">
+        <Grid container spacing={2} alignItems="center" justifyContent="center">
           <Grid item xs={"auto"} className={classes.buttonGrid}>
             <Button
               variant="contained"
@@ -206,7 +206,7 @@ class BackupCard extends React.Component {
             </Button>
           </Grid>
         </Grid>
-        <Grid container spacing={2} alignItems="center" justify="center" className={classes.chipGrid}>
+        <Grid container spacing={2} alignItems="center" justifyContent="center" className={classes.chipGrid}>
           <Grid item xs={"auto"} className={classes.buttonGrid}>
             <Chip
               label={`Backups: ${hasBackup ? this.state.backups.length : "--"}`}

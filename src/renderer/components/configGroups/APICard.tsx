@@ -121,7 +121,7 @@ class APICard extends React.Component {
       <React.Fragment>
         <Typography align="center" className={classes.title}>API Sign In</Typography>
 
-        <Grid container spacing={2} alignItems="center" justify="center">
+        <Grid container spacing={2} alignItems="center" justifyContent="center">
           <Grid item>
             <Tooltip title={tumblrAuthorized ? "Authorized: Click to Sign Out of Tumblr" : "Unauthorized: Click to Authorize Tumblr"}  placement="top-end">
               <Fab

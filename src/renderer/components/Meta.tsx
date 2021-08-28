@@ -2,7 +2,7 @@ import {remote, ipcRenderer, IpcMessageEvent} from 'electron';
 import * as React from 'react';
 
 import {
-  Box, createMuiTheme, CssBaseline, Dialog, DialogContent, DialogContentText, Slide, Snackbar, SnackbarContent
+  Box, createTheme, CssBaseline, Dialog, DialogContent, DialogContentText, Slide, Snackbar, SnackbarContent
 } from "@material-ui/core";
 import {ThemeProvider} from "@material-ui/styles";
 
@@ -123,7 +123,7 @@ export default class Meta extends React.Component {
     const a = (fn: any, ...args: any[]) => this.applyAction.bind(this, fn, ...args);
     const p = (fn: any) => this.progressAction.bind(this, fn);
 
-    const theme = createMuiTheme(this.state.theme);
+    const theme = createTheme(this.state.theme);
     return (
       <ThemeProvider theme={theme}>
         <ErrorBoundary

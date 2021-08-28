@@ -183,7 +183,7 @@ class PiwigoDialog extends React.Component {
       <Dialog
         open={this.props.open}
         onClose={this.props.onClose.bind(this)}
-        onEntered={this.onDialogEntered.bind(this)}
+        TransitionProps={{onEntered: this.onDialogEntered.bind(this)}}
         fullWidth={true}
         aria-labelledby="url-import-title"
         aria-describedby="url-import-description">

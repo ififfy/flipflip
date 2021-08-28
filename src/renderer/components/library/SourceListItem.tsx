@@ -151,7 +151,7 @@ class SourceListItem extends React.Component {
           <ListItemAvatar>
             <Badge
               invisible={!this.props.source.offline}
-              overlap="circle"
+              overlap="circular"
               anchorOrigin={{
                 vertical: 'top',
                 horizontal: 'left',
