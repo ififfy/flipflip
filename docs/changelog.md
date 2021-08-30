@@ -20,6 +20,7 @@
 - Fix bug with performance when playing single video
 - Fix bug with blurred background not updating while paused
 - Fix bug with holding down right-arrow key during playback
+- Fix bug with recent picture grid
 
 ## 3.1.4 <small>(06/26/2021)</small>
 - Add Piwigo support (abrenoch)

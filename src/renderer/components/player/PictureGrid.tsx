@@ -5,6 +5,7 @@ import Scene from "../../data/Scene";
 
 const styles = (theme: Theme) => createStyles({
   content: {
+    position: 'absolute',
     display: 'flex',
     flexGrow: 1,
     flexDirection: 'column',
@@ -50,15 +51,19 @@ class PictureGrid extends React.Component {
           {grid.map((c, x) =>
             <Grid key={x} xs={12} sm={6} md={4} lg={3} item>
               <Grid container>
-                {c.map((p, y) =>
-                  <Grid key={y} xs={12} item className={classes.image}>
-                    <ImageView
-                      image={p}
-                      fitParent
-                      hasStarted
-                      scene={null}
-                      pictureGrid/>
-                  </Grid>
+                {c.map((p, y) => {
+                    return (
+                      <Grid key={y} xs={12} item className={classes.image}>
+                        <ImageView
+                          image={p}
+                          fitParent
+                          hasStarted
+                          removeChild
+                          scene={null}
+                          pictureGrid/>
+                      </Grid>
+                    );
+                  }
                 )}
               </Grid>
             </Grid>

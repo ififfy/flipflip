@@ -476,7 +476,12 @@ export default class ImageView extends React.Component {
             img.contentWindow.document.getElementById("intro-start").click();
           }
         }
-        el.appendChild(img);
+
+        if (this.props.pictureGrid) {
+          el.appendChild(img.cloneNode());
+        } else {
+          el.appendChild(img);
+        }
       }
       if (this.props.gridCoordinates) {
         for (let element of document.getElementsByClassName("copy-" + this.props.gridCoordinates[0] + "-" + this.props.gridCoordinates[1])) {

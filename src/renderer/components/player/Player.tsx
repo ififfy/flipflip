@@ -101,10 +101,10 @@ export default class Player extends React.Component {
 
   render() {
     const nextScene = this.getScene(this.props.scene.nextSceneID == -1 ? this.props.scene.nextSceneRandomID : this.props.scene.nextSceneID);
-    const showCaptionProgram = (this.state.hasStarted &&
+    const showCaptionProgram = (!this.state.recentPictureGrid && this.state.hasStarted &&
       ((this.props.scene.textEnabled &&
       this.props.scene.scriptPlaylists.length) || this.state.persistText));
-    const showStrobe = this.props.scene.strobe && this.state.hasStarted && this.state.isPlaying &&
+    const showStrobe = !this.state.recentPictureGrid && this.props.scene.strobe && this.state.hasStarted && this.state.isPlaying &&
       (this.props.scene.strobeLayer == SL.top || this.props.scene.strobeLayer == SL.bottom);
 
     let rootStyle: any;
@@ -387,11 +387,6 @@ export default class Player extends React.Component {
           />
         )}
 
-        {this.state.recentPictureGrid && (
-          <PictureGrid
-            pictures={this.state.historyPaths} />
-        )}
-
         <div style={playerStyle}
              ref={this.idleTimerRef}>
           {!this.props.gridView && (
@@ -401,7 +396,11 @@ export default class Player extends React.Component {
               onIdle={this.onIdle.bind(this)}
               timeout={2000} />
           )}
-          {this.props.config.generalSettings.watermark && (
+          {this.state.recentPictureGrid && (
+            <PictureGrid
+              pictures={this.state.historyPaths} />
+          )}
+          {!this.state.recentPictureGrid && this.props.config.generalSettings.watermark && (
             <div style={watermarkStyle}>
               {watermarkText}
             </div>
@@ -414,10 +413,10 @@ export default class Player extends React.Component {
               fitParent
               hasStarted
               removeChild
-              />
+            />
           )}
-          {(this.props.config.displaySettings.audioAlert || this.props.tags) &&
-          (this.props.scene.audioEnabled || this.state.persistAudio) && (
+          {!this.state.recentPictureGrid && (this.props.config.displaySettings.audioAlert || this.props.tags) &&
+            (this.props.scene.audioEnabled || this.state.persistAudio) && (
             <AudioAlert
               audio={this.state.currentAudio}
             />
@@ -428,7 +427,7 @@ export default class Player extends React.Component {
               scene={this.props.scene}
               nextScene={nextScene}
               currentAudio={this.state.currentAudio}
-              opacity={1}
+              opacity={this.state.recentPictureGrid ? 0 : 1}
               gridCoordinates={this.props.gridCoordinates}
               gridView={this.props.gridView}
               isPlaying={this.state.isPlaying}
@@ -452,7 +451,7 @@ export default class Player extends React.Component {
             />
           )}
 
-          {!this.props.scene.audioScene && this.props.scene.overlayEnabled && this.props.scene.overlays.length > 0 &&
+          {!this.state.recentPictureGrid && !this.props.scene.audioScene && this.props.scene.overlayEnabled && this.props.scene.overlays.length > 0 &&
            !this.state.isEmpty && this.props.scene.overlays.map((overlay, index) => {
               let showProgress = this.state.isMainLoaded && !this.state.hasStarted;
               if (showProgress) {
