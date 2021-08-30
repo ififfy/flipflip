@@ -2,7 +2,7 @@
 The **EFFECTS** tab controls the various image effects: **Zoom/Move**, **Cross Fade**, **Strobe**, **Fade In/Out**, 
 and **Panning**.
 
-![](doc_images/scene_detail_effects.png)
+<img src="doc_images/scene_detail_effects.png" alt="FlipFlip" width="50%" style="min-width: 483px">
 
 FlipFlip effects all share the same types of timings (in ms):
 * **Constant**: Occurs at a set interval
@@ -27,29 +27,46 @@ This section controls image movement. This effect restarts when the displayed im
 
 <div style="display:flex">
     <div>
-        <div><img src="doc_images/zoom_ex.gif" alt="Zoom Example" style="min-height:388px"></div>
+        <div><img src="doc_images/zoom_ex.gif" alt="Zoom Example" style="height:388px"></div>
         <div>Using the default Linear easing</div>
     </div>
     <div>
-        <div><img src="doc_images/zoom_ex2.gif" alt="Zoom Example" style="min-height:388px"></div>
+        <div><img src="doc_images/zoom_ex2.gif" alt="Zoom Example" style="height:388px"></div>
         <div>Using the <b>Back Out</b> easing</div>
     </div>
 </div>
 
-## Crossfade
+## Cross-fade
 This section controls fade effects.  This effect restarts when the displayed image changes.
 * Choose whether to cross-fade images/video.
 * Choose whether to cross-fade audio when cross-fading video.
-* Control cross fade timing options.
+* Control cross-fade timing options.
 
 <div style="display:flex">
     <div>
-        <div><img src="doc_images/fade_ex.gif" alt="Fade Example" style="min-height:388px"></div>
+        <div><img src="doc_images/fade_ex.gif" alt="Fade Example" style="height:388px"></div>
         <div>Using the default Linear easing</div>
     </div>
     <div>
-        <div><img src="doc_images/fade_ex2.gif" alt="Fade Example" style="min-height:388px"></div>
+        <div><img src="doc_images/fade_ex2.gif" alt="Fade Example" style="height:388px"></div>
         <div>Using the <b>Exp In</b> easing</div>
+    </div>
+</div>
+
+## Slide
+This section controls the slide effect.  This effect restarts when the displayed image changes.
+* Choose slide on/off. Control slide time (ms).
+* Control slide direction and distance
+
+
+<div style="display:flex">
+    <div>
+        <div><img src="doc_images/slide_ex.gif" alt="Strobe Example" style="height:388px"></div>
+        <div>Using the default Linear easing</div>
+    </div>
+    <div>
+        <div><img src="doc_images/slide_ex2.gif" alt="Strobe Example" style="height:388px"></div>
+        <div>Using the <b>Back In/Out</b> easing</div>
     </div>
 </div>
 
@@ -63,11 +80,11 @@ This section controls the strobe effect.  This effect restarts when the displaye
 
 <div style="display:flex">
     <div>
-        <div><img src="doc_images/strobe_ex.gif" alt="Strobe Example" style="min-height:388px"></div>
+        <div><img src="doc_images/strobe_ex.gif" alt="Strobe Example" style="height:388px"></div>
         <div>Using the default Linear easing</div>
     </div>
     <div>
-        <div><img src="doc_images/strobe_ex2.gif" alt="Strobe Example" style="min-height:388px"></div>
+        <div><img src="doc_images/strobe_ex2.gif" alt="Strobe Example" style="height:388px"></div>
         <div>Using the <b>Exp In</b> easing</div>
     </div>
 </div>
@@ -80,11 +97,11 @@ changes.
 
 <div style="display:flex">
     <div>
-        <div><img src="doc_images/fadeio_ex.gif" alt="Fade In/Out Example" style="min-height:388px"></div>
+        <div><img src="doc_images/fadeio_ex.gif" alt="Fade In/Out Example" style="height:388px"></div>
         <div>Using the default Linear easing for both start and end</div>
     </div>
     <div>
-        <div><img src="doc_images/fadeio_ex2.gif" alt="Fade In/Out Example" style="min-height:388px"></div>
+        <div><img src="doc_images/fadeio_ex2.gif" alt="Fade In/Out Example" style="height:388px"></div>
         <div>Using the <b>Poly In</b> easing for both start and end</div>
     </div>
 </div>
@@ -101,11 +118,11 @@ changes.
 
 <div style="display:flex">
     <div>
-        <div><img src="doc_images/panning_ex.gif" alt="Panning Example" style="min-height:388px"></div>
+        <div><img src="doc_images/panning_ex.gif" alt="Panning Example" style="height:388px"></div>
         <div>Using the default Linear easing for both start and end</div>
     </div>
     <div>
-        <div><img src="doc_images/panning_ex2.gif" alt="Panning Example" style="min-height:388px"></div>
+        <div><img src="doc_images/panning_ex2.gif" alt="Panning Example" style="height:388px"></div>
         <div>Using the <b>Linear</b> easing for start and the <b>Bounce Out</b> easing for end</div>
     </div>
 </div>

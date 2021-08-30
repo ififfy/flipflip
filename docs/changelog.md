@@ -1,4 +1,26 @@
 # Changelog
+## 3.2.0 <small>(09/01/2021)</small>
+- Organize Scenes into groups
+- Add Nimja Spiral support
+- Add ability to clone/mirror Scene Grid cells
+- Add Slide effect
+- Add scene effect import/export
+- Add ability to import scene from URL
+- Allow use of Next Scene with grid scenes
+- Add video playback controls to grid view
+- Add ability to batch clip library sources
+- Add ability to batch delete library sources
+- Add ability to use search terms with scene generators
+- Add OR rules to scene generators
+- Add ability to change video speed during playback
+- Add option to prioritize either performance or loading times
+- Fix bug with consecutive clips from the same source
+- Fix bug with circular progress indicator
+- Fix bug with timestamp precision
+- Fix bug with performance when playing single video
+- Fix bug with blurred background not updating while paused
+- Fix bug with holding down right-arrow key during playback
+
 ## 3.1.4 <small>(06/26/2021)</small>
 - Add Piwigo support (abrenoch)
 - Add <Unclipped> filter

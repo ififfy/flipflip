@@ -18,7 +18,7 @@ the displayed sources have that tag/type.
   * `<Untagged>` shows only sources which have no tags.
 * Type any term and press "Enter" or "Search for ___" to search. This is not case-sensitive.
 * Type a phrase surrounded by `"` and `"` to search that exact phrase.
-  * By default -- without this option, FlipFlip splits separate words into separate search terms. 
+  * By default -- without this option, FlipFlip splits separate words into separate search terms.
 * Type a tag surrounded by `[` and `]` to search by tag.
 * Type a type surrounded by `{`` and `}` to search by type.
 * Type `-` and then any term or filter to _exclude_ those sources.
@@ -28,10 +28,10 @@ the displayed sources have that tag/type.
 * Type `duration>TIMESTAMP`, `duration>TIMESTAMP` or `duration=TIMESTAMP` to query based on video durations. (Replace
   `TIMESTAMP` with a valid timestamp or simply the number of seconds).
   * This only applies to video sources which have had their metadata detected.
-* Type `resolution>RESOLUTION`, `resolution>RESOLUTION` or `resolution=RESOLUTION` to query based on video resolutions. 
+* Type `resolution>RESOLUTION`, `resolution>RESOLUTION` or `resolution=RESOLUTION` to query based on video resolutions.
   (Replace `RESOLUTION` with a number).
   * This only applies to video sources which have had their metadata detected.
-  
+
 ## Marking Sources
 Users may wish to visually highlight certain items. To do this, search/filter the displayed sources until they are 
 the ones you wish to highlight, and then press **Alt+M**. These sources will be colored differently and will remain that 
@@ -80,3 +80,7 @@ the source's avatar icon. You will be prompted to confirm this choice, after whi
 on your system will be deleted.
 
 ?> **Note**: This can only be done for local sources (directories or videos)
+
+You can also **Shift+Ctrl+Alt+Click** the `Delete All Sources` ( 
+<img style="vertical-align: -5px" src="doc_icons/delete_swipe.svg" alt="Video Metadata" width="20" height="20"> ) 
+button to batch delete sources. This will _permanently delete_ files for any of the visible sources.

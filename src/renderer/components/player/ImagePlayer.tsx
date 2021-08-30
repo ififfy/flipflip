@@ -694,6 +694,7 @@ export default class ImagePlayer extends React.Component {
       }
 
       video.src = url;
+      video.volume = 0;
       video.preload = "auto";
 
       clearTimeout(this._imgLoadTimeouts[i]);

@@ -353,9 +353,10 @@ const styles = (theme: Theme) => createStyles({
   groupTitle: {
     lineHeight: '45px',
     minWidth: '20px',
+    color: theme.palette.text.primary,
   },
   titleInput: {
-    color: theme.palette.primary.contrastText,
+    color: theme.palette.text.primary,
     fontSize: theme.typography.h6.fontSize,
   },
   groupHandle: {

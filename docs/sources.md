@@ -4,7 +4,7 @@ this Scene. FlipFlip supports sources from (1) Local Directories, (2) A text doc
 image/video URLs, (3) a single video file URL, (4) a single playlsit file URL, or (5) one of the 
 [currently supported remote sources](#currently-supported-remote-sources).
 
-![](doc_images/scene_detail_sources.png)
+<img src="doc_images/scene_detail_sources.png" alt="FlipFlip" width="50%" style="min-width: 483px">
 
 * Sources can be ordered Alphabetically (either their full URL or their parsed name), by Date Added, by Count, or by Type.
 * Sources can also be manually ordered by drag'n'dropping them.
@@ -58,9 +58,10 @@ Click `+` and choose one of the following options:
 * To see additional options for a source click the <img style="vertical-align: -5px" src="doc_icons/build.svg" 
 alt="Options" width="20" height="20">
   * This will only show up for certain types of sources:
-    * _**Video** - specify a subtitle file_
-    * _**Reddit** - specify feed for subreddits (i.e. "Hot", "Top", "New", etc.)_
-    * _**Twitter** - include/exclude retweets and replies_
+  * _**Local** - toggle whether to treat inner directories as if they were their own sources_
+  * _**Video** - specify a subtitle file_
+  * _**Reddit** - specify feed for subreddits (i.e. "Hot", "Top", "New", etc.)_
+  * _**Twitter** - include/exclude retweets and replies_
 * To edit the blacklist for a source, click the <img style="vertical-align: -5px" src="doc_icons/blacklist.svg" 
 alt="Blacklist" width="20" height="20">
   * _This will only appear for sources which have a blacklist._
@@ -111,6 +112,7 @@ local video/playlist file, add a `Local video/playlsit` and choose the video(s) 
 * <img style="vertical-align: -2px; margin-right: 5px" src="doc_icons/hydrus.svg" alt="Hydrus" width="15" height="15">Hydrus Tag
 * <img style="vertical-align: -2px; margin-right: 5px" src="doc_icons/piwigo.svg" alt="Piwigo" width="15" height="15">Piwigo Album
 * <img style="vertical-align: -2px; margin-right: 5px" src="doc_icons/b.svg" alt="BDSMlr" width="15" height="15">BDSMlr Blog (Only works for blogs with images in RSS feed)
+* <img style="vertical-align: -2px; margin-right: 5px" src="doc_icons/nimja.svg" alt="Nimja" width="15" height="15">Nimja Spiral
 * ~~<img style="vertical-align: -2px" src="doc_icons/sexcom.svg" alt="Sex.com" width="15" height="15"> Sex.com Gallery/User~~ _Currently broken_
 
 #### Gooninator import

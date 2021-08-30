@@ -2773,12 +2773,9 @@ export function exportLibrary(state: State): Object {
   return {};
 }
 
-export function importLibrary(state: State, backup: Function): Object {
-  const filePath = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
-    {filters: [{name:'All Files (*.*)', extensions: ['*']},{name: 'JSON Document', extensions: ['json']}], properties: ['openFile']});
-  if (!filePath || !filePath.length) return;
+export function importLibrary(state: State, backup: Function, libraryImport: any): Object {
+  if (!libraryImport || !libraryImport.length) return;
   backup();
-  const libraryImport = JSON.parse(fs.readFileSync(filePath[0], 'utf-8'));
   const newLibrary = Array.from(state.library);
   const newTags = Array.from(state.tags);
   const myLibrary = newLibrary.map((s) => s.url);

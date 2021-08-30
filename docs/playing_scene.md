@@ -16,7 +16,7 @@ click `Start Now` when it appears. You can also configure all scenes to start im
 All scene options (except the image filter) can also be changed while playing a slideshow by hovering over the sidebar 
 on the left. This is also where you will find video/audio playback controls.
 
-![](doc_images/player_options.png)
+<img src="doc_images/player_options.png" alt="FlipFlip" width="50%" style="min-width: 483px">
 
 ## Image info
 While a Scene is playing, you can right click on an image to get more information about it.
@@ -45,7 +45,7 @@ To open additional windows for playing scenes, click the `New Window` button (
 You will be warned that any changes made in this new window will not be saved. Extra windows hide access to the
 Library, Preferences, and to adding new scenes. Click a Scene and edit/start as you would usually.
 
-![](doc_images/new_window.png)
+<img src="doc_images/new_window.png" alt="FlipFlip" width="50%" style="min-width: 483px">
 
 ## Player Hotkeys
 A number of hotkeys are available for quickly performing user actions. These functions are also available in the menu.

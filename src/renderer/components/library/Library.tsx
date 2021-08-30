@@ -1,15 +1,17 @@
 import * as React from "react";
 import clsx from "clsx";
-import {readdir, unlinkSync} from "fs";
+import {readdir, readFileSync, unlinkSync} from "fs";
 import rimraf from "rimraf";
 import {move} from "fs-extra";
 import path from "path";
+import {remote} from "electron";
+import wretch from "wretch";
 
 import {
   AppBar, Backdrop, Badge, Button, Chip, Collapse, Container, createStyles, Dialog, DialogActions, DialogContent,
-  DialogContentText, DialogTitle, Divider, Drawer, Fab, IconButton, LinearProgress, ListItem, ListItemIcon,
-  ListItemSecondaryAction, ListItemText, ListSubheader, Menu, MenuItem, SvgIcon, Theme, Toolbar, Tooltip, Typography,
-  withStyles
+  DialogContentText, DialogTitle, Divider, Drawer, Fab, IconButton, InputAdornment, LinearProgress, ListItem,
+  ListItemIcon, ListItemSecondaryAction, ListItemText, ListSubheader, Menu, MenuItem, SvgIcon, TextField, Theme,
+  Toolbar, Tooltip, Typography, withStyles
 } from "@material-ui/core";
 
 import AddIcon from '@material-ui/icons/Add';
@@ -321,7 +323,7 @@ class Library extends React.Component {
     onEditBlacklist(sourceURL: string, blacklist: string): void,
     onExportLibrary(): void,
     onImportFromLibrary(sources: Array<LibrarySource>): void,
-    onImportLibrary(): void,
+    onImportLibrary(importLibrary: any): void,
     onImportInstagram(): void,
     onImportReddit(): void,
     onImportTumblr(): void,
@@ -347,6 +349,7 @@ class Library extends React.Component {
     menuAnchorEl: null as any,
     openMenu: null as string,
     moveDialog: false,
+    importFile: "",
   };
 
   render() {
@@ -617,7 +620,7 @@ class Library extends React.Component {
               </ListItem>
             </Tooltip>
             <Tooltip title={this.state.drawerOpen ? "" : "Import Library"}>
-              <ListItem button onClick={this.props.onImportLibrary.bind(this)}>
+              <ListItem button onClick={this.onImportLibrary.bind(this)}>
                 <ListItemIcon>
                   <GetAppIcon />
                 </ListItemIcon>
@@ -725,6 +728,47 @@ class Library extends React.Component {
                 </Fab>
               </Tooltip>
             )}
+            <Dialog
+              open={this.state.openMenu == MO.libraryImport}
+              onClose={this.onCloseDialog.bind(this)}
+              aria-labelledby="import-title"
+              aria-describedby="import-description">
+              <DialogTitle id="import-title">Import Library</DialogTitle>
+              <DialogContent>
+                <DialogContentText id="import-description">
+                  To import a library, enter the URL or open a local file.
+                </DialogContentText>
+                <TextField
+                  label="Import File"
+                  fullWidth
+                  placeholder="Paste URL Here"
+                  margin="dense"
+                  value={this.state.importFile}
+                  InputProps={{
+                    endAdornment:
+                      <InputAdornment position="end">
+                        <Tooltip title="Open File">
+                          <IconButton
+                            onClick={this.onOpenImportFile.bind(this)}>
+                            <FolderIcon/>
+                          </IconButton>
+                        </Tooltip>
+                      </InputAdornment>,
+                  }}
+                  onChange={this.onChangeImportFile.bind(this)}
+                />
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={this.onCloseDialog.bind(this)} color="default">
+                  Cancel
+                </Button>
+                <Button color="primary"
+                        disabled={this.state.importFile.length == 0}
+                        onClick={this.onFinishImportLibrary.bind(this, this.state.importFile)}>
+                  Import
+                </Button>
+              </DialogActions>
+            </Dialog>
             <Dialog
               open={this.state.openMenu == MO.removeAllAlert}
               onClose={this.onCloseDialog.bind(this)}
@@ -1000,7 +1044,7 @@ class Library extends React.Component {
   }
 
   componentDidUpdate(props: any, state: any) {
-    if (state.filters != this.state.filters || props.library != this.props.library) {
+    if (state.filters != this.state.filters || props.library != this.props.library || props.specialMode != this.props.specialMode) {
       this.setState({displaySources: this.getDisplaySources()});
     }
     if (this.props.tutorial == LT.final && this.state.drawerOpen) {
@@ -1191,7 +1235,7 @@ class Library extends React.Component {
   }
 
   onCloseDialog() {
-    this.setState({menuAnchorEl: null, openMenu: null, drawerOpen: false});
+    this.setState({menuAnchorEl: null, openMenu: null, drawerOpen: false, importFile: ""});
   }
 
   onRemoveAll(e: MouseEvent) {
@@ -1254,6 +1298,45 @@ class Library extends React.Component {
     });
     this.onCloseDialog();
     this.setState({filters: []});
+  }
+
+  onOpenImportFile() {
+    const filePath = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+      {filters: [{name:'All Files (*.*)', extensions: ['*']},{name: 'JSON Document', extensions: ['json']}], properties: ['openFile']});
+    if (!filePath || !filePath.length) return;
+    this.setState({importFile: filePath[0]});
+  }
+
+  onChangeImportFile(e: MouseEvent) {
+    const input = (e.target as HTMLInputElement);
+    this.setState({importFile: input.value});
+  }
+
+  onImportLibrary() {
+    this.setState({openMenu: MO.libraryImport});
+  }
+
+  onFinishImportLibrary() {
+    if (this.state.importFile.startsWith("http")) {
+      wretch(this.state.importFile)
+        .get()
+        .text((text) => {
+          let json;
+          try {
+            json = JSON.parse(text);
+            this.props.onImportLibrary(json);
+            this.onCloseDialog();
+          } catch (e) {
+            this.props.systemMessage("This is not a valid JSON file");
+          }
+        })
+        .catch((e) => {
+          this.props.systemMessage("Error accessing URL");
+        });
+    } else {
+      this.props.onImportLibrary(JSON.parse(readFileSync(this.state.importFile, 'utf-8')));
+      this.onCloseDialog();
+    }
   }
 
   onImportFromLibrary() {
@@ -1407,6 +1490,9 @@ class Library extends React.Component {
       }
     } else {
       displaySources = this.props.library;
+    }
+    if (this.props.specialMode == SP.batchClip) {
+      displaySources = displaySources.filter((s) => getSourceType(s.url) == ST.video);
     }
     return displaySources;
   }

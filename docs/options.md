@@ -102,6 +102,7 @@ This setting overrides Scene timing specifically for animated GIFs.
 * **No Change** 
 * **Play Part (Constant)** - Play GIFs for a certain length
 * **Play Part (Random)** - Play GIFs for a random length (between min and max)
+* **Play At Least** - Play GIFs for at least this length of time (will play full loops until time period has passed)
 * **Play Full**
 
 #### Video Options
@@ -109,6 +110,7 @@ This setting overrides Scene timing specifically for videos.
 * **No Change** 
 * **Play Part (Constant)** - Play videos for a certain length
 * **Play Part (Random)** - Play videos for a random length (between min and max)
+* **Play At Least** - Play videos for at least this length of time (will play full loops until time period has passed)
 * **Play Full**
 
 Videos also have a number of other settings:
@@ -124,12 +126,12 @@ Videos also have a number of other settings:
 This setting controls how the images are weighted.
 * **By source** - each source will be used an even amount (regardless of number of pictures).
 * **By image** - each image will be used an even amount (regardless of source).
-  
+
 #### Source Ordering
 This setting controls the order sources will be used.
 * **Ordered**
-* **Randomized**  
-  
+* **Randomized**
+
 #### Image Ordering
 This setting controls the order images will appear.
 * **Strictly Ordered**

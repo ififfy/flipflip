@@ -531,7 +531,7 @@ export default class ImageView extends React.Component {
             if (this.props.removeChild && element.hasChildNodes() && bg.hasChildNodes()) {
               element.removeChild(element.children.item(0));
             }
-            if (img instanceof HTMLVideoElement) {
+            if (img instanceof HTMLVideoElement || bgImg instanceof HTMLCanvasElement) {
               const canvas = document.createElement("canvas");
               canvas.className = "canvas-bg-" + this.props.gridCoordinates[0] + "-" + this.props.gridCoordinates[1];
               canvas.width = bgImg.width;
@@ -550,7 +550,15 @@ export default class ImageView extends React.Component {
       } else {
         appendOriginalBG();
       }
+
+      if (this.props.gridCoordinates && type == null) {
+        for (let canvas of document.getElementsByClassName("canvas-bg-" + this.props.gridCoordinates[0] + "-" + this.props.gridCoordinates[1])) {
+          const context: any = (canvas as HTMLCanvasElement).getContext('2d');
+          context.drawImage(img, 0, 0, parentWidth, parentHeight)
+        }
+      }
     }
+
 
     if (this.props.onLoaded) {
       this.props.onLoaded();
@@ -630,6 +638,12 @@ export default class ImageView extends React.Component {
         filter: 'blur(' + this.props.scene.backgroundBlur + 'px)',
       };
     }
+    if (this.props.scene.slide) {
+      backgroundStyle = {
+        ...backgroundStyle,
+        overflow: 'hidden',
+      }
+    }
     let viewDiv;
     const imageClassName = this.props.gridCoordinates ? "copy-" + this.props.gridCoordinates[0] + "-" + this.props.gridCoordinates[1]: undefined;
     const backgroundClassName = !this.props.pictureGrid && this.props.scene.backgroundType == BT.blur && this.props.gridCoordinates ? "copy-bg-" + this.props.gridCoordinates[0] + "-" + this.props.gridCoordinates[1]: undefined;
@@ -654,7 +668,8 @@ export default class ImageView extends React.Component {
         style={{
           height: '100%',
           width: '100%',
-          zIndex: 1,
+          zIndex: -1,
+          position: 'absolute',
           backgroundSize: 'cover',
           ...backgroundStyle
         }}/>;

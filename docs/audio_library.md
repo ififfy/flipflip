@@ -20,15 +20,15 @@ the displayed tracks have that tag.
 * Type any term and press "Enter" or "Search for ___" to search. This is not case-sensitive.
   * Default audio search includes **url**, **name**, **artist**, and  **album** metadata.
 * Type a phrase surrounded by `"` and `"` to search that exact phrase.
-  * By default -- without this option, FlipFlip splits separate words into separate search terms. 
+  * By default -- without this option, FlipFlip splits separate words into separate search terms.
 * Type a tag surrounded by `[` and `]` to search by tag.
 * Type `artist:` and then any term to search only the  **artist** field.
 * Type `album:` and then any term to search only the  **album** field.
 * Type `comment:` and then any term to search only the  **comment** field.
 * Type `-` and then any term or filter to _exclude_ those tracks.
-* Type `count>NUM`, `count<NUM`, or `count=NUM` to query based on the number of times a track has been played. 
+* Type `count>NUM`, `count<NUM`, or `count=NUM` to query based on the number of times a track has been played.
 (Replace "NUM" with a number).
-  
+
 ## Marking Sources
 Users may wish to visually highlight certain items. To do this, search/filter the displayed tracks until they are 
 the ones you wish to highlight, and then press **Alt+M**. These tracks will be marked with a dot in the top-left, and 

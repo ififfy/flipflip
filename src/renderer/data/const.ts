@@ -201,6 +201,7 @@ const MO = { // Menu/Modal Constants
   newPlaylist: 'mo.newplaylist',
   playlistDuplicates: 'mo.playlistduplicates',
   urlImport: 'mo.urlimport',
+  libraryImport: 'mo.libraryImport',
   newWindowAlert: 'mo.nwalert',
   removeAllAlert: 'mo.raalert',
   deleteAlert: 'mo.dalert',

@@ -28,15 +28,15 @@ Let's create a simple scene to get you familiar with how things will work.
   * You can read more about effects [here](effects.md).
 * Click the `Play` button ( <img style="vertical-align: -5px" src="doc_icons/play.svg" alt="Edit" width="20" height="20"> )
 
-![](doc_images/scene_detail_sources.png)
+<img src="doc_images/scene_detail_sources.png" alt="FlipFlip" width="50%" style="min-width: 483px">
 
 ## Your first slideshow
 Great! Now your sources have loaded and the slideshow has started!
 
 Video/Audio controls and all scene options (except the image filter) can also be accessed by hovering 
 over the sidebar on the left while the slideshow is playing.
-                                                      
-![](doc_images/player_options.png) 
+
+<img src="doc_images/player_options.png" alt="FlipFlip" width="50%" style="min-width: 483px">
 
 ## Navigating image history
 Use the arrow keys (← / →) to navigate through playback history. Use `Space` to pause/resume playback. 

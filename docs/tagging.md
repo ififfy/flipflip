@@ -27,10 +27,10 @@ While Tagging, use `[` and `]` to jump to Tagging the previous/next visible sour
 
 ## Batch Tagging
 To begin batch tagging, click the `Batch Tag` button ( <img style="vertical-align: -5px" 
-src="doc_icons/batch.svg" alt="Batch Tag" width="20" height="20"> ) in the sidebar. This will provide a checkbox 
+src="doc_icons/batch.svg" alt="Batch Tag" width="20" height="20"> ) in the Library sidebar. This will provide a checkbox 
 next to each visible source. Select the sources you would like to batch tag and click the `Tag` button 
-( <img style="vertical-align: -5px" src="doc_icons/tag.svg" alt="Manage Tags" width="20" height="20"> ). You 
-will be presented with a pop-up and a number of options.
+( <img style="vertical-align: -5px" src="doc_icons/tag.svg" alt="Manage Tags" width="20" height="20"> ) in the bottom 
+right. You will be presented with a pop-up and a number of options.
 
 * Select tags and click `Overwrite` to force each selected scene to match those tags
 * Select tags and click `- Remove` to remove those tags from each selected scene.

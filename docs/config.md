@@ -26,7 +26,12 @@ These settings control various player options.
 * `Show Adv Easing Controls` - enables controls for advanced [easings](effects.md) in effects
 * `Show Audio Info` - when enabled, [audio information](audio_tagging#tagging-a-track) will appear during playback when a track changes.
   * _This only ever applies to the first playlist_
+* `Clone Grid Videos Directly` - when enabled, cloned grid cells will use a copy of the actual video file, instead of a
+canvas. This may improve video framerate, but will remove absolute synchronization.
 ---
+* `Prioritize Performance/Loading`
+  * `Prioritize Performance` - This mode will prioritize smooth playback, while taking a longer time to load
+  * `Prioritize Loading` - This mode will prioritize loading times, but may cause stuttering during playback.
 * `Confirm Scene Delete` - Disabling this will hide the confirmation dialog when deleting a Scene.
 * `Portable Mode` - Portable Mode will save a copy of your data in the same directory as the FlipFlip executable, 
 as well as the default save path. This needs to be enabled on each machine.
@@ -35,7 +40,8 @@ as well as the default save path. This needs to be enabled on each machine.
 ---
 * `Min Image/Video Size` - the minimum number of pixels each dimension of an image/video must be 
 (default: 200 - image's width _and_ height must be larger than 200px).
-* `Max in Memory` - the maximum number of images to keep in history (navigating backwards and forwards).
+* `Max in History` - the maximum number of images to keep in history (navigating backwards and forwards). 
+* `Max in Memory` - the maximum number of images to queue up for rendering. 
   * Images in memory/history are cleared when the slideshow is stopped.
 * `Max Loading at Once` - the number of threads to have loading images.
   * _Be cautious increasing this number as this will increase processing and may degrade performance._
@@ -105,7 +111,7 @@ on your computer and is never shared with anyone or sent to any server (besides 
 * You should see a Success! message
 
 ### Hydrus
-In order to use a Hydrus server for sources, you'll need to provide the serve details. This includes protocol 
+In order to use a Hydrus server for sources, you'll need to provide the server details. This includes protocol 
 (`http` vs `https`), domain, port, and API Key.
 
 ?> You can only have **one Hydrus server** configured at a time.
@@ -118,6 +124,22 @@ on your computer and is never shared with anyone or sent to any server (besides 
 * Click `Configure Hydrus`
 * You should see a Success! message
   * If you see an error message, FlipFlip was not able to establish connection to the server.
+
+### Piwigo
+In order to use a Piwigo server for sources, you'll need to provide the server details. This includes protocol
+(`http` vs `https`), host, username, and password
+
+?> You can only have **one Piwigo server** configured at a time.
+
+FlipFlip does not store any user information or make changes to the server. Server information is stored locally
+on your computer and is never shared with anyone or sent to any server (besides Piwigo, obviously).
+
+* Click the `Piwigo` icon
+* Enter the server's protocol and hostname.
+* Enter your username and password
+* Click `Configure Piwigo`
+* You should see a Success! message
+  * If you see an error message, FlipFlip was not able to establish connection to the server or was unable to authenticate your user.
 
 ## Backup
 Backup your FlipFlip data or restore from a previous backup.

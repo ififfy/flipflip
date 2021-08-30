@@ -20,9 +20,9 @@
 ## Features
 * Local files as well as Tumblr, Reddit, Twitter, Instagram, Imgur, DeviantArt, Booru & More
 * Animated GIF and video support
-* Grid view
+* Grid view with cloneable grid cells
 * Multiple windows
-* Visual effects (fade, zoom/transition, strobe/pulse, overlay)
+* Visual effects (zoom/transition, cross-fade, slide, strobe/pulse, fade in/out, panning, overlay)
 * Randomized and ordered playback
 * Timing control
 * Caption scripting support

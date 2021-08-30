@@ -35,5 +35,22 @@ of this clip to the current volume. Right click to reset the volume.
 While Clipping use Space to play/pause and use ← → to jump back/foward in 10sec intervals. Use `[` and `]` to jump to 
 Clipping the previous/next visible video in the Library.  
 
-?> Note: If clips don't seem to be working, ensure that "Use Clips" is enabled for your scene (otherwise, 
+?> Note: If clips don't seem to be working during playback, ensure that "Use Clips" is enabled for your scene (otherwise, 
 it will play from the entire video). 
+
+## Batch Clipping
+To begin batch clipping, click the `Batch Clip` button ( <img style="vertical-align: -5px"
+src="doc_icons/clip.svg" alt="Batch Clip" width="20" height="20"> ) in the Library sidebar. This will provide a checkbox
+next to each visible source. Select the sources you would like to batch tag and click the `Clip` button
+( <img style="vertical-align: -5px" src="doc_icons/clip.svg" alt="Manage Tags" width="20" height="20"> ) in the bottom 
+right. You will be presented with a pop-up.
+
+* Enter values for `Skip First` and `Skip Last`
+  * `Skip First` is how far into the video the clip should start
+  * `Skip Last` is how far before the end the clip should stop
+* Click `Create Batch Clips`
+  * One (1) clip will be created for each of the selected video files using the given times
+
+?> **Tip**: Use the _SHIFT_ key to quickly select multiple sources
+
+<img src="doc_images/library_clip.png" alt="Options" width="50%" style="min-width: 483px">

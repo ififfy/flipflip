@@ -41,12 +41,10 @@ to this playlist.
 
 Scripts must follow the [caption script format](caption_script.md).
 
-
 Click the wrench to change the following options for a track:
 * **Stop at End** - The Scene will stop when the caption script ends.
 * **Next Scene at End** - The Next Scene will play when the audio track ends.
-* **Sync Timestamp with Audio** - When enabled, timestamps in this script will be synced with the currently playing 
-  audio (if there is any). Disable this to unsync your script's timestamps.
+* **Sync Timestamp with Audio** - When enabled, timestamps in this script will be synced with the currently playing audio (if there is any). Disable this to unsync your script's timestamps.
 * **Font Options** - You can select the font family, size, and color as well as border width and color for each of action command
-  
+
 <img src="doc_images/caption_ex.gif" alt="Caption Example">

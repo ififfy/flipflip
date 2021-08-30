@@ -8,6 +8,7 @@
   - [Playing Scene](playing_scene.md)
   - [Scene Generators](scene_generators.md)
   - [Scene Grid](grid.md)
+  - [Scene Groups](groups.md)
   
 - Library
 

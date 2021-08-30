@@ -12,3 +12,20 @@ To edit a cell, simply click it, and select the Scene you want to be there. Alte
 Start your scene as normal and your grid should work:
 
 <img src="doc_images/grid_ex.gif" alt="Grid Example"> 
+
+### Clone/Mirror Cells
+
+You can also choose to clone/mirror grid cells so that playback is synced across them.
+
+To clone a cell, first add a scene, then drag-n-drop it onto the other cell(s) you want it to be cloned to. You can
+also choose to "mirror" that cell's playback (flip horizontally). Cloned cells will be color coded, so they can more
+easily be identified.
+
+<img src="doc_images/grid_clone.png" alt="FlipFlip" width="50%" style="min-width: 483px">
+
+?> Note: Playing a grid with many scenes may negatively affect the framerate of cloned videos. In order to
+compensate, you can enable "Clone Grid Videos Directly" in [Settings](config.md). When enabled, cloned grid cells will
+use a copy of the actual video file, instead of drawing each frame on a canvas. This may improve video framerate, but
+will remove absolute synchronization.
+
+<img src="doc_images/grid_ex2.gif" alt="Grid Clone Example" width="50%" style="min-width: 483px">
