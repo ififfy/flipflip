@@ -197,7 +197,7 @@ class AudioPlaylist extends React.Component {
               <ListItem key={i}>
                 <ListItemAvatar className={classes.listAvatar}>
                   <Badge
-                    classes={{anchorOriginTopRightRectangle: classes.trackNum}}
+                    classes={{anchorOriginTopRightRectangular: classes.trackNum}}
                     invisible={!a.trackNum}
                     max={999}
                     color="primary"

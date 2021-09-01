@@ -224,6 +224,9 @@ export default class ImagePlayer extends React.Component {
       this._backForth = null;
       setTimeout(() => this.advance(true, false), 200);
       this._backForth = setTimeout(this.backForth.bind(this, -1), this.getBackForthTiming());
+    } else if (props.scene.backForth && !this.props.scene.backForth) {
+      clearTimeout(this._backForth);
+      this._backForth = null;
     }
 
     if (this._count % this.props.config.displaySettings.maxInHistory == 0) {

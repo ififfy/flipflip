@@ -6,7 +6,7 @@ just click the `Script Library` icon in the Scene Picker (Home) sidebar ( <img s
 
 ## Adding Scripts
 You can add scripts by clicking the plus-sign in the bottom right. These can be either local script files, or the URL
-of a remote script. This needs to be a plain text file with only the script (e.g. use `raw` URL for pastebin). You can
+of a remote script. This needs to be a plain text file with only the script (e.g. use `raw` URL for Pastebin/Hastebin). You can
 also save scripts to your library from the [Scriptor Tool](scriptor.md).
 
 ## Search/Filter

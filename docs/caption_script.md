@@ -19,7 +19,7 @@ blink KITTENS / ARE / YOUR / LIFE
 cap Cuddle all the kittens forever because you love them.
 ```
 
-Upload your script to [Pastebin](https://pastebin.com) to share it with others, or keep it as a text file on your computer.
+Upload your script to [Pastebin](https://pastebin.com) or [Hastebin](https://hastebin.com) to share it with others, or keep it as a text file on your computer.
 
 ## Basic commands
 

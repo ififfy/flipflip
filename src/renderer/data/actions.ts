@@ -2630,6 +2630,8 @@ export function importScene(state: State, importScenes: any, addToLibrary: boole
   let newScenes = state.scenes;
   let newGrids = state.grids;
   let sources = Array<LibrarySource>();
+  let audios = Array<Audio>();
+  let scripts = Array<CaptionScript>();
 
   const scene = new Scene(importScenes[0]);
   let id = state.scenes.length + 1;
@@ -2649,6 +2651,12 @@ export function importScene(state: State, importScenes: any, addToLibrary: boole
   newScenes = newScenes.concat([scene]);
   if (addToLibrary) {
     sources = sources.concat(scene.sources);
+    for (let playlist of scene.audioPlaylists) {
+      audios = audios.concat(playlist.audios);
+    }
+    for (let playlist of scene.scriptPlaylists) {
+      scripts = scripts.concat(playlist.scripts);
+    }
   }
 
   if (scene.overlays) {
@@ -2718,15 +2726,22 @@ export function importScene(state: State, importScenes: any, addToLibrary: boole
         newScenes = newScenes.concat([scene]);
         if (addToLibrary) {
           sources = sources.concat(scene.sources);
+          for (let playlist of scene.audioPlaylists) {
+            audios = audios.concat(playlist.audios);
+          }
+          for (let playlist of scene.scriptPlaylists) {
+            scripts = scripts.concat(playlist.scripts);
+          }
         }
       }
     }
   }
 
-  let lid = state.library.length + 1;
+
   if (addToLibrary) {
-    const sourceURLs = sources.map((s) => s.url);
     // Don't add sources which are already in the library
+    let lid = state.library.length + 1;
+    const sourceURLs = sources.map((s) => s.url);
     for (let source of state.library) {
       lid = Math.max(source.id + 1, lid);
       let indexOf = sourceURLs.indexOf(source.url);
@@ -2738,16 +2753,79 @@ export function importScene(state: State, importScenes: any, addToLibrary: boole
         }
       }
     }
+    for (let source of sources) {
+      source.id = lid++;
+    }
 
-    if (sources.length > 0) {
-      for (let source of sources) {
-        source.id = lid++;
+    // Don't add sources which are already in the audio library
+    let aid = state.audios.length + 1;
+    const audioURLs = audios.map((s) => s.url);
+    for (let audio of state.audios) {
+      aid = Math.max(audio.id + 1, aid);
+      let indexOf = audioURLs.indexOf(audio.url);
+      if (indexOf >= 0) {
+        while (indexOf >= 0) {
+          audios.splice(indexOf, 1);
+          audioURLs.splice(indexOf, 1);
+          indexOf = audioURLs.indexOf(audio.url);
+        }
+      }
+    }
+    for (let audio of audios) {
+      audio.id = aid++;
+    }
+
+    // Don't add sources which are already in the script library
+    let sid = state.scripts.length + 1;
+    const scriptURLs = scripts.map((s) => s.url);
+    for (let script of state.scripts) {
+      sid = Math.max(script.id + 1, sid);
+      let indexOf = scriptURLs.indexOf(script.url);
+      if (indexOf >= 0) {
+        while (indexOf >= 0) {
+          scripts.splice(indexOf, 1);
+          scriptURLs.splice(indexOf, 1);
+          indexOf = scriptURLs.indexOf(script.url);
+        }
+      }
+    }
+    for (let script of scripts) {
+      script.id = sid++;
+    }
+
+    if (sources.length > 0 || audios.length > 0 || scripts.length > 0) {
+      let message = "Added ";
+      if (sources.length > 0) {
+        message += sources.length + " new source";
+        if (sources.length > 1) {
+          message += "s"
+        }
+      }
+      if (audios.length > 0) {
+        if (!message.endsWith(" ")) {
+          message += ", ";
+        }
+        message += audios.length + " new audio";
+        if (audios.length > 1) {
+          message += "s"
+        }
+      }
+      if (scripts.length > 0) {
+        if (!message.endsWith(" ")) {
+          message += ", ";
+        }
+        message += scripts.length + " new script";
+        if (scripts.length > 1) {
+          message += "s"
+        }
       }
       return {
-        systemSnack: "Added " + sources.length + " new sources to the Library",
+        systemSnack: message,
         scenes: newScenes,
         grids: newGrids,
         library: state.library.concat(sources),
+        audios: state.audios.concat(audios),
+        scripts: state.scripts.concat(scripts),
         route: [new Route({kind: 'scene', value: scene.id})]
       };
     } else {

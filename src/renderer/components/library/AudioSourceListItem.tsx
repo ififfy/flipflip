@@ -186,7 +186,7 @@ class AudioSourceListItem extends React.Component {
             color="secondary">
             <ListItemAvatar className={classes.listAvatar}>
               <Badge
-                classes={{anchorOriginTopRightRectangle: classes.trackNum}}
+                classes={{anchorOriginTopRightRectangular: classes.trackNum}}
                 invisible={!this.props.source.trackNum}
                 max={999}
                 color="primary"

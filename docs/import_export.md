@@ -25,8 +25,8 @@ To export a Scene, open the Scene you want to export and click the `Export Scene
 Save the file and share where you'd like. This file is just a long line of text which holds the data about your 
 Scene's full configuration.
 
-If you'd prefer not to share the file itself, you can paste the contents of the export file onto a service like 
-Pastebin, and then share the raw URL instead.
+If you'd prefer not to share the file itself, you can paste the contents of the export file onto a service like
+[Pastebin](https://pastebin.com) or [Hastebin](https://hastebin.com), and then share the raw URL instead.
 
 Any overlays will also be exported with this scene. However, those overlays' overlays will not be exported.
 
@@ -44,7 +44,7 @@ alt="Import" width="20" height="20"> ) on the Scene Picker (Home). You will be p
 * If you have a URL, paste it into the text field
   * URLs should be to the **raw** json file 
 
-Mark the checkbox if you'd like to import this scene's sources into your library.
+Mark the checkbox if you'd like to import this scene's sources, audios, and scripts into your libraries.
 
 After you click `Import`, the imported Scene (and any overlays/grids) will be created.
 
@@ -57,7 +57,7 @@ you'd like, or keep it as a backup. This file is just a long line of text which 
 Library's sources.
 
 If you'd prefer not to share the file itself, you can paste the contents of the export file onto a service like
-Pastebin, and then share the raw URL instead.
+[Pastebin](https://pastebin.com) or [Hastebin](https://hastebin.com), and then share the raw URL instead.
 
 ## Library Import
 To import a Library, click the `Import Library` button ( <img style="vertical-align: -5px" src="doc_icons/import.svg" 

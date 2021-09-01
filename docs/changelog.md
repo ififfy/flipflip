@@ -21,6 +21,8 @@
 - Fix bug with blurred background not updating while paused
 - Fix bug with holding down right-arrow key during playback
 - Fix bug with recent picture grid
+- Fix bug with caption scripts not loading
+- Fix bug with back/forth not stopping when disabled during playback
 
 ## 3.1.4 <small>(06/26/2021)</small>
 - Add Piwigo support (abrenoch)
