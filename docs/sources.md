@@ -4,7 +4,7 @@ this Scene. FlipFlip supports sources from (1) Local Directories, (2) A text doc
 image/video URLs, (3) a single video file URL, (4) a single playlsit file URL, or (5) one of the 
 [currently supported remote sources](#currently-supported-remote-sources).
 
-<img src="doc_images/scene_detail_sources.png" alt="FlipFlip" width="50%" style="min-width: 483px">
+<img src="doc_images/scene_detail_sources.png" alt="Scene Detail Sources" class="col-xs-10 col-xl-7">
 
 * Sources can be ordered Alphabetically (either their full URL or their parsed name), by Date Added, by Count, or by Type.
 * Sources can also be manually ordered by drag'n'dropping them.
@@ -123,4 +123,4 @@ To access this tool, click in the "Sources" area and then press **Alt+P**. You s
 the Gooninator URL, and select whether you'd like to import these sources as Tumblr blogs or Local directories. If you 
 choose to import as local directories, you must also configure the directory where you kept your blog backups.
 
-![](doc_images/gooninator_import_modal.png)
+<img src="doc_images/gooninator_import_modal.png" alt="Gooninator Import Modal" class="col-xs-10 col-md-8 col-xl-6">

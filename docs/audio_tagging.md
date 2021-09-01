@@ -15,10 +15,11 @@ Toggle tags on/off as desired by clicking on them. When you're done, click "Back
 
 While Tagging, use `[` and `]` to skip to the previous/next visible track in the Library. 
 
-![](doc_images/audio_tagging.png)
+## Audio Info
+If "Show Audio Info" is enabled in FlipFlip Settings, track information will apear for about 8 seconds whenever a
+track chages.
 
-?> If "Show Audio Info" is enabled in FlipFlip Settings, track information will apear for about 8 seconds whenever a 
-track chages. 
+<img src="doc_images/audio_tagging.png" alt="Audio Tagging" class="col-xs-10 col-lg-8 col-xl-6">
 
 ## Batch Tagging
 To begin batch tagging, click the `Batch Tag` button ( <img style="vertical-align: -5px" 
@@ -33,4 +34,4 @@ will be presented with a pop-up and a number of options.
 
 ?> **Tip**: Use the _SHIFT_ key to quickly select multiple sources
 
-![](doc_images/audio_library_batch.png)
+<img src="doc_images/audio_library_batch.png" alt="Audio Library Batch" class="col-xs-12">

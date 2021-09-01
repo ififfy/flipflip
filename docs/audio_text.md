@@ -1,7 +1,7 @@
 # Audio/Text
 The **AUDIO/TEXT** tab controls audio and text overlays.
 
-<img src="doc_images/scene_detail_audio_text.png" alt="Options" width="50%" style="min-width: 483px">
+<img src="doc_images/scene_detail_audio_text.png" alt="Scene Detail Audio Text" class="col-xs-10 col-xl-7">
 
 ## Audio
 This card allows you to layer multiple audio track playlists over your Scene. Each playlist, a sequence of 
@@ -47,4 +47,4 @@ Click the wrench to change the following options for a track:
 * **Sync Timestamp with Audio** - When enabled, timestamps in this script will be synced with the currently playing audio (if there is any). Disable this to unsync your script's timestamps.
 * **Font Options** - You can select the font family, size, and color as well as border width and color for each of action command
 
-<img src="doc_images/caption_ex.gif" alt="Caption Example">
+<img src="doc_images/caption_ex.gif" alt="Caption Example" class="col-xs-12">

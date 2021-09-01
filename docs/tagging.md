@@ -14,7 +14,7 @@ From this screen, we can add, remove, and re-order our tags as well as manage "t
 * To remove a tag, click the tag and then click the <img style="vertical-align: -5px" src="doc_icons/delete.svg" alt="Remove" width="20" height="20">. 
 * To manually re-order tags, simply drag'n'drop them. (This is the order which they will appear everywhere else).
 
-![](doc_images/manage_tags.png)
+<img src="doc_images/manage_tags.png" alt="Manage Tags" class="col-xs-10 col-lg-8 col-xl-6">
 
 ## Tagging a source
 To tag a source in the Library, click the source's Avatar. This will start a Scene with just that source. 
@@ -23,7 +23,7 @@ desired by clicking on them. When you're done, click "Back" to return to the Lib
 
 While Tagging, use `[` and `]` to jump to Tagging the previous/next visible source in the Library. 
 
-<img src="doc_images/tagging.png" alt="Options" width="50%" style="min-width: 483px">
+<img src="doc_images/tagging.png" alt="Tagging" class="col-xs-10 col-xl-7">
 
 ## Batch Tagging
 To begin batch tagging, click the `Batch Tag` button ( <img style="vertical-align: -5px" 
@@ -38,4 +38,4 @@ right. You will be presented with a pop-up and a number of options.
 
 ?> **Tip**: Use the _SHIFT_ key to quickly select multiple sources
 
-![](doc_images/library_batch.png)
+<img src="doc_images/library_batch.png" alt="Library Batch" class="col-xs-12">

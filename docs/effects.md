@@ -2,7 +2,7 @@
 The **EFFECTS** tab controls the various image effects: **Zoom/Move**, **Cross Fade**, **Strobe**, **Fade In/Out**, 
 and **Panning**.
 
-<img src="doc_images/scene_detail_effects.png" alt="FlipFlip" width="50%" style="min-width: 483px">
+<img src="doc_images/scene_detail_effects.png" alt="Scene Detail Effects" class="col-xs-10 col-xl-7">
 
 FlipFlip effects all share the same types of timings (in ms):
 * **Constant**: Occurs at a set interval
@@ -27,11 +27,11 @@ This section controls image movement. This effect restarts when the displayed im
 
 <div style="display:flex">
     <div>
-        <div><img src="doc_images/zoom_ex.gif" alt="Zoom Example" style="height:388px"></div>
+        <div><img src="doc_images/zoom_ex.gif" alt="Zoom Example" class="col-xs-12"></div>
         <div>Using the default Linear easing</div>
     </div>
     <div>
-        <div><img src="doc_images/zoom_ex2.gif" alt="Zoom Example" style="height:388px"></div>
+        <div><img src="doc_images/zoom_ex2.gif" alt="Zoom Example" class="col-xs-12"></div>
         <div>Using the <b>Back Out</b> easing</div>
     </div>
 </div>
@@ -44,11 +44,11 @@ This section controls fade effects.  This effect restarts when the displayed ima
 
 <div style="display:flex">
     <div>
-        <div><img src="doc_images/fade_ex.gif" alt="Fade Example" style="height:388px"></div>
+        <div><img src="doc_images/fade_ex.gif" alt="Fade Example" class="col-xs-12"></div>
         <div>Using the default Linear easing</div>
     </div>
     <div>
-        <div><img src="doc_images/fade_ex2.gif" alt="Fade Example" style="height:388px"></div>
+        <div><img src="doc_images/fade_ex2.gif" alt="Fade Example" class="col-xs-12"></div>
         <div>Using the <b>Exp In</b> easing</div>
     </div>
 </div>
@@ -61,11 +61,11 @@ This section controls the slide effect.  This effect restarts when the displayed
 
 <div style="display:flex">
     <div>
-        <div><img src="doc_images/slide_ex.gif" alt="Strobe Example" style="height:388px"></div>
+        <div><img src="doc_images/slide_ex.gif" alt="Strobe Example" class="col-xs-12" style="max-height: 385px"></div>
         <div>Using the default Linear easing</div>
     </div>
     <div>
-        <div><img src="doc_images/slide_ex2.gif" alt="Strobe Example" style="height:388px"></div>
+        <div><img src="doc_images/slide_ex2.gif" alt="Strobe Example" class="col-xs-12" style="max-height: 385px"></div>
         <div>Using the <b>Back In/Out</b> easing</div>
     </div>
 </div>
@@ -80,11 +80,11 @@ This section controls the strobe effect.  This effect restarts when the displaye
 
 <div style="display:flex">
     <div>
-        <div><img src="doc_images/strobe_ex.gif" alt="Strobe Example" style="height:388px"></div>
+        <div><img src="doc_images/strobe_ex.gif" alt="Strobe Example" class="col-xs-12"></div>
         <div>Using the default Linear easing</div>
     </div>
     <div>
-        <div><img src="doc_images/strobe_ex2.gif" alt="Strobe Example" style="height:388px"></div>
+        <div><img src="doc_images/strobe_ex2.gif" alt="Strobe Example" class="col-xs-12"></div>
         <div>Using the <b>Exp In</b> easing</div>
     </div>
 </div>
@@ -97,11 +97,11 @@ changes.
 
 <div style="display:flex">
     <div>
-        <div><img src="doc_images/fadeio_ex.gif" alt="Fade In/Out Example" style="height:388px"></div>
+        <div><img src="doc_images/fadeio_ex.gif" alt="Fade In/Out Example" class="col-xs-12"></div>
         <div>Using the default Linear easing for both start and end</div>
     </div>
     <div>
-        <div><img src="doc_images/fadeio_ex2.gif" alt="Fade In/Out Example" style="height:388px"></div>
+        <div><img src="doc_images/fadeio_ex2.gif" alt="Fade In/Out Example" class="col-xs-12"></div>
         <div>Using the <b>Poly In</b> easing for both start and end</div>
     </div>
 </div>
@@ -118,11 +118,11 @@ changes.
 
 <div style="display:flex">
     <div>
-        <div><img src="doc_images/panning_ex.gif" alt="Panning Example" style="height:388px"></div>
+        <div><img src="doc_images/panning_ex.gif" alt="Panning Example" class="col-xs-12"></div>
         <div>Using the default Linear easing for both start and end</div>
     </div>
     <div>
-        <div><img src="doc_images/panning_ex2.gif" alt="Panning Example" style="height:388px"></div>
+        <div><img src="doc_images/panning_ex2.gif" alt="Panning Example" class="col-xs-12"></div>
         <div>Using the <b>Linear</b> easing for start and the <b>Bounce Out</b> easing for end</div>
     </div>
 </div>

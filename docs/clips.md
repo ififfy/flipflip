@@ -9,7 +9,7 @@ video URL (local or remote).
 Then, click the <img style="vertical-align: -5px" src="doc_icons/clip.svg" alt="Clip" width="20" height="20"> 
 next to the source to go to the "Video Clipper" interface:
 
-![](doc_images/video_clipper.png) 
+<img src="doc_images/video_clipper.png" alt="Video Clipper" class="col-xs-10 col-xl-7">
 
 To create a new clip, click the `+`. To edit/view an existing clip, just click its number.
 
@@ -53,4 +53,4 @@ right. You will be presented with a pop-up.
 
 ?> **Tip**: Use the _SHIFT_ key to quickly select multiple sources
 
-<img src="doc_images/library_clip.png" alt="Options" width="50%" style="min-width: 483px">
+<img src="doc_images/library_clip.png" alt="Library Clip" class="col-xs-10 col-xl-7">

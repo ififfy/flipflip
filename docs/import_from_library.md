@@ -7,4 +7,4 @@ Your selected sources will now appear in the scene.
 
 ?> **Tip**: Use the _SHIFT_ key to quickly select multiple sources
 
-![](doc_images/library_import.png)
+<img src="doc_images/library_import.png" alt="Library Import" class="col-xs-10 col-xl-7">

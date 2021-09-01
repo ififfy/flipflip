@@ -16,7 +16,7 @@ you're done, click "Back" to return to the Library.
 While Tagging, use `[` and `]` to jump to Tagging the previous/next visible script in the Library. It will continue
 playing using the same Scene. Return to the library to choose a different scene.
 
-<img src="doc_images/script_tagging.png" alt="Options" width="50%" style="min-width: 483px">
+<img src="doc_images/script_tagging.png" alt="Script Tagging" class="col-xs-10 col-xl-7">
 
 ## Batch Tagging
 

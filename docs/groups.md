@@ -10,4 +10,4 @@ You can drag-n-drop your scenes into, out of, and between groups, as well as reo
 
 Click the X on the right to delete a group. Its scenes will simply return to the general pool.
 
-<img src="doc_images/scene_groups.png" alt="Options" width="50%" style="min-width: 483px">
+<img src="doc_images/scene_groups.png" alt="Scene Groups" class="col-xs-12 col-xl-10">

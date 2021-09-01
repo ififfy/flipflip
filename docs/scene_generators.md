@@ -4,7 +4,7 @@
 Once you have at least 1 source in the Library, you can add a `Scene Generator` from the Scene Picker (Home). 
 Scene Generators appear in their own tab in the Scene Picker.
 
-<img src="doc_images/scene_detail_generator.png" alt="FlipFlip" width="50%" style="min-width: 483px">
+<img src="doc_images/scene_detail_generator.png" alt="Scene Detail Generator" class="col-xs-12 col-xl-10">
 
 ## Make Rules
 

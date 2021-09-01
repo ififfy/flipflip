@@ -5,7 +5,7 @@ local file or from your Script Library.
 
 ?> All scripts must be in the [caption script format](caption_script.md)
 
-<img src="doc_images/scriptor.png" alt="Options" width="75%" style="min-width: 483px">
+<img src="doc_images/scriptor.png" alt="Scriptor" class="col-xs-12">
 
 ## Code
 

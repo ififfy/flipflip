@@ -9,7 +9,7 @@ No installation necessary, just run `FlipFlip`.
 
 When you first open FlipFlip, you should see a screen like this:
 
-<img src="doc_images/flipflip_home.png" alt="FlipFlip" width="50%" style="min-width: 483px">
+<img src="doc_images/flipflip_home.png" alt="FlipFlip" class="col-xs-10 col-xl-7">
 
 _Note: Some of these features will be disabled until they are relevant_
 
@@ -28,7 +28,7 @@ Let's create a simple scene to get you familiar with how things will work.
   * You can read more about effects [here](effects.md).
 * Click the `Play` button ( <img style="vertical-align: -5px" src="doc_icons/play.svg" alt="Edit" width="20" height="20"> )
 
-<img src="doc_images/scene_detail_sources.png" alt="FlipFlip" width="50%" style="min-width: 483px">
+<img src="doc_images/scene_detail_sources.png" alt="Scene Detail Sources" class="col-xs-10 col-xl-7">
 
 ## Your first slideshow
 Great! Now your sources have loaded and the slideshow has started!
@@ -36,12 +36,12 @@ Great! Now your sources have loaded and the slideshow has started!
 Video/Audio controls and all scene options (except the image filter) can also be accessed by hovering 
 over the sidebar on the left while the slideshow is playing.
 
-<img src="doc_images/player_options.png" alt="FlipFlip" width="50%" style="min-width: 483px">
+<img src="doc_images/player_options.png" alt="Player Options" class="col-xs-10 col-xl-7">
 
 ## Navigating image history
 Use the arrow keys (← / →) to navigate through playback history. Use `Space` to pause/resume playback. 
 These controls are also available in the bar at the top.
 
-![](doc_images/player_controls.png) 
+<img src="doc_images/player_controls.png" alt="Player Controls" class="col-xs-10 col-xl-7">
 
 ### When you're done, click Back to return

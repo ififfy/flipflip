@@ -2,7 +2,7 @@
 The **Library** is a place for you to collect and manage all your sources. To access the Library, just click the `Library`
 icon in the Scene Picker (Home) sidebar ( <img style="vertical-align: -5px" src="doc_icons/library.svg" alt="Library" width="20" height="20"> )
 
-<img src="doc_images/library.png" alt="Options" width="50%" style="min-width: 483px">
+<img src="doc_images/library.png" alt="Library" class="col-xs-12 col-xl-8">
 
 ## Adding Sources
 Sources are added to the Library and sorted just like in a [Scene](sources.md#modifying-sources).
@@ -38,7 +38,7 @@ the ones you wish to highlight, and then press **Alt+M**. These sources will be 
 way after the search/filter is cleared. This may be useful for keeping track of a set of sources you are working on 
 (for instance new sources you are tagging). 
 
-<img src="doc_images/library_marked.png" alt="Options" width="50%" style="min-width: 483px">
+<img src="doc_images/library_marked.png" alt="Library Marked" class="col-xs-12 col-xl-8">
 
 ## Find Mergeables
 When you have a large number of local directories, it may be helpful to find those which share the tags so that you can
@@ -62,7 +62,7 @@ As your Library grows, it's possible some sources will become unavailable. To ai
 width="20" height="20"> ) to check your sources. When this process completes, unavailable sources will be marked with 
 an offline icon.
 
-<img src="doc_images/library_offline.png" alt="Options" width="50%" style="min-width: 483px">
+<img src="doc_images/library_offline.png" alt="Library Offline" class="col-xs-12 col-xl-8">
 
 ## Detect Video Metadata
 It may be useful to sort or search through your videos by duration or resolution. Click the `Video Metadata` button

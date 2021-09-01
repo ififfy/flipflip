@@ -8,4 +8,4 @@ Your selected tracks will now appear in the playlist. Tracks are added in the or
 
 ?> **Tip**: Use the _SHIFT_ key to quickly select multiple tracks
 
-<img src="doc_images/audio_library_import.png" alt="Options" width="50%" style="min-width: 483px">
+<img src="doc_images/audio_library_import.png" alt="Options" class="col-xs-10 col-xl-7">

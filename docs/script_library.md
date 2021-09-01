@@ -2,7 +2,7 @@
 The **Script Library** is a place for you to collect and manage all your caption scripts. To access the Script Library, 
 just click the `Script Library` icon in the Scene Picker (Home) sidebar ( <img style="vertical-align: -5px" src="doc_icons/script_library.svg" alt="Script Library" width="20" height="20"> )
 
-<img src="doc_images/script_library.png" alt="Options" width="50%" style="min-width: 483px">
+<img src="doc_images/script_library.png" alt="Script Library" class="col-xs-12 col-xl-8">
 
 ## Adding Scripts
 You can add scripts by clicking the plus-sign in the bottom right. These can be either local script files, or the URL

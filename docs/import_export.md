@@ -17,7 +17,7 @@ To share your scene effects, simply click `Copy To Clipboard` and paste this tex
 To apply effects, paste an effect hash into the text area and click "Apply". Your current effects will be overridden 
 with those of the hash. This will not affect the scene's sources, audio, or captions.
 
-<img src="doc_images/scene_effect_export.png" alt="Options" width="50%" style="min-width: 483px">
+<img src="doc_images/scene_effect_export.png" alt="Scene Effect Export" class="col-xs-10 col-xl-7">
 
 ## Full Scene Export
 To export a Scene, open the Scene you want to export and click the `Export Scene` button ( 
@@ -48,7 +48,7 @@ Mark the checkbox if you'd like to import this scene's sources, audios, and scri
 
 After you click `Import`, the imported Scene (and any overlays/grids) will be created.
 
-<img src="doc_images/import.png" alt="Options" width="30%" style="min-width: 483px">
+<img src="doc_images/import.png" alt="Import" class="col-xs-10 col-xl-7">
 
 ## Library Export
 To export your Library, click the `Export Library` button ( <img style="vertical-align: -5px" src="doc_icons/export.svg" 

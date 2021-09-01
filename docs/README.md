@@ -1,8 +1,9 @@
 # FlipFlip
 
-<img src="doc_images/flipflip_home.png" alt="FlipFlip" width="50%" style="min-width: 483px">
+<img src="doc_images/flipflip_home.png" alt="FlipFlip" class="col-xs-10 col-xl-7">
 
-##### [Releases](https://github.com/ififfy/flipflip/releases)
+## [Releases](https://github.com/ififfy/flipflip/releases)
+#### [Latest Release](https://github.com/ififfy/flipflip/releases/latest)
 
 ## Features
 * Local files as well as Tumblr, Reddit, Twitter, Instagram, Imgur, DeviantArt, Booru & More

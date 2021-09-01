@@ -2,7 +2,7 @@
 The **OPTIONS** tab provides a number of ways to control the Scene playback and what images will display. This tab
 has two cards: `Scene Options` and `ImageOptions` 
 
-<img src="doc_images/scene_detail_options.png" alt="Options" width="50%" style="min-width: 483px">
+<img src="doc_images/scene_detail_options.png" alt="Scene Detail Options" class="col-xs-12 col-xl-10">
 
 ## Scene Options
 
@@ -16,14 +16,14 @@ or based on **audio BPM**.
 * **BPM**: Changes at the rate of the BPM of the first audio file
   * You can change the BPM multiplier to increase/decrease this rate.
 
-<img src="doc_images/timing_ex.gif" alt="Timing Example">
+<img src="doc_images/timing_ex.gif" alt="Timing Example" class="col-xs-12" style="max-height: 385px">
 
 _An example of **Wave** timing_
 
 #### Back/Forth
 The back/forth feature automatically toggles between the 2 most recent images in a Scene at a set interval. 
 
-<img src="doc_images/backforth_ex.gif" alt="Back Forth Example" style="width: 483px">
+<img src="doc_images/backforth_ex.gif" alt="Back Forth Example" class="col-xs-12" style="max-height: 385px">
 
 _An example of **Back/Forth** every 200ms_
 

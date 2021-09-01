@@ -8,7 +8,7 @@ Some other General Settings exist to help customize your FlipFlip experience. To
 When you are done making changes to the Settings, click the `OK` button ( <img style="vertical-align: -5px" 
 src="doc_icons/ok.svg" alt="OK" width="20" height="20"> ). Settings will only be saved if they are valid.
 
-<img src="doc_images/config.png" alt="Options" width="50%" style="min-width: 483px">
+<img src="doc_images/config.png" alt="Config" class="col-xs-12 col-xl-10">
 
 ## Scene Default Option/Effects
 Configure default settings for each Scene just like you would in the Scene itself. These preferences will be applied 
@@ -165,7 +165,7 @@ use your configured rules. If Auto-Clean is off, you can choose how many of the 
 ## Theme
 The FlipFlip UI allows you to customize the **Primary** and **Secondary** colors. You can also toggle Dark Mode on/off here
 
-<img src="doc_images/flipflip_colors.png" alt="Options" width="50%" style="min-width: 483px">
+<img src="doc_images/flipflip_colors.png" alt="FlipFlip Colors" class="col-xs-10 col-xl-7">
 
 ## Watermark
 Enabling this will display a custom watermark during FlipFlip playback. In addition to the watermark text, you can also

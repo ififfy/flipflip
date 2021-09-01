@@ -3,7 +3,7 @@ The **Audio Library**, like the regular Source [Library](library.md), is a place
 audio tracks. To access the Audio Library, just click the `Audio Library` icon in the Scene Picker (Home) sidebar 
 ( <img style="vertical-align: -5px" src="doc_icons/audio_library.svg" alt="Audio Library" width="20" height="20"> )
 
-![](doc_images/audio_library.png)
+<img src="doc_images/audio_library.png" alt="Audio Library" class="col-xs-12 col-xl-8">
 
 ## Adding Tracks
 Add new tracks by going to the **Songs** tab and clicking the plus-sign in the bottom right. You can add tracks locally
@@ -35,7 +35,7 @@ the ones you wish to highlight, and then press **Alt+M**. These tracks will be m
 will remain that way after the search/filter is cleared. This may be useful for keeping track of a set of tracks you 
 are working on (for instance new tracks you are editing or tagging). 
 
-![](doc_images/audio_library_marked.png)
+<img src="doc_images/audio_library_marked.png" alt="Audio Library Marked" class="col-xs-12 col-xl-8">
 
 ## Batch Edit
 To begin batch editing, click the `Batch Edit` button ( <img style="vertical-align: -5px" 
@@ -49,7 +49,7 @@ automatically populated.
 
 ?> **Tip**: Use the _SHIFT_ key to quickly select multiple sources
 
-![](doc_images/audio_library_edit.png)
+<img src="doc_images/audio_library_edit.png" alt="Audio Library Edit" class="col-xs-12 col-xl-8">
 
 ## Playlists
 You can also make playlists directly within the Audio Library. To make a playlist, click the `Add to Playlist` button 

@@ -10,13 +10,13 @@ indicator as well. When both the Scene and overlay have loaded, the slideshow wi
 ?> To avoid lag and janky playback, it's recommended to let loading finish, but if you want to start early anyway, 
 click `Start Now` when it appears. You can also configure all scenes to start immediately in [Settings](config.md#player-settings).
 
-![](doc_images/scene_loading.png)
+<img src="doc_images/scene_loading.png" alt="Scene Loading" class="col-xs-10 col-xl-7">
 
 ## Playback controls
 All scene options (except the image filter) can also be changed while playing a slideshow by hovering over the sidebar 
 on the left. This is also where you will find video/audio playback controls.
 
-<img src="doc_images/player_options.png" alt="FlipFlip" width="50%" style="min-width: 483px">
+<img src="doc_images/player_options.png" alt="Player Options" class="col-xs-10 col-xl-7">
 
 ## Image info
 While a Scene is playing, you can right click on an image to get more information about it.
@@ -37,7 +37,7 @@ While a Scene is playing, you can right click on an image to get more informatio
 * Select "Recent Picture Grid" to view a grid of recently played files. 
   * _This will auto-pause playback. Press the back arrow to return to normal playback._
 
-![](doc_images/image_context_menu.png)
+<img src="doc_images/image_context_menu.png" alt="Image Context Menu" class="col-xs-10 col-xl-7">
 
 ## New Window
 To open additional windows for playing scenes, click the `New Window` button ( 
@@ -45,7 +45,7 @@ To open additional windows for playing scenes, click the `New Window` button (
 You will be warned that any changes made in this new window will not be saved. Extra windows hide access to the
 Library, Preferences, and to adding new scenes. Click a Scene and edit/start as you would usually.
 
-<img src="doc_images/new_window.png" alt="FlipFlip" width="50%" style="min-width: 483px">
+<img src="doc_images/new_window.png" alt="New Window" class="col-xs-10 col-xl-7">
 
 ## Player Hotkeys
 A number of hotkeys are available for quickly performing user actions. These functions are also available in the menu.

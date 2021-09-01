@@ -21,11 +21,11 @@ in mind when creating it. After you've made an account, you can download and ins
 
 The first time you launch **Loom**, you'll need to sign in (with the account you just created):
 
-![](doc_images/loom_login.png)
+<img src="doc_images/loom_login.png" alt="Loom Login" class="col-xs-10 col-sm-8 col-lg-6 col-xl-3">
 
 Then you'll see the main **Loom** screen:
 
-![](doc_images/loom_home.png)
+<img src="doc_images/loom_home.png" alt="Loom Home" class="col-xs-10 col-sm-8 col-lg-6 col-xl-3">
 
 Unless you want to also record your webcam, we recommend "Screen Only" and disabling the camera input. Next, we'll need 
 to send our audio output to a recording channel. This is where **Virtual Audio Cable** comes in.
@@ -41,7 +41,7 @@ use `VBCable_Setup`). Then, just click the big "Install Driver" button. Windows 
 That should be it! Click the audio/sound icon in your taskbar then the playback device dropdown. Select the new output 
 option "CABLE Input (VB-Audio Virtual Cable)":
 
-![](doc_images/vac_input.png)
+<img src="doc_images/vac_input.png" alt="VAC Input" class="col-xs-10 col-sm-8 col-lg-6 col-xl-3">
 
 This will output all of your system audio to a channel **Loom** can record on.
 
@@ -55,7 +55,7 @@ channel.
 Now that we have all the parts setup, let's go back to **Loom** for a minute. Click the Mic dropdown and select the new 
 "CABLE Output (VB-Audio Virtual Cable)" option. Now, **Loom** will be able to record the sound coming from FlipFlip!
 
-![](doc_images/loom_mic.png)
+<img src="doc_images/loom_mic.png" alt="Loom Mic" class="col-xs-10 col-sm-8 col-lg-6 col-xl-3">
 
 We're ready to record now. Before we start, get your FlipFlip Scene ready to play. Open up FlipFlip and navigate to the 
 Scene you wish to record. Depending on your preference, you may want to start recording before your Scene starts, or 
