@@ -147,7 +147,9 @@ class LibrarySearch extends React.Component {
         markedCount++;
       }
 
+      let untagged = true;
       if (source.tags.length > 0) {
+        untagged = false;
         for (let tag of source.tags) {
           if (tags.has(tag.name)) {
             tags.set(tag.name, tags.get(tag.name) + 1);
@@ -155,7 +157,24 @@ class LibrarySearch extends React.Component {
             tags.set(tag.name, 1);
           }
         }
-      } else {
+      }
+
+      if (source instanceof LibrarySource) {
+        for (let clip of source.clips) {
+          for (let tag of clip.tags) {
+            untagged = false;
+            if (!source.tags.includes(tag)) {
+              if (tags.has(tag.name)) {
+                tags.set(tag.name, tags.get(tag.name) + 1);
+              } else {
+                tags.set(tag.name, 1);
+              }
+            }
+          }
+        }
+      }
+
+      if (untagged) {
         untaggedCount += 1;
       }
 

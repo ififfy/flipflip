@@ -118,6 +118,8 @@ export default class Meta extends React.Component {
   // TODO Be able to change audio/script playlists during playback
   //      Be able to right click on grid scenes as overlay
   //      Be able to modify source tags as popup during playback
+  //      Generate different sources even for same scenes in grid
+  //      Add option to disable "delete file" prompt
   render() {
     const scene = actions.getActiveScene(this.state);
     const grid = actions.getActiveGrid(this.state);
