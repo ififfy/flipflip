@@ -1214,7 +1214,7 @@ class AudioLibrary extends React.Component {
           if (!adResult) return;
           for (let path of adResult) {
             if (fs.existsSync(path) && fs.lstatSync(path).isDirectory()) {
-              aResult = adResult.concat(getFilesRecursively(path));
+              aResult = aResult.concat(getFilesRecursively(path));
             } else {
               aResult.push(path);
             }
@@ -1224,7 +1224,6 @@ class AudioLibrary extends React.Component {
             {filters: [{name: 'All Files (*.*)', extensions: ['*']}, {name: 'Audio files', extensions: ['mp3', 'm4a', 'wav', 'ogg']}], properties: ['openFile', 'multiSelections']});
           if (!aResult) return;
         }
-        // TODO Bug: When adding multiple directories, only seems to add last directory
         aResult = aResult.filter((r) => isAudio(r, true));
         this.setState({loadingSources: true});
         this.addAudioSources(aResult);
