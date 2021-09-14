@@ -158,13 +158,6 @@ export default class Player extends React.Component {
       }
     }
 
-    if (this.state.hideCursor) {
-      playerStyle = {
-        ...playerStyle,
-        cursor: 'none',
-      }
-    }
-
     let watermarkStyle: any = {}
     let watermarkText = "";
     if (this.props.config.generalSettings.watermark && (!this.props.gridView || this.props.config.generalSettings.watermarkGrid)) {
@@ -251,6 +244,16 @@ export default class Player extends React.Component {
 
     return (
       <div style={rootStyle}>
+        {!this.props.gridView && (
+          <div style={{zIndex: 999, position: 'absolute', width: '100%', height: '100%', cursor: this.state.hideCursor ? 'none' : 'unset'}}
+               ref={this.idleTimerRef}>
+            <IdleTimer
+              ref={ref => {return this.idleTimerRef}}
+              onActive={this.onActive.bind(this)}
+              onIdle={this.onIdle.bind(this)}
+              timeout={2000} />
+          </div>
+        )}
         {showStrobe && (
           <Strobe
             currentAudio={this.state.currentAudio}
@@ -387,15 +390,7 @@ export default class Player extends React.Component {
           />
         )}
 
-        <div style={playerStyle}
-             ref={this.idleTimerRef}>
-          {!this.props.gridView && (
-            <IdleTimer
-              ref={ref => {return this.idleTimerRef}}
-              onActive={this.onActive.bind(this)}
-              onIdle={this.onIdle.bind(this)}
-              timeout={2000} />
-          )}
+        <div style={playerStyle}>
           {this.state.recentPictureGrid && (
             <PictureGrid
               pictures={this.state.historyPaths} />

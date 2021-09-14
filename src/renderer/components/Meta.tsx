@@ -120,6 +120,7 @@ export default class Meta extends React.Component {
   //      Be able to modify source tags as popup during playback
   //      Generate different sources even for same scenes in grid
   //      Add option to disable "delete file" prompt
+  //      Add way to notify user about images filtered due to min size
   render() {
     const scene = actions.getActiveScene(this.state);
     const grid = actions.getActiveGrid(this.state);
