@@ -348,7 +348,7 @@ class SourceListItem extends React.Component {
       let cachePath;
       if (fileType == ST.video || fileType == ST.playlist) {
         if (existsSync(getCachePath(sourceURL, this.props.config) + getFileName(sourceURL))) {
-          cachePath = getCachePath(sourceURL, this.props.config) + getFileName(sourceURL);
+          cachePath = getCachePath(sourceURL, this.props.config);
         } else if (existsSync(sourceURL)) {
           remote.shell.showItemInFolder(sourceURL);
         }
