@@ -2688,7 +2688,7 @@ export function importScene(state: State, importScenes: any, addToLibrary: boole
         grid.id = newGridMap.get(grid.id);
         for (let r = 0; r < grid.grid.length; r++) {
           for (let c = 0; c < grid.grid[r].length; c++) {
-            const cellID = parseInt(grid.grid[r][c] as any);
+            const cellID = parseInt(grid.grid[r][c].sceneID as any);
             if (cellID != -1) {
               if (!newSceneMap.has(cellID)) {
                 newSceneMap.set(cellID, id++);
