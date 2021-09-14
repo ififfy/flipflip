@@ -419,7 +419,7 @@ class PlayerBars extends React.Component {
                         sidebar
                         allScenes={this.props.scenes}
                         allSceneGrids={this.props.sceneGrids}
-                        isTagging={this.props.tags != null}
+                        isTagging={this.props.allTags != null}
                         scene={this.props.scene}
                         onUpdateScene={this.props.onUpdateScene.bind(this)}/>
                     </AccordionDetails>
@@ -593,32 +593,36 @@ class PlayerBars extends React.Component {
               onMouseEnter={this.onMouseEnterTagDrawer.bind(this)}
               onMouseLeave={this.onMouseLeaveTagDrawer.bind(this)}>
               <Grid container alignItems="center">
-                <Grid item xs>
-                  <div className={classes.tagList}>
-                    {this.props.allTags.map((tag) =>
-                      <Card className={clsx(classes.tag, tagNames && tagNames.includes(tag.name) && classes.selectedTag)} key={tag.id}>
-                        <CardActionArea onClick={this.props.toggleTag.bind(this, this.props.scene.libraryID, tag)}>
-                          <CardContent className={classes.tagContent}>
-                            <Typography component="h6" variant="body2">
-                              {tag.name}
-                            </Typography>
-                          </CardContent>
-                        </CardActionArea>
-                      </Card>
+                {this.props.tags != null && (
+                  <React.Fragment>
+                    <Grid item xs>
+                      <div className={classes.tagList}>
+                        {this.props.allTags.map((tag) =>
+                          <Card className={clsx(classes.tag, tagNames && tagNames.includes(tag.name) && classes.selectedTag)} key={tag.id}>
+                            <CardActionArea onClick={this.props.toggleTag.bind(this, this.props.scene.libraryID, tag)}>
+                              <CardContent className={classes.tagContent}>
+                                <Typography component="h6" variant="body2">
+                                  {tag.name}
+                                </Typography>
+                              </CardContent>
+                            </CardActionArea>
+                          </Card>
+                        )}
+                      </div>
+                    </Grid>
+                    {(this.props.inheritTags && (!tagNames || tagNames.length == 0) && this.props.scene.sources[0].clips && this.props.scene.sources[0].clips.find((c) => c.tags && c.tags.length > 0) != null) && (
+                      <Grid item className={classes.tagButtons}>
+                        <Tooltip title="Inherit Clip Tags">
+                          <Fab
+                            color="primary"
+                            size="small"
+                            onClick={this.props.inheritTags.bind(this, this.props.scene.libraryID)}>
+                            <SystemUpdateAltIcon/>
+                          </Fab>
+                        </Tooltip>
+                      </Grid>
                     )}
-                  </div>
-                </Grid>
-                {(this.props.inheritTags && (!tagNames || tagNames.length == 0) && this.props.scene.sources[0].clips && this.props.scene.sources[0].clips.find((c) => c.tags && c.tags.length > 0) != null) && (
-                  <Grid item className={classes.tagButtons}>
-                    <Tooltip title="Inherit Clip Tags">
-                      <Fab
-                        color="primary"
-                        size="small"
-                        onClick={this.props.inheritTags.bind(this, this.props.scene.libraryID)}>
-                        <SystemUpdateAltIcon/>
-                      </Fab>
-                    </Tooltip>
-                  </Grid>
+                  </React.Fragment>
                 )}
                 <Grid item xs={12}>
                   {this.props.scene.sources.length == 1 && getSourceType(this.props.scene.sources[0].url) == ST.video && (
@@ -701,7 +705,7 @@ class PlayerBars extends React.Component {
 
     window.addEventListener('contextmenu', this.showContextMenu, false);
     window.addEventListener('keydown', this.onKeyDown, false);
-    if (this.props.tags == null) {
+    if (this.props.allTags == null) {
       window.addEventListener('wheel', this.onScroll, false);
     }
     this.buildMenu();
@@ -719,7 +723,7 @@ class PlayerBars extends React.Component {
     createMainMenu(Menu, createMenuTemplate(app));
     window.removeEventListener('contextmenu', this.showContextMenu);
     window.removeEventListener('keydown', this.onKeyDown);
-    if (this.props.tags == null) {
+    if (this.props.allTags == null) {
       window.removeEventListener('wheel', this.onScroll);
     }
   }
@@ -953,7 +957,7 @@ class PlayerBars extends React.Component {
         }
       }));
     }
-    if (!this.props.tags) {
+    if (!this.props.allTags) {
       contextMenu.append(new MenuItem({
         label: 'Goto Tag Source',
         click: () => {
@@ -995,7 +999,7 @@ class PlayerBars extends React.Component {
       keyMap.set('onDelete', ['Delete Image', 'Delete']);
     }
 
-    if (!this.props.scene.audioScene && !this.props.scene.scriptScene && this.props.tags != null) {
+    if (!this.props.scene.audioScene && !this.props.scene.scriptScene && this.props.allTags != null) {
       keyMap.set('prevSource', ['Previous Source', '[']);
       keyMap.set('nextSource', ['Next Source', ']']);
     }
@@ -1061,13 +1065,13 @@ class PlayerBars extends React.Component {
         }
         break;
       case '[':
-        if (!this.props.scene.audioScene && !this.props.scene.scriptScene && this.props.tags != null) {
+        if (!this.props.scene.audioScene && !this.props.scene.scriptScene && this.props.allTags != null) {
           e.preventDefault();
           this.prevSource();
         }
         break;
       case ']':
-        if (!this.props.scene.audioScene && !this.props.scene.scriptScene && this.props.tags != null) {
+        if (!this.props.scene.audioScene && !this.props.scene.scriptScene && this.props.allTags != null) {
           e.preventDefault();
           this.nextSource();
         }

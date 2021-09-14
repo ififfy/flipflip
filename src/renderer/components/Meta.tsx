@@ -390,7 +390,7 @@ export default class Meta extends React.Component {
                 onUpdateScene={a(actions.updateScene)}
                 goBack={a(actions.endPlaySceneFromLibrary)}
                 playTrack={a(actions.playTrack)}
-                tags={scene.audioScene ? actions.getAudioSource(this.state)?.tags : scene.scriptScene ? actions.getScriptSource(this.state)?.tags : actions.getLibrarySource(this.state)?.tags}
+                tags={scene.audioScene ? actions.getAudioSource(this.state)?.tags : scene.scriptScene ? actions.getScriptSource(this.state)?.tags : actions.getLibrarySource(this.state)?.id != -1 ? actions.getLibrarySource(this.state)?.tags : null}
                 allTags={this.state.tags}
                 toggleTag={scene.audioScene ? a(actions.toggleAudioTag) : scene.scriptScene ? a(actions.toggleScriptTag) : a(actions.toggleTag)}
                 inheritTags={scene.audioScene || scene.scriptScene ? undefined : a(actions.inheritTags)}

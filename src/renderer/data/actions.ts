@@ -914,43 +914,78 @@ export function playScript(state: State, source: CaptionScript, sceneID: number,
 export function playSceneFromLibrary(state: State, source: LibrarySource, displayed: Array<LibrarySource>): Object {
   const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path.sep);
   let librarySource = state.library.find((s) => s.url == sourceURL);
-  if (librarySource == null) {
-    throw new Error("Source not found in Library");
+  if (librarySource != null) {
+    librarySource.disabledClips =  [];
+    let id = state.scenes.length + 1;
+    state.scenes.forEach((s: Scene) => {
+      id = Math.max(s.id + 1, id);
+    });
+    if (getLibrarySource(state) != null) {
+      state.route.pop();
+      state.route.pop();
+      state.scenes.pop();
+    }
+    const sourceType = getSourceType(source.url);
+    let tempScene = new Scene({
+      id: id,
+      name: "library_scene_temp",
+      sources: [librarySource],
+      libraryID: librarySource.id,
+      forceAll: state.config.defaultScene.forceAll,
+      backgroundType: state.config.defaultScene.backgroundType,
+      backgroundColor: state.config.defaultScene.backgroundColor,
+      backgroundColorSet: state.config.defaultScene.backgroundColorSet,
+      backgroundBlur: state.config.defaultScene.backgroundBlur,
+      imageOrientation: state.config.defaultScene.imageOrientation,
+      videoOrientation: state.config.defaultScene.videoOrientation,
+      randomVideoStart: state.config.defaultScene.randomVideoStart,
+      videoOption: sourceType == ST.video ? VO.full : state.config.defaultScene.videoOption,
+      continueVideo:  sourceType == ST.video || state.config.defaultScene.continueVideo,
+      playVideoClips: state.config.defaultScene.playVideoClips,
+      videoVolume: state.config.defaultScene.videoVolume,
+    });
+    return {
+      displayedSources: displayed,
+      scenes: state.scenes.concat([tempScene]),
+      route: state.route.concat([new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'libraryplay', value: tempScene.id})]),
+    };
+  } else {
+    source.disabledClips =  [];
+    let id = state.scenes.length + 1;
+    state.scenes.forEach((s: Scene) => {
+      id = Math.max(s.id + 1, id);
+    });
+    if (getActiveScene(state)?.libraryID != null) {
+      state.route.pop();
+      state.route.pop();
+      state.scenes.pop();
+    }
+    const sourceType = getSourceType(source.url);
+    let tempScene = new Scene({
+      id: id,
+      name: "library_scene_temp",
+      sources: [source],
+      libraryID: -1,
+      forceAll: state.config.defaultScene.forceAll,
+      backgroundType: state.config.defaultScene.backgroundType,
+      backgroundColor: state.config.defaultScene.backgroundColor,
+      backgroundColorSet: state.config.defaultScene.backgroundColorSet,
+      backgroundBlur: state.config.defaultScene.backgroundBlur,
+      imageOrientation: state.config.defaultScene.imageOrientation,
+      videoOrientation: state.config.defaultScene.videoOrientation,
+      randomVideoStart: state.config.defaultScene.randomVideoStart,
+      videoOption: sourceType == ST.video ? VO.full : state.config.defaultScene.videoOption,
+      continueVideo:  sourceType == ST.video || state.config.defaultScene.continueVideo,
+      playVideoClips: state.config.defaultScene.playVideoClips,
+      videoVolume: state.config.defaultScene.videoVolume,
+    });
+    return {
+      displayedSources: displayed,
+      scenes: state.scenes.concat([tempScene]),
+      route: state.route.concat([new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'libraryplay', value: tempScene.id})]),
+    };
   }
-  librarySource.disabledClips =  [];
-  let id = state.scenes.length + 1;
-  state.scenes.forEach((s: Scene) => {
-    id = Math.max(s.id + 1, id);
-  });
-  if (getLibrarySource(state) != null) {
-    state.route.pop();
-    state.route.pop();
-    state.scenes.pop();
-  }
-  const sourceType = getSourceType(source.url);
-  let tempScene = new Scene({
-    id: id,
-    name: "library_scene_temp",
-    sources: [librarySource],
-    libraryID: librarySource.id,
-    forceAll: state.config.defaultScene.forceAll,
-    backgroundType: state.config.defaultScene.backgroundType,
-    backgroundColor: state.config.defaultScene.backgroundColor,
-    backgroundColorSet: state.config.defaultScene.backgroundColorSet,
-    backgroundBlur: state.config.defaultScene.backgroundBlur,
-    imageOrientation: state.config.defaultScene.imageOrientation,
-    videoOrientation: state.config.defaultScene.videoOrientation,
-    randomVideoStart: state.config.defaultScene.randomVideoStart,
-    videoOption: sourceType == ST.video ? VO.full : state.config.defaultScene.videoOption,
-    continueVideo:  sourceType == ST.video || state.config.defaultScene.continueVideo,
-    playVideoClips: state.config.defaultScene.playVideoClips,
-    videoVolume: state.config.defaultScene.videoVolume,
-  });
-  return {
-    displayedSources: displayed,
-    scenes: state.scenes.concat([tempScene]),
-    route: state.route.concat([new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'libraryplay', value: tempScene.id})]),
-  };
+
 }
 
 export function onUpdateClips(state: State, sourceURL: string, clips: Array<Clip>) {
@@ -1016,19 +1051,21 @@ export function navigateClipping(state: State, offset: number): Object {
 export function navigateDisplayedLibrary(state: State, offset: number): Object {
   const activeScene = getActiveScene(state);
   const librarySource = getLibrarySource(state);
-  const tagNames = state.tags.map((t: Tag) => t.name);
-  // Re-order the tags of the source we were playing
-  librarySource.tags = librarySource.tags.sort((a: Tag, b: Tag) => {
-    const aIndex = tagNames.indexOf(a.name);
-    const bIndex = tagNames.indexOf(b.name);
-    if (aIndex < bIndex) {
-      return -1;
-    } else if (aIndex > bIndex) {
-      return 1;
-    } else {
-      return 0;
-    }
-  });
+  if (librarySource != null) {
+    const tagNames = state.tags.map((t: Tag) => t.name);
+    // Re-order the tags of the source we were playing
+    librarySource.tags = librarySource.tags.sort((a: Tag, b: Tag) => {
+      const aIndex = tagNames.indexOf(a.name);
+      const bIndex = tagNames.indexOf(b.name);
+      if (aIndex < bIndex) {
+        return -1;
+      } else if (aIndex > bIndex) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+  }
   const displayed = Array.from(state.displayedSources);
   const indexOf = displayed.map((s) => s.url).indexOf(activeScene.sources[0].url);
   let newIndexOf = indexOf + offset;
@@ -1050,19 +1087,21 @@ export function endPlaySceneFromLibrary(state: State): Object {
     librarySource = getLibrarySource(state);
   }
   state.scenes.pop();
-  const tagNames = state.tags.map((t: Tag) => t.name);
-  // Re-order the tags of the source we were playing
-  librarySource.tags = librarySource.tags.sort((a: Tag, b: Tag) => {
-    const aIndex = tagNames.indexOf(a.name);
-    const bIndex = tagNames.indexOf(b.name);
-    if (aIndex < bIndex) {
-      return -1;
-    } else if (aIndex > bIndex) {
-      return 1;
-    } else {
-      return 0;
-    }
-  });
+  if (librarySource != null) {
+    const tagNames = state.tags.map((t: Tag) => t.name);
+    // Re-order the tags of the source we were playing
+    librarySource.tags = librarySource.tags.sort((a: Tag, b: Tag) => {
+      const aIndex = tagNames.indexOf(a.name);
+      const bIndex = tagNames.indexOf(b.name);
+      if (aIndex < bIndex) {
+        return -1;
+      } else if (aIndex > bIndex) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+  }
   state.route.pop();
   state.route.pop();
   return {route: state.route.slice(0), scenes: state.scenes.slice(0)};

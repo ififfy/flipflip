@@ -360,7 +360,7 @@ export default class Player extends React.Component {
             scene={this.props.scene}
             scenes={this.props.scenes}
             sceneGrids={this.props.sceneGrids}
-            title={this.props.tags ? (this.props.scene.audioScene ? this.state.currentAudio ? this.state.currentAudio.name : "Loading..." : this.props.scene.sources[0].url) : this.props.scene.name}
+            title={this.props.allTags ? (this.props.scene.audioScene ? this.state.currentAudio ? this.state.currentAudio.name : "Loading..." : this.props.scene.sources[0].url) : this.props.scene.name}
             tutorial={this.props.tutorial}
             recentPictureGrid={this.state.recentPictureGrid}
             persistAudio={this.state.persistAudio}
@@ -415,7 +415,7 @@ export default class Player extends React.Component {
               removeChild
             />
           )}
-          {!this.state.recentPictureGrid && (this.props.config.displaySettings.audioAlert || this.props.tags) &&
+          {!this.state.recentPictureGrid && (this.props.config.displaySettings.audioAlert || this.props.allTags) &&
             (this.props.scene.audioEnabled || this.state.persistAudio) && (
             <AudioAlert
               audio={this.state.currentAudio}
@@ -614,7 +614,7 @@ export default class Player extends React.Component {
       };
     }
     if (props.scene.id !== this.props.scene.id) {
-      if (this.props.tags) {
+      if (this.props.allTags) {
         this.setState({startTime: new Date()});
       } else {
         this.setState({hasStarted: true, startTime: new Date()});
