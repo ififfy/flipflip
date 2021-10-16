@@ -571,90 +571,90 @@ class SceneOptionCard extends React.Component {
                 )}
               </Grid>
             </Grid>
-            <Grid item xs={12}>
-              <Divider/>
+          </React.Fragment>
+        )}
+        <Grid item xs={12}>
+          <Divider/>
+        </Grid>
+        <Grid item xs={12} className={clsx(this.props.tutorial == SDT.overlays && classes.highlight)}>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs>
+              <FormControlLabel
+                control={
+                  <Switch checked={this.props.scene.overlayEnabled}
+                          onChange={this.onBoolInput.bind(this, 'overlayEnabled')}/>
+                }
+                label="Overlays"/>
             </Grid>
-            <Grid item xs={12} className={clsx(this.props.tutorial == SDT.overlays && classes.highlight)}>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs>
-                  <FormControlLabel
-                    control={
-                      <Switch checked={this.props.scene.overlayEnabled}
-                              onChange={this.onBoolInput.bind(this, 'overlayEnabled')}/>
-                    }
-                    label="Overlays"/>
-                </Grid>
-                <Grid item>
-                  <Collapse in={this.props.scene.overlayEnabled}>
-                    <Fab
-                      className={classes.addButton}
-                      onClick={this.onAddOverlay.bind(this)}
-                      size="small">
-                      <AddIcon/>
-                    </Fab>
-                  </Collapse>
-                </Grid>
-              </Grid>
+            <Grid item>
+              <Collapse in={this.props.scene.overlayEnabled}>
+                <Fab
+                  className={classes.addButton}
+                  onClick={this.onAddOverlay.bind(this)}
+                  size="small">
+                  <AddIcon/>
+                </Fab>
+              </Collapse>
             </Grid>
-            {this.props.scene.overlays.map((o) => {
-                const overlayOpacity = typeof o.opacity === 'number' ? o.opacity : 0;
-                const oScene = this.props.allScenes.find((s) => s.id == o.sceneID);
-                const regenerate = oScene && oScene.generatorWeights && oScene.regenerate;
-                const invalid = regenerate && !areWeightsValid(oScene);
-                return (
-                  <React.Fragment key={o.id}>
-                    <Grid item xs={12} className={clsx(!this.props.scene.overlayEnabled && classes.noPadding)}>
-                      <Collapse in={this.props.scene.overlayEnabled} className={classes.fullWidth}>
-                        <Grid container spacing={2} alignItems="center">
-                          <Grid item xs={12} sm={this.props.sidebar ? 12 : 5}>
-                            <Typography className={classes.selectText} variant="caption">Overlay{regenerate ? invalid ? " ✗" : " ⟳" : ""}</Typography>
-                            <SceneSelect
-                              allScenes={this.props.allScenes}
-                              allSceneGrids={this.props.allSceneGrids}
-                              value={o.sceneID}
-                              getSceneName={this.getSceneName.bind(this)}
-                              onChange={this.changeOverlayIntKey.bind(this, o.id, 'sceneID')}
-                            />
+          </Grid>
+        </Grid>
+        {this.props.scene.overlays.map((o) => {
+            const overlayOpacity = typeof o.opacity === 'number' ? o.opacity : 0;
+            const oScene = this.props.allScenes.find((s) => s.id == o.sceneID);
+            const regenerate = oScene && oScene.generatorWeights && oScene.regenerate;
+            const invalid = regenerate && !areWeightsValid(oScene);
+            return (
+              <React.Fragment key={o.id}>
+                <Grid item xs={12} className={clsx(!this.props.scene.overlayEnabled && classes.noPadding)}>
+                  <Collapse in={this.props.scene.overlayEnabled} className={classes.fullWidth}>
+                    <Grid container spacing={2} alignItems="center">
+                      <Grid item xs={12} sm={this.props.sidebar ? 12 : 5}>
+                        <Typography className={classes.selectText} variant="caption">Overlay{regenerate ? invalid ? " ✗" : " ⟳" : ""}</Typography>
+                        <SceneSelect
+                          allScenes={this.props.allScenes}
+                          allSceneGrids={this.props.allSceneGrids}
+                          value={o.sceneID}
+                          getSceneName={this.getSceneName.bind(this)}
+                          onChange={this.changeOverlayIntKey.bind(this, o.id, 'sceneID')}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={this.props.sidebar ? 12 : 7}>
+                        <Typography id="overlay-opacity-slider" variant="caption" component="div"
+                                    color="textSecondary">
+                          Overlay Opacity: {o.opacity}%
+                        </Typography>
+                        <Grid container spacing={1} alignItems="center">
+                          <Grid item xs>
+                            <Slider
+                              min={0}
+                              max={100}
+                              defaultValue={overlayOpacity}
+                              onChangeCommitted={this.onOverlaySliderChange.bind(this, o.id, 'opacity')}
+                              valueLabelDisplay={'auto'}
+                              valueLabelFormat={(v) => v + "%"}
+                              aria-labelledby="overlay-opacity-slider"/>
                           </Grid>
-                          <Grid item xs={12} sm={this.props.sidebar ? 12 : 7}>
-                            <Typography id="overlay-opacity-slider" variant="caption" component="div"
-                                        color="textSecondary">
-                              Overlay Opacity: {o.opacity}%
-                            </Typography>
-                            <Grid container spacing={1} alignItems="center">
-                              <Grid item xs>
-                                <Slider
-                                  min={0}
-                                  max={100}
-                                  defaultValue={overlayOpacity}
-                                  onChangeCommitted={this.onOverlaySliderChange.bind(this, o.id, 'opacity')}
-                                  valueLabelDisplay={'auto'}
-                                  valueLabelFormat={(v) => v + "%"}
-                                  aria-labelledby="overlay-opacity-slider"/>
-                              </Grid>
-                              <Grid item>
-                                <Tooltip title="Remove Overlay">
-                                  <IconButton
-                                    onClick={this.onRemoveOverlay.bind(this, o.id)}>
-                                    <DeleteIcon color="error"/>
-                                  </IconButton>
-                                </Tooltip>
-                              </Grid>
-                            </Grid>
+                          <Grid item>
+                            <Tooltip title="Remove Overlay">
+                              <IconButton
+                                onClick={this.onRemoveOverlay.bind(this, o.id)}>
+                                <DeleteIcon color="error"/>
+                              </IconButton>
+                            </Tooltip>
                           </Grid>
                         </Grid>
-                      </Collapse>
+                      </Grid>
                     </Grid>
-                    <Grid item xs={12} className={clsx(!this.props.scene.overlayEnabled && classes.noPadding)}>
-                      <Collapse in={this.props.scene.overlayEnabled} className={classes.fullWidth}>
-                        <Divider/>
-                      </Collapse>
-                    </Grid>
-                  </React.Fragment>
-                )
-              }
-            )}
-          </React.Fragment>
+                  </Collapse>
+                </Grid>
+                <Grid item xs={12} className={clsx(!this.props.scene.overlayEnabled && classes.noPadding)}>
+                  <Collapse in={this.props.scene.overlayEnabled} className={classes.fullWidth}>
+                    <Divider/>
+                  </Collapse>
+                </Grid>
+              </React.Fragment>
+            )
+          }
         )}
       </Grid>
     );

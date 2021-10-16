@@ -32,7 +32,7 @@ class SceneSelect extends React.Component {
     autoFocus?: boolean,
     includeExtra?: boolean
     onlyExtra?: boolean
-    getSceneName(sceneID: string): void,
+    getSceneName(sceneID: string): string,
     onChange(sceneID: number): void,
   }
 
@@ -47,7 +47,7 @@ class SceneSelect extends React.Component {
     if (this.props.allSceneGrids) {
       idList = idList.concat(this.props.allSceneGrids.map((s) => "999" + s.id));
     }
-    const options = idList.map((id) => {return {label: this.props.getSceneName(id), value: id}})
+    const options = idList.map((id) => {return{label: this.props.getSceneName(id), value: id}}).filter((o) => o.label != "library_scene_temp");
     return (
       <Select
         className={classes.select}

@@ -282,7 +282,7 @@ export default class Scene {
       this.transDuration = this.effectLevel * 1000;
       this.effectLevel = 0;
     }
-    if (this.overlaySceneID != 0) {
+    if (!!this.overlaySceneID && this.overlaySceneID != 0) {
       this.overlays.push(new Overlay({sceneID: this.overlaySceneID, opacity: this.overlaySceneOpacity * 100}));
       this.overlaySceneID = 0;
     }

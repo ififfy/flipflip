@@ -911,6 +911,7 @@ export function playScript(state: State, source: CaptionScript, sceneID: number,
   };
 }
 
+// TODO Fix bug, playing non-Library source in Scene and hit Back results in deleted Scene
 export function playSceneFromLibrary(state: State, source: LibrarySource, displayed: Array<LibrarySource>): Object {
   const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path.sep);
   let librarySource = state.library.find((s) => s.url == sourceURL);
@@ -944,6 +945,7 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
       playVideoClips: state.config.defaultScene.playVideoClips,
       videoVolume: state.config.defaultScene.videoVolume,
     });
+    console.log(tempScene);
     return {
       displayedSources: displayed,
       scenes: state.scenes.concat([tempScene]),
@@ -979,6 +981,7 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
       playVideoClips: state.config.defaultScene.playVideoClips,
       videoVolume: state.config.defaultScene.videoVolume,
     });
+    console.log(tempScene);
     return {
       displayedSources: displayed,
       scenes: state.scenes.concat([tempScene]),
