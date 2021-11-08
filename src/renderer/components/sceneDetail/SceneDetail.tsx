@@ -360,7 +360,7 @@ class SceneDetail extends React.Component {
     onDelete(scene: Scene): void,
     onEditBlacklist(sourceURL: string, blacklist: string): void,
     onExport(scene: Scene): void,
-    onGenerate(scenes: Array<Scene>): void,
+    onGenerate(scene: Scene | SceneGrid, children?: boolean): void,
     onPlayScene(scene: Scene): void,
     onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void,
     onPlayAudio(source: Audio, displayed: Array<Audio>): void,
@@ -1119,35 +1119,7 @@ class SceneDetail extends React.Component {
     }
 
     // Regenerate scene(s) before playback
-    const generateScenes: Array<Scene> = []
-    if (this.props.scene.regenerate && areWeightsValid(this.props.scene)) {
-      generateScenes.push(this.props.scene);
-    }
-    if (this.props.scene.overlayEnabled) {
-      for (let overlay of this.props.scene.overlays) {
-        if (overlay.sceneID.toString().startsWith('999')) {
-          const id = overlay.sceneID.toString().replace('999', '');
-          const oScene = this.props.allSceneGrids.find((s) => s.id.toString() == id);
-          for (let row of oScene.grid) {
-            for (let cell of row) {
-              const gScene = this.props.allScenes.find((s) => s.id == cell.sceneID);
-              if (gScene && gScene.generatorWeights && gScene.regenerate && areWeightsValid(gScene)) {
-                generateScenes.push(gScene);
-              }
-            }
-          }
-        } else {
-          const oScene = this.props.allScenes.find((s) => s.id == overlay.sceneID);
-          if (oScene && oScene.generatorWeights && oScene.regenerate && areWeightsValid(oScene)) {
-            generateScenes.push(oScene);
-          }
-        }
-      }
-    }
-    if (generateScenes.length > 0) {
-      this.props.onGenerate(generateScenes);
-    }
-
+    this.props.onGenerate(this.props.scene);
     this.props.onPlayScene(this.props.scene);
   }
 
@@ -1162,7 +1134,7 @@ class SceneDetail extends React.Component {
   }
 
   onGenerate() {
-    this.props.onGenerate([this.props.scene]);
+    this.props.onGenerate(this.props.scene, false);
     this.generateCallback();
   }
 

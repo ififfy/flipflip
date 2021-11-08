@@ -96,6 +96,7 @@ class SceneOptionCard extends React.Component {
     tutorial: string,
     onUpdateScene(scene: Scene | SceneSettings, fn: (scene: Scene | SceneSettings) => void): void,
     isTagging?: boolean,
+    onGenerate?(scene: Scene | SceneGrid, children?: boolean): void,
   };
 
   readonly state = {
@@ -697,7 +698,17 @@ class SceneOptionCard extends React.Component {
   }
 
   changeOverlayIntKey(id: number, key: string, intString: string) {
-    this.changeOverlayKey(id, key, intString === '' ? '' : Number(intString));
+    const value = intString === '' ? '' : Number(intString);
+    if (this.props.sidebar && this.props.onGenerate) {
+      if (intString.startsWith('999')) {
+        intString = intString.replace('999', '');
+        const gValue = intString === '' ? '' : Number(intString);
+        this.props.onGenerate(this.props.allSceneGrids.find((s) => s.id == gValue));
+      } else {
+        this.props.onGenerate(this.props.allScenes.find((s) => s.id == value));
+      }
+    }
+    this.changeOverlayKey(id, key, value);
   }
 
   blurIntKey(key: string, e: MouseEvent) {

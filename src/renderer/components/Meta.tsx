@@ -365,6 +365,7 @@ export default class Meta extends React.Component {
                 sceneGrids={this.state.grids}
                 theme={theme}
                 tutorial={this.state.tutorial}
+                onGenerate={a(actions.generateScenes)}
                 onUpdateScene={a(actions.updateScene)}
                 nextScene={a(actions.nextScene)}
                 goBack={a(actions.goBack)}
@@ -388,6 +389,7 @@ export default class Meta extends React.Component {
                 sceneGrids={this.state.grids}
                 theme={theme}
                 tutorial={this.state.tutorial}
+                onGenerate={a(actions.generateScenes)}
                 onUpdateScene={a(actions.updateScene)}
                 goBack={a(actions.endPlaySceneFromLibrary)}
                 playTrack={a(actions.playTrack)}
@@ -415,6 +417,7 @@ export default class Meta extends React.Component {
                 sceneGrids={this.state.grids}
                 theme={theme}
                 tutorial={this.state.tutorial}
+                onGenerate={a(actions.generateScenes)}
                 onUpdateScene={a(actions.updateScene)}
                 nextScene={a(actions.nextScene)}
                 goBack={a(actions.endPlaySceneGrid)}

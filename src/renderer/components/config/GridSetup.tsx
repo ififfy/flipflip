@@ -133,7 +133,7 @@ class GridSetup extends React.Component {
     tutorial: string,
     goBack(): void,
     onDelete(grid: SceneGrid): void,
-    onGenerate(scenes: Array<Scene>): void,
+    onGenerate(scene: Scene | SceneGrid, children?: boolean): void,
     onPlayGrid(grid: SceneGrid): void,
     onTutorial(tutorial: string): void,
     onUpdateGrid(grid: SceneGrid, fn: (grid: SceneGrid) => void): void,
@@ -591,31 +591,7 @@ class GridSetup extends React.Component {
 
   onPlayGrid() {
     // Regenerate scene(s) before playback
-    const generateScenes: Array<Scene> = []
-    for (let row of this.props.scene.grid) {
-      for (let cell of row) {
-        const gScene = this.props.allScenes.find((s) => s.id == cell.sceneID);
-        if (gScene && gScene.generatorWeights && gScene.regenerate && areWeightsValid(gScene)) {
-          generateScenes.push(gScene);
-        }
-        if (gScene && gScene.overlayEnabled) {
-          for (let overlay of gScene.overlays) {
-            if (overlay.sceneID.toString().startsWith('999')) {
-              // No grid overlays within a grid
-            } else {
-              const oScene = this.props.allScenes.find((s) => s.id == overlay.sceneID);
-              if (oScene && oScene.generatorWeights && oScene.regenerate && areWeightsValid(oScene)) {
-                generateScenes.push(oScene);
-              }
-            }
-          }
-        }
-      }
-    }
-    if (generateScenes.length > 0) {
-      this.props.onGenerate(generateScenes);
-    }
-
+    this.props.onGenerate(this.props.scene);
     this.props.onPlayGrid(this.props.scene);
   }
 

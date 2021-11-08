@@ -66,6 +66,7 @@ export default class Player extends React.Component {
     setProgress?(total: number, current: number, message: string[]): void,
     setSceneCopy?(children: React.ReactNode): void,
     setVideo?(video: HTMLVideoElement): void,
+    onGenerate?(scene: Scene | SceneGrid, children?: boolean): void,
   };
 
   readonly state = {
@@ -378,6 +379,7 @@ export default class Player extends React.Component {
             play={this.play.bind(this)}
             pause={this.pause.bind(this)}
             playTrack={this.props.playTrack}
+            onGenerate={this.props.onGenerate}
             onPlaying={!this.props.scene.textEnabled || !this.state.currentAudio || this.props.getCurrentTimestamp ? undefined : this.onPlaying.bind(this)}
             setCurrentAudio={this.setCurrentAudio.bind(this)}
             allTags={this.props.allTags}
@@ -536,6 +538,7 @@ export default class Player extends React.Component {
                       finishedLoading={this.setOverlayLoaded.bind(this, index)}
                       getTags={this.props.getTags}
                       goBack={this.props.goBack}
+                      onGenerate={this.props.onGenerate}
                       setCount={this.props.setCount}
                       setProgress={showProgress ? this.setProgress.bind(this) : undefined}
                       setVideo={this.setGridOverlayVideo.bind(this, index)}

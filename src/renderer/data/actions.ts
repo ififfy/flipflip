@@ -15,9 +15,11 @@ import request from "request";
 import moment from "moment";
 
 import {
+  applyEffects,
+  areWeightsValid,
   filterSource,
   getBackups,
-  getCachePath,
+  getCachePath, getEffects,
   getFilesRecursively,
   getRandomIndex,
   randomizeList,
@@ -921,11 +923,6 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
     state.scenes.forEach((s: Scene) => {
       id = Math.max(s.id + 1, id);
     });
-    if (getLibrarySource(state) != null) {
-      state.route.pop();
-      state.route.pop();
-      state.scenes.pop();
-    }
     const sourceType = getSourceType(source.url);
     let tempScene = new Scene({
       id: id,
@@ -945,7 +942,15 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
       playVideoClips: state.config.defaultScene.playVideoClips,
       videoVolume: state.config.defaultScene.videoVolume,
     });
-    console.log(tempScene);
+    if (getLibrarySource(state) != null) {
+      const activeScene = getActiveScene(state);
+      applyEffects(tempScene, getEffects(activeScene));
+      tempScene.overlayEnabled = activeScene.overlayEnabled;
+      tempScene.overlays = activeScene.overlays;
+      state.route.pop();
+      state.route.pop();
+      state.scenes.pop();
+    }
     return {
       displayedSources: displayed,
       scenes: state.scenes.concat([tempScene]),
@@ -957,11 +962,6 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
     state.scenes.forEach((s: Scene) => {
       id = Math.max(s.id + 1, id);
     });
-    if (getActiveScene(state)?.libraryID != null) {
-      state.route.pop();
-      state.route.pop();
-      state.scenes.pop();
-    }
     const sourceType = getSourceType(source.url);
     let tempScene = new Scene({
       id: id,
@@ -981,7 +981,15 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
       playVideoClips: state.config.defaultScene.playVideoClips,
       videoVolume: state.config.defaultScene.videoVolume,
     });
-    console.log(tempScene);
+    if (getActiveScene(state)?.libraryID != null) {
+      const activeScene = getActiveScene(state);
+      applyEffects(tempScene, getEffects(activeScene));
+      tempScene.overlayEnabled = activeScene.overlayEnabled;
+      tempScene.overlays = activeScene.overlays;
+      state.route.pop();
+      state.route.pop();
+      state.scenes.pop();
+    }
     return {
       displayedSources: displayed,
       scenes: state.scenes.concat([tempScene]),
@@ -1167,9 +1175,57 @@ function reduceList(sources: Array<LibrarySource>, limit: number): Array<Library
   return sources;
 }
 
-export function generateScenes(state: State, scenes: Array<Scene>): Object {
+export function generateScenes(state: State, s: Scene | SceneGrid, children: boolean =  true): Object {
+  const generateScenes: Array<Scene> = []
+  if (s instanceof SceneGrid) {
+    for (let row of s.grid) {
+      for (let cell of row) {
+        const gScene = state.scenes.find((s) => s.id == cell.sceneID);
+        if (gScene && gScene.generatorWeights && gScene.regenerate && areWeightsValid(gScene)) {
+          generateScenes.push(gScene);
+        }
+        if (gScene && gScene.overlayEnabled) {
+          for (let overlay of gScene.overlays) {
+            if (overlay.sceneID.toString().startsWith('999')) {
+              // No grid overlays within a grid
+            } else {
+              const oScene = state.scenes.find((s) => s.id == overlay.sceneID);
+              if (oScene && oScene.generatorWeights && oScene.regenerate && areWeightsValid(oScene)) {
+                generateScenes.push(oScene);
+              }
+            }
+          }
+        }
+      }
+    }
+  } else {
+    if (s.regenerate && areWeightsValid(s)) {
+      generateScenes.push(s);
+    }
+    if (s.overlayEnabled && children) {
+      for (let overlay of s.overlays) {
+        if (overlay.sceneID.toString().startsWith('999')) {
+          const id = overlay.sceneID.toString().replace('999', '');
+          const oScene = state.grids.find((s) => s.id.toString() == id);
+          for (let row of oScene.grid) {
+            for (let cell of row) {
+              const gScene = state.scenes.find((s) => s.id == cell.sceneID);
+              if (gScene && gScene.generatorWeights && gScene.regenerate && areWeightsValid(gScene)) {
+                generateScenes.push(gScene);
+              }
+            }
+          }
+        } else {
+          const oScene = state.scenes.find((s) => s.id == overlay.sceneID);
+          if (oScene && oScene.generatorWeights && oScene.regenerate && areWeightsValid(oScene)) {
+            generateScenes.push(oScene);
+          }
+        }
+      }
+    }
+  }
   const newScenes = Array.from(state.scenes);
-  for (let scene of scenes) {
+  for (let scene of generateScenes) {
     const newScene = state.scenes.find((s) => s.id == scene.id);
 
     // Record all the groups we're requiring/excluding

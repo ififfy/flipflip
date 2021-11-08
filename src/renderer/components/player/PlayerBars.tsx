@@ -244,6 +244,7 @@ class PlayerBars extends React.Component {
     historyBack(): void,
     historyForward(): void,
     navigateTagging(offset: number): void,
+    onGenerate(scene: Scene | SceneGrid, children?: boolean): void,
     onRecentPictureGrid(): void,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
     playNextScene(): void,
@@ -421,7 +422,8 @@ class PlayerBars extends React.Component {
                         allSceneGrids={this.props.sceneGrids}
                         isTagging={this.props.allTags != null}
                         scene={this.props.scene}
-                        onUpdateScene={this.props.onUpdateScene.bind(this)}/>
+                        onUpdateScene={this.props.onUpdateScene.bind(this)}
+                        onGenerate={this.props.onGenerate.bind(this)}/>
                     </AccordionDetails>
                   </Accordion>
 

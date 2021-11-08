@@ -105,6 +105,7 @@ class GridPlayer extends React.Component {
     cache(i: HTMLImageElement | HTMLVideoElement): void,
     getTags(source: string): Array<Tag>,
     goBack(): void,
+    onGenerate(scene: Scene | SceneGrid, children?: boolean): void,
     setCount(sourceURL: string, count: number, countComplete: boolean): void,
     systemMessage(message: string): void,
     finishedLoading?(empty: boolean): void,
@@ -277,6 +278,7 @@ class GridPlayer extends React.Component {
                               cache={this.props.cache.bind(this)}
                               getTags={this.props.getTags.bind(this)}
                               goBack={this.props.goBack.bind(this)}
+                              onGenerate={this.props.onGenerate}
                               onLoaded={this.setCellLoaded.bind(this, rowIndex, colIndex)}
                               setCount={this.props.setCount.bind(this)}
                               setProgress={showProgress ? this.props.setProgress : this.nop}
