@@ -9,7 +9,7 @@ import uuidv4 from "uuid/v4";
 
 import {Dialog, DialogContent} from "@material-ui/core";
 
-import {CancelablePromise, flatten, getCachePath, randomizeList} from "../../data/utils";
+import {CancelablePromise, flatten, getCachePath, randomizeList, urlToPath} from "../../data/utils";
 import {
   filterPathsToJustPlayable, getFileName, getSourceType, isVideo, loadBDSMlr, loadDanbooru, loadDeviantArt, loadE621,
   loadEHentai, loadGelbooru1, loadGelbooru2, loadHydrus, loadImageFap, loadImgur, loadInstagram, loadPiwigo, loadReddit,
@@ -193,7 +193,7 @@ const loadLocalDirectory = (pm: Function, allURLs: Map<string, Array<string>>, c
       });
 
       if (source.blacklist && source.blacklist.length > 0) {
-        sources = sources.filter((url: string) => !source.blacklist.includes(url));
+        sources = sources.filter((url: string) => !source.blacklist.includes(url) && !source.blacklist.includes(urlToPath(url)));
       }
       allURLs = processAllURLs(sources, allURLs, source, weight, helpers);
       // If this is a local source (not a cacheDir call)

@@ -889,6 +889,7 @@ class PlayerBars extends React.Component {
     const img = this.props.recentPictureGrid ? e.target : this.props.historyPaths[(this.props.historyPaths.length - 1) + this.props.historyOffset];
     const url = img.src;
     let source = img.getAttribute("source");
+    const literalSource = source;
     if (/^https?:\/\//g.exec(source) == null) {
       source = urlToPath(fileURL(source));
     }
@@ -896,7 +897,7 @@ class PlayerBars extends React.Component {
     const path = urlToPath(url);
     const type = getSourceType(source);
     contextMenu.append(new MenuItem({
-      label: source,
+      label: literalSource,
       click: () => { navigator.clipboard.writeText(source); }
     }));
     contextMenu.append(new MenuItem({
@@ -936,7 +937,7 @@ class PlayerBars extends React.Component {
       contextMenu.append(new MenuItem({
         label: 'Blacklist File',
         click: () => {
-          this.onBlacklistFile(source, isFile ? path : url);
+          this.onBlacklistFile(literalSource, isFile ? path : url);
         }
       }));
     }
