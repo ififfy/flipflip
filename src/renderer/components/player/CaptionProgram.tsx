@@ -64,7 +64,8 @@ export default class CaptionProgram extends React.Component {
     countColor: "#FFFFFF",
     countProgress: false,
     countCurrent: 0,
-    countTotal: 0
+    countTotal: 0,
+    countChild: 0,
   };
 
   _runningPromise: CancelablePromise = null;
@@ -151,15 +152,28 @@ export default class CaptionProgram extends React.Component {
             overflow: 'hidden',
             opacity: this.props.captionScript.opacity / 100,
           }}>
-            <CircularProgress
-              style={{
-                ...countXStyle,
-                ...countYStyle,
-                color: this.state.countColor,
-              }}
-              size={this.state.countProgressScale * this.props.scale}
-              value={Math.round((this.state.countCurrent / this.state.countTotal) * 100)}
-              variant="static"/>
+            {this.state.countChild == 0 && (
+              <CircularProgress
+                style={{
+                  ...countXStyle,
+                  ...countYStyle,
+                  color: this.state.countColor,
+                }}
+                size={this.state.countProgressScale * this.props.scale}
+                value={Math.round((this.state.countCurrent / this.state.countTotal) * 100)}
+                variant="determinate"/>
+            )}
+            {this.state.countChild == 1 && (
+              <CircularProgress
+                style={{
+                  ...countXStyle,
+                  ...countYStyle,
+                  color: this.state.countColor,
+                }}
+                size={this.state.countProgressScale * this.props.scale}
+                value={Math.round((this.state.countCurrent / this.state.countTotal) * 100)}
+                variant="determinate"/>
+            )}
           </div>
         )}
       </React.Fragment>
@@ -826,7 +840,10 @@ export default class CaptionProgram extends React.Component {
           }
           newCounter = 0;
         }
-        this.setState({programCounter: newCounter});
+        this.setState({
+          programCounter: newCounter,
+          countChild: this.state.countChild == 0 ? 1 : 0
+        });
         this.captionLoop();
       });
     }
