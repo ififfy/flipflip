@@ -162,6 +162,7 @@ const styles = (theme: Theme) => createStyles({
     position: 'absolute',
   },
   tagDrawerPaper: {
+    overflow: 'hidden',
     transform: 'scale(0)',
     transformOrigin: 'bottom left',
     backgroundColor: hexToRGB(theme.palette.background.default),
@@ -707,9 +708,7 @@ class PlayerBars extends React.Component {
 
     window.addEventListener('contextmenu', this.showContextMenu, false);
     window.addEventListener('keydown', this.onKeyDown, false);
-    if (this.props.allTags == null) {
-      window.addEventListener('wheel', this.onScroll, false);
-    }
+    window.addEventListener('wheel', this.onScroll, false);
     this.buildMenu();
   }
 
@@ -725,9 +724,7 @@ class PlayerBars extends React.Component {
     createMainMenu(Menu, createMenuTemplate(app));
     window.removeEventListener('contextmenu', this.showContextMenu);
     window.removeEventListener('keydown', this.onKeyDown);
-    if (this.props.allTags == null) {
-      window.removeEventListener('wheel', this.onScroll);
-    }
+    window.removeEventListener('wheel', this.onScroll);
   }
 
   onScroll = (e: WheelEvent) => {
