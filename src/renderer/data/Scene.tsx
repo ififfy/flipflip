@@ -12,6 +12,7 @@ export default class Scene {
   id: number = 0;
   name: string = "Unnamed scene";
   sources: Array<LibrarySource> = [];
+  useWeights = false;
 
   timingFunction = TF.constant;
   timingConstant = 1000;

@@ -115,6 +115,7 @@ class SourceListItem extends React.Component {
     sources: Array<LibrarySource>,
     style: any,
     tutorial: string,
+    useWeights?: boolean,
     onClean(source: LibrarySource): void,
     onClearBlacklist(sourceURL: string): void,
     onClip(source: LibrarySource, displaySources: Array<LibrarySource>): void,
@@ -122,6 +123,7 @@ class SourceListItem extends React.Component {
     onEditBlacklist(source: LibrarySource): void,
     onEndEdit(newURL: string): void,
     onOpenClipMenu(source: LibrarySource): void,
+    onOpenWeightMenu(source: LibrarySource): void,
     onPlay(source: LibrarySource, displaySources: Array<LibrarySource>): void,
     onRemove(source: LibrarySource): void,
     onSourceOptions(source: LibrarySource): void,
@@ -219,6 +221,17 @@ class SourceListItem extends React.Component {
 
           {this.props.isEditing != this.props.source.id && (
             <ListItemSecondaryAction className={clsx(classes.source, this.props.tutorial == SDT.sourceButtons && classes.highlight)}>
+              {this.props.useWeights && (
+                <React.Fragment>
+                  <Chip
+                    className={classes.countChip}
+                    clickable
+                    label={!!this.props.source.weight ? this.props.source.weight : "1"}
+                    color="default"
+                    size="small"
+                    onClick={this.props.onOpenWeightMenu.bind(this, this.props.source)}/>
+                </React.Fragment>
+              )}
               {(sourceType == ST.video && this.props.source.duration) && (
                 <Chip
                   className={classes.countChip}

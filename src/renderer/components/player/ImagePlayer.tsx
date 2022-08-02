@@ -356,11 +356,23 @@ export default class ImagePlayer extends React.Component {
 
     // For source weighted
     if (this.props.scene.weightFunction == WF.sources) {
+      let keys;
+      if (this.props.scene.useWeights) {
+        const validKeys = Array.from(this.props.allURLs.keys());
+        keys = [];
+        for (let source of this.props.scene.sources) {
+          if (validKeys.includes(source.url)) {
+            for (let w = source.weight; w > 0; w--) {
+              keys.push(source.url);
+            }
+          }
+        }
+      } else {
+        keys = Array.from(this.props.allURLs.keys());
+      }
 
       // If sorting randomly, get a random source
       if (this.props.scene.sourceOrderFunction == SOF.random) {
-        let keys = Array.from(this.props.allURLs.keys());
-
         // If we're playing full sources
         if (this.props.scene.fullSource) {
           // If this is the first loop or source is done get next source
@@ -390,15 +402,15 @@ export default class ImagePlayer extends React.Component {
         if (this.props.scene.fullSource) {
           // If this is the first loop or source is done get next source
           if (this._nextIndex == -1 || this._sourceComplete) {
-            source = Array.from(this.props.allURLs.keys())[++this._nextIndex % this.props.allURLs.size];
+            source = keys[++this._nextIndex % keys.length];
             this._sourceComplete = false;
           } else { // Play same source
-            source = Array.from(this.props.allURLs.keys())[this._nextIndex % this.props.allURLs.size];
+            source = keys[this._nextIndex % keys.length];
           }
         } else {
-          source = Array.from(this.props.allURLs.keys())[++this._nextIndex % this.props.allURLs.size];
+          source = keys[++this._nextIndex % keys.length];
         }
-        sourceIndex = this._nextIndex % this.props.allURLs.size;
+        sourceIndex = this._nextIndex % keys.length;
       }
       // Get the urls from the source
       collection = this.props.allURLs.get(source);

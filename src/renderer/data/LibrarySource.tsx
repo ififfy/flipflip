@@ -13,6 +13,7 @@ export default class LibrarySource {
   blacklist: Array<string> = [];
   count: number = 0;
   countComplete: boolean = false;
+  weight: number = 1;
 
   // Type specific properties
   // Local

@@ -63,6 +63,9 @@ const styles = (theme: Theme) => createStyles({
     position: 'absolute',
     bottom: 260,
     right: 160,
+  },
+  weightMenu: {
+    width: theme.spacing(10)
   }
 });
 
@@ -82,6 +85,7 @@ class SourceList extends React.Component {
     isSelect?: boolean,
     selected?: Array<string>,
     yOffset?: number,
+    useWeights?: boolean,
     onUpdateLibrary?(fn: (library: Array<LibrarySource>) => void): void,
     onUpdateScene?(fn: (scene: Scene) => void): void,
     onUpdateSelected?(selected: Array<string>): void,
@@ -94,6 +98,7 @@ class SourceList extends React.Component {
     mouseX: null as any,
     mouseY: null as any,
     clipMenu: null as LibrarySource,
+    weightMenu: null as LibrarySource,
     blacklistSource: null as string,
     editBlacklist: null as string,
     sourceOptionsType: null as string,
@@ -192,6 +197,35 @@ class SourceList extends React.Component {
               </ListItemSecondaryAction>
             </MenuItem>
           )}
+        </Menu>
+        <Menu
+          id="weight-menu"
+          classes={{paper: classes.weightMenu}}
+          elevation={1}
+          anchorReference="anchorPosition"
+          anchorPosition={
+            this.state.mouseY !== null && this.state.mouseX !== null
+              ? { top: this.state.mouseY, left: this.state.mouseX }
+              : undefined
+          }
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+          keepMounted
+          open={!!this.state.weightMenu}
+          onClose={this.onCloseDialog.bind(this)}>
+          <MenuItem >
+            <TextField
+              margin="dense"
+              value={!!this.state.weightMenu ? !!this.state.weightMenu.weight ? this.state.weightMenu.weight : 1 : 1}
+              onChange={this.onWeightInput.bind(this)}
+              onBlur={this.blurWeight.bind(this)}
+              inputProps={{
+                min: 1,
+                type: 'number',
+              }}/>
+          </MenuItem>
         </Menu>
         {this.state.cachePath != null && (
           <Dialog
@@ -481,6 +515,29 @@ class SourceList extends React.Component {
     this.props.onUpdateSelected(newSelected);
   }
 
+  blurWeight(e: MouseEvent) {
+    const min = (e.currentTarget as any).min ? (e.currentTarget as any).min : null;
+    const max = (e.currentTarget as any).max ? (e.currentTarget as any).max : null;
+    if (min && this.state.weightMenu.weight < min) {
+      this.changeWeight(min);
+    } else if (max && this.state.weightMenu.weight > max) {
+      this.changeWeight(max);
+    }
+  }
+
+  onWeightInput(e: MouseEvent) {
+    const input = (e.target as HTMLInputElement);
+    this.changeWeight(input.value === '' ? 1 : Number(input.value));
+  }
+
+  changeWeight(intString: number) {
+    this.props.onUpdateScene((scene) => {
+      const source = scene.sources.find((ls) => ls.id == this.state.weightMenu.id);
+      source.weight = intString;
+      this.setState({weightMenu: source});
+    });
+  }
+
   onToggleClip(s: LibrarySource, c: Clip) {
     this.props.onUpdateScene((scene) => {
       const source = scene.sources.find((ls) => ls.id == s.id);
@@ -610,8 +667,12 @@ class SourceList extends React.Component {
     this.setState({mouseX: e.clientX, mouseY: e.clientY, clipMenu: source});
   }
 
+  onOpenWeightMenu(source: LibrarySource, e: MouseEvent) {
+    this.setState({mouseX: e.clientX, mouseY: e.clientY, weightMenu: source});
+  }
+
   onCloseDialog() {
-    this.setState({menuAnchorEl: null, clipMenu: null});
+    this.setState({menuAnchorEl: null, clipMenu: null, weightMenu: null});
   }
 
   onCloseBlacklist() {
@@ -708,6 +769,7 @@ class SourceList extends React.Component {
         sources={this.props.sources}
         style={value.style}
         tutorial={this.props.tutorial}
+        useWeights={this.props.useWeights}
         onClean={this.onClean.bind(this)}
         onClearBlacklist={this.props.onClearBlacklist.bind(this)}
         onClip={this.props.onClip.bind(this)}
@@ -715,6 +777,7 @@ class SourceList extends React.Component {
         onEditBlacklist={this.onEditBlacklist.bind(this)}
         onEndEdit={this.onEndEdit.bind(this)}
         onOpenClipMenu={this.onOpenClipMenu.bind(this)}
+        onOpenWeightMenu={this.onOpenWeightMenu.bind(this)}
         onPlay={this.props.onPlay.bind(this)}
         onRemove={this.onRemove.bind(this)}
         onSourceOptions={this.onSourceOptions.bind(this)}

@@ -37,7 +37,7 @@ import ShuffleIcon from "@material-ui/icons/Shuffle";
 import SortIcon from '@material-ui/icons/Sort';
 import WarningIcon from '@material-ui/icons/Warning';
 
-import {AF, MO, SB, SDGT, SDT, SF, ST, TT} from "../../data/const";
+import {AF, MO, SB, SDGT, SDT, SF, ST, TT, WF} from "../../data/const";
 import en from "../../data/en";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
@@ -223,6 +223,16 @@ const styles = (theme: Theme) => createStyles({
     margin: 0,
     top: 'auto',
     right: 20,
+    bottom: 20,
+    left: 'auto',
+    position: 'fixed',
+  },
+  weightButton: {
+    backgroundColor: theme.palette.secondary.dark,
+    color: theme.palette.secondary.contrastText,
+    margin: 0,
+    top: 'auto',
+    right: 135,
     bottom: 20,
     left: 'auto',
     position: 'fixed',
@@ -670,6 +680,7 @@ class SceneDetail extends React.Component {
                       library={this.props.library}
                       sources={this.state.displaySources}
                       tutorial={this.props.tutorial == SDGT.final ? null : this.props.tutorial}
+                      useWeights={this.props.scene.weightFunction == WF.sources && this.props.scene.useWeights}
                       onClearBlacklist={this.props.onClearBlacklist.bind(this)}
                       onClip={this.props.onClip.bind(this)}
                       onEditBlacklist={this.props.onEditBlacklist.bind(this)}
@@ -860,6 +871,25 @@ class SceneDetail extends React.Component {
 
             {this.props.scene.sources.length >= 2 && (
               <React.Fragment>
+                {this.props.scene.weightFunction == WF.sources && (
+                  <Fab
+                    className={classes.weightButton}
+                    onClick={this.onToggleWeight.bind(this)}
+                    size="medium">
+                    <SvgIcon viewBox="0 0 489.183 489.183" fontSize="small">
+                      <path d="M487.106,259.27c-2.808-4.906-8.032-7.918-13.678-7.918h-3.219L411.005,56.795c-4.736-15.562-20.915-24.607-36.652-20.492
+                              l-104.48,27.322V30.391c0-13.967-11.317-25.284-25.283-25.284c-13.966,0-25.283,11.317-25.283,25.284V76.9l-111.262,28.928
+                              c-13.496,3.509-24.215,13.759-28.349,27.077C62.657,187.792,18.954,329.07,18.954,329.07h-3.203c-5.653,0-10.864,3.029-13.67,7.926
+                              c-2.807,4.905-2.774,10.938,0.09,15.801c19.045,32.304,54.188,53.99,94.409,53.99c40.22,0,75.354-21.679,94.399-53.99
+                              c2.871-4.864,2.913-10.904,0.106-15.81c-2.806-4.905-8.033-7.917-13.679-7.917h-3.217l-61.611-198.008l106.728-28.022V433.51
+                              h-75.848c-13.966,0-25.283,11.316-25.283,25.283c0,13.966,11.317,25.282,25.283,25.282h202.263
+                              c13.966,0,25.283-11.316,25.283-25.282c0-13.967-11.317-25.283-25.283-25.283h-75.849V89.763l103.881-27.267l-58.78,188.856h-3.202
+                              c-5.654,0-10.864,3.029-13.671,7.925c-2.806,4.905-2.772,10.938,0.092,15.803c19.043,32.303,54.186,53.989,94.406,53.989
+                              s75.355-21.678,94.398-53.989C489.872,270.216,489.913,264.176,487.106,259.27z M147.714,329.07H45.439l51.142-164.339
+                              L147.714,329.07z M341.458,251.353l51.142-164.338l51.134,164.338H341.458z"/>
+                    </SvgIcon>
+                  </Fab>
+                )}
                 <Fab
                   className={classes.sortMenuButton}
                   aria-haspopup="true"
@@ -1212,6 +1242,10 @@ class SceneDetail extends React.Component {
 
   onOpenSortMenu(e: MouseEvent) {
     this.setState({menuAnchorEl: e.currentTarget, openMenu: MO.sort});
+  }
+
+  onToggleWeight() {
+    this.changeKey('useWeights', !this.props.scene.useWeights);
   }
 
   onOpenPiwigoMenu() {
