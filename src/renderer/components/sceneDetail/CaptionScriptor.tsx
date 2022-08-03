@@ -111,7 +111,7 @@ const styles = (theme: Theme) => createStyles({
   },
   playerGrid: {
     overflow: 'hidden',
-    position: 'relative',
+    display: 'grid',
   },
   fontGrid: {
     borderWidth: 1,
@@ -206,6 +206,9 @@ const styles = (theme: Theme) => createStyles({
   disable: {
     pointerEvents: 'none',
   },
+  relative: {
+    position: 'relative',
+  }
 });
 
 
@@ -604,19 +607,21 @@ class CaptionScriptor extends React.Component {
                   <ErrorOutlineIcon className={classes.errorIcon} color="error" />
                 )}
                 {!this.state.scene && this.state.captionScript.script && this.state.captionScript.script.length > 0 && (
-                  <CaptionProgram
-                    captionScript={this.state.captionScript}
-                    repeat={RP.one}
-                    scale={0.35}
-                    singleTrack={true}
-                    getTags={this.props.getTags.bind(this)}
-                    goBack={this.props.goBack.bind(this)}
-                    playNextScene={() => {}}
-                    timeToNextFrame={null}
-                    currentAudio={null}
-                    currentImage={null}
-                    jumpToHack={this.state.captionProgramJumpToHack}
-                    onError={this.onError.bind(this)}/>
+                  <div className={clsx(!this.state.fullscreen && classes.relative)}>
+                    <CaptionProgram
+                      captionScript={this.state.captionScript}
+                      repeat={RP.one}
+                      scale={0.35}
+                      singleTrack={true}
+                      getTags={this.props.getTags.bind(this)}
+                      goBack={this.props.goBack.bind(this)}
+                      playNextScene={() => {}}
+                      timeToNextFrame={null}
+                      currentAudio={null}
+                      currentImage={null}
+                      jumpToHack={this.state.captionProgramJumpToHack}
+                      onError={this.onError.bind(this)}/>
+                  </div>
                 )}
               </div>
               <div className={clsx(classes.fontGrid, this.state.fullscreen && classes.hidden, this.props.tutorial == CST.fonts && classes.backdropTopHighlight)}>

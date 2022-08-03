@@ -424,7 +424,7 @@ class PlayerBars extends React.Component {
                         isTagging={this.props.allTags != null}
                         scene={this.props.scene}
                         onUpdateScene={this.props.onUpdateScene.bind(this)}
-                        onGenerate={this.props.onGenerate.bind(this)}/>
+                        onGenerate={this.props.onGenerate}/>
                     </AccordionDetails>
                   </Accordion>
 
