@@ -1449,8 +1449,10 @@ export const loadDanbooru = (allURLs: Map<string, Array<string>>, config: Config
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
   const thisHost = hostRegex.exec(url)[1];
   let suffix = "";
-  if (url.includes("/pool/")) {
-    suffix = "/pool/show.json?page=" + (helpers.next + 1) + "&id=" + url.substring(url.lastIndexOf("/") + 1);
+  if (url.includes("/pools/")) {
+    suffix = "/pools/" + url.substring(url.lastIndexOf("/") + 1) + ".json";
+  } else if (url.includes("favorite_groups")) {
+    suffix = "/favorite_groups/" + url.substring(url.lastIndexOf("/") + 1) + ".json";
   } else {
     suffix = "/post/index.json?limit=20&page=" + (helpers.next + 1);
     const tagRegex = /[?&]tags=(.*)&?/g;
@@ -1513,36 +1515,113 @@ export const loadDanbooru = (allURLs: Map<string, Array<string>>, config: Config
           source: source,
           timeout: timeout,
         }, resolve);
+        return;
       }
 
-      let list;
-      if (json.posts) {
-        list = json.posts;
-      } else {
-        list = json;
-      }
-
-      const images = Array<string>();
-      for (let p of list) {
-        if (p.file_url) {
-          let fileURL = p.file_url;
-          if (!p.file_url.startsWith("http")) {
-            fileURL = "https://" + p.file_url;
-          }
-          images.push(fileURL);
+      if (json.post_ids) {
+        if (json.post_ids.length == 0) {
+          helpers.next = null;
+          pm({
+            data: [],
+            allURLs: allURLs,
+            weight: weight,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          }, resolve);
+          return;
         }
-      }
 
-      helpers.next = url.includes("/pool/") ? null : helpers.next + 1;
-      helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
-      pm({
-        data: filterPathsToJustPlayable(filter, images, true),
-        allURLs: allURLs,
-        weight: weight,
-        helpers: helpers,
-        source: source,
-        timeout: timeout,
-      }, resolve);
+        const images = Array<string>();
+        const postIDs = json.post_ids;
+        const limit = 10;
+        let current = helpers.next;
+        const getPost = () => {
+          wretch(thisHost + "/posts/" + postIDs[current++] + ".json")
+            .get()
+            .setTimeout(5000)
+            .badRequest((e) => pm({
+              error: e.message,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            }, resolve))
+            .notFound((e) => pm({
+              error: e.message,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            }, resolve))
+            .timeout((e) => pm({
+              error: e.message,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            }, resolve))
+            .internalError((e) => pm({
+              error: e.message,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            }, resolve))
+            .onAbort((e) => pm({
+              error: e.message,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            }, resolve))
+            .json((json: any) => {
+              images.push(json.file_url);
+              if (images.length == limit || postIDs.length == current) {
+                if (postIDs.length == current) {
+                  helpers.next = null;
+                } else {
+                  helpers.next = current;
+                }
+                helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+                pm({
+                  data: filterPathsToJustPlayable(filter, images, true),
+                  allURLs: allURLs,
+                  weight: weight,
+                  helpers: helpers,
+                  source: source,
+                  timeout: timeout,
+                }, resolve);
+              } else {
+                setTimeout(getPost, 200);
+              }
+            })
+            .catch((e) => pm({
+              error: e.message,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            }, resolve));
+        }
+        setTimeout(getPost, 200);
+      } else {
+        const images = Array<string>();
+        for (let p of json) {
+          if (p.file_url) {
+            let fileURL = p.file_url;
+            if (!p.file_url.startsWith("http")) {
+              fileURL = "https://" + p.file_url;
+            }
+            images.push(fileURL);
+          }
+        }
+
+        helpers.next = helpers.next + 1;
+        helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+        pm({
+          data: filterPathsToJustPlayable(filter, images, true),
+          allURLs: allURLs,
+          weight: weight,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }, resolve);
+      }
     })
     .catch((e) => pm({
       error: e.message,
@@ -2746,8 +2825,10 @@ export function getFileGroup(url: string) {
       const hostRegex = /^https?:\/\/(?:www\.)?([^.]*)\./g;
       const host =  hostRegex.exec(url)[1];
       let danbooruID = "";
-      if (url.includes("/pool/")) {
-        danbooruID = "pool" + url.substring(url.lastIndexOf("/"));
+      if (url.includes("/pools/")) {
+        danbooruID = "pools/" + url.substring(url.lastIndexOf("/"));
+      } else if (url.includes("/favorite_groups/")) {
+        danbooruID = "favorite_groups/" + url.substring(url.lastIndexOf("/"));
       } else {
         const tagRegex = /[?&]tags=(.*)&?/g;
         let tags;
