@@ -12,8 +12,8 @@ import {Dialog, DialogContent} from "@material-ui/core";
 import {CancelablePromise, flatten, getCachePath, randomizeList, urlToPath} from "../../data/utils";
 import {
   filterPathsToJustPlayable, getFileName, getSourceType, isVideo, loadBDSMlr, loadDanbooru, loadDeviantArt, loadE621,
-  loadEHentai, loadGelbooru1, loadGelbooru2, loadHydrus, loadImageFap, loadImgur, loadInstagram, loadPiwigo, loadReddit,
-  loadRemoteImageURLList, loadSexCom, loadTumblr, loadTwitter, processAllURLs
+  loadEHentai, loadGelbooru1, loadGelbooru2, loadHydrus, loadImageFap, loadImgur, loadInstagram, loadLuscious,
+  loadPiwigo, loadReddit, loadRemoteImageURLList, loadSexCom, loadTumblr, loadTwitter, processAllURLs
 } from "./Scrapers";
 import {IF, SOF, ST} from '../../data/const';
 import Config from "../../data/Config";
@@ -101,6 +101,8 @@ function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<strin
       workerFunction = returnPromise ? loadDanbooruPromise : worker.loadDanbooru;
     } else if (sourceType == ST.e621) {
       workerFunction = returnPromise ? loadE621Promise : worker.loadE621;
+    } else if (sourceType == ST.luscious) {
+      workerFunction = returnPromise ? loadLusciousPromise : worker.loadLuscious;
     } else if (sourceType == ST.gelbooru1) {
       workerFunction = returnPromise ? loadGelbooru1Promise : worker.loadGelbooru1;
     } else if (sourceType == ST.gelbooru2) {
@@ -420,6 +422,10 @@ const loadHydrusPromise = (allURLs: Map<string, Array<string>>, config: Config, 
 
 const loadPiwigoPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
   loadPiwigo(allURLs, config, source, filter, weight, helpers, resolve);
+}
+
+const loadLusciousPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadLuscious(allURLs, config, source, filter, weight, helpers, resolve);
 }
 
 export default class SourceScraper extends React.Component {

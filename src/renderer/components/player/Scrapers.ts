@@ -1823,6 +1823,281 @@ export const loadEHentai = (allURLs: Map<string, Array<string>>, config: Config,
     });
 }
 
+export const loadLuscious = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
+  const timeout = 8000;
+  const url = source.url;
+  if (url.includes("albums")) {
+    const name = getFileGroup(url);
+    const id = name.substring(name.indexOf("_") + 1, name.length);
+    wretch("https://members.luscious.net/graphql/nobatch/?operationName=AlbumListOwnPictures")
+      .json({
+        "operationName": "AlbumListOwnPictures",
+        "query": "query AlbumListOwnPictures($input: PictureListInput!) {\n" +
+          "picture {\n" +
+          "list(input: $input) {\n" +
+          "info {...FacetCollectionInfo}\n" +
+          "items {...PictureStandardWithoutAlbum}\n" +
+          "}\n" +
+          "}\n" +
+          "}\n" +
+          "fragment FacetCollectionInfo on FacetCollectionInfo {\n" +
+          "page\n" +
+          "has_next_page\n" +
+          "has_previous_page\n" +
+          "total_items\n" +
+          "total_pages\n" +
+          "items_per_page\n" +
+          "}\n" +
+          "fragment PictureStandardWithoutAlbum on Picture {\n" +
+          "url_to_original\n" +
+          "url_to_video\n" +
+          "url\n" +
+          "}",
+        "variables": {
+          "input": {
+            "filters": [
+              {
+                "name": "album_id",
+                "value": id,
+              }
+            ],
+            "display": "rating_all_time",
+            "page": helpers.next + 1,
+          }
+        }
+      })
+      .post()
+      .setTimeout(5000)
+      .onAbort((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }, resolve))
+      .notFound((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }, resolve))
+      .json((json) => {
+        const hasNextPage = json.data.picture.list.info.has_next_page;
+        const items = json.data.picture.list.items;
+        if (items.length > 0) {
+          const images = [];
+          for (let item of items) {
+            images.push(item.url_to_original);
+          }
+          helpers.next = hasNextPage ? helpers.next + 1 : null;
+          helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+          pm({
+            data: filterPathsToJustPlayable(filter, images, true),
+            allURLs: allURLs,
+            weight: weight,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          }, resolve);
+        } else {
+          helpers.next = null;
+          pm({
+            data: [],
+            allURLs: allURLs,
+            weight: weight,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          }, resolve);
+        }
+      })
+      .catch((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }, resolve));
+  } else {
+    const id = getFileGroup(url);
+    if (helpers.next == 0) {
+      helpers.next = [0, 0, 0];
+    }
+    wretch("https://members.luscious.net/graphql/nobatch/?operationName=AlbumList")
+      .json({
+        "operationName": "AlbumList",
+        "query": "query AlbumList($input: AlbumListInput!) {\n" +
+          "album {\n" +
+            "list(input: $input) {\n" +
+              "info {...FacetCollectionInfo}\n" +
+              "items {...AlbumMinimal}\n" +
+            "}\n" +
+          "}\n" +
+        "}\n" +
+        "fragment FacetCollectionInfo on FacetCollectionInfo {\n" +
+          "page\n" +
+          "has_next_page\n" +
+          "has_previous_page\n" +
+          "total_items\n" +
+          "total_pages\n" +
+          "url_complete\n" +
+        "}\n" +
+        "fragment AlbumMinimal on Album {\n" +
+          "id\n" +
+        "}",
+        "variables": {
+          "input": {
+            "display": "date_newest",
+            "filters": [
+              {
+                "name": "created_by_id",
+                "value": id
+              }
+            ],
+            "page": helpers.next[0] + 1,
+          }
+        }
+      })
+      .post()
+      .setTimeout(5000)
+      .onAbort((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }, resolve))
+      .notFound((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }, resolve))
+      .json((json) => {
+        const userHasNextPage = json.data.album.list.info.has_next_page;
+        const albums = json.data.album.list.items;
+        if (albums.length > 0) {
+          const album = albums[helpers.next[1]];
+          wretch("https://members.luscious.net/graphql/nobatch/?operationName=AlbumListOwnPictures")
+            .json({
+              "operationName": "AlbumListOwnPictures",
+              "query": "query AlbumListOwnPictures($input: PictureListInput!) {\n" +
+                "picture {\n" +
+                "list(input: $input) {\n" +
+                "info {...FacetCollectionInfo}\n" +
+                "items {...PictureStandardWithoutAlbum}\n" +
+                "}\n" +
+                "}\n" +
+                "}\n" +
+                "fragment FacetCollectionInfo on FacetCollectionInfo {\n" +
+                "page\n" +
+                "has_next_page\n" +
+                "has_previous_page\n" +
+                "total_items\n" +
+                "total_pages\n" +
+                "items_per_page\n" +
+                "}\n" +
+                "fragment PictureStandardWithoutAlbum on Picture {\n" +
+                "url_to_original\n" +
+                "url_to_video\n" +
+                "url\n" +
+                "}",
+              "variables": {
+                "input": {
+                  "filters": [
+                    {
+                      "name": "album_id",
+                      "value": album.id,
+                    }
+                  ],
+                  "display": "rating_all_time",
+                  "page": helpers.next[2] + 1,
+                }
+              }
+            })
+            .post()
+            .setTimeout(5000)
+            .onAbort((e) => pm({
+              error: e.message,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            }, resolve))
+            .notFound((e) => pm({
+              error: e.message,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            }, resolve))
+            .json((json) => {
+              const hasNextPage = json.data.picture.list.info.has_next_page;
+              if (hasNextPage) {
+                helpers.next[2] = helpers.next[2] + 1;
+              } else {
+                if (helpers.next[1] < albums.length - 1) {
+                  helpers.next[1] = helpers.next[1] + 1;
+                  helpers.next[2] = 0;
+                } else {
+                  if (userHasNextPage) {
+                    helpers.next[0] = helpers.next[0] + 1;
+                    helpers.next[1] = 0;
+                    helpers.next[2] = 0;
+                  } else {
+                    helpers.next = null;
+                  }
+                }
+              }
+              const items = json.data.picture.list.items;
+              if (items.length > 0) {
+                const images = [];
+                for (let item of items) {
+                  images.push(item.url_to_original);
+                }
+                helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+                pm({
+                  data: filterPathsToJustPlayable(filter, images, true),
+                  allURLs: allURLs,
+                  weight: weight,
+                  helpers: helpers,
+                  source: source,
+                  timeout: timeout,
+                }, resolve);
+              } else {
+                pm({
+                  data: [],
+                  allURLs: allURLs,
+                  weight: weight,
+                  helpers: helpers,
+                  source: source,
+                  timeout: timeout,
+                }, resolve);
+              }
+            })
+            .catch((e) => pm({
+              error: e.message,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            }, resolve));
+        } else {
+          helpers.next = null;
+          pm({
+            warning: json,
+            data: [],
+            allURLs: allURLs,
+            weight: weight,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          }, resolve);
+        }
+      })
+      .catch((e) => pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }, resolve));
+  }
+}
+
 export const loadBDSMlr = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 8000;
   let url = source.url;
@@ -2034,7 +2309,7 @@ export const loadPiwigo = (allURLs: Map<string, Array<string>>, config: Config, 
     let systemMessage = undefined;
     if (!piwigoAlerted) {
       systemMessage = "You haven't configured FlipFlip to work with Piwigo yet.\nVisit Settings to configure Piwigo.";
-      hydrusAlerted = true;
+      piwigoAlerted = true;
     }
     pm({
       systemMessage: systemMessage,
@@ -2371,6 +2646,8 @@ export function getSourceType(url: string): string {
     return ST.gelbooru2;
   } else if (/^https?:\/\/(www\.)?(e621\.net)\//.exec(url) != null) {
     return ST.e621;
+  } else if (/^https?:\/\/(www\.|members\.)?luscious\.net\//.exec(url) != null) {
+    return ST.luscious;
   } else if (/^https?:\/\/(www\.)?(.*\.booru\.org|idol\.sankakucomplex\.com)\//.exec(url) != null) {
     return ST.gelbooru1;
   } else if (/^https?:\/\/(www\.)?e-hentai\.org\/g\//.exec(url) != null) {
@@ -2457,6 +2734,12 @@ export function getFileGroup(url: string) {
         }
       }
       return hostE621 + "/" + decodeURIComponent(E621ID);
+    case ST.luscious:
+      let albumID = url.replace(/^https?:\/\/(www\.|members\.)?luscious\.net\/(albums|users)\//, "");
+      if (albumID.includes("/")) {
+        albumID = albumID.substring(0, albumID.indexOf("/"));
+      }
+      return albumID;
     case ST.danbooru:
     case ST.gelbooru1:
     case ST.gelbooru2:

@@ -158,6 +158,7 @@ const ST = { // source types
   instagram: 'st.instagram',
   danbooru: 'st.danbooru',
   e621: 'st.e621',
+  luscious: 'st.luscious',
   gelbooru1: 'st.gelbooru1',
   gelbooru2: 'st.gelbooru2',
   ehentai: 'st.ehentai',
