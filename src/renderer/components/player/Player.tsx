@@ -245,7 +245,7 @@ export default class Player extends React.Component {
 
     return (
       <div style={rootStyle}>
-        {!this.props.gridView && (
+        {!this.props.gridView && this.state.hasStarted && (
           <div style={{zIndex: 999, position: 'absolute', width: '100%', height: '100%', cursor: this.state.hideCursor ? 'none' : 'unset'}}
                ref={this.idleTimerRef}>
             <IdleTimer
