@@ -17,7 +17,7 @@
     "@types/react-sound": "^1.2.1",
     "css-loader": "^3.5.1",
     "domino-ext": "^2.1.4",
-    "electron": "4.2.12",
+    "electron": "15.5.5",
     "electron-packager": "^15.2.0",
     "file-loader": "^6.0.0",
     "html-webpack-plugin": "^4.0.4",
