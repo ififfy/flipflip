@@ -3,8 +3,10 @@ import clsx from "clsx";
 import Select, {components} from "react-select";
 import CreatableSelect from "react-select/creatable";
 
-import {Checkbox, createStyles, Theme, withStyles} from "@material-ui/core";
-import {grey} from "@material-ui/core/colors";
+import { Checkbox, Theme } from "@mui/material";
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import {grey} from "@mui/material/colors";
 
 import {getSourceType} from "../player/Scrapers";
 import en from "../../data/en";
@@ -19,7 +21,7 @@ const styles = (theme: Theme) => createStyles({
     color: grey[900],
   },
   limitWidth: {
-    maxWidth: `calc(100% - ${theme.spacing(7)}px)`,
+    maxWidth: `calc(100% - ${theme.spacing(7)})`,
   },
   select: {
     color: grey[900],

@@ -4,23 +4,27 @@ import {existsSync} from "fs";
 import {remote} from "electron";
 
 import {
-  createStyles, Fab,
+  Fab,
   IconButton,
   List,
-  ListItem, ListItemAvatar,
+  ListItem,
+  ListItemAvatar,
   ListItemSecondaryAction,
   ListItemText,
-  Theme, Tooltip,
-  withStyles
-} from "@material-ui/core";
+  Theme,
+  Tooltip,
+} from "@mui/material";
 
-import AddIcon from "@material-ui/icons/Add";
-import BuildIcon from "@material-ui/icons/Build";
-import ClearIcon from "@material-ui/icons/Clear";
-import DeleteIcon from "@material-ui/icons/Delete";
-import RepeatIcon from '@material-ui/icons/Repeat';
-import RepeatOneIcon from '@material-ui/icons/RepeatOne';
-import ShuffleIcon from '@material-ui/icons/Shuffle';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import AddIcon from "@mui/icons-material/Add";
+import BuildIcon from "@mui/icons-material/Build";
+import ClearIcon from "@mui/icons-material/Clear";
+import DeleteIcon from "@mui/icons-material/Delete";
+import RepeatIcon from '@mui/icons-material/Repeat';
+import RepeatOneIcon from '@mui/icons-material/RepeatOne';
+import ShuffleIcon from '@mui/icons-material/Shuffle';
 
 import {arrayMove} from "../../data/utils";
 import {RP} from "../../data/const";
@@ -123,10 +127,13 @@ class ScriptPlaylist extends React.Component {
               </ListItemAvatar>
               <ListItemText primary={s.url} />
               <ListItemSecondaryAction>
-                <IconButton edge="end" onClick={this.props.onSourceOptions.bind(this, this.props.playlistIndex, s)}>
+                <IconButton
+                  edge="end"
+                  onClick={this.props.onSourceOptions.bind(this, this.props.playlistIndex, s)}
+                  size="large">
                   <BuildIcon/>
                 </IconButton>
-                <IconButton edge="end" onClick={this.removeScript.bind(this, i)}>
+                <IconButton edge="end" onClick={this.removeScript.bind(this, i)} size="large">
                   <DeleteIcon color={"error"}/>
                 </IconButton>
               </ListItemSecondaryAction>
@@ -136,12 +143,12 @@ class ScriptPlaylist extends React.Component {
         <div className={classes.playlistAction}>
           <div className={classes.left}>
             <Tooltip title={"Shuffle " + (this.props.playlist.shuffle ? "(On)" : "(Off)")}>
-              <IconButton onClick={this.toggleShuffle.bind(this)}>
+              <IconButton onClick={this.toggleShuffle.bind(this)} size="large">
                 <ShuffleIcon color={this.props.playlist.shuffle ? "primary" : undefined}/>
               </IconButton>
             </Tooltip>
             <Tooltip title={"Repeat " + (this.props.playlist.repeat == RP.none ? "(Off)" : this.props.playlist.repeat == RP.all ? "(All)" : "(One)")}>
-              <IconButton onClick={this.changeRepeat.bind(this)}>
+              <IconButton onClick={this.changeRepeat.bind(this)} size="large">
                 {this.props.playlist.repeat == RP.none && (
                   <RepeatIcon />
                 )}
@@ -155,13 +162,15 @@ class ScriptPlaylist extends React.Component {
             </Tooltip>
           </div>
           <Tooltip title="Add Tracks">
-            <IconButton onClick={this.props.onAddScript.bind(this, this.props.playlistIndex)}>
+            <IconButton
+              onClick={this.props.onAddScript.bind(this, this.props.playlistIndex)}
+              size="large">
               <AddIcon/>
             </IconButton>
           </Tooltip>
           <div className={classes.right}>
             <Tooltip title="Remove Playlist">
-              <IconButton onClick={this.removePlaylist.bind(this)}>
+              <IconButton onClick={this.removePlaylist.bind(this)} size="large">
                 <ClearIcon color={"error"}/>
               </IconButton>
             </Tooltip>

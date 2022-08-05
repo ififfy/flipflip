@@ -4,17 +4,30 @@ import {existsSync} from "fs";
 import {remote} from "electron";
 
 import {
-  Badge, Checkbox, Chip, createStyles, Fab, IconButton, ListItem, ListItemAvatar, ListItemSecondaryAction, ListItemText,
-  Theme, Tooltip, Typography, withStyles
-} from "@material-ui/core";
+  Badge,
+  Checkbox,
+  Chip,
+  Fab,
+  IconButton,
+  ListItem,
+  ListItemAvatar,
+  ListItemSecondaryAction,
+  ListItemText,
+  Theme,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 
-import BuildIcon from '@material-ui/icons/Build';
-import DeleteIcon from '@material-ui/icons/Delete';
-import EditIcon from '@material-ui/icons/Edit';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import BuildIcon from '@mui/icons-material/Build';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 
 import {getTimestamp} from "../../data/utils";
 import Tag from "../../data/Tag";
-import {grey} from "@material-ui/core/colors";
+import {grey} from "@mui/material/colors";
 import Audio from "../../data/Audio";
 import SourceIcon from "./SourceIcon";
 
@@ -23,19 +36,19 @@ const styles = (theme: Theme) => createStyles({
     display: 'flex',
   },
   oddChild: {
-    backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["100"] : grey[900],
+    backgroundColor: theme.palette.mode == 'light' ? (theme.palette.primary as any)["100"] : grey[900],
     '&:hover': {
-      backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["200"] : '#080808',
+      backgroundColor: theme.palette.mode == 'light' ? (theme.palette.primary as any)["200"] : '#080808',
     },
   },
   evenChild: {
-    backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["50"] : theme.palette.background.default,
+    backgroundColor: theme.palette.mode == 'light' ? (theme.palette.primary as any)["50"] : theme.palette.background.default,
     '&:hover': {
-      backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["200"] : '#080808',
+      backgroundColor: theme.palette.mode == 'light' ? (theme.palette.primary as any)["200"] : '#080808',
     },
   },
   lastSelected: {
-    backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["200"] : '#0F0F0F',
+    backgroundColor: theme.palette.mode == 'light' ? (theme.palette.primary as any)["200"] : '#0F0F0F',
   },
   avatar: {
     backgroundColor: theme.palette.primary.main,
@@ -192,12 +205,12 @@ class AudioSourceListItem extends React.Component {
                 color="primary"
                 badgeContent={this.props.source.trackNum}>
                 <Tooltip placement={this.props.source.comment ? 'right' : 'bottom'}
-                         PopperProps={this.props.source.comment || this.props.source.tags.length > 0 ? {modifiers:{
+                         /*TODO PopperProps={this.props.source.comment || this.props.source.tags.length > 0 ? {modifiers:{
                            preventOverflow: {
                             enabled: true,
                             boundariesElement: 'viewport',
                           }
-                         }} : {}}
+                         }} : {}}*/
                          classes={this.props.source.comment ? {tooltip: classes.bigTooltip} : null}
                          arrow={!!this.props.source.comment || this.props.source.tags.length > 0}
                          title={

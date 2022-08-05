@@ -3,16 +3,39 @@ import wretch from "wretch";
 import Sortable from "react-sortablejs";
 
 import {
-  Button, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl,
-  MenuItem, Select, Theme, withStyles, List, ListItem, ListItemAvatar, Avatar, ListItemText,
-  Container, Card, CardContent, Typography, Checkbox, FormControlLabel, Tooltip, Divider, Chip
-} from "@material-ui/core";
-import { Rating } from '@material-ui/lab';
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  FormControl,
+  MenuItem,
+  Select,
+  Theme,
+  List,
+  ListItem,
+  ListItemAvatar,
+  Avatar,
+  ListItemText,
+  Container,
+  Card,
+  CardContent,
+  Typography,
+  Checkbox,
+  FormControlLabel,
+  Tooltip,
+  Divider,
+  Chip,
+} from "@mui/material";
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import { Rating } from '@mui/material';
 
-import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import ExpandLessIcon from '@material-ui/icons/ExpandLess';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 import {AF, PW, PWS} from "../../data/const";
 import {arrayMove} from "../../data/utils";

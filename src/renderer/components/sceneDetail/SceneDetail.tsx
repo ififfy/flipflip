@@ -2,40 +2,72 @@ import * as React from "react";
 import clsx from "clsx";
 
 import {
-  AppBar, Backdrop, Badge, Box, Button, Collapse, Container, createStyles, Dialog, DialogActions, DialogContent,
-  DialogContentText, DialogTitle, Divider, Drawer, Fab, IconButton, ListItem, ListItemIcon, ListItemSecondaryAction,
-  ListItemText, Menu, MenuItem, Slide, Snackbar, SnackbarContent, SvgIcon, Tab, Tabs, TextField, Theme, Toolbar,
-  Tooltip, Typography, withStyles
-} from "@material-ui/core";
+  AppBar,
+  Backdrop,
+  Badge,
+  Box,
+  Button,
+  Collapse,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Divider,
+  Drawer,
+  Fab,
+  IconButton,
+  ListItem,
+  ListItemIcon,
+  ListItemSecondaryAction,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Slide,
+  Snackbar,
+  SnackbarContent,
+  SvgIcon,
+  Tab,
+  Tabs,
+  TextField,
+  Theme,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 
-import AddIcon from '@material-ui/icons/Add';
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
-import AudiotrackIcon from '@material-ui/icons/Audiotrack';
-import BuildIcon from '@material-ui/icons/Build';
-import CachedIcon from '@material-ui/icons/Cached';
-import CheckIcon from "@material-ui/icons/CheckCircle";
-import CheckCircleIcon from "@material-ui/icons/CheckCircle";
-import CollectionsIcon from '@material-ui/icons/Collections';
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
-import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
-import FileCopyIcon from '@material-ui/icons/FileCopy';
-import FolderIcon from '@material-ui/icons/Folder';
-import HttpIcon from '@material-ui/icons/Http';
-import LocalOfferIcon from '@material-ui/icons/LocalOffer';
-import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
-import MenuIcon from'@material-ui/icons/Menu';
-import MovieIcon from '@material-ui/icons/Movie';
-import PhotoFilterIcon from '@material-ui/icons/PhotoFilter';
-import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
-import PublishIcon from '@material-ui/icons/Publish';
-import RestoreIcon from "@material-ui/icons/Restore";
-import SaveIcon from '@material-ui/icons/Save';
-import ShuffleIcon from "@material-ui/icons/Shuffle";
-import SortIcon from '@material-ui/icons/Sort';
-import WarningIcon from '@material-ui/icons/Warning';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import AddIcon from '@mui/icons-material/Add';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import AudiotrackIcon from '@mui/icons-material/Audiotrack';
+import BuildIcon from '@mui/icons-material/Build';
+import CachedIcon from '@mui/icons-material/Cached';
+import CheckIcon from "@mui/icons-material/CheckCircle";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CollectionsIcon from '@mui/icons-material/Collections';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
+import FileCopyIcon from '@mui/icons-material/FileCopy';
+import FolderIcon from '@mui/icons-material/Folder';
+import HttpIcon from '@mui/icons-material/Http';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
+import MenuIcon from'@mui/icons-material/Menu';
+import MovieIcon from '@mui/icons-material/Movie';
+import PhotoFilterIcon from '@mui/icons-material/PhotoFilter';
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import PublishIcon from '@mui/icons-material/Publish';
+import RestoreIcon from "@mui/icons-material/Restore";
+import SaveIcon from '@mui/icons-material/Save';
+import ShuffleIcon from "@mui/icons-material/Shuffle";
+import SortIcon from '@mui/icons-material/Sort';
+import WarningIcon from '@mui/icons-material/Warning';
 
 import {AF, MO, SB, SDGT, SDT, SF, ST, TT, WF} from "../../data/const";
 import en from "../../data/en";
@@ -411,7 +443,8 @@ class SceneDetail extends React.Component {
                 edge="start"
                 color="inherit"
                 aria-label="Back"
-                onClick={this.props.goBack.bind(this)}>
+                onClick={this.props.goBack.bind(this)}
+                size="large">
                 <ArrowBackIcon />
               </IconButton>
             </Tooltip>
@@ -434,7 +467,8 @@ class SceneDetail extends React.Component {
               <React.Fragment>
                 <div className={classes.fill}/>
                 <Typography component="h1" variant="h4" color="inherit" noWrap
-                            className={clsx(classes.title, this.props.scene.name.length == 0 && classes.noTitle, this.props.tutorial == SDT.title && classes.highlight)} onClick={this.beginEditingName.bind(this)}>
+                            className={clsx(classes.title, this.props.scene.name.length == 0 && classes.noTitle, this.props.tutorial == SDT.title && classes.highlight)}
+                            /*TODO onClick={this.beginEditingName.bind(this)}*/>
                   {this.props.scene.name}
                 </Typography>
                 <div className={classes.fill}/>
@@ -477,7 +511,7 @@ class SceneDetail extends React.Component {
           </div>
 
           <ListItem className={classes.drawerButton}>
-            <IconButton onClick={this.onToggleDrawer.bind(this)}>
+            <IconButton onClick={this.onToggleDrawer.bind(this)} size="large">
               <MenuIcon className={classes.drawerIcon}/>
             </IconButton>
           </ListItem>
@@ -601,12 +635,7 @@ class SceneDetail extends React.Component {
           <Container maxWidth={false} className={classes.container}>
 
             {this.props.scene.openTab === 0 && (
-              <Typography
-                component="div"
-                role="tabpanel"
-                hidden={this.props.scene.openTab !== 0}
-                id="vertical-tabpanel-0"
-                aria-labelledby="vertical-tab-0">
+              <Typography component="div">
                 <div className={classes.tabPanel}>
                   <div className={classes.drawerSpacer}/>
                   <Box p={2} className={classes.fill}>
@@ -622,12 +651,7 @@ class SceneDetail extends React.Component {
             )}
 
             {this.props.scene.openTab === 1 && (
-              <Typography
-                component="div"
-                role="tabpanel"
-                hidden={this.props.scene.openTab !== 1}
-                id="vertical-tabpanel-1"
-                aria-labelledby="vertical-tab-1">
+              <Typography component="div">
                 <div className={classes.tabPanel}>
                   <div className={classes.drawerSpacer}/>
                   <Box p={2} className={classes.fill}>
@@ -642,12 +666,7 @@ class SceneDetail extends React.Component {
             )}
 
             {this.props.scene.openTab === 2 && (
-              <Typography
-                component="div"
-                role="tabpanel"
-                hidden={this.props.scene.openTab !== 2}
-                id="vertical-tabpanel-2"
-                aria-labelledby="vertical-tab-2">
+              <Typography component="div">
                 <div className={classes.tabPanel}>
                   <div className={classes.drawerSpacer}/>
                   <Box p={2} className={classes.fill}>
@@ -667,11 +686,7 @@ class SceneDetail extends React.Component {
             {this.props.scene.openTab === 3 && (
               <Typography
                 className={clsx(this.props.scene.openTab === 3 && classes.sourcesSection)}
-                component="div"
-                role="tabpanel"
-                hidden={this.props.scene.openTab !== 3}
-                id="vertical-tabpanel-3"
-                aria-labelledby="vertical-tab-3">
+                component="div">
                 <div className={classes.tabPanel}>
                   <div className={classes.drawerSpacer}/>
                   <Box className={classes.fill}>
@@ -695,11 +710,7 @@ class SceneDetail extends React.Component {
             {this.props.scene.generatorWeights && this.props.scene.openTab === 4 && (
               <Typography
                 className={clsx(this.props.scene.openTab === 4 && classes.generateSection)}
-                component="div"
-                role="tabpanel"
-                hidden={this.props.scene.openTab !== 4}
-                id="vertical-tabpanel-4"
-                aria-labelledby="vertical-tab-4">
+                component="div">
                 <div className={classes.tabPanel}>
                   <div className={classes.drawerSpacer}/>
                   <Box p={1} className={classes.fill}>
@@ -910,7 +921,6 @@ class SceneDetail extends React.Component {
                     vertical: 'bottom',
                     horizontal: 'right',
                   }}
-                  getContentAnchorEl={null}
                   anchorEl={this.state.menuAnchorEl}
                   keepMounted
                   classes={{paper: classes.sortMenu}}
@@ -920,10 +930,16 @@ class SceneDetail extends React.Component {
                     <MenuItem key={sf}>
                       <ListItemText primary={en.get(sf)}/>
                       <ListItemSecondaryAction>
-                        <IconButton edge="end" onClick={this.props.onSort.bind(this, this.props.scene, sf, true)}>
+                        <IconButton
+                          edge="end"
+                          onClick={this.props.onSort.bind(this, this.props.scene, sf, true)}
+                          size="large">
                           <ArrowUpwardIcon/>
                         </IconButton>
-                        <IconButton edge="end" onClick={this.props.onSort.bind(this, this.props.scene, sf, false)}>
+                        <IconButton
+                          edge="end"
+                          onClick={this.props.onSort.bind(this, this.props.scene, sf, false)}
+                          size="large">
                           <ArrowDownwardIcon/>
                         </IconButton>
                       </ListItemSecondaryAction>
@@ -932,7 +948,10 @@ class SceneDetail extends React.Component {
                   <MenuItem key={SF.random}>
                     <ListItemText primary={en.get(SF.random)}/>
                     <ListItemSecondaryAction>
-                      <IconButton edge="end" onClick={this.props.onSort.bind(this, this.props.scene, SF.random, true)}>
+                      <IconButton
+                        edge="end"
+                        onClick={this.props.onSort.bind(this, this.props.scene, SF.random, true)}
+                        size="large">
                         <ShuffleIcon/>
                       </IconButton>
                     </ListItemSecondaryAction>
@@ -996,7 +1015,6 @@ class SceneDetail extends React.Component {
                 vertical: 'bottom',
                 horizontal: 'right',
               }}
-              getContentAnchorEl={null}
               anchorEl={this.state.menuAnchorEl}
               keepMounted
               classes={{paper: classes.maxMenu}}
@@ -1057,7 +1075,6 @@ class SceneDetail extends React.Component {
                 vertical: 'bottom',
                 horizontal: 'right',
               }}
-              getContentAnchorEl={null}
               anchorEl={this.state.menuAnchorEl}
               keepMounted
               className={clsx(this.props.tutorial == SDGT.buttons && classes.backdropTop)}
@@ -1086,7 +1103,7 @@ class SceneDetail extends React.Component {
           autoHideDuration={5000}
           ClickAwayListenerProps={{mouseEvent: false}}
           onClose={this.onCloseSnackbar.bind(this)}
-          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
+          /*TODO TransitionComponent={(props) => <Slide {...props} direction="up"/>}*/>
           <SnackbarContent
             message={
               <span className={classes.snackbarMessage}>
@@ -1102,7 +1119,7 @@ class SceneDetail extends React.Component {
           />
         </Snackbar>
       </div>
-    )
+    );
   }
 
   componentDidMount() {

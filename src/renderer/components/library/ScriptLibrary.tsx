@@ -4,26 +4,52 @@ import * as fs from "fs";
 import {remote} from "electron";
 
 import {
-  AppBar, Backdrop, Badge, Button, Chip, Collapse, Container, createStyles, Dialog, DialogActions, DialogContent,
-  DialogContentText, DialogTitle, Divider, Drawer, Fab, IconButton, ListItem, ListItemIcon, ListItemSecondaryAction,
-  ListItemText, Menu, MenuItem, Theme, Toolbar, Tooltip, Typography, withStyles
-} from "@material-ui/core";
+  AppBar,
+  Backdrop,
+  Badge,
+  Button,
+  Chip,
+  Collapse,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Divider,
+  Drawer,
+  Fab,
+  IconButton,
+  ListItem,
+  ListItemIcon,
+  ListItemSecondaryAction,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Theme,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 
-import AddIcon from '@material-ui/icons/Add';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
-import ClearIcon from '@material-ui/icons/Clear';
-import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
-import DescriptionIcon from '@material-ui/icons/Description';
-import FormatListBulletedIcon from '@material-ui/icons/FormatListBulleted';
-import GetAppIcon from '@material-ui/icons/GetApp';
-import HttpIcon from '@material-ui/icons/Http';
-import LocalOfferIcon from '@material-ui/icons/LocalOffer';
-import MenuIcon from'@material-ui/icons/Menu';
-import SelectAllIcon from '@material-ui/icons/SelectAll';
-import ShuffleIcon from "@material-ui/icons/Shuffle";
-import SortIcon from '@material-ui/icons/Sort';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import AddIcon from '@mui/icons-material/Add';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ClearIcon from '@mui/icons-material/Clear';
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
+import DescriptionIcon from '@mui/icons-material/Description';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import GetAppIcon from '@mui/icons-material/GetApp';
+import HttpIcon from '@mui/icons-material/Http';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import MenuIcon from'@mui/icons-material/Menu';
+import SelectAllIcon from '@mui/icons-material/SelectAll';
+import ShuffleIcon from "@mui/icons-material/Shuffle";
+import SortIcon from '@mui/icons-material/Sort';
 
 import {AF, MO, SF, SP, SLT} from "../../data/const";
 import {getFilesRecursively, isText} from "../../data/utils";
@@ -125,7 +151,7 @@ const styles = (theme: Theme) => createStyles({
   drawerButton: {
     backgroundColor: theme.palette.primary.main,
     minHeight: theme.spacing(6),
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       paddingLeft: 0,
       paddingRight: 0,
     },
@@ -328,7 +354,8 @@ class ScriptLibrary extends React.Component {
                   color="inherit"
                   aria-label="Back"
                   className={classes.backButton}
-                  onClick={this.goBack.bind(this)}>
+                  onClick={this.goBack.bind(this)}
+                  size="large">
                   <ArrowBackIcon />
                 </IconButton>
               </Tooltip>
@@ -382,7 +409,8 @@ class ScriptLibrary extends React.Component {
           <ListItem className={classes.drawerButton}>
             <IconButton
               className={clsx(this.props.tutorial == SLT.sidebar1 && classes.highlight)}
-              onClick={this.onToggleDrawer.bind(this)}>
+              onClick={this.onToggleDrawer.bind(this)}
+              size="large">
               <MenuIcon className={classes.drawerIcon}/>
             </IconButton>
           </ListItem>
@@ -592,7 +620,6 @@ class ScriptLibrary extends React.Component {
             vertical: 'bottom',
             horizontal: 'right',
           }}
-          getContentAnchorEl={null}
           anchorEl={this.state.menuAnchorEl}
           keepMounted
           classes={{paper: classes.sortMenu}}
@@ -602,10 +629,10 @@ class ScriptLibrary extends React.Component {
             <MenuItem key={sf}>
               <ListItemText primary={en.get(sf)}/>
               <ListItemSecondaryAction>
-                <IconButton edge="end" onClick={this.props.onSort.bind(this, sf, true)}>
+                <IconButton edge="end" onClick={this.props.onSort.bind(this, sf, true)} size="large">
                   <ArrowUpwardIcon/>
                 </IconButton>
-                <IconButton edge="end" onClick={this.props.onSort.bind(this, sf, false)}>
+                <IconButton edge="end" onClick={this.props.onSort.bind(this, sf, false)} size="large">
                   <ArrowDownwardIcon/>
                 </IconButton>
               </ListItemSecondaryAction>
@@ -614,7 +641,10 @@ class ScriptLibrary extends React.Component {
           <MenuItem key={SF.random}>
             <ListItemText primary={en.get(SF.random)}/>
             <ListItemSecondaryAction>
-              <IconButton edge="end" onClick={this.props.onSort.bind(this, SF.random, true)}>
+              <IconButton
+                edge="end"
+                onClick={this.props.onSort.bind(this, SF.random, true)}
+                size="large">
                 <ShuffleIcon/>
               </IconButton>
             </ListItemSecondaryAction>

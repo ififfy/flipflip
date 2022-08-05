@@ -8,33 +8,63 @@ import {remote} from "electron";
 import wretch from "wretch";
 
 import {
-  AppBar, Backdrop, Badge, Button, Chip, Collapse, Container, createStyles, Dialog, DialogActions, DialogContent,
-  DialogContentText, DialogTitle, Divider, Drawer, Fab, IconButton, InputAdornment, LinearProgress, ListItem,
-  ListItemIcon, ListItemSecondaryAction, ListItemText, ListSubheader, Menu, MenuItem, SvgIcon, TextField, Theme,
-  Toolbar, Tooltip, Typography, withStyles
-} from "@material-ui/core";
+  AppBar,
+  Backdrop,
+  Badge,
+  Button,
+  Chip,
+  Collapse,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Divider,
+  Drawer,
+  Fab,
+  IconButton,
+  InputAdornment,
+  LinearProgress,
+  ListItem,
+  ListItemIcon,
+  ListItemSecondaryAction,
+  ListItemText,
+  ListSubheader,
+  Menu,
+  MenuItem,
+  SvgIcon,
+  TextField,
+  Theme,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 
-import AddIcon from '@material-ui/icons/Add';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
-import CancelIcon from '@material-ui/icons/Cancel';
-import ClearIcon from '@material-ui/icons/Clear';
-import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
-import FolderIcon from '@material-ui/icons/Folder';
-import FormatListBulletedIcon from '@material-ui/icons/FormatListBulleted';
-import GetAppIcon from '@material-ui/icons/GetApp';
-import HttpIcon from '@material-ui/icons/Http';
-import LocalOfferIcon from '@material-ui/icons/LocalOffer';
-import MenuIcon from'@material-ui/icons/Menu';
-import MergeTypeIcon from '@material-ui/icons/MergeType';
-import MovieFilterIcon from '@material-ui/icons/MovieFilter';
-import MovieIcon from '@material-ui/icons/Movie';
-import OfflineBoltIcon from '@material-ui/icons/OfflineBolt';
-import PublishIcon from '@material-ui/icons/Publish';
-import SelectAllIcon from '@material-ui/icons/SelectAll';
-import ShuffleIcon from "@material-ui/icons/Shuffle";
-import SortIcon from '@material-ui/icons/Sort';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import AddIcon from '@mui/icons-material/Add';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import CancelIcon from '@mui/icons-material/Cancel';
+import ClearIcon from '@mui/icons-material/Clear';
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
+import FolderIcon from '@mui/icons-material/Folder';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import GetAppIcon from '@mui/icons-material/GetApp';
+import HttpIcon from '@mui/icons-material/Http';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import MenuIcon from'@mui/icons-material/Menu';
+import MergeTypeIcon from '@mui/icons-material/MergeType';
+import MovieFilterIcon from '@mui/icons-material/MovieFilter';
+import MovieIcon from '@mui/icons-material/Movie';
+import OfflineBoltIcon from '@mui/icons-material/OfflineBolt';
+import PublishIcon from '@mui/icons-material/Publish';
+import SelectAllIcon from '@mui/icons-material/SelectAll';
+import ShuffleIcon from "@mui/icons-material/Shuffle";
+import SortIcon from '@mui/icons-material/Sort';
 
 import {AF, LT, MO, PR, SF, SP, ST} from "../../data/const";
 import {filterSource, getCachePath, getLocalPath} from "../../data/utils";
@@ -142,7 +172,7 @@ const styles = (theme: Theme) => createStyles({
   drawerButton: {
     backgroundColor: theme.palette.primary.main,
     minHeight: theme.spacing(6),
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       paddingLeft: 0,
       paddingRight: 0,
     },
@@ -396,7 +426,8 @@ class Library extends React.Component {
                   color="inherit"
                   aria-label="Back"
                   className={classes.backButton}
-                  onClick={this.goBack.bind(this)}>
+                  onClick={this.goBack.bind(this)}
+                  size="large">
                   <ArrowBackIcon />
                 </IconButton>
               </Tooltip>
@@ -449,7 +480,8 @@ class Library extends React.Component {
           <ListItem className={classes.drawerButton}>
             <IconButton
               className={clsx(this.props.tutorial == LT.sidebar1 && classes.highlight)}
-              onClick={this.onToggleDrawer.bind(this)}>
+              onClick={this.onToggleDrawer.bind(this)}
+              size="large">
               <MenuIcon className={classes.drawerIcon}/>
             </IconButton>
           </ListItem>
@@ -748,8 +780,7 @@ class Library extends React.Component {
                     endAdornment:
                       <InputAdornment position="end">
                         <Tooltip title="Open File">
-                          <IconButton
-                            onClick={this.onOpenImportFile.bind(this)}>
+                          <IconButton onClick={this.onOpenImportFile.bind(this)} size="large">
                             <FolderIcon/>
                           </IconButton>
                         </Tooltip>
@@ -759,7 +790,7 @@ class Library extends React.Component {
                 />
               </DialogContent>
               <DialogActions>
-                <Button onClick={this.onCloseDialog.bind(this)} color="default">
+                <Button onClick={this.onCloseDialog.bind(this)}>
                   Cancel
                 </Button>
                 <Button color="primary"
@@ -935,7 +966,6 @@ class Library extends React.Component {
             vertical: 'bottom',
             horizontal: 'right',
           }}
-          getContentAnchorEl={null}
           anchorEl={this.state.menuAnchorEl}
           keepMounted
           classes={{paper: classes.sortMenu}}
@@ -945,10 +975,16 @@ class Library extends React.Component {
             <MenuItem key={sf}>
               <ListItemText primary={en.get(sf)}/>
               <ListItemSecondaryAction>
-                <IconButton edge="end" onClick={this.props.onSort.bind(this, null, sf, true)}>
+                <IconButton
+                  edge="end"
+                  onClick={this.props.onSort.bind(this, null, sf, true)}
+                  size="large">
                   <ArrowUpwardIcon/>
                 </IconButton>
-                <IconButton edge="end" onClick={this.props.onSort.bind(this, null, sf, false)}>
+                <IconButton
+                  edge="end"
+                  onClick={this.props.onSort.bind(this, null, sf, false)}
+                  size="large">
                   <ArrowDownwardIcon/>
                 </IconButton>
               </ListItemSecondaryAction>
@@ -957,7 +993,10 @@ class Library extends React.Component {
           <MenuItem key={SF.random}>
             <ListItemText primary={en.get(SF.random)}/>
             <ListItemSecondaryAction>
-              <IconButton edge="end" onClick={this.props.onSort.bind(this, null, SF.random, true)}>
+              <IconButton
+                edge="end"
+                onClick={this.props.onSort.bind(this, null, SF.random, true)}
+                size="large">
                 <ShuffleIcon/>
               </IconButton>
             </ListItemSecondaryAction>

@@ -3,20 +3,44 @@ import clsx from "clsx";
 import * as fs from "fs";
 
 import {
-  AppBar, Box, Button, Collapse, Container, createStyles, Dialog, DialogActions, DialogContent, DialogContentText,
-  DialogTitle, Divider, Drawer, IconButton, ListItem, ListItemIcon, ListItemText, Slide, Snackbar, SnackbarContent,
-  Tab, Tabs, Theme, Toolbar, Tooltip, Typography, withStyles
-} from "@material-ui/core";
+  AppBar,
+  Box,
+  Button,
+  Collapse,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Divider,
+  Drawer,
+  IconButton,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Snackbar,
+  SnackbarContent,
+  Tab,
+  Tabs,
+  Theme,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import BuildIcon from '@material-ui/icons/Build';
-import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import ErrorIcon from '@material-ui/icons/Error';
-import LiveHelpIcon from '@material-ui/icons/LiveHelp';
-import MenuIcon from'@material-ui/icons/Menu';
-import PhotoFilterIcon from '@material-ui/icons/PhotoFilter';
-import RestoreIcon from '@material-ui/icons/Restore';
-import SettingsIcon from '@material-ui/icons/Settings';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import BuildIcon from '@mui/icons-material/Build';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
+import LiveHelpIcon from '@mui/icons-material/LiveHelp';
+import MenuIcon from'@mui/icons-material/Menu';
+import PhotoFilterIcon from '@mui/icons-material/PhotoFilter';
+import RestoreIcon from '@mui/icons-material/Restore';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 import {MO} from "../../data/const";
 import Config, { CacheSettings, DisplaySettings, GeneralSettings, RemoteSettings, SceneSettings } from "../../data/Config";
@@ -81,7 +105,7 @@ const styles = (theme: Theme) => createStyles({
   drawerButton: {
     backgroundColor: theme.palette.primary.main,
     minHeight: theme.spacing(6),
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       paddingLeft: 0,
       paddingRight: 0,
     },
@@ -183,7 +207,7 @@ class ConfigForm extends React.Component {
     const classes = this.props.classes;
     const open = this.state.drawerOpen;
 
-    return(
+    return (
       <div className={classes.root}>
 
         <AppBar position="absolute" className={classes.appBar}>
@@ -193,7 +217,8 @@ class ConfigForm extends React.Component {
                 edge="start"
                 color="inherit"
                 aria-label="Back"
-                onClick={this.goBack.bind(this)}>
+                onClick={this.goBack.bind(this)}
+                size="large">
                 <ArrowBackIcon />
               </IconButton>
             </Tooltip>
@@ -210,7 +235,8 @@ class ConfigForm extends React.Component {
                 edge="start"
                 color="inherit"
                 aria-label="Confirm"
-                onClick={this.onConfirmConfig.bind(this)}>
+                onClick={this.onConfirmConfig.bind(this)}
+                size="large">
                 <CheckCircleIcon fontSize="large"/>
               </IconButton>
             </Tooltip>
@@ -229,7 +255,7 @@ class ConfigForm extends React.Component {
           </div>
 
           <ListItem className={classes.drawerButton}>
-            <IconButton onClick={this.onToggleDrawer.bind(this)}>
+            <IconButton onClick={this.onToggleDrawer.bind(this)} size="large">
               <MenuIcon className={classes.drawerIcon}/>
             </IconButton>
           </ListItem>
@@ -320,12 +346,7 @@ class ConfigForm extends React.Component {
           <Container maxWidth={false} className={classes.container}>
 
             {this.state.openTab === 0 && (
-              <Typography
-                component="div"
-                role="tabpanel"
-                hidden={this.state.openTab !== 0}
-                id="vertical-tabpanel-0"
-                aria-labelledby="vertical-tab-0">
+              <Typography component="div">
                 <div className={classes.tabPanel}>
                   <div className={classes.drawerSpacer}/>
                   <Box p={2} className={classes.fill}>
@@ -341,12 +362,7 @@ class ConfigForm extends React.Component {
             )}
 
             {this.state.openTab === 1 && (
-              <Typography
-                component="div"
-                role="tabpanel"
-                hidden={this.state.openTab !== 1}
-                id="vertical-tabpanel-1"
-                aria-labelledby="vertical-tab-1">
+              <Typography component="div">
                 <div className={classes.tabPanel}>
                   <div className={classes.drawerSpacer}/>
                   <Box p={2} className={classes.fill}>
@@ -362,11 +378,7 @@ class ConfigForm extends React.Component {
             {this.state.openTab === 2 && (
               <Typography
                 className={clsx(this.state.openTab === 2 && classes.sourcesSection)}
-                component="div"
-                role="tabpanel"
-                hidden={this.state.openTab !== 2}
-                id="vertical-tabpanel-2"
-                aria-labelledby="vertical-tab-2">
+                component="div">
                 <div className={classes.tabPanel}>
                   <div className={classes.drawerSpacer}/>
                   <Box p={2} className={classes.fill}>
@@ -420,7 +432,7 @@ class ConfigForm extends React.Component {
           open={!!this.state.errorSnack}
           autoHideDuration={20000}
           onClose={this.onCloseErrorSnack.bind(this)}
-          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
+          /*TODO TransitionComponent={(props) => <Slide {...props} direction="up"/>}*/>
           <SnackbarContent
             message={
               <span className={classes.snackbarMessage}>

@@ -5,15 +5,22 @@ import SystemFonts from "system-font-families";
 import {
   Button,
   Collapse,
-  createStyles, Dialog, DialogActions,
-  DialogContent, Divider, FormControlLabel,
-  Grid, Slider, Switch,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  Divider,
+  FormControlLabel,
+  Grid,
+  Slider,
+  Switch,
   Theme,
   Typography,
-  withStyles
-} from "@material-ui/core";
+} from "@mui/material";
 
-import {green, red} from "@material-ui/core/colors";
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import {green, red} from "@mui/material/colors";
 
 import {CancelablePromise} from "../../data/utils";
 import CaptionScript, {FontSettingsI} from "../../data/CaptionScript";
@@ -128,7 +135,7 @@ class ScriptOptions extends React.Component {
               </Grid>
             </Grid>
             <Grid item xs={12}>
-              <Typography id="opacity-slider" variant="caption" component="div" color="textSecondary">
+              <Typography variant="caption" component="div" color="textSecondary">
                 Script Opacity: {this.state.script.opacity}%
               </Typography>
               <Slider

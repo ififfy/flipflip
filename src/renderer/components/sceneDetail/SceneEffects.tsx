@@ -1,7 +1,10 @@
 import * as React from "react";
 import clsx from "clsx";
 
-import {Card, CardContent, createStyles, Grid, Theme, withStyles} from "@material-ui/core";
+import { Card, CardContent, Grid, Theme } from "@mui/material";
+
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
 
 import {SDT} from "../../data/const";
 import {SceneSettings} from "../../data/Config";

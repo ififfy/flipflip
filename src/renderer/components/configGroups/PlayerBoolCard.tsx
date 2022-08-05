@@ -11,7 +11,7 @@ import {
   Grid,
   Switch,
   Tooltip
-} from "@material-ui/core";
+} from "@mui/material";
 
 import {DisplaySettings, GeneralSettings} from "../../data/Config";
 import {portablePath} from "../../data/utils";

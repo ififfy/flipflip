@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import {Grid, InputAdornment, TextField, Tooltip} from "@material-ui/core";
+import {Grid, InputAdornment, TextField, Tooltip} from "@mui/material";
 
 import {DisplaySettings} from "../../data/Config";
 

@@ -1,6 +1,6 @@
 const defaultTheme = {
   palette: {
-    type: "light",
+    mode: "light",
     primary: {
       50: "#e8eaf6",
       100: "#c5cae9",

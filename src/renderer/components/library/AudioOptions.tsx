@@ -10,21 +10,35 @@ import {
   Button,
   CircularProgress,
   Collapse,
-  createStyles, Dialog, DialogActions,
-  DialogContent, Divider, FormControl, FormControlLabel,
-  Grid, IconButton, InputAdornment, InputLabel, MenuItem, Select,
-  Slider, SvgIcon, Switch,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  Divider,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
+  Slider,
+  SvgIcon,
+  Switch,
   TextField,
-  Theme, Tooltip,
+  Theme,
+  Tooltip,
   Typography,
-  withStyles
-} from "@material-ui/core";
+} from "@mui/material";
 
-import AudiotrackIcon from "@material-ui/icons/Audiotrack";
-import CheckIcon from "@material-ui/icons/Check";
-import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
 
-import {green, red} from "@material-ui/core/colors";
+import AudiotrackIcon from "@mui/icons-material/Audiotrack";
+import CheckIcon from "@mui/icons-material/Check";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+
+import {green, red} from "@mui/material/colors";
 
 import {toArrayBuffer} from "../../data/utils";
 import {RP, TF} from "../../data/const";
@@ -92,7 +106,7 @@ class AudioOptions extends React.Component {
   render() {
     const classes = this.props.classes;
 
-    return(
+    return (
       <Dialog
         open={true}
         onClose={this.props.onCancel.bind(this)}
@@ -172,7 +186,8 @@ class AudioOptions extends React.Component {
                               <Tooltip title="Detect BPM">
                                 <IconButton
                                   className={clsx(this.state.successBPM && classes.success, this.state.errorBPM && classes.failure)}
-                                  onClick={this.onDetectBPM.bind(this)}>
+                                  onClick={this.onDetectBPM.bind(this)}
+                                  size="large">
                                   {this.state.successBPM ? <CheckIcon/> :
                                     this.state.errorBPM ? <ErrorOutlineIcon/> :
                                       <SvgIcon viewBox="0 0 24 24" fontSize="small">
@@ -186,7 +201,8 @@ class AudioOptions extends React.Component {
                               <Tooltip title="Read BPM Metadata">
                                 <IconButton
                                   className={clsx(this.state.successTag && classes.success, this.state.errorTag && classes.failure)}
-                                  onClick={this.onReadBPMTag.bind(this)}>
+                                  onClick={this.onReadBPMTag.bind(this)}
+                                  size="large">
                                   {this.state.successTag ? <CheckIcon/> :
                                     this.state.errorTag ? <ErrorOutlineIcon/> :
                                       <AudiotrackIcon/>
@@ -202,7 +218,7 @@ class AudioOptions extends React.Component {
                         }}/>
                     </Grid>
                     <Grid item xs={12}>
-                      <Typography id="audio-speed-slider" variant="caption" component="div"
+                      <Typography variant="caption" component="div"
                                   color="textSecondary">
                         Speed {this.state.audio.speed / 10}x
                       </Typography>
@@ -236,7 +252,7 @@ class AudioOptions extends React.Component {
                   </Grid>
                   <Grid item xs={12} sm={8}>
                     <Collapse in={this.state.audio.tickMode == TF.sin} className={classes.fullWidth}>
-                      <Typography id="tick-sin-rate-slider" variant="caption" component="div"
+                      <Typography variant="caption" component="div"
                                   color="textSecondary">
                         Wave Rate
                       </Typography>
@@ -266,7 +282,7 @@ class AudioOptions extends React.Component {
                       </Grid>
                     </Collapse>
                     <Collapse in={this.state.audio.tickMode == TF.bpm} className={classes.fullWidth}>
-                      <Typography id="tick-bpm-multi-slider" variant="caption" component="div"
+                      <Typography variant="caption" component="div"
                                   color="textSecondary">
                         BPM
                         Multiplier {this.state.audio.tickBPMMulti > 0 ? this.state.audio.tickBPMMulti : "1 / " + (-1 * (this.state.audio.tickBPMMulti - 2))}x

@@ -1,16 +1,18 @@
 import * as React from "react";
 
-import {createStyles, Grid, IconButton, Slider, Theme, Tooltip, Typography, withStyles} from "@material-ui/core";
-import ValueLabel from "@material-ui/core/Slider/ValueLabel";
+import { Grid, IconButton, Slider, Theme, Tooltip, Typography } from "@mui/material";
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+//import ValueLabel from "@mui/material/Slider/ValueLabel";
 
-import Forward10Icon from '@material-ui/icons/Forward10';
-import Replay10Icon from '@material-ui/icons/Replay10';
-import PauseIcon from '@material-ui/icons/Pause';
-import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import SkipNextIcon from "@material-ui/icons/SkipNext";
-import SpeedIcon from '@material-ui/icons/Speed';
-import VolumeDownIcon from '@material-ui/icons/VolumeDown';
-import VolumeUpIcon from '@material-ui/icons/VolumeUp';
+import Forward10Icon from '@mui/icons-material/Forward10';
+import Replay10Icon from '@mui/icons-material/Replay10';
+import PauseIcon from '@mui/icons-material/Pause';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import SkipNextIcon from "@mui/icons-material/SkipNext";
+import SpeedIcon from '@mui/icons-material/Speed';
+import VolumeDownIcon from '@mui/icons-material/VolumeDown';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 
 
 import {getTimestamp} from "../../data/utils";
@@ -27,7 +29,7 @@ const styles = (theme: Theme) => createStyles({
   },
 });
 
-const StyledValueLabel = withStyles((theme: Theme) => createStyles({
+/*const StyledValueLabel = withStyles((theme: Theme) => createStyles({
   offset: {
     top: -5,
     left: 'calc(-50% + 8px)',
@@ -41,7 +43,7 @@ const StyledValueLabel = withStyles((theme: Theme) => createStyles({
   label: {
     color: theme.palette.text.primary,
   }
-}))(ValueLabel as any);
+}))(ValueLabel as any);*/
 
 class VideoControl extends React.Component {
   readonly props: {
@@ -75,7 +77,7 @@ class VideoControl extends React.Component {
             max={this.props.clipValue ? this.props.clipValue[1] : this.props.video.duration}
             color={this.props.clipValue ? "secondary" : "primary"}
             value={this.props.video.currentTime}
-            ValueLabelComponent={(props) => <StyledValueLabel {...props}/>}
+            /*TODO ValueLabelComponent={(props) => <StyledValueLabel {...props}/>}*/
             valueLabelDisplay="on"
             valueLabelFormat={(value) => getTimestamp(value)}
             marks={this.state.marks}
@@ -86,42 +88,38 @@ class VideoControl extends React.Component {
             <Grid item xs={12} style={{textAlign: 'center'}}>
               {this.props.nextTrack && this.state.showSpeed && (
                 <Tooltip title="Show Volume Controls">
-                  <IconButton
-                    onClick={this.onSwapSlider.bind(this)}>
+                  <IconButton onClick={this.onSwapSlider.bind(this)} size="large">
                     <VolumeUpIcon />
                   </IconButton>
                 </Tooltip>
               )}
               {this.props.nextTrack && !this.state.showSpeed && (
                 <Tooltip title="Show Speed Controls">
-                  <IconButton
-                    onClick={this.onSwapSlider.bind(this)}>
+                  <IconButton onClick={this.onSwapSlider.bind(this)} size="large">
                     <SpeedIcon />
                   </IconButton>
                 </Tooltip>
               )}
               <Tooltip title="Jump Back">
-                <IconButton
-                  onClick={this.onBack.bind(this)}>
+                <IconButton onClick={this.onBack.bind(this)} size="large">
                   <Replay10Icon/>
                 </IconButton>
               </Tooltip>
               <Tooltip title={this.state.playing ? "Pause" : "Play"}>
                 <IconButton
-                  onClick={this.state.playing ? this.onPause.bind(this) : this.onPlay.bind(this)}>
+                  onClick={this.state.playing ? this.onPause.bind(this) : this.onPlay.bind(this)}
+                  size="large">
                   {this.state.playing ? <PauseIcon/> : <PlayArrowIcon/>}
                 </IconButton>
               </Tooltip>
               <Tooltip title="Jump Forward">
-                <IconButton
-                  onClick={this.onForward.bind(this)}>
+                <IconButton onClick={this.onForward.bind(this)} size="large">
                   <Forward10Icon/>
                 </IconButton>
               </Tooltip>
               {this.props.nextTrack && (
                 <Tooltip title="Next Track">
-                  <IconButton
-                    onClick={this.props.nextTrack.bind(this)}>
+                  <IconButton onClick={this.props.nextTrack.bind(this)} size="large">
                     <SkipNextIcon />
                   </IconButton>
                 </Tooltip>
@@ -130,8 +128,7 @@ class VideoControl extends React.Component {
             <Grid item xs={12}>
               {this.state.showSpeed && (
                 <React.Fragment>
-                  <Typography id="video-speed-slider" variant="caption" component="div"
-                              color="textSecondary">
+                  <Typography variant="caption" component="div" color="textSecondary">
                     Video Speed {this.props.video.playbackRate}x
                   </Typography>
                   <Slider

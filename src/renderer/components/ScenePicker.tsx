@@ -6,36 +6,68 @@ import Sortable from "react-sortablejs";
 import fs from "fs";
 
 import {
-  AppBar, Badge, Button, Card, CardActionArea, CardContent, Checkbox, Chip, Container, createStyles, Dialog,
-  DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Drawer, Fab, IconButton,
-  InputAdornment, Link, ListItem, ListItemIcon, ListItemSecondaryAction, ListItemText, Menu, MenuItem, Tab, Tabs,
-  TextField, Theme, Toolbar, Tooltip, Typography, withStyles
-} from "@material-ui/core";
+  AppBar,
+  Badge,
+  Button,
+  Card,
+  CardActionArea,
+  CardContent,
+  Checkbox,
+  Chip,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Divider,
+  Drawer,
+  Fab,
+  IconButton,
+  InputAdornment,
+  Link,
+  ListItem,
+  ListItemIcon,
+  ListItemSecondaryAction,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Tab,
+  Tabs,
+  TextField,
+  Theme,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 
-import AddIcon from '@material-ui/icons/Add';
-import ArrowDownwardIcon from '@material-ui/icons/ArrowDownward';
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
-import CasinoIcon from '@material-ui/icons/Casino';
-import CloseIcon from '@material-ui/icons/Close';
-import CodeIcon from '@material-ui/icons/Code';
-import CreateNewFolderIcon from '@material-ui/icons/CreateNewFolder';
-import DeleteIcon from '@material-ui/icons/Delete';
-import DragHandleIcon from '@material-ui/icons/DragHandle';
-import FolderIcon from "@material-ui/icons/Folder";
-import GetAppIcon from '@material-ui/icons/GetApp';
-import GridOnIcon from '@material-ui/icons/GridOn';
-import HelpIcon from '@material-ui/icons/Help';
-import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
-import LibraryMusicIcon from '@material-ui/icons/LibraryMusic';
-import LocalLibraryIcon from '@material-ui/icons/LocalLibrary';
-import MenuIcon from '@material-ui/icons/Menu';
-import MovieIcon from '@material-ui/icons/Movie';
-import MovieFilterIcon from '@material-ui/icons/MovieFilter';
-import OpenInNewIcon from '@material-ui/icons/OpenInNew';
-import SettingsIcon from '@material-ui/icons/Settings';
-import ShuffleIcon from '@material-ui/icons/Shuffle';
-import SortIcon from '@material-ui/icons/Sort';
-import SystemUpdateIcon from '@material-ui/icons/SystemUpdate';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import AddIcon from '@mui/icons-material/Add';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import CasinoIcon from '@mui/icons-material/Casino';
+import CloseIcon from '@mui/icons-material/Close';
+import CodeIcon from '@mui/icons-material/Code';
+import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
+import DeleteIcon from '@mui/icons-material/Delete';
+import DragHandleIcon from '@mui/icons-material/DragHandle';
+import FolderIcon from "@mui/icons-material/Folder";
+import GetAppIcon from '@mui/icons-material/GetApp';
+import GridOnIcon from '@mui/icons-material/GridOn';
+import HelpIcon from '@mui/icons-material/Help';
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
+import LibraryMusicIcon from '@mui/icons-material/LibraryMusic';
+import LocalLibraryIcon from '@mui/icons-material/LocalLibrary';
+import MenuIcon from '@mui/icons-material/Menu';
+import MovieIcon from '@mui/icons-material/Movie';
+import MovieFilterIcon from '@mui/icons-material/MovieFilter';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import SettingsIcon from '@mui/icons-material/Settings';
+import ShuffleIcon from '@mui/icons-material/Shuffle';
+import SortIcon from '@mui/icons-material/Sort';
+import SystemUpdateIcon from '@mui/icons-material/SystemUpdate';
 
 import {arrayMove, getRandomListItem} from "../data/utils";
 import {IPC, MO, SF, SG, SPT} from "../data/const";
@@ -448,7 +480,8 @@ class ScenePicker extends React.Component {
                 color="inherit"
                 aria-label="Toggle Drawer"
                 className={clsx(this.props.tutorial == SPT.scenePicker && classes.highlight)}
-                onClick={this.onToggleDrawer.bind(this)}>
+                onClick={this.onToggleDrawer.bind(this)}
+                size="large">
                 <MenuIcon />
               </IconButton>
             )}
@@ -464,7 +497,11 @@ class ScenePicker extends React.Component {
             <div className={classes.fill}/>
             {this.state.newVersion != "" && (
               <Tooltip title={`Download ${this.state.newVersion}`}>
-                <IconButton color="inherit" className={classes.updateIcon} onClick={this.openGitRelease.bind(this)}>
+                <IconButton
+                  color="inherit"
+                  className={classes.updateIcon}
+                  onClick={this.openGitRelease.bind(this)}
+                  size="large">
                   <Badge variant="dot" color="secondary">
                     <SystemUpdateIcon />
                   </Badge>
@@ -490,7 +527,8 @@ class ScenePicker extends React.Component {
               edge="start"
               color="inherit"
               aria-label="Toggle Drawer"
-              onClick={this.onToggleDrawer.bind(this)}>
+              onClick={this.onToggleDrawer.bind(this)}
+              size="large">
               <MenuIcon />
             </IconButton>
             <VSpin>
@@ -664,12 +702,7 @@ class ScenePicker extends React.Component {
           <Container maxWidth={false} className={classes.container}>
 
             {this.props.openTab === 0 && (
-              <Typography
-                component="div"
-                role="tabpanel"
-                hidden={this.props.openTab !== 0}
-                id="vertical-tabpanel-0"
-                aria-labelledby="vertical-tab-0">
+              <Typography component="div">
                 <Sortable
                   className={classes.sceneList}
                   options={{
@@ -756,7 +789,8 @@ class ScenePicker extends React.Component {
                         <IconButton
                           color="inherit"
                           aria-label="Delete"
-                          onClick={this.props.onDeleteGroup.bind(this, g)}>
+                          onClick={this.props.onDeleteGroup.bind(this, g)}
+                          size="large">
                           <CloseIcon />
                         </IconButton>
                       </div>
@@ -826,12 +860,7 @@ class ScenePicker extends React.Component {
             )}
 
             {this.props.openTab === 1 && (
-              <Typography
-                component="div"
-                role="tabpanel"
-                hidden={this.props.openTab !== 1}
-                id="vertical-tabpanel-1"
-                aria-labelledby="vertical-tab-1">
+              <Typography component="div">
                 <Sortable
                   className={classes.sceneList}
                   options={{
@@ -918,7 +947,8 @@ class ScenePicker extends React.Component {
                         <IconButton
                           color="inherit"
                           aria-label="Delete"
-                          onClick={this.props.onDeleteGroup.bind(this, g)}>
+                          onClick={this.props.onDeleteGroup.bind(this, g)}
+                          size="large">
                           <CloseIcon />
                         </IconButton>
                       </div>
@@ -988,12 +1018,7 @@ class ScenePicker extends React.Component {
             )}
 
             {this.props.openTab === 2 && (
-              <Typography
-                component="div"
-                role="tabpanel"
-                hidden={this.props.openTab !== 2}
-                id="vertical-tabpanel-2"
-                aria-labelledby="vertical-tab-2">
+              <Typography component="div">
                 <Sortable
                   className={classes.sceneList}
                   options={{
@@ -1082,7 +1107,8 @@ class ScenePicker extends React.Component {
                         <IconButton
                           color="inherit"
                           aria-label="Delete"
-                          onClick={this.props.onDeleteGroup.bind(this, g)}>
+                          onClick={this.props.onDeleteGroup.bind(this, g)}
+                          size="large">
                           <CloseIcon />
                         </IconButton>
                       </div>
@@ -1264,7 +1290,6 @@ class ScenePicker extends React.Component {
                         vertical: 'bottom',
                         horizontal: 'right',
                       }}
-                      getContentAnchorEl={null}
                       anchorEl={this.state.menuAnchorEl}
                       keepMounted
                       classes={{paper: classes.sortMenu}}
@@ -1274,10 +1299,10 @@ class ScenePicker extends React.Component {
                         <MenuItem key={sf}>
                           <ListItemText primary={en.get(sf)}/>
                           <ListItemSecondaryAction>
-                            <IconButton edge="end" onClick={this.props.onSort.bind(this, sf, true)}>
+                            <IconButton edge="end" onClick={this.props.onSort.bind(this, sf, true)} size="large">
                               <ArrowUpwardIcon/>
                             </IconButton>
-                            <IconButton edge="end" onClick={this.props.onSort.bind(this, sf, false)}>
+                            <IconButton edge="end" onClick={this.props.onSort.bind(this, sf, false)} size="large">
                               <ArrowDownwardIcon/>
                             </IconButton>
                           </ListItemSecondaryAction>
@@ -1286,7 +1311,10 @@ class ScenePicker extends React.Component {
                       <MenuItem key={SF.random}>
                         <ListItemText primary={en.get(SF.random)}/>
                         <ListItemSecondaryAction>
-                          <IconButton edge="end" onClick={this.props.onSort.bind(this, SF.random, true)}>
+                          <IconButton
+                            edge="end"
+                            onClick={this.props.onSort.bind(this, SF.random, true)}
+                            size="large">
                             <ShuffleIcon/>
                           </IconButton>
                         </ListItemSecondaryAction>
@@ -1327,8 +1355,7 @@ class ScenePicker extends React.Component {
                 endAdornment:
                   <InputAdornment position="end">
                     <Tooltip title="Open File">
-                      <IconButton
-                        onClick={this.onOpenImportFile.bind(this)}>
+                      <IconButton onClick={this.onOpenImportFile.bind(this)} size="large">
                         <FolderIcon/>
                       </IconButton>
                     </Tooltip>
@@ -1342,7 +1369,7 @@ class ScenePicker extends React.Component {
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.onCloseDialog.bind(this)} color="default">
+            <Button onClick={this.onCloseDialog.bind(this)}>
               Cancel
             </Button>
             <Button color="primary"

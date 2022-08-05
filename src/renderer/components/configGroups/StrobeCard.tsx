@@ -2,11 +2,27 @@ import * as React from "react";
 import clsx from "clsx";
 
 import {
-  Collapse, createStyles, Divider, FormControl, FormControlLabel, Grid, InputAdornment, InputLabel,
-  MenuItem, Select, Slider, Switch, TextField, Theme, Tooltip, Typography, withStyles
-} from "@material-ui/core";
+  Collapse,
+  Divider,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
+  Slider,
+  Switch,
+  TextField,
+  Theme,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 
-import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
 import {EA, SC, SL, TF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
@@ -141,7 +157,7 @@ class StrobeCard extends React.Component {
               </Grid>
               <Grid item xs={12} sm={this.props.sidebar ? 12 : true} className={clsx(this.props.scene.strobeLayer != SL.bottom && classes.noPadding)}>
                 <Collapse in={this.props.scene.strobeLayer == SL.bottom} className={classes.fullWidth}>
-                  <Typography id="strobe-opacity-slider" variant="caption" component="div" color="textSecondary">
+                  <Typography variant="caption" component="div" color="textSecondary">
                     Strobe Opacity
                   </Typography>
                   <Grid container spacing={2} alignItems="center">
@@ -205,7 +221,7 @@ class StrobeCard extends React.Component {
               </Grid>
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 8}>
                 <Collapse in={this.props.scene.strobeTF == TF.sin} className={classes.fullWidth}>
-                  <Typography id="strobe-sin-rate-slider" variant="caption" component="div" color="textSecondary">
+                  <Typography variant="caption" component="div" color="textSecondary">
                     Wave Rate
                   </Typography>
                   <Grid container alignItems="center">
@@ -235,7 +251,7 @@ class StrobeCard extends React.Component {
                   </Grid>
                 </Collapse>
                 <Collapse in={this.props.scene.strobeTF == TF.bpm} className={classes.fullWidth}>
-                  <Typography id="strobe-bpm-multi-slider" variant="caption" component="div" color="textSecondary">
+                  <Typography variant="caption" component="div" color="textSecondary">
                     BPM Multiplier {this.props.scene.strobeBPMMulti / 10}x
                   </Typography>
                   <Slider
@@ -330,7 +346,7 @@ class StrobeCard extends React.Component {
               </Grid>
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 8}>
                 <Collapse in={this.props.scene.strobeDelayTF == TF.sin} className={classes.fullWidth}>
-                  <Typography id="strobe-delay-sin-rate-slider" variant="caption" component="div" color="textSecondary">
+                  <Typography variant="caption" component="div" color="textSecondary">
                     Wave Rate
                   </Typography>
                   <Grid container alignItems="center">
@@ -360,7 +376,7 @@ class StrobeCard extends React.Component {
                   </Grid>
                 </Collapse>
                 <Collapse in={this.props.scene.strobeDelayTF == TF.bpm} className={classes.fullWidth}>
-                  <Typography id="strobe-delay-bpm-multi-slider" variant="caption" component="div" color="textSecondary">
+                  <Typography variant="caption" component="div" color="textSecondary">
                     BPM Multiplier {this.props.scene.strobeDelayBPMMulti / 10}x
                   </Typography>
                   <Slider
@@ -457,7 +473,7 @@ class StrobeCard extends React.Component {
                   </Grid>
                   <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                     <Collapse in={this.props.scene.strobeEase == EA.polyIn || this.props.scene.strobeEase == EA.polyOut || this.props.scene.strobeEase == EA.polyInOut} className={classes.fullWidth}>
-                      <Typography id="exp-slider" variant="caption" component="div" color="textSecondary">
+                      <Typography variant="caption" component="div" color="textSecondary">
                         Exponent: {this.props.scene.strobeExp / 2}
                       </Typography>
                       <Slider
@@ -470,7 +486,7 @@ class StrobeCard extends React.Component {
                         aria-labelledby="exp-slider"/>
                     </Collapse>
                     <Collapse in={this.props.scene.strobeEase == EA.backIn || this.props.scene.strobeEase == EA.backOut || this.props.scene.strobeEase == EA.backInOut} className={classes.fullWidth}>
-                      <Typography id="ov-slider" variant="caption" component="div" color="textSecondary">
+                      <Typography variant="caption" component="div" color="textSecondary">
                         Overshoot: {this.props.scene.strobeOv / 2}
                       </Typography>
                       <Slider
@@ -485,7 +501,7 @@ class StrobeCard extends React.Component {
                   </Grid>
                   <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                     <Collapse in={this.props.scene.strobeEase == EA.elasticIn || this.props.scene.strobeEase == EA.elasticOut || this.props.scene.strobeEase == EA.elasticInOut} className={classes.fullWidth}>
-                      <Typography id="amp-slider" variant="caption" component="div" color="textSecondary">
+                      <Typography variant="caption" component="div" color="textSecondary">
                         Amplitude: {this.props.scene.strobeAmp / 20}
                       </Typography>
                       <Slider
@@ -500,7 +516,7 @@ class StrobeCard extends React.Component {
                   </Grid>
                   <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                     <Collapse in={this.props.scene.strobeEase == EA.elasticIn || this.props.scene.strobeEase == EA.elasticOut || this.props.scene.strobeEase == EA.elasticInOut} className={classes.fullWidth}>
-                      <Typography id="per-slider" variant="caption" component="div" color="textSecondary">
+                      <Typography variant="caption" component="div" color="textSecondary">
                         Period: {this.props.scene.strobePer / 20}
                       </Typography>
                       <Slider

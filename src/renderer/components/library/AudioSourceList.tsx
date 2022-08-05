@@ -6,7 +6,6 @@ import {FixedSizeList} from "react-window";
 
 import {
   Button,
-  createStyles,
   Dialog,
   DialogActions,
   DialogContent,
@@ -14,8 +13,10 @@ import {
   List,
   Theme,
   Typography,
-  withStyles
-} from "@material-ui/core";
+} from "@mui/material";
+
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
 
 import {arrayMove} from "../../data/utils";
 import Audio from "../../data/Audio";

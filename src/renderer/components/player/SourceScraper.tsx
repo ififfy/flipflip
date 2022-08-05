@@ -7,7 +7,7 @@ import fileURL from "file-url";
 import wretch from "wretch";
 import uuidv4 from "uuid/v4";
 
-import {Dialog, DialogContent} from "@material-ui/core";
+import {Dialog, DialogContent} from "@mui/material";
 
 import {CancelablePromise, flatten, getCachePath, randomizeList, urlToPath} from "../../data/utils";
 import {

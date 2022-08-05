@@ -6,12 +6,30 @@ import {existsSync} from "fs";
 import getFolderSize from "get-folder-size";
 
 import {
-  Button, Chip, Collapse, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, Divider,
-  FormControlLabel, Grid, IconButton, InputAdornment, Link, Switch, TextField, Theme, Tooltip, withStyles
-} from "@material-ui/core";
+  Button,
+  Chip,
+  Collapse,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  Divider,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  InputAdornment,
+  Link,
+  Switch,
+  TextField,
+  Theme,
+  Tooltip,
+} from "@mui/material";
 
-import ClearIcon from '@material-ui/icons/Clear';
-import DeleteSweepIcon from '@material-ui/icons/DeleteSweep';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import ClearIcon from '@mui/icons-material/Clear';
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 
 import Config, {CacheSettings} from "../../data/Config";
 import {getCachePath, urlToPath} from "../../data/utils";
@@ -42,7 +60,7 @@ class CacheCard extends React.Component {
   render() {
     const classes = this.props.classes;
     const cachePath = getCachePath(null, this.props.config);
-    return(
+    return (
       <Grid container spacing={this.props.config.caching.enabled ? 2 : 0} alignItems="center">
         <Grid item xs={12}>
           <Grid container alignItems="center">
@@ -62,7 +80,8 @@ class CacheCard extends React.Component {
                   <IconButton
                     edge="start"
                     color="inherit"
-                    onClick={this.onClearCache.bind(this)}>
+                    onClick={this.onClearCache.bind(this)}
+                    size="large">
                     <DeleteSweepIcon color="error" />
                   </IconButton>
                 </Tooltip>
@@ -94,8 +113,7 @@ class CacheCard extends React.Component {
               </Grid>
               <Grid item>
                 <Tooltip title="Reset Cache Directory">
-                  <IconButton
-                    onClick={this.onResetCacheDir.bind(this)}>
+                  <IconButton onClick={this.onResetCacheDir.bind(this)} size="large">
                     <ClearIcon color="error"/>
                   </IconButton>
                 </Tooltip>

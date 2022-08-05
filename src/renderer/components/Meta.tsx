@@ -2,9 +2,18 @@ import {remote, ipcRenderer, IpcMessageEvent} from 'electron';
 import * as React from 'react';
 
 import {
-  Box, createTheme, CssBaseline, Dialog, DialogContent, DialogContentText, Slide, Snackbar, SnackbarContent
-} from "@material-ui/core";
-import {ThemeProvider} from "@material-ui/styles";
+  Box,
+  createTheme,
+  CssBaseline,
+  Dialog,
+  DialogContent,
+  DialogContentText,
+  Slide,
+  Snackbar,
+  SnackbarContent,
+  adaptV4Theme, Theme,
+} from "@mui/material";
+import { ThemeProvider } from "@mui/styles";
 
 import {IPC, SP} from "../data/const";
 import {getCachePath} from "../data/utils";
@@ -24,6 +33,14 @@ import Tutorial from "./Tutorial";
 import AudioLibrary from "./library/AudioLibrary";
 import CaptionScriptor from "./sceneDetail/CaptionScriptor";
 import ScriptLibrary from "./library/ScriptLibrary";
+
+
+declare module '@mui/styles/defaultTheme' {
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
+  interface DefaultTheme extends Theme {}
+}
+
+
 const appStorage = new AppStorage(remote.getCurrentWindow().id);
 
 export default class Meta extends React.Component {
@@ -129,7 +146,7 @@ export default class Meta extends React.Component {
     const a = (fn: any, ...args: any[]) => this.applyAction.bind(this, fn, ...args);
     const p = (fn: any) => this.progressAction.bind(this, fn);
 
-    const theme = createTheme(this.state.theme);
+    const theme = createTheme(adaptV4Theme(this.state.theme));
     return (
       <ThemeProvider theme={theme}>
         <ErrorBoundary
@@ -482,7 +499,7 @@ export default class Meta extends React.Component {
               autoHideDuration={2000}
               key={this.state.systemSnack + new Date()}
               onClose={a(actions.closeMessage)}
-              TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
+              TransitionComponent={(props: any) => <Slide {...props} direction="up"/>}>
               <SnackbarContent
                 message={
                   <span style={{display: 'flex', alignItems: 'center',}}>
@@ -512,8 +529,8 @@ export default class Meta extends React.Component {
           </Box>
         </ErrorBoundary>
       </ThemeProvider>
-    )
+    );
   }
-};
+}
 
 (Meta as any).displayName="Meta";

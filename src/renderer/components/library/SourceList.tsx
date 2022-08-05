@@ -8,12 +8,34 @@ import {FixedSizeList} from "react-window";
 import clsx from "clsx";
 
 import {
-  Button, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, FormControl, FormControlLabel,
-  IconButton, InputAdornment, InputLabel, Link, List, ListItemSecondaryAction, ListItemText, Menu, MenuItem,
-  Select, Switch, TextField, Theme, Tooltip, Typography, withStyles
-} from "@material-ui/core";
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  FormControl,
+  FormControlLabel,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  Link,
+  List,
+  ListItemSecondaryAction,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Select,
+  Switch,
+  TextField,
+  Theme,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 
-import FolderIcon from "@material-ui/icons/Folder";
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import FolderIcon from "@mui/icons-material/Folder";
 
 import {arrayMove, getCachePath, getTimestamp, urlToPath} from "../../data/utils";
 import {getFileName, getSourceType} from "../player/Scrapers";
@@ -313,8 +335,7 @@ class SourceList extends React.Component {
                   endAdornment:
                     <InputAdornment position="end">
                       <Tooltip title="Open File">
-                        <IconButton
-                          onClick={this.onOpenSubtitleFile.bind(this)}>
+                        <IconButton onClick={this.onOpenSubtitleFile.bind(this)} size="large">
                           <FolderIcon/>
                         </IconButton>
                       </Tooltip>
@@ -410,7 +431,7 @@ class SourceList extends React.Component {
           </Dialog>
         )}
       </React.Fragment>
-    )
+    );
   }
 
   componentDidMount() {

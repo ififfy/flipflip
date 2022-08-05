@@ -1,7 +1,10 @@
 import * as React from "react";
 import clsx from "clsx";
 
-import {createStyles, FormControlLabel, Switch, Theme, Typography, withStyles} from "@material-ui/core";
+import { FormControlLabel, Switch, Theme, Typography } from "@mui/material";
+
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
 
 import ThemeColorPicker from "../config/ThemeColorPicker";
 
@@ -32,7 +35,7 @@ class ThemeCard extends React.Component {
         <div>
           <FormControlLabel
             control={
-              <Switch checked={this.props.theme.palette.type === "dark"}
+              <Switch checked={this.props.theme.palette.mode === "dark"}
                       onChange={this.props.onToggleDarkMode.bind(this)}/>
             }
             label="Dark Mode"/>

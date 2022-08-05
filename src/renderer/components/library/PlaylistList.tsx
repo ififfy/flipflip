@@ -1,11 +1,14 @@
 import * as React from "react";
 import clsx from "clsx";
 
-import {Card, CardContent, CardMedia, createStyles, Grid, Theme, Tooltip, Typography, withStyles} from "@material-ui/core";
+import { Card, CardContent, CardMedia, Grid, Theme, Tooltip, Typography } from "@mui/material";
+
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
 
 import Audio from "../../data/Audio";
 import Playlist from "../../data/Playlist";
-import AudiotrackIcon from "@material-ui/icons/Audiotrack";
+import AudiotrackIcon from "@mui/icons-material/Audiotrack";
 
 const styles = (theme: Theme) => createStyles({
   emptyMessage: {
@@ -126,7 +129,7 @@ class PlaylistList extends React.Component {
           )
         })}
       </Grid>
-    )
+    );
   }
 
   componentDidUpdate(props: any) {

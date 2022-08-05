@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import {Card, CardContent, Grid, Theme} from "@material-ui/core";
+import {Card, CardContent, Grid, Theme} from "@mui/material";
 
 import Config, {CacheSettings, DisplaySettings, GeneralSettings, RemoteSettings} from "../../data/Config";
 import PlayerBoolCard from "../configGroups/PlayerBoolCard";

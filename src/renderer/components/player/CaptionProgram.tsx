@@ -16,7 +16,7 @@ import Tag from "../../data/Tag";
 import ChildCallbackHack from "./ChildCallbackHack";
 import Audio from "../../data/Audio";
 import CaptionScript from "../../data/CaptionScript";
-import {CircularProgress} from "@material-ui/core";
+import {CircularProgress} from "@mui/material";
 
 const splitFirstWord = function (s: string) {
   const firstSpaceIndex = s.indexOf(" ");

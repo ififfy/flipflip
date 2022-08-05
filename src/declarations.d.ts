@@ -19,7 +19,7 @@ declare module '*.icns' {
   export = value;
 }
 
-declare module "@material-ui/core/Slider/ValueLabel"
+declare module "@mui/material/Slider/ValueLabel"
 declare module 'd3-ease';
 declare module 'electron-default-menu';
 declare module 'electron-google-analytics';

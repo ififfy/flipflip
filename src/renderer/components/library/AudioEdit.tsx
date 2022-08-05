@@ -6,18 +6,20 @@ import * as mm from "music-metadata";
 
 import {
   Button,
-  createStyles, Dialog,
+  Dialog,
   DialogActions,
   DialogContent,
   IconButton,
   TextField,
   Theme,
   Typography,
-  withStyles
-} from "@material-ui/core";
+} from "@mui/material";
 
-import AudiotrackIcon from "@material-ui/icons/Audiotrack";
-import DeleteIcon from "@material-ui/icons/Delete";
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import AudiotrackIcon from "@mui/icons-material/Audiotrack";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 import {extractMusicMetadata, generateThumbnailFile} from "../../data/utils";
 import {isImage} from "../player/Scrapers";
@@ -86,7 +88,7 @@ class AudioEdit extends React.Component {
   render() {
     const classes = this.props.classes;
 
-    return(
+    return (
       <Dialog
         open={true}
         onClose={this.props.onCancel.bind(this)}
@@ -149,7 +151,7 @@ class AudioEdit extends React.Component {
         </DialogContent>
         <DialogActions className={classes.actions}>
           {this.props.allowSuggestion && (
-            <Button onClick={this.loadSuggestions.bind(this)} color="default">
+            <Button onClick={this.loadSuggestions.bind(this)}>
               Use Suggestions
             </Button>
           )}

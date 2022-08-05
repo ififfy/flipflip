@@ -3,16 +3,37 @@ import path from "path";
 import clsx from "clsx";
 
 import {
-  Button, Chip, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl,
-  FormControlLabel, Grid, InputAdornment, InputLabel, MenuItem, Select, Slide, Snackbar, SnackbarContent, Switch,
-  TextField, Theme, Tooltip, withStyles
-} from "@material-ui/core";
+  Button,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
+  Slide,
+  Snackbar,
+  SnackbarContent,
+  Switch,
+  TextField,
+  Theme,
+  Tooltip,
+} from "@mui/material";
 
-import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import DeleteIcon from '@material-ui/icons/Delete';
-import ErrorIcon from '@material-ui/icons/Error';
-import RestoreIcon from '@material-ui/icons/Restore';
-import SaveIcon from '@material-ui/icons/Save';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ErrorIcon from '@mui/icons-material/Error';
+import RestoreIcon from '@mui/icons-material/Restore';
+import SaveIcon from '@mui/icons-material/Save';
 
 import {convertFromEpoch, getBackups, saveDir} from "../../data/utils";
 import {MO} from "../../data/const";
@@ -26,7 +47,7 @@ const styles = (theme: Theme) => createStyles({
     paddingTop: theme.spacing(1),
   },
   hideXS: {
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       display: 'none'
     },
   },
@@ -313,7 +334,7 @@ class BackupCard extends React.Component {
           open={this.state.restoreSnack}
           autoHideDuration={5000}
           onClose={this.onCloseRestoreSnack.bind(this)}
-          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
+          /*TODO TransitionComponent={(props) => <Slide {...props} direction="up"/>}*/>
           <SnackbarContent
             message={
               <span className={classes.snackbarMessage}>
@@ -327,7 +348,7 @@ class BackupCard extends React.Component {
           open={this.state.backupSnack}
           autoHideDuration={5000}
           onClose={this.onCloseBackupSnack.bind(this)}
-          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
+          /*TODO TransitionComponent={(props) => <Slide {...props} direction="up"/>}*/>
           <SnackbarContent
             message={
               <span className={classes.snackbarMessage}>
@@ -341,7 +362,7 @@ class BackupCard extends React.Component {
           open={this.state.cleanSnack}
           autoHideDuration={5000}
           onClose={this.onCloseCleanSnack.bind(this)}
-          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
+          /*TODO TransitionComponent={(props) => <Slide {...props} direction="up"/>}*/>
           <SnackbarContent
             message={
               <span className={classes.snackbarMessage}>
@@ -355,7 +376,7 @@ class BackupCard extends React.Component {
           open={!!this.state.errorSnack}
           autoHideDuration={10000}
           onClose={this.onCloseErrorSnack.bind(this)}
-          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
+          /*TODO TransitionComponent={(props) => <Slide {...props} direction="up"/>}*/>
           <SnackbarContent
             message={
               <span className={classes.snackbarMessage}>

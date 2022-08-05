@@ -3,9 +3,23 @@ import fontList from "font-list";
 import SystemFonts from "system-font-families";
 
 import {
-  Collapse, createStyles, Divider, FormControl, FormControlLabel, Grid, InputAdornment, InputLabel, MenuItem, Select,
-  Switch, TextField, Theme, Tooltip, withStyles
-} from "@material-ui/core";
+  Collapse,
+  Divider,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
+  Switch,
+  TextField,
+  Theme,
+  Tooltip,
+} from "@mui/material";
+
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
 
 import {GeneralSettings} from "../../data/Config";
 import {WC} from "../../data/const";

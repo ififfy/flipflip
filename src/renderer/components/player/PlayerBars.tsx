@@ -7,18 +7,41 @@ import fs from "fs";
 import wretch from "wretch";
 
 import {
-  AppBar, Button, Card, CardActionArea, CardContent, createStyles, Dialog, DialogActions, DialogContent,
-  DialogContentText, DialogTitle, Divider, Drawer, Accordion, AccordionDetails, AccordionSummary, Grid,
-  IconButton, Link, Theme, Toolbar, Tooltip, Typography, withStyles, Fab
-} from "@material-ui/core";
+  AppBar,
+  Button,
+  Card,
+  CardActionArea,
+  CardContent,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Divider,
+  Drawer,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Grid,
+  IconButton,
+  Link,
+  Theme,
+  Toolbar,
+  Tooltip,
+  Typography,
+  Fab,
+} from "@mui/material";
 
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import ForwardIcon from '@material-ui/icons/Forward';
-import FullscreenIcon from '@material-ui/icons/Fullscreen';
-import PauseIcon from '@material-ui/icons/Pause';
-import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import SystemUpdateAltIcon from "@material-ui/icons/SystemUpdateAlt";
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ForwardIcon from '@mui/icons-material/Forward';
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import PauseIcon from '@mui/icons-material/Pause';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
 
 import {createMainMenu, createMenuTemplate} from "../../../main/MainMenu";
 import {PT, ST} from "../../data/const";
@@ -294,7 +317,7 @@ class PlayerBars extends React.Component {
       source = this.props.scene.sources.find((s) => s.url == sourceURL);
     }
 
-    return(
+    return (
       <React.Fragment>
         <div
           className={classes.hoverBar}
@@ -313,7 +336,8 @@ class PlayerBars extends React.Component {
                   edge="start"
                   color="inherit"
                   aria-label="Back"
-                  onClick={this.navigateBack.bind(this)}>
+                  onClick={this.navigateBack.bind(this)}
+                  size="large">
                   <ArrowBackIcon />
                 </IconButton>
               </Tooltip>
@@ -331,7 +355,8 @@ class PlayerBars extends React.Component {
                   edge="start"
                   color="inherit"
                   aria-label="FullScreen"
-                  onClick={this.toggleFull.bind(this)}>
+                  onClick={this.toggleFull.bind(this)}
+                  size="large">
                   <FullscreenIcon fontSize="large"/>
                 </IconButton>
               </Tooltip>
@@ -343,21 +368,24 @@ class PlayerBars extends React.Component {
                     edge="start"
                     color="inherit"
                     aria-label="Backward"
-                    onClick={this.historyBack.bind(this)}>
+                    onClick={this.historyBack.bind(this)}
+                    size="large">
                     <ForwardIcon fontSize="large" style={{transform: 'rotate(180deg)'}}/>
                   </IconButton>
                   <IconButton
                     edge="start"
                     color="inherit"
                     aria-label={this.props.isPlaying ? "Pause" : "Play"}
-                    onClick={this.setPlayPause.bind(this, !this.props.isPlaying)}>
+                    onClick={this.setPlayPause.bind(this, !this.props.isPlaying)}
+                    size="large">
                     {this.props.isPlaying ? <PauseIcon fontSize="large"/> : <PlayArrowIcon fontSize="large"/>}
                   </IconButton>
                   <IconButton
                     edge="start"
                     color="inherit"
                     aria-label="Forward"
-                    onClick={this.historyForward.bind(this)}>
+                    onClick={this.historyForward.bind(this)}
+                    size="large">
                     <ForwardIcon fontSize="large" style={canGoForward ? {} : {color: 'rgba(255, 255, 255, 0.3)', backgroundColor: 'transparent'}}/>
                   </IconButton>
                 </React.Fragment>

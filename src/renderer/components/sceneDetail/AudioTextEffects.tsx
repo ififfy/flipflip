@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import {Card, CardContent, Grid} from "@material-ui/core";
+import {Card, CardContent, Grid} from "@mui/material";
 
 import Scene from "../../data/Scene";
 import AudioCard from "../configGroups/AudioCard";

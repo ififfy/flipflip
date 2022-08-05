@@ -1,8 +1,11 @@
 import * as React from "react";
 
-import {createStyles, Fab, Grid, TextField, Theme, withStyles} from "@material-ui/core";
+import { Fab, Grid, TextField, Theme } from "@mui/material";
 
-import * as color from "@material-ui/core/colors";
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import * as color from "@mui/material/colors";
 
 const styles = (theme: Theme) => createStyles({
   colorGrid: {

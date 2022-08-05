@@ -1,11 +1,11 @@
 import {remote, webFrame} from 'electron';
 const {getCurrentWindow} = remote;
 import * as React from 'react';
-import IdleTimer from "react-idle-timer";
+import {IdleTimer} from "./IdleTimer";
 
 import {
   Button, CircularProgress, Container, Theme, Typography
-} from "@material-ui/core";
+} from "@mui/material";
 
 import {SL, WC} from "../../data/const";
 import {getRandomListItem, urlToPath} from "../../data/utils";

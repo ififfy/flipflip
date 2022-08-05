@@ -3,18 +3,21 @@ import Sound from "react-sound";
 import clsx from "clsx";
 import Timeout = NodeJS.Timeout;
 
-import {Collapse, createStyles, Grid, IconButton, Slider, Theme, Tooltip, Typography, withStyles} from "@material-ui/core";
+import { Collapse, Grid, IconButton, Slider, Theme, Tooltip, Typography } from "@mui/material";
 
-import Forward10Icon from '@material-ui/icons/Forward10';
-import Forward5Icon from '@material-ui/icons/Forward5';
-import Replay10Icon from '@material-ui/icons/Replay10';
-import Replay5Icon from '@material-ui/icons/Replay5';
-import PauseIcon from '@material-ui/icons/Pause';
-import PlayArrowIcon from '@material-ui/icons/PlayArrow';
-import SkipNextIcon from '@material-ui/icons/SkipNext';
-import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
-import VolumeDownIcon from '@material-ui/icons/VolumeDown';
-import VolumeUpIcon from '@material-ui/icons/VolumeUp';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import Forward10Icon from '@mui/icons-material/Forward10';
+import Forward5Icon from '@mui/icons-material/Forward5';
+import Replay10Icon from '@mui/icons-material/Replay10';
+import Replay5Icon from '@mui/icons-material/Replay5';
+import PauseIcon from '@mui/icons-material/Pause';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import SkipNextIcon from '@mui/icons-material/SkipNext';
+import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
+import VolumeDownIcon from '@mui/icons-material/VolumeDown';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 
 import {getMsRemainder, getTimestamp} from "../../data/utils";
 import {RP, TF} from "../../data/const";
@@ -78,7 +81,7 @@ class AudioControl extends React.Component {
         msRemainder = undefined;
       }
     }
-    return(
+    return (
       <React.Fragment key={audio.id}>
         {this.props.audioEnabled && this.props.audio.tick && this.state.playing && (
           <SoundTick
@@ -112,7 +115,7 @@ class AudioControl extends React.Component {
                   <Grid item xs={12} sm={12}>
                     <Grid container spacing={1} alignItems="center">
                       <Grid item>
-                        <Typography id="strobe-opacity-slider" variant="caption" component="div" color="textSecondary">
+                        <Typography variant="caption" component="div" color="textSecondary">
                           {getTimestampFromMs(this.state.position)}
                         </Typography>
                       </Grid>
@@ -125,7 +128,7 @@ class AudioControl extends React.Component {
                           onChange={this.onChangePosition.bind(this)}/>
                       </Grid>
                       <Grid item>
-                        <Typography id="strobe-opacity-slider" variant="caption" component="div" color="textSecondary">
+                        <Typography variant="caption" component="div" color="textSecondary">
                           {getTimestampFromMs(this.state.duration)}
                         </Typography>
                       </Grid>
@@ -134,34 +137,31 @@ class AudioControl extends React.Component {
                   <Grid item>
                     {this.props.prevTrack && (
                       <Tooltip title="Prev Track">
-                        <IconButton
-                          onClick={this.props.prevTrack.bind(this)}>
+                        <IconButton onClick={this.props.prevTrack.bind(this)} size="large">
                           <SkipPreviousIcon />
                         </IconButton>
                       </Tooltip>
                     )}
                     <Tooltip title="Jump Back">
-                      <IconButton
-                        onClick={this.onBack.bind(this)}>
+                      <IconButton onClick={this.onBack.bind(this)} size="large">
                         {this.props.shorterSeek ? <Replay5Icon /> : <Replay10Icon />}
                       </IconButton>
                     </Tooltip>
                     <Tooltip title={this.state.playing ? "Pause" : "Play"}>
                       <IconButton
-                        onClick={this.state.playing ? this.onPause.bind(this) : this.onPlay.bind(this)}>
+                        onClick={this.state.playing ? this.onPause.bind(this) : this.onPlay.bind(this)}
+                        size="large">
                         {this.state.playing ? <PauseIcon/> : <PlayArrowIcon/>}
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Jump Forward">
-                      <IconButton
-                        onClick={this.onForward.bind(this)}>
+                      <IconButton onClick={this.onForward.bind(this)} size="large">
                         {this.props.shorterSeek ? <Forward5Icon /> : <Forward10Icon />}
                       </IconButton>
                     </Tooltip>
                     {this.props.nextTrack && (
                       <Tooltip title="Next Track">
-                        <IconButton
-                          onClick={this.props.nextTrack.bind(this)}>
+                        <IconButton onClick={this.props.nextTrack.bind(this)} size="large">
                           <SkipNextIcon />
                         </IconButton>
                       </Tooltip>

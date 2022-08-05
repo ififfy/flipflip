@@ -1,9 +1,10 @@
 import * as React from "react";
 import { SketchPicker } from 'react-color';
 
-import {
-  createStyles, Fab, Grid, Menu, TextField, Theme, Tooltip, withStyles
-} from "@material-ui/core";
+import { Fab, Grid, Menu, TextField, Theme, Tooltip } from "@mui/material";
+
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
 
 const styles = (theme: Theme) => createStyles({
   colorGrid: {
@@ -78,7 +79,6 @@ class ColorPicker extends React.Component {
               vertical: 'top',
               horizontal: 'left',
             }}
-            getContentAnchorEl={null}
             anchorEl={this.state.pickerAnchorEl}
             keepMounted
             open={!!this.state.pickerColor}

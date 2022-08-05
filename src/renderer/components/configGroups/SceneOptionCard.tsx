@@ -2,15 +2,37 @@ import * as React from "react";
 import clsx from "clsx";
 
 import {
-  Button, Collapse, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, Divider, Fab, FormControl,
-  FormControlLabel, Grid, IconButton, InputAdornment, InputLabel, MenuItem, Select, Slider, Switch, TextField, Theme,
-  Tooltip, Typography, withStyles
-} from "@material-ui/core";
+  Button,
+  Collapse,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  Divider,
+  Fab,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
+  Slider,
+  Switch,
+  TextField,
+  Theme,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 
-import AddIcon from '@material-ui/icons/Add';
-import DeleteIcon from '@material-ui/icons/Delete';
-import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
-import ListIcon from '@material-ui/icons/List';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import ListIcon from '@mui/icons-material/List';
 
 import {BT, IT, SDT, TF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
@@ -147,7 +169,7 @@ class SceneOptionCard extends React.Component {
             </Grid>
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 8}>
               <Collapse in={this.props.scene.timingFunction == TF.sin} className={classes.fullWidth}>
-                <Typography id="scene-sin-rate-slider" variant="caption" component="div" color="textSecondary">
+                <Typography variant="caption" component="div" color="textSecondary">
                   Wave Rate
                 </Typography>
                 <Grid container alignItems="center">
@@ -177,7 +199,7 @@ class SceneOptionCard extends React.Component {
                 </Grid>
               </Collapse>
               <Collapse in={this.props.scene.timingFunction == TF.bpm} className={classes.fullWidth}>
-                <Typography id="scene-bpm-multi-slider" variant="caption" component="div" color="textSecondary">
+                <Typography variant="caption" component="div" color="textSecondary">
                   BPM Multiplier {this.props.scene.timingBPMMulti / 10}x
                 </Typography>
                 <Slider
@@ -288,7 +310,7 @@ class SceneOptionCard extends React.Component {
               </Grid>
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 8}>
                 <Collapse in={this.props.scene.backForthTF == TF.sin} className={classes.fullWidth}>
-                  <Typography id="bf-sin-rate-slider" variant="caption" component="div" color="textSecondary">
+                  <Typography variant="caption" component="div" color="textSecondary">
                     Wave Rate
                   </Typography>
                   <Grid container alignItems="center">
@@ -318,7 +340,7 @@ class SceneOptionCard extends React.Component {
                   </Grid>
                 </Collapse>
                 <Collapse in={this.props.scene.backForthTF == TF.bpm} className={classes.fullWidth}>
-                  <Typography id="bf-bpm-multi-slider" variant="caption" component="div" color="textSecondary">
+                  <Typography variant="caption" component="div" color="textSecondary">
                     BPM Multiplier {this.props.scene.backForthBPMMulti / 10}x
                   </Typography>
                   <Slider
@@ -424,7 +446,7 @@ class SceneOptionCard extends React.Component {
             </Grid>
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 8}>
               <Collapse in={this.props.scene.backgroundType == BT.blur} className={classes.fullWidth}>
-                <Typography id="scene-bg-color-slider" variant="caption" component="div" color="textSecondary">
+                <Typography variant="caption" component="div" color="textSecondary">
                   Blur: {this.props.scene.backgroundBlur}px
                 </Typography>
                 <Slider
@@ -489,10 +511,10 @@ class SceneOptionCard extends React.Component {
                       />
                     </DialogContent>
                     <DialogActions>
-                      <Button onClick={this.onSelectNone.bind(this)} color="default">
+                      <Button onClick={this.onSelectNone.bind(this)}>
                         Select None
                       </Button>
-                      <Button onClick={this.onSelectAll.bind(this)} color="default">
+                      <Button onClick={this.onSelectAll.bind(this)}>
                         Select All
                       </Button>
                     </DialogActions>
@@ -512,7 +534,8 @@ class SceneOptionCard extends React.Component {
                     title={this.props.scene.nextSceneRandoms.length == 0 ? "Select Scenes (EMPTY)" : "Select Scenes"}>
                     <IconButton
                       className={clsx(this.props.scene.nextSceneRandoms.length == 0 && classes.error)}
-                      onClick={this.onRandomSceneDialog.bind(this)}>
+                      onClick={this.onRandomSceneDialog.bind(this)}
+                      size="large">
                       <ListIcon/>
                     </IconButton>
                   </Tooltip>
@@ -620,7 +643,7 @@ class SceneOptionCard extends React.Component {
                         />
                       </Grid>
                       <Grid item xs={12} sm={this.props.sidebar ? 12 : 7}>
-                        <Typography id="overlay-opacity-slider" variant="caption" component="div"
+                        <Typography variant="caption" component="div"
                                     color="textSecondary">
                           Overlay Opacity: {o.opacity}%
                         </Typography>
@@ -637,8 +660,7 @@ class SceneOptionCard extends React.Component {
                           </Grid>
                           <Grid item>
                             <Tooltip title="Remove Overlay">
-                              <IconButton
-                                onClick={this.onRemoveOverlay.bind(this, o.id)}>
+                              <IconButton onClick={this.onRemoveOverlay.bind(this, o.id)} size="large">
                                 <DeleteIcon color="error"/>
                               </IconButton>
                             </Tooltip>
@@ -654,7 +676,7 @@ class SceneOptionCard extends React.Component {
                   </Collapse>
                 </Grid>
               </React.Fragment>
-            )
+            );
           }
         )}
       </Grid>

@@ -2,8 +2,10 @@ import * as React from "react";
 import clsx from "clsx";
 import CreatableSelect from "react-select/creatable";
 
-import {createStyles, Theme, withStyles} from "@material-ui/core";
-import {grey} from "@material-ui/core/colors";
+import { Theme } from "@mui/material";
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import {grey} from "@mui/material/colors";
 
 import Scene from "./data/Scene";
 

@@ -4,39 +4,53 @@ import {existsSync} from "fs";
 import {remote} from "electron";
 
 import {
-  Checkbox, Chip, createStyles, Fab, IconButton, ListItem, ListItemAvatar, ListItemSecondaryAction, ListItemText, Radio,
-  TextField, Theme, Tooltip, Typography, withStyles
-} from "@material-ui/core";
+  Checkbox,
+  Chip,
+  Fab,
+  IconButton,
+  ListItem,
+  ListItemAvatar,
+  ListItemSecondaryAction,
+  ListItemText,
+  Radio,
+  TextField,
+  Theme,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 
-import BuildIcon from '@material-ui/icons/Build';
-import DeleteIcon from '@material-ui/icons/Delete';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import BuildIcon from '@mui/icons-material/Build';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import {urlToPath} from "../../data/utils";
 import Tag from "../../data/Tag";
 import SourceIcon from "./SourceIcon";
 import CaptionScript from "../../data/CaptionScript";
-import {grey} from "@material-ui/core/colors";
+import {grey} from "@mui/material/colors";
 import {SP} from "../../data/const";
-import EditIcon from "@material-ui/icons/Edit";
+import EditIcon from "@mui/icons-material/Edit";
 
 const styles = (theme: Theme) => createStyles({
   root: {
     display: 'flex',
   },
   oddChild: {
-    backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["100"] : grey[900],
+    backgroundColor: theme.palette.mode == 'light' ? (theme.palette.primary as any)["100"] : grey[900],
     '&:hover': {
-      backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["200"] : '#080808',
+      backgroundColor: theme.palette.mode == 'light' ? (theme.palette.primary as any)["200"] : '#080808',
     },
   },
   evenChild: {
-    backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["50"] : theme.palette.background.default,
+    backgroundColor: theme.palette.mode == 'light' ? (theme.palette.primary as any)["50"] : theme.palette.background.default,
     '&:hover': {
-      backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["200"] : '#080808',
+      backgroundColor: theme.palette.mode == 'light' ? (theme.palette.primary as any)["200"] : '#080808',
     },
   },
   lastSelected: {
-    backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["200"] : '#0F0F0F',
+    backgroundColor: theme.palette.mode == 'light' ? (theme.palette.primary as any)["200"] : '#0F0F0F',
   },
   avatar: {
     backgroundColor: theme.palette.primary.main,
@@ -61,7 +75,7 @@ const styles = (theme: Theme) => createStyles({
     marginLeft: theme.spacing(1),
   },
   fullTag: {
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       display: 'none',
     },
   },
@@ -69,7 +83,7 @@ const styles = (theme: Theme) => createStyles({
     [theme.breakpoints.up('md')]: {
       display: 'none',
     },
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       display: 'none',
     },
   },

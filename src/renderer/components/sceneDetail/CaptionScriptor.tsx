@@ -10,20 +10,42 @@ require('codemirror/lib/codemirror.css');
 require('codemirror/theme/material.css');
 
 import {
-  AppBar, Button, Card, CardContent, Container, createStyles, Dialog, DialogActions, DialogContent, DialogContentText,
-  DialogTitle, Divider, Grid, IconButton, Link, Menu, MenuItem, Select, Slider, Theme, Toolbar, Tooltip, Typography,
-  withStyles
-} from "@material-ui/core";
+  AppBar,
+  Button,
+  Card,
+  CardContent,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Divider,
+  Grid,
+  IconButton,
+  Link,
+  Menu,
+  MenuItem,
+  Select,
+  Slider,
+  Theme,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
-import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
-import FolderIcon from '@material-ui/icons/Folder';
-import FullscreenIcon from '@material-ui/icons/Fullscreen';
-import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
-import GetAppIcon from '@material-ui/icons/GetApp';
-import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
-import SaveIcon from '@material-ui/icons/Save';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import FolderIcon from '@mui/icons-material/Folder';
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
+import GetAppIcon from '@mui/icons-material/GetApp';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import SaveIcon from '@mui/icons-material/Save';
 
 import {CST, MO, RP} from "../../data/const";
 import captionProgramDefaults, {CancelablePromise} from "../../data/utils";
@@ -172,7 +194,7 @@ const styles = (theme: Theme) => createStyles({
   openFileName: {
     marginLeft: 'auto',
     marginTop: theme.spacing(1.5),
-    color: theme.palette.text.hint,
+    color: theme.palette.text.secondary,
   },
   menuDivider: {
     marginLeft: 'auto',
@@ -278,7 +300,7 @@ class CaptionScriptor extends React.Component {
       getTimestamp = this.getTimestamp.bind(this);
     }
 
-    return(
+    return (
       <div className={classes.root}>
         <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
           <Toolbar className={classes.headerBar}>
@@ -289,7 +311,8 @@ class CaptionScriptor extends React.Component {
                   color="inherit"
                   aria-label="Back"
                   className={classes.backButton}
-                  onClick={this.goBack.bind(this)}>
+                  onClick={this.goBack.bind(this)}
+                  size="large">
                   <ArrowBackIcon />
                 </IconButton>
               </Tooltip>
@@ -307,7 +330,8 @@ class CaptionScriptor extends React.Component {
                   edge="start"
                   color="inherit"
                   aria-label={this.state.fullscreen ? "Exit Fullscreen" : "Fullscreen"}
-                  onClick={this.onFullscreen.bind(this)}>
+                  onClick={this.onFullscreen.bind(this)}
+                  size="large">
                   {this.state.fullscreen ? <FullscreenExitIcon fontSize="large"/> : <FullscreenIcon fontSize="large"/>}
                 </IconButton>
               </span>
@@ -358,12 +382,12 @@ class CaptionScriptor extends React.Component {
                         this.props.tutorial == CST.menu && classes.backdropTopHighlight,
                         this.props.tutorial == CST.menu && classes.disable)}>
                         <Tooltip title="New">
-                          <IconButton onClick={this.onNew.bind(this)}>
+                          <IconButton onClick={this.onNew.bind(this)} size="large">
                             <InsertDriveFileIcon/>
                           </IconButton>
                         </Tooltip>
                         <Tooltip title="Open">
-                          <IconButton onClick={this.onOpenMenu.bind(this)}>
+                          <IconButton onClick={this.onOpenMenu.bind(this)} size="large">
                             <FolderIcon/>
                           </IconButton>
                         </Tooltip>
@@ -378,7 +402,6 @@ class CaptionScriptor extends React.Component {
                             vertical: 'top',
                             horizontal: 'center',
                           }}
-                          getContentAnchorEl={null}
                           anchorEl={this.state.menuAnchorEl}
                           keepMounted
                           open={this.state.openMenu == MO.open}
@@ -387,7 +410,7 @@ class CaptionScriptor extends React.Component {
                           <MenuItem onClick={this.onOpenFromLibrary.bind(this)}>Open From Library</MenuItem>
                         </Menu>
                         <Tooltip title="Save">
-                          <IconButton onClick={this.onSaveMenu.bind(this)}>
+                          <IconButton onClick={this.onSaveMenu.bind(this)} size="large">
                             <SaveIcon/>
                           </IconButton>
                         </Tooltip>
@@ -402,7 +425,6 @@ class CaptionScriptor extends React.Component {
                             vertical: 'top',
                             horizontal: 'center',
                           }}
-                          getContentAnchorEl={null}
                           anchorEl={this.state.menuAnchorEl}
                           keepMounted
                           open={this.state.openMenu == MO.save}
@@ -414,7 +436,10 @@ class CaptionScriptor extends React.Component {
                         <Divider orientation="vertical" flexItem className={classes.menuDivider} />
                         <Tooltip title="Load From Scene">
                           <span style={this.state.sceneScripts == null || !this.state.sceneScripts.length ? { pointerEvents: "none" } : {}}>
-                            <IconButton disabled={this.state.sceneScripts == null || !this.state.sceneScripts.length} onClick={this.onLoadFromScene.bind(this)}>
+                            <IconButton
+                              disabled={this.state.sceneScripts == null || !this.state.sceneScripts.length}
+                              onClick={this.onLoadFromScene.bind(this)}
+                              size="large">
                               {this.state.loadFromSceneError ? <ErrorOutlineIcon color={"error"}/> : <GetAppIcon/>}
                             </IconButton>
                           </span>
@@ -567,7 +592,7 @@ class CaptionScriptor extends React.Component {
                         onPlaying={this.onPlaying.bind(this)}
                         onUpdateScene={this.onUpdateScene.bind(this)}/>
                     )}
-                    <Typography id="opacity-slider" variant="caption" component="div" color="textSecondary">
+                    <Typography variant="caption" component="div" color="textSecondary">
                       Script Opacity: {this.state.captionScript.opacity}%
                     </Typography>
                     <Slider
@@ -576,7 +601,7 @@ class CaptionScriptor extends React.Component {
                         defaultValue={this.state.captionScript.opacity}
                         onChangeCommitted={this.onSliderChange.bind(this, 'opacity')}
                         valueLabelDisplay={'auto'}
-                        valueLabelFormat={(v) => v + "%"}
+                        valueLabelFormat={(v: any) => v + "%"}
                         aria-labelledby="opacity-slider"/>
                   </CardContent>
                 </Card>

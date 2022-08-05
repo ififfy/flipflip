@@ -3,12 +3,13 @@ import clsx from "clsx";
 import {remote} from "electron";
 const {getCurrentWindow, Menu, app} = remote;
 
-import {
-  AppBar, Container, createStyles, IconButton, Theme, Toolbar, Tooltip, Typography, withStyles
-} from "@material-ui/core";
+import { AppBar, Container, IconButton, Theme, Toolbar, Tooltip, Typography } from "@mui/material";
 
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import FullscreenIcon from '@material-ui/icons/Fullscreen';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
 
 import {createMainMenu, createMenuTemplate} from "../../../main/MainMenu";
 import SceneGrid from "../../data/SceneGrid";
@@ -17,7 +18,7 @@ import Scene from "../../data/Scene";
 import Tag from "../../data/Tag";
 import Player from "./Player";
 import ChildCallbackHack from "./ChildCallbackHack";
-import IdleTimer from "react-idle-timer";
+import {IdleTimer} from "./IdleTimer";
 import {flatten} from "../../data/utils";
 
 const styles = (theme: Theme) => createStyles({
@@ -142,7 +143,7 @@ class GridPlayer extends React.Component {
       gridTemplateRows += rowSize.toString() + "% ";
     }
 
-    return(
+    return (
       <div className={classes.root}>
         {!this.props.hideBars && (
           <React.Fragment>
@@ -162,7 +163,8 @@ class GridPlayer extends React.Component {
                     edge="start"
                     color="inherit"
                     aria-label="Back"
-                    onClick={this.props.goBack.bind(this)}>
+                    onClick={this.props.goBack.bind(this)}
+                    size="large">
                     <ArrowBackIcon />
                   </IconButton>
                 </Tooltip>
@@ -178,7 +180,8 @@ class GridPlayer extends React.Component {
                     edge="start"
                     color="inherit"
                     aria-label="FullScreen"
-                    onClick={this.toggleFull.bind(this)}>
+                    onClick={this.toggleFull.bind(this)}
+                    size="large">
                     <FullscreenIcon fontSize="large"/>
                   </IconButton>
                 </Tooltip>

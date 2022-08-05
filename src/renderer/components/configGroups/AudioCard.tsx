@@ -1,10 +1,11 @@
 import * as React from "react";
 
-import {
-  Collapse, createStyles, Divider, Fab, FormControlLabel, Grid, Switch, Theme, Tooltip, withStyles
-} from "@material-ui/core";
+import { Collapse, Divider, Fab, FormControlLabel, Grid, Switch, Theme, Tooltip } from "@mui/material";
 
-import AddIcon from '@material-ui/icons/Add';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import AddIcon from '@mui/icons-material/Add';
 
 import {RP} from "../../data/const";
 import Scene from "../../data/Scene";

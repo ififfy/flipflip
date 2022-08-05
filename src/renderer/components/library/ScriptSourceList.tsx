@@ -5,8 +5,19 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import {FixedSizeList} from "react-window";
 
 import {
-  Button, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, List, Theme, Typography, withStyles
-} from "@material-ui/core";
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  List,
+  Theme,
+  Typography,
+} from "@mui/material";
+
+
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
 
 
 import {arrayMove} from "../../data/utils";

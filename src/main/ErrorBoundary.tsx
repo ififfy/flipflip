@@ -3,14 +3,14 @@ import {remote} from "electron";
 import rimraf from "rimraf";
 import path from "path";
 
-import ArrowBackIcon from "@material-ui/icons/ArrowBack";
-import HighlightOffIcon from '@material-ui/icons/HighlightOff';
-import RestoreIcon from "@material-ui/icons/Restore";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import RestoreIcon from "@mui/icons-material/Restore";
 
 import {
   Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, FormControl, InputLabel,
   Link, MenuItem, Select, Typography
-} from "@material-ui/core";
+} from "@mui/material";
 
 import {convertFromEpoch, getBackups, saveDir, savePath} from "../renderer/data/utils";
 
@@ -39,7 +39,7 @@ export default class ErrorBoundary extends React.Component {
 
   render() {
     if (this.state.hasError) {
-      return(
+      return (
         <Box style={{overflow: "auto", padding: 8, position: "absolute", top: 0, left: 0, bottom: 0, right: 0}} className="Error">
           <Typography component={"h2"} variant={"h2"}>Mistakes were made ಥ﹏ಥ</Typography>
           <Divider/>

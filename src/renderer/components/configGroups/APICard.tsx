@@ -8,13 +8,39 @@ import wretch from "wretch";
 import {IgApiClient, IgCheckpointError, IgLoginTwoFactorRequiredError} from "instagram-private-api";
 
 import {
-  Avatar, Button, Collapse, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Fab,
-  FormControl, FormControlLabel, Grid, InputLabel, Link, MenuItem, Radio, RadioGroup, Select, Slide, Snackbar,
-  SnackbarContent, Switch, TextField, Theme, Tooltip, Typography, withStyles
-} from "@material-ui/core";
+  Avatar,
+  Button,
+  Collapse,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Fab,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  InputLabel,
+  Link,
+  MenuItem,
+  Radio,
+  RadioGroup,
+  Select,
+  Slide,
+  Snackbar,
+  SnackbarContent,
+  Switch,
+  TextField,
+  Theme,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 
-import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import ErrorIcon from '@material-ui/icons/Error';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
 
 import Config, {RemoteSettings} from "../../data/Config";
 import {IG, MO, ST} from "../../data/const";
@@ -560,7 +586,7 @@ class APICard extends React.Component {
           open={!!this.state.successSnack}
           autoHideDuration={20000}
           onClose={this.onCloseSnack.bind(this)}
-          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
+          /*TODO TransitionComponent={(props) => <Slide {...props} direction="up"/>}*/>
           <SnackbarContent
             message={
               <span className={classes.snackbarMessage}>
@@ -575,7 +601,7 @@ class APICard extends React.Component {
           open={!!this.state.errorSnack}
           autoHideDuration={20000}
           onClose={this.onCloseErrorSnack.bind(this)}
-          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
+          /*TOOD TransitionComponent={(props) => <Slide {...props} direction="up"/>}*/>
           <SnackbarContent
             message={
               <span className={classes.snackbarMessage}>

@@ -1,8 +1,10 @@
 import Select, {components} from "react-select";
 import * as React from "react";
 
-import {Checkbox, createStyles,Theme, withStyles} from "@material-ui/core";
-import {grey} from "@material-ui/core/colors";
+import { Checkbox, Theme } from "@mui/material";
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import {grey} from "@mui/material/colors";
 
 import Scene from "../../data/Scene";
 

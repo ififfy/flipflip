@@ -1,9 +1,21 @@
 import * as React from "react";
 
 import {
-  Collapse, createStyles, FormControl, FormControlLabel, Grid, InputAdornment,
-  InputLabel, MenuItem, Select, Switch, TextField, Theme, withStyles
-} from "@material-ui/core";
+  Collapse,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
+  Switch,
+  TextField,
+  Theme,
+} from "@mui/material";
+
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
 
 import {FontSettingsI} from "../../data/CaptionScript";
 import ColorPicker from "../config/ColorPicker";

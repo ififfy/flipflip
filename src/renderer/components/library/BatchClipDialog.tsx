@@ -1,9 +1,21 @@
 import * as React from "react";
 
 import {
-  Button, CircularProgress, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
-  Grid, InputAdornment, TextField, Theme, withStyles
-} from "@material-ui/core";
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Grid,
+  InputAdornment,
+  TextField,
+  Theme,
+} from "@mui/material";
+
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
 
 import {getSourceType} from "../player/Scrapers";
 import {ST} from "../../data/const";

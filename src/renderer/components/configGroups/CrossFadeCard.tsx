@@ -2,11 +2,27 @@ import * as React from "react";
 import clsx from "clsx";
 
 import {
-  Collapse, createStyles, Divider, FormControl, FormControlLabel, Grid, InputAdornment, InputLabel,
-  MenuItem, Select, Slider, Switch, TextField, Theme, Tooltip, Typography, withStyles
-} from "@material-ui/core";
+  Collapse,
+  Divider,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
+  Slider,
+  Switch,
+  TextField,
+  Theme,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 
-import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
 import {EA, SDT, TF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
@@ -121,7 +137,7 @@ class CrossFadeCard extends React.Component {
               </Grid>
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 8}>
                 <Collapse in={this.props.scene.fadeTF == TF.sin} className={classes.fullWidth}>
-                  <Typography id="fade-sin-rate-slider" variant="caption" component="div" color="textSecondary">
+                  <Typography variant="caption" component="div" color="textSecondary">
                     Wave Rate
                   </Typography>
                   <Grid container alignItems="center">
@@ -151,7 +167,7 @@ class CrossFadeCard extends React.Component {
                   </Grid>
                 </Collapse>
                 <Collapse in={this.props.scene.fadeTF == TF.bpm} className={classes.fullWidth}>
-                  <Typography id="fade-bpm-multi-slider" variant="caption" component="div" color="textSecondary">
+                  <Typography variant="caption" component="div" color="textSecondary">
                     BPM Multiplier {this.props.scene.fadeBPMMulti / 10}x
                   </Typography>
                   <Slider
@@ -248,7 +264,7 @@ class CrossFadeCard extends React.Component {
                   </Grid>
                   <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                     <Collapse in={this.props.scene.fadeEase == EA.polyIn || this.props.scene.fadeEase == EA.polyOut || this.props.scene.fadeEase == EA.polyInOut} className={classes.fullWidth}>
-                      <Typography id="exp-slider" variant="caption" component="div" color="textSecondary">
+                      <Typography variant="caption" component="div" color="textSecondary">
                         Exponent: {this.props.scene.fadeExp / 2}
                       </Typography>
                       <Slider
@@ -261,7 +277,7 @@ class CrossFadeCard extends React.Component {
                         aria-labelledby="exp-slider"/>
                     </Collapse>
                     <Collapse in={this.props.scene.fadeEase == EA.backIn || this.props.scene.fadeEase == EA.backOut || this.props.scene.fadeEase == EA.backInOut} className={classes.fullWidth}>
-                      <Typography id="ov-slider" variant="caption" component="div" color="textSecondary">
+                      <Typography variant="caption" component="div" color="textSecondary">
                         Overshoot: {this.props.scene.fadeOv / 2}
                       </Typography>
                       <Slider
@@ -276,7 +292,7 @@ class CrossFadeCard extends React.Component {
                   </Grid>
                   <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                     <Collapse in={this.props.scene.fadeEase == EA.elasticIn || this.props.scene.fadeEase == EA.elasticOut || this.props.scene.fadeEase == EA.elasticInOut} className={classes.fullWidth}>
-                      <Typography id="amp-slider" variant="caption" component="div" color="textSecondary">
+                      <Typography variant="caption" component="div" color="textSecondary">
                         Amplitude: {this.props.scene.fadeAmp / 20}
                       </Typography>
                       <Slider
@@ -291,7 +307,7 @@ class CrossFadeCard extends React.Component {
                   </Grid>
                   <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                     <Collapse in={this.props.scene.fadeEase == EA.elasticIn || this.props.scene.fadeEase == EA.elasticOut || this.props.scene.fadeEase == EA.elasticInOut} className={classes.fullWidth}>
-                      <Typography id="per-slider" variant="caption" component="div" color="textSecondary">
+                      <Typography variant="caption" component="div" color="textSecondary">
                         Period: {this.props.scene.fadePer / 20}
                       </Typography>
                       <Slider

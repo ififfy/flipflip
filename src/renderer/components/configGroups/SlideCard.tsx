@@ -2,11 +2,27 @@ import * as React from "react";
 import clsx from "clsx";
 
 import {
-  Collapse, createStyles, Divider, FormControl, FormControlLabel, Grid, InputAdornment, InputLabel,
-  MenuItem, Select, Slider, Switch, TextField, Theme, Tooltip, Typography, withStyles
-} from "@material-ui/core";
+  Collapse,
+  Divider,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
+  Slider,
+  Switch,
+  TextField,
+  Theme,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 
-import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
 import {EA, STF, TF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
@@ -98,7 +114,7 @@ class SlideCard extends React.Component {
                 </FormControl>
               </Grid>
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 8}>
-                <Typography id="slide-distance-slider" variant="caption" component="div" color="textSecondary">
+                <Typography variant="caption" component="div" color="textSecondary">
                   Distance: {slideDistance}%
                 </Typography>
                 <Slider
@@ -129,7 +145,7 @@ class SlideCard extends React.Component {
               </Grid>
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 8}>
                 <Collapse in={this.props.scene.slideTF == TF.sin} className={classes.fullWidth}>
-                  <Typography id="slide-sin-rate-slider" variant="caption" component="div" color="textSecondary">
+                  <Typography variant="caption" component="div" color="textSecondary">
                     Wave Rate
                   </Typography>
                   <Grid container alignItems="center">
@@ -159,7 +175,7 @@ class SlideCard extends React.Component {
                   </Grid>
                 </Collapse>
                 <Collapse in={this.props.scene.slideTF == TF.bpm} className={classes.fullWidth}>
-                  <Typography id="slide-bpm-multi-slider" variant="caption" component="div" color="textSecondary">
+                  <Typography variant="caption" component="div" color="textSecondary">
                     BPM Multiplier {this.props.scene.slideBPMMulti / 10}x
                   </Typography>
                   <Slider
@@ -256,7 +272,7 @@ class SlideCard extends React.Component {
                   </Grid>
                   <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                     <Collapse in={this.props.scene.slideEase == EA.polyIn || this.props.scene.slideEase == EA.polyOut || this.props.scene.slideEase == EA.polyInOut} className={classes.fullWidth}>
-                      <Typography id="exp-slider" variant="caption" component="div" color="textSecondary">
+                      <Typography variant="caption" component="div" color="textSecondary">
                         Exponent: {this.props.scene.slideExp / 2}
                       </Typography>
                       <Slider
@@ -269,7 +285,7 @@ class SlideCard extends React.Component {
                         aria-labelledby="exp-slider"/>
                     </Collapse>
                     <Collapse in={this.props.scene.slideEase == EA.backIn || this.props.scene.slideEase == EA.backOut || this.props.scene.slideEase == EA.backInOut} className={classes.fullWidth}>
-                      <Typography id="ov-slider" variant="caption" component="div" color="textSecondary">
+                      <Typography variant="caption" component="div" color="textSecondary">
                         Overshoot: {this.props.scene.slideOv / 2}
                       </Typography>
                       <Slider
@@ -284,7 +300,7 @@ class SlideCard extends React.Component {
                   </Grid>
                   <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                     <Collapse in={this.props.scene.slideEase == EA.elasticIn || this.props.scene.slideEase == EA.elasticOut || this.props.scene.slideEase == EA.elasticInOut} className={classes.fullWidth}>
-                      <Typography id="amp-slider" variant="caption" component="div" color="textSecondary">
+                      <Typography variant="caption" component="div" color="textSecondary">
                         Amplitude: {this.props.scene.slideAmp / 20}
                       </Typography>
                       <Slider
@@ -299,7 +315,7 @@ class SlideCard extends React.Component {
                   </Grid>
                   <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
                     <Collapse in={this.props.scene.slideEase == EA.elasticIn || this.props.scene.slideEase == EA.elasticOut || this.props.scene.slideEase == EA.elasticInOut} className={classes.fullWidth}>
-                      <Typography id="per-slider" variant="caption" component="div" color="textSecondary">
+                      <Typography variant="caption" component="div" color="textSecondary">
                         Period: {this.props.scene.slidePer / 20}
                       </Typography>
                       <Slider

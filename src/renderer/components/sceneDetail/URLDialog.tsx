@@ -2,9 +2,23 @@ import * as React from "react";
 import {remote} from "electron";
 
 import {
-  Button, Collapse, createStyles, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl,
-  InputLabel, MenuItem, Select, TextField, Theme, withStyles
-} from "@material-ui/core";
+  Button,
+  Collapse,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Theme,
+} from "@mui/material";
+
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
 
 import {GT} from "../../data/const";
 

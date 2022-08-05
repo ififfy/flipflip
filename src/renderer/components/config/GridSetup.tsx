@@ -3,16 +3,18 @@ import clsx from "clsx";
 import Draggable, {DraggableData} from "react-draggable";
 
 import {
-  AppBar, Button, Container, createStyles, Fab, FormControlLabel, IconButton, Menu, Switch, TextField, Theme, Toolbar,
-  Tooltip, Typography, withStyles
-} from "@material-ui/core";
+  AppBar, Button, Container, Fab, FormControlLabel, IconButton, Menu, Switch, TextField, Theme, Toolbar, Tooltip,
+  Typography,
+} from "@mui/material";
 
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import DeleteIcon from '@material-ui/icons/Delete';
-import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import DeleteIcon from '@mui/icons-material/Delete';
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 
 import {SGT} from "../../data/const";
-import {areWeightsValid} from "../../data/utils";
 import Scene from "../../data/Scene";
 import SceneSelect from "../configGroups/SceneSelect";
 import SceneGrid from "../../data/SceneGrid";
@@ -202,7 +204,7 @@ class GridSetup extends React.Component {
       }
     }
 
-    return(
+    return (
       <div className={classes.root}>
 
         <AppBar position="absolute" className={clsx(classes.appBar, this.props.tutorial == SGT.dimensions && classes.backdropTop)}>
@@ -214,7 +216,8 @@ class GridSetup extends React.Component {
                   color="inherit"
                   aria-label="Back"
                   className={clsx(this.props.tutorial == SGT.dimensions && classes.disable)}
-                  onClick={this.goBack.bind(this)}>
+                  onClick={this.goBack.bind(this)}
+                  size="large">
                   <ArrowBackIcon />
                 </IconButton>
               </Tooltip>
@@ -236,8 +239,9 @@ class GridSetup extends React.Component {
               </form>
             )}
             {this.state.isEditingName == null && (
-              <Typography component="h1" variant="h4" color="inherit" noWrap
-                          className={clsx(classes.title, this.props.scene.name.length == 0 && classes.noTitle, this.props.tutorial == SGT.dimensions && classes.disable)} onClick={this.beginEditingName.bind(this)}>
+              <Typography component="h1" variant="h4" noWrap
+                          className={clsx(classes.title, this.props.scene.name.length == 0 && classes.noTitle, this.props.tutorial == SGT.dimensions && classes.disable)}
+                          /*TODO onClick={this.beginEditingName.bind(this)}*/>
                 {this.props.scene.name}
               </Typography>
             )}
@@ -278,7 +282,8 @@ class GridSetup extends React.Component {
                 color="inherit"
                 aria-label="Play"
                 className={clsx(this.props.tutorial == SGT.dimensions && classes.disable)}
-                onClick={this.onPlayGrid.bind(this)}>
+                onClick={this.onPlayGrid.bind(this)}
+                size="large">
                 <PlayCircleOutlineIcon fontSize="large"/>
               </IconButton>
             </div>
@@ -310,8 +315,9 @@ class GridSetup extends React.Component {
                         <Button
                           id={rowIndex + "-" + colIndex}
                           className={classes.gridCell}
+                          // TODO Used to be "label", verify "text" is working as expected
                           classes={{
-                            label: classes.gridCellLabel
+                            text: classes.gridCellLabel
                           }}
                           style={(colors[rowIndex] == undefined || colors[rowIndex][colIndex] == undefined || colors[rowIndex][colIndex] == "") ? {} : {borderStyle: 'solid', borderWidth: 10, borderColor: colors[rowIndex][colIndex]}}
                           variant="outlined">
@@ -341,7 +347,6 @@ class GridSetup extends React.Component {
                 vertical: 'bottom',
                 horizontal: 'center',
               }}
-              getContentAnchorEl={null}
               anchorEl={this.state.menuAnchorEl}
               keepMounted
               classes={{paper: classes.sceneMenu}}

@@ -184,7 +184,7 @@ export function changeThemeColor(state: State, colorTheme: any, primary: boolean
   const newTheme = JSON.parse(JSON.stringify(state.theme));
   if (primary) {
     newTheme.palette.primary = colorTheme;
-    const type = newTheme.palette.type;
+    const type = newTheme.palette.mode;
     if (type === "dark") {
       (newTheme.palette as any).background = {};
     } else if (type === "light") {
@@ -327,12 +327,12 @@ export function doneTutorial(state: State, tutorial: string): Object {
 
 export function toggleDarkMode(state: State): Object {
   const newTheme = state.theme;
-  const type = newTheme.palette.type;
+  const type = newTheme.palette.mode;
   if (type === "dark") {
-    newTheme.palette.type = "light";
+    newTheme.palette.mode = "light";
     (newTheme.palette as any).background = {default: newTheme.palette.primary[50]};
   } else if (type === "light") {
-    newTheme.palette.type = "dark";
+    newTheme.palette.mode = "dark";
     (newTheme.palette as any).background = {};
   }
   return {theme: newTheme};
@@ -2487,7 +2487,7 @@ function audioSortFunction(algorithm: string, ascending: boolean): (a: Audio, b:
         return 0;
       }
     }
-  }
+  };
 }
 
 export function sortScripts(state: State, algorithm: string, ascending: boolean): Object {

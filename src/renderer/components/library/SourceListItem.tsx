@@ -5,13 +5,28 @@ import * as path from "path";
 import {remote} from "electron";
 
 import {
-  Badge, Checkbox, Chip, createStyles, Fab, IconButton, ListItem, ListItemAvatar, ListItemSecondaryAction, ListItemText,
-  SvgIcon, TextField, Theme, Tooltip, Typography, withStyles
-} from "@material-ui/core";
+  Badge,
+  Checkbox,
+  Chip,
+  Fab,
+  IconButton,
+  ListItem,
+  ListItemAvatar,
+  ListItemSecondaryAction,
+  ListItemText,
+  SvgIcon,
+  TextField,
+  Theme,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 
-import BuildIcon from '@material-ui/icons/Build';
-import DeleteIcon from '@material-ui/icons/Delete';
-import OfflineBoltIcon from '@material-ui/icons/OfflineBolt';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+import BuildIcon from '@mui/icons-material/Build';
+import DeleteIcon from '@mui/icons-material/Delete';
+import OfflineBoltIcon from '@mui/icons-material/OfflineBolt';
 
 import {getCachePath, getTimestamp, urlToPath} from "../../data/utils";
 import {getFileName, getSourceType} from "../player/Scrapers";
@@ -20,22 +35,22 @@ import Tag from "../../data/Tag";
 import SourceIcon from "./SourceIcon";
 import LibrarySource from "../../data/LibrarySource";
 import Config from "../../data/Config";
-import {grey} from "@material-ui/core/colors";
+import {grey} from "@mui/material/colors";
 
 const styles = (theme: Theme) => createStyles({
   root: {
     display: 'flex',
   },
   oddChild: {
-    backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["100"] : grey[900],
+    backgroundColor: theme.palette.mode == 'light' ? (theme.palette.primary as any)["100"] : grey[900],
     '&:hover': {
-      backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["200"] : '#080808',
+      backgroundColor: theme.palette.mode == 'light' ? (theme.palette.primary as any)["200"] : '#080808',
     },
   },
   evenChild: {
-    backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["50"] : theme.palette.background.default,
+    backgroundColor: theme.palette.mode == 'light' ? (theme.palette.primary as any)["50"] : theme.palette.background.default,
     '&:hover': {
-      backgroundColor: theme.palette.type == 'light' ? (theme.palette.primary as any)["200"] : '#080808',
+      backgroundColor: theme.palette.mode == 'light' ? (theme.palette.primary as any)["200"] : '#080808',
     },
   },
   avatar: {
@@ -68,12 +83,12 @@ const styles = (theme: Theme) => createStyles({
   countChip: {
     userSelect: 'none',
     marginRight: theme.spacing(1),
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       display: 'none',
     },
   },
   fullTag: {
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('md')]: {
       display: 'none',
     },
   },
@@ -81,7 +96,7 @@ const styles = (theme: Theme) => createStyles({
     [theme.breakpoints.up('md')]: {
       display: 'none',
     },
-    [theme.breakpoints.down('xs')]: {
+    [theme.breakpoints.down('sm')]: {
       display: 'none',
     },
   },
@@ -140,7 +155,7 @@ class SourceListItem extends React.Component {
   render() {
     const classes = this.props.classes;
     const sourceType = getSourceType(this.props.source.url);
-    return(
+    return (
       <div style={this.props.style}
            className={clsx(this.props.index % 2 == 0 ? classes.evenChild : classes.oddChild,
              this.props.tutorial == SDT.source && classes.highlight,

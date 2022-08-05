@@ -1,22 +1,41 @@
 import * as React from "react";
 import clsx from "clsx";
-import {green, red} from "@material-ui/core/colors";
+import {green, red} from "@mui/material/colors";
 
 import {
-  AppBar, Button, Card, CardActionArea, CardContent, CircularProgress, Collapse, Container, createStyles, Drawer,
-  Fab, Grid, IconButton, Slider, SvgIcon, TextField, Theme, Toolbar, Tooltip, Typography, withStyles
-} from "@material-ui/core";
-import ValueLabel from "@material-ui/core/Slider/ValueLabel";
+  AppBar,
+  Button,
+  Card,
+  CardActionArea,
+  CardContent,
+  CircularProgress,
+  Collapse,
+  Container,
+  Drawer,
+  Fab,
+  Grid,
+  IconButton,
+  Slider,
+  SvgIcon,
+  TextField,
+  Theme,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+//TODO import ValueLabel from "@mui/material/Slider/ValueLabel";
 
-import AddIcon from '@material-ui/icons/Add';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-import CheckIcon from '@material-ui/icons/Check';
-import CloseIcon from '@material-ui/icons/Close';
-import DeleteIcon from '@material-ui/icons/Delete';
-import KeyboardReturnIcon from '@material-ui/icons/KeyboardReturn';
-import LocalOfferIcon from '@material-ui/icons/LocalOffer';
-import SaveIcon from '@material-ui/icons/Save';
-import SystemUpdateAltIcon from '@material-ui/icons/SystemUpdateAlt';
+import AddIcon from '@mui/icons-material/Add';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
+import DeleteIcon from '@mui/icons-material/Delete';
+import KeyboardReturnIcon from '@mui/icons-material/KeyboardReturn';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import SaveIcon from '@mui/icons-material/Save';
+import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
 
 import {getTimestamp, getTimestampValue} from "../../data/utils";
 import {BT, VCT} from "../../data/const";
@@ -159,7 +178,7 @@ const styles = (theme: Theme) => createStyles({
   },
 });
 
-const StyledValueLabel = withStyles((theme: Theme) => createStyles({
+/*const StyledValueLabel = withStyles((theme: Theme) => createStyles({
   offset: {
     top: -5,
     left: 'calc(-50% + 8px)',
@@ -173,7 +192,7 @@ const StyledValueLabel = withStyles((theme: Theme) => createStyles({
   label: {
     color: theme.palette.text.primary,
   }
-}))(ValueLabel as any);
+}))(ValueLabel as any);*/
 
 class VideoClipper extends React.Component {
   readonly props: {
@@ -210,7 +229,7 @@ class VideoClipper extends React.Component {
       tagNames = this.state.isEditing.tags.map((t) => t.name);
     }
 
-    return(
+    return (
       <div className={clsx(classes.root, "VideoClipper")}>
         <AppBar
           className={classes.appBar}>
@@ -221,7 +240,8 @@ class VideoClipper extends React.Component {
                   edge="start"
                   color="inherit"
                   aria-label="Back"
-                  onClick={this.props.goBack.bind(this)}>
+                  onClick={this.props.goBack.bind(this)}
+                  size="large">
                   <ArrowBackIcon />
                 </IconButton>
               </Tooltip>
@@ -308,8 +328,7 @@ class VideoClipper extends React.Component {
                       </Fab>
                     </Tooltip>
                     <Tooltip title="End Tagging" placement="top">
-                      <IconButton
-                        onClick={this.onTag.bind(this)}>
+                      <IconButton onClick={this.onTag.bind(this)} size="large">
                         <KeyboardReturnIcon/>
                       </IconButton>
                     </Tooltip>
@@ -384,7 +403,7 @@ class VideoClipper extends React.Component {
                             min={0}
                             max={this.state.video.duration}
                             value={this.state.isEditingValue}
-                            ValueLabelComponent={(props) => <StyledValueLabel {...props}/>}
+                            /*TODO ValueLabelComponent={(props) => <StyledValueLabel {...props}/>}*/
                             valueLabelDisplay="on"
                             valueLabelFormat={(value) => getTimestamp(value)}
                             marks={[{value: 0, label: getTimestamp(0)}, {value: this.state.video.duration, label: getTimestamp(this.state.video.duration)}]}
@@ -460,7 +479,8 @@ class VideoClipper extends React.Component {
                           <Tooltip title="Cancel" placement="top">
                             <IconButton
                               className={clsx(this.props.tutorial == VCT.clip && classes.disable)}
-                              onClick={this.onCancel.bind(this)}>
+                              onClick={this.onCancel.bind(this)}
+                              size="large">
                               <KeyboardReturnIcon/>
                             </IconButton>
                           </Tooltip>

@@ -2,13 +2,33 @@ import * as React from "react";
 import clsx from "clsx";
 
 import {
-  Collapse, createStyles, Divider, FormControl, FormControlLabel, FormLabel, Grid, InputAdornment,
-  InputLabel, MenuItem, Radio, RadioGroup, Select, Slider, Switch, TextField, Theme, Tooltip, Typography, withStyles
-} from "@material-ui/core";
+  Collapse,
+  Divider,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  Grid,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Radio,
+  RadioGroup,
+  Select,
+  Slider,
+  Switch,
+  TextField,
+  Theme,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 
 
-import VolumeDownIcon from '@material-ui/icons/VolumeDown';
-import VolumeUpIcon from '@material-ui/icons/VolumeUp';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+
+
+import VolumeDownIcon from '@mui/icons-material/VolumeDown';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 
 import {GO, IF, OF, OT, SDT, SOF, VO, WF} from "../../data/const";
 import {SceneSettings} from "../../data/Config";
@@ -282,7 +302,7 @@ class ImageVideoCard extends React.Component {
           )}
           <Grid item xs={12} sm={this.props.sidebar ? 12 : 8} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.images) && classes.noPadding)}>
             <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.images && !this.props.scene.videoRandomSpeed}>
-              <Typography id="video-speed-slider" variant="caption" component="div"
+              <Typography variant="caption" component="div"
                           color="textSecondary">
                 Video Speed {this.props.scene.videoSpeed / 10}x
               </Typography>
@@ -298,7 +318,7 @@ class ImageVideoCard extends React.Component {
             <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.images && this.props.scene.videoRandomSpeed}>
               <Grid container spacing={1}>
                 <Grid item xs={6}>
-                  <Typography id="video-speed-min-slider" variant="caption" component="div"
+                  <Typography variant="caption" component="div"
                               color="textSecondary">
                     Video Speed Min {this.props.scene.videoSpeedMin / 10}x
                   </Typography>
@@ -312,7 +332,7 @@ class ImageVideoCard extends React.Component {
                     aria-labelledby="video-speed-min-slider"/>
                 </Grid>
                 <Grid item xs={6}>
-                  <Typography id="video-speed-max-slider" variant="caption" component="div"
+                  <Typography variant="caption" component="div"
                               color="textSecondary">
                     Video Speed Max {this.props.scene.videoSpeedMax / 10}x
                   </Typography>
