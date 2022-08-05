@@ -1,5 +1,5 @@
 # Sources
-**Sources** are the most important part of any Scene. A **source* is a place FlipFlip will find images/videos for 
+**Sources** are the most important part of any Scene. A **source** is a place FlipFlip will find images/videos for 
 this Scene. FlipFlip supports sources from (1) Local Directories, (2) A text document with a list of 
 image/video URLs, (3) a single video file URL, (4) a single playlsit file URL, or (5) one of the 
 [currently supported remote sources](#currently-supported-remote-sources).
@@ -11,7 +11,12 @@ image/video URLs, (3) a single video file URL, (4) a single playlsit file URL, o
 * A count of usable images/videos will appear next to each source.
   * "**+**" indicates an incomplete count (didn't reach the end, but has _at least_ that many images & videos).
   * Video sources will display the number of clips as their count. You can click this count to toggle clips on/off for a scene.
-  
+* Sources can be manually weighted against each other by clicking the <img style="vertical-align: -5px" src="doc_icons/scale.svg"
+  alt="Weight" width="20" height="20"> button.
+  * This is only available when weighting "By Source"
+  * A number will appear next to each source indicating its weight (default: 1);
+  * Adjust this number according to your preference (e.g. setting value to 5 is like including that source 5 times in the list).
+
 ## Supported filetypes
 The following filetypes are supported by FlipFlip:
 
@@ -113,6 +118,7 @@ local video/playlist file, add a `Local video/playlsit` and choose the video(s) 
 * <img style="vertical-align: -2px; margin-right: 5px" src="doc_icons/piwigo.svg" alt="Piwigo" width="15" height="15">Piwigo Album
 * <img style="vertical-align: -2px; margin-right: 5px" src="doc_icons/b.svg" alt="BDSMlr" width="15" height="15">BDSMlr Blog (Only works for blogs with images in RSS feed)
 * <img style="vertical-align: -2px; margin-right: 5px" src="doc_icons/nimja.svg" alt="Nimja" width="15" height="15">Nimja Spiral
+* <img style="vertical-align: -2px; margin-right: 5px" src="doc_icons/luscious.svg" alt="Luscious" width="15" height="15">Luscious Album/User
 * ~~<img style="vertical-align: -2px" src="doc_icons/sexcom.svg" alt="Sex.com" width="15" height="15"> Sex.com Gallery/User~~ _Currently broken_
 
 #### Gooninator import

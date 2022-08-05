@@ -1,4 +1,21 @@
 # Changelog
+## 3.2.1 <small>(08/XX/2021)</small>
+- Add support for Luscious sources
+- Allow sources to be weighted within a scene
+- Allow non-Library sources to be played via the source list
+- Allow overlays to be changed while tagging
+- Enable scroll volume controls while tagging
+- Retain effects when tagging and navigating between sources
+- Fix broken Danbooru scraper
+- Fix bug with blacklisting local files
+- Fix bug where clip tags weren't appearing in Library Search
+- Fix bug with grid imports
+- Fix bug with Reveal File with remote video file
+- Fix bug with recursively adding audio files
+- Fix bug with hiding cursor while using Strobe effect
+- Fix bug CaptionScriptor scene playback
+- Fix issue with Start Now button not being clickable
+
 ## 3.2.0 <small>(09/01/2021)</small>
 - Organize Scenes into groups
 - Add Nimja Spiral support
