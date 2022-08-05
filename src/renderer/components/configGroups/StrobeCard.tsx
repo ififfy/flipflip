@@ -82,7 +82,7 @@ class StrobeCard extends React.Component {
 
     const playlists = (this.props.scene.audioPlaylists as {audios: Audio[], shuffle: boolean, repeat: string}[]);
     const hasBPM = !!playlists && playlists.length && playlists[0].audios.length && playlists[0].audios[0].bpm;
-    return(
+    return (
       <Grid container spacing={2} alignItems="center">
         <Grid item xs={12}>
           <Grid container alignItems="center">
@@ -112,9 +112,10 @@ class StrobeCard extends React.Component {
           <Collapse in={this.props.scene.strobe && this.props.scene.strobeLayer != SL.image} className={classes.fullWidth}>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12} sm={!this.props.sidebar && this.props.scene.strobeLayer == SL.bottom ? 4 : 12} className={classes.paddingTop}>
-                <FormControl className={classes.fullWidth}>
+                <FormControl variant="standard" className={classes.fullWidth}>
                   <InputLabel>Color Type</InputLabel>
                   <Select
+                    variant="standard"
                     value={this.props.scene.strobeColorType}
                     onChange={this.onInput.bind(this, 'strobeColorType')}>
                     {Object.values(SC).map((sc) =>
@@ -144,9 +145,10 @@ class StrobeCard extends React.Component {
           <Collapse in={this.props.scene.strobe} className={classes.fullWidth}>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12} sm={!this.props.sidebar && this.props.scene.strobeLayer == SL.bottom ? 4 : 12} className={classes.paddingTop}>
-                <FormControl className={classes.fullWidth}>
+                <FormControl variant="standard" className={classes.fullWidth}>
                   <InputLabel>Strobe Layer</InputLabel>
                   <Select
+                    variant="standard"
                     value={this.props.scene.strobeLayer}
                     onChange={this.onInput.bind(this, 'strobeLayer')}>
                     {Object.values(SL).map((sl) =>
@@ -171,6 +173,7 @@ class StrobeCard extends React.Component {
                     </Grid>
                     <Grid item xs={3} className={classes.percentInput}>
                       <TextField
+                        variant="standard"
                         value={Math.round(strobeOpacity * 100)}
                         margin="dense"
                         onChange={this.onPercentIntInput.bind(this, 'strobeOpacity')}
@@ -185,7 +188,7 @@ class StrobeCard extends React.Component {
                           max: 100,
                           type: 'number',
                           'aria-labelledby': 'strobe-opacity-slider',
-                        }}/>
+                        }} />
                     </Grid>
                   </Grid>
                 </Collapse>
@@ -202,9 +205,10 @@ class StrobeCard extends React.Component {
           <Collapse in={this.props.scene.strobe} className={classes.fullWidth}>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} style={{paddingTop: 10}}>
-                <FormControl className={classes.fullWidth}>
+                <FormControl variant="standard" className={classes.fullWidth}>
                   <InputLabel>Timing</InputLabel>
                   <Select
+                    variant="standard"
                     value={this.props.scene.strobeTF}
                     onChange={this.onInput.bind(this, 'strobeTF')}>
                     {Object.values(TF).map((tf) => {
@@ -236,6 +240,7 @@ class StrobeCard extends React.Component {
                     </Grid>
                     <Grid item xs={3} className={classes.percentInput}>
                       <TextField
+                        variant="standard"
                         value={strobeSinRate}
                         onChange={this.onIntInput.bind(this, 'strobeSinRate')}
                         onBlur={this.blurIntKey.bind(this, 'strobeSinRate')}
@@ -246,7 +251,7 @@ class StrobeCard extends React.Component {
                           max: 100,
                           type: 'number',
                           'aria-labelledby': 'strobe-sin-rate-slider',
-                        }}/>
+                        }} />
                     </Grid>
                   </Grid>
                 </Collapse>
@@ -333,9 +338,10 @@ class StrobeCard extends React.Component {
           <Collapse in={this.props.scene.strobe && this.props.scene.strobePulse} className={classes.fullWidth}>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} style={{paddingTop: 10}}>
-                <FormControl className={classes.fullWidth}>
+                <FormControl variant="standard" className={classes.fullWidth}>
                   <InputLabel>Delay Timing</InputLabel>
                   <Select
+                    variant="standard"
                     value={this.props.scene.strobeDelayTF}
                     onChange={this.onInput.bind(this, 'strobeDelayTF')}>
                     {Object.values(TF).map((tf) =>
@@ -361,6 +367,7 @@ class StrobeCard extends React.Component {
                     </Grid>
                     <Grid item xs={3} className={classes.percentInput}>
                       <TextField
+                        variant="standard"
                         value={strobeDelaySinRate}
                         onChange={this.onIntInput.bind(this, 'strobeDelaySinRate')}
                         onBlur={this.blurIntKey.bind(this, 'strobeDelaySinRate')}
@@ -371,7 +378,7 @@ class StrobeCard extends React.Component {
                           max: 100,
                           type: 'number',
                           'aria-labelledby': 'strobe-delay-sin-rate-slider',
-                        }}/>
+                        }} />
                     </Grid>
                   </Grid>
                 </Collapse>
@@ -460,9 +467,10 @@ class StrobeCard extends React.Component {
               <Collapse in={this.props.scene.strobe} className={classes.fullWidth}>
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
-                    <FormControl className={classes.fullWidth}>
+                    <FormControl variant="standard" className={classes.fullWidth}>
                       <InputLabel>Easing</InputLabel>
                       <Select
+                        variant="standard"
                         value={this.props.scene.strobeEase}
                         onChange={this.onInput.bind(this, 'strobeEase')}>
                         {Object.values(EA).map((rf) =>

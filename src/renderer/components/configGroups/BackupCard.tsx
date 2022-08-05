@@ -93,7 +93,7 @@ class BackupCard extends React.Component {
   render() {
     const classes = this.props.classes;
     const hasBackup = this.state.backups.length > 0;
-    return(
+    return (
       <React.Fragment>
         <Grid container spacing={2} alignItems="center" justifyContent="center" className={classes.chipGrid}>
           <Grid item xs={"auto"} className={classes.buttonGrid}>
@@ -302,9 +302,10 @@ class BackupCard extends React.Component {
               Choose a backup to restore from:
             </DialogContentText>
             {this.state.backup && (
-              <FormControl>
+              <FormControl variant="standard">
                 <InputLabel>Backups</InputLabel>
                 <Select
+                  variant="standard"
                   value={this.state.backup.url}
                   MenuProps={{
                     PaperProps: {

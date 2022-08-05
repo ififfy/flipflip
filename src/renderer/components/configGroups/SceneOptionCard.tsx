@@ -150,9 +150,10 @@ class SceneOptionCard extends React.Component {
         <Grid item xs={12} className={clsx(this.props.tutorial == SDT.timing && classes.highlight)}>
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} style={{paddingTop: 10}}>
-              <FormControl className={classes.fullWidth}>
+              <FormControl variant="standard" className={classes.fullWidth}>
                 <InputLabel>Timing</InputLabel>
                 <Select
+                  variant="standard"
                   value={this.props.scene.timingFunction}
                   onChange={this.onInput.bind(this, 'timingFunction')}>
                   {[TF.constant, TF.random, TF.sin, TF.bpm].map((tf) => {
@@ -184,6 +185,7 @@ class SceneOptionCard extends React.Component {
                   </Grid>
                   <Grid item xs={3} className={classes.percentInput}>
                     <TextField
+                      variant="standard"
                       value={timingSinRate}
                       onChange={this.onIntInput.bind(this, 'timingSinRate')}
                       onBlur={this.blurIntKey.bind(this, 'timingSinRate')}
@@ -194,7 +196,7 @@ class SceneOptionCard extends React.Component {
                         max: 100,
                         type: 'number',
                         'aria-labelledby': 'scene-sin-rate-slider',
-                      }}/>
+                      }} />
                   </Grid>
                 </Grid>
               </Collapse>
@@ -291,9 +293,10 @@ class SceneOptionCard extends React.Component {
           <Collapse in={this.props.scene.backForth}>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} style={{paddingTop: 10}}>
-                <FormControl className={classes.fullWidth}>
+                <FormControl variant="standard" className={classes.fullWidth}>
                   <InputLabel>Back/Forth Timing</InputLabel>
                   <Select
+                    variant="standard"
                     value={this.props.scene.backForthTF}
                     onChange={this.onInput.bind(this, 'backForthTF')}>
                     {[TF.constant, TF.random, TF.sin, TF.bpm].map((tf) => {
@@ -325,6 +328,7 @@ class SceneOptionCard extends React.Component {
                     </Grid>
                     <Grid item xs={3} className={classes.percentInput}>
                       <TextField
+                        variant="standard"
                         value={backForthSinRate}
                         onChange={this.onIntInput.bind(this, 'backForthSinRate')}
                         onBlur={this.blurIntKey.bind(this, 'backForthSinRate')}
@@ -335,7 +339,7 @@ class SceneOptionCard extends React.Component {
                           max: 100,
                           type: 'number',
                           'aria-labelledby': 'bf-sin-rate-slider',
-                        }}/>
+                        }} />
                     </Grid>
                   </Grid>
                 </Collapse>
@@ -420,9 +424,10 @@ class SceneOptionCard extends React.Component {
         <Grid item xs={12} className={clsx(this.props.tutorial == SDT.imageSizing && classes.highlight)}>
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={this.props.sidebar ? 8 : 12} sm={this.props.sidebar ? 8 : 6}>
-              <FormControl className={classes.fullWidth}>
+              <FormControl variant="standard" className={classes.fullWidth}>
                 <InputLabel>Image Sizing</InputLabel>
                 <Select
+                  variant="standard"
                   value={this.props.scene.imageType}
                   onChange={this.onInput.bind(this, 'imageType')}>
                   {Object.values(IT).map((it) =>
@@ -433,9 +438,10 @@ class SceneOptionCard extends React.Component {
             </Grid>
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}/>
             <Grid item xs={this.props.sidebar ? 8 : 12} sm={this.props.sidebar ? 8 : 4}>
-              <FormControl className={classes.fullWidth}>
+              <FormControl variant="standard" className={classes.fullWidth}>
                 <InputLabel>Background</InputLabel>
                 <Select
+                  variant="standard"
                   value={this.props.scene.backgroundType}
                   onChange={this.onInput.bind(this, 'backgroundType')}>
                   {Object.values(BT).map((bt) =>

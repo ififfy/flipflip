@@ -226,6 +226,7 @@ class GridSetup extends React.Component {
             {this.state.isEditingName != null && (
               <form onSubmit={this.endEditingName.bind(this)} className={classes.titleField}>
                 <TextField
+                  variant="standard"
                   autoFocus
                   fullWidth
                   id="title"
@@ -234,8 +235,7 @@ class GridSetup extends React.Component {
                   ref={this.nameInputRef}
                   inputProps={{className: classes.titleInput}}
                   onBlur={this.endEditingName.bind(this)}
-                  onChange={this.onChangeName.bind(this)}
-                />
+                  onChange={this.onChangeName.bind(this)} />
               </form>
             )}
             {this.state.isEditingName == null && (

@@ -116,11 +116,12 @@ class AudioOptions extends React.Component {
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12}>
               <TextField
+                variant="standard"
                 fullWidth
                 value={this.state.audio.url}
                 margin="normal"
                 label="URL"
-                onChange={this.onSourceInput.bind(this, 'url')}/>
+                onChange={this.onSourceInput.bind(this, 'url')} />
             </Grid>
             <Grid item xs={12}>
               <AudioControl
@@ -239,9 +240,10 @@ class AudioOptions extends React.Component {
               <Collapse in={this.state.audio.tick} className={classes.fullWidth}>
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs={12} sm={4}>
-                    <FormControl className={classes.fullWidth}>
+                    <FormControl variant="standard" className={classes.fullWidth}>
                       <InputLabel>Timing</InputLabel>
                       <Select
+                        variant="standard"
                         value={this.state.audio.tickMode}
                         onChange={this.onSourceInput.bind(this, 'tickMode')}>
                         {Object.values(TF).map((tf) => {
@@ -267,6 +269,7 @@ class AudioOptions extends React.Component {
                         </Grid>
                         <Grid item xs={3} className={classes.percentInput}>
                           <TextField
+                            variant="standard"
                             value={this.state.audio.tickSinRate}
                             onChange={this.onSourceIntInput.bind(this, 'tickSinRate')}
                             onBlur={this.blurSourceIntKey.bind(this, 'tickSinRate')}
@@ -277,7 +280,7 @@ class AudioOptions extends React.Component {
                               max: 100,
                               type: 'number',
                               'aria-labelledby': 'tick-sin-rate-slider',
-                            }}/>
+                            }} />
                         </Grid>
                       </Grid>
                     </Collapse>

@@ -100,9 +100,10 @@ export default class ErrorBoundary extends React.Component {
                       Choose a backup to restore from:
                     </DialogContentText>
                     {this.state.backup && (
-                      <FormControl>
+                      <FormControl variant="standard">
                         <InputLabel>Backups</InputLabel>
                         <Select
+                          variant="standard"
                           value={this.state.backup.url}
                           MenuProps={{
                             PaperProps: {

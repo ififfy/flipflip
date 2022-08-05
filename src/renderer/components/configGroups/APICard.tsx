@@ -143,7 +143,7 @@ class APICard extends React.Component {
         menuTypeSignOut = this.onFinishClearPiwigo.bind(this);
         break;
     }
-    return(
+    return (
       <React.Fragment>
         <Typography align="center" className={classes.title}>API Sign In</Typography>
 
@@ -306,17 +306,19 @@ class APICard extends React.Component {
               </div>
               <div className={classes.tumblrFields}>
                 <TextField
+                  variant="standard"
                   fullWidth
                   margin="dense"
                   label="Tumblr OAuth Consumer Key"
                   value={this.state.input1}
-                  onChange={this.onInput1.bind(this)}/>
+                  onChange={this.onInput1.bind(this)} />
                 <TextField
+                  variant="standard"
                   fullWidth
                   margin="dense"
                   label="Tumblr OAuth Consumer Secret"
                   value={this.state.input2}
-                  onChange={this.onInput2.bind(this)}/>
+                  onChange={this.onInput2.bind(this)} />
               </div>
             </div>
           </DialogContent>
@@ -405,41 +407,45 @@ class APICard extends React.Component {
               stored locally on your computer and is never shared with anyone or sent to any server (besides Instagram, obviously).
             </DialogContentText>
             <TextField
+              variant="standard"
               fullWidth
               disabled={this.state.instagramMode != null}
               margin="dense"
               label="Instagram Username"
               value={this.state.input1}
-              onChange={this.onInput1.bind(this)}/>
+              onChange={this.onInput1.bind(this)} />
             <TextField
+              variant="standard"
               fullWidth
               disabled={this.state.instagramMode != null}
               margin="dense"
               label="Instagram Password"
               type="password"
               value={this.state.input2}
-              onChange={this.onInput2.bind(this)}/>
+              onChange={this.onInput2.bind(this)} />
             <Collapse in={this.state.instagramMode == IG.tfa}>
               <DialogContentText id="instagram-description">
                 Enter your two-factor authentication code to confirm login:
               </DialogContentText>
               <TextField
+                variant="standard"
                 fullWidth
                 margin="dense"
                 label="Instagram 2FA"
                 value={this.state.input3}
-                onChange={this.onInput3.bind(this)}/>
+                onChange={this.onInput3.bind(this)} />
             </Collapse>
             <Collapse in={this.state.instagramMode == IG.checkpoint}>
               <DialogContentText id="instagram-description">
                 Please verify your account to continue: (check your email)
               </DialogContentText>
               <TextField
+                variant="standard"
                 fullWidth
                 margin="dense"
                 label="Instagram Checkpoint"
                 value={this.state.input3}
-                onChange={this.onInput3.bind(this)}/>
+                onChange={this.onInput3.bind(this)} />
             </Collapse>
           </DialogContent>
           <DialogActions>
@@ -486,9 +492,10 @@ class APICard extends React.Component {
               FlipFlip does not store any user information or make changes to the Hydrus server. Your configured information is
               stored locally on your computer and is never shared with anyone or sent to any server (besides Hydrus, obviously).
             </DialogContentText>
-            <FormControl margin="dense">
+            <FormControl variant="standard" margin="dense">
               <InputLabel>Protocol</InputLabel>
               <Select
+                variant="standard"
                 value={this.state.input1}
                 onChange={this.onInput1.bind(this)}>
                 <MenuItem key={"http"} value={"http"}>http</MenuItem>
@@ -496,22 +503,25 @@ class APICard extends React.Component {
               </Select>
             </FormControl>
             <TextField
+              variant="standard"
               className={classes.middleInput}
               margin="dense"
               label="Hydrus Domain"
               value={this.state.input2}
-              onChange={this.onInput2.bind(this)}/>
+              onChange={this.onInput2.bind(this)} />
             <TextField
+              variant="standard"
               margin="dense"
               label="Hydrus Port"
               value={this.state.input3}
-              onChange={this.onInput3.bind(this)}/>
+              onChange={this.onInput3.bind(this)} />
             <TextField
+              variant="standard"
               fullWidth
               margin="dense"
               label="Hydrus API Key"
               value={this.state.input4}
-              onChange={this.onInput4.bind(this)}/>
+              onChange={this.onInput4.bind(this)} />
           </DialogContent>
           <DialogActions>
             <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
@@ -541,9 +551,10 @@ class APICard extends React.Component {
               FlipFlip does not store any user information or make changes to the Piwigo server. Your configured information is
               stored locally on your computer and is never shared with anyone or sent to any server (besides Piwigo, obviously).
             </DialogContentText>
-            <FormControl margin="dense">
+            <FormControl variant="standard" margin="dense">
               <InputLabel>Protocol</InputLabel>
               <Select
+                variant="standard"
                 value={this.state.input1}
                 onChange={this.onInput1.bind(this)}>
                 <MenuItem key={"http"} value={"http"}>http</MenuItem>
@@ -551,24 +562,27 @@ class APICard extends React.Component {
               </Select>
             </FormControl>
             <TextField
+              variant="standard"
               className={classes.middleInput}
               margin="dense"
               label="Piwigo Host"
               value={this.state.input2}
-              onChange={this.onInput2.bind(this)}/>
+              onChange={this.onInput2.bind(this)} />
             <TextField
+              variant="standard"
               fullWidth
               margin="dense"
               label="Username"
               value={this.state.input3}
-              onChange={this.onInput3.bind(this)}/>
+              onChange={this.onInput3.bind(this)} />
             <TextField
+              variant="standard"
               fullWidth
               margin="dense"
               label="Password"
               type="password"
               value={this.state.input4}
-              onChange={this.onInput4.bind(this)}/>
+              onChange={this.onInput4.bind(this)} />
           </DialogContent>
           <DialogActions>
             <Button onClick={this.onCloseDialog.bind(this)} color="secondary">

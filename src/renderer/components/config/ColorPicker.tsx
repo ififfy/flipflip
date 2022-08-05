@@ -51,7 +51,7 @@ class ColorPicker extends React.Component {
   render() {
     const classes = this.props.classes;
 
-    return(
+    return (
       <Grid container alignItems="center">
         <Grid item className={classes.colorGrid}>
           <Tooltip title="Pick Color">
@@ -64,10 +64,11 @@ class ColorPicker extends React.Component {
             </Fab>
           </Tooltip>
           <TextField
+            variant="standard"
             className={classes.colorField}
             label="Color"
             value={!!this.state.pickerColor ? !!this.state.pickerColor.hex ? this.state.pickerColor.hex : this.state.pickerColor : this.props.currentColor}
-            onChange={this.props.onChangeColor.bind(this)}/>
+            onChange={this.props.onChangeColor.bind(this)} />
           <Menu
             id="color-picker"
             elevation={1}

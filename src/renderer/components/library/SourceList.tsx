@@ -239,6 +239,7 @@ class SourceList extends React.Component {
           onClose={this.onCloseDialog.bind(this)}>
           <MenuItem >
             <TextField
+              variant="standard"
               margin="dense"
               value={!!this.state.weightMenu ? !!this.state.weightMenu.weight ? this.state.weightMenu.weight : 1 : 1}
               onChange={this.onWeightInput.bind(this)}
@@ -246,7 +247,7 @@ class SourceList extends React.Component {
               inputProps={{
                 min: 1,
                 type: 'number',
-              }}/>
+              }} />
           </MenuItem>
         </Menu>
         {this.state.cachePath != null && (
@@ -278,14 +279,14 @@ class SourceList extends React.Component {
               Blacklist ({this.state.blacklistSource})
             </DialogContentText>
             <TextField
+              variant="standard"
               fullWidth
               multiline
               helperText="One URL to blacklist per line"
               value={this.state.editBlacklist}
               margin="dense"
               inputProps={{className: classes.blacklistInput}}
-              onChange={this.onChangeBlacklist.bind(this)}
-            />
+              onChange={this.onChangeBlacklist.bind(this)} />
           </DialogContent>
           <DialogActions>
             <Button onClick={this.onCloseBlacklist.bind(this)} color="secondary">
@@ -326,6 +327,7 @@ class SourceList extends React.Component {
                 Video Options ({this.state.sourceOptions.url})
               </DialogContentText>
               <TextField
+                variant="standard"
                 label="Subtitle File"
                 fullWidth
                 placeholder="Paste URL Here"
@@ -341,8 +343,7 @@ class SourceList extends React.Component {
                       </Tooltip>
                     </InputAdornment>,
                 }}
-                onChange={this.onSourceInput.bind(this, 'subtitleFile')}
-              />
+                onChange={this.onSourceInput.bind(this, 'subtitleFile')} />
             </DialogContent>
           </Dialog>
         )}
@@ -355,9 +356,10 @@ class SourceList extends React.Component {
               <DialogContentText id="reddit-options-description">
                 Reddit Options ({this.state.sourceOptions.url})
               </DialogContentText>
-              <FormControl className={classes.fullWidth}>
+              <FormControl variant="standard" className={classes.fullWidth}>
                 <InputLabel>Post Order</InputLabel>
                 <Select
+                  variant="standard"
                   disabled={this.state.sourceOptions.url.includes("/user/") || this.state.sourceOptions.url.includes("/u/")}
                   value={this.state.sourceOptions.redditFunc == null ? RF.hot : this.state.sourceOptions.redditFunc}
                   onChange={this.onSourceInput.bind(this, 'redditFunc')}>
@@ -368,6 +370,7 @@ class SourceList extends React.Component {
               </FormControl>
               {this.state.sourceOptions.redditFunc == RF.top && (
                 <Select
+                  variant="standard"
                   className={classes.fullWidth}
                   disabled={this.state.sourceOptions.url.includes("/user/") || this.state.sourceOptions.url.includes("/u/")}
                   value={this.state.sourceOptions.redditTime == null ? RT.day : this.state.sourceOptions.redditTime}

@@ -452,6 +452,7 @@ class SceneDetail extends React.Component {
             {this.state.isEditingName != null && (
               <form onSubmit={this.endEditingName.bind(this)} className={classes.titleField}>
                 <TextField
+                  variant="standard"
                   autoFocus
                   fullWidth
                   id="title"
@@ -459,8 +460,7 @@ class SceneDetail extends React.Component {
                   margin="none"
                   inputProps={{className: classes.titleInput}}
                   onBlur={this.endEditingName.bind(this)}
-                  onChange={this.onChangeName.bind(this)}
-                />
+                  onChange={this.onChangeName.bind(this)} />
               </form>
             )}
             {this.state.isEditingName == null && (
@@ -742,6 +742,7 @@ class SceneDetail extends React.Component {
           <DialogTitle id="effects-all-title">Scene Effects Import/Export</DialogTitle>
           <DialogContent>
             <TextField
+              variant="standard"
               fullWidth
               multiline
               label="Scene Effects Hash"
@@ -750,8 +751,7 @@ class SceneDetail extends React.Component {
               value={this.state.sceneEffects}
               margin="dense"
               inputProps={{className: classes.phraseInput}}
-              onChange={this.onChangeSceneEffects.bind(this)}
-            />
+              onChange={this.onChangeSceneEffects.bind(this)} />
           </DialogContent>
           <DialogActions>
             <Button onClick={this.onCopySceneEffects.bind(this)} color="secondary">
@@ -1021,6 +1021,7 @@ class SceneDetail extends React.Component {
               open={this.state.openMenu == MO.max}
               onClose={this.onCloseDialog.bind(this)}>
               <TextField
+                variant="standard"
                 label="Max"
                 margin="dense"
                 value={this.props.scene.generatorMax}
@@ -1029,7 +1030,7 @@ class SceneDetail extends React.Component {
                 inputProps={{
                   min: 1,
                   type: 'number',
-                }}/>
+                }} />
             </Menu>
             <Tooltip title="Adv Rule"  placement="left">
               <Fab

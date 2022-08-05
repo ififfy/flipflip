@@ -125,7 +125,7 @@ class ScriptSourceListItem extends React.Component {
 
   render() {
     const classes = this.props.classes;
-    return(
+    return (
       <div style={this.props.style}
            className={clsx(this.props.index % 2 == 0 ? classes.evenChild : classes.oddChild, this.props.lastSelected && classes.lastSelected)}>
         <ListItem>
@@ -160,13 +160,14 @@ class ScriptSourceListItem extends React.Component {
             {this.props.isEditing == this.props.source.id && (
               <form onSubmit={this.onEndEdit.bind(this)} className={classes.urlField}>
                 <TextField
+                  variant="standard"
                   autoFocus
                   fullWidth
                   value={this.state.urlInput}
                   margin="none"
                   className={classes.urlField}
                   onBlur={this.onEndEdit.bind(this)}
-                  onChange={this.onEditSource.bind(this)}/>
+                  onChange={this.onEditSource.bind(this)} />
               </form>
             )}
             {this.props.isEditing != this.props.source.id && (

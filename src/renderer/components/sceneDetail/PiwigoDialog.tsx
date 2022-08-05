@@ -212,7 +212,7 @@ class PiwigoDialog extends React.Component {
         aria-describedby="url-import-description">
         <DialogTitle id="url-import-title">Create a New Piwigo Source</DialogTitle>
         <DialogContent>
-          <FormControl>
+          <FormControl variant="standard">
             <Typography component="h2" variant="h6" className={classes.areaHeaderFirst}>
               Piwigo Source Type
             </Typography>
@@ -220,6 +220,7 @@ class PiwigoDialog extends React.Component {
               Select the type of image list to create
             </DialogContentText>
             <Select
+              variant="standard"
               value={listType}
               className={classes.typeSelect}
               onChange={this.onListTypeChange.bind(this)}>

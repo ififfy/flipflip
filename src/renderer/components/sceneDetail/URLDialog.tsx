@@ -60,16 +60,18 @@ class URLDialog extends React.Component {
             Paste a gooninator URL and choose how to import the sources:
           </DialogContentText>
           <TextField
+            variant="standard"
             label="Gooninator URL"
             fullWidth
             placeholder="Paste URL Here"
             margin="dense"
             value={this.state.importURL}
-            onChange={this.onURLChange.bind(this)}/>
+            onChange={this.onURLChange.bind(this)} />
           <div className={classes.root}>
-            <FormControl>
+            <FormControl variant="standard">
               <InputLabel>Import as</InputLabel>
               <Select
+                variant="standard"
                 value={this.state.importType}
                 onChange={this.onTypeChange.bind(this)}>
                 <MenuItem value={GT.tumblr}>Tumblr Blogs</MenuItem>
@@ -78,11 +80,12 @@ class URLDialog extends React.Component {
             </FormControl>
             <Collapse className={classes.rootInput} in={this.state.importType == GT.local}>
               <TextField
+                variant="standard"
                 fullWidth
                 label="Parent Directory"
                 value={this.state.rootDir}
                 InputProps={{readOnly: true}}
-                onClick={this.onRootChange.bind(this)}/>
+                onClick={this.onRootChange.bind(this)} />
             </Collapse>
           </div>
         </DialogContent>

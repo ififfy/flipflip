@@ -515,6 +515,7 @@ class CaptionScriptor extends React.Component {
                           </Grid>
                           <Grid item xs={12}>
                             <Select
+                              variant="standard"
                               fullWidth
                               value={""}
                               onChange={this.onAddSetter.bind(this)}>>
@@ -699,6 +700,7 @@ class CaptionScriptor extends React.Component {
               Choose a script to load:
             </DialogContentText>
             <Select
+              variant="standard"
               fullWidth
               value={this.state.selectScript}
               onChange={this.onChangeSelectScript.bind(this)}>

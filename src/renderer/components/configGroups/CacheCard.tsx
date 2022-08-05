@@ -99,6 +99,7 @@ class CacheCard extends React.Component {
             <Grid container spacing={2} alignItems="center">
               <Grid item xs>
                 <TextField
+                  variant="standard"
                   fullWidth
                   label="Caching Directory"
                   placeholder={cachePath}
@@ -109,7 +110,7 @@ class CacheCard extends React.Component {
                   InputProps={{
                     readOnly: true,
                   }}
-                  onClick={this.onCacheDirChange.bind(this)}/>
+                  onClick={this.onCacheDirChange.bind(this)} />
               </Grid>
               <Grid item>
                 <Tooltip title="Reset Cache Directory">
@@ -123,6 +124,7 @@ class CacheCard extends React.Component {
               <Grid item xs>
                 <Tooltip title="The maximum size of the caching directory. After the max is reached, new images won't be kept. Set this to 0 to ignore size.">
                   <TextField
+                    variant="standard"
                     label="Max Cache Size"
                     margin="dense"
                     value={this.props.config.caching.maxSize}
@@ -134,7 +136,7 @@ class CacheCard extends React.Component {
                     inputProps={{
                       min: 0,
                       type: 'number',
-                    }}/>
+                    }} />
                 </Tooltip>
               </Grid>
               <Grid item>

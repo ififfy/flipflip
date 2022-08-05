@@ -223,9 +223,10 @@ class ZoomMoveCard extends React.Component {
         <Grid item xs={12} className={clsx(this.props.tutorial && classes.disable)}>
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} sm={!this.props.sidebar && this.props.scene.horizTransType != HTF.none ? 5 : 12}>
-              <FormControl className={classes.fullWidth}>
+              <FormControl variant="standard" className={classes.fullWidth}>
                 <InputLabel>Move Horizontally</InputLabel>
                 <Select
+                  variant="standard"
                   value={this.props.scene.horizTransType}
                   onChange={this.onInput.bind(this, 'horizTransType')}>
                   {Object.values(HTF).map((tf) =>
@@ -260,6 +261,7 @@ class ZoomMoveCard extends React.Component {
                   </Grid>
                   <Grid item xs={3} className={classes.percentInput}>
                     <TextField
+                      variant="standard"
                       value={horizTransLevel}
                       margin="dense"
                       onChange={this.onIntInput.bind(this, 'horizTransLevel')}
@@ -315,9 +317,10 @@ class ZoomMoveCard extends React.Component {
         <Grid item xs={12} className={clsx(this.props.tutorial && classes.disable)}>
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} sm={!this.props.sidebar && this.props.scene.vertTransType != VTF.none ? 5 : 12}>
-              <FormControl className={classes.fullWidth}>
+              <FormControl variant="standard" className={classes.fullWidth}>
                 <InputLabel>Move Vertically</InputLabel>
                 <Select
+                  variant="standard"
                   value={this.props.scene.vertTransType}
                   onChange={this.onInput.bind(this, 'vertTransType')}>
                   {Object.values(VTF).map((tf) =>
@@ -352,6 +355,7 @@ class ZoomMoveCard extends React.Component {
                   </Grid>
                   <Grid item xs={3} className={classes.percentInput}>
                     <TextField
+                      variant="standard"
                       value={vertTransLevel}
                       margin="dense"
                       onChange={this.onIntInput.bind(this, 'vertTransLevel')}
@@ -408,9 +412,12 @@ class ZoomMoveCard extends React.Component {
           <Collapse in={enabled} className={classes.fullWidth}>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 4}>
-                <FormControl className={clsx(classes.fullWidth, this.props.tutorial == SDT.zoom3 && clsx(classes.highlight, classes.backdropTop))}>
+                <FormControl
+                  variant="standard"
+                  className={clsx(classes.fullWidth, this.props.tutorial == SDT.zoom3 && clsx(classes.highlight, classes.backdropTop))}>
                   <InputLabel>Timing</InputLabel>
                   <Select
+                    variant="standard"
                     value={this.props.scene.transTF}
                     MenuProps={this.props.tutorial == SDT.zoom3 ? { className: classes.backdropTop } : {}}
                     onChange={this.onInput.bind(this, 'transTF')}>
@@ -443,6 +450,7 @@ class ZoomMoveCard extends React.Component {
                     </Grid>
                     <Grid item xs={3} className={classes.percentInput}>
                       <TextField
+                        variant="standard"
                         value={transSinRate}
                         onChange={this.onIntInput.bind(this, 'transSinRate')}
                         onBlur={this.blurIntKey.bind(this, 'transSinRate')}
@@ -542,9 +550,10 @@ class ZoomMoveCard extends React.Component {
               <Collapse in={enabled} className={classes.fullWidth}>
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
-                    <FormControl className={classes.fullWidth}>
+                    <FormControl variant="standard" className={classes.fullWidth}>
                       <InputLabel>Easing</InputLabel>
                       <Select
+                        variant="standard"
                         value={this.props.scene.transEase}
                         onChange={this.onInput.bind(this, 'transEase')}>
                         {Object.values(EA).map((rf) =>

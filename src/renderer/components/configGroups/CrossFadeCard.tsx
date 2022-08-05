@@ -82,7 +82,7 @@ class CrossFadeCard extends React.Component {
 
     const playlists = (this.props.scene.audioPlaylists as {audios: Audio[], shuffle: boolean, repeat: string}[]);
     const hasBPM = !!playlists && playlists.length && playlists[0].audios.length && playlists[0].audios[0].bpm;
-    return(
+    return (
       <Grid container spacing={this.props.scene.crossFade ? 2 : 0} alignItems="center">
         <Grid item xs={12}  className={clsx(this.props.tutorial != null && this.props.tutorial != SDT.fade1 && classes.disable)}>
           <Grid container alignItems="center">
@@ -118,9 +118,10 @@ class CrossFadeCard extends React.Component {
           <Collapse in={this.props.scene.crossFade} className={classes.fullWidth}>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} style={{paddingTop: 10}}>
-                <FormControl className={classes.fullWidth}>
+                <FormControl variant="standard" className={classes.fullWidth}>
                   <InputLabel>Timing</InputLabel>
                   <Select
+                    variant="standard"
                     value={this.props.scene.fadeTF}
                     onChange={this.onInput.bind(this, 'fadeTF')}>
                     {Object.values(TF).map((tf) => {
@@ -152,6 +153,7 @@ class CrossFadeCard extends React.Component {
                     </Grid>
                     <Grid item xs={3} className={classes.percentInput}>
                       <TextField
+                        variant="standard"
                         value={fadeSinRate}
                         onChange={this.onIntInput.bind(this, 'fadeSinRate')}
                         onBlur={this.blurIntKey.bind(this, 'fadeSinRate')}
@@ -162,7 +164,7 @@ class CrossFadeCard extends React.Component {
                           max: 100,
                           type: 'number',
                           'aria-labelledby': 'fade-sin-rate-slider',
-                        }}/>
+                        }} />
                     </Grid>
                   </Grid>
                 </Collapse>
@@ -251,9 +253,10 @@ class CrossFadeCard extends React.Component {
               <Collapse in={this.props.scene.crossFade} className={classes.fullWidth}>
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
-                    <FormControl className={classes.fullWidth}>
+                    <FormControl variant="standard" className={classes.fullWidth}>
                       <InputLabel>Easing</InputLabel>
                       <Select
+                        variant="standard"
                         value={this.props.scene.fadeEase}
                         onChange={this.onInput.bind(this, 'fadeEase')}>
                         {Object.values(EA).map((rf) =>

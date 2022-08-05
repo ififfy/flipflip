@@ -197,13 +197,14 @@ class SourceListItem extends React.Component {
             {this.props.isEditing == this.props.source.id && (
               <form onSubmit={this.onEndEdit.bind(this)} className={classes.urlField}>
                 <TextField
+                  variant="standard"
                   autoFocus
                   fullWidth
                   value={this.state.urlInput}
                   margin="none"
                   className={classes.urlField}
                   onBlur={this.onEndEdit.bind(this)}
-                  onChange={this.onEditSource.bind(this)}/>
+                  onChange={this.onEditSource.bind(this)} />
               </form>
             )}
             {this.props.isEditing != this.props.source.id && (

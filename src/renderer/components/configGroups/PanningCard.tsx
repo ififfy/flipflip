@@ -93,7 +93,7 @@ class PanningCard extends React.Component {
 
     const playlists = (this.props.scene.audioPlaylists as {audios: Audio[], shuffle: boolean, repeat: string}[]);
     const hasBPM = !!playlists && playlists.length && playlists[0].audios.length && playlists[0].audios[0].bpm;
-    return(
+    return (
       <Grid container spacing={this.props.scene.panning ? 2 : 0} alignItems="center" className={clsx(this.props.tutorial != null && classes.disable)}>
         <Grid item xs={12}>
           <FormControlLabel
@@ -112,9 +112,10 @@ class PanningCard extends React.Component {
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} sm={!this.props.sidebar && this.props.scene.panHorizTransType != HTF.none ? 5 : 12}>
               <Collapse in={this.props.scene.panning} className={clsx(classes.fullWidth, classes.paddingLeft)}>
-                <FormControl className={classes.fullWidth}>
+                <FormControl variant="standard" className={classes.fullWidth}>
                   <InputLabel>Move Horizontally</InputLabel>
                   <Select
+                    variant="standard"
                     value={this.props.scene.panHorizTransType}
                     onChange={this.onInput.bind(this, 'panHorizTransType')}>
                     {Object.values(HTF).map((tf) => {
@@ -169,6 +170,7 @@ class PanningCard extends React.Component {
                   </Grid>
                   <Grid item xs={3} className={classes.percentInput}>
                     <TextField
+                      variant="standard"
                       value={horizTransLevel}
                       margin="dense"
                       onChange={this.onIntInput.bind(this, 'panHorizTransLevel')}
@@ -225,9 +227,10 @@ class PanningCard extends React.Component {
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} sm={!this.props.sidebar && this.props.scene.panVertTransType != VTF.none ? 5 : 12}>
               <Collapse in={this.props.scene.panning} className={clsx(classes.fullWidth, classes.paddingLeft)}>
-                <FormControl className={classes.fullWidth}>
+                <FormControl variant="standard" className={classes.fullWidth}>
                   <InputLabel>Move Vertically</InputLabel>
                   <Select
+                    variant="standard"
                     value={this.props.scene.panVertTransType}
                     onChange={this.onInput.bind(this, 'panVertTransType')}>
                     {Object.values(VTF).map((tf) => {
@@ -282,6 +285,7 @@ class PanningCard extends React.Component {
                   </Grid>
                   <Grid item xs={3} className={classes.percentInput}>
                     <TextField
+                      variant="standard"
                       value={vertTransLevel}
                       margin="dense"
                       onChange={this.onIntInput.bind(this, 'panVertTransLevel')}
@@ -338,9 +342,10 @@ class PanningCard extends React.Component {
           <Collapse in={this.props.scene.panning} className={classes.fullWidth}>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} style={{paddingTop: 10}}>
-                <FormControl className={classes.fullWidth}>
+                <FormControl variant="standard" className={classes.fullWidth}>
                   <InputLabel>Timing</InputLabel>
                   <Select
+                    variant="standard"
                     value={this.props.scene.panTF}
                     onChange={this.onInput.bind(this, 'panTF')}>
                     {Object.values(TF).map((tf) => {
@@ -372,6 +377,7 @@ class PanningCard extends React.Component {
                     </Grid>
                     <Grid item xs={3} className={classes.percentInput}>
                       <TextField
+                        variant="standard"
                         value={panSinRate}
                         onChange={this.onIntInput.bind(this, 'panSinRate')}
                         onBlur={this.blurIntKey.bind(this, 'panSinRate')}
@@ -382,7 +388,7 @@ class PanningCard extends React.Component {
                           max: 100,
                           type: 'number',
                           'aria-labelledby': 'pan-sin-rate-slider',
-                        }}/>
+                        }} />
                     </Grid>
                   </Grid>
                 </Collapse>
@@ -471,9 +477,10 @@ class PanningCard extends React.Component {
               <Collapse in={this.props.scene.panning} className={classes.fullWidth}>
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
-                    <FormControl className={classes.fullWidth}>
+                    <FormControl variant="standard" className={classes.fullWidth}>
                       <InputLabel>Start Easing</InputLabel>
                       <Select
+                        variant="standard"
                         value={this.props.scene.panStartEase}
                         onChange={this.onInput.bind(this, 'panStartEase')}>
                         {Object.values(EA).map((rf) =>
@@ -541,9 +548,10 @@ class PanningCard extends React.Component {
                     </Collapse>
                   </Grid>
                   <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
-                    <FormControl className={classes.fullWidth}>
+                    <FormControl variant="standard" className={classes.fullWidth}>
                       <InputLabel>End Easing</InputLabel>
                       <Select
+                        variant="standard"
                         value={this.props.scene.panEndEase}
                         onChange={this.onInput.bind(this, 'panEndEase')}>
                         {Object.values(EA).map((rf) =>

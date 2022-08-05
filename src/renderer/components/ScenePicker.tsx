@@ -770,14 +770,14 @@ class ScenePicker extends React.Component {
                         {this.state.isEditing == g.id && (
                           <form onSubmit={this.endEditingName.bind(this)} className={clsx(classes.titleField, classes.groupTitle)}>
                             <TextField
+                              variant="standard"
                               autoFocus
                               id="title"
                               value={this.state.isEditingName}
                               margin="none"
                               inputProps={{className: classes.titleInput}}
                               onBlur={this.endEditingName.bind(this)}
-                              onChange={this.onChangeName.bind(this)}
-                            />
+                              onChange={this.onChangeName.bind(this)} />
                           </form>
                         )}
                         {this.state.isEditing != g.id && (
@@ -928,14 +928,14 @@ class ScenePicker extends React.Component {
                         {this.state.isEditing == g.id && (
                           <form onSubmit={this.endEditingName.bind(this)} className={clsx(classes.titleField, classes.groupTitle)}>
                             <TextField
+                              variant="standard"
                               autoFocus
                               id="title"
                               value={this.state.isEditingName}
                               margin="none"
                               inputProps={{className: classes.titleInput}}
                               onBlur={this.endEditingName.bind(this)}
-                              onChange={this.onChangeName.bind(this)}
-                            />
+                              onChange={this.onChangeName.bind(this)} />
                           </form>
                         )}
                         {this.state.isEditing != g.id && (
@@ -1086,14 +1086,14 @@ class ScenePicker extends React.Component {
                         {this.state.isEditing == g.id && (
                           <form onSubmit={this.endEditingName.bind(this)} className={clsx(classes.titleField, classes.groupTitle)}>
                             <TextField
+                              variant="standard"
                               autoFocus
                               id="title"
                               value={this.state.isEditingName}
                               margin="none"
                               inputProps={{className: classes.titleInput}}
                               onBlur={this.endEditingName.bind(this)}
-                              onChange={this.onChangeName.bind(this)}
-                            />
+                              onChange={this.onChangeName.bind(this)} />
                           </form>
                         )}
                         {this.state.isEditing != g.id && (
@@ -1346,6 +1346,7 @@ class ScenePicker extends React.Component {
               To import a scene, enter the URL or open a local file. You can also choose whether or not to import sources into your Library.
             </DialogContentText>
             <TextField
+              variant="standard"
               label="Import File"
               fullWidth
               placeholder="Paste URL Here"
@@ -1365,8 +1366,7 @@ class ScenePicker extends React.Component {
                     </Tooltip>
                   </InputAdornment>,
               }}
-              onChange={this.onChangeImportFile.bind(this)}
-            />
+              onChange={this.onChangeImportFile.bind(this)} />
           </DialogContent>
           <DialogActions>
             <Button onClick={this.onCloseDialog.bind(this)}>

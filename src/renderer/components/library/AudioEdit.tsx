@@ -96,11 +96,12 @@ class AudioEdit extends React.Component {
         <DialogContent>
           <Typography variant="h6">{this.props.title}</Typography>
           <TextField
+            variant="standard"
             className={classes.input}
             value={this.state.audio.name == null ? "" : this.state.audio.name}
             margin="normal"
             label="Name"
-            onChange={this.onEdit.bind(this, 'name')}/>
+            onChange={this.onEdit.bind(this, 'name')} />
           <div className={clsx(classes.trackThumb, this.state.audio.thumb == null && classes.pointer)} onClick={this.state.audio.thumb == null ? this.loadThumb.bind(this) : this.nop}>
             {this.state.audio.thumb != null && (
               <React.Fragment>
@@ -120,18 +121,21 @@ class AudioEdit extends React.Component {
             )}
           </div>
           <TextField
+            variant="standard"
             className={classes.input}
             value={this.state.audio.artist == null ? "" : this.state.audio.artist}
             margin="normal"
             label="Artist"
-            onChange={this.onEdit.bind(this, 'artist')}/>
+            onChange={this.onEdit.bind(this, 'artist')} />
           <TextField
+            variant="standard"
             className={classes.input}
             value={this.state.audio.album == null ? "" : this.state.audio.album}
             margin="normal"
             label="Album"
-            onChange={this.onEdit.bind(this, 'album')}/>
+            onChange={this.onEdit.bind(this, 'album')} />
           <TextField
+            variant="standard"
             className={classes.inputShort}
             value={this.state.audio.trackNum == null ? "" : this.state.audio.trackNum}
             margin="normal"
@@ -140,14 +144,15 @@ class AudioEdit extends React.Component {
               min: 0,
               type: 'number',
             }}
-            onChange={this.onEditInt.bind(this, 'trackNum')}/>
+            onChange={this.onEditInt.bind(this, 'trackNum')} />
           <TextField
+            variant="standard"
             className={classes.inputFull}
             value={this.state.audio.comment == null ? "" : this.state.audio.comment}
             margin="normal"
             label="Comment"
             multiline
-            onChange={this.onEdit.bind(this, 'comment')}/>
+            onChange={this.onEdit.bind(this, 'comment')} />
         </DialogContent>
         <DialogActions className={classes.actions}>
           {this.props.allowSuggestion && (

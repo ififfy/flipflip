@@ -771,6 +771,7 @@ class Library extends React.Component {
                   To import a library, enter the URL or open a local file.
                 </DialogContentText>
                 <TextField
+                  variant="standard"
                   label="Import File"
                   fullWidth
                   placeholder="Paste URL Here"
@@ -786,8 +787,7 @@ class Library extends React.Component {
                         </Tooltip>
                       </InputAdornment>,
                   }}
-                  onChange={this.onChangeImportFile.bind(this)}
-                />
+                  onChange={this.onChangeImportFile.bind(this)} />
               </DialogContent>
               <DialogActions>
                 <Button onClick={this.onCloseDialog.bind(this)}>

@@ -82,7 +82,7 @@ class FadeIOCard extends React.Component {
 
     const playlists = (this.props.scene.audioPlaylists as {audios: Audio[], shuffle: boolean, repeat: string}[]);
     const hasBPM = !!playlists && playlists.length && playlists[0].audios.length && playlists[0].audios[0].bpm;
-    return(
+    return (
       <Grid container spacing={this.props.scene.fadeInOut ? 2 : 0} alignItems="center" className={clsx(this.props.tutorial != null && classes.disable)}>
         <Grid item xs={12}>
           <FormControlLabel
@@ -101,9 +101,10 @@ class FadeIOCard extends React.Component {
           <Collapse in={this.props.scene.fadeInOut} className={classes.fullWidth}>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} style={{paddingTop: 10}}>
-                <FormControl className={classes.fullWidth}>
+                <FormControl variant="standard" className={classes.fullWidth}>
                   <InputLabel>Timing</InputLabel>
                   <Select
+                    variant="standard"
                     value={this.props.scene.fadeIOTF}
                     onChange={this.onInput.bind(this, 'fadeIOTF')}>
                     {Object.values(TF).map((tf) => {
@@ -135,6 +136,7 @@ class FadeIOCard extends React.Component {
                     </Grid>
                     <Grid item xs={3} className={classes.percentInput}>
                       <TextField
+                        variant="standard"
                         value={fadeSinRate}
                         onChange={this.onIntInput.bind(this, 'fadeIOSinRate')}
                         onBlur={this.blurIntKey.bind(this, 'fadeIOSinRate')}
@@ -145,7 +147,7 @@ class FadeIOCard extends React.Component {
                           max: 100,
                           type: 'number',
                           'aria-labelledby': 'fadeio-sin-rate-slider',
-                        }}/>
+                        }} />
                     </Grid>
                   </Grid>
                 </Collapse>
@@ -234,9 +236,10 @@ class FadeIOCard extends React.Component {
               <Collapse in={this.props.scene.fadeInOut} className={classes.fullWidth}>
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
-                    <FormControl className={classes.fullWidth}>
+                    <FormControl variant="standard" className={classes.fullWidth}>
                       <InputLabel>Start Easing</InputLabel>
                       <Select
+                        variant="standard"
                         value={this.props.scene.fadeIOStartEase}
                         onChange={this.onInput.bind(this, 'fadeIOStartEase')}>
                         {Object.values(EA).map((rf) =>
@@ -304,9 +307,10 @@ class FadeIOCard extends React.Component {
                     </Collapse>
                   </Grid>
                   <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
-                    <FormControl className={classes.fullWidth}>
+                    <FormControl variant="standard" className={classes.fullWidth}>
                       <InputLabel>End Easing</InputLabel>
                       <Select
+                        variant="standard"
                         value={this.props.scene.fadeIOEndEase}
                         onChange={this.onInput.bind(this, 'fadeIOEndEase')}>
                         {Object.values(EA).map((rf) =>

@@ -411,21 +411,23 @@ class VideoClipper extends React.Component {
                         </Grid>
                         <Grid item>
                           <TextField
+                            variant="standard"
                             id="start"
                             className={classes.clipField}
                             label="Start"
                             value={this.state.isEditingStartText}
                             onDoubleClick={this.onClickStartText.bind(this)}
-                            onChange={this.onChangeStartText.bind(this)}/>
+                            onChange={this.onChangeStartText.bind(this)} />
                         </Grid>
                         <Grid item>
                           <TextField
+                            variant="standard"
                             id="end"
                             className={classes.clipField}
                             label="End"
                             value={this.state.isEditingEndText}
                             onDoubleClick={this.onClickEndText.bind(this)}
-                            onChange={this.onChangeEndText.bind(this)}/>
+                            onChange={this.onChangeEndText.bind(this)} />
                         </Grid>
                         <Grid item>
                           <Tooltip title="Save" placement="top">

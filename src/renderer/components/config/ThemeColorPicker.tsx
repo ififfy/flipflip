@@ -46,7 +46,7 @@ class ThemeColorPicker extends React.Component {
   render() {
     const classes = this.props.classes;
 
-    return(
+    return (
       <Grid container alignItems="center">
         <Grid item className={classes.colorGrid}>
           <Fab
@@ -56,12 +56,13 @@ class ThemeColorPicker extends React.Component {
             <div/>
           </Fab>
           <TextField
+            variant="standard"
             className={classes.colorField}
             label="Color"
             InputProps={{
               readOnly: true,
             }}
-            value={this.props.currentColor}/>
+            value={this.props.currentColor} />
         </Grid>
         <Grid item xs={12} sm>
           <Grid container alignItems="center">

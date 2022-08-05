@@ -221,15 +221,16 @@ class TagManager extends React.Component {
             <DialogTitle id="edit-title">Edit Tag</DialogTitle>
             <DialogContent>
               <TextField
+                variant="standard"
                 autoFocus
                 fullWidth
                 required
                 label="Name"
                 value={this.state.tagName}
                 margin="dense"
-                onChange={this.onChangeTitle.bind(this)}
-              />
+                onChange={this.onChangeTitle.bind(this)} />
               <TextField
+                variant="standard"
                 fullWidth
                 multiline
                 label="Tag Phrases"
@@ -238,8 +239,7 @@ class TagManager extends React.Component {
                 value={this.state.tagPhrase}
                 margin="dense"
                 inputProps={{className: classes.phraseInput}}
-                onChange={this.onChangePhrase.bind(this)}
-              />
+                onChange={this.onChangePhrase.bind(this)} />
             </DialogContent>
             <DialogActions>
               <IconButton

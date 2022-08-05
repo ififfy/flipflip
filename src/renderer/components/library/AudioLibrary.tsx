@@ -988,12 +988,13 @@ class AudioLibrary extends React.Component {
                 Enter the URL of the audio file:
               </DialogContentText>
               <TextField
+                variant="standard"
                 label="Audio URL"
                 fullWidth
                 placeholder="Paste URL Here"
                 margin="dense"
                 value={this.state.importURL == null ? "" : this.state.importURL}
-                onChange={this.onURLChange.bind(this)}/>
+                onChange={this.onURLChange.bind(this)} />
             </DialogContent>
             <DialogActions>
               {this.state.loadingMetadata && <CircularProgress size={34} className={classes.progress} />}
@@ -1039,12 +1040,13 @@ class AudioLibrary extends React.Component {
             <DialogTitle id="add-playist-title">New Playlist</DialogTitle>
             <DialogContent className={classes.noScroll}>
               <TextField
+                variant="standard"
                 label="Name"
                 fullWidth
                 placeholder="Name your playlist"
                 margin="dense"
                 value={this.state.importURL == null ? "" : this.state.importURL}
-                onChange={this.onURLChange.bind(this)}/>
+                onChange={this.onURLChange.bind(this)} />
             </DialogContent>
             <DialogActions>
               <Button onClick={this.onCloseDialog.bind(this)} color="secondary">

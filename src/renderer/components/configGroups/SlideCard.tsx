@@ -83,7 +83,7 @@ class SlideCard extends React.Component {
 
     const playlists = (this.props.scene.audioPlaylists as {audios: Audio[], shuffle: boolean, repeat: string}[]);
     const hasBPM = !!playlists && playlists.length && playlists[0].audios.length && playlists[0].audios[0].bpm;
-    return(
+    return (
       <Grid container spacing={this.props.scene.slide ? 2 : 0} alignItems="center" className={clsx(this.props.tutorial != null && classes.disable)}>
         <Grid item xs={12}>
           <FormControlLabel
@@ -102,9 +102,10 @@ class SlideCard extends React.Component {
           <Collapse in={this.props.scene.slide} className={classes.fullWidth}>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} style={{paddingTop: 10}}>
-                <FormControl className={classes.fullWidth}>
+                <FormControl variant="standard" className={classes.fullWidth}>
                   <InputLabel>Direction</InputLabel>
                   <Select
+                    variant="standard"
                     value={this.props.scene.slideType}
                     onChange={this.onInput.bind(this, 'slideType')}>
                     {Object.values(STF).map((tf) =>
@@ -126,9 +127,10 @@ class SlideCard extends React.Component {
                   aria-labelledby="slide-distance-slider"/>
               </Grid>
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 4}>
-                <FormControl className={classes.fullWidth}>
+                <FormControl variant="standard" className={classes.fullWidth}>
                   <InputLabel>Timing</InputLabel>
                   <Select
+                    variant="standard"
                     value={this.props.scene.slideTF}
                     onChange={this.onInput.bind(this, 'slideTF')}>
                     {Object.values(TF).map((tf) => {
@@ -160,6 +162,7 @@ class SlideCard extends React.Component {
                     </Grid>
                     <Grid item xs={3} className={classes.percentInput}>
                       <TextField
+                        variant="standard"
                         value={slideSinRate}
                         onChange={this.onIntInput.bind(this, 'slideSinRate')}
                         onBlur={this.blurIntKey.bind(this, 'slideSinRate')}
@@ -170,7 +173,7 @@ class SlideCard extends React.Component {
                           max: 100,
                           type: 'number',
                           'aria-labelledby': 'slide-sin-rate-slider',
-                        }}/>
+                        }} />
                     </Grid>
                   </Grid>
                 </Collapse>
@@ -259,9 +262,10 @@ class SlideCard extends React.Component {
               <Collapse in={this.props.scene.slide} className={classes.fullWidth}>
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
-                    <FormControl className={classes.fullWidth}>
+                    <FormControl variant="standard" className={classes.fullWidth}>
                       <InputLabel>Easing</InputLabel>
                       <Select
+                        variant="standard"
                         value={this.props.scene.slideEase}
                         onChange={this.onInput.bind(this, 'slideEase')}>
                         {Object.values(EA).map((rf) =>

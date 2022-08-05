@@ -91,7 +91,7 @@ class ImageVideoCard extends React.Component {
     const skipVideoEnd = typeof this.props.scene.skipVideoEnd === 'number' ? this.props.scene.skipVideoEnd : 0;
     const videoVolume = typeof this.props.scene.videoVolume === 'number' ? this.props.scene.videoVolume : 0;
     const disableWeightOptions = !this.props.isConfig && (this.props.scene.sources.length == 0 || (this.props.scene.sources.length == 1 && !this.props.scene.sources[0].dirOfSources));
-    return(
+    return (
       <Grid container alignItems="center">
         {!this.props.isPlayer && (
           <Grid container spacing={2} alignItems="center" className={clsx(classes.gutterBottom, this.props.tutorial == SDT.imageOptions && classes.highlight)}>
@@ -108,9 +108,10 @@ class ImageVideoCard extends React.Component {
               </Grid>
             )}
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 6}>
-              <FormControl className={classes.fullWidth}>
+              <FormControl variant="standard" className={classes.fullWidth}>
                 <InputLabel>Image Filter</InputLabel>
                 <Select
+                  variant="standard"
                   value={this.props.scene.imageTypeFilter}
                   onChange={this.onInput.bind(this, 'imageTypeFilter')}>
                   {Object.values(IF).map((tf) =>
@@ -133,9 +134,10 @@ class ImageVideoCard extends React.Component {
             </Grid>
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 6} className={clsx(this.props.scene.imageTypeFilter == IF.videos && classes.noPadding)}>
               <Collapse in={this.props.scene.imageTypeFilter != IF.videos}>
-                <FormControl className={classes.fullWidth}>
+                <FormControl variant="standard" className={classes.fullWidth}>
                   <InputLabel>Image Orientation</InputLabel>
                   <Select
+                    variant="standard"
                     value={this.props.scene.imageOrientation}
                     onChange={this.onInput.bind(this, 'imageOrientation')}>
                     {Object.values(OT).map((tf) =>
@@ -149,9 +151,10 @@ class ImageVideoCard extends React.Component {
             </Grid>
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.videos) && classes.noPadding)}>
               <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.videos}>
-                <FormControl className={classes.fullWidth}>
+                <FormControl variant="standard" className={classes.fullWidth}>
                   <InputLabel>GIF Options</InputLabel>
                   <Select
+                    variant="standard"
                     value={this.props.scene.gifOption}
                     onChange={this.onInput.bind(this, 'gifOption')}>
                     {Object.values(GO).map((go) =>
@@ -217,9 +220,10 @@ class ImageVideoCard extends React.Component {
         <Grid container spacing={2} alignItems="center" className={clsx(this.props.tutorial == SDT.videoOptions && classes.highlight)}>
           <Grid item xs={12} sm={this.props.sidebar ? 12 : 6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.images) && classes.noPadding)}>
             <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.images}>
-              <FormControl className={classes.fullWidth}>
+              <FormControl variant="standard" className={classes.fullWidth}>
                 <InputLabel>Video Options</InputLabel>
                 <Select
+                  variant="standard"
                   value={this.props.scene.videoOption}
                   onChange={this.onInput.bind(this, 'videoOption')}>
                   {Object.values(VO).map((vo) =>
@@ -284,9 +288,10 @@ class ImageVideoCard extends React.Component {
             <React.Fragment>
               <Grid item xs={12} sm={this.props.sidebar ? 12 : 6} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.images) && classes.noPadding)}>
                 <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.images}>
-                  <FormControl className={classes.fullWidth}>
+                  <FormControl variant="standard" className={classes.fullWidth}>
                     <InputLabel>Video Orientation</InputLabel>
                     <Select
+                      variant="standard"
                       value={this.props.scene.videoOrientation}
                       onChange={this.onInput.bind(this, 'videoOrientation')}>
                       {Object.values(OT).map((tf) =>
@@ -460,7 +465,7 @@ class ImageVideoCard extends React.Component {
         <Grid container spacing={2} alignItems="center">
           {!this.props.isPlayer && (
             <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} className={clsx(this.props.tutorial == SDT.weighting && classes.highlight)}>
-              <FormControl component="fieldset">
+              <FormControl variant="standard" component="fieldset">
                 <FormLabel component="legend">Weighting</FormLabel>
                 <RadioGroup
                   value={this.props.scene.weightFunction}
@@ -478,7 +483,7 @@ class ImageVideoCard extends React.Component {
             </Grid>
           )}
           <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} className={clsx(this.props.tutorial == SDT.sordering && classes.highlight)}>
-            <FormControl component="fieldset">
+            <FormControl variant="standard" component="fieldset">
               <FormLabel component="legend">Source Ordering</FormLabel>
               <RadioGroup
                 value={this.props.scene.sourceOrderFunction}
@@ -504,7 +509,7 @@ class ImageVideoCard extends React.Component {
             </Collapse>
           </Grid>
           <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} className={clsx(this.props.tutorial == SDT.ordering && classes.highlight)}>
-            <FormControl component="fieldset">
+            <FormControl variant="standard" component="fieldset">
               <FormLabel component="legend">Image Ordering</FormLabel>
               <RadioGroup
                 value={this.props.scene.orderFunction}
