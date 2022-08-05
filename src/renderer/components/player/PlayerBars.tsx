@@ -679,7 +679,11 @@ class PlayerBars extends React.Component {
           <DialogTitle id="blacklist-title">Blacklist File</DialogTitle>
           <DialogContent>
             <DialogContentText id="blacklist-description">
-              Are you sure you want to blacklist <Link className={classes.wordWrap} href="#" onClick={this.openLink.bind(this, this.state.blacklistFile)}>{this.state.blacklistFile}</Link> ?
+              Are you sure you want to blacklist <Link
+              className={classes.wordWrap}
+              href="#"
+              onClick={this.openLink.bind(this, this.state.blacklistFile)}
+              underline="hover">{this.state.blacklistFile}</Link> ?
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -701,7 +705,11 @@ class PlayerBars extends React.Component {
           <DialogContent>
             {this.state.deletePath && (
               <DialogContentText id="delete-description">
-                Are you sure you want to delete <Link className={classes.wordWrap} href="#" onClick={this.openLink.bind(this, this.state.deletePath)}>{this.state.deletePath}</Link>
+                Are you sure you want to delete <Link
+                className={classes.wordWrap}
+                href="#"
+                onClick={this.openLink.bind(this, this.state.deletePath)}
+                underline="hover">{this.state.deletePath}</Link>
               </DialogContentText>
             )}
           </DialogContent>

@@ -578,7 +578,10 @@ class CaptionScriptor extends React.Component {
                       </Grid>
                       <Grid item xs={12}>
                         <Typography variant="body2" color="inherit">
-                          See <Link href="#" onClick={this.openLink.bind(this, "https://ififfy.github.io/flipflip/#/caption_script")}>documentation</Link> for help.
+                          See <Link
+                          href="#"
+                          onClick={this.openLink.bind(this, "https://ififfy.github.io/flipflip/#/caption_script")}
+                          underline="hover">documentation</Link> for help.
                         </Typography>
                       </Grid>
                     </Grid>

@@ -257,7 +257,11 @@ class SourceList extends React.Component {
             aria-describedby="clean-cache-description">
             <DialogContent>
               <DialogContentText id="clean-cache-description">
-                Are you SURE you want to delete <Link className={classes.wordWrap} href="#" onClick={this.openDirectory.bind(this, this.state.cachePath)}>{this.state.cachePath}</Link> ?
+                Are you SURE you want to delete <Link
+                className={classes.wordWrap}
+                href="#"
+                onClick={this.openDirectory.bind(this, this.state.cachePath)}
+                underline="hover">{this.state.cachePath}</Link> ?
               </DialogContentText>
             </DialogContent>
             <DialogActions>

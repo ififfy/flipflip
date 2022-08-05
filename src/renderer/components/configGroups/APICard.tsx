@@ -258,7 +258,10 @@ class APICard extends React.Component {
           </DialogTitle>
           <DialogContent>
             <DialogContentText id="sign-in-description">
-              You are about to be directed to <Link href="#" onClick={this.openLink.bind(this, "https://www.tumblr.com")}>Tumblr.com</Link> to
+              You are about to be directed to <Link
+              href="#"
+              onClick={this.openLink.bind(this, "https://www.tumblr.com")}
+              underline="hover">Tumblr.com</Link> to
               authorize FlipFlip. You should only have to do this once. Tumblr has no Read-Only mode, so read <i>and</i> write
               access are requested. FlipFlip does not store any user information or make any changes to your account.
             </DialogContentText>
@@ -287,8 +290,14 @@ class APICard extends React.Component {
           <DialogContent>
             <DialogContentText id="tumblr-description">
               FlipFlip provides a few public keys for use, but we recommend registering and using your own
-              on <Link href="#" onClick={this.openLink.bind(this, "https://www.tumblr.com/oauth/apps")}>Tumblr OAuth</Link>.
-              Refer to the <Link href="#" onClick={this.openLink.bind(this, "https://ififfy.github.io/flipflip/#/tumblr_api")}>FlipFlip documentation</Link> for
+              on <Link
+              href="#"
+              onClick={this.openLink.bind(this, "https://www.tumblr.com/oauth/apps")}
+              underline="hover">Tumblr OAuth</Link>.
+              Refer to the <Link
+              href="#"
+              onClick={this.openLink.bind(this, "https://ififfy.github.io/flipflip/#/tumblr_api")}
+              underline="hover">FlipFlip documentation</Link> for
               complete instructions.
             </DialogContentText>
             <div className={classes.root}>
@@ -347,7 +356,10 @@ class APICard extends React.Component {
           </DialogTitle>
           <DialogContent>
             <DialogContentText id="sign-in-description">
-              You are about to be directed to <Link href="#" onClick={this.openLink.bind(this, "https://www.reddit.com")}>Reddit.com</Link> to
+              You are about to be directed to <Link
+              href="#"
+              onClick={this.openLink.bind(this, "https://www.reddit.com")}
+              underline="hover">Reddit.com</Link> to
               authorize FlipFlip. You should only have to do this once. FlipFlip does not store any user information
               or make any changes to your account.
             </DialogContentText>
@@ -375,7 +387,10 @@ class APICard extends React.Component {
           </DialogTitle>
           <DialogContent>
             <DialogContentText id="sign-in-description">
-              You are about to be directed to <Link href="#" onClick={this.openLink.bind(this, "https://www.twitter.com")}>Twitter.com</Link> to
+              You are about to be directed to <Link
+              href="#"
+              onClick={this.openLink.bind(this, "https://www.twitter.com")}
+              underline="hover">Twitter.com</Link> to
               authorize FlipFlip. You should only have to do this once. FlipFlip does not store any user information
               or make any changes to your account.
             </DialogContentText>

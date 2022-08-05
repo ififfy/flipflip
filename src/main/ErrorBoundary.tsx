@@ -46,7 +46,7 @@ export default class ErrorBoundary extends React.Component {
           <Typography style={{margin: 10}} component={"h5"} variant={"h5"} color={"error"}>{this.state.error.name}: {this.state.error.message}</Typography>
           <Typography style={{whiteSpace: "pre", marginBottom: 20}} component={"div"} variant={"body2"} color={"error"}>{this.state.info.componentStack.trim().replace(/\s*in (ForwardRef|div)/g, "")}</Typography>
           <Typography component={"h6"} variant={"h6"}>
-            Please consider reporting this bug to our <Link href="#" onClick={this.onSubmitIssue.bind(this)}>GitHub</Link>
+            Please consider reporting this bug to our <Link href="#" onClick={this.onSubmitIssue.bind(this)} underline="hover">GitHub</Link>
           </Typography>
           <Button
             style={{margin: 10}}

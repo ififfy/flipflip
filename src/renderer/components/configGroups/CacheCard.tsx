@@ -154,7 +154,10 @@ class CacheCard extends React.Component {
           aria-describedby="clean-cache-description">
           <DialogContent>
             <DialogContentText id="clean-cache-description">
-              Are you SURE you want to delete the contents of <Link href="#" onClick={this.openDirectory.bind(this, cachePath)}>{cachePath}</Link> ?
+              Are you SURE you want to delete the contents of <Link
+              href="#"
+              onClick={this.openDirectory.bind(this, cachePath)}
+              underline="hover">{cachePath}</Link> ?
             </DialogContentText>
           </DialogContent>
           <DialogActions>

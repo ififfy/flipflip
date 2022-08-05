@@ -969,7 +969,10 @@ class Tutorial extends React.Component {
                 Well that about covers all the basics! You've learned how to <b>add a Scene</b>, <b>configure it</b>, and <b>begin playback</b>!
               </DialogContentText>
               <DialogContentText id="tutorial-description">
-                Be sure to check out the <Link href="#" onClick={this.openLink.bind(this, "https://ififfy.github.io/flipflip/#")}>FlipFlip docs</Link> if you need any help.
+                Be sure to check out the <Link
+                href="#"
+                onClick={this.openLink.bind(this, "https://ififfy.github.io/flipflip/#")}
+                underline="hover">FlipFlip docs</Link> if you need any help.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 <b>Enjoy FlipFlip!</b>

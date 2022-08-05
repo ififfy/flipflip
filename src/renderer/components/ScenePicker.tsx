@@ -692,7 +692,13 @@ class ScenePicker extends React.Component {
             <Typography variant="body2" color="inherit" className={classes.drawerText}>
               Questions? Suggestions?
               <br/>
-              Visit us on <Link href="#" onClick={this.openLink.bind(this, "https://github.com/ififfy/flipflip")}>GitHub</Link> or <Link href="#" onClick={this.openLink.bind(this, "https://www.reddit.com/r/flipflip")}>Reddit</Link>
+              Visit us on <Link
+              href="#"
+              onClick={this.openLink.bind(this, "https://github.com/ififfy/flipflip")}
+              underline="hover">GitHub</Link> or <Link
+              href="#"
+              onClick={this.openLink.bind(this, "https://www.reddit.com/r/flipflip")}
+              underline="hover">Reddit</Link>
             </Typography>
           </div>
         </Drawer>
