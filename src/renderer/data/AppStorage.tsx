@@ -345,6 +345,61 @@ export default class AppStorage {
             this.initialState.library[i].id = i;
           }
           break;
+        case "3.0.0-beta3":
+        case "3.0.0":
+        case "3.0.1":
+        case "3.0.3":
+        case "3.0.4":
+        case "3.0.5":
+        case "3.0.6":
+        case "3.0.7":
+        case "3.1.0-beta1":
+        case "3.1.0-beta2":
+        case "3.1.0":
+        case "3.1.1":
+        case "3.1.2":
+        case "3.1.3":
+        case "3.1.4":
+        case "3.2.0":
+          this.initialState = {
+            version: __VERSION__,
+            specialMode: data.specialMode,
+            openTab: data.openTab,
+            displayedSources: Array<LibrarySource>(),
+            config: new Config(data.config),
+            scenes: data.scenes.map((s: any) => new Scene(s)),
+            sceneGroups: data.sceneGroups ? data.sceneGroups.map((g: any) => new SceneGroup(g)) : [],
+            grids: data.grids.map((g: any) => new SceneGrid(g)),
+            audios: data.audios ? data.audios.map((a: any) => new Audio(a)) : [],
+            scripts: data.scripts ? data.scripts.map((s: any) => new CaptionScript(s)) : [],
+            playlists: data.playlists ? data.playlists.map((p: any) => new Playlist(p)) : [],
+            library: data.library.map((s: any) => new LibrarySource(s)),
+            tags: data.tags.map((t: any) => new Tag(t)),
+            route: data.route.map((s: any) => new Route(s)),
+            libraryYOffset: 0,
+            libraryFilters: Array<string>(),
+            librarySelected: Array<string>(),
+            audioOpenTab: data.audioOpenTab ? data.audioOpenTab : 3,
+            audioYOffset: 0,
+            audioFilters: Array<string>(),
+            audioSelected: Array<string>(),
+            scriptYOffset: 0,
+            scriptFilters: Array<string>(),
+            scriptSelected: Array<string>(),
+            progressMode: null as string,
+            progressTitle: null as string,
+            progressCurrent: 0,
+            progressTotal: 0,
+            progressNext: null as string,
+            systemMessage: null as string,
+            systemSnack: null as string,
+            tutorial: data.tutorial,
+            theme: data.theme,
+          };
+          if (!this.initialState.theme.palette.mode && !!this.initialState.theme.palette.type) {
+            this.initialState.theme.palette.mode = this.initialState.theme.palette.type;
+          }
+          break;
         default:
           this.initialState = {
             version: __VERSION__,

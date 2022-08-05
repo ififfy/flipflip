@@ -194,7 +194,7 @@ const styles = (theme: Theme) => createStyles({
   openFileName: {
     marginLeft: 'auto',
     marginTop: theme.spacing(1.5),
-    color: theme.palette.text.secondary,
+    color: (theme.palette.text as any).hint,
   },
   menuDivider: {
     marginLeft: 'auto',

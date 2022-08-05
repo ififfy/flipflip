@@ -1,9 +1,13 @@
-import { Component } from 'react'
+import * as React from "react";
 import { withIdleTimer } from 'react-idle-timer'
 
-class IdleTimerComponent extends Component {
+class IdleTimerComponent extends React.Component {
   render () {
-    return this.props.children
+    return (
+      <React.Fragment>
+        {this.props.children}
+      </React.Fragment>
+    );
   }
 }
 

@@ -24,6 +24,9 @@ const defaultTheme = {
     error: {
       main: "#f44336",
     },
+    text: {
+      hint: 'rgba(0, 0, 0, 0.38)',
+    }
   }
 };
 

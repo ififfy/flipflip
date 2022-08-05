@@ -12,7 +12,7 @@ import Scene from "./data/Scene";
 const styles = (theme: Theme) => createStyles({
   searchSelect: {
     minWidth: 200,
-    maxWidth: `calc(100% - ${theme.spacing(7)}px)`,
+    maxWidth: `calc(100% - ${theme.spacing(7)})`,
     maxHeight: theme.mixins.toolbar.minHeight,
     color: grey[900],
   },
