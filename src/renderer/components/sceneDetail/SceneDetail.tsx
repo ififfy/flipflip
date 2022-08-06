@@ -430,7 +430,7 @@ class SceneDetail extends React.Component {
 
         <AppBar enableColorOnDark position="absolute" className={clsx(classes.appBar, (this.props.tutorial == SDT.title || this.props.tutorial == SDT.play) && classes.backdropTop)}>
           <Toolbar>
-            <Tooltip title="Back" placement="right-end">
+            <Tooltip disableInteractive title="Back" placement="right-end">
               <IconButton
                 edge="start"
                 color="inherit"
@@ -552,7 +552,7 @@ class SceneDetail extends React.Component {
                 <ListItemText primary="Save as Scene" />
               </ListItem>
             )}
-            <Tooltip title={this.state.drawerOpen ? "" : `Clone ${this.props.scene.generatorWeights ? 'Generator' : 'Scene'}`}>
+            <Tooltip disableInteractive title={this.state.drawerOpen ? "" : `Clone ${this.props.scene.generatorWeights ? 'Generator' : 'Scene'}`}>
               <ListItem button onClick={this.props.onCloneScene.bind(this, this.props.scene)} className={clsx((this.props.tutorial == SDT.options1 || this.props.tutorial == SDT.effects1) && classes.disable)}>
                 <ListItemIcon>
                   <FileCopyIcon />
@@ -560,7 +560,7 @@ class SceneDetail extends React.Component {
                 <ListItemText primary={`Clone ${this.props.scene.generatorWeights ? 'Generator' : 'Scene'}`} />
               </ListItem>
             </Tooltip>
-            <Tooltip title={this.state.drawerOpen ? "" : "Scene Effects Import/Export"}>
+            <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Scene Effects Import/Export"}>
               <ListItem button onClick={this.onOpenSceneEffectsMenu.bind(this)} className={clsx((this.props.tutorial == SDT.options1 || this.props.tutorial == SDT.effects1) && classes.disable)}>
                 <ListItemIcon>
                   <SvgIcon viewBox="0 0 488.472 488.472">
@@ -573,7 +573,7 @@ class SceneDetail extends React.Component {
                 <ListItemText primary="Export Scene Effects" />
               </ListItem>
             </Tooltip>
-            <Tooltip title={this.state.drawerOpen ? "" : "Export Scene"}>
+            <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Export Scene"}>
               <ListItem button onClick={this.props.onExport.bind(this, this.props.scene)} className={clsx((this.props.tutorial == SDT.options1 || this.props.tutorial == SDT.effects1) && classes.disable)}>
                 <ListItemIcon>
                   <PublishIcon />
@@ -581,7 +581,7 @@ class SceneDetail extends React.Component {
                 <ListItemText primary="Export Scene" />
               </ListItem>
             </Tooltip>
-            <Tooltip title={this.state.drawerOpen ? "" : "Restore Defaults"}>
+            <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Restore Defaults"}>
               <ListItem button onClick={this.props.onResetScene.bind(this, this.props.scene)} className={clsx((this.props.tutorial == SDT.options1 || this.props.tutorial == SDT.effects1) && classes.disable)}>
                 <ListItemIcon>
                   <RestoreIcon/>
@@ -589,7 +589,7 @@ class SceneDetail extends React.Component {
                 <ListItemText primary={"Restore Defaults"} />
               </ListItem>
             </Tooltip>
-            <Tooltip title={this.state.drawerOpen ? "" : "Delete Scene"}>
+            <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Delete Scene"}>
               <ListItem button onClick={this.onDeleteScene.bind(this, this.props.scene)}
                         className={clsx(classes.deleteItem, (this.props.tutorial == SDT.options1 || this.props.tutorial == SDT.effects1) && classes.disable)}>
                 <ListItemIcon>
@@ -759,7 +759,7 @@ class SceneDetail extends React.Component {
         {this.props.scene.openTab == 3 && (
           <React.Fragment>
             {this.props.scene.sources.length > 0 && (
-              <Tooltip title={this.state.filters.length == 0 ? "Remove All Sources" : "Remove These Sources"}  placement="left">
+              <Tooltip disableInteractive title={this.state.filters.length == 0 ? "Remove All Sources" : "Remove These Sources"}  placement="left">
                 <Fab
                   className={clsx(classes.addButton, !piwigoConfigured && classes.removeAllButton, piwigoConfigured && classes.removeAllButtonAlt, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.props.tutorial && classes.disable)}
                   onClick={this.onRemoveAll.bind(this)}
@@ -811,7 +811,7 @@ class SceneDetail extends React.Component {
               )}
             </Dialog>
             {piwigoConfigured &&
-              <Tooltip title="From Piwigo"  placement="left">
+              <Tooltip disableInteractive title="From Piwigo"  placement="left">
                 <Fab
                   className={clsx(classes.addButton, classes.piwigoImportButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.props.tutorial && classes.disable)}
                   onClick={this.onOpenPiwigoMenu.bind(this)}
@@ -820,7 +820,7 @@ class SceneDetail extends React.Component {
                 </Fab>
               </Tooltip>
             }
-            <Tooltip title="From Library"  placement="left">
+            <Tooltip disableInteractive title="From Library"  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.libraryImportButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.props.tutorial && classes.disable)}
                 onClick={this.onAddSource.bind(this, AF.library)}
@@ -828,7 +828,7 @@ class SceneDetail extends React.Component {
                 <LocalLibraryIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip title="Local Video/Playlist"  placement="left">
+            <Tooltip disableInteractive title="Local Video/Playlist"  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addVideoButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.props.tutorial && classes.disable)}
                 onClick={this.onAddSource.bind(this, AF.videos)}
@@ -836,7 +836,7 @@ class SceneDetail extends React.Component {
                 <MovieIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip title="Local Directory"  placement="left">
+            <Tooltip disableInteractive title="Local Directory"  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addDirectoryButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.props.tutorial && classes.disable)}
                 onClick={this.onAddSource.bind(this, AF.directory)}
@@ -844,7 +844,7 @@ class SceneDetail extends React.Component {
                 <FolderIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip title="URL"  placement="left">
+            <Tooltip disableInteractive title="URL"  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addURLButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.openMenu != MO.new && classes.addButtonClose, this.props.tutorial == SDT.add2 && classes.highlight)}
                 onClick={this.onAddSource.bind(this, AF.url)}
@@ -958,7 +958,7 @@ class SceneDetail extends React.Component {
           <React.Fragment>
             {this.props.scene.generatorWeights.length > 0 && (
               <React.Fragment>
-                <Tooltip title="Remove All Rules" placement="top-end">
+                <Tooltip disableInteractive title="Remove All Rules" placement="top-end">
                   <Fab
                     className={classes.removeAllWGButton}
                     onClick={this.onRemoveAll.bind(this)}
@@ -988,7 +988,7 @@ class SceneDetail extends React.Component {
                 </Dialog>
               </React.Fragment>
             )}
-            <Tooltip title="Max" placement="top">
+            <Tooltip disableInteractive title="Max" placement="top">
               <Fab
                 className={clsx(classes.sortMenuButton, this.props.tutorial == SDGT.buttons && clsx(classes.backdropTop, classes.disable))}
                 onClick={this.onOpenMaxMenu.bind(this)}
@@ -1024,7 +1024,7 @@ class SceneDetail extends React.Component {
                   type: 'number',
                 }} />
             </Menu>
-            <Tooltip title="Adv Rule"  placement="left">
+            <Tooltip disableInteractive title="Adv Rule"  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addDirectoryButton, this.props.tutorial == SDGT.buttons && clsx(classes.backdropTop, classes.disable))}
                 onClick={this.onAddAdvRule.bind(this)}
@@ -1032,7 +1032,7 @@ class SceneDetail extends React.Component {
                 <AddCircleOutlineIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip title="Simple Rule"  placement="left">
+            <Tooltip disableInteractive title="Simple Rule"  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addURLButton, this.props.tutorial == SDGT.buttons && clsx(classes.backdropTop, classes.highlight))}
                 onClick={this.onOpenTagMenu.bind(this)}
@@ -1040,7 +1040,7 @@ class SceneDetail extends React.Component {
                 <AddIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip title="Generate Sources" placement="top-end">
+            <Tooltip disableInteractive title="Generate Sources" placement="top-end">
               <span className={clsx(classes.generateTooltip, this.props.tutorial == SDGT.buttons && clsx(classes.backdropTop, classes.disable), this.props.tutorial == SDGT.generate && classes.backdropTop)}
                     style={!areWeightsValid(this.props.scene) ? { pointerEvents: "none" } : {}}>
                 <Fab

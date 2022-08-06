@@ -55,7 +55,7 @@ class ColorSetPicker extends React.Component {
     return (
       <Grid container>
         <Grid item className={classes.colorGrid}>
-          <Tooltip title="Add Color">
+          <Tooltip disableInteractive title="Add Color">
             <Fab
               id="add-color"
               className={classes.colorButton}
@@ -106,7 +106,7 @@ class ColorSetPicker extends React.Component {
           </Grid>
         </Grid>
         <Grid item>
-          <Tooltip title="Clear Colors">
+          <Tooltip disableInteractive title="Clear Colors">
             <IconButton onClick={this.onClearColors.bind(this)} size="large">
               <DeleteIcon color="error"/>
             </IconButton>

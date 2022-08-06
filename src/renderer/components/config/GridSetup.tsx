@@ -207,7 +207,7 @@ class GridSetup extends React.Component {
         <AppBar enableColorOnDark position="absolute" className={clsx(classes.appBar, this.props.tutorial == SGT.dimensions && classes.backdropTop)}>
           <Toolbar className={classes.headerBar}>
             <div className={classes.headerLeft}>
-              <Tooltip title="Back" placement="right-end">
+              <Tooltip disableInteractive title="Back" placement="right-end">
                 <IconButton
                   edge="start"
                   color="inherit"

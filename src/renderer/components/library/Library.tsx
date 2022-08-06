@@ -420,7 +420,7 @@ class Library extends React.Component {
         <AppBar enableColorOnDark position="absolute" className={clsx(classes.appBar, open && classes.appBarShift, this.props.tutorial == LT.toolbar && clsx(classes.backdropTop, classes.disable))}>
           <Toolbar className={classes.headerBar}>
             <div className={classes.headerLeft}>
-              <Tooltip title={this.props.specialMode == SP.select ? "Cancel Import" : "Back"} placement="right-end">
+              <Tooltip disableInteractive title={this.props.specialMode == SP.select ? "Cancel Import" : "Back"} placement="right-end">
                 <IconButton
                   edge="start"
                   color="inherit"
@@ -490,7 +490,7 @@ class Library extends React.Component {
 
           <div className={clsx(this.props.tutorial != null && classes.disable)}>
 
-            <Tooltip title={this.state.drawerOpen ? "" : "Manage Tags"}>
+            <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Manage Tags"}>
               <ListItem button onClick={this.props.onManageTags.bind(this)}>
                 <ListItemIcon>
                   <LocalOfferIcon />
@@ -506,7 +506,7 @@ class Library extends React.Component {
                 )}
               </ListItem>
             </Tooltip>
-            <Tooltip title={this.state.drawerOpen ? "" : "Batch Tag"}>
+            <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Batch Tag"}>
               <ListItem button onClick={this.onBatchTag.bind(this)}>
                 <ListItemIcon>
                   <FormatListBulletedIcon />
@@ -514,7 +514,7 @@ class Library extends React.Component {
                 <ListItemText primary="Batch Tag" />
               </ListItem>
             </Tooltip>
-            <Tooltip title={this.state.drawerOpen ? "" : "Batch Clip"}>
+            <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Batch Clip"}>
               <ListItem button onClick={this.onBatchClip.bind(this)}>
                 <ListItemIcon>
                   <SvgIcon>
@@ -532,7 +532,7 @@ class Library extends React.Component {
                 <ListItemText primary="Batch Clip" />
               </ListItem>
             </Tooltip>
-            <Tooltip title={"Identify local sources which have identical tags"}>
+            <Tooltip disableInteractive title={"Identify local sources which have identical tags"}>
               <ListItem button onClick={this.onFindMerges.bind(this)}>
                 <ListItemIcon>
                   <MergeTypeIcon />
@@ -553,7 +553,7 @@ class Library extends React.Component {
                   </ListSubheader>
                 </Collapse>
                 {tumblrAuthorized && (
-                  <Tooltip title={this.state.drawerOpen ? "" : "Import from Tumblr"}>
+                  <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Import from Tumblr"}>
                     <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onImportTumblr.bind(this)}>
                       <ListItemIcon>
                         <SourceIcon type={ST.tumblr}/>
@@ -563,7 +563,7 @@ class Library extends React.Component {
                   </Tooltip>
                 )}
                 {redditAuthorized && (
-                  <Tooltip title={this.state.drawerOpen ? "" : "Import from Reddit"}>
+                  <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Import from Reddit"}>
                     <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onImportReddit.bind(this)}>
                       <ListItemIcon>
                         <SourceIcon type={ST.reddit}/>
@@ -573,7 +573,7 @@ class Library extends React.Component {
                   </Tooltip>
                 )}
                 {twitterAuthorized && (
-                  <Tooltip title={this.state.drawerOpen ? "" : "Import from Twitter"}>
+                  <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Import from Twitter"}>
                     <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onImportTwitter.bind(this)}>
                       <ListItemIcon>
                         <SourceIcon type={ST.twitter}/>
@@ -583,7 +583,7 @@ class Library extends React.Component {
                   </Tooltip>
                 )}
                 {instagramAuthorized && (
-                  <Tooltip title={this.state.drawerOpen ? "" : "Import from Instagram"}>
+                  <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Import from Instagram"}>
                     <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onImportInstagram.bind(this)}>
                       <ListItemIcon>
                         <SourceIcon type={ST.instagram}/>
@@ -599,7 +599,7 @@ class Library extends React.Component {
           <Divider />
 
           <div className={clsx(this.props.tutorial != null && classes.disable)}>
-            <Tooltip title={"Identify sources which are not accessible"}>
+            <Tooltip disableInteractive title={"Identify sources which are not accessible"}>
               <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onMarkOffline.bind(this)}>
                 <ListItemIcon>
                   <OfflineBoltIcon />
@@ -607,7 +607,7 @@ class Library extends React.Component {
                 <ListItemText primary="Mark Offline" />
               </ListItem>
             </Tooltip>
-            <Tooltip title={"Detect duration and resolution of video sources"}>
+            <Tooltip disableInteractive title={"Detect duration and resolution of video sources"}>
               <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onUpdateVideoMetadata.bind(this)}>
                 <ListItemIcon>
                   <MovieFilterIcon />
@@ -622,7 +622,7 @@ class Library extends React.Component {
               <Divider />
 
               <div>
-                <Tooltip title={this.state.drawerOpen ? "" : cancelProgressMessage}>
+                <Tooltip disableInteractive title={this.state.drawerOpen ? "" : cancelProgressMessage}>
                   <ListItem button onClick={this.props.onUpdateMode.bind(this, PR.cancel)}>
                     <ListItemIcon>
                       <CancelIcon color="error"/>
@@ -643,7 +643,7 @@ class Library extends React.Component {
           <div className={classes.fill}/>
 
           <div className={clsx(this.props.tutorial != null && classes.disable)}>
-            <Tooltip title={this.state.drawerOpen ? "" : "Export Library"}>
+            <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Export Library"}>
               <ListItem button onClick={this.props.onExportLibrary.bind(this)}>
                 <ListItemIcon>
                   <PublishIcon />
@@ -651,7 +651,7 @@ class Library extends React.Component {
                 <ListItemText primary="Export Library" />
               </ListItem>
             </Tooltip>
-            <Tooltip title={this.state.drawerOpen ? "" : "Import Library"}>
+            <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Import Library"}>
               <ListItem button onClick={this.onImportLibrary.bind(this)}>
                 <ListItemIcon>
                   <GetAppIcon />
@@ -696,7 +696,7 @@ class Library extends React.Component {
 
         {this.props.specialMode && (
           <React.Fragment>
-            <Tooltip title="Clear"  placement="top-end">
+            <Tooltip disableInteractive title="Clear"  placement="top-end">
               <Fab
                 className={classes.selectNoneButton}
                 onClick={this.onSelectNone.bind(this)}
@@ -704,7 +704,7 @@ class Library extends React.Component {
                 <ClearIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip title="Select All"  placement="top-end">
+            <Tooltip disableInteractive title="Select All"  placement="top-end">
               <Fab
                 className={classes.selectAllButton}
                 onClick={this.onSelectAll.bind(this)}
@@ -712,7 +712,7 @@ class Library extends React.Component {
                 <SelectAllIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip title={this.props.specialMode == SP.batchTag ? "Batch Tag" : this.props.specialMode == SP.batchClip ? "Batch Clip" : "Import"}  placement="top-end">
+            <Tooltip disableInteractive title={this.props.specialMode == SP.batchTag ? "Batch Tag" : this.props.specialMode == SP.batchClip ? "Batch Clip" : "Import"}  placement="top-end">
               <Badge
                 className={classes.importBadge}
                 color="secondary"
@@ -751,7 +751,7 @@ class Library extends React.Component {
         {!this.props.specialMode && (
           <React.Fragment>
             {this.props.library.length > 0 && (
-              <Tooltip title={this.state.filters.length == 0 ? "Delete All Sources" : "Delete These Sources"}  placement="left">
+              <Tooltip disableInteractive title={this.state.filters.length == 0 ? "Delete All Sources" : "Delete These Sources"}  placement="left">
                 <Fab
                   className={classes.removeAllButton}
                   onClick={this.onRemoveAll.bind(this)}
@@ -780,7 +780,7 @@ class Library extends React.Component {
                   InputProps={{
                     endAdornment:
                       <InputAdornment position="end">
-                        <Tooltip title="Open File">
+                        <Tooltip disableInteractive title="Open File">
                           <IconButton onClick={this.onOpenImportFile.bind(this)} size="large">
                             <FolderIcon/>
                           </IconButton>
@@ -891,7 +891,7 @@ class Library extends React.Component {
               )}
             </Dialog>
             {piwigoConfigured &&
-              <Tooltip title={this.state.filters.length > 0 ? "" : "Piwigo"}  placement="left">
+              <Tooltip disableInteractive title={this.state.filters.length > 0 ? "" : "Piwigo"}  placement="left">
                 <Fab
                   className={clsx(classes.addButton, classes.addPiwigoButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
                   disabled={this.state.filters.length > 0}
@@ -901,7 +901,7 @@ class Library extends React.Component {
                 </Fab>
               </Tooltip>
             }
-            <Tooltip title={this.state.filters.length > 0 ? "" : "Local Video/Playlist"}  placement="left">
+            <Tooltip disableInteractive title={this.state.filters.length > 0 ? "" : "Local Video/Playlist"}  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addVideoButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
                 disabled={this.state.filters.length > 0}
@@ -910,7 +910,7 @@ class Library extends React.Component {
                 <MovieIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip title={this.state.filters.length > 0 ? "" : "Local Directory"}  placement="left">
+            <Tooltip disableInteractive title={this.state.filters.length > 0 ? "" : "Local Directory"}  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addDirectoryButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
                 disabled={this.state.filters.length > 0}
@@ -919,7 +919,7 @@ class Library extends React.Component {
                 <FolderIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip title={this.state.filters.length > 0 ? "" : "URL"}  placement="left">
+            <Tooltip disableInteractive title={this.state.filters.length > 0 ? "" : "URL"}  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addURLButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
                 disabled={this.state.filters.length > 0}

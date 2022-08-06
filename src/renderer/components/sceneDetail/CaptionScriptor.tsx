@@ -305,7 +305,7 @@ class CaptionScriptor extends React.Component {
         <AppBar enableColorOnDark position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
           <Toolbar className={classes.headerBar}>
             <div className={classes.headerLeft}>
-              <Tooltip title="Back" placement="right-end">
+              <Tooltip disableInteractive title="Back" placement="right-end">
                 <IconButton
                   edge="start"
                   color="inherit"
@@ -323,7 +323,7 @@ class CaptionScriptor extends React.Component {
               {this.state.captionScript.url ? this.state.captionScript.url : "Caption Scriptor"}
             </Typography>
 
-            <Tooltip title={this.state.fullscreen ? "Exit Fullscreen" : "Fullscreen"}>
+            <Tooltip disableInteractive title={this.state.fullscreen ? "Exit Fullscreen" : "Fullscreen"}>
               <span style={this.state.scene == null ? { pointerEvents: "none" } : {}}>
                 <IconButton
                   disabled={this.state.scene == null}
@@ -381,12 +381,12 @@ class CaptionScriptor extends React.Component {
                       <Grid item xs={12} className={clsx(classes.menuGridButtons,
                         this.props.tutorial == CST.menu && classes.backdropTopHighlight,
                         this.props.tutorial == CST.menu && classes.disable)}>
-                        <Tooltip title="New">
+                        <Tooltip disableInteractive title="New">
                           <IconButton onClick={this.onNew.bind(this)} size="large">
                             <InsertDriveFileIcon/>
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title="Open">
+                        <Tooltip disableInteractive title="Open">
                           <IconButton onClick={this.onOpenMenu.bind(this)} size="large">
                             <FolderIcon/>
                           </IconButton>
@@ -409,7 +409,7 @@ class CaptionScriptor extends React.Component {
                           <MenuItem onClick={this.onOpen.bind(this)}>Open File</MenuItem>
                           <MenuItem onClick={this.onOpenFromLibrary.bind(this)}>Open From Library</MenuItem>
                         </Menu>
-                        <Tooltip title="Save">
+                        <Tooltip disableInteractive title="Save">
                           <IconButton onClick={this.onSaveMenu.bind(this)} size="large">
                             <SaveIcon/>
                           </IconButton>
@@ -434,7 +434,7 @@ class CaptionScriptor extends React.Component {
                           <MenuItem disabled={!this.state.captionScript.url} onClick={this.onSaveToLibrary.bind(this)}>Save To Library</MenuItem>
                         </Menu>
                         <Divider orientation="vertical" flexItem className={classes.menuDivider} />
-                        <Tooltip title="Load From Scene">
+                        <Tooltip disableInteractive title="Load From Scene">
                           <span style={this.state.sceneScripts == null || !this.state.sceneScripts.length ? { pointerEvents: "none" } : {}}>
                             <IconButton
                               disabled={this.state.sceneScripts == null || !this.state.sceneScripts.length}
@@ -469,37 +469,37 @@ class CaptionScriptor extends React.Component {
                             <Typography variant={"h5"}>Actions</Typography>
                           </Grid>
                           <Grid item>
-                            <Tooltip title={"For each <TEXT> between slashes, show text for blinkDuration ms, then wait blinkDelay ms. When they are all done, wait blinkGroupDelay ms."}>
+                            <Tooltip disableInteractive title={"For each <TEXT> between slashes, show text for blinkDuration ms, then wait blinkDelay ms. When they are all done, wait blinkGroupDelay ms."}>
                               <Button className={classes.actionButton} onClick={this.onAddBlink.bind(this)} variant="outlined">blink</Button>
                             </Tooltip>
                           </Grid>
                           <Grid item>
-                            <Tooltip title={"Show smaller <TEXT> for captionDuration ms, then wait captionDelay ms."}>
+                            <Tooltip disableInteractive title={"Show smaller <TEXT> for captionDuration ms, then wait captionDelay ms."}>
                               <Button className={classes.actionButton} onClick={this.onAddCap.bind(this)} variant="outlined">cap</Button>
                             </Tooltip>
                           </Grid>
                           <Grid item>
-                            <Tooltip title={"Show bigger <TEXT> for captionDuration ms, then wait captionDelay ms."}>
+                            <Tooltip disableInteractive title={"Show bigger <TEXT> for captionDuration ms, then wait captionDelay ms."}>
                               <Button className={classes.actionButton} onClick={this.onAddBigCap.bind(this)} variant="outlined">bigcap</Button>
                             </Tooltip>
                           </Grid>
                           <Grid item>
-                            <Tooltip title={"Count from <START> to <END> (<START> and <END> are whole numbers). Display each number for countDuration ms, then wait countDelay ms. When they are all done, wait countGroupDelay ms."}>
+                            <Tooltip disableInteractive title={"Count from <START> to <END> (<START> and <END> are whole numbers). Display each number for countDuration ms, then wait countDelay ms. When they are all done, wait countGroupDelay ms."}>
                               <Button className={classes.actionButton} onClick={this.onAddCount.bind(this)} variant="outlined">count</Button>
                             </Tooltip>
                           </Grid>
                           <Grid item>
-                            <Tooltip title={"Wait <MILLISECONDS> ms"}>
+                            <Tooltip disableInteractive title={"Wait <MILLISECONDS> ms"}>
                               <Button className={classes.actionButton} onClick={this.onAddWait.bind(this)} variant="outlined">wait</Button>
                             </Tooltip>
                           </Grid>
                           <Grid item>
-                            <Tooltip title={"Advance to the next image"}>
+                            <Tooltip disableInteractive title={"Advance to the next image"}>
                               <Button className={classes.actionButton} onClick={this.onAddAdvance.bind(this)} variant="outlined">advance</Button>
                             </Tooltip>
                           </Grid>
                           <Grid item>
-                            <Tooltip title={"Play audio <ALIAS> at volume <VOLUME>"}>
+                            <Tooltip disableInteractive title={"Play audio <ALIAS> at volume <VOLUME>"}>
                               <Button className={classes.actionButton} onClick={this.onAddPlayAudio.bind(this)} variant="outlined">playAudio</Button>
                             </Tooltip>
                           </Grid>
@@ -552,22 +552,22 @@ class CaptionScriptor extends React.Component {
                             <Typography variant={"h5"}>Special</Typography>
                           </Grid>
                           <Grid item>
-                            <Tooltip title={"Stores an audio file to be used with playAudio"}>
+                            <Tooltip disableInteractive title={"Stores an audio file to be used with playAudio"}>
                               <Button className={classes.storeButton} onClick={this.onAddStoreAudio.bind(this)} variant="outlined">storeAudio</Button>
                             </Tooltip>
                           </Grid>
                           <Grid item>
-                            <Tooltip title={"Stores a phrase to be used with $RANDOM_PHRASE"}>
+                            <Tooltip disableInteractive title={"Stores a phrase to be used with $RANDOM_PHRASE"}>
                               <Button className={classes.storeButton} onClick={this.onAddStorePhrase.bind(this)} variant="outlined">storePhrase</Button>
                             </Tooltip>
                           </Grid>
                           <Grid item>
-                            <Tooltip title={"When running, is replaced with a random stored phrase"}>
+                            <Tooltip disableInteractive title={"When running, is replaced with a random stored phrase"}>
                               <Button className={classes.keywordButton} onClick={this.onAddString.bind(this, "$RANDOM_PHRASE")} variant="outlined">$RANDOM_PHRASE</Button>
                             </Tooltip>
                           </Grid>
                           <Grid item>
-                            <Tooltip title={"When running, is replaced with a random tag phrase based on the current source"}>
+                            <Tooltip disableInteractive title={"When running, is replaced with a random tag phrase based on the current source"}>
                               <Button className={classes.keywordButton} onClick={this.onAddString.bind(this, "$TAG_PHRASE")} variant="outlined">$TAG_PHRASE</Button>
                             </Tooltip>
                           </Grid>

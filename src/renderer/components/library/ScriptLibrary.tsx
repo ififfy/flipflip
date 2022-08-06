@@ -347,7 +347,7 @@ class ScriptLibrary extends React.Component {
         <AppBar enableColorOnDark position="absolute" className={clsx(classes.appBar, open && classes.appBarShift, this.props.tutorial == SLT.toolbar && clsx(classes.backdropTop, classes.disable))}>
           <Toolbar className={classes.headerBar}>
             <div className={classes.headerLeft}>
-              <Tooltip title={this.props.specialMode == SP.select || this.props.specialMode == SP.selectSingle ?
+              <Tooltip disableInteractive title={this.props.specialMode == SP.select || this.props.specialMode == SP.selectSingle ?
                 "Cancel Import" : "Back"} placement="right-end">
                 <IconButton
                   edge="start"
@@ -418,7 +418,7 @@ class ScriptLibrary extends React.Component {
           <Divider />
 
           <div className={clsx(this.props.tutorial != null && classes.disable)}>
-            <Tooltip title={this.state.drawerOpen ? "" : "Manage Tags"}>
+            <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Manage Tags"}>
               <ListItem button onClick={this.props.onManageTags.bind(this)}>
                 <ListItemIcon>
                   <LocalOfferIcon />
@@ -434,7 +434,7 @@ class ScriptLibrary extends React.Component {
                 )}
               </ListItem>
             </Tooltip>
-            <Tooltip title={this.state.drawerOpen ? "" : "Batch Tag"}>
+            <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Batch Tag"}>
               <ListItem button onClick={this.onBatchTag.bind(this)}>
                 <ListItemIcon>
                   <FormatListBulletedIcon />
@@ -477,7 +477,7 @@ class ScriptLibrary extends React.Component {
 
         {this.props.specialMode && (
           <React.Fragment>
-            <Tooltip title="Clear"  placement="top-end">
+            <Tooltip disableInteractive title="Clear"  placement="top-end">
               <Fab
                 className={classes.selectNoneButton}
                 onClick={this.onSelectNone.bind(this)}
@@ -485,7 +485,7 @@ class ScriptLibrary extends React.Component {
                 <ClearIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip title="Select All"  placement="top-end">
+            <Tooltip disableInteractive title="Select All"  placement="top-end">
               <Fab
                 className={classes.selectAllButton}
                 onClick={this.onSelectAll.bind(this)}
@@ -493,7 +493,7 @@ class ScriptLibrary extends React.Component {
                 <SelectAllIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip title={this.props.specialMode == SP.batchTag ? "Batch Tag" : "Import"}  placement="top-end">
+            <Tooltip disableInteractive title={this.props.specialMode == SP.batchTag ? "Batch Tag" : "Import"}  placement="top-end">
               <Badge
                 className={classes.importBadge}
                 color="secondary"
@@ -520,7 +520,7 @@ class ScriptLibrary extends React.Component {
         {!this.props.specialMode && (
           <React.Fragment>
             {this.props.library.length > 0 && (
-              <Tooltip title={this.state.filters.length == 0 ? "Delete All Sources" : "Delete These Sources"}  placement="left">
+              <Tooltip disableInteractive title={this.state.filters.length == 0 ? "Delete All Sources" : "Delete These Sources"}  placement="left">
                 <Fab
                   className={classes.removeAllButton}
                   onClick={this.onRemoveAll.bind(this)}
@@ -571,7 +571,7 @@ class ScriptLibrary extends React.Component {
                 </React.Fragment>
               )}
             </Dialog>
-            <Tooltip title={this.state.filters.length > 0 ? "" : "Local Script"}  placement="left">
+            <Tooltip disableInteractive title={this.state.filters.length > 0 ? "" : "Local Script"}  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addLocalButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
                 disabled={this.state.filters.length > 0}
@@ -580,7 +580,7 @@ class ScriptLibrary extends React.Component {
                 <DescriptionIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip title={this.state.filters.length > 0 ? "" : "URL"}  placement="left">
+            <Tooltip disableInteractive title={this.state.filters.length > 0 ? "" : "URL"}  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addURLButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
                 disabled={this.state.filters.length > 0}

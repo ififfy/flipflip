@@ -159,7 +159,7 @@ class SceneOptionCard extends React.Component {
                   {[TF.constant, TF.random, TF.sin, TF.bpm].map((tf) => {
                     if (tf == TF.bpm) {
                       return <MenuItem key={tf} value={tf}>
-                        {en.get(tf)} {!hasBPM && <Tooltip title={"Missing audio with BPM"}><ErrorOutlineIcon color={'error'} className={classes.noBPM}/></Tooltip>}
+                        {en.get(tf)} {!hasBPM && <Tooltip disableInteractive title={"Missing audio with BPM"}><ErrorOutlineIcon color={'error'} className={classes.noBPM}/></Tooltip>}
                       </MenuItem>
                     } else {
                       return <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
@@ -280,7 +280,7 @@ class SceneOptionCard extends React.Component {
         <Grid item xs={12} className={clsx(this.props.tutorial == SDT.backForth && classes.highlight)}>
           <Grid container alignItems="center">
             <Grid item xs={12}>
-              <Tooltip title="Go back and forth between the last two images">
+              <Tooltip disableInteractive title="Go back and forth between the last two images">
                 <FormControlLabel
                   control={
                     <Switch checked={this.props.scene.backForth}
@@ -302,7 +302,7 @@ class SceneOptionCard extends React.Component {
                     {[TF.constant, TF.random, TF.sin, TF.bpm].map((tf) => {
                       if (tf == TF.bpm) {
                         return <MenuItem key={tf} value={tf}>
-                          {en.get(tf)} {!hasBPM && <Tooltip title={"Missing audio with BPM"}><ErrorOutlineIcon color={'error'} className={classes.noBPM}/></Tooltip>}
+                          {en.get(tf)} {!hasBPM && <Tooltip disableInteractive title={"Missing audio with BPM"}><ErrorOutlineIcon color={'error'} className={classes.noBPM}/></Tooltip>}
                         </MenuItem>
                       } else {
                         return <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>
@@ -536,7 +536,7 @@ class SceneOptionCard extends React.Component {
                 </Grid>
                 {this.props.scene.nextSceneID == -1 &&
                 <Grid item className={classes.selectOffset}>
-                  <Tooltip
+                  <Tooltip disableInteractive
                     title={this.props.scene.nextSceneRandoms.length == 0 ? "Select Scenes (EMPTY)" : "Select Scenes"}>
                     <IconButton
                       className={clsx(this.props.scene.nextSceneRandoms.length == 0 && classes.error)}
@@ -665,7 +665,7 @@ class SceneOptionCard extends React.Component {
                               aria-labelledby="overlay-opacity-slider"/>
                           </Grid>
                           <Grid item>
-                            <Tooltip title="Remove Overlay">
+                            <Tooltip disableInteractive title="Remove Overlay">
                               <IconButton onClick={this.onRemoveOverlay.bind(this, o.id)} size="large">
                                 <DeleteIcon color="error"/>
                               </IconButton>

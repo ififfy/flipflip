@@ -159,7 +159,7 @@ class GridPlayer extends React.Component {
               onMouseLeave={this.onMouseLeaveAppBar.bind(this)}
               className={clsx(classes.appBar, this.state.appBarHover && classes.appBarHover)}>
               <Toolbar>
-                <Tooltip title="Back" placement="right-end">
+                <Tooltip disableInteractive title="Back" placement="right-end">
                   <IconButton
                     edge="start"
                     color="inherit"
@@ -176,7 +176,7 @@ class GridPlayer extends React.Component {
                 </Typography>
                 <div className={classes.fill}/>
 
-                <Tooltip title="Toggle Fullscreen">
+                <Tooltip disableInteractive title="Toggle Fullscreen">
                   <IconButton
                     edge="start"
                     color="inherit"

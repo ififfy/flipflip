@@ -108,7 +108,7 @@ class AudioAlbumList extends React.Component {
                   <AudiotrackIcon className={classes.mediaIcon}/>
                 )}
                 <CardContent classes={{root: classes.cardContent}}>
-                  <Tooltip title={a} enterDelay={800}>
+                  <Tooltip disableInteractive title={a} enterDelay={800}>
                     <Typography
                       className={clsx(this.state.hover == a && classes.underlineTitle)}
                       noWrap

@@ -137,7 +137,7 @@ class APICard extends React.Component {
 
         <Grid container spacing={2} alignItems="center" justifyContent="center">
           <Grid item>
-            <Tooltip title={tumblrAuthorized ? "Authorized: Click to Sign Out of Tumblr" : "Unauthorized: Click to Authorize Tumblr"}  placement="top-end">
+            <Tooltip disableInteractive title={tumblrAuthorized ? "Authorized: Click to Sign Out of Tumblr" : "Unauthorized: Click to Authorize Tumblr"}  placement="top-end">
               <Fab
                 className={clsx(classes.fab, tumblrAuthorized ? classes.authorized : classes.noAuth)}
                 onClick={tumblrAuthorized ? this.onClearTumblr.bind(this) : this.onAuthTumblr.bind(this)}
@@ -147,7 +147,7 @@ class APICard extends React.Component {
             </Tooltip>
           </Grid>
           <Grid item>
-            <Tooltip title={redditAuthorized ? "Authorized: Click to Sign Out of Reddit" : "Unauthorized: Click to Authorize Reddit"}  placement="top-end">
+            <Tooltip disableInteractive title={redditAuthorized ? "Authorized: Click to Sign Out of Reddit" : "Unauthorized: Click to Authorize Reddit"}  placement="top-end">
               <Fab
                 className={clsx(classes.fab, redditAuthorized ? classes.authorized : classes.noAuth)}
                 onClick={redditAuthorized ? this.onClearReddit.bind(this) : this.onAuthReddit.bind(this)}
@@ -157,7 +157,7 @@ class APICard extends React.Component {
             </Tooltip>
           </Grid>
           <Grid item>
-            <Tooltip title={twitterAuthorized ? "Authorized: Click to Sign Out of Twitter" : "Unauthorized: Click to Authorize Twitter"}  placement="top-end">
+            <Tooltip disableInteractive title={twitterAuthorized ? "Authorized: Click to Sign Out of Twitter" : "Unauthorized: Click to Authorize Twitter"}  placement="top-end">
               <Fab
                 className={clsx(classes.fab, twitterAuthorized ? classes.authorized : classes.noAuth)}
                 onClick={twitterAuthorized ? this.onClearTwitter.bind(this) : this.onAuthTwitter.bind(this)}
@@ -167,7 +167,7 @@ class APICard extends React.Component {
             </Tooltip>
           </Grid>
           <Grid item>
-            <Tooltip title={instagramConfigured ? "Authorized: Click to Sign Out of Instagram" : "Unauthorized: Click to Authorize Instragram"}  placement="top-end">
+            <Tooltip disableInteractive title={instagramConfigured ? "Authorized: Click to Sign Out of Instagram" : "Unauthorized: Click to Authorize Instragram"}  placement="top-end">
               <Fab
                 className={clsx(classes.fab, instagramConfigured ? classes.authorized : classes.noAuth)}
                 onClick={instagramConfigured ? this.onClearInstagram.bind(this) : this.onAuthInstagram.bind(this)}
@@ -177,7 +177,7 @@ class APICard extends React.Component {
             </Tooltip>
           </Grid>
           <Grid item>
-            <Tooltip title={hydrusConfigured ? "Configured: Click to Remove Hydrus Configuration" : "Unauthorized: Click to Configure Hydrus"}  placement="top-end">
+            <Tooltip disableInteractive title={hydrusConfigured ? "Configured: Click to Remove Hydrus Configuration" : "Unauthorized: Click to Configure Hydrus"}  placement="top-end">
               <Fab
                 className={clsx(classes.fab, hydrusConfigured ? classes.authorized : classes.noAuth)}
                 onClick={hydrusConfigured ? this.onClearHydrus.bind(this) : this.onAuthHydrus.bind(this)}
@@ -187,7 +187,7 @@ class APICard extends React.Component {
             </Tooltip>
           </Grid>
           <Grid item>
-            <Tooltip title={piwigoConfigured ? "Configured: Click to Remove Piwigo Configuration" : "Unauthorized: Click to Configure Piwigo"}  placement="top-end">
+            <Tooltip disableInteractive title={piwigoConfigured ? "Configured: Click to Remove Piwigo Configuration" : "Unauthorized: Click to Configure Piwigo"}  placement="top-end">
               <Fab
                 className={clsx(classes.fab, piwigoConfigured ? classes.authorized : classes.noAuth)}
                 onClick={piwigoConfigured ? this.onClearPiwigo.bind(this) : this.onAuthPiwigo.bind(this)}

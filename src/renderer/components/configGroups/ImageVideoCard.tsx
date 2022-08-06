@@ -99,7 +99,7 @@ class ImageVideoCard extends React.Component {
               <Grid item xs={12}>
                 <FormControlLabel
                   control={
-                    <Tooltip title={"When enabled, this scene will be automatically regenerated with each playback (even if used as an overlay for another scene)"}>
+                    <Tooltip disableInteractive title={"When enabled, this scene will be automatically regenerated with each playback (even if used as an overlay for another scene)"}>
                       <Switch checked={this.props.scene.regenerate}
                               onChange={this.onBoolInput.bind(this, 'regenerate')}/>
                     </Tooltip>
@@ -124,7 +124,7 @@ class ImageVideoCard extends React.Component {
               <Collapse in={this.props.scene.weightFunction == WF.sources}>
                 <FormControlLabel
                   control={
-                    <Tooltip title={"Play all images in a source before proceeding to the next one"}>
+                    <Tooltip disableInteractive title={"Play all images in a source before proceeding to the next one"}>
                       <Switch checked={this.props.scene.fullSource}
                               onChange={this.onBoolInput.bind(this, 'fullSource')}/>
                     </Tooltip>
@@ -379,7 +379,7 @@ class ImageVideoCard extends React.Component {
             <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.images}>
               <FormControlLabel
                 control={
-                  <Tooltip title={"Each time a video is played, continue from where it left off. Default: Start from beginning"}>
+                  <Tooltip disableInteractive title={"Each time a video is played, continue from where it left off. Default: Start from beginning"}>
                     <Switch checked={this.props.scene.continueVideo}
                             size="small"
                             onChange={this.onBoolInput.bind(this, 'continueVideo')}/>

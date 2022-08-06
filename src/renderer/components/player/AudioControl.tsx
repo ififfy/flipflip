@@ -136,31 +136,31 @@ class AudioControl extends React.Component {
                   </Grid>
                   <Grid item>
                     {this.props.prevTrack && (
-                      <Tooltip title="Prev Track">
+                      <Tooltip disableInteractive title="Prev Track">
                         <IconButton onClick={this.props.prevTrack.bind(this)} size="large">
                           <SkipPreviousIcon />
                         </IconButton>
                       </Tooltip>
                     )}
-                    <Tooltip title="Jump Back">
+                    <Tooltip disableInteractive title="Jump Back">
                       <IconButton onClick={this.onBack.bind(this)} size="large">
                         {this.props.shorterSeek ? <Replay5Icon /> : <Replay10Icon />}
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title={this.state.playing ? "Pause" : "Play"}>
+                    <Tooltip disableInteractive title={this.state.playing ? "Pause" : "Play"}>
                       <IconButton
                         onClick={this.state.playing ? this.onPause.bind(this) : this.onPlay.bind(this)}
                         size="large">
                         {this.state.playing ? <PauseIcon/> : <PlayArrowIcon/>}
                       </IconButton>
                     </Tooltip>
-                    <Tooltip title="Jump Forward">
+                    <Tooltip disableInteractive title="Jump Forward">
                       <IconButton onClick={this.onForward.bind(this)} size="large">
                         {this.props.shorterSeek ? <Forward5Icon /> : <Forward10Icon />}
                       </IconButton>
                     </Tooltip>
                     {this.props.nextTrack && (
-                      <Tooltip title="Next Track">
+                      <Tooltip disableInteractive title="Next Track">
                         <IconButton onClick={this.props.nextTrack.bind(this)} size="large">
                           <SkipNextIcon />
                         </IconButton>

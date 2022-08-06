@@ -457,7 +457,7 @@ class AudioLibrary extends React.Component {
         <AppBar enableColorOnDark position="absolute" className={clsx(classes.appBar, open && classes.appBarShift, this.props.tutorial == ALT.toolbar && clsx(classes.backdropTop, classes.disable))}>
           <Toolbar className={classes.headerBar}>
             <div className={classes.headerLeft}>
-              <Tooltip title={this.props.specialMode == SP.select ? "Cancel Import" : "Back"} placement="right-end">
+              <Tooltip disableInteractive title={this.props.specialMode == SP.select ? "Cancel Import" : "Back"} placement="right-end">
                 <IconButton
                   edge="start"
                   color="inherit"
@@ -555,7 +555,7 @@ class AudioLibrary extends React.Component {
           <Divider />
 
           <div className={clsx(this.props.tutorial != null && classes.disable)}>
-            <Tooltip title={this.state.drawerOpen ? "" : "Manage Tags"}>
+            <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Manage Tags"}>
               <ListItem button onClick={this.props.onManageTags.bind(this)} disabled={this.props.specialMode != null}>
                 <ListItemIcon>
                   <LocalOfferIcon />
@@ -571,7 +571,7 @@ class AudioLibrary extends React.Component {
                 )}
               </ListItem>
             </Tooltip>
-            <Tooltip title={this.state.drawerOpen ? "" : "Add to Playlist"}>
+            <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Add to Playlist"}>
               <ListItem button onClick={this.onAddToPlaylist.bind(this)} disabled={this.props.specialMode != null}>
                 <ListItemIcon>
                   <PlaylistAddIcon />
@@ -579,7 +579,7 @@ class AudioLibrary extends React.Component {
                 <ListItemText primary="Add to Playlist" />
               </ListItem>
             </Tooltip>
-            <Tooltip title={this.state.drawerOpen ? "" : "Batch Tag"}>
+            <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Batch Tag"}>
               <ListItem button onClick={this.onBatchTag.bind(this)} disabled={this.props.specialMode != null}>
                 <ListItemIcon>
                   <FormatListBulletedIcon />
@@ -587,7 +587,7 @@ class AudioLibrary extends React.Component {
                 <ListItemText primary="Batch Tag" />
               </ListItem>
             </Tooltip>
-            <Tooltip title={this.state.drawerOpen ? "" : "Batch Edit"}>
+            <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Batch Edit"}>
               <ListItem button onClick={this.onBatchEdit.bind(this)} disabled={this.props.specialMode != null}>
                 <ListItemIcon>
                   <EditIcon />
@@ -600,7 +600,7 @@ class AudioLibrary extends React.Component {
           <Divider />
 
           <div className={clsx(this.props.tutorial != null && classes.disable)}>
-            <Tooltip title={"BPM Detection"}>
+            <Tooltip disableInteractive title={"BPM Detection"}>
               <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onBatchDetectBPM.bind(this)}>
                 <ListItemIcon>
                   <SvgIcon viewBox="0 0 24 24" fontSize="small">
@@ -618,7 +618,7 @@ class AudioLibrary extends React.Component {
               <Divider />
 
               <div>
-                <Tooltip title={this.state.drawerOpen ? "" : "Cancel BPM Detection"}>
+                <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Cancel BPM Detection"}>
                   <ListItem button onClick={this.props.onUpdateMode.bind(this, PR.cancel)}>
                     <ListItemIcon>
                       <CancelIcon color="error"/>
@@ -725,7 +725,7 @@ class AudioLibrary extends React.Component {
 
         {this.props.specialMode && this.props.openTab == 3 && (
           <React.Fragment>
-            <Tooltip title="Clear"  placement="top-end">
+            <Tooltip disableInteractive title="Clear"  placement="top-end">
               <Fab
                 className={classes.selectNoneButton}
                 onClick={this.onSelectNone.bind(this)}
@@ -733,7 +733,7 @@ class AudioLibrary extends React.Component {
                 <ClearIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip title="Select All"  placement="top-end">
+            <Tooltip disableInteractive title="Select All"  placement="top-end">
               <Fab
                 className={classes.selectAllButton}
                 onClick={this.onSelectAll.bind(this)}
@@ -742,7 +742,7 @@ class AudioLibrary extends React.Component {
               </Fab>
             </Tooltip>
             {this.props.specialMode == SP.batchTag && (
-              <Tooltip title={"Batch Tag"}  placement="top-end">
+              <Tooltip disableInteractive title={"Batch Tag"}  placement="top-end">
                 <Badge
                   className={classes.importBadge}
                   color="secondary"
@@ -759,7 +759,7 @@ class AudioLibrary extends React.Component {
               </Tooltip>
             )}
             {this.props.specialMode == SP.batchEdit && (
-              <Tooltip title={"Batch Edit"}  placement="top-end">
+              <Tooltip disableInteractive title={"Batch Edit"}  placement="top-end">
                 <Badge
                   className={classes.importBadge}
                   color="secondary"
@@ -776,7 +776,7 @@ class AudioLibrary extends React.Component {
               </Tooltip>
             )}
             {this.props.specialMode == SP.addToPlaylist && (
-              <Tooltip title={"Add to Playlist"}  placement="top-end">
+              <Tooltip disableInteractive title={"Add to Playlist"}  placement="top-end">
                 <Badge
                   className={classes.importBadge}
                   color="secondary"
@@ -793,7 +793,7 @@ class AudioLibrary extends React.Component {
               </Tooltip>
             )}
             {this.props.specialMode == SP.select && (
-              <Tooltip title={"Import"}  placement="top-end">
+              <Tooltip disableInteractive title={"Import"}  placement="top-end">
                 <Badge
                   className={classes.importBadge}
                   color="secondary"
@@ -816,7 +816,7 @@ class AudioLibrary extends React.Component {
         {!this.props.specialMode && this.props.openTab == 3 && (
           <React.Fragment>
             {this.props.library.length > 0 && (
-              <Tooltip title={this.state.filters.length == 0 ? "Delete All Sources" : playlist ? "Delete Playlist" : "Delete These Sources"}  placement="left">
+              <Tooltip disableInteractive title={this.state.filters.length == 0 ? "Delete All Sources" : playlist ? "Delete Playlist" : "Delete These Sources"}  placement="left">
                 <Fab
                   className={classes.removeAllButton}
                   onClick={this.onRemoveAll.bind(this)}
@@ -885,7 +885,7 @@ class AudioLibrary extends React.Component {
                 </React.Fragment>
               )}
             </Dialog>
-            <Tooltip title={this.state.filters.length > 0 ? "" : "Local Audio"}  placement="left">
+            <Tooltip disableInteractive title={this.state.filters.length > 0 ? "" : "Local Audio"}  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addLocalButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
                 disabled={this.state.filters.length > 0}
@@ -894,7 +894,7 @@ class AudioLibrary extends React.Component {
                 <AudiotrackIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip title={this.state.filters.length > 0 ? "" : "URL"}  placement="left">
+            <Tooltip disableInteractive title={this.state.filters.length > 0 ? "" : "URL"}  placement="left">
               <Fab
                 className={clsx(classes.addButton, classes.addURLButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
                 disabled={this.state.filters.length > 0}

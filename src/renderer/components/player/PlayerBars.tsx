@@ -332,7 +332,7 @@ class PlayerBars extends React.Component {
           className={clsx(classes.appBar, (this.props.tutorial == PT.toolbar || !this.props.hasStarted || this.props.isEmpty || this.props.recentPictureGrid || this.state.appBarHover) && classes.appBarHover, this.props.tutorial == PT.toolbar && clsx(classes.backdropTop, classes.highlight))}>
           <Toolbar className={classes.headerBar}>
             <div className={classes.headerLeft}>
-              <Tooltip title="Back" placement="right-end">
+              <Tooltip disableInteractive title="Back" placement="right-end">
                 <IconButton
                   edge="start"
                   color="inherit"
@@ -344,14 +344,14 @@ class PlayerBars extends React.Component {
               </Tooltip>
             </div>
 
-            <Tooltip title={this.props.title}>
+            <Tooltip disableInteractive title={this.props.title}>
               <Typography component="h1" variant="h4" color="inherit" noWrap className={classes.title}>
                 {this.props.title}
               </Typography>
             </Tooltip>
 
             <div className={classes.headerRight}>
-              <Tooltip title="Toggle Fullscreen">
+              <Tooltip disableInteractive title="Toggle Fullscreen">
                 <IconButton
                   edge="start"
                   color="inherit"
@@ -644,7 +644,7 @@ class PlayerBars extends React.Component {
                     </Grid>
                     {(this.props.inheritTags && (!tagNames || tagNames.length == 0) && this.props.scene.sources[0].clips && this.props.scene.sources[0].clips.find((c) => c.tags && c.tags.length > 0) != null) && (
                       <Grid item className={classes.tagButtons}>
-                        <Tooltip title="Inherit Clip Tags">
+                        <Tooltip disableInteractive title="Inherit Clip Tags">
                           <Fab
                             color="primary"
                             size="small"

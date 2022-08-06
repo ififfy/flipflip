@@ -106,7 +106,7 @@ class ScriptPlaylist extends React.Component {
           {this.props.playlist.scripts.map((s, i) =>
             <ListItem key={i}>
               <ListItemAvatar className={classes.listAvatar}>
-                  <Tooltip placement={'bottom'}
+                  <Tooltip disableInteractive placement={'bottom'}
                            title={
                                <div>
                                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Click: Library Tagging
@@ -142,12 +142,12 @@ class ScriptPlaylist extends React.Component {
         </Sortable>
         <div className={classes.playlistAction}>
           <div className={classes.left}>
-            <Tooltip title={"Shuffle " + (this.props.playlist.shuffle ? "(On)" : "(Off)")}>
+            <Tooltip disableInteractive title={"Shuffle " + (this.props.playlist.shuffle ? "(On)" : "(Off)")}>
               <IconButton onClick={this.toggleShuffle.bind(this)} size="large">
                 <ShuffleIcon color={this.props.playlist.shuffle ? "primary" : undefined}/>
               </IconButton>
             </Tooltip>
-            <Tooltip title={"Repeat " + (this.props.playlist.repeat == RP.none ? "(Off)" : this.props.playlist.repeat == RP.all ? "(All)" : "(One)")}>
+            <Tooltip disableInteractive title={"Repeat " + (this.props.playlist.repeat == RP.none ? "(Off)" : this.props.playlist.repeat == RP.all ? "(All)" : "(One)")}>
               <IconButton onClick={this.changeRepeat.bind(this)} size="large">
                 {this.props.playlist.repeat == RP.none && (
                   <RepeatIcon />
@@ -161,7 +161,7 @@ class ScriptPlaylist extends React.Component {
               </IconButton>
             </Tooltip>
           </div>
-          <Tooltip title="Add Tracks">
+          <Tooltip disableInteractive title="Add Tracks">
             <IconButton
               onClick={this.props.onAddScript.bind(this, this.props.playlistIndex)}
               size="large">
@@ -169,7 +169,7 @@ class ScriptPlaylist extends React.Component {
             </IconButton>
           </Tooltip>
           <div className={classes.right}>
-            <Tooltip title="Remove Playlist">
+            <Tooltip disableInteractive title="Remove Playlist">
               <IconButton onClick={this.removePlaylist.bind(this)} size="large">
                 <ClearIcon color={"error"}/>
               </IconButton>

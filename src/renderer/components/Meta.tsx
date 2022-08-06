@@ -130,7 +130,6 @@ export default class Meta extends React.Component {
   //      Generate different sources even for same scenes in grid
   //      Add option to disable "delete file" prompt
   //      Add way to notify user about images filtered due to min size
-  //      Find and replace all "<Tooltip" with "<Tooltip disableInteractive"
   render() {
     const scene = actions.getActiveScene(this.state);
     const grid = actions.getActiveGrid(this.state);

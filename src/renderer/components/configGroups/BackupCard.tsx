@@ -125,7 +125,7 @@ class BackupCard extends React.Component {
           </Grid>
         </Grid>
         <Grid container spacing={2} alignItems="center" justifyContent="center" className={classes.chipGrid}>
-          <Tooltip title="If enabled, backups will be automatically cleaned up. This algorithm will keep 1 backup for
+          <Tooltip disableInteractive title="If enabled, backups will be automatically cleaned up. This algorithm will keep 1 backup for
            each of the configured periods.">
             <Grid item xs={"auto"} className={classes.buttonGrid}>
               <FormControlLabel

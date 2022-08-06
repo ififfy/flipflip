@@ -54,7 +54,7 @@ class ColorPicker extends React.Component {
     return (
       <Grid container alignItems="center">
         <Grid item className={classes.colorGrid}>
-          <Tooltip title="Pick Color">
+          <Tooltip disableInteractive title="Pick Color">
             <Fab
               className={classes.colorButton}
               style={{backgroundColor: !!this.state.pickerColor ? !!this.state.pickerColor.hex ? this.state.pickerColor.hex : this.state.pickerColor : this.props.currentColor}}

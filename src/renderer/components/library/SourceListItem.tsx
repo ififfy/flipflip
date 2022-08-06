@@ -174,7 +174,7 @@ class SourceListItem extends React.Component {
                 horizontal: 'left',
               }}
               badgeContent={<OfflineBoltIcon className={classes.errorIcon} />}>
-              <Tooltip title={
+              <Tooltip disableInteractive title={
                 <div>
                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Click: Library Tagging
                   <br/>

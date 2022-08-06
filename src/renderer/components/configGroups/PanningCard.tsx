@@ -351,7 +351,7 @@ class PanningCard extends React.Component {
                     {Object.values(TF).map((tf) => {
                       if (tf == TF.bpm) {
                         return <MenuItem key={tf} value={tf}>
-                          {en.get(tf)} {!hasBPM && <Tooltip title={"Missing audio with BPM"}><ErrorOutlineIcon color={'error'} className={classes.noBPM}/></Tooltip>}
+                          {en.get(tf)} {!hasBPM && <Tooltip disableInteractive title={"Missing audio with BPM"}><ErrorOutlineIcon color={'error'} className={classes.noBPM}/></Tooltip>}
                         </MenuItem>
                       } else {
                         return <MenuItem key={tf} value={tf}>{en.get(tf)}</MenuItem>

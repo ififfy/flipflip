@@ -204,7 +204,7 @@ class AudioSourceListItem extends React.Component {
                 max={999}
                 color="primary"
                 badgeContent={this.props.source.trackNum}>
-                <Tooltip placement={this.props.source.comment ? 'right' : 'bottom'}
+                <Tooltip disableInteractive placement={this.props.source.comment ? 'right' : 'bottom'}
                          classes={this.props.source.comment ? {tooltip: classes.bigTooltip} : null}
                          arrow={!!this.props.source.comment || this.props.source.tags.length > 0}
                          title={

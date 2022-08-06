@@ -147,12 +147,12 @@ class AlbumListItem extends React.Component {
           </ListItemAvatar>
           <ListItemText primary={album.name} secondary={album.comment} />
           {(album.sub_categories?.length && !foldersOpen) &&
-            <Tooltip title="Show Sub-Albums">
+            <Tooltip disableInteractive title="Show Sub-Albums">
               <ExpandMoreIcon onClick={this.setOpen.bind(this, true)} /> 
             </Tooltip>
           }
           {(album.sub_categories?.length && foldersOpen) &&
-            <Tooltip title="Hide Sub-Albums">
+            <Tooltip disableInteractive title="Hide Sub-Albums">
               <ExpandLessIcon onClick={this.setOpen.bind(this, false)} /> 
             </Tooltip>
           }
@@ -327,12 +327,12 @@ class PiwigoDialog extends React.Component {
                       {column.label}
                     </Typography>
                     {column.direction === "ASC" &&
-                      <Tooltip title="Sort Ascending">
+                      <Tooltip disableInteractive title="Sort Ascending">
                           <ArrowUpwardIcon className={classes.sortColDir} />
                       </Tooltip>
                     }
                     {column.direction === "DESC" &&
-                      <Tooltip title="Sort Descending">
+                      <Tooltip disableInteractive title="Sort Descending">
                           <ArrowDownwardIcon className={classes.sortColDir} />
                       </Tooltip>
                     }

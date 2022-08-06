@@ -221,7 +221,7 @@ class VideoClipper extends React.Component {
         <AppBar enableColorOnDark className={classes.appBar}>
           <Toolbar className={classes.headerBar}>
             <div className={classes.headerLeft}>
-              <Tooltip title="Back" placement="right-end">
+              <Tooltip disableInteractive title="Back" placement="right-end">
                 <IconButton
                   edge="start"
                   color="inherit"
@@ -305,7 +305,7 @@ class VideoClipper extends React.Component {
                     </div>
                   </Grid>
                   <Grid item className={classes.tagButtons}>
-                    <Tooltip title="Inherit Source Tags">
+                    <Tooltip disableInteractive title="Inherit Source Tags">
                       <Fab
                         color="primary"
                         size="small"
@@ -313,7 +313,7 @@ class VideoClipper extends React.Component {
                         <SystemUpdateAltIcon/>
                       </Fab>
                     </Tooltip>
-                    <Tooltip title="End Tagging" placement="top">
+                    <Tooltip disableInteractive title="End Tagging" placement="top">
                       <IconButton onClick={this.onTag.bind(this)} size="large">
                         <KeyboardReturnIcon/>
                       </IconButton>
@@ -344,7 +344,7 @@ class VideoClipper extends React.Component {
                     <Collapse in={!this.state.isEditing}>
                       <Grid container spacing={1} alignItems="center" className={clsx(this.props.tutorial == VCT.controls && classes.disable, this.props.tutorial == VCT.clips && classes.highlight)}>
                         <Grid key={-1} item>
-                          <Tooltip title="New Clip" placement="top">
+                          <Tooltip disableInteractive title="New Clip" placement="top">
                             <Fab
                               color="primary"
                               size="small"
@@ -372,7 +372,7 @@ class VideoClipper extends React.Component {
                       <Grid container spacing={1} alignItems="center" className={clsx(this.props.tutorial == VCT.clip && classes.highlight)}>
                         {!this.props.isLibrary && this.state.isEditing && this.props.source.clips.find((c) => c.id == this.state.isEditing.id) && (
                           <Grid item>
-                            <Tooltip title={this.props.source.disabledClips && this.props.source.disabledClips.includes(this.state.isEditing.id) ? "Disabled" : "Enabled"} placement="top">
+                            <Tooltip disableInteractive title={this.props.source.disabledClips && this.props.source.disabledClips.includes(this.state.isEditing.id) ? "Disabled" : "Enabled"} placement="top">
                               <Fab
                                 size="small"
                                 className={clsx(classes.fab,
@@ -418,7 +418,7 @@ class VideoClipper extends React.Component {
                             onChange={this.onChangeEndText.bind(this)} />
                         </Grid>
                         <Grid item>
-                          <Tooltip title="Save" placement="top">
+                          <Tooltip disableInteractive title="Save" placement="top">
                             <Fab
                               color="primary"
                               size="small"
@@ -429,7 +429,7 @@ class VideoClipper extends React.Component {
                           </Tooltip>
                         </Grid>
                         <Grid item>
-                          <Tooltip title="Tag Clip" placement="top">
+                          <Tooltip disableInteractive title="Tag Clip" placement="top">
                             <Fab
                               color="secondary"
                               size="small"
@@ -440,7 +440,7 @@ class VideoClipper extends React.Component {
                           </Tooltip>
                         </Grid>
                         <Grid item>
-                          <Tooltip title="Set Volume" placement="top">
+                          <Tooltip disableInteractive title="Set Volume" placement="top">
                             <Fab
                               color="secondary"
                               size="small"
@@ -455,7 +455,7 @@ class VideoClipper extends React.Component {
                         </Grid>
                         {this.state.isEditing && this.props.source.clips.find((c) => c.id == this.state.isEditing.id) && (
                           <Grid item>
-                            <Tooltip title="Delete Clip" placement="top">
+                            <Tooltip disableInteractive title="Delete Clip" placement="top">
                               <Fab
                                 size="small"
                                 className={clsx(classes.fab, classes.removeFab, this.props.tutorial == VCT.clip && classes.disable)}
@@ -466,7 +466,7 @@ class VideoClipper extends React.Component {
                           </Grid>
                         )}
                         <Grid item>
-                          <Tooltip title="Cancel" placement="top">
+                          <Tooltip disableInteractive title="Cancel" placement="top">
                             <IconButton
                               className={clsx(this.props.tutorial == VCT.clip && classes.disable)}
                               onClick={this.onCancel.bind(this)}

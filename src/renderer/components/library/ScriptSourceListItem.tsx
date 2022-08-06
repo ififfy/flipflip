@@ -138,7 +138,7 @@ class ScriptSourceListItem extends React.Component {
                       checked={this.props.checked}/>
           )}
           <ListItemAvatar>
-            <Tooltip title={
+            <Tooltip disableInteractive title={
               <div>
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Click: Library Tagging
                 <br/>

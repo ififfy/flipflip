@@ -65,7 +65,7 @@ class CacheCard extends React.Component {
         <Grid item xs={12}>
           <Grid container alignItems="center">
             <Grid item xs>
-              <Tooltip title="When enabled, FlipFlip will store downloaded images in a local directory to improve future performance and reduce the need re-download files.">
+              <Tooltip disableInteractive title="When enabled, FlipFlip will store downloaded images in a local directory to improve future performance and reduce the need re-download files.">
                 <FormControlLabel
                   control={
                     <Switch checked={this.props.config.caching.enabled}
@@ -76,7 +76,7 @@ class CacheCard extends React.Component {
             </Grid>
             <Grid item>
               <Collapse in={this.props.config.caching.enabled} className={clsx(classes.fullWidth, classes.paddingLeft)}>
-                <Tooltip title="Clear Cache">
+                <Tooltip disableInteractive title="Clear Cache">
                   <IconButton
                     edge="start"
                     color="inherit"
@@ -113,7 +113,7 @@ class CacheCard extends React.Component {
                   onClick={this.onCacheDirChange.bind(this)} />
               </Grid>
               <Grid item>
-                <Tooltip title="Reset Cache Directory">
+                <Tooltip disableInteractive title="Reset Cache Directory">
                   <IconButton onClick={this.onResetCacheDir.bind(this)} size="large">
                     <ClearIcon color="error"/>
                   </IconButton>
@@ -122,7 +122,7 @@ class CacheCard extends React.Component {
             </Grid>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs>
-                <Tooltip title="The maximum size of the caching directory. After the max is reached, new images won't be kept. Set this to 0 to ignore size.">
+                <Tooltip disableInteractive title="The maximum size of the caching directory. After the max is reached, new images won't be kept. Set this to 0 to ignore size.">
                   <TextField
                     variant="standard"
                     label="Max Cache Size"

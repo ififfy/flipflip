@@ -212,7 +212,7 @@ class ConfigForm extends React.Component {
 
         <AppBar enableColorOnDark position="absolute" className={classes.appBar}>
           <Toolbar>
-            <Tooltip title="Back" placement="right-end">
+            <Tooltip disableInteractive title="Back" placement="right-end">
               <IconButton
                 edge="start"
                 color="inherit"
@@ -230,7 +230,7 @@ class ConfigForm extends React.Component {
             </Typography>
             <div className={classes.fill}/>
 
-            <Tooltip title="Confirm Settings">
+            <Tooltip disableInteractive title="Confirm Settings">
               <IconButton
                 edge="start"
                 color="inherit"
@@ -286,7 +286,7 @@ class ConfigForm extends React.Component {
           <div className={classes.fill}/>
 
           <div>
-            <Tooltip title={this.state.drawerOpen ? "" : "Reset Tutorials"}>
+            <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Reset Tutorials"}>
               <ListItem
                 disabled={
                   this.props.config.tutorials.scenePicker == null &&
@@ -308,7 +308,7 @@ class ConfigForm extends React.Component {
                 <ListItemText primary="Reset Tutorials" />
               </ListItem>
             </Tooltip>
-            <Tooltip title={this.state.drawerOpen ? "" : "Restore Defaults"}>
+            <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Restore Defaults"}>
               <ListItem button onClick={this.onRestoreDefaults.bind(this)}
                         className={classes.deleteItem}>
                 <ListItemIcon>

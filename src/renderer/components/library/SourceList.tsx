@@ -312,7 +312,7 @@ class SourceList extends React.Component {
               </DialogContentText>
               <FormControlLabel
                 control={
-                  <Tooltip title={"Enable this to treat directories directly inside this one as their own individual sources"}>
+                  <Tooltip disableInteractive title={"Enable this to treat directories directly inside this one as their own individual sources"}>
                     <Switch checked={this.state.sourceOptions.dirOfSources}
                             onChange={this.onSourceBoolInput.bind(this, 'dirOfSources')}/>
                   </Tooltip>
@@ -340,7 +340,7 @@ class SourceList extends React.Component {
                 InputProps={{
                   endAdornment:
                     <InputAdornment position="end">
-                      <Tooltip title="Open File">
+                      <Tooltip disableInteractive title="Open File">
                         <IconButton onClick={this.onOpenSubtitleFile.bind(this)} size="large">
                           <FolderIcon/>
                         </IconButton>

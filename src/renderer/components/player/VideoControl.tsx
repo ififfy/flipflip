@@ -76,38 +76,38 @@ class VideoControl extends React.Component {
           <Grid container alignItems="center">
             <Grid item xs={12} style={{textAlign: 'center'}}>
               {this.props.nextTrack && this.state.showSpeed && (
-                <Tooltip title="Show Volume Controls">
+                <Tooltip disableInteractive title="Show Volume Controls">
                   <IconButton onClick={this.onSwapSlider.bind(this)} size="large">
                     <VolumeUpIcon />
                   </IconButton>
                 </Tooltip>
               )}
               {this.props.nextTrack && !this.state.showSpeed && (
-                <Tooltip title="Show Speed Controls">
+                <Tooltip disableInteractive title="Show Speed Controls">
                   <IconButton onClick={this.onSwapSlider.bind(this)} size="large">
                     <SpeedIcon />
                   </IconButton>
                 </Tooltip>
               )}
-              <Tooltip title="Jump Back">
+              <Tooltip disableInteractive title="Jump Back">
                 <IconButton onClick={this.onBack.bind(this)} size="large">
                   <Replay10Icon/>
                 </IconButton>
               </Tooltip>
-              <Tooltip title={this.state.playing ? "Pause" : "Play"}>
+              <Tooltip disableInteractive title={this.state.playing ? "Pause" : "Play"}>
                 <IconButton
                   onClick={this.state.playing ? this.onPause.bind(this) : this.onPlay.bind(this)}
                   size="large">
                   {this.state.playing ? <PauseIcon/> : <PlayArrowIcon/>}
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Jump Forward">
+              <Tooltip disableInteractive title="Jump Forward">
                 <IconButton onClick={this.onForward.bind(this)} size="large">
                   <Forward10Icon/>
                 </IconButton>
               </Tooltip>
               {this.props.nextTrack && (
-                <Tooltip title="Next Track">
+                <Tooltip disableInteractive title="Next Track">
                   <IconButton onClick={this.props.nextTrack.bind(this)} size="large">
                     <SkipNextIcon />
                   </IconButton>

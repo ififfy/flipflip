@@ -160,7 +160,7 @@ class AudioOptions extends React.Component {
                   <Collapse in={!this.state.audio.stopAtEnd && !this.state.audio.nextSceneAtEnd}>
                     <FormControlLabel
                       control={
-                        <Tooltip title={"Repeat track at particular interval"}>
+                        <Tooltip disableInteractive title={"Repeat track at particular interval"}>
                           <Switch
                             size="small"
                             checked={this.state.audio.tick}
@@ -184,7 +184,7 @@ class AudioOptions extends React.Component {
                         InputProps={{
                           endAdornment:
                             <InputAdornment position="end">
-                              <Tooltip title="Detect BPM">
+                              <Tooltip disableInteractive title="Detect BPM">
                                 <IconButton
                                   className={clsx(this.state.successBPM && classes.success, this.state.errorBPM && classes.failure)}
                                   onClick={this.onDetectBPM.bind(this)}
@@ -199,7 +199,7 @@ class AudioOptions extends React.Component {
                                 </IconButton>
                               </Tooltip>
                               {this.state.loadingBPM && <CircularProgress size={34} className={classes.bpmProgress} />}
-                              <Tooltip title="Read BPM Metadata">
+                              <Tooltip disableInteractive title="Read BPM Metadata">
                                 <IconButton
                                   className={clsx(this.state.successTag && classes.success, this.state.errorTag && classes.failure)}
                                   onClick={this.onReadBPMTag.bind(this)}

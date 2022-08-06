@@ -160,7 +160,7 @@ class TagManager extends React.Component {
         <AppBar enableColorOnDark position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
           <Toolbar className={classes.headerBar}>
             <div className={classes.headerLeft}>
-              <Tooltip title="Back" placement="right-end">
+              <Tooltip disableInteractive title="Back" placement="right-end">
                 <IconButton
                   edge="start"
                   color="inherit"
@@ -260,7 +260,7 @@ class TagManager extends React.Component {
 
         {this.props.tags.length > 0 && (
           <React.Fragment>
-            <Tooltip title="Remove All Tags">
+            <Tooltip disableInteractive title="Remove All Tags">
               <Fab
                 className={classes.removeAllButton}
                 onClick={this.onRemoveAll.bind(this)}

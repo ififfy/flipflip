@@ -14,7 +14,7 @@ export default class PlayerNumCard extends React.Component {
     return (
       <Grid container spacing={2} alignItems="center">
         <Grid item xs={12}>
-          <Tooltip title="Images under this size (width or height) will be skipped">
+          <Tooltip disableInteractive title="Images under this size (width or height) will be skipped">
             <TextField
               variant="standard"
               label="Min Image Size"
@@ -32,7 +32,7 @@ export default class PlayerNumCard extends React.Component {
           </Tooltip>
         </Grid>
         <Grid item xs={12}>
-          <Tooltip title="Videos under this size (width or height) will be skipped">
+          <Tooltip disableInteractive title="Videos under this size (width or height) will be skipped">
             <TextField
               variant="standard"
               label="Min Video Size"
@@ -50,7 +50,7 @@ export default class PlayerNumCard extends React.Component {
           </Tooltip>
         </Grid>
         <Grid item xs={12}>
-          <Tooltip title="The maximum number of images/videos to keep in player history. Reduce this number to reduce memory usage and improve performance.">
+          <Tooltip disableInteractive title="The maximum number of images/videos to keep in player history. Reduce this number to reduce memory usage and improve performance.">
             <TextField
               variant="standard"
               label="Max in History"
@@ -65,7 +65,7 @@ export default class PlayerNumCard extends React.Component {
           </Tooltip>
         </Grid>
         <Grid item xs={12}>
-          <Tooltip title="The maximum number of images/videos to queue up for rendering. Reduce this number to reduce memory usage and improve performance.">
+          <Tooltip disableInteractive title="The maximum number of images/videos to queue up for rendering. Reduce this number to reduce memory usage and improve performance.">
             <TextField
               variant="standard"
               label="Max in Memory"
@@ -80,7 +80,7 @@ export default class PlayerNumCard extends React.Component {
           </Tooltip>
         </Grid>
         <Grid item xs={12}>
-          <Tooltip title="The maximum number of simultaneous images/videos loading. Increase this number to load sources faster. Reduce this number to improve display performance.">
+          <Tooltip disableInteractive title="The maximum number of simultaneous images/videos loading. Increase this number to load sources faster. Reduce this number to improve display performance.">
             <TextField
               variant="standard"
               label="Max Loading at Once"

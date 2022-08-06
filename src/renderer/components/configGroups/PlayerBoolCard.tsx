@@ -57,7 +57,7 @@ export default class PlayerBoolCard extends React.Component {
             label="Fullscreen"/>
         </Grid>
         <Grid item xs={12}>
-          <Tooltip title="If enabled, the player will start as soon as first image loads. If disabled, the player will load the first set of images from all sources before starting.">
+          <Tooltip disableInteractive title="If enabled, the player will start as soon as first image loads. If disabled, the player will load the first set of images from all sources before starting.">
             <FormControlLabel
               control={
                 <Switch checked={this.props.displaySettings.startImmediately}
@@ -67,7 +67,7 @@ export default class PlayerBoolCard extends React.Component {
           </Tooltip>
         </Grid>
         <Grid item xs={12}>
-          <Tooltip title="If enabled, additional controls for controlling 'easing' will be available in the Effect section.">
+          <Tooltip disableInteractive title="If enabled, additional controls for controlling 'easing' will be available in the Effect section.">
             <FormControlLabel
               control={
                 <Switch checked={this.props.displaySettings.easingControls}
@@ -77,7 +77,7 @@ export default class PlayerBoolCard extends React.Component {
           </Tooltip>
         </Grid>
         <Grid item xs={12}>
-          <Tooltip title="If enabled, track information will appear during playback whenever a new audio track starts.">
+          <Tooltip disableInteractive title="If enabled, track information will appear during playback whenever a new audio track starts.">
             <FormControlLabel
               control={
                 <Switch checked={this.props.displaySettings.audioAlert}
@@ -87,7 +87,7 @@ export default class PlayerBoolCard extends React.Component {
           </Tooltip>
         </Grid>
         <Grid item xs={12}>
-          <Tooltip title="If enabled, cloned/mirrored grid cells will use a copy of the actual video file, instead of a canvas. This may improve video framerate, but will remove absolute synchronization">
+          <Tooltip disableInteractive title="If enabled, cloned/mirrored grid cells will use a copy of the actual video file, instead of a canvas. This may improve video framerate, but will remove absolute synchronization">
             <FormControlLabel
               control={
                 <Switch checked={this.props.displaySettings.cloneGridVideoElements}
@@ -100,7 +100,7 @@ export default class PlayerBoolCard extends React.Component {
           <Divider/>
         </Grid>
         <Grid item xs={12}>
-          <Tooltip title={<div>Prioritizing performance will smooth image effects, but may dramatically increase load times.<br/>Prioritizing loading will decrease load times, but may result in jittery effects during playback</div>}>
+          <Tooltip disableInteractive title={<div>Prioritizing performance will smooth image effects, but may dramatically increase load times.<br/>Prioritizing loading will decrease load times, but may result in jittery effects during playback</div>}>
             <FormControlLabel
               control={
                 <Switch checked={this.props.generalSettings.prioritizePerformance}
@@ -110,7 +110,7 @@ export default class PlayerBoolCard extends React.Component {
           </Tooltip>
         </Grid>
         <Grid item xs={12}>
-          <Tooltip title="If disabled, no prompt will appear to confirm Scene deletion">
+          <Tooltip disableInteractive title="If disabled, no prompt will appear to confirm Scene deletion">
             <FormControlLabel
               control={
                 <Switch checked={this.props.generalSettings.confirmSceneDeletion}
@@ -120,7 +120,7 @@ export default class PlayerBoolCard extends React.Component {
           </Tooltip>
         </Grid>
         <Grid item xs={12}>
-          <Tooltip title="Portable Mode will save a copy of your data in the same directory as the FlipFlip executable, as well as the default save path. This needs to be enabled on each machine.">
+          <Tooltip disableInteractive title="Portable Mode will save a copy of your data in the same directory as the FlipFlip executable, as well as the default save path. This needs to be enabled on each machine.">
             <FormControlLabel
               control={
                 <Switch checked={this.props.generalSettings.portableMode}
@@ -131,7 +131,7 @@ export default class PlayerBoolCard extends React.Component {
         </Grid>
         {this.props.generalSettings.portableMode && (
           <Grid item xs={12}>
-            <Tooltip title="If on, data will only be saved in the same directory as the FlipFlip executable, and not at the default save path.">
+            <Tooltip disableInteractive title="If on, data will only be saved in the same directory as the FlipFlip executable, and not at the default save path.">
               <FormControlLabel
                 control={
                   <Switch checked={this.props.generalSettings.disableLocalSave}
