@@ -205,12 +205,6 @@ class AudioSourceListItem extends React.Component {
                 color="primary"
                 badgeContent={this.props.source.trackNum}>
                 <Tooltip placement={this.props.source.comment ? 'right' : 'bottom'}
-                         /*TODO PopperProps={this.props.source.comment || this.props.source.tags.length > 0 ? {modifiers:{
-                           preventOverflow: {
-                            enabled: true,
-                            boundariesElement: 'viewport',
-                          }
-                         }} : {}}*/
                          classes={this.props.source.comment ? {tooltip: classes.bigTooltip} : null}
                          arrow={!!this.props.source.comment || this.props.source.tags.length > 0}
                          title={

@@ -344,7 +344,7 @@ class ScriptLibrary extends React.Component {
 
     return (
       <div className={classes.root}>
-        <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift, this.props.tutorial == SLT.toolbar && clsx(classes.backdropTop, classes.disable))}>
+        <AppBar enableColorOnDark position="absolute" className={clsx(classes.appBar, open && classes.appBarShift, this.props.tutorial == SLT.toolbar && clsx(classes.backdropTop, classes.disable))}>
           <Toolbar className={classes.headerBar}>
             <div className={classes.headerLeft}>
               <Tooltip title={this.props.specialMode == SP.select || this.props.specialMode == SP.selectSingle ?

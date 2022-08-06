@@ -2,6 +2,7 @@ import {remote, ipcRenderer, IpcMessageEvent} from 'electron';
 import * as React from 'react';
 
 import {
+  Alert,
   Box,
   createTheme,
   CssBaseline,
@@ -10,9 +11,8 @@ import {
   DialogContentText,
   Slide,
   Snackbar,
-  SnackbarContent,
 } from "@mui/material";
-import { StyledEngineProvider, ThemeProvider, Theme } from '@mui/material/styles';
+import { StyledEngineProvider, ThemeProvider } from '@mui/material/styles';
 
 import {IPC, SP} from "../data/const";
 import {getCachePath} from "../data/utils";
@@ -32,13 +32,6 @@ import Tutorial from "./Tutorial";
 import AudioLibrary from "./library/AudioLibrary";
 import CaptionScriptor from "./sceneDetail/CaptionScriptor";
 import ScriptLibrary from "./library/ScriptLibrary";
-
-
-declare module '@mui/styles/defaultTheme' {
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  interface DefaultTheme extends Theme {}
-}
-
 
 const appStorage = new AppStorage(remote.getCurrentWindow().id);
 
@@ -137,6 +130,7 @@ export default class Meta extends React.Component {
   //      Generate different sources even for same scenes in grid
   //      Add option to disable "delete file" prompt
   //      Add way to notify user about images filtered due to min size
+  //      Find and replace all "<Tooltip" with "<Tooltip disableInteractive"
   render() {
     const scene = actions.getActiveScene(this.state);
     const grid = actions.getActiveGrid(this.state);
@@ -496,17 +490,14 @@ export default class Meta extends React.Component {
 
               <Snackbar
                 open={!!this.state.systemSnack}
+                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
                 autoHideDuration={2000}
                 key={this.state.systemSnack + new Date()}
                 onClose={a(actions.closeMessage)}
                 TransitionComponent={(props: any) => <Slide {...props} direction="up"/>}>
-                <SnackbarContent
-                  message={
-                    <span style={{display: 'flex', alignItems: 'center',}}>
-                      {this.state.systemSnack}
-                    </span>
-                  }
-                />
+                <Alert onClose={a(actions.closeMessage)} severity={this.state.systemSnackSeverity}>
+                  {this.state.systemSnack}
+                </Alert>
               </Snackbar>
 
               {this.state.tutorial && (

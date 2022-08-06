@@ -3,7 +3,6 @@ import * as React from "react";
 import { Grid, IconButton, Slider, Theme, Tooltip, Typography } from "@mui/material";
 import createStyles from '@mui/styles/createStyles';
 import withStyles from '@mui/styles/withStyles';
-//import ValueLabel from "@mui/material/Slider/ValueLabel";
 
 import Forward10Icon from '@mui/icons-material/Forward10';
 import Replay10Icon from '@mui/icons-material/Replay10';
@@ -27,23 +26,11 @@ const styles = (theme: Theme) => createStyles({
     marginRight: theme.spacing(3),
     marginTop: theme.spacing(2),
   },
-});
-
-/*const StyledValueLabel = withStyles((theme: Theme) => createStyles({
-  offset: {
-    top: -5,
-    left: 'calc(-50% + 8px)',
-    fontSize: '1rem',
-  },
-  circle: {
-    width: theme.spacing(1),
-    height: theme.spacing(1),
+  valueLabel: {
     backgroundColor: 'transparent',
+    top: 2
   },
-  label: {
-    color: theme.palette.text.primary,
-  }
-}))(ValueLabel as any);*/
+});
 
 class VideoControl extends React.Component {
   readonly props: {
@@ -77,7 +64,9 @@ class VideoControl extends React.Component {
             max={this.props.clipValue ? this.props.clipValue[1] : this.props.video.duration}
             color={this.props.clipValue ? "secondary" : "primary"}
             value={this.props.video.currentTime}
-            /*TODO ValueLabelComponent={(props) => <StyledValueLabel {...props}/>}*/
+            classes={{
+              valueLabel: classes.valueLabel,
+            }}
             valueLabelDisplay="on"
             valueLabelFormat={(value) => getTimestamp(value)}
             marks={this.state.marks}

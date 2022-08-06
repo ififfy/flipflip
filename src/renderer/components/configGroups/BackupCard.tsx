@@ -3,6 +3,7 @@ import path from "path";
 import clsx from "clsx";
 
 import {
+  Alert,
   Button,
   Chip,
   Dialog,
@@ -333,59 +334,43 @@ class BackupCard extends React.Component {
         </Dialog>
         <Snackbar
           open={this.state.restoreSnack}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           autoHideDuration={5000}
           onClose={this.onCloseRestoreSnack.bind(this)}
-          /*TODO TransitionComponent={(props) => <Slide {...props} direction="up"/>}*/>
-          <SnackbarContent
-            message={
-              <span className={classes.snackbarMessage}>
-                  <CheckCircleIcon color="secondary" className={classes.snackbarIcon}/>
-                  Restore succes!
-              </span>
-            }
-          />
+          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
+          <Alert onClose={this.onCloseRestoreSnack.bind(this)} severity="success">
+            Restore success!
+          </Alert>
         </Snackbar>
         <Snackbar
           open={this.state.backupSnack}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           autoHideDuration={5000}
           onClose={this.onCloseBackupSnack.bind(this)}
-          /*TODO TransitionComponent={(props) => <Slide {...props} direction="up"/>}*/>
-          <SnackbarContent
-            message={
-              <span className={classes.snackbarMessage}>
-                  <CheckCircleIcon color="primary" className={classes.snackbarIcon}/>
-                  Backup succes!
-              </span>
-            }
-          />
+          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
+          <Alert onClose={this.onCloseBackupSnack.bind(this)} severity="success">
+            Backup success!
+          </Alert>
         </Snackbar>
         <Snackbar
           open={this.state.cleanSnack}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           autoHideDuration={5000}
           onClose={this.onCloseCleanSnack.bind(this)}
-          /*TODO TransitionComponent={(props) => <Slide {...props} direction="up"/>}*/>
-          <SnackbarContent
-            message={
-              <span className={classes.snackbarMessage}>
-                  <CheckCircleIcon color="inherit" className={classes.snackbarIcon}/>
-                  Clean succes!
-              </span>
-            }
-          />
+          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
+          <Alert onClose={this.onCloseCleanSnack.bind(this)} severity="success">
+            Clean success!
+          </Alert>
         </Snackbar>
         <Snackbar
           open={!!this.state.errorSnack}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           autoHideDuration={10000}
           onClose={this.onCloseErrorSnack.bind(this)}
-          /*TODO TransitionComponent={(props) => <Slide {...props} direction="up"/>}*/>
-          <SnackbarContent
-            message={
-              <span className={classes.snackbarMessage}>
-                  <ErrorIcon color="error" className={classes.snackbarIcon}/>
-                  Error: {this.state.errorSnack ? this.state.errorSnack.message : ""}
-              </span>
-            }
-          />
+          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
+          <Alert onClose={this.onCloseErrorSnack.bind(this)} severity="error">
+            Error: {this.state.errorSnack ? this.state.errorSnack.message : ""}
+          </Alert>
         </Snackbar>
       </React.Fragment>
     );

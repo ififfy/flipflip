@@ -210,12 +210,6 @@ class AudioPlaylist extends React.Component {
                     color="primary"
                     badgeContent={a.trackNum}>
                     <Tooltip placement={a.comment ? 'right' : 'bottom'}
-                             /*TODO PopperProps={a.comment || (a.tags && a.tags.length > 0) ? {modifiers:{
-                                 preventOverflow: {
-                                   enabled: true,
-                                   boundariesElement: 'viewport',
-                                 }
-                               }} : {}}*/
                              classes={a.comment ? {tooltip: classes.bigTooltip} : null}
                              arrow={!!a.comment || (a.tags && a.tags.length > 0)}
                              title={

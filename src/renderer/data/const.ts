@@ -458,6 +458,13 @@ const PWS = { // Piwigo sort types
   sortOptionRandom: 'random',
 }
 
+const SS = { // MUI Snack Severity
+  error: 'error',
+  warning: 'warning',
+  info: 'info',
+  success: 'success',
+}
+
 export {
-  AF, ALT, ASF, BT, CST, DONE, EA, GO, GT, HTF, IF, IG, IPC, IT, LT, MO, OF, OT, PR, PT, PW, PWS, RF, RP, RT, SB, SC, SDGT, SDT, SF, SG, SGT, SL, SLT, STF, SOF, SP, SPT, ST, TF, TT, VCT, VO, VTF, WC, WF
+  AF, ALT, ASF, BT, CST, DONE, EA, GO, GT, HTF, IF, IG, IPC, IT, LT, MO, OF, OT, PR, PT, PW, PWS, RF, RP, RT, SB, SC, SDGT, SDT, SF, SG, SGT, SL, SLT, STF, SOF, SP, SPT, SS, ST, TF, TT, VCT, VO, VTF, WC, WF
 };

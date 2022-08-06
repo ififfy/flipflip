@@ -258,7 +258,7 @@ const styles = (theme: Theme) => createStyles({
     backgroundColor: theme.palette.secondary.light,
     margin: 0,
     top: 'auto',
-    right: 130,
+    right: 132,
     bottom: 20,
     left: 'auto',
     position: 'fixed',
@@ -472,7 +472,7 @@ class ScenePicker extends React.Component {
     return (
       <div className={classes.root} onClick={this.onClickCloseMenu.bind(this)}>
 
-        <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift, this.props.tutorial == SPT.scenePicker && classes.backdropTop)}>
+        <AppBar enableColorOnDark position="absolute" className={clsx(classes.appBar, open && classes.appBarShift, this.props.tutorial == SPT.scenePicker && classes.backdropTop)}>
           <Toolbar>
             {!open && (
               <IconButton

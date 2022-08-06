@@ -54,6 +54,7 @@ export const defaultInitialState = {
   progressNext: null as string,
   systemMessage: null as string,
   systemSnack: null as string,
+  systemSnackSeverity: null as string,
   tutorial: null as string,
   theme: defaultTheme,
 };
@@ -153,6 +154,7 @@ export default class AppStorage {
             progressNext: null as string,
             systemMessage: null as string,
             systemSnack: null as string,
+            systemSnackSeverity: null as string,
             tutorial: null as string,
             theme: defaultTheme,
           };
@@ -229,6 +231,7 @@ export default class AppStorage {
             progressNext: null as string,
             systemMessage: null as string,
             systemSnack: null as string,
+            systemSnackSeverity: null as string,
             tutorial: null as string,
             theme: defaultTheme,
           };
@@ -361,6 +364,7 @@ export default class AppStorage {
         case "3.1.3":
         case "3.1.4":
         case "3.2.0":
+        case "3.2.1":
           this.initialState = {
             version: __VERSION__,
             specialMode: data.specialMode,
@@ -393,6 +397,7 @@ export default class AppStorage {
             progressNext: null as string,
             systemMessage: null as string,
             systemSnack: null as string,
+            systemSnackSeverity: null as string,
             tutorial: data.tutorial,
             theme: data.theme,
           };
@@ -433,6 +438,7 @@ export default class AppStorage {
             progressNext: null as string,
             systemMessage: null as string,
             systemSnack: null as string,
+            systemSnackSeverity: null as string,
             tutorial: data.tutorial,
             theme: data.theme,
           };

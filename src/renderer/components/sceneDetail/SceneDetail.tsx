@@ -2,6 +2,7 @@ import * as React from "react";
 import clsx from "clsx";
 
 import {
+  Alert,
   AppBar,
   Backdrop,
   Badge,
@@ -347,15 +348,6 @@ const styles = (theme: Theme) => createStyles({
     height: '100%',
     width: '100%',
   },
-  snackbarIcon: {
-    fontSize: 20,
-    opacity: 0.9,
-    marginRight: theme.spacing(1),
-  },
-  snackbarMessage: {
-    display: 'flex',
-    alignItems: 'center',
-  },
   backdropTop: {
     zIndex: `${theme.zIndex.modal + 1} !important` as any,
   },
@@ -436,7 +428,7 @@ class SceneDetail extends React.Component {
     return (
       <div className={classes.root}>
 
-        <AppBar position="absolute" className={clsx(classes.appBar, (this.props.tutorial == SDT.title || this.props.tutorial == SDT.play) && classes.backdropTop)}>
+        <AppBar enableColorOnDark position="absolute" className={clsx(classes.appBar, (this.props.tutorial == SDT.title || this.props.tutorial == SDT.play) && classes.backdropTop)}>
           <Toolbar>
             <Tooltip title="Back" placement="right-end">
               <IconButton
@@ -468,7 +460,7 @@ class SceneDetail extends React.Component {
                 <div className={classes.fill}/>
                 <Typography component="h1" variant="h4" color="inherit" noWrap
                             className={clsx(classes.title, this.props.scene.name.length == 0 && classes.noTitle, this.props.tutorial == SDT.title && classes.highlight)}
-                            /*TODO onClick={this.beginEditingName.bind(this)}*/>
+                            onClick={this.beginEditingName.bind(this)}>
                   {this.props.scene.name}
                 </Typography>
                 <div className={classes.fill}/>
@@ -1101,23 +1093,23 @@ class SceneDetail extends React.Component {
         )}
         <Snackbar
           open={!!this.state.snackbar}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           autoHideDuration={5000}
           ClickAwayListenerProps={{mouseEvent: false}}
           onClose={this.onCloseSnackbar.bind(this)}
-          /*TODO TransitionComponent={(props) => <Slide {...props} direction="up"/>}*/>
-          <SnackbarContent
-            message={
-              <span className={classes.snackbarMessage}>
-                {this.state.snackbarType == SB.warning && (
-                  <WarningIcon color="inherit" className={classes.snackbarIcon}/>
-                )}
-                {this.state.snackbarType == SB.success && (
-                  <CheckIcon color="inherit" className={classes.snackbarIcon}/>
-                )}
+          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
+          <React.Fragment>
+            {this.state.snackbarType == SB.warning && (
+              <Alert onClose={this.onCloseSnackbar.bind(this)} severity="warning">
                 {this.state.snackbar}
-              </span>
-            }
-          />
+              </Alert>
+            )}
+            {this.state.snackbarType == SB.success && (
+              <Alert onClose={this.onCloseSnackbar.bind(this)} severity="success">
+                {this.state.snackbar}
+              </Alert>
+            )}
+          </React.Fragment>
         </Snackbar>
       </div>
     );

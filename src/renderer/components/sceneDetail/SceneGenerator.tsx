@@ -28,7 +28,6 @@ import {
 } from "@mui/material";
 import createStyles from '@mui/styles/createStyles';
 import withStyles from '@mui/styles/withStyles';
-//import ValueLabel from "@mui/material/Slider/ValueLabel";
 
 import AddIcon from '@mui/icons-material/Add';
 import AdjustIcon from '@mui/icons-material/Adjust';
@@ -119,24 +118,17 @@ const styles = (theme: Theme) => createStyles({
   },
   disable: {
     pointerEvents: 'none',
-  }
+  },
+  valueLabel: {
+    top: theme.spacing(2.75),
+    right: 'unset',
+    left: theme.spacing(4),
+    '&:before': {
+      left: '0%',
+      right: 'unset'
+    }
+  },
 });
-
-/*const StyledValueLabel = withStyles({
-  offset: {
-    top: -10,
-    left: 'calc(-50% + 28px)',
-  },
-  circle: {
-    borderRadius: '0 50% 50% 50%',
-  },
-  open: {},
-  thumb: {
-    '&$open $offset': {
-      transform: 'scale(1)',
-    },
-  },
-})(ValueLabel);*/
 
 class SceneGenerator extends React.Component {
   readonly props: {
@@ -297,12 +289,14 @@ class SceneGenerator extends React.Component {
             <div className={clsx(classes.slider, isWeighing.type != TT.weight && classes.sliderClose)}>
               <Slider
                 className={classes.editSlider}
+                classes={{
+                  valueLabel: classes.valueLabel,
+                }}
                 max={this.getRemainingPercent() + isWeighing.percent}
                 defaultValue={isWeighing.percent}
                 onChangeCommitted={this.onGroupSliderChange.bind(this, this.state.isWeighing, 'percent')}
                 valueLabelDisplay={'auto'}
                 valueLabelFormat={(v) => v + "%"}
-                /*TODO ValueLabelComponent={StyledValueLabel as any}*/
                 orientation="vertical"/>
             </div>
           )}

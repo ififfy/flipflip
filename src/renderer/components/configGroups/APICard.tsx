@@ -8,6 +8,7 @@ import wretch from "wretch";
 import {IgApiClient, IgCheckpointError, IgLoginTwoFactorRequiredError} from "instagram-private-api";
 
 import {
+  Alert,
   Avatar,
   Button,
   Collapse,
@@ -28,7 +29,6 @@ import {
   Select,
   Slide,
   Snackbar,
-  SnackbarContent,
   Switch,
   TextField,
   Theme,
@@ -38,9 +38,6 @@ import {
 
 import createStyles from '@mui/styles/createStyles';
 import withStyles from '@mui/styles/withStyles';
-
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import ErrorIcon from '@mui/icons-material/Error';
 
 import Config, {RemoteSettings} from "../../data/Config";
 import {IG, MO, ST} from "../../data/const";
@@ -75,15 +72,6 @@ const styles = (theme: Theme) => createStyles({
   },
   center: {
     textAlign: 'center',
-  },
-  snackbarIcon: {
-    fontSize: 20,
-    opacity: 0.9,
-    marginRight: theme.spacing(1),
-  },
-  snackbarMessage: {
-    display: 'flex',
-    alignItems: 'center',
   },
   middleInput: {
     marginLeft: theme.spacing(1),
@@ -613,32 +601,24 @@ class APICard extends React.Component {
 
         <Snackbar
           open={!!this.state.successSnack}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           autoHideDuration={20000}
           onClose={this.onCloseSnack.bind(this)}
-          /*TODO TransitionComponent={(props) => <Slide {...props} direction="up"/>}*/>
-          <SnackbarContent
-            message={
-              <span className={classes.snackbarMessage}>
-                  <CheckCircleIcon color="inherit" className={classes.snackbarIcon}/>
-                  {this.state.successSnack}
-              </span>
-            }
-          />
+          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
+          <Alert onClose={this.onCloseSnack.bind(this)} severity="success">
+            {this.state.successSnack}
+          </Alert>
         </Snackbar>
 
         <Snackbar
           open={!!this.state.errorSnack}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           autoHideDuration={20000}
           onClose={this.onCloseErrorSnack.bind(this)}
-          /*TOOD TransitionComponent={(props) => <Slide {...props} direction="up"/>}*/>
-          <SnackbarContent
-            message={
-              <span className={classes.snackbarMessage}>
-                  <ErrorIcon color="error" className={classes.snackbarIcon}/>
-                  Error: {this.state.errorSnack}
-              </span>
-            }
-          />
+          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
+          <Alert onClose={this.onCloseErrorSnack.bind(this)} severity="error">
+            Error: {this.state.errorSnack}
+          </Alert>
         </Snackbar>
       </React.Fragment>
     );

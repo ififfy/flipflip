@@ -302,7 +302,7 @@ class CaptionScriptor extends React.Component {
 
     return (
       <div className={classes.root}>
-        <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
+        <AppBar enableColorOnDark position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
           <Toolbar className={classes.headerBar}>
             <div className={classes.headerLeft}>
               <Tooltip title="Back" placement="right-end">

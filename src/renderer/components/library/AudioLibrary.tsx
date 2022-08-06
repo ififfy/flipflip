@@ -454,7 +454,7 @@ class AudioLibrary extends React.Component {
     const playlist = this.state.filters.find((f) => f.startsWith("playlist:"))?.replace("playlist:", "");
     return (
       <div className={classes.root}>
-        <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift, this.props.tutorial == ALT.toolbar && clsx(classes.backdropTop, classes.disable))}>
+        <AppBar enableColorOnDark position="absolute" className={clsx(classes.appBar, open && classes.appBarShift, this.props.tutorial == ALT.toolbar && clsx(classes.backdropTop, classes.disable))}>
           <Toolbar className={classes.headerBar}>
             <div className={classes.headerLeft}>
               <Tooltip title={this.props.specialMode == SP.select ? "Cancel Import" : "Back"} placement="right-end">

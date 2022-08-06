@@ -3,6 +3,7 @@ import clsx from "clsx";
 import * as fs from "fs";
 
 import {
+  Alert,
   AppBar,
   Box,
   Button,
@@ -19,8 +20,8 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  Slide,
   Snackbar,
-  SnackbarContent,
   Tab,
   Tabs,
   Theme,
@@ -35,7 +36,6 @@ import withStyles from '@mui/styles/withStyles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import BuildIcon from '@mui/icons-material/Build';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import ErrorIcon from '@mui/icons-material/Error';
 import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 import MenuIcon from'@mui/icons-material/Menu';
 import PhotoFilterIcon from '@mui/icons-material/PhotoFilter';
@@ -210,7 +210,7 @@ class ConfigForm extends React.Component {
     return (
       <div className={classes.root}>
 
-        <AppBar position="absolute" className={classes.appBar}>
+        <AppBar enableColorOnDark position="absolute" className={classes.appBar}>
           <Toolbar>
             <Tooltip title="Back" placement="right-end">
               <IconButton
@@ -430,17 +430,13 @@ class ConfigForm extends React.Component {
 
         <Snackbar
           open={!!this.state.errorSnack}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           autoHideDuration={20000}
           onClose={this.onCloseErrorSnack.bind(this)}
-          /*TODO TransitionComponent={(props) => <Slide {...props} direction="up"/>}*/>
-          <SnackbarContent
-            message={
-              <span className={classes.snackbarMessage}>
-                  <ErrorIcon color="error" className={classes.snackbarIcon}/>
-                  Error: {this.state.errorSnack}
-              </span>
-            }
-          />
+          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
+          <Alert onClose={this.onCloseErrorSnack.bind(this)} severity="error">
+            Error: {this.state.errorSnack}
+          </Alert>
         </Snackbar>
       </div>
     );

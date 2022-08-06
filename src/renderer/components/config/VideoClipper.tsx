@@ -25,7 +25,6 @@ import {
 } from "@mui/material";
 import createStyles from '@mui/styles/createStyles';
 import withStyles from '@mui/styles/withStyles';
-//TODO import ValueLabel from "@mui/material/Slider/ValueLabel";
 
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -176,23 +175,11 @@ const styles = (theme: Theme) => createStyles({
       backgroundColor: red[700],
     },
   },
-});
-
-/*const StyledValueLabel = withStyles((theme: Theme) => createStyles({
-  offset: {
-    top: -5,
-    left: 'calc(-50% + 8px)',
-    fontSize: '1rem',
-  },
-  circle: {
-    width: theme.spacing(1),
-    height: theme.spacing(1),
+  valueLabel: {
     backgroundColor: 'transparent',
+    top: 2
   },
-  label: {
-    color: theme.palette.text.primary,
-  }
-}))(ValueLabel as any);*/
+});
 
 class VideoClipper extends React.Component {
   readonly props: {
@@ -231,8 +218,7 @@ class VideoClipper extends React.Component {
 
     return (
       <div className={clsx(classes.root, "VideoClipper")}>
-        <AppBar
-          className={classes.appBar}>
+        <AppBar enableColorOnDark className={classes.appBar}>
           <Toolbar className={classes.headerBar}>
             <div className={classes.headerLeft}>
               <Tooltip title="Back" placement="right-end">
@@ -403,7 +389,9 @@ class VideoClipper extends React.Component {
                             min={0}
                             max={this.state.video.duration}
                             value={this.state.isEditingValue}
-                            /*TODO ValueLabelComponent={(props) => <StyledValueLabel {...props}/>}*/
+                            classes={{
+                              valueLabel: classes.valueLabel,
+                            }}
                             valueLabelDisplay="on"
                             valueLabelFormat={(value) => getTimestamp(value)}
                             marks={[{value: 0, label: getTimestamp(0)}, {value: this.state.video.duration, label: getTimestamp(this.state.video.duration)}]}

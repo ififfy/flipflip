@@ -88,9 +88,6 @@ const styles = (theme: Theme) => createStyles({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  gridCellLabel: {
-    display: 'flex',
     flexDirection: 'column',
   },
   sceneMenu: {
@@ -207,7 +204,7 @@ class GridSetup extends React.Component {
     return (
       <div className={classes.root}>
 
-        <AppBar position="absolute" className={clsx(classes.appBar, this.props.tutorial == SGT.dimensions && classes.backdropTop)}>
+        <AppBar enableColorOnDark position="absolute" className={clsx(classes.appBar, this.props.tutorial == SGT.dimensions && classes.backdropTop)}>
           <Toolbar className={classes.headerBar}>
             <div className={classes.headerLeft}>
               <Tooltip title="Back" placement="right-end">
@@ -241,7 +238,7 @@ class GridSetup extends React.Component {
             {this.state.isEditingName == null && (
               <Typography component="h1" variant="h4" noWrap
                           className={clsx(classes.title, this.props.scene.name.length == 0 && classes.noTitle, this.props.tutorial == SGT.dimensions && classes.disable)}
-                          /*TODO onClick={this.beginEditingName.bind(this)}*/>
+                          onClick={this.beginEditingName.bind(this)}>
                 {this.props.scene.name}
               </Typography>
             )}
@@ -315,10 +312,6 @@ class GridSetup extends React.Component {
                         <Button
                           id={rowIndex + "-" + colIndex}
                           className={classes.gridCell}
-                          // TODO Used to be "label", verify "text" is working as expected
-                          classes={{
-                            text: classes.gridCellLabel
-                          }}
                           style={(colors[rowIndex] == undefined || colors[rowIndex][colIndex] == undefined || colors[rowIndex][colIndex] == "") ? {} : {borderStyle: 'solid', borderWidth: 10, borderColor: colors[rowIndex][colIndex]}}
                           variant="outlined">
                           {scene ? scene.name : sceneCopy ? "*" + sceneCopy.name + "*" : ""}

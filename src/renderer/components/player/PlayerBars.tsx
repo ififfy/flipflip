@@ -325,6 +325,7 @@ class PlayerBars extends React.Component {
           onMouseLeave={this.onMouseLeaveAppBar.bind(this)}/>
 
         <AppBar
+          enableColorOnDark
           position="absolute"
           onMouseEnter={this.onMouseEnterAppBar.bind(this)}
           onMouseLeave={this.onMouseLeaveAppBar.bind(this)}

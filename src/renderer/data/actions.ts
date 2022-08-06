@@ -30,8 +30,37 @@ import {
 import {getFileGroup, getFileName, getSourceType, isVideo, isVideoPlaylist} from "../components/player/Scrapers";
 import defaultTheme from "./theme";
 import {
-  AF, ALT, ASF, BT, CST, DONE, GT, HTF, IF, IT, LT, OF, PR, PT, RP, SDGT, SDT, SF, SGT, SL, SLT, SOF, SP, SPT, ST, TF,
-  TT, VCT, VO, VTF
+  AF,
+  ALT,
+  ASF,
+  BT,
+  CST,
+  DONE,
+  GT,
+  HTF,
+  IF,
+  IT,
+  LT,
+  OF,
+  PR,
+  PT,
+  RP,
+  SDGT,
+  SDT,
+  SF,
+  SGT,
+  SL,
+  SLT,
+  SOF,
+  SP,
+  SPT,
+  SS,
+  ST,
+  TF,
+  TT,
+  VCT,
+  VO,
+  VTF
 } from "./const";
 import {defaultInitialState} from './AppStorage';
 import {Route} from "./Route";
@@ -175,6 +204,7 @@ export function restoreFromBackup(state: State, backupFile: string): Object {
     progressNext: null as string,
     systemMessage: null as string,
     systemSnack: null as string,
+    systemSnackSeverity: null as string,
     tutorial: null as string,
     theme: data.theme ? data.theme : defaultTheme,
   };
@@ -488,7 +518,8 @@ export function cloneScene(state: State, scene: Scene): Object {
     scenes: state.scenes.concat([sceneCopy]),
     route: [new Route({kind: 'scene', value: sceneCopy.id})],
     specialMode: SP.autoEdit,
-    systemSnack: "Clone successful!"
+    systemSnack: "Clone successful!",
+    systemSnackSeverity: SS.success,
   };
 }
 
@@ -505,20 +536,21 @@ export function saveScene(state: State, scene: Scene): Object {
     scenes: state.scenes.concat([sceneCopy]),
     route: [new Route({kind: 'scene', value: sceneCopy.id})],
     specialMode: SP.autoEdit,
-    systemSnack: "Save successful!"
+    systemSnack: "Save successful!",
+    systemSnackSeverity: SS.success,
   };
 }
 
 export function closeMessage(state: State): Object {
-  return {systemMessage: null, systemSnack: null};
+  return {systemMessage: null, systemSnack: null, systemSnackSeverity: null};
 }
 
 export function systemMessage(state: State, message: string): Object {
   return {systemMessage: message};
 }
 
-export function systemSnack(state: State, message: string): Object {
-  return {systemSnack: message};
+export function systemSnack(state: State, message: string, severity: string): Object {
+  return {systemSnack: message, systemSnackSeverity: severity};
 }
 
 export function changeScenePickerTab(state: State, newTab: number): Object {
@@ -2918,6 +2950,7 @@ export function importScene(state: State, importScenes: any, addToLibrary: boole
       }
       return {
         systemSnack: message,
+        systemSnackSeverity: SS.info,
         scenes: newScenes,
         grids: newGrids,
         library: state.library.concat(sources),
@@ -2928,6 +2961,7 @@ export function importScene(state: State, importScenes: any, addToLibrary: boole
     } else {
       return {
         systemSnack: "No new sources detected",
+        systemSnackSeverity: SS.info,
         scenes: newScenes,
         grids: newGrids,
         route: [new Route({kind: 'scene', value: scene.id})]};
@@ -3009,7 +3043,7 @@ export function importLibrary(state: State, backup: Function, libraryImport: any
     }
   }
 
-  return {systemSnack: "Library Import complete!", library: newLibrary, tags: newTags};
+  return {systemSnack: "Library Import complete!", systemSnackSeverity: SS.success, library: newLibrary, tags: newTags};
 }
 
 export function setMode(state: State, mode: string): Object {
@@ -3034,6 +3068,7 @@ export function markOffline(getState: () => State, setState: Function) {
       win.setProgressBar(-1);
       setState({
         systemSnack: "Offline Check has completed. Sources not available are now marked.",
+        systemSnackSeverity: SS.success,
         progressMode: null,
         progressCurrent: 0,
         progressTotal: 0,
@@ -3199,6 +3234,7 @@ export function detectBPMs(getState: () => State, setState: Function) {
       win.setProgressBar(-1);
       setState({
         systemSnack: "BPM Detection has completed.",
+        systemSnackSeverity: SS.success,
         progressMode: null,
         progressCurrent: 0,
         progressTotal: 0,
@@ -3256,6 +3292,7 @@ export function updateVideoMetadata(getState: () => State, setState: Function) {
       win.setProgressBar(-1);
       setState({
         systemSnack: "Video Metadata update has completed.",
+        systemSnackSeverity: SS.success,
         progressMode: null,
         progressCurrent: 0,
         progressTotal: 0,
@@ -3380,7 +3417,7 @@ export function importTumblr(getState: () => State, setState: Function) {
         setTimeout(tumblrImportLoop, 1500);
       } else {
         win.setProgressBar(-1);
-        setState({systemSnack: "Tumblr Following Import has completed", progressMode: null, progressCurrent: 0, progressTotal: 0});
+        setState({systemSnack: "Tumblr Following Import has completed", systemSnackSeverity: SS.success, progressMode: null, progressCurrent: 0, progressTotal: 0});
       }
     });
   };
@@ -3432,7 +3469,7 @@ export function importReddit(getState: () => State, setState: Function) {
     reddit.getSubscriptions({limit: 20, after: state.progressNext}).then((subscriptionListing: any) => {
       if (subscriptionListing.length == 0) {
         win.setProgressBar(-1);
-        setState({systemSnack: "Reddit Subscription Import has completed", progressMode: null, progressNext: null, progressCurrent: 0});
+        setState({systemSnack: "Reddit Subscription Import has completed", systemSnackSeverity: SS.success, progressMode: null, progressNext: null, progressCurrent: 0});
       } else {
         // Get the next 20 blogs
         let subscriptions = [];
@@ -3491,6 +3528,7 @@ export function importReddit(getState: () => State, setState: Function) {
     state.progressCurrent = 0;
     setState({
       systemSnack: "Your Reddit subscriptions are being imported... You will recieve an alert when the import is finished.",
+      systemSnackSeverity: SS.info,
       progressMode: state.progressMode, progressCurrent: state.progressCurrent
     });
     win.setProgressBar(2);
@@ -3551,7 +3589,7 @@ export function importTwitter(getState: () => State, setState: Function) {
 
       if (data.next_cursor == 0) { // We're done
         win.setProgressBar(-1);
-        setState({systemSnack: "Twitter Following Import has completed", progressMode: null, progressNext: null, progressCurrent: 0});
+        setState({systemSnack: "Twitter Following Import has completed", systemSnackSeverity: SS.success, progressMode: null, progressNext: null, progressCurrent: 0});
       } else {
         // Loop until we run out of blogs
         setTimeout(twitterImportLoop, 1500);
@@ -3577,6 +3615,7 @@ export function importTwitter(getState: () => State, setState: Function) {
     state.progressCurrent = 0;
     setState({
       systemSnack: "Your Twitter Following is being imported... You will recieve an alert when the import is finished.",
+      systemSnackSeverity: SS.info,
       progressMode: state.progressMode, progressCurrent: state.progressCurrent
     });
     win.setProgressBar(2);
@@ -3661,7 +3700,7 @@ export function importInstagram(getState: () => State, setState: Function) {
         if (!followingFeed.isMoreAvailable()) {
           ig = null;
           win.setProgressBar(-1);
-          setState({systemSnack: "Instagram Following Import has completed", progressMode: null, progressNext: null, progressCurrent: 0});
+          setState({systemSnack: "Instagram Following Import has completed", systemSnackSeverity: SS.success, progressMode: null, progressNext: null, progressCurrent: 0});
           return;
         }
         followingFeed.items().then((items) => {
@@ -3678,6 +3717,7 @@ export function importInstagram(getState: () => State, setState: Function) {
     state.progressCurrent = 0;
     setState({
       systemSnack: "Your Instagram Following is being imported... You will recieve an alert when the import is finished.",
+      systemSnackSeverity: SS.info,
       progressMode: state.progressMode, progressCurrent: state.progressCurrent
     });
     win.setProgressBar(2);
