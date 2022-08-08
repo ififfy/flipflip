@@ -100,7 +100,7 @@ const styles = (theme: Theme) => createStyles({
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
     height: theme.spacing(8),
-    marginTop: -theme.spacing(8) - 3,
+    marginTop: theme.spacing(-8.5),
     transition: theme.transitions.create('margin', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,

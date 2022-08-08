@@ -2,7 +2,7 @@ import * as React from "react";
 import {remote} from "electron";
 import path from 'path';
 import clsx from "clsx";
-import * as mm from "music-metadata";
+import {parseBuffer, parseFile} from "music-metadata";
 import * as fs from "fs";
 import wretch from "wretch";
 
@@ -1294,7 +1294,7 @@ class AudioLibrary extends React.Component {
       .timeout(error)
       .internalError(error)
       .arrayBuffer((buffer) => {
-        mm.parseBuffer(Buffer.from(buffer))
+        parseBuffer(Buffer.from(buffer))
           .then((metadata: any) => {
             if (metadata) {
               extractMusicMetadata(newAudio, metadata, this.props.cachePath);
@@ -1351,7 +1351,7 @@ class AudioLibrary extends React.Component {
           tags: [],
         });
         id += 1;
-        mm.parseFile(url)
+        parseFile(url)
           .then((metadata: any) => {
             if (metadata) {
               extractMusicMetadata(newAudio, metadata, this.props.cachePath);

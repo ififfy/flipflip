@@ -2,7 +2,7 @@ import * as React from "react";
 import {IncomingMessage} from "electron";
 import clsx from "clsx";
 import {analyze} from "web-audio-beat-detector";
-import * as mm from "music-metadata";
+import { parseFile } from 'music-metadata';
 import {existsSync, readFileSync} from "fs";
 import request from "request";
 
@@ -445,7 +445,7 @@ class AudioOptions extends React.Component {
   onReadBPMTag() {
     if (this.state.audio.url && !this.state.loadingTag) {
       this.setState({loadingTag: true});
-      mm.parseFile(this.state.audio.url)
+      parseFile(this.state.audio.url)
         .then((metadata: any) => {
           if (metadata && metadata.common && metadata.common.bpm) {
             this.changeKey('bpm', metadata.common.bpm);

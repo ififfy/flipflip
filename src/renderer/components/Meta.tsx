@@ -130,6 +130,7 @@ export default class Meta extends React.Component {
   //      Generate different sources even for same scenes in grid
   //      Add option to disable "delete file" prompt
   //      Add way to notify user about images filtered due to min size
+  //      Grids are slightly erroneously offset due to -5 margin. Need to add margin around entire grid to compensate
   render() {
     const scene = actions.getActiveScene(this.state);
     const grid = actions.getActiveGrid(this.state);

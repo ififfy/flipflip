@@ -2,7 +2,7 @@ import * as React from "react";
 import {remote} from "electron";
 import {readFileSync} from "fs";
 import clsx from "clsx";
-import * as mm from "music-metadata";
+import {parseFile} from "music-metadata";
 
 import {
   Button,
@@ -208,7 +208,7 @@ class AudioEdit extends React.Component {
 
   loadSuggestions() {
     const url = this.state.audio.url;
-    mm.parseFile(url)
+    parseFile(url)
       .then((metadata: any) => {
         if (metadata) {
           const newAudio = new Audio(this.state.audio);

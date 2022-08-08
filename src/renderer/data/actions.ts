@@ -10,7 +10,7 @@ import Snoowrap from "snoowrap";
 import Twitter from "twitter";
 import {IgApiClient} from "instagram-private-api";
 import {analyze} from "web-audio-beat-detector";
-import * as mm from "music-metadata";
+import {parseFile} from "music-metadata";
 import request from "request";
 import moment from "moment";
 
@@ -3149,7 +3149,7 @@ export function detectBPMs(getState: () => State, setState: Function) {
   const readMetadata = (audio: Audio, offset: number) => {
     const win = remote.getCurrentWindow();
     const state = getState();
-    mm.parseFile(audio.url)
+    parseFile(audio.url)
       .then((metadata: any) => {
         if (metadata && metadata.common && metadata.common.bpm) {
           audio.bpm = metadata.common.bpm;

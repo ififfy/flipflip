@@ -184,7 +184,7 @@ class CacheCard extends React.Component {
         getFolderSize(getCachePath(null, this.props.config), (err: string, size: number) => {
           if (err) { throw err; }
           const mbSize = (size / 1024 / 1024);
-          this.setState({cacheSize: mbSize.toFixed(2) + "MB"});
+          this.setState({cacheSize: mbSize.toFixed(2)});
         });
       }
     }
