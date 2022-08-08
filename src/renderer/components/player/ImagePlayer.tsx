@@ -32,7 +32,7 @@ export default class ImagePlayer extends React.Component {
     isPlaying: boolean,
     historyOffset: number,
     hasStarted: boolean,
-    finishedLoading: number,
+    singleImage: number,
     deleteHack?: ChildCallbackHack,
     gridCoordinates?: Array<number>,
     isOverlay?: boolean,
@@ -316,7 +316,7 @@ export default class ImagePlayer extends React.Component {
   }
 
   animationFrame = () => {
-    if (!this._isMounted || (this.props.finishedLoading == 1)) {
+    if (!this._isMounted || (this.props.singleImage)) {
       cancelAnimationFrame(this._animationFrameHandle);
       return;
     }
@@ -993,7 +993,7 @@ export default class ImagePlayer extends React.Component {
         timeToNextFrame,
       });
       this._count++;
-      if (!(nextImg instanceof HTMLVideoElement && this.props.scene.videoOption == VO.full) && !(this.props.finishedLoading == 1 && this.state.historyPaths.length > 0 && getSourceType(this.state.historyPaths[this.state.historyPaths.length - 1]?.getAttribute("source")) == ST.nimja)) {
+      if (!(nextImg instanceof HTMLVideoElement && this.props.scene.videoOption == VO.full) && !(this.props.singleImage && this.state.historyPaths.length > 0 && getSourceType(this.state.historyPaths[this.state.historyPaths.length - 1]?.getAttribute("source")) == ST.nimja)) {
         this._timeout = setTimeout(this.advance.bind(this, false, true), timeToNextFrame);
       }
     }

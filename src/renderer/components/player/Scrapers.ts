@@ -1903,7 +1903,7 @@ export const loadEHentai = (allURLs: Map<string, Array<string>>, config: Config,
 }
 
 export const loadLuscious = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
-  const timeout = 8000;
+  const timeout = 5000;
   const url = source.url;
   if (url.includes("albums")) {
     const name = getFileGroup(url);
@@ -1962,13 +1962,14 @@ export const loadLuscious = (allURLs: Map<string, Array<string>>, config: Config
       .json((json) => {
         const hasNextPage = json.data.picture.list.info.has_next_page;
         const items = json.data.picture.list.items;
+        const totalItems = json.data.picture.list.info.total_items;
         if (items.length > 0) {
           const images = [];
           for (let item of items) {
             images.push(item.url_to_original);
           }
           helpers.next = hasNextPage ? helpers.next + 1 : null;
-          helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+          helpers.count = totalItems;
           pm({
             data: filterPathsToJustPlayable(filter, images, true),
             allURLs: allURLs,
