@@ -131,6 +131,9 @@ export default class Meta extends React.Component {
   //      Add option to disable "delete file" prompt
   //      Add way to notify user about images filtered due to min size
   //      Grids are slightly erroneously offset due to -5 margin. Need to add margin around entire grid to compensate
+  //      Pressing hamburger button on ScenePicker causes it to disappear
+  //      Pressing hamburger button second time on Scene has bad animation
+  //      RecentPicture grid is not scrolling
   render() {
     const scene = actions.getActiveScene(this.state);
     const grid = actions.getActiveGrid(this.state);

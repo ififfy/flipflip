@@ -77,6 +77,9 @@ const styles = (theme: Theme) => createStyles({
     backgroundColor: theme.palette.error.contrastText,
     borderRadius: '50%',
   },
+  importBadge:{
+    zIndex: theme.zIndex.fab + 1,
+  },
   actionButton: {
     marginLeft: theme.spacing(1),
   },
@@ -167,6 +170,9 @@ class SourceListItem extends React.Component {
           )}
           <ListItemAvatar>
             <Badge
+              classes={{
+                badge: classes.importBadge
+              }}
               invisible={!this.props.source.offline}
               overlap="circular"
               anchorOrigin={{

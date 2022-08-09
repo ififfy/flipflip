@@ -77,9 +77,6 @@ const styles = (theme: Theme) => createStyles({
   listAvatar: {
     width: 56,
   },
-  trackNum: {
-    top: 17,
-  },
   bigTooltip: {
     fontSize: "medium",
     maxWidth: 500,
@@ -204,9 +201,9 @@ class AudioPlaylist extends React.Component {
               <ListItem key={i}>
                 <ListItemAvatar className={classes.listAvatar}>
                   <Badge
-                    classes={{anchorOriginTopRightRectangular: classes.trackNum}}
                     invisible={!a.trackNum}
                     max={999}
+                    overlap="rectangular"
                     color="primary"
                     badgeContent={a.trackNum}>
                     <Tooltip disableInteractive placement={a.comment ? 'right' : 'bottom'}

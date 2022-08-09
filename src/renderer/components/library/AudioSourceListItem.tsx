@@ -104,9 +104,6 @@ const styles = (theme: Theme) => createStyles({
   thumbImage: {
     height: '100%',
   },
-  trackNum: {
-    top: 17,
-  },
   trackName: {
     maxWidth: 500,
     minWidth: 250,
@@ -196,12 +193,13 @@ class AudioSourceListItem extends React.Component {
             anchorOrigin={{vertical: 'top', horizontal: 'left'}}
             variant={"dot"}
             invisible={!this.props.source.marked}
+            overlap="rectangular"
             color="secondary">
             <ListItemAvatar className={classes.listAvatar}>
               <Badge
-                classes={{anchorOriginTopRightRectangular: classes.trackNum}}
                 invisible={!this.props.source.trackNum}
                 max={999}
+                overlap="rectangular"
                 color="primary"
                 badgeContent={this.props.source.trackNum}>
                 <Tooltip disableInteractive placement={this.props.source.comment ? 'right' : 'bottom'}

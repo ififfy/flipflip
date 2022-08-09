@@ -252,9 +252,10 @@ const styles = (theme: Theme) => createStyles({
   importBadge:{
     top: 'auto',
     right: 30,
-    bottom: 75,
+    bottom: 50,
     left: 'auto',
     position: 'fixed',
+    zIndex: theme.zIndex.fab + 1,
   },
   addButton: {
     backgroundColor: theme.palette.primary.main,
@@ -744,7 +745,10 @@ class AudioLibrary extends React.Component {
             {this.props.specialMode == SP.batchTag && (
               <Tooltip disableInteractive title={"Batch Tag"}  placement="top-end">
                 <Badge
-                  className={classes.importBadge}
+                  classes={{
+                    badge: classes.importBadge
+                  }}
+                  overlap="circular"
                   color="secondary"
                   badgeContent={this.state.selected.length}
                   max={999}>
@@ -761,7 +765,10 @@ class AudioLibrary extends React.Component {
             {this.props.specialMode == SP.batchEdit && (
               <Tooltip disableInteractive title={"Batch Edit"}  placement="top-end">
                 <Badge
-                  className={classes.importBadge}
+                  classes={{
+                    badge: classes.importBadge
+                  }}
+                  overlap="circular"
                   color="secondary"
                   badgeContent={this.state.selected.length}
                   max={999}>
@@ -778,7 +785,10 @@ class AudioLibrary extends React.Component {
             {this.props.specialMode == SP.addToPlaylist && (
               <Tooltip disableInteractive title={"Add to Playlist"}  placement="top-end">
                 <Badge
-                  className={classes.importBadge}
+                  classes={{
+                    badge: classes.importBadge
+                  }}
+                  overlap="circular"
                   color="secondary"
                   badgeContent={this.state.selected.length}
                   max={999}>
@@ -795,7 +805,10 @@ class AudioLibrary extends React.Component {
             {this.props.specialMode == SP.select && (
               <Tooltip disableInteractive title={"Import"}  placement="top-end">
                 <Badge
-                  className={classes.importBadge}
+                  classes={{
+                    badge: classes.importBadge
+                  }}
+                  overlap="circular"
                   color="secondary"
                   badgeContent={this.state.selected.length}
                   max={999}>

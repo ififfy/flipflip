@@ -226,9 +226,10 @@ const styles = (theme: Theme) => createStyles({
   importBadge:{
     top: 'auto',
     right: 30,
-    bottom: 75,
+    bottom: 50,
     left: 'auto',
     position: 'fixed',
+    zIndex: theme.zIndex.fab + 1,
   },
   addButton: {
     backgroundColor: theme.palette.primary.main,
@@ -495,7 +496,10 @@ class ScriptLibrary extends React.Component {
             </Tooltip>
             <Tooltip disableInteractive title={this.props.specialMode == SP.batchTag ? "Batch Tag" : "Import"}  placement="top-end">
               <Badge
-                className={classes.importBadge}
+                classes={{
+                  badge: classes.importBadge
+                }}
+                overlap="circular"
                 color="secondary"
                 badgeContent={this.state.selected.length}
                 max={999}>

@@ -322,6 +322,14 @@ const styles = (theme: Theme) => createStyles({
       duration: theme.transitions.duration.leavingScreen,
     }),
   },
+  importBadge:{
+    top: 'auto',
+    right: 30,
+    bottom: 50,
+    left: 'auto',
+    position: 'fixed',
+    zIndex: theme.zIndex.fab + 1,
+},
   icon: {
     color: theme.palette.primary.contrastText,
   },
@@ -1049,6 +1057,10 @@ class SceneDetail extends React.Component {
                   onClick={this.onGenerate.bind(this)}
                   size="large">
                   <Badge
+                    classes={{
+                      badge: classes.importBadge
+                    }}
+                    overlap="circular"
                     color="secondary"
                     max={100}
                     invisible={areWeightsValid(this.props.scene)}
