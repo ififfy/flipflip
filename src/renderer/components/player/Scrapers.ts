@@ -1940,7 +1940,7 @@ export const loadLuscious = (allURLs: Map<string, Array<string>>, config: Config
                 "value": id,
               }
             ],
-            "display": "rating_all_time",
+            "display": "position",
             "page": helpers.next + 1,
           }
         }

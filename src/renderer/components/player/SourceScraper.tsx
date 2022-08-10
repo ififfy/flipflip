@@ -182,8 +182,8 @@ const loadLocalDirectory = (pm: Function, allURLs: Map<string, Array<string>>, c
           aFile = parseInt(aFile);
         }
         let bFile: any = getFileName(b, false);
-        if (parseInt(aFile)) {
-          aFile = parseInt(aFile);
+        if (parseInt(bFile)) {
+          bFile = parseInt(bFile);
         }
         if (aFile > bFile) {
           return 1;
