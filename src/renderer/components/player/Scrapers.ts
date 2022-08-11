@@ -1970,8 +1970,9 @@ export const loadLuscious = (allURLs: Map<string, Array<string>>, config: Config
           }
           helpers.next = hasNextPage ? helpers.next + 1 : null;
           helpers.count = totalItems;
+          // TODO Remove this when server comes back up
           pm({
-            data: filterPathsToJustPlayable(filter, images, true),
+            data: filterPathsToJustPlayable(filter, images, true).map((s) => s.replace('cdnio.', 'w1680.')),
             allURLs: allURLs,
             weight: weight,
             helpers: helpers,

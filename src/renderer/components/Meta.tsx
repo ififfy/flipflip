@@ -139,6 +139,8 @@ export default class Meta extends React.Component {
   //      Pressing hamburger button on ScenePicker causes it to disappear
   //      Pressing hamburger button second time on Scene has bad animation
   //      RecentPicture grid is not scrolling
+  //      Add configurable privacy screen with shortcut and ability to set image
+  //      Add minimize shortcut key in same vain?
   render() {
     const scene = actions.getActiveScene(this.state);
     const grid = actions.getActiveGrid(this.state);

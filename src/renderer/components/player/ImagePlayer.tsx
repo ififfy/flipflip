@@ -208,13 +208,9 @@ export default class ImagePlayer extends React.Component {
   }
 
   componentDidUpdate(props: any, state: any) {
-    if (((!props.isPlaying && this.props.isPlaying) ||
-      (!props.allURLs && this.props.allURLs) ||
+    if (((!props.allURLs && this.props.allURLs) ||
       (!props.hasStarted && this.props.hasStarted)) && !this._isLooping) {
       this.start();
-    } else if (!this.props.isPlaying) {
-      this._isLooping = false;
-      clearTimeout(this._timeout);
     }
     if (this.props.scene.orderFunction !== props.scene.orderFunction || this.props.scene.sourceOrderFunction !== props.scene.sourceOrderFunction) {
       this.setState({readyToDisplay: []});
@@ -743,10 +739,26 @@ export default class ImagePlayer extends React.Component {
         }
 
         (img as any).key = this.state.nextImageID;
-        this.setState({
-          readyToDisplay: this.state.readyToDisplay.concat([img]),
-          nextImageID: this.state.nextImageID + 1,
-        });
+        if (this.props.scene.orderFunction == OF.strict) {
+          const lastIndex = this.state.historyPaths.length ? parseInt(this.state.historyPaths[this.state.historyPaths.length - 1].getAttribute("index")) : -1;
+
+          let readyToDisplay = this.state.readyToDisplay;
+          let count = 0;
+          while (readyToDisplay.length < urlIndex - lastIndex) {
+            count++;
+            readyToDisplay = readyToDisplay.concat([null]);
+          }
+          readyToDisplay[urlIndex - lastIndex - 1] = img;
+          this.setState({
+            readyToDisplay: readyToDisplay,
+            nextImageID: this.state.nextImageID + 1,
+          });
+        } else {
+          this.setState({
+            readyToDisplay: this.state.readyToDisplay.concat([img]),
+            nextImageID: this.state.nextImageID + 1,
+          });
+        }
         if (this.state.historyPaths.length === 0) {
           this.advance(false, false);
         }
@@ -878,37 +890,9 @@ export default class ImagePlayer extends React.Component {
         }
       }
 
-      if (this.props.scene.orderFunction == OF.strict) {
-        this.state.readyToDisplay.sort((a, b) => {
-          // JavaScript doesn't calculate negative modulos correctly, use this
-          const mod = (x: number, n: number) => (x % n + n) % n;
-          const aStrict = mod((parseInt(a.getAttribute("index")) - this._count), parseInt(a.getAttribute("length")));
-          const bStrict = mod((parseInt(b.getAttribute("index")) - this._count), parseInt(b.getAttribute("length")));
-          if (aStrict > bStrict) {
-            return 1;
-          } else if (aStrict < bStrict) {
-            return -1;
-          } else {
-            if (a.hasAttribute("sindex") && b.hasAttribute("sindex")) {
-              const aSource = parseInt(a.getAttribute("sindex"));
-              const bSource = parseInt(b.getAttribute("sindex"));
-              if (aSource > bSource) {
-                return 1;
-              } else if (aSource < bSource) {
-                return -1;
-              } else {
-                return 0;
-              }
-            } else {
-              return 0;
-            }
-          }
-        });
-      }
-
       // Prevent playing same image again, if possible
       do {
-        if (this.state.readyToDisplay.length) {
+        if (this.state.readyToDisplay.length && this.state.readyToDisplay[0] != null) {
           // If there is an image ready, display the next image
           nextImg = this.state.readyToDisplay.shift();
         } else if (this.state.historyPaths.length && this.props.config.defaultScene.orderFunction == OF.random && !this.props.scene.forceAll) {
@@ -918,7 +902,12 @@ export default class ImagePlayer extends React.Component {
         } else if (this.state.historyPaths.length) {
           // If no image is ready, we have a history to choose from, and ordering is not random
           // Show the next image from history
-          nextImg = this.state.historyPaths[this._nextAdvIndex++ % this.state.historyPaths.length];
+          if (this.props.scene.orderFunction == OF.strict) {
+            // If ordering strictly and next isn't ready yet, don't load any image
+            nextImg = null;
+          } else {
+            nextImg = this.state.historyPaths[this._nextAdvIndex++ % this.state.historyPaths.length];
+          }
         }
       } while (this.state.historyPaths.length > 0 && nextImg?.src == this.state.historyPaths[this.state.historyPaths.length - 1].src &&
       (this.state.readyToDisplay.length > 0 || this.state.historyPaths.filter((s) => s.src != this.state.historyPaths[this.state.historyPaths.length - 1]?.src).length > 0))
@@ -982,6 +971,10 @@ export default class ImagePlayer extends React.Component {
       }
       if (nextImg && nextImg.getAttribute("duration") && timeToNextFrame < parseFloat(nextImg.getAttribute("duration"))) {
         timeToNextFrame = parseFloat(nextImg.getAttribute("duration"));
+      }
+      // If we're ordering strictly and next image wasn't ready, try again frequently
+      if (this.props.scene.orderFunction == OF.strict && nextImg == null) {
+        timeToNextFrame = 200;
       }
       if (this.props.setTimeToNextFrame) {
         this.props.setTimeToNextFrame(timeToNextFrame);

@@ -698,11 +698,6 @@ export default class SourceScraper extends React.Component {
     let nextSourceLoop = () => {
       if (!this._isMounted) return;
 
-      if (!this.props.isPlaying) {
-        setTimeout(nextSourceLoop, 500);
-        return;
-      }
-
       const d = nextSources[n];
       if (!this.props.nextScene.playVideoClips && d.clips) {
         d.clips = [];
@@ -770,11 +765,6 @@ export default class SourceScraper extends React.Component {
         if (workerListener != null) {
           workerInstance?.removeEventListener('message', workerListener);
         }
-        return;
-      }
-
-      if (!this.props.isPlaying) {
-        setTimeout(promiseLoop, 500);
         return;
       }
 
