@@ -449,8 +449,10 @@ export default class Meta extends React.Component {
               {this.isRoute('config') && (
                 <ConfigForm
                   config={this.state.config}
+                  library={this.state.library}
                   scenes={this.state.scenes}
                   sceneGrids={this.state.grids}
+                  tags={this.state.tags}
                   theme={this.state.theme}
                   goBack={a(actions.goBack)}
                   onBackup={appStorage.backup.bind(appStorage, this.state)}

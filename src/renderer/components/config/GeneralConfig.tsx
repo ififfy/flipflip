@@ -3,6 +3,8 @@ import * as React from "react";
 import {Card, CardContent, Grid, Theme} from "@mui/material";
 
 import Config, {CacheSettings, DisplaySettings, GeneralSettings, RemoteSettings} from "../../data/Config";
+import Tag from "../../data/Tag";
+import LibrarySource from "../../data/LibrarySource";
 import PlayerBoolCard from "../configGroups/PlayerBoolCard";
 import PlayerNumCard from "../configGroups/PlayerNumCard";
 import CacheCard from "../configGroups/CacheCard";
@@ -14,6 +16,8 @@ import WatermarkCard from "../configGroups/WatermarkCard";
 export default class GeneralConfig extends React.Component {
   readonly props: {
     config: Config,
+    library: Array<LibrarySource>,
+    tags: Array<Tag>,
     theme: Theme,
     onBackup(): void,
     onChangeThemeColor(colorTheme: any, primary: boolean): void,
@@ -45,9 +49,11 @@ export default class GeneralConfig extends React.Component {
         </Grid>
 
         <Grid item xs={12} sm={4} md={3} lg={2}>
-          <Card>
+          <Card style={{overflow: 'visible'}}>
             <CardContent>
               <PlayerNumCard
+                library={this.props.library}
+                tags={this.props.tags}
                 settings={this.props.config.displaySettings}
                 onUpdateSettings={this.props.onUpdateDisplaySettings.bind(this)}/>
             </CardContent>

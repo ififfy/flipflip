@@ -243,7 +243,7 @@ interface CacheSettingsI {
 }
 
 interface DisplaySettingsI {
-  [key: string]: number | boolean;
+  [key: string]: number | boolean | Array<string>;
   alwaysOnTop: boolean;
   showMenu: boolean;
   fullScreen: boolean;
@@ -257,6 +257,8 @@ interface DisplaySettingsI {
   maxInMemory: number;
   maxInHistory: number;
   maxLoadingAtOnce: number;
+
+  ignoredTags: Array<string>;
 }
 
 interface GeneralSettingsI {
@@ -555,7 +557,7 @@ export class CacheSettings implements CacheSettingsI {
 }
 
 export class DisplaySettings  implements DisplaySettingsI {
-  [key: string]: number | boolean;
+  [key: string]: number | boolean | Array<string>;
 
   alwaysOnTop = false;
   showMenu = true;
@@ -570,6 +572,8 @@ export class DisplaySettings  implements DisplaySettingsI {
   maxInMemory = 40;
   maxInHistory = 120;
   maxLoadingAtOnce = 5;
+
+  ignoredTags = Array<string>();
 }
 
 export class GeneralSettings  implements GeneralSettingsI {

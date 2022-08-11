@@ -1266,6 +1266,11 @@ export function generateScenes(state: State, s: Scene | SceneGrid, children: boo
     const allAdvRules = newScene.generatorWeights.filter((wg) => wg.type == TT.all && wg.rules).map((wg) => wg.search);
     const noneAdvRules = newScene.generatorWeights.filter((wg) => wg.type == TT.none && wg.rules).map((wg) => wg.search);
 
+    // Add globally ignored tags/types
+    for (let ignored of state.config.displaySettings.ignoredTags) {
+      noneSearches.push(ignored);
+    }
+
     // Sources to require
     let reqAdvSources: Array<LibrarySource> = null;
     // Sources to exclude

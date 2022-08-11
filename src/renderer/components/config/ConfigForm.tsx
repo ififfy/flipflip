@@ -44,12 +44,14 @@ import SettingsIcon from '@mui/icons-material/Settings';
 
 import {MO} from "../../data/const";
 import Config, { CacheSettings, DisplaySettings, GeneralSettings, RemoteSettings, SceneSettings } from "../../data/Config";
+import LibrarySource from "../../data/LibrarySource";
 import Scene from "../../data/Scene";
+import SceneGrid from "../../data/SceneGrid";
+import Tag from "../../data/Tag";
 import GeneralConfig from "./GeneralConfig";
 import SceneOptions from "../sceneDetail/SceneOptions";
 import SceneEffects from "../sceneDetail/SceneEffects";
 import {portablePath} from "../../data/utils";
-import SceneGrid from "../../data/SceneGrid";
 
 const drawerWidth = 240;
 
@@ -180,8 +182,10 @@ class ConfigForm extends React.Component {
   readonly props: {
     classes: any,
     config: Config,
+    library: Array<LibrarySource>,
     scenes: Array<Scene>,
     sceneGrids: Array<SceneGrid>,
+    tags: Array<Tag>,
     theme: Theme,
     goBack(): void,
     onBackup(): void,
@@ -384,6 +388,8 @@ class ConfigForm extends React.Component {
                   <Box p={2} className={classes.fill}>
                     <GeneralConfig
                       config={this.state.config}
+                      library={this.props.library}
+                      tags={this.props.tags}
                       theme={this.props.theme}
                       onBackup={this.props.onBackup.bind(this)}
                       onChangeThemeColor={this.props.onChangeThemeColor.bind(this)}
