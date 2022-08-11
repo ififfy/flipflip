@@ -27,7 +27,6 @@ import {
   MenuItem,
   Slide,
   Snackbar,
-  SnackbarContent,
   SvgIcon,
   Tab,
   Tabs,
@@ -49,7 +48,6 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import AudiotrackIcon from '@mui/icons-material/Audiotrack';
 import BuildIcon from '@mui/icons-material/Build';
 import CachedIcon from '@mui/icons-material/Cached';
-import CheckIcon from "@mui/icons-material/CheckCircle";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CollectionsIcon from '@mui/icons-material/Collections';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -68,9 +66,8 @@ import RestoreIcon from "@mui/icons-material/Restore";
 import SaveIcon from '@mui/icons-material/Save';
 import ShuffleIcon from "@mui/icons-material/Shuffle";
 import SortIcon from '@mui/icons-material/Sort';
-import WarningIcon from '@mui/icons-material/Warning';
 
-import {AF, MO, SB, SDGT, SDT, SF, ST, TT, WF} from "../../data/const";
+import {AF, MO, SDGT, SDT, SF, SS, ST, TT, WF} from "../../data/const";
 import en from "../../data/en";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
@@ -381,6 +378,10 @@ const styles = (theme: Theme) => createStyles({
   }
 });
 
+function TransitionUp(props: any) {
+  return <Slide {...props} direction="up" />;
+}
+
 class SceneDetail extends React.Component {
   readonly props: {
     classes: any,
@@ -420,8 +421,9 @@ class SceneDetail extends React.Component {
     drawerOpen: false,
     menuAnchorEl: null as any,
     openMenu: null as string,
+    snackbarOpen: false,
     snackbar: null as string,
-    snackbarType: null as string,
+    snackbarSeverity: null as string,
     sceneEffects: "",
     confirmCopy: false,
     displaySources: Array<LibrarySource>(),
@@ -1104,24 +1106,14 @@ class SceneDetail extends React.Component {
           </React.Fragment>
         )}
         <Snackbar
-          open={!!this.state.snackbar}
+          open={this.state.snackbarOpen}
           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           autoHideDuration={5000}
-          ClickAwayListenerProps={{mouseEvent: false}}
           onClose={this.onCloseSnackbar.bind(this)}
-          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
-          <React.Fragment>
-            {this.state.snackbarType == SB.warning && (
-              <Alert onClose={this.onCloseSnackbar.bind(this)} severity="warning">
-                {this.state.snackbar}
-              </Alert>
-            )}
-            {this.state.snackbarType == SB.success && (
-              <Alert onClose={this.onCloseSnackbar.bind(this)} severity="success">
-                {this.state.snackbar}
-              </Alert>
-            )}
-          </React.Fragment>
+          TransitionComponent={TransitionUp}>
+          <Alert onClose={this.onCloseSnackbar.bind(this)} severity={this.state.snackbarSeverity as any}>
+            {this.state.snackbar}
+          </Alert>
         </Snackbar>
       </div>
     );
@@ -1158,7 +1150,7 @@ class SceneDetail extends React.Component {
   };
 
   onCloseSnackbar() {
-    this.setState({snackbar: null, snackbarType: null});
+    this.setState({snackbarOpen: false});
   }
 
   onOpenMaxMenu(e: MouseEvent) {
@@ -1192,12 +1184,12 @@ class SceneDetail extends React.Component {
 
   generateCallback() {
     if (this.props.scene.sources.length == 0) {
-      this.setState({snackbar: "Sorry, no sources were found for these rules", snackbarType: SB.warning});
+      this.setState({snackbarOpen: true, snackbar: "Sorry, no sources were found for these rules", snackbarSeverity: SS.warning});
       if (this.props.tutorial == SDGT.generate) {
         this.props.onTutorial(SDGT.generateError);
       }
     } else {
-      this.setState({snackbar: "Generated scene with " + this.props.scene.sources.length + " sources", snackbarType: SB.success});
+      this.setState({snackbarOpen: true, snackbar: "Generated scene with " + this.props.scene.sources.length + " sources", snackbarSeverity: SS.success});
       if (this.props.tutorial == SDGT.generate) {
         this.props.onTutorial(SDGT.generate);
       }

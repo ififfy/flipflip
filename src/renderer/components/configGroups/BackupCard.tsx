@@ -37,7 +37,7 @@ import RestoreIcon from '@mui/icons-material/Restore';
 import SaveIcon from '@mui/icons-material/Save';
 
 import {convertFromEpoch, getBackups, saveDir} from "../../data/utils";
-import {MO} from "../../data/const";
+import {MO, SS} from "../../data/const";
 import {GeneralSettings} from "../../data/Config";
 
 const styles = (theme: Theme) => createStyles({
@@ -71,6 +71,10 @@ const styles = (theme: Theme) => createStyles({
   }
 });
 
+function TransitionUp(props: any) {
+  return <Slide {...props} direction="up" />;
+}
+
 class BackupCard extends React.Component {
   readonly props: {
     classes: any,
@@ -85,10 +89,9 @@ class BackupCard extends React.Component {
     backups: Array<{url: string, size: number}>(),
     backup: (null as {url: string, size: number}),
     openMenu: null as string,
-    restoreSnack: false,
-    backupSnack: false,
-    cleanSnack: false,
-    errorSnack: null as any,
+    snackbarOpen: false,
+    snackbar: null as string,
+    snackbarSeverity: null as string,
   };
 
   render() {
@@ -333,43 +336,13 @@ class BackupCard extends React.Component {
           </DialogActions>
         </Dialog>
         <Snackbar
-          open={this.state.restoreSnack}
+          open={this.state.snackbarOpen}
           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           autoHideDuration={5000}
-          onClose={this.onCloseRestoreSnack.bind(this)}
-          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
-          <Alert onClose={this.onCloseRestoreSnack.bind(this)} severity="success">
-            Restore success!
-          </Alert>
-        </Snackbar>
-        <Snackbar
-          open={this.state.backupSnack}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-          autoHideDuration={5000}
-          onClose={this.onCloseBackupSnack.bind(this)}
-          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
-          <Alert onClose={this.onCloseBackupSnack.bind(this)} severity="success">
-            Backup success!
-          </Alert>
-        </Snackbar>
-        <Snackbar
-          open={this.state.cleanSnack}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-          autoHideDuration={5000}
-          onClose={this.onCloseCleanSnack.bind(this)}
-          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
-          <Alert onClose={this.onCloseCleanSnack.bind(this)} severity="success">
-            Clean success!
-          </Alert>
-        </Snackbar>
-        <Snackbar
-          open={!!this.state.errorSnack}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-          autoHideDuration={10000}
-          onClose={this.onCloseErrorSnack.bind(this)}
-          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
-          <Alert onClose={this.onCloseErrorSnack.bind(this)} severity="error">
-            Error: {this.state.errorSnack ? this.state.errorSnack.message : ""}
+          onClose={this.onCloseDialog.bind(this)}
+          TransitionComponent={TransitionUp}>
+          <Alert onClose={this.onCloseDialog.bind(this)} severity={this.state.snackbarSeverity as any}>
+            {this.state.snackbar}
           </Alert>
         </Snackbar>
       </React.Fragment>
@@ -392,9 +365,10 @@ class BackupCard extends React.Component {
   onBackup() {
     try {
       this.props.onBackup();
-      this.setState({backupSnack: true});
+      this.setState({snackbarOpen: true, snackbar: "Backup success!", snackbarSeverity: SS.success});
     } catch (e) {
-      this.setState({errorSnack: e});
+      console.error(e);
+      this.setState({snackbarOpen: true, snackbar: "Error: " + e, snackbarSeverity: SS.error});
     }
     this.refreshBackups();
   }
@@ -407,9 +381,10 @@ class BackupCard extends React.Component {
     this.onCloseDialog();
     try {
       this.props.onClean();
-      this.setState({cleanSnack: true});
+      this.setState({snackbarOpen: true, snackbar: "Clean success!", snackbarSeverity: SS.success});
     } catch (e) {
-      this.setState({errorSnack: e});
+      console.error(e);
+      this.setState({snackbarOpen: true, snackbar: "Error: " + e, snackbarSeverity: SS.error});
     }
     this.refreshBackups();
   }
@@ -422,30 +397,15 @@ class BackupCard extends React.Component {
     this.onCloseDialog();
     try {
       this.props.onRestore(saveDir + path.sep + this.state.backup.url);
-      this.setState({restoreSnack: true});
+      this.setState({snackbarOpen: true, snackbar: "Restore success!", snackbarSeverity: SS.success});
     } catch (e) {
-      this.setState({errorSnack: e});
+      console.error(e);
+      this.setState({snackbarOpen: true, snackbar: "Error: " + e, snackbarSeverity: SS.error});
     }
   }
 
-  onCloseRestoreSnack() {
-    this.setState({restoreSnack: false});
-  }
-
-  onCloseBackupSnack() {
-    this.setState({backupSnack: false});
-  }
-
-  onCloseCleanSnack() {
-    this.setState({cleanSnack: false});
-  }
-
-  onCloseErrorSnack() {
-    this.setState({errorSnack: null});
-  }
-
   onCloseDialog() {
-    this.setState({openMenu: null});
+    this.setState({openMenu: null, snackbarOpen: false});
   }
 
   blurIntKey(key: string, e: MouseEvent) {

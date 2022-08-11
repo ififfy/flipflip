@@ -40,7 +40,7 @@ import createStyles from '@mui/styles/createStyles';
 import withStyles from '@mui/styles/withStyles';
 
 import Config, {RemoteSettings} from "../../data/Config";
-import {IG, MO, ST} from "../../data/const";
+import {IG, MO, SS, ST} from "../../data/const";
 import en from "../../data/en";
 import SourceIcon from "../library/SourceIcon";
 
@@ -79,6 +79,10 @@ const styles = (theme: Theme) => createStyles({
   },
 });
 
+function TransitionUp(props: any) {
+  return <Slide {...props} direction="up" />;
+}
+
 class APICard extends React.Component {
   readonly props: {
     classes: any,
@@ -90,8 +94,9 @@ class APICard extends React.Component {
   readonly state = {
     openMenu: null as string,
     menuType: null as string,
-    successSnack: null as string,
-    errorSnack: null as string,
+    snackbarOpen: false,
+    snackbar: null as string,
+    snackbarSeverity: null as string,
     server: null as any,
     instagramMode: null as string,
     input1: "",
@@ -600,24 +605,13 @@ class APICard extends React.Component {
         </Dialog>
 
         <Snackbar
-          open={!!this.state.successSnack}
+          open={this.state.snackbarOpen}
           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           autoHideDuration={20000}
           onClose={this.onCloseSnack.bind(this)}
-          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
-          <Alert onClose={this.onCloseSnack.bind(this)} severity="success">
-            {this.state.successSnack}
-          </Alert>
-        </Snackbar>
-
-        <Snackbar
-          open={!!this.state.errorSnack}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-          autoHideDuration={20000}
-          onClose={this.onCloseErrorSnack.bind(this)}
-          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
-          <Alert onClose={this.onCloseErrorSnack.bind(this)} severity="error">
-            Error: {this.state.errorSnack}
+          TransitionComponent={TransitionUp}>
+          <Alert onClose={this.onCloseSnack.bind(this)} severity={this.state.snackbarSeverity as any}>
+            {this.state.snackbar}
           </Alert>
         </Snackbar>
       </React.Fragment>
@@ -806,11 +800,7 @@ class APICard extends React.Component {
   }
 
   onCloseSnack() {
-    this.setState({successSnack: null});
-  }
-
-  onCloseErrorSnack() {
-    this.setState({errorSnack: null});
+    this.setState({snackbarOpen: false});
   }
 
   onInput1(e: MouseEvent) {
@@ -875,7 +865,7 @@ class APICard extends React.Component {
     oauth.getOAuthRequestToken((err: {statusCode: number, data: string}, token: string, secret: string) => {
       if (err) {
         console.error(err.statusCode + " - " + err.data);
-        this.setState({errorSnack: "Error: " + err.statusCode + " - " + err.data});
+        this.setState({snackbarOpen: true, snackbar: "Error: " + err.statusCode + " - " + err.data, snackbarSeverity: SS.error});
         this.closeServer();
         return;
       }
@@ -904,7 +894,7 @@ class APICard extends React.Component {
             (err: any, token: string, secret: string) => {
               if (err) {
                 console.error("Validation failed with error", err);
-                this.setState({errorSnack: "Error: " + err.statusCode + " - " + err.data});
+                this.setState({snackbarOpen: true, snackbar: "Error: " + err.statusCode + " - " + err.data, snackbarSeverity: SS.error});
                 this.closeServer();
                 req.connection.destroy();
                 res.end();
@@ -924,14 +914,14 @@ class APICard extends React.Component {
                 s.tumblrOAuthTokenSecret = secret;
               });
 
-              this.setState({successSnack: "Tumblr is now activated"});
+              this.setState({snackbarOpen: true, snackbar: "Tumblr is now activated", snackbarSeverity: SS.success});
               remote.getCurrentWindow().show();
               this.closeServer();
               req.connection.destroy();
             }
           );
         } else {
-          this.setState({errorSnack: "Error: Access Denied"});
+          this.setState({snackbarOpen: true, snackbar: "Error: Access Denied", snackbarSeverity: SS.error});
           this.closeServer();
           req.connection.destroy();
         }
@@ -962,7 +952,7 @@ class APICard extends React.Component {
       })
       .catch(e => {
         console.error(e);
-        this.setState({errorSnack: "Error: " + e.message});
+        this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
         this.closeServer();
         return;
       });
@@ -998,14 +988,14 @@ class APICard extends React.Component {
                   s.redditRefreshToken = json.refresh_token;
                 });
 
-                this.setState({successSnack: "Reddit is now activated"});
+                this.setState({snackbarOpen: true, snackbar: "Reddit is now activated", snackbarSeverity: SS.success});
                 remote.getCurrentWindow().show();
                 this.closeServer();
                 req.connection.destroy();
               })
               .catch(e => {
                 console.error(e);
-                this.setState({errorSnack: "Error: " + e.message});
+                this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
                 this.closeServer();
                 req.connection.destroy();
                 res.end();
@@ -1019,7 +1009,7 @@ class APICard extends React.Component {
           if (state == deviceID) {
             const error = args[1].substring(6);
             console.error(error);
-            this.setState({errorSnack: "Error: " + error});
+            this.setState({snackbarOpen: true, snackbar: "Error: " + error, snackbarSeverity: SS.error});
           }
 
           this.closeServer();
@@ -1059,7 +1049,7 @@ class APICard extends React.Component {
     oauth.getOAuthRequestToken((err: {statusCode: number, data: string}, token: string, secret: string) => {
       if (err) {
         console.error(err.statusCode + " - " + err.data);
-        this.setState({errorSnack: "Error: " + err.statusCode + " - " + err.data});
+        this.setState({snackbarOpen: true, snackbar: "Error: " + err.statusCode + " - " + err.data, snackbarSeverity: SS.error});
         this.closeServer();
         return;
       }
@@ -1088,7 +1078,7 @@ class APICard extends React.Component {
             (err: any, token: string, secret: string) => {
               if (err) {
                 console.error("Validation failed with error", err);
-                this.setState({errorSnack: "Error: " + err.statusCode + " - " + err.data});
+                this.setState({snackbarOpen: true, snackbar: "Error: " + err.statusCode + " - " + err.data, snackbarSeverity: SS.error});
                 this.closeServer();
                 req.connection.destroy();
                 res.end();
@@ -1106,14 +1096,14 @@ class APICard extends React.Component {
                 s.twitterAccessTokenSecret = secret;
               });
 
-              this.setState({successSnack: "Twitter is now activated"});
+              this.setState({snackbarOpen: true, snackbar: "Twitter is now activated", snackbarSeverity: SS.success});
               remote.getCurrentWindow().show();
               this.closeServer();
               req.connection.destroy();
             }
           );
         } else {
-          this.setState({errorSnack: "Error: Access Denied"});
+          this.setState({snackbarOpen: true, snackbar: "Error: Access Denied", snackbarSeverity: SS.error});
           this.closeServer();
           req.connection.destroy();
         }
@@ -1141,7 +1131,7 @@ class APICard extends React.Component {
         s.instagramUsername = this.state.input1;
         s.instagramPassword = this.state.input2;
       });
-      this.setState({successSnack: "Instagram is activated"});
+      this.setState({snackbarOpen: true, snackbar: "Instagram is activated", snackbarSeverity: SS.success});
       this.onCloseDialog();
       this._ig = null;
     }).catch((e) => {
@@ -1155,7 +1145,7 @@ class APICard extends React.Component {
       } else {
         this.onCloseDialog();
         console.error(e);
-        this.setState({errorSnack: e.message});
+        this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
         this._ig = null;
       }
     });
@@ -1179,14 +1169,14 @@ class APICard extends React.Component {
         s.instagramUsername = this.state.input1;
         s.instagramPassword = this.state.input2;
       });
-      this.setState({successSnack: "Instagram is activated"});
+      this.setState({snackbarOpen: true, snackbar: "Instagram is activated", snackbarSeverity: SS.success});
       this.onCloseDialog();
       this._ig = null;
       this._tfa = null;
     }).catch((e) => {
       this.onCloseDialog();
       console.error(e);
-      this.setState({errorSnack: e.message});
+      this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
       this._ig = null;
       this._tfa = null;
     });
@@ -1204,13 +1194,13 @@ class APICard extends React.Component {
         s.instagramUsername = this.state.input1;
         s.instagramPassword = this.state.input2;
       });
-      this.setState({successSnack: "Instagram is activated"});
+      this.setState({snackbarOpen: true, snackbar: "Instagram is activated", snackbarSeverity: SS.success});
       this.onCloseDialog();
       this._ig = null;
     }).catch((e) => {
       this.onCloseDialog();
       console.error(e);
-      this.setState({errorSnack: e.message});
+      this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
       this._ig = null;
     });
   }
@@ -1222,11 +1212,11 @@ class APICard extends React.Component {
       .setTimeout(5000)
       .notFound((e) => {
         console.error(e);
-        this.setState({errorSnack: e.message});
+        this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
       })
       .internalError((e) => {
         console.error(e);
-        this.setState({errorSnack: e.message});
+        this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
       })
       .json((json) => {
         if (json.session_key) {
@@ -1244,16 +1234,16 @@ class APICard extends React.Component {
             s.hydrusPort = this.state.input3;
             s.hydrusAPIKey = this.state.input4;
           });
-          this.setState({successSnack: "Hydrus is configured"});
+          this.setState({snackbarOpen: true, snackbar: "Hydrus is configured", snackbarSeverity: SS.success});
           this.onCloseDialog();
         } else {
           console.error("Invalid response from Hydrus server");
-          this.setState({errorSnack: "Invalid response from Hydrus server"});
+          this.setState({snackbarOpen: true, snackbar: "Invalid response from Hydrus server", snackbarSeverity: SS.error});
         }
       })
       .catch((e) => {
         console.error(e);
-        this.setState({errorSnack: e.message});
+        this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
       });
   }
 
@@ -1274,11 +1264,11 @@ class APICard extends React.Component {
       .setTimeout(5000)
       .notFound((e) => {
         console.error(e);
-        this.setState({errorSnack: e.message});
+        this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
       })
       .internalError((e) => {
         console.error(e);
-        this.setState({errorSnack: e.message});
+        this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
       })
       .json((json) => {
         if (json.stat == "ok") {
@@ -1295,16 +1285,16 @@ class APICard extends React.Component {
             s.piwigoUsername = this.state.input3;
             s.piwigoPassword = this.state.input4;
           });
-          this.setState({successSnack: "Piwigo is configured"});
+          this.setState({snackbarOpen: true, snackbar: "Piwigo is configured", snackbarSeverity: SS.success});
           this.onCloseDialog();
         } else {
           console.error("Invalid response from Piwigo server");
-          this.setState({errorSnack: "Invalid response from Piwigo server"});
+          this.setState({snackbarOpen: true, snackbar: "Invalid response from Piwigo server", snackbarSeverity: SS.error});
         }
       })
       .catch((e) => {
         console.error(e);
-        this.setState({errorSnack: e.message});
+        this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
       });
   }
 }

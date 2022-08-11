@@ -35,6 +35,10 @@ import ScriptLibrary from "./library/ScriptLibrary";
 
 const appStorage = new AppStorage(remote.getCurrentWindow().id);
 
+function TransitionUp(props: any) {
+  return <Slide {...props} direction="up" />;
+}
+
 export default class Meta extends React.Component {
   readonly state = appStorage.initialState;
 
@@ -113,6 +117,7 @@ export default class Meta extends React.Component {
       prevState.progressTotal !== this.state.progressTotal ||
       prevState.progressNext !== this.state.progressNext ||
       prevState.systemMessage !== this.state.systemMessage ||
+      prevState.systemSnackOpen !== this.state.systemSnackOpen ||
       prevState.systemSnack !== this.state.systemSnack ||
       prevState.tutorial !== this.state.tutorial ||
       prevState.theme !== this.state.theme) {
@@ -494,12 +499,12 @@ export default class Meta extends React.Component {
               </Dialog>
 
               <Snackbar
-                open={!!this.state.systemSnack}
+                open={this.state.systemSnackOpen}
                 anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
                 autoHideDuration={2000}
                 key={this.state.systemSnack + new Date()}
                 onClose={a(actions.closeMessage)}
-                TransitionComponent={(props: any) => <Slide {...props} direction="up"/>}>
+                TransitionComponent={TransitionUp}>
                 <Alert onClose={a(actions.closeMessage)} severity={this.state.systemSnackSeverity}>
                   {this.state.systemSnack}
                 </Alert>

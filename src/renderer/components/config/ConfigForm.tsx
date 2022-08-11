@@ -178,6 +178,10 @@ const styles = (theme: Theme) => createStyles({
   },
 });
 
+function TransitionUp(props: any) {
+  return <Slide {...props} direction="up" />;
+}
+
 class ConfigForm extends React.Component {
   readonly props: {
     classes: any,
@@ -204,6 +208,7 @@ class ConfigForm extends React.Component {
     drawerOpen: false,
     openMenu: null as string,
     openTab: 2,
+    errorSnackOpen: false,
     errorSnack: null as string,
   };
 
@@ -435,11 +440,11 @@ class ConfigForm extends React.Component {
         </Dialog>
 
         <Snackbar
-          open={!!this.state.errorSnack}
+          open={this.state.errorSnackOpen}
           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           autoHideDuration={20000}
           onClose={this.onCloseErrorSnack.bind(this)}
-          TransitionComponent={(props) => <Slide {...props} direction="up"/>}>
+          TransitionComponent={TransitionUp}>
           <Alert onClose={this.onCloseErrorSnack.bind(this)} severity="error">
             Error: {this.state.errorSnack}
           </Alert>
@@ -472,7 +477,8 @@ class ConfigForm extends React.Component {
       this.props.onUpdateConfig(this.state.config);
       return true;
     } else {
-      this.setState({errorSnack: errorMessage});
+      console.error(errorMessage);
+      this.setState({errorSnackOpen: true, errorSnack: errorMessage});
       return false;
     }
   }
@@ -554,7 +560,7 @@ class ConfigForm extends React.Component {
   }
 
   onCloseErrorSnack() {
-    this.setState({errorSnack: null});
+    this.setState({errorSnackOpen: false});
   }
 }
 
