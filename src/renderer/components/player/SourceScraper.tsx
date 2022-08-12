@@ -176,23 +176,8 @@ const loadLocalDirectory = (pm: Function, allURLs: Map<string, Array<string>>, c
         timeout: 0,
       }});
     } else {
-      let sources = filterPathsToJustPlayable(filter, rawFiles, true).map((p) => fileURL(p)).sort((a, b) => {
-        let aFile: any = getFileName(a, false);
-        if (parseInt(aFile)) {
-          aFile = parseInt(aFile);
-        }
-        let bFile: any = getFileName(b, false);
-        if (parseInt(bFile)) {
-          bFile = parseInt(bFile);
-        }
-        if (aFile > bFile) {
-          return 1;
-        } else if (aFile < bFile) {
-          return -1;
-        } else {
-          return 0;
-        }
-      });
+      const collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
+      let sources = filterPathsToJustPlayable(filter, rawFiles, true).map((p) => fileURL(p)).sort(collator.compare);
 
       if (source.blacklist && source.blacklist.length > 0) {
         sources = sources.filter((url: string) => !source.blacklist.includes(url) && !source.blacklist.includes(urlToPath(url)));

@@ -970,10 +970,6 @@ export default class ImagePlayer extends React.Component {
       if (nextImg && nextImg.getAttribute("duration") && timeToNextFrame < parseFloat(nextImg.getAttribute("duration"))) {
         timeToNextFrame = parseFloat(nextImg.getAttribute("duration"));
       }
-      // If we're ordering strictly and next image wasn't ready, try again frequently
-      if (this.props.scene.orderFunction == OF.strict && nextImg == null) {
-        timeToNextFrame = 200;
-      }
       if (this.props.setTimeToNextFrame) {
         this.props.setTimeToNextFrame(timeToNextFrame);
       }
