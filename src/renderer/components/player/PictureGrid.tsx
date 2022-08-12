@@ -1,9 +1,10 @@
 import * as React from "react";
-import { Grid, Theme } from "@mui/material";
+import { Theme } from "@mui/material";
 import createStyles from '@mui/styles/createStyles';
 import withStyles from '@mui/styles/withStyles';
+import Masonry from '@mui/lab/Masonry';
+
 import ImageView from "./ImageView";
-import Scene from "../../data/Scene";
 
 const styles = (theme: Theme) => createStyles({
   content: {
@@ -12,14 +13,17 @@ const styles = (theme: Theme) => createStyles({
     flexGrow: 1,
     flexDirection: 'column',
     height: '100vh',
+    width: '100%',
     zIndex: theme.zIndex.appBar - 1,
     backgroundColor: theme.palette.background.default,
   },
-  grid: {
+  masonry: {
     overflowY: 'auto',
+    overflowX: 'hidden',
+    minHeight: 'calc(100% - ' + theme.mixins.toolbar.minHeight + 'px)',
   },
   image: {
-    width: '100%',
+    marginBottom: 0,
     '&:hover': {
       opacity: 0.7,
     },
@@ -39,39 +43,25 @@ class PictureGrid extends React.Component {
   render() {
     const classes = this.props.classes;
     const pictures = Array.from(this.props.pictures).reverse();
-    let grid = Array<Array<any>>();
-    for (let p=0; p<pictures.length; p++) {
-      if (!grid[p%4]) {
-        grid[p%4] = [];
-      }
-      grid[p%4].push(pictures[p]);
-    }
     return (
-      <main className={classes.content} >
+      <div className={classes.content} >
         <div className={classes.appBarSpacer} />
-        <Grid container className={classes.grid}>
-          {grid.map((c, x) =>
-            <Grid key={x} xs={12} sm={6} md={4} lg={3} item>
-              <Grid container>
-                {c.map((p, y) => {
-                    return (
-                      <Grid key={y} xs={12} item className={classes.image}>
-                        <ImageView
-                          image={p}
-                          fitParent
-                          hasStarted
-                          removeChild
-                          scene={null}
-                          pictureGrid/>
-                      </Grid>
-                    );
-                  }
-                )}
-              </Grid>
-            </Grid>
-          )}
-        </Grid>
-      </main>
+        <div className={classes.masonry}>
+          <Masonry columns={4} spacing={1}>
+            {pictures.map((p, x) =>
+              <ImageView
+                key={x}
+                className={classes.image}
+                image={p}
+                fitParent
+                hasStarted
+                removeChild
+                scene={null}
+                pictureGrid/>
+            )}
+          </Masonry>
+        </div>
+      </div>
     )
   }
 }

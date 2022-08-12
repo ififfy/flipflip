@@ -28,7 +28,8 @@ export default class ImageView extends React.Component {
     timeToNextFrame?: number,
     toggleStrobe?: boolean,
     pictureGrid?: boolean,
-    removeChild?: boolean
+    removeChild?: boolean,
+    className?: string,
     onLoaded?(): void,
     setSceneCopy?(children: React.ReactNode): void,
     setVideo?(video: HTMLVideoElement): void,
@@ -585,6 +586,7 @@ export default class ImageView extends React.Component {
     if (!this.props.image) {
       return (
         <div
+          className={this.props.className}
           style={{
             zIndex: 2,
             margin: '-5px -10px -10px -5px',
@@ -621,6 +623,7 @@ export default class ImageView extends React.Component {
     } else if (this.props.pictureGrid) {
       return (
         <animated.div
+          className={this.props.className}
           ref={this.contentRef}/>
       );
     }

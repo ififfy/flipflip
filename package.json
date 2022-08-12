@@ -39,6 +39,7 @@
     "@emotion/react": "^11.10.0",
     "@emotion/styled": "^11.10.0",
     "@mui/icons-material": "^5.8.4",
+    "@mui/lab": "^5.0.0-alpha.94",
     "@mui/material": "5.8.7",
     "@mui/styles": "5.8.7",
     "@mui/system": "5.8.7",
