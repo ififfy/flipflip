@@ -56,7 +56,6 @@ export default class ImagePlayer extends React.Component {
     historyOffset: 0,
   };
 
-  readonly idleTimerRef: React.RefObject<HTMLDivElement> = React.createRef();
   _backForth: NodeJS.Timeout = null;
   _isMounted: boolean;
   _isLooping: boolean;
@@ -91,8 +90,7 @@ export default class ImagePlayer extends React.Component {
     };
 
     return (
-      <div style={style}
-           ref={this.idleTimerRef}>
+      <div style={style}>
         {(this.props.scene && this.props.scene.strobe && this.props.strobeLayer == SL.middle) && (
           <Strobe
             currentAudio={this.props.currentAudio}

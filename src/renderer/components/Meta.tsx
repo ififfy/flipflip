@@ -141,6 +141,9 @@ export default class Meta extends React.Component {
   //      RecentPicture grid is not scrolling
   //      Add configurable privacy screen with shortcut and ability to set image
   //      Add minimize shortcut key in same vain?
+  //      AutoHide cursor isn't working on secondary monitor
+  //      Strict ordering not playing image 0
+  //      Strict ordering falls apart after first cycle through
   render() {
     const scene = actions.getActiveScene(this.state);
     const grid = actions.getActiveGrid(this.state);

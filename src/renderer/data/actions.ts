@@ -77,6 +77,7 @@ import Playlist from "./Playlist";
 import CaptionScript from "./CaptionScript";
 import SceneGroup from "./SceneGroup";
 import SceneGridCell from "./SceneGridCell";
+import WeightGroup from "./WeightGroup";
 
 type State = typeof defaultInitialState;
 
@@ -1259,17 +1260,18 @@ export function generateScenes(state: State, s: Scene | SceneGrid, children: boo
   const newScenes = Array.from(state.scenes);
   for (let scene of generateScenes) {
     const newScene = state.scenes.find((s) => s.id == scene.id);
-
-    // Record all the groups we're requiring/excluding
-    const allSearches = newScene.generatorWeights.filter((wg) => wg.type == TT.all && !wg.rules).map((wg) => wg.search);
-    const noneSearches = newScene.generatorWeights.filter((wg) => wg.type == TT.none && !wg.rules).map((wg) => wg.search);
-    const allAdvRules = newScene.generatorWeights.filter((wg) => wg.type == TT.all && wg.rules).map((wg) => wg.search);
-    const noneAdvRules = newScene.generatorWeights.filter((wg) => wg.type == TT.none && wg.rules).map((wg) => wg.search);
+    let generatorWeights = newScene.generatorWeights;
 
     // Add globally ignored tags/types
     for (let ignored of state.config.displaySettings.ignoredTags) {
-      noneSearches.push(ignored);
+      generatorWeights = generatorWeights.concat([new WeightGroup({type: TT.none, search: ignored})]);
     }
+
+    // Record all the groups we're requiring/excluding
+    const allSearches = generatorWeights.filter((wg) => wg.type == TT.all && !wg.rules).map((wg) => wg.search);
+    const noneSearches = generatorWeights.filter((wg) => wg.type == TT.none && !wg.rules).map((wg) => wg.search);
+    const allAdvRules = generatorWeights.filter((wg) => wg.type == TT.all && wg.rules).map((wg) => wg.search);
+    const noneAdvRules = generatorWeights.filter((wg) => wg.type == TT.none && wg.rules).map((wg) => wg.search);
 
     // Sources to require
     let reqAdvSources: Array<LibrarySource> = null;
@@ -1280,7 +1282,7 @@ export function generateScenes(state: State, s: Scene | SceneGrid, children: boo
     let genSources = new Array<LibrarySource>();
 
     // First, build all our adv rules
-    for (let wg of newScene.generatorWeights.filter((wg) => !!wg.rules)) {
+    for (let wg of generatorWeights.filter((wg) => !!wg.rules)) {
       // Build each adv rule like a regular set of simple rules
       // First get tags to require/exclude
       const ruleAllSearches = wg.rules.filter((wg) => wg.type == TT.all).map((wg) => wg.search);
@@ -1578,7 +1580,7 @@ export function generateScenes(state: State, s: Scene | SceneGrid, children: boo
 
     // Now, build our simple rules
     // If we don't have any weights, calculate by just require/exclude
-    if (allSearches.length + noneSearches.length + allAdvRules.length + noneAdvRules.length == newScene.generatorWeights.length) {
+    if (allSearches.length + noneSearches.length + allAdvRules.length + noneAdvRules.length == generatorWeights.length) {
       let sources = [];
       for (let s of state.library) {
         // Filter out sources which are not in required list
@@ -1653,7 +1655,7 @@ export function generateScenes(state: State, s: Scene | SceneGrid, children: boo
       genSources = sources;
     } else {
       // Otherwise, generate sources for each weight
-      for (let wg of newScene.generatorWeights.filter((wg) => !wg.rules && wg.type == TT.weight)) {
+      for (let wg of generatorWeights.filter((wg) => !wg.rules && wg.type == TT.weight)) {
         let sources = [];
         // For each source in the library
         for (let s of state.library) {
