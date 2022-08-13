@@ -135,15 +135,10 @@ export default class Meta extends React.Component {
   //      Generate different sources even for same scenes in grid
   //      Add option to disable "delete file" prompt
   //      Add way to notify user about images filtered due to min size
-  //      Grids are slightly erroneously offset due to -5 margin. Need to add margin around entire grid to compensate
-  //      Pressing hamburger button on ScenePicker causes it to disappear
-  //      Pressing hamburger button second time on Scene has bad animation
-  //      RecentPicture grid is not scrolling
   //      Add configurable privacy screen with shortcut and ability to set image
   //      Add minimize shortcut key in same vain?
   //      AutoHide cursor isn't working on secondary monitor
   //      Issue restarting playback after pausing
-  //      Separate out image vs video limit in history
   render() {
     const scene = actions.getActiveScene(this.state);
     const grid = actions.getActiveGrid(this.state);

@@ -130,14 +130,6 @@ const styles = (theme: Theme) => createStyles({
       duration: theme.transitions.duration.enteringScreen,
     }),
   },
-  titleOut: {
-    marginLeft: -111,
-    opacity: 0,
-    transition: theme.transitions.create(['opacity', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
   updateIcon: {
     float: 'right',
   },
@@ -474,24 +466,22 @@ class ScenePicker extends React.Component {
 
         <AppBar enableColorOnDark position="absolute" className={clsx(classes.appBar, open && classes.appBarShift, this.props.tutorial == SPT.scenePicker && classes.backdropTop)}>
           <Toolbar>
-            {!open && (
-              <IconButton
-                edge="start"
-                color="inherit"
-                aria-label="Toggle Drawer"
-                className={clsx(this.props.tutorial == SPT.scenePicker && classes.highlight)}
-                onClick={this.onToggleDrawer.bind(this)}
-                size="large">
-                <MenuIcon />
-              </IconButton>
-            )}
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="Toggle Drawer"
+              className={clsx(this.props.tutorial == SPT.scenePicker && classes.highlight)}
+              onClick={this.onToggleDrawer.bind(this)}
+              size="large">
+              <MenuIcon />
+            </IconButton>
             <VSpin>
-              <div className={clsx(classes.logo, open && classes.titleOut)}/>
+              <div className={classes.logo}/>
             </VSpin>
-            <Typography component="h1" variant="h4" color="inherit" noWrap className={clsx(classes.title, open && classes.titleOut)}>
+            <Typography component="h1" variant="h4" color="inherit" noWrap className={classes.title}>
               FlipFlip
             </Typography>
-            <Typography variant="caption" color="inherit" noWrap className={clsx(classes.version, open && classes.titleOut)}>
+            <Typography variant="caption" color="inherit" noWrap className={classes.version}>
               v{this.props.version}
             </Typography>
             <div className={classes.fill}/>
