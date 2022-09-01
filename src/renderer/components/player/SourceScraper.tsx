@@ -438,6 +438,7 @@ export default class SourceScraper extends React.Component {
     setCount(sourceURL: string, count: number, countComplete: boolean): void,
     cache(i: HTMLImageElement | HTMLVideoElement): void,
     systemMessage(message: string): void,
+    onEndScene?(): void,
     setTimeToNextFrame?(timeToNextFrame: number): void,
     setSceneCopy?(children: React.ReactNode): void,
     playNextScene?(): void,
@@ -495,6 +496,7 @@ export default class SourceScraper extends React.Component {
             onLoaded={this.props.firstImageLoaded.bind(this)}
             setVideo={this.props.setVideo}
             cache={this.props.cache}
+            onEndScene={this.props.onEndScene}
             playNextScene={this.props.playNextScene}
             gridCoordinates={this.props.gridCoordinates}
             setSceneCopy={this.props.setSceneCopy}

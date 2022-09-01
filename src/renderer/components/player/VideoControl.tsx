@@ -30,6 +30,9 @@ const styles = (theme: Theme) => createStyles({
     backgroundColor: 'transparent',
     top: 2
   },
+  noTransition: {
+    transition: 'unset',
+  }
 });
 
 class VideoControl extends React.Component {
@@ -66,6 +69,8 @@ class VideoControl extends React.Component {
             value={this.props.video.currentTime}
             classes={{
               valueLabel: classes.valueLabel,
+              thumb: classes.noTransition,
+              track: classes.noTransition,
             }}
             valueLabelDisplay="on"
             valueLabelFormat={(value) => getTimestamp(value)}

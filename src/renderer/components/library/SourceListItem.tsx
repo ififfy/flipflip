@@ -138,6 +138,7 @@ class SourceListItem extends React.Component {
     onClearBlacklist(sourceURL: string): void,
     onClip(source: LibrarySource, displaySources: Array<LibrarySource>): void,
     onDelete(source: LibrarySource): void;
+    onDownload(source: LibrarySource): void;
     onEditBlacklist(source: LibrarySource): void,
     onEndEdit(newURL: string): void,
     onOpenClipMenu(source: LibrarySource): void,
@@ -187,6 +188,12 @@ class SourceListItem extends React.Component {
                   Shift+Click: Open Source
                   <br/>
                   &nbsp;&nbsp;Ctrl+Click: {sourceType == ST.video ? 'Reveal File' : 'Open Cache'}
+                  {(sourceType != ST.local && sourceType != ST.video && sourceType != ST.piwigo && sourceType != ST.hydrus && sourceType != ST.nimja) &&
+                    <React.Fragment>
+                      <br/>
+                      &nbsp;&nbsp;&nbsp;Alt+Click: Download Source
+                    </React.Fragment>
+                  }
                 </div>
               }>
                 <Fab
@@ -374,11 +381,17 @@ class SourceListItem extends React.Component {
 
   onSourceIconClick(e: MouseEvent) {
     const sourceURL = this.props.source.url;
+    const sourceType = getSourceType(sourceURL);
     if (e.shiftKey && e.ctrlKey && e.altKey) {
       this.props.onDelete(this.props.source);
-    } else if (e.shiftKey && !e.ctrlKey) {
+    } else if (e.shiftKey && !e.ctrlKey && !e.altKey) {
       this.openExternalURL(sourceURL);
-    } else if (!e.shiftKey && e.ctrlKey) {
+    } else if (!e.shiftKey && !e.ctrlKey && e.altKey) {
+      // If local source, still catch keypress, but don't do anything
+      if (sourceType != ST.local && sourceType != ST.video && sourceType != ST.piwigo && sourceType != ST.hydrus && sourceType != ST.nimja) {
+        this.props.onDownload(this.props.source);
+      }
+    } else if (!e.shiftKey && e.ctrlKey && !e.altKey) {
       const fileType = getSourceType(sourceURL);
       let cachePath;
       if (fileType == ST.video || fileType == ST.playlist) {

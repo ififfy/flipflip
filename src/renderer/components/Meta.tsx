@@ -139,6 +139,7 @@ export default class Meta extends React.Component {
   //      Add minimize shortcut key in same vain?
   //      AutoHide cursor isn't working on secondary monitor
   //      Issue restarting playback after pausing
+  //      Create a download component which can use SourceScraper
   render() {
     const scene = actions.getActiveScene(this.state);
     const grid = actions.getActiveGrid(this.state);
@@ -215,6 +216,7 @@ export default class Meta extends React.Component {
                   onClip={a(actions.clipVideo)}
                   onCloneScene={a(actions.cloneScene)}
                   onDelete={a(actions.deleteScene)}
+                  onDownload={a(actions.downloadSource)}
                   onEditBlacklist={a(actions.editBlacklist)}
                   onExport={a(actions.exportScene)}
                   onGenerate={a(actions.generateScenes)}
@@ -251,6 +253,7 @@ export default class Meta extends React.Component {
                   onBatchTag={a(actions.batchTag)}
                   onClearBlacklist={a(actions.clearBlacklist)}
                   onClip={a(actions.clipVideo)}
+                  onDownload={a(actions.downloadSource)}
                   onEditBlacklist={a(actions.editBlacklist)}
                   onExportLibrary={a(actions.exportLibrary)}
                   onImportFromLibrary={a(actions.importFromLibrary)}

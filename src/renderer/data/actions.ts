@@ -2683,6 +2683,86 @@ function sortFunction(algorithm: string, ascending: boolean, getName: (a: any) =
   }
 }
 
+export function downloadSource(state: State, source: LibrarySource): Object {
+  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path.sep);
+  let librarySource = state.library.find((s) => s.url == sourceURL);
+  if (librarySource != null) {
+    librarySource.disabledClips =  [];
+    let id = state.scenes.length + 1;
+    state.scenes.forEach((s: Scene) => {
+      id = Math.max(s.id + 1, id);
+    });
+    let tempScene = new Scene({
+      id: id,
+      name: "download_scene_temp",
+      sources: [librarySource],
+      libraryID: librarySource.id,
+      timingFunction: TF.constant,
+      timingConstant: 1,
+      backgroundType: state.config.defaultScene.backgroundType,
+      backgroundColor: state.config.defaultScene.backgroundColor,
+      backgroundColorSet: state.config.defaultScene.backgroundColorSet,
+      backgroundBlur: state.config.defaultScene.backgroundBlur,
+      imageOrientation: state.config.defaultScene.imageOrientation,
+      videoOrientation: state.config.defaultScene.videoOrientation,
+      playVideoClips: false,
+      videoVolume: 0,
+      orderFunction: OF.strict,
+      downloadScene: true,
+    });
+    if (getLibrarySource(state) != null) {
+      const activeScene = getActiveScene(state);
+      applyEffects(tempScene, getEffects(activeScene));
+      tempScene.overlayEnabled = activeScene.overlayEnabled;
+      tempScene.overlays = activeScene.overlays;
+      state.route.pop();
+      state.route.pop();
+      state.scenes.pop();
+    }
+    return {
+      scenes: state.scenes.concat([tempScene]),
+      route: state.route.concat([new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'libraryplay', value: tempScene.id})]),
+    };
+  } else {
+    source.disabledClips =  [];
+    let id = state.scenes.length + 1;
+    state.scenes.forEach((s: Scene) => {
+      id = Math.max(s.id + 1, id);
+    });
+    let tempScene = new Scene({
+      id: id,
+      name: "download_scene_temp",
+      sources: [source],
+      libraryID: null,
+      timingFunction: TF.constant,
+      timingConstant: 1,
+      backgroundType: state.config.defaultScene.backgroundType,
+      backgroundColor: state.config.defaultScene.backgroundColor,
+      backgroundColorSet: state.config.defaultScene.backgroundColorSet,
+      backgroundBlur: state.config.defaultScene.backgroundBlur,
+      imageOrientation: state.config.defaultScene.imageOrientation,
+      videoOrientation: state.config.defaultScene.videoOrientation,
+      playVideoClips: false,
+      videoVolume: 0,
+      orderFunction: OF.strict,
+      downloadScene: true,
+    });
+    if (getActiveScene(state)?.libraryID != -1) {
+      const activeScene = getActiveScene(state);
+      applyEffects(tempScene, getEffects(activeScene));
+      tempScene.overlayEnabled = activeScene.overlayEnabled;
+      tempScene.overlays = activeScene.overlays;
+      state.route.pop();
+      state.route.pop();
+      state.scenes.pop();
+    }
+    return {
+      scenes: state.scenes.concat([tempScene]),
+      route: state.route.concat([new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'libraryplay', value: tempScene.id})]),
+    };
+  }
+}
+
 export function exportScene(state: State, scene: Scene): Object {
   const scenesToExport = Array<Scene>();
   const gridsToExport = Array<SceneGrid>();

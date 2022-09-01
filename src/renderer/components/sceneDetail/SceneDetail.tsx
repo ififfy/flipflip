@@ -401,6 +401,7 @@ class SceneDetail extends React.Component {
     onClip(source: LibrarySource, displayed: Array<LibrarySource>): void,
     onCloneScene(scene: Scene): void,
     onDelete(scene: Scene): void,
+    onDownload(source: LibrarySource): void;
     onEditBlacklist(sourceURL: string, blacklist: string): void,
     onExport(scene: Scene): void,
     onGenerate(scene: Scene | SceneGrid, children?: boolean): void,
@@ -700,6 +701,7 @@ class SceneDetail extends React.Component {
                       useWeights={this.props.scene.weightFunction == WF.sources && this.props.scene.useWeights}
                       onClearBlacklist={this.props.onClearBlacklist.bind(this)}
                       onClip={this.props.onClip.bind(this)}
+                      onDownload={this.props.onDownload.bind(this)}
                       onEditBlacklist={this.props.onEditBlacklist.bind(this)}
                       onPlay={this.props.onPlay.bind(this)}
                       onUpdateScene={this.update.bind(this)}

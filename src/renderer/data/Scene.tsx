@@ -202,6 +202,7 @@ export default class Scene {
 
   gridScene = false;
   scriptScene = false;
+  downloadScene = false;
   generatorMax = 100;
   overlayEnabled = false;
   overlays: Array<Overlay> = [];

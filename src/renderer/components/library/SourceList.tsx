@@ -101,6 +101,7 @@ class SourceList extends React.Component {
     tutorial: string,
     onClearBlacklist(sourceURL: string): void,
     onClip(source: LibrarySource, displayed: Array<LibrarySource>): void,
+    onDownload(source: LibrarySource): void;
     onEditBlacklist(sourceURL: string, blacklist: string): void,
     onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void,
     systemMessage(message: string): void,
@@ -802,6 +803,7 @@ class SourceList extends React.Component {
         onClearBlacklist={this.props.onClearBlacklist.bind(this)}
         onClip={this.props.onClip.bind(this)}
         onDelete={this.onDelete.bind(this)}
+        onDownload={this.props.onDownload.bind(this)}
         onEditBlacklist={this.onEditBlacklist.bind(this)}
         onEndEdit={this.onEndEdit.bind(this)}
         onOpenClipMenu={this.onOpenClipMenu.bind(this)}

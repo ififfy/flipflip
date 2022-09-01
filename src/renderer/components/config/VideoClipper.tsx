@@ -179,6 +179,9 @@ const styles = (theme: Theme) => createStyles({
     backgroundColor: 'transparent',
     top: 2
   },
+  noTransition: {
+    transition: 'unset',
+  }
 });
 
 class VideoClipper extends React.Component {
@@ -391,6 +394,8 @@ class VideoClipper extends React.Component {
                             value={this.state.isEditingValue}
                             classes={{
                               valueLabel: classes.valueLabel,
+                              thumb: classes.noTransition,
+                              track: classes.noTransition,
                             }}
                             valueLabelDisplay="on"
                             valueLabelFormat={(value) => getTimestamp(value)}

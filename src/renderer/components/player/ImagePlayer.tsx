@@ -5,6 +5,8 @@ import request from 'request';
 import fs from "fs";
 import gifInfo from 'gif-info';
 
+import {CircularProgress, Container, Typography} from "@mui/material";
+
 import {GO, IF, OF, OT, SL, SOF, ST, TF, VO, WF} from '../../data/const';
 import {flatten, getCachePath, getRandomListItem, getRandomNumber, toArrayBuffer, urlToPath} from '../../data/utils';
 import {getFileName, getSourceType, isVideo} from "./Scrapers";
@@ -42,6 +44,7 @@ export default class ImagePlayer extends React.Component {
     onLoaded(): void,
     setVideo(video: HTMLVideoElement): void,
     cache(i: HTMLImageElement | HTMLVideoElement): void,
+    onEndScene?(): void,
     setSceneCopy?(children: React.ReactNode): void,
     setTimeToNextFrame?(timeToNextFrame: number): void,
     playNextScene?(): void,
@@ -98,6 +101,38 @@ export default class ImagePlayer extends React.Component {
             toggleStrobe={this._toggleStrobe}
             timeToNextFrame={this.state.timeToNextFrame}
             scene={this.props.scene}/>
+        )}
+        {this.props.scene.downloadScene && (
+          <Container
+            maxWidth={false}
+            style={{
+              height: '100%',
+              zIndex: 3,
+              flexGrow: 1,
+              padding: 0,
+              position: 'relative',
+              alignItems: 'center',
+              justifyContent: 'center',
+              display: 'flex',
+            }}>
+            {this.props.scene.sources[0].countComplete &&
+              <CircularProgress size={300} variant="determinate"
+                                value={Math.round((this._playedURLs?.length / this.props.scene.sources[0].count) * 100)}
+              />}
+            {!this.props.scene.sources[0].countComplete && <CircularProgress size={300}/>}
+            <div
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                display: 'flex',
+                position: 'absolute',
+                flexDirection: 'column',
+              }}>
+              <Typography component="h1" variant="h6" color="inherit" noWrap style={{paddingLeft: 8, paddingRight: 8, backgroundColor: '#2C2C2C'}}>
+                {this._playedURLs?.length} / {this.props.scene.sources[0].count}{this.props.scene.sources[0].countComplete? "" : "+"}
+              </Typography>
+            </div>
+          </Container>
         )}
         <ImageView
           removeChild
@@ -221,12 +256,6 @@ export default class ImagePlayer extends React.Component {
     } else if (props.scene.backForth && !this.props.scene.backForth) {
       clearTimeout(this._backForth);
       this._backForth = null;
-    }
-
-    if (this._count % this.props.config.displaySettings.maxInHistory == 0) {
-      //printMemoryReport();
-      webFrame.clearCache();
-      //setTimeout(printMemoryReport, 1000);
     }
   }
 
@@ -656,10 +685,25 @@ export default class ImagePlayer extends React.Component {
         }
 
         (video as any).key = this.state.nextImageID;
-        this.setState({
-          readyToDisplay: this.state.readyToDisplay.concat([video]),
-          nextImageID: this.state.nextImageID + 1,
-        });
+        if (this.props.scene.orderFunction == OF.strict) {
+          const lastIndex = this.state.historyPaths.length ? parseInt(this.state.historyPaths[this.state.historyPaths.length - 1].getAttribute("index")) : -1;
+          let readyToDisplay = this.state.readyToDisplay;
+          let count = 0;
+          while (readyToDisplay.length < urlIndex - lastIndex) {
+            count++;
+            readyToDisplay = readyToDisplay.concat([null]);
+          }
+          readyToDisplay[urlIndex - lastIndex - 1] = video;
+          this.setState({
+            readyToDisplay: readyToDisplay,
+            nextImageID: this.state.nextImageID + 1,
+          });
+        } else {
+          this.setState({
+            readyToDisplay: this.state.readyToDisplay.concat([video]),
+            nextImageID: this.state.nextImageID + 1,
+          });
+        }
         if (this.state.historyPaths.length === 0) {
           this.advance(false, false);
         }
@@ -671,8 +715,32 @@ export default class ImagePlayer extends React.Component {
           clearTimeout(this._imgLoadTimeouts[i]);
         }
         if (!this._isMounted) return;
-        if (this.props.scene.nextSceneAllImages && this.props.scene.nextSceneID != 0 && this.props.playNextScene && video && video.src) {
-          this._playedURLs.push(video.src);
+        if (this.props.scene.downloadScene || (this.props.scene.nextSceneAllImages && this.props.scene.nextSceneID != 0 && this.props.playNextScene && video && video.src)) {
+          if (!this._playedURLs.includes(video.src)) {
+            this._playedURLs.push(video.src);
+          }
+        }
+        if (this.props.scene.orderFunction == OF.strict) {
+          const lastIndex = this.state.historyPaths.length ? parseInt(this.state.historyPaths[this.state.historyPaths.length - 1].getAttribute("index")) : -1;
+
+          let readyToDisplay = this.state.readyToDisplay;
+          let count = 0;
+          while (readyToDisplay.length < urlIndex - lastIndex) {
+            count++;
+            readyToDisplay = readyToDisplay.concat([null]);
+          }
+          const errImage = new Image();
+          errImage.setAttribute("index", urlIndex.toString());
+          errImage.setAttribute("length", sourceLength.toString());
+          if (sourceIndex != null) {
+            errImage.setAttribute("sindex", sourceIndex.toString());
+          }
+          errImage.src = "src/renderer/icons/flipflip_logo.png"
+          readyToDisplay[urlIndex - lastIndex - 1] = errImage;
+          this.setState({
+            readyToDisplay: readyToDisplay,
+            nextImageID: this.state.nextImageID + 1,
+          });
         }
         this.queueRunFetchLoop(i);
       };
@@ -683,6 +751,7 @@ export default class ImagePlayer extends React.Component {
         // Also, now  we know the image size, so we can finally filter it.
         if (video.videoWidth < this.props.config.displaySettings.minVideoSize
           || video.videoHeight < this.props.config.displaySettings.minVideoSize) {
+          console.warn("Video skipped due to minimum width/height: " + video.src);
           errorCallback();
         } else {
           successCallback();
@@ -768,8 +837,32 @@ export default class ImagePlayer extends React.Component {
           clearTimeout(this._imgLoadTimeouts[i]);
         }
         if (!this._isMounted) return;
-        if (this.props.scene.nextSceneAllImages && this.props.scene.nextSceneID != 0 && this.props.playNextScene && img && img.src) {
-          this._playedURLs.push(img.src);
+        if (this.props.scene.downloadScene || (this.props.scene.nextSceneAllImages && this.props.scene.nextSceneID != 0 && this.props.playNextScene && img && img.src)) {
+          if (!this._playedURLs.includes(img.src)) {
+            this._playedURLs.push(img.src);
+          }
+        }
+        if (this.props.scene.orderFunction == OF.strict) {
+          const lastIndex = this.state.historyPaths.length ? parseInt(this.state.historyPaths[this.state.historyPaths.length - 1].getAttribute("index")) : -1;
+
+          let readyToDisplay = this.state.readyToDisplay;
+          let count = 0;
+          while (readyToDisplay.length < urlIndex - lastIndex) {
+            count++;
+            readyToDisplay = readyToDisplay.concat([null]);
+          }
+          const errImage = new Image();
+          errImage.setAttribute("index", urlIndex.toString());
+          errImage.setAttribute("length", sourceLength.toString());
+          if (sourceIndex != null) {
+            errImage.setAttribute("sindex", sourceIndex.toString());
+          }
+          errImage.src = "src/renderer/icons/flipflip_logo.png"
+          readyToDisplay[urlIndex - lastIndex - 1] = errImage;
+          this.setState({
+            readyToDisplay: readyToDisplay,
+            nextImageID: this.state.nextImageID + 1,
+          });
         }
         this.queueRunFetchLoop(i);
       };
@@ -780,6 +873,7 @@ export default class ImagePlayer extends React.Component {
         // Also, now  we know the image size, so we can finally filter it.
         if (img.width < this.props.config.displaySettings.minImageSize
           || img.height < this.props.config.displaySettings.minImageSize) {
+          console.warn("Image skipped due to minimum width/height: " + img.src);
           errorCallback();
         } else {
           successCallback();
@@ -874,6 +968,9 @@ export default class ImagePlayer extends React.Component {
     let nextHistoryPaths = this.state.historyPaths;
     let nextImg: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement;
     if (this.props.historyOffset == 0) {
+      if (this.props.scene.downloadScene && this._playedURLs.length == this.props.scene.sources[0].count && this.props.hasStarted) {
+        this.props.onEndScene();
+      }
       if (this.props.scene.nextSceneAllImages && this.props.scene.nextSceneID != 0 && this.props.playNextScene) {
         let remainingLibrary;
         if (this.props.scene.weightFunction == WF.sources) {
@@ -923,11 +1020,13 @@ export default class ImagePlayer extends React.Component {
       }
 
       while (nextHistoryPaths.length > this.props.config.displaySettings.maxInHistory) {
-        nextHistoryPaths.shift();
+        nextHistoryPaths.shift().remove();
       }
 
-      if (this.props.scene.nextSceneAllImages && this.props.scene.nextSceneID != 0 && this.props.playNextScene && nextImg && nextImg.src) {
-        this._playedURLs.push(nextImg.src);
+      if (nextImg != null && (this.props.scene.downloadScene || (this.props.scene.nextSceneAllImages && this.props.scene.nextSceneID != 0 && this.props.playNextScene && nextImg && nextImg.src))) {
+        if (!this._playedURLs.includes(nextImg.src)) {
+          this._playedURLs.push(nextImg.src);
+        }
       }
     } else {
       const newOffset = this.props.historyOffset + 1;

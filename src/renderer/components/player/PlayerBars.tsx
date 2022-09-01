@@ -395,7 +395,7 @@ class PlayerBars extends React.Component {
           </Toolbar>
         </AppBar>
 
-        {this.props.hasStarted && !this.props.isEmpty && !this.props.recentPictureGrid && (
+        {this.props.hasStarted && !this.props.isEmpty && !this.props.recentPictureGrid && !this.props.scene.downloadScene && (
           <React.Fragment>
             <div
               className={classes.hoverDrawer}
@@ -609,7 +609,7 @@ class PlayerBars extends React.Component {
           </React.Fragment>
         )}
 
-        {this.props.hasStarted && this.props.allTags && (
+        {!this.props.scene.downloadScene && this.props.hasStarted && this.props.allTags && (
           <React.Fragment>
             <div
               className={classes.hoverTagDrawer}
@@ -1010,7 +1010,7 @@ class PlayerBars extends React.Component {
         }
       }));
     }
-    if (!this.props.recentPictureGrid) {
+    if (!this.props.recentPictureGrid && !this.props.scene.downloadScene) {
       contextMenu.append(new MenuItem({
         label: 'Recent Picture Grid',
         click: () => {
@@ -1036,7 +1036,7 @@ class PlayerBars extends React.Component {
       keyMap.set('onDelete', ['Delete Image', 'Delete']);
     }
 
-    if (!this.props.scene.audioScene && !this.props.scene.scriptScene && this.props.allTags != null) {
+    if (!this.props.scene.downloadScene && !this.props.scene.audioScene && !this.props.scene.scriptScene && this.props.allTags != null) {
       keyMap.set('prevSource', ['Previous Source', '[']);
       keyMap.set('nextSource', ['Next Source', ']']);
     }
@@ -1102,13 +1102,13 @@ class PlayerBars extends React.Component {
         }
         break;
       case '[':
-        if (!this.props.scene.audioScene && !this.props.scene.scriptScene && this.props.allTags != null) {
+        if (!this.props.scene.downloadScene && !this.props.scene.audioScene && !this.props.scene.scriptScene && this.props.allTags != null) {
           e.preventDefault();
           this.prevSource();
         }
         break;
       case ']':
-        if (!this.props.scene.audioScene && !this.props.scene.scriptScene && this.props.allTags != null) {
+        if (!this.props.scene.downloadScene && !this.props.scene.audioScene && !this.props.scene.scriptScene && this.props.allTags != null) {
           e.preventDefault();
           this.nextSource();
         }

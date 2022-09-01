@@ -31,6 +31,9 @@ const styles = (theme: Theme) => createStyles({
   noPadding: {
     padding: '0 !important',
   },
+  noTransition: {
+    transition: 'unset',
+  }
 });
 
 function getTimestampFromMs(ms: number): string {
@@ -124,6 +127,10 @@ class AudioControl extends React.Component {
                           valueLabelDisplay={msRemainder ? "auto" : "off"}
                           valueLabelFormat={msRemainder}
                           value={this.state.position}
+                          classes={{
+                            thumb: classes.noTransition,
+                            track: classes.noTransition,
+                          }}
                           max={this.state.duration}
                           onChange={this.onChangePosition.bind(this)}/>
                       </Grid>

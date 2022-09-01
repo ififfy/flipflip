@@ -152,7 +152,7 @@ export default class Player extends React.Component {
         height: '100%',
       }
     }
-    if (!this.state.hasStarted) {
+    if (!this.state.hasStarted && !this.props.scene.downloadScene) {
       playerStyle = {
         ...playerStyle,
         opacity: 0,
@@ -264,7 +264,7 @@ export default class Player extends React.Component {
             scene={this.props.scene}
           />
         )}
-        {!this.state.hasStarted && !this.state.isEmpty && (
+        {!this.state.hasStarted && !this.state.isEmpty && !this.props.scene.downloadScene && (
           <main style={{
             display: 'flex',
             flexGrow: 1,
@@ -442,6 +442,7 @@ export default class Player extends React.Component {
               setVideo={this.props.setVideo ? this.props.setVideo : this.setMainVideo.bind(this)}
               setCount={this.props.setCount.bind(this)}
               cache={this.props.cache.bind(this)}
+              onEndScene={this.props.goBack.bind(this)}
               setTimeToNextFrame={this.setTimeToNextFrame.bind(this)}
               systemMessage={this.props.systemMessage.bind(this)}
               playNextScene={this.props.nextScene}
