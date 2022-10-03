@@ -746,6 +746,9 @@ class PlayerBars extends React.Component {
     window.addEventListener('contextmenu', this.showContextMenu, false);
     window.addEventListener('keydown', this.onKeyDown, false);
     window.addEventListener('wheel', this.onScroll, false);
+    if (this.props.config.displaySettings.clickToProgress) {
+      window.addEventListener('click', this.onClick, false);
+    }
     this.buildMenu();
   }
 
@@ -762,6 +765,16 @@ class PlayerBars extends React.Component {
     window.removeEventListener('contextmenu', this.showContextMenu);
     window.removeEventListener('keydown', this.onKeyDown);
     window.removeEventListener('wheel', this.onScroll);
+    if (this.props.config.displaySettings.clickToProgress) {
+      window.removeEventListener('click', this.onClick);
+    }
+  }
+
+  onClick = (e: MouseEvent) => {
+    if (this.props.recentPictureGrid || !this.props.onUpdateScene || this.state.drawerHover || this.state.tagDrawerHover || this.state.appBarHover) return;
+    if ((!this.props.isPlaying || this.props.config.displaySettings.clickToProgressWhilePlaying) && this.props.hasStarted) {
+      this.props.imagePlayerAdvanceHacks[0][0].fire();
+    }
   }
 
   onScroll = (e: WheelEvent) => {

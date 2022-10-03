@@ -2,7 +2,7 @@ import * as React from "react";
 import {existsSync} from 'fs';
 
 import {
-  Button, Dialog,
+  Button, Collapse, Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
@@ -65,6 +65,29 @@ export default class PlayerBoolCard extends React.Component {
               }
               label="Start Immediately"/>
           </Tooltip>
+        </Grid>
+        <Grid item xs={12}>
+          <Tooltip disableInteractive title="If enabled, clicking the currently playing image will advance to the next image.">
+            <FormControlLabel
+              control={
+                <Switch checked={this.props.displaySettings.clickToProgress}
+                        onChange={this.onBoolInput.bind(this, 'clickToProgress')}/>
+              }
+              label="Click to Progress"/>
+          </Tooltip>
+        </Grid>
+        <Grid item xs={12} style={this.props.displaySettings.clickToProgress ? {paddingLeft: 40} : {padding: 0}}>
+          <Collapse in={this.props.displaySettings.clickToProgress}>
+            <Tooltip disableInteractive title="If enabled, clicking will advance even during Scene playback. If disabled, clicking will only advance while Scene playback is paused.">
+              <FormControlLabel
+                control={
+                  <Switch checked={this.props.displaySettings.clickToProgressWhilePlaying}
+                          onChange={this.onBoolInput.bind(this, 'clickToProgressWhilePlaying')}
+                          size="small"/>
+                }
+                label="While Playing"/>
+            </Tooltip>
+          </Collapse>
         </Grid>
         <Grid item xs={12}>
           <Tooltip disableInteractive title="If enabled, additional controls for controlling 'easing' will be available in the Effect section.">

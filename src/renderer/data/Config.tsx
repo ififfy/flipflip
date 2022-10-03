@@ -247,6 +247,8 @@ interface DisplaySettingsI {
   alwaysOnTop: boolean;
   showMenu: boolean;
   fullScreen: boolean;
+  clickToProgress: boolean;
+  clickToProgressWhilePlaying: boolean;
   startImmediately: boolean;
   easingControls: boolean;
   audioAlert: boolean;
@@ -562,6 +564,8 @@ export class DisplaySettings  implements DisplaySettingsI {
   alwaysOnTop = false;
   showMenu = true;
   fullScreen = false;
+  clickToProgress = true;
+  clickToProgressWhilePlaying = false;
   startImmediately = false;
   easingControls = false;
   audioAlert = true;
