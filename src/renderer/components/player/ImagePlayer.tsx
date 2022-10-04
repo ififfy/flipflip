@@ -961,6 +961,7 @@ export default class ImagePlayer extends React.Component {
     }
   }
 
+  _strictCheckCount = 0;
   advance(force = false, schedule = true) {
     // bail if dead
     if (!(force || (this.props.isPlaying && this._isMounted && (this.props.hasStarted || this.state.historyPaths.length == 0)))) {
@@ -994,6 +995,7 @@ export default class ImagePlayer extends React.Component {
         if (this.state.readyToDisplay.length && this.state.readyToDisplay[0] != null) {
           // If there is an image ready, display the next image
           nextImg = this.state.readyToDisplay.shift();
+          this._strictCheckCount = 0;
         } else if (this.state.historyPaths.length && this.props.config.defaultScene.orderFunction == OF.random && !this.props.scene.forceAll) {
           // If no image is ready, we have a history to choose from, ordering is random, and NOT forcing all
           // Choose a random image from history to display
@@ -1003,6 +1005,11 @@ export default class ImagePlayer extends React.Component {
           // Show the next image from history
           if (this.props.scene.orderFunction == OF.strict) {
             // If ordering strictly and next isn't ready yet, don't load any image
+            this._strictCheckCount++;
+            if (this._strictCheckCount >= 50) {
+              this.state.readyToDisplay.shift();
+              this._strictCheckCount = 0;
+            }
             nextImg = null;
           } else {
             nextImg = this.state.historyPaths[this._nextAdvIndex++ % this.state.historyPaths.length];
