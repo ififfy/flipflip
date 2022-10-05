@@ -200,6 +200,7 @@ export default class Scene {
   panEndPer = 6;
   panEndOv = 3;
 
+  overrideIgnore = false;
   gridScene = false;
   scriptScene = false;
   downloadScene = false;

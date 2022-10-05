@@ -1262,9 +1262,11 @@ export function generateScenes(state: State, s: Scene | SceneGrid, children: boo
     const newScene = state.scenes.find((s) => s.id == scene.id);
     let generatorWeights = newScene.generatorWeights;
 
-    // Add globally ignored tags/types
-    for (let ignored of state.config.displaySettings.ignoredTags) {
-      generatorWeights = generatorWeights.concat([new WeightGroup({type: TT.none, search: ignored})]);
+    // Add globally ignored tags/types if not overridden by generator
+    if (!newScene.overrideIgnore) {
+      for (let ignored of state.config.displaySettings.ignoredTags) {
+        generatorWeights = generatorWeights.concat([new WeightGroup({type: TT.none, search: ignored})]);
+      }
     }
 
     // Record all the groups we're requiring/excluding

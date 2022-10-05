@@ -53,6 +53,8 @@ import CollectionsIcon from '@mui/icons-material/Collections';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import FileCopyIcon from '@mui/icons-material/FileCopy';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import FilterListOffIcon from '@mui/icons-material/FilterListOff';
 import FolderIcon from '@mui/icons-material/Folder';
 import HttpIcon from '@mui/icons-material/Http';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
@@ -233,10 +235,28 @@ const styles = (theme: Theme) => createStyles({
     backgroundColor: theme.palette.error.main,
     margin: 0,
     top: 'auto',
+    right: 190,
+    bottom: 20,
+    left: 'auto',
+    position: 'fixed',
+  },
+  overrideOn: {
+    backgroundColor: theme.palette.primary.dark,
+  },
+  overrideOff: {
+    backgroundColor: theme.palette.secondary.dark,
+  },
+  overrideIgnoreWGButton: {
+    margin: 0,
+    top: 'auto',
     right: 135,
     bottom: 20,
     left: 'auto',
     position: 'fixed',
+    transition: theme.transitions.create('height', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
   },
   generateTooltip: {
     top: 'auto',
@@ -1000,6 +1020,15 @@ class SceneDetail extends React.Component {
                 </Dialog>
               </React.Fragment>
             )}
+            <Tooltip disableInteractive title={this.props.scene.overrideIgnore ? "Overriding globally ignored tags/types" : "Respecting globally ignored tags/types"} placement="top-end">
+              <Fab
+                className={clsx(classes.overrideIgnoreWGButton, this.props.scene.overrideIgnore && classes.overrideOn, !this.props.scene.overrideIgnore && classes.overrideOff)}
+                onClick={this.onToggleOverrideIgnore.bind(this)}
+                size="medium">
+                {this.props.scene.overrideIgnore && <FilterListOffIcon className={classes.icon} />}
+                {!this.props.scene.overrideIgnore && <FilterListIcon className={classes.icon} />}
+              </Fab>
+            </Tooltip>
             <Tooltip disableInteractive title="Max" placement="top">
               <Fab
                 className={clsx(classes.sortMenuButton, this.props.tutorial == SDGT.buttons && clsx(classes.backdropTop, classes.disable))}
@@ -1167,6 +1196,10 @@ class SceneDetail extends React.Component {
     // Regenerate scene(s) before playback
     this.props.onGenerate(this.props.scene);
     this.props.onPlayScene(this.props.scene);
+  }
+
+  onToggleOverrideIgnore() {
+    this.changeKey("overrideIgnore", !this.props.scene.overrideIgnore);
   }
 
   getRemainingPercent(): number {
