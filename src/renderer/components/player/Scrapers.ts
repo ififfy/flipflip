@@ -525,6 +525,114 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
   }
 }
 
+export const loadRedGifs = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
+  const timeout = 10000;
+  const url = source.url;
+  let apiURL = "https://api.redgifs.com/v2/";
+  let orderRegex = /^https?:\/\/(?:www\.)?redgifs\.com\/browse\?.*order=([^&]*)/.exec(url);
+  let order = null;
+  if (!!orderRegex) {
+    order = orderRegex[1];
+  }
+  let typeRegex = /^https?:\/\/(?:www\.)?redgifs\.com\/browse\?.*type=(\w)/.exec(url);
+  let type = null;
+  if (!!typeRegex) {
+    type = typeRegex[1];
+  }
+  let tagsRegex = /^https?:\/\/(?:www\.)?redgifs\.com\/browse\?.*tags=([^&]*)/.exec(url);
+  let tags = null;
+  if (!!tagsRegex) {
+    tags = tagsRegex[1];
+  }
+  let ratioRegex = /^https?:\/\/(?:www\.)?redgifs\.com\/browse\?.*ratio=(\w)/.exec(url);
+  let ratio = null;
+  if (!!ratioRegex) {
+    ratio = ratioRegex[1];
+  }
+  let verifiedRegex = /^https?:\/\/(?:www\.)?redgifs\.com\/browse\?.*verified=(\w)/.exec(url);
+  let verified = null;
+  if (!!verifiedRegex) {
+    verified = verifiedRegex[1];
+  }
+  let longRegex = /^https?:\/\/(?:www\.)?redgifs\.com\/browse\?.*long=(\w)/.exec(url);
+  let long = null;
+  if (!!longRegex) {
+    long = longRegex[1];
+  }
+  let soundRegex = /^https?:\/\/(?:www\.)?redgifs\.com\/browse\?.*sound=(\w)/.exec(url);
+  let sound = null;
+  if (!!soundRegex) {
+    sound = soundRegex[1];
+  }
+
+  if (url.includes("/users/")) {
+    apiURL += "users/" + getFileGroup(url) + "/search?";
+    if (!order) {
+      order="recent"
+    }
+  } else if (url.includes("/browse?")) {
+    apiURL += "gifs/search?search_text=" + tags + "&count=80&";
+    if (!order) {
+      order="trending"
+    }
+  }
+  let page = helpers.next + 1;
+  if (!!type) {
+    apiURL += "type=" + type + "&";
+  }
+  if (!!ratio) {
+    apiURL += "ratio=" + ratio + "&";
+  }
+  if (!!verified) {
+    apiURL += "verified=" + verified + "&";
+  }
+  if (!!long) {
+    apiURL += "long=" + long + "&";
+  }
+  if (!!sound) {
+    apiURL += "sound=" + sound + "&";
+  }
+  apiURL += "order=" + order + "&page=" + page + "";
+
+  wretch(apiURL)
+    .get()
+    .setTimeout(15000)
+    .onAbort((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }, resolve))
+    .json((json) => {
+      const images = json.gifs.map((g: any) => {
+        if (g.urls.hd) {
+          return g.urls.hd;
+        } else if (g.urls.sd) {
+          return g.urls.sd;
+        }
+        return null;
+      }).filter((url: string) => !!url);
+      helpers.next = json.page == json.pages ? null : (helpers.next + 1);
+      helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
+      pm({
+        data: filterPathsToJustPlayable(filter, images, false),
+        allURLs: allURLs,
+        weight: weight,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }, resolve);
+    })
+    .catch((err: any) => {
+      pm({
+        error: err.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }, resolve);
+    });
+}
+
 export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 8000;
   const url = source.url;
@@ -2709,6 +2817,8 @@ export function getSourceType(url: string): string {
     return ST.tumblr;
   } else if (/^https?:\/\/(www\.)?reddit\.com\//.exec(url) != null) {
     return ST.reddit;
+  } else if (/^https?:\/\/(www\.)?redgifs\.com\//.exec(url) != null) {
+    return ST.redgifs;
   } else if (/^https?:\/\/(www\.)?imagefap\.com\//.exec(url) != null) {
     return ST.imagefap;
   } else if (/^https?:\/\/(www\.)?imgur\.com\//.exec(url) != null) {
@@ -2761,6 +2871,18 @@ export function getFileGroup(url: string) {
       if (redditID.endsWith("/saved")) redditID = redditID.replace("/saved", "");
       redditID = redditID.substring(redditID.lastIndexOf("/") + 1);
       return redditID;
+    case ST.redgifs:
+      let redgifID;
+      if (url.includes("/browse?")) {
+        let redgifRegex = /^https?:\/\/(?:www\.)?redgifs\.com\/browse\?.*tags=([^&]*)/.exec(url);
+        return redgifRegex.length ? redgifRegex[1] : "all";
+      } else  if (url.includes("/users/")) {
+        redgifID = url.replace(/^https?:\/\/(www\.)?redgifs\.com\/users\//, "");
+        if (redgifID.includes("/")) {
+          redgifID = redgifID.substring(0, redgifID.indexOf("/"));
+        }
+      }
+      return redgifID;
     case ST.imagefap:
       let imagefapID = url.replace(/https?:\/\/www.imagefap.com\//, "");
       imagefapID = imagefapID.replace(/pictures\//, "");

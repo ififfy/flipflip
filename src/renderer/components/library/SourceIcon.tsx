@@ -13,6 +13,23 @@ import TwitterIcon from '@mui/icons-material/Twitter';
 import {getSourceType} from "../player/Scrapers";
 import {ST} from "../../data/const";
 
+function RedGifsIcon(props: any) {
+  return (
+    <SvgIcon {...props} viewBox="0 0 32 32" fontSize="small">
+      <g transform="translate(0,32) scale(0.1,-0.1)">
+        <path d="M0 160 l0 -160 160 0 160 0 0 160 0 160 -160 0 -160 0 0 -160z m268
+        84 c36 -10 27 -34 -13 -34 -39 0 -60 -27 -51 -65 6 -24 31 -39 47 -29 15 9 10
+        24 -7 24 -9 0 -14 7 -12 18 2 12 13 17 33 17 28 0 30 -3 33 -39 4 -44 -7 -56
+        -53 -56 -43 0 -73 25 -81 65 -7 40 14 81 49 95 28 11 27 11 55 4z m-140 -16
+        c15 -15 15 -43 0 -67 -9 -14 -8 -23 5 -42 21 -29 21 -39 2 -39 -8 0 -25 14
+        -37 31 l-23 31 -5 -28 c-3 -17 -13 -30 -23 -32 -15 -3 -17 6 -17 77 l0 81 43
+        0 c24 0 48 -5 55 -12z"/>
+        <path d="M70 191 c0 -14 5 -19 15 -14 17 6 15 25 -3 31 -7 2 -12 -5 -12 -17z"/>
+      </g>
+    </SvgIcon>
+  );
+}
+
 function TumblrIcon(props: any) {
   return (
     <SvgIcon {...props} viewBox="0 0 430.118 430.118" fontSize="small">
@@ -249,6 +266,8 @@ export default class SourceIcon extends React.Component {
         return <ListIcon className={this.props.className}/>;
       case ST.reddit:
         return <RedditIcon className={this.props.className}/>;
+      case ST.redgifs:
+        return <RedGifsIcon className={this.props.className}/>;
       case ST.twitter:
         return <TwitterIcon className={this.props.className}/>;
       case ST.instagram:

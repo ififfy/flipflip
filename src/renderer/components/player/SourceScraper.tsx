@@ -13,7 +13,7 @@ import {CancelablePromise, flatten, getCachePath, randomizeList, urlToPath} from
 import {
   filterPathsToJustPlayable, getFileName, getSourceType, isVideo, loadBDSMlr, loadDanbooru, loadDeviantArt, loadE621,
   loadEHentai, loadGelbooru1, loadGelbooru2, loadHydrus, loadImageFap, loadImgur, loadInstagram, loadLuscious,
-  loadPiwigo, loadReddit, loadRemoteImageURLList, loadSexCom, loadTumblr, loadTwitter, processAllURLs
+  loadPiwigo, loadReddit, loadRedGifs, loadRemoteImageURLList, loadSexCom, loadTumblr, loadTwitter, processAllURLs
 } from "./Scrapers";
 import {IF, SOF, ST} from '../../data/const';
 import Config from "../../data/Config";
@@ -85,6 +85,8 @@ function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<strin
       workerFunction = returnPromise ? loadTumblrPromise : worker.loadTumblr;
     } else if (sourceType == ST.reddit) {
       workerFunction = returnPromise ? loadRedditPromise : worker.loadReddit;
+    } else if (sourceType == ST.redgifs) {
+      workerFunction = returnPromise ? loadRedGifsPromise : worker.loadRedGifs;
     } else if (sourceType == ST.imagefap) {
       workerFunction = returnPromise ? loadImageFapPromise : worker.loadImageFap;
     } else if (sourceType == ST.sexcom) {
@@ -353,6 +355,10 @@ const loadRedditPromise = (allURLs: Map<string, Array<string>>, config: Config, 
   loadReddit(allURLs, config, source, filter, weight, helpers, resolve);
 }
 
+const loadRedGifsPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadRedGifs(allURLs, config, source, filter, weight, helpers, resolve);
+}
+
 const loadImageFapPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
   loadImageFap(allURLs, config, source, filter, weight, helpers, resolve);
 }
@@ -615,7 +621,7 @@ export default class SourceScraper extends React.Component {
         }
 
         if (object?.error != null) {
-          console.error("Error retrieving " + object?.source?.url + (object?.helpers?.next > 0 ? "Page " + object.helpers.next : ""));
+          console.error("Error retrieving " + object?.source?.url + (object?.helpers?.next > 0 ? " Page " + object.helpers.next : ""));
           console.error(object.error);
         }
 
@@ -695,7 +701,7 @@ export default class SourceScraper extends React.Component {
         if (object?.type == "RPC" || (object?.helpers != null && object.helpers.uuid != uuid)) return;
 
         if (object?.error != null) {
-          console.error("Error retrieving " + object?.source?.url + (object?.helpers?.next > 0 ? "Page " + object.helpers.next : ""));
+          console.error("Error retrieving " + object?.source?.url + (object?.helpers?.next > 0 ? " Page " + object.helpers.next : ""));
           console.error(object.error);
         }
 
@@ -764,7 +770,7 @@ export default class SourceScraper extends React.Component {
         }
 
         if (object?.error != null) {
-          console.error("Error retrieving " + object?.source?.url + (object?.helpers?.next > 0 ? "Page " + object.helpers.next : ""));
+          console.error("Error retrieving " + object?.source?.url + (object?.helpers?.next > 0 ? " Page " + object.helpers.next : ""));
           console.error(object.error);
         }
 

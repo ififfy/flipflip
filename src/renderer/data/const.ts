@@ -150,6 +150,7 @@ const ST = { // source types
   list: 'st.list',
   tumblr: 'st.tumblr',
   reddit: 'st.reddit',
+  redgifs: 'st.redgifs',
   imagefap: 'st.imagefap',
   sexcom: 'st.sexcom',
   imgur: 'st.imgur',

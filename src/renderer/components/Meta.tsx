@@ -137,7 +137,6 @@ export default class Meta extends React.Component {
   //      Add configurable privacy screen with shortcut and ability to set image
   //      Add minimize shortcut key in same vain?
   //      AutoHide cursor isn't working on secondary monitor
-  //      Create a download component which can use SourceScraper
   render() {
     const scene = actions.getActiveScene(this.state);
     const grid = actions.getActiveGrid(this.state);
