@@ -236,9 +236,9 @@ export const loadTumblr = (allURLs: Map<string, Array<string>>, config: Config, 
             convertedCount++;
             if (convertedCount == images.length) {
               helpers.next = helpers.next + 1;
-              helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedSource, true).length;
+              helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedSource, false).length;
               pm({
-                data: filterPathsToJustPlayable(filter, convertedSource, true),
+                data: filterPathsToJustPlayable(filter, convertedSource, false),
                 allURLs: allURLs,
                 weight: weight,
                 helpers: helpers,
@@ -251,10 +251,10 @@ export const loadTumblr = (allURLs: Map<string, Array<string>>, config: Config, 
               convertedCount++;
               if (convertedCount == images.length) {
                 helpers.next = helpers.next + 1;
-                helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedSource, true).length;
+                helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedSource, false).length;
                 pm({
                   error: error.message,
-                  data: filterPathsToJustPlayable(filter, convertedSource, true),
+                  data: filterPathsToJustPlayable(filter, convertedSource, false),
                   allURLs: allURLs,
                   weight: weight,
                   helpers: helpers,
@@ -313,9 +313,9 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
               convertedCount++;
               if (convertedCount == submissionListing.length) {
                 helpers.next = submissionListing[submissionListing.length - 1].name;
-                helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
+                helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, false).length;
                 pm({
-                  data: filterPathsToJustPlayable(filter, convertedListing, true),
+                  data: filterPathsToJustPlayable(filter, convertedListing, false),
                   allURLs: allURLs,
                   weight: weight,
                   helpers: helpers,
@@ -328,10 +328,10 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
                 convertedCount++;
                 if (convertedCount == submissionListing.length) {
                   helpers.next = submissionListing[submissionListing.length - 1].name;
-                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
+                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, false).length;
                   pm({
                     error: error.message,
-                    data: filterPathsToJustPlayable(filter, convertedListing, true),
+                    data: filterPathsToJustPlayable(filter, convertedListing, false),
                     allURLs: allURLs,
                     weight: weight,
                     helpers: helpers,
@@ -403,9 +403,9 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
                 convertedCount++;
                 if (convertedCount == submissionListing.length) {
                   helpers.next = submissionListing[submissionListing.length - 1].name;
-                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
+                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, false).length;
                   pm({
-                    data: filterPathsToJustPlayable(filter, convertedListing, true),
+                    data: filterPathsToJustPlayable(filter, convertedListing, false),
                     allURLs: allURLs,
                     weight: weight,
                     helpers: helpers,
@@ -418,10 +418,10 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
                   convertedCount++;
                   if (convertedCount == submissionListing.length) {
                     helpers.next = submissionListing[submissionListing.length - 1].name;
-                    helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
+                    helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, false).length;
                     pm({
                       error: error.message,
-                      data: filterPathsToJustPlayable(filter, convertedListing, true),
+                      data: filterPathsToJustPlayable(filter, convertedListing, false),
                       allURLs: allURLs,
                       weight: weight,
                       helpers: helpers,
@@ -462,9 +462,9 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
                 convertedCount++;
                 if (convertedCount == submissionListing.length) {
                   helpers.next = submissionListing[submissionListing.length - 1].name;
-                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
+                  helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, false).length;
                   pm({
-                    data: filterPathsToJustPlayable(filter, convertedListing, true),
+                    data: filterPathsToJustPlayable(filter, convertedListing, false),
                     allURLs: allURLs,
                     weight: weight,
                     helpers: helpers,
@@ -477,10 +477,10 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
                   convertedCount++;
                   if (convertedCount == submissionListing.length) {
                     helpers.next = submissionListing[submissionListing.length - 1].name;
-                    helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, true).length;
+                    helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, false).length;
                     pm({
                       error: error.message,
-                      data: filterPathsToJustPlayable(filter, convertedListing, true),
+                      data: filterPathsToJustPlayable(filter, convertedListing, false),
                       allURLs: allURLs,
                       weight: weight,
                       helpers: helpers,
@@ -2738,6 +2738,10 @@ export function getFileName(url: string, extension = true) {
 }
 
 async function convertURL(url: string): Promise<Array<string>> {
+  if (url.includes(".gifv")) {
+    return [url.replace(".gifv", ".mp4")];
+  }
+
   // If this is a imgur image page, return image file
   let imgurMatch = url.match("^https?://(?:m\.)?imgur\.com/([\\w\\d]{7})$");
   if (imgurMatch != null) {
@@ -2785,16 +2789,18 @@ async function convertURL(url: string): Promise<Array<string>> {
   }
 
   // If this is redgif page, return redgif image
-  let redgifMatch = url.match("^https?://(?:www\.)?redgifs\.com/watch/(\\w*)$");
+  let redgifMatch = /^https?:\/\/(?:www\.)?redgifs\.com\/watch\/(\w*).*$/.exec(url);
   if (redgifMatch != null) {
     let fourOFour = false
-    let html = await wretch(url).get().notFound(() => {fourOFour = true}).text();
+    let json: any = await wretch("https://api.redgifs.com/v2/gifs/" + redgifMatch[1]).get().notFound(() => {fourOFour = true}).json();
     if (fourOFour) {
       return [url];
-    } else if (html) {
-      let redgif = /<meta property="og:video" content="([^"]*)">/g.exec(html);
-      if (redgif != null) {
-        return [redgif[1]];
+    } else if (json && json.gif) {
+      if (json.gif.urls.hd) {
+        return [json.gif.urls.hd];
+      }
+      if (json.gif.urls.sd) {
+        return [json.gif.urls.sd];
       }
     }
   }
