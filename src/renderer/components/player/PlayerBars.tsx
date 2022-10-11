@@ -300,6 +300,7 @@ class PlayerBars extends React.Component {
   _appBarTimeout: any = null;
   _drawerTimeout: any = null;
   _tagDrawerTimeout: any = null;
+  _showVideoControls = false;
 
   render() {
     const classes = this.props.classes;
@@ -315,6 +316,10 @@ class PlayerBars extends React.Component {
       clipID = parseInt(this.props.mainVideo.getAttribute("clip"));
       const sourceURL = this.props.mainVideo.getAttribute("source");
       source = this.props.scene.sources.find((s) => s.url == sourceURL);
+    }
+
+    if (!this._showVideoControls) {
+      this._showVideoControls = this.props.mainVideo != null || this.props.overlayVideos.find((a) => a != null) != null;
     }
 
     return (
@@ -415,7 +420,7 @@ class PlayerBars extends React.Component {
                 </Typography>
               </div>
 
-              {!this.props.scene.audioScene && (this.props.mainVideo != null || this.props.overlayVideos.find((a) => a != null) != null) && (
+              {!this.props.scene.audioScene && this._showVideoControls && (
                 <Accordion TransitionProps={{ unmountOnExit: false }}>
                   <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}
