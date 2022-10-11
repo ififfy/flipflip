@@ -28,10 +28,6 @@ const styles = (theme: Theme) => createStyles({
       opacity: 0.7,
     },
   },
-  appBarSpacer: {
-    backgroundColor: theme.palette.primary.main,
-    ...theme.mixins.toolbar
-  },
 });
 
 class PictureGrid extends React.Component {
@@ -45,7 +41,6 @@ class PictureGrid extends React.Component {
     const pictures = Array.from(this.props.pictures).reverse();
     return (
       <div className={classes.content} >
-        <div className={classes.appBarSpacer} />
         <div className={classes.masonry}>
           <Masonry columns={4} spacing={1}>
             {pictures.map((p, x) =>
