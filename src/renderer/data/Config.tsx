@@ -466,7 +466,7 @@ export class SceneSettings implements SceneSettingsI {
   overlayEnabled: false;
   overlays: Array<Overlay> = [];
   nextSceneID = 0;
-  nextSceneTime = 900;
+  nextSceneTime = 900000;
   nextSceneAllImages = false;
   persistAudio = false;
   persistText = false;

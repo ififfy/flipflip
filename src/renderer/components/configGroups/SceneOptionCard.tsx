@@ -557,7 +557,7 @@ class SceneOptionCard extends React.Component {
                       onChange={this.onIntInput.bind(this, 'nextSceneTime')}
                       onBlur={this.blurIntKey.bind(this, 'nextSceneTime')}
                       InputProps={{
-                        endAdornment: <InputAdornment position="end">sec</InputAdornment>,
+                        endAdornment: <InputAdornment position="end">ms</InputAdornment>,
                       }}
                       inputProps={{
                         min: 0,

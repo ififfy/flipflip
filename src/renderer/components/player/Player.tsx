@@ -590,7 +590,7 @@ export default class Player extends React.Component {
       clearInterval(this._interval);
     }
     if (!this.props.scene.scriptScene && this.state.isPlaying && this.state.startTime != null && !this.props.scene.nextSceneAllImages &&
-      Math.round(Math.abs(new Date().getTime() - this.state.startTime.getTime()) / 1000) >= this.props.scene.nextSceneTime) {
+      Math.abs(new Date().getTime() - this.state.startTime.getTime()) >= this.props.scene.nextSceneTime) {
       this.setState({startTime: null});
       this.props.nextScene();
     } else if (!this.state.isPlaying && this.state.startTime) {

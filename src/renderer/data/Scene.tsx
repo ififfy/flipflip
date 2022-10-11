@@ -208,7 +208,7 @@ export default class Scene {
   overlayEnabled = false;
   overlays: Array<Overlay> = [];
   nextSceneID: number = 0;
-  nextSceneTime: number = 900;
+  nextSceneTime: number = 900000;
   nextSceneAllImages = false;
   persistAudio = false;
   persistText = false;

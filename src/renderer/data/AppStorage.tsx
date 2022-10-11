@@ -408,6 +408,11 @@ export default class AppStorage {
           if (!this.initialState.theme.palette.mode && !!this.initialState.theme.palette.type) {
             this.initialState.theme.palette.mode = this.initialState.theme.palette.type;
           }
+          // Multiply all nextSceneTime
+          for (let scene of this.initialState.scenes) {
+            scene.nextSceneTime = scene.nextSceneTime * 1000;
+          }
+          this.initialState.config.defaultScene.nextSceneTime = this.initialState.config.defaultScene.nextSceneTime * 1000;
           break;
         default:
           this.initialState = {
