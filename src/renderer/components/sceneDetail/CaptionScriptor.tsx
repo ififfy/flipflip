@@ -518,7 +518,7 @@ class CaptionScriptor extends React.Component {
                               variant="standard"
                               fullWidth
                               value={""}
-                              onChange={this.onAddSetter.bind(this)}>>
+                              onChange={this.onAddSetter.bind(this)}>
                               <MenuItem key={"all"} value={"all"}>Insert All</MenuItem>
                               <Divider/>
                               {tupleSetters.map((s) =>
