@@ -2737,6 +2737,7 @@ export function getFileName(url: string, extension = true) {
   return url;
 }
 
+let _redgifOAuth: any = null;
 async function convertURL(url: string): Promise<Array<string>> {
   if (url.includes(".gifv")) {
     return [url.replace(".gifv", ".mp4")];
@@ -2792,7 +2793,21 @@ async function convertURL(url: string): Promise<Array<string>> {
   let redgifMatch = /^https?:\/\/(?:www\.)?redgifs\.com\/watch\/(\w*).*$/.exec(url);
   if (redgifMatch != null) {
     let fourOFour = false
-    let json: any = await wretch("https://api.redgifs.com/v2/gifs/" + redgifMatch[1]).get().notFound(() => {fourOFour = true}).json();
+    if (_redgifOAuth == null) {
+      let authJson: any = await wretch("https://api.redgifs.com/v2/oauth/client")
+        .content("application/x-www-form-urlencoded")
+        .formUrl({
+          grant_type: "client_credentials",
+          client_id: "183c871ed84-0009-314e-0005-2eb73632ccb8",
+          client_secret: "e600b7ca33a0d5a012df08468b3adb25"
+        })
+        .post().json();
+      if (_redgifOAuth == null && authJson.access_token) {
+        _redgifOAuth = "Bearer " + authJson.access_token;
+      }
+    }
+
+    let json: any = await wretch("https://api.redgifs.com/v2/gifs/" + redgifMatch[1]).auth(_redgifOAuth).get().notFound(() => {fourOFour = true}).json();
     if (fourOFour) {
       return [url];
     } else if (json && json.gif) {
