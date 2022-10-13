@@ -268,7 +268,7 @@ class PlayerBars extends React.Component {
     historyBack(): void,
     historyForward(): void,
     navigateTagging(offset: number): void,
-    onGenerate(scene: Scene | SceneGrid, children?: boolean): void,
+    onGenerate(scene: Scene | SceneGrid, children?: boolean, force?: boolean): void,
     onRecentPictureGrid(): void,
     onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
     playNextScene(): void,

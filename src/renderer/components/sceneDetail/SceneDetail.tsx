@@ -424,7 +424,7 @@ class SceneDetail extends React.Component {
     onDownload(source: LibrarySource): void;
     onEditBlacklist(sourceURL: string, blacklist: string): void,
     onExport(scene: Scene): void,
-    onGenerate(scene: Scene | SceneGrid, children?: boolean): void,
+    onGenerate(scene: Scene | SceneGrid, children?: boolean, force?: boolean): void,
     onPlayScene(scene: Scene): void,
     onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void,
     onPlayAudio(source: Audio, displayed: Array<Audio>): void,
@@ -1213,7 +1213,7 @@ class SceneDetail extends React.Component {
   }
 
   onGenerate() {
-    this.props.onGenerate(this.props.scene, false);
+    this.props.onGenerate(this.props.scene, false, true);
     this.generateCallback();
   }
 

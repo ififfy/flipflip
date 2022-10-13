@@ -1208,7 +1208,7 @@ function reduceList(sources: Array<LibrarySource>, limit: number): Array<Library
   return sources;
 }
 
-export function generateScenes(state: State, s: Scene | SceneGrid, children: boolean =  true): Object {
+export function generateScenes(state: State, s: Scene | SceneGrid, children: boolean =  true, force: boolean = false): Object {
   const generateScenes: Array<Scene> = []
   if (s instanceof SceneGrid) {
     for (let row of s.grid) {
@@ -1232,7 +1232,7 @@ export function generateScenes(state: State, s: Scene | SceneGrid, children: boo
       }
     }
   } else {
-    if (s.regenerate && areWeightsValid(s)) {
+    if ((s.regenerate || force) && areWeightsValid(s)) {
       generateScenes.push(s);
     }
     if (s.overlayEnabled && children) {

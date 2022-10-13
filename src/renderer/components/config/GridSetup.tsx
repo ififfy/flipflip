@@ -132,7 +132,7 @@ class GridSetup extends React.Component {
     tutorial: string,
     goBack(): void,
     onDelete(grid: SceneGrid): void,
-    onGenerate(scene: Scene | SceneGrid, children?: boolean): void,
+    onGenerate(scene: Scene | SceneGrid, children?: boolean, force?: boolean): void,
     onPlayGrid(grid: SceneGrid): void,
     onTutorial(tutorial: string): void,
     onUpdateGrid(grid: SceneGrid, fn: (grid: SceneGrid) => void): void,

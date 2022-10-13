@@ -106,7 +106,7 @@ class GridPlayer extends React.Component {
     cache(i: HTMLImageElement | HTMLVideoElement): void,
     getTags(source: string): Array<Tag>,
     goBack(): void,
-    onGenerate(scene: Scene | SceneGrid, children?: boolean): void,
+    onGenerate(scene: Scene | SceneGrid, children?: boolean, force?: boolean): void,
     setCount(sourceURL: string, count: number, countComplete: boolean): void,
     systemMessage(message: string): void,
     finishedLoading?(empty: boolean): void,
