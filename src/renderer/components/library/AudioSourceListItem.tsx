@@ -150,6 +150,9 @@ const styles = (theme: Theme) => createStyles({
   },
   listItem: {
     paddingRight: 110,
+  },
+  preLine: {
+    whiteSpace: 'pre-line',
   }
 });
 
@@ -207,7 +210,7 @@ class AudioSourceListItem extends React.Component {
                          arrow={!!this.props.source.comment || this.props.source.tags.length > 0}
                          title={
                   this.props.source.comment || this.props.source.tags.length > 0 ?
-                    <div>
+                    <div className={classes.preLine}>
                       {this.props.source.comment}
                       {this.props.source.comment && this.props.source.tags.length > 0 && (<br/>)}
                       <div className={classes.tagChips}>
