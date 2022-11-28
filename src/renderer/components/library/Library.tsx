@@ -1314,10 +1314,14 @@ class Library extends React.Component {
   onFinishDeleteAll() {
     for (let l of this.props.library) {
       const fileType = getSourceType(l.url);
-      if (fileType == ST.local) {
-        rimraf.sync(l.url);
-      } else if (fileType == ST.video || fileType == ST.playlist || fileType == ST.list) {
-        unlinkSync(l.url);
+      try {
+        if (fileType == ST.local) {
+          rimraf.sync(l.url);
+        } else if (fileType == ST.video || fileType == ST.playlist || fileType == ST.list) {
+          unlinkSync(l.url);
+        }
+      } catch (e) {
+        console.error(e);
       }
     }
     this.props.onUpdateLibrary((l) => {
@@ -1332,10 +1336,14 @@ class Library extends React.Component {
       for (let i = l.length -1; i >= 0 ; i--) {
         if (displayIDs.includes(l[i].id)) {
           const fileType = getSourceType(l[i].url);
-          if (fileType == ST.local) {
-            rimraf.sync(l[i].url);
-          } else if (fileType == ST.video || fileType == ST.playlist || fileType == ST.list) {
-            unlinkSync(l[i].url);
+          try {
+            if (fileType == ST.local) {
+              rimraf.sync(l[i].url);
+            } else if (fileType == ST.video || fileType == ST.playlist || fileType == ST.list) {
+              unlinkSync(l[i].url);
+            }
+          } catch (e) {
+            console.error(e);
           }
           l.splice(i, 1);
         }

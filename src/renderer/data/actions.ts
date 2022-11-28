@@ -419,7 +419,11 @@ export function cleanBackups(config: Config) {
     }
   }
   for (let backup of backups) {
-    fs.unlinkSync(saveDir + path.sep + backup.url);
+    try {
+      fs.unlinkSync(saveDir + path.sep + backup.url);
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
 
