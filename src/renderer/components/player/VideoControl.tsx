@@ -58,6 +58,7 @@ class VideoControl extends React.Component {
   };
 
   render() {
+    if (this.props.video == null) return <Grid container spacing={1} alignItems="center" justifyContent={this.props.player ? "center" : "flex-start"}/>;
     const classes = this.props.classes;
     return (
       <Grid container spacing={1} alignItems="center" justifyContent={this.props.player ? "center" : "flex-start"}>
@@ -160,6 +161,7 @@ class VideoControl extends React.Component {
   _interval: any = null;
   componentDidMount() {
     this._interval = setInterval(() => {
+      if (!this.props.video) return;
       if (!this.props.video.paused) {
         this.triggerUpdate();
       }
@@ -266,6 +268,7 @@ class VideoControl extends React.Component {
   }
 
   getMarks(): Array<{value: number, label: string}> {
+    if (!this.props.video) return [];
     const min = this.props.clipValue ?  this.props.clipValue[0] : 0;
     const max = this.props.clipValue ? this.props.clipValue[1] : this.props.video.duration;
     const marks = [{value: min, label: getTimestamp(min)}, {value: max, label: getTimestamp(max)}];
