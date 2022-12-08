@@ -2854,7 +2854,7 @@ export function getSourceType(url: string): string {
     return ST.instagram;
   } else if (/^https?:\/\/(www\.)?(lolibooru\.moe|hypnohub\.net|danbooru\.donmai\.us)\//.exec(url) != null) {
     return ST.danbooru;
-  } else if (/^https?:\/\/(www\.)?(gelbooru\.com|furry\.booru\.org|rule34\.xxx|realbooru\.com)\//.exec(url) != null) {
+  } else if (/^https?:\/\/(www\.)?(gelbooru\.com|furry\.booru\.org|rule34\.xxx|realbooru\.com|safebooru\.org)\//.exec(url) != null) {
     return ST.gelbooru2;
   } else if (/^https?:\/\/(www\.)?(e621\.net)\//.exec(url) != null) {
     return ST.e621;
