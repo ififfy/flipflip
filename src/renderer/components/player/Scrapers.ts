@@ -2928,6 +2928,9 @@ export function getFileGroup(url: string) {
       if (twitterID.includes("?")) {
         twitterID = twitterID.substring(0, twitterID.indexOf("?"));
       }
+      if (twitterID.endsWith("/")) {
+        twitterID = twitterID.substring(0, twitterID.length - 1);
+      }
       return twitterID;
     case ST.deviantart:
       let authorID = url.replace(/https?:\/\/www.deviantart.com\//, "");
