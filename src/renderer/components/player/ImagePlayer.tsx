@@ -31,6 +31,7 @@ export default class ImagePlayer extends React.Component {
     gridView: boolean,
     advanceHack: ChildCallbackHack,
     allURLs: Map<string, Array<string>>,
+    allPosts: Map<string, string>,
     isPlaying: boolean,
     historyOffset: number,
     hasStarted: boolean,
@@ -533,6 +534,8 @@ export default class ImagePlayer extends React.Component {
       source = this.props.allURLs.get(url)[0];
     }
 
+    let post = this.props.allPosts.has(url) ? this.props.allPosts.get(url) : null;
+
     if (this.props.scene.orderFunction == OF.random && (this.props.scene.forceAll || (this.props.scene.weightFunction == WF.sources && this.props.scene.fullSource))) {
       this._loadedURLs.push(url);
     }
@@ -553,6 +556,9 @@ export default class ImagePlayer extends React.Component {
     if (fileType == ST.nimja) {
       let iframe = document.createElement('iframe');
       iframe.setAttribute("source", source);
+      if (!!post) {
+        iframe.setAttribute("post", post);
+      }
       if (this.props.scene.orderFunction == OF.strict) {
         iframe.setAttribute("index", urlIndex.toString());
         iframe.setAttribute("length", sourceLength.toString());
@@ -588,6 +594,9 @@ export default class ImagePlayer extends React.Component {
     } else if (isVideo(url, false)) {
       let video = document.createElement('video');
       video.setAttribute("source", source);
+      if (!!post) {
+        video.setAttribute("post", post);
+      }
       if (this.props.scene.orderFunction == OF.strict) {
         video.setAttribute("index", urlIndex.toString());
         video.setAttribute("length", sourceLength.toString());
@@ -786,6 +795,9 @@ export default class ImagePlayer extends React.Component {
     } else {
       const img = new Image();
       img.setAttribute("source", source);
+      if (!!post) {
+        img.setAttribute("post", post);
+      }
       if (this.props.scene.orderFunction == OF.strict) {
         img.setAttribute("index", urlIndex.toString());
         img.setAttribute("length", sourceLength.toString());

@@ -199,11 +199,17 @@ export default class Player extends React.Component {
       if (img) {
         watermarkText = watermarkText.replace("{source_url}", img.getAttribute("source"));
         watermarkText = watermarkText.replace("{source_name}", getFileGroup(img.getAttribute("source")));
-        watermarkText = watermarkText.replace("{file_url}", urlToPath(img.src));
+        if (img.hasAttribute("post")) {
+          watermarkText = watermarkText.replace("{post_url}", img.getAttribute("post"));
+        } else {
+          watermarkText = watermarkText.replace(/\{post_url\}\s*/g, "");
+        }
+        watermarkText = watermarkText.replace("{file_url}", img.src.startsWith("file") ? urlToPath(img.src) : img.src);
         watermarkText = watermarkText.replace("{file_name}", decodeURIComponent(getFileName(img.src)));
       } else {
         watermarkText = watermarkText.replace(/\s*\{source_url\}\s*/g, "");
         watermarkText = watermarkText.replace(/\s*\{source_name\}\s*/g, "");
+        watermarkText = watermarkText.replace(/\s*\{post_url\}\s*/g, "");
         watermarkText = watermarkText.replace(/\s*\{file_url\}\s*/g, "");
         watermarkText = watermarkText.replace(/\s*\{file_name\}\s*/g, "");
       }
@@ -213,17 +219,17 @@ export default class Player extends React.Component {
         if (this.state.currentAudio.name) {
           watermarkText = watermarkText.replace("{audio_title}", this.state.currentAudio.name);
         } else {
-          watermarkText = watermarkText.replace(/\s*\{audio_title\}\s*/g, "");
+          watermarkText = watermarkText.replace(/\{audio_title\}\s*/g, "");
         }
         if (this.state.currentAudio.artist) {
           watermarkText = watermarkText.replace("{audio_artist}", this.state.currentAudio.artist);
         } else {
-          watermarkText = watermarkText.replace(/\s*\{audio_artist\}\s*/g, "");
+          watermarkText = watermarkText.replace(/\{audio_artist\}\s*/g, "");
         }
         if (this.state.currentAudio.album) {
           watermarkText = watermarkText.replace("{audio_album}", this.state.currentAudio.album);
         } else {
-          watermarkText = watermarkText.replace(/\s*\{audio_album\}\s*/g, "");
+          watermarkText = watermarkText.replace(/\{audio_album\}\s*/g, "");
         }
       } else {
         watermarkText = watermarkText.replace(/\s*\{audio_url\}\s*/g, "");

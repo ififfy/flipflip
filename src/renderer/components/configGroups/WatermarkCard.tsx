@@ -62,6 +62,8 @@ class WatermarkCard extends React.Component {
                            <br/>
                            {"{source_name}"} - Name of the current Source
                            <br/>
+                           {"{post_url}"} - URL of the current file's post
+                           <br/>
                            {"{file_url}"} - URL of the current file
                            <br/>
                            {"{file_name}"} - Name of the current file

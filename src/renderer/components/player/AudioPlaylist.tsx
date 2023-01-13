@@ -397,6 +397,7 @@ class AudioPlaylist extends React.Component {
   }
 
   nextTrack() {
+    console.log("Next Track");
     let nextTrack = this.state.currentIndex + 1;
     if (nextTrack >= this.state.playingAudios.length) {
       nextTrack = 0;
@@ -446,7 +447,8 @@ class AudioPlaylist extends React.Component {
   }
 
   onAudioSliderChange(e: MouseEvent, value: number) {
-    this.props.onUpdateScene(this.props.scene, (s) => s.audioPlaylists[this.props.playlistIndex].audios.find((a: Audio) => a.id == this.state.playingAudios[this.state.currentIndex].id).volume = value);
+    // TODO this is causing playback to skip to the next track
+    //this.props.onUpdateScene(this.props.scene, (s) => s.audioPlaylists[this.props.playlistIndex].audios.find((a: Audio) => a.id == this.state.playingAudios[this.state.currentIndex].id).volume = value);
   }
 }
 

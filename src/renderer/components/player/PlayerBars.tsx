@@ -776,9 +776,17 @@ class PlayerBars extends React.Component {
   }
 
   onClick = (e: MouseEvent) => {
-    if (this.props.recentPictureGrid || !this.props.onUpdateScene || this.state.drawerHover || this.state.tagDrawerHover || this.state.appBarHover) return;
+    if (this.props.scene.audioScene || this.props.recentPictureGrid || this.state.drawerHover || this.state.tagDrawerHover || this.state.appBarHover) return;
     if ((!this.props.isPlaying || this.props.config.displaySettings.clickToProgressWhilePlaying) && this.props.hasStarted) {
+      console.log("Next");
+      //console.log(this.props.imagePlayerAdvanceHacks);
       this.props.imagePlayerAdvanceHacks[0][0].fire();
+      // Improve this to be able to advance specific grids
+      /*for (let x of this.props.imagePlayerAdvanceHacks) {
+        for (let y of x) {
+          y.fire();
+        }
+      }*/
     }
   }
 
@@ -941,6 +949,7 @@ class PlayerBars extends React.Component {
     const img = this.props.recentPictureGrid ? e.target : this.props.historyPaths[(this.props.historyPaths.length - 1) + this.props.historyOffset];
     const url = img.src;
     let source = img.getAttribute("source");
+    let post = img.hasAttribute("post") ? img.getAttribute("post") : null;
     const literalSource = source;
     if (/^https?:\/\//g.exec(source) == null) {
       source = urlToPath(fileURL(source));
@@ -952,6 +961,12 @@ class PlayerBars extends React.Component {
       label: literalSource,
       click: () => { navigator.clipboard.writeText(source); }
     }));
+    if (!!post) {
+      contextMenu.append(new MenuItem({
+        label: post,
+        click: () => { navigator.clipboard.writeText(post); }
+      }));
+    }
     contextMenu.append(new MenuItem({
       label: isFile ? path : url,
       click: () => { navigator.clipboard.writeText(isFile ? path : url); }
@@ -968,6 +983,12 @@ class PlayerBars extends React.Component {
       label: 'Open Source',
       click: () => { remote.shell.openExternal(source); }
     }));
+    if (!!post) {
+      contextMenu.append(new MenuItem({
+        label: 'Open Post',
+        click: () => { remote.shell.openExternal(post); }
+      }));
+    }
     contextMenu.append(new MenuItem({
       label: 'Open File',
       click: () => { remote.shell.openExternal(url); }

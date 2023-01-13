@@ -34,50 +34,50 @@ function isEmpty(allURLs: any[]): boolean {
 }
 
 // Determine what kind of source we have based on the URL and return associated Promise
-function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, returnPromise = false) {
+function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, returnPromise = false) {
   const sourceType = getSourceType(source.url);
   if (sourceType == ST.local) { // Local files
     if (returnPromise) {
       return new CancelablePromise((resolve) => {
-        loadLocalDirectory(resolve, allURLs, config, source, filter, weight, helpers, null);
+        loadLocalDirectory(resolve, allURLs, allPosts, config, source, filter, weight, helpers, null);
       });
     } else {
-      loadLocalDirectory(pm, allURLs, config, source, filter, weight, helpers, null);
+      loadLocalDirectory(pm, allURLs, allPosts, config, source, filter, weight, helpers, null);
     }
   } else if (sourceType == ST.list) { // Image List
     helpers.next = null;
     if (returnPromise) {
       return new CancelablePromise((resolve) => {
-        loadRemoteImageURLListPromise(allURLs, config, source, filter, weight, helpers, resolve);
+        loadRemoteImageURLListPromise(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
       });
     } else {
-      worker.loadRemoteImageURLList(allURLs, config, source, filter, weight, helpers);
+      worker.loadRemoteImageURLList(allURLs, allPosts, config, source, filter, weight, helpers);
     }
   } else if (sourceType == ST.video) {
     const cachePath = getCachePath(source.url, config) + getFileName(source.url);
     if (returnPromise) {
       return new CancelablePromise((resolve) => {
-        loadVideo(resolve, allURLs, config, source, filter, weight, helpers, config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null);
+        loadVideo(resolve, allURLs, allPosts, config, source, filter, weight, helpers, config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null);
       });
     } else {
-      loadVideo(pm, allURLs, config, source, filter, weight, helpers, config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null);
+      loadVideo(pm, allURLs, allPosts, config, source, filter, weight, helpers, config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null);
     }
   } else if (sourceType == ST.playlist) {
     const cachePath = getCachePath(source.url, config) + getFileName(source.url);
     if (returnPromise) {
       return new CancelablePromise((resolve) => {
-        loadPlaylist(resolve, allURLs, config, source, filter, weight, helpers, config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null);
+        loadPlaylist(resolve, allURLs, allPosts, config, source, filter, weight, helpers, config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null);
       });
     } else {
-      loadPlaylist(pm, allURLs, config, source, filter, weight, helpers, config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null);
+      loadPlaylist(pm, allURLs, allPosts, config, source, filter, weight, helpers, config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null);
     }
   } else if (sourceType == ST.nimja) {
     if (returnPromise) {
       return new CancelablePromise((resolve) => {
-        loadNimja(resolve, allURLs, config, source, filter, weight, helpers, null);
+        loadNimja(resolve, allURLs, allPosts, config, source, filter, weight, helpers, null);
       });
     } else {
-      loadNimja(pm, allURLs, config, source, filter, weight, helpers, null);
+      loadNimja(pm, allURLs, allPosts, config, source, filter, weight, helpers, null);
     }
   } else { // Paging sources
     let workerFunction: any;
@@ -125,39 +125,40 @@ function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<strin
         // If the cache directory exists, use it
         if (returnPromise) {
           return new CancelablePromise((resolve) => {
-            loadLocalDirectory(resolve, allURLs, config, source, filter, weight, helpers, cachePath);
+            loadLocalDirectory(resolve, allURLs, allPosts, config, source, filter, weight, helpers, cachePath);
           });
         } else {
-          loadLocalDirectory(pm, allURLs, config, source, filter, weight, helpers, cachePath);
+          loadLocalDirectory(pm, allURLs, allPosts, config, source, filter, weight, helpers, cachePath);
         }
       } else {
         if (returnPromise) {
           return new CancelablePromise((resolve) => {
-            workerFunction(allURLs, config, source, filter, weight, helpers, resolve);
+            workerFunction(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
           });
         } else {
-          workerFunction(allURLs, config, source, filter, weight, helpers);
+          workerFunction(allURLs, allPosts, config, source, filter, weight, helpers);
         }
       }
     } else {
       if (returnPromise) {
         return new CancelablePromise((resolve) => {
-          workerFunction(allURLs, config, source, filter, weight, helpers, resolve);
+          workerFunction(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
         });
       } else {
-        workerFunction(allURLs, config, source, filter, weight, helpers);
+        workerFunction(allURLs, allPosts, config, source, filter, weight, helpers);
       }
     }
   }
 }
 
-const loadNimja = (pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, cachePath: string) => {
+const loadNimja = (pm: Function, allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, cachePath: string) => {
   let sources = [source.url];
   allURLs = processAllURLs(sources, allURLs, source, weight, helpers);
   helpers.next = null;
   pm({data: {
       data: sources,
-      allURLs: allURLs,
+      allURLs: allURLs, 
+      allPosts: allPosts,
       weight: weight,
       helpers: helpers,
       source: source,
@@ -165,7 +166,7 @@ const loadNimja = (pm: Function, allURLs: Map<string, Array<string>>, config: Co
     }});
 }
 
-const loadLocalDirectory = (pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, cachePath: string) => {
+const loadLocalDirectory = (pm: Function, allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, cachePath: string) => {
   const blacklist = ['*.css', '*.html', 'avatar.png', '*.txt'];
   const url = cachePath ? cachePath : source.url;
 
@@ -193,7 +194,8 @@ const loadLocalDirectory = (pm: Function, allURLs: Map<string, Array<string>>, c
 
       pm({data: {
         data: sources,
-        allURLs: allURLs,
+        allURLs: allURLs, 
+        allPosts: allPosts,
         weight: weight,
         helpers: helpers,
         source: source,
@@ -203,13 +205,14 @@ const loadLocalDirectory = (pm: Function, allURLs: Map<string, Array<string>>, c
   });
 }
 
-export const loadVideo = (pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, cachePath: string) => {
+export const loadVideo = (pm: Function, allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, cachePath: string) => {
   const url = cachePath ? cachePath : source.url;
   const missingVideo = () => {
     pm({data: {
       error: "Could not find " + source.url,
       data: [],
-      allURLs: allURLs,
+      allURLs: allURLs, 
+      allPosts: allPosts,
       weight: weight,
       helpers: helpers,
       source: source,
@@ -250,7 +253,8 @@ export const loadVideo = (pm: Function, allURLs: Map<string, Array<string>>, con
 
     pm({data: {
       data: paths,
-      allURLs: allURLs,
+      allURLs: allURLs, 
+      allPosts: allPosts,
       weight: weight,
       helpers: helpers,
       source: source,
@@ -280,7 +284,7 @@ export const loadVideo = (pm: Function, allURLs: Map<string, Array<string>>, con
   }
 }
 
-export const loadPlaylist = (pm: Function, allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, cachePath: string) => {
+export const loadPlaylist = (pm: Function, allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, cachePath: string) => {
   const url = cachePath ? cachePath : source.url;
   wretch(url)
     .get()
@@ -327,6 +331,7 @@ export const loadPlaylist = (pm: Function, allURLs: Map<string, Array<string>>, 
       pm({data: {
         data: urls,
         allURLs: allURLs,
+        allPosts: allPosts,
         weight: weight,
         helpers: helpers,
         source: source,
@@ -343,80 +348,80 @@ export const loadPlaylist = (pm: Function, allURLs: Map<string, Array<string>>, 
     });
 }
 
-const loadRemoteImageURLListPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
-  loadRemoteImageURLList(allURLs, config, source, filter, weight, helpers, resolve);
+const loadRemoteImageURLListPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadRemoteImageURLList(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
 }
 
-const loadTumblrPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
-  loadTumblr(allURLs, config, source, filter, weight, helpers, resolve);
+const loadTumblrPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadTumblr(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
 }
 
-const loadRedditPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
-  loadReddit(allURLs, config, source, filter, weight, helpers, resolve);
+const loadRedditPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadReddit(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
 }
 
-const loadRedGifsPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
-  loadRedGifs(allURLs, config, source, filter, weight, helpers, resolve);
+const loadRedGifsPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadRedGifs(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
 }
 
-const loadImageFapPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
-  loadImageFap(allURLs, config, source, filter, weight, helpers, resolve);
+const loadImageFapPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadImageFap(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
 }
 
-const loadSexComPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
-  loadSexCom(allURLs, config, source, filter, weight, helpers, resolve);
+const loadSexComPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadSexCom(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
 }
 
-const loadImgurPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
-  loadImgur(allURLs, config, source, filter, weight, helpers, resolve);
+const loadImgurPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadImgur(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
 }
 
-const loadTwitterPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
-  loadTwitter(allURLs, config, source, filter, weight, helpers, resolve);
+const loadTwitterPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadTwitter(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
 }
 
-const loadDeviantArtPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
-  loadDeviantArt(allURLs, config, source, filter, weight, helpers, resolve);
+const loadDeviantArtPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadDeviantArt(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
 }
 
-const loadInstagramPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
-  loadInstagram(allURLs, config, source, filter, weight, helpers, resolve);
+const loadInstagramPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadInstagram(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
 }
 
-const loadDanbooruPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
-  loadDanbooru(allURLs, config, source, filter, weight, helpers, resolve);
+const loadDanbooruPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadDanbooru(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
 }
 
-const loadE621Promise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
-  loadE621(allURLs, config, source, filter, weight, helpers, resolve);
+const loadE621Promise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadE621(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
 }
 
-const loadGelbooru1Promise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
-  loadGelbooru1(allURLs, config, source, filter, weight, helpers, resolve);
+const loadGelbooru1Promise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadGelbooru1(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
 }
 
-const loadGelbooru2Promise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
-  loadGelbooru2(allURLs, config, source, filter, weight, helpers, resolve);
+const loadGelbooru2Promise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadGelbooru2(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
 }
 
-const loadEHentaiPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
-  loadEHentai(allURLs, config, source, filter, weight, helpers, resolve);
+const loadEHentaiPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadEHentai(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
 }
 
-const loadBDSMlrPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
-  loadBDSMlr(allURLs, config, source, filter, weight, helpers, resolve);
+const loadBDSMlrPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadBDSMlr(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
 }
 
-const loadHydrusPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
-  loadHydrus(allURLs, config, source, filter, weight, helpers, resolve);
+const loadHydrusPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadHydrus(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
 }
 
-const loadPiwigoPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
-  loadPiwigo(allURLs, config, source, filter, weight, helpers, resolve);
+const loadPiwigoPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadPiwigo(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
 }
 
-const loadLusciousPromise = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
-  loadLuscious(allURLs, config, source, filter, weight, helpers, resolve);
+const loadLusciousPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadLuscious(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
 }
 
 export default class SourceScraper extends React.Component {
@@ -452,6 +457,7 @@ export default class SourceScraper extends React.Component {
 
   readonly state = {
     allURLs: new Map<string, Array<string>>(),
+    allPosts: new Map<string, string>(),
     restart: false,
     preload: false,
     videoVolume: this.props.scene.videoVolume,
@@ -465,6 +471,7 @@ export default class SourceScraper extends React.Component {
   _promiseQueue: Array<{source: LibrarySource, helpers: {next: any, count: number, retries: number, uuid: string}}> = null;
   _nextPromiseQueue: Array<{source: LibrarySource, helpers: {next: any, count: number, retries: number, uuid: string}}> = null;
   _nextAllURLs: Map<string, Array<string>> = null;
+  _nextAllPosts: Map<string, string> = null;
 
   render() {
     let style: any = {opacity: this.props.opacity};
@@ -499,6 +506,7 @@ export default class SourceScraper extends React.Component {
             hasStarted={this.props.hasStarted}
             singleImage={this.state.singleImage}
             allURLs={isEmpty(Array.from(this.state.allURLs.values())) ? null : this.state.allURLs}
+            allPosts={this.state.allPosts}
             onLoaded={this.props.firstImageLoaded.bind(this)}
             setVideo={this.props.setVideo}
             cache={this.props.cache}
@@ -542,11 +550,16 @@ export default class SourceScraper extends React.Component {
       this._promiseQueue = new Array<{ source: LibrarySource, helpers: {next: any, count: number, retries: number, uuid: string} }>();
       this._nextPromiseQueue = new Array<{ source: LibrarySource, helpers: {next: any, count: number, retries: number, uuid: string} }>();
       this._nextAllURLs = new Map<string, Array<string>>();
+      this._nextAllPosts = new Map<string, string>();
     }
     let n = 0;
     let newAllURLs = new Map<string, Array<string>>();
     if (this.state.allURLs.size > 0) {
       newAllURLs = this.state.allURLs;
+    }
+    let newAllPosts = new Map<string, string>();
+    if (this.state.allPosts.size > 0) {
+      newAllPosts = this.state.allPosts;
     }
 
     let sceneSources = new Array<LibrarySource>();
@@ -641,6 +654,8 @@ export default class SourceScraper extends React.Component {
             const source = object.source;
             newAllURLs = object.allURLs;
             this.setState({allURLs: newAllURLs});
+            newAllPosts = object.allPosts;
+            this.setState({allPosts: newAllPosts});
 
             // If this is a remote URL, queue up the next promise
             if (object.helpers.next != null) {
@@ -679,9 +694,9 @@ export default class SourceScraper extends React.Component {
         }
         workerListener = receiveMessage.bind(this);
         workerInstance.addEventListener('message', workerListener);
-        scrapeFiles(workerInstance, workerListener, this.state.allURLs, this.props.config, d, this.props.scene.imageTypeFilter, this.props.scene.weightFunction, {next: -1, count: 0, retries: 0, uuid: uuid})
+        scrapeFiles(workerInstance, workerListener, this.state.allURLs, this.state.allPosts, this.props.config, d, this.props.scene.imageTypeFilter, this.props.scene.weightFunction, {next: -1, count: 0, retries: 0, uuid: uuid})
       } else {
-        scrapeFiles(workerInstance, workerListener, this.state.allURLs, this.props.config, d, this.props.scene.imageTypeFilter, this.props.scene.weightFunction, {next: -1, count: 0, retries: 0, uuid: uuid}, true).then((data) => {
+        scrapeFiles(workerInstance, workerListener, this.state.allURLs, this.state.allPosts, this.props.config, d, this.props.scene.imageTypeFilter, this.props.scene.weightFunction, {next: -1, count: 0, retries: 0, uuid: uuid}, true).then((data) => {
           receiveMessage(data);
         })
       }
@@ -720,6 +735,7 @@ export default class SourceScraper extends React.Component {
           if (object?.data != null) {
             const source = object.source;
             this._nextAllURLs = object.allURLs;
+            this._nextAllPosts = object.allPosts;
 
             // If this is a remote URL, queue up the next promise
             if (object.helpers.next != null) {
@@ -741,9 +757,9 @@ export default class SourceScraper extends React.Component {
         }
         nextWorkerListener = receiveMessage.bind(this);
         nextWorkerInstance.addEventListener('message', nextWorkerListener);
-        scrapeFiles(nextWorkerInstance, nextWorkerListener, this._nextAllURLs, this.props.config, d, this.props.nextScene.imageTypeFilter, this.props.nextScene.weightFunction, {next: -1, count: 0, retries: 0, uuid: uuid});
+        scrapeFiles(nextWorkerInstance, nextWorkerListener, this._nextAllURLs, this._nextAllPosts, this.props.config, d, this.props.nextScene.imageTypeFilter, this.props.nextScene.weightFunction, {next: -1, count: 0, retries: 0, uuid: uuid});
       } else {
-        scrapeFiles(nextWorkerInstance, nextWorkerListener, this._nextAllURLs, this.props.config, d, this.props.nextScene.imageTypeFilter, this.props.nextScene.weightFunction, {next: -1, count: 0, retries: 0, uuid: uuid}, true).then((data) => {
+        scrapeFiles(nextWorkerInstance, nextWorkerListener, this._nextAllURLs, this._nextAllPosts, this.props.config, d, this.props.nextScene.imageTypeFilter, this.props.nextScene.weightFunction, {next: -1, count: 0, retries: 0, uuid: uuid}, true).then((data) => {
           receiveMessage(data);
         });
       }
@@ -788,6 +804,8 @@ export default class SourceScraper extends React.Component {
             const source = object.source;
             let newAllURLs = object.allURLs;
             this.setState({allURLs: newAllURLs});
+            let newAllPosts = object.allPosts;
+            this.setState({allPosts: newAllPosts});
 
             // Add the next promise to the queue
             if (object.helpers.next != null) {
@@ -808,9 +826,9 @@ export default class SourceScraper extends React.Component {
         }
         workerListener = receiveMessage.bind(this);
         workerInstance.addEventListener('message', workerListener);
-        scrapeFiles(workerInstance, workerListener, this.state.allURLs, this.props.config, promiseData.source, this.props.scene.imageTypeFilter, this.props.scene.weightFunction, promiseData.helpers);
+        scrapeFiles(workerInstance, workerListener, this.state.allURLs, this.state.allPosts, this.props.config, promiseData.source, this.props.scene.imageTypeFilter, this.props.scene.weightFunction, promiseData.helpers);
       } else {
-        scrapeFiles(workerInstance, workerListener, this.state.allURLs, this.props.config, promiseData.source, this.props.scene.imageTypeFilter, this.props.scene.weightFunction, promiseData.helpers, true).then((data) => {
+        scrapeFiles(workerInstance, workerListener, this.state.allURLs, this.state.allPosts, this.props.config, promiseData.source, this.props.scene.imageTypeFilter, this.props.scene.weightFunction, promiseData.helpers, true).then((data) => {
           receiveMessage(data);
         });
       }
@@ -840,7 +858,8 @@ export default class SourceScraper extends React.Component {
       props.gridView !== this.props.gridView ||
       state.captcha !== this.state.captcha ||
       state.restart !== this.state.restart ||
-      state.allURLs != this.state.allURLs;
+      state.allURLs != this.state.allURLs ||
+      state.allPosts != this.state.allPosts;
   }
 
   componentDidUpdate(props: any, state: any) {
@@ -855,12 +874,15 @@ export default class SourceScraper extends React.Component {
       if (props.nextScene != null && this.props.scene.id === props.nextScene.id) { // If the next scene has been played
         if (this.props.nextScene && this.props.nextScene.id === props.scene.id) { // Just swap values if we're coming back to this scene again
           const newAllURLs = this._nextAllURLs;
+          const newAllPosts = this._nextAllPosts;
           const temp = this._nextPromiseQueue;
           this._nextPromiseQueue = this._promiseQueue;
           this._promiseQueue = temp;
           this._nextAllURLs = state.allURLs;
+          this._nextAllPosts = state.allPosts;
           this.setState({
             allURLs: newAllURLs,
+            allPosts: newAllPosts,
             preload: true,
             restart: true,
             singleImage: null,
@@ -869,17 +891,20 @@ export default class SourceScraper extends React.Component {
           this._promiseQueue = this._nextPromiseQueue;
           this.setState({
             allURLs: this._nextAllURLs,
+            allPosts: this._nextAllPosts,
             preload: true,
             restart: true,
             singleImage: null,
           });
           this._nextPromiseQueue = Array<{source: LibrarySource, helpers: {next: any, count: number, retries: number, uuid: string}}>();
           this._nextAllURLs = new Map<string, Array<string>>();
+          this._nextAllPosts = new Map<string, string>();
         }
       } else {
         this._promiseQueue = Array<{ source: LibrarySource, helpers: {next: any, count: number, retries: number, uuid: string}}>();
         this.setState({
           allURLs: new Map<string, Array<string>>(),
+          allPosts: new Map<string, string>(),
           preload: false,
           restart: true,
           singleImage: null,
@@ -903,6 +928,7 @@ export default class SourceScraper extends React.Component {
     this._promiseQueue = null;
     this._nextPromiseQueue = null;
     this._nextAllURLs = null;
+    this._nextAllPosts = null;
     clearTimeout(this._backForth);
     this._backForth = null;
   }

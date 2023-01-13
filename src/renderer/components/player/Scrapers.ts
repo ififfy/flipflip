@@ -79,7 +79,7 @@ export const reset = () => {
   piwigoAlerted = false;
 }
 
-export const loadRemoteImageURLList = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
+export const loadRemoteImageURLList = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const url = source.url;
   wretch(url)
     .get()
@@ -97,6 +97,7 @@ export const loadRemoteImageURLList = (allURLs: Map<string, Array<string>>, conf
               pm({
                 data: filterPathsToJustPlayable(filter, convertedSource, true),
                 allURLs: allURLs,
+                allPosts: allPosts,
                 weight: weight,
                 helpers: helpers,
                 source: source,
@@ -112,6 +113,7 @@ export const loadRemoteImageURLList = (allURLs: Map<string, Array<string>>, conf
                   error: error.message,
                   data: filterPathsToJustPlayable(filter, convertedSource, true),
                   allURLs: allURLs,
+                  allPosts: allPosts,
                   weight: weight,
                   helpers: helpers,
                   source: source,
@@ -139,7 +141,7 @@ export const loadRemoteImageURLList = (allURLs: Map<string, Array<string>>, conf
     });
 }
 
-export const loadTumblr = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
+export const loadTumblr = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 3000;
   let configured = config.remoteSettings.tumblrOAuthToken != "" && config.remoteSettings.tumblrOAuthTokenSecret != "";
   if (configured) {
@@ -186,6 +188,7 @@ export const loadTumblr = (allURLs: Map<string, Array<string>>, config: Config, 
         pm({
           data: [],
           allURLs: allURLs,
+          allPosts: allPosts,
           weight: weight,
           helpers: helpers,
           source: source,
@@ -240,6 +243,7 @@ export const loadTumblr = (allURLs: Map<string, Array<string>>, config: Config, 
               pm({
                 data: filterPathsToJustPlayable(filter, convertedSource, false),
                 allURLs: allURLs,
+                allPosts: allPosts,
                 weight: weight,
                 helpers: helpers,
                 source: source,
@@ -256,6 +260,7 @@ export const loadTumblr = (allURLs: Map<string, Array<string>>, config: Config, 
                   error: error.message,
                   data: filterPathsToJustPlayable(filter, convertedSource, false),
                   allURLs: allURLs,
+                  allPosts: allPosts,
                   weight: weight,
                   helpers: helpers,
                   source: source,
@@ -269,6 +274,7 @@ export const loadTumblr = (allURLs: Map<string, Array<string>>, config: Config, 
         pm({
           data: [],
           allURLs: allURLs,
+          allPosts: allPosts,
           weight: weight,
           helpers: helpers,
           source: source,
@@ -291,7 +297,7 @@ export const loadTumblr = (allURLs: Map<string, Array<string>>, config: Config, 
   }
 }
 
-export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
+export const loadReddit = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 3000;
   let configured = config.remoteSettings.redditRefreshToken != "";
   if (configured) {
@@ -311,12 +317,16 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
             convertURL(s.url).then((urls: Array<string>) => {
               convertedListing = convertedListing.concat(urls);
               convertedCount++;
+              for (let u of urls) {
+                allPosts.set(u, "https://www.reddit.com" + s.permalink);
+              }
               if (convertedCount == submissionListing.length) {
                 helpers.next = submissionListing[submissionListing.length - 1].name;
                 helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, false).length;
                 pm({
                   data: filterPathsToJustPlayable(filter, convertedListing, false),
                   allURLs: allURLs,
+                  allPosts: allPosts,
                   weight: weight,
                   helpers: helpers,
                   source: source,
@@ -333,6 +343,7 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
                     error: error.message,
                     data: filterPathsToJustPlayable(filter, convertedListing, false),
                     allURLs: allURLs,
+                    allPosts: allPosts,
                     weight: weight,
                     helpers: helpers,
                     source: source,
@@ -346,6 +357,7 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
           pm({
             data: [],
             allURLs: allURLs,
+            allPosts: allPosts,
             weight: weight,
             helpers: helpers,
             source: source,
@@ -401,12 +413,16 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
               convertURL(s.url).then((urls: Array<string>) => {
                 convertedListing = convertedListing.concat(urls);
                 convertedCount++;
+                for (let u of urls) {
+                  allPosts.set(u, "https://www.reddit.com" + s.permalink);
+                }
                 if (convertedCount == submissionListing.length) {
                   helpers.next = submissionListing[submissionListing.length - 1].name;
                   helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, false).length;
                   pm({
                     data: filterPathsToJustPlayable(filter, convertedListing, false),
                     allURLs: allURLs,
+                    allPosts: allPosts,
                     weight: weight,
                     helpers: helpers,
                     source: source,
@@ -423,6 +439,7 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
                       error: error.message,
                       data: filterPathsToJustPlayable(filter, convertedListing, false),
                       allURLs: allURLs,
+                      allPosts: allPosts,
                       weight: weight,
                       helpers: helpers,
                       source: source,
@@ -436,6 +453,7 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
             pm({
               data: [],
               allURLs: allURLs,
+              allPosts: allPosts,
               weight: weight,
               helpers: helpers,
               source: source,
@@ -460,12 +478,16 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
               convertURL(s.url).then((urls: Array<string>) => {
                 convertedListing = convertedListing.concat(urls);
                 convertedCount++;
+                for (let u of urls) {
+                  allPosts.set(u, "https://www.reddit.com" + s.permalink);
+                }
                 if (convertedCount == submissionListing.length) {
                   helpers.next = submissionListing[submissionListing.length - 1].name;
                   helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedListing, false).length;
                   pm({
                     data: filterPathsToJustPlayable(filter, convertedListing, false),
                     allURLs: allURLs,
+                    allPosts: allPosts,
                     weight: weight,
                     helpers: helpers,
                     source: source,
@@ -482,6 +504,7 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
                       error: error.message,
                       data: filterPathsToJustPlayable(filter, convertedListing, false),
                       allURLs: allURLs,
+                      allPosts: allPosts,
                       weight: weight,
                       helpers: helpers,
                       source: source,
@@ -495,6 +518,7 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
             pm({
               data: [],
               allURLs: allURLs,
+              allPosts: allPosts,
               weight: weight,
               helpers: helpers,
               source: source,
@@ -525,7 +549,7 @@ export const loadReddit = (allURLs: Map<string, Array<string>>, config: Config, 
   }
 }
 
-export const loadRedGifs = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
+export const loadRedGifs = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 10000;
   const url = source.url;
   let apiURL = "https://api.redgifs.com/v2/";
@@ -617,6 +641,7 @@ export const loadRedGifs = (allURLs: Map<string, Array<string>>, config: Config,
       pm({
         data: filterPathsToJustPlayable(filter, images, false),
         allURLs: allURLs,
+        allPosts: allPosts,
         weight: weight,
         helpers: helpers,
         source: source,
@@ -633,7 +658,7 @@ export const loadRedGifs = (allURLs: Map<string, Array<string>>, config: Config,
     });
 }
 
-export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
+export const loadImageFap = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 8000;
   const url = source.url;
   if (url.includes("/pictures/")) {
@@ -670,6 +695,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
                     captcha: captcha,
                     data: filterPathsToJustPlayable(filter, images, false),
                     allURLs: allURLs,
+                    allPosts: allPosts,
                     weight: weight,
                     helpers: helpers,
                     source: source,
@@ -695,6 +721,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
             captcha: captcha,
             data: images,
             allURLs: allURLs,
+            allPosts: allPosts,
             weight: weight,
             helpers: helpers,
             source: source,
@@ -729,6 +756,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
             captcha: captcha,
             data: [],
             allURLs: allURLs,
+            allPosts: allPosts,
             weight: weight,
             helpers: helpers,
             source: source,
@@ -775,6 +803,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
                           captcha: captcha,
                           data: filterPathsToJustPlayable(filter, images, false),
                           allURLs: allURLs,
+                          allPosts: allPosts,
                           weight: weight,
                           helpers: helpers,
                           source: source,
@@ -799,6 +828,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
                   captcha: captcha,
                   data: [],
                   allURLs: allURLs,
+                  allPosts: allPosts,
                   weight: weight,
                   helpers: helpers,
                   source: source,
@@ -822,6 +852,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
             captcha: captcha,
             data: images,
             allURLs: allURLs,
+            allPosts: allPosts,
             weight: weight,
             helpers: helpers,
             source: source,
@@ -842,6 +873,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
     pm({
       data: [],
       allURLs: allURLs,
+      allPosts: allPosts,
       weight: weight,
       helpers: helpers,
       source: source,
@@ -871,6 +903,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
           pm({
             data: filterPathsToJustPlayable(filter, videoURLs, false),
             allURLs: allURLs,
+            allPosts: allPosts,
             weight: weight,
             helpers: helpers,
             source: source,
@@ -881,6 +914,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
           pm({
             data: [],
             allURLs: allURLs,
+            allPosts: allPosts,
             weight: weight,
             helpers: helpers,
             source: source,
@@ -893,6 +927,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
     pm({
       data: [],
       allURLs: allURLs,
+      allPosts: allPosts,
       weight: weight,
       helpers: helpers,
       source: source,
@@ -901,7 +936,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, config: Config
   }
 }
 
-export const loadSexCom = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
+export const loadSexCom = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 8000;
   const url = source.url;
   // This doesn't work anymore due to src url requiring referer
@@ -909,6 +944,7 @@ export const loadSexCom = (allURLs: Map<string, Array<string>>, config: Config, 
   pm({
     data: [],
     allURLs: allURLs,
+    allPosts: allPosts,
     weight: weight,
     helpers: helpers,
     source: source,
@@ -954,6 +990,7 @@ export const loadSexCom = (allURLs: Map<string, Array<string>>, config: Config, 
           pm({
             data: filterPathsToJustPlayable(filter, images, false),
             allURLs: allURLs,
+            allPosts: allPosts,
             weight: weight,
             helpers: helpers,
             source: source,
@@ -1007,6 +1044,7 @@ export const loadSexCom = (allURLs: Map<string, Array<string>>, config: Config, 
                   pm({
                     data: filePaths,
                     allURLs: allURLs,
+                    allPosts: allPosts,
                     weight: weight,
                     helpers: helpers,
                     source: source,
@@ -1021,6 +1059,7 @@ export const loadSexCom = (allURLs: Map<string, Array<string>>, config: Config, 
         pm({
           data: [],
           allURLs: allURLs,
+          allPosts: allPosts,
           weight: weight,
           helpers: helpers,
           source: source,
@@ -1030,7 +1069,7 @@ export const loadSexCom = (allURLs: Map<string, Array<string>>, config: Config, 
     });*/
 }
 
-export const loadImgur = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
+export const loadImgur = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 3000;
   const url = source.url;
   imgur.getAlbumInfo(getFileGroup(url))
@@ -1041,6 +1080,7 @@ export const loadImgur = (allURLs: Map<string, Array<string>>, config: Config, s
       pm({
         data: filterPathsToJustPlayable(filter, images, true),
         allURLs: allURLs,
+        allPosts: allPosts,
         weight: weight,
         helpers: helpers,
         source: source,
@@ -1057,7 +1097,7 @@ export const loadImgur = (allURLs: Map<string, Array<string>>, config: Config, s
     });
 }
 
-export const loadTwitter = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
+export const loadTwitter = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 3000;
   let configured = config.remoteSettings.twitterAccessTokenKey != "" && config.remoteSettings.twitterAccessTokenSecret != "";
   if (configured) {
@@ -1112,6 +1152,7 @@ export const loadTwitter = (allURLs: Map<string, Array<string>>, config: Config,
           pm({
             data: [],
             allURLs: allURLs,
+            allPosts: allPosts,
             weight: weight,
             helpers: helpers,
             source: source,
@@ -1123,6 +1164,7 @@ export const loadTwitter = (allURLs: Map<string, Array<string>>, config: Config,
           pm({
             data: filterPathsToJustPlayable(filter, images, true),
             allURLs: allURLs,
+            allPosts: allPosts,
             weight: weight,
             helpers: helpers,
             source: source,
@@ -1145,7 +1187,7 @@ export const loadTwitter = (allURLs: Map<string, Array<string>>, config: Config,
   }
 }
 
-export const loadDeviantArt = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
+export const loadDeviantArt = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 3000;
   const url = source.url;
   wretch("https://backend.deviantart.com/rss.xml?type=deviation&q=by%3A" + getFileGroup(url) + "+sort%3Atime+meta%3Aall" + (helpers.next != 0 ? "&offset=" + helpers.next : ""))
@@ -1189,6 +1231,7 @@ export const loadDeviantArt = (allURLs: Map<string, Array<string>>, config: Conf
       pm({
         data: filterPathsToJustPlayable(filter, images, false),
         allURLs: allURLs,
+        allPosts: allPosts,
         weight: weight,
         helpers: helpers,
         source: source,
@@ -1199,7 +1242,7 @@ export const loadDeviantArt = (allURLs: Map<string, Array<string>>, config: Conf
 
 let ig: IgApiClient = null;
 let session: any = null;
-export const loadInstagram = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
+export const loadInstagram = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 3000;
   const configured = config.remoteSettings.instagramUsername != "" && config.remoteSettings.instagramPassword != "";
   if (configured) {
@@ -1223,6 +1266,7 @@ export const loadInstagram = (allURLs: Map<string, Array<string>>, config: Confi
       pm({
         data: filterPathsToJustPlayable(filter, images, false),
         allURLs: allURLs,
+        allPosts: allPosts,
         weight: weight,
         helpers: helpers,
         source: source,
@@ -1298,6 +1342,7 @@ export const loadInstagram = (allURLs: Map<string, Array<string>>, config: Confi
           pm({
             data: [],
             allURLs: allURLs,
+            allPosts: allPosts,
             weight: weight,
             helpers: helpers,
             source: source,
@@ -1336,7 +1381,7 @@ export const loadInstagram = (allURLs: Map<string, Array<string>>, config: Confi
   }
 }
 
-export const loadE621 = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
+export const loadE621 = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 8000;
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
@@ -1384,6 +1429,7 @@ export const loadE621 = (allURLs: Map<string, Array<string>>, config: Config, so
           pm({
             data: [],
             allURLs: allURLs,
+            allPosts: allPosts,
             weight: weight,
             helpers: helpers,
             source: source,
@@ -1444,6 +1490,7 @@ export const loadE621 = (allURLs: Map<string, Array<string>>, config: Config, so
                 pm({
                   data: filterPathsToJustPlayable(filter, images, true),
                   allURLs: allURLs,
+                  allPosts: allPosts,
                   weight: weight,
                   helpers: helpers,
                   source: source,
@@ -1512,6 +1559,7 @@ export const loadE621 = (allURLs: Map<string, Array<string>>, config: Config, so
           pm({
             data: [],
             allURLs: allURLs,
+            allPosts: allPosts,
             weight: weight,
             helpers: helpers,
             source: source,
@@ -1536,6 +1584,7 @@ export const loadE621 = (allURLs: Map<string, Array<string>>, config: Config, so
         pm({
           data: filterPathsToJustPlayable(filter, images, true),
           allURLs: allURLs,
+          allPosts: allPosts,
           weight: weight,
           helpers: helpers,
           source: source,
@@ -1551,7 +1600,7 @@ export const loadE621 = (allURLs: Map<string, Array<string>>, config: Config, so
   }
 }
 
-export const loadDanbooru = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
+export const loadDanbooru = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 8000;
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
@@ -1618,6 +1667,7 @@ export const loadDanbooru = (allURLs: Map<string, Array<string>>, config: Config
         pm({
           data: [],
           allURLs: allURLs,
+          allPosts: allPosts,
           weight: weight,
           helpers: helpers,
           source: source,
@@ -1632,6 +1682,7 @@ export const loadDanbooru = (allURLs: Map<string, Array<string>>, config: Config
           pm({
             data: [],
             allURLs: allURLs,
+            allPosts: allPosts,
             weight: weight,
             helpers: helpers,
             source: source,
@@ -1690,6 +1741,7 @@ export const loadDanbooru = (allURLs: Map<string, Array<string>>, config: Config
                 pm({
                   data: filterPathsToJustPlayable(filter, images, true),
                   allURLs: allURLs,
+                  allPosts: allPosts,
                   weight: weight,
                   helpers: helpers,
                   source: source,
@@ -1724,6 +1776,7 @@ export const loadDanbooru = (allURLs: Map<string, Array<string>>, config: Config
         pm({
           data: filterPathsToJustPlayable(filter, images, true),
           allURLs: allURLs,
+          allPosts: allPosts,
           weight: weight,
           helpers: helpers,
           source: source,
@@ -1739,7 +1792,7 @@ export const loadDanbooru = (allURLs: Map<string, Array<string>>, config: Config
     }, resolve));
 }
 
-export const loadGelbooru1 = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
+export const loadGelbooru1 = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 8000;
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
@@ -1823,6 +1876,7 @@ export const loadGelbooru1 = (allURLs: Map<string, Array<string>>, config: Confi
                 pm({
                   data: filterPathsToJustPlayable(filter, images, false),
                   allURLs: allURLs,
+                  allPosts: allPosts,
                   weight: weight,
                   helpers: helpers,
                   source: source,
@@ -1842,6 +1896,7 @@ export const loadGelbooru1 = (allURLs: Map<string, Array<string>>, config: Confi
         pm({
           data: [],
           allURLs: allURLs,
+          allPosts: allPosts,
           weight: weight,
           helpers: helpers,
           source: source,
@@ -1851,7 +1906,7 @@ export const loadGelbooru1 = (allURLs: Map<string, Array<string>>, config: Confi
     });
 }
 
-export const loadGelbooru2 = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
+export const loadGelbooru2 = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 8000;
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
@@ -1901,6 +1956,7 @@ export const loadGelbooru2 = (allURLs: Map<string, Array<string>>, config: Confi
         pm({
           data: [],
           allURLs: allURLs,
+          allPosts: allPosts,
           weight: weight,
           helpers: helpers,
           source: source,
@@ -1922,6 +1978,7 @@ export const loadGelbooru2 = (allURLs: Map<string, Array<string>>, config: Confi
       pm({
         data: filterPathsToJustPlayable(filter, images, true),
         allURLs: allURLs,
+        allPosts: allPosts,
         weight: weight,
         helpers: helpers,
         source: source,
@@ -1936,7 +1993,7 @@ export const loadGelbooru2 = (allURLs: Map<string, Array<string>>, config: Confi
     }, resolve));
 }
 
-export const loadEHentai = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
+export const loadEHentai = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 8000;
   const url = source.url;
   wretch(url + "?p=" + (helpers.next + 1))
@@ -1988,6 +2045,7 @@ export const loadEHentai = (allURLs: Map<string, Array<string>>, config: Config,
                 pm({
                   data: filterPathsToJustPlayable(filter, images, true),
                   allURLs: allURLs,
+                  allPosts: allPosts,
                   weight: weight,
                   helpers: helpers,
                   source: source,
@@ -2001,6 +2059,7 @@ export const loadEHentai = (allURLs: Map<string, Array<string>>, config: Config,
         pm({
           data: [],
           allURLs: allURLs,
+          allPosts: allPosts,
           weight: weight,
           helpers: helpers,
           source: source,
@@ -2010,7 +2069,7 @@ export const loadEHentai = (allURLs: Map<string, Array<string>>, config: Config,
     });
 }
 
-export const loadLuscious = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
+export const loadLuscious = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 5000;
   const url = source.url;
   if (url.includes("albums")) {
@@ -2082,6 +2141,7 @@ export const loadLuscious = (allURLs: Map<string, Array<string>>, config: Config
           pm({
             data: filterPathsToJustPlayable(filter, images, true),
             allURLs: allURLs,
+            allPosts: allPosts,
             weight: weight,
             helpers: helpers,
             source: source,
@@ -2092,6 +2152,7 @@ export const loadLuscious = (allURLs: Map<string, Array<string>>, config: Config
           pm({
             data: [],
             allURLs: allURLs,
+            allPosts: allPosts,
             weight: weight,
             helpers: helpers,
             source: source,
@@ -2243,6 +2304,7 @@ export const loadLuscious = (allURLs: Map<string, Array<string>>, config: Config
                 pm({
                   data: filterPathsToJustPlayable(filter, images, true),
                   allURLs: allURLs,
+                  allPosts: allPosts,
                   weight: weight,
                   helpers: helpers,
                   source: source,
@@ -2252,6 +2314,7 @@ export const loadLuscious = (allURLs: Map<string, Array<string>>, config: Config
                 pm({
                   data: [],
                   allURLs: allURLs,
+                  allPosts: allPosts,
                   weight: weight,
                   helpers: helpers,
                   source: source,
@@ -2271,6 +2334,7 @@ export const loadLuscious = (allURLs: Map<string, Array<string>>, config: Config
             warning: json,
             data: [],
             allURLs: allURLs,
+            allPosts: allPosts,
             weight: weight,
             helpers: helpers,
             source: source,
@@ -2287,7 +2351,7 @@ export const loadLuscious = (allURLs: Map<string, Array<string>>, config: Config
   }
 }
 
-export const loadBDSMlr = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
+export const loadBDSMlr = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 8000;
   let url = source.url;
   if (url.endsWith("/rss")) {
@@ -2299,6 +2363,7 @@ export const loadBDSMlr = (allURLs: Map<string, Array<string>>, config: Config, 
       pm({
         data: [],
         allURLs: allURLs,
+        allPosts: allPosts,
         weight: weight,
         helpers: helpers,
         source: source,
@@ -2344,6 +2409,7 @@ export const loadBDSMlr = (allURLs: Map<string, Array<string>>, config: Config, 
         pm({
           data: filterPathsToJustPlayable(filter, images, true),
           allURLs: allURLs,
+          allPosts: allPosts,
           weight: weight,
           helpers: helpers,
           source: source,
@@ -2354,6 +2420,7 @@ export const loadBDSMlr = (allURLs: Map<string, Array<string>>, config: Config, 
         pm({
           data: [],
           allURLs: allURLs,
+          allPosts: allPosts,
           weight: weight,
           helpers: helpers,
           source: source,
@@ -2364,7 +2431,7 @@ export const loadBDSMlr = (allURLs: Map<string, Array<string>>, config: Config, 
 }
 
 let piwigoLoggedIn: boolean = false;
-export const loadPiwigo = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
+export const loadPiwigo = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 8000;
   let url = source.url;
 
@@ -2421,6 +2488,7 @@ export const loadPiwigo = (allURLs: Map<string, Array<string>>, config: Config, 
         pm({
           data: [],
           allURLs: allURLs,
+          allPosts: allPosts,
           weight: weight,
           helpers: helpers,
           source: source,
@@ -2453,6 +2521,7 @@ export const loadPiwigo = (allURLs: Map<string, Array<string>>, config: Config, 
             pm({
               data: [],
               allURLs: allURLs,
+              allPosts: allPosts,
               weight: weight,
               helpers: helpers,
               source: source,
@@ -2481,6 +2550,7 @@ export const loadPiwigo = (allURLs: Map<string, Array<string>>, config: Config, 
           pm({
             data: filterPathsToJustPlayable(filter, images, true),
             allURLs: allURLs,
+            allPosts: allPosts,
             weight: weight,
             helpers: helpers,
             source: source,
@@ -2509,7 +2579,7 @@ export const loadPiwigo = (allURLs: Map<string, Array<string>>, config: Config, 
   }
 }
 
-export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
+export const loadHydrus = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 8000;
   const apiKey = config.remoteSettings.hydrusAPIKey;
   const configured = apiKey != "";
@@ -2614,6 +2684,7 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, config: Config, 
             pm({
               data: images,
               allURLs: allURLs,
+              allPosts: allPosts,
               weight: weight,
               helpers: helpers,
               source: source,

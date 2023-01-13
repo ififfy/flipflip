@@ -179,6 +179,7 @@ with the relevant information:
 | `{scene_name}`   | Name of the current **Scene**                       |
 | `{source_url}`   | URL of the current **Source**                       |
 | `{source_name}`  | Name of the current **Source**                      |
+| `{post_url}`     | URL of the currently displayed image's **Post**     |
 | `{file_url}`     | URL of the currently displayed **File**             |
 | `{file_name}`    | Name of the currently displayed **File**            |
 | `{audio_url}`    | URL of the currently playing **Audio**              |
