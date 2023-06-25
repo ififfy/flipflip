@@ -564,7 +564,7 @@ class Library extends React.Component {
                     </ListItem>
                   </Tooltip>
                 )}
-                {redditAuthorized && (
+                {/*{redditAuthorized && (
                   <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Import from Reddit"}>
                     <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onImportReddit.bind(this)}>
                       <ListItemIcon>
@@ -573,8 +573,8 @@ class Library extends React.Component {
                       <ListItemText primary="Reddit" />
                     </ListItem>
                   </Tooltip>
-                )}
-                {twitterAuthorized && (
+                )}*/}
+                {/*{twitterAuthorized && (
                   <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Import from Twitter"}>
                     <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onImportTwitter.bind(this)}>
                       <ListItemIcon>
@@ -583,7 +583,7 @@ class Library extends React.Component {
                       <ListItemText primary="Twitter" />
                     </ListItem>
                   </Tooltip>
-                )}
+                )}*/}
                 {instagramAuthorized && (
                   <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Import from Instagram"}>
                     <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onImportInstagram.bind(this)}>

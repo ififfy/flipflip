@@ -48,3 +48,8 @@ Scene, you can click `Save as Scene` in the sidebar to save these sources as the
 
 ?> In the options tab, select "Re-Generate on Playback" to automatically regenerate this scene when it is played. This 
 includes direct playback, as well as its use in overlays or grids. Scenes with invalid weights will not be re-generated.
+
+?> You can designate tags/types to be globally ignored during generation by visiting the FlipFlip [Settings](config.md) 
+menu. By default, new Scene Generators will respect these settings, but you can override this for a particular Generator 
+by clicking the `Filter` icon ( 
+<img style="vertical-align: -5px" src="doc_icons/filter.svg" alt="Filter" width="20" height="20"> ).

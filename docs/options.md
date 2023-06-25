@@ -46,7 +46,7 @@ This setting controls the background for this Scene:
 * **None**
 
 #### Next Scene
-Choose a Scene to transition to after this one (or none). Control the timing of the Next Scene (sec)
+Choose a Scene to transition to after this one (or none). Control the timing of the Next Scene (ms)
 
 * **Play After All Images** - Instead of using a fixed time, transition to the Next Scene after all images in this 
   scene have played

@@ -368,6 +368,7 @@ export default class AppStorage {
         case "3.1.4":
         case "3.2.0":
         case "3.2.1":
+        case "3.2.2":
           this.initialState = {
             version: __VERSION__,
             specialMode: data.specialMode,

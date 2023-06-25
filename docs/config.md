@@ -23,6 +23,9 @@ These settings control various player options.
 * `Fullscreen` - display player in fullscreen mode
 * `Start Immediately` - don't wait for full scene to load, start as soon as first image loads
   * _Be aware this may cause the beginning to be janky, while the sources continue loading_
+* `Click to Progress` - enables the ability to advance to the next image in a scene by simply clicking the currently displayed image.
+  * `While Playing` - by default, this is only enabled while playback is paused, enable this secondary option to allow 
+Click to Progress, even while the scene is playing
 * `Show Adv Easing Controls` - enables controls for advanced [easings](effects.md) in effects
 * `Show Audio Info` - when enabled, [audio information](audio_tagging#tagging-a-track) will appear during playback when a track changes.
   * _This only ever applies to the first playlist_
@@ -45,6 +48,8 @@ as well as the default save path. This needs to be enabled on each machine.
   * Images in memory/history are cleared when the slideshow is stopped.
 * `Max Loading at Once` - the number of threads to have loading images.
   * _Be cautious increasing this number as this will increase processing and may degrade performance._
+* `Ignored Tags/Types` - add tags/types here to be globally ignored by Scene Generators 
+  * This can be overridden by individual generators as needed
 
 ## Caching
 These settings control the caching abilities of FlipFlip. By default, FlipFlip caches 500MB of images in the 
@@ -74,30 +79,38 @@ make any changes to your account.
 ?> Enable **Silence Tumblr Throttle Alert** to prevent FlipFlip from alerting you when Tumblr starts returning 429 responses.
 
 ### Reddit
-In order to use Reddit Subreddits/Users as sources or import your Subscriptions, you must first activate FlipFlip 
-with your account. You should only ever have to do this once.
 
-FlipFlip does not store any user information or make any changes to your account.
+!> Reddit's API is no longer publicly available and so this service is no longer functioning in FlipFlip. If this changes
+in the future, access will be re-enabled.
 
-* Click the `Reddit` icon
-* Click `OK` on the confirmation dialog
-* You will be directed to Reddit.com in your browser
-* Click `Allow` to give FlipFlip read permission
-* Go back to FlipFlip
-* You should see a Success! message
+~~In order to use Reddit Subreddits/Users as sources or import your Subscriptions, you must first activate FlipFlip 
+with your account. You should only ever have to do this once.~~
+
+~~FlipFlip does not store any user information or make any changes to your account.~~
+
+* ~~Click the `Reddit` icon~~
+* ~~Click `OK` on the confirmation dialog~~
+* ~~You will be directed to Reddit.com in your browser~~
+* ~~Click `Allow` to give FlipFlip read permission~~
+* ~~Go back to FlipFlip~~
+* ~~You should see a Success! message~~
 
 ### Twitter
-In order to use Twitter Profiles as sources or import your Following, you must first activate FlipFlip with your 
-account. You should only ever have to do this once.
 
-FlipFlip does not store any user information or make any changes to your account.
+!> Twitter's API is no longer publicly available and so this service is no longer functioning in FlipFlip. If this changes
+in the future, access will be re-enabled.
 
-* Click the `Twitter` icon
-* Click `OK` on the confirmation dialog
-* You will be directed to Twitter.com in your browser
-* Click `Allow` to give FlipFlip permission
-* Go back to FlipFlip
-* You should see a Success! message
+~~In order to use Twitter Profiles as sources or import your Following, you must first activate FlipFlip with your 
+account. You should only ever have to do this once.~~
+
+~~FlipFlip does not store any user information or make any changes to your account.~~
+
+* ~~Click the `Twitter` icon~~
+* ~~Click `OK` on the confirmation dialog~~
+* ~~You will be directed to Twitter.com in your browser~~
+* ~~Click `Allow` to give FlipFlip permission~~
+* ~~Go back to FlipFlip~~
+* ~~You should see a Success! message~~
 
 ### Instagram
 In order to use Instagram Profiles as sources, you'll need to provide your username and password.

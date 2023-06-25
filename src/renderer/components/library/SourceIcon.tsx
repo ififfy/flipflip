@@ -265,11 +265,11 @@ export default class SourceIcon extends React.Component {
       case ST.list:
         return <ListIcon className={this.props.className}/>;
       case ST.reddit:
-        return <RedditIcon className={this.props.className}/>;
+        return <RedditIcon style={{color: "red"}} className={this.props.className}/>;
       case ST.redgifs:
         return <RedGifsIcon className={this.props.className}/>;
       case ST.twitter:
-        return <TwitterIcon className={this.props.className}/>;
+        return <TwitterIcon style={{color: "red"}} className={this.props.className}/>;
       case ST.instagram:
         return <InstagramIcon className={this.props.className}/>;
       case ST.tumblr:
@@ -277,7 +277,7 @@ export default class SourceIcon extends React.Component {
       case ST.imagefap:
         return <ImageFapIcon className={this.props.className}/>;
       case ST.sexcom:
-        return <SexComIcon className={this.props.className}/>;
+        return <SexComIcon style={{color: "red"}} className={this.props.className}/>;
       case ST.imgur:
         return <ImgurIcon className={this.props.className}/>;
       case ST.deviantart:

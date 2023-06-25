@@ -1,5 +1,24 @@
 # Changelog
-## 3.2.1 <small>(08/XX/2021)</small>
+## 3.2.2 <small>(06/XX/2023)</small>
+- Upgrade UI to MUIv5
+- Upgrade 3rd parties dependencies
+- Add ability to scrape and download a particular source (BETA)
+- Add ability to globally ignore certain tags/types during scene generation
+- Improve recent picture grid layout
+- Add M4V support
+- Change nextSceneTime top use ms instead of sec
+- Leave Video Controls section visible in sidebar (avoid quick flashing of controls during playback)
+- Add support for displaying and linking to media's post URL
+- Add safebooru to list of supported boorus
+- Removed support for Reddit/Twitter
+- Properly show comment linebreaks in Audio tooltips
+- Fix CaptionScriptor bugs
+- Fix bug with manual scene generation when auto-regeneration is enabled
+- Fix bug with strict ordering
+- Fix bug with playback when only 1 image is cached
+- Fix bug with restarting playback after pausing
+
+## 3.2.1 <small>(08/06/2022)</small>
 - Add support for Luscious sources
 - Allow sources to be weighted within a scene
 - Allow non-Library sources to be played via the source list

@@ -151,7 +151,7 @@ class APICard extends React.Component {
               </Fab>
             </Tooltip>
           </Grid>
-          <Grid item>
+          {/*<Grid item>
             <Tooltip disableInteractive title={redditAuthorized ? "Authorized: Click to Sign Out of Reddit" : "Unauthorized: Click to Authorize Reddit"}  placement="top-end">
               <Fab
                 className={clsx(classes.fab, redditAuthorized ? classes.authorized : classes.noAuth)}
@@ -160,8 +160,8 @@ class APICard extends React.Component {
                 <SourceIcon className={classes.icon} type={ST.reddit}/>
               </Fab>
             </Tooltip>
-          </Grid>
-          <Grid item>
+          </Grid>*/}
+          {/*<Grid item>
             <Tooltip disableInteractive title={twitterAuthorized ? "Authorized: Click to Sign Out of Twitter" : "Unauthorized: Click to Authorize Twitter"}  placement="top-end">
               <Fab
                 className={clsx(classes.fab, twitterAuthorized ? classes.authorized : classes.noAuth)}
@@ -170,7 +170,7 @@ class APICard extends React.Component {
                 <SourceIcon className={classes.icon} type={ST.twitter}/>
               </Fab>
             </Tooltip>
-          </Grid>
+          </Grid>*/}
           <Grid item>
             <Tooltip disableInteractive title={instagramConfigured ? "Authorized: Click to Sign Out of Instagram" : "Unauthorized: Click to Authorize Instragram"}  placement="top-end">
               <Fab
