@@ -668,6 +668,7 @@ class PlayerBars extends React.Component {
                       clip={source ? source.clips.find((c) => c.id == clipID) : null}
                       clipValue={clipValue ? clipValue : null}
                       useHotkeys
+                      skip={this.props.scene.videoSkip}
                       onChangeVolume={() => {}}/>
                   )}
                 </Grid>

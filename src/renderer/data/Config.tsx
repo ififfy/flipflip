@@ -163,6 +163,7 @@ interface SceneSettingsI {
   videoRandomSpeed: boolean;
   videoSpeedMin: number;
   videoSpeedMax: number;
+  videoSkip: number;
   generatorMax: number;
   overlayEnabled: boolean;
   overlays: Array<Overlay>;
@@ -462,6 +463,7 @@ export class SceneSettings implements SceneSettingsI {
   videoRandomSpeed = false;
   videoSpeedMin = 5;
   videoSpeedMax = 20;
+  videoSkip = 10;
   generatorMax = 100;
   overlayEnabled: false;
   overlays: Array<Overlay> = [];

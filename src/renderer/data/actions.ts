@@ -977,6 +977,7 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
       continueVideo:  sourceType == ST.video || state.config.defaultScene.continueVideo,
       playVideoClips: state.config.defaultScene.playVideoClips,
       videoVolume: state.config.defaultScene.videoVolume,
+      videoSkip: state.config.defaultScene.videoSkip,
       orderFunction: state.config.defaultScene.orderFunction,
     });
     if (getLibrarySource(state) != null) {
@@ -1017,6 +1018,7 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
       continueVideo:  sourceType == ST.video || state.config.defaultScene.continueVideo,
       playVideoClips: state.config.defaultScene.playVideoClips,
       videoVolume: state.config.defaultScene.videoVolume,
+      videoSkip: state.config.defaultScene.videoSkip,
     });
     if (getActiveScene(state)?.libraryID != -1) {
       const activeScene = getActiveScene(state);

@@ -4,8 +4,14 @@ import { Grid, IconButton, Slider, Theme, Tooltip, Typography } from "@mui/mater
 import createStyles from '@mui/styles/createStyles';
 import withStyles from '@mui/styles/withStyles';
 
+import Forward5Icon from '@mui/icons-material/Forward5';
 import Forward10Icon from '@mui/icons-material/Forward10';
+import Forward30Icon from '@mui/icons-material/Forward30';
+import FastForwardIcon from '@mui/icons-material/FastForward';
+import FastRewindIcon from '@mui/icons-material/FastRewind';
+import Replay5Icon from '@mui/icons-material/Replay5';
 import Replay10Icon from '@mui/icons-material/Replay10';
+import Replay30Icon from '@mui/icons-material/Replay30';
 import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import SkipNextIcon from "@mui/icons-material/SkipNext";
@@ -27,6 +33,7 @@ const styles = (theme: Theme) => createStyles({
     marginTop: theme.spacing(2),
   },
   valueLabel: {
+    color: theme.palette.text.primary,
     backgroundColor: 'transparent',
     top: 2
   },
@@ -45,6 +52,7 @@ class VideoControl extends React.Component {
     clip?: Clip,
     clipValue?: Array<number>,
     clips?: Array<Clip>,
+    skip?: number,
     onChangeVolume(volume: number): void,
     onChangeSpeed?(speed: number): void,
     nextTrack?(): void,
@@ -58,6 +66,7 @@ class VideoControl extends React.Component {
   };
 
   render() {
+    console.log(this.props.skip);
     if (this.props.video == null) return <Grid container spacing={1} alignItems="center" justifyContent={this.props.player ? "center" : "flex-start"}/>;
     const classes = this.props.classes;
     return (
@@ -97,7 +106,11 @@ class VideoControl extends React.Component {
               )}
               <Tooltip disableInteractive title="Jump Back">
                 <IconButton onClick={this.onBack.bind(this)} size="large">
-                  <Replay10Icon/>
+                  {(this.props.skip == 5) && (<Replay5Icon/>)}
+                  {(!this.props.skip || this.props.skip == 10) && (<Replay10Icon/>)}
+                  {(this.props.skip == 30) && (<Replay30Icon/>)}
+                  {(this.props.skip == 60) && (<FastRewindIcon/>)}
+                  {(this.props.skip == 120) && (<FastRewindIcon/>)}
                 </IconButton>
               </Tooltip>
               <Tooltip disableInteractive title={this.state.playing ? "Pause" : "Play"}>
@@ -109,7 +122,11 @@ class VideoControl extends React.Component {
               </Tooltip>
               <Tooltip disableInteractive title="Jump Forward">
                 <IconButton onClick={this.onForward.bind(this)} size="large">
-                  <Forward10Icon/>
+                  {(this.props.skip == 5) && (<Forward5Icon/>)}
+                  {(!this.props.skip || this.props.skip == 10) && (<Forward10Icon/>)}
+                  {(this.props.skip == 30) && (<Forward30Icon/>)}
+                  {(this.props.skip == 60) && (<FastForwardIcon/>)}
+                  {(this.props.skip == 120) && (<FastForwardIcon/>)}
                 </IconButton>
               </Tooltip>
               {this.props.nextTrack && (
@@ -226,6 +243,12 @@ class VideoControl extends React.Component {
   }
 
   onChangeVolume(e: MouseEvent, volume: number) {
+    if (volume > 100) {
+      volume = 100;
+    }
+    if (volume < 0) {
+      volume = 0;
+    }
     this.props.onChangeVolume(volume);
     if (this.props.video) {
       this.props.video.volume = volume / 100;
@@ -252,7 +275,8 @@ class VideoControl extends React.Component {
   }
 
   onBack() {
-    let position = this.props.video.currentTime - 10;
+    let skip = !!this.props.skip ? this.props.skip : 10;
+    let position = this.props.video.currentTime - skip;
     if (position < 0) {
       position = 0;
     }
@@ -260,7 +284,8 @@ class VideoControl extends React.Component {
   }
 
   onForward() {
-    let position = this.props.video.currentTime + 10;
+    let skip = !!this.props.skip ? this.props.skip : 10;
+    let position = this.props.video.currentTime + skip;
     if (position > this.props.video.duration) {
       position = this.props.video.duration;
     }
@@ -287,6 +312,18 @@ class VideoControl extends React.Component {
         e.preventDefault();
         this.state.playing ? this.onPause() : this.onPlay();
         break;
+      case 'ArrowUp':
+        if (e.ctrlKey) {
+          e.preventDefault();
+          this.onChangeVolume(null,(this.props.video.volume * 100) + 5);
+        }
+        break;
+      case 'ArrowDown':
+        if (e.ctrlKey) {
+          e.preventDefault();
+          this.onChangeVolume(null,(this.props.video.volume * 100) - 5);
+        }
+        break;
       case 'ArrowLeft':
         if (focus != "input") {
           e.preventDefault();
@@ -309,6 +346,18 @@ class VideoControl extends React.Component {
         case ' ':
           e.preventDefault();
           this.state.playing ? this.onPause() : this.onPlay();
+          break;
+        case 'ArrowUp':
+          if (e.ctrlKey) {
+            e.preventDefault();
+            this.onChangeVolume(null,(this.props.video.volume * 100) + 5);
+          }
+          break;
+        case 'ArrowDown':
+          if (e.ctrlKey) {
+            e.preventDefault();
+            this.onChangeVolume(null,(this.props.video.volume * 100) - 5);
+          }
           break;
         case 'ArrowLeft':
           if (focus != "input") {

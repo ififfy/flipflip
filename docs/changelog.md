@@ -4,8 +4,10 @@
 - Upgrade 3rd parties dependencies
 - Add ability to scrape and download a particular source (BETA)
 - Add ability to globally ignore certain tags/types during scene generation
+- Add ability to set video skip rate
 - Improve recent picture grid layout
 - Add M4V support
+- Add keyboard shortcut for video volume
 - Change nextSceneTime top use ms instead of sec
 - Leave Video Controls section visible in sidebar (avoid quick flashing of controls during playback)
 - Add support for displaying and linking to media's post URL
@@ -17,6 +19,7 @@
 - Fix bug with strict ordering
 - Fix bug with playback when only 1 image is cached
 - Fix bug with restarting playback after pausing
+- Fix bug with video timestamp not showing in proper color when not in dark mode
 
 ## 3.2.1 <small>(08/06/2022)</small>
 - Add support for Luscious sources

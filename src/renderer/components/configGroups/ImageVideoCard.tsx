@@ -309,7 +309,7 @@ class ImageVideoCard extends React.Component {
             <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.images && !this.props.scene.videoRandomSpeed}>
               <Typography variant="caption" component="div"
                           color="textSecondary">
-                Video Speed {this.props.scene.videoSpeed / 10}x
+                Video Speed: {this.props.scene.videoSpeed / 10}x
               </Typography>
               <Slider
                 min={1}
@@ -325,7 +325,7 @@ class ImageVideoCard extends React.Component {
                 <Grid item xs={6}>
                   <Typography variant="caption" component="div"
                               color="textSecondary">
-                    Video Speed Min {this.props.scene.videoSpeedMin / 10}x
+                    Video Speed Min: {this.props.scene.videoSpeedMin / 10}x
                   </Typography>
                   <Slider
                     min={1}
@@ -339,7 +339,7 @@ class ImageVideoCard extends React.Component {
                 <Grid item xs={6}>
                   <Typography variant="caption" component="div"
                               color="textSecondary">
-                    Video Speed Max {this.props.scene.videoSpeedMax / 10}x
+                    Video Speed Max: {this.props.scene.videoSpeedMax / 10}x
                   </Typography>
                   <Slider
                     min={1}
@@ -362,6 +362,25 @@ class ImageVideoCard extends React.Component {
                           onChange={this.onBoolInput.bind(this, 'videoRandomSpeed')}/>
                 }
                 label="Random Speed"/>
+            </Collapse>
+          </Grid>
+          <Grid item xs={12} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.images) && classes.noPadding)}>
+            <Collapse in={this.props.scene.imageTypeFilter != IF.stills && this.props.scene.imageTypeFilter != IF.images}>
+              <Typography variant="caption" component="div"
+                          color="textSecondary">
+                Video Skip Rate: {this.props.scene.videoSkip} sec
+              </Typography>
+              <Slider
+                min={5}
+                max={120}
+                step={null}
+                defaultValue={this.props.scene.videoSkip}
+                onChangeCommitted={this.onSliderChange.bind(this, 'videoSkip')}
+                valueLabelDisplay={'auto'}
+                marks={[5, 10, 30, 60, 120].map((s) => {
+                  return {value: s, label: s.toString()}
+                })}
+                aria-labelledby="video-skip-slider"/>
             </Collapse>
           </Grid>
           <Grid item xs={12} sm={this.props.sidebar ? 12 : 4} md={this.props.sidebar ? 12 : 6} lg={this.props.sidebar ? 12 : 4} className={clsx((this.props.scene.imageTypeFilter == IF.stills || this.props.scene.imageTypeFilter == IF.images) && classes.noPadding)}>

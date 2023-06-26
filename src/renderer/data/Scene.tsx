@@ -49,6 +49,7 @@ export default class Scene {
   videoRandomSpeed = false;
   videoSpeedMin = 5;
   videoSpeedMax = 20;
+  videoSkip = 10;
   randomVideoStart = false;
   continueVideo = false;
   playVideoClips = true;
