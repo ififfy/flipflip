@@ -20,6 +20,8 @@
 - Fix bug with playback when only 1 image is cached
 - Fix bug with restarting playback after pausing
 - Fix bug with video timestamp not showing in proper color when not in dark mode
+- Fix bug with storeAudio function in caption scripts
+- Fix bug with caption scripts that only play audio
 
 ## 3.2.1 <small>(08/06/2022)</small>
 - Add support for Luscious sources

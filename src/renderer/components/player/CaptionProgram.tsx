@@ -430,45 +430,55 @@ export default class CaptionProgram extends React.Component {
             let file: string, alias: string;
             if (audioSplit[0].startsWith('\'')) {
               file = audioSplit[0].substring(1);
-              for (let s = 1; s < audioSplit.length; s++) {
-                if (audioSplit[s].endsWith('\'')) {
-                  file += " " + audioSplit[s].substring(0, audioSplit[s].length - 1);
-                  if (audioSplit.length == s + 1 ) {
-                    error = "Error: {" + index + "} '" + line + "' - missing parameter";
-                  } else if (audioSplit.length > s + 2) {
-                    error = "Error: {" + index + "} '" + line + "' - extra parameter";
+              if (file.endsWith("\'")) {
+                file = file.substring(0, file.length - 1);
+                alias = audioSplit[audioSplit.length - 1];
+              } else {
+                for (let s = 1; s < audioSplit.length; s++) {
+                  if (audioSplit[s].endsWith('\'')) {
+                    file += " " + audioSplit[s].substring(0, audioSplit[s].length - 1);
+                    if (audioSplit.length == s + 1) {
+                      error = "Error: {" + index + "} '" + line + "' - missing parameter";
+                    } else if (audioSplit.length > s + 2) {
+                      error = "Error: {" + index + "} '" + line + "' - extra parameter";
+                    } else {
+                      alias = audioSplit[audioSplit.length - 1];
+                    }
+                    break;
+                  } else if (s == audioSplit.length - 1) {
+                    error = "Error: {" + index + "} '" + line + "' - invalid command";
+                    break;
                   } else {
-                    alias = audioSplit[audioSplit.length - 1];
+                    file += " " + audioSplit[s];
                   }
-                  break;
-                } else if (s == audioSplit.length - 1) {
-                  error = "Error: {" + index + "} '" + line + "' - invalid command";
-                  break;
-                } else {
-                  file += " " + audioSplit[s];
                 }
               }
               if (error != null) break;
               alias = audioSplit[audioSplit.length - 1];
             } else if (audioSplit[0].startsWith('\"')) {
               file = audioSplit[0].substring(1);
-              for (let s = 1; s < audioSplit.length; s++) {
-                if (audioSplit[s].endsWith('\"')) {
-                  file += " " + audioSplit[s].substring(0, audioSplit[s].length - 1);
-                  if (s < audioSplit.length - 2) {
-                    error = "Error: {" + index + "} '" + line + "' - missing parameter";
+              if (file.endsWith('\"')) {
+                file = file.substring(0, file.length - 1);
+              } else {
+                for (let s = 1; s < audioSplit.length; s++) {
+                  if (audioSplit[s].endsWith('\"')) {
+                    file += " " + audioSplit[s].substring(0, audioSplit[s].length - 1);
+                    if (s < audioSplit.length - 2) {
+                      error = "Error: {" + index + "} '" + line + "' - missing parameter";
+                    } else {
+                      alias = audioSplit[audioSplit.length - 1];
+                    }
+                    break;
+                  } else if (s == audioSplit.length - 1) {
+                    error = "Error: {" + index + "} '" + line + "' - invalid command";
+                    break;
                   } else {
-                    alias = audioSplit[audioSplit.length - 1];
+                    file += " " + audioSplit[s];
                   }
-                  break;
-                } else if (s == audioSplit.length - 1) {
-                  error = "Error: {" + index + "} '" + line + "' - invalid command";
-                  break;
-                } else {
-                  file += " " + audioSplit[s];
                 }
               }
               if (error != null) break;
+              alias = audioSplit[audioSplit.length - 1];
             } else {
               file = audioSplit[0];
               alias = audioSplit[1];
@@ -507,12 +517,14 @@ export default class CaptionProgram extends React.Component {
             }
             fn = (this as any)[command](pSplit[0], volume);
             if (timestamp != null) {
+              containsTimestampAction = true;
               if (newTimestamps.has(timestamp)) {
                 newTimestamps.get(timestamp).push(fn);
               } else {
                 newTimestamps.set(timestamp, [fn]);
               }
             } else {
+              containsAction = true;
               newProgram.push(fn);
             }
             break;
