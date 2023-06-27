@@ -329,6 +329,7 @@ export default class Meta extends React.Component {
                   onTutorial={a(actions.doneTutorial)}
                   onUpdateLibrary={a(actions.updateScriptLibrary)}
                   onUpdateMode={a(actions.setMode)}
+                  onUpdateScript={a(actions.updateScript)}
                   savePosition={a(actions.saveScriptPosition)}
                   systemMessage={a(actions.systemMessage)}
                 />

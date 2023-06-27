@@ -1819,6 +1819,20 @@ export function updateAudioLibrary(state: State, fn: (audios: Array<Audio>) => v
   return {audios: audiosCopy, audioSelected: audioSelected};
 }
 
+export function updateScript(state: State, script: CaptionScript): Object {
+  const scenesCopy = JSON.parse(JSON.stringify(state.scenes));
+  for (let scene of scenesCopy) {
+    for (let playlist of scene.scriptPlaylists) {
+      for (let s = 0; s < playlist.scripts.length; s++) {
+        if (playlist.scripts[s].url == script.url) {
+          playlist.scripts.splice(s, 1, script);
+        }
+      }
+    }
+  }
+  return {scenes: scenesCopy}
+}
+
 export function updateScriptLibrary(state: State, fn: (scripts: Array<CaptionScript>) => void): Object {
   const scriptsCopy = JSON.parse(JSON.stringify(state.scripts));
   fn(scriptsCopy);

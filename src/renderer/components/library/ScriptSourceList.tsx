@@ -67,6 +67,7 @@ class ScriptSourceList extends React.Component {
     onEditScript(source: CaptionScript): void,
     onPlay(source: CaptionScript, sceneID: number, displayed: Array<CaptionScript>): void,
     onUpdateLibrary(fn: (library: Array<CaptionScript>) => void): void,
+    onUpdateScript(script: CaptionScript): void,
     systemMessage(message: string): void,
     specialMode?: string,
     selected?: Array<string>,
@@ -255,6 +256,7 @@ class ScriptSourceList extends React.Component {
       let editSource = a.find((a) => a.id == this.state.sourceOptions.id);
       Object.assign(editSource, newScript);
     })
+    this.props.onUpdateScript(newScript);
     this.onCloseSourceOptions();
   }
 

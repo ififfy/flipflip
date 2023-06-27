@@ -325,6 +325,7 @@ class ScriptLibrary extends React.Component {
     onTutorial(tutorial: string): void,
     onUpdateLibrary(fn: (library: Array<CaptionScript>) => void): void,
     onUpdateMode(mode: string): void,
+    onUpdateScript(script: CaptionScript): void,
     savePosition(yOffset: number, filters:Array<string>, selected: Array<string>): void,
     systemMessage(message: string): void,
   };
@@ -465,6 +466,7 @@ class ScriptLibrary extends React.Component {
                 onPlay={this.props.onPlay.bind(this)}
                 onUpdateSelected={this.onUpdateSelected.bind(this)}
                 onUpdateLibrary={this.props.onUpdateLibrary.bind(this)}
+                onUpdateScript={this.props.onUpdateScript.bind(this)}
                 savePosition={this.savePosition.bind(this)}
                 systemMessage={this.props.systemMessage.bind(this)}/>
             </Container>
