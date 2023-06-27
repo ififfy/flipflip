@@ -66,7 +66,6 @@ class VideoControl extends React.Component {
   };
 
   render() {
-    console.log(this.props.skip);
     if (this.props.video == null) return <Grid container spacing={1} alignItems="center" justifyContent={this.props.player ? "center" : "flex-start"}/>;
     const classes = this.props.classes;
     return (

@@ -397,7 +397,6 @@ class AudioPlaylist extends React.Component {
   }
 
   nextTrack() {
-    console.log("Next Track");
     let nextTrack = this.state.currentIndex + 1;
     if (nextTrack >= this.state.playingAudios.length) {
       nextTrack = 0;

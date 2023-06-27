@@ -779,10 +779,8 @@ class PlayerBars extends React.Component {
   onClick = (e: MouseEvent) => {
     if (this.props.scene.audioScene || this.props.recentPictureGrid || this.state.drawerHover || this.state.tagDrawerHover || this.state.appBarHover) return;
     if ((!this.props.isPlaying || this.props.config.displaySettings.clickToProgressWhilePlaying) && this.props.hasStarted) {
-      console.log("Next");
-      //console.log(this.props.imagePlayerAdvanceHacks);
       this.props.imagePlayerAdvanceHacks[0][0].fire();
-      // Improve this to be able to advance specific grids
+      // TODO Improve this to be able to advance specific grids
       /*for (let x of this.props.imagePlayerAdvanceHacks) {
         for (let y of x) {
           y.fire();
