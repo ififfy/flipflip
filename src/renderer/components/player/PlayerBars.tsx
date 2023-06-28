@@ -864,7 +864,11 @@ class PlayerBars extends React.Component {
   }
 
   onBlacklistFile(source: string, fileToBlacklist: string) {
-    this.setState({blacklistSource: source, blacklistFile: fileToBlacklist});
+    if (this.props.config.generalSettings.confirmBlacklist) {
+      this.setState({blacklistSource: source, blacklistFile: fileToBlacklist});
+    } else {
+      this.props.blacklistFile(source, fileToBlacklist);
+    }
   }
 
   onFinishBlacklistFile() {
@@ -874,22 +878,30 @@ class PlayerBars extends React.Component {
 
   onDeletePath(path: string) {
     if (fs.existsSync(path)) {
-      this.setState({deletePath: path});
+      if (this.props.config.generalSettings.confirmFileDeletion) {
+        this.setState({deletePath: path});
+      } else {
+        this.doDelete(path);
+      }
     } else {
       this.setState({deletePath: null, deleteError: "This file doesn't exist, cannot delete"});
     }
   }
 
-  onFinishDeletePath() {
-    fs.unlink(this.state.deletePath, (err) => {
+  doDelete(path: string) {
+    fs.unlink(path, (err) => {
       if (err) {
-        this.setState({deletePath: null, deleteError: "An error ocurred while deleting the file: " + err.message});
+        this.setState({deletePath: null, deleteError: "An error occurred while deleting the file: " + err.message});
         console.error(err);
       } else {
         this.props.imagePlayerDeleteHack.fire();
         this.onCloseDialog();
       }
     });
+  }
+
+  onFinishDeletePath() {
+    this.doDelete(this.state.deletePath);
   }
 
   toggleFull() {
@@ -1131,6 +1143,12 @@ class PlayerBars extends React.Component {
           this.toggleMenuBarDisplay();
         }
         break;
+      case 'b':
+        if (e.ctrlKey) {
+          e.preventDefault();
+          this.onBlacklist();
+        }
+        break;
       case 'Delete':
         if (!this.state.drawerHover || focus != "input") {
           if (this.props.config.caching.enabled) {
@@ -1244,6 +1262,16 @@ class PlayerBars extends React.Component {
         this.onDeletePath(path);
       }
     }
+  }
+
+  onBlacklist() {
+    const img = this.props.historyPaths[(this.props.historyPaths.length - 1) + this.props.historyOffset];
+    if (img == null) return;
+    const source = img.getAttribute("source");
+    const url = img.src;
+    const isFile = url.startsWith('file://');
+    const path = urlToPath(url);
+    this.onBlacklistFile(source, isFile ? path : url);
   }
 
   playPause() {

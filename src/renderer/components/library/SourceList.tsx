@@ -62,8 +62,8 @@ const styles = (theme: Theme) => createStyles({
     marginRight: theme.spacing(1),
   },
   blacklistInput: {
-    minWidth: 200,
-    minHeight: 100,
+    minWidth: 550,
+    minHeight: 300,
     whiteSpace: 'nowrap',
     overflowX: 'hidden',
     overflowY: 'auto !important' as any,

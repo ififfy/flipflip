@@ -6,12 +6,14 @@ import Config, {CacheSettings, DisplaySettings, GeneralSettings, RemoteSettings}
 import Tag from "../../data/Tag";
 import LibrarySource from "../../data/LibrarySource";
 import PlayerBoolCard from "../configGroups/PlayerBoolCard";
+import PlayerBoolCard2 from "../configGroups/PlayerBoolCard2";
 import PlayerNumCard from "../configGroups/PlayerNumCard";
 import CacheCard from "../configGroups/CacheCard";
 import BackupCard from "../configGroups/BackupCard";
 import APICard from "../configGroups/APICard";
 import ThemeCard from "../configGroups/ThemeCard";
 import WatermarkCard from "../configGroups/WatermarkCard";
+import Masonry from "@mui/lab/Masonry/Masonry";
 
 export default class GeneralConfig extends React.Component {
   readonly props: {
@@ -35,50 +37,61 @@ export default class GeneralConfig extends React.Component {
   render() {
     return(
       <Grid container spacing={2}>
-        <Grid item xs={12} sm={6} md={4} lg={3}>
-          <Card>
-            <CardContent>
-              <PlayerBoolCard
-                displaySettings={this.props.config.displaySettings}
-                generalSettings={this.props.config.generalSettings}
-                onPortableOverride={this.props.onPortableOverride.bind(this)}
-                onUpdateDisplaySettings={this.props.onUpdateDisplaySettings.bind(this)}
-                onUpdateGeneralSettings={this.props.onUpdateGeneralSettings.bind(this)}/>
-            </CardContent>
-          </Card>
-        </Grid>
+        <Grid item xs={12}>
+          <Masonry columns={[1,2,3,4]} spacing={2}>
 
-        <Grid item xs={12} sm={4} md={3} lg={2}>
-          <Card style={{overflow: 'visible'}}>
-            <CardContent>
-              <PlayerNumCard
-                library={this.props.library}
-                tags={this.props.tags}
-                settings={this.props.config.displaySettings}
-                onUpdateSettings={this.props.onUpdateDisplaySettings.bind(this)}/>
-            </CardContent>
-          </Card>
-        </Grid>
+            <Card>
+              <CardContent>
+                <PlayerBoolCard
+                  displaySettings={this.props.config.displaySettings}
+                  onUpdateDisplaySettings={this.props.onUpdateDisplaySettings.bind(this)}/>
+              </CardContent>
+            </Card>
 
-        <Grid item xs={12} sm={8} md={5} lg={4}>
-          <Card>
-            <CardContent>
-              <CacheCard
-                config={this.props.config}
-                onUpdateSettings={this.props.onUpdateCachingSettings.bind(this)}/>
-            </CardContent>
-          </Card>
-        </Grid>
+            <Card>
+              <CardContent>
+                <PlayerBoolCard2
+                  generalSettings={this.props.config.generalSettings}
+                  onPortableOverride={this.props.onPortableOverride.bind(this)}
+                  onUpdateGeneralSettings={this.props.onUpdateGeneralSettings.bind(this)}/>
+              </CardContent>
+            </Card>
 
-        <Grid item xs={12} sm={4} md={3} lg={3}>
-          <Card>
-            <CardContent>
-              <APICard
-                settings={this.props.config.remoteSettings}
-                onUpdateSettings={this.props.onUpdateRemoteSettings.bind(this)}
-                onUpdateConfig={this.props.onUpdateConfig.bind(this)}/>
-            </CardContent>
-          </Card>
+            <Card style={{overflow: 'visible'}}>
+              <CardContent>
+                <PlayerNumCard
+                  library={this.props.library}
+                  tags={this.props.tags}
+                  settings={this.props.config.displaySettings}
+                  onUpdateSettings={this.props.onUpdateDisplaySettings.bind(this)}/>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent>
+                <CacheCard
+                  config={this.props.config}
+                  onUpdateSettings={this.props.onUpdateCachingSettings.bind(this)}/>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent>
+                <APICard
+                  settings={this.props.config.remoteSettings}
+                  onUpdateSettings={this.props.onUpdateRemoteSettings.bind(this)}
+                  onUpdateConfig={this.props.onUpdateConfig.bind(this)}/>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent>
+                <WatermarkCard
+                  settings={this.props.config.generalSettings}
+                  onUpdateSettings={this.props.onUpdateGeneralSettings.bind(this)}/>
+              </CardContent>
+            </Card>
+          </Masonry>
         </Grid>
 
         <Grid item xs={12} sm={"auto"}>
@@ -105,15 +118,6 @@ export default class GeneralConfig extends React.Component {
           </Card>
         </Grid>
 
-        <Grid item xs={12} sm={4} md={3} lg={3}>
-          <Card>
-            <CardContent>
-              <WatermarkCard
-                settings={this.props.config.generalSettings}
-                onUpdateSettings={this.props.onUpdateGeneralSettings.bind(this)}/>
-            </CardContent>
-          </Card>
-        </Grid>
       </Grid>
     );
   }
