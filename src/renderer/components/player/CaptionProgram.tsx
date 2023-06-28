@@ -44,6 +44,7 @@ export default class CaptionProgram extends React.Component {
     captionScript: CaptionScript,
     currentAudio: Audio
     currentImage: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement,
+    persist: boolean,
     repeat: string,
     scale: number,
     singleTrack: boolean,
@@ -215,7 +216,7 @@ export default class CaptionProgram extends React.Component {
       this._sceneCommand = null;
       command();
     }
-    if (this.el.current && (this.props.captionScript.url != props.captionScript.url || this.props.captionScript.script != props.captionScript.script) ||
+    if (this.el.current && this.props.captionScript !== props.captionScript ||
       (this.props.getCurrentTimestamp != null && props.getCurrentTimestamp == null)) {
       this.stop();
       this.reset();
@@ -844,7 +845,7 @@ export default class CaptionProgram extends React.Component {
           }
           if (this.props.captionScript.nextSceneAtEnd && this.props.playNextScene) {
             this.props.playNextScene();
-            return;
+            if (!this.props.persist) return;
           }
           if (((this.props.repeat == RP.all && !this.props.singleTrack) || this.props.repeat == RP.none) && this.props.nextTrack) {
             this.props.nextTrack();

@@ -42,6 +42,7 @@ export default class CaptionProgramPlaylist extends React.Component {
     return (
       <CaptionProgram
         captionScript={script}
+        persist={this.props.persist}
         repeat={this.props.playlist.repeat}
         scale={this.props.scale}
         singleTrack={this.state.playingScripts.length == 1}

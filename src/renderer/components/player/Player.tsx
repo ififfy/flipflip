@@ -92,6 +92,7 @@ export default class Player extends React.Component {
     thumbImage: null as HTMLImageElement,
     persistAudio: false,
     persistText: false,
+    scriptPlaylists: null as {scripts: CaptionScript[], shuffle: boolean, repeat: string}[],
     hideCursor: false,
   };
 
@@ -104,7 +105,8 @@ export default class Player extends React.Component {
     const nextScene = this.getScene(this.props.scene.nextSceneID == -1 ? this.props.scene.nextSceneRandomID : this.props.scene.nextSceneID);
     const showCaptionProgram = (!this.state.recentPictureGrid && this.state.hasStarted &&
       ((this.props.scene.textEnabled &&
-      this.props.scene.scriptPlaylists.length) || this.state.persistText));
+      this.props.scene.scriptPlaylists.length > 0) || this.state.persistText));
+    const scriptPlaylists = this.state.persistText ? this.state.scriptPlaylists : this.props.scene.scriptPlaylists;
     const showStrobe = !this.state.recentPictureGrid && this.props.scene.strobe && this.state.hasStarted && this.state.isPlaying &&
       (this.props.scene.strobeLayer == SL.top || this.props.scene.strobeLayer == SL.bottom);
 
@@ -563,7 +565,7 @@ export default class Player extends React.Component {
           )}
         </div>
 
-        {showCaptionProgram && this.props.scene.scriptPlaylists.map((playlist, i) =>
+        {showCaptionProgram && scriptPlaylists.map((playlist, i) =>
           <CaptionProgramPlaylist
             key={i}
             playlistIndex={i}
@@ -693,7 +695,7 @@ export default class Player extends React.Component {
       this.setState({persistAudio: true});
     }
     if (this.props.scene.persistText && this.props.scene.textEnabled) {
-      this.setState({persistText: true});
+      this.setState({persistText: true, scriptPlaylists: this.props.scene.scriptPlaylists});
     }
   }
 
