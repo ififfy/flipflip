@@ -1280,10 +1280,10 @@ export const loadInstagram = (allURLs: Map<string, Array<string>>, allPosts: Map
       ig.account.login(config.remoteSettings.instagramUsername, config.remoteSettings.instagramPassword).then((loggedInUser) => {
         ig.state.serializeCookieJar().then((cookies) => {
           session = JSON.stringify(cookies);
-          ig.user.getIdByUsername(getFileGroup(url)).then((id) => {
-            const userFeed = ig.feed.user(id);
-            userFeed.items().then((items) => {
-              helpers.next = [id, userFeed.serialize()];
+          if (url.endsWith("/saved")) {
+            const saved = ig.feed.saved();
+            saved.items().then((items) => {
+              helpers.next = [null, saved.serialize()];
               processItems(items, helpers);
             }).catch((e) => pm({
               error: e.message,
@@ -1291,12 +1291,25 @@ export const loadInstagram = (allURLs: Map<string, Array<string>>, allPosts: Map
               source: source,
               timeout: timeout,
             }, resolve));
-          }).catch((e) => pm({
-            error: e.message,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          }, resolve));
+          } else {
+            ig.user.getIdByUsername(getFileGroup(url)).then((id) => {
+              const userFeed = ig.feed.user(id);
+              userFeed.items().then((items) => {
+                helpers.next = [id, userFeed.serialize()];
+                processItems(items, helpers);
+              }).catch((e) => pm({
+                error: e.message,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              }, resolve));
+            }).catch((e) => pm({
+              error: e.message,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            }, resolve));
+          }
         }).catch((e) => pm({
           error: e.message,
           helpers: helpers,
@@ -1314,10 +1327,10 @@ export const loadInstagram = (allURLs: Map<string, Array<string>>, allPosts: Map
         ig = null;
       });
     } else if (helpers.next == 0) {
-      ig.user.getIdByUsername(getFileGroup(url)).then((id) => {
-        const userFeed = ig.feed.user(id);
-        userFeed.items().then((items) => {
-          helpers.next = [id, userFeed.serialize()];
+      if (url.endsWith("/saved")) {
+        const saved = ig.feed.saved();
+        saved.items().then((items) => {
+          helpers.next = [null, saved.serialize()];
           processItems(items, helpers);
         }).catch((e) => pm({
           error: e.message,
@@ -1325,19 +1338,37 @@ export const loadInstagram = (allURLs: Map<string, Array<string>>, allPosts: Map
           source: source,
           timeout: timeout,
         }, resolve));
-      }).catch((e) => pm({
-        error: e.message,
-        helpers: helpers,
-        source: source,
-        timeout: timeout,
-      }, resolve));
+      } else {
+        ig.user.getIdByUsername(getFileGroup(url)).then((id) => {
+          const userFeed = ig.feed.user(id);
+          userFeed.items().then((items) => {
+            helpers.next = [id, userFeed.serialize()];
+            processItems(items, helpers);
+          }).catch((e) => pm({
+            error: e.message,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          }, resolve));
+        }).catch((e) => pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }, resolve));
+      }
     } else {
       ig.state.deserializeCookieJar(JSON.parse(session)).then((data) => {
         const id = helpers.next[0];
         const feedSession = helpers.next[1];
-        const userFeed = ig.feed.user(id);
-        userFeed.deserialize(feedSession);
-        if (!userFeed.isMoreAvailable()) {
+        let feed: any;
+        if (url.endsWith("/saved")) {
+          feed = ig.feed.saved();
+        } else {
+          feed = ig.feed.user(id)
+        }
+        feed.deserialize(feedSession);
+        if (!feed.isMoreAvailable()) {
           helpers.next = null;
           pm({
             data: [],
@@ -1350,10 +1381,10 @@ export const loadInstagram = (allURLs: Map<string, Array<string>>, allPosts: Map
           }, resolve);
           return;
         }
-        userFeed.items().then((items) => {
-          helpers.next = [id, userFeed.serialize()];
+        feed.items().then((items: any) => {
+          helpers.next = [id, feed.serialize()];
           processItems(items, helpers);
-        }).catch((e) => pm({
+        }).catch((e: any) => pm({
           error: e.message,
           helpers: helpers,
           source: source,
@@ -2601,6 +2632,7 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, allPosts: Map<st
         source: source,
         timeout: timeout,
       }, resolve);
+      return;
     }
 
     const tagsRegex = /tags=([^&]*)&?.*$/.exec(source.url);
