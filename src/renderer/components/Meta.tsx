@@ -19,7 +19,6 @@ import {getCachePath} from "../data/utils";
 import * as actions from '../data/actions';
 import ErrorBoundary from "../../main/ErrorBoundary";
 import AppStorage from '../data/AppStorage';
-import FFAnalytics from "./FFAnalytics";
 import ScenePicker from './ScenePicker';
 import ConfigForm from './config/ConfigForm';
 import Library from './library/Library';
@@ -522,12 +521,6 @@ export default class Meta extends React.Component {
                   onSkipAllTutorials={a(actions.skipTutorials)}
                 />
               )}
-
-              <FFAnalytics
-                config={this.state.config}
-                onUpdateConfig={a(actions.updateConfig)}
-                version={this.state.version}
-                page={this.state.route.length == 0 ? 'home' : this.state.route[this.state.route.length - 1].kind} />
             </Box>
           </ErrorBoundary>
         </ThemeProvider>

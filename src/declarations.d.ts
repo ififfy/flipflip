@@ -22,7 +22,6 @@ declare module '*.icns' {
 declare module "@mui/material/Slider/ValueLabel"
 declare module 'd3-ease';
 declare module 'electron-default-menu';
-declare module 'electron-google-analytics';
 declare module 'get-folder-size';
 declare module 'gif-info';
 declare module 'fs-extra';
