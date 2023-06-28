@@ -2612,6 +2612,7 @@ export const loadPiwigo = (allURLs: Map<string, Array<string>>, allPosts: Map<st
 
 export const loadHydrus = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 8000;
+  const chunk = 1000;
   const apiKey = config.remoteSettings.hydrusAPIKey;
   const configured = apiKey != "";
   if (configured) {
@@ -2663,14 +2664,8 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, allPosts: Map<st
         })
         .json((json) => {
           const fileIDs = json.file_ids;
-          const chunk = 1000;
           pages = Math.ceil(fileIDs.length / chunk);
-          let page = 0;
-          for (let i=0; i<fileIDs.length; i+=chunk) {
-            const pageIDs = fileIDs.slice(i,i+chunk);
-            // Stagger our getFileMetadata calls
-            setTimeout(() => getFileMetadata(pageIDs, ++page), page*1000);
-          }
+          getFileMetadata(fileIDs, 0);
         })
         .catch((e) => pm({
           error: e.message,
@@ -2682,7 +2677,8 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, allPosts: Map<st
 
     let images = Array<string>();
     const getFileMetadata = (fileIDs: Array<number>, page: number) => {
-      wretch(hydrusURL + "/get_files/file_metadata?file_ids=[" + fileIDs.toString() + "]")
+      const pageIDs = fileIDs.slice(page*chunk, (page+1)*chunk);
+      wretch(hydrusURL + "/get_files/file_metadata?file_ids=[" + pageIDs.toString() + "]")
         .headers({"Hydrus-Client-API-Access-Key": apiKey})
         .get()
         .setTimeout(15000)
@@ -2712,6 +2708,7 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, allPosts: Map<st
             }
           }
 
+          page += 1;
           if (page == pages) {
             pm({
               data: images,
@@ -2722,6 +2719,8 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, allPosts: Map<st
               source: source,
               timeout: timeout,
             }, resolve);
+          } else {
+            getFileMetadata(fileIDs, page);
           }
         })
         .catch((e) => pm({
