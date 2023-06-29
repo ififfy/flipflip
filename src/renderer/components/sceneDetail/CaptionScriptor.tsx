@@ -639,6 +639,7 @@ class CaptionScriptor extends React.Component {
                   <div className={clsx(!this.state.fullscreen && classes.relative)}>
                     <CaptionProgram
                       captionScript={this.state.captionScript}
+                      persist={false}
                       repeat={RP.one}
                       scale={0.35}
                       singleTrack={true}
