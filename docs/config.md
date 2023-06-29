@@ -35,7 +35,9 @@ canvas. This may improve video framerate, but will remove absolute synchronizati
 * `Prioritize Performance/Loading`
   * `Prioritize Performance` - This mode will prioritize smooth playback, while taking a longer time to load
   * `Prioritize Loading` - This mode will prioritize loading times, but may cause stuttering during playback.
-* `Confirm Scene Delete` - Disabling this will hide the confirmation dialog when deleting a Scene.
+* `Confirm Scene Deletion` - Disabling this will hide the confirmation dialog when deleting a Scene.
+* `Confirm Blacklist` - Disabling this will hide the confirmation dialog when blacklisting a file.
+* `Confirm File Deletion` - Disabling this will hide the confirmation dialog when deleting a file.
 * `Portable Mode` - Portable Mode will save a copy of your data in the same directory as the FlipFlip executable, 
 as well as the default save path. This needs to be enabled on each machine.
   * `Disable Local Saves` - When this is on, FlipFlip will _only_ save its data to the folder with the FlipFlip 
@@ -154,6 +156,29 @@ on your computer and is never shared with anyone or sent to any server (besides 
 * You should see a Success! message
   * If you see an error message, FlipFlip was not able to establish connection to the server or was unable to authenticate your user.
 
+## Watermark
+Enabling this will display a custom watermark during FlipFlip playback. In addition to the watermark text, you can also
+select which corner it appears in, as well as font family, size, and color.
+
+You can include the following special variables in your watermark text, and they will be automatically replaced
+with the relevant information:
+
+| Variable Code    | Replaced By                                         |
+|:----------------:|:---------------------------------------------------:|
+| `{scene_name}`   | Name of the current **Scene**                       |
+| `{source_url}`   | URL of the current **Source**                       |
+| `{source_name}`  | Name of the current **Source**                      |
+| `{post_url}`     | URL of the currently displayed image's **Post**     |
+| `{file_url}`     | URL of the currently displayed **File**             |
+| `{file_name}`    | Name of the currently displayed **File**            |
+| `{audio_url}`    | URL of the currently playing **Audio**              |
+| `{audio_name}`   | Name of the currently playing **Audio**             |
+| `{audio_title}`  | Title (metadata) of the currently playing **Audio** |
+| `{audio_artist}` | Arist (metadata) of the currently playing **Audio** |
+| `{audio_album}`  | Album (metadata) of the currently playing **Audio** |
+
+?> A source/file/audio "Name" is the shortened name parsed from the full "URL". (e.g. `https://www.reddit.com/r/AnimalsBeingDerps/` becomes `AnimalsBeingDerps`)
+
 ## Backup
 Backup your FlipFlip data or restore from a previous backup.
 
@@ -179,26 +204,3 @@ use your configured rules. If Auto-Clean is off, you can choose how many of the 
 The FlipFlip UI allows you to customize the **Primary** and **Secondary** colors. You can also toggle Dark Mode on/off here
 
 <img src="doc_images/flipflip_colors.png" alt="FlipFlip Colors" class="col-xs-10 col-xl-7">
-
-## Watermark
-Enabling this will display a custom watermark during FlipFlip playback. In addition to the watermark text, you can also
-select which corner it appears in, as well as font family, size, and color.
-
-You can include the following special variables in your watermark text, and they will be automatically replaced 
-with the relevant information:
-
-| Variable Code    | Replaced By                                         |
-|:----------------:|:---------------------------------------------------:|
-| `{scene_name}`   | Name of the current **Scene**                       |
-| `{source_url}`   | URL of the current **Source**                       |
-| `{source_name}`  | Name of the current **Source**                      |
-| `{post_url}`     | URL of the currently displayed image's **Post**     |
-| `{file_url}`     | URL of the currently displayed **File**             |
-| `{file_name}`    | Name of the currently displayed **File**            |
-| `{audio_url}`    | URL of the currently playing **Audio**              |
-| `{audio_name}`   | Name of the currently playing **Audio**             |
-| `{audio_title}`  | Title (metadata) of the currently playing **Audio** |
-| `{audio_artist}` | Arist (metadata) of the currently playing **Audio** |
-| `{audio_album}`  | Album (metadata) of the currently playing **Audio** |
-
-?> A source/file/audio "Name" is the shortened name parsed from the full "URL". (e.g. `https://www.reddit.com/r/AnimalsBeingDerps/` becomes `AnimalsBeingDerps`)

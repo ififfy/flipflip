@@ -25,8 +25,8 @@ While a Scene is playing, you can right click on an image to get more informatio
 * Press Ctrl+C or select "Copy Image" to attempt to copy the image itself to the clipboard. 
   * _Image image cannot be copied to clipboard, path will be copied instead_ 
 * You can choose to open the source or image directly.
- * _Will use your system's default app for opening that type of link._
-* If this image is not from the cache, you can add it to the blacklist for its source. 
+  * _Will use your system's default app for opening that type of link._
+* If this image is not from the cache, you can add it to the blacklist for its source.
 * If this image is a local file, you are given options to view it in Explorer/Finder or delete it from the system. 
   * _Handy for pruning images you don't want in FlipFlip._ 
 * If this image is a remote file and you have enabled caching, a link to the caching directory is also provided.
@@ -58,12 +58,14 @@ Use the arrow keys (← / →) to navigate through playback history. Use `Space`
 | Space         | Play/Pause                  |
 | ← →           | Navigate History            |
 | Shift + Space | Play/Pause Video            |
-| Shift + ← →   | Back/Forward 15sec of Video |
+| Shift + ← →   | Back/Forward N sec of Video |
+| Shift + ↑ ↓   | Volume Up/Down              |
 | Mouse Wheel   | Volume Up/Down              |
 | [ ]           | Navigate Tagging            |
 | Esc           | Exit Scene                  |
 | Del           | Delete Image                |
 | Ctrl+C        | Copy Image/Path             |
+| Ctrl+B        | Blacklist File              |
 | Ctrl+F        | Toggle Fullscreen           |
 | Ctrl+T        | Toggle Always On Top        |
 | Ctrl+G        | Toggle Menu Bar             |

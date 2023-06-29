@@ -132,10 +132,8 @@ export default class Meta extends React.Component {
   //      Be able to right click on grid scenes as overlay
   //      Be able to modify source tags as popup during playback
   //      Generate different sources even for same scenes in grid
-  //      Add option to disable "delete file" prompt
   //      Add configurable privacy screen with shortcut and ability to set image
   //      Add minimize shortcut key in same vain?
-  //      AutoHide cursor isn't working on secondary monitor
   render() {
     const scene = actions.getActiveScene(this.state);
     const grid = actions.getActiveGrid(this.state);

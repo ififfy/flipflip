@@ -18,7 +18,7 @@
 * **[Subreddit](https://www.reddit.com/r/flipflip/)**
 
 ## Features
-* Local files as well as Tumblr, Reddit, Twitter, Instagram, Imgur, DeviantArt, Booru & More
+* Local files as well as Tumblr, ~~Reddit~~, ~~Twitter~~, Instagram, Imgur, DeviantArt, Booru & More
 * Animated GIF and video support
 * Grid view with cloneable grid cells
 * Multiple windows

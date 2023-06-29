@@ -116,6 +116,7 @@ This setting overrides Scene timing specifically for videos.
 Videos also have a number of other settings:
 * **Video Speed** - Choose the playback speed of videos.
 * **Random Speed** - Choose to play videos at random speeds and specify the range of speeds.
+* **Video Skip Rate** - Choose the rate at which videos skip forward/backwards.
 * **Start at Random Time** - Starts videos at a random timestamp (videos start from beginning by default).
 * **Continue Videos** - Continue videos from last timestamp during this slideshow (videos restart by default).
 * **Use Clips** - Choose to use only [video clips](clips.md) or the entire video.

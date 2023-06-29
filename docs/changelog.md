@@ -3,17 +3,24 @@
 - Upgrade UI to MUIv5
 - Upgrade 3rd parties dependencies
 - Add ability to scrape and download a particular source (BETA)
+- Allow changes in Script Library to propagate to scripts in Scenes
 - Add ability to globally ignore certain tags/types during scene generation
+- Add option to disable file delete dialog
+- Add option to disable file blacklist dialog
 - Add ability to set video skip rate
-- Improve recent picture grid layout
 - Add M4V support
 - Add keyboard shortcut for video volume
+- Add keyboard shortcut for blacklist file
 - Change nextSceneTime top use ms instead of sec
-- Leave Video Controls section visible in sidebar (avoid quick flashing of controls during playback)
 - Add support for displaying and linking to media's post URL
 - Add safebooru to list of supported boorus
-- Removed support for Reddit/Twitter
+- Add support for Saved Instagram feed
 - Properly show comment linebreaks in Audio tooltips
+- Improve recent picture grid layout
+- Remove Google Analytics
+- Removed support for Reddit/Twitter
+- Leave Video Controls section visible in sidebar (avoid quick flashing of controls during playback)
+- Fix bug with Hydrus scraper sometimes not returning the full set of files
 - Fix CaptionScriptor bugs
 - Fix bug with manual scene generation when auto-regeneration is enabled
 - Fix bug with strict ordering
@@ -22,6 +29,7 @@
 - Fix bug with video timestamp not showing in proper color when not in dark mode
 - Fix bug with storeAudio function in caption scripts
 - Fix bug with caption scripts that only play audio
+- Fix bug with caption playback when using Next Scene
 
 ## 3.2.1 <small>(08/06/2022)</small>
 - Add support for Luscious sources

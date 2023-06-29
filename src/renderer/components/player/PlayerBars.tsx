@@ -1271,7 +1271,10 @@ class PlayerBars extends React.Component {
     const url = img.src;
     const isFile = url.startsWith('file://');
     const path = urlToPath(url);
-    this.onBlacklistFile(source, isFile ? path : url);
+    const type = getSourceType(source);
+    if ((!isFile && type != ST.video && type != ST.playlist) || type == ST.local) {
+      this.onBlacklistFile(source, isFile ? path : url);
+    }
   }
 
   playPause() {
