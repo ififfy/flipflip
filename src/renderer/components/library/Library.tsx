@@ -91,11 +91,19 @@ const styles = (theme: Theme) => createStyles({
     zIndex: theme.zIndex.drawer + 1,
   },
   appBarSpacerWrapper: {
-    ...theme.mixins.toolbar,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    padding: '0 8px',
+    minHeight: 64,
   },
   appBarSpacer: {
     backgroundColor: theme.palette.primary.main,
-    ...theme.mixins.toolbar
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    padding: '0 8px',
+    minHeight: 64,
   },
   backButton: {
     float: 'left',

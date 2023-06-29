@@ -113,7 +113,7 @@ class ScriptPlaylist extends React.Component {
                                  <br/>
                                  Shift+Click: Open Source
                                  <br/>
-                                 &nbsp;&nbsp;Ctrl+Click: Reveal File}
+                                 &nbsp;&nbsp;Ctrl+Click: Reveal File
                                </div>
                            }>
                     <div onClick={this.onSourceIconClick.bind(this, s)} className={classes.scriptThumb}>

@@ -29,7 +29,11 @@ const styles = (theme: Theme) => createStyles({
     zIndex: theme.zIndex.drawer + 1,
   },
   appBarSpacer: {
-    ...theme.mixins.toolbar
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    padding: '0 8px',
+    minHeight: 64,
   },
   title: {
     textAlign: 'center',

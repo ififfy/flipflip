@@ -159,9 +159,10 @@ const styles = (theme: Theme) => createStyles({
     alignItems: 'center',
     justifyContent: 'flex-start',
     color: theme.palette.primary.contrastText,
+    padding: '0 8px',
     paddingLeft: 23,
     backgroundColor: theme.palette.primary.main,
-    ...theme.mixins.toolbar,
+    minHeight: 64,
   },
   drawerBottom: {
     width: drawerWidth,
@@ -194,7 +195,11 @@ const styles = (theme: Theme) => createStyles({
   },
   appBarSpacer: {
     backgroundColor: theme.palette.primary.main,
-    ...theme.mixins.toolbar
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    padding: '0 8px',
+    minHeight: 64,
   },
   content: {
     display: 'flex',

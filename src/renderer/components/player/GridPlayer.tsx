@@ -52,7 +52,11 @@ const styles = (theme: Theme) => createStyles({
     opacity: 0,
     height: theme.spacing(5),
     width: '100%',
-    ... theme.mixins.toolbar,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    padding: '0 8px',
+    minHeight: 64,
   },
   title: {
     textAlign: 'center',

@@ -54,7 +54,11 @@ const styles = (theme: Theme) => createStyles({
   },
   appBarSpacer: {
     backgroundColor: theme.palette.primary.main,
-    ...theme.mixins.toolbar
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    padding: '0 8px',
+    minHeight: 64,
   },
   backButton: {
     float: 'left',

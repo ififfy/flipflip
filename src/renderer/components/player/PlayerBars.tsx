@@ -95,7 +95,11 @@ const styles = (theme: Theme) => createStyles({
     opacity: 0,
     height: theme.spacing(5),
     width: '100%',
-    ... theme.mixins.toolbar,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    padding: '0 8px',
+    minHeight: 64,
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
@@ -136,7 +140,8 @@ const styles = (theme: Theme) => createStyles({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: theme.palette.background.default,
-    ...theme.mixins.toolbar,
+    padding: '0 8px',
+    minHeight: 64,
   },
   drawer: {
     zIndex: theme.zIndex.drawer,

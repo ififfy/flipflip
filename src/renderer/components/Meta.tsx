@@ -143,6 +143,7 @@ export default class Meta extends React.Component {
     const p = (fn: any) => this.progressAction.bind(this, fn);
 
     const theme = createTheme(this.state.theme);
+    // @ts-ignore
     return (
       <StyledEngineProvider injectFirst>
         <ThemeProvider theme={theme}>
