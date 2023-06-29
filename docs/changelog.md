@@ -1,8 +1,9 @@
 # Changelog
 ## 3.2.2 <small>(06/XX/2023)</small>
 - Upgrade UI to MUIv5
-- Upgrade 3rd parties dependencies
+- Upgrade 3rd party libraries
 - Add ability to scrape and download a particular source (BETA)
+- Add ability to click image to progress Scene
 - Allow changes in Script Library to propagate to scripts in Scenes
 - Add ability to globally ignore certain tags/types during scene generation
 - Add option to disable file delete dialog
