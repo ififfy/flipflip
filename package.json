@@ -1,6 +1,6 @@
 {
   "name": "flipflip",
-  "version": "3.2.2",
+  "version": "3.2.3",
   "main": "./dist/main.bundle.js",
   "author": "ififfy",
   "license": "MIT",

@@ -219,7 +219,7 @@ export default class ErrorBoundary extends React.Component {
     if (errorComponent != null) {
       title = errorComponent[1] + " - " + title;
     }
-    remote.shell.openExternal("https://github.com/ififfy/flipflip/issues/new?title=" + title + "&body=" + body);
+    remote.shell.openExternal("https://github.com/regtemp8/flipflip/issues/new?title=" + title + "&body=" + body);
   }
 }
 

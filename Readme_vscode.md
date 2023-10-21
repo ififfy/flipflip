@@ -12,7 +12,7 @@ Install and enable VS Code's [Debugger for Chrome](https://marketplace.visualstu
 
 ## 2 If on Windows, edit launch.json
 
-You'll need to edit the value of `runtimeExecutable` in `.vscode/launch.json` to reflec the slightly different path to the Electron executable.
+You'll need to edit the value of `runtimeExecutable` in `.vscode/launch.json` to reflect the slightly different path to the Electron executable.
 
 The new value should be `"${workspaceRoot}/node_modules/.bin/electron.cmd"`.
 

@@ -689,7 +689,7 @@ class ScenePicker extends React.Component {
               <br/>
               Visit us on <Link
               href="#"
-              onClick={this.openLink.bind(this, "https://github.com/ififfy/flipflip")}
+              onClick={this.openLink.bind(this, "https://github.com/regtemp8/flipflip")}
               underline="hover">GitHub</Link> or <Link
               href="#"
               onClick={this.openLink.bind(this, "https://www.reddit.com/r/flipflip")}
@@ -1389,7 +1389,7 @@ class ScenePicker extends React.Component {
     this.setState({displayScenes: this.getDisplayScenes(), displayGrids: this.getDisplayGrids()});
     if (remote.getCurrentWindow().id == 1) {
       this.setState({isFirstWindow: true});
-      wretch("https://api.github.com/repos/ififfy/flipflip/releases")
+      wretch("https://api.github.com/repos/regtemp8/flipflip/releases")
         .get()
         .json(json => {
           const newestReleaseTag = json[0].tag_name;

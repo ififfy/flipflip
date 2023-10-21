@@ -1,4 +1,8 @@
 # Changelog
+## 3.2.3 <small>(10/XX/2023)</small>
+- Fix ImageFap gallery, organizer and video
+- Point error and feedback links to this repo
+
 ## 3.2.2 <small>(06/XX/2023)</small>
 - Upgrade UI to MUIv5
 - Upgrade 3rd party libraries
