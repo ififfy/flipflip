@@ -1,0 +1,851 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ColorPicker should match snapshot 1`] = `
+[
+  <style
+    dangerouslySetInnerHTML={
+      {
+        "__html": ".css-1vam7s3-MuiGrid-root{box-sizing:border-box;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-flex-wrap:wrap;-webkit-flex-wrap:wrap;-ms-flex-wrap:wrap;flex-wrap:wrap;width:100%;-webkit-flex-direction:row;-ms-flex-direction:row;flex-direction:row;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;}",
+      }
+    }
+    data-emotion="css 1vam7s3-MuiGrid-root"
+  />,
+  <div
+    className="MuiGrid-root MuiGrid-container css-1vam7s3-MuiGrid-root"
+  >
+    <style
+      dangerouslySetInnerHTML={
+        {
+          "__html": ".css-13i4rnv-MuiGrid-root{box-sizing:border-box;margin:0;-webkit-flex-direction:row;-ms-flex-direction:row;flex-direction:row;}",
+        }
+      }
+      data-emotion="css 13i4rnv-MuiGrid-root"
+    />
+    <div
+      className="MuiGrid-root MuiGrid-item ColorPicker-colorGrid-1 css-13i4rnv-MuiGrid-root"
+    >
+      <style
+        dangerouslySetInnerHTML={
+          {
+            "__html": ".css-vcu0sc-MuiFab-root{font-family:"Roboto","Helvetica","Arial",sans-serif;font-weight:500;font-size:0.875rem;line-height:1.75;letter-spacing:0.02857em;text-transform:uppercase;min-height:36px;-webkit-transition:background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;transition:background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;border-radius:50%;padding:0;min-width:0;width:48px;height:48px;z-index:1050;box-shadow:0px 3px 5px -1px rgba(0,0,0,0.2),0px 6px 10px 0px rgba(0,0,0,0.14),0px 1px 18px 0px rgba(0,0,0,0.12);color:rgba(0, 0, 0, 0.87);background-color:#e0e0e0;}.css-vcu0sc-MuiFab-root:active{box-shadow:0px 7px 8px -4px rgba(0,0,0,0.2),0px 12px 17px 2px rgba(0,0,0,0.14),0px 5px 22px 4px rgba(0,0,0,0.12);}.css-vcu0sc-MuiFab-root:hover{background-color:#f5f5f5;-webkit-text-decoration:none;text-decoration:none;}@media (hover: none){.css-vcu0sc-MuiFab-root:hover{background-color:#e0e0e0;}}.css-vcu0sc-MuiFab-root.Mui-focusVisible{box-shadow:0px 3px 5px -1px rgba(0,0,0,0.2),0px 6px 10px 0px rgba(0,0,0,0.14),0px 1px 18px 0px rgba(0,0,0,0.12);}.css-vcu0sc-MuiFab-root.Mui-disabled{color:rgba(0, 0, 0, 0.26);box-shadow:none;background-color:rgba(0, 0, 0, 0.12);}",
+          }
+        }
+        data-emotion="css vcu0sc-MuiFab-root"
+      />
+      <style
+        dangerouslySetInnerHTML={
+          {
+            "__html": ".css-1fwudth-MuiButtonBase-root-MuiFab-root{display:-webkit-inline-box;display:-webkit-inline-flex;display:-ms-inline-flexbox;display:inline-flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-ms-flex-pack:center;-webkit-justify-content:center;justify-content:center;position:relative;box-sizing:border-box;-webkit-tap-highlight-color:transparent;background-color:transparent;outline:0;border:0;margin:0;border-radius:0;padding:0;cursor:pointer;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;vertical-align:middle;-moz-appearance:none;-webkit-appearance:none;-webkit-text-decoration:none;text-decoration:none;color:inherit;font-family:"Roboto","Helvetica","Arial",sans-serif;font-weight:500;font-size:0.875rem;line-height:1.75;letter-spacing:0.02857em;text-transform:uppercase;min-height:36px;-webkit-transition:background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;transition:background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;border-radius:50%;padding:0;min-width:0;width:48px;height:48px;z-index:1050;box-shadow:0px 3px 5px -1px rgba(0,0,0,0.2),0px 6px 10px 0px rgba(0,0,0,0.14),0px 1px 18px 0px rgba(0,0,0,0.12);color:rgba(0, 0, 0, 0.87);background-color:#e0e0e0;}.css-1fwudth-MuiButtonBase-root-MuiFab-root::-moz-focus-inner{border-style:none;}.css-1fwudth-MuiButtonBase-root-MuiFab-root.Mui-disabled{pointer-events:none;cursor:default;}@media print{.css-1fwudth-MuiButtonBase-root-MuiFab-root{-webkit-print-color-adjust:exact;color-adjust:exact;}}.css-1fwudth-MuiButtonBase-root-MuiFab-root:active{box-shadow:0px 7px 8px -4px rgba(0,0,0,0.2),0px 12px 17px 2px rgba(0,0,0,0.14),0px 5px 22px 4px rgba(0,0,0,0.12);}.css-1fwudth-MuiButtonBase-root-MuiFab-root:hover{background-color:#f5f5f5;-webkit-text-decoration:none;text-decoration:none;}@media (hover: none){.css-1fwudth-MuiButtonBase-root-MuiFab-root:hover{background-color:#e0e0e0;}}.css-1fwudth-MuiButtonBase-root-MuiFab-root.Mui-focusVisible{box-shadow:0px 3px 5px -1px rgba(0,0,0,0.2),0px 6px 10px 0px rgba(0,0,0,0.14),0px 1px 18px 0px rgba(0,0,0,0.12);}.css-1fwudth-MuiButtonBase-root-MuiFab-root.Mui-disabled{color:rgba(0, 0, 0, 0.26);box-shadow:none;background-color:rgba(0, 0, 0, 0.12);}",
+          }
+        }
+        data-emotion="css 1fwudth-MuiButtonBase-root-MuiFab-root"
+      />
+      <button
+        aria-label="Pick Color"
+        aria-labelledby={null}
+        className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeMedium MuiFab-default ColorPicker-colorButton-2 css-1fwudth-MuiButtonBase-root-MuiFab-root"
+        data-mui-internal-clone-element={true}
+        disabled={false}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onContextMenu={[Function]}
+        onDragLeave={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseLeave={[Function]}
+        onMouseOver={[Function]}
+        onMouseUp={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        style={
+          {
+            "backgroundColor": "#fff",
+          }
+        }
+        tabIndex={0}
+        type="button"
+      >
+        <div />
+      </button>
+      <style
+        dangerouslySetInnerHTML={
+          {
+            "__html": ".css-1433tg5-MuiTooltip-popper{z-index:1500;pointer-events:none;}",
+          }
+        }
+        data-emotion="css 1433tg5-MuiTooltip-popper"
+      />
+      <style
+        dangerouslySetInnerHTML={
+          {
+            "__html": ".css-179vq5o-MuiPopper-root-MuiTooltip-popper{z-index:1500;pointer-events:none;}",
+          }
+        }
+        data-emotion="css 179vq5o-MuiPopper-root-MuiTooltip-popper"
+      />
+      <style
+        dangerouslySetInnerHTML={
+          {
+            "__html": ".css-1u3bzj6-MuiFormControl-root-MuiTextField-root{display:-webkit-inline-box;display:-webkit-inline-flex;display:-ms-inline-flexbox;display:inline-flex;-webkit-flex-direction:column;-ms-flex-direction:column;flex-direction:column;position:relative;min-width:0;padding:0;margin:0;border:0;vertical-align:top;}",
+          }
+        }
+        data-emotion="css 1u3bzj6-MuiFormControl-root-MuiTextField-root"
+      />
+      <div
+        className="MuiFormControl-root MuiTextField-root ColorPicker-colorField-4 css-1u3bzj6-MuiFormControl-root-MuiTextField-root"
+      >
+        <style
+          dangerouslySetInnerHTML={
+            {
+              "__html": ".css-l5ymln-MuiInputLabel-root{display:block;transform-origin:top left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:133%;position:absolute;left:0;top:0;-webkit-transform:translate(0, -1.5px) scale(0.75);-moz-transform:translate(0, -1.5px) scale(0.75);-ms-transform:translate(0, -1.5px) scale(0.75);transform:translate(0, -1.5px) scale(0.75);-webkit-transition:color 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms,-webkit-transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms,max-width 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms;transition:color 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms,transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms,max-width 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms;}",
+            }
+          }
+          data-emotion="css l5ymln-MuiInputLabel-root"
+        />
+        <style
+          dangerouslySetInnerHTML={
+            {
+              "__html": ".css-syr9i-MuiFormLabel-root-MuiInputLabel-root{color:rgba(0, 0, 0, 0.6);font-family:"Roboto","Helvetica","Arial",sans-serif;font-weight:400;font-size:1rem;line-height:1.4375em;letter-spacing:0.00938em;padding:0;position:relative;display:block;transform-origin:top left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:133%;position:absolute;left:0;top:0;-webkit-transform:translate(0, -1.5px) scale(0.75);-moz-transform:translate(0, -1.5px) scale(0.75);-ms-transform:translate(0, -1.5px) scale(0.75);transform:translate(0, -1.5px) scale(0.75);-webkit-transition:color 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms,-webkit-transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms,max-width 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms;transition:color 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms,transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms,max-width 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms;}.css-syr9i-MuiFormLabel-root-MuiInputLabel-root.Mui-focused{color:#3f51b5;}.css-syr9i-MuiFormLabel-root-MuiInputLabel-root.Mui-disabled{color:rgba(0, 0, 0, 0.38);}.css-syr9i-MuiFormLabel-root-MuiInputLabel-root.Mui-error{color:#f44336;}",
+            }
+          }
+          data-emotion="css syr9i-MuiFormLabel-root-MuiInputLabel-root"
+        />
+        <label
+          className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-standard MuiFormLabel-colorPrimary MuiFormLabel-filled css-syr9i-MuiFormLabel-root-MuiInputLabel-root"
+          data-shrink={true}
+        >
+          Color
+        </label>
+        <style
+          dangerouslySetInnerHTML={
+            {
+              "__html": "@-webkit-keyframes mui-auto-fill{from{display:block;}}@keyframes mui-auto-fill{from{display:block;}}@-webkit-keyframes mui-auto-fill-cancel{from{display:block;}}@keyframes mui-auto-fill-cancel{from{display:block;}}",
+            }
+          }
+          data-emotion="css-global 1prfaxn"
+        />
+        <style
+          dangerouslySetInnerHTML={
+            {
+              "__html": ".css-1kf0u8v-MuiInputBase-root-MuiInput-root{font-family:"Roboto","Helvetica","Arial",sans-serif;font-weight:400;font-size:1rem;line-height:1.4375em;letter-spacing:0.00938em;color:rgba(0, 0, 0, 0.87);box-sizing:border-box;position:relative;cursor:text;display:-webkit-inline-box;display:-webkit-inline-flex;display:-ms-inline-flexbox;display:inline-flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;position:relative;}.css-1kf0u8v-MuiInputBase-root-MuiInput-root.Mui-disabled{color:rgba(0, 0, 0, 0.38);cursor:default;}label+.css-1kf0u8v-MuiInputBase-root-MuiInput-root{margin-top:16px;}.css-1kf0u8v-MuiInputBase-root-MuiInput-root:after{border-bottom:2px solid #3f51b5;left:0;bottom:0;content:"";position:absolute;right:0;-webkit-transform:scaleX(0);-moz-transform:scaleX(0);-ms-transform:scaleX(0);transform:scaleX(0);-webkit-transition:-webkit-transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms;transition:transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms;pointer-events:none;}.css-1kf0u8v-MuiInputBase-root-MuiInput-root.Mui-focused:after{-webkit-transform:scaleX(1) translateX(0);-moz-transform:scaleX(1) translateX(0);-ms-transform:scaleX(1) translateX(0);transform:scaleX(1) translateX(0);}.css-1kf0u8v-MuiInputBase-root-MuiInput-root.Mui-error:after{border-bottom-color:#f44336;-webkit-transform:scaleX(1);-moz-transform:scaleX(1);-ms-transform:scaleX(1);transform:scaleX(1);}.css-1kf0u8v-MuiInputBase-root-MuiInput-root:before{border-bottom:1px solid rgba(0, 0, 0, 0.42);left:0;bottom:0;content:"\\00a0";position:absolute;right:0;-webkit-transition:border-bottom-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;transition:border-bottom-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;pointer-events:none;}.css-1kf0u8v-MuiInputBase-root-MuiInput-root:hover:not(.Mui-disabled):before{border-bottom:2px solid rgba(0, 0, 0, 0.87);}@media (hover: none){.css-1kf0u8v-MuiInputBase-root-MuiInput-root:hover:not(.Mui-disabled):before{border-bottom:1px solid rgba(0, 0, 0, 0.42);}}.css-1kf0u8v-MuiInputBase-root-MuiInput-root.Mui-disabled:before{border-bottom-style:dotted;}",
+            }
+          }
+          data-emotion="css 1kf0u8v-MuiInputBase-root-MuiInput-root"
+        />
+        <div
+          className="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-formControl css-1kf0u8v-MuiInputBase-root-MuiInput-root"
+          onClick={[Function]}
+        >
+          <style
+            dangerouslySetInnerHTML={
+              {
+                "__html": ".css-1x51dt5-MuiInputBase-input-MuiInput-input{font:inherit;letter-spacing:inherit;color:currentColor;padding:4px 0 5px;border:0;box-sizing:content-box;background:none;height:1.4375em;margin:0;-webkit-tap-highlight-color:transparent;display:block;min-width:0;width:100%;-webkit-animation-name:mui-auto-fill-cancel;animation-name:mui-auto-fill-cancel;-webkit-animation-duration:10ms;animation-duration:10ms;}.css-1x51dt5-MuiInputBase-input-MuiInput-input::-webkit-input-placeholder{color:currentColor;opacity:0.42;-webkit-transition:opacity 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;transition:opacity 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;}.css-1x51dt5-MuiInputBase-input-MuiInput-input::-moz-placeholder{color:currentColor;opacity:0.42;-webkit-transition:opacity 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;transition:opacity 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;}.css-1x51dt5-MuiInputBase-input-MuiInput-input:-ms-input-placeholder{color:currentColor;opacity:0.42;-webkit-transition:opacity 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;transition:opacity 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;}.css-1x51dt5-MuiInputBase-input-MuiInput-input::-ms-input-placeholder{color:currentColor;opacity:0.42;-webkit-transition:opacity 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;transition:opacity 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;}.css-1x51dt5-MuiInputBase-input-MuiInput-input:focus{outline:0;}.css-1x51dt5-MuiInputBase-input-MuiInput-input:invalid{box-shadow:none;}.css-1x51dt5-MuiInputBase-input-MuiInput-input::-webkit-search-decoration{-webkit-appearance:none;}label[data-shrink=false]+.MuiInputBase-formControl .css-1x51dt5-MuiInputBase-input-MuiInput-input::-webkit-input-placeholder{opacity:0!important;}label[data-shrink=false]+.MuiInputBase-formControl .css-1x51dt5-MuiInputBase-input-MuiInput-input::-moz-placeholder{opacity:0!important;}label[data-shrink=false]+.MuiInputBase-formControl .css-1x51dt5-MuiInputBase-input-MuiInput-input:-ms-input-placeholder{opacity:0!important;}label[data-shrink=false]+.MuiInputBase-formControl .css-1x51dt5-MuiInputBase-input-MuiInput-input::-ms-input-placeholder{opacity:0!important;}label[data-shrink=false]+.MuiInputBase-formControl .css-1x51dt5-MuiInputBase-input-MuiInput-input:focus::-webkit-input-placeholder{opacity:0.42;}label[data-shrink=false]+.MuiInputBase-formControl .css-1x51dt5-MuiInputBase-input-MuiInput-input:focus::-moz-placeholder{opacity:0.42;}label[data-shrink=false]+.MuiInputBase-formControl .css-1x51dt5-MuiInputBase-input-MuiInput-input:focus:-ms-input-placeholder{opacity:0.42;}label[data-shrink=false]+.MuiInputBase-formControl .css-1x51dt5-MuiInputBase-input-MuiInput-input:focus::-ms-input-placeholder{opacity:0.42;}.css-1x51dt5-MuiInputBase-input-MuiInput-input.Mui-disabled{opacity:1;-webkit-text-fill-color:rgba(0, 0, 0, 0.38);}.css-1x51dt5-MuiInputBase-input-MuiInput-input:-webkit-autofill{-webkit-animation-duration:5000s;animation-duration:5000s;-webkit-animation-name:mui-auto-fill;animation-name:mui-auto-fill;}",
+              }
+            }
+            data-emotion="css 1x51dt5-MuiInputBase-input-MuiInput-input"
+          />
+          <input
+            aria-invalid={false}
+            autoFocus={false}
+            className="MuiInputBase-input MuiInput-input css-1x51dt5-MuiInputBase-input-MuiInput-input"
+            disabled={false}
+            onAnimationStart={[Function]}
+            onBlur={[Function]}
+            onChange={[Function]}
+            onFocus={[Function]}
+            required={false}
+            type="text"
+            value="#fff"
+          />
+        </div>
+      </div>
+    </div>
+    <style
+      dangerouslySetInnerHTML={
+        {
+          "__html": ".css-cyocdy-MuiGrid-root{box-sizing:border-box;margin:0;-webkit-flex-direction:row;-ms-flex-direction:row;flex-direction:row;-webkit-flex-basis:100%;-ms-flex-preferred-size:100%;flex-basis:100%;-webkit-box-flex:0;-webkit-flex-grow:0;-ms-flex-positive:0;flex-grow:0;max-width:100%;}@media (min-width:600px){.css-cyocdy-MuiGrid-root{-webkit-flex-basis:0;-ms-flex-preferred-size:0;flex-basis:0;-webkit-box-flex:1;-webkit-flex-grow:1;-ms-flex-positive:1;flex-grow:1;max-width:100%;}}@media (min-width:900px){.css-cyocdy-MuiGrid-root{-webkit-flex-basis:0;-ms-flex-preferred-size:0;flex-basis:0;-webkit-box-flex:1;-webkit-flex-grow:1;-ms-flex-positive:1;flex-grow:1;max-width:100%;}}@media (min-width:1200px){.css-cyocdy-MuiGrid-root{-webkit-flex-basis:0;-ms-flex-preferred-size:0;flex-basis:0;-webkit-box-flex:1;-webkit-flex-grow:1;-ms-flex-positive:1;flex-grow:1;max-width:100%;}}@media (min-width:1536px){.css-cyocdy-MuiGrid-root{-webkit-flex-basis:0;-ms-flex-preferred-size:0;flex-basis:0;-webkit-box-flex:1;-webkit-flex-grow:1;-ms-flex-positive:1;flex-grow:1;max-width:100%;}}",
+        }
+      }
+      data-emotion="css cyocdy-MuiGrid-root"
+    />
+    <div
+      className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 MuiGrid-grid-sm-true css-cyocdy-MuiGrid-root"
+    >
+      <div
+        className="MuiGrid-root MuiGrid-container css-1vam7s3-MuiGrid-root"
+      >
+        <div
+          className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+        >
+          <style
+            dangerouslySetInnerHTML={
+              {
+                "__html": ".css-8kwszm-MuiFab-root{font-family:"Roboto","Helvetica","Arial",sans-serif;font-weight:500;font-size:0.875rem;line-height:1.75;letter-spacing:0.02857em;text-transform:uppercase;min-height:36px;-webkit-transition:background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;transition:background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;border-radius:50%;padding:0;min-width:0;width:40px;height:40px;z-index:1050;box-shadow:0px 3px 5px -1px rgba(0,0,0,0.2),0px 6px 10px 0px rgba(0,0,0,0.14),0px 1px 18px 0px rgba(0,0,0,0.12);color:rgba(0, 0, 0, 0.87);background-color:#e0e0e0;}.css-8kwszm-MuiFab-root:active{box-shadow:0px 7px 8px -4px rgba(0,0,0,0.2),0px 12px 17px 2px rgba(0,0,0,0.14),0px 5px 22px 4px rgba(0,0,0,0.12);}.css-8kwszm-MuiFab-root:hover{background-color:#f5f5f5;-webkit-text-decoration:none;text-decoration:none;}@media (hover: none){.css-8kwszm-MuiFab-root:hover{background-color:#e0e0e0;}}.css-8kwszm-MuiFab-root.Mui-focusVisible{box-shadow:0px 3px 5px -1px rgba(0,0,0,0.2),0px 6px 10px 0px rgba(0,0,0,0.14),0px 1px 18px 0px rgba(0,0,0,0.12);}.css-8kwszm-MuiFab-root.Mui-disabled{color:rgba(0, 0, 0, 0.26);box-shadow:none;background-color:rgba(0, 0, 0, 0.12);}",
+              }
+            }
+            data-emotion="css 8kwszm-MuiFab-root"
+          />
+          <style
+            dangerouslySetInnerHTML={
+              {
+                "__html": ".css-12m9wit-MuiButtonBase-root-MuiFab-root{display:-webkit-inline-box;display:-webkit-inline-flex;display:-ms-inline-flexbox;display:inline-flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-ms-flex-pack:center;-webkit-justify-content:center;justify-content:center;position:relative;box-sizing:border-box;-webkit-tap-highlight-color:transparent;background-color:transparent;outline:0;border:0;margin:0;border-radius:0;padding:0;cursor:pointer;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;vertical-align:middle;-moz-appearance:none;-webkit-appearance:none;-webkit-text-decoration:none;text-decoration:none;color:inherit;font-family:"Roboto","Helvetica","Arial",sans-serif;font-weight:500;font-size:0.875rem;line-height:1.75;letter-spacing:0.02857em;text-transform:uppercase;min-height:36px;-webkit-transition:background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;transition:background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;border-radius:50%;padding:0;min-width:0;width:40px;height:40px;z-index:1050;box-shadow:0px 3px 5px -1px rgba(0,0,0,0.2),0px 6px 10px 0px rgba(0,0,0,0.14),0px 1px 18px 0px rgba(0,0,0,0.12);color:rgba(0, 0, 0, 0.87);background-color:#e0e0e0;}.css-12m9wit-MuiButtonBase-root-MuiFab-root::-moz-focus-inner{border-style:none;}.css-12m9wit-MuiButtonBase-root-MuiFab-root.Mui-disabled{pointer-events:none;cursor:default;}@media print{.css-12m9wit-MuiButtonBase-root-MuiFab-root{-webkit-print-color-adjust:exact;color-adjust:exact;}}.css-12m9wit-MuiButtonBase-root-MuiFab-root:active{box-shadow:0px 7px 8px -4px rgba(0,0,0,0.2),0px 12px 17px 2px rgba(0,0,0,0.14),0px 5px 22px 4px rgba(0,0,0,0.12);}.css-12m9wit-MuiButtonBase-root-MuiFab-root:hover{background-color:#f5f5f5;-webkit-text-decoration:none;text-decoration:none;}@media (hover: none){.css-12m9wit-MuiButtonBase-root-MuiFab-root:hover{background-color:#e0e0e0;}}.css-12m9wit-MuiButtonBase-root-MuiFab-root.Mui-focusVisible{box-shadow:0px 3px 5px -1px rgba(0,0,0,0.2),0px 6px 10px 0px rgba(0,0,0,0.14),0px 1px 18px 0px rgba(0,0,0,0.12);}.css-12m9wit-MuiButtonBase-root-MuiFab-root.Mui-disabled{color:rgba(0, 0, 0, 0.26);box-shadow:none;background-color:rgba(0, 0, 0, 0.12);}",
+              }
+            }
+            data-emotion="css 12m9wit-MuiButtonBase-root-MuiFab-root"
+          />
+          <button
+            className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+            disabled={false}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onContextMenu={[Function]}
+            onDragLeave={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchMove={[Function]}
+            onTouchStart={[Function]}
+            style={
+              {
+                "backgroundColor": "#f44336",
+              }
+            }
+            tabIndex={0}
+            type="button"
+            value="#f44336"
+          >
+            <div />
+          </button>
+        </div>
+        <div
+          className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+        >
+          <button
+            className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+            disabled={false}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onContextMenu={[Function]}
+            onDragLeave={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchMove={[Function]}
+            onTouchStart={[Function]}
+            style={
+              {
+                "backgroundColor": "#e91e63",
+              }
+            }
+            tabIndex={0}
+            type="button"
+            value="#e91e63"
+          >
+            <div />
+          </button>
+        </div>
+        <div
+          className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+        >
+          <button
+            className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+            disabled={false}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onContextMenu={[Function]}
+            onDragLeave={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchMove={[Function]}
+            onTouchStart={[Function]}
+            style={
+              {
+                "backgroundColor": "#9c27b0",
+              }
+            }
+            tabIndex={0}
+            type="button"
+            value="#9c27b0"
+          >
+            <div />
+          </button>
+        </div>
+        <div
+          className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+        >
+          <button
+            className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+            disabled={false}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onContextMenu={[Function]}
+            onDragLeave={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchMove={[Function]}
+            onTouchStart={[Function]}
+            style={
+              {
+                "backgroundColor": "#673ab7",
+              }
+            }
+            tabIndex={0}
+            type="button"
+            value="#673ab7"
+          >
+            <div />
+          </button>
+        </div>
+        <div
+          className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+        >
+          <button
+            className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+            disabled={false}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onContextMenu={[Function]}
+            onDragLeave={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchMove={[Function]}
+            onTouchStart={[Function]}
+            style={
+              {
+                "backgroundColor": "#3f51b5",
+              }
+            }
+            tabIndex={0}
+            type="button"
+            value="#3f51b5"
+          >
+            <div />
+          </button>
+        </div>
+        <div
+          className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+        >
+          <button
+            className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+            disabled={false}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onContextMenu={[Function]}
+            onDragLeave={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchMove={[Function]}
+            onTouchStart={[Function]}
+            style={
+              {
+                "backgroundColor": "#2196f3",
+              }
+            }
+            tabIndex={0}
+            type="button"
+            value="#2196f3"
+          >
+            <div />
+          </button>
+        </div>
+        <div
+          className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+        >
+          <button
+            className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+            disabled={false}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onContextMenu={[Function]}
+            onDragLeave={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchMove={[Function]}
+            onTouchStart={[Function]}
+            style={
+              {
+                "backgroundColor": "#03a9f4",
+              }
+            }
+            tabIndex={0}
+            type="button"
+            value="#03a9f4"
+          >
+            <div />
+          </button>
+        </div>
+        <div
+          className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+        >
+          <button
+            className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+            disabled={false}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onContextMenu={[Function]}
+            onDragLeave={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchMove={[Function]}
+            onTouchStart={[Function]}
+            style={
+              {
+                "backgroundColor": "#00bcd4",
+              }
+            }
+            tabIndex={0}
+            type="button"
+            value="#00bcd4"
+          >
+            <div />
+          </button>
+        </div>
+        <div
+          className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+        >
+          <button
+            className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+            disabled={false}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onContextMenu={[Function]}
+            onDragLeave={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchMove={[Function]}
+            onTouchStart={[Function]}
+            style={
+              {
+                "backgroundColor": "#009688",
+              }
+            }
+            tabIndex={0}
+            type="button"
+            value="#009688"
+          >
+            <div />
+          </button>
+        </div>
+        <div
+          className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+        >
+          <button
+            className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+            disabled={false}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onContextMenu={[Function]}
+            onDragLeave={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchMove={[Function]}
+            onTouchStart={[Function]}
+            style={
+              {
+                "backgroundColor": "#4caf50",
+              }
+            }
+            tabIndex={0}
+            type="button"
+            value="#4caf50"
+          >
+            <div />
+          </button>
+        </div>
+        <div
+          className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+        >
+          <button
+            className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+            disabled={false}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onContextMenu={[Function]}
+            onDragLeave={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchMove={[Function]}
+            onTouchStart={[Function]}
+            style={
+              {
+                "backgroundColor": "#8bc34a",
+              }
+            }
+            tabIndex={0}
+            type="button"
+            value="#8bc34a"
+          >
+            <div />
+          </button>
+        </div>
+        <div
+          className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+        >
+          <button
+            className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+            disabled={false}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onContextMenu={[Function]}
+            onDragLeave={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchMove={[Function]}
+            onTouchStart={[Function]}
+            style={
+              {
+                "backgroundColor": "#cddc39",
+              }
+            }
+            tabIndex={0}
+            type="button"
+            value="#cddc39"
+          >
+            <div />
+          </button>
+        </div>
+        <div
+          className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+        >
+          <button
+            className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+            disabled={false}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onContextMenu={[Function]}
+            onDragLeave={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchMove={[Function]}
+            onTouchStart={[Function]}
+            style={
+              {
+                "backgroundColor": "#ffeb3b",
+              }
+            }
+            tabIndex={0}
+            type="button"
+            value="#ffeb3b"
+          >
+            <div />
+          </button>
+        </div>
+        <div
+          className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+        >
+          <button
+            className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+            disabled={false}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onContextMenu={[Function]}
+            onDragLeave={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchMove={[Function]}
+            onTouchStart={[Function]}
+            style={
+              {
+                "backgroundColor": "#ffc107",
+              }
+            }
+            tabIndex={0}
+            type="button"
+            value="#ffc107"
+          >
+            <div />
+          </button>
+        </div>
+        <div
+          className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+        >
+          <button
+            className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+            disabled={false}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onContextMenu={[Function]}
+            onDragLeave={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchMove={[Function]}
+            onTouchStart={[Function]}
+            style={
+              {
+                "backgroundColor": "#ff9800",
+              }
+            }
+            tabIndex={0}
+            type="button"
+            value="#ff9800"
+          >
+            <div />
+          </button>
+        </div>
+        <div
+          className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+        >
+          <button
+            className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+            disabled={false}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onContextMenu={[Function]}
+            onDragLeave={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchMove={[Function]}
+            onTouchStart={[Function]}
+            style={
+              {
+                "backgroundColor": "#ff5722",
+              }
+            }
+            tabIndex={0}
+            type="button"
+            value="#ff5722"
+          >
+            <div />
+          </button>
+        </div>
+        <div
+          className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+        >
+          <button
+            className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+            disabled={false}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onContextMenu={[Function]}
+            onDragLeave={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchMove={[Function]}
+            onTouchStart={[Function]}
+            style={
+              {
+                "backgroundColor": "#795548",
+              }
+            }
+            tabIndex={0}
+            type="button"
+            value="#795548"
+          >
+            <div />
+          </button>
+        </div>
+        <div
+          className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+        >
+          <button
+            className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+            disabled={false}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onContextMenu={[Function]}
+            onDragLeave={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchMove={[Function]}
+            onTouchStart={[Function]}
+            style={
+              {
+                "backgroundColor": "#9e9e9e",
+              }
+            }
+            tabIndex={0}
+            type="button"
+            value="#9e9e9e"
+          >
+            <div />
+          </button>
+        </div>
+        <div
+          className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+        >
+          <button
+            className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+            disabled={false}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onContextMenu={[Function]}
+            onDragLeave={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchMove={[Function]}
+            onTouchStart={[Function]}
+            style={
+              {
+                "backgroundColor": "#607d8b",
+              }
+            }
+            tabIndex={0}
+            type="button"
+            value="#607d8b"
+          >
+            <div />
+          </button>
+        </div>
+        <div
+          className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+        >
+          <button
+            className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+            disabled={false}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onContextMenu={[Function]}
+            onDragLeave={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchMove={[Function]}
+            onTouchStart={[Function]}
+            style={
+              {
+                "backgroundColor": "#fff",
+              }
+            }
+            tabIndex={0}
+            type="button"
+            value="#fff"
+          >
+            <div />
+          </button>
+        </div>
+        <div
+          className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+        >
+          <button
+            className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+            disabled={false}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onContextMenu={[Function]}
+            onDragLeave={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchMove={[Function]}
+            onTouchStart={[Function]}
+            style={
+              {
+                "backgroundColor": "#000",
+              }
+            }
+            tabIndex={0}
+            type="button"
+            value="#000"
+          >
+            <div />
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>,
+]
+`;
