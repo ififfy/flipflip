@@ -1,14 +1,23 @@
 import React from "react";
 import { describe, it, expect } from "@jest/globals";
 import renderer from "react-test-renderer";
-import ColorPicker from "../../../../src/renderer/components/config/ColorPicker";
+import SoundTick from "../../../../src/renderer/components/player/SoundTick";
 import TestProvider from "../../../util/TestProvider";
 
-describe("ColorPicker", () => {
+describe("SoundTick", () => {
   it("should match snapshot", () => {
     const component = renderer.create(
       <TestProvider>
-        <ColorPicker currentColor="#fff" onChangeColor={(e: any) => {}} />
+        <SoundTick
+          url={null}
+          playing={null}
+          speed={1}
+          volume={0}
+          tick={false}
+          onPlaying={(soundData) => {}}
+          onError={(errorCode, description) => {}}
+          onFinishedPlaying={() => {}}
+        />
       </TestProvider>
     );
 

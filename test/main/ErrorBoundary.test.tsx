@@ -1,14 +1,20 @@
 import React from "react";
 import { describe, it, expect } from "@jest/globals";
 import renderer from "react-test-renderer";
-import ColorPicker from "../../../../src/renderer/components/config/ColorPicker";
-import TestProvider from "../../../util/TestProvider";
+import ErrorBoundary from "../../src/main/ErrorBoundary";
+import TestProvider from "../util/TestProvider";
 
-describe("ColorPicker", () => {
+describe("ErrorBoundary", () => {
   it("should match snapshot", () => {
     const component = renderer.create(
       <TestProvider>
-        <ColorPicker currentColor="#fff" onChangeColor={(e: any) => {}} />
+        <ErrorBoundary
+          version="1.0.0"
+          goBack={() => {}}
+          onRestore={(backupFile) => {}}
+        >
+          <p>FlipFlip</p>
+        </ErrorBoundary>
       </TestProvider>
     );
 

@@ -1,0 +1,403 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ScenePicker should match snapshot 1`] = `
+<div
+  className="ScenePicker-root-1"
+  onClick={[Function]}
+>
+  <header
+    className="MuiPaper-root MuiPaper-elevation MuiPaper-elevation4 MuiAppBar-root MuiAppBar-colorPrimary MuiAppBar-positionAbsolute ScenePicker-appBar-2 css-iu2t21-MuiPaper-root-MuiAppBar-root"
+  >
+    <div
+      className="MuiToolbar-root MuiToolbar-gutters MuiToolbar-regular css-hyum1k-MuiToolbar-root"
+    >
+      <button
+        aria-label="Toggle Drawer"
+        className="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-edgeStart MuiIconButton-sizeLarge css-184mzhy-MuiButtonBase-root-MuiIconButton-root"
+        disabled={false}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onContextMenu={[Function]}
+        onDragLeave={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        tabIndex={0}
+        type="button"
+      >
+        <svg
+          aria-hidden={true}
+          className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root"
+          data-testid="MenuIcon"
+          focusable="false"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"
+          />
+        </svg>
+        <span
+          className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+        />
+      </button>
+      <VSpin>
+        <div
+          className="ScenePicker-logo-4"
+        />
+      </VSpin>
+      <h1
+        className="MuiTypography-root MuiTypography-h4 MuiTypography-noWrap ScenePicker-title-6 css-1r3v6n7-MuiTypography-root"
+      >
+        FlipFlip
+      </h1>
+      <span
+        className="MuiTypography-root MuiTypography-caption MuiTypography-noWrap ScenePicker-version-7 css-44w6i2-MuiTypography-root"
+      >
+        v
+      </span>
+      <div
+        className="ScenePicker-fill-44"
+      />
+      <SceneSearch
+        displaySources={[]}
+        filters={[]}
+        onUpdateFilters={[Function]}
+        placeholder="Search ..."
+      />
+    </div>
+  </header>
+  <div
+    className="MuiDrawer-root MuiDrawer-docked css-7ik032-MuiDrawer-docked"
+  >
+    <div
+      className="MuiPaper-root MuiPaper-elevation MuiPaper-elevation0 MuiDrawer-paper ScenePicker-drawerPaper-9 ScenePicker-drawerPaperClose-10 MuiDrawer-paperAnchorLeft MuiDrawer-paperAnchorDockedLeft css-12i7wg6-MuiPaper-root-MuiDrawer-paper"
+    >
+      <div
+        className="ScenePicker-drawerToolbar-11"
+      >
+        <button
+          aria-label="Toggle Drawer"
+          className="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-edgeStart MuiIconButton-sizeLarge css-184mzhy-MuiButtonBase-root-MuiIconButton-root"
+          disabled={false}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onContextMenu={[Function]}
+          onDragLeave={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseDown={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onTouchEnd={[Function]}
+          onTouchMove={[Function]}
+          onTouchStart={[Function]}
+          tabIndex={0}
+          type="button"
+        >
+          <svg
+            aria-hidden={true}
+            className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root"
+            data-testid="MenuIcon"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"
+            />
+          </svg>
+          <span
+            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </button>
+        <VSpin>
+          <div
+            className="ScenePicker-logo-4 ScenePicker-drawerLogo-5"
+          />
+        </VSpin>
+        <h1
+          className="MuiTypography-root MuiTypography-h6 MuiTypography-noWrap css-2l1qg7-MuiTypography-root"
+        >
+          FlipFlip
+        </h1>
+      </div>
+      <hr
+        className="MuiDivider-root MuiDivider-fullWidth css-9mgopn-MuiDivider-root"
+      />
+      <div>
+        <div
+          className="MuiTabs-root MuiTabs-vertical ScenePicker-tabs-38 css-1g4ac1o-MuiTabs-root"
+        >
+          <div
+            className="MuiTabs-scroller MuiTabs-fixed css-jpln7h-MuiTabs-scroller"
+            onScroll={[Function]}
+            style={
+              {
+                "marginRight": -0,
+                "overflow": "hidden",
+              }
+            }
+          >
+            <div
+              aria-label="scene picker tabs"
+              aria-orientation="vertical"
+              className="MuiTabs-flexContainer MuiTabs-flexContainerVertical css-lfwcke-MuiTabs-flexContainer"
+              onKeyDown={[Function]}
+              role="tablist"
+            >
+              <button
+                aria-controls="vertical-tabpanel-0"
+                aria-selected={true}
+                className="MuiButtonBase-root MuiTab-root MuiTab-textColorPrimary Mui-selected ScenePicker-tab-39 ScenePicker-sceneTab-41 ScenePicker-tabClose-40 css-1i8cmzc-MuiButtonBase-root-MuiTab-root"
+                disabled={false}
+                id="vertical-tab-0"
+                onBlur={[Function]}
+                onClick={[Function]}
+                onContextMenu={[Function]}
+                onDragLeave={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchMove={[Function]}
+                onTouchStart={[Function]}
+                role="tab"
+                tabIndex={0}
+                type="button"
+              >
+                <svg
+                  aria-hidden={true}
+                  className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root"
+                  data-testid="MovieIcon"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="m18 4 2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"
+                  />
+                </svg>
+                
+                <span
+                  className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+                />
+              </button>
+              <button
+                aria-controls="vertical-tabpanel-1"
+                aria-selected={false}
+                className="MuiButtonBase-root MuiTab-root MuiTab-textColorPrimary ScenePicker-tab-39 ScenePicker-generatorTab-42 ScenePicker-tabClose-40 css-1i8cmzc-MuiButtonBase-root-MuiTab-root"
+                disabled={false}
+                id="vertical-tab-1"
+                onBlur={[Function]}
+                onClick={[Function]}
+                onContextMenu={[Function]}
+                onDragLeave={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchMove={[Function]}
+                onTouchStart={[Function]}
+                role="tab"
+                tabIndex={-1}
+                type="button"
+              >
+                <svg
+                  aria-hidden={true}
+                  className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root"
+                  data-testid="MovieFilterIcon"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="m18 4 2 3h-3l-2-3h-2l2 3h-3l-2-3H8l2 3H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4zm-6.75 11.25L10 18l-1.25-2.75L6 14l2.75-1.25L10 10l1.25 2.75L14 14l-2.75 1.25zm5.69-3.31L16 14l-.94-2.06L13 11l2.06-.94L16 8l.94 2.06L19 11l-2.06.94z"
+                  />
+                </svg>
+                
+                <span
+                  className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+                />
+              </button>
+              <button
+                aria-controls="vertical-tabpanel-2"
+                aria-selected={false}
+                className="MuiButtonBase-root MuiTab-root MuiTab-textColorPrimary ScenePicker-tab-39 ScenePicker-gridTab-43 ScenePicker-tabClose-40 css-1i8cmzc-MuiButtonBase-root-MuiTab-root"
+                disabled={false}
+                id="vertical-tab-2"
+                onBlur={[Function]}
+                onClick={[Function]}
+                onContextMenu={[Function]}
+                onDragLeave={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchMove={[Function]}
+                onTouchStart={[Function]}
+                role="tab"
+                tabIndex={-1}
+                type="button"
+              >
+                <svg
+                  aria-hidden={true}
+                  className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root"
+                  data-testid="GridOnIcon"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 20H4v-4h4v4zm0-6H4v-4h4v4zm0-6H4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4z"
+                  />
+                </svg>
+                
+                <span
+                  className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+                />
+              </button>
+            </div>
+            <span
+              className="MuiTabs-indicator css-t3lg8-MuiTabs-indicator"
+              style={
+                {
+                  "height": 0,
+                  "top": 0,
+                }
+              }
+            />
+          </div>
+        </div>
+      </div>
+      <div
+        className="ScenePicker-fill-44"
+      />
+      <div
+        className="ScenePicker-drawerBottom-12 ScenePicker-drawerBottomClose-13"
+      >
+        <p
+          className="MuiTypography-root MuiTypography-body2 css-16epbcf-MuiTypography-root"
+        >
+          Questions? Suggestions?
+          <br />
+          Visit us on 
+          <a
+            className="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineHover css-17biv4x-MuiTypography-root-MuiLink-root"
+            href="#"
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+          >
+            GitHub
+          </a>
+           or 
+          <a
+            className="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineHover css-17biv4x-MuiTypography-root-MuiLink-root"
+            href="#"
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+          >
+            Reddit
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+  <main
+    className="ScenePicker-content-17"
+  >
+    <div
+      className="ScenePicker-appBarSpacer-16"
+    />
+    <div
+      className="MuiContainer-root ScenePicker-container-18 css-ur2jdm-MuiContainer-root"
+    >
+      <div
+        className="MuiTypography-root MuiTypography-body1 css-ahj2mt-MuiTypography-root"
+      >
+        <Sortable
+          className="ScenePicker-sceneList-19"
+          onChange={[Function]}
+          options={
+            {
+              "animation": 150,
+              "easing": "cubic-bezier(1, 0, 0, 1)",
+              "group": {
+                "name": "sg.scene",
+                "pull": true,
+                "put": true,
+              },
+            }
+          }
+        />
+        <Sortable
+          onChange={[Function]}
+          options={
+            {
+              "animation": 150,
+              "easing": "cubic-bezier(1, 0, 0, 1)",
+              "group": {
+                "name": "group",
+                "pull": false,
+                "put": false,
+              },
+              "handle": ".group-handle",
+            }
+          }
+        />
+      </div>
+    </div>
+  </main>
+  <button
+    aria-label="Random Scene"
+    aria-labelledby={null}
+    className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ScenePicker-randomButton-25 ScenePicker-extraWindowRandomButton-26 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+    data-mui-internal-clone-element={true}
+    disabled={false}
+    onBlur={[Function]}
+    onClick={[Function]}
+    onContextMenu={[Function]}
+    onDragLeave={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    onMouseLeave={[Function]}
+    onMouseOver={[Function]}
+    onMouseUp={[Function]}
+    onTouchEnd={[Function]}
+    onTouchMove={[Function]}
+    onTouchStart={[Function]}
+    tabIndex={0}
+    type="button"
+  >
+    <svg
+      aria-hidden={true}
+      className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium ScenePicker-icon-36 css-i4bv87-MuiSvgIcon-root"
+      data-testid="CasinoIcon"
+      focusable="false"
+      viewBox="0 0 24 24"
+    >
+      <path
+        d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM7.5 18c-.83 0-1.5-.67-1.5-1.5S6.67 15 7.5 15s1.5.67 1.5 1.5S8.33 18 7.5 18zm0-9C6.67 9 6 8.33 6 7.5S6.67 6 7.5 6 9 6.67 9 7.5 8.33 9 7.5 9zm4.5 4.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4.5 4.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm0-9c-.83 0-1.5-.67-1.5-1.5S15.67 6 16.5 6s1.5.67 1.5 1.5S17.33 9 16.5 9z"
+      />
+    </svg>
+    <span
+      className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+    />
+  </button>
+</div>
+`;

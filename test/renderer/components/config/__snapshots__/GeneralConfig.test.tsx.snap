@@ -1,0 +1,1161 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GeneralConfig should match snapshot 1`] = `
+<div
+  className="MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-2 css-mhc70k-MuiGrid-root"
+>
+  <div
+    className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 css-1idn90j-MuiGrid-root"
+  >
+    <Masonry
+      columns={
+        [
+          1,
+          2,
+          3,
+          4,
+        ]
+      }
+      spacing={2}
+    >
+      <div
+        className="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiCard-root css-bhp9pd-MuiPaper-root-MuiCard-root"
+      >
+        <div
+          className="MuiCardContent-root css-46bh2p-MuiCardContent-root"
+        >
+          <PlayerBoolCard
+            displaySettings={
+              DisplaySettings {
+                "alwaysOnTop": false,
+                "audioAlert": true,
+                "clickToProgress": true,
+                "clickToProgressWhilePlaying": false,
+                "cloneGridVideoElements": false,
+                "easingControls": false,
+                "fullScreen": false,
+                "ignoredTags": [],
+                "maxInHistory": 120,
+                "maxInMemory": 40,
+                "maxLoadingAtOnce": 5,
+                "minImageSize": 200,
+                "minVideoSize": 200,
+                "showMenu": true,
+                "startImmediately": false,
+              }
+            }
+            onUpdateDisplaySettings={[Function]}
+          />
+        </div>
+      </div>
+      <div
+        className="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiCard-root css-bhp9pd-MuiPaper-root-MuiCard-root"
+      >
+        <div
+          className="MuiCardContent-root css-46bh2p-MuiCardContent-root"
+        >
+          <PlayerBoolCard2
+            generalSettings={
+              GeneralSettings {
+                "autoBackup": false,
+                "autoBackupDays": 1,
+                "autoCleanBackup": false,
+                "autoCleanBackupDays": 14,
+                "autoCleanBackupMonths": 6,
+                "autoCleanBackupWeeks": 8,
+                "cleanRetain": 1,
+                "confirmBlacklist": true,
+                "confirmFileDeletion": true,
+                "confirmSceneDeletion": true,
+                "disableLocalSave": false,
+                "portableMode": false,
+                "prioritizePerformance": true,
+                "watermark": false,
+                "watermarkColor": "#FFFFFF",
+                "watermarkCorner": "wc.bottomRight",
+                "watermarkFontFamily": "Arial Black,Arial Bold,Gadget,sans-serif",
+                "watermarkFontSize": 14,
+                "watermarkGrid": false,
+                "watermarkText": "",
+              }
+            }
+            onPortableOverride={[Function]}
+            onUpdateGeneralSettings={[Function]}
+          />
+        </div>
+      </div>
+      <div
+        className="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiCard-root css-bhp9pd-MuiPaper-root-MuiCard-root"
+        style={
+          {
+            "overflow": "visible",
+          }
+        }
+      >
+        <div
+          className="MuiCardContent-root css-46bh2p-MuiCardContent-root"
+        >
+          <PlayerNumCard
+            library={[]}
+            onUpdateSettings={[Function]}
+            settings={
+              DisplaySettings {
+                "alwaysOnTop": false,
+                "audioAlert": true,
+                "clickToProgress": true,
+                "clickToProgressWhilePlaying": false,
+                "cloneGridVideoElements": false,
+                "easingControls": false,
+                "fullScreen": false,
+                "ignoredTags": [],
+                "maxInHistory": 120,
+                "maxInMemory": 40,
+                "maxLoadingAtOnce": 5,
+                "minImageSize": 200,
+                "minVideoSize": 200,
+                "showMenu": true,
+                "startImmediately": false,
+              }
+            }
+            tags={[]}
+          />
+        </div>
+      </div>
+      <div
+        className="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiCard-root css-bhp9pd-MuiPaper-root-MuiCard-root"
+      >
+        <div
+          className="MuiCardContent-root css-46bh2p-MuiCardContent-root"
+        >
+          <CacheCard
+            config={
+              Config {
+                "caching": CacheSettings {
+                  "directory": "",
+                  "enabled": true,
+                  "maxSize": 500,
+                },
+                "clientID": "",
+                "defaultScene": SceneSettings {
+                  "audios": [],
+                  "backForth": false,
+                  "backForthBPMMulti": 10,
+                  "backForthConstant": 1000,
+                  "backForthMax": 1200,
+                  "backForthMin": 200,
+                  "backForthSinRate": 100,
+                  "backForthTF": "tf.c",
+                  "backgroundBlur": 8,
+                  "backgroundColor": "#000000",
+                  "backgroundColorSet": [],
+                  "backgroundType": "bt.blur",
+                  "continueVideo": false,
+                  "crossFade": false,
+                  "crossFadeAudio": false,
+                  "fadeAmp": 20,
+                  "fadeBPMMulti": 10,
+                  "fadeDuration": 500,
+                  "fadeDurationMax": 700,
+                  "fadeDurationMin": 100,
+                  "fadeEase": "ea.linear",
+                  "fadeExp": 6,
+                  "fadeIOBPMMulti": 10,
+                  "fadeIODelay": 2000,
+                  "fadeIODelayBPMMulti": 10,
+                  "fadeIODelayMax": 5000,
+                  "fadeIODelayMin": 2000,
+                  "fadeIODelaySinRate": 100,
+                  "fadeIODelayTF": "tf.c",
+                  "fadeIODuration": 2000,
+                  "fadeIODurationMax": 5000,
+                  "fadeIODurationMin": 2000,
+                  "fadeIOEndAmp": 20,
+                  "fadeIOEndEase": "ea.linear",
+                  "fadeIOEndExp": 6,
+                  "fadeIOEndOv": 3,
+                  "fadeIOEndPer": 6,
+                  "fadeIOPulse": false,
+                  "fadeIOSinRate": 100,
+                  "fadeIOStartAmp": 20,
+                  "fadeIOStartEase": "ea.linear",
+                  "fadeIOStartExp": 6,
+                  "fadeIOStartOv": 3,
+                  "fadeIOStartPer": 6,
+                  "fadeIOTF": "tf.c",
+                  "fadeInOut": false,
+                  "fadeOv": 3,
+                  "fadePer": 6,
+                  "fadeSinRate": 100,
+                  "fadeTF": "tf.c",
+                  "forceAll": false,
+                  "forceAllSource": false,
+                  "fullSource": false,
+                  "generatorMax": 100,
+                  "gifOption": "go.none",
+                  "gifTimingConstant": 3000,
+                  "gifTimingMax": 3000,
+                  "gifTimingMin": 1000,
+                  "grid": [
+                    [],
+                  ],
+                  "gridView": false,
+                  "horizTransLevel": 10,
+                  "horizTransLevelMax": 10,
+                  "horizTransLevelMin": 5,
+                  "horizTransRandom": false,
+                  "horizTransType": "htf.none",
+                  "imageOrientation": "ot.original",
+                  "imageType": "it.fitBestNoClip",
+                  "imageTypeFilter": "if.any",
+                  "nextSceneAllImages": false,
+                  "nextSceneID": 0,
+                  "nextSceneRandoms": [],
+                  "nextSceneTime": 900000,
+                  "orderFunction": "of.random",
+                  "overlaySceneID": 0,
+                  "overlaySceneOpacity": 0.5,
+                  "overlays": [],
+                  "panBPMMulti": 10,
+                  "panDuration": 2000,
+                  "panDurationMax": 5000,
+                  "panDurationMin": 2000,
+                  "panEndAmp": 20,
+                  "panEndEase": "ea.linear",
+                  "panEndExp": 6,
+                  "panEndOv": 3,
+                  "panEndPer": 6,
+                  "panHorizTransImg": false,
+                  "panHorizTransLevel": 10,
+                  "panHorizTransLevelMax": 10,
+                  "panHorizTransLevelMin": 5,
+                  "panHorizTransRandom": false,
+                  "panHorizTransType": "htf.none",
+                  "panSinRate": 100,
+                  "panStartAmp": 20,
+                  "panStartEase": "ea.linear",
+                  "panStartExp": 6,
+                  "panStartOv": 3,
+                  "panStartPer": 6,
+                  "panTF": "tf.c",
+                  "panVertTransImg": false,
+                  "panVertTransLevel": 10,
+                  "panVertTransLevelMax": 10,
+                  "panVertTransLevelMin": 5,
+                  "panVertTransRandom": false,
+                  "panVertTransType": "vtf.none",
+                  "panning": false,
+                  "persistAudio": false,
+                  "persistText": false,
+                  "playVideoClips": true,
+                  "randomVideoStart": false,
+                  "regenerate": true,
+                  "rotatePortrait": false,
+                  "skipVideoEnd": 0,
+                  "skipVideoStart": 0,
+                  "slide": false,
+                  "slideAmp": 20,
+                  "slideBPMMulti": 10,
+                  "slideDistance": 100,
+                  "slideDuration": 500,
+                  "slideDurationMax": 700,
+                  "slideDurationMin": 100,
+                  "slideEase": "ea.linear",
+                  "slideExp": 6,
+                  "slideOv": 3,
+                  "slidePer": 6,
+                  "slideSinRate": 100,
+                  "slideTF": "tf.c",
+                  "slideType": "stf.left",
+                  "sourceOrderFunction": "sof.random",
+                  "sources": [],
+                  "strobe": false,
+                  "strobeAmp": 20,
+                  "strobeBPMMulti": 10,
+                  "strobeColor": "#FFFFFF",
+                  "strobeColorSet": [],
+                  "strobeColorType": "bt.color",
+                  "strobeDelay": 200,
+                  "strobeDelayBPMMulti": 10,
+                  "strobeDelayMax": 300,
+                  "strobeDelayMin": 100,
+                  "strobeDelaySinRate": 100,
+                  "strobeDelayTF": "tf.c",
+                  "strobeEase": "ea.linear",
+                  "strobeExp": 6,
+                  "strobeLayer": "sl.top",
+                  "strobeOpacity": 1,
+                  "strobeOv": 3,
+                  "strobePer": 6,
+                  "strobePulse": false,
+                  "strobeSinRate": 100,
+                  "strobeTF": "tf.c",
+                  "strobeTime": 200,
+                  "strobeTimeMax": 300,
+                  "strobeTimeMin": 100,
+                  "timingBPMMulti": 10,
+                  "timingConstant": 1000,
+                  "timingFunction": "tf.c",
+                  "timingMax": 1200,
+                  "timingMin": 200,
+                  "timingSinRate": 100,
+                  "transAmp": 20,
+                  "transBPMMulti": 10,
+                  "transDuration": 5000,
+                  "transDurationMax": 7000,
+                  "transDurationMin": 1000,
+                  "transEase": "ea.linear",
+                  "transExp": 6,
+                  "transOv": 3,
+                  "transPer": 6,
+                  "transSinRate": 100,
+                  "transTF": "tf.c",
+                  "vertTransLevel": 10,
+                  "vertTransLevelMax": 10,
+                  "vertTransLevelMin": 5,
+                  "vertTransRandom": false,
+                  "vertTransType": "vtf.none",
+                  "videoOption": "vo.none",
+                  "videoOrientation": "ot.original",
+                  "videoRandomSpeed": false,
+                  "videoSkip": 10,
+                  "videoSpeed": 10,
+                  "videoSpeedMax": 20,
+                  "videoSpeedMin": 5,
+                  "videoTimingConstant": 3000,
+                  "videoTimingMax": 3000,
+                  "videoTimingMin": 1000,
+                  "videoVolume": 0,
+                  "weightFunction": "wf.s",
+                  "zoom": false,
+                  "zoomEnd": 2,
+                  "zoomEndMax": 2,
+                  "zoomEndMin": 1.5,
+                  "zoomRandom": false,
+                  "zoomStart": 1,
+                  "zoomStartMax": 1,
+                  "zoomStartMin": 0.5,
+                },
+                "displaySettings": DisplaySettings {
+                  "alwaysOnTop": false,
+                  "audioAlert": true,
+                  "clickToProgress": true,
+                  "clickToProgressWhilePlaying": false,
+                  "cloneGridVideoElements": false,
+                  "easingControls": false,
+                  "fullScreen": false,
+                  "ignoredTags": [],
+                  "maxInHistory": 120,
+                  "maxInMemory": 40,
+                  "maxLoadingAtOnce": 5,
+                  "minImageSize": 200,
+                  "minVideoSize": 200,
+                  "showMenu": true,
+                  "startImmediately": false,
+                },
+                "generalSettings": GeneralSettings {
+                  "autoBackup": false,
+                  "autoBackupDays": 1,
+                  "autoCleanBackup": false,
+                  "autoCleanBackupDays": 14,
+                  "autoCleanBackupMonths": 6,
+                  "autoCleanBackupWeeks": 8,
+                  "cleanRetain": 1,
+                  "confirmBlacklist": true,
+                  "confirmFileDeletion": true,
+                  "confirmSceneDeletion": true,
+                  "disableLocalSave": false,
+                  "portableMode": false,
+                  "prioritizePerformance": true,
+                  "watermark": false,
+                  "watermarkColor": "#FFFFFF",
+                  "watermarkCorner": "wc.bottomRight",
+                  "watermarkFontFamily": "Arial Black,Arial Bold,Gadget,sans-serif",
+                  "watermarkFontSize": 14,
+                  "watermarkGrid": false,
+                  "watermarkText": "",
+                },
+                "newWindowAlerted": false,
+                "remoteSettings": RemoteSettings {
+                  "hydrusAPIKey": "",
+                  "hydrusDomain": "localhost",
+                  "hydrusPort": "45869",
+                  "hydrusProtocol": "http",
+                  "instagramPassword": "",
+                  "instagramUsername": "",
+                  "piwigoHost": "",
+                  "piwigoPassword": "",
+                  "piwigoProtocol": "http",
+                  "piwigoUsername": "",
+                  "redditClientID": "2Iqe-1CsO4VQlA",
+                  "redditDeviceID": "",
+                  "redditRefreshToken": "",
+                  "redditUserAgent": "desktop:flipflip:v2.0.0 (by /u/ififfy)",
+                  "silenceTumblrAlert": false,
+                  "tumblrKey": "",
+                  "tumblrKeys": [
+                    "BaQquvlxQeRhKRyViknF98vseIdcBEyDrzJBpHxvAiMPHCKR2l",
+                    "G4iZd6FBiyDxHVUpNqtOTDu4woWzfp8WuH3tTrT3MC16GTmNzq",
+                    "y5uUQJYTCp15Nj3P80cLmNFqwSr1mxIhm3C4PCsGAfReydkF9m",
+                    "IZiOt6PYazf4g0sYWVfpfebMITRFWmtlKq2UKe6l0RsqKHPgui",
+                    "ATtwOUlruyVl8bEiHTnYcRpByEAzov2LtLEWOfDLqhPRZFmT4X",
+                  ],
+                  "tumblrOAuthToken": "",
+                  "tumblrOAuthTokenSecret": "",
+                  "tumblrSecret": "",
+                  "tumblrSecrets": [
+                    "XWVCo7t0GMGkOAd9wsxMMkKPhQbl3RqauGzQtnzAnmHCJ7WdSn",
+                    "RmoWUh844NqVdw7btWI6EYldJ91KhwJyfCKPtAIcuVokFtRYgS",
+                    "xiEV5sJISJAwegJHTTLWtxnmFUkowxgMk2gOq4mc20VNLM2TpJ",
+                    "Iw3yKgjfMvrKPNCcqdUyRuxCkYWYyRlrMdFUojRHVkSSADOKCT",
+                    "cMM7xqJV1roUudEdBiZeOqv3n1H0pzNnGY1iAbp3oo3c29MXGq",
+                  ],
+                  "twitterAccessTokenKey": "",
+                  "twitterAccessTokenSecret": "",
+                  "twitterConsumerKey": "qSRfdIWfpkesYDVJHrRh05wji",
+                  "twitterConsumerSecret": "ad11IC4CLwVzYyGyYwHKVMP9WwAcKxymw4D9162S5Ex75l5eWw",
+                },
+                "tutorials": Tutorials {
+                  "audios": null,
+                  "library": null,
+                  "player": null,
+                  "sceneDetail": null,
+                  "sceneGenerator": null,
+                  "sceneGrid": null,
+                  "scenePicker": null,
+                  "scriptor": null,
+                  "scripts": null,
+                  "videoClipper": null,
+                },
+              }
+            }
+            onUpdateSettings={[Function]}
+          />
+        </div>
+      </div>
+      <div
+        className="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiCard-root css-bhp9pd-MuiPaper-root-MuiCard-root"
+      >
+        <div
+          className="MuiCardContent-root css-46bh2p-MuiCardContent-root"
+        >
+          <APICard
+            onUpdateConfig={[Function]}
+            onUpdateSettings={[Function]}
+            settings={
+              RemoteSettings {
+                "hydrusAPIKey": "",
+                "hydrusDomain": "localhost",
+                "hydrusPort": "45869",
+                "hydrusProtocol": "http",
+                "instagramPassword": "",
+                "instagramUsername": "",
+                "piwigoHost": "",
+                "piwigoPassword": "",
+                "piwigoProtocol": "http",
+                "piwigoUsername": "",
+                "redditClientID": "2Iqe-1CsO4VQlA",
+                "redditDeviceID": "",
+                "redditRefreshToken": "",
+                "redditUserAgent": "desktop:flipflip:v2.0.0 (by /u/ififfy)",
+                "silenceTumblrAlert": false,
+                "tumblrKey": "",
+                "tumblrKeys": [
+                  "BaQquvlxQeRhKRyViknF98vseIdcBEyDrzJBpHxvAiMPHCKR2l",
+                  "G4iZd6FBiyDxHVUpNqtOTDu4woWzfp8WuH3tTrT3MC16GTmNzq",
+                  "y5uUQJYTCp15Nj3P80cLmNFqwSr1mxIhm3C4PCsGAfReydkF9m",
+                  "IZiOt6PYazf4g0sYWVfpfebMITRFWmtlKq2UKe6l0RsqKHPgui",
+                  "ATtwOUlruyVl8bEiHTnYcRpByEAzov2LtLEWOfDLqhPRZFmT4X",
+                ],
+                "tumblrOAuthToken": "",
+                "tumblrOAuthTokenSecret": "",
+                "tumblrSecret": "",
+                "tumblrSecrets": [
+                  "XWVCo7t0GMGkOAd9wsxMMkKPhQbl3RqauGzQtnzAnmHCJ7WdSn",
+                  "RmoWUh844NqVdw7btWI6EYldJ91KhwJyfCKPtAIcuVokFtRYgS",
+                  "xiEV5sJISJAwegJHTTLWtxnmFUkowxgMk2gOq4mc20VNLM2TpJ",
+                  "Iw3yKgjfMvrKPNCcqdUyRuxCkYWYyRlrMdFUojRHVkSSADOKCT",
+                  "cMM7xqJV1roUudEdBiZeOqv3n1H0pzNnGY1iAbp3oo3c29MXGq",
+                ],
+                "twitterAccessTokenKey": "",
+                "twitterAccessTokenSecret": "",
+                "twitterConsumerKey": "qSRfdIWfpkesYDVJHrRh05wji",
+                "twitterConsumerSecret": "ad11IC4CLwVzYyGyYwHKVMP9WwAcKxymw4D9162S5Ex75l5eWw",
+              }
+            }
+          />
+        </div>
+      </div>
+      <div
+        className="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiCard-root css-bhp9pd-MuiPaper-root-MuiCard-root"
+      >
+        <div
+          className="MuiCardContent-root css-46bh2p-MuiCardContent-root"
+        >
+          <WatermarkCard
+            onUpdateSettings={[Function]}
+            settings={
+              GeneralSettings {
+                "autoBackup": false,
+                "autoBackupDays": 1,
+                "autoCleanBackup": false,
+                "autoCleanBackupDays": 14,
+                "autoCleanBackupMonths": 6,
+                "autoCleanBackupWeeks": 8,
+                "cleanRetain": 1,
+                "confirmBlacklist": true,
+                "confirmFileDeletion": true,
+                "confirmSceneDeletion": true,
+                "disableLocalSave": false,
+                "portableMode": false,
+                "prioritizePerformance": true,
+                "watermark": false,
+                "watermarkColor": "#FFFFFF",
+                "watermarkCorner": "wc.bottomRight",
+                "watermarkFontFamily": "Arial Black,Arial Bold,Gadget,sans-serif",
+                "watermarkFontSize": 14,
+                "watermarkGrid": false,
+                "watermarkText": "",
+              }
+            }
+          />
+        </div>
+      </div>
+    </Masonry>
+  </div>
+  <div
+    className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 MuiGrid-grid-sm-auto css-pr9bjb-MuiGrid-root"
+  >
+    <div
+      className="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiCard-root css-bhp9pd-MuiPaper-root-MuiCard-root"
+    >
+      <div
+        className="MuiCardContent-root css-46bh2p-MuiCardContent-root"
+      >
+        <BackupCard
+          onBackup={[Function]}
+          onClean={[Function]}
+          onRestore={[Function]}
+          onUpdateSettings={[Function]}
+          settings={
+            GeneralSettings {
+              "autoBackup": false,
+              "autoBackupDays": 1,
+              "autoCleanBackup": false,
+              "autoCleanBackupDays": 14,
+              "autoCleanBackupMonths": 6,
+              "autoCleanBackupWeeks": 8,
+              "cleanRetain": 1,
+              "confirmBlacklist": true,
+              "confirmFileDeletion": true,
+              "confirmSceneDeletion": true,
+              "disableLocalSave": false,
+              "portableMode": false,
+              "prioritizePerformance": true,
+              "watermark": false,
+              "watermarkColor": "#FFFFFF",
+              "watermarkCorner": "wc.bottomRight",
+              "watermarkFontFamily": "Arial Black,Arial Bold,Gadget,sans-serif",
+              "watermarkFontSize": 14,
+              "watermarkGrid": false,
+              "watermarkText": "",
+            }
+          }
+        />
+      </div>
+    </div>
+  </div>
+  <div
+    className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 MuiGrid-grid-sm-auto css-pr9bjb-MuiGrid-root"
+  >
+    <div
+      className="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiCard-root css-bhp9pd-MuiPaper-root-MuiCard-root"
+    >
+      <div
+        className="MuiCardContent-root css-46bh2p-MuiCardContent-root"
+      >
+        <ThemeCard
+          onChangeThemeColor={[Function]}
+          onToggleDarkMode={[Function]}
+          theme={
+            {
+              "breakpoints": {
+                "between": [Function],
+                "down": [Function],
+                "keys": [
+                  "xs",
+                  "sm",
+                  "md",
+                  "lg",
+                  "xl",
+                ],
+                "not": [Function],
+                "only": [Function],
+                "unit": "px",
+                "up": [Function],
+                "values": {
+                  "lg": 1200,
+                  "md": 900,
+                  "sm": 600,
+                  "xl": 1536,
+                  "xs": 0,
+                },
+              },
+              "components": {},
+              "direction": "ltr",
+              "mixins": {
+                "toolbar": {
+                  "@media (min-width:0px)": {
+                    "@media (orientation: landscape)": {
+                      "minHeight": 48,
+                    },
+                  },
+                  "@media (min-width:600px)": {
+                    "minHeight": 64,
+                  },
+                  "minHeight": 56,
+                },
+              },
+              "palette": {
+                "action": {
+                  "activatedOpacity": 0.12,
+                  "active": "rgba(0, 0, 0, 0.54)",
+                  "disabled": "rgba(0, 0, 0, 0.26)",
+                  "disabledBackground": "rgba(0, 0, 0, 0.12)",
+                  "disabledOpacity": 0.38,
+                  "focus": "rgba(0, 0, 0, 0.12)",
+                  "focusOpacity": 0.12,
+                  "hover": "rgba(0, 0, 0, 0.04)",
+                  "hoverOpacity": 0.04,
+                  "selected": "rgba(0, 0, 0, 0.08)",
+                  "selectedOpacity": 0.08,
+                },
+                "augmentColor": [Function],
+                "background": {
+                  "default": "#fff",
+                  "paper": "#fff",
+                },
+                "common": {
+                  "black": "#000",
+                  "white": "#fff",
+                },
+                "contrastThreshold": 3,
+                "divider": "rgba(0, 0, 0, 0.12)",
+                "error": {
+                  "contrastText": "#fff",
+                  "dark": "rgb(170, 46, 37)",
+                  "light": "rgb(246, 104, 94)",
+                  "main": "#f44336",
+                },
+                "getContrastText": [Function],
+                "grey": {
+                  "100": "#f5f5f5",
+                  "200": "#eeeeee",
+                  "300": "#e0e0e0",
+                  "400": "#bdbdbd",
+                  "50": "#fafafa",
+                  "500": "#9e9e9e",
+                  "600": "#757575",
+                  "700": "#616161",
+                  "800": "#424242",
+                  "900": "#212121",
+                  "A100": "#f5f5f5",
+                  "A200": "#eeeeee",
+                  "A400": "#bdbdbd",
+                  "A700": "#616161",
+                },
+                "info": {
+                  "contrastText": "#fff",
+                  "dark": "#01579b",
+                  "light": "#03a9f4",
+                  "main": "#0288d1",
+                },
+                "mode": "light",
+                "primary": {
+                  "100": "#c5cae9",
+                  "200": "#9fa8da",
+                  "300": "#7986cb",
+                  "400": "#5c6bc0",
+                  "50": "#e8eaf6",
+                  "500": "#3f51b5",
+                  "600": "#3949ab",
+                  "700": "#303f9f",
+                  "800": "#283593",
+                  "900": "#1a237e",
+                  "A100": "#8c9eff",
+                  "A200": "#536dfe",
+                  "A400": "#3d5afe",
+                  "A700": "#304ffe",
+                  "contrastText": "#fff",
+                  "dark": "#303f9f",
+                  "light": "#7986cb",
+                  "main": "#3f51b5",
+                },
+                "secondary": {
+                  "contrastText": "#fff",
+                  "dark": "rgb(171, 0, 60)",
+                  "light": "rgb(247, 51, 120)",
+                  "main": "#f50057",
+                },
+                "success": {
+                  "contrastText": "#fff",
+                  "dark": "#1b5e20",
+                  "light": "#4caf50",
+                  "main": "#2e7d32",
+                },
+                "text": {
+                  "disabled": "rgba(0, 0, 0, 0.38)",
+                  "hint": "rgba(0, 0, 0, 0.38)",
+                  "primary": "rgba(0, 0, 0, 0.87)",
+                  "secondary": "rgba(0, 0, 0, 0.6)",
+                },
+                "tonalOffset": 0.2,
+                "warning": {
+                  "contrastText": "#fff",
+                  "dark": "#e65100",
+                  "light": "#ff9800",
+                  "main": "#ed6c02",
+                },
+              },
+              "shadows": [
+                "none",
+                "0px 2px 1px -1px rgba(0,0,0,0.2),0px 1px 1px 0px rgba(0,0,0,0.14),0px 1px 3px 0px rgba(0,0,0,0.12)",
+                "0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12)",
+                "0px 3px 3px -2px rgba(0,0,0,0.2),0px 3px 4px 0px rgba(0,0,0,0.14),0px 1px 8px 0px rgba(0,0,0,0.12)",
+                "0px 2px 4px -1px rgba(0,0,0,0.2),0px 4px 5px 0px rgba(0,0,0,0.14),0px 1px 10px 0px rgba(0,0,0,0.12)",
+                "0px 3px 5px -1px rgba(0,0,0,0.2),0px 5px 8px 0px rgba(0,0,0,0.14),0px 1px 14px 0px rgba(0,0,0,0.12)",
+                "0px 3px 5px -1px rgba(0,0,0,0.2),0px 6px 10px 0px rgba(0,0,0,0.14),0px 1px 18px 0px rgba(0,0,0,0.12)",
+                "0px 4px 5px -2px rgba(0,0,0,0.2),0px 7px 10px 1px rgba(0,0,0,0.14),0px 2px 16px 1px rgba(0,0,0,0.12)",
+                "0px 5px 5px -3px rgba(0,0,0,0.2),0px 8px 10px 1px rgba(0,0,0,0.14),0px 3px 14px 2px rgba(0,0,0,0.12)",
+                "0px 5px 6px -3px rgba(0,0,0,0.2),0px 9px 12px 1px rgba(0,0,0,0.14),0px 3px 16px 2px rgba(0,0,0,0.12)",
+                "0px 6px 6px -3px rgba(0,0,0,0.2),0px 10px 14px 1px rgba(0,0,0,0.14),0px 4px 18px 3px rgba(0,0,0,0.12)",
+                "0px 6px 7px -4px rgba(0,0,0,0.2),0px 11px 15px 1px rgba(0,0,0,0.14),0px 4px 20px 3px rgba(0,0,0,0.12)",
+                "0px 7px 8px -4px rgba(0,0,0,0.2),0px 12px 17px 2px rgba(0,0,0,0.14),0px 5px 22px 4px rgba(0,0,0,0.12)",
+                "0px 7px 8px -4px rgba(0,0,0,0.2),0px 13px 19px 2px rgba(0,0,0,0.14),0px 5px 24px 4px rgba(0,0,0,0.12)",
+                "0px 7px 9px -4px rgba(0,0,0,0.2),0px 14px 21px 2px rgba(0,0,0,0.14),0px 5px 26px 4px rgba(0,0,0,0.12)",
+                "0px 8px 9px -5px rgba(0,0,0,0.2),0px 15px 22px 2px rgba(0,0,0,0.14),0px 6px 28px 5px rgba(0,0,0,0.12)",
+                "0px 8px 10px -5px rgba(0,0,0,0.2),0px 16px 24px 2px rgba(0,0,0,0.14),0px 6px 30px 5px rgba(0,0,0,0.12)",
+                "0px 8px 11px -5px rgba(0,0,0,0.2),0px 17px 26px 2px rgba(0,0,0,0.14),0px 6px 32px 5px rgba(0,0,0,0.12)",
+                "0px 9px 11px -5px rgba(0,0,0,0.2),0px 18px 28px 2px rgba(0,0,0,0.14),0px 7px 34px 6px rgba(0,0,0,0.12)",
+                "0px 9px 12px -6px rgba(0,0,0,0.2),0px 19px 29px 2px rgba(0,0,0,0.14),0px 7px 36px 6px rgba(0,0,0,0.12)",
+                "0px 10px 13px -6px rgba(0,0,0,0.2),0px 20px 31px 3px rgba(0,0,0,0.14),0px 8px 38px 7px rgba(0,0,0,0.12)",
+                "0px 10px 13px -6px rgba(0,0,0,0.2),0px 21px 33px 3px rgba(0,0,0,0.14),0px 8px 40px 7px rgba(0,0,0,0.12)",
+                "0px 10px 14px -6px rgba(0,0,0,0.2),0px 22px 35px 3px rgba(0,0,0,0.14),0px 8px 42px 7px rgba(0,0,0,0.12)",
+                "0px 11px 14px -7px rgba(0,0,0,0.2),0px 23px 36px 3px rgba(0,0,0,0.14),0px 9px 44px 8px rgba(0,0,0,0.12)",
+                "0px 11px 15px -7px rgba(0,0,0,0.2),0px 24px 38px 3px rgba(0,0,0,0.14),0px 9px 46px 8px rgba(0,0,0,0.12)",
+              ],
+              "shape": {
+                "borderRadius": 4,
+              },
+              "spacing": [Function],
+              "transitions": {
+                "create": [Function],
+                "duration": {
+                  "complex": 375,
+                  "enteringScreen": 225,
+                  "leavingScreen": 195,
+                  "short": 250,
+                  "shorter": 200,
+                  "shortest": 150,
+                  "standard": 300,
+                },
+                "easing": {
+                  "easeIn": "cubic-bezier(0.4, 0, 1, 1)",
+                  "easeInOut": "cubic-bezier(0.4, 0, 0.2, 1)",
+                  "easeOut": "cubic-bezier(0.0, 0, 0.2, 1)",
+                  "sharp": "cubic-bezier(0.4, 0, 0.6, 1)",
+                },
+                "getAutoHeightDuration": [Function],
+              },
+              "typography": {
+                "body1": {
+                  "fontFamily": ""Roboto", "Helvetica", "Arial", sans-serif",
+                  "fontSize": "1rem",
+                  "fontWeight": 400,
+                  "letterSpacing": "0.00938em",
+                  "lineHeight": 1.5,
+                },
+                "body2": {
+                  "fontFamily": ""Roboto", "Helvetica", "Arial", sans-serif",
+                  "fontSize": "0.875rem",
+                  "fontWeight": 400,
+                  "letterSpacing": "0.01071em",
+                  "lineHeight": 1.43,
+                },
+                "button": {
+                  "fontFamily": ""Roboto", "Helvetica", "Arial", sans-serif",
+                  "fontSize": "0.875rem",
+                  "fontWeight": 500,
+                  "letterSpacing": "0.02857em",
+                  "lineHeight": 1.75,
+                  "textTransform": "uppercase",
+                },
+                "caption": {
+                  "fontFamily": ""Roboto", "Helvetica", "Arial", sans-serif",
+                  "fontSize": "0.75rem",
+                  "fontWeight": 400,
+                  "letterSpacing": "0.03333em",
+                  "lineHeight": 1.66,
+                },
+                "fontFamily": ""Roboto", "Helvetica", "Arial", sans-serif",
+                "fontSize": 14,
+                "fontWeightBold": 700,
+                "fontWeightLight": 300,
+                "fontWeightMedium": 500,
+                "fontWeightRegular": 400,
+                "h1": {
+                  "fontFamily": ""Roboto", "Helvetica", "Arial", sans-serif",
+                  "fontSize": "6rem",
+                  "fontWeight": 300,
+                  "letterSpacing": "-0.01562em",
+                  "lineHeight": 1.167,
+                },
+                "h2": {
+                  "fontFamily": ""Roboto", "Helvetica", "Arial", sans-serif",
+                  "fontSize": "3.75rem",
+                  "fontWeight": 300,
+                  "letterSpacing": "-0.00833em",
+                  "lineHeight": 1.2,
+                },
+                "h3": {
+                  "fontFamily": ""Roboto", "Helvetica", "Arial", sans-serif",
+                  "fontSize": "3rem",
+                  "fontWeight": 400,
+                  "letterSpacing": "0em",
+                  "lineHeight": 1.167,
+                },
+                "h4": {
+                  "fontFamily": ""Roboto", "Helvetica", "Arial", sans-serif",
+                  "fontSize": "2.125rem",
+                  "fontWeight": 400,
+                  "letterSpacing": "0.00735em",
+                  "lineHeight": 1.235,
+                },
+                "h5": {
+                  "fontFamily": ""Roboto", "Helvetica", "Arial", sans-serif",
+                  "fontSize": "1.5rem",
+                  "fontWeight": 400,
+                  "letterSpacing": "0em",
+                  "lineHeight": 1.334,
+                },
+                "h6": {
+                  "fontFamily": ""Roboto", "Helvetica", "Arial", sans-serif",
+                  "fontSize": "1.25rem",
+                  "fontWeight": 500,
+                  "letterSpacing": "0.0075em",
+                  "lineHeight": 1.6,
+                },
+                "htmlFontSize": 16,
+                "inherit": {
+                  "fontFamily": "inherit",
+                  "fontSize": "inherit",
+                  "fontWeight": "inherit",
+                  "letterSpacing": "inherit",
+                  "lineHeight": "inherit",
+                },
+                "overline": {
+                  "fontFamily": ""Roboto", "Helvetica", "Arial", sans-serif",
+                  "fontSize": "0.75rem",
+                  "fontWeight": 400,
+                  "letterSpacing": "0.08333em",
+                  "lineHeight": 2.66,
+                  "textTransform": "uppercase",
+                },
+                "pxToRem": [Function],
+                "subtitle1": {
+                  "fontFamily": ""Roboto", "Helvetica", "Arial", sans-serif",
+                  "fontSize": "1rem",
+                  "fontWeight": 400,
+                  "letterSpacing": "0.00938em",
+                  "lineHeight": 1.75,
+                },
+                "subtitle2": {
+                  "fontFamily": ""Roboto", "Helvetica", "Arial", sans-serif",
+                  "fontSize": "0.875rem",
+                  "fontWeight": 500,
+                  "letterSpacing": "0.00714em",
+                  "lineHeight": 1.57,
+                },
+              },
+              "unstable_sx": [Function],
+              "unstable_sxConfig": {
+                "alignContent": {},
+                "alignItems": {},
+                "alignSelf": {},
+                "backgroundColor": {
+                  "themeKey": "palette",
+                  "transform": [Function],
+                },
+                "bgcolor": {
+                  "cssProperty": "backgroundColor",
+                  "themeKey": "palette",
+                  "transform": [Function],
+                },
+                "border": {
+                  "themeKey": "borders",
+                  "transform": [Function],
+                },
+                "borderBottom": {
+                  "themeKey": "borders",
+                  "transform": [Function],
+                },
+                "borderBottomColor": {
+                  "themeKey": "palette",
+                },
+                "borderColor": {
+                  "themeKey": "palette",
+                },
+                "borderLeft": {
+                  "themeKey": "borders",
+                  "transform": [Function],
+                },
+                "borderLeftColor": {
+                  "themeKey": "palette",
+                },
+                "borderRadius": {
+                  "style": [Function],
+                  "themeKey": "shape.borderRadius",
+                },
+                "borderRight": {
+                  "themeKey": "borders",
+                  "transform": [Function],
+                },
+                "borderRightColor": {
+                  "themeKey": "palette",
+                },
+                "borderTop": {
+                  "themeKey": "borders",
+                  "transform": [Function],
+                },
+                "borderTopColor": {
+                  "themeKey": "palette",
+                },
+                "bottom": {},
+                "boxShadow": {
+                  "themeKey": "shadows",
+                },
+                "boxSizing": {},
+                "color": {
+                  "themeKey": "palette",
+                  "transform": [Function],
+                },
+                "columnGap": {
+                  "style": [Function],
+                },
+                "display": {},
+                "displayPrint": {
+                  "cssProperty": false,
+                  "transform": [Function],
+                },
+                "flex": {},
+                "flexBasis": {},
+                "flexDirection": {},
+                "flexGrow": {},
+                "flexShrink": {},
+                "flexWrap": {},
+                "fontFamily": {
+                  "themeKey": "typography",
+                },
+                "fontSize": {
+                  "themeKey": "typography",
+                },
+                "fontStyle": {
+                  "themeKey": "typography",
+                },
+                "fontWeight": {
+                  "themeKey": "typography",
+                },
+                "gap": {
+                  "style": [Function],
+                },
+                "gridArea": {},
+                "gridAutoColumns": {},
+                "gridAutoFlow": {},
+                "gridAutoRows": {},
+                "gridColumn": {},
+                "gridRow": {},
+                "gridTemplateAreas": {},
+                "gridTemplateColumns": {},
+                "gridTemplateRows": {},
+                "height": {
+                  "transform": [Function],
+                },
+                "justifyContent": {},
+                "justifyItems": {},
+                "justifySelf": {},
+                "left": {},
+                "letterSpacing": {},
+                "lineHeight": {},
+                "m": {
+                  "style": [Function],
+                },
+                "margin": {
+                  "style": [Function],
+                },
+                "marginBlock": {
+                  "style": [Function],
+                },
+                "marginBlockEnd": {
+                  "style": [Function],
+                },
+                "marginBlockStart": {
+                  "style": [Function],
+                },
+                "marginBottom": {
+                  "style": [Function],
+                },
+                "marginInline": {
+                  "style": [Function],
+                },
+                "marginInlineEnd": {
+                  "style": [Function],
+                },
+                "marginInlineStart": {
+                  "style": [Function],
+                },
+                "marginLeft": {
+                  "style": [Function],
+                },
+                "marginRight": {
+                  "style": [Function],
+                },
+                "marginTop": {
+                  "style": [Function],
+                },
+                "marginX": {
+                  "style": [Function],
+                },
+                "marginY": {
+                  "style": [Function],
+                },
+                "maxHeight": {
+                  "transform": [Function],
+                },
+                "maxWidth": {
+                  "style": [Function],
+                },
+                "mb": {
+                  "style": [Function],
+                },
+                "minHeight": {
+                  "transform": [Function],
+                },
+                "minWidth": {
+                  "transform": [Function],
+                },
+                "ml": {
+                  "style": [Function],
+                },
+                "mr": {
+                  "style": [Function],
+                },
+                "mt": {
+                  "style": [Function],
+                },
+                "mx": {
+                  "style": [Function],
+                },
+                "my": {
+                  "style": [Function],
+                },
+                "order": {},
+                "overflow": {},
+                "p": {
+                  "style": [Function],
+                },
+                "padding": {
+                  "style": [Function],
+                },
+                "paddingBlock": {
+                  "style": [Function],
+                },
+                "paddingBlockEnd": {
+                  "style": [Function],
+                },
+                "paddingBlockStart": {
+                  "style": [Function],
+                },
+                "paddingBottom": {
+                  "style": [Function],
+                },
+                "paddingInline": {
+                  "style": [Function],
+                },
+                "paddingInlineEnd": {
+                  "style": [Function],
+                },
+                "paddingInlineStart": {
+                  "style": [Function],
+                },
+                "paddingLeft": {
+                  "style": [Function],
+                },
+                "paddingRight": {
+                  "style": [Function],
+                },
+                "paddingTop": {
+                  "style": [Function],
+                },
+                "paddingX": {
+                  "style": [Function],
+                },
+                "paddingY": {
+                  "style": [Function],
+                },
+                "pb": {
+                  "style": [Function],
+                },
+                "pl": {
+                  "style": [Function],
+                },
+                "position": {},
+                "pr": {
+                  "style": [Function],
+                },
+                "pt": {
+                  "style": [Function],
+                },
+                "px": {
+                  "style": [Function],
+                },
+                "py": {
+                  "style": [Function],
+                },
+                "right": {},
+                "rowGap": {
+                  "style": [Function],
+                },
+                "textAlign": {},
+                "textOverflow": {},
+                "textTransform": {},
+                "top": {},
+                "typography": {
+                  "cssProperty": false,
+                  "themeKey": "typography",
+                },
+                "visibility": {},
+                "whiteSpace": {},
+                "width": {
+                  "transform": [Function],
+                },
+                "zIndex": {
+                  "themeKey": "zIndex",
+                },
+              },
+              "zIndex": {
+                "appBar": 1100,
+                "drawer": 1200,
+                "fab": 1050,
+                "mobileStepper": 1000,
+                "modal": 1300,
+                "snackbar": 1400,
+                "speedDial": 1050,
+                "tooltip": 1500,
+              },
+            }
+          }
+        />
+      </div>
+    </div>
+  </div>
+</div>
+`;

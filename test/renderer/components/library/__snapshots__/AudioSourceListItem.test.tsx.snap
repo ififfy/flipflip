@@ -1,0 +1,105 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AudioSourceListItem should match snapshot 1`] = `
+<div
+  className="AudioSourceListItem-evenChild-3"
+  style={null}
+>
+  <li
+    className="MuiListItem-root AudioSourceListItem-listItem-27 MuiListItem-gutters MuiListItem-padding css-5mcrhl-MuiListItem-root"
+    disabled={false}
+  >
+    <span
+      className="MuiBadge-root css-1c32n2y-MuiBadge-root"
+    >
+      <div
+        className="MuiListItemAvatar-root AudioSourceListItem-listAvatar-6 css-1e9lk82-MuiListItemAvatar-root"
+      >
+        <span
+          className="MuiBadge-root css-1c32n2y-MuiBadge-root"
+        >
+          <div
+            aria-label={null}
+            aria-labelledby={null}
+            className="AudioSourceListItem-trackThumb-17"
+            data-mui-internal-clone-element={true}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onMouseLeave={[Function]}
+            onMouseOver={[Function]}
+            onTouchEnd={[Function]}
+            onTouchStart={[Function]}
+          >
+            <button
+              className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default AudioSourceListItem-avatar-5 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+              disabled={false}
+              onBlur={[Function]}
+              onContextMenu={[Function]}
+              onDragLeave={[Function]}
+              onFocus={[Function]}
+              onKeyDown={[Function]}
+              onKeyUp={[Function]}
+              onMouseDown={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onTouchEnd={[Function]}
+              onTouchMove={[Function]}
+              onTouchStart={[Function]}
+              tabIndex={0}
+              type="button"
+            >
+              <SourceIcon
+                className="AudioSourceListItem-sourceIcon-8"
+                url="audio.mp3"
+              />
+              <span
+                className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+              />
+            </button>
+          </div>
+          <span
+            className="MuiBadge-badge MuiBadge-standard MuiBadge-invisible MuiBadge-anchorOriginTopRight MuiBadge-anchorOriginTopRightRectangular MuiBadge-overlapRectangular MuiBadge-colorPrimary css-uqlr8p-MuiBadge-badge"
+          />
+        </span>
+      </div>
+      <span
+        className="MuiBadge-badge MuiBadge-dot MuiBadge-invisible MuiBadge-anchorOriginTopLeft MuiBadge-anchorOriginTopLeftRectangular MuiBadge-overlapRectangular MuiBadge-colorSecondary css-14825hp-MuiBadge-badge"
+      />
+    </span>
+    <div
+      className="MuiListItemText-root css-tlelie-MuiListItemText-root"
+    >
+      <span
+        className="MuiTypography-root MuiTypography-body1 MuiListItemText-primary AudioSourceListItem-root-1 css-10hburv-MuiTypography-root"
+      >
+        <p
+          className="MuiTypography-root MuiTypography-body1 MuiTypography-noWrap AudioSourceListItem-trackName-19 css-fvtpii-MuiTypography-root"
+        />
+        <p
+          className="MuiTypography-root MuiTypography-body1 AudioSourceListItem-trackDuration-20 css-ahj2mt-MuiTypography-root"
+        >
+          NaN:0NaN
+        </p>
+        <div
+          className="AudioSourceListItem-artistContainer-21"
+          onClick={[Function]}
+        >
+          <p
+            className="MuiTypography-root MuiTypography-body1 MuiTypography-noWrap AudioSourceListItem-trackArtist-22 css-fvtpii-MuiTypography-root"
+          />
+        </div>
+        <div
+          className="AudioSourceListItem-albumContainer-23"
+          onClick={[Function]}
+        >
+          <p
+            className="MuiTypography-root MuiTypography-body1 AudioSourceListItem-trackAlbum-24 css-ahj2mt-MuiTypography-root"
+          />
+        </div>
+      </span>
+    </div>
+    0
+  </li>
+</div>
+`;

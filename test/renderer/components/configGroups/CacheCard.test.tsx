@@ -1,14 +1,16 @@
 import React from "react";
 import { describe, it, expect } from "@jest/globals";
 import renderer from "react-test-renderer";
-import ColorPicker from "../../../../src/renderer/components/config/ColorPicker";
+import CacheCard from "../../../../src/renderer/components/configGroups/CacheCard";
 import TestProvider from "../../../util/TestProvider";
+import Config from "../../../../src/renderer/data/Config";
 
-describe("ColorPicker", () => {
+describe("CacheCard", () => {
   it("should match snapshot", () => {
+    const config = new Config()
     const component = renderer.create(
       <TestProvider>
-        <ColorPicker currentColor="#fff" onChangeColor={(e: any) => {}} />
+        <CacheCard config={config} onUpdateSettings={(fn) => {}} />
       </TestProvider>
     );
 

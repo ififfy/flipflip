@@ -1,14 +1,20 @@
 import React from "react";
 import { describe, it, expect } from "@jest/globals";
 import renderer from "react-test-renderer";
-import ColorPicker from "../../../../src/renderer/components/config/ColorPicker";
+import LibrarySearch from "../../../../src/renderer/components/library/LibrarySearch";
 import TestProvider from "../../../util/TestProvider";
 
-describe("ColorPicker", () => {
+describe("LibrarySearch", () => {
   it("should match snapshot", () => {
     const component = renderer.create(
       <TestProvider>
-        <ColorPicker currentColor="#fff" onChangeColor={(e: any) => {}} />
+        <LibrarySearch
+          displaySources={[]}
+          tags={[]}
+          filters={[]}
+          placeholder="Search..."
+          onUpdateFilters={(filter) => {}}
+        />
       </TestProvider>
     );
 

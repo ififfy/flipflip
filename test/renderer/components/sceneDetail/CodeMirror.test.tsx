@@ -1,14 +1,17 @@
 import React from "react";
 import { describe, it, expect } from "@jest/globals";
 import renderer from "react-test-renderer";
-import ColorPicker from "../../../../src/renderer/components/config/ColorPicker";
+import CodeMirror from "../../../../src/renderer/components/sceneDetail/CodeMirror";
 import TestProvider from "../../../util/TestProvider";
 
-describe("ColorPicker", () => {
+describe("CodeMirror", () => {
   it("should match snapshot", () => {
     const component = renderer.create(
       <TestProvider>
-        <ColorPicker currentColor="#fff" onChangeColor={(e: any) => {}} />
+        <CodeMirror
+          onGutterClick={(editor: any, clickedLine: number) => {}}
+          onUpdateScript={(text: string, changed?: boolean) => {}}
+        />
       </TestProvider>
     );
 

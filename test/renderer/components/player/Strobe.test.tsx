@@ -1,14 +1,24 @@
 import React from "react";
 import { describe, it, expect } from "@jest/globals";
 import renderer from "react-test-renderer";
-import ColorPicker from "../../../../src/renderer/components/config/ColorPicker";
+import Strobe from "../../../../src/renderer/components/player/Strobe";
 import TestProvider from "../../../util/TestProvider";
+import Scene from "../../../../src/renderer/data/Scene";
 
-describe("ColorPicker", () => {
+describe("Strobe", () => {
   it("should match snapshot", () => {
+    const scene = new Scene();
     const component = renderer.create(
       <TestProvider>
-        <ColorPicker currentColor="#fff" onChangeColor={(e: any) => {}} />
+        <Strobe
+          toggleStrobe={false}
+          scene={scene}
+          timeToNextFrame={0}
+          currentAudio={null}
+          zIndex={0}
+        >
+          <p>Test</p>
+        </Strobe>
       </TestProvider>
     );
 

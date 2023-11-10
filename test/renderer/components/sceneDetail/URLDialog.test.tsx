@@ -1,14 +1,18 @@
 import React from "react";
 import { describe, it, expect } from "@jest/globals";
 import renderer from "react-test-renderer";
-import ColorPicker from "../../../../src/renderer/components/config/ColorPicker";
+import URLDialog from "../../../../src/renderer/components/sceneDetail/URLDialog";
 import TestProvider from "../../../util/TestProvider";
 
-describe("ColorPicker", () => {
+describe("URLDialog", () => {
   it("should match snapshot", () => {
     const component = renderer.create(
       <TestProvider>
-        <ColorPicker currentColor="#fff" onChangeColor={(e: any) => {}} />
+        <URLDialog
+          open={false}
+          onClose={() => {}}
+          onImportURL={(type, e, args) => {}}
+        />
       </TestProvider>
     );
 

@@ -1,14 +1,16 @@
 import React from "react";
 import { describe, it, expect } from "@jest/globals";
 import renderer from "react-test-renderer";
-import ColorPicker from "../../../../src/renderer/components/config/ColorPicker";
+import PictureGrid from "../../../../src/renderer/components/player/PictureGrid";
 import TestProvider from "../../../util/TestProvider";
 
-describe("ColorPicker", () => {
+jest.mock('../../../../src/renderer/components/player/ImageView', () => 'ImageView');
+
+describe("PictureGrid", () => {
   it("should match snapshot", () => {
     const component = renderer.create(
       <TestProvider>
-        <ColorPicker currentColor="#fff" onChangeColor={(e: any) => {}} />
+        <PictureGrid pictures={[]} />
       </TestProvider>
     );
 

@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AudioAlbumList should match snapshot 1`] = `
+[
+  <h1
+    className="MuiTypography-root MuiTypography-h3 MuiTypography-noWrap AudioAlbumList-emptyMessage-1 css-1yk4hom-MuiTypography-root"
+  >
+    乁( ◔ ౪◔)「
+  </h1>,
+  <h1
+    className="MuiTypography-root MuiTypography-h4 MuiTypography-noWrap AudioAlbumList-emptyMessage2-2 css-1r3v6n7-MuiTypography-root"
+  >
+    Nothing here
+  </h1>,
+]
+`;

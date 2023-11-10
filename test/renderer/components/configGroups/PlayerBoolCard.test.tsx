@@ -1,14 +1,19 @@
 import React from "react";
 import { describe, it, expect } from "@jest/globals";
 import renderer from "react-test-renderer";
-import ColorPicker from "../../../../src/renderer/components/config/ColorPicker";
+import PlayerBoolCard from "../../../../src/renderer/components/configGroups/PlayerBoolCard";
 import TestProvider from "../../../util/TestProvider";
+import { DisplaySettings } from "../../../../src/renderer/data/Config";
 
-describe("ColorPicker", () => {
+describe("PlayerBoolCard", () => {
   it("should match snapshot", () => {
+    const settings = new DisplaySettings();
     const component = renderer.create(
       <TestProvider>
-        <ColorPicker currentColor="#fff" onChangeColor={(e: any) => {}} />
+        <PlayerBoolCard
+          displaySettings={settings}
+          onUpdateDisplaySettings={(fn) => {}}
+        />
       </TestProvider>
     );
 

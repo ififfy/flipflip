@@ -1,14 +1,19 @@
 import React from "react";
 import { describe, it, expect } from "@jest/globals";
 import renderer from "react-test-renderer";
-import ColorPicker from "../../../../src/renderer/components/config/ColorPicker";
+import SceneSelect from "../../../../src/renderer/components/configGroups/SceneSelect";
 import TestProvider from "../../../util/TestProvider";
 
-describe("ColorPicker", () => {
+describe("SceneSelect", () => {
   it("should match snapshot", () => {
     const component = renderer.create(
       <TestProvider>
-        <ColorPicker currentColor="#fff" onChangeColor={(e: any) => {}} />
+        <SceneSelect
+            allScenes={[]}
+            value={0}
+            getSceneName={(sceneID) => ''}
+            onChange={(sceneID) => {}}
+        />
       </TestProvider>
     );
 

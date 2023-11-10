@@ -1,14 +1,16 @@
 import React from "react";
 import { describe, it, expect } from "@jest/globals";
 import renderer from "react-test-renderer";
-import ColorPicker from "../../../../src/renderer/components/config/ColorPicker";
+import AudioAlert from "../../../../src/renderer/components/player/AudioAlert";
 import TestProvider from "../../../util/TestProvider";
+import Audio from "../../../../src/renderer/data/Audio";
 
-describe("ColorPicker", () => {
+describe("AudioAlert", () => {
   it("should match snapshot", () => {
+    const audio = new Audio();
     const component = renderer.create(
       <TestProvider>
-        <ColorPicker currentColor="#fff" onChangeColor={(e: any) => {}} />
+        <AudioAlert audio={audio} />
       </TestProvider>
     );
 

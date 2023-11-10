@@ -1,0 +1,1484 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SceneDetail should match snapshot 1`] = `
+<div
+  className="SceneDetail-root-1"
+>
+  <header
+    className="MuiPaper-root MuiPaper-elevation MuiPaper-elevation4 MuiAppBar-root MuiAppBar-colorPrimary MuiAppBar-positionAbsolute SceneDetail-appBar-2 css-iu2t21-MuiPaper-root-MuiAppBar-root"
+  >
+    <div
+      className="MuiToolbar-root MuiToolbar-gutters MuiToolbar-regular css-hyum1k-MuiToolbar-root"
+    >
+      <button
+        aria-label="Back"
+        aria-labelledby={null}
+        className="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-edgeStart MuiIconButton-sizeLarge css-184mzhy-MuiButtonBase-root-MuiIconButton-root"
+        data-mui-internal-clone-element={true}
+        disabled={false}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onContextMenu={[Function]}
+        onDragLeave={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseLeave={[Function]}
+        onMouseOver={[Function]}
+        onMouseUp={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        tabIndex={0}
+        type="button"
+      >
+        <svg
+          aria-hidden={true}
+          className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root"
+          data-testid="ArrowBackIcon"
+          focusable="false"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+          />
+        </svg>
+        <span
+          className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+        />
+      </button>
+      <div
+        className="SceneDetail-fill-51"
+      />
+      <h1
+        className="MuiTypography-root MuiTypography-h4 MuiTypography-noWrap SceneDetail-title-5 css-1r3v6n7-MuiTypography-root"
+        onClick={[Function]}
+      >
+        Unnamed scene
+      </h1>
+      <div
+        className="SceneDetail-fill-51"
+      />
+      <div
+        className="SceneDetail-librarySearch-58"
+      >
+        <LibrarySearch
+          displaySources={[]}
+          filters={[]}
+          isCreatable={true}
+          onUpdateFilters={[Function]}
+          onlyUsed={true}
+          placeholder="Search ..."
+          tags={[]}
+        />
+      </div>
+      <button
+        aria-label="Play"
+        className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeLarge MuiFab-secondary Mui-disabled MuiFab-root MuiFab-circular MuiFab-sizeLarge MuiFab-secondary SceneDetail-playButton-47 css-hrxebx-MuiButtonBase-root-MuiFab-root"
+        disabled={true}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onContextMenu={[Function]}
+        onDragLeave={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        tabIndex={-1}
+        type="button"
+      >
+        <svg
+          aria-hidden={true}
+          className="MuiSvgIcon-root MuiSvgIcon-fontSizeLarge css-tzssek-MuiSvgIcon-root"
+          data-testid="PlayCircleOutlineIcon"
+          focusable="false"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="m10 16.5 6-4.5-6-4.5v9zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+          />
+        </svg>
+      </button>
+    </div>
+  </header>
+  <div
+    className="MuiDrawer-root MuiDrawer-docked SceneDetail-drawer-9 css-7ik032-MuiDrawer-docked"
+  >
+    <div
+      className="MuiPaper-root MuiPaper-elevation MuiPaper-elevation0 MuiDrawer-paper SceneDetail-drawerPaper-13 SceneDetail-drawerPaperClose-14 MuiDrawer-paperAnchorLeft MuiDrawer-paperAnchorDockedLeft css-12i7wg6-MuiPaper-root-MuiDrawer-paper"
+    >
+      <div
+        className="SceneDetail-appBarSpacerWrapper-3"
+      >
+        <div
+          className="MuiCollapse-root MuiCollapse-vertical MuiCollapse-entered css-pwcg7p-MuiCollapse-root"
+          style={
+            {
+              "minHeight": "0px",
+            }
+          }
+        >
+          <div
+            className="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+          >
+            <div
+              className="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+            >
+              <div
+                className="SceneDetail-appBarSpacer-4"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <li
+        className="MuiListItem-root MuiListItem-gutters MuiListItem-padding SceneDetail-drawerButton-11 css-5mcrhl-MuiListItem-root"
+        disabled={false}
+      >
+        <button
+          className="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeLarge css-mf1cb5-MuiButtonBase-root-MuiIconButton-root"
+          disabled={false}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onContextMenu={[Function]}
+          onDragLeave={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseDown={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onTouchEnd={[Function]}
+          onTouchMove={[Function]}
+          onTouchStart={[Function]}
+          tabIndex={0}
+          type="button"
+        >
+          <svg
+            aria-hidden={true}
+            className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium SceneDetail-drawerIcon-12 css-i4bv87-MuiSvgIcon-root"
+            data-testid="MenuIcon"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"
+            />
+          </svg>
+          <span
+            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </button>
+      </li>
+      <hr
+        className="MuiDivider-root MuiDivider-fullWidth css-9mgopn-MuiDivider-root"
+      />
+      <div>
+        <div
+          className="MuiTabs-root MuiTabs-vertical SceneDetail-tabs-15 css-1g4ac1o-MuiTabs-root"
+        >
+          <div
+            className="MuiTabs-scroller MuiTabs-fixed css-jpln7h-MuiTabs-scroller"
+            onScroll={[Function]}
+            style={
+              {
+                "marginRight": -0,
+                "overflow": "hidden",
+              }
+            }
+          >
+            <div
+              aria-label="scene detail tabs"
+              aria-orientation="vertical"
+              className="MuiTabs-flexContainer MuiTabs-flexContainerVertical css-lfwcke-MuiTabs-flexContainer"
+              onKeyDown={[Function]}
+              role="tablist"
+            >
+              <button
+                aria-controls="vertical-tabpanel-0"
+                aria-selected={false}
+                className="MuiButtonBase-root MuiTab-root MuiTab-textColorPrimary SceneDetail-tab-20 SceneDetail-optionsTab-22 SceneDetail-tabClose-21 css-1i8cmzc-MuiButtonBase-root-MuiTab-root"
+                disabled={false}
+                id="vertical-tab-0"
+                onBlur={[Function]}
+                onClick={[Function]}
+                onContextMenu={[Function]}
+                onDragLeave={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchMove={[Function]}
+                onTouchStart={[Function]}
+                role="tab"
+                tabIndex={-1}
+                type="button"
+              >
+                <svg
+                  aria-hidden={true}
+                  className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root"
+                  data-testid="BuildIcon"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="m22.7 19-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"
+                  />
+                </svg>
+                
+                <span
+                  className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+                />
+              </button>
+              <button
+                aria-controls="vertical-tabpanel-1"
+                aria-selected={false}
+                className="MuiButtonBase-root MuiTab-root MuiTab-textColorPrimary SceneDetail-tab-20 SceneDetail-effectsTab-23 SceneDetail-tabClose-21 css-1i8cmzc-MuiButtonBase-root-MuiTab-root"
+                disabled={false}
+                id="vertical-tab-1"
+                onBlur={[Function]}
+                onClick={[Function]}
+                onContextMenu={[Function]}
+                onDragLeave={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchMove={[Function]}
+                onTouchStart={[Function]}
+                role="tab"
+                tabIndex={-1}
+                type="button"
+              >
+                <svg
+                  aria-hidden={true}
+                  className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root"
+                  data-testid="PhotoFilterIcon"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M19.02 10v9H5V5h9V3H5.02c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-9h-2zM17 10l.94-2.06L20 7l-2.06-.94L17 4l-.94 2.06L14 7l2.06.94zm-3.75.75L12 8l-1.25 2.75L8 12l2.75 1.25L12 16l1.25-2.75L16 12z"
+                  />
+                </svg>
+                
+                <span
+                  className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+                />
+              </button>
+              <button
+                aria-controls="vertical-tabpanel-2"
+                aria-selected={false}
+                className="MuiButtonBase-root MuiTab-root MuiTab-textColorPrimary SceneDetail-tab-20 SceneDetail-audioTextTab-24 SceneDetail-tabClose-21 css-1i8cmzc-MuiButtonBase-root-MuiTab-root"
+                disabled={false}
+                id="vertical-tab-2"
+                onBlur={[Function]}
+                onClick={[Function]}
+                onContextMenu={[Function]}
+                onDragLeave={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchMove={[Function]}
+                onTouchStart={[Function]}
+                role="tab"
+                tabIndex={-1}
+                type="button"
+              >
+                <svg
+                  aria-hidden={true}
+                  className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root"
+                  data-testid="AudiotrackIcon"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"
+                  />
+                </svg>
+                
+                <span
+                  className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+                />
+              </button>
+              <button
+                aria-controls="vertical-tabpanel-3"
+                aria-selected={true}
+                className="MuiButtonBase-root MuiTab-root MuiTab-textColorPrimary Mui-selected SceneDetail-tab-20 SceneDetail-sourcesTab-25 SceneDetail-tabClose-21 css-1i8cmzc-MuiButtonBase-root-MuiTab-root"
+                disabled={false}
+                id="vertical-tab-3"
+                onBlur={[Function]}
+                onClick={[Function]}
+                onContextMenu={[Function]}
+                onDragLeave={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onKeyUp={[Function]}
+                onMouseDown={[Function]}
+                onMouseLeave={[Function]}
+                onMouseUp={[Function]}
+                onTouchEnd={[Function]}
+                onTouchMove={[Function]}
+                onTouchStart={[Function]}
+                role="tab"
+                tabIndex={0}
+                type="button"
+              >
+                <svg
+                  aria-hidden={true}
+                  className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root"
+                  data-testid="CollectionsIcon"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M22 16V4c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2zm-11-4 2.03 2.71L16 11l4 5H8l3-4zM2 6v14c0 1.1.9 2 2 2h14v-2H4V6H2z"
+                  />
+                </svg>
+                
+                <span
+                  className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+                />
+              </button>
+            </div>
+            <span
+              className="MuiTabs-indicator css-t3lg8-MuiTabs-indicator"
+              style={
+                {
+                  "height": 0,
+                  "top": 0,
+                }
+              }
+            />
+          </div>
+        </div>
+      </div>
+      <div
+        className="SceneDetail-fill-51"
+      />
+      <div>
+        <div
+          aria-label="Clone Scene"
+          aria-labelledby={null}
+          className="MuiButtonBase-root MuiListItem-root MuiListItem-gutters MuiListItem-padding MuiListItem-button css-fitbhc-MuiButtonBase-root-MuiListItem-root"
+          data-mui-internal-clone-element={true}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onContextMenu={[Function]}
+          onDragLeave={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseDown={[Function]}
+          onMouseLeave={[Function]}
+          onMouseOver={[Function]}
+          onMouseUp={[Function]}
+          onTouchEnd={[Function]}
+          onTouchMove={[Function]}
+          onTouchStart={[Function]}
+          role="button"
+          tabIndex={0}
+        >
+          <div
+            className="MuiListItemIcon-root css-cveggr-MuiListItemIcon-root"
+          >
+            <svg
+              aria-hidden={true}
+              className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root"
+              data-testid="FileCopyIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm-1 4 6 6v10c0 1.1-.9 2-2 2H7.99C6.89 23 6 22.1 6 21l.01-14c0-1.1.89-2 1.99-2h7zm-1 7h5.5L14 6.5V12z"
+              />
+            </svg>
+          </div>
+          <div
+            className="MuiListItemText-root css-tlelie-MuiListItemText-root"
+          >
+            <span
+              className="MuiTypography-root MuiTypography-body1 MuiListItemText-primary css-10hburv-MuiTypography-root"
+            >
+              Clone Scene
+            </span>
+          </div>
+          <span
+            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </div>
+        <div
+          aria-label="Scene Effects Import/Export"
+          aria-labelledby={null}
+          className="MuiButtonBase-root MuiListItem-root MuiListItem-gutters MuiListItem-padding MuiListItem-button css-fitbhc-MuiButtonBase-root-MuiListItem-root"
+          data-mui-internal-clone-element={true}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onContextMenu={[Function]}
+          onDragLeave={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseDown={[Function]}
+          onMouseLeave={[Function]}
+          onMouseOver={[Function]}
+          onMouseUp={[Function]}
+          onTouchEnd={[Function]}
+          onTouchMove={[Function]}
+          onTouchStart={[Function]}
+          role="button"
+          tabIndex={0}
+        >
+          <div
+            className="MuiListItemIcon-root css-cveggr-MuiListItemIcon-root"
+          >
+            <svg
+              aria-hidden={true}
+              className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root"
+              focusable="false"
+              viewBox="0 0 488.472 488.472"
+            >
+              <path
+                d="m331.351 96.061c-5.963-5.963-15.622-5.963-21.585 0l-305.294 305.294c-5.963 5.963-5.963 15.622 0 21.585l61.059 61.059c2.981 2.981 6.887 4.472 10.793 4.472s7.811-1.491 10.793-4.472l305.293-305.294c5.963-5.963 5.963-15.622 0-21.585 0 0-61.059-61.059-61.059-61.059zm-255.028 355.561-39.473-39.474 207.385-207.385 39.474 39.474c0-.001-207.386 207.385-207.386 207.385zm228.971-228.971-39.474-39.474 54.738-54.738 39.474 39.474z"
+              />
+              <path
+                d="m213.707 122.118c15.265-30.529 30.529-45.794 61.059-61.059-30.529-15.265-45.794-30.529-61.059-61.059-15.265 30.529-30.531 45.794-61.059 61.059 30.53 15.265 45.794 30.53 61.059 61.059z"
+              />
+              <path
+                d="m457.942 213.707c-7.632 15.265-15.267 22.897-30.529 30.529 15.265 7.632 22.897 15.265 30.529 30.529 7.632-15.265 15.265-22.897 30.529-30.529-15.264-7.632-22.896-15.265-30.529-30.529z"
+              />
+              <path
+                d="m457.942 45.795c-22.897-11.449-34.346-22.897-45.794-45.794-11.449 22.897-22.899 34.346-45.794 45.794 22.897 11.449 34.346 22.897 45.794 45.794 11.449-22.897 22.897-34.346 45.794-45.794z"
+              />
+            </svg>
+          </div>
+          <div
+            className="MuiListItemText-root css-tlelie-MuiListItemText-root"
+          >
+            <span
+              className="MuiTypography-root MuiTypography-body1 MuiListItemText-primary css-10hburv-MuiTypography-root"
+            >
+              Export Scene Effects
+            </span>
+          </div>
+          <span
+            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </div>
+        <div
+          aria-label="Export Scene"
+          aria-labelledby={null}
+          className="MuiButtonBase-root MuiListItem-root MuiListItem-gutters MuiListItem-padding MuiListItem-button css-fitbhc-MuiButtonBase-root-MuiListItem-root"
+          data-mui-internal-clone-element={true}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onContextMenu={[Function]}
+          onDragLeave={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseDown={[Function]}
+          onMouseLeave={[Function]}
+          onMouseOver={[Function]}
+          onMouseUp={[Function]}
+          onTouchEnd={[Function]}
+          onTouchMove={[Function]}
+          onTouchStart={[Function]}
+          role="button"
+          tabIndex={0}
+        >
+          <div
+            className="MuiListItemIcon-root css-cveggr-MuiListItemIcon-root"
+          >
+            <svg
+              aria-hidden={true}
+              className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root"
+              data-testid="PublishIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M5 4v2h14V4H5zm0 10h4v6h6v-6h4l-7-7-7 7z"
+              />
+            </svg>
+          </div>
+          <div
+            className="MuiListItemText-root css-tlelie-MuiListItemText-root"
+          >
+            <span
+              className="MuiTypography-root MuiTypography-body1 MuiListItemText-primary css-10hburv-MuiTypography-root"
+            >
+              Export Scene
+            </span>
+          </div>
+          <span
+            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </div>
+        <div
+          aria-label="Restore Defaults"
+          aria-labelledby={null}
+          className="MuiButtonBase-root MuiListItem-root MuiListItem-gutters MuiListItem-padding MuiListItem-button css-fitbhc-MuiButtonBase-root-MuiListItem-root"
+          data-mui-internal-clone-element={true}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onContextMenu={[Function]}
+          onDragLeave={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseDown={[Function]}
+          onMouseLeave={[Function]}
+          onMouseOver={[Function]}
+          onMouseUp={[Function]}
+          onTouchEnd={[Function]}
+          onTouchMove={[Function]}
+          onTouchStart={[Function]}
+          role="button"
+          tabIndex={0}
+        >
+          <div
+            className="MuiListItemIcon-root css-cveggr-MuiListItemIcon-root"
+          >
+            <svg
+              aria-hidden={true}
+              className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root"
+              data-testid="RestoreIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"
+              />
+            </svg>
+          </div>
+          <div
+            className="MuiListItemText-root css-tlelie-MuiListItemText-root"
+          >
+            <span
+              className="MuiTypography-root MuiTypography-body1 MuiListItemText-primary css-10hburv-MuiTypography-root"
+            >
+              Restore Defaults
+            </span>
+          </div>
+          <span
+            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </div>
+        <div
+          aria-label="Delete Scene"
+          aria-labelledby={null}
+          className="MuiButtonBase-root MuiListItem-root MuiListItem-gutters MuiListItem-padding MuiListItem-button SceneDetail-deleteItem-27 css-fitbhc-MuiButtonBase-root-MuiListItem-root"
+          data-mui-internal-clone-element={true}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onContextMenu={[Function]}
+          onDragLeave={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseDown={[Function]}
+          onMouseLeave={[Function]}
+          onMouseOver={[Function]}
+          onMouseUp={[Function]}
+          onTouchEnd={[Function]}
+          onTouchMove={[Function]}
+          onTouchStart={[Function]}
+          role="button"
+          tabIndex={0}
+        >
+          <div
+            className="MuiListItemIcon-root css-cveggr-MuiListItemIcon-root"
+          >
+            <svg
+              aria-hidden={true}
+              className="MuiSvgIcon-root MuiSvgIcon-colorError MuiSvgIcon-fontSizeMedium css-1145ie3-MuiSvgIcon-root"
+              data-testid="DeleteForeverIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12 1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z"
+              />
+            </svg>
+          </div>
+          <div
+            className="MuiListItemText-root css-tlelie-MuiListItemText-root"
+          >
+            <span
+              className="MuiTypography-root MuiTypography-body1 MuiListItemText-primary css-10hburv-MuiTypography-root"
+            >
+              Delete Scene
+            </span>
+          </div>
+          <span
+            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <main
+    className="SceneDetail-content-16"
+  >
+    <div
+      className="SceneDetail-appBarSpacer-4"
+    />
+    <div
+      className="MuiContainer-root SceneDetail-container-17 css-ur2jdm-MuiContainer-root"
+    >
+      <div
+        className="MuiTypography-root MuiTypography-body1 SceneDetail-sourcesSection-18 css-ahj2mt-MuiTypography-root"
+      >
+        <div
+          className="SceneDetail-tabPanel-19"
+        >
+          <div
+            className="SceneDetail-drawerSpacer-10"
+          />
+          <div
+            className="SceneDetail-fill-51 MuiBox-root css-0"
+          >
+            <SourceList
+              config={
+                Config {
+                  "caching": CacheSettings {
+                    "directory": "",
+                    "enabled": true,
+                    "maxSize": 500,
+                  },
+                  "clientID": "",
+                  "defaultScene": SceneSettings {
+                    "audios": [],
+                    "backForth": false,
+                    "backForthBPMMulti": 10,
+                    "backForthConstant": 1000,
+                    "backForthMax": 1200,
+                    "backForthMin": 200,
+                    "backForthSinRate": 100,
+                    "backForthTF": "tf.c",
+                    "backgroundBlur": 8,
+                    "backgroundColor": "#000000",
+                    "backgroundColorSet": [],
+                    "backgroundType": "bt.blur",
+                    "continueVideo": false,
+                    "crossFade": false,
+                    "crossFadeAudio": false,
+                    "fadeAmp": 20,
+                    "fadeBPMMulti": 10,
+                    "fadeDuration": 500,
+                    "fadeDurationMax": 700,
+                    "fadeDurationMin": 100,
+                    "fadeEase": "ea.linear",
+                    "fadeExp": 6,
+                    "fadeIOBPMMulti": 10,
+                    "fadeIODelay": 2000,
+                    "fadeIODelayBPMMulti": 10,
+                    "fadeIODelayMax": 5000,
+                    "fadeIODelayMin": 2000,
+                    "fadeIODelaySinRate": 100,
+                    "fadeIODelayTF": "tf.c",
+                    "fadeIODuration": 2000,
+                    "fadeIODurationMax": 5000,
+                    "fadeIODurationMin": 2000,
+                    "fadeIOEndAmp": 20,
+                    "fadeIOEndEase": "ea.linear",
+                    "fadeIOEndExp": 6,
+                    "fadeIOEndOv": 3,
+                    "fadeIOEndPer": 6,
+                    "fadeIOPulse": false,
+                    "fadeIOSinRate": 100,
+                    "fadeIOStartAmp": 20,
+                    "fadeIOStartEase": "ea.linear",
+                    "fadeIOStartExp": 6,
+                    "fadeIOStartOv": 3,
+                    "fadeIOStartPer": 6,
+                    "fadeIOTF": "tf.c",
+                    "fadeInOut": false,
+                    "fadeOv": 3,
+                    "fadePer": 6,
+                    "fadeSinRate": 100,
+                    "fadeTF": "tf.c",
+                    "forceAll": false,
+                    "forceAllSource": false,
+                    "fullSource": false,
+                    "generatorMax": 100,
+                    "gifOption": "go.none",
+                    "gifTimingConstant": 3000,
+                    "gifTimingMax": 3000,
+                    "gifTimingMin": 1000,
+                    "grid": [
+                      [],
+                    ],
+                    "gridView": false,
+                    "horizTransLevel": 10,
+                    "horizTransLevelMax": 10,
+                    "horizTransLevelMin": 5,
+                    "horizTransRandom": false,
+                    "horizTransType": "htf.none",
+                    "imageOrientation": "ot.original",
+                    "imageType": "it.fitBestNoClip",
+                    "imageTypeFilter": "if.any",
+                    "nextSceneAllImages": false,
+                    "nextSceneID": 0,
+                    "nextSceneRandoms": [],
+                    "nextSceneTime": 900000,
+                    "orderFunction": "of.random",
+                    "overlaySceneID": 0,
+                    "overlaySceneOpacity": 0.5,
+                    "overlays": [],
+                    "panBPMMulti": 10,
+                    "panDuration": 2000,
+                    "panDurationMax": 5000,
+                    "panDurationMin": 2000,
+                    "panEndAmp": 20,
+                    "panEndEase": "ea.linear",
+                    "panEndExp": 6,
+                    "panEndOv": 3,
+                    "panEndPer": 6,
+                    "panHorizTransImg": false,
+                    "panHorizTransLevel": 10,
+                    "panHorizTransLevelMax": 10,
+                    "panHorizTransLevelMin": 5,
+                    "panHorizTransRandom": false,
+                    "panHorizTransType": "htf.none",
+                    "panSinRate": 100,
+                    "panStartAmp": 20,
+                    "panStartEase": "ea.linear",
+                    "panStartExp": 6,
+                    "panStartOv": 3,
+                    "panStartPer": 6,
+                    "panTF": "tf.c",
+                    "panVertTransImg": false,
+                    "panVertTransLevel": 10,
+                    "panVertTransLevelMax": 10,
+                    "panVertTransLevelMin": 5,
+                    "panVertTransRandom": false,
+                    "panVertTransType": "vtf.none",
+                    "panning": false,
+                    "persistAudio": false,
+                    "persistText": false,
+                    "playVideoClips": true,
+                    "randomVideoStart": false,
+                    "regenerate": true,
+                    "rotatePortrait": false,
+                    "skipVideoEnd": 0,
+                    "skipVideoStart": 0,
+                    "slide": false,
+                    "slideAmp": 20,
+                    "slideBPMMulti": 10,
+                    "slideDistance": 100,
+                    "slideDuration": 500,
+                    "slideDurationMax": 700,
+                    "slideDurationMin": 100,
+                    "slideEase": "ea.linear",
+                    "slideExp": 6,
+                    "slideOv": 3,
+                    "slidePer": 6,
+                    "slideSinRate": 100,
+                    "slideTF": "tf.c",
+                    "slideType": "stf.left",
+                    "sourceOrderFunction": "sof.random",
+                    "sources": [],
+                    "strobe": false,
+                    "strobeAmp": 20,
+                    "strobeBPMMulti": 10,
+                    "strobeColor": "#FFFFFF",
+                    "strobeColorSet": [],
+                    "strobeColorType": "bt.color",
+                    "strobeDelay": 200,
+                    "strobeDelayBPMMulti": 10,
+                    "strobeDelayMax": 300,
+                    "strobeDelayMin": 100,
+                    "strobeDelaySinRate": 100,
+                    "strobeDelayTF": "tf.c",
+                    "strobeEase": "ea.linear",
+                    "strobeExp": 6,
+                    "strobeLayer": "sl.top",
+                    "strobeOpacity": 1,
+                    "strobeOv": 3,
+                    "strobePer": 6,
+                    "strobePulse": false,
+                    "strobeSinRate": 100,
+                    "strobeTF": "tf.c",
+                    "strobeTime": 200,
+                    "strobeTimeMax": 300,
+                    "strobeTimeMin": 100,
+                    "timingBPMMulti": 10,
+                    "timingConstant": 1000,
+                    "timingFunction": "tf.c",
+                    "timingMax": 1200,
+                    "timingMin": 200,
+                    "timingSinRate": 100,
+                    "transAmp": 20,
+                    "transBPMMulti": 10,
+                    "transDuration": 5000,
+                    "transDurationMax": 7000,
+                    "transDurationMin": 1000,
+                    "transEase": "ea.linear",
+                    "transExp": 6,
+                    "transOv": 3,
+                    "transPer": 6,
+                    "transSinRate": 100,
+                    "transTF": "tf.c",
+                    "vertTransLevel": 10,
+                    "vertTransLevelMax": 10,
+                    "vertTransLevelMin": 5,
+                    "vertTransRandom": false,
+                    "vertTransType": "vtf.none",
+                    "videoOption": "vo.none",
+                    "videoOrientation": "ot.original",
+                    "videoRandomSpeed": false,
+                    "videoSkip": 10,
+                    "videoSpeed": 10,
+                    "videoSpeedMax": 20,
+                    "videoSpeedMin": 5,
+                    "videoTimingConstant": 3000,
+                    "videoTimingMax": 3000,
+                    "videoTimingMin": 1000,
+                    "videoVolume": 0,
+                    "weightFunction": "wf.s",
+                    "zoom": false,
+                    "zoomEnd": 2,
+                    "zoomEndMax": 2,
+                    "zoomEndMin": 1.5,
+                    "zoomRandom": false,
+                    "zoomStart": 1,
+                    "zoomStartMax": 1,
+                    "zoomStartMin": 0.5,
+                  },
+                  "displaySettings": DisplaySettings {
+                    "alwaysOnTop": false,
+                    "audioAlert": true,
+                    "clickToProgress": true,
+                    "clickToProgressWhilePlaying": false,
+                    "cloneGridVideoElements": false,
+                    "easingControls": false,
+                    "fullScreen": false,
+                    "ignoredTags": [],
+                    "maxInHistory": 120,
+                    "maxInMemory": 40,
+                    "maxLoadingAtOnce": 5,
+                    "minImageSize": 200,
+                    "minVideoSize": 200,
+                    "showMenu": true,
+                    "startImmediately": false,
+                  },
+                  "generalSettings": GeneralSettings {
+                    "autoBackup": false,
+                    "autoBackupDays": 1,
+                    "autoCleanBackup": false,
+                    "autoCleanBackupDays": 14,
+                    "autoCleanBackupMonths": 6,
+                    "autoCleanBackupWeeks": 8,
+                    "cleanRetain": 1,
+                    "confirmBlacklist": true,
+                    "confirmFileDeletion": true,
+                    "confirmSceneDeletion": true,
+                    "disableLocalSave": false,
+                    "portableMode": false,
+                    "prioritizePerformance": true,
+                    "watermark": false,
+                    "watermarkColor": "#FFFFFF",
+                    "watermarkCorner": "wc.bottomRight",
+                    "watermarkFontFamily": "Arial Black,Arial Bold,Gadget,sans-serif",
+                    "watermarkFontSize": 14,
+                    "watermarkGrid": false,
+                    "watermarkText": "",
+                  },
+                  "newWindowAlerted": false,
+                  "remoteSettings": RemoteSettings {
+                    "hydrusAPIKey": "",
+                    "hydrusDomain": "localhost",
+                    "hydrusPort": "45869",
+                    "hydrusProtocol": "http",
+                    "instagramPassword": "",
+                    "instagramUsername": "",
+                    "piwigoHost": "",
+                    "piwigoPassword": "",
+                    "piwigoProtocol": "http",
+                    "piwigoUsername": "",
+                    "redditClientID": "2Iqe-1CsO4VQlA",
+                    "redditDeviceID": "",
+                    "redditRefreshToken": "",
+                    "redditUserAgent": "desktop:flipflip:v2.0.0 (by /u/ififfy)",
+                    "silenceTumblrAlert": false,
+                    "tumblrKey": "",
+                    "tumblrKeys": [
+                      "BaQquvlxQeRhKRyViknF98vseIdcBEyDrzJBpHxvAiMPHCKR2l",
+                      "G4iZd6FBiyDxHVUpNqtOTDu4woWzfp8WuH3tTrT3MC16GTmNzq",
+                      "y5uUQJYTCp15Nj3P80cLmNFqwSr1mxIhm3C4PCsGAfReydkF9m",
+                      "IZiOt6PYazf4g0sYWVfpfebMITRFWmtlKq2UKe6l0RsqKHPgui",
+                      "ATtwOUlruyVl8bEiHTnYcRpByEAzov2LtLEWOfDLqhPRZFmT4X",
+                    ],
+                    "tumblrOAuthToken": "",
+                    "tumblrOAuthTokenSecret": "",
+                    "tumblrSecret": "",
+                    "tumblrSecrets": [
+                      "XWVCo7t0GMGkOAd9wsxMMkKPhQbl3RqauGzQtnzAnmHCJ7WdSn",
+                      "RmoWUh844NqVdw7btWI6EYldJ91KhwJyfCKPtAIcuVokFtRYgS",
+                      "xiEV5sJISJAwegJHTTLWtxnmFUkowxgMk2gOq4mc20VNLM2TpJ",
+                      "Iw3yKgjfMvrKPNCcqdUyRuxCkYWYyRlrMdFUojRHVkSSADOKCT",
+                      "cMM7xqJV1roUudEdBiZeOqv3n1H0pzNnGY1iAbp3oo3c29MXGq",
+                    ],
+                    "twitterAccessTokenKey": "",
+                    "twitterAccessTokenSecret": "",
+                    "twitterConsumerKey": "qSRfdIWfpkesYDVJHrRh05wji",
+                    "twitterConsumerSecret": "ad11IC4CLwVzYyGyYwHKVMP9WwAcKxymw4D9162S5Ex75l5eWw",
+                  },
+                  "tutorials": Tutorials {
+                    "audios": null,
+                    "library": null,
+                    "player": null,
+                    "sceneDetail": null,
+                    "sceneGenerator": null,
+                    "sceneGrid": null,
+                    "scenePicker": null,
+                    "scriptor": null,
+                    "scripts": null,
+                    "videoClipper": null,
+                  },
+                }
+              }
+              library={[]}
+              onClearBlacklist={[Function]}
+              onClip={[Function]}
+              onDownload={[Function]}
+              onEditBlacklist={[Function]}
+              onPlay={[Function]}
+              onUpdateScene={[Function]}
+              sources={[]}
+              systemMessage={[Function]}
+              tutorial={null}
+              useWeights={false}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div
+    aria-hidden={true}
+    className="MuiBackdrop-root SceneDetail-backdrop-52 css-sox5kk-MuiBackdrop-root"
+    onClick={[Function]}
+    style={
+      {
+        "opacity": 0,
+        "visibility": "hidden",
+      }
+    }
+  />
+  <button
+    aria-label="From Library"
+    aria-labelledby={null}
+    className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default SceneDetail-addButton-36 SceneDetail-libraryImportButton-40 SceneDetail-addButtonClose-44 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+    data-mui-internal-clone-element={true}
+    disabled={false}
+    onBlur={[Function]}
+    onClick={[Function]}
+    onContextMenu={[Function]}
+    onDragLeave={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    onMouseLeave={[Function]}
+    onMouseOver={[Function]}
+    onMouseUp={[Function]}
+    onTouchEnd={[Function]}
+    onTouchMove={[Function]}
+    onTouchStart={[Function]}
+    tabIndex={0}
+    type="button"
+  >
+    <svg
+      aria-hidden={true}
+      className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium SceneDetail-icon-46 css-i4bv87-MuiSvgIcon-root"
+      data-testid="LocalLibraryIcon"
+      focusable="false"
+      viewBox="0 0 24 24"
+    >
+      <path
+        d="M12 11.55C9.64 9.35 6.48 8 3 8v11c3.48 0 6.64 1.35 9 3.55 2.36-2.19 5.52-3.55 9-3.55V8c-3.48 0-6.64 1.35-9 3.55zM12 8c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3z"
+      />
+    </svg>
+    <span
+      className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+    />
+  </button>
+  <button
+    aria-label="Local Video/Playlist"
+    aria-labelledby={null}
+    className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default SceneDetail-addButton-36 SceneDetail-addVideoButton-39 SceneDetail-addButtonClose-44 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+    data-mui-internal-clone-element={true}
+    disabled={false}
+    onBlur={[Function]}
+    onClick={[Function]}
+    onContextMenu={[Function]}
+    onDragLeave={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    onMouseLeave={[Function]}
+    onMouseOver={[Function]}
+    onMouseUp={[Function]}
+    onTouchEnd={[Function]}
+    onTouchMove={[Function]}
+    onTouchStart={[Function]}
+    tabIndex={0}
+    type="button"
+  >
+    <svg
+      aria-hidden={true}
+      className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium SceneDetail-icon-46 css-i4bv87-MuiSvgIcon-root"
+      data-testid="MovieIcon"
+      focusable="false"
+      viewBox="0 0 24 24"
+    >
+      <path
+        d="m18 4 2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"
+      />
+    </svg>
+    <span
+      className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+    />
+  </button>
+  <button
+    aria-label="Local Directory"
+    aria-labelledby={null}
+    className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default SceneDetail-addButton-36 SceneDetail-addDirectoryButton-38 SceneDetail-addButtonClose-44 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+    data-mui-internal-clone-element={true}
+    disabled={false}
+    onBlur={[Function]}
+    onClick={[Function]}
+    onContextMenu={[Function]}
+    onDragLeave={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    onMouseLeave={[Function]}
+    onMouseOver={[Function]}
+    onMouseUp={[Function]}
+    onTouchEnd={[Function]}
+    onTouchMove={[Function]}
+    onTouchStart={[Function]}
+    tabIndex={0}
+    type="button"
+  >
+    <svg
+      aria-hidden={true}
+      className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium SceneDetail-icon-46 css-i4bv87-MuiSvgIcon-root"
+      data-testid="FolderIcon"
+      focusable="false"
+      viewBox="0 0 24 24"
+    >
+      <path
+        d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"
+      />
+    </svg>
+    <span
+      className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+    />
+  </button>
+  <button
+    aria-label="URL"
+    aria-labelledby={null}
+    className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default SceneDetail-addButton-36 SceneDetail-addURLButton-37 SceneDetail-addButtonClose-44 SceneDetail-addButtonClose-44 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+    data-mui-internal-clone-element={true}
+    disabled={false}
+    onBlur={[Function]}
+    onClick={[Function]}
+    onContextMenu={[Function]}
+    onDragLeave={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    onMouseLeave={[Function]}
+    onMouseOver={[Function]}
+    onMouseUp={[Function]}
+    onTouchEnd={[Function]}
+    onTouchMove={[Function]}
+    onTouchStart={[Function]}
+    tabIndex={0}
+    type="button"
+  >
+    <svg
+      aria-hidden={true}
+      className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium SceneDetail-icon-46 css-i4bv87-MuiSvgIcon-root"
+      data-testid="HttpIcon"
+      focusable="false"
+      viewBox="0 0 24 24"
+    >
+      <path
+        d="M4.5 11h-2V9H1v6h1.5v-2.5h2V15H6V9H4.5v2zm2.5-.5h1.5V15H10v-4.5h1.5V9H7v1.5zm5.5 0H14V15h1.5v-4.5H17V9h-4.5v1.5zm9-1.5H18v6h1.5v-2h2c.8 0 1.5-.7 1.5-1.5v-1c0-.8-.7-1.5-1.5-1.5zm0 2.5h-2v-1h2v1z"
+      />
+    </svg>
+    <span
+      className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+    />
+  </button>
+  <button
+    className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeLarge MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeLarge MuiFab-default SceneDetail-addMenuButton-33 css-mm42gz-MuiButtonBase-root-MuiFab-root"
+    disabled={false}
+    onBlur={[Function]}
+    onClick={[Function]}
+    onContextMenu={[Function]}
+    onDragLeave={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    onMouseLeave={[Function]}
+    onMouseUp={[Function]}
+    onTouchEnd={[Function]}
+    onTouchMove={[Function]}
+    onTouchStart={[Function]}
+    tabIndex={0}
+    type="button"
+  >
+    <svg
+      aria-hidden={true}
+      className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium SceneDetail-icon-46 css-i4bv87-MuiSvgIcon-root"
+      data-testid="AddIcon"
+      focusable="false"
+      viewBox="0 0 24 24"
+    >
+      <path
+        d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+      />
+    </svg>
+    <span
+      className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+    />
+  </button>
+  <URLDialog
+    onClose={[Function]}
+    onImportURL={[Function]}
+    open={false}
+  />
+  <PiwigoDialog
+    config={
+      Config {
+        "caching": CacheSettings {
+          "directory": "",
+          "enabled": true,
+          "maxSize": 500,
+        },
+        "clientID": "",
+        "defaultScene": SceneSettings {
+          "audios": [],
+          "backForth": false,
+          "backForthBPMMulti": 10,
+          "backForthConstant": 1000,
+          "backForthMax": 1200,
+          "backForthMin": 200,
+          "backForthSinRate": 100,
+          "backForthTF": "tf.c",
+          "backgroundBlur": 8,
+          "backgroundColor": "#000000",
+          "backgroundColorSet": [],
+          "backgroundType": "bt.blur",
+          "continueVideo": false,
+          "crossFade": false,
+          "crossFadeAudio": false,
+          "fadeAmp": 20,
+          "fadeBPMMulti": 10,
+          "fadeDuration": 500,
+          "fadeDurationMax": 700,
+          "fadeDurationMin": 100,
+          "fadeEase": "ea.linear",
+          "fadeExp": 6,
+          "fadeIOBPMMulti": 10,
+          "fadeIODelay": 2000,
+          "fadeIODelayBPMMulti": 10,
+          "fadeIODelayMax": 5000,
+          "fadeIODelayMin": 2000,
+          "fadeIODelaySinRate": 100,
+          "fadeIODelayTF": "tf.c",
+          "fadeIODuration": 2000,
+          "fadeIODurationMax": 5000,
+          "fadeIODurationMin": 2000,
+          "fadeIOEndAmp": 20,
+          "fadeIOEndEase": "ea.linear",
+          "fadeIOEndExp": 6,
+          "fadeIOEndOv": 3,
+          "fadeIOEndPer": 6,
+          "fadeIOPulse": false,
+          "fadeIOSinRate": 100,
+          "fadeIOStartAmp": 20,
+          "fadeIOStartEase": "ea.linear",
+          "fadeIOStartExp": 6,
+          "fadeIOStartOv": 3,
+          "fadeIOStartPer": 6,
+          "fadeIOTF": "tf.c",
+          "fadeInOut": false,
+          "fadeOv": 3,
+          "fadePer": 6,
+          "fadeSinRate": 100,
+          "fadeTF": "tf.c",
+          "forceAll": false,
+          "forceAllSource": false,
+          "fullSource": false,
+          "generatorMax": 100,
+          "gifOption": "go.none",
+          "gifTimingConstant": 3000,
+          "gifTimingMax": 3000,
+          "gifTimingMin": 1000,
+          "grid": [
+            [],
+          ],
+          "gridView": false,
+          "horizTransLevel": 10,
+          "horizTransLevelMax": 10,
+          "horizTransLevelMin": 5,
+          "horizTransRandom": false,
+          "horizTransType": "htf.none",
+          "imageOrientation": "ot.original",
+          "imageType": "it.fitBestNoClip",
+          "imageTypeFilter": "if.any",
+          "nextSceneAllImages": false,
+          "nextSceneID": 0,
+          "nextSceneRandoms": [],
+          "nextSceneTime": 900000,
+          "orderFunction": "of.random",
+          "overlaySceneID": 0,
+          "overlaySceneOpacity": 0.5,
+          "overlays": [],
+          "panBPMMulti": 10,
+          "panDuration": 2000,
+          "panDurationMax": 5000,
+          "panDurationMin": 2000,
+          "panEndAmp": 20,
+          "panEndEase": "ea.linear",
+          "panEndExp": 6,
+          "panEndOv": 3,
+          "panEndPer": 6,
+          "panHorizTransImg": false,
+          "panHorizTransLevel": 10,
+          "panHorizTransLevelMax": 10,
+          "panHorizTransLevelMin": 5,
+          "panHorizTransRandom": false,
+          "panHorizTransType": "htf.none",
+          "panSinRate": 100,
+          "panStartAmp": 20,
+          "panStartEase": "ea.linear",
+          "panStartExp": 6,
+          "panStartOv": 3,
+          "panStartPer": 6,
+          "panTF": "tf.c",
+          "panVertTransImg": false,
+          "panVertTransLevel": 10,
+          "panVertTransLevelMax": 10,
+          "panVertTransLevelMin": 5,
+          "panVertTransRandom": false,
+          "panVertTransType": "vtf.none",
+          "panning": false,
+          "persistAudio": false,
+          "persistText": false,
+          "playVideoClips": true,
+          "randomVideoStart": false,
+          "regenerate": true,
+          "rotatePortrait": false,
+          "skipVideoEnd": 0,
+          "skipVideoStart": 0,
+          "slide": false,
+          "slideAmp": 20,
+          "slideBPMMulti": 10,
+          "slideDistance": 100,
+          "slideDuration": 500,
+          "slideDurationMax": 700,
+          "slideDurationMin": 100,
+          "slideEase": "ea.linear",
+          "slideExp": 6,
+          "slideOv": 3,
+          "slidePer": 6,
+          "slideSinRate": 100,
+          "slideTF": "tf.c",
+          "slideType": "stf.left",
+          "sourceOrderFunction": "sof.random",
+          "sources": [],
+          "strobe": false,
+          "strobeAmp": 20,
+          "strobeBPMMulti": 10,
+          "strobeColor": "#FFFFFF",
+          "strobeColorSet": [],
+          "strobeColorType": "bt.color",
+          "strobeDelay": 200,
+          "strobeDelayBPMMulti": 10,
+          "strobeDelayMax": 300,
+          "strobeDelayMin": 100,
+          "strobeDelaySinRate": 100,
+          "strobeDelayTF": "tf.c",
+          "strobeEase": "ea.linear",
+          "strobeExp": 6,
+          "strobeLayer": "sl.top",
+          "strobeOpacity": 1,
+          "strobeOv": 3,
+          "strobePer": 6,
+          "strobePulse": false,
+          "strobeSinRate": 100,
+          "strobeTF": "tf.c",
+          "strobeTime": 200,
+          "strobeTimeMax": 300,
+          "strobeTimeMin": 100,
+          "timingBPMMulti": 10,
+          "timingConstant": 1000,
+          "timingFunction": "tf.c",
+          "timingMax": 1200,
+          "timingMin": 200,
+          "timingSinRate": 100,
+          "transAmp": 20,
+          "transBPMMulti": 10,
+          "transDuration": 5000,
+          "transDurationMax": 7000,
+          "transDurationMin": 1000,
+          "transEase": "ea.linear",
+          "transExp": 6,
+          "transOv": 3,
+          "transPer": 6,
+          "transSinRate": 100,
+          "transTF": "tf.c",
+          "vertTransLevel": 10,
+          "vertTransLevelMax": 10,
+          "vertTransLevelMin": 5,
+          "vertTransRandom": false,
+          "vertTransType": "vtf.none",
+          "videoOption": "vo.none",
+          "videoOrientation": "ot.original",
+          "videoRandomSpeed": false,
+          "videoSkip": 10,
+          "videoSpeed": 10,
+          "videoSpeedMax": 20,
+          "videoSpeedMin": 5,
+          "videoTimingConstant": 3000,
+          "videoTimingMax": 3000,
+          "videoTimingMin": 1000,
+          "videoVolume": 0,
+          "weightFunction": "wf.s",
+          "zoom": false,
+          "zoomEnd": 2,
+          "zoomEndMax": 2,
+          "zoomEndMin": 1.5,
+          "zoomRandom": false,
+          "zoomStart": 1,
+          "zoomStartMax": 1,
+          "zoomStartMin": 0.5,
+        },
+        "displaySettings": DisplaySettings {
+          "alwaysOnTop": false,
+          "audioAlert": true,
+          "clickToProgress": true,
+          "clickToProgressWhilePlaying": false,
+          "cloneGridVideoElements": false,
+          "easingControls": false,
+          "fullScreen": false,
+          "ignoredTags": [],
+          "maxInHistory": 120,
+          "maxInMemory": 40,
+          "maxLoadingAtOnce": 5,
+          "minImageSize": 200,
+          "minVideoSize": 200,
+          "showMenu": true,
+          "startImmediately": false,
+        },
+        "generalSettings": GeneralSettings {
+          "autoBackup": false,
+          "autoBackupDays": 1,
+          "autoCleanBackup": false,
+          "autoCleanBackupDays": 14,
+          "autoCleanBackupMonths": 6,
+          "autoCleanBackupWeeks": 8,
+          "cleanRetain": 1,
+          "confirmBlacklist": true,
+          "confirmFileDeletion": true,
+          "confirmSceneDeletion": true,
+          "disableLocalSave": false,
+          "portableMode": false,
+          "prioritizePerformance": true,
+          "watermark": false,
+          "watermarkColor": "#FFFFFF",
+          "watermarkCorner": "wc.bottomRight",
+          "watermarkFontFamily": "Arial Black,Arial Bold,Gadget,sans-serif",
+          "watermarkFontSize": 14,
+          "watermarkGrid": false,
+          "watermarkText": "",
+        },
+        "newWindowAlerted": false,
+        "remoteSettings": RemoteSettings {
+          "hydrusAPIKey": "",
+          "hydrusDomain": "localhost",
+          "hydrusPort": "45869",
+          "hydrusProtocol": "http",
+          "instagramPassword": "",
+          "instagramUsername": "",
+          "piwigoHost": "",
+          "piwigoPassword": "",
+          "piwigoProtocol": "http",
+          "piwigoUsername": "",
+          "redditClientID": "2Iqe-1CsO4VQlA",
+          "redditDeviceID": "",
+          "redditRefreshToken": "",
+          "redditUserAgent": "desktop:flipflip:v2.0.0 (by /u/ififfy)",
+          "silenceTumblrAlert": false,
+          "tumblrKey": "",
+          "tumblrKeys": [
+            "BaQquvlxQeRhKRyViknF98vseIdcBEyDrzJBpHxvAiMPHCKR2l",
+            "G4iZd6FBiyDxHVUpNqtOTDu4woWzfp8WuH3tTrT3MC16GTmNzq",
+            "y5uUQJYTCp15Nj3P80cLmNFqwSr1mxIhm3C4PCsGAfReydkF9m",
+            "IZiOt6PYazf4g0sYWVfpfebMITRFWmtlKq2UKe6l0RsqKHPgui",
+            "ATtwOUlruyVl8bEiHTnYcRpByEAzov2LtLEWOfDLqhPRZFmT4X",
+          ],
+          "tumblrOAuthToken": "",
+          "tumblrOAuthTokenSecret": "",
+          "tumblrSecret": "",
+          "tumblrSecrets": [
+            "XWVCo7t0GMGkOAd9wsxMMkKPhQbl3RqauGzQtnzAnmHCJ7WdSn",
+            "RmoWUh844NqVdw7btWI6EYldJ91KhwJyfCKPtAIcuVokFtRYgS",
+            "xiEV5sJISJAwegJHTTLWtxnmFUkowxgMk2gOq4mc20VNLM2TpJ",
+            "Iw3yKgjfMvrKPNCcqdUyRuxCkYWYyRlrMdFUojRHVkSSADOKCT",
+            "cMM7xqJV1roUudEdBiZeOqv3n1H0pzNnGY1iAbp3oo3c29MXGq",
+          ],
+          "twitterAccessTokenKey": "",
+          "twitterAccessTokenSecret": "",
+          "twitterConsumerKey": "qSRfdIWfpkesYDVJHrRh05wji",
+          "twitterConsumerSecret": "ad11IC4CLwVzYyGyYwHKVMP9WwAcKxymw4D9162S5Ex75l5eWw",
+        },
+        "tutorials": Tutorials {
+          "audios": null,
+          "library": null,
+          "player": null,
+          "sceneDetail": null,
+          "sceneGenerator": null,
+          "sceneGrid": null,
+          "scenePicker": null,
+          "scriptor": null,
+          "scripts": null,
+          "videoClipper": null,
+        },
+      }
+    }
+    onClose={[Function]}
+    onImportURL={[Function]}
+    open={false}
+  />
+</div>
+`;

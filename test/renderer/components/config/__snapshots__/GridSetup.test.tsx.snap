@@ -1,0 +1,293 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GridSetup should match snapshot 1`] = `
+<div
+  className="GridSetup-root-1"
+>
+  <header
+    className="MuiPaper-root MuiPaper-elevation MuiPaper-elevation4 MuiAppBar-root MuiAppBar-colorPrimary MuiAppBar-positionAbsolute GridSetup-appBar-2 css-iu2t21-MuiPaper-root-MuiAppBar-root"
+  >
+    <div
+      className="MuiToolbar-root MuiToolbar-gutters MuiToolbar-regular GridSetup-headerBar-5 css-hyum1k-MuiToolbar-root"
+    >
+      <div
+        className="GridSetup-headerLeft-6"
+      >
+        <button
+          aria-label="Back"
+          aria-labelledby={null}
+          className="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-edgeStart MuiIconButton-sizeLarge css-184mzhy-MuiButtonBase-root-MuiIconButton-root"
+          data-mui-internal-clone-element={true}
+          disabled={false}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onContextMenu={[Function]}
+          onDragLeave={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseDown={[Function]}
+          onMouseLeave={[Function]}
+          onMouseOver={[Function]}
+          onMouseUp={[Function]}
+          onTouchEnd={[Function]}
+          onTouchMove={[Function]}
+          onTouchStart={[Function]}
+          tabIndex={0}
+          type="button"
+        >
+          <svg
+            aria-hidden={true}
+            className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root"
+            data-testid="ArrowBackIcon"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+            />
+          </svg>
+          <span
+            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </button>
+      </div>
+      <h1
+        className="MuiTypography-root MuiTypography-h4 MuiTypography-noWrap GridSetup-title-4 css-x00mp-MuiTypography-root"
+        onClick={[Function]}
+      >
+        test
+      </h1>
+      <div
+        className="GridSetup-headerRight-7"
+      >
+        <div
+          className="MuiFormControl-root MuiFormControl-marginDense MuiTextField-root css-4mzek5-MuiFormControl-root-MuiTextField-root"
+        >
+          <label
+            className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-filled MuiFormLabel-colorPrimary MuiFormLabel-filled MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-filled GridSetup-dimensionInput-13 css-104bnou-MuiFormLabel-root-MuiInputLabel-root"
+            data-shrink={true}
+            htmlFor="mui-2"
+            id="mui-2-label"
+          >
+            Height
+          </label>
+          <div
+            className="MuiInputBase-root MuiFilledInput-root MuiFilledInput-underline MuiInputBase-colorPrimary MuiInputBase-formControl css-dtbfm4-MuiInputBase-root-MuiFilledInput-root"
+            onClick={[Function]}
+          >
+            <input
+              aria-invalid={false}
+              autoFocus={false}
+              className="MuiInputBase-input MuiFilledInput-input GridSetup-dimensionInput-13 css-10botns-MuiInputBase-input-MuiFilledInput-input"
+              disabled={false}
+              id="mui-2"
+              max={5}
+              min={1}
+              onAnimationStart={[Function]}
+              onBlur={[Function]}
+              onChange={[Function]}
+              onFocus={[Function]}
+              required={false}
+              type="number"
+              value={1}
+            />
+          </div>
+        </div>
+        <div
+          className="MuiFormControl-root MuiFormControl-marginDense MuiTextField-root css-4mzek5-MuiFormControl-root-MuiTextField-root"
+        >
+          <label
+            className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-filled MuiFormLabel-colorPrimary MuiFormLabel-filled MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-filled GridSetup-dimensionInput-13 css-104bnou-MuiFormLabel-root-MuiInputLabel-root"
+            data-shrink={true}
+            htmlFor="mui-3"
+            id="mui-3-label"
+          >
+            Width
+          </label>
+          <div
+            className="MuiInputBase-root MuiFilledInput-root MuiFilledInput-underline MuiInputBase-colorPrimary MuiInputBase-formControl css-dtbfm4-MuiInputBase-root-MuiFilledInput-root"
+            onClick={[Function]}
+          >
+            <input
+              aria-invalid={false}
+              autoFocus={false}
+              className="MuiInputBase-input MuiFilledInput-input GridSetup-dimensionInput-13 css-10botns-MuiInputBase-input-MuiFilledInput-input"
+              disabled={false}
+              id="mui-3"
+              max={5}
+              min={1}
+              onAnimationStart={[Function]}
+              onBlur={[Function]}
+              onChange={[Function]}
+              onFocus={[Function]}
+              required={false}
+              type="number"
+              value={1}
+            />
+          </div>
+        </div>
+        <button
+          aria-label="Play"
+          className="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-edgeEnd MuiIconButton-sizeLarge css-1f5y6oa-MuiButtonBase-root-MuiIconButton-root"
+          disabled={false}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onContextMenu={[Function]}
+          onDragLeave={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseDown={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onTouchEnd={[Function]}
+          onTouchMove={[Function]}
+          onTouchStart={[Function]}
+          tabIndex={0}
+          type="button"
+        >
+          <svg
+            aria-hidden={true}
+            className="MuiSvgIcon-root MuiSvgIcon-fontSizeLarge css-tzssek-MuiSvgIcon-root"
+            data-testid="PlayCircleOutlineIcon"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="m10 16.5 6-4.5-6-4.5v9zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+            />
+          </svg>
+          <span
+            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </button>
+      </div>
+    </div>
+  </header>
+  <main
+    className="GridSetup-content-11"
+  >
+    <div
+      className="GridSetup-appBarSpacer-3"
+    />
+    <div
+      className="MuiContainer-root GridSetup-container-12 css-ur2jdm-MuiContainer-root"
+    >
+      <div
+        className="GridSetup-grid-14"
+        style={
+          {
+            "gridTemplateColumns": "100% ",
+            "gridTemplateRows": "100% ",
+          }
+        }
+      >
+        <button
+          className="MuiButtonBase-root MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium MuiButton-root MuiButton-outlined MuiButton-outlinedPrimary MuiButton-sizeMedium MuiButton-outlinedSizeMedium GridSetup-gridCell-15 react-draggable css-1g0jmg2-MuiButtonBase-root-MuiButton-root"
+          disabled={false}
+          id="0-0"
+          onBlur={[Function]}
+          onContextMenu={[Function]}
+          onDragLeave={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseDown={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onTouchEnd={[Function]}
+          onTouchMove={[Function]}
+          onTouchStart={[Function]}
+          style={
+            {
+              "transform": "translate(0px,0px)",
+            }
+          }
+          tabIndex={0}
+          transform={null}
+          type="button"
+        >
+          
+          <span
+            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+          />
+        </button>
+      </div>
+      <div
+        TransitionComponent={[Function]}
+        className="MuiPopover-root MuiMenu-root MuiModal-root MuiModal-hidden css-6f6ff7-MuiModal-root-MuiPopover-root-MuiMenu-root"
+        id="scene-menu"
+        onKeyDown={[Function]}
+        role="presentation"
+      >
+        <div
+          data-testid="sentinelStart"
+          onFocus={[Function]}
+          tabIndex={-1}
+        />
+        <div
+          className="MuiPaper-root MuiMenu-paper GridSetup-sceneMenu-16 MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiPopover-paper css-1yuf3k2-MuiPaper-root-MuiPopover-paper-MuiMenu-paper"
+          style={
+            {
+              "opacity": 0,
+            }
+          }
+        >
+          <MenuList
+            actions={
+              {
+                "current": null,
+              }
+            }
+            autoFocus={true}
+            autoFocusItem={false}
+            className="MuiMenu-list css-rpp6kk-MuiMenu-list"
+            onKeyDown={[Function]}
+            variant="selectedMenu"
+          />
+        </div>
+        <div
+          data-testid="sentinelEnd"
+          onFocus={[Function]}
+          tabIndex={-1}
+        />
+      </div>
+      <button
+        className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default GridSetup-deleteButton-17 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+        disabled={false}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onContextMenu={[Function]}
+        onDragLeave={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        tabIndex={0}
+        type="button"
+      >
+        <svg
+          aria-hidden={true}
+          className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium GridSetup-deleteIcon-18 css-i4bv87-MuiSvgIcon-root"
+          data-testid="DeleteIcon"
+          focusable="false"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
+          />
+        </svg>
+        <span
+          className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+        />
+      </button>
+    </div>
+  </main>
+</div>
+`;

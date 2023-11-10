@@ -1,0 +1,1739 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PanningCard should match snapshot 1`] = `
+<div
+  className="MuiGrid-root MuiGrid-container css-1vam7s3-MuiGrid-root"
+>
+  <div
+    className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 css-1idn90j-MuiGrid-root"
+  >
+    <label
+      className="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-j204z7-MuiFormControlLabel-root"
+    >
+      <span
+        className="MuiSwitch-root MuiSwitch-sizeMedium css-julti5-MuiSwitch-root"
+      >
+        <span
+          className="MuiButtonBase-root MuiSwitch-switchBase MuiSwitch-colorPrimary PrivateSwitchBase-root MuiSwitch-switchBase MuiSwitch-colorPrimary css-1flv81n-MuiButtonBase-root-MuiSwitch-switchBase"
+          onBlur={[Function]}
+          onContextMenu={[Function]}
+          onDragLeave={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseDown={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onTouchEnd={[Function]}
+          onTouchMove={[Function]}
+          onTouchStart={[Function]}
+          tabIndex={null}
+        >
+          <input
+            checked={false}
+            className="PrivateSwitchBase-input MuiSwitch-input css-1m9pwf3"
+            onChange={[Function]}
+            required={false}
+            type="checkbox"
+          />
+          <span
+            className="MuiSwitch-thumb css-jsexje-MuiSwitch-thumb"
+          />
+        </span>
+        <span
+          className="MuiSwitch-track css-1yjjitx-MuiSwitch-track"
+        />
+      </span>
+      <span
+        className="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-ahj2mt-MuiTypography-root"
+      >
+        Panning
+      </span>
+    </label>
+  </div>
+  <div
+    className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 css-1idn90j-MuiGrid-root"
+  >
+    <div
+      className="MuiCollapse-root MuiCollapse-vertical PanningCard-fullWidth-1 MuiCollapse-hidden css-bz4dnt-MuiCollapse-root"
+      style={
+        {
+          "minHeight": "0px",
+        }
+      }
+    >
+      <div
+        className="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+      >
+        <div
+          className="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+        >
+          <hr
+            className="MuiDivider-root MuiDivider-fullWidth css-9mgopn-MuiDivider-root"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 css-1idn90j-MuiGrid-root"
+  >
+    <div
+      className="MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-2 css-ofrcno-MuiGrid-root"
+    >
+      <div
+        className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 MuiGrid-grid-sm-12 css-1idn90j-MuiGrid-root"
+      >
+        <div
+          className="MuiCollapse-root MuiCollapse-vertical PanningCard-fullWidth-1 PanningCard-paddingLeft-2 MuiCollapse-hidden css-bz4dnt-MuiCollapse-root"
+          style={
+            {
+              "minHeight": "0px",
+            }
+          }
+        >
+          <div
+            className="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+          >
+            <div
+              className="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+            >
+              <div
+                className="MuiFormControl-root PanningCard-fullWidth-1 css-1nrlq1o-MuiFormControl-root"
+              >
+                <label
+                  className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-standard MuiFormLabel-colorPrimary MuiFormLabel-filled MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-standard css-syr9i-MuiFormLabel-root-MuiInputLabel-root"
+                  data-shrink={true}
+                >
+                  Move Horizontally
+                </label>
+                <div
+                  className="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-formControl  css-1ktbog5-MuiInputBase-root-MuiInput-root-MuiSelect-root"
+                  onClick={[Function]}
+                >
+                  <div
+                    aria-expanded="false"
+                    aria-haspopup="listbox"
+                    className="MuiSelect-select MuiSelect-standard MuiInputBase-input MuiInput-input css-1rxz5jq-MuiSelect-select-MuiInputBase-input-MuiInput-input"
+                    onBlur={[Function]}
+                    onFocus={[Function]}
+                    onKeyDown={[Function]}
+                    onMouseDown={[Function]}
+                    role="button"
+                    tabIndex={0}
+                  >
+                    None
+                  </div>
+                  <input
+                    aria-hidden={true}
+                    aria-invalid={false}
+                    className="MuiSelect-nativeInput css-yf8vq0-MuiSelect-nativeInput"
+                    disabled={false}
+                    onAnimationStart={[Function]}
+                    onChange={[Function]}
+                    required={false}
+                    tabIndex={-1}
+                    value="htf.none"
+                  />
+                  <svg
+                    aria-hidden={true}
+                    className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium MuiSelect-icon MuiSelect-iconStandard css-pqjvzy-MuiSvgIcon-root-MuiSelect-icon"
+                    data-testid="ArrowDropDownIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M7 10l5 5 5-5z"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 MuiGrid-grid-sm-12 PanningCard-noPadding-8 css-1idn90j-MuiGrid-root"
+      >
+        <div
+          className="MuiCollapse-root MuiCollapse-vertical PanningCard-fullWidth-1 PanningCard-paddingLeft-2 MuiCollapse-hidden css-bz4dnt-MuiCollapse-root"
+          style={
+            {
+              "minHeight": "0px",
+            }
+          }
+        >
+          <div
+            className="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+          >
+            <div
+              className="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+            >
+              <label
+                className="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-j204z7-MuiFormControlLabel-root"
+              >
+                <span
+                  className="MuiSwitch-root MuiSwitch-sizeSmall css-1ycxvqq-MuiSwitch-root"
+                >
+                  <span
+                    className="MuiButtonBase-root MuiSwitch-switchBase MuiSwitch-colorPrimary PrivateSwitchBase-root MuiSwitch-switchBase MuiSwitch-colorPrimary css-1flv81n-MuiButtonBase-root-MuiSwitch-switchBase"
+                    onBlur={[Function]}
+                    onContextMenu={[Function]}
+                    onDragLeave={[Function]}
+                    onFocus={[Function]}
+                    onKeyDown={[Function]}
+                    onKeyUp={[Function]}
+                    onMouseDown={[Function]}
+                    onMouseLeave={[Function]}
+                    onMouseUp={[Function]}
+                    onTouchEnd={[Function]}
+                    onTouchMove={[Function]}
+                    onTouchStart={[Function]}
+                    tabIndex={null}
+                  >
+                    <input
+                      checked={false}
+                      className="PrivateSwitchBase-input MuiSwitch-input css-1m9pwf3"
+                      onChange={[Function]}
+                      required={false}
+                      type="checkbox"
+                    />
+                    <span
+                      className="MuiSwitch-thumb css-jsexje-MuiSwitch-thumb"
+                    />
+                  </span>
+                  <span
+                    className="MuiSwitch-track css-1yjjitx-MuiSwitch-track"
+                  />
+                </span>
+                <span
+                  className="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-ahj2mt-MuiTypography-root"
+                >
+                  Randomize
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div
+          className="MuiCollapse-root MuiCollapse-vertical PanningCard-fullWidth-1 PanningCard-paddingLeft-2 MuiCollapse-hidden css-bz4dnt-MuiCollapse-root"
+          style={
+            {
+              "minHeight": "0px",
+            }
+          }
+        >
+          <div
+            className="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+          >
+            <div
+              className="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+            >
+              <label
+                className="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-j204z7-MuiFormControlLabel-root"
+              >
+                <span
+                  className="MuiSwitch-root MuiSwitch-sizeSmall css-1ycxvqq-MuiSwitch-root"
+                >
+                  <span
+                    className="MuiButtonBase-root MuiSwitch-switchBase MuiSwitch-colorPrimary PrivateSwitchBase-root MuiSwitch-switchBase MuiSwitch-colorPrimary css-1flv81n-MuiButtonBase-root-MuiSwitch-switchBase"
+                    onBlur={[Function]}
+                    onContextMenu={[Function]}
+                    onDragLeave={[Function]}
+                    onFocus={[Function]}
+                    onKeyDown={[Function]}
+                    onKeyUp={[Function]}
+                    onMouseDown={[Function]}
+                    onMouseLeave={[Function]}
+                    onMouseUp={[Function]}
+                    onTouchEnd={[Function]}
+                    onTouchMove={[Function]}
+                    onTouchStart={[Function]}
+                    tabIndex={null}
+                  >
+                    <input
+                      checked={false}
+                      className="PrivateSwitchBase-input MuiSwitch-input css-1m9pwf3"
+                      onChange={[Function]}
+                      required={false}
+                      type="checkbox"
+                    />
+                    <span
+                      className="MuiSwitch-thumb css-jsexje-MuiSwitch-thumb"
+                    />
+                  </span>
+                  <span
+                    className="MuiSwitch-track css-1yjjitx-MuiSwitch-track"
+                  />
+                </span>
+                <span
+                  className="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-ahj2mt-MuiTypography-root"
+                >
+                  Use Img Width
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 PanningCard-noPadding-8 css-1idn90j-MuiGrid-root"
+      >
+        <div
+          className="MuiCollapse-root MuiCollapse-vertical PanningCard-fullWidth-1 MuiCollapse-hidden css-bz4dnt-MuiCollapse-root"
+          style={
+            {
+              "minHeight": "0px",
+            }
+          }
+        >
+          <div
+            className="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+          >
+            <div
+              className="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+            >
+              <div
+                className="MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-2 css-ofrcno-MuiGrid-root"
+              >
+                <div
+                  className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-true css-1vd824g-MuiGrid-root"
+                >
+                  <span
+                    className="MuiSlider-root MuiSlider-colorPrimary MuiSlider-sizeMedium css-19qy7iz-MuiSlider-root"
+                    defaultValue={10}
+                    onMouseDown={[Function]}
+                  >
+                    <span
+                      className="MuiSlider-rail css-14pt78w-MuiSlider-rail"
+                    />
+                    <span
+                      className="MuiSlider-track css-1gv0vcd-MuiSlider-track"
+                      style={
+                        {
+                          "left": "0%",
+                          "width": "10%",
+                        }
+                      }
+                    />
+                    <span
+                      className="MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary css-hvku5w-MuiSlider-thumb"
+                      data-index={0}
+                      onMouseLeave={[Function]}
+                      onMouseOver={[Function]}
+                      style={
+                        {
+                          "left": "10%",
+                          "pointerEvents": undefined,
+                        }
+                      }
+                    >
+                      <input
+                        aria-labelledby="horiz-trans-level-slider"
+                        aria-orientation="horizontal"
+                        aria-valuemax={100}
+                        aria-valuemin={0}
+                        aria-valuenow={10}
+                        data-index={0}
+                        disabled={false}
+                        max={100}
+                        min={0}
+                        onBlur={[Function]}
+                        onChange={[Function]}
+                        onFocus={[Function]}
+                        step={1}
+                        style={
+                          {
+                            "border": 0,
+                            "clip": "rect(0 0 0 0)",
+                            "direction": "ltr",
+                            "height": "100%",
+                            "margin": -1,
+                            "overflow": "hidden",
+                            "padding": 0,
+                            "position": "absolute",
+                            "whiteSpace": "nowrap",
+                            "width": "100%",
+                          }
+                        }
+                        type="range"
+                        value={10}
+                      />
+                      <span
+                        aria-hidden={true}
+                        className="MuiSlider-valueLabel css-nnid7-MuiSlider-valueLabel"
+                      >
+                        <span
+                          className="MuiSlider-valueLabelCircle"
+                        >
+                          <span
+                            className="MuiSlider-valueLabelLabel"
+                          >
+                            10%
+                          </span>
+                        </span>
+                      </span>
+                    </span>
+                  </span>
+                </div>
+                <div
+                  className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-3 PanningCard-percentInput-4 css-1equabv-MuiGrid-root"
+                >
+                  <div
+                    className="MuiFormControl-root MuiFormControl-marginDense MuiTextField-root css-4mzek5-MuiFormControl-root-MuiTextField-root"
+                  >
+                    <div
+                      className="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-adornedEnd css-cwspju-MuiInputBase-root-MuiInput-root"
+                      onClick={[Function]}
+                    >
+                      <input
+                        aria-invalid={false}
+                        aria-labelledby="horiz-trans-level-slider"
+                        autoFocus={false}
+                        className="MuiInputBase-input MuiInput-input MuiInputBase-inputAdornedEnd PanningCard-endInput-3 css-1x51dt5-MuiInputBase-input-MuiInput-input"
+                        disabled={false}
+                        max={100}
+                        min={0}
+                        onAnimationStart={[Function]}
+                        onBlur={[Function]}
+                        onChange={[Function]}
+                        onFocus={[Function]}
+                        required={false}
+                        step={5}
+                        type="number"
+                        value={10}
+                      />
+                      <div
+                        className="MuiInputAdornment-root MuiInputAdornment-positionEnd MuiInputAdornment-standard MuiInputAdornment-sizeMedium css-1laqsz7-MuiInputAdornment-root"
+                      >
+                        <p
+                          className="MuiTypography-root MuiTypography-body1 css-1pnmrwp-MuiTypography-root"
+                        >
+                          %
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          className="MuiCollapse-root MuiCollapse-vertical PanningCard-fullWidth-1 MuiCollapse-hidden css-bz4dnt-MuiCollapse-root"
+          style={
+            {
+              "minHeight": "0px",
+            }
+          }
+        >
+          <div
+            className="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+          >
+            <div
+              className="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+            >
+              <div
+                className="MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-2 css-ofrcno-MuiGrid-root"
+              >
+                <div
+                  className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 MuiGrid-grid-sm-6 css-1b3l6lk-MuiGrid-root"
+                >
+                  <p
+                    className="MuiTypography-root MuiTypography-body1 css-ahj2mt-MuiTypography-root"
+                  >
+                    Min: 
+                    5
+                    %
+                  </p>
+                  <span
+                    className="MuiSlider-root MuiSlider-colorPrimary MuiSlider-sizeMedium css-19qy7iz-MuiSlider-root"
+                    defaultValue={5}
+                    onMouseDown={[Function]}
+                  >
+                    <span
+                      className="MuiSlider-rail css-14pt78w-MuiSlider-rail"
+                    />
+                    <span
+                      className="MuiSlider-track css-1gv0vcd-MuiSlider-track"
+                      style={
+                        {
+                          "left": "0%",
+                          "width": "5%",
+                        }
+                      }
+                    />
+                    <span
+                      className="MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary css-hvku5w-MuiSlider-thumb"
+                      data-index={0}
+                      onMouseLeave={[Function]}
+                      onMouseOver={[Function]}
+                      style={
+                        {
+                          "left": "5%",
+                          "pointerEvents": undefined,
+                        }
+                      }
+                    >
+                      <input
+                        aria-labelledby="horiz-trans-min-slider"
+                        aria-orientation="horizontal"
+                        aria-valuemax={100}
+                        aria-valuemin={0}
+                        aria-valuenow={5}
+                        data-index={0}
+                        disabled={false}
+                        max={100}
+                        min={0}
+                        onBlur={[Function]}
+                        onChange={[Function]}
+                        onFocus={[Function]}
+                        step={1}
+                        style={
+                          {
+                            "border": 0,
+                            "clip": "rect(0 0 0 0)",
+                            "direction": "ltr",
+                            "height": "100%",
+                            "margin": -1,
+                            "overflow": "hidden",
+                            "padding": 0,
+                            "position": "absolute",
+                            "whiteSpace": "nowrap",
+                            "width": "100%",
+                          }
+                        }
+                        type="range"
+                        value={5}
+                      />
+                      <span
+                        aria-hidden={true}
+                        className="MuiSlider-valueLabel css-nnid7-MuiSlider-valueLabel"
+                      >
+                        <span
+                          className="MuiSlider-valueLabelCircle"
+                        >
+                          <span
+                            className="MuiSlider-valueLabelLabel"
+                          >
+                            5%
+                          </span>
+                        </span>
+                      </span>
+                    </span>
+                  </span>
+                </div>
+                <div
+                  className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 MuiGrid-grid-sm-6 css-1b3l6lk-MuiGrid-root"
+                >
+                  <p
+                    className="MuiTypography-root MuiTypography-body1 css-ahj2mt-MuiTypography-root"
+                  >
+                    Max: 
+                    10
+                    %
+                  </p>
+                  <span
+                    className="MuiSlider-root MuiSlider-colorPrimary MuiSlider-sizeMedium css-19qy7iz-MuiSlider-root"
+                    defaultValue={10}
+                    onMouseDown={[Function]}
+                  >
+                    <span
+                      className="MuiSlider-rail css-14pt78w-MuiSlider-rail"
+                    />
+                    <span
+                      className="MuiSlider-track css-1gv0vcd-MuiSlider-track"
+                      style={
+                        {
+                          "left": "0%",
+                          "width": "10%",
+                        }
+                      }
+                    />
+                    <span
+                      className="MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary css-hvku5w-MuiSlider-thumb"
+                      data-index={0}
+                      onMouseLeave={[Function]}
+                      onMouseOver={[Function]}
+                      style={
+                        {
+                          "left": "10%",
+                          "pointerEvents": undefined,
+                        }
+                      }
+                    >
+                      <input
+                        aria-labelledby="horiz-trans-max-slider"
+                        aria-orientation="horizontal"
+                        aria-valuemax={100}
+                        aria-valuemin={0}
+                        aria-valuenow={10}
+                        data-index={0}
+                        disabled={false}
+                        max={100}
+                        min={0}
+                        onBlur={[Function]}
+                        onChange={[Function]}
+                        onFocus={[Function]}
+                        step={1}
+                        style={
+                          {
+                            "border": 0,
+                            "clip": "rect(0 0 0 0)",
+                            "direction": "ltr",
+                            "height": "100%",
+                            "margin": -1,
+                            "overflow": "hidden",
+                            "padding": 0,
+                            "position": "absolute",
+                            "whiteSpace": "nowrap",
+                            "width": "100%",
+                          }
+                        }
+                        type="range"
+                        value={10}
+                      />
+                      <span
+                        aria-hidden={true}
+                        className="MuiSlider-valueLabel css-nnid7-MuiSlider-valueLabel"
+                      >
+                        <span
+                          className="MuiSlider-valueLabelCircle"
+                        >
+                          <span
+                            className="MuiSlider-valueLabelLabel"
+                          >
+                            10%
+                          </span>
+                        </span>
+                      </span>
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 PanningCard-noPadding-8 css-1idn90j-MuiGrid-root"
+  >
+    <div
+      className="MuiCollapse-root MuiCollapse-vertical PanningCard-fullWidth-1 MuiCollapse-hidden css-bz4dnt-MuiCollapse-root"
+      style={
+        {
+          "minHeight": "0px",
+        }
+      }
+    >
+      <div
+        className="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+      >
+        <div
+          className="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+        >
+          <hr
+            className="MuiDivider-root MuiDivider-fullWidth css-9mgopn-MuiDivider-root"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 css-1idn90j-MuiGrid-root"
+  >
+    <div
+      className="MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-2 css-ofrcno-MuiGrid-root"
+    >
+      <div
+        className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 MuiGrid-grid-sm-12 css-1idn90j-MuiGrid-root"
+      >
+        <div
+          className="MuiCollapse-root MuiCollapse-vertical PanningCard-fullWidth-1 PanningCard-paddingLeft-2 MuiCollapse-hidden css-bz4dnt-MuiCollapse-root"
+          style={
+            {
+              "minHeight": "0px",
+            }
+          }
+        >
+          <div
+            className="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+          >
+            <div
+              className="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+            >
+              <div
+                className="MuiFormControl-root PanningCard-fullWidth-1 css-1nrlq1o-MuiFormControl-root"
+              >
+                <label
+                  className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-standard MuiFormLabel-colorPrimary MuiFormLabel-filled MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-standard css-syr9i-MuiFormLabel-root-MuiInputLabel-root"
+                  data-shrink={true}
+                >
+                  Move Vertically
+                </label>
+                <div
+                  className="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-formControl  css-1ktbog5-MuiInputBase-root-MuiInput-root-MuiSelect-root"
+                  onClick={[Function]}
+                >
+                  <div
+                    aria-expanded="false"
+                    aria-haspopup="listbox"
+                    className="MuiSelect-select MuiSelect-standard MuiInputBase-input MuiInput-input css-1rxz5jq-MuiSelect-select-MuiInputBase-input-MuiInput-input"
+                    onBlur={[Function]}
+                    onFocus={[Function]}
+                    onKeyDown={[Function]}
+                    onMouseDown={[Function]}
+                    role="button"
+                    tabIndex={0}
+                  >
+                    None
+                  </div>
+                  <input
+                    aria-hidden={true}
+                    aria-invalid={false}
+                    className="MuiSelect-nativeInput css-yf8vq0-MuiSelect-nativeInput"
+                    disabled={false}
+                    onAnimationStart={[Function]}
+                    onChange={[Function]}
+                    required={false}
+                    tabIndex={-1}
+                    value="vtf.none"
+                  />
+                  <svg
+                    aria-hidden={true}
+                    className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium MuiSelect-icon MuiSelect-iconStandard css-pqjvzy-MuiSvgIcon-root-MuiSelect-icon"
+                    data-testid="ArrowDropDownIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M7 10l5 5 5-5z"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 MuiGrid-grid-sm-12 PanningCard-noPadding-8 css-1idn90j-MuiGrid-root"
+      >
+        <div
+          className="MuiCollapse-root MuiCollapse-vertical PanningCard-fullWidth-1 PanningCard-paddingLeft-2 MuiCollapse-hidden css-bz4dnt-MuiCollapse-root"
+          style={
+            {
+              "minHeight": "0px",
+            }
+          }
+        >
+          <div
+            className="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+          >
+            <div
+              className="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+            >
+              <label
+                className="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-j204z7-MuiFormControlLabel-root"
+              >
+                <span
+                  className="MuiSwitch-root MuiSwitch-sizeSmall css-1ycxvqq-MuiSwitch-root"
+                >
+                  <span
+                    className="MuiButtonBase-root MuiSwitch-switchBase MuiSwitch-colorPrimary PrivateSwitchBase-root MuiSwitch-switchBase MuiSwitch-colorPrimary css-1flv81n-MuiButtonBase-root-MuiSwitch-switchBase"
+                    onBlur={[Function]}
+                    onContextMenu={[Function]}
+                    onDragLeave={[Function]}
+                    onFocus={[Function]}
+                    onKeyDown={[Function]}
+                    onKeyUp={[Function]}
+                    onMouseDown={[Function]}
+                    onMouseLeave={[Function]}
+                    onMouseUp={[Function]}
+                    onTouchEnd={[Function]}
+                    onTouchMove={[Function]}
+                    onTouchStart={[Function]}
+                    tabIndex={null}
+                  >
+                    <input
+                      checked={false}
+                      className="PrivateSwitchBase-input MuiSwitch-input css-1m9pwf3"
+                      onChange={[Function]}
+                      required={false}
+                      type="checkbox"
+                    />
+                    <span
+                      className="MuiSwitch-thumb css-jsexje-MuiSwitch-thumb"
+                    />
+                  </span>
+                  <span
+                    className="MuiSwitch-track css-1yjjitx-MuiSwitch-track"
+                  />
+                </span>
+                <span
+                  className="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-ahj2mt-MuiTypography-root"
+                >
+                  Randomize
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div
+          className="MuiCollapse-root MuiCollapse-vertical PanningCard-fullWidth-1 PanningCard-paddingLeft-2 MuiCollapse-hidden css-bz4dnt-MuiCollapse-root"
+          style={
+            {
+              "minHeight": "0px",
+            }
+          }
+        >
+          <div
+            className="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+          >
+            <div
+              className="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+            >
+              <label
+                className="MuiFormControlLabel-root MuiFormControlLabel-labelPlacementEnd css-j204z7-MuiFormControlLabel-root"
+              >
+                <span
+                  className="MuiSwitch-root MuiSwitch-sizeSmall css-1ycxvqq-MuiSwitch-root"
+                >
+                  <span
+                    className="MuiButtonBase-root MuiSwitch-switchBase MuiSwitch-colorPrimary PrivateSwitchBase-root MuiSwitch-switchBase MuiSwitch-colorPrimary css-1flv81n-MuiButtonBase-root-MuiSwitch-switchBase"
+                    onBlur={[Function]}
+                    onContextMenu={[Function]}
+                    onDragLeave={[Function]}
+                    onFocus={[Function]}
+                    onKeyDown={[Function]}
+                    onKeyUp={[Function]}
+                    onMouseDown={[Function]}
+                    onMouseLeave={[Function]}
+                    onMouseUp={[Function]}
+                    onTouchEnd={[Function]}
+                    onTouchMove={[Function]}
+                    onTouchStart={[Function]}
+                    tabIndex={null}
+                  >
+                    <input
+                      checked={false}
+                      className="PrivateSwitchBase-input MuiSwitch-input css-1m9pwf3"
+                      onChange={[Function]}
+                      required={false}
+                      type="checkbox"
+                    />
+                    <span
+                      className="MuiSwitch-thumb css-jsexje-MuiSwitch-thumb"
+                    />
+                  </span>
+                  <span
+                    className="MuiSwitch-track css-1yjjitx-MuiSwitch-track"
+                  />
+                </span>
+                <span
+                  className="MuiTypography-root MuiTypography-body1 MuiFormControlLabel-label css-ahj2mt-MuiTypography-root"
+                >
+                  Use Img Height
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 PanningCard-noPadding-8 css-1idn90j-MuiGrid-root"
+        id="test"
+      >
+        <div
+          className="MuiCollapse-root MuiCollapse-vertical PanningCard-fullWidth-1 MuiCollapse-hidden css-bz4dnt-MuiCollapse-root"
+          style={
+            {
+              "minHeight": "0px",
+            }
+          }
+        >
+          <div
+            className="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+          >
+            <div
+              className="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+            >
+              <div
+                className="MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-2 css-ofrcno-MuiGrid-root"
+              >
+                <div
+                  className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-true css-1vd824g-MuiGrid-root"
+                >
+                  <span
+                    className="MuiSlider-root MuiSlider-colorPrimary MuiSlider-sizeMedium css-19qy7iz-MuiSlider-root"
+                    defaultValue={10}
+                    onMouseDown={[Function]}
+                  >
+                    <span
+                      className="MuiSlider-rail css-14pt78w-MuiSlider-rail"
+                    />
+                    <span
+                      className="MuiSlider-track css-1gv0vcd-MuiSlider-track"
+                      style={
+                        {
+                          "left": "0%",
+                          "width": "10%",
+                        }
+                      }
+                    />
+                    <span
+                      className="MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary css-hvku5w-MuiSlider-thumb"
+                      data-index={0}
+                      onMouseLeave={[Function]}
+                      onMouseOver={[Function]}
+                      style={
+                        {
+                          "left": "10%",
+                          "pointerEvents": undefined,
+                        }
+                      }
+                    >
+                      <input
+                        aria-labelledby="vert-trans-level-slider"
+                        aria-orientation="horizontal"
+                        aria-valuemax={100}
+                        aria-valuemin={0}
+                        aria-valuenow={10}
+                        data-index={0}
+                        disabled={false}
+                        max={100}
+                        min={0}
+                        onBlur={[Function]}
+                        onChange={[Function]}
+                        onFocus={[Function]}
+                        step={1}
+                        style={
+                          {
+                            "border": 0,
+                            "clip": "rect(0 0 0 0)",
+                            "direction": "ltr",
+                            "height": "100%",
+                            "margin": -1,
+                            "overflow": "hidden",
+                            "padding": 0,
+                            "position": "absolute",
+                            "whiteSpace": "nowrap",
+                            "width": "100%",
+                          }
+                        }
+                        type="range"
+                        value={10}
+                      />
+                      <span
+                        aria-hidden={true}
+                        className="MuiSlider-valueLabel css-nnid7-MuiSlider-valueLabel"
+                      >
+                        <span
+                          className="MuiSlider-valueLabelCircle"
+                        >
+                          <span
+                            className="MuiSlider-valueLabelLabel"
+                          >
+                            10%
+                          </span>
+                        </span>
+                      </span>
+                    </span>
+                  </span>
+                </div>
+                <div
+                  className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-3 PanningCard-percentInput-4 css-1equabv-MuiGrid-root"
+                >
+                  <div
+                    className="MuiFormControl-root MuiFormControl-marginDense MuiTextField-root css-4mzek5-MuiFormControl-root-MuiTextField-root"
+                  >
+                    <div
+                      className="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-adornedEnd css-cwspju-MuiInputBase-root-MuiInput-root"
+                      onClick={[Function]}
+                    >
+                      <input
+                        aria-invalid={false}
+                        aria-labelledby="vert-trans-level-slider"
+                        autoFocus={false}
+                        className="MuiInputBase-input MuiInput-input MuiInputBase-inputAdornedEnd PanningCard-endInput-3 css-1x51dt5-MuiInputBase-input-MuiInput-input"
+                        disabled={false}
+                        max={100}
+                        min={0}
+                        onAnimationStart={[Function]}
+                        onBlur={[Function]}
+                        onChange={[Function]}
+                        onFocus={[Function]}
+                        required={false}
+                        step={5}
+                        type="number"
+                        value={10}
+                      />
+                      <div
+                        className="MuiInputAdornment-root MuiInputAdornment-positionEnd MuiInputAdornment-standard MuiInputAdornment-sizeMedium css-1laqsz7-MuiInputAdornment-root"
+                      >
+                        <p
+                          className="MuiTypography-root MuiTypography-body1 css-1pnmrwp-MuiTypography-root"
+                        >
+                          %
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          className="MuiCollapse-root MuiCollapse-vertical PanningCard-fullWidth-1 MuiCollapse-hidden css-bz4dnt-MuiCollapse-root"
+          style={
+            {
+              "minHeight": "0px",
+            }
+          }
+        >
+          <div
+            className="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+          >
+            <div
+              className="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+            >
+              <div
+                className="MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-2 css-ofrcno-MuiGrid-root"
+              >
+                <div
+                  className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 MuiGrid-grid-sm-6 css-1b3l6lk-MuiGrid-root"
+                >
+                  <p
+                    className="MuiTypography-root MuiTypography-body1 css-ahj2mt-MuiTypography-root"
+                  >
+                    Min: 
+                    5
+                    %
+                  </p>
+                  <span
+                    className="MuiSlider-root MuiSlider-colorPrimary MuiSlider-sizeMedium css-19qy7iz-MuiSlider-root"
+                    defaultValue={5}
+                    onMouseDown={[Function]}
+                  >
+                    <span
+                      className="MuiSlider-rail css-14pt78w-MuiSlider-rail"
+                    />
+                    <span
+                      className="MuiSlider-track css-1gv0vcd-MuiSlider-track"
+                      style={
+                        {
+                          "left": "0%",
+                          "width": "5%",
+                        }
+                      }
+                    />
+                    <span
+                      className="MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary css-hvku5w-MuiSlider-thumb"
+                      data-index={0}
+                      onMouseLeave={[Function]}
+                      onMouseOver={[Function]}
+                      style={
+                        {
+                          "left": "5%",
+                          "pointerEvents": undefined,
+                        }
+                      }
+                    >
+                      <input
+                        aria-labelledby="vert-trans-min-slider"
+                        aria-orientation="horizontal"
+                        aria-valuemax={100}
+                        aria-valuemin={0}
+                        aria-valuenow={5}
+                        data-index={0}
+                        disabled={false}
+                        max={100}
+                        min={0}
+                        onBlur={[Function]}
+                        onChange={[Function]}
+                        onFocus={[Function]}
+                        step={1}
+                        style={
+                          {
+                            "border": 0,
+                            "clip": "rect(0 0 0 0)",
+                            "direction": "ltr",
+                            "height": "100%",
+                            "margin": -1,
+                            "overflow": "hidden",
+                            "padding": 0,
+                            "position": "absolute",
+                            "whiteSpace": "nowrap",
+                            "width": "100%",
+                          }
+                        }
+                        type="range"
+                        value={5}
+                      />
+                      <span
+                        aria-hidden={true}
+                        className="MuiSlider-valueLabel css-nnid7-MuiSlider-valueLabel"
+                      >
+                        <span
+                          className="MuiSlider-valueLabelCircle"
+                        >
+                          <span
+                            className="MuiSlider-valueLabelLabel"
+                          >
+                            5%
+                          </span>
+                        </span>
+                      </span>
+                    </span>
+                  </span>
+                </div>
+                <div
+                  className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 MuiGrid-grid-sm-6 css-1b3l6lk-MuiGrid-root"
+                >
+                  <p
+                    className="MuiTypography-root MuiTypography-body1 css-ahj2mt-MuiTypography-root"
+                  >
+                    Max: 
+                    10
+                    %
+                  </p>
+                  <span
+                    className="MuiSlider-root MuiSlider-colorPrimary MuiSlider-sizeMedium css-19qy7iz-MuiSlider-root"
+                    defaultValue={10}
+                    onMouseDown={[Function]}
+                  >
+                    <span
+                      className="MuiSlider-rail css-14pt78w-MuiSlider-rail"
+                    />
+                    <span
+                      className="MuiSlider-track css-1gv0vcd-MuiSlider-track"
+                      style={
+                        {
+                          "left": "0%",
+                          "width": "10%",
+                        }
+                      }
+                    />
+                    <span
+                      className="MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary css-hvku5w-MuiSlider-thumb"
+                      data-index={0}
+                      onMouseLeave={[Function]}
+                      onMouseOver={[Function]}
+                      style={
+                        {
+                          "left": "10%",
+                          "pointerEvents": undefined,
+                        }
+                      }
+                    >
+                      <input
+                        aria-labelledby="vert-trans-max-slider"
+                        aria-orientation="horizontal"
+                        aria-valuemax={100}
+                        aria-valuemin={0}
+                        aria-valuenow={10}
+                        data-index={0}
+                        disabled={false}
+                        max={100}
+                        min={0}
+                        onBlur={[Function]}
+                        onChange={[Function]}
+                        onFocus={[Function]}
+                        step={1}
+                        style={
+                          {
+                            "border": 0,
+                            "clip": "rect(0 0 0 0)",
+                            "direction": "ltr",
+                            "height": "100%",
+                            "margin": -1,
+                            "overflow": "hidden",
+                            "padding": 0,
+                            "position": "absolute",
+                            "whiteSpace": "nowrap",
+                            "width": "100%",
+                          }
+                        }
+                        type="range"
+                        value={10}
+                      />
+                      <span
+                        aria-hidden={true}
+                        className="MuiSlider-valueLabel css-nnid7-MuiSlider-valueLabel"
+                      >
+                        <span
+                          className="MuiSlider-valueLabelCircle"
+                        >
+                          <span
+                            className="MuiSlider-valueLabelLabel"
+                          >
+                            10%
+                          </span>
+                        </span>
+                      </span>
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 PanningCard-noPadding-8 css-1idn90j-MuiGrid-root"
+  >
+    <div
+      className="MuiCollapse-root MuiCollapse-vertical PanningCard-fullWidth-1 MuiCollapse-hidden css-bz4dnt-MuiCollapse-root"
+      style={
+        {
+          "minHeight": "0px",
+        }
+      }
+    >
+      <div
+        className="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+      >
+        <div
+          className="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+        >
+          <hr
+            className="MuiDivider-root MuiDivider-fullWidth css-9mgopn-MuiDivider-root"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 css-1idn90j-MuiGrid-root"
+  >
+    <div
+      className="MuiCollapse-root MuiCollapse-vertical PanningCard-fullWidth-1 MuiCollapse-hidden css-bz4dnt-MuiCollapse-root"
+      style={
+        {
+          "minHeight": "0px",
+        }
+      }
+    >
+      <div
+        className="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+      >
+        <div
+          className="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+        >
+          <div
+            className="MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-2 css-ofrcno-MuiGrid-root"
+          >
+            <div
+              className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 MuiGrid-grid-sm-4 css-wg4xta-MuiGrid-root"
+              style={
+                {
+                  "paddingTop": 10,
+                }
+              }
+            >
+              <div
+                className="MuiFormControl-root PanningCard-fullWidth-1 css-1nrlq1o-MuiFormControl-root"
+              >
+                <label
+                  className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-standard MuiFormLabel-colorPrimary MuiFormLabel-filled MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-standard css-syr9i-MuiFormLabel-root-MuiInputLabel-root"
+                  data-shrink={true}
+                >
+                  Timing
+                </label>
+                <div
+                  className="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-formControl  css-1ktbog5-MuiInputBase-root-MuiInput-root-MuiSelect-root"
+                  onClick={[Function]}
+                >
+                  <div
+                    aria-expanded="false"
+                    aria-haspopup="listbox"
+                    className="MuiSelect-select MuiSelect-standard MuiInputBase-input MuiInput-input css-1rxz5jq-MuiSelect-select-MuiInputBase-input-MuiInput-input"
+                    onBlur={[Function]}
+                    onFocus={[Function]}
+                    onKeyDown={[Function]}
+                    onMouseDown={[Function]}
+                    role="button"
+                    tabIndex={0}
+                  >
+                    Constant
+                  </div>
+                  <input
+                    aria-hidden={true}
+                    aria-invalid={false}
+                    className="MuiSelect-nativeInput css-yf8vq0-MuiSelect-nativeInput"
+                    disabled={false}
+                    onAnimationStart={[Function]}
+                    onChange={[Function]}
+                    required={false}
+                    tabIndex={-1}
+                    value="tf.c"
+                  />
+                  <svg
+                    aria-hidden={true}
+                    className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium MuiSelect-icon MuiSelect-iconStandard css-pqjvzy-MuiSvgIcon-root-MuiSelect-icon"
+                    data-testid="ArrowDropDownIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M7 10l5 5 5-5z"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div
+              className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 MuiGrid-grid-sm-8 css-o4bg9w-MuiGrid-root"
+            >
+              <div
+                className="MuiCollapse-root MuiCollapse-vertical PanningCard-fullWidth-1 MuiCollapse-hidden css-bz4dnt-MuiCollapse-root"
+                style={
+                  {
+                    "minHeight": "0px",
+                  }
+                }
+              >
+                <div
+                  className="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+                >
+                  <div
+                    className="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+                  >
+                    <div
+                      className="MuiTypography-root MuiTypography-caption css-ol7wxs-MuiTypography-root"
+                    >
+                      Wave Rate
+                    </div>
+                    <div
+                      className="MuiGrid-root MuiGrid-container css-1vam7s3-MuiGrid-root"
+                    >
+                      <div
+                        className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-true css-1vd824g-MuiGrid-root"
+                      >
+                        <span
+                          className="MuiSlider-root MuiSlider-colorPrimary MuiSlider-sizeMedium css-19qy7iz-MuiSlider-root"
+                          defaultValue={100}
+                          onMouseDown={[Function]}
+                        >
+                          <span
+                            className="MuiSlider-rail css-14pt78w-MuiSlider-rail"
+                          />
+                          <span
+                            className="MuiSlider-track css-1gv0vcd-MuiSlider-track"
+                            style={
+                              {
+                                "left": "0%",
+                                "width": "100%",
+                              }
+                            }
+                          />
+                          <span
+                            className="MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary css-hvku5w-MuiSlider-thumb"
+                            data-index={0}
+                            onMouseLeave={[Function]}
+                            onMouseOver={[Function]}
+                            style={
+                              {
+                                "left": "100%",
+                                "pointerEvents": undefined,
+                              }
+                            }
+                          >
+                            <input
+                              aria-labelledby="pan-sin-rate-slider"
+                              aria-orientation="horizontal"
+                              aria-valuemax={100}
+                              aria-valuemin={1}
+                              aria-valuenow={100}
+                              data-index={0}
+                              disabled={false}
+                              max={100}
+                              min={1}
+                              onBlur={[Function]}
+                              onChange={[Function]}
+                              onFocus={[Function]}
+                              step={1}
+                              style={
+                                {
+                                  "border": 0,
+                                  "clip": "rect(0 0 0 0)",
+                                  "direction": "ltr",
+                                  "height": "100%",
+                                  "margin": -1,
+                                  "overflow": "hidden",
+                                  "padding": 0,
+                                  "position": "absolute",
+                                  "whiteSpace": "nowrap",
+                                  "width": "100%",
+                                }
+                              }
+                              type="range"
+                              value={100}
+                            />
+                            <span
+                              aria-hidden={true}
+                              className="MuiSlider-valueLabel css-nnid7-MuiSlider-valueLabel"
+                            >
+                              <span
+                                className="MuiSlider-valueLabelCircle"
+                              >
+                                <span
+                                  className="MuiSlider-valueLabelLabel"
+                                >
+                                  100
+                                </span>
+                              </span>
+                            </span>
+                          </span>
+                        </span>
+                      </div>
+                      <div
+                        className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-3 PanningCard-percentInput-4 css-1equabv-MuiGrid-root"
+                      >
+                        <div
+                          className="MuiFormControl-root MuiTextField-root css-1u3bzj6-MuiFormControl-root-MuiTextField-root"
+                        >
+                          <div
+                            className="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-formControl css-cwspju-MuiInputBase-root-MuiInput-root"
+                            onClick={[Function]}
+                          >
+                            <input
+                              aria-invalid={false}
+                              aria-labelledby="pan-sin-rate-slider"
+                              autoFocus={false}
+                              className="MuiInputBase-input MuiInput-input PanningCard-endInput-3 css-1x51dt5-MuiInputBase-input-MuiInput-input"
+                              disabled={false}
+                              max={100}
+                              min={0}
+                              onAnimationStart={[Function]}
+                              onBlur={[Function]}
+                              onChange={[Function]}
+                              onFocus={[Function]}
+                              required={false}
+                              step={5}
+                              type="number"
+                              value={100}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                className="MuiCollapse-root MuiCollapse-vertical PanningCard-fullWidth-1 MuiCollapse-hidden css-bz4dnt-MuiCollapse-root"
+                style={
+                  {
+                    "minHeight": "0px",
+                  }
+                }
+              >
+                <div
+                  className="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+                >
+                  <div
+                    className="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+                  >
+                    <div
+                      className="MuiTypography-root MuiTypography-caption css-ol7wxs-MuiTypography-root"
+                    >
+                      BPM Multiplier 
+                      1
+                      x
+                    </div>
+                    <span
+                      className="MuiSlider-root MuiSlider-colorPrimary MuiSlider-sizeMedium css-19qy7iz-MuiSlider-root"
+                      defaultValue={10}
+                      onMouseDown={[Function]}
+                    >
+                      <span
+                        className="MuiSlider-rail css-14pt78w-MuiSlider-rail"
+                      />
+                      <span
+                        className="MuiSlider-track css-1gv0vcd-MuiSlider-track"
+                        style={
+                          {
+                            "left": "0%",
+                            "width": "9.090909090909092%",
+                          }
+                        }
+                      />
+                      <span
+                        className="MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary MuiSlider-thumb MuiSlider-thumbSizeMedium MuiSlider-thumbColorPrimary css-hvku5w-MuiSlider-thumb"
+                        data-index={0}
+                        onMouseLeave={[Function]}
+                        onMouseOver={[Function]}
+                        style={
+                          {
+                            "left": "9.090909090909092%",
+                            "pointerEvents": undefined,
+                          }
+                        }
+                      >
+                        <input
+                          aria-labelledby="pan-bpm-multi-slider"
+                          aria-orientation="horizontal"
+                          aria-valuemax={100}
+                          aria-valuemin={1}
+                          aria-valuenow={10}
+                          data-index={0}
+                          disabled={false}
+                          max={100}
+                          min={1}
+                          onBlur={[Function]}
+                          onChange={[Function]}
+                          onFocus={[Function]}
+                          step={1}
+                          style={
+                            {
+                              "border": 0,
+                              "clip": "rect(0 0 0 0)",
+                              "direction": "ltr",
+                              "height": "100%",
+                              "margin": -1,
+                              "overflow": "hidden",
+                              "padding": 0,
+                              "position": "absolute",
+                              "whiteSpace": "nowrap",
+                              "width": "100%",
+                            }
+                          }
+                          type="range"
+                          value={10}
+                        />
+                        <span
+                          aria-hidden={true}
+                          className="MuiSlider-valueLabel css-nnid7-MuiSlider-valueLabel"
+                        >
+                          <span
+                            className="MuiSlider-valueLabelCircle"
+                          >
+                            <span
+                              className="MuiSlider-valueLabelLabel"
+                            >
+                              1x
+                            </span>
+                          </span>
+                        </span>
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div
+                className="MuiCollapse-root MuiCollapse-vertical PanningCard-fullWidth-1 MuiCollapse-hidden css-bz4dnt-MuiCollapse-root"
+                style={
+                  {
+                    "minHeight": "0px",
+                  }
+                }
+              >
+                <div
+                  className="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+                >
+                  <div
+                    className="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+                  >
+                    <div
+                      className="MuiFormControl-root MuiFormControl-marginDense MuiTextField-root css-4mzek5-MuiFormControl-root-MuiTextField-root"
+                    >
+                      <label
+                        className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined css-uogadk-MuiFormLabel-root-MuiInputLabel-root"
+                        data-shrink={true}
+                      >
+                        For
+                      </label>
+                      <div
+                        className="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-adornedEnd css-plngxy-MuiInputBase-root-MuiOutlinedInput-root"
+                        onClick={[Function]}
+                      >
+                        <input
+                          aria-invalid={false}
+                          autoFocus={false}
+                          className="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputAdornedEnd css-nxo287-MuiInputBase-input-MuiOutlinedInput-input"
+                          disabled={false}
+                          min={0}
+                          onAnimationStart={[Function]}
+                          onBlur={[Function]}
+                          onChange={[Function]}
+                          onFocus={[Function]}
+                          required={false}
+                          step={100}
+                          type="number"
+                          value={2000}
+                        />
+                        <div
+                          className="MuiInputAdornment-root MuiInputAdornment-positionEnd MuiInputAdornment-outlined MuiInputAdornment-sizeMedium css-1laqsz7-MuiInputAdornment-root"
+                        >
+                          <p
+                            className="MuiTypography-root MuiTypography-body1 css-1pnmrwp-MuiTypography-root"
+                          >
+                            ms
+                          </p>
+                        </div>
+                        <fieldset
+                          aria-hidden={true}
+                          className="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+                        >
+                          <legend
+                            className="css-14lo706"
+                          >
+                            <span>
+                              For
+                            </span>
+                          </legend>
+                        </fieldset>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 css-1idn90j-MuiGrid-root"
+  >
+    <div
+      className="MuiCollapse-root MuiCollapse-vertical PanningCard-fullWidth-1 MuiCollapse-hidden css-bz4dnt-MuiCollapse-root"
+      style={
+        {
+          "minHeight": "0px",
+        }
+      }
+    >
+      <div
+        className="MuiCollapse-wrapper MuiCollapse-vertical css-smkl36-MuiCollapse-wrapper"
+      >
+        <div
+          className="MuiCollapse-wrapperInner MuiCollapse-vertical css-9l5vo-MuiCollapse-wrapperInner"
+        >
+          <div
+            className="MuiGrid-root MuiGrid-container css-1vam7s3-MuiGrid-root"
+          >
+            <div
+              className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 MuiGrid-grid-sm-6 css-1b3l6lk-MuiGrid-root"
+            >
+              <div
+                className="MuiFormControl-root MuiFormControl-marginDense MuiTextField-root css-4mzek5-MuiFormControl-root-MuiTextField-root"
+              >
+                <label
+                  className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined css-uogadk-MuiFormLabel-root-MuiInputLabel-root"
+                  data-shrink={true}
+                >
+                  Between
+                </label>
+                <div
+                  className="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-adornedEnd css-plngxy-MuiInputBase-root-MuiOutlinedInput-root"
+                  onClick={[Function]}
+                >
+                  <input
+                    aria-invalid={false}
+                    autoFocus={false}
+                    className="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputAdornedEnd css-nxo287-MuiInputBase-input-MuiOutlinedInput-input"
+                    disabled={false}
+                    min={0}
+                    onAnimationStart={[Function]}
+                    onBlur={[Function]}
+                    onChange={[Function]}
+                    onFocus={[Function]}
+                    required={false}
+                    step={100}
+                    type="number"
+                    value={2000}
+                  />
+                  <div
+                    className="MuiInputAdornment-root MuiInputAdornment-positionEnd MuiInputAdornment-outlined MuiInputAdornment-sizeMedium css-1laqsz7-MuiInputAdornment-root"
+                  >
+                    <p
+                      className="MuiTypography-root MuiTypography-body1 css-1pnmrwp-MuiTypography-root"
+                    >
+                      ms
+                    </p>
+                  </div>
+                  <fieldset
+                    aria-hidden={true}
+                    className="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+                  >
+                    <legend
+                      className="css-14lo706"
+                    >
+                      <span>
+                        Between
+                      </span>
+                    </legend>
+                  </fieldset>
+                </div>
+              </div>
+            </div>
+            <div
+              className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 MuiGrid-grid-sm-6 css-1b3l6lk-MuiGrid-root"
+            >
+              <div
+                className="MuiFormControl-root MuiFormControl-marginDense MuiTextField-root css-4mzek5-MuiFormControl-root-MuiTextField-root"
+              >
+                <label
+                  className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined MuiFormLabel-colorPrimary MuiFormLabel-filled MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-outlined css-uogadk-MuiFormLabel-root-MuiInputLabel-root"
+                  data-shrink={true}
+                >
+                  and
+                </label>
+                <div
+                  className="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl MuiInputBase-adornedEnd css-plngxy-MuiInputBase-root-MuiOutlinedInput-root"
+                  onClick={[Function]}
+                >
+                  <input
+                    aria-invalid={false}
+                    autoFocus={false}
+                    className="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-inputAdornedEnd css-nxo287-MuiInputBase-input-MuiOutlinedInput-input"
+                    disabled={false}
+                    min={0}
+                    onAnimationStart={[Function]}
+                    onBlur={[Function]}
+                    onChange={[Function]}
+                    onFocus={[Function]}
+                    required={false}
+                    step={100}
+                    type="number"
+                    value={5000}
+                  />
+                  <div
+                    className="MuiInputAdornment-root MuiInputAdornment-positionEnd MuiInputAdornment-outlined MuiInputAdornment-sizeMedium css-1laqsz7-MuiInputAdornment-root"
+                  >
+                    <p
+                      className="MuiTypography-root MuiTypography-body1 css-1pnmrwp-MuiTypography-root"
+                    >
+                      ms
+                    </p>
+                  </div>
+                  <fieldset
+                    aria-hidden={true}
+                    className="MuiOutlinedInput-notchedOutline css-1d3z3hw-MuiOutlinedInput-notchedOutline"
+                  >
+                    <legend
+                      className="css-14lo706"
+                    >
+                      <span>
+                        and
+                      </span>
+                    </legend>
+                  </fieldset>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

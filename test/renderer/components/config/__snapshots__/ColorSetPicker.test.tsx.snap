@@ -1,18 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ColorPicker should match snapshot 1`] = `
+exports[`ColorSetPicker should match snapshot 1`] = `
 <div
-  className="MuiGrid-root MuiGrid-container css-1vam7s3-MuiGrid-root"
+  className="MuiGrid-root MuiGrid-container css-11lq3yg-MuiGrid-root"
 >
   <div
-    className="MuiGrid-root MuiGrid-item ColorPicker-colorGrid-1 css-13i4rnv-MuiGrid-root"
+    className="MuiGrid-root MuiGrid-item ColorSetPicker-colorGrid-1 css-13i4rnv-MuiGrid-root"
   >
     <button
-      aria-label="Pick Color"
+      aria-label="Add Color"
       aria-labelledby={null}
-      className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeMedium MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeMedium MuiFab-default ColorPicker-colorButton-2 css-1fwudth-MuiButtonBase-root-MuiFab-root"
+      className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeMedium MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeMedium MuiFab-default ColorSetPicker-colorButton-2 css-1fwudth-MuiButtonBase-root-MuiFab-root"
       data-mui-internal-clone-element={true}
       disabled={false}
+      id="add-color"
       onBlur={[Function]}
       onClick={[Function]}
       onContextMenu={[Function]}
@@ -27,50 +28,25 @@ exports[`ColorPicker should match snapshot 1`] = `
       onTouchEnd={[Function]}
       onTouchMove={[Function]}
       onTouchStart={[Function]}
-      style={
-        {
-          "backgroundColor": "#fff",
-        }
-      }
+      style={{}}
       tabIndex={0}
       type="button"
     >
-      <div />
+      <svg
+        aria-hidden={true}
+        className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root"
+        data-testid="AddIcon"
+        focusable="false"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+        />
+      </svg>
       <span
         className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
       />
     </button>
-    <div
-      className="MuiFormControl-root MuiTextField-root ColorPicker-colorField-4 css-1u3bzj6-MuiFormControl-root-MuiTextField-root"
-    >
-      <label
-        className="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-standard MuiFormLabel-colorPrimary MuiFormLabel-filled MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiInputLabel-standard css-syr9i-MuiFormLabel-root-MuiInputLabel-root"
-        data-shrink={true}
-        htmlFor="mui-2"
-        id="mui-2-label"
-      >
-        Color
-      </label>
-      <div
-        className="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-colorPrimary MuiInputBase-formControl css-cwspju-MuiInputBase-root-MuiInput-root"
-        onClick={[Function]}
-      >
-        <input
-          aria-invalid={false}
-          autoFocus={false}
-          className="MuiInputBase-input MuiInput-input css-1x51dt5-MuiInputBase-input-MuiInput-input"
-          disabled={false}
-          id="mui-2"
-          onAnimationStart={[Function]}
-          onBlur={[Function]}
-          onChange={[Function]}
-          onFocus={[Function]}
-          required={false}
-          type="text"
-          value="#fff"
-        />
-      </div>
-    </div>
     <div
       TransitionComponent={[Function]}
       className="MuiPopover-root MuiMenu-root MuiModal-root MuiModal-hidden css-6f6ff7-MuiModal-root-MuiPopover-root-MuiMenu-root"
@@ -205,7 +181,7 @@ exports[`ColorPicker should match snapshot 1`] = `
                         "cursor": "default",
                         "left": "0%",
                         "position": "absolute",
-                        "top": "0%",
+                        "top": "100%",
                       }
                     }
                   >
@@ -439,8 +415,8 @@ exports[`ColorPicker should match snapshot 1`] = `
                           "OBoxShadow": undefined,
                           "WebkitBorderRadius": undefined,
                           "WebkitBoxShadow": undefined,
-                          "background": "linear-gradient(to right, rgba(255,255,255, 0) 0%,
-           rgba(255,255,255, 1) 100%)",
+                          "background": "linear-gradient(to right, rgba(0,0,0, 0) 0%,
+           rgba(0,0,0, 1) 100%)",
                           "borderRadius": undefined,
                           "bottom": "0px",
                           "boxShadow": undefined,
@@ -550,7 +526,7 @@ exports[`ColorPicker should match snapshot 1`] = `
                       "OBoxShadow": "inset 0 0 0 1px rgba(0,0,0,.15), inset 0 0 4px rgba(0,0,0,.25)",
                       "WebkitBorderRadius": "2px",
                       "WebkitBoxShadow": "inset 0 0 0 1px rgba(0,0,0,.15), inset 0 0 4px rgba(0,0,0,.25)",
-                      "background": "rgba(255,255,255,1)",
+                      "background": "rgba(0,0,0,1)",
                       "borderRadius": "2px",
                       "bottom": "0px",
                       "boxShadow": "inset 0 0 0 1px rgba(0,0,0,.15), inset 0 0 4px rgba(0,0,0,.25)",
@@ -611,7 +587,7 @@ exports[`ColorPicker should match snapshot 1`] = `
                         "width": "80%",
                       }
                     }
-                    value="FFFFFF"
+                    value="000000"
                   />
                   <label
                     htmlFor="rc-editable-input-1"
@@ -670,7 +646,7 @@ exports[`ColorPicker should match snapshot 1`] = `
                         "width": "80%",
                       }
                     }
-                    value="255"
+                    value="0"
                   />
                   <label
                     htmlFor="rc-editable-input-2"
@@ -730,7 +706,7 @@ exports[`ColorPicker should match snapshot 1`] = `
                         "width": "80%",
                       }
                     }
-                    value="255"
+                    value="0"
                   />
                   <label
                     htmlFor="rc-editable-input-3"
@@ -790,7 +766,7 @@ exports[`ColorPicker should match snapshot 1`] = `
                         "width": "80%",
                       }
                     }
-                    value="255"
+                    value="0"
                   />
                   <label
                     htmlFor="rc-editable-input-4"
@@ -897,7 +873,7 @@ exports[`ColorPicker should match snapshot 1`] = `
     </div>
   </div>
   <div
-    className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 MuiGrid-grid-sm-true css-cyocdy-MuiGrid-root"
+    className="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-true css-1vd824g-MuiGrid-root"
   >
     <div
       className="MuiGrid-root MuiGrid-container css-1vam7s3-MuiGrid-root"
@@ -906,654 +882,9 @@ exports[`ColorPicker should match snapshot 1`] = `
         className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
       >
         <button
-          className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+          className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorSetPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
           disabled={false}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onContextMenu={[Function]}
-          onDragLeave={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          style={
-            {
-              "backgroundColor": "#f44336",
-            }
-          }
-          tabIndex={0}
-          type="button"
-          value="#f44336"
-        >
-          <div />
-          <span
-            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-          />
-        </button>
-      </div>
-      <div
-        className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
-      >
-        <button
-          className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
-          disabled={false}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onContextMenu={[Function]}
-          onDragLeave={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          style={
-            {
-              "backgroundColor": "#e91e63",
-            }
-          }
-          tabIndex={0}
-          type="button"
-          value="#e91e63"
-        >
-          <div />
-          <span
-            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-          />
-        </button>
-      </div>
-      <div
-        className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
-      >
-        <button
-          className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
-          disabled={false}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onContextMenu={[Function]}
-          onDragLeave={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          style={
-            {
-              "backgroundColor": "#9c27b0",
-            }
-          }
-          tabIndex={0}
-          type="button"
-          value="#9c27b0"
-        >
-          <div />
-          <span
-            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-          />
-        </button>
-      </div>
-      <div
-        className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
-      >
-        <button
-          className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
-          disabled={false}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onContextMenu={[Function]}
-          onDragLeave={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          style={
-            {
-              "backgroundColor": "#673ab7",
-            }
-          }
-          tabIndex={0}
-          type="button"
-          value="#673ab7"
-        >
-          <div />
-          <span
-            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-          />
-        </button>
-      </div>
-      <div
-        className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
-      >
-        <button
-          className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
-          disabled={false}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onContextMenu={[Function]}
-          onDragLeave={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          style={
-            {
-              "backgroundColor": "#3f51b5",
-            }
-          }
-          tabIndex={0}
-          type="button"
-          value="#3f51b5"
-        >
-          <div />
-          <span
-            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-          />
-        </button>
-      </div>
-      <div
-        className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
-      >
-        <button
-          className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
-          disabled={false}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onContextMenu={[Function]}
-          onDragLeave={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          style={
-            {
-              "backgroundColor": "#2196f3",
-            }
-          }
-          tabIndex={0}
-          type="button"
-          value="#2196f3"
-        >
-          <div />
-          <span
-            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-          />
-        </button>
-      </div>
-      <div
-        className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
-      >
-        <button
-          className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
-          disabled={false}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onContextMenu={[Function]}
-          onDragLeave={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          style={
-            {
-              "backgroundColor": "#03a9f4",
-            }
-          }
-          tabIndex={0}
-          type="button"
-          value="#03a9f4"
-        >
-          <div />
-          <span
-            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-          />
-        </button>
-      </div>
-      <div
-        className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
-      >
-        <button
-          className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
-          disabled={false}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onContextMenu={[Function]}
-          onDragLeave={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          style={
-            {
-              "backgroundColor": "#00bcd4",
-            }
-          }
-          tabIndex={0}
-          type="button"
-          value="#00bcd4"
-        >
-          <div />
-          <span
-            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-          />
-        </button>
-      </div>
-      <div
-        className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
-      >
-        <button
-          className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
-          disabled={false}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onContextMenu={[Function]}
-          onDragLeave={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          style={
-            {
-              "backgroundColor": "#009688",
-            }
-          }
-          tabIndex={0}
-          type="button"
-          value="#009688"
-        >
-          <div />
-          <span
-            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-          />
-        </button>
-      </div>
-      <div
-        className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
-      >
-        <button
-          className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
-          disabled={false}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onContextMenu={[Function]}
-          onDragLeave={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          style={
-            {
-              "backgroundColor": "#4caf50",
-            }
-          }
-          tabIndex={0}
-          type="button"
-          value="#4caf50"
-        >
-          <div />
-          <span
-            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-          />
-        </button>
-      </div>
-      <div
-        className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
-      >
-        <button
-          className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
-          disabled={false}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onContextMenu={[Function]}
-          onDragLeave={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          style={
-            {
-              "backgroundColor": "#8bc34a",
-            }
-          }
-          tabIndex={0}
-          type="button"
-          value="#8bc34a"
-        >
-          <div />
-          <span
-            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-          />
-        </button>
-      </div>
-      <div
-        className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
-      >
-        <button
-          className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
-          disabled={false}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onContextMenu={[Function]}
-          onDragLeave={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          style={
-            {
-              "backgroundColor": "#cddc39",
-            }
-          }
-          tabIndex={0}
-          type="button"
-          value="#cddc39"
-        >
-          <div />
-          <span
-            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-          />
-        </button>
-      </div>
-      <div
-        className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
-      >
-        <button
-          className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
-          disabled={false}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onContextMenu={[Function]}
-          onDragLeave={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          style={
-            {
-              "backgroundColor": "#ffeb3b",
-            }
-          }
-          tabIndex={0}
-          type="button"
-          value="#ffeb3b"
-        >
-          <div />
-          <span
-            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-          />
-        </button>
-      </div>
-      <div
-        className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
-      >
-        <button
-          className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
-          disabled={false}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onContextMenu={[Function]}
-          onDragLeave={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          style={
-            {
-              "backgroundColor": "#ffc107",
-            }
-          }
-          tabIndex={0}
-          type="button"
-          value="#ffc107"
-        >
-          <div />
-          <span
-            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-          />
-        </button>
-      </div>
-      <div
-        className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
-      >
-        <button
-          className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
-          disabled={false}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onContextMenu={[Function]}
-          onDragLeave={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          style={
-            {
-              "backgroundColor": "#ff9800",
-            }
-          }
-          tabIndex={0}
-          type="button"
-          value="#ff9800"
-        >
-          <div />
-          <span
-            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-          />
-        </button>
-      </div>
-      <div
-        className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
-      >
-        <button
-          className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
-          disabled={false}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onContextMenu={[Function]}
-          onDragLeave={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          style={
-            {
-              "backgroundColor": "#ff5722",
-            }
-          }
-          tabIndex={0}
-          type="button"
-          value="#ff5722"
-        >
-          <div />
-          <span
-            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-          />
-        </button>
-      </div>
-      <div
-        className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
-      >
-        <button
-          className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
-          disabled={false}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onContextMenu={[Function]}
-          onDragLeave={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          style={
-            {
-              "backgroundColor": "#795548",
-            }
-          }
-          tabIndex={0}
-          type="button"
-          value="#795548"
-        >
-          <div />
-          <span
-            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-          />
-        </button>
-      </div>
-      <div
-        className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
-      >
-        <button
-          className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
-          disabled={false}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onContextMenu={[Function]}
-          onDragLeave={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          style={
-            {
-              "backgroundColor": "#9e9e9e",
-            }
-          }
-          tabIndex={0}
-          type="button"
-          value="#9e9e9e"
-        >
-          <div />
-          <span
-            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-          />
-        </button>
-      </div>
-      <div
-        className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
-      >
-        <button
-          className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
-          disabled={false}
-          onBlur={[Function]}
-          onClick={[Function]}
-          onContextMenu={[Function]}
-          onDragLeave={[Function]}
-          onFocus={[Function]}
-          onKeyDown={[Function]}
-          onKeyUp={[Function]}
-          onMouseDown={[Function]}
-          onMouseLeave={[Function]}
-          onMouseUp={[Function]}
-          onTouchEnd={[Function]}
-          onTouchMove={[Function]}
-          onTouchStart={[Function]}
-          style={
-            {
-              "backgroundColor": "#607d8b",
-            }
-          }
-          tabIndex={0}
-          type="button"
-          value="#607d8b"
-        >
-          <div />
-          <span
-            className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
-          />
-        </button>
-      </div>
-      <div
-        className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
-      >
-        <button
-          className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
-          disabled={false}
+          id="color-0"
           onBlur={[Function]}
           onClick={[Function]}
           onContextMenu={[Function]}
@@ -1586,8 +917,9 @@ exports[`ColorPicker should match snapshot 1`] = `
         className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
       >
         <button
-          className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
+          className="MuiButtonBase-root MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default MuiFab-root MuiFab-circular MuiFab-sizeSmall MuiFab-default ColorSetPicker-colorPickerButton-3 css-12m9wit-MuiButtonBase-root-MuiFab-root"
           disabled={false}
+          id="color-1"
           onBlur={[Function]}
           onClick={[Function]}
           onContextMenu={[Function]}
@@ -1617,6 +949,48 @@ exports[`ColorPicker should match snapshot 1`] = `
         </button>
       </div>
     </div>
+  </div>
+  <div
+    className="MuiGrid-root MuiGrid-item css-13i4rnv-MuiGrid-root"
+  >
+    <button
+      aria-label="Clear Colors"
+      aria-labelledby={null}
+      className="MuiButtonBase-root MuiIconButton-root MuiIconButton-sizeLarge css-mf1cb5-MuiButtonBase-root-MuiIconButton-root"
+      data-mui-internal-clone-element={true}
+      disabled={false}
+      onBlur={[Function]}
+      onClick={[Function]}
+      onContextMenu={[Function]}
+      onDragLeave={[Function]}
+      onFocus={[Function]}
+      onKeyDown={[Function]}
+      onKeyUp={[Function]}
+      onMouseDown={[Function]}
+      onMouseLeave={[Function]}
+      onMouseOver={[Function]}
+      onMouseUp={[Function]}
+      onTouchEnd={[Function]}
+      onTouchMove={[Function]}
+      onTouchStart={[Function]}
+      tabIndex={0}
+      type="button"
+    >
+      <svg
+        aria-hidden={true}
+        className="MuiSvgIcon-root MuiSvgIcon-colorError MuiSvgIcon-fontSizeMedium css-1145ie3-MuiSvgIcon-root"
+        data-testid="DeleteIcon"
+        focusable="false"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
+        />
+      </svg>
+      <span
+        className="MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root"
+      />
+    </button>
   </div>
 </div>
 `;

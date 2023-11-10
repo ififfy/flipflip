@@ -1,14 +1,16 @@
 import React from "react";
 import { describe, it, expect } from "@jest/globals";
 import renderer from "react-test-renderer";
-import ColorPicker from "../../../../src/renderer/components/config/ColorPicker";
+import { IdleTimer } from "../../../../src/renderer/components/player/IdleTimer";
 import TestProvider from "../../../util/TestProvider";
 
-describe("ColorPicker", () => {
+describe("IdleTimer", () => {
   it("should match snapshot", () => {
     const component = renderer.create(
       <TestProvider>
-        <ColorPicker currentColor="#fff" onChangeColor={(e: any) => {}} />
+        <IdleTimer>
+          <p>Test</p>
+        </IdleTimer>
       </TestProvider>
     );
 

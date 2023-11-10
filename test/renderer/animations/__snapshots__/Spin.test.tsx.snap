@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Spin should match snapshot 1`] = `
+<div
+  onMouseEnter={[Function]}
+  style={
+    {
+      "transform": "rotateY(0deg)",
+    }
+  }
+>
+  <div
+    style={
+      {
+        "transform": "rotateY(0deg)",
+      }
+    }
+  />
+</div>
+`;
