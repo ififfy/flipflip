@@ -78,8 +78,9 @@ import BatchClipDialog from "./BatchClipDialog";
 import LibrarySearch from "./LibrarySearch";
 import SourceIcon from "./SourceIcon";
 import SourceList from "./SourceList";
-import URLDialog from "../sceneDetail/URLDialog";
+import GooninatorDialog from "../sceneDetail/GooninatorDialog";
 import PiwigoDialog from "../sceneDetail/PiwigoDialog";
+import URLDialog from "../sceneDetail/URLDialog";
 
 const drawerWidth = 240;
 
@@ -1017,6 +1018,11 @@ class Library extends React.Component {
           </MenuItem>
         </Menu>
 
+        <GooninatorDialog
+          open={this.state.openMenu == MO.gooninatorImport}
+          onImportURL={this.onAddSource.bind(this)}
+          onClose={this.onCloseDialog.bind(this)}
+        />
         <URLDialog
           open={this.state.openMenu == MO.urlImport}
           onImportURL={this.onAddSource.bind(this)}
@@ -1114,7 +1120,7 @@ class Library extends React.Component {
   // Use alt+L to move cached offline sources to local sources
   onKeyDown = (e: KeyboardEvent) => {
     if (!e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'p' || e.key == 'π')) {
-      this.setState({openMenu: this.state.openMenu == MO.urlImport ? null : MO.urlImport});
+      this.setState({openMenu: this.state.openMenu == MO.gooninatorImport ? null : MO.gooninatorImport});
     } else if (!e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'm' || e.key == 'µ')) {
       this.toggleMarked();
     } else if (!e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'l' || e.key == '¬')) {
@@ -1247,6 +1253,8 @@ class Library extends React.Component {
     this.onCloseDialog();
     if (addFunction == AF.videos && e.shiftKey) {
       this.props.onAddSource(null, AF.videoDir, ...args);
+    } else if (addFunction == AF.url && e.shiftKey) {
+      this.setState({openMenu: MO.urlImport});
     } else {
       this.props.onAddSource(null, addFunction, ...args);
     }

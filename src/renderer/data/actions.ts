@@ -2290,6 +2290,17 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
         }
       }
 
+    case AF.list:
+      let newSources = Array.from(args[0].trim().split("\n")).filter((s: string) => s.length > 0) as Array<string>;
+      if (scene != null) {
+        return updateScene(state, scene, (s) => {
+          addSources(s.sources, newSources, state.library);
+          handleArgs(s);
+        })
+      } else {
+        return updateLibrary(state, (l) =>  addSources(l, newSources, state.library));
+      }
+
     case AF.directory:
       let dResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory', 'multiSelections']});
       if (!dResult) return;
@@ -2425,6 +2436,7 @@ function mergeSources(originalSources: Array<LibrarySource>, newSources: Array<L
 
 function addSources(originalSources: Array<LibrarySource>, newSources: Array<string>, library: Array<LibrarySource>) {
   // dedup
+  newSources = [...new Set(newSources)];
   let sourceURLs = originalSources.map((s) => s.url);
   newSources = newSources.filter((s) => !sourceURLs.includes(s));
 

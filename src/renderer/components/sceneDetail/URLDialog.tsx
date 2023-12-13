@@ -20,7 +20,7 @@ import {
 import createStyles from '@mui/styles/createStyles';
 import withStyles from '@mui/styles/withStyles';
 
-import {GT} from "../../data/const";
+import {AF} from "../../data/const";
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -29,6 +29,13 @@ const styles = (theme: Theme) => createStyles({
   rootInput: {
     marginLeft: theme.spacing(2),
     flexGrow: 1,
+  },
+  urlInput: {
+    minWidth: 550,
+    minHeight: 300,
+    whiteSpace: 'nowrap',
+    overflowX: 'hidden',
+    overflowY: 'auto !important' as any,
   },
 });
 
@@ -41,9 +48,7 @@ class URLDialog extends React.Component {
   };
 
   readonly state = {
-    importType: GT.tumblr,
-    importURL: "",
-    rootDir: "",
+    importURLs: "",
   };
 
   render() {
@@ -54,74 +59,43 @@ class URLDialog extends React.Component {
         onClose={this.props.onClose.bind(this)}
         aria-labelledby="url-import-title"
         aria-describedby="url-import-description">
-        <DialogTitle id="url-import-title">Import URL</DialogTitle>
+        <DialogTitle id="url-import-title">Add Multiple URL Sources</DialogTitle>
         <DialogContent>
           <DialogContentText id="remove-all-description">
-            Paste a gooninator URL and choose how to import the sources:
+            Paste URLs to add as sources, one per line:
           </DialogContentText>
           <TextField
             variant="standard"
-            label="Gooninator URL"
+            label="Source URLs"
             fullWidth
-            placeholder="Paste URL Here"
+            multiline
             margin="dense"
-            value={this.state.importURL}
+            value={this.state.importURLs}
+            inputProps={{className: classes.urlInput}}
             onChange={this.onURLChange.bind(this)} />
-          <div className={classes.root}>
-            <FormControl variant="standard">
-              <InputLabel>Import as</InputLabel>
-              <Select
-                variant="standard"
-                value={this.state.importType}
-                onChange={this.onTypeChange.bind(this)}>
-                <MenuItem value={GT.tumblr}>Tumblr Blogs</MenuItem>
-                <MenuItem value={GT.local}>Local Directories</MenuItem>
-              </Select>
-            </FormControl>
-            <Collapse className={classes.rootInput} in={this.state.importType == GT.local}>
-              <TextField
-                variant="standard"
-                fullWidth
-                label="Parent Directory"
-                value={this.state.rootDir}
-                InputProps={{readOnly: true}}
-                onClick={this.onRootChange.bind(this)} />
-            </Collapse>
-          </div>
         </DialogContent>
         <DialogActions>
           <Button onClick={this.props.onClose.bind(this)} color="secondary">
             Cancel
           </Button>
           <Button
-            disabled={!this.state.importURL.match("^https?://") || (this.state.importType == GT.local && this.state.rootDir.length == 0)}
             onClick={this.onImportURL.bind(this)}
             color="primary">
-            Import
+            Add Sources
           </Button>
         </DialogActions>
       </Dialog>
     );
   }
 
-  onTypeChange(e: MouseEvent) {
-    const type = (e.target as HTMLInputElement).value;
-    this.setState({importType: type});
-  }
-
   onURLChange(e: MouseEvent) {
     const type = (e.target as HTMLInputElement).value;
-    this.setState({importURL: type});
-  }
-
-  onRootChange() {
-    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']});
-    if (!result || !result.length) return;
-    this.setState({rootDir: result[0]});
+    this.setState({importURLs: type});
   }
 
   onImportURL() {
-    this.props.onImportURL(this.state.importType, null, this.state.importURL, this.state.rootDir);
+    this.props.onImportURL(AF.list, null, this.state.importURLs);
+    this.setState({importURLs: ""});
     this.props.onClose();
   }
 }

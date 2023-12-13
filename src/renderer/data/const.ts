@@ -180,6 +180,7 @@ const SL = { // strobe layers
 
 const AF = { // add functions
   url: 'af.url',
+  list: 'af.list',
   directory: 'af.directory',
   videos: 'af.videos',
   videoDir: 'af.videodir',
@@ -202,6 +203,7 @@ const MO = { // Menu/Modal Constants
   playlist: 'mo.playlist',
   newPlaylist: 'mo.newplaylist',
   playlistDuplicates: 'mo.playlistduplicates',
+  gooninatorImport: 'mo.gooninatorimport',
   urlImport: 'mo.urlimport',
   libraryImport: 'mo.libraryImport',
   newWindowAlert: 'mo.nwalert',

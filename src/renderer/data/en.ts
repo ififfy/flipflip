@@ -133,6 +133,7 @@ export default new Map<string, string>([
   ['sl.bottom', 'Behind All'],
 
   ['af.url', '+ URL'],
+  ['af.list', '+ List'],
   ['af.audios', '+ Local audio'],
   ['af.directory', '+ Local directory'],
   ['af.videos', '+ Local video/playlist'],

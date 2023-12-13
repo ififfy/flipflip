@@ -79,7 +79,7 @@ import WeightGroup from "../../data/WeightGroup";
 import SceneEffects from "./SceneEffects";
 import SceneGenerator from "./SceneGenerator";
 import SceneOptions from "./SceneOptions";
-import URLDialog from "./URLDialog";
+import GooninatorDialog from "./GooninatorDialog";
 import LibrarySearch from "../library/LibrarySearch";
 import SourceList from "../library/SourceList";
 import AudioTextEffects from "./AudioTextEffects";
@@ -90,6 +90,7 @@ import CaptionScript from "../../data/CaptionScript";
 import SceneGrid from "../../data/SceneGrid";
 import PiwigoDialog from "./PiwigoDialog";
 import SourceIcon from "../library/SourceIcon";
+import URLDialog from "./URLDialog";
 
 const drawerWidth = 240;
 
@@ -899,12 +900,16 @@ class SceneDetail extends React.Component {
               <AddIcon className={classes.icon} />
             </Fab>
 
+            <GooninatorDialog
+              open={this.state.openMenu == MO.gooninatorImport}
+              onImportURL={this.onAddSource.bind(this)}
+              onClose={this.onCloseDialog.bind(this)}
+            />
             <URLDialog
               open={this.state.openMenu == MO.urlImport}
               onImportURL={this.onAddSource.bind(this)}
               onClose={this.onCloseDialog.bind(this)}
             />
-
             <PiwigoDialog 
               config={this.props.config}
               open={this.state.openMenu == MO.piwigo}
@@ -1184,7 +1189,7 @@ class SceneDetail extends React.Component {
   // Use alt+U to toggle highlighting untagged sources
   onKeyDown = (e: KeyboardEvent) => {
     if (!e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'p' || e.key == 'π')) {
-      this.setState({openMenu: this.state.openMenu == MO.urlImport ? null : MO.urlImport});
+      this.setState({openMenu: this.state.openMenu == MO.gooninatorImport ? null : MO.gooninatorImport});
     }
   };
 
@@ -1280,7 +1285,9 @@ class SceneDetail extends React.Component {
       this.props.onTutorial(SDT.add2);
       this.props.onAddSource(this.props.scene, "tutorial");
     } else if (addFunction == AF.videos && e.shiftKey) {
-        this.props.onAddSource(this.props.scene, AF.videoDir, ...args);
+      this.props.onAddSource(this.props.scene, AF.videoDir, ...args);
+    } else if (addFunction == AF.url && e.shiftKey) {
+      this.setState({openMenu: MO.urlImport});
     } else {
       this.props.onAddSource(this.props.scene, addFunction, ...args);
     }
