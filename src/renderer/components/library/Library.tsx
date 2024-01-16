@@ -68,7 +68,7 @@ import SortIcon from '@mui/icons-material/Sort';
 
 import {AF, LT, MO, PR, SF, SP, ST} from "../../data/const";
 import {filterSource, getCachePath, getLocalPath} from "../../data/utils";
-import {getSourceType} from "../player/Scrapers";
+import {getFileName, getSourceType} from "../player/Scrapers";
 import en from "../../data/en";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
@@ -1351,12 +1351,16 @@ class Library extends React.Component {
       const displayIDs = this.state.displaySources.map((s) => s.id);
       for (let i = l.length -1; i >= 0 ; i--) {
         if (displayIDs.includes(l[i].id)) {
-          const fileType = getSourceType(l[i].url);
+          const sourceURL = l[i].url;
+          const fileType = getSourceType(sourceURL);
           try {
             if (fileType == ST.local) {
-              rimraf.sync(l[i].url);
+              rimraf.sync(sourceURL);
             } else if (fileType == ST.video || fileType == ST.playlist || fileType == ST.list) {
-              unlinkSync(l[i].url);
+              unlinkSync(sourceURL);
+              rimraf.sync(getCachePath(sourceURL, this.props.config) + getFileName(sourceURL));
+            } else {
+              rimraf.sync(getCachePath(sourceURL, this.props.config));
             }
           } catch (e) {
             console.error(e);
