@@ -658,66 +658,87 @@ export const loadRedGifs = (allURLs: Map<string, Array<string>>, allPosts: Map<s
     });
 }
 
-export const loadImageFap = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
-  const timeout = 8000;
-  const url = source.url;
-  if (url.includes("/pictures/")) {
-    wretch("https://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2")
-      .get()
-      .setTimeout(15000)
-      .onAbort((e) => pm({
-        error: e.message,
-        helpers: helpers,
-        source: source,
-        timeout: timeout,
-      }, resolve))
-      .text((html) => {
-        let imageEls = domino.createWindow(html).document.querySelectorAll(".expp-container > form > table > tbody > tr > td");
-        let images = Array<string>();
-        if (imageEls.length > 0) {
-          helpers.count = imageEls.length;
-          let imageCount = helpers.next > 0 ? helpers.next : 0;
-          const imageLoop = () => {
-            const image = imageEls.item(imageCount++);
-            wretch("https://www.imagefap.com/photo/" + image.id + "/")
-              .get()
-              .text((html) => {
-                let captcha = undefined;
-                let contentURL = html.match("\"contentUrl\": \"(.*?)\",");
-                if (contentURL != null) {
-                  images.push(contentURL[1]);
-                } else {
-                  captcha = "https://www.imagefap.com/photo/" + image.id + "/";
-                }
-                if (imageCount == imageEls.length || captcha != null) {
-                  helpers.next = imageCount == imageEls.length ? null : imageCount;
-                  pm({
-                    captcha: captcha,
-                    data: filterPathsToJustPlayable(filter, images, false),
-                    allURLs: allURLs,
-                    allPosts: allPosts,
-                    weight: weight,
-                    helpers: helpers,
-                    source: source,
-                    timeout: timeout,
-                  }, resolve);
-                } else {
-                  setTimeout(imageLoop, 200);
-                }
-              });
-          }
-          imageLoop();
+const loadImageFapGallery = (
+  galleryURL: string,
+  allURLs: Map<string, Array<string>>,
+  allPosts: Map<string, string>,
+  source: LibrarySource,
+  filter: string,
+  weight: string,
+  helpers: { next: any; count: number; retries: number; uuid: string },
+  timeout: number,
+  images: Array<string>,
+  baseGalleryURL: string,
+  onFinishedLoading: (helpers: { next: any; count: number; retries: number; uuid: string }) => void,
+  resolve?: Function
+) => {
+  wretch(galleryURL)
+    .get()
+    .setTimeout(15000)
+    .onAbort((e) =>
+      pm(
+        {
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        },
+        resolve
+      )
+    )
+    .text((html) => {
+      const galleryWindow = domino.createWindow(html);
+      let imageEl = galleryWindow.document.querySelector(
+        ".expp-container > form > table > tbody > tr > td > table > tbody > tr > td > a"
+      );
+      if (imageEl) {
+        const imageURL = "https://www.imagefap.com" + imageEl.href;
+        wretch(imageURL)
+          .get()
+          .text((html) => {
+            let captcha = undefined;
+            const ahrefs = domino
+              .createWindow(html)
+              .document.querySelectorAll(
+                'a[href^="https://cdn.imagefap.com/images/full/"]'
+              );
+
+            if (ahrefs.length > 0) {
+              for (let i = 0; i < ahrefs.length; i++) {
+                images.push(ahrefs.item(i).href);
+              }
+            } else {
+              captcha = imageURL;
+            }
+
+            if (captcha != null) {
+              pm(
+                {
+                  captcha: captcha,
+                  data: images,
+                  allURLs: allURLs,
+                  allPosts: allPosts,
+                  weight: weight,
+                  helpers: helpers,
+                  source: source,
+                  timeout: timeout,
+                },
+                resolve
+              );
+            }
+          });
+      } else {
+        let captcha = undefined;
+        if (html.includes("Enter the captcha")) {
+          helpers.count = source.count;
+          captcha = galleryURL;
+          images = allURLs.get(source.url);
+          pm({ warning: source.url + " - blocked due to captcha" }, resolve);
         } else {
-          let captcha = undefined;
-          if (html.includes("Enter the captcha")) {
-            helpers.count = source.count;
-            captcha = "https://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2";
-            images = allURLs.get(url);
-            pm({warning: source.url + " - blocked due to captcha"}, resolve);
-          } else {
-            helpers.next = null;
-          }
-          pm({
+          onFinishedLoading(helpers);
+        }
+        pm(
+          {
             captcha: captcha,
             data: images,
             allURLs: allURLs,
@@ -726,9 +747,85 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, allPosts: Map<
             helpers: helpers,
             source: source,
             timeout: timeout,
-          }, resolve);
+          },
+          resolve
+        );
+      }
+
+      const nextGalleryLink = galleryWindow.document.querySelector(
+        "#gallery > font > span > a:last-child"
+      );
+      if (nextGalleryLink && nextGalleryLink.innerHTML == ":: next ::") {
+        let href = nextGalleryLink.href;
+        if (href.startsWith("/")) {
+          href = href.substring(1);
         }
-      });
+        setTimeout(
+          () =>
+            loadImageFapGallery(
+              baseGalleryURL + href,
+              allURLs,
+              allPosts,
+              source,
+              filter,
+              weight,
+              helpers,
+              timeout,
+              images,
+              baseGalleryURL,
+              onFinishedLoading,
+              resolve
+            ),
+          2000
+        );
+      } else {
+        onFinishedLoading(helpers);
+        pm(
+          {
+            data: filterPathsToJustPlayable(filter, images, false),
+            allURLs: allURLs,
+            allPosts: allPosts,
+            weight: weight,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          },
+          resolve
+        );
+      }
+    });
+};
+
+export const loadImageFap = (
+  allURLs: Map<string, Array<string>>,
+  allPosts: Map<string, string>,
+  config: Config,
+  source: LibrarySource,
+  filter: string,
+  weight: string,
+  helpers: { next: any; count: number; retries: number; uuid: string },
+  resolve?: Function
+) => {
+  const timeout = 8000;
+  const url = source.url;
+  if (url.includes("/gallery/") || url.includes("/pictures/")) {
+    let images = Array<string>();
+    const gid = getFileGroup(url);
+    const baseGalleryURL = "https://www.imagefap.com/gallery/" + gid;
+    loadImageFapGallery(
+      baseGalleryURL + "?gid=" + gid + "&view=0",
+      allURLs,
+      allPosts,
+      source,
+      filter,
+      weight,
+      helpers,
+      timeout,
+      images,
+      baseGalleryURL,
+      (h) => h.next = null,
+      resolve
+    );
   } else if (url.includes("/organizer/")) {
     if (helpers.next == 0) {
       helpers.next = [0, 0, 0];
@@ -752,135 +849,97 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, allPosts: Map<
             pm({warning: source.url + " - blocked due to captcha"}, resolve);
           }
           helpers.next = null;
-          pm({
-            captcha: captcha,
-            data: [],
-            allURLs: allURLs,
-            allPosts: allPosts,
-            weight: weight,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          }, resolve);
-        } else if (albumEls.length > helpers.next[1]) {
-          let albumEl = albumEls[helpers.next[1]];
-          let albumID = albumEl.getAttribute("href").substring(albumEl.getAttribute("href").lastIndexOf("/") + 1);
-          wretch("https://www.imagefap.com/gallery/" + albumID + "?view=2")
-            .get()
-            .setTimeout(15000)
-            .onAbort((e) => pm({
-              error: e.message,
+          pm(
+            {
+              captcha: captcha,
+              data: [],
+              allURLs: allURLs,
+              allPosts: allPosts,
+              weight: weight,
               helpers: helpers,
               source: source,
               timeout: timeout,
-            }, resolve))
-            .text((html) => {
-              let imageEls = domino.createWindow(html).document.querySelectorAll(".expp-container > form > table > tbody > tr > td");
-              let images = Array<string>();
-              if (imageEls.length > 0) {
-                let imageCount = helpers.next[2];
-                const imageLoop = () => {
-                  const image = imageEls.item(imageCount++);
-                  wretch("https://www.imagefap.com/photo/" + image.id + "/")
-                    .get()
-                    .text((html) => {
-                      let captcha = undefined;
-                      let contentURL = html.match("\"contentUrl\": \"(.*?)\",");
-                      if (contentURL != null) {
-                        images.push(contentURL[1]);
-                      } else {
-                        captcha = "https://www.imagefap.com/photo/" + image.id + "/";
-                      }
-                      if (imageCount == imageEls.length || captcha != null) {
-                        if (imageCount == imageEls.length) {
-                            helpers.next[2] = 0;
-                            helpers.next[1] += 1;
-                            helpers.count += imageEls.length;
-                        } else {
-                            helpers.next = imageCount;
-                        }
-                        pm({
-                          captcha: captcha,
-                          data: filterPathsToJustPlayable(filter, images, false),
-                          allURLs: allURLs,
-                          allPosts: allPosts,
-                          weight: weight,
-                          helpers: helpers,
-                          source: source,
-                          timeout: timeout,
-                        }, resolve);
-                      } else {
-                        setTimeout(imageLoop, 200);
-                      }
-                    });
-                }
-                imageLoop();
-              } else {
-                let captcha = undefined;
-                if (html.includes("Enter the captcha")) {
-                  helpers.count = source.count;
-                  captcha = "https://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2";
-                  pm({warning: source.url + " - blocked due to captcha"}, resolve);
-                } else {
-                  helpers.next[1] += 1;
-                }
-                pm({
-                  captcha: captcha,
-                  data: [],
-                  allURLs: allURLs,
-                  allPosts: allPosts,
-                  weight: weight,
-                  helpers: helpers,
-                  source: source,
-                  timeout: timeout,
-                }, resolve);
-              }
-            });
+            },
+            resolve
+          );
+        } else if (albumEls.length > helpers.next[1]) {
+          let albumEl = albumEls[helpers.next[1]];
+          let albumID = albumEl
+            .getAttribute("href")
+            .substring(albumEl.getAttribute("href").lastIndexOf("/") + 1);
+
+          let images = Array<string>();
+          const baseGalleryURL = "https://www.imagefap.com/gallery/" + albumID;
+          loadImageFapGallery(
+            baseGalleryURL + "?gid=" + albumID + "&view=0",
+            allURLs,
+            allPosts,
+            source,
+            filter,
+            weight,
+            helpers,
+            timeout,
+            images,
+            baseGalleryURL,
+            (h) => h.next[1] += 1,
+            resolve
+          );
         } else {
           let images = Array<string>();
           let captcha = undefined;
           if (html.includes("Enter the captcha")) {
             helpers.count = source.count;
-            captcha = "https://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2";
+            captcha =
+              "https://www.imagefap.com/gallery/" +
+              getFileGroup(url) +
+              "?view=0";
             images = allURLs.get(url);
-            pm({warning: source.url + " - blocked due to captcha"}, resolve);
+            pm({ warning: source.url + " - blocked due to captcha" }, resolve);
           } else {
             helpers.next[0] += 1;
             helpers.next[1] = 0;
           }
-          pm({
-            captcha: captcha,
-            data: images,
-            allURLs: allURLs,
-            allPosts: allPosts,
-            weight: weight,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          }, resolve);
+          pm(
+            {
+              captcha: captcha,
+              data: images,
+              allURLs: allURLs,
+              allPosts: allPosts,
+              weight: weight,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            },
+            resolve
+          );
         }
       })
       .catch((e) => {
-        pm({
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        }, resolve);
+        pm(
+          {
+            error: e.message,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          },
+          resolve
+        );
       });
   } else if (url.includes("/video.php?vid=")) {
     helpers.next = null;
-    pm({
-      data: [],
-      allURLs: allURLs,
-      allPosts: allPosts,
-      weight: weight,
-      helpers: helpers,
-      source: source,
-      timeout: timeout,
-    }, resolve);
-    // This doesn't work anymore due to src url requiring referer
-    /*wretch(url)
+    pm(
+      {
+        data: [],
+        allURLs: allURLs,
+        allPosts: allPosts,
+        weight: weight,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      },
+      resolve
+    );
+    wretch(url)
       .get()
       .setTimeout(10000)
       .onAbort((e) => pm({
@@ -890,25 +949,49 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, allPosts: Map<
         timeout: timeout,
       }, resolve))
       .text((html) => {
-        const findVideoURLs = /url: '(https:\/\/cdn-fck\.moviefap\.com\/moviefap\/.*)',/g.exec(html);
-        if (findVideoURLs) {
-          let videoURLs = Array<string>();
-          for (let v of findVideoURLs) {
-            if (!v.startsWith('url:')) {
-              videoURLs.push(v);
-            }
-          }
-          helpers.next = null;
-          helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, videoURLs, false).length;
-          pm({
-            data: filterPathsToJustPlayable(filter, videoURLs, false),
-            allURLs: allURLs,
-            allPosts: allPosts,
-            weight: weight,
+        const foundVideoConfigURLs = /url: '(https:\/\/cdn-fck\.moviefap\.com\/moviefap\/.*)',/g.exec(html);
+        if(foundVideoConfigURLs.length == 2) {
+          const videoConfigURL = foundVideoConfigURLs[1]; // get first group
+          wretch(videoConfigURL)
+          .get()
+          .setTimeout(10000)
+          .onAbort((e) => pm({
+            error: e.message,
             helpers: helpers,
             source: source,
             timeout: timeout,
-          }, resolve);
+          }, resolve))
+          .text((xml) => {
+            // Get highest resolution video link
+            let res = 0;
+            let videoLink = '';
+            const videoQualities = domino.createWindow(xml).document.querySelectorAll("flixV2 > quality > item");
+            for(let i = 0; i < videoQualities.length; i++) {
+              const quality = videoQualities.item(i);
+              const newResText = quality.querySelector('res').innerHTML.slice(0, -1);
+              const newRes = Number(newResText);
+              if(newRes > res) {
+                res = newRes;
+                videoLink = quality.querySelector('videoLink').textContent;
+              }
+            }
+
+            const data = videoLink ? filterPathsToJustPlayable(filter, [videoLink], false) : [];
+            if(data.length > 0) {
+              helpers.count = helpers.count + data.length;
+            }
+
+            helpers.next = null;
+            pm({
+              data,
+              allURLs: allURLs,
+              allPosts: allPosts,
+              weight: weight,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            }, resolve);
+          })
         } else {
           helpers.next = null;
           pm({
@@ -921,7 +1004,7 @@ export const loadImageFap = (allURLs: Map<string, Array<string>>, allPosts: Map<
             timeout: timeout,
           }, resolve);
         }
-      });*/
+      });
   } else {
     helpers.next = null;
     pm({
@@ -3009,6 +3092,7 @@ export function getFileGroup(url: string) {
     case ST.imagefap:
       let imagefapID = url.replace(/https?:\/\/www.imagefap.com\//, "");
       imagefapID = imagefapID.replace(/pictures\//, "");
+      imagefapID = imagefapID.replace(/gallery\//, "");
       imagefapID = imagefapID.replace(/organizer\//, "");
       imagefapID = imagefapID.replace(/video\.php\?vid=/, "");
       imagefapID = imagefapID.split("/")[0];
