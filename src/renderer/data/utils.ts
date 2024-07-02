@@ -490,14 +490,24 @@ export function filterSource(filter: string, source: LibrarySource, clip: Clip, 
   let countRegex;
   if (filter == "<Mergeable>") {
     matchesFilter = !!mergeSources && mergeSources.includes(source);
+  } else if (filter == "-<Mergeable>") {
+    matchesFilter = !(!!mergeSources && mergeSources.includes(source));
   } else if (filter == "<Offline>") { // This is offline filter
     matchesFilter = source.offline;
+  } else if (filter == "-<Offline>") { // This is offline filter
+    matchesFilter = !(source.offline);
   } else if (filter == "<Marked>") { // This is a marked filter
     matchesFilter = source.marked;
+  } else if (filter == "-<Marked>") { // This is a marked filter
+    matchesFilter = !(source.marked);
   } else if (filter == "<Untagged>") { // This is untagged filter
     matchesFilter = clip && clip.tags && clip.tags.length > 0 ? clip.tags.length === 0 : source.tags.length === 0;
+  } else if (filter == "-<Untagged>") { // This is untagged filter
+    matchesFilter = !(clip && clip.tags && clip.tags.length > 0 ? clip.tags.length === 0 : source.tags.length === 0);
   } else if (filter == "<Unclipped>") {
     matchesFilter = getSourceType(source.url) == ST.video && source.clips.length === 0;
+  } else if (filter == "-<Unclipped>") {
+    matchesFilter = !(getSourceType(source.url) == ST.video && source.clips.length === 0);
   } else if ((filter.startsWith("[") || filter.startsWith("-[")) && filter.endsWith("]")) { // This is a tag filter
     let tags = clip && clip.tags && clip.tags.length > 0 ? clip.tags : source.tags;
     if (filter.startsWith("-")) {
