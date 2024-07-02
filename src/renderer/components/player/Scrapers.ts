@@ -1996,7 +1996,7 @@ export const loadGelbooru2 = (allURLs: Map<string, Array<string>>, allPosts: Map
       }
 
       const images = Array<string>();
-      for (let p of json) {
+      for (let p of json.post) {
         if (p.file_url) {
           images.push(p.file_url);
         } else if (p.image) {
