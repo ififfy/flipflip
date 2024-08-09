@@ -5,6 +5,5 @@
 > A glorified slideshow, with _lots_ of bells and whistles
 
 
-[GitHub](https://github.com/ififfy/flipflip/)
-[KoFi](https://ko-fi.com/flipflipapp)
+[GitHub](https://github.com/regtemp8/flipflip/)
 [Get Started](#flipflip)  

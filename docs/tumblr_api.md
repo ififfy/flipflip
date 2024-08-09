@@ -6,9 +6,9 @@ your own for seamless use.
 1. Go to https://www.tumblr.com/oauth/apps
 1. Click `+ Register Application`
     * Application Name: **FlipFlip**
-    * Application Website: **`https://github.com/ififfy/flipflip`**
+    * Application Website: **`https://github.com/regtemp8/flipflip`**
     * Application Description: **FlipFlip**
-    * Default callback URL: **`https://github.com/ififfy/flipflip`**
+    * Default callback URL: **`https://github.com/regtemp8/flipflip`**
 1. Click Register
 1. Return to FlipFlip Settings and click the `Tumblr` icon
 1. Copy the "OAuth Consumer Key" into the FlipFlip

@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://ififfy.github.io/flipflip/">
+  <a href="https://regtemp8.github.io/flipflip/">
     <img alt="flipflip" src="./docs/doc_images/flipflip_logo.png" height=320>
   </a>
 </p>
@@ -13,8 +13,8 @@
 
 ## Links
 
-* **[Download Latest Release (Mac/Windows/Linux)](https://github.com/ififfy/flipflip/releases/latest)**
-* **[User manual](https://ififfy.github.io/flipflip/)**
+* **[Download Latest Release (Mac/Windows/Linux)](https://github.com/regtemp8/flipflip/releases/latest)**
+* **[User manual](https://regtemp8.github.io/flipflip/)**
 * **[Subreddit](https://www.reddit.com/r/flipflip/)**
 
 ## Features
@@ -32,14 +32,10 @@
 
 ## Quick start
 
-Check out our [quick start](https://ififfy.github.io/flipflip/#/quickstart) guide.
+Check out our [quick start](https://regtemp8.github.io/flipflip/#/quickstart) guide.
 
 ## Contributing
 
 Create a new branch, make your changes, and open a pull request. The policy of the FlipFlip project is, 
-"patches are generally accepted." See the [developers](https://ififfy.github.io/flipflip/#/developers) 
+"patches are generally accepted." See the [developers](https://regtemp8.github.io/flipflip/#/developers) 
 documentation to get started.
-
-## Donate
-
-Enjoying FlipFlip? [Buy me a coffee](https://ko-fi.com/flipflipapp) and help support FlipFlip development!

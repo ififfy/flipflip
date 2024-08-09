@@ -1172,7 +1172,7 @@ class Tutorial extends React.Component<TutorialProps> {
                   href="#"
                   onClick={this.openLink.bind(
                     this,
-                    "https://ififfy.github.io/flipflip/#",
+                    "https://regtemp8.github.io/flipflip/#",
                   )}
                   underline="hover"
                 >

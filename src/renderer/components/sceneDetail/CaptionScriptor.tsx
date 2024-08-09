@@ -924,7 +924,7 @@ class CaptionScriptor extends React.Component<CaptionScriptorProps> {
                             href="#"
                             onClick={this.openLink.bind(
                               this,
-                              "https://ififfy.github.io/flipflip/#/caption_script",
+                              "https://regtemp8.github.io/flipflip/#/caption_script",
                             )}
                             underline="hover"
                           >

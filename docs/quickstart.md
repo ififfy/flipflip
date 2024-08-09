@@ -1,6 +1,6 @@
 # Getting Started
 
-Download the newest release for your OS [here](https://github.com/ififfy/flipflip/releases/latest). 
+Download the newest release for your OS [here](https://github.com/regtemp8/flipflip/releases/latest). 
 No installation necessary, just run `FlipFlip`.  
 
 ?> **Mac users**: Right-click the app and pick `Open`. Click through all the dumb prompts until it opens.

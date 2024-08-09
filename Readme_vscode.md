@@ -22,8 +22,8 @@ In a terminal (Ahem for our Windows friends - a command prompt or Powershell) ty
 
    (Skipable explanatory waffle: `yarn development`:
 
-   1. Calls the `development` script in FlipFlip's [`package.json`](https://github.com/ififfy/flipflip/blob/master/package.json);
-   1. 'Bundles' the code using [webpack](https://webpack.js.org/) and the configuration information provided in FlipFlip's [`webpack.dev.js`](https://github.com/ififfy/flipflip/blob/master/webpack.dev.js) - output being stored under `~/dist`; and
+   1. Calls the `development` script in FlipFlip's [`package.json`](https://github.com/regtemp8/flipflip/blob/master/package.json);
+   1. 'Bundles' the code using [webpack](https://webpack.js.org/) and the configuration information provided in FlipFlip's [`webpack.dev.js`](https://github.com/regtemp8/flipflip/blob/master/webpack.dev.js) - output being stored under `~/dist`; and
    1. 'Watches' for code changes to dynamically re-bundle when they are saved. )
 
 ## 4 Debug

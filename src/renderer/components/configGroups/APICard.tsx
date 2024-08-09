@@ -365,7 +365,7 @@ class APICard extends React.Component<APICardProps> {
                 href="#"
                 onClick={this.openLink.bind(
                   this,
-                  "https://ififfy.github.io/flipflip/#/tumblr_api",
+                  "https://regtemp8.github.io/flipflip/#/tumblr_api",
                 )}
                 underline="hover"
               >

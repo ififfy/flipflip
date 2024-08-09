@@ -12,7 +12,7 @@ You will need to download and install the following tools:
 
 Then, in a Bash shell, run the following:
 ```sh
-git clone https://github.com/ififfy/flipflip.git
+git clone https://github.com/regtemp8/flipflip.git
 cd flipflip
 yarn install --dev
 
@@ -52,8 +52,6 @@ on the project to make changes as you wish. :-)
 ## Contribution guidelines
 
 * Try to keep the code repository and the application itself G-rated.
-  If you want to break this guideline, email ififfy@mm.st and let's see
-  if we can figure something out.
 * Code needs to work on both Mac and Windows.
 * The project is run on ["open open source"](http://openopensource.org)
   principles.

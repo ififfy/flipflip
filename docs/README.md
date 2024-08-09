@@ -2,8 +2,8 @@
 
 <img src="doc_images/flipflip_home.png" alt="FlipFlip" class="col-xs-10 col-xl-7">
 
-## [Releases](https://github.com/ififfy/flipflip/releases)
-#### [Latest Release](https://github.com/ififfy/flipflip/releases/latest)
+## [Releases](https://github.com/regtemp8/flipflip/releases)
+#### [Latest Release](https://github.com/regtemp8/flipflip/releases/latest)
 
 ## Features
 * Local files as well as Tumblr, ~~Reddit~~, Imgur, DeviantArt, Booru & More
@@ -20,9 +20,5 @@
 
 ## Community
 Having an issue with FlipFlip? Have a new feature recommendation? Just want to share how much you enjoy it?
-You can reach us on our [GitHub](https://github.com/ififfy/flipflip) or on Reddit at 
+You can reach us on our [GitHub](https://github.com/regtemp8/flipflip) or on Reddit at 
 [/r/flipflip](https://www.reddit.com/r/flipflip/).
-
-## Donate
-
-Enjoying FlipFlip? [Buy me a coffee](https://ko-fi.com/flipflipapp) and help support FlipFlip development!
