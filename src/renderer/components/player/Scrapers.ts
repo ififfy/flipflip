@@ -2678,7 +2678,7 @@ export const loadHydrus = (allURLs: Map<string, Array<string>>, allPosts: Map<st
     let images = Array<string>();
     const getFileMetadata = (fileIDs: Array<number>, page: number) => {
       const pageIDs = fileIDs.slice(page*chunk, (page+1)*chunk);
-      wretch(hydrusURL + "/get_files/file_metadata?file_ids=[" + pageIDs.toString() + "]")
+      wretch(hydrusURL + "/get_files/file_metadata?only_return_basic_information=true&include_services_object=false&file_ids=[" + pageIDs.toString() + "]")
         .headers({"Hydrus-Client-API-Access-Key": apiKey})
         .get()
         .setTimeout(15000)
