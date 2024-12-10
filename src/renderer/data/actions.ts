@@ -3402,7 +3402,7 @@ export function detectBPMs(getState: () => State, setState: Function) {
 export function updateVideoMetadata(getState: () => State, setState: Function) {
   const win = remote.getCurrentWindow();
   const state = getState();
-  const actionableLibrary = state.library.filter((ls) => getSourceType(ls.url) == ST.video && (ls.duration == null || ls.resolution == null));
+  const actionableLibrary = state.library.filter((ls) => getSourceType(ls.url) == ST.video && (ls.duration == null || ls.resolution == null || isNaN(ls.resolution) || ls.resolution<=0));
 
   const videoMetadataLoop = () => {
     const state = getState();
