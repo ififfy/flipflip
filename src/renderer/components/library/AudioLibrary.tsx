@@ -1180,6 +1180,10 @@ class AudioLibrary extends React.Component {
   onKeyDown = (e: KeyboardEvent) => {
     if (!e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'm' || e.key == 'µ')) {
       this.toggleMarked();
+    } else if (e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'M' || e.key == 'µ')) {
+      this.addMarked();
+    } else if (e.shiftKey && e.ctrlKey && e.altKey && (e.key == 'M' || e.key == 'µ')) {
+      this.removeMarked();
     } else if (e.key == 'Escape' && this.props.specialMode != null) {
       this.goBack();
     }
@@ -1601,8 +1605,10 @@ class AudioLibrary extends React.Component {
     }
   }
 
-  toggleMarked() {
-    let taggingMode = this.props.library.find((s) => s.marked) == null;
+  toggleMarked(taggingMode?: boolean) {
+    if (taggingMode == null) {
+      taggingMode = this.props.library.find((s) => s.marked) == null;
+    }
     if (taggingMode) { // We're marking sources
       this.props.onUpdateLibrary((l) => {
         for (let source of this.state.displaySources) {
@@ -1616,6 +1622,13 @@ class AudioLibrary extends React.Component {
         }
       });
     }
+  }
+  addMarked() {
+    this.toggleMarked(true);
+  }
+
+  removeMarked() {
+    this.toggleMarked(false);
   }
 
   onFinishBatchEdit(common: Audio) {
