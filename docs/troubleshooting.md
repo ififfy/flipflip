@@ -10,10 +10,19 @@
 ## FlipFlip data storage location
 The FlipFlip data storage location is different for each operating system:
 
-| <!-- -->      | <!-- -->                                 |
-| ------------- | -----------------------------------------|
-| Windows       | `%APPDATA%/flipflip`                     |
-| MacOS         | `~/Library/Application Support/flipflip` |
-| Linux         | `~/.config/flipflip`                     |
+<table>
+<tr>
+<td>Windows</td>
+<td>`%APPDATA%/flipflip`</td>
+</tr>
+<tr>
+<td>MacOS</td>
+<td>`~/Library/Application Support/flipflip`</td>
+</tr>
+<tr>
+<td>Linux</td>
+<td>`~/.config/flipflip`</td>
+</tr>
+</table>
 
 The `data.json` file is the latest config. Other `data-*.json` files with a timestamp are backups. 
