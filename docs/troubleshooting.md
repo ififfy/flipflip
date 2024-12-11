@@ -9,6 +9,7 @@
 
 ## FlipFlip data storage location
 The FlipFlip data storage location is different for each operating system:
+
 | <!-- -->      | <!-- -->                                 |
 | ------------- | -----------------------------------------|
 | Windows       | `%APPDATA%/flipflip`                     |
