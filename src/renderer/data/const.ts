@@ -128,6 +128,7 @@ const SF = { // sort function
   type: 'sf.type',
   duration: 'sf.duration',
   resolution: 'sf.resolution',
+  fileSize: 'sf.fileSize',
   random: 'sf.random',
 };
 

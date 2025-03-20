@@ -22,6 +22,7 @@ export default class LibrarySource {
   subtitleFile: string;
   duration: number;
   resolution: number;
+  fileSize: number;
   // Reddit
   redditFunc: string;
   redditTime: string;

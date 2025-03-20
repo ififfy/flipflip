@@ -2689,12 +2689,16 @@ function sortFunction(algorithm: string, ascending: boolean, getName: (a: any) =
         aValue = a.resolution;
         bValue = b.resolution;
         break;
+      case SF.fileSize:
+        aValue = a.fileSize;
+        bValue = b.fileSize;
+        break;
       default:
         aValue = "";
         bValue = "";
     }
 
-    if (algorithm == SF.duration || algorithm == SF.resolution) {
+    if (algorithm == SF.duration || algorithm == SF.resolution || algorithm == SF.fileSize) {
       if (aValue == null && bValue != null) {
         return 1;
       } else if (bValue == null && aValue != null) {
@@ -3402,7 +3406,7 @@ export function detectBPMs(getState: () => State, setState: Function) {
 export function updateVideoMetadata(getState: () => State, setState: Function) {
   const win = remote.getCurrentWindow();
   const state = getState();
-  const actionableLibrary = state.library.filter((ls) => getSourceType(ls.url) == ST.video && (ls.duration == null || ls.resolution == null || isNaN(ls.resolution) || ls.resolution<=0));
+  const actionableLibrary = state.library.filter((ls) => getSourceType(ls.url) == ST.video && (ls.duration == null || ls.resolution == null || isNaN(ls.resolution) || ls.resolution<=0 || ls.fileSize == null || isNaN(ls.fileSize)));
 
   const videoMetadataLoop = () => {
     const state = getState();
@@ -3436,6 +3440,12 @@ export function updateVideoMetadata(getState: () => State, setState: Function) {
           librarySource.resolution = Math.min(height, width);
           librarySource.duration = video.duration;
           video.remove();
+          try {
+            librarySource.fileSize = fs.statSync(librarySource.url)?.size;
+          } catch (e) {
+            librarySource.fileSize = -1;
+          }
+
           state.progressCurrent = offset + 1;
           setState({progressCurrent: state.progressCurrent});
           win.setProgressBar(state.progressCurrent / state.progressTotal);

@@ -90,6 +90,14 @@ const styles = (theme: Theme) => createStyles({
       display: 'none',
     },
   },
+  sizeChip: {
+    backgroundColor: theme.palette.grey.A700,
+    userSelect: 'none',
+    marginRight: theme.spacing(1),
+    [theme.breakpoints.down('sm')]: {
+      display: 'none',
+    },
+  },
   fullTag: {
     [theme.breakpoints.down('md')]: {
       display: 'none',
@@ -275,6 +283,13 @@ class SourceListItem extends React.Component {
                   color="secondary"
                   size="small"/>
               )}
+              {(sourceType == ST.video && !!this.props.source.fileSize) && (
+                <Chip
+                  className={classes.sizeChip}
+                  label={`${this.humanFileSize(this.props.source.fileSize, true, 1)}`}
+                  color="secondary"
+                  size="small"/>
+              )}
               {(this.props.source.count > 0 && sourceType != ST.video) && (
                 <Chip
                   className={clsx(classes.countChip, this.props.tutorial == SDT.sourceCount && classes.highlight)}
@@ -453,6 +468,38 @@ class SourceListItem extends React.Component {
   openExternalURL(url: string) {
     remote.shell.openExternal(url);
   }
+
+  /**
+   * Format bytes as human-readable text.
+   *
+   * @param bytes Number of bytes.
+   * @param si True to use metric (SI) units, aka powers of 1000. False to use
+   *           binary (IEC), aka powers of 1024.
+   * @param dp Number of decimal places to display.
+   *
+   * @return Formatted string.
+   */
+  humanFileSize(bytes: number, si=false, dp=1) {
+    const thresh = si ? 1000 : 1024;
+
+    if (Math.abs(bytes) < thresh) {
+      return bytes + ' B';
+    }
+
+    const units = si
+      ? ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+      : ['KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'];
+    let u = -1;
+    const r = 10**dp;
+
+    do {
+      bytes /= thresh;
+      ++u;
+    } while (Math.round(Math.abs(bytes) * r) / r >= thresh && u < units.length - 1);
+
+    return bytes.toFixed(dp) + ' ' + units[u];
+  }
+
 }
 
 (SourceListItem as any).displayName="SourceListItem";

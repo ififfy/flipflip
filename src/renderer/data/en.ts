@@ -90,6 +90,7 @@ export default new Map<string, string>([
   ['sf.type', 'By Type'],
   ['sf.duration', 'By Duration'],
   ['sf.resolution', 'By Resolution'],
+  ['sf.fileSize', 'By File Size'],
   ['sf.random', 'Randomize Order'],
 
   ['asf.url', 'By URL'],
