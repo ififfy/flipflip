@@ -436,6 +436,8 @@ export default class SourceScraper extends React.Component {
     historyOffset: number,
     advanceHack: ChildCallbackHack,
     deleteHack?: ChildCallbackHack,
+    focusData?: Map<string, Map<string, string>>,
+    focusMode?: boolean,
     gridCoordinates?: Array<number>,
     isOverlay?: boolean,
     nextScene?: Scene,
@@ -512,6 +514,8 @@ export default class SourceScraper extends React.Component {
             cache={this.props.cache}
             onEndScene={this.props.onEndScene}
             playNextScene={this.props.playNextScene}
+            focusData={this.props.focusData}
+            focusMode={this.props.focusMode}
             gridCoordinates={this.props.gridCoordinates}
             setSceneCopy={this.props.setSceneCopy}
             setTimeToNextFrame={this.props.setTimeToNextFrame}/>)}

@@ -36,6 +36,7 @@ import createStyles from '@mui/styles/createStyles';
 import withStyles from '@mui/styles/withStyles';
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CenterFocusStrongIcon from "@mui/icons-material/CenterFocusStrong";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ForwardIcon from '@mui/icons-material/Forward';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
@@ -281,12 +282,16 @@ class PlayerBars extends React.Component {
     pause(): void,
     setCurrentAudio(audio: Audio): void,
     allTags?: Array<Tag>,
+    focusData?: Map<string, Map<string, string>>,
+    focusMode?: boolean,
     tags?: Array<Tag>,
     blacklistFile?(sourceURL: string, fileToBlacklist: string): void,
     goToTagSource?(source: LibrarySource): void,
     goToClipSource?(source: LibrarySource): void,
     playTrack?(url: string): void,
     onPlaying?(position: number, duration: number): void,
+    onToggleFocusMode?(): void,
+    setFocusData?(sourceURL: string, focusMap: Map<string, string>): void,
     toggleTag?(sourceID: number, tag: Tag): void,
     inheritTags?(sourceID: number): void,
   };
@@ -386,6 +391,7 @@ class PlayerBars extends React.Component {
                   <IconButton
                     edge="start"
                     color="inherit"
+                    disabled={this.props.focusMode}
                     aria-label={this.props.isPlaying ? "Pause" : "Play"}
                     onClick={this.setPlayPause.bind(this, !this.props.isPlaying)}
                     size="large">
@@ -405,7 +411,7 @@ class PlayerBars extends React.Component {
           </Toolbar>
         </AppBar>
 
-        {this.props.hasStarted && !this.props.isEmpty && !this.props.recentPictureGrid && !this.props.scene.downloadScene && (
+        {this.props.hasStarted && !this.props.isEmpty && !this.props.recentPictureGrid && !this.props.scene.downloadScene && !this.props.focusMode && (
           <React.Fragment>
             <div
               className={classes.hoverDrawer}
@@ -650,6 +656,15 @@ class PlayerBars extends React.Component {
                             </CardActionArea>
                           </Card>
                         )}
+                        {getSourceType(this.props.scene.sources[0].url) == ST.local && (
+                          <Card className={clsx(classes.tag, this.props.focusMode && classes.selectedTag)} key={'focus'}>
+                            <CardActionArea onClick={this.props.onToggleFocusMode.bind(this)}>
+                              <CardContent className={classes.tagContent}>
+                                <CenterFocusStrongIcon/>
+                              </CardContent>
+                            </CardActionArea>
+                          </Card>
+                        )}
                       </div>
                     </Grid>
                     {(this.props.inheritTags && (!tagNames || tagNames.length == 0) && this.props.scene.sources[0].clips && this.props.scene.sources[0].clips.find((c) => c.tags && c.tags.length > 0) != null) && (
@@ -757,9 +772,7 @@ class PlayerBars extends React.Component {
     window.addEventListener('contextmenu', this.showContextMenu, false);
     window.addEventListener('keydown', this.onKeyDown, false);
     window.addEventListener('wheel', this.onScroll, false);
-    if (this.props.config.displaySettings.clickToProgress) {
-      window.addEventListener('click', this.onClick, false);
-    }
+    window.addEventListener('click', this.onClick, false);
     this.buildMenu();
   }
 
@@ -776,14 +789,12 @@ class PlayerBars extends React.Component {
     window.removeEventListener('contextmenu', this.showContextMenu);
     window.removeEventListener('keydown', this.onKeyDown);
     window.removeEventListener('wheel', this.onScroll);
-    if (this.props.config.displaySettings.clickToProgress) {
-      window.removeEventListener('click', this.onClick);
-    }
+    window.removeEventListener('click', this.onClick);
   }
 
   onClick = (e: MouseEvent) => {
     if (this.props.scene.audioScene || this.props.recentPictureGrid || this.state.drawerHover || this.state.tagDrawerHover || this.state.appBarHover) return;
-    if ((!this.props.isPlaying || this.props.config.displaySettings.clickToProgressWhilePlaying) && this.props.hasStarted) {
+    if (this.props.config.displaySettings.clickToProgress && (!this.props.isPlaying || this.props.config.displaySettings.clickToProgressWhilePlaying) && this.props.hasStarted) {
       this.props.imagePlayerAdvanceHacks[0][0].fire();
       // TODO Improve this to be able to advance specific grids
       /*for (let x of this.props.imagePlayerAdvanceHacks) {
@@ -791,6 +802,34 @@ class PlayerBars extends React.Component {
           y.fire();
         }
       }*/
+    }
+    if (this.props.focusMode) {
+      const clientX = e.clientX;
+      const clientY = e.clientY;
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
+
+      const currentImage = this.props.historyPaths[(this.props.historyPaths.length - 1) + this.props.historyOffset - (this.props.config.displaySettings.clickToProgress ? 1 : 0)];
+      const imageSource = currentImage.getAttribute("source");
+      let sourceFocusData;
+      if (this.props.focusData?.has(imageSource)) {
+        sourceFocusData = this.props.focusData.get(imageSource);
+      } else {
+        sourceFocusData = new Map<string, string>();
+      }
+      const imageURL = currentImage.src;
+
+      const centerWidth = windowWidth / 2;
+      const centerHeight = windowHeight / 2;
+
+      let left = clientX > centerWidth;
+      let up = clientY > centerHeight;
+
+      let horizontalAmount = Math.round(Math.abs(clientX - centerWidth) / windowWidth * 100);
+      let verticalAmount = Math.round(Math.abs(clientY - centerHeight) / windowHeight * 100);
+
+      sourceFocusData.set(imageURL, (left ? "" : "-") + horizontalAmount + "," + (up ? "" : "-") + verticalAmount);
+      this.props.setFocusData(imageSource, sourceFocusData);
     }
   }
 

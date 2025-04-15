@@ -1,13 +1,13 @@
 import IncomingMessage = Electron.IncomingMessage;
-import {webFrame} from "electron";
 import * as React from 'react';
+import * as path from "path";
 import request from 'request';
 import fs from "fs";
 import gifInfo from 'gif-info';
 
 import {CircularProgress, Container, Typography} from "@mui/material";
 
-import {GO, IF, OF, OT, SL, SOF, ST, TF, VO, WF} from '../../data/const';
+import {GO, HTF, IF, OF, OT, SL, SOF, ST, TF, VO, VTF, WF} from '../../data/const';
 import {flatten, getCachePath, getRandomListItem, getRandomNumber, toArrayBuffer, urlToPath} from '../../data/utils';
 import {getFileName, getSourceType, isVideo} from "./Scrapers";
 import Config from "../../data/Config";
@@ -16,6 +16,7 @@ import ChildCallbackHack from './ChildCallbackHack';
 import ImageView from './ImageView';
 import Strobe from "./Strobe";
 import Audio from "../../data/Audio";
+import AdjustIcon from "@mui/icons-material/Adjust";
 
 class GifInfo {
   animated: boolean;
@@ -37,6 +38,8 @@ export default class ImagePlayer extends React.Component {
     hasStarted: boolean,
     singleImage: number,
     deleteHack?: ChildCallbackHack,
+    focusData?: Map<string, Map<string, string>>,
+    focusMode?: boolean,
     gridCoordinates?: Array<number>,
     isOverlay?: boolean,
     strobeLayer?: string,
@@ -58,6 +61,7 @@ export default class ImagePlayer extends React.Component {
     timeoutID: 0,
     nextImageID: 0,
     historyOffset: 0,
+    zoom: null as string,
   };
 
   _backForth: NodeJS.Timeout = null;
@@ -93,8 +97,52 @@ export default class ImagePlayer extends React.Component {
       zIndex: this.props.isOverlay ? 4 : 'auto',
     };
 
+    let left = 50;
+    let bottom = 50;
+    if (!!this.state.zoom) {
+      let zoomStringSplit = this.state.zoom.split(",");
+      let horiz = parseInt(zoomStringSplit[0]);
+      let vert = parseInt(zoomStringSplit[1]);
+
+      let horizTransType = horiz > 0 ? HTF.left : HTF.right;
+      let horizTransLevel = Math.abs(horiz);
+      let vertTransType = vert > 0 ? VTF.up : VTF.down;
+      let vertTransLevel = Math.abs(vert);
+
+      if (horizTransType == HTF.left) {
+        left+=horizTransLevel;
+      } else if (horizTransType == HTF.right) {
+        left-=horizTransLevel;
+      }
+      if (vertTransType == VTF.up) {
+        bottom-=vertTransLevel;
+      } else if (vertTransType == VTF.down) {
+        bottom+=vertTransLevel;
+      }
+    }
+
     return (
       <div style={style}>
+        {this.props.focusMode && this.state.zoom && (
+          <Container
+            maxWidth={false}
+            style={{
+              zIndex: 3,
+              flexGrow: 1,
+              padding: 0,
+              position: 'absolute',
+              left: left + "%",
+              bottom: bottom + "%",
+            }}>
+            <AdjustIcon
+              style={{
+                color: "red",
+                marginLeft: -12,
+                marginBottom: -12,
+              }}
+            />
+          </Container>
+        )}
         {(this.props.scene && this.props.scene.strobe && this.props.strobeLayer == SL.middle) && (
           <Strobe
             currentAudio={this.props.currentAudio}
@@ -146,6 +194,7 @@ export default class ImagePlayer extends React.Component {
           toggleStrobe={this._toggleStrobe}
           fitParent={this.props.gridView}
           hasStarted={this.props.hasStarted}
+          zoom={this.props.focusMode ? null : this.state.zoom}
           onLoaded={this.state.historyPaths.length == 1 ? this.props.onLoaded : undefined}
           setSceneCopy={this.props.setSceneCopy}
           setVideo={this.props.setVideo}/>
@@ -795,6 +844,12 @@ export default class ImagePlayer extends React.Component {
     } else {
       const img = new Image();
       img.setAttribute("source", source);
+      if (this.props.focusData.has(source)) {
+        const focusData = this.props.focusData.get(source);
+        if (!!focusData && !!focusData.has && focusData.has(url)) {
+          img.setAttribute("focus", focusData.get(url));
+        }
+      }
       if (!!post) {
         img.setAttribute("post", post);
       }
@@ -1095,11 +1150,16 @@ export default class ImagePlayer extends React.Component {
       if (this.props.setTimeToNextFrame) {
         this.props.setTimeToNextFrame(timeToNextFrame);
       }
+      let zoom = null;
+      if (nextImg && nextImg.hasAttribute("focus")) {
+        zoom = nextImg.getAttribute("focus");
+      }
       this._toggleStrobe = !this._toggleStrobe;
       this.props.setHistoryPaths(nextHistoryPaths);
       this.setState({
         historyPaths: nextHistoryPaths,
         timeToNextFrame,
+        zoom: zoom,
       });
       this._count++;
       if (!(nextImg instanceof HTMLVideoElement && this.props.scene.videoOption == VO.full) && !(this.props.singleImage && this.state.historyPaths.length > 0 && getSourceType(this.state.historyPaths[this.state.historyPaths.length - 1]?.getAttribute("source")) == ST.nimja)) {

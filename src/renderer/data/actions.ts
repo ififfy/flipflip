@@ -1038,6 +1038,8 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
 
 }
 
+
+
 export function onUpdateClips(state: State, sourceURL: string, clips: Array<Clip>) {
   const newLibrary = state.library;
   const newScenes = state.scenes;
@@ -1855,6 +1857,18 @@ export function updateLibrary(state: State, fn: (library: Array<LibrarySource>) 
     }
   }
   return {library: libraryCopy, librarySelected: librarySelected};
+}
+
+export function clearFocus(state: State, sourceURL: string): Object {
+  fs.unlink(sourceURL + path.sep + "focus.txt", () => {});
+  return {};
+}
+
+export function storeFocusData(state: State, focusData: Map<string, Map<string, string>>) {
+  for (let source of focusData.keys()) {
+    fs.writeFile(source + path.sep + "focus.txt", JSON.stringify([...focusData.get(source)]), () => {});
+  }
+  return {};
 }
 
 export function clearBlacklist(state: State, sourceURL: string): Object {

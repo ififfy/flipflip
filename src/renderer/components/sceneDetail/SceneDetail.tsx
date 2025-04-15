@@ -427,6 +427,7 @@ class SceneDetail extends React.Component {
     onAddScript(playlistIndex: number): void,
     onAddTracks(playlistIndex: number): void,
     onClearBlacklist(sourceURL: string): void,
+    onClearFocus(sourceURL: string): void,
     onClip(source: LibrarySource, displayed: Array<LibrarySource>): void,
     onCloneScene(scene: Scene): void,
     onDelete(scene: Scene): void,
@@ -729,6 +730,7 @@ class SceneDetail extends React.Component {
                       tutorial={this.props.tutorial == SDGT.final ? null : this.props.tutorial}
                       useWeights={this.props.scene.weightFunction == WF.sources && this.props.scene.useWeights}
                       onClearBlacklist={this.props.onClearBlacklist.bind(this)}
+                      onClearFocus={this.props.onClearFocus.bind(this)}
                       onClip={this.props.onClip.bind(this)}
                       onDownload={this.props.onDownload.bind(this)}
                       onEditBlacklist={this.props.onEditBlacklist.bind(this)}

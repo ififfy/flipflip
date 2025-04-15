@@ -30,6 +30,7 @@ export default class ImageView extends React.Component {
     pictureGrid?: boolean,
     removeChild?: boolean,
     className?: string,
+    zoom?: string,
     onLoaded?(): void,
     setSceneCopy?(children: React.ReactNode): void,
     setVideo?(video: HTMLVideoElement): void,
@@ -703,10 +704,22 @@ export default class ImageView extends React.Component {
           </Strobe>
       }
     }
-    if (this.props.scene.zoom || this.props.scene.horizTransType != HTF.none || this.props.scene.vertTransType != VTF.none) {
+    let horizTransType = this.props.scene.horizTransType;
+    let vertTransType = this.props.scene.vertTransType;
+    if (!!this.props.zoom) {
+      let zoomStringSplit = this.props.zoom.split(",");
+      let horiz = parseInt(zoomStringSplit[0]);
+      let vert = parseInt(zoomStringSplit[1]);
+
+      horizTransType = horiz > 0 ? HTF.left : HTF.right;
+      vertTransType = vert > 0 ? VTF.up : VTF.down;
+    }
+
+    if (this.props.scene.zoom || horizTransType != HTF.none || vertTransType != VTF.none) {
       imageDiv =
         <ZoomMove
           scene={this.props.scene}
+          zoom={this.props.zoom}
           reset={!this.props.scene.panning && !this.props.scene.fadeInOut && !this.props.scene.slide && !this.props.scene.crossFade}
           timeToNextFrame={this.props.timeToNextFrame}
           currentAudio={this.props.currentAudio}>

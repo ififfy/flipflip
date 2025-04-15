@@ -100,6 +100,7 @@ class SourceList extends React.Component {
     sources: Array<LibrarySource>,
     tutorial: string,
     onClearBlacklist(sourceURL: string): void,
+    onClearFocus(sourceURL: string): void,
     onClip(source: LibrarySource, displayed: Array<LibrarySource>): void,
     onDownload(source: LibrarySource): void;
     onEditBlacklist(sourceURL: string, blacklist: string): void,
@@ -801,6 +802,7 @@ class SourceList extends React.Component {
         useWeights={this.props.useWeights}
         onClean={this.onClean.bind(this)}
         onClearBlacklist={this.props.onClearBlacklist.bind(this)}
+        onClearFocus={this.props.onClearFocus.bind(this)}
         onClip={this.props.onClip.bind(this)}
         onDelete={this.onDelete.bind(this)}
         onDownload={this.props.onDownload.bind(this)}

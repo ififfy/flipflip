@@ -12,6 +12,7 @@ export default class ZoomMove extends React.Component {
     reset: boolean
     timeToNextFrame: number,
     currentAudio: Audio,
+    zoom?: string,
     children?: React.ReactNode,
   };
 
@@ -24,17 +25,37 @@ export default class ZoomMove extends React.Component {
   }
 
   ZoomMoveLayer = (data: {children: React.ReactNode}) => {
+    let horizTransType = this.props.scene.horizTransType;
+    let forceHorizTransLevel = null;
+    let vertTransType = this.props.scene.vertTransType;
+    let forceVertTransLevel = null;
+    if (!!this.props.zoom) {
+      let zoomStringSplit = this.props.zoom.split(",");
+      let horiz = parseInt(zoomStringSplit[0]);
+      let vert = parseInt(zoomStringSplit[1]);
+
+      horizTransType = horiz > 0 ? HTF.left : HTF.right;
+      forceHorizTransLevel = Math.abs(horiz);
+      vertTransType = vert > 0 ? VTF.up : VTF.down;
+      forceVertTransLevel = Math.abs(vert);
+    }
+
+
+
     let horizTransLevel = 0;
-    if (this.props.scene.horizTransType != HTF.none) {
+    if (horizTransType != HTF.none) {
       horizTransLevel = this.props.scene.horizTransLevel;
       if (this.props.scene.horizTransRandom) {
         horizTransLevel = Math.floor(Math.random() * (this.props.scene.horizTransLevelMax - this.props.scene.horizTransLevelMin + 1)) + this.props.scene.horizTransLevelMin;
       }
-      if (this.props.scene.horizTransType == HTF.left) {
+      if (!!forceHorizTransLevel) {
+        horizTransLevel = forceHorizTransLevel;
+      }
+      if (horizTransType == HTF.left) {
         horizTransLevel = -horizTransLevel;
-      } else if (this.props.scene.horizTransType == HTF.right) {
+      } else if (horizTransType == HTF.right) {
         // Already set
-      } else if (this.props.scene.horizTransType == HTF.random) {
+      } else if (horizTransType == HTF.random) {
         const type = Math.floor(Math.random() * 2);
         if (type) {
           horizTransLevel = -horizTransLevel;
@@ -45,16 +66,19 @@ export default class ZoomMove extends React.Component {
     }
 
     let vertTransLevel = 0;
-    if (this.props.scene.vertTransType != VTF.none) {
+    if (vertTransType != VTF.none) {
       vertTransLevel = this.props.scene.vertTransLevel;
       if (this.props.scene.vertTransRandom) {
         vertTransLevel = Math.floor(Math.random() * (this.props.scene.vertTransLevelMax - this.props.scene.vertTransLevelMin + 1)) + this.props.scene.vertTransLevelMin;
       }
-      if (this.props.scene.vertTransType == VTF.up) {
+      if (!!forceVertTransLevel) {
+        vertTransLevel = forceVertTransLevel;
+      }
+      if (vertTransType == VTF.up) {
         vertTransLevel = -vertTransLevel;
-      } else if (this.props.scene.vertTransType == VTF.down) {
+      } else if (vertTransType == VTF.down) {
         // Already set
-      } else if (this.props.scene.vertTransType == VTF.random) {
+      } else if (vertTransType == VTF.random) {
         const type = Math.floor(Math.random() * 2);
         if (type) {
           vertTransLevel = -vertTransLevel;

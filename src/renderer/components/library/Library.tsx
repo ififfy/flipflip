@@ -359,6 +359,7 @@ class Library extends React.Component {
     onBatchClip(): void,
     onBatchTag(): void,
     onClearBlacklist(sourceURL: string): void,
+    onClearFocus(sourceURL: string): void,
     onClip(source: LibrarySource, displayed: Array<LibrarySource>): void,
     onDownload(source: LibrarySource): void;
     onEditBlacklist(sourceURL: string, blacklist: string): void,
@@ -689,6 +690,7 @@ class Library extends React.Component {
                 sources={this.state.displaySources}
                 yOffset={this.props.yOffset}
                 onClearBlacklist={this.props.onClearBlacklist.bind(this)}
+                onClearFocus={this.props.onClearFocus.bind(this)}
                 onClip={this.props.onClip.bind(this)}
                 onDownload={this.props.onDownload.bind(this)}
                 onEditBlacklist={this.props.onEditBlacklist.bind(this)}

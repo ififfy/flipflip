@@ -7,9 +7,9 @@ import {
   Button, CircularProgress, Container, Theme, Typography
 } from "@mui/material";
 
-import {SL, WC} from "../../data/const";
+import {HTF, SL, ST, VTF, WC} from "../../data/const";
 import {getRandomListItem, urlToPath} from "../../data/utils";
-import {getFileGroup, getFileName} from "./Scrapers";
+import {getFileGroup, getFileName, getSourceType} from "./Scrapers";
 import Audio from "../../data/Audio";
 import CaptionScript from "../../data/CaptionScript";
 import Config from "../../data/Config";
@@ -26,6 +26,8 @@ import PictureGrid from "./PictureGrid";
 import PlayerBars from "./PlayerBars";
 import SourceScraper from './SourceScraper';
 import Strobe from "./Strobe";
+import fs from "fs";
+import path from "path";
 
 export default class Player extends React.Component {
   readonly props: {
@@ -60,6 +62,7 @@ export default class Player extends React.Component {
     changeAudioRoute?(aID: number): void,
     toggleTag?(sourceID: number, tag: Tag): void,
     inheritTags?(sourceID: number): void,
+    storeFocusData?(focusMap: Map<string, Map<string, string>>): void,
     getCurrentTimestamp?(): number,
     onCaptionError?(e: string): void,
     onLoaded?(): void,
@@ -94,12 +97,15 @@ export default class Player extends React.Component {
     persistText: false,
     scriptPlaylists: null as {scripts: CaptionScript[], shuffle: boolean, repeat: string}[],
     hideCursor: false,
+    focusMode: false,
   };
 
   readonly idleTimerRef: React.RefObject<HTMLDivElement> = React.createRef();
   _interval: NodeJS.Timer = null;
   _toggleStrobe = false;
   _powerSaveID: number = null;
+  _focusDataChanged = false;
+  _focusData = new Map<string, Map<string, string>>();
 
   render() {
     const nextScene = this.getScene(this.props.scene.nextSceneID == -1 ? this.props.scene.nextSceneRandomID : this.props.scene.nextSceneID);
@@ -391,10 +397,14 @@ export default class Player extends React.Component {
             onPlaying={!this.props.scene.textEnabled || !this.state.currentAudio || this.props.getCurrentTimestamp ? undefined : this.onPlaying.bind(this)}
             setCurrentAudio={this.setCurrentAudio.bind(this)}
             allTags={this.props.allTags}
+            focusData={this._focusData}
+            focusMode={this.state.focusMode}
             tags={this.props.tags}
             blacklistFile={this.props.blacklistFile}
             goToTagSource={this.props.goToTagSource}
             goToClipSource={this.props.goToClipSource}
+            onToggleFocusMode={this.onToggleFocusMode.bind(this)}
+            setFocusData={this.setFocusData.bind(this)}
             toggleTag={this.props.toggleTag}
             inheritTags={this.props.inheritTags}
           />
@@ -433,6 +443,8 @@ export default class Player extends React.Component {
               nextScene={nextScene}
               currentAudio={this.state.currentAudio}
               opacity={this.state.recentPictureGrid ? 0 : 1}
+              focusData={this._focusData}
+              focusMode={this.state.focusMode}
               gridCoordinates={this.props.gridCoordinates}
               gridView={this.props.gridView}
               isPlaying={this.state.isPlaying}
@@ -697,9 +709,25 @@ export default class Player extends React.Component {
     if (this.props.scene.persistText && this.props.scene.textEnabled) {
       this.setState({persistText: true, scriptPlaylists: this.props.scene.scriptPlaylists});
     }
+    for (let source of this.props.scene.sources) {
+      if (getSourceType(source.url) == ST.local) {
+        if (fs.existsSync(source.url + path.sep + "focus.txt")) {
+          let fileData: string[][] = JSON.parse(fs.readFileSync(source.url + path.sep + "focus.txt", null).toString());
+          let sourceMap = new Map<string, string>();
+          for (let data of fileData) {
+            sourceMap.set(data[0], data[1]);
+          }
+          this._focusData.set(source.url, sourceMap);
+        }
+      }
+    }
   }
 
   componentWillUnmount() {
+    if (this._focusDataChanged) {
+      this.props.storeFocusData(this._focusData);
+    }
+    this._focusData = null;
     clearInterval(this._interval);
     this._interval = null;
     getCurrentWindow().setAlwaysOnTop(false);
@@ -736,6 +764,7 @@ export default class Player extends React.Component {
       this.state.overlayVideos !== state.overlayVideos ||
       this.state.recentPictureGrid !== state.recentPictureGrid ||
       this.state.thumbImage !== state.thumbImage ||
+      this.state.focusMode !== state.focusMode ||
       this.state.currentAudio !== state.currentAudio;
   }
 
@@ -868,8 +897,10 @@ export default class Player extends React.Component {
   }
 
   play() {
-    this.setState({isPlaying: true});
-    this.start(this.state.canStart);
+    if (!this.state.focusMode) {
+      this.setState({isPlaying: true});
+      this.start(this.state.canStart);
+    }
   }
 
   pause() {
@@ -912,6 +943,28 @@ export default class Player extends React.Component {
 
   onIdle() {
     this.setState({hideCursor: true})
+  }
+
+  _WASPLAYING = false;
+  onToggleFocusMode() {
+    // TODO Turn off other effect
+    if (this.state.focusMode) {
+      this.setState({
+        focusMode: false,
+        isPlaying: this._WASPLAYING,
+      });
+    } else {
+      this._WASPLAYING = this.state.isPlaying;
+      this.setState({
+        focusMode: !this.state.focusMode,
+        isPlaying: false,
+      });
+    }
+  }
+
+  setFocusData(sourceURL: string, focusData: Map<string, string>) {
+    this._focusData.set(sourceURL, focusData);
+    this._focusDataChanged = true;
   }
 
   navigateTagging(offset: number) {

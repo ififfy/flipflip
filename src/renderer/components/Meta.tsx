@@ -208,6 +208,7 @@ export default class Meta extends React.Component {
                   onAddTracks={a(actions.addTracks)}
                   onAddScript={a(actions.addScript)}
                   onClearBlacklist={a(actions.clearBlacklist)}
+                  onClearFocus={a(actions.clearFocus)}
                   onClip={a(actions.clipVideo)}
                   onCloneScene={a(actions.cloneScene)}
                   onDelete={a(actions.deleteScene)}
@@ -247,6 +248,7 @@ export default class Meta extends React.Component {
                   onBatchClip={a(actions.batchClip)}
                   onBatchTag={a(actions.batchTag)}
                   onClearBlacklist={a(actions.clearBlacklist)}
+                  onClearFocus={a(actions.clearFocus)}
                   onClip={a(actions.clipVideo)}
                   onDownload={a(actions.downloadSource)}
                   onEditBlacklist={a(actions.editBlacklist)}
@@ -418,6 +420,7 @@ export default class Meta extends React.Component {
                   navigateTagging={a(actions.navigateDisplayedLibrary)}
                   getTags={actions.getTags.bind(this, this.state.library)}
                   changeAudioRoute={scene.audioScene ? a(actions.changeAudioRoute) : undefined}
+                  storeFocusData={a(actions.storeFocusData)}
                   setCount={a(actions.setCount)}
                   cache={a(actions.cacheImage)}
                   goToClipSource={a(actions.clipVideo)}

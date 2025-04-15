@@ -25,6 +25,7 @@ import createStyles from '@mui/styles/createStyles';
 import withStyles from '@mui/styles/withStyles';
 
 import BuildIcon from '@mui/icons-material/Build';
+import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
 import DeleteIcon from '@mui/icons-material/Delete';
 import OfflineBoltIcon from '@mui/icons-material/OfflineBolt';
 
@@ -144,6 +145,7 @@ class SourceListItem extends React.Component {
     useWeights?: boolean,
     onClean(source: LibrarySource): void,
     onClearBlacklist(sourceURL: string): void,
+    onClearFocus(sourceURL: string): void,
     onClip(source: LibrarySource, displaySources: Array<LibrarySource>): void,
     onDelete(source: LibrarySource): void;
     onDownload(source: LibrarySource): void;
@@ -342,6 +344,16 @@ class SourceListItem extends React.Component {
                   </SvgIcon>
                 </IconButton>
               )}
+              {sourceType == ST.local && (
+                <IconButton
+                  onClick={this.onClickFocus.bind(this)}
+                  className={classes.actionButton}
+                  edge="end"
+                  size="small"
+                  aria-label="clear focus points">
+                  <CenterFocusStrongIcon/>
+                </IconButton>
+              )}
               {this.props.source.blacklist && this.props.source.blacklist.length > 0 && (
                 <IconButton
                   onClick={this.onClickBlacklist.bind(this)}
@@ -434,6 +446,10 @@ class SourceListItem extends React.Component {
   onClip() {
     this.props.savePosition();
     this.props.onClip(this.props.source, this.props.sources);
+  }
+
+  onClickFocus() {
+    this.props.onClearFocus(this.props.source.url);
   }
 
   onClickBlacklist(e: MouseEvent) {
