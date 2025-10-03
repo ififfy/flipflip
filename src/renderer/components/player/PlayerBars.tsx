@@ -796,7 +796,7 @@ class PlayerBars extends React.Component {
 
   onScroll = (e: WheelEvent) => {
     if (this.props.recentPictureGrid || !this.props.onUpdateScene || this.state.drawerHover) return;
-    const volumeChange = (e.deltaY / 100) * -5;
+    const volumeChange = (e.deltaY / 100) * -2;
     let newVolume = parseInt(this.props.scene.videoVolume as any) + volumeChange;
     if (newVolume < 0) {
       newVolume = 0;
