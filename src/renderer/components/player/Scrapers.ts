@@ -2106,30 +2106,61 @@ export const loadLuscious = (allURLs: Map<string, Array<string>>, allPosts: Map<
   if (url.includes("albums")) {
     const name = getFileGroup(url);
     const id = name.substring(name.indexOf("_") + 1, name.length);
-    wretch("https://members.luscious.net/graphql/nobatch/?operationName=AlbumListOwnPictures")
+    wretch("https://members.luscious.net/graphql/nobatch/?operationName=PictureListInsideAlbum")
       .json({
         "operationName": "AlbumListOwnPictures",
-        "query": "query AlbumListOwnPictures($input: PictureListInput!) {\n" +
-          "picture {\n" +
-          "list(input: $input) {\n" +
-          "info {...FacetCollectionInfo}\n" +
-          "items {...PictureStandardWithoutAlbum}\n" +
+        "query": "\n" +
+          "query PictureListInsideAlbum($input: PictureListInput!) {\n" +
+          "  picture {\n" +
+          "    list(input: $input) {\n" +
+          "      info {\n" +
+          "        ...FacetCollectionInfo\n" +
+          "      }\n" +
+          "      items {\n" +
+          "        __typename\n" +
+          "        id\n" +
+          "        title\n" +
+          "        description\n" +
+          "        created\n" +
+          "        like_status\n" +
+          "        number_of_comments\n" +
+          "        number_of_favorites\n" +
+          "        moderation_status\n" +
+          "        width\n" +
+          "        height\n" +
+          "        resolution\n" +
+          "        aspect_ratio\n" +
+          "        url_to_original\n" +
+          "        url_to_video\n" +
+          "        is_animated\n" +
+          "        position\n" +
+          "        permissions\n" +
+          "        url\n" +
+          "        tags {\n" +
+          "          category\n" +
+          "          text\n" +
+          "          url\n" +
+          "        }\n" +
+          "        thumbnails {\n" +
+          "          width\n" +
+          "          height\n" +
+          "          size\n" +
+          "          url\n" +
+          "        }\n" +
+          "      }\n" +
+          "    }\n" +
+          "  }\n" +
           "}\n" +
-          "}\n" +
-          "}\n" +
+          "    \n" +
           "fragment FacetCollectionInfo on FacetCollectionInfo {\n" +
-          "page\n" +
-          "has_next_page\n" +
-          "has_previous_page\n" +
-          "total_items\n" +
-          "total_pages\n" +
-          "items_per_page\n" +
-          "}\n" +
-          "fragment PictureStandardWithoutAlbum on Picture {\n" +
-          "url_to_original\n" +
-          "url_to_video\n" +
-          "url\n" +
-          "}",
+          "  page\n" +
+          "  has_next_page\n" +
+          "  has_previous_page\n" +
+          "  total_items\n" +
+          "  total_pages\n" +
+          "  items_per_page\n" +
+          "  url_complete\n" +
+          "}\n",
         "variables": {
           "input": {
             "filters": [
@@ -2164,13 +2195,23 @@ export const loadLuscious = (allURLs: Map<string, Array<string>>, allPosts: Map<
         if (items.length > 0) {
           const images = [];
           for (let item of items) {
-            images.push(item.url_to_original);
+            let width = 0;
+            let url = null;
+            for (let thumbnail of item.thumbnails) {
+              if (thumbnail.width > width) {
+                width = thumbnail.width;
+                url = thumbnail.url;
+              }
+            }
+            if (url != null) {
+              images.push(url);
+            }
           }
           helpers.next = hasNextPage ? helpers.next + 1 : null;
           helpers.count = totalItems;
           // If cdnio image server goes down, use this: filterPathsToJustPlayable(filter, images, true).map((s) => s.replace('cdnio.', 'w1680.')),
           pm({
-            data: filterPathsToJustPlayable(filter, images, true),
+            data: filterPathsToJustPlayable(filter, images, false),
             allURLs: allURLs,
             allPosts: allPosts,
             weight: weight,
