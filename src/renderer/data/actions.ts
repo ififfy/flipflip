@@ -3181,7 +3181,9 @@ export function markOffline(getState: () => State, setState: Function) {
   const state = getState();
   const actionableLibrary = state.library.filter((ls) => {
     // If this link was checked within the last week, skip
-    return new Date().getTime() - new Date(ls.lastCheck).getTime() >= 604800000;
+    const timeCheck = new Date().getTime() - new Date(ls.lastCheck).getTime() >= 604800000
+    const offlineLocal = ls.offline && (getSourceType(ls.url) == ST.video || getSourceType(ls.url) == ST.local);
+    return timeCheck || offlineLocal;
   });
 
   const offlineLoop = () => {
@@ -3249,9 +3251,7 @@ export function markOffline(getState: () => State, setState: Function) {
 
       actionSource.lastCheck = new Date();
       const exists = existsSync(actionSource.url);
-      if (!exists) {
-        actionSource.offline = true;
-      }
+      actionSource.offline = !exists;
       setTimeout(offlineLoop, 10);
     }
   };
