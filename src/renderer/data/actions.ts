@@ -978,7 +978,8 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
       playVideoClips: state.config.defaultScene.playVideoClips,
       videoVolume: state.config.defaultScene.videoVolume,
       videoSkip: state.config.defaultScene.videoSkip,
-      orderFunction: state.config.defaultScene.orderFunction,
+      orderFunction: OF.strict,
+      sourceOrderFunction: SOF.ordered,
     });
     if (getLibrarySource(state) != null) {
       const activeScene = getActiveScene(state);
