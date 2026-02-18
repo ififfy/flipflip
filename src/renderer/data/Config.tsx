@@ -548,6 +548,9 @@ export class RemoteSettings implements RemoteSettingsI {
   hydrusPort = "45869";
   hydrusAPIKey = "";
 
+  rule34APIKey = "";
+  rule34UserID = "";
+
   piwigoProtocol = "http";
   piwigoHost = "";
   piwigoUsername = "";

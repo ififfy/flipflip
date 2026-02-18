@@ -112,6 +112,7 @@ class APICard extends React.Component {
     const twitterAuthorized = this.props.settings.twitterAccessTokenKey != "" && this.props.settings.twitterAccessTokenSecret != "";
     const instagramConfigured = this.props.settings.instagramUsername != "" && this.props.settings.instagramPassword != "";
     const hydrusConfigured = this.props.settings.hydrusAPIKey != "";
+    const rule34Configured = this.props.settings.rule34APIKey != "" && this.props.settings.rule34UserID != "";
     const piwigoConfigured = this.props.settings.piwigoProtocol != "" && this.props.settings.piwigoHost != "" && this.props.settings.piwigoUsername != "" && this.props.settings.piwigoPassword != "";
     const indexOf = this.props.settings.tumblrKeys.indexOf(this.props.settings.tumblrKey);
     const menuType = this.state.menuType ? en.get(this.state.menuType)[0].toUpperCase() + en.get(this.state.menuType).slice(1) : "";
@@ -131,6 +132,9 @@ class APICard extends React.Component {
         break;
       case ST.hydrus:
         menuTypeSignOut = this.onFinishClearHydrus.bind(this);
+        break;
+      case ST.rule34:
+        menuTypeSignOut = this.onFinishClearRule34.bind(this);
         break;
       case ST.piwigo:
         menuTypeSignOut = this.onFinishClearPiwigo.bind(this);
@@ -188,6 +192,16 @@ class APICard extends React.Component {
                 onClick={hydrusConfigured ? this.onClearHydrus.bind(this) : this.onAuthHydrus.bind(this)}
                 size="large">
                 <SourceIcon className={classes.icon} type={ST.hydrus}/>
+              </Fab>
+            </Tooltip>
+          </Grid>
+          <Grid item>
+            <Tooltip disableInteractive title={rule34Configured ? "Configured: Click to Remove Rule34 Configuration" : "Unauthorized: Click to Configure Rule34"}  placement="top-end">
+              <Fab
+                className={clsx(classes.fab, rule34Configured ? classes.authorized : classes.noAuth)}
+                onClick={rule34Configured ? this.onClearRule34.bind(this) : this.onAuthRule34.bind(this)}
+                size="large">
+                <SourceIcon className={classes.icon} type={ST.rule34}/>
               </Fab>
             </Tooltip>
           </Grid>
@@ -544,6 +558,49 @@ class APICard extends React.Component {
         </Dialog>
 
         <Dialog
+          open={this.state.openMenu == MO.signIn && this.state.menuType == ST.rule34}
+          onClose={this.onCloseDialog.bind(this)}
+          aria-labelledby="rule34-title"
+          aria-describedby="rule34-description">
+          <DialogTitle id="rule34-title">
+            Rule34 Configuration
+            <Avatar className={classes.iconAvatar}>
+              <SourceIcon className={classes.icon} type={ST.rule34}/>
+            </Avatar>
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="rule34-description">
+              FlipFlip does not store any user information or make changes to your Rule34 account. Your configured information is
+              stored locally on your computer and is never shared with anyone or sent to any server (besides Rule34, obviously).
+            </DialogContentText>
+            <TextField
+              variant="standard"
+              fullWidth
+              margin="dense"
+              label="Rule34 API Key"
+              value={this.state.input1}
+              onChange={this.onInput1.bind(this)} />
+            <TextField
+              variant="standard"
+              fullWidth
+              margin="dense"
+              label="Rule34 User ID"
+              value={this.state.input2}
+              onChange={this.onInput2.bind(this)} />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+              Cancel
+            </Button>
+            <Button
+              disabled={this.state.input1.length == 0 || this.state.input2.length == 0}
+              onClick={this.onFinishAuthRule34.bind(this)} color="primary">
+              Configure Rule34
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog
           open={this.state.openMenu == MO.signIn && this.state.menuType == ST.piwigo}
           onClose={this.onCloseDialog.bind(this)}
           aria-labelledby="piwigo-title"
@@ -708,6 +765,24 @@ class APICard extends React.Component {
     this.onCloseDialog();
   }
 
+  onClearRule34() {
+    this.setState({openMenu: MO.signOut, menuType: ST.rule34});
+  }
+
+  onFinishClearRule34() {
+    // Update props
+    this.props.onUpdateConfig((c) => {
+      c.remoteSettings.rule34APIKey = "";
+      c.remoteSettings.rule34UserID = "";
+    });
+    // Update state
+    this.props.onUpdateSettings((s) => {
+      s.rule34APIKey = "";
+      s.rule34UserID = "";
+    });
+    this.onCloseDialog();
+  }
+
   onClearPiwigo() {
     this.setState({openMenu: MO.signOut, menuType: ST.piwigo});
   }
@@ -777,6 +852,10 @@ class APICard extends React.Component {
 
   onAuthHydrus() {
     this.setState({openMenu: MO.signIn, menuType: ST.hydrus, input1: this.props.settings.hydrusProtocol, input2: this.props.settings.hydrusDomain, input3: this.props.settings.hydrusPort, input4: this.props.settings.hydrusAPIKey});
+  }
+
+  onAuthRule34() {
+    this.setState({openMenu: MO.signIn, menuType: ST.rule34, input1: this.props.settings.rule34APIKey, input2: this.props.settings.rule34UserID});
   }
 
   onAuthPiwigo() {
@@ -1239,6 +1318,43 @@ class APICard extends React.Component {
         } else {
           console.error("Invalid response from Hydrus server");
           this.setState({snackbarOpen: true, snackbar: "Invalid response from Hydrus server", snackbarSeverity: SS.error});
+        }
+      })
+      .catch((e) => {
+        console.error(e);
+        this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
+      });
+  }
+
+  onFinishAuthRule34() {
+    wretch("https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&limit=1&pid=0&json=1&api_key=" + this.state.input1 + "&user_id=" + this.state.input2)
+      .get()
+      .setTimeout(5000)
+      .notFound((e) => {
+        console.error(e);
+        this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
+      })
+      .internalError((e) => {
+        console.error(e);
+        this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
+      })
+      .json((json) => {
+        if (json.length > 0 && !!json[0].file_url) {
+          //Update props
+          this.props.onUpdateConfig((c) => {
+            c.remoteSettings.rule34APIKey = this.state.input1;
+            c.remoteSettings.rule34UserID = this.state.input2;
+          });
+          // Update state
+          this.props.onUpdateSettings((s) => {
+            s.rule34APIKey = this.state.input1;
+            s.rule34UserID = this.state.input2;
+          });
+          this.setState({snackbarOpen: true, snackbar: "Rule34 is configured", snackbarSeverity: SS.success});
+          this.onCloseDialog();
+        } else {
+          console.error("Invalid response from Rule34");
+          this.setState({snackbarOpen: true, snackbar: "Invalid response from Rule34", snackbarSeverity: SS.error});
         }
       })
       .catch((e) => {

@@ -12,8 +12,9 @@ import {Dialog, DialogContent} from "@mui/material";
 import {CancelablePromise, flatten, getCachePath, randomizeList, urlToPath} from "../../data/utils";
 import {
   filterPathsToJustPlayable, getFileName, getSourceType, isVideo, loadBDSMlr, loadDanbooru, loadDeviantArt, loadE621,
-  loadEHentai, loadGelbooru1, loadGelbooru2, loadHydrus, loadImageFap, loadImgur, loadInstagram, loadLuscious,
-  loadPiwigo, loadReddit, loadRedGifs, loadRemoteImageURLList, loadSexCom, loadTumblr, loadTwitter, processAllURLs
+  loadEHentai, loadGelbooruScrape, loadGelbooruAPI, loadHydrus, loadImageFap, loadImgur, loadInstagram, loadLuscious,
+  loadPiwigo, loadReddit, loadRedGifs, loadRemoteImageURLList, loadRule34, loadSexCom, loadTumblr, loadTwitter,
+  processAllURLs
 } from "./Scrapers";
 import {IF, SOF, ST} from '../../data/const';
 import Config from "../../data/Config";
@@ -105,10 +106,12 @@ function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<strin
       workerFunction = returnPromise ? loadE621Promise : worker.loadE621;
     } else if (sourceType == ST.luscious) {
       workerFunction = returnPromise ? loadLusciousPromise : worker.loadLuscious;
-    } else if (sourceType == ST.gelbooru1) {
-      workerFunction = returnPromise ? loadGelbooru1Promise : worker.loadGelbooru1;
-    } else if (sourceType == ST.gelbooru2) {
-      workerFunction = returnPromise ? loadGelbooru2Promise : worker.loadGelbooru2;
+    } else if (sourceType == ST.gelbooruScrape) {
+      workerFunction = returnPromise ? loadGelbooruScrapePromise : worker.loadGelbooruScrape;
+    } else if (sourceType == ST.gelbooruAPI) {
+      workerFunction = returnPromise ? loadGelbooruAPIPromise : worker.loadGelbooruAPI;
+    } else if (sourceType == ST.rule34) {
+      workerFunction = returnPromise ? loadRule34Promise: worker.loadRule34;
     } else if (sourceType == ST.ehentai) {
       workerFunction = returnPromise ? loadEHentaiPromise : worker.loadEHentai;
     } else if (sourceType == ST.bdsmlr) {
@@ -396,12 +399,16 @@ const loadE621Promise = (allURLs: Map<string, Array<string>>, allPosts: Map<stri
   loadE621(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
 }
 
-const loadGelbooru1Promise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
-  loadGelbooru1(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
+const loadGelbooruScrapePromise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadGelbooruScrape(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
 }
 
-const loadGelbooru2Promise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
-  loadGelbooru2(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
+const loadGelbooruAPIPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadGelbooruAPI(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
+}
+
+const loadRule34Promise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
+  loadRule34(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
 }
 
 const loadEHentaiPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {

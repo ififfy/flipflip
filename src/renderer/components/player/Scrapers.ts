@@ -1545,7 +1545,7 @@ export const loadE621 = (allURLs: Map<string, Array<string>>, allPosts: Map<stri
       }, resolve));
   } else {
     suffix = "/posts.json?limit=20&page=" + (helpers.next + 1);
-    const tagRegex = /[?&]tags=(.*)&?/g;
+    const tagRegex = /[?&]tags=(.*)(&|\z)/g;
     let tags;
     if ((tags = tagRegex.exec(url)) !== null) {
       suffix += "&tags=" + tags[1];
@@ -1643,7 +1643,7 @@ export const loadDanbooru = (allURLs: Map<string, Array<string>>, allPosts: Map<
     suffix = "/favorite_groups/" + url.substring(url.lastIndexOf("/") + 1) + ".json";
   } else {
     suffix = "/post/index.json?limit=20&page=" + (helpers.next + 1);
-    const tagRegex = /[?&]tags=(.*)&?/g;
+    const tagRegex = /[?&]tags=(.*)(&|\z)/g;
     let tags;
     if ((tags = tagRegex.exec(url)) !== null) {
       suffix += "&tags=" + tags[1];
@@ -1823,7 +1823,7 @@ export const loadDanbooru = (allURLs: Map<string, Array<string>>, allPosts: Map<
     }, resolve));
 }
 
-export const loadGelbooru1 = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
+export const loadGelbooruScrape = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 8000;
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
@@ -1937,13 +1937,13 @@ export const loadGelbooru1 = (allURLs: Map<string, Array<string>>, allPosts: Map
     });
 }
 
-export const loadGelbooru2 = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
+export const loadGelbooruAPI = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 8000;
   const url = source.url;
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
   const thisHost = hostRegex.exec(url)[1];
   let suffix = "/index.php?page=dapi&s=post&q=index&limit=20&json=1&pid=" + (helpers.next + 1);
-  const tagRegex = /[?&]tags=(.*)&?/g;
+  const tagRegex = /[?&]tags=(.*)(&|\z)/g;
   let tags;
   if ((tags = tagRegex.exec(url)) !== null) {
     suffix += "&tags=" + tags[1];
@@ -1996,7 +1996,93 @@ export const loadGelbooru2 = (allURLs: Map<string, Array<string>>, allPosts: Map
       }
 
       const images = Array<string>();
-      for (let p of json.post) {
+      for (let p of json) {
+        if (p.file_url) {
+          images.push(p.file_url);
+        } else if (p.image) {
+          images.push(thisHost + "//images/" + p.directory + "/" + p.image);
+        }
+      }
+
+      helpers.next = helpers.next + 1;
+      helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+      pm({
+        data: filterPathsToJustPlayable(filter, images, true),
+        allURLs: allURLs,
+        allPosts: allPosts,
+        weight: weight,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }, resolve);
+    })
+    .catch((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }, resolve));
+}
+
+export const loadRule34 = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
+  const timeout = 8000;
+  const url = source.url;
+  const thisHost = "https://api.rule34.xxx";
+  let suffix = "/index.php?page=dapi&s=post&q=index&limit=20&json=1&pid=" + (helpers.next + 1) + "&api_key=" + config.remoteSettings.rule34APIKey + "&user_id=" + config.remoteSettings.rule34UserID;
+  const tagRegex = /[?&]tags=(.*)(&|\z)/g;
+  let tags;
+  if ((tags = tagRegex.exec(url)) !== null) {
+    suffix += "&tags=" + tags[1];
+  }
+  wretch(thisHost + suffix)
+    .get()
+    .setTimeout(5000)
+    .badRequest((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }, resolve))
+    .notFound((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }, resolve))
+    .timeout((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }, resolve))
+    .internalError((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }, resolve))
+    .onAbort((e) => pm({
+      error: e.message,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    }, resolve))
+    .json((json: any) => {
+      if (json.length == 0) {
+        helpers.next = null;
+        pm({
+          data: [],
+          allURLs: allURLs,
+          allPosts: allPosts,
+          weight: weight,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }, resolve);
+      }
+
+      const images = Array<string>();
+      for (let p of json) {
         if (p.file_url) {
           images.push(p.file_url);
         } else if (p.image) {
@@ -2997,14 +3083,16 @@ export function getSourceType(url: string): string {
     return ST.instagram;
   } else if (/^https?:\/\/(www\.)?(lolibooru\.moe|hypnohub\.net|danbooru\.donmai\.us)\//.exec(url) != null) {
     return ST.danbooru;
-  } else if (/^https?:\/\/(www\.)?(gelbooru\.com|furry\.booru\.org|rule34\.xxx|realbooru\.com|safebooru\.org)\//.exec(url) != null) {
-    return ST.gelbooru2;
+  } else if (/^https?:\/\/(www\.)?(safebooru\.org)\//.exec(url) != null) {
+    return ST.gelbooruAPI;
+  } else if (/^https?:\/\/(www\.)?(rule34\.xxx)\//.exec(url) != null) {
+    return ST.rule34;
   } else if (/^https?:\/\/(www\.)?(e621\.net)\//.exec(url) != null) {
     return ST.e621;
   } else if (/^https?:\/\/(www\.|members\.)?luscious\.net\//.exec(url) != null) {
     return ST.luscious;
-  } else if (/^https?:\/\/(www\.)?(.*\.booru\.org|idol\.sankakucomplex\.com)\//.exec(url) != null) {
-    return ST.gelbooru1;
+  } else if (/^https?:\/\/(www\.)?(gelbooru\.com|.*\.booru\.org)\//.exec(url) != null) {
+    return ST.gelbooruScrape;
   } else if (/^https?:\/\/(www\.)?e-hentai\.org\/g\//.exec(url) != null) {
     return ST.ehentai;
   } else if (/^https?:\/\/[^.]*\.bdsmlr\.com/.exec(url) != null) {
@@ -3094,7 +3182,7 @@ export function getFileGroup(url: string) {
       if (url.includes("/pools/")) {
         E621ID = "pool" + url.substring(url.lastIndexOf("/"));
       } else {
-        const tagRegex = /[?&]tags=(.*)&?/g;
+        const tagRegex = /[?&]tags=(.*)(&|\z)/g;
         let tags;
         if ((tags = tagRegex.exec(url)) !== null) {
           E621ID = tags[1];
@@ -3111,8 +3199,8 @@ export function getFileGroup(url: string) {
       }
       return albumID;
     case ST.danbooru:
-    case ST.gelbooru1:
-    case ST.gelbooru2:
+    case ST.gelbooruScrape:
+    case ST.gelbooruAPI:
       const hostRegex = /^https?:\/\/(?:www\.)?([^.]*)\./g;
       const host =  hostRegex.exec(url)[1];
       let danbooruID = "";
@@ -3121,10 +3209,12 @@ export function getFileGroup(url: string) {
       } else if (url.includes("/favorite_groups/")) {
         danbooruID = "favorite_groups/" + url.substring(url.lastIndexOf("/"));
       } else {
-        const tagRegex = /[?&]tags=(.*)&?/g;
+        const tagRegex = /[?&]tags=(.*)(&|\z)/g;
         let tags;
         if ((tags = tagRegex.exec(url)) !== null) {
-          danbooruID = tags[1];
+          let sanitizedTags = tags[1];
+          sanitizedTags = sanitizedTags.replace("%3A", "");
+          danbooruID = sanitizedTags;
         }
         const titleRegex = /[?&]title=(.*)&?/g;
         let title;
@@ -3141,6 +3231,19 @@ export function getFileGroup(url: string) {
         }
       }
       return host + "/" + decodeURIComponent(danbooruID);
+    case ST.rule34:
+      let rule34 = "";
+      const r34tagRegex = /[?&]tags=(.*)(&|\z)/g;
+      let r34Tags;
+      if ((r34Tags = r34tagRegex.exec(url)) !== null) {
+        let sanitizedTags = r34Tags[1];
+        sanitizedTags = sanitizedTags.replace("%3A", "");
+        rule34 = sanitizedTags;
+      }
+      if (rule34.endsWith("+")) {
+        rule34 = rule34.substring(0, rule34.length - 1);
+      }
+      return decodeURIComponent(rule34);
     case ST.ehentai:
       const galleryRegex = /^https?:\/\/(?:www\.)?e-hentai\.org\/g\/([^\/]*)/g;
       const gallery = galleryRegex.exec(url);

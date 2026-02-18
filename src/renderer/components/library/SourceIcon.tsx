@@ -129,6 +129,14 @@ function GelbooruIcon(props: any) {
   );
 }
 
+function Rule34Icon(props: any) {
+  return (
+    <SvgIcon {...props} viewBox="0 17.329999923706055 56.540000915527344 32.79000473022461">
+      <path d="M6.69 34.08L7.10 34.08Q7.18 34.11 7.50 34.11Q7.93 36.89 9.79 38.48Q11.65 40.06 14.04 40.06Q15.94 40.06 15.94 39.33Q15.94 38.99 15.82 38.79Q15.21 38.92 14.23 38.92Q11.91 38.92 10.33 37.45Q8.74 35.99 8.74 33.54Q8.74 31.10 10.27 29.65Q11.79 28.20 14.26 28.20L14.70 28.20Q14.89 28.20 15.23 28.25Q15.31 28.10 15.31 27.93Q15.31 27.15 14.01 27.15Q11.87 27.15 10.07 28.39Q8.28 29.64 7.62 32.06Q3.96 32.06 1.98 30.32Q0.29 28.86 0.29 26.49Q0.29 22.51 3.92 19.92Q7.54 17.33 13.37 17.33Q19.19 17.33 22.97 20.24Q26.73 23.14 26.73 27.76Q26.73 30.81 24.54 32.79Q23.46 32.28 22.66 32.28Q21.85 32.28 21.85 32.93Q21.85 33.23 22.00 33.35Q23.93 33.35 25.51 34.77Q27.49 36.52 27.49 39.77Q27.49 44.70 23.32 47.53Q19.48 50.12 13.56 50.12Q7.64 50.12 3.82 47.46Q0 44.80 0 40.38Q0 37.67 1.75 35.88Q3.49 34.08 6.69 34.08ZM40.14 34.77L42.75 34.77L42.75 31.49L42.21 31.49Q41.31 33.23 40.14 34.30L40.14 34.77M40.38 45.65L42.36 45.65Q43.14 45.65 43.48 45.52Q43.82 45.39 43.82 45.06Q43.82 44.73 43.73 44.51L36.33 44.51Q32.23 44.51 30.05 41.94Q28.08 39.65 28.08 35.74Q28.08 33.72 28.42 32.20Q32.03 29.10 35.13 25.15Q36.84 22.95 40.19 17.75L46.41 17.75Q49.46 17.75 51.39 19.40Q53.32 21.04 53.32 23.90L53.32 33.23L52.81 33.23Q51.76 33.23 51.76 34.06L51.76 34.38L55.69 34.38Q56.54 36.52 56.54 39.28Q56.54 41.19 55.74 42.61Q54.93 44.04 53.30 44.41L53.30 48.14Q50.56 50.12 46.69 50.12Q42.82 50.12 40.38 48.29L40.38 45.65Z"/>
+    </SvgIcon>
+  );
+}
+
 function EHentaiIcon(props: any) {
   return (
     <SvgIcon {...props} viewBox="0 0 400 400" fontSize="small">
@@ -287,9 +295,11 @@ export default class SourceIcon extends React.Component {
         return <DanbooruIcon className={this.props.className}/>;
       case ST.luscious:
         return <LusciousIcon className={this.props.className}/>;
-      case ST.gelbooru1:
-      case ST.gelbooru2:
+      case ST.gelbooruScrape:
+      case ST.gelbooruAPI:
         return <GelbooruIcon className={this.props.className}/>;
+      case ST.rule34:
+        return <Rule34Icon className={this.props.className}/>;
       case ST.ehentai:
         return <EHentaiIcon className={this.props.className}/>;
       case ST.bdsmlr:
