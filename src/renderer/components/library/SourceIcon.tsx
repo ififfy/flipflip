@@ -295,8 +295,9 @@ export default class SourceIcon extends React.Component {
         return <DanbooruIcon className={this.props.className}/>;
       case ST.luscious:
         return <LusciousIcon className={this.props.className}/>;
-      case ST.gelbooruScrape:
-      case ST.gelbooruAPI:
+      case ST.booruScrape:
+      case ST.booruAPI:
+      case ST.gelbooru:
         return <GelbooruIcon className={this.props.className}/>;
       case ST.rule34:
         return <Rule34Icon className={this.props.className}/>;

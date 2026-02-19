@@ -113,6 +113,7 @@ class APICard extends React.Component {
     const instagramConfigured = this.props.settings.instagramUsername != "" && this.props.settings.instagramPassword != "";
     const hydrusConfigured = this.props.settings.hydrusAPIKey != "";
     const rule34Configured = this.props.settings.rule34APIKey != "" && this.props.settings.rule34UserID != "";
+    const gelbooruConfigured = this.props.settings.gelbooruAPIKey != "" && this.props.settings.gelbooruUserID != "";
     const piwigoConfigured = this.props.settings.piwigoProtocol != "" && this.props.settings.piwigoHost != "" && this.props.settings.piwigoUsername != "" && this.props.settings.piwigoPassword != "";
     const indexOf = this.props.settings.tumblrKeys.indexOf(this.props.settings.tumblrKey);
     const menuType = this.state.menuType ? en.get(this.state.menuType)[0].toUpperCase() + en.get(this.state.menuType).slice(1) : "";
@@ -135,6 +136,9 @@ class APICard extends React.Component {
         break;
       case ST.rule34:
         menuTypeSignOut = this.onFinishClearRule34.bind(this);
+        break;
+      case ST.gelbooru:
+        menuTypeSignOut = this.onFinishClearGelbooru.bind(this);
         break;
       case ST.piwigo:
         menuTypeSignOut = this.onFinishClearPiwigo.bind(this);
@@ -202,6 +206,16 @@ class APICard extends React.Component {
                 onClick={rule34Configured ? this.onClearRule34.bind(this) : this.onAuthRule34.bind(this)}
                 size="large">
                 <SourceIcon className={classes.icon} type={ST.rule34}/>
+              </Fab>
+            </Tooltip>
+          </Grid>
+          <Grid item>
+            <Tooltip disableInteractive title={gelbooruConfigured ? "Configured: Click to Remove Gelbooru Configuration" : "Unauthorized: Click to Configure Gelbooru"}  placement="top-end">
+              <Fab
+                className={clsx(classes.fab, gelbooruConfigured ? classes.authorized : classes.noAuth)}
+                onClick={gelbooruConfigured ? this.onClearGelbooru.bind(this) : this.onAuthGelbooru.bind(this)}
+                size="large">
+                <SourceIcon className={classes.icon} type={ST.gelbooru}/>
               </Fab>
             </Tooltip>
           </Grid>
@@ -601,6 +615,49 @@ class APICard extends React.Component {
         </Dialog>
 
         <Dialog
+          open={this.state.openMenu == MO.signIn && this.state.menuType == ST.gelbooru}
+          onClose={this.onCloseDialog.bind(this)}
+          aria-labelledby="gelbooru-title"
+          aria-describedby="gelbooru-description">
+          <DialogTitle id="gelbooru-title">
+            Gelbooru Configuration
+            <Avatar className={classes.iconAvatar}>
+              <SourceIcon className={classes.icon} type={ST.gelbooru}/>
+            </Avatar>
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="gelbooru-description">
+              FlipFlip does not store any user information or make changes to your Gelbooru account. Your configured information is
+              stored locally on your computer and is never shared with anyone or sent to any server (besides Gelbooru, obviously).
+            </DialogContentText>
+            <TextField
+              variant="standard"
+              fullWidth
+              margin="dense"
+              label="Gelbooru API Key"
+              value={this.state.input1}
+              onChange={this.onInput1.bind(this)} />
+            <TextField
+              variant="standard"
+              fullWidth
+              margin="dense"
+              label="Gelbooru User ID"
+              value={this.state.input2}
+              onChange={this.onInput2.bind(this)} />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+              Cancel
+            </Button>
+            <Button
+              disabled={this.state.input1.length == 0 || this.state.input2.length == 0}
+              onClick={this.onFinishAuthGelbooru.bind(this)} color="primary">
+              Configure Gelbooru
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog
           open={this.state.openMenu == MO.signIn && this.state.menuType == ST.piwigo}
           onClose={this.onCloseDialog.bind(this)}
           aria-labelledby="piwigo-title"
@@ -783,6 +840,24 @@ class APICard extends React.Component {
     this.onCloseDialog();
   }
 
+  onClearGelbooru() {
+    this.setState({openMenu: MO.signOut, menuType: ST.gelbooru});
+  }
+
+  onFinishClearGelbooru() {
+    // Update props
+    this.props.onUpdateConfig((c) => {
+      c.remoteSettings.gelbooruAPIKey = "";
+      c.remoteSettings.gelbooruUserID = "";
+    });
+    // Update state
+    this.props.onUpdateSettings((s) => {
+      s.gelbooruAPIKey = "";
+      s.gelbooruUserID = "";
+    });
+    this.onCloseDialog();
+  }
+
   onClearPiwigo() {
     this.setState({openMenu: MO.signOut, menuType: ST.piwigo});
   }
@@ -856,6 +931,10 @@ class APICard extends React.Component {
 
   onAuthRule34() {
     this.setState({openMenu: MO.signIn, menuType: ST.rule34, input1: this.props.settings.rule34APIKey, input2: this.props.settings.rule34UserID});
+  }
+
+  onAuthGelbooru() {
+    this.setState({openMenu: MO.signIn, menuType: ST.gelbooru, input1: this.props.settings.gelbooruAPIKey, input2: this.props.settings.gelbooruUserID});
   }
 
   onAuthPiwigo() {
@@ -1355,6 +1434,43 @@ class APICard extends React.Component {
         } else {
           console.error("Invalid response from Rule34");
           this.setState({snackbarOpen: true, snackbar: "Invalid response from Rule34", snackbarSeverity: SS.error});
+        }
+      })
+      .catch((e) => {
+        console.error(e);
+        this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
+      });
+  }
+
+  onFinishAuthGelbooru() {
+    wretch("https://gelbooru.com/index.php?page=dapi&s=post&q=index&limit=1&pid=0&json=1&api_key=" + this.state.input1 + "&user_id=" + this.state.input2)
+      .get()
+      .setTimeout(5000)
+      .notFound((e) => {
+        console.error(e);
+        this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
+      })
+      .internalError((e) => {
+        console.error(e);
+        this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
+      })
+      .json((json) => {
+        if (json.post.length > 0 && !!json.post[0].file_url) {
+          //Update props
+          this.props.onUpdateConfig((c) => {
+            c.remoteSettings.gelbooruAPIKey = this.state.input1;
+            c.remoteSettings.gelbooruUserID = this.state.input2;
+          });
+          // Update state
+          this.props.onUpdateSettings((s) => {
+            s.gelbooruAPIKey = this.state.input1;
+            s.gelbooruUserID = this.state.input2;
+          });
+          this.setState({snackbarOpen: true, snackbar: "Gelbooru is configured", snackbarSeverity: SS.success});
+          this.onCloseDialog();
+        } else {
+          console.error("Invalid response from Gelbooru");
+          this.setState({snackbarOpen: true, snackbar: "Invalid response from Gelbooru", snackbarSeverity: SS.error});
         }
       })
       .catch((e) => {

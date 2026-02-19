@@ -551,6 +551,9 @@ export class RemoteSettings implements RemoteSettingsI {
   rule34APIKey = "";
   rule34UserID = "";
 
+  gelbooruAPIKey = "";
+  gelbooruUserID = "";
+
   piwigoProtocol = "http";
   piwigoHost = "";
   piwigoUsername = "";
