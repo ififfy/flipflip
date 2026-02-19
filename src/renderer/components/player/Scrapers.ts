@@ -3330,7 +3330,7 @@ export function getFileGroup(url: string) {
       let r34Tags;
       if ((r34Tags = r34tagRegex.exec(url)) !== null) {
         let sanitizedTags = r34Tags[1];
-        sanitizedTags = sanitizedTags.replace("%3A", "");
+        sanitizedTags = sanitizedTags.replace("%3A", "").replace("%3a", "");
         rule34 = sanitizedTags;
       }
       if (rule34.endsWith("+")) {
