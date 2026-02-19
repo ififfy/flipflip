@@ -2118,12 +2118,13 @@ export const loadRule34 = (allURLs: Map<string, Array<string>>, allPosts: Map<st
   const timeout = 8000;
   const url = source.url;
   const thisHost = "https://api.rule34.xxx";
-  let suffix = "/index.php?page=dapi&s=post&q=index&limit=20&json=1&pid=" + (helpers.next + 1) + "&api_key=" + config.remoteSettings.rule34APIKey + "&user_id=" + config.remoteSettings.rule34UserID;
+  let suffix = "/index.php?page=dapi&s=post&q=index&limit=20&json=1&pid=" + (helpers.next) + "&api_key=" + config.remoteSettings.rule34APIKey + "&user_id=" + config.remoteSettings.rule34UserID;
   const tagRegex = /[?&]tags=([^&]*)/g;
   let tags;
   if ((tags = tagRegex.exec(url)) !== null) {
     suffix += "&tags=" + tags[1];
   }
+  pm({warning: thisHost + suffix});
   wretch(thisHost + suffix)
     .get()
     .setTimeout(5000)
