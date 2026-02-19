@@ -1545,7 +1545,7 @@ export const loadE621 = (allURLs: Map<string, Array<string>>, allPosts: Map<stri
       }, resolve));
   } else {
     suffix = "/posts.json?limit=20&page=" + (helpers.next + 1);
-    const tagRegex = /[?&]tags=(.*)(&|\z)/g;
+    const tagRegex = /[?&]tags=([^&]*)/g;
     let tags;
     if ((tags = tagRegex.exec(url)) !== null) {
       suffix += "&tags=" + tags[1];
@@ -1643,7 +1643,7 @@ export const loadDanbooru = (allURLs: Map<string, Array<string>>, allPosts: Map<
     suffix = "/favorite_groups/" + url.substring(url.lastIndexOf("/") + 1) + ".json";
   } else {
     suffix = "/post/index.json?limit=20&page=" + (helpers.next + 1);
-    const tagRegex = /[?&]tags=(.*)(&|\z)/g;
+    const tagRegex = /[?&]tags=([^&]*)/g;
     let tags;
     if ((tags = tagRegex.exec(url)) !== null) {
       suffix += "&tags=" + tags[1];
@@ -1943,7 +1943,7 @@ export const loadBooruAPI = (allURLs: Map<string, Array<string>>, allPosts: Map<
   const hostRegex = /^(https?:\/\/[^\/]*)\//g;
   const thisHost = hostRegex.exec(url)[1];
   let suffix = "/index.php?page=dapi&s=post&q=index&limit=20&json=1&pid=" + (helpers.next + 1);
-  const tagRegex = /[?&]tags=(.*)(&|\z)/g;
+  const tagRegex = /[?&]tags=([^&]*)/g;
   let tags;
   if ((tags = tagRegex.exec(url)) !== null) {
     suffix += "&tags=" + tags[1];
@@ -2029,7 +2029,7 @@ export const loadGelbooru = (allURLs: Map<string, Array<string>>, allPosts: Map<
   const url = source.url;
   const thisHost = "https://gelbooru.com";
   let suffix = "/index.php?page=dapi&s=post&q=index&limit=20&json=1&pid=" + (helpers.next + 1) + "&api_key=" + config.remoteSettings.gelbooruAPIKey + "&user_id=" + config.remoteSettings.gelbooruUserID;
-  const tagRegex = /[?&]tags=(.*)(&|\z)/g;
+  const tagRegex = /[?&]tags=([^&]*)/g;
   let tags;
   if ((tags = tagRegex.exec(url)) !== null) {
     suffix += "&tags=" + tags[1];
@@ -2119,7 +2119,7 @@ export const loadRule34 = (allURLs: Map<string, Array<string>>, allPosts: Map<st
   const url = source.url;
   const thisHost = "https://api.rule34.xxx";
   let suffix = "/index.php?page=dapi&s=post&q=index&limit=20&json=1&pid=" + (helpers.next + 1) + "&api_key=" + config.remoteSettings.rule34APIKey + "&user_id=" + config.remoteSettings.rule34UserID;
-  const tagRegex = /[?&]tags=(.*)(&|\z)/g;
+  const tagRegex = /[?&]tags=([^&]*)/g;
   let tags;
   if ((tags = tagRegex.exec(url)) !== null) {
     suffix += "&tags=" + tags[1];
@@ -3274,7 +3274,7 @@ export function getFileGroup(url: string) {
       if (url.includes("/pools/")) {
         E621ID = "pool" + url.substring(url.lastIndexOf("/"));
       } else {
-        const tagRegex = /[?&]tags=(.*)(&|\z)/g;
+        const tagRegex = /[?&]tags=([^&]*)/g;
         let tags;
         if ((tags = tagRegex.exec(url)) !== null) {
           E621ID = tags[1];
@@ -3301,7 +3301,7 @@ export function getFileGroup(url: string) {
       } else if (url.includes("/favorite_groups/")) {
         danbooruID = "favorite_groups/" + url.substring(url.lastIndexOf("/"));
       } else {
-        const tagRegex = /[?&]tags=(.*)(&|\z)/g;
+        const tagRegex = /[?&]tags=([^&]*)/g;
         let tags;
         if ((tags = tagRegex.exec(url)) !== null) {
           let sanitizedTags = tags[1];
@@ -3326,7 +3326,7 @@ export function getFileGroup(url: string) {
     case ST.rule34:
     case ST.gelbooru:
       let rule34 = "";
-      const r34tagRegex = /[?&]tags=(.*)(&|\z)/g;
+      const r34tagRegex = /[?&]tags=([^&]*)/g;
       let r34Tags;
       if ((r34Tags = r34tagRegex.exec(url)) !== null) {
         let sanitizedTags = r34Tags[1];
