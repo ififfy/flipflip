@@ -15,3 +15,4 @@ FlipFlip-linux-ia32/
 *.ipr
 *.iws
 .idea/
+.vite/
