@@ -2,7 +2,6 @@ import * as React from "react";
 import clsx from "clsx";
 import rimraf from "rimraf";
 import {remote} from "electron";
-import getFolderSize from "get-folder-size";
 
 import {
   Button,
@@ -33,6 +32,7 @@ import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import Config, {CacheSettings} from "../../data/Config";
 import {getCachePath, urlToPath} from "../../data/utils";
 import { fs_existsSync } from "../../dummy/fs";
+import { folder_getFolderSize } from "src/renderer/dummy/folder";
 
 const styles = (theme: Theme) => createStyles({
   fullWidth: {
@@ -181,7 +181,7 @@ class CacheCard extends React.Component {
     if (this.props.config.caching.maxSize != 0) {
       const cachePath = getCachePath(null, this.props.config);
       if (fs_existsSync(cachePath)) {
-        getFolderSize(getCachePath(null, this.props.config), (err: string, size: number) => {
+        folder_getFolderSize(getCachePath(null, this.props.config), (err: string, size: number) => {
           if (err) { throw err; }
           const mbSize = (size / 1024 / 1024);
           this.setState({cacheSize: mbSize.toFixed(2)});

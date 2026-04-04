@@ -1,6 +1,5 @@
 import {IncomingMessage, remote, webFrame} from "electron";
 import wretch from "wretch";
-import getFolderSize from "get-folder-size";
 import tumblr, {TumblrClient} from "tumblr.js";
 import Snoowrap from "snoowrap";
 import Twitter from "twitter";
@@ -77,6 +76,7 @@ import WeightGroup from "./WeightGroup";
 import { fs_existsSync, fs_fileSize, fs_isDirectory, fs_mkdirSync, fs_readFileSync, fs_unlink, fs_writeFileSync } from "../dummy/fs";
 import { fsExtra_outputFile } from "../dummy/fs-extra";
 import { path_sep } from "../dummy/path";
+import { folder_getFolderSize } from "../dummy/folder";
 
 type State = typeof defaultInitialState;
 
@@ -457,7 +457,7 @@ export function cacheImage(state: State, i: HTMLImageElement | HTMLVideoElement)
       if (maxSize == 0) {
         downloadImage();
       } else {
-        getFolderSize(cachePath, (err: string, size: number) => {
+        folder_getFolderSize(cachePath, (err: string, size: number) => {
           if (err) {
             throw err;
           }
