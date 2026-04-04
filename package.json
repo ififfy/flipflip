@@ -81,7 +81,6 @@
     "tumblr.js": "^3.0.0",
     "twitter": "^1.7.1",
     "web-audio-beat-detector": "^8.1.33",
-    "workerize-loader": "^2.0.2",
     "wretch": "^1.7.10",
     "xmldom": "^0.6.0"
   }

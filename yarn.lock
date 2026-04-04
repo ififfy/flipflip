@@ -2232,11 +2232,6 @@ bidi-js@^1.0.3:
   dependencies:
     require-from-string "^2.0.2"
 
-big.js@^5.2.2:
-  version "5.2.2"
-  resolved "https://registry.yarnpkg.com/big.js/-/big.js-5.2.2.tgz#65f0af382f578bcdc742bd9c281e9cb2d7768328"
-  integrity sha512-vyL2OymJxmarO8gxMr0mhChsO9QGwhynfuu4+MHTAW6czfq9humCB7rKpUjDd9YUiDPU4mzpyupFSvOClAwbmQ==
-
 bignumber.js@^9.0.0:
   version "9.3.1"
   resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-9.3.1.tgz#759c5aaddf2ffdc4f154f7b493e1c8770f88c4d7"
@@ -2980,11 +2975,6 @@ emoji-regex@^9.2.2:
   version "9.2.2"
   resolved "https://registry.yarnpkg.com/emoji-regex/-/emoji-regex-9.2.2.tgz#840c8803b0d8047f4ff0cf963176b32d4ef3ed72"
   integrity sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==
-
-emojis-list@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/emojis-list/-/emojis-list-3.0.0.tgz#5570662046ad29e2e916e71aae260abdff4f6a78"
-  integrity sha512-/kyM18EfinwXZbno9FyUGeFh87KC8HRQBQGildHZbEuRyWFOmv1U10o9BBp8XVZDVNNuQKyIGIu5ZYAAXJ0V2Q==
 
 encoding@^0.1.13:
   version "0.1.13"
@@ -4546,11 +4536,6 @@ json5@^1.0.2:
   dependencies:
     minimist "^1.2.0"
 
-json5@^2.1.2:
-  version "2.2.3"
-  resolved "https://registry.yarnpkg.com/json5/-/json5-2.2.3.tgz#78cd6f1a19bdc12b73db5ad0c61efd66c1e29283"
-  integrity sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==
-
 jsonfile@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/jsonfile/-/jsonfile-4.0.0.tgz#8771aae0799b64076b76640fca058f9c10e33ecb"
@@ -4698,15 +4683,6 @@ loader-runner@^4.3.1:
   version "4.3.1"
   resolved "https://registry.yarnpkg.com/loader-runner/-/loader-runner-4.3.1.tgz#6c76ed29b0ccce9af379208299f07f876de737e3"
   integrity sha512-IWqP2SCPhyVFTBtRcgMHdzlf9ul25NwaFx4wCEH/KjAXuuHY4yNjvPXsBokp8jCB936PyWRaPKUNh8NvylLp2Q==
-
-loader-utils@^2.0.0:
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/loader-utils/-/loader-utils-2.0.4.tgz#8b5cb38b5c34a9a018ee1fc0e6a066d1dfcc528c"
-  integrity sha512-xXqpXoINfFhgua9xiqD8fPFHgkoq1mmmpE92WlDbm9rNRd/EbRb+Gqf908T2DMfuHjjJlksiK2RbHVOdD/MqSw==
-  dependencies:
-    big.js "^5.2.2"
-    emojis-list "^3.0.0"
-    json5 "^2.1.2"
 
 locate-path@^2.0.0:
   version "2.0.0"
@@ -7410,13 +7386,6 @@ worker-factory@^7.0.49:
     "@babel/runtime" "^7.29.2"
     fast-unique-numbers "^9.0.27"
     tslib "^2.8.1"
-
-workerize-loader@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/workerize-loader/-/workerize-loader-2.0.2.tgz#2f39c3e6eb6c41fac8d28d5b9fa20b4035e3db7a"
-  integrity sha512-HoZ6XY4sHWxA2w0WpzgBwUiR3dv1oo7bS+oCwIpb6n54MclQ/7KXdXsVIChTCygyuHtVuGBO1+i3HzTt699UJQ==
-  dependencies:
-    loader-utils "^2.0.0"
 
 wrap-ansi@^6.2.0:
   version "6.2.0"

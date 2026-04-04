@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as fs from "fs";
 import * as path from "path";
-import worker from 'workerize-loader!./Scrapers';
+import * as worker from './Scrapers';
 import recursiveReaddir from "recursive-readdir";
 import fileURL from "file-url";
 import wretch from "wretch";
