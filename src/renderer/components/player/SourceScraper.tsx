@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as worker from './Scrapers';
 import recursiveReaddir from "recursive-readdir";
-import fileURL from "file-url";
+import {fileUrl_fileURL} from "../../dummy/file-url";
 import wretch from "wretch";
 import uuidv4 from "uuid/v4";
 
@@ -180,7 +180,7 @@ const loadLocalDirectory = (pm: Function, allURLs: Map<string, Array<string>>, a
       }});
     } else {
       const collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
-      let sources = filterPathsToJustPlayable(filter, rawFiles, true).map((p) => fileURL(p)).sort(collator.compare);
+      let sources = filterPathsToJustPlayable(filter, rawFiles, true).map((p) => fileUrl_fileURL(p)).sort(collator.compare);
 
       if (source.blacklist && source.blacklist.length > 0) {
         sources = sources.filter((url: string) => !source.blacklist.includes(url) && !source.blacklist.includes(urlToPath(url)));
@@ -221,7 +221,7 @@ export const loadVideo = (pm: Function, allURLs: Map<string, Array<string>>, all
   }
   const ifExists = (url: string) => {
     if (!url.startsWith("http")) {
-      url = fileURL(url);
+      url = fileUrl_fileURL(url);
     }
     helpers.count = 1;
 

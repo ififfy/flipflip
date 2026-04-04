@@ -2,7 +2,7 @@ import * as React from "react";
 import {clipboard, nativeImage, remote} from "electron";
 const {getCurrentWindow, Menu, MenuItem, app} = remote;
 import clsx from "clsx";
-import fileURL from "file-url";
+import {fileUrl_fileURL} from "../../dummy/file-url";
 import wretch from "wretch";
 
 import {
@@ -968,7 +968,7 @@ class PlayerBars extends React.Component {
     let post = img.hasAttribute("post") ? img.getAttribute("post") : null;
     const literalSource = source;
     if (/^https?:\/\//g.exec(source) == null) {
-      source = urlToPath(fileURL(source));
+      source = urlToPath(fileUrl_fileURL(source));
     }
     const isFile = url.startsWith('file://');
     const path = urlToPath(url);
