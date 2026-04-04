@@ -1,5 +1,3 @@
-import path from "path";
-
 import {urlToPath} from "./utils";
 import {BT, EA, GO, HTF, IF, IT, OF, OT, RP, SC, SL, SOF, STF, TF, VO, VTF, WF} from './const';
 import LibrarySource from "./LibrarySource";
@@ -7,6 +5,7 @@ import Audio from "./Audio";
 import Overlay from "./Overlay";
 import WeightGroup from "./WeightGroup";
 import CaptionScript from "./CaptionScript";
+import { path_sep } from "../dummy/path";
 
 export default class Scene {
   id: number = 0;
@@ -378,8 +377,8 @@ export default class Scene {
           if (a.url.startsWith("http")) {
             a.name = a.url.substring(a.url.lastIndexOf("\/") + 1, a.url.lastIndexOf("."))
           } else {
-            a.url = urlToPath(a.url).replace(/\//g, path.sep);
-            a.name = a.url.substring(a.url.lastIndexOf(path.sep) + 1, a.url.lastIndexOf("."));
+            a.url = urlToPath(a.url).replace(/\//g, path_sep());
+            a.name = a.url.substring(a.url.lastIndexOf(path_sep()) + 1, a.url.lastIndexOf("."));
           }
           a.duration = 0;
         }

@@ -1,4 +1,4 @@
-import { copyFileSync, mkdirSync, existsSync, readFileSync, renameSync, writeFile } from 'fs';
+import { fs_copyFileSync, fs_mkdirSync, fs_existsSync, fs_readFileSync, fs_renameSync, fs_writeFile } from '../dummy/fs';
 
 import {getBackups, portablePath, removeDuplicatesBy, saveDir, savePath} from "./utils";
 import {cleanBackups} from "./actions";
@@ -66,8 +66,8 @@ export const defaultInitialState = {
  * @param {string} filePath
  */
 function archiveFile(filePath: string): void {
-  if (existsSync(filePath)) {
-    copyFileSync(filePath, (filePath + '.' + Date.now()));
+  if (fs_existsSync(filePath)) {
+    fs_copyFileSync(filePath, (filePath + '.' + Date.now()));
   }
 }
 
@@ -76,7 +76,7 @@ export default class AppStorage {
 
   constructor(windowId: number) {
     try {
-      mkdirSync(saveDir);
+      fs_mkdirSync(saveDir);
     }
     catch (e) {
       // who cares
@@ -84,27 +84,27 @@ export default class AppStorage {
     try {
       let data;
       let portableMode = false;
-      if (!existsSync(savePath) && existsSync(portablePath)) {
-        data = JSON.parse(readFileSync(portablePath, 'utf-8'));
+      if (!fs_existsSync(savePath) && fs_existsSync(portablePath)) {
+        data = JSON.parse(fs_readFileSync(portablePath, 'utf-8'));
         if (!data.config.generalSettings.portableMode) {
-          data = JSON.parse(readFileSync(savePath, 'utf-8'));
+          data = JSON.parse(fs_readFileSync(savePath, 'utf-8'));
         } else {
           portableMode = true;
           console.log("Portable: " + portablePath);
         }
       } else {
-        data = JSON.parse(readFileSync(savePath, 'utf-8'));
+        data = JSON.parse(fs_readFileSync(savePath, 'utf-8'));
         if (data.config.generalSettings.portableMode) {
           portableMode = true;
           console.log("Portable: " + portablePath);
-          data = JSON.parse(readFileSync(portablePath, 'utf-8'));
+          data = JSON.parse(fs_readFileSync(portablePath, 'utf-8'));
         }
       }
 
       if (portableMode) {
-        if (existsSync(`${portablePath}.new`)) console.warn("FOUND OLD SAVE");
+        if (fs_existsSync(`${portablePath}.new`)) console.warn("FOUND OLD SAVE");
       } else {
-        if (existsSync(`${savePath}.new`)) console.warn("FOUND OLD SAVE");
+        if (fs_existsSync(`${savePath}.new`)) console.warn("FOUND OLD SAVE");
       }
 
       if (data.version != __VERSION__) {
@@ -477,12 +477,12 @@ export default class AppStorage {
 
   writeFileTransactional (path: any, content: any, callback?: Function) {
     let temporaryPath = `${path}.new`;
-    writeFile(temporaryPath, content, function (err) {
+    fs_writeFile(temporaryPath, content, function (err) {
       if (err) {
         console.error(err);
         return;
       }
-      renameSync(temporaryPath, path);
+      fs_renameSync(temporaryPath, path);
       if (callback) {
         callback();
       }

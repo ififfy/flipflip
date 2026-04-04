@@ -1,7 +1,5 @@
 import * as React from "react";
 import clsx from "clsx";
-import {existsSync} from "fs";
-import * as path from "path";
 import {remote} from "electron";
 
 import {
@@ -36,6 +34,7 @@ import SourceIcon from "./SourceIcon";
 import LibrarySource from "../../data/LibrarySource";
 import Config from "../../data/Config";
 import {grey} from "@mui/material/colors";
+import { fs_existsSync } from "../../dummy/fs";
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -410,9 +409,9 @@ class SourceListItem extends React.Component {
       const fileType = getSourceType(sourceURL);
       let cachePath;
       if (fileType == ST.video || fileType == ST.playlist) {
-        if (existsSync(getCachePath(sourceURL, this.props.config) + getFileName(sourceURL))) {
+        if (fs_existsSync(getCachePath(sourceURL, this.props.config) + getFileName(sourceURL))) {
           cachePath = getCachePath(sourceURL, this.props.config);
-        } else if (existsSync(sourceURL)) {
+        } else if (fs_existsSync(sourceURL)) {
           remote.shell.showItemInFolder(sourceURL);
         }
       } else {

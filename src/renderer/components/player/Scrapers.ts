@@ -1,4 +1,3 @@
-import path from "path";
 import wretch from "wretch";
 import {DOMParser} from "xmldom";
 import {JSDOM} from 'jsdom';
@@ -11,6 +10,7 @@ import {IgApiClient} from "instagram-private-api";
 import {IF, RF, RT, ST, WF} from "../../data/const";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
+import { path_sep } from "../../dummy/path";
 
 const pm = (object: any, resolve?: Function) => {
   if (object?.source && object?.data && object?.allURLs && object?.weight && object?.helpers) {
@@ -2921,7 +2921,7 @@ export function getFileName(url: string, extension = true) {
   if (/^(https?:\/\/)|(file:\/\/)/g.exec(url) != null) {
     sep = "/"
   } else {
-    sep = path.sep;
+    sep = path_sep();
   }
   url = url.substring(url.lastIndexOf(sep) + 1);
   if (url.includes("?")) {
@@ -3207,15 +3207,15 @@ export function getFileGroup(url: string) {
       if (/^https?:\/\//g.exec(url) != null) {
         sep = "/"
       } else {
-        sep = path.sep;
+        sep = path_sep();
       }
       return url.substring(url.lastIndexOf(sep) + 1).replace(".txt", "");
     case ST.local:
-      if (url.endsWith(path.sep)) {
+      if (url.endsWith(path_sep())) {
         url = url.substring(0, url.length - 1);
-        return url.substring(url.lastIndexOf(path.sep)+1);
+        return url.substring(url.lastIndexOf(path_sep())+1);
       } else {
-        return url.substring(url.lastIndexOf(path.sep)+1);
+        return url.substring(url.lastIndexOf(path_sep())+1);
       }
     case ST.video:
     case ST.playlist:
@@ -3223,7 +3223,7 @@ export function getFileGroup(url: string) {
       if (/^https?:\/\//g.exec(url) != null) {
         sep = "/"
       } else {
-        sep = path.sep;
+        sep = path_sep();
       }
       let name = url.substring(0, url.lastIndexOf(sep));
       return name.substring(name.lastIndexOf(sep)+1);

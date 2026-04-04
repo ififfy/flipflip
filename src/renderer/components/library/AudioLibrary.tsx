@@ -1,9 +1,7 @@
 import * as React from "react";
 import {remote} from "electron";
-import path from 'path';
 import clsx from "clsx";
 import {parseBuffer, parseFile} from "music-metadata";
-import * as fs from "fs";
 import wretch from "wretch";
 
 import {
@@ -83,6 +81,8 @@ import AudioAlbumList from "./AudioAlbumList";
 import PlaylistSelect from "../configGroups/PlaylistSelect";
 import PlaylistList from "./PlaylistList";
 import AudioEdit from "./AudioEdit";
+import { fs_existsSync, fs_isDirectory } from "../../dummy/fs";
+import { path_sep } from "../../dummy/path";
 
 const drawerWidth = 240;
 
@@ -1264,7 +1264,7 @@ class AudioLibrary extends React.Component {
             {filters: [{name:'All Files (*.*)', extensions: ['*']}], properties: ['openDirectory', 'multiSelections']});
           if (!adResult) return;
           for (let path of adResult) {
-            if (fs.existsSync(path) && fs.lstatSync(path).isDirectory()) {
+            if (fs_isDirectory(path)) {
               aResult = aResult.concat(getFilesRecursively(path));
             } else {
               aResult.push(path);
@@ -1325,7 +1325,7 @@ class AudioLibrary extends React.Component {
               extractMusicMetadata(newAudio, metadata, this.props.cachePath);
             }
             if (!newAudio.name) {
-              newAudio.name = url.substring(url.lastIndexOf(path.sep) + 1, url.lastIndexOf("."));
+              newAudio.name = url.substring(url.lastIndexOf(path_sep()) + 1, url.lastIndexOf("."));
             }
             originalSources.unshift(newAudio);
             this.props.onUpdateLibrary((l) => {
@@ -1369,7 +1369,7 @@ class AudioLibrary extends React.Component {
       const url = newSources[index];
       index++;
 
-      if (url.startsWith("http") || fs.existsSync(url)) {
+      if (url.startsWith("http") || fs_existsSync(url)) {
         const newAudio = new Audio({
           url: url,
           id: id,
@@ -1382,7 +1382,7 @@ class AudioLibrary extends React.Component {
               extractMusicMetadata(newAudio, metadata, this.props.cachePath);
             }
             if (!newAudio.name) {
-              newAudio.name = url.substring(url.lastIndexOf(path.sep) + 1, url.lastIndexOf("."));
+              newAudio.name = url.substring(url.lastIndexOf(path_sep()) + 1, url.lastIndexOf("."));
             }
             originalSources.unshift(newAudio);
             addSourceLoop();

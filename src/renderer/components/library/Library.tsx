@@ -1,9 +1,6 @@
 import * as React from "react";
 import clsx from "clsx";
-import {readdir, readFileSync, unlinkSync} from "fs";
 import rimraf from "rimraf";
-import {move} from "fs-extra";
-import path from "path";
 import {remote} from "electron";
 import wretch from "wretch";
 
@@ -81,6 +78,8 @@ import SourceList from "./SourceList";
 import GooninatorDialog from "../sceneDetail/GooninatorDialog";
 import PiwigoDialog from "../sceneDetail/PiwigoDialog";
 import URLDialog from "../sceneDetail/URLDialog";
+import { fs_readdir, fs_readFileSync, fs_unlinkSync } from "../../dummy/fs";
+import { fsExtra_move } from "../../dummy/fs-extra";
 
 const drawerWidth = 240;
 
@@ -1146,7 +1145,7 @@ class Library extends React.Component {
     for (let source of this.props.library) {
       if (source.offline) {
         const cachePath = getCachePath(source.url, this.props.config);
-        readdir(cachePath, (error, files) => {
+        fs_readdir(cachePath, (error, files) => {
           if (!!error || files.length == 0) {
             this.props.onUpdateLibrary((l) => {
               l.forEach((s, index) => {
@@ -1158,7 +1157,7 @@ class Library extends React.Component {
             });
           } else {
             const localPath = getLocalPath(source.url, this.props.config);
-            move(cachePath, localPath, console.error);
+            fsExtra_move(cachePath, localPath, console.error);
             this.props.onUpdateLibrary((l) => {
               l.forEach((s, index) => {
                 if (s.id == source.id) {
@@ -1338,7 +1337,7 @@ class Library extends React.Component {
         if (fileType == ST.local) {
           rimraf.sync(l.url);
         } else if (fileType == ST.video || fileType == ST.playlist || fileType == ST.list) {
-          unlinkSync(l.url);
+          unlink(l.url);
         }
       } catch (e) {
         console.error(e);
@@ -1361,7 +1360,7 @@ class Library extends React.Component {
             if (fileType == ST.local) {
               rimraf.sync(sourceURL);
             } else if (fileType == ST.video || fileType == ST.playlist || fileType == ST.list) {
-              unlinkSync(sourceURL);
+              fs_unlinkSync(sourceURL);
               rimraf.sync(getCachePath(sourceURL, this.props.config) + getFileName(sourceURL));
             } else {
               rimraf.sync(getCachePath(sourceURL, this.props.config));
@@ -1411,7 +1410,7 @@ class Library extends React.Component {
           this.props.systemMessage("Error accessing URL");
         });
     } else {
-      this.props.onImportLibrary(JSON.parse(readFileSync(this.state.importFile, 'utf-8')));
+      this.props.onImportLibrary(JSON.parse(fs_readFileSync(this.state.importFile, 'utf-8')));
       this.onCloseDialog();
     }
   }

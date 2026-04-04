@@ -1,6 +1,5 @@
 import * as React from "react";
 import clsx from "clsx";
-import {existsSync} from "fs";
 import {remote} from "electron";
 
 import {
@@ -32,6 +31,7 @@ import CaptionScript from "../../data/CaptionScript";
 import {grey} from "@mui/material/colors";
 import {SP} from "../../data/const";
 import EditIcon from "@mui/icons-material/Edit";
+import { fs_existsSync } from "../../dummy/fs";
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -245,7 +245,7 @@ class ScriptSourceListItem extends React.Component {
     } else if (e.shiftKey && !e.ctrlKey) {
       this.openExternalURL(sourceURL);
     } else if (!e.shiftKey && e.ctrlKey) {
-      if (existsSync(sourceURL)) {
+      if (fs_existsSync(sourceURL)) {
         remote.shell.showItemInFolder(sourceURL);
       }
     } else if (!e.shiftKey && !e.ctrlKey) {

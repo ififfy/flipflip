@@ -1,6 +1,5 @@
 import * as React from "react";
 import wretch from "wretch";
-import * as fs from "fs";
 import Sound from "react-sound";
 
 import captionProgramDefaults, {
@@ -17,6 +16,7 @@ import ChildCallbackHack from "./ChildCallbackHack";
 import Audio from "../../data/Audio";
 import CaptionScript from "../../data/CaptionScript";
 import {CircularProgress} from "@mui/material";
+import { fs_existsSync } from "../../dummy/fs";
 
 const splitFirstWord = function (s: string) {
   const firstSpaceIndex = s.indexOf(" ");
@@ -484,7 +484,7 @@ export default class CaptionProgram extends React.Component {
               file = audioSplit[0];
               alias = audioSplit[1];
             }
-            if (!file.startsWith("http") && !fs.existsSync(file)) {
+            if (!file.startsWith("http") && !fs_existsSync(file)) {
               error = "Error: {" + index + "} '" + line + "' - file '" + file + "' does not exist";
               break;
             }

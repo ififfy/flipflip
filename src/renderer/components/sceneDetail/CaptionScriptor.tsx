@@ -2,7 +2,6 @@ import * as React from "react";
 import {remote} from "electron";
 import wretch from "wretch";
 import clsx from "clsx";
-import fs from "fs";
 import fontList from "font-list";
 import SystemFonts from "system-font-families";
 
@@ -68,6 +67,7 @@ import CodeMirror, {
   tupleSetters
 } from "./CodeMirror";
 import SceneGrid from "../../data/SceneGrid";
+import { fs_writeFileSync } from "../../dummy/fs";
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -910,7 +910,7 @@ class CaptionScriptor extends React.Component {
       return this.onSaveAs();
     } else {
       if (!this.state.captionScript.url.startsWith("http")) {
-        fs.writeFileSync(this.state.captionScript.url, this.state.captionScript.script);
+        fs_writeFileSync(this.state.captionScript.url, this.state.captionScript.script);
         this.setState({scriptChanged: false});
         return true;
       } else {
@@ -924,7 +924,7 @@ class CaptionScriptor extends React.Component {
     remote.dialog.showSaveDialog(remote.getCurrentWindow(),
       {filters: [{name: 'Text Document', extensions: ['txt']}], defaultPath: this.state.captionScript.url}, (filePath) => {
         if (filePath != null) {
-          fs.writeFileSync(filePath, this.state.captionScript.script);
+          fs_writeFileSync(filePath, this.state.captionScript.script);
           const setURL = (script: CaptionScript) => {
             script.url = filePath;
             return script;

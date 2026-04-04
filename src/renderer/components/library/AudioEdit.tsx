@@ -1,6 +1,5 @@
 import * as React from "react";
 import {remote} from "electron";
-import {readFileSync} from "fs";
 import clsx from "clsx";
 import {parseFile} from "music-metadata";
 
@@ -24,6 +23,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import {extractMusicMetadata, generateThumbnailFile} from "../../data/utils";
 import {isImage} from "../player/Scrapers";
 import Audio from "../../data/Audio";
+import { fs_readFileSync } from "../../dummy/fs";
 
 const styles = (theme: Theme) => createStyles({
   input: {
@@ -201,7 +201,7 @@ class AudioEdit extends React.Component {
     iResult = iResult.filter((i) => isImage(i, true));
     if (iResult.length > 0) {
       const newAudio = this.state.audio;
-      newAudio.thumb = generateThumbnailFile(this.props.cachePath, readFileSync(iResult[0]));
+      newAudio.thumb = generateThumbnailFile(this.props.cachePath, fs_readFileSync(iResult[0]));
       this.setState({audio: newAudio});
     }
   }

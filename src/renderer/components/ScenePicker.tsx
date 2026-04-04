@@ -3,7 +3,6 @@ import {ipcRenderer, remote} from "electron";
 import wretch from "wretch";
 import clsx from 'clsx';
 import Sortable from "react-sortablejs";
-import fs from "fs";
 
 import {
   AppBar,
@@ -79,6 +78,7 @@ import Jiggle from "../animations/Jiggle";
 import VSpin from "../animations/VSpin";
 import SceneGrid from "../data/SceneGrid";
 import SceneSearch from "../SceneSearch";
+import { fs_readFileSync } from '../dummy/fs';
 
 const drawerWidth = 240;
 
@@ -1497,7 +1497,7 @@ class ScenePicker extends React.Component {
           this.props.systemMessage("Error accessing URL");
         });
     } else {
-      this.props.onImportScene(JSON.parse(fs.readFileSync(this.state.importFile, 'utf-8')), this.state.importSources);
+      this.props.onImportScene(JSON.parse(fs_readFileSync(this.state.importFile, 'utf-8')), this.state.importSources);
       this.onCloseDialog();
     }
   }

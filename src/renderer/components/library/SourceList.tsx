@@ -1,6 +1,5 @@
 import * as React from "react";
 import rimraf from "rimraf";
-import {existsSync, unlinkSync} from "fs";
 import {remote} from "electron";
 import {sortableContainer, sortableElement} from 'react-sortable-hoc';
 import AutoSizer from "react-virtualized-auto-sizer";
@@ -46,6 +45,7 @@ import SourceListItem from "./SourceListItem";
 import Clip from "../../data/Clip";
 import en from "../../data/en";
 import Scene from "../../data/Scene";
+import { fs_existsSync, fs_unlinkSync } from "../../dummy/fs";
 
 const styles = (theme: Theme) => createStyles({
   emptyMessage: {
@@ -481,7 +481,7 @@ class SourceList extends React.Component {
 
   onDelete(source: LibrarySource) {
     const fileType = getSourceType(source.url);
-    if ((fileType == ST.local || fileType == ST.video || fileType == ST.playlist || fileType == ST.list) && existsSync(source.url)) {
+    if ((fileType == ST.local || fileType == ST.video || fileType == ST.playlist || fileType == ST.list) && fs_existsSync(source.url)) {
       this.setState({deleteDialog: source});
     }
   }
@@ -495,7 +495,7 @@ class SourceList extends React.Component {
     if (fileType == ST.local) {
       rimraf.sync(this.state.deleteDialog.url);
     } else if (fileType == ST.video || fileType == ST.playlist || fileType == ST.list) {
-      unlinkSync(this.state.deleteDialog.url);
+      fs_unlinkSync(this.state.deleteDialog.url);
     }
     this.onRemove(this.state.deleteDialog);
     this.onCloseDeleteDialog();

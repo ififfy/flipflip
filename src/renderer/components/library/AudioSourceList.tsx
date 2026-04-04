@@ -1,5 +1,4 @@
 import * as React from "react";
-import {unlinkSync} from "fs";
 import {sortableContainer, sortableElement} from 'react-sortable-hoc';
 import AutoSizer from "react-virtualized-auto-sizer";
 import {FixedSizeList} from "react-window";
@@ -24,6 +23,7 @@ import Playlist from "../../data/Playlist";
 import AudioSourceListItem from "./AudioSourceListItem";
 import AudioEdit from "./AudioEdit";
 import AudioOptions from "./AudioOptions";
+import { fs_unlinkSync } from "../../dummy/fs";
 
 const styles = (theme: Theme) => createStyles({
   emptyMessage: {
@@ -231,7 +231,7 @@ class AudioSourceList extends React.Component {
   }
 
   onFinishDelete() {
-    unlinkSync(this.state.deleteDialog.url);
+    fs_unlinkSync(this.state.deleteDialog.url);
     this.onRemove(this.state.deleteDialog);
     this.onCloseDeleteDialog();
   }

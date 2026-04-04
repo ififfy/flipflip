@@ -1,6 +1,5 @@
 import * as React from "react";
 import Sortable from "react-sortablejs";
-import {existsSync} from "fs";
 import {remote} from "electron";
 
 import {
@@ -31,6 +30,7 @@ import {RP} from "../../data/const";
 import Scene from "../../data/Scene";
 import SourceIcon from "../library/SourceIcon";
 import CaptionScript from "../../data/CaptionScript";
+import { fs_existsSync } from "../../dummy/fs";
 
 const styles = (theme: Theme) => createStyles({
   scriptList: {
@@ -185,7 +185,7 @@ class ScriptPlaylist extends React.Component {
     if (e.shiftKey && !e.ctrlKey) {
       this.openExternalURL(sourceURL);
     } else if (!e.shiftKey && e.ctrlKey) {
-      if (existsSync(sourceURL)) {
+      if (fs_existsSync(sourceURL)) {
         remote.shell.showItemInFolder(sourceURL);
       }
     } else if (!e.shiftKey && !e.ctrlKey && this.props.systemMessage) {

@@ -1,6 +1,5 @@
 import * as React from "react";
 import clsx from "clsx";
-import * as fs from "fs";
 import {remote} from "electron";
 
 import {
@@ -59,6 +58,7 @@ import LibrarySearch from "./LibrarySearch";
 import CaptionScript from "../../data/CaptionScript";
 import ScriptSourceList from "./ScriptSourceList";
 import Scene from "../../data/Scene";
+import { fs_existsSync, fs_isDirectory } from "../../dummy/fs";
 
 const drawerWidth = 240;
 
@@ -782,7 +782,7 @@ class ScriptLibrary extends React.Component {
             {filters: [{name:'All Files (*.*)', extensions: ['*']}], properties: ['openDirectory', 'multiSelections']});
           if (!adResult) return;
           for (let path of adResult) {
-            if (fs.existsSync(path) && fs.lstatSync(path).isDirectory()) {
+            if (fs_isDirectory(path)) {
               aResult = adResult.concat(getFilesRecursively(path));
             } else {
               aResult.push(path);
@@ -812,7 +812,7 @@ class ScriptLibrary extends React.Component {
     });
 
     for (let url of newSources) {
-      if (fs.existsSync(url)) {
+      if (fs_existsSync(url)) {
         const newText = new CaptionScript({
           url: url,
           id: id,

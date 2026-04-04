@@ -1,8 +1,6 @@
 import IncomingMessage = Electron.IncomingMessage;
-import {webFrame} from "electron";
 import * as React from 'react';
 import request from 'request';
-import fs from "fs";
 import gifInfo from 'gif-info';
 
 import {CircularProgress, Container, Typography} from "@mui/material";
@@ -16,6 +14,7 @@ import ChildCallbackHack from './ChildCallbackHack';
 import ImageView from './ImageView';
 import Strobe from "./Strobe";
 import Audio from "../../data/Audio";
+import { fs_existsSync, fs_readFileSync } from '../../dummy/fs';
 
 class GifInfo {
   animated: boolean;
@@ -546,7 +545,7 @@ export default class ImagePlayer extends React.Component {
       if (fileType != ST.nimja && fileType != ST.hydrus && fileType != ST.piwigo && fileType != ST.video && fileType != ST.local && fileType != ST.playlist) {
         const sourceCachePath = getCachePath(source, this.props.config);
         const filePath = sourceCachePath + getFileName(url);
-        const cachedAlready = fs.existsSync(filePath);
+        const cachedAlready = fs_existsSync(filePath);
         if (cachedAlready) {
           url = filePath;
         }
@@ -951,7 +950,7 @@ export default class ImagePlayer extends React.Component {
         // Get gif info. See https://github.com/Prinzhorn/gif-info
         try {
           if (url.includes("file://")) {
-            processInfo(gifInfo(toArrayBuffer(fs.readFileSync(urlToPath(url)))));
+            processInfo(gifInfo(toArrayBuffer(fs_readFileSync(urlToPath(url)))));
           } else {
             request.get({url, encoding: null}, function (err: Error, res: IncomingMessage, body: Buffer) {
               if (err) {

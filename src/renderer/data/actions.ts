@@ -1,9 +1,5 @@
 import {IncomingMessage, remote, webFrame} from "electron";
-import * as fs from "fs";
-import {existsSync, readFileSync} from "fs";
-import path, {sep} from 'path';
 import wretch from "wretch";
-import {outputFile} from "fs-extra";
 import getFolderSize from "get-folder-size";
 import tumblr, {TumblrClient} from "tumblr.js";
 import Snoowrap from "snoowrap";
@@ -78,6 +74,9 @@ import CaptionScript from "./CaptionScript";
 import SceneGroup from "./SceneGroup";
 import SceneGridCell from "./SceneGridCell";
 import WeightGroup from "./WeightGroup";
+import { fs_existsSync, fs_fileSize, fs_isDirectory, fs_mkdirSync, fs_readFileSync, fs_unlink, fs_writeFileSync } from "../dummy/fs";
+import { fsExtra_outputFile } from "../dummy/fs-extra";
+import { path_sep } from "../dummy/path";
 
 type State = typeof defaultInitialState;
 
@@ -172,7 +171,7 @@ export function getTags(library: Array<LibrarySource>, source: string, clipID?: 
 // The first argument is always a State object, even if it isn't used.
 
 export function restoreFromBackup(state: State, backupFile: string): Object {
-  const data = JSON.parse(fs.readFileSync(backupFile, 'utf-8'));
+  const data = JSON.parse(fs_readFileSync(backupFile, 'utf-8'));
   return {
     version: data.version,
     specialMode: data.specialMode ? data.specialMode : null,
@@ -418,13 +417,8 @@ export function cleanBackups(config: Config) {
       backups.shift(); // Keep the K newest backups
     }
   }
-  for (let backup of backups) {
-    try {
-      fs.unlinkSync(saveDir + path.sep + backup.url);
-    } catch (e) {
-      console.error(e);
-    }
-  }
+
+  unlinkBackups(backups);
 }
 
 export function cacheImage(state: State, i: HTMLImageElement | HTMLVideoElement) {
@@ -434,14 +428,13 @@ export function cacheImage(state: State, i: HTMLImageElement | HTMLVideoElement)
 
     if (fileType != ST.local && i.src.startsWith("http")) {
       const cachePath = getCachePath(null, state.config);
-      if (!fs.existsSync(cachePath)) {
-        fs.mkdirSync(cachePath)
-      }
+      fs_mkdirSync(cachePath)
+      
       const maxSize = state.config.caching.maxSize;
       const sourceCachePath = getCachePath(i.getAttribute("source"), state.config);
       const filePath = sourceCachePath + getFileName(i.src);
       const downloadImage = () => {
-        if (!fs.existsSync(filePath)) {
+        if (!fs_existsSync(filePath)) {
           wretch(i.src)
             .get()
             .blob(blob => {
@@ -454,7 +447,7 @@ export function cacheImage(state: State, i: HTMLImageElement | HTMLVideoElement)
                   for (let i = 0; i < arrayBuffer.byteLength; ++i) {
                     buffer[i] = view[i];
                   }
-                  outputFile(filePath, buffer);
+                  fsExtra_outputFile(filePath, buffer);
                 }
               };
               reader.readAsArrayBuffer(blob);
@@ -887,7 +880,7 @@ export function playTrack(state: State, url: string) {
 }
 
 export function playAudio(state: State, source: Audio, displayed: Array<Audio>): Object {
-  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path.sep);
+  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path_sep());
   let librarySource = state.audios.find((s) => s.url == sourceURL);
   if (librarySource == null) {
     throw new Error("Source not found in Library");
@@ -927,7 +920,7 @@ export function playAudio(state: State, source: Audio, displayed: Array<Audio>):
 }
 
 export function playScript(state: State, source: CaptionScript, sceneID: number, displayed: Array<CaptionScript>): Object {
-  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path.sep);
+  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path_sep());
   let librarySource = state.scripts.find((s) => s.url == sourceURL);
   if (librarySource == null) {
     throw new Error("Script not found in Library");
@@ -951,7 +944,7 @@ export function playScript(state: State, source: CaptionScript, sceneID: number,
 }
 
 export function playSceneFromLibrary(state: State, source: LibrarySource, displayed: Array<LibrarySource>): Object {
-  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path.sep);
+  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path_sep());
   let librarySource = state.library.find((s) => s.url == sourceURL);
   if (librarySource != null) {
     librarySource.disabledClips =  [];
@@ -1056,7 +1049,7 @@ export function onUpdateClips(state: State, sourceURL: string, clips: Array<Clip
 }
 
 export function clipVideo(state: State, source: LibrarySource, displayed: Array<LibrarySource>) {
-  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path.sep);
+  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path_sep());
   let librarySource = state.library.find((s) => s.url == sourceURL);
   if (getActiveSource(state) != null) {
     state.route.pop();
@@ -1901,13 +1894,11 @@ export function blacklistFile(state: State, sourceURL: string, fileToBlacklist: 
   }
   if (fileToBlacklist != null) {
     const cachePath = getCachePath(sourceURL, state.config) + getFileName(fileToBlacklist);
-    if (fs.existsSync(cachePath)) {
-      fs.unlink(cachePath, (err) => {
-        if (err) {
-          console.error(err);
-        }
-      });
-    }
+    fs_unlink(cachePath, (err) => {
+      if (err) {
+        console.error(err);
+      }
+    });
   }
   return {library: newLibrary, scenes: newScenes};
 }
@@ -2333,7 +2324,7 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
       if (!vdResult) return;
       let rvResult = new Array<string>();
       for (let path of vdResult) {
-        if (fs.existsSync(path) && fs.lstatSync(path).isDirectory()) {
+        if (fs_isDirectory(path)) {
           rvResult = rvResult.concat(getFilesRecursively(path));
         } else {
           rvResult.push(path);
@@ -2354,8 +2345,8 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
         return;
       }
       let rootDir = args[1];
-      if (!rootDir.endsWith(sep)) {
-        rootDir += sep;
+      if (!rootDir.endsWith(path_sep())) {
+        rootDir += path_sep();
       }
       if (scene != null) {
         return updateScene(state, scene, (s) => {
@@ -2400,7 +2391,7 @@ function getImportURLs(importURL: string, rootDir?: string): string[]  {
       } else {
         fullPath = "http://" + importURLs[u] + ".tumblr.com";
       }
-      if (importURLs.includes(fullPath) || importURLs[u] === sep || importURLs[u] === "") {
+      if (importURLs.includes(fullPath) || importURLs[u] === path_sep() || importURLs[u] === "") {
         // Remove index and push u back
         importURLs.splice(u, 1);
         u -= 1
@@ -2722,7 +2713,7 @@ function sortFunction(algorithm: string, ascending: boolean, getName: (a: any) =
 }
 
 export function downloadSource(state: State, source: LibrarySource): Object {
-  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path.sep);
+  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path_sep());
   let librarySource = state.library.find((s) => s.url == sourceURL);
   if (librarySource != null) {
     librarySource.disabledClips =  [];
@@ -2872,7 +2863,7 @@ export function exportScene(state: State, scene: Scene): Object {
   remote.dialog.showSaveDialog(remote.getCurrentWindow(),
     {filters: [{name: 'JSON Document', extensions: ['json']}], defaultPath: fileName}, (filePath) => {
       if (filePath != null) {
-        fs.writeFileSync(filePath, sceneExport);
+        fs_writeFileSync(filePath, sceneExport);
       }
   });
   return {};
@@ -3102,7 +3093,7 @@ export function exportLibrary(state: State): Object {
   remote.dialog.showSaveDialog(remote.getCurrentWindow(),
     {filters: [{name: 'JSON Document', extensions: ['json']}], defaultPath: fileName}, (filePath) => {
       if (filePath != null) {
-        fs.writeFileSync(filePath, libraryExport);
+        fs_writeFileSync(filePath, libraryExport);
       }
     });
   return {};
@@ -3248,7 +3239,7 @@ export function markOffline(getState: () => State, setState: Function) {
       win.setProgressBar(state.progressCurrent / state.progressTotal);
 
       actionSource.lastCheck = new Date();
-      const exists = existsSync(actionSource.url);
+      const exists = fs_existsSync(actionSource.url);
       if (!exists) {
         actionSource.offline = true;
       }
@@ -3334,8 +3325,8 @@ export function detectBPMs(getState: () => State, setState: Function) {
 
     try {
       const url = audio.url;
-      if (existsSync(url)) {
-        detectBPM(toArrayBuffer(readFileSync(url)));
+      if (fs_existsSync(url)) {
+        detectBPM(toArrayBuffer(fs_readFileSync(url)));
       } else {
         request.get({url, encoding: null}, function (e: Error, res: IncomingMessage, body: Buffer) {
           if (e) {
@@ -3441,7 +3432,7 @@ export function updateVideoMetadata(getState: () => State, setState: Function) {
           librarySource.duration = video.duration;
           video.remove();
           try {
-            librarySource.fileSize = fs.statSync(librarySource.url)?.size;
+            librarySource.fileSize = fs_fileSize(librarySource.url);
           } catch (e) {
             librarySource.fileSize = -1;
           }

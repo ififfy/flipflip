@@ -1,6 +1,4 @@
 import * as React from 'react';
-import * as fs from "fs";
-import * as path from "path";
 import * as worker from './Scrapers';
 import recursiveReaddir from "recursive-readdir";
 import fileURL from "file-url";
@@ -22,6 +20,8 @@ import Scene from '../../data/Scene';
 import Audio from "../../data/Audio";
 import ChildCallbackHack from './ChildCallbackHack';
 import ImagePlayer from './ImagePlayer';
+import { fs_containsFiles, fs_existsSync, fs_readDirectoryNames } from '../../dummy/fs';
+import { path_join } from '../../dummy/path';
 
 let workerInstance: any = null;
 let workerListener: any = null;
@@ -57,19 +57,19 @@ function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<strin
     const cachePath = getCachePath(source.url, config) + getFileName(source.url);
     if (returnPromise) {
       return new CancelablePromise((resolve) => {
-        loadVideo(resolve, allURLs, allPosts, config, source, filter, weight, helpers, config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null);
+        loadVideo(resolve, allURLs, allPosts, config, source, filter, weight, helpers, config.caching.enabled && fs_existsSync(cachePath) ? cachePath : null);
       });
     } else {
-      loadVideo(pm, allURLs, allPosts, config, source, filter, weight, helpers, config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null);
+      loadVideo(pm, allURLs, allPosts, config, source, filter, weight, helpers, config.caching.enabled && fs_existsSync(cachePath) ? cachePath : null);
     }
   } else if (sourceType == ST.playlist) {
     const cachePath = getCachePath(source.url, config) + getFileName(source.url);
     if (returnPromise) {
       return new CancelablePromise((resolve) => {
-        loadPlaylist(resolve, allURLs, allPosts, config, source, filter, weight, helpers, config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null);
+        loadPlaylist(resolve, allURLs, allPosts, config, source, filter, weight, helpers, config.caching.enabled && fs_existsSync(cachePath) ? cachePath : null);
       });
     } else {
-      loadPlaylist(pm, allURLs, allPosts, config, source, filter, weight, helpers, config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null);
+      loadPlaylist(pm, allURLs, allPosts, config, source, filter, weight, helpers, config.caching.enabled && fs_existsSync(cachePath) ? cachePath : null);
     }
   } else if (sourceType == ST.nimja) {
     if (returnPromise) {
@@ -121,7 +121,7 @@ function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<strin
     if (helpers.next == -1) {
       helpers.next = 0;
       const cachePath = getCachePath(source.url, config);
-      if (config.caching.enabled && fs.existsSync(cachePath) && fs.readdirSync(cachePath).length > 0) {
+      if (config.caching.enabled && fs_containsFiles(cachePath)) {
         // If the cache directory exists, use it
         if (returnPromise) {
           return new CancelablePromise((resolve) => {
@@ -275,7 +275,7 @@ export const loadVideo = (pm: Function, allURLs: Map<string, Array<string>>, all
         ifExists(url);
       })
   } else {
-    const exists = fs.existsSync(url);
+    const exists = fs_existsSync(url);
     if (exists) {
       ifExists(url);
     } else {
@@ -566,11 +566,9 @@ export default class SourceScraper extends React.Component {
     for (let source of this.props.scene.sources) {
       if (source.dirOfSources && getSourceType(source.url) == ST.local) {
         try {
-          const directories = fs.readdirSync(source.url, {withFileTypes: true})
-            .filter(dirent => dirent.isDirectory())
-            .map(dirent => dirent.name);
+          const directories = fs_readDirectoryNames(source.url);
           for (let d of directories) {
-            sceneSources.push(new LibrarySource({url: source.url + path.sep + d}));
+            sceneSources.push(new LibrarySource({url: path_join(source.url, d)}));
           }
         } catch (e) {
           sceneSources.push(new LibrarySource({url: source.url}));
@@ -591,11 +589,9 @@ export default class SourceScraper extends React.Component {
       for (let source of this.props.nextScene.sources) {
         if (source.dirOfSources && getSourceType(source.url) == ST.local) {
           try {
-            const directories = fs.readdirSync(source.url, {withFileTypes: true})
-              .filter(dirent => dirent.isDirectory())
-              .map(dirent => dirent.name);
+            const directories = fs_readDirectoryNames(source.url);
             for (let d of directories) {
-              nextSceneSources.push(new LibrarySource({url: source.url + path.sep + d}));
+              nextSceneSources.push(new LibrarySource({url: path_join(source.url, d)}));
             }
           } catch (e) {
             nextSceneSources.push(new LibrarySource({url: source.url}));

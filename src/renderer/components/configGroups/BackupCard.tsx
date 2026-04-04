@@ -1,5 +1,4 @@
 import * as React from "react";
-import path from "path";
 import clsx from "clsx";
 
 import {
@@ -39,6 +38,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import {convertFromEpoch, getBackups, saveDir} from "../../data/utils";
 import {MO, SS} from "../../data/const";
 import {GeneralSettings} from "../../data/Config";
+import { path_join } from "../../dummy/path";
 
 const styles = (theme: Theme) => createStyles({
   buttonGrid: {
@@ -396,7 +396,7 @@ class BackupCard extends React.Component {
   onFinishRestore() {
     this.onCloseDialog();
     try {
-      this.props.onRestore(saveDir + path.sep + this.state.backup.url);
+      this.props.onRestore(path_join(saveDir, this.state.backup.url));
       this.setState({snackbarOpen: true, snackbar: "Restore success!", snackbarSeverity: SS.success});
     } catch (e) {
       console.error(e);

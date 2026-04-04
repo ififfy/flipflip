@@ -1,6 +1,5 @@
 import * as React from "react";
 import clsx from "clsx";
-import * as fs from "fs";
 
 import {
   Alert,
@@ -52,6 +51,7 @@ import GeneralConfig from "./GeneralConfig";
 import SceneOptions from "../sceneDetail/SceneOptions";
 import SceneEffects from "../sceneDetail/SceneEffects";
 import {portablePath} from "../../data/utils";
+import { fs_existsSync } from "../../dummy/fs";
 
 const drawerWidth = 240;
 
@@ -495,7 +495,7 @@ class ConfigForm extends React.Component {
   validate(): string {
     let errorMessages = "";
     if (this.state.config.caching.directory != "" &&
-      !fs.existsSync(this.state.config.caching.directory)) {
+      !fs_existsSync(this.state.config.caching.directory)) {
       errorMessages = "Invalid Cache Directory";
     }
     return errorMessages;

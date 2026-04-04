@@ -3,7 +3,6 @@ import {IncomingMessage} from "electron";
 import clsx from "clsx";
 import {analyze} from "web-audio-beat-detector";
 import { parseFile } from 'music-metadata';
-import {existsSync, readFileSync} from "fs";
 import request from "request";
 
 import {
@@ -45,6 +44,7 @@ import {RP, TF} from "../../data/const";
 import en from "../../data/en";
 import Audio from "../../data/Audio";
 import AudioControl from "../player/AudioControl";
+import { fs_existsSync, fs_readFileSync } from "../../dummy/fs";
 
 const styles = (theme: Theme) => createStyles({
   bpmProgress: {
@@ -504,8 +504,8 @@ class AudioOptions extends React.Component {
       this.setState({loadingBPM: true});
       try {
         const url = this.state.audio.url;
-        if (existsSync(url)) {
-          detectBPM(toArrayBuffer(readFileSync(url)));
+        if (fs_existsSync(url)) {
+          detectBPM(toArrayBuffer(fs_readFileSync(url)));
         } else {
           request.get({url, encoding: null}, function (err: Error, res: IncomingMessage, body: Buffer) {
             if (err) {

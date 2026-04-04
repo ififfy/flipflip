@@ -3,7 +3,6 @@ import {clipboard, nativeImage, remote} from "electron";
 const {getCurrentWindow, Menu, MenuItem, app} = remote;
 import clsx from "clsx";
 import fileURL from "file-url";
-import fs from "fs";
 import wretch from "wretch";
 
 import {
@@ -66,6 +65,7 @@ import FadeIOCard from "../configGroups/FadeIOCard";
 import PanningCard from "../configGroups/PanningCard";
 import Audio from "../../data/Audio";
 import SceneGrid from "../../data/SceneGrid";
+import { fs_existsSync, fs_unlink } from "../../dummy/fs";
 
 const drawerWidth = 340;
 
@@ -882,7 +882,7 @@ class PlayerBars extends React.Component {
   }
 
   onDeletePath(path: string) {
-    if (fs.existsSync(path)) {
+    if (fs_existsSync(path)) {
       if (this.props.config.generalSettings.confirmFileDeletion) {
         this.setState({deletePath: path});
       } else {
@@ -894,7 +894,7 @@ class PlayerBars extends React.Component {
   }
 
   doDelete(path: string) {
-    fs.unlink(path, (err) => {
+    fs_unlink(path, (err) => {
       if (err) {
         this.setState({deletePath: null, deleteError: "An error occurred while deleting the file: " + err.message});
         console.error(err);

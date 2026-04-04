@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {remote} from "electron";
 import rimraf from "rimraf";
-import path from "path";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
@@ -13,6 +12,7 @@ import {
 } from "@mui/material";
 
 import {convertFromEpoch, getBackups, saveDir, savePath} from "../renderer/data/utils";
+import { path_join } from '../renderer/dummy/path';
 
 export default class ErrorBoundary extends React.Component {
   readonly props: {
@@ -201,7 +201,7 @@ export default class ErrorBoundary extends React.Component {
   onFinishRestore() {
     this.onCloseDialog();
     try {
-      this.props.onRestore(saveDir + path.sep + this.state.backup.url);
+      this.props.onRestore(path_join(saveDir, this.state.backup.url));
       this.clearError();
     } catch (e) {
       console.error(e);

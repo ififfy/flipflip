@@ -1,6 +1,5 @@
 import * as React from "react";
 import clsx from "clsx";
-import {existsSync} from "fs";
 import {remote} from "electron";
 
 import {
@@ -30,6 +29,7 @@ import Tag from "../../data/Tag";
 import {grey} from "@mui/material/colors";
 import Audio from "../../data/Audio";
 import SourceIcon from "./SourceIcon";
+import { fs_existsSync } from "../../dummy/fs";
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -315,7 +315,7 @@ class AudioSourceListItem extends React.Component {
     } else if (e.shiftKey && !e.ctrlKey) {
       this.openExternalURL(sourceURL);
     } else if (!e.shiftKey && e.ctrlKey) {
-      if (existsSync(sourceURL)) {
+      if (fs_existsSync(sourceURL)) {
         remote.shell.showItemInFolder(sourceURL);
       }
     } else if (!e.shiftKey && !e.ctrlKey) {
