@@ -1,8 +1,7 @@
 import path from "path";
 import wretch from "wretch";
 import {DOMParser} from "xmldom";
-// @ts-ignore
-import domino from "domino-ext";
+import {JSDOM} from 'jsdom';
 import tumblr from "tumblr.js";
 import Snoowrap from "snoowrap";
 import * as imgur from "imgur";
@@ -687,7 +686,7 @@ const loadImageFapGallery = (
       )
     )
     .text((html) => {
-      const galleryWindow = domino.createWindow(html);
+      const galleryWindow = new JSDOM(html, { contentType: 'text/html' }).window;
       let imageEl = galleryWindow.document.querySelector(
         ".expp-container > form > table > tbody > tr > td > table > tbody > tr > td > a"
       );
@@ -697,9 +696,9 @@ const loadImageFapGallery = (
           .get()
           .text((html) => {
             let captcha = undefined;
-            const ahrefs = domino
-              .createWindow(html)
-              .document.querySelectorAll(
+            const ahrefs = new JSDOM(html, {
+              contentType: 'text/html'
+            }).window.document.querySelectorAll(
                 'a[href^="https://cdn.imagefap.com/images/full/"]'
               );
 
@@ -840,7 +839,11 @@ export const loadImageFap = (
         timeout: timeout,
       }, resolve))
       .text((html) => {
-        let albumEls = domino.createWindow(html).document.querySelectorAll("td.blk_galleries > font > a.blk_galleries");
+        const albumEls = new JSDOM(html, {
+          contentType: 'text/html'
+        }).window.document.querySelectorAll(
+          'td.blk_galleries > font > a.blk_galleries'
+        );
         if (albumEls.length == 0) {
           let captcha = undefined;
           if (html.includes("Enter the captcha")) {
@@ -965,8 +968,10 @@ export const loadImageFap = (
             // Get highest resolution video link
             let res = 0;
             let videoLink = '';
-            const videoQualities = domino.createWindow(xml).document.querySelectorAll("flixV2 > quality > item");
-            for(let i = 0; i < videoQualities.length; i++) {
+            const videoQualities = new JSDOM(xml, {
+                contentType: 'application/xml'
+              }).window.document.querySelectorAll('flixV2 > quality > item');
+              for (let i = 0; i < videoQualities.length; i++) {
               const quality = videoQualities.item(i);
               const newResText = quality.querySelector('res').innerHTML.slice(0, -1);
               const newRes = Number(newResText);
@@ -1933,7 +1938,9 @@ export const loadGelbooru1 = (allURLs: Map<string, Array<string>>, allPosts: Map
       timeout: timeout,
     }, resolve))
     .text((html) => {
-      let imageEls = domino.createWindow(html).document.querySelectorAll("span.thumb > a");
+      const imageEls = new JSDOM(html, {
+        contentType: 'text/html'
+      }).window.document.querySelectorAll('span.thumb > a');
       if (imageEls.length > 0) {
         let imageCount = 0;
         let images = Array<string>();
@@ -2126,7 +2133,9 @@ export const loadEHentai = (allURLs: Map<string, Array<string>>, allPosts: Map<s
       timeout: timeout,
     }, resolve))
     .text((html) => {
-      let imageEls = domino.createWindow(html).document.querySelectorAll("#gdt > .gdtm > div > a");
+      const imageEls = new JSDOM(html, {
+        contentType: 'text/html'
+      }).window.document.querySelectorAll('#gdt > .gdtm > div > a');
       if (imageEls.length > 0) {
         let imageCount = 0;
         let images = Array<string>();
@@ -2504,7 +2513,9 @@ export const loadBDSMlr = (allURLs: Map<string, Array<string>>, allPosts: Map<st
     .internalError(retry)
     .text((html) => {
       helpers.retries = 0;
-      let itemEls = domino.createWindow(html).document.querySelectorAll("item");
+      const itemEls = new JSDOM(html, {
+        contentType: 'application/xml'
+      }).window.document.querySelectorAll('item')
       if (itemEls.length > 0) {
         let imageCount = 0;
         let images = Array<string>();
@@ -2951,8 +2962,12 @@ async function convertURL(url: string): Promise<Array<string>> {
       return ["https://giant.gfycat.com/" + gfycatMatch[1] + ".mp4"];
     }
 
-    let html = await wretch(url).get().notFound(() => {return [url]}).text();
-    let gfycat = domino.createWindow(html).document.querySelectorAll("#video-" + gfycatMatch[1].toLocaleLowerCase() + " > source");
+    let html = await wretch(url).get().notFound(() => { return [url] }).text();
+    const gfycat = new JSDOM(html, {
+      contentType: 'text/html'
+    }).window.document.querySelectorAll(
+      '#video-' + gfycatMatch[1].toLocaleLowerCase() + ' > source'
+    );
     if (gfycat.length > 0) {
       for (let source of gfycat) {
         if ((source as any).type == "video/webm") {
