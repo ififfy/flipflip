@@ -1,9 +1,7 @@
 import * as React from "react";
-import {remote} from "electron";
+import { remote } from "electron";
 import wretch from "wretch";
 import clsx from "clsx";
-import fontList from "font-list";
-import SystemFonts from "system-font-families";
 
 require('codemirror/lib/codemirror.css');
 require('codemirror/theme/material.css');
@@ -46,8 +44,8 @@ import GetAppIcon from '@mui/icons-material/GetApp';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import SaveIcon from '@mui/icons-material/Save';
 
-import {CST, MO, RP} from "../../data/const";
-import captionProgramDefaults, {CancelablePromise} from "../../data/utils";
+import { CST, MO, RP } from "../../data/const";
+import captionProgramDefaults, { CancelablePromise } from "../../data/utils";
 import Scene from "../../data/Scene";
 import Tag from "../../data/Tag";
 import Player from "../player/Player";
@@ -57,7 +55,7 @@ import CaptionProgram from "../player/CaptionProgram";
 import ChildCallbackHack from "../player/ChildCallbackHack";
 import AudioCard from "../configGroups/AudioCard";
 import FontOptions from "../library/FontOptions";
-import CaptionScript, {FontSettingsI} from "../../data/CaptionScript";
+import CaptionScript, { FontSettingsI } from "../../data/CaptionScript";
 import CodeMirror, {
   booleanSetters,
   colorSetters,
@@ -68,6 +66,7 @@ import CodeMirror, {
 } from "./CodeMirror";
 import SceneGrid from "../../data/SceneGrid";
 import { fs_writeFileSync } from "../../dummy/fs";
+import { fonts_getFonts } from "src/renderer/dummy/fonts";
 
 const styles = (theme: Theme) => createStyles({
   root: {
@@ -255,7 +254,7 @@ class CaptionScriptor extends React.Component {
   };
 
   readonly state = {
-    captionScript: new CaptionScript({script: ""}),
+    captionScript: new CaptionScript({ script: "" }),
     sceneScripts: null as Array<CaptionScript>,
     selectScript: "",
     scene: null as Scene,
@@ -276,22 +275,22 @@ class CaptionScriptor extends React.Component {
     const classes = this.props.classes;
 
     let menuName, menuThen;
-    switch(this.state.openMenu) {
+    switch (this.state.openMenu) {
       case MO.error:
-        menuName="Back";
-        menuThen=this.props.goBack;
+        menuName = "Back";
+        menuThen = this.props.goBack;
         break;
       case MO.new:
-        menuName="New";
-        menuThen=this.onConfirmNew.bind(this);
+        menuName = "New";
+        menuThen = this.onConfirmNew.bind(this);
         break;
       case MO.openLocal:
-        menuName="Open";
-        menuThen=this.onConfirmOpen.bind(this);
+        menuName = "Open";
+        menuThen = this.onConfirmOpen.bind(this);
         break;
       case MO.openLibrary:
-        menuName="Open";
-        menuThen=this.onConfirmOpenFromLibrary.bind(this);
+        menuName = "Open";
+        menuThen = this.onConfirmOpenFromLibrary.bind(this);
         break;
       case MO.load:
         menuName = "Load From Scene";
@@ -323,7 +322,7 @@ class CaptionScriptor extends React.Component {
             </div>
 
             <Typography component="h1" variant="h4" color="inherit" noWrap
-                        className={classes.title}>
+              className={classes.title}>
               {this.state.captionScript.url ? this.state.captionScript.url : "Caption Scriptor"}
             </Typography>
 
@@ -336,7 +335,7 @@ class CaptionScriptor extends React.Component {
                   aria-label={this.state.fullscreen ? "Exit Fullscreen" : "Fullscreen"}
                   onClick={this.onFullscreen.bind(this)}
                   size="large">
-                  {this.state.fullscreen ? <FullscreenExitIcon fontSize="large"/> : <FullscreenIcon fontSize="large"/>}
+                  {this.state.fullscreen ? <FullscreenExitIcon fontSize="large" /> : <FullscreenIcon fontSize="large" />}
                 </IconButton>
               </span>
             </Tooltip>
@@ -349,7 +348,7 @@ class CaptionScriptor extends React.Component {
           <div className={clsx(classes.root, classes.fill)}>
             <Container maxWidth={false} className={classes.container}>
               <div className={clsx(classes.scriptGrid, this.state.fullscreen && classes.hidden)}
-                   id={'script-field'}>
+                id={'script-field'}>
                 {this.state.error != null && (
                   <div className={classes.statusMessage}>
                     <ErrorOutlineIcon className={classes.errorMessageIcon} color="error" />
@@ -360,7 +359,7 @@ class CaptionScriptor extends React.Component {
                 )}
                 {this.state.error == null && this.state.captionScript.script && this.state.captionScript.script.length > 0 && (
                   <div className={classes.statusMessage}>
-                    <CheckCircleOutlineIcon className={classes.okIcon}/>
+                    <CheckCircleOutlineIcon className={classes.okIcon} />
                   </div>
                 )}
                 {(!this.state.captionScript.script || this.state.captionScript.script.length == 0) && (
@@ -387,12 +386,12 @@ class CaptionScriptor extends React.Component {
                         this.props.tutorial == CST.menu && classes.disable)}>
                         <Tooltip disableInteractive title="New">
                           <IconButton onClick={this.onNew.bind(this)} size="large">
-                            <InsertDriveFileIcon/>
+                            <InsertDriveFileIcon />
                           </IconButton>
                         </Tooltip>
                         <Tooltip disableInteractive title="Open">
                           <IconButton onClick={this.onOpenMenu.bind(this)} size="large">
-                            <FolderIcon/>
+                            <FolderIcon />
                           </IconButton>
                         </Tooltip>
                         <Menu
@@ -415,7 +414,7 @@ class CaptionScriptor extends React.Component {
                         </Menu>
                         <Tooltip disableInteractive title="Save">
                           <IconButton onClick={this.onSaveMenu.bind(this)} size="large">
-                            <SaveIcon/>
+                            <SaveIcon />
                           </IconButton>
                         </Tooltip>
                         <Menu
@@ -444,13 +443,13 @@ class CaptionScriptor extends React.Component {
                               disabled={this.state.sceneScripts == null || !this.state.sceneScripts.length}
                               onClick={this.onLoadFromScene.bind(this)}
                               size="large">
-                              {this.state.loadFromSceneError ? <ErrorOutlineIcon color={"error"}/> : <GetAppIcon/>}
+                              {this.state.loadFromSceneError ? <ErrorOutlineIcon color={"error"} /> : <GetAppIcon />}
                             </IconButton>
                           </span>
                         </Tooltip>
                       </Grid>
                       <Grid item xs={12} className={clsx(classes.noPaddingTop, this.props.tutorial == CST.menu && classes.backdropTop)}>
-                        <Divider variant={"fullWidth"}/>
+                        <Divider variant={"fullWidth"} />
                       </Grid>
                       <Grid item xs={12} className={clsx(this.props.tutorial == CST.menu && classes.backdropTopHighlight,
                         this.props.tutorial == CST.menu && classes.disable)}>
@@ -510,7 +509,7 @@ class CaptionScriptor extends React.Component {
                         </Grid>
                       </Grid>
                       <Grid item xs={12} className={clsx(this.props.tutorial == CST.actions && classes.backdropTop)}>
-                        <Divider variant={"fullWidth"}/>
+                        <Divider variant={"fullWidth"} />
                       </Grid>
                       <Grid item xs={12} className={clsx(this.props.tutorial == CST.actions && classes.backdropTopHighlight, this.props.tutorial == CST.actions && classes.disable)}>
                         <Grid container spacing={1}>
@@ -524,31 +523,31 @@ class CaptionScriptor extends React.Component {
                               value={""}
                               onChange={this.onAddSetter.bind(this)}>
                               <MenuItem key={"all"} value={"all"}>Insert All</MenuItem>
-                              <Divider/>
+                              <Divider />
                               {tupleSetters.map((s) =>
                                 <MenuItem className={classes.setterButton} key={s} value={s}>{s}</MenuItem>
                               )}
-                              <Divider/>
+                              <Divider />
                               {stringSetters.map((s) =>
                                 <MenuItem className={classes.setterButton} key={s} value={s}>{s}</MenuItem>
                               )}
-                              <Divider/>
+                              <Divider />
                               {singleSetters.map((s) =>
                                 <MenuItem className={classes.setterButton} key={s} value={s}>{s}</MenuItem>
                               )}
-                              <Divider/>
+                              <Divider />
                               {booleanSetters.map((s) =>
                                 <MenuItem className={classes.setterButton} key={s} value={s}>{s}</MenuItem>
                               )}
                               {colorSetters.map((s) =>
-                                  <MenuItem className={classes.setterButton} key={s} value={s}>{s}</MenuItem>
+                                <MenuItem className={classes.setterButton} key={s} value={s}>{s}</MenuItem>
                               )}
                             </Select>
                           </Grid>
                         </Grid>
                       </Grid>
                       <Grid item xs={12} className={clsx(this.props.tutorial == CST.actions && classes.backdropTop)}>
-                        <Divider variant={"fullWidth"}/>
+                        <Divider variant={"fullWidth"} />
                       </Grid>
                       <Grid item xs={12} className={clsx(this.props.tutorial == CST.actions && classes.backdropTopHighlight, this.props.tutorial == CST.actions && classes.disable)}>
                         <Grid container spacing={1}>
@@ -578,18 +577,18 @@ class CaptionScriptor extends React.Component {
                         </Grid>
                       </Grid>
                       <Grid item xs={12}>
-                        <Divider variant={"fullWidth"}/>
+                        <Divider variant={"fullWidth"} />
                       </Grid>
                       <Grid item xs={12}>
                         <Typography variant="body2" color="inherit">
                           See <Link
-                          href="#"
-                          onClick={this.openLink.bind(this, "https://ififfy.github.io/flipflip/#/caption_script")}
-                          underline="hover">documentation</Link> for help.
+                            href="#"
+                            onClick={this.openLink.bind(this, "https://ififfy.github.io/flipflip/#/caption_script")}
+                            underline="hover">documentation</Link> for help.
                         </Typography>
                       </Grid>
                     </Grid>
-                    <div className={classes.fill}/>
+                    <div className={classes.fill} />
                     {this.state.scene && !this.state.fullscreen && (
                       <AudioCard
                         sidebar
@@ -598,19 +597,19 @@ class CaptionScriptor extends React.Component {
                         showMsTimestamp
                         scene={this.state.scene}
                         onPlaying={this.onPlaying.bind(this)}
-                        onUpdateScene={this.onUpdateScene.bind(this)}/>
+                        onUpdateScene={this.onUpdateScene.bind(this)} />
                     )}
                     <Typography variant="caption" component="div" color="textSecondary">
                       Script Opacity: {this.state.captionScript.opacity}%
                     </Typography>
                     <Slider
-                        min={0}
-                        max={100}
-                        defaultValue={this.state.captionScript.opacity}
-                        onChangeCommitted={this.onSliderChange.bind(this, 'opacity')}
-                        valueLabelDisplay={'auto'}
-                        valueLabelFormat={(v: any) => v + "%"}
-                        aria-labelledby="opacity-slider"/>
+                      min={0}
+                      max={100}
+                      defaultValue={this.state.captionScript.opacity}
+                      onChangeCommitted={this.onSliderChange.bind(this, 'opacity')}
+                      valueLabelDisplay={'auto'}
+                      valueLabelFormat={(v: any) => v + "%"}
+                      aria-labelledby="opacity-slider" />
                   </CardContent>
                 </Card>
               </div>
@@ -631,9 +630,9 @@ class CaptionScriptor extends React.Component {
                     captionProgramJumpToHack={this.state.captionProgramJumpToHack}
                     tutorial={null}
                     getCurrentTimestamp={this.state.fullscreen ? undefined : getTimestamp}
-                    cache={() => {}}
-                    setCount={() => {}}
-                    systemMessage={() => {}}
+                    cache={() => { }}
+                    setCount={() => { }}
+                    systemMessage={() => { }}
                   />
                 )}
                 {this.state.error != null && (
@@ -649,12 +648,12 @@ class CaptionScriptor extends React.Component {
                       singleTrack={true}
                       getTags={this.props.getTags.bind(this)}
                       goBack={this.props.goBack.bind(this)}
-                      playNextScene={() => {}}
+                      playNextScene={() => { }}
                       timeToNextFrame={null}
                       currentAudio={null}
                       currentImage={null}
                       jumpToHack={this.state.captionProgramJumpToHack}
-                      onError={this.onError.bind(this)}/>
+                      onError={this.onError.bind(this)} />
                   </div>
                 )}
               </div>
@@ -668,21 +667,21 @@ class CaptionScriptor extends React.Component {
                         systemFonts={this.state.systemFonts}
                         onUpdateOptions={this.onUpdateOptions.bind(this, 'blink')}
                       />
-                      <Divider className={classes.fontDivider}/>
+                      <Divider className={classes.fontDivider} />
                       <FontOptions
                         name={"Caption"}
                         options={this.state.captionScript.caption}
                         systemFonts={this.state.systemFonts}
                         onUpdateOptions={this.onUpdateOptions.bind(this, 'caption')}
                       />
-                      <Divider className={classes.fontDivider}/>
+                      <Divider className={classes.fontDivider} />
                       <FontOptions
                         name={"Big Caption"}
                         options={this.state.captionScript.captionBig}
                         systemFonts={this.state.systemFonts}
                         onUpdateOptions={this.onUpdateOptions.bind(this, 'captionBig')}
                       />
-                      <Divider className={classes.fontDivider}/>
+                      <Divider className={classes.fontDivider} />
                       <FontOptions
                         name={"Count"}
                         options={this.state.captionScript.count}
@@ -712,7 +711,7 @@ class CaptionScriptor extends React.Component {
               fullWidth
               value={this.state.selectScript}
               onChange={this.onChangeSelectScript.bind(this)}>
-              {this.state.sceneScripts && this.state.sceneScripts.map((s, i) => 
+              {this.state.sceneScripts && this.state.sceneScripts.map((s, i) =>
                 <MenuItem key={i} value={s.url}>{s.url}</MenuItem>
               )}
             </Select>
@@ -763,7 +762,7 @@ class CaptionScriptor extends React.Component {
   }
 
   onCloseDialog() {
-    this.setState({openMenu: null, menuAnchorEl: null, drawerOpen: false, selectScript: ""});
+    this.setState({ openMenu: null, menuAnchorEl: null, drawerOpen: false, selectScript: "" });
   }
 
   _promise: CancelablePromise = null;
@@ -771,50 +770,29 @@ class CaptionScriptor extends React.Component {
     this._currentTimestamp = 0;
     window.addEventListener('keydown', this.onKeyDown, false);
     // Define system fonts
-    if (process.platform == "darwin") {
-      this._promise = new CancelablePromise((resolve, reject) => {
-        new SystemFonts().getFonts().then((res: Array<string>) => {
-            if (!this._promise.hasCanceled) {
-              this.setState({systemFonts: res});
-            }
-          },
-          (err: string) => {
-            console.error(err);
-          }
-        );
-      });
-    } else {
-      this._promise = new CancelablePromise((resolve, reject) => {
-        fontList.getFonts().then((res: Array<string>) => {
-            res = res.map((r) => {
-              if (r.startsWith("\"") && r.endsWith("\"")) {
-                return r.substring(1, r.length - 1);
-              } else {
-                return r;
-              }
-            })
-            if (!this._promise.hasCanceled) {
-              this.setState({systemFonts: res});
-            }
-          },
-          (err: string) => {
-            console.error(err);
-          }
-        );
-      });
-    }
+    this._promise = new CancelablePromise((resolve, reject) => {
+      fonts_getFonts().then((res: Array<string>) => {
+        if (!this._promise.hasCanceled) {
+          this.setState({ systemFonts: res });
+        }
+      },
+        (err: string) => {
+          console.error(err);
+        }
+      );
+    });
     if (this.props.openScript) {
       if (this.props.openScript.script) {
         this.state.codeMirrorOverwriteHack.args = [this.props.openScript.script];
         this.state.codeMirrorOverwriteHack.fire();
-        this.setState({captionScript: this.props.openScript, scriptChanged: false});
+        this.setState({ captionScript: this.props.openScript, scriptChanged: false });
       } else {
         wretch(this.props.openScript.url)
           .get()
           .text(data => {
             this.state.codeMirrorOverwriteHack.args = [data];
             this.state.codeMirrorOverwriteHack.fire();
-            this.setState({captionScript: this.props.openScript, scriptChanged: false});
+            this.setState({ captionScript: this.props.openScript, scriptChanged: false });
           });
       }
     }
@@ -836,7 +814,7 @@ class CaptionScriptor extends React.Component {
 
   onNew() {
     if (this.state.scriptChanged) {
-      this.setState({openMenu: MO.new});
+      this.setState({ openMenu: MO.new });
     } else {
       this.onConfirmNew();
     }
@@ -844,19 +822,19 @@ class CaptionScriptor extends React.Component {
 
   onConfirmNew() {
     this.onCloseDialog();
-    this.setState({captionScript: new CaptionScript({script: ""}), error: null, scriptChanged: false});
+    this.setState({ captionScript: new CaptionScript({ script: "" }), error: null, scriptChanged: false });
     this.state.codeMirrorOverwriteHack.args = [""];
     this.state.codeMirrorOverwriteHack.fire();
   }
 
   onOpenMenu(e: MouseEvent) {
-    this.setState({menuAnchorEl: e.currentTarget, openMenu: MO.open});
+    this.setState({ menuAnchorEl: e.currentTarget, openMenu: MO.open });
   }
 
   onOpen() {
     this.onCloseDialog();
     if (this.state.scriptChanged) {
-      this.setState({openMenu: MO.openLocal});
+      this.setState({ openMenu: MO.openLocal });
     } else {
       this.onConfirmOpen();
     }
@@ -866,7 +844,7 @@ class CaptionScriptor extends React.Component {
     this.onCloseDialog();
     let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
       {
-        filters: [{name: 'All Files (*.*)', extensions: ['*']}, {name: 'Text Document', extensions: ['txt']}],
+        filters: [{ name: 'All Files (*.*)', extensions: ['*'] }, { name: 'Text Document', extensions: ['txt'] }],
         properties: ['openFile']
       });
     if (!result || !result.length) return;
@@ -876,14 +854,14 @@ class CaptionScriptor extends React.Component {
       .text(data => {
         this.state.codeMirrorOverwriteHack.args = [data];
         this.state.codeMirrorOverwriteHack.fire();
-        this.setState({captionScript: new CaptionScript({url: url}), scriptChanged: false});
+        this.setState({ captionScript: new CaptionScript({ url: url }), scriptChanged: false });
       });
   }
 
   onOpenFromLibrary() {
     this.onCloseDialog();
     if (this.state.scriptChanged) {
-      this.setState({openMenu: MO.openLibrary});
+      this.setState({ openMenu: MO.openLibrary });
     } else {
       this.onConfirmOpenFromLibrary();
     }
@@ -901,7 +879,7 @@ class CaptionScriptor extends React.Component {
   }
 
   onSaveMenu(e: MouseEvent) {
-    this.setState({menuAnchorEl: e.currentTarget, openMenu: MO.save});
+    this.setState({ menuAnchorEl: e.currentTarget, openMenu: MO.save });
   }
 
   onSave() {
@@ -911,7 +889,7 @@ class CaptionScriptor extends React.Component {
     } else {
       if (!this.state.captionScript.url.startsWith("http")) {
         fs_writeFileSync(this.state.captionScript.url, this.state.captionScript.script);
-        this.setState({scriptChanged: false});
+        this.setState({ scriptChanged: false });
         return true;
       } else {
         return false;
@@ -922,14 +900,14 @@ class CaptionScriptor extends React.Component {
   onSaveAs() {
     this.onCloseDialog();
     remote.dialog.showSaveDialog(remote.getCurrentWindow(),
-      {filters: [{name: 'Text Document', extensions: ['txt']}], defaultPath: this.state.captionScript.url}, (filePath) => {
+      { filters: [{ name: 'Text Document', extensions: ['txt'] }], defaultPath: this.state.captionScript.url }, (filePath) => {
         if (filePath != null) {
           fs_writeFileSync(filePath, this.state.captionScript.script);
           const setURL = (script: CaptionScript) => {
             script.url = filePath;
             return script;
           }
-          this.setState({captionScript: setURL(this.state.captionScript), scriptChanged: false});
+          this.setState({ captionScript: setURL(this.state.captionScript), scriptChanged: false });
           return true;
         } else {
           return false;
@@ -937,7 +915,7 @@ class CaptionScriptor extends React.Component {
       });
   }
 
-    onSaveToLibrary() {
+  onSaveToLibrary() {
     this.onCloseDialog();
     this.onSave();
     this.props.onUpdateLibrary((library) => {
@@ -961,9 +939,9 @@ class CaptionScriptor extends React.Component {
   }
 
   onLoadFromScene() {
-    if (!this.state.sceneScripts.length || this.state.loadFromSceneError)  return;
+    if (!this.state.sceneScripts.length || this.state.loadFromSceneError) return;
     if (this.state.scriptChanged) {
-      this.setState({openMenu: MO.load});
+      this.setState({ openMenu: MO.load });
     } else {
       this.onOpenScriptSelect();
     }
@@ -971,19 +949,19 @@ class CaptionScriptor extends React.Component {
 
   onOpenScriptSelect() {
     const defScript = this.state.sceneScripts != null && this.state.sceneScripts.length ? this.state.sceneScripts[0].url : "";
-    this.setState({openMenu: MO.select, selectScript: defScript});
+    this.setState({ openMenu: MO.select, selectScript: defScript });
   }
 
   onChangeSelectScript(e: MouseEvent) {
     const input = (e.target as HTMLInputElement);
-    this.setState({selectScript: input.value});
+    this.setState({ selectScript: input.value });
   }
 
   onConfirmLoadFromScene() {
     const error = (error: any) => {
       console.error(error);
-      this.setState({loadFromSceneError: true});
-      setTimeout(() => {this.setState({loadFromSceneError: false});}, 3000);
+      this.setState({ loadFromSceneError: true });
+      setTimeout(() => { this.setState({ loadFromSceneError: false }); }, 3000);
     }
 
     const script = JSON.parse(JSON.stringify(this.state.sceneScripts.find((s) => s.url == this.state.selectScript)));
@@ -1001,20 +979,20 @@ class CaptionScriptor extends React.Component {
       .text(data => {
         this.state.codeMirrorOverwriteHack.args = [data];
         this.state.codeMirrorOverwriteHack.fire();
-        this.setState({captionScript: script, scriptChanged: false});
+        this.setState({ captionScript: script, scriptChanged: false });
       });
   }
 
   onFullscreen() {
     if (this.state.scene != null) {
-      this.setState({fullscreen: !this.state.fullscreen});
+      this.setState({ fullscreen: !this.state.fullscreen });
     } else {
-      this.setState({fullscreen: false});
+      this.setState({ fullscreen: false });
     }
   }
 
   onError(e: string) {
-    this.setState({error: e});
+    this.setState({ error: e });
   }
 
   onUpdateScript(script: string, changed = false) {
@@ -1026,10 +1004,10 @@ class CaptionScriptor extends React.Component {
     newScript.script = script;
     if (this.state.scene) {
       const newScene = JSON.parse(JSON.stringify(this.state.scene));
-      newScene.scriptPlaylists = [{scripts: [newScript], shuffle: false, repeat: RP.one}];
-      this.setState({scene: newScene, captionScript: newScript, error: null, scriptChanged: changed ? true : this.state.scriptChanged});
+      newScene.scriptPlaylists = [{ scripts: [newScript], shuffle: false, repeat: RP.one }];
+      this.setState({ scene: newScene, captionScript: newScript, error: null, scriptChanged: changed ? true : this.state.scriptChanged });
     } else {
-      this.setState({captionScript: newScript, error: null, scriptChanged: changed ? true : this.state.scriptChanged});
+      this.setState({ captionScript: newScript, error: null, scriptChanged: changed ? true : this.state.scriptChanged });
     }
   }
 
@@ -1049,7 +1027,7 @@ class CaptionScriptor extends React.Component {
 
   onChangeScene(sceneID: number) {
     if (sceneID == 0) {
-      this.setState({scene: null, sceneScripts: null, sceneChanged: false});
+      this.setState({ scene: null, sceneScripts: null, sceneChanged: false });
       return;
     }
     const scene = JSON.parse(JSON.stringify(this.props.scenes.find((s) => s.id == sceneID)));
@@ -1057,14 +1035,14 @@ class CaptionScriptor extends React.Component {
     scene.audioEnabled = false;
     scene.videoVolume = 0;
     scene.textEnabled = true;
-    scene.scriptPlaylists = [{scripts: [this.state.captionScript], shuffle: false, repeat: RP.one}];
+    scene.scriptPlaylists = [{ scripts: [this.state.captionScript], shuffle: false, repeat: RP.one }];
     const originalScripts = new Array<CaptionScript>();
     for (let playlist of originalPlaylists) {
       for (let script of playlist.scripts) {
         originalScripts.push(script);
       }
     }
-    this.setState({scene: scene, sceneScripts: originalScripts, sceneChanged: false});
+    this.setState({ scene: scene, sceneScripts: originalScripts, sceneChanged: false });
   }
 
   getSceneName(id: string): string {
@@ -1075,14 +1053,14 @@ class CaptionScriptor extends React.Component {
   onUpdateScene(scene: Scene, fn: (scene: Scene) => void) {
     const newScene = JSON.parse(JSON.stringify(scene))
     fn(newScene);
-    this.setState({scene: newScene, sceneChanged: true});
+    this.setState({ scene: newScene, sceneChanged: true });
   }
 
   goBack() {
     if (this.state.fullscreen) {
       this.onFullscreen();
     } else if (this.state.scriptChanged) {
-      this.setState({openMenu: MO.error});
+      this.setState({ openMenu: MO.error });
     } else {
       this.props.goBack();
     }
@@ -1211,10 +1189,10 @@ class CaptionScriptor extends React.Component {
     (script as any)[property] = newOptions;
     if (this.state.scene) {
       const newScene = JSON.parse(JSON.stringify(this.state.scene));
-      newScene.scriptPlaylists = [{scripts: [script], shuffle: false, repeat: RP.one}];
-      this.setState({scene: newScene, captionScript: script, error: null, scriptChanged: true});
+      newScene.scriptPlaylists = [{ scripts: [script], shuffle: false, repeat: RP.one }];
+      this.setState({ scene: newScene, captionScript: script, error: null, scriptChanged: true });
     } else {
-      this.setState({captionScript: script, error: null, scriptChanged: true});
+      this.setState({ captionScript: script, error: null, scriptChanged: true });
     }
   }
 
@@ -1223,10 +1201,10 @@ class CaptionScriptor extends React.Component {
     (script as any)[key] = value;
     if (this.state.scene) {
       const newScene = JSON.parse(JSON.stringify(this.state.scene));
-      newScene.scriptPlaylists = [{scripts: [script], shuffle: false, repeat: RP.one}];
-      this.setState({scene: newScene, captionScript: script, error: null, scriptChanged: true});
+      newScene.scriptPlaylists = [{ scripts: [script], shuffle: false, repeat: RP.one }];
+      this.setState({ scene: newScene, captionScript: script, error: null, scriptChanged: true });
     } else {
-      this.setState({captionScript: script});
+      this.setState({ captionScript: script });
     }
   }
 
@@ -1235,5 +1213,5 @@ class CaptionScriptor extends React.Component {
   }
 }
 
-(CaptionScriptor as any).displayName="CaptionScriptor";
+(CaptionScriptor as any).displayName = "CaptionScriptor";
 export default withStyles(styles)(CaptionScriptor as any);

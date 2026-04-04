@@ -1,6 +1,4 @@
 import * as React from "react";
-import fontList from "font-list";
-import SystemFonts from "system-font-families";
 
 import {
   Button,
@@ -25,6 +23,7 @@ import {green, red} from "@mui/material/colors";
 import {CancelablePromise} from "../../data/utils";
 import CaptionScript, {FontSettingsI} from "../../data/CaptionScript";
 import FontOptions from "./FontOptions";
+import { fonts_getFonts } from "src/renderer/dummy/fonts";
 
 const styles = (theme: Theme) => createStyles({
   bpmProgress: {
@@ -193,38 +192,17 @@ class ScriptOptions extends React.Component {
   _promise: CancelablePromise = null;
   componentDidMount() {
     // Define system fonts
-    if (process.platform == "darwin") {
-      this._promise = new CancelablePromise((resolve, reject) => {
-        new SystemFonts().getFonts().then((res: Array<string>) => {
-            if (!this._promise.hasCanceled) {
-              this.setState({systemFonts: res});
-            }
-          },
-          (err: string) => {
-            console.error(err);
-          }
-        );
-      });
-    } else {
-      this._promise = new CancelablePromise((resolve, reject) => {
-        fontList.getFonts().then((res: Array<string>) => {
-            res = res.map((r) => {
-              if (r.startsWith("\"") && r.endsWith("\"")) {
-                return r.substring(1, r.length - 1);
-              } else {
-                return r;
-              }
-            })
-            if (!this._promise.hasCanceled) {
-              this.setState({systemFonts: res, loadingFonts: false});
-            }
-          },
-          (err: string) => {
-            console.error(err);
-          }
-        );
-      });
-    }
+    this._promise = new CancelablePromise((resolve, reject) => {
+      fonts_getFonts().then((res: Array<string>) => {
+        if (!this._promise.hasCanceled) {
+          this.setState({ systemFonts: res });
+        }
+      },
+        (err: string) => {
+          console.error(err);
+        }
+      );
+    });
   }
 
   componentWillUnmount() {
