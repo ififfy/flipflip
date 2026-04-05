@@ -225,6 +225,7 @@ const IPC = {
   openVideoDirs: "ipc.openVideoDirs",
   openVideos: "ipc.openVideos",
   openAudios: "ipc.openAudios",
+  openScripts: "ipc.openScripts",
 };
 
 const MO = {

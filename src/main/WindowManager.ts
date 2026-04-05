@@ -10,7 +10,8 @@ import {
   isAudio,
   isVideo,
   isVideoPlaylist,
-} from "src/renderer/components/player/Scrapers";
+} from "../renderer/components/player/Scrapers";
+import { isText } from "../renderer/data/utils";
 
 // Current window list
 const currentWindows: Map<number, BrowserWindow> = new Map();
@@ -222,4 +223,39 @@ export async function openAudios(windowId: number, shiftKey: boolean) {
   }
 
   return audios.filter((r) => isAudio(r, true));
+}
+
+export async function openScripts(windowId: number, shiftKey: boolean) {
+  const window = currentWindows.get(windowId);
+  if (window == null) {
+    return [];
+  }
+
+  let scripts = new Array<string>();
+  if (shiftKey) {
+    const result = await dialog.showOpenDialog(window, {
+      filters: [{ name: "All Files (*.*)", extensions: ["*"] }],
+      properties: ["openDirectory", "multiSelections"],
+    });
+
+    for (const filePath of result.filePaths) {
+      if (fs.existsSync(filePath) && fs.lstatSync(filePath).isDirectory()) {
+        scripts = scripts.concat(getFilesRecursively(filePath));
+      } else {
+        scripts.push(filePath);
+      }
+    }
+  } else {
+    const result = await dialog.showOpenDialog(window, {
+      filters: [
+        { name: "All Files (*.*)", extensions: ["*"] },
+        { name: "Text files", extensions: ["txt"] },
+      ],
+      properties: ["openFile", "multiSelections"],
+    });
+
+    scripts = result.filePaths;
+  }
+
+  return scripts.filter((r) => isText(r, true));
 }

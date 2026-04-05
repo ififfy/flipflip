@@ -83,6 +83,7 @@ declare global {
       openVideoDirs: () => Promise<string[]>;
       openVideos: () => Promise<string[]>;
       openAudios: (shiftKey: boolean) => Promise<string[]>;
+      openScripts: (shiftKey: boolean) => Promise<string[]>;
     };
   }
 }
