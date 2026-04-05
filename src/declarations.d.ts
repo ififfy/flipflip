@@ -60,3 +60,13 @@ interface NavigatorClipboard {
 }
 
 interface Navigator extends NavigatorClipboard {}
+
+declare global {
+  interface Window {
+    ipc: {
+      newWindow: () => void
+    }
+  }
+}
+
+export {}

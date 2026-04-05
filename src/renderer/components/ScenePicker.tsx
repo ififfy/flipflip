@@ -486,7 +486,7 @@ class ScenePicker extends React.Component {
               FlipFlip
             </Typography>
             <Typography variant="caption" color="inherit" noWrap className={classes.version}>
-              v{window.versions.electron()}
+              v{this.props.version}
             </Typography>
             <div className={classes.fill}/>
             {this.state.newVersion != "" && (
@@ -630,35 +630,35 @@ class ScenePicker extends React.Component {
               <div>
                 {this.props.scenes.length > 0 && (
                   <React.Fragment>
-                    <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "New Window"}>
-                      <ListItem button onClick={this.onNewWindow.bind(this)}>
-                        <ListItemIcon>
-                          <OpenInNewIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="New Window" />
-                      </ListItem>
-                    </Tooltip>
+                  <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "New Window"}>
+                    <ListItem button onClick={this.onNewWindow.bind(this)}>
+                      <ListItemIcon>
+                        <OpenInNewIcon />
+                      </ListItemIcon>
+                      <ListItemText primary="New Window" />
+                    </ListItem>
+                  </Tooltip>
 
-                    <Dialog
-                      open={this.state.openMenu == MO.newWindowAlert}
-                      onClose={this.onCloseDialog.bind(this)}
-                      aria-labelledby="new-window-title"
-                      aria-describedby="new-window-description">
-                      <DialogTitle id="new-window-title">New Window Warning</DialogTitle>
-                      <DialogContent>
-                        <DialogContentText id="new-window-description">
-                          Please be aware that only changes made in the main window (this window) will be saved.
-                        </DialogContentText>
-                      </DialogContent>
-                      <DialogActions>
-                        <Button onClick={this.newWindow.bind(this, true)} color="secondary">
-                          Don't show again
-                        </Button>
-                        <Button onClick={this.newWindow.bind(this, false)} color="primary">
-                          OK
-                        </Button>
-                      </DialogActions>
-                    </Dialog>
+                  <Dialog
+                    open={this.state.openMenu == MO.newWindowAlert}
+                    onClose={this.onCloseDialog.bind(this)}
+                    aria-labelledby="new-window-title"
+                    aria-describedby="new-window-description">
+                    <DialogTitle id="new-window-title">New Window Warning</DialogTitle>
+                    <DialogContent>
+                      <DialogContentText id="new-window-description">
+                        Please be aware that only changes made in the main window (this window) will be saved.
+                      </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={this.newWindow.bind(this, true)} color="secondary">
+                        Don't show again
+                      </Button>
+                      <Button onClick={this.newWindow.bind(this, false)} color="primary">
+                        OK
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
                   </React.Fragment>
                 )}
                 <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Settings"}>
@@ -1525,8 +1525,8 @@ class ScenePicker extends React.Component {
         this.props.onUpdateConfig(newConfig);
       }
     }
-    // FIXME
-    // ipcRenderer.send(IPC.newWindow);
+
+    window.ipc.newWindow();
   }
 
   onToggleDrawer() {

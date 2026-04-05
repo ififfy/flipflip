@@ -1,8 +1,6 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
+import {IPC} from "../renderer/data/const";
 
-contextBridge.exposeInMainWorld('versions', {
-  node: () => process.versions.node,
-  chrome: () => process.versions.chrome,
-  electron: () => process.versions.electron
-  // we can also expose variables, not just functions
+contextBridge.exposeInMainWorld('ipc', {
+  newWindow: () => ipcRenderer.send(IPC.newWindow)
 })
