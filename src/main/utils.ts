@@ -31,3 +31,25 @@ export function getBackups(): Array<Backup> {
   });
   return backups;
 }
+
+export function getFilesRecursively(filePath: string): string[] {
+  const isDirectory = (filePath: string) => fs.statSync(filePath).isDirectory();
+  const getDirectories = (filePath: string) =>
+    fs
+      .readdirSync(filePath)
+      .map((name) => path.join(filePath, name))
+      .filter(isDirectory);
+
+  const isFile = (filePath: string) => fs.statSync(filePath).isFile();
+  const getFiles = (filePath: string) =>
+    fs
+      .readdirSync(filePath)
+      .map((name) => path.join(filePath, name))
+      .filter(isFile);
+
+  const dirs = getDirectories(filePath);
+  const files = dirs
+    .map((dir) => getFilesRecursively(dir)) // go through each directory
+    .reduce((a, b) => a.concat(b), []); // map returns a 2d array (array of file arrays) so flatten
+  return files.concat(getFiles(filePath));
+}

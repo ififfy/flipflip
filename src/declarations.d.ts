@@ -80,6 +80,7 @@ declare global {
       saveExport: (filePath: string, json: string) => void;
       openImport: () => Promise<string | undefined>;
       openDirectory: () => Promise<string[]>;
+      openVideoDirs: () => Promise<string[]>;
     };
   }
 }

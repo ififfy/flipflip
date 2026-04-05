@@ -222,6 +222,7 @@ const IPC = {
   saveExport: "ipc.saveExport",
   openImport: "ipc.openImport",
   openDirectory: "ipc.openDirectory",
+  openVideoDirs: "ipc.openVideoDirs",
 };
 
 const MO = {

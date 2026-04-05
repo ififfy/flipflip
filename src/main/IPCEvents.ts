@@ -5,6 +5,7 @@ import {
   saveExport,
   openImport,
   openDirectory,
+  openVideoDirs,
 } from "./WindowManager";
 import { IPC } from "../common/const";
 import { getBackups } from "./utils";
@@ -66,6 +67,10 @@ async function onOpenDirectory(ev: IpcMainEvent) {
   return await openDirectory(ev.sender.id);
 }
 
+async function onOpenVideoDirs(ev: IpcMainEvent) {
+  return await openVideoDirs(ev.sender.id);
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -86,6 +91,7 @@ export function initializeIpcEvents() {
   ipcMain.on(IPC.saveExport, onSaveExport);
   ipcMain.handle(IPC.openImport, onOpenImport);
   ipcMain.handle(IPC.openDirectory, onOpenDirectory);
+  ipcMain.handle(IPC.openVideoDirs, onOpenVideoDirs);
 }
 
 export function releaseIpcEvents() {

@@ -2628,28 +2628,22 @@ export function addSource(
       break;
 
     case AF.videoDir:
-    // FIXME
-    // let vdResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
-    //   {filters: [{name:'All Files (*.*)', extensions: ['*']}], properties: ['openDirectory', 'multiSelections']});
-    // if (!vdResult) return;
-    // let rvResult = new Array<string>();
-    // for (let path of vdResult) {
-    //   if (fs_isDirectory(path)) {
-    //     rvResult = rvResult.concat(getFilesRecursively(path));
-    //   } else {
-    //     rvResult.push(path);
-    //   }
-    // }
-    // rvResult = rvResult.filter((r) => isVideo(r, true) || isVideoPlaylist(r, true));
-    // if (scene != null) {
-    //   return updateScene(state, scene, (s) => {
-    //     addSources(s.sources, rvResult, state.library);
-    //     handleArgs(s);
-    //   })
-    // } else {
-    //   return updateLibrary(state, (l) =>  addSources(l, rvResult, state.library));
-    // }
+      return window.ipc.openVideoDirs().then((result) => {
+        if (result.length === 0) {
+          return;
+        }
 
+        if (scene != null) {
+          return updateScene(state, scene, (s) => {
+            addSources(s.sources, result, state.library);
+            handleArgs(s);
+          });
+        } else {
+          return updateLibrary(state, (l) =>
+            addSources(l, result, state.library),
+          );
+        }
+      });
     case GT.local:
       if (!args || args.length < 2) {
         return;

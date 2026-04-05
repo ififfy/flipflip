@@ -5,6 +5,11 @@ import windowStateKeeper from "electron-window-state";
 
 import { releaseIpcEvents } from "./IPCEvents";
 import { IPC } from "../common/const";
+import { getFilesRecursively } from "./utils";
+import {
+  isVideo,
+  isVideoPlaylist,
+} from "src/renderer/components/player/Scrapers";
 
 // Current window list
 const currentWindows: Map<number, BrowserWindow> = new Map();
@@ -136,4 +141,29 @@ export async function openDirectory(windowId: number) {
     properties: ["openDirectory"],
   });
   return result.filePaths;
+}
+
+export async function openVideoDirs(windowId: number) {
+  const window = currentWindows.get(windowId);
+  if (window == null) {
+    return [];
+  }
+
+  const result = await dialog.showOpenDialog(window, {
+    filters: [{ name: "All Files (*.*)", extensions: ["*"] }],
+    properties: ["openDirectory", "multiSelections"],
+  });
+
+  let files = new Array<string>();
+  for (const filePath of result.filePaths) {
+    if (fs.existsSync(filePath) && fs.lstatSync(filePath).isDirectory()) {
+      files = files.concat(getFilesRecursively(filePath));
+    } else {
+      files.push(filePath);
+    }
+  }
+
+  return files.filter(
+    (file) => isVideo(file, true) || isVideoPlaylist(file, true),
+  );
 }

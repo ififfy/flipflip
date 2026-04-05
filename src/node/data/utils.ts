@@ -60,25 +60,3 @@ function cachePath(source: string, typeDir: string, config: Config) {
     }
   }
 }
-
-export function getFilesRecursively(path: string): string[] {
-  const isDirectory = (path: string) => fs.statSync(path).isDirectory();
-  const getDirectories = (path: string) =>
-    fs
-      .readdirSync(path)
-      .map((name) => path.join(path, name))
-      .filter(isDirectory);
-
-  const isFile = (path: string) => fs.statSync(path).isFile();
-  const getFiles = (path: string) =>
-    fs
-      .readdirSync(path)
-      .map((name) => path.join(path, name))
-      .filter(isFile);
-
-  let dirs = getDirectories(path);
-  let files = dirs
-    .map((dir) => getFilesRecursively(dir)) // go through each directory
-    .reduce((a, b) => a.concat(b), []); // map returns a 2d array (array of file arrays) so flatten
-  return files.concat(getFiles(path));
-}
