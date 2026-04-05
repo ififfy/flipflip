@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { saveDir } from './utils'
 import recursiveReaddir from 'recursive-readdir'
+import { rimraf } from 'rimraf'
 
 export function fs_readFileSync(path: string, encoding?: BufferEncoding) {
   return fs.readFileSync(path, encoding)
@@ -79,4 +80,8 @@ export function fs_writeFile(path: string, data: string, callback: (err: Error) 
 
 export function fs_recursiveReaddir(url: string, blacklist: string[], callback: (err: any, rawFiles: Array<string>) => void) {
    recursiveReaddir(url, blacklist, callback)
+}
+
+export function fs_rimrafSync(path: string) {
+  rimraf.sync(path);
 }

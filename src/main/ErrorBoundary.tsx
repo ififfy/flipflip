@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {remote} from "electron";
-import rimraf from "rimraf";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
@@ -13,6 +12,7 @@ import {
 
 import {convertFromEpoch, getBackups, saveDir, savePath} from "../renderer/data/utils";
 import { path_join } from '../renderer/dummy/path';
+import { fs_rimrafSync } from '../renderer/dummy/fs';
 
 export default class ErrorBoundary extends React.Component {
   readonly props: {
@@ -172,7 +172,7 @@ export default class ErrorBoundary extends React.Component {
   }
 
   reset() {
-    rimraf.sync(savePath);
+    fs_rimrafSync(savePath);
     remote.getCurrentWindow().reload();
   }
 

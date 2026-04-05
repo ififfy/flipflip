@@ -1,5 +1,4 @@
 import * as React from "react";
-import rimraf from "rimraf";
 import {remote} from "electron";
 import {sortableContainer, sortableElement} from 'react-sortable-hoc';
 import AutoSizer from "react-virtualized-auto-sizer";
@@ -45,7 +44,7 @@ import SourceListItem from "./SourceListItem";
 import Clip from "../../data/Clip";
 import en from "../../data/en";
 import Scene from "../../data/Scene";
-import { fs_existsSync, fs_unlinkSync } from "../../dummy/fs";
+import { fs_existsSync, fs_unlinkSync, fs_rimrafSync } from "../../dummy/fs";
 
 const styles = (theme: Theme) => createStyles({
   emptyMessage: {
@@ -465,7 +464,7 @@ class SourceList extends React.Component {
   onFinishDelete() {
     const fileType = getSourceType(this.state.deleteDialog.url);
     if (fileType == ST.local) {
-      rimraf.sync(this.state.deleteDialog.url);
+      fs_rimrafSync(this.state.deleteDialog.url);
     } else if (fileType == ST.video || fileType == ST.playlist || fileType == ST.list) {
       fs_unlinkSync(this.state.deleteDialog.url);
     }
@@ -644,7 +643,7 @@ class SourceList extends React.Component {
   }
 
   onFinishClean() {
-    rimraf.sync(this.state.cachePath);
+    fs_rimrafSync(this.state.cachePath);
     this.onCloseClean();
   }
 

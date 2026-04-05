@@ -39,8 +39,6 @@ declare module 'react-spring';
 declare module 'react-virtualized-auto-sizer';
 declare module 'react-window';
 declare module 'recursive-readdir';
-declare module 'request';
-declare module 'rimraf';
 declare module 'snoowrap';
 declare module 'system-font-families';
 declare module 'uuid/v4';

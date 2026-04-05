@@ -1,6 +1,5 @@
 import * as React from "react";
 import clsx from "clsx";
-import rimraf from "rimraf";
 import {remote} from "electron";
 import wretch from "wretch";
 
@@ -78,7 +77,7 @@ import SourceList from "./SourceList";
 import GooninatorDialog from "../sceneDetail/GooninatorDialog";
 import PiwigoDialog from "../sceneDetail/PiwigoDialog";
 import URLDialog from "../sceneDetail/URLDialog";
-import { fs_readdir, fs_readFileSync, fs_unlinkSync } from "../../dummy/fs";
+import { fs_readdir, fs_readFileSync, fs_unlinkSync, fs_rimrafSync } from "../../dummy/fs";
 import { fsExtra_move } from "../../dummy/fs-extra";
 
 const drawerWidth = 240;
@@ -1307,7 +1306,7 @@ class Library extends React.Component {
       const fileType = getSourceType(l.url);
       try {
         if (fileType == ST.local) {
-          rimraf.sync(l.url);
+          fs_rimrafSync(l.url);
         } else if (fileType == ST.video || fileType == ST.playlist || fileType == ST.list) {
           unlink(l.url);
         }
@@ -1330,12 +1329,12 @@ class Library extends React.Component {
           const fileType = getSourceType(sourceURL);
           try {
             if (fileType == ST.local) {
-              rimraf.sync(sourceURL);
+              fs_rimrafSync(sourceURL);
             } else if (fileType == ST.video || fileType == ST.playlist || fileType == ST.list) {
               fs_unlinkSync(sourceURL);
-              rimraf.sync(getCachePath(sourceURL, this.props.config) + getFileName(sourceURL));
+              fs_rimrafSync(getCachePath(sourceURL, this.props.config) + getFileName(sourceURL));
             } else {
-              rimraf.sync(getCachePath(sourceURL, this.props.config));
+              fs_rimrafSync(getCachePath(sourceURL, this.props.config));
             }
           } catch (e) {
             console.error(e);

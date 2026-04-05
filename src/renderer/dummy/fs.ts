@@ -57,3 +57,6 @@ export function fs_writeFile(path: string, data: string, callback: (err: Error) 
 export function fs_recursiveReaddir(url: string, blacklist: string[], callback: (err: any, rawFiles: Array<string>) => void) {
   callback(null, [])
 }
+
+export function fs_rimrafSync(path: string) {
+}
