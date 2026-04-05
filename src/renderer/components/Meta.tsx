@@ -65,18 +65,16 @@ export default class Meta extends React.Component {
   }
 
   componentDidMount() {
-    window.ipc.getAppStorage().then((result) => this.setState(result));
+    window.ipc.getAppStorage().then((result) => {
+      this.setState(result);
+      setInterval(this.queueSave.bind(this), 500);
+    });
     // We never bother cleaning this up, but that's OK because this is the top level
     // component of the whole app.
     window.ipc.onStartScene(this.startScene.bind(this));
 
     // Disable react-sound's verbose console output
     (window as any).soundManager.setup({ debugMode: false });
-
-    // FIXME
-    // if (remote.getCurrentWindow().id == 1) {
-    //   setInterval(this.queueSave.bind(this), 500);
-    // }
   }
 
   _queueSave = false;
