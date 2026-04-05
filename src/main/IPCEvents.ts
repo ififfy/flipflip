@@ -1,6 +1,6 @@
 import { ipcMain, IpcMainEvent, IpcMainInvokeEvent, shell } from "electron";
 
-import { createNewWindow } from "./WindowManager";
+import { createNewWindow, saveExport } from "./WindowManager";
 import { IPC } from "../common/const";
 import { getBackups } from "./utils";
 import {
@@ -49,6 +49,10 @@ function onReset(ev: IpcMainEvent) {
   reset(ev.sender.id);
 }
 
+function onSaveExport(ev: IpcMainEvent, filePath: string, json: string) {
+  saveExport(ev.sender.id, filePath, json);
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -66,6 +70,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.restoreBackup, onRestoreBackup);
   ipcMain.on(IPC.openExternal, onOpenExternal);
   ipcMain.on(IPC.reset, onReset);
+  ipcMain.on(IPC.saveExport, onSaveExport);
 }
 
 export function releaseIpcEvents() {

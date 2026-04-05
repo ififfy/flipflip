@@ -16,6 +16,8 @@ contextBridge.exposeInMainWorld("ipc", {
     ipcRenderer.invoke(IPC.restoreBackup, backupFile),
   openExternal: (url: string) => ipcRenderer.send(IPC.openExternal, url),
   reset: () => ipcRenderer.send(IPC.reset),
+  saveExport: (filePath: string, json: string) =>
+    ipcRenderer.send(IPC.saveExport, filePath, json),
   onStartScene: (callback: (sceneName: string) => void) =>
     ipcRenderer.on(IPC.startScene, (_event, sceneName: string) =>
       callback(sceneName),

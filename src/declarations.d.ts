@@ -77,6 +77,7 @@ declare global {
       onStartScene: (callback: (sceneName: string) => void) => void;
       openExternal: (url: string) => void;
       reset: () => void;
+      saveExport: (filePath: string, json: string) => void;
     };
   }
 }

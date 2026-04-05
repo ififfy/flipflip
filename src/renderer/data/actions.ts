@@ -3301,13 +3301,7 @@ export function exportScene(state: State, scene: Scene): Object {
   const allExports = (scenesToExport as Array<any>).concat(gridsToExport);
   const sceneExport = JSON.stringify(allExports);
   const fileName = sceneCopy.name + "_export.json";
-  // FIXME
-  // remote.dialog.showSaveDialog(remote.getCurrentWindow(),
-  //   {filters: [{name: 'JSON Document', extensions: ['json']}], defaultPath: fileName}, (filePath) => {
-  //     if (filePath != null) {
-  //       fs_writeFileSync(filePath, sceneExport);
-  //     }
-  // });
+  window.ipc.saveExport(fileName, sceneExport);
   return {};
 }
 
@@ -3544,13 +3538,7 @@ export function importScene(
 export function exportLibrary(state: State): Object {
   const libraryExport = JSON.stringify(state.library);
   const fileName = "library_export-" + new Date().getTime() + ".json";
-  // FIXME
-  // remote.dialog.showSaveDialog(remote.getCurrentWindow(),
-  //   {filters: [{name: 'JSON Document', extensions: ['json']}], defaultPath: fileName}, (filePath) => {
-  //     if (filePath != null) {
-  //       fs_writeFileSync(filePath, libraryExport);
-  //     }
-  //   });
+  window.ipc.saveExport(fileName, libraryExport);
   return {};
 }
 

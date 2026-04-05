@@ -1,7 +1,7 @@
-import { app, BrowserWindow } from "electron";
+import fs from "fs";
+import path from "path";
+import { app, BrowserWindow, dialog } from "electron";
 import windowStateKeeper from "electron-window-state";
-import * as path from "path";
-import * as url from "url";
 
 import { releaseIpcEvents } from "./IPCEvents";
 import { IPC } from "../common/const";
@@ -86,4 +86,25 @@ export function createNewWindow() {
 
 export function reloadWindow(windowId: number) {
   currentWindows.get(windowId)?.reload();
+}
+
+export async function saveExport(
+  windowId: number,
+  filePath: string,
+  json: string,
+) {
+  const window = currentWindows.get(windowId);
+  if (window == null) {
+    return;
+  }
+
+  const result = await dialog.showSaveDialog(window, {
+    filters: [{ name: "JSON Document", extensions: ["json"] }],
+    defaultPath: filePath,
+  });
+  if (result.canceled) {
+    return;
+  }
+
+  fs.writeFileSync(result.filePath, json);
 }
