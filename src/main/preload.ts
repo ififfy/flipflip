@@ -19,7 +19,8 @@ contextBridge.exposeInMainWorld("ipc", {
   saveExport: (filePath: string, json: string) =>
     ipcRenderer.send(IPC.saveExport, filePath, json),
   openImport: () => ipcRenderer.invoke(IPC.openImport),
-  openDirectory: () => ipcRenderer.invoke(IPC.openDirectory),
+  openDirectory: (multiSelections?: boolean) =>
+    ipcRenderer.invoke(IPC.openDirectory, multiSelections),
   openVideoDirs: () => ipcRenderer.invoke(IPC.openVideoDirs),
   openVideos: () => ipcRenderer.invoke(IPC.openVideos),
   openAudios: (shiftKey: boolean) =>

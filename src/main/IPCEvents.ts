@@ -69,8 +69,8 @@ async function onOpenImport(ev: IpcMainEvent) {
   return await openImport(ev.sender.id);
 }
 
-async function onOpenDirectory(ev: IpcMainEvent) {
-  return await openDirectory(ev.sender.id);
+async function onOpenDirectory(ev: IpcMainEvent, multiSelections?: boolean) {
+  return await openDirectory(ev.sender.id, multiSelections);
 }
 
 async function onOpenVideoDirs(ev: IpcMainEvent) {

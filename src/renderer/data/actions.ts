@@ -2599,19 +2599,22 @@ export function addSource(
       }
 
     case AF.directory:
-      // FIXME
-      // let dResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory', 'multiSelections']});
-      // if (!dResult) return;
-      // if (scene != null) {
-      //   return updateScene(state, scene, (s) => {
-      //     addSources(s.sources, dResult, state.library);
-      //     handleArgs(s);
-      //   })
-      // } else {
-      //   return updateLibrary(state, (l) =>  addSources(l, dResult, state.library));
-      // }
-      break;
+      return window.ipc.openDirectory(true).then((result) => {
+        if (result.length === 0) {
+          return;
+        }
 
+        if (scene != null) {
+          return updateScene(state, scene, (s) => {
+            addSources(s.sources, result, state.library);
+            handleArgs(s);
+          });
+        } else {
+          return updateLibrary(state, (l) =>
+            addSources(l, result, state.library),
+          );
+        }
+      });
     case AF.videos:
       return window.ipc.openVideos().then((result) => {
         if (result.length === 0) {
