@@ -1,11 +1,44 @@
-import { ipcMain, IpcMessageEvent } from "electron";
+import { ipcMain, IpcMainInvokeEvent } from "electron";
 
 import { createNewWindow } from "./WindowManager";
-import { IPC } from "../renderer/data/const";
+import { IPC } from "../common/const";
+import { getBackups } from "./utils";
+import {
+  createNewAppStorage,
+  saveAppStorage,
+  createBackup,
+} from "./storage/StorageManager";
+import AppStorageState from "../common/AppStorageState";
+import { cleanBackups, restoreFromBackup } from "./actions";
+import Config from "../common/Config";
 
 // Define functions
-function onRequestCreateNewWindow(ev: IpcMessageEvent) {
+function onRequestCreateNewWindow() {
   createNewWindow();
+}
+
+function onRequestBackups() {
+  return getBackups();
+}
+
+function onRequestAppStorage(ev: IpcMainInvokeEvent) {
+  return createNewAppStorage(ev.sender.id);
+}
+
+function onSaveAppStorage(ev: IpcMainInvokeEvent, state: AppStorageState) {
+  saveAppStorage(ev.sender.id, state);
+}
+
+function onCreateBackup(ev: IpcMainInvokeEvent, state: AppStorageState) {
+  createBackup(ev.sender.id, state);
+}
+
+function onCleanBackups(ev: IpcMainInvokeEvent, config: Config) {
+  cleanBackups(config);
+}
+
+function onRestoreBackup(ev: IpcMainInvokeEvent, backupFile: string) {
+  return restoreFromBackup(backupFile);
 }
 
 // Initialize and release listeners
@@ -17,11 +50,18 @@ export function initializeIpcEvents() {
 
   initialized = true;
   ipcMain.on(IPC.newWindow, onRequestCreateNewWindow);
+  ipcMain.handle(IPC.getBackups, onRequestBackups);
+  ipcMain.handle(IPC.getAppStorage, onRequestAppStorage);
+  ipcMain.on(IPC.saveAppStorage, onSaveAppStorage);
+  ipcMain.on(IPC.createBackup, onCreateBackup);
+  ipcMain.on(IPC.cleanBackups, onCleanBackups);
+  ipcMain.handle(IPC.restoreBackup, onRestoreBackup);
 }
 
 export function releaseIpcEvents() {
   if (initialized) {
     ipcMain.removeAllListeners(IPC.newWindow);
+    ipcMain.removeAllListeners(IPC.getBackups);
   }
 
   initialized = false;

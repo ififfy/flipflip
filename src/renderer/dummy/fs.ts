@@ -29,10 +29,6 @@ export function fs_readDirectoryNames(path: string): string[] {
 
 export function fs_writeFileSync(path: string, text: string) {}
 
-export function fs_unlinkBackups(
-  backups: Array<{ url: string; size: number }>,
-) {}
-
 export function fs_mkdirSync(path: string) {}
 
 export function fs_fileSize(path: string) {

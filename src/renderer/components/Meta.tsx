@@ -13,11 +13,10 @@ import {
 } from "@mui/material";
 import { StyledEngineProvider, ThemeProvider } from "@mui/material/styles";
 
-import { SP } from "../data/const";
+import { SP } from "../../common/const";
 import { getCachePath } from "../data/utils";
 import * as actions from "../data/actions";
-import ErrorBoundary from "../../main/ErrorBoundary";
-import AppStorage from "../data/AppStorage";
+import ErrorBoundary from "./ErrorBoundary";
 import ScenePicker from "./ScenePicker";
 import ConfigForm from "./config/ConfigForm";
 import Library from "./library/Library";
@@ -30,15 +29,14 @@ import Tutorial from "./Tutorial";
 import AudioLibrary from "./library/AudioLibrary";
 import CaptionScriptor from "./sceneDetail/CaptionScriptor";
 import ScriptLibrary from "./library/ScriptLibrary";
-
-const appStorage = new AppStorage(1 /* FIXME remote.getCurrentWindow().id*/);
+import AppStorageState from "../../common/AppStorageState";
 
 function TransitionUp(props: any) {
   return <Slide {...props} direction="up" />;
 }
 
 export default class Meta extends React.Component {
-  readonly state = appStorage.initialState;
+  readonly state?: AppStorageState;
 
   isRoute(kind: string): Boolean {
     return actions.isRoute(this.state, kind);
@@ -49,11 +47,14 @@ export default class Meta extends React.Component {
     // So we simply call the function and setState(return value).
     // This is basically the Redux pattern with fewer steps.
     const result = fn(this.state, ...args);
-    // run `window.logStateChanges = true` to see these
-    if ((window as any).logStateChanges) {
-      console.log(result);
-    }
-    this.setState(result);
+    // result can be a Promise if action performs IPC calls
+    Promise.resolve(result).then((value) => {
+      // run `window.logStateChanges = true` to see these
+      if ((window as any).logStateChanges) {
+        console.log(value);
+      }
+      this.setState(value);
+    });
   }
 
   progressAction(fn: any, ...args: any[]) {
@@ -64,6 +65,7 @@ export default class Meta extends React.Component {
   }
 
   componentDidMount() {
+    window.ipc.getAppStorage().then((result) => this.setState(result));
     // We never bother cleaning this up, but that's OK because this is the top level
     // component of the whole app.
     window.ipc.onStartScene(this.startScene.bind(this));
@@ -81,11 +83,12 @@ export default class Meta extends React.Component {
   _lastSave: Date = null;
   queueSave() {
     if (
+      this.state != null &&
       this._queueSave &&
       (this._lastSave == null ||
         new Date().getTime() - this._lastSave.getTime() > 3000)
     ) {
-      appStorage.save(this.state);
+      window.ipc.saveAppStorage(this.state);
       this._lastSave = new Date();
       this._queueSave = false;
     }
@@ -93,40 +96,40 @@ export default class Meta extends React.Component {
 
   componentDidUpdate(prevProps: any, prevState: any) {
     if (
-      prevState.version !== this.state.version ||
-      prevState.config !== this.state.config ||
-      prevState.scenes !== this.state.scenes ||
-      prevState.sceneGroups !== this.state.sceneGroups ||
-      prevState.grids !== this.state.grids ||
-      prevState.library !== this.state.library ||
-      prevState.audios !== this.state.audios ||
-      prevState.scripts !== this.state.scripts ||
-      prevState.playlists !== this.state.playlists ||
-      prevState.tags !== this.state.tags ||
-      prevState.route !== this.state.route ||
-      prevState.specialMode !== this.state.specialMode ||
-      prevState.openTab !== this.state.openTab ||
-      prevState.displayedSources !== this.state.displayedSources ||
-      prevState.libraryYOffset !== this.state.libraryYOffset ||
-      prevState.libraryFilters !== this.state.libraryFilters ||
-      prevState.librarySelected !== this.state.librarySelected ||
-      prevState.audioOpenTab !== this.state.audioOpenTab ||
-      prevState.audioYOffset !== this.state.audioYOffset ||
-      prevState.audioFilters !== this.state.audioFilters ||
-      prevState.audioSelected !== this.state.audioSelected ||
-      prevState.scriptYOffset !== this.state.scriptYOffset ||
-      prevState.scriptFilters !== this.state.scriptFilters ||
-      prevState.scriptSelected !== this.state.scriptSelected ||
-      prevState.progressMode !== this.state.progressMode ||
-      prevState.progressTitle !== this.state.progressTitle ||
-      prevState.progressCurrent !== this.state.progressCurrent ||
-      prevState.progressTotal !== this.state.progressTotal ||
-      prevState.progressNext !== this.state.progressNext ||
-      prevState.systemMessage !== this.state.systemMessage ||
-      prevState.systemSnackOpen !== this.state.systemSnackOpen ||
-      prevState.systemSnack !== this.state.systemSnack ||
-      prevState.tutorial !== this.state.tutorial ||
-      prevState.theme !== this.state.theme
+      prevState?.version !== this.state?.version ||
+      prevState?.config !== this.state?.config ||
+      prevState?.scenes !== this.state?.scenes ||
+      prevState?.sceneGroups !== this.state?.sceneGroups ||
+      prevState?.grids !== this.state?.grids ||
+      prevState?.library !== this.state?.library ||
+      prevState?.audios !== this.state?.audios ||
+      prevState?.scripts !== this.state?.scripts ||
+      prevState?.playlists !== this.state?.playlists ||
+      prevState?.tags !== this.state?.tags ||
+      prevState?.route !== this.state?.route ||
+      prevState?.specialMode !== this.state?.specialMode ||
+      prevState?.openTab !== this.state?.openTab ||
+      prevState?.displayedSources !== this.state?.displayedSources ||
+      prevState?.libraryYOffset !== this.state?.libraryYOffset ||
+      prevState?.libraryFilters !== this.state?.libraryFilters ||
+      prevState?.librarySelected !== this.state?.librarySelected ||
+      prevState?.audioOpenTab !== this.state?.audioOpenTab ||
+      prevState?.audioYOffset !== this.state?.audioYOffset ||
+      prevState?.audioFilters !== this.state?.audioFilters ||
+      prevState?.audioSelected !== this.state?.audioSelected ||
+      prevState?.scriptYOffset !== this.state?.scriptYOffset ||
+      prevState?.scriptFilters !== this.state?.scriptFilters ||
+      prevState?.scriptSelected !== this.state?.scriptSelected ||
+      prevState?.progressMode !== this.state?.progressMode ||
+      prevState?.progressTitle !== this.state?.progressTitle ||
+      prevState?.progressCurrent !== this.state?.progressCurrent ||
+      prevState?.progressTotal !== this.state?.progressTotal ||
+      prevState?.progressNext !== this.state?.progressNext ||
+      prevState?.systemMessage !== this.state?.systemMessage ||
+      prevState?.systemSnackOpen !== this.state?.systemSnackOpen ||
+      prevState?.systemSnack !== this.state?.systemSnack ||
+      prevState?.tutorial !== this.state?.tutorial ||
+      prevState?.theme !== this.state?.theme
     ) {
       this._queueSave = true;
     }
@@ -143,6 +146,10 @@ export default class Meta extends React.Component {
   //      Add configurable privacy screen with shortcut and ability to set image
   //      Add minimize shortcut key in same vain?
   render() {
+    if (this.state == null) {
+      return null;
+    }
+
     const scene = actions.getActiveScene(this.state);
     const grid = actions.getActiveGrid(this.state);
 
@@ -264,7 +271,7 @@ export default class Meta extends React.Component {
                   onImportFromLibrary={a(actions.importFromLibrary)}
                   onImportLibrary={a(
                     actions.importLibrary,
-                    appStorage.backup.bind(appStorage, this.state),
+                    actions.createBackup.bind(this.state),
                   )}
                   onImportReddit={p(actions.importReddit)}
                   onImportTumblr={p(actions.importTumblr)}
@@ -490,7 +497,7 @@ export default class Meta extends React.Component {
                   tags={this.state.tags}
                   theme={this.state.theme}
                   goBack={a(actions.goBack)}
-                  onBackup={appStorage.backup.bind(appStorage, this.state)}
+                  onBackup={actions.createBackup.bind(this.state)}
                   onChangeThemeColor={a(actions.changeThemeColor)}
                   onClean={actions.cleanBackups}
                   onDefault={a(actions.setDefaultConfig)}

@@ -21,14 +21,9 @@ import {
   Typography,
 } from "@mui/material";
 
-import {
-  convertFromEpoch,
-  getBackups,
-  saveDir,
-  savePath,
-} from "../renderer/data/utils";
-import { path_join } from "../renderer/dummy/path";
-import { fs_rimrafSync } from "../renderer/dummy/fs";
+import { convertFromEpoch, saveDir, savePath } from "../data/utils";
+import { path_join } from "../dummy/path";
+import { fs_rimrafSync } from "../dummy/fs";
 
 export default class ErrorBoundary extends React.Component {
   readonly props: {
@@ -273,16 +268,17 @@ export default class ErrorBoundary extends React.Component {
   }
 
   backupCheck() {
-    const backups = getBackups();
-    if (backups.length == 0) {
-      this.setState({ backupCheck: true, backups: backups, backup: null });
-    } else {
-      this.setState({
-        backupCheck: true,
-        backups: backups,
-        backup: backups[0],
-      });
-    }
+    window.ipc.getBackups().then((backups) => {
+      if (backups.length == 0) {
+        this.setState({ backupCheck: true, backups: backups, backup: null });
+      } else {
+        this.setState({
+          backupCheck: true,
+          backups: backups,
+          backup: backups[0],
+        });
+      }
+    });
   }
 
   onChangeBackup(e: MouseEvent) {

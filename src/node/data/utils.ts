@@ -1,16 +1,9 @@
-import { remote } from "electron";
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
-import { getFileGroup } from "../components/player/Scrapers";
-import { ST } from "./const";
-
-export const saveDir = path.join(remote.app.getPath("appData"), "flipflip");
-export const savePath = path.join(saveDir, "data.json");
-export const portablePath = path.join(
-  path.dirname(remote.app.getAppPath()),
-  "data.json",
-);
+import { getFileGroup } from "../../renderer/components/player/Scrapers";
+import { ST } from "../../common/const";
+import Config from "../../common/Config";
 
 export function generateThumbnailFile(cachePath: string, data: Buffer): string {
   let checksumThumbnailPath = cachePath;
@@ -88,27 +81,4 @@ export function getFilesRecursively(path: string): string[] {
     .map((dir) => getFilesRecursively(dir)) // go through each directory
     .reduce((a, b) => a.concat(b), []); // map returns a 2d array (array of file arrays) so flatten
   return files.concat(getFiles(path));
-}
-
-export function getBackups(): Array<{ url: string; size: number }> {
-  const files = fs.readdirSync(saveDir);
-  const backups = Array<any>();
-  for (let file of files) {
-    if (file.startsWith("data.json.") && file != "data.json.new") {
-      const stats = fs.statSync(saveDir + "/" + file);
-      backups.push({ url: file, size: stats.size });
-    }
-  }
-  backups.sort((a, b) => {
-    const aFile = a.url;
-    const bFile = b.url;
-    if (aFile > bFile) {
-      return -1;
-    } else if (aFile < bFile) {
-      return 1;
-    } else {
-      return 0;
-    }
-  });
-  return backups;
 }

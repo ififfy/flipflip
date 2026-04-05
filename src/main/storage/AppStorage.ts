@@ -1,33 +1,21 @@
-import {
-  fs_copyFileSync,
-  fs_mkdirSync,
-  fs_existsSync,
-  fs_readFileSync,
-  fs_renameSync,
-  fs_writeFile,
-} from "../dummy/fs";
-
-import {
-  getBackups,
-  portablePath,
-  removeDuplicatesBy,
-  saveDir,
-  savePath,
-} from "./utils";
-import { cleanBackups } from "./actions";
-import { Route } from "./Route";
-import { TT } from "./const";
-import Audio from "./Audio";
-import LibrarySource from "../data/LibrarySource";
-import Tag from "../data/Tag";
-import WeightGroup from "../data/WeightGroup";
-import Config from "./Config";
-import Scene from "./Scene";
-import SceneGrid from "./SceneGrid";
-import defaultTheme from "./theme";
-import Playlist from "./Playlist";
-import CaptionScript from "./CaptionScript";
-import SceneGroup from "./SceneGroup";
+import fs from "fs";
+import { getBackups, portablePath, saveDir, savePath } from "../utils";
+import { cleanBackups } from "../actions";
+import { Route } from "../../common/Route";
+import { TT } from "../../common/const";
+import Audio from "../../common/Audio";
+import LibrarySource from "../../common/LibrarySource";
+import Tag from "../../common/Tag";
+import WeightGroup from "../../common/WeightGroup";
+import Config from "../../common/Config";
+import Scene from "../../common/Scene";
+import SceneGrid from "../../common/SceneGrid";
+import defaultTheme from "../../common/theme";
+import Playlist from "../../common/Playlist";
+import CaptionScript from "../../common/CaptionScript";
+import SceneGroup from "../../common/SceneGroup";
+import AppStorageState from "../../common/AppStorageState";
+import { removeDuplicatesBy } from "../../common/utils";
 
 /**
  * A compile-time global variable defined in webpack.config' [plugins]
@@ -35,7 +23,7 @@ import SceneGroup from "./SceneGroup";
  */
 export declare var __VERSION__: string;
 
-export const defaultInitialState = {
+export const defaultInitialState: AppStorageState = {
   version: __VERSION__,
   config: new Config(),
   sceneGroups: Array<SceneGroup>(),
@@ -79,45 +67,45 @@ export const defaultInitialState = {
  * @param {string} filePath
  */
 function archiveFile(filePath: string): void {
-  if (fs_existsSync(filePath)) {
-    fs_copyFileSync(filePath, filePath + "." + Date.now());
+  if (fs.existsSync(filePath)) {
+    fs.copyFileSync(filePath, filePath + "." + Date.now());
   }
 }
 
 export default class AppStorage {
-  initialState: any = defaultInitialState;
+  initialState: AppStorageState = defaultInitialState;
 
   constructor(windowId: number) {
     try {
-      fs_mkdirSync(saveDir);
+      fs.mkdirSync(saveDir);
     } catch (e) {
       // who cares
     }
     try {
       let data;
       let portableMode = false;
-      if (!fs_existsSync(savePath) && fs_existsSync(portablePath)) {
-        data = JSON.parse(fs_readFileSync(portablePath, "utf-8"));
+      if (!fs.existsSync(savePath) && fs.existsSync(portablePath)) {
+        data = JSON.parse(fs.readFileSync(portablePath, "utf-8"));
         if (!data.config.generalSettings.portableMode) {
-          data = JSON.parse(fs_readFileSync(savePath, "utf-8"));
+          data = JSON.parse(fs.readFileSync(savePath, "utf-8"));
         } else {
           portableMode = true;
           console.log("Portable: " + portablePath);
         }
       } else {
-        data = JSON.parse(fs_readFileSync(savePath, "utf-8"));
+        data = JSON.parse(fs.readFileSync(savePath, "utf-8"));
         if (data.config.generalSettings.portableMode) {
           portableMode = true;
           console.log("Portable: " + portablePath);
-          data = JSON.parse(fs_readFileSync(portablePath, "utf-8"));
+          data = JSON.parse(fs.readFileSync(portablePath, "utf-8"));
         }
       }
 
       if (portableMode) {
-        if (fs_existsSync(`${portablePath}.new`))
+        if (fs.existsSync(`${portablePath}.new`))
           console.warn("FOUND OLD SAVE");
       } else {
-        if (fs_existsSync(`${savePath}.new`)) console.warn("FOUND OLD SAVE");
+        if (fs.existsSync(`${savePath}.new`)) console.warn("FOUND OLD SAVE");
       }
 
       if (data.version != __VERSION__) {
@@ -542,12 +530,12 @@ export default class AppStorage {
 
   writeFileTransactional(path: any, content: any, callback?: Function) {
     let temporaryPath = `${path}.new`;
-    fs_writeFile(temporaryPath, content, function (err) {
+    fs.writeFile(temporaryPath, content, function (err) {
       if (err) {
         console.error(err);
         return;
       }
-      fs_renameSync(temporaryPath, path);
+      fs.renameSync(temporaryPath, path);
       if (callback) {
         callback();
       }

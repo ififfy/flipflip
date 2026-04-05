@@ -211,6 +211,12 @@ const AF = {
 const IPC = {
   newWindow: "ipc.newWindow",
   startScene: "ipc.startScene",
+  getBackups: "ipc.getBackups",
+  createBackup: "ipc.createBackup",
+  cleanBackups: "ipc.cleanBackups",
+  restoreBackup: "ipc.restoreBackup",
+  getAppStorage: "ipc.getAppStorage",
+  saveAppStorage: "ipc.saveAppStorage",
 };
 
 const MO = {

@@ -1,3 +1,6 @@
+import AppStorageState from "./common/AppStorageState";
+import Backup from "./common/Backup";
+
 // Put all your custom type information for 3rd party modules here
 declare module "*.svg" {
   const value: any;
@@ -65,6 +68,12 @@ declare global {
   interface Window {
     ipc: {
       newWindow: () => void;
+      getBackups: () => Promise<Array<Backup>>;
+      getAppStorage: () => Promise<AppStorageState>;
+      saveAppStorage: (state: AppStorageState) => void;
+      createBackup: (state: AppStorageState) => void;
+      cleanBackups: (config: Config) => void;
+      restoreBackup: (backupFile: string) => Promise<AppStorageState>;
       onStartScene: (callback: (sceneName: string) => void) => void;
     };
   }

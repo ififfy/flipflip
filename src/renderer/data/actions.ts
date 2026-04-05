@@ -16,7 +16,6 @@ import {
   getFileName,
   getSourceType,
 } from "../components/player/Scrapers";
-import defaultTheme from "../../common/theme";
 import {
   AF,
   ALT,

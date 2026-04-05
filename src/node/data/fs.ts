@@ -43,18 +43,6 @@ export function fs_writeFileSync(path: string, text: string) {
   fs.writeFileSync(path, text);
 }
 
-export function fs_unlinkBackups(
-  backups: Array<{ url: string; size: number }>,
-) {
-  for (let backup of backups) {
-    try {
-      fs.unlinkSync(path.join(saveDir, backup.url));
-    } catch (e) {
-      console.error(e);
-    }
-  }
-}
-
 export function fs_mkdirSync(path: string) {
   if (!fs.existsSync(path)) {
     fs.mkdirSync(path);
