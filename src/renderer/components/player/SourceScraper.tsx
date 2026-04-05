@@ -10,7 +10,7 @@ import {Dialog, DialogContent} from "@mui/material";
 import {CancelablePromise, flatten, getCachePath, randomizeList, urlToPath} from "../../data/utils";
 import {
   filterPathsToJustPlayable, getFileName, getSourceType, isVideo, loadBDSMlr, loadDanbooru, loadDeviantArt, loadE621,
-  loadEHentai, loadGelbooru1, loadGelbooru2, loadHydrus, loadImageFap, loadImgur, loadInstagram, loadLuscious,
+  loadEHentai, loadGelbooru1, loadGelbooru2, loadHydrus, loadImageFap, loadImgur, loadLuscious,
   loadPiwigo, loadReddit, loadRedGifs, loadRemoteImageURLList, loadSexCom, loadTumblr, loadTwitter, processAllURLs
 } from "./Scrapers";
 import {IF, SOF, ST} from '../../data/const';
@@ -97,8 +97,6 @@ function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<strin
       workerFunction = returnPromise ? loadTwitterPromise : worker.loadTwitter;
     } else if (sourceType == ST.deviantart) {
       workerFunction = returnPromise ? loadDeviantArtPromise : worker.loadDeviantArt;
-    } else if (sourceType == ST.instagram) {
-      workerFunction = returnPromise ? loadInstagramPromise : worker.loadInstagram;
     } else if (sourceType == ST.danbooru) {
       workerFunction = returnPromise ? loadDanbooruPromise : worker.loadDanbooru;
     } else if (sourceType == ST.e621) {
@@ -382,10 +380,6 @@ const loadTwitterPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<s
 
 const loadDeviantArtPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
   loadDeviantArt(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
-}
-
-const loadInstagramPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
-  loadInstagram(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
 }
 
 const loadDanbooruPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {

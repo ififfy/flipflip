@@ -221,9 +221,6 @@ interface RemoteSettingsI {
   twitterConsumerSecret: string;
   twitterAccessTokenKey: string;
   twitterAccessTokenSecret: string;
-
-  instagramUsername: string;
-  instagramPassword: string;
   
   hydrusProtocol: string;
   hydrusDomain: string;
@@ -539,9 +536,6 @@ export class RemoteSettings implements RemoteSettingsI {
   twitterConsumerSecret = "ad11IC4CLwVzYyGyYwHKVMP9WwAcKxymw4D9162S5Ex75l5eWw";
   twitterAccessTokenKey = "";
   twitterAccessTokenSecret = "";
-
-  instagramUsername = "";
-  instagramPassword = "";
 
   hydrusProtocol = "http";
   hydrusDomain = "localhost";

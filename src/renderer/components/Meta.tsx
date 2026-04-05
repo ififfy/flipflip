@@ -253,7 +253,6 @@ export default class Meta extends React.Component {
                   onExportLibrary={a(actions.exportLibrary)}
                   onImportFromLibrary={a(actions.importFromLibrary)}
                   onImportLibrary={a(actions.importLibrary, appStorage.backup.bind(appStorage, this.state))}
-                  onImportInstagram={p(actions.importInstagram)}
                   onImportReddit={p(actions.importReddit)}
                   onImportTumblr={p(actions.importTumblr)}
                   onImportTwitter={p(actions.importTwitter)}

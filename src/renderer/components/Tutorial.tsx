@@ -1081,7 +1081,7 @@ class Tutorial extends React.Component {
                 </ul>
               </DialogContentText>
               <DialogContentText id="tutorial-description">
-                <b>Remote source imports</b> (<i>Tumblr</i>, <s><i>Reddit</i></s>, <s><i>Twitter</i></s>, <i>Instagram</i>) will appear after you have logged into the relevant service in <b>Settings</b>.
+                <b>Remote source imports</b> (<i>Tumblr</i>, <s><i>Reddit</i></s>, <s><i>Twitter</i></s>) will appear after you have logged into the relevant service in <b>Settings</b>.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 While any of these processes are running, you will see a <b>progress bar</b>. Feel free to <b>continue using FlipFlip</b>. You will be <b>alerted</b> when the job is finished.
@@ -1107,7 +1107,7 @@ class Tutorial extends React.Component {
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 Alternatively, you can head to <b>Settings</b> (from the home page) and activate
-                <i>Tumblr</i>, <s><i>Reddit</i></s>, <s><i>Twitter</i></s>, and/or <i>Instagram</i> and then come back here to <b>import your sources</b>.
+                <i>Tumblr</i>, <s><i>Reddit</i></s>, and/or <s><i>Twitter</i></s> and then come back here to <b>import your sources</b>.
               </DialogContentText>
               <DialogContentText id="tutorial-description">
                 After you've <b>added a few tags</b>, you can <b>tag Sources by clicking their Avatar</b>.

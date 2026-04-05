@@ -364,7 +364,6 @@ class Library extends React.Component {
     onExportLibrary(): void,
     onImportFromLibrary(sources: Array<LibrarySource>): void,
     onImportLibrary(importLibrary: any): void,
-    onImportInstagram(): void,
     onImportReddit(): void,
     onImportTumblr(): void,
     onImportTwitter(): void,
@@ -401,11 +400,9 @@ class Library extends React.Component {
     const redditAuthorized = this.props.config.remoteSettings.redditRefreshToken != "";
     const twitterAuthorized = this.props.config.remoteSettings.twitterAccessTokenKey != "" &&
       this.props.config.remoteSettings.twitterAccessTokenSecret != "";
-    const instagramAuthorized = this.props.config.remoteSettings.instagramUsername != "" &&
-      this.props.config.remoteSettings.instagramPassword != "";
     const piwigoConfigured = this.props.config.remoteSettings.piwigoProtocol != "" &&
       this.props.config.remoteSettings.piwigoHost != "";
-    const remoteAuthorized = tumblrAuthorized || redditAuthorized || twitterAuthorized || instagramAuthorized;
+    const remoteAuthorized = tumblrAuthorized || redditAuthorized || twitterAuthorized;
 
     let cancelProgressMessage;
     switch (this.props.progressMode) {
@@ -420,7 +417,6 @@ class Library extends React.Component {
         break;
       case PR.reddit:
       case PR.twitter:
-      case PR.instagram:
         cancelProgressMessage = "Cancel Import";
         break;
     }
@@ -592,16 +588,6 @@ class Library extends React.Component {
                     </ListItem>
                   </Tooltip>
                 )}*/}
-                {instagramAuthorized && (
-                  <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Import from Instagram"}>
-                    <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onImportInstagram.bind(this)}>
-                      <ListItemIcon>
-                        <SourceIcon type={ST.instagram}/>
-                      </ListItemIcon>
-                      <ListItemText primary="Instagram" />
-                    </ListItem>
-                  </Tooltip>
-                )}
               </div>
             </React.Fragment>
           )}

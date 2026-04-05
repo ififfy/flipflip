@@ -110,7 +110,6 @@ export default new Map<string, string>([
   ['st.imgur', 'Imgur'],
   ['st.twitter', 'Twitter'],
   ['st.deviantart', 'DeviantArt'],
-  ['st.instagram', 'Instagram'],
   ['st.danbooru', 'Danbooru'],
   ['st.e621', 'E621'],
   ['st.luscious', 'Luscious'],

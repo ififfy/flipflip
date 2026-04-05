@@ -114,17 +114,6 @@ account. You should only ever have to do this once.~~
 * ~~Go back to FlipFlip~~
 * ~~You should see a Success! message~~
 
-### Instagram
-In order to use Instagram Profiles as sources, you'll need to provide your username and password.
-
-FlipFlip does not store any user information or make changes to your account. Your login information is stored locally 
-on your computer and is never shared with anyone or sent to any server (besides Instagram, obviously).
-
-* Click the `Instagram` icon
-* Enter your Username and Password
-* Click `Authorize FlipFlip on Instagram`
-* You should see a Success! message
-
 ### Hydrus
 In order to use a Hydrus server for sources, you'll need to provide the server details. This includes protocol 
 (`http` vs `https`), domain, port, and API Key.

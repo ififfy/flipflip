@@ -5,7 +5,6 @@ import {OAuth} from "oauth";
 import http from "http";
 import uuidv4 from "uuid/v4";
 import wretch from "wretch";
-import {IgApiClient, IgCheckpointError, IgLoginTwoFactorRequiredError} from "instagram-private-api";
 
 import {
   Alert,
@@ -98,7 +97,6 @@ class APICard extends React.Component {
     snackbar: null as string,
     snackbarSeverity: null as string,
     server: null as any,
-    instagramMode: null as string,
     input1: "",
     input2: "",
     input3: "",
@@ -110,7 +108,6 @@ class APICard extends React.Component {
     const tumblrAuthorized = this.props.settings.tumblrOAuthToken != "" && this.props.settings.tumblrOAuthTokenSecret != "";
     const redditAuthorized = this.props.settings.redditRefreshToken != "";
     const twitterAuthorized = this.props.settings.twitterAccessTokenKey != "" && this.props.settings.twitterAccessTokenSecret != "";
-    const instagramConfigured = this.props.settings.instagramUsername != "" && this.props.settings.instagramPassword != "";
     const hydrusConfigured = this.props.settings.hydrusAPIKey != "";
     const piwigoConfigured = this.props.settings.piwigoProtocol != "" && this.props.settings.piwigoHost != "" && this.props.settings.piwigoUsername != "" && this.props.settings.piwigoPassword != "";
     const indexOf = this.props.settings.tumblrKeys.indexOf(this.props.settings.tumblrKey);
@@ -125,9 +122,6 @@ class APICard extends React.Component {
         break;
       case ST.twitter:
         menuTypeSignOut = this.onFinishClearTwitter.bind(this);
-        break;
-      case ST.instagram:
-        menuTypeSignOut = this.onFinishClearInstagram.bind(this);
         break;
       case ST.hydrus:
         menuTypeSignOut = this.onFinishClearHydrus.bind(this);
@@ -171,16 +165,6 @@ class APICard extends React.Component {
               </Fab>
             </Tooltip>
           </Grid>*/}
-          <Grid item>
-            <Tooltip disableInteractive title={instagramConfigured ? "Authorized: Click to Sign Out of Instagram" : "Unauthorized: Click to Authorize Instragram"}  placement="top-end">
-              <Fab
-                className={clsx(classes.fab, instagramConfigured ? classes.authorized : classes.noAuth)}
-                onClick={instagramConfigured ? this.onClearInstagram.bind(this) : this.onAuthInstagram.bind(this)}
-                size="large">
-                <SourceIcon className={classes.icon} type={ST.instagram}/>
-              </Fab>
-            </Tooltip>
-          </Grid>
           <Grid item>
             <Tooltip disableInteractive title={hydrusConfigured ? "Configured: Click to Remove Hydrus Configuration" : "Unauthorized: Click to Configure Hydrus"}  placement="top-end">
               <Fab
@@ -399,92 +383,6 @@ class APICard extends React.Component {
         </Dialog>
 
         <Dialog
-          open={this.state.openMenu == MO.signIn && this.state.menuType == ST.instagram}
-          onClose={this.onCloseDialog.bind(this)}
-          aria-labelledby="instagram-title"
-          aria-describedby="instagram-description">
-          <DialogTitle id="instagram-title">
-            Instagram Sign In
-            <Avatar className={classes.iconAvatar}>
-              <SourceIcon className={classes.icon} type={ST.instagram}/>
-            </Avatar>
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText id="instagram-description">
-              FlipFlip does not store any user information or make changes to your account. Your login information is
-              stored locally on your computer and is never shared with anyone or sent to any server (besides Instagram, obviously).
-            </DialogContentText>
-            <TextField
-              variant="standard"
-              fullWidth
-              disabled={this.state.instagramMode != null}
-              margin="dense"
-              label="Instagram Username"
-              value={this.state.input1}
-              onChange={this.onInput1.bind(this)} />
-            <TextField
-              variant="standard"
-              fullWidth
-              disabled={this.state.instagramMode != null}
-              margin="dense"
-              label="Instagram Password"
-              type="password"
-              value={this.state.input2}
-              onChange={this.onInput2.bind(this)} />
-            <Collapse in={this.state.instagramMode == IG.tfa}>
-              <DialogContentText id="instagram-description">
-                Enter your two-factor authentication code to confirm login:
-              </DialogContentText>
-              <TextField
-                variant="standard"
-                fullWidth
-                margin="dense"
-                label="Instagram 2FA"
-                value={this.state.input3}
-                onChange={this.onInput3.bind(this)} />
-            </Collapse>
-            <Collapse in={this.state.instagramMode == IG.checkpoint}>
-              <DialogContentText id="instagram-description">
-                Please verify your account to continue: (check your email)
-              </DialogContentText>
-              <TextField
-                variant="standard"
-                fullWidth
-                margin="dense"
-                label="Instagram Checkpoint"
-                value={this.state.input3}
-                onChange={this.onInput3.bind(this)} />
-            </Collapse>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
-              Cancel
-            </Button>
-            {this.state.instagramMode == IG.tfa && (
-              <Button
-                disabled={this.state.input3.length == 0}
-                onClick={this.onTFAInstagram.bind(this)} color="primary">
-                Authorize FlipFlip on Instagram
-              </Button>
-            )}
-            {this.state.instagramMode == IG.checkpoint && (
-              <Button
-                disabled={this.state.input3.length == 0}
-                onClick={this.onCheckpointInstagram.bind(this)} color="primary">
-                Authorize FlipFlip on Instagram
-              </Button>
-            )}
-            {this.state.instagramMode == null && (
-              <Button
-                disabled={this.state.input1.length == 0 || this.state.input2.length == 0}
-                onClick={this.onFinishAuthInstagram.bind(this)} color="primary">
-                Authorize FlipFlip on Instagram
-              </Button>
-            )}
-          </DialogActions>
-        </Dialog>
-
-        <Dialog
           open={this.state.openMenu == MO.signIn && this.state.menuType == ST.hydrus}
           onClose={this.onCloseDialog.bind(this)}
           aria-labelledby="hydrus-title"
@@ -670,22 +568,6 @@ class APICard extends React.Component {
     this.onCloseDialog();
   }
 
-  onClearInstagram() {
-    this.setState({openMenu: MO.signOut, menuType: ST.instagram});
-  }
-
-  onFinishClearInstagram() {
-    // Update props
-    this.props.onUpdateConfig((c) => {
-      c.remoteSettings.instagramPassword = "";
-    });
-    // Update state
-    this.props.onUpdateSettings((s) => {
-      s.instagramPassword = "";
-    });
-    this.onCloseDialog();
-  }
-
   onClearHydrus() {
     this.setState({openMenu: MO.signOut, menuType: ST.hydrus});
   }
@@ -771,10 +653,6 @@ class APICard extends React.Component {
     this.setState({openMenu: MO.signIn, menuType: ST.twitter});
   }
 
-  onAuthInstagram() {
-    this.setState({openMenu: MO.signIn, menuType: ST.instagram, input1: this.props.settings.instagramUsername, input2: this.props.settings.instagramPassword});
-  }
-
   onAuthHydrus() {
     this.setState({openMenu: MO.signIn, menuType: ST.hydrus, input1: this.props.settings.hydrusProtocol, input2: this.props.settings.hydrusDomain, input3: this.props.settings.hydrusPort, input4: this.props.settings.hydrusAPIKey});
   }
@@ -784,7 +662,7 @@ class APICard extends React.Component {
   }
 
   onCloseDialog() {
-    this.setState({openMenu: null, menuType: null, input1: "", input2: "", input3: "", input4: "", instagramMode: null});
+    this.setState({openMenu: null, menuType: null, input1: "", input2: "", input3: "", input4: ""});
   }
 
   openLink(url: string) {
@@ -1112,97 +990,6 @@ class APICard extends React.Component {
     }).listen(65010);
 
     this.setState({server: server});
-  }
-
-  _ig: IgApiClient = null;
-  _tfa: any = null;
-  onFinishAuthInstagram() {
-    this._ig = new IgApiClient();
-    this._tfa = null;
-    this._ig.state.generateDevice(this.state.input1);
-    this._ig.account.login(this.state.input1, this.state.input2).then((loggedInUser) => {
-      // Update props
-      this.props.onUpdateConfig((c) => {
-        c.remoteSettings.instagramUsername = this.state.input1;
-        c.remoteSettings.instagramPassword = this.state.input2;
-      });
-      // Update state
-      this.props.onUpdateSettings((s) => {
-        s.instagramUsername = this.state.input1;
-        s.instagramPassword = this.state.input2;
-      });
-      this.setState({snackbarOpen: true, snackbar: "Instagram is activated", snackbarSeverity: SS.success});
-      this.onCloseDialog();
-      this._ig = null;
-    }).catch((e) => {
-      if (e instanceof IgLoginTwoFactorRequiredError) {
-        this.setState({instagramMode: IG.tfa});
-        this._tfa = e.response.body.two_factor_info.two_factor_identifier;
-      } else if (e instanceof IgCheckpointError) {
-        this._ig.challenge.auto(true).then(() => {
-          this.setState({instagramMode: IG.checkpoint});
-        });
-      } else {
-        this.onCloseDialog();
-        console.error(e);
-        this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
-        this._ig = null;
-      }
-    });
-  }
-
-  onTFAInstagram() {
-    this._ig.account.twoFactorLogin({
-      twoFactorIdentifier: this._tfa,
-      verificationMethod: '1',
-      trustThisDevice: '1',
-      username: this.props.settings.instagramUsername,
-      verificationCode: this.state.input3,
-    }).then(() => {
-      // Update props
-      this.props.onUpdateConfig((c) => {
-        c.remoteSettings.instagramUsername = this.state.input1;
-        c.remoteSettings.instagramPassword = this.state.input2;
-      });
-      // Update state
-      this.props.onUpdateSettings((s) => {
-        s.instagramUsername = this.state.input1;
-        s.instagramPassword = this.state.input2;
-      });
-      this.setState({snackbarOpen: true, snackbar: "Instagram is activated", snackbarSeverity: SS.success});
-      this.onCloseDialog();
-      this._ig = null;
-      this._tfa = null;
-    }).catch((e) => {
-      this.onCloseDialog();
-      console.error(e);
-      this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
-      this._ig = null;
-      this._tfa = null;
-    });
-  }
-
-  onCheckpointInstagram() {
-    this._ig.challenge.sendSecurityCode(this.state.input3).then(() => {
-      // Update props
-      this.props.onUpdateConfig((c) => {
-        c.remoteSettings.instagramUsername = this.state.input1;
-        c.remoteSettings.instagramPassword = this.state.input2;
-      });
-      // Update state
-      this.props.onUpdateSettings((s) => {
-        s.instagramUsername = this.state.input1;
-        s.instagramPassword = this.state.input2;
-      });
-      this.setState({snackbarOpen: true, snackbar: "Instagram is activated", snackbarSeverity: SS.success});
-      this.onCloseDialog();
-      this._ig = null;
-    }).catch((e) => {
-      this.onCloseDialog();
-      console.error(e);
-      this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
-      this._ig = null;
-    });
   }
 
   onFinishAuthHydrus() {

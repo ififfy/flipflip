@@ -5,7 +5,6 @@ import tumblr from "tumblr.js";
 import Snoowrap from "snoowrap";
 import * as imgur from "imgur";
 import * as Twitter from "twitter";
-import {IgApiClient} from "instagram-private-api";
 
 import {IF, RF, RT, ST, WF} from "../../data/const";
 import Config from "../../data/Config";
@@ -64,7 +63,6 @@ let redditAlerted = false;
 let tumblrAlerted = false;
 let tumblr429Alerted = false;
 let twitterAlerted = false;
-let instagramAlerted = false;
 let hydrusAlerted = false;
 let piwigoAlerted = false;
 
@@ -73,7 +71,6 @@ export const reset = () => {
   tumblrAlerted = false;
   tumblr429Alerted = false;
   twitterAlerted = false;
-  instagramAlerted = false;
   hydrusAlerted = false;
   piwigoAlerted = false;
 }
@@ -1326,178 +1323,6 @@ export const loadDeviantArt = (allURLs: Map<string, Array<string>>, allPosts: Ma
         timeout: timeout,
       }, resolve);
     });
-}
-
-let ig: IgApiClient = null;
-let session: any = null;
-export const loadInstagram = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
-  const timeout = 3000;
-  const configured = config.remoteSettings.instagramUsername != "" && config.remoteSettings.instagramPassword != "";
-  if (configured) {
-    const url = source.url;
-    const processItems = (items: any, helpers: {next: any, count: number, retries: number, uuid: string}) => {
-      let images = Array<string>();
-      for (let item of items) {
-        if (item.carousel_media) {
-          for (let media of item.carousel_media) {
-            images.push(media.image_versions2.candidates[0].url);
-          }
-        }
-        if (item.video_versions) {
-          images.push(item.video_versions[0].url);
-        } else if (item.image_versions2) {
-          images.push(item.image_versions2.candidates[0].url);
-        }
-      }
-      // Strict filter won't work because instagram media needs the extra parameters on the end
-      helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
-      pm({
-        data: filterPathsToJustPlayable(filter, images, false),
-        allURLs: allURLs,
-        allPosts: allPosts,
-        weight: weight,
-        helpers: helpers,
-        source: source,
-        timeout: timeout,
-      }, resolve);
-    };
-
-    if (ig == null) {
-      ig = new IgApiClient();
-      ig.state.generateDevice(config.remoteSettings.instagramUsername);
-      ig.account.login(config.remoteSettings.instagramUsername, config.remoteSettings.instagramPassword).then((loggedInUser) => {
-        ig.state.serializeCookieJar().then((cookies) => {
-          session = JSON.stringify(cookies);
-          if (url.endsWith("/saved")) {
-            const saved = ig.feed.saved();
-            saved.items().then((items) => {
-              helpers.next = [null, saved.serialize()];
-              processItems(items, helpers);
-            }).catch((e) => pm({
-              error: e.message,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            }, resolve));
-          } else {
-            ig.user.getIdByUsername(getFileGroup(url)).then((id) => {
-              const userFeed = ig.feed.user(id);
-              userFeed.items().then((items) => {
-                helpers.next = [id, userFeed.serialize()];
-                processItems(items, helpers);
-              }).catch((e) => pm({
-                error: e.message,
-                helpers: helpers,
-                source: source,
-                timeout: timeout,
-              }, resolve));
-            }).catch((e) => pm({
-              error: e.message,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            }, resolve));
-          }
-        }).catch((e) => pm({
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        }, resolve));
-      }).catch((e) => {
-        pm({
-          error: e.message,
-          systemMessage: e + "\n\nVisit Settings to authorize Instagram and attempt to resolve this issue.",
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        }, resolve);
-        ig = null;
-      });
-    } else if (helpers.next == 0) {
-      if (url.endsWith("/saved")) {
-        const saved = ig.feed.saved();
-        saved.items().then((items) => {
-          helpers.next = [null, saved.serialize()];
-          processItems(items, helpers);
-        }).catch((e) => pm({
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        }, resolve));
-      } else {
-        ig.user.getIdByUsername(getFileGroup(url)).then((id) => {
-          const userFeed = ig.feed.user(id);
-          userFeed.items().then((items) => {
-            helpers.next = [id, userFeed.serialize()];
-            processItems(items, helpers);
-          }).catch((e) => pm({
-            error: e.message,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          }, resolve));
-        }).catch((e) => pm({
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        }, resolve));
-      }
-    } else {
-      ig.state.deserializeCookieJar(JSON.parse(session)).then((data) => {
-        const id = helpers.next[0];
-        const feedSession = helpers.next[1];
-        let feed: any;
-        if (url.endsWith("/saved")) {
-          feed = ig.feed.saved();
-        } else {
-          feed = ig.feed.user(id)
-        }
-        feed.deserialize(feedSession);
-        if (!feed.isMoreAvailable()) {
-          helpers.next = null;
-          pm({
-            data: [],
-            allURLs: allURLs,
-            allPosts: allPosts,
-            weight: weight,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          }, resolve);
-          return;
-        }
-        feed.items().then((items: any) => {
-          helpers.next = [id, feed.serialize()];
-          processItems(items, helpers);
-        }).catch((e: any) => pm({
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        }, resolve));
-      }).catch((e) => pm({
-        error: e.message,
-        helpers: helpers,
-        source: source,
-        timeout: timeout,
-      }, resolve));
-    }
-  } else {
-    let systemMessage = undefined;
-    if (!instagramAlerted) {
-      systemMessage = "You haven't authorized FlipFlip to work with Instagram yet.\nVisit Settings to authorize Instagram.";
-      instagramAlerted = true;
-    }
-    pm({
-      systemMessage: systemMessage,
-      helpers: helpers,
-      source: source,
-      timeout: timeout,
-    }, resolve);
-  }
 }
 
 export const loadE621 = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
@@ -3050,8 +2875,6 @@ export function getSourceType(url: string): string {
     return ST.twitter;
   } else if (/^https?:\/\/(www\.)?deviantart\.com\//.exec(url) != null) {
     return ST.deviantart;
-  } else if (/^https?:\/\/(www\.)?instagram\.com\//.exec(url) != null) {
-    return ST.instagram;
   } else if (/^https?:\/\/(www\.)?(lolibooru\.moe|hypnohub\.net|danbooru\.donmai\.us)\//.exec(url) != null) {
     return ST.danbooru;
   } else if (/^https?:\/\/(www\.)?(gelbooru\.com|furry\.booru\.org|rule34\.xxx|realbooru\.com|safebooru\.org)\//.exec(url) != null) {
@@ -3139,12 +2962,6 @@ export function getFileGroup(url: string) {
         authorID = authorID.substring(0, authorID.indexOf("/"));
       }
       return authorID;
-    case ST.instagram:
-      let instagramID = url.replace(/https?:\/\/www.instagram.com\//, "");
-      if (instagramID.includes("/")) {
-        instagramID = instagramID.substring(0, instagramID.indexOf("/"));
-      }
-      return instagramID;
     case ST.e621:
       const hostRegexE621 = /^https?:\/\/(?:www\.)?([^.]*)\./g;
       const hostE621 =  hostRegexE621.exec(url)[1];

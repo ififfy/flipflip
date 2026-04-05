@@ -3,7 +3,6 @@ import * as React from 'react';
 import {SvgIcon} from "@mui/material";
 import AudiotrackIcon from "@mui/icons-material/Audiotrack";
 import FolderIcon from '@mui/icons-material/Folder';
-import InstagramIcon from '@mui/icons-material/Instagram';
 import ListIcon from '@mui/icons-material/List';
 import MovieIcon from '@mui/icons-material/Movie';
 import RedditIcon from '@mui/icons-material/Reddit';
@@ -270,8 +269,6 @@ export default class SourceIcon extends React.Component {
         return <RedGifsIcon className={this.props.className}/>;
       case ST.twitter:
         return <TwitterIcon style={{color: "red"}} className={this.props.className}/>;
-      case ST.instagram:
-        return <InstagramIcon className={this.props.className}/>;
       case ST.tumblr:
         return <TumblrIcon className={this.props.className}/>;
       case ST.imagefap:

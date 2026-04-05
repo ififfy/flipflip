@@ -157,7 +157,6 @@ const ST = { // source types
   imgur: 'st.imgur',
   twitter: 'st.twitter',
   deviantart: 'st.deviantart',
-  instagram: 'st.instagram',
   danbooru: 'st.danbooru',
   e621: 'st.e621',
   luscious: 'st.luscious',
@@ -236,13 +235,7 @@ const PR = { // Global progress functions
   bpm: 'pr.bpm',
   tumblr: 'pr.tumblr',
   reddit: 'pr.reddit',
-  twitter: 'pr.twitter',
-  instagram: 'pr.instagram',
-};
-
-const IG = { // Instagram modes
-  tfa: 'ig.tfa',
-  checkpoint: 'ig.checkpoint',
+  twitter: 'pr.twitter'
 };
 
 const RF = { // Reddit functions

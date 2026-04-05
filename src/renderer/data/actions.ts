@@ -3,7 +3,6 @@ import wretch from "wretch";
 import tumblr, {TumblrClient} from "tumblr.js";
 import Snoowrap from "snoowrap";
 import Twitter from "twitter";
-import {IgApiClient} from "instagram-private-api";
 import {analyze} from "web-audio-beat-detector";
 import {parseFile} from "music-metadata";
 import moment from "moment";
@@ -3740,107 +3739,5 @@ export function importTwitter(getState: () => State, setState: Function) {
     });
     win.setProgressBar(2);
     twitterImportLoop();
-  }
-}
-
-let ig: IgApiClient = null;
-let session: any = null;
-export function importInstagram(getState: () => State, setState: Function) {
-  const win = remote.getCurrentWindow();
-  const processItems = (items: any, next: any) => {
-    let following = [];
-    for (let account of items) {
-      const accountURL = "https://www.instagram.com/" + account.username + "/";
-      following.push(accountURL);
-    }
-
-    // dedup
-    const newestState = getState();
-    let sourceURLs = newestState.library.map((s) => s.url);
-    following = following.filter((s) => !sourceURLs.includes(s));
-
-    let id = newestState.library.length + 1;
-    newestState.library.forEach((s) => {
-      id = Math.max(s.id + 1, id);
-    });
-
-    // Add to Library
-    let newLibrary = newestState.library;
-    for (let url of following) {
-      newLibrary = newLibrary.concat([new LibrarySource({
-        url: url,
-        id: id,
-        tags: new Array<Tag>(),
-      })]);
-      id += 1;
-    }
-    setState({library: newLibrary});
-
-    // Loop until we run out of blogs
-    setTimeout(instagramImportLoop, 1500);
-    state.progressNext = next;
-    state.progressCurrent = state.progressCurrent + 1;
-    setState({progressNext: state.progressNext, progressCurrent: state.progressCurrent});
-    win.setProgressBar(2);
-  };
-
-  const error = (error: string) => {
-    win.setProgressBar(-1);
-    setState({systemMessage: error, progressMode: null, progressNext: null, progressCurrent: 0});
-    console.error(error);
-    ig = null;
-  };
-
-  // Define our loop
-  const instagramImportLoop = () => {
-    const state = getState();
-    if (state.progressMode == PR.cancel) {
-      win.setProgressBar(-1);
-      setState({progressMode: null, progressNext: null, progressCurrent: 0});
-      return;
-    }
-    if (ig == null) {
-      ig = new IgApiClient();
-      ig.state.generateDevice(state.config.remoteSettings.instagramUsername);
-      ig.account.login(state.config.remoteSettings.instagramUsername, state.config.remoteSettings.instagramPassword).then((loggedInUser) => {
-        ig.state.serializeCookieJar().then((cookies) => {
-          session = JSON.stringify(cookies);
-          const followingFeed = ig.feed.accountFollowing(loggedInUser.pk);
-          followingFeed.items().then((items) => {
-            processItems(items, loggedInUser.pk + "~" + followingFeed.serialize());
-          }).catch((e) => {error(e);});
-        }).catch((e) => {error(e);});
-      }).catch((e) => {error(e);});
-    } else {
-      ig.state.deserializeCookieJar(JSON.parse(session)).then((data) => {
-        const id = (state.progressNext as string).split("~")[0];
-        const feedSession = (state.progressNext as string).split("~")[1];
-        const followingFeed = ig.feed.accountFollowing(id);
-        followingFeed.deserialize(feedSession);
-        if (!followingFeed.isMoreAvailable()) {
-          ig = null;
-          win.setProgressBar(-1);
-          setState({systemSnack: "Instagram Following Import has completed", systemSnackSeverity: SS.success, progressMode: null, progressNext: null, progressCurrent: 0});
-          return;
-        }
-        followingFeed.items().then((items) => {
-          processItems(items, id + "~" + followingFeed.serialize());
-        }).catch((e) => {error(e);});
-      }).catch((e) => {error(e);});
-    }
-  };
-
-  const state = getState();
-  if (!state.progressMode) {
-    // Show progress bar and kick off loop
-    state.progressMode = PR.instagram;
-    state.progressCurrent = 0;
-    setState({
-      systemSnack: "Your Instagram Following is being imported... You will recieve an alert when the import is finished.",
-      systemSnackSeverity: SS.info,
-      progressMode: state.progressMode, progressCurrent: state.progressCurrent
-    });
-    win.setProgressBar(2);
-    instagramImportLoop();
   }
 }
