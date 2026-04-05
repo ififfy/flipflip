@@ -1,8 +1,9 @@
 import fs from "fs";
 import path from "path";
 import moment from "moment";
+import rimraf from "rimraf";
 import Config from "../common/Config";
-import { saveDir, getBackups } from "./utils";
+import { saveDir, getBackups, savePath } from "./utils";
 import Backup from "../common/Backup";
 import AppStorageState from "../common/AppStorageState";
 import LibrarySource from "../common/LibrarySource";
@@ -15,6 +16,7 @@ import Playlist from "../common/Playlist";
 import Tag from "../common/Tag";
 import { Route } from "../common/Route";
 import defaultTheme from "../common/theme";
+import { reloadWindow } from "./WindowManager";
 
 export function cleanBackups(config: Config) {
   let backups = getBackups();
@@ -147,4 +149,9 @@ export function restoreFromBackup(backupFile: string): AppStorageState {
   };
 
   return state;
+}
+
+export function reset(windowId: number) {
+  rimraf.sync(savePath);
+  reloadWindow(windowId);
 }

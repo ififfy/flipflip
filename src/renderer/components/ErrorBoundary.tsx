@@ -254,9 +254,7 @@ export default class ErrorBoundary extends React.Component {
   }
 
   reset() {
-    fs_rimrafSync(savePath);
-    // FIXME
-    // remote.getCurrentWindow().reload();
+    window.ipc.reset();
   }
 
   resetCheck() {

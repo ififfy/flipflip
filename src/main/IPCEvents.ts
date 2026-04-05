@@ -9,7 +9,7 @@ import {
   createBackup,
 } from "./storage/StorageManager";
 import AppStorageState from "../common/AppStorageState";
-import { cleanBackups, restoreFromBackup } from "./actions";
+import { cleanBackups, reset, restoreFromBackup } from "./actions";
 import Config from "../common/Config";
 
 // Define functions
@@ -45,6 +45,10 @@ function onOpenExternal(ev: IpcMainEvent, url: string) {
   shell.openExternal(url);
 }
 
+function onReset(ev: IpcMainEvent) {
+  reset(ev.sender.id);
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -61,6 +65,7 @@ export function initializeIpcEvents() {
   ipcMain.on(IPC.cleanBackups, onCleanBackups);
   ipcMain.handle(IPC.restoreBackup, onRestoreBackup);
   ipcMain.on(IPC.openExternal, onOpenExternal);
+  ipcMain.on(IPC.reset, onReset);
 }
 
 export function releaseIpcEvents() {

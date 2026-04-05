@@ -83,3 +83,7 @@ export function createNewWindow() {
     newWindow.webContents.openDevTools();
   }
 }
+
+export function reloadWindow(windowId: number) {
+  currentWindows.get(windowId)?.reload();
+}
