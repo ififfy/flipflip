@@ -2,7 +2,6 @@ import {remote, webFrame} from "electron";
 import wretch from "wretch";
 import tumblr, {TumblrClient} from "tumblr.js";
 import Snoowrap from "snoowrap";
-import Twitter from "twitter";
 import {analyze} from "web-audio-beat-detector";
 import {parseFile} from "music-metadata";
 import moment from "moment";
@@ -3652,92 +3651,5 @@ export function importReddit(getState: () => State, setState: Function) {
     });
     win.setProgressBar(2);
     redditImportLoop();
-  }
-}
-
-export function importTwitter(getState: () => State, setState: Function) {
-  let twitter: any;
-  const win = remote.getCurrentWindow();
-  const twitterImportLoop = () => {
-    const state = getState();
-    if (state.progressMode == PR.cancel) {
-      win.setProgressBar(-1);
-      setState({progressMode: null, progressNext: null, progressCurrent: 0});
-      return;
-    }
-    twitter.get('friends/list', !state.progressNext ? {count: 200} : {count: 200, cursor: state.progressNext}, (error: any, data: any) => {
-      if (error) {
-        let message = "Error retrieving following:";
-        for (let e of error) {
-          message = message + "\n" + e.code + " - " + e.message;
-          console.error("Error retrieving following: " + e.code + " - " + e.message);
-        }
-        win.setProgressBar(-1);
-        setState({systemMessage: message, progressMode: null, progressNext: null, progressCurrent: 0});
-        return;
-      }
-
-      // Get the next 200 users
-      let following = [];
-      for (let user of data.users) {
-        const userURL = "https://twitter.com/" + user.screen_name;
-        following.push(userURL);
-      }
-
-      // dedup
-      const newestState = getState();
-      let sourceURLs = newestState.library.map((s) => s.url);
-      following = following.filter((s) => !sourceURLs.includes(s));
-
-      let id = newestState.library.length + 1;
-      newestState.library.forEach((s) => {
-        id = Math.max(s.id + 1, id);
-      });
-
-      // Add to Library
-      let newLibrary = newestState.library;
-      for (let url of following) {
-        newLibrary = newLibrary.concat([new LibrarySource({
-          url: url,
-          id: id,
-          tags: new Array<Tag>(),
-        })]);
-        id += 1;
-      }
-      setState({library: newLibrary});
-
-      if (data.next_cursor == 0) { // We're done
-        win.setProgressBar(-1);
-        setState({systemSnack: "Twitter Following Import has completed", systemSnackSeverity: SS.success, progressMode: null, progressNext: null, progressCurrent: 0});
-      } else {
-        // Loop until we run out of blogs
-        setTimeout(twitterImportLoop, 1500);
-        state.progressNext = data.next_cursor;
-        state.progressCurrent = state.progressCurrent + 1;
-        setState({progressNext: state.progressNext, progressCurrent: state.progressCurrent});
-        win.setProgressBar(2);
-      }
-    });
-  };
-
-  const state = getState();
-  if (!state.progressMode) {
-    twitter = new Twitter({
-      consumer_key: state.config.remoteSettings.twitterConsumerKey,
-      consumer_secret: state.config.remoteSettings.twitterConsumerSecret,
-      access_token_key: state.config.remoteSettings.twitterAccessTokenKey,
-      access_token_secret: state.config.remoteSettings.twitterAccessTokenSecret,
-    });
-
-    // Show progress bar and kick off loop
-    state.progressMode = PR.twitter;
-    state.progressCurrent = 0;
-    setState({
-      systemSnack: "Your Twitter Following is being imported... You will recieve an alert when the import is finished.",
-      systemSnackSeverity: SS.info,
-      progressMode: state.progressMode, progressCurrent: state.progressCurrent
-    });
-    win.setProgressBar(2);
-    twitterImportLoop();
   }
 }

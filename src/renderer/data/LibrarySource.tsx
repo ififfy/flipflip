@@ -26,9 +26,6 @@ export default class LibrarySource {
   // Reddit
   redditFunc: string;
   redditTime: string;
-  // Twitter
-  includeRetweets: boolean = false;
-  includeReplies: boolean = false;
 
   constructor(init?: Partial<LibrarySource>) {
     Object.assign(this, init);

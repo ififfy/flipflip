@@ -108,7 +108,6 @@ export default new Map<string, string>([
   ['st.imagefap', 'ImageFap'],
   ['st.sexcom', 'SexCom'],
   ['st.imgur', 'Imgur'],
-  ['st.twitter', 'Twitter'],
   ['st.deviantart', 'DeviantArt'],
   ['st.danbooru', 'Danbooru'],
   ['st.e621', 'E621'],

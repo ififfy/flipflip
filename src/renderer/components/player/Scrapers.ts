@@ -4,7 +4,6 @@ import {JSDOM} from 'jsdom';
 import tumblr from "tumblr.js";
 import Snoowrap from "snoowrap";
 import * as imgur from "imgur";
-import * as Twitter from "twitter";
 
 import {IF, RF, RT, ST, WF} from "../../data/const";
 import Config from "../../data/Config";
@@ -62,7 +61,6 @@ export const processAllURLs = (data: string[], allURLs: Map<string, string[]>, s
 let redditAlerted = false;
 let tumblrAlerted = false;
 let tumblr429Alerted = false;
-let twitterAlerted = false;
 let hydrusAlerted = false;
 let piwigoAlerted = false;
 
@@ -70,7 +68,6 @@ export const reset = () => {
   redditAlerted = false;
   tumblrAlerted = false;
   tumblr429Alerted = false;
-  twitterAlerted = false;
   hydrusAlerted = false;
   piwigoAlerted = false;
 }
@@ -1180,96 +1177,6 @@ export const loadImgur = (allURLs: Map<string, Array<string>>, allPosts: Map<str
         timeout: timeout,
       }, resolve);
     });
-}
-
-export const loadTwitter = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
-  const timeout = 3000;
-  let configured = config.remoteSettings.twitterAccessTokenKey != "" && config.remoteSettings.twitterAccessTokenSecret != "";
-  if (configured) {
-    const includeRetweets = source.includeRetweets;
-    const includeReplies = source.includeReplies;
-    const url = source.url;
-    const twitter = new Twitter({
-      consumer_key: config.remoteSettings.twitterConsumerKey,
-      consumer_secret: config.remoteSettings.twitterConsumerSecret,
-      access_token_key: config.remoteSettings.twitterAccessTokenKey,
-      access_token_secret: config.remoteSettings.twitterAccessTokenSecret,
-    });
-    twitter.get('statuses/user_timeline',
-      helpers.next == 0 ? {screen_name: getFileGroup(url), count: 200, exclude_replies: !includeReplies, include_rts: includeRetweets, tweet_mode: 'extended'} : {screen_name: getFileGroup(url), count: 200, exclude_replies: !includeReplies, include_rts: includeRetweets, tweet_mode: 'extended', max_id: helpers.next},
-      (error: any, tweets: any) => {
-        if (error) {
-          pm({
-            error: error.message,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          }, resolve);
-          return;
-        }
-        let images = Array<string>();
-        let lastID = "";
-        for (let t of tweets) {
-          // Skip FanCentro/OnlyFans/ClipTeez posts
-          if (/href="https?:\/\/(fancentro\.com|onlyfans\.com|mykink\.xxx)\/?"/.exec(t.source) != null) continue;
-          if (t.extended_entities && t.extended_entities.media) {
-            for (let m of t.extended_entities.media) {
-              let url;
-              if (m.video_info) {
-                url = m.video_info.variants[0].url;
-              } else {
-                url = m.media_url;
-              }
-              if (url.includes("?")) {
-                url = url.substring(0, url.lastIndexOf("?"));
-              }
-              images.push(url);
-            }
-          } else if (t.entities.media) {
-            for (let m of t.entities.media) {
-              images.push(m.media_url);
-            }
-          }
-          lastID = t.id;
-        }
-        if (lastID == helpers.next) {
-          helpers.next = null;
-          pm({
-            data: [],
-            allURLs: allURLs,
-            allPosts: allPosts,
-            weight: weight,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          }, resolve);
-        } else {
-          helpers.next = lastID;
-          helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
-          pm({
-            data: filterPathsToJustPlayable(filter, images, true),
-            allURLs: allURLs,
-            allPosts: allPosts,
-            weight: weight,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          }, resolve);
-        }
-      })
-  } else {
-    let systemMessage = undefined;
-    if (!twitterAlerted) {
-      systemMessage = "You haven't authorized FlipFlip to work with Twitter yet.\nVisit Settings to authorize Twitter.";
-      twitterAlerted = true;
-    }
-    pm({
-      systemMessage: systemMessage,
-      helpers: helpers,
-      source: source,
-      timeout: timeout,
-    }, resolve);
-  }
 }
 
 export const loadDeviantArt = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
@@ -2871,8 +2778,6 @@ export function getSourceType(url: string): string {
     return ST.imgur;
   } else if (/^https?:\/\/(www\.)?(cdn\.)?sex\.com\//.exec(url) != null) {
     return ST.sexcom;
-  } else if (/^https?:\/\/(www\.)?twitter\.com\//.exec(url) != null) {
-    return ST.twitter;
   } else if (/^https?:\/\/(www\.)?deviantart\.com\//.exec(url) != null) {
     return ST.deviantart;
   } else if (/^https?:\/\/(www\.)?(lolibooru\.moe|hypnohub\.net|danbooru\.donmai\.us)\//.exec(url) != null) {
@@ -2947,15 +2852,6 @@ export function getFileGroup(url: string) {
       let imgurID = url.replace(/https?:\/\/imgur.com\//, "");
       imgurID = imgurID.replace(/a\//, "");
       return imgurID;
-    case ST.twitter:
-      let twitterID = url.replace(/https?:\/\/twitter.com\//, "");
-      if (twitterID.includes("?")) {
-        twitterID = twitterID.substring(0, twitterID.indexOf("?"));
-      }
-      if (twitterID.endsWith("/")) {
-        twitterID = twitterID.substring(0, twitterID.length - 1);
-      }
-      return twitterID;
     case ST.deviantart:
       let authorID = url.replace(/https?:\/\/www.deviantart.com\//, "");
       if (authorID.includes("/")) {

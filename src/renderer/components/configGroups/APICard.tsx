@@ -107,7 +107,6 @@ class APICard extends React.Component {
     const classes = this.props.classes;
     const tumblrAuthorized = this.props.settings.tumblrOAuthToken != "" && this.props.settings.tumblrOAuthTokenSecret != "";
     const redditAuthorized = this.props.settings.redditRefreshToken != "";
-    const twitterAuthorized = this.props.settings.twitterAccessTokenKey != "" && this.props.settings.twitterAccessTokenSecret != "";
     const hydrusConfigured = this.props.settings.hydrusAPIKey != "";
     const piwigoConfigured = this.props.settings.piwigoProtocol != "" && this.props.settings.piwigoHost != "" && this.props.settings.piwigoUsername != "" && this.props.settings.piwigoPassword != "";
     const indexOf = this.props.settings.tumblrKeys.indexOf(this.props.settings.tumblrKey);
@@ -119,9 +118,6 @@ class APICard extends React.Component {
         break;
       case ST.reddit:
         menuTypeSignOut = this.onFinishClearReddit.bind(this);
-        break;
-      case ST.twitter:
-        menuTypeSignOut = this.onFinishClearTwitter.bind(this);
         break;
       case ST.hydrus:
         menuTypeSignOut = this.onFinishClearHydrus.bind(this);
@@ -152,16 +148,6 @@ class APICard extends React.Component {
                 onClick={redditAuthorized ? this.onClearReddit.bind(this) : this.onAuthReddit.bind(this)}
                 size="large">
                 <SourceIcon className={classes.icon} type={ST.reddit}/>
-              </Fab>
-            </Tooltip>
-          </Grid>*/}
-          {/*<Grid item>
-            <Tooltip disableInteractive title={twitterAuthorized ? "Authorized: Click to Sign Out of Twitter" : "Unauthorized: Click to Authorize Twitter"}  placement="top-end">
-              <Fab
-                className={clsx(classes.fab, twitterAuthorized ? classes.authorized : classes.noAuth)}
-                onClick={twitterAuthorized ? this.onClearTwitter.bind(this) : this.onAuthTwitter.bind(this)}
-                size="large">
-                <SourceIcon className={classes.icon} type={ST.twitter}/>
               </Fab>
             </Tooltip>
           </Grid>*/}
@@ -352,37 +338,6 @@ class APICard extends React.Component {
         </Dialog>
 
         <Dialog
-          open={this.state.openMenu == MO.signIn && this.state.menuType == ST.twitter}
-          onClose={this.onCloseDialog.bind(this)}
-          aria-labelledby="sign-in-title"
-          aria-describedby="sign-in-description">
-          <DialogTitle id="sign-in-title">
-            Twitter Sign In
-            <Avatar className={classes.iconAvatar}>
-              <SourceIcon className={classes.icon} type={ST.twitter}/>
-            </Avatar>
-          </DialogTitle>
-          <DialogContent>
-            <DialogContentText id="sign-in-description">
-              You are about to be directed to <Link
-              href="#"
-              onClick={this.openLink.bind(this, "https://www.twitter.com")}
-              underline="hover">Twitter.com</Link> to
-              authorize FlipFlip. You should only have to do this once. FlipFlip does not store any user information
-              or make any changes to your account.
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
-              Cancel
-            </Button>
-            <Button onClick={this.onFinishAuthTwitter.bind(this)} color="primary">
-              Authorize FlipFlip on Twitter
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-        <Dialog
           open={this.state.openMenu == MO.signIn && this.state.menuType == ST.hydrus}
           onClose={this.onCloseDialog.bind(this)}
           aria-labelledby="hydrus-title"
@@ -550,24 +505,6 @@ class APICard extends React.Component {
     this.onCloseDialog();
   }
 
-  onClearTwitter() {
-    this.setState({openMenu: MO.signOut, menuType: ST.twitter});
-  }
-
-  onFinishClearTwitter() {
-    // Update props
-    this.props.onUpdateConfig((c) => {
-      c.remoteSettings.twitterAccessTokenKey = "";
-      c.remoteSettings.twitterAccessTokenSecret = "";
-    });
-    // Update state
-    this.props.onUpdateSettings((s) => {
-      s.twitterAccessTokenKey = "";
-      s.twitterAccessTokenSecret = "";
-    });
-    this.onCloseDialog();
-  }
-
   onClearHydrus() {
     this.setState({openMenu: MO.signOut, menuType: ST.hydrus});
   }
@@ -647,10 +584,6 @@ class APICard extends React.Component {
 
   onAuthReddit() {
     this.setState({openMenu: MO.signIn, menuType: ST.reddit});
-  }
-
-  onAuthTwitter() {
-    this.setState({openMenu: MO.signIn, menuType: ST.twitter});
   }
 
   onAuthHydrus() {
@@ -890,98 +823,6 @@ class APICard extends React.Component {
             this.setState({snackbarOpen: true, snackbar: "Error: " + error, snackbarSeverity: SS.error});
           }
 
-          this.closeServer();
-          req.connection.destroy();
-        }
-      }
-      res.end();
-    }).listen(65010);
-
-    this.setState({server: server});
-  }
-
-  onFinishAuthTwitter() {
-    this.onCloseDialog();
-    this.closeServer();
-
-    // Twitter endpoints
-    const authorizeUrl = 'https://api.twitter.com/oauth/authorize';
-    const requestTokenUrl = 'https://api.twitter.com/oauth/request_token';
-    const accessTokenUrl = 'https://api.twitter.com/oauth/access_token';
-
-    const consumerKey = this.props.settings.twitterConsumerKey;
-    const consumerSecret = this.props.settings.twitterConsumerSecret;
-
-    const oauth = new OAuth(
-      requestTokenUrl,
-      accessTokenUrl,
-      consumerKey,
-      consumerSecret,
-      '1.0A',
-      'http://localhost:65010',
-      'HMAC-SHA1'
-    );
-
-    let sharedSecret = "";
-
-    oauth.getOAuthRequestToken((err: {statusCode: number, data: string}, token: string, secret: string) => {
-      if (err) {
-        console.error(err.statusCode + " - " + err.data);
-        this.setState({snackbarOpen: true, snackbar: "Error: " + err.statusCode + " - " + err.data, snackbarSeverity: SS.error});
-        this.closeServer();
-        return;
-      }
-
-      sharedSecret = secret;
-      remote.shell.openExternal(authorizeUrl + '?oauth_token=' + token);
-    });
-
-    // Start a server to listen for Twitter OAuth response
-    const server = http.createServer((req, res) => {
-      // Can't seem to get electron to properly return focus to FlipFlip, just alert the user in the response
-      const html = "<html><body><h1>Please return to FlipFlip</h1></body></html>";
-      res.writeHead(200, {"Content-Type": "text/html"});
-      res.write(html);
-
-      if (!req.url.endsWith("favicon.ico")) {
-        if (req.url.includes("oauth_token") && req.url.includes("oauth_verifier")) {
-          const args = req.url.replace("\/?", "").split("&");
-          const oauthToken = args[0].substring(12);
-          const oauthVerifier = args[1].substring(15);
-
-          oauth.getOAuthAccessToken(
-            oauthToken,
-            sharedSecret,
-            oauthVerifier,
-            (err: any, token: string, secret: string) => {
-              if (err) {
-                console.error("Validation failed with error", err);
-                this.setState({snackbarOpen: true, snackbar: "Error: " + err.statusCode + " - " + err.data, snackbarSeverity: SS.error});
-                this.closeServer();
-                req.connection.destroy();
-                res.end();
-                return;
-              }
-
-              // Update props
-              this.props.onUpdateConfig((c) => {
-                c.remoteSettings.twitterAccessTokenKey = token;
-                c.remoteSettings.twitterAccessTokenSecret = secret;
-              });
-              // Update state
-              this.props.onUpdateSettings((s) => {
-                s.twitterAccessTokenKey = token;
-                s.twitterAccessTokenSecret = secret;
-              });
-
-              this.setState({snackbarOpen: true, snackbar: "Twitter is now activated", snackbarSeverity: SS.success});
-              remote.getCurrentWindow().show();
-              this.closeServer();
-              req.connection.destroy();
-            }
-          );
-        } else {
-          this.setState({snackbarOpen: true, snackbar: "Error: Access Denied", snackbarSeverity: SS.error});
           this.closeServer();
           req.connection.destroy();
         }

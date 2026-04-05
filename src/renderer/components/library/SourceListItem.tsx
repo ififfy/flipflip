@@ -311,7 +311,7 @@ class SourceListItem extends React.Component {
                   color="primary"
                   size="small"/>
               )}
-              {(sourceType == ST.local || sourceType == ST.video || sourceType == ST.twitter || sourceType == ST.reddit) && (
+              {(sourceType == ST.local || sourceType == ST.video || sourceType == ST.reddit) && (
                 <IconButton
                   onClick={this.props.onSourceOptions.bind(this, this.props.source)}
                   className={classes.actionButton}

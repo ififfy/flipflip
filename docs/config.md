@@ -97,23 +97,6 @@ with your account. You should only ever have to do this once.~~
 * ~~Go back to FlipFlip~~
 * ~~You should see a Success! message~~
 
-### Twitter
-
-!> Twitter's API is no longer publicly available and so this service is no longer functioning in FlipFlip. If this changes
-in the future, access will be re-enabled.
-
-~~In order to use Twitter Profiles as sources or import your Following, you must first activate FlipFlip with your 
-account. You should only ever have to do this once.~~
-
-~~FlipFlip does not store any user information or make any changes to your account.~~
-
-* ~~Click the `Twitter` icon~~
-* ~~Click `OK` on the confirmation dialog~~
-* ~~You will be directed to Twitter.com in your browser~~
-* ~~Click `Allow` to give FlipFlip permission~~
-* ~~Go back to FlipFlip~~
-* ~~You should see a Success! message~~
-
 ### Hydrus
 In order to use a Hydrus server for sources, you'll need to provide the server details. This includes protocol 
 (`http` vs `https`), domain, port, and API Key.

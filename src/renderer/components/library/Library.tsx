@@ -366,7 +366,6 @@ class Library extends React.Component {
     onImportLibrary(importLibrary: any): void,
     onImportReddit(): void,
     onImportTumblr(): void,
-    onImportTwitter(): void,
     onManageTags(): void,
     onMarkOffline(): void,
     onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void,
@@ -398,11 +397,9 @@ class Library extends React.Component {
     const tumblrAuthorized = this.props.config.remoteSettings.tumblrOAuthToken != "" &&
       this.props.config.remoteSettings.tumblrOAuthTokenSecret != "";
     const redditAuthorized = this.props.config.remoteSettings.redditRefreshToken != "";
-    const twitterAuthorized = this.props.config.remoteSettings.twitterAccessTokenKey != "" &&
-      this.props.config.remoteSettings.twitterAccessTokenSecret != "";
     const piwigoConfigured = this.props.config.remoteSettings.piwigoProtocol != "" &&
       this.props.config.remoteSettings.piwigoHost != "";
-    const remoteAuthorized = tumblrAuthorized || redditAuthorized || twitterAuthorized;
+    const remoteAuthorized = tumblrAuthorized || redditAuthorized;
 
     let cancelProgressMessage;
     switch (this.props.progressMode) {
@@ -416,7 +413,6 @@ class Library extends React.Component {
         cancelProgressMessage = "Cancel Import ( " + this.props.progressCurrent + " / " + this.props.progressTotal + " )";
         break;
       case PR.reddit:
-      case PR.twitter:
         cancelProgressMessage = "Cancel Import";
         break;
     }
@@ -575,16 +571,6 @@ class Library extends React.Component {
                         <SourceIcon type={ST.reddit}/>
                       </ListItemIcon>
                       <ListItemText primary="Reddit" />
-                    </ListItem>
-                  </Tooltip>
-                )}*/}
-                {/*{twitterAuthorized && (
-                  <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Import from Twitter"}>
-                    <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onImportTwitter.bind(this)}>
-                      <ListItemIcon>
-                        <SourceIcon type={ST.twitter}/>
-                      </ListItemIcon>
-                      <ListItemText primary="Twitter" />
                     </ListItem>
                   </Tooltip>
                 )}*/}

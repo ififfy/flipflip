@@ -255,7 +255,6 @@ export default class Meta extends React.Component {
                   onImportLibrary={a(actions.importLibrary, appStorage.backup.bind(appStorage, this.state))}
                   onImportReddit={p(actions.importReddit)}
                   onImportTumblr={p(actions.importTumblr)}
-                  onImportTwitter={p(actions.importTwitter)}
                   onManageTags={a(actions.manageTags)}
                   onMarkOffline={p(actions.markOffline)}
                   onPlay={a(actions.playSceneFromLibrary)}

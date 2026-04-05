@@ -155,7 +155,6 @@ const ST = { // source types
   imagefap: 'st.imagefap',
   sexcom: 'st.sexcom',
   imgur: 'st.imgur',
-  twitter: 'st.twitter',
   deviantart: 'st.deviantart',
   danbooru: 'st.danbooru',
   e621: 'st.e621',
@@ -234,8 +233,7 @@ const PR = { // Global progress functions
   videoMetadata: 'pr.video',
   bpm: 'pr.bpm',
   tumblr: 'pr.tumblr',
-  reddit: 'pr.reddit',
-  twitter: 'pr.twitter'
+  reddit: 'pr.reddit'
 };
 
 const RF = { // Reddit functions

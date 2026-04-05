@@ -390,34 +390,6 @@ class SourceList extends React.Component {
             </DialogContent>
           </Dialog>
         )}
-        {this.state.sourceOptionsType == ST.twitter && (
-          <Dialog
-            open={this.state.sourceOptionsType == ST.twitter}
-            onClose={this.onCloseSourceOptions.bind(this)}
-            aria-describedby="twitter-options-description">
-            <DialogContent>
-              <DialogContentText id="twitter-options-description">
-                Twitter Options ({this.state.sourceOptions.url})
-              </DialogContentText>
-              <FormControlLabel
-                control={
-                  <Switch
-                    size="small"
-                    checked={this.state.sourceOptions.includeReplies}
-                    onChange={this.onSourceBoolInput.bind(this, 'includeReplies')}/>
-                }
-                label="Include Replies"/>
-              <FormControlLabel
-                control={
-                  <Switch
-                    size="small"
-                    checked={this.state.sourceOptions.includeRetweets}
-                    onChange={this.onSourceBoolInput.bind(this, 'includeRetweets')}/>
-                }
-                label="Include Retweets"/>
-            </DialogContent>
-          </Dialog>
-        )}
         {this.state.deleteDialog != null && (
           <Dialog
             open={true}

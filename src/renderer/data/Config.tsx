@@ -216,11 +216,6 @@ interface RemoteSettingsI {
   redditClientID: string;
   redditDeviceID: string;
   redditRefreshToken: string;
-
-  twitterConsumerKey: string;
-  twitterConsumerSecret: string;
-  twitterAccessTokenKey: string;
-  twitterAccessTokenSecret: string;
   
   hydrusProtocol: string;
   hydrusDomain: string;
@@ -531,11 +526,6 @@ export class RemoteSettings implements RemoteSettingsI {
   redditClientID = "2Iqe-1CsO4VQlA";
   redditDeviceID = "";
   redditRefreshToken = "";
-
-  twitterConsumerKey = "qSRfdIWfpkesYDVJHrRh05wji";
-  twitterConsumerSecret = "ad11IC4CLwVzYyGyYwHKVMP9WwAcKxymw4D9162S5Ex75l5eWw";
-  twitterAccessTokenKey = "";
-  twitterAccessTokenSecret = "";
 
   hydrusProtocol = "http";
   hydrusDomain = "localhost";

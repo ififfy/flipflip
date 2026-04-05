@@ -11,7 +11,7 @@ import {CancelablePromise, flatten, getCachePath, randomizeList, urlToPath} from
 import {
   filterPathsToJustPlayable, getFileName, getSourceType, isVideo, loadBDSMlr, loadDanbooru, loadDeviantArt, loadE621,
   loadEHentai, loadGelbooru1, loadGelbooru2, loadHydrus, loadImageFap, loadImgur, loadLuscious,
-  loadPiwigo, loadReddit, loadRedGifs, loadRemoteImageURLList, loadSexCom, loadTumblr, loadTwitter, processAllURLs
+  loadPiwigo, loadReddit, loadRedGifs, loadRemoteImageURLList, loadSexCom, loadTumblr, processAllURLs
 } from "./Scrapers";
 import {IF, SOF, ST} from '../../data/const';
 import Config from "../../data/Config";
@@ -93,8 +93,6 @@ function scrapeFiles(worker: any, pm: Function, allURLs: Map<string, Array<strin
       workerFunction = returnPromise ? loadSexComPromise : worker.loadSexCom;
     } else if (sourceType == ST.imgur) {
       workerFunction = returnPromise ? loadImgurPromise : worker.loadImgur;
-    } else if (sourceType == ST.twitter) {
-      workerFunction = returnPromise ? loadTwitterPromise : worker.loadTwitter;
     } else if (sourceType == ST.deviantart) {
       workerFunction = returnPromise ? loadDeviantArtPromise : worker.loadDeviantArt;
     } else if (sourceType == ST.danbooru) {
@@ -372,10 +370,6 @@ const loadSexComPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<st
 
 const loadImgurPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
   loadImgur(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
-}
-
-const loadTwitterPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {
-  loadTwitter(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
 }
 
 const loadDeviantArtPromise = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve: Function) => {

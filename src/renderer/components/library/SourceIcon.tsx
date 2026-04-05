@@ -7,7 +7,6 @@ import ListIcon from '@mui/icons-material/List';
 import MovieIcon from '@mui/icons-material/Movie';
 import RedditIcon from '@mui/icons-material/Reddit';
 import SubscriptionsIcon from '@mui/icons-material/Subscriptions';
-import TwitterIcon from '@mui/icons-material/Twitter';
 
 import {getSourceType} from "../player/Scrapers";
 import {ST} from "../../data/const";
@@ -267,8 +266,6 @@ export default class SourceIcon extends React.Component {
         return <RedditIcon style={{color: "red"}} className={this.props.className}/>;
       case ST.redgifs:
         return <RedGifsIcon className={this.props.className}/>;
-      case ST.twitter:
-        return <TwitterIcon style={{color: "red"}} className={this.props.className}/>;
       case ST.tumblr:
         return <TumblrIcon className={this.props.className}/>;
       case ST.imagefap:
