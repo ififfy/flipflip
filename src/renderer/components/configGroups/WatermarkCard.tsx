@@ -24,7 +24,7 @@ import {WC} from "../../data/const";
 import en from "../../data/en";
 import ColorPicker from "../config/ColorPicker";
 import {CancelablePromise} from "../../data/utils";
-import { fonts_getFonts } from "src/renderer/dummy/fonts";
+import { fonts_getFonts } from "../../dummy/fonts";
 
 const styles = (theme: Theme) => createStyles({
   fullWidth: {

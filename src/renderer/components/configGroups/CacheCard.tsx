@@ -32,7 +32,7 @@ import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import Config, {CacheSettings} from "../../data/Config";
 import {getCachePath, urlToPath} from "../../data/utils";
 import { fs_existsSync } from "../../dummy/fs";
-import { folder_getFolderSize } from "src/renderer/dummy/folder";
+import { folder_getFolderSize } from "../../dummy/folder";
 
 const styles = (theme: Theme) => createStyles({
   fullWidth: {

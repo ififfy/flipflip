@@ -66,7 +66,7 @@ import CodeMirror, {
 } from "./CodeMirror";
 import SceneGrid from "../../data/SceneGrid";
 import { fs_writeFileSync } from "../../dummy/fs";
-import { fonts_getFonts } from "src/renderer/dummy/fonts";
+import { fonts_getFonts } from "../../dummy/fonts";
 
 const styles = (theme: Theme) => createStyles({
   root: {

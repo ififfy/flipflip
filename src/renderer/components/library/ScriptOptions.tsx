@@ -23,7 +23,7 @@ import {green, red} from "@mui/material/colors";
 import {CancelablePromise} from "../../data/utils";
 import CaptionScript, {FontSettingsI} from "../../data/CaptionScript";
 import FontOptions from "./FontOptions";
-import { fonts_getFonts } from "src/renderer/dummy/fonts";
+import { fonts_getFonts } from "../../dummy/fonts";
 
 const styles = (theme: Theme) => createStyles({
   bpmProgress: {
