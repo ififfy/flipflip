@@ -221,6 +221,7 @@ const IPC = {
   reset: "ipc.reset",
   saveExport: "ipc.saveExport",
   openImport: "ipc.openImport",
+  openDirectory: "ipc.openDirectory",
 };
 
 const MO = {

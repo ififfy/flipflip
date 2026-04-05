@@ -112,7 +112,7 @@ export async function saveExport(
 export async function openImport(windowId: number) {
   const window = currentWindows.get(windowId);
   if (window == null) {
-    return;
+    return undefined;
   }
 
   const result = await dialog.showOpenDialog(window, {
@@ -122,5 +122,21 @@ export async function openImport(windowId: number) {
     ],
     properties: ["openFile"],
   });
+
   return result.filePaths.length > 0 ? result.filePaths[0] : undefined;
+}
+
+export async function openDirectory(
+  windowId: number,
+  multiSelections?: boolean,
+) {
+  const window = currentWindows.get(windowId);
+  if (window == null) {
+    return [];
+  }
+
+  const result = await dialog.showOpenDialog(window, {
+    properties: ["openDirectory"],
+  });
+  return result.filePaths;
 }

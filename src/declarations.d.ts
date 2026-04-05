@@ -79,6 +79,7 @@ declare global {
       reset: () => void;
       saveExport: (filePath: string, json: string) => void;
       openImport: () => Promise<string | undefined>;
+      openDirectory: (multiSelections?: boolean) => Promise<string[]>;
     };
   }
 }

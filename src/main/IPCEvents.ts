@@ -1,6 +1,11 @@
 import { ipcMain, IpcMainEvent, IpcMainInvokeEvent, shell } from "electron";
 
-import { createNewWindow, saveExport, openImport } from "./WindowManager";
+import {
+  createNewWindow,
+  saveExport,
+  openImport,
+  openDirectory,
+} from "./WindowManager";
 import { IPC } from "../common/const";
 import { getBackups } from "./utils";
 import {
@@ -57,6 +62,10 @@ async function onOpenImport(ev: IpcMainEvent) {
   return await openImport(ev.sender.id);
 }
 
+async function onOpenDirectory(ev: IpcMainEvent, multiSelections?: boolean) {
+  return await openDirectory(ev.sender.id, multiSelections);
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -76,12 +85,14 @@ export function initializeIpcEvents() {
   ipcMain.on(IPC.reset, onReset);
   ipcMain.on(IPC.saveExport, onSaveExport);
   ipcMain.handle(IPC.openImport, onOpenImport);
+  ipcMain.handle(IPC.openDirectory, onOpenDirectory);
 }
 
 export function releaseIpcEvents() {
   if (initialized) {
     ipcMain.removeAllListeners(IPC.newWindow);
     ipcMain.removeAllListeners(IPC.getBackups);
+    // FIXME removeAllListeners for all initialized events
   }
 
   initialized = false;

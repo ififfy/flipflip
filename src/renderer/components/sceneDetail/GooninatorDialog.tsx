@@ -127,10 +127,11 @@ class GooninatorDialog extends React.Component {
   }
 
   onRootChange() {
-    // FIXME
-    // let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']});
-    // if (!result || !result.length) return;
-    // this.setState({rootDir: result[0]});
+    window.ipc.openDirectory().then((result) => {
+      if (result.length > 0) {
+        this.setState({ rootDir: result[0] });
+      }
+    });
   }
 
   onImportURL() {
