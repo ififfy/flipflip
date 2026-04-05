@@ -7,6 +7,7 @@ import {
   openDirectory,
   openVideoDirs,
   openVideos,
+  openAudios,
 } from "./WindowManager";
 import { IPC } from "../common/const";
 import { getBackups } from "./utils";
@@ -76,6 +77,10 @@ async function onOpenVideos(ev: IpcMainEvent) {
   return await openVideos(ev.sender.id);
 }
 
+async function onOpenAudios(ev: IpcMainEvent, shiftKey: boolean) {
+  return await openAudios(ev.sender.id, shiftKey);
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -98,6 +103,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.openDirectory, onOpenDirectory);
   ipcMain.handle(IPC.openVideoDirs, onOpenVideoDirs);
   ipcMain.handle(IPC.openVideos, onOpenVideos);
+  ipcMain.handle(IPC.openAudios, onOpenAudios);
 }
 
 export function releaseIpcEvents() {

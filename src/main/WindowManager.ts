@@ -7,6 +7,7 @@ import { releaseIpcEvents } from "./IPCEvents";
 import { IPC } from "../common/const";
 import { getFilesRecursively } from "./utils";
 import {
+  isAudio,
   isVideo,
   isVideoPlaylist,
 } from "src/renderer/components/player/Scrapers";
@@ -186,4 +187,39 @@ export async function openVideos(windowId: number) {
   return result.filePaths.filter(
     (r) => isVideo(r, true) || isVideoPlaylist(r, true),
   );
+}
+
+export async function openAudios(windowId: number, shiftKey: boolean) {
+  const window = currentWindows.get(windowId);
+  if (window == null) {
+    return [];
+  }
+
+  let audios = new Array<string>();
+  if (shiftKey) {
+    const result = await dialog.showOpenDialog(window, {
+      filters: [{ name: "All Files (*.*)", extensions: ["*"] }],
+      properties: ["openDirectory", "multiSelections"],
+    });
+
+    for (const filePath of result.filePaths) {
+      if (fs.existsSync(filePath) && fs.lstatSync(filePath).isDirectory()) {
+        audios = audios.concat(getFilesRecursively(filePath));
+      } else {
+        audios.push(filePath);
+      }
+    }
+  } else {
+    const result = await dialog.showOpenDialog(window, {
+      filters: [
+        { name: "All Files (*.*)", extensions: ["*"] },
+        { name: "Audio files", extensions: ["mp3", "m4a", "wav", "ogg"] },
+      ],
+      properties: ["openFile", "multiSelections"],
+    });
+
+    audios = result.filePaths;
+  }
+
+  return audios.filter((r) => isAudio(r, true));
 }

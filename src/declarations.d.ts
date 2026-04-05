@@ -82,6 +82,7 @@ declare global {
       openDirectory: () => Promise<string[]>;
       openVideoDirs: () => Promise<string[]>;
       openVideos: () => Promise<string[]>;
+      openAudios: (shiftKey: boolean) => Promise<string[]>;
     };
   }
 }
