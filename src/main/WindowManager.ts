@@ -293,3 +293,22 @@ export async function openScript(windowId: number) {
 
   return result.filePaths.length > 0 ? result.filePaths[0] : undefined;
 }
+
+export async function saveScript(windowId: number, script: string) {
+  const window = currentWindows.get(windowId);
+  if (window == null) {
+    return undefined;
+  }
+
+  const result = await dialog.showSaveDialog(window, {
+    filters: [{ name: "Text Document", extensions: ["txt"] }],
+    defaultPath: this.state.captionScript.url,
+  });
+
+  if (result.canceled) {
+    return undefined;
+  }
+
+  fs.writeFileSync(result.filePath, script);
+  return result.filePath;
+}

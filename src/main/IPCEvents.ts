@@ -11,6 +11,7 @@ import {
   openScripts,
   openSubtitle,
   openScript,
+  saveScript,
 } from "./WindowManager";
 import { IPC } from "../common/const";
 import { getBackups } from "./utils";
@@ -96,6 +97,10 @@ async function onOpenScript(ev: IpcMainEvent) {
   return await openScript(ev.sender.id);
 }
 
+async function onSaveScript(ev: IpcMainEvent, script: string) {
+  return await saveScript(ev.sender.id, script);
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -122,6 +127,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.openScripts, onOpenScripts);
   ipcMain.handle(IPC.openSubtitle, onOpenSubtitle);
   ipcMain.handle(IPC.openScript, onOpenScript);
+  ipcMain.handle(IPC.saveScript, onSaveScript);
 }
 
 export function releaseIpcEvents() {

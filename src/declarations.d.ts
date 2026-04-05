@@ -86,6 +86,7 @@ declare global {
       openScripts: (shiftKey: boolean) => Promise<string[]>;
       openSubtitle: () => Promise<string | undefined>;
       openScript: () => Promise<string | undefined>;
+      saveScript: (script: string) => Promise<string | undefined>;
     };
   }
 }

@@ -1279,50 +1279,48 @@ class CaptionScriptor extends React.Component {
   }
 
   onSaveThen(then: () => void) {
-    if (this.onSave()) {
-      then();
-    }
+    this.onSave(then);
   }
 
   onSaveMenu(e: MouseEvent) {
     this.setState({ menuAnchorEl: e.currentTarget, openMenu: MO.save });
   }
 
-  onSave() {
+  onSave(callback?: () => void) {
     this.onCloseDialog();
     if (!this.state.captionScript.url) {
-      return this.onSaveAs();
-    } else {
-      if (!this.state.captionScript.url.startsWith("http")) {
-        fs_writeFileSync(
-          this.state.captionScript.url,
-          this.state.captionScript.script,
-        );
-        this.setState({ scriptChanged: false });
-        return true;
-      } else {
-        return false;
+      this.onSaveAs(callback);
+    } else if (!this.state.captionScript.url.startsWith("http")) {
+      fs_writeFileSync(
+        this.state.captionScript.url,
+        this.state.captionScript.script,
+      );
+      this.setState({ scriptChanged: false });
+      if (callback != null) {
+        callback();
       }
     }
   }
 
-  onSaveAs() {
+  onSaveAs(callback?: () => void) {
     this.onCloseDialog();
-    // FIXME
-    // remote.dialog.showSaveDialog(remote.getCurrentWindow(),
-    //   { filters: [{ name: 'Text Document', extensions: ['txt'] }], defaultPath: this.state.captionScript.url }, (filePath) => {
-    //     if (filePath != null) {
-    //       fs_writeFileSync(filePath, this.state.captionScript.script);
-    //       const setURL = (script: CaptionScript) => {
-    //         script.url = filePath;
-    //         return script;
-    //       }
-    //       this.setState({ captionScript: setURL(this.state.captionScript), scriptChanged: false });
-    //       return true;
-    //     } else {
-    //       return false;
-    //     }
-    //   });
+    window.ipc.saveScript(this.state.captionScript.script).then((filePath) => {
+      if (filePath == null) {
+        return;
+      }
+
+      const setURL = (script: CaptionScript) => {
+        script.url = filePath;
+        return script;
+      };
+      this.setState({
+        captionScript: setURL(this.state.captionScript),
+        scriptChanged: false,
+      });
+      if (callback != null) {
+        callback();
+      }
+    });
   }
 
   onSaveToLibrary() {

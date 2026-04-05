@@ -228,6 +228,7 @@ const IPC = {
   openScripts: "ipc.openScripts",
   openSubtitle: "ipc.openSubtitle",
   openScript: "ipc.openScript",
+  saveScript: "ipc.saveScript",
 };
 
 const MO = {
