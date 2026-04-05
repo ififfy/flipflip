@@ -25,9 +25,9 @@ const defaultTheme = {
       main: "#f44336",
     },
     text: {
-      hint: 'rgba(0, 0, 0, 0.38)',
-    }
-  }
+      hint: "rgba(0, 0, 0, 0.38)",
+    },
+  },
 };
 
 export default defaultTheme;

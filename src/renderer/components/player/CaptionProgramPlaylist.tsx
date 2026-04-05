@@ -1,44 +1,49 @@
 import * as React from "react";
 
-import {randomizeList} from "../../data/utils";
+import { randomizeList } from "../../data/utils";
 import Audio from "../../data/Audio";
 import Scene from "../../data/Scene";
 import Tag from "../../data/Tag";
 import CaptionProgram from "./CaptionProgram";
 import ChildCallbackHack from "./ChildCallbackHack";
 import CaptionScript from "../../data/CaptionScript";
-import {RP} from "../../data/const";
+import { RP } from "../../data/const";
 
 export default class CaptionProgramPlaylist extends React.Component {
   readonly props: {
-    playlistIndex: number,
-    playlist: { scripts: Array<CaptionScript>, shuffle: boolean, repeat: string },
-    currentAudio: Audio
-    currentImage: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement,
-    scale: number,
-    scene: Scene,
-    timeToNextFrame: number,
-    getTags(source: string, clipID?: string): Array<Tag>,
-    goBack(): void,
-    orderScriptTags(script: CaptionScript): void,
-    playNextScene(): void,
-    jumpToHack?: ChildCallbackHack,
-    persist?: boolean,
-    advance?(): void,
-    getCurrentTimestamp?(): number,
-    onError?(e: string): void,
-    systemMessage?(message: string): void,
+    playlistIndex: number;
+    playlist: {
+      scripts: Array<CaptionScript>;
+      shuffle: boolean;
+      repeat: string;
+    };
+    currentAudio: Audio;
+    currentImage: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement;
+    scale: number;
+    scene: Scene;
+    timeToNextFrame: number;
+    getTags(source: string, clipID?: string): Array<Tag>;
+    goBack(): void;
+    orderScriptTags(script: CaptionScript): void;
+    playNextScene(): void;
+    jumpToHack?: ChildCallbackHack;
+    persist?: boolean;
+    advance?(): void;
+    getCurrentTimestamp?(): number;
+    onError?(e: string): void;
+    systemMessage?(message: string): void;
   };
 
   readonly state = {
-    currentIndex: this.props.playlistIndex == 0 ? this.props.scene.scriptStartIndex : 0,
+    currentIndex:
+      this.props.playlistIndex == 0 ? this.props.scene.scriptStartIndex : 0,
     playingScripts: Array<CaptionScript>(),
-  }
+  };
 
   render() {
     let script = this.state.playingScripts[this.state.currentIndex];
     if (!script) script = this.props.playlist.scripts[this.state.currentIndex];
-    if (!script) return <div/>;
+    if (!script) return <div />;
     return (
       <CaptionProgram
         captionScript={script}
@@ -56,7 +61,8 @@ export default class CaptionProgramPlaylist extends React.Component {
         currentImage={this.props.currentImage}
         jumpToHack={this.props.jumpToHack}
         advance={this.props.advance}
-        onError={this.props.onError}/>
+        onError={this.props.onError}
+      />
     );
   }
 
@@ -68,7 +74,7 @@ export default class CaptionProgramPlaylist extends React.Component {
 
   componentDidMount() {
     if (this.props.playlistIndex == 0 && this.props.scene.scriptScene) {
-      window.addEventListener('keydown', this.onKeyDown, false);
+      window.addEventListener("keydown", this.onKeyDown, false);
     }
     this.restart();
   }
@@ -78,36 +84,40 @@ export default class CaptionProgramPlaylist extends React.Component {
     if (this.props.playlist.shuffle) {
       scripts = randomizeList(Array.from(scripts));
     }
-    this.setState({playingScripts: scripts});
+    this.setState({ playingScripts: scripts });
   }
 
   componentWillUnmount() {
     if (this.props.playlistIndex == 0 && this.props.scene.scriptScene) {
-      window.removeEventListener('keydown', this.onKeyDown);
+      window.removeEventListener("keydown", this.onKeyDown);
     }
   }
 
   onKeyDown = (e: KeyboardEvent) => {
     switch (e.key) {
-      case '[':
+      case "[":
         e.preventDefault();
-        this.props.orderScriptTags(this.props.playlist.scripts[this.state.currentIndex]);
+        this.props.orderScriptTags(
+          this.props.playlist.scripts[this.state.currentIndex],
+        );
         this.prevTrack();
         break;
-      case ']':
+      case "]":
         e.preventDefault();
-        this.props.orderScriptTags(this.props.playlist.scripts[this.state.currentIndex]);
+        this.props.orderScriptTags(
+          this.props.playlist.scripts[this.state.currentIndex],
+        );
         this.nextTrack();
         break;
     }
-  }
+  };
 
   prevTrack() {
     let prevTrack = this.state.currentIndex - 1;
     if (prevTrack < 0) {
       prevTrack = this.props.playlist.scripts.length - 1;
     }
-    this.setState({currentIndex: prevTrack});
+    this.setState({ currentIndex: prevTrack });
   }
 
   nextTrack() {
@@ -119,8 +129,8 @@ export default class CaptionProgramPlaylist extends React.Component {
         nextTrack = 0;
       }
     }
-    this.setState({currentIndex: nextTrack});
+    this.setState({ currentIndex: nextTrack });
   }
 }
 
-(CaptionProgramPlaylist as any).displayName="CaptionProgramPlaylist";
+(CaptionProgramPlaylist as any).displayName = "CaptionProgramPlaylist";

@@ -1,19 +1,19 @@
-import * as React from 'react';
-import {animated, useTransition} from "react-spring";
+import * as React from "react";
+import { animated, useTransition } from "react-spring";
 
-import {TF} from "../../data/const";
-import {getEaseFunction} from "../../data/utils";
+import { TF } from "../../data/const";
+import { getEaseFunction } from "../../data/utils";
 import Scene from "../../data/Scene";
 import Audio from "../../data/Audio";
 
 export default class FadeInOut extends React.Component {
   readonly props: {
-    toggleFade: boolean,
-    currentAudio: Audio,
-    timeToNextFrame: number,
-    scene: Scene,
-    fadeFunction: Function,
-    children?: React.ReactNode,
+    toggleFade: boolean;
+    currentAudio: Audio;
+    timeToNextFrame: number;
+    scene: Scene;
+    fadeFunction: Function;
+    children?: React.ReactNode;
   };
 
   readonly state = {
@@ -27,27 +27,22 @@ export default class FadeInOut extends React.Component {
 
   render() {
     // TODO Fix with TF.scene
-    return (
-      <this.FadeInOutLayer>
-        {this.props.children}
-      </this.FadeInOutLayer>
-    );
+    return <this.FadeInOutLayer>{this.props.children}</this.FadeInOutLayer>;
   }
 
-
   _lastToggle: any = null;
-  FadeInOutLayer = (data: {children: React.ReactNode}) => {
+  FadeInOutLayer = (data: { children: React.ReactNode }) => {
     const sceneTiming = this.props.scene.fadeIOTF == TF.scene;
     if (this.props.toggleFade != this._lastToggle) {
       this._fadeOut = false;
       this._lastToggle = this.props.toggleFade;
     }
-    let fadeTransitions: [{ item: any, props: any, key: any }];
+    let fadeTransitions: [{ item: any; props: any; key: any }];
     if (sceneTiming) {
       fadeTransitions = useTransition(
         this._fadeOut ? null : this.props.toggleFade,
         (toggle: any) => {
-          return toggle
+          return toggle;
         },
         {
           from: {
@@ -62,10 +57,23 @@ export default class FadeInOut extends React.Component {
           unique: true,
           config: {
             duration: this.getDuration(),
-            easing : this._fadeOut ? getEaseFunction(this.props.scene.fadeIOEndEase, this.props.scene.fadeIOEndExp, this.props.scene.fadeIOEndAmp, this.props.scene.fadeIOEndPer, this.props.scene.fadeIOEndOv) :
-              getEaseFunction(this.props.scene.fadeIOStartEase, this.props.scene.fadeIOStartExp, this.props.scene.fadeIOStartAmp, this.props.scene.fadeIOStartPer, this.props.scene.fadeIOStartOv)
+            easing: this._fadeOut
+              ? getEaseFunction(
+                  this.props.scene.fadeIOEndEase,
+                  this.props.scene.fadeIOEndExp,
+                  this.props.scene.fadeIOEndAmp,
+                  this.props.scene.fadeIOEndPer,
+                  this.props.scene.fadeIOEndOv,
+                )
+              : getEaseFunction(
+                  this.props.scene.fadeIOStartEase,
+                  this.props.scene.fadeIOStartExp,
+                  this.props.scene.fadeIOStartAmp,
+                  this.props.scene.fadeIOStartPer,
+                  this.props.scene.fadeIOStartOv,
+                ),
           },
-        }
+        },
       );
       clearTimeout(this._fadeTimeout);
       if (this._fadeOut) {
@@ -76,14 +84,14 @@ export default class FadeInOut extends React.Component {
       } else {
         this._fadeTimeout = setTimeout(() => {
           this._fadeOut = true;
-          this.setState({toggleFade: !this.state.toggleFade});
+          this.setState({ toggleFade: !this.state.toggleFade });
         }, this.getDuration());
       }
     } else {
       fadeTransitions = useTransition(
         this.state.toggleFade,
         (toggle: any) => {
-          return toggle
+          return toggle;
         },
         {
           from: {
@@ -98,28 +106,42 @@ export default class FadeInOut extends React.Component {
           unique: true,
           config: {
             duration: this.state.duration,
-            easing : this.state.toggleFade ? getEaseFunction(this.props.scene.panEndEase, this.props.scene.panEndExp, this.props.scene.panEndAmp, this.props.scene.panEndPer, this.props.scene.panEndOv) :
-              getEaseFunction(this.props.scene.panStartEase, this.props.scene.panStartExp, this.props.scene.panStartAmp, this.props.scene.panStartPer, this.props.scene.panStartOv)
+            easing: this.state.toggleFade
+              ? getEaseFunction(
+                  this.props.scene.panEndEase,
+                  this.props.scene.panEndExp,
+                  this.props.scene.panEndAmp,
+                  this.props.scene.panEndPer,
+                  this.props.scene.panEndOv,
+                )
+              : getEaseFunction(
+                  this.props.scene.panStartEase,
+                  this.props.scene.panStartExp,
+                  this.props.scene.panStartAmp,
+                  this.props.scene.panStartPer,
+                  this.props.scene.panStartOv,
+                ),
           },
-        }
+        },
       );
     }
 
     return (
       <React.Fragment>
-        {fadeTransitions.map(({item, props, key}) => {
+        {fadeTransitions.map(({ item, props, key }) => {
           return (
             <animated.div
               key={key}
               style={{
-                position: 'absolute',
+                position: "absolute",
                 top: 0,
                 right: 0,
                 bottom: 0,
                 left: 0,
                 zIndex: 2,
-                ...props
-              }}>
+                ...props,
+              }}
+            >
               {data.children}
             </animated.div>
           );
@@ -131,7 +153,11 @@ export default class FadeInOut extends React.Component {
   fade() {
     const duration = this.getDuration();
     const delay = this.props.scene.fadeIOPulse ? this.getDelay() : duration;
-    this.setState({toggleFade: !this.state.toggleFade, duration: duration, delay: delay});
+    this.setState({
+      toggleFade: !this.state.toggleFade,
+      duration: duration,
+      delay: delay,
+    });
     this.props.fadeFunction();
     return delay;
   }
@@ -144,7 +170,11 @@ export default class FadeInOut extends React.Component {
   componentDidMount() {
     this._fadeOut = false;
     if (this.props.scene.fadeInOut) {
-      if (this.props.scene.fadeIOPulse ? this.props.scene.fadeIODelayTF != TF.scene : this.props.scene.fadeIOTF != TF.scene) {
+      if (
+        this.props.scene.fadeIOPulse
+          ? this.props.scene.fadeIODelayTF != TF.scene
+          : this.props.scene.fadeIOTF != TF.scene
+      ) {
         this.fadeLoop();
       }
     }
@@ -152,9 +182,17 @@ export default class FadeInOut extends React.Component {
 
   componentDidUpdate(props: any) {
     if (this.props.scene.fadeInOut) {
-      if (this.props.scene.fadeIOTF != props.scene.fadeIOTF || this.props.scene.fadeIODelayTF != props.scene.fadeIODelayTF || this.props.scene.fadeIOPulse != props.scene.fadeIOPulse) {
+      if (
+        this.props.scene.fadeIOTF != props.scene.fadeIOTF ||
+        this.props.scene.fadeIODelayTF != props.scene.fadeIODelayTF ||
+        this.props.scene.fadeIOPulse != props.scene.fadeIOPulse
+      ) {
         clearTimeout(this._fadeTimeout);
-        if (this.props.scene.fadeIOPulse ? this.props.scene.fadeIODelayTF != TF.scene : this.props.scene.fadeIOTF != TF.scene) {
+        if (
+          this.props.scene.fadeIOPulse
+            ? this.props.scene.fadeIODelayTF != TF.scene
+            : this.props.scene.fadeIOTF != TF.scene
+        ) {
           this.fadeLoop();
         }
       }
@@ -162,9 +200,11 @@ export default class FadeInOut extends React.Component {
   }
 
   shouldComponentUpdate(props: any, state: any) {
-    return !props.fadeInOut ||
+    return (
+      !props.fadeInOut ||
       this.props.toggleFade != props.toggleFade ||
-      this.state.toggleFade != state.toggleFade;
+      this.state.toggleFade != state.toggleFade
+    );
   }
 
   componentWillUnmount() {
@@ -180,11 +220,24 @@ export default class FadeInOut extends React.Component {
         duration = Math.max(this.props.scene.fadeIODuration, 10);
         break;
       case TF.random:
-        duration = Math.floor(Math.random() * (Math.max(this.props.scene.fadeIODurationMax, 10) - Math.max(this.props.scene.fadeIODurationMin, 10) + 1)) + Math.max(this.props.scene.fadeIODurationMin, 10);
+        duration =
+          Math.floor(
+            Math.random() *
+              (Math.max(this.props.scene.fadeIODurationMax, 10) -
+                Math.max(this.props.scene.fadeIODurationMin, 10) +
+                1),
+          ) + Math.max(this.props.scene.fadeIODurationMin, 10);
         break;
       case TF.sin:
-        const sinRate = (Math.abs(this.props.scene.fadeIOSinRate - 100) + 2) * 1000;
-        duration = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (Math.max(this.props.scene.fadeIODurationMax, 10) - Math.max(this.props.scene.fadeIODurationMin, 10) + 1)) + Math.max(this.props.scene.fadeIODurationMin, 10);
+        const sinRate =
+          (Math.abs(this.props.scene.fadeIOSinRate - 100) + 2) * 1000;
+        duration =
+          Math.floor(
+            Math.abs(Math.sin(Date.now() / sinRate)) *
+              (Math.max(this.props.scene.fadeIODurationMax, 10) -
+                Math.max(this.props.scene.fadeIODurationMin, 10) +
+                1),
+          ) + Math.max(this.props.scene.fadeIODurationMin, 10);
         break;
       case TF.bpm:
         const bpmMulti = this.props.scene.fadeIOBPMMulti / 10;
@@ -209,11 +262,24 @@ export default class FadeInOut extends React.Component {
         delay = this.props.scene.fadeIODelay;
         break;
       case TF.random:
-        delay = Math.floor(Math.random() * (this.props.scene.fadeIODelayMax - this.props.scene.fadeIODelayMin + 1)) + this.props.scene.fadeIODelayMin;
+        delay =
+          Math.floor(
+            Math.random() *
+              (this.props.scene.fadeIODelayMax -
+                this.props.scene.fadeIODelayMin +
+                1),
+          ) + this.props.scene.fadeIODelayMin;
         break;
       case TF.sin:
-        const sinRate = (Math.abs(this.props.scene.fadeIODelaySinRate - 100) + 2) * 1000;
-        delay = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (this.props.scene.fadeIODelayMax - this.props.scene.fadeIODelayMin + 1)) + this.props.scene.fadeIODelayMin;
+        const sinRate =
+          (Math.abs(this.props.scene.fadeIODelaySinRate - 100) + 2) * 1000;
+        delay =
+          Math.floor(
+            Math.abs(Math.sin(Date.now() / sinRate)) *
+              (this.props.scene.fadeIODelayMax -
+                this.props.scene.fadeIODelayMin +
+                1),
+          ) + this.props.scene.fadeIODelayMin;
         break;
       case TF.bpm:
         const bpmMulti = this.props.scene.fadeIODelayBPMMulti / 10;
@@ -231,4 +297,4 @@ export default class FadeInOut extends React.Component {
   }
 }
 
-(FadeInOut as any).displayName="FadeInOut";
+(FadeInOut as any).displayName = "FadeInOut";

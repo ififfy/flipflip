@@ -16,27 +16,28 @@ import {
   Tooltip,
 } from "@mui/material";
 
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
+import createStyles from "@mui/styles/createStyles";
+import withStyles from "@mui/styles/withStyles";
 
-import {GeneralSettings} from "../../data/Config";
-import {WC} from "../../data/const";
+import { GeneralSettings } from "../../data/Config";
+import { WC } from "../../data/const";
 import en from "../../data/en";
 import ColorPicker from "../config/ColorPicker";
-import {CancelablePromise} from "../../data/utils";
+import { CancelablePromise } from "../../data/utils";
 import { fonts_getFonts } from "../../dummy/fonts";
 
-const styles = (theme: Theme) => createStyles({
-  fullWidth: {
-    width: '100%',
-  },
-});
+const styles = (theme: Theme) =>
+  createStyles({
+    fullWidth: {
+      width: "100%",
+    },
+  });
 
 class WatermarkCard extends React.Component {
   readonly props: {
-    classes: any,
-    settings: GeneralSettings,
-    onUpdateSettings(fn: (settings: GeneralSettings) => void): void,
+    classes: any;
+    settings: GeneralSettings;
+    onUpdateSettings(fn: (settings: GeneralSettings) => void): void;
   };
 
   readonly state = {
@@ -47,75 +48,104 @@ class WatermarkCard extends React.Component {
     const classes = this.props.classes;
 
     return (
-      <Grid container spacing={this.props.settings.watermark ? 2 : 0} alignItems="center">
+      <Grid
+        container
+        spacing={this.props.settings.watermark ? 2 : 0}
+        alignItems="center"
+      >
         <Grid item xs={12}>
           <Grid container alignItems="center">
             <Grid item xs={12} sm={6}>
-              <Tooltip disableInteractive title={
-                         <div>
-                           When enabled, FlipFlip will display a watermark over each Scene. You may use the following variables:
-                           <br/>
-                           {"{scene_name}"} - Name of the current Scene
-                           <br/>
-                           {"{source_url}"} - URL of the current Source
-                           <br/>
-                           {"{source_name}"} - Name of the current Source
-                           <br/>
-                           {"{post_url}"} - URL of the current file's post
-                           <br/>
-                           {"{file_url}"} - URL of the current file
-                           <br/>
-                           {"{file_name}"} - Name of the current file
-                           <br/>
-                           {"{audio_url}"} - URL of the currently playing audio file
-                           <br/>
-                           {"{audio_name}"} - Name of the currently playing audio file
-                           <br/>
-                           {"{audio_title}"} - Title of the currently playing audio file
-                           <br/>
-                           {"{audio_artist}"} - Artist of the currently playing audio file
-                           <br/>
-                           {"{audio_album}"} - Album of the currently playing audio file
-                         </div>
-                       }>
+              <Tooltip
+                disableInteractive
+                title={
+                  <div>
+                    When enabled, FlipFlip will display a watermark over each
+                    Scene. You may use the following variables:
+                    <br />
+                    {"{scene_name}"} - Name of the current Scene
+                    <br />
+                    {"{source_url}"} - URL of the current Source
+                    <br />
+                    {"{source_name}"} - Name of the current Source
+                    <br />
+                    {"{post_url}"} - URL of the current file's post
+                    <br />
+                    {"{file_url}"} - URL of the current file
+                    <br />
+                    {"{file_name}"} - Name of the current file
+                    <br />
+                    {"{audio_url}"} - URL of the currently playing audio file
+                    <br />
+                    {"{audio_name}"} - Name of the currently playing audio file
+                    <br />
+                    {"{audio_title}"} - Title of the currently playing audio
+                    file
+                    <br />
+                    {"{audio_artist}"} - Artist of the currently playing audio
+                    file
+                    <br />
+                    {"{audio_album}"} - Album of the currently playing audio
+                    file
+                  </div>
+                }
+              >
                 <FormControlLabel
                   control={
-                    <Switch checked={this.props.settings.watermark}
-                            onChange={this.onBoolInput.bind(this, 'watermark')}/>
+                    <Switch
+                      checked={this.props.settings.watermark}
+                      onChange={this.onBoolInput.bind(this, "watermark")}
+                    />
                   }
-                  label="Enable Watermark"/>
+                  label="Enable Watermark"
+                />
               </Tooltip>
             </Grid>
             <Grid item xs={12} sm={6}>
               {this.props.settings.watermark && (
-                <Tooltip disableInteractive title={"When enabled, watermark will display on Grid Scenes"}>
+                <Tooltip
+                  disableInteractive
+                  title={"When enabled, watermark will display on Grid Scenes"}
+                >
                   <FormControlLabel
                     control={
-                      <Switch checked={this.props.settings.watermarkGrid}
-                              onChange={this.onBoolInput.bind(this, 'watermarkGrid')}/>
+                      <Switch
+                        checked={this.props.settings.watermarkGrid}
+                        onChange={this.onBoolInput.bind(this, "watermarkGrid")}
+                      />
                     }
-                    label="Show on Grids"/>
+                    label="Show on Grids"
+                  />
                 </Tooltip>
               )}
             </Grid>
           </Grid>
         </Grid>
         <Grid item xs={12}>
-          <Collapse in={this.props.settings.watermark} className={classes.fullWidth}>
+          <Collapse
+            in={this.props.settings.watermark}
+            className={classes.fullWidth}
+          >
             <Divider />
           </Collapse>
         </Grid>
         <Grid item xs={12}>
-          <Collapse in={this.props.settings.watermark} className={classes.fullWidth}>
+          <Collapse
+            in={this.props.settings.watermark}
+            className={classes.fullWidth}
+          >
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12}>
                 <Select
                   variant="standard"
                   value={this.props.settings.watermarkCorner}
-                  onChange={this.onInput.bind(this, 'watermarkCorner')}>
-                  {Object.values(WC).map((wc) =>
-                    <MenuItem value={wc} key={wc}>{en.get(wc)}</MenuItem>
-                  )}
+                  onChange={this.onInput.bind(this, "watermarkCorner")}
+                >
+                  {Object.values(WC).map((wc) => (
+                    <MenuItem value={wc} key={wc}>
+                      {en.get(wc)}
+                    </MenuItem>
+                  ))}
                 </Select>
               </Grid>
               <Grid item xs={12}>
@@ -126,13 +156,17 @@ class WatermarkCard extends React.Component {
                   label="Watermark Text"
                   value={this.props.settings.watermarkText}
                   margin="dense"
-                  onChange={this.onInput.bind(this, 'watermarkText')} />
+                  onChange={this.onInput.bind(this, "watermarkText")}
+                />
               </Grid>
             </Grid>
           </Collapse>
         </Grid>
         <Grid item xs={12}>
-          <Collapse in={this.props.settings.watermark} className={classes.fullWidth}>
+          <Collapse
+            in={this.props.settings.watermark}
+            className={classes.fullWidth}
+          >
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={9}>
                 <FormControl variant="standard" className={classes.fullWidth}>
@@ -141,7 +175,9 @@ class WatermarkCard extends React.Component {
                     variant="standard"
                     value={this.props.settings.watermarkFontFamily}
                     disabled={this.state.systemFonts.length == 0}
-                    style={{fontFamily: this.props.settings.watermarkFontFamily}}
+                    style={{
+                      fontFamily: this.props.settings.watermarkFontFamily,
+                    }}
                     MenuProps={{
                       PaperProps: {
                         style: {
@@ -149,10 +185,13 @@ class WatermarkCard extends React.Component {
                         },
                       },
                     }}
-                    onChange={this.onInput.bind(this, 'watermarkFontFamily')}>
-                    {this.state.systemFonts.map((f) =>
-                      <MenuItem key={f} value={f} style={{fontFamily: f}}>{f}</MenuItem>
-                    )}
+                    onChange={this.onInput.bind(this, "watermarkFontFamily")}
+                  >
+                    {this.state.systemFonts.map((f) => (
+                      <MenuItem key={f} value={f} style={{ fontFamily: f }}>
+                        {f}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Grid>
@@ -162,20 +201,24 @@ class WatermarkCard extends React.Component {
                   label="Size"
                   margin="dense"
                   value={this.props.settings.watermarkFontSize}
-                  onChange={this.onIntInput.bind(this, 'watermarkFontSize')}
-                  onBlur={this.blurIntKey.bind(this, 'watermarkFontSize')}
+                  onChange={this.onIntInput.bind(this, "watermarkFontSize")}
+                  onBlur={this.blurIntKey.bind(this, "watermarkFontSize")}
                   InputProps={{
-                    endAdornment: <InputAdornment position="end">px</InputAdornment>,
+                    endAdornment: (
+                      <InputAdornment position="end">px</InputAdornment>
+                    ),
                   }}
                   inputProps={{
                     min: 1,
-                    type: 'number',
-                  }} />
+                    type: "number",
+                  }}
+                />
               </Grid>
               <Grid item xs={12}>
                 <ColorPicker
                   currentColor={this.props.settings.watermarkColor}
-                  onChangeColor={this.onInput.bind(this, 'watermarkColor')}/>
+                  onChangeColor={this.onInput.bind(this, "watermarkColor")}
+                />
               </Grid>
             </Grid>
           </Collapse>
@@ -188,14 +231,15 @@ class WatermarkCard extends React.Component {
   componentDidMount() {
     // Define system fonts
     this._promise = new CancelablePromise((resolve, reject) => {
-      fonts_getFonts().then((res: Array<string>) => {
-        if (!this._promise.hasCanceled) {
-          this.setState({ systemFonts: res });
-        }
-      },
+      fonts_getFonts().then(
+        (res: Array<string>) => {
+          if (!this._promise.hasCanceled) {
+            this.setState({ systemFonts: res });
+          }
+        },
         (err: string) => {
           console.error(err);
-        }
+        },
       );
     });
   }
@@ -207,18 +251,22 @@ class WatermarkCard extends React.Component {
   }
 
   onInput(key: string, e: MouseEvent) {
-    const input = (e.target as HTMLInputElement);
+    const input = e.target as HTMLInputElement;
     this.changeKey(key, input.value);
   }
 
   onIntInput(key: string, e: MouseEvent) {
-    const input = (e.target as HTMLInputElement);
-    this.changeKey(key, input.value === '' ? '' : Number(input.value));
+    const input = e.target as HTMLInputElement;
+    this.changeKey(key, input.value === "" ? "" : Number(input.value));
   }
 
   blurIntKey(key: string, e: MouseEvent) {
-    const min = (e.currentTarget as any).min ? (e.currentTarget as any).min : null;
-    const max = (e.currentTarget as any).max ? (e.currentTarget as any).max : null;
+    const min = (e.currentTarget as any).min
+      ? (e.currentTarget as any).min
+      : null;
+    const max = (e.currentTarget as any).max
+      ? (e.currentTarget as any).max
+      : null;
     if (min && (this.props.settings as any)[key] < min) {
       this.changeIntKey(key, min);
     } else if (max && (this.props.settings as any)[key] > max) {
@@ -226,18 +274,18 @@ class WatermarkCard extends React.Component {
     }
   }
 
-  changeIntKey(key:string, intString: string) {
-    this.changeKey(key, intString === '' ? '' : Number(intString));
+  changeIntKey(key: string, intString: string) {
+    this.changeKey(key, intString === "" ? "" : Number(intString));
   }
 
   onBoolInput(key: string, e: MouseEvent) {
-    const input = (e.target as HTMLInputElement);
+    const input = e.target as HTMLInputElement;
     const checked = input.checked;
     this.changeKey(key, checked);
   }
 
   changeKey(key: string, value: any) {
-    this.update((s) => s[key] = value);
+    this.update((s) => (s[key] = value));
   }
 
   update(fn: (scene: any) => void) {
@@ -245,5 +293,5 @@ class WatermarkCard extends React.Component {
   }
 }
 
-(WatermarkCard as any).displayName="WatermarkCard";
+(WatermarkCard as any).displayName = "WatermarkCard";
 export default withStyles(styles)(WatermarkCard as any);

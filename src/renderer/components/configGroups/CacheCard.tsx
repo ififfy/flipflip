@@ -21,33 +21,34 @@ import {
   Tooltip,
 } from "@mui/material";
 
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
+import createStyles from "@mui/styles/createStyles";
+import withStyles from "@mui/styles/withStyles";
 
-import ClearIcon from '@mui/icons-material/Clear';
-import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
+import ClearIcon from "@mui/icons-material/Clear";
+import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 
-import Config, {CacheSettings} from "../../data/Config";
-import {getCachePath, urlToPath} from "../../data/utils";
+import Config, { CacheSettings } from "../../data/Config";
+import { getCachePath, urlToPath } from "../../data/utils";
 import { fs_existsSync, fs_rimrafSync } from "../../dummy/fs";
 import { folder_getFolderSize } from "../../dummy/folder";
 
-const styles = (theme: Theme) => createStyles({
-  fullWidth: {
-    width: '100%',
-  },
-  paddingLeft: {
-    [theme.breakpoints.up('sm')]: {
-      paddingLeft: theme.spacing(1),
+const styles = (theme: Theme) =>
+  createStyles({
+    fullWidth: {
+      width: "100%",
     },
-  },
-});
+    paddingLeft: {
+      [theme.breakpoints.up("sm")]: {
+        paddingLeft: theme.spacing(1),
+      },
+    },
+  });
 
 class CacheCard extends React.Component {
   readonly props: {
-    classes: any,
-    config: Config,
-    onUpdateSettings(fn: (settings: CacheSettings) => void): void,
+    classes: any;
+    config: Config;
+    onUpdateSettings(fn: (settings: CacheSettings) => void): void;
   };
 
   readonly state = {
@@ -59,27 +60,41 @@ class CacheCard extends React.Component {
     const classes = this.props.classes;
     const cachePath = getCachePath(null, this.props.config);
     return (
-      <Grid container spacing={this.props.config.caching.enabled ? 2 : 0} alignItems="center">
+      <Grid
+        container
+        spacing={this.props.config.caching.enabled ? 2 : 0}
+        alignItems="center"
+      >
         <Grid item xs={12}>
           <Grid container alignItems="center">
             <Grid item xs>
-              <Tooltip disableInteractive title="When enabled, FlipFlip will store downloaded images in a local directory to improve future performance and reduce the need re-download files.">
+              <Tooltip
+                disableInteractive
+                title="When enabled, FlipFlip will store downloaded images in a local directory to improve future performance and reduce the need re-download files."
+              >
                 <FormControlLabel
                   control={
-                    <Switch checked={this.props.config.caching.enabled}
-                            onChange={this.onBoolInput.bind(this, 'enabled')}/>
+                    <Switch
+                      checked={this.props.config.caching.enabled}
+                      onChange={this.onBoolInput.bind(this, "enabled")}
+                    />
                   }
-                  label="Caching"/>
+                  label="Caching"
+                />
               </Tooltip>
             </Grid>
             <Grid item>
-              <Collapse in={this.props.config.caching.enabled} className={clsx(classes.fullWidth, classes.paddingLeft)}>
+              <Collapse
+                in={this.props.config.caching.enabled}
+                className={clsx(classes.fullWidth, classes.paddingLeft)}
+              >
                 <Tooltip disableInteractive title="Clear Cache">
                   <IconButton
                     edge="start"
                     color="inherit"
                     onClick={this.onClearCache.bind(this)}
-                    size="large">
+                    size="large"
+                  >
                     <DeleteSweepIcon color="error" />
                   </IconButton>
                 </Tooltip>
@@ -88,12 +103,18 @@ class CacheCard extends React.Component {
           </Grid>
         </Grid>
         <Grid item xs={12}>
-          <Collapse in={this.props.config.caching.enabled} className={classes.fullWidth}>
+          <Collapse
+            in={this.props.config.caching.enabled}
+            className={classes.fullWidth}
+          >
             <Divider />
           </Collapse>
         </Grid>
         <Grid item xs={12}>
-          <Collapse in={this.props.config.caching.enabled} className={classes.fullWidth}>
+          <Collapse
+            in={this.props.config.caching.enabled}
+            className={classes.fullWidth}
+          >
             <Grid container spacing={2} alignItems="center">
               <Grid item xs>
                 <TextField
@@ -108,40 +129,51 @@ class CacheCard extends React.Component {
                   InputProps={{
                     readOnly: true,
                   }}
-                  onClick={this.onCacheDirChange.bind(this)} />
+                  onClick={this.onCacheDirChange.bind(this)}
+                />
               </Grid>
               <Grid item>
                 <Tooltip disableInteractive title="Reset Cache Directory">
-                  <IconButton onClick={this.onResetCacheDir.bind(this)} size="large">
-                    <ClearIcon color="error"/>
+                  <IconButton
+                    onClick={this.onResetCacheDir.bind(this)}
+                    size="large"
+                  >
+                    <ClearIcon color="error" />
                   </IconButton>
                 </Tooltip>
               </Grid>
             </Grid>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs>
-                <Tooltip disableInteractive title="The maximum size of the caching directory. After the max is reached, new images won't be kept. Set this to 0 to ignore size.">
+                <Tooltip
+                  disableInteractive
+                  title="The maximum size of the caching directory. After the max is reached, new images won't be kept. Set this to 0 to ignore size."
+                >
                   <TextField
                     variant="standard"
                     label="Max Cache Size"
                     margin="dense"
                     value={this.props.config.caching.maxSize}
-                    onChange={this.onIntInput.bind(this, 'maxSize')}
-                    onBlur={this.blurIntKey.bind(this, 'maxSize')}
+                    onChange={this.onIntInput.bind(this, "maxSize")}
+                    onBlur={this.blurIntKey.bind(this, "maxSize")}
                     InputProps={{
-                      endAdornment: <InputAdornment position="end">MB</InputAdornment>,
+                      endAdornment: (
+                        <InputAdornment position="end">MB</InputAdornment>
+                      ),
                     }}
                     inputProps={{
                       min: 0,
-                      type: 'number',
-                    }} />
+                      type: "number",
+                    }}
+                  />
                 </Tooltip>
               </Grid>
               <Grid item>
                 <Chip
                   label={`Current: ${this.state.cacheSize} MB`}
                   color="primary"
-                  variant="outlined"/>
+                  variant="outlined"
+                />
               </Grid>
             </Grid>
           </Collapse>
@@ -149,20 +181,29 @@ class CacheCard extends React.Component {
         <Dialog
           open={this.state.clearCacheAlert}
           onClose={this.onCloseClear.bind(this)}
-          aria-describedby="clean-cache-description">
+          aria-describedby="clean-cache-description"
+        >
           <DialogContent>
             <DialogContentText id="clean-cache-description">
-              Are you SURE you want to delete the contents of <Link
-              href="#"
-              onClick={this.openDirectory.bind(this, cachePath)}
-              underline="hover">{cachePath}</Link> ?
+              Are you SURE you want to delete the contents of{" "}
+              <Link
+                href="#"
+                onClick={this.openDirectory.bind(this, cachePath)}
+                underline="hover"
+              >
+                {cachePath}
+              </Link>{" "}
+              ?
             </DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={this.onCloseClear.bind(this)} color="secondary">
               Cancel
             </Button>
-            <Button onClick={this.onFinishClearCache.bind(this)} color="primary">
+            <Button
+              onClick={this.onFinishClearCache.bind(this)}
+              color="primary"
+            >
               OK
             </Button>
           </DialogActions>
@@ -179,33 +220,38 @@ class CacheCard extends React.Component {
     if (this.props.config.caching.maxSize != 0) {
       const cachePath = getCachePath(null, this.props.config);
       if (fs_existsSync(cachePath)) {
-        folder_getFolderSize(getCachePath(null, this.props.config), (err: string, size: number) => {
-          if (err) { throw err; }
-          const mbSize = (size / 1024 / 1024);
-          this.setState({cacheSize: mbSize.toFixed(2)});
-        });
+        folder_getFolderSize(
+          getCachePath(null, this.props.config),
+          (err: string, size: number) => {
+            if (err) {
+              throw err;
+            }
+            const mbSize = size / 1024 / 1024;
+            this.setState({ cacheSize: mbSize.toFixed(2) });
+          },
+        );
       }
     }
   }
 
   onCloseClear() {
-    this.setState({clearCacheAlert: false});
+    this.setState({ clearCacheAlert: false });
   }
 
   onClearCache() {
-    this.setState({clearCacheAlert: true});
+    this.setState({ clearCacheAlert: true });
   }
 
   onFinishClearCache() {
     const cachePath = getCachePath(null, this.props.config);
     fs_rimrafSync(cachePath);
-    this.setState({cacheSize: "--"});
+    this.setState({ cacheSize: "--" });
     this.calculateCacheSize();
   }
 
   onResetCacheDir(e: MouseEvent) {
     e.preventDefault();
-    this.changeKey('directory', "");
+    this.changeKey("directory", "");
   }
 
   onCacheDirChange() {
@@ -216,8 +262,12 @@ class CacheCard extends React.Component {
   }
 
   blurIntKey(key: string, e: MouseEvent) {
-    const min = (e.currentTarget as any).min ? (e.currentTarget as any).min : null;
-    const max = (e.currentTarget as any).max ? (e.currentTarget as any).max : null;
+    const min = (e.currentTarget as any).min
+      ? (e.currentTarget as any).min
+      : null;
+    const max = (e.currentTarget as any).max
+      ? (e.currentTarget as any).max
+      : null;
     if (min && (this.props.config.caching as any)[key] < min) {
       this.changeIntKey(key, min);
     } else if (max && (this.props.config.caching as any)[key] > max) {
@@ -226,22 +276,22 @@ class CacheCard extends React.Component {
   }
 
   onIntInput(key: string, e: MouseEvent) {
-    const input = (e.target as HTMLInputElement);
-    this.changeKey(key, input.value === '' ? '' : Number(input.value));
+    const input = e.target as HTMLInputElement;
+    this.changeKey(key, input.value === "" ? "" : Number(input.value));
   }
 
-  changeIntKey(key:string, intString: string) {
-    this.changeKey(key, intString === '' ? '' : Number(intString));
+  changeIntKey(key: string, intString: string) {
+    this.changeKey(key, intString === "" ? "" : Number(intString));
   }
 
   onBoolInput(key: string, e: MouseEvent) {
-    const input = (e.target as HTMLInputElement);
+    const input = e.target as HTMLInputElement;
     const checked = input.checked;
     this.changeKey(key, checked);
   }
 
   changeKey(key: string, value: any) {
-    this.update((s) => s[key] = value);
+    this.update((s) => (s[key] = value));
   }
 
   update(fn: (settings: any) => void) {
@@ -262,5 +312,5 @@ class CacheCard extends React.Component {
   }
 }
 
-(CacheCard as any).displayName="CacheCard";
+(CacheCard as any).displayName = "CacheCard";
 export default withStyles(styles)(CacheCard as any);

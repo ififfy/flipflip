@@ -30,27 +30,27 @@ import {
   Typography,
 } from "@mui/material";
 
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
+import createStyles from "@mui/styles/createStyles";
+import withStyles from "@mui/styles/withStyles";
 
-import AddIcon from '@mui/icons-material/Add';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ClearIcon from '@mui/icons-material/Clear';
-import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
-import DescriptionIcon from '@mui/icons-material/Description';
-import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
-import GetAppIcon from '@mui/icons-material/GetApp';
-import HttpIcon from '@mui/icons-material/Http';
-import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import MenuIcon from'@mui/icons-material/Menu';
-import SelectAllIcon from '@mui/icons-material/SelectAll';
+import AddIcon from "@mui/icons-material/Add";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ClearIcon from "@mui/icons-material/Clear";
+import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
+import DescriptionIcon from "@mui/icons-material/Description";
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import GetAppIcon from "@mui/icons-material/GetApp";
+import HttpIcon from "@mui/icons-material/Http";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+import MenuIcon from "@mui/icons-material/Menu";
+import SelectAllIcon from "@mui/icons-material/SelectAll";
 import ShuffleIcon from "@mui/icons-material/Shuffle";
-import SortIcon from '@mui/icons-material/Sort';
+import SortIcon from "@mui/icons-material/Sort";
 
-import {AF, MO, SF, SP, SLT} from "../../data/const";
-import {getFilesRecursively, isText} from "../../data/utils";
+import { AF, MO, SF, SP, SLT } from "../../data/const";
+import { getFilesRecursively, isText } from "../../data/utils";
 import en from "../../data/en";
 import Tag from "../../data/Tag";
 import LibrarySearch from "./LibrarySearch";
@@ -61,280 +61,291 @@ import { fs_existsSync, fs_isDirectory } from "../../dummy/fs";
 
 const drawerWidth = 240;
 
-const styles = (theme: Theme) => createStyles({
-  root: {
-    display: 'flex',
-  },
-  appBar: {
-    zIndex: theme.zIndex.drawer + 1,
-  },
-  appBarSpacerWrapper: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    padding: '0 8px',
-    minHeight: 64,
-  },
-  appBarSpacer: {
-    backgroundColor: theme.palette.primary.main,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    padding: '0 8px',
-    minHeight: 64,
-  },
-  backButton: {
-    float: 'left',
-  },
-  title: {
-    textAlign: 'center',
-    flexGrow: 1,
-  },
-  headerBar: {
-    display: 'flex',
-    alignItems: 'center',
-    whiteSpace: 'nowrap',
-    flexWrap: 'nowrap',
-  },
-  headerLeft: {
-    flexBasis: '20%',
-  },
-  headerRight: {
-    flexBasis: '20%',
-    justifyContent: 'flex-end',
-    display: 'flex',
-  },
-  searchBar: {
-    float: 'right',
-    display: 'flex',
-    maxWidth: '100%',
-  },
-  searchCount: {
-    color: theme.palette.primary.contrastText,
-    marginTop: 3,
-    marginRight: theme.spacing(1),
-  },
-  displayCount: {
-    marginTop: 3,
-    marginRight: theme.spacing(1),
-  },
-  drawerPaper: {
-    position: 'relative',
-    whiteSpace: 'nowrap',
-    overflowX: 'hidden',
-    height: '100vh',
-    width: drawerWidth,
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  drawerPaperClose: {
-    width: theme.spacing(7),
-    [theme.breakpoints.up('sm')]: {
-      width: theme.spacing(9),
+const styles = (theme: Theme) =>
+  createStyles({
+    root: {
+      display: "flex",
     },
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  drawerPaperHidden: {
-    width: 0,
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  drawer: {
-    position: 'absolute',
-  },
-  drawerSpacer: {
-    width: theme.spacing(7),
-    [theme.breakpoints.up('sm')]: {
-      width: theme.spacing(9),
+    appBar: {
+      zIndex: theme.zIndex.drawer + 1,
     },
-  },
-  drawerButton: {
-    backgroundColor: theme.palette.primary.main,
-    minHeight: theme.spacing(6),
-    [theme.breakpoints.down('sm')]: {
-      paddingLeft: 0,
-      paddingRight: 0,
+    appBarSpacerWrapper: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "flex-end",
+      padding: "0 8px",
+      minHeight: 64,
     },
-  },
-  drawerIcon: {
-    color: theme.palette.primary.contrastText,
-  },
-  chip: {
-    transition: theme.transitions.create(['opacity'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  chipClose: {
-    opacity: 0,
-    transition: theme.transitions.create(['opacity'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  content: {
-    display: 'flex',
-    flexGrow: 1,
-    flexDirection: 'column',
-    height: '100vh',
-    backgroundColor: theme.palette.background.default,
-  },
-  container: {
-    padding: theme.spacing(0),
-    overflow: 'hidden',
-    flexGrow: 1,
-  },
-  containerNotEmpty: {
-    display: 'flex',
-  },
-  addMenuButton: {
-    backgroundColor: theme.palette.primary.dark,
-    margin: 0,
-    top: 'auto',
-    right: 20,
-    bottom: 20,
-    left: 'auto',
-    position: 'fixed',
-  },
-  sortMenuButton: {
-    backgroundColor: theme.palette.secondary.dark,
-    margin: 0,
-    top: 'auto',
-    right: 80,
-    bottom: 20,
-    left: 'auto',
-    position: 'fixed',
-  },
-  selectAllButton: {
-    backgroundColor: theme.palette.secondary.dark,
-    margin: 0,
-    top: 'auto',
-    right: 130,
-    bottom: 20,
-    left: 'auto',
-    position: 'fixed',
-  },
-  selectNoneButton: {
-    backgroundColor: theme.palette.secondary.light,
-    margin: 0,
-    top: 'auto',
-    right: 180,
-    bottom: 20,
-    left: 'auto',
-    position: 'fixed',
-  },
-  importBadge:{
-    top: 'auto',
-    right: 30,
-    bottom: 50,
-    left: 'auto',
-    position: 'fixed',
-    zIndex: theme.zIndex.fab + 1,
-  },
-  addButton: {
-    backgroundColor: theme.palette.primary.main,
-    margin: 0,
-    top: 'auto',
-    right: 28,
-    bottom: 25,
-    left: 'auto',
-    position: 'fixed',
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  addURLButton: {
-    marginBottom: 60
-  },
-  addLocalButton: {
-    marginBottom: 115
-  },
-  removeAllButton: {
-    backgroundColor: theme.palette.error.main,
-    margin: 0,
-    top: 'auto',
-    right: 130,
-    bottom: 20,
-    left: 'auto',
-    position: 'fixed',
-  },
-  addButtonClose: {
-    marginBottom: 0,
-    transition: theme.transitions.create(['margin', 'opacity'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen + theme.transitions.duration.standard,
-    }),
-  },
-  icon: {
-    color: theme.palette.primary.contrastText,
-  },
-  sortMenu: {
-    width: 200,
-  },
-  fill: {
-    flexGrow: 1,
-  },
-  backdrop: {
-    zIndex: theme.zIndex.modal,
-    height: '100%',
-    width: '100%',
-  },
-  hidden: {
-    opacity: 0,
-    transition: theme.transitions.create(['margin', 'opacity'], {
-      easing: theme.transitions.easing.sharp,
-      duration: 100,
-    }),
-  },
-  noScroll: {
-    overflow: 'visible',
-  },
-  backdropTop: {
-    zIndex: theme.zIndex.modal + 1,
-  },
-  highlight: {
-    borderWidth: 2,
-    borderColor: theme.palette.secondary.main,
-    borderStyle: 'solid',
-  },
-  disable: {
-    pointerEvents: 'none',
-  }
-});
+    appBarSpacer: {
+      backgroundColor: theme.palette.primary.main,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "flex-end",
+      padding: "0 8px",
+      minHeight: 64,
+    },
+    backButton: {
+      float: "left",
+    },
+    title: {
+      textAlign: "center",
+      flexGrow: 1,
+    },
+    headerBar: {
+      display: "flex",
+      alignItems: "center",
+      whiteSpace: "nowrap",
+      flexWrap: "nowrap",
+    },
+    headerLeft: {
+      flexBasis: "20%",
+    },
+    headerRight: {
+      flexBasis: "20%",
+      justifyContent: "flex-end",
+      display: "flex",
+    },
+    searchBar: {
+      float: "right",
+      display: "flex",
+      maxWidth: "100%",
+    },
+    searchCount: {
+      color: theme.palette.primary.contrastText,
+      marginTop: 3,
+      marginRight: theme.spacing(1),
+    },
+    displayCount: {
+      marginTop: 3,
+      marginRight: theme.spacing(1),
+    },
+    drawerPaper: {
+      position: "relative",
+      whiteSpace: "nowrap",
+      overflowX: "hidden",
+      height: "100vh",
+      width: drawerWidth,
+      transition: theme.transitions.create("width", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+    },
+    drawerPaperClose: {
+      width: theme.spacing(7),
+      [theme.breakpoints.up("sm")]: {
+        width: theme.spacing(9),
+      },
+      transition: theme.transitions.create("width", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+    },
+    drawerPaperHidden: {
+      width: 0,
+      transition: theme.transitions.create("width", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+    },
+    drawer: {
+      position: "absolute",
+    },
+    drawerSpacer: {
+      width: theme.spacing(7),
+      [theme.breakpoints.up("sm")]: {
+        width: theme.spacing(9),
+      },
+    },
+    drawerButton: {
+      backgroundColor: theme.palette.primary.main,
+      minHeight: theme.spacing(6),
+      [theme.breakpoints.down("sm")]: {
+        paddingLeft: 0,
+        paddingRight: 0,
+      },
+    },
+    drawerIcon: {
+      color: theme.palette.primary.contrastText,
+    },
+    chip: {
+      transition: theme.transitions.create(["opacity"], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+    },
+    chipClose: {
+      opacity: 0,
+      transition: theme.transitions.create(["opacity"], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+    },
+    content: {
+      display: "flex",
+      flexGrow: 1,
+      flexDirection: "column",
+      height: "100vh",
+      backgroundColor: theme.palette.background.default,
+    },
+    container: {
+      padding: theme.spacing(0),
+      overflow: "hidden",
+      flexGrow: 1,
+    },
+    containerNotEmpty: {
+      display: "flex",
+    },
+    addMenuButton: {
+      backgroundColor: theme.palette.primary.dark,
+      margin: 0,
+      top: "auto",
+      right: 20,
+      bottom: 20,
+      left: "auto",
+      position: "fixed",
+    },
+    sortMenuButton: {
+      backgroundColor: theme.palette.secondary.dark,
+      margin: 0,
+      top: "auto",
+      right: 80,
+      bottom: 20,
+      left: "auto",
+      position: "fixed",
+    },
+    selectAllButton: {
+      backgroundColor: theme.palette.secondary.dark,
+      margin: 0,
+      top: "auto",
+      right: 130,
+      bottom: 20,
+      left: "auto",
+      position: "fixed",
+    },
+    selectNoneButton: {
+      backgroundColor: theme.palette.secondary.light,
+      margin: 0,
+      top: "auto",
+      right: 180,
+      bottom: 20,
+      left: "auto",
+      position: "fixed",
+    },
+    importBadge: {
+      top: "auto",
+      right: 30,
+      bottom: 50,
+      left: "auto",
+      position: "fixed",
+      zIndex: theme.zIndex.fab + 1,
+    },
+    addButton: {
+      backgroundColor: theme.palette.primary.main,
+      margin: 0,
+      top: "auto",
+      right: 28,
+      bottom: 25,
+      left: "auto",
+      position: "fixed",
+      transition: theme.transitions.create("margin", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+    },
+    addURLButton: {
+      marginBottom: 60,
+    },
+    addLocalButton: {
+      marginBottom: 115,
+    },
+    removeAllButton: {
+      backgroundColor: theme.palette.error.main,
+      margin: 0,
+      top: "auto",
+      right: 130,
+      bottom: 20,
+      left: "auto",
+      position: "fixed",
+    },
+    addButtonClose: {
+      marginBottom: 0,
+      transition: theme.transitions.create(["margin", "opacity"], {
+        easing: theme.transitions.easing.sharp,
+        duration:
+          theme.transitions.duration.leavingScreen +
+          theme.transitions.duration.standard,
+      }),
+    },
+    icon: {
+      color: theme.palette.primary.contrastText,
+    },
+    sortMenu: {
+      width: 200,
+    },
+    fill: {
+      flexGrow: 1,
+    },
+    backdrop: {
+      zIndex: theme.zIndex.modal,
+      height: "100%",
+      width: "100%",
+    },
+    hidden: {
+      opacity: 0,
+      transition: theme.transitions.create(["margin", "opacity"], {
+        easing: theme.transitions.easing.sharp,
+        duration: 100,
+      }),
+    },
+    noScroll: {
+      overflow: "visible",
+    },
+    backdropTop: {
+      zIndex: theme.zIndex.modal + 1,
+    },
+    highlight: {
+      borderWidth: 2,
+      borderColor: theme.palette.secondary.main,
+      borderStyle: "solid",
+    },
+    disable: {
+      pointerEvents: "none",
+    },
+  });
 
 class ScriptLibrary extends React.Component {
   readonly props: {
-    classes: any,
-    allScenes: Array<Scene>,
-    filters: Array<string>,
-    library: Array<CaptionScript>,
-    selected: Array<string>,
-    specialMode: string,
-    tags: Array<Tag>,
-    tutorial: string,
-    yOffset: number,
-    goBack(): void,
-    onBatchTag(): void,
-    onEditScript(source: CaptionScript): void,
-    onImportFromLibrary(sources: Array<CaptionScript>): void,
-    onImportToScriptor(source: CaptionScript): void,
-    onManageTags(): void,
-    onPlay(source: CaptionScript, sceneID: string, displayed: Array<CaptionScript>): void,
-    onSort(algorithm: string, ascending: boolean): void,
-    onTutorial(tutorial: string): void,
-    onUpdateLibrary(fn: (library: Array<CaptionScript>) => void): void,
-    onUpdateMode(mode: string): void,
-    onUpdateScript(script: CaptionScript): void,
-    savePosition(yOffset: number, filters:Array<string>, selected: Array<string>): void,
-    systemMessage(message: string): void,
+    classes: any;
+    allScenes: Array<Scene>;
+    filters: Array<string>;
+    library: Array<CaptionScript>;
+    selected: Array<string>;
+    specialMode: string;
+    tags: Array<Tag>;
+    tutorial: string;
+    yOffset: number;
+    goBack(): void;
+    onBatchTag(): void;
+    onEditScript(source: CaptionScript): void;
+    onImportFromLibrary(sources: Array<CaptionScript>): void;
+    onImportToScriptor(source: CaptionScript): void;
+    onManageTags(): void;
+    onPlay(
+      source: CaptionScript,
+      sceneID: string,
+      displayed: Array<CaptionScript>,
+    ): void;
+    onSort(algorithm: string, ascending: boolean): void;
+    onTutorial(tutorial: string): void;
+    onUpdateLibrary(fn: (library: Array<CaptionScript>) => void): void;
+    onUpdateMode(mode: string): void;
+    onUpdateScript(script: CaptionScript): void;
+    savePosition(
+      yOffset: number,
+      filters: Array<string>,
+      selected: Array<string>,
+    ): void;
+    systemMessage(message: string): void;
   };
 
   readonly state = {
@@ -353,42 +364,72 @@ class ScriptLibrary extends React.Component {
 
     return (
       <div className={classes.root}>
-        <AppBar enableColorOnDark position="absolute" className={clsx(classes.appBar, open && classes.appBarShift, this.props.tutorial == SLT.toolbar && clsx(classes.backdropTop, classes.disable))}>
+        <AppBar
+          enableColorOnDark
+          position="absolute"
+          className={clsx(
+            classes.appBar,
+            open && classes.appBarShift,
+            this.props.tutorial == SLT.toolbar &&
+              clsx(classes.backdropTop, classes.disable),
+          )}
+        >
           <Toolbar className={classes.headerBar}>
             <div className={classes.headerLeft}>
-              <Tooltip disableInteractive title={this.props.specialMode == SP.select || this.props.specialMode == SP.selectSingle ?
-                "Cancel Import" : "Back"} placement="right-end">
+              <Tooltip
+                disableInteractive
+                title={
+                  this.props.specialMode == SP.select ||
+                  this.props.specialMode == SP.selectSingle
+                    ? "Cancel Import"
+                    : "Back"
+                }
+                placement="right-end"
+              >
                 <IconButton
                   edge="start"
                   color="inherit"
                   aria-label="Back"
                   className={classes.backButton}
                   onClick={this.goBack.bind(this)}
-                  size="large">
+                  size="large"
+                >
                   <ArrowBackIcon />
                 </IconButton>
               </Tooltip>
             </div>
 
-            <Typography component="h1" variant="h4" color="inherit" noWrap
-                        className={classes.title}>
+            <Typography
+              component="h1"
+              variant="h4"
+              color="inherit"
+              noWrap
+              className={classes.title}
+            >
               Caption Script Library
             </Typography>
 
             <div className={classes.headerRight}>
-              <div className={clsx(classes.searchBar, this.props.tutorial == SLT.toolbar && classes.highlight)}>
+              <div
+                className={clsx(
+                  classes.searchBar,
+                  this.props.tutorial == SLT.toolbar && classes.highlight,
+                )}
+              >
                 {this.props.library.length > 0 && (
                   <Chip
                     className={classes.searchCount}
                     label={this.props.library.length}
-                    size='medium'
-                    variant='outlined'/>
+                    size="medium"
+                    variant="outlined"
+                  />
                 )}
                 {this.state.filters.length > 0 && (
                   <Chip
                     className={classes.displayCount}
                     label={this.state.displaySources.length}
-                    size='medium'/>
+                    size="medium"
+                  />
                 )}
                 <LibrarySearch
                   displaySources={this.state.displaySources}
@@ -398,17 +439,32 @@ class ScriptLibrary extends React.Component {
                   isCreatable
                   onlyUsed
                   noTypes
-                  onUpdateFilters={this.onUpdateFilters.bind(this)}/>
+                  onUpdateFilters={this.onUpdateFilters.bind(this)}
+                />
               </div>
             </div>
           </Toolbar>
         </AppBar>
 
         <Drawer
-          className={clsx(classes.drawer, (this.props.tutorial == SLT.sidebar1 || this.props.tutorial == SLT.sidebar2 || this.state.drawerOpen) && classes.backdropTop, this.props.tutorial == SLT.sidebar2 && classes.highlight)}
+          className={clsx(
+            classes.drawer,
+            (this.props.tutorial == SLT.sidebar1 ||
+              this.props.tutorial == SLT.sidebar2 ||
+              this.state.drawerOpen) &&
+              classes.backdropTop,
+            this.props.tutorial == SLT.sidebar2 && classes.highlight,
+          )}
           variant="permanent"
-          classes={{paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose, this.props.specialMode && classes.drawerPaperHidden)}}
-          open={this.state.drawerOpen}>
+          classes={{
+            paper: clsx(
+              classes.drawerPaper,
+              !open && classes.drawerPaperClose,
+              this.props.specialMode && classes.drawerPaperHidden,
+            ),
+          }}
+          open={this.state.drawerOpen}
+        >
           <div className={clsx(!open && classes.appBarSpacerWrapper)}>
             <Collapse in={!open}>
               <div className={classes.appBarSpacer} />
@@ -417,17 +473,23 @@ class ScriptLibrary extends React.Component {
 
           <ListItem className={classes.drawerButton}>
             <IconButton
-              className={clsx(this.props.tutorial == SLT.sidebar1 && classes.highlight)}
+              className={clsx(
+                this.props.tutorial == SLT.sidebar1 && classes.highlight,
+              )}
               onClick={this.onToggleDrawer.bind(this)}
-              size="large">
-              <MenuIcon className={classes.drawerIcon}/>
+              size="large"
+            >
+              <MenuIcon className={classes.drawerIcon} />
             </IconButton>
           </ListItem>
 
           <Divider />
 
           <div className={clsx(this.props.tutorial != null && classes.disable)}>
-            <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Manage Tags"}>
+            <Tooltip
+              disableInteractive
+              title={this.state.drawerOpen ? "" : "Manage Tags"}
+            >
               <ListItem button onClick={this.props.onManageTags.bind(this)}>
                 <ListItemIcon>
                   <LocalOfferIcon />
@@ -437,13 +499,17 @@ class ScriptLibrary extends React.Component {
                   <Chip
                     className={clsx(classes.chip, !open && classes.chipClose)}
                     label={this.props.tags.length}
-                    color='primary'
-                    size='small'
-                    variant='outlined'/>
+                    color="primary"
+                    size="small"
+                    variant="outlined"
+                  />
                 )}
               </ListItem>
             </Tooltip>
-            <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Batch Tag"}>
+            <Tooltip
+              disableInteractive
+              title={this.state.drawerOpen ? "" : "Batch Tag"}
+            >
               <ListItem button onClick={this.onBatchTag.bind(this)}>
                 <ListItemIcon>
                   <FormatListBulletedIcon />
@@ -457,16 +523,25 @@ class ScriptLibrary extends React.Component {
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
           <div className={clsx(classes.root, classes.fill)}>
-            {!this.props.specialMode &&  (
-              <div className={classes.drawerSpacer}/>
+            {!this.props.specialMode && (
+              <div className={classes.drawerSpacer} />
             )}
-            <Container maxWidth={false} className={clsx(classes.container, this.state.displaySources.length > 0 && classes.containerNotEmpty)}>
+            <Container
+              maxWidth={false}
+              className={clsx(
+                classes.container,
+                this.state.displaySources.length > 0 &&
+                  classes.containerNotEmpty,
+              )}
+            >
               <ScriptSourceList
                 specialMode={this.props.specialMode}
                 library={this.props.library}
                 scenes={this.props.allScenes}
                 selected={this.state.selected}
-                showHelp={!this.props.specialMode && this.state.filters.length == 0}
+                showHelp={
+                  !this.props.specialMode && this.state.filters.length == 0
+                }
                 sources={this.state.displaySources}
                 yOffset={this.props.yOffset}
                 onEditScript={this.props.onEditScript}
@@ -475,7 +550,8 @@ class ScriptLibrary extends React.Component {
                 onUpdateLibrary={this.props.onUpdateLibrary.bind(this)}
                 onUpdateScript={this.props.onUpdateScript.bind(this)}
                 savePosition={this.savePosition.bind(this)}
-                systemMessage={this.props.systemMessage.bind(this)}/>
+                systemMessage={this.props.systemMessage.bind(this)}
+              />
             </Container>
           </div>
         </main>
@@ -483,42 +559,62 @@ class ScriptLibrary extends React.Component {
         <Backdrop
           className={classes.backdrop}
           onClick={this.onCloseDialog.bind(this)}
-          open={this.props.tutorial == null && (this.state.openMenu == MO.new || this.state.drawerOpen)} />
+          open={
+            this.props.tutorial == null &&
+            (this.state.openMenu == MO.new || this.state.drawerOpen)
+          }
+        />
 
         {this.props.specialMode && (
           <React.Fragment>
-            <Tooltip disableInteractive title="Clear"  placement="top-end">
+            <Tooltip disableInteractive title="Clear" placement="top-end">
               <Fab
                 className={classes.selectNoneButton}
                 onClick={this.onSelectNone.bind(this)}
-                size="small">
+                size="small"
+              >
                 <ClearIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip disableInteractive title="Select All"  placement="top-end">
+            <Tooltip disableInteractive title="Select All" placement="top-end">
               <Fab
                 className={classes.selectAllButton}
                 onClick={this.onSelectAll.bind(this)}
-                size="medium">
+                size="medium"
+              >
                 <SelectAllIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip disableInteractive title={this.props.specialMode == SP.batchTag ? "Batch Tag" : "Import"}  placement="top-end">
+            <Tooltip
+              disableInteractive
+              title={
+                this.props.specialMode == SP.batchTag ? "Batch Tag" : "Import"
+              }
+              placement="top-end"
+            >
               <Badge
                 classes={{
-                  badge: classes.importBadge
+                  badge: classes.importBadge,
                 }}
                 overlap="circular"
                 color="secondary"
                 badgeContent={this.state.selected.length}
-                max={999}>
+                max={999}
+              >
                 <Fab
                   className={classes.addMenuButton}
                   disabled={this.state.selected.length == 0}
-                  onClick={this.props.specialMode == SP.batchTag ? this.onToggleBatchTagModal.bind(this) :
-                    this.props.specialMode == SP.select ? this.onImportFromLibrary.bind(this) : this.onImportSingleFromLibrary.bind(this)}
-                  size="large">
-                  {(this.props.specialMode == SP.select || this.props.specialMode == SP.selectSingle) && (
+                  onClick={
+                    this.props.specialMode == SP.batchTag
+                      ? this.onToggleBatchTagModal.bind(this)
+                      : this.props.specialMode == SP.select
+                        ? this.onImportFromLibrary.bind(this)
+                        : this.onImportSingleFromLibrary.bind(this)
+                  }
+                  size="large"
+                >
+                  {(this.props.specialMode == SP.select ||
+                    this.props.specialMode == SP.selectSingle) && (
                     <GetAppIcon className={classes.icon} />
                   )}
                   {this.props.specialMode == SP.batchTag && (
@@ -533,11 +629,20 @@ class ScriptLibrary extends React.Component {
         {!this.props.specialMode && (
           <React.Fragment>
             {this.props.library.length > 0 && (
-              <Tooltip disableInteractive title={this.state.filters.length == 0 ? "Delete All Sources" : "Delete These Sources"}  placement="left">
+              <Tooltip
+                disableInteractive
+                title={
+                  this.state.filters.length == 0
+                    ? "Delete All Sources"
+                    : "Delete These Sources"
+                }
+                placement="left"
+              >
                 <Fab
                   className={classes.removeAllButton}
                   onClick={this.onRemoveAll.bind(this)}
-                  size="small">
+                  size="small"
+                >
                   <DeleteSweepIcon className={classes.icon} />
                 </Fab>
               </Tooltip>
@@ -546,20 +651,30 @@ class ScriptLibrary extends React.Component {
               open={this.state.openMenu == MO.removeAllAlert}
               onClose={this.onCloseDialog.bind(this)}
               aria-labelledby="remove-all-title"
-              aria-describedby="remove-all-description">
+              aria-describedby="remove-all-description"
+            >
               {this.state.filters.length == 0 && (
                 <React.Fragment>
-                  <DialogTitle id="remove-all-title">Delete Caption Script Library</DialogTitle>
+                  <DialogTitle id="remove-all-title">
+                    Delete Caption Script Library
+                  </DialogTitle>
                   <DialogContent>
                     <DialogContentText id="remove-all-description">
-                      Are you sure you really wanna delete your entire caption script library...? ಠ_ಠ
+                      Are you sure you really wanna delete your entire caption
+                      script library...? ಠ_ಠ
                     </DialogContentText>
                   </DialogContent>
                   <DialogActions>
-                    <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+                    <Button
+                      onClick={this.onCloseDialog.bind(this)}
+                      color="secondary"
+                    >
                       Cancel
                     </Button>
-                    <Button onClick={this.onFinishRemoveAll.bind(this)} color="primary">
+                    <Button
+                      onClick={this.onFinishRemoveAll.bind(this)}
+                      color="primary"
+                    >
                       Yea... I'm sure
                     </Button>
                   </DialogActions>
@@ -567,46 +682,81 @@ class ScriptLibrary extends React.Component {
               )}
               {this.state.filters.length > 0 && (
                 <React.Fragment>
-                  <DialogTitle id="remove-all-title">Delete Sources</DialogTitle>
+                  <DialogTitle id="remove-all-title">
+                    Delete Sources
+                  </DialogTitle>
                   <DialogContent>
                     <DialogContentText id="remove-all-description">
-                      Are you sure you want to remove these sources from your caption script library?
+                      Are you sure you want to remove these sources from your
+                      caption script library?
                     </DialogContentText>
                   </DialogContent>
                   <DialogActions>
-                    <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+                    <Button
+                      onClick={this.onCloseDialog.bind(this)}
+                      color="secondary"
+                    >
                       Cancel
                     </Button>
-                    <Button onClick={this.onFinishRemoveVisible.bind(this)} color="primary">
+                    <Button
+                      onClick={this.onFinishRemoveVisible.bind(this)}
+                      color="primary"
+                    >
                       Confirm
                     </Button>
                   </DialogActions>
                 </React.Fragment>
               )}
             </Dialog>
-            <Tooltip disableInteractive title={this.state.filters.length > 0 ? "" : "Local Script"}  placement="left">
+            <Tooltip
+              disableInteractive
+              title={this.state.filters.length > 0 ? "" : "Local Script"}
+              placement="left"
+            >
               <Fab
-                className={clsx(classes.addButton, classes.addLocalButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
+                className={clsx(
+                  classes.addButton,
+                  classes.addLocalButton,
+                  this.state.openMenu != MO.new && classes.addButtonClose,
+                  this.state.openMenu == MO.new && classes.backdropTop,
+                  this.state.filters.length > 0 && classes.hidden,
+                )}
                 disabled={this.state.filters.length > 0}
                 onClick={this.onAddSource.bind(this, AF.script)}
-                size="small">
+                size="small"
+              >
                 <DescriptionIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip disableInteractive title={this.state.filters.length > 0 ? "" : "URL"}  placement="left">
+            <Tooltip
+              disableInteractive
+              title={this.state.filters.length > 0 ? "" : "URL"}
+              placement="left"
+            >
               <Fab
-                className={clsx(classes.addButton, classes.addURLButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
+                className={clsx(
+                  classes.addButton,
+                  classes.addURLButton,
+                  this.state.openMenu != MO.new && classes.addButtonClose,
+                  this.state.openMenu == MO.new && classes.backdropTop,
+                  this.state.filters.length > 0 && classes.hidden,
+                )}
                 disabled={this.state.filters.length > 0}
                 onClick={this.onAddSource.bind(this, AF.url)}
-                size="small">
+                size="small"
+              >
                 <HttpIcon className={classes.icon} />
               </Fab>
             </Tooltip>
             <Fab
-              className={clsx(classes.addMenuButton, this.state.openMenu == MO.new && classes.backdropTop)}
+              className={clsx(
+                classes.addMenuButton,
+                this.state.openMenu == MO.new && classes.backdropTop,
+              )}
               disabled={this.state.filters.length > 0}
               onClick={this.onToggleNewMenu.bind(this)}
-              size="large">
+              size="large"
+            >
               <AddIcon className={classes.icon} />
             </Fab>
           </React.Fragment>
@@ -619,82 +769,105 @@ class ScriptLibrary extends React.Component {
           aria-controls="sort-menu"
           aria-label="Sort Sources"
           onClick={this.onOpenSortMenu.bind(this)}
-          size="medium">
+          size="medium"
+        >
           <SortIcon className={classes.icon} />
         </Fab>
         <Menu
           id="sort-menu"
           elevation={1}
           anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'center',
+            vertical: "top",
+            horizontal: "center",
           }}
           transformOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right',
+            vertical: "bottom",
+            horizontal: "right",
           }}
           anchorEl={this.state.menuAnchorEl}
           keepMounted
-          classes={{paper: classes.sortMenu}}
+          classes={{ paper: classes.sortMenu }}
           open={this.state.openMenu == MO.sort}
-          onClose={this.onCloseDialog.bind(this)}>
-          {[SF.alpha, SF.alphaFull, SF.date].map((sf) =>
+          onClose={this.onCloseDialog.bind(this)}
+        >
+          {[SF.alpha, SF.alphaFull, SF.date].map((sf) => (
             <MenuItem key={sf}>
-              <ListItemText primary={en.get(sf)}/>
+              <ListItemText primary={en.get(sf)} />
               <ListItemSecondaryAction>
-                <IconButton edge="end" onClick={this.props.onSort.bind(this, sf, true)} size="large">
-                  <ArrowUpwardIcon/>
+                <IconButton
+                  edge="end"
+                  onClick={this.props.onSort.bind(this, sf, true)}
+                  size="large"
+                >
+                  <ArrowUpwardIcon />
                 </IconButton>
-                <IconButton edge="end" onClick={this.props.onSort.bind(this, sf, false)} size="large">
-                  <ArrowDownwardIcon/>
+                <IconButton
+                  edge="end"
+                  onClick={this.props.onSort.bind(this, sf, false)}
+                  size="large"
+                >
+                  <ArrowDownwardIcon />
                 </IconButton>
               </ListItemSecondaryAction>
             </MenuItem>
-          )}
+          ))}
           <MenuItem key={SF.random}>
-            <ListItemText primary={en.get(SF.random)}/>
+            <ListItemText primary={en.get(SF.random)} />
             <ListItemSecondaryAction>
               <IconButton
                 edge="end"
                 onClick={this.props.onSort.bind(this, SF.random, true)}
-                size="large">
-                <ShuffleIcon/>
+                size="large"
+              >
+                <ShuffleIcon />
               </IconButton>
             </ListItemSecondaryAction>
           </MenuItem>
         </Menu>
 
         <Dialog
-          classes={{paper: classes.noScroll}}
+          classes={{ paper: classes.noScroll }}
           open={this.state.openMenu == MO.batchTag}
           onClose={this.onCloseDialog.bind(this)}
           aria-labelledby="batch-tag-title"
-          aria-describedby="batch-tag-description">
+          aria-describedby="batch-tag-description"
+        >
           <DialogTitle id="batch-tag-title">Batch Tag</DialogTitle>
           <DialogContent className={classes.noScroll}>
             <DialogContentText id="batch-tag-description">
               Choose tags to add, remove, or overwrite on the selected source(s)
             </DialogContentText>
-            {this.state.openMenu == MO.batchTag &&
-            <LibrarySearch
-              displaySources={this.props.library}
-              filters={this.state.selectedTags}
-              tags={this.props.tags}
-              placeholder={"Tag These Sources"}
-              isClearable
-              onlyTags
-              showCheckboxes
-              hideSelectedOptions={false}
-              onUpdateFilters={this.onSelectTags.bind(this)}/>
-            }
+            {this.state.openMenu == MO.batchTag && (
+              <LibrarySearch
+                displaySources={this.props.library}
+                filters={this.state.selectedTags}
+                tags={this.props.tags}
+                placeholder={"Tag These Sources"}
+                isClearable
+                onlyTags
+                showCheckboxes
+                hideSelectedOptions={false}
+                onUpdateFilters={this.onSelectTags.bind(this)}
+              />
+            )}
           </DialogContent>
           <DialogActions>
-            <Button disabled={this.state.selectedTags && this.state.selectedTags.length == 0}
-                    onClick={this.batchTagRemove.bind(this)} color="secondary">
+            <Button
+              disabled={
+                this.state.selectedTags && this.state.selectedTags.length == 0
+              }
+              onClick={this.batchTagRemove.bind(this)}
+              color="secondary"
+            >
               - Remove
             </Button>
-            <Button disabled={this.state.selectedTags && this.state.selectedTags.length == 0}
-                    onClick={this.batchTagAdd.bind(this)} color="secondary">
+            <Button
+              disabled={
+                this.state.selectedTags && this.state.selectedTags.length == 0
+              }
+              onClick={this.batchTagAdd.bind(this)}
+              color="secondary"
+            >
               + Add
             </Button>
             <Button onClick={this.batchTagOverwrite.bind(this)} color="primary">
@@ -707,32 +880,50 @@ class ScriptLibrary extends React.Component {
   }
 
   componentDidMount() {
-    this.setState({displaySources: this.getDisplaySources()});
-    window.addEventListener('keydown', this.onKeyDown, false);
+    this.setState({ displaySources: this.getDisplaySources() });
+    window.addEventListener("keydown", this.onKeyDown, false);
   }
 
   componentDidUpdate(props: any, state: any) {
-    if (state.filters != this.state.filters || props.library != this.props.library) {
-      this.setState({displaySources: this.getDisplaySources()});
+    if (
+      state.filters != this.state.filters ||
+      props.library != this.props.library
+    ) {
+      this.setState({ displaySources: this.getDisplaySources() });
     }
     if (this.props.tutorial == SLT.final && this.state.drawerOpen) {
-      this.setState({drawerOpen: false});
+      this.setState({ drawerOpen: false });
     }
   }
 
   componentWillUnmount() {
     this.savePosition();
-    window.removeEventListener('keydown', this.onKeyDown);
+    window.removeEventListener("keydown", this.onKeyDown);
   }
 
   onKeyDown = (e: KeyboardEvent) => {
-    if (!e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'm' || e.key == 'µ')) {
+    if (
+      !e.shiftKey &&
+      !e.ctrlKey &&
+      e.altKey &&
+      (e.key == "m" || e.key == "µ")
+    ) {
       this.toggleMarked();
-    } else if (e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'M' || e.key == 'µ')) {
+    } else if (
+      e.shiftKey &&
+      !e.ctrlKey &&
+      e.altKey &&
+      (e.key == "M" || e.key == "µ")
+    ) {
       this.addMarked();
-    } else if (e.shiftKey && e.ctrlKey && e.altKey && (e.key == 'M' || e.key == 'µ')) {
+    } else if (
+      e.shiftKey &&
+      e.ctrlKey &&
+      e.altKey &&
+      (e.key == "M" || e.key == "µ")
+    ) {
       this.removeMarked();
-    } else if (e.key == 'Escape' && this.props.specialMode != null) {
+    } else if (e.key == "Escape" && this.props.specialMode != null) {
       this.goBack();
     }
   };
@@ -744,7 +935,7 @@ class ScriptLibrary extends React.Component {
 
   goBack() {
     if (this.props.specialMode == SP.batchTag) {
-      this.setState({selected: [], selectedTags: []});
+      this.setState({ selected: [], selectedTags: [] });
       this.props.onBatchTag();
     } else {
       this.props.goBack();
@@ -752,7 +943,10 @@ class ScriptLibrary extends React.Component {
   }
 
   onUpdateFilters(filters: Array<string>) {
-    this.setState({filters: filters, displaySources: this.getDisplaySources()});
+    this.setState({
+      filters: filters,
+      displaySources: this.getDisplaySources(),
+    });
   }
 
   onAddSource(type: string, e: MouseEvent) {
@@ -764,11 +958,13 @@ class ScriptLibrary extends React.Component {
         originalSources.forEach((s) => {
           id = Math.max(s.id + 1, id);
         });
-        originalSources.unshift(new CaptionScript({
-          url: "",
-          id: id,
-          tags: [],
-        }));
+        originalSources.unshift(
+          new CaptionScript({
+            url: "",
+            id: id,
+            tags: [],
+          }),
+        );
         this.props.onUpdateLibrary((l) => {
           l.splice(0, l.length);
           l.push(...originalSources);
@@ -831,37 +1027,40 @@ class ScriptLibrary extends React.Component {
 
   onToggleBatchTagModal() {
     if (this.state.openMenu == MO.batchTag) {
-      this.setState({openMenu: null, selectedTags: []});
+      this.setState({ openMenu: null, selectedTags: [] });
     } else {
-      this.setState({openMenu: MO.batchTag, selectedTags: this.getSelectedTags()});
+      this.setState({
+        openMenu: MO.batchTag,
+        selectedTags: this.getSelectedTags(),
+      });
     }
   }
 
   onSelectTags(selectedTags: Array<string>) {
-    this.setState({selectedTags: selectedTags});
+    this.setState({ selectedTags: selectedTags });
   }
 
   onToggleDrawer() {
     if (this.props.tutorial == SLT.sidebar1) {
       this.props.onTutorial(SLT.sidebar1);
     }
-    this.setState({drawerOpen: !this.state.drawerOpen});
+    this.setState({ drawerOpen: !this.state.drawerOpen });
   }
 
   onToggleNewMenu() {
-    this.setState({openMenu: this.state.openMenu == MO.new ? null : MO.new});
+    this.setState({ openMenu: this.state.openMenu == MO.new ? null : MO.new });
   }
 
   onOpenSortMenu(e: MouseEvent) {
-    this.setState({menuAnchorEl: e.currentTarget, openMenu: MO.sort});
+    this.setState({ menuAnchorEl: e.currentTarget, openMenu: MO.sort });
   }
 
   onCloseDialog() {
-    this.setState({menuAnchorEl: null, openMenu: null, drawerOpen: false});
+    this.setState({ menuAnchorEl: null, openMenu: null, drawerOpen: false });
   }
 
   onRemoveAll() {
-    this.setState({openMenu: MO.removeAllAlert});
+    this.setState({ openMenu: MO.removeAllAlert });
   }
 
   onFinishRemoveAll() {
@@ -874,14 +1073,14 @@ class ScriptLibrary extends React.Component {
   onFinishRemoveVisible() {
     this.props.onUpdateLibrary((l) => {
       const displayIDs = this.state.displaySources.map((s) => s.id);
-      for (let i = l.length -1; i >= 0 ; i--) {
+      for (let i = l.length - 1; i >= 0; i--) {
         if (displayIDs.includes(l[i].id)) {
           l.splice(i, 1);
         }
       }
     });
     this.onCloseDialog();
-    this.setState({filters: []});
+    this.setState({ filters: [] });
   }
 
   onImportFromLibrary() {
@@ -904,11 +1103,10 @@ class ScriptLibrary extends React.Component {
         break;
       }
     }
-
   }
 
   onUpdateSelected(selected: Array<string>) {
-    this.setState({selected: selected});
+    this.setState({ selected: selected });
   }
 
   onSelectAll() {
@@ -919,7 +1117,7 @@ class ScriptLibrary extends React.Component {
         newSelected.push(source);
       }
     }
-    this.setState({selected: newSelected});
+    this.setState({ selected: newSelected });
   }
 
   onSelectNone() {
@@ -927,10 +1125,10 @@ class ScriptLibrary extends React.Component {
     let newSelected = Array.from(this.state.selected);
     for (let source of displaySources.map((s) => s.url)) {
       if (newSelected.includes(source)) {
-        newSelected.splice(newSelected.indexOf(source), 1)
+        newSelected.splice(newSelected.indexOf(source), 1);
       }
     }
-    this.setState({selected: newSelected});
+    this.setState({ selected: newSelected });
   }
 
   savePosition() {
@@ -938,7 +1136,11 @@ class ScriptLibrary extends React.Component {
     if (sortableList) {
       const scrollElement = sortableList.firstElementChild;
       const scrollTop = scrollElement ? scrollElement.scrollTop : 0;
-      this.props.savePosition(scrollTop, this.state.filters, this.state.selected);
+      this.props.savePosition(
+        scrollTop,
+        this.state.filters,
+        this.state.selected,
+      );
     }
   }
 
@@ -947,13 +1149,15 @@ class ScriptLibrary extends React.Component {
       taggingMode = this.props.library.find((s) => s.marked) == null;
     }
 
-    if (taggingMode) { // We're marking sources
+    if (taggingMode) {
+      // We're marking sources
       this.props.onUpdateLibrary((l) => {
         for (let source of this.state.displaySources) {
           l.find((s) => s.id == source.id).marked = true;
         }
       });
-    } else { // We're unmarking sources
+    } else {
+      // We're unmarking sources
       this.props.onUpdateLibrary((l) => {
         for (let source of l) {
           source.marked = false;
@@ -976,7 +1180,12 @@ class ScriptLibrary extends React.Component {
         const source = l.find((s) => s.url === sourceURL);
         source.tags = new Array<Tag>();
         for (let tag of this.state.selectedTags) {
-          source.tags.push(new Tag({name: tag, id: this.props.tags.find((t) => t.name == tag).id}));
+          source.tags.push(
+            new Tag({
+              name: tag,
+              id: this.props.tags.find((t) => t.name == tag).id,
+            }),
+          );
         }
       }
     });
@@ -990,7 +1199,12 @@ class ScriptLibrary extends React.Component {
         const sourceTags = source.tags.map((t) => t.name);
         for (let tag of this.state.selectedTags) {
           if (!sourceTags.includes(tag)) {
-            source.tags.push(new Tag({name: tag, id: this.props.tags.find((t) => t.name == tag).id}));
+            source.tags.push(
+              new Tag({
+                name: tag,
+                id: this.props.tags.find((t) => t.name == tag).id,
+              }),
+            );
           }
         }
       }
@@ -1046,20 +1260,30 @@ class ScriptLibrary extends React.Component {
         let matchesFilter = true;
         let countRegex;
         for (let filter of this.state.filters) {
-          if (filter == "<Marked>") { // This is a marked filter
+          if (filter == "<Marked>") {
+            // This is a marked filter
             matchesFilter = source.marked;
-          }else if (filter == "<Untagged>") { // This is untagged filter
+          } else if (filter == "<Untagged>") {
+            // This is untagged filter
             matchesFilter = source.tags.length === 0;
-          } else if ((filter.startsWith("[") || filter.startsWith("-[")) && filter.endsWith("]")) { // This is a tag filter
+          } else if (
+            (filter.startsWith("[") || filter.startsWith("-[")) &&
+            filter.endsWith("]")
+          ) {
+            // This is a tag filter
             if (filter.startsWith("-")) {
-              let tag = filter.substring(2, filter.length-1);
+              let tag = filter.substring(2, filter.length - 1);
               matchesFilter = source.tags.find((t) => t.name == tag) == null;
             } else {
-              let tag = filter.substring(1, filter.length-1);
+              let tag = filter.substring(1, filter.length - 1);
               matchesFilter = source.tags.find((t) => t.name == tag) != null;
             }
-          } else if (((filter.startsWith('"') || filter.startsWith('-"')) && filter.endsWith('"')) ||
-            ((filter.startsWith('\'') || filter.startsWith('-\'')) && filter.endsWith('\''))) {
+          } else if (
+            ((filter.startsWith('"') || filter.startsWith('-"')) &&
+              filter.endsWith('"')) ||
+            ((filter.startsWith("'") || filter.startsWith("-'")) &&
+              filter.endsWith("'"))
+          ) {
             if (filter.startsWith("-")) {
               filter = filter.substring(2, filter.length - 1);
               const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
@@ -1069,7 +1293,8 @@ class ScriptLibrary extends React.Component {
               const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
               matchesFilter = regex.test(source.url);
             }
-          } else { // This is a search filter
+          } else {
+            // This is a search filter
             filter = filter.replace("\\", "\\\\");
             if (filter.startsWith("-")) {
               filter = filter.substring(1, filter.length);
@@ -1093,5 +1318,5 @@ class ScriptLibrary extends React.Component {
   }
 }
 
-(ScriptLibrary as any).displayName="ScriptLibrary";
+(ScriptLibrary as any).displayName = "ScriptLibrary";
 export default withStyles(styles)(ScriptLibrary as any);

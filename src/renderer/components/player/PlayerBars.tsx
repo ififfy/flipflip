@@ -1,6 +1,6 @@
 import * as React from "react";
 import clsx from "clsx";
-import {fileUrl_fileURL} from "../../dummy/file-url";
+import { fileUrl_fileURL } from "../../dummy/file-url";
 import wretch from "wretch";
 
 import {
@@ -29,21 +29,21 @@ import {
   Fab,
 } from "@mui/material";
 
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
+import createStyles from "@mui/styles/createStyles";
+import withStyles from "@mui/styles/withStyles";
 
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ForwardIcon from '@mui/icons-material/Forward';
-import FullscreenIcon from '@mui/icons-material/Fullscreen';
-import PauseIcon from '@mui/icons-material/Pause';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ForwardIcon from "@mui/icons-material/Forward";
+import FullscreenIcon from "@mui/icons-material/Fullscreen";
+import PauseIcon from "@mui/icons-material/Pause";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
 
-import {createMainMenu, createMenuTemplate} from "../../../main/MainMenu";
-import {PT, ST} from "../../data/const";
-import {getCachePath, urlToPath} from "../../data/utils";
-import {getSourceType} from "./Scrapers";
+import { createMainMenu, createMenuTemplate } from "../../../main/MainMenu";
+import { PT, ST } from "../../data/const";
+import { getCachePath, urlToPath } from "../../data/utils";
+import { getSourceType } from "./Scrapers";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
 import Scene from "../../data/Scene";
@@ -68,7 +68,9 @@ import { fs_existsSync, fs_unlink } from "../../dummy/fs";
 const drawerWidth = 340;
 
 const hexToRGB = (h: string) => {
-  let r = "0", g = "0", b = "0";
+  let r = "0",
+    g = "0",
+    b = "0";
 
   // 3 digits
   if (h.length == 4) {
@@ -83,210 +85,215 @@ const hexToRGB = (h: string) => {
     b = "0x" + h[5] + h[6];
   }
 
-  return "rgb("+ +r + "," + +g + "," + +b + ", 0.6)";
-}
+  return "rgb(" + +r + "," + +g + "," + +b + ", 0.6)";
+};
 
-const styles = (theme: Theme) => createStyles({
-  hoverBar: {
-    zIndex: theme.zIndex.drawer + 1,
-    position: 'absolute',
-    opacity: 0,
-    height: theme.spacing(5),
-    width: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    padding: '0 8px',
-    minHeight: 64,
-  },
-  appBar: {
-    zIndex: theme.zIndex.drawer + 1,
-    height: theme.spacing(8),
-    marginTop: theme.spacing(-8.5),
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  appBarHover: {
-    marginTop: 0,
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  title: {
-    textAlign: 'center',
-    flexGrow: 1,
-  },
-  headerBar: {
-    display: 'flex',
-    alignItems: 'center',
-    whiteSpace: 'nowrap',
-    flexWrap: 'nowrap',
-  },
-  headerLeft: {
-    flexBasis: '20%',
-  },
-  headerRight: {
-    flexBasis: '20%',
-    justifyContent: 'flex-end',
-    display: 'flex',
-  },
-  drawerToolbar: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: theme.palette.background.default,
-    padding: '0 8px',
-    minHeight: 64,
-  },
-  drawer: {
-    zIndex: theme.zIndex.drawer,
-    width: drawerWidth,
-    marginLeft: -drawerWidth - 3,
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  drawerHover: {
-    marginLeft: 0,
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  hoverDrawer: {
-    zIndex: theme.zIndex.drawer,
-    position: 'absolute',
-    opacity: 0,
-    width: theme.spacing(5),
-    height: '100%',
-  },
-  drawerPaper: {
-    position: 'relative',
-    whiteSpace: 'nowrap',
-    overflowX: 'hidden',
-    height: '100vh',
-    width: 0,
-    backgroundColor: theme.palette.background.default,
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  drawerPaperHover: {
-    width: drawerWidth,
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  tagDrawer: {
-    zIndex: theme.zIndex.drawer + 1,
-    position: 'absolute',
-  },
-  tagDrawerPaper: {
-    overflow: 'hidden',
-    transform: 'scale(0)',
-    transformOrigin: 'bottom left',
-    backgroundColor: hexToRGB(theme.palette.background.default),
-    transition: theme.transitions.create('transform', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  tagDrawerPaperHover: {
-    transform: 'scale(1)',
-    transition: theme.transitions.create('transform', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  hoverTagDrawer: {
-    zIndex: theme.zIndex.drawer + 1,
-    position: 'absolute',
-    bottom: 0,
-    opacity: 0,
-    width: '100%',
-    height: theme.spacing(5),
-  },
-  tagList: {
-    padding: theme.spacing(1),
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    width: '100%',
-  },
-  tag: {
-    marginRight: theme.spacing(1),
-    marginBottom: theme.spacing(1),
-  },
-  tagContent: {
-    padding: theme.spacing(1),
-  },
-  selectedTag: {
-    backgroundColor: theme.palette.primary.light,
-    color: theme.palette.primary.contrastText,
-  },
-  wordWrap: {
-    wordWrap: 'break-word',
-  },
-  backdropTop: {
-    zIndex: theme.zIndex.modal + 1,
-  },
-  highlight: {
-    borderWidth: 2,
-    borderColor: theme.palette.secondary.main,
-    borderStyle: 'solid',
-  },
-  disable: {
-    pointerEvents: 'none',
-  }
-});
+const styles = (theme: Theme) =>
+  createStyles({
+    hoverBar: {
+      zIndex: theme.zIndex.drawer + 1,
+      position: "absolute",
+      opacity: 0,
+      height: theme.spacing(5),
+      width: "100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "flex-end",
+      padding: "0 8px",
+      minHeight: 64,
+    },
+    appBar: {
+      zIndex: theme.zIndex.drawer + 1,
+      height: theme.spacing(8),
+      marginTop: theme.spacing(-8.5),
+      transition: theme.transitions.create("margin", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+    },
+    appBarHover: {
+      marginTop: 0,
+      transition: theme.transitions.create("margin", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+    },
+    title: {
+      textAlign: "center",
+      flexGrow: 1,
+    },
+    headerBar: {
+      display: "flex",
+      alignItems: "center",
+      whiteSpace: "nowrap",
+      flexWrap: "nowrap",
+    },
+    headerLeft: {
+      flexBasis: "20%",
+    },
+    headerRight: {
+      flexBasis: "20%",
+      justifyContent: "flex-end",
+      display: "flex",
+    },
+    drawerToolbar: {
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: theme.palette.background.default,
+      padding: "0 8px",
+      minHeight: 64,
+    },
+    drawer: {
+      zIndex: theme.zIndex.drawer,
+      width: drawerWidth,
+      marginLeft: -drawerWidth - 3,
+      transition: theme.transitions.create("margin", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+    },
+    drawerHover: {
+      marginLeft: 0,
+      transition: theme.transitions.create("margin", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+    },
+    hoverDrawer: {
+      zIndex: theme.zIndex.drawer,
+      position: "absolute",
+      opacity: 0,
+      width: theme.spacing(5),
+      height: "100%",
+    },
+    drawerPaper: {
+      position: "relative",
+      whiteSpace: "nowrap",
+      overflowX: "hidden",
+      height: "100vh",
+      width: 0,
+      backgroundColor: theme.palette.background.default,
+      transition: theme.transitions.create("width", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+    },
+    drawerPaperHover: {
+      width: drawerWidth,
+      transition: theme.transitions.create("width", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+    },
+    tagDrawer: {
+      zIndex: theme.zIndex.drawer + 1,
+      position: "absolute",
+    },
+    tagDrawerPaper: {
+      overflow: "hidden",
+      transform: "scale(0)",
+      transformOrigin: "bottom left",
+      backgroundColor: hexToRGB(theme.palette.background.default),
+      transition: theme.transitions.create("transform", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+    },
+    tagDrawerPaperHover: {
+      transform: "scale(1)",
+      transition: theme.transitions.create("transform", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+    },
+    hoverTagDrawer: {
+      zIndex: theme.zIndex.drawer + 1,
+      position: "absolute",
+      bottom: 0,
+      opacity: 0,
+      width: "100%",
+      height: theme.spacing(5),
+    },
+    tagList: {
+      padding: theme.spacing(1),
+      display: "flex",
+      flexWrap: "wrap",
+      justifyContent: "center",
+      width: "100%",
+    },
+    tag: {
+      marginRight: theme.spacing(1),
+      marginBottom: theme.spacing(1),
+    },
+    tagContent: {
+      padding: theme.spacing(1),
+    },
+    selectedTag: {
+      backgroundColor: theme.palette.primary.light,
+      color: theme.palette.primary.contrastText,
+    },
+    wordWrap: {
+      wordWrap: "break-word",
+    },
+    backdropTop: {
+      zIndex: theme.zIndex.modal + 1,
+    },
+    highlight: {
+      borderWidth: 2,
+      borderColor: theme.palette.secondary.main,
+      borderStyle: "solid",
+    },
+    disable: {
+      pointerEvents: "none",
+    },
+  });
 
 class PlayerBars extends React.Component {
   readonly props: {
-    classes: any,
-    config: Config,
-    hasStarted: boolean,
-    historyPaths: Array<any>,
-    historyOffset: number,
-    imagePlayerAdvanceHacks: Array<Array<ChildCallbackHack>>,
-    imagePlayerDeleteHack: ChildCallbackHack,
-    isEmpty: boolean,
-    isPlaying: boolean,
-    mainVideo: HTMLVideoElement,
-    overlayVideos: Array<Array<HTMLVideoElement>>,
-    persistAudio: boolean,
-    persistText: boolean,
-    recentPictureGrid: boolean,
-    scene: Scene,
-    scenes: Array<Scene>,
-    sceneGrids: Array<SceneGrid>,
-    title: string,
-    tutorial: string,
-    goBack(): void,
-    historyBack(): void,
-    historyForward(): void,
-    navigateTagging(offset: number): void,
-    onGenerate(scene: Scene | SceneGrid, children?: boolean, force?: boolean): void,
-    onRecentPictureGrid(): void,
-    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void,
-    playNextScene(): void,
-    play(): void,
-    pause(): void,
-    setCurrentAudio(audio: Audio): void,
-    allTags?: Array<Tag>,
-    tags?: Array<Tag>,
-    blacklistFile?(sourceURL: string, fileToBlacklist: string): void,
-    goToTagSource?(source: LibrarySource): void,
-    goToClipSource?(source: LibrarySource): void,
-    playTrack?(url: string): void,
-    onPlaying?(position: number, duration: number): void,
-    toggleTag?(sourceID: number, tag: Tag): void,
-    inheritTags?(sourceID: number): void,
+    classes: any;
+    config: Config;
+    hasStarted: boolean;
+    historyPaths: Array<any>;
+    historyOffset: number;
+    imagePlayerAdvanceHacks: Array<Array<ChildCallbackHack>>;
+    imagePlayerDeleteHack: ChildCallbackHack;
+    isEmpty: boolean;
+    isPlaying: boolean;
+    mainVideo: HTMLVideoElement;
+    overlayVideos: Array<Array<HTMLVideoElement>>;
+    persistAudio: boolean;
+    persistText: boolean;
+    recentPictureGrid: boolean;
+    scene: Scene;
+    scenes: Array<Scene>;
+    sceneGrids: Array<SceneGrid>;
+    title: string;
+    tutorial: string;
+    goBack(): void;
+    historyBack(): void;
+    historyForward(): void;
+    navigateTagging(offset: number): void;
+    onGenerate(
+      scene: Scene | SceneGrid,
+      children?: boolean,
+      force?: boolean,
+    ): void;
+    onRecentPictureGrid(): void;
+    onUpdateScene(scene: Scene, fn: (scene: Scene) => void): void;
+    playNextScene(): void;
+    play(): void;
+    pause(): void;
+    setCurrentAudio(audio: Audio): void;
+    allTags?: Array<Tag>;
+    tags?: Array<Tag>;
+    blacklistFile?(sourceURL: string, fileToBlacklist: string): void;
+    goToTagSource?(source: LibrarySource): void;
+    goToClipSource?(source: LibrarySource): void;
+    playTrack?(url: string): void;
+    onPlaying?(position: number, duration: number): void;
+    toggleTag?(sourceID: number, tag: Tag): void;
+    inheritTags?(sourceID: number): void;
   };
 
   readonly state = {
@@ -308,21 +315,31 @@ class PlayerBars extends React.Component {
   render() {
     const classes = this.props.classes;
 
-    const canGoBack = this.props.historyOffset > -(this.props.historyPaths.length - 1);
+    const canGoBack =
+      this.props.historyOffset > -(this.props.historyPaths.length - 1);
     const canGoForward = this.props.historyOffset < 0;
     const tagNames = this.props.tags ? this.props.tags.map((t) => t.name) : [];
     let clipValue = null;
     let clipID: number = null;
     let source = null;
-    if (this.props.mainVideo && this.props.mainVideo.hasAttribute("start") && this.props.mainVideo.hasAttribute("end")) {
-      clipValue = [parseFloat(this.props.mainVideo.getAttribute("start")), parseFloat(this.props.mainVideo.getAttribute("end"))]
+    if (
+      this.props.mainVideo &&
+      this.props.mainVideo.hasAttribute("start") &&
+      this.props.mainVideo.hasAttribute("end")
+    ) {
+      clipValue = [
+        parseFloat(this.props.mainVideo.getAttribute("start")),
+        parseFloat(this.props.mainVideo.getAttribute("end")),
+      ];
       clipID = parseInt(this.props.mainVideo.getAttribute("clip"));
       const sourceURL = this.props.mainVideo.getAttribute("source");
       source = this.props.scene.sources.find((s) => s.url == sourceURL);
     }
 
     if (!this._showVideoControls) {
-      this._showVideoControls = this.props.mainVideo != null || this.props.overlayVideos.find((a) => a != null) != null;
+      this._showVideoControls =
+        this.props.mainVideo != null ||
+        this.props.overlayVideos.find((a) => a != null) != null;
     }
 
     return (
@@ -330,14 +347,25 @@ class PlayerBars extends React.Component {
         <div
           className={classes.hoverBar}
           onMouseEnter={this.onMouseEnterAppBar.bind(this)}
-          onMouseLeave={this.onMouseLeaveAppBar.bind(this)}/>
+          onMouseLeave={this.onMouseLeaveAppBar.bind(this)}
+        />
 
         <AppBar
           enableColorOnDark
           position="absolute"
           onMouseEnter={this.onMouseEnterAppBar.bind(this)}
           onMouseLeave={this.onMouseLeaveAppBar.bind(this)}
-          className={clsx(classes.appBar, (this.props.tutorial == PT.toolbar || !this.props.hasStarted || this.props.isEmpty || this.state.appBarHover) && classes.appBarHover, this.props.tutorial == PT.toolbar && clsx(classes.backdropTop, classes.highlight))}>
+          className={clsx(
+            classes.appBar,
+            (this.props.tutorial == PT.toolbar ||
+              !this.props.hasStarted ||
+              this.props.isEmpty ||
+              this.state.appBarHover) &&
+              classes.appBarHover,
+            this.props.tutorial == PT.toolbar &&
+              clsx(classes.backdropTop, classes.highlight),
+          )}
+        >
           <Toolbar className={classes.headerBar}>
             <div className={classes.headerLeft}>
               <Tooltip disableInteractive title="Back" placement="right-end">
@@ -346,14 +374,21 @@ class PlayerBars extends React.Component {
                   color="inherit"
                   aria-label="Back"
                   onClick={this.navigateBack.bind(this)}
-                  size="large">
+                  size="large"
+                >
                   <ArrowBackIcon />
                 </IconButton>
               </Tooltip>
             </div>
 
             <Tooltip disableInteractive title={this.props.title}>
-              <Typography component="h1" variant="h4" color="inherit" noWrap className={classes.title}>
+              <Typography
+                component="h1"
+                variant="h4"
+                color="inherit"
+                noWrap
+                className={classes.title}
+              >
                 {this.props.title}
               </Typography>
             </Tooltip>
@@ -365,37 +400,65 @@ class PlayerBars extends React.Component {
                   color="inherit"
                   aria-label="FullScreen"
                   onClick={this.toggleFull.bind(this)}
-                  size="large">
-                  <FullscreenIcon fontSize="large"/>
+                  size="large"
+                >
+                  <FullscreenIcon fontSize="large" />
                 </IconButton>
               </Tooltip>
               {!this.props.scene.gridScene && (
                 <React.Fragment>
-                  <Divider component="div" orientation="vertical" style={{height: 48, margin: '0 14px 0 3px'}}/>
+                  <Divider
+                    component="div"
+                    orientation="vertical"
+                    style={{ height: 48, margin: "0 14px 0 3px" }}
+                  />
                   <IconButton
                     disabled={!canGoBack}
                     edge="start"
                     color="inherit"
                     aria-label="Backward"
                     onClick={this.historyBack.bind(this)}
-                    size="large">
-                    <ForwardIcon fontSize="large" style={{transform: 'rotate(180deg)'}}/>
+                    size="large"
+                  >
+                    <ForwardIcon
+                      fontSize="large"
+                      style={{ transform: "rotate(180deg)" }}
+                    />
                   </IconButton>
                   <IconButton
                     edge="start"
                     color="inherit"
                     aria-label={this.props.isPlaying ? "Pause" : "Play"}
-                    onClick={this.setPlayPause.bind(this, !this.props.isPlaying)}
-                    size="large">
-                    {this.props.isPlaying ? <PauseIcon fontSize="large"/> : <PlayArrowIcon fontSize="large"/>}
+                    onClick={this.setPlayPause.bind(
+                      this,
+                      !this.props.isPlaying,
+                    )}
+                    size="large"
+                  >
+                    {this.props.isPlaying ? (
+                      <PauseIcon fontSize="large" />
+                    ) : (
+                      <PlayArrowIcon fontSize="large" />
+                    )}
                   </IconButton>
                   <IconButton
                     edge="start"
                     color="inherit"
                     aria-label="Forward"
                     onClick={this.historyForward.bind(this)}
-                    size="large">
-                    <ForwardIcon fontSize="large" style={canGoForward ? {} : {color: 'rgba(255, 255, 255, 0.3)', backgroundColor: 'transparent'}}/>
+                    size="large"
+                  >
+                    <ForwardIcon
+                      fontSize="large"
+                      style={
+                        canGoForward
+                          ? {}
+                          : {
+                              color: "rgba(255, 255, 255, 0.3)",
+                              backgroundColor: "transparent",
+                            }
+                      }
+                    />
                   </IconButton>
                 </React.Fragment>
               )}
@@ -403,304 +466,392 @@ class PlayerBars extends React.Component {
           </Toolbar>
         </AppBar>
 
-        {this.props.hasStarted && !this.props.isEmpty && !this.props.recentPictureGrid && !this.props.scene.downloadScene && (
-          <React.Fragment>
-            <div
-              className={classes.hoverDrawer}
-              onMouseEnter={this.onMouseEnterDrawer.bind(this)}
-              onMouseLeave={this.onMouseLeaveDrawer.bind(this)}/>
+        {this.props.hasStarted &&
+          !this.props.isEmpty &&
+          !this.props.recentPictureGrid &&
+          !this.props.scene.downloadScene && (
+            <React.Fragment>
+              <div
+                className={classes.hoverDrawer}
+                onMouseEnter={this.onMouseEnterDrawer.bind(this)}
+                onMouseLeave={this.onMouseLeaveDrawer.bind(this)}
+              />
 
-            <Drawer
-              variant="permanent"
-              className={clsx(classes.drawer, (this.props.tutorial == PT.sidebar || this.state.drawerHover) && classes.drawerHover)}
-              classes={{paper: clsx(classes.drawerPaper, (this.props.tutorial == PT.sidebar || this.state.drawerHover) && classes.drawerPaperHover, this.props.tutorial == PT.toolbar && clsx(classes.backdropTop, classes.highlight))}}
-              open={this.props.tutorial == PT.sidebar || this.state.drawerHover}
-              onMouseEnter={this.onMouseEnterDrawer.bind(this)}
-              onMouseLeave={this.onMouseLeaveDrawer.bind(this)}>
-              <div className={classes.drawerToolbar}>
-                <Typography variant="h4">
-                  Settings
-                </Typography>
-              </div>
-
-              {!this.props.scene.audioScene && this._showVideoControls && (
-                <Accordion TransitionProps={{ unmountOnExit: false }}>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                  >
-                    <Typography>Video Controls</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <VideoCard
-                      scene={this.props.scene}
-                      otherScenes={this.props.scene.overlays.map((o) => this.getScene(o.sceneID))}
-                      isPlaying={this.props.isPlaying}
-                      mainVideo={this.props.mainVideo}
-                      mainClip={source ? source.clips.find((c) => c.id == clipID) : null}
-                      mainClipValue={clipValue ? clipValue : null}
-                      otherVideos={this.props.overlayVideos}
-                      imagePlayerAdvanceHacks={this.props.imagePlayerAdvanceHacks}
-                      onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-                  </AccordionDetails>
-                </Accordion>
-              )}
-
-              {!this.props.scene.audioScene && !this.props.scene.gridScene && (
-                <React.Fragment>
-                  <Accordion TransitionProps={{ unmountOnExit: true }}>
-                    <AccordionSummary
-                      expandIcon={<ExpandMoreIcon />}
-                    >
-                      <Typography>Scene Options</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <SceneOptionCard
-                        sidebar
-                        allScenes={this.props.scenes}
-                        allSceneGrids={this.props.sceneGrids}
-                        isTagging={this.props.allTags != null}
-                        scene={this.props.scene}
-                        onUpdateScene={this.props.onUpdateScene.bind(this)}
-                        onGenerate={this.props.onGenerate}/>
-                    </AccordionDetails>
-                  </Accordion>
-
-                  <Accordion TransitionProps={{ unmountOnExit: true }}>
-                    <AccordionSummary
-                      expandIcon={<ExpandMoreIcon />}
-                    >
-                      <Typography>Image/Video Options</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <ImageVideoCard
-                        sidebar
-                        isPlayer
-                        isConfig={false}
-                        scene={this.props.scene}
-                        onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-                    </AccordionDetails>
-                  </Accordion>
-
-                  <Accordion TransitionProps={{ unmountOnExit: true }}>
-                    <AccordionSummary
-                      expandIcon={<ExpandMoreIcon />}
-                    >
-                      <Typography>Zoom/Move</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <ZoomMoveCard
-                        sidebar
-                        scene={this.props.scene}
-                        easingControls={this.props.config.displaySettings.easingControls}
-                        onUpdateScene={this.props.onUpdateScene.bind(this)} />
-                    </AccordionDetails>
-                  </Accordion>
-
-                  <Accordion TransitionProps={{ unmountOnExit: true }}>
-                    <AccordionSummary
-                      expandIcon={<ExpandMoreIcon />}
-                    >
-                      <Typography>Cross-Fade</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <CrossFadeCard
-                        sidebar
-                        scene={this.props.scene}
-                        easingControls={this.props.config.displaySettings.easingControls}
-                        onUpdateScene={this.props.onUpdateScene.bind(this)} />
-                    </AccordionDetails>
-                  </Accordion>
-
-                  <Accordion TransitionProps={{ unmountOnExit: true }}>
-                    <AccordionSummary
-                      expandIcon={<ExpandMoreIcon />}
-                    >
-                      <Typography>Slide</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <SlideCard
-                        sidebar
-                        scene={this.props.scene}
-                        easingControls={this.props.config.displaySettings.easingControls}
-                        onUpdateScene={this.props.onUpdateScene.bind(this)} />
-                    </AccordionDetails>
-                  </Accordion>
-
-                  <Accordion TransitionProps={{ unmountOnExit: true }}>
-                    <AccordionSummary
-                      expandIcon={<ExpandMoreIcon />}
-                    >
-                      <Typography>Strobe</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <StrobeCard
-                        sidebar
-                        scene={this.props.scene}
-                        easingControls={this.props.config.displaySettings.easingControls}
-                        onUpdateScene={this.props.onUpdateScene.bind(this)} />
-                    </AccordionDetails>
-                  </Accordion>
-
-                  <Accordion TransitionProps={{ unmountOnExit: true }}>
-                    <AccordionSummary
-                      expandIcon={<ExpandMoreIcon />}
-                    >
-                      <Typography>Fade In/Out</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <FadeIOCard
-                        sidebar
-                        scene={this.props.scene}
-                        easingControls={this.props.config.displaySettings.easingControls}
-                        onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-                    </AccordionDetails>
-                  </Accordion>
-
-                  <Accordion TransitionProps={{ unmountOnExit: true }}>
-                    <AccordionSummary
-                      expandIcon={<ExpandMoreIcon />}
-                    >
-                      <Typography>Panning</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <PanningCard
-                        sidebar
-                        scene={this.props.scene}
-                        easingControls={this.props.config.displaySettings.easingControls}
-                        onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-                    </AccordionDetails>
-                  </Accordion>
-                </React.Fragment>
-              )}
-
-              {!this.props.scene.gridScene && (
-                <Accordion defaultExpanded={this.props.scene.audioScene} TransitionProps={{ unmountOnExit: !this.props.scene.audioEnabled && this.props.scene.nextSceneID === 0 }}>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                  >
-                    <Typography>Audio Tracks</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <AudioCard
-                      sidebar
-                      scene={this.props.scene}
-                      scenePaths={this.props.historyPaths}
-                      startPlaying
-                      persist={this.props.persistAudio}
-                      onUpdateScene={this.props.onUpdateScene.bind(this)}
-                      goBack={this.navigateBack.bind(this)}
-                      orderAudioTags={this.orderAudioTags.bind(this)}
-                      onPlaying={this.props.onPlaying}
-                      playTrack={this.props.playTrack}
-                      playNextScene={this.props.playNextScene}
-                      setCurrentAudio={this.props.setCurrentAudio.bind(this)}/>
-                  </AccordionDetails>
-                </Accordion>
-              )}
-
-              {!this.props.scene.audioScene && !this.props.scene.gridScene && !this.props.persistText && (
-                <Accordion TransitionProps={{ unmountOnExit: true }}>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                  >
-                    <Typography>Text Overlay</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <TextCard
-                      sidebar
-                      scene={this.props.scene}
-                      onUpdateScene={this.props.onUpdateScene.bind(this)}/>
-                  </AccordionDetails>
-                </Accordion>
-              )}
-            </Drawer>
-          </React.Fragment>
-        )}
-
-        {!this.props.scene.downloadScene && this.props.hasStarted && this.props.allTags && (
-          <React.Fragment>
-            <div
-              className={classes.hoverTagDrawer}
-              onMouseEnter={this.onMouseEnterTagDrawer.bind(this)}
-              onMouseLeave={this.onMouseLeaveTagDrawer.bind(this)}/>
-
-            <Drawer
-              variant="permanent"
-              anchor="bottom"
-              className={classes.tagDrawer}
-              classes={{paper: clsx(classes.tagDrawerPaper, this.state.tagDrawerHover && classes.tagDrawerPaperHover)}}
-              open={this.state.tagDrawerHover}
-              onMouseEnter={this.onMouseEnterTagDrawer.bind(this)}
-              onMouseLeave={this.onMouseLeaveTagDrawer.bind(this)}>
-              <Grid container alignItems="center">
-                {this.props.tags != null && (
-                  <React.Fragment>
-                    <Grid item xs>
-                      <div className={classes.tagList}>
-                        {this.props.allTags.map((tag) =>
-                          <Card className={clsx(classes.tag, tagNames && tagNames.includes(tag.name) && classes.selectedTag)} key={tag.id}>
-                            <CardActionArea onClick={this.props.toggleTag.bind(this, this.props.scene.libraryID, tag)}>
-                              <CardContent className={classes.tagContent}>
-                                <Typography component="h6" variant="body2">
-                                  {tag.name}
-                                </Typography>
-                              </CardContent>
-                            </CardActionArea>
-                          </Card>
-                        )}
-                      </div>
-                    </Grid>
-                    {(this.props.inheritTags && (!tagNames || tagNames.length == 0) && this.props.scene.sources[0].clips && this.props.scene.sources[0].clips.find((c) => c.tags && c.tags.length > 0) != null) && (
-                      <Grid item className={classes.tagButtons}>
-                        <Tooltip disableInteractive title="Inherit Clip Tags">
-                          <Fab
-                            color="primary"
-                            size="small"
-                            onClick={this.props.inheritTags.bind(this, this.props.scene.libraryID)}>
-                            <SystemUpdateAltIcon/>
-                          </Fab>
-                        </Tooltip>
-                      </Grid>
-                    )}
-                  </React.Fragment>
+              <Drawer
+                variant="permanent"
+                className={clsx(
+                  classes.drawer,
+                  (this.props.tutorial == PT.sidebar ||
+                    this.state.drawerHover) &&
+                    classes.drawerHover,
                 )}
-                <Grid item xs={12}>
-                  {this.props.scene.sources.length == 1 && getSourceType(this.props.scene.sources[0].url) == ST.video && (
-                    <VideoControl
-                      video={this.props.mainVideo}
-                      clip={source ? source.clips.find((c) => c.id == clipID) : null}
-                      clipValue={clipValue ? clipValue : null}
-                      useHotkeys
-                      skip={this.props.scene.videoSkip}
-                      onChangeVolume={() => {}}/>
-                  )}
-                </Grid>
-              </Grid>
+                classes={{
+                  paper: clsx(
+                    classes.drawerPaper,
+                    (this.props.tutorial == PT.sidebar ||
+                      this.state.drawerHover) &&
+                      classes.drawerPaperHover,
+                    this.props.tutorial == PT.toolbar &&
+                      clsx(classes.backdropTop, classes.highlight),
+                  ),
+                }}
+                open={
+                  this.props.tutorial == PT.sidebar || this.state.drawerHover
+                }
+                onMouseEnter={this.onMouseEnterDrawer.bind(this)}
+                onMouseLeave={this.onMouseLeaveDrawer.bind(this)}
+              >
+                <div className={classes.drawerToolbar}>
+                  <Typography variant="h4">Settings</Typography>
+                </div>
 
-            </Drawer>
-          </React.Fragment>
-        )}
+                {!this.props.scene.audioScene && this._showVideoControls && (
+                  <Accordion TransitionProps={{ unmountOnExit: false }}>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography>Video Controls</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <VideoCard
+                        scene={this.props.scene}
+                        otherScenes={this.props.scene.overlays.map((o) =>
+                          this.getScene(o.sceneID),
+                        )}
+                        isPlaying={this.props.isPlaying}
+                        mainVideo={this.props.mainVideo}
+                        mainClip={
+                          source
+                            ? source.clips.find((c) => c.id == clipID)
+                            : null
+                        }
+                        mainClipValue={clipValue ? clipValue : null}
+                        otherVideos={this.props.overlayVideos}
+                        imagePlayerAdvanceHacks={
+                          this.props.imagePlayerAdvanceHacks
+                        }
+                        onUpdateScene={this.props.onUpdateScene.bind(this)}
+                      />
+                    </AccordionDetails>
+                  </Accordion>
+                )}
+
+                {!this.props.scene.audioScene &&
+                  !this.props.scene.gridScene && (
+                    <React.Fragment>
+                      <Accordion TransitionProps={{ unmountOnExit: true }}>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                          <Typography>Scene Options</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <SceneOptionCard
+                            sidebar
+                            allScenes={this.props.scenes}
+                            allSceneGrids={this.props.sceneGrids}
+                            isTagging={this.props.allTags != null}
+                            scene={this.props.scene}
+                            onUpdateScene={this.props.onUpdateScene.bind(this)}
+                            onGenerate={this.props.onGenerate}
+                          />
+                        </AccordionDetails>
+                      </Accordion>
+
+                      <Accordion TransitionProps={{ unmountOnExit: true }}>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                          <Typography>Image/Video Options</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <ImageVideoCard
+                            sidebar
+                            isPlayer
+                            isConfig={false}
+                            scene={this.props.scene}
+                            onUpdateScene={this.props.onUpdateScene.bind(this)}
+                          />
+                        </AccordionDetails>
+                      </Accordion>
+
+                      <Accordion TransitionProps={{ unmountOnExit: true }}>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                          <Typography>Zoom/Move</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <ZoomMoveCard
+                            sidebar
+                            scene={this.props.scene}
+                            easingControls={
+                              this.props.config.displaySettings.easingControls
+                            }
+                            onUpdateScene={this.props.onUpdateScene.bind(this)}
+                          />
+                        </AccordionDetails>
+                      </Accordion>
+
+                      <Accordion TransitionProps={{ unmountOnExit: true }}>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                          <Typography>Cross-Fade</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <CrossFadeCard
+                            sidebar
+                            scene={this.props.scene}
+                            easingControls={
+                              this.props.config.displaySettings.easingControls
+                            }
+                            onUpdateScene={this.props.onUpdateScene.bind(this)}
+                          />
+                        </AccordionDetails>
+                      </Accordion>
+
+                      <Accordion TransitionProps={{ unmountOnExit: true }}>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                          <Typography>Slide</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <SlideCard
+                            sidebar
+                            scene={this.props.scene}
+                            easingControls={
+                              this.props.config.displaySettings.easingControls
+                            }
+                            onUpdateScene={this.props.onUpdateScene.bind(this)}
+                          />
+                        </AccordionDetails>
+                      </Accordion>
+
+                      <Accordion TransitionProps={{ unmountOnExit: true }}>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                          <Typography>Strobe</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <StrobeCard
+                            sidebar
+                            scene={this.props.scene}
+                            easingControls={
+                              this.props.config.displaySettings.easingControls
+                            }
+                            onUpdateScene={this.props.onUpdateScene.bind(this)}
+                          />
+                        </AccordionDetails>
+                      </Accordion>
+
+                      <Accordion TransitionProps={{ unmountOnExit: true }}>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                          <Typography>Fade In/Out</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <FadeIOCard
+                            sidebar
+                            scene={this.props.scene}
+                            easingControls={
+                              this.props.config.displaySettings.easingControls
+                            }
+                            onUpdateScene={this.props.onUpdateScene.bind(this)}
+                          />
+                        </AccordionDetails>
+                      </Accordion>
+
+                      <Accordion TransitionProps={{ unmountOnExit: true }}>
+                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                          <Typography>Panning</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <PanningCard
+                            sidebar
+                            scene={this.props.scene}
+                            easingControls={
+                              this.props.config.displaySettings.easingControls
+                            }
+                            onUpdateScene={this.props.onUpdateScene.bind(this)}
+                          />
+                        </AccordionDetails>
+                      </Accordion>
+                    </React.Fragment>
+                  )}
+
+                {!this.props.scene.gridScene && (
+                  <Accordion
+                    defaultExpanded={this.props.scene.audioScene}
+                    TransitionProps={{
+                      unmountOnExit:
+                        !this.props.scene.audioEnabled &&
+                        this.props.scene.nextSceneID === 0,
+                    }}
+                  >
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Typography>Audio Tracks</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <AudioCard
+                        sidebar
+                        scene={this.props.scene}
+                        scenePaths={this.props.historyPaths}
+                        startPlaying
+                        persist={this.props.persistAudio}
+                        onUpdateScene={this.props.onUpdateScene.bind(this)}
+                        goBack={this.navigateBack.bind(this)}
+                        orderAudioTags={this.orderAudioTags.bind(this)}
+                        onPlaying={this.props.onPlaying}
+                        playTrack={this.props.playTrack}
+                        playNextScene={this.props.playNextScene}
+                        setCurrentAudio={this.props.setCurrentAudio.bind(this)}
+                      />
+                    </AccordionDetails>
+                  </Accordion>
+                )}
+
+                {!this.props.scene.audioScene &&
+                  !this.props.scene.gridScene &&
+                  !this.props.persistText && (
+                    <Accordion TransitionProps={{ unmountOnExit: true }}>
+                      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                        <Typography>Text Overlay</Typography>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <TextCard
+                          sidebar
+                          scene={this.props.scene}
+                          onUpdateScene={this.props.onUpdateScene.bind(this)}
+                        />
+                      </AccordionDetails>
+                    </Accordion>
+                  )}
+              </Drawer>
+            </React.Fragment>
+          )}
+
+        {!this.props.scene.downloadScene &&
+          this.props.hasStarted &&
+          this.props.allTags && (
+            <React.Fragment>
+              <div
+                className={classes.hoverTagDrawer}
+                onMouseEnter={this.onMouseEnterTagDrawer.bind(this)}
+                onMouseLeave={this.onMouseLeaveTagDrawer.bind(this)}
+              />
+
+              <Drawer
+                variant="permanent"
+                anchor="bottom"
+                className={classes.tagDrawer}
+                classes={{
+                  paper: clsx(
+                    classes.tagDrawerPaper,
+                    this.state.tagDrawerHover && classes.tagDrawerPaperHover,
+                  ),
+                }}
+                open={this.state.tagDrawerHover}
+                onMouseEnter={this.onMouseEnterTagDrawer.bind(this)}
+                onMouseLeave={this.onMouseLeaveTagDrawer.bind(this)}
+              >
+                <Grid container alignItems="center">
+                  {this.props.tags != null && (
+                    <React.Fragment>
+                      <Grid item xs>
+                        <div className={classes.tagList}>
+                          {this.props.allTags.map((tag) => (
+                            <Card
+                              className={clsx(
+                                classes.tag,
+                                tagNames &&
+                                  tagNames.includes(tag.name) &&
+                                  classes.selectedTag,
+                              )}
+                              key={tag.id}
+                            >
+                              <CardActionArea
+                                onClick={this.props.toggleTag.bind(
+                                  this,
+                                  this.props.scene.libraryID,
+                                  tag,
+                                )}
+                              >
+                                <CardContent className={classes.tagContent}>
+                                  <Typography component="h6" variant="body2">
+                                    {tag.name}
+                                  </Typography>
+                                </CardContent>
+                              </CardActionArea>
+                            </Card>
+                          ))}
+                        </div>
+                      </Grid>
+                      {this.props.inheritTags &&
+                        (!tagNames || tagNames.length == 0) &&
+                        this.props.scene.sources[0].clips &&
+                        this.props.scene.sources[0].clips.find(
+                          (c) => c.tags && c.tags.length > 0,
+                        ) != null && (
+                          <Grid item className={classes.tagButtons}>
+                            <Tooltip
+                              disableInteractive
+                              title="Inherit Clip Tags"
+                            >
+                              <Fab
+                                color="primary"
+                                size="small"
+                                onClick={this.props.inheritTags.bind(
+                                  this,
+                                  this.props.scene.libraryID,
+                                )}
+                              >
+                                <SystemUpdateAltIcon />
+                              </Fab>
+                            </Tooltip>
+                          </Grid>
+                        )}
+                    </React.Fragment>
+                  )}
+                  <Grid item xs={12}>
+                    {this.props.scene.sources.length == 1 &&
+                      getSourceType(this.props.scene.sources[0].url) ==
+                        ST.video && (
+                        <VideoControl
+                          video={this.props.mainVideo}
+                          clip={
+                            source
+                              ? source.clips.find((c) => c.id == clipID)
+                              : null
+                          }
+                          clipValue={clipValue ? clipValue : null}
+                          useHotkeys
+                          skip={this.props.scene.videoSkip}
+                          onChangeVolume={() => {}}
+                        />
+                      )}
+                  </Grid>
+                </Grid>
+              </Drawer>
+            </React.Fragment>
+          )}
 
         <Dialog
           open={!!this.state.blacklistFile}
           onClose={this.onCloseDialog.bind(this)}
           aria-labelledby="blacklist-title"
-          aria-describedby="blacklist-description">
+          aria-describedby="blacklist-description"
+        >
           <DialogTitle id="blacklist-title">Blacklist File</DialogTitle>
           <DialogContent>
             <DialogContentText id="blacklist-description">
-              Are you sure you want to blacklist <Link
-              className={classes.wordWrap}
-              href="#"
-              onClick={this.openLink.bind(this, this.state.blacklistFile)}
-              underline="hover">{this.state.blacklistFile}</Link> ?
+              Are you sure you want to blacklist{" "}
+              <Link
+                className={classes.wordWrap}
+                href="#"
+                onClick={this.openLink.bind(this, this.state.blacklistFile)}
+                underline="hover"
+              >
+                {this.state.blacklistFile}
+              </Link>{" "}
+              ?
             </DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
               Cancel
             </Button>
-            <Button onClick={this.onFinishBlacklistFile.bind(this)} color="primary">
+            <Button
+              onClick={this.onFinishBlacklistFile.bind(this)}
+              color="primary"
+            >
               Yes
             </Button>
           </DialogActions>
@@ -710,16 +861,21 @@ class PlayerBars extends React.Component {
           open={!!this.state.deletePath}
           onClose={this.onCloseDialog.bind(this)}
           aria-labelledby="delete-title"
-          aria-describedby="delete-description">
+          aria-describedby="delete-description"
+        >
           <DialogTitle id="delete-title">Delete File</DialogTitle>
           <DialogContent>
             {this.state.deletePath && (
               <DialogContentText id="delete-description">
-                Are you sure you want to delete <Link
-                className={classes.wordWrap}
-                href="#"
-                onClick={this.openLink.bind(this, this.state.deletePath)}
-                underline="hover">{this.state.deletePath}</Link>
+                Are you sure you want to delete{" "}
+                <Link
+                  className={classes.wordWrap}
+                  href="#"
+                  onClick={this.openLink.bind(this, this.state.deletePath)}
+                  underline="hover"
+                >
+                  {this.state.deletePath}
+                </Link>
               </DialogContentText>
             )}
           </DialogContent>
@@ -727,7 +883,10 @@ class PlayerBars extends React.Component {
             <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
               Cancel
             </Button>
-            <Button onClick={this.onFinishDeletePath.bind(this)} color="primary">
+            <Button
+              onClick={this.onFinishDeletePath.bind(this)}
+              color="primary"
+            >
               Yes
             </Button>
           </DialogActions>
@@ -736,9 +895,13 @@ class PlayerBars extends React.Component {
         <Dialog
           open={!!this.state.deleteError}
           onClose={this.onCloseDialog.bind(this)}
-          aria-describedby="delete-error-description">
+          aria-describedby="delete-error-description"
+        >
           <DialogContent>
-            <DialogContentText className={classes.wordWrap} id="delete-error-description">
+            <DialogContentText
+              className={classes.wordWrap}
+              id="delete-error-description"
+            >
               {this.state.deleteError}
             </DialogContentText>
           </DialogContent>
@@ -752,11 +915,11 @@ class PlayerBars extends React.Component {
     this.setMenuBarVisibility(this.props.config.displaySettings.showMenu);
     this.setFullscreen(this.props.config.displaySettings.fullScreen);
 
-    window.addEventListener('contextmenu', this.showContextMenu, false);
-    window.addEventListener('keydown', this.onKeyDown, false);
-    window.addEventListener('wheel', this.onScroll, false);
+    window.addEventListener("contextmenu", this.showContextMenu, false);
+    window.addEventListener("keydown", this.onKeyDown, false);
+    window.addEventListener("wheel", this.onScroll, false);
     if (this.props.config.displaySettings.clickToProgress) {
-      window.addEventListener('click', this.onClick, false);
+      window.addEventListener("click", this.onClick, false);
     }
     this.buildMenu();
   }
@@ -772,17 +935,28 @@ class PlayerBars extends React.Component {
     this._tagDrawerTimeout = null;
     // FIXME
     // createMainMenu(Menu, createMenuTemplate(app));
-    window.removeEventListener('contextmenu', this.showContextMenu);
-    window.removeEventListener('keydown', this.onKeyDown);
-    window.removeEventListener('wheel', this.onScroll);
+    window.removeEventListener("contextmenu", this.showContextMenu);
+    window.removeEventListener("keydown", this.onKeyDown);
+    window.removeEventListener("wheel", this.onScroll);
     if (this.props.config.displaySettings.clickToProgress) {
-      window.removeEventListener('click', this.onClick);
+      window.removeEventListener("click", this.onClick);
     }
   }
 
   onClick = (e: MouseEvent) => {
-    if (this.props.scene.audioScene || this.props.recentPictureGrid || this.state.drawerHover || this.state.tagDrawerHover || this.state.appBarHover) return;
-    if ((!this.props.isPlaying || this.props.config.displaySettings.clickToProgressWhilePlaying) && this.props.hasStarted) {
+    if (
+      this.props.scene.audioScene ||
+      this.props.recentPictureGrid ||
+      this.state.drawerHover ||
+      this.state.tagDrawerHover ||
+      this.state.appBarHover
+    )
+      return;
+    if (
+      (!this.props.isPlaying ||
+        this.props.config.displaySettings.clickToProgressWhilePlaying) &&
+      this.props.hasStarted
+    ) {
       this.props.imagePlayerAdvanceHacks[0][0].fire();
       // TODO Improve this to be able to advance specific grids
       /*for (let x of this.props.imagePlayerAdvanceHacks) {
@@ -791,12 +965,18 @@ class PlayerBars extends React.Component {
         }
       }*/
     }
-  }
+  };
 
   onScroll = (e: WheelEvent) => {
-    if (this.props.recentPictureGrid || !this.props.onUpdateScene || this.state.drawerHover) return;
+    if (
+      this.props.recentPictureGrid ||
+      !this.props.onUpdateScene ||
+      this.state.drawerHover
+    )
+      return;
     const volumeChange = (e.deltaY / 100) * -5;
-    let newVolume = parseInt(this.props.scene.videoVolume as any) + volumeChange;
+    let newVolume =
+      parseInt(this.props.scene.videoVolume as any) + volumeChange;
     if (newVolume < 0) {
       newVolume = 0;
     } else if (newVolume > 100) {
@@ -805,13 +985,18 @@ class PlayerBars extends React.Component {
     if (this.props.mainVideo) {
       this.props.mainVideo.volume = newVolume / 100;
     }
-    this.props.onUpdateScene(this.props.scene, (s) => s.videoVolume = newVolume);
-  }
+    this.props.onUpdateScene(
+      this.props.scene,
+      (s) => (s.videoVolume = newVolume),
+    );
+  };
 
   getScene(id: number): Scene | SceneGrid {
     if (id == null) return null;
-    if (id.toString().startsWith('999')) {
-      return this.props.sceneGrids.find((s) => s.id.toString() == id.toString().replace('999',''));
+    if (id.toString().startsWith("999")) {
+      return this.props.sceneGrids.find(
+        (s) => s.id.toString() == id.toString().replace("999", ""),
+      );
     } else {
       return this.props.scenes.find((s) => s.id == id);
     }
@@ -824,11 +1009,11 @@ class PlayerBars extends React.Component {
 
   onMouseEnterAppBar() {
     clearTimeout(this._appBarTimeout);
-    this.setState({appBarHover: true});
+    this.setState({ appBarHover: true });
   }
 
   closeAppBar() {
-    this.setState({appBarHover: false});
+    this.setState({ appBarHover: false });
   }
 
   onMouseLeaveAppBar() {
@@ -838,11 +1023,11 @@ class PlayerBars extends React.Component {
 
   onMouseEnterDrawer() {
     clearTimeout(this._drawerTimeout);
-    this.setState({drawerHover: true});
+    this.setState({ drawerHover: true });
   }
 
   closeDrawer() {
-    this.setState({drawerHover: false});
+    this.setState({ drawerHover: false });
   }
 
   onMouseLeaveDrawer() {
@@ -852,11 +1037,11 @@ class PlayerBars extends React.Component {
 
   onMouseEnterTagDrawer() {
     clearTimeout(this._tagDrawerTimeout);
-    this.setState({tagDrawerHover: true});
+    this.setState({ tagDrawerHover: true });
   }
 
   closeTagDrawer() {
-    this.setState({tagDrawerHover: false});
+    this.setState({ tagDrawerHover: false });
   }
 
   onMouseLeaveTagDrawer() {
@@ -865,38 +1050,56 @@ class PlayerBars extends React.Component {
   }
 
   onCloseDialog() {
-    this.setState({blacklistSource: null, blacklistFile: null, deletePath: null, deleteError: null});
+    this.setState({
+      blacklistSource: null,
+      blacklistFile: null,
+      deletePath: null,
+      deleteError: null,
+    });
   }
 
   onBlacklistFile(source: string, fileToBlacklist: string) {
     if (this.props.config.generalSettings.confirmBlacklist) {
-      this.setState({blacklistSource: source, blacklistFile: fileToBlacklist});
+      this.setState({
+        blacklistSource: source,
+        blacklistFile: fileToBlacklist,
+      });
     } else {
       this.props.blacklistFile(source, fileToBlacklist);
     }
   }
 
   onFinishBlacklistFile() {
-    this.props.blacklistFile(this.state.blacklistSource, this.state.blacklistFile);
+    this.props.blacklistFile(
+      this.state.blacklistSource,
+      this.state.blacklistFile,
+    );
     this.onCloseDialog();
   }
 
   onDeletePath(path: string) {
     if (fs_existsSync(path)) {
       if (this.props.config.generalSettings.confirmFileDeletion) {
-        this.setState({deletePath: path});
+        this.setState({ deletePath: path });
       } else {
         this.doDelete(path);
       }
     } else {
-      this.setState({deletePath: null, deleteError: "This file doesn't exist, cannot delete"});
+      this.setState({
+        deletePath: null,
+        deleteError: "This file doesn't exist, cannot delete",
+      });
     }
   }
 
   doDelete(path: string) {
     fs_unlink(path, (err) => {
       if (err) {
-        this.setState({deletePath: null, deleteError: "An error occurred while deleting the file: " + err.message});
+        this.setState({
+          deletePath: null,
+          deleteError:
+            "An error occurred while deleting the file: " + err.message,
+        });
         console.error(err);
       } else {
         this.props.imagePlayerDeleteHack.fire();
@@ -916,7 +1119,10 @@ class PlayerBars extends React.Component {
   }
 
   historyBack() {
-    if (!this.state.drawerHover || document.activeElement.tagName.toLocaleLowerCase() != "input") {
+    if (
+      !this.state.drawerHover ||
+      document.activeElement.tagName.toLocaleLowerCase() != "input"
+    ) {
       if (this.props.historyOffset > -(this.props.historyPaths.length - 1)) {
         this.props.historyBack();
       }
@@ -924,7 +1130,10 @@ class PlayerBars extends React.Component {
   }
 
   historyForward() {
-    if (!this.state.drawerHover || document.activeElement.tagName.toLocaleLowerCase() != "input") {
+    if (
+      !this.state.drawerHover ||
+      document.activeElement.tagName.toLocaleLowerCase() != "input"
+    ) {
       if (this.props.historyOffset >= 0) {
         this.props.imagePlayerAdvanceHacks[0][0].fire();
       } else {
@@ -1002,25 +1211,25 @@ class PlayerBars extends React.Component {
     // }
     // contextMenu.append(new MenuItem({
     //   label: 'Open Source',
-    //   click: () => { 
+    //   click: () => {
     //     // FIXME
-    //     // remote.shell.openExternal(source); 
+    //     // remote.shell.openExternal(source);
     //   }
     // }));
     // if (!!post) {
     //   contextMenu.append(new MenuItem({
     //     label: 'Open Post',
-    //     click: () => { 
+    //     click: () => {
     //       // FIXME
-    //       // remote.shell.openExternal(post); 
+    //       // remote.shell.openExternal(post);
     //     }
     //   }));
     // }
     // contextMenu.append(new MenuItem({
     //   label: 'Open File',
-    //   click: () => { 
+    //   click: () => {
     //     // FIXME
-    //     // remote.shell.openExternal(url); 
+    //     // remote.shell.openExternal(url);
     //   }
     // }));
     // if (this.props.config.caching.enabled && type != ST.local) {
@@ -1094,22 +1303,54 @@ class PlayerBars extends React.Component {
 
   getKeyMap() {
     const keyMap = new Map<String, Array<string>>([
-      ['playPause', ['Play/Pause ' + (this.props.isPlaying ? '(Playing)' : '(Paused)'), 'space']],
-      ['historyBack', ['Back in Time', 'left']],
-      ['historyForward', ['Forward in Time', 'right']],
-      ['navigateBack', ['Go Back to Scene Details', 'escape']],
-      ['toggleFullscreen', ['Toggle Fullscreen ' + (this.props.config.displaySettings.fullScreen ? '(On)' : '(Off)'), 'Control+F']],
-      ['toggleAlwaysOnTop', ['Toggle Always On Top ' + (this.props.config.displaySettings.alwaysOnTop ? '(On)' : '(Off)'), 'Control+T']],
-      ['toggleMenuBarDisplay', ['Toggle Menu Bar ' + (this.props.config.displaySettings.showMenu ? '(On)' : '(Off)'), 'Control+G']],
+      [
+        "playPause",
+        [
+          "Play/Pause " + (this.props.isPlaying ? "(Playing)" : "(Paused)"),
+          "space",
+        ],
+      ],
+      ["historyBack", ["Back in Time", "left"]],
+      ["historyForward", ["Forward in Time", "right"]],
+      ["navigateBack", ["Go Back to Scene Details", "escape"]],
+      [
+        "toggleFullscreen",
+        [
+          "Toggle Fullscreen " +
+            (this.props.config.displaySettings.fullScreen ? "(On)" : "(Off)"),
+          "Control+F",
+        ],
+      ],
+      [
+        "toggleAlwaysOnTop",
+        [
+          "Toggle Always On Top " +
+            (this.props.config.displaySettings.alwaysOnTop ? "(On)" : "(Off)"),
+          "Control+T",
+        ],
+      ],
+      [
+        "toggleMenuBarDisplay",
+        [
+          "Toggle Menu Bar " +
+            (this.props.config.displaySettings.showMenu ? "(On)" : "(Off)"),
+          "Control+G",
+        ],
+      ],
     ]);
 
     if (this.props.config.caching.enabled) {
-      keyMap.set('onDelete', ['Delete Image', 'Delete']);
+      keyMap.set("onDelete", ["Delete Image", "Delete"]);
     }
 
-    if (!this.props.scene.downloadScene && !this.props.scene.audioScene && !this.props.scene.scriptScene && this.props.allTags != null) {
-      keyMap.set('prevSource', ['Previous Source', '[']);
-      keyMap.set('nextSource', ['Next Source', ']']);
+    if (
+      !this.props.scene.downloadScene &&
+      !this.props.scene.audioScene &&
+      !this.props.scene.scriptScene &&
+      this.props.allTags != null
+    ) {
+      keyMap.set("prevSource", ["Previous Source", "["]);
+      keyMap.set("nextSource", ["Next Source", "]"]);
     }
 
     return keyMap;
@@ -1118,59 +1359,59 @@ class PlayerBars extends React.Component {
   onKeyDown = (e: KeyboardEvent) => {
     const focus = document.activeElement.tagName.toLocaleLowerCase();
     switch (e.key) {
-      case ' ':
+      case " ":
         if ((!this.state.drawerHover || focus != "input") && !e.shiftKey) {
           e.preventDefault();
           this.playPause();
         }
         break;
-      case 'ArrowLeft':
+      case "ArrowLeft":
         if ((!this.state.drawerHover || focus != "input") && !e.shiftKey) {
           e.preventDefault();
           this.historyBack();
         }
         break;
-      case 'ArrowRight':
+      case "ArrowRight":
         if ((!this.state.drawerHover || focus != "input") && !e.shiftKey) {
           e.preventDefault();
           this.historyForward();
         }
         break;
-      case 'Escape':
+      case "Escape":
         e.preventDefault();
         this.navigateBack();
         break;
-      case 'c':
+      case "c":
         if (e.ctrlKey) {
           e.preventDefault();
           this.copyImageToClipboard(null);
         }
         break;
-      case 'f':
+      case "f":
         if (e.ctrlKey) {
           e.preventDefault();
           this.toggleFullscreen();
         }
         break;
-      case 't':
+      case "t":
         if (e.ctrlKey) {
           e.preventDefault();
           this.toggleAlwaysOnTop();
         }
         break;
-      case 'g':
+      case "g":
         if (e.ctrlKey) {
           e.preventDefault();
           this.toggleMenuBarDisplay();
         }
         break;
-      case 'b':
+      case "b":
         if (e.ctrlKey) {
           e.preventDefault();
           this.onBlacklist();
         }
         break;
-      case 'Delete':
+      case "Delete":
         if (!this.state.drawerHover || focus != "input") {
           if (this.props.config.caching.enabled) {
             e.preventDefault();
@@ -1178,14 +1419,24 @@ class PlayerBars extends React.Component {
           }
         }
         break;
-      case '[':
-        if (!this.props.scene.downloadScene && !this.props.scene.audioScene && !this.props.scene.scriptScene && this.props.allTags != null) {
+      case "[":
+        if (
+          !this.props.scene.downloadScene &&
+          !this.props.scene.audioScene &&
+          !this.props.scene.scriptScene &&
+          this.props.allTags != null
+        ) {
           e.preventDefault();
           this.prevSource();
         }
         break;
-      case ']':
-        if (!this.props.scene.downloadScene && !this.props.scene.audioScene && !this.props.scene.scriptScene && this.props.allTags != null) {
+      case "]":
+        if (
+          !this.props.scene.downloadScene &&
+          !this.props.scene.audioScene &&
+          !this.props.scene.scriptScene &&
+          this.props.allTags != null
+        ) {
           e.preventDefault();
           this.nextSource();
         }
@@ -1211,14 +1462,14 @@ class PlayerBars extends React.Component {
 
   setPlayPause(play: boolean) {
     if (play) {
-      this.props.play()
+      this.props.play();
     } else {
-      this.props.pause()
+      this.props.pause();
     }
     this.buildMenu();
   }
 
-  setAlwaysOnTop(alwaysOnTop: boolean){
+  setAlwaysOnTop(alwaysOnTop: boolean) {
     this.props.config.displaySettings.alwaysOnTop = alwaysOnTop;
     this.buildMenu();
     // FIXME
@@ -1236,19 +1487,26 @@ class PlayerBars extends React.Component {
   copyImageToClipboard(sourceURL: string) {
     let url = sourceURL;
     if (!url) {
-      url = this.props.historyPaths[(this.props.historyPaths.length - 1) + this.props.historyOffset].src;
+      url =
+        this.props.historyPaths[
+          this.props.historyPaths.length - 1 + this.props.historyOffset
+        ].src;
     }
-    const isFile = url.startsWith('file://');
+    const isFile = url.startsWith("file://");
     const path = urlToPath(url);
     const imagePath = isFile ? path : url;
-    if (imagePath.toLocaleLowerCase().endsWith(".png") || imagePath.toLocaleLowerCase().endsWith(".jpg") || imagePath.toLocaleLowerCase().endsWith(".jpeg")) {
+    if (
+      imagePath.toLocaleLowerCase().endsWith(".png") ||
+      imagePath.toLocaleLowerCase().endsWith(".jpg") ||
+      imagePath.toLocaleLowerCase().endsWith(".jpeg")
+    ) {
       if (isFile) {
         // FIXME
         // clipboard.writeImage(nativeImage.createFromPath(imagePath));
       } else {
         wretch(imagePath)
           .get()
-          .blob(blob => {
+          .blob((blob) => {
             const reader = new FileReader();
             reader.onload = function () {
               if (reader.readyState == 2) {
@@ -1279,10 +1537,16 @@ class PlayerBars extends React.Component {
   /* Menu and hotkey options DON'T DELETE */
 
   onDelete() {
-    if (!this.state.drawerHover || document.activeElement.tagName.toLocaleLowerCase() != "input") {
-      const img = this.props.historyPaths[(this.props.historyPaths.length - 1) + this.props.historyOffset];
+    if (
+      !this.state.drawerHover ||
+      document.activeElement.tagName.toLocaleLowerCase() != "input"
+    ) {
+      const img =
+        this.props.historyPaths[
+          this.props.historyPaths.length - 1 + this.props.historyOffset
+        ];
       const url = img.src;
-      const isFile = url.startsWith('file://');
+      const isFile = url.startsWith("file://");
       const path = urlToPath(url);
       if (isFile) {
         this.onDeletePath(path);
@@ -1291,21 +1555,30 @@ class PlayerBars extends React.Component {
   }
 
   onBlacklist() {
-    const img = this.props.historyPaths[(this.props.historyPaths.length - 1) + this.props.historyOffset];
+    const img =
+      this.props.historyPaths[
+        this.props.historyPaths.length - 1 + this.props.historyOffset
+      ];
     if (img == null) return;
     const source = img.getAttribute("source");
     const url = img.src;
-    const isFile = url.startsWith('file://');
+    const isFile = url.startsWith("file://");
     const path = urlToPath(url);
     const type = getSourceType(source);
-    if ((!isFile && type != ST.video && type != ST.playlist) || type == ST.local) {
+    if (
+      (!isFile && type != ST.video && type != ST.playlist) ||
+      type == ST.local
+    ) {
       this.onBlacklistFile(source, isFile ? path : url);
     }
   }
 
   playPause() {
-    if (!this.state.drawerHover || document.activeElement.tagName.toLocaleLowerCase() != "input") {
-      this.setPlayPause(!this.props.isPlaying)
+    if (
+      !this.state.drawerHover ||
+      document.activeElement.tagName.toLocaleLowerCase() != "input"
+    ) {
+      this.setPlayPause(!this.props.isPlaying);
     }
   }
 
@@ -1330,5 +1603,5 @@ class PlayerBars extends React.Component {
   }
 }
 
-(PlayerBars as any).displayName="PlayerBars";
+(PlayerBars as any).displayName = "PlayerBars";
 export default withStyles(styles)(PlayerBars as any);

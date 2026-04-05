@@ -1,13 +1,12 @@
-import { ipcMain, IpcMessageEvent } from 'electron'
+import { ipcMain, IpcMessageEvent } from "electron";
 
-import { createNewWindow } from './WindowManager'
-import {IPC} from "../renderer/data/const";
+import { createNewWindow } from "./WindowManager";
+import { IPC } from "../renderer/data/const";
 
 // Define functions
 function onRequestCreateNewWindow(ev: IpcMessageEvent) {
   createNewWindow();
 }
-
 
 // Initialize and release listeners
 let initialized = false;

@@ -1,68 +1,73 @@
 import * as React from "react";
 import clsx from "clsx";
-import Select, {components} from "react-select";
+import Select, { components } from "react-select";
 import CreatableSelect from "react-select/creatable";
 
 import { Checkbox, Theme } from "@mui/material";
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
-import {grey} from "@mui/material/colors";
+import createStyles from "@mui/styles/createStyles";
+import withStyles from "@mui/styles/withStyles";
+import { grey } from "@mui/material/colors";
 
-import {getSourceType} from "../player/Scrapers";
+import { getSourceType } from "../player/Scrapers";
 import en from "../../data/en";
 import Audio from "../../data/Audio";
 import LibrarySource from "../../data/LibrarySource";
 import Tag from "../../data/Tag";
 
-const styles = (theme: Theme) => createStyles({
-  searchSelect: {
-    minWidth: 200,
-    maxHeight: theme.mixins.toolbar.minHeight,
-    color: grey[900],
-  },
-  limitWidth: {
-    maxWidth: `calc(100% - ${theme.spacing(7)})`,
-  },
-  select: {
-    color: grey[900],
-  }
-});
+const styles = (theme: Theme) =>
+  createStyles({
+    searchSelect: {
+      minWidth: 200,
+      maxHeight: theme.mixins.toolbar.minHeight,
+      color: grey[900],
+    },
+    limitWidth: {
+      maxWidth: `calc(100% - ${theme.spacing(7)})`,
+    },
+    select: {
+      color: grey[900],
+    },
+  });
 
 class LibrarySearch extends React.Component {
   readonly props: {
-    classes: any,
-    displaySources: Array<LibrarySource | Audio>,
-    tags: Array<Tag>,
-    filters: Array<string>,
-    placeholder: string,
-    autoFocus?: boolean,
-    controlShouldRenderValue?: boolean,
-    hideSelectedOptions?: boolean,
-    isClearable?: boolean
-    isCreatable?: boolean,
-    menuIsOpen?: boolean,
-    noTypes?: boolean,
-    onlyTags?: boolean,
-    onlyTagsAndTypes?: boolean,
-    onlyUsed?: boolean
-    showCheckboxes?: boolean,
-    fullWidth?: boolean,
-    withBrackets?: boolean,
-    onUpdateFilters(filter: Array<string>): void,
+    classes: any;
+    displaySources: Array<LibrarySource | Audio>;
+    tags: Array<Tag>;
+    filters: Array<string>;
+    placeholder: string;
+    autoFocus?: boolean;
+    controlShouldRenderValue?: boolean;
+    hideSelectedOptions?: boolean;
+    isClearable?: boolean;
+    isCreatable?: boolean;
+    menuIsOpen?: boolean;
+    noTypes?: boolean;
+    onlyTags?: boolean;
+    onlyTagsAndTypes?: boolean;
+    onlyUsed?: boolean;
+    showCheckboxes?: boolean;
+    fullWidth?: boolean;
+    withBrackets?: boolean;
+    onUpdateFilters(filter: Array<string>): void;
   };
 
   readonly state = {
     searchInput: "",
-    options: Array<{ label: string, value: string }>(),
-    defaultValues: Array<{ label: string, value: string }>(),
+    options: Array<{ label: string; value: string }>(),
+    defaultValues: Array<{ label: string; value: string }>(),
   };
 
   Option = (props: any) => (
     <div>
       <components.Option {...props}>
-        {this.props.showCheckboxes &&
-          <Checkbox className={this.props.classes.select} checked={props.isSelected} onChange={() => null}/>
-        }
+        {this.props.showCheckboxes && (
+          <Checkbox
+            className={this.props.classes.select}
+            checked={props.isSelected}
+            onChange={() => null}
+          />
+        )}
         <label>{props.label}</label>
       </components.Option>
     </div>
@@ -80,10 +85,14 @@ class LibrarySearch extends React.Component {
     if (this.props.isCreatable) {
       return (
         <CreatableSelect
-          className={clsx(classes.searchSelect, "CreatableSelect", !this.props.fullWidth && classes.limitWidth)}
+          className={clsx(
+            classes.searchSelect,
+            "CreatableSelect",
+            !this.props.fullWidth && classes.limitWidth,
+          )}
           value={this.state.defaultValues}
           options={this.state.options}
-          components={{DropdownIndicator: null,}}
+          components={{ DropdownIndicator: null }}
           menuIsOpen={this.props.menuIsOpen}
           autoFocus={this.props.autoFocus}
           inputValue={this.state.searchInput}
@@ -113,7 +122,8 @@ class LibrarySearch extends React.Component {
           closeMenuOnSelect={false}
           backspaceRemovesValue={false}
           placeholder={this.props.placeholder}
-          onChange={this.handleChange} />
+          onChange={this.handleChange}
+        />
       );
     }
   }
@@ -124,8 +134,10 @@ class LibrarySearch extends React.Component {
 
   componentDidUpdate(props: any) {
     if (props) {
-      if (props.filters != this.props.filters ||
-        props.displaySources != this.props.displaySources) {
+      if (
+        props.filters != this.props.filters ||
+        props.displaySources != this.props.displaySources
+      ) {
         this.update();
       }
     }
@@ -140,8 +152,8 @@ class LibrarySearch extends React.Component {
     let untaggedCount = 0;
     let offlineCount = 0;
     let markedCount = 0;
-    const options = Array<{ label: string, value: string }>();
-    const defaultValues = Array<{ label: string, value: string }>();
+    const options = Array<{ label: string; value: string }>();
+    const defaultValues = Array<{ label: string; value: string }>();
     for (let source of this.props.displaySources) {
       if (!!(source as any).offline) {
         offlineCount++;
@@ -211,64 +223,103 @@ class LibrarySearch extends React.Component {
       }
     });
     for (let filter of this.props.filters) {
-      const opt = {label: filter, value: filter};
+      const opt = { label: filter, value: filter };
       options.push(opt);
       defaultValues.push(opt);
     }
 
     if (!this.props.onlyTags && !this.props.onlyTagsAndTypes) {
       if (untaggedCount > 0 && !this.props.filters.includes("<Untagged>")) {
-        options.push({label: "<Untagged> (" + untaggedCount + ")", value: "<Untagged>"});
+        options.push({
+          label: "<Untagged> (" + untaggedCount + ")",
+          value: "<Untagged>",
+        });
       }
       if (offlineCount > 0 && !this.props.filters.includes("<Offline>")) {
-        options.push({label: "<Offline> (" + offlineCount + ")", value: "<Offline>"});
+        options.push({
+          label: "<Offline> (" + offlineCount + ")",
+          value: "<Offline>",
+        });
       }
       if (markedCount > 0 && !this.props.filters.includes("<Marked>")) {
-        options.push({label: "<Marked> (" + markedCount + ")", value: "<Marked>"});
+        options.push({
+          label: "<Marked> (" + markedCount + ")",
+          value: "<Marked>",
+        });
       }
     }
     for (let tag of tagKeys) {
-      const opt = this.props.isCreatable || this.props.withBrackets ? "[" + tag + "]" : tag;
+      const opt =
+        this.props.isCreatable || this.props.withBrackets
+          ? "[" + tag + "]"
+          : tag;
       if (!this.props.filters.includes(opt)) {
-        options.push({label: tag + " (" + tags.get(tag) + ")", value: opt});
+        options.push({ label: tag + " (" + tags.get(tag) + ")", value: opt });
       }
     }
     if (!this.props.onlyTags && !this.props.noTypes) {
       for (let type of typeKeys) {
-        const opt = this.props.isCreatable || this.props.withBrackets ? "{" + type + "}" : type;
+        const opt =
+          this.props.isCreatable || this.props.withBrackets
+            ? "{" + type + "}"
+            : type;
         if (!this.props.filters.includes(opt)) {
-          options.push({label: type + " (" + types.get(type) + ")", value: opt});
+          options.push({
+            label: type + " (" + types.get(type) + ")",
+            value: opt,
+          });
         }
       }
     }
     if (this.state.searchInput.startsWith("-")) {
       for (let tag of tagKeys) {
-        const opt = this.props.isCreatable || this.props.withBrackets ? "[" + tag + "]" : tag;
+        const opt =
+          this.props.isCreatable || this.props.withBrackets
+            ? "[" + tag + "]"
+            : tag;
         if (!this.props.filters.includes(opt)) {
-          options.push({label: "-" + tag + " (" + tags.get(tag) + ")", value: "-" + opt});
+          options.push({
+            label: "-" + tag + " (" + tags.get(tag) + ")",
+            value: "-" + opt,
+          });
         }
       }
       for (let type of typeKeys) {
-        const opt = this.props.isCreatable || this.props.withBrackets ? "{" + type + "}" : type;
+        const opt =
+          this.props.isCreatable || this.props.withBrackets
+            ? "{" + type + "}"
+            : type;
         if (!this.props.filters.includes(opt)) {
-          options.push({label: "-" + type + " (" + types.get(type) + ")", value: "-" + opt});
+          options.push({
+            label: "-" + type + " (" + types.get(type) + ")",
+            value: "-" + opt,
+          });
         }
       }
     }
-    this.setState({options: options, defaultValues: defaultValues, })
+    this.setState({ options: options, defaultValues: defaultValues });
   }
 
-  handleChange = (search: [{label: string, value: string}]) => {
+  handleChange = (search: [{ label: string; value: string }]) => {
     if (search == null) {
       this.props.onUpdateFilters([]);
     } else {
       let filters = Array<string>();
       for (let s of search) {
-        if (!this.props.isCreatable || ((s.value.startsWith("[") || s.value.startsWith("-[")) && s.value.endsWith("]")) ||
-          ((s.value.startsWith("{") || s.value.startsWith("-{")) && s.value.endsWith("}")) || s.value.startsWith("playlist:") ||
-          s.value.startsWith("artist:") || s.value.startsWith("album:") ||
-          ((s.value.startsWith('"') || s.value.startsWith('-"')) && s.value.endsWith('"')) ||
-          ((s.value.startsWith('\'') || s.value.startsWith('-\'')) && s.value.endsWith('\''))) {
+        if (
+          !this.props.isCreatable ||
+          ((s.value.startsWith("[") || s.value.startsWith("-[")) &&
+            s.value.endsWith("]")) ||
+          ((s.value.startsWith("{") || s.value.startsWith("-{")) &&
+            s.value.endsWith("}")) ||
+          s.value.startsWith("playlist:") ||
+          s.value.startsWith("artist:") ||
+          s.value.startsWith("album:") ||
+          ((s.value.startsWith('"') || s.value.startsWith('-"')) &&
+            s.value.endsWith('"')) ||
+          ((s.value.startsWith("'") || s.value.startsWith("-'")) &&
+            s.value.endsWith("'"))
+        ) {
           filters = filters.concat(s.value);
         } else {
           filters = filters.concat(s.value.split(" "));
@@ -279,9 +330,9 @@ class LibrarySearch extends React.Component {
   };
 
   handleInputChange = (searchInput: string) => {
-    this.setState({searchInput})
+    this.setState({ searchInput });
   };
 }
 
-(LibrarySearch as any).displayName="LibrarySearch";
+(LibrarySearch as any).displayName = "LibrarySearch";
 export default withStyles(styles)(LibrarySearch as any);

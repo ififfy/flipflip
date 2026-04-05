@@ -36,34 +36,34 @@ import {
   Typography,
 } from "@mui/material";
 
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
+import createStyles from "@mui/styles/createStyles";
+import withStyles from "@mui/styles/withStyles";
 
-import AddIcon from '@mui/icons-material/Add';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import CancelIcon from '@mui/icons-material/Cancel';
-import ClearIcon from '@mui/icons-material/Clear';
-import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
-import FolderIcon from '@mui/icons-material/Folder';
-import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
-import GetAppIcon from '@mui/icons-material/GetApp';
-import HttpIcon from '@mui/icons-material/Http';
-import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import MenuIcon from'@mui/icons-material/Menu';
-import MergeTypeIcon from '@mui/icons-material/MergeType';
-import MovieFilterIcon from '@mui/icons-material/MovieFilter';
-import MovieIcon from '@mui/icons-material/Movie';
-import OfflineBoltIcon from '@mui/icons-material/OfflineBolt';
-import PublishIcon from '@mui/icons-material/Publish';
-import SelectAllIcon from '@mui/icons-material/SelectAll';
+import AddIcon from "@mui/icons-material/Add";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import CancelIcon from "@mui/icons-material/Cancel";
+import ClearIcon from "@mui/icons-material/Clear";
+import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
+import FolderIcon from "@mui/icons-material/Folder";
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import GetAppIcon from "@mui/icons-material/GetApp";
+import HttpIcon from "@mui/icons-material/Http";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+import MenuIcon from "@mui/icons-material/Menu";
+import MergeTypeIcon from "@mui/icons-material/MergeType";
+import MovieFilterIcon from "@mui/icons-material/MovieFilter";
+import MovieIcon from "@mui/icons-material/Movie";
+import OfflineBoltIcon from "@mui/icons-material/OfflineBolt";
+import PublishIcon from "@mui/icons-material/Publish";
+import SelectAllIcon from "@mui/icons-material/SelectAll";
 import ShuffleIcon from "@mui/icons-material/Shuffle";
-import SortIcon from '@mui/icons-material/Sort';
+import SortIcon from "@mui/icons-material/Sort";
 
-import {AF, LT, MO, PR, SF, SP, ST} from "../../data/const";
-import {filterSource, getCachePath, getLocalPath} from "../../data/utils";
-import {getFileName, getSourceType} from "../player/Scrapers";
+import { AF, LT, MO, PR, SF, SP, ST } from "../../data/const";
+import { filterSource, getCachePath, getLocalPath } from "../../data/utils";
+import { getFileName, getSourceType } from "../player/Scrapers";
 import en from "../../data/en";
 import Config from "../../data/Config";
 import LibrarySource from "../../data/LibrarySource";
@@ -76,304 +76,316 @@ import SourceList from "./SourceList";
 import GooninatorDialog from "../sceneDetail/GooninatorDialog";
 import PiwigoDialog from "../sceneDetail/PiwigoDialog";
 import URLDialog from "../sceneDetail/URLDialog";
-import { fs_readdir, fs_readFileSync, fs_unlinkSync, fs_rimrafSync } from "../../dummy/fs";
+import {
+  fs_readdir,
+  fs_readFileSync,
+  fs_unlinkSync,
+  fs_rimrafSync,
+} from "../../dummy/fs";
 import { fsExtra_move } from "../../dummy/fs-extra";
 
 const drawerWidth = 240;
 
-const styles = (theme: Theme) => createStyles({
-  root: {
-    display: 'flex',
-  },
-  appBar: {
-    zIndex: theme.zIndex.drawer + 1,
-  },
-  appBarSpacerWrapper: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    padding: '0 8px',
-    minHeight: 64,
-  },
-  appBarSpacer: {
-    backgroundColor: theme.palette.primary.main,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    padding: '0 8px',
-    minHeight: 64,
-  },
-  backButton: {
-    float: 'left',
-  },
-  title: {
-    textAlign: 'center',
-    flexGrow: 1,
-  },
-  headerBar: {
-    display: 'flex',
-    alignItems: 'center',
-    whiteSpace: 'nowrap',
-    flexWrap: 'nowrap',
-  },
-  headerLeft: {
-    flexBasis: '20%',
-  },
-  headerRight: {
-    flexBasis: '20%',
-    justifyContent: 'flex-end',
-    display: 'flex',
-  },
-  searchBar: {
-    float: 'right',
-    display: 'flex',
-    maxWidth: '100%',
-  },
-  searchCount: {
-    color: theme.palette.primary.contrastText,
-    marginTop: 3,
-    marginRight: theme.spacing(1),
-  },
-  displayCount: {
-    marginTop: 3,
-    marginRight: theme.spacing(1),
-  },
-  drawerPaper: {
-    position: 'relative',
-    whiteSpace: 'nowrap',
-    overflowX: 'hidden',
-    height: '100vh',
-    width: drawerWidth,
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  drawerPaperClose: {
-    width: theme.spacing(7),
-    [theme.breakpoints.up('sm')]: {
-      width: theme.spacing(9),
+const styles = (theme: Theme) =>
+  createStyles({
+    root: {
+      display: "flex",
     },
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  drawerPaperHidden: {
-    width: 0,
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  drawer: {
-    position: 'absolute',
-  },
-  drawerSpacer: {
-    width: theme.spacing(7),
-    [theme.breakpoints.up('sm')]: {
-      width: theme.spacing(9),
+    appBar: {
+      zIndex: theme.zIndex.drawer + 1,
     },
-  },
-  drawerButton: {
-    backgroundColor: theme.palette.primary.main,
-    minHeight: theme.spacing(6),
-    [theme.breakpoints.down('sm')]: {
-      paddingLeft: 0,
-      paddingRight: 0,
+    appBarSpacerWrapper: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "flex-end",
+      padding: "0 8px",
+      minHeight: 64,
     },
-  },
-  drawerIcon: {
-    color: theme.palette.primary.contrastText,
-  },
-  chip: {
-    transition: theme.transitions.create(['opacity'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  chipClose: {
-    opacity: 0,
-    transition: theme.transitions.create(['opacity'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  content: {
-    display: 'flex',
-    flexGrow: 1,
-    flexDirection: 'column',
-    height: '100vh',
-    backgroundColor: theme.palette.background.default,
-  },
-  container: {
-    padding: theme.spacing(0),
-    overflow: 'hidden',
-    flexGrow: 1,
-  },
-  containerNotEmpty: {
-    display: 'flex',
-  },
-  addMenuButton: {
-    backgroundColor: theme.palette.primary.dark,
-    margin: 0,
-    top: 'auto',
-    right: 20,
-    bottom: 20,
-    left: 'auto',
-    position: 'fixed',
-  },
-  sortMenuButton: {
-    backgroundColor: theme.palette.secondary.dark,
-    margin: 0,
-    top: 'auto',
-    right: 80,
-    bottom: 20,
-    left: 'auto',
-    position: 'fixed',
-  },
-  selectAllButton: {
-    backgroundColor: theme.palette.secondary.dark,
-    margin: 0,
-    top: 'auto',
-    right: 130,
-    bottom: 20,
-    left: 'auto',
-    position: 'fixed',
-  },
-  selectNoneButton: {
-    backgroundColor: theme.palette.secondary.light,
-    margin: 0,
-    top: 'auto',
-    right: 180,
-    bottom: 20,
-    left: 'auto',
-    position: 'fixed',
-  },
-  importBadge:{
-    top: 'auto',
-    right: 30,
-    bottom: 50,
-    left: 'auto',
-    position: 'fixed',
-    zIndex: theme.zIndex.fab + 1,
-  },
-  addButton: {
-    backgroundColor: theme.palette.primary.main,
-    margin: 0,
-    top: 'auto',
-    right: 28,
-    bottom: 25,
-    left: 'auto',
-    position: 'fixed',
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  addURLButton: {
-    marginBottom: 60
-  },
-  addDirectoryButton: {
-    marginBottom: 115
-  },
-  addVideoButton: {
-    marginBottom: 170
-  },
-  addPiwigoButton: {
-    marginBottom: 225
-  },
-  removeAllButton: {
-    backgroundColor: theme.palette.error.main,
-    margin: 0,
-    top: 'auto',
-    right: 130,
-    bottom: 20,
-    left: 'auto',
-    position: 'fixed',
-  },
-  addButtonClose: {
-    marginBottom: 0,
-    transition: theme.transitions.create(['margin', 'opacity'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen + theme.transitions.duration.standard,
-    }),
-  },
-  icon: {
-    color: theme.palette.primary.contrastText,
-  },
-  sortMenu: {
-    width: 200,
-  },
-  fill: {
-    flexGrow: 1,
-  },
-  backdrop: {
-    zIndex: theme.zIndex.modal,
-    height: '100%',
-    width: '100%',
-  },
-  hidden: {
-    opacity: 0,
-    transition: theme.transitions.create(['margin', 'opacity'], {
-      easing: theme.transitions.easing.sharp,
-      duration: 100,
-    }),
-  },
-  noScroll: {
-    overflow: 'visible',
-  },
-  backdropTop: {
-    zIndex: theme.zIndex.modal + 1,
-  },
-  highlight: {
-    borderWidth: 2,
-    borderColor: theme.palette.secondary.main,
-    borderStyle: 'solid',
-  },
-  disable: {
-    pointerEvents: 'none',
-  }
-});
+    appBarSpacer: {
+      backgroundColor: theme.palette.primary.main,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "flex-end",
+      padding: "0 8px",
+      minHeight: 64,
+    },
+    backButton: {
+      float: "left",
+    },
+    title: {
+      textAlign: "center",
+      flexGrow: 1,
+    },
+    headerBar: {
+      display: "flex",
+      alignItems: "center",
+      whiteSpace: "nowrap",
+      flexWrap: "nowrap",
+    },
+    headerLeft: {
+      flexBasis: "20%",
+    },
+    headerRight: {
+      flexBasis: "20%",
+      justifyContent: "flex-end",
+      display: "flex",
+    },
+    searchBar: {
+      float: "right",
+      display: "flex",
+      maxWidth: "100%",
+    },
+    searchCount: {
+      color: theme.palette.primary.contrastText,
+      marginTop: 3,
+      marginRight: theme.spacing(1),
+    },
+    displayCount: {
+      marginTop: 3,
+      marginRight: theme.spacing(1),
+    },
+    drawerPaper: {
+      position: "relative",
+      whiteSpace: "nowrap",
+      overflowX: "hidden",
+      height: "100vh",
+      width: drawerWidth,
+      transition: theme.transitions.create("width", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+    },
+    drawerPaperClose: {
+      width: theme.spacing(7),
+      [theme.breakpoints.up("sm")]: {
+        width: theme.spacing(9),
+      },
+      transition: theme.transitions.create("width", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+    },
+    drawerPaperHidden: {
+      width: 0,
+      transition: theme.transitions.create("width", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+    },
+    drawer: {
+      position: "absolute",
+    },
+    drawerSpacer: {
+      width: theme.spacing(7),
+      [theme.breakpoints.up("sm")]: {
+        width: theme.spacing(9),
+      },
+    },
+    drawerButton: {
+      backgroundColor: theme.palette.primary.main,
+      minHeight: theme.spacing(6),
+      [theme.breakpoints.down("sm")]: {
+        paddingLeft: 0,
+        paddingRight: 0,
+      },
+    },
+    drawerIcon: {
+      color: theme.palette.primary.contrastText,
+    },
+    chip: {
+      transition: theme.transitions.create(["opacity"], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+    },
+    chipClose: {
+      opacity: 0,
+      transition: theme.transitions.create(["opacity"], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+    },
+    content: {
+      display: "flex",
+      flexGrow: 1,
+      flexDirection: "column",
+      height: "100vh",
+      backgroundColor: theme.palette.background.default,
+    },
+    container: {
+      padding: theme.spacing(0),
+      overflow: "hidden",
+      flexGrow: 1,
+    },
+    containerNotEmpty: {
+      display: "flex",
+    },
+    addMenuButton: {
+      backgroundColor: theme.palette.primary.dark,
+      margin: 0,
+      top: "auto",
+      right: 20,
+      bottom: 20,
+      left: "auto",
+      position: "fixed",
+    },
+    sortMenuButton: {
+      backgroundColor: theme.palette.secondary.dark,
+      margin: 0,
+      top: "auto",
+      right: 80,
+      bottom: 20,
+      left: "auto",
+      position: "fixed",
+    },
+    selectAllButton: {
+      backgroundColor: theme.palette.secondary.dark,
+      margin: 0,
+      top: "auto",
+      right: 130,
+      bottom: 20,
+      left: "auto",
+      position: "fixed",
+    },
+    selectNoneButton: {
+      backgroundColor: theme.palette.secondary.light,
+      margin: 0,
+      top: "auto",
+      right: 180,
+      bottom: 20,
+      left: "auto",
+      position: "fixed",
+    },
+    importBadge: {
+      top: "auto",
+      right: 30,
+      bottom: 50,
+      left: "auto",
+      position: "fixed",
+      zIndex: theme.zIndex.fab + 1,
+    },
+    addButton: {
+      backgroundColor: theme.palette.primary.main,
+      margin: 0,
+      top: "auto",
+      right: 28,
+      bottom: 25,
+      left: "auto",
+      position: "fixed",
+      transition: theme.transitions.create("margin", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+    },
+    addURLButton: {
+      marginBottom: 60,
+    },
+    addDirectoryButton: {
+      marginBottom: 115,
+    },
+    addVideoButton: {
+      marginBottom: 170,
+    },
+    addPiwigoButton: {
+      marginBottom: 225,
+    },
+    removeAllButton: {
+      backgroundColor: theme.palette.error.main,
+      margin: 0,
+      top: "auto",
+      right: 130,
+      bottom: 20,
+      left: "auto",
+      position: "fixed",
+    },
+    addButtonClose: {
+      marginBottom: 0,
+      transition: theme.transitions.create(["margin", "opacity"], {
+        easing: theme.transitions.easing.sharp,
+        duration:
+          theme.transitions.duration.leavingScreen +
+          theme.transitions.duration.standard,
+      }),
+    },
+    icon: {
+      color: theme.palette.primary.contrastText,
+    },
+    sortMenu: {
+      width: 200,
+    },
+    fill: {
+      flexGrow: 1,
+    },
+    backdrop: {
+      zIndex: theme.zIndex.modal,
+      height: "100%",
+      width: "100%",
+    },
+    hidden: {
+      opacity: 0,
+      transition: theme.transitions.create(["margin", "opacity"], {
+        easing: theme.transitions.easing.sharp,
+        duration: 100,
+      }),
+    },
+    noScroll: {
+      overflow: "visible",
+    },
+    backdropTop: {
+      zIndex: theme.zIndex.modal + 1,
+    },
+    highlight: {
+      borderWidth: 2,
+      borderColor: theme.palette.secondary.main,
+      borderStyle: "solid",
+    },
+    disable: {
+      pointerEvents: "none",
+    },
+  });
 
 class Library extends React.Component {
   readonly props: {
-    classes: any,
-    config: Config,
-    filters: Array<string>,
-    library: Array<LibrarySource>,
-    progressCurrent: number,
-    progressMode: string,
-    progressTitle: string,
-    progressTotal: number,
-    selected: Array<string>,
-    specialMode: string,
-    tags: Array<Tag>,
-    tutorial: string,
-    yOffset: number,
-    goBack(): void,
-    onAddSource(scene: Scene, type: string, ...args: any[]): void,
-    onBatchClip(): void,
-    onBatchTag(): void,
-    onClearBlacklist(sourceURL: string): void,
-    onClip(source: LibrarySource, displayed: Array<LibrarySource>): void,
+    classes: any;
+    config: Config;
+    filters: Array<string>;
+    library: Array<LibrarySource>;
+    progressCurrent: number;
+    progressMode: string;
+    progressTitle: string;
+    progressTotal: number;
+    selected: Array<string>;
+    specialMode: string;
+    tags: Array<Tag>;
+    tutorial: string;
+    yOffset: number;
+    goBack(): void;
+    onAddSource(scene: Scene, type: string, ...args: any[]): void;
+    onBatchClip(): void;
+    onBatchTag(): void;
+    onClearBlacklist(sourceURL: string): void;
+    onClip(source: LibrarySource, displayed: Array<LibrarySource>): void;
     onDownload(source: LibrarySource): void;
-    onEditBlacklist(sourceURL: string, blacklist: string): void,
-    onExportLibrary(): void,
-    onImportFromLibrary(sources: Array<LibrarySource>): void,
-    onImportLibrary(importLibrary: any): void,
-    onImportReddit(): void,
-    onImportTumblr(): void,
-    onManageTags(): void,
-    onMarkOffline(): void,
-    onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void,
-    onSort(scene: Scene, algorithm: string, ascending: boolean): void,
-    onTutorial(tutorial: string): void,
-    onUpdateLibrary(fn: (library: Array<LibrarySource>) => void): void,
-    onUpdateMode(mode: string): void,
-    onUpdateVideoMetadata(): void,
-    savePosition(yOffset: number, filters:Array<string>, selected: Array<string>): void,
-    systemMessage(message: string): void,
+    onEditBlacklist(sourceURL: string, blacklist: string): void;
+    onExportLibrary(): void;
+    onImportFromLibrary(sources: Array<LibrarySource>): void;
+    onImportLibrary(importLibrary: any): void;
+    onImportReddit(): void;
+    onImportTumblr(): void;
+    onManageTags(): void;
+    onMarkOffline(): void;
+    onPlay(source: LibrarySource, displayed: Array<LibrarySource>): void;
+    onSort(scene: Scene, algorithm: string, ascending: boolean): void;
+    onTutorial(tutorial: string): void;
+    onUpdateLibrary(fn: (library: Array<LibrarySource>) => void): void;
+    onUpdateMode(mode: string): void;
+    onUpdateVideoMetadata(): void;
+    savePosition(
+      yOffset: number,
+      filters: Array<string>,
+      selected: Array<string>,
+    ): void;
+    systemMessage(message: string): void;
   };
 
   readonly state = {
@@ -392,23 +404,41 @@ class Library extends React.Component {
     const classes = this.props.classes;
     const open = this.state.drawerOpen;
 
-    const tumblrAuthorized = this.props.config.remoteSettings.tumblrOAuthToken != "" &&
+    const tumblrAuthorized =
+      this.props.config.remoteSettings.tumblrOAuthToken != "" &&
       this.props.config.remoteSettings.tumblrOAuthTokenSecret != "";
-    const redditAuthorized = this.props.config.remoteSettings.redditRefreshToken != "";
-    const piwigoConfigured = this.props.config.remoteSettings.piwigoProtocol != "" &&
+    const redditAuthorized =
+      this.props.config.remoteSettings.redditRefreshToken != "";
+    const piwigoConfigured =
+      this.props.config.remoteSettings.piwigoProtocol != "" &&
       this.props.config.remoteSettings.piwigoHost != "";
     const remoteAuthorized = tumblrAuthorized || redditAuthorized;
 
     let cancelProgressMessage;
     switch (this.props.progressMode) {
       case PR.offline:
-        cancelProgressMessage = "Cancel Offline Check ( " + this.props.progressCurrent + " / " + this.props.progressTotal + " )";
+        cancelProgressMessage =
+          "Cancel Offline Check ( " +
+          this.props.progressCurrent +
+          " / " +
+          this.props.progressTotal +
+          " )";
         break;
       case PR.videoMetadata:
-        cancelProgressMessage = "End Video MD Check ( " + this.props.progressCurrent + " / " + this.props.progressTotal + " )";
+        cancelProgressMessage =
+          "End Video MD Check ( " +
+          this.props.progressCurrent +
+          " / " +
+          this.props.progressTotal +
+          " )";
         break;
       case PR.tumblr:
-        cancelProgressMessage = "Cancel Import ( " + this.props.progressCurrent + " / " + this.props.progressTotal + " )";
+        cancelProgressMessage =
+          "Cancel Import ( " +
+          this.props.progressCurrent +
+          " / " +
+          this.props.progressTotal +
+          " )";
         break;
       case PR.reddit:
         cancelProgressMessage = "Cancel Import";
@@ -417,41 +447,69 @@ class Library extends React.Component {
 
     return (
       <div className={classes.root}>
-        <AppBar enableColorOnDark position="absolute" className={clsx(classes.appBar, open && classes.appBarShift, this.props.tutorial == LT.toolbar && clsx(classes.backdropTop, classes.disable))}>
+        <AppBar
+          enableColorOnDark
+          position="absolute"
+          className={clsx(
+            classes.appBar,
+            open && classes.appBarShift,
+            this.props.tutorial == LT.toolbar &&
+              clsx(classes.backdropTop, classes.disable),
+          )}
+        >
           <Toolbar className={classes.headerBar}>
             <div className={classes.headerLeft}>
-              <Tooltip disableInteractive title={this.props.specialMode == SP.select ? "Cancel Import" : "Back"} placement="right-end">
+              <Tooltip
+                disableInteractive
+                title={
+                  this.props.specialMode == SP.select ? "Cancel Import" : "Back"
+                }
+                placement="right-end"
+              >
                 <IconButton
                   edge="start"
                   color="inherit"
                   aria-label="Back"
                   className={classes.backButton}
                   onClick={this.goBack.bind(this)}
-                  size="large">
+                  size="large"
+                >
                   <ArrowBackIcon />
                 </IconButton>
               </Tooltip>
             </div>
 
-            <Typography component="h1" variant="h4" color="inherit" noWrap
-                        className={classes.title}>
+            <Typography
+              component="h1"
+              variant="h4"
+              color="inherit"
+              noWrap
+              className={classes.title}
+            >
               Library
             </Typography>
 
             <div className={classes.headerRight}>
-              <div className={clsx(classes.searchBar, this.props.tutorial == LT.toolbar && classes.highlight)}>
+              <div
+                className={clsx(
+                  classes.searchBar,
+                  this.props.tutorial == LT.toolbar && classes.highlight,
+                )}
+              >
                 {this.props.library.length > 0 && (
                   <Chip
                     className={classes.searchCount}
                     label={this.props.library.length}
-                    size='medium'
-                    variant='outlined'/>
+                    size="medium"
+                    variant="outlined"
+                  />
                 )}
                 {this.state.filters.length > 0 && (
                   <Chip
                     className={classes.displayCount}
                     label={this.state.displaySources.length}
-                    size='medium'/>
+                    size="medium"
+                  />
                 )}
                 <LibrarySearch
                   displaySources={this.state.displaySources}
@@ -460,17 +518,32 @@ class Library extends React.Component {
                   placeholder={"Search ..."}
                   isCreatable
                   onlyUsed
-                  onUpdateFilters={this.onUpdateFilters.bind(this)}/>
+                  onUpdateFilters={this.onUpdateFilters.bind(this)}
+                />
               </div>
             </div>
           </Toolbar>
         </AppBar>
 
         <Drawer
-          className={clsx(classes.drawer, (this.props.tutorial == LT.sidebar1 || this.props.tutorial == LT.sidebar2 || this.state.drawerOpen) && classes.backdropTop, this.props.tutorial == LT.sidebar2 && classes.highlight)}
+          className={clsx(
+            classes.drawer,
+            (this.props.tutorial == LT.sidebar1 ||
+              this.props.tutorial == LT.sidebar2 ||
+              this.state.drawerOpen) &&
+              classes.backdropTop,
+            this.props.tutorial == LT.sidebar2 && classes.highlight,
+          )}
           variant="permanent"
-          classes={{paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose, this.props.specialMode && classes.drawerPaperHidden)}}
-          open={this.state.drawerOpen}>
+          classes={{
+            paper: clsx(
+              classes.drawerPaper,
+              !open && classes.drawerPaperClose,
+              this.props.specialMode && classes.drawerPaperHidden,
+            ),
+          }}
+          open={this.state.drawerOpen}
+        >
           <div className={clsx(!open && classes.appBarSpacerWrapper)}>
             <Collapse in={!open}>
               <div className={classes.appBarSpacer} />
@@ -479,18 +552,23 @@ class Library extends React.Component {
 
           <ListItem className={classes.drawerButton}>
             <IconButton
-              className={clsx(this.props.tutorial == LT.sidebar1 && classes.highlight)}
+              className={clsx(
+                this.props.tutorial == LT.sidebar1 && classes.highlight,
+              )}
               onClick={this.onToggleDrawer.bind(this)}
-              size="large">
-              <MenuIcon className={classes.drawerIcon}/>
+              size="large"
+            >
+              <MenuIcon className={classes.drawerIcon} />
             </IconButton>
           </ListItem>
 
           <Divider />
 
           <div className={clsx(this.props.tutorial != null && classes.disable)}>
-
-            <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Manage Tags"}>
+            <Tooltip
+              disableInteractive
+              title={this.state.drawerOpen ? "" : "Manage Tags"}
+            >
               <ListItem button onClick={this.props.onManageTags.bind(this)}>
                 <ListItemIcon>
                   <LocalOfferIcon />
@@ -500,13 +578,17 @@ class Library extends React.Component {
                   <Chip
                     className={clsx(classes.chip, !open && classes.chipClose)}
                     label={this.props.tags.length}
-                    color='primary'
-                    size='small'
-                    variant='outlined'/>
+                    color="primary"
+                    size="small"
+                    variant="outlined"
+                  />
                 )}
               </ListItem>
             </Tooltip>
-            <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Batch Tag"}>
+            <Tooltip
+              disableInteractive
+              title={this.state.drawerOpen ? "" : "Batch Tag"}
+            >
               <ListItem button onClick={this.onBatchTag.bind(this)}>
                 <ListItemIcon>
                   <FormatListBulletedIcon />
@@ -514,11 +596,15 @@ class Library extends React.Component {
                 <ListItemText primary="Batch Tag" />
               </ListItem>
             </Tooltip>
-            <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Batch Clip"}>
+            <Tooltip
+              disableInteractive
+              title={this.state.drawerOpen ? "" : "Batch Clip"}
+            >
               <ListItem button onClick={this.onBatchClip.bind(this)}>
                 <ListItemIcon>
                   <SvgIcon>
-                    <path d="M11 21H7V19H11V21M15.5 19H17V21H13V19H13.2L11.8 12.9L9.3 13.5C9.2 14 9 14.4 8.8
+                    <path
+                      d="M11 21H7V19H11V21M15.5 19H17V21H13V19H13.2L11.8 12.9L9.3 13.5C9.2 14 9 14.4 8.8
                           14.8C7.9 16.3 6 16.7 4.5 15.8C3 14.9 2.6 13 3.5 11.5C4.4 10 6.3 9.6 7.8 10.5C8.2 10.7 8.5
                           11.1 8.7 11.4L11.2 10.8L10.6 8.3C10.2 8.2 9.8 8 9.4 7.8C8 6.9 7.5 5 8.4 3.5C9.3 2 11.2
                           1.6 12.7 2.5C14.2 3.4 14.6 5.3 13.7 6.8C13.5 7.2 13.1 7.5 12.8 7.7L15.5 19M7 11.8C6.3
@@ -526,13 +612,17 @@ class Library extends React.Component {
                           11.8M12.4 6C12.9 5.3 12.6 4.3 11.9 3.8C11.2 3.3 10.2 3.6 9.7 4.3C9.3 5 9.5 6 10.3 6.5C11
                           6.9 12 6.7 12.4 6M12.8 11.3C12.6 11.2 12.4 11.2 12.3 11.4C12.2 11.6 12.2 11.8 12.4
                           11.9C12.6 12 12.8 12 12.9 11.8C13.1 11.6 13 11.4 12.8 11.3M21 8.5L14.5 10L15 12.2L22.5
-                          10.4L23 9.7L21 8.5M23 19H19V21H23V19M5 19H1V21H5V19Z" />
+                          10.4L23 9.7L21 8.5M23 19H19V21H23V19M5 19H1V21H5V19Z"
+                    />
                   </SvgIcon>
                 </ListItemIcon>
                 <ListItemText primary="Batch Clip" />
               </ListItem>
             </Tooltip>
-            <Tooltip disableInteractive title={"Identify local sources which have identical tags"}>
+            <Tooltip
+              disableInteractive
+              title={"Identify local sources which have identical tags"}
+            >
               <ListItem button onClick={this.onFindMerges.bind(this)}>
                 <ListItemIcon>
                   <MergeTypeIcon />
@@ -546,17 +636,24 @@ class Library extends React.Component {
             <React.Fragment>
               <Divider />
 
-              <div className={clsx(this.props.tutorial != null && classes.disable)}>
+              <div
+                className={clsx(this.props.tutorial != null && classes.disable)}
+              >
                 <Collapse in={open}>
-                  <ListSubheader inset>
-                    Import Remote Sources
-                  </ListSubheader>
+                  <ListSubheader inset>Import Remote Sources</ListSubheader>
                 </Collapse>
                 {tumblrAuthorized && (
-                  <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Import from Tumblr"}>
-                    <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onImportTumblr.bind(this)}>
+                  <Tooltip
+                    disableInteractive
+                    title={this.state.drawerOpen ? "" : "Import from Tumblr"}
+                  >
+                    <ListItem
+                      button
+                      disabled={this.props.progressMode != null}
+                      onClick={this.props.onImportTumblr.bind(this)}
+                    >
                       <ListItemIcon>
-                        <SourceIcon type={ST.tumblr}/>
+                        <SourceIcon type={ST.tumblr} />
                       </ListItemIcon>
                       <ListItemText primary="Tumblr" />
                     </ListItem>
@@ -579,16 +676,30 @@ class Library extends React.Component {
           <Divider />
 
           <div className={clsx(this.props.tutorial != null && classes.disable)}>
-            <Tooltip disableInteractive title={"Identify sources which are not accessible"}>
-              <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onMarkOffline.bind(this)}>
+            <Tooltip
+              disableInteractive
+              title={"Identify sources which are not accessible"}
+            >
+              <ListItem
+                button
+                disabled={this.props.progressMode != null}
+                onClick={this.props.onMarkOffline.bind(this)}
+              >
                 <ListItemIcon>
                   <OfflineBoltIcon />
                 </ListItemIcon>
                 <ListItemText primary="Mark Offline" />
               </ListItem>
             </Tooltip>
-            <Tooltip disableInteractive title={"Detect duration and resolution of video sources"}>
-              <ListItem button disabled={this.props.progressMode != null} onClick={this.props.onUpdateVideoMetadata.bind(this)}>
+            <Tooltip
+              disableInteractive
+              title={"Detect duration and resolution of video sources"}
+            >
+              <ListItem
+                button
+                disabled={this.props.progressMode != null}
+                onClick={this.props.onUpdateVideoMetadata.bind(this)}
+              >
                 <ListItemIcon>
                   <MovieFilterIcon />
                 </ListItemIcon>
@@ -602,28 +713,53 @@ class Library extends React.Component {
               <Divider />
 
               <div>
-                <Tooltip disableInteractive title={this.state.drawerOpen ? "" : cancelProgressMessage}>
-                  <ListItem button onClick={this.props.onUpdateMode.bind(this, PR.cancel)}>
+                <Tooltip
+                  disableInteractive
+                  title={this.state.drawerOpen ? "" : cancelProgressMessage}
+                >
+                  <ListItem
+                    button
+                    onClick={this.props.onUpdateMode.bind(this, PR.cancel)}
+                  >
                     <ListItemIcon>
-                      <CancelIcon color="error"/>
+                      <CancelIcon color="error" />
                     </ListItemIcon>
                     <ListItemText primary={cancelProgressMessage} />
                   </ListItem>
                 </Tooltip>
-                {(this.props.progressMode === PR.offline || this.props.progressMode === PR.tumblr || this.props.progressMode === PR.videoMetadata) && (
-                  <LinearProgress variant="determinate" value={Math.round((this.props.progressCurrent / this.props.progressTotal) * 100)}/>
+                {(this.props.progressMode === PR.offline ||
+                  this.props.progressMode === PR.tumblr ||
+                  this.props.progressMode === PR.videoMetadata) && (
+                  <LinearProgress
+                    variant="determinate"
+                    value={Math.round(
+                      (this.props.progressCurrent / this.props.progressTotal) *
+                        100,
+                    )}
+                  />
                 )}
-                {this.props.progressMode !== PR.offline && this.props.progressMode !== PR.tumblr && this.props.progressMode !== PR.videoMetadata && (
-                  <LinearProgress variant={this.props.progressMode === PR.cancel ? "query" : "indeterminate"}/>
-                )}
+                {this.props.progressMode !== PR.offline &&
+                  this.props.progressMode !== PR.tumblr &&
+                  this.props.progressMode !== PR.videoMetadata && (
+                    <LinearProgress
+                      variant={
+                        this.props.progressMode === PR.cancel
+                          ? "query"
+                          : "indeterminate"
+                      }
+                    />
+                  )}
               </div>
             </React.Fragment>
           )}
 
-          <div className={classes.fill}/>
+          <div className={classes.fill} />
 
           <div className={clsx(this.props.tutorial != null && classes.disable)}>
-            <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Export Library"}>
+            <Tooltip
+              disableInteractive
+              title={this.state.drawerOpen ? "" : "Export Library"}
+            >
               <ListItem button onClick={this.props.onExportLibrary.bind(this)}>
                 <ListItemIcon>
                   <PublishIcon />
@@ -631,7 +767,10 @@ class Library extends React.Component {
                 <ListItemText primary="Export Library" />
               </ListItem>
             </Tooltip>
-            <Tooltip disableInteractive title={this.state.drawerOpen ? "" : "Import Library"}>
+            <Tooltip
+              disableInteractive
+              title={this.state.drawerOpen ? "" : "Import Library"}
+            >
               <ListItem button onClick={this.onImportLibrary.bind(this)}>
                 <ListItemIcon>
                   <GetAppIcon />
@@ -645,16 +784,25 @@ class Library extends React.Component {
         <main className={classes.content}>
           <div className={classes.appBarSpacer} />
           <div className={clsx(classes.root, classes.fill)}>
-            {!this.props.specialMode &&  (
-              <div className={classes.drawerSpacer}/>
+            {!this.props.specialMode && (
+              <div className={classes.drawerSpacer} />
             )}
-            <Container maxWidth={false} className={clsx(classes.container, this.state.displaySources.length > 0 && classes.containerNotEmpty)}>
+            <Container
+              maxWidth={false}
+              className={clsx(
+                classes.container,
+                this.state.displaySources.length > 0 &&
+                  classes.containerNotEmpty,
+              )}
+            >
               <SourceList
                 config={this.props.config}
                 isSelect={!!this.props.specialMode}
                 library={this.props.library}
                 selected={this.state.selected}
-                showHelp={!this.props.specialMode && this.state.filters.length == 0}
+                showHelp={
+                  !this.props.specialMode && this.state.filters.length == 0
+                }
                 sources={this.state.displaySources}
                 yOffset={this.props.yOffset}
                 onClearBlacklist={this.props.onClearBlacklist.bind(this)}
@@ -665,7 +813,8 @@ class Library extends React.Component {
                 onUpdateSelected={this.onUpdateSelected.bind(this)}
                 onUpdateLibrary={this.props.onUpdateLibrary.bind(this)}
                 savePosition={this.savePosition.bind(this)}
-                systemMessage={this.props.systemMessage.bind(this)}/>
+                systemMessage={this.props.systemMessage.bind(this)}
+              />
             </Container>
           </div>
         </main>
@@ -673,40 +822,64 @@ class Library extends React.Component {
         <Backdrop
           className={classes.backdrop}
           onClick={this.onCloseDialog.bind(this)}
-          open={this.props.tutorial == null && (this.state.openMenu == MO.new || this.state.drawerOpen)} />
+          open={
+            this.props.tutorial == null &&
+            (this.state.openMenu == MO.new || this.state.drawerOpen)
+          }
+        />
 
         {this.props.specialMode && (
           <React.Fragment>
-            <Tooltip disableInteractive title="Clear"  placement="top-end">
+            <Tooltip disableInteractive title="Clear" placement="top-end">
               <Fab
                 className={classes.selectNoneButton}
                 onClick={this.onSelectNone.bind(this)}
-                size="small">
+                size="small"
+              >
                 <ClearIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip disableInteractive title="Select All"  placement="top-end">
+            <Tooltip disableInteractive title="Select All" placement="top-end">
               <Fab
                 className={classes.selectAllButton}
                 onClick={this.onSelectAll.bind(this)}
-                size="medium">
+                size="medium"
+              >
                 <SelectAllIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip disableInteractive title={this.props.specialMode == SP.batchTag ? "Batch Tag" : this.props.specialMode == SP.batchClip ? "Batch Clip" : "Import"}  placement="top-end">
+            <Tooltip
+              disableInteractive
+              title={
+                this.props.specialMode == SP.batchTag
+                  ? "Batch Tag"
+                  : this.props.specialMode == SP.batchClip
+                    ? "Batch Clip"
+                    : "Import"
+              }
+              placement="top-end"
+            >
               <Badge
                 classes={{
-                  badge: classes.importBadge
+                  badge: classes.importBadge,
                 }}
                 overlap="circular"
                 color="secondary"
                 badgeContent={this.state.selected.length}
-                max={999}>
+                max={999}
+              >
                 <Fab
                   className={classes.addMenuButton}
                   disabled={this.state.selected.length == 0}
-                  onClick={this.props.specialMode == SP.batchTag ? this.onToggleBatchTagModal.bind(this) : this.props.specialMode == SP.batchClip ? this.onToggleBatchClipModal.bind(this) : this.onImportFromLibrary.bind(this)}
-                  size="large">
+                  onClick={
+                    this.props.specialMode == SP.batchTag
+                      ? this.onToggleBatchTagModal.bind(this)
+                      : this.props.specialMode == SP.batchClip
+                        ? this.onToggleBatchClipModal.bind(this)
+                        : this.onImportFromLibrary.bind(this)
+                  }
+                  size="large"
+                >
                   {this.props.specialMode == SP.select && (
                     <GetAppIcon className={classes.icon} />
                   )}
@@ -714,8 +887,9 @@ class Library extends React.Component {
                     <LocalOfferIcon className={classes.icon} />
                   )}
                   {this.props.specialMode == SP.batchClip && (
-                    <SvgIcon className={classes.icon} >
-                      <path d="M11 21H7V19H11V21M15.5 19H17V21H13V19H13.2L11.8 12.9L9.3 13.5C9.2 14 9 14.4 8.8
+                    <SvgIcon className={classes.icon}>
+                      <path
+                        d="M11 21H7V19H11V21M15.5 19H17V21H13V19H13.2L11.8 12.9L9.3 13.5C9.2 14 9 14.4 8.8
                           14.8C7.9 16.3 6 16.7 4.5 15.8C3 14.9 2.6 13 3.5 11.5C4.4 10 6.3 9.6 7.8 10.5C8.2 10.7 8.5
                           11.1 8.7 11.4L11.2 10.8L10.6 8.3C10.2 8.2 9.8 8 9.4 7.8C8 6.9 7.5 5 8.4 3.5C9.3 2 11.2
                           1.6 12.7 2.5C14.2 3.4 14.6 5.3 13.7 6.8C13.5 7.2 13.1 7.5 12.8 7.7L15.5 19M7 11.8C6.3
@@ -723,7 +897,8 @@ class Library extends React.Component {
                           11.8M12.4 6C12.9 5.3 12.6 4.3 11.9 3.8C11.2 3.3 10.2 3.6 9.7 4.3C9.3 5 9.5 6 10.3 6.5C11
                           6.9 12 6.7 12.4 6M12.8 11.3C12.6 11.2 12.4 11.2 12.3 11.4C12.2 11.6 12.2 11.8 12.4
                           11.9C12.6 12 12.8 12 12.9 11.8C13.1 11.6 13 11.4 12.8 11.3M21 8.5L14.5 10L15 12.2L22.5
-                          10.4L23 9.7L21 8.5M23 19H19V21H23V19M5 19H1V21H5V19Z" />
+                          10.4L23 9.7L21 8.5M23 19H19V21H23V19M5 19H1V21H5V19Z"
+                      />
                     </SvgIcon>
                   )}
                 </Fab>
@@ -735,11 +910,20 @@ class Library extends React.Component {
         {!this.props.specialMode && (
           <React.Fragment>
             {this.props.library.length > 0 && (
-              <Tooltip disableInteractive title={this.state.filters.length == 0 ? "Delete All Sources" : "Delete These Sources"}  placement="left">
+              <Tooltip
+                disableInteractive
+                title={
+                  this.state.filters.length == 0
+                    ? "Delete All Sources"
+                    : "Delete These Sources"
+                }
+                placement="left"
+              >
                 <Fab
                   className={classes.removeAllButton}
                   onClick={this.onRemoveAll.bind(this)}
-                  size="small">
+                  size="small"
+                >
                   <DeleteSweepIcon className={classes.icon} />
                 </Fab>
               </Tooltip>
@@ -748,7 +932,8 @@ class Library extends React.Component {
               open={this.state.openMenu == MO.libraryImport}
               onClose={this.onCloseDialog.bind(this)}
               aria-labelledby="import-title"
-              aria-describedby="import-description">
+              aria-describedby="import-description"
+            >
               <DialogTitle id="import-title">Import Library</DialogTitle>
               <DialogContent>
                 <DialogContentText id="import-description">
@@ -762,24 +947,32 @@ class Library extends React.Component {
                   margin="dense"
                   value={this.state.importFile}
                   InputProps={{
-                    endAdornment:
+                    endAdornment: (
                       <InputAdornment position="end">
                         <Tooltip disableInteractive title="Open File">
-                          <IconButton onClick={this.onOpenImportFile.bind(this)} size="large">
-                            <FolderIcon/>
+                          <IconButton
+                            onClick={this.onOpenImportFile.bind(this)}
+                            size="large"
+                          >
+                            <FolderIcon />
                           </IconButton>
                         </Tooltip>
-                      </InputAdornment>,
+                      </InputAdornment>
+                    ),
                   }}
-                  onChange={this.onChangeImportFile.bind(this)} />
+                  onChange={this.onChangeImportFile.bind(this)}
+                />
               </DialogContent>
               <DialogActions>
-                <Button onClick={this.onCloseDialog.bind(this)}>
-                  Cancel
-                </Button>
-                <Button color="primary"
-                        disabled={this.state.importFile.length == 0}
-                        onClick={this.onFinishImportLibrary.bind(this, this.state.importFile)}>
+                <Button onClick={this.onCloseDialog.bind(this)}>Cancel</Button>
+                <Button
+                  color="primary"
+                  disabled={this.state.importFile.length == 0}
+                  onClick={this.onFinishImportLibrary.bind(
+                    this,
+                    this.state.importFile,
+                  )}
+                >
                   Import
                 </Button>
               </DialogActions>
@@ -788,20 +981,30 @@ class Library extends React.Component {
               open={this.state.openMenu == MO.removeAllAlert}
               onClose={this.onCloseDialog.bind(this)}
               aria-labelledby="remove-all-title"
-              aria-describedby="remove-all-description">
+              aria-describedby="remove-all-description"
+            >
               {this.state.filters.length == 0 && (
                 <React.Fragment>
-                  <DialogTitle id="remove-all-title">Delete Library</DialogTitle>
+                  <DialogTitle id="remove-all-title">
+                    Delete Library
+                  </DialogTitle>
                   <DialogContent>
                     <DialogContentText id="remove-all-description">
-                      Are you sure you really wanna delete your entire library...? ಠ_ಠ
+                      Are you sure you really wanna delete your entire
+                      library...? ಠ_ಠ
                     </DialogContentText>
                   </DialogContent>
                   <DialogActions>
-                    <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+                    <Button
+                      onClick={this.onCloseDialog.bind(this)}
+                      color="secondary"
+                    >
                       Cancel
                     </Button>
-                    <Button onClick={this.onFinishRemoveAll.bind(this)} color="primary">
+                    <Button
+                      onClick={this.onFinishRemoveAll.bind(this)}
+                      color="primary"
+                    >
                       Yea... I'm sure
                     </Button>
                   </DialogActions>
@@ -809,17 +1012,26 @@ class Library extends React.Component {
               )}
               {this.state.filters.length > 0 && (
                 <React.Fragment>
-                  <DialogTitle id="remove-all-title">Delete Sources</DialogTitle>
+                  <DialogTitle id="remove-all-title">
+                    Delete Sources
+                  </DialogTitle>
                   <DialogContent>
                     <DialogContentText id="remove-all-description">
-                      Are you sure you want to remove these sources from your library?
+                      Are you sure you want to remove these sources from your
+                      library?
                     </DialogContentText>
                   </DialogContent>
                   <DialogActions>
-                    <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+                    <Button
+                      onClick={this.onCloseDialog.bind(this)}
+                      color="secondary"
+                    >
                       Cancel
                     </Button>
-                    <Button onClick={this.onFinishRemoveVisible.bind(this)} color="primary">
+                    <Button
+                      onClick={this.onFinishRemoveVisible.bind(this)}
+                      color="primary"
+                    >
                       Confirm
                     </Button>
                   </DialogActions>
@@ -830,23 +1042,33 @@ class Library extends React.Component {
               open={this.state.openMenu == MO.deleteAlert}
               onClose={this.onCloseDialog.bind(this)}
               aria-labelledby="delete-all-title"
-              aria-describedby="delete-all-description">
+              aria-describedby="delete-all-description"
+            >
               {this.state.filters.length == 0 && (
                 <React.Fragment>
-                  <DialogTitle id="delete-all-title">PERMANENTLY Delete Library</DialogTitle>
+                  <DialogTitle id="delete-all-title">
+                    PERMANENTLY Delete Library
+                  </DialogTitle>
                   <DialogContent>
                     <DialogContentText id="delete-all-description">
-                      Are you sure you really wanna delete your entire library...? ಠ_ಠ
+                      Are you sure you really wanna delete your entire
+                      library...? ಠ_ಠ
                     </DialogContentText>
                     <DialogContentText id="delete-all-description">
                       WARNING: THIS WILL DELETE ANY LOCAL FILES FROM DISK
                     </DialogContentText>
                   </DialogContent>
                   <DialogActions>
-                    <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+                    <Button
+                      onClick={this.onCloseDialog.bind(this)}
+                      color="secondary"
+                    >
                       Cancel
                     </Button>
-                    <Button onClick={this.onFinishDeleteAll.bind(this)} color="primary">
+                    <Button
+                      onClick={this.onFinishDeleteAll.bind(this)}
+                      color="primary"
+                    >
                       PERMANENTLY DELETE FROM DISK
                     </Button>
                   </DialogActions>
@@ -854,75 +1076,134 @@ class Library extends React.Component {
               )}
               {this.state.filters.length > 0 && (
                 <React.Fragment>
-                  <DialogTitle id="delete-all-title">PERMANENTLY Delete Sources</DialogTitle>
+                  <DialogTitle id="delete-all-title">
+                    PERMANENTLY Delete Sources
+                  </DialogTitle>
                   <DialogContent>
                     <DialogContentText id="delete-all-description">
-                      Are you sure you want to remove these sources from your library?
+                      Are you sure you want to remove these sources from your
+                      library?
                     </DialogContentText>
                     <DialogContentText id="delete-all-description">
                       WARNING: THIS WILL DELETE ANY LOCAL FILES FROM DISK
                     </DialogContentText>
                   </DialogContent>
                   <DialogActions>
-                    <Button onClick={this.onCloseDialog.bind(this)} color="secondary">
+                    <Button
+                      onClick={this.onCloseDialog.bind(this)}
+                      color="secondary"
+                    >
                       Cancel
                     </Button>
-                    <Button onClick={this.onFinishDeleteVisible.bind(this)} color="primary">
+                    <Button
+                      onClick={this.onFinishDeleteVisible.bind(this)}
+                      color="primary"
+                    >
                       PERMANENTLY DELETE FROM DISK
                     </Button>
                   </DialogActions>
                 </React.Fragment>
               )}
             </Dialog>
-            {piwigoConfigured &&
-              <Tooltip disableInteractive title={this.state.filters.length > 0 ? "" : "Piwigo"}  placement="left">
+            {piwigoConfigured && (
+              <Tooltip
+                disableInteractive
+                title={this.state.filters.length > 0 ? "" : "Piwigo"}
+                placement="left"
+              >
                 <Fab
-                  className={clsx(classes.addButton, classes.addPiwigoButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
+                  className={clsx(
+                    classes.addButton,
+                    classes.addPiwigoButton,
+                    this.state.openMenu != MO.new && classes.addButtonClose,
+                    this.state.openMenu == MO.new && classes.backdropTop,
+                    this.state.filters.length > 0 && classes.hidden,
+                  )}
                   disabled={this.state.filters.length > 0}
                   onClick={this.openPiwigoDialog.bind(this)}
-                  size="small">
-                  <SourceIcon className={classes.icon} type={ST.piwigo}/>
+                  size="small"
+                >
+                  <SourceIcon className={classes.icon} type={ST.piwigo} />
                 </Fab>
               </Tooltip>
-            }
-            <Tooltip disableInteractive title={this.state.filters.length > 0 ? "" : "Local Video/Playlist"}  placement="left">
+            )}
+            <Tooltip
+              disableInteractive
+              title={
+                this.state.filters.length > 0 ? "" : "Local Video/Playlist"
+              }
+              placement="left"
+            >
               <Fab
-                className={clsx(classes.addButton, classes.addVideoButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
+                className={clsx(
+                  classes.addButton,
+                  classes.addVideoButton,
+                  this.state.openMenu != MO.new && classes.addButtonClose,
+                  this.state.openMenu == MO.new && classes.backdropTop,
+                  this.state.filters.length > 0 && classes.hidden,
+                )}
                 disabled={this.state.filters.length > 0}
                 onClick={this.onAddSource.bind(this, AF.videos)}
-                size="small">
+                size="small"
+              >
                 <MovieIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip disableInteractive title={this.state.filters.length > 0 ? "" : "Local Directory"}  placement="left">
+            <Tooltip
+              disableInteractive
+              title={this.state.filters.length > 0 ? "" : "Local Directory"}
+              placement="left"
+            >
               <Fab
-                className={clsx(classes.addButton, classes.addDirectoryButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
+                className={clsx(
+                  classes.addButton,
+                  classes.addDirectoryButton,
+                  this.state.openMenu != MO.new && classes.addButtonClose,
+                  this.state.openMenu == MO.new && classes.backdropTop,
+                  this.state.filters.length > 0 && classes.hidden,
+                )}
                 disabled={this.state.filters.length > 0}
                 onClick={this.onAddSource.bind(this, AF.directory)}
-                size="small">
+                size="small"
+              >
                 <FolderIcon className={classes.icon} />
               </Fab>
             </Tooltip>
-            <Tooltip disableInteractive title={this.state.filters.length > 0 ? "" : "URL"}  placement="left">
+            <Tooltip
+              disableInteractive
+              title={this.state.filters.length > 0 ? "" : "URL"}
+              placement="left"
+            >
               <Fab
-                className={clsx(classes.addButton, classes.addURLButton, this.state.openMenu != MO.new && classes.addButtonClose, this.state.openMenu == MO.new && classes.backdropTop, this.state.filters.length > 0 && classes.hidden)}
+                className={clsx(
+                  classes.addButton,
+                  classes.addURLButton,
+                  this.state.openMenu != MO.new && classes.addButtonClose,
+                  this.state.openMenu == MO.new && classes.backdropTop,
+                  this.state.filters.length > 0 && classes.hidden,
+                )}
                 disabled={this.state.filters.length > 0}
                 onClick={this.onAddSource.bind(this, AF.url)}
-                size="small">
+                size="small"
+              >
                 <HttpIcon className={classes.icon} />
               </Fab>
             </Tooltip>
             <Fab
-              className={clsx(classes.addMenuButton, this.state.openMenu == MO.new && classes.backdropTop)}
+              className={clsx(
+                classes.addMenuButton,
+                this.state.openMenu == MO.new && classes.backdropTop,
+              )}
               disabled={this.state.filters.length > 0}
               onClick={this.onToggleNewMenu.bind(this)}
-              size="large">
+              size="large"
+            >
               <AddIcon className={classes.icon} />
             </Fab>
           </React.Fragment>
         )}
 
-        <PiwigoDialog 
+        <PiwigoDialog
           config={this.props.config}
           open={this.state.openMenu == MO.piwigo}
           onClose={this.onCloseDialog.bind(this)}
@@ -936,52 +1217,59 @@ class Library extends React.Component {
           aria-controls="sort-menu"
           aria-label="Sort Sources"
           onClick={this.onOpenSortMenu.bind(this)}
-          size="medium">
+          size="medium"
+        >
           <SortIcon className={classes.icon} />
         </Fab>
         <Menu
           id="sort-menu"
           elevation={1}
           anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'center',
+            vertical: "top",
+            horizontal: "center",
           }}
           transformOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right',
+            vertical: "bottom",
+            horizontal: "right",
           }}
           anchorEl={this.state.menuAnchorEl}
           keepMounted
-          classes={{paper: classes.sortMenu}}
+          classes={{ paper: classes.sortMenu }}
           open={this.state.openMenu == MO.sort}
-          onClose={this.onCloseDialog.bind(this)}>
-          {Object.values(SF).filter((sf) => sf != SF.random).map((sf) =>
-            <MenuItem key={sf}>
-              <ListItemText primary={en.get(sf)}/>
-              <ListItemSecondaryAction>
-                <IconButton
-                  edge="end"
-                  onClick={this.props.onSort.bind(this, null, sf, true)}
-                  size="large">
-                  <ArrowUpwardIcon/>
-                </IconButton>
-                <IconButton
-                  edge="end"
-                  onClick={this.props.onSort.bind(this, null, sf, false)}
-                  size="large">
-                  <ArrowDownwardIcon/>
-                </IconButton>
-              </ListItemSecondaryAction>
-            </MenuItem>
-          )}
+          onClose={this.onCloseDialog.bind(this)}
+        >
+          {Object.values(SF)
+            .filter((sf) => sf != SF.random)
+            .map((sf) => (
+              <MenuItem key={sf}>
+                <ListItemText primary={en.get(sf)} />
+                <ListItemSecondaryAction>
+                  <IconButton
+                    edge="end"
+                    onClick={this.props.onSort.bind(this, null, sf, true)}
+                    size="large"
+                  >
+                    <ArrowUpwardIcon />
+                  </IconButton>
+                  <IconButton
+                    edge="end"
+                    onClick={this.props.onSort.bind(this, null, sf, false)}
+                    size="large"
+                  >
+                    <ArrowDownwardIcon />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </MenuItem>
+            ))}
           <MenuItem key={SF.random}>
-            <ListItemText primary={en.get(SF.random)}/>
+            <ListItemText primary={en.get(SF.random)} />
             <ListItemSecondaryAction>
               <IconButton
                 edge="end"
                 onClick={this.props.onSort.bind(this, null, SF.random, true)}
-                size="large">
-                <ShuffleIcon/>
+                size="large"
+              >
+                <ShuffleIcon />
               </IconButton>
             </ListItemSecondaryAction>
           </MenuItem>
@@ -998,17 +1286,18 @@ class Library extends React.Component {
           onClose={this.onCloseDialog.bind(this)}
         />
         <Dialog
-          classes={{paper: classes.noScroll}}
+          classes={{ paper: classes.noScroll }}
           open={this.state.openMenu == MO.batchTag}
           onClose={this.onCloseDialog.bind(this)}
           aria-labelledby="batch-tag-title"
-          aria-describedby="batch-tag-description">
+          aria-describedby="batch-tag-description"
+        >
           <DialogTitle id="batch-tag-title">Batch Tag</DialogTitle>
           <DialogContent className={classes.noScroll}>
             <DialogContentText id="batch-tag-description">
               Choose tags to add, remove, or overwrite on the selected source(s)
             </DialogContentText>
-            {this.state.openMenu == MO.batchTag &&
+            {this.state.openMenu == MO.batchTag && (
               <LibrarySearch
                 displaySources={this.props.library}
                 filters={this.state.selectedTags}
@@ -1018,16 +1307,27 @@ class Library extends React.Component {
                 onlyTags
                 showCheckboxes
                 hideSelectedOptions={false}
-                onUpdateFilters={this.onSelectTags.bind(this)}/>
-            }
+                onUpdateFilters={this.onSelectTags.bind(this)}
+              />
+            )}
           </DialogContent>
           <DialogActions>
-            <Button disabled={this.state.selectedTags && this.state.selectedTags.length == 0}
-                    onClick={this.batchTagRemove.bind(this)} color="secondary">
+            <Button
+              disabled={
+                this.state.selectedTags && this.state.selectedTags.length == 0
+              }
+              onClick={this.batchTagRemove.bind(this)}
+              color="secondary"
+            >
               - Remove
             </Button>
-            <Button disabled={this.state.selectedTags && this.state.selectedTags.length == 0}
-                    onClick={this.batchTagAdd.bind(this)} color="secondary">
+            <Button
+              disabled={
+                this.state.selectedTags && this.state.selectedTags.length == 0
+              }
+              onClick={this.batchTagAdd.bind(this)}
+              color="secondary"
+            >
               + Add
             </Button>
             <Button onClick={this.batchTagOverwrite.bind(this)} color="primary">
@@ -1045,16 +1345,21 @@ class Library extends React.Component {
         <Dialog
           open={this.state.moveDialog}
           onClose={this.onCloseMoveDialog.bind(this)}
-          aria-describedby="move-description">
+          aria-describedby="move-description"
+        >
           <DialogTitle id="move-title">Localize Offline Sources</DialogTitle>
           <DialogContent>
             <DialogContentText id="move-description">
-              You are about to convert all offline sources to local sources. Any cached images will be moved to a
-              local directory. Offline sources without cached images will be removed from the Library.
+              You are about to convert all offline sources to local sources. Any
+              cached images will be moved to a local directory. Offline sources
+              without cached images will be removed from the Library.
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.onCloseMoveDialog.bind(this)} color="secondary">
+            <Button
+              onClick={this.onCloseMoveDialog.bind(this)}
+              color="secondary"
+            >
               Cancel
             </Button>
             <Button onClick={this.onFinishMove.bind(this)} color="primary">
@@ -1067,48 +1372,82 @@ class Library extends React.Component {
   }
 
   componentDidMount() {
-    this.setState({displaySources: this.getDisplaySources()});
-    window.addEventListener('keydown', this.onKeyDown, false);
+    this.setState({ displaySources: this.getDisplaySources() });
+    window.addEventListener("keydown", this.onKeyDown, false);
   }
 
   componentDidUpdate(props: any, state: any) {
-    if (state.filters != this.state.filters || props.library != this.props.library || props.specialMode != this.props.specialMode) {
-      this.setState({displaySources: this.getDisplaySources()});
+    if (
+      state.filters != this.state.filters ||
+      props.library != this.props.library ||
+      props.specialMode != this.props.specialMode
+    ) {
+      this.setState({ displaySources: this.getDisplaySources() });
     }
     if (this.props.tutorial == LT.final && this.state.drawerOpen) {
-      this.setState({drawerOpen: false});
+      this.setState({ drawerOpen: false });
     }
   }
 
   componentWillUnmount() {
-    window.removeEventListener('keydown', this.onKeyDown);
+    window.removeEventListener("keydown", this.onKeyDown);
   }
 
   // Use alt+P to access import modal
   // Use alt+M to toggle highlighting  sources
   // Use alt+L to move cached offline sources to local sources
   onKeyDown = (e: KeyboardEvent) => {
-    if (!e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'p' || e.key == 'π')) {
-      this.setState({openMenu: this.state.openMenu == MO.gooninatorImport ? null : MO.gooninatorImport});
-    } else if (!e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'm' || e.key == 'µ')) {
+    if (
+      !e.shiftKey &&
+      !e.ctrlKey &&
+      e.altKey &&
+      (e.key == "p" || e.key == "π")
+    ) {
+      this.setState({
+        openMenu:
+          this.state.openMenu == MO.gooninatorImport
+            ? null
+            : MO.gooninatorImport,
+      });
+    } else if (
+      !e.shiftKey &&
+      !e.ctrlKey &&
+      e.altKey &&
+      (e.key == "m" || e.key == "µ")
+    ) {
       this.toggleMarked();
-    } else if (e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'M' || e.key == 'µ')) {
+    } else if (
+      e.shiftKey &&
+      !e.ctrlKey &&
+      e.altKey &&
+      (e.key == "M" || e.key == "µ")
+    ) {
       this.addMarked();
-    } else if (e.shiftKey && e.ctrlKey && e.altKey && (e.key == 'M' || e.key == 'µ')) {
+    } else if (
+      e.shiftKey &&
+      e.ctrlKey &&
+      e.altKey &&
+      (e.key == "M" || e.key == "µ")
+    ) {
       this.removeMarked();
-    } else if (!e.shiftKey && !e.ctrlKey && e.altKey && (e.key == 'l' || e.key == '¬')) {
+    } else if (
+      !e.shiftKey &&
+      !e.ctrlKey &&
+      e.altKey &&
+      (e.key == "l" || e.key == "¬")
+    ) {
       this.moveOffline();
-    } else if (e.key == 'Escape' && this.props.specialMode != null) {
+    } else if (e.key == "Escape" && this.props.specialMode != null) {
       this.goBack();
     }
   };
 
   moveOffline() {
-    this.setState({moveDialog: true});
+    this.setState({ moveDialog: true });
   }
 
   openPiwigoDialog() {
-    this.setState({openMenu: MO.piwigo});
+    this.setState({ openMenu: MO.piwigo });
   }
 
   onFinishMove() {
@@ -1148,7 +1487,7 @@ class Library extends React.Component {
   }
 
   onCloseMoveDialog() {
-    this.setState({moveDialog: false});
+    this.setState({ moveDialog: false });
   }
 
   onBatchClip() {
@@ -1167,7 +1506,9 @@ class Library extends React.Component {
 
   getMerges() {
     let merges: Array<LibrarySource> = [];
-    let remainingLibrary = this.props.library.filter((ls) => getSourceType(ls.url) == ST.local && ls.tags.length > 0);
+    let remainingLibrary = this.props.library.filter(
+      (ls) => getSourceType(ls.url) == ST.local && ls.tags.length > 0,
+    );
     // While we still have sources left to check
     while (remainingLibrary.length > 0) {
       // Grab the first source in the list
@@ -1208,10 +1549,10 @@ class Library extends React.Component {
 
   goBack() {
     if (this.props.specialMode == SP.batchTag) {
-      this.setState({selected: [], selectedTags: []});
+      this.setState({ selected: [], selectedTags: [] });
       this.props.onBatchTag();
     } else if (this.props.specialMode == SP.batchClip) {
-      this.setState({selected: [], clipOffset: [0, 0]});
+      this.setState({ selected: [], clipOffset: [0, 0] });
       this.props.onBatchClip();
     } else {
       this.props.goBack();
@@ -1219,7 +1560,10 @@ class Library extends React.Component {
   }
 
   onUpdateFilters(filters: Array<string>) {
-    this.setState({filters: filters, displaySources: this.getDisplaySources()});
+    this.setState({
+      filters: filters,
+      displaySources: this.getDisplaySources(),
+    });
   }
 
   onAddSource(addFunction: string, e: MouseEvent, ...args: any[]) {
@@ -1227,7 +1571,7 @@ class Library extends React.Component {
     if (addFunction == AF.videos && e.shiftKey) {
       this.props.onAddSource(null, AF.videoDir, ...args);
     } else if (addFunction == AF.url && e.shiftKey) {
-      this.setState({openMenu: MO.urlImport});
+      this.setState({ openMenu: MO.urlImport });
     } else {
       this.props.onAddSource(null, addFunction, ...args);
     }
@@ -1235,48 +1579,56 @@ class Library extends React.Component {
 
   onToggleBatchClipModal() {
     if (this.state.openMenu == MO.batchClip) {
-      this.setState({openMenu: null, clipOffset: [0, 0]});
+      this.setState({ openMenu: null, clipOffset: [0, 0] });
     } else {
-      this.setState({openMenu: MO.batchClip, clipOffset: [0, 0]});
+      this.setState({ openMenu: MO.batchClip, clipOffset: [0, 0] });
     }
   }
 
   onToggleBatchTagModal() {
     if (this.state.openMenu == MO.batchTag) {
-      this.setState({openMenu: null, selectedTags: []});
+      this.setState({ openMenu: null, selectedTags: [] });
     } else {
-      this.setState({openMenu: MO.batchTag, selectedTags: this.getSelectedTags()});
+      this.setState({
+        openMenu: MO.batchTag,
+        selectedTags: this.getSelectedTags(),
+      });
     }
   }
 
   onSelectTags(selectedTags: Array<string>) {
-    this.setState({selectedTags: selectedTags});
+    this.setState({ selectedTags: selectedTags });
   }
 
   onToggleDrawer() {
     if (this.props.tutorial == LT.sidebar1) {
       this.props.onTutorial(LT.sidebar1);
     }
-    this.setState({drawerOpen: !this.state.drawerOpen});
+    this.setState({ drawerOpen: !this.state.drawerOpen });
   }
 
   onToggleNewMenu() {
-    this.setState({openMenu: this.state.openMenu == MO.new ? null : MO.new});
+    this.setState({ openMenu: this.state.openMenu == MO.new ? null : MO.new });
   }
 
   onOpenSortMenu(e: MouseEvent) {
-    this.setState({menuAnchorEl: e.currentTarget, openMenu: MO.sort});
+    this.setState({ menuAnchorEl: e.currentTarget, openMenu: MO.sort });
   }
 
   onCloseDialog() {
-    this.setState({menuAnchorEl: null, openMenu: null, drawerOpen: false, importFile: ""});
+    this.setState({
+      menuAnchorEl: null,
+      openMenu: null,
+      drawerOpen: false,
+      importFile: "",
+    });
   }
 
   onRemoveAll(e: MouseEvent) {
     if (e.shiftKey && e.altKey && e.ctrlKey) {
-      this.setState({openMenu: MO.deleteAlert});
+      this.setState({ openMenu: MO.deleteAlert });
     } else {
-      this.setState({openMenu: MO.removeAllAlert});
+      this.setState({ openMenu: MO.removeAllAlert });
     }
   }
 
@@ -1290,14 +1642,14 @@ class Library extends React.Component {
   onFinishRemoveVisible() {
     this.props.onUpdateLibrary((l) => {
       const displayIDs = this.state.displaySources.map((s) => s.id);
-      for (let i = l.length -1; i >= 0 ; i--) {
+      for (let i = l.length - 1; i >= 0; i--) {
         if (displayIDs.includes(l[i].id)) {
           l.splice(i, 1);
         }
       }
     });
     this.onCloseDialog();
-    this.setState({filters: []});
+    this.setState({ filters: [] });
   }
 
   onFinishDeleteAll() {
@@ -1306,7 +1658,11 @@ class Library extends React.Component {
       try {
         if (fileType == ST.local) {
           fs_rimrafSync(l.url);
-        } else if (fileType == ST.video || fileType == ST.playlist || fileType == ST.list) {
+        } else if (
+          fileType == ST.video ||
+          fileType == ST.playlist ||
+          fileType == ST.list
+        ) {
           unlink(l.url);
         }
       } catch (e) {
@@ -1322,16 +1678,23 @@ class Library extends React.Component {
   onFinishDeleteVisible() {
     this.props.onUpdateLibrary((l) => {
       const displayIDs = this.state.displaySources.map((s) => s.id);
-      for (let i = l.length -1; i >= 0 ; i--) {
+      for (let i = l.length - 1; i >= 0; i--) {
         if (displayIDs.includes(l[i].id)) {
           const sourceURL = l[i].url;
           const fileType = getSourceType(sourceURL);
           try {
             if (fileType == ST.local) {
               fs_rimrafSync(sourceURL);
-            } else if (fileType == ST.video || fileType == ST.playlist || fileType == ST.list) {
+            } else if (
+              fileType == ST.video ||
+              fileType == ST.playlist ||
+              fileType == ST.list
+            ) {
               fs_unlinkSync(sourceURL);
-              fs_rimrafSync(getCachePath(sourceURL, this.props.config) + getFileName(sourceURL));
+              fs_rimrafSync(
+                getCachePath(sourceURL, this.props.config) +
+                  getFileName(sourceURL),
+              );
             } else {
               fs_rimrafSync(getCachePath(sourceURL, this.props.config));
             }
@@ -1343,7 +1706,7 @@ class Library extends React.Component {
       }
     });
     this.onCloseDialog();
-    this.setState({filters: []});
+    this.setState({ filters: [] });
   }
 
   onOpenImportFile() {
@@ -1355,12 +1718,12 @@ class Library extends React.Component {
   }
 
   onChangeImportFile(e: MouseEvent) {
-    const input = (e.target as HTMLInputElement);
-    this.setState({importFile: input.value});
+    const input = e.target as HTMLInputElement;
+    this.setState({ importFile: input.value });
   }
 
   onImportLibrary() {
-    this.setState({openMenu: MO.libraryImport});
+    this.setState({ openMenu: MO.libraryImport });
   }
 
   onFinishImportLibrary() {
@@ -1381,7 +1744,9 @@ class Library extends React.Component {
           this.props.systemMessage("Error accessing URL");
         });
     } else {
-      this.props.onImportLibrary(JSON.parse(fs_readFileSync(this.state.importFile, 'utf-8')));
+      this.props.onImportLibrary(
+        JSON.parse(fs_readFileSync(this.state.importFile, "utf-8")),
+      );
       this.onCloseDialog();
     }
   }
@@ -1399,7 +1764,7 @@ class Library extends React.Component {
   }
 
   onUpdateSelected(selected: Array<string>) {
-    this.setState({selected: selected});
+    this.setState({ selected: selected });
   }
 
   onSelectAll() {
@@ -1410,7 +1775,7 @@ class Library extends React.Component {
         newSelected.push(source);
       }
     }
-    this.setState({selected: newSelected});
+    this.setState({ selected: newSelected });
   }
 
   onSelectNone() {
@@ -1418,10 +1783,10 @@ class Library extends React.Component {
     let newSelected = Array.from(this.state.selected);
     for (let source of displaySources.map((s) => s.url)) {
       if (newSelected.includes(source)) {
-        newSelected.splice(newSelected.indexOf(source), 1)
+        newSelected.splice(newSelected.indexOf(source), 1);
       }
     }
-    this.setState({selected: newSelected});
+    this.setState({ selected: newSelected });
   }
 
   savePosition() {
@@ -1429,7 +1794,11 @@ class Library extends React.Component {
     if (sortableList) {
       const scrollElement = sortableList.firstElementChild;
       const scrollTop = scrollElement ? scrollElement.scrollTop : 0;
-      this.props.savePosition(scrollTop, this.state.filters, this.state.selected);
+      this.props.savePosition(
+        scrollTop,
+        this.state.filters,
+        this.state.selected,
+      );
     }
   }
 
@@ -1438,13 +1807,15 @@ class Library extends React.Component {
       taggingMode = this.props.library.find((s) => s.marked) == null;
     }
 
-    if (taggingMode) { // We're marking sources
+    if (taggingMode) {
+      // We're marking sources
       this.props.onUpdateLibrary((l) => {
         for (let source of this.state.displaySources) {
           l.find((s) => s.id == source.id).marked = true;
         }
       });
-    } else { // We're unmarking sources
+    } else {
+      // We're unmarking sources
       this.props.onUpdateLibrary((l) => {
         for (let source of l) {
           source.marked = false;
@@ -1452,7 +1823,6 @@ class Library extends React.Component {
       });
     }
   }
-
 
   addMarked() {
     this.toggleMarked(true);
@@ -1468,7 +1838,12 @@ class Library extends React.Component {
         const source = l.find((s) => s.url === sourceURL);
         source.tags = new Array<Tag>();
         for (let tag of this.state.selectedTags) {
-          source.tags.push(new Tag({name: tag, id: this.props.tags.find((t) => t.name == tag).id}));
+          source.tags.push(
+            new Tag({
+              name: tag,
+              id: this.props.tags.find((t) => t.name == tag).id,
+            }),
+          );
         }
       }
     });
@@ -1482,7 +1857,12 @@ class Library extends React.Component {
         const sourceTags = source.tags.map((t) => t.name);
         for (let tag of this.state.selectedTags) {
           if (!sourceTags.includes(tag)) {
-            source.tags.push(new Tag({name: tag, id: this.props.tags.find((t) => t.name == tag).id}));
+            source.tags.push(
+              new Tag({
+                name: tag,
+                id: this.props.tags.find((t) => t.name == tag).id,
+              }),
+            );
           }
         }
       }
@@ -1534,7 +1914,9 @@ class Library extends React.Component {
     let displaySources = [];
     const filtering = this.state.filters.length > 0;
     if (filtering) {
-      const mergeSources = this.state.filters.includes("<Mergeable>") ? this.getMerges() : null;
+      const mergeSources = this.state.filters.includes("<Mergeable>")
+        ? this.getMerges()
+        : null;
       for (let source of mergeSources ? mergeSources : this.props.library) {
         let matchesFilter = true;
         for (let filter of this.state.filters) {
@@ -1549,11 +1931,13 @@ class Library extends React.Component {
       displaySources = this.props.library;
     }
     if (this.props.specialMode == SP.batchClip) {
-      displaySources = displaySources.filter((s) => getSourceType(s.url) == ST.video);
+      displaySources = displaySources.filter(
+        (s) => getSourceType(s.url) == ST.video,
+      );
     }
     return displaySources;
   }
 }
 
-(Library as any).displayName="Library";
+(Library as any).displayName = "Library";
 export default withStyles(styles)(Library as any);

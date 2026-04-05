@@ -8,12 +8,14 @@ export default class SceneGrid {
   constructor(init?: Partial<SceneGrid>) {
     Object.assign(this, init);
 
-    this.grid = this.grid.map((r) => r.map((c) => {
-      if (!c.sceneID) {
-        return new SceneGridCell({sceneID: parseInt(c as any)})
-      } else {
-        return c;
-      }
-    }));
+    this.grid = this.grid.map((r) =>
+      r.map((c) => {
+        if (!c.sceneID) {
+          return new SceneGridCell({ sceneID: parseInt(c as any) });
+        } else {
+          return c;
+        }
+      }),
+    );
   }
 }

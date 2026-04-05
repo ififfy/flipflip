@@ -1,8 +1,27 @@
-import * as easings from 'd3-ease';
+import * as easings from "d3-ease";
 import "core-js/features/array/flat";
 
-import {getSourceType} from "../components/player/Scrapers";
-import {BT, EA, GO, HTF, IF, IT, OF, OT, SC, SL, SOF, ST, STF, TF, TT, VO, VTF, WF} from "./const";
+import { getSourceType } from "../components/player/Scrapers";
+import {
+  BT,
+  EA,
+  GO,
+  HTF,
+  IF,
+  IT,
+  OF,
+  OT,
+  SC,
+  SL,
+  SOF,
+  ST,
+  STF,
+  TF,
+  TT,
+  VO,
+  VTF,
+  WF,
+} from "./const";
 import en from "./en";
 import Config from "./Config";
 import LibrarySource from "./LibrarySource";
@@ -10,12 +29,12 @@ import Audio from "./Audio";
 import WeightGroup from "./WeightGroup";
 import Scene from "./Scene";
 import Clip from "./Clip";
-import { fs_readFileSync } from '../dummy/fs';
+import { fs_readFileSync } from "../dummy/fs";
 
 // dummy, migrated to src/node/data/utils.ts
-export const saveDir = '';
-export const savePath = 'data.json';
-export const portablePath = 'portable-data.json';
+export const saveDir = "";
+export const savePath = "data.json";
+export const portablePath = "portable-data.json";
 
 export function flatten(array: Array<any>) {
   let values;
@@ -27,8 +46,14 @@ export function flatten(array: Array<any>) {
   return values;
 }
 
-export function getEaseFunction(ea: string, exp: number, amp: number, per: number, ov: number) {
-  switch(ea) {
+export function getEaseFunction(
+  ea: string,
+  exp: number,
+  amp: number,
+  per: number,
+  ov: number,
+) {
+  switch (ea) {
     case EA.linear:
       return easings.easeLinear;
     case EA.sinIn:
@@ -73,11 +98,10 @@ export function getEaseFunction(ea: string, exp: number, amp: number, per: numbe
       return easings.easeBackOut.overshoot(ov);
     case EA.backInOut:
       return easings.easeBackInOut.overshoot(ov);
-
   }
 }
 
-export function getBackups(): Array<{url: string, size: number}> {
+export function getBackups(): Array<{ url: string; size: number }> {
   // dummy, migrated to src/node/data/utils.ts
   return [];
 }
@@ -89,28 +113,36 @@ export function convertFromEpoch(backupFile: string) {
 }
 
 export function getTimingFromString(tf: string): string {
-  switch(tf) {
+  switch (tf) {
     case "constant":
     case "const":
       return TF.constant;
     case "random":
     case "rand":
-      return  TF.random;
+      return TF.random;
     case "wave":
     case "sin":
-      return  TF.sin;
+      return TF.sin;
     case "bpm":
     case "audio":
-      return  TF.bpm;
+      return TF.bpm;
     case "scene":
-      return  TF.scene;
+      return TF.scene;
     default:
       return null;
   }
 }
 
-export function getTimeout(tf: string, c: number, min: number, max: number, sinRate: number,
-                           audio: Audio, bpmMulti: number, timeToNextFrame: number): number {
+export function getTimeout(
+  tf: string,
+  c: number,
+  min: number,
+  max: number,
+  sinRate: number,
+  audio: Audio,
+  bpmMulti: number,
+  timeToNextFrame: number,
+): number {
   let timeout = null;
   switch (tf) {
     case TF.random:
@@ -118,7 +150,9 @@ export function getTimeout(tf: string, c: number, min: number, max: number, sinR
       break;
     case TF.sin:
       sinRate = (Math.abs(sinRate - 100) + 2) * 1000;
-      timeout = Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (max - min + 1)) + min;
+      timeout =
+        Math.floor(Math.abs(Math.sin(Date.now() / sinRate)) * (max - min + 1)) +
+        min;
       break;
     case TF.constant:
       timeout = c;
@@ -143,10 +177,16 @@ export function getTimeout(tf: string, c: number, min: number, max: number, sinR
 
 export function getTimestamp(secs: number): string {
   const hours = Math.floor(secs / 3600);
-  const minutes = Math.floor(secs % 3600 / 60);
-  const seconds = Math.floor(secs % 3600 % 60);
+  const minutes = Math.floor((secs % 3600) / 60);
+  const seconds = Math.floor((secs % 3600) % 60);
   if (hours > 0) {
-    return hours + ":" + (minutes >= 10 ? minutes : "0" + minutes) + ":" + (seconds >= 10 ? seconds : "0" + seconds);
+    return (
+      hours +
+      ":" +
+      (minutes >= 10 ? minutes : "0" + minutes) +
+      ":" +
+      (seconds >= 10 ? seconds : "0" + seconds)
+    );
   } else {
     return minutes + ":" + (seconds >= 10 ? seconds : "0" + seconds);
   }
@@ -193,9 +233,9 @@ export function getMsTimestampValue(value: string): number {
 
   let ms;
   if (split.length == 3) {
-    ms = (splitInt[0] * 60 * 60) + (splitInt[1] * 60) + splitInt[2];
+    ms = splitInt[0] * 60 * 60 + splitInt[1] * 60 + splitInt[2];
   } else if (split.length == 2) {
-    ms = (splitInt[0] * 60) + splitInt[1];
+    ms = splitInt[0] * 60 + splitInt[1];
   } else if (split.length == 1) {
     ms = splitInt[0];
   }
@@ -220,9 +260,9 @@ export function getTimestampValue(value: string): number {
   }
 
   if (split.length == 3) {
-    return (splitInt[0] * 60 * 60) + (splitInt[1] * 60) + splitInt[2];
+    return splitInt[0] * 60 * 60 + splitInt[1] * 60 + splitInt[2];
   } else if (split.length == 2) {
-    return (splitInt[0] * 60) + splitInt[1];
+    return splitInt[0] * 60 + splitInt[1];
   } else if (split.length == 1) {
     return splitInt[0];
   }
@@ -230,10 +270,14 @@ export function getTimestampValue(value: string): number {
 
 export function generateThumbnailFile(cachePath: string, data: Buffer): string {
   // dummy, migrated to src/node/data/utils.ts
-  return '';
+  return "";
 }
 
-export function extractMusicMetadata(audio: Audio, metadata: any, cachePath: string) {
+export function extractMusicMetadata(
+  audio: Audio,
+  metadata: any,
+  cachePath: string,
+) {
   if (metadata.common) {
     if (metadata.common.title) {
       audio.name = metadata.common.title;
@@ -245,7 +289,10 @@ export function extractMusicMetadata(audio: Audio, metadata: any, cachePath: str
       audio.artist = metadata.common.artist;
     }
     if (metadata.common.picture && metadata.common.picture.length > 0) {
-      audio.thumb = generateThumbnailFile(cachePath, metadata.common.picture[0].data);
+      audio.thumb = generateThumbnailFile(
+        cachePath,
+        metadata.common.picture[0].data,
+      );
     }
     if (metadata.common.track && metadata.common.track.no) {
       audio.trackNum = parseInt(metadata.common.track.no);
@@ -276,11 +323,16 @@ export function getCachePath(source: string, config: Config) {
 
 function cachePath(source: string, typeDir: string, config: Config) {
   // dummy, migrated to src/node/data/utils.ts
-  return '';
+  return "";
 }
 
 export function htmlEntities(str: string): string {
-  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\\n/g,"<br/>");
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/\\n/g, "<br/>");
 }
 
 export function urlToPath(url: string): string {
@@ -322,8 +374,8 @@ export function toArrayBuffer(buf: Buffer) {
 }
 
 export function getRandomColor() {
-  let letters = '0123456789ABCDEF';
-  let color = '#';
+  let letters = "0123456789ABCDEF";
+  let color = "#";
   for (let i = 0; i < 6; i++) {
     color += letters[Math.floor(Math.random() * 16)];
   }
@@ -331,11 +383,12 @@ export function getRandomColor() {
 }
 
 export function randomizeList(list: any[]) {
-  let currentIndex = list.length, temporaryValue, randomIndex;
+  let currentIndex = list.length,
+    temporaryValue,
+    randomIndex;
 
   // While there remain elements to shuffle...
   while (0 !== currentIndex) {
-
     // Pick a remaining element...
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex -= 1;
@@ -350,11 +403,11 @@ export function randomizeList(list: any[]) {
 }
 
 export function getRandomIndex(list: any[]) {
-  return Math.floor(Math.random() * list.length)
+  return Math.floor(Math.random() * list.length);
 }
 
 export function getRandomNumber(min: number, max: number) {
-  return Math.floor(Math.random() * (max - min + 1)) + min
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 export function getRandomListItem(list: any[], count: number = 1) {
@@ -365,7 +418,7 @@ export function getRandomListItem(list: any[], count: number = 1) {
   } else {
     let newList = [];
     for (let c = 0; c < count && list.length > 0; c++) {
-      newList.push(list.splice(getRandomIndex(list), 1)[0])
+      newList.push(list.splice(getRandomIndex(list), 1)[0]);
     }
     return newList;
   }
@@ -397,7 +450,14 @@ function areRulesValid(wg: WeightGroup) {
   for (let rule of weightRules) {
     rulesRemaining = rulesRemaining - rule.percent;
   }
-  return wg.rules.length > 0 && (orRules.length == 0 || (orRules.length + weightRules.length == wg.rules.length && rulesRemaining == 0) || orRules.length == wg.rules.length) && (rulesRemaining == 0 || (rulesRemaining == 100 && weightRules.length == 0));
+  return (
+    wg.rules.length > 0 &&
+    (orRules.length == 0 ||
+      (orRules.length + weightRules.length == wg.rules.length &&
+        rulesRemaining == 0) ||
+      orRules.length == wg.rules.length) &&
+    (rulesRemaining == 0 || (rulesRemaining == 100 && weightRules.length == 0))
+  );
 }
 
 export function areWeightsValid(scene: Scene): boolean {
@@ -414,47 +474,82 @@ export function areWeightsValid(scene: Scene): boolean {
       remaining = remaining - wg.percent;
     }
   }
-  return scene.generatorWeights.length > 0 && (orRules.length == 0 || (orRules.length + weightRules.length == scene.generatorWeights.length && remaining == 0) || orRules.length == scene.generatorWeights.length) && (remaining == 0 || (remaining == 100 && weightRules.length == 0));
+  return (
+    scene.generatorWeights.length > 0 &&
+    (orRules.length == 0 ||
+      (orRules.length + weightRules.length == scene.generatorWeights.length &&
+        remaining == 0) ||
+      orRules.length == scene.generatorWeights.length) &&
+    (remaining == 0 || (remaining == 100 && weightRules.length == 0))
+  );
 }
 
-export function filterSource(filter: string, source: LibrarySource, clip: Clip, mergeSources?: Array<LibrarySource>): boolean {
+export function filterSource(
+  filter: string,
+  source: LibrarySource,
+  clip: Clip,
+  mergeSources?: Array<LibrarySource>,
+): boolean {
   let matchesFilter = true;
   let countRegex;
   if (filter == "<Mergeable>") {
     matchesFilter = !!mergeSources && mergeSources.includes(source);
   } else if (filter == "-<Mergeable>") {
     matchesFilter = !(!!mergeSources && mergeSources.includes(source));
-  } else if (filter == "<Offline>") { // This is offline filter
+  } else if (filter == "<Offline>") {
+    // This is offline filter
     matchesFilter = source.offline;
-  } else if (filter == "-<Offline>") { // This is offline filter
-    matchesFilter = !(source.offline);
-  } else if (filter == "<Marked>") { // This is a marked filter
+  } else if (filter == "-<Offline>") {
+    // This is offline filter
+    matchesFilter = !source.offline;
+  } else if (filter == "<Marked>") {
+    // This is a marked filter
     matchesFilter = source.marked;
-  } else if (filter == "-<Marked>") { // This is a marked filter
-    matchesFilter = !(source.marked);
-  } else if (filter == "<Untagged>") { // This is untagged filter
-    matchesFilter = clip && clip.tags && clip.tags.length > 0 ? clip.tags.length === 0 : source.tags.length === 0;
-  } else if (filter == "-<Untagged>") { // This is untagged filter
-    matchesFilter = !(clip && clip.tags && clip.tags.length > 0 ? clip.tags.length === 0 : source.tags.length === 0);
+  } else if (filter == "-<Marked>") {
+    // This is a marked filter
+    matchesFilter = !source.marked;
+  } else if (filter == "<Untagged>") {
+    // This is untagged filter
+    matchesFilter =
+      clip && clip.tags && clip.tags.length > 0
+        ? clip.tags.length === 0
+        : source.tags.length === 0;
+  } else if (filter == "-<Untagged>") {
+    // This is untagged filter
+    matchesFilter = !(clip && clip.tags && clip.tags.length > 0
+      ? clip.tags.length === 0
+      : source.tags.length === 0);
   } else if (filter == "<Unclipped>") {
-    matchesFilter = getSourceType(source.url) == ST.video && source.clips.length === 0;
+    matchesFilter =
+      getSourceType(source.url) == ST.video && source.clips.length === 0;
   } else if (filter == "-<Unclipped>") {
-    matchesFilter = !(getSourceType(source.url) == ST.video && source.clips.length === 0);
-  } else if ((filter.startsWith("[") || filter.startsWith("-[")) && filter.endsWith("]")) { // This is a tag filter
-    let tags = clip && clip.tags && clip.tags.length > 0 ? clip.tags : source.tags;
+    matchesFilter = !(
+      getSourceType(source.url) == ST.video && source.clips.length === 0
+    );
+  } else if (
+    (filter.startsWith("[") || filter.startsWith("-[")) &&
+    filter.endsWith("]")
+  ) {
+    // This is a tag filter
+    let tags =
+      clip && clip.tags && clip.tags.length > 0 ? clip.tags : source.tags;
     if (filter.startsWith("-")) {
-      let tag = filter.substring(2, filter.length-1);
+      let tag = filter.substring(2, filter.length - 1);
       matchesFilter = tags.find((t) => t.name == tag) == null;
     } else {
-      let tag = filter.substring(1, filter.length-1);
+      let tag = filter.substring(1, filter.length - 1);
       matchesFilter = tags.find((t) => t.name == tag) != null;
     }
-  } else if ((filter.startsWith("{") || filter.startsWith("-{")) && filter.endsWith("}")) { // This is a type filter
+  } else if (
+    (filter.startsWith("{") || filter.startsWith("-{")) &&
+    filter.endsWith("}")
+  ) {
+    // This is a type filter
     if (filter.startsWith("-")) {
-      let type = filter.substring(2, filter.length-1);
+      let type = filter.substring(2, filter.length - 1);
       matchesFilter = en.get(getSourceType(source.url)) != type;
     } else {
-      let type = filter.substring(1, filter.length-1);
+      let type = filter.substring(1, filter.length - 1);
       matchesFilter = en.get(getSourceType(source.url)) == type;
     }
   } else if ((countRegex = /^count(\+?)([>=<])(\d*)$/.exec(filter)) != null) {
@@ -528,8 +623,12 @@ export function filterSource(filter: string, source: LibrarySource, clip: Clip, 
     } else {
       matchesFilter = false;
     }
-  } else if (((filter.startsWith('"') || filter.startsWith('-"')) && filter.endsWith('"')) ||
-    ((filter.startsWith('\'') || filter.startsWith('-\'')) && filter.endsWith('\''))) {
+  } else if (
+    ((filter.startsWith('"') || filter.startsWith('-"')) &&
+      filter.endsWith('"')) ||
+    ((filter.startsWith("'") || filter.startsWith("-'")) &&
+      filter.endsWith("'"))
+  ) {
     if (filter.startsWith("-")) {
       filter = filter.substring(2, filter.length - 1);
       const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
@@ -539,7 +638,8 @@ export function filterSource(filter: string, source: LibrarySource, clip: Clip, 
       const regex = new RegExp(filter.replace("\\", "\\\\"), "i");
       matchesFilter = regex.test(source.url);
     }
-  } else { // This is a search filter
+  } else {
+    // This is a search filter
     filter = filter.replace("\\", "\\\\");
     if (filter.startsWith("-")) {
       filter = filter.substring(1, filter.length);
@@ -743,11 +843,11 @@ export function getEffects(scene: Scene) {
 
   // Add future items here
 
-  return Buffer.from(effects.join(",")).toString('base64').slice(0, -1);
+  return Buffer.from(effects.join(",")).toString("base64").slice(0, -1);
 }
 
 export function applyEffects(scene: Scene, base64String: string) {
-  base64String += '=';
+  base64String += "=";
   const effectsString = atob(base64String);
   const effects = effectsString.split(",");
 
@@ -950,7 +1050,12 @@ let captionProgramDefaults = {
   timestamps: Array<number>(),
   timestampFn: new Map<number, Array<Function>>(),
   timestampCounter: 0,
-  audios: new Array<{alias: string, file: string, playing: boolean, volume: number}>(),
+  audios: new Array<{
+    alias: string;
+    file: string;
+    playing: boolean;
+    volume: number;
+  }>(),
   phrases: new Map<number, Array<string>>(),
 
   blinkDuration: [200, 500],
@@ -1011,7 +1116,7 @@ let captionProgramDefaults = {
   blinkOpacity: 100,
   captionOpacity: 100,
   countOpacity: 100,
-}
+};
 export default captionProgramDefaults;
 
 // Inspired by https://reactjs.org/blog/2015/12/16/ismounted-antipattern.html
@@ -1024,27 +1129,53 @@ export default captionProgramDefaults;
  *   * count - current count
  */
 export class CancelablePromise extends Promise<{
-  data: Array<string>, helpers: {next: any, count: number, retries: number, uuid: string}}> {
+  data: Array<string>;
+  helpers: { next: any; count: number; retries: number; uuid: string };
+}> {
   hasCanceled: boolean;
   source: LibrarySource;
   timeout: number;
 
-
-  constructor(executor: (resolve: (value?: (
-    PromiseLike<{data: Array<string>, helpers: {next: any, count: number, retries: number, uuid: string}}> |
-    {data: Array<string>, helpers: {next: any, count: number, retries: number, uuid: string}}
-    )) => void, reject: (reason?: any) => void) => void) {
+  constructor(
+    executor: (
+      resolve: (
+        value?:
+          | PromiseLike<{
+              data: Array<string>;
+              helpers: {
+                next: any;
+                count: number;
+                retries: number;
+                uuid: string;
+              };
+            }>
+          | {
+              data: Array<string>;
+              helpers: {
+                next: any;
+                count: number;
+                retries: number;
+                uuid: string;
+              };
+            },
+      ) => void,
+      reject: (reason?: any) => void,
+    ) => void,
+  ) {
     super(executor);
     this.hasCanceled = false;
     this.source = null;
     this.timeout = 0;
   }
 
-  getPromise(): Promise<{data: Array<string>, helpers: {next: any, count: number, retries: number, uuid: string}}> {
+  getPromise(): Promise<{
+    data: Array<string>;
+    helpers: { next: any; count: number; retries: number; uuid: string };
+  }> {
     return new Promise((resolve, reject) => {
       this.then(
-        val => this.hasCanceled ? null : resolve(val),
-        error => this.hasCanceled ? null : reject(error)
+        (val) => (this.hasCanceled ? null : resolve(val)),
+        (error) => (this.hasCanceled ? null : reject(error)),
       );
     });
   }

@@ -1,8 +1,8 @@
-import { app, Menu, session } from 'electron';
-import { initializeIpcEvents, releaseIpcEvents } from './IPCEvents';
-import { createMainMenu, createMenuTemplate } from './MainMenu';
-import {createNewWindow, startScene} from "./WindowManager";
-import started from 'electron-squirrel-startup';
+import { app, Menu, session } from "electron";
+import { initializeIpcEvents, releaseIpcEvents } from "./IPCEvents";
+import { createMainMenu, createMenuTemplate } from "./MainMenu";
+import { createNewWindow, startScene } from "./WindowManager";
+import started from "electron-squirrel-startup";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -12,33 +12,40 @@ if (started) {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', () => {
-  session.defaultSession.webRequest.onHeadersReceived((details: any, callback: any) => {
-    callback({
-      responseHeaders: {
-        ...details.responseHeaders,
-      }
-    })
-  });
+app.on("ready", () => {
+  session.defaultSession.webRequest.onHeadersReceived(
+    (details: any, callback: any) => {
+      callback({
+        responseHeaders: {
+          ...details.responseHeaders,
+        },
+      });
+    },
+  );
 
   // Enable garbage collection
-  app.commandLine.appendSwitch('js-flags', '--expose_gc');
+  app.commandLine.appendSwitch("js-flags", "--expose_gc");
 
   createNewWindow();
   createMainMenu(Menu, createMenuTemplate(app));
   initializeIpcEvents();
 
   // This could be improved, but there are only two command line options currently
-  const sceneName = process.argv.find((el, i, arr) => el != '--no-dev-tools' && !el.endsWith('electron.exe') && !el.endsWith('bundle.js'));
+  const sceneName = process.argv.find(
+    (el, i, arr) =>
+      el != "--no-dev-tools" &&
+      !el.endsWith("electron.exe") &&
+      !el.endsWith("bundle.js"),
+  );
   if (sceneName) {
     setTimeout(startScene.bind(null, sceneName), 1500);
   }
 });
 
 // Quit when all windows are closed.
-app.on('window-all-closed', () => {
+app.on("window-all-closed", () => {
   releaseIpcEvents();
   app.quit();
 });
 
-app.commandLine.appendSwitch('--autoplay-policy','no-user-gesture-required')
+app.commandLine.appendSwitch("--autoplay-policy", "no-user-gesture-required");

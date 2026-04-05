@@ -1,16 +1,16 @@
-import * as React from 'react';
+import * as React from "react";
 import Sound from "react-sound";
 
 export default class SoundTick extends React.Component {
   readonly props: {
-    url: string,
-    playing: any,
-    speed: number,
-    volume: number,
-    tick: boolean,
-    onPlaying(soundData: any): void,
-    onError(errorCode: number, description: string): void,
-    onFinishedPlaying(): void,
+    url: string;
+    playing: any;
+    speed: number;
+    volume: number;
+    tick: boolean;
+    onPlaying(soundData: any): void;
+    onError(errorCode: number, description: string): void;
+    onFinishedPlaying(): void;
   };
 
   shouldComponentUpdate(props: any) {
@@ -29,9 +29,10 @@ export default class SoundTick extends React.Component {
         onPlaying={this.props.onPlaying.bind(this)}
         onError={this.props.onError.bind(this)}
         onFinishedPlaying={this.props.onFinishedPlaying.bind(this)}
-        playFromPosition={this.props.tick ? 0 : 1}/>
+        playFromPosition={this.props.tick ? 0 : 1}
+      />
     );
   }
 }
 
-(SoundTick as any).displayName="SoundTick";
+(SoundTick as any).displayName = "SoundTick";

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import * as React from "react";
 
 import {
   Alert,
@@ -11,27 +11,27 @@ import {
   Slide,
   Snackbar,
 } from "@mui/material";
-import { StyledEngineProvider, ThemeProvider } from '@mui/material/styles';
+import { StyledEngineProvider, ThemeProvider } from "@mui/material/styles";
 
-import {IPC, SP} from "../data/const";
-import {getCachePath} from "../data/utils";
-import * as actions from '../data/actions';
+import { IPC, SP } from "../data/const";
+import { getCachePath } from "../data/utils";
+import * as actions from "../data/actions";
 import ErrorBoundary from "../../main/ErrorBoundary";
-import AppStorage from '../data/AppStorage';
-import ScenePicker from './ScenePicker';
-import ConfigForm from './config/ConfigForm';
-import Library from './library/Library';
+import AppStorage from "../data/AppStorage";
+import ScenePicker from "./ScenePicker";
+import ConfigForm from "./config/ConfigForm";
+import Library from "./library/Library";
 import TagManager from "./library/TagManager";
 import GridSetup from "./config/GridSetup";
 import VideoClipper from "./config/VideoClipper";
-import Player from './player/Player';
-import SceneDetail from './sceneDetail/SceneDetail';
+import Player from "./player/Player";
+import SceneDetail from "./sceneDetail/SceneDetail";
 import Tutorial from "./Tutorial";
 import AudioLibrary from "./library/AudioLibrary";
 import CaptionScriptor from "./sceneDetail/CaptionScriptor";
 import ScriptLibrary from "./library/ScriptLibrary";
 
-const appStorage = new AppStorage(1/* FIXME remote.getCurrentWindow().id*/);
+const appStorage = new AppStorage(1 /* FIXME remote.getCurrentWindow().id*/);
 
 function TransitionUp(props: any) {
   return <Slide {...props} direction="up" />;
@@ -57,7 +57,9 @@ export default class Meta extends React.Component {
   }
 
   progressAction(fn: any, ...args: any[]) {
-    const getState = () => {return this.state};
+    const getState = () => {
+      return this.state;
+    };
     fn(getState, this.setState.bind(this), ...args);
   }
 
@@ -67,7 +69,7 @@ export default class Meta extends React.Component {
     window.ipc.onStartScene(this.startScene.bind(this));
 
     // Disable react-sound's verbose console output
-    (window as any).soundManager.setup({debugMode: false});
+    (window as any).soundManager.setup({ debugMode: false });
 
     // FIXME
     // if (remote.getCurrentWindow().id == 1) {
@@ -78,7 +80,11 @@ export default class Meta extends React.Component {
   _queueSave = false;
   _lastSave: Date = null;
   queueSave() {
-    if (this._queueSave && (this._lastSave == null || new Date().getTime() - this._lastSave.getTime() > 3000)) {
+    if (
+      this._queueSave &&
+      (this._lastSave == null ||
+        new Date().getTime() - this._lastSave.getTime() > 3000)
+    ) {
       appStorage.save(this.state);
       this._lastSave = new Date();
       this._queueSave = false;
@@ -86,7 +92,8 @@ export default class Meta extends React.Component {
   }
 
   componentDidUpdate(prevProps: any, prevState: any) {
-    if (prevState.version !== this.state.version ||
+    if (
+      prevState.version !== this.state.version ||
       prevState.config !== this.state.config ||
       prevState.scenes !== this.state.scenes ||
       prevState.sceneGroups !== this.state.sceneGroups ||
@@ -119,7 +126,8 @@ export default class Meta extends React.Component {
       prevState.systemSnackOpen !== this.state.systemSnackOpen ||
       prevState.systemSnack !== this.state.systemSnack ||
       prevState.tutorial !== this.state.tutorial ||
-      prevState.theme !== this.state.theme) {
+      prevState.theme !== this.state.theme
+    ) {
       this._queueSave = true;
     }
   }
@@ -139,7 +147,8 @@ export default class Meta extends React.Component {
     const grid = actions.getActiveGrid(this.state);
 
     // Save a lot of typing and potential bugs
-    const a = (fn: any, ...args: any[]) => this.applyAction.bind(this, fn, ...args);
+    const a = (fn: any, ...args: any[]) =>
+      this.applyAction.bind(this, fn, ...args);
     const p = (fn: any) => this.progressAction.bind(this, fn);
 
     const theme = createTheme(this.state.theme);
@@ -150,7 +159,8 @@ export default class Meta extends React.Component {
           <ErrorBoundary
             version={this.state.version}
             onRestore={a(actions.restoreFromBackup)}
-            goBack={a(actions.goBack)}>
+            goBack={a(actions.goBack)}
+          >
             <Box className="Meta">
               <CssBaseline />
               {this.state.route.length === 0 && (
@@ -193,7 +203,7 @@ export default class Meta extends React.Component {
                 />
               )}
 
-              {this.isRoute('scene') && (
+              {this.isRoute("scene") && (
                 <SceneDetail
                   autoEdit={this.state.specialMode == SP.autoEdit}
                   allScenes={this.state.scenes}
@@ -228,7 +238,7 @@ export default class Meta extends React.Component {
                 />
               )}
 
-              {this.isRoute('library') && (
+              {this.isRoute("library") && (
                 <Library
                   config={this.state.config}
                   filters={this.state.libraryFilters}
@@ -252,7 +262,10 @@ export default class Meta extends React.Component {
                   onEditBlacklist={a(actions.editBlacklist)}
                   onExportLibrary={a(actions.exportLibrary)}
                   onImportFromLibrary={a(actions.importFromLibrary)}
-                  onImportLibrary={a(actions.importLibrary, appStorage.backup.bind(appStorage, this.state))}
+                  onImportLibrary={a(
+                    actions.importLibrary,
+                    appStorage.backup.bind(appStorage, this.state),
+                  )}
                   onImportReddit={p(actions.importReddit)}
                   onImportTumblr={p(actions.importTumblr)}
                   onManageTags={a(actions.manageTags)}
@@ -268,7 +281,7 @@ export default class Meta extends React.Component {
                 />
               )}
 
-              {this.isRoute('audios') && (
+              {this.isRoute("audios") && (
                 <AudioLibrary
                   cachePath={getCachePath(null, this.state.config)}
                   filters={this.state.audioFilters}
@@ -304,7 +317,7 @@ export default class Meta extends React.Component {
                 />
               )}
 
-              {this.isRoute('scripts') && (
+              {this.isRoute("scripts") && (
                 <ScriptLibrary
                   allScenes={this.state.scenes}
                   filters={this.state.scriptFilters}
@@ -331,7 +344,7 @@ export default class Meta extends React.Component {
                 />
               )}
 
-              {this.isRoute('tags') && (
+              {this.isRoute("tags") && (
                 <TagManager
                   tags={this.state.tags}
                   goBack={a(actions.goBack)}
@@ -340,7 +353,7 @@ export default class Meta extends React.Component {
                 />
               )}
 
-              {this.isRoute('clip') && (
+              {this.isRoute("clip") && (
                 <VideoClipper
                   allTags={this.state.tags}
                   source={actions.getActiveSource(this.state)}
@@ -357,7 +370,7 @@ export default class Meta extends React.Component {
                 />
               )}
 
-              {this.isRoute('grid') && (
+              {this.isRoute("grid") && (
                 <GridSetup
                   allScenes={this.state.scenes}
                   autoEdit={this.state.specialMode == SP.autoEdit}
@@ -372,7 +385,7 @@ export default class Meta extends React.Component {
                 />
               )}
 
-              {this.isRoute('play') && (
+              {this.isRoute("play") && (
                 <Player
                   preventSleep
                   config={this.state.config}
@@ -396,7 +409,7 @@ export default class Meta extends React.Component {
                 />
               )}
 
-              {this.isRoute('libraryplay') && (
+              {this.isRoute("libraryplay") && (
                 <Player
                   preventSleep
                   config={this.state.config}
@@ -409,13 +422,33 @@ export default class Meta extends React.Component {
                   onUpdateScene={a(actions.updateScene)}
                   goBack={a(actions.endPlaySceneFromLibrary)}
                   playTrack={a(actions.playTrack)}
-                  tags={scene.audioScene ? actions.getAudioSource(this.state)?.tags : scene.scriptScene ? actions.getScriptSource(this.state)?.tags : actions.getLibrarySource(this.state)?.id != -1 ? actions.getLibrarySource(this.state)?.tags : null}
+                  tags={
+                    scene.audioScene
+                      ? actions.getAudioSource(this.state)?.tags
+                      : scene.scriptScene
+                        ? actions.getScriptSource(this.state)?.tags
+                        : actions.getLibrarySource(this.state)?.id != -1
+                          ? actions.getLibrarySource(this.state)?.tags
+                          : null
+                  }
                   allTags={this.state.tags}
-                  toggleTag={scene.audioScene ? a(actions.toggleAudioTag) : scene.scriptScene ? a(actions.toggleScriptTag) : a(actions.toggleTag)}
-                  inheritTags={scene.audioScene || scene.scriptScene ? undefined : a(actions.inheritTags)}
+                  toggleTag={
+                    scene.audioScene
+                      ? a(actions.toggleAudioTag)
+                      : scene.scriptScene
+                        ? a(actions.toggleScriptTag)
+                        : a(actions.toggleTag)
+                  }
+                  inheritTags={
+                    scene.audioScene || scene.scriptScene
+                      ? undefined
+                      : a(actions.inheritTags)
+                  }
                   navigateTagging={a(actions.navigateDisplayedLibrary)}
                   getTags={actions.getTags.bind(this, this.state.library)}
-                  changeAudioRoute={scene.audioScene ? a(actions.changeAudioRoute) : undefined}
+                  changeAudioRoute={
+                    scene.audioScene ? a(actions.changeAudioRoute) : undefined
+                  }
                   setCount={a(actions.setCount)}
                   cache={a(actions.cacheImage)}
                   goToClipSource={a(actions.clipVideo)}
@@ -424,7 +457,7 @@ export default class Meta extends React.Component {
                 />
               )}
 
-              {this.isRoute('gridplay') && (
+              {this.isRoute("gridplay") && (
                 <Player
                   preventSleep
                   config={this.state.config}
@@ -448,7 +481,7 @@ export default class Meta extends React.Component {
                 />
               )}
 
-              {this.isRoute('config') && (
+              {this.isRoute("config") && (
                 <ConfigForm
                   config={this.state.config}
                   library={this.state.library}
@@ -468,7 +501,7 @@ export default class Meta extends React.Component {
                 />
               )}
 
-              {this.isRoute('scriptor') && (
+              {this.isRoute("scriptor") && (
                 <CaptionScriptor
                   config={this.state.config}
                   scenes={this.state.scenes}
@@ -487,7 +520,8 @@ export default class Meta extends React.Component {
               <Dialog
                 open={!!this.state.systemMessage}
                 onClose={a(actions.closeMessage)}
-                aria-describedby="message-description">
+                aria-describedby="message-description"
+              >
                 <DialogContent>
                   <DialogContentText id="message-description">
                     {this.state.systemMessage}
@@ -501,8 +535,12 @@ export default class Meta extends React.Component {
                 autoHideDuration={2000}
                 key={this.state.systemSnack + new Date()}
                 onClose={a(actions.closeMessage)}
-                TransitionComponent={TransitionUp}>
-                <Alert onClose={a(actions.closeMessage)} severity={this.state.systemSnackSeverity}>
+                TransitionComponent={TransitionUp}
+              >
+                <Alert
+                  onClose={a(actions.closeMessage)}
+                  severity={this.state.systemSnackSeverity}
+                >
                   {this.state.systemSnack}
                 </Alert>
               </Snackbar>
@@ -526,4 +564,4 @@ export default class Meta extends React.Component {
   }
 }
 
-(Meta as any).displayName="Meta";
+(Meta as any).displayName = "Meta";

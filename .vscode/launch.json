@@ -12,9 +12,9 @@
       "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron",
       "runtimeArgs": [
         "${workspaceFolder}/dist/main.bundle.js",
-         "--remote-debugging-port=9222",
-         "--no-dev-tools"
-      ],
+        "--remote-debugging-port=9222",
+        "--no-dev-tools"
+      ]
     }
   ]
 }

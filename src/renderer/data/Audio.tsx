@@ -1,4 +1,4 @@
-import {TF} from "./const";
+import { TF } from "./const";
 import Tag from "./Tag";
 
 export default class Audio {

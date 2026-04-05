@@ -26,50 +26,51 @@ import {
   Tooltip,
 } from "@mui/material";
 
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
+import createStyles from "@mui/styles/createStyles";
+import withStyles from "@mui/styles/withStyles";
 
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import DeleteIcon from '@mui/icons-material/Delete';
-import ErrorIcon from '@mui/icons-material/Error';
-import RestoreIcon from '@mui/icons-material/Restore';
-import SaveIcon from '@mui/icons-material/Save';
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ErrorIcon from "@mui/icons-material/Error";
+import RestoreIcon from "@mui/icons-material/Restore";
+import SaveIcon from "@mui/icons-material/Save";
 
-import {convertFromEpoch, getBackups, saveDir} from "../../data/utils";
-import {MO, SS} from "../../data/const";
-import {GeneralSettings} from "../../data/Config";
+import { convertFromEpoch, getBackups, saveDir } from "../../data/utils";
+import { MO, SS } from "../../data/const";
+import { GeneralSettings } from "../../data/Config";
 import { path_join } from "../../dummy/path";
 
-const styles = (theme: Theme) => createStyles({
-  buttonGrid: {
-    textAlign: 'center',
-  },
-  chipGrid: {
-    paddingTop: theme.spacing(1),
-  },
-  hideXS: {
-    [theme.breakpoints.down('sm')]: {
-      display: 'none'
+const styles = (theme: Theme) =>
+  createStyles({
+    buttonGrid: {
+      textAlign: "center",
     },
-  },
-  showXS: {
-    [theme.breakpoints.up('sm')]: {
-      display: 'none'
+    chipGrid: {
+      paddingTop: theme.spacing(1),
     },
-  },
-  snackbarIcon: {
-    fontSize: 20,
-    opacity: 0.9,
-    marginRight: theme.spacing(1),
-  },
-  snackbarMessage: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  backupDays: {
-    width: theme.spacing(16),
-  }
-});
+    hideXS: {
+      [theme.breakpoints.down("sm")]: {
+        display: "none",
+      },
+    },
+    showXS: {
+      [theme.breakpoints.up("sm")]: {
+        display: "none",
+      },
+    },
+    snackbarIcon: {
+      fontSize: 20,
+      opacity: 0.9,
+      marginRight: theme.spacing(1),
+    },
+    snackbarMessage: {
+      display: "flex",
+      alignItems: "center",
+    },
+    backupDays: {
+      width: theme.spacing(16),
+    },
+  });
 
 function TransitionUp(props: any) {
   return <Slide {...props} direction="up" />;
@@ -77,17 +78,17 @@ function TransitionUp(props: any) {
 
 class BackupCard extends React.Component {
   readonly props: {
-    classes: any,
-    settings: GeneralSettings,
-    onBackup(): void,
-    onClean(): void,
-    onRestore(backupFile: string): void,
-    onUpdateSettings(fn: (settings: GeneralSettings) => void): void,
+    classes: any;
+    settings: GeneralSettings;
+    onBackup(): void;
+    onClean(): void;
+    onRestore(backupFile: string): void;
+    onUpdateSettings(fn: (settings: GeneralSettings) => void): void;
   };
 
   readonly state = {
-    backups: Array<{url: string, size: number}>(),
-    backup: (null as {url: string, size: number}),
+    backups: Array<{ url: string; size: number }>(),
+    backup: null as { url: string; size: number },
     openMenu: null as string,
     snackbarOpen: false,
     snackbar: null as string,
@@ -99,14 +100,23 @@ class BackupCard extends React.Component {
     const hasBackup = this.state.backups.length > 0;
     return (
       <React.Fragment>
-        <Grid container spacing={2} alignItems="center" justifyContent="center" className={classes.chipGrid}>
+        <Grid
+          container
+          spacing={2}
+          alignItems="center"
+          justifyContent="center"
+          className={classes.chipGrid}
+        >
           <Grid item xs={"auto"} className={classes.buttonGrid}>
             <FormControlLabel
               control={
-                <Switch checked={this.props.settings.autoBackup}
-                        onChange={this.onBoolInput.bind(this, 'autoBackup')}/>
+                <Switch
+                  checked={this.props.settings.autoBackup}
+                  onChange={this.onBoolInput.bind(this, "autoBackup")}
+                />
               }
-              label="Auto Backup"/>
+              label="Auto Backup"
+            />
           </Grid>
           <Grid item xs={"auto"} className={classes.buttonGrid}>
             <TextField
@@ -116,27 +126,42 @@ class BackupCard extends React.Component {
               label="Every"
               margin="dense"
               value={this.props.settings.autoBackupDays}
-              onChange={this.onIntInput.bind(this, 'autoBackupDays')}
-              onBlur={this.blurIntKey.bind(this, 'autoBackupDays')}
+              onChange={this.onIntInput.bind(this, "autoBackupDays")}
+              onBlur={this.blurIntKey.bind(this, "autoBackupDays")}
               InputProps={{
-                endAdornment: <InputAdornment position="end">Days</InputAdornment>,
+                endAdornment: (
+                  <InputAdornment position="end">Days</InputAdornment>
+                ),
               }}
               inputProps={{
                 min: 1,
-                type: 'number',
-              }}/>
+                type: "number",
+              }}
+            />
           </Grid>
         </Grid>
-        <Grid container spacing={2} alignItems="center" justifyContent="center" className={classes.chipGrid}>
-          <Tooltip disableInteractive title="If enabled, backups will be automatically cleaned up. This algorithm will keep 1 backup for
-           each of the configured periods.">
+        <Grid
+          container
+          spacing={2}
+          alignItems="center"
+          justifyContent="center"
+          className={classes.chipGrid}
+        >
+          <Tooltip
+            disableInteractive
+            title="If enabled, backups will be automatically cleaned up. This algorithm will keep 1 backup for
+           each of the configured periods."
+          >
             <Grid item xs={"auto"} className={classes.buttonGrid}>
               <FormControlLabel
                 control={
-                  <Switch checked={this.props.settings.autoCleanBackup}
-                          onChange={this.onBoolInput.bind(this, 'autoCleanBackup')}/>
+                  <Switch
+                    checked={this.props.settings.autoCleanBackup}
+                    onChange={this.onBoolInput.bind(this, "autoCleanBackup")}
+                  />
                 }
-                label="Auto Clean"/>
+                label="Auto Clean"
+              />
             </Grid>
           </Tooltip>
           <Grid item xs={"auto"} className={classes.buttonGrid}>
@@ -147,15 +172,18 @@ class BackupCard extends React.Component {
               label="Keep Last"
               margin="dense"
               value={this.props.settings.autoCleanBackupDays}
-              onChange={this.onIntInput.bind(this, 'autoCleanBackupDays')}
-              onBlur={this.blurIntKey.bind(this, 'autoCleanBackupDays')}
+              onChange={this.onIntInput.bind(this, "autoCleanBackupDays")}
+              onBlur={this.blurIntKey.bind(this, "autoCleanBackupDays")}
               InputProps={{
-                endAdornment: <InputAdornment position="end">Days</InputAdornment>,
+                endAdornment: (
+                  <InputAdornment position="end">Days</InputAdornment>
+                ),
               }}
               inputProps={{
                 min: 1,
-                type: 'number',
-              }}/>
+                type: "number",
+              }}
+            />
           </Grid>
           <Grid item xs={"auto"} className={classes.buttonGrid}>
             <TextField
@@ -165,15 +193,18 @@ class BackupCard extends React.Component {
               label="Keep Last"
               margin="dense"
               value={this.props.settings.autoCleanBackupWeeks}
-              onChange={this.onIntInput.bind(this, 'autoCleanBackupWeeks')}
-              onBlur={this.blurIntKey.bind(this, 'autoCleanBackupWeeks')}
+              onChange={this.onIntInput.bind(this, "autoCleanBackupWeeks")}
+              onBlur={this.blurIntKey.bind(this, "autoCleanBackupWeeks")}
               InputProps={{
-                endAdornment: <InputAdornment position="end">Weeks</InputAdornment>,
+                endAdornment: (
+                  <InputAdornment position="end">Weeks</InputAdornment>
+                ),
               }}
               inputProps={{
                 min: 1,
-                type: 'number',
-              }}/>
+                type: "number",
+              }}
+            />
           </Grid>
           <Grid item xs={"auto"} className={classes.buttonGrid}>
             <TextField
@@ -183,15 +214,18 @@ class BackupCard extends React.Component {
               label="Keep Last"
               margin="dense"
               value={this.props.settings.autoCleanBackupMonths}
-              onChange={this.onIntInput.bind(this, 'autoCleanBackupMonths')}
-              onBlur={this.blurIntKey.bind(this, 'autoCleanBackupMonths')}
+              onChange={this.onIntInput.bind(this, "autoCleanBackupMonths")}
+              onBlur={this.blurIntKey.bind(this, "autoCleanBackupMonths")}
               InputProps={{
-                endAdornment: <InputAdornment position="end">Months</InputAdornment>,
+                endAdornment: (
+                  <InputAdornment position="end">Months</InputAdornment>
+                ),
               }}
               inputProps={{
                 min: 1,
-                type: 'number',
-              }}/>
+                type: "number",
+              }}
+            />
           </Grid>
         </Grid>
         <Grid container spacing={2} alignItems="center" justifyContent="center">
@@ -231,44 +265,66 @@ class BackupCard extends React.Component {
             </Button>
           </Grid>
         </Grid>
-        <Grid container spacing={2} alignItems="center" justifyContent="center" className={classes.chipGrid}>
+        <Grid
+          container
+          spacing={2}
+          alignItems="center"
+          justifyContent="center"
+          className={classes.chipGrid}
+        >
           <Grid item xs={"auto"} className={classes.buttonGrid}>
             <Chip
               label={`Backups: ${hasBackup ? this.state.backups.length : "--"}`}
               color="primary"
-              variant="outlined"/>
+              variant="outlined"
+            />
           </Grid>
-          <Grid item xs={"auto"} className={clsx(classes.buttonGrid, classes.hideXS)}>
+          <Grid
+            item
+            xs={"auto"}
+            className={clsx(classes.buttonGrid, classes.hideXS)}
+          >
             <Chip
               label={`Latest: ${hasBackup ? convertFromEpoch(this.state.backups[0].url) + " (" + Math.round(this.state.backups[0].size / 1000) + " KB)" : "--"}`}
               color="secondary"
-              variant="outlined"/>
+              variant="outlined"
+            />
           </Grid>
-          <Grid item xs={"auto"} className={clsx(classes.buttonGrid, classes.showXS)}>
+          <Grid
+            item
+            xs={"auto"}
+            className={clsx(classes.buttonGrid, classes.showXS)}
+          >
             <Chip
               label={`Latest: ${hasBackup ? convertFromEpoch(this.state.backups[0].url) : "--"}`}
               color="secondary"
-              variant="outlined"/>
+              variant="outlined"
+            />
           </Grid>
         </Grid>
         <Dialog
           open={this.state.openMenu == MO.deleteAlert}
           onClose={this.onCloseDialog.bind(this)}
           aria-labelledby="remove-all-title"
-          aria-describedby="remove-all-description">
+          aria-describedby="remove-all-description"
+        >
           <DialogTitle id="remove-all-title">Clean backups</DialogTitle>
           <DialogContent>
             {this.props.settings.autoCleanBackup && (
               <DialogContentText id="remove-all-description">
-                You are about to clean your backups. Backups will be retained according to your Auto Clean
-                configuration. A record will be kept for each of the
-                last: {this.props.settings.autoCleanBackupDays} Days, {this.props.settings.autoCleanBackupWeeks} Weeks, {this.props.settings.autoCleanBackupMonths} Months.
+                You are about to clean your backups. Backups will be retained
+                according to your Auto Clean configuration. A record will be
+                kept for each of the last:{" "}
+                {this.props.settings.autoCleanBackupDays} Days,{" "}
+                {this.props.settings.autoCleanBackupWeeks} Weeks,{" "}
+                {this.props.settings.autoCleanBackupMonths} Months.
               </DialogContentText>
             )}
             {!this.props.settings.autoCleanBackup && (
               <React.Fragment>
                 <DialogContentText id="remove-all-description">
-                  You are about to clean your backups. How many of the most recent backups would you like to retain?
+                  You are about to clean your backups. How many of the most
+                  recent backups would you like to retain?
                 </DialogContentText>
                 {this.props.settings.cleanRetain != null && (
                   <TextField
@@ -276,12 +332,13 @@ class BackupCard extends React.Component {
                     label="Keep Last"
                     margin="dense"
                     value={this.props.settings.cleanRetain}
-                    onChange={this.onIntInput.bind(this, 'cleanRetain')}
-                    onBlur={this.blurIntKey.bind(this, 'cleanRetain')}
+                    onChange={this.onIntInput.bind(this, "cleanRetain")}
+                    onBlur={this.blurIntKey.bind(this, "cleanRetain")}
                     inputProps={{
                       min: 1,
-                      type: 'number',
-                    }}/>
+                      type: "number",
+                    }}
+                  />
                 )}
               </React.Fragment>
             )}
@@ -299,7 +356,8 @@ class BackupCard extends React.Component {
           open={this.state.openMenu == MO.restore}
           onClose={this.onCloseDialog.bind(this)}
           aria-labelledby="restore-title"
-          aria-describedby="restore-description">
+          aria-describedby="restore-description"
+        >
           <DialogTitle id="restore-title">Restore Backup</DialogTitle>
           <DialogContent>
             <DialogContentText id="restore-description">
@@ -318,10 +376,13 @@ class BackupCard extends React.Component {
                       },
                     },
                   }}
-                  onChange={this.onChangeBackup.bind(this)}>
-                  {this.state.backups.map((b) =>
-                    <MenuItem value={b.url} key={b.url}>{convertFromEpoch(b.url)} ({Math.round(b.size / 1000)} KB)</MenuItem>
-                  )}
+                  onChange={this.onChangeBackup.bind(this)}
+                >
+                  {this.state.backups.map((b) => (
+                    <MenuItem value={b.url} key={b.url}>
+                      {convertFromEpoch(b.url)} ({Math.round(b.size / 1000)} KB)
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             )}
@@ -340,8 +401,12 @@ class BackupCard extends React.Component {
           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           autoHideDuration={5000}
           onClose={this.onCloseDialog.bind(this)}
-          TransitionComponent={TransitionUp}>
-          <Alert onClose={this.onCloseDialog.bind(this)} severity={this.state.snackbarSeverity as any}>
+          TransitionComponent={TransitionUp}
+        >
+          <Alert
+            onClose={this.onCloseDialog.bind(this)}
+            severity={this.state.snackbarSeverity as any}
+          >
             {this.state.snackbar}
           </Alert>
         </Snackbar>
@@ -354,63 +419,93 @@ class BackupCard extends React.Component {
   }
 
   refreshBackups() {
-    this.setState({backups: getBackups()});
+    this.setState({ backups: getBackups() });
   }
 
   onChangeBackup(e: MouseEvent) {
-    const input = (e.target as HTMLInputElement);
-    this.setState({backup: this.state.backups.find((b) => b.url == input.value)});
+    const input = e.target as HTMLInputElement;
+    this.setState({
+      backup: this.state.backups.find((b) => b.url == input.value),
+    });
   }
 
   onBackup() {
     try {
       this.props.onBackup();
-      this.setState({snackbarOpen: true, snackbar: "Backup success!", snackbarSeverity: SS.success});
+      this.setState({
+        snackbarOpen: true,
+        snackbar: "Backup success!",
+        snackbarSeverity: SS.success,
+      });
     } catch (e) {
       console.error(e);
-      this.setState({snackbarOpen: true, snackbar: "Error: " + e, snackbarSeverity: SS.error});
+      this.setState({
+        snackbarOpen: true,
+        snackbar: "Error: " + e,
+        snackbarSeverity: SS.error,
+      });
     }
     this.refreshBackups();
   }
 
   onClean() {
-    this.setState({backup: this.state.backups[0], openMenu: MO.deleteAlert});
+    this.setState({ backup: this.state.backups[0], openMenu: MO.deleteAlert });
   }
 
   onFinishClean() {
     this.onCloseDialog();
     try {
       this.props.onClean();
-      this.setState({snackbarOpen: true, snackbar: "Clean success!", snackbarSeverity: SS.success});
+      this.setState({
+        snackbarOpen: true,
+        snackbar: "Clean success!",
+        snackbarSeverity: SS.success,
+      });
     } catch (e) {
       console.error(e);
-      this.setState({snackbarOpen: true, snackbar: "Error: " + e, snackbarSeverity: SS.error});
+      this.setState({
+        snackbarOpen: true,
+        snackbar: "Error: " + e,
+        snackbarSeverity: SS.error,
+      });
     }
     this.refreshBackups();
   }
 
   onRestore() {
-    this.setState({backup: this.state.backups[0], openMenu: MO.restore});
+    this.setState({ backup: this.state.backups[0], openMenu: MO.restore });
   }
 
   onFinishRestore() {
     this.onCloseDialog();
     try {
       this.props.onRestore(path_join(saveDir, this.state.backup.url));
-      this.setState({snackbarOpen: true, snackbar: "Restore success!", snackbarSeverity: SS.success});
+      this.setState({
+        snackbarOpen: true,
+        snackbar: "Restore success!",
+        snackbarSeverity: SS.success,
+      });
     } catch (e) {
       console.error(e);
-      this.setState({snackbarOpen: true, snackbar: "Error: " + e, snackbarSeverity: SS.error});
+      this.setState({
+        snackbarOpen: true,
+        snackbar: "Error: " + e,
+        snackbarSeverity: SS.error,
+      });
     }
   }
 
   onCloseDialog() {
-    this.setState({openMenu: null, snackbarOpen: false});
+    this.setState({ openMenu: null, snackbarOpen: false });
   }
 
   blurIntKey(key: string, e: MouseEvent) {
-    const min = (e.currentTarget as any).min ? (e.currentTarget as any).min : null;
-    const max = (e.currentTarget as any).max ? (e.currentTarget as any).max : null;
+    const min = (e.currentTarget as any).min
+      ? (e.currentTarget as any).min
+      : null;
+    const max = (e.currentTarget as any).max
+      ? (e.currentTarget as any).max
+      : null;
     if (min && (this.props.settings as any)[key] < min) {
       this.changeIntKey(key, min);
     } else if (max && (this.props.settings as any)[key] > max) {
@@ -419,22 +514,22 @@ class BackupCard extends React.Component {
   }
 
   onIntInput(key: string, e: MouseEvent) {
-    const input = (e.target as HTMLInputElement);
-    this.changeKey(key, input.value === '' ? '' : Number(input.value));
+    const input = e.target as HTMLInputElement;
+    this.changeKey(key, input.value === "" ? "" : Number(input.value));
   }
 
-  changeIntKey(key:string, intString: string) {
-    this.changeKey(key, intString === '' ? '' : Number(intString));
+  changeIntKey(key: string, intString: string) {
+    this.changeKey(key, intString === "" ? "" : Number(intString));
   }
 
   onBoolInput(key: string, e: MouseEvent) {
-    const input = (e.target as HTMLInputElement);
+    const input = e.target as HTMLInputElement;
     const checked = input.checked;
     this.changeKey(key, checked);
   }
 
   changeKey(key: string, value: any) {
-    this.update((s) => s[key] = value);
+    this.update((s) => (s[key] = value));
   }
 
   update(fn: (scene: any) => void) {
@@ -442,5 +537,5 @@ class BackupCard extends React.Component {
   }
 }
 
-(BackupCard as any).displayName="BackupCard";
+(BackupCard as any).displayName = "BackupCard";
 export default withStyles(styles)(BackupCard as any);

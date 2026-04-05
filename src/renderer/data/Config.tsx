@@ -1,4 +1,22 @@
-import {BT, EA, GO, HTF, IF, IT, OF, OT, SC, SL, SOF, STF, TF, VO, VTF, WC, WF} from "./const";
+import {
+  BT,
+  EA,
+  GO,
+  HTF,
+  IF,
+  IT,
+  OF,
+  OT,
+  SC,
+  SL,
+  SOF,
+  STF,
+  TF,
+  VO,
+  VTF,
+  WC,
+  WF,
+} from "./const";
 import Overlay from "./Overlay";
 import LibrarySource from "./LibrarySource";
 import Audio from "./Audio";
@@ -216,7 +234,7 @@ interface RemoteSettingsI {
   redditClientID: string;
   redditDeviceID: string;
   redditRefreshToken: string;
-  
+
   hydrusProtocol: string;
   hydrusDomain: string;
   hydrusPort: string;
@@ -225,7 +243,7 @@ interface RemoteSettingsI {
   piwigoProtocol: string;
   piwigoHost: string;
   piwigoUsername: string;
-  piwigoPassword:string;
+  piwigoPassword: string;
 }
 
 interface CacheSettingsI {
@@ -505,16 +523,20 @@ export class SceneSettings implements SceneSettingsI {
 export class RemoteSettings implements RemoteSettingsI {
   [key: string]: string | Array<string> | boolean;
 
-  tumblrKeys = ["BaQquvlxQeRhKRyViknF98vseIdcBEyDrzJBpHxvAiMPHCKR2l",
+  tumblrKeys = [
+    "BaQquvlxQeRhKRyViknF98vseIdcBEyDrzJBpHxvAiMPHCKR2l",
     "G4iZd6FBiyDxHVUpNqtOTDu4woWzfp8WuH3tTrT3MC16GTmNzq",
     "y5uUQJYTCp15Nj3P80cLmNFqwSr1mxIhm3C4PCsGAfReydkF9m",
     "IZiOt6PYazf4g0sYWVfpfebMITRFWmtlKq2UKe6l0RsqKHPgui",
-    "ATtwOUlruyVl8bEiHTnYcRpByEAzov2LtLEWOfDLqhPRZFmT4X"];
-  tumblrSecrets = ["XWVCo7t0GMGkOAd9wsxMMkKPhQbl3RqauGzQtnzAnmHCJ7WdSn",
+    "ATtwOUlruyVl8bEiHTnYcRpByEAzov2LtLEWOfDLqhPRZFmT4X",
+  ];
+  tumblrSecrets = [
+    "XWVCo7t0GMGkOAd9wsxMMkKPhQbl3RqauGzQtnzAnmHCJ7WdSn",
     "RmoWUh844NqVdw7btWI6EYldJ91KhwJyfCKPtAIcuVokFtRYgS",
     "xiEV5sJISJAwegJHTTLWtxnmFUkowxgMk2gOq4mc20VNLM2TpJ",
     "Iw3yKgjfMvrKPNCcqdUyRuxCkYWYyRlrMdFUojRHVkSSADOKCT",
-    "cMM7xqJV1roUudEdBiZeOqv3n1H0pzNnGY1iAbp3oo3c29MXGq"];
+    "cMM7xqJV1roUudEdBiZeOqv3n1H0pzNnGY1iAbp3oo3c29MXGq",
+  ];
 
   tumblrKey = "";
   tumblrSecret = "";
@@ -546,7 +568,7 @@ export class CacheSettings implements CacheSettingsI {
   maxSize = 500; // Size in MB
 }
 
-export class DisplaySettings  implements DisplaySettingsI {
+export class DisplaySettings implements DisplaySettingsI {
   [key: string]: number | boolean | Array<string>;
 
   alwaysOnTop = false;
@@ -568,7 +590,7 @@ export class DisplaySettings  implements DisplaySettingsI {
   ignoredTags = Array<string>();
 }
 
-export class GeneralSettings  implements GeneralSettingsI {
+export class GeneralSettings implements GeneralSettingsI {
   [key: string]: number | boolean | string;
 
   prioritizePerformance = true;
@@ -653,12 +675,16 @@ export default class Config {
       }
     }
 
-    if (this.defaultScene && this.defaultScene.overlaySceneID != 0) this.defaultScene.overlaySceneID = 0;
+    if (this.defaultScene && this.defaultScene.overlaySceneID != 0)
+      this.defaultScene.overlaySceneID = 0;
     if (this.defaultScene && this.defaultScene.rotatePortrait) {
       this.defaultScene.videoOrientation = OT.forceLandscape;
       this.defaultScene.rotatePortrait = false;
     }
-    if (this.displaySettings && (this.displaySettings as any).portableMode == true) {
+    if (
+      this.displaySettings &&
+      (this.displaySettings as any).portableMode == true
+    ) {
       (this.displaySettings as any).portableMode = undefined;
       this.generalSettings.portableMode = true;
     }

@@ -1,25 +1,78 @@
 import * as React from "react";
-import * as CodeMirrorComp from 'react-codemirror2'
+import * as CodeMirrorComp from "react-codemirror2";
 
-import {getTimingFromString} from "../../data/utils";
+import { getTimingFromString } from "../../data/utils";
 import ChildCallbackHack from "../player/ChildCallbackHack";
 
-const actions = ["blink", "cap", "bigcap", "count", "wait", "playAudio", "advance"];
-export const tupleSetters = ["setBlinkDuration", "setBlinkDelay", "setBlinkGroupDelay", "setCaptionDuration", "setCaptionDelay",
-  "setCountDuration", "setCountDelay", "setCountGroupDelay"];
-export const singleSetters = ["setBlinkWaveRate", "setBlinkBPMMulti", "setBlinkDelayWaveRate", "setBlinkDelayBPMMulti",
-  "setBlinkGroupDelayWaveRate", "setBlinkGroupDelayBPMMulti", "setBlinkOpacity", "setBlinkX", "setBlinkY",
-  "setCaptionWaveRate", "setCaptionBPMMulti", "setCaptionDelayWaveRate", "setCaptionDelayBPMMulti", "setCaptionOpacity",
-  "setCaptionX", "setCaptionY", "setBigCaptionX", "setBigCaptionY", "setCountWaveRate", "setCountBPMMulti",
-  "setCountDelayWaveRate", "setCountDelayBPMMulti", "setCountGroupDelayWaveRate", "setCountGroupDelayBPMMulti",
-  "setCountOpacity", "setCountX", "setCountY", "setCountProgressScale"];
-export const stringSetters = ["setBlinkTF", "setBlinkDelayTF", "setBlinkGroupDelayTF", "setCaptionTF", "setCaptionDelayTF",
-  "setCountTF", "setCountDelayTF", "setCountGroupDelayTF"];
-export const booleanSetters = ["setShowCountProgress", "setCountProgressOffset", "setCountColorMatch"];
-export const colorSetters = ["setCountProgressColor"]
+const actions = [
+  "blink",
+  "cap",
+  "bigcap",
+  "count",
+  "wait",
+  "playAudio",
+  "advance",
+];
+export const tupleSetters = [
+  "setBlinkDuration",
+  "setBlinkDelay",
+  "setBlinkGroupDelay",
+  "setCaptionDuration",
+  "setCaptionDelay",
+  "setCountDuration",
+  "setCountDelay",
+  "setCountGroupDelay",
+];
+export const singleSetters = [
+  "setBlinkWaveRate",
+  "setBlinkBPMMulti",
+  "setBlinkDelayWaveRate",
+  "setBlinkDelayBPMMulti",
+  "setBlinkGroupDelayWaveRate",
+  "setBlinkGroupDelayBPMMulti",
+  "setBlinkOpacity",
+  "setBlinkX",
+  "setBlinkY",
+  "setCaptionWaveRate",
+  "setCaptionBPMMulti",
+  "setCaptionDelayWaveRate",
+  "setCaptionDelayBPMMulti",
+  "setCaptionOpacity",
+  "setCaptionX",
+  "setCaptionY",
+  "setBigCaptionX",
+  "setBigCaptionY",
+  "setCountWaveRate",
+  "setCountBPMMulti",
+  "setCountDelayWaveRate",
+  "setCountDelayBPMMulti",
+  "setCountGroupDelayWaveRate",
+  "setCountGroupDelayBPMMulti",
+  "setCountOpacity",
+  "setCountX",
+  "setCountY",
+  "setCountProgressScale",
+];
+export const stringSetters = [
+  "setBlinkTF",
+  "setBlinkDelayTF",
+  "setBlinkGroupDelayTF",
+  "setCaptionTF",
+  "setCaptionDelayTF",
+  "setCountTF",
+  "setCountDelayTF",
+  "setCountGroupDelayTF",
+];
+export const booleanSetters = [
+  "setShowCountProgress",
+  "setCountProgressOffset",
+  "setCountColorMatch",
+];
+export const colorSetters = ["setCountProgressColor"];
 const storers = ["storephrase", "storePhrase", "storeAudio"];
 const keywords = ["$RANDOM_PHRASE", "$TAG_PHRASE"];
-export const timestampRegex = /^((\d?\d:)?\d?\d:\d\d(\.\d\d?\d?)?|\d?\d(\.\d\d?\d?)?)$/;
+export const timestampRegex =
+  /^((\d?\d:)?\d?\d:\d\d(\.\d\d?\d?)?|\d?\d(\.\d\d?\d?)?)$/;
 
 // FIXME
 // (function(mod) {
@@ -254,17 +307,17 @@ export const timestampRegex = /^((\d?\d:)?\d?\d:\d\d(\.\d\d?\d?)?|\d?\d(\.\d\d?\
 
 export default class CodeMirror extends React.Component {
   readonly props: {
-    onGutterClick(editor: any, clickedLine: number): void
-    onUpdateScript(text: string, changed?: boolean): void,
-    addHack?: ChildCallbackHack,
-    className?: string,
-    overwriteHack?: ChildCallbackHack,
-  }
+    onGutterClick(editor: any, clickedLine: number): void;
+    onUpdateScript(text: string, changed?: boolean): void;
+    addHack?: ChildCallbackHack;
+    className?: string;
+    overwriteHack?: ChildCallbackHack;
+  };
 
   readonly state = {
     scriptText: "",
-    cursor: {line: 0, ch: 0},
-  }
+    cursor: { line: 0, ch: 0 },
+  };
 
   render() {
     return (
@@ -273,8 +326,8 @@ export default class CodeMirror extends React.Component {
         value={this.state.scriptText}
         autoScroll={false}
         options={{
-          mode: 'flipflip',
-          theme: 'material',
+          mode: "flipflip",
+          theme: "material",
           lineNumbers: true,
           lineWrapping: true,
           viewportMargin: Infinity,
@@ -293,7 +346,7 @@ export default class CodeMirror extends React.Component {
         const newLine: boolean = args[1];
         let newValue = "";
         if (newLine == true) {
-          const lines = this.state.scriptText.split('\n');
+          const lines = this.state.scriptText.split("\n");
           for (let l = 0; l < lines.length; l++) {
             if (l == this.state.cursor.line + 1) {
               if (lines[l].length > 0) {
@@ -307,11 +360,14 @@ export default class CodeMirror extends React.Component {
             }
           }
         } else {
-          const lines = this.state.scriptText.split('\n');
+          const lines = this.state.scriptText.split("\n");
           for (let l = 0; l < lines.length; l++) {
             if (l == this.state.cursor.line) {
               let newLine = lines[l];
-              newLine = newLine.slice(0, this.state.cursor.ch) + string + newLine.slice(this.state.cursor.ch);
+              newLine =
+                newLine.slice(0, this.state.cursor.ch) +
+                string +
+                newLine.slice(this.state.cursor.ch);
               newValue += "\n" + newLine;
             } else {
               newValue += "\n" + lines[l];
@@ -320,13 +376,13 @@ export default class CodeMirror extends React.Component {
         }
         newValue = newValue.trim();
         this.onUpdateScript(newValue);
-      }
+      };
     }
 
     if (this.props.overwriteHack) {
       this.props.overwriteHack.listener = (args) => {
         this.onUpdateScript(args[0]);
-      }
+      };
     }
   }
 
@@ -340,25 +396,31 @@ export default class CodeMirror extends React.Component {
   }
 
   _sendUpdate: NodeJS.Timeout = null;
-  onBeforeChangeScript(editor: any, data: any, value: any)  {
+  onBeforeChangeScript(editor: any, data: any, value: any) {
     if (this.state.scriptText != value) {
       this.onUpdateScript(value, editor, true);
     }
   }
 
   onCursorActivity(editor: any) {
-    this.setState({cursor: editor.getDoc().getCursor()});
+    this.setState({ cursor: editor.getDoc().getCursor() });
   }
 
   onUpdateScript(scriptText: any, editor?: any, changed = false) {
     if (editor) {
-      this.setState({scriptText: scriptText, cursor: editor.getDoc().getCursor()});
+      this.setState({
+        scriptText: scriptText,
+        cursor: editor.getDoc().getCursor(),
+      });
     } else {
-      this.setState({scriptText: scriptText});
+      this.setState({ scriptText: scriptText });
     }
     clearTimeout(this._sendUpdate);
-    this._sendUpdate = setTimeout(this.props.onUpdateScript.bind(this, scriptText, changed), 500);
+    this._sendUpdate = setTimeout(
+      this.props.onUpdateScript.bind(this, scriptText, changed),
+      500,
+    );
   }
 }
 
-(CodeMirror as any).displayName="CodeMirror";
+(CodeMirror as any).displayName = "CodeMirror";

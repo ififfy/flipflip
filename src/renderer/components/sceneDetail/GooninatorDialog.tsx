@@ -16,27 +16,28 @@ import {
   Theme,
 } from "@mui/material";
 
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
+import createStyles from "@mui/styles/createStyles";
+import withStyles from "@mui/styles/withStyles";
 
-import {GT} from "../../data/const";
+import { GT } from "../../data/const";
 
-const styles = (theme: Theme) => createStyles({
-  root: {
-    display: 'flex',
-  },
-  rootInput: {
-    marginLeft: theme.spacing(2),
-    flexGrow: 1,
-  },
-});
+const styles = (theme: Theme) =>
+  createStyles({
+    root: {
+      display: "flex",
+    },
+    rootInput: {
+      marginLeft: theme.spacing(2),
+      flexGrow: 1,
+    },
+  });
 
 class GooninatorDialog extends React.Component {
   readonly props: {
-    classes: any,
-    open: boolean,
-    onClose(): void,
-    onImportURL(type: string, e: MouseEvent, ...args: any[]): void,
+    classes: any;
+    open: boolean;
+    onClose(): void;
+    onImportURL(type: string, e: MouseEvent, ...args: any[]): void;
   };
 
   readonly state = {
@@ -52,7 +53,8 @@ class GooninatorDialog extends React.Component {
         open={this.props.open}
         onClose={this.props.onClose.bind(this)}
         aria-labelledby="url-import-title"
-        aria-describedby="url-import-description">
+        aria-describedby="url-import-description"
+      >
         <DialogTitle id="url-import-title">Import URL</DialogTitle>
         <DialogContent>
           <DialogContentText id="remove-all-description">
@@ -65,26 +67,32 @@ class GooninatorDialog extends React.Component {
             placeholder="Paste URL Here"
             margin="dense"
             value={this.state.importURL}
-            onChange={this.onURLChange.bind(this)} />
+            onChange={this.onURLChange.bind(this)}
+          />
           <div className={classes.root}>
             <FormControl variant="standard">
               <InputLabel>Import as</InputLabel>
               <Select
                 variant="standard"
                 value={this.state.importType}
-                onChange={this.onTypeChange.bind(this)}>
+                onChange={this.onTypeChange.bind(this)}
+              >
                 <MenuItem value={GT.tumblr}>Tumblr Blogs</MenuItem>
                 <MenuItem value={GT.local}>Local Directories</MenuItem>
               </Select>
             </FormControl>
-            <Collapse className={classes.rootInput} in={this.state.importType == GT.local}>
+            <Collapse
+              className={classes.rootInput}
+              in={this.state.importType == GT.local}
+            >
               <TextField
                 variant="standard"
                 fullWidth
                 label="Parent Directory"
                 value={this.state.rootDir}
-                InputProps={{readOnly: true}}
-                onClick={this.onRootChange.bind(this)} />
+                InputProps={{ readOnly: true }}
+                onClick={this.onRootChange.bind(this)}
+              />
             </Collapse>
           </div>
         </DialogContent>
@@ -93,9 +101,14 @@ class GooninatorDialog extends React.Component {
             Cancel
           </Button>
           <Button
-            disabled={!this.state.importURL.match("^https?://") || (this.state.importType == GT.local && this.state.rootDir.length == 0)}
+            disabled={
+              !this.state.importURL.match("^https?://") ||
+              (this.state.importType == GT.local &&
+                this.state.rootDir.length == 0)
+            }
             onClick={this.onImportURL.bind(this)}
-            color="primary">
+            color="primary"
+          >
             Import
           </Button>
         </DialogActions>
@@ -105,12 +118,12 @@ class GooninatorDialog extends React.Component {
 
   onTypeChange(e: MouseEvent) {
     const type = (e.target as HTMLInputElement).value;
-    this.setState({importType: type});
+    this.setState({ importType: type });
   }
 
   onURLChange(e: MouseEvent) {
     const type = (e.target as HTMLInputElement).value;
-    this.setState({importURL: type});
+    this.setState({ importURL: type });
   }
 
   onRootChange() {
@@ -121,10 +134,15 @@ class GooninatorDialog extends React.Component {
   }
 
   onImportURL() {
-    this.props.onImportURL(this.state.importType, null, this.state.importURL, this.state.rootDir);
+    this.props.onImportURL(
+      this.state.importType,
+      null,
+      this.state.importURL,
+      this.state.rootDir,
+    );
     this.props.onClose();
   }
 }
 
-(GooninatorDialog as any).displayName="GooninatorDialog";
+(GooninatorDialog as any).displayName = "GooninatorDialog";
 export default withStyles(styles)(GooninatorDialog as any);

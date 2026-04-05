@@ -6,13 +6,20 @@ import {
   areWeightsValid,
   filterSource,
   getBackups,
-  getCachePath, getEffects,
+  getCachePath,
+  getEffects,
   getRandomIndex,
   randomizeList,
   removeDuplicatesBy,
-  toArrayBuffer
+  toArrayBuffer,
 } from "./utils";
-import {getFileGroup, getFileName, getSourceType, isVideo, isVideoPlaylist} from "../components/player/Scrapers";
+import {
+  getFileGroup,
+  getFileName,
+  getSourceType,
+  isVideo,
+  isVideoPlaylist,
+} from "../components/player/Scrapers";
 import defaultTheme from "./theme";
 import {
   AF,
@@ -45,10 +52,10 @@ import {
   TT,
   VCT,
   VO,
-  VTF
+  VTF,
 } from "./const";
-import {defaultInitialState} from './AppStorage';
-import {Route} from "./Route";
+import { defaultInitialState } from "./AppStorage";
+import { Route } from "./Route";
 import en from "./en";
 import Audio from "./Audio";
 import Scene from "./Scene";
@@ -63,7 +70,15 @@ import CaptionScript from "./CaptionScript";
 import SceneGroup from "./SceneGroup";
 import SceneGridCell from "./SceneGridCell";
 import WeightGroup from "./WeightGroup";
-import { fs_existsSync, fs_fileSize, fs_isDirectory, fs_mkdirSync, fs_readFileSync, fs_unlink, fs_writeFileSync } from "../dummy/fs";
+import {
+  fs_existsSync,
+  fs_fileSize,
+  fs_isDirectory,
+  fs_mkdirSync,
+  fs_readFileSync,
+  fs_unlink,
+  fs_writeFileSync,
+} from "../dummy/fs";
 import { fsExtra_outputFile } from "../dummy/fs-extra";
 import { path_sep } from "../dummy/path";
 import { folder_getFolderSize } from "../dummy/folder";
@@ -81,7 +96,7 @@ export function isRoute(state: State, kind: string): Boolean {
 // Returns the active scene, or null if the current route isn't a scene
 export function getActiveScene(state: State): Scene | null {
   for (let r of state.route.slice().reverse()) {
-    if (r.kind == 'scene') {
+    if (r.kind == "scene") {
       return state.scenes.find((s: Scene) => s.id === r.value);
     }
   }
@@ -90,7 +105,7 @@ export function getActiveScene(state: State): Scene | null {
 
 export function getActiveGrid(state: State): SceneGrid | null {
   for (let r of state.route.slice().reverse()) {
-    if (r.kind == 'grid') {
+    if (r.kind == "grid") {
       return state.grids.find((g: SceneGrid) => g.id === r.value);
     }
   }
@@ -99,7 +114,7 @@ export function getActiveGrid(state: State): SceneGrid | null {
 
 export function getActiveSource(state: State): LibrarySource | null {
   for (let r of state.route.slice().reverse()) {
-    if (r.kind == 'clip') {
+    if (r.kind == "clip") {
       return r.value;
     }
   }
@@ -139,7 +154,11 @@ export function changeAudioRoute(state: State, aID: number): Object {
   return {};
 }
 
-export function getTags(library: Array<LibrarySource>, source: string, clipID?: string): Array<Tag> {
+export function getTags(
+  library: Array<LibrarySource>,
+  source: string,
+  clipID?: string,
+): Array<Tag> {
   const librarySource = library.find((s) => s.url == source);
   if (librarySource) {
     if (clipID) {
@@ -161,7 +180,7 @@ export function getTags(library: Array<LibrarySource>, source: string, clipID?: 
 // The first argument is always a State object, even if it isn't used.
 
 export function restoreFromBackup(state: State, backupFile: string): Object {
-  const data = JSON.parse(fs_readFileSync(backupFile, 'utf-8'));
+  const data = JSON.parse(fs_readFileSync(backupFile, "utf-8"));
   return {
     version: data.version,
     specialMode: data.specialMode ? data.specialMode : null,
@@ -169,11 +188,21 @@ export function restoreFromBackup(state: State, backupFile: string): Object {
     displayedSources: Array<LibrarySource>(),
     config: new Config(data.config),
     scenes: data.scenes.map((s: any) => new Scene(s)),
-    sceneGroups: data.sceneGroups ? data.sceneGroups.map((g: any) => new SceneGroup(g)) : Array<SceneGroup>(),
-    grids: data.grids ? data.grids.map((g: any) => new SceneGrid(g)) : Array<SceneGrid>(),
-    audios: data.audios ? data.audios.map((a: any) => new Audio(a)) : Array <Audio>(),
-    scripts: data.scripts ? data.scripts.map((a: any) => new CaptionScript(a)) : Array <CaptionScript>(),
-    playlists: data.playlists ? data.playlists.map((p: any) => new Playlist(p)) : Array <Playlist>(),
+    sceneGroups: data.sceneGroups
+      ? data.sceneGroups.map((g: any) => new SceneGroup(g))
+      : Array<SceneGroup>(),
+    grids: data.grids
+      ? data.grids.map((g: any) => new SceneGrid(g))
+      : Array<SceneGrid>(),
+    audios: data.audios
+      ? data.audios.map((a: any) => new Audio(a))
+      : Array<Audio>(),
+    scripts: data.scripts
+      ? data.scripts.map((a: any) => new CaptionScript(a))
+      : Array<CaptionScript>(),
+    playlists: data.playlists
+      ? data.playlists.map((p: any) => new Playlist(p))
+      : Array<Playlist>(),
     library: data.library.map((s: any) => new LibrarySource(s)),
     tags: data.tags.map((t: any) => new Tag(t)),
     route: data.route.map((s: any) => new Route(s)),
@@ -200,7 +229,11 @@ export function restoreFromBackup(state: State, backupFile: string): Object {
   };
 }
 
-export function changeThemeColor(state: State, colorTheme: any, primary: boolean): Object {
+export function changeThemeColor(
+  state: State,
+  colorTheme: any,
+  primary: boolean,
+): Object {
   const newTheme = JSON.parse(JSON.stringify(state.theme));
   if (primary) {
     newTheme.palette.primary = colorTheme;
@@ -208,32 +241,32 @@ export function changeThemeColor(state: State, colorTheme: any, primary: boolean
     if (type === "dark") {
       (newTheme.palette as any).background = {};
     } else if (type === "light") {
-      (newTheme.palette as any).background = {default: colorTheme[50]};
+      (newTheme.palette as any).background = { default: colorTheme[50] };
     }
   } else {
     newTheme.palette.secondary = colorTheme;
   }
-  return {theme: newTheme};
+  return { theme: newTheme };
 }
 
 export function startTutorial(state: State): Object {
   if (state.config.tutorials.scenePicker == null) {
-    return {tutorial: SPT.welcome}
+    return { tutorial: SPT.welcome };
   } else {
-    return {}
+    return {};
   }
 }
 
 export function startVCTutorial(state: State): Object {
   if (state.config.tutorials.videoClipper == null) {
-    return {tutorial: VCT.welcome}
+    return { tutorial: VCT.welcome };
   } else {
-    return {}
+    return {};
   }
 }
 
 export function setTutorial(state: State, tutorial: string): Object {
-  return {tutorial: tutorial};
+  return { tutorial: tutorial };
 }
 
 export function skipTutorials(state: State): Object {
@@ -248,7 +281,7 @@ export function skipTutorials(state: State): Object {
   newConfig.tutorials.sceneGenerator = DONE;
   newConfig.tutorials.sceneGrid = DONE;
   newConfig.tutorials.videoClipper = DONE;
-  return {config: newConfig, tutorial: null}
+  return { config: newConfig, tutorial: null };
 }
 
 export function resetTutorials(state: State): Object {
@@ -263,7 +296,7 @@ export function resetTutorials(state: State): Object {
   newConfig.tutorials.sceneGenerator = null;
   newConfig.tutorials.sceneGrid = null;
   newConfig.tutorials.videoClipper = null;
-  return {config: newConfig, tutorial: null}
+  return { config: newConfig, tutorial: null };
 }
 
 export function doneTutorial(state: State, tutorial: string): Object {
@@ -276,7 +309,7 @@ export function doneTutorial(state: State, tutorial: string): Object {
     } else {
       state.config.tutorials.scenePicker = tutorial;
     }
-  } else if (isRoute(state, 'scene')) {
+  } else if (isRoute(state, "scene")) {
     if (getActiveScene(state).generatorWeights) {
       if (tutorial == SDGT.final || tutorial == SDGT.finalError) {
         newTutorial = null;
@@ -292,49 +325,49 @@ export function doneTutorial(state: State, tutorial: string): Object {
         state.config.tutorials.sceneDetail = tutorial;
       }
     }
-  } else if (isRoute(state, 'play')) {
+  } else if (isRoute(state, "play")) {
     if (tutorial == PT.final) {
       newTutorial = null;
       state.config.tutorials.player = DONE;
     } else {
       state.config.tutorials.player = tutorial;
     }
-  } else if (isRoute(state, 'library')) {
+  } else if (isRoute(state, "library")) {
     if (tutorial == LT.final) {
       newTutorial = null;
       state.config.tutorials.library = DONE;
     } else {
       state.config.tutorials.library = tutorial;
     }
-  } else if (isRoute(state, 'audios')) {
+  } else if (isRoute(state, "audios")) {
     if (tutorial == ALT.final) {
       newTutorial = null;
       state.config.tutorials.audios = DONE;
     } else {
       state.config.tutorials.audios = tutorial;
     }
-  } else if (isRoute(state, 'scripts')) {
+  } else if (isRoute(state, "scripts")) {
     if (tutorial == SLT.final) {
       newTutorial = null;
       state.config.tutorials.scripts = DONE;
     } else {
       state.config.tutorials.scripts = tutorial;
     }
-  } else if (isRoute(state, 'scriptor')) {
+  } else if (isRoute(state, "scriptor")) {
     if (tutorial == CST.final) {
       newTutorial = null;
       state.config.tutorials.scriptor = DONE;
     } else {
       state.config.tutorials.scriptor = tutorial;
     }
-  } else if (isRoute(state, 'grid')) {
+  } else if (isRoute(state, "grid")) {
     if (tutorial == SGT.final) {
       newTutorial = null;
       state.config.tutorials.sceneGrid = DONE;
     } else {
       state.config.tutorials.sceneGrid = tutorial;
     }
-  } else if (isRoute(state, 'clip')) {
+  } else if (isRoute(state, "clip")) {
     if (tutorial == VCT.final) {
       newTutorial = null;
       state.config.tutorials.videoClipper = DONE;
@@ -342,7 +375,7 @@ export function doneTutorial(state: State, tutorial: string): Object {
       state.config.tutorials.videoClipper = tutorial;
     }
   }
-  return {config: newConfig, tutorial: newTutorial};
+  return { config: newConfig, tutorial: newTutorial };
 }
 
 export function toggleDarkMode(state: State): Object {
@@ -350,24 +383,28 @@ export function toggleDarkMode(state: State): Object {
   const type = newTheme.palette.mode;
   if (type === "dark") {
     newTheme.palette.mode = "light";
-    (newTheme.palette as any).background = {default: newTheme.palette.primary[50]};
+    (newTheme.palette as any).background = {
+      default: newTheme.palette.primary[50],
+    };
   } else if (type === "light") {
     newTheme.palette.mode = "dark";
     (newTheme.palette as any).background = {};
   }
-  return {theme: newTheme};
+  return { theme: newTheme };
 }
 
 export function cleanBackups(config: Config) {
   let backups = getBackups();
   if (backups.length <= 1) return;
   if (config.generalSettings.autoCleanBackup) {
-    let keepDays = [backups[0]], keepWeeks = [backups[0]], keepMonths = [backups[0]];
+    let keepDays = [backups[0]],
+      keepWeeks = [backups[0]],
+      keepMonths = [backups[0]];
 
     const convertFromEpoch = (backupFile: string) => {
       const epochString = backupFile.substring(backupFile.lastIndexOf(".") + 1);
       return new Date(Number.parseInt(epochString));
-    }
+    };
 
     for (let backup of backups) {
       let backupDate = convertFromEpoch(backup.url);
@@ -375,33 +412,48 @@ export function cleanBackups(config: Config) {
       let lastWeek = convertFromEpoch(keepWeeks[keepWeeks.length - 1].url);
       let lastMonth = convertFromEpoch(keepMonths[keepMonths.length - 1].url);
 
-      if (moment(backupDate).isSame(lastDay, 'day')) {
-        if (moment(backupDate).isSame(new Date(), 'day') && backupDate > lastDay) {
+      if (moment(backupDate).isSame(lastDay, "day")) {
+        if (
+          moment(backupDate).isSame(new Date(), "day") &&
+          backupDate > lastDay
+        ) {
           keepDays[keepDays.length - 1] = backup;
-        } else if (!moment(backupDate).isSame(new Date(), 'day') && backupDate < lastDay) {
+        } else if (
+          !moment(backupDate).isSame(new Date(), "day") &&
+          backupDate < lastDay
+        ) {
           keepDays[keepDays.length - 1] = backup;
         }
       } else if (keepDays.length < config.generalSettings.autoCleanBackupDays) {
         keepDays.push(backup);
       }
 
-      if (moment(backupDate).isSame(lastWeek, 'week')) {
+      if (moment(backupDate).isSame(lastWeek, "week")) {
         if (backupDate < lastWeek) {
           keepWeeks[keepWeeks.length - 1] = backup;
         }
-      } else if (keepWeeks.length < config.generalSettings.autoCleanBackupWeeks) {
+      } else if (
+        keepWeeks.length < config.generalSettings.autoCleanBackupWeeks
+      ) {
         keepWeeks.push(backup);
       }
 
-      if (moment(backupDate).isSame(lastMonth, 'month')) {
+      if (moment(backupDate).isSame(lastMonth, "month")) {
         if (backupDate < lastWeek) {
           keepMonths[keepMonths.length - 1] = backup;
         }
-      } else if (keepMonths.length < config.generalSettings.autoCleanBackupMonths) {
+      } else if (
+        keepMonths.length < config.generalSettings.autoCleanBackupMonths
+      ) {
         keepMonths.push(backup);
       }
     }
-    backups = backups.filter((b) => !keepDays.includes(b) && !keepWeeks.includes(b) && !keepMonths.includes(b));
+    backups = backups.filter(
+      (b) =>
+        !keepDays.includes(b) &&
+        !keepWeeks.includes(b) &&
+        !keepMonths.includes(b),
+    );
   } else {
     for (let k = 0; k < config.generalSettings.cleanRetain; k++) {
       backups.shift(); // Keep the K newest backups
@@ -411,23 +463,29 @@ export function cleanBackups(config: Config) {
   unlinkBackups(backups);
 }
 
-export function cacheImage(state: State, i: HTMLImageElement | HTMLVideoElement) {
+export function cacheImage(
+  state: State,
+  i: HTMLImageElement | HTMLVideoElement,
+) {
   if (state.config.caching.enabled) {
     const fileType = getSourceType(i.getAttribute("source"));
     if (fileType == ST.hydrus || fileType == ST.piwigo) return;
 
     if (fileType != ST.local && i.src.startsWith("http")) {
       const cachePath = getCachePath(null, state.config);
-      fs_mkdirSync(cachePath)
-      
+      fs_mkdirSync(cachePath);
+
       const maxSize = state.config.caching.maxSize;
-      const sourceCachePath = getCachePath(i.getAttribute("source"), state.config);
+      const sourceCachePath = getCachePath(
+        i.getAttribute("source"),
+        state.config,
+      );
       const filePath = sourceCachePath + getFileName(i.src);
       const downloadImage = () => {
         if (!fs_existsSync(filePath)) {
           wretch(i.src)
             .get()
-            .blob(blob => {
+            .blob((blob) => {
               const reader = new FileReader();
               reader.onload = function () {
                 if (reader.readyState == 2) {
@@ -452,7 +510,7 @@ export function cacheImage(state: State, i: HTMLImageElement | HTMLVideoElement)
             throw err;
           }
 
-          const mbSize = (size / 1024 / 1024);
+          const mbSize = size / 1024 / 1024;
           if (mbSize < maxSize) {
             downloadImage();
           }
@@ -472,28 +530,44 @@ export function printMemoryReport() {
     return f;
   }
   function logB(x: any) {
-    console.log(format(x[0]), format((x[1] / (1000.0*1000)).toFixed(2)), "MB");
+    console.log(
+      format(x[0]),
+      format((x[1] / (1000.0 * 1000)).toFixed(2)),
+      "MB",
+    );
   }
   function logKB(x: any) {
-    console.log(format(x[0]), format((x[1] / (1000.0)).toFixed(2)), "MB");
+    console.log(format(x[0]), format((x[1] / 1000.0).toFixed(2)), "MB");
   }
   function logCount(x: any) {
-    console.log(format(x[0]), format(x[1].count), format((x[1].size / (1000.0*1000)).toFixed(2)), "MB", format((x[1].liveSize / (1000.0*1000)).toFixed(2)), "MB");
+    console.log(
+      format(x[0]),
+      format(x[1].count),
+      format((x[1].size / (1000.0 * 1000)).toFixed(2)),
+      "MB",
+      format((x[1].liveSize / (1000.0 * 1000)).toFixed(2)),
+      "MB",
+    );
   }
 
   Object.entries(process.memoryUsage()).map(logB);
   Object.entries(process.getProcessMemoryInfo()).map(logKB);
   Object.entries(process.getSystemMemoryInfo()).map(logKB);
   console.log("\n");
-  console.log(format("object"), format("count"), format("size"), format("liveSize"));
+  console.log(
+    format("object"),
+    format("count"),
+    format("size"),
+    format("liveSize"),
+  );
   // FIXME
   // Object.entries(webFrame.getResourceUsage()).map(logCount);
-  console.log('------');
+  console.log("------");
 }
 
 export function goBack(state: State): Object {
   const newRoute = state.route.slice(0, state.route.length - 1);
-  return {route: newRoute, specialMode: null};
+  return { route: newRoute, specialMode: null };
 }
 
 export function cloneScene(state: State, scene: Scene): Object {
@@ -505,7 +579,7 @@ export function cloneScene(state: State, scene: Scene): Object {
   sceneCopy.id = id;
   return {
     scenes: state.scenes.concat([sceneCopy]),
-    route: [new Route({kind: 'scene', value: sceneCopy.id})],
+    route: [new Route({ kind: "scene", value: sceneCopy.id })],
     specialMode: SP.autoEdit,
     systemSnack: "Clone successful!",
     systemSnackSeverity: SS.success,
@@ -523,7 +597,7 @@ export function saveScene(state: State, scene: Scene): Object {
   sceneCopy.openTab = 3;
   return {
     scenes: state.scenes.concat([sceneCopy]),
-    route: [new Route({kind: 'scene', value: sceneCopy.id})],
+    route: [new Route({ kind: "scene", value: sceneCopy.id })],
     specialMode: SP.autoEdit,
     systemSnack: "Save successful!",
     systemSnackSeverity: SS.success,
@@ -531,23 +605,27 @@ export function saveScene(state: State, scene: Scene): Object {
 }
 
 export function closeMessage(state: State): Object {
-  return {systemMessage: null, systemSnack: null, systemSnackSeverity: null};
+  return { systemMessage: null, systemSnack: null, systemSnackSeverity: null };
 }
 
 export function systemMessage(state: State, message: string): Object {
-  return {systemMessage: message};
+  return { systemMessage: message };
 }
 
-export function systemSnack(state: State, message: string, severity: string): Object {
-  return {systemSnack: message, systemSnackSeverity: severity};
+export function systemSnack(
+  state: State,
+  message: string,
+  severity: string,
+): Object {
+  return { systemSnack: message, systemSnackSeverity: severity };
 }
 
 export function changeScenePickerTab(state: State, newTab: number): Object {
-  return {openTab: newTab};
+  return { openTab: newTab };
 }
 
 export function changeAudioLibraryTab(state: State, newTab: number): Object {
-  return {audioOpenTab: newTab};
+  return { audioOpenTab: newTab };
 }
 
 export function addSceneGroup(state: State, type: string): Object {
@@ -555,13 +633,13 @@ export function addSceneGroup(state: State, type: string): Object {
   state.sceneGroups.forEach((s: SceneGroup) => {
     id = Math.max(s.id + 1, id);
   });
-  let sceneGroup = new SceneGroup( {
+  let sceneGroup = new SceneGroup({
     id: id,
     type: type,
-  })
+  });
   return {
     sceneGroups: state.sceneGroups.concat(sceneGroup),
-  }
+  };
 }
 
 export function addScene(state: State): Object {
@@ -603,7 +681,7 @@ export function addScene(state: State): Object {
   return {
     scenes: state.scenes.concat([scene]),
     tutorial: newTutorial,
-    route: [new Route({kind: 'scene', value: scene.id})],
+    route: [new Route({ kind: "scene", value: scene.id })],
     specialMode: !tutorial ? SP.autoEdit : null,
   };
 }
@@ -611,7 +689,7 @@ export function addScene(state: State): Object {
 export function deleteSceneGroup(state: State, group: SceneGroup): Object {
   return {
     sceneGroups: state.sceneGroups.filter((g) => g.id != group.id),
-  }
+  };
 }
 
 export function deleteScenes(state: State, sceneIDs: Array<number>): Object {
@@ -626,15 +704,28 @@ export function deleteScenes(state: State, sceneIDs: Array<number>): Object {
     }
   }
 
-  const newScenes = state.scenes.filter((s: Scene) => !deleteScenes.includes(s.id));
+  const newScenes = state.scenes.filter(
+    (s: Scene) => !deleteScenes.includes(s.id),
+  );
   for (let s of newScenes) {
     if (deleteScenes.includes(s.nextSceneID)) {
       s.nextSceneID = 0;
     }
-    s.nextSceneRandoms = s.nextSceneRandoms.filter((s) => !deleteScenes.includes(s));
-    s.overlays = s.overlays.filter((o) => !deleteScenes.includes(o.sceneID) && (!o.sceneID.toString().startsWith("999") || !deleteGrids.includes(parseInt(o.sceneID.toString().replace("999", "")))));
+    s.nextSceneRandoms = s.nextSceneRandoms.filter(
+      (s) => !deleteScenes.includes(s),
+    );
+    s.overlays = s.overlays.filter(
+      (o) =>
+        !deleteScenes.includes(o.sceneID) &&
+        (!o.sceneID.toString().startsWith("999") ||
+          !deleteGrids.includes(
+            parseInt(o.sceneID.toString().replace("999", "")),
+          )),
+    );
   }
-  const newGrids = state.grids.filter((g: SceneGrid) => !deleteGrids.includes(g.id));
+  const newGrids = state.grids.filter(
+    (g: SceneGrid) => !deleteGrids.includes(g.id),
+  );
   for (let g of newGrids) {
     for (let row of g.grid) {
       row.forEach((cell) => {
@@ -685,7 +776,9 @@ export function deleteGrid(state: State, grid: SceneGrid): Object {
   const newGrids = state.grids.filter((g: SceneGrid) => g.id != grid.id);
   const newScenes = state.scenes;
   for (let s of newScenes) {
-    s.overlays = s.overlays.filter((o) => o.sceneID != parseInt("999" + grid.id.toString()));
+    s.overlays = s.overlays.filter(
+      (o) => o.sceneID != parseInt("999" + grid.id.toString()),
+    );
   }
   return {
     scenes: newScenes,
@@ -697,16 +790,21 @@ export function deleteGrid(state: State, grid: SceneGrid): Object {
 
 export function nextScene(state: State): Object {
   const scene = getActiveScene(state);
-  if (scene && scene.nextSceneID !== 0){
+  if (scene && scene.nextSceneID !== 0) {
     let nextScene;
     if (scene.nextSceneID == -1) {
-      nextScene = state.scenes.find((s: Scene) => s.id == scene.nextSceneRandomID);
+      nextScene = state.scenes.find(
+        (s: Scene) => s.id == scene.nextSceneRandomID,
+      );
     } else {
       nextScene = state.scenes.find((s: Scene) => s.id == scene.nextSceneID);
     }
     if (nextScene != null) {
       return {
-        route: [new Route({kind: 'scene', value: nextScene.id}), new Route({kind: 'play', value: nextScene.id})],
+        route: [
+          new Route({ kind: "scene", value: nextScene.id }),
+          new Route({ kind: "play", value: nextScene.id }),
+        ],
       };
     }
   }
@@ -717,10 +815,13 @@ export function startFromScene(state: State, sceneName: string) {
   if (scene) {
     if (scene.sources.length > 0) {
       return {
-        route: [new Route({kind: 'scene', value: scene.id}), new Route({kind: 'play', value: scene.id})],
+        route: [
+          new Route({ kind: "scene", value: scene.id }),
+          new Route({ kind: "play", value: scene.id }),
+        ],
       };
     } else {
-      console.error("Scene '" + sceneName+ "' has no sources");
+      console.error("Scene '" + sceneName + "' has no sources");
     }
   } else {
     console.error("Couldn't find scene '" + sceneName + "'");
@@ -728,39 +829,49 @@ export function startFromScene(state: State, sceneName: string) {
 }
 
 export function updateConfig(state: State, newConfig: Config): Object {
-  return {config: newConfig};
+  return { config: newConfig };
 }
 
 export function openConfig(state: State): Object {
-  return {route: [new Route({kind: 'config', value: null})]};
+  return { route: [new Route({ kind: "config", value: null })] };
 }
 
 export function setDefaultConfig(state: State): Object {
-  return {config: new Config()};
+  return { config: new Config() };
 }
 
 export function goToScene(state: State, scene: Scene): Object {
-  return {route: [new Route({kind: 'scene', value: scene.id})]};
+  return { route: [new Route({ kind: "scene", value: scene.id })] };
 }
 
 export function goToGrid(state: State, scene: Scene): Object {
-  return {route: [new Route({kind: 'grid', value: scene.id})]};
+  return { route: [new Route({ kind: "grid", value: scene.id })] };
 }
 
 export function openLibrary(state: State): Object {
-  return {route: [new Route({kind: 'library', value: null})], tutorial: state.config.tutorials.library == null ? LT.welcome : null};
+  return {
+    route: [new Route({ kind: "library", value: null })],
+    tutorial: state.config.tutorials.library == null ? LT.welcome : null,
+  };
 }
 
 export function openAudios(state: State): Object {
-  return {route: [new Route({kind: 'audios', value: null})], tutorial: state.config.tutorials.audios == null ? ALT.welcome : null};
+  return {
+    route: [new Route({ kind: "audios", value: null })],
+    tutorial: state.config.tutorials.audios == null ? ALT.welcome : null,
+  };
 }
 
 export function openScripts(state: State): Object {
-  return {route: [new Route({kind: 'scripts', value: null})], tutorial: state.config.tutorials.scripts == null ? SLT.welcome : null};
+  return {
+    route: [new Route({ kind: "scripts", value: null })],
+    tutorial: state.config.tutorials.scripts == null ? SLT.welcome : null,
+  };
 }
 
 export function openScriptor(state: State): Object {
-  const testScript = "setBlinkDuration 300\n" +
+  const testScript =
+    "setBlinkDuration 300\n" +
     "setBlinkDelay 100\n" +
     "setBlinkGroupDelay 1200\n" +
     "setCaptionDuration 2000\n" +
@@ -768,42 +879,90 @@ export function openScriptor(state: State): Object {
     "\n" +
     "bigcap YOU LOVE FLUFFY KITTENS\n" +
     "blink KITTENS / ARE / YOUR / LIFE\n" +
-    "cap Cuddle all the kittens forever because you love them."
+    "cap Cuddle all the kittens forever because you love them.";
   const tutorial = state.config.tutorials.scriptor == null;
-  return {route: [new Route({kind: 'scriptor', value: tutorial ? new CaptionScript({script:testScript}) : null})], tutorial: tutorial ? CST.welcome : null};
+  return {
+    route: [
+      new Route({
+        kind: "scriptor",
+        value: tutorial ? new CaptionScript({ script: testScript }) : null,
+      }),
+    ],
+    tutorial: tutorial ? CST.welcome : null,
+  };
 }
 
 export function openScriptInScriptor(state: State, source: CaptionScript) {
-  return {route: state.route.concat(new Route({kind: 'scriptor', value: source}))};
+  return {
+    route: state.route.concat(new Route({ kind: "scriptor", value: source })),
+  };
 }
 
 export function openLibraryImport(state: State): Object {
-  return {route: state.route.concat(new Route({kind: 'library', value: null})), specialMode: SP.select, librarySelected: []};
+  return {
+    route: state.route.concat(new Route({ kind: "library", value: null })),
+    specialMode: SP.select,
+    librarySelected: [],
+  };
 }
 
-export function importAudioFromLibrary(state: State, sources: Array<Audio>): Object {
+export function importAudioFromLibrary(
+  state: State,
+  sources: Array<Audio>,
+): Object {
   const playlistIndex = state.route[state.route.length - 1].value;
-  return {...updateScene(state, getActiveScene(state), (s: Scene) => {s.audioPlaylists[playlistIndex].audios = s.audioPlaylists[playlistIndex].audios.concat(sources)}), ...goBack(state)};
+  return {
+    ...updateScene(state, getActiveScene(state), (s: Scene) => {
+      s.audioPlaylists[playlistIndex].audios =
+        s.audioPlaylists[playlistIndex].audios.concat(sources);
+    }),
+    ...goBack(state),
+  };
 }
 
-export function importScriptFromLibrary(state: State, sources: Array<CaptionScript>): Object {
+export function importScriptFromLibrary(
+  state: State,
+  sources: Array<CaptionScript>,
+): Object {
   const playlistIndex = state.route[state.route.length - 1].value;
-  return {...updateScene(state, getActiveScene(state), (s: Scene) => {s.scriptPlaylists[playlistIndex].scripts = s.scriptPlaylists[playlistIndex].scripts.concat(sources)}), ...goBack(state)};
+  return {
+    ...updateScene(state, getActiveScene(state), (s: Scene) => {
+      s.scriptPlaylists[playlistIndex].scripts =
+        s.scriptPlaylists[playlistIndex].scripts.concat(sources);
+    }),
+    ...goBack(state),
+  };
 }
 
-export function importScriptToScriptor(state: State, source: CaptionScript): Object {
+export function importScriptToScriptor(
+  state: State,
+  source: CaptionScript,
+): Object {
   const newRoute = state.route.slice(0, state.route.length - 1);
   newRoute[newRoute.length - 1].value = source;
-  return {route: newRoute, specialMode: null};
+  return { route: newRoute, specialMode: null };
 }
 
-export function importFromLibrary(state: State, sources: Array<LibrarySource>): Object {
+export function importFromLibrary(
+  state: State,
+  sources: Array<LibrarySource>,
+): Object {
   const scene = getActiveScene(state);
   const sceneSources = mergeSources(scene.sources, sources);
-  return {...updateScene(state, getActiveScene(state), (s: Scene) => {s.sources = sceneSources}), ...goBack(state)};
+  return {
+    ...updateScene(state, getActiveScene(state), (s: Scene) => {
+      s.sources = sceneSources;
+    }),
+    ...goBack(state),
+  };
 }
 
-export function saveLibraryPosition(state: State, yOffset: number, filters: Array<string>, selected: Array<string>): Object {
+export function saveLibraryPosition(
+  state: State,
+  yOffset: number,
+  filters: Array<string>,
+  selected: Array<string>,
+): Object {
   return {
     libraryYOffset: yOffset,
     libraryFilters: filters,
@@ -811,7 +970,12 @@ export function saveLibraryPosition(state: State, yOffset: number, filters: Arra
   };
 }
 
-export function saveAudioPosition(state: State, yOffset: number, filters: Array<string>, selected: Array<string>): Object {
+export function saveAudioPosition(
+  state: State,
+  yOffset: number,
+  filters: Array<string>,
+  selected: Array<string>,
+): Object {
   return {
     audioYOffset: yOffset,
     audioFilters: filters,
@@ -819,7 +983,12 @@ export function saveAudioPosition(state: State, yOffset: number, filters: Array<
   };
 }
 
-export function saveScriptPosition(state: State, yOffset: number, filters: Array<string>, selected: Array<string>): Object {
+export function saveScriptPosition(
+  state: State,
+  yOffset: number,
+  filters: Array<string>,
+  selected: Array<string>,
+): Object {
   return {
     scriptYOffset: yOffset,
     scriptFilters: filters,
@@ -848,15 +1017,23 @@ export function playGrid(state: State, grid: SceneGrid): Object {
     overlayEnabled: true,
     gridScene: true,
   });
-  tempScene.overlays = [new Overlay({id: 1, sceneID: parseInt("999" + grid.id), opacity: 100})];
+  tempScene.overlays = [
+    new Overlay({ id: 1, sceneID: parseInt("999" + grid.id), opacity: 100 }),
+  ];
   return {
     scenes: state.scenes.concat([tempScene]),
-    route: state.route.concat([new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'gridplay', value: tempScene.id})]),
+    route: state.route.concat([
+      new Route({ kind: "scene", value: tempScene.id }),
+      new Route({ kind: "gridplay", value: tempScene.id }),
+    ]),
   };
 }
 
 export function playScene(state: State, scene: Scene): Object {
-  return {route: state.route.concat(new Route({kind: 'play', value: scene.id})), tutorial: state.config.tutorials.player == null ? PT.welcome : null};
+  return {
+    route: state.route.concat(new Route({ kind: "play", value: scene.id })),
+    tutorial: state.config.tutorials.player == null ? PT.welcome : null,
+  };
 }
 
 export function playTrack(state: State, url: string) {
@@ -867,11 +1044,17 @@ export function playTrack(state: State, url: string) {
         break;
       }
     }
-  })
+  });
 }
 
-export function playAudio(state: State, source: Audio, displayed: Array<Audio>): Object {
-  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path_sep());
+export function playAudio(
+  state: State,
+  source: Audio,
+  displayed: Array<Audio>,
+): Object {
+  const sourceURL = source.url.startsWith("http")
+    ? source.url
+    : source.url.replace(/\//g, path_sep());
   let librarySource = state.audios.find((s) => s.url == sourceURL);
   if (librarySource == null) {
     throw new Error("Source not found in Library");
@@ -880,14 +1063,16 @@ export function playAudio(state: State, source: Audio, displayed: Array<Audio>):
   state.scenes.forEach((s: Scene) => {
     id = Math.max(s.id + 1, id);
   });
-  const startIndex = displayed.indexOf(displayed.find((a) => a.url == source.url));
+  const startIndex = displayed.indexOf(
+    displayed.find((a) => a.url == source.url),
+  );
   const tempScene = new Scene({
     id: id,
     name: "audio_scene_temp",
     libraryID: librarySource.id,
     audioScene: true,
     audioEnabled: true,
-    audioPlaylists: [{audios: displayed, shuffle: false, repeat: RP.all}],
+    audioPlaylists: [{ audios: displayed, shuffle: false, repeat: RP.all }],
     audioStartIndex: startIndex,
     strobe: true,
     strobeTime: 10000,
@@ -906,12 +1091,22 @@ export function playAudio(state: State, source: Audio, displayed: Array<Audio>):
   });
   return {
     scenes: state.scenes.concat([tempScene]),
-    route: state.route.concat([new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'libraryplay', value: tempScene.id})]),
+    route: state.route.concat([
+      new Route({ kind: "scene", value: tempScene.id }),
+      new Route({ kind: "libraryplay", value: tempScene.id }),
+    ]),
   };
 }
 
-export function playScript(state: State, source: CaptionScript, sceneID: number, displayed: Array<CaptionScript>): Object {
-  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path_sep());
+export function playScript(
+  state: State,
+  source: CaptionScript,
+  sceneID: number,
+  displayed: Array<CaptionScript>,
+): Object {
+  const sourceURL = source.url.startsWith("http")
+    ? source.url
+    : source.url.replace(/\//g, path_sep());
   let librarySource = state.scripts.find((s) => s.url == sourceURL);
   if (librarySource == null) {
     throw new Error("Script not found in Library");
@@ -920,25 +1115,40 @@ export function playScript(state: State, source: CaptionScript, sceneID: number,
   state.scenes.forEach((s: Scene) => {
     id = Math.max(s.id + 1, id);
   });
-  const startIndex = displayed.indexOf(displayed.find((s) => s.url == source.url));
-  const tempScene = JSON.parse(JSON.stringify(state.scenes.find((s) => s.id == sceneID)));
+  const startIndex = displayed.indexOf(
+    displayed.find((s) => s.url == source.url),
+  );
+  const tempScene = JSON.parse(
+    JSON.stringify(state.scenes.find((s) => s.id == sceneID)),
+  );
   tempScene.id = id;
   tempScene.libraryID = librarySource.id;
   tempScene.scriptScene = true;
   tempScene.textEnabled = true;
-  tempScene.scriptPlaylists = [{scripts: displayed, shuffle: false, repeat: RP.all}];
+  tempScene.scriptPlaylists = [
+    { scripts: displayed, shuffle: false, repeat: RP.all },
+  ];
   tempScene.scriptStartIndex = startIndex;
   return {
     scenes: state.scenes.concat([tempScene]),
-    route: state.route.concat([new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'libraryplay', value: tempScene.id})]),
+    route: state.route.concat([
+      new Route({ kind: "scene", value: tempScene.id }),
+      new Route({ kind: "libraryplay", value: tempScene.id }),
+    ]),
   };
 }
 
-export function playSceneFromLibrary(state: State, source: LibrarySource, displayed: Array<LibrarySource>): Object {
-  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path_sep());
+export function playSceneFromLibrary(
+  state: State,
+  source: LibrarySource,
+  displayed: Array<LibrarySource>,
+): Object {
+  const sourceURL = source.url.startsWith("http")
+    ? source.url
+    : source.url.replace(/\//g, path_sep());
   let librarySource = state.library.find((s) => s.url == sourceURL);
   if (librarySource != null) {
-    librarySource.disabledClips =  [];
+    librarySource.disabledClips = [];
     let id = state.scenes.length + 1;
     state.scenes.forEach((s: Scene) => {
       id = Math.max(s.id + 1, id);
@@ -957,8 +1167,12 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
       imageOrientation: state.config.defaultScene.imageOrientation,
       videoOrientation: state.config.defaultScene.videoOrientation,
       randomVideoStart: state.config.defaultScene.randomVideoStart,
-      videoOption: sourceType == ST.video ? VO.full : state.config.defaultScene.videoOption,
-      continueVideo:  sourceType == ST.video || state.config.defaultScene.continueVideo,
+      videoOption:
+        sourceType == ST.video
+          ? VO.full
+          : state.config.defaultScene.videoOption,
+      continueVideo:
+        sourceType == ST.video || state.config.defaultScene.continueVideo,
       playVideoClips: state.config.defaultScene.playVideoClips,
       videoVolume: state.config.defaultScene.videoVolume,
       videoSkip: state.config.defaultScene.videoSkip,
@@ -976,10 +1190,13 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
     return {
       displayedSources: displayed,
       scenes: state.scenes.concat([tempScene]),
-      route: state.route.concat([new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'libraryplay', value: tempScene.id})]),
+      route: state.route.concat([
+        new Route({ kind: "scene", value: tempScene.id }),
+        new Route({ kind: "libraryplay", value: tempScene.id }),
+      ]),
     };
   } else {
-    source.disabledClips =  [];
+    source.disabledClips = [];
     let id = state.scenes.length + 1;
     state.scenes.forEach((s: Scene) => {
       id = Math.max(s.id + 1, id);
@@ -998,8 +1215,12 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
       imageOrientation: state.config.defaultScene.imageOrientation,
       videoOrientation: state.config.defaultScene.videoOrientation,
       randomVideoStart: state.config.defaultScene.randomVideoStart,
-      videoOption: sourceType == ST.video ? VO.full : state.config.defaultScene.videoOption,
-      continueVideo:  sourceType == ST.video || state.config.defaultScene.continueVideo,
+      videoOption:
+        sourceType == ST.video
+          ? VO.full
+          : state.config.defaultScene.videoOption,
+      continueVideo:
+        sourceType == ST.video || state.config.defaultScene.continueVideo,
       playVideoClips: state.config.defaultScene.playVideoClips,
       videoVolume: state.config.defaultScene.videoVolume,
       videoSkip: state.config.defaultScene.videoSkip,
@@ -1016,13 +1237,19 @@ export function playSceneFromLibrary(state: State, source: LibrarySource, displa
     return {
       displayedSources: displayed,
       scenes: state.scenes.concat([tempScene]),
-      route: state.route.concat([new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'libraryplay', value: tempScene.id})]),
+      route: state.route.concat([
+        new Route({ kind: "scene", value: tempScene.id }),
+        new Route({ kind: "libraryplay", value: tempScene.id }),
+      ]),
     };
   }
-
 }
 
-export function onUpdateClips(state: State, sourceURL: string, clips: Array<Clip>) {
+export function onUpdateClips(
+  state: State,
+  sourceURL: string,
+  clips: Array<Clip>,
+) {
   const newLibrary = state.library;
   const newScenes = state.scenes;
   const source = newLibrary.find((s) => s.url == sourceURL);
@@ -1033,14 +1260,24 @@ export function onUpdateClips(state: State, sourceURL: string, clips: Array<Clip
     const sceneSource = scene.sources.find((s) => s.url == sourceURL);
     if (sceneSource) {
       sceneSource.clips = clips;
-      sceneSource.disabledClips = sceneSource.disabledClips ? sceneSource.disabledClips.filter((n) => sceneSource.clips.find((c) => c.id == n)) : [];
+      sceneSource.disabledClips = sceneSource.disabledClips
+        ? sceneSource.disabledClips.filter((n) =>
+            sceneSource.clips.find((c) => c.id == n),
+          )
+        : [];
     }
   }
-  return {library: newLibrary, scenes: newScenes};
+  return { library: newLibrary, scenes: newScenes };
 }
 
-export function clipVideo(state: State, source: LibrarySource, displayed: Array<LibrarySource>) {
-  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path_sep());
+export function clipVideo(
+  state: State,
+  source: LibrarySource,
+  displayed: Array<LibrarySource>,
+) {
+  const sourceURL = source.url.startsWith("http")
+    ? source.url
+    : source.url.replace(/\//g, path_sep());
   let librarySource = state.library.find((s) => s.url == sourceURL);
   if (getActiveSource(state) != null) {
     state.route.pop();
@@ -1050,7 +1287,9 @@ export function clipVideo(state: State, source: LibrarySource, displayed: Array<
   }
   return {
     displayedSources: displayed,
-    route: state.route.concat([new Route({kind: 'clip', value: librarySource})])
+    route: state.route.concat([
+      new Route({ kind: "clip", value: librarySource }),
+    ]),
   };
 }
 
@@ -1058,17 +1297,21 @@ export function setDisabledClips(state: State, disabled: Array<number>) {
   const activeScene = getActiveScene(state);
   if (activeScene) {
     return updateScene(state, activeScene, (s) => {
-      const source = s.sources.find((ls) => ls.url == getActiveSource(state).url);
+      const source = s.sources.find(
+        (ls) => ls.url == getActiveSource(state).url,
+      );
       if (source) {
         source.disabledClips = disabled;
       }
-    })
+    });
   }
 }
 
 export function navigateClipping(state: State, offset: number): Object {
   const displayed = Array.from(state.displayedSources);
-  let newIndexOf = displayed.map((s) => s.url).indexOf(getActiveSource(state).url);
+  let newIndexOf = displayed
+    .map((s) => s.url)
+    .indexOf(getActiveSource(state).url);
   let newSource;
   do {
     newIndexOf = newIndexOf + offset;
@@ -1101,7 +1344,9 @@ export function navigateDisplayedLibrary(state: State, offset: number): Object {
     });
   }
   const displayed = Array.from(state.displayedSources);
-  const indexOf = displayed.map((s) => s.url).indexOf(activeScene.sources[0].url);
+  const indexOf = displayed
+    .map((s) => s.url)
+    .indexOf(activeScene.sources[0].url);
   let newIndexOf = indexOf + offset;
   if (newIndexOf < 0) {
     newIndexOf = displayed.length - 1;
@@ -1138,18 +1383,20 @@ export function endPlaySceneFromLibrary(state: State): Object {
   }
   state.route.pop();
   state.route.pop();
-  return {route: state.route.slice(0), scenes: state.scenes.slice(0)};
+  return { route: state.route.slice(0), scenes: state.scenes.slice(0) };
 }
 
 export function endPlaySceneGrid(state: State): Object {
   state.scenes.pop();
   state.route.pop();
   state.route.pop();
-  return {route: state.route.slice(0), scenes: state.scenes.slice(0)};
+  return { route: state.route.slice(0), scenes: state.scenes.slice(0) };
 }
 
 export function manageTags(state: State): Object {
-  return {route: state.route.concat(new Route({kind: 'tags', value: null}))};
+  return {
+    route: state.route.concat(new Route({ kind: "tags", value: null })),
+  };
 }
 
 export function addGrid(state: State): Object {
@@ -1164,9 +1411,9 @@ export function addGrid(state: State): Object {
   });
   return {
     grids: state.grids.concat([grid]),
-    route: [new Route({kind: 'grid', value: grid.id})],
+    route: [new Route({ kind: "grid", value: grid.id })],
     specialMode: SP.autoEdit,
-    tutorial: state.config.tutorials.sceneGrid == null ? SGT.welcome : null
+    tutorial: state.config.tutorials.sceneGrid == null ? SGT.welcome : null,
   };
 }
 
@@ -1185,35 +1432,54 @@ export function addGenerator(state: State): Object {
   });
   return {
     scenes: state.scenes.concat([scene]),
-    route: [new Route({kind: 'scene', value: scene.id})],
+    route: [new Route({ kind: "scene", value: scene.id })],
     specialMode: SP.autoEdit,
-    tutorial: state.config.tutorials.sceneGenerator == null ? SDGT.welcome : null
+    tutorial:
+      state.config.tutorials.sceneGenerator == null ? SDGT.welcome : null,
   };
 }
 
-function reduceList(sources: Array<LibrarySource>, limit: number): Array<LibrarySource> {
+function reduceList(
+  sources: Array<LibrarySource>,
+  limit: number,
+): Array<LibrarySource> {
   while (sources.length > limit) {
     sources.splice(getRandomIndex(sources), 1);
   }
   return sources;
 }
 
-export function generateScenes(state: State, s: Scene | SceneGrid, children: boolean =  true, force: boolean = false): Object {
-  const generateScenes: Array<Scene> = []
+export function generateScenes(
+  state: State,
+  s: Scene | SceneGrid,
+  children: boolean = true,
+  force: boolean = false,
+): Object {
+  const generateScenes: Array<Scene> = [];
   if (s instanceof SceneGrid) {
     for (let row of s.grid) {
       for (let cell of row) {
         const gScene = state.scenes.find((s) => s.id == cell.sceneID);
-        if (gScene && gScene.generatorWeights && gScene.regenerate && areWeightsValid(gScene)) {
+        if (
+          gScene &&
+          gScene.generatorWeights &&
+          gScene.regenerate &&
+          areWeightsValid(gScene)
+        ) {
           generateScenes.push(gScene);
         }
         if (gScene && gScene.overlayEnabled) {
           for (let overlay of gScene.overlays) {
-            if (overlay.sceneID.toString().startsWith('999')) {
+            if (overlay.sceneID.toString().startsWith("999")) {
               // No grid overlays within a grid
             } else {
               const oScene = state.scenes.find((s) => s.id == overlay.sceneID);
-              if (oScene && oScene.generatorWeights && oScene.regenerate && areWeightsValid(oScene)) {
+              if (
+                oScene &&
+                oScene.generatorWeights &&
+                oScene.regenerate &&
+                areWeightsValid(oScene)
+              ) {
                 generateScenes.push(oScene);
               }
             }
@@ -1227,20 +1493,30 @@ export function generateScenes(state: State, s: Scene | SceneGrid, children: boo
     }
     if (s.overlayEnabled && children) {
       for (let overlay of s.overlays) {
-        if (overlay.sceneID.toString().startsWith('999')) {
-          const id = overlay.sceneID.toString().replace('999', '');
+        if (overlay.sceneID.toString().startsWith("999")) {
+          const id = overlay.sceneID.toString().replace("999", "");
           const oScene = state.grids.find((s) => s.id.toString() == id);
           for (let row of oScene.grid) {
             for (let cell of row) {
               const gScene = state.scenes.find((s) => s.id == cell.sceneID);
-              if (gScene && gScene.generatorWeights && gScene.regenerate && areWeightsValid(gScene)) {
+              if (
+                gScene &&
+                gScene.generatorWeights &&
+                gScene.regenerate &&
+                areWeightsValid(gScene)
+              ) {
                 generateScenes.push(gScene);
               }
             }
           }
         } else {
           const oScene = state.scenes.find((s) => s.id == overlay.sceneID);
-          if (oScene && oScene.generatorWeights && oScene.regenerate && areWeightsValid(oScene)) {
+          if (
+            oScene &&
+            oScene.generatorWeights &&
+            oScene.regenerate &&
+            areWeightsValid(oScene)
+          ) {
             generateScenes.push(oScene);
           }
         }
@@ -1255,15 +1531,25 @@ export function generateScenes(state: State, s: Scene | SceneGrid, children: boo
     // Add globally ignored tags/types if not overridden by generator
     if (!newScene.overrideIgnore) {
       for (let ignored of state.config.displaySettings.ignoredTags) {
-        generatorWeights = generatorWeights.concat([new WeightGroup({type: TT.none, search: ignored})]);
+        generatorWeights = generatorWeights.concat([
+          new WeightGroup({ type: TT.none, search: ignored }),
+        ]);
       }
     }
 
     // Record all the groups we're requiring/excluding
-    const allSearches = generatorWeights.filter((wg) => wg.type == TT.all && !wg.rules).map((wg) => wg.search);
-    const noneSearches = generatorWeights.filter((wg) => wg.type == TT.none && !wg.rules).map((wg) => wg.search);
-    const allAdvRules = generatorWeights.filter((wg) => wg.type == TT.all && wg.rules).map((wg) => wg.search);
-    const noneAdvRules = generatorWeights.filter((wg) => wg.type == TT.none && wg.rules).map((wg) => wg.search);
+    const allSearches = generatorWeights
+      .filter((wg) => wg.type == TT.all && !wg.rules)
+      .map((wg) => wg.search);
+    const noneSearches = generatorWeights
+      .filter((wg) => wg.type == TT.none && !wg.rules)
+      .map((wg) => wg.search);
+    const allAdvRules = generatorWeights
+      .filter((wg) => wg.type == TT.all && wg.rules)
+      .map((wg) => wg.search);
+    const noneAdvRules = generatorWeights
+      .filter((wg) => wg.type == TT.none && wg.rules)
+      .map((wg) => wg.search);
 
     // Sources to require
     let reqAdvSources: Array<LibrarySource> = null;
@@ -1277,22 +1563,37 @@ export function generateScenes(state: State, s: Scene | SceneGrid, children: boo
     for (let wg of generatorWeights.filter((wg) => !!wg.rules)) {
       // Build each adv rule like a regular set of simple rules
       // First get tags to require/exclude
-      const ruleAllSearches = wg.rules.filter((wg) => wg.type == TT.all).map((wg) => wg.search);
-      const ruleOrSearches = wg.rules.filter((wg) => wg.type == TT.or).map((wg) => wg.search);
-      const ruleNoneSearches = wg.rules.filter((wg) => wg.type == TT.none).map((wg) => wg.search);
+      const ruleAllSearches = wg.rules
+        .filter((wg) => wg.type == TT.all)
+        .map((wg) => wg.search);
+      const ruleOrSearches = wg.rules
+        .filter((wg) => wg.type == TT.or)
+        .map((wg) => wg.search);
+      const ruleNoneSearches = wg.rules
+        .filter((wg) => wg.type == TT.none)
+        .map((wg) => wg.search);
 
       // Build this rule's list of sources
       let rulesSources = new Array<LibrarySource>();
 
       // If we don't have any weights, calculate by just require/exclude
-      if (ruleAllSearches.length + ruleOrSearches.length + ruleNoneSearches.length == wg.rules.length) {
+      if (
+        ruleAllSearches.length +
+          ruleOrSearches.length +
+          ruleNoneSearches.length ==
+        wg.rules.length
+      ) {
         let sources = [];
         // For each source in the library
         for (let s of state.library) {
           let addedClip = false;
           let invalidClips = [];
           // If this is a video with clips
-          if (getSourceType(s.url) == ST.video && s.clips && s.clips.length > 0) {
+          if (
+            getSourceType(s.url) == ST.video &&
+            s.clips &&
+            s.clips.length > 0
+          ) {
             // Weight each clip first
             for (let c of s.clips) {
               let b = false;
@@ -1336,7 +1637,7 @@ export function generateScenes(state: State, s: Scene | SceneGrid, children: boo
                   break;
                 }
               }
-              if (b) continue
+              if (b) continue;
               for (let ns of noneSearches) {
                 if (filterSource(ns, s, c)) {
                   invalidClips.push(c.id);
@@ -1415,7 +1716,11 @@ export function generateScenes(state: State, s: Scene | SceneGrid, children: boo
               let addedClip = false;
               let invalidClips = [];
               // If this is a video with clips
-              if (getSourceType(s.url) == ST.video && s.clips && s.clips.length > 0) {
+              if (
+                getSourceType(s.url) == ST.video &&
+                s.clips &&
+                s.clips.length > 0
+              ) {
                 // Weight each clip first
                 for (let c of s.clips) {
                   let b = false;
@@ -1465,7 +1770,7 @@ export function generateScenes(state: State, s: Scene | SceneGrid, children: boo
                       break;
                     }
                   }
-                  if (b) continue
+                  if (b) continue;
                   for (let ns of noneSearches) {
                     if (filterSource(ns, s, c)) {
                       invalidClips.push(c.id);
@@ -1547,7 +1852,10 @@ export function generateScenes(state: State, s: Scene | SceneGrid, children: boo
         // If this adv rule is weighted, add the percentage of sources to the master list
         case TT.weight:
           wg.max = rulesSources.length;
-          let chosenSources = reduceList(randomizeList(rulesSources), Math.round(newScene.generatorMax * (wg.percent / 100)))
+          let chosenSources = reduceList(
+            randomizeList(rulesSources),
+            Math.round(newScene.generatorMax * (wg.percent / 100)),
+          );
           genSources = genSources.concat(chosenSources);
           wg.chosen = chosenSources.length;
           break;
@@ -1556,7 +1864,9 @@ export function generateScenes(state: State, s: Scene | SceneGrid, children: boo
           if (!reqAdvSources) {
             reqAdvSources = rulesSources;
           } else {
-            reqAdvSources = reqAdvSources.filter((s) => !!rulesSources.find((source) => source.url == s.url));
+            reqAdvSources = reqAdvSources.filter(
+              (s) => !!rulesSources.find((source) => source.url == s.url),
+            );
           }
           break;
         // If this adv rule is none, add the sources to the excl list
@@ -1572,15 +1882,27 @@ export function generateScenes(state: State, s: Scene | SceneGrid, children: boo
 
     // Now, build our simple rules
     // If we don't have any weights, calculate by just require/exclude
-    if (allSearches.length + noneSearches.length + allAdvRules.length + noneAdvRules.length == generatorWeights.length) {
+    if (
+      allSearches.length +
+        noneSearches.length +
+        allAdvRules.length +
+        noneAdvRules.length ==
+      generatorWeights.length
+    ) {
       let sources = [];
       for (let s of state.library) {
         // Filter out sources which are not in required list
-        if (reqAdvSources && !reqAdvSources.find((source) => source.id == s.id)) {
+        if (
+          reqAdvSources &&
+          !reqAdvSources.find((source) => source.id == s.id)
+        ) {
           continue;
         }
         // Filter out sources which are in exclude list
-        if (excAdvSources && excAdvSources.find((source) => source.id == s.id)) {
+        if (
+          excAdvSources &&
+          excAdvSources.find((source) => source.id == s.id)
+        ) {
           continue;
         }
 
@@ -1647,23 +1969,35 @@ export function generateScenes(state: State, s: Scene | SceneGrid, children: boo
       genSources = sources;
     } else {
       // Otherwise, generate sources for each weight
-      for (let wg of generatorWeights.filter((wg) => !wg.rules && wg.type == TT.weight)) {
+      for (let wg of generatorWeights.filter(
+        (wg) => !wg.rules && wg.type == TT.weight,
+      )) {
         let sources = [];
         // For each source in the library
         for (let s of state.library) {
           // Filter out sources which are not in required list
-          if (reqAdvSources && !reqAdvSources.find((source) => source.id == s.id)) {
+          if (
+            reqAdvSources &&
+            !reqAdvSources.find((source) => source.id == s.id)
+          ) {
             continue;
           }
           // Filter out sources which are in exclude list
-          if (excAdvSources && excAdvSources.find((source) => source.id == s.id)) {
+          if (
+            excAdvSources &&
+            excAdvSources.find((source) => source.id == s.id)
+          ) {
             continue;
           }
 
           let addedClip = false;
           let invalidClips = [];
           // If this is a video with clips
-          if (getSourceType(s.url) == ST.video && s.clips && s.clips.length > 0) {
+          if (
+            getSourceType(s.url) == ST.video &&
+            s.clips &&
+            s.clips.length > 0
+          ) {
             // Weight each clip first
             for (let c of s.clips) {
               let b = false;
@@ -1732,20 +2066,32 @@ export function generateScenes(state: State, s: Scene | SceneGrid, children: boo
           sources.push(s);
         }
         wg.max = sources.length;
-        let chosenSources = reduceList(sources, Math.round(newScene.generatorMax * (wg.percent / 100)));
+        let chosenSources = reduceList(
+          sources,
+          Math.round(newScene.generatorMax * (wg.percent / 100)),
+        );
         genSources = genSources.concat(chosenSources);
         wg.chosen = chosenSources.length;
       }
     }
-    genSources = reduceList(randomizeList(removeDuplicatesBy((s: LibrarySource) => s.url, genSources)), newScene.generatorMax);
+    genSources = reduceList(
+      randomizeList(
+        removeDuplicatesBy((s: LibrarySource) => s.url, genSources),
+      ),
+      newScene.generatorMax,
+    );
     genSources = JSON.parse(JSON.stringify(genSources));
-    genSources.forEach((s, i) => s.id = i);
+    genSources.forEach((s, i) => (s.id = i));
     newScene.sources = genSources;
   }
-  return {scenes: newScenes};
+  return { scenes: newScenes };
 }
 
-export function updateScene(state: State, scene: Scene, fn: (scene: Scene) => void): Object {
+export function updateScene(
+  state: State,
+  scene: Scene,
+  fn: (scene: Scene) => void,
+): Object {
   const newScenes = Array<Scene>();
   for (let s of state.scenes) {
     if (s.id == scene.id) {
@@ -1756,10 +2102,14 @@ export function updateScene(state: State, scene: Scene, fn: (scene: Scene) => vo
       newScenes.push(s);
     }
   }
-  return {scenes: newScenes};
+  return { scenes: newScenes };
 }
 
-export function updateGrid(state: State, grid: SceneGrid, fn: (grid: SceneGrid) => void): Object {
+export function updateGrid(
+  state: State,
+  grid: SceneGrid,
+  fn: (grid: SceneGrid) => void,
+): Object {
   const newGrids = Array<SceneGrid>();
   for (let g of state.grids) {
     if (g.id == grid.id) {
@@ -1770,28 +2120,37 @@ export function updateGrid(state: State, grid: SceneGrid, fn: (grid: SceneGrid) 
       newGrids.push(g);
     }
   }
-  return {grids: newGrids};
+  return { grids: newGrids };
 }
 
-export function replaceSceneGroups(state: State, groups: Array<SceneGroup>): Object {
-  return {sceneGroups: groups};
+export function replaceSceneGroups(
+  state: State,
+  groups: Array<SceneGroup>,
+): Object {
+  return { sceneGroups: groups };
 }
 
 export function replaceScenes(state: State, scenes: Array<Scene>): Object {
-  return {scenes: scenes};
+  return { scenes: scenes };
 }
 
 export function replaceGrids(state: State, grids: Array<SceneGrid>): Object {
-  return {grids: grids};
+  return { grids: grids };
 }
 
-export function updatePlaylists(state: State, fn: (playlists: Array<Playlist>) => void): Object {
+export function updatePlaylists(
+  state: State,
+  fn: (playlists: Array<Playlist>) => void,
+): Object {
   const playlistsCopy = JSON.parse(JSON.stringify(state.playlists));
   fn(playlistsCopy);
-  return {playlists: playlistsCopy};
+  return { playlists: playlistsCopy };
 }
 
-export function updateAudioLibrary(state: State, fn: (audios: Array<Audio>) => void): Object {
+export function updateAudioLibrary(
+  state: State,
+  fn: (audios: Array<Audio>) => void,
+): Object {
   const audiosCopy = JSON.parse(JSON.stringify(state.audios));
   fn(audiosCopy);
   let audioSelected = JSON.parse(JSON.stringify(state.audioSelected));
@@ -1800,7 +2159,7 @@ export function updateAudioLibrary(state: State, fn: (audios: Array<Audio>) => v
       audioSelected = audioSelected.filter((s: LibrarySource) => s.url != url);
     }
   }
-  return {audios: audiosCopy, audioSelected: audioSelected};
+  return { audios: audiosCopy, audioSelected: audioSelected };
 }
 
 export function updateScript(state: State, script: CaptionScript): Object {
@@ -1814,39 +2173,55 @@ export function updateScript(state: State, script: CaptionScript): Object {
       }
     }
   }
-  return {scenes: scenesCopy}
+  return { scenes: scenesCopy };
 }
 
-export function updateScriptLibrary(state: State, fn: (scripts: Array<CaptionScript>) => void): Object {
+export function updateScriptLibrary(
+  state: State,
+  fn: (scripts: Array<CaptionScript>) => void,
+): Object {
   const scriptsCopy = JSON.parse(JSON.stringify(state.scripts));
   fn(scriptsCopy);
   let scriptSelected = JSON.parse(JSON.stringify(state.scriptSelected));
   for (let url of scriptSelected) {
     if (scriptsCopy.find((s: LibrarySource) => s.url == url) == null) {
-      scriptSelected = scriptSelected.filter((s: LibrarySource) => s.url != url);
+      scriptSelected = scriptSelected.filter(
+        (s: LibrarySource) => s.url != url,
+      );
     }
   }
-  return {scripts: scriptsCopy, scriptSelected: scriptSelected};
+  return { scripts: scriptsCopy, scriptSelected: scriptSelected };
 }
 
-export function updateLibrary(state: State, fn: (library: Array<LibrarySource>) => void): Object {
+export function updateLibrary(
+  state: State,
+  fn: (library: Array<LibrarySource>) => void,
+): Object {
   const libraryCopy = JSON.parse(JSON.stringify(state.library));
   fn(libraryCopy);
   let librarySelected = JSON.parse(JSON.stringify(state.librarySelected));
   for (let url of librarySelected) {
     if (libraryCopy.find((s: LibrarySource) => s.url == url) == null) {
-      librarySelected = librarySelected.filter((s: LibrarySource) => s.url != url);
+      librarySelected = librarySelected.filter(
+        (s: LibrarySource) => s.url != url,
+      );
     }
   }
-  return {library: libraryCopy, librarySelected: librarySelected};
+  return { library: libraryCopy, librarySelected: librarySelected };
 }
 
 export function clearBlacklist(state: State, sourceURL: string): Object {
   return blacklistFile(state, sourceURL, null);
 }
 
-export function editBlacklist(state: State, sourceURL: string, blacklist: string): Object {
-  const newBlacklist = blacklist.split("\n").filter((s) => /^\w*$/.exec(s) == null);
+export function editBlacklist(
+  state: State,
+  sourceURL: string,
+  blacklist: string,
+): Object {
+  const newBlacklist = blacklist
+    .split("\n")
+    .filter((s) => /^\w*$/.exec(s) == null);
   const newLibrary = state.library;
   const newScenes = state.scenes;
   const source = newLibrary.find((s) => s.url == sourceURL);
@@ -1859,15 +2234,20 @@ export function editBlacklist(state: State, sourceURL: string, blacklist: string
       sceneSource.blacklist = newBlacklist;
     }
   }
-  return {library: newLibrary, scenes: newScenes};
+  return { library: newLibrary, scenes: newScenes };
 }
 
-export function blacklistFile(state: State, sourceURL: string, fileToBlacklist: string): Object {
+export function blacklistFile(
+  state: State,
+  sourceURL: string,
+  fileToBlacklist: string,
+): Object {
   const newLibrary = state.library;
   const newScenes = state.scenes;
   const source = newLibrary.find((s) => s.url == sourceURL);
   if (source) {
-    if (source.blacklist === undefined || fileToBlacklist == null) source.blacklist = [];
+    if (source.blacklist === undefined || fileToBlacklist == null)
+      source.blacklist = [];
     if (fileToBlacklist != null) {
       source.blacklist.push(fileToBlacklist);
     }
@@ -1875,7 +2255,8 @@ export function blacklistFile(state: State, sourceURL: string, fileToBlacklist: 
   for (let scene of newScenes) {
     const sceneSource = scene.sources.find((s) => s.url == sourceURL);
     if (sceneSource) {
-      if (sceneSource.blacklist === undefined || fileToBlacklist == null) sceneSource.blacklist = [];
+      if (sceneSource.blacklist === undefined || fileToBlacklist == null)
+        sceneSource.blacklist = [];
       if (fileToBlacklist != null) {
         if (!sceneSource.blacklist.includes(fileToBlacklist)) {
           sceneSource.blacklist.push(fileToBlacklist);
@@ -1884,17 +2265,23 @@ export function blacklistFile(state: State, sourceURL: string, fileToBlacklist: 
     }
   }
   if (fileToBlacklist != null) {
-    const cachePath = getCachePath(sourceURL, state.config) + getFileName(fileToBlacklist);
+    const cachePath =
+      getCachePath(sourceURL, state.config) + getFileName(fileToBlacklist);
     fs_unlink(cachePath, (err) => {
       if (err) {
         console.error(err);
       }
     });
   }
-  return {library: newLibrary, scenes: newScenes};
+  return { library: newLibrary, scenes: newScenes };
 }
 
-export function setCount(state: State, sourceURL: string, count: number, countComplete: boolean): Object {
+export function setCount(
+  state: State,
+  sourceURL: string,
+  count: number,
+  countComplete: boolean,
+): Object {
   const newLibrary = state.library;
   const newScenes = state.scenes;
   const source = newLibrary.find((s) => s.url == sourceURL);
@@ -1912,7 +2299,8 @@ export function setCount(state: State, sourceURL: string, count: number, countCo
     const sceneSource = scene.sources.find((s) => s.url == sourceURL);
     if (sceneSource) {
       if (sceneSource.count === undefined) sceneSource.count = 0;
-      if (sceneSource.countComplete === undefined) sceneSource.countComplete = false;
+      if (sceneSource.countComplete === undefined)
+        sceneSource.countComplete = false;
       if (countComplete) {
         sceneSource.count = count;
         sceneSource.countComplete = true;
@@ -1921,7 +2309,7 @@ export function setCount(state: State, sourceURL: string, count: number, countCo
       }
     }
   }
-  return {library: newLibrary, scenes: newScenes};
+  return { library: newLibrary, scenes: newScenes };
 }
 
 export function updateTags(state: State, tags: Array<Tag>): Object {
@@ -2089,43 +2477,46 @@ export function updateTags(state: State, tags: Array<Tag>): Object {
       }
     }
   }
-  return {tags: tags, library: newLibrary};
+  return { tags: tags, library: newLibrary };
 }
 
 export function addToPlaylist(state: State): Object {
   if (state.specialMode == SP.addToPlaylist) {
-    return {specialMode: null, audioOpenTab: 3};
+    return { specialMode: null, audioOpenTab: 3 };
   } else {
-    return {specialMode: SP.addToPlaylist, audioOpenTab: 3};
+    return { specialMode: SP.addToPlaylist, audioOpenTab: 3 };
   }
 }
 
 export function batchClip(state: State): Object {
   if (state.specialMode == SP.batchClip) {
-    return {specialMode: null, audioOpenTab: 3};
+    return { specialMode: null, audioOpenTab: 3 };
   } else {
-    return {specialMode: SP.batchClip, audioOpenTab: 3};
+    return { specialMode: SP.batchClip, audioOpenTab: 3 };
   }
 }
 
 export function batchTag(state: State): Object {
   if (state.specialMode == SP.batchTag) {
-    return {specialMode: null, audioOpenTab: 3};
+    return { specialMode: null, audioOpenTab: 3 };
   } else {
-    return {specialMode: SP.batchTag, audioOpenTab: 3};
+    return { specialMode: SP.batchTag, audioOpenTab: 3 };
   }
-
 }
 
 export function batchEdit(state: State): Object {
   if (state.specialMode == SP.batchEdit) {
-    return {specialMode: null, audioOpenTab: 3};
+    return { specialMode: null, audioOpenTab: 3 };
   } else {
-    return {specialMode: SP.batchEdit, audioOpenTab: 3};
+    return { specialMode: SP.batchEdit, audioOpenTab: 3 };
   }
 }
 
-export function toggleAudioTag(state: State, sourceID: number, tag: Tag): Object {
+export function toggleAudioTag(
+  state: State,
+  sourceID: number,
+  tag: Tag,
+): Object {
   const newAudios = state.audios;
   const source = newAudios.find((s) => s.id == sourceID);
   if (source) {
@@ -2135,10 +2526,14 @@ export function toggleAudioTag(state: State, sourceID: number, tag: Tag): Object
       source.tags.push(tag);
     }
   }
-  return {audios: newAudios};
+  return { audios: newAudios };
 }
 
-export function toggleScriptTag(state: State, sourceID: number, tag: Tag): Object {
+export function toggleScriptTag(
+  state: State,
+  sourceID: number,
+  tag: Tag,
+): Object {
   const newScripts = state.scripts;
   const source = newScripts.find((s) => s.id == sourceID);
   if (source) {
@@ -2148,7 +2543,7 @@ export function toggleScriptTag(state: State, sourceID: number, tag: Tag): Objec
       source.tags.push(tag);
     }
   }
-  return {scripts: newScripts};
+  return { scripts: newScripts };
 }
 
 export function toggleTag(state: State, sourceID: number, tag: Tag): Object {
@@ -2168,7 +2563,7 @@ export function toggleTag(state: State, sourceID: number, tag: Tag): Object {
       }
     }
   }
-  return {library: newLibrary, scenes: newScenes};
+  return { library: newLibrary, scenes: newScenes };
 }
 
 export function inheritTags(state: State, sourceID: number): Object {
@@ -2192,22 +2587,44 @@ export function inheritTags(state: State, sourceID: number): Object {
       }
     }
   }
-  return {library: newLibrary, scenes: newScenes};
+  return { library: newLibrary, scenes: newScenes };
 }
 
 export function addTracks(state: State, playlistIndex: number) {
-  return {route: state.route.concat(new Route({kind: 'audios', value: playlistIndex})), specialMode: SP.select, audioSelected: new Array<string>(), audioOpenTab: 3};
+  return {
+    route: state.route.concat(
+      new Route({ kind: "audios", value: playlistIndex }),
+    ),
+    specialMode: SP.select,
+    audioSelected: new Array<string>(),
+    audioOpenTab: 3,
+  };
 }
 
 export function addScript(state: State, playlistIndex: number) {
-  return {route: state.route.concat(new Route({kind: 'scripts', value: playlistIndex})), specialMode: SP.select, scriptSelected: new Array<string>()};
+  return {
+    route: state.route.concat(
+      new Route({ kind: "scripts", value: playlistIndex }),
+    ),
+    specialMode: SP.select,
+    scriptSelected: new Array<string>(),
+  };
 }
 
 export function addScriptSingle(state: State) {
-  return {route: state.route.concat(new Route({kind: 'scripts', value: null})), specialMode: SP.selectSingle, scriptSelected: new Array<string>()};
+  return {
+    route: state.route.concat(new Route({ kind: "scripts", value: null })),
+    specialMode: SP.selectSingle,
+    scriptSelected: new Array<string>(),
+  };
 }
 
-export function addSource(state: State, scene: Scene, type: string, ...args: any[]): Object {
+export function addSource(
+  state: State,
+  scene: Scene,
+  type: string,
+  ...args: any[]
+): Object {
   const handleArgs = (s: Scene) => {
     if (args.length > 0) {
       let importURL = args[0];
@@ -2219,10 +2636,16 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
         }
 
         // Update hastebin URL (if present)
-        s.scriptPlaylists.push({scripts: [new CaptionScript({url: "https://hastebin.com/raw/" + importURL})], shuffle: false, repeat: RP.none});
+        s.scriptPlaylists.push({
+          scripts: [
+            new CaptionScript({ url: "https://hastebin.com/raw/" + importURL }),
+          ],
+          shuffle: false,
+          repeat: RP.none,
+        });
       }
     }
-  }
+  };
 
   switch (type) {
     case "tutorial":
@@ -2239,14 +2662,16 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
         const animalTag = new Tag();
         animalTag.id = 1000001;
         animalTag.name = "Animals";
-        combinedSources.unshift(new LibrarySource({
-          url: "https://imgur.com/a/mMslVXT",
-          id: id,
-          tags: [cuteTag, animalTag],
-          count: 100,
-        }));
+        combinedSources.unshift(
+          new LibrarySource({
+            url: "https://imgur.com/a/mMslVXT",
+            id: id,
+            tags: [cuteTag, animalTag],
+            count: 100,
+          }),
+        );
         s.sources = combinedSources;
-      })
+      });
 
     case AF.library:
       return openLibraryImport(state);
@@ -2257,30 +2682,38 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
           return updateScene(state, scene, (s) => {
             addSources(s.sources, [""], state.library);
             handleArgs(s);
-          })
+          });
         } else {
-          return updateLibrary(state, (l) => {addSources(l, [""], state.library)});
+          return updateLibrary(state, (l) => {
+            addSources(l, [""], state.library);
+          });
         }
       } else {
         if (scene != null) {
           return updateScene(state, scene, (s) => {
             addSources(s.sources, args[0], state.library);
             handleArgs(s);
-          })
+          });
         } else {
-          return updateLibrary(state, (l) =>  addSources(l, args[0], state.library));
+          return updateLibrary(state, (l) =>
+            addSources(l, args[0], state.library),
+          );
         }
       }
 
     case AF.list:
-      let newSources = Array.from(args[0].trim().split("\n")).filter((s: string) => s.length > 0) as Array<string>;
+      let newSources = Array.from(args[0].trim().split("\n")).filter(
+        (s: string) => s.length > 0,
+      ) as Array<string>;
       if (scene != null) {
         return updateScene(state, scene, (s) => {
           addSources(s.sources, newSources, state.library);
           handleArgs(s);
-        })
+        });
       } else {
-        return updateLibrary(state, (l) =>  addSources(l, newSources, state.library));
+        return updateLibrary(state, (l) =>
+          addSources(l, newSources, state.library),
+        );
       }
 
     case AF.directory:
@@ -2295,7 +2728,7 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
       // } else {
       //   return updateLibrary(state, (l) =>  addSources(l, dResult, state.library));
       // }
-      break
+      break;
 
     case AF.videos:
       // let vResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
@@ -2310,30 +2743,30 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
       // } else {
       //   return updateLibrary(state, (l) =>  addSources(l, vResult, state.library));
       // }
-      break
+      break;
 
     case AF.videoDir:
-      // FIXME
-      // let vdResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
-      //   {filters: [{name:'All Files (*.*)', extensions: ['*']}], properties: ['openDirectory', 'multiSelections']});
-      // if (!vdResult) return;
-      // let rvResult = new Array<string>();
-      // for (let path of vdResult) {
-      //   if (fs_isDirectory(path)) {
-      //     rvResult = rvResult.concat(getFilesRecursively(path));
-      //   } else {
-      //     rvResult.push(path);
-      //   }
-      // }
-      // rvResult = rvResult.filter((r) => isVideo(r, true) || isVideoPlaylist(r, true));
-      // if (scene != null) {
-      //   return updateScene(state, scene, (s) => {
-      //     addSources(s.sources, rvResult, state.library);
-      //     handleArgs(s);
-      //   })
-      // } else {
-      //   return updateLibrary(state, (l) =>  addSources(l, rvResult, state.library));
-      // }
+    // FIXME
+    // let vdResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+    //   {filters: [{name:'All Files (*.*)', extensions: ['*']}], properties: ['openDirectory', 'multiSelections']});
+    // if (!vdResult) return;
+    // let rvResult = new Array<string>();
+    // for (let path of vdResult) {
+    //   if (fs_isDirectory(path)) {
+    //     rvResult = rvResult.concat(getFilesRecursively(path));
+    //   } else {
+    //     rvResult.push(path);
+    //   }
+    // }
+    // rvResult = rvResult.filter((r) => isVideo(r, true) || isVideoPlaylist(r, true));
+    // if (scene != null) {
+    //   return updateScene(state, scene, (s) => {
+    //     addSources(s.sources, rvResult, state.library);
+    //     handleArgs(s);
+    //   })
+    // } else {
+    //   return updateLibrary(state, (l) =>  addSources(l, rvResult, state.library));
+    // }
 
     case GT.local:
       if (!args || args.length < 2) {
@@ -2347,9 +2780,11 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
         return updateScene(state, scene, (s) => {
           addSources(s.sources, getImportURLs(args[0], rootDir), state.library);
           handleArgs(s);
-        })
+        });
       } else {
-        return updateLibrary(state, (l) =>  addSources(l, getImportURLs(args[0], rootDir), state.library));
+        return updateLibrary(state, (l) =>
+          addSources(l, getImportURLs(args[0], rootDir), state.library),
+        );
       }
 
     case GT.tumblr:
@@ -2360,14 +2795,16 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
         return updateScene(state, scene, (s) => {
           addSources(s.sources, getImportURLs(args[0]), state.library);
           handleArgs(s);
-        })
+        });
       } else {
-        return updateLibrary(state, (l) =>  addSources(l, getImportURLs(args[0]), state.library));
+        return updateLibrary(state, (l) =>
+          addSources(l, getImportURLs(args[0]), state.library),
+        );
       }
   }
 }
 
-function getImportURLs(importURL: string, rootDir?: string): string[]  {
+function getImportURLs(importURL: string, rootDir?: string): string[] {
   if (importURL.includes("sources=")) {
     // Remove everything before "sources="
     importURL = importURL.substring(importURL.indexOf("sources=") + 8);
@@ -2386,10 +2823,14 @@ function getImportURLs(importURL: string, rootDir?: string): string[]  {
       } else {
         fullPath = "http://" + importURLs[u] + ".tumblr.com";
       }
-      if (importURLs.includes(fullPath) || importURLs[u] === path_sep() || importURLs[u] === "") {
+      if (
+        importURLs.includes(fullPath) ||
+        importURLs[u] === path_sep() ||
+        importURLs[u] === ""
+      ) {
         // Remove index and push u back
         importURLs.splice(u, 1);
-        u -= 1
+        u -= 1;
       } else {
         importURLs[u] = fullPath;
       }
@@ -2399,7 +2840,10 @@ function getImportURLs(importURL: string, rootDir?: string): string[]  {
   return [];
 }
 
-function mergeSources(originalSources: Array<LibrarySource>, newSources: Array<LibrarySource>): Array<LibrarySource> {
+function mergeSources(
+  originalSources: Array<LibrarySource>,
+  newSources: Array<LibrarySource>,
+): Array<LibrarySource> {
   // dedup
   let sourceURLs = originalSources.map((s) => s.url);
   newSources = newSources.filter((s) => !sourceURLs.includes(s.url));
@@ -2419,8 +2863,11 @@ function mergeSources(originalSources: Array<LibrarySource>, newSources: Array<L
   return combinedSources;
 }
 
-
-function addSources(originalSources: Array<LibrarySource>, newSources: Array<string>, library: Array<LibrarySource>) {
+function addSources(
+  originalSources: Array<LibrarySource>,
+  newSources: Array<string>,
+  library: Array<LibrarySource>,
+) {
   // dedup
   newSources = [...new Set(newSources)];
   let sourceURLs = originalSources.map((s) => s.url);
@@ -2433,23 +2880,29 @@ function addSources(originalSources: Array<LibrarySource>, newSources: Array<str
 
   for (let url of newSources) {
     const librarySource = library.find((s) => s.url === url);
-    originalSources.unshift(new LibrarySource({
-      url: url,
-      id: id,
-      lastCheck: new Date(),
-      tags: librarySource ? librarySource.tags : [],
-      clips: librarySource ? librarySource.clips : [],
-      blacklist: librarySource ? librarySource.blacklist : [],
-      count: librarySource ? librarySource.count : 0,
-      countComplete: librarySource ? librarySource.countComplete : false,
-    }));
+    originalSources.unshift(
+      new LibrarySource({
+        url: url,
+        id: id,
+        lastCheck: new Date(),
+        tags: librarySource ? librarySource.tags : [],
+        clips: librarySource ? librarySource.clips : [],
+        blacklist: librarySource ? librarySource.blacklist : [],
+        count: librarySource ? librarySource.count : 0,
+        countComplete: librarySource ? librarySource.countComplete : false,
+      }),
+    );
     id += 1;
   }
 }
 
-export function sortScene(state: State, algorithm: string, ascending: boolean): Object {
+export function sortScene(
+  state: State,
+  algorithm: string,
+  ascending: boolean,
+): Object {
   if (algorithm == SF.random) {
-    return {scenes: randomizeList(state.scenes.concat())}
+    return { scenes: randomizeList(state.scenes.concat()) };
   }
   const getName = (a: Scene) => {
     return a.name.toLowerCase();
@@ -2464,31 +2917,57 @@ export function sortScene(state: State, algorithm: string, ascending: boolean): 
     return "0";
   };
   const newScenes = state.scenes.sort(
-    sortFunction(algorithm, ascending, getName, null, getCount, getType,
-      algorithm == SF.type ? SF.alpha : null));
-  return {scenes: newScenes}
+    sortFunction(
+      algorithm,
+      ascending,
+      getName,
+      null,
+      getCount,
+      getType,
+      algorithm == SF.type ? SF.alpha : null,
+    ),
+  );
+  return { scenes: newScenes };
 }
 
-export function sortPlaylist(state: State, playlistName: string, algorithm: string, ascending: boolean): Object {
+export function sortPlaylist(
+  state: State,
+  playlistName: string,
+  algorithm: string,
+  ascending: boolean,
+): Object {
   const newPlaylists = Array.from(state.playlists);
   const playlist = newPlaylists.find((p) => p.name == playlistName);
   if (playlist) {
-    playlist.audios = playlist.audios.map((aID) => state.audios.find((a) => a.id==aID)).concat().sort(audioSortFunction(algorithm, ascending)).map((a) => a.id);
-    return {playlists: newPlaylists};
+    playlist.audios = playlist.audios
+      .map((aID) => state.audios.find((a) => a.id == aID))
+      .concat()
+      .sort(audioSortFunction(algorithm, ascending))
+      .map((a) => a.id);
+    return { playlists: newPlaylists };
   }
   return {};
 }
 
-export function sortAudioSources(state: State, algorithm: string, ascending: boolean): Object {
+export function sortAudioSources(
+  state: State,
+  algorithm: string,
+  ascending: boolean,
+): Object {
   if (algorithm == ASF.random) {
-    return {audios: randomizeList(state.audios.concat())};
+    return { audios: randomizeList(state.audios.concat()) };
   } else {
-    const newLibrary = state.audios.concat().sort(audioSortFunction(algorithm, ascending));
-    return {audios: newLibrary};
+    const newLibrary = state.audios
+      .concat()
+      .sort(audioSortFunction(algorithm, ascending));
+    return { audios: newLibrary };
   }
 }
 
-function audioSortFunction(algorithm: string, ascending: boolean): (a: Audio, b: Audio) => number {
+function audioSortFunction(
+  algorithm: string,
+  ascending: boolean,
+): (a: Audio, b: Audio) => number {
   return (a, b) => {
     let secondary = null;
     let aValue: any, bValue: any;
@@ -2498,11 +2977,11 @@ function audioSortFunction(algorithm: string, ascending: boolean): (a: Audio, b:
         bValue = b.url;
         break;
       case ASF.name:
-        const reA = /^(A\s|a\s|The\s|the\s)/g
+        const reA = /^(A\s|a\s|The\s|the\s)/g;
         aValue = a.name.replace(reA, "");
         bValue = b.name.replace(reA, "");
 
-        const compare = aValue.localeCompare(bValue, 'en', { numeric: true });
+        const compare = aValue.localeCompare(bValue, "en", { numeric: true });
         return ascending ? compare : compare * -1;
       case ASF.artist:
         aValue = a.artist;
@@ -2550,15 +3029,24 @@ function audioSortFunction(algorithm: string, ascending: boolean): (a: Audio, b:
   };
 }
 
-export function sortScripts(state: State, algorithm: string, ascending: boolean): Object {
+export function sortScripts(
+  state: State,
+  algorithm: string,
+  ascending: boolean,
+): Object {
   if (algorithm == SF.random) {
-    return {scripts: randomizeList(state.scripts.concat())};
+    return { scripts: randomizeList(state.scripts.concat()) };
   }
-  const newLibrary = state.scripts.concat().sort(scriptSortFunction(algorithm, ascending));
-  return {scripts: newLibrary};
+  const newLibrary = state.scripts
+    .concat()
+    .sort(scriptSortFunction(algorithm, ascending));
+  return { scripts: newLibrary };
 }
 
-function scriptSortFunction(algorithm: string, ascending: boolean): (a: CaptionScript, b: CaptionScript) => number {
+function scriptSortFunction(
+  algorithm: string,
+  ascending: boolean,
+): (a: CaptionScript, b: CaptionScript) => number {
   return (a, b) => {
     let aValue: any, bValue: any;
     switch (algorithm) {
@@ -2585,21 +3073,32 @@ function scriptSortFunction(algorithm: string, ascending: boolean): (a: CaptionS
     } else {
       return 0;
     }
-  }
+  };
 }
 
-export function sortSources(state: State, scene: Scene, algorithm: string, ascending: boolean): Object {
+export function sortSources(
+  state: State,
+  scene: Scene,
+  algorithm: string,
+  ascending: boolean,
+): Object {
   if (algorithm == SF.random) {
     if (scene != null) {
-      return updateScene(state, scene, (s) => s.sources = randomizeList(s.sources.concat()));
+      return updateScene(
+        state,
+        scene,
+        (s) => (s.sources = randomizeList(s.sources.concat())),
+      );
     } else {
       const newLibrary = randomizeList(state.library.concat());
-      return {library: newLibrary};
+      return { library: newLibrary };
     }
   }
   const getName = (a: LibrarySource) => {
     const sourceType = getSourceType(a.url);
-    return sourceType == ST.video || sourceType == ST.playlist ? getFileName(a.url).toLowerCase() : getFileGroup(a.url).toLowerCase();
+    return sourceType == ST.video || sourceType == ST.playlist
+      ? getFileName(a.url).toLowerCase()
+      : getFileGroup(a.url).toLowerCase();
   };
   const getFullName = (a: LibrarySource) => {
     return a.url.toLowerCase();
@@ -2613,7 +3112,7 @@ export function sortSources(state: State, scene: Scene, algorithm: string, ascen
     return a.count;
   };
   const getType = (a: LibrarySource) => {
-    return getSourceType(a.url)
+    return getSourceType(a.url);
   };
   let secondary: string = null;
   if (algorithm == SF.alpha) {
@@ -2623,27 +3122,63 @@ export function sortSources(state: State, scene: Scene, algorithm: string, ascen
     secondary = SF.alpha;
   }
   if (scene != null) {
-    return updateScene(state, scene, (s) => s.sources = s.sources.sort(
-      sortFunction(algorithm, ascending, getName, getFullName, getCount, getType, secondary)));
+    return updateScene(
+      state,
+      scene,
+      (s) =>
+        (s.sources = s.sources.sort(
+          sortFunction(
+            algorithm,
+            ascending,
+            getName,
+            getFullName,
+            getCount,
+            getType,
+            secondary,
+          ),
+        )),
+    );
   } else {
-    const newLibrary = state.library.concat().sort(
-      sortFunction(algorithm, ascending, getName, getFullName, getCount, getType, secondary));
-    return {library: newLibrary};
+    const newLibrary = state.library
+      .concat()
+      .sort(
+        sortFunction(
+          algorithm,
+          ascending,
+          getName,
+          getFullName,
+          getCount,
+          getType,
+          secondary,
+        ),
+      );
+    return { library: newLibrary };
   }
 }
 
-export function sortTags(state: State, algorithm: string, ascending: boolean): Object {
+export function sortTags(
+  state: State,
+  algorithm: string,
+  ascending: boolean,
+): Object {
   const getName = (a: Tag) => {
     return a.name.toLowerCase();
   };
   const newTags = state.tags.sort(
-    sortFunction(algorithm, ascending, getName, null, null, null, null));
-  return {tags: newTags}
+    sortFunction(algorithm, ascending, getName, null, null, null, null),
+  );
+  return { tags: newTags };
 }
 
-function sortFunction(algorithm: string, ascending: boolean, getName: (a: any) => string,
-                      getFullName: (a: any) => string, getCount: (a: any) => number,
-                      getType: (a: any) => string, secondary: string): (a: any, b: any) => number {
+function sortFunction(
+  algorithm: string,
+  ascending: boolean,
+  getName: (a: any) => string,
+  getFullName: (a: any) => string,
+  getCount: (a: any) => number,
+  getType: (a: any) => string,
+  secondary: string,
+): (a: any, b: any) => number {
   return (a, b) => {
     let aValue: any, bValue: any;
     switch (algorithm) {
@@ -2684,7 +3219,11 @@ function sortFunction(algorithm: string, ascending: boolean, getName: (a: any) =
         bValue = "";
     }
 
-    if (algorithm == SF.duration || algorithm == SF.resolution || algorithm == SF.fileSize) {
+    if (
+      algorithm == SF.duration ||
+      algorithm == SF.resolution ||
+      algorithm == SF.fileSize
+    ) {
       if (aValue == null && bValue != null) {
         return 1;
       } else if (bValue == null && aValue != null) {
@@ -2699,19 +3238,29 @@ function sortFunction(algorithm: string, ascending: boolean, getName: (a: any) =
       return ascending ? 1 : -1;
     } else {
       if (!!secondary) {
-        return sortFunction(secondary, true, getName, getFullName, getCount, getType, null)(a, b);
+        return sortFunction(
+          secondary,
+          true,
+          getName,
+          getFullName,
+          getCount,
+          getType,
+          null,
+        )(a, b);
       } else {
         return 0;
       }
     }
-  }
+  };
 }
 
 export function downloadSource(state: State, source: LibrarySource): Object {
-  const sourceURL = source.url.startsWith("http") ? source.url : source.url.replace(/\//g, path_sep());
+  const sourceURL = source.url.startsWith("http")
+    ? source.url
+    : source.url.replace(/\//g, path_sep());
   let librarySource = state.library.find((s) => s.url == sourceURL);
   if (librarySource != null) {
-    librarySource.disabledClips =  [];
+    librarySource.disabledClips = [];
     let id = state.scenes.length + 1;
     state.scenes.forEach((s: Scene) => {
       id = Math.max(s.id + 1, id);
@@ -2745,10 +3294,13 @@ export function downloadSource(state: State, source: LibrarySource): Object {
     }
     return {
       scenes: state.scenes.concat([tempScene]),
-      route: state.route.concat([new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'libraryplay', value: tempScene.id})]),
+      route: state.route.concat([
+        new Route({ kind: "scene", value: tempScene.id }),
+        new Route({ kind: "libraryplay", value: tempScene.id }),
+      ]),
     };
   } else {
-    source.disabledClips =  [];
+    source.disabledClips = [];
     let id = state.scenes.length + 1;
     state.scenes.forEach((s: Scene) => {
       id = Math.max(s.id + 1, id);
@@ -2782,7 +3334,10 @@ export function downloadSource(state: State, source: LibrarySource): Object {
     }
     return {
       scenes: state.scenes.concat([tempScene]),
-      route: state.route.concat([new Route({kind: 'scene', value: tempScene.id}), new Route({kind: 'libraryplay', value: tempScene.id})]),
+      route: state.route.concat([
+        new Route({ kind: "scene", value: tempScene.id }),
+        new Route({ kind: "libraryplay", value: tempScene.id }),
+      ]),
     };
   }
 }
@@ -2793,7 +3348,9 @@ export function exportScene(state: State, scene: Scene): Object {
   const sceneCopy = JSON.parse(JSON.stringify(scene)); // Make a copy
   sceneCopy.generatorWeights = null;
   sceneCopy.openTab = 3;
-  sceneCopy.overlays = sceneCopy.overlays.filter((o: Overlay) => o.sceneID != 0);
+  sceneCopy.overlays = sceneCopy.overlays.filter(
+    (o: Overlay) => o.sceneID != 0,
+  );
   scenesToExport.push(sceneCopy);
 
   // Add overlays
@@ -2818,9 +3375,16 @@ export function exportScene(state: State, scene: Scene): Object {
                   if (cell.overlayEnabled) {
                     for (let co of cell.overlays) {
                       if (!co.sceneID.toString().startsWith("999")) {
-                        const overlay = state.scenes.find((s) => s.id == co.sceneID);
-                        if (overlay && !scenesToExport.find((s) => s.id == co.sceneID)) {
-                          const overlayCopy = JSON.parse(JSON.stringify(overlay)); // Make a copy
+                        const overlay = state.scenes.find(
+                          (s) => s.id == co.sceneID,
+                        );
+                        if (
+                          overlay &&
+                          !scenesToExport.find((s) => s.id == co.sceneID)
+                        ) {
+                          const overlayCopy = JSON.parse(
+                            JSON.stringify(overlay),
+                          ); // Make a copy
                           overlayCopy.generatorWeights = null;
                           overlayCopy.openTab = 3;
                           overlayCopy.overlays = [];
@@ -2865,9 +3429,17 @@ export function exportScene(state: State, scene: Scene): Object {
   return {};
 }
 
-export function importScene(state: State, importScenes: any, addToLibrary: boolean): Object {
-  if (!importScenes[0].id || !importScenes[0].name || !importScenes[0].sources) {
-    return {systemMessage: "Not a valid scene file"};
+export function importScene(
+  state: State,
+  importScenes: any,
+  addToLibrary: boolean,
+): Object {
+  if (
+    !importScenes[0].id ||
+    !importScenes[0].name ||
+    !importScenes[0].sources
+  ) {
+    return { systemMessage: "Not a valid scene file" };
   }
   let newScenes = state.scenes;
   let newGrids = state.grids;
@@ -2904,11 +3476,11 @@ export function importScene(state: State, importScenes: any, addToLibrary: boole
   if (scene.overlays) {
     for (let o of scene.overlays) {
       if (o.sceneID.toString().startsWith("999")) {
-        const sID = parseInt(o.sceneID.toString().replace("999",""));
+        const sID = parseInt(o.sceneID.toString().replace("999", ""));
         if (newGridMap.has(sID)) {
           o.sceneID = parseInt("999" + newGridMap.get(sID));
         } else {
-          o.sceneID = parseInt("999" + (gid));
+          o.sceneID = parseInt("999" + gid);
           newGridMap.set(sID, gid++);
         }
       } else {
@@ -2924,7 +3496,7 @@ export function importScene(state: State, importScenes: any, addToLibrary: boole
   }
 
   if (newSceneMap.size > 0) {
-    for (let i=1; i < importScenes.length; i++) {
+    for (let i = 1; i < importScenes.length; i++) {
       if (importScenes[i].grid) {
         const grid = new SceneGrid(importScenes[i]);
         grid.id = newGridMap.get(grid.id);
@@ -2948,11 +3520,11 @@ export function importScene(state: State, importScenes: any, addToLibrary: boole
         scene.id = newSceneMap.get(scene.id);
         for (let o of scene.overlays) {
           if (o.sceneID.toString().startsWith("999")) {
-            const sID = parseInt(o.sceneID.toString().replace("999",""));
+            const sID = parseInt(o.sceneID.toString().replace("999", ""));
             if (newGridMap.has(sID)) {
               o.sceneID = parseInt("999" + newGridMap.get(sID));
             } else {
-              o.sceneID = parseInt("999" + (gid));
+              o.sceneID = parseInt("999" + gid);
               newGridMap.set(sID, gid++);
             }
           } else {
@@ -2978,7 +3550,6 @@ export function importScene(state: State, importScenes: any, addToLibrary: boole
       }
     }
   }
-
 
   if (addToLibrary) {
     // Don't add sources which are already in the library
@@ -3040,7 +3611,7 @@ export function importScene(state: State, importScenes: any, addToLibrary: boole
       if (sources.length > 0) {
         message += sources.length + " new source";
         if (sources.length > 1) {
-          message += "s"
+          message += "s";
         }
       }
       if (audios.length > 0) {
@@ -3049,7 +3620,7 @@ export function importScene(state: State, importScenes: any, addToLibrary: boole
         }
         message += audios.length + " new audio";
         if (audios.length > 1) {
-          message += "s"
+          message += "s";
         }
       }
       if (scripts.length > 0) {
@@ -3058,7 +3629,7 @@ export function importScene(state: State, importScenes: any, addToLibrary: boole
         }
         message += scripts.length + " new script";
         if (scripts.length > 1) {
-          message += "s"
+          message += "s";
         }
       }
       return {
@@ -3069,7 +3640,7 @@ export function importScene(state: State, importScenes: any, addToLibrary: boole
         library: state.library.concat(sources),
         audios: state.audios.concat(audios),
         scripts: state.scripts.concat(scripts),
-        route: [new Route({kind: 'scene', value: scene.id})]
+        route: [new Route({ kind: "scene", value: scene.id })],
       };
     } else {
       return {
@@ -3077,10 +3648,15 @@ export function importScene(state: State, importScenes: any, addToLibrary: boole
         systemSnackSeverity: SS.info,
         scenes: newScenes,
         grids: newGrids,
-        route: [new Route({kind: 'scene', value: scene.id})]};
+        route: [new Route({ kind: "scene", value: scene.id })],
+      };
     }
   }
-  return {scenes: newScenes, grids: newGrids, route: [new Route({kind: 'scene', value: scene.id})]};
+  return {
+    scenes: newScenes,
+    grids: newGrids,
+    route: [new Route({ kind: "scene", value: scene.id })],
+  };
 }
 
 export function exportLibrary(state: State): Object {
@@ -3096,7 +3672,11 @@ export function exportLibrary(state: State): Object {
   return {};
 }
 
-export function importLibrary(state: State, backup: Function, libraryImport: any): Object {
+export function importLibrary(
+  state: State,
+  backup: Function,
+  libraryImport: any,
+): Object {
   if (!libraryImport || !libraryImport.length) return;
   backup();
   const newLibrary = Array.from(state.library);
@@ -3104,13 +3684,19 @@ export function importLibrary(state: State, backup: Function, libraryImport: any
   const myLibrary = newLibrary.map((s) => s.url);
   const myTags = newTags.map((t) => t.name);
   let tagID = newTags.length + 1;
-  newTags.forEach((t) => {tagID = Math.max(t.id + 1, tagID);});
+  newTags.forEach((t) => {
+    tagID = Math.max(t.id + 1, tagID);
+  });
   let sourceID = newLibrary.length + 1;
-  newLibrary.forEach((s) => {sourceID = Math.max(s.id + 1, sourceID);});
+  newLibrary.forEach((s) => {
+    sourceID = Math.max(s.id + 1, sourceID);
+  });
   for (let source of libraryImport) {
     if (source.tags) {
-      for (let tag of source.tags) { // Make sure we have all of these tags
-        if (!myTags.includes(tag.name)) { // Add tags we don't have yet
+      for (let tag of source.tags) {
+        // Make sure we have all of these tags
+        if (!myTags.includes(tag.name)) {
+          // Add tags we don't have yet
           tag.id = tagID++;
           newTags.push(tag);
           myTags.push(tag.name);
@@ -3123,7 +3709,8 @@ export function importLibrary(state: State, backup: Function, libraryImport: any
     }
 
     const indexOf = myLibrary.indexOf(source.url);
-    if (indexOf === -1) { // Add sources we don't have yet
+    if (indexOf === -1) {
+      // Add sources we don't have yet
       source.id = sourceID++;
       newLibrary.push(source);
       myLibrary.push(source.url);
@@ -3134,7 +3721,11 @@ export function importLibrary(state: State, backup: Function, libraryImport: any
         librarySource.tags = source.tags;
       }
       // Add new blacklist urls
-      librarySource.blacklist = librarySource.blacklist.concat(source.blacklist.filter((url: string) => !librarySource.blacklist.includes(url)));
+      librarySource.blacklist = librarySource.blacklist.concat(
+        source.blacklist.filter(
+          (url: string) => !librarySource.blacklist.includes(url),
+        ),
+      );
       // Add new clips
       if (source.clips) {
         let newID = source.clips.length + 1;
@@ -3157,11 +3748,16 @@ export function importLibrary(state: State, backup: Function, libraryImport: any
     }
   }
 
-  return {systemSnack: "Library Import complete!", systemSnackSeverity: SS.success, library: newLibrary, tags: newTags};
+  return {
+    systemSnack: "Library Import complete!",
+    systemSnackSeverity: SS.success,
+    library: newLibrary,
+    tags: newTags,
+  };
 }
 
 export function setMode(state: State, mode: string): Object {
-  return {progressMode: mode};
+  return { progressMode: mode };
 }
 
 export function markOffline(getState: () => State, setState: Function) {
@@ -3172,7 +3768,6 @@ export function markOffline(getState: () => State, setState: Function) {
   //   // If this link was checked within the last week, skip
   //   return new Date().getTime() - new Date(ls.lastCheck).getTime() >= 604800000;
   // });
-
   // const offlineLoop = () => {
   //   const state = getState();
   //   const offset = state.progressCurrent;
@@ -3194,7 +3789,6 @@ export function markOffline(getState: () => State, setState: Function) {
   //     const actionSource = actionableLibrary[offset];
   //     state.progressTitle = actionSource.url;
   //     setState({progressTitle: state.progressTitle});
-
   //     const librarySource = state.library.find((s) => s.url == actionSource.url);
   //     if (librarySource) {
   //       librarySource.lastCheck = new Date();
@@ -3235,7 +3829,6 @@ export function markOffline(getState: () => State, setState: Function) {
   //     state.progressCurrent = offset + 1;
   //     setState({progressTitle: state.progressTitle, progressCurrent: state.progressCurrent});
   //     win.setProgressBar(state.progressCurrent / state.progressTotal);
-
   //     actionSource.lastCheck = new Date();
   //     const exists = fs_existsSync(actionSource.url);
   //     if (!exists) {
@@ -3244,7 +3837,6 @@ export function markOffline(getState: () => State, setState: Function) {
   //     setTimeout(offlineLoop, 10);
   //   }
   // };
-
   // // If we don't have an import running
   // if (!state.progressMode) {
   //   state.progressMode = PR.offline;
@@ -3282,7 +3874,7 @@ export function detectBPMs(getState: () => State, setState: Function) {
     //     console.error(e);
     //     detectBPM(audio, offset);
     //   });
-  }
+  };
 
   const detectBPM = (audio: Audio, offset: number) => {
     const bpmError = (e: any) => {
@@ -3295,7 +3887,7 @@ export function detectBPMs(getState: () => State, setState: Function) {
       // setState({progressCurrent: state.progressCurrent});
       // win.setProgressBar(state.progressCurrent / state.progressTotal);
       // setTimeout(detectBPMLoop, 100);
-    }
+    };
 
     const detectBPM = (data: ArrayBuffer) => {
       const maxByteSize = 200000000;
@@ -3322,23 +3914,26 @@ export function detectBPMs(getState: () => State, setState: Function) {
       } else {
         console.error("'" + audio.url + "' is too large to decode");
       }
-    }
+    };
 
     try {
       const url = audio.url;
       if (fs_existsSync(url)) {
         detectBPM(toArrayBuffer(fs_readFileSync(url)));
       } else {
-        wretch(url).get().arrayBuffer((body) => {
-          detectBPM(body);
-        }).catch((e) => {
-          bpmError(e);
-        })
+        wretch(url)
+          .get()
+          .arrayBuffer((body) => {
+            detectBPM(body);
+          })
+          .catch((e) => {
+            bpmError(e);
+          });
       }
     } catch (e) {
       bpmError(e);
     }
-  }
+  };
 
   const detectBPMLoop = () => {
     // FIXME
@@ -3361,7 +3956,6 @@ export function detectBPMs(getState: () => State, setState: Function) {
     //   const actionSource = actionableLibrary[offset];
     //   state.progressTitle = actionSource.url;
     //   setState({progressTitle: state.progressTitle});
-
     //   const librarySource = state.audios.find((s) => s.url == actionSource.url);
     //   if (librarySource) {
     //     readMetadata(librarySource, offset)
@@ -3373,7 +3967,7 @@ export function detectBPMs(getState: () => State, setState: Function) {
     //     detectBPMLoop();
     //   }
     // }
-  }
+  };
 
   // FIXME
   // const win = remote.getCurrentWindow();
@@ -3400,7 +3994,6 @@ export function updateVideoMetadata(getState: () => State, setState: Function) {
   // const win = remote.getCurrentWindow();
   // const state = getState();
   // const actionableLibrary = state.library.filter((ls) => getSourceType(ls.url) == ST.video && (ls.duration == null || ls.resolution == null || isNaN(ls.resolution) || ls.resolution<=0 || ls.fileSize == null || isNaN(ls.fileSize)));
-
   // const videoMetadataLoop = () => {
   //   const state = getState();
   //   const offset = state.progressCurrent;
@@ -3421,12 +4014,10 @@ export function updateVideoMetadata(getState: () => State, setState: Function) {
   //     const actionSource = actionableLibrary[offset];
   //     state.progressTitle = actionSource.url;
   //     setState({progressTitle: state.progressTitle});
-
   //     const librarySource = state.library.find((s) => s.url == actionSource.url);
   //     if (librarySource) {
   //       let video = document.createElement('video');
   //       video.preload = 'metadata';
-
   //       video.onloadedmetadata = () => {
   //         const height = video.videoHeight;
   //         const width = video.videoWidth;
@@ -3438,7 +4029,6 @@ export function updateVideoMetadata(getState: () => State, setState: Function) {
   //         } catch (e) {
   //           librarySource.fileSize = -1;
   //         }
-
   //         state.progressCurrent = offset + 1;
   //         setState({progressCurrent: state.progressCurrent});
   //         win.setProgressBar(state.progressCurrent / state.progressTotal);
@@ -3451,7 +4041,6 @@ export function updateVideoMetadata(getState: () => State, setState: Function) {
   //         win.setProgressBar(state.progressCurrent / state.progressTotal);
   //         setTimeout(videoMetadataLoop, 100);
   //       }
-
   //       video.src = librarySource.url;
   //     } else {
   //       // Skip if removed from library during check
@@ -3462,7 +4051,6 @@ export function updateVideoMetadata(getState: () => State, setState: Function) {
   //     }
   //   }
   // }
-
   // // If we don't have an import running
   // if (!state.progressMode && actionableLibrary.length) {
   //   state.progressMode = PR.videoMetadata;
@@ -3499,24 +4087,20 @@ export function importTumblr(getState: () => State, setState: Function) {
   //       console.error(err);
   //       return;
   //     }
-
   //     // Get the next 20 blogs
   //     let following = [];
   //     for (let blog of data.blogs) {
   //       const blogURL = "http://" + blog.name + ".tumblr.com/";
   //       following.push(blogURL);
   //     }
-
   //     // dedup
   //     const newestState = getState();
   //     let sourceURLs = newestState.library.map((s) => s.url);
   //     following = following.filter((b) => !sourceURLs.includes(b));
-
   //     let id = newestState.library.length + 1;
   //     newestState.library.forEach((s) => {
   //       id = Math.max(s.id + 1, id);
   //     });
-
   //     // Add to Library
   //     let newLibrary = newestState.library;
   //     for (let url of following) {
@@ -3528,16 +4112,13 @@ export function importTumblr(getState: () => State, setState: Function) {
   //       id += 1;
   //     }
   //     setState({library: newLibrary});
-
   //     let nextOffset = offset + 20;
   //     if (offset > state.progressTotal) {
   //       nextOffset = state.progressTotal;
   //     }
-
   //     // Update progress
   //     setState({progressCurrent: nextOffset});
   //     win.setProgressBar(nextOffset / state.progressTotal);
-
   //     // Loop until we run out of blogs
   //     if ((nextOffset) < state.progressTotal) {
   //       setTimeout(tumblrImportLoop, 1500);
@@ -3547,7 +4128,6 @@ export function importTumblr(getState: () => State, setState: Function) {
   //     }
   //   });
   // };
-
   // // If we don't have an import running
   // const state = getState();
   // if (!state.progressMode) {
@@ -3558,7 +4138,6 @@ export function importTumblr(getState: () => State, setState: Function) {
   //     token: state.config.remoteSettings.tumblrOAuthToken,
   //     token_secret: state.config.remoteSettings.tumblrOAuthTokenSecret,
   //   });
-
   //   // Make the first call just to check the total blogs
   //   client.userFollowing({limit: 0}, (err, data) => {
   //     if (err) {
@@ -3567,7 +4146,6 @@ export function importTumblr(getState: () => State, setState: Function) {
   //       console.error(err);
   //       return;
   //     }
-
   //     state.progressMode = PR.tumblr;
   //     state.progressCurrent = 0;
   //     state.progressTotal = data.total_blogs;
@@ -3603,17 +4181,14 @@ export function importReddit(getState: () => State, setState: Function) {
   //         const subURL = "http://www.reddit.com" + sub.url;
   //         subscriptions.push(subURL);
   //       }
-
   //       // dedup
   //       const newestState = getState();
   //       let sourceURLs = newestState.library.map((s) => s.url);
   //       subscriptions = subscriptions.filter((s) => !sourceURLs.includes(s));
-
   //       let id = newestState.library.length + 1;
   //       newestState.library.forEach((s) => {
   //         id = Math.max(s.id + 1, id);
   //       });
-
   //       // Add to Library
   //       let newLibrary = newestState.library;
   //       for (let url of subscriptions) {
@@ -3625,7 +4200,6 @@ export function importReddit(getState: () => State, setState: Function) {
   //         id += 1;
   //       }
   //       setState({library: newLibrary});
-
   //       // Loop until we run out of blogs
   //       setTimeout(redditImportLoop, 1500);
   //       state.progressNext = subscriptionListing[subscriptionListing.length - 1].name;
@@ -3639,7 +4213,6 @@ export function importReddit(getState: () => State, setState: Function) {
   //     setState({systemMessage: "Error retrieving subscriptions: " + err, progressMode: null, progressNext: null, progressCurrent: 0});
   //   });
   // };
-
   // const state = getState();
   // if (!state.progressMode) {
   //   reddit = new Snoowrap({
@@ -3648,7 +4221,6 @@ export function importReddit(getState: () => State, setState: Function) {
   //     clientSecret: "",
   //     refreshToken: state.config.remoteSettings.redditRefreshToken,
   //   });
-
   //   // Show progress bar and kick off loop
   //   state.progressMode = PR.reddit;
   //   state.progressCurrent = 0;

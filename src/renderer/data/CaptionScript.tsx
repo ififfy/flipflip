@@ -23,7 +23,7 @@ export default class CaptionScript {
   };
 
   caption: FontSettingsI = {
-    color: "#FFFFFF" ,
+    color: "#FFFFFF",
     fontSize: 8,
     fontFamily: "Helvetica Neue,Helvetica,Arial,sans-serif",
     border: false,
@@ -47,7 +47,7 @@ export default class CaptionScript {
     border: false,
     borderpx: 5,
     borderColor: "#000000",
-  }
+  };
 
   constructor(init?: Partial<CaptionScript>) {
     Object.assign(this, init);
@@ -60,10 +60,10 @@ export default class CaptionScript {
 
 export interface FontSettingsI {
   [key: string]: string | number | boolean;
-  color: string,
-  fontSize: number,
-  fontFamily: string,
-  border: boolean,
-  borderpx: number,
-  borderColor: string,
+  color: string;
+  fontSize: number;
+  fontFamily: string;
+  border: boolean;
+  borderpx: number;
+  borderColor: string;
 }

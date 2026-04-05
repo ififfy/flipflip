@@ -3,37 +3,38 @@ import clsx from "clsx";
 import CreatableSelect from "react-select/creatable";
 
 import { Theme } from "@mui/material";
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
-import {grey} from "@mui/material/colors";
+import createStyles from "@mui/styles/createStyles";
+import withStyles from "@mui/styles/withStyles";
+import { grey } from "@mui/material/colors";
 
 import Scene from "./data/Scene";
 
-const styles = (theme: Theme) => createStyles({
-  searchSelect: {
-    minWidth: 200,
-    maxWidth: `calc(100% - ${theme.spacing(7)})`,
-    maxHeight: theme.mixins.toolbar.minHeight,
-    color: grey[900],
-  },
-  select: {
-    color: grey[900],
-  }
-});
+const styles = (theme: Theme) =>
+  createStyles({
+    searchSelect: {
+      minWidth: 200,
+      maxWidth: `calc(100% - ${theme.spacing(7)})`,
+      maxHeight: theme.mixins.toolbar.minHeight,
+      color: grey[900],
+    },
+    select: {
+      color: grey[900],
+    },
+  });
 
 class SceneSearch extends React.Component {
   readonly props: {
-    classes: any,
-    displaySources: Array<Scene>,
-    filters: Array<string>,
-    placeholder: string,
-    onUpdateFilters(filter: Array<string>): void,
+    classes: any;
+    displaySources: Array<Scene>;
+    filters: Array<string>;
+    placeholder: string;
+    onUpdateFilters(filter: Array<string>): void;
   };
 
   readonly state = {
     searchInput: "",
-    options: Array<{ label: string, value: string }>(),
-    defaultValues: Array<{ label: string, value: string }>(),
+    options: Array<{ label: string; value: string }>(),
+    defaultValues: Array<{ label: string; value: string }>(),
   };
 
   render() {
@@ -41,7 +42,7 @@ class SceneSearch extends React.Component {
     return (
       <CreatableSelect
         className={clsx(classes.searchSelect, "CreatableSelect")}
-        components={{DropdownIndicator: null,}}
+        components={{ DropdownIndicator: null }}
         value={this.state.defaultValues}
         options={this.state.options}
         inputValue={this.state.searchInput}
@@ -62,32 +63,38 @@ class SceneSearch extends React.Component {
 
   componentDidUpdate(props: any) {
     if (props) {
-      if (props.filters != this.props.filters ||
-        props.displaySources != this.props.displaySources) {
+      if (
+        props.filters != this.props.filters ||
+        props.displaySources != this.props.displaySources
+      ) {
         this.update();
       }
     }
   }
 
   update() {
-    const options = Array<{ label: string, value: string }>();
-    const defaultValues = Array<{ label: string, value: string }>();
+    const options = Array<{ label: string; value: string }>();
+    const defaultValues = Array<{ label: string; value: string }>();
     for (let filter of this.props.filters) {
-      const opt = {label: filter, value: filter};
+      const opt = { label: filter, value: filter };
       options.push(opt);
       defaultValues.push(opt);
     }
-    this.setState({options: options, defaultValues: defaultValues})
+    this.setState({ options: options, defaultValues: defaultValues });
   }
 
-  handleChange = (search: [{label: string, value: string}]) => {
+  handleChange = (search: [{ label: string; value: string }]) => {
     if (search == null) {
       this.props.onUpdateFilters([]);
     } else {
       let filters = Array<string>();
       for (let s of search) {
-        if (((s.value.startsWith('"') || s.value.startsWith('-"')) && s.value.endsWith('"')) ||
-          ((s.value.startsWith('\'') || s.value.startsWith('-\'')) && s.value.endsWith('\''))) {
+        if (
+          ((s.value.startsWith('"') || s.value.startsWith('-"')) &&
+            s.value.endsWith('"')) ||
+          ((s.value.startsWith("'") || s.value.startsWith("-'")) &&
+            s.value.endsWith("'"))
+        ) {
           filters = filters.concat(s.value);
         } else {
           filters = filters.concat(s.value.split(" "));
@@ -98,9 +105,9 @@ class SceneSearch extends React.Component {
   };
 
   handleInputChange = (searchInput: string) => {
-    this.setState({searchInput})
+    this.setState({ searchInput });
   };
 }
 
-(SceneSearch as any).displayName="SceneSearch";
+(SceneSearch as any).displayName = "SceneSearch";
 export default withStyles(styles)(SceneSearch as any);

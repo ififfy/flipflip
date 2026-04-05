@@ -1,5 +1,23 @@
-import {urlToPath} from "./utils";
-import {BT, EA, GO, HTF, IF, IT, OF, OT, RP, SC, SL, SOF, STF, TF, VO, VTF, WF} from './const';
+import { urlToPath } from "./utils";
+import {
+  BT,
+  EA,
+  GO,
+  HTF,
+  IF,
+  IT,
+  OF,
+  OT,
+  RP,
+  SC,
+  SL,
+  SOF,
+  STF,
+  TF,
+  VO,
+  VTF,
+  WF,
+} from "./const";
 import LibrarySource from "./LibrarySource";
 import Audio from "./Audio";
 import Overlay from "./Overlay";
@@ -104,7 +122,7 @@ export default class Scene {
   fadeAmp = 20;
   fadePer = 6;
   fadeOv = 3;
-  
+
   slide = false;
   slideTF = TF.constant;
   slideType = STF.left;
@@ -144,7 +162,7 @@ export default class Scene {
   strobeAmp = 20;
   strobePer = 6;
   strobeOv = 3;
-  
+
   fadeInOut = false;
   fadeIOPulse = false;
   fadeIOTF = TF.constant;
@@ -169,7 +187,7 @@ export default class Scene {
   fadeIOEndAmp = 20;
   fadeIOEndPer = 6;
   fadeIOEndOv = 3;
-  
+
   panning = false;
   panTF = TF.constant;
   panDuration = 2000;
@@ -217,10 +235,18 @@ export default class Scene {
   libraryID: number = -1;
   audioScene = false;
   audioEnabled = false;
-  audioPlaylists: Array<{audios: Array<Audio>, shuffle: boolean, repeat: string}> = [];
+  audioPlaylists: Array<{
+    audios: Array<Audio>;
+    shuffle: boolean;
+    repeat: string;
+  }> = [];
   audioStartIndex = 0;
   textEnabled = false;
-  scriptPlaylists: Array<{scripts: Array<CaptionScript>, shuffle: boolean, repeat: string}> = [];
+  scriptPlaylists: Array<{
+    scripts: Array<CaptionScript>;
+    shuffle: boolean;
+    repeat: string;
+  }> = [];
   scriptStartIndex = 0;
   regenerate = true;
   generatorWeights?: Array<WeightGroup> = null;
@@ -286,12 +312,17 @@ export default class Scene {
       this.effectLevel = 0;
     }
     if (!!this.overlaySceneID && this.overlaySceneID != 0) {
-      this.overlays.push(new Overlay({sceneID: this.overlaySceneID, opacity: this.overlaySceneOpacity * 100}));
+      this.overlays.push(
+        new Overlay({
+          sceneID: this.overlaySceneID,
+          opacity: this.overlaySceneOpacity * 100,
+        }),
+      );
       this.overlaySceneID = 0;
     }
 
     if (this.audioURL && this.audioURL != "") {
-      this.audios.push(new Audio({url: this.audioURL}));
+      this.audios.push(new Audio({ url: this.audioURL }));
       this.audioURL = "";
     }
 
@@ -299,30 +330,30 @@ export default class Scene {
       this.timingConstant = parseInt(this.timingConstant);
     }
 
-    if (this.timingFunction == 'tf.variableFaster') {
+    if (this.timingFunction == "tf.variableFaster") {
       this.timingFunction = TF.sin;
       this.timingMin = 0;
       this.timingMax = 600;
-    } else if (this.timingFunction == 'tf.variableMedium') {
+    } else if (this.timingFunction == "tf.variableMedium") {
       this.timingFunction = TF.sin;
       this.timingMin = 3000;
       this.timingMax = 5000;
-    } else if (this.timingFunction == 'tf.variableSlow') {
+    } else if (this.timingFunction == "tf.variableSlow") {
       this.timingFunction = TF.sin;
       this.timingMin = 3500;
       this.timingMax = 6500;
-    } else if (this.timingFunction == 'tf.variableSlower') {
+    } else if (this.timingFunction == "tf.variableSlower") {
       this.timingFunction = TF.sin;
       this.timingMin = 10000;
       this.timingMax = 20000;
-    } else if (this.timingFunction == 'tf.variableSlowest') {
+    } else if (this.timingFunction == "tf.variableSlowest") {
       this.timingFunction = TF.sin;
       this.timingMin = 30000;
       this.timingMax = 60000;
     } else if (this.timingFunction == "at.random") {
-      this.timingFunction = "tf.random"
+      this.timingFunction = "tf.random";
     } else if (this.timingFunction == "at.sin") {
-      this.timingFunction = "tf.sin"
+      this.timingFunction = "tf.sin";
     }
 
     if (this.transFull) {
@@ -372,60 +403,72 @@ export default class Scene {
     }
 
     if (this.audios) {
-      this.audioPlaylists = this.audios.filter((a) => !!a.url && a.url.length).map((a) => {
-        if (!a.name) {
-          if (a.url.startsWith("http")) {
-            a.name = a.url.substring(a.url.lastIndexOf("\/") + 1, a.url.lastIndexOf("."))
-          } else {
-            a.url = urlToPath(a.url).replace(/\//g, path_sep());
-            a.name = a.url.substring(a.url.lastIndexOf(path_sep()) + 1, a.url.lastIndexOf("."));
+      this.audioPlaylists = this.audios
+        .filter((a) => !!a.url && a.url.length)
+        .map((a) => {
+          if (!a.name) {
+            if (a.url.startsWith("http")) {
+              a.name = a.url.substring(
+                a.url.lastIndexOf("\/") + 1,
+                a.url.lastIndexOf("."),
+              );
+            } else {
+              a.url = urlToPath(a.url).replace(/\//g, path_sep());
+              a.name = a.url.substring(
+                a.url.lastIndexOf(path_sep()) + 1,
+                a.url.lastIndexOf("."),
+              );
+            }
+            a.duration = 0;
           }
-          a.duration = 0;
-        }
-        return {audios: [a], shuffle: false, repeat: RP.all};
-      });
+          return { audios: [a], shuffle: false, repeat: RP.all };
+        });
       this.audios = null;
     }
 
     if (this.textSource && this.textSource.length > 0) {
-      const newScripts = [new CaptionScript({
-        url: this.textSource,
-        stopAtEnd: this.textEndStop,
-        nextSceneAtEnd: this.textNextScene,
-        blink: {
-          color: this.blinkColor,
-          fontSize: this.blinkFontSize,
-          fontFamily: this.blinkFontFamily,
-          border: this.blinkBorder,
-          borderpx: this.blinkBorderpx,
-          borderColor: this.blinkBorderColor
-        },
-        caption: {
-          color: this.captionColor,
-          fontSize: this.captionFontSize,
-          fontFamily: this.captionFontFamily,
-          border: this.captionBorder,
-          borderpx: this.captionBorderpx,
-          borderColor: this.captionBorderColor
-        },
-        captionBig: {
-          color: this.captionBigColor,
-          fontSize: this.captionBigFontSize,
-          fontFamily: this.captionBigFontFamily,
-          border: this.captionBigBorder,
-          borderpx: this.captionBigBorderpx,
-          borderColor: this.captionBigBorderColor
-        },
-        count: {
-          color: this.countColor,
-          fontSize: this.countFontSize,
-          fontFamily: this.countFontFamily,
-          border: this.countBorder,
-          borderpx: this.countBorderpx,
-          borderColor: this.countBorderColor
-        },
-      })];
-      this.scriptPlaylists = [{scripts: newScripts, shuffle: false, repeat: RP.all}]
+      const newScripts = [
+        new CaptionScript({
+          url: this.textSource,
+          stopAtEnd: this.textEndStop,
+          nextSceneAtEnd: this.textNextScene,
+          blink: {
+            color: this.blinkColor,
+            fontSize: this.blinkFontSize,
+            fontFamily: this.blinkFontFamily,
+            border: this.blinkBorder,
+            borderpx: this.blinkBorderpx,
+            borderColor: this.blinkBorderColor,
+          },
+          caption: {
+            color: this.captionColor,
+            fontSize: this.captionFontSize,
+            fontFamily: this.captionFontFamily,
+            border: this.captionBorder,
+            borderpx: this.captionBorderpx,
+            borderColor: this.captionBorderColor,
+          },
+          captionBig: {
+            color: this.captionBigColor,
+            fontSize: this.captionBigFontSize,
+            fontFamily: this.captionBigFontFamily,
+            border: this.captionBigBorder,
+            borderpx: this.captionBigBorderpx,
+            borderColor: this.captionBigBorderColor,
+          },
+          count: {
+            color: this.countColor,
+            fontSize: this.countFontSize,
+            fontFamily: this.countFontFamily,
+            border: this.countBorder,
+            borderpx: this.countBorderpx,
+            borderColor: this.countBorderColor,
+          },
+        }),
+      ];
+      this.scriptPlaylists = [
+        { scripts: newScripts, shuffle: false, repeat: RP.all },
+      ];
       this.textSource = null;
       this.textEndStop = null;
       this.textNextScene = null;

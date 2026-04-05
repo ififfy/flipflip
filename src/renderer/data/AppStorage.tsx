@@ -1,15 +1,28 @@
-import { fs_copyFileSync, fs_mkdirSync, fs_existsSync, fs_readFileSync, fs_renameSync, fs_writeFile } from '../dummy/fs';
+import {
+  fs_copyFileSync,
+  fs_mkdirSync,
+  fs_existsSync,
+  fs_readFileSync,
+  fs_renameSync,
+  fs_writeFile,
+} from "../dummy/fs";
 
-import {getBackups, portablePath, removeDuplicatesBy, saveDir, savePath} from "./utils";
-import {cleanBackups} from "./actions";
-import { Route } from './Route';
-import {TT} from "./const";
+import {
+  getBackups,
+  portablePath,
+  removeDuplicatesBy,
+  saveDir,
+  savePath,
+} from "./utils";
+import { cleanBackups } from "./actions";
+import { Route } from "./Route";
+import { TT } from "./const";
 import Audio from "./Audio";
-import LibrarySource from '../data/LibrarySource';
+import LibrarySource from "../data/LibrarySource";
 import Tag from "../data/Tag";
 import WeightGroup from "../data/WeightGroup";
 import Config from "./Config";
-import Scene from './Scene';
+import Scene from "./Scene";
 import SceneGrid from "./SceneGrid";
 import defaultTheme from "./theme";
 import Playlist from "./Playlist";
@@ -67,7 +80,7 @@ export const defaultInitialState = {
  */
 function archiveFile(filePath: string): void {
   if (fs_existsSync(filePath)) {
-    fs_copyFileSync(filePath, (filePath + '.' + Date.now()));
+    fs_copyFileSync(filePath, filePath + "." + Date.now());
   }
 }
 
@@ -77,32 +90,32 @@ export default class AppStorage {
   constructor(windowId: number) {
     try {
       fs_mkdirSync(saveDir);
-    }
-    catch (e) {
+    } catch (e) {
       // who cares
     }
     try {
       let data;
       let portableMode = false;
       if (!fs_existsSync(savePath) && fs_existsSync(portablePath)) {
-        data = JSON.parse(fs_readFileSync(portablePath, 'utf-8'));
+        data = JSON.parse(fs_readFileSync(portablePath, "utf-8"));
         if (!data.config.generalSettings.portableMode) {
-          data = JSON.parse(fs_readFileSync(savePath, 'utf-8'));
+          data = JSON.parse(fs_readFileSync(savePath, "utf-8"));
         } else {
           portableMode = true;
           console.log("Portable: " + portablePath);
         }
       } else {
-        data = JSON.parse(fs_readFileSync(savePath, 'utf-8'));
+        data = JSON.parse(fs_readFileSync(savePath, "utf-8"));
         if (data.config.generalSettings.portableMode) {
           portableMode = true;
           console.log("Portable: " + portablePath);
-          data = JSON.parse(fs_readFileSync(portablePath, 'utf-8'));
+          data = JSON.parse(fs_readFileSync(portablePath, "utf-8"));
         }
       }
 
       if (portableMode) {
-        if (fs_existsSync(`${portablePath}.new`)) console.warn("FOUND OLD SAVE");
+        if (fs_existsSync(`${portablePath}.new`))
+          console.warn("FOUND OLD SAVE");
       } else {
         if (fs_existsSync(`${savePath}.new`)) console.warn("FOUND OLD SAVE");
       }
@@ -164,11 +177,13 @@ export default class AppStorage {
           let libraryID = 0;
           const newLibrarySources = Array<LibrarySource>();
           for (let url of sources) {
-            newLibrarySources.push(new LibrarySource({
-              url: url,
-              id: libraryID,
-              tags: Array<Tag>(),
-            }));
+            newLibrarySources.push(
+              new LibrarySource({
+                url: url,
+                id: libraryID,
+                tags: Array<Tag>(),
+              }),
+            );
             libraryID += 1;
           }
           this.initialState.library = newLibrarySources;
@@ -179,11 +194,13 @@ export default class AppStorage {
             let sourceID = 0;
             const newSources = Array<LibrarySource>();
             for (let oldDirectory of oldScene.directories) {
-              newSources.push(new LibrarySource({
-                url: oldDirectory,
-                id: sourceID,
-                tags: Array<Tag>(),
-              }));
+              newSources.push(
+                new LibrarySource({
+                  url: oldDirectory,
+                  id: sourceID,
+                  tags: Array<Tag>(),
+                }),
+              );
               sourceID += 1;
             }
             newScene.sources = newSources;
@@ -245,13 +262,27 @@ export default class AppStorage {
             if (scene.tagWeights || scene.sceneWeights) {
               scene.generatorWeights = [];
               // Get weights for this scene
-              const tagWeights = new Map<Tag, { type: string, value: number }>(JSON.parse(scene.tagWeights));
-              let sceneWeights = new Map<number, { type: string, value: number }>();
+              const tagWeights = new Map<Tag, { type: string; value: number }>(
+                JSON.parse(scene.tagWeights),
+              );
+              let sceneWeights = new Map<
+                number,
+                { type: string; value: number }
+              >();
               if (scene.sceneWeights != null) {
-                sceneWeights = new Map<number, { type: string, value: number }>(JSON.parse(scene.sceneWeights));
+                sceneWeights = new Map<number, { type: string; value: number }>(
+                  JSON.parse(scene.sceneWeights),
+                );
               }
-              const weights = Array.from(tagWeights.values()).concat(Array.from(sceneWeights.values()));
-              const sum = weights.length > 0 ? weights.map((w) => w.value).reduce((total, value) => Number(total) + Number(value)) : 0;
+              const weights = Array.from(tagWeights.values()).concat(
+                Array.from(sceneWeights.values()),
+              );
+              const sum =
+                weights.length > 0
+                  ? weights
+                      .map((w) => w.value)
+                      .reduce((total, value) => Number(total) + Number(value))
+                  : 0;
 
               // For each tag weight
               for (let tag of tagWeights.keys()) {
@@ -283,11 +314,23 @@ export default class AppStorage {
                   wg.type = TT.weight;
 
                   // Build a set of rules from this scene's weights
-                  const tagScene = this.initialState.scenes.find((s: Scene) => s.id == sceneID);
+                  const tagScene = this.initialState.scenes.find(
+                    (s: Scene) => s.id == sceneID,
+                  );
                   if (tagScene.tagWeights) {
-                    const tagWeights = new Map<Tag, { type: string, value: number }>(JSON.parse(tagScene.tagWeights));
+                    const tagWeights = new Map<
+                      Tag,
+                      { type: string; value: number }
+                    >(JSON.parse(tagScene.tagWeights));
                     const weights = Array.from(tagWeights.values());
-                    const swSum = weights.length > 0 ? weights.map((w) => w.value).reduce((total, value) => Number(total) + Number(value)) : 0;
+                    const swSum =
+                      weights.length > 0
+                        ? weights
+                            .map((w) => w.value)
+                            .reduce(
+                              (total, value) => Number(total) + Number(value),
+                            )
+                        : 0;
                     const rules = new Array<WeightGroup>();
 
                     // For each tag weight
@@ -298,7 +341,9 @@ export default class AppStorage {
                         // Add as weight group
                         const rule = new WeightGroup();
                         if (weight.value > 0) {
-                          rule.percent = Math.round((weight.value / swSum) * 100);
+                          rule.percent = Math.round(
+                            (weight.value / swSum) * 100,
+                          );
                         } else {
                           rule.percent = 0;
                         }
@@ -375,11 +420,19 @@ export default class AppStorage {
             displayedSources: Array<LibrarySource>(),
             config: new Config(data.config),
             scenes: data.scenes.map((s: any) => new Scene(s)),
-            sceneGroups: data.sceneGroups ? data.sceneGroups.map((g: any) => new SceneGroup(g)) : [],
+            sceneGroups: data.sceneGroups
+              ? data.sceneGroups.map((g: any) => new SceneGroup(g))
+              : [],
             grids: data.grids.map((g: any) => new SceneGrid(g)),
-            audios: data.audios ? data.audios.map((a: any) => new Audio(a)) : [],
-            scripts: data.scripts ? data.scripts.map((s: any) => new CaptionScript(s)) : [],
-            playlists: data.playlists ? data.playlists.map((p: any) => new Playlist(p)) : [],
+            audios: data.audios
+              ? data.audios.map((a: any) => new Audio(a))
+              : [],
+            scripts: data.scripts
+              ? data.scripts.map((s: any) => new CaptionScript(s))
+              : [],
+            playlists: data.playlists
+              ? data.playlists.map((p: any) => new Playlist(p))
+              : [],
             library: data.library.map((s: any) => new LibrarySource(s)),
             tags: data.tags.map((t: any) => new Tag(t)),
             route: data.route.map((s: any) => new Route(s)),
@@ -405,14 +458,19 @@ export default class AppStorage {
             tutorial: data.tutorial,
             theme: data.theme,
           };
-          if (!this.initialState.theme.palette.mode && !!this.initialState.theme.palette.type) {
-            this.initialState.theme.palette.mode = this.initialState.theme.palette.type;
+          if (
+            !this.initialState.theme.palette.mode &&
+            !!this.initialState.theme.palette.type
+          ) {
+            this.initialState.theme.palette.mode =
+              this.initialState.theme.palette.type;
           }
           // Multiply all nextSceneTime
           for (let scene of this.initialState.scenes) {
             scene.nextSceneTime = scene.nextSceneTime * 1000;
           }
-          this.initialState.config.defaultScene.nextSceneTime = this.initialState.config.defaultScene.nextSceneTime * 1000;
+          this.initialState.config.defaultScene.nextSceneTime =
+            this.initialState.config.defaultScene.nextSceneTime * 1000;
           break;
         default:
           this.initialState = {
@@ -422,11 +480,19 @@ export default class AppStorage {
             displayedSources: Array<LibrarySource>(),
             config: new Config(data.config),
             scenes: data.scenes.map((s: any) => new Scene(s)),
-            sceneGroups: data.sceneGroups ? data.sceneGroups.map((g: any) => new SceneGroup(g)) : [],
+            sceneGroups: data.sceneGroups
+              ? data.sceneGroups.map((g: any) => new SceneGroup(g))
+              : [],
             grids: data.grids.map((g: any) => new SceneGrid(g)),
-            audios: data.audios ? data.audios.map((a: any) => new Audio(a)) : [],
-            scripts: data.scripts ? data.scripts.map((s: any) => new CaptionScript(s)) : [],
-            playlists: data.playlists ? data.playlists.map((p: any) => new Playlist(p)) : [],
+            audios: data.audios
+              ? data.audios.map((a: any) => new Audio(a))
+              : [],
+            scripts: data.scripts
+              ? data.scripts.map((s: any) => new CaptionScript(s))
+              : [],
+            playlists: data.playlists
+              ? data.playlists.map((p: any) => new Playlist(p))
+              : [],
             library: data.library.map((s: any) => new LibrarySource(s)),
             tags: data.tags.map((t: any) => new Tag(t)),
             route: data.route.map((s: any) => new Route(s)),
@@ -454,8 +520,7 @@ export default class AppStorage {
           };
           break;
       }
-    }
-    catch (e) {
+    } catch (e) {
       // When an error occurs archive potentially incompatible data.json file
       // This essentially renames the data.json file and thus the app is self-healing
       // in that it will recreate an initial (blank) data.json file on restarting
@@ -475,7 +540,7 @@ export default class AppStorage {
     }
   }
 
-  writeFileTransactional (path: any, content: any, callback?: Function) {
+  writeFileTransactional(path: any, content: any, callback?: Function) {
     let temporaryPath = `${path}.new`;
     fs_writeFile(temporaryPath, content, function (err) {
       if (err) {
@@ -487,11 +552,15 @@ export default class AppStorage {
         callback();
       }
     });
-  };
+  }
 
   save(state: any, callback?: Function) {
     if (state.config.generalSettings.portableMode) {
-      this.writeFileTransactional(portablePath, JSON.stringify(state), callback);
+      this.writeFileTransactional(
+        portablePath,
+        JSON.stringify(state),
+        callback,
+      );
       if (!state.config.generalSettings.disableLocalSave) {
         this.writeFileTransactional(savePath, JSON.stringify(state), callback);
       }
@@ -502,13 +571,20 @@ export default class AppStorage {
     if (callback) return;
 
     if (state.config.generalSettings.autoCleanBackup) {
-      checkAutoClean(state).then((r) => {if (r) console.log("Performed Auto Clean")}).catch((e) => console.error(e));
+      checkAutoClean(state)
+        .then((r) => {
+          if (r) console.log("Performed Auto Clean");
+        })
+        .catch((e) => console.error(e));
     }
 
     if (state.config.generalSettings.autoBackup) {
-      checkAutoBackup(state, this.backup).then((r) => {if (r) console.log("Performed Auto Backup")}).catch((e) => console.error(e));
+      checkAutoBackup(state, this.backup)
+        .then((r) => {
+          if (r) console.log("Performed Auto Backup");
+        })
+        .catch((e) => console.error(e));
     }
-
   }
 
   backup(state: any) {
@@ -529,10 +605,15 @@ async function checkAutoClean(state: any): Promise<boolean> {
   let epoch;
   do {
     lastBackup = backups.shift();
-    epoch = parseInt(lastBackup.url.substring(lastBackup.url.lastIndexOf(".") + 1));
-  } while (isNaN(epoch))
+    epoch = parseInt(
+      lastBackup.url.substring(lastBackup.url.lastIndexOf(".") + 1),
+    );
+  } while (isNaN(epoch));
   // If it's been longer than N days since our last backup
-  if (Date.now() - epoch > (86400000 * state.config.generalSettings.autoBackupDays)) {
+  if (
+    Date.now() - epoch >
+    86400000 * state.config.generalSettings.autoBackupDays
+  ) {
     cleanBackups(state.config);
     return true;
   }
@@ -549,10 +630,15 @@ async function checkAutoBackup(state: any, backup: Function): Promise<boolean> {
     let epoch;
     do {
       lastBackup = backups.shift();
-      epoch = parseInt(lastBackup.url.substring(lastBackup.url.lastIndexOf(".") + 1));
-    } while (isNaN(epoch))
+      epoch = parseInt(
+        lastBackup.url.substring(lastBackup.url.lastIndexOf(".") + 1),
+      );
+    } while (isNaN(epoch));
     // If it's been longer than N days since our last backup
-    if (Date.now() - epoch > (86400000 * state.config.generalSettings.autoBackupDays)) {
+    if (
+      Date.now() - epoch >
+      86400000 * state.config.generalSettings.autoBackupDays
+    ) {
       backup(state);
       return true;
     }
