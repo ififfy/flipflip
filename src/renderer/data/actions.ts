@@ -2613,20 +2613,21 @@ export function addSource(
       break;
 
     case AF.videos:
-      // let vResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
-      //   {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'Video files', extensions: ['mp4', 'mkv', 'webm', 'ogv', 'mov']}, {name: 'Playlist files', extensions: ['asx', 'm3u8', 'pls', 'xspf']}], properties: ['openFile', 'multiSelections']});
-      // if (!vResult) return;
-      // vResult = vResult.filter((r) => isVideo(r, true) || isVideoPlaylist(r, true));
-      // if (scene != null) {
-      //   return updateScene(state, scene, (s) => {
-      //     addSources(s.sources, vResult, state.library);
-      //     handleArgs(s);
-      //   })
-      // } else {
-      //   return updateLibrary(state, (l) =>  addSources(l, vResult, state.library));
-      // }
-      break;
-
+      return window.ipc.openVideos().then((result) => {
+        if (result.length === 0) {
+          return;
+        }
+        if (scene != null) {
+          return updateScene(state, scene, (s) => {
+            addSources(s.sources, result, state.library);
+            handleArgs(s);
+          });
+        } else {
+          return updateLibrary(state, (l) =>
+            addSources(l, result, state.library),
+          );
+        }
+      });
     case AF.videoDir:
       return window.ipc.openVideoDirs().then((result) => {
         if (result.length === 0) {

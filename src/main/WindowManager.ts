@@ -167,3 +167,23 @@ export async function openVideoDirs(windowId: number) {
     (file) => isVideo(file, true) || isVideoPlaylist(file, true),
   );
 }
+
+export async function openVideos(windowId: number) {
+  const window = currentWindows.get(windowId);
+  if (window == null) {
+    return [];
+  }
+
+  const result = await dialog.showOpenDialog(window, {
+    filters: [
+      { name: "All Files (*.*)", extensions: ["*"] },
+      { name: "Video files", extensions: ["mp4", "mkv", "webm", "ogv", "mov"] },
+      { name: "Playlist files", extensions: ["asx", "m3u8", "pls", "xspf"] },
+    ],
+    properties: ["openFile", "multiSelections"],
+  });
+
+  return result.filePaths.filter(
+    (r) => isVideo(r, true) || isVideoPlaylist(r, true),
+  );
+}
