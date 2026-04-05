@@ -1711,10 +1711,10 @@ class Library extends React.Component {
 
   onOpenImportFile() {
     window.ipc.openImport().then((importFile) => {
-      if(importFile != null) {
-        this.setState({importFile});
+      if (importFile != null) {
+        this.setState({ importFile });
       }
-    })
+    });
   }
 
   onChangeImportFile(e: MouseEvent) {
