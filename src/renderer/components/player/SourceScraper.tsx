@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as worker from './Scrapers';
-import recursiveReaddir from "recursive-readdir";
 import {fileUrl_fileURL} from "../../dummy/file-url";
 import wretch from "wretch";
 import uuidv4 from "uuid/v4";
@@ -20,7 +19,7 @@ import Scene from '../../data/Scene';
 import Audio from "../../data/Audio";
 import ChildCallbackHack from './ChildCallbackHack';
 import ImagePlayer from './ImagePlayer';
-import { fs_containsFiles, fs_existsSync, fs_readDirectoryNames } from '../../dummy/fs';
+import { fs_containsFiles, fs_existsSync, fs_readDirectoryNames, fs_recursiveReaddir } from '../../dummy/fs';
 import { path_join } from '../../dummy/path';
 
 let workerInstance: any = null;
@@ -166,7 +165,7 @@ const loadLocalDirectory = (pm: Function, allURLs: Map<string, Array<string>>, a
   const blacklist = ['*.css', '*.html', 'avatar.png', '*.txt'];
   const url = cachePath ? cachePath : source.url;
 
-  recursiveReaddir(url, blacklist, (err: any, rawFiles: Array<string>) => {
+  fs_recursiveReaddir(url, blacklist, (err: any, rawFiles: Array<string>) => {
     if (err) {
       pm({data: {
         error: err.message,

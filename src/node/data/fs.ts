@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { saveDir } from './utils'
+import recursiveReaddir from 'recursive-readdir'
 
 export function fs_readFileSync(path: string, encoding?: BufferEncoding) {
   return fs.readFileSync(path, encoding)
@@ -74,4 +75,8 @@ export function fs_renameSync(src: string, dest: string) {
 
 export function fs_writeFile(path: string, data: string, callback: (err: Error) => void) {
   fs.writeFile(path, data, callback)
+}
+
+export function fs_recursiveReaddir(url: string, blacklist: string[], callback: (err: any, rawFiles: Array<string>) => void) {
+   recursiveReaddir(url, blacklist, callback)
 }
