@@ -49,8 +49,8 @@ function onReset(ev: IpcMainEvent) {
   reset(ev.sender.id);
 }
 
-function onSaveExport(ev: IpcMainEvent, filePath: string, json: string) {
-  saveExport(ev.sender.id, filePath, json);
+async function onSaveExport(ev: IpcMainEvent, filePath: string, json: string) {
+  await saveExport(ev.sender.id, filePath, json);
 }
 
 // Initialize and release listeners
