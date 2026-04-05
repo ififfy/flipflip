@@ -259,3 +259,20 @@ export async function openScripts(windowId: number, shiftKey: boolean) {
 
   return scripts.filter((r) => isText(r, true));
 }
+
+export async function openSubtitle(windowId: number) {
+  const window = currentWindows.get(windowId);
+  if (window == null) {
+    return undefined;
+  }
+
+  const result = await dialog.showOpenDialog(window, {
+    filters: [
+      { name: "All Files (*.*)", extensions: ["*"] },
+      { name: "Web Video Text Tracks (WebVTT)", extensions: ["vtt"] },
+    ],
+    properties: ["openFile"],
+  });
+
+  return result.filePaths.length > 0 ? result.filePaths[0] : undefined;
+}

@@ -890,10 +890,11 @@ class SourceList extends React.Component {
   }
 
   onOpenSubtitleFile() {
-    // FIXME
-    // let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'Web Video Text Tracks (WebVTT)', extensions: ['vtt']}], properties: ['openFile']});
-    // if (!result || !result.length) return;
-    // this.changeKey('subtitleFile', result[0]);
+    window.ipc.openSubtitle().then((result) => {
+      if (result != null) {
+        this.changeKey("subtitleFile", result);
+      }
+    });
   }
 
   onSourceInput(key: string, e: MouseEvent) {
