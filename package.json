@@ -1,7 +1,7 @@
 {
   "name": "flipflip",
   "productName": "flipflip",
-  "version": "1.0.0",
+  "version": "5.0.0-beta1",
   "description": "My Electron application description",
   "main": ".vite/build/main.js",
   "private": true,
