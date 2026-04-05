@@ -64,7 +64,8 @@ interface Navigator extends NavigatorClipboard {}
 declare global {
   interface Window {
     ipc: {
-      newWindow: () => void
+      newWindow: () => void,
+      onStartScene: (callback: (sceneName: string) => void) => void
     }
   }
 }

@@ -64,8 +64,7 @@ export default class Meta extends React.Component {
   componentDidMount() {
     // We never bother cleaning this up, but that's OK because this is the top level
     // component of the whole app.
-    // FIXME
-    // ipcRenderer.on(IPC.startScene, this.startScene.bind(this));
+    window.ipc.onStartScene(this.startScene.bind(this));
 
     // Disable react-sound's verbose console output
     (window as any).soundManager.setup({debugMode: false});
@@ -125,10 +124,9 @@ export default class Meta extends React.Component {
     }
   }
 
-  // FIXME
-  // startScene(ev: IpcMessageEvent, sceneName: string) {
-  //   this.applyAction(actions.startFromScene, sceneName);
-  // }
+  startScene(sceneName: string) {
+    this.applyAction(actions.startFromScene, sceneName);
+  }
 
   // TODO Be able to change audio/script playlists during playback
   //      Be able to right click on grid scenes as overlay
