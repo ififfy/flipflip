@@ -1,9 +1,8 @@
 import * as React from "react";
-import {IncomingMessage} from "electron";
 import clsx from "clsx";
-import {analyze} from "web-audio-beat-detector";
+import { analyze } from "web-audio-beat-detector";
 import { parseFile } from 'music-metadata';
-import request from "request";
+import wretch from "wretch";
 
 import {
   Button,
@@ -37,10 +36,10 @@ import AudiotrackIcon from "@mui/icons-material/Audiotrack";
 import CheckIcon from "@mui/icons-material/Check";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
-import {green, red} from "@mui/material/colors";
+import { green, red } from "@mui/material/colors";
 
-import {toArrayBuffer} from "../../data/utils";
-import {RP, TF} from "../../data/const";
+import { toArrayBuffer } from "../../data/utils";
+import { RP, TF } from "../../data/const";
 import en from "../../data/en";
 import Audio from "../../data/Audio";
 import AudioControl from "../player/AudioControl";
@@ -92,7 +91,7 @@ class AudioOptions extends React.Component {
     onCancel(): void,
     onFinishEdit(common: Audio): void,
   };
-  
+
   readonly state = {
     audio: this.props.audio,
     loadingBPM: false,
@@ -132,7 +131,7 @@ class AudioOptions extends React.Component {
                 repeat={RP.one}
                 scenePaths={[]}
                 startPlaying={false}
-                onAudioSliderChange={this.onSourceSliderChange.bind(this, 'volume')}/>
+                onAudioSliderChange={this.onSourceSliderChange.bind(this, 'volume')} />
             </Grid>
             <Grid item xs={12}>
               <Grid container spacing={2} alignItems="center">
@@ -143,9 +142,9 @@ class AudioOptions extends React.Component {
                         <Switch
                           size="small"
                           checked={this.state.audio.stopAtEnd}
-                          onChange={this.onSourceBoolInput.bind(this, 'stopAtEnd')}/>
+                          onChange={this.onSourceBoolInput.bind(this, 'stopAtEnd')} />
                       }
-                      label="Stop at End"/>
+                      label="Stop at End" />
                   </Collapse>
                   <Collapse in={!this.state.audio.tick && !this.state.audio.stopAtEnd}>
                     <FormControlLabel
@@ -153,9 +152,9 @@ class AudioOptions extends React.Component {
                         <Switch
                           size="small"
                           checked={this.state.audio.nextSceneAtEnd}
-                          onChange={this.onSourceBoolInput.bind(this, 'nextSceneAtEnd')}/>
+                          onChange={this.onSourceBoolInput.bind(this, 'nextSceneAtEnd')} />
                       }
-                      label="Next Scene at End"/>
+                      label="Next Scene at End" />
                   </Collapse>
                   <Collapse in={!this.state.audio.stopAtEnd && !this.state.audio.nextSceneAtEnd}>
                     <FormControlLabel
@@ -164,13 +163,13 @@ class AudioOptions extends React.Component {
                           <Switch
                             size="small"
                             checked={this.state.audio.tick}
-                            onChange={this.onSourceBoolInput.bind(this, 'tick')}/>
+                            onChange={this.onSourceBoolInput.bind(this, 'tick')} />
                         </Tooltip>
                       }
-                      label="Tick"/>
+                      label="Tick" />
                   </Collapse>
                 </Grid>
-                <Divider component="div" orientation="vertical" style={{height: 48}}/>
+                <Divider component="div" orientation="vertical" style={{ height: 48 }} />
                 <Grid item xs>
                   <Grid container>
                     <Grid item xs={12}>
@@ -189,11 +188,11 @@ class AudioOptions extends React.Component {
                                   className={clsx(this.state.successBPM && classes.success, this.state.errorBPM && classes.failure)}
                                   onClick={this.onDetectBPM.bind(this)}
                                   size="large">
-                                  {this.state.successBPM ? <CheckIcon/> :
-                                    this.state.errorBPM ? <ErrorOutlineIcon/> :
+                                  {this.state.successBPM ? <CheckIcon /> :
+                                    this.state.errorBPM ? <ErrorOutlineIcon /> :
                                       <SvgIcon viewBox="0 0 24 24" fontSize="small">
                                         <path
-                                          d="M12,1.75L8.57,2.67L4.07,19.5C4.06,19.5 4,19.84 4,20C4,21.11 4.89,22 6,22H18C19.11,22 20,21.11 20,20C20,19.84 19.94,19.5 19.93,19.5L15.43,2.67L12,1.75M10.29,4H13.71L17.2,17H13V12H11V17H6.8L10.29,4M11,5V9H10V11H14V9H13V5H11Z"/>
+                                          d="M12,1.75L8.57,2.67L4.07,19.5C4.06,19.5 4,19.84 4,20C4,21.11 4.89,22 6,22H18C19.11,22 20,21.11 20,20C20,19.84 19.94,19.5 19.93,19.5L15.43,2.67L12,1.75M10.29,4H13.71L17.2,17H13V12H11V17H6.8L10.29,4M11,5V9H10V11H14V9H13V5H11Z" />
                                       </SvgIcon>
                                   }
                                 </IconButton>
@@ -204,9 +203,9 @@ class AudioOptions extends React.Component {
                                   className={clsx(this.state.successTag && classes.success, this.state.errorTag && classes.failure)}
                                   onClick={this.onReadBPMTag.bind(this)}
                                   size="large">
-                                  {this.state.successTag ? <CheckIcon/> :
-                                    this.state.errorTag ? <ErrorOutlineIcon/> :
-                                      <AudiotrackIcon/>
+                                  {this.state.successTag ? <CheckIcon /> :
+                                    this.state.errorTag ? <ErrorOutlineIcon /> :
+                                      <AudiotrackIcon />
                                   }
                                 </IconButton>
                               </Tooltip>
@@ -216,11 +215,11 @@ class AudioOptions extends React.Component {
                         inputProps={{
                           min: 0,
                           type: 'number',
-                        }}/>
+                        }} />
                     </Grid>
                     <Grid item xs={12}>
                       <Typography variant="caption" component="div"
-                                  color="textSecondary">
+                        color="textSecondary">
                         Speed {this.state.audio.speed / 10}x
                       </Typography>
                       <Slider
@@ -229,8 +228,8 @@ class AudioOptions extends React.Component {
                         defaultValue={this.state.audio.speed}
                         onChangeCommitted={this.onSourceSliderChange.bind(this, 'speed')}
                         valueLabelDisplay={'auto'}
-                        valueLabelFormat={(v) => v/10 + "x"}
-                        aria-labelledby="audio-speed-slider"/>
+                        valueLabelFormat={(v) => v / 10 + "x"}
+                        aria-labelledby="audio-speed-slider" />
                     </Grid>
                   </Grid>
                 </Grid>
@@ -255,7 +254,7 @@ class AudioOptions extends React.Component {
                   <Grid item xs={12} sm={8}>
                     <Collapse in={this.state.audio.tickMode == TF.sin} className={classes.fullWidth}>
                       <Typography variant="caption" component="div"
-                                  color="textSecondary">
+                        color="textSecondary">
                         Wave Rate
                       </Typography>
                       <Grid container alignItems="center">
@@ -265,7 +264,7 @@ class AudioOptions extends React.Component {
                             defaultValue={this.state.audio.tickSinRate}
                             onChangeCommitted={this.onSourceSliderChange.bind(this, 'tickSinRate')}
                             valueLabelDisplay={'auto'}
-                            aria-labelledby="tick-sin-rate-slider"/>
+                            aria-labelledby="tick-sin-rate-slider" />
                         </Grid>
                         <Grid item xs={3} className={classes.percentInput}>
                           <TextField
@@ -286,7 +285,7 @@ class AudioOptions extends React.Component {
                     </Collapse>
                     <Collapse in={this.state.audio.tickMode == TF.bpm} className={classes.fullWidth}>
                       <Typography variant="caption" component="div"
-                                  color="textSecondary">
+                        color="textSecondary">
                         BPM
                         Multiplier {this.state.audio.tickBPMMulti > 0 ? this.state.audio.tickBPMMulti : "1 / " + (-1 * (this.state.audio.tickBPMMulti - 2))}x
                       </Typography>
@@ -297,7 +296,7 @@ class AudioOptions extends React.Component {
                         onChangeCommitted={this.onSourceSliderChange.bind(this, 'tickBPMMulti')}
                         valueLabelDisplay={'auto'}
                         valueLabelFormat={(v) => v > 0 ? v + "x" : "1/" + (-1 * (v - 2)) + "x"}
-                        aria-labelledby="tick-bpm-multi-slider"/>
+                        aria-labelledby="tick-bpm-multi-slider" />
                     </Collapse>
                     <Collapse in={this.state.audio.tickMode == TF.constant} className={classes.fullWidth}>
                       <TextField
@@ -314,7 +313,7 @@ class AudioOptions extends React.Component {
                           step: 100,
                           min: 0,
                           type: 'number',
-                        }}/>
+                        }} />
                     </Collapse>
                   </Grid>
                 </Grid>
@@ -338,7 +337,7 @@ class AudioOptions extends React.Component {
                         step: 100,
                         min: 0,
                         type: 'number',
-                      }}/>
+                      }} />
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <TextField
@@ -355,7 +354,7 @@ class AudioOptions extends React.Component {
                         step: 100,
                         min: 0,
                         type: 'number',
-                      }}/>
+                      }} />
                   </Grid>
                 </Grid>
               </Collapse>
@@ -407,7 +406,7 @@ class AudioOptions extends React.Component {
           audio.tick = true;
           audio.stopAtEnd = false;
           audio.nextSceneAtEnd = false;
-          this.setState({audio: audio});
+          this.setState({ audio: audio });
         } else {
           this.changeKey(key, false);
         }
@@ -418,7 +417,7 @@ class AudioOptions extends React.Component {
           audio.stopAtEnd = true;
           audio.tick = false;
           audio.nextSceneAtEnd = false;
-          this.setState({audio: audio});
+          this.setState({ audio: audio });
         } else {
           this.changeKey(key, false);
         }
@@ -429,7 +428,7 @@ class AudioOptions extends React.Component {
           audio.nextSceneAtEnd = true;
           audio.tick = false;
           audio.stopAtEnd = false;
-          this.setState({audio: audio});
+          this.setState({ audio: audio });
         } else {
           this.changeKey(key, false);
         }
@@ -439,36 +438,36 @@ class AudioOptions extends React.Component {
   changeKey(key: string, value: any) {
     const audio = new Audio(this.state.audio);
     (audio as any)[key] = value;
-    this.setState({audio: audio});
+    this.setState({ audio: audio });
   }
 
   onReadBPMTag() {
     if (this.state.audio.url && !this.state.loadingTag) {
-      this.setState({loadingTag: true});
+      this.setState({ loadingTag: true });
       parseFile(this.state.audio.url)
         .then((metadata: any) => {
           if (metadata && metadata.common && metadata.common.bpm) {
             this.changeKey('bpm', metadata.common.bpm);
-            this.setState({loadingTag: false, successTag: true});
-            setTimeout(() => {this.setState({successTag: false})}, 3000);
+            this.setState({ loadingTag: false, successTag: true });
+            setTimeout(() => { this.setState({ successTag: false }) }, 3000);
           } else {
-            this.setState({loadingTag: false, errorTag: true});
-            setTimeout(() => {this.setState({errorTag: false})}, 3000);
+            this.setState({ loadingTag: false, errorTag: true });
+            setTimeout(() => { this.setState({ errorTag: false }) }, 3000);
           }
         })
         .catch((err: any) => {
           console.error("Error reading metadata:", err.message);
-          this.setState({loadingTag: false, errorTag: true});
-          setTimeout(() => {this.setState({errorTag: false})}, 3000);
+          this.setState({ loadingTag: false, errorTag: true });
+          setTimeout(() => { this.setState({ errorTag: false }) }, 3000);
         });
     }
   }
 
   onDetectBPM() {
     const bpmError = () => {
-      this.setState({loadingBPM: false, errorBPM: true});
+      this.setState({ loadingBPM: false, errorBPM: true });
       setTimeout(() => {
-        this.setState({errorBPM: false})
+        this.setState({ errorBPM: false })
       }, 3000);
     }
 
@@ -480,9 +479,9 @@ class AudioOptions extends React.Component {
           analyze(buffer)
             .then((tempo: number) => {
               this.changeKey('bpm', tempo.toFixed(2));
-              this.setState({loadingBPM: false, successBPM: true});
+              this.setState({ loadingBPM: false, successBPM: true });
               setTimeout(() => {
-                this.setState({successBPM: false})
+                this.setState({ successBPM: false })
               }, 3000);
             })
             .catch((err: any) => {
@@ -501,20 +500,18 @@ class AudioOptions extends React.Component {
     }
 
     if (this.state.audio.url && !this.state.loadingBPM) {
-      this.setState({loadingBPM: true});
+      this.setState({ loadingBPM: true });
       try {
         const url = this.state.audio.url;
         if (fs_existsSync(url)) {
           detectBPM(toArrayBuffer(fs_readFileSync(url)));
         } else {
-          request.get({url, encoding: null}, function (err: Error, res: IncomingMessage, body: Buffer) {
-            if (err) {
-              console.error(err);
-              bpmError();
-              return;
-            }
-            detectBPM(toArrayBuffer(body));
-          });
+          wretch(url).get().arrayBuffer((body) => {
+            detectBPM(body);
+          }).catch((err) => {
+            console.error(err);
+            bpmError();
+          })
         }
       } catch (e) {
         console.error(e);
@@ -524,5 +521,5 @@ class AudioOptions extends React.Component {
   }
 }
 
-(AudioOptions as any).displayName="AudioOptions";
+(AudioOptions as any).displayName = "AudioOptions";
 export default withStyles(styles)(AudioOptions as any);

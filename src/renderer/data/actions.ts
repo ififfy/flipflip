@@ -1,4 +1,4 @@
-import {IncomingMessage, remote, webFrame} from "electron";
+import {remote, webFrame} from "electron";
 import wretch from "wretch";
 import tumblr, {TumblrClient} from "tumblr.js";
 import Snoowrap from "snoowrap";
@@ -6,7 +6,6 @@ import Twitter from "twitter";
 import {IgApiClient} from "instagram-private-api";
 import {analyze} from "web-audio-beat-detector";
 import {parseFile} from "music-metadata";
-import request from "request";
 import moment from "moment";
 
 import {
@@ -3328,13 +3327,11 @@ export function detectBPMs(getState: () => State, setState: Function) {
       if (fs_existsSync(url)) {
         detectBPM(toArrayBuffer(fs_readFileSync(url)));
       } else {
-        request.get({url, encoding: null}, function (e: Error, res: IncomingMessage, body: Buffer) {
-          if (e) {
-            bpmError(e);
-            return;
-          }
-          detectBPM(toArrayBuffer(body));
-        });
+        wretch(url).get().arrayBuffer((body) => {
+          detectBPM(body);
+        }).catch((e) => {
+          bpmError(e);
+        })
       }
     } catch (e) {
       bpmError(e);

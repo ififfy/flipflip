@@ -1,6 +1,5 @@
 import IncomingMessage = Electron.IncomingMessage;
 import * as React from 'react';
-import request from 'request';
 import gifInfo from 'gif-info';
 
 import {CircularProgress, Container, Typography} from "@mui/material";
@@ -15,6 +14,7 @@ import ImageView from './ImageView';
 import Strobe from "./Strobe";
 import Audio from "../../data/Audio";
 import { fs_existsSync, fs_readFileSync } from '../../dummy/fs';
+import wretch from "wretch";
 
 class GifInfo {
   animated: boolean;
@@ -952,14 +952,12 @@ export default class ImagePlayer extends React.Component {
           if (url.includes("file://")) {
             processInfo(gifInfo(toArrayBuffer(fs_readFileSync(urlToPath(url)))));
           } else {
-            request.get({url, encoding: null}, function (err: Error, res: IncomingMessage, body: Buffer) {
-              if (err) {
-                console.error(err);
-                processInfo(null);
-                return;
-              }
-              processInfo(gifInfo(toArrayBuffer(body)));
-            });
+            wretch(url).get().arrayBuffer((body) => {
+              processInfo(gifInfo(body));
+            }).catch((err) => {
+              console.error(err);
+              processInfo(null);
+            })
           }
         } catch (e) {
           console.error(e);
