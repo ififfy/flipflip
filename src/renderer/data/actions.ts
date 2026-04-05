@@ -402,51 +402,6 @@ export function cacheImage(
   }
 }
 
-export function printMemoryReport() {
-  function format(x: any) {
-    let f = x.toString();
-    while (f.length < 15) {
-      f = " " + f;
-    }
-    f = f.substr(0, 15);
-    return f;
-  }
-  function logB(x: any) {
-    console.log(
-      format(x[0]),
-      format((x[1] / (1000.0 * 1000)).toFixed(2)),
-      "MB",
-    );
-  }
-  function logKB(x: any) {
-    console.log(format(x[0]), format((x[1] / 1000.0).toFixed(2)), "MB");
-  }
-  function logCount(x: any) {
-    console.log(
-      format(x[0]),
-      format(x[1].count),
-      format((x[1].size / (1000.0 * 1000)).toFixed(2)),
-      "MB",
-      format((x[1].liveSize / (1000.0 * 1000)).toFixed(2)),
-      "MB",
-    );
-  }
-
-  Object.entries(process.memoryUsage()).map(logB);
-  Object.entries(process.getProcessMemoryInfo()).map(logKB);
-  Object.entries(process.getSystemMemoryInfo()).map(logKB);
-  console.log("\n");
-  console.log(
-    format("object"),
-    format("count"),
-    format("size"),
-    format("liveSize"),
-  );
-  // FIXME
-  // Object.entries(webFrame.getResourceUsage()).map(logCount);
-  console.log("------");
-}
-
 export function goBack(state: State): Object {
   const newRoute = state.route.slice(0, state.route.length - 1);
   return { route: newRoute, specialMode: null };
