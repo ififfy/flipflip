@@ -220,6 +220,7 @@ const IPC = {
   openExternal: "ipc.openExternal",
   reset: "ipc.reset",
   saveExport: "ipc.saveExport",
+  openImport: "ipc.openImport",
 };
 
 const MO = {

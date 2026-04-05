@@ -78,6 +78,7 @@ declare global {
       openExternal: (url: string) => void;
       reset: () => void;
       saveExport: (filePath: string, json: string) => void;
+      openImport: () => Promise<string | undefined>;
     };
   }
 }

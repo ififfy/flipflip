@@ -108,3 +108,19 @@ export async function saveExport(
 
   fs.writeFileSync(result.filePath, json);
 }
+
+export async function openImport(windowId: number) {
+  const window = currentWindows.get(windowId);
+  if (window == null) {
+    return;
+  }
+
+  const result = await dialog.showOpenDialog(window, {
+    filters: [
+      { name: "All Files (*.*)", extensions: ["*"] },
+      { name: "JSON Document", extensions: ["json"] },
+    ],
+    properties: ["openFile"],
+  });
+  return result.filePaths.length > 0 ? result.filePaths[0] : undefined;
+}
