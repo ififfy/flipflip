@@ -227,10 +227,7 @@ class ScriptPlaylist extends React.Component {
     if (e.shiftKey && !e.ctrlKey) {
       this.openExternalURL(sourceURL);
     } else if (!e.shiftKey && e.ctrlKey) {
-      if (fs_existsSync(sourceURL)) {
-        // FIXME
-        // remote.shell.showItemInFolder(sourceURL);
-      }
+      window.ipc.showItemInFolder(sourceURL);
     } else if (!e.shiftKey && !e.ctrlKey && this.props.systemMessage) {
       try {
         this.props.onPlay(

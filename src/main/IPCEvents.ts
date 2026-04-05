@@ -1,3 +1,4 @@
+import fs from "fs";
 import { ipcMain, IpcMainEvent, IpcMainInvokeEvent, shell } from "electron";
 
 import {
@@ -55,6 +56,12 @@ function onRestoreBackup(ev: IpcMainInvokeEvent, backupFile: string) {
 
 function onOpenExternal(ev: IpcMainEvent, url: string) {
   shell.openExternal(url);
+}
+
+function onShowItemInFolder(ev: IpcMainEvent, path: string) {
+  if (fs.existsSync(path)) {
+    shell.showItemInFolder(path);
+  }
 }
 
 function onReset(ev: IpcMainEvent) {
@@ -117,6 +124,7 @@ export function initializeIpcEvents() {
   ipcMain.on(IPC.cleanBackups, onCleanBackups);
   ipcMain.handle(IPC.restoreBackup, onRestoreBackup);
   ipcMain.on(IPC.openExternal, onOpenExternal);
+  ipcMain.on(IPC.showItemInFolder, onShowItemInFolder);
   ipcMain.on(IPC.reset, onReset);
   ipcMain.on(IPC.saveExport, onSaveExport);
   ipcMain.handle(IPC.openImport, onOpenImport);

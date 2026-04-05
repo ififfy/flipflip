@@ -218,6 +218,7 @@ const IPC = {
   getAppStorage: "ipc.getAppStorage",
   saveAppStorage: "ipc.saveAppStorage",
   openExternal: "ipc.openExternal",
+  showItemInFolder: "ipc.showItemInFolder",
   reset: "ipc.reset",
   saveExport: "ipc.saveExport",
   openImport: "ipc.openImport",

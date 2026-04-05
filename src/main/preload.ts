@@ -15,6 +15,8 @@ contextBridge.exposeInMainWorld("ipc", {
   restoreBackup: (backupFile: string) =>
     ipcRenderer.invoke(IPC.restoreBackup, backupFile),
   openExternal: (url: string) => ipcRenderer.send(IPC.openExternal, url),
+  showItemInFolder: (path: string) =>
+    ipcRenderer.send(IPC.showItemInFolder, path),
   reset: () => ipcRenderer.send(IPC.reset),
   saveExport: (filePath: string, json: string) =>
     ipcRenderer.send(IPC.saveExport, filePath, json),

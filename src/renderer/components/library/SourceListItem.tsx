@@ -544,9 +544,8 @@ class SourceListItem extends React.Component {
           )
         ) {
           cachePath = getCachePath(sourceURL, this.props.config);
-        } else if (fs_existsSync(sourceURL)) {
-          // FIXME
-          // remote.shell.showItemInFolder(sourceURL);
+        } else {
+          window.ipc.showItemInFolder(sourceURL);
         }
       } else {
         cachePath = getCachePath(sourceURL, this.props.config);

@@ -392,10 +392,7 @@ class AudioSourceListItem extends React.Component {
     } else if (e.shiftKey && !e.ctrlKey) {
       this.openExternalURL(sourceURL);
     } else if (!e.shiftKey && e.ctrlKey) {
-      // FIXME
-      // if (fs_existsSync(sourceURL)) {
-      //   remote.shell.showItemInFolder(sourceURL);
-      // }
+      window.ipc.showItemInFolder(sourceURL);
     } else if (!e.shiftKey && !e.ctrlKey) {
       this.props.savePosition();
       try {
