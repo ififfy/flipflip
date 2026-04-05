@@ -66,7 +66,7 @@ import SortIcon from "@mui/icons-material/Sort";
 
 import { red } from "@mui/material/colors";
 
-import { extractMusicMetadata, getFilesRecursively } from "../../data/utils";
+import { extractMusicMetadata } from "../../data/utils";
 import { isAudio } from "../player/Scrapers";
 import { AF, ASF, ALT, MO, SP, PR } from "../../../common/const";
 import en from "../../data/en";
@@ -80,7 +80,7 @@ import AudioAlbumList from "./AudioAlbumList";
 import PlaylistSelect from "../configGroups/PlaylistSelect";
 import PlaylistList from "./PlaylistList";
 import AudioEdit from "./AudioEdit";
-import { fs_existsSync, fs_isDirectory } from "../../dummy/fs";
+import { fs_existsSync } from "../../dummy/fs";
 import { path_sep } from "../../dummy/path";
 
 const drawerWidth = 240;

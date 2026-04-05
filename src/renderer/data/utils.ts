@@ -409,11 +409,6 @@ export function getRandomListItem(list: any[], count: number = 1) {
   }
 }
 
-export function getFilesRecursively(path: string): string[] {
-  // dummy, migrated to src/node/data/utils.ts
-  return [];
-}
-
 export function isText(path: string, strict: boolean): boolean {
   if (path == null) return false;
   const p = path.toLowerCase();
