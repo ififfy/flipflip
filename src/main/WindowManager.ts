@@ -276,3 +276,20 @@ export async function openSubtitle(windowId: number) {
 
   return result.filePaths.length > 0 ? result.filePaths[0] : undefined;
 }
+
+export async function openScript(windowId: number) {
+  const window = currentWindows.get(windowId);
+  if (window == null) {
+    return undefined;
+  }
+
+  const result = await dialog.showOpenDialog(window, {
+    filters: [
+      { name: "All Files (*.*)", extensions: ["*"] },
+      { name: "Text Document", extensions: ["txt"] },
+    ],
+    properties: ["openFile"],
+  });
+
+  return result.filePaths.length > 0 ? result.filePaths[0] : undefined;
+}

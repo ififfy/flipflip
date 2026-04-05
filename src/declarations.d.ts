@@ -85,6 +85,7 @@ declare global {
       openAudios: (shiftKey: boolean) => Promise<string[]>;
       openScripts: (shiftKey: boolean) => Promise<string[]>;
       openSubtitle: () => Promise<string | undefined>;
+      openScript: () => Promise<string | undefined>;
     };
   }
 }

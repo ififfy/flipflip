@@ -27,6 +27,7 @@ contextBridge.exposeInMainWorld("ipc", {
   openScripts: (shiftKey: boolean) =>
     ipcRenderer.invoke(IPC.openScripts, shiftKey),
   openSubtitle: () => ipcRenderer.invoke(IPC.openSubtitle),
+  openScript: () => ipcRenderer.invoke(IPC.openScript),
   onStartScene: (callback: (sceneName: string) => void) =>
     ipcRenderer.on(IPC.startScene, (_event, sceneName: string) =>
       callback(sceneName),

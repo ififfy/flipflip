@@ -10,6 +10,7 @@ import {
   openAudios,
   openScripts,
   openSubtitle,
+  openScript,
 } from "./WindowManager";
 import { IPC } from "../common/const";
 import { getBackups } from "./utils";
@@ -91,6 +92,10 @@ async function onOpenSubtitle(ev: IpcMainEvent) {
   return await openSubtitle(ev.sender.id);
 }
 
+async function onOpenScript(ev: IpcMainEvent) {
+  return await openScript(ev.sender.id);
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -116,6 +121,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.openAudios, onOpenAudios);
   ipcMain.handle(IPC.openScripts, onOpenScripts);
   ipcMain.handle(IPC.openSubtitle, onOpenSubtitle);
+  ipcMain.handle(IPC.openScript, onOpenScript);
 }
 
 export function releaseIpcEvents() {

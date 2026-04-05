@@ -1246,21 +1246,22 @@ class CaptionScriptor extends React.Component {
 
   onConfirmOpen() {
     this.onCloseDialog();
-    // FIXME
-    // let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
-    //   {
-    //     filters: [{ name: 'All Files (*.*)', extensions: ['*'] }, { name: 'Text Document', extensions: ['txt'] }],
-    //     properties: ['openFile']
-    //   });
-    // if (!result || !result.length) return;
-    // const url = result[0];
-    // wretch(url)
-    //   .get()
-    //   .text(data => {
-    //     this.state.codeMirrorOverwriteHack.args = [data];
-    //     this.state.codeMirrorOverwriteHack.fire();
-    //     this.setState({ captionScript: new CaptionScript({ url: url }), scriptChanged: false });
-    //   });
+    window.ipc.openScript().then((url) => {
+      if (url == null) {
+        return;
+      }
+
+      wretch(url)
+        .get()
+        .text((data) => {
+          this.state.codeMirrorOverwriteHack.args = [data];
+          this.state.codeMirrorOverwriteHack.fire();
+          this.setState({
+            captionScript: new CaptionScript({ url }),
+            scriptChanged: false,
+          });
+        });
+    });
   }
 
   onOpenFromLibrary() {
