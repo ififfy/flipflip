@@ -19,8 +19,7 @@ contextBridge.exposeInMainWorld("ipc", {
   saveExport: (filePath: string, json: string) =>
     ipcRenderer.send(IPC.saveExport, filePath, json),
   openImport: () => ipcRenderer.invoke(IPC.openImport),
-  openDirectory: (multiSelections?: boolean) =>
-    ipcRenderer.invoke(IPC.openDirectory, multiSelections),
+  openDirectory: () => ipcRenderer.invoke(IPC.openDirectory),
   onStartScene: (callback: (sceneName: string) => void) =>
     ipcRenderer.on(IPC.startScene, (_event, sceneName: string) =>
       callback(sceneName),

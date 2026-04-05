@@ -126,10 +126,7 @@ export async function openImport(windowId: number) {
   return result.filePaths.length > 0 ? result.filePaths[0] : undefined;
 }
 
-export async function openDirectory(
-  windowId: number,
-  multiSelections?: boolean,
-) {
+export async function openDirectory(windowId: number) {
   const window = currentWindows.get(windowId);
   if (window == null) {
     return [];
