@@ -3,10 +3,10 @@ import { animated } from "react-spring";
 import Timeout = NodeJS.Timeout;
 
 import { getRandomColor, getRandomListItem } from "../../data/utils";
-import { BT, HTF, IT, OT, SL, ST, TF, VTF } from "../../data/const";
-import Config from "../../data/Config";
-import Scene from "../../data/Scene";
-import Audio from "../../data/Audio";
+import { BT, HTF, IT, OT, SL, ST, TF, VTF } from "../../../common/const";
+import Config from "../../../common/Config";
+import Scene from "../../../common/Scene";
+import Audio from "../../../common/Audio";
 import Strobe from "./Strobe";
 import wretch from "wretch";
 import FadeInOut from "./FadeInOut";

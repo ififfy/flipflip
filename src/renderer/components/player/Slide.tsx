@@ -1,10 +1,10 @@
 import * as React from "react";
 import { animated, useTransition } from "react-spring";
 
-import { STF, TF } from "../../data/const";
+import { STF, TF } from "../../../common/const";
 import { getEaseFunction, getRandomNumber } from "../../data/utils";
-import Scene from "../../data/Scene";
-import Audio from "../../data/Audio";
+import Scene from "../../../common/Scene";
+import Audio from "../../../common/Audio";
 
 export default class Slide extends React.Component {
   readonly props: {

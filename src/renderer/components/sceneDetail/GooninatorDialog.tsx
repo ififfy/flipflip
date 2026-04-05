@@ -19,7 +19,7 @@ import {
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 
-import { GT } from "../../data/const";
+import { GT } from "../../../common/const";
 
 const styles = (theme: Theme) =>
   createStyles({

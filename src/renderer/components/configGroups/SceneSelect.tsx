@@ -6,8 +6,8 @@ import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 import { grey } from "@mui/material/colors";
 
-import Scene from "../../data/Scene";
-import SceneGrid from "../../data/SceneGrid";
+import Scene from "../../../common/Scene";
+import SceneGrid from "../../../common/SceneGrid";
 import { areWeightsValid } from "../../data/utils";
 
 const styles = (theme: Theme) =>

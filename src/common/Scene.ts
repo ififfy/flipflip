@@ -1,4 +1,4 @@
-import { urlToPath } from "./utils";
+import { urlToPath } from "../renderer/data/utils";
 import {
   BT,
   EA,
@@ -23,7 +23,7 @@ import Audio from "./Audio";
 import Overlay from "./Overlay";
 import WeightGroup from "./WeightGroup";
 import CaptionScript from "./CaptionScript";
-import { path_sep } from "../dummy/path";
+import { path_sep } from "../renderer/dummy/path";
 
 export default class Scene {
   id: number = 0;

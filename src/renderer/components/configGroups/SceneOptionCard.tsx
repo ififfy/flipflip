@@ -34,18 +34,18 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import ListIcon from "@mui/icons-material/List";
 
-import { BT, IT, SDT, TF } from "../../data/const";
-import { SceneSettings } from "../../data/Config";
+import { BT, IT, SDT, TF } from "../../../common/const";
+import { SceneSettings } from "../../../common/Config";
 import SceneSelect from "./SceneSelect";
 import en from "../../data/en";
-import Overlay from "../../data/Overlay";
-import Scene from "../../data/Scene";
+import Overlay from "../../../common/Overlay";
+import Scene from "../../../common/Scene";
 import ColorPicker from "../config/ColorPicker";
 import ColorSetPicker from "../config/ColorSetPicker";
 import MultiSceneSelect from "./MultiSceneSelect";
 import { areWeightsValid } from "../../data/utils";
-import Audio from "../../data/Audio";
-import SceneGrid from "../../data/SceneGrid";
+import Audio from "../../../common/Audio";
+import SceneGrid from "../../../common/SceneGrid";
 
 const styles = (theme: Theme) =>
   createStyles({

@@ -18,8 +18,8 @@ import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 
 import { arrayMove } from "../../data/utils";
-import Audio from "../../data/Audio";
-import Playlist from "../../data/Playlist";
+import Audio from "../../../common/Audio";
+import Playlist from "../../../common/Playlist";
 import AudioSourceListItem from "./AudioSourceListItem";
 import AudioEdit from "./AudioEdit";
 import AudioOptions from "./AudioOptions";

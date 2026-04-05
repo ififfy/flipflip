@@ -4,7 +4,7 @@ import * as path from "path";
 import * as url from "url";
 
 import { releaseIpcEvents } from "./IPCEvents";
-import { IPC } from "../renderer/data/const";
+import { IPC } from "../common/const";
 
 // Current window list
 const currentWindows: Map<number, BrowserWindow> = new Map();

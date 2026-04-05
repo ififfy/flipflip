@@ -6,7 +6,7 @@ import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 import { grey } from "@mui/material/colors";
 
-import Playlist from "../../data/Playlist";
+import Playlist from "../../../common/Playlist";
 
 const styles = (theme: Theme) =>
   createStyles({

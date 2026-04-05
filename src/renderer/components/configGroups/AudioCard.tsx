@@ -16,9 +16,9 @@ import withStyles from "@mui/styles/withStyles";
 
 import AddIcon from "@mui/icons-material/Add";
 
-import { RP } from "../../data/const";
-import Scene from "../../data/Scene";
-import Audio from "../../data/Audio";
+import { RP } from "../../../common/const";
+import Scene from "../../../common/Scene";
+import Audio from "../../../common/Audio";
 import AudioPlaylist from "../player/AudioPlaylist";
 import AudioOptions from "../library/AudioOptions";
 

@@ -4,7 +4,7 @@ import gifInfo from "gif-info";
 
 import { CircularProgress, Container, Typography } from "@mui/material";
 
-import { GO, IF, OF, OT, SL, SOF, ST, TF, VO, WF } from "../../data/const";
+import { GO, IF, OF, OT, SL, SOF, ST, TF, VO, WF } from "../../../common/const";
 import {
   flatten,
   getCachePath,
@@ -14,12 +14,12 @@ import {
   urlToPath,
 } from "../../data/utils";
 import { getFileName, getSourceType, isVideo } from "./Scrapers";
-import Config from "../../data/Config";
-import Scene from "../../data/Scene";
+import Config from "../../../common/Config";
+import Scene from "../../../common/Scene";
 import ChildCallbackHack from "./ChildCallbackHack";
 import ImageView from "./ImageView";
 import Strobe from "./Strobe";
-import Audio from "../../data/Audio";
+import Audio from "../../../common/Audio";
 import { fs_existsSync, fs_readFileSync } from "../../dummy/fs";
 import wretch from "wretch";
 

@@ -2,12 +2,12 @@ import * as React from "react";
 
 import { Card, CardContent, Grid } from "@mui/material";
 
-import Scene from "../../data/Scene";
+import Scene from "../../../common/Scene";
 import AudioCard from "../configGroups/AudioCard";
 import TextCard from "../configGroups/TextCard";
-import { SceneSettings } from "../../data/Config";
-import Audio from "../../data/Audio";
-import CaptionScript from "../../data/CaptionScript";
+import { SceneSettings } from "../../../common/Config";
+import Audio from "../../../common/Audio";
+import CaptionScript from "../../../common/CaptionScript";
 
 export default class AudioTextEffects extends React.Component {
   readonly props: {

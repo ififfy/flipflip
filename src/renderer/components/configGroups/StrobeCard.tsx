@@ -24,11 +24,11 @@ import withStyles from "@mui/styles/withStyles";
 
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
-import { EA, SC, SL, TF } from "../../data/const";
-import { SceneSettings } from "../../data/Config";
+import { EA, SC, SL, TF } from "../../../common/const";
+import { SceneSettings } from "../../../common/Config";
 import en from "../../data/en";
-import Scene from "../../data/Scene";
-import Audio from "../../data/Audio";
+import Scene from "../../../common/Scene";
+import Audio from "../../../common/Audio";
 import ColorPicker from "../config/ColorPicker";
 import ColorSetPicker from "../config/ColorSetPicker";
 

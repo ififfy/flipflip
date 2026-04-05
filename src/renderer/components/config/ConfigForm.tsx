@@ -41,18 +41,18 @@ import PhotoFilterIcon from "@mui/icons-material/PhotoFilter";
 import RestoreIcon from "@mui/icons-material/Restore";
 import SettingsIcon from "@mui/icons-material/Settings";
 
-import { MO } from "../../data/const";
+import { MO } from "../../../common/const";
 import Config, {
   CacheSettings,
   DisplaySettings,
   GeneralSettings,
   RemoteSettings,
   SceneSettings,
-} from "../../data/Config";
-import LibrarySource from "../../data/LibrarySource";
-import Scene from "../../data/Scene";
-import SceneGrid from "../../data/SceneGrid";
-import Tag from "../../data/Tag";
+} from "../../../common/Config";
+import LibrarySource from "../../../common/LibrarySource";
+import Scene from "../../../common/Scene";
+import SceneGrid from "../../../common/SceneGrid";
+import Tag from "../../../common/Tag";
 import GeneralConfig from "./GeneralConfig";
 import SceneOptions from "../sceneDetail/SceneOptions";
 import SceneEffects from "../sceneDetail/SceneEffects";

@@ -38,14 +38,14 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import NotInterestedIcon from "@mui/icons-material/NotInterested";
 
-import { SDGT, TT } from "../../data/const";
+import { SDGT, TT } from "../../../common/const";
 import { arrayMove } from "../../data/utils";
 import en from "../../data/en";
-import Scene from "../../data/Scene";
-import Tag from "../../data/Tag";
-import WeightGroup from "../../data/WeightGroup";
+import Scene from "../../../common/Scene";
+import Tag from "../../../common/Tag";
+import WeightGroup from "../../../common/WeightGroup";
 import LibrarySearch from "../library/LibrarySearch";
-import LibrarySource from "../../data/LibrarySource";
+import LibrarySource from "../../../common/LibrarySource";
 
 const styles = (theme: Theme) =>
   createStyles({

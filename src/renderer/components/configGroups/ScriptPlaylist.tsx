@@ -25,10 +25,10 @@ import RepeatOneIcon from "@mui/icons-material/RepeatOne";
 import ShuffleIcon from "@mui/icons-material/Shuffle";
 
 import { arrayMove } from "../../data/utils";
-import { RP } from "../../data/const";
-import Scene from "../../data/Scene";
+import { RP } from "../../../common/const";
+import Scene from "../../../common/Scene";
 import SourceIcon from "../library/SourceIcon";
-import CaptionScript from "../../data/CaptionScript";
+import CaptionScript from "../../../common/CaptionScript";
 import { fs_existsSync } from "../../dummy/fs";
 
 const styles = (theme: Theme) =>

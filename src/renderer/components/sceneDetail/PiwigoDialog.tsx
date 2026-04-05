@@ -37,7 +37,7 @@ import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 
-import { AF, PW, PWS } from "../../data/const";
+import { AF, PW, PWS } from "../../../common/const";
 import { arrayMove } from "../../data/utils";
 import en from "../../data/en";
 

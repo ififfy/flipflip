@@ -28,8 +28,8 @@ import VolumeDownIcon from "@mui/icons-material/VolumeDown";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 
 import { getMsRemainder, getTimestamp } from "../../data/utils";
-import { RP, TF } from "../../data/const";
-import Audio from "../../data/Audio";
+import { RP, TF } from "../../../common/const";
+import Audio from "../../../common/Audio";
 import SoundTick from "./SoundTick";
 
 const styles = (theme: Theme) =>

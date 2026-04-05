@@ -1,10 +1,10 @@
 import * as React from "react";
 import { animated, useTransition } from "react-spring";
 
-import { TF } from "../../data/const";
+import { TF } from "../../../common/const";
 import { getEaseFunction } from "../../data/utils";
-import Scene from "../../data/Scene";
-import Audio from "../../data/Audio";
+import Scene from "../../../common/Scene";
+import Audio from "../../../common/Audio";
 
 export default class CrossFade extends React.Component {
   readonly props: {

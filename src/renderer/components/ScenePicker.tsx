@@ -68,14 +68,14 @@ import SortIcon from "@mui/icons-material/Sort";
 import SystemUpdateIcon from "@mui/icons-material/SystemUpdate";
 
 import { arrayMove, getRandomListItem } from "../data/utils";
-import { MO, SF, SG, SPT } from "../data/const";
+import { MO, SF, SG, SPT } from "../../common/const";
 import en from "../data/en";
-import Config from "../data/Config";
-import Scene from "../data/Scene";
-import SceneGroup from "../data/SceneGroup";
+import Config from "../../common/Config";
+import Scene from "../../common/Scene";
+import SceneGroup from "../../common/SceneGroup";
 import Jiggle from "../animations/Jiggle";
 import VSpin from "../animations/VSpin";
-import SceneGrid from "../data/SceneGrid";
+import SceneGrid from "../../common/SceneGrid";
 import SceneSearch from "../SceneSearch";
 import { fs_readFileSync } from "../dummy/fs";
 

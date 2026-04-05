@@ -69,13 +69,13 @@ import SaveIcon from "@mui/icons-material/Save";
 import ShuffleIcon from "@mui/icons-material/Shuffle";
 import SortIcon from "@mui/icons-material/Sort";
 
-import { AF, MO, SDGT, SDT, SF, SS, ST, TT, WF } from "../../data/const";
+import { AF, MO, SDGT, SDT, SF, SS, ST, TT, WF } from "../../../common/const";
 import en from "../../data/en";
-import Config from "../../data/Config";
-import LibrarySource from "../../data/LibrarySource";
-import Scene from "../../data/Scene";
-import Tag from "../../data/Tag";
-import WeightGroup from "../../data/WeightGroup";
+import Config from "../../../common/Config";
+import LibrarySource from "../../../common/LibrarySource";
+import Scene from "../../../common/Scene";
+import Tag from "../../../common/Tag";
+import WeightGroup from "../../../common/WeightGroup";
 import SceneEffects from "./SceneEffects";
 import SceneGenerator from "./SceneGenerator";
 import SceneOptions from "./SceneOptions";
@@ -90,9 +90,9 @@ import {
   getTimestampValue,
 } from "../../data/utils";
 import { getSourceType } from "../player/Scrapers";
-import Audio from "../../data/Audio";
-import CaptionScript from "../../data/CaptionScript";
-import SceneGrid from "../../data/SceneGrid";
+import Audio from "../../../common/Audio";
+import CaptionScript from "../../../common/CaptionScript";
+import SceneGrid from "../../../common/SceneGrid";
 import PiwigoDialog from "./PiwigoDialog";
 import SourceIcon from "../library/SourceIcon";
 import URLDialog from "./URLDialog";

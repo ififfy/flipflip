@@ -10,11 +10,11 @@ import captionProgramDefaults, {
   getTimingFromString,
   htmlEntities,
 } from "../../data/utils";
-import { RP, TF } from "../../data/const";
-import Tag from "../../data/Tag";
+import { RP, TF } from "../../../common/const";
+import Tag from "../../../common/Tag";
 import ChildCallbackHack from "./ChildCallbackHack";
-import Audio from "../../data/Audio";
-import CaptionScript from "../../data/CaptionScript";
+import Audio from "../../../common/Audio";
+import CaptionScript from "../../../common/CaptionScript";
 import { CircularProgress } from "@mui/material";
 import { fs_existsSync } from "../../dummy/fs";
 

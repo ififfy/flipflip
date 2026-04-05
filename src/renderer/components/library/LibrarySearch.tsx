@@ -10,9 +10,9 @@ import { grey } from "@mui/material/colors";
 
 import { getSourceType } from "../player/Scrapers";
 import en from "../../data/en";
-import Audio from "../../data/Audio";
-import LibrarySource from "../../data/LibrarySource";
-import Tag from "../../data/Tag";
+import Audio from "../../../common/Audio";
+import LibrarySource from "../../../common/LibrarySource";
+import Tag from "../../../common/Tag";
 
 const styles = (theme: Theme) =>
   createStyles({

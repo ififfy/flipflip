@@ -7,7 +7,7 @@ import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 import { grey } from "@mui/material/colors";
 
-import Audio from "../../data/Audio";
+import Audio from "../../../common/Audio";
 
 const styles = (theme: Theme) =>
   createStyles({

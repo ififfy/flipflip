@@ -6,12 +6,12 @@ import { Card, CardContent, Grid, Theme } from "@mui/material";
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 
-import { SDT } from "../../data/const";
-import { SceneSettings } from "../../data/Config";
-import Scene from "../../data/Scene";
+import { SDT } from "../../../common/const";
+import { SceneSettings } from "../../../common/Config";
+import Scene from "../../../common/Scene";
 import ImageVideoCard from "../configGroups/ImageVideoCard";
 import SceneOptionCard from "../configGroups/SceneOptionCard";
-import SceneGrid from "../../data/SceneGrid";
+import SceneGrid from "../../../common/SceneGrid";
 
 const styles = (theme: Theme) =>
   createStyles({

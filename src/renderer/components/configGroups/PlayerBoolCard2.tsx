@@ -13,7 +13,7 @@ import {
   Tooltip,
 } from "@mui/material";
 
-import { GeneralSettings } from "../../data/Config";
+import { GeneralSettings } from "../../../common/Config";
 import { portablePath } from "../../data/utils";
 
 export default class PlayerBoolCard2 extends React.Component {

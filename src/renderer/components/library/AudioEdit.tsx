@@ -21,7 +21,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 
 import { extractMusicMetadata, generateThumbnailFile } from "../../data/utils";
 import { isImage } from "../player/Scrapers";
-import Audio from "../../data/Audio";
+import Audio from "../../../common/Audio";
 import { fs_readFileSync } from "../../dummy/fs";
 
 const styles = (theme: Theme) =>

@@ -6,9 +6,9 @@ import {
   getRandomColor,
   getRandomListItem,
 } from "../../data/utils";
-import { SC, SL, TF } from "../../data/const";
-import Scene from "../../data/Scene";
-import Audio from "../../data/Audio";
+import { SC, SL, TF } from "../../../common/const";
+import Scene from "../../../common/Scene";
+import Audio from "../../../common/Audio";
 
 export default class Strobe extends React.Component {
   readonly props: {

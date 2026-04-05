@@ -27,7 +27,7 @@ import withStyles from "@mui/styles/withStyles";
 import ClearIcon from "@mui/icons-material/Clear";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 
-import Config, { CacheSettings } from "../../data/Config";
+import Config, { CacheSettings } from "../../../common/Config";
 import { getCachePath, urlToPath } from "../../data/utils";
 import { fs_existsSync, fs_rimrafSync } from "../../dummy/fs";
 import { folder_getFolderSize } from "../../dummy/folder";

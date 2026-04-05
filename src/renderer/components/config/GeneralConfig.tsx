@@ -7,9 +7,9 @@ import Config, {
   DisplaySettings,
   GeneralSettings,
   RemoteSettings,
-} from "../../data/Config";
-import Tag from "../../data/Tag";
-import LibrarySource from "../../data/LibrarySource";
+} from "../../../common/Config";
+import Tag from "../../../common/Tag";
+import LibrarySource from "../../../common/LibrarySource";
 import PlayerBoolCard from "../configGroups/PlayerBoolCard";
 import PlayerBoolCard2 from "../configGroups/PlayerBoolCard2";
 import PlayerNumCard from "../configGroups/PlayerNumCard";

@@ -9,16 +9,16 @@ import {
   Typography,
 } from "@mui/material";
 
-import { SL, WC } from "../../data/const";
+import { SL, WC } from "../../../common/const";
 import { getRandomListItem, urlToPath } from "../../data/utils";
 import { getFileGroup, getFileName } from "./Scrapers";
-import Audio from "../../data/Audio";
-import CaptionScript from "../../data/CaptionScript";
-import Config from "../../data/Config";
-import LibrarySource from "../../data/LibrarySource";
-import Scene from "../../data/Scene";
-import SceneGrid from "../../data/SceneGrid";
-import Tag from "../../data/Tag";
+import Audio from "../../../common/Audio";
+import CaptionScript from "../../../common/CaptionScript";
+import Config from "../../../common/Config";
+import LibrarySource from "../../../common/LibrarySource";
+import Scene from "../../../common/Scene";
+import SceneGrid from "../../../common/SceneGrid";
+import Tag from "../../../common/Tag";
 import AudioAlert from "./AudioAlert";
 import CaptionProgramPlaylist from "./CaptionProgramPlaylist";
 import ChildCallbackHack from "./ChildCallbackHack";

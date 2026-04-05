@@ -2,9 +2,9 @@ import wretch from "wretch";
 import { DOMParser } from "xmldom";
 import Snoowrap from "snoowrap";
 
-import { IF, RF, RT, ST, WF } from "../../data/const";
-import Config from "../../data/Config";
-import LibrarySource from "../../data/LibrarySource";
+import { IF, RF, RT, ST, WF } from "../../../common/const";
+import Config from "../../../common/Config";
+import LibrarySource from "../../../common/LibrarySource";
 import { path_sep } from "../../dummy/path";
 
 const pm = (object: any, resolve?: Function) => {

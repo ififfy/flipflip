@@ -21,7 +21,7 @@ import withStyles from "@mui/styles/withStyles";
 import { green, red } from "@mui/material/colors";
 
 import { CancelablePromise } from "../../data/utils";
-import CaptionScript, { FontSettingsI } from "../../data/CaptionScript";
+import CaptionScript, { FontSettingsI } from "../../../common/CaptionScript";
 import FontOptions from "./FontOptions";
 import { fonts_getFonts } from "../../dummy/fonts";
 

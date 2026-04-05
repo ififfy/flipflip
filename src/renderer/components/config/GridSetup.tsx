@@ -25,11 +25,11 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 
-import { SGT } from "../../data/const";
-import Scene from "../../data/Scene";
+import { SGT } from "../../../common/const";
+import Scene from "../../../common/Scene";
 import SceneSelect from "../configGroups/SceneSelect";
-import SceneGrid from "../../data/SceneGrid";
-import SceneGridCell from "../../data/SceneGridCell";
+import SceneGrid from "../../../common/SceneGrid";
+import SceneGridCell from "../../../common/SceneGridCell";
 
 const styles = (theme: Theme) =>
   createStyles({

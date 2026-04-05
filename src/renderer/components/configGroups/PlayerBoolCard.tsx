@@ -8,7 +8,7 @@ import {
   Tooltip,
 } from "@mui/material";
 
-import { DisplaySettings } from "../../data/Config";
+import { DisplaySettings } from "../../../common/Config";
 
 export default class PlayerBoolCard extends React.Component {
   readonly props: {

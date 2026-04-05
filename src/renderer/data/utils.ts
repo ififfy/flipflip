@@ -21,14 +21,14 @@ import {
   VO,
   VTF,
   WF,
-} from "./const";
+} from "../../common/const";
 import en from "./en";
-import Config from "./Config";
-import LibrarySource from "./LibrarySource";
-import Audio from "./Audio";
-import WeightGroup from "./WeightGroup";
-import Scene from "./Scene";
-import Clip from "./Clip";
+import Config from "../../common/Config";
+import LibrarySource from "../../common/LibrarySource";
+import Audio from "../../common/Audio";
+import WeightGroup from "../../common/WeightGroup";
+import Scene from "../../common/Scene";
+import Clip from "../../common/Clip";
 import { fs_readFileSync } from "../dummy/fs";
 
 // dummy, migrated to src/node/data/utils.ts
@@ -99,11 +99,6 @@ export function getEaseFunction(
     case EA.backInOut:
       return easings.easeBackInOut.overshoot(ov);
   }
-}
-
-export function getBackups(): Array<{ url: string; size: number }> {
-  // dummy, migrated to src/node/data/utils.ts
-  return [];
 }
 
 export function convertFromEpoch(backupFile: string) {
@@ -342,16 +337,6 @@ export function urlToPath(url: string): string {
   } else {
     return decodeURIComponent(path);
   }
-}
-
-export function removeDuplicatesBy(keyFn: Function, array: any[]): any[] {
-  let mySet = new Set();
-  return array.filter(function (x: any) {
-    let key = keyFn(x);
-    let isNew = !mySet.has(key);
-    if (isNew) mySet.add(key);
-    return isNew;
-  });
 }
 
 export function arrayMove(arr: any[], old_index: number, new_index: number) {

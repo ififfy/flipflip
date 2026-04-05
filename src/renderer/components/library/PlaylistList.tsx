@@ -14,8 +14,8 @@ import {
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 
-import Audio from "../../data/Audio";
-import Playlist from "../../data/Playlist";
+import Audio from "../../../common/Audio";
+import Playlist from "../../../common/Playlist";
 import AudiotrackIcon from "@mui/icons-material/Audiotrack";
 
 const styles = (theme: Theme) =>

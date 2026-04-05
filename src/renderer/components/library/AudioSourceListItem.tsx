@@ -24,9 +24,9 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 
 import { getTimestamp } from "../../data/utils";
-import Tag from "../../data/Tag";
+import Tag from "../../../common/Tag";
 import { grey } from "@mui/material/colors";
-import Audio from "../../data/Audio";
+import Audio from "../../../common/Audio";
 import SourceIcon from "./SourceIcon";
 import { fs_existsSync } from "../../dummy/fs";
 

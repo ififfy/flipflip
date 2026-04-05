@@ -9,10 +9,10 @@ import {
   Typography,
 } from "@mui/material";
 
-import { DisplaySettings } from "../../data/Config";
+import { DisplaySettings } from "../../../common/Config";
 import LibrarySearch from "../library/LibrarySearch";
-import LibrarySource from "../../data/LibrarySource";
-import Tag from "../../data/Tag";
+import LibrarySource from "../../../common/LibrarySource";
+import Tag from "../../../common/Tag";
 import { withStyles } from "@mui/styles";
 import createStyles from "@mui/styles/createStyles";
 

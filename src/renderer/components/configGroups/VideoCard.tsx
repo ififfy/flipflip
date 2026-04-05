@@ -3,12 +3,12 @@ import * as React from "react";
 import { Grid, Typography } from "@mui/material";
 
 import { getSourceType } from "../player/Scrapers";
-import { ST } from "../../data/const";
-import Clip from "../../data/Clip";
-import Scene from "../../data/Scene";
+import { ST } from "../../../common/const";
+import Clip from "../../../common/Clip";
+import Scene from "../../../common/Scene";
 import VideoControl from "../player/VideoControl";
 import ChildCallbackHack from "../player/ChildCallbackHack";
-import SceneGrid from "../../data/SceneGrid";
+import SceneGrid from "../../../common/SceneGrid";
 
 export default class VideoCard extends React.Component {
   readonly props: {

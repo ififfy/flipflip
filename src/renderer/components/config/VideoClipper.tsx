@@ -37,11 +37,11 @@ import SaveIcon from "@mui/icons-material/Save";
 import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
 
 import { getTimestamp, getTimestampValue } from "../../data/utils";
-import { BT, VCT } from "../../data/const";
-import LibrarySource from "../../data/LibrarySource";
-import Tag from "../../data/Tag";
-import Clip from "../../data/Clip";
-import Scene from "../../data/Scene";
+import { BT, VCT } from "../../../common/const";
+import LibrarySource from "../../../common/LibrarySource";
+import Tag from "../../../common/Tag";
+import Clip from "../../../common/Clip";
+import Scene from "../../../common/Scene";
 import ImageView from "../player/ImageView";
 import VideoControl from "../player/VideoControl";
 

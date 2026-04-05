@@ -1,13 +1,13 @@
 import * as React from "react";
 
 import { randomizeList } from "../../data/utils";
-import Audio from "../../data/Audio";
-import Scene from "../../data/Scene";
-import Tag from "../../data/Tag";
+import Audio from "../../../common/Audio";
+import Scene from "../../../common/Scene";
+import Tag from "../../../common/Tag";
 import CaptionProgram from "./CaptionProgram";
 import ChildCallbackHack from "./ChildCallbackHack";
-import CaptionScript from "../../data/CaptionScript";
-import { RP } from "../../data/const";
+import CaptionScript from "../../../common/CaptionScript";
+import { RP } from "../../../common/const";
 
 export default class CaptionProgramPlaylist extends React.Component {
   readonly props: {

@@ -9,7 +9,7 @@ import RedditIcon from "@mui/icons-material/Reddit";
 import SubscriptionsIcon from "@mui/icons-material/Subscriptions";
 
 import { getSourceType } from "../player/Scrapers";
-import { ST } from "../../data/const";
+import { ST } from "../../../common/const";
 
 function RedGifsIcon(props: any) {
   return (

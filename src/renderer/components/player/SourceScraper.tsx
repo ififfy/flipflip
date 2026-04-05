@@ -37,11 +37,11 @@ import {
   loadTumblr,
   processAllURLs,
 } from "./Scrapers";
-import { IF, SOF, ST } from "../../data/const";
-import Config from "../../data/Config";
-import LibrarySource from "../../data/LibrarySource";
-import Scene from "../../data/Scene";
-import Audio from "../../data/Audio";
+import { IF, SOF, ST } from "../../../common/const";
+import Config from "../../../common/Config";
+import LibrarySource from "../../../common/LibrarySource";
+import Scene from "../../../common/Scene";
+import Audio from "../../../common/Audio";
 import ChildCallbackHack from "./ChildCallbackHack";
 import ImagePlayer from "./ImagePlayer";
 import {

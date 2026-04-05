@@ -19,7 +19,6 @@ import {
   Select,
   Slide,
   Snackbar,
-  SnackbarContent,
   Switch,
   TextField,
   Theme,
@@ -29,15 +28,13 @@ import {
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import DeleteIcon from "@mui/icons-material/Delete";
-import ErrorIcon from "@mui/icons-material/Error";
 import RestoreIcon from "@mui/icons-material/Restore";
 import SaveIcon from "@mui/icons-material/Save";
 
-import { convertFromEpoch, getBackups, saveDir } from "../../data/utils";
-import { MO, SS } from "../../data/const";
-import { GeneralSettings } from "../../data/Config";
+import { convertFromEpoch, saveDir } from "../../data/utils";
+import { MO, SS } from "../../../common/const";
+import { GeneralSettings } from "../../../common/Config";
 import { path_join } from "../../dummy/path";
 
 const styles = (theme: Theme) =>
@@ -419,7 +416,9 @@ class BackupCard extends React.Component {
   }
 
   refreshBackups() {
-    this.setState({ backups: getBackups() });
+    window.ipc.getBackups().then((backups) => {
+      this.setState({ backups });
+    });
   }
 
   onChangeBackup(e: MouseEvent) {

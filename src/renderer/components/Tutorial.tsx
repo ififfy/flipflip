@@ -39,12 +39,12 @@ import {
   SPT,
   TF,
   VCT,
-} from "../data/const";
-import { Route } from "../data/Route";
-import Config from "../data/Config";
-import Scene from "../data/Scene";
-import SceneGrid from "../data/SceneGrid";
-import SceneGridCell from "../data/SceneGridCell";
+} from "../../common/const";
+import { Route } from "../../common/Route";
+import Config from "../../common/Config";
+import Scene from "../../common/Scene";
+import SceneGrid from "../../common/SceneGrid";
+import SceneGridCell from "../../common/SceneGridCell";
 
 const styles = (theme: Theme) =>
   createStyles({

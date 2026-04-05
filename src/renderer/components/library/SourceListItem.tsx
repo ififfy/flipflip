@@ -27,11 +27,11 @@ import OfflineBoltIcon from "@mui/icons-material/OfflineBolt";
 
 import { getCachePath, getTimestamp, urlToPath } from "../../data/utils";
 import { getFileName, getSourceType } from "../player/Scrapers";
-import { SDT, ST } from "../../data/const";
-import Tag from "../../data/Tag";
+import { SDT, ST } from "../../../common/const";
+import Tag from "../../../common/Tag";
 import SourceIcon from "./SourceIcon";
-import LibrarySource from "../../data/LibrarySource";
-import Config from "../../data/Config";
+import LibrarySource from "../../../common/LibrarySource";
+import Config from "../../../common/Config";
 import { grey } from "@mui/material/colors";
 import { fs_existsSync } from "../../dummy/fs";
 

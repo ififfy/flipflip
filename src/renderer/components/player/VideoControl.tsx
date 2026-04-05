@@ -27,7 +27,7 @@ import VolumeDownIcon from "@mui/icons-material/VolumeDown";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 
 import { getTimestamp } from "../../data/utils";
-import Clip from "../../data/Clip";
+import Clip from "../../../common/Clip";
 
 const styles = (theme: Theme) =>
   createStyles({

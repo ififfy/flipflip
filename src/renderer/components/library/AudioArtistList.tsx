@@ -8,7 +8,7 @@ import withStyles from "@mui/styles/withStyles";
 
 import AudiotrackIcon from "@mui/icons-material/Audiotrack";
 
-import Audio from "../../data/Audio";
+import Audio from "../../../common/Audio";
 
 const styles = (theme: Theme) =>
   createStyles({

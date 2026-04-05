@@ -41,13 +41,13 @@ import {
   urlToPath,
 } from "../../data/utils";
 import { getFileName, getSourceType } from "../player/Scrapers";
-import { RF, RT, SDT, ST } from "../../data/const";
-import Config from "../../data/Config";
-import LibrarySource from "../../data/LibrarySource";
+import { RF, RT, SDT, ST } from "../../../common/const";
+import Config from "../../../common/Config";
+import LibrarySource from "../../../common/LibrarySource";
 import SourceListItem from "./SourceListItem";
-import Clip from "../../data/Clip";
+import Clip from "../../../common/Clip";
 import en from "../../data/en";
-import Scene from "../../data/Scene";
+import Scene from "../../../common/Scene";
 import { fs_existsSync, fs_unlinkSync, fs_rimrafSync } from "../../dummy/fs";
 
 const styles = (theme: Theme) =>

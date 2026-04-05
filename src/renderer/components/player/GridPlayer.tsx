@@ -17,10 +17,10 @@ import withStyles from "@mui/styles/withStyles";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 
-import SceneGrid from "../../data/SceneGrid";
-import Config from "../../data/Config";
-import Scene from "../../data/Scene";
-import Tag from "../../data/Tag";
+import SceneGrid from "../../../common/SceneGrid";
+import Config from "../../../common/Config";
+import Scene from "../../../common/Scene";
+import Tag from "../../../common/Tag";
 import Player from "./Player";
 import ChildCallbackHack from "./ChildCallbackHack";
 import { IdleTimer } from "./IdleTimer";

@@ -44,18 +44,18 @@ import GetAppIcon from "@mui/icons-material/GetApp";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import SaveIcon from "@mui/icons-material/Save";
 
-import { CST, MO, RP } from "../../data/const";
+import { CST, MO, RP } from "../../../common/const";
 import captionProgramDefaults, { CancelablePromise } from "../../data/utils";
-import Scene from "../../data/Scene";
-import Tag from "../../data/Tag";
+import Scene from "../../../common/Scene";
+import Tag from "../../../common/Tag";
 import Player from "../player/Player";
-import Config from "../../data/Config";
+import Config from "../../../common/Config";
 import SceneSelect from "../configGroups/SceneSelect";
 import CaptionProgram from "../player/CaptionProgram";
 import ChildCallbackHack from "../player/ChildCallbackHack";
 import AudioCard from "../configGroups/AudioCard";
 import FontOptions from "../library/FontOptions";
-import CaptionScript, { FontSettingsI } from "../../data/CaptionScript";
+import CaptionScript, { FontSettingsI } from "../../../common/CaptionScript";
 import CodeMirror, {
   booleanSetters,
   colorSetters,
@@ -64,7 +64,7 @@ import CodeMirror, {
   timestampRegex,
   tupleSetters,
 } from "./CodeMirror";
-import SceneGrid from "../../data/SceneGrid";
+import SceneGrid from "../../../common/SceneGrid";
 import { fs_writeFileSync } from "../../dummy/fs";
 import { fonts_getFonts } from "../../dummy/fonts";
 

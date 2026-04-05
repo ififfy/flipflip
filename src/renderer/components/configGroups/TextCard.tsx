@@ -14,12 +14,12 @@ import {
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 
-import Scene from "../../data/Scene";
+import Scene from "../../../common/Scene";
 import AddIcon from "@mui/icons-material/Add";
-import { RP } from "../../data/const";
+import { RP } from "../../../common/const";
 import ScriptPlaylist from "./ScriptPlaylist";
 import ScriptOptions from "../library/ScriptOptions";
-import CaptionScript from "../../data/CaptionScript";
+import CaptionScript from "../../../common/CaptionScript";
 
 const styles = (theme: Theme) =>
   createStyles({

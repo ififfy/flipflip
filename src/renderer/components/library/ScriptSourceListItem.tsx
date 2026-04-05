@@ -24,13 +24,12 @@ import BuildIcon from "@mui/icons-material/Build";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 import { urlToPath } from "../../data/utils";
-import Tag from "../../data/Tag";
+import Tag from "../../../common/Tag";
 import SourceIcon from "./SourceIcon";
-import CaptionScript from "../../data/CaptionScript";
+import CaptionScript from "../../../common/CaptionScript";
 import { grey } from "@mui/material/colors";
-import { SP } from "../../data/const";
+import { SP } from "../../../common/const";
 import EditIcon from "@mui/icons-material/Edit";
-import { fs_existsSync } from "../../dummy/fs";
 
 const styles = (theme: Theme) =>
   createStyles({

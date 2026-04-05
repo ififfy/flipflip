@@ -68,11 +68,11 @@ import { red } from "@mui/material/colors";
 
 import { extractMusicMetadata, getFilesRecursively } from "../../data/utils";
 import { isAudio } from "../player/Scrapers";
-import { AF, ASF, ALT, MO, SP, PR } from "../../data/const";
+import { AF, ASF, ALT, MO, SP, PR } from "../../../common/const";
 import en from "../../data/en";
-import Audio from "../../data/Audio";
-import Playlist from "../../data/Playlist";
-import Tag from "../../data/Tag";
+import Audio from "../../../common/Audio";
+import Playlist from "../../../common/Playlist";
+import Tag from "../../../common/Tag";
 import LibrarySearch from "./LibrarySearch";
 import AudioSourceList from "./AudioSourceList";
 import AudioArtistList from "./AudioArtistList";

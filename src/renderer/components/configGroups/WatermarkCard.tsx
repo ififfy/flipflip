@@ -19,8 +19,8 @@ import {
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 
-import { GeneralSettings } from "../../data/Config";
-import { WC } from "../../data/const";
+import { GeneralSettings } from "../../../common/Config";
+import { WC } from "../../../common/const";
 import en from "../../data/en";
 import ColorPicker from "../config/ColorPicker";
 import { CancelablePromise } from "../../data/utils";

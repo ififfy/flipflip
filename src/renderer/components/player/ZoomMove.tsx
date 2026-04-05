@@ -1,10 +1,10 @@
 import * as React from "react";
 import { animated, useSpring } from "react-spring";
 
-import { HTF, TF, VTF } from "../../data/const";
+import { HTF, TF, VTF } from "../../../common/const";
 import { getEaseFunction } from "../../data/utils";
-import Scene from "../../data/Scene";
-import Audio from "../../data/Audio";
+import Scene from "../../../common/Scene";
+import Audio from "../../../common/Audio";
 
 export default class ZoomMove extends React.Component {
   readonly props: {

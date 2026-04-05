@@ -18,9 +18,9 @@ import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 
 import { getSourceType } from "../player/Scrapers";
-import { ST } from "../../data/const";
-import Clip from "../../data/Clip";
-import LibrarySource from "../../data/LibrarySource";
+import { ST } from "../../../common/const";
+import Clip from "../../../common/Clip";
+import LibrarySource from "../../../common/LibrarySource";
 
 const styles = (theme: Theme) =>
   createStyles({

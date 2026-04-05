@@ -34,8 +34,8 @@ import {
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 
-import Config, { RemoteSettings } from "../../data/Config";
-import { MO, SS, ST } from "../../data/const";
+import Config, { RemoteSettings } from "../../../common/Config";
+import { MO, SS, ST } from "../../../common/const";
 import en from "../../data/en";
 import SourceIcon from "../library/SourceIcon";
 

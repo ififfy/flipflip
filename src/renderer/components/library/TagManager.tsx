@@ -38,11 +38,12 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 import SortIcon from "@mui/icons-material/Sort";
 
-import { MO, SF } from "../../data/const";
-import { arrayMove, removeDuplicatesBy } from "../../data/utils";
+import { MO, SF } from "../../../common/const";
+import { arrayMove } from "../../data/utils";
+import { removeDuplicatesBy } from "../../../common/utils";
 import en from "../../data/en";
-import Scene from "../../data/Scene";
-import Tag from "../../data/Tag";
+import Scene from "../../../common/Scene";
+import Tag from "../../../common/Tag";
 import Jiggle from "../../animations/Jiggle";
 
 const styles = (theme: Theme) =>

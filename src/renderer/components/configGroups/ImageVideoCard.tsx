@@ -28,10 +28,10 @@ import withStyles from "@mui/styles/withStyles";
 import VolumeDownIcon from "@mui/icons-material/VolumeDown";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 
-import { GO, IF, OF, OT, SDT, SOF, VO, WF } from "../../data/const";
-import { SceneSettings } from "../../data/Config";
+import { GO, IF, OF, OT, SDT, SOF, VO, WF } from "../../../common/const";
+import { SceneSettings } from "../../../common/Config";
 import en from "../../data/en";
-import Scene from "../../data/Scene";
+import Scene from "../../../common/Scene";
 
 const styles = (theme: Theme) =>
   createStyles({

@@ -30,11 +30,11 @@ import RepeatOneIcon from "@mui/icons-material/RepeatOne";
 import ShuffleIcon from "@mui/icons-material/Shuffle";
 
 import { arrayMove, getTimestamp, randomizeList } from "../../data/utils";
-import { RP } from "../../data/const";
+import { RP } from "../../../common/const";
 import AudioControl from "./AudioControl";
-import Audio from "../../data/Audio";
-import Scene from "../../data/Scene";
-import Tag from "../../data/Tag";
+import Audio from "../../../common/Audio";
+import Scene from "../../../common/Scene";
+import Tag from "../../../common/Tag";
 import SourceIcon from "../library/SourceIcon";
 import { fs_existsSync } from "../../dummy/fs";
 

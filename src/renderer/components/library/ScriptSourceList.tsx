@@ -18,12 +18,12 @@ import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 
 import { arrayMove } from "../../data/utils";
-import CaptionScript from "../../data/CaptionScript";
+import CaptionScript from "../../../common/CaptionScript";
 import ScriptSourceListItem from "./ScriptSourceListItem";
 import SceneSelect from "../configGroups/SceneSelect";
-import Scene from "../../data/Scene";
+import Scene from "../../../common/Scene";
 import ScriptOptions from "./ScriptOptions";
-import { SP } from "../../data/const";
+import { SP } from "../../../common/const";
 import { fs_unlinkSync } from "../../dummy/fs";
 
 const styles = (theme: Theme) =>
