@@ -2640,8 +2640,7 @@ class Tutorial extends React.Component {
   }
 
   openLink(url: string) {
-    // FIXME
-    // remote.shell.openExternal(url);
+    window.ipc.openExternal(url);
   }
 }
 

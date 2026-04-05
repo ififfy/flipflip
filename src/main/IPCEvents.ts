@@ -1,4 +1,4 @@
-import { ipcMain, IpcMainInvokeEvent } from "electron";
+import { ipcMain, IpcMainEvent, IpcMainInvokeEvent, shell } from "electron";
 
 import { createNewWindow } from "./WindowManager";
 import { IPC } from "../common/const";
@@ -25,20 +25,24 @@ function onRequestAppStorage(ev: IpcMainInvokeEvent) {
   return createNewAppStorage(ev.sender.id);
 }
 
-function onSaveAppStorage(ev: IpcMainInvokeEvent, state: AppStorageState) {
+function onSaveAppStorage(ev: IpcMainEvent, state: AppStorageState) {
   saveAppStorage(ev.sender.id, state);
 }
 
-function onCreateBackup(ev: IpcMainInvokeEvent, state: AppStorageState) {
+function onCreateBackup(ev: IpcMainEvent, state: AppStorageState) {
   createBackup(ev.sender.id, state);
 }
 
-function onCleanBackups(ev: IpcMainInvokeEvent, config: Config) {
+function onCleanBackups(ev: IpcMainEvent, config: Config) {
   cleanBackups(config);
 }
 
 function onRestoreBackup(ev: IpcMainInvokeEvent, backupFile: string) {
   return restoreFromBackup(backupFile);
+}
+
+function onOpenExternal(ev: IpcMainEvent, url: string) {
+  shell.openExternal(url);
 }
 
 // Initialize and release listeners
@@ -56,6 +60,7 @@ export function initializeIpcEvents() {
   ipcMain.on(IPC.createBackup, onCreateBackup);
   ipcMain.on(IPC.cleanBackups, onCleanBackups);
   ipcMain.handle(IPC.restoreBackup, onRestoreBackup);
+  ipcMain.on(IPC.openExternal, onOpenExternal);
 }
 
 export function releaseIpcEvents() {

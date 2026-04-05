@@ -838,8 +838,7 @@ class SourceList extends React.Component {
   }
 
   openExternalURL(url: string) {
-    // FIXME
-    // remote.shell.openExternal(url);
+    window.ipc.openExternal(url);
   }
 
   onOpenClipMenu(source: LibrarySource, e: MouseEvent) {

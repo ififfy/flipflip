@@ -75,6 +75,7 @@ declare global {
       cleanBackups: (config: Config) => void;
       restoreBackup: (backupFile: string) => Promise<AppStorageState>;
       onStartScene: (callback: (sceneName: string) => void) => void;
+      openExternal: (url: string) => void;
     };
   }
 }

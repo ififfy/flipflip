@@ -217,6 +217,7 @@ const IPC = {
   restoreBackup: "ipc.restoreBackup",
   getAppStorage: "ipc.getAppStorage",
   saveAppStorage: "ipc.saveAppStorage",
+  openExternal: "ipc.openExternal",
 };
 
 const MO = {

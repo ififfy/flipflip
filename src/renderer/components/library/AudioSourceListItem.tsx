@@ -409,8 +409,7 @@ class AudioSourceListItem extends React.Component {
   }
 
   openExternalURL(url: string) {
-    // FIXME
-    // remote.shell.openExternal(url);
+    window.ipc.openExternal(url);
   }
 }
 
