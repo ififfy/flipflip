@@ -68,7 +68,7 @@ import SortIcon from "@mui/icons-material/Sort";
 import SystemUpdateIcon from "@mui/icons-material/SystemUpdate";
 
 import { arrayMove, getRandomListItem } from "../data/utils";
-import { IPC, MO, SF, SG, SPT } from "../data/const";
+import { MO, SF, SG, SPT } from "../data/const";
 import en from "../data/en";
 import Config from "../data/Config";
 import Scene from "../data/Scene";

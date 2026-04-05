@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { StyledEngineProvider, ThemeProvider } from "@mui/material/styles";
 
-import { IPC, SP } from "../data/const";
+import { SP } from "../data/const";
 import { getCachePath } from "../data/utils";
 import * as actions from "../data/actions";
 import ErrorBoundary from "../../main/ErrorBoundary";
