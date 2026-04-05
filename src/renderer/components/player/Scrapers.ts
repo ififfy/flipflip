@@ -1,9 +1,6 @@
 import wretch from "wretch";
 import {DOMParser} from "xmldom";
-import {JSDOM} from 'jsdom';
-import tumblr from "tumblr.js";
 import Snoowrap from "snoowrap";
-import * as imgur from "imgur";
 
 import {IF, RF, RT, ST, WF} from "../../data/const";
 import Config from "../../data/Config";
@@ -138,143 +135,144 @@ export const loadTumblr = (allURLs: Map<string, Array<string>>, allPosts: Map<st
   const timeout = 3000;
   let configured = config.remoteSettings.tumblrOAuthToken != "" && config.remoteSettings.tumblrOAuthTokenSecret != "";
   if (configured) {
-    const url = source.url;
-    const client = tumblr.createClient({
-      consumer_key: config.remoteSettings.tumblrKey,
-      consumer_secret: config.remoteSettings.tumblrSecret,
-      token: config.remoteSettings.tumblrOAuthToken,
-      token_secret: config.remoteSettings.tumblrOAuthTokenSecret,
-    });
-    // TumblrID takes the form of <blog_name>.tumblr.com
-    let tumblrID = url.replace(/https?:\/\//, "");
-    tumblrID = tumblrID.replace("/", "");
-    if (tumblr429Alerted) {
-      pm({
-        helpers: helpers,
-        source: source,
-        timeout: timeout,
-      }, resolve);
-      return;
-    }
-    client.blogPosts(tumblrID, {offset: helpers.next*20}, (err, data) => {
-      if (err) {
-        let systemMessage = undefined;
-        if (err.message.includes("429 Limit Exceeded") && !tumblr429Alerted && helpers.next == 0) {
-          if (!config.remoteSettings.silenceTumblrAlert) {
-            systemMessage = "Tumblr has temporarily throttled your FlipFlip due to high traffic. Try again in a few minutes or visit Settings to try a different Tumblr API key.";
-          }
-          tumblr429Alerted = true;
-        }
-        pm({
-          error: err.message,
-          systemMessage: systemMessage,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        }, resolve);
-        return;
-      }
+    // FIXME
+    // const url = source.url;
+    // const client = tumblr.createClient({
+    //   consumer_key: config.remoteSettings.tumblrKey,
+    //   consumer_secret: config.remoteSettings.tumblrSecret,
+    //   token: config.remoteSettings.tumblrOAuthToken,
+    //   token_secret: config.remoteSettings.tumblrOAuthTokenSecret,
+    // });
+    // // TumblrID takes the form of <blog_name>.tumblr.com
+    // let tumblrID = url.replace(/https?:\/\//, "");
+    // tumblrID = tumblrID.replace("/", "");
+    // if (tumblr429Alerted) {
+    //   pm({
+    //     helpers: helpers,
+    //     source: source,
+    //     timeout: timeout,
+    //   }, resolve);
+    //   return;
+    // }
+    // client.blogPosts(tumblrID, {offset: helpers.next*20}, (err, data) => {
+    //   if (err) {
+    //     let systemMessage = undefined;
+    //     if (err.message.includes("429 Limit Exceeded") && !tumblr429Alerted && helpers.next == 0) {
+    //       if (!config.remoteSettings.silenceTumblrAlert) {
+    //         systemMessage = "Tumblr has temporarily throttled your FlipFlip due to high traffic. Try again in a few minutes or visit Settings to try a different Tumblr API key.";
+    //       }
+    //       tumblr429Alerted = true;
+    //     }
+    //     pm({
+    //       error: err.message,
+    //       systemMessage: systemMessage,
+    //       helpers: helpers,
+    //       source: source,
+    //       timeout: timeout,
+    //     }, resolve);
+    //     return;
+    //   }
 
-      // End loop if we're at end of posts
-      if (data.posts.length == 0) {
-        helpers.next = null;
-        pm({
-          data: [],
-          allURLs: allURLs,
-          allPosts: allPosts,
-          weight: weight,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        }, resolve);
-        return;
-      }
+    //   // End loop if we're at end of posts
+    //   if (data.posts.length == 0) {
+    //     helpers.next = null;
+    //     pm({
+    //       data: [],
+    //       allURLs: allURLs,
+    //       allPosts: allPosts,
+    //       weight: weight,
+    //       helpers: helpers,
+    //       source: source,
+    //       timeout: timeout,
+    //     }, resolve);
+    //     return;
+    //   }
 
-      let images = [];
-      for (let post of data.posts) {
-        // Sometimes photos are listed separately
-        if (post.photos) {
-          for (let photo of post.photos) {
-            images.push(photo.original_size.url);
-          }
-        }
-        if (post.player) {
-          for (let embed of post.player) {
-            const regex = /<iframe[^(?:src|\/>)]*src=["']([^"']*)[^(?:\/>)]*\/?>/g;
-            let imageSource;
-            while ((imageSource = regex.exec(embed.embed_code)) !== null) {
-              images.push(imageSource[1]);
-            }
-          }
-        }
-        if (post.body) {
-          const regex = /<img[^(?:src|\/>)]*src=["']([^"']*)[^>]*>/g;
-          let imageSource;
-          while ((imageSource = regex.exec(post.body)) !== null) {
-            images.push(imageSource[1]);
-          }
-          const regex2 = /<source[^(?:src|\/>)]*src=["']([^"']*)[^>]*>/g;
-          while ((imageSource = regex2.exec(post.body)) !== null) {
-            images.push(imageSource[1]);
-          }
-        }
-        if (post.video_url) {
-          images.push(post.video_url);
-        }
-      }
+    //   let images = [];
+    //   for (let post of data.posts) {
+    //     // Sometimes photos are listed separately
+    //     if (post.photos) {
+    //       for (let photo of post.photos) {
+    //         images.push(photo.original_size.url);
+    //       }
+    //     }
+    //     if (post.player) {
+    //       for (let embed of post.player) {
+    //         const regex = /<iframe[^(?:src|\/>)]*src=["']([^"']*)[^(?:\/>)]*\/?>/g;
+    //         let imageSource;
+    //         while ((imageSource = regex.exec(embed.embed_code)) !== null) {
+    //           images.push(imageSource[1]);
+    //         }
+    //       }
+    //     }
+    //     if (post.body) {
+    //       const regex = /<img[^(?:src|\/>)]*src=["']([^"']*)[^>]*>/g;
+    //       let imageSource;
+    //       while ((imageSource = regex.exec(post.body)) !== null) {
+    //         images.push(imageSource[1]);
+    //       }
+    //       const regex2 = /<source[^(?:src|\/>)]*src=["']([^"']*)[^>]*>/g;
+    //       while ((imageSource = regex2.exec(post.body)) !== null) {
+    //         images.push(imageSource[1]);
+    //       }
+    //     }
+    //     if (post.video_url) {
+    //       images.push(post.video_url);
+    //     }
+    //   }
 
-      if (images.length > 0) {
-        let convertedSource = Array<string>();
-        let convertedCount = 0;
-        for (let url of images) {
-          convertURL(url).then((urls: Array<string>) => {
-            convertedSource = convertedSource.concat(urls);
-            convertedCount++;
-            if (convertedCount == images.length) {
-              helpers.next = helpers.next + 1;
-              helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedSource, false).length;
-              pm({
-                data: filterPathsToJustPlayable(filter, convertedSource, false),
-                allURLs: allURLs,
-                allPosts: allPosts,
-                weight: weight,
-                helpers: helpers,
-                source: source,
-                timeout: timeout,
-              }, resolve);
-            }
-          })
-            .catch ((error: any) => {
-              convertedCount++;
-              if (convertedCount == images.length) {
-                helpers.next = helpers.next + 1;
-                helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedSource, false).length;
-                pm({
-                  error: error.message,
-                  data: filterPathsToJustPlayable(filter, convertedSource, false),
-                  allURLs: allURLs,
-                  allPosts: allPosts,
-                  weight: weight,
-                  helpers: helpers,
-                  source: source,
-                  timeout: timeout,
-                }, resolve);
-              }
-            });
-        }
-      } else {
-        helpers.next = null;
-        pm({
-          data: [],
-          allURLs: allURLs,
-          allPosts: allPosts,
-          weight: weight,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        }, resolve);
-      }
-    });
+    //   if (images.length > 0) {
+    //     let convertedSource = Array<string>();
+    //     let convertedCount = 0;
+    //     for (let url of images) {
+    //       convertURL(url).then((urls: Array<string>) => {
+    //         convertedSource = convertedSource.concat(urls);
+    //         convertedCount++;
+    //         if (convertedCount == images.length) {
+    //           helpers.next = helpers.next + 1;
+    //           helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedSource, false).length;
+    //           pm({
+    //             data: filterPathsToJustPlayable(filter, convertedSource, false),
+    //             allURLs: allURLs,
+    //             allPosts: allPosts,
+    //             weight: weight,
+    //             helpers: helpers,
+    //             source: source,
+    //             timeout: timeout,
+    //           }, resolve);
+    //         }
+    //       })
+    //         .catch ((error: any) => {
+    //           convertedCount++;
+    //           if (convertedCount == images.length) {
+    //             helpers.next = helpers.next + 1;
+    //             helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedSource, false).length;
+    //             pm({
+    //               error: error.message,
+    //               data: filterPathsToJustPlayable(filter, convertedSource, false),
+    //               allURLs: allURLs,
+    //               allPosts: allPosts,
+    //               weight: weight,
+    //               helpers: helpers,
+    //               source: source,
+    //               timeout: timeout,
+    //             }, resolve);
+    //           }
+    //         });
+    //     }
+    //   } else {
+    //     helpers.next = null;
+    //     pm({
+    //       data: [],
+    //       allURLs: allURLs,
+    //       allPosts: allPosts,
+    //       weight: weight,
+    //       helpers: helpers,
+    //       source: source,
+    //       timeout: timeout,
+    //     }, resolve);
+    //   }
+    // });
   } else {
     let systemMessage = undefined;
     if (!tumblrAlerted) {
@@ -680,112 +678,113 @@ const loadImageFapGallery = (
       )
     )
     .text((html) => {
-      const galleryWindow = new JSDOM(html, { contentType: 'text/html' }).window;
-      let imageEl = galleryWindow.document.querySelector(
-        ".expp-container > form > table > tbody > tr > td > table > tbody > tr > td > a"
-      );
-      if (imageEl) {
-        const imageURL = "https://www.imagefap.com" + imageEl.href;
-        wretch(imageURL)
-          .get()
-          .text((html) => {
-            let captcha = undefined;
-            const ahrefs = new JSDOM(html, {
-              contentType: 'text/html'
-            }).window.document.querySelectorAll(
-                'a[href^="https://cdn.imagefap.com/images/full/"]'
-              );
+      // FIXME
+      // const galleryWindow = new JSDOM(html, { contentType: 'text/html' }).window;
+      // let imageEl = galleryWindow.document.querySelector(
+      //   ".expp-container > form > table > tbody > tr > td > table > tbody > tr > td > a"
+      // );
+      // if (imageEl) {
+      //   const imageURL = "https://www.imagefap.com" + imageEl.href;
+      //   wretch(imageURL)
+      //     .get()
+      //     .text((html) => {
+      //       let captcha = undefined;
+      //       const ahrefs = new JSDOM(html, {
+      //         contentType: 'text/html'
+      //       }).window.document.querySelectorAll(
+      //           'a[href^="https://cdn.imagefap.com/images/full/"]'
+      //         );
 
-            if (ahrefs.length > 0) {
-              for (let i = 0; i < ahrefs.length; i++) {
-                images.push(ahrefs.item(i).href);
-              }
-            } else {
-              captcha = imageURL;
-            }
+      //       if (ahrefs.length > 0) {
+      //         for (let i = 0; i < ahrefs.length; i++) {
+      //           images.push(ahrefs.item(i).href);
+      //         }
+      //       } else {
+      //         captcha = imageURL;
+      //       }
 
-            if (captcha != null) {
-              pm(
-                {
-                  captcha: captcha,
-                  data: images,
-                  allURLs: allURLs,
-                  allPosts: allPosts,
-                  weight: weight,
-                  helpers: helpers,
-                  source: source,
-                  timeout: timeout,
-                },
-                resolve
-              );
-            }
-          });
-      } else {
-        let captcha = undefined;
-        if (html.includes("Enter the captcha")) {
-          helpers.count = source.count;
-          captcha = galleryURL;
-          images = allURLs.get(source.url);
-          pm({ warning: source.url + " - blocked due to captcha" }, resolve);
-        } else {
-          onFinishedLoading(helpers);
-        }
-        pm(
-          {
-            captcha: captcha,
-            data: images,
-            allURLs: allURLs,
-            allPosts: allPosts,
-            weight: weight,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve
-        );
-      }
+      //       if (captcha != null) {
+      //         pm(
+      //           {
+      //             captcha: captcha,
+      //             data: images,
+      //             allURLs: allURLs,
+      //             allPosts: allPosts,
+      //             weight: weight,
+      //             helpers: helpers,
+      //             source: source,
+      //             timeout: timeout,
+      //           },
+      //           resolve
+      //         );
+      //       }
+      //     });
+      // } else {
+      //   let captcha = undefined;
+      //   if (html.includes("Enter the captcha")) {
+      //     helpers.count = source.count;
+      //     captcha = galleryURL;
+      //     images = allURLs.get(source.url);
+      //     pm({ warning: source.url + " - blocked due to captcha" }, resolve);
+      //   } else {
+      //     onFinishedLoading(helpers);
+      //   }
+      //   pm(
+      //     {
+      //       captcha: captcha,
+      //       data: images,
+      //       allURLs: allURLs,
+      //       allPosts: allPosts,
+      //       weight: weight,
+      //       helpers: helpers,
+      //       source: source,
+      //       timeout: timeout,
+      //     },
+      //     resolve
+      //   );
+      // }
 
-      const nextGalleryLink = galleryWindow.document.querySelector(
-        "#gallery > font > span > a:last-child"
-      );
-      if (nextGalleryLink && nextGalleryLink.innerHTML == ":: next ::") {
-        let href = nextGalleryLink.href;
-        if (href.startsWith("/")) {
-          href = href.substring(1);
-        }
-        setTimeout(
-          () =>
-            loadImageFapGallery(
-              baseGalleryURL + href,
-              allURLs,
-              allPosts,
-              source,
-              filter,
-              weight,
-              helpers,
-              timeout,
-              images,
-              baseGalleryURL,
-              onFinishedLoading,
-              resolve
-            ),
-          2000
-        );
-      } else {
-        onFinishedLoading(helpers);
-        pm(
-          {
-            data: filterPathsToJustPlayable(filter, images, false),
-            allURLs: allURLs,
-            allPosts: allPosts,
-            weight: weight,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve
-        );
-      }
+      // const nextGalleryLink = galleryWindow.document.querySelector(
+      //   "#gallery > font > span > a:last-child"
+      // );
+      // if (nextGalleryLink && nextGalleryLink.innerHTML == ":: next ::") {
+      //   let href = nextGalleryLink.href;
+      //   if (href.startsWith("/")) {
+      //     href = href.substring(1);
+      //   }
+      //   setTimeout(
+      //     () =>
+      //       loadImageFapGallery(
+      //         baseGalleryURL + href,
+      //         allURLs,
+      //         allPosts,
+      //         source,
+      //         filter,
+      //         weight,
+      //         helpers,
+      //         timeout,
+      //         images,
+      //         baseGalleryURL,
+      //         onFinishedLoading,
+      //         resolve
+      //       ),
+      //     2000
+      //   );
+      // } else {
+      //   onFinishedLoading(helpers);
+      //   pm(
+      //     {
+      //       data: filterPathsToJustPlayable(filter, images, false),
+      //       allURLs: allURLs,
+      //       allPosts: allPosts,
+      //       weight: weight,
+      //       helpers: helpers,
+      //       source: source,
+      //       timeout: timeout,
+      //     },
+      //     resolve
+      //   );
+      // }
     });
 };
 
@@ -833,83 +832,83 @@ export const loadImageFap = (
         timeout: timeout,
       }, resolve))
       .text((html) => {
-        const albumEls = new JSDOM(html, {
-          contentType: 'text/html'
-        }).window.document.querySelectorAll(
-          'td.blk_galleries > font > a.blk_galleries'
-        );
-        if (albumEls.length == 0) {
-          let captcha = undefined;
-          if (html.includes("Enter the captcha")) {
-            helpers.count = source.count;
-            captcha = "https://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2";
-            pm({warning: source.url + " - blocked due to captcha"}, resolve);
-          }
-          helpers.next = null;
-          pm(
-            {
-              captcha: captcha,
-              data: [],
-              allURLs: allURLs,
-              allPosts: allPosts,
-              weight: weight,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            },
-            resolve
-          );
-        } else if (albumEls.length > helpers.next[1]) {
-          let albumEl = albumEls[helpers.next[1]];
-          let albumID = albumEl
-            .getAttribute("href")
-            .substring(albumEl.getAttribute("href").lastIndexOf("/") + 1);
+        // const albumEls = new JSDOM(html, {
+        //   contentType: 'text/html'
+        // }).window.document.querySelectorAll(
+        //   'td.blk_galleries > font > a.blk_galleries'
+        // );
+        // if (albumEls.length == 0) {
+        //   let captcha = undefined;
+        //   if (html.includes("Enter the captcha")) {
+        //     helpers.count = source.count;
+        //     captcha = "https://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2";
+        //     pm({warning: source.url + " - blocked due to captcha"}, resolve);
+        //   }
+        //   helpers.next = null;
+        //   pm(
+        //     {
+        //       captcha: captcha,
+        //       data: [],
+        //       allURLs: allURLs,
+        //       allPosts: allPosts,
+        //       weight: weight,
+        //       helpers: helpers,
+        //       source: source,
+        //       timeout: timeout,
+        //     },
+        //     resolve
+        //   );
+        // } else if (albumEls.length > helpers.next[1]) {
+        //   let albumEl = albumEls[helpers.next[1]];
+        //   let albumID = albumEl
+        //     .getAttribute("href")
+        //     .substring(albumEl.getAttribute("href").lastIndexOf("/") + 1);
 
-          let images = Array<string>();
-          const baseGalleryURL = "https://www.imagefap.com/gallery/" + albumID;
-          loadImageFapGallery(
-            baseGalleryURL + "?gid=" + albumID + "&view=0",
-            allURLs,
-            allPosts,
-            source,
-            filter,
-            weight,
-            helpers,
-            timeout,
-            images,
-            baseGalleryURL,
-            (h) => h.next[1] += 1,
-            resolve
-          );
-        } else {
-          let images = Array<string>();
-          let captcha = undefined;
-          if (html.includes("Enter the captcha")) {
-            helpers.count = source.count;
-            captcha =
-              "https://www.imagefap.com/gallery/" +
-              getFileGroup(url) +
-              "?view=0";
-            images = allURLs.get(url);
-            pm({ warning: source.url + " - blocked due to captcha" }, resolve);
-          } else {
-            helpers.next[0] += 1;
-            helpers.next[1] = 0;
-          }
-          pm(
-            {
-              captcha: captcha,
-              data: images,
-              allURLs: allURLs,
-              allPosts: allPosts,
-              weight: weight,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            },
-            resolve
-          );
-        }
+        //   let images = Array<string>();
+        //   const baseGalleryURL = "https://www.imagefap.com/gallery/" + albumID;
+        //   loadImageFapGallery(
+        //     baseGalleryURL + "?gid=" + albumID + "&view=0",
+        //     allURLs,
+        //     allPosts,
+        //     source,
+        //     filter,
+        //     weight,
+        //     helpers,
+        //     timeout,
+        //     images,
+        //     baseGalleryURL,
+        //     (h) => h.next[1] += 1,
+        //     resolve
+        //   );
+        // } else {
+        //   let images = Array<string>();
+        //   let captcha = undefined;
+        //   if (html.includes("Enter the captcha")) {
+        //     helpers.count = source.count;
+        //     captcha =
+        //       "https://www.imagefap.com/gallery/" +
+        //       getFileGroup(url) +
+        //       "?view=0";
+        //     images = allURLs.get(url);
+        //     pm({ warning: source.url + " - blocked due to captcha" }, resolve);
+        //   } else {
+        //     helpers.next[0] += 1;
+        //     helpers.next[1] = 0;
+        //   }
+        //   pm(
+        //     {
+        //       captcha: captcha,
+        //       data: images,
+        //       allURLs: allURLs,
+        //       allPosts: allPosts,
+        //       weight: weight,
+        //       helpers: helpers,
+        //       source: source,
+        //       timeout: timeout,
+        //     },
+        //     resolve
+        //   );
+        // }
       })
       .catch((e) => {
         pm(
@@ -962,18 +961,19 @@ export const loadImageFap = (
             // Get highest resolution video link
             let res = 0;
             let videoLink = '';
-            const videoQualities = new JSDOM(xml, {
-                contentType: 'application/xml'
-              }).window.document.querySelectorAll('flixV2 > quality > item');
-              for (let i = 0; i < videoQualities.length; i++) {
-              const quality = videoQualities.item(i);
-              const newResText = quality.querySelector('res').innerHTML.slice(0, -1);
-              const newRes = Number(newResText);
-              if(newRes > res) {
-                res = newRes;
-                videoLink = quality.querySelector('videoLink').textContent;
-              }
-            }
+            // FIXME
+            // const videoQualities = new JSDOM(xml, {
+            //     contentType: 'application/xml'
+            //   }).window.document.querySelectorAll('flixV2 > quality > item');
+            //   for (let i = 0; i < videoQualities.length; i++) {
+            //   const quality = videoQualities.item(i);
+            //   const newResText = quality.querySelector('res').innerHTML.slice(0, -1);
+            //   const newRes = Number(newResText);
+            //   if(newRes > res) {
+            //     res = newRes;
+            //     videoLink = quality.querySelector('videoLink').textContent;
+            //   }
+            // }
 
             const data = videoLink ? filterPathsToJustPlayable(filter, [videoLink], false) : [];
             if(data.length > 0) {
@@ -1154,29 +1154,30 @@ export const loadSexCom = (allURLs: Map<string, Array<string>>, allPosts: Map<st
 export const loadImgur = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
   const timeout = 3000;
   const url = source.url;
-  imgur.getAlbumInfo(getFileGroup(url))
-    .then((json: any) => {
-      const images = json.data.images.map((i: any) => i.link);
-      helpers.next = null;
-      helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
-      pm({
-        data: filterPathsToJustPlayable(filter, images, true),
-        allURLs: allURLs,
-        allPosts: allPosts,
-        weight: weight,
-        helpers: helpers,
-        source: source,
-        timeout: timeout,
-      }, resolve);
-    })
-    .catch((err: any) => {
-      pm({
-        error: err.message,
-        helpers: helpers,
-        source: source,
-        timeout: timeout,
-      }, resolve);
-    });
+  // FIXME
+  // imgur.getAlbumInfo(getFileGroup(url))
+  //   .then((json: any) => {
+  //     const images = json.data.images.map((i: any) => i.link);
+  //     helpers.next = null;
+  //     helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+  //     pm({
+  //       data: filterPathsToJustPlayable(filter, images, true),
+  //       allURLs: allURLs,
+  //       allPosts: allPosts,
+  //       weight: weight,
+  //       helpers: helpers,
+  //       source: source,
+  //       timeout: timeout,
+  //     }, resolve);
+  //   })
+  //   .catch((err: any) => {
+  //     pm({
+  //       error: err.message,
+  //       helpers: helpers,
+  //       source: source,
+  //       timeout: timeout,
+  //     }, resolve);
+  //   });
 }
 
 export const loadDeviantArt = (allURLs: Map<string, Array<string>>, allPosts: Map<string, string>, config: Config, source: LibrarySource, filter: string, weight: string, helpers: {next: any, count: number, retries: number, uuid: string}, resolve?: Function) => {
@@ -1670,92 +1671,93 @@ export const loadGelbooru1 = (allURLs: Map<string, Array<string>>, allPosts: Map
       timeout: timeout,
     }, resolve))
     .text((html) => {
-      const imageEls = new JSDOM(html, {
-        contentType: 'text/html'
-      }).window.document.querySelectorAll('span.thumb > a');
-      if (imageEls.length > 0) {
-        let imageCount = 0;
-        let images = Array<string>();
+      // FIXME
+      // const imageEls = new JSDOM(html, {
+      //   contentType: 'text/html'
+      // }).window.document.querySelectorAll('span.thumb > a');
+      // if (imageEls.length > 0) {
+      //   let imageCount = 0;
+      //   let images = Array<string>();
 
-        const getImage = (index: number) => {
-          let link = imageEls.item(index).getAttribute("href");
-          if (!link.startsWith("http")) {
-            link = thisHost + "/" + link;
-          }
-          wretch(link)
-            .get()
-            .setTimeout(5000)
-            .onAbort((e) => pm({
-              error: e.message,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            }, resolve))
-            .notFound((e) => pm({
-              error: e.message,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            }, resolve))
-            .error(503, (e) => pm({
-              error: e.message,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            }, resolve))
-            .text((html) => {
-              imageCount++;
-              let contentURL = html.match("<img[^>]*id=\"?image\"?[^>]*src=\"([^\"]*)\"");
-              if (contentURL != null) {
-                let url = contentURL[1];
-                if (url.startsWith("//")) url = "http:" + url;
-                images.push(url);
-              }
-              contentURL = html.match("<img[^>]*src=\"([^\"]*)\"[^>]*id=\"?image\"?");
-              if (contentURL != null) {
-                let url = contentURL[1];
-                if (url.startsWith("//")) url = "http:" + url;
-                images.push(url);
-              }
-              contentURL = html.match("<video[^>]*src=\"([^\"]*)\"");
-              if (contentURL != null) {
-                let url = contentURL[1];
-                if (url.startsWith("//")) url = "http:" + url;
-                images.push(url);
-              }
-              if (imageCount == imageEls.length || imageCount == 10) {
-                helpers.next = helpers.next + 1;
-                helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
-                pm({
-                  data: filterPathsToJustPlayable(filter, images, false),
-                  allURLs: allURLs,
-                  allPosts: allPosts,
-                  weight: weight,
-                  helpers: helpers,
-                  source: source,
-                  timeout: timeout,
-                }, resolve);
-              }
-            });
+      //   const getImage = (index: number) => {
+      //     let link = imageEls.item(index).getAttribute("href");
+      //     if (!link.startsWith("http")) {
+      //       link = thisHost + "/" + link;
+      //     }
+      //     wretch(link)
+      //       .get()
+      //       .setTimeout(5000)
+      //       .onAbort((e) => pm({
+      //         error: e.message,
+      //         helpers: helpers,
+      //         source: source,
+      //         timeout: timeout,
+      //       }, resolve))
+      //       .notFound((e) => pm({
+      //         error: e.message,
+      //         helpers: helpers,
+      //         source: source,
+      //         timeout: timeout,
+      //       }, resolve))
+      //       .error(503, (e) => pm({
+      //         error: e.message,
+      //         helpers: helpers,
+      //         source: source,
+      //         timeout: timeout,
+      //       }, resolve))
+      //       .text((html) => {
+      //         imageCount++;
+      //         let contentURL = html.match("<img[^>]*id=\"?image\"?[^>]*src=\"([^\"]*)\"");
+      //         if (contentURL != null) {
+      //           let url = contentURL[1];
+      //           if (url.startsWith("//")) url = "http:" + url;
+      //           images.push(url);
+      //         }
+      //         contentURL = html.match("<img[^>]*src=\"([^\"]*)\"[^>]*id=\"?image\"?");
+      //         if (contentURL != null) {
+      //           let url = contentURL[1];
+      //           if (url.startsWith("//")) url = "http:" + url;
+      //           images.push(url);
+      //         }
+      //         contentURL = html.match("<video[^>]*src=\"([^\"]*)\"");
+      //         if (contentURL != null) {
+      //           let url = contentURL[1];
+      //           if (url.startsWith("//")) url = "http:" + url;
+      //           images.push(url);
+      //         }
+      //         if (imageCount == imageEls.length || imageCount == 10) {
+      //           helpers.next = helpers.next + 1;
+      //           helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
+      //           pm({
+      //             data: filterPathsToJustPlayable(filter, images, false),
+      //             allURLs: allURLs,
+      //             allPosts: allPosts,
+      //             weight: weight,
+      //             helpers: helpers,
+      //             source: source,
+      //             timeout: timeout,
+      //           }, resolve);
+      //         }
+      //       });
 
-          if (index < imageEls.length - 1 && index < 9) {
-            setTimeout(getImage.bind(null, index+1), 1000);
-          }
-        };
+      //     if (index < imageEls.length - 1 && index < 9) {
+      //       setTimeout(getImage.bind(null, index+1), 1000);
+      //     }
+      //   };
 
-        setTimeout(getImage.bind(null, 0), 1000);
-      } else {
-        helpers.next = null;
-        pm({
-          data: [],
-          allURLs: allURLs,
-          allPosts: allPosts,
-          weight: weight,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        }, resolve);
-      }
+      //   setTimeout(getImage.bind(null, 0), 1000);
+      // } else {
+      //   helpers.next = null;
+      //   pm({
+      //     data: [],
+      //     allURLs: allURLs,
+      //     allPosts: allPosts,
+      //     weight: weight,
+      //     helpers: helpers,
+      //     source: source,
+      //     timeout: timeout,
+      //   }, resolve);
+      // }
     });
 }
 
@@ -1865,62 +1867,63 @@ export const loadEHentai = (allURLs: Map<string, Array<string>>, allPosts: Map<s
       timeout: timeout,
     }, resolve))
     .text((html) => {
-      const imageEls = new JSDOM(html, {
-        contentType: 'text/html'
-      }).window.document.querySelectorAll('#gdt > .gdtm > div > a');
-      if (imageEls.length > 0) {
-        let imageCount = 0;
-        let images = Array<string>();
-        for (let i = 0; i < imageEls.length; i++) {
-          const image = imageEls.item(i)
-          wretch(image.getAttribute("href"))
-            .get()
-            .setTimeout(5000)
-            .onAbort((e) => pm({
-              error: e.message,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            }, resolve))
-            .notFound((e) => pm({
-              error: e.message,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            }, resolve))
-            .text((html) => {
-              imageCount++;
-              let contentURL = html.match("<img id=\"img\" src=\"(.*?)\"");
-              if (contentURL != null) {
-                images.push(contentURL[1]);
-              }
-              if (imageCount == imageEls.length) {
-                helpers.next = helpers.next + 1;
-                helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
-                pm({
-                  data: filterPathsToJustPlayable(filter, images, true),
-                  allURLs: allURLs,
-                  allPosts: allPosts,
-                  weight: weight,
-                  helpers: helpers,
-                  source: source,
-                  timeout: timeout,
-                }, resolve);
-              }
-            })
-        }
-      } else {
-        helpers.next = null;
-        pm({
-          data: [],
-          allURLs: allURLs,
-          allPosts: allPosts,
-          weight: weight,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        }, resolve);
-      }
+      // FIXME
+      // const imageEls = new JSDOM(html, {
+      //   contentType: 'text/html'
+      // }).window.document.querySelectorAll('#gdt > .gdtm > div > a');
+      // if (imageEls.length > 0) {
+      //   let imageCount = 0;
+      //   let images = Array<string>();
+      //   for (let i = 0; i < imageEls.length; i++) {
+      //     const image = imageEls.item(i)
+      //     wretch(image.getAttribute("href"))
+      //       .get()
+      //       .setTimeout(5000)
+      //       .onAbort((e) => pm({
+      //         error: e.message,
+      //         helpers: helpers,
+      //         source: source,
+      //         timeout: timeout,
+      //       }, resolve))
+      //       .notFound((e) => pm({
+      //         error: e.message,
+      //         helpers: helpers,
+      //         source: source,
+      //         timeout: timeout,
+      //       }, resolve))
+      //       .text((html) => {
+      //         imageCount++;
+      //         let contentURL = html.match("<img id=\"img\" src=\"(.*?)\"");
+      //         if (contentURL != null) {
+      //           images.push(contentURL[1]);
+      //         }
+      //         if (imageCount == imageEls.length) {
+      //           helpers.next = helpers.next + 1;
+      //           helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+      //           pm({
+      //             data: filterPathsToJustPlayable(filter, images, true),
+      //             allURLs: allURLs,
+      //             allPosts: allPosts,
+      //             weight: weight,
+      //             helpers: helpers,
+      //             source: source,
+      //             timeout: timeout,
+      //           }, resolve);
+      //         }
+      //       })
+      //   }
+      // } else {
+      //   helpers.next = null;
+      //   pm({
+      //     data: [],
+      //     allURLs: allURLs,
+      //     allPosts: allPosts,
+      //     weight: weight,
+      //     helpers: helpers,
+      //     source: source,
+      //     timeout: timeout,
+      //   }, resolve);
+      // }
     });
 }
 
@@ -2245,45 +2248,46 @@ export const loadBDSMlr = (allURLs: Map<string, Array<string>>, allPosts: Map<st
     .internalError(retry)
     .text((html) => {
       helpers.retries = 0;
-      const itemEls = new JSDOM(html, {
-        contentType: 'application/xml'
-      }).window.document.querySelectorAll('item')
-      if (itemEls.length > 0) {
-        let imageCount = 0;
-        let images = Array<string>();
-        for (let i = 0; i < itemEls.length; i++) {
-          const item = itemEls.item(i);
-          const embeddedImages = item.querySelectorAll("description > img");
-          if (embeddedImages.length > 0) {
-            for (let image of embeddedImages) {
-              imageCount++;
-              images.push(image.getAttribute("src"));
-            }
-          }
-        }
-        helpers.next = helpers.next + 1;
-        helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
-        pm({
-          data: filterPathsToJustPlayable(filter, images, true),
-          allURLs: allURLs,
-          allPosts: allPosts,
-          weight: weight,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        }, resolve);
-      } else {
-        helpers.next = null;
-        pm({
-          data: [],
-          allURLs: allURLs,
-          allPosts: allPosts,
-          weight: weight,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        }, resolve);
-      }
+      // FIXME
+      // const itemEls = new JSDOM(html, {
+      //   contentType: 'application/xml'
+      // }).window.document.querySelectorAll('item')
+      // if (itemEls.length > 0) {
+      //   let imageCount = 0;
+      //   let images = Array<string>();
+      //   for (let i = 0; i < itemEls.length; i++) {
+      //     const item = itemEls.item(i);
+      //     const embeddedImages = item.querySelectorAll("description > img");
+      //     if (embeddedImages.length > 0) {
+      //       for (let image of embeddedImages) {
+      //         imageCount++;
+      //         images.push(image.getAttribute("src"));
+      //       }
+      //     }
+      //   }
+      //   helpers.next = helpers.next + 1;
+      //   helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+      //   pm({
+      //     data: filterPathsToJustPlayable(filter, images, true),
+      //     allURLs: allURLs,
+      //     allPosts: allPosts,
+      //     weight: weight,
+      //     helpers: helpers,
+      //     source: source,
+      //     timeout: timeout,
+      //   }, resolve);
+      // } else {
+      //   helpers.next = null;
+      //   pm({
+      //     data: [],
+      //     allURLs: allURLs,
+      //     allPosts: allPosts,
+      //     weight: weight,
+      //     helpers: helpers,
+      //     source: source,
+      //     timeout: timeout,
+      //   }, resolve);
+      // }
     });
 }
 
@@ -2680,10 +2684,12 @@ async function convertURL(url: string): Promise<Array<string>> {
   // If this is imgur album, return album images
   let imgurAlbumMatch = url.match("^https?://imgur\.com/a/([\\w\\d]{7})$");
   if (imgurAlbumMatch != null) {
-    let json = await imgur.getAlbumInfo(getFileGroup(url));
-    if (json) {
-      return json.data.images.map((i: any) => i.link);
-    }
+    // FIXME
+    // let json = await imgur.getAlbumInfo(getFileGroup(url));
+    // if (json) {
+    //   return json.data.images.map((i: any) => i.link);
+    // }
+    return []
   }
 
   // If this is gfycat page, return gfycat image
@@ -2695,30 +2701,31 @@ async function convertURL(url: string): Promise<Array<string>> {
     }
 
     let html = await wretch(url).get().notFound(() => { return [url] }).text();
-    const gfycat = new JSDOM(html, {
-      contentType: 'text/html'
-    }).window.document.querySelectorAll(
-      '#video-' + gfycatMatch[1].toLocaleLowerCase() + ' > source'
-    );
-    if (gfycat.length > 0) {
-      for (let source of gfycat) {
-        if ((source as any).type == "video/webm") {
-          return [(source as any).src];
-        }
-      }
-      // Fallback to MP4
-      for (let source of gfycat) {
-        if ((source as any).type == "video/mp4" && !(source as any).src.endsWith("-mobile.mp4")) {
-          return [(source as any).src];
-        }
-      }
-      // Fallback to MP4-mobile
-      for (let source of gfycat) {
-        if ((source as any).type == "video/mp4") {
-          return [(source as any).src];
-        }
-      }
-    }
+    // FIXME
+    // const gfycat = new JSDOM(html, {
+    //   contentType: 'text/html'
+    // }).window.document.querySelectorAll(
+    //   '#video-' + gfycatMatch[1].toLocaleLowerCase() + ' > source'
+    // );
+    // if (gfycat.length > 0) {
+    //   for (let source of gfycat) {
+    //     if ((source as any).type == "video/webm") {
+    //       return [(source as any).src];
+    //     }
+    //   }
+    //   // Fallback to MP4
+    //   for (let source of gfycat) {
+    //     if ((source as any).type == "video/mp4" && !(source as any).src.endsWith("-mobile.mp4")) {
+    //       return [(source as any).src];
+    //     }
+    //   }
+    //   // Fallback to MP4-mobile
+    //   for (let source of gfycat) {
+    //     if ((source as any).type == "video/mp4") {
+    //       return [(source as any).src];
+    //     }
+    //   }
+    // }
   }
 
   // If this is redgif page, return redgif image

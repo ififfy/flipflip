@@ -1,6 +1,5 @@
 import * as React from "react";
 import clsx from "clsx";
-import {remote} from "electron";
 
 import {
   Button,
@@ -2259,7 +2258,8 @@ class Tutorial extends React.Component {
   }
 
   openLink(url: string) {
-    remote.shell.openExternal(url);
+    // FIXME
+    // remote.shell.openExternal(url);
   }
 }
 

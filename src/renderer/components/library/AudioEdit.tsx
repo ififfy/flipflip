@@ -1,5 +1,4 @@
 import * as React from "react";
-import {remote} from "electron";
 import clsx from "clsx";
 import {parseFile} from "music-metadata";
 
@@ -195,15 +194,16 @@ class AudioEdit extends React.Component {
   }
 
   loadThumb() {
-    let iResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
-      {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'Image files', extensions: ["gif", "png", "jpeg", "jpg", "webp", "tiff", "svg"]}], properties: ['openFile']});
-    if (!iResult) return;
-    iResult = iResult.filter((i) => isImage(i, true));
-    if (iResult.length > 0) {
-      const newAudio = this.state.audio;
-      newAudio.thumb = generateThumbnailFile(this.props.cachePath, fs_readFileSync(iResult[0]));
-      this.setState({audio: newAudio});
-    }
+    // FIXME
+    // let iResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+    //   {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'Image files', extensions: ["gif", "png", "jpeg", "jpg", "webp", "tiff", "svg"]}], properties: ['openFile']});
+    // if (!iResult) return;
+    // iResult = iResult.filter((i) => isImage(i, true));
+    // if (iResult.length > 0) {
+    //   const newAudio = this.state.audio;
+    //   newAudio.thumb = generateThumbnailFile(this.props.cachePath, fs_readFileSync(iResult[0]));
+    //   this.setState({audio: newAudio});
+    // }
   }
 
   loadSuggestions() {

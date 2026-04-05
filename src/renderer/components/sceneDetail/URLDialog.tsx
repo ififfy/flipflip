@@ -1,5 +1,4 @@
 import * as React from "react";
-import {remote} from "electron";
 
 import {
   Button,

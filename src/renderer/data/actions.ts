@@ -1,9 +1,4 @@
-import {remote, webFrame} from "electron";
 import wretch from "wretch";
-import tumblr, {TumblrClient} from "tumblr.js";
-import Snoowrap from "snoowrap";
-import {analyze} from "web-audio-beat-detector";
-import {parseFile} from "music-metadata";
 import moment from "moment";
 
 import {
@@ -12,11 +7,9 @@ import {
   filterSource,
   getBackups,
   getCachePath, getEffects,
-  getFilesRecursively,
   getRandomIndex,
   randomizeList,
   removeDuplicatesBy,
-  saveDir,
   toArrayBuffer
 } from "./utils";
 import {getFileGroup, getFileName, getSourceType, isVideo, isVideoPlaylist} from "../components/player/Scrapers";
@@ -493,7 +486,8 @@ export function printMemoryReport() {
   Object.entries(process.getSystemMemoryInfo()).map(logKB);
   console.log("\n");
   console.log(format("object"), format("count"), format("size"), format("liveSize"));
-  Object.entries(webFrame.getResourceUsage()).map(logCount);
+  // FIXME
+  // Object.entries(webFrame.getResourceUsage()).map(logCount);
   console.log('------');
 }
 
@@ -2290,52 +2284,56 @@ export function addSource(state: State, scene: Scene, type: string, ...args: any
       }
 
     case AF.directory:
-      let dResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory', 'multiSelections']});
-      if (!dResult) return;
-      if (scene != null) {
-        return updateScene(state, scene, (s) => {
-          addSources(s.sources, dResult, state.library);
-          handleArgs(s);
-        })
-      } else {
-        return updateLibrary(state, (l) =>  addSources(l, dResult, state.library));
-      }
+      // FIXME
+      // let dResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory', 'multiSelections']});
+      // if (!dResult) return;
+      // if (scene != null) {
+      //   return updateScene(state, scene, (s) => {
+      //     addSources(s.sources, dResult, state.library);
+      //     handleArgs(s);
+      //   })
+      // } else {
+      //   return updateLibrary(state, (l) =>  addSources(l, dResult, state.library));
+      // }
+      break
 
     case AF.videos:
-      let vResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
-        {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'Video files', extensions: ['mp4', 'mkv', 'webm', 'ogv', 'mov']}, {name: 'Playlist files', extensions: ['asx', 'm3u8', 'pls', 'xspf']}], properties: ['openFile', 'multiSelections']});
-      if (!vResult) return;
-      vResult = vResult.filter((r) => isVideo(r, true) || isVideoPlaylist(r, true));
-      if (scene != null) {
-        return updateScene(state, scene, (s) => {
-          addSources(s.sources, vResult, state.library);
-          handleArgs(s);
-        })
-      } else {
-        return updateLibrary(state, (l) =>  addSources(l, vResult, state.library));
-      }
+      // let vResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+      //   {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'Video files', extensions: ['mp4', 'mkv', 'webm', 'ogv', 'mov']}, {name: 'Playlist files', extensions: ['asx', 'm3u8', 'pls', 'xspf']}], properties: ['openFile', 'multiSelections']});
+      // if (!vResult) return;
+      // vResult = vResult.filter((r) => isVideo(r, true) || isVideoPlaylist(r, true));
+      // if (scene != null) {
+      //   return updateScene(state, scene, (s) => {
+      //     addSources(s.sources, vResult, state.library);
+      //     handleArgs(s);
+      //   })
+      // } else {
+      //   return updateLibrary(state, (l) =>  addSources(l, vResult, state.library));
+      // }
+      break
 
     case AF.videoDir:
-      let vdResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
-        {filters: [{name:'All Files (*.*)', extensions: ['*']}], properties: ['openDirectory', 'multiSelections']});
-      if (!vdResult) return;
-      let rvResult = new Array<string>();
-      for (let path of vdResult) {
-        if (fs_isDirectory(path)) {
-          rvResult = rvResult.concat(getFilesRecursively(path));
-        } else {
-          rvResult.push(path);
-        }
-      }
-      rvResult = rvResult.filter((r) => isVideo(r, true) || isVideoPlaylist(r, true));
-      if (scene != null) {
-        return updateScene(state, scene, (s) => {
-          addSources(s.sources, rvResult, state.library);
-          handleArgs(s);
-        })
-      } else {
-        return updateLibrary(state, (l) =>  addSources(l, rvResult, state.library));
-      }
+      // FIXME
+      // let vdResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+      //   {filters: [{name:'All Files (*.*)', extensions: ['*']}], properties: ['openDirectory', 'multiSelections']});
+      // if (!vdResult) return;
+      // let rvResult = new Array<string>();
+      // for (let path of vdResult) {
+      //   if (fs_isDirectory(path)) {
+      //     rvResult = rvResult.concat(getFilesRecursively(path));
+      //   } else {
+      //     rvResult.push(path);
+      //   }
+      // }
+      // rvResult = rvResult.filter((r) => isVideo(r, true) || isVideoPlaylist(r, true));
+      // if (scene != null) {
+      //   return updateScene(state, scene, (s) => {
+      //     addSources(s.sources, rvResult, state.library);
+      //     handleArgs(s);
+      //   })
+      // } else {
+      //   return updateLibrary(state, (l) =>  addSources(l, rvResult, state.library));
+      // }
 
     case GT.local:
       if (!args || args.length < 2) {
@@ -2857,12 +2855,13 @@ export function exportScene(state: State, scene: Scene): Object {
   const allExports = (scenesToExport as Array<any>).concat(gridsToExport);
   const sceneExport = JSON.stringify(allExports);
   const fileName = sceneCopy.name + "_export.json";
-  remote.dialog.showSaveDialog(remote.getCurrentWindow(),
-    {filters: [{name: 'JSON Document', extensions: ['json']}], defaultPath: fileName}, (filePath) => {
-      if (filePath != null) {
-        fs_writeFileSync(filePath, sceneExport);
-      }
-  });
+  // FIXME
+  // remote.dialog.showSaveDialog(remote.getCurrentWindow(),
+  //   {filters: [{name: 'JSON Document', extensions: ['json']}], defaultPath: fileName}, (filePath) => {
+  //     if (filePath != null) {
+  //       fs_writeFileSync(filePath, sceneExport);
+  //     }
+  // });
   return {};
 }
 
@@ -3087,12 +3086,13 @@ export function importScene(state: State, importScenes: any, addToLibrary: boole
 export function exportLibrary(state: State): Object {
   const libraryExport = JSON.stringify(state.library);
   const fileName = "library_export-" + new Date().getTime() + ".json";
-  remote.dialog.showSaveDialog(remote.getCurrentWindow(),
-    {filters: [{name: 'JSON Document', extensions: ['json']}], defaultPath: fileName}, (filePath) => {
-      if (filePath != null) {
-        fs_writeFileSync(filePath, libraryExport);
-      }
-    });
+  // FIXME
+  // remote.dialog.showSaveDialog(remote.getCurrentWindow(),
+  //   {filters: [{name: 'JSON Document', extensions: ['json']}], defaultPath: fileName}, (filePath) => {
+  //     if (filePath != null) {
+  //       fs_writeFileSync(filePath, libraryExport);
+  //     }
+  //   });
   return {};
 }
 
@@ -3165,156 +3165,160 @@ export function setMode(state: State, mode: string): Object {
 }
 
 export function markOffline(getState: () => State, setState: Function) {
-  const win = remote.getCurrentWindow();
-  const state = getState();
-  const actionableLibrary = state.library.filter((ls) => {
-    // If this link was checked within the last week, skip
-    return new Date().getTime() - new Date(ls.lastCheck).getTime() >= 604800000;
-  });
+  // FIXME
+  // const win = remote.getCurrentWindow();
+  // const state = getState();
+  // const actionableLibrary = state.library.filter((ls) => {
+  //   // If this link was checked within the last week, skip
+  //   return new Date().getTime() - new Date(ls.lastCheck).getTime() >= 604800000;
+  // });
 
-  const offlineLoop = () => {
-    const state = getState();
-    const offset = state.progressCurrent;
-    if (state.progressMode == PR.cancel) {
-      win.setProgressBar(-1);
-      setState({progressMode: null, progressCurrent: 0, progressTotal: 0, progressTitle: ""});
-    } else if (actionableLibrary.length == offset) {
-      win.setProgressBar(-1);
-      setState({
-        systemSnack: "Offline Check has completed. Sources not available are now marked.",
-        systemSnackSeverity: SS.success,
-        progressMode: null,
-        progressCurrent: 0,
-        progressTotal: 0,
-        progressTitle: ""
-      });
-    } else if (actionableLibrary[offset].url.startsWith("http://") ||
-      actionableLibrary[offset].url.startsWith("https://")) {
-      const actionSource = actionableLibrary[offset];
-      state.progressTitle = actionSource.url;
-      setState({progressTitle: state.progressTitle});
+  // const offlineLoop = () => {
+  //   const state = getState();
+  //   const offset = state.progressCurrent;
+  //   if (state.progressMode == PR.cancel) {
+  //     win.setProgressBar(-1);
+  //     setState({progressMode: null, progressCurrent: 0, progressTotal: 0, progressTitle: ""});
+  //   } else if (actionableLibrary.length == offset) {
+  //     win.setProgressBar(-1);
+  //     setState({
+  //       systemSnack: "Offline Check has completed. Sources not available are now marked.",
+  //       systemSnackSeverity: SS.success,
+  //       progressMode: null,
+  //       progressCurrent: 0,
+  //       progressTotal: 0,
+  //       progressTitle: ""
+  //     });
+  //   } else if (actionableLibrary[offset].url.startsWith("http://") ||
+  //     actionableLibrary[offset].url.startsWith("https://")) {
+  //     const actionSource = actionableLibrary[offset];
+  //     state.progressTitle = actionSource.url;
+  //     setState({progressTitle: state.progressTitle});
 
-      const librarySource = state.library.find((s) => s.url == actionSource.url);
-      if (librarySource) {
-        librarySource.lastCheck = new Date();
-        wretch(librarySource.url)
-          .get()
-          .notFound((res) => {
-            librarySource.offline = true;
-            state.progressCurrent = offset + 1;
-            setState({progressCurrent: state.progressCurrent});
-            win.setProgressBar(state.progressCurrent / state.progressTotal);
-            setTimeout(offlineLoop, 1000);
-          })
-          .res((res) => {
-            librarySource.offline = false;
-            state.progressCurrent = offset + 1;
-            setState({progressCurrent: state.progressCurrent});
-            win.setProgressBar(state.progressCurrent / state.progressTotal);
-            setTimeout(offlineLoop, 1000);
-          })
-          .catch((e) => {
-            console.error(e);
-            librarySource.lastCheck = null;
-            state.progressCurrent = offset + 1;
-            setState({progressCurrent: state.progressCurrent});
-            win.setProgressBar(state.progressCurrent / state.progressTotal);
-            setTimeout(offlineLoop, 100);
-          });
-      } else {
-        // Skip if removed from library during check
-        state.progressCurrent = offset + 1;
-        setState({progressCurrent: state.progressCurrent});
-        win.setProgressBar(state.progressCurrent / state.progressTotal);
-        setTimeout(offlineLoop, 100);
-      }
-    } else {
-      const actionSource = actionableLibrary[offset];
-      state.progressTitle = actionSource.url;
-      state.progressCurrent = offset + 1;
-      setState({progressTitle: state.progressTitle, progressCurrent: state.progressCurrent});
-      win.setProgressBar(state.progressCurrent / state.progressTotal);
+  //     const librarySource = state.library.find((s) => s.url == actionSource.url);
+  //     if (librarySource) {
+  //       librarySource.lastCheck = new Date();
+  //       wretch(librarySource.url)
+  //         .get()
+  //         .notFound((res) => {
+  //           librarySource.offline = true;
+  //           state.progressCurrent = offset + 1;
+  //           setState({progressCurrent: state.progressCurrent});
+  //           win.setProgressBar(state.progressCurrent / state.progressTotal);
+  //           setTimeout(offlineLoop, 1000);
+  //         })
+  //         .res((res) => {
+  //           librarySource.offline = false;
+  //           state.progressCurrent = offset + 1;
+  //           setState({progressCurrent: state.progressCurrent});
+  //           win.setProgressBar(state.progressCurrent / state.progressTotal);
+  //           setTimeout(offlineLoop, 1000);
+  //         })
+  //         .catch((e) => {
+  //           console.error(e);
+  //           librarySource.lastCheck = null;
+  //           state.progressCurrent = offset + 1;
+  //           setState({progressCurrent: state.progressCurrent});
+  //           win.setProgressBar(state.progressCurrent / state.progressTotal);
+  //           setTimeout(offlineLoop, 100);
+  //         });
+  //     } else {
+  //       // Skip if removed from library during check
+  //       state.progressCurrent = offset + 1;
+  //       setState({progressCurrent: state.progressCurrent});
+  //       win.setProgressBar(state.progressCurrent / state.progressTotal);
+  //       setTimeout(offlineLoop, 100);
+  //     }
+  //   } else {
+  //     const actionSource = actionableLibrary[offset];
+  //     state.progressTitle = actionSource.url;
+  //     state.progressCurrent = offset + 1;
+  //     setState({progressTitle: state.progressTitle, progressCurrent: state.progressCurrent});
+  //     win.setProgressBar(state.progressCurrent / state.progressTotal);
 
-      actionSource.lastCheck = new Date();
-      const exists = fs_existsSync(actionSource.url);
-      if (!exists) {
-        actionSource.offline = true;
-      }
-      setTimeout(offlineLoop, 10);
-    }
-  };
+  //     actionSource.lastCheck = new Date();
+  //     const exists = fs_existsSync(actionSource.url);
+  //     if (!exists) {
+  //       actionSource.offline = true;
+  //     }
+  //     setTimeout(offlineLoop, 10);
+  //   }
+  // };
 
-  // If we don't have an import running
-  if (!state.progressMode) {
-    state.progressMode = PR.offline;
-    state.progressCurrent = 0;
-    state.progressTotal = actionableLibrary.length;
-    setState({
-      progressMode: state.progressMode,
-      progressCurrent: state.progressCurrent,
-      progressTotal: state.progressTotal,
-    });
-    win.setProgressBar(state.progressCurrent / state.progressTotal);
-    offlineLoop();
-  }
+  // // If we don't have an import running
+  // if (!state.progressMode) {
+  //   state.progressMode = PR.offline;
+  //   state.progressCurrent = 0;
+  //   state.progressTotal = actionableLibrary.length;
+  //   setState({
+  //     progressMode: state.progressMode,
+  //     progressCurrent: state.progressCurrent,
+  //     progressTotal: state.progressTotal,
+  //   });
+  //   win.setProgressBar(state.progressCurrent / state.progressTotal);
+  //   offlineLoop();
+  // }
 }
 
 export function detectBPMs(getState: () => State, setState: Function) {
   const readMetadata = (audio: Audio, offset: number) => {
-    const win = remote.getCurrentWindow();
-    const state = getState();
-    parseFile(audio.url)
-      .then((metadata: any) => {
-        if (metadata && metadata.common && metadata.common.bpm) {
-          audio.bpm = metadata.common.bpm;
-          state.progressCurrent = offset + 1;
-          setState({progressCurrent: state.progressCurrent});
-          win.setProgressBar(state.progressCurrent / state.progressTotal);
-          setTimeout(detectBPMLoop, 100);
-        } else {
-          detectBPM(audio, offset);
-        }
-      })
-      .catch((e: any) => {
-        console.error("Error reading track metadata: " + audio.url);
-        console.error(e);
-        detectBPM(audio, offset);
-      });
+    // FIXME
+    // const win = remote.getCurrentWindow();
+    // const state = getState();
+    // parseFile(audio.url)
+    //   .then((metadata: any) => {
+    //     if (metadata && metadata.common && metadata.common.bpm) {
+    //       audio.bpm = metadata.common.bpm;
+    //       state.progressCurrent = offset + 1;
+    //       setState({progressCurrent: state.progressCurrent});
+    //       win.setProgressBar(state.progressCurrent / state.progressTotal);
+    //       setTimeout(detectBPMLoop, 100);
+    //     } else {
+    //       detectBPM(audio, offset);
+    //     }
+    //   })
+    //   .catch((e: any) => {
+    //     console.error("Error reading track metadata: " + audio.url);
+    //     console.error(e);
+    //     detectBPM(audio, offset);
+    //   });
   }
 
   const detectBPM = (audio: Audio, offset: number) => {
     const bpmError = (e: any) => {
       console.error("Error detecting track BPM: " + audio.url);
       console.error(e);
-      const win = remote.getCurrentWindow();
-      const state = getState();
-      state.progressCurrent = offset + 1;
-      setState({progressCurrent: state.progressCurrent});
-      win.setProgressBar(state.progressCurrent / state.progressTotal);
-      setTimeout(detectBPMLoop, 100);
+      // FIXME
+      // const win = remote.getCurrentWindow();
+      // const state = getState();
+      // state.progressCurrent = offset + 1;
+      // setState({progressCurrent: state.progressCurrent});
+      // win.setProgressBar(state.progressCurrent / state.progressTotal);
+      // setTimeout(detectBPMLoop, 100);
     }
 
     const detectBPM = (data: ArrayBuffer) => {
       const maxByteSize = 200000000;
       if (data.byteLength < maxByteSize) {
-        const win = remote.getCurrentWindow();
-        const state = getState();
-        let context = new AudioContext();
-        context.decodeAudioData(data, (buffer) => {
-          analyze(buffer)
-            .then((tempo: number) => {
-              audio.bpm = Number.parseFloat(tempo.toFixed(2));
-              state.progressCurrent = offset + 1;
-              setState({progressCurrent: state.progressCurrent});
-              win.setProgressBar(state.progressCurrent / state.progressTotal);
-              setTimeout(detectBPMLoop, 100);
-            })
-            .catch((e: any) => {
-              bpmError(e);
-            });
-        }, (e) => {
-          bpmError(e);
-        });
+        // FIXME
+        // const win = remote.getCurrentWindow();
+        // const state = getState();
+        // let context = new AudioContext();
+        // context.decodeAudioData(data, (buffer) => {
+        //   analyze(buffer)
+        //     .then((tempo: number) => {
+        //       audio.bpm = Number.parseFloat(tempo.toFixed(2));
+        //       state.progressCurrent = offset + 1;
+        //       setState({progressCurrent: state.progressCurrent});
+        //       win.setProgressBar(state.progressCurrent / state.progressTotal);
+        //       setTimeout(detectBPMLoop, 100);
+        //     })
+        //     .catch((e: any) => {
+        //       bpmError(e);
+        //     });
+        // }, (e) => {
+        //   bpmError(e);
+        // });
       } else {
         console.error("'" + audio.url + "' is too large to decode");
       }
@@ -3337,319 +3341,323 @@ export function detectBPMs(getState: () => State, setState: Function) {
   }
 
   const detectBPMLoop = () => {
-    const state = getState();
-    const offset = state.progressCurrent;
-    if (state.progressMode == PR.cancel) {
-      win.setProgressBar(-1);
-      setState({progressMode: null, progressCurrent: 0, progressTotal: 0, progressTitle: ""});
-    } else if (actionableLibrary.length == offset) {
-      win.setProgressBar(-1);
-      setState({
-        systemSnack: "BPM Detection has completed.",
-        systemSnackSeverity: SS.success,
-        progressMode: null,
-        progressCurrent: 0,
-        progressTotal: 0,
-        progressTitle: ""
-      });
-    } else {
-      const actionSource = actionableLibrary[offset];
-      state.progressTitle = actionSource.url;
-      setState({progressTitle: state.progressTitle});
+    // FIXME
+    // const state = getState();
+    // const offset = state.progressCurrent;
+    // if (state.progressMode == PR.cancel) {
+    //   win.setProgressBar(-1);
+    //   setState({progressMode: null, progressCurrent: 0, progressTotal: 0, progressTitle: ""});
+    // } else if (actionableLibrary.length == offset) {
+    //   win.setProgressBar(-1);
+    //   setState({
+    //     systemSnack: "BPM Detection has completed.",
+    //     systemSnackSeverity: SS.success,
+    //     progressMode: null,
+    //     progressCurrent: 0,
+    //     progressTotal: 0,
+    //     progressTitle: ""
+    //   });
+    // } else {
+    //   const actionSource = actionableLibrary[offset];
+    //   state.progressTitle = actionSource.url;
+    //   setState({progressTitle: state.progressTitle});
 
-      const librarySource = state.audios.find((s) => s.url == actionSource.url);
-      if (librarySource) {
-        readMetadata(librarySource, offset)
-      } else {
-        // Skip if removed from library during check
-        state.progressCurrent = offset + 1;
-        setState({progressCurrent: state.progressCurrent});
-        win.setProgressBar(state.progressCurrent / state.progressTotal);
-        detectBPMLoop();
-      }
-    }
+    //   const librarySource = state.audios.find((s) => s.url == actionSource.url);
+    //   if (librarySource) {
+    //     readMetadata(librarySource, offset)
+    //   } else {
+    //     // Skip if removed from library during check
+    //     state.progressCurrent = offset + 1;
+    //     setState({progressCurrent: state.progressCurrent});
+    //     win.setProgressBar(state.progressCurrent / state.progressTotal);
+    //     detectBPMLoop();
+    //   }
+    // }
   }
 
-  const win = remote.getCurrentWindow();
-  const state = getState();
-  const actionableLibrary = state.audios.filter((a) => a.bpm == 0);
+  // FIXME
+  // const win = remote.getCurrentWindow();
+  // const state = getState();
+  // const actionableLibrary = state.audios.filter((a) => a.bpm == 0);
 
-  // If we don't have an import running
-  if (!state.progressMode) {
-    state.progressMode = PR.bpm;
-    state.progressCurrent = 0;
-    state.progressTotal = actionableLibrary.length;
-    setState({
-      progressMode: state.progressMode,
-      progressCurrent: state.progressCurrent,
-      progressTotal: state.progressTotal,
-    });
-    win.setProgressBar(state.progressCurrent / state.progressTotal);
-    detectBPMLoop();
-  }
+  // // If we don't have an import running
+  // if (!state.progressMode) {
+  //   state.progressMode = PR.bpm;
+  //   state.progressCurrent = 0;
+  //   state.progressTotal = actionableLibrary.length;
+  //   setState({
+  //     progressMode: state.progressMode,
+  //     progressCurrent: state.progressCurrent,
+  //     progressTotal: state.progressTotal,
+  //   });
+  //   win.setProgressBar(state.progressCurrent / state.progressTotal);
+  //   detectBPMLoop();
+  // }
 }
 
 export function updateVideoMetadata(getState: () => State, setState: Function) {
-  const win = remote.getCurrentWindow();
-  const state = getState();
-  const actionableLibrary = state.library.filter((ls) => getSourceType(ls.url) == ST.video && (ls.duration == null || ls.resolution == null || isNaN(ls.resolution) || ls.resolution<=0 || ls.fileSize == null || isNaN(ls.fileSize)));
+  // FIXME
+  // const win = remote.getCurrentWindow();
+  // const state = getState();
+  // const actionableLibrary = state.library.filter((ls) => getSourceType(ls.url) == ST.video && (ls.duration == null || ls.resolution == null || isNaN(ls.resolution) || ls.resolution<=0 || ls.fileSize == null || isNaN(ls.fileSize)));
 
-  const videoMetadataLoop = () => {
-    const state = getState();
-    const offset = state.progressCurrent;
-    if (state.progressMode == PR.cancel) {
-      win.setProgressBar(-1);
-      setState({progressMode: null, progressCurrent: 0, progressTotal: 0, progressTitle: ""});
-    } else if (actionableLibrary.length == offset) {
-      win.setProgressBar(-1);
-      setState({
-        systemSnack: "Video Metadata update has completed.",
-        systemSnackSeverity: SS.success,
-        progressMode: null,
-        progressCurrent: 0,
-        progressTotal: 0,
-        progressTitle: ""
-      });
-    } else {
-      const actionSource = actionableLibrary[offset];
-      state.progressTitle = actionSource.url;
-      setState({progressTitle: state.progressTitle});
+  // const videoMetadataLoop = () => {
+  //   const state = getState();
+  //   const offset = state.progressCurrent;
+  //   if (state.progressMode == PR.cancel) {
+  //     win.setProgressBar(-1);
+  //     setState({progressMode: null, progressCurrent: 0, progressTotal: 0, progressTitle: ""});
+  //   } else if (actionableLibrary.length == offset) {
+  //     win.setProgressBar(-1);
+  //     setState({
+  //       systemSnack: "Video Metadata update has completed.",
+  //       systemSnackSeverity: SS.success,
+  //       progressMode: null,
+  //       progressCurrent: 0,
+  //       progressTotal: 0,
+  //       progressTitle: ""
+  //     });
+  //   } else {
+  //     const actionSource = actionableLibrary[offset];
+  //     state.progressTitle = actionSource.url;
+  //     setState({progressTitle: state.progressTitle});
 
-      const librarySource = state.library.find((s) => s.url == actionSource.url);
-      if (librarySource) {
-        let video = document.createElement('video');
-        video.preload = 'metadata';
+  //     const librarySource = state.library.find((s) => s.url == actionSource.url);
+  //     if (librarySource) {
+  //       let video = document.createElement('video');
+  //       video.preload = 'metadata';
 
-        video.onloadedmetadata = () => {
-          const height = video.videoHeight;
-          const width = video.videoWidth;
-          librarySource.resolution = Math.min(height, width);
-          librarySource.duration = video.duration;
-          video.remove();
-          try {
-            librarySource.fileSize = fs_fileSize(librarySource.url);
-          } catch (e) {
-            librarySource.fileSize = -1;
-          }
+  //       video.onloadedmetadata = () => {
+  //         const height = video.videoHeight;
+  //         const width = video.videoWidth;
+  //         librarySource.resolution = Math.min(height, width);
+  //         librarySource.duration = video.duration;
+  //         video.remove();
+  //         try {
+  //           librarySource.fileSize = fs_fileSize(librarySource.url);
+  //         } catch (e) {
+  //           librarySource.fileSize = -1;
+  //         }
 
-          state.progressCurrent = offset + 1;
-          setState({progressCurrent: state.progressCurrent});
-          win.setProgressBar(state.progressCurrent / state.progressTotal);
-          setTimeout(videoMetadataLoop, 100);
-        }
-        video.onerror = () => {
-          video.remove();
-          state.progressCurrent = offset + 1;
-          setState({progressCurrent: state.progressCurrent});
-          win.setProgressBar(state.progressCurrent / state.progressTotal);
-          setTimeout(videoMetadataLoop, 100);
-        }
+  //         state.progressCurrent = offset + 1;
+  //         setState({progressCurrent: state.progressCurrent});
+  //         win.setProgressBar(state.progressCurrent / state.progressTotal);
+  //         setTimeout(videoMetadataLoop, 100);
+  //       }
+  //       video.onerror = () => {
+  //         video.remove();
+  //         state.progressCurrent = offset + 1;
+  //         setState({progressCurrent: state.progressCurrent});
+  //         win.setProgressBar(state.progressCurrent / state.progressTotal);
+  //         setTimeout(videoMetadataLoop, 100);
+  //       }
 
-        video.src = librarySource.url;
-      } else {
-        // Skip if removed from library during check
-        state.progressCurrent = offset + 1;
-        setState({progressCurrent: state.progressCurrent});
-        win.setProgressBar(state.progressCurrent / state.progressTotal);
-        videoMetadataLoop();
-      }
-    }
-  }
+  //       video.src = librarySource.url;
+  //     } else {
+  //       // Skip if removed from library during check
+  //       state.progressCurrent = offset + 1;
+  //       setState({progressCurrent: state.progressCurrent});
+  //       win.setProgressBar(state.progressCurrent / state.progressTotal);
+  //       videoMetadataLoop();
+  //     }
+  //   }
+  // }
 
-  // If we don't have an import running
-  if (!state.progressMode && actionableLibrary.length) {
-    state.progressMode = PR.videoMetadata;
-    state.progressCurrent = 0;
-    state.progressTotal = actionableLibrary.length;
-    setState({
-      progressMode: state.progressMode,
-      progressCurrent: state.progressCurrent,
-      progressTotal: state.progressTotal,
-    });
-    win.setProgressBar(state.progressCurrent / state.progressTotal);
-    videoMetadataLoop();
-  }
+  // // If we don't have an import running
+  // if (!state.progressMode && actionableLibrary.length) {
+  //   state.progressMode = PR.videoMetadata;
+  //   state.progressCurrent = 0;
+  //   state.progressTotal = actionableLibrary.length;
+  //   setState({
+  //     progressMode: state.progressMode,
+  //     progressCurrent: state.progressCurrent,
+  //     progressTotal: state.progressTotal,
+  //   });
+  //   win.setProgressBar(state.progressCurrent / state.progressTotal);
+  //   videoMetadataLoop();
+  // }
 }
 
 export function importTumblr(getState: () => State, setState: Function) {
-  let client: TumblrClient;
-  const win = remote.getCurrentWindow();
-  // Define our loop
-  const tumblrImportLoop = () => {
-    const state = getState();
-    const offset = state.progressCurrent;
-    if (state.progressMode == PR.cancel) {
-      win.setProgressBar(-1);
-      setState({progressMode: null, progressCurrent: 0, progressTotal: 0});
-      return;
-    }
-    // Get the next page of blogs
-    client.userFollowing({offset: offset}, (err, data) => {
-      if (err) {
-        win.setProgressBar(-1);
-        setState({systemMessage: "Error retrieving following: " + err, progressMode: null, progressCurrent: 0, progressTotal: 0});
-        console.error(err);
-        return;
-      }
+  // FIXME
+  // let client: TumblrClient;
+  // const win = remote.getCurrentWindow();
+  // // Define our loop
+  // const tumblrImportLoop = () => {
+  //   const state = getState();
+  //   const offset = state.progressCurrent;
+  //   if (state.progressMode == PR.cancel) {
+  //     win.setProgressBar(-1);
+  //     setState({progressMode: null, progressCurrent: 0, progressTotal: 0});
+  //     return;
+  //   }
+  //   // Get the next page of blogs
+  //   client.userFollowing({offset: offset}, (err, data) => {
+  //     if (err) {
+  //       win.setProgressBar(-1);
+  //       setState({systemMessage: "Error retrieving following: " + err, progressMode: null, progressCurrent: 0, progressTotal: 0});
+  //       console.error(err);
+  //       return;
+  //     }
 
-      // Get the next 20 blogs
-      let following = [];
-      for (let blog of data.blogs) {
-        const blogURL = "http://" + blog.name + ".tumblr.com/";
-        following.push(blogURL);
-      }
+  //     // Get the next 20 blogs
+  //     let following = [];
+  //     for (let blog of data.blogs) {
+  //       const blogURL = "http://" + blog.name + ".tumblr.com/";
+  //       following.push(blogURL);
+  //     }
 
-      // dedup
-      const newestState = getState();
-      let sourceURLs = newestState.library.map((s) => s.url);
-      following = following.filter((b) => !sourceURLs.includes(b));
+  //     // dedup
+  //     const newestState = getState();
+  //     let sourceURLs = newestState.library.map((s) => s.url);
+  //     following = following.filter((b) => !sourceURLs.includes(b));
 
-      let id = newestState.library.length + 1;
-      newestState.library.forEach((s) => {
-        id = Math.max(s.id + 1, id);
-      });
+  //     let id = newestState.library.length + 1;
+  //     newestState.library.forEach((s) => {
+  //       id = Math.max(s.id + 1, id);
+  //     });
 
-      // Add to Library
-      let newLibrary = newestState.library;
-      for (let url of following) {
-        newLibrary = newLibrary.concat([new LibrarySource({
-          url: url,
-          id: id,
-          tags: new Array<Tag>(),
-        })]);
-        id += 1;
-      }
-      setState({library: newLibrary});
+  //     // Add to Library
+  //     let newLibrary = newestState.library;
+  //     for (let url of following) {
+  //       newLibrary = newLibrary.concat([new LibrarySource({
+  //         url: url,
+  //         id: id,
+  //         tags: new Array<Tag>(),
+  //       })]);
+  //       id += 1;
+  //     }
+  //     setState({library: newLibrary});
 
-      let nextOffset = offset + 20;
-      if (offset > state.progressTotal) {
-        nextOffset = state.progressTotal;
-      }
+  //     let nextOffset = offset + 20;
+  //     if (offset > state.progressTotal) {
+  //       nextOffset = state.progressTotal;
+  //     }
 
-      // Update progress
-      setState({progressCurrent: nextOffset});
-      win.setProgressBar(nextOffset / state.progressTotal);
+  //     // Update progress
+  //     setState({progressCurrent: nextOffset});
+  //     win.setProgressBar(nextOffset / state.progressTotal);
 
-      // Loop until we run out of blogs
-      if ((nextOffset) < state.progressTotal) {
-        setTimeout(tumblrImportLoop, 1500);
-      } else {
-        win.setProgressBar(-1);
-        setState({systemSnack: "Tumblr Following Import has completed", systemSnackSeverity: SS.success, progressMode: null, progressCurrent: 0, progressTotal: 0});
-      }
-    });
-  };
+  //     // Loop until we run out of blogs
+  //     if ((nextOffset) < state.progressTotal) {
+  //       setTimeout(tumblrImportLoop, 1500);
+  //     } else {
+  //       win.setProgressBar(-1);
+  //       setState({systemSnack: "Tumblr Following Import has completed", systemSnackSeverity: SS.success, progressMode: null, progressCurrent: 0, progressTotal: 0});
+  //     }
+  //   });
+  // };
 
-  // If we don't have an import running
-  const state = getState();
-  if (!state.progressMode) {
-    // Build our Tumblr client
-    client = tumblr.createClient({
-      consumer_key: state.config.remoteSettings.tumblrKey,
-      consumer_secret: state.config.remoteSettings.tumblrSecret,
-      token: state.config.remoteSettings.tumblrOAuthToken,
-      token_secret: state.config.remoteSettings.tumblrOAuthTokenSecret,
-    });
+  // // If we don't have an import running
+  // const state = getState();
+  // if (!state.progressMode) {
+  //   // Build our Tumblr client
+  //   client = tumblr.createClient({
+  //     consumer_key: state.config.remoteSettings.tumblrKey,
+  //     consumer_secret: state.config.remoteSettings.tumblrSecret,
+  //     token: state.config.remoteSettings.tumblrOAuthToken,
+  //     token_secret: state.config.remoteSettings.tumblrOAuthTokenSecret,
+  //   });
 
-    // Make the first call just to check the total blogs
-    client.userFollowing({limit: 0}, (err, data) => {
-      if (err) {
-        win.setProgressBar(-1);
-        setState({systemMessage: "Error retrieving following: " + err, progressMode: null, progressCurrent: 0, progressTotal: 0});
-        console.error(err);
-        return;
-      }
+  //   // Make the first call just to check the total blogs
+  //   client.userFollowing({limit: 0}, (err, data) => {
+  //     if (err) {
+  //       win.setProgressBar(-1);
+  //       setState({systemMessage: "Error retrieving following: " + err, progressMode: null, progressCurrent: 0, progressTotal: 0});
+  //       console.error(err);
+  //       return;
+  //     }
 
-      state.progressMode = PR.tumblr;
-      state.progressCurrent = 0;
-      state.progressTotal = data.total_blogs;
-      setState({
-        progressMode: state.progressMode,
-        progressCurrent: state.progressCurrent,
-        progressTotal: state.progressTotal,
-      });
-      win.setProgressBar(state.progressCurrent / state.progressTotal);
-      tumblrImportLoop();
-    });
-  }
+  //     state.progressMode = PR.tumblr;
+  //     state.progressCurrent = 0;
+  //     state.progressTotal = data.total_blogs;
+  //     setState({
+  //       progressMode: state.progressMode,
+  //       progressCurrent: state.progressCurrent,
+  //       progressTotal: state.progressTotal,
+  //     });
+  //     win.setProgressBar(state.progressCurrent / state.progressTotal);
+  //     tumblrImportLoop();
+  //   });
+  // }
 }
 
 export function importReddit(getState: () => State, setState: Function) {
-  let reddit: any;
-  const win = remote.getCurrentWindow();
-  const redditImportLoop = () => {
-    const state = getState();
-    if (state.progressMode == PR.cancel) {
-      win.setProgressBar(-1);
-      setState({progressMode: null, progressNext: null, progressCurrent: 0});
-      return;
-    }
-    reddit.getSubscriptions({limit: 20, after: state.progressNext}).then((subscriptionListing: any) => {
-      if (subscriptionListing.length == 0) {
-        win.setProgressBar(-1);
-        setState({systemSnack: "Reddit Subscription Import has completed", systemSnackSeverity: SS.success, progressMode: null, progressNext: null, progressCurrent: 0});
-      } else {
-        // Get the next 20 blogs
-        let subscriptions = [];
-        for (let sub of subscriptionListing) {
-          const subURL = "http://www.reddit.com" + sub.url;
-          subscriptions.push(subURL);
-        }
+  // let reddit: any;
+  // const win = remote.getCurrentWindow();
+  // const redditImportLoop = () => {
+  //   const state = getState();
+  //   if (state.progressMode == PR.cancel) {
+  //     win.setProgressBar(-1);
+  //     setState({progressMode: null, progressNext: null, progressCurrent: 0});
+  //     return;
+  //   }
+  //   reddit.getSubscriptions({limit: 20, after: state.progressNext}).then((subscriptionListing: any) => {
+  //     if (subscriptionListing.length == 0) {
+  //       win.setProgressBar(-1);
+  //       setState({systemSnack: "Reddit Subscription Import has completed", systemSnackSeverity: SS.success, progressMode: null, progressNext: null, progressCurrent: 0});
+  //     } else {
+  //       // Get the next 20 blogs
+  //       let subscriptions = [];
+  //       for (let sub of subscriptionListing) {
+  //         const subURL = "http://www.reddit.com" + sub.url;
+  //         subscriptions.push(subURL);
+  //       }
 
-        // dedup
-        const newestState = getState();
-        let sourceURLs = newestState.library.map((s) => s.url);
-        subscriptions = subscriptions.filter((s) => !sourceURLs.includes(s));
+  //       // dedup
+  //       const newestState = getState();
+  //       let sourceURLs = newestState.library.map((s) => s.url);
+  //       subscriptions = subscriptions.filter((s) => !sourceURLs.includes(s));
 
-        let id = newestState.library.length + 1;
-        newestState.library.forEach((s) => {
-          id = Math.max(s.id + 1, id);
-        });
+  //       let id = newestState.library.length + 1;
+  //       newestState.library.forEach((s) => {
+  //         id = Math.max(s.id + 1, id);
+  //       });
 
-        // Add to Library
-        let newLibrary = newestState.library;
-        for (let url of subscriptions) {
-          newLibrary = newLibrary.concat([new LibrarySource({
-            url: url,
-            id: id,
-            tags: new Array<Tag>(),
-          })]);
-          id += 1;
-        }
-        setState({library: newLibrary});
+  //       // Add to Library
+  //       let newLibrary = newestState.library;
+  //       for (let url of subscriptions) {
+  //         newLibrary = newLibrary.concat([new LibrarySource({
+  //           url: url,
+  //           id: id,
+  //           tags: new Array<Tag>(),
+  //         })]);
+  //         id += 1;
+  //       }
+  //       setState({library: newLibrary});
 
-        // Loop until we run out of blogs
-        setTimeout(redditImportLoop, 1500);
-        state.progressNext = subscriptionListing[subscriptionListing.length - 1].name;
-        state.progressCurrent = state.progressCurrent + 1;
-        setState({progressNext: state.progressNext, progressCurrent: state.progressCurrent});
-        win.setProgressBar(2);
-      }
-    }).catch((err: any) => {
-      console.error(err);
-      win.setProgressBar(-1);
-      setState({systemMessage: "Error retrieving subscriptions: " + err, progressMode: null, progressNext: null, progressCurrent: 0});
-    });
-  };
+  //       // Loop until we run out of blogs
+  //       setTimeout(redditImportLoop, 1500);
+  //       state.progressNext = subscriptionListing[subscriptionListing.length - 1].name;
+  //       state.progressCurrent = state.progressCurrent + 1;
+  //       setState({progressNext: state.progressNext, progressCurrent: state.progressCurrent});
+  //       win.setProgressBar(2);
+  //     }
+  //   }).catch((err: any) => {
+  //     console.error(err);
+  //     win.setProgressBar(-1);
+  //     setState({systemMessage: "Error retrieving subscriptions: " + err, progressMode: null, progressNext: null, progressCurrent: 0});
+  //   });
+  // };
 
-  const state = getState();
-  if (!state.progressMode) {
-    reddit = new Snoowrap({
-      userAgent: state.config.remoteSettings.redditUserAgent,
-      clientId: state.config.remoteSettings.redditClientID,
-      clientSecret: "",
-      refreshToken: state.config.remoteSettings.redditRefreshToken,
-    });
+  // const state = getState();
+  // if (!state.progressMode) {
+  //   reddit = new Snoowrap({
+  //     userAgent: state.config.remoteSettings.redditUserAgent,
+  //     clientId: state.config.remoteSettings.redditClientID,
+  //     clientSecret: "",
+  //     refreshToken: state.config.remoteSettings.redditRefreshToken,
+  //   });
 
-    // Show progress bar and kick off loop
-    state.progressMode = PR.reddit;
-    state.progressCurrent = 0;
-    setState({
-      systemSnack: "Your Reddit subscriptions are being imported... You will recieve an alert when the import is finished.",
-      systemSnackSeverity: SS.info,
-      progressMode: state.progressMode, progressCurrent: state.progressCurrent
-    });
-    win.setProgressBar(2);
-    redditImportLoop();
-  }
+  //   // Show progress bar and kick off loop
+  //   state.progressMode = PR.reddit;
+  //   state.progressCurrent = 0;
+  //   setState({
+  //     systemSnack: "Your Reddit subscriptions are being imported... You will recieve an alert when the import is finished.",
+  //     systemSnackSeverity: SS.info,
+  //     progressMode: state.progressMode, progressCurrent: state.progressCurrent
+  //   });
+  //   win.setProgressBar(2);
+  //   redditImportLoop();
+  // }
 }

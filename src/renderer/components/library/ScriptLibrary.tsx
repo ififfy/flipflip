@@ -1,6 +1,5 @@
 import * as React from "react";
 import clsx from "clsx";
-import {remote} from "electron";
 
 import {
   AppBar,
@@ -776,26 +775,27 @@ class ScriptLibrary extends React.Component {
         });
         break;
       case AF.script:
-        let aResult = new Array<string>();
-        if (e.shiftKey) {
-          let adResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
-            {filters: [{name:'All Files (*.*)', extensions: ['*']}], properties: ['openDirectory', 'multiSelections']});
-          if (!adResult) return;
-          for (let path of adResult) {
-            if (fs_isDirectory(path)) {
-              aResult = adResult.concat(getFilesRecursively(path));
-            } else {
-              aResult.push(path);
-            }
-          }
-        } else {
-          aResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
-            {filters: [{name: 'All Files (*.*)', extensions: ['*']}, {name: 'Text files', extensions: ['txt']}], properties: ['openFile', 'multiSelections']});
-          if (!aResult) return;
-        }
-        aResult = aResult.filter((r) => isText(r, true));
-        this.setState({loadingSources: true});
-        this.addScriptSources(aResult);
+        // FIXME
+        // let aResult = new Array<string>();
+        // if (e.shiftKey) {
+        //   let adResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+        //     {filters: [{name:'All Files (*.*)', extensions: ['*']}], properties: ['openDirectory', 'multiSelections']});
+        //   if (!adResult) return;
+        //   for (let path of adResult) {
+        //     if (fs_isDirectory(path)) {
+        //       aResult = adResult.concat(getFilesRecursively(path));
+        //     } else {
+        //       aResult.push(path);
+        //     }
+        //   }
+        // } else {
+        //   aResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+        //     {filters: [{name: 'All Files (*.*)', extensions: ['*']}, {name: 'Text files', extensions: ['txt']}], properties: ['openFile', 'multiSelections']});
+        //   if (!aResult) return;
+        // }
+        // aResult = aResult.filter((r) => isText(r, true));
+        // this.setState({loadingSources: true});
+        // this.addScriptSources(aResult);
         break;
     }
   }

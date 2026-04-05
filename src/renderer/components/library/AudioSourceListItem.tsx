@@ -1,6 +1,5 @@
 import * as React from "react";
 import clsx from "clsx";
-import {remote} from "electron";
 
 import {
   Badge,
@@ -315,9 +314,10 @@ class AudioSourceListItem extends React.Component {
     } else if (e.shiftKey && !e.ctrlKey) {
       this.openExternalURL(sourceURL);
     } else if (!e.shiftKey && e.ctrlKey) {
-      if (fs_existsSync(sourceURL)) {
-        remote.shell.showItemInFolder(sourceURL);
-      }
+      // FIXME
+      // if (fs_existsSync(sourceURL)) {
+      //   remote.shell.showItemInFolder(sourceURL);
+      // }
     } else if (!e.shiftKey && !e.ctrlKey) {
       this.props.savePosition();
       try {
@@ -329,7 +329,8 @@ class AudioSourceListItem extends React.Component {
   }
 
   openExternalURL(url: string) {
-    remote.shell.openExternal(url);
+    // FIXME
+    // remote.shell.openExternal(url);
   }
 }
 

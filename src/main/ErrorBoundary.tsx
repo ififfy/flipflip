@@ -1,5 +1,4 @@
 import * as React from 'react';
-import {remote} from "electron";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
@@ -173,7 +172,8 @@ export default class ErrorBoundary extends React.Component {
 
   reset() {
     fs_rimrafSync(savePath);
-    remote.getCurrentWindow().reload();
+    // FIXME
+    // remote.getCurrentWindow().reload();
   }
 
   resetCheck() {
@@ -219,7 +219,8 @@ export default class ErrorBoundary extends React.Component {
     if (errorComponent != null) {
       title = errorComponent[1] + " - " + title;
     }
-    remote.shell.openExternal("https://github.com/regtemp8/flipflip/issues/new?title=" + title + "&body=" + body);
+    // FIXME
+    // remote.shell.openExternal("https://github.com/regtemp8/flipflip/issues/new?title=" + title + "&body=" + body);
   }
 }
 

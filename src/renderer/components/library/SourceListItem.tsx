@@ -1,6 +1,5 @@
 import * as React from "react";
 import clsx from "clsx";
-import {remote} from "electron";
 
 import {
   Badge,
@@ -412,7 +411,8 @@ class SourceListItem extends React.Component {
         if (fs_existsSync(getCachePath(sourceURL, this.props.config) + getFileName(sourceURL))) {
           cachePath = getCachePath(sourceURL, this.props.config);
         } else if (fs_existsSync(sourceURL)) {
-          remote.shell.showItemInFolder(sourceURL);
+          // FIXME
+          // remote.shell.showItemInFolder(sourceURL);
         }
       } else {
         cachePath = getCachePath(sourceURL, this.props.config);
@@ -465,7 +465,8 @@ class SourceListItem extends React.Component {
   }
 
   openExternalURL(url: string) {
-    remote.shell.openExternal(url);
+    // FIXME
+    // remote.shell.openExternal(url);
   }
 
   /**

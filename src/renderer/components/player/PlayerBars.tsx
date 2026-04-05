@@ -1,6 +1,4 @@
 import * as React from "react";
-import {clipboard, nativeImage, remote} from "electron";
-const {getCurrentWindow, Menu, MenuItem, app} = remote;
 import clsx from "clsx";
 import {fileUrl_fileURL} from "../../dummy/file-url";
 import wretch from "wretch";
@@ -772,7 +770,8 @@ class PlayerBars extends React.Component {
     this._appBarTimeout = null;
     this._drawerTimeout = null;
     this._tagDrawerTimeout = null;
-    createMainMenu(Menu, createMenuTemplate(app));
+    // FIXME
+    // createMainMenu(Menu, createMenuTemplate(app));
     window.removeEventListener('contextmenu', this.showContextMenu);
     window.removeEventListener('keydown', this.onKeyDown);
     window.removeEventListener('wheel', this.onScroll);
@@ -819,7 +818,8 @@ class PlayerBars extends React.Component {
   }
 
   openLink(url: string) {
-    remote.shell.openExternal(url);
+    // FIXME
+    // remote.shell.openExternal(url);
   }
 
   onMouseEnterAppBar() {
@@ -910,8 +910,9 @@ class PlayerBars extends React.Component {
   }
 
   toggleFull() {
-    this.setFullscreen(!getCurrentWindow().isFullScreen());
-    this.setMenuBarVisibility(!getCurrentWindow().isFullScreen());
+    // FIXME
+    // this.setFullscreen(!getCurrentWindow().isFullScreen());
+    // this.setMenuBarVisibility(!getCurrentWindow().isFullScreen());
   }
 
   historyBack() {
@@ -935,145 +936,160 @@ class PlayerBars extends React.Component {
   setMenuBarVisibility(showMenu: boolean) {
     this.props.config.displaySettings.showMenu = showMenu;
     this.buildMenu();
-    getCurrentWindow().setMenuBarVisibility(showMenu);
+    // FIXME
+    // getCurrentWindow().setMenuBarVisibility(showMenu);
   }
 
   setFullscreen(fullScreen: boolean) {
     this.props.config.displaySettings.fullScreen = fullScreen;
     this.buildMenu();
-    getCurrentWindow().setFullScreen(fullScreen);
+    // FIXME
+    // getCurrentWindow().setFullScreen(fullScreen);
   }
 
   buildMenu() {
     if (this.props.tutorial != null) return;
-    createMainMenu(Menu, createMenuTemplate(app, {
-      label: 'Player controls',
-      submenu: Array.from(this.getKeyMap().entries()).map(([k, v]) => {
-        const [label, accelerator] = v;
-        return {
-          label,
-          accelerator,
-          click: (this as any)[k as any].bind(this),
-        };
-      })
-    }));
+    // FIXME
+    // createMainMenu(Menu, createMenuTemplate(app, {
+    //   label: 'Player controls',
+    //   submenu: Array.from(this.getKeyMap().entries()).map(([k, v]) => {
+    //     const [label, accelerator] = v;
+    //     return {
+    //       label,
+    //       accelerator,
+    //       click: (this as any)[k as any].bind(this),
+    //     };
+    //   })
+    // }));
   }
 
   showContextMenu = (e: MouseEvent) => {
     if (this.props.tutorial != null) return;
-    const contextMenu = new Menu();
-    const img = this.props.recentPictureGrid ? e.target : this.props.historyPaths[(this.props.historyPaths.length - 1) + this.props.historyOffset];
-    const url = img.src;
-    let source = img.getAttribute("source");
-    let post = img.hasAttribute("post") ? img.getAttribute("post") : null;
-    const literalSource = source;
-    if (/^https?:\/\//g.exec(source) == null) {
-      source = urlToPath(fileUrl_fileURL(source));
-    }
-    const isFile = url.startsWith('file://');
-    const path = urlToPath(url);
-    const type = getSourceType(source);
-    contextMenu.append(new MenuItem({
-      label: literalSource,
-      click: () => { navigator.clipboard.writeText(source); }
-    }));
-    if (!!post) {
-      contextMenu.append(new MenuItem({
-        label: post,
-        click: () => { navigator.clipboard.writeText(post); }
-      }));
-    }
-    contextMenu.append(new MenuItem({
-      label: isFile ? path : url,
-      click: () => { navigator.clipboard.writeText(isFile ? path : url); }
-    }));
-    if (url.toLocaleLowerCase().endsWith(".png") || url.toLocaleLowerCase().endsWith(".jpg") || url.toLocaleLowerCase().endsWith(".jpeg")) {
-      contextMenu.append(new MenuItem({
-        label: 'Copy Image',
-        click: () => {
-          this.copyImageToClipboard(url);
-        }
-      }));
-    }
-    contextMenu.append(new MenuItem({
-      label: 'Open Source',
-      click: () => { remote.shell.openExternal(source); }
-    }));
-    if (!!post) {
-      contextMenu.append(new MenuItem({
-        label: 'Open Post',
-        click: () => { remote.shell.openExternal(post); }
-      }));
-    }
-    contextMenu.append(new MenuItem({
-      label: 'Open File',
-      click: () => { remote.shell.openExternal(url); }
-    }));
-    if (this.props.config.caching.enabled && type != ST.local) {
-      contextMenu.append(new MenuItem({
-        label: 'Open Cached Images',
-        click: () => {
-          // for some reason windows uses URLs and everyone else uses paths
-          if (process.platform === "win32") {
-            remote.shell.openExternal(getCachePath(source, this.props.config));
-          } else {
-            remote.shell.openItem(getCachePath(source, this.props.config));
-          }
-        }
-      }));
-    }
-    if ((!isFile && type != ST.video && type != ST.playlist) || type == ST.local) {
-      contextMenu.append(new MenuItem({
-        label: 'Blacklist File',
-        click: () => {
-          this.onBlacklistFile(literalSource, isFile ? path : url);
-        }
-      }));
-    }
-    if (isFile) {
-      contextMenu.append(new MenuItem({
-        label: 'Reveal',
-        click: () => {
-          // for some reason windows uses URLs and everyone else uses paths
-          if (process.platform === "win32") {
-            remote.shell.showItemInFolder(url);
-          } else {
-            remote.shell.showItemInFolder(path);
-          }
-        }
-      }));
-      contextMenu.append(new MenuItem({
-        label: 'Delete',
-        click: () => {
-          this.onDeletePath(path);
-        }
-      }));
-    }
-    if (!this.props.allTags) {
-      contextMenu.append(new MenuItem({
-        label: 'Goto Tag Source',
-        click: () => {
-          this.props.goToTagSource(new LibrarySource({url: source}));
-        }
-      }));
-    }
-    if (type == ST.video) {
-      contextMenu.append(new MenuItem({
-        label: 'Goto Clip Source',
-        click: () => {
-          this.props.goToClipSource(new LibrarySource({url: source}));
-        }
-      }));
-    }
-    if (!this.props.recentPictureGrid && !this.props.scene.downloadScene) {
-      contextMenu.append(new MenuItem({
-        label: 'Recent Picture Grid',
-        click: () => {
-          this.props.onRecentPictureGrid();
-        }
-      }));
-    }
-    contextMenu.popup({});
+    // FIXME
+    // const contextMenu = new Menu();
+    // const img = this.props.recentPictureGrid ? e.target : this.props.historyPaths[(this.props.historyPaths.length - 1) + this.props.historyOffset];
+    // const url = img.src;
+    // let source = img.getAttribute("source");
+    // let post = img.hasAttribute("post") ? img.getAttribute("post") : null;
+    // const literalSource = source;
+    // if (/^https?:\/\//g.exec(source) == null) {
+    //   source = urlToPath(fileUrl_fileURL(source));
+    // }
+    // const isFile = url.startsWith('file://');
+    // const path = urlToPath(url);
+    // const type = getSourceType(source);
+    // contextMenu.append(new MenuItem({
+    //   label: literalSource,
+    //   click: () => { navigator.clipboard.writeText(source); }
+    // }));
+    // if (!!post) {
+    //   contextMenu.append(new MenuItem({
+    //     label: post,
+    //     click: () => { navigator.clipboard.writeText(post); }
+    //   }));
+    // }
+    // contextMenu.append(new MenuItem({
+    //   label: isFile ? path : url,
+    //   click: () => { navigator.clipboard.writeText(isFile ? path : url); }
+    // }));
+    // if (url.toLocaleLowerCase().endsWith(".png") || url.toLocaleLowerCase().endsWith(".jpg") || url.toLocaleLowerCase().endsWith(".jpeg")) {
+    //   contextMenu.append(new MenuItem({
+    //     label: 'Copy Image',
+    //     click: () => {
+    //       this.copyImageToClipboard(url);
+    //     }
+    //   }));
+    // }
+    // contextMenu.append(new MenuItem({
+    //   label: 'Open Source',
+    //   click: () => { 
+    //     // FIXME
+    //     // remote.shell.openExternal(source); 
+    //   }
+    // }));
+    // if (!!post) {
+    //   contextMenu.append(new MenuItem({
+    //     label: 'Open Post',
+    //     click: () => { 
+    //       // FIXME
+    //       // remote.shell.openExternal(post); 
+    //     }
+    //   }));
+    // }
+    // contextMenu.append(new MenuItem({
+    //   label: 'Open File',
+    //   click: () => { 
+    //     // FIXME
+    //     // remote.shell.openExternal(url); 
+    //   }
+    // }));
+    // if (this.props.config.caching.enabled && type != ST.local) {
+    //   contextMenu.append(new MenuItem({
+    //     label: 'Open Cached Images',
+    //     click: () => {
+    //       // for some reason windows uses URLs and everyone else uses paths
+    //       // FIXME
+    //       // if (process.platform === "win32") {
+    //       //   remote.shell.openExternal(getCachePath(source, this.props.config));
+    //       // } else {
+    //       //   remote.shell.openItem(getCachePath(source, this.props.config));
+    //       // }
+    //     }
+    //   }));
+    // }
+    // if ((!isFile && type != ST.video && type != ST.playlist) || type == ST.local) {
+    //   contextMenu.append(new MenuItem({
+    //     label: 'Blacklist File',
+    //     click: () => {
+    //       this.onBlacklistFile(literalSource, isFile ? path : url);
+    //     }
+    //   }));
+    // }
+    // if (isFile) {
+    //   contextMenu.append(new MenuItem({
+    //     label: 'Reveal',
+    //     click: () => {
+    //       // for some reason windows uses URLs and everyone else uses paths
+    //       // FIXME
+    //       // if (process.platform === "win32") {
+    //       //   remote.shell.showItemInFolder(url);
+    //       // } else {
+    //       //   remote.shell.showItemInFolder(path);
+    //       // }
+    //     }
+    //   }));
+    //   contextMenu.append(new MenuItem({
+    //     label: 'Delete',
+    //     click: () => {
+    //       this.onDeletePath(path);
+    //     }
+    //   }));
+    // }
+    // if (!this.props.allTags) {
+    //   contextMenu.append(new MenuItem({
+    //     label: 'Goto Tag Source',
+    //     click: () => {
+    //       this.props.goToTagSource(new LibrarySource({url: source}));
+    //     }
+    //   }));
+    // }
+    // if (type == ST.video) {
+    //   contextMenu.append(new MenuItem({
+    //     label: 'Goto Clip Source',
+    //     click: () => {
+    //       this.props.goToClipSource(new LibrarySource({url: source}));
+    //     }
+    //   }));
+    // }
+    // if (!this.props.recentPictureGrid && !this.props.scene.downloadScene) {
+    //   contextMenu.append(new MenuItem({
+    //     label: 'Recent Picture Grid',
+    //     click: () => {
+    //       this.props.onRecentPictureGrid();
+    //     }
+    //   }));
+    // }
+    // contextMenu.popup({});
   };
 
   getKeyMap() {
@@ -1205,13 +1221,15 @@ class PlayerBars extends React.Component {
   setAlwaysOnTop(alwaysOnTop: boolean){
     this.props.config.displaySettings.alwaysOnTop = alwaysOnTop;
     this.buildMenu();
-    getCurrentWindow().setAlwaysOnTop(alwaysOnTop);
+    // FIXME
+    // getCurrentWindow().setAlwaysOnTop(alwaysOnTop);
   }
 
   navigateBack() {
-    const window = getCurrentWindow();
-    window.setFullScreen(false);
-    window.setMenuBarVisibility(true);
+    // FIXME
+    // const window = getCurrentWindow();
+    // window.setFullScreen(false);
+    // window.setMenuBarVisibility(true);
     this.props.goBack();
   }
 
@@ -1225,7 +1243,8 @@ class PlayerBars extends React.Component {
     const imagePath = isFile ? path : url;
     if (imagePath.toLocaleLowerCase().endsWith(".png") || imagePath.toLocaleLowerCase().endsWith(".jpg") || imagePath.toLocaleLowerCase().endsWith(".jpeg")) {
       if (isFile) {
-        clipboard.writeImage(nativeImage.createFromPath(imagePath));
+        // FIXME
+        // clipboard.writeImage(nativeImage.createFromPath(imagePath));
       } else {
         wretch(imagePath)
           .get()
@@ -1239,19 +1258,21 @@ class PlayerBars extends React.Component {
                 for (let i = 0; i < arrayBuffer.byteLength; ++i) {
                   buffer[i] = view[i];
                 }
-                const bufferImage = nativeImage.createFromBuffer(buffer);
-                if (bufferImage.isEmpty()) {
-                  clipboard.writeText(imagePath);
-                } else {
-                  clipboard.writeImage(bufferImage);
-                }
+                // FIXME
+                // const bufferImage = nativeImage.createFromBuffer(buffer);
+                // if (bufferImage.isEmpty()) {
+                //   clipboard.writeText(imagePath);
+                // } else {
+                //   clipboard.writeImage(bufferImage);
+                // }
               }
             };
             reader.readAsArrayBuffer(blob);
           });
       }
     } else {
-      clipboard.writeText(imagePath);
+      // FIXME
+      // clipboard.writeText(imagePath);
     }
   }
 

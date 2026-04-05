@@ -1,7 +1,5 @@
 import * as React from "react";
 import clsx from "clsx";
-import {remote} from "electron";
-const {getCurrentWindow, Menu, app} = remote;
 
 import { AppBar, Container, IconButton, Theme, Toolbar, Tooltip, Typography } from "@mui/material";
 
@@ -11,7 +9,6 @@ import withStyles from '@mui/styles/withStyles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 
-import {createMainMenu, createMenuTemplate} from "../../../main/MainMenu";
 import SceneGrid from "../../data/SceneGrid";
 import Config from "../../data/Config";
 import Scene from "../../data/Scene";
@@ -360,40 +357,45 @@ class GridPlayer extends React.Component {
   }
 
   toggleFull() {
-    this.setFullscreen(!getCurrentWindow().isFullScreen());
-    this.setMenuBarVisibility(!getCurrentWindow().isFullScreen());
+    // FIXME
+    // this.setFullscreen(!getCurrentWindow().isFullScreen());
+    // this.setMenuBarVisibility(!getCurrentWindow().isFullScreen());
   }
 
   setAlwaysOnTop(alwaysOnTop: boolean){
     this.props.config.displaySettings.alwaysOnTop = alwaysOnTop;
     this.buildMenu();
-    getCurrentWindow().setAlwaysOnTop(alwaysOnTop);
+    // FIXME
+    // getCurrentWindow().setAlwaysOnTop(alwaysOnTop);
   }
 
   setMenuBarVisibility(showMenu: boolean) {
     this.props.config.displaySettings.showMenu = showMenu;
     this.buildMenu();
-    getCurrentWindow().setMenuBarVisibility(showMenu);
+    // FIXME
+    // getCurrentWindow().setMenuBarVisibility(showMenu);
   }
 
   setFullscreen(fullScreen: boolean) {
     this.props.config.displaySettings.fullScreen = fullScreen;
     this.buildMenu();
-    getCurrentWindow().setFullScreen(fullScreen);
+    // FIXME
+    // getCurrentWindow().setFullScreen(fullScreen);
   }
 
   buildMenu() {
-    createMainMenu(Menu, createMenuTemplate(app, {
-      label: 'Player controls',
-      submenu: Array.from(this.getKeyMap().entries()).map(([k, v]) => {
-        const [label, accelerator] = v;
-        return {
-          label,
-          accelerator,
-          click: (this as any)[k as any].bind(this),
-        };
-      })
-    }));
+    // FIXME
+    // createMainMenu(Menu, createMenuTemplate(app, {
+    //   label: 'Player controls',
+    //   submenu: Array.from(this.getKeyMap().entries()).map(([k, v]) => {
+    //     const [label, accelerator] = v;
+    //     return {
+    //       label,
+    //       accelerator,
+    //       click: (this as any)[k as any].bind(this),
+    //     };
+    //   })
+    // }));
   }
 
   getKeyMap() {
@@ -418,9 +420,10 @@ class GridPlayer extends React.Component {
   }
 
   navigateBack() {
-    const window = getCurrentWindow();
-    window.setFullScreen(false);
-    window.setMenuBarVisibility(true);
+    // FIXME
+    // const window = getCurrentWindow();
+    // window.setFullScreen(false);
+    // window.setMenuBarVisibility(true);
     this.props.goBack();
   }
 }

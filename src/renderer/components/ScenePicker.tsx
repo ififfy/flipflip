@@ -1,5 +1,4 @@
 import * as React from 'react';
-import {ipcRenderer, remote} from "electron";
 import wretch from "wretch";
 import clsx from 'clsx';
 import Sortable from "react-sortablejs";
@@ -487,7 +486,7 @@ class ScenePicker extends React.Component {
               FlipFlip
             </Typography>
             <Typography variant="caption" color="inherit" noWrap className={classes.version}>
-              v{this.props.version}
+              v{window.versions.electron()}
             </Typography>
             <div className={classes.fill}/>
             {this.state.newVersion != "" && (
@@ -1387,7 +1386,8 @@ class ScenePicker extends React.Component {
   componentDidMount() {
     this.props.startTutorial();
     this.setState({displayScenes: this.getDisplayScenes(), displayGrids: this.getDisplayGrids()});
-    if (remote.getCurrentWindow().id == 1) {
+    // FIXME
+    // if (remote.getCurrentWindow().id == 1) {
       this.setState({isFirstWindow: true});
       wretch("https://api.github.com/repos/regtemp8/flipflip/releases")
         .get()
@@ -1436,7 +1436,7 @@ class ScenePicker extends React.Component {
           }
         })
         .catch((e) => console.error(e));
-    }
+    // }
   }
 
   componentDidUpdate(props: any, state: any) {
@@ -1525,7 +1525,8 @@ class ScenePicker extends React.Component {
         this.props.onUpdateConfig(newConfig);
       }
     }
-    ipcRenderer.send(IPC.newWindow);
+    // FIXME
+    // ipcRenderer.send(IPC.newWindow);
   }
 
   onToggleDrawer() {
@@ -1600,10 +1601,11 @@ class ScenePicker extends React.Component {
   }
 
   onOpenImportFile() {
-    const filePath = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
-      {filters: [{name:'All Files (*.*)', extensions: ['*']},{name: 'JSON Document', extensions: ['json']}], properties: ['openFile']});
-    if (!filePath || !filePath.length) return;
-    this.setState({importFile: filePath[0]});
+    // FIXME
+    // const filePath = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+    //   {filters: [{name:'All Files (*.*)', extensions: ['*']},{name: 'JSON Document', extensions: ['json']}], properties: ['openFile']});
+    // if (!filePath || !filePath.length) return;
+    // this.setState({importFile: filePath[0]});
   }
 
   onChangeImportFile(e: MouseEvent) {
@@ -1629,7 +1631,8 @@ class ScenePicker extends React.Component {
   }
 
   openLink(url: string) {
-    remote.shell.openExternal(url);
+    // FIXME
+    // remote.shell.openExternal(url);
   }
 
   getDisplayScenes() {

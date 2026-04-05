@@ -1,6 +1,5 @@
 import * as React from "react";
 import clsx from "clsx";
-import {remote} from "electron";
 import wretch from "wretch";
 
 import {
@@ -1348,10 +1347,11 @@ class Library extends React.Component {
   }
 
   onOpenImportFile() {
-    const filePath = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
-      {filters: [{name:'All Files (*.*)', extensions: ['*']},{name: 'JSON Document', extensions: ['json']}], properties: ['openFile']});
-    if (!filePath || !filePath.length) return;
-    this.setState({importFile: filePath[0]});
+    // FIXME
+    // const filePath = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+    //   {filters: [{name:'All Files (*.*)', extensions: ['*']},{name: 'JSON Document', extensions: ['json']}], properties: ['openFile']});
+    // if (!filePath || !filePath.length) return;
+    // this.setState({importFile: filePath[0]});
   }
 
   onChangeImportFile(e: MouseEvent) {

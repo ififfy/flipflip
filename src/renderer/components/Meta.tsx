@@ -1,4 +1,3 @@
-import {remote, ipcRenderer, IpcMessageEvent} from 'electron';
 import * as React from 'react';
 
 import {
@@ -32,7 +31,7 @@ import AudioLibrary from "./library/AudioLibrary";
 import CaptionScriptor from "./sceneDetail/CaptionScriptor";
 import ScriptLibrary from "./library/ScriptLibrary";
 
-const appStorage = new AppStorage(remote.getCurrentWindow().id);
+const appStorage = new AppStorage(1/* FIXME remote.getCurrentWindow().id*/);
 
 function TransitionUp(props: any) {
   return <Slide {...props} direction="up" />;
@@ -65,14 +64,16 @@ export default class Meta extends React.Component {
   componentDidMount() {
     // We never bother cleaning this up, but that's OK because this is the top level
     // component of the whole app.
-    ipcRenderer.on(IPC.startScene, this.startScene.bind(this));
+    // FIXME
+    // ipcRenderer.on(IPC.startScene, this.startScene.bind(this));
 
     // Disable react-sound's verbose console output
     (window as any).soundManager.setup({debugMode: false});
 
-    if (remote.getCurrentWindow().id == 1) {
-      setInterval(this.queueSave.bind(this), 500);
-    }
+    // FIXME
+    // if (remote.getCurrentWindow().id == 1) {
+    //   setInterval(this.queueSave.bind(this), 500);
+    // }
   }
 
   _queueSave = false;
@@ -124,9 +125,10 @@ export default class Meta extends React.Component {
     }
   }
 
-  startScene(ev: IpcMessageEvent, sceneName: string) {
-    this.applyAction(actions.startFromScene, sceneName);
-  }
+  // FIXME
+  // startScene(ev: IpcMessageEvent, sceneName: string) {
+  //   this.applyAction(actions.startFromScene, sceneName);
+  // }
 
   // TODO Be able to change audio/script playlists during playback
   //      Be able to right click on grid scenes as overlay

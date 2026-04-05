@@ -1,5 +1,3 @@
-import {remote, webFrame} from 'electron';
-const {getCurrentWindow} = remote;
 import * as React from 'react';
 import {IdleTimer} from "./IdleTimer";
 
@@ -667,7 +665,8 @@ export default class Player extends React.Component {
       this._interval = setInterval(() => this.nextSceneLoop(), 1000);
     }
     if (this.props.preventSleep) {
-      this._powerSaveID = remote.powerSaveBlocker.start('prevent-display-sleep');
+      // FIXME
+      // this._powerSaveID = remote.powerSaveBlocker.start('prevent-display-sleep');
     }
     if (this.props.scene.nextSceneID == -1 && this.props.onUpdateScene) {
       let sceneID: number;
@@ -702,16 +701,17 @@ export default class Player extends React.Component {
   componentWillUnmount() {
     clearInterval(this._interval);
     this._interval = null;
-    getCurrentWindow().setAlwaysOnTop(false);
-    getCurrentWindow().setFullScreen(false);
-    // Clear ALL the available browser caches
-    global.gc();
-    webFrame.clearCache();
-    remote.getCurrentWindow().webContents.session.clearCache(() => {});
-    if (this.props.preventSleep || this._powerSaveID != null) {
-      remote.powerSaveBlocker.stop(this._powerSaveID);
-      this._powerSaveID = null;
-    }
+    // FIXME
+    // getCurrentWindow().setAlwaysOnTop(false);
+    // getCurrentWindow().setFullScreen(false);
+    // // Clear ALL the available browser caches
+    // global.gc();
+    // webFrame.clearCache();
+    // remote.getCurrentWindow().webContents.session.clearCache(() => {});
+    // if (this.props.preventSleep || this._powerSaveID != null) {
+    //   remote.powerSaveBlocker.stop(this._powerSaveID);
+    //   this._powerSaveID = null;
+    // }
   }
 
   shouldComponentUpdate(props: any, state: any): boolean {

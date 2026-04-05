@@ -1,6 +1,5 @@
 import * as React from "react";
 import Sortable from "react-sortablejs";
-import {remote} from "electron";
 
 import {
   Fab,
@@ -186,7 +185,8 @@ class ScriptPlaylist extends React.Component {
       this.openExternalURL(sourceURL);
     } else if (!e.shiftKey && e.ctrlKey) {
       if (fs_existsSync(sourceURL)) {
-        remote.shell.showItemInFolder(sourceURL);
+        // FIXME
+        // remote.shell.showItemInFolder(sourceURL);
       }
     } else if (!e.shiftKey && !e.ctrlKey && this.props.systemMessage) {
       try {
@@ -198,7 +198,8 @@ class ScriptPlaylist extends React.Component {
   }
 
   openExternalURL(url: string) {
-    remote.shell.openExternal(url);
+    // FIXME
+    // remote.shell.openExternal(url);
   }
 
   toggleShuffle() {

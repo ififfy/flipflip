@@ -1,6 +1,5 @@
 import * as React from "react";
 import clsx from "clsx";
-import {remote} from "electron";
 
 import {
   Button,
@@ -210,9 +209,10 @@ class CacheCard extends React.Component {
   }
 
   onCacheDirChange() {
-    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']});
-    if (!result || !result.length) return;
-    this.changeKey('directory', result[0]);
+    // FIXME
+    // let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']});
+    // if (!result || !result.length) return;
+    // this.changeKey('directory', result[0]);
   }
 
   blurIntKey(key: string, e: MouseEvent) {
@@ -257,7 +257,8 @@ class CacheCard extends React.Component {
   }
 
   openExternalURL(url: string) {
-    remote.shell.openExternal(url);
+    // FIXME
+    // remote.shell.openExternal(url);
   }
 }
 

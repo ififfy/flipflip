@@ -1,5 +1,4 @@
 import * as React from "react";
-import {remote} from "electron";
 import clsx from "clsx";
 import {parseBuffer, parseFile} from "music-metadata";
 import wretch from "wretch";
@@ -1258,26 +1257,27 @@ class AudioLibrary extends React.Component {
         this.setState({openMenu: MO.urlImport, importURL: ""});
         break;
       case AF.audios:
-        let aResult = new Array<string>();
-        if (e.shiftKey) {
-          let adResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
-            {filters: [{name:'All Files (*.*)', extensions: ['*']}], properties: ['openDirectory', 'multiSelections']});
-          if (!adResult) return;
-          for (let path of adResult) {
-            if (fs_isDirectory(path)) {
-              aResult = aResult.concat(getFilesRecursively(path));
-            } else {
-              aResult.push(path);
-            }
-          }
-        } else {
-          aResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
-            {filters: [{name: 'All Files (*.*)', extensions: ['*']}, {name: 'Audio files', extensions: ['mp3', 'm4a', 'wav', 'ogg']}], properties: ['openFile', 'multiSelections']});
-          if (!aResult) return;
-        }
-        aResult = aResult.filter((r) => isAudio(r, true));
-        this.setState({loadingSources: true});
-        this.addAudioSources(aResult);
+        // FIXME
+        // let aResult = new Array<string>();
+        // if (e.shiftKey) {
+        //   let adResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+        //     {filters: [{name:'All Files (*.*)', extensions: ['*']}], properties: ['openDirectory', 'multiSelections']});
+        //   if (!adResult) return;
+        //   for (let path of adResult) {
+        //     if (fs_isDirectory(path)) {
+        //       aResult = aResult.concat(getFilesRecursively(path));
+        //     } else {
+        //       aResult.push(path);
+        //     }
+        //   }
+        // } else {
+        //   aResult = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+        //     {filters: [{name: 'All Files (*.*)', extensions: ['*']}, {name: 'Audio files', extensions: ['mp3', 'm4a', 'wav', 'ogg']}], properties: ['openFile', 'multiSelections']});
+        //   if (!aResult) return;
+        // }
+        // aResult = aResult.filter((r) => isAudio(r, true));
+        // this.setState({loadingSources: true});
+        // this.addAudioSources(aResult);
         break;
     }
   }

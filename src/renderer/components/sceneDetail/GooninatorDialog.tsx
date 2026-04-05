@@ -1,5 +1,4 @@
 import * as React from "react";
-import {remote} from "electron";
 
 import {
   Button,
@@ -115,9 +114,10 @@ class GooninatorDialog extends React.Component {
   }
 
   onRootChange() {
-    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']});
-    if (!result || !result.length) return;
-    this.setState({rootDir: result[0]});
+    // FIXME
+    // let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']});
+    // if (!result || !result.length) return;
+    // this.setState({rootDir: result[0]});
   }
 
   onImportURL() {

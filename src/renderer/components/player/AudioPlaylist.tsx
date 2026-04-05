@@ -1,6 +1,5 @@
 import * as React from "react";
 import Sortable from "react-sortablejs";
-import {remote} from "electron";
 
 import {
   Avatar,
@@ -369,9 +368,10 @@ class AudioPlaylist extends React.Component {
     if (e.shiftKey && !e.ctrlKey) {
       this.openExternalURL(sourceURL);
     } else if (!e.shiftKey && e.ctrlKey) {
-      if (fs_existsSync(sourceURL)) {
-        remote.shell.showItemInFolder(sourceURL);
-      }
+      // FIXME
+      // if (fs_existsSync(sourceURL)) {
+      //   remote.shell.showItemInFolder(sourceURL);
+      // }
     } else if (!e.shiftKey && !e.ctrlKey && this.props.onPlay && this.props.systemMessage) {
       try {
         this.props.onPlay(audio, this.props.playlist.audios);
@@ -382,7 +382,8 @@ class AudioPlaylist extends React.Component {
   }
 
   openExternalURL(url: string) {
-    remote.shell.openExternal(url);
+    // FIXME
+    // remote.shell.openExternal(url);
   }
 
   prevTrack() {

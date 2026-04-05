@@ -33,8 +33,7 @@ export function createNewWindow() {
     'icon': path.join(__dirname, 'src/renderer/icons/flipflip_logo.png'),
     'title': 'FlipFlip',
     webPreferences: {
-      nodeIntegration: true,
-      nodeIntegrationInWorker: true,
+      preload: path.join(__dirname, 'preload.js')
     }
   });
 
@@ -65,13 +64,13 @@ export function createNewWindow() {
     }
   });
 
-  newWindow.loadURL(
-    url.format({
-      pathname: path.join(__dirname, './index.html'),
-      protocol: 'file:',
-      slashes: true,
-    })
-  );
+  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+    newWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+  } else {
+    newWindow.loadFile(
+      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
+    );
+  }
 
   // Open the DevTools.
   const isDevToolsDisabled = Boolean(process.argv.find((el, i, arr) => {

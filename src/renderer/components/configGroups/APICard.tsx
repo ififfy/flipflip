@@ -1,8 +1,5 @@
 import * as React from "react";
 import clsx from "clsx";
-import {remote} from "electron";
-import {OAuth} from "oauth";
-import http from "http";
 import uuidv4 from "uuid/v4";
 import wretch from "wretch";
 
@@ -10,7 +7,6 @@ import {
   Alert,
   Avatar,
   Button,
-  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
@@ -39,7 +35,7 @@ import createStyles from '@mui/styles/createStyles';
 import withStyles from '@mui/styles/withStyles';
 
 import Config, {RemoteSettings} from "../../data/Config";
-import {IG, MO, SS, ST} from "../../data/const";
+import {MO, SS, ST} from "../../data/const";
 import en from "../../data/en";
 import SourceIcon from "../library/SourceIcon";
 
@@ -599,7 +595,8 @@ class APICard extends React.Component {
   }
 
   openLink(url: string) {
-    remote.shell.openExternal(url);
+    // FIXME
+    // remote.shell.openExternal(url);
   }
 
   closeServer() {
@@ -661,86 +658,87 @@ class APICard extends React.Component {
     let tumblrKey = this.props.settings.tumblrKey;
     let tumblrSecret = this.props.settings.tumblrSecret;
 
-    const oauth = new OAuth(
-      requestTokenUrl,
-      accessTokenUrl,
-      tumblrKey,
-      tumblrSecret,
-      '1.0A',
-      'http://localhost:65010',
-      'HMAC-SHA1'
-    );
+    // FIXME
+    // const oauth = new OAuth(
+    //   requestTokenUrl,
+    //   accessTokenUrl,
+    //   tumblrKey,
+    //   tumblrSecret,
+    //   '1.0A',
+    //   'http://localhost:65010',
+    //   'HMAC-SHA1'
+    // );
 
-    let sharedSecret = "";
+    // let sharedSecret = "";
 
-    oauth.getOAuthRequestToken((err: {statusCode: number, data: string}, token: string, secret: string) => {
-      if (err) {
-        console.error(err.statusCode + " - " + err.data);
-        this.setState({snackbarOpen: true, snackbar: "Error: " + err.statusCode + " - " + err.data, snackbarSeverity: SS.error});
-        this.closeServer();
-        return;
-      }
+    // oauth.getOAuthRequestToken((err: {statusCode: number, data: string}, token: string, secret: string) => {
+    //   if (err) {
+    //     console.error(err.statusCode + " - " + err.data);
+    //     this.setState({snackbarOpen: true, snackbar: "Error: " + err.statusCode + " - " + err.data, snackbarSeverity: SS.error});
+    //     this.closeServer();
+    //     return;
+    //   }
 
-      sharedSecret = secret;
-      remote.shell.openExternal(authorizeUrl + '?oauth_token=' + token);
-    });
+    //   sharedSecret = secret;
+    //   remote.shell.openExternal(authorizeUrl + '?oauth_token=' + token);
+    // });
 
-    // Start a server to listen for Tumblr OAuth response
-    const server = http.createServer((req, res) => {
-      // Can't seem to get electron to properly return focus to FlipFlip, just alert the user in the response
-      const html = "<html><body><h1>Please return to FlipFlip</h1></body></html>";
-      res.writeHead(200, {"Content-Type": "text/html"});
-      res.write(html);
+    // // Start a server to listen for Tumblr OAuth response
+    // const server = http.createServer((req, res) => {
+    //   // Can't seem to get electron to properly return focus to FlipFlip, just alert the user in the response
+    //   const html = "<html><body><h1>Please return to FlipFlip</h1></body></html>";
+    //   res.writeHead(200, {"Content-Type": "text/html"});
+    //   res.write(html);
 
-      if (!req.url.endsWith("favicon.ico")) {
-        if (req.url.includes("oauth_token") && req.url.includes("oauth_verifier")) {
-          const args = req.url.replace("\/?", "").split("&");
-          const oauthToken = args[0].substring(12);
-          const oauthVerifier = args[1].substring(15);
+    //   if (!req.url.endsWith("favicon.ico")) {
+    //     if (req.url.includes("oauth_token") && req.url.includes("oauth_verifier")) {
+    //       const args = req.url.replace("\/?", "").split("&");
+    //       const oauthToken = args[0].substring(12);
+    //       const oauthVerifier = args[1].substring(15);
 
-          oauth.getOAuthAccessToken(
-            oauthToken,
-            sharedSecret,
-            oauthVerifier,
-            (err: any, token: string, secret: string) => {
-              if (err) {
-                console.error("Validation failed with error", err);
-                this.setState({snackbarOpen: true, snackbar: "Error: " + err.statusCode + " - " + err.data, snackbarSeverity: SS.error});
-                this.closeServer();
-                req.connection.destroy();
-                res.end();
-                return;
-              }
+    //       oauth.getOAuthAccessToken(
+    //         oauthToken,
+    //         sharedSecret,
+    //         oauthVerifier,
+    //         (err: any, token: string, secret: string) => {
+    //           if (err) {
+    //             console.error("Validation failed with error", err);
+    //             this.setState({snackbarOpen: true, snackbar: "Error: " + err.statusCode + " - " + err.data, snackbarSeverity: SS.error});
+    //             this.closeServer();
+    //             req.connection.destroy();
+    //             res.end();
+    //             return;
+    //           }
 
-              // Update props
-              this.props.onUpdateConfig((c) => {
-                c.remoteSettings.tumblrKey = tumblrKey;
-                c.remoteSettings.tumblrSecret = tumblrSecret;
-                c.remoteSettings.tumblrOAuthToken = token;
-                c.remoteSettings.tumblrOAuthTokenSecret = secret;
-              });
-              // Update state
-              this.props.onUpdateSettings((s) => {
-                s.tumblrOAuthToken = token;
-                s.tumblrOAuthTokenSecret = secret;
-              });
+    //           // Update props
+    //           this.props.onUpdateConfig((c) => {
+    //             c.remoteSettings.tumblrKey = tumblrKey;
+    //             c.remoteSettings.tumblrSecret = tumblrSecret;
+    //             c.remoteSettings.tumblrOAuthToken = token;
+    //             c.remoteSettings.tumblrOAuthTokenSecret = secret;
+    //           });
+    //           // Update state
+    //           this.props.onUpdateSettings((s) => {
+    //             s.tumblrOAuthToken = token;
+    //             s.tumblrOAuthTokenSecret = secret;
+    //           });
 
-              this.setState({snackbarOpen: true, snackbar: "Tumblr is now activated", snackbarSeverity: SS.success});
-              remote.getCurrentWindow().show();
-              this.closeServer();
-              req.connection.destroy();
-            }
-          );
-        } else {
-          this.setState({snackbarOpen: true, snackbar: "Error: Access Denied", snackbarSeverity: SS.error});
-          this.closeServer();
-          req.connection.destroy();
-        }
-      }
-      res.end();
-    }).listen(65010);
+    //           this.setState({snackbarOpen: true, snackbar: "Tumblr is now activated", snackbarSeverity: SS.success});
+    //           remote.getCurrentWindow().show();
+    //           this.closeServer();
+    //           req.connection.destroy();
+    //         }
+    //       );
+    //     } else {
+    //       this.setState({snackbarOpen: true, snackbar: "Error: Access Denied", snackbarSeverity: SS.error});
+    //       this.closeServer();
+    //       req.connection.destroy();
+    //     }
+    //   }
+    //   res.end();
+    // }).listen(65010);
 
-    this.setState({server: server});
+    // this.setState({server: server});
   }
 
   onFinishAuthReddit() {
@@ -754,83 +752,84 @@ class APICard extends React.Component {
       deviceID = uuidv4();
     }
 
-    // Make initial request and open authorization form in browser
-    wretch("https://www.reddit.com/api/v1/authorize?client_id=" + clientID + "&response_type=code&state=" + deviceID +
-      "&redirect_uri=http://localhost:65010&duration=permanent&scope=read,mysubreddits,history")
-      .post()
-      .res(res => {
-        remote.shell.openExternal(res.url);
-      })
-      .catch(e => {
-        console.error(e);
-        this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
-        this.closeServer();
-        return;
-      });
+    // FIXME
+    // // Make initial request and open authorization form in browser
+    // wretch("https://www.reddit.com/api/v1/authorize?client_id=" + clientID + "&response_type=code&state=" + deviceID +
+    //   "&redirect_uri=http://localhost:65010&duration=permanent&scope=read,mysubreddits,history")
+    //   .post()
+    //   .res(res => {
+    //     remote.shell.openExternal(res.url);
+    //   })
+    //   .catch(e => {
+    //     console.error(e);
+    //     this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
+    //     this.closeServer();
+    //     return;
+    //   });
 
-    // Start a server to listen for Reddit OAuth response
-    const server = http.createServer((req, res) => {
-      // Can't seem to get electron to properly return focus to FlipFlip, just alert the user in the response
-      const html = "<html><body><h1>Please return to FlipFlip</h1></body></html>";
-      res.writeHead(200, {"Content-Type": "text/html"});
-      res.write(html);
+    // // Start a server to listen for Reddit OAuth response
+    // const server = http.createServer((req, res) => {
+    //   // Can't seem to get electron to properly return focus to FlipFlip, just alert the user in the response
+    //   const html = "<html><body><h1>Please return to FlipFlip</h1></body></html>";
+    //   res.writeHead(200, {"Content-Type": "text/html"});
+    //   res.write(html);
 
-      if (!req.url.endsWith("favicon.ico")) {
-        if (req.url.includes("state") && req.url.includes("code")) {
-          const args = req.url.replace("\/?", "").split("&");
-          // This should be the same as the deviceID
-          const state = args[0].substring(6);
-          if (state == deviceID) {
-            // This is what we use to get our token
-            const code = args[1].substring(5);
-            wretch("https://www.reddit.com/api/v1/access_token")
-              .headers({"User-Agent": userAgent, "Authorization": "Basic " + btoa(clientID + ":")})
-              .formData({grant_type: "authorization_code", code: code, redirect_uri: "http://localhost:65010"})
-              .post()
-              .json(json => {
-                // Update props
-                this.props.onUpdateConfig((c) => {
-                  c.remoteSettings.redditDeviceID = deviceID;
-                  c.remoteSettings.redditRefreshToken = json.refresh_token;
-                });
-                // Update state
-                this.props.onUpdateSettings((s) => {
-                  s.redditDeviceID = deviceID;
-                  s.redditRefreshToken = json.refresh_token;
-                });
+    //   if (!req.url.endsWith("favicon.ico")) {
+    //     if (req.url.includes("state") && req.url.includes("code")) {
+    //       const args = req.url.replace("\/?", "").split("&");
+    //       // This should be the same as the deviceID
+    //       const state = args[0].substring(6);
+    //       if (state == deviceID) {
+    //         // This is what we use to get our token
+    //         const code = args[1].substring(5);
+    //         wretch("https://www.reddit.com/api/v1/access_token")
+    //           .headers({"User-Agent": userAgent, "Authorization": "Basic " + btoa(clientID + ":")})
+    //           .formData({grant_type: "authorization_code", code: code, redirect_uri: "http://localhost:65010"})
+    //           .post()
+    //           .json(json => {
+    //             // Update props
+    //             this.props.onUpdateConfig((c) => {
+    //               c.remoteSettings.redditDeviceID = deviceID;
+    //               c.remoteSettings.redditRefreshToken = json.refresh_token;
+    //             });
+    //             // Update state
+    //             this.props.onUpdateSettings((s) => {
+    //               s.redditDeviceID = deviceID;
+    //               s.redditRefreshToken = json.refresh_token;
+    //             });
 
-                this.setState({snackbarOpen: true, snackbar: "Reddit is now activated", snackbarSeverity: SS.success});
-                remote.getCurrentWindow().show();
-                this.closeServer();
-                req.connection.destroy();
-              })
-              .catch(e => {
-                console.error(e);
-                this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
-                this.closeServer();
-                req.connection.destroy();
-                res.end();
-                return;
-              });
-          }
-        } else if (req.url.includes("state") && req.url.includes("error")) {
-          const args = req.url.replace("\/?", "").split("&");
-          // This should be the same as the deviceID
-          const state = args[0].substring(6);
-          if (state == deviceID) {
-            const error = args[1].substring(6);
-            console.error(error);
-            this.setState({snackbarOpen: true, snackbar: "Error: " + error, snackbarSeverity: SS.error});
-          }
+    //             this.setState({snackbarOpen: true, snackbar: "Reddit is now activated", snackbarSeverity: SS.success});
+    //             remote.getCurrentWindow().show();
+    //             this.closeServer();
+    //             req.connection.destroy();
+    //           })
+    //           .catch(e => {
+    //             console.error(e);
+    //             this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
+    //             this.closeServer();
+    //             req.connection.destroy();
+    //             res.end();
+    //             return;
+    //           });
+    //       }
+    //     } else if (req.url.includes("state") && req.url.includes("error")) {
+    //       const args = req.url.replace("\/?", "").split("&");
+    //       // This should be the same as the deviceID
+    //       const state = args[0].substring(6);
+    //       if (state == deviceID) {
+    //         const error = args[1].substring(6);
+    //         console.error(error);
+    //         this.setState({snackbarOpen: true, snackbar: "Error: " + error, snackbarSeverity: SS.error});
+    //       }
 
-          this.closeServer();
-          req.connection.destroy();
-        }
-      }
-      res.end();
-    }).listen(65010);
+    //       this.closeServer();
+    //       req.connection.destroy();
+    //     }
+    //   }
+    //   res.end();
+    // }).listen(65010);
 
-    this.setState({server: server});
+    // this.setState({server: server});
   }
 
   onFinishAuthHydrus() {

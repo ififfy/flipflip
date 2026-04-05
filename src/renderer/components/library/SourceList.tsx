@@ -1,5 +1,4 @@
 import * as React from "react";
-import {remote} from "electron";
 import {sortableContainer, sortableElement} from 'react-sortable-hoc';
 import AutoSizer from "react-virtualized-auto-sizer";
 import {FixedSizeList} from "react-window";
@@ -660,7 +659,8 @@ class SourceList extends React.Component {
   }
 
   openExternalURL(url: string) {
-    remote.shell.openExternal(url);
+    // FIXME
+    // remote.shell.openExternal(url);
   }
 
   onOpenClipMenu(source: LibrarySource, e: MouseEvent) {
@@ -701,9 +701,10 @@ class SourceList extends React.Component {
   }
 
   onOpenSubtitleFile() {
-    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'Web Video Text Tracks (WebVTT)', extensions: ['vtt']}], properties: ['openFile']});
-    if (!result || !result.length) return;
-    this.changeKey('subtitleFile', result[0]);
+    // FIXME
+    // let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(), {filters: [{name:'All Files (*.*)', extensions: ['*']}, {name: 'Web Video Text Tracks (WebVTT)', extensions: ['vtt']}], properties: ['openFile']});
+    // if (!result || !result.length) return;
+    // this.changeKey('subtitleFile', result[0]);
   }
 
   onSourceInput(key: string, e: MouseEvent) {

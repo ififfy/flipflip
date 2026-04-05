@@ -1,10 +1,10 @@
 import * as React from "react";
-import { remote } from "electron";
 import wretch from "wretch";
 import clsx from "clsx";
 
-require('codemirror/lib/codemirror.css');
-require('codemirror/theme/material.css');
+// FIXME
+// require('codemirror/lib/codemirror.css');
+// require('codemirror/theme/material.css');
 
 import {
   AppBar,
@@ -842,20 +842,21 @@ class CaptionScriptor extends React.Component {
 
   onConfirmOpen() {
     this.onCloseDialog();
-    let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
-      {
-        filters: [{ name: 'All Files (*.*)', extensions: ['*'] }, { name: 'Text Document', extensions: ['txt'] }],
-        properties: ['openFile']
-      });
-    if (!result || !result.length) return;
-    const url = result[0];
-    wretch(url)
-      .get()
-      .text(data => {
-        this.state.codeMirrorOverwriteHack.args = [data];
-        this.state.codeMirrorOverwriteHack.fire();
-        this.setState({ captionScript: new CaptionScript({ url: url }), scriptChanged: false });
-      });
+    // FIXME
+    // let result = remote.dialog.showOpenDialog(remote.getCurrentWindow(),
+    //   {
+    //     filters: [{ name: 'All Files (*.*)', extensions: ['*'] }, { name: 'Text Document', extensions: ['txt'] }],
+    //     properties: ['openFile']
+    //   });
+    // if (!result || !result.length) return;
+    // const url = result[0];
+    // wretch(url)
+    //   .get()
+    //   .text(data => {
+    //     this.state.codeMirrorOverwriteHack.args = [data];
+    //     this.state.codeMirrorOverwriteHack.fire();
+    //     this.setState({ captionScript: new CaptionScript({ url: url }), scriptChanged: false });
+    //   });
   }
 
   onOpenFromLibrary() {
@@ -899,20 +900,21 @@ class CaptionScriptor extends React.Component {
 
   onSaveAs() {
     this.onCloseDialog();
-    remote.dialog.showSaveDialog(remote.getCurrentWindow(),
-      { filters: [{ name: 'Text Document', extensions: ['txt'] }], defaultPath: this.state.captionScript.url }, (filePath) => {
-        if (filePath != null) {
-          fs_writeFileSync(filePath, this.state.captionScript.script);
-          const setURL = (script: CaptionScript) => {
-            script.url = filePath;
-            return script;
-          }
-          this.setState({ captionScript: setURL(this.state.captionScript), scriptChanged: false });
-          return true;
-        } else {
-          return false;
-        }
-      });
+    // FIXME
+    // remote.dialog.showSaveDialog(remote.getCurrentWindow(),
+    //   { filters: [{ name: 'Text Document', extensions: ['txt'] }], defaultPath: this.state.captionScript.url }, (filePath) => {
+    //     if (filePath != null) {
+    //       fs_writeFileSync(filePath, this.state.captionScript.script);
+    //       const setURL = (script: CaptionScript) => {
+    //         script.url = filePath;
+    //         return script;
+    //       }
+    //       this.setState({ captionScript: setURL(this.state.captionScript), scriptChanged: false });
+    //       return true;
+    //     } else {
+    //       return false;
+    //     }
+    //   });
   }
 
   onSaveToLibrary() {
@@ -1209,7 +1211,8 @@ class CaptionScriptor extends React.Component {
   }
 
   openLink(url: string) {
-    remote.shell.openExternal(url);
+    // FIXME
+    // remote.shell.openExternal(url);
   }
 }
 
