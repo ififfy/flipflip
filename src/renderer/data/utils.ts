@@ -1,7 +1,7 @@
 import * as easings from "d3-ease";
 import "core-js/features/array/flat";
 
-import { getSourceType } from "../components/player/Scrapers";
+import { getSourceType } from "../../main/scrape/Scrapers";
 import {
   BT,
   EA,

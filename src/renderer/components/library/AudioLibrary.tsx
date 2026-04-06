@@ -67,7 +67,7 @@ import SortIcon from "@mui/icons-material/Sort";
 import { red } from "@mui/material/colors";
 
 import { extractMusicMetadata } from "../../data/utils";
-import { isAudio } from "../player/Scrapers";
+import { isAudio } from "../../../main/scrape/Scrapers";
 import { AF, ASF, ALT, MO, SP, PR } from "../../../common/const";
 import en from "../../data/en";
 import Audio from "../../../common/Audio";

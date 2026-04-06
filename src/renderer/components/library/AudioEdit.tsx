@@ -20,9 +20,7 @@ import AudiotrackIcon from "@mui/icons-material/Audiotrack";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 import { extractMusicMetadata, generateThumbnailFile } from "../../data/utils";
-import { isImage } from "../player/Scrapers";
 import Audio from "../../../common/Audio";
-import { fs_readFileSync } from "../../dummy/fs";
 
 const styles = (theme: Theme) =>
   createStyles({

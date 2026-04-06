@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { Grid, Typography } from "@mui/material";
 
-import { getSourceType } from "../player/Scrapers";
+import { getSourceType } from "../../../main/scrape/Scrapers";
 import { ST } from "../../../common/const";
 import Clip from "../../../common/Clip";
 import Scene from "../../../common/Scene";

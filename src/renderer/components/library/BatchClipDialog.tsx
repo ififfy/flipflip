@@ -17,7 +17,7 @@ import {
 import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 
-import { getSourceType } from "../player/Scrapers";
+import { getSourceType } from "../../../main/scrape/Scrapers";
 import { ST } from "../../../common/const";
 import Clip from "../../../common/Clip";
 import LibrarySource from "../../../common/LibrarySource";

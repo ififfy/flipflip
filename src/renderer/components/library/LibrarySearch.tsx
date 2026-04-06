@@ -8,7 +8,7 @@ import createStyles from "@mui/styles/createStyles";
 import withStyles from "@mui/styles/withStyles";
 import { grey } from "@mui/material/colors";
 
-import { getSourceType } from "../player/Scrapers";
+import { getSourceType } from "../../../main/scrape/Scrapers";
 import en from "../../data/en";
 import Audio from "../../../common/Audio";
 import LibrarySource from "../../../common/LibrarySource";

@@ -11,7 +11,7 @@ import {
 
 import { SL, WC } from "../../../common/const";
 import { getRandomListItem, urlToPath } from "../../data/utils";
-import { getFileGroup, getFileName } from "./Scrapers";
+import { getFileGroup, getFileName } from "../../../main/scrape/Scrapers";
 import Audio from "../../../common/Audio";
 import CaptionScript from "../../../common/CaptionScript";
 import Config from "../../../common/Config";

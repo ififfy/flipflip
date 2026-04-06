@@ -15,7 +15,7 @@ import {
   getFileGroup,
   getFileName,
   getSourceType,
-} from "../components/player/Scrapers";
+} from "../../main/scrape/Scrapers";
 import {
   AF,
   ALT,
