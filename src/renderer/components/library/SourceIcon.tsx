@@ -8,7 +8,7 @@ import MovieIcon from "@mui/icons-material/Movie";
 import RedditIcon from "@mui/icons-material/Reddit";
 import SubscriptionsIcon from "@mui/icons-material/Subscriptions";
 
-import { getSourceType } from "../../../main/scrape/Scrapers";
+import { getSourceType } from "../../../main/scraper/Scrapers";
 import { ST } from "../../../common/const";
 
 function RedGifsIcon(props: any) {

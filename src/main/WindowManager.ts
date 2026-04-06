@@ -10,7 +10,7 @@ import {
   isAudio,
   isVideo,
   isVideoPlaylist,
-} from "./scrape/Scrapers";
+} from "./scraper/Scrapers";
 import { isText } from "../renderer/data/utils";
 
 // Current window list

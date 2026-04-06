@@ -26,7 +26,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import OfflineBoltIcon from "@mui/icons-material/OfflineBolt";
 
 import { getCachePath, getTimestamp, urlToPath } from "../../data/utils";
-import { getFileName, getSourceType } from "../../../main/scrape/Scrapers";
+import { getFileName, getSourceType } from "../../../main/scraper/Scrapers";
 import { SDT, ST } from "../../../common/const";
 import Tag from "../../../common/Tag";
 import SourceIcon from "./SourceIcon";
