@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import moment from "moment";
-import rimraf from "rimraf";
+import { rimrafSync } from "rimraf";
 import { webFrame } from "electron";
 import Config from "../common/Config";
 import { saveDir, getBackups, savePath } from "./utils";
@@ -155,7 +155,7 @@ export function restoreFromBackup(backupFile: string): AppStorageState {
 }
 
 export function reset(windowId: number) {
-  rimraf.sync(savePath);
+  rimrafSync(savePath);
   reloadWindow(windowId);
 }
 
