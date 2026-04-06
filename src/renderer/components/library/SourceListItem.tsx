@@ -592,7 +592,7 @@ class SourceListItem extends React.Component {
   }
 
   openDirectory(cachePath: string) {
-    if (process.platform === "win32") {
+    if (window.ipc.platform() === "win32") {
       this.openExternalURL(cachePath);
     } else {
       this.openExternalURL(urlToPath(cachePath));

@@ -67,6 +67,7 @@ interface Navigator extends NavigatorClipboard {}
 declare global {
   interface Window {
     ipc: {
+      platform: () => string
       newWindow: () => void;
       getBackups: () => Promise<Array<Backup>>;
       getAppStorage: () => Promise<AppStorageState>;

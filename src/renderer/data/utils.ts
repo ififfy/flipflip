@@ -332,7 +332,7 @@ export function htmlEntities(str: string): string {
 
 export function urlToPath(url: string): string {
   const path = new URL(url).pathname;
-  if (process.platform === "win32") {
+  if (window.ipc.platform() === "win32") {
     return decodeURIComponent(path.substring(1, path.length));
   } else {
     return decodeURIComponent(path);

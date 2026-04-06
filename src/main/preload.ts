@@ -4,6 +4,7 @@ import AppStorageState from "../common/AppStorageState";
 import Config from "../common/Config";
 
 contextBridge.exposeInMainWorld("ipc", {
+  platform: () => process.platform,
   newWindow: () => ipcRenderer.send(IPC.newWindow),
   getBackups: () => ipcRenderer.invoke(IPC.getBackups),
   getAppStorage: () => ipcRenderer.invoke(IPC.getAppStorage),
