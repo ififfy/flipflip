@@ -97,6 +97,14 @@ declare global {
       onTumblrAuthResponse: (
         callback: (response: AuthResponse) => void,
       ) => void;
+      redditAuthRequest: (
+        userAgent: string,
+        clientID: string,
+        deviceID: string,
+      ) => void;
+      onRedditAuthResponse: (
+        callback: (response: AuthResponse) => void,
+      ) => void;
     };
   }
 }

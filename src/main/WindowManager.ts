@@ -20,7 +20,7 @@ export function startScene(sceneName: string) {
 }
 
 export function getWindow(windowId: number) {
-  return currentWindows.get(windowId)
+  return currentWindows.get(windowId);
 }
 
 export function createNewWindow() {

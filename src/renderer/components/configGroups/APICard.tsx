@@ -826,14 +826,13 @@ class APICard extends React.Component {
   onFinishAuthTumblr() {
     this.onCloseDialog();
 
-    const {tumblrKey, tumblrSecret} = this.props.settings;
+    const { tumblrKey, tumblrSecret } = this.props.settings;
     window.ipc.tumblrAuthRequest(tumblrKey, tumblrSecret);
     window.ipc.onTumblrAuthResponse((response) => {
       if (response.error != null) {
-        const { statusCode, data } = response.error;
         this.setState({
           snackbarOpen: true,
-          snackbar: "Error: " + statusCode + " - " + data,
+          snackbar: "Error: " + response.error,
           snackbarSeverity: SS.error,
         });
       }
@@ -871,84 +870,33 @@ class APICard extends React.Component {
       deviceID = uuidv4();
     }
 
-    // FIXME
-    // // Make initial request and open authorization form in browser
-    // wretch("https://www.reddit.com/api/v1/authorize?client_id=" + clientID + "&response_type=code&state=" + deviceID +
-    //   "&redirect_uri=http://localhost:65010&duration=permanent&scope=read,mysubreddits,history")
-    //   .post()
-    //   .res(res => {
-    //     remote.shell.openExternal(res.url);
-    //   })
-    //   .catch(e => {
-    //     console.error(e);
-    //     this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
-    //     this.closeServer();
-    //     return;
-    //   });
+    window.ipc.redditAuthRequest(userAgent, clientID, deviceID);
+    window.ipc.onRedditAuthResponse((response) => {
+      if (response.error != null) {
+        this.setState({
+          snackbarOpen: true,
+          snackbar: "Error: " + response.error,
+          snackbarSeverity: SS.error,
+        });
+      }
+      if (response.success != null) {
+        this.props.onUpdateConfig((c) => {
+          c.remoteSettings.redditDeviceID = deviceID;
+          c.remoteSettings.redditRefreshToken = response.success.token;
+        });
+        // Update state
+        this.props.onUpdateSettings((s) => {
+          s.redditDeviceID = deviceID;
+          s.redditRefreshToken = response.success.token;
+        });
 
-    // // Start a server to listen for Reddit OAuth response
-    // const server = http.createServer((req, res) => {
-    //   // Can't seem to get electron to properly return focus to FlipFlip, just alert the user in the response
-    //   const html = "<html><body><h1>Please return to FlipFlip</h1></body></html>";
-    //   res.writeHead(200, {"Content-Type": "text/html"});
-    //   res.write(html);
-
-    //   if (!req.url.endsWith("favicon.ico")) {
-    //     if (req.url.includes("state") && req.url.includes("code")) {
-    //       const args = req.url.replace("\/?", "").split("&");
-    //       // This should be the same as the deviceID
-    //       const state = args[0].substring(6);
-    //       if (state == deviceID) {
-    //         // This is what we use to get our token
-    //         const code = args[1].substring(5);
-    //         wretch("https://www.reddit.com/api/v1/access_token")
-    //           .headers({"User-Agent": userAgent, "Authorization": "Basic " + btoa(clientID + ":")})
-    //           .formData({grant_type: "authorization_code", code: code, redirect_uri: "http://localhost:65010"})
-    //           .post()
-    //           .json(json => {
-    //             // Update props
-    //             this.props.onUpdateConfig((c) => {
-    //               c.remoteSettings.redditDeviceID = deviceID;
-    //               c.remoteSettings.redditRefreshToken = json.refresh_token;
-    //             });
-    //             // Update state
-    //             this.props.onUpdateSettings((s) => {
-    //               s.redditDeviceID = deviceID;
-    //               s.redditRefreshToken = json.refresh_token;
-    //             });
-
-    //             this.setState({snackbarOpen: true, snackbar: "Reddit is now activated", snackbarSeverity: SS.success});
-    //             remote.getCurrentWindow().show();
-    //             this.closeServer();
-    //             req.connection.destroy();
-    //           })
-    //           .catch(e => {
-    //             console.error(e);
-    //             this.setState({snackbarOpen: true, snackbar: "Error: " + e.message, snackbarSeverity: SS.error});
-    //             this.closeServer();
-    //             req.connection.destroy();
-    //             res.end();
-    //             return;
-    //           });
-    //       }
-    //     } else if (req.url.includes("state") && req.url.includes("error")) {
-    //       const args = req.url.replace("\/?", "").split("&");
-    //       // This should be the same as the deviceID
-    //       const state = args[0].substring(6);
-    //       if (state == deviceID) {
-    //         const error = args[1].substring(6);
-    //         console.error(error);
-    //         this.setState({snackbarOpen: true, snackbar: "Error: " + error, snackbarSeverity: SS.error});
-    //       }
-
-    //       this.closeServer();
-    //       req.connection.destroy();
-    //     }
-    //   }
-    //   res.end();
-    // }).listen(65010);
-
-    // this.setState({server: server});
+        this.setState({
+          snackbarOpen: true,
+          snackbar: "Reddit is now activated",
+          snackbarSeverity: SS.success,
+        });
+      }
+    });
   }
 
   onFinishAuthHydrus() {

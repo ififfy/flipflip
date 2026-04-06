@@ -13,7 +13,7 @@ import {
   openSubtitle,
   openScript,
   saveScript,
-  getWindow
+  getWindow,
 } from "./WindowManager";
 import { IPC } from "../common/const";
 import { getBackups } from "./utils";
@@ -23,7 +23,14 @@ import {
   createBackup,
 } from "./storage/StorageManager";
 import AppStorageState from "../common/AppStorageState";
-import { cleanBackups, getFonts, reset, restoreFromBackup, tumblrAuth } from "./actions";
+import {
+  cleanBackups,
+  getFonts,
+  redditAuth,
+  reset,
+  restoreFromBackup,
+  tumblrAuth,
+} from "./actions";
 import Config from "../common/Config";
 
 // Define functions
@@ -113,13 +120,31 @@ async function onGetFonts(ev: IpcMainEvent) {
   return await getFonts();
 }
 
-function onTumblrAuthRequest(ev: IpcMainEvent, tumblrKey: string, tumblrSecret: string) {
-  const window = getWindow(ev.sender.id)
-  if(window == null) {
-    return
+function onTumblrAuthRequest(
+  ev: IpcMainEvent,
+  tumblrKey: string,
+  tumblrSecret: string,
+) {
+  const window = getWindow(ev.sender.id);
+  if (window == null) {
+    return;
   }
 
-  tumblrAuth(window, tumblrKey, tumblrSecret)
+  tumblrAuth(window, tumblrKey, tumblrSecret);
+}
+
+function onRedditAuthRequest(
+  ev: IpcMainEvent,
+  userAgent: string,
+  clientID: string,
+  deviceID: string,
+) {
+  const window = getWindow(ev.sender.id);
+  if (window == null) {
+    return;
+  }
+
+  redditAuth(window, userAgent, clientID, deviceID);
 }
 
 // Initialize and release listeners
@@ -152,6 +177,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.saveScript, onSaveScript);
   ipcMain.handle(IPC.getFonts, onGetFonts);
   ipcMain.on(IPC.tumblrAuthRequest, onTumblrAuthRequest);
+  ipcMain.on(IPC.redditAuthRequest, onRedditAuthRequest);
 }
 
 export function releaseIpcEvents() {

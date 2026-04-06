@@ -233,6 +233,8 @@ const IPC = {
   getFonts: "ipc.getFonts",
   tumblrAuthRequest: "ipc.tumblrAuthRequest",
   tumblrAuthResponse: "ipc.tumblrAuthResponse",
+  redditAuthRequest: "ipc.redditAuthRequest",
+  redditAuthResponse: "ipc.redditAuthResponse",
 };
 
 const MO = {

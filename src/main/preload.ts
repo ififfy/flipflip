@@ -41,6 +41,12 @@ contextBridge.exposeInMainWorld("ipc", {
     ipcRenderer.once(IPC.tumblrAuthResponse, (_event, response: AuthResponse) =>
       callback(response),
     ),
+  redditAuthRequest: (userAgent: string, clientID: string, deviceID: string) =>
+    ipcRenderer.send(IPC.redditAuthRequest, userAgent, clientID, deviceID),
+  onRedditAuthResponse: (callback: (response: AuthResponse) => void) =>
+    ipcRenderer.once(IPC.redditAuthResponse, (_event, response: AuthResponse) =>
+      callback(response),
+    ),
   onStartScene: (callback: (sceneName: string) => void) =>
     ipcRenderer.on(IPC.startScene, (_event, sceneName: string) =>
       callback(sceneName),
