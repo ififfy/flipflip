@@ -59,16 +59,12 @@ import CaptionScript from "../../common/CaptionScript";
 import SceneGroup from "../../common/SceneGroup";
 import SceneGridCell from "../../common/SceneGridCell";
 import WeightGroup from "../../common/WeightGroup";
-import {
-  fs_existsSync,
-  fs_mkdirSync,
-  fs_unlink,
-} from "../dummy/fs";
+import { fs_existsSync, fs_mkdirSync, fs_unlink } from "../dummy/fs";
 import { fsExtra_outputFile } from "../dummy/fs-extra";
 import { path_sep } from "../dummy/path";
 import { folder_getFolderSize } from "../dummy/folder";
 import AppStorageState from "src/common/AppStorageState";
-import {analyze} from "web-audio-beat-detector";
+import { analyze } from "web-audio-beat-detector";
 type State = AppStorageState;
 
 /** Getters **/
@@ -3691,13 +3687,16 @@ export function markOffline(getState: () => State, setState: Function) {
 export function detectBPMs(getState: () => State, setState: Function) {
   const readMetadata = (audio: Audio, offset: number) => {
     const state = getState();
-    window.files.parseAudioFile(audio.url)
+    window.files
+      .parseAudioFile(audio.url)
       .then((metadata: any) => {
         if (metadata && metadata.common && metadata.common.bpm) {
           audio.bpm = metadata.common.bpm;
           state.progressCurrent = offset + 1;
-          setState({progressCurrent: state.progressCurrent});
-          window.ipc.setProgressBar(state.progressCurrent / state.progressTotal);
+          setState({ progressCurrent: state.progressCurrent });
+          window.ipc.setProgressBar(
+            state.progressCurrent / state.progressTotal,
+          );
           setTimeout(detectBPMLoop, 100);
         } else {
           detectBPM(audio, offset);
@@ -3716,7 +3715,7 @@ export function detectBPMs(getState: () => State, setState: Function) {
       console.error(e);
       const state = getState();
       state.progressCurrent = offset + 1;
-      setState({progressCurrent: state.progressCurrent});
+      setState({ progressCurrent: state.progressCurrent });
       window.ipc.setProgressBar(state.progressCurrent / state.progressTotal);
       setTimeout(detectBPMLoop, 100);
     };
@@ -3726,21 +3725,27 @@ export function detectBPMs(getState: () => State, setState: Function) {
       if (data.byteLength < maxByteSize) {
         const state = getState();
         let context = new AudioContext();
-        context.decodeAudioData(data, (buffer) => {
-          analyze(buffer)
-            .then((tempo: number) => {
-              audio.bpm = Number.parseFloat(tempo.toFixed(2));
-              state.progressCurrent = offset + 1;
-              setState({progressCurrent: state.progressCurrent});
-              window.ipc.setProgressBar(state.progressCurrent / state.progressTotal);
-              setTimeout(detectBPMLoop, 100);
-            })
-            .catch((e: any) => {
-              bpmError(e);
-            });
-        }, (e) => {
-          bpmError(e);
-        });
+        context.decodeAudioData(
+          data,
+          (buffer) => {
+            analyze(buffer)
+              .then((tempo: number) => {
+                audio.bpm = Number.parseFloat(tempo.toFixed(2));
+                state.progressCurrent = offset + 1;
+                setState({ progressCurrent: state.progressCurrent });
+                window.ipc.setProgressBar(
+                  state.progressCurrent / state.progressTotal,
+                );
+                setTimeout(detectBPMLoop, 100);
+              })
+              .catch((e: any) => {
+                bpmError(e);
+              });
+          },
+          (e) => {
+            bpmError(e);
+          },
+        );
       } else {
         console.error("'" + audio.url + "' is too large to decode");
       }
@@ -3770,7 +3775,12 @@ export function detectBPMs(getState: () => State, setState: Function) {
     const offset = state.progressCurrent;
     if (state.progressMode == PR.cancel) {
       window.ipc.setProgressBar(-1);
-      setState({progressMode: null, progressCurrent: 0, progressTotal: 0, progressTitle: ""});
+      setState({
+        progressMode: null,
+        progressCurrent: 0,
+        progressTotal: 0,
+        progressTitle: "",
+      });
     } else if (actionableLibrary.length == offset) {
       window.ipc.setProgressBar(-1);
       setState({
@@ -3779,19 +3789,19 @@ export function detectBPMs(getState: () => State, setState: Function) {
         progressMode: null,
         progressCurrent: 0,
         progressTotal: 0,
-        progressTitle: ""
+        progressTitle: "",
       });
     } else {
       const actionSource = actionableLibrary[offset];
       state.progressTitle = actionSource.url;
-      setState({progressTitle: state.progressTitle});
+      setState({ progressTitle: state.progressTitle });
       const librarySource = state.audios.find((s) => s.url == actionSource.url);
       if (librarySource) {
-        readMetadata(librarySource, offset)
+        readMetadata(librarySource, offset);
       } else {
         // Skip if removed from library during check
         state.progressCurrent = offset + 1;
-        setState({progressCurrent: state.progressCurrent});
+        setState({ progressCurrent: state.progressCurrent });
         window.ipc.setProgressBar(state.progressCurrent / state.progressTotal);
         detectBPMLoop();
       }
@@ -3817,80 +3827,98 @@ export function detectBPMs(getState: () => State, setState: Function) {
 }
 
 export function updateVideoMetadata(getState: () => State, setState: Function) {
-  // FIXME
-  // const win = remote.getCurrentWindow();
-  // const state = getState();
-  // const actionableLibrary = state.library.filter((ls) => getSourceType(ls.url) == ST.video && (ls.duration == null || ls.resolution == null || isNaN(ls.resolution) || ls.resolution<=0 || ls.fileSize == null || isNaN(ls.fileSize)));
-  // const videoMetadataLoop = () => {
-  //   const state = getState();
-  //   const offset = state.progressCurrent;
-  //   if (state.progressMode == PR.cancel) {
-  //     win.setProgressBar(-1);
-  //     setState({progressMode: null, progressCurrent: 0, progressTotal: 0, progressTitle: ""});
-  //   } else if (actionableLibrary.length == offset) {
-  //     win.setProgressBar(-1);
-  //     setState({
-  //       systemSnack: "Video Metadata update has completed.",
-  //       systemSnackSeverity: SS.success,
-  //       progressMode: null,
-  //       progressCurrent: 0,
-  //       progressTotal: 0,
-  //       progressTitle: ""
-  //     });
-  //   } else {
-  //     const actionSource = actionableLibrary[offset];
-  //     state.progressTitle = actionSource.url;
-  //     setState({progressTitle: state.progressTitle});
-  //     const librarySource = state.library.find((s) => s.url == actionSource.url);
-  //     if (librarySource) {
-  //       let video = document.createElement('video');
-  //       video.preload = 'metadata';
-  //       video.onloadedmetadata = () => {
-  //         const height = video.videoHeight;
-  //         const width = video.videoWidth;
-  //         librarySource.resolution = Math.min(height, width);
-  //         librarySource.duration = video.duration;
-  //         video.remove();
-  //         try {
-  //           librarySource.fileSize = fs_fileSize(librarySource.url);
-  //         } catch (e) {
-  //           librarySource.fileSize = -1;
-  //         }
-  //         state.progressCurrent = offset + 1;
-  //         setState({progressCurrent: state.progressCurrent});
-  //         win.setProgressBar(state.progressCurrent / state.progressTotal);
-  //         setTimeout(videoMetadataLoop, 100);
-  //       }
-  //       video.onerror = () => {
-  //         video.remove();
-  //         state.progressCurrent = offset + 1;
-  //         setState({progressCurrent: state.progressCurrent});
-  //         win.setProgressBar(state.progressCurrent / state.progressTotal);
-  //         setTimeout(videoMetadataLoop, 100);
-  //       }
-  //       video.src = librarySource.url;
-  //     } else {
-  //       // Skip if removed from library during check
-  //       state.progressCurrent = offset + 1;
-  //       setState({progressCurrent: state.progressCurrent});
-  //       win.setProgressBar(state.progressCurrent / state.progressTotal);
-  //       videoMetadataLoop();
-  //     }
-  //   }
-  // }
-  // // If we don't have an import running
-  // if (!state.progressMode && actionableLibrary.length) {
-  //   state.progressMode = PR.videoMetadata;
-  //   state.progressCurrent = 0;
-  //   state.progressTotal = actionableLibrary.length;
-  //   setState({
-  //     progressMode: state.progressMode,
-  //     progressCurrent: state.progressCurrent,
-  //     progressTotal: state.progressTotal,
-  //   });
-  //   win.setProgressBar(state.progressCurrent / state.progressTotal);
-  //   videoMetadataLoop();
-  // }
+  const state = getState();
+  const actionableLibrary = state.library.filter(
+    (ls) =>
+      getSourceType(ls.url) == ST.video &&
+      (ls.duration == null ||
+        ls.resolution == null ||
+        isNaN(ls.resolution) ||
+        ls.resolution <= 0 ||
+        ls.fileSize == null ||
+        isNaN(ls.fileSize)),
+  );
+  const videoMetadataLoop = () => {
+    const state = getState();
+    const offset = state.progressCurrent;
+    if (state.progressMode == PR.cancel) {
+      window.ipc.setProgressBar(-1);
+      setState({
+        progressMode: null,
+        progressCurrent: 0,
+        progressTotal: 0,
+        progressTitle: "",
+      });
+    } else if (actionableLibrary.length == offset) {
+      window.ipc.setProgressBar(-1);
+      setState({
+        systemSnack: "Video Metadata update has completed.",
+        systemSnackSeverity: SS.success,
+        progressMode: null,
+        progressCurrent: 0,
+        progressTotal: 0,
+        progressTitle: "",
+      });
+    } else {
+      const actionSource = actionableLibrary[offset];
+      state.progressTitle = actionSource.url;
+      setState({ progressTitle: state.progressTitle });
+      const librarySource = state.library.find(
+        (s) => s.url == actionSource.url,
+      );
+      if (librarySource) {
+        let video = document.createElement("video");
+        video.preload = "metadata";
+        video.onloadedmetadata = () => {
+          const height = video.videoHeight;
+          const width = video.videoWidth;
+          librarySource.resolution = Math.min(height, width);
+          librarySource.duration = video.duration;
+          video.remove();
+          try {
+            librarySource.fileSize = window.files.fileSize(librarySource.url);
+          } catch (e) {
+            librarySource.fileSize = -1;
+          }
+          state.progressCurrent = offset + 1;
+          setState({ progressCurrent: state.progressCurrent });
+          window.ipc.setProgressBar(
+            state.progressCurrent / state.progressTotal,
+          );
+          setTimeout(videoMetadataLoop, 100);
+        };
+        video.onerror = () => {
+          video.remove();
+          state.progressCurrent = offset + 1;
+          setState({ progressCurrent: state.progressCurrent });
+          window.ipc.setProgressBar(
+            state.progressCurrent / state.progressTotal,
+          );
+          setTimeout(videoMetadataLoop, 100);
+        };
+        video.src = librarySource.url;
+      } else {
+        // Skip if removed from library during check
+        state.progressCurrent = offset + 1;
+        setState({ progressCurrent: state.progressCurrent });
+        window.ipc.setProgressBar(state.progressCurrent / state.progressTotal);
+        videoMetadataLoop();
+      }
+    }
+  };
+  // If we don't have an import running
+  if (!state.progressMode && actionableLibrary.length) {
+    state.progressMode = PR.videoMetadata;
+    state.progressCurrent = 0;
+    state.progressTotal = actionableLibrary.length;
+    setState({
+      progressMode: state.progressMode,
+      progressCurrent: state.progressCurrent,
+      progressTotal: state.progressTotal,
+    });
+    window.ipc.setProgressBar(state.progressCurrent / state.progressTotal);
+    videoMetadataLoop();
+  }
 }
 
 export function importTumblr(getState: () => State, setState: Function) {

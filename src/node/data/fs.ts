@@ -42,10 +42,6 @@ export function fs_mkdirSync(path: string) {
   }
 }
 
-export function fs_fileSize(path: string) {
-  return fs.statSync(path)?.size;
-}
-
 export function fs_readdir(
   path: string,
   callback: (error: NodeJS.ErrnoException, files: string[]) => void,

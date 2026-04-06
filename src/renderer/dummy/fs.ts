@@ -27,10 +27,6 @@ export function fs_writeFileSync(path: string, text: string) {}
 
 export function fs_mkdirSync(path: string) {}
 
-export function fs_fileSize(path: string) {
-  return 0;
-}
-
 export function fs_readdir(
   path: string,
   callback: (error: NodeJS.ErrnoException, files: string[]) => void,
