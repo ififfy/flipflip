@@ -109,7 +109,7 @@ async function onSaveScript(ev: IpcMainEvent, script: string) {
 }
 
 async function onGetFonts(ev: IpcMainEvent) {
-  return await getFonts()
+  return await getFonts();
 }
 
 // Initialize and release listeners

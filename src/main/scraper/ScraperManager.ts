@@ -1,10 +1,10 @@
-import fs from 'fs'
-import wretch from 'wretch'
+import fs from "fs";
+import wretch from "wretch";
 import fileUrl from "file-url";
 import recursiveReaddir from "recursive-readdir";
 import Config from "../../common/Config";
 import LibrarySource from "../../common/LibrarySource";
-import {IF, ST} from "../../common/const";
+import { IF, ST } from "../../common/const";
 import {
   CancelablePromise,
   getCachePath,
@@ -244,7 +244,11 @@ function scrapeFiles(
     if (helpers.next == -1) {
       helpers.next = 0;
       const cachePath = getCachePath(source.url, config);
-      if (config.caching.enabled && fs.existsSync(cachePath) && fs.readdirSync(cachePath).length > 0) {
+      if (
+        config.caching.enabled &&
+        fs.existsSync(cachePath) &&
+        fs.readdirSync(cachePath).length > 0
+      ) {
         // If the cache directory exists, use it
         if (returnPromise) {
           return new CancelablePromise((resolve) => {

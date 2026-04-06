@@ -62,12 +62,12 @@ interface NavigatorClipboard {
   readonly clipboard?: Clipboard;
 }
 
-interface Navigator extends NavigatorClipboard { }
+interface Navigator extends NavigatorClipboard {}
 
 declare global {
   interface Window {
     ipc: {
-      platform: () => string
+      platform: () => string;
       newWindow: () => void;
       getBackups: () => Promise<Array<Backup>>;
       getAppStorage: () => Promise<AppStorageState>;
@@ -94,4 +94,4 @@ declare global {
   }
 }
 
-export { };
+export {};

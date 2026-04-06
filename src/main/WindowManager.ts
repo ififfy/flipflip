@@ -6,11 +6,7 @@ import windowStateKeeper from "electron-window-state";
 import { releaseIpcEvents } from "./IPCEvents";
 import { IPC } from "../common/const";
 import { getFilesRecursively } from "./utils";
-import {
-  isAudio,
-  isVideo,
-  isVideoPlaylist,
-} from "./scraper/Scrapers";
+import { isAudio, isVideo, isVideoPlaylist } from "./scraper/Scrapers";
 import { isText } from "../renderer/data/utils";
 
 // Current window list
