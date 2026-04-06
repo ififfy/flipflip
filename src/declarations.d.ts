@@ -1,3 +1,4 @@
+import { IAudioMetadata } from "music-metadata";
 import AppStorageState from "./common/AppStorageState";
 import Backup from "./common/Backup";
 
@@ -65,10 +66,15 @@ interface NavigatorClipboard {
   readonly clipboard?: Clipboard;
 }
 
-interface Navigator extends NavigatorClipboard {}
+interface Navigator extends NavigatorClipboard { }
 
 declare global {
   interface Window {
+    files: {
+      existsSync: (path: string) => boolean
+      readFileSync: (path: string) => Buffer
+      parseAudioFile: (path: string) => Promise<IAudioMetadata>
+    },
     ipc: {
       platform: () => string;
       newWindow: () => void;
@@ -111,4 +117,4 @@ declare global {
   }
 }
 
-export {};
+export { };

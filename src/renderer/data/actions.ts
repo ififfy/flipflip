@@ -62,14 +62,13 @@ import WeightGroup from "../../common/WeightGroup";
 import {
   fs_existsSync,
   fs_mkdirSync,
-  fs_readFileSync,
   fs_unlink,
 } from "../dummy/fs";
 import { fsExtra_outputFile } from "../dummy/fs-extra";
 import { path_sep } from "../dummy/path";
 import { folder_getFolderSize } from "../dummy/folder";
 import AppStorageState from "src/common/AppStorageState";
-
+import {analyze} from "web-audio-beat-detector";
 type State = AppStorageState;
 
 /** Getters **/
@@ -3691,63 +3690,57 @@ export function markOffline(getState: () => State, setState: Function) {
 
 export function detectBPMs(getState: () => State, setState: Function) {
   const readMetadata = (audio: Audio, offset: number) => {
-    // FIXME
-    // const win = remote.getCurrentWindow();
-    // const state = getState();
-    // parseFile(audio.url)
-    //   .then((metadata: any) => {
-    //     if (metadata && metadata.common && metadata.common.bpm) {
-    //       audio.bpm = metadata.common.bpm;
-    //       state.progressCurrent = offset + 1;
-    //       setState({progressCurrent: state.progressCurrent});
-    //       win.setProgressBar(state.progressCurrent / state.progressTotal);
-    //       setTimeout(detectBPMLoop, 100);
-    //     } else {
-    //       detectBPM(audio, offset);
-    //     }
-    //   })
-    //   .catch((e: any) => {
-    //     console.error("Error reading track metadata: " + audio.url);
-    //     console.error(e);
-    //     detectBPM(audio, offset);
-    //   });
+    const state = getState();
+    window.files.parseAudioFile(audio.url)
+      .then((metadata: any) => {
+        if (metadata && metadata.common && metadata.common.bpm) {
+          audio.bpm = metadata.common.bpm;
+          state.progressCurrent = offset + 1;
+          setState({progressCurrent: state.progressCurrent});
+          window.ipc.setProgressBar(state.progressCurrent / state.progressTotal);
+          setTimeout(detectBPMLoop, 100);
+        } else {
+          detectBPM(audio, offset);
+        }
+      })
+      .catch((e: any) => {
+        console.error("Error reading track metadata: " + audio.url);
+        console.error(e);
+        detectBPM(audio, offset);
+      });
   };
 
   const detectBPM = (audio: Audio, offset: number) => {
     const bpmError = (e: any) => {
       console.error("Error detecting track BPM: " + audio.url);
       console.error(e);
-      // FIXME
-      // const win = remote.getCurrentWindow();
-      // const state = getState();
-      // state.progressCurrent = offset + 1;
-      // setState({progressCurrent: state.progressCurrent});
-      // win.setProgressBar(state.progressCurrent / state.progressTotal);
-      // setTimeout(detectBPMLoop, 100);
+      const state = getState();
+      state.progressCurrent = offset + 1;
+      setState({progressCurrent: state.progressCurrent});
+      window.ipc.setProgressBar(state.progressCurrent / state.progressTotal);
+      setTimeout(detectBPMLoop, 100);
     };
 
     const detectBPM = (data: ArrayBuffer) => {
       const maxByteSize = 200000000;
       if (data.byteLength < maxByteSize) {
-        // FIXME
-        // const win = remote.getCurrentWindow();
-        // const state = getState();
-        // let context = new AudioContext();
-        // context.decodeAudioData(data, (buffer) => {
-        //   analyze(buffer)
-        //     .then((tempo: number) => {
-        //       audio.bpm = Number.parseFloat(tempo.toFixed(2));
-        //       state.progressCurrent = offset + 1;
-        //       setState({progressCurrent: state.progressCurrent});
-        //       win.setProgressBar(state.progressCurrent / state.progressTotal);
-        //       setTimeout(detectBPMLoop, 100);
-        //     })
-        //     .catch((e: any) => {
-        //       bpmError(e);
-        //     });
-        // }, (e) => {
-        //   bpmError(e);
-        // });
+        const state = getState();
+        let context = new AudioContext();
+        context.decodeAudioData(data, (buffer) => {
+          analyze(buffer)
+            .then((tempo: number) => {
+              audio.bpm = Number.parseFloat(tempo.toFixed(2));
+              state.progressCurrent = offset + 1;
+              setState({progressCurrent: state.progressCurrent});
+              window.ipc.setProgressBar(state.progressCurrent / state.progressTotal);
+              setTimeout(detectBPMLoop, 100);
+            })
+            .catch((e: any) => {
+              bpmError(e);
+            });
+        }, (e) => {
+          bpmError(e);
+        });
       } else {
         console.error("'" + audio.url + "' is too large to decode");
       }
@@ -3755,8 +3748,8 @@ export function detectBPMs(getState: () => State, setState: Function) {
 
     try {
       const url = audio.url;
-      if (fs_existsSync(url)) {
-        detectBPM(toArrayBuffer(fs_readFileSync(url)));
+      if (window.files.existsSync(url)) {
+        detectBPM(toArrayBuffer(window.files.readFileSync(url)));
       } else {
         wretch(url)
           .get()
@@ -3773,57 +3766,54 @@ export function detectBPMs(getState: () => State, setState: Function) {
   };
 
   const detectBPMLoop = () => {
-    // FIXME
-    // const state = getState();
-    // const offset = state.progressCurrent;
-    // if (state.progressMode == PR.cancel) {
-    //   win.setProgressBar(-1);
-    //   setState({progressMode: null, progressCurrent: 0, progressTotal: 0, progressTitle: ""});
-    // } else if (actionableLibrary.length == offset) {
-    //   win.setProgressBar(-1);
-    //   setState({
-    //     systemSnack: "BPM Detection has completed.",
-    //     systemSnackSeverity: SS.success,
-    //     progressMode: null,
-    //     progressCurrent: 0,
-    //     progressTotal: 0,
-    //     progressTitle: ""
-    //   });
-    // } else {
-    //   const actionSource = actionableLibrary[offset];
-    //   state.progressTitle = actionSource.url;
-    //   setState({progressTitle: state.progressTitle});
-    //   const librarySource = state.audios.find((s) => s.url == actionSource.url);
-    //   if (librarySource) {
-    //     readMetadata(librarySource, offset)
-    //   } else {
-    //     // Skip if removed from library during check
-    //     state.progressCurrent = offset + 1;
-    //     setState({progressCurrent: state.progressCurrent});
-    //     win.setProgressBar(state.progressCurrent / state.progressTotal);
-    //     detectBPMLoop();
-    //   }
-    // }
+    const state = getState();
+    const offset = state.progressCurrent;
+    if (state.progressMode == PR.cancel) {
+      window.ipc.setProgressBar(-1);
+      setState({progressMode: null, progressCurrent: 0, progressTotal: 0, progressTitle: ""});
+    } else if (actionableLibrary.length == offset) {
+      window.ipc.setProgressBar(-1);
+      setState({
+        systemSnack: "BPM Detection has completed.",
+        systemSnackSeverity: SS.success,
+        progressMode: null,
+        progressCurrent: 0,
+        progressTotal: 0,
+        progressTitle: ""
+      });
+    } else {
+      const actionSource = actionableLibrary[offset];
+      state.progressTitle = actionSource.url;
+      setState({progressTitle: state.progressTitle});
+      const librarySource = state.audios.find((s) => s.url == actionSource.url);
+      if (librarySource) {
+        readMetadata(librarySource, offset)
+      } else {
+        // Skip if removed from library during check
+        state.progressCurrent = offset + 1;
+        setState({progressCurrent: state.progressCurrent});
+        window.ipc.setProgressBar(state.progressCurrent / state.progressTotal);
+        detectBPMLoop();
+      }
+    }
   };
 
-  // FIXME
-  // const win = remote.getCurrentWindow();
-  // const state = getState();
-  // const actionableLibrary = state.audios.filter((a) => a.bpm == 0);
+  const state = getState();
+  const actionableLibrary = state.audios.filter((a) => a.bpm == 0);
 
-  // // If we don't have an import running
-  // if (!state.progressMode) {
-  //   state.progressMode = PR.bpm;
-  //   state.progressCurrent = 0;
-  //   state.progressTotal = actionableLibrary.length;
-  //   setState({
-  //     progressMode: state.progressMode,
-  //     progressCurrent: state.progressCurrent,
-  //     progressTotal: state.progressTotal,
-  //   });
-  //   win.setProgressBar(state.progressCurrent / state.progressTotal);
-  //   detectBPMLoop();
-  // }
+  // If we don't have an import running
+  if (!state.progressMode) {
+    state.progressMode = PR.bpm;
+    state.progressCurrent = 0;
+    state.progressTotal = actionableLibrary.length;
+    setState({
+      progressMode: state.progressMode,
+      progressCurrent: state.progressCurrent,
+      progressTotal: state.progressTotal,
+    });
+    window.ipc.setProgressBar(state.progressCurrent / state.progressTotal);
+    detectBPMLoop();
+  }
 }
 
 export function updateVideoMetadata(getState: () => State, setState: Function) {

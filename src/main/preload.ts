@@ -1,8 +1,16 @@
+import fs from 'fs'
 import { contextBridge, ipcRenderer } from "electron";
 import { IPC } from "../common/const";
 import AppStorageState from "../common/AppStorageState";
 import Config from "../common/Config";
 import AuthResponse from "../common/AuthResponse";
+import { parseFile } from 'music-metadata';
+
+contextBridge.exposeInMainWorld("files", {
+  existsSync: (path: string) => fs.existsSync(path),
+  readFileSync: (path: string) => fs.readFileSync(path),
+  parseAudioFile: (path: string) => parseFile(path)
+});
 
 contextBridge.exposeInMainWorld("ipc", {
   platform: () => process.platform,
