@@ -5,16 +5,9 @@ import recursiveReaddir from "recursive-readdir";
 import Config from "../../common/Config";
 import LibrarySource from "../../common/LibrarySource";
 import { IF, ST } from "../../common/const";
-import {
-  CancelablePromise,
-  getCachePath,
-  urlToPath,
-} from "../../renderer/data/utils";
+import { getCachePath, urlToPath } from "../../renderer/data/utils";
 import {
   filterPathsToJustPlayable,
-  getFileName,
-  getSourceType,
-  isVideo,
   loadBDSMlr,
   loadDanbooru,
   loadDeviantArt,
@@ -34,10 +27,10 @@ import {
   loadTumblr,
   processAllURLs,
 } from "./Scrapers";
+import { getFileName, getSourceType, isVideo } from "../../common/utils";
 
-// Determine what kind of source we have based on the URL and return associated Promise
+// Determine what kind of source we have based on the URL
 function scrapeFiles(
-  worker: any,
   pm: Function,
   allURLs: Map<string, Array<string>>,
   allPosts: Map<string, string>,
@@ -46,200 +39,108 @@ function scrapeFiles(
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
-  returnPromise = false,
 ) {
   const sourceType = getSourceType(source.url);
   if (sourceType == ST.local) {
     // Local files
-    if (returnPromise) {
-      return new CancelablePromise((resolve) => {
-        loadLocalDirectory(
-          resolve,
-          allURLs,
-          allPosts,
-          config,
-          source,
-          filter,
-          weight,
-          helpers,
-          null,
-        );
-      });
-    } else {
-      loadLocalDirectory(
-        pm,
-        allURLs,
-        allPosts,
-        config,
-        source,
-        filter,
-        weight,
-        helpers,
-        null,
-      );
-    }
+    loadLocalDirectory(
+      pm,
+      allURLs,
+      allPosts,
+      config,
+      source,
+      filter,
+      weight,
+      helpers,
+      null,
+    );
   } else if (sourceType == ST.list) {
     // Image List
     helpers.next = null;
-    if (returnPromise) {
-      return new CancelablePromise((resolve) => {
-        loadRemoteImageURLListPromise(
-          allURLs,
-          allPosts,
-          config,
-          source,
-          filter,
-          weight,
-          helpers,
-          resolve,
-        );
-      });
-    } else {
-      worker.loadRemoteImageURLList(
-        allURLs,
-        allPosts,
-        config,
-        source,
-        filter,
-        weight,
-        helpers,
-      );
-    }
+    loadRemoteImageURLList(
+      allURLs,
+      allPosts,
+      config,
+      source,
+      filter,
+      weight,
+      helpers,
+    );
   } else if (sourceType == ST.video) {
     const cachePath =
       getCachePath(source.url, config) + getFileName(source.url);
-    if (returnPromise) {
-      return new CancelablePromise((resolve) => {
-        loadVideo(
-          resolve,
-          allURLs,
-          allPosts,
-          config,
-          source,
-          filter,
-          weight,
-          helpers,
-          config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null,
-        );
-      });
-    } else {
-      loadVideo(
-        pm,
-        allURLs,
-        allPosts,
-        config,
-        source,
-        filter,
-        weight,
-        helpers,
-        config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null,
-      );
-    }
+    loadVideo(
+      pm,
+      allURLs,
+      allPosts,
+      config,
+      source,
+      filter,
+      weight,
+      helpers,
+      config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null,
+    );
   } else if (sourceType == ST.playlist) {
     const cachePath =
       getCachePath(source.url, config) + getFileName(source.url);
-    if (returnPromise) {
-      return new CancelablePromise((resolve) => {
-        loadPlaylist(
-          resolve,
-          allURLs,
-          allPosts,
-          config,
-          source,
-          filter,
-          weight,
-          helpers,
-          config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null,
-        );
-      });
-    } else {
-      loadPlaylist(
-        pm,
-        allURLs,
-        allPosts,
-        config,
-        source,
-        filter,
-        weight,
-        helpers,
-        config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null,
-      );
-    }
+    loadPlaylist(
+      pm,
+      allURLs,
+      allPosts,
+      config,
+      source,
+      filter,
+      weight,
+      helpers,
+      config.caching.enabled && fs.existsSync(cachePath) ? cachePath : null,
+    );
   } else if (sourceType == ST.nimja) {
-    if (returnPromise) {
-      return new CancelablePromise((resolve) => {
-        loadNimja(
-          resolve,
-          allURLs,
-          allPosts,
-          config,
-          source,
-          filter,
-          weight,
-          helpers,
-          null,
-        );
-      });
-    } else {
-      loadNimja(
-        pm,
-        allURLs,
-        allPosts,
-        config,
-        source,
-        filter,
-        weight,
-        helpers,
-        null,
-      );
-    }
+    loadNimja(
+      pm,
+      allURLs,
+      allPosts,
+      config,
+      source,
+      filter,
+      weight,
+      helpers,
+      null,
+    );
   } else {
     // Paging sources
     let workerFunction: any;
     if (sourceType == ST.tumblr) {
-      workerFunction = returnPromise ? loadTumblrPromise : worker.loadTumblr;
+      workerFunction = loadTumblr;
     } else if (sourceType == ST.reddit) {
-      workerFunction = returnPromise ? loadRedditPromise : worker.loadReddit;
+      workerFunction = loadReddit;
     } else if (sourceType == ST.redgifs) {
-      workerFunction = returnPromise ? loadRedGifsPromise : worker.loadRedGifs;
+      workerFunction = loadRedGifs;
     } else if (sourceType == ST.imagefap) {
-      workerFunction = returnPromise
-        ? loadImageFapPromise
-        : worker.loadImageFap;
+      workerFunction = loadImageFap;
     } else if (sourceType == ST.sexcom) {
-      workerFunction = returnPromise ? loadSexComPromise : worker.loadSexCom;
+      workerFunction = loadSexCom;
     } else if (sourceType == ST.imgur) {
-      workerFunction = returnPromise ? loadImgurPromise : worker.loadImgur;
+      workerFunction = loadImgur;
     } else if (sourceType == ST.deviantart) {
-      workerFunction = returnPromise
-        ? loadDeviantArtPromise
-        : worker.loadDeviantArt;
+      workerFunction = loadDeviantArt;
     } else if (sourceType == ST.danbooru) {
-      workerFunction = returnPromise
-        ? loadDanbooruPromise
-        : worker.loadDanbooru;
+      workerFunction = loadDanbooru;
     } else if (sourceType == ST.e621) {
-      workerFunction = returnPromise ? loadE621Promise : worker.loadE621;
+      workerFunction = loadE621;
     } else if (sourceType == ST.luscious) {
-      workerFunction = returnPromise
-        ? loadLusciousPromise
-        : worker.loadLuscious;
+      workerFunction = loadLuscious;
     } else if (sourceType == ST.gelbooru1) {
-      workerFunction = returnPromise
-        ? loadGelbooru1Promise
-        : worker.loadGelbooru1;
+      workerFunction = loadGelbooru1;
     } else if (sourceType == ST.gelbooru2) {
-      workerFunction = returnPromise
-        ? loadGelbooru2Promise
-        : worker.loadGelbooru2;
+      workerFunction = loadGelbooru2;
     } else if (sourceType == ST.ehentai) {
-      workerFunction = returnPromise ? loadEHentaiPromise : worker.loadEHentai;
+      workerFunction = loadEHentai;
     } else if (sourceType == ST.bdsmlr) {
-      workerFunction = returnPromise ? loadBDSMlrPromise : worker.loadBDSMlr;
+      workerFunction = loadBDSMlr;
     } else if (sourceType == ST.hydrus) {
-      workerFunction = returnPromise ? loadHydrusPromise : worker.loadHydrus;
+      workerFunction = loadHydrus;
     } else if (sourceType == ST.piwigo) {
-      workerFunction = returnPromise ? loadPiwigoPromise : worker.loadPiwigo;
+      workerFunction = loadPiwigo;
     }
     if (helpers.next == -1) {
       helpers.next = 0;
@@ -250,73 +151,17 @@ function scrapeFiles(
         fs.readdirSync(cachePath).length > 0
       ) {
         // If the cache directory exists, use it
-        if (returnPromise) {
-          return new CancelablePromise((resolve) => {
-            loadLocalDirectory(
-              resolve,
-              allURLs,
-              allPosts,
-              config,
-              source,
-              filter,
-              weight,
-              helpers,
-              cachePath,
-            );
-          });
-        } else {
-          loadLocalDirectory(
-            pm,
-            allURLs,
-            allPosts,
-            config,
-            source,
-            filter,
-            weight,
-            helpers,
-            cachePath,
-          );
-        }
-      } else {
-        if (returnPromise) {
-          return new CancelablePromise((resolve) => {
-            workerFunction(
-              allURLs,
-              allPosts,
-              config,
-              source,
-              filter,
-              weight,
-              helpers,
-              resolve,
-            );
-          });
-        } else {
-          workerFunction(
-            allURLs,
-            allPosts,
-            config,
-            source,
-            filter,
-            weight,
-            helpers,
-          );
-        }
-      }
-    } else {
-      if (returnPromise) {
-        return new CancelablePromise((resolve) => {
-          workerFunction(
-            allURLs,
-            allPosts,
-            config,
-            source,
-            filter,
-            weight,
-            helpers,
-            resolve,
-          );
-        });
+        loadLocalDirectory(
+          pm,
+          allURLs,
+          allPosts,
+          config,
+          source,
+          filter,
+          weight,
+          helpers,
+          cachePath,
+        );
       } else {
         workerFunction(
           allURLs,
@@ -328,6 +173,16 @@ function scrapeFiles(
           helpers,
         );
       }
+    } else {
+      workerFunction(
+        allURLs,
+        allPosts,
+        config,
+        source,
+        filter,
+        weight,
+        helpers,
+      );
     }
   }
 }
@@ -607,369 +462,4 @@ export const loadPlaylist = (
         },
       });
     });
-};
-
-const loadRemoteImageURLListPromise = (
-  allURLs: Map<string, Array<string>>,
-  allPosts: Map<string, string>,
-  config: Config,
-  source: LibrarySource,
-  filter: string,
-  weight: string,
-  helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve: Function,
-) => {
-  loadRemoteImageURLList(
-    allURLs,
-    allPosts,
-    config,
-    source,
-    filter,
-    weight,
-    helpers,
-    resolve,
-  );
-};
-
-const loadTumblrPromise = (
-  allURLs: Map<string, Array<string>>,
-  allPosts: Map<string, string>,
-  config: Config,
-  source: LibrarySource,
-  filter: string,
-  weight: string,
-  helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve: Function,
-) => {
-  loadTumblr(
-    allURLs,
-    allPosts,
-    config,
-    source,
-    filter,
-    weight,
-    helpers,
-    resolve,
-  );
-};
-
-const loadRedditPromise = (
-  allURLs: Map<string, Array<string>>,
-  allPosts: Map<string, string>,
-  config: Config,
-  source: LibrarySource,
-  filter: string,
-  weight: string,
-  helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve: Function,
-) => {
-  loadReddit(
-    allURLs,
-    allPosts,
-    config,
-    source,
-    filter,
-    weight,
-    helpers,
-    resolve,
-  );
-};
-
-const loadRedGifsPromise = (
-  allURLs: Map<string, Array<string>>,
-  allPosts: Map<string, string>,
-  config: Config,
-  source: LibrarySource,
-  filter: string,
-  weight: string,
-  helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve: Function,
-) => {
-  loadRedGifs(
-    allURLs,
-    allPosts,
-    config,
-    source,
-    filter,
-    weight,
-    helpers,
-    resolve,
-  );
-};
-
-const loadImageFapPromise = (
-  allURLs: Map<string, Array<string>>,
-  allPosts: Map<string, string>,
-  config: Config,
-  source: LibrarySource,
-  filter: string,
-  weight: string,
-  helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve: Function,
-) => {
-  loadImageFap(
-    allURLs,
-    allPosts,
-    config,
-    source,
-    filter,
-    weight,
-    helpers,
-    resolve,
-  );
-};
-
-const loadSexComPromise = (
-  allURLs: Map<string, Array<string>>,
-  allPosts: Map<string, string>,
-  config: Config,
-  source: LibrarySource,
-  filter: string,
-  weight: string,
-  helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve: Function,
-) => {
-  loadSexCom(
-    allURLs,
-    allPosts,
-    config,
-    source,
-    filter,
-    weight,
-    helpers,
-    resolve,
-  );
-};
-
-const loadImgurPromise = (
-  allURLs: Map<string, Array<string>>,
-  allPosts: Map<string, string>,
-  config: Config,
-  source: LibrarySource,
-  filter: string,
-  weight: string,
-  helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve: Function,
-) => {
-  loadImgur(
-    allURLs,
-    allPosts,
-    config,
-    source,
-    filter,
-    weight,
-    helpers,
-    resolve,
-  );
-};
-
-const loadDeviantArtPromise = (
-  allURLs: Map<string, Array<string>>,
-  allPosts: Map<string, string>,
-  config: Config,
-  source: LibrarySource,
-  filter: string,
-  weight: string,
-  helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve: Function,
-) => {
-  loadDeviantArt(
-    allURLs,
-    allPosts,
-    config,
-    source,
-    filter,
-    weight,
-    helpers,
-    resolve,
-  );
-};
-
-const loadDanbooruPromise = (
-  allURLs: Map<string, Array<string>>,
-  allPosts: Map<string, string>,
-  config: Config,
-  source: LibrarySource,
-  filter: string,
-  weight: string,
-  helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve: Function,
-) => {
-  loadDanbooru(
-    allURLs,
-    allPosts,
-    config,
-    source,
-    filter,
-    weight,
-    helpers,
-    resolve,
-  );
-};
-
-const loadE621Promise = (
-  allURLs: Map<string, Array<string>>,
-  allPosts: Map<string, string>,
-  config: Config,
-  source: LibrarySource,
-  filter: string,
-  weight: string,
-  helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve: Function,
-) => {
-  loadE621(allURLs, allPosts, config, source, filter, weight, helpers, resolve);
-};
-
-const loadGelbooru1Promise = (
-  allURLs: Map<string, Array<string>>,
-  allPosts: Map<string, string>,
-  config: Config,
-  source: LibrarySource,
-  filter: string,
-  weight: string,
-  helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve: Function,
-) => {
-  loadGelbooru1(
-    allURLs,
-    allPosts,
-    config,
-    source,
-    filter,
-    weight,
-    helpers,
-    resolve,
-  );
-};
-
-const loadGelbooru2Promise = (
-  allURLs: Map<string, Array<string>>,
-  allPosts: Map<string, string>,
-  config: Config,
-  source: LibrarySource,
-  filter: string,
-  weight: string,
-  helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve: Function,
-) => {
-  loadGelbooru2(
-    allURLs,
-    allPosts,
-    config,
-    source,
-    filter,
-    weight,
-    helpers,
-    resolve,
-  );
-};
-
-const loadEHentaiPromise = (
-  allURLs: Map<string, Array<string>>,
-  allPosts: Map<string, string>,
-  config: Config,
-  source: LibrarySource,
-  filter: string,
-  weight: string,
-  helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve: Function,
-) => {
-  loadEHentai(
-    allURLs,
-    allPosts,
-    config,
-    source,
-    filter,
-    weight,
-    helpers,
-    resolve,
-  );
-};
-
-const loadBDSMlrPromise = (
-  allURLs: Map<string, Array<string>>,
-  allPosts: Map<string, string>,
-  config: Config,
-  source: LibrarySource,
-  filter: string,
-  weight: string,
-  helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve: Function,
-) => {
-  loadBDSMlr(
-    allURLs,
-    allPosts,
-    config,
-    source,
-    filter,
-    weight,
-    helpers,
-    resolve,
-  );
-};
-
-const loadHydrusPromise = (
-  allURLs: Map<string, Array<string>>,
-  allPosts: Map<string, string>,
-  config: Config,
-  source: LibrarySource,
-  filter: string,
-  weight: string,
-  helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve: Function,
-) => {
-  loadHydrus(
-    allURLs,
-    allPosts,
-    config,
-    source,
-    filter,
-    weight,
-    helpers,
-    resolve,
-  );
-};
-
-const loadPiwigoPromise = (
-  allURLs: Map<string, Array<string>>,
-  allPosts: Map<string, string>,
-  config: Config,
-  source: LibrarySource,
-  filter: string,
-  weight: string,
-  helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve: Function,
-) => {
-  loadPiwigo(
-    allURLs,
-    allPosts,
-    config,
-    source,
-    filter,
-    weight,
-    helpers,
-    resolve,
-  );
-};
-
-const loadLusciousPromise = (
-  allURLs: Map<string, Array<string>>,
-  allPosts: Map<string, string>,
-  config: Config,
-  source: LibrarySource,
-  filter: string,
-  weight: string,
-  helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve: Function,
-) => {
-  loadLuscious(
-    allURLs,
-    allPosts,
-    config,
-    source,
-    filter,
-    weight,
-    helpers,
-    resolve,
-  );
 };

@@ -1,16 +1,16 @@
 import wretch from "wretch";
-import {JSDOM} from "jsdom";
+import { JSDOM } from "jsdom";
 import { DOMParser } from "xmldom";
 import * as imgur from "imgur";
 import tumblr from "tumblr.js";
 import Snoowrap from "snoowrap";
 
-import { IF, RF, RT, ST, WF } from "../../common/const";
+import { IF, RF, RT, WF } from "../../common/const";
 import Config from "../../common/Config";
 import LibrarySource from "../../common/LibrarySource";
-import { path_sep } from "../../renderer/dummy/path";
+import { getFileGroup, getFileName, isVideo } from "../../common/utils";
 
-const pm = (object: any, resolve?: Function) => {
+const pm = (object: any) => {
   if (
     object?.source &&
     object?.data &&
@@ -32,12 +32,9 @@ const pm = (object: any, resolve?: Function) => {
       object.helpers,
     );
   }
-  if (!!resolve) {
-    resolve({ data: object });
-  } else {
-    // @ts-ignore
-    postMessage(object);
-  }
+
+  // @ts-ignore
+  postMessage(object);
 };
 
 export const processAllURLs = (
@@ -109,7 +106,6 @@ export const loadRemoteImageURLList = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve?: Function,
 ) => {
   const url = source.url;
   wretch(url)
@@ -137,22 +133,19 @@ export const loadRemoteImageURLList = (
                   convertedSource,
                   true,
                 ).length;
-                pm(
-                  {
-                    data: filterPathsToJustPlayable(
-                      filter,
-                      convertedSource,
-                      true,
-                    ),
-                    allURLs: allURLs,
-                    allPosts: allPosts,
-                    weight: weight,
-                    helpers: helpers,
-                    source: source,
-                    timeout: 0,
-                  },
-                  resolve,
-                );
+                pm({
+                  data: filterPathsToJustPlayable(
+                    filter,
+                    convertedSource,
+                    true,
+                  ),
+                  allURLs: allURLs,
+                  allPosts: allPosts,
+                  weight: weight,
+                  helpers: helpers,
+                  source: source,
+                  timeout: 0,
+                });
               }
             })
             .catch((error: any) => {
@@ -163,48 +156,39 @@ export const loadRemoteImageURLList = (
                   convertedSource,
                   true,
                 ).length;
-                pm(
-                  {
-                    error: error.message,
-                    data: filterPathsToJustPlayable(
-                      filter,
-                      convertedSource,
-                      true,
-                    ),
-                    allURLs: allURLs,
-                    allPosts: allPosts,
-                    weight: weight,
-                    helpers: helpers,
-                    source: source,
-                    timeout: 0,
-                  },
-                  resolve,
-                );
+                pm({
+                  error: error.message,
+                  data: filterPathsToJustPlayable(
+                    filter,
+                    convertedSource,
+                    true,
+                  ),
+                  allURLs: allURLs,
+                  allPosts: allPosts,
+                  weight: weight,
+                  helpers: helpers,
+                  source: source,
+                  timeout: 0,
+                });
               }
             });
         }
       } else {
-        pm(
-          {
-            warning: "No lines in" + url + " are links or files",
-            helpers: helpers,
-            source: source,
-            timeout: 0,
-          },
-          resolve,
-        );
-      }
-    })
-    .catch((e) => {
-      pm(
-        {
-          error: e.message,
+        pm({
+          warning: "No lines in" + url + " are links or files",
           helpers: helpers,
           source: source,
           timeout: 0,
-        },
-        resolve,
-      );
+        });
+      }
+    })
+    .catch((e) => {
+      pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: 0,
+      });
     });
 };
 
@@ -216,7 +200,6 @@ export const loadTumblr = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve?: Function,
 ) => {
   const timeout = 3000;
   let configured =
@@ -238,15 +221,20 @@ export const loadTumblr = (
         helpers: helpers,
         source: source,
         timeout: timeout,
-      }, resolve);
+      });
       return;
     }
-    client.blogPosts(tumblrID, {offset: helpers.next*20}, (err, data) => {
+    client.blogPosts(tumblrID, { offset: helpers.next * 20 }, (err, data) => {
       if (err) {
         let systemMessage = undefined;
-        if (err.message.includes("429 Limit Exceeded") && !tumblr429Alerted && helpers.next == 0) {
+        if (
+          err.message.includes("429 Limit Exceeded") &&
+          !tumblr429Alerted &&
+          helpers.next == 0
+        ) {
           if (!config.remoteSettings.silenceTumblrAlert) {
-            systemMessage = "Tumblr has temporarily throttled your FlipFlip due to high traffic. Try again in a few minutes or visit Settings to try a different Tumblr API key.";
+            systemMessage =
+              "Tumblr has temporarily throttled your FlipFlip due to high traffic. Try again in a few minutes or visit Settings to try a different Tumblr API key.";
           }
           tumblr429Alerted = true;
         }
@@ -256,7 +244,7 @@ export const loadTumblr = (
           helpers: helpers,
           source: source,
           timeout: timeout,
-        }, resolve);
+        });
         return;
       }
       // End loop if we're at end of posts
@@ -270,7 +258,7 @@ export const loadTumblr = (
           helpers: helpers,
           source: source,
           timeout: timeout,
-        }, resolve);
+        });
         return;
       }
       let images = [];
@@ -283,7 +271,8 @@ export const loadTumblr = (
         }
         if (post.player) {
           for (let embed of post.player) {
-            const regex = /<iframe[^(?:src|\/>)]*src=["']([^"']*)[^(?:\/>)]*\/?>/g;
+            const regex =
+              /<iframe[^(?:src|\/>)]*src=["']([^"']*)[^(?:\/>)]*\/?>/g;
             let imageSource;
             while ((imageSource = regex.exec(embed.embed_code)) !== null) {
               images.push(imageSource[1]);
@@ -309,38 +298,53 @@ export const loadTumblr = (
         let convertedSource = Array<string>();
         let convertedCount = 0;
         for (let url of images) {
-          convertURL(url).then((urls: Array<string>) => {
-            convertedSource = convertedSource.concat(urls);
-            convertedCount++;
-            if (convertedCount == images.length) {
-              helpers.next = helpers.next + 1;
-              helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedSource, false).length;
-              pm({
-                data: filterPathsToJustPlayable(filter, convertedSource, false),
-                allURLs: allURLs,
-                allPosts: allPosts,
-                weight: weight,
-                helpers: helpers,
-                source: source,
-                timeout: timeout,
-              }, resolve);
-            }
-          })
-            .catch ((error: any) => {
+          convertURL(url)
+            .then((urls: Array<string>) => {
+              convertedSource = convertedSource.concat(urls);
               convertedCount++;
               if (convertedCount == images.length) {
                 helpers.next = helpers.next + 1;
-                helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, convertedSource, false).length;
+                helpers.count =
+                  helpers.count +
+                  filterPathsToJustPlayable(IF.any, convertedSource, false)
+                    .length;
                 pm({
-                  error: error.message,
-                  data: filterPathsToJustPlayable(filter, convertedSource, false),
+                  data: filterPathsToJustPlayable(
+                    filter,
+                    convertedSource,
+                    false,
+                  ),
                   allURLs: allURLs,
                   allPosts: allPosts,
                   weight: weight,
                   helpers: helpers,
                   source: source,
                   timeout: timeout,
-                }, resolve);
+                });
+              }
+            })
+            .catch((error: any) => {
+              convertedCount++;
+              if (convertedCount == images.length) {
+                helpers.next = helpers.next + 1;
+                helpers.count =
+                  helpers.count +
+                  filterPathsToJustPlayable(IF.any, convertedSource, false)
+                    .length;
+                pm({
+                  error: error.message,
+                  data: filterPathsToJustPlayable(
+                    filter,
+                    convertedSource,
+                    false,
+                  ),
+                  allURLs: allURLs,
+                  allPosts: allPosts,
+                  weight: weight,
+                  helpers: helpers,
+                  source: source,
+                  timeout: timeout,
+                });
               }
             });
         }
@@ -354,7 +358,7 @@ export const loadTumblr = (
           helpers: helpers,
           source: source,
           timeout: timeout,
-        }, resolve);
+        });
       }
     });
   } else {
@@ -364,15 +368,12 @@ export const loadTumblr = (
         "You haven't authorized FlipFlip to work with Tumblr yet.\nVisit Settings to authorize Tumblr.";
       tumblrAlerted = true;
     }
-    pm(
-      {
-        systemMessage: systemMessage,
-        helpers: helpers,
-        source: source,
-        timeout: timeout,
-      },
-      resolve,
-    );
+    pm({
+      systemMessage: systemMessage,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    });
   }
 };
 
@@ -384,7 +385,6 @@ export const loadReddit = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve?: Function,
 ) => {
   const timeout = 3000;
   let configured = config.remoteSettings.redditRefreshToken != "";
@@ -416,22 +416,19 @@ export const loadReddit = (
                     helpers.count +
                     filterPathsToJustPlayable(IF.any, convertedListing, false)
                       .length;
-                  pm(
-                    {
-                      data: filterPathsToJustPlayable(
-                        filter,
-                        convertedListing,
-                        false,
-                      ),
-                      allURLs: allURLs,
-                      allPosts: allPosts,
-                      weight: weight,
-                      helpers: helpers,
-                      source: source,
-                      timeout: timeout,
-                    },
-                    resolve,
-                  );
+                  pm({
+                    data: filterPathsToJustPlayable(
+                      filter,
+                      convertedListing,
+                      false,
+                    ),
+                    allURLs: allURLs,
+                    allPosts: allPosts,
+                    weight: weight,
+                    helpers: helpers,
+                    source: source,
+                    timeout: timeout,
+                  });
                 }
               })
               .catch((error: any) => {
@@ -443,52 +440,43 @@ export const loadReddit = (
                     helpers.count +
                     filterPathsToJustPlayable(IF.any, convertedListing, false)
                       .length;
-                  pm(
-                    {
-                      error: error.message,
-                      data: filterPathsToJustPlayable(
-                        filter,
-                        convertedListing,
-                        false,
-                      ),
-                      allURLs: allURLs,
-                      allPosts: allPosts,
-                      weight: weight,
-                      helpers: helpers,
-                      source: source,
-                      timeout: timeout,
-                    },
-                    resolve,
-                  );
+                  pm({
+                    error: error.message,
+                    data: filterPathsToJustPlayable(
+                      filter,
+                      convertedListing,
+                      false,
+                    ),
+                    allURLs: allURLs,
+                    allPosts: allPosts,
+                    weight: weight,
+                    helpers: helpers,
+                    source: source,
+                    timeout: timeout,
+                  });
                 }
               });
           }
         } else {
           helpers.next = null;
-          pm(
-            {
-              data: [],
-              allURLs: allURLs,
-              allPosts: allPosts,
-              weight: weight,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            },
-            resolve,
-          );
-        }
-      };
-      const errorSubmission = (error: any) => {
-        pm(
-          {
-            error: error.message,
+          pm({
+            data: [],
+            allURLs: allURLs,
+            allPosts: allPosts,
+            weight: weight,
             helpers: helpers,
             source: source,
             timeout: timeout,
-          },
-          resolve,
-        );
+          });
+        }
+      };
+      const errorSubmission = (error: any) => {
+        pm({
+          error: error.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        });
       };
 
       switch (source.redditFunc) {
@@ -553,22 +541,19 @@ export const loadReddit = (
                       helpers.count +
                       filterPathsToJustPlayable(IF.any, convertedListing, false)
                         .length;
-                    pm(
-                      {
-                        data: filterPathsToJustPlayable(
-                          filter,
-                          convertedListing,
-                          false,
-                        ),
-                        allURLs: allURLs,
-                        allPosts: allPosts,
-                        weight: weight,
-                        helpers: helpers,
-                        source: source,
-                        timeout: timeout,
-                      },
-                      resolve,
-                    );
+                    pm({
+                      data: filterPathsToJustPlayable(
+                        filter,
+                        convertedListing,
+                        false,
+                      ),
+                      allURLs: allURLs,
+                      allPosts: allPosts,
+                      weight: weight,
+                      helpers: helpers,
+                      source: source,
+                      timeout: timeout,
+                    });
                   }
                 })
                 .catch((error: any) => {
@@ -580,52 +565,43 @@ export const loadReddit = (
                       helpers.count +
                       filterPathsToJustPlayable(IF.any, convertedListing, false)
                         .length;
-                    pm(
-                      {
-                        error: error.message,
-                        data: filterPathsToJustPlayable(
-                          filter,
-                          convertedListing,
-                          false,
-                        ),
-                        allURLs: allURLs,
-                        allPosts: allPosts,
-                        weight: weight,
-                        helpers: helpers,
-                        source: source,
-                        timeout: timeout,
-                      },
-                      resolve,
-                    );
+                    pm({
+                      error: error.message,
+                      data: filterPathsToJustPlayable(
+                        filter,
+                        convertedListing,
+                        false,
+                      ),
+                      allURLs: allURLs,
+                      allPosts: allPosts,
+                      weight: weight,
+                      helpers: helpers,
+                      source: source,
+                      timeout: timeout,
+                    });
                   }
                 });
             }
           } else {
             helpers.next = null;
-            pm(
-              {
-                data: [],
-                allURLs: allURLs,
-                allPosts: allPosts,
-                weight: weight,
-                helpers: helpers,
-                source: source,
-                timeout: timeout,
-              },
-              resolve,
-            );
-          }
-        })
-        .catch((err: any) => {
-          pm(
-            {
-              error: err.message,
+            pm({
+              data: [],
+              allURLs: allURLs,
+              allPosts: allPosts,
+              weight: weight,
               helpers: helpers,
               source: source,
               timeout: timeout,
-            },
-            resolve,
-          );
+            });
+          }
+        })
+        .catch((err: any) => {
+          pm({
+            error: err.message,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          });
         });
     } else if (url.includes("/user/") || url.includes("/u/")) {
       reddit
@@ -650,22 +626,19 @@ export const loadReddit = (
                       helpers.count +
                       filterPathsToJustPlayable(IF.any, convertedListing, false)
                         .length;
-                    pm(
-                      {
-                        data: filterPathsToJustPlayable(
-                          filter,
-                          convertedListing,
-                          false,
-                        ),
-                        allURLs: allURLs,
-                        allPosts: allPosts,
-                        weight: weight,
-                        helpers: helpers,
-                        source: source,
-                        timeout: timeout,
-                      },
-                      resolve,
-                    );
+                    pm({
+                      data: filterPathsToJustPlayable(
+                        filter,
+                        convertedListing,
+                        false,
+                      ),
+                      allURLs: allURLs,
+                      allPosts: allPosts,
+                      weight: weight,
+                      helpers: helpers,
+                      source: source,
+                      timeout: timeout,
+                    });
                   }
                 })
                 .catch((error: any) => {
@@ -677,52 +650,43 @@ export const loadReddit = (
                       helpers.count +
                       filterPathsToJustPlayable(IF.any, convertedListing, false)
                         .length;
-                    pm(
-                      {
-                        error: error.message,
-                        data: filterPathsToJustPlayable(
-                          filter,
-                          convertedListing,
-                          false,
-                        ),
-                        allURLs: allURLs,
-                        allPosts: allPosts,
-                        weight: weight,
-                        helpers: helpers,
-                        source: source,
-                        timeout: timeout,
-                      },
-                      resolve,
-                    );
+                    pm({
+                      error: error.message,
+                      data: filterPathsToJustPlayable(
+                        filter,
+                        convertedListing,
+                        false,
+                      ),
+                      allURLs: allURLs,
+                      allPosts: allPosts,
+                      weight: weight,
+                      helpers: helpers,
+                      source: source,
+                      timeout: timeout,
+                    });
                   }
                 });
             }
           } else {
             helpers.next = null;
-            pm(
-              {
-                data: [],
-                allURLs: allURLs,
-                allPosts: allPosts,
-                weight: weight,
-                helpers: helpers,
-                source: source,
-                timeout: timeout,
-              },
-              resolve,
-            );
-          }
-        })
-        .catch((err: any) => {
-          pm(
-            {
-              error: err.message,
+            pm({
+              data: [],
+              allURLs: allURLs,
+              allPosts: allPosts,
+              weight: weight,
               helpers: helpers,
               source: source,
               timeout: timeout,
-            },
-            resolve,
-          );
+            });
+          }
+        })
+        .catch((err: any) => {
+          pm({
+            error: err.message,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          });
         });
     }
   } else {
@@ -732,15 +696,12 @@ export const loadReddit = (
         "You haven't authorized FlipFlip to work with Reddit yet.\nVisit Settings to authorize Reddit.";
       redditAlerted = true;
     }
-    pm(
-      {
-        systemMessage: systemMessage,
-        helpers: helpers,
-        source: source,
-        timeout: timeout,
-      },
-      resolve,
-    );
+    pm({
+      systemMessage: systemMessage,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    });
   }
 };
 
@@ -752,7 +713,6 @@ export const loadRedGifs = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve?: Function,
 ) => {
   const timeout = 10000;
   const url = source.url;
@@ -833,15 +793,12 @@ export const loadRedGifs = (
     .get()
     .setTimeout(15000)
     .onAbort((e) =>
-      pm(
-        {
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      ),
+      pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }),
     )
     .json((json) => {
       const images = json.gifs
@@ -857,29 +814,23 @@ export const loadRedGifs = (
       helpers.next = json.page == json.pages ? null : helpers.next + 1;
       helpers.count =
         helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
-      pm(
-        {
-          data: filterPathsToJustPlayable(filter, images, false),
-          allURLs: allURLs,
-          allPosts: allPosts,
-          weight: weight,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      );
+      pm({
+        data: filterPathsToJustPlayable(filter, images, false),
+        allURLs: allURLs,
+        allPosts: allPosts,
+        weight: weight,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      });
     })
     .catch((err: any) => {
-      pm(
-        {
-          error: err.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      );
+      pm({
+        error: err.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      });
     });
 };
 
@@ -900,26 +851,23 @@ const loadImageFapGallery = (
     retries: number;
     uuid: string;
   }) => void,
-  resolve?: Function,
 ) => {
   wretch(galleryURL)
     .get()
     .setTimeout(15000)
     .onAbort((e) =>
-      pm(
-        {
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      ),
+      pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }),
     )
     .text((html) => {
-      const galleryWindow = new JSDOM(html, { contentType: 'text/html' }).window;
+      const galleryWindow = new JSDOM(html, { contentType: "text/html" })
+        .window;
       let imageEl = galleryWindow.document.querySelector(
-        ".expp-container > form > table > tbody > tr > td > table > tbody > tr > td > a"
+        ".expp-container > form > table > tbody > tr > td > table > tbody > tr > td > a",
       );
       if (imageEl) {
         const imageURL = "https://www.imagefap.com" + imageEl.href;
@@ -928,10 +876,10 @@ const loadImageFapGallery = (
           .text((html) => {
             let captcha = undefined;
             const ahrefs = new JSDOM(html, {
-              contentType: 'text/html'
+              contentType: "text/html",
             }).window.document.querySelectorAll(
-                'a[href^="https://cdn.imagefap.com/images/full/"]'
-              );
+              'a[href^="https://cdn.imagefap.com/images/full/"]',
+            );
             if (ahrefs.length > 0) {
               for (let i = 0; i < ahrefs.length; i++) {
                 images.push(ahrefs.item(i).href);
@@ -940,19 +888,16 @@ const loadImageFapGallery = (
               captcha = imageURL;
             }
             if (captcha != null) {
-              pm(
-                {
-                  captcha: captcha,
-                  data: images,
-                  allURLs: allURLs,
-                  allPosts: allPosts,
-                  weight: weight,
-                  helpers: helpers,
-                  source: source,
-                  timeout: timeout,
-                },
-                resolve
-              );
+              pm({
+                captcha: captcha,
+                data: images,
+                allURLs: allURLs,
+                allPosts: allPosts,
+                weight: weight,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              });
             }
           });
       } else {
@@ -961,26 +906,23 @@ const loadImageFapGallery = (
           helpers.count = source.count;
           captcha = galleryURL;
           images = allURLs.get(source.url);
-          pm({ warning: source.url + " - blocked due to captcha" }, resolve);
+          pm({ warning: source.url + " - blocked due to captcha" });
         } else {
           onFinishedLoading(helpers);
         }
-        pm(
-          {
-            captcha: captcha,
-            data: images,
-            allURLs: allURLs,
-            allPosts: allPosts,
-            weight: weight,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve
-        );
+        pm({
+          captcha: captcha,
+          data: images,
+          allURLs: allURLs,
+          allPosts: allPosts,
+          weight: weight,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        });
       }
       const nextGalleryLink = galleryWindow.document.querySelector(
-        "#gallery > font > span > a:last-child"
+        "#gallery > font > span > a:last-child",
       );
       if (nextGalleryLink && nextGalleryLink.innerHTML == ":: next ::") {
         let href = nextGalleryLink.href;
@@ -1001,24 +943,20 @@ const loadImageFapGallery = (
               images,
               baseGalleryURL,
               onFinishedLoading,
-              resolve
             ),
-          2000
+          2000,
         );
       } else {
         onFinishedLoading(helpers);
-        pm(
-          {
-            data: filterPathsToJustPlayable(filter, images, false),
-            allURLs: allURLs,
-            allPosts: allPosts,
-            weight: weight,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve
-        );
+        pm({
+          data: filterPathsToJustPlayable(filter, images, false),
+          allURLs: allURLs,
+          allPosts: allPosts,
+          weight: weight,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        });
       }
     });
 };
@@ -1031,7 +969,6 @@ export const loadImageFap = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve?: Function,
 ) => {
   const timeout = 8000;
   const url = source.url;
@@ -1051,7 +988,6 @@ export const loadImageFap = (
       images,
       baseGalleryURL,
       (h) => (h.next = null),
-      resolve,
     );
   } else if (url.includes("/organizer/")) {
     if (helpers.next == 0) {
@@ -1061,132 +997,116 @@ export const loadImageFap = (
       .get()
       .setTimeout(10000)
       .onAbort((e) =>
-        pm(
-          {
-            error: e.message,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve,
-        ),
+        pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }),
       )
       .text((html) => {
-        // const albumEls = new JSDOM(html, {
-        //   contentType: 'text/html'
-        // }).window.document.querySelectorAll(
-        //   'td.blk_galleries > font > a.blk_galleries'
-        // );
-        // if (albumEls.length == 0) {
-        //   let captcha = undefined;
-        //   if (html.includes("Enter the captcha")) {
-        //     helpers.count = source.count;
-        //     captcha = "https://www.imagefap.com/gallery/" + getFileGroup(url) + "?view=2";
-        //     pm({warning: source.url + " - blocked due to captcha"}, resolve);
-        //   }
-        //   helpers.next = null;
-        //   pm(
-        //     {
-        //       captcha: captcha,
-        //       data: [],
-        //       allURLs: allURLs,
-        //       allPosts: allPosts,
-        //       weight: weight,
-        //       helpers: helpers,
-        //       source: source,
-        //       timeout: timeout,
-        //     },
-        //     resolve
-        //   );
-        // } else if (albumEls.length > helpers.next[1]) {
-        //   let albumEl = albumEls[helpers.next[1]];
-        //   let albumID = albumEl
-        //     .getAttribute("href")
-        //     .substring(albumEl.getAttribute("href").lastIndexOf("/") + 1);
-        //   let images = Array<string>();
-        //   const baseGalleryURL = "https://www.imagefap.com/gallery/" + albumID;
-        //   loadImageFapGallery(
-        //     baseGalleryURL + "?gid=" + albumID + "&view=0",
-        //     allURLs,
-        //     allPosts,
-        //     source,
-        //     filter,
-        //     weight,
-        //     helpers,
-        //     timeout,
-        //     images,
-        //     baseGalleryURL,
-        //     (h) => h.next[1] += 1,
-        //     resolve
-        //   );
-        // } else {
-        //   let images = Array<string>();
-        //   let captcha = undefined;
-        //   if (html.includes("Enter the captcha")) {
-        //     helpers.count = source.count;
-        //     captcha =
-        //       "https://www.imagefap.com/gallery/" +
-        //       getFileGroup(url) +
-        //       "?view=0";
-        //     images = allURLs.get(url);
-        //     pm({ warning: source.url + " - blocked due to captcha" }, resolve);
-        //   } else {
-        //     helpers.next[0] += 1;
-        //     helpers.next[1] = 0;
-        //   }
-        //   pm(
-        //     {
-        //       captcha: captcha,
-        //       data: images,
-        //       allURLs: allURLs,
-        //       allPosts: allPosts,
-        //       weight: weight,
-        //       helpers: helpers,
-        //       source: source,
-        //       timeout: timeout,
-        //     },
-        //     resolve
-        //   );
-        // }
-      })
-      .catch((e) => {
-        pm(
-          {
-            error: e.message,
+        const albumEls = new JSDOM(html, {
+          contentType: "text/html",
+        }).window.document.querySelectorAll(
+          "td.blk_galleries > font > a.blk_galleries",
+        );
+        if (albumEls.length == 0) {
+          let captcha = undefined;
+          if (html.includes("Enter the captcha")) {
+            helpers.count = source.count;
+            captcha =
+              "https://www.imagefap.com/gallery/" +
+              getFileGroup(url) +
+              "?view=2";
+            pm({ warning: source.url + " - blocked due to captcha" });
+          }
+          helpers.next = null;
+          pm({
+            captcha: captcha,
+            data: [],
+            allURLs: allURLs,
+            allPosts: allPosts,
+            weight: weight,
             helpers: helpers,
             source: source,
             timeout: timeout,
-          },
-          resolve,
-        );
+          });
+        } else if (albumEls.length > helpers.next[1]) {
+          let albumEl = albumEls[helpers.next[1]];
+          let albumID = albumEl
+            .getAttribute("href")
+            .substring(albumEl.getAttribute("href").lastIndexOf("/") + 1);
+          let images = Array<string>();
+          const baseGalleryURL = "https://www.imagefap.com/gallery/" + albumID;
+          loadImageFapGallery(
+            baseGalleryURL + "?gid=" + albumID + "&view=0",
+            allURLs,
+            allPosts,
+            source,
+            filter,
+            weight,
+            helpers,
+            timeout,
+            images,
+            baseGalleryURL,
+            (h) => (h.next[1] += 1),
+          );
+        } else {
+          let images = Array<string>();
+          let captcha = undefined;
+          if (html.includes("Enter the captcha")) {
+            helpers.count = source.count;
+            captcha =
+              "https://www.imagefap.com/gallery/" +
+              getFileGroup(url) +
+              "?view=0";
+            images = allURLs.get(url);
+            pm({ warning: source.url + " - blocked due to captcha" });
+          } else {
+            helpers.next[0] += 1;
+            helpers.next[1] = 0;
+          }
+          pm({
+            captcha: captcha,
+            data: images,
+            allURLs: allURLs,
+            allPosts: allPosts,
+            weight: weight,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          });
+        }
+      })
+      .catch((e) => {
+        pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        });
       });
   } else if (url.includes("/video.php?vid=")) {
     helpers.next = null;
-    pm(
-      {
-        data: [],
-        allURLs: allURLs,
-        allPosts: allPosts,
-        weight: weight,
-        helpers: helpers,
-        source: source,
-        timeout: timeout,
-      },
-      resolve,
-    );
+    pm({
+      data: [],
+      allURLs: allURLs,
+      allPosts: allPosts,
+      weight: weight,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    });
     wretch(url)
       .get()
       .setTimeout(10000)
       .onAbort((e) =>
-        pm(
-          {
-            error: e.message,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve,
-        ),
+        pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }),
       )
       .text((html) => {
         const foundVideoConfigURLs =
@@ -1199,30 +1119,29 @@ export const loadImageFap = (
             .get()
             .setTimeout(10000)
             .onAbort((e) =>
-              pm(
-                {
-                  error: e.message,
-                  helpers: helpers,
-                  source: source,
-                  timeout: timeout,
-                },
-                resolve,
-              ),
+              pm({
+                error: e.message,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              }),
             )
             .text((xml) => {
               // Get highest resolution video link
               let res = 0;
               let videoLink = "";
               const videoQualities = new JSDOM(xml, {
-                  contentType: 'application/xml'
-                }).window.document.querySelectorAll('flixV2 > quality > item');
-                for (let i = 0; i < videoQualities.length; i++) {
+                contentType: "application/xml",
+              }).window.document.querySelectorAll("flixV2 > quality > item");
+              for (let i = 0; i < videoQualities.length; i++) {
                 const quality = videoQualities.item(i);
-                const newResText = quality.querySelector('res').innerHTML.slice(0, -1);
+                const newResText = quality
+                  .querySelector("res")
+                  .innerHTML.slice(0, -1);
                 const newRes = Number(newResText);
-                if(newRes > res) {
+                if (newRes > res) {
                   res = newRes;
-                  videoLink = quality.querySelector('videoLink').textContent;
+                  videoLink = quality.querySelector("videoLink").textContent;
                 }
               }
 
@@ -1234,49 +1153,40 @@ export const loadImageFap = (
               }
 
               helpers.next = null;
-              pm(
-                {
-                  data,
-                  allURLs: allURLs,
-                  allPosts: allPosts,
-                  weight: weight,
-                  helpers: helpers,
-                  source: source,
-                  timeout: timeout,
-                },
-                resolve,
-              );
+              pm({
+                data,
+                allURLs: allURLs,
+                allPosts: allPosts,
+                weight: weight,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              });
             });
         } else {
           helpers.next = null;
-          pm(
-            {
-              data: [],
-              allURLs: allURLs,
-              allPosts: allPosts,
-              weight: weight,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            },
-            resolve,
-          );
+          pm({
+            data: [],
+            allURLs: allURLs,
+            allPosts: allPosts,
+            weight: weight,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          });
         }
       });
   } else {
     helpers.next = null;
-    pm(
-      {
-        data: [],
-        allURLs: allURLs,
-        allPosts: allPosts,
-        weight: weight,
-        helpers: helpers,
-        source: source,
-        timeout: timeout,
-      },
-      resolve,
-    );
+    pm({
+      data: [],
+      allURLs: allURLs,
+      allPosts: allPosts,
+      weight: weight,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    });
   }
 };
 
@@ -1288,24 +1198,20 @@ export const loadSexCom = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve?: Function,
 ) => {
   const timeout = 8000;
   const url = source.url;
   // This doesn't work anymore due to src url requiring referer
   helpers.next = null;
-  pm(
-    {
-      data: [],
-      allURLs: allURLs,
-      allPosts: allPosts,
-      weight: weight,
-      helpers: helpers,
-      source: source,
-      timeout: timeout,
-    },
-    resolve,
-  );
+  pm({
+    data: [],
+    allURLs: allURLs,
+    allPosts: allPosts,
+    weight: weight,
+    helpers: helpers,
+    source: source,
+    timeout: timeout,
+  });
   /*let requestURL;
   if (url.includes("/user/")) {
     requestURL = "https://www.sex.com/user/" + getFileGroup(url) + "?page=" + (helpers.next + 1);
@@ -1320,13 +1226,13 @@ export const loadSexCom = (
       helpers: helpers,
       source: source,
       timeout: timeout,
-    }, resolve))
+    }))
     .notFound((e) => pm({
       error: e.message,
       helpers: helpers,
       source: source,
       timeout: timeout,
-    }, resolve))
+    }))
     .text((html) => {
       let imageEls = domino.createWindow(html).document.querySelectorAll(".small_pin_box > .image_wrapper > img");
       if (imageEls.length > 0) {
@@ -1351,7 +1257,7 @@ export const loadSexCom = (
             helpers: helpers,
             source: source,
             timeout: timeout,
-          }, resolve);
+          });
         } else {
           const validImages = filterPathsToJustPlayable(filter, images, false);
           images = [];
@@ -1365,13 +1271,13 @@ export const loadSexCom = (
                 helpers: helpers,
                 source: source,
                 timeout: timeout,
-              }, resolve))
+              }))
               .notFound((e) => pm({
                 error: e.message,
                 helpers: helpers,
                 source: source,
                 timeout: timeout,
-              }, resolve))
+              }))
               .text((html) => {
                 count += 1;
 
@@ -1405,7 +1311,7 @@ export const loadSexCom = (
                     helpers: helpers,
                     source: source,
                     timeout: timeout,
-                  }, resolve);
+                  });
                 }
               });
           }
@@ -1420,7 +1326,7 @@ export const loadSexCom = (
           helpers: helpers,
           source: source,
           timeout: timeout,
-        }, resolve);
+        });
       }
     });*/
 };
@@ -1433,15 +1339,16 @@ export const loadImgur = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve?: Function,
 ) => {
   const timeout = 3000;
   const url = source.url;
-  imgur.getAlbumInfo(getFileGroup(url))
+  imgur
+    .getAlbumInfo(getFileGroup(url))
     .then((json: any) => {
       const images = json.data.images.map((i: any) => i.link);
       helpers.next = null;
-      helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+      helpers.count =
+        helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
       pm({
         data: filterPathsToJustPlayable(filter, images, true),
         allURLs: allURLs,
@@ -1450,7 +1357,7 @@ export const loadImgur = (
         helpers: helpers,
         source: source,
         timeout: timeout,
-      }, resolve);
+      });
     })
     .catch((err: any) => {
       pm({
@@ -1458,7 +1365,7 @@ export const loadImgur = (
         helpers: helpers,
         source: source,
         timeout: timeout,
-      }, resolve);
+      });
     });
 };
 
@@ -1470,7 +1377,6 @@ export const loadDeviantArt = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve?: Function,
 ) => {
   const timeout = 3000;
   const url = source.url;
@@ -1483,26 +1389,20 @@ export const loadDeviantArt = (
     .get()
     .setTimeout(5000)
     .onAbort((e) =>
-      pm(
-        {
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      ),
+      pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }),
     )
     .notFound((e) =>
-      pm(
-        {
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      ),
+      pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }),
     )
     .text((text) => {
       const xml = new DOMParser().parseFromString(text, "text/xml");
@@ -1528,18 +1428,15 @@ export const loadDeviantArt = (
       }
       helpers.count =
         helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
-      pm(
-        {
-          data: filterPathsToJustPlayable(filter, images, false),
-          allURLs: allURLs,
-          allPosts: allPosts,
-          weight: weight,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      );
+      pm({
+        data: filterPathsToJustPlayable(filter, images, false),
+        allURLs: allURLs,
+        allPosts: allPosts,
+        weight: weight,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      });
     });
 };
 
@@ -1551,7 +1448,6 @@ export const loadE621 = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve?: Function,
 ) => {
   const timeout = 8000;
   const url = source.url;
@@ -1566,75 +1462,57 @@ export const loadE621 = (
       .get()
       .setTimeout(5000)
       .badRequest((e) =>
-        pm(
-          {
-            error: e.message,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve,
-        ),
+        pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }),
       )
       .notFound((e) =>
-        pm(
-          {
-            error: e.message,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve,
-        ),
+        pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }),
       )
       .timeout((e) =>
-        pm(
-          {
-            error: e.message,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve,
-        ),
+        pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }),
       )
       .internalError((e) =>
-        pm(
-          {
-            error: e.message,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve,
-        ),
+        pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }),
       )
       .onAbort((e) =>
-        pm(
-          {
-            error: e.message,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve,
-        ),
+        pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }),
       )
       .json((json: any) => {
         if (json.length == 0) {
           helpers.next = null;
-          pm(
-            {
-              data: [],
-              allURLs: allURLs,
-              allPosts: allPosts,
-              weight: weight,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            },
-            resolve,
-          );
+          pm({
+            data: [],
+            allURLs: allURLs,
+            allPosts: allPosts,
+            weight: weight,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          });
           return;
         }
 
@@ -1646,59 +1524,44 @@ export const loadE621 = (
             .get()
             .setTimeout(5000)
             .badRequest((e) =>
-              pm(
-                {
-                  error: e.message,
-                  helpers: helpers,
-                  source: source,
-                  timeout: timeout,
-                },
-                resolve,
-              ),
+              pm({
+                error: e.message,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              }),
             )
             .notFound((e) =>
-              pm(
-                {
-                  error: e.message,
-                  helpers: helpers,
-                  source: source,
-                  timeout: timeout,
-                },
-                resolve,
-              ),
+              pm({
+                error: e.message,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              }),
             )
             .timeout((e) =>
-              pm(
-                {
-                  error: e.message,
-                  helpers: helpers,
-                  source: source,
-                  timeout: timeout,
-                },
-                resolve,
-              ),
+              pm({
+                error: e.message,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              }),
             )
             .internalError((e) =>
-              pm(
-                {
-                  error: e.message,
-                  helpers: helpers,
-                  source: source,
-                  timeout: timeout,
-                },
-                resolve,
-              ),
+              pm({
+                error: e.message,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              }),
             )
             .onAbort((e) =>
-              pm(
-                {
-                  error: e.message,
-                  helpers: helpers,
-                  source: source,
-                  timeout: timeout,
-                },
-                resolve,
-              ),
+              pm({
+                error: e.message,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              }),
             )
             .json((json: any) => {
               if (json.post && json.post.file.url) {
@@ -1714,43 +1577,34 @@ export const loadE621 = (
                 helpers.count =
                   helpers.count +
                   filterPathsToJustPlayable(IF.any, images, true).length;
-                pm(
-                  {
-                    data: filterPathsToJustPlayable(filter, images, true),
-                    allURLs: allURLs,
-                    allPosts: allPosts,
-                    weight: weight,
-                    helpers: helpers,
-                    source: source,
-                    timeout: timeout,
-                  },
-                  resolve,
-                );
-              }
-            })
-            .catch((e) =>
-              pm(
-                {
-                  error: e.message,
+                pm({
+                  data: filterPathsToJustPlayable(filter, images, true),
+                  allURLs: allURLs,
+                  allPosts: allPosts,
+                  weight: weight,
                   helpers: helpers,
                   source: source,
                   timeout: timeout,
-                },
-                resolve,
-              ),
+                });
+              }
+            })
+            .catch((e) =>
+              pm({
+                error: e.message,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              }),
             );
         }
       })
       .catch((e) =>
-        pm(
-          {
-            error: e.message,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve,
-        ),
+        pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }),
       );
   } else {
     suffix = "/posts.json?limit=20&page=" + (helpers.next + 1);
@@ -1764,75 +1618,57 @@ export const loadE621 = (
       .get()
       .setTimeout(5000)
       .badRequest((e) =>
-        pm(
-          {
-            error: e.message,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve,
-        ),
+        pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }),
       )
       .notFound((e) =>
-        pm(
-          {
-            error: e.message,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve,
-        ),
+        pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }),
       )
       .timeout((e) =>
-        pm(
-          {
-            error: e.message,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve,
-        ),
+        pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }),
       )
       .internalError((e) =>
-        pm(
-          {
-            error: e.message,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve,
-        ),
+        pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }),
       )
       .onAbort((e) =>
-        pm(
-          {
-            error: e.message,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve,
-        ),
+        pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }),
       )
       .json((json: any) => {
         if (json.length == 0) {
           helpers.next = null;
-          pm(
-            {
-              data: [],
-              allURLs: allURLs,
-              allPosts: allPosts,
-              weight: weight,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            },
-            resolve,
-          );
+          pm({
+            data: [],
+            allURLs: allURLs,
+            allPosts: allPosts,
+            weight: weight,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          });
         }
 
         let list = json.posts;
@@ -1851,29 +1687,23 @@ export const loadE621 = (
         helpers.count =
           helpers.count +
           filterPathsToJustPlayable(IF.any, images, true).length;
-        pm(
-          {
-            data: filterPathsToJustPlayable(filter, images, true),
-            allURLs: allURLs,
-            allPosts: allPosts,
-            weight: weight,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve,
-        );
+        pm({
+          data: filterPathsToJustPlayable(filter, images, true),
+          allURLs: allURLs,
+          allPosts: allPosts,
+          weight: weight,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        });
       })
       .catch((e) =>
-        pm(
-          {
-            error: e.message,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve,
-        ),
+        pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }),
       );
   }
 };
@@ -1886,7 +1716,6 @@ export const loadDanbooru = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve?: Function,
 ) => {
   const timeout = 8000;
   const url = source.url;
@@ -1920,65 +1749,64 @@ export const loadDanbooru = (
     .get()
     .setTimeout(5000)
     .badRequest((e) =>
-      pm(
-        {
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      ),
+      pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }),
     )
     .notFound((e) =>
-      pm(
-        {
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      ),
+      pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }),
     )
     .timeout((e) =>
-      pm(
-        {
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      ),
+      pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }),
     )
     .internalError((e) =>
-      pm(
-        {
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      ),
+      pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }),
     )
     .onAbort((e) =>
-      pm(
-        {
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      ),
+      pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }),
     )
     .json((json: any) => {
       if (json.length == 0) {
         helpers.next = null;
-        pm(
-          {
+        pm({
+          data: [],
+          allURLs: allURLs,
+          allPosts: allPosts,
+          weight: weight,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        });
+        return;
+      }
+
+      if (json.post_ids) {
+        if (json.post_ids.length == 0) {
+          helpers.next = null;
+          pm({
             data: [],
             allURLs: allURLs,
             allPosts: allPosts,
@@ -1986,27 +1814,7 @@ export const loadDanbooru = (
             helpers: helpers,
             source: source,
             timeout: timeout,
-          },
-          resolve,
-        );
-        return;
-      }
-
-      if (json.post_ids) {
-        if (json.post_ids.length == 0) {
-          helpers.next = null;
-          pm(
-            {
-              data: [],
-              allURLs: allURLs,
-              allPosts: allPosts,
-              weight: weight,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            },
-            resolve,
-          );
+          });
           return;
         }
 
@@ -2019,59 +1827,44 @@ export const loadDanbooru = (
             .get()
             .setTimeout(5000)
             .badRequest((e) =>
-              pm(
-                {
-                  error: e.message,
-                  helpers: helpers,
-                  source: source,
-                  timeout: timeout,
-                },
-                resolve,
-              ),
+              pm({
+                error: e.message,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              }),
             )
             .notFound((e) =>
-              pm(
-                {
-                  error: e.message,
-                  helpers: helpers,
-                  source: source,
-                  timeout: timeout,
-                },
-                resolve,
-              ),
+              pm({
+                error: e.message,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              }),
             )
             .timeout((e) =>
-              pm(
-                {
-                  error: e.message,
-                  helpers: helpers,
-                  source: source,
-                  timeout: timeout,
-                },
-                resolve,
-              ),
+              pm({
+                error: e.message,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              }),
             )
             .internalError((e) =>
-              pm(
-                {
-                  error: e.message,
-                  helpers: helpers,
-                  source: source,
-                  timeout: timeout,
-                },
-                resolve,
-              ),
+              pm({
+                error: e.message,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              }),
             )
             .onAbort((e) =>
-              pm(
-                {
-                  error: e.message,
-                  helpers: helpers,
-                  source: source,
-                  timeout: timeout,
-                },
-                resolve,
-              ),
+              pm({
+                error: e.message,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              }),
             )
             .json((json: any) => {
               images.push(json.file_url);
@@ -2084,32 +1877,26 @@ export const loadDanbooru = (
                 helpers.count =
                   helpers.count +
                   filterPathsToJustPlayable(IF.any, images, true).length;
-                pm(
-                  {
-                    data: filterPathsToJustPlayable(filter, images, true),
-                    allURLs: allURLs,
-                    allPosts: allPosts,
-                    weight: weight,
-                    helpers: helpers,
-                    source: source,
-                    timeout: timeout,
-                  },
-                  resolve,
-                );
+                pm({
+                  data: filterPathsToJustPlayable(filter, images, true),
+                  allURLs: allURLs,
+                  allPosts: allPosts,
+                  weight: weight,
+                  helpers: helpers,
+                  source: source,
+                  timeout: timeout,
+                });
               } else {
                 setTimeout(getPost, 200);
               }
             })
             .catch((e) =>
-              pm(
-                {
-                  error: e.message,
-                  helpers: helpers,
-                  source: source,
-                  timeout: timeout,
-                },
-                resolve,
-              ),
+              pm({
+                error: e.message,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              }),
             );
         };
         setTimeout(getPost, 200);
@@ -2129,30 +1916,24 @@ export const loadDanbooru = (
         helpers.count =
           helpers.count +
           filterPathsToJustPlayable(IF.any, images, true).length;
-        pm(
-          {
-            data: filterPathsToJustPlayable(filter, images, true),
-            allURLs: allURLs,
-            allPosts: allPosts,
-            weight: weight,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve,
-        );
-      }
-    })
-    .catch((e) =>
-      pm(
-        {
-          error: e.message,
+        pm({
+          data: filterPathsToJustPlayable(filter, images, true),
+          allURLs: allURLs,
+          allPosts: allPosts,
+          weight: weight,
           helpers: helpers,
           source: source,
           timeout: timeout,
-        },
-        resolve,
-      ),
+        });
+      }
+    })
+    .catch((e) =>
+      pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }),
     );
 };
 
@@ -2164,7 +1945,6 @@ export const loadGelbooru1 = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve?: Function,
 ) => {
   const timeout = 8000;
   const url = source.url;
@@ -2174,42 +1954,33 @@ export const loadGelbooru1 = (
     .get()
     .setTimeout(5000)
     .onAbort((e) =>
-      pm(
-        {
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      ),
+      pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }),
     )
     .notFound((e) =>
-      pm(
-        {
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      ),
+      pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }),
     )
     .error(503, (e) =>
-      pm(
-        {
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      ),
+      pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }),
     )
     .text((html) => {
       const imageEls = new JSDOM(html, {
-        contentType: 'text/html'
-      }).window.document.querySelectorAll('span.thumb > a');
+        contentType: "text/html",
+      }).window.document.querySelectorAll("span.thumb > a");
       if (imageEls.length > 0) {
         let imageCount = 0;
         let images = Array<string>();
@@ -2221,39 +1992,49 @@ export const loadGelbooru1 = (
           wretch(link)
             .get()
             .setTimeout(5000)
-            .onAbort((e) => pm({
-              error: e.message,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            }, resolve))
-            .notFound((e) => pm({
-              error: e.message,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            }, resolve))
-            .error(503, (e) => pm({
-              error: e.message,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            }, resolve))
+            .onAbort((e) =>
+              pm({
+                error: e.message,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              }),
+            )
+            .notFound((e) =>
+              pm({
+                error: e.message,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              }),
+            )
+            .error(503, (e) =>
+              pm({
+                error: e.message,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              }),
+            )
             .text((html) => {
               imageCount++;
-              let contentURL = html.match("<img[^>]*id=\"?image\"?[^>]*src=\"([^\"]*)\"");
+              let contentURL = html.match(
+                '<img[^>]*id="?image"?[^>]*src="([^"]*)"',
+              );
               if (contentURL != null) {
                 let url = contentURL[1];
                 if (url.startsWith("//")) url = "http:" + url;
                 images.push(url);
               }
-              contentURL = html.match("<img[^>]*src=\"([^\"]*)\"[^>]*id=\"?image\"?");
+              contentURL = html.match(
+                '<img[^>]*src="([^"]*)"[^>]*id="?image"?',
+              );
               if (contentURL != null) {
                 let url = contentURL[1];
                 if (url.startsWith("//")) url = "http:" + url;
                 images.push(url);
               }
-              contentURL = html.match("<video[^>]*src=\"([^\"]*)\"");
+              contentURL = html.match('<video[^>]*src="([^"]*)"');
               if (contentURL != null) {
                 let url = contentURL[1];
                 if (url.startsWith("//")) url = "http:" + url;
@@ -2261,7 +2042,9 @@ export const loadGelbooru1 = (
               }
               if (imageCount == imageEls.length || imageCount == 10) {
                 helpers.next = helpers.next + 1;
-                helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, false).length;
+                helpers.count =
+                  helpers.count +
+                  filterPathsToJustPlayable(IF.any, images, false).length;
                 pm({
                   data: filterPathsToJustPlayable(filter, images, false),
                   allURLs: allURLs,
@@ -2270,11 +2053,11 @@ export const loadGelbooru1 = (
                   helpers: helpers,
                   source: source,
                   timeout: timeout,
-                }, resolve);
+                });
               }
             });
           if (index < imageEls.length - 1 && index < 9) {
-            setTimeout(getImage.bind(null, index+1), 1000);
+            setTimeout(getImage.bind(null, index + 1), 1000);
           }
         };
         setTimeout(getImage.bind(null, 0), 1000);
@@ -2288,7 +2071,7 @@ export const loadGelbooru1 = (
           helpers: helpers,
           source: source,
           timeout: timeout,
-        }, resolve);
+        });
       }
     });
 };
@@ -2301,7 +2084,6 @@ export const loadGelbooru2 = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve?: Function,
 ) => {
   const timeout = 8000;
   const url = source.url;
@@ -2319,75 +2101,57 @@ export const loadGelbooru2 = (
     .get()
     .setTimeout(5000)
     .badRequest((e) =>
-      pm(
-        {
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      ),
+      pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }),
     )
     .notFound((e) =>
-      pm(
-        {
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      ),
+      pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }),
     )
     .timeout((e) =>
-      pm(
-        {
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      ),
+      pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }),
     )
     .internalError((e) =>
-      pm(
-        {
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      ),
+      pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }),
     )
     .onAbort((e) =>
-      pm(
-        {
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      ),
+      pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }),
     )
     .json((json: any) => {
       if (json.length == 0) {
         helpers.next = null;
-        pm(
-          {
-            data: [],
-            allURLs: allURLs,
-            allPosts: allPosts,
-            weight: weight,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve,
-        );
+        pm({
+          data: [],
+          allURLs: allURLs,
+          allPosts: allPosts,
+          weight: weight,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        });
       }
 
       const images = Array<string>();
@@ -2402,29 +2166,23 @@ export const loadGelbooru2 = (
       helpers.next = helpers.next + 1;
       helpers.count =
         helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
-      pm(
-        {
-          data: filterPathsToJustPlayable(filter, images, true),
-          allURLs: allURLs,
-          allPosts: allPosts,
-          weight: weight,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      );
+      pm({
+        data: filterPathsToJustPlayable(filter, images, true),
+        allURLs: allURLs,
+        allPosts: allPosts,
+        weight: weight,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      });
     })
     .catch((e) =>
-      pm(
-        {
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      ),
+      pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }),
     );
 };
 
@@ -2436,7 +2194,6 @@ export const loadEHentai = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve?: Function,
 ) => {
   const timeout = 8000;
   const url = source.url;
@@ -2444,60 +2201,60 @@ export const loadEHentai = (
     .get()
     .setTimeout(5000)
     .onAbort((e) =>
-      pm(
-        {
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      ),
+      pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }),
     )
     .notFound((e) =>
-      pm(
-        {
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      ),
+      pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }),
     )
     .text((html) => {
       const imageEls = new JSDOM(html, {
-        contentType: 'text/html'
-      }).window.document.querySelectorAll('#gdt > .gdtm > div > a');
+        contentType: "text/html",
+      }).window.document.querySelectorAll("#gdt > .gdtm > div > a");
       if (imageEls.length > 0) {
         let imageCount = 0;
         let images = Array<string>();
         for (let i = 0; i < imageEls.length; i++) {
-          const image = imageEls.item(i)
+          const image = imageEls.item(i);
           wretch(image.getAttribute("href"))
             .get()
             .setTimeout(5000)
-            .onAbort((e) => pm({
-              error: e.message,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            }, resolve))
-            .notFound((e) => pm({
-              error: e.message,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            }, resolve))
+            .onAbort((e) =>
+              pm({
+                error: e.message,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              }),
+            )
+            .notFound((e) =>
+              pm({
+                error: e.message,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              }),
+            )
             .text((html) => {
               imageCount++;
-              let contentURL = html.match("<img id=\"img\" src=\"(.*?)\"");
+              let contentURL = html.match('<img id="img" src="(.*?)"');
               if (contentURL != null) {
                 images.push(contentURL[1]);
               }
               if (imageCount == imageEls.length) {
                 helpers.next = helpers.next + 1;
-                helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+                helpers.count =
+                  helpers.count +
+                  filterPathsToJustPlayable(IF.any, images, true).length;
                 pm({
                   data: filterPathsToJustPlayable(filter, images, true),
                   allURLs: allURLs,
@@ -2506,9 +2263,9 @@ export const loadEHentai = (
                   helpers: helpers,
                   source: source,
                   timeout: timeout,
-                }, resolve);
+                });
               }
-            })
+            });
         }
       } else {
         helpers.next = null;
@@ -2520,7 +2277,7 @@ export const loadEHentai = (
           helpers: helpers,
           source: source,
           timeout: timeout,
-        }, resolve);
+        });
       }
     });
 };
@@ -2533,7 +2290,6 @@ export const loadLuscious = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve?: Function,
 ) => {
   const timeout = 5000;
   const url = source.url;
@@ -2583,26 +2339,20 @@ export const loadLuscious = (
       .post()
       .setTimeout(5000)
       .onAbort((e) =>
-        pm(
-          {
-            error: e.message,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve,
-        ),
+        pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }),
       )
       .notFound((e) =>
-        pm(
-          {
-            error: e.message,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve,
-        ),
+        pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }),
       )
       .json((json) => {
         const hasNextPage = json.data.picture.list.info.has_next_page;
@@ -2616,44 +2366,35 @@ export const loadLuscious = (
           helpers.next = hasNextPage ? helpers.next + 1 : null;
           helpers.count = totalItems;
           // If cdnio image server goes down, use this: filterPathsToJustPlayable(filter, images, true).map((s) => s.replace('cdnio.', 'w1680.')),
-          pm(
-            {
-              data: filterPathsToJustPlayable(filter, images, true),
-              allURLs: allURLs,
-              allPosts: allPosts,
-              weight: weight,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            },
-            resolve,
-          );
-        } else {
-          helpers.next = null;
-          pm(
-            {
-              data: [],
-              allURLs: allURLs,
-              allPosts: allPosts,
-              weight: weight,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            },
-            resolve,
-          );
-        }
-      })
-      .catch((e) =>
-        pm(
-          {
-            error: e.message,
+          pm({
+            data: filterPathsToJustPlayable(filter, images, true),
+            allURLs: allURLs,
+            allPosts: allPosts,
+            weight: weight,
             helpers: helpers,
             source: source,
             timeout: timeout,
-          },
-          resolve,
-        ),
+          });
+        } else {
+          helpers.next = null;
+          pm({
+            data: [],
+            allURLs: allURLs,
+            allPosts: allPosts,
+            weight: weight,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          });
+        }
+      })
+      .catch((e) =>
+        pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }),
       );
   } else {
     const id = getFileGroup(url);
@@ -2701,26 +2442,20 @@ export const loadLuscious = (
       .post()
       .setTimeout(5000)
       .onAbort((e) =>
-        pm(
-          {
-            error: e.message,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve,
-        ),
+        pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }),
       )
       .notFound((e) =>
-        pm(
-          {
-            error: e.message,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve,
-        ),
+        pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }),
       )
       .json((json) => {
         const userHasNextPage = json.data.album.list.info.has_next_page;
@@ -2770,26 +2505,20 @@ export const loadLuscious = (
             .post()
             .setTimeout(5000)
             .onAbort((e) =>
-              pm(
-                {
-                  error: e.message,
-                  helpers: helpers,
-                  source: source,
-                  timeout: timeout,
-                },
-                resolve,
-              ),
+              pm({
+                error: e.message,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              }),
             )
             .notFound((e) =>
-              pm(
-                {
-                  error: e.message,
-                  helpers: helpers,
-                  source: source,
-                  timeout: timeout,
-                },
-                resolve,
-              ),
+              pm({
+                error: e.message,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              }),
             )
             .json((json) => {
               const hasNextPage = json.data.picture.list.info.has_next_page;
@@ -2818,71 +2547,56 @@ export const loadLuscious = (
                 helpers.count =
                   helpers.count +
                   filterPathsToJustPlayable(IF.any, images, true).length;
-                pm(
-                  {
-                    data: filterPathsToJustPlayable(filter, images, true),
-                    allURLs: allURLs,
-                    allPosts: allPosts,
-                    weight: weight,
-                    helpers: helpers,
-                    source: source,
-                    timeout: timeout,
-                  },
-                  resolve,
-                );
-              } else {
-                pm(
-                  {
-                    data: [],
-                    allURLs: allURLs,
-                    allPosts: allPosts,
-                    weight: weight,
-                    helpers: helpers,
-                    source: source,
-                    timeout: timeout,
-                  },
-                  resolve,
-                );
-              }
-            })
-            .catch((e) =>
-              pm(
-                {
-                  error: e.message,
+                pm({
+                  data: filterPathsToJustPlayable(filter, images, true),
+                  allURLs: allURLs,
+                  allPosts: allPosts,
+                  weight: weight,
                   helpers: helpers,
                   source: source,
                   timeout: timeout,
-                },
-                resolve,
-              ),
+                });
+              } else {
+                pm({
+                  data: [],
+                  allURLs: allURLs,
+                  allPosts: allPosts,
+                  weight: weight,
+                  helpers: helpers,
+                  source: source,
+                  timeout: timeout,
+                });
+              }
+            })
+            .catch((e) =>
+              pm({
+                error: e.message,
+                helpers: helpers,
+                source: source,
+                timeout: timeout,
+              }),
             );
         } else {
           helpers.next = null;
-          pm(
-            {
-              warning: json,
-              data: [],
-              allURLs: allURLs,
-              allPosts: allPosts,
-              weight: weight,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            },
-            resolve,
-          );
-        }
-      })
-      .catch((e) =>
-        pm(
-          {
-            error: e.message,
+          pm({
+            warning: json,
+            data: [],
+            allURLs: allURLs,
+            allPosts: allPosts,
+            weight: weight,
             helpers: helpers,
             source: source,
             timeout: timeout,
-          },
-          resolve,
-        ),
+          });
+        }
+      })
+      .catch((e) =>
+        pm({
+          error: e.message,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        }),
       );
   }
 };
@@ -2895,7 +2609,6 @@ export const loadBDSMlr = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve?: Function,
 ) => {
   const timeout = 8000;
   let url = source.url;
@@ -2905,27 +2618,21 @@ export const loadBDSMlr = (
   const retry = () => {
     if (helpers.retries < 3) {
       helpers.retries += 1;
-      pm(
-        {
-          data: [],
-          allURLs: allURLs,
-          allPosts: allPosts,
-          weight: weight,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      );
+      pm({
+        data: [],
+        allURLs: allURLs,
+        allPosts: allPosts,
+        weight: weight,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      });
     } else {
-      pm(
-        {
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      );
+      pm({
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      });
     }
   };
   wretch(url + "/rss?page=" + (helpers.next + 1))
@@ -2933,22 +2640,19 @@ export const loadBDSMlr = (
     .setTimeout(5000)
     .onAbort(retry)
     .notFound((e) =>
-      pm(
-        {
-          error: e.message,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      ),
+      pm({
+        error: e.message,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      }),
     )
     .internalError(retry)
     .text((html) => {
       helpers.retries = 0;
       const itemEls = new JSDOM(html, {
-        contentType: 'application/xml'
-      }).window.document.querySelectorAll('item')
+        contentType: "application/xml",
+      }).window.document.querySelectorAll("item");
       if (itemEls.length > 0) {
         let imageCount = 0;
         let images = Array<string>();
@@ -2963,7 +2667,9 @@ export const loadBDSMlr = (
           }
         }
         helpers.next = helpers.next + 1;
-        helpers.count = helpers.count + filterPathsToJustPlayable(IF.any, images, true).length;
+        helpers.count =
+          helpers.count +
+          filterPathsToJustPlayable(IF.any, images, true).length;
         pm({
           data: filterPathsToJustPlayable(filter, images, true),
           allURLs: allURLs,
@@ -2972,7 +2678,7 @@ export const loadBDSMlr = (
           helpers: helpers,
           source: source,
           timeout: timeout,
-        }, resolve);
+        });
       } else {
         helpers.next = null;
         pm({
@@ -2983,7 +2689,7 @@ export const loadBDSMlr = (
           helpers: helpers,
           source: source,
           timeout: timeout,
-        }, resolve);
+        });
       }
     });
 };
@@ -2997,7 +2703,6 @@ export const loadPiwigo = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve?: Function,
 ) => {
   const timeout = 8000;
   let url = source.url;
@@ -3019,80 +2724,62 @@ export const loadPiwigo = (
         .post()
         .setTimeout(5000)
         .notFound((e) =>
-          pm(
-            {
-              error: e.message,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            },
-            resolve,
-          ),
+          pm({
+            error: e.message,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          }),
         )
         .internalError((e) =>
-          pm(
-            {
-              error: e.message,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            },
-            resolve,
-          ),
+          pm({
+            error: e.message,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          }),
         )
         .json((json) => {
           if (json.stat == "ok") {
             piwigoLoggedIn = true;
             search();
           } else {
-            pm(
-              {
-                error: "Piwigo login failed.",
-                helpers: helpers,
-                source: source,
-                timeout: timeout,
-              },
-              resolve,
-            );
-          }
-        })
-        .catch((e) => {
-          pm(
-            {
-              error: e.message,
+            pm({
+              error: "Piwigo login failed.",
               helpers: helpers,
               source: source,
               timeout: timeout,
-            },
-            resolve,
-          );
+            });
+          }
+        })
+        .catch((e) => {
+          pm({
+            error: e.message,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          });
         });
     };
 
     const retry = () => {
       if (helpers.retries < 3) {
         helpers.retries += 1;
-        pm(
-          {
-            data: [],
-            allURLs: allURLs,
-            allPosts: allPosts,
-            weight: weight,
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve,
-        );
+        pm({
+          data: [],
+          allURLs: allURLs,
+          allPosts: allPosts,
+          weight: weight,
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        });
       } else {
-        pm(
-          {
-            helpers: helpers,
-            source: source,
-            timeout: timeout,
-          },
-          resolve,
-        );
+        pm({
+          helpers: helpers,
+          source: source,
+          timeout: timeout,
+        });
       }
     };
 
@@ -3102,32 +2789,26 @@ export const loadPiwigo = (
         .setTimeout(5000)
         .onAbort(retry)
         .notFound((e) =>
-          pm(
-            {
-              error: e.message,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            },
-            resolve,
-          ),
+          pm({
+            error: e.message,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          }),
         )
         .internalError(retry)
         .json((json) => {
           if (json.stat != "ok") {
             helpers.next = null;
-            pm(
-              {
-                data: [],
-                allURLs: allURLs,
-                allPosts: allPosts,
-                weight: weight,
-                helpers: helpers,
-                source: source,
-                timeout: timeout,
-              },
-              resolve,
-            );
+            pm({
+              data: [],
+              allURLs: allURLs,
+              allPosts: allPosts,
+              weight: weight,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            });
             return;
           }
 
@@ -3150,18 +2831,15 @@ export const loadPiwigo = (
             helpers.next = null;
           }
 
-          pm(
-            {
-              data: filterPathsToJustPlayable(filter, images, true),
-              allURLs: allURLs,
-              allPosts: allPosts,
-              weight: weight,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            },
-            resolve,
-          );
+          pm({
+            data: filterPathsToJustPlayable(filter, images, true),
+            allURLs: allURLs,
+            allPosts: allPosts,
+            weight: weight,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          });
         });
     };
 
@@ -3177,15 +2855,12 @@ export const loadPiwigo = (
         "You haven't configured FlipFlip to work with Piwigo yet.\nVisit Settings to configure Piwigo.";
       piwigoAlerted = true;
     }
-    pm(
-      {
-        systemMessage: systemMessage,
-        helpers: helpers,
-        source: source,
-        timeout: timeout,
-      },
-      resolve,
-    );
+    pm({
+      systemMessage: systemMessage,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    });
   }
 };
 
@@ -3197,7 +2872,6 @@ export const loadHydrus = (
   filter: string,
   weight: string,
   helpers: { next: any; count: number; retries: number; uuid: string },
-  resolve?: Function,
 ) => {
   const timeout = 8000;
   const chunk = 1000;
@@ -3219,15 +2893,12 @@ export const loadHydrus = (
           hydrusURL;
         hydrusAlerted = true;
       }
-      pm(
-        {
-          systemMessage: systemMessage,
-          helpers: helpers,
-          source: source,
-          timeout: timeout,
-        },
-        resolve,
-      );
+      pm({
+        systemMessage: systemMessage,
+        helpers: helpers,
+        source: source,
+        timeout: timeout,
+      });
       return;
     }
 
@@ -3244,26 +2915,20 @@ export const loadHydrus = (
         .get()
         .setTimeout(15000)
         .notFound((e) => {
-          pm(
-            {
-              error: e.message,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            },
-            resolve,
-          );
+          pm({
+            error: e.message,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          });
         })
         .internalError((e) => {
-          pm(
-            {
-              error: e.message,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            },
-            resolve,
-          );
+          pm({
+            error: e.message,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          });
         })
         .json((json) => {
           const fileIDs = json.file_ids;
@@ -3271,15 +2936,12 @@ export const loadHydrus = (
           getFileMetadata(fileIDs, 0);
         })
         .catch((e) =>
-          pm(
-            {
-              error: e.message,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            },
-            resolve,
-          ),
+          pm({
+            error: e.message,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          }),
         );
     };
 
@@ -3296,26 +2958,20 @@ export const loadHydrus = (
         .get()
         .setTimeout(15000)
         .notFound((e) => {
-          pm(
-            {
-              error: e.message,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            },
-            resolve,
-          );
+          pm({
+            error: e.message,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          });
         })
         .internalError((e) => {
-          pm(
-            {
-              error: e.message,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            },
-            resolve,
-          );
+          pm({
+            error: e.message,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          });
         })
         .json((json) => {
           for (let metadata of json.metadata) {
@@ -3342,32 +2998,26 @@ export const loadHydrus = (
 
           page += 1;
           if (page == pages) {
-            pm(
-              {
-                data: images,
-                allURLs: allURLs,
-                allPosts: allPosts,
-                weight: weight,
-                helpers: helpers,
-                source: source,
-                timeout: timeout,
-              },
-              resolve,
-            );
+            pm({
+              data: images,
+              allURLs: allURLs,
+              allPosts: allPosts,
+              weight: weight,
+              helpers: helpers,
+              source: source,
+              timeout: timeout,
+            });
           } else {
             getFileMetadata(fileIDs, page);
           }
         })
         .catch((e) =>
-          pm(
-            {
-              error: e.message,
-              helpers: helpers,
-              source: source,
-              timeout: timeout,
-            },
-            resolve,
-          ),
+          pm({
+            error: e.message,
+            helpers: helpers,
+            source: source,
+            timeout: timeout,
+          }),
         );
     };
 
@@ -3379,15 +3029,12 @@ export const loadHydrus = (
         "You haven't configured FlipFlip to work with Hydrus yet.\nVisit Settings to configure Hydrus.";
       hydrusAlerted = true;
     }
-    pm(
-      {
-        systemMessage: systemMessage,
-        helpers: helpers,
-        source: source,
-        timeout: timeout,
-      },
-      resolve,
-    );
+    pm({
+      systemMessage: systemMessage,
+      helpers: helpers,
+      source: source,
+      timeout: timeout,
+    });
   }
 };
 
@@ -3438,72 +3085,6 @@ export function isImage(path: string, strict: boolean): boolean {
   return false;
 }
 
-export function isVideo(path: string, strict: boolean): boolean {
-  if (path == null) return false;
-  const p = path.toLowerCase();
-  const acceptableExtensions = [
-    ".mp4",
-    ".mkv",
-    ".webm",
-    ".ogv",
-    ".mov",
-    ".m4v",
-  ];
-  for (let ext of acceptableExtensions) {
-    if (strict) {
-      if (p.endsWith(ext)) return true;
-    } else {
-      if (p.includes(ext)) return true;
-    }
-  }
-  return false;
-}
-
-export function isVideoPlaylist(path: string, strict: boolean): boolean {
-  if (path == null) return false;
-  const p = path.toLowerCase();
-  const acceptableExtensions = [".asx", ".m3u8", ".pls", ".xspf"];
-  for (let ext of acceptableExtensions) {
-    if (strict) {
-      if (p.endsWith(ext)) return true;
-    } else {
-      if (p.includes(ext)) return true;
-    }
-  }
-  return false;
-}
-
-export function isAudio(path: string, strict: boolean): boolean {
-  if (path == null) return false;
-  const p = path.toLowerCase();
-  const acceptableExtensions = [".mp3", ".m4a", ".wav", ".ogg"];
-  for (let ext of acceptableExtensions) {
-    if (strict) {
-      if (p.endsWith(ext)) return true;
-    } else {
-      if (p.includes(ext)) return true;
-    }
-  }
-  return false;
-}
-
-export function getFileName(url: string, extension = true) {
-  let sep;
-  if (/^(https?:\/\/)|(file:\/\/)/g.exec(url) != null) {
-    sep = "/";
-  } else {
-    sep = path_sep();
-  }
-  url = url.substring(url.lastIndexOf(sep) + 1);
-  if (url.includes("?")) {
-    url = url.substring(0, url.indexOf("?"));
-  }
-  if (!extension) {
-    url = url.substring(0, url.lastIndexOf("."));
-  }
-  return url;
-}
-
 let _redgifOAuth: any = null;
 async function convertURL(url: string): Promise<Array<string>> {
   if (url.includes(".gifv")) {
@@ -3541,10 +3122,10 @@ async function convertURL(url: string): Promise<Array<string>> {
       })
       .text();
 
-      const gfycat = new JSDOM(html, {
-      contentType: 'text/html'
+    const gfycat = new JSDOM(html, {
+      contentType: "text/html",
     }).window.document.querySelectorAll(
-      '#video-' + gfycatMatch[1].toLocaleLowerCase() + ' > source'
+      "#video-" + gfycatMatch[1].toLocaleLowerCase() + " > source",
     );
     if (gfycat.length > 0) {
       for (let source of gfycat) {
@@ -3554,7 +3135,10 @@ async function convertURL(url: string): Promise<Array<string>> {
       }
       // Fallback to MP4
       for (let source of gfycat) {
-        if ((source as any).type == "video/mp4" && !(source as any).src.endsWith("-mobile.mp4")) {
+        if (
+          (source as any).type == "video/mp4" &&
+          !(source as any).src.endsWith("-mobile.mp4")
+        ) {
           return [(source as any).src];
         }
       }
@@ -3616,237 +3200,4 @@ async function convertURL(url: string): Promise<Array<string>> {
   }
 
   return [url];
-}
-
-export function getSourceType(url: string): string {
-  if (isAudio(url, false)) {
-    return ST.audio;
-  } else if (isVideo(url, false)) {
-    return ST.video;
-  } else if (isVideoPlaylist(url, true)) {
-    return ST.playlist;
-  } else if (/^https?:\/\/([^.]*|(66\.media))\.tumblr\.com/.exec(url) != null) {
-    return ST.tumblr;
-  } else if (/^https?:\/\/(www\.)?reddit\.com\//.exec(url) != null) {
-    return ST.reddit;
-  } else if (/^https?:\/\/(www\.)?redgifs\.com\//.exec(url) != null) {
-    return ST.redgifs;
-  } else if (/^https?:\/\/(www\.)?imagefap\.com\//.exec(url) != null) {
-    return ST.imagefap;
-  } else if (/^https?:\/\/(www\.)?imgur\.com\//.exec(url) != null) {
-    return ST.imgur;
-  } else if (/^https?:\/\/(www\.)?(cdn\.)?sex\.com\//.exec(url) != null) {
-    return ST.sexcom;
-  } else if (/^https?:\/\/(www\.)?deviantart\.com\//.exec(url) != null) {
-    return ST.deviantart;
-  } else if (
-    /^https?:\/\/(www\.)?(lolibooru\.moe|hypnohub\.net|danbooru\.donmai\.us)\//.exec(
-      url,
-    ) != null
-  ) {
-    return ST.danbooru;
-  } else if (
-    /^https?:\/\/(www\.)?(gelbooru\.com|furry\.booru\.org|rule34\.xxx|realbooru\.com|safebooru\.org)\//.exec(
-      url,
-    ) != null
-  ) {
-    return ST.gelbooru2;
-  } else if (/^https?:\/\/(www\.)?(e621\.net)\//.exec(url) != null) {
-    return ST.e621;
-  } else if (
-    /^https?:\/\/(www\.|members\.)?luscious\.net\//.exec(url) != null
-  ) {
-    return ST.luscious;
-  } else if (
-    /^https?:\/\/(www\.)?(.*\.booru\.org|idol\.sankakucomplex\.com)\//.exec(
-      url,
-    ) != null
-  ) {
-    return ST.gelbooru1;
-  } else if (/^https?:\/\/(www\.)?e-hentai\.org\/g\//.exec(url) != null) {
-    return ST.ehentai;
-  } else if (/^https?:\/\/[^.]*\.bdsmlr\.com/.exec(url) != null) {
-    return ST.bdsmlr;
-  } else if (
-    /^https?:\/\/[\w\\.]+:\d+\/get_files\/search_files/.exec(url) != null
-  ) {
-    return ST.hydrus;
-  } else if (/^https?:\/\/[^.]*\.[a-z0-9\.:]+\/ws.php/.exec(url) != null) {
-    return ST.piwigo;
-  } else if (/^https?:\/\/hypno\.nimja\.com\/visual\/\d+/.exec(url) != null) {
-    return ST.nimja;
-  } else if (/(^https?:\/\/)|(\.txt$)/.exec(url) != null) {
-    // Arbitrary URL, assume image list
-    return ST.list;
-  } else {
-    // Directory
-    return ST.local;
-  }
-}
-
-export function getFileGroup(url: string) {
-  let sep;
-  switch (getSourceType(url)) {
-    case ST.tumblr:
-      let tumblrID = url.replace(/https?:\/\//, "");
-      tumblrID = tumblrID.replace(/\.tumblr\.com\/?/, "");
-      return tumblrID;
-    case ST.reddit:
-      let redditID = url;
-      if (redditID.endsWith("/"))
-        redditID = redditID.slice(0, url.lastIndexOf("/"));
-      if (redditID.endsWith("/saved"))
-        redditID = redditID.replace("/saved", "");
-      redditID = redditID.substring(redditID.lastIndexOf("/") + 1);
-      return redditID;
-    case ST.redgifs:
-      let redgifID;
-      if (url.includes("/browse?")) {
-        let redgifRegex =
-          /^https?:\/\/(?:www\.)?redgifs\.com\/browse\?.*tags=([^&]*)/.exec(
-            url,
-          );
-        return redgifRegex.length ? redgifRegex[1] : "all";
-      } else if (url.includes("/users/")) {
-        redgifID = url.replace(/^https?:\/\/(www\.)?redgifs\.com\/users\//, "");
-        if (redgifID.includes("/")) {
-          redgifID = redgifID.substring(0, redgifID.indexOf("/"));
-        }
-      }
-      return redgifID;
-    case ST.imagefap:
-      let imagefapID = url.replace(/https?:\/\/www.imagefap.com\//, "");
-      imagefapID = imagefapID.replace(/pictures\//, "");
-      imagefapID = imagefapID.replace(/gallery\//, "");
-      imagefapID = imagefapID.replace(/organizer\//, "");
-      imagefapID = imagefapID.replace(/video\.php\?vid=/, "");
-      imagefapID = imagefapID.split("/")[0];
-      return imagefapID;
-    case ST.sexcom:
-      let sexcomID = url.replace(/https?:\/\/www.sex.com\//, "");
-      sexcomID = sexcomID.replace(/user\//, "");
-      sexcomID = sexcomID.split("?")[0];
-      if (sexcomID.endsWith("/")) {
-        sexcomID = sexcomID.substring(0, sexcomID.length - 1);
-      }
-      return sexcomID;
-    case ST.imgur:
-      let imgurID = url.replace(/https?:\/\/imgur.com\//, "");
-      imgurID = imgurID.replace(/a\//, "");
-      return imgurID;
-    case ST.deviantart:
-      let authorID = url.replace(/https?:\/\/www.deviantart.com\//, "");
-      if (authorID.includes("/")) {
-        authorID = authorID.substring(0, authorID.indexOf("/"));
-      }
-      return authorID;
-    case ST.e621:
-      const hostRegexE621 = /^https?:\/\/(?:www\.)?([^.]*)\./g;
-      const hostE621 = hostRegexE621.exec(url)[1];
-      let E621ID = "";
-      if (url.includes("/pools/")) {
-        E621ID = "pool" + url.substring(url.lastIndexOf("/"));
-      } else {
-        const tagRegex = /[?&]tags=(.*)&?/g;
-        let tags;
-        if ((tags = tagRegex.exec(url)) !== null) {
-          E621ID = tags[1];
-        }
-        if (E621ID.endsWith("+")) {
-          E621ID = E621ID.substring(0, E621ID.length - 1);
-        }
-      }
-      return hostE621 + "/" + decodeURIComponent(E621ID);
-    case ST.luscious:
-      let albumID = url.replace(
-        /^https?:\/\/(www\.|members\.)?luscious\.net\/(albums|users)\//,
-        "",
-      );
-      if (albumID.includes("/")) {
-        albumID = albumID.substring(0, albumID.indexOf("/"));
-      }
-      return albumID;
-    case ST.danbooru:
-    case ST.gelbooru1:
-    case ST.gelbooru2:
-      const hostRegex = /^https?:\/\/(?:www\.)?([^.]*)\./g;
-      const host = hostRegex.exec(url)[1];
-      let danbooruID = "";
-      if (url.includes("/pools/")) {
-        danbooruID = "pools/" + url.substring(url.lastIndexOf("/"));
-      } else if (url.includes("/favorite_groups/")) {
-        danbooruID = "favorite_groups/" + url.substring(url.lastIndexOf("/"));
-      } else {
-        const tagRegex = /[?&]tags=(.*)&?/g;
-        let tags;
-        if ((tags = tagRegex.exec(url)) !== null) {
-          danbooruID = tags[1];
-        }
-        const titleRegex = /[?&]title=(.*)&?/g;
-        let title;
-        if ((title = titleRegex.exec(url)) !== null) {
-          if (tags == null) {
-            danbooruID = "";
-          } else if (!danbooruID.endsWith("+")) {
-            danbooruID += "+";
-          }
-          danbooruID += title[1];
-        }
-        if (danbooruID.endsWith("+")) {
-          danbooruID = danbooruID.substring(0, danbooruID.length - 1);
-        }
-      }
-      return host + "/" + decodeURIComponent(danbooruID);
-    case ST.ehentai:
-      const galleryRegex = /^https?:\/\/(?:www\.)?e-hentai\.org\/g\/([^\/]*)/g;
-      const gallery = galleryRegex.exec(url);
-      return gallery[1];
-    case ST.list:
-      if (/^https?:\/\//g.exec(url) != null) {
-        sep = "/";
-      } else {
-        sep = path_sep();
-      }
-      return url.substring(url.lastIndexOf(sep) + 1).replace(".txt", "");
-    case ST.local:
-      if (url.endsWith(path_sep())) {
-        url = url.substring(0, url.length - 1);
-        return url.substring(url.lastIndexOf(path_sep()) + 1);
-      } else {
-        return url.substring(url.lastIndexOf(path_sep()) + 1);
-      }
-    case ST.video:
-    case ST.playlist:
-    case ST.nimja:
-      if (/^https?:\/\//g.exec(url) != null) {
-        sep = "/";
-      } else {
-        sep = path_sep();
-      }
-      let name = url.substring(0, url.lastIndexOf(sep));
-      return name.substring(name.lastIndexOf(sep) + 1);
-    case ST.bdsmlr:
-      let bdsmlrID = url.replace(/https?:\/\//, "");
-      bdsmlrID = bdsmlrID.replace(/\/rss/, "");
-      bdsmlrID = bdsmlrID.replace(/\.bdsmlr\.com\/?/, "");
-      return bdsmlrID;
-    case ST.hydrus:
-      const tagsRegex = /tags=([^&]*)&?.*$/.exec(url);
-      if (tagsRegex == null) return "hydrus";
-      let tags = tagsRegex[1];
-      if (!tags.startsWith("[")) {
-        tags = decodeURIComponent(tags);
-      }
-      tags = tags.substring(1, tags.length - 1);
-      tags = tags.replace(/"/g, "");
-      return tags;
-    case ST.piwigo:
-      const catRegex = /cat_id\[]=(\d*)/.exec(url);
-      if (catRegex != null) return catRegex[1];
-
-      const tagRegex = /tag_id\[]=(\d*)/.exec(url);
-      if (tagRegex != null) return tagRegex[1];
-
-      return "piwigo";
-  }
 }
