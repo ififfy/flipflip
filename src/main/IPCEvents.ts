@@ -147,6 +147,10 @@ function onRedditAuthRequest(
   redditAuth(window, userAgent, clientID, deviceID);
 }
 
+function onRequestIsFirstWindow(ev: IpcMainInvokeEvent) {
+  return ev.sender.id === 1;
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -156,6 +160,7 @@ export function initializeIpcEvents() {
 
   initialized = true;
   ipcMain.on(IPC.newWindow, onRequestCreateNewWindow);
+  ipcMain.handle(IPC.isFirstWindow, onRequestIsFirstWindow);
   ipcMain.handle(IPC.getBackups, onRequestBackups);
   ipcMain.handle(IPC.getAppStorage, onRequestAppStorage);
   ipcMain.on(IPC.saveAppStorage, onSaveAppStorage);

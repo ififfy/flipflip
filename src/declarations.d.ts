@@ -72,6 +72,7 @@ declare global {
     ipc: {
       platform: () => string;
       newWindow: () => void;
+      isFirstWindow: () => Promise<boolean>;
       getBackups: () => Promise<Array<Backup>>;
       getAppStorage: () => Promise<AppStorageState>;
       saveAppStorage: (state: AppStorageState) => void;

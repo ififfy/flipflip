@@ -7,6 +7,7 @@ import AuthResponse from "../common/AuthResponse";
 contextBridge.exposeInMainWorld("ipc", {
   platform: () => process.platform,
   newWindow: () => ipcRenderer.send(IPC.newWindow),
+  isFirstWindow: () => ipcRenderer.invoke(IPC.isFirstWindow),
   getBackups: () => ipcRenderer.invoke(IPC.getBackups),
   getAppStorage: () => ipcRenderer.invoke(IPC.getAppStorage),
   saveAppStorage: (state: AppStorageState) =>

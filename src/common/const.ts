@@ -210,6 +210,7 @@ const AF = {
 
 const IPC = {
   newWindow: "ipc.newWindow",
+  isFirstWindow: "ipc.isFirstWindow",
   startScene: "ipc.startScene",
   getBackups: "ipc.getBackups",
   createBackup: "ipc.createBackup",

@@ -1999,62 +1999,68 @@ class ScenePicker extends React.Component {
       displayScenes: this.getDisplayScenes(),
       displayGrids: this.getDisplayGrids(),
     });
-    // FIXME
-    // if (remote.getCurrentWindow().id == 1) {
-    this.setState({ isFirstWindow: true });
-    wretch("https://api.github.com/repos/regtemp8/flipflip/releases")
-      .get()
-      .json((json) => {
-        const newestReleaseTag = json[0].tag_name;
-        const newestReleaseURL = json[0].html_url;
-        let releaseVersion = newestReleaseTag
-          .replace("v", "")
-          .replace(".", "")
-          .replace(".", "");
-        let releaseBetaVersion = -1;
-        if (releaseVersion.includes("-")) {
-          const releaseSplit = releaseVersion.split("-");
-          releaseVersion = releaseSplit[0];
-          const betaString = releaseSplit[1];
-          const betaNumber = betaString.replace("beta", "");
-          if (betaNumber == "") {
-            releaseBetaVersion = 0;
-          } else {
-            releaseBetaVersion = parseInt(betaNumber);
+
+    window.ipc.isFirstWindow().then((isFirstWindow) => {
+      if (!isFirstWindow) {
+        return;
+      }
+
+      this.setState({ isFirstWindow });
+      wretch("https://api.github.com/repos/regtemp8/flipflip/releases")
+        .get()
+        .json((json) => {
+          const newestReleaseTag = json[0].tag_name;
+          const newestReleaseURL = json[0].html_url;
+          let releaseVersion = newestReleaseTag
+            .replace("v", "")
+            .replace(".", "")
+            .replace(".", "");
+          let releaseBetaVersion = -1;
+          if (releaseVersion.includes("-")) {
+            const releaseSplit = releaseVersion.split("-");
+            releaseVersion = releaseSplit[0];
+            const betaString = releaseSplit[1];
+            const betaNumber = betaString.replace("beta", "");
+            if (betaNumber == "") {
+              releaseBetaVersion = 0;
+            } else {
+              releaseBetaVersion = parseInt(betaNumber);
+            }
           }
-        }
-        let thisVersion = this.props.version.replace(".", "").replace(".", "");
-        let thisBetaVersion = -1;
-        if (thisVersion.includes("-")) {
-          const releaseSplit = thisVersion.split("-");
-          thisVersion = releaseSplit[0];
-          const betaString = releaseSplit[1];
-          const betaNumber = betaString.replace("beta", "");
-          if (betaNumber == "") {
-            thisBetaVersion = 0;
-          } else {
-            thisBetaVersion = parseInt(betaNumber);
+          let thisVersion = this.props.version
+            .replace(".", "")
+            .replace(".", "");
+          let thisBetaVersion = -1;
+          if (thisVersion.includes("-")) {
+            const releaseSplit = thisVersion.split("-");
+            thisVersion = releaseSplit[0];
+            const betaString = releaseSplit[1];
+            const betaNumber = betaString.replace("beta", "");
+            if (betaNumber == "") {
+              thisBetaVersion = 0;
+            } else {
+              thisBetaVersion = parseInt(betaNumber);
+            }
           }
-        }
-        if (parseInt(releaseVersion) > parseInt(thisVersion)) {
-          this.setState({
-            newVersion: newestReleaseTag,
-            newVersionLink: newestReleaseURL,
-          });
-        } else if (parseInt(releaseVersion) == parseInt(thisVersion)) {
-          if (
-            (releaseBetaVersion == -1 && thisBetaVersion >= 0) ||
-            releaseBetaVersion > thisBetaVersion
-          ) {
+          if (parseInt(releaseVersion) > parseInt(thisVersion)) {
             this.setState({
               newVersion: newestReleaseTag,
               newVersionLink: newestReleaseURL,
             });
+          } else if (parseInt(releaseVersion) == parseInt(thisVersion)) {
+            if (
+              (releaseBetaVersion == -1 && thisBetaVersion >= 0) ||
+              releaseBetaVersion > thisBetaVersion
+            ) {
+              this.setState({
+                newVersion: newestReleaseTag,
+                newVersionLink: newestReleaseURL,
+              });
+            }
           }
-        }
-      })
-      .catch((e) => console.error(e));
-    // }
+        })
+        .catch((e) => console.error(e));
+    });
   }
 
   componentDidUpdate(props: any, state: any) {
