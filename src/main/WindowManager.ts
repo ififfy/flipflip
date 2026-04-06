@@ -317,3 +317,12 @@ export async function saveScript(windowId: number, script: string) {
   fs.writeFileSync(result.filePath, script);
   return result.filePath;
 }
+
+export function setProgressBar(windowId: number, progress: number) {
+  const window = currentWindows.get(windowId);
+  if (window == null) {
+    return;
+  }
+
+  window.setProgressBar(progress);
+}

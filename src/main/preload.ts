@@ -8,6 +8,8 @@ contextBridge.exposeInMainWorld("ipc", {
   platform: () => process.platform,
   newWindow: () => ipcRenderer.send(IPC.newWindow),
   isFirstWindow: () => ipcRenderer.invoke(IPC.isFirstWindow),
+  setProgressBar: (progress: number) =>
+    ipcRenderer.send(IPC.setProgressBar, progress),
   getBackups: () => ipcRenderer.invoke(IPC.getBackups),
   getAppStorage: () => ipcRenderer.invoke(IPC.getAppStorage),
   saveAppStorage: (state: AppStorageState) =>

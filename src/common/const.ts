@@ -236,6 +236,7 @@ const IPC = {
   tumblrAuthResponse: "ipc.tumblrAuthResponse",
   redditAuthRequest: "ipc.redditAuthRequest",
   redditAuthResponse: "ipc.redditAuthResponse",
+  setProgressBar: "ipc.setProgressBar",
 };
 
 const MO = {

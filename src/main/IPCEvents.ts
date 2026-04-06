@@ -14,6 +14,7 @@ import {
   openScript,
   saveScript,
   getWindow,
+  setProgressBar,
 } from "./WindowManager";
 import { IPC } from "../common/const";
 import { getBackups } from "./utils";
@@ -151,6 +152,10 @@ function onRequestIsFirstWindow(ev: IpcMainInvokeEvent) {
   return ev.sender.id === 1;
 }
 
+function onSetProgressBar(ev: IpcMainEvent, progress: number) {
+  setProgressBar(ev.sender.id, progress);
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -183,6 +188,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.getFonts, onGetFonts);
   ipcMain.on(IPC.tumblrAuthRequest, onTumblrAuthRequest);
   ipcMain.on(IPC.redditAuthRequest, onRedditAuthRequest);
+  ipcMain.on(IPC.setProgressBar, onSetProgressBar);
 }
 
 export function releaseIpcEvents() {

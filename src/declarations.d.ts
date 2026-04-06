@@ -73,6 +73,7 @@ declare global {
       platform: () => string;
       newWindow: () => void;
       isFirstWindow: () => Promise<boolean>;
+      setProgressBar: (progress: number) => void;
       getBackups: () => Promise<Array<Backup>>;
       getAppStorage: () => Promise<AppStorageState>;
       saveAppStorage: (state: AppStorageState) => void;

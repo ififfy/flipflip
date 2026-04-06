@@ -25,6 +25,7 @@ import {
   IT,
   LT,
   OF,
+  PR,
   PT,
   RP,
   SDGT,
@@ -3580,95 +3581,112 @@ export function setMode(state: State, mode: string): Object {
 }
 
 export function markOffline(getState: () => State, setState: Function) {
-  // FIXME
-  // const win = remote.getCurrentWindow();
-  // const state = getState();
-  // const actionableLibrary = state.library.filter((ls) => {
-  //   // If this link was checked within the last week, skip
-  //   return new Date().getTime() - new Date(ls.lastCheck).getTime() >= 604800000;
-  // });
-  // const offlineLoop = () => {
-  //   const state = getState();
-  //   const offset = state.progressCurrent;
-  //   if (state.progressMode == PR.cancel) {
-  //     win.setProgressBar(-1);
-  //     setState({progressMode: null, progressCurrent: 0, progressTotal: 0, progressTitle: ""});
-  //   } else if (actionableLibrary.length == offset) {
-  //     win.setProgressBar(-1);
-  //     setState({
-  //       systemSnack: "Offline Check has completed. Sources not available are now marked.",
-  //       systemSnackSeverity: SS.success,
-  //       progressMode: null,
-  //       progressCurrent: 0,
-  //       progressTotal: 0,
-  //       progressTitle: ""
-  //     });
-  //   } else if (actionableLibrary[offset].url.startsWith("http://") ||
-  //     actionableLibrary[offset].url.startsWith("https://")) {
-  //     const actionSource = actionableLibrary[offset];
-  //     state.progressTitle = actionSource.url;
-  //     setState({progressTitle: state.progressTitle});
-  //     const librarySource = state.library.find((s) => s.url == actionSource.url);
-  //     if (librarySource) {
-  //       librarySource.lastCheck = new Date();
-  //       wretch(librarySource.url)
-  //         .get()
-  //         .notFound((res) => {
-  //           librarySource.offline = true;
-  //           state.progressCurrent = offset + 1;
-  //           setState({progressCurrent: state.progressCurrent});
-  //           win.setProgressBar(state.progressCurrent / state.progressTotal);
-  //           setTimeout(offlineLoop, 1000);
-  //         })
-  //         .res((res) => {
-  //           librarySource.offline = false;
-  //           state.progressCurrent = offset + 1;
-  //           setState({progressCurrent: state.progressCurrent});
-  //           win.setProgressBar(state.progressCurrent / state.progressTotal);
-  //           setTimeout(offlineLoop, 1000);
-  //         })
-  //         .catch((e) => {
-  //           console.error(e);
-  //           librarySource.lastCheck = null;
-  //           state.progressCurrent = offset + 1;
-  //           setState({progressCurrent: state.progressCurrent});
-  //           win.setProgressBar(state.progressCurrent / state.progressTotal);
-  //           setTimeout(offlineLoop, 100);
-  //         });
-  //     } else {
-  //       // Skip if removed from library during check
-  //       state.progressCurrent = offset + 1;
-  //       setState({progressCurrent: state.progressCurrent});
-  //       win.setProgressBar(state.progressCurrent / state.progressTotal);
-  //       setTimeout(offlineLoop, 100);
-  //     }
-  //   } else {
-  //     const actionSource = actionableLibrary[offset];
-  //     state.progressTitle = actionSource.url;
-  //     state.progressCurrent = offset + 1;
-  //     setState({progressTitle: state.progressTitle, progressCurrent: state.progressCurrent});
-  //     win.setProgressBar(state.progressCurrent / state.progressTotal);
-  //     actionSource.lastCheck = new Date();
-  //     const exists = fs_existsSync(actionSource.url);
-  //     if (!exists) {
-  //       actionSource.offline = true;
-  //     }
-  //     setTimeout(offlineLoop, 10);
-  //   }
-  // };
-  // // If we don't have an import running
-  // if (!state.progressMode) {
-  //   state.progressMode = PR.offline;
-  //   state.progressCurrent = 0;
-  //   state.progressTotal = actionableLibrary.length;
-  //   setState({
-  //     progressMode: state.progressMode,
-  //     progressCurrent: state.progressCurrent,
-  //     progressTotal: state.progressTotal,
-  //   });
-  //   win.setProgressBar(state.progressCurrent / state.progressTotal);
-  //   offlineLoop();
-  // }
+  const state = getState();
+  const actionableLibrary = state.library.filter((ls) => {
+    // If this link was checked within the last week, skip
+    return new Date().getTime() - new Date(ls.lastCheck).getTime() >= 604800000;
+  });
+  const offlineLoop = () => {
+    const state = getState();
+    const offset = state.progressCurrent;
+    if (state.progressMode == PR.cancel) {
+      window.ipc.setProgressBar(-1);
+      setState({
+        progressMode: null,
+        progressCurrent: 0,
+        progressTotal: 0,
+        progressTitle: "",
+      });
+    } else if (actionableLibrary.length == offset) {
+      window.ipc.setProgressBar(-1);
+      setState({
+        systemSnack:
+          "Offline Check has completed. Sources not available are now marked.",
+        systemSnackSeverity: SS.success,
+        progressMode: null,
+        progressCurrent: 0,
+        progressTotal: 0,
+        progressTitle: "",
+      });
+    } else if (
+      actionableLibrary[offset].url.startsWith("http://") ||
+      actionableLibrary[offset].url.startsWith("https://")
+    ) {
+      const actionSource = actionableLibrary[offset];
+      state.progressTitle = actionSource.url;
+      setState({ progressTitle: state.progressTitle });
+      const librarySource = state.library.find(
+        (s) => s.url == actionSource.url,
+      );
+      if (librarySource) {
+        librarySource.lastCheck = new Date();
+        wretch(librarySource.url)
+          .get()
+          .notFound((res) => {
+            librarySource.offline = true;
+            state.progressCurrent = offset + 1;
+            setState({ progressCurrent: state.progressCurrent });
+            window.ipc.setProgressBar(
+              state.progressCurrent / state.progressTotal,
+            );
+            setTimeout(offlineLoop, 1000);
+          })
+          .res((res) => {
+            librarySource.offline = false;
+            state.progressCurrent = offset + 1;
+            setState({ progressCurrent: state.progressCurrent });
+            window.ipc.setProgressBar(
+              state.progressCurrent / state.progressTotal,
+            );
+            setTimeout(offlineLoop, 1000);
+          })
+          .catch((e) => {
+            console.error(e);
+            librarySource.lastCheck = null;
+            state.progressCurrent = offset + 1;
+            setState({ progressCurrent: state.progressCurrent });
+            window.ipc.setProgressBar(
+              state.progressCurrent / state.progressTotal,
+            );
+            setTimeout(offlineLoop, 100);
+          });
+      } else {
+        // Skip if removed from library during check
+        state.progressCurrent = offset + 1;
+        setState({ progressCurrent: state.progressCurrent });
+        window.ipc.setProgressBar(state.progressCurrent / state.progressTotal);
+        setTimeout(offlineLoop, 100);
+      }
+    } else {
+      const actionSource = actionableLibrary[offset];
+      state.progressTitle = actionSource.url;
+      state.progressCurrent = offset + 1;
+      setState({
+        progressTitle: state.progressTitle,
+        progressCurrent: state.progressCurrent,
+      });
+      window.ipc.setProgressBar(state.progressCurrent / state.progressTotal);
+      actionSource.lastCheck = new Date();
+      const exists = fs_existsSync(actionSource.url);
+      if (!exists) {
+        actionSource.offline = true;
+      }
+      setTimeout(offlineLoop, 10);
+    }
+  };
+  // If we don't have an import running
+  if (!state.progressMode) {
+    state.progressMode = PR.offline;
+    state.progressCurrent = 0;
+    state.progressTotal = actionableLibrary.length;
+    setState({
+      progressMode: state.progressMode,
+      progressCurrent: state.progressCurrent,
+      progressTotal: state.progressTotal,
+    });
+    window.ipc.setProgressBar(state.progressCurrent / state.progressTotal);
+    offlineLoop();
+  }
 }
 
 export function detectBPMs(getState: () => State, setState: Function) {
@@ -3980,6 +3998,7 @@ export function importTumblr(getState: () => State, setState: Function) {
 }
 
 export function importReddit(getState: () => State, setState: Function) {
+  // FIXME
   // let reddit: any;
   // const win = remote.getCurrentWindow();
   // const redditImportLoop = () => {
