@@ -66,7 +66,6 @@ import CodeMirror, {
 } from "./CodeMirror";
 import SceneGrid from "../../../common/SceneGrid";
 import { fs_writeFileSync } from "../../dummy/fs";
-import { fonts_getFonts } from "../../dummy/fonts";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -1162,7 +1161,7 @@ class CaptionScriptor extends React.Component {
     window.addEventListener("keydown", this.onKeyDown, false);
     // Define system fonts
     this._promise = new CancelablePromise((resolve, reject) => {
-      fonts_getFonts().then(
+      window.ipc.getFonts().then(
         (res: Array<string>) => {
           if (!this._promise.hasCanceled) {
             this.setState({ systemFonts: res });

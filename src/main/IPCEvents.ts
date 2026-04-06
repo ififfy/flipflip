@@ -22,7 +22,7 @@ import {
   createBackup,
 } from "./storage/StorageManager";
 import AppStorageState from "../common/AppStorageState";
-import { cleanBackups, reset, restoreFromBackup } from "./actions";
+import { cleanBackups, getFonts, reset, restoreFromBackup } from "./actions";
 import Config from "../common/Config";
 
 // Define functions
@@ -108,6 +108,10 @@ async function onSaveScript(ev: IpcMainEvent, script: string) {
   return await saveScript(ev.sender.id, script);
 }
 
+async function onGetFonts(ev: IpcMainEvent) {
+  return await getFonts()
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -136,6 +140,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.openSubtitle, onOpenSubtitle);
   ipcMain.handle(IPC.openScript, onOpenScript);
   ipcMain.handle(IPC.saveScript, onSaveScript);
+  ipcMain.handle(IPC.getFonts, onGetFonts);
 }
 
 export function releaseIpcEvents() {

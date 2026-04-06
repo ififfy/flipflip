@@ -18,6 +18,8 @@ import Tag from "../common/Tag";
 import { Route } from "../common/Route";
 import defaultTheme from "../common/theme";
 import { reloadWindow } from "./WindowManager";
+import fontList from "font-list";
+import SystemFonts from "system-font-families";
 
 export function cleanBackups(config: Config) {
   let backups = getBackups();
@@ -155,6 +157,22 @@ export function restoreFromBackup(backupFile: string): AppStorageState {
 export function reset(windowId: number) {
   rimraf.sync(savePath);
   reloadWindow(windowId);
+}
+
+export function getFonts() {
+  if (process.platform == "darwin") {
+    return new SystemFonts().getFonts();
+  } else {
+    return fontList.getFonts().then((res: Array<string>) => {
+      return res.map((r) => {
+        if (r.startsWith('"') && r.endsWith('"')) {
+          return r.substring(1, r.length - 1);
+        } else {
+          return r;
+        }
+      });
+    });
+  }
 }
 
 export function printMemoryReport() {

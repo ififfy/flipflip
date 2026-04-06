@@ -23,7 +23,6 @@ import { green, red } from "@mui/material/colors";
 import { CancelablePromise } from "../../data/utils";
 import CaptionScript, { FontSettingsI } from "../../../common/CaptionScript";
 import FontOptions from "./FontOptions";
-import { fonts_getFonts } from "../../dummy/fonts";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -218,7 +217,7 @@ class ScriptOptions extends React.Component {
   componentDidMount() {
     // Define system fonts
     this._promise = new CancelablePromise((resolve, reject) => {
-      fonts_getFonts().then(
+      window.ipc.getFonts().then(
         (res: Array<string>) => {
           if (!this._promise.hasCanceled) {
             this.setState({ systemFonts: res });

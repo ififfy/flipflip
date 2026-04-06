@@ -62,7 +62,7 @@ interface NavigatorClipboard {
   readonly clipboard?: Clipboard;
 }
 
-interface Navigator extends NavigatorClipboard {}
+interface Navigator extends NavigatorClipboard { }
 
 declare global {
   interface Window {
@@ -89,8 +89,9 @@ declare global {
       openSubtitle: () => Promise<string | undefined>;
       openScript: () => Promise<string | undefined>;
       saveScript: (script: string) => Promise<string | undefined>;
+      getFonts: () => Promise<string[]>;
     };
   }
 }
 
-export {};
+export { };

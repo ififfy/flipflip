@@ -24,7 +24,6 @@ import { WC } from "../../../common/const";
 import en from "../../data/en";
 import ColorPicker from "../config/ColorPicker";
 import { CancelablePromise } from "../../data/utils";
-import { fonts_getFonts } from "../../dummy/fonts";
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -231,7 +230,7 @@ class WatermarkCard extends React.Component {
   componentDidMount() {
     // Define system fonts
     this._promise = new CancelablePromise((resolve, reject) => {
-      fonts_getFonts().then(
+      window.ipc.getFonts().then(
         (res: Array<string>) => {
           if (!this._promise.hasCanceled) {
             this.setState({ systemFonts: res });
