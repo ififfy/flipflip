@@ -13,11 +13,7 @@ import {
   toArrayBuffer,
   urlToPath,
 } from "../../data/utils";
-import {
-  getFileName,
-  getSourceType,
-  isVideo,
-} from "../../../main/scraper/Scrapers";
+import { getFileName, getSourceType, isVideo } from "../../../common/utils";
 import Config from "../../../common/Config";
 import Scene from "../../../common/Scene";
 import ChildCallbackHack from "./ChildCallbackHack";

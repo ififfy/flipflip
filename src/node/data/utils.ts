@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
-import { getFileGroup } from "../../main/scraper/Scrapers";
+import { getFileGroup } from "../../common/utils";
 import { ST } from "../../common/const";
 import Config from "../../common/Config";
 

@@ -42,7 +42,7 @@ import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
 
 import { PT, ST } from "../../../common/const";
 import { urlToPath } from "../../data/utils";
-import { getSourceType } from "../../../main/scraper/Scrapers";
+import { getSourceType } from "../../../common/utils";
 import Config from "../../../common/Config";
 import LibrarySource from "../../../common/LibrarySource";
 import Scene from "../../../common/Scene";

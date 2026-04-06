@@ -40,7 +40,7 @@ import {
   getTimestamp,
   urlToPath,
 } from "../../data/utils";
-import { getFileName, getSourceType } from "../../../main/scraper/Scrapers";
+import { getFileName, getSourceType } from "../../../common/utils";
 import { RF, RT, SDT, ST } from "../../../common/const";
 import Config from "../../../common/Config";
 import LibrarySource from "../../../common/LibrarySource";

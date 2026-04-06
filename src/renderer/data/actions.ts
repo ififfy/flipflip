@@ -11,11 +11,7 @@ import {
   randomizeList,
   toArrayBuffer,
 } from "./utils";
-import {
-  getFileGroup,
-  getFileName,
-  getSourceType,
-} from "../../main/scraper/Scrapers";
+import { getFileGroup, getFileName, getSourceType } from "../../common/utils";
 import {
   AF,
   ALT,
@@ -48,7 +44,6 @@ import {
   VO,
   VTF,
 } from "../../common/const";
-import { defaultInitialState } from "../../main/storage/AppStorage";
 import { Route } from "../../common/Route";
 import Audio from "../../common/Audio";
 import Scene from "../../common/Scene";
@@ -72,8 +67,9 @@ import {
 import { fsExtra_outputFile } from "../dummy/fs-extra";
 import { path_sep } from "../dummy/path";
 import { folder_getFolderSize } from "../dummy/folder";
+import AppStorageState from "src/common/AppStorageState";
 
-type State = typeof defaultInitialState;
+type State = AppStorageState;
 
 /** Getters **/
 

@@ -89,7 +89,7 @@ import {
   getEffects,
   getTimestampValue,
 } from "../../data/utils";
-import { getSourceType } from "../../../main/scraper/Scrapers";
+import { getSourceType } from "../../../common/utils";
 import Audio from "../../../common/Audio";
 import CaptionScript from "../../../common/CaptionScript";
 import SceneGrid from "../../../common/SceneGrid";

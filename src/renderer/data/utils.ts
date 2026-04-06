@@ -1,7 +1,7 @@
 import * as easings from "d3-ease";
 import "core-js/features/array/flat";
 
-import { getSourceType } from "../../main/scraper/Scrapers";
+import { getSourceType } from "../../common/utils";
 import {
   BT,
   EA,
@@ -407,20 +407,6 @@ export function getRandomListItem(list: any[], count: number = 1) {
     }
     return newList;
   }
-}
-
-export function isText(path: string, strict: boolean): boolean {
-  if (path == null) return false;
-  const p = path.toLowerCase();
-  const acceptableExtensions = [".txt"];
-  for (let ext of acceptableExtensions) {
-    if (strict) {
-      if (p.endsWith(ext)) return true;
-    } else {
-      if (p.includes(ext)) return true;
-    }
-  }
-  return false;
 }
 
 function areRulesValid(wg: WeightGroup) {
