@@ -19,6 +19,10 @@ export function startScene(sceneName: string) {
   }
 }
 
+export function getWindow(windowId: number) {
+  return currentWindows.get(windowId)
+}
+
 export function createNewWindow() {
   // Load the previous state with fallback to defaults
   let mainWindowState = windowStateKeeper({

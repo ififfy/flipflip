@@ -93,7 +93,6 @@ class APICard extends React.Component {
     snackbarOpen: false,
     snackbar: null as string,
     snackbarSeverity: null as string,
-    server: null as any,
     input1: "",
     input2: "",
     input3: "",
@@ -785,14 +784,6 @@ class APICard extends React.Component {
     window.ipc.openExternal(url);
   }
 
-  closeServer() {
-    const server = this.state.server;
-    if (server) {
-      server.close();
-      this.setState({ server: null });
-    }
-  }
-
   onCloseSnack() {
     this.setState({ snackbarOpen: false });
   }
@@ -834,102 +825,44 @@ class APICard extends React.Component {
 
   onFinishAuthTumblr() {
     this.onCloseDialog();
-    this.closeServer();
 
-    // Tumblr endpoints
-    const authorizeUrl = "https://www.tumblr.com/oauth/authorize";
-    const requestTokenUrl = "https://www.tumblr.com/oauth/request_token";
-    const accessTokenUrl = "https://www.tumblr.com/oauth/access_token";
+    const {tumblrKey, tumblrSecret} = this.props.settings;
+    window.ipc.tumblrAuthRequest(tumblrKey, tumblrSecret);
+    window.ipc.onTumblrAuthResponse((response) => {
+      if (response.error != null) {
+        const { statusCode, data } = response.error;
+        this.setState({
+          snackbarOpen: true,
+          snackbar: "Error: " + statusCode + " - " + data,
+          snackbarSeverity: SS.error,
+        });
+      }
+      if (response.success != null) {
+        const { token, secret } = response.success;
+        // Update props
+        this.props.onUpdateConfig((c) => {
+          c.remoteSettings.tumblrKey = tumblrKey;
+          c.remoteSettings.tumblrSecret = tumblrSecret;
+          c.remoteSettings.tumblrOAuthToken = token;
+          c.remoteSettings.tumblrOAuthTokenSecret = secret;
+        });
+        // Update state
+        this.props.onUpdateSettings((s) => {
+          s.tumblrOAuthToken = token;
+          s.tumblrOAuthTokenSecret = secret;
+        });
 
-    let tumblrKey = this.props.settings.tumblrKey;
-    let tumblrSecret = this.props.settings.tumblrSecret;
-
-    // FIXME
-    // const oauth = new OAuth(
-    //   requestTokenUrl,
-    //   accessTokenUrl,
-    //   tumblrKey,
-    //   tumblrSecret,
-    //   '1.0A',
-    //   'http://localhost:65010',
-    //   'HMAC-SHA1'
-    // );
-
-    // let sharedSecret = "";
-
-    // oauth.getOAuthRequestToken((err: {statusCode: number, data: string}, token: string, secret: string) => {
-    //   if (err) {
-    //     console.error(err.statusCode + " - " + err.data);
-    //     this.setState({snackbarOpen: true, snackbar: "Error: " + err.statusCode + " - " + err.data, snackbarSeverity: SS.error});
-    //     this.closeServer();
-    //     return;
-    //   }
-
-    //   sharedSecret = secret;
-    //   remote.shell.openExternal(authorizeUrl + '?oauth_token=' + token);
-    // });
-
-    // // Start a server to listen for Tumblr OAuth response
-    // const server = http.createServer((req, res) => {
-    //   // Can't seem to get electron to properly return focus to FlipFlip, just alert the user in the response
-    //   const html = "<html><body><h1>Please return to FlipFlip</h1></body></html>";
-    //   res.writeHead(200, {"Content-Type": "text/html"});
-    //   res.write(html);
-
-    //   if (!req.url.endsWith("favicon.ico")) {
-    //     if (req.url.includes("oauth_token") && req.url.includes("oauth_verifier")) {
-    //       const args = req.url.replace("\/?", "").split("&");
-    //       const oauthToken = args[0].substring(12);
-    //       const oauthVerifier = args[1].substring(15);
-
-    //       oauth.getOAuthAccessToken(
-    //         oauthToken,
-    //         sharedSecret,
-    //         oauthVerifier,
-    //         (err: any, token: string, secret: string) => {
-    //           if (err) {
-    //             console.error("Validation failed with error", err);
-    //             this.setState({snackbarOpen: true, snackbar: "Error: " + err.statusCode + " - " + err.data, snackbarSeverity: SS.error});
-    //             this.closeServer();
-    //             req.connection.destroy();
-    //             res.end();
-    //             return;
-    //           }
-
-    //           // Update props
-    //           this.props.onUpdateConfig((c) => {
-    //             c.remoteSettings.tumblrKey = tumblrKey;
-    //             c.remoteSettings.tumblrSecret = tumblrSecret;
-    //             c.remoteSettings.tumblrOAuthToken = token;
-    //             c.remoteSettings.tumblrOAuthTokenSecret = secret;
-    //           });
-    //           // Update state
-    //           this.props.onUpdateSettings((s) => {
-    //             s.tumblrOAuthToken = token;
-    //             s.tumblrOAuthTokenSecret = secret;
-    //           });
-
-    //           this.setState({snackbarOpen: true, snackbar: "Tumblr is now activated", snackbarSeverity: SS.success});
-    //           remote.getCurrentWindow().show();
-    //           this.closeServer();
-    //           req.connection.destroy();
-    //         }
-    //       );
-    //     } else {
-    //       this.setState({snackbarOpen: true, snackbar: "Error: Access Denied", snackbarSeverity: SS.error});
-    //       this.closeServer();
-    //       req.connection.destroy();
-    //     }
-    //   }
-    //   res.end();
-    // }).listen(65010);
-
-    // this.setState({server: server});
+        this.setState({
+          snackbarOpen: true,
+          snackbar: "Tumblr is now activated",
+          snackbarSeverity: SS.success,
+        });
+      }
+    });
   }
 
   onFinishAuthReddit() {
     this.onCloseDialog();
-    this.closeServer();
     const clientID = this.props.settings.redditClientID;
     const userAgent = this.props.settings.redditUserAgent;
 

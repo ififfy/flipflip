@@ -93,6 +93,10 @@ declare global {
       openScript: () => Promise<string | undefined>;
       saveScript: (script: string) => Promise<string | undefined>;
       getFonts: () => Promise<string[]>;
+      tumblrAuthRequest: (tumblrKey: string, tumblrSecret: string) => void;
+      onTumblrAuthResponse: (
+        callback: (response: AuthResponse) => void,
+      ) => void;
     };
   }
 }

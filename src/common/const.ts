@@ -231,6 +231,8 @@ const IPC = {
   openScript: "ipc.openScript",
   saveScript: "ipc.saveScript",
   getFonts: "ipc.getFonts",
+  tumblrAuthRequest: "ipc.tumblrAuthRequest",
+  tumblrAuthResponse: "ipc.tumblrAuthResponse",
 };
 
 const MO = {

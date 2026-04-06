@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer } from "electron";
 import { IPC } from "../common/const";
 import AppStorageState from "../common/AppStorageState";
 import Config from "../common/Config";
+import AuthResponse from "../common/AuthResponse";
 
 contextBridge.exposeInMainWorld("ipc", {
   platform: () => process.platform,
@@ -34,6 +35,12 @@ contextBridge.exposeInMainWorld("ipc", {
   openScript: () => ipcRenderer.invoke(IPC.openScript),
   saveScript: (script: string) => ipcRenderer.invoke(IPC.saveScript, script),
   getFonts: () => ipcRenderer.invoke(IPC.getFonts),
+  tumblrAuthRequest: (tumblrKey: string, tumblrSecret: string) =>
+    ipcRenderer.send(IPC.tumblrAuthRequest, tumblrKey, tumblrSecret),
+  onTumblrAuthResponse: (callback: (response: AuthResponse) => void) =>
+    ipcRenderer.once(IPC.tumblrAuthResponse, (_event, response: AuthResponse) =>
+      callback(response),
+    ),
   onStartScene: (callback: (sceneName: string) => void) =>
     ipcRenderer.on(IPC.startScene, (_event, sceneName: string) =>
       callback(sceneName),

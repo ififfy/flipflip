@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import moment from "moment";
 import { rimrafSync } from "rimraf";
-import { webFrame } from "electron";
+import { BrowserWindow, webFrame } from "electron";
 import Config from "../common/Config";
 import { saveDir, getBackups, savePath } from "./utils";
 import Backup from "../common/Backup";
@@ -20,6 +20,10 @@ import defaultTheme from "../common/theme";
 import { reloadWindow } from "./WindowManager";
 import fontList from "font-list";
 import SystemFonts from "system-font-families";
+import { OAuth } from "oauth";
+import http from "http";
+import { shell } from "electron";
+import { IPC } from "../common/const";
 
 export function cleanBackups(config: Config) {
   let backups = getBackups();
@@ -173,6 +177,107 @@ export function getFonts() {
       });
     });
   }
+}
+
+export function tumblrAuth(
+  window: BrowserWindow,
+  tumblrKey: string,
+  tumblrSecret: string,
+) {
+  // Tumblr endpoints
+  const authorizeUrl = "https://www.tumblr.com/oauth/authorize";
+  const requestTokenUrl = "https://www.tumblr.com/oauth/request_token";
+  const accessTokenUrl = "https://www.tumblr.com/oauth/access_token";
+
+  const closeServer = (server?: http.Server) => {
+    if (server != null) {
+      server.close();
+    }
+  };
+
+  const oauth = new OAuth(
+    requestTokenUrl,
+    accessTokenUrl,
+    tumblrKey,
+    tumblrSecret,
+    "1.0A",
+    "http://localhost:65010",
+    "HMAC-SHA1",
+  );
+
+  let server: http.Server | undefined = undefined;
+  let sharedSecret = "";
+
+  oauth.getOAuthRequestToken(
+    (
+      error: { statusCode: number; data: string },
+      token: string,
+      secret: string,
+    ) => {
+      if (error) {
+        console.error(error.statusCode + " - " + error.data);
+        window.webContents.send(IPC.tumblrAuthResponse, { error });
+        closeServer(server);
+        return;
+      }
+
+      sharedSecret = secret;
+      shell.openExternal(authorizeUrl + "?oauth_token=" + token);
+    },
+  );
+
+  // Start a server to listen for Tumblr OAuth response
+  server = http
+    .createServer((req, res) => {
+      // Can't seem to get electron to properly return focus to FlipFlip, just alert the user in the response
+      const html =
+        "<html><body><h1>Please return to FlipFlip</h1></body></html>";
+      res.writeHead(200, { "Content-Type": "text/html" });
+      res.write(html);
+
+      if (!req.url.endsWith("favicon.ico")) {
+        if (
+          req.url.includes("oauth_token") &&
+          req.url.includes("oauth_verifier")
+        ) {
+          const args = req.url.replace("\/?", "").split("&");
+          const oauthToken = args[0].substring(12);
+          const oauthVerifier = args[1].substring(15);
+
+          oauth.getOAuthAccessToken(
+            oauthToken,
+            sharedSecret,
+            oauthVerifier,
+            (error: any, token: string, secret: string) => {
+              if (error) {
+                console.error("Validation failed with error", error);
+                window.webContents.send(IPC.tumblrAuthResponse, { error });
+                closeServer(server);
+                req.socket.destroy();
+                res.end();
+                return;
+              }
+
+              window.webContents.send(IPC.tumblrAuthResponse, {
+                success: { token, secret },
+              });
+              window.show();
+
+              closeServer(server);
+              req.socket.destroy();
+            },
+          );
+        } else {
+          window.webContents.send(IPC.tumblrAuthResponse, {
+            error: { statusCode: 0, data: "Access Denied" },
+          });
+          closeServer(server);
+          req.socket.destroy();
+        }
+      }
+      res.end();
+    })
+    .listen(65010);
 }
 
 export function printMemoryReport() {

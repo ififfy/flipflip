@@ -13,6 +13,7 @@ import {
   openSubtitle,
   openScript,
   saveScript,
+  getWindow
 } from "./WindowManager";
 import { IPC } from "../common/const";
 import { getBackups } from "./utils";
@@ -22,7 +23,7 @@ import {
   createBackup,
 } from "./storage/StorageManager";
 import AppStorageState from "../common/AppStorageState";
-import { cleanBackups, getFonts, reset, restoreFromBackup } from "./actions";
+import { cleanBackups, getFonts, reset, restoreFromBackup, tumblrAuth } from "./actions";
 import Config from "../common/Config";
 
 // Define functions
@@ -112,6 +113,15 @@ async function onGetFonts(ev: IpcMainEvent) {
   return await getFonts();
 }
 
+function onTumblrAuthRequest(ev: IpcMainEvent, tumblrKey: string, tumblrSecret: string) {
+  const window = getWindow(ev.sender.id)
+  if(window == null) {
+    return
+  }
+
+  tumblrAuth(window, tumblrKey, tumblrSecret)
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -141,6 +151,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.openScript, onOpenScript);
   ipcMain.handle(IPC.saveScript, onSaveScript);
   ipcMain.handle(IPC.getFonts, onGetFonts);
+  ipcMain.on(IPC.tumblrAuthRequest, onTumblrAuthRequest);
 }
 
 export function releaseIpcEvents() {
