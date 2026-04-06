@@ -43,12 +43,15 @@ declare module "react-virtualized-auto-sizer";
 declare module "react-window";
 declare module "recursive-readdir";
 declare module "snoowrap";
-declare module "system-font-families";
+declare module "system-font-families" {
+  export default class SystemFonts {
+    constructor();
+    getFonts(): Promise<string[]>;
+  }
+}
 declare module "uuid/v4";
 declare module "web-audio-beat-detector";
 declare module "xmldom";
-
-declare module "workerize-loader!./Scrapers";
 
 // Type declarations for Clipboard API
 // https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API
