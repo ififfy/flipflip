@@ -21,9 +21,8 @@ import {
   Typography,
 } from "@mui/material";
 
-import { convertFromEpoch, saveDir, savePath } from "../data/utils";
+import { convertFromEpoch, saveDir } from "../data/utils";
 import { path_join } from "../dummy/path";
-import { fs_rimrafSync } from "../dummy/fs";
 
 export default class ErrorBoundary extends React.Component {
   readonly props: {

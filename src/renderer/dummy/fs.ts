@@ -19,10 +19,6 @@ export function fs_unlink(path: string, callback: (err: Error) => void) {
   callback(null);
 }
 
-export function fs_containsFiles(path: string) {
-  return true;
-}
-
 export function fs_readDirectoryNames(path: string): string[] {
   return [];
 }
@@ -52,14 +48,6 @@ export function fs_writeFile(
   callback: (err: Error) => void,
 ) {
   callback(null);
-}
-
-export function fs_recursiveReaddir(
-  url: string,
-  blacklist: string[],
-  callback: (err: any, rawFiles: Array<string>) => void,
-) {
-  callback(null, []);
 }
 
 export function fs_rimrafSync(path: string) {}

@@ -1,7 +1,4 @@
 import fs from "fs";
-import path from "path";
-import { saveDir } from "./utils";
-import recursiveReaddir from "recursive-readdir";
 import { rimraf } from "rimraf";
 
 export function fs_readFileSync(path: string, encoding?: BufferEncoding) {
@@ -26,10 +23,6 @@ export function fs_unlink(path: string, callback: (err: Error) => void) {
   if (fs.existsSync(path)) {
     fs.unlink(path, callback);
   }
-}
-
-export function fs_containsFiles(path: string) {
-  return fs.existsSync(path) && fs.readdirSync(path).length > 0;
 }
 
 export function fs_readDirectoryNames(path: string) {
@@ -74,14 +67,6 @@ export function fs_writeFile(
   callback: (err: Error) => void,
 ) {
   fs.writeFile(path, data, callback);
-}
-
-export function fs_recursiveReaddir(
-  url: string,
-  blacklist: string[],
-  callback: (err: any, rawFiles: Array<string>) => void,
-) {
-  recursiveReaddir(url, blacklist, callback);
 }
 
 export function fs_rimrafSync(path: string) {
