@@ -27,6 +27,8 @@ import { IPC } from "../common/const";
 import wretch from "wretch";
 import Snoowrap from "snoowrap";
 import RedditSubscriptionResponse from "../common/RedditSubscriptionResponse";
+import TumblrFollowingResponse from "../common/TumblrFollowingResponse";
+import tumblr from "tumblr.js";
 
 export function cleanBackups(config: Config) {
   let backups = getBackups();
@@ -427,7 +429,6 @@ export function printMemoryReport() {
 }
 
 export function getRedditSubscriptions(
-  window: BrowserWindow,
   userAgent: string,
   clientId: string,
   refreshToken: string,
@@ -448,4 +449,38 @@ export function getRedditSubscriptions(
 
   const next = listing[listing.length - 1].name;
   return { subs, next };
+}
+
+export function getTumblrFollowing(
+  key: string,
+  secret: string,
+  token: string,
+  tokenSecret: string,
+  limit: number,
+  offset: number,
+) {
+  return new Promise<TumblrFollowingResponse>((resolve) => {
+    const client = tumblr.createClient({
+      consumer_key: key,
+      consumer_secret: secret,
+      token,
+      token_secret: tokenSecret,
+    });
+
+    client.userFollowing({ limit, offset }, (err, resp) => {
+      let error;
+      let total = 0;
+      const blogs = [];
+      if (err) {
+        error = String(err);
+      } else {
+        total = resp.total_blogs;
+        for (const blog of resp.blogs) {
+          blogs.push(blog.name);
+        }
+      }
+
+      resolve({ error, total, blogs });
+    });
+  });
 }

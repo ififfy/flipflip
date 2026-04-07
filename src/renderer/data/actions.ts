@@ -3922,97 +3922,135 @@ export function updateVideoMetadata(getState: () => State, setState: Function) {
 }
 
 export function importTumblr(getState: () => State, setState: Function) {
-  // FIXME
-  // let client: TumblrClient;
-  // const win = remote.getCurrentWindow();
-  // // Define our loop
-  // const tumblrImportLoop = () => {
-  //   const state = getState();
-  //   const offset = state.progressCurrent;
-  //   if (state.progressMode == PR.cancel) {
-  //     win.setProgressBar(-1);
-  //     setState({progressMode: null, progressCurrent: 0, progressTotal: 0});
-  //     return;
-  //   }
-  //   // Get the next page of blogs
-  //   client.userFollowing({offset: offset}, (err, data) => {
-  //     if (err) {
-  //       win.setProgressBar(-1);
-  //       setState({systemMessage: "Error retrieving following: " + err, progressMode: null, progressCurrent: 0, progressTotal: 0});
-  //       console.error(err);
-  //       return;
-  //     }
-  //     // Get the next 20 blogs
-  //     let following = [];
-  //     for (let blog of data.blogs) {
-  //       const blogURL = "http://" + blog.name + ".tumblr.com/";
-  //       following.push(blogURL);
-  //     }
-  //     // dedup
-  //     const newestState = getState();
-  //     let sourceURLs = newestState.library.map((s) => s.url);
-  //     following = following.filter((b) => !sourceURLs.includes(b));
-  //     let id = newestState.library.length + 1;
-  //     newestState.library.forEach((s) => {
-  //       id = Math.max(s.id + 1, id);
-  //     });
-  //     // Add to Library
-  //     let newLibrary = newestState.library;
-  //     for (let url of following) {
-  //       newLibrary = newLibrary.concat([new LibrarySource({
-  //         url: url,
-  //         id: id,
-  //         tags: new Array<Tag>(),
-  //       })]);
-  //       id += 1;
-  //     }
-  //     setState({library: newLibrary});
-  //     let nextOffset = offset + 20;
-  //     if (offset > state.progressTotal) {
-  //       nextOffset = state.progressTotal;
-  //     }
-  //     // Update progress
-  //     setState({progressCurrent: nextOffset});
-  //     win.setProgressBar(nextOffset / state.progressTotal);
-  //     // Loop until we run out of blogs
-  //     if ((nextOffset) < state.progressTotal) {
-  //       setTimeout(tumblrImportLoop, 1500);
-  //     } else {
-  //       win.setProgressBar(-1);
-  //       setState({systemSnack: "Tumblr Following Import has completed", systemSnackSeverity: SS.success, progressMode: null, progressCurrent: 0, progressTotal: 0});
-  //     }
-  //   });
-  // };
-  // // If we don't have an import running
-  // const state = getState();
-  // if (!state.progressMode) {
-  //   // Build our Tumblr client
-  //   client = tumblr.createClient({
-  //     consumer_key: state.config.remoteSettings.tumblrKey,
-  //     consumer_secret: state.config.remoteSettings.tumblrSecret,
-  //     token: state.config.remoteSettings.tumblrOAuthToken,
-  //     token_secret: state.config.remoteSettings.tumblrOAuthTokenSecret,
-  //   });
-  //   // Make the first call just to check the total blogs
-  //   client.userFollowing({limit: 0}, (err, data) => {
-  //     if (err) {
-  //       win.setProgressBar(-1);
-  //       setState({systemMessage: "Error retrieving following: " + err, progressMode: null, progressCurrent: 0, progressTotal: 0});
-  //       console.error(err);
-  //       return;
-  //     }
-  //     state.progressMode = PR.tumblr;
-  //     state.progressCurrent = 0;
-  //     state.progressTotal = data.total_blogs;
-  //     setState({
-  //       progressMode: state.progressMode,
-  //       progressCurrent: state.progressCurrent,
-  //       progressTotal: state.progressTotal,
-  //     });
-  //     win.setProgressBar(state.progressCurrent / state.progressTotal);
-  //     tumblrImportLoop();
-  //   });
-  // }
+  // Define our loop
+  const tumblrImportLoop = () => {
+    const state = getState();
+    const offset = state.progressCurrent;
+    if (state.progressMode == PR.cancel) {
+      window.ipc.setProgressBar(-1);
+      setState({ progressMode: null, progressCurrent: 0, progressTotal: 0 });
+      return;
+    }
+    // Get the next page of blogs
+    const {
+      tumblrKey,
+      tumblrSecret,
+      tumblrOAuthToken,
+      tumblrOAuthTokenSecret,
+    } = state.config.remoteSettings;
+    window.ipc
+      .tumblrFollowing(
+        tumblrKey,
+        tumblrSecret,
+        tumblrOAuthToken,
+        tumblrOAuthTokenSecret,
+        20,
+        offset,
+      )
+      .then(({ error, blogs }) => {
+        if (error != null) {
+          window.ipc.setProgressBar(-1);
+          setState({
+            systemMessage: "Error retrieving following: " + error,
+            progressMode: null,
+            progressCurrent: 0,
+            progressTotal: 0,
+          });
+          console.error(error);
+          return;
+        }
+        // Get the next 20 blogs
+        let following = [];
+        for (let blog of blogs) {
+          const blogURL = "http://" + blog + ".tumblr.com/";
+          following.push(blogURL);
+        }
+        // dedup
+        const newestState = getState();
+        let sourceURLs = newestState.library.map((s) => s.url);
+        following = following.filter((b) => !sourceURLs.includes(b));
+        let id = newestState.library.length + 1;
+        newestState.library.forEach((s) => {
+          id = Math.max(s.id + 1, id);
+        });
+        // Add to Library
+        let newLibrary = newestState.library;
+        for (let url of following) {
+          newLibrary = newLibrary.concat([
+            new LibrarySource({
+              url: url,
+              id: id,
+              tags: new Array<Tag>(),
+            }),
+          ]);
+          id += 1;
+        }
+        setState({ library: newLibrary });
+        let nextOffset = offset + 20;
+        if (offset > state.progressTotal) {
+          nextOffset = state.progressTotal;
+        }
+        // Update progress
+        setState({ progressCurrent: nextOffset });
+        window.ipc.setProgressBar(nextOffset / state.progressTotal);
+        // Loop until we run out of blogs
+        if (nextOffset < state.progressTotal) {
+          setTimeout(tumblrImportLoop, 1500);
+        } else {
+          window.ipc.setProgressBar(-1);
+          setState({
+            systemSnack: "Tumblr Following Import has completed",
+            systemSnackSeverity: SS.success,
+            progressMode: null,
+            progressCurrent: 0,
+            progressTotal: 0,
+          });
+        }
+      });
+  };
+  // If we don't have an import running
+  const state = getState();
+  if (!state.progressMode) {
+    // Make the first call just to check the total blogs
+    const {
+      tumblrKey,
+      tumblrSecret,
+      tumblrOAuthToken,
+      tumblrOAuthTokenSecret,
+    } = state.config.remoteSettings;
+    window.ipc
+      .tumblrFollowing(
+        tumblrKey,
+        tumblrSecret,
+        tumblrOAuthToken,
+        tumblrOAuthTokenSecret,
+        0,
+        0,
+      )
+      .then(({ error, total }) => {
+        if (error != null) {
+          window.ipc.setProgressBar(-1);
+          setState({
+            systemMessage: "Error retrieving following: " + error,
+            progressMode: null,
+            progressCurrent: 0,
+            progressTotal: 0,
+          });
+          console.error(error);
+          return;
+        }
+        state.progressMode = PR.tumblr;
+        state.progressCurrent = 0;
+        state.progressTotal = total;
+        setState({
+          progressMode: state.progressMode,
+          progressCurrent: state.progressCurrent,
+          progressTotal: state.progressTotal,
+        });
+        window.ipc.setProgressBar(state.progressCurrent / state.progressTotal);
+        tumblrImportLoop();
+      });
+  }
 }
 
 export function importReddit(getState: () => State, setState: Function) {

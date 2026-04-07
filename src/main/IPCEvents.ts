@@ -28,6 +28,7 @@ import {
   cleanBackups,
   getFonts,
   getRedditSubscriptions,
+  getTumblrFollowing,
   redditAuth,
   reset,
   restoreFromBackup,
@@ -164,13 +165,25 @@ function onGetRedditSubscriptions(
   refreshToken: string,
   after: string,
 ) {
-  const window = getWindow(ev.sender.id);
-  return getRedditSubscriptions(
-    window,
-    userAgent,
-    clientId,
-    refreshToken,
-    after,
+  return getRedditSubscriptions(userAgent, clientId, refreshToken, after);
+}
+
+async function onGetTumblrFollowing(
+  ev: IpcMainInvokeEvent,
+  key: string,
+  secret: string,
+  token: string,
+  tokenSecret: string,
+  limit: number,
+  offset: number,
+) {
+  return await getTumblrFollowing(
+    key,
+    secret,
+    token,
+    tokenSecret,
+    limit,
+    offset,
   );
 }
 
@@ -208,6 +221,7 @@ export function initializeIpcEvents() {
   ipcMain.on(IPC.redditAuthRequest, onRedditAuthRequest);
   ipcMain.on(IPC.setProgressBar, onSetProgressBar);
   ipcMain.handle(IPC.redditSubscriptions, onGetRedditSubscriptions);
+  ipcMain.handle(IPC.tumblrFollowing, onGetTumblrFollowing);
 }
 
 export function releaseIpcEvents() {

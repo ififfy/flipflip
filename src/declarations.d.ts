@@ -2,6 +2,7 @@ import { IAudioMetadata } from "music-metadata";
 import AppStorageState from "./common/AppStorageState";
 import Backup from "./common/Backup";
 import RedditSubscriptionResponse from "./common/RedditSubscriptionResponse";
+import TumblrFollowingResponse from "./common/TumblrFollowingResponse";
 
 // Put all your custom type information for 3rd party modules here
 declare module "*.svg" {
@@ -44,7 +45,6 @@ declare module "react-spring";
 declare module "react-virtualized-auto-sizer";
 declare module "react-window";
 declare module "recursive-readdir";
-declare module "snoowrap";
 declare module "system-font-families" {
   export default class SystemFonts {
     constructor();
@@ -107,6 +107,14 @@ declare global {
       onTumblrAuthResponse: (
         callback: (response: AuthResponse) => void,
       ) => void;
+      tumblrFollowing: (
+        key: string,
+        secret: string,
+        token: string,
+        tokenSecret: string,
+        limit: number,
+        offset: number,
+      ) => Promise<TumblrFollowingResponse>;
       redditAuthRequest: (
         userAgent: string,
         clientID: string,

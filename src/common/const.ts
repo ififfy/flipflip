@@ -238,6 +238,7 @@ const IPC = {
   redditAuthResponse: "ipc.redditAuthResponse",
   setProgressBar: "ipc.setProgressBar",
   redditSubscriptions: "ipc.redditSubscriptions",
+  tumblrFollowing: "ipc.tumblrFollowing",
 };
 
 const MO = {
