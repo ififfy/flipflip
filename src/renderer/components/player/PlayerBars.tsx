@@ -1,7 +1,6 @@
 import * as React from "react";
 import clsx from "clsx";
 import { fileUrl_fileURL } from "../../dummy/file-url";
-import wretch from "wretch";
 
 import {
   AppBar,
@@ -305,11 +304,20 @@ class PlayerBars extends React.Component {
     deleteError: null as string,
   };
 
-  _interval: NodeJS.Timer = null;
+  _interval: number = null;
   _appBarTimeout: any = null;
   _drawerTimeout: any = null;
   _tagDrawerTimeout: any = null;
   _showVideoControls = false;
+  _onNavigateBack: () => void = null;
+  _onToggleFullscreen: () => void = null;
+  _onToggleAlwaysOnTop: () => void = null;
+  _onToggleMenuBarDisplay: () => void = null;
+  _onHistoryBack: () => void = null;
+  _onHistoryForward: () => void = null;
+  _onDelete: () => void = null;
+  _onPrevSource: () => void = null;
+  _onNextSource: () => void = null;
 
   render() {
     const classes = this.props.classes;
@@ -932,8 +940,30 @@ class PlayerBars extends React.Component {
     this._appBarTimeout = null;
     this._drawerTimeout = null;
     this._tagDrawerTimeout = null;
-    // FIXME
-    // createMainMenu(Menu, createMenuTemplate(app));
+
+    window.ipc.offPlayerMenu(
+      this._onHistoryBack,
+      this._onHistoryForward,
+      this._onNavigateBack,
+      this._onToggleFullscreen,
+      this._onToggleAlwaysOnTop,
+      this._onToggleMenuBarDisplay,
+      this._onDelete,
+      this._onPrevSource,
+      this._onNextSource,
+    );
+
+    this._onNavigateBack = null;
+    this._onToggleFullscreen = null;
+    this._onToggleAlwaysOnTop = null;
+    this._onToggleMenuBarDisplay = null;
+    this._onHistoryBack = null;
+    this._onHistoryForward = null;
+    this._onDelete = null;
+    this._onPrevSource = null;
+    this._onNextSource = null;
+    window.ipc.destroyPlayerMenu();
+
     window.removeEventListener("contextmenu", this.showContextMenu);
     window.removeEventListener("keydown", this.onKeyDown);
     window.removeEventListener("wheel", this.onScroll);
@@ -1111,9 +1141,9 @@ class PlayerBars extends React.Component {
   }
 
   toggleFull() {
-    // FIXME
-    // this.setFullscreen(!getCurrentWindow().isFullScreen());
-    // this.setMenuBarVisibility(!getCurrentWindow().isFullScreen());
+    const toggleFull = !this.props.config.displaySettings.fullScreen;
+    this.setFullscreen(toggleFull);
+    this.setMenuBarVisibility(toggleFull);
   }
 
   historyBack() {
@@ -1142,32 +1172,55 @@ class PlayerBars extends React.Component {
 
   setMenuBarVisibility(showMenu: boolean) {
     this.props.config.displaySettings.showMenu = showMenu;
-    this.buildMenu();
-    // FIXME
-    // getCurrentWindow().setMenuBarVisibility(showMenu);
+    window.ipc.setMenuBarVisibility(showMenu);
   }
 
   setFullscreen(fullScreen: boolean) {
     this.props.config.displaySettings.fullScreen = fullScreen;
-    this.buildMenu();
-    // FIXME
-    // getCurrentWindow().setFullScreen(fullScreen);
+    window.ipc.setFullScreen(fullScreen);
   }
 
   buildMenu() {
-    if (this.props.tutorial != null) return;
-    // FIXME
-    // createMainMenu(Menu, createMenuTemplate(app, {
-    //   label: 'Player controls',
-    //   submenu: Array.from(this.getKeyMap().entries()).map(([k, v]) => {
-    //     const [label, accelerator] = v;
-    //     return {
-    //       label,
-    //       accelerator,
-    //       click: (this as any)[k as any].bind(this),
-    //     };
-    //   })
-    // }));
+    if (this.props.tutorial != null) {
+      return;
+    }
+
+    this._onNavigateBack = this.navigateBack.bind(this);
+    this._onToggleFullscreen = this.toggleFullscreen.bind(this);
+    this._onToggleAlwaysOnTop = this.toggleAlwaysOnTop.bind(this);
+    this._onToggleMenuBarDisplay = this.toggleMenuBarDisplay.bind(this);
+    this._onHistoryBack = this.historyBack.bind(this);
+    this._onHistoryForward = this.historyForward.bind(this);
+    this._onDelete = this.onDelete.bind(this);
+    this._onPrevSource = this.prevSource.bind(this);
+    this._onNextSource = this.nextSource.bind(this);
+    window.ipc.onPlayerMenu(
+      this._onHistoryBack,
+      this._onHistoryForward,
+      this._onNavigateBack,
+      this._onToggleFullscreen,
+      this._onToggleAlwaysOnTop,
+      this._onToggleMenuBarDisplay,
+      this._onDelete,
+      this._onPrevSource,
+      this._onNextSource,
+    );
+
+    const { fullScreen, alwaysOnTop, showMenu } =
+      this.props.config.displaySettings;
+    const { downloadScene, audioScene, scriptScene } = this.props.scene;
+    const hasAllTags = this.props.allTags != null;
+    window.ipc.buildPlayerMenu(
+      this.props.isPlaying,
+      fullScreen,
+      alwaysOnTop,
+      showMenu,
+      this.props.config.caching.enabled,
+      downloadScene,
+      audioScene,
+      scriptScene,
+      hasAllTags,
+    );
   }
 
   showContextMenu = (e: MouseEvent) => {
@@ -1299,61 +1352,6 @@ class PlayerBars extends React.Component {
     // contextMenu.popup({});
   };
 
-  getKeyMap() {
-    const keyMap = new Map<String, Array<string>>([
-      [
-        "playPause",
-        [
-          "Play/Pause " + (this.props.isPlaying ? "(Playing)" : "(Paused)"),
-          "space",
-        ],
-      ],
-      ["historyBack", ["Back in Time", "left"]],
-      ["historyForward", ["Forward in Time", "right"]],
-      ["navigateBack", ["Go Back to Scene Details", "escape"]],
-      [
-        "toggleFullscreen",
-        [
-          "Toggle Fullscreen " +
-            (this.props.config.displaySettings.fullScreen ? "(On)" : "(Off)"),
-          "Control+F",
-        ],
-      ],
-      [
-        "toggleAlwaysOnTop",
-        [
-          "Toggle Always On Top " +
-            (this.props.config.displaySettings.alwaysOnTop ? "(On)" : "(Off)"),
-          "Control+T",
-        ],
-      ],
-      [
-        "toggleMenuBarDisplay",
-        [
-          "Toggle Menu Bar " +
-            (this.props.config.displaySettings.showMenu ? "(On)" : "(Off)"),
-          "Control+G",
-        ],
-      ],
-    ]);
-
-    if (this.props.config.caching.enabled) {
-      keyMap.set("onDelete", ["Delete Image", "Delete"]);
-    }
-
-    if (
-      !this.props.scene.downloadScene &&
-      !this.props.scene.audioScene &&
-      !this.props.scene.scriptScene &&
-      this.props.allTags != null
-    ) {
-      keyMap.set("prevSource", ["Previous Source", "["]);
-      keyMap.set("nextSource", ["Next Source", "]"]);
-    }
-
-    return keyMap;
-  }
-
   onKeyDown = (e: KeyboardEvent) => {
     const focus = document.activeElement.tagName.toLocaleLowerCase();
     switch (e.key) {
@@ -1464,72 +1462,23 @@ class PlayerBars extends React.Component {
     } else {
       this.props.pause();
     }
-    this.buildMenu();
+
+    window.ipc.playerMenuSetPlayPause(play);
   }
 
   setAlwaysOnTop(alwaysOnTop: boolean) {
     this.props.config.displaySettings.alwaysOnTop = alwaysOnTop;
-    this.buildMenu();
-    // FIXME
-    // getCurrentWindow().setAlwaysOnTop(alwaysOnTop);
+    window.ipc.setAllwaysOnTop(alwaysOnTop);
   }
 
   navigateBack() {
-    // FIXME
-    // const window = getCurrentWindow();
-    // window.setFullScreen(false);
-    // window.setMenuBarVisibility(true);
+    this.setFullscreen(false);
+    this.setMenuBarVisibility(true);
     this.props.goBack();
   }
 
   copyImageToClipboard(sourceURL: string) {
-    let url = sourceURL;
-    if (!url) {
-      url =
-        this.props.historyPaths[
-          this.props.historyPaths.length - 1 + this.props.historyOffset
-        ].src;
-    }
-    const isFile = url.startsWith("file://");
-    const path = urlToPath(url);
-    const imagePath = isFile ? path : url;
-    if (
-      imagePath.toLocaleLowerCase().endsWith(".png") ||
-      imagePath.toLocaleLowerCase().endsWith(".jpg") ||
-      imagePath.toLocaleLowerCase().endsWith(".jpeg")
-    ) {
-      if (isFile) {
-        // FIXME
-        // clipboard.writeImage(nativeImage.createFromPath(imagePath));
-      } else {
-        wretch(imagePath)
-          .get()
-          .blob((blob) => {
-            const reader = new FileReader();
-            reader.onload = function () {
-              if (reader.readyState == 2) {
-                const arrayBuffer = reader.result as ArrayBuffer;
-                const buffer = Buffer.alloc(arrayBuffer.byteLength);
-                const view = new Uint8Array(arrayBuffer);
-                for (let i = 0; i < arrayBuffer.byteLength; ++i) {
-                  buffer[i] = view[i];
-                }
-                // FIXME
-                // const bufferImage = nativeImage.createFromBuffer(buffer);
-                // if (bufferImage.isEmpty()) {
-                //   clipboard.writeText(imagePath);
-                // } else {
-                //   clipboard.writeImage(bufferImage);
-                // }
-              }
-            };
-            reader.readAsArrayBuffer(blob);
-          });
-      }
-    } else {
-      // FIXME
-      // clipboard.writeText(imagePath);
-    }
+    window.ipc.copyImageToClipboard(sourceURL);
   }
 
   /* Menu and hotkey options DON'T DELETE */

@@ -239,6 +239,23 @@ const IPC = {
   setProgressBar: "ipc.setProgressBar",
   redditSubscriptions: "ipc.redditSubscriptions",
   tumblrFollowing: "ipc.tumblrFollowing",
+  buildPlayerMenu: "ipc.buildPlayerMenu",
+  destroyPlayerMenu: "ipc.destroyPlayerMenu",
+  playerMenuPlayPause: "ipc.playerMenuPlayPause",
+  playerMenuHistoryBack: "ipc.playerMenuHistoryBack",
+  playerMenuHistoryForward: "ipc.playerMenuHistoryForward",
+  playerMenuNavigateBack: "ipc.playerMenuNavigateBack",
+  playerMenuToggleFullscreen: "ipc.playerMenuToggleFullscreen",
+  playerMenuToggleAlwaysOnTop: "ipc.playerMenuToggleAlwaysOnTop",
+  playerMenuToggleMenuBarDisplay: "ipc.playerMenuToggleMenuBarDisplay",
+  playerMenuOnDelete: "ipc.playerMenuOnDelete",
+  playerMenuPrevSource: "ipc.playerMenuPrevSource",
+  playerMenuNextSource: "ipc.playerMenuNextSource",
+  setAllwaysOnTop: "ipc.setAllwaysOnTop",
+  setMenuBarVisibility: "ipc.setMenuBarVisibility",
+  setFullScreen: "ipc.setFullScreen",
+  playerMenuSetPlayPause: "ipc.playerMenuSetPlayPause",
+  copyImageToClipboard: "ipc.copyImageToClipboard",
 };
 
 const MO = {

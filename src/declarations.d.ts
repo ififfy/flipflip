@@ -129,6 +129,45 @@ declare global {
         refreshToken: string,
         after: string,
       ) => Promise<RedditSubscriptionResponse>;
+      buildPlayerMenu: (
+        isPlaying: boolean,
+        fullScreen: boolean,
+        alwaysOnTop: boolean,
+        showMenu: boolean,
+        cachingEnabled: boolean,
+        downloadScene: boolean,
+        audioScene: boolean,
+        scriptScene: boolean,
+        hasAllTags: boolean,
+      ) => void;
+      destroyPlayerMenu: () => void;
+      setAllwaysOnTop: (alwaysOnTop: boolean) => void;
+      setMenuBarVisibility: (showMenu: boolean) => void;
+      setFullScreen: (fullScreen: boolean) => void;
+      playerMenuSetPlayPause: (play: boolean) => void;
+      onPlayerMenu: (
+        historyBack: () => void,
+        historyForward: () => void,
+        navigateBack: () => void,
+        toggleFullscreen: () => void,
+        toggleAlwaysOnTop: () => void,
+        toggleMenuBarDisplay: () => void,
+        onDelete: () => void,
+        prevSource: () => void,
+        nextSource: () => void,
+      ) => void;
+      offPlayerMenu: (
+        historyBack: () => void,
+        historyForward: () => void,
+        navigateBack: () => void,
+        toggleFullscreen: () => void,
+        toggleAlwaysOnTop: () => void,
+        toggleMenuBarDisplay: () => void,
+        onDelete: () => void,
+        prevSource: () => void,
+        nextSource: () => void,
+      ) => void;
+      copyImageToClipboard: (sourceURL: string) => void;
     };
   }
 }

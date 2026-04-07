@@ -6,9 +6,10 @@ import Config from "../common/Config";
 import AuthResponse from "../common/AuthResponse";
 // import { parseFile } from "music-metadata";
 
+// FIXME these are just dummys
 contextBridge.exposeInMainWorld("files", {
   existsSync: (path: string) => true,
-  readFileSync: (path: string) => 'text',
+  readFileSync: (path: string) => "text",
   fileSize: (path: string) => -1,
   parseAudioFile: (path: string) => Promise.resolve({}),
 });
@@ -101,4 +102,80 @@ contextBridge.exposeInMainWorld("ipc", {
     ipcRenderer.on(IPC.startScene, (_event, sceneName: string) =>
       callback(sceneName),
     ),
+  buildPlayerMenu: (
+    isPlaying: boolean,
+    fullScreen: boolean,
+    alwaysOnTop: boolean,
+    showMenu: boolean,
+    cachingEnabled: boolean,
+    downloadScene: boolean,
+    audioScene: boolean,
+    scriptScene: boolean,
+    hasAllTags: boolean,
+  ) =>
+    ipcRenderer.send(
+      IPC.buildPlayerMenu,
+      isPlaying,
+      fullScreen,
+      alwaysOnTop,
+      showMenu,
+      cachingEnabled,
+      downloadScene,
+      audioScene,
+      scriptScene,
+      hasAllTags,
+    ),
+  destroyPlayerMenu: () => ipcRenderer.send(IPC.destroyPlayerMenu),
+  onPlayerMenu: (
+    historyBack: () => void,
+    historyForward: () => void,
+    navigateBack: () => void,
+    toggleFullscreen: () => void,
+    toggleAlwaysOnTop: () => void,
+    toggleMenuBarDisplay: () => void,
+    onDelete: () => void,
+    prevSource: () => void,
+    nextSource: () => void,
+  ) => {
+    ipcRenderer.on(IPC.playerMenuHistoryBack, historyBack);
+    ipcRenderer.on(IPC.playerMenuHistoryForward, historyForward);
+    ipcRenderer.on(IPC.playerMenuNavigateBack, navigateBack);
+    ipcRenderer.on(IPC.playerMenuToggleFullscreen, toggleFullscreen);
+    ipcRenderer.on(IPC.playerMenuToggleAlwaysOnTop, toggleAlwaysOnTop);
+    ipcRenderer.on(IPC.playerMenuToggleMenuBarDisplay, toggleMenuBarDisplay);
+    ipcRenderer.on(IPC.playerMenuOnDelete, onDelete);
+    ipcRenderer.on(IPC.playerMenuPrevSource, prevSource);
+    ipcRenderer.on(IPC.playerMenuNextSource, nextSource);
+  },
+  offPlayerMenu: (
+    historyBack: () => void,
+    historyForward: () => void,
+    navigateBack: () => void,
+    toggleFullscreen: () => void,
+    toggleAlwaysOnTop: () => void,
+    toggleMenuBarDisplay: () => void,
+    onDelete: () => void,
+    prevSource: () => void,
+    nextSource: () => void,
+  ) => {
+    ipcRenderer.off(IPC.playerMenuHistoryBack, historyBack);
+    ipcRenderer.off(IPC.playerMenuHistoryForward, historyForward);
+    ipcRenderer.off(IPC.playerMenuNavigateBack, navigateBack);
+    ipcRenderer.off(IPC.playerMenuToggleFullscreen, toggleFullscreen);
+    ipcRenderer.off(IPC.playerMenuToggleAlwaysOnTop, toggleAlwaysOnTop);
+    ipcRenderer.off(IPC.playerMenuToggleMenuBarDisplay, toggleMenuBarDisplay);
+    ipcRenderer.off(IPC.playerMenuOnDelete, onDelete);
+    ipcRenderer.off(IPC.playerMenuPrevSource, prevSource);
+    ipcRenderer.off(IPC.playerMenuNextSource, nextSource);
+  },
+  setAllwaysOnTop: (alwaysOnTop: boolean) =>
+    ipcRenderer.send(IPC.setAllwaysOnTop, alwaysOnTop),
+  setMenuBarVisibility: (showMenu: boolean) =>
+    ipcRenderer.send(IPC.setMenuBarVisibility, showMenu),
+  setFullScreen: (fullScreen: boolean) =>
+    ipcRenderer.send(IPC.setFullScreen, fullScreen),
+  playerMenuSetPlayPause: (play: boolean) =>
+    ipcRenderer.send(IPC.playerMenuSetPlayPause, play),
+  copyImageToClipboard: (sourceURL: string) =>
+    ipcRenderer.send(IPC.copyImageToClipboard, sourceURL),
 });

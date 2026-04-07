@@ -1,5 +1,14 @@
 import fs from "fs";
-import { ipcMain, IpcMainEvent, IpcMainInvokeEvent, shell } from "electron";
+import wretch from "wretch";
+import {
+  ipcMain,
+  IpcMainEvent,
+  IpcMainInvokeEvent,
+  shell,
+  clipboard,
+  nativeImage,
+} from "electron";
+import { urlToPath } from "../renderer/data/utils";
 
 import {
   createNewWindow,
@@ -35,6 +44,7 @@ import {
   tumblrAuth,
 } from "./actions";
 import Config from "../common/Config";
+import PlayerMenu from "./PlayerMenu";
 
 // Define functions
 function onRequestCreateNewWindow() {
@@ -187,6 +197,72 @@ async function onGetTumblrFollowing(
   );
 }
 
+function onSetAlwaysOnTop(ev: IpcMainEvent, alwaysOnTop: boolean) {
+  const window = getWindow(ev.sender.id);
+  if (window == null) {
+    return;
+  }
+
+  window.setAlwaysOnTop(alwaysOnTop);
+  PlayerMenu.setAlwaysOnTop(alwaysOnTop);
+}
+
+function onSetMenuBarVisibility(ev: IpcMainEvent, showMenu: boolean) {
+  const window = getWindow(ev.sender.id);
+  if (window == null) {
+    return;
+  }
+
+  window.setMenuBarVisibility(showMenu);
+  PlayerMenu.setMenuBarVisibility(showMenu);
+}
+
+function onSetFullScreen(ev: IpcMainEvent, fullScreen: boolean) {
+  const window = getWindow(ev.sender.id);
+  if (window == null) {
+    return;
+  }
+
+  window.setFullScreen(fullScreen);
+  PlayerMenu.setFullScreen(fullScreen);
+}
+
+function onCopyImageToClipboard(ev: IpcMainEvent, sourceURL: string) {
+  let url = sourceURL;
+  if (!url) {
+    url =
+      this.props.historyPaths[
+        this.props.historyPaths.length - 1 + this.props.historyOffset
+      ].src;
+  }
+  const isFile = url.startsWith("file://");
+  const path = urlToPath(url);
+  const imagePath = isFile ? path : url;
+  if (
+    imagePath.toLocaleLowerCase().endsWith(".png") ||
+    imagePath.toLocaleLowerCase().endsWith(".jpg") ||
+    imagePath.toLocaleLowerCase().endsWith(".jpeg")
+  ) {
+    if (isFile) {
+      clipboard.writeImage(nativeImage.createFromPath(imagePath));
+    } else {
+      wretch(imagePath)
+        .get()
+        .arrayBuffer((arrayBuffer) => {
+          const buffer = Buffer.from(arrayBuffer);
+          const bufferImage = nativeImage.createFromBuffer(buffer);
+          if (bufferImage.isEmpty()) {
+            clipboard.writeText(imagePath);
+          } else {
+            clipboard.writeImage(bufferImage);
+          }
+        });
+    }
+  } else {
+    clipboard.writeText(imagePath);
+  }
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -222,6 +298,13 @@ export function initializeIpcEvents() {
   ipcMain.on(IPC.setProgressBar, onSetProgressBar);
   ipcMain.handle(IPC.redditSubscriptions, onGetRedditSubscriptions);
   ipcMain.handle(IPC.tumblrFollowing, onGetTumblrFollowing);
+  ipcMain.on(IPC.buildPlayerMenu, PlayerMenu.create);
+  ipcMain.on(IPC.destroyPlayerMenu, PlayerMenu.destroy);
+  ipcMain.on(IPC.setAllwaysOnTop, onSetAlwaysOnTop);
+  ipcMain.on(IPC.setMenuBarVisibility, onSetMenuBarVisibility);
+  ipcMain.on(IPC.setFullScreen, onSetFullScreen);
+  ipcMain.on(IPC.playerMenuSetPlayPause, PlayerMenu.setIsPlaying);
+  ipcMain.on(IPC.copyImageToClipboard, onCopyImageToClipboard);
 }
 
 export function releaseIpcEvents() {
