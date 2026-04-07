@@ -36,37 +36,6 @@ const styles = (theme: Theme) =>
       bottom: 0,
       left: 0,
     },
-    appBar: {
-      zIndex: theme.zIndex.drawer + 1,
-      height: theme.spacing(8),
-      marginTop: -theme.spacing(8) - 3,
-      transition: theme.transitions.create("margin", {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-      }),
-    },
-    appBarHover: {
-      marginTop: 0,
-      transition: theme.transitions.create("margin", {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-    },
-    hoverBar: {
-      zIndex: theme.zIndex.drawer + 1,
-      position: "absolute",
-      opacity: 0,
-      height: theme.spacing(5),
-      width: "100%",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "flex-end",
-      padding: "0 8px",
-      minHeight: 64,
-    },
-    title: {
-      textAlign: "center",
-    },
     content: {
       display: "flex",
       flexGrow: 1,
@@ -87,9 +56,6 @@ const styles = (theme: Theme) =>
       width: "100%",
       display: "grid",
       overflow: "hidden",
-    },
-    fill: {
-      flexGrow: 1,
     },
     hidden: {
       opacity: 0,
@@ -112,7 +78,6 @@ class GridPlayer extends React.Component {
     theme: Theme;
     advanceHacks?: Array<ChildCallbackHack>;
     hasStarted?: boolean;
-    hideBars?: boolean;
     cache(i: HTMLImageElement | HTMLVideoElement): void;
     getTags(source: string): Array<Tag>;
     goBack(): void;
@@ -129,7 +94,6 @@ class GridPlayer extends React.Component {
   };
 
   readonly state = {
-    appBarHover: false,
     scene: JSON.parse(JSON.stringify(this.props.scene)) as SceneGrid,
     height:
       this.props.scene.grid &&
@@ -151,7 +115,6 @@ class GridPlayer extends React.Component {
   };
 
   readonly idleTimerRef: React.RefObject<HTMLDivElement> = React.createRef();
-  _appBarTimeout: any = null;
 
   render() {
     const classes = this.props.classes;
@@ -169,65 +132,6 @@ class GridPlayer extends React.Component {
 
     return (
       <div className={classes.root}>
-        {!this.props.hideBars && (
-          <React.Fragment>
-            <div
-              className={classes.hoverBar}
-              onMouseEnter={this.onMouseEnterAppBar.bind(this)}
-              onMouseLeave={this.onMouseLeaveAppBar.bind(this)}
-            />
-
-            <AppBar
-              enableColorOnDark
-              position="absolute"
-              onMouseEnter={this.onMouseEnterAppBar.bind(this)}
-              onMouseLeave={this.onMouseLeaveAppBar.bind(this)}
-              className={clsx(
-                classes.appBar,
-                this.state.appBarHover && classes.appBarHover,
-              )}
-            >
-              <Toolbar>
-                <Tooltip disableInteractive title="Back" placement="right-end">
-                  <IconButton
-                    edge="start"
-                    color="inherit"
-                    aria-label="Back"
-                    onClick={this.props.goBack.bind(this)}
-                    size="large"
-                  >
-                    <ArrowBackIcon />
-                  </IconButton>
-                </Tooltip>
-
-                <div className={classes.fill} />
-                <Typography
-                  component="h1"
-                  variant="h4"
-                  color="inherit"
-                  noWrap
-                  className={classes.title}
-                >
-                  {this.props.scene.name}
-                </Typography>
-                <div className={classes.fill} />
-
-                <Tooltip disableInteractive title="Toggle Fullscreen">
-                  <IconButton
-                    edge="start"
-                    color="inherit"
-                    aria-label="FullScreen"
-                    onClick={this.toggleFull.bind(this)}
-                    size="large"
-                  >
-                    <FullscreenIcon fontSize="large" />
-                  </IconButton>
-                </Tooltip>
-              </Toolbar>
-            </AppBar>
-          </React.Fragment>
-        )}
-
         <main
           className={clsx(
             classes.content,
@@ -470,112 +374,6 @@ class GridPlayer extends React.Component {
       this.props.finishedLoading(false);
     }
     this.setState({ isLoaded: newLoaded });
-  }
-
-  onMouseEnterAppBar() {
-    clearTimeout(this._appBarTimeout);
-    this.setState({ appBarHover: true });
-  }
-
-  closeAppBar() {
-    this.setState({ appBarHover: false });
-  }
-
-  onMouseLeaveAppBar() {
-    clearTimeout(this._appBarTimeout);
-    this._appBarTimeout = setTimeout(this.closeAppBar.bind(this), 1000);
-  }
-
-  toggleFull() {
-    // FIXME
-    // this.setFullscreen(!getCurrentWindow().isFullScreen());
-    // this.setMenuBarVisibility(!getCurrentWindow().isFullScreen());
-  }
-
-  setAlwaysOnTop(alwaysOnTop: boolean) {
-    this.props.config.displaySettings.alwaysOnTop = alwaysOnTop;
-    this.buildMenu();
-    // FIXME
-    // getCurrentWindow().setAlwaysOnTop(alwaysOnTop);
-  }
-
-  setMenuBarVisibility(showMenu: boolean) {
-    this.props.config.displaySettings.showMenu = showMenu;
-    this.buildMenu();
-    // FIXME
-    // getCurrentWindow().setMenuBarVisibility(showMenu);
-  }
-
-  setFullscreen(fullScreen: boolean) {
-    this.props.config.displaySettings.fullScreen = fullScreen;
-    this.buildMenu();
-    // FIXME
-    // getCurrentWindow().setFullScreen(fullScreen);
-  }
-
-  buildMenu() {
-    // FIXME
-    // createMainMenu(Menu, createMenuTemplate(app, {
-    //   label: 'Player controls',
-    //   submenu: Array.from(this.getKeyMap().entries()).map(([k, v]) => {
-    //     const [label, accelerator] = v;
-    //     return {
-    //       label,
-    //       accelerator,
-    //       click: (this as any)[k as any].bind(this),
-    //     };
-    //   })
-    // }));
-  }
-
-  getKeyMap() {
-    return new Map<String, Array<string>>([
-      ["navigateBack", ["Go Back to Grid Setup", "escape"]],
-      [
-        "toggleFullscreen",
-        [
-          "Toggle Fullscreen " +
-            (this.props.config.displaySettings.fullScreen ? "(On)" : "(Off)"),
-          "Control+F",
-        ],
-      ],
-      [
-        "toggleAlwaysOnTop",
-        [
-          "Toggle Always On Top " +
-            (this.props.config.displaySettings.alwaysOnTop ? "(On)" : "(Off)"),
-          "Control+T",
-        ],
-      ],
-      [
-        "toggleMenuBarDisplay",
-        [
-          "Toggle Menu Bar " +
-            (this.props.config.displaySettings.showMenu ? "(On)" : "(Off)"),
-          "Control+G",
-        ],
-      ],
-    ]);
-  }
-
-  toggleAlwaysOnTop() {
-    this.setAlwaysOnTop(!this.props.config.displaySettings.alwaysOnTop);
-  }
-
-  toggleMenuBarDisplay() {
-    this.setMenuBarVisibility(!this.props.config.displaySettings.showMenu);
-  }
-
-  toggleFullscreen() {
-    this.setFullscreen(!this.props.config.displaySettings.fullScreen);
-  }
-
-  navigateBack() {
-    // FIXME
-    // const window = getCurrentWindow();
-    // window.setFullScreen(false);
-    // window.setMenuBarVisibility(true);
-    this.props.goBack();
   }
 }
 
