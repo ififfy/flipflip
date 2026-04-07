@@ -368,7 +368,10 @@ export default class Panning extends React.Component {
 
   panLoop(panIn: boolean) {
     const delay = panIn ? this.panIn() : this.panOut();
-    this._panTimeout = window.setTimeout(this.panLoop.bind(this, !panIn), delay);
+    this._panTimeout = window.setTimeout(
+      this.panLoop.bind(this, !panIn),
+      delay,
+    );
   }
 
   componentDidMount() {

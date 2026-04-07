@@ -3755,7 +3755,7 @@ export function detectBPMs(getState: () => State, setState: Function) {
       const url = audio.url;
       // FIXME
       // have to use IPC for file operations
-      // maybe you can create a file url (file://path/to/file.mp3) 
+      // maybe you can create a file url (file://path/to/file.mp3)
       // pass that to an audio element and load the file that way?
       if (window.files.existsSync(url)) {
         detectBPM(toArrayBuffer(window.files.readFileSync(url)));

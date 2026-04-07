@@ -984,7 +984,10 @@ export default class CaptionProgram extends React.Component {
         }
       }
       this._lastTimestamp = passed;
-      this._timestampTimeout = window.setTimeout(this.timestampLoop.bind(this), 100);
+      this._timestampTimeout = window.setTimeout(
+        this.timestampLoop.bind(this),
+        100,
+      );
     } else {
       if (this._nextTimestamp == null) {
         this._nextTimestamp =
@@ -997,7 +1000,10 @@ export default class CaptionProgram extends React.Component {
           return;
         }
       }
-      this._timestampTimeout = window.setTimeout(this.timestampLoop.bind(this), 100);
+      this._timestampTimeout = window.setTimeout(
+        this.timestampLoop.bind(this),
+        100,
+      );
     }
   }
 

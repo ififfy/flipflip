@@ -473,7 +473,10 @@ export default class ImagePlayer extends React.Component {
       !this.props.allURLs
     ) {
       // Wait for the display loop to use an image
-      this._waitTimeouts[i] = window.setTimeout(() => this.queueRunFetchLoop(i), 100);
+      this._waitTimeouts[i] = window.setTimeout(
+        () => this.queueRunFetchLoop(i),
+        100,
+      );
       return;
     }
 
