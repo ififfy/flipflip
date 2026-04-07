@@ -24,7 +24,7 @@ export default class Panning extends React.Component {
     duration: this.getDuration(),
   };
 
-  _panTimeout: NodeJS.Timeout = null;
+  _panTimeout: number = null;
   _panOut = false;
 
   render() {
@@ -235,15 +235,15 @@ export default class Panning extends React.Component {
           },
         },
       );
-      clearTimeout(this._panTimeout);
+      window.clearTimeout(this._panTimeout);
       if (this._panOut) {
         this.props.panFunction();
-        this._panTimeout = setTimeout(() => {
+        this._panTimeout = window.setTimeout(() => {
           this._panOut = false;
           1;
         }, this.getDuration());
       } else {
-        this._panTimeout = setTimeout(() => {
+        this._panTimeout = window.setTimeout(() => {
           this._panOut = true;
           this.setState({ togglePan: !this.state.togglePan });
         }, this.getDuration());
@@ -368,7 +368,7 @@ export default class Panning extends React.Component {
 
   panLoop(panIn: boolean) {
     const delay = panIn ? this.panIn() : this.panOut();
-    this._panTimeout = setTimeout(this.panLoop.bind(this, !panIn), delay);
+    this._panTimeout = window.setTimeout(this.panLoop.bind(this, !panIn), delay);
   }
 
   componentDidMount() {
@@ -385,7 +385,7 @@ export default class Panning extends React.Component {
       this.props.scene.panning &&
       this.props.scene.panTF != props.scene.panTF
     ) {
-      clearTimeout(this._panTimeout);
+      window.clearTimeout(this._panTimeout);
       if (this.props.scene.panTF != TF.scene) {
         this.panLoop(true);
       }
@@ -403,7 +403,7 @@ export default class Panning extends React.Component {
   }
 
   componentWillUnmount() {
-    clearTimeout(this._panTimeout);
+    window.clearTimeout(this._panTimeout);
     this._panTimeout = null;
     this._panOut = null;
     this._lastToggle = null;

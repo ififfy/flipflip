@@ -395,7 +395,7 @@ export default class CodeMirror extends React.Component {
     }
   }
 
-  _sendUpdate: NodeJS.Timeout = null;
+  _sendUpdate: number = null;
   onBeforeChangeScript(editor: any, data: any, value: any) {
     if (this.state.scriptText != value) {
       this.onUpdateScript(value, editor, true);
@@ -415,8 +415,8 @@ export default class CodeMirror extends React.Component {
     } else {
       this.setState({ scriptText: scriptText });
     }
-    clearTimeout(this._sendUpdate);
-    this._sendUpdate = setTimeout(
+    window.clearTimeout(this._sendUpdate);
+    this._sendUpdate = window.setTimeout(
       this.props.onUpdateScript.bind(this, scriptText, changed),
       500,
     );

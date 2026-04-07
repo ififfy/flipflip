@@ -70,7 +70,7 @@ export default class CaptionProgram extends React.Component {
   };
 
   _runningPromise: CancelablePromise = null;
-  _timeout: any = null;
+  _timeout: number = null;
 
   render() {
     const countXPos = this.state.countX * this.props.scale;
@@ -282,7 +282,7 @@ export default class CaptionProgram extends React.Component {
       this._runningPromise = null;
     }
     if (this._timeout) {
-      clearTimeout(this._timeout);
+      window.clearTimeout(this._timeout);
       this._timeout = null;
     }
     this._sceneCommand = null;
@@ -290,7 +290,7 @@ export default class CaptionProgram extends React.Component {
     this._lastTimestamp = null;
     this._nextTimestamp = null;
     if (this._timestampTimeout) {
-      clearTimeout(this._timestampTimeout);
+      window.clearTimeout(this._timestampTimeout);
       this._timestampTimeout = null;
     }
   }
@@ -903,7 +903,7 @@ export default class CaptionProgram extends React.Component {
   _timeStarted: Date = null;
   _nextTimestamp: number = null;
   _lastTimestamp: number = null;
-  _timestampTimeout: NodeJS.Timeout = null;
+  _timestampTimeout: number = null;
   timestampLoop() {
     const doLoop = (passed: number): number => {
       let index = this.state.timestampCounter;
@@ -984,7 +984,7 @@ export default class CaptionProgram extends React.Component {
         }
       }
       this._lastTimestamp = passed;
-      this._timestampTimeout = setTimeout(this.timestampLoop.bind(this), 100);
+      this._timestampTimeout = window.setTimeout(this.timestampLoop.bind(this), 100);
     } else {
       if (this._nextTimestamp == null) {
         this._nextTimestamp =
@@ -997,7 +997,7 @@ export default class CaptionProgram extends React.Component {
           return;
         }
       }
-      this._timestampTimeout = setTimeout(this.timestampLoop.bind(this), 100);
+      this._timestampTimeout = window.setTimeout(this.timestampLoop.bind(this), 100);
     }
   }
 
@@ -1078,8 +1078,8 @@ export default class CaptionProgram extends React.Component {
 
   wait(ms: number) {
     return (nextCommand: Function) => {
-      clearTimeout(this._timeout);
-      this._timeout = setTimeout(nextCommand, ms);
+      window.clearTimeout(this._timeout);
+      this._timeout = window.setTimeout(nextCommand, ms);
     };
   }
 

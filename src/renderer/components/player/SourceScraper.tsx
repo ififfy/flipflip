@@ -68,7 +68,7 @@ export default class SourceScraper extends React.Component {
   };
 
   _isMounted = false;
-  _backForth: NodeJS.Timeout = null;
+  _backForth: number = null;
   _promiseQueue: Array<{
     source: LibrarySource;
     helpers: { next: any; count: number; retries: number; uuid: string };
@@ -311,11 +311,7 @@ export default class SourceScraper extends React.Component {
 
           if (n < sceneSources.length) {
             const timeout = object?.timeout != null ? object.timeout : 1000;
-            if (timeout == 0) {
-              setImmediate(sourceLoop);
-            } else {
-              setTimeout(sourceLoop, timeout);
-            }
+            window.setTimeout(sourceLoop, timeout);
           } else {
             const values = flatten(Array.from(newAllURLs.values()));
             if (this._promiseQueue.length == 0) {
@@ -425,7 +421,7 @@ export default class SourceScraper extends React.Component {
           }
 
           if (n < nextSources.length) {
-            setTimeout(
+            window.setTimeout(
               nextSourceLoop,
               object.timeout != null ? object.timeout : 1000,
             );
@@ -474,7 +470,7 @@ export default class SourceScraper extends React.Component {
 
     let promiseLoop = () => {
       if (this.state.captcha != null && this._promiseQueue.length == 0) {
-        setTimeout(promiseLoop, 2000);
+        window.setTimeout(promiseLoop, 2000);
       }
       // Process until queue is empty or player has been stopped
       if (!this._isMounted || this._promiseQueue.length == 0) {
@@ -542,7 +538,7 @@ export default class SourceScraper extends React.Component {
             );
           }
 
-          setTimeout(
+          window.setTimeout(
             promiseLoop,
             object?.timeout != null ? object.timeout : 1000,
           );
@@ -707,7 +703,7 @@ export default class SourceScraper extends React.Component {
     this._nextPromiseQueue = null;
     this._nextAllURLs = null;
     this._nextAllPosts = null;
-    clearTimeout(this._backForth);
+    window.clearTimeout(this._backForth);
     this._backForth = null;
   }
 }

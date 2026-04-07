@@ -27,7 +27,7 @@ export default class Strobe extends React.Component {
     delay: 0,
   };
 
-  _strobeTimeout: NodeJS.Timeout = null;
+  _strobeTimeout: number = null;
 
   render() {
     return <this.StrobeLayer>{this.props.children}</this.StrobeLayer>;
@@ -127,7 +127,7 @@ export default class Strobe extends React.Component {
 
   strobeLoop() {
     const delay = this.strobe();
-    this._strobeTimeout = setTimeout(this.strobeLoop.bind(this), delay);
+    this._strobeTimeout = window.setTimeout(this.strobeLoop.bind(this), delay);
   }
 
   componentDidMount() {
@@ -146,7 +146,7 @@ export default class Strobe extends React.Component {
       this.props.scene.strobeDelayTF != props.scene.strobeDelayTF ||
       this.props.scene.strobePulse != props.scene.strobePulse
     ) {
-      clearTimeout(this._strobeTimeout);
+      window.clearTimeout(this._strobeTimeout);
       if (
         this.props.scene.strobePulse
           ? this.props.scene.strobeDelayTF != TF.scene
@@ -166,7 +166,7 @@ export default class Strobe extends React.Component {
   }
 
   componentWillUnmount() {
-    clearTimeout(this._strobeTimeout);
+    window.clearTimeout(this._strobeTimeout);
     this._strobeTimeout = null;
   }
 

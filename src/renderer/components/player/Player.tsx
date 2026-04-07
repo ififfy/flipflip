@@ -119,7 +119,7 @@ export default class Player extends React.Component {
   };
 
   readonly idleTimerRef: React.RefObject<HTMLDivElement> = React.createRef();
-  _interval: NodeJS.Timer = null;
+  _interval: number = null;
   _toggleStrobe = false;
   _powerSaveID: number = null;
 
@@ -713,7 +713,6 @@ export default class Player extends React.Component {
                     }}
                   >
                     <GridPlayer
-                      hideBars
                       advanceHacks={
                         this.state.imagePlayerAdvanceHacks[index + 1]
                       }

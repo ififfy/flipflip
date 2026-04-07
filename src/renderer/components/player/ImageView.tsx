@@ -1,6 +1,5 @@
 import * as React from "react";
 import { animated } from "react-spring";
-import Timeout = NodeJS.Timeout;
 
 import { getRandomColor, getRandomListItem } from "../../data/utils";
 import { BT, HTF, IT, OT, SL, ST, TF, VTF } from "../../../common/const";
@@ -41,10 +40,10 @@ export default class ImageView extends React.Component {
   readonly contentRef: React.RefObject<HTMLDivElement> = React.createRef();
   _image: HTMLImageElement | HTMLVideoElement | HTMLIFrameElement = null;
   _scale: number = null;
-  _timeouts: Array<Timeout>;
+  _timeouts: Array<number>;
 
   componentDidMount() {
-    this._timeouts = new Array<Timeout>();
+    this._timeouts = new Array<number>();
     this._applyImage();
   }
 
@@ -84,7 +83,7 @@ export default class ImageView extends React.Component {
 
   clearTimeouts() {
     for (let timeout of this._timeouts) {
-      clearTimeout(timeout);
+      window.clearTimeout(timeout);
     }
   }
 
@@ -172,7 +171,7 @@ export default class ImageView extends React.Component {
           v.currentTime = start;
         }
       }
-      this._timeouts.push(setTimeout(videoLoop, 100, v));
+      this._timeouts.push(window.setTimeout(videoLoop, 100, v));
     };
 
     const drawLoop = (
@@ -189,7 +188,7 @@ export default class ImageView extends React.Component {
       )
         return;
       c.drawImage(v, 0, 0, w, h);
-      this._timeouts.push(setTimeout(drawLoop, 20, v, c, w, h));
+      this._timeouts.push(window.setTimeout(drawLoop, 20, v, c, w, h));
     };
 
     const extraDrawLoop = (v: any, w: number, h: number) => {
@@ -211,7 +210,7 @@ export default class ImageView extends React.Component {
         const context = (canvas as HTMLCanvasElement).getContext("2d");
         context.drawImage(v, 0, 0, w, h);
       }
-      this._timeouts.push(setTimeout(extraDrawLoop, 20, v, w, h));
+      this._timeouts.push(window.setTimeout(extraDrawLoop, 20, v, w, h));
     };
 
     const extraBGDrawLoop = (v: any, w: number, h: number) => {
@@ -231,7 +230,7 @@ export default class ImageView extends React.Component {
         const context = (canvas as HTMLCanvasElement).getContext("2d");
         context.drawImage(v, 0, 0, w, h);
       }
-      this._timeouts.push(setTimeout(extraBGDrawLoop, 20, v, w, h));
+      this._timeouts.push(window.setTimeout(extraBGDrawLoop, 20, v, w, h));
     };
 
     let parentWidth = el.offsetWidth;
@@ -1007,7 +1006,7 @@ export default class ImageView extends React.Component {
     );
 
     if (this.props.setSceneCopy) {
-      setImmediate(() => this.props.setSceneCopy(renderDiv));
+      window.setTimeout(() => this.props.setSceneCopy(renderDiv), 0);
     }
 
     return renderDiv;

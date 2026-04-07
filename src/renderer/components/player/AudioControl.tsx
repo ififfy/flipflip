@@ -1,7 +1,6 @@
 import * as React from "react";
 import Sound from "react-sound";
 import clsx from "clsx";
-import Timeout = NodeJS.Timeout;
 
 import {
   Collapse,
@@ -254,7 +253,7 @@ class AudioControl extends React.Component {
     );
   }
 
-  _timeout: Timeout = null;
+  _timeout: number = null;
   _queueNextTrack = false;
   componentDidMount() {
     if (this.state.playing) {
@@ -283,7 +282,7 @@ class AudioControl extends React.Component {
       ) {
         this.tickLoop(true);
       } else {
-        clearTimeout(this._timeout);
+        window.clearTimeout(this._timeout);
       }
     }
     if (
@@ -305,7 +304,7 @@ class AudioControl extends React.Component {
 
   componentWillUnmount() {
     if (this._timeout != null) {
-      clearTimeout(this._timeout);
+      window.clearTimeout(this._timeout);
     }
     this._queueNextTrack = null;
   }
@@ -356,7 +355,7 @@ class AudioControl extends React.Component {
           break;
       }
       if (timeout != null) {
-        this._timeout = setTimeout(this.tickLoop.bind(this), timeout);
+        this._timeout = window.setTimeout(this.tickLoop.bind(this), timeout);
         return;
       }
     }

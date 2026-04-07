@@ -70,7 +70,7 @@ export default class ImagePlayer extends React.Component {
     historyOffset: 0,
   };
 
-  _backForth: NodeJS.Timeout = null;
+  _backForth: number = null;
   _isMounted: boolean;
   _isLooping: boolean;
   _loadedSources: Array<string>;
@@ -81,9 +81,9 @@ export default class ImagePlayer extends React.Component {
   _sourceComplete: boolean;
   _count: number;
   _nextSourceIndex: Map<string, number>;
-  _timeout: NodeJS.Timeout;
-  _waitTimeouts: Array<NodeJS.Timeout>;
-  _imgLoadTimeouts: Array<NodeJS.Timeout>;
+  _timeout: number;
+  _waitTimeouts: Array<number>;
+  _imgLoadTimeouts: Array<number>;
   _toggleStrobe: boolean;
   _runFetchLoopCallRequests: Array<number>;
   _animationFrameHandle: number;
@@ -216,10 +216,10 @@ export default class ImagePlayer extends React.Component {
     this._sourceComplete = false;
     this._count = 0;
     this._nextSourceIndex = new Map<string, number>();
-    this._waitTimeouts = new Array<NodeJS.Timeout>(
+    this._waitTimeouts = new Array<number>(
       this.props.config.displaySettings.maxLoadingAtOnce,
     ).fill(null);
-    this._imgLoadTimeouts = new Array<NodeJS.Timeout>(
+    this._imgLoadTimeouts = new Array<number>(
       this.props.config.displaySettings.maxLoadingAtOnce,
     ).fill(null);
     this._toggleStrobe = false;
@@ -239,7 +239,7 @@ export default class ImagePlayer extends React.Component {
         new Date().getTime() - this._lastAdvance > delay
       ) {
         this._lastAdvance = new Date().getTime();
-        clearTimeout(this._timeout);
+        window.clearTimeout(this._timeout);
         this.advance(true, true);
       }
     };
@@ -256,13 +256,13 @@ export default class ImagePlayer extends React.Component {
 
   componentWillUnmount() {
     cancelAnimationFrame(this._animationFrameHandle);
-    clearTimeout(this._backForth);
-    clearTimeout(this._timeout);
+    window.clearTimeout(this._backForth);
+    window.clearTimeout(this._timeout);
     for (let timeout of this._waitTimeouts) {
-      clearTimeout(timeout);
+      window.clearTimeout(timeout);
     }
     for (let timeout of this._imgLoadTimeouts) {
-      clearTimeout(timeout);
+      window.clearTimeout(timeout);
     }
     this._backForth = null;
     this._timeout = null;
@@ -309,7 +309,7 @@ export default class ImagePlayer extends React.Component {
       this.start();
     } else if (!this.props.isPlaying) {
       this._isLooping = false;
-      clearTimeout(this._timeout);
+      window.clearTimeout(this._timeout);
     }
     if (
       this.props.scene.orderFunction !== props.scene.orderFunction ||
@@ -323,15 +323,15 @@ export default class ImagePlayer extends React.Component {
       this.props.isPlaying &&
       this.props.hasStarted
     ) {
-      clearTimeout(this._backForth);
+      window.clearTimeout(this._backForth);
       this._backForth = null;
-      setTimeout(() => this.advance(true, false), 200);
-      this._backForth = setTimeout(
+      window.setTimeout(() => this.advance(true, false), 200);
+      this._backForth = window.setTimeout(
         this.backForth.bind(this, -1),
         this.getBackForthTiming(),
       );
     } else if (props.scene.backForth && !this.props.scene.backForth) {
-      clearTimeout(this._backForth);
+      window.clearTimeout(this._backForth);
       this._backForth = null;
     }
   }
@@ -378,7 +378,7 @@ export default class ImagePlayer extends React.Component {
   backForth(newOffset: number) {
     if (this.props.isPlaying && this._isMounted) {
       this.setState({ historyOffset: newOffset });
-      this._backForth = setTimeout(
+      this._backForth = window.setTimeout(
         this.backForth.bind(this, newOffset == 0 ? -1 : 0),
         this.getBackForthTiming(),
       );
@@ -386,7 +386,7 @@ export default class ImagePlayer extends React.Component {
       if (this._isMounted && this.state.historyOffset != 0) {
         this.setState({ historyOffset: 0 });
       }
-      clearTimeout(this._backForth);
+      window.clearTimeout(this._backForth);
       this._backForth = null;
     }
   }
@@ -430,7 +430,7 @@ export default class ImagePlayer extends React.Component {
     if (loop < max) {
       this.runFetchLoop(loop);
       // Put a small delay between our loops
-      this._waitTimeouts[loop] = setTimeout(
+      this._waitTimeouts[loop] = window.setTimeout(
         this.startFetchLoops.bind(this, max, loop + 1),
         10,
       );
@@ -456,7 +456,7 @@ export default class ImagePlayer extends React.Component {
     if (requestAnimation) {
       this._animationFrameHandle = requestAnimationFrame(this.animationFrame);
     } else {
-      setTimeout(this.animationFrame, 100);
+      window.setTimeout(this.animationFrame, 100);
     }
   };
 
@@ -473,7 +473,7 @@ export default class ImagePlayer extends React.Component {
       !this.props.allURLs
     ) {
       // Wait for the display loop to use an image
-      this._waitTimeouts[i] = setTimeout(() => this.queueRunFetchLoop(i), 100);
+      this._waitTimeouts[i] = window.setTimeout(() => this.queueRunFetchLoop(i), 100);
       return;
     }
 
@@ -707,7 +707,7 @@ export default class ImagePlayer extends React.Component {
 
       const successCallback = () => {
         if (this._imgLoadTimeouts) {
-          clearTimeout(this._imgLoadTimeouts[i]);
+          window.clearTimeout(this._imgLoadTimeouts[i]);
         }
         if (!this._isMounted) return;
 
@@ -729,7 +729,7 @@ export default class ImagePlayer extends React.Component {
       iframe.setAttribute("sandbox", "allow-scripts allow-same-origin");
       iframe.src = url;
 
-      clearTimeout(this._imgLoadTimeouts[i]);
+      window.clearTimeout(this._imgLoadTimeouts[i]);
       successCallback();
     } else if (isVideo(url, false)) {
       let video = document.createElement("video");
@@ -764,7 +764,7 @@ export default class ImagePlayer extends React.Component {
 
       const successCallback = () => {
         if (this._imgLoadTimeouts) {
-          clearTimeout(this._imgLoadTimeouts[i]);
+          window.clearTimeout(this._imgLoadTimeouts[i]);
         }
         if (!this._isMounted) return;
         this.props.cache(video);
@@ -913,7 +913,7 @@ export default class ImagePlayer extends React.Component {
 
       const errorCallback = () => {
         if (this._imgLoadTimeouts) {
-          clearTimeout(this._imgLoadTimeouts[i]);
+          window.clearTimeout(this._imgLoadTimeouts[i]);
         }
         if (!this._isMounted) return;
         if (
@@ -982,7 +982,7 @@ export default class ImagePlayer extends React.Component {
 
       video.onended = () => {
         if (this.props.scene.videoOption == VO.full) {
-          clearTimeout(this._timeout);
+          window.clearTimeout(this._timeout);
           this.advance(true, true);
         } else {
           video.play();
@@ -993,8 +993,8 @@ export default class ImagePlayer extends React.Component {
       video.volume = 0;
       video.preload = "auto";
 
-      clearTimeout(this._imgLoadTimeouts[i]);
-      this._imgLoadTimeouts[i] = setTimeout(errorCallback, 15000);
+      window.clearTimeout(this._imgLoadTimeouts[i]);
+      this._imgLoadTimeouts[i] = window.setTimeout(errorCallback, 15000);
 
       video.load();
     } else {
@@ -1013,7 +1013,7 @@ export default class ImagePlayer extends React.Component {
 
       const successCallback = () => {
         if (this._imgLoadTimeouts) {
-          clearTimeout(this._imgLoadTimeouts[i]);
+          window.clearTimeout(this._imgLoadTimeouts[i]);
         }
         if (!this._isMounted) return;
         this.props.cache(img);
@@ -1065,7 +1065,7 @@ export default class ImagePlayer extends React.Component {
 
       const errorCallback = () => {
         if (this._imgLoadTimeouts) {
-          clearTimeout(this._imgLoadTimeouts[i]);
+          window.clearTimeout(this._imgLoadTimeouts[i]);
         }
         if (!this._isMounted) return;
         if (
@@ -1197,8 +1197,8 @@ export default class ImagePlayer extends React.Component {
         }
 
         img.src = url;
-        clearTimeout(this._imgLoadTimeouts[i]);
-        this._imgLoadTimeouts[i] = setTimeout(errorCallback, 5000);
+        window.clearTimeout(this._imgLoadTimeouts[i]);
+        this._imgLoadTimeouts[i] = window.setTimeout(errorCallback, 5000);
       };
 
       // Get gifinfo if we need for imageFilter or playing full gif
@@ -1230,8 +1230,8 @@ export default class ImagePlayer extends React.Component {
         }
       } else {
         img.src = url;
-        clearTimeout(this._imgLoadTimeouts[i]);
-        this._imgLoadTimeouts[i] = setTimeout(errorCallback, 5000);
+        window.clearTimeout(this._imgLoadTimeouts[i]);
+        this._imgLoadTimeouts[i] = window.setTimeout(errorCallback, 5000);
       }
     }
   }
@@ -1452,7 +1452,7 @@ export default class ImagePlayer extends React.Component {
           ) == ST.nimja
         )
       ) {
-        this._timeout = setTimeout(
+        this._timeout = window.setTimeout(
           this.advance.bind(this, false, true),
           timeToNextFrame,
         );
