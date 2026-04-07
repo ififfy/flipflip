@@ -27,6 +27,7 @@ import AppStorageState from "../common/AppStorageState";
 import {
   cleanBackups,
   getFonts,
+  getRedditSubscriptions,
   redditAuth,
   reset,
   restoreFromBackup,
@@ -156,6 +157,23 @@ function onSetProgressBar(ev: IpcMainEvent, progress: number) {
   setProgressBar(ev.sender.id, progress);
 }
 
+function onGetRedditSubscriptions(
+  ev: IpcMainInvokeEvent,
+  userAgent: string,
+  clientId: string,
+  refreshToken: string,
+  after: string,
+) {
+  const window = getWindow(ev.sender.id);
+  return getRedditSubscriptions(
+    window,
+    userAgent,
+    clientId,
+    refreshToken,
+    after,
+  );
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -189,6 +207,7 @@ export function initializeIpcEvents() {
   ipcMain.on(IPC.tumblrAuthRequest, onTumblrAuthRequest);
   ipcMain.on(IPC.redditAuthRequest, onRedditAuthRequest);
   ipcMain.on(IPC.setProgressBar, onSetProgressBar);
+  ipcMain.handle(IPC.redditSubscriptions, onGetRedditSubscriptions);
 }
 
 export function releaseIpcEvents() {

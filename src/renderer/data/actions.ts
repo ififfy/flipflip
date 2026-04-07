@@ -4016,76 +4016,96 @@ export function importTumblr(getState: () => State, setState: Function) {
 }
 
 export function importReddit(getState: () => State, setState: Function) {
-  // FIXME
-  // let reddit: any;
-  // const win = remote.getCurrentWindow();
-  // const redditImportLoop = () => {
-  //   const state = getState();
-  //   if (state.progressMode == PR.cancel) {
-  //     win.setProgressBar(-1);
-  //     setState({progressMode: null, progressNext: null, progressCurrent: 0});
-  //     return;
-  //   }
-  //   reddit.getSubscriptions({limit: 20, after: state.progressNext}).then((subscriptionListing: any) => {
-  //     if (subscriptionListing.length == 0) {
-  //       win.setProgressBar(-1);
-  //       setState({systemSnack: "Reddit Subscription Import has completed", systemSnackSeverity: SS.success, progressMode: null, progressNext: null, progressCurrent: 0});
-  //     } else {
-  //       // Get the next 20 blogs
-  //       let subscriptions = [];
-  //       for (let sub of subscriptionListing) {
-  //         const subURL = "http://www.reddit.com" + sub.url;
-  //         subscriptions.push(subURL);
-  //       }
-  //       // dedup
-  //       const newestState = getState();
-  //       let sourceURLs = newestState.library.map((s) => s.url);
-  //       subscriptions = subscriptions.filter((s) => !sourceURLs.includes(s));
-  //       let id = newestState.library.length + 1;
-  //       newestState.library.forEach((s) => {
-  //         id = Math.max(s.id + 1, id);
-  //       });
-  //       // Add to Library
-  //       let newLibrary = newestState.library;
-  //       for (let url of subscriptions) {
-  //         newLibrary = newLibrary.concat([new LibrarySource({
-  //           url: url,
-  //           id: id,
-  //           tags: new Array<Tag>(),
-  //         })]);
-  //         id += 1;
-  //       }
-  //       setState({library: newLibrary});
-  //       // Loop until we run out of blogs
-  //       setTimeout(redditImportLoop, 1500);
-  //       state.progressNext = subscriptionListing[subscriptionListing.length - 1].name;
-  //       state.progressCurrent = state.progressCurrent + 1;
-  //       setState({progressNext: state.progressNext, progressCurrent: state.progressCurrent});
-  //       win.setProgressBar(2);
-  //     }
-  //   }).catch((err: any) => {
-  //     console.error(err);
-  //     win.setProgressBar(-1);
-  //     setState({systemMessage: "Error retrieving subscriptions: " + err, progressMode: null, progressNext: null, progressCurrent: 0});
-  //   });
-  // };
-  // const state = getState();
-  // if (!state.progressMode) {
-  //   reddit = new Snoowrap({
-  //     userAgent: state.config.remoteSettings.redditUserAgent,
-  //     clientId: state.config.remoteSettings.redditClientID,
-  //     clientSecret: "",
-  //     refreshToken: state.config.remoteSettings.redditRefreshToken,
-  //   });
-  //   // Show progress bar and kick off loop
-  //   state.progressMode = PR.reddit;
-  //   state.progressCurrent = 0;
-  //   setState({
-  //     systemSnack: "Your Reddit subscriptions are being imported... You will recieve an alert when the import is finished.",
-  //     systemSnackSeverity: SS.info,
-  //     progressMode: state.progressMode, progressCurrent: state.progressCurrent
-  //   });
-  //   win.setProgressBar(2);
-  //   redditImportLoop();
-  // }
+  const redditImportLoop = () => {
+    const state = getState();
+    if (state.progressMode == PR.cancel) {
+      window.ipc.setProgressBar(-1);
+      setState({ progressMode: null, progressNext: null, progressCurrent: 0 });
+      return;
+    }
+
+    const { redditUserAgent, redditClientID, redditRefreshToken } =
+      state.config.remoteSettings;
+    window.ipc
+      .redditSubscriptions(
+        redditUserAgent,
+        redditClientID,
+        redditRefreshToken,
+        state.progressNext,
+      )
+      .then((response) => {
+        if (response.subs.length == 0) {
+          window.ipc.setProgressBar(-1);
+          setState({
+            systemSnack: "Reddit Subscription Import has completed",
+            systemSnackSeverity: SS.success,
+            progressMode: null,
+            progressNext: null,
+            progressCurrent: 0,
+          });
+        } else {
+          // Get the next 20 blogs
+          let subscriptions = [];
+          for (let sub of response.subs) {
+            const subURL = "http://www.reddit.com" + sub;
+            subscriptions.push(subURL);
+          }
+          // dedup
+          const newestState = getState();
+          let sourceURLs = newestState.library.map((s) => s.url);
+          subscriptions = subscriptions.filter((s) => !sourceURLs.includes(s));
+          let id = newestState.library.length + 1;
+          newestState.library.forEach((s) => {
+            id = Math.max(s.id + 1, id);
+          });
+          // Add to Library
+          let newLibrary = newestState.library;
+          for (let url of subscriptions) {
+            newLibrary = newLibrary.concat([
+              new LibrarySource({
+                url: url,
+                id: id,
+                tags: new Array<Tag>(),
+              }),
+            ]);
+            id += 1;
+          }
+          setState({ library: newLibrary });
+          // Loop until we run out of blogs
+          setTimeout(redditImportLoop, 1500);
+          state.progressNext = response.next;
+          state.progressCurrent = state.progressCurrent + 1;
+          setState({
+            progressNext: state.progressNext,
+            progressCurrent: state.progressCurrent,
+          });
+          window.ipc.setProgressBar(2);
+        }
+      })
+      .catch((err: any) => {
+        console.error(err);
+        window.ipc.setProgressBar(-1);
+        setState({
+          systemMessage: "Error retrieving subscriptions: " + err,
+          progressMode: null,
+          progressNext: null,
+          progressCurrent: 0,
+        });
+      });
+  };
+  const state = getState();
+  if (!state.progressMode) {
+    // Show progress bar and kick off loop
+    state.progressMode = PR.reddit;
+    state.progressCurrent = 0;
+    setState({
+      systemSnack:
+        "Your Reddit subscriptions are being imported... You will recieve an alert when the import is finished.",
+      systemSnackSeverity: SS.info,
+      progressMode: state.progressMode,
+      progressCurrent: state.progressCurrent,
+    });
+    window.ipc.setProgressBar(2);
+    redditImportLoop();
+  }
 }

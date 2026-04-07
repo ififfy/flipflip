@@ -1,6 +1,7 @@
 import { IAudioMetadata } from "music-metadata";
 import AppStorageState from "./common/AppStorageState";
 import Backup from "./common/Backup";
+import RedditSubscriptionResponse from "./common/RedditSubscriptionResponse";
 
 // Put all your custom type information for 3rd party modules here
 declare module "*.svg" {
@@ -114,6 +115,12 @@ declare global {
       onRedditAuthResponse: (
         callback: (response: AuthResponse) => void,
       ) => void;
+      redditSubscriptions: (
+        userAgent: string,
+        clientId: string,
+        refreshToken: string,
+        after: string,
+      ) => Promise<RedditSubscriptionResponse>;
     };
   }
 }

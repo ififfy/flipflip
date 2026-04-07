@@ -237,6 +237,7 @@ const IPC = {
   redditAuthRequest: "ipc.redditAuthRequest",
   redditAuthResponse: "ipc.redditAuthResponse",
   setProgressBar: "ipc.setProgressBar",
+  redditSubscriptions: "ipc.redditSubscriptions",
 };
 
 const MO = {

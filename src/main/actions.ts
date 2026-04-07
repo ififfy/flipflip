@@ -25,6 +25,8 @@ import http from "http";
 import { shell } from "electron";
 import { IPC } from "../common/const";
 import wretch from "wretch";
+import Snoowrap from "snoowrap";
+import RedditSubscriptionResponse from "../common/RedditSubscriptionResponse";
 
 export function cleanBackups(config: Config) {
   let backups = getBackups();
@@ -422,4 +424,28 @@ export function printMemoryReport() {
   );
   Object.entries(webFrame.getResourceUsage()).map(logCount);
   console.log("------");
+}
+
+export function getRedditSubscriptions(
+  window: BrowserWindow,
+  userAgent: string,
+  clientId: string,
+  refreshToken: string,
+  after: string,
+): RedditSubscriptionResponse {
+  const reddit = new Snoowrap({
+    userAgent,
+    clientId,
+    clientSecret: "",
+    refreshToken,
+  });
+
+  const listing = reddit.getSubscriptions({ limit: 20, after });
+  const subs: string[] = [];
+  for (const sub of listing) {
+    subs.push(sub.url);
+  }
+
+  const next = listing[listing.length - 1].name;
+  return { subs, next };
 }

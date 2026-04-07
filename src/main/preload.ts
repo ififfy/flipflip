@@ -59,6 +59,19 @@ contextBridge.exposeInMainWorld("ipc", {
     ipcRenderer.once(IPC.redditAuthResponse, (_event, response: AuthResponse) =>
       callback(response),
     ),
+  redditSubscriptions: (
+    userAgent: string,
+    clientId: string,
+    refreshToken: string,
+    after: string,
+  ) =>
+    ipcRenderer.invoke(
+      IPC.redditSubscriptions,
+      userAgent,
+      clientId,
+      refreshToken,
+      after,
+    ),
   onStartScene: (callback: (sceneName: string) => void) =>
     ipcRenderer.on(IPC.startScene, (_event, sceneName: string) =>
       callback(sceneName),
