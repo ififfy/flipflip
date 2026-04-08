@@ -78,7 +78,6 @@ import PiwigoDialog from "../sceneDetail/PiwigoDialog";
 import URLDialog from "../sceneDetail/URLDialog";
 import {
   fs_readdir,
-  fs_readFileSync,
   fs_unlinkSync,
   fs_rimrafSync,
   fs_unlink,
@@ -1763,10 +1762,10 @@ class Library extends React.Component<LibraryProps> {
           this.props.systemMessage("Error accessing URL");
         });
     } else {
-      this.props.onImportLibrary(
-        JSON.parse(fs_readFileSync(this.state.importFile, "utf-8")),
-      );
-      this.onCloseDialog();
+      window.ipc.readTextFile(this.state.importFile).then((text) => {
+        this.props.onImportLibrary(JSON.parse(text));
+        this.onCloseDialog();
+      });
     }
   }
 

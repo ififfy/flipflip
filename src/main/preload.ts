@@ -221,5 +221,6 @@ contextBridge.exposeInMainWorld("ipc", {
   startPowerSaveBlocker: () => ipcRenderer.invoke(IPC.startPowerSaveBlocker),
   stopPowerSaveBlocker: () => ipcRenderer.send(IPC.stopPowerSaveBlocker),
   clearBrowserCaches: () => ipcRenderer.send(IPC.clearBrowserCaches),
-  getFileSize: (path: string) => ipcRenderer.invoke(IPC.getFileSize),
+  getFileSize: (path: string) => ipcRenderer.invoke(IPC.getFileSize, path),
+  readTextFile: (path: string) => ipcRenderer.invoke(IPC.readTextFile, path),
 });

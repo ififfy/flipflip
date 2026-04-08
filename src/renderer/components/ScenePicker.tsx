@@ -77,7 +77,6 @@ import Jiggle from "../animations/Jiggle";
 import VSpin from "../animations/VSpin";
 import SceneGrid from "../../common/SceneGrid";
 import SceneSearch from "../SceneSearch";
-import { fs_readFileSync } from "../dummy/fs";
 
 const drawerWidth = 240;
 
@@ -2157,11 +2156,10 @@ class ScenePicker extends React.Component<ScenePickerProps> {
           this.props.systemMessage("Error accessing URL");
         });
     } else {
-      this.props.onImportScene(
-        JSON.parse(fs_readFileSync(this.state.importFile, "utf-8")),
-        this.state.importSources,
-      );
-      this.onCloseDialog();
+      window.ipc.readTextFile(this.state.importFile).then((text) => {
+        this.props.onImportScene(JSON.parse(text), this.state.importSources);
+        this.onCloseDialog();
+      });
     }
   }
 

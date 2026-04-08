@@ -463,7 +463,9 @@ async function onClearBrowserCaches(ev: IpcMainEvent) {
     return;
   }
 
-  global.gc();
+  if (global.gc) {
+    global.gc();
+  }
   webFrame.clearCache();
   await window.webContents.session.clearCache();
 }
@@ -474,6 +476,10 @@ function onGetFileSize(ev: IpcMainEvent, path: string) {
   } catch (e) {
     return -1;
   }
+}
+
+function onReadTextFile(ev: IpcMainEvent, path: string) {
+  return fs.readFileSync(path, "utf-8");
 }
 
 // Initialize and release listeners
@@ -523,6 +529,7 @@ export function initializeIpcEvents() {
   ipcMain.on(IPC.stopPowerSaveBlocker, onStopPowerSaveBlocker);
   ipcMain.on(IPC.clearBrowserCaches, onClearBrowserCaches);
   ipcMain.handle(IPC.getFileSize, onGetFileSize);
+  ipcMain.handle(IPC.readTextFile, onReadTextFile);
 }
 
 export function releaseIpcEvents() {

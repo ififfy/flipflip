@@ -267,6 +267,7 @@ const IPC = {
   stopPowerSaveBlocker: "ipc.stopPowerSaveBlocker",
   clearBrowserCaches: "ipc.clearBrowserCaches",
   getFileSize: "ipc.getFileSize",
+  readTextFile: "ipc.readTextFile",
 };
 
 const MO = {

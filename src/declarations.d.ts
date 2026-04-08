@@ -212,6 +212,7 @@ declare global {
       stopPowerSaveBlocker: (powerSaveID: number) => void;
       clearBrowserCaches: () => void;
       getFileSize: (path: string) => Promise<number>;
+      readTextFile: (path: string) => Promise<string>;
     };
   }
 }
