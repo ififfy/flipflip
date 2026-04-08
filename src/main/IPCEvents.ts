@@ -468,6 +468,14 @@ async function onClearBrowserCaches(ev: IpcMainEvent) {
   await window.webContents.session.clearCache();
 }
 
+function onGetFileSize(ev: IpcMainEvent, path: string) {
+  try {
+    return fs.statSync(path)?.size ?? -1;
+  } catch (e) {
+    return -1;
+  }
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -514,6 +522,7 @@ export function initializeIpcEvents() {
   ipcMain.handle(IPC.startPowerSaveBlocker, onStartPowerSaveBlocker);
   ipcMain.on(IPC.stopPowerSaveBlocker, onStopPowerSaveBlocker);
   ipcMain.on(IPC.clearBrowserCaches, onClearBrowserCaches);
+  ipcMain.handle(IPC.getFileSize, onGetFileSize);
 }
 
 export function releaseIpcEvents() {

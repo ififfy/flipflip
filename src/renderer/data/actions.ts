@@ -3879,17 +3879,15 @@ export function updateVideoMetadata(getState: () => State, setState: Function) {
           librarySource.resolution = Math.min(height, width);
           librarySource.duration = video.duration;
           video.remove();
-          try {
-            librarySource.fileSize = window.files.fileSize(librarySource.url);
-          } catch (e) {
-            librarySource.fileSize = -1;
-          }
-          state.progressCurrent = offset + 1;
-          setState({ progressCurrent: state.progressCurrent });
-          window.ipc.setProgressBar(
-            state.progressCurrent / state.progressTotal,
-          );
-          setTimeout(videoMetadataLoop, 100);
+          window.ipc.getFileSize(librarySource.url).then((size) => {
+            librarySource.fileSize = size;
+            state.progressCurrent = offset + 1;
+            setState({ progressCurrent: state.progressCurrent });
+            window.ipc.setProgressBar(
+              state.progressCurrent / state.progressTotal,
+            );
+            setTimeout(videoMetadataLoop, 100);
+          });
         };
         video.onerror = () => {
           video.remove();

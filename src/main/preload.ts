@@ -10,7 +10,6 @@ import AuthResponse from "../common/AuthResponse";
 contextBridge.exposeInMainWorld("files", {
   existsSync: (path: string) => true,
   readFileSync: (path: string) => "text",
-  fileSize: (path: string) => -1,
   parseAudioFile: (path: string) => Promise.resolve({}),
 });
 
@@ -18,7 +17,6 @@ contextBridge.exposeInMainWorld("files", {
 // contextBridge.exposeInMainWorld("files", {
 //   existsSync: (path: string) => fs.existsSync(path),
 //   readFileSync: (path: string) => fs.readFileSync(path),
-//   fileSize: (path: string) => fs.statSync(path)?.size ?? -1,
 //   parseAudioFile: (path: string) => parseFile(path),
 // });
 
@@ -223,4 +221,5 @@ contextBridge.exposeInMainWorld("ipc", {
   startPowerSaveBlocker: () => ipcRenderer.invoke(IPC.startPowerSaveBlocker),
   stopPowerSaveBlocker: () => ipcRenderer.send(IPC.stopPowerSaveBlocker),
   clearBrowserCaches: () => ipcRenderer.send(IPC.clearBrowserCaches),
+  getFileSize: (path: string) => ipcRenderer.invoke(IPC.getFileSize),
 });

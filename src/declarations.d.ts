@@ -74,7 +74,6 @@ declare global {
     files: {
       existsSync: (path: string) => boolean;
       readFileSync: (path: string) => Buffer;
-      fileSize: (path: string) => number;
       parseAudioFile: (path: string) => Promise<IAudioMetadata>;
     };
     ipc: {
@@ -212,6 +211,7 @@ declare global {
       startPowerSaveBlocker: () => Promise<number>;
       stopPowerSaveBlocker: (powerSaveID: number) => void;
       clearBrowserCaches: () => void;
+      getFileSize: (path: string) => Promise<number>;
     };
   }
 }
