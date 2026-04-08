@@ -10,6 +10,7 @@ import {
   nativeImage,
   Menu,
   MenuItem,
+  powerSaveBlocker,
 } from "electron";
 import { getCachePath, urlToPath } from "../renderer/data/utils";
 
@@ -359,7 +360,6 @@ function onShowPlayerContextMenu(
         label: "Open Cached Images",
         click: () => {
           // for some reason windows uses URLs and everyone else uses paths
-          // FIXME
           if (process.platform === "win32") {
             shell.openExternal(getCachePath(source, config));
           } else {
@@ -448,6 +448,14 @@ function onShowPlayerContextMenu(
   });
 }
 
+function onStartPowerSaveBlocker() {
+  return powerSaveBlocker.start("prevent-display-sleep");
+}
+
+function onStopPowerSaveBlocker(ev: IpcMainEvent, powerSaveID: number) {
+  powerSaveBlocker.stop(powerSaveID);
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -491,6 +499,8 @@ export function initializeIpcEvents() {
   ipcMain.on(IPC.playerMenuSetPlayPause, PlayerMenu.setIsPlaying);
   ipcMain.on(IPC.copyImageToClipboard, onCopyImageToClipboard);
   ipcMain.on(IPC.showPlayerContextMenu, onShowPlayerContextMenu);
+  ipcMain.handle(IPC.startPowerSaveBlocker, onStartPowerSaveBlocker);
+  ipcMain.on(IPC.stopPowerSaveBlocker, onStopPowerSaveBlocker);
 }
 
 export function releaseIpcEvents() {

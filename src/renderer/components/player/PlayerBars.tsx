@@ -1227,7 +1227,7 @@ class PlayerBars extends React.Component {
     if (this.props.tutorial != null) {
       return;
     }
-    
+
     const onBlacklistFile = (
       ev: IpcRendererEvent,
       source: string,

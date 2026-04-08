@@ -263,6 +263,8 @@ const IPC = {
   goToTagSource: "ipc.goToTagSource",
   goToClipSource: "ipc.goToClipSource",
   showRecentPictureGrid: "ipc.showRecentPictureGrid",
+  startPowerSaveBlocker: "ipc.startPowerSaveBlocker",
+  stopPowerSaveBlocker: "ipc.stopPowerSaveBlocker",
 };
 
 const MO = {

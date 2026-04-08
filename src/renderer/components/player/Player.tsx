@@ -878,11 +878,10 @@ export default class Player extends React.Component {
 
   componentDidMount() {
     if (!!this.props.nextScene) {
-      this._interval = setInterval(() => this.nextSceneLoop(), 1000);
+      this._interval = window.setInterval(() => this.nextSceneLoop(), 1000);
     }
     if (this.props.preventSleep) {
-      // FIXME
-      // this._powerSaveID = remote.powerSaveBlocker.start('prevent-display-sleep');
+      window.ipc.startPowerSaveBlocker().then((id) => (this._powerSaveID = id));
     }
     if (this.props.scene.nextSceneID == -1 && this.props.onUpdateScene) {
       let sceneID: number;
@@ -927,10 +926,10 @@ export default class Player extends React.Component {
     // global.gc();
     // webFrame.clearCache();
     // remote.getCurrentWindow().webContents.session.clearCache(() => {});
-    // if (this.props.preventSleep || this._powerSaveID != null) {
-    //   remote.powerSaveBlocker.stop(this._powerSaveID);
-    //   this._powerSaveID = null;
-    // }
+    if (this.props.preventSleep || this._powerSaveID != null) {
+      window.ipc.stopPowerSaveBlocker(this._powerSaveID);
+      this._powerSaveID = null;
+    }
   }
 
   shouldComponentUpdate(props: any, state: any): boolean {

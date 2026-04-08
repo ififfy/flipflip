@@ -209,6 +209,8 @@ declare global {
         callback: (event: IpcRendererEvent, source: string) => void,
       ) => void;
       offShowRecentPictureGrid: (callback: () => void) => void;
+      startPowerSaveBlocker: () => Promise<number>;
+      stopPowerSaveBlocker: (powerSaveID: number) => void;
     };
   }
 }
