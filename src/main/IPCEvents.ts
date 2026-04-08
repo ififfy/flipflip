@@ -11,6 +11,7 @@ import {
   Menu,
   MenuItem,
   powerSaveBlocker,
+  webFrame,
 } from "electron";
 import { getCachePath, urlToPath } from "../renderer/data/utils";
 
@@ -456,6 +457,17 @@ function onStopPowerSaveBlocker(ev: IpcMainEvent, powerSaveID: number) {
   powerSaveBlocker.stop(powerSaveID);
 }
 
+async function onClearBrowserCaches(ev: IpcMainEvent) {
+  const window = getWindow(ev.sender.id);
+  if (window == null) {
+    return;
+  }
+
+  global.gc();
+  webFrame.clearCache();
+  await window.webContents.session.clearCache();
+}
+
 // Initialize and release listeners
 let initialized = false;
 export function initializeIpcEvents() {
@@ -501,6 +513,7 @@ export function initializeIpcEvents() {
   ipcMain.on(IPC.showPlayerContextMenu, onShowPlayerContextMenu);
   ipcMain.handle(IPC.startPowerSaveBlocker, onStartPowerSaveBlocker);
   ipcMain.on(IPC.stopPowerSaveBlocker, onStopPowerSaveBlocker);
+  ipcMain.on(IPC.clearBrowserCaches, onClearBrowserCaches);
 }
 
 export function releaseIpcEvents() {

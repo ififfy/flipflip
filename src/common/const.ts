@@ -265,6 +265,7 @@ const IPC = {
   showRecentPictureGrid: "ipc.showRecentPictureGrid",
   startPowerSaveBlocker: "ipc.startPowerSaveBlocker",
   stopPowerSaveBlocker: "ipc.stopPowerSaveBlocker",
+  clearBrowserCaches: "ipc.clearBrowserCaches",
 };
 
 const MO = {

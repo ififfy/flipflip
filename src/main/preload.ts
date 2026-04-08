@@ -222,4 +222,5 @@ contextBridge.exposeInMainWorld("ipc", {
     ipcRenderer.off(IPC.showRecentPictureGrid, callback),
   startPowerSaveBlocker: () => ipcRenderer.invoke(IPC.startPowerSaveBlocker),
   stopPowerSaveBlocker: () => ipcRenderer.send(IPC.stopPowerSaveBlocker),
+  clearBrowserCaches: () => ipcRenderer.send(IPC.clearBrowserCaches),
 });

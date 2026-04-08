@@ -211,6 +211,7 @@ declare global {
       offShowRecentPictureGrid: (callback: () => void) => void;
       startPowerSaveBlocker: () => Promise<number>;
       stopPowerSaveBlocker: (powerSaveID: number) => void;
+      clearBrowserCaches: () => void;
     };
   }
 }
