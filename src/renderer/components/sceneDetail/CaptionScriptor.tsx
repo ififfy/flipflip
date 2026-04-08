@@ -55,14 +55,14 @@ import ChildCallbackHack from "../player/ChildCallbackHack";
 import AudioCard from "../configGroups/AudioCard";
 import FontOptions from "../library/FontOptions";
 import CaptionScript, { FontSettingsI } from "../../../common/CaptionScript";
-import CodeMirror, {
+import CodeMirrorEditor, {
   booleanSetters,
   colorSetters,
   singleSetters,
   stringSetters,
   timestampRegex,
   tupleSetters,
-} from "./CodeMirror";
+} from "./CodeMirrorEditor";
 import SceneGrid from "../../../common/SceneGrid";
 import { fs_writeFileSync } from "../../dummy/fs";
 
@@ -432,7 +432,7 @@ class CaptionScriptor extends React.Component<CaptionScriptorProps> {
                     </Typography>
                   </div>
                 )}
-                <CodeMirror
+                <CodeMirrorEditor
                   className={
                     this.props.tutorial == CST.code
                       ? classes.backdropTopHighlight
