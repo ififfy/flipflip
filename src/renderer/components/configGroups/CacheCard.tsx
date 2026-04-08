@@ -229,19 +229,10 @@ class CacheCard extends React.Component<CacheCardProps> {
 
   calculateCacheSize() {
     if (this.props.config.caching.maxSize != 0) {
-      const cachePath = getCachePath(null, this.props.config);
-      if (fs_existsSync(cachePath)) {
-        folder_getFolderSize(
-          getCachePath(null, this.props.config),
-          (err: string, size: number) => {
-            if (err) {
-              throw err;
-            }
-            const mbSize = size / 1024 / 1024;
-            this.setState({ cacheSize: mbSize.toFixed(2) });
-          },
-        );
-      }
+      window.ipc.getCacheSize(this.props.config).then((size) => {
+        const mbSize = size / 1024 / 1024;
+        this.setState({ cacheSize: mbSize.toFixed(2) });
+      });
     }
   }
 

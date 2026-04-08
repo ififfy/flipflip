@@ -488,7 +488,12 @@ function onReadTextFile(ev: IpcMainInvokeEvent, path: string) {
   return fs.readFileSync(path, "utf-8");
 }
 
-function onCacheImage(ev: IpcMainEvent, config: Config, url: string, source: string) {
+function onCacheImage(
+  ev: IpcMainEvent,
+  config: Config,
+  url: string,
+  source: string,
+) {
   const cachePath = getCachePath(null, config);
   fs.mkdirSync(cachePath);
 
@@ -500,7 +505,7 @@ function onCacheImage(ev: IpcMainEvent, config: Config, url: string, source: str
       wretch(url)
         .get()
         .arrayBuffer((arrayBuffer) => {
-          const buffer = Buffer.from(arrayBuffer)
+          const buffer = Buffer.from(arrayBuffer);
           outputFile(filePath, buffer);
         });
     }
@@ -510,7 +515,7 @@ function onCacheImage(ev: IpcMainEvent, config: Config, url: string, source: str
   } else {
     getFolderSize(cachePath, (err: string, size: number) => {
       if (err) {
-        throw err;
+        return;
       }
 
       const mbSize = size / 1024 / 1024;
@@ -519,6 +524,21 @@ function onCacheImage(ev: IpcMainEvent, config: Config, url: string, source: str
       }
     });
   }
+}
+
+function onGetCacheSize(ev: IpcMainEvent, config: Config) {
+  return new Promise((resolve) => {
+    const cachePath = getCachePath(null, config);
+    if (fs.existsSync(cachePath)) {
+      getFolderSize(cachePath, (err: string, size: number) => {
+        if (err) {
+          resolve(0);
+        } else {
+          resolve(size);
+        }
+      });
+    }
+  });
 }
 
 // Initialize and release listeners
@@ -570,7 +590,8 @@ export function initializeIpcEvents() {
   ipcMain.on(IPC.clearBrowserCaches, onClearBrowserCaches);
   ipcMain.handle(IPC.getFileSize, onGetFileSize);
   ipcMain.handle(IPC.readTextFile, onReadTextFile);
-  ipcMain.on(IPC.cacheImage, onCacheImage)
+  ipcMain.on(IPC.cacheImage, onCacheImage);
+  ipcMain.handle(IPC.getCacheSize, onGetCacheSize);
 }
 
 export function releaseIpcEvents() {

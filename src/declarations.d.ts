@@ -3,6 +3,7 @@ import AppStorageState from "./common/AppStorageState";
 import Backup from "./common/Backup";
 import RedditSubscriptionResponse from "./common/RedditSubscriptionResponse";
 import TumblrFollowingResponse from "./common/TumblrFollowingResponse";
+import { Config } from "./common/Config";
 
 // Put all your custom type information for 3rd party modules here
 declare module "*.svg" {
@@ -214,7 +215,8 @@ declare global {
       clearBrowserCaches: () => void;
       getFileSize: (path: string) => Promise<number>;
       readTextFile: (path: string) => Promise<string>;
-      cacheImage: (config: Config, url: string, source: string) => void
+      cacheImage: (config: Config, url: string, source: string) => void;
+      getCacheSize: (config: Config) => Promise<number>;
     };
   }
 }

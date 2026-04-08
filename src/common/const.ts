@@ -269,7 +269,8 @@ const IPC = {
   clearBrowserCaches: "ipc.clearBrowserCaches",
   getFileSize: "ipc.getFileSize",
   readTextFile: "ipc.readTextFile",
-  cacheImage: "ipc.cacheImage"
+  cacheImage: "ipc.cacheImage",
+  getCacheSize: "ipc.getCacheSize",
 };
 
 const MO = {

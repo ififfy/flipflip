@@ -226,5 +226,8 @@ contextBridge.exposeInMainWorld("ipc", {
   clearBrowserCaches: () => ipcRenderer.send(IPC.clearBrowserCaches),
   getFileSize: (path: string) => ipcRenderer.invoke(IPC.getFileSize, path),
   readTextFile: (path: string) => ipcRenderer.invoke(IPC.readTextFile, path),
-  cacheImage: (config: Config, url: string, source: string) => ipcRenderer.send(IPC.cacheImage, config, url, source)
+  cacheImage: (config: Config, url: string, source: string) =>
+    ipcRenderer.send(IPC.cacheImage, config, url, source),
+  getCacheSize: (config: Config) =>
+    ipcRenderer.invoke(IPC.getCacheSize, config),
 });
